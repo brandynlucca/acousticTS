@@ -78,7 +78,7 @@ ya <- function(l,n){return((ja(l,n) * cos(l*pi) - ja(-l,n)) / sin(l*pi))}
 
 #Import scipy.special module from Python for Bessel functions (referenced from AMOS)
 #Spherical Bessel function of first kind
-jl <- function(l,n,sign){ifelse(sign==1,ja(l+0.5,n) * sqrt(pi/2/n),spclja(l-0.5,n) * sqrt(pi/2/n))}
+jl <- function(l,n,sign){ifelse(sign==1,ja(l+0.5,n) * sqrt(pi/2/n),ja(l-0.5,n) * sqrt(pi/2/n))}
 #Spherical Bessel function of second kind
 yl <- function(l,n){ya(l+0.5,n) * sqrt(pi/2/n)}
 

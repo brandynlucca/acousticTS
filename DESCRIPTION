@@ -5,7 +5,6 @@ Authors@R: person("First", "Last", email = "first.last@example.com", role = c("a
 Description: What the package does (one paragraph).
 Depends: R (>= 3.4.3)
 Imports:
-	reticulate (>= 1.7),
 	ggplot2 (>= 3.1.0)
 License: What license is it under?
 Encoding: UTF-8
