@@ -234,7 +234,6 @@ sphere.cw <- function(frequency,c,rho,material="Tungsten carbide",diameter=38.1,
 #' This function is a wrapper around TS_calculate(...) that parametrizes the remainder of the model, while also doing 
 #' simple calculations that do not need to be looped. This function provides TS estimates along a frequency spectrum.
 #' 
-#' @param frequency The acoustic frequency (Hz) 
 #' @param c The ambient seawater sound speed (m/s). 
 #' @param rho The ambient seawater density (kg/m^3).
 #' @param material The material of the calibration sphere (tungsten carbide, aluminum, stainless steel, copper)
@@ -253,7 +252,7 @@ sphere.cw <- function(frequency,c,rho,material="Tungsten carbide",diameter=38.1,
 #' #' @return 
 #' Returns the TS-frequency spectrum of an elastic sphere.
 
-sphere.spec <- function(frequency,c,rho,material="Tungsten carbide",diameter,fs,fe,fi){
+sphere.spec <- function(c,rho,material="Tungsten carbide",diameter,fs,fe,fi){
   freq_spec <- seq(from=fs, to=fe, by=fi) #frequency spectrum
   sphere_mat <- sphere_param(material) #call sphere material properties
   a <- diameter*1e-3/2 #calculate radius; convert from diameter to radius; m
