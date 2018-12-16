@@ -2,7 +2,7 @@
 
 export(TS_calculate)
 export(jd)
-export(jl1)
+export(jl)
 export(sphere.cw)
 export(sphere.spec)
 export(sphere.spec_plot)
