@@ -1,4 +1,5 @@
 library(reticulate) #rPython crossover
+spcl <- import("scipy.special")
 
 # Theoretical TS for elastic spheres
 # All formulas for calculation of TS derived from: MacLennan D.N. (1981) The Theory of Solid Spheres as Sonar
@@ -31,11 +32,12 @@ library(reticulate) #rPython crossover
 #' @export
 
 #Import scipy.special module from Python for Bessel functions (referenced from AMOS)
-spcl <- import("scipy.special")
 #Spherical Bessel function of first kind
-jl <- function(l,n,sign){ifelse(sign==1,spcl$jv(l+0.5,n) * sqrt(pi/2/n),spcl$jv(l-0.5,n) * sqrt(pi/2/n))}
+jl <- function(l,n,sign){
+  ifelse(sign==1,spcl$jv(l+0.5,n) * sqrt(pi/2/n),spcl$jv(l-0.5,n) * sqrt(pi/2/n))}
 #Spherical Bessel function of second kind
-yl <- function(l,n){spcl$yv(l+0.5,n) * sqrt(pi/2/n)}
+yl <- function(l,n){
+  spcl$yv(l+0.5,n) * sqrt(pi/2/n)}
 
 #' Calculate derivatives of spherical Bessel functions.
 #'
