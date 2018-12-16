@@ -1,5 +1,5 @@
 # acousticTS
-##Calibration sphere target strength model
+## Calibration sphere target strength model
 Current version: v0.2 [16 December 2018]
 
 ## **To Do**
