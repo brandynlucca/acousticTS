@@ -1,9 +1,54 @@
-library(reticulate) #rPython crossover
-spcl <- import("scipy.special")
-
 # Theoretical TS for elastic spheres
 # All formulas for calculation of TS derived from: MacLennan D.N. (1981) The Theory of Solid Spheres as Sonar
 # Calibration Targets. Scottish Fisheries Research No. 22, Department of Agriculture and Fisheries for Scotland.
+
+#' Calculate Bessel function of the first kind.
+#' 
+#' @param l An integer or fractional order
+#' @param n A complex or real argument
+#' @usage 
+#' ja(l,n)
+#' #examples
+#' l <- 1.5
+#' n <- 1
+#' ja(l,n)
+#' [1] 0.2402978
+#' @return 
+#' Calculates the Bessel function of the first kind (J_a). Functions are referenced from Amost D.E., "AMOS, A Portable Package 
+#' for Bessel Functions of a Complex Argument and Nonnegative Order", http://netlib.org/amos
+#' @export
+
+#Bessel function of first or second kind calculation
+ja <- function(l,n){
+    f <- 0; t <- 0; s <- 0; i <- 0 #pre-allocate terms for while loop
+
+    while(f == 0){
+      s <- s + (-1)^i * (n/2)^(l+2*i) / (factorial(i) * gamma(i+l+1))
+      
+      if(abs(s - t) < 1e-30){f <- 1} #thresholding term
+      t <- s; i <- i + 1 #iterate forward
+    }
+  return(s)
+}
+
+#' Calculate Bessel function of the second kind.
+#' 
+#' @param l An integer or fractional order
+#' @param n A complex or real argument
+#' @usage 
+#' ja(l,n)
+#' #examples
+#' l <- 1.5
+#' n <- 1
+#' ya(l,n)
+#' [1] -1.102496
+#' @return 
+#' Calculates the Bessel function of the second kind (Y_a). Functions are referenced from Amost D.E., "AMOS, A Portable Package 
+#' for Bessel Functions of a Complex Argument and Nonnegative Order", http://netlib.org/amos
+#' @export
+
+#Bessel function of first or second kind calculation
+ya <- function(l,n){return((ja(l,n) * cos(l*pi) - ja(-l,n)) / sin(l*pi))}
 
 #' Calculate spherical Bessel functions.
 #'
@@ -33,10 +78,9 @@ spcl <- import("scipy.special")
 
 #Import scipy.special module from Python for Bessel functions (referenced from AMOS)
 #Spherical Bessel function of first kind
-jl <- function(l,n,sign){ifelse(sign==1,spcl$jv(l+0.5,n) * sqrt(pi/2/n),spcl$jv(l-0.5,n) * sqrt(pi/2/n))}
+jl <- function(l,n,sign){ifelse(sign==1,ja(l+0.5,n) * sqrt(pi/2/n),spclja(l-0.5,n) * sqrt(pi/2/n))}
 #Spherical Bessel function of second kind
-yl <- function(l,n){
-  spcl$yv(l+0.5,n) * sqrt(pi/2/n)}
+yl <- function(l,n){ya(l+0.5,n) * sqrt(pi/2/n)}
 
 #' Calculate derivatives of spherical Bessel functions.
 #'
@@ -294,6 +338,7 @@ sphere.spec <- function(c,rho,material="Tungsten carbide",diameter,fs,fe,fi){
 #' @return 
 #' Generates TS-frequency spectrum for an elastic sphere. 
 #' @export
+#' @import ggplot2
 
 sphere.spec_plot <- function(df){
   require(ggplot2)
