@@ -8,7 +8,7 @@ There are three target strength model functions for calibration spheres: 1) sphe
 
 There are a few support and wrapper functions as well. The sphere.spec_plot(...) function takes the output of sphere.spec(...) and plots the TS-frequency spectrum. Another is sphere_param(...) which allows the user to toggle through preset material property measurements (i.e., transversal/longitudinal sound speeds, density) of different types of calibration spheres (i.e., tungsten carbide, copper, stainless steel, and aluminum). 
 
-###Citations
+### Citations
 
 Amos D.E., "AMOS, A portable package for Bessel functions of a complex argument and nonnegative order", http://netlib.org/amos. 
 
