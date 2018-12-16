@@ -33,7 +33,14 @@ spcl <- import("scipy.special")
 
 #Import scipy.special module from Python for Bessel functions (referenced from AMOS)
 #Spherical Bessel function of first kind
-jl <- function(l,n,sign){
+jl1 <- function(l,n){
+  if(n == -1){
+    return(cos(l)/l)
+  }else if(n == -2){
+    return(-cos(n)/n^2 - sin(n)/n)
+  }else{
+    return(besselJ(l+0.5,n) * sqrt(pi/(2*n)))
+  }
   ifelse(sign==1,spcl$jv(l+0.5,n) * sqrt(pi/2/n),spcl$jv(l-0.5,n) * sqrt(pi/2/n))}
 #Spherical Bessel function of second kind
 yl <- function(l,n){
