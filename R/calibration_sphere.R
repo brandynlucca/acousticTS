@@ -28,6 +28,7 @@ library(reticulate) #rPython crossover
 #' @return 
 #' jl(l,n,sign) calculates the spherical Bessel function of the first kind (zbesj AMOS routine, Iv).
 #' yl(l,n) calculates the spherical Bessel function of the second kind (zbesy AMOS routine, Yv)
+#' @export
 
 #Import scipy.special module from Python for Bessel functions (referenced from AMOS)
 spcl <- import("scipy.special")
@@ -64,6 +65,7 @@ yl <- function(l,n){spcl$yv(l+0.5,n) * sqrt(pi/2/n)}
 #' jd(l,n) calculates the first derivative of the spherical Bessel function of the first kind (zbesj AMOS routine, Iv).
 #' yd(l,n) calculates the first derivative of the spherical Bessel function of the second kind (zbesy AMOS routine, Yv).
 #' jdd(l,n) calculates the second derivative of the spherical Bessel function of the first kind (zbesj, AMOS routine, Iv).
+#' @export
 
 #First derivatives of spherical Bessel functions
 jd <- function(l,n){jl(l,n,-1) - (l+1) / n * jl(l,n,1)} #first kind
@@ -82,9 +84,9 @@ jdd <- function(l,n){1 / (n^2) * ((l+1)*(l+2) - n^2) * jl(l,n,1) - 2 / n * jl(l,
 #' @param material Accepts one of four character arguments: Tungsten carbide (default), Copper, Stainless steel, and Aluminum.
 #' @usage 
 #' sphere_param(material="Tungsten carbide")
-#' @return 
-#' Returns a 1x4 dataframe which includes the material (Material, factor), longitudinal sound speed (c1, numeric, m/s), transversal 
+#' @return Returns a 1x4 dataframe which includes the material (Material, factor), longitudinal sound speed (c1, numeric, m/s), transversal 
 #' sound speed (c2, numeric, m/s), and density (rho1, numeric, kg/m^3).
+#' @export
 
 #Sphere parameters function
 sphere_param <- function(material="Tungsten carbide"){
@@ -107,8 +109,8 @@ sphere_param <- function(material="Tungsten carbide"){
 #' @param beta The relationship with alpha subtracted from between the seawater-to-sphere soundspeed 
 #' and density ratios (Equation 6e).
 #' @param a The radius of the target sphere (mm). 
-#' @return 
-#' The theoretical acoustic target strength (TS, dB re: 1 m^2) of an elastic sphere. 
+#' @return The theoretical acoustic target strength (TS, dB re: 1 m^2) of an elastic sphere. 
+#' @export
 
 #Calculate theoretical TS at a single frequency for a calibration sphere
 TS_calculate <- function(q,q1,q2,alpha,beta,a){
@@ -158,8 +160,8 @@ TS_calculate <- function(q,q1,q2,alpha,beta,a){
 #' diameter <- 38.1
 #' sphere.ts(frequency,c,rho,material,diameter)
 #' [1] -39.52
-#' #' @return 
-#' The theoretical acoustic target strength (TS, dB re: 1 m^2) of an elastic sphere at a given frequency. 
+#' @return The theoretical acoustic target strength (TS, dB re: 1 m^2) of an elastic sphere at a given frequency. 
+#' @export
 
 #Calculate theoretical TS frequency spectrum for a calibration sphere
 sphere.ts <- function(frequency,c,rho,material="Tungsten carbide",diameter=38.1){
@@ -197,8 +199,9 @@ sphere.ts <- function(frequency,c,rho,material="Tungsten carbide",diameter=38.1)
 #' pulse_length <- 256
 #' sphere.cw(frequency,c,rho,material,diameter,pulse_length)
 #' [1] -39.549
-#' #' @return 
-#' The theoretical acoustic target strength (TS, dB re: 1 m^2) of an elastic sphere at a given frequency and pulse length. 
+#' @return The theoretical acoustic target strength (TS, dB re: 1 m^2) of 
+#'    an elastic sphere at a given frequency and pulse length. 
+#' @export
 
 #Calculate theoretical TS frequency spectrum for a calibration sphere
 sphere.cw <- function(frequency,c,rho,material="Tungsten carbide",diameter=38.1,pulse_length){
@@ -249,8 +252,8 @@ sphere.cw <- function(frequency,c,rho,material="Tungsten carbide",diameter=38.1,
 #' diameter <- 38.1
 #' 
 #' sphere.spec(frequency,c,rho,material,diameter,fs=18e3,fe=230e3,fi=1e3)
-#' #' @return 
-#' Returns the TS-frequency spectrum of an elastic sphere.
+#' @return Returns the TS-frequency spectrum of an elastic sphere.
+#' @export
 
 sphere.spec <- function(c,rho,material="Tungsten carbide",diameter,fs,fe,fi){
   freq_spec <- seq(from=fs, to=fe, by=fi) #frequency spectrum
@@ -287,8 +290,9 @@ sphere.spec <- function(c,rho,material="Tungsten carbide",diameter,fs,fe,fi){
 #' ts.df <- sphere.spec(frequency=120e3,c=1500,rho=1030,material="Tungsten carbide",diameter=38.1,fs=18e3,fe=230e3,fi=1e3)
 #' sphere.spec_plot(ts.df)
 #'  
-#' #' @return 
+#' @return 
 #' Generates TS-frequency spectrum for an elastic sphere. 
+#' @export
 
 sphere.spec_plot <- function(df){
   require(ggplot2)

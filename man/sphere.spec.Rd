@@ -4,12 +4,9 @@
 \alias{sphere.spec}
 \title{Calculate the frequency spectrum of the acoustic target strength (TS, dB re: 1 m^2) of an elastic sphere .}
 \usage{
-sphere.spec(frequency, c, rho, material = "Tungsten carbide", diameter,
-  fs, fe, fi)
+sphere.spec(c, rho, material = "Tungsten carbide", diameter, fs, fe, fi)
 }
 \arguments{
-\item{frequency}{The acoustic frequency (Hz)}
-
 \item{c}{The ambient seawater sound speed (m/s).}
 
 \item{rho}{The ambient seawater density (kg/m^3).}
@@ -24,6 +21,9 @@ sphere.spec(frequency, c, rho, material = "Tungsten carbide", diameter,
 
 \item{fi}{Frequency interval (Hz).}
 }
+\value{
+Returns the TS-frequency spectrum of an elastic sphere.
+}
 \description{
 This function is a wrapper around TS_calculate(...) that parametrizes the remainder of the model, while also doing 
 simple calculations that do not need to be looped. This function provides TS estimates along a frequency spectrum.
@@ -36,6 +36,4 @@ material <- "Tungsten carbide"
 diameter <- 38.1
 
 sphere.spec(frequency,c,rho,material,diameter,fs=18e3,fe=230e3,fi=1e3)
-#' @return 
-Returns the TS-frequency spectrum of an elastic sphere.
 }

@@ -18,6 +18,9 @@ sphere.ts(frequency, c, rho, material = "Tungsten carbide",
 
 \item{diameter}{The diameter of the sphere (mm).}
 }
+\value{
+The theoretical acoustic target strength (TS, dB re: 1 m^2) of an elastic sphere at a given frequency.
+}
 \description{
 This function is a wrapper around TS_calculate(...) that parametrizes the remainder of the model, while also doing 
 simple calculations that do not need to be looped. This function provides a TS estimate at a given frequency.
@@ -30,6 +33,4 @@ material <- "Tungsten carbide"
 diameter <- 38.1
 sphere.ts(frequency,c,rho,material,diameter)
 [1] -39.52
-#' @return 
-The theoretical acoustic target strength (TS, dB re: 1 m^2) of an elastic sphere at a given frequency. 
 }
