@@ -36,8 +36,8 @@ ja <- function(l,n){
 #' @param l An integer or fractional order
 #' @param n A complex or real argument
 #' @usage 
-#' ja(l,n)
-#' #examples
+#' ya(l,n)
+#' @examples
 #' l <- 1.5
 #' n <- 1
 #' ya(l,n)

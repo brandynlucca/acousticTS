@@ -4,12 +4,7 @@
 \alias{ya}
 \title{Calculate Bessel function of the second kind.}
 \usage{
-ja(l,n)
-#examples
-l <- 1.5
-n <- 1
 ya(l,n)
-[1] -1.102496
 }
 \arguments{
 \item{l}{An integer or fractional order}
@@ -22,4 +17,10 @@ for Bessel Functions of a Complex Argument and Nonnegative Order", http://netlib
 }
 \description{
 Calculate Bessel function of the second kind.
+}
+\examples{
+l <- 1.5
+n <- 1
+ya(l,n)
+[1] -1.102496
 }
