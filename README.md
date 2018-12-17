@@ -19,6 +19,6 @@ MacLennan D. N. (1981). The theory of solid spheres as sonar calibration targets
 ## **To Do**
 - [X] Fix required package imports 
 - [ ] Create full README.md file to provide overview and walkthrough of package
-- [ ] Flesh out documentation for all functions; separate out each of the Bessel functions and their respective derivatives
+- [X] Flesh out documentation for all functions; separate out each of the Bessel functions and their respective derivatives
 - [X] Replace Python-sourced Bessel functions to cut down on load-time 
 - [ ] Add sound speed, density, and absorption coefficient calculator
