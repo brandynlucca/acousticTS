@@ -8,7 +8,7 @@
 #' @param n A complex or real argument
 #' @usage 
 #' ja(l,n)
-#' #examples
+#' @examples
 #' l <- 1.5
 #' n <- 1
 #' ja(l,n)

@@ -5,11 +5,6 @@
 \title{Calculate Bessel function of the first kind.}
 \usage{
 ja(l,n)
-#examples
-l <- 1.5
-n <- 1
-ja(l,n)
-[1] 0.2402978
 }
 \arguments{
 \item{l}{An integer or fractional order}
@@ -22,4 +17,10 @@ for Bessel Functions of a Complex Argument and Nonnegative Order", http://netlib
 }
 \description{
 Calculate Bessel function of the first kind.
+}
+\examples{
+l <- 1.5
+n <- 1
+ja(l,n)
+[1] 0.2402978
 }
