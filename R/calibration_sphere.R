@@ -304,7 +304,7 @@ sphere.ts <- function(frequency,c,rho,material="Tungsten carbide",diameter=38.1)
 
 #Calculate theoretical TS frequency spectrum for a calibration sphere
 sphere.cw <- function(frequency,c,rho,material="Tungsten carbide",diameter=38.1,pulse_length){
-  bandwidth <- 1/pulse_length/1e6 #BW = 1/pulse length, pulse length here is converted to seconds
+  bandwidth <- 1/(pulse_length/1e6) #BW = 1/pulse length, pulse length here is converted to seconds
   fs <- frequency - bandwidth/2 #frequency start
   fe <- frequency + bandwidth/2 #frequency end
   cw_spec <- seq(fs,fe,length.out=100) #calculate frequency spectrum with 100 steps
