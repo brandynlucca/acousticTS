@@ -18,7 +18,6 @@ for spherical Bessel function of first kind.}
 yl(l,n) calculates the spherical Bessel function of the second kind (zbesy AMOS routine, Yv)
 }
 \description{
-#' @description
 This function calculates the spherical Bessel functions of the second kind. Referenced from Amost D.E., 
 "AMOS, A Portable Package for Bessel Functions of a Complex Argument and Nonnegative Order", http://netlib.org/amos
 }

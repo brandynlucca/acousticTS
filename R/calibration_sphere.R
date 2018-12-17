@@ -76,7 +76,7 @@ jl <- function(l,n,sign){ifelse(sign==1,ja(l+0.5,n) * sqrt(pi/2/n),ja(l-0.5,n) *
 
 #' Calculate spherical Bessel function of the second kind.
 #' 
-#' #' @description
+#' @description
 #' This function calculates the spherical Bessel functions of the second kind. Referenced from Amost D.E., 
 #' "AMOS, A Portable Package for Bessel Functions of a Complex Argument and Nonnegative Order", http://netlib.org/amos
 #' 
