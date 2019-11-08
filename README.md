@@ -1,6 +1,6 @@
 # acousticTS
 ### Calibration sphere target strength model
-Current version: v0.2 [17 December 2018]
+Current version: v0.7 [08 November 2019]
 
 Comprises multiple Bessel functions: Bessel functions of the first [ja(...)] and second [ya(...)] kind, spherical Bessel functions of the first [jl(...)] and second [yl(...)] kind, first derivative of the spherical Bessel functions of the first [jd(...)] and second [yd(...)] kind, and the second derivative of the spherical Bessel function of the first kind [jdd(...)]. 
 
