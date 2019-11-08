@@ -23,7 +23,7 @@ and Nonnegative Order", http://netlib.org/amos
 }
 \examples{
 l <- 1
-n < 1 
+n < 1
 yd(l,n)
 [1] 2.223244
 }

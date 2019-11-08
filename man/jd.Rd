@@ -23,7 +23,7 @@ and Nonnegative Order", http://netlib.org/amos
 }
 \examples{
 l <- 1
-n < 1 
+n < 1
 jd(l,n)
 [1] 0.2391336
 }

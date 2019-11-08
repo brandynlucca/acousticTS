@@ -21,11 +21,11 @@ sphere.cw(frequency, c, rho, material = "Tungsten carbide",
 \item{pulse_length}{The pulse length (microseconds) of a signal.}
 }
 \value{
-The theoretical acoustic target strength (TS, dB re: 1 m^2) of 
+The theoretical acoustic target strength (TS, dB re: 1 m^2) of
    an elastic sphere at a given frequency and pulse length.
 }
 \description{
-This function is a wrapper around TS_calculate(...) that parametrizes the remainder of the model, while also doing 
+This function is a wrapper around TS_calculate(...) that parametrizes the remainder of the model, while also doing
 simple calculations that do not need to be looped. This function provides a mean TS which includes a FM sweep around
 a center frequency. This is calculated by adding and subtracting half an estimated bandwidth (1/pulse length) and taking
 the mean (calculated in the linear domain).

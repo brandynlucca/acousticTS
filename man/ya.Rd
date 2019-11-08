@@ -12,7 +12,7 @@ ya(l,n)
 \item{n}{A complex or real argument}
 }
 \value{
-Calculates the Bessel function of the second kind (Y_a). Functions are referenced from Amost D.E., "AMOS, A Portable Package 
+Calculates the Bessel function of the second kind (Y_a). Functions are referenced from Amost D.E., "AMOS, A Portable Package
 for Bessel Functions of a Complex Argument and Nonnegative Order", http://netlib.org/amos
 }
 \description{

@@ -1,8 +1,8 @@
 Package: acousticTS
-Title: What the Package Does (one line, title case)
-Version: 0.2
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Title: Scattering models for calculating acoustic target strength.
+Version: 0.7
+Authors@R: person("B.M. Lucca", email = "brandyn.lucca@gmail.com", role = c("aut", "cre"))
+Description: This package provides several functions that allow for calculating theoretical target strength (TS) models for different types of scatterers, including calibration spheres, swimbladdered fish, and fluid-filled scatterers (e.g., shrimp and krill). 
 Depends: R (>= 3.4.3)
 License: What license is it under?
 Encoding: UTF-8

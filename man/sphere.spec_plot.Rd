@@ -18,5 +18,5 @@ This function generates a plot of the TS-frequency spectrum using ggplot2.
 \examples{
 ts.df <- sphere.spec(frequency=120e3,c=1500,rho=1030,material="Tungsten carbide",diameter=38.1,fs=18e3,fe=230e3,fi=1e3)
 sphere.spec_plot(ts.df)
- 
+
 }

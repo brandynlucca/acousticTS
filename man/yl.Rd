@@ -4,26 +4,23 @@
 \alias{yl}
 \title{Calculate spherical Bessel function of the second kind.}
 \usage{
-jl(l,n,sign)
+yl(l,n)
 }
 \arguments{
 \item{l}{An integer or fractional order}
 
 \item{n}{A complex or real argument}
-
-\item{sign}{Flag used to to determine whether to add or subtract 0.5 from the function's order (l); only used 
-for spherical Bessel function of first kind.}
 }
 \value{
 yl(l,n) calculates the spherical Bessel function of the second kind (zbesy AMOS routine, Yv)
 }
 \description{
-This function calculates the spherical Bessel functions of the second kind. Referenced from Amost D.E., 
+This function calculates the spherical Bessel functions of the second kind. Referenced from Amost D.E.,
 "AMOS, A Portable Package for Bessel Functions of a Complex Argument and Nonnegative Order", http://netlib.org/amos
 }
 \examples{
 l <- 1
-n < 1 
+n < 1
 yl(l,n)
 [1] -1.381773
 }

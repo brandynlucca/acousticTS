@@ -25,7 +25,7 @@ sphere.spec(c, rho, material = "Tungsten carbide", diameter, fs, fe, fi)
 Returns the TS-frequency spectrum of an elastic sphere.
 }
 \description{
-This function is a wrapper around TS_calculate(...) that parametrizes the remainder of the model, while also doing 
+This function is a wrapper around TS_calculate(...) that parametrizes the remainder of the model, while also doing
 simple calculations that do not need to be looped. This function provides TS estimates along a frequency spectrum.
 }
 \examples{

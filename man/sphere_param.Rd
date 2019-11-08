@@ -10,11 +10,11 @@ sphere_param(material="Tungsten carbide")
 \item{material}{Accepts one of four character arguments: Tungsten carbide (default), Copper, Stainless steel, and Aluminum.}
 }
 \value{
-Returns a 1x4 dataframe which includes the material (Material, factor), longitudinal sound speed (c1, numeric, m/s), transversal 
+Returns a 1x4 dataframe which includes the material (Material, factor), longitudinal sound speed (c1, numeric, m/s), transversal
 sound speed (c2, numeric, m/s), and density (rho1, numeric, kg/m^3).
 }
 \description{
 This function parses the acoustic material properties of four typical types of calibration spheres: tungsten carbide, copper,
-stainless steel, and aluminum. These material properties include the transerval and longitudinal sound speeds (m/s), as well as 
+stainless steel, and aluminum. These material properties include the transerval and longitudinal sound speeds (m/s), as well as
 the density (kg/m^3).
 }

@@ -15,7 +15,7 @@ TS_calculate(q, q1, q2, alpha, beta, a)
 
 \item{alpha}{The relationship between the seawater-to-sphere soundspeed and density ratios (Equation 6d).}
 
-\item{beta}{The relationship with alpha subtracted from between the seawater-to-sphere soundspeed 
+\item{beta}{The relationship with alpha subtracted from between the seawater-to-sphere soundspeed
 and density ratios (Equation 6e).}
 
 \item{a}{The radius of the target sphere (mm).}
@@ -24,6 +24,6 @@ and density ratios (Equation 6e).}
 The theoretical acoustic target strength (TS, dB re: 1 m^2) of an elastic sphere.
 }
 \description{
-This function calculates the acoustic target strength (TS, dB re: 1 m^2) of an elastic sphere. All equations are taken from 
+This function calculates the acoustic target strength (TS, dB re: 1 m^2) of an elastic sphere. All equations are taken from
 MacLennan (1981).
 }

@@ -12,8 +12,7 @@ ja(l,n)
 \item{n}{A complex or real argument}
 }
 \value{
-Calculates the Bessel function of the first kind (J_a). Functions are referenced from Amost D.E., "AMOS, A Portable Package 
-for Bessel Functions of a Complex Argument and Nonnegative Order", http://netlib.org/amos
+Calculates the Bessel function of the first kind (J_a).
 }
 \description{
 Calculate Bessel function of the first kind.
@@ -23,4 +22,7 @@ l <- 1.5
 n <- 1
 ja(l,n)
 [1] 0.2402978
+}
+\references{
+Amost D.E., "AMOS, A Portable Package for Bessel Functions of a Complex Argument and Nonnegative Order", http://netlib.org/amos
 }
