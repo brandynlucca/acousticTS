@@ -73,7 +73,22 @@ kcalc <- function(f,c){2*pi*f/c}
 #' @export
 
 #Create S4 class object to contain all animal metadata
-FFS <- setClass("FFS",slots=c(rpos="matrix", a="numeric", g="numeric", h="numeric", theta="numeric", shape="character", pc="numeric"))
+FFS <- setClass("FFS", slots=c(rpos="matrix", a="numeric", g="numeric", h="numeric", theta="numeric", shape="character", pc="numeric"))
+
+#' Calls in a *.csv file as a FFS object
+#' @param file A *.csv file formatted with the following columns: x, y, z, a [radius], g, h
+#' @usage
+#' FFS_shape(file)
+#' @return
+#' Calls in an FFS_shape from a file
+#' @export
+
+FFS_shape <- function(file){
+  animal <- read.csv(file, header=T) #Call in *.csv file; assumes headers are present
+  return(new("FFS", rpos=as.matrix(rbind(animal$x,animal$y,animal$z)),a=animal$a, g=animal$g[1],
+             h=animal$h[1],
+             theta=90,
+             shape="straight",pc=0.0))}
 
 #' Calculates the theoretical TS of a fluid-filled scatterer at a given frequency using the distorted Born wave approximation (DWBA) model.
 #'
@@ -101,15 +116,15 @@ SDWBA <- function(shape, c=1500, f, phi=0.0, tilt=pi/2){
   require(elliptic)
   k_1 <- cbind(cos(tilt), rep(0,length(tilt)), sin(tilt))
   k1 <- kcalc(f,c) * k_1
-  k2 <- vecnorm(k1) / animal@h
-  n <- length(animal@a)
+  k2 <- vecnorm(k1) / shape@h
+  n <- length(shape@a)
   f.bs <- 0 + 0i
 
   for(j in 1:(n-1)){
-    r1 <- c(animal@rpos[1,j], animal@rpos[2,j], animal@rpos[3,j])
-    r2 <- c(animal@rpos[1,j+1], animal@rpos[2,j+1], animal@rpos[3,j+1])
-    a1 <- animal@a[j]
-    a2 <- animal@a[j+1]
+    r1 <- c(shape@rpos[1,j], shape@rpos[2,j], shape@rpos[3,j])
+    r2 <- c(shape@rpos[1,j+1], shape@rpos[2,j+1], shape@rpos[3,j+1])
+    a1 <- shape@a[j]
+    a2 <- shape@a[j+1]
     alphatilt <- acos((k1%*%(r2-r1)) / (vecnorm(k1)*vecnorm(r2-r1)))
     betatilt <- abs(alphatilt - pi/2)
 
@@ -119,7 +134,7 @@ SDWBA <- function(shape, c=1500, f, phi=0.0, tilt=pi/2){
       rz <- s * (r2[3] - r1[3]) + r1[3]
       r <- c(rx, ry, rz)
       a <- s * (a2 - a1) + a1
-      gamgam <- 1/(animal@g*animal@h^2)+1/animal@g-2
+      gamgam <- 1/(shape@g*shape@h^2)+1/shape@g-2
 
       if(abs(abs(betatilt) - (pi/2)) < 1e-10){
         bessy <- k2 * a
@@ -127,10 +142,10 @@ SDWBA <- function(shape, c=1500, f, phi=0.0, tilt=pi/2){
         bessy <- ja(1,2*k2*a*cos(betatilt))/cos(betatilt)
       }
 
-      if(animal@shape == "straight"){
-        return(vecnorm(k1)/4*gamgam*a*exp(2i*k1%*%r/animal@h)*bessy*vecnorm(r2-r1))
+      if(shape@shape == "straight"){
+        return(vecnorm(k1)/4*gamgam*a*exp(2i*k1%*%r/shape@h)*bessy*vecnorm(r2-r1))
       }else{
-        pc <- animal@pc
+        pc <- shape@pc
         return(vecnorm(k1)*pc/4*gamgam*a*exp(1i*2.0*k2*pc)*exp(-1i*2.0*k2*pc*cos(betatilt))*bessy*(vecnorm(r2-r1)/pc))
       }
     }
@@ -192,3 +207,20 @@ DFCM <- function(shape=NULL, L=max(shape@rpos[,1]), a=max(shape@a), g=shape@g, h
   }
 }
 
+#' Resize animal to maintain shape based on length.
+#'
+#' @param shape Desired object/animal shape.
+#' @param length New length (m).
+#' @usage
+#' resize(shape, length)
+#' @return
+#' Rescales the shape of an animal based on a desired length.
+#' @export
+
+resize <- function(shape, length){
+  lscale <- length/max(shape@rpos[1,]) #grab current length of shape and calculate scale ratio
+  mscale <- cbind(c(1,0,0),c(0,1,0),c(0,0,1)) * lscale #calculate position matrix scale
+  shape@rpos <- t(t(shape@rpos) %*% mscale) #rescale length of shape
+  shape@a <- shape@a * lscale #scale radius based on same length ratio
+  return(shape)
+}
