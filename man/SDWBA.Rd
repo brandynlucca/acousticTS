@@ -4,14 +4,14 @@
 \alias{SDWBA}
 \title{Calculates the theoretical TS of a fluid-filled scatterer at a given frequency using the distorted Born wave approximation (DWBA) model.}
 \usage{
-SDWBA(shape, c, f, phi, tilt)
+SDWBA(shape, c, f, phi, theta)
 }
 \arguments{
 \item{shape}{Desired object/animal shape. Must be class "FFS".}
 
 \item{c}{Sound speed of surrounding medium (m/s). Default value is 1500 m/s.}
 
-\item{tilt}{Orientation of the target relative to the transmit source (\eqn{\theta}). Broadside incidence is considered 90 degrees, or pi/2.
+\item{theta}{Orientation of the target relative to the transmit source (\eqn{\theta}). Broadside incidence is considered 90 degrees, or pi/2.
 Default value is pi/2; input should be in radians.}
 
 \item{f}{Frequency (Hz).}

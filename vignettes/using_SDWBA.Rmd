@@ -47,8 +47,23 @@ The TS of an individual scatterer can be calculated using the `SDWBA(...)` (see:
 
 ```{r}
 #First we will create vectors for the x-, y-, and z-axis. 
+x <- seq(1,10,1)*1e-3; y <- rep(0,10); z <- c(seq(1,5,1),rev(seq(1,5,1)))*1e-4
+
+#Now we will assign a radius vector
+a <- z/2
+
+#Material properties
+g <- 1.036; h <- 1.0279
+
+#Fill out the remaining model parameters
+c <- 1500 #sound speed, m/s
+freq <- 120e3 #frequency, Hz
+
+#Now let's calculate the TS of this hypothetical shape at 120 kHz and ambient sound speed of 1500 m/s
+SDWBA(c=c, frequency=freq, x=x, y=y, z=z, a=a, g=g, h=h)
 
 ```
+
 
 2. Manually creating a FFS-object using `FFSgenerate(...)` (see: `?FFSgenerate`). 
 
@@ -59,5 +74,6 @@ The TS of an individual scatterer can be calculated using the `SDWBA(...)` (see:
 3. Calling in a *.csv formatted file to create a FFS-object using `FFSread(...)` (see: `?FFSread`).
 
 ```{r}
+
 
 ```

@@ -6,12 +6,12 @@
 #' @param f Frequency (Hz).
 #' @param phi Phase deviation (\eqn{\phi}), or phase variability. Accounts for complexities in animal shape and stochasticity of noise in scattering field.
 #' Default value is 0.0.
-#' @param tilt Orientation of the target relative to the transmit source (\eqn{\theta}). Broadside incidence is considered 90 degrees, or pi/2.
+#' @param theta Orientation of the target relative to the transmit source (\eqn{\theta}). Broadside incidence is considered 90 degrees, or pi/2.
 #' Default value is pi/2; input should be in radians.
 #' @param niterations Number of times/iterations the model will be ran.
 #' @param summary Will output the
 #' @usage
-#' SDWBA(shape, c, f, phi, tilt)
+#' SDWBA(shape, c, f, phi, theta)
 #' @details
 #' Calculates the theoretical TS of a fluid-filled scatterer at a given frequency using the distorted Born wave approximation (DWBA) model.
 #' @return
@@ -23,12 +23,13 @@
 #' @export
 
 SDWBA <- function(shape=NULL, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@rpos[3,],
-                  c=1500, frequency, phase=0.0, tilt=shape@theta, a=shape@a, h=shape@h, g=shape@g, pc=shape@pc,
+                  c=1500, frequency, phase=0.0, a=shape@a, h=shape@h, g=shape@g, pc=shape@pc,
+                  theta=ifelse(is.null(shape),pi/2,shape@theta),
                   curve=ifelse(is.null(shape),F,shape@curve),
                   ncyl=ifelse(is.null(shape),length(x),shape@ncyl)){
   require(elliptic)
   rpos <- as.matrix(rbind(x,y,z))
-  kt <- cbind(cos(tilt),rep(0,length(tilt)),sin(tilt))
+  kt <- cbind(cos(theta),rep(0,length(theta)),sin(theta))
   k1 <- kcalc(frequency,c)*kt; k2 <- vecnorm(k1) / h
   fbs <- 0 + 0i
 
