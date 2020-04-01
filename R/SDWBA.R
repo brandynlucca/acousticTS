@@ -93,7 +93,7 @@ SDWBA <- function(shape=NULL, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@rpos[3
 
 SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@rpos[3,],
                       c=1500, frequency, phase=0.0, a=shape@a, h=shape@h, g=shape@g,
-                      curve=F,
+                      curve=shape@curve,
                       pc=shape@pc,
                       theta=ifelse(is.null(shape),pi/2,shape@theta),
                       length=ifelse(is.null(shape),max(x),shape@L),

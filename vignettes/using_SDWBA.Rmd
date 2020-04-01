@@ -178,7 +178,7 @@ SDWBA.sim(target_resize, c=c, frequency=freq, phase=0.77, nrep=5, parallel=T, n.
 
 Note that `SDWBA.sim(...)` requires a FFS-class object input. Of course not all targets/animals comprise the same model parameters, or comprise a distribution of values such as various orientations, body curvatures, and material properties. We can also use `SDWBA.sim(...)` to draw from distributions for these other parameters:
 
-```{r warning=F}
+```{r warning=F, fig.width=6, fig.height=4}
 #Using our same curved shape above, let's play around with a few distributions
 n <- 5 #number of animal parameters we want to simulate
 lengths <- rnorm(n,mean=30,sd=5)*1e-3 #Normal distribution of lengths
@@ -201,9 +201,15 @@ ggplot(data=ts_sim, aes(x=TS)) + geom_histogram(fill="red", color="black") +
        y="Frequency")
 ```
 
-## Example: TS-Frequency spectrum comparison between curved and non-curved animal
+The output of `SDWBA.sim(...)` is by default a data.frame; however, if only a single aggregate statistic is needed, then `SDWBA.sim(..., aggregate=c("mean","median","maximum","minimum"))` can be used to generate just the mean, median, maximum, minimum, or any combination of those descriptive statistics. 
 
 ```{r}
+SDWBA.sim(target_resize, c=c, frequency=freq, phase=pd, g=g, h=h, length=lengths, theta=theta, parallel=T, aggregate=c("mean","median"))
+```
+
+## Example: TS-Frequency spectrum comparison between curved and non-curved animal
+
+```{r, fig.width=6, fig.height=4}
 #We will compare the TS-frequency spectra of the same target when it is curved and non-curved
 curve = c(T,F) #curved and non-curved
 freq <- seq(10,300,1)*1e3 #frequencies to simulate, Hz
@@ -211,13 +217,32 @@ theta <- pi/2 #broadside incidence
 ts_freq <- SDWBA.sim(target_resize, c=c, frequency=freq, curve=curve, theta=theta, parallel=T)
 
 #And we can plot!
-ggplot(data=ts_freq, aes(y=TS,x=frequency)) + geom_path(size=2) +
-  facet_wrap(~curve)
-                                                        
-                                                        
+ggplot(data=ts_freq, aes(y=TS,x=frequency*1e-3)) + geom_path(aes(color=curve), size=2) +
   theme_bw() + theme(text=element_text(size=16), axis.text=element_text(size=14, color="black"),
                      panel.grid=element_blank()) +
-  scale_color_manual(values=c("red","blue")) +
-  labs(x=expression(paste("Target strength (dB re: 1 ",m^2,")")),
-       y="Frequency")
+  scale_color_manual(values=c("red","blue"), labels=c("Straight","Curved")) +
+  labs(y=expression(paste("Target strength (dB re: 1 ",m^2,")")),
+       x="Frequency (kHz)", color="")
+```
+
+## Example: Effect of orientation and body curvature on TS.
+
+```{r, fig.width=6, fig.height=4}
+#Let's see how body curvature, pc, and orientation, theta, influences TS at 120 kHz
+freq <- 120e3
+theta <- seq(0,180,5) #degrees, 0 to 180 degrees at 5 degree resolution, or 0 to pi radians
+thetar <- degrad(theta, "deg")
+pc <- seq(2.0,8.0,0.25) #curvature
+ts_orfreq <- SDWBA.sim(target_resize, c=c, frequency=freq, theta=thetar, pc=pc, parallel=T)
+
+#Now let's plot
+require(viridis)
+ggplot(data=ts_orfreq, aes(x=theta, y=pc, fill=TS)) + geom_tile() + theme_bw() +
+  theme(text=element_text(size=16), axis.text=element_text(size=14, color="black"),
+        panel.grid=element_blank()) +
+  scale_fill_viridis(option="B") + 
+  coord_cartesian(expand=c(0,0)) +
+  labs(x="Orientation (radians)",
+       y=expression(paste("Radius of curvature (",rho[c],")")),
+       fill=expression(paste("TS (dB re: 1 ",m^2,")")))
 ```
