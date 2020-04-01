@@ -7,7 +7,7 @@
 #' converting one class of scatterer into another for seemless usage for model comparisons.
 #' @export
 
-FFS <- setClass("FFS",slots=c(rpos="matrix",a="numeric",g="numeric",h="numeric",theta="numeric",shape="character",pc="numeric",L="numeric",ncyl="numeric"))
+FFS <- setClass("FFS",slots=c(rpos="matrix",a="numeric",g="numeric",h="numeric",theta="numeric",curve="logical",pc="numeric",L="numeric",ncyl="numeric"))
 
 #' Calls in a *.csv file as a FFS object
 #'
@@ -23,7 +23,39 @@ FFSread <- function(file){
   return(new("FFS", rpos=as.matrix(rbind(animal$x,animal$y,animal$z)),a=animal$a,
              g=animal$g[1],h=animal$h[1],
              theta=ifelse(length(animal$theta) > 0, animal$theta, pi/2),
-             shape="straight",pc=0.0,L=max(animal$x),ncyl=length(animal$x)))}
+             curve=F,pc=0.0,L=max(animal$x),ncyl=length(animal$x)))}
+
+#' Manually generate a FFS object.
+#'
+#' @param x Vector containing x-axis body (m) shape data.
+#' @param y Vector containing y-axis body (m) shape data.
+#' @param z Vector containing z-axis body (m) shape data.
+#' @param a Vector containing radii (m).
+#' @param g Density contrast.
+#' @param h Soundspeed contrast
+#' @param theta Orientation of the target relative to the transmit source (\eqn{\theta}). Broadside incidence is considered 90 degrees, or pi/2.
+#' Default value is pi/2; input should be in radians.
+#' @usage
+#' #Manually parameterize shape
+#' x <- seq(1,10,1)*1e-3; y <- rep(0,10); z <- c(seq(1,5,1),rev(seq(1,5,1)))*1e-4
+#' a <- z/2
+#' g <- 1.036
+#' h <- 1.0279
+#' new_target <- FFSgenerate(x=x,y=y,z=z,a=a,g=g,h=h)
+#' #Let's model where sound speed (c) is 1500 m/s, frequency is 120 kHz, with no phase deviation
+#' c <- 1500
+#' freq <- 120e3
+#' SDWBA(shape=new_target, c=c, frequency=freq)
+#' [1] -114.0107
+#' @return
+#' Calls in an FFS-class object from a *.csv file
+#' @export
+#Manual shape creation
+##Inputs required:
+##x,y,z for position matrix, a for radius, g and h for material properties, theta for tilt angle (default = 0.0 deg)
+FFSgenerate <- function(x,y,z,a,g,h,theta=pi/2){
+  return(new("FFS", rpos=as.matrix(rbind(x,y,z)),a=a,g=g,h=h,theta=theta[1],curve=F,pc=0.0,L=max(x),ncyl=length(x)))}
+
 
 #' Swimbladdered fish (SBF) object/class.
 #'

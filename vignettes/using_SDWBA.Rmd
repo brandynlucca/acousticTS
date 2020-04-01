@@ -24,13 +24,13 @@ $$
 
 where $N$ is the number of cylinders comprising each animal shape, $i$ is an imaginary number, $\vec{k_1}$ is the acoustic wave number of seawater adjusted for animal orientation $\theta$ whereby broadside incidence is 90$^\circ$/270$^\circ$, $\vec{k_2}$ is the acoustic wave number inside each cylinder adjusted for orientation, $\vec{r_0}$ is the position matrix which represents the x, y, and z coordinates of the animal shape, $a_j$ is the radius for cylinder $j$, $M$ is equal to $\frac{1}{gh^2} + \frac{1}{g-2}$, $g$ is the density contrast ($\frac{\rho_{animal}}{\rho_{seawater}}$), $h$ is the soundspeed contrast ($\frac{c_{animal}}{c_{seawater}}$), $J_1$ is the Bessel function of the first kind of order 1, $\rho_c$ is the radius of curvature, and $\phi_j$ is the stochastic phase variability term for each cylinder which provides a multiplicative term drawn from a standard normal distribution: $N(0, \phi_j)$. The TS of the scatterer is then calculated via $TS = 20~log_{10}(f_{bs}(\theta))$. 
 
-## Package installation and setup
+## Package installation
 
 The `acousticTS` package can be found on GitHub at https://github.com/brandynlucca/acousticTS and was built using R version 3.6.1. The package is actively updated, so updates and new features can be tracked via this repository. R is an open-source, statistical programming-language commonly used for data analysis across many fields. Updated versions of R can be installed on Windows, MacOS, and UNIX platforms from https://r-project.org. This package only has two dependencies: `ggplot2` (data visualization) and `elliptic` (integration of complex numbers).
 
 To install and call the latest version of `acousticTS` from the development GitHub repository: 
 
-```{r message=F,warning=F}
+```{r message=F,warning=F,results="hide",eval=F}
 #install.packages("devtools") #if needed, uncomment this line and install devtools
 require(devtools) #call in devtools
 install_github("brandynlucca/acousticTS")
@@ -39,7 +39,9 @@ require(acousticTS)
 
 Full documentation is provided for all functions (e.g., `?jl` provides the help documentation for the built-in spherical Bessel function of the first kind). 
 
-## Model syntax
+## Model syntax and setup
 
-The TS of an individual scatterer can be calculated using the `SDWBA(...)` (see: `?SDWBA`) function which requires a `fluid-filled scatterer (FFS)` (see: `?FFS`) class object, which is a S4 object that comprises the target's position matrix ($r_0$), radius ($a$), material properties ($g$, $h$), orientation ($\theta$), body curvature ($\rho_c$), body shape ($straight$ or $curved$), body length ($L$), and number of cylinders ($N$). There are three ways to calculate
+The TS of an individual scatterer can be calculated using the `SDWBA(...)` (see: `?SDWBA`) function which requires a `fluid-filled scatterer (FFS)` (see: `?FFS`) class object, which is a S4 object that comprises the target's position matrix ($r_0$), radius ($a$), material properties ($g$, $h$), orientation ($\theta$), body curvature ($\rho_c$), body shape ($straight$ or $curved$), body length ($L$), and number of cylinders ($N$). A sample shape can be called via `data(mcgehee)` (see: `?mcgehee`), which calls in the shape file and other model parameters reported in McGehee *et al.* (1998) for *Euphausia superba*, which has been commonly used for TS modelling efforts for krill. There are three ways to calculate:
 
+1. Manually creating 
+2. Using BBBB

@@ -22,15 +22,15 @@
 #' Hankin, R.K.S. 2006. Introducing elliptic, an R package for elliptic and modular functions. Journal of Statistical Software, 15(7).
 #' @export
 
-SDWBA <- function(animal=NULL, x=animal@rpos[1,], y=animal@rpos[2,], z=animal@rpos[3,],
-                  c=1500, frequency, phase=0.0, tilt=animal@theta, a=animal@a, h=animal@h, g=animal@g, pc=animal@pc){
+SDWBA <- function(shape=NULL, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@rpos[3,],
+                  c=1500, frequency, phase=0.0, tilt=shape@theta, a=shape@a, h=shape@h, g=shape@g, pc=shape@pc){
   require(elliptic)
   rpos <- as.matrix(rbind(x,y,z))
   kt <- cbind(cos(tilt),rep(0,length(tilt)),sin(tilt))
   k1 <- kcalc(frequency,c)*kt; k2 <- vecnorm(k1) / h
   fbs <- 0 + 0i
 
-  for(j in 1:(animal@ncyl-1)){
+  for(j in 1:(shape@ncyl-1)){
     r1 <- rpos[,j]; r2 <- rpos[,j+1]
     a1 <- a[j]; a2 <- a[j+1]
     beta <- abs(acos((k1%*%(r2-r1))/(vecnorm(k1)*vecnorm(r2-r1))) - pi/2)
@@ -46,7 +46,7 @@ SDWBA <- function(animal=NULL, x=animal@rpos[1,], y=animal@rpos[2,], z=animal@rp
         bessel <- ja(1,2*k2*aint*cos(beta))/cos(beta)
       }
 
-      if(animal@shape == "straight"){
+      if(shape@curve == F){
         return(vecnorm(k1)/4*gamma*aint*exp(2i*k1%*%rint/h)*bessel*vecnorm(r2-r1))
       }else{
         return(vecnorm(k1)*pc/4*gamma*aint*exp(2i*k2*pc)*exp(-2i*k2*pc*cos(beta))*bessel*(vecnorm(r2-r1)/pc))
