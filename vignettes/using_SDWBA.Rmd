@@ -122,16 +122,6 @@ SDWBA(target_premade, c=c, frequency=freq, curve=T, pc=3.3)
 
 The `Shapely(...)` function can also be used to change the orientation angle (`Shapely(..., theta=angle)`) and resize both the $r_0$ matrix and $a$ vector based on a new length (`Shapely(..., length=new_length)`). The identical alternative is available by manually inputting a new orientation value into `SDWBA(...)`, but the shape manipulation requires `Shapely(...)`. For the purpose of convenience, the `degrad(...)` (see: `?degrad`) function is available for readily converting degrees to radians, and vice versa. 
 
-degrad <- function(x,d){
-  if(d == "deg"){
-    value <- x*pi/180.0
-  }else if(d == "rad"){
-    value <- x*180.0/pi
-  }
-  return(value)
-}
-
-
 ```{r}
 #First let's change the orientation of the object
 target_angle <- Shapely(target_curved, theta=pi)

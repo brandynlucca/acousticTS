@@ -80,6 +80,18 @@ resize <- function(shape, length){
   return(shape)
 }
 
+
+#' Manipulate object
+#'
+#' @param shape Desired object/animal shape.
+#' @param curve Curve (boolean, T/F).
+#' @param pc Radius of curvature (pc)
+#' @param theta Orientation
+#' @param length New Length (m)
+#' @usage
+#'
+#' @return
+#' Returns manipulated object.
 #' @export
 Shapely <- function(shape, curve=F, pc=0.0, theta=shape@theta, length=shape@L){
   if(curve == T){

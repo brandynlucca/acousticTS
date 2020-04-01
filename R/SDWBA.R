@@ -109,7 +109,7 @@ SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@r
   if(parallel==F){
     for(i in 1:nrow(simdf)){
       target_sim <- Shapely(shape,curve=simdf$curve[i],pc=simdf$pc[i],theta=simdf$theta[i],length=simdf$length[i])
-      simdf$TS[i] <- SDWBA(target_sim,c=c,frequency=frequency,phase=simdf$phase[i],g=simdf$g[i],h=simdf$h[i])
+      simdf$TS[i] <- SDWBA(target_sim,c=simdf$c[i],frequency=simdf$frequency[i],phase=simdf$phase[i],g=simdf$g[i],h=simdf$h[i])
     }
   }else if(parallel==T){
     require(foreach)
