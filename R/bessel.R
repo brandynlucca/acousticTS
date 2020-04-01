@@ -150,7 +150,11 @@ yl <- function(l,n){ya(l+0.5,n) * sqrt(pi/2/n)}
 #' @return
 #' jd(l,n) calculates the first derivative of the spherical Bessel function of the first kind (zbesj AMOS routine, Iv).
 #' @export
+#'
+#First derivatives of spherical Bessel functions
+jsd <- function(l,n){jl(l,n,-1) - (l+1) / n * jl(l,n,1)} #first kind
 
+#' @export
 jd <- function(l,n){
   s <- ja(l-1,n)-(l/n)*ja(l,n)
   return(s)
@@ -166,9 +170,6 @@ yd <- function(l,n){
   s <- ya(l-1,n)-(l/n)*ya(l,n)
   return(ifelse(sign<1,(-1^l)*s,s))
 }
-
-#First derivatives of spherical Bessel functions
-jsd <- function(l,n){jl(l,n,-1) - (l+1) / n * jl(l,n,1)} #first kind
 
 #' Calculate the first derivative of the spherical Bessel function of the second kind.
 #'
@@ -207,15 +208,15 @@ ysd <- function(l,n){l / n * yl(l,n) - yl(l+1,n)} #second kind
 #' @param l An integer or fractional order
 #' @param n A complex or real argument
 #' @usage
-#' jdd(l,n)
+#' jsdd(l,n)
 #' @examples
 #' l <- 1
 #' n < 1
-#' jdd(l,n)
+#' jsdd(l,n)
 #' [1] -0.1770986
 #' @return
-#' jdd(l,n) calculates the second derivative of the spherical Bessel function of the first kind (zbesj, AMOS routine, Iv).
+#' jsdd(l,n) calculates the second derivative of the spherical Bessel function of the first kind (zbesj, AMOS routine, Iv).
 #' @export
 
 #Second derivative of spherical Bessel function of first kind
-jsd <- function(l,n){1 / (n^2) * ((l+1)*(l+2) - n^2) * jl(l,n,1) - 2 / n * jl(l,n,-1)}
+jsdd <- function(l,n){1 / (n^2) * ((l+1)*(l+2) - n^2) * jl(l,n,1) - 2 / n * jl(l,n,-1)}
