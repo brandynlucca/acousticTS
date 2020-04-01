@@ -41,5 +41,5 @@ Full documentation is provided for all functions (e.g., `?jl` provides the help 
 
 ## Model syntax
 
-The TS of an individual scatterer can be calculated using the `SDWBA(...)` (see: `?SDWBA`) function which requires a `fluid-filled scatterer (FFS)` (see: `?FFS`) class object, which is a S4 object that comprises the target's position matrix ($r_0$), radius ($a$), material properties ($g$, $h$), orientation ($\theta$), body curvature ($\rho_c$), body shape ($straight$ or $curved$), body length ($L$), and number of cylinders ($N$). There are three ways to calculate 
+The TS of an individual scatterer can be calculated using the `SDWBA(...)` (see: `?SDWBA`) function which requires a `fluid-filled scatterer (FFS)` (see: `?FFS`) class object, which is a S4 object that comprises the target's position matrix ($r_0$), radius ($a$), material properties ($g$, $h$), orientation ($\theta$), body curvature ($\rho_c$), body shape ($straight$ or $curved$), body length ($L$), and number of cylinders ($N$). There are three ways to calculate
 
