@@ -231,7 +231,8 @@ ggplot(data=ts_freq, aes(y=TS,x=frequency*1e-3)) + geom_path(aes(color=curve), s
 #Let's see how body curvature, pc, and orientation, theta, influences TS at 120 kHz
 freq <- 120e3
 theta <- seq(0,180,5) #degrees, 0 to 180 degrees at 5 degree resolution, or 0 to pi radians
-thetar <- degrad(theta, "deg")
+thetar <- degrad(theta, "deg") #convert to radians
+curve = T #set animal to be curved
 pc <- seq(2.0,8.0,0.25) #curvature
 ts_orfreq <- SDWBA.sim(target_resize, c=c, frequency=freq, theta=thetar, pc=pc, parallel=T)
 

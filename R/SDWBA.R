@@ -95,8 +95,8 @@ SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@r
                       c=1500, frequency, phase=0.0, a=shape@a, h=shape@h, g=shape@g,
                       curve=shape@curve,
                       pc=shape@pc,
-                      theta=ifelse(is.null(shape),pi/2,shape@theta),
-                      length=ifelse(is.null(shape),max(x),shape@L),
+                      theta=shape@theta,
+                      length=shape@L,
                       nrep=NULL, aggregate=NULL, parallel=F, n.cores=NULL){
   if(!is.null(nrep)){
     repseq <- seq(1,nrep,1)
