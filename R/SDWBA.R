@@ -24,9 +24,11 @@
 
 SDWBA <- function(shape=NULL, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@rpos[3,],
                   c=1500, frequency, phase=0.0, a=shape@a, h=shape@h, g=shape@g,
-                  pc=ifelse(curve == T, ifelse(is.null(shape),3.0,shape@pc),0.0),
-                  theta=ifelse(is.null(shape),pi/2,shape@theta),
                   curve=ifelse(is.null(shape),F,shape@curve),
+                  pc=ifelse(is.null(shape),
+                            ifelse(curve==T, 3.3, NA),
+                            ifelse(curve==T, shape@pc, NA)),
+                  theta=ifelse(is.null(shape),pi/2,shape@theta),
                   ncyl=ifelse(is.null(shape),length(x),shape@ncyl)){
   require(elliptic)
   rpos <- as.matrix(rbind(x,y,z))
@@ -91,9 +93,9 @@ SDWBA <- function(shape=NULL, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@rpos[3
 
 SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@rpos[3,],
                       c=1500, frequency, phase=0.0, a=shape@a, h=shape@h, g=shape@g,
-                      pc=ifelse(curve == T, ifelse(is.null(shape),3.0,shape@pc),0.0),
+                      curve=F,
+                      pc=shape@pc,
                       theta=ifelse(is.null(shape),pi/2,shape@theta),
-                      curve=ifelse(is.null(shape),F,shape@curve),
                       length=ifelse(is.null(shape),max(x),shape@L),
                       nrep=NULL, aggregate=NULL, parallel=F, n.cores=NULL){
   if(!is.null(nrep)){
@@ -101,7 +103,8 @@ SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@r
   }else{
     repseq <- 1
   }
-  simdf <- expand.grid(iteration=repseq, c=c, frequency=frequency, g=g, h=h, pc=pc, theta=theta, curve=curve, phase=phase, length=length, TS=NA)
+
+  simdf <- expand.grid(iteration=repseq, c=c, frequency=frequency, g=g, h=h, theta=theta, pc=pc, curve=curve, phase=phase, length=length, TS=NA)
 
   if(parallel==F){
     for(i in 1:nrow(simdf)){

@@ -84,6 +84,8 @@ resize <- function(shape, length){
 Shapely <- function(shape, curve=F, pc=0.0, theta=shape@theta, length=shape@L){
   if(curve == T){
     shape@curve <- T; shape@pc <- ifelse(pc == 0.0, 3.0, pc)
+  }else if(curve == F & shape@curve == T){
+    shape@curve <- F
   }
   if(shape@theta != theta){
     shape@theta <- theta

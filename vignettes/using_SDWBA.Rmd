@@ -190,7 +190,7 @@ Note that `SDWBA.sim(...)` requires a FFS-class object input. Of course not all 
 
 ```{r warning=F}
 #Using our same curved shape above, let's play around with a few distributions
-n <- 10 #number of animal parameters we want to simulate
+n <- 5 #number of animal parameters we want to simulate
 lengths <- rnorm(n,mean=30,sd=5)*1e-3 #Normal distribution of lengths
 g <- rnorm(n,mean=target_resize@g,sd=1e-3) #Normal distribution for g
 h <- rnorm(n,mean=target_resize@h,sd=1e-3) #Normal distribution for h
@@ -207,6 +207,27 @@ require(ggplot2)
 ggplot(data=ts_sim, aes(x=TS)) + geom_histogram(fill="red", color="black") +
   theme_bw() + theme(text=element_text(size=16), axis.text=element_text(size=14, color="black"),
                      panel.grid=element_blank()) +
+  labs(x=expression(paste("Target strength (dB re: 1 ",m^2,")")),
+       y="Frequency")
+```
+
+## Example: TS-Frequency spectrum comparison between curved and non-curved animal
+
+```{r}
+#We will compare the TS-frequency spectra of the same target when it is curved and non-curved
+curve = c(T,F) #curved and non-curved
+freq <- seq(10,300,1)*1e3 #frequencies to simulate, Hz
+theta <- pi/2 #broadside incidence
+ts_freq <- SDWBA.sim(target_resize, c=c, frequency=freq, curve=curve, theta=theta, parallel=T)
+
+#And we can plot!
+ggplot(data=ts_freq, aes(y=TS,x=frequency)) + geom_path(size=2) +
+  facet_wrap(~curve)
+                                                        
+                                                        
+  theme_bw() + theme(text=element_text(size=16), axis.text=element_text(size=14, color="black"),
+                     panel.grid=element_blank()) +
+  scale_color_manual(values=c("red","blue")) +
   labs(x=expression(paste("Target strength (dB re: 1 ",m^2,")")),
        y="Frequency")
 ```
