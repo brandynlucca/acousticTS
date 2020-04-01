@@ -1,5 +1,5 @@
 # acousticTS
-### Calibration sphere target strength model
+### Suite of theoretical acoustic target strength scattering models
 Current version: v0.9.2 [01 April 2020]
 
 ### Citations
