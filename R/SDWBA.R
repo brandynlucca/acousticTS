@@ -65,7 +65,28 @@ SDWBA <- function(shape=NULL, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@rpos[3
   return(20*log10(abs(fbs)))
 }
 
-#Wrapper function that can simulate over distributions of values
+#' Wrapper function that can simulate over distributions of values
+#'
+#'
+#' @param shape Desired object/animal shape. Must be class "FFS".
+#' @param c Sound speed of surrounding medium (m/s). Default value is 1500 m/s.
+#' @param f Frequency (Hz).
+#' @param phi Phase deviation (\eqn{\phi}), or phase variability. Accounts for complexities in animal shape and stochasticity of noise in scattering field.
+#' Default value is 0.0.
+#' @param theta Orientation of the target relative to the transmit source (\eqn{\theta}). Broadside incidence is considered 90 degrees, or pi/2.
+#' Default value is pi/2; input should be in radians.
+#' @param nrep Number of times/iterations the model will be ran.
+#' @param aggregate Will output an aggregate statistic with the following options: "mean", "median", "maximum", and "minimum". Multiple, or all, of these options are also available.
+#' @usage
+#' SDWBA.sim(shape, c, f, phi, theta)
+#' @details
+#' Calculates the theoretical TS of a fluid-filled scatterer at a given frequency using the distorted Born wave approximation (DWBA) model.
+#' @return
+#' Target strength (TS, dB re: 1 m^2)
+#' @references
+#' Stanton, T.K., Chu, D., and Wiebe, P.H. 1998. Sound scattering by several zooplankton groups. II. Scattering models. Journal of the Acoustical Society of America, 103(1), 236-253.
+#'
+#' Hankin, R.K.S. 2006. Introducing elliptic, an R package for elliptic and modular functions. Journal of Statistical Software, 15(7).
 #' @export
 
 SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@rpos[3,],
@@ -99,7 +120,7 @@ SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@r
     cl <- makeCluster(n.cores)
     registerDoParallel(cl)
 
-    simdf$TS <- foreach(i=1:nrow(simdf), .combine=c) %dopar% {
+    simdf$TS <- foreach(i=1:nrow(simdf), .combine=c, .packages="acousticTS") %dopar% {
       target_sim <- Shapely(shape,curve=simdf$curve,pc=simdf$pc,theta=simdf$theta,length=simdf$length)
       SDWBA(target_sim,c=simdf$c[i],frequency=simdf$frequency[i],phase=simdf$phase[i],g=simdf$g[i],h=simdf$h[i])
     }
