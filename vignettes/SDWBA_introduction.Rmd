@@ -1,8 +1,8 @@
 ---
-title: "Introduction to the SDWBA acousticTS"
+title: "Introduction to using the SDWBA in acousticTS"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{using_SDWBA}
+  %\VignetteIndexEntry{SDWBA_introduction}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
   
@@ -234,7 +234,7 @@ theta <- seq(0,180,5) #degrees, 0 to 180 degrees at 5 degree resolution, or 0 to
 thetar <- degrad(theta, "deg") #convert to radians
 curve = T #set animal to be curved
 pc <- seq(2.0,8.0,0.25) #curvature
-ts_orfreq <- SDWBA.sim(target_resize, c=c, frequency=freq, theta=thetar, pc=pc, parallel=T)
+ts_orfreq <- SDWBA.sim(target_resize, c=c, frequency=freq, theta=thetar, curve=curve, pc=pc, parallel=T)
 
 #Now let's plot
 require(viridis)
@@ -243,7 +243,31 @@ ggplot(data=ts_orfreq, aes(x=theta, y=pc, fill=TS)) + geom_tile() + theme_bw() +
         panel.grid=element_blank()) +
   scale_fill_viridis(option="B") + 
   coord_cartesian(expand=c(0,0)) +
-  labs(x="Orientation (radians)",
+  labs(x=expression(paste("Orientation (",theta," radians)")),
        y=expression(paste("Radius of curvature (",rho[c],")")),
+       fill=expression(paste("TS (dB re: 1 ",m^2,")")))
+```
+
+## Example: Effect of material properties on TS at four discrete frequencies.
+
+```{r, fig.width=8, fig.height=7}
+#Let's see how variation in g and h influences a target at 38, 70, 120, 200, 455, and 710 kHz. 
+freq <- c(38, 70, 120, 200, 455, 710)*1e3 #Hz
+g <- seq(1.01,1.06,length.out=25) #g
+h <- seq(1.01,1.06,length.out=25) #h
+ts_gh <- SDWBA.sim(target_resize, c=c, frequency=freq, g=g, h=h, parallel=T)
+
+#Now let's plot
+ts_gh$frequency <- ts_gh$frequency * 1e-3 #convert from Hz to kHz
+ts_gh$label <- paste(ts_gh$frequency," kHz",sep="")
+ts_gh$label <- factor(ts_gh$label, levels=c("38 kHz","70 kHz","120 kHz","200 kHz","455 kHz","710 kHz"))
+ggplot(data=ts_gh, aes(x=g, y=h, fill=TS)) + geom_tile() + theme_bw() +
+  theme(text=element_text(size=16), axis.text=element_text(size=14, color="black"),
+        panel.grid=element_blank(), strip.background=element_blank(), strip.text=element_text(size=15),
+        axis.text.x=element_text(angle=90)) +
+  scale_fill_viridis(option="B") +
+  facet_wrap(~label) +
+  labs(x=expression(paste("g (",rho[animal],"/",rho[seawater],")")),
+       y=expression(paste("h (",c[animal],"/",c[seawater],")")),
        fill=expression(paste("TS (dB re: 1 ",m^2,")")))
 ```
