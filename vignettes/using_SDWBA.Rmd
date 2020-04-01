@@ -174,7 +174,7 @@ SDWBA(target_resize, c=c, frequency=freq, phase=0.50)
 SDWBA(target_resize, c=c, frequency=freq, phase=0.77)
 ```
 
-Because this is a stochastic variable, it makes more sense to simulate over more than a single iteration. This can be achieved using `SDWBA.sim(...)` (see: `?SDWBA.sim`), specifically defining `SDWBA.sim(..., nrep=NULL)`.
+Because this is a stochastic variable, it makes more sense to simulate over more than a single iteration. This can be achieved using `SDWBA.sim(...)` (see: `?SDWBA.sim`), specifically defining `SDWBA.sim(..., nrep=NULL)`:
 
 ```{r}
 #Let's generate 10 iterations using the phase deviation, phi, of 0.77. This will print a bunch of values with their respective parameters.
@@ -184,5 +184,29 @@ SDWBA.sim(target_resize, c=c, frequency=freq, phase=0.77, nrep=5)
 #This can also be parallelized, if desired and available to your computer by setting SDWBA.sim(..., parallel=T) and defining the number of cores you'd like to use via SDWBA.sim(..., n.cores=number); the default number of cores will revert to the number of cores available to your computer.
 set.seed(1000)
 SDWBA.sim(target_resize, c=c, frequency=freq, phase=0.77, nrep=5, parallel=T, n.cores=6)
+```
 
+Note that `SDWBA.sim(...)` requires a FFS-class object input. Of course not all targets/animals comprise the same model parameters, or comprise a distribution of values such as various orientations, body curvatures, and material properties. We can also use `SDWBA.sim(...)` to draw from distributions for these other parameters:
+
+```{r warning=F}
+#Using our same curved shape above, let's play around with a few distributions
+n <- 10 #number of animal parameters we want to simulate
+lengths <- rnorm(n,mean=30,sd=5)*1e-3 #Normal distribution of lengths
+g <- rnorm(n,mean=target_resize@g,sd=1e-3) #Normal distribution for g
+h <- rnorm(n,mean=target_resize@h,sd=1e-3) #Normal distribution for h
+theta <- c(pi/2,pi/4) #Play around with two different orienation angles
+pd <- 0.77 #phase deviation
+
+#Now let's simulate over every combination of these values
+ts_sim <- SDWBA.sim(target_resize, c=c, frequency=freq, phase=pd, g=g, h=h, length=lengths, theta=theta, parallel=T)
+head(ts_sim)
+
+#We can then look at the distribution of values to see our simulated TS results! 
+require(ggplot2)
+
+ggplot(data=ts_sim, aes(x=TS)) + geom_histogram(fill="red", color="black") +
+  theme_bw() + theme(text=element_text(size=16), axis.text=element_text(size=14, color="black"),
+                     panel.grid=element_blank()) +
+  labs(x=expression(paste("Target strength (dB re: 1 ",m^2,")")),
+       y="Frequency")
 ```

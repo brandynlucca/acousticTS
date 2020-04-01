@@ -101,7 +101,7 @@ SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@r
   }else{
     repseq <- 1
   }
-  simdf <- expand.grid(iteation=repseq, c=c, frequency=frequency, g=g, h=h, pc=pc, theta=theta, curve=curve, phase=phase, length=length, TS=NA)
+  simdf <- expand.grid(iteration=repseq, c=c, frequency=frequency, g=g, h=h, pc=pc, theta=theta, curve=curve, phase=phase, length=length, TS=NA)
 
   if(parallel==F){
     for(i in 1:nrow(simdf)){
@@ -121,7 +121,7 @@ SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@r
     registerDoParallel(cl)
 
     simdf$TS <- foreach(i=1:nrow(simdf), .combine=c, .packages="acousticTS") %dopar% {
-      target_sim <- Shapely(shape,curve=simdf$curve,pc=simdf$pc,theta=simdf$theta,length=simdf$length)
+      target_sim <- Shapely(shape,curve=simdf$curve[i],pc=simdf$pc[i],theta=simdf$theta[i],length=simdf$length[i])
       SDWBA(target_sim,c=simdf$c[i],frequency=simdf$frequency[i],phase=simdf$phase[i],g=simdf$g[i],h=simdf$h[i])
     }
 
