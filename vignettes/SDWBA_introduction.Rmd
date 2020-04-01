@@ -26,14 +26,14 @@ where $N$ is the number of cylinders comprising each animal shape, $i$ is an ima
 
 ## Package installation
 
-The `acousticTS` package can be found on GitHub at https://github.com/brandynlucca/acousticTS and was built using R version 3.6.1. The package is actively updated, so updates and new features can be tracked via this repository. R is an open-source, statistical programming-language commonly used for data analysis across many fields. Updated versions of R can be installed on Windows, MacOS, and UNIX platforms from https://r-project.org. This package only has one dependency: `elliptic` (integration of complex numbers).
+The `acousticTS` package can be found on GitHub at https://github.com/brandynlucca/acousticTS and was built using R version 3.6.1. The package is actively updated, so updates and new features can be tracked via this repository. R is an open-source, statistical programming-language commonly used for data analysis across many fields. Updated versions of R can be installed on Windows, MacOS, and UNIX platforms from https://r-project.org. This package has four dependencies: `elliptic` (integration of complex numbers) and `parallel`/`foreach`/`doParallel` (parallelized functions for improved model performance). 
 
 To install and call the latest version of `acousticTS` from the development GitHub repository: 
 
 ```{r message=F,warning=F,results="hide",eval=F}
 #install.packages("devtools") #if needed, uncomment this line and install devtools
 require(devtools) #call in devtools
-install_github("brandynlucca/acousticTS")
+install_github("brandynlucca/acousticTS@test-branch")
 ```
 
 Full documentation is provided for all functions (e.g., `?jl` provides the help documentation for the built-in spherical Bessel function of the first kind). 

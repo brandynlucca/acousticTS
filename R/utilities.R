@@ -93,9 +93,9 @@ resize <- function(shape, length){
 #' @return
 #' Returns manipulated object.
 #' @export
-Shapely <- function(shape, curve=F, pc=0.0, theta=shape@theta, length=shape@L){
+Shapely <- function(shape, curve=shape@curve, pc=0.0, theta=shape@theta, length=shape@L){
   if(curve == T){
-    shape@curve <- T; shape@pc <- ifelse(pc == 0.0, 3.0, pc)
+    shape@curve <- T; shape@pc <- ifelse(pc == 0.0, 3.3, pc)
   }else if(curve == F & shape@curve == T){
     shape@curve <- F
   }
