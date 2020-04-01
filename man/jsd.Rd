@@ -4,7 +4,7 @@
 \alias{jsd}
 \title{Calculate the first derivative of the spherical Bessel function of the first kind.}
 \usage{
-jd(l,n)
+jsd(l,n)
 }
 \arguments{
 \item{l}{An integer or fractional order}
@@ -12,7 +12,7 @@ jd(l,n)
 \item{n}{A complex or real argument}
 }
 \value{
-jd(l,n) calculates the first derivative of the spherical Bessel function of the first kind (zbesj AMOS routine, Iv).
+jsd(l,n) calculates the first derivative of the spherical Bessel function of the first kind (zbesj AMOS routine, Iv).
 }
 \description{
 These functions alculate the first and second derivatives of the spherical Bessel functions required for the elastic sphere
@@ -24,6 +24,6 @@ and Nonnegative Order", http://netlib.org/amos
 \examples{
 l <- 1
 n < 1
-jd(l,n)
+jsd(l,n)
 [1] 0.2391336
 }

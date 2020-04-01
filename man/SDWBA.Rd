@@ -7,17 +7,21 @@
 SDWBA(shape, c, f, phi, tilt)
 }
 \arguments{
-\item{shape}{Desired object/animal shape. Must be class "FFS".}
-
 \item{c}{Sound speed of surrounding medium (m/s). Default value is 1500 m/s.}
+
+\item{tilt}{Orientation of the target relative to the transmit source (\eqn{\theta}). Broadside incidence is considered 90 degrees, or pi/2.
+Default value is pi/2; input should be in radians.}
+
+\item{shape}{Desired object/animal shape. Must be class "FFS".}
 
 \item{f}{Frequency (Hz).}
 
 \item{phi}{Phase deviation (\eqn{\phi}), or phase variability. Accounts for complexities in animal shape and stochasticity of noise in scattering field.
 Default value is 0.0.}
 
-\item{tilt}{Orientation of the target relative to the transmit source (\eqn{\theta}). Broadside incidence is considered 90 degrees, or pi/2.
-Default value is pi/2; input should be in radians.}
+\item{niterations}{Number of times/iterations the model will be ran.}
+
+\item{summary}{Will output the}
 }
 \value{
 Target strength (TS, dB re: 1 m^2)

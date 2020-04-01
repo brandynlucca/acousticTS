@@ -141,14 +141,14 @@ yl <- function(l,n){ya(l+0.5,n) * sqrt(pi/2/n)}
 #' @param l An integer or fractional order
 #' @param n A complex or real argument
 #' @usage
-#' jd(l,n)
+#' jsd(l,n)
 #' @examples
 #' l <- 1
 #' n < 1
-#' jd(l,n)
+#' jsd(l,n)
 #' [1] 0.2391336
 #' @return
-#' jd(l,n) calculates the first derivative of the spherical Bessel function of the first kind (zbesj AMOS routine, Iv).
+#' jsd(l,n) calculates the first derivative of the spherical Bessel function of the first kind (zbesj AMOS routine, Iv).
 #' @export
 #'
 #First derivatives of spherical Bessel functions
