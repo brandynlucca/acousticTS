@@ -41,7 +41,23 @@ Full documentation is provided for all functions (e.g., `?jl` provides the help 
 
 ## Model syntax and setup
 
-The TS of an individual scatterer can be calculated using the `SDWBA(...)` (see: `?SDWBA`) function which requires a `fluid-filled scatterer (FFS)` (see: `?FFS`) class object, which is a S4 object that comprises the target's position matrix ($r_0$), radius ($a$), material properties ($g$, $h$), orientation ($\theta$), body curvature ($\rho_c$), body shape ($straight$ or $curved$), body length ($L$), and number of cylinders ($N$). A sample shape can be called via `data(mcgehee)` (see: `?mcgehee`), which calls in the shape file and other model parameters reported in McGehee *et al.* (1998) for *Euphausia superba*, which has been commonly used for TS modelling efforts for krill. There are three ways to calculate:
+The TS of an individual scatterer can be calculated using the `SDWBA(...)` (see: `?SDWBA`) function which requires a `fluid-filled scatterer (FFS)` (see: `?FFS`) class object, which is a S4 object that comprises the target's position matrix ($r_0$), radius ($a$), material properties ($g$, $h$), orientation ($\theta$), body curvature ($\rho_c$), body shape ($straight$ or $curved$), body length ($L$), and number of cylinders ($N$). A sample shape can be called via `data(mcgehee)` (see: `?mcgehee`), which calls in the shape file and other model parameters reported in McGehee *et al.* (1998) for *Euphausia superba*, which has been commonly used for TS modelling efforts for krill. There are three ways to calculate TS using `SDWBA(...)`:
 
-1. Manually creating 
-2. Using BBBB
+1. Manually parameterizing the model.
+
+```{r}
+#First we will create vectors for the x-, y-, and z-axis. 
+
+```
+
+2. Manually creating a FFS-object using `FFSgenerate(...)` (see: `?FFSgenerate`). 
+
+```{r}
+
+```
+
+3. Calling in a *.csv formatted file to create a FFS-object using `FFSread(...)` (see: `?FFSread`).
+
+```{r}
+
+```

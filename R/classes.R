@@ -36,6 +36,8 @@ FFSread <- function(file){
 #' @param theta Orientation of the target relative to the transmit source (\eqn{\theta}). Broadside incidence is considered 90 degrees, or pi/2.
 #' Default value is pi/2; input should be in radians.
 #' @usage
+#' FFSgenerate(x,y,z,a,g,h,theta)
+#' @examples
 #' #Manually parameterize shape
 #' x <- seq(1,10,1)*1e-3; y <- rep(0,10); z <- c(seq(1,5,1),rev(seq(1,5,1)))*1e-4
 #' a <- z/2

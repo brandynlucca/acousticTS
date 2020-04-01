@@ -4,17 +4,7 @@
 \alias{FFSgenerate}
 \title{Manually generate a FFS object.}
 \usage{
-#Manually parameterize shape
-x <- seq(1,10,1)*1e-3; y <- rep(0,10); z <- c(seq(1,5,1),rev(seq(1,5,1)))*1e-4
-a <- z/2
-g <- 1.036
-h <- 1.0279
-new_target <- FFSgenerate(x=x,y=y,z=z,a=a,g=g,h=h)
-#Let's model where sound speed (c) is 1500 m/s, frequency is 120 kHz, with no phase deviation
-c <- 1500
-freq <- 120e3
-SDWBA(shape=new_target, c=c, frequency=freq)
-[1] -114.0107
+FFSgenerate(x,y,z,a,g,h,theta)
 }
 \arguments{
 \item{x}{Vector containing x-axis body (m) shape data.}
@@ -37,4 +27,17 @@ Calls in an FFS-class object from a *.csv file
 }
 \description{
 Manually generate a FFS object.
+}
+\examples{
+#Manually parameterize shape
+x <- seq(1,10,1)*1e-3; y <- rep(0,10); z <- c(seq(1,5,1),rev(seq(1,5,1)))*1e-4
+a <- z/2
+g <- 1.036
+h <- 1.0279
+new_target <- FFSgenerate(x=x,y=y,z=z,a=a,g=g,h=h)
+#Let's model where sound speed (c) is 1500 m/s, frequency is 120 kHz, with no phase deviation
+c <- 1500
+freq <- 120e3
+SDWBA(shape=new_target, c=c, frequency=freq)
+[1] -114.0107
 }

@@ -1,6 +1,5 @@
 #' Calculates the theoretical TS of a fluid-filled scatterer at a given frequency using the deformed finite cylinder model (DFCM).
 #'
-#'
 #' @param shape Desired object/animal shape. Must be class "FFS".
 #' @param L Maximum length (m) of the scatterer. Can either be provided by shape input, or a manual value.
 #' @param a Maximum radius (m) of the scatterer. Can either be provided by shape input, or a manual value.
@@ -28,7 +27,7 @@
 
 DFCM <- function(shape=NULL, L=max(shape@rpos[,1]), a=max(shape@a), g=shape@g, h=shape@h, pc=shape@pc, numdiv=length(shape@rpos[1,]),
                  tilt=shape@theta, cm=1500, pm=1.025, f, alpha=0.8, method="two-ray"){
-  
+
   if(method == "two-ray"){
     ca <- h*cm #animal soundspeed
     pa <- g*pm #animal density
