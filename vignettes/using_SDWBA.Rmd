@@ -1,0 +1,45 @@
+---
+title: "Introduction to the SDWBA acousticTS"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{using_SDWBA}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  
+---
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## General Introduction
+
+The purpose of `acousticTS` is the calculate the acoustic target strength (TS, dB re: m^2^) of a given scatterer, such as bubbles or euphausiids. Euphausiid TS is generally modelled using the distorted Born wave approximation (DWBA), which is a function of acoustic frequency (Hz), material properties (soundspeed, $h$, and density, $g$, contrast compared to ambient seawater), body morphometrics (shape, $r_{0}$, length, $L$, and curvature, $\rho_c$), and orientation relative to the sea surface ($\theta$). This model is used because it can be calculated for all frequencies, orientations, and animal shapes. The model treats each animal as a series of of bent cylinders that are generally weakly scattering ($\pm$ 5%). We use a special formulation of the model known as the SDWBA, which adds an additional phase deviation term ($\phi$) that accounts for imperfections in how sound scatters off of each cylinder. This model is mathematically expressed as:
+
+$$
+f_{bs}(\theta) = \sum_{j=1}^N [\frac{k_1~\rho_c}{4}~e^{(2~i~k_2~\rho_c)} \int M~e^{(-2~i~\vec{k_2}~cos~\beta_{tilt})} \frac{a_j J_1(2~k_2~a_j cos~ \beta_{tilt})}{cos~\beta_{tilt}}~d\beta_{tilt}] e^{(i~\phi_j)}
+$$
+
+where $N$ is the number of cylinders comprising each animal shape, $i$ is an imaginary number, $\vec{k_1}$ is the acoustic wave number of seawater adjusted for animal orientation $\theta$ whereby broadside incidence is 90$^\circ$/270$^\circ$, $\vec{k_2}$ is the acoustic wave number inside each cylinder adjusted for orientation, $\vec{r_0}$ is the position matrix which represents the x, y, and z coordinates of the animal shape, $a_j$ is the radius for cylinder $j$, $M$ is equal to $\frac{1}{gh^2} + \frac{1}{g-2}$, $g$ is the density contrast ($\frac{\rho_{animal}}{\rho_{seawater}}$), $h$ is the soundspeed contrast ($\frac{c_{animal}}{c_{seawater}}$), $J_1$ is the Bessel function of the first kind of order 1, $\rho_c$ is the radius of curvature, and $\phi_j$ is the stochastic phase variability term for each cylinder which provides a multiplicative term drawn from a standard normal distribution: $N(0, \phi_j)$. The TS of the scatterer is then calculated via $TS = 20~log_{10}(f_{bs}(\theta))$. 
+
+## Package installation and setup
+
+The `acousticTS` package can be found on GitHub at https://github.com/brandynlucca/acousticTS and was built using R version 3.6.1. The package is actively updated, so updates and new features can be tracked via this repository. R is an open-source, statistical programming-language commonly used for data analysis across many fields. Updated versions of R can be installed on Windows, MacOS, and UNIX platforms from https://r-project.org. This package only has two dependencies: `ggplot2` (data visualization) and `elliptic` (integration of complex numbers).
+
+To install and call the latest version of `acousticTS` from the development GitHub repository: 
+
+```{r message=F,warning=F}
+#install.packages("devtools") #if needed, uncomment this line and install devtools
+require(devtools) #call in devtools
+install_github("brandynlucca/acousticTS")
+require(acousticTS)
+```
+
+Full documentation is provided for all functions (e.g., `?jl` provides the help documentation for the built-in spherical Bessel function of the first kind). 
+
+## Model syntax
+
+The TS of an individual scatterer can be calculated using the `SDWBA(...)` (see: `?SDWBA`) function which requires a `fluid-filled scatterer (FFS)` (see: `?FFS`) class object, which is a S4 object that comprises the target's position matrix ($r_0$), radius ($a$), material properties ($g$, $h$), orientation ($\theta$), body curvature ($\rho_c$), body shape ($straight$ or $curved$), body length ($L$), and number of cylinders ($N$). There are three ways to calculate 
+
