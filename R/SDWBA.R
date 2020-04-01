@@ -113,7 +113,7 @@ SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@r
     require(parallel)
     require(doParallel)
     if(!is.null(n.cores)){
-      n.cores <- ncores
+      n.cores <- n.cores
     }else{
       n.cores <- detectCores()
     }
