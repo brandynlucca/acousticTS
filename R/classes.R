@@ -58,6 +58,11 @@ FFSread <- function(file){
 FFSgenerate <- function(x,y,z,a,g,h,theta=pi/2){
   return(new("FFS", rpos=as.matrix(rbind(x,y,z)),a=a,g=g,h=h,theta=theta[1],curve=F,pc=0.0,L=max(x),ncyl=length(x)))}
 
+#' @export
+FFSwrite <- function(shape, filename=paste(getwd(),"/target_shape_",Sys.Date(),".csv",sep="")){
+  object <- data.frame(x=shape@x,y=shape@y,z=shape@z,a=shape@a,h=rep(shape@h,shape@ncyl),g=rep(shape@g,shape@ncyl))
+  write.csv(shape, file=filename)
+}
 
 #' Swimbladdered fish (SBF) object/class.
 #'

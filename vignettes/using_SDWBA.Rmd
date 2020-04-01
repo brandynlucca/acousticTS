@@ -34,18 +34,20 @@ To install and call the latest version of `acousticTS` from the development GitH
 #install.packages("devtools") #if needed, uncomment this line and install devtools
 require(devtools) #call in devtools
 install_github("brandynlucca/acousticTS")
-require(acousticTS)
 ```
 
 Full documentation is provided for all functions (e.g., `?jl` provides the help documentation for the built-in spherical Bessel function of the first kind). 
 
 ## Model syntax and setup
 
-The TS of an individual scatterer can be calculated using the `SDWBA(...)` (see: `?SDWBA`) function which requires a `fluid-filled scatterer (FFS)` (see: `?FFS`) class object, which is a S4 object that comprises the target's position matrix ($r_0$), radius ($a$), material properties ($g$, $h$), orientation ($\theta$), body curvature ($\rho_c$), body shape ($straight$ or $curved$), body length ($L$), and number of cylinders ($N$). A sample shape can be called via `data(mcgehee)` (see: `?mcgehee`), which calls in the shape file and other model parameters reported in McGehee *et al.* (1998) for *Euphausia superba*, which has been commonly used for TS modelling efforts for krill. There are three ways to calculate TS using `SDWBA(...)`:
+The TS of an individual scatterer can be calculated using the `SDWBA(...)` (see: `?SDWBA`) function which requires a `fluid-filled scatterer (FFS)` (see: `?FFS`) class object, which is a S4 object that comprises the target's position matrix ($r_0$), radius ($a$), material properties ($g$, $h$), orientation ($\theta$), body curvature ($\rho_c$), body shape ($straight$ or $curved$), body length ($L$), and number of cylinders ($N$). A sample shape can be called via `data(mcgehee)` (see: `?mcgehee`), which calls in the shape file and other model parameters reported in McGehee *et al.* (1998) for *Euphausia superba*, which has been commonly used for TS modelling efforts for krill. There are four ways to calculate TS using `SDWBA(...)`, which provides flexibility depending on users' needs, data format, and coding preferences:
 
 1. Manually parameterizing the model.
 
-```{r}
+```{r warnings=F,message=F}
+#Let's call in the package
+require(acousticTS)
+
 #First we will create vectors for the x-, y-, and z-axis. 
 x <- seq(1,10,1)*1e-3; y <- rep(0,10); z <- c(seq(1,5,1),rev(seq(1,5,1)))*1e-4
 
@@ -68,12 +70,56 @@ SDWBA(c=c, frequency=freq, x=x, y=y, z=z, a=a, g=g, h=h)
 2. Manually creating a FFS-object using `FFSgenerate(...)` (see: `?FFSgenerate`). 
 
 ```{r}
+#We will use the same information we used before to generate our new scatterer
+target <- FFSgenerate(x=x,y=y,z=z,a=a,g=g,h=h)
 
+#We can look at the structure to get an idea about what the FFS scatterer object looks like
+str(target)
+
+#Now let's run the model on the object
+SDWBA(target, c=c, frequency=freq)
+
+#If we want to save this object for later modelling efforts, we can create a data.frame and write a *.csv file that is properly formatted
+#Note that the FFSwrite(..., filename) defaults to saving this file in your current working directory. Name this file accordingly. 
+#FFSwrite(target)
 ```
 
-3. Calling in a *.csv formatted file to create a FFS-object using `FFSread(...)` (see: `?FFSread`).
+3. Calling in a *.csv formatted file to create a FFS-object using `FFSread(...)` (see: `?FFSread`) and `FFSwrite(...)` (see: `?FFSwrite`).
 
 ```{r}
+#We will call in a sample krill shape reported by McGehee et al. (1998) from the GitHub repository, but this can be applied to any *.csv file with the correct filepath. 
+target_premade <- FFSread("https://raw.githubusercontent.com/brandynlucca/acousticTS/test-branch/data/mcgehee.csv")
 
+#We can see that the file structure is the same as the previous "target" scatterer, just filled with different values
+str(target_premade)
 
+#Now let's run the model on the object
+SDWBA(target_premade, c=c, frequency=freq)
 ```
+
+4. Using both arbitrary and pre-generated FFS-object parameters. 
+
+```{r}
+#Let's say we are interested in a very different set of material properties!
+SDWBA(target_premade, c=c, frequency=freq, g=1.01, h=1.005)
+```
+
+## FFS-object manipulation
+
+In the previous section it was assumed that all of the scatterers we not curved and were straight from rostrum-to-telson. In these cases, a more traditional form of the model was used that discounts $\rho_c$. An animal can be curved by either setting `SDWBA(..., curve=T)` or using the `Shapely(...)` (see: `?Shapely(...)`). If `curve=TRUE`, the default $p_c$ is 3.0 unless it is otherwise defined. 
+
+```{r}
+#Let's take a look at the str of our target. We can see that "curve" is set to False, and the radius of curvature (pc) is set to 0.0. 
+str(target_premade)
+
+#So we can force the object to do our bidding and curve it.
+target_curved <- Shapely(target_premade, curve=T, pc=3.3)
+
+#Now let's calculate the TS using both of the described methods, which will yield the same answer
+SDWBA(target_curved, c=c, frequency=freq)
+SDWBA(target_premade, c=c, frequency=freq, curve=T, pc=3.3)
+```
+
+
+## Stochastic/vectorized model inputs
+

@@ -79,3 +79,20 @@ resize <- function(shape, length){
   shape@a <- shape@a * lscale #scale radius based on same length ratio
   return(shape)
 }
+
+#' @export
+Shapely <- function(shape, curve=F, pc=0.0, theta=shape@theta, length=shape@L){
+  if(curve == T){
+    shape@curve <- T; shape@pc <- ifelse(pc == 0.0, 3.0, pc)
+  }
+  if(shape@theta != theta){
+    shape@theta <- theta
+  }
+  if(shape@L != length){
+    lscale <- length/max(shape@rpos[1,])
+    mscale <- cbind(c(1,0,0),c(0,1,0),c(0,0,1)) * lscale
+    shape@rpos <- t(t(shape@rpos) %*% mscale)
+    shape@a <- shape@a * lscale
+  }
+    return(shape)
+}
