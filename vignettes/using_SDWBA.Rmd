@@ -26,7 +26,7 @@ where $N$ is the number of cylinders comprising each animal shape, $i$ is an ima
 
 ## Package installation
 
-The `acousticTS` package can be found on GitHub at https://github.com/brandynlucca/acousticTS and was built using R version 3.6.1. The package is actively updated, so updates and new features can be tracked via this repository. R is an open-source, statistical programming-language commonly used for data analysis across many fields. Updated versions of R can be installed on Windows, MacOS, and UNIX platforms from https://r-project.org. This package only has two dependencies: `ggplot2` (data visualization) and `elliptic` (integration of complex numbers).
+The `acousticTS` package can be found on GitHub at https://github.com/brandynlucca/acousticTS and was built using R version 3.6.1. The package is actively updated, so updates and new features can be tracked via this repository. R is an open-source, statistical programming-language commonly used for data analysis across many fields. Updated versions of R can be installed on Windows, MacOS, and UNIX platforms from https://r-project.org. This package only has one dependency: `elliptic` (integration of complex numbers).
 
 To install and call the latest version of `acousticTS` from the development GitHub repository: 
 
@@ -40,7 +40,7 @@ Full documentation is provided for all functions (e.g., `?jl` provides the help 
 
 ## Model syntax and setup
 
-The TS of an individual scatterer can be calculated using the `SDWBA(...)` (see: `?SDWBA`) function which requires a `fluid-filled scatterer (FFS)` (see: `?FFS`) class object, which is a S4 object that comprises the target's position matrix ($r_0$), radius ($a$), material properties ($g$, $h$), orientation ($\theta$), body curvature ($\rho_c$), body shape ($straight$ or $curved$), body length ($L$), and number of cylinders ($N$). A sample shape can be called via `data(mcgehee)` (see: `?mcgehee`), which calls in the shape file and other model parameters reported in McGehee *et al.* (1998) for *Euphausia superba*, which has been commonly used for TS modelling efforts for krill. There are four ways to calculate TS using `SDWBA(...)`, which provides flexibility depending on users' needs, data format, and coding preferences:
+The TS of an individual scatterer can be calculated using the `SDWBA(...)` (see: `?SDWBA`) function which requires a `fluid-filled scatterer (FFS)` (see: `?FFS`) class object, which is a S4 object that comprises the target's position matrix ($r_0$), radius ($a$), material properties ($g$, $h$), orientation ($\theta$), body curvature ($\rho_c$), body curve (a boolean `TRUE` or `FALSE`), body length ($L$), and number of cylinders ($N$). A sample shape can be called via `data(mcgehee)` (see: `?mcgehee`), which calls in the shape file and other model parameters reported in McGehee *et al.* (1998) for *Euphausia superba*, which has been commonly used for TS modelling efforts for krill. There are four ways to calculate TS using `SDWBA(...)`, which provides flexibility depending on users' needs, data format, and coding preferences:
 
 1. Manually parameterizing the model.
 
@@ -67,7 +67,7 @@ SDWBA(c=c, frequency=freq, x=x, y=y, z=z, a=a, g=g, h=h)
 ```
 
 
-2. Manually creating a FFS-object using `FFSgenerate(...)` (see: `?FFSgenerate`). 
+2. Manually creating a FFS-object using `FFSgenerate(...)` (see: `?FFSgenerate`) and `FFSwrite(...)` (see: `?FFSwrite`). 
 
 ```{r}
 #We will use the same information we used before to generate our new scatterer
@@ -84,7 +84,7 @@ SDWBA(target, c=c, frequency=freq)
 #FFSwrite(target)
 ```
 
-3. Calling in a *.csv formatted file to create a FFS-object using `FFSread(...)` (see: `?FFSread`) and `FFSwrite(...)` (see: `?FFSwrite`).
+3. Calling in a *.csv formatted file to create a FFS-object using `FFSread(...)` (see: `?FFSread`).
 
 ```{r}
 #We will call in a sample krill shape reported by McGehee et al. (1998) from the GitHub repository, but this can be applied to any *.csv file with the correct filepath. 
@@ -106,7 +106,7 @@ SDWBA(target_premade, c=c, frequency=freq, g=1.01, h=1.005)
 
 ## FFS-object manipulation
 
-In the previous section it was assumed that all of the scatterers we not curved and were straight from rostrum-to-telson. In these cases, a more traditional form of the model was used that discounts $\rho_c$. An animal can be curved by either setting `SDWBA(..., curve=T)` or using the `Shapely(...)` (see: `?Shapely(...)`). If `curve=TRUE`, the default $p_c$ is 3.0 unless it is otherwise defined. 
+In the previous section it was assumed that all of the scatterers we not curved and were straight from rostrum-to-telson. In these cases, a more traditional form of the model was used that discounts $\rho_c$. An animal can be curved by either setting `SDWBA(..., curve=T)` or using the `Shapely(...)` (see: `?Shapely(...)`). If `curve=TRUE`, the default $\rho_c$ (i.e., `pc`) is 3.0 unless it is otherwise defined. 
 
 ```{r}
 #Let's take a look at the str of our target. We can see that "curve" is set to False, and the radius of curvature (pc) is set to 0.0. 
@@ -118,6 +118,39 @@ target_curved <- Shapely(target_premade, curve=T, pc=3.3)
 #Now let's calculate the TS using both of the described methods, which will yield the same answer
 SDWBA(target_curved, c=c, frequency=freq)
 SDWBA(target_premade, c=c, frequency=freq, curve=T, pc=3.3)
+```
+
+The `Shapely(...)` function can also be used to change the orientation angle (`Shapely(..., theta=angle)`) and resize both the $r_0$ matrix and $a$ vector based on a new length (`Shapely(..., length=new_length)`). The identical alternative is available by manually inputting a new orientation value into `SDWBA(...)`, but the shape manipulation requires `Shapely(...)`. For the purpose of convenience, the `degrad(...)` (see: `?degrad`) function is available for readily converting degrees to radians, and vice versa. 
+
+degrad <- function(x,d){
+  if(d == "deg"){
+    value <- x*pi/180.0
+  }else if(d == "rad"){
+    value <- x*180.0/pi
+  }
+  return(value)
+}
+
+
+```{r}
+#First let's change the orientation of the object
+target_angle <- Shapely(target_curved, theta=pi)
+SDWBA(target_angle, c=c, frequency=freq)
+SDWBA(target_curved, c=c, frequency=freq, theta=pi)
+
+#If our orientation values are in degrees, we can use degrad(...) to convert! 
+angle_radians <- degrad(90,"deg") #degrees to radians
+angle_radians
+angle_degrees <- degrad(angle_radians,"rad") #degrees to radians
+angle_degrees
+
+#We can also resize our target shape; the new length is in m
+target_resize <- Shapely(target_angle, length=30e-3)
+target_resize
+
+#So we have resized our target from a 41 mm krill to 30 mm, which adjusted both the position matrix, rpos, and our radius vector, a.
+SDWBA(target_resize, c=c, frequency=freq)
+
 ```
 
 
