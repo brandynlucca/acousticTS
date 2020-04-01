@@ -64,3 +64,66 @@ SDWBA <- function(shape=NULL, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@rpos[3
   }
   return(20*log10(abs(fbs)))
 }
+
+#Wrapper function that can simulate over distributions of values
+#' @export
+
+SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@rpos[3,],
+                      c=1500, frequency, phase=0.0, a=shape@a, h=shape@h, g=shape@g,
+                      pc=ifelse(curve == T, ifelse(is.null(shape),3.0,shape@pc),0.0),
+                      theta=ifelse(is.null(shape),pi/2,shape@theta),
+                      curve=ifelse(is.null(shape),F,shape@curve),
+                      length=ifelse(is.null(shape),max(x),shape@L),
+                      nrep=NULL, aggregate=NULL, parallel=F, n.cores=NULL){
+  if(!is.null(nrep)){
+    repseq <- seq(1,nrep,1)
+  }else{
+    repseq <- 1
+  }
+  simdf <- expand.grid(iteation=repseq, c=c, frequency=frequency, g=g, h=h, pc=pc, theta=theta, curve=curve, phase=phase, length=length, TS=NA)
+
+  if(parallel==F){
+    for(i in 1:nrow(simdf)){
+      target_sim <- Shapely(shape,curve=simdf$curve[i],pc=simdf$pc[i],theta=simdf$theta[i],length=simdf$length[i])
+      simdf$TS[i] <- SDWBA(target_sim,c=c,frequency=frequency,phase=simdf$phase[i],g=simdf$g[i],h=simdf$h[i])
+    }
+  }else if(parallel==T){
+    require(foreach)
+    require(parallel)
+    require(doParallel)
+    if(!is.null(n.cores)){
+      n.cores <- ncores
+    }else{
+      n.cores <- detectCores()
+    }
+    cl <- makeCluster(n.cores)
+    registerDoParallel(cl)
+
+    simdf$TS <- foreach(i=1:nrow(simdf), .combine=c) %dopar% {
+      target_sim <- Shapely(shape,curve=simdf$curve,pc=simdf$pc,theta=simdf$theta,length=simdf$length)
+      SDWBA(target_sim,c=simdf$c[i],frequency=simdf$frequency[i],phase=simdf$phase[i],g=simdf$g[i],h=simdf$h[i])
+    }
+
+    stopCluster(cl)
+  }
+
+  if(!is.null(aggregate)){
+    dum <- data.frame(Stat=NA,TS=NA)
+    if("mean" %in% aggregate){
+      dum <- rbind(dum,data.frame(Stat="Mean", TS=10*log10(mean(10^(simdf$TS/10)))))
+    }
+    if("median" %in% aggregate){
+      dum <- rbind(dum,data.frame(Stat="Median", TS=median(simdf$TS)))
+    }
+    if("minimum" %in% aggregate){
+      dum <- rbind(dum,data.frame(Stat="Minimum", TS=min(simdf$TS)))
+    }
+    if("maximum" %in% aggregate){
+      dum <- rbind(dum,data.frame(Stat="Maximum", TS=max(simdf$TS)))
+    }
+    dum <- dum[-(is.na(dum$Stat)),]
+    return(dum)
+  }else{
+    return(simdf)
+  }
+}

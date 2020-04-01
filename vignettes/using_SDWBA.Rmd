@@ -156,3 +156,33 @@ SDWBA(target_resize, c=c, frequency=freq)
 
 ## Stochastic/vectorized model inputs
 
+Up until now, we have not added in the phase deviation term ($\phi$) that is set via `SDWBA(..., phase=0.0)`. As noted, this sets the standard deviation term to draw from a standard normal distribution that is drawn from `rnorm(1,0,phase)`. We can see that this can have a negligible-to-large effect depending on how large $\phi$ is set. 
+
+```{r}
+set.seed(1000)
+#Normal DWBA, phase = 0.0
+SDWBA(target_resize, c=c, frequency=freq)
+#phase = 0.04
+SDWBA(target_resize, c=c, frequency=freq, phase=0.04)
+#phase = 0.07
+SDWBA(target_resize, c=c, frequency=freq, phase=0.07)
+#phase = 0.22
+SDWBA(target_resize, c=c, frequency=freq, phase=0.22)
+#phase = 0.50
+SDWBA(target_resize, c=c, frequency=freq, phase=0.50)
+#phase = 0.77
+SDWBA(target_resize, c=c, frequency=freq, phase=0.77)
+```
+
+Because this is a stochastic variable, it makes more sense to simulate over more than a single iteration. This can be achieved using `SDWBA.sim(...)` (see: `?SDWBA.sim`), specifically defining `SDWBA.sim(..., nrep=NULL)`.
+
+```{r}
+#Let's generate 10 iterations using the phase deviation, phi, of 0.77. This will print a bunch of values with their respective parameters.
+set.seed(1000)
+SDWBA.sim(target_resize, c=c, frequency=freq, phase=0.77, nrep=5)
+
+#This can also be parallelized, if desired and available to your computer by setting SDWBA.sim(..., parallel=T) and defining the number of cores you'd like to use via SDWBA.sim(..., n.cores=number); the default number of cores will revert to the number of cores available to your computer.
+set.seed(1000)
+SDWBA.sim(target_resize, c=c, frequency=freq, phase=0.77, nrep=5, parallel=T, n.cores=6)
+
+```
