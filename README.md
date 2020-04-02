@@ -7,6 +7,8 @@ Current version: v0.9.2 [01 April 2020]
 # General 
 Amos D.E., "AMOS, A portable package for Bessel functions of a complex argument and nonnegative order", http://netlib.org/amos. 
 
+Cephes Mathematical Functions Library, http://www.netlib.org/cephes.
+
 # DWBA 
 Conti S.G. and Demer D.A. (2006). Improved parameterization of the SDWBA for estimating krill target strength. ICES Journal of Marine Science, 64, 928-935. 
 
