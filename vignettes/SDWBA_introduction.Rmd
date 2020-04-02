@@ -1,6 +1,8 @@
 ---
 title: "Introduction to using the SDWBA in acousticTS"
-output: rmarkdown::html_vignette
+output: word_document
+author: "Brandyn M. Lucca"
+date: "`r Sys.Date()`"
 vignette: >
   %\VignetteIndexEntry{SDWBA_introduction}
   %\VignetteEngine{knitr::rmarkdown}
