@@ -16,3 +16,7 @@
 #'   \item{ncyl}{Number of cylinders (15)}
 #' }
 "mcgehee"
+"epac"
+"ndiff"
+"tspin"
+"cakrill"
