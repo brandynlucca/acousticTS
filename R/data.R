@@ -16,3 +16,7 @@
 #'   \item{ncyl}{Number of cylinders (15)}
 #' }
 "mcgehee"
+
+#' Sample krill shape taken from krill in Monterey Bay (2019).
+#'
+"cakrill"
