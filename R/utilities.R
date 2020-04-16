@@ -34,7 +34,6 @@ vecnorm <- function(x){sqrt(sum(x**2))}
 #' Converts degrees to radians or radians to degrees
 #' @export
 
-#Toggle between radians and dgrees
 degrad <- function(x,d){
   if(d == "deg"){
     value <- x*pi/180.0
