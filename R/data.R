@@ -15,7 +15,7 @@
 #'   \item{L}{Length (m) (0.0410898)}
 #'   \item{ncyl}{Number of cylinders (15)}
 #' }
-"cakrill"
+"mcgehee"
 
 #' Sample krill shape taken from krill in Monterey Bay (2019).
 #'
@@ -24,3 +24,11 @@
 #' Sample krill shape taken from krill in Monterey Bay (2019).
 #'
 "epac"
+
+#' Sample krill shape taken from krill in Monterey Bay (2019).
+#'
+"tspin"
+
+#' Sample krill shape taken from krill in Monterey Bay (2019).
+#'
+"ndiff"
