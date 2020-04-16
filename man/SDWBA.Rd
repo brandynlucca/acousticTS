@@ -2,12 +2,12 @@
 % Please edit documentation in R/SDWBA.R
 \name{SDWBA}
 \alias{SDWBA}
-\title{Calculates the theoretical TS of a fluid-filled scatterer at a given frequency using the distorted Born wave approximation (DWBA) model.}
+\title{Calculates the theoretical TS of a fluid-like scatterer at a given frequency using the distorted Born wave approximation (DWBA) model.}
 \usage{
 SDWBA(shape, c, f, phi, theta)
 }
 \arguments{
-\item{shape}{Desired object/animal shape. Must be class "FFS".}
+\item{shape}{Desired object/animal shape. Must be class "FLS".}
 
 \item{c}{Sound speed of surrounding medium (m/s). Default value is 1500 m/s.}
 
@@ -27,7 +27,7 @@ Default value is 0.0.}
 Target strength (TS, dB re: 1 m^2)
 }
 \description{
-Calculates the theoretical TS of a fluid-filled scatterer at a given frequency using the distorted Born wave approximation (DWBA) model.
+Calculates the theoretical TS of a fluid-like scatterer at a given frequency using the distorted Born wave approximation (DWBA) model.
 }
 \details{
 Calculates the theoretical TS of a fluid-filled scatterer at a given frequency using the distorted Born wave approximation (DWBA) model.
