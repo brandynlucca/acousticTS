@@ -15,7 +15,7 @@
 #'   \item{L}{Length (m) (0.0410898)}
 #'   \item{ncyl}{Number of cylinders (15)}
 #' }
-"mcgehee"
+"cakrill"
 
 #' Sample krill shape taken from krill in Monterey Bay (2019).
 #'
