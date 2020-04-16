@@ -1,7 +1,7 @@
-#' Calculates the theoretical TS of a fluid-filled scatterer at a given frequency using the distorted Born wave approximation (DWBA) model.
+#' Calculates the theoretical TS of a fluid-like scatterer at a given frequency using the distorted Born wave approximation (DWBA) model.
 #'
 #'
-#' @param shape Desired object/animal shape. Must be class "FFS".
+#' @param shape Desired object/animal shape. Must be class "FLS".
 #' @param c Sound speed of surrounding medium (m/s). Default value is 1500 m/s.
 #' @param f Frequency (Hz).
 #' @param phi Phase deviation (\eqn{\phi}), or phase variability. Accounts for complexities in animal shape and stochasticity of noise in scattering field.
