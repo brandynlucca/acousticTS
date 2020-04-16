@@ -55,8 +55,8 @@ FLSread <- function(file){
 #Manual shape creation
 ##Inputs required:
 ##x,y,z for position matrix, a for radius, g and h for material properties, theta for tilt angle (default = 0.0 deg)
-FLSgenerate <- function(x,y,z,a,g,h,theta=pi/2){
-  return(new("FLS", rpos=as.matrix(rbind(x,y,z)),a=a,g=g,h=h,theta=theta[1],curve=F,pc=0.0,L=max(x),ncyl=length(x)))}
+FLSgenerate <- function(x,y,z,a,g,h,theta=pi/2,curve=F,pc=0.0){
+  return(new("FLS", rpos=as.matrix(rbind(x,y,z)),a=a,g=g,h=h,theta=theta,curve=curve,pc=pc,L=max(x),ncyl=length(x)))}
 
 #' @export
 FLSwrite <- function(shape, filename=paste(getwd(),"/target_shape_",Sys.Date(),".csv",sep="")){
