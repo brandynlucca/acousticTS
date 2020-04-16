@@ -19,16 +19,8 @@
 
 #' Sample krill shape taken from krill in Monterey Bay (2019).
 #'
-"cakrill"
-
-#' Sample krill shape taken from krill in Monterey Bay (2019).
-#'
 "epac"
 
 #' Sample krill shape taken from krill in Monterey Bay (2019).
 #'
-"tspin"
-
-#' Sample krill shape taken from krill in Monterey Bay (2019).
-#'
-"ndiff"
+"cakrill"
