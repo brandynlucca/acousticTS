@@ -107,6 +107,7 @@ Shapely <- function(shape, curve=shape@curve, pc=0.0, theta=shape@theta, length=
     mscale <- cbind(c(1,0,0),c(0,1,0),c(0,0,1)) * lscale
     shape@rpos <- t(t(shape@rpos) %*% mscale)
     shape@a <- shape@a * lscale
+    shape@L <- max(shape@rpos[1,])
   }
     return(shape)
 }
