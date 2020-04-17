@@ -4,24 +4,35 @@
 \alias{SDWBA}
 \title{Calculates the theoretical TS of a fluid-like scatterer at a given frequency using the distorted Born wave approximation (DWBA) model.}
 \usage{
-SDWBA(shape, c, f, phi, theta)
+SDWBA(shape, c, frequency, phase)
+SDWBA(c, frequency, x, y, z, a, h, g, pc, curve, phase, theta ncyl)
 }
 \arguments{
 \item{shape}{Desired object/animal shape. Must be class "FLS".}
 
+\item{x, y, z}{The x-, y-, and z-axis coordinates that make up the position matrix, \eqn{r_0}.}
+
 \item{c}{Sound speed of surrounding medium (m/s). Default value is 1500 m/s.}
+
+\item{frequency}{Frequency (Hz).}
+
+\item{phase}{Phase deviation (\eqn{\phi}), or phase variability. Accounts for complexities in animal shape and stochasticity of noise in scattering field.
+Default value is 0.0.}
+
+\item{a}{Radius vector of an animal (m).}
+
+\item{h}{Sound speed contrast.}
+
+\item{g}{Density contrast.}
+
+\item{curve}{A boolean value that dictates whether an animal is curved or not.}
+
+\item{pc}{Radius of curvature. Default is 3.3.}
 
 \item{theta}{Orientation of the target relative to the transmit source (\eqn{\theta}). Broadside incidence is considered 90 degrees, or pi/2.
 Default value is pi/2; input should be in radians.}
 
-\item{f}{Frequency (Hz).}
-
-\item{phi}{Phase deviation (\eqn{\phi}), or phase variability. Accounts for complexities in animal shape and stochasticity of noise in scattering field.
-Default value is 0.0.}
-
-\item{niterations}{Number of times/iterations the model will be ran.}
-
-\item{summary}{Will output the}
+\item{ncyl}{Number of segments comprising the scatterer shape.}
 }
 \value{
 Target strength (TS, dB re: 1 m^2)

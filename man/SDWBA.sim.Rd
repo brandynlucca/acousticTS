@@ -4,24 +4,42 @@
 \alias{SDWBA.sim}
 \title{Wrapper function that can simulate over distributions of values}
 \usage{
-SDWBA.sim(shape, c, f, phi, theta)
+SDWBA.sim(shape, c, frequency, phase, theta, length, nrep, aggregate, parallel, n.cores)
 }
 \arguments{
-\item{shape}{Desired object/animal shape. Must be class "FFS".}
+\item{shape}{Desired object/animal shape. Must be class "FLS".}
+
+\item{x, y, z}{The x-, y-, and z-axis coordinates that make up the position matrix, \eqn{r_0}.}
 
 \item{c}{Sound speed of surrounding medium (m/s). Default value is 1500 m/s.}
+
+\item{frequency}{Frequency (Hz).}
+
+\item{phase}{Phase deviation (\eqn{\phi}), or phase variability. Accounts for complexities in animal shape and stochasticity of noise in scattering field.
+Default value is 0.0.}
+
+\item{a}{Radius vector of an animal (m).}
+
+\item{h}{Sound speed contrast.}
+
+\item{g}{Density contrast.}
+
+\item{curve}{A boolean value that dictates whether an animal is curved or not.}
+
+\item{pc}{Radius of curvature. Default is 3.3.}
 
 \item{theta}{Orientation of the target relative to the transmit source (\eqn{\theta}). Broadside incidence is considered 90 degrees, or pi/2.
 Default value is pi/2; input should be in radians.}
 
-\item{nrep}{Number of times/iterations the model will be ran.}
+\item{length}{Option to change the length of the scatterer shape.}
 
-\item{aggregate}{Will output an aggregate statistic with the following options: "mean", "median", "maximum", and "minimum". Multiple, or all, of these options are also available.}
+\item{nrep}{Number of repeated iterations to run the model.}
 
-\item{f}{Frequency (Hz).}
+\item{aggregate}{Options to aggregate dataframe output into a series of summary statistics. Options include "mean", "median", "minimum", and "maximum".}
 
-\item{phi}{Phase deviation (\eqn{\phi}), or phase variability. Accounts for complexities in animal shape and stochasticity of noise in scattering field.
-Default value is 0.0.}
+\item{parallel}{Boolean value that sets whether multicore CPU parallelization will be used to speed up calculations.}
+
+\item{n.cores}{Number of CPU cores that will be dedicated to parallelizing model calculations.}
 }
 \value{
 Target strength (TS, dB re: 1 m^2)
