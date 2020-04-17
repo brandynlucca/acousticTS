@@ -1,107 +1,23 @@
-# All formulas for calculation of TS derived from:
-#
-
-#' Calculates the Euclidean norm of a vector.
-#'
-#' @param x A vector with numeric, real values.
-#' @usage
-#' vecnorm(x)
-#' @examples
-#' values <- c(1,2,3)
-#' vecnorm(values)
-#' [1] 3.741657
-#' @return
-#' Calculates the Euclidean norm of a vector.
-#' @export
-
-#Euclidean vector norm
-vecnorm <- function(x){sqrt(sum(x**2))} #Calculates Euclidean norm of a vecto
-
-#' Toggle between radians and degrees.
-#'
-#' @param x A real value in degrees or radians
-#' @param d The value input-type. Two input types: "deg" for degrees and "rad" for radians.
-#' @usage
-#' degrad(x,d)
-#' @examples
-#' x <- 180 #degrees
-#' degrad(x, "deg")
-#' [1] 3.141593
-#' x <- pi #radians
-#' degrad(x, "rad")
-#' [1] 180
-#' @return
-#' Converts degrees to radians or radians to degrees
-#' @export
-
-#Toggle between radians and dgrees
-degrad <- function(x,d){
-  if(d == "deg"){
-    value <- x*pi/180.0
-  }else if(d == "rad"){
-    value <- x*180.0/pi
-  }
-  return(value)
-}
-
-
-#' Calculate the acoustic wavenumber based on the sound speed of water.
-#'
-#' @param c Sound speed (m/s)
-#' @param f Frequency (Hz)
-#' @usage
-#' kcalc(f,c)
-#' @examples
-#' c <- 1500 #m/s
-#' f <- 120e3 #Hz
-#' kcalc(f,c)
-#' [1] 502.6547
-#' @return
-#' Calculates the acoustic wavenumber based on the sound speed of water
-#' @export
-
-#Calculate acoustic wavenumber based on the sound speed of water
-kcalc <- function(f,c){2*pi*f/c}
-
-#' Fluid-filled scatterer (FFS) object/class.
-#'
-#' @description
-#' A S4 class that provides slots to contain relevant animal metadata for parameterizing models for fluid-filled scatterers (FFS) partitioned
-#' into discretized cylinders. This, specifically, includes a position matrix, radius, material properties (g, h), orientation,
-#' animal shape, and body curvature. This class is used within the DWBA and DFCM model functions. In the future, this will also allow for
-#' converting one class of scatterer into another for seemless usage for model comparisons.
-#' @export
-
-#Create S4 class object to contain all animal metadata
-FFS <- setClass("FFS", slots=c(rpos="matrix", a="numeric", g="numeric", h="numeric", theta="numeric", shape="character", pc="numeric"))
-
-#' Calls in a *.csv file as a FFS object
-#' @param file A *.csv file formatted with the following columns: x, y, z, a [radius], g, h
-#' @usage
-#' FFS_shape(file)
-#' @return
-#' Calls in an FFS_shape from a file
-#' @export
-
-FFS_shape <- function(file){
-  animal <- read.csv(file, header=T) #Call in *.csv file; assumes headers are present
-  return(new("FFS", rpos=as.matrix(rbind(animal$x,animal$y,animal$z)),a=animal$a, g=animal$g[1],
-             h=animal$h[1],
-             theta=90,
-             shape="straight",pc=0.0))}
-
-#' Calculates the theoretical TS of a fluid-filled scatterer at a given frequency using the distorted Born wave approximation (DWBA) model.
+#' Calculates the theoretical TS of a fluid-like scatterer at a given frequency using the distorted Born wave approximation (DWBA) model.
 #'
 #'
-#' @param shape Desired object/animal shape. Must be class "FFS".
+#' @param shape Desired object/animal shape. Must be class "FLS".
 #' @param c Sound speed of surrounding medium (m/s). Default value is 1500 m/s.
-#' @param f Frequency (Hz).
-#' @param phi Phase deviation (\eqn{\phi}), or phase variability. Accounts for complexities in animal shape and stochasticity of noise in scattering field.
+#' @param frequency Frequency (Hz).
+#' @param x,y,z The x-, y-, and z-axis coordinates that make up the position matrix, \eqn{r_0}.
+#' @param a Radius vector of an animal (m).
+#' @param h Sound speed contrast.
+#' @param g Density contrast.
+#' @param pc Radius of curvature. Default is 3.3.
+#' @param curve A boolean value that dictates whether an animal is curved or not.
+#' @param phase Phase deviation (\eqn{\phi}), or phase variability. Accounts for complexities in animal shape and stochasticity of noise in scattering field.
 #' Default value is 0.0.
-#' @param tilt Orientation of the target relative to the transmit source (\eqn{\theta}). Broadside incidence is considered 90 degrees, or pi/2.
+#' @param theta Orientation of the target relative to the transmit source (\eqn{\theta}). Broadside incidence is considered 90 degrees, or pi/2.
 #' Default value is pi/2; input should be in radians.
+#' @param ncyl Number of segments comprising the scatterer shape.
 #' @usage
-#' SDWBA(shape, c, f, phi, tilt)
+#' SDWBA(shape, c, frequency, phase)
+#' SDWBA(c, frequency, x, y, z, a, h, g, pc, curve, phase, theta ncyl)
 #' @details
 #' Calculates the theoretical TS of a fluid-filled scatterer at a given frequency using the distorted Born wave approximation (DWBA) model.
 #' @return
@@ -112,115 +28,141 @@ FFS_shape <- function(file){
 #' Hankin, R.K.S. 2006. Introducing elliptic, an R package for elliptic and modular functions. Journal of Statistical Software, 15(7).
 #' @export
 
-SDWBA <- function(shape, c=1500, f, phi=0.0, tilt=pi/2){
+SDWBA <- function(shape=NULL, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@rpos[3,],
+                  c=1500, frequency, phase=0.0, a=shape@a, h=shape@h, g=shape@g,
+                  curve=ifelse(is.null(shape),F,shape@curve),
+                  pc=ifelse(is.null(shape),
+                            ifelse(curve==T, 3.3, NA),
+                            ifelse(curve==T, shape@pc, NA)),
+                  theta=ifelse(is.null(shape),pi/2,shape@theta),
+                  ncyl=ifelse(is.null(shape),length(x),shape@ncyl)){
   require(elliptic)
-  k_1 <- cbind(cos(tilt), rep(0,length(tilt)), sin(tilt))
-  k1 <- kcalc(f,c) * k_1
-  k2 <- vecnorm(k1) / shape@h
-  n <- length(shape@a)
-  f.bs <- 0 + 0i
+  rpos <- as.matrix(rbind(x,y,z))
+  kt <- cbind(cos(theta),rep(0,length(theta)),sin(theta))
+  k1 <- kcalc(frequency,c)*kt; k2 <- vecnorm(k1) / h
+  fbs <- 0 + 0i
 
-  for(j in 1:(n-1)){
-    r1 <- c(shape@rpos[1,j], shape@rpos[2,j], shape@rpos[3,j])
-    r2 <- c(shape@rpos[1,j+1], shape@rpos[2,j+1], shape@rpos[3,j+1])
-    a1 <- shape@a[j]
-    a2 <- shape@a[j+1]
-    alphatilt <- acos((k1%*%(r2-r1)) / (vecnorm(k1)*vecnorm(r2-r1)))
-    betatilt <- abs(alphatilt - pi/2)
+  for(j in 1:(ncyl-1)){
+    r1 <- rpos[,j]; r2 <- rpos[,j+1]
+    a1 <- a[j]; a2 <- a[j+1]
+    beta <- abs(acos((k1%*%(r2-r1))/(vecnorm(k1)*vecnorm(r2-r1))) - pi/2)
 
-    integrand <- function(s){
-      rx <- s * (r2[1] - r1[1]) + r1[1]
-      ry <- s * (r2[2] - r1[2]) + r1[2]
-      rz <- s * (r2[3] - r1[3]) + r1[3]
-      r <- c(rx, ry, rz)
-      a <- s * (a2 - a1) + a1
-      gamgam <- 1/(shape@g*shape@h^2)+1/shape@g-2
+    SDWBAint <- function(s){
+      rint <- s * (r2-r1)+r1
+      aint <- s * (a2-a1)+a1
+      gamma <- 1/(g*h^2)+1/g-2
 
-      if(abs(abs(betatilt) - (pi/2)) < 1e-10){
-        bessy <- k2 * a
+      if(abs(abs(beta)-pi/2)<1e-10){
+        bessel <- k2*aint
       }else{
-        bessy <- ja(1,2*k2*a*cos(betatilt))/cos(betatilt)
+        bessel <- ja(1,2*k2*aint*cos(beta))/cos(beta)
       }
 
-      if(shape@shape == "straight"){
-        return(vecnorm(k1)/4*gamgam*a*exp(2i*k1%*%r/shape@h)*bessy*vecnorm(r2-r1))
+      if(curve == F){
+        return(vecnorm(k1)/4*gamma*aint*exp(2i*k1%*%rint/h)*bessel*vecnorm(r2-r1))
       }else{
-        pc <- shape@pc
-        return(vecnorm(k1)*pc/4*gamgam*a*exp(1i*2.0*k2*pc)*exp(-1i*2.0*k2*pc*cos(betatilt))*bessy*(vecnorm(r2-r1)/pc))
+        pc <- pc*max(x)
+        return(vecnorm(k1)*pc/4*gamma*aint*exp(2i*k2*pc)*exp(-2i*k2*pc*cos(beta))*bessel*(vecnorm(r2-r1)/pc))
       }
     }
 
-    integrand <- Vectorize(integrand)
-
-    f <- myintegrate(integrand, 0, 1)
-    f.bs <- f.bs + f * exp(1i * rnorm(1,0,phi))
+    SDWBAint <- Vectorize(SDWBAint)
+    integral <- myintegrate(SDWBAint,0,1)
+    fbs <- fbs + integral * exp(1i * rnorm(1,0,phase))
   }
-  TS <- 20*log10(abs(f.bs))
-  return(TS)
+  return(20*log10(abs(fbs)))
 }
 
-#' Calculates the theoretical TS of a fluid-filled scatterer at a given frequency using the deformed finite cylinder model (DFCM).
+#' Wrapper function that can simulate over distributions of values
 #'
 #'
-#' @param shape Desired object/animal shape. Must be class "FFS".
-#' @param L Maximum length (m) of the scatterer. Can either be provided by shape input, or a manual value.
-#' @param a Maximum radius (m) of the scatterer. Can either be provided by shape input, or a manual value.
-#' @param g Density contrast (g) of the scatterer. Can either be provided by shape input, or a manual value.
-#' @param h Sound speed contrast (h) of the scatterer. Can either be provided by shape input, or a manual value.
-#' @param pc Radius of curvature (m) of the scatterer. Can either be provided by shape input, or a manual value.
-#' @param numdiv Number of divisions to partition the animal shape into.
-#' Can either be provided by the length of the shape position vector, or a manual value.
-#' @param pm Density of surrounding medium (kg/m^3). Default value 1.025 kg/m^3.
-#' @param cm Sound speed of surrounding medium (m/s). Default value is 1500 m/s.
-#' @param f Frequency (Hz).
-#' @param alpha Numerically derived coefficient (\eqn{\alpha_\beta}). Default is 0.8, and is the suggested value.
-#' @param method Currently only the two-ray method is available, but the six-ray and other formulations will be available in the future.
+#' @param shape Desired object/animal shape. Must be class "FLS".
+#' @param c Sound speed of surrounding medium (m/s). Default value is 1500 m/s.
+#' @param frequency Frequency (Hz).
+#' @param x,y,z The x-, y-, and z-axis coordinates that make up the position matrix, \eqn{r_0}.
+#' @param a Radius vector of an animal (m).
+#' @param h Sound speed contrast.
+#' @param g Density contrast.
+#' @param pc Radius of curvature. Default is 3.3.
+#' @param curve A boolean value that dictates whether an animal is curved or not.
+#' @param phase Phase deviation (\eqn{\phi}), or phase variability. Accounts for complexities in animal shape and stochasticity of noise in scattering field.
+#' Default value is 0.0.
+#' @param theta Orientation of the target relative to the transmit source (\eqn{\theta}). Broadside incidence is considered 90 degrees, or pi/2.
+#' Default value is pi/2; input should be in radians.
+#' @param length Option to change the length of the scatterer shape.
+#' @param parallel Boolean value that sets whether multicore CPU parallelization will be used to speed up calculations.
+#' @param n.cores Number of CPU cores that will be dedicated to parallelizing model calculations.
+#' @param nrep Number of repeated iterations to run the model.
+#' @param aggregate Options to aggregate dataframe output into a series of summary statistics. Options include "mean", "median", "minimum", and "maximum".
 #' @usage
-#' SDWBA(shape, f)
-#' SDWBA(L, a, g, h, pc, numdiv, tilt, f)
-#' SDWBA(shape, L, a, g, h, pc, numdiv, tilt, cm, pm, f, alpha, method)
+#' SDWBA.sim(shape, c, frequency, phase, theta, length, nrep, aggregate, parallel, n.cores)
 #' @details
-#' Calculates the theoretical TS of a fluid-filled scatterer at a given frequency using the deformed finite cylinder model (DFCM).
+#' Calculates the theoretical TS of a fluid-filled scatterer at a given frequency using the distorted Born wave approximation (DWBA) model.
 #' @return
 #' Target strength (TS, dB re: 1 m^2)
 #' @references
 #' Stanton, T.K., Chu, D., and Wiebe, P.H. 1998. Sound scattering by several zooplankton groups. II. Scattering models. Journal of the Acoustical Society of America, 103(1), 236-253.
-#' @export
-
-DFCM <- function(shape=NULL, L=max(shape@rpos[,1]), a=max(shape@a), g=shape@g, h=shape@h, pc=shape@pc, numdiv=length(shape@rpos[1,]),
-                 tilt=shape@theta, cm=1500, pm=1.025, f, alpha=0.8, method="two-ray"){
-
-  if(method == "two-ray"){
-    ca <- h*cm #animal soundspeed
-    pa <- g*pm #animal density
-    a_new <- L/numdiv
-    R12 <- ((pa*ca)/(cm*pm)-1) / (pa*ca/(pm*cm)+1)
-    km <- kcalc(f,cm)
-    ka <- kcalc(f,ca)
-    T12 <- 2*(pa*ca/(pm*cm))/(1+(pa*ca/(pm*cm)))
-    T21 <- 2*(pm*cm/(pa*ca))/(1+(pm*cm/(pa*ca)))
-    mu <- -pi/2*km*a_new / (km*a_new+0.4)
-    Io <- 1 - T12 * T21 * exp(1i*4*ka*a_new) * exp(1i*mu)
-    fbs <- 0.5*sqrt(pc*a_new) * R12 * exp(-1i*2*km*a_new) * Io * exp(-alpha*(2*(tilt-pi/2)*pc/L)^2)
-    TS <- 20*log10(abs(fbs))
-    return(TS)
-  }
-}
-
-#' Resize animal to maintain shape based on length.
 #'
-#' @param shape Desired object/animal shape.
-#' @param length New length (m).
-#' @usage
-#' resize(shape, length)
-#' @return
-#' Rescales the shape of an animal based on a desired length.
+#' Hankin, R.K.S. 2006. Introducing elliptic, an R package for elliptic and modular functions. Journal of Statistical Software, 15(7).
 #' @export
 
-resize <- function(shape, length){
-  lscale <- length/max(shape@rpos[1,]) #grab current length of shape and calculate scale ratio
-  mscale <- cbind(c(1,0,0),c(0,1,0),c(0,0,1)) * lscale #calculate position matrix scale
-  shape@rpos <- t(t(shape@rpos) %*% mscale) #rescale length of shape
-  shape@a <- shape@a * lscale #scale radius based on same length ratio
-  return(shape)
+SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@rpos[3,],
+                      c=1500, frequency, phase=0.0, a=shape@a, h=shape@h, g=shape@g,
+                      curve=shape@curve,
+                      pc=shape@pc,
+                      theta=shape@theta,
+                      length=shape@L,
+                      nrep=NULL, aggregate=NULL, parallel=F, n.cores=NULL){
+  if(!is.null(nrep)){
+    repseq <- seq(1,nrep,1)
+  }else{
+    repseq <- 1
+  }
+
+  simdf <- expand.grid(iteration=repseq, c=c, frequency=frequency, g=g, h=h, theta=theta, pc=pc, curve=curve, phase=phase, length=length, TS=NA)
+
+  if(parallel==F){
+    for(i in 1:nrow(simdf)){
+      target_sim <- Shapely(shape,curve=simdf$curve[i],pc=simdf$pc[i],theta=simdf$theta[i],length=simdf$length[i])
+      simdf$TS[i] <- SDWBA(target_sim,c=simdf$c[i],frequency=simdf$frequency[i],phase=simdf$phase[i],g=simdf$g[i],h=simdf$h[i])
+    }
+  }else if(parallel==T){
+    require(foreach)
+    require(parallel)
+    require(doParallel)
+    if(!is.null(n.cores)){
+      n.cores <- n.cores
+    }else{
+      n.cores <- detectCores()
+    }
+    cl <- makeCluster(n.cores)
+    registerDoParallel(cl)
+
+    simdf$TS <- foreach(i=1:nrow(simdf), .combine=c, .packages="acousticTS") %dopar% {
+      target_sim <- Shapely(shape,curve=simdf$curve[i],pc=simdf$pc[i],theta=simdf$theta[i],length=simdf$length[i])
+      SDWBA(target_sim,c=simdf$c[i],frequency=simdf$frequency[i],phase=simdf$phase[i],g=simdf$g[i],h=simdf$h[i])
+    }
+
+    stopCluster(cl)
+  }
+
+  if(!is.null(aggregate)){
+    dum <- data.frame(Stat=NA,TS=NA)
+    if("mean" %in% aggregate){
+      dum <- rbind(dum,data.frame(Stat="Mean", TS=10*log10(mean(10^(simdf$TS/10)))))
+    }
+    if("median" %in% aggregate){
+      dum <- rbind(dum,data.frame(Stat="Median", TS=median(simdf$TS)))
+    }
+    if("minimum" %in% aggregate){
+      dum <- rbind(dum,data.frame(Stat="Minimum", TS=min(simdf$TS)))
+    }
+    if("maximum" %in% aggregate){
+      dum <- rbind(dum,data.frame(Stat="Maximum", TS=max(simdf$TS)))
+    }
+    dum <- dum[-(is.na(dum$Stat)),]
+    return(dum)
+  }else{
+    return(simdf)
+  }
 }
