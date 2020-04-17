@@ -1,6 +1,6 @@
 # acousticTS
 ### Suite of theoretical acoustic target strength scattering models
-Current version: v0.9.2 [01 April 2020]
+Current version: v0.9.5 [17 April 2020]
 
 ### Citations
 
