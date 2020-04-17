@@ -2,12 +2,12 @@
 % Please edit documentation in R/utilities.R
 \name{Shapely}
 \alias{Shapely}
-\title{Manipulate object}
+\title{Manipulate scatterer object.}
 \usage{
-
+Shapely(shape, curve, pc, theta, length)
 }
 \arguments{
-\item{shape}{Desired object/animal shape.}
+\item{shape}{Input scatterer shape. [Currently only supports the FLS object-class]}
 
 \item{curve}{Curve (boolean, T/F).}
 
@@ -21,5 +21,5 @@
 Returns manipulated object.
 }
 \description{
-Manipulate object
+Manipulate scatterer object.
 }
