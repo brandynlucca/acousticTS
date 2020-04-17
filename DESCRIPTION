@@ -8,7 +8,10 @@ Description:
 Depends: 
 	R (>= 3.4.3)
 Imports:
-	elliptic
+	elliptic,
+	parallel,
+	doParallel,
+	foreach
 License: What license is it under?
 Encoding: UTF-8
 LazyData: 

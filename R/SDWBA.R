@@ -3,15 +3,21 @@
 #'
 #' @param shape Desired object/animal shape. Must be class "FLS".
 #' @param c Sound speed of surrounding medium (m/s). Default value is 1500 m/s.
-#' @param f Frequency (Hz).
-#' @param phi Phase deviation (\eqn{\phi}), or phase variability. Accounts for complexities in animal shape and stochasticity of noise in scattering field.
+#' @param frequency Frequency (Hz).
+#' @param x,y,z The x-, y-, and z-axis coordinates that make up the position matrix, \eqn{r_0}.
+#' @param a Radius vector of an animal (m).
+#' @param h Sound speed contrast.
+#' @param g Density contrast.
+#' @param pc Radius of curvature. Default is 3.3.
+#' @param curve A boolean value that dictates whether an animal is curved or not.
+#' @param phase Phase deviation (\eqn{\phi}), or phase variability. Accounts for complexities in animal shape and stochasticity of noise in scattering field.
 #' Default value is 0.0.
 #' @param theta Orientation of the target relative to the transmit source (\eqn{\theta}). Broadside incidence is considered 90 degrees, or pi/2.
 #' Default value is pi/2; input should be in radians.
-#' @param niterations Number of times/iterations the model will be ran.
-#' @param summary Will output the
+#' @param ncyl Number of segments comprising the scatterer shape.
 #' @usage
-#' SDWBA(shape, c, f, phi, theta)
+#' SDWBA(shape, c, frequency, phase)
+#' SDWBA(c, frequency, x, y, z, a, h, g, pc, curve, phase, theta ncyl)
 #' @details
 #' Calculates the theoretical TS of a fluid-filled scatterer at a given frequency using the distorted Born wave approximation (DWBA) model.
 #' @return
@@ -70,17 +76,26 @@ SDWBA <- function(shape=NULL, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@rpos[3
 #' Wrapper function that can simulate over distributions of values
 #'
 #'
-#' @param shape Desired object/animal shape. Must be class "FFS".
+#' @param shape Desired object/animal shape. Must be class "FLS".
 #' @param c Sound speed of surrounding medium (m/s). Default value is 1500 m/s.
-#' @param f Frequency (Hz).
-#' @param phi Phase deviation (\eqn{\phi}), or phase variability. Accounts for complexities in animal shape and stochasticity of noise in scattering field.
+#' @param frequency Frequency (Hz).
+#' @param x,y,z The x-, y-, and z-axis coordinates that make up the position matrix, \eqn{r_0}.
+#' @param a Radius vector of an animal (m).
+#' @param h Sound speed contrast.
+#' @param g Density contrast.
+#' @param pc Radius of curvature. Default is 3.3.
+#' @param curve A boolean value that dictates whether an animal is curved or not.
+#' @param phase Phase deviation (\eqn{\phi}), or phase variability. Accounts for complexities in animal shape and stochasticity of noise in scattering field.
 #' Default value is 0.0.
 #' @param theta Orientation of the target relative to the transmit source (\eqn{\theta}). Broadside incidence is considered 90 degrees, or pi/2.
 #' Default value is pi/2; input should be in radians.
-#' @param nrep Number of times/iterations the model will be ran.
-#' @param aggregate Will output an aggregate statistic with the following options: "mean", "median", "maximum", and "minimum". Multiple, or all, of these options are also available.
+#' @param length Option to change the length of the scatterer shape.
+#' @param parallel Boolean value that sets whether multicore CPU parallelization will be used to speed up calculations.
+#' @param n.cores Number of CPU cores that will be dedicated to parallelizing model calculations.
+#' @param nrep Number of repeated iterations to run the model.
+#' @param aggregate Options to aggregate dataframe output into a series of summary statistics. Options include "mean", "median", "minimum", and "maximum".
 #' @usage
-#' SDWBA.sim(shape, c, f, phi, theta)
+#' SDWBA.sim(shape, c, frequency, phase, theta, length, nrep, aggregate, parallel, n.cores)
 #' @details
 #' Calculates the theoretical TS of a fluid-filled scatterer at a given frequency using the distorted Born wave approximation (DWBA) model.
 #' @return
