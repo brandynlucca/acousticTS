@@ -61,34 +61,15 @@ degrad <- function(x,d){
 #Calculate acoustic wavenumber based on the sound speed of water
 kcalc <- function(f,c){2*pi*f/c}
 
-#' Resize animal to maintain shape based on length.
+#' Manipulate scatterer object.
 #'
-#' @param shape Desired object/animal shape.
-#' @param length New length (m).
-#' @usage
-#' resize(shape, length)
-#' @return
-#' Rescales the shape of an animal based on a desired length.
-#' @export
-
-resize <- function(shape, length){
-  lscale <- length/max(shape@rpos[1,]) #grab current length of shape and calculate scale ratio
-  mscale <- cbind(c(1,0,0),c(0,1,0),c(0,0,1)) * lscale #calculate position matrix scale
-  shape@rpos <- t(t(shape@rpos) %*% mscale) #rescale length of shape
-  shape@a <- shape@a * lscale #scale radius based on same length ratio
-  return(shape)
-}
-
-
-#' Manipulate object
-#'
-#' @param shape Desired object/animal shape.
+#' @param shape Input scatterer shape. [Currently only supports the FLS object-class]
 #' @param curve Curve (boolean, T/F).
 #' @param pc Radius of curvature (pc)
 #' @param theta Orientation
 #' @param length New Length (m)
 #' @usage
-#'
+#' Shapely(shape, curve, pc, theta, length)
 #' @return
 #' Returns manipulated object.
 #' @export
