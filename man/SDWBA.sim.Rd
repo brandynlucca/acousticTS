@@ -32,7 +32,10 @@ Default value is 0.0.}
 
 \item{pc}{Radius of curvature. Default is 3.3.}
 
-\item{theta}{Orientation of the target relative to the transmit source (\eqn{\theta}). Broadside incidence is considered 90 degrees, or pi/2.
+\item{theta}{Orientation of the target relative to the transmit source (\eqn{\theta}). Broadside incidence is considered 0 degrees, or 0 radians. Animals are
+either tilted anterior-end down, which corresponds to (\eqn{-\pi/2}) and (\eqn{pi/2}) respectively. The model will automatically convert these orientations
+to the orientation definition used by McGehee et al. (1998) whereby orientation is based on the angle of the incident soundwave such that
+broadside incidence is \eqn{\pi/2} (dorsal-up) and \eqn{3\pi/2} (dorsal-down), or when the transmitted soundwave is completely perpendicular to the target.
 Default value is pi/2; input should be in radians.}
 
 \item{length}{Option to change the length of the scatterer shape.}

@@ -75,7 +75,6 @@ SDWBA <- function(shape=NULL, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@rpos[3
 
 #' Wrapper function that can simulate over distributions of values
 #'
-#'
 #' @param shape Desired object/animal shape. Must be class "FLS".
 #' @param c Sound speed of surrounding medium (m/s). Default value is 1500 m/s.
 #' @param frequency Frequency (Hz).
@@ -87,7 +86,10 @@ SDWBA <- function(shape=NULL, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@rpos[3
 #' @param curve A boolean value that dictates whether an animal is curved or not.
 #' @param phase Phase deviation (\eqn{\phi}), or phase variability. Accounts for complexities in animal shape and stochasticity of noise in scattering field.
 #' Default value is 0.0.
-#' @param theta Orientation of the target relative to the transmit source (\eqn{\theta}). Broadside incidence is considered 90 degrees, or pi/2.
+#' @param theta Orientation of the target relative to the transmit source (\eqn{\theta}). Broadside incidence is considered 0 degrees, or 0 radians. Animals are
+#' either tilted anterior-end down, which corresponds to (\eqn{-\pi/2}) and (\eqn{pi/2}) respectively. The model will automatically convert these orientations
+#' to the orientation definition used by McGehee et al. (1998) whereby orientation is based on the angle of the incident soundwave such that
+#' broadside incidence is \eqn{\pi/2} (dorsal-up) and \eqn{3\pi/2} (dorsal-down), or when the transmitted soundwave is completely perpendicular to the target.
 #' Default value is pi/2; input should be in radians.
 #' @param length Option to change the length of the scatterer shape.
 #' @param nrep Number of repeated iterations to run the model.
@@ -118,6 +120,11 @@ SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@r
                       theta=shape@theta,
                       length=shape@L,
                       nrep=NULL, permute=F, aggregate=NULL, parallel=F, n.cores=NULL){
+
+  if(theta != shape@theta){
+    theta <- theta + pi/2
+  }
+
   if(!is.null(nrep)){
     repseq <- seq(1,nrep,1)
   }else{
