@@ -23,7 +23,10 @@
 #' \link[acousticTS]{DFCM}, and \link[acousticTS]{Shapely} functions all use FLS-objects for their respective inputs.
 #'
 #' @seealso
-#' \code{\link[acousticTS{FLSread}}
+#' \link{SDWBA}
+#' \code{\link{SDWBA}}
+#' \link[acousticTS]{SDWBA}
+#'
 #'
 #' @export
 

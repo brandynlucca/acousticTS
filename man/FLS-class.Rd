@@ -37,5 +37,7 @@ built-in datasets (e.g., \link[acousticTS]{mcgehee}) or using \link[acousticTS]{
 \link[acousticTS]{DFCM}, and \link[acousticTS]{Shapely} functions all use FLS-objects for their respective inputs.
 }
 \seealso{
-\code{\link[acousticTS{FLSread}}
+\link{SDWBA}
+\code{\link{SDWBA}}
+\link[acousticTS]{SDWBA}
 }
