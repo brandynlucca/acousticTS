@@ -90,12 +90,17 @@ SDWBA <- function(shape=NULL, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@rpos[3
 #' @param theta Orientation of the target relative to the transmit source (\eqn{\theta}). Broadside incidence is considered 90 degrees, or pi/2.
 #' Default value is pi/2; input should be in radians.
 #' @param length Option to change the length of the scatterer shape.
-#' @param parallel Boolean value that sets whether multicore CPU parallelization will be used to speed up calculations.
-#' @param n.cores Number of CPU cores that will be dedicated to parallelizing model calculations.
 #' @param nrep Number of repeated iterations to run the model.
 #' @param aggregate Options to aggregate dataframe output into a series of summary statistics. Options include "mean", "median", "minimum", and "maximum".
+#' @param permute Calculates for every permutation of variables.
+#' @param parallel Boolean value that sets whether multicore CPU parallelization will be used to speed up calculations.
+#' @param n.cores Number of CPU cores that will be dedicated to parallelizing model calculations.
 #' @usage
-#' SDWBA.sim(shape, c, frequency, phase, theta, length, nrep, aggregate, parallel, n.cores)
+#' SDWBA.sim(shape, c=1500, frequency, phase=0.0, curve=F, nrep=NULL, permute=F,
+#' aggregate=NULL, parallel=F, n.cores=NULL)
+#'
+#' SDWBA.sim(shape, c=1500, frequency, phase=0.0, h, g, curve=F, pc, theta, length,
+#' nrep=NULL, permute=F, aggregate=NULL, parallel=F, n.cores=NULL)
 #' @details
 #' Calculates the theoretical TS of a fluid-filled scatterer at a given frequency using the distorted Born wave approximation (DWBA) model.
 #' @return
@@ -112,14 +117,30 @@ SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@r
                       pc=shape@pc,
                       theta=shape@theta,
                       length=shape@L,
-                      nrep=NULL, aggregate=NULL, parallel=F, n.cores=NULL){
+                      nrep=NULL, permute=F, aggregate=NULL, parallel=F, n.cores=NULL){
   if(!is.null(nrep)){
     repseq <- seq(1,nrep,1)
   }else{
     repseq <- 1
   }
 
-  simdf <- expand.grid(iteration=repseq, c=c, frequency=frequency, g=g, h=h, theta=theta, pc=pc, curve=curve, phase=phase, length=length, TS=NA)
+  if(permute == T){
+    simdf <- expand.grid(iteration=repseq, c=c, frequency=frequency, g=g, h=h, theta=theta, pc=pc, curve=curve, phase=phase, length=length, TS=NA)
+  }else{
+    lendf <- data.frame(param=c("h","g","curve","pc","theta","length","phase"),
+                        len=c(length(h),length(g),length(curve),length(pc),length(theta),length(length),length(phase)))
+    val<- data.frame(x=seq(1,max(lendf$len),1))
+    simdf <- expand.grid(iteration=repseq, iterator=t(val), c=c, frequency=frequency)
+    simdf <- cbind(simdf, data.frame(g=rep(g,max(lendf$len)/lendf$len[2]*max(repseq)),
+                                     h=rep(h,max(lendf$len)/lendf$len[1]*max(repseq)),
+                                     theta=rep(theta,lendf$len[5]/max(lendf$len)*max(repseq)),
+                                     pc=rep(pc,max(lendf$len)/lendf$len[4]*max(repseq)),
+                                     curve=rep(curve,max(lendf$len)/lendf$len[3]*max(repseq)),
+                                     phase=rep(phase,max(lendf$len)/lendf$len[7]*max(repseq)),
+                                     length=rep(length,max(lendf$len)/lendf$len[6]*max(repseq)),
+                                     TS=NA))
+    simdf <- simdf[,-2]
+  }
 
   if(parallel==F){
     for(i in 1:nrow(simdf)){

@@ -4,7 +4,11 @@
 \alias{SDWBA.sim}
 \title{Wrapper function that can simulate over distributions of values}
 \usage{
-SDWBA.sim(shape, c, frequency, phase, theta, length, nrep, aggregate, parallel, n.cores)
+SDWBA.sim(shape, c=1500, frequency, phase=0.0, curve=F, nrep=NULL, permute=F,
+aggregate=NULL, parallel=F, n.cores=NULL)
+
+SDWBA.sim(shape, c=1500, frequency, phase=0.0, h, g, curve=F, pc, theta, length,
+nrep=NULL, permute=F, aggregate=NULL, parallel=F, n.cores=NULL)
 }
 \arguments{
 \item{shape}{Desired object/animal shape. Must be class "FLS".}
@@ -34,6 +38,8 @@ Default value is pi/2; input should be in radians.}
 \item{length}{Option to change the length of the scatterer shape.}
 
 \item{nrep}{Number of repeated iterations to run the model.}
+
+\item{permute}{Calculates for every permutation of variables.}
 
 \item{aggregate}{Options to aggregate dataframe output into a series of summary statistics. Options include "mean", "median", "minimum", and "maximum".}
 
