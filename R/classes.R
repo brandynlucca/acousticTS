@@ -20,13 +20,7 @@
 #' @details
 #' FLS objects can be created using \link[acousticTS]{FLSwrite} and \link[acousticTS]{FLSgenerate}. These objects can also be read using
 #' built-in datasets (e.g., \link[acousticTS]{mcgehee}) or using \link[acousticTS]{FLSread}. The \link[acousticTS]{SDWBA}, \link[acousticTS]{SDWBA.sim},
-#' \link[acousticTS]{DFCM}, and \link[acousticTS]{Shapely} functions all use FLS-objects for their respective inputs.
-#'
-#' @seealso
-#' \link{SDWBA}
-#' \code{\link{SDWBA}}
-#' \link[acousticTS]{SDWBA}
-#'
+#' \link[acousticTS]{DFCM}, and \link[acousticTS]{Shapely} functions all use FLS-objects for their respective inputs. \code{\link[=acousticTS]{SDWBA()}}
 #'
 #' @export
 
