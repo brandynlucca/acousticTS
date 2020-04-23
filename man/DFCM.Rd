@@ -4,9 +4,10 @@
 \alias{DFCM}
 \title{Calculates the theoretical TS of a fluid-filled scatterer at a given frequency using the deformed finite cylinder model (DFCM).}
 \usage{
-SDWBA(shape, f)
-SDWBA(L, a, g, h, pc, numdiv, tilt, f)
-SDWBA(shape, L, a, g, h, pc, numdiv, tilt, cm, pm, f, alpha, method)
+DFCM(shape = NULL, L = max(shape@rpos[, 1]), a = max(shape@a),
+  g = shape@g, h = shape@h, pc = shape@pc,
+  numdiv = length(shape@rpos[1, ]), theta = shape@theta, cm = 1500,
+  pm = 1.025, frequency, alpha = 0.8, method = "two-ray")
 }
 \arguments{
 \item{shape}{Desired object/animal shape. Must be class "FFS".}
@@ -24,11 +25,13 @@ SDWBA(shape, L, a, g, h, pc, numdiv, tilt, cm, pm, f, alpha, method)
 \item{numdiv}{Number of divisions to partition the animal shape into.
 Can either be provided by the length of the shape position vector, or a manual value.}
 
+\item{theta}{Orientation (radians).}
+
 \item{cm}{Sound speed of surrounding medium (m/s). Default value is 1500 m/s.}
 
 \item{pm}{Density of surrounding medium (kg/m^3). Default value 1.025 kg/m^3.}
 
-\item{f}{Frequency (Hz).}
+\item{frequency}{Frequency (Hz).}
 
 \item{alpha}{Numerically derived coefficient (\eqn{\alpha_\beta}). Default is 0.8, and is the suggested value.}
 

@@ -183,11 +183,11 @@ yd <- function(l,n){
 #' @param l An integer or fractional order
 #' @param n A complex or real argument
 #' @usage
-#' yd(l,n)
+#' ysd(l,n)
 #' @examples
 #' l <- 1
 #' n < 1
-#' yd(l,n)
+#' ysd(l,n)
 #' [1] 2.223244
 #' @return
 #' yd(l,n) calculates the first derivative of the spherical Bessel function of the second kind (zbesy AMOS routine, Yv).

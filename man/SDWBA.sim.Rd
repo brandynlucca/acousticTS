@@ -9,6 +9,9 @@ aggregate=NULL, parallel=F, n.cores=NULL)
 
 SDWBA.sim(shape, c=1500, frequency, phase=0.0, h, g, curve=F, pc, theta, length,
 nrep=NULL, permute=F, aggregate=NULL, parallel=F, n.cores=NULL)
+
+SDWBA.sim(shape, c=1500, frequency, phase=0.0, x, y, z, a, h, g, curve=F, pc, theta, length,
+nrep=NULL, permute=F, aggregate=NULL, parallel=F, n.cores=NULL)
 }
 \arguments{
 \item{shape}{Desired object/animal shape. Must be class "FLS".}

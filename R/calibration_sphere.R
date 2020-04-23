@@ -218,7 +218,6 @@ sphere.spec <- function(c,rho,material="Tungsten carbide",diameter,fs,fe,fi){
 #' @return
 #' Generates TS-frequency spectrum for an elastic sphere.
 #' @export
-#' @import ggplot2
 
 sphere.spec_plot <- function(df){
   require(ggplot2)

@@ -17,7 +17,8 @@
 #' @param ncyl Number of segments comprising the scatterer shape.
 #' @usage
 #' SDWBA(shape, c, frequency, phase)
-#' SDWBA(c, frequency, x, y, z, a, h, g, pc, curve, phase, theta ncyl)
+#'
+#' SDWBA(shape=NULL, c, frequency, x, y, z, a, h, g, pc, curve, phase, theta, ncyl)
 #' @details
 #' Calculates the theoretical TS of a fluid-filled scatterer at a given frequency using the distorted Born wave approximation (DWBA) model.
 #' @return
@@ -27,6 +28,10 @@
 #'
 #' Hankin, R.K.S. 2006. Introducing elliptic, an R package for elliptic and modular functions. Journal of Statistical Software, 15(7).
 #' @export
+#' @import elliptic
+#' @import foreach
+#' @import doParallel
+#' @import parallel
 
 SDWBA <- function(shape=NULL, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@rpos[3,],
                   c=1500, frequency, phase=0.0, a=shape@a, h=shape@h, g=shape@g,
@@ -36,7 +41,7 @@ SDWBA <- function(shape=NULL, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@rpos[3
                             ifelse(curve==T, shape@pc, NA)),
                   theta=ifelse(is.null(shape),pi/2,shape@theta),
                   ncyl=ifelse(is.null(shape),length(x),shape@ncyl)){
-  require(elliptic)
+  requireNamespace(elliptic, quietly=T)
   rpos <- as.matrix(rbind(x,y,z))
   kt <- cbind(cos(theta),rep(0,length(theta)),sin(theta))
   k1 <- kcalc(frequency,c)*kt; k2 <- vecnorm(k1) / h
@@ -103,6 +108,9 @@ SDWBA <- function(shape=NULL, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@rpos[3
 #'
 #' SDWBA.sim(shape, c=1500, frequency, phase=0.0, h, g, curve=F, pc, theta, length,
 #' nrep=NULL, permute=F, aggregate=NULL, parallel=F, n.cores=NULL)
+#'
+#' SDWBA.sim(shape, c=1500, frequency, phase=0.0, x, y, z, a, h, g, curve=F, pc, theta, length,
+#' nrep=NULL, permute=F, aggregate=NULL, parallel=F, n.cores=NULL)
 #' @details
 #' Calculates the theoretical TS of a fluid-filled scatterer at a given frequency using the distorted Born wave approximation (DWBA) model.
 #' @return
@@ -112,6 +120,10 @@ SDWBA <- function(shape=NULL, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@rpos[3
 #'
 #' Hankin, R.K.S. 2006. Introducing elliptic, an R package for elliptic and modular functions. Journal of Statistical Software, 15(7).
 #' @export
+#' @import elliptic
+#' @import foreach
+#' @import doParallel
+#' @import parallel
 
 SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@rpos[3,],
                       c=1500, frequency, phase=0.0, a=shape@a, h=shape@h, g=shape@g,
@@ -155,9 +167,9 @@ SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@r
       simdf$TS[i] <- SDWBA(target_sim,c=simdf$c[i],frequency=simdf$frequency[i],phase=simdf$phase[i],g=simdf$g[i],h=simdf$h[i])
     }
   }else if(parallel==T){
-    require(foreach)
-    require(parallel)
-    require(doParallel)
+    requireNamespace(foreach, quietly=T)
+    requireNamespace(parallel, quietly=T)
+    requireNamespace(doParallel, quietly=T)
     if(!is.null(n.cores)){
       n.cores <- n.cores
     }else{

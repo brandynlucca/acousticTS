@@ -4,7 +4,16 @@
 \alias{HP}
 \title{Calculates the theoretical TS of a shelled organism using the non-modal High Pass (HP) model}
 \usage{
-HP(animal, c = 1500, frequency, a = max(animal@a))
+HP(shape, c = 1500, frequency, a = max(shape@a))
+}
+\arguments{
+\item{shape}{Desired object/animal shape.}
+
+\item{c}{Sound speed of surrounding medium (m/s). Default value is 1500 m/s.}
+
+\item{frequency}{Frequency (Hz).}
+
+\item{a}{Radius of object (m).}
 }
 \value{
 Target strength (TS, dB re: 1 m^2)
