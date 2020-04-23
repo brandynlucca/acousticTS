@@ -1,16 +1,17 @@
 #' Calculates the theoretical TS of a shelled organism using the non-modal High Pass (HP) model
-#'
-#' @usage
-#' @details
+#' @param shape Desired object/animal shape.
+#' @param frequency Frequency (Hz).
+#' @param c Sound speed of surrounding medium (m/s). Default value is 1500 m/s.
+#' @param a Radius of object (m).
 #' @return
 #' Target strength (TS, dB re: 1 m^2)
 #' @references
 #' @export
 
-HP <- function(animal, c=1500, frequency, a=max(animal@a)){
+HP <- function(shape, c=1500, frequency, a=max(shape@a)){
   k <- kcalc(frequency, c)
-  alphapi <- (1-animal@g*animal@h^2)/3*animal@g*animal@h^2+(1-animal@g)/(1+2*animal@g)
-  R <- (animal@g*animal@h-1)/(animal@g*animal@h+1)
+  alphapi <- (1-shape@g*shape@h^2)/3*shape@g*shape@h^2+(1-shape@g)/(1+2*shape@g)
+  R <- (shape@g*shape@h-1)/(shape@g*shape@h+1)
   fbs <- a^2*(k*a)^4*alphapi^2/(1+4*(k*a)^4*alphapi^2/R^2)
   TS <- 10*log10(fbs)
   return(TS)

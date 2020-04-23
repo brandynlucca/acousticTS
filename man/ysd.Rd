@@ -4,7 +4,7 @@
 \alias{ysd}
 \title{Calculate the first derivative of the spherical Bessel function of the second kind.}
 \usage{
-yd(l,n)
+ysd(l,n)
 }
 \arguments{
 \item{l}{An integer or fractional order}
@@ -24,6 +24,6 @@ and Nonnegative Order", http://netlib.org/amos
 \examples{
 l <- 1
 n < 1
-yd(l,n)
+ysd(l,n)
 [1] 2.223244
 }

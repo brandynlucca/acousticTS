@@ -5,7 +5,8 @@
 \title{Calculates the theoretical TS of a fluid-like scatterer at a given frequency using the distorted Born wave approximation (DWBA) model.}
 \usage{
 SDWBA(shape, c, frequency, phase)
-SDWBA(c, frequency, x, y, z, a, h, g, pc, curve, phase, theta ncyl)
+
+SDWBA(shape=NULL, c, frequency, x, y, z, a, h, g, pc, curve, phase, theta, ncyl)
 }
 \arguments{
 \item{shape}{Desired object/animal shape. Must be class "FLS".}

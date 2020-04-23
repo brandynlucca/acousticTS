@@ -5,6 +5,23 @@
 #' into discretized cylinders. This, specifically, includes a position matrix, radius, material properties (g, h), orientation,
 #' animal shape, and body curvature. This class is used within the DWBA and DFCM model functions. In the future, this will also allow for
 #' converting one class of scatterer into another for seemless usage for model comparisons.
+#'
+#' @param rpos A 3xN matrix, where N is the number of columns, or segments, in our scatterer object. The rows represent the x-, y-, and z-axis
+#' shape values in that order. Units in meters.
+#' @param a An N-length radius vector. Units in meters.
+#' @param g Density contrast. Units are dimensionless.
+#' @param h Sound speed contrast. Units are dimensionless.
+#' @param theta Animal orientation, where \eqn{\pi/2} is broadside incidence. Units in radians.
+#' @param curve Body curvature/flexure. Boolean (T/F) which flags the appropriate model formulation.
+#' @param pc Radius of curvature ratio. Units are dimensionless.
+#' @param L Length of target. Units in meters.
+#' @param ncyl Number of segments/cylinders comprising the shape. Units should be an integer value.
+#'
+#' @details
+#' FLS objects can be created using \link[acousticTS]{FLSwrite} and \link[acousticTS]{FLSgenerate}. These objects can also be read using
+#' built-in datasets (e.g., \link[acousticTS]{mcgehee}) or using \link[acousticTS]{FLSread}. The \link[acousticTS]{SDWBA}, \link[acousticTS]{SDWBA.sim},
+#' \link[acousticTS]{DFCM}, and \link[acousticTS]{Shapely} functions all use FLS-objects for their respective inputs.
+#'
 #' @export
 
 FLS <- setClass("FLS",slots=c(rpos="matrix",a="numeric",g="numeric",h="numeric",theta="numeric",curve="logical",pc="numeric",L="numeric",ncyl="numeric"))
