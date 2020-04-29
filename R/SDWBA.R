@@ -51,6 +51,7 @@ SDWBA <- function(shape=NULL, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@rpos[3
     beta <- abs(acos((k1%*%(r2-r1))/(vecnorm(k1)*vecnorm(r2-r1))) - pi/2)
 
     SDWBAint <- function(s){
+      requireNamespace("elliptic", quietly=T)
       rint <- s * (r2-r1)+r1
       aint <- s * (a2-a1)+a1
       gamma <- 1/(g*h^2)+1/g-2
@@ -131,7 +132,7 @@ SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@r
                       length=shape@L,
                       nrep=NULL, permute=F, aggregate=NULL, parallel=F, n.cores=NULL){
 
-  if(theta != shape@theta){
+  if(theta[1] != shape@theta){
     theta <- theta + pi/2
   }
 
@@ -165,9 +166,8 @@ SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@r
       simdf$TS[i] <- SDWBA(target_sim,c=simdf$c[i],frequency=simdf$frequency[i],phase=simdf$phase[i],g=simdf$g[i],h=simdf$h[i])
     }
   }else if(parallel==T){
-    requireNamespace(foreach, quietly=T)
-    requireNamespace(parallel, quietly=T)
-    requireNamespace(doParallel, quietly=T)
+    requireNamespace("foreach", quietly=T)
+    requireNamespace("doParallel", quietly=T)
     if(!is.null(n.cores)){
       n.cores <- n.cores
     }else{
