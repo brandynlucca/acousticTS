@@ -1,6 +1,5 @@
 #' Calculates the theoretical TS of a fluid-like scatterer at a given frequency using the distorted Born wave approximation (DWBA) model.
 #'
-#'
 #' @param shape Desired object/animal shape. Must be class "FLS".
 #' @param c Sound speed of surrounding medium (m/s). Default value is 1500 m/s.
 #' @param frequency Frequency (Hz).
@@ -41,7 +40,6 @@ SDWBA <- function(shape=NULL, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@rpos[3
                             ifelse(curve==T, shape@pc, NA)),
                   theta=ifelse(is.null(shape),pi/2,shape@theta),
                   ncyl=ifelse(is.null(shape),length(x),shape@ncyl)){
-  requireNamespace(elliptic, quietly=T)
   rpos <- as.matrix(rbind(x,y,z))
   kt <- cbind(cos(theta),rep(0,length(theta)),sin(theta))
   k1 <- kcalc(frequency,c)*kt; k2 <- vecnorm(k1) / h

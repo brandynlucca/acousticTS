@@ -171,6 +171,18 @@ yd <- function(l,n){
   return(ifelse(sign<1,(-1^l)*s,s))
 }
 
+#' Bessel function of the third kind
+#'@export
+ha <- function(l,n){return(ja(l,n) + 1i*ya(l,n))}
+
+#' Spherical Bessel function of the third kind
+#' @export
+hl <- function(l,n){return(sqrt(pi/(2*n))*ha(l+0.5,n))}
+
+#' First derivative of the spherical Bessel function of the third kind
+#' @export
+hsd <- function(l,n){return(-hl(l+1,n)+(l/n)*hl(l,n))}
+
 #' Calculate the first derivative of the spherical Bessel function of the second kind.
 #'
 #' @description
