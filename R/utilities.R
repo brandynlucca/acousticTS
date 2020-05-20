@@ -90,8 +90,6 @@ Shapely <- function(shape, curve=shape@curve, pc=0.0, theta=shape@theta, length=
 }
 
 #' Toggle between log- and linear-domain for backscatter values.
-#' @aliases TS2sigma
-#' @aliases sigma2TS
 #' @param x A real value in degrees or radians
 #' @usage
 #' To convert from TS to \eqn{\sigma_bs}
@@ -111,6 +109,7 @@ TS2sigma <- function(x){
   return(10^(x/10))
 }
 
+#' Convert sigma to TS.
 #' @export
 sigma2TS <- function(x){
   return(10*log10(x))
