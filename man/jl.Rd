@@ -10,9 +10,6 @@ jl(l,n,sign)
 \item{l}{An integer or fractional order}
 
 \item{n}{A complex or real argument}
-
-\item{sign}{Flag used to to determine whether to add or subtract 0.5 from the function's order (l); only used
-for spherical Bessel function of first kind.}
 }
 \value{
 jl(l,n,sign) calculates the spherical Bessel function of the first kind (zbesj AMOS routine, Iv).

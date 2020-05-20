@@ -21,3 +21,6 @@ Target strength (TS, dB re: 1 m^2)
 \description{
 Calculates the theoretical TS of a shelled organism using the non-modal High Pass (HP) model
 }
+\references{
+
+}
