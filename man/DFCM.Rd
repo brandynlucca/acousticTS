@@ -4,10 +4,21 @@
 \alias{DFCM}
 \title{Calculates the theoretical TS of a fluid-filled scatterer at a given frequency using the deformed finite cylinder model (DFCM).}
 \usage{
-DFCM(shape = NULL, L = max(shape@rpos[, 1]), a = max(shape@a),
-  g = shape@g, h = shape@h, pc = shape@pc,
-  numdiv = length(shape@rpos[1, ]), theta = shape@theta, cm = 1500,
-  pm = 1.025, frequency, alpha = 0.8, method = "two-ray")
+DFCM(
+  shape = NULL,
+  L = max(shape@rpos[, 1]),
+  a = max(shape@a),
+  g = shape@g,
+  h = shape@h,
+  pc = shape@pc,
+  numdiv = length(shape@rpos[1, ]),
+  theta = shape@theta,
+  cm = 1500,
+  pm = 1.025,
+  frequency,
+  alpha = 0.8,
+  method = "two-ray"
+)
 }
 \arguments{
 \item{shape}{Desired object/animal shape. Must be class "FFS".}

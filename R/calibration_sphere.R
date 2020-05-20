@@ -45,11 +45,11 @@ TS_calculate <- function(q,q1,q2,alpha,beta,a){
   foo_l <- 0 #Previous iteration of summed term in Equation 7
 
   while(k == TRUE){
-    A2 <- (l^2 + l - 2)* jl(l,q2,1) + q2^2 * jsdd(l,q2) #Equation 6b
-    A1 <- 2 * l * (l + 1) * (q1 * jsd(l,q1) - jl(l,q1,1)) #Equation 6c
-    B2 <- A2 * q1^2 * (beta*jl(l,q1,1) - alpha*jsdd(l,q1)) - A1 * alpha * (jl(l,q2,1) - q2 * jsd(l,q2)) #Equation 6f
-    B1 <- q * (A2 * q1 * jsd(l,q1) - A1 * jl(l,q2,1)) #Equation 6g
-    eta_l <- atan(-(B2 * jsd(l,q) - B1 * jl(l,q,1)) / (B2 * ysd(l,q) - B1*yl(l,q))) #Equation 6h
+    A2 <- (l^2 + l - 2)* jl(l,q2) + q2^2 * jsdd(l,q2) #Equation 6b
+    A1 <- 2 * l * (l + 1) * (q1 * jsd(l,q1) - jl(l,q1)) #Equation 6c
+    B2 <- A2 * q1^2 * (beta*jl(l,q1) - alpha*jsdd(l,q1)) - A1 * alpha * (jl(l,q2) - q2 * jsd(l,q2)) #Equation 6f
+    B1 <- q * (A2 * q1 * jsd(l,q1) - A1 * jl(l,q2)) #Equation 6g
+    eta_l <- atan(-(B2 * jsd(l,q) - B1 * jl(l,q)) / (B2 * ysd(l,q) - B1*yl(l,q))) #Equation 6h
     foo_l <- (-1)^l * (2*l+1) * sin(eta_l) * exp(1i*eta_l) #Equation 7; what is calculated and summed for "l"th iteration
     foo_ll <- foo_ll + foo_l #Sum up to current iteration
 

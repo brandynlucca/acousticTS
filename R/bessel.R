@@ -91,8 +91,6 @@ ya <- function(l,n){
 #'
 #' @param l An integer or fractional order
 #' @param n A complex or real argument
-#' @param sign Flag used to to determine whether to add or subtract 0.5 from the function's order (l); only used
-#' for spherical Bessel function of first kind.
 #' @usage
 #' jl(l,n,sign)
 #' @examples
@@ -105,7 +103,15 @@ ya <- function(l,n){
 #' @export
 
 #Spherical Bessel function of first kind
-jl <- function(l,n,sign){ifelse(sign==1,ja(l+0.5,n) * sqrt(pi/2/n),ja(l-0.5,n) * sqrt(pi/2/n))}
+jl <- function(l,n){
+  if(n > 0){
+    return(ja(l+0.5,n) * sqrt(pi/2/n))
+  }else if(n < 0){
+    return(-(ja(l+0.5,n) * sqrt(pi/2/n)))
+  }else if(n == 0){
+    return(0)
+  }
+}
 
 #' Calculate spherical Bessel function of the second kind.
 #'
@@ -127,7 +133,15 @@ jl <- function(l,n,sign){ifelse(sign==1,ja(l+0.5,n) * sqrt(pi/2/n),ja(l-0.5,n) *
 #' @export
 
 #Spherical Bessel function of second kind
-yl <- function(l,n){ya(l+0.5,n) * sqrt(pi/2/n)}
+yl <- function(l,n){
+  if(n > 0){
+    return(ya(l+0.5,n) * sqrt(pi/2/n))
+  }else if(n < 0){
+    return(-(ya(l+0.5,n) * sqrt(pi/2/n)))
+  }else if(n == 0){
+    return(Inf)
+  }
+}
 
 #' Calculate the first derivative of the spherical Bessel function of the first kind.
 #'

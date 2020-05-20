@@ -4,8 +4,14 @@
 \alias{sphere.cw}
 \title{Calculate the acoustic target strength (TS, dB re: 1 m^2) of an elastic sphere of a certain material at a given frequency.}
 \usage{
-sphere.cw(frequency, c, rho, material = "Tungsten carbide",
-  diameter = 38.1, pulse_length)
+sphere.cw(
+  frequency,
+  c,
+  rho,
+  material = "Tungsten carbide",
+  diameter = 38.1,
+  pulse_length
+)
 }
 \arguments{
 \item{frequency}{The acoustic frequency (Hz)}

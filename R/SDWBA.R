@@ -97,6 +97,9 @@ SDWBA <- function(shape=NULL, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@rpos[3
 #' Default value is pi/2; input should be in radians.
 #' @param length Option to change the length of the scatterer shape.
 #' @param nrep Number of repeated iterations to run the model.
+#' @param scale Log or linear domain. Log is the default, and outputs TS (dB re: 1 m^2). Linear represent \eqn{\sigma_bs} (m^2), which is the
+#' backscattering cross-section. Values must be in the linear domain as \eqn{\sigma_bs} if any averaging is going to be conducted on the output of
+#' this model. Inputs allowed are "linear", "log", or "both".
 #' @param aggregate Options to aggregate dataframe output into a series of summary statistics. Options include "mean", "median", "minimum", and "maximum".
 #' @param permute Calculates for every permutation of variables.
 #' @param parallel Boolean value that sets whether multicore CPU parallelization will be used to speed up calculations.
@@ -130,6 +133,7 @@ SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@r
                       pc=shape@pc,
                       theta=shape@theta,
                       length=shape@L,
+                      scale="log",
                       nrep=NULL, permute=F, aggregate=NULL, parallel=F, n.cores=NULL){
 
   if(theta[1] != shape@theta){
@@ -201,6 +205,12 @@ SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@r
     dum <- dum[-(is.na(dum$Stat)),]
     return(dum)
   }else{
+    if(scale %in% c("linear","both")){
+      simdf$sigmabs <- 10^(simdf$TS/10)
+      if(scale == "linear"){
+        simdf <- simdf[-(which(colnames(simdf) == "TS"))]
+      }
+    }
     return(simdf)
   }
 }

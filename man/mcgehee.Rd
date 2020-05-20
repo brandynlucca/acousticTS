@@ -4,7 +4,8 @@
 \name{mcgehee}
 \alias{mcgehee}
 \title{Sample krill shape taken from McGehee et al. (1998)}
-\format{A FLS object comprising all information required for target strength modelling. The variables are as follows:
+\format{
+A FLS object comprising all information required for target strength modelling. The variables are as follows:
 \describe{
   \item{rpos}{Position matrix ([x,y,z], m)[0.0410898,0.0000000,0.0000000] to [0.0000000,0.0000000,0.003815]}
   \item{a}{Radius vector (m) (0.0000000 to 0.0005946)}
@@ -15,7 +16,8 @@
   \item{pc}{Radius of curvature (0)}
   \item{L}{Length (m) (0.0410898)}
   \item{ncyl}{Number of cylinders (15)}
-}}
+}
+}
 \usage{
 mcgehee
 }

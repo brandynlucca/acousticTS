@@ -1,6 +1,3 @@
-# All formulas for calculation of TS derived from:
-#
-
 #' Calculates the Euclidean norm of a vector.
 #'
 #' @param x A vector with numeric, real values.
@@ -91,3 +88,29 @@ Shapely <- function(shape, curve=shape@curve, pc=0.0, theta=shape@theta, length=
   }
     return(shape)
 }
+
+#' Toggle between log- and linear-domain for backscatter values.
+#'
+#' @param x A real value in degrees or radians
+#' @usage
+#' To convert from TS to \eqn{\sigma_bs}
+#' TS2sigma(x)
+#' To convert from \eqn{\sigma_bs} to TS
+#' sigma2TS(x)
+#' @examples
+#' TS <- -85 #dB re: 1 m^2
+#' (sigma <- TS2sigma(TS)) #m^2; convert TS to sigma_bs
+#' [1] 3.162278e-09
+#' sigma2TS(sigma) #dB re: 1 m^2; convert sigma_bs to TS
+#' [1] -85
+#' @return
+#' Converts TS to sigma_bs and vice versa.
+#' @export
+TS2sigma <- function(x){
+  return(10^(x/10))
+}
+
+sigma2TS <- function(x){
+  return(10*log10(x))
+}
+

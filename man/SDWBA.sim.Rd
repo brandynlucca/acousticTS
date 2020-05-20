@@ -43,6 +43,10 @@ Default value is pi/2; input should be in radians.}
 
 \item{length}{Option to change the length of the scatterer shape.}
 
+\item{scale}{Log or linear domain. Log is the default, and outputs TS (dB re: 1 m^2). Linear represent \eqn{\sigma_bs} (m^2), which is the
+backscattering cross-section. Values must be in the linear domain as \eqn{\sigma_bs} if any averaging is going to be conducted on the output of
+this model. Inputs allowed are "linear", "log", or "both".}
+
 \item{nrep}{Number of repeated iterations to run the model.}
 
 \item{permute}{Calculates for every permutation of variables.}
