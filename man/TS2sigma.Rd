@@ -2,6 +2,7 @@
 % Please edit documentation in R/utilities.R
 \name{TS2sigma}
 \alias{TS2sigma}
+\alias{sigma2TS}
 \title{Toggle between log- and linear-domain for backscatter values.}
 \usage{
 To convert from TS to \eqn{\sigma_bs}
