@@ -138,7 +138,9 @@ SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@r
                       progress=T){
 
   if(theta[1] != shape@theta){
-    theta <- theta + pi/2
+    if(0 %in% round(theta,0)){
+      theta <- theta + pi/2
+    }
   }
 
   if(!is.null(nrep)){
