@@ -183,12 +183,13 @@ SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@r
   }else if(parallel==T){
     requireNamespace("foreach", quietly=T)
     requireNamespace("doSNOW", quietly=T)
+    requireNamespace("snow", quietly=T)
     if(!is.null(n.cores)){
       n.cores <- n.cores
     }else{
       n.cores <- detectCores()
     }
-    cl <- makeSOCKcluster(n.cores)
+    cl <- snow::makeCluster(n.cores)
     registerDoSNOW(cl)
 
     if(progress == T){

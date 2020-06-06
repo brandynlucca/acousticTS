@@ -4,7 +4,14 @@
 \alias{HP}
 \title{Calculates the theoretical TS of a shelled organism using the non-modal High Pass (HP) model}
 \usage{
-HP(shape, c = 1500, frequency, a = max(shape@a))
+HP(
+  shape = NULL,
+  c = 1500,
+  frequency,
+  g = shape@g,
+  h = shape@h,
+  a = max(shape@a)
+)
 }
 \arguments{
 \item{shape}{Desired object/animal shape.}
