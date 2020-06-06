@@ -115,3 +115,5 @@ sigma2TS <- function(x){
   return(10*log10(x))
 }
 
+#' Convert sigma to TS.
+#' @export

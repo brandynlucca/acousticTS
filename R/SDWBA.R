@@ -39,7 +39,8 @@ SDWBA <- function(shape=NULL, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@rpos[3
                             ifelse(curve==T, 3.3, NA),
                             ifelse(curve==T, shape@pc, NA)),
                   theta=ifelse(is.null(shape),pi/2,shape@theta),
-                  ncyl=ifelse(is.null(shape),length(x),shape@ncyl)){
+                  ncyl=ifelse(is.null(shape),length(x),shape@ncyl),
+                  progress=TRUE){
   rpos <- as.matrix(rbind(x,y,z))
   kt <- cbind(cos(theta),rep(0,length(theta)),sin(theta))
   k1 <- kcalc(frequency,c)*kt; k2 <- vecnorm(k1) / h
@@ -124,8 +125,7 @@ SDWBA <- function(shape=NULL, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@rpos[3
 #' @export
 #' @import elliptic
 #' @import foreach
-#' @import doParallel
-#' @import parallel
+#' @import doSNOW
 
 SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@rpos[3,],
                       c=1500, frequency, phase=0.0, a=shape@a, h=shape@h, g=shape@g,
@@ -134,7 +134,8 @@ SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@r
                       theta=shape@theta,
                       length=shape@L,
                       scale="log",
-                      nrep=NULL, permute=F, aggregate=NULL, parallel=F, n.cores=NULL){
+                      nrep=NULL, permute=F, aggregate=NULL, parallel=F, n.cores=NULL,
+                      progress=T){
 
   if(theta[1] != shape@theta){
     theta <- theta + pi/2
@@ -164,28 +165,49 @@ SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@r
     simdf <- simdf[,-2]
   }
 
+  if(progress == T){
+    bar <- txtProgressBar(min=1, max=nrow(simdf), style=3, title="Calculating TS values...")
+    progbar <- function(n) setTxtProgressBar(bar, n)
+  }
+
+
   if(parallel==F){
     for(i in 1:nrow(simdf)){
       target_sim <- Shapely(shape,curve=simdf$curve[i],pc=simdf$pc[i],theta=simdf$theta[i],length=simdf$length[i])
       simdf$TS[i] <- SDWBA(target_sim,c=simdf$c[i],frequency=simdf$frequency[i],phase=simdf$phase[i],g=simdf$g[i],h=simdf$h[i])
+
+      if(progress == T){
+        progbar(i)
+      }
     }
   }else if(parallel==T){
     requireNamespace("foreach", quietly=T)
-    requireNamespace("doParallel", quietly=T)
+    requireNamespace("doSNOW", quietly=T)
     if(!is.null(n.cores)){
       n.cores <- n.cores
     }else{
       n.cores <- detectCores()
     }
-    cl <- makeCluster(n.cores)
-    registerDoParallel(cl)
+    cl <- makeSOCKcluster(n.cores)
+    registerDoSNOW(cl)
 
-    simdf$TS <- foreach(i=1:nrow(simdf), .combine=c, .packages="acousticTS") %dopar% {
+    if(progress == T){
+      bar <- txtProgressBar(min=1, max=nrow(simdf), style=3)
+      opts <- list(progress=progbar)
+    }else{
+      opts <- list()
+    }
+
+    simdf$TS <- foreach(i=1:nrow(simdf), .combine=c, .packages="acousticTS", .options.snow=opts) %dopar% {
       target_sim <- Shapely(shape,curve=simdf$curve[i],pc=simdf$pc[i],theta=simdf$theta[i],length=simdf$length[i])
       SDWBA(target_sim,c=simdf$c[i],frequency=simdf$frequency[i],phase=simdf$phase[i],g=simdf$g[i],h=simdf$h[i])
     }
 
     stopCluster(cl)
+
+    if(progress == T){
+      close(bar)
+    }
   }
 
   if(!is.null(aggregate)){
