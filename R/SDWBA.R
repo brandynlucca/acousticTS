@@ -158,7 +158,7 @@ SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@r
     simdf <- expand.grid(iteration=repseq, iterator=t(val), c=c, frequency=frequency)
     simdf <- cbind(simdf, data.frame(g=rep(g,max(lendf$len)/lendf$len[2]*max(repseq)),
                                      h=rep(h,max(lendf$len)/lendf$len[1]*max(repseq)),
-                                     theta=rep(theta,lendf$len[5]/max(lendf$len)*max(repseq)),
+                                     theta=rep(theta,lendf$len[5]*max(lendf$len)*max(repseq)),
                                      pc=rep(pc,max(lendf$len)/lendf$len[4]*max(repseq)),
                                      curve=rep(curve,max(lendf$len)/lendf$len[3]*max(repseq)),
                                      phase=rep(phase,max(lendf$len)/lendf$len[7]*max(repseq)),
@@ -168,7 +168,7 @@ SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@r
   }
 
   if(progress == T){
-    bar <- txtProgressBar(min=1, max=nrow(simdf), style=3, title="Calculating TS values...")
+    bar <- txtProgressBar(min=0, max=nrow(simdf), style=3, title="Calculating TS values...")
     progbar <- function(n) setTxtProgressBar(bar, n)
   }
 
@@ -195,7 +195,7 @@ SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@r
     registerDoSNOW(cl)
 
     if(progress == T){
-      bar <- txtProgressBar(min=1, max=nrow(simdf), style=3)
+      bar <- txtProgressBar(min=0, max=nrow(simdf), style=3)
       opts <- list(progress=progbar)
     }else{
       opts <- list()
