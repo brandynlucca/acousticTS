@@ -157,19 +157,6 @@ SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@r
                          g=g, h=h, theta=theta, pc=pc, curve=curve,
                          phase=phase, length=length, TS=NA)
   }else{
-    lendf <- data.frame(param=c("h","g","curve","pc","theta","length","phase"),
-                        len=c(length(h),length(g),length(curve),length(pc),length(theta),length(length),length(phase)))
-    val<- data.frame(x=seq(1,max(lendf$len),1))
-    simdf <- expand.grid(iteration=repseq, iterator=t(val), c=c, frequency=frequency)
-    simdf <- cbind(simdf, data.frame(g=rep(g,max(lendf$len)/lendf$len[2]*max(repseq)),
-                                     h=rep(h,max(lendf$len)/lendf$len[1]*max(repseq)),
-                                     theta=rep(theta,lendf$len[5]*max(lendf$len)*max(repseq)),
-                                     pc=rep(pc,max(lendf$len)/lendf$len[4]*max(repseq)),
-                                     curve=rep(curve,max(lendf$len)/lendf$len[3]*max(repseq)),
-                                     phase=rep(phase,max(lendf$len)/lendf$len[7]*max(repseq)),
-                                     length=rep(length,max(lendf$len)/lendf$len[6]*max(repseq)),
-                                     TS=NA))
-    simdf <- simdf[,-2]
     baselen <- data.frame(param=c("repseq", "c", "frequency"),
                           len=c(length(repseq), length(c), length(frequency)))
     baseprod <- prod(baselen$len)

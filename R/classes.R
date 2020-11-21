@@ -110,3 +110,9 @@ SBFread <- function(file){
              pb=animal$pb[1], cb=animal$cb[1], psb=animal$psb[1], csb=animal$csb[1],
              theta=ifelse(length(animal$theta) > 0, animal$theta, pi/2), L=max(animal$xb),
              ncylb=length(animal$xb[!is.na(animal$xb)]),ncylsb=length(animal$xsb[!is.na(animal$xsb)])))}
+
+#' Generate SBF shape
+#' @export
+SBFgenerate <- function(xb,wb,zbU,zbL,xsb,wsb,zsbU,zsbL,pb,cb,psb,csb,theta=pi/2){
+  return(new("SBF", body=as.matrix(rbind(xb,wb,zbU,zbL)), bladder=as.matrix(rbind(xsb,wsb,zsbU,zsbL)),
+             pb=pb, cb=cb, psb=psb, csb=csb, theta=theta, L=max(xb), ncylb=length(xb), ncylsb=length(xsb)))}
