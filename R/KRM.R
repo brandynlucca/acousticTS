@@ -60,7 +60,7 @@ KRM <- function(shape=NULL, c=1500, rho=1030, frequency, theta=pi/2){
 KRM.sim <- function(shape=shape, c=1500, rho=1030, frequency,
                     theta=shape@theta,
                     pb=shape@pb, cb=shape@cb, length=shape@L,
-                    permute=T, progress=T, parallel=F){
+                    permute=T, progress=T, parallel=F, n.cores=NULL){
   if(permute == T){
     simdf <- expand.grid(c=c, frequency=frequency, pb=pb, cb=cb,
                          theta=theta, length=length, TS=NA)
