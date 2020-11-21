@@ -1,6 +1,6 @@
 Package: acousticTS
 Title: Scattering models for calculating acoustic target strength
-Version: 0.9.6
+Version: 0.9.7
 Authors@R: 
 	person("B.M. Lucca", email = "brandyn.lucca@gmail.com", role = c("aut", "cre"))
 Description: 
