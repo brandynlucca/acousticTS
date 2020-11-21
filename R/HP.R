@@ -10,9 +10,10 @@
 
 HP <- function(shape=NULL, c=1500, frequency, g=shape@g, h=shape@h, a=max(shape@a)){
   k <- kcalc(frequency, c)
-  alphapi <- (1-g*h^2)/3*g*h^2+(1-g)/(1+2*g)
+  api <- (1-g*h^2)/(3*g*h^2) + (1-g)/(1+2*g)
   R <- (g*h-1)/(g*h+1)
-  fbs <- a^2*(k*a)^4*alphapi^2/(1+4*(k*a)^4*alphapi^2/R^2)
+  fbs <- a^2*(k*a)^4*api^2/((1+4*(k*a)^4*api^2)/R^2)
   TS <- 10*log10(fbs)
   return(TS)
 }
+

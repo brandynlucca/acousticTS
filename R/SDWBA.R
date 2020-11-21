@@ -36,11 +36,15 @@ SDWBA <- function(shape=NULL, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@rpos[3
                   c=1500, frequency, phase=0.0, a=shape@a, h=shape@h, g=shape@g,
                   curve=ifelse(is.null(shape),F,shape@curve),
                   pc=ifelse(is.null(shape),
-                            ifelse(curve==T, 3.3, NA),
-                            ifelse(curve==T, shape@pc, NA)),
+                            ifelse(curve==T, 3.0, NA),
+                            ifelse(curve==T,
+                                   ifelse(shape@pc == 0, 3.0, shape@pc),
+                                   NA)),
                   theta=ifelse(is.null(shape),pi/2,shape@theta),
                   ncyl=ifelse(is.null(shape),length(x),shape@ncyl),
+                  L=shape@L,
                   progress=TRUE){
+
   rpos <- as.matrix(rbind(x,y,z))
   kt <- cbind(cos(theta),rep(0,length(theta)),sin(theta))
   k1 <- kcalc(frequency,c)*kt; k2 <- vecnorm(k1) / h
@@ -49,25 +53,30 @@ SDWBA <- function(shape=NULL, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@rpos[3
   for(j in 1:(ncyl-1)){
     r1 <- rpos[,j]; r2 <- rpos[,j+1]
     a1 <- a[j]; a2 <- a[j+1]
-    beta <- abs(acos((k1%*%(r2-r1))/(vecnorm(k1)*vecnorm(r2-r1))) - pi/2)
+    alpha <- acos((k1 %*% (r2-r1)) / (vecnorm(k1)*vecnorm(r2-r1)))
+    beta <- abs(alpha - pi/2)
+    # beta <- abs(acos(k1 %*% (r2 - r1)/(vecnorm(k1) * vecnorm(r2 - r1))) - pi/2)
 
     SDWBAint <- function(s){
-      requireNamespace("elliptic", quietly=T)
+      requireNamespace("elliptic", quietly = T)
       rint <- s * (r2-r1)+r1
       aint <- s * (a2-a1)+a1
       gamma <- 1/(g*h^2)+1/g-2
 
-      if(abs(abs(beta)-pi/2)<1e-10){
+      if(abs(abs(beta) - pi/2) < 1e-10){
         bessel <- k2*aint
       }else{
         bessel <- ja(1,2*k2*aint*cos(beta))/cos(beta)
       }
 
       if(curve == F){
-        return(vecnorm(k1)/4*gamma*aint*exp(2i*k1%*%rint/h)*bessel*vecnorm(r2-r1))
+        ts <- vecnorm(k1)/4*gamma*aint*exp(2i*k1%*%rint/h)*bessel*vecnorm(r2-r1)
+        return(ts)
       }else{
-        pc <- pc*max(x)
-        return(vecnorm(k1)*pc/4*gamma*aint*exp(2i*k2*pc)*exp(-2i*k2*pc*cos(beta))*bessel*(vecnorm(r2-r1)/pc))
+        pct <- pc*L
+        # pct <- pc
+        ts <- vecnorm(k1)*pct/4*gamma*aint*exp(2i*k2*pct)*exp(-2i*k2*pct*cos(beta))*bessel*(vecnorm(r2-r1)/pct)
+        return(ts)
       }
     }
 
@@ -137,12 +146,6 @@ SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@r
                       nrep=NULL, permute=F, aggregate=NULL, parallel=F, n.cores=NULL,
                       progress=T){
 
-  if(theta[1] != shape@theta){
-    if(0 %in% round(theta,0)){
-      theta <- theta + pi/2
-    }
-  }
-
   if(!is.null(nrep)){
     repseq <- seq(1,nrep,1)
   }else{
@@ -150,7 +153,9 @@ SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@r
   }
 
   if(permute == T){
-    simdf <- expand.grid(iteration=repseq, c=c, frequency=frequency, g=g, h=h, theta=theta, pc=pc, curve=curve, phase=phase, length=length, TS=NA)
+    simdf <- expand.grid(iteration=repseq, c=c, frequency=frequency,
+                         g=g, h=h, theta=theta, pc=pc, curve=curve,
+                         phase=phase, length=length, TS=NA)
   }else{
     lendf <- data.frame(param=c("h","g","curve","pc","theta","length","phase"),
                         len=c(length(h),length(g),length(curve),length(pc),length(theta),length(length),length(phase)))
@@ -158,17 +163,31 @@ SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@r
     simdf <- expand.grid(iteration=repseq, iterator=t(val), c=c, frequency=frequency)
     simdf <- cbind(simdf, data.frame(g=rep(g,max(lendf$len)/lendf$len[2]*max(repseq)),
                                      h=rep(h,max(lendf$len)/lendf$len[1]*max(repseq)),
-                                     theta=rep(theta,lendf$len[5]/max(lendf$len)*max(repseq)),
+                                     theta=rep(theta,lendf$len[5]*max(lendf$len)*max(repseq)),
                                      pc=rep(pc,max(lendf$len)/lendf$len[4]*max(repseq)),
                                      curve=rep(curve,max(lendf$len)/lendf$len[3]*max(repseq)),
                                      phase=rep(phase,max(lendf$len)/lendf$len[7]*max(repseq)),
                                      length=rep(length,max(lendf$len)/lendf$len[6]*max(repseq)),
                                      TS=NA))
     simdf <- simdf[,-2]
+    baselen <- data.frame(param=c("repseq", "c", "frequency"),
+                          len=c(length(repseq), length(c), length(frequency)))
+    baseprod <- prod(baselen$len)
+    paramlen <- data.frame(param=c("h","g","curve","pc","theta","length","phase"),
+                           len=c(length(h),length(g),length(curve),length(pc),
+                                 length(theta),length(length),length(phase)))
+    simdf <- data.frame(iterator=seq_len(baseprod), c=c, frequency=frequency)
+    simdf <- cbind(simdf,
+                   data.frame(g=rep(g, baseprod), h=rep(h, baseprod),
+                              theta=rep(theta, baseprod), pc=rep(pc, baseprod),
+                              curve=rep(curve, baseprod), length=rep(length, baseprod),
+                              phase=rep(phase, baseprod),
+                              TS=NA))
+    simdf <- simdf[,-1]
   }
 
   if(progress == T){
-    bar <- txtProgressBar(min=1, max=nrow(simdf), style=3, title="Calculating TS values...")
+    bar <- txtProgressBar(min=0, max=nrow(simdf), style=3, title="Calculating TS values...")
     progbar <- function(n) setTxtProgressBar(bar, n)
   }
 
@@ -176,35 +195,45 @@ SDWBA.sim <- function(shape=shape, x=shape@rpos[1,], y=shape@rpos[2,], z=shape@r
   if(parallel==F){
     for(i in 1:nrow(simdf)){
       target_sim <- Shapely(shape,curve=simdf$curve[i],pc=simdf$pc[i],theta=simdf$theta[i],length=simdf$length[i])
-      simdf$TS[i] <- SDWBA(target_sim,c=simdf$c[i],frequency=simdf$frequency[i],phase=simdf$phase[i],g=simdf$g[i],h=simdf$h[i])
+      simdf$TS[i] <- SDWBA(target_sim,c=simdf$c[i],frequency=simdf$frequency[i],
+                           phase=simdf$phase[i],g=simdf$g[i],h=simdf$h[i],
+                           curve=simdf$curve[i],pc=simdf$pc[i])
 
       if(progress == T){
         progbar(i)
       }
     }
   }else if(parallel==T){
-    requireNamespace("foreach", quietly=T)
+    requireNamespace("parallel", quietly=T)
     requireNamespace("doSNOW", quietly=T)
     requireNamespace("snow", quietly=T)
+
     if(!is.null(n.cores)){
       n.cores <- n.cores
     }else{
-      n.cores <- detectCores()
+      n.cores <- detectCores() - 1
     }
     cl <- snow::makeCluster(n.cores)
     registerDoSNOW(cl)
 
     if(progress == T){
-      bar <- txtProgressBar(min=1, max=nrow(simdf), style=3)
+      bar <- txtProgressBar(min=0, max=nrow(simdf), style=3)
       opts <- list(progress=progbar)
     }else{
       opts <- list()
     }
 
-    simdf$TS <- foreach(i=1:nrow(simdf), .combine=c, .packages="acousticTS", .options.snow=opts) %dopar% {
-      target_sim <- Shapely(shape,curve=simdf$curve[i],pc=simdf$pc[i],theta=simdf$theta[i],length=simdf$length[i])
-      SDWBA(target_sim,c=simdf$c[i],frequency=simdf$frequency[i],phase=simdf$phase[i],g=simdf$g[i],h=simdf$h[i])
-    }
+    simdf$TS<- foreach(
+      i=seq_len(nrow(simdf)), .combine=c,
+      .packages=c("acousticTS","elliptic"),
+      .options.snow=opts) %dopar% {
+        target_sim <- Shapely(shape,curve=simdf$curve[i],pc=simdf$pc[i],
+                              theta=simdf$theta[i],length=simdf$length[i])
+
+        return(SDWBA(target_sim,c=simdf$c[i],frequency=simdf$frequency[i],
+                     phase=simdf$phase[i],g=simdf$g[i],h=simdf$h[i],
+                     curve=simdf$curve[i],theta=simdf$theta[i],pc=simdf$pc[i]))
+      }
 
     stopCluster(cl)
 
