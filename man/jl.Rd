@@ -4,7 +4,7 @@
 \alias{jl}
 \title{Calculate spherical Bessel function of the first kind.}
 \usage{
-jl(l,n,sign)
+jl(l,n)
 }
 \arguments{
 \item{l}{An integer or fractional order}
@@ -12,7 +12,7 @@ jl(l,n,sign)
 \item{n}{A complex or real argument}
 }
 \value{
-jl(l,n,sign) calculates the spherical Bessel function of the first kind (zbesj AMOS routine, Iv).
+jl(l,n) calculates the spherical Bessel function of the first kind (zbesj AMOS routine, Iv).
 }
 \description{
 This function calculates the spherical Bessel functions of the first kind. Referenced from Amost D.E.,
@@ -21,6 +21,6 @@ This function calculates the spherical Bessel functions of the first kind. Refer
 \examples{
 l <- 1
 n < 1
-jl(l,n,sign=1)
+jl(l,n)
 [1] 0.3011687
 }

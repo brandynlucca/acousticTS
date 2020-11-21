@@ -20,36 +20,38 @@
 #' @references
 #' \href{https://doi.org/10.1121/1.1906621}(Anderson, V.C. (1950). Sound scattering from a fluid sphere. Journal of the Acoustical Society of America, 22, 426-431. )
 #' @export
-#' 
+#'
+
 fsphere <- function(shape=NULL, frequency, c=1500, a=shape@a, g=shape@g, h=shape@h, method=1){
   k1 <- kcalc(frequency, c); k2 <- kcalc(frequency, c*h)
   m <- 0; fsub <- 0; t <- 0; f <- TRUE #initialize
   #Iterate through while loop
   while(f == TRUE){
     if(method == 1){
-      cmn <- (jsd(m,k2*a)*yl(m,k1*a)) / (jl(m,k2*a,sign=1)*jsd(m,k1*a)) - (g*h*ysd(m,k1*a)/jsd(m,k1*a)) #numerator term
-      cmd <- (jsd(m,k2*a)*jl(m,k1*a,sign=1)) / (jl(m,k2*a,sign=1)*jsd(m,k1*a)) - (g*h)
+      cmn <- (jsd(m,k2*a)*yl(m,k1*a)) / (jl(m,k2*a)*jsd(m,k1*a)) - (g*h*ysd(m,k1*a)/jsd(m,k1*a)) #numerator term
+      cmd <- (jsd(m,k2*a)*jl(m,k1*a)) / (jl(m,k2*a)*jsd(m,k1*a)) - (g*h)
       cm <- cmn/cmd
       bm <- -1 / (1 + 1i*cm)
     }else if(method == 2){
       bm <- -(jsd(m,k1*a)/hsd(m,k1*a))
     }else if(method == 3){
-      bm <- -(jl(m,k1*a,1)/hl(m,k1*a)) 
+      bm <- -(jl(m,k1*a)/hl(m,k1*a))
     }
 
     t <- ((2*m+1)*(-1)^m*bm)
     fsub <- fsub + t
-    
+
     if(abs(t)/abs(fsub) < 1e-30){
       f <- FALSE
     }else{
       m <- m + 1
     }
   }
-  
+
   fbubble <- -1i/k1 * fsub
   return(20*log10(abs(fbubble)))
 }
+
 
 #' Wrapper function that can simulate over distributions of values
 #'
