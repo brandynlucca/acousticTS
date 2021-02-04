@@ -10,7 +10,8 @@ Depends:
 Imports:
 	elliptic,
 	parallel,
-	doParallel,
+	doSNOW,
+	snow,
 	foreach,
 	methods,
 	stats

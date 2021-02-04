@@ -15,7 +15,8 @@ KRM.sim(
   length = shape@L,
   permute = T,
   progress = T,
-  parallel = F
+  parallel = F,
+  n.cores = NULL
 )
 }
 \description{

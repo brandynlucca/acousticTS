@@ -7,22 +7,27 @@
 SDWBA.sim(shape, c=1500, frequency, phase=0.0, curve=F, nrep=NULL, permute=F,
 aggregate=NULL, parallel=F, n.cores=NULL)
 
-SDWBA.sim(shape, c=1500, frequency, phase=0.0, h, g, curve=F, pc, theta, length,
+SDWBA.sim(shape, c=1500, frequency, phase=0.0, h, g, curve=F, pc, theta, 
+length,
 nrep=NULL, permute=F, aggregate=NULL, parallel=F, n.cores=NULL)
 
-SDWBA.sim(shape, c=1500, frequency, phase=0.0, x, y, z, a, h, g, curve=F, pc, theta, length,
+SDWBA.sim(shape, c=1500, frequency, phase=0.0, x, y, z, a, h, g, curve=F, 
+pc, theta, length,
 nrep=NULL, permute=F, aggregate=NULL, parallel=F, n.cores=NULL)
 }
 \arguments{
 \item{shape}{Desired object/animal shape. Must be class "FLS".}
 
-\item{x, y, z}{The x-, y-, and z-axis coordinates that make up the position matrix, \eqn{r_0}.}
+\item{x, y, z}{The x-, y-, and z-axis coordinates that make up the position 
+matrix, \eqn{r_0}.}
 
 \item{c}{Sound speed of surrounding medium (m/s). Default value is 1500 m/s.}
 
 \item{frequency}{Frequency (Hz).}
 
-\item{phase}{Phase deviation (\eqn{\phi}), or phase variability. Accounts for complexities in animal shape and stochasticity of noise in scattering field.
+\item{phase}{Phase deviation (\eqn{\phi}), or phase variability. Accounts 
+for complexities in animal shape and stochasticity of noise in scattering 
+field.
 Default value is 0.0.}
 
 \item{a}{Radius vector of an animal (m).}
@@ -31,31 +36,44 @@ Default value is 0.0.}
 
 \item{g}{Density contrast.}
 
-\item{curve}{A boolean value that dictates whether an animal is curved or not.}
+\item{curve}{A boolean value that dictates whether an animal is curved or 
+not.}
 
 \item{pc}{Radius of curvature. Default is 3.3.}
 
-\item{theta}{Orientation of the target relative to the transmit source (\eqn{\theta}). Broadside incidence is considered 0 degrees, or 0 radians. Animals are
-either tilted anterior-end down, which corresponds to (\eqn{-\pi/2}) and (\eqn{pi/2}) respectively. The model will automatically convert these orientations
-to the orientation definition used by McGehee et al. (1998) whereby orientation is based on the angle of the incident soundwave such that
-broadside incidence is \eqn{\pi/2} (dorsal-up) and \eqn{3\pi/2} (dorsal-down), or when the transmitted soundwave is completely perpendicular to the target.
+\item{theta}{Orientation of the target relative to the transmit source 
+(\eqn{\theta}). Broadside incidence is considered 0 degrees, or 0 radians. 
+Animals are
+either tilted anterior-end down, which corresponds to (\eqn{-\pi/2}) 
+and (\eqn{pi/2}) respectively. The model will automatically convert these 
+orientations
+to the orientation definition used by McGehee et al. (1998) whereby 
+orientation is based on the angle of the incident soundwave such that
+broadside incidence is \eqn{\pi/2} (dorsal-up) and \eqn{3\pi/2} 
+(dorsal-down), or when the transmitted soundwave is completely perpendicular 
+to the target.
 Default value is pi/2; input should be in radians.}
 
 \item{length}{Option to change the length of the scatterer shape.}
 
-\item{scale}{Log or linear domain. Log is the default, and outputs TS (dB re: 1 m^2). Linear represent \eqn{\sigma_bs} (m^2), which is the
-backscattering cross-section. Values must be in the linear domain as \eqn{\sigma_bs} if any averaging is going to be conducted on the output of
+\item{scale}{Log or linear domain. Log is the default, and outputs TS 
+(dB re: 1 m^2). Linear represent \eqn{\sigma_bs} (m^2), which is the
+backscattering cross-section. Values must be in the linear domain as 
+\eqn{\sigma_bs} if any averaging is going to be conducted on the output of
 this model. Inputs allowed are "linear", "log", or "both".}
 
 \item{nrep}{Number of repeated iterations to run the model.}
 
 \item{permute}{Calculates for every permutation of variables.}
 
-\item{aggregate}{Options to aggregate dataframe output into a series of summary statistics. Options include "mean", "median", "minimum", and "maximum".}
+\item{aggregate}{Options to aggregate dataframe output into a series of 
+summary statistics. Options include "mean", "median", "minimum", and "maximum".}
 
-\item{parallel}{Boolean value that sets whether multicore CPU parallelization will be used to speed up calculations.}
+\item{parallel}{Boolean value that sets whether multicore CPU parallelization 
+will be used to speed up calculations.}
 
-\item{n.cores}{Number of CPU cores that will be dedicated to parallelizing model calculations.}
+\item{n.cores}{Number of CPU cores that will be dedicated to parallelizing 
+model calculations.}
 }
 \value{
 Target strength (TS, dB re: 1 m^2)
@@ -64,10 +82,14 @@ Target strength (TS, dB re: 1 m^2)
 Wrapper function that can simulate over distributions of values
 }
 \details{
-Calculates the theoretical TS of a fluid-filled scatterer at a given frequency using the distorted Born wave approximation (DWBA) model.
+Calculates the theoretical TS of a fluid-filled scatterer at a given 
+frequency using the distorted Born wave approximation (DWBA) model.
 }
 \references{
-Stanton, T.K., Chu, D., and Wiebe, P.H. 1998. Sound scattering by several zooplankton groups. II. Scattering models. Journal of the Acoustical Society of America, 103(1), 236-253.
+Stanton, T.K., Chu, D., and Wiebe, P.H. 1998. Sound scattering by several 
+zooplankton groups. II. Scattering models. Journal of the Acoustical Society 
+of America, 103(1), 236-253.
 
-Hankin, R.K.S. 2006. Introducing elliptic, an R package for elliptic and modular functions. Journal of Statistical Software, 15(7).
+Hankin, R.K.S. 2006. Introducing elliptic, an R package for elliptic and 
+modular functions. Journal of Statistical Software, 15(7).
 }

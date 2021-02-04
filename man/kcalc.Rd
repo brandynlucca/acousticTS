@@ -21,5 +21,5 @@ Calculate the acoustic wavenumber based on the sound speed of water.
 c <- 1500 #m/s
 f <- 120e3 #Hz
 kcalc(f,c)
-[1] 502.6547
+# 502.6547
 }

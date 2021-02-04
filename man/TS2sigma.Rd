@@ -2,11 +2,11 @@
 % Please edit documentation in R/utilities.R
 \name{TS2sigma}
 \alias{TS2sigma}
+\alias{sigma2TS}
 \title{Toggle between log- and linear-domain for backscatter values.}
 \usage{
-To convert from TS to \eqn{\sigma_bs}
 TS2sigma(x)
-To convert from \eqn{\sigma_bs} to TS
+
 sigma2TS(x)
 }
 \arguments{
@@ -16,12 +16,15 @@ sigma2TS(x)
 Converts TS to sigma_bs and vice versa.
 }
 \description{
-Toggle between log- and linear-domain for backscatter values.
+To convert from TS to \eqn{\sigma_bs}
+TS2sigma(x)
+To convert from \eqn{\sigma_bs} to TS
+sigma2TS(x)
 }
 \examples{
 TS <- -85 #dB re: 1 m^2
 (sigma <- TS2sigma(TS)) #m^2; convert TS to sigma_bs
-[1] 3.162278e-09
+# 3.162278e-09
 sigma2TS(sigma) #dB re: 1 m^2; convert sigma_bs to TS
-[1] -85
+# -85
 }

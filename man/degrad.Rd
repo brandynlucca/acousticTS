@@ -9,7 +9,8 @@ degrad(x,d)
 \arguments{
 \item{x}{A real value in degrees or radians}
 
-\item{d}{The value input-type. Two input types: "deg" for degrees and "rad" for radians.}
+\item{d}{The value input-type. Two input types: "deg" for degrees and "rad" 
+for radians.}
 }
 \value{
 Converts degrees to radians or radians to degrees
@@ -20,8 +21,8 @@ Toggle between radians and degrees.
 \examples{
 x <- 180 #degrees
 degrad(x, "deg")
-[1] 3.141593
+# 3.141593
 x <- pi #radians
 degrad(x, "rad")
-[1] 180
+# 180
 }
