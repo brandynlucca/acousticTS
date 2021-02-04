@@ -40,14 +40,14 @@ another for seemless usage for model comparisons.
 }
 \details{
 FLS objects can be created using 
-\link[acousticTS; class_utilities]{FLSwrite} and 
-\link[acousticTS; class_utilities]{FLSgenerate}. These objects can also be 
+\link[acousticTS]{FLSwrite} and 
+\link[acousticTS]{FLSgenerate}. These objects can also be 
 read using
 built-in datasets (e.g., \link[acousticTS]{mcgehee}) or using 
-\link[acousticTS; class_utilities]{FLSread}. The 
-\link[acousticTS; models]{SDWBA}, 
-\link[acousticTS; SDWBA]{SDWBA.sim}, \link[acousticTS; models]{DCM}, and 
-\link[acousticTS; utilities]{Shapely} functions all use FLS-objects for their 
+\link[acousticTS]{FLSread}. The 
+\link[acousticTS]{SDWBA}, 
+\link[acousticTS]{SDWBA.sim}, \link[acousticTS]{DCM}, and 
+\link[acousticTS]{Shapely} functions all use FLS-objects for their 
 respective 
 inputs.
 }

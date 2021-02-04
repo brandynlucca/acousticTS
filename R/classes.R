@@ -12,15 +12,15 @@
 #' the \eqn{acousticTS} package:
 #' 
 #' \itemize{
-#'  \item \strong{FLS}: \code{\link[acousticTS; classes; FLS]{fluid-like 
-#'  scatterers (FLS)}} defined 
+#'  \item \strong{FLS}: fluid-like 
+#'  scatterers (\code{\link[acousticTS]{FLS}}) defined 
 #'  by the FLS-class. These generally describe scatterers (or body structures) 
 #'  that are fluid-like, meaning that the acoustic material properties (i.e., 
 #'  sound speed and density) are similar to that of the surrounding medium. 
 #'  Consequently, things like thin flesh and crustaceans are typically modeled 
 #'  as FLS objects. Current models available to FLS objects includes the 
-#'  \link[acousticTS; models]{SDWBA}, \link[acousticTS; models]{KRM}, and 
-#'  \link[acousticTS; models]{DCM}.
+#'  \link[acousticTS]{SDWBA}, \link[acousticTS]{KRM}, and 
+#'  \link[acousticTSs]{DCM}.
 #'  \item \strong{SBF}: `swimbladdered fish (SBF)` defined by the SBF-class. 
 #'  \item \strong{CAL}: `solid and calibration spheres (CAL)` defined by the 
 #'  CAL-class. 
@@ -60,14 +60,14 @@ scattering <- setClass("scattering", representation("VIRTUAL"))
 #'
 #' @details
 #' FLS objects can be created using 
-#' \link[acousticTS; class_utilities]{FLSwrite} and 
-#' \link[acousticTS; class_utilities]{FLSgenerate}. These objects can also be 
+#' \link[acousticTS]{FLSwrite} and 
+#' \link[acousticTS]{FLSgenerate}. These objects can also be 
 #' read using
 #' built-in datasets (e.g., \link[acousticTS]{mcgehee}) or using 
-#' \link[acousticTS; class_utilities]{FLSread}. The 
-#' \link[acousticTS; models]{SDWBA}, 
-#' \link[acousticTS; SDWBA]{SDWBA.sim}, \link[acousticTS; models]{DCM}, and 
-#' \link[acousticTS; utilities]{Shapely} functions all use FLS-objects for their 
+#' \link[acousticTS]{FLSread}. The 
+#' \link[acousticTS]{SDWBA}, 
+#' \link[acousticTS]{SDWBA.sim}, \link[acousticTS]{DCM}, and 
+#' \link[acousticTS]{Shapely} functions all use FLS-objects for their 
 #' respective 
 #' inputs.
 #'
