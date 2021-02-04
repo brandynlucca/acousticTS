@@ -68,6 +68,7 @@
 #' @import foreach
 #' @import doSNOW
 #' @import snow
+#' @importFrom elliptic myintegrate
 #' @importFrom parallel detectCores
 #' @import stats
 #' @import methods
@@ -141,7 +142,7 @@ SDWBA.sim <- function(shape=shape,
     if(!is.null(n.cores)){
       n.cores <- n.cores
     }else{
-      n.cores <- detectCores() - 1
+      n.cores <- parallel::detectCores() - 1
     }
     cl <- snow::makeCluster(n.cores)
     registerDoSNOW(cl)

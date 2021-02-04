@@ -36,8 +36,8 @@
 #'
 #' Hankin, R.K.S. 2006. Introducing elliptic, an R package for elliptic and 
 #' modular functions. Journal of Statistical Software, 15(7).
-#' @export
 #' @importFrom elliptic myintegrate
+#' @export
 
 SDWBA <- function(shape=NULL, 
                   x=shape@rpos[1,], y=shape@rpos[2,], z=shape@rpos[3,],
@@ -281,7 +281,6 @@ fsphere <- function(shape=NULL, frequency, c=1500, a=shape@a,
 #' Clay C.S. and Horne J.K. (1994). Acoustic models of fish: The Atlantic cod 
 #' (Gadus morhua). Journal of the Acoustical Society of AMerica, 96, 1661-1668.
 #' @export
-#' @import elliptic
 #' @import foreach
 #' @import doSNOW
 #' @importFrom parallel detectCores
