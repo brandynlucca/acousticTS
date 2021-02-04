@@ -129,6 +129,7 @@ pull <- function(object, parameter){
 #' @export
 pos_matrix <- function(object){
   out_df <- data.frame(t(pull(object, "rpos")))
+  colnames(out_df) <- c("x","y","z")
   out_df$a <- pull(object, "a")
   return(out_df)
 }
