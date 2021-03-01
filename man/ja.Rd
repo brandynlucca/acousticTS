@@ -2,9 +2,15 @@
 % Please edit documentation in R/bessel.R
 \name{ja}
 \alias{ja}
-\title{Calculate Bessel function of the first kind.}
+\alias{jd}
+\alias{jdd}
+\title{Bessel functions of the first kind}
 \usage{
 ja(l,n)
+
+jd(l, n)
+
+jdd(l, n)
 }
 \arguments{
 \item{l}{An integer or fractional order}
@@ -15,14 +21,19 @@ ja(l,n)
 Calculates the Bessel function of the first kind (J_a).
 }
 \description{
-Calculate Bessel function of the first kind.
+Bessel functions of the first kind
+
+First derivative of Bessel function of the first kind
+
+Second derivative of the Bessel function of first kind
 }
 \examples{
 l <- 1.5
 n <- 1
 ja(l,n)
-[1] 0.2402978
+# 0.2402978
 }
 \references{
-Amost D.E., "AMOS, A Portable Package for Bessel Functions of a Complex Argument and Nonnegative Order", http://netlib.org/amos
+Amost D.E., "AMOS, A Portable Package for Bessel Functions of a Complex 
+Argument and Nonnegative Order", http://netlib.org/amos
 }

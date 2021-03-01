@@ -7,7 +7,7 @@
 Shapely(shape, curve, pc, theta, length)
 }
 \arguments{
-\item{shape}{Input scatterer shape. [Currently only supports the FLS object-class]}
+\item{shape}{Input scatterer shape.}
 
 \item{curve}{Curve (boolean, T/F).}
 

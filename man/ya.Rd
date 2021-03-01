@@ -2,9 +2,12 @@
 % Please edit documentation in R/bessel.R
 \name{ya}
 \alias{ya}
+\alias{yd}
 \title{Calculate Bessel function of the second kind.}
 \usage{
 ya(l,n)
+
+yd(l, n)
 }
 \arguments{
 \item{l}{An integer or fractional order}
@@ -12,15 +15,19 @@ ya(l,n)
 \item{n}{A complex or real argument}
 }
 \value{
-Calculates the Bessel function of the second kind (Y_a). Functions are referenced from Amost D.E., "AMOS, A Portable Package
-for Bessel Functions of a Complex Argument and Nonnegative Order", http://netlib.org/amos
+Calculates the Bessel function of the second kind (Y_a). Functions are 
+referenced from Amost D.E., "AMOS, A Portable Package
+for Bessel Functions of a Complex Argument and Nonnegative Order", 
+http://netlib.org/amos
 }
 \description{
 Calculate Bessel function of the second kind.
+
+First derivative of Bessel function of the second kind
 }
 \examples{
 l <- 1.5
 n <- 1
 ya(l,n)
-[1] -1.102496
+# -1.102496
 }

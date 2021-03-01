@@ -6,8 +6,11 @@
 \alias{SBF}
 \title{Swimbladdered fish (SBF) object/class.}
 \description{
-A S4 class that provides slots to contain relevant animal metadata for parameterizing models for swimbladdered fish/scatterers (SBF)
-partitioend into two sets of discretized cylinders: the body and swimbladder. Both shapes comprise a position matrix, material properties
-(sound speed, c, and density, rho), orientation (theta), the overall body length of the animal, and the number of cylinders. This class is
+A S4 class that provides slots to contain relevant animal metadata for 
+parameterizing models for swimbladdered fish/scatterers (SBF)
+partitioend into two sets of discretized cylinders: the body and 
+swimbladder. Both shapes comprise a position matrix, material properties
+(sound speed, c, and density, rho), orientation (theta), the overall body 
+length of the animal, and the number of cylinders. This class is
 used within the KRM and GBZ model functions.
 }

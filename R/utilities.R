@@ -6,7 +6,7 @@
 #' @examples
 #' values <- c(1,2,3)
 #' vecnorm(values)
-#' [1] 3.741657
+#' # 3.741657
 #' @return
 #' Calculates the Euclidean norm of a vector.
 #' @export
@@ -17,16 +17,17 @@ vecnorm <- function(x){sqrt(sum(x**2))}
 #' Toggle between radians and degrees.
 #'
 #' @param x A real value in degrees or radians
-#' @param d The value input-type. Two input types: "deg" for degrees and "rad" for radians.
+#' @param d The value input-type. Two input types: "deg" for degrees and "rad" 
+#' for radians.
 #' @usage
 #' degrad(x,d)
 #' @examples
 #' x <- 180 #degrees
 #' degrad(x, "deg")
-#' [1] 3.141593
+#' # 3.141593
 #' x <- pi #radians
 #' degrad(x, "rad")
-#' [1] 180
+#' # 180
 #' @return
 #' Converts degrees to radians or radians to degrees
 #' @export
@@ -50,7 +51,7 @@ degrad <- function(x,d){
 #' c <- 1500 #m/s
 #' f <- 120e3 #Hz
 #' kcalc(f,c)
-#' [1] 502.6547
+#' # 502.6547
 #' @return
 #' Calculates the acoustic wavenumber based on the sound speed of water
 #' @export
@@ -60,7 +61,7 @@ kcalc <- function(f,c){2*pi*f/c}
 
 #' Manipulate scatterer object.
 #'
-#' @param shape Input scatterer shape. [Currently only supports the FLS object-class]
+#' @param shape Input scatterer shape.
 #' @param curve Curve (boolean, T/F).
 #' @param pc Radius of curvature (pc)
 #' @param theta Orientation
@@ -70,7 +71,8 @@ kcalc <- function(f,c){2*pi*f/c}
 #' @return
 #' Returns manipulated object.
 #' @export
-Shapely <- function(shape, curve=shape@curve, pc=0.0, theta=shape@theta, length=shape@L){
+Shapely <- function(shape, curve=shape@curve, pc=0.0, theta=shape@theta, 
+                    length=shape@L){
   if(curve == T){
     shape@curve <- T; shape@pc <- ifelse(pc == 0.0, 3.3, pc)
   }else if(curve == F & shape@curve == T){
@@ -91,7 +93,7 @@ Shapely <- function(shape, curve=shape@curve, pc=0.0, theta=shape@theta, length=
 
 #' Toggle between log- and linear-domain for backscatter values.
 #' @param x A real value in degrees or radians
-#' @usage
+#' @description
 #' To convert from TS to \eqn{\sigma_bs}
 #' TS2sigma(x)
 #' To convert from \eqn{\sigma_bs} to TS
@@ -99,21 +101,57 @@ Shapely <- function(shape, curve=shape@curve, pc=0.0, theta=shape@theta, length=
 #' @examples
 #' TS <- -85 #dB re: 1 m^2
 #' (sigma <- TS2sigma(TS)) #m^2; convert TS to sigma_bs
-#' [1] 3.162278e-09
+#' # 3.162278e-09
 #' sigma2TS(sigma) #dB re: 1 m^2; convert sigma_bs to TS
-#' [1] -85
+#' # -85
 #' @return
 #' Converts TS to sigma_bs and vice versa.
+#' @rdname TS2sigma
 #' @export
 TS2sigma <- function(x){
   return(10^(x/10))
 }
 
 #' Convert sigma to TS.
+#' @rdname TS2sigma
 #' @export
 sigma2TS <- function(x){
   return(10*log10(x))
 }
 
-#' Convert sigma to TS.
+#' Primary accessor function. 
 #' @export
+pull <- function(object, parameter){
+  return(slot(object, parameter))
+}
+
+#' Extract position matrix from object for plotting and other purposes.
+#' @export
+pos_matrix <- function(object){
+  out_df <- data.frame(t(pull(object, "rpos")))
+  colnames(out_df) <- c("x","y","z")
+  out_df$a <- pull(object, "a")
+  return(out_df)
+}
+
+#' #' Generic for plotting scatterer-class objects.
+#' #' @export
+setGeneric("plot", function(x,y,...) standardGeneric("plot"))
+
+#' Method for plotting scatterer-class objects.
+#' @export
+#' @import graphics
+setMethod("plot", signature(x="scattering", y="missing"), 
+          definition = function(x, nudge_y=1, ...) {
+  coord <- pos_matrix(x)
+  z_up <- coord$z - median(coord$z) #center on 0 vertically 
+  a_hi <- z_up + coord$a; a_lo <- z_up - coord$a
+  par(ask=F)
+  plot(coord$x, z_up, type='l', 
+       ylim=c(min(a_lo)*(1-(1-nudge_y)), max(a_hi)*nudge_y),
+       xlab="Along-body axis (m)",, ylab="Height / Width (m)", ...)
+  lines(coord$x, a_lo, lty=2)
+  lines(coord$x, a_hi, lty=2)
+  segments(y0=a_lo, y1=a_hi,
+           x0=coord$x, x1=coord$x, lty=3, col="gray30")
+})

@@ -18,5 +18,5 @@ Calculates the Euclidean norm of a vector.
 \examples{
 values <- c(1,2,3)
 vecnorm(values)
-[1] 3.741657
+# 3.741657
 }
