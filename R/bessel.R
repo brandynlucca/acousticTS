@@ -28,7 +28,7 @@ ja <- function(l,n){
       nn <- abs(n)
     }
 
-    if(nn > 10){
+    if(nn > 20){
       s <- sqrt(2/(pi*nn)) * cos(nn - (l/2 + 0.25)*pi)
     }else if(nn < 0.01){
       s <- (0.5*nn)^l / gamma(l+1)
@@ -137,8 +137,8 @@ js <- function(l,n){
 #' @rdname js
 #' @export
 jsd <- function(l,n){
-  return(-js(l+1, n) + (l/n)*js(l,n))
-} #first kind
+  return((js(l-1,n)-(l+1)/n*js(l,n)))
+} #f
 
 #' Calculate the second derivative of the spherical Bessel function of the 
 #' first kind.
@@ -148,7 +148,7 @@ jsd <- function(l,n){
 #' 
 #' @rdname js
 #' @export
-jsdd <- function(l,n){-(2*n*jsd(l,n)+(n^2-l*(l+1))*js(l,n))/(n^2)}
+jsdd <- function(l,n){return(1/(n^2)*((l+1)*(l+2)-n^2)*js(l,n)-2/n*js(l-1,n))}
 
 #' Calculate Bessel function of the second kind.
 #'

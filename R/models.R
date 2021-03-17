@@ -180,7 +180,8 @@ DCM <- function(shape=NULL, frequency, c=1500, rho=1026, method="two-ray",
 ssphere <- function(shape=NULL, frequency, c=1500, rho=1026,
                     a=shape@a, c1=shape@c1, c2=shape@c2, rho1=shape@rho1,
                     g=shape@rho1/rho, h1=shape@c1/c, h2=shape@c2/c){
-  ka <- kcalc(frequency,c)*a; ka1 <- q/h1; ka2 <- q/h2  #Equations 6a
+  
+  ka <- kcalc(frequency,c)*a; ka1 <- ka/h1; ka2 <- ka/h2  #Equations 6a
   alpha <- 2*g*h2^2; beta <- g*h1^2 - alpha #Equations 6d & 6e
   m <- 0; fsub <- 0; t <- 0; f <- TRUE #initialize
   #Iterate through while loop
