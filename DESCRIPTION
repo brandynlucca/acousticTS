@@ -1,24 +1,46 @@
 Package: acousticTS
-Title: Scattering models for calculating acoustic target strength
-Version: 0.9.8
+Title: Estimating acoustic target strength via physics-based scattering
+    models
+Version: 1.0.0
 Authors@R: 
-	person("B.M. Lucca", email = "brandyn.lucca@gmail.com", role = c("aut", "cre"))
-Description: 
-	This package provides several functions that allow for calculating theoretical target strength (TS) models for different types of scatterers, including calibration spheres, swimbladdered fish, and fluid-filled scatterers (e.g., shrimp and krill). 
-Depends: 
-	R (>= 4.0.0)
-Imports:
-	elliptic,
-	parallel,
-	doSNOW,
-	snow,
-	foreach,
-	methods,
-	stats
-License: GPL (>= 3)
+    person("Brandyn", "Lucca", , "brandyn.lucca@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0003-3145-2969"))
+Description: Acoustic target strength (TS) represents the intensity of an
+    echo returning from an individual scatterer such as bubbles, fish, or
+    zooplankton. TS can be used to convert integrated or volumetric
+    backscatter collected from fisheries acoustic surveys into units of
+    number density (e.g. animals per m^3), abundance (e.g. number of
+    animals), and biomass (e.g. kg). This parameter can also be used to
+    aid in classifying backscatter, such as separating likely echoes of
+    large predatory fish (e.g. adult cod) from smaller prey (e.g. shrimp).
+    One way to estimate TS is to use physics-based models to calculate
+    theoretical TS that comprise exact and approximate solutions as well
+    as analytical approaches. The models provided can help provide TS
+    estimates over broad statistical distirbutions of model parameters.
+License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: 
-	true
-RoxygenNote: 7.1.1
+Language: en
+VignetteBuilder: knitr
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.2
+Collate: 
+    'create_scatterer.R'
+    'shapes.R'
+    'data.R'
+    'scatterer.R'
+    'methods.R'
+    'models.R'
+    'utils.R'
+    'variable_functions.R'
+Depends:
+    R (>= 4.0.0)
 Suggests: 
-    testthat
+    testthat (>= 3.0.0),
+    rmarkdown,
+    knitr
+Config/testthat/edition: 3
+Imports: 
+    graphics,
+    methods,
+    stats,
+    utils

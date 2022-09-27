@@ -5,24 +5,37 @@
 \alias{mcgehee}
 \title{Sample krill shape taken from McGehee et al. (1998)}
 \format{
-A FLS object comprising all information required for target strength modelling. The variables are as follows:
+A pre-generated SBF scatterer containing all information required for
+target strength modeling.
 \describe{
-  \item{rpos}{Position matrix ([x,y,z], m)[0.0410898,0.0000000,0.0000000] to [0.0000000,0.0000000,0.003815]}
-  \item{a}{Radius vector (m) (0.0000000 to 0.0005946)}
-  \item{g}{Density contrast (1.0357)}
-  \item{h}{Soundspeed contrast (1.0279)}
-  \item{theta}{Orientation (degrees) (pi/2, or ~1.570796)}
-  \item{shape}{Body curvature (straight)}
-  \item{pc}{Radius of curvature (0)}
-  \item{L}{Length (m) (0.0410898)}
-  \item{ncyl}{Number of cylinders (15)}
-}
+\item{metadata}{Relevant and identifying metadata (\code{list}).}
+\item{model_parameters}{Container for specified model parameters (\code{list}).}
+\item{model}{Model outputs and results (\code{list}).}
+\item{body}{
+\itemize{
+\item{rpos:}{ Position matrix (x, y, z; m).}
+\item{radius:}{ Radius of each discrete cylinder along the position
+matrix (m).}
+\item{g:}{ Body density contrast relative to the surrounding medium.}
+\item{h:}{ Sound speed contrast relative to the surrounding medium.}
+\item{theta:}{ Body orientation relative to transmitting transducer (\ifelse{html}{\out{&theta;<sub>body</sub>}}{\eqn{\theta_{body}}}
+, rads)}}}
+\item{shape_parameters}{
+\itemize{
+\item{body}{
+\itemize{
+\item{length:}{ Body length (m).}
+\item{ncyl:}{ Number of discrete cylinders along body length.}
+\item{theta_units:}{ Units used for orientation of body.}
+\item{length_units:}{ Units used for body length.}}
+}}
+}}
 }
 \usage{
-mcgehee
+data(mcgehee)
 }
 \description{
 A dataset containing a sample krill (Euphausia superba) body shape proposed
- by McGehee et al. (1998).
+by McGehee et al. (1998).
 }
 \keyword{datasets}

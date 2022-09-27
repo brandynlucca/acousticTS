@@ -4,20 +4,10 @@
 \alias{KRM}
 \title{Calculates the theoretical TS using Kirchoff-ray Mode approximation.}
 \usage{
-KRM(shape, c, rho, frequency, theta)
+KRM(object)
 }
 \arguments{
-\item{shape}{Desired object/animal shape. Must be class "SBF".}
-
-\item{c}{Sound speed of surrounding medium (m/s). Default value is 1500 m/s.}
-
-\item{rho}{Density of medium (kg m^-1). Default value is 1030 kg m^-1.}
-
-\item{frequency}{Frequency (Hz).}
-
-\item{theta}{Orientation of the target relative to the transmit source 
-(\eqn{\theta}). Broadside incidence is considered 90 degrees, or pi/2.
-Default value is pi/2; input should be in radians.}
+\item{object}{Desired object/animal shape. Must be class "SBF".}
 }
 \value{
 Target strength (TS, dB re: 1 m^2)
@@ -29,6 +19,6 @@ Calculates the theoretical TS using Kirchoff-ray Mode approximation.
 Calculates the theoretical TS using the Kirchoff-ray Mode model.
 }
 \references{
-Clay C.S. and Horne J.K. (1994). Acoustic models of fish: The Atlantic cod 
+Clay C.S. and Horne J.K. (1994). Acoustic models of fish: The Atlantic cod
 (Gadus morhua). Journal of the Acoustical Society of AMerica, 96, 1661-1668.
 }
