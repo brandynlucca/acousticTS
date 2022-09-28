@@ -9,3 +9,24 @@ You can install the development version of acousticTS like so:
 ``` r
 devtools::install_github("brandynlucca/acousticTS@test-branch")
 ```
+
+## Example
+
+This is a basic example which shows you how to solve a common problem:
+
+``` r
+library(acousticTS)
+## Let's create a calibration sphere 
+cal_sphere <- cal_generate()
+## The default inputs here are a 38.1 mm diameter and a tungsten carbide (WC) material.
+## Let's define frequency
+frequency <- c(38e3, 70e3, 120e3, 200e3)
+# Calculate TS; update original CAL object
+cal_sphere <- target_strength(object = cal_sphere,
+                              frequency = frequency,
+                              model = "calibration")
+# Extract model results
+model_results <- extract(cal_sphere, "model")
+# Print the results
+print(model_results)
+```
