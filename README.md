@@ -1,85 +1,55 @@
----
-output:
-  html_document:
-    keep_md: true
----
+
 # acousticTS
 
-<<<<<<< HEAD
-Acoustic backscatter from a single target or organism is expressed as the 
-intensity of an echo typically denoted as the *backscattering cross-section* 
-(&sigma;~bs~, m^2^). Target strength (TS, dB re. 1 m^2^) is the logarithmic 
-representation of &sigma;~bs~ where: $TS = 10~log_{10}(\sigma_{bs})$. TS can 
-be used to convert integrated (e.g. nautical area scattering coefficient, S~A~,
-dB re. 1(m^2^ nmi^-2^) or volumetric backscatter (e.g. S~v~, dB re. 1 m^-1^) 
-collected from fisheries acoustic surveys into units of number density, such as 
-the volumetric density of a fish school (i.e. animals m^-3^). This parameter can 
-also aid in classifying backscatter based on the multifrequency response of 
-targets, such as separating likely echoes of large predatory fish from smaller
-prey. While there are several approaches for estimating TS, one common method is
-to apply physics-based models to predict theoretical TS that comprise exact and
-approximate solutions. The models provided in the `acousticTS` package can help
-provide TS estimates parameterized using broad statitsical distributions of 
-inputs. This package is in a constant state of development with updates to 
-the available model library, computational efficiency, and quality-of-life 
-improvements.
-=======
-Acoustic target strength (TS) represents the intensity of an echo returning from an individual scatterer such as bubbles, fish, or zooplankton. TS can be used to convert integrated or volumetric backscatter collected from fisheries acoustic surveys into units of number density (e.g. animals per m^3), abundance (e.g. number of animals), and biomass (e.g. kg). This parameter can also be used to aid in classifying backscatter, such as separating likely echoes of large predatory fish (e.g. adult cod) from smaller prey (e.g. shrimp). One way to estimate TS is to use physics-based models to calculate theoretical TS that comprise exact and approximate solutions as well as analytical approaches. The models provided can help provide TS estimates over broad statistical distirbutions of model parameters.
->>>>>>> fdb31ab6549f90f40906ea4461fee3b15e7e9a57
+Acoustic backscatter from a single target or organism is expressed as
+the intensity of an echo typically denoted as the *backscattering
+cross-section* (σ<sub>bs</sub>, m<sup>2</sup>). Target strength (TS, dB
+re. 1 m<sup>2</sup>) is the logarithmic representation of σ<sub>bs</sub>
+where: *T**S* = 10 *l**o**g*<sub>10</sub>(*σ*<sub>*b**s*</sub>). TS can
+be used to convert integrated (e.g. nautical area scattering
+coefficient, S<sub>A</sub>, dB re. 1(m<sup>2</sup> nmi<sup>-2</sup>) or
+volumetric backscatter (e.g. S<sub>v</sub>, dB re. 1 m<sup>-1</sup>)
+collected from fisheries acoustic surveys into units of number density,
+such as the volumetric density of a fish school (i.e. animals
+m<sup>-3</sup>). This parameter can also aid in classifying backscatter
+based on the multifrequency response of targets, such as separating
+likely echoes of large predatory fish from smaller prey. While there are
+several approaches for estimating TS, one common method is to apply
+physics-based models to predict theoretical TS that comprise exact and
+approximate solutions. The models provided in the `acousticTS` package
+can help provide TS estimates parameterized using broad statitsical
+distributions of inputs. This package is in a constant state of
+development with updates to the available model library, computational
+efficiency, and quality-of-life improvements.
 
 ## Installation
 
-You can install the current released version of acousticTS via: 
+You can install the current released version of acousticTS via:
 
-<<<<<<< HEAD
-```r
-devtools::install_github("brandynlucca/acousticTS")
-=======
 ``` r
-devtools::install_github("brandynlucca/acousticTS@test-branch")
->>>>>>> fdb31ab6549f90f40906ea4461fee3b15e7e9a57
+devtools::install_github("brandynlucca/acousticTS")
 ```
 
 Or you can install the development version of acousticTS like so:
 
-```r
+``` r
 devtools::install_github("brandynlucca/acousticTS@test-branch")
 ```
 
 ## Examples
 
-Below are two examples with predicting TS for a tungsten carbide calibration 
-sphere and a sardine with a gas-filled swimbladder.
+Below are two examples with predicting TS for a tungsten carbide
+calibration sphere and a sardine with a gas-filled swimbladder.
 
 ### Kirchoff Ray-Mode approximation for a Sardine with a gas-filled swimbladder
 
-
-```r
+``` r
 ### Call in the library
 library(acousticTS)
-<<<<<<< HEAD
 ### Call in the built-in sardine shape dataset
 data(sardine)
 ### Inspect the object
 print(sardine)
-=======
-## Let's create a calibration sphere 
-cal_sphere <- cal_generate()
-## The default inputs here are a 38.1 mm diameter and a tungsten carbide (WC) material.
-## Let's define frequency
-frequency <- c(38e3, 70e3, 120e3, 200e3)
-# Calculate TS; update original CAL object
-cal_sphere <- target_strength(object = cal_sphere,
-                              frequency = frequency,
-                              model = "calibration")
-# Extract model results
-model_results <- extract(cal_sphere, "model")
-# Print the results
-print(model_results)
->>>>>>> fdb31ab6549f90f40906ea4461fee3b15e7e9a57
-```
-
-```
 ## SBF object 
 ##  Gas-filled swimbladdered scatterer 
 ##  ID: UID 
@@ -89,15 +59,12 @@ print(model_results)
 ##  Bladder orientation (relative to transducer axis): 1.571 
 ##  Material properties (body): density = 1070 (kg/m^3); sound speed = 1570 (m/s) 
 ##  Material properties (bladder): density = 1.24 (kg/m^3); sound speed = 345 (m/s)
-```
-
-```r
 plot(sardine)
 ```
 
-![](test_md_files/figure-html/unnamed-chunk-1-1.png)<!-- -->
+<img src="README_figs/README-sardine-1.png" width="672" />
 
-```r
+``` r
 ### We will now define a frequency range to predict TS over
 frequency <- seq(1e3, 400e3, 1e3)
 ### And now we use the target_strength(...) function to model TS for this fish
@@ -110,9 +77,6 @@ sardine_ts <- extract(sardine, "model")$KRM
 ### tissues, soft tissue representing the swimbladder, the summation of these
 ### two tissue-types, and TS.
 head(sardine_ts)
-```
-
-```
 ##                       f_fluid                    f_soft
 ## 1 -7.283091e-05-4.958492e-04i -0.004076481+0.002142353i
 ## 2 -1.756594e-04-6.856564e-04i -0.006913023+0.003296627i
@@ -127,23 +91,22 @@ head(sardine_ts)
 ## 4 -0.011171026+0.003187039i -38.69830
 ## 5 -0.012677445+0.003066274i -37.69246
 ## 6 -0.013938924+0.002765477i -36.94775
-```
-
-```r
 ### Plot results
+### par(mar=c(5,5,4,1)+.05)
 plot(x = frequency * 1e-3,
      y = sardine_ts$TS,
      type = 'l',
      xlab = "Frequency (kHz)",
-     ylab = expression(Target~strength~(dB~re.~1~m^2)))
+     ylab = expression(Target~strength~(dB~re.~1~m^2)),
+     cex.lab = 1.5,
+     cex.axis = 1.3)
 ```
 
-![](test_md_files/figure-html/unnamed-chunk-1-2.png)<!-- -->
+<img src="README_figs/README-sardine-2.png" width="672" />
 
 ### Calibration sphere
 
-
-```r
+``` r
 ### Let's create a calibration sphere 
 ### Default inputs here are a 38.1 mm diameter and a tungsten carbide 
 ### (WC) material properties.
@@ -158,9 +121,12 @@ calibration_ts <- extract(cal_sphere, "model")
 ### Plot the results
 plot(x = frequency * 1e-3,
      y = calibration_ts$TS,
+     ylim = c(-60, -35),
      type = 'l',
      xlab = "Frequency (kHz)",
-     ylab = expression(Target~strength~(dB~re.~1~m^2)))
+     ylab = expression(Target~strength~(dB~re.~1~m^2)),
+     cex.lab = 1.5,
+     cex.axis = 1.3)
 ```
 
-![](test_md_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+<img src="README_figs/README-calibration-1.png" width="672" />
