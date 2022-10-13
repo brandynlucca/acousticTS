@@ -44,6 +44,7 @@ DCM <- function(object){
   slot(object, "model")$DCM <- data.frame(f_bs = f_bs,
                                           sigma_bs = abs(f_bs)^2,
                                           TS = 20 * log10(abs(f_bs)))
+  return(object)
 }
 
 #' Calculates the theoretical TS of a fluid-like scatterer at a given frequency

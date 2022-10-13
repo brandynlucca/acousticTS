@@ -14,6 +14,7 @@ fls_generate(
   theta_body = pi/2,
   theta_units = "radians",
   length_units = "m",
+  radius_curvature = NULL,
   ID = NULL
 )
 }

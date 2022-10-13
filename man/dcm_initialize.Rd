@@ -8,11 +8,11 @@ dcm_initialize(
   object,
   frequency,
   radius_cylinder = NULL,
-  radius_curvature_ratio = 3,
+  radius_curvature_ratio = NULL,
   radius_cylinder_fun = "max",
   length = NULL,
-  g = NULL,
-  h = NULL,
+  g_body = NULL,
+  h_body = NULL,
   theta = NULL,
   sound_speed_sw = 1500,
   density_sw = 1026,
@@ -34,10 +34,6 @@ radius vector. Defaults to "max", but also accepts "mean" and "median".}
 
 \item{length}{Body length (m).}
 
-\item{g}{Density contrast.}
-
-\item{h}{Sound speed contrast.}
-
 \item{theta}{Body orientation relative to the indicent sound wave.}
 
 \item{sound_speed_sw}{Seawater sound speed
@@ -49,6 +45,10 @@ m \ifelse{html}{\out{s<sup>-1</sup>}}{\eqn{s^{-1}}}).}
 kg \ifelse{html}{\out{m<sup>3</sup>}}{\eqn{m^3}})}
 
 \item{alpha_B}{Numerical coefficient (\ifelse{html}{\out{&alpha;<sub>B</sub>}}{\eqn{\alpha_{B}}}).}
+
+\item{g}{Density contrast.}
+
+\item{h}{Sound speed contrast.}
 }
 \description{
 Initialize object for modeling using the DCM.

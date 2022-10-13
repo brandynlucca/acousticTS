@@ -172,7 +172,7 @@ fls_generate <- function(x_body,
                          theta_body=pi/2,
                          theta_units="radians",
                          length_units="m",
-                         # radius_curvature=NULL,
+                         radius_curvature=NULL,
                          ID=NULL){
 
   metadata <- list(ID=ifelse(!is.null(ID), ID, "UID"))

@@ -564,12 +564,12 @@ dcm_initialize <- function(object,
                            # Optional inputs
                            # Shape (radius)
                            radius_cylinder = NULL,
-                           radius_curvature_ratio = 3.0,
+                           radius_curvature_ratio = NULL,
                            radius_cylinder_fun = "max",
                            # Body parameters
                            length = NULL,
-                           g = NULL,
-                           h = NULL,
+                           g_body = NULL,
+                           h_body = NULL,
                            theta = NULL,
                            # Medium
                            sound_speed_sw = 1500,
@@ -589,16 +589,16 @@ dcm_initialize <- function(object,
                                   mean = mean(body$radius, na.rm = T),
                                   median = median(body$radius, na.rm = T)))
   # Calculate radius of curvature either based on user input or ratio ========
-  radius_curvature <- ifelse(!is.null(radius_curvature),
-                             radius_curvature,
-                             length * radius_curvature_ratio)
+  radius_curvature = ifelse(is.null(radius_curvature_ratio),
+                            body$radius_curvature,
+                            length * radius_curvature_ratio)
   # Fill in remaining model inputs required by DCM ===========================
   # Orientation ==============================================================
   theta <- ifelse(!is.null(theta), theta, body$theta)
   # Density contrast, g ======================================================
-  g <- ifelse(!is.null(g), g, body$g)
+  g <- ifelse(!is.null(g_body), g_body, body$g)
   # Sound speed contrast, h ==================================================
-  h <- ifelse(!is.null(h), h, body$h)
+  h <- ifelse(!is.null(h_body), h_body, body$h)
   # Define model dataframe for body parameterization =========================
   body_params <- data.frame(length = length,
                             radius = radius_uniform,
@@ -928,9 +928,9 @@ anderson_initialize <- function(object,
   # Fill in remaining model inputs required by DCM ===========================
   radius <- ifelse(!is.null(radius_body), radius_body, body$radius)
   # Density contrast, g ======================================================
-  g <- ifelse(!is.null(g), g, body$g)
+  g <- ifelse(is.null(g_body), body$g, g_body)
   # Sound speed contrast, h ==================================================
-  h <- ifelse(!is.null(h), h, body$h)
+  h <- ifelse(is.null(h_body), body$h, h_body)
   # Define model dataframe for body parameterization =========================
   body_params <- data.frame(radius = radius,
                             diameter = radius * 2,

@@ -38,8 +38,10 @@ devtools::install_github("brandynlucca/acousticTS@test-branch")
 
 ## Examples
 
-Below are two examples with predicting TS for a tungsten carbide
-calibration sphere and a sardine with a gas-filled swimbladder.
+Below are examples of different models used to predict TS for a sardine
+with a gas-filled swimbladder, a tungsten carbide calibration sphere, a
+crustacean modeled as a prolate spheroid, and a generic gas-filled
+bubble.
 
 ### Kirchoff Ray-Mode approximation for a Sardine with a gas-filled swimbladder
 
@@ -130,3 +132,95 @@ plot(x = frequency * 1e-3,
 ```
 
 <img src="README_figs/README-calibration-1.png" width="672" />
+
+### Fluid sphere (Anderson, 1950)
+
+``` r
+### Let's create a gas-filled bubble with a raidus of 4 mm
+### This defaults to a density contrast, g_body, of 0.0012
+### This defaults to a soundspeed contrast, h_body, of 0.220
+bubble <- gas_generate(radius_body = 4e-3)
+### Model TS using the Anderson (1950) model
+bubble <- target_strength(bubble,
+                          frequency = seq(1e3, 300e3, 0.5e3),
+                          model = "anderson")
+### Extract model results
+bubble_ts <- extract(bubble, "model")$fluid_sphere$anderson
+### Plot the results
+plot(x =  seq(1e3, 300e3, 0.5e3) * 1e-3,
+     y = bubble_ts$TS,
+     ylim = c(-60, -35),
+     type = 'l',
+     xlab = "Frequency (kHz)",
+     ylab = expression(Target~strength~(dB~re.~1~m^2)),
+     cex.lab = 1.5,
+     cex.axis = 1.3)
+```
+
+<img src="README_figs/README-bubble-1.png" width="672" />
+
+### Fluid-like crustacean (prolate spheroid) using the distorted Born wave approximation (DWBA) and ray-based deformed cylinder model (DCM)
+
+``` r
+### First let's create a prolate spheroid shape 
+### 25 mm long with a length-to-radius ratio of 16
+crustacean_shape <- prolate_spheroid(length = 25e-3,
+                                     length_radius_ratio = 16)
+### Create fluid-like scatterer (FLS) object -- broadside incidence
+crustacean <- fls_generate(x_body = crustacean_shape$rpos[, 1],
+                           y_body = crustacean_shape$rpos[, 2],
+                           z_body = crustacean_shape$rpos[, 3],
+                           radius_body = crustacean_shape$radius,
+                           g_body = 1.03,
+                           h_body = 1.02,
+                           theta_body = pi / 2)
+### Check shape parameters
+print(crustacean)
+## FLS object 
+##  Fluid-like scatterer 
+##  ID: UID 
+##  Body length: 0.025 m (n = 100  cylinders) 
+##  Maximum radius:  0.002 m;  Mean radius:  0.001 m 
+##  Body orientation (relative to transducer axis):  1.571 radians 
+##  Material properties (body): g = 1.03; h = 1.02
+### Plot shape
+plot(crustacean)
+```
+
+<img src="README_figs/README-crustacean-1.png" width="672" />
+
+``` r
+### Model TS using the DWBA
+crustacean <- target_strength(crustacean,
+                              frequency = seq(1e3, 400e3, 1e3),
+                              model = "DWBA")
+### Model TS using the DCM
+crustacean <- target_strength(crustacean,
+                              frequency = seq(1e3, 400e3, 1e3),
+                              model = "DCM",
+                              radius_curvature_ratio = 3.3)
+### Extract both
+crustacean_dwba <- extract(crustacean, "model")$DWBA
+crustacean_dcm <- extract(crustacean, "model")$DCM
+### Plot both
+plot(x = seq(1e3, 400e3, 1e3) * 1e-3,
+     y = crustacean_dwba$TS,
+     type = 'l',
+     xlab = "Frequency (kHz)",
+     ylab = expression(Target~strength~(dB~re.~1~m^2)),
+     cex.lab = 1.5,
+     cex.axis = 1.3,
+     lwd = 2)
+lines(x = seq(1e3, 400e3, 1e3) * 1e-3,
+      y = crustacean_dcm$TS,
+      col = 'red',
+      lwd = 2)
+legend(x = "bottomright",
+       legend = c("DWBA", "DCM"),
+       lty = c(1, 1),
+       lwd = c(4, 3.5),
+       col = c('black', 'red'),
+       cex = 1)
+```
+
+<img src="README_figs/README-crustacean-2.png" width="672" />
