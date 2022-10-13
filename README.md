@@ -5,16 +5,16 @@ Acoustic backscatter from a single target or organism is expressed as
 the intensity of an echo typically denoted as the *backscattering
 cross-section* (σ<sub>bs</sub>, m<sup>2</sup>). Target strength (TS, dB
 re. 1 m<sup>2</sup>) is the logarithmic representation of σ<sub>bs</sub>
-where: *T**S* = 10 *l**o**g*<sub>10</sub>(*σ*<sub>*b**s*</sub>). TS can
-be used to convert integrated (e.g. nautical area scattering
-coefficient, S<sub>A</sub>, dB re. 1(m<sup>2</sup> nmi<sup>-2</sup>) or
-volumetric backscatter (e.g. S<sub>v</sub>, dB re. 1 m<sup>-1</sup>)
-collected from fisheries acoustic surveys into units of number density,
-such as the volumetric density of a fish school (i.e. animals
-m<sup>-3</sup>). This parameter can also aid in classifying backscatter
-based on the multifrequency response of targets, such as separating
-likely echoes of large predatory fish from smaller prey. While there are
-several approaches for estimating TS, one common method is to apply
+where: TS = 10 log<sub>10</sub> (σ<sub>bs</sub>). TS can be used to
+convert integrated (e.g. nautical area scattering coefficient,
+S<sub>A</sub>, dB re. 1(m<sup>2</sup> nmi<sup>-2</sup>) or volumetric
+backscatter (e.g. S<sub>v</sub>, dB re. 1 m<sup>-1</sup>) collected from
+fisheries acoustic surveys into units of number density, such as the
+volumetric density of a fish school (i.e. animals m<sup>-3</sup>). This
+parameter can also aid in classifying backscatter based on the
+multifrequency response of targets, such as separating likely echoes of
+large predatory fish from smaller prey. While there are several
+approaches for estimating TS, one common method is to apply
 physics-based models to predict theoretical TS that comprise exact and
 approximate solutions. The models provided in the `acousticTS` package
 can help provide TS estimates parameterized using broad statitsical
