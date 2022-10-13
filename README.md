@@ -94,7 +94,7 @@ head(sardine_ts)
 ## 5 -0.012677445+0.003066274i -37.69246
 ## 6 -0.013938924+0.002765477i -36.94775
 ### Plot results
-### par(mar=c(5,5,4,1)+.05)
+par(mar=c(5,5,4,1)+.05)
 plot(x = frequency * 1e-3,
      y = sardine_ts$TS,
      type = 'l',
@@ -121,6 +121,7 @@ cal_sphere <- target_strength(object = cal_sphere,
 ### Extract model results
 calibration_ts <- extract(cal_sphere, "model")
 ### Plot the results
+par(mar = c(5,5,4,1) + .05)
 plot(x = frequency * 1e-3,
      y = calibration_ts$TS,
      ylim = c(-60, -35),
@@ -147,6 +148,7 @@ bubble <- target_strength(bubble,
 ### Extract model results
 bubble_ts <- extract(bubble, "model")$fluid_sphere$anderson
 ### Plot the results
+par(mar = c(5,5,4,1) + .05)
 plot(x =  seq(1e3, 300e3, 0.5e3) * 1e-3,
      y = bubble_ts$TS,
      ylim = c(-60, -35),
@@ -203,6 +205,7 @@ crustacean <- target_strength(crustacean,
 crustacean_dwba <- extract(crustacean, "model")$DWBA
 crustacean_dcm <- extract(crustacean, "model")$DCM
 ### Plot both
+par(mar = c(5,5,4,1) + .05)
 plot(x = seq(1e3, 400e3, 1e3) * 1e-3,
      y = crustacean_dwba$TS,
      type = 'l',
