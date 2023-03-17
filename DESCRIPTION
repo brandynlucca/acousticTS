@@ -24,14 +24,19 @@ VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
 Collate: 
+    'acoustics.R'
+    'bessel.R'
     'create_scatterer.R'
-    'shapes.R'
     'data.R'
-    'scatterer.R'
-    'methods.R'
+    'math.R'
+    'model_initialization.R'
     'models.R'
-    'utils.R'
-    'variable_functions.R'
+    'scatterer.R'
+    'scatterer_plot.R'
+    'scatterer_reforge.R'
+    'shapes.R'
+    'show.R'
+    'utilities.R'
 Depends:
     R (>= 4.0.0)
 Suggests: 

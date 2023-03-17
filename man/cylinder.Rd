@@ -7,10 +7,6 @@
 cylinder(length, radius, length_radius_ratio, taper, n_segments)
 }
 \arguments{
-\item{length}{Length (m).}
-
-\item{radius}{Maximum/uniform radius (m).}
-
 \item{length_radius_ratio}{Optional ratio input when radius is not explicitly
 known.}
 
@@ -19,6 +15,10 @@ the cylinder.}
 
 \item{n_segments}{Number of segments to discretize object shape. Defaults to
 1e2 segments.}
+
+\item{length}{Length (m).}
+
+\item{radius}{Maximum/uniform radius (m).}
 }
 \value{
 Creates the position vector for a tapered or untapered cylinder.

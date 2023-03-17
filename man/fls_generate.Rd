@@ -5,17 +5,19 @@
 \title{Manually generate a FLS object.}
 \usage{
 fls_generate(
-  x_body,
-  y_body,
-  z_body,
-  radius_body,
+  shape = "arbitrary",
+  x_body = NULL,
+  y_body = NULL,
+  z_body = NULL,
+  length_body = NULL,
+  radius_body = NULL,
   g_body,
   h_body,
   theta_body = pi/2,
-  theta_units = "radians",
+  ID = NULL,
   length_units = "m",
-  radius_curvature = NULL,
-  ID = NULL
+  theta_units = "radians",
+  n_segments = 100
 )
 }
 \arguments{
@@ -35,11 +37,11 @@ fls_generate(
 (\eqn{\theta}). Broadside incidence is considered 90 degrees, or pi/2.
 Default value is pi/2; input should be in radians.}
 
-\item{theta_units}{Units used for orientation. Defaults to "radians".}
+\item{ID}{Optional metadata entry.}
 
 \item{length_units}{Units used for position vector. Defaults to "m".}
 
-\item{ID}{Optional metadata entry.}
+\item{theta_units}{Units used for orientation. Defaults to "radians".}
 }
 \value{
 Calls in an FLS-class object from a *.csv file

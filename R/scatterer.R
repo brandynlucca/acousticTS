@@ -67,10 +67,11 @@
 #' @rdname scatterer
 #' @export
 setClass("scatterer",
-         slots=c(metadata="list",
-                 model_parameters="list"),
-         contains="VIRTUAL")
-
+         slots = base::c(
+           metadata = "list" ,
+           model_parameters = "list"
+         )
+)
 #' Swimbladdered fish (SBF) object/class.
 #'
 #' @description
@@ -104,13 +105,15 @@ SBF <- setClass("SBF",
 #' @rdname FLS
 #' @export
 FLS <- setClass("FLS",
-                slots=c(metadata="list",
-                        model_parameters="list",
-                        model="list",
-                        body="list",
-                        shape_parameters="list"),
-                contains="scatterer")
-
+                slots = base::c(
+                  metadata = "list" ,
+                  model_parameters = "list" ,
+                  model = "list" ,
+                  body = "list" ,
+                  shape_parameters = "list"
+                ) ,
+                contains = "scatterer"
+)
 #' Solid and calibration sphere (CAL) object/class.
 #'
 #' @description
@@ -163,9 +166,9 @@ ESS <- setClass("ESS",
 #' GAS scatterer.
 #' @export
 GAS <- setClass("GAS",
-                slots = c(metadata = "list",
-                          model_parameters = "list",
-                          model = "list",
-                          body = "list",
-                          shape_parameters = "list"),
+                slots = c( metadata = "list",
+                           model_parameters = "list",
+                           model = "list",
+                           body = "list",
+                           shape_parameters = "list" ),
                 contains = "scatterer")

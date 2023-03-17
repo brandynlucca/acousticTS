@@ -2,10 +2,50 @@
 # FUNCTIONS FOR GENERATIGN CANONICAL & PRE-DEFINED SHAPES
 ################################################################################
 ################################################################################
+# Define shape-class object
+################################################################################
+setClass(
+  "shape" ,
+  slots = base::c(
+    position_matrix = "matrix" ,
+    shape_parameters = "list" )
+)
+################################################################################
+# Arbitrary (or pre-generated) body shape parameters
+################################################################################
+#' Creates arbitrary body shape from user inputs
+#' @param x_body x-axis (m)
+#' @param y_body y-axis (m)
+#' @param z_body z-axis (m)
+#' @param radius_body Radius (m)
+#' @param length_units Units for body length. Defaults to meters: "m"
+#' @rdname arbitrary
+#' @export
+arbitrary <- function( x_body ,
+                       y_body ,
+                       z_body ,
+                       radius_body ,
+                       length_units = "m" ) {
+  position_matrix <- base::cbind( x = x_body ,
+                                  y = y_body ,
+                                  z = z_body ,
+                                  zU = z_body + radius_body ,
+                                  zL = z_body - radius_body )
+  # Generate shape parameters list =============================================
+  shape_parameters <- list(
+    radius = radius_body ,
+    n_segments = base::length( x_body ) - 1 ,
+    diameter_units = length_units )
+  # Generate new shape object ==================================================
+  return( new( "shape" ,
+               position_matrix = position_matrix ,
+               shape_parameters = shape_parameters ) )
+
+}
+################################################################################
 # Sphere
 ################################################################################
 #' Creates a sphere.
-#'
 #' @param radius Object radius (m).
 #' @param n_segments Number of segments to discretize object shape. Defaults to
 #'    1e3 segments.
@@ -14,18 +54,32 @@
 #' @return
 #' Creates position vector for a spherical object of a defined radius.
 #' @export
-sphere <- function(radius,
-                   n_segments = 1e3) {
+sphere <- function(  radius ,
+                     n_segments = 1e2 ,
+                     diameter_units = "m" ) {
   # Define semi-major or x-axis ================================================
   diameter <- radius * 2
-  x_axis <- seq(0, diameter, length.out = n_segments + 1)
-  # Map radius along x-axis ====================================================
-  radius_out <- sqrt((radius)^2 - (x_axis - radius)^2)
-  # Generate position vector, 'rpos' ===========================================
-  rpos <- rbind(x = x_axis - radius_out,
-                radiusU = radius_out,
-                radiusL = -rev(radius_out))
-  return(rpos)
+  semi_major <- base::seq(
+    from = 0 ,
+    to = diameter ,
+    length.out = n_segments + 1
+  )
+  # Along-semimajor radii ======================================================
+  along_radius <- sqrt( radius ^ 2 - ( semi_major - radius ) ^ 2 )
+  # Generate position matrix ===================================================
+  position_matrix <- cbind( x = semi_major ,
+                            y1 = along_radius ,
+                            y2 = -rev( along_radius ) )
+  # Generate shape parameters list =============================================
+  shape_parameters <- list(
+    diameter = diameter ,
+    radius = diameter / 2 ,
+    n_segments = n_segments ,
+    diameter_units = diameter_units )
+  # Generate new shape object ==================================================
+  return( new( "shape" ,
+               position_matrix = position_matrix ,
+               shape_parameters = shape_parameters ) )
 }
 ################################################################################
 # Prolate spheroid
@@ -86,32 +140,52 @@ prolate_spheroid <- function(length,
 #' @return
 #' Creates the position vector for a tapered or untapered cylinder.
 #' @export
-cylinder <- function(length,
-                     radius,
-                     length_radius_ratio = NULL,
-                     taper = NULL,
-                     n_segments = 1e2) {
+cylinder <-  function( length_body ,
+                       radius_body = NULL ,
+                       length_radius_ratio = NULL ,
+                       taper = NULL ,
+                       n_segments = 1e2 ,
+                       length_units = "m" ) {
   # Define maximum radius ======================================================
-  if(missing(radius) & !is.null(length_radius_ratio)) {
-    max_radius <- length / length_radius_ratio
-  }else if(!missing(radius)) {
-    max_radius <- radius
+  if ( base::is.null( radius_body ) ) {
+    max_radius <- length_body / length_radius_ratio
+  } else if ( !base::is.null( radius_body ) ) {
+    max_radius <- radius_body
   } else {
     stop("Radius/width and/or length-to-radius ratio are missing.")
   }
   # Define normalized x-axis ===================================================
-  x_n_axis <- seq(-1, 1, length.out = n_segments + 1)
-  # Define tapered radius vector, if applicable
-  tapered <- ifelse(!is.null(taper), sqrt(1 - x_n_axis^taper), 1)
-  radius_output <- max_radius * tapered
-  # Define output x-axis =======================================================
-  x_axis <- x_n_axis * length / 2 + length / 2
-  # Generate position vector, 'rpos' ===========================================
-  rpos <- list(rpos = data.frame(x = x_axis,
-                                 y = rep(0, length(x_axis)),
-                                 z = rep(0, length(x_axis))),
-               radius = radius_output)
-  return(rpos)
+  x_n_axis <- base::seq( -1 , 1 , length.out = n_segments + 1 )
+  # Define tapered radius vector, if applicable ================================
+  if ( !base::is.null( taper ) ) {
+    tapering <- base::sqrt( 1 - x_n_axis ^ taper )
+  } else {
+    tapering <- base::rep( 1 , n_segments + 1 )
+  }
+  radius_tapered <- max_radius * tapering
+  # Generate position matrix ===================================================
+  x_axis <- ( 1 - base::sqrt( 1 - x_n_axis ^ 2 ) )
+  position_matrix <- base::cbind( x = x_n_axis * length_body / 2 + length_body / 2 ,
+                                  y = base::rep( 0 , base::length( x_n_axis ) ) ,
+                                  z = base::rep( 0 , base::length( x_n_axis ) ) ,
+                                  zU = radius_tapered ,
+                                  zL = - base::rev( radius_tapered ) )
+  # Generate shape parameters list =============================================
+  shape_parameters <- base::list(
+    length = base::max( position_matrix[ , 1 ] ) ,
+    radius = radius_tapered ,
+    length_radius_ratio = base::max( position_matrix[ , 1 ] ) /
+      base::max( radius_tapered ) ,
+    n_segments = n_segments ,
+    taper_order = base::ifelse( base::is.null( taper ) ,
+                                NA ,
+                                taper ) ,
+    length_units = length_units
+  )
+  # Generate new shape object ==================================================
+  return( methods::new( "shape" ,
+                        position_matrix = position_matrix ,
+                        shape_parameters = shape_parameters ) )
 }
 ################################################################################
 # Polynomial cylinder
@@ -216,13 +290,25 @@ polynomial_cylinder <- function(length,
 #' approximation target strength model for Bering Sea euphausiids. ICES Journal
 #' of Marine Science, 70(1): 204-214. https://doi.org/10.1093/icesjms/fss140
 #' @export
-create_shape <- function(shape,
-                         ...) {
+create_shape <- function( shape , ... ) {
+  # Grab input arguments =======================================================
+  # args <- base::list( ... )
+  # Grab shape function arguments related to input =============================
+  # shargs <- base::names( base::formals( shape ) )
   # Define shape output ========================================================
-  shape_out <- switch(shape,
-                      sphere = sphere(...),
-                      prolate_sphoeroid = prolate_spheroid(...),
-                      cylinder = cylinder(...),
-                      polynomial_cylinder = polynomial_cylinder(...))
-  return(shape_out)
+  # shape_out <- switch( shape,
+  #                      cylinder = base::do.call( cylinder ,
+  #                                                args[ base::names( args ) %in% shargs ] ) ,
+  #                      polynomial_cylinder = base::do.call( polynomial_cylinder ,
+  #                                                           args[ base::names( args ) %in% shargs ] ) ,
+  #                      prolate_spheroid = base::do.call( prolate_spheroid ,
+  #                                                        args[ base::names( args ) %in% shargs ] ) ,
+  #                      sphere = base::do.call( sphere ,
+  #                                              args[ base::names( args ) %in% shargs ] ) )
+  shape_out <- switch( shape ,
+                       cylinder = cylinder( ... ) ,
+                       polynomial_cylinder = polynomial_cylinder( ... ) ,
+                       prolate_spheroid = prolate_spheroid( ... ) ,
+                       sphere = sphere( ... ) )
+  return( shape_out )
 }

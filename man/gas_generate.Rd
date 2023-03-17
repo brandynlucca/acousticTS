@@ -5,23 +5,42 @@
 \title{Create GAS object}
 \usage{
 gas_generate(
-  radius_body,
-  g_body = 0.0012,
-  h_body = 0.22,
+  shape = "sphere",
+  radius_body = NULL,
+  h_fluid = 0.22,
+  g_fluid = 0.0012,
+  sound_speed_fluid = NULL,
+  density_fluid = NULL,
+  theta_body = pi/2,
   ID = NULL,
-  diameter_units = "m"
+  radius_units = "m",
+  theta_units = "radians",
+  n_segments = 100
 )
 }
 \arguments{
-\item{radius_body}{Vector containing radii (m).}
+\item{shape}{Optional pre-made shape input. Default is a sphere.}
 
-\item{g_body}{Density contrast.}
+\item{radius_body}{Optional average radius (m).}
 
-\item{h_body}{Soundspeed contrast}
+\item{h_fluid}{Sound speed contrast of fluid relative to surrounding
+medium (h).}
+
+\item{g_fluid}{Density contrast of fluid relative to surrounding density (g).}
+
+\item{sound_speed_fluid}{Optional fluid sound speed (m/s).}
+
+\item{density_fluid}{Optional fluid density (m/s).}
+
+\item{theta_body}{Orientation of the target relative to the transmit source
+(\eqn{\theta}). Broadside incidence is considered 90 degrees, or pi/2.
+Default value is pi/2; input should be in radians.}
 
 \item{ID}{Optional metadata entry.}
 
-\item{diameter_units}{Diameter units. Defaults to "m".}
+\item{radius_units}{Diameter units. Defaults to "m".}
+
+\item{theta_units}{Units used for orientation. Defaults to "radians".}
 }
 \value{
 Creates a FLS-class object from a *.csv file

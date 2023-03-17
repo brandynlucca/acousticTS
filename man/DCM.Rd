@@ -5,7 +5,7 @@
 \title{Calculates the theoretical TS of a target using the deformed cylinder
 model (DCM).}
 \usage{
-DCM(object)
+DCM( object )
 }
 \arguments{
 \item{object}{FLS-class scatterer.}

@@ -10,8 +10,11 @@ cal_generate(
   sound_speed_longitudinal = NULL,
   sound_speed_transversal = NULL,
   density_sphere = NULL,
+  theta_sphere = pi,
   ID = NULL,
-  diameter_units = "m"
+  diameter_units = "m",
+  theta_units = "radians",
+  n_segments = 100
 )
 }
 \arguments{
@@ -26,9 +29,13 @@ options. Default is tungsten carbide (WC).}
 
 \item{density_sphere}{Density (kg/m^3).}
 
+\item{theta_sphere}{Backscattering direction (Default: pi radians).}
+
 \item{ID}{Optional metadata ID input.}
 
 \item{diameter_units}{Units for diameter. Defaults to "m".}
+
+\item{theta_units}{Units for direction. Defaults to "radians".}
 }
 \value{
 Generates a CAL-class object.

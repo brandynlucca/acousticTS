@@ -78,12 +78,12 @@
 #' @usage data(cod)
 "cod"
 
-#' Sample krill shape taken from McGehee et al. (1998)
+#' Sample krill (Euphausia superba) shape taken from McGehee et al. (1998)
 #'
 #' A dataset containing a sample krill (Euphausia superba) body shape proposed
 #'  by McGehee et al. (1998).
 #'
-#' @format A pre-generated SBF scatterer containing all information required for
+#' @format A pre-generated FLS scatterer containing all information required for
 #' target strength modeling.
 #' \describe{
 #'   \item{metadata}{Relevant and identifying metadata (\code{list}).}
@@ -108,5 +108,5 @@
 #'           \item{length_units:}{ Units used for body length.}}
 #'       }}
 #'       }}
-#' @usage data(mcgehee)
-"mcgehee"
+#' @usage data(krill)
+"krill"
