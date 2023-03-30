@@ -3,11 +3,11 @@
 \name{hs}
 \alias{hs}
 \alias{hsd}
-\title{Spherical Bessel function of the third kind}
+\title{Spherical Bessel function of the third kind (ha)}
 \usage{
-hs(l, n)
+hs( l , n )
 
-hsd(l, n)
+hsd( l , n )
 }
 \arguments{
 \item{l}{An integer or fractional order}
@@ -15,7 +15,7 @@ hsd(l, n)
 \item{n}{A complex or real argument}
 }
 \description{
-Spherical Bessel function of the third kind
+Spherical Bessel function of the third kind (ha)
 
-First derivative of the spherical Bessel function of the third kind
+First derivative of the spherical Bessel function of the third kind (had)
 }

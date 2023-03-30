@@ -1,310 +1,290 @@
-#' Bessel functions of the first kind
-#'
+################################################################################
+# DIFFERENTIAL EQUATION SOLUTION FUNCTIONS
+################################################################################
+################################################################################
+# Cyndrical Bessel functions
+################################################################################
+################################################################################
+#' Wrapper function for the Cylindrical Bessel function of the first kind (Jc)
 #' @param l An integer or fractional order
 #' @param n A complex or real argument
 #' @usage
-#' ja(l,n)
-#' @examples
-#' l <- 1.5
-#' n <- 1
-#' ja(l,n)
-#' # 0.2402978
+#' jc( l , n )
 #' @return
-#' Calculates the Bessel function of the first kind (J_a).
+#' Calculates the Cylindrical Bessel function of the first kind (J_a).
 #' @references
-#' Amost D.E., "AMOS, A Portable Package for Bessel Functions of a Complex 
+#' Amost D.E., "AMOS, A Portable Package for Bessel Functions of a Complex
 #' Argument and Nonnegative Order", http://netlib.org/amos
-#' @rdname ja
+#' @rdname jc
 #' @export
-
-#Bessel function of first or second kind calculation
-ja <- function(l,n){
-  if(n == 0){
-    s <- 0
-  }else{
-    if(n > 0){
-      nn <- n
-    }else{
-      nn <- abs(n)
-    }
-
-    if(nn > 10){
-      s <- sqrt(2/(pi*nn)) * cos(nn - (l/2 + 0.25)*pi)
-    }else if(nn < 0.01){
-      s <- (0.5*nn)^l / gamma(l+1)
-    }else{
-      if(l >= 0){
-        ll <- l
-      }else if(l < 0 & l%%1==0){
-        ll <- abs(l)
-      }else{
-        ll <- l
-      }
-
-      f <- 0; t <- 0; s <- 0; i <- 0
-      while(f == 0){
-        s <- s + (-1)^i * (nn/2)^(ll+2*i) / (factorial(i) * gamma(i+ll+1))
-
-        if(abs(s - t) < 1e-30){f <- 1}
-        t <- s; i <- i + 1
-
-      }
-
-      if(n < 0){
-        if(l > 0){
-          s <- -1^l * s
-        }else if(l%%1!=0){
-          if(s < 0){
-            s <- 1i*s
-          }else{
-            s <- -1i*s
-          }
-        }
-      }else{
-        if(l < 0 & l%%1==0){
-          s <- -1^l * s
-        }
-      }
-    }
-  }
-  return(s)
-}
-
-#'First derivative of Bessel function of the first kind
-#' @param l An integer or fractional order
-#' @param n A complex or real argument
-#' @rdname ja
-#' @export
-jd <- function(l,n){
-  if(n == 0){
-    if(l == 0){
-      s <- 0
-    }else if(l == 1){
-      s <- 0.5
-    }else{
-      s <- 0
-    }
-  }else{
-    s <- ja(l-1,n)-(l/n)*ja(l,n)
-  }
-  return(s)
-}
-
-#' Second derivative of the Bessel function of first kind
-#' @param l An integer or fractional order
-#' @param n A complex or real argument
-#' @rdname ja
-#' @export
-jdd <- function(l,n){
-  s <- (0.25)*(ja(l-2,n) - 2*ja(l,n)+ja(l+2,n))
-  return(s)
-}
-
-#' Spherical Bessel function of the first kind.
-#'
+jc <- function( l , n ) return( base::besselJ( n , l ) )
+################################################################################
+#' Wrapper function for the Cylindrical Bessel (Neumann) function of the second kind (Yc)
 #' @param l An integer or fractional order
 #' @param n A complex or real argument
 #' @usage
-#' js(l,n)
-#' @examples
-#' l <- 1
-#' n <- 1
-#' js(l,n)
-#' # 0.3011687
+#' yc( l , n )
 #' @return
-#' js(l,n) calculates the spherical Bessel function of the first kind 
+#' Calculates the Bessel function of the second kind (Y_v). Functions are
+#' referenced from Amost D.E., "AMOS, A Portable Package
+#' for Bessel Functions of a Complex Argument and Nonnegative Order",
+#' http://netlib.org/amos
+#' @rdname yc
+#' @export
+yc <- function( l , n ) return( base::besselY( n , l ) )
+################################################################################
+#' Cylindrical Bessel (Hankel) function of the third kind (Hc)
+#' @param l An integer or fractional order
+#' @param n A complex or real argument
+#' @usage
+#' hc( l , n )
+#' @return
+#' Calculates the Bessel function of the second kind (H_v). Functions are
+#' referenced from Amost D.E., "AMOS, A Portable Package
+#' for Bessel Functions of a Complex Argument and Nonnegative Order",
+#' http://netlib.org/amos
+#' @rdname hc
+#' @export
+hc <- function( l , n ) return( jc( l , n ) + 1i * yc( l , n ) )
+################################################################################
+# Cyndrical Bessel function derivatives (first and second)
+################################################################################
+################################################################################
+#' First derivative of the Cylindrical Bessel function of the first kind (Jcd)
+#' @param l An integer or fractional order
+#' @param n A complex or real argument
+#' @usage
+#' jcd( l , n )
+#' @rdname jc
+#' @export
+jcd <- function( l , n ) {
+  ## Iterate through modal series constant vector ==============================
+  if ( n == 0.0 ) {
+    if ( l == 1 ) {
+      return( 0.5 )
+    } else {
+      return( 0.0 )
+    }
+  } else {
+    return( jc( l - 1 , n ) - ( l / n ) * jc( l , n ) )
+  }
+}
+################################################################################
+#' Second derivative of the Cylindrical Bessel function of the first kind (Jcdd)
+#' @param l An integer or fractional order
+#' @param n A complex or real argument
+#' @usage
+#' jcdd( l , n )
+#' @rdname jc
+#' @export
+jcdd <- function( l , n ) {
+  return( 0.25 * ( jc( l - 2 , n ) - 2 * jc( l , n ) + jc( l + 2 , n ) ) )
+}
+################################################################################
+#' First derivative of Cylindrical Bessel function of the second kind (Ycd)
+#' @param l An integer or fractional order
+#' @param n A complex or real argument
+#' @usage
+#' ycd( l , n )
+#' @rdname yc
+#' @export
+ycd <- function( l , n ) {
+  ## Iterate through modal series constant vector ==============================
+  if ( n == 0.0 ) {
+    if ( l == 1 ) {
+      return( 0.5 )
+    } else {
+      return( 0.0 )
+    }
+  } else {
+    return( yc( l - 1 , n ) - ( l / n ) * yc( l , n ) )
+  }
+}
+################################################################################
+#' First derivative of the Bessel function of the third kind (Hcd)
+#' @param l An integer or fractional order
+#' @param n A complex or real argument
+#' @usage
+#' hcd( l , n )
+#' @rdname hc
+#' @export
+hcd <- function( l, n ) return( ( l * hc( l , n ) / n - hc( l + 1 , n ) ) )
+################################################################################
+# Spherical Bessel functions
+################################################################################
+################################################################################
+#' Spherical Bessel function of the first kind (ja)
+#' @param l An integer or fractional order
+#' @param n A complex or real argument
+#' @usage
+#' js( l , n )
+#' @return
+#' js( l , n ) calculates the spherical Bessel function of the first kind
 #' (zbesj AMOS routine, Iv).
 #' @rdname js
 #' @export
-
 #Spherical Bessel function of first kind
-js <- function(l,n){
-  if(n == 0){
-    return(0)
-  }else if(n > 0){
-    return(ja(l+0.5, n) * sqrt(pi/2/n))
-  }else{
-    return(-1^l * (ja(abs(l)+0.5, abs(n)) * sqrt(pi/2/abs(n))))
+js <- function( l , n ) {
+  # Function check =============================================================
+  if ( !base::is.numeric( l ) && !base::numeric( n ) )
+    stop( "Inputs must be numeric vectors." )
+  # Internal function ==========================================================
+  js_internal <- function( l , n ) {
+    if( n == 0 ) {
+      return( 0 )
+    } else {
+      return( jc( l + 0.5 , n ) * base::sqrt( pi / ( 2 * n ) ) )
+    }
   }
+  js_vec <- Vectorize( js_internal )
+  # Return based on input class ================================================
+  base::switch( class( n )[1] ,
+                numeric = js_vec( l , n ) ,
+                matrix = apply( n , 2 , FUN = function( x ) {
+                  js_vec( l , x )
+                } ) ) -> result
+  return( result )
 }
-
-#' Calculate the first derivative of the spherical Bessel function of the 
-#' first kind.
-#' 
-#' @param l An integer or fractional order
-#' @param n A complex or real argument
-#' 
-#' @rdname js
-#' @export
-jsd <- function(l,n){
-  return(-js(l+1, n) + (l/n)*js(l,n))
-} #first kind
-
-#' Calculate the second derivative of the spherical Bessel function of the 
-#' first kind.
-#' 
-#' @param l An integer or fractional order
-#' @param n A complex or real argument
-#' 
-#' @rdname js
-#' @export
-jsdd <- function(l,n){-(2*n*jsd(l,n)+(n^2-l*(l+1))*js(l,n))/(n^2)}
-
-#' Calculate Bessel function of the second kind.
-#'
-#' @param l An integer or fractional order
-#' @param n A complex or real argument
-#' @usage
-#' ya(l,n)
-#' @examples
-#' l <- 1.5
-#' n <- 1
-#' ya(l,n)
-#' # -1.102496
-#' @return
-#' Calculates the Bessel function of the second kind (Y_a). Functions are 
-#' referenced from Amost D.E., "AMOS, A Portable Package
-#' for Bessel Functions of a Complex Argument and Nonnegative Order", 
-#' http://netlib.org/amos
-#' @rdname ya
-#' @export
-
-#Bessel function of first or second kind calculation
-ya <- function(l,n){
-
-  nn <- abs(n)
-  ll <- abs(l)
-
-  if(ll%%1==0){
-    p1 <- -(nn/2)^(-ll)/pi
-    p2 <- 0
-    for (i in seq(0, (ll - 1), 1)) {
-      p2 <- p2 + (factorial(ll - i - 1)/factorial(i)) *
-        (nn^2/4)^i
-    }
-    p3 <- 2/pi * log(nn/2) * ja(ll, nn)
-    f <- 0; t <- 0; i <- 0
-    p4 <- 0
-
-    while (f == 0) {
-      p4 <- p4 + (digamma(i + 1) + digamma(ll + i + 1)) *
-        ((-nn^2/4)^i)/(factorial(i) * factorial(ll + i))
-      if (abs(p4 - t) < 1e-30) {
-        f <- 1
-      }
-      t <- p4
-      i <- i + 1
-    }
-    s <- p1 * p2 + p3 - (nn/2)^ll/pi * p4
-  }else{
-    s <- (ja(ll, nn) * cos(ll * pi) - ja(-ll, nn))/sin(ll * pi)
-  }
-
-  if(n < 0){
-    if(n%%1 == 0){
-      if(l%%1==0){
-        s <- -1^ll * s + 1i*(-1)^ll*2*ja(ll,nn)
-      }else{
-        s <- 1i*-1^(ll+1) * s
-      }
-    }
-  }
-
-  if(l < 0){
-    if(l%%1==0){
-      s <- -1^l * s
-    }else{
-      s <- -1^l * ja(ll+0.5, n)
-    }
-  }
-
-  return(s)
-}
-
-#'First derivative of Bessel function of the second kind
-#' @param l An integer or fractional order
-#' @param n A complex or real argument
-#' 
-#' @rdname ya
-#' @export
-yd <- function(l,n){
-  sign <- 1
-  if(l < 0){
-    sign <- -1
-    l <- abs(l)
-  }
-  s <- ya(l-1,n)-(l/n)*ya(l,n)
-  return(ifelse(sign<1,(-1^l)*s,s))
-}
-
-#' Calculate spherical Bessel function of the second kind.
-#'
+################################################################################
+#' Calculate spherical Bessel function of the second kind (ya)
 #' @description
-#' This function calculates the spherical Bessel functions of the second kind. 
+#' This function calculates the spherical Bessel functions of the second kind.
 #' Referenced from Amost D.E.,
-#' "AMOS, A Portable Package for Bessel Functions of a Complex Argument and 
+#' "AMOS, A Portable Package for Bessel Functions of a Complex Argument and
 #' Nonnegative Order", http://netlib.org/amos
 #'
 #' @param l An integer or fractional order
 #' @param n A complex or real argument
 #' @usage
-#' ys(l,n)
-#' @examples
-#' l <- 1
-#' n <- 1
-#' ys(l,n)
-#' # -1.381773
+#' ys( l , n )
 #' @return
-#' ys(l,n) calculates the spherical Bessel function of the second kind (zbesy 
-#' AMOS routine, Yv)
+#' ys( l , n ) calculates the spherical Bessel function of the second kind (zbesy
+#' AMOS routine, y_v)
 #' @rdname ys
 #' @export
 #Spherical Bessel function of second kind
-ys <- function(l,n){
-  if(n > 0){
-    return(ya(l+0.5,n) * sqrt(pi/2/n))
-  }else if(n < 0){
-    return(-(ya(l+0.5,n) * sqrt(pi/2/n)))
-  }else if(n == 0){
-    return(Inf)
+ys <- function( l , n ) {
+  # Function check =============================================================
+  if ( !base::is.numeric( l ) && !base::numeric( n ) )
+    stop( "Inputs must be numeric vectors." )
+  # Internal function ==========================================================
+  ys_internal <- function( l , n ) {
+    if( n > 0 ) {
+      return( yc( l + 0.5 , n ) * base::sqrt( pi / ( 2 * n ) ) )
+    }else if( n < 0 ){
+      return( - ( yc( l + 0.5 , n ) * base::sqrt (pi / ( 2 * n ) ) ) )
+    }else if( n == 0 ){
+      return( -Inf )
+    }
   }
+  ys_vec <- Vectorize( ys_internal )
+  # Return based on input class ================================================
+  base::switch( class( n )[1] ,
+                numeric = ys_vec( l , n ) ,
+                matrix = apply( n , 2 , FUN = function( x ) {
+                  ys_vec( l , x )
+                } ) ) -> result
+  return( result )
 }
-
-#' First derivatives of spherical Bessel functions
-#' 
+################################################################################
+#' Spherical Bessel function of the third kind (ha)
 #' @param l An integer or fractional order
 #' @param n A complex or real argument
+#' @usage
+#' hs( l , n )
+#' @rdname hs
+#' @export
+hs <- function( l , n) return( base::sqrt( pi / ( 2 * n ) ) * hc( l + 0.5 , n ) )
+################################################################################
+# Spherical Bessel function derivatives (first and second)
+################################################################################
+################################################################################
+#' Calculate the first derivative of the spherical Bessel function of the
+#' first kind (jad)
+#'
+#' @param l An integer or fractional order
+#' @param n A complex or real argument
+#' @usage
+#' jsd( l , n )
+#' @rdname js
+#' @export
+jsd <- function( l , n ) {
+  return( js( l - 1 , n ) - ( l + 1 ) / n * js( l , n ) )
+}
+################################################################################
+#' Calculate the second derivative of the spherical Bessel function of the
+#' first kind (jadd)
+#' @param l An integer or fractional order
+#' @param n A complex or real argument
+#' @usage
+#' jsdd( l , n )
+#' @rdname js
+#' @export
+jsdd <- function( l , n ) {
+  return( 1 / ( n ^ 2 ) *
+            ( ( l + 1 ) * ( l + 2 ) - n ^ 2 ) * js( l , n ) -
+            2 / n * js( l - 1 , n ) )
+}
+################################################################################
+#' First derivatives of spherical Bessel functions (yad)
+#' @param l An integer or fractional order
+#' @param n A complex or real argument
+#' @usage
+#' ysd( l , n )
 #' @rdname ys
 #' @export
-ysd <- function(l,n){l / n * ys(l,n) - ys(l+1,n)} #second kind
-
-#' Bessel function of the third kind
-#' @param l An integer or fractional order
-#' @param n A complex or real argument
-#' @rdname ha
-#' @export
-ha <- function(l,n){return(ja(l,n) + 1i*ya(l,n))}
-
-#' First derivative of the Bessel function of the third kind
-#' @param l An integer or fractional order
-#' @param n A complex or real argument
-#' @rdname ha
-#' @export
-had <- function(l, n){
-  return((l*ha(l,n)/n - ha(l+1,n)))
+ysd <- function( l , n ) {
+  return( l / n * ys( l , n ) - ys( l + 1 , n ) )
 }
-
-
-#' Spherical Bessel function of the third kind
+################################################################################
+#' First derivative of the spherical Bessel function of the third kind (had)
 #' @param l An integer or fractional order
 #' @param n A complex or real argument
+#' @usage
+#' hsd( l , n )
 #' @rdname hs
 #' @export
-hs <- function(l,n){return(sqrt(pi/(2*n))*ha(l+0.5,n))}
-
-#' First derivative of the spherical Bessel function of the third kind
-#' @param l An integer or fractional order
-#' @param n A complex or real argument
-#' @rdname hs
+hsd <- function( l , n ) return( - hs( l + 1 , n ) + ( l / n ) * hs( l , n ) )
+################################################################################
+# Legendre Polynomials
+################################################################################
+################################################################################
+#' Legendre Polynomial function (Pn) of the first kind.
+#' @param n Polynomial degree.
+#' @param x Interval bounded by -1 and 1
+#' @rdname Pn
 #' @export
-hsd <- function(l,n){return(-hs(l+1,n)+(l/n)*hs(l,n))}
+Pn <- function( n , x ) {
+  # Define internal recursive function =========================================
+  Pn_internal <- function( n , x ) {
+    # Boolean statement ========================================================
+    ## Pre-allocate result vector ==============================================
+    result <- base::rep( x = 0 ,
+                         times = base::length( x ) )
+    ## Iterate through modal series constant vector ============================
+    if ( n == 0 ) {
+      result <- base::rep( x = 1 ,
+                           times = base::length( x ) )
+    } else if ( n == 1 ) {
+      result <- x
+    } else {
+      for ( i in 1 : base::length( x ) ) {
+        x_val <- x[i]
+        P_n_1 <- x_val
+        P_n_2 <- 1
+        P_n <- 0
+        for ( j in 2 : n ) {
+          P_n <- ( ( 2 * j - 1 ) * x_val * P_n_1 - ( j - 1 ) * P_n_2 ) / j
+          P_n_2 <- P_n_1
+          P_n_1 <- P_n
+        }
+        result[i] <- P_n
+      }
+    }
+    return( result )
+  }
+  # Vectorize the internal function ============================================
+  Pn_vec <- Vectorize( Pn_internal )
+  # Calculate outer product to generate vector of values =======================
+  return( base::outer( n , x , Pn_vec ) )
+}

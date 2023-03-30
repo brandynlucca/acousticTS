@@ -4,13 +4,13 @@
 \alias{js}
 \alias{jsd}
 \alias{jsdd}
-\title{Spherical Bessel function of the first kind.}
+\title{Spherical Bessel function of the first kind (ja)}
 \usage{
-js(l,n)
+js( l , n )
 
-jsd(l, n)
+jsd( l , n )
 
-jsdd(l, n)
+jsdd( l , n )
 }
 \arguments{
 \item{l}{An integer or fractional order}
@@ -18,21 +18,15 @@ jsdd(l, n)
 \item{n}{A complex or real argument}
 }
 \value{
-js(l,n) calculates the spherical Bessel function of the first kind 
+js( l , n ) calculates the spherical Bessel function of the first kind
 (zbesj AMOS routine, Iv).
 }
 \description{
-Spherical Bessel function of the first kind.
+Spherical Bessel function of the first kind (ja)
 
-Calculate the first derivative of the spherical Bessel function of the 
-first kind.
+Calculate the first derivative of the spherical Bessel function of the
+first kind (jad)
 
-Calculate the second derivative of the spherical Bessel function of the 
-first kind.
-}
-\examples{
-l <- 1
-n <- 1
-js(l,n)
-# 0.3011687
+Calculate the second derivative of the spherical Bessel function of the
+first kind (jadd)
 }

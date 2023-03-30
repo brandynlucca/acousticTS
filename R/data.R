@@ -1,18 +1,112 @@
-#' Sample krill shape taken from McGehee et al. (1998)
+#' Sample sardine shape with fully inflated swimbladder.
+#'
+#' @format A pre-generated SBF scatterer containing all information required for
+#' target strength modeling.
+#' \describe{
+#'   \item{metadata}{Relevant and identifying metadata (\code{list}).}
+#'   \item{model_parameters}{Container for specified model parameters (\code{list}).}
+#'   \item{model}{Model outputs and results (\code{list}).}
+#'   \item{body}{
+#'   \itemize{
+#'   \item{rpos:}{ Position matrix (x, yw, zU, zL; m).}
+#'   \item{sound_speed:}{ Flesh sound speed (\ifelse{html}{\out{c<sub>body</sub>}}{\eqn{c_{body}}}, m \ifelse{html}{\out{s<sup>-1</sup>}}{\eqn{s^{-1}}})}
+#'   \item{density:}{ Flesh density (\ifelse{html}{\out{&rho;<sub>body</sub>}}{\eqn{\rho_{body}}}, kg \ifelse{html}{\out{m<sup>3</sup>}}{\eqn{m^3}})}
+#'   \item{theta:}{ Body orientation relative to transmitting transducer (\ifelse{html}{\out{&theta;<sub>body</sub>}}{\eqn{\theta_{body}}}
+#'   , rads)}}}
+#'   \item{bladder}{
+#'   \itemize{
+#'   \item{rpos:}{ Position matrix (x, yw, zU, zL; m).}
+#'   \item{sound_speed:}{ Flesh sound speed (\ifelse{html}{\out{c<sub>bladder</sub>}}{\eqn{c_{bladder}}}, m \ifelse{html}{\out{s<sup>-1</sup>}}{\eqn{s^{-1}}})}
+#'   \item{density:}{ Flesh density (\ifelse{html}{\out{&rho;<sub>bladder</sub>}}{\eqn{\rho_{bladder}}}, kg \ifelse{html}{\out{m<sup>3</sup>}}{\eqn{m^3}})}
+#'   \item{theta:}{ Body orientation relative to transmitting transducer (\ifelse{html}{\out{&theta;<sub>bladder</sub>}}{\eqn{\theta_{bladder}}}
+#'   , rads)}}}
+#'   \item{shape_parameters}{
+#'   \itemize{
+#'   \item{body}{
+#'   \itemize{
+#'   \item{length:}{ Body length (m).}
+#'   \item{ncyl:}{ Number of discrete cylinders along body length.}
+#'   \item{theta_units:}{ Units used for orientation of body.}
+#'   \item{length_units:}{ Units used for body length.}}}
+#'   \item{bladder}{
+#'   \itemize{
+#'   \item{length:}{ Bladder length (m).}
+#'   \item{ncyl:}{ Number of discrete cylinders along swimbladder length.}
+#'   \item{theta_units:}{ Units used for orientation of swimbladder.}
+#'   \item{length_units:}{ Units used for swimbladder length.
+#'   }}}}}}
+#' @usage data(sardine)
+"sardine"
+
+#' Sample sardine shape with fully inflated swimbladder.
+#'
+#' @format A pre-generated SBF scatterer containing all information required for
+#' target strength modeling.
+#' \describe{
+#'   \item{metadata}{Relevant and identifying metadata (\code{list}).}
+#'   \item{model_parameters}{Container for specified model parameters (\code{list}).}
+#'   \item{model}{Model outputs and results (\code{list}).}
+#'   \item{body}{
+#'   \itemize{
+#'   \item{rpos:}{ Position matrix (x, yw, zU, zL; m).}
+#'   \item{sound_speed:}{ Flesh sound speed (\ifelse{html}{\out{c<sub>body</sub>}}{\eqn{c_{body}}}, m \ifelse{html}{\out{s<sup>-1</sup>}}{\eqn{s^{-1}}})}
+#'   \item{density:}{ Flesh density (\ifelse{html}{\out{&rho;<sub>body</sub>}}{\eqn{\rho_{body}}}, kg \ifelse{html}{\out{m<sup>3</sup>}}{\eqn{m^3}})}
+#'   \item{theta:}{ Body orientation relative to transmitting transducer (\ifelse{html}{\out{&theta;<sub>body</sub>}}{\eqn{\theta_{body}}}
+#'   , rads)}}}
+#'   \item{bladder}{
+#'   \itemize{
+#'   \item{rpos:}{ Position matrix (x, yw, zU, zL; m).}
+#'   \item{sound_speed:}{ Flesh sound speed (\ifelse{html}{\out{c<sub>bladder</sub>}}{\eqn{c_{bladder}}}, m \ifelse{html}{\out{s<sup>-1</sup>}}{\eqn{s^{-1}}})}
+#'   \item{density:}{ Flesh density (\ifelse{html}{\out{&rho;<sub>bladder</sub>}}{\eqn{\rho_{bladder}}}, kg \ifelse{html}{\out{m<sup>3</sup>}}{\eqn{m^3}})}
+#'   \item{theta:}{ Body orientation relative to transmitting transducer (\ifelse{html}{\out{&theta;<sub>bladder</sub>}}{\eqn{\theta_{bladder}}}
+#'   , rads)}}}
+#'   \item{shape_parameters}{
+#'   \itemize{
+#'   \item{body}{
+#'   \itemize{
+#'   \item{length:}{ Body length (m).}
+#'   \item{ncyl:}{ Number of discrete cylinders along body length.}
+#'   \item{theta_units:}{ Units used for orientation of body.}
+#'   \item{length_units:}{ Units used for body length.}}}
+#'   \item{bladder}{
+#'   \itemize{
+#'   \item{length:}{ Bladder length (m).}
+#'   \item{ncyl:}{ Number of discrete cylinders along swimbladder length.}
+#'   \item{theta_units:}{ Units used for orientation of swimbladder.}
+#'   \item{length_units:}{ Units used for swimbladder length.
+#'   }}}}}}
+#' @usage data(cod)
+"cod"
+
+#' Sample krill (Euphausia superba) shape taken from McGehee et al. (1998)
 #'
 #' A dataset containing a sample krill (Euphausia superba) body shape proposed
 #'  by McGehee et al. (1998).
 #'
-#' @format A FLS object comprising all information required for target strength modelling. The variables are as follows:
+#' @format A pre-generated FLS scatterer containing all information required for
+#' target strength modeling.
 #' \describe{
-#'   \item{rpos}{Position matrix ([x,y,z], m)[0.0410898,0.0000000,0.0000000] to [0.0000000,0.0000000,0.003815]}
-#'   \item{a}{Radius vector (m) (0.0000000 to 0.0005946)}
-#'   \item{g}{Density contrast (1.0357)}
-#'   \item{h}{Soundspeed contrast (1.0279)}
-#'   \item{theta}{Orientation (degrees) (pi/2, or ~1.570796)}
-#'   \item{shape}{Body curvature (straight)}
-#'   \item{pc}{Radius of curvature (0)}
-#'   \item{L}{Length (m) (0.0410898)}
-#'   \item{ncyl}{Number of cylinders (15)}
-#' }
-"mcgehee"
+#'   \item{metadata}{Relevant and identifying metadata (\code{list}).}
+#'   \item{model_parameters}{Container for specified model parameters (\code{list}).}
+#'   \item{model}{Model outputs and results (\code{list}).}
+#'   \item{body}{
+#'     \itemize{
+#'       \item{rpos:}{ Position matrix (x, y, z; m).}
+#'       \item{radius:}{ Radius of each discrete cylinder along the position
+#'       matrix (m).}
+#'       \item{g:}{ Body density contrast relative to the surrounding medium.}
+#'       \item{h:}{ Sound speed contrast relative to the surrounding medium.}
+#'       \item{theta:}{ Body orientation relative to transmitting transducer (\ifelse{html}{\out{&theta;<sub>body</sub>}}{\eqn{\theta_{body}}}
+#'       , rads)}}}
+#'   \item{shape_parameters}{
+#'     \itemize{
+#'       \item{body}{
+#'         \itemize{
+#'           \item{length:}{ Body length (m).}
+#'           \item{ncyl:}{ Number of discrete cylinders along body length.}
+#'           \item{theta_units:}{ Units used for orientation of body.}
+#'           \item{length_units:}{ Units used for body length.}}
+#'       }}
+#'       }}
+#' @usage data(krill)
+"krill"
