@@ -22,9 +22,9 @@ along_sum <- function( rpos , iterations ) {
 #' @return
 #' Converts degrees to radians or radians to degrees
 #' @export
-radians <- function( x ) x * 180.0 / pi
+radians <- function( x ) x * pi / 180.0
 #' @rdname radians
-degrees <- function( x ) x * pi / 180.0
+degrees <- function( x ) x * 180.0 / pi
 ################################################################################
 #' Vectorized Euclidean norm function
 #' @param x A matrix with numeric, real values.
