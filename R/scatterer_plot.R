@@ -99,9 +99,9 @@ cal_plot <- function( object ,
       stop("ERROR: no model results detected in object.")
     } else {
       # Extract body shape information ============================
-      shape <- extract(object, "body")
+      shape <- extract( object , "body" )
       # Extract model results ====================================
-      TS <- extract(object, "model")$TS
+      TS <- extract( object , "model" )$calibration$TS
       x_axis_domain <- extract(object, "model_parameters")$calibration$parameters
       if( x_units == "frequency" ) {
         x_axis <- x_axis_domain$acoustics$frequency * 1e-3

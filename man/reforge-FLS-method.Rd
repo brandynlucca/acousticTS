@@ -4,7 +4,7 @@
 \alias{reforge,FLS-method}
 \title{Reforge FLS-class object.}
 \usage{
-\S4method{reforge}{FLS}(object, full_size = 1)
+\S4method{reforge}{FLS}(object, new_length)
 }
 \arguments{
 \item{object}{FLS-class object.}
