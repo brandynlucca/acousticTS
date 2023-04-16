@@ -40,14 +40,14 @@ anderson_initialize <- function(object ,
                            SBF = acousticTS::extract( object ,
                                                       "bladder" ) ,
                            GAS = body )
-  # Equivalent spherical radius ================================================
-  if ( scatterer_type == "SBF" ) {
-    # Equivalent volume ========================================================
-    acousticTS::along_sum( bladder$rpos , shape$bladder$n_segments )
-    bladder$rpos[ 2 , ] / 2
-  }
-  aesr <- base::switch( scatterer_type ,
-                        )
+  # # Equivalent spherical radius ================================================
+  # if ( scatterer_type == "SBF" ) {
+  #   # Equivalent volume ========================================================
+  #   acousticTS::along_sum( bladder$rpos , shape$bladder$n_segments )
+  #   bladder$rpos[ 2 , ] / 2
+  # }
+  # aesr <- base::switch( scatterer_type ,
+  #                       )
 
 
 
