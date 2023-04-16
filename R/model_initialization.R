@@ -298,6 +298,182 @@ dwba_initialize <- function( object ,
   return( object )
 }
 ################################################################################
+#' Initialize FLS-class object for SDWBA modeling
+#' @param object FLS-class object.
+#' @inheritParams dwba_initialize
+#' @export
+sdwba_initialize <- function( object , 
+                              frequency , 
+                              sound_speed_sw = 1500 , 
+                              density_sw = 1026 , 
+                              n_iterations = 100 , 
+                              n_segments_init = 14 , 
+                              phase_sd_init = base::sqrt( 2 ) / 2 , 
+                              length_init = 38.35e-3 , 
+                              frequency_init = 120e3 ) {
+  # Parse metadata =============================================================
+  meta <- acousticTS::extract( object , "metadata" )
+  # Parse shape ================================================================
+  shape <- acousticTS::extract( object , "shape_parameters" )
+  # Parse body =================================================================
+  body <- acousticTS::extract( object , "body" )
+  # Define medium parameters ===================================================
+  medium_params <- base::data.frame( sound_speed = sound_speed_sw ,
+                                     density = density_sw )
+  # Define model parameters recipe =============================================
+  model_params <- base::list(
+    acoustics = base::data.frame(
+      frequency = frequency ,
+      # Wavenumber (medium) ====================================================
+      k_sw = acousticTS::kcalc( frequency ,
+                                sound_speed_sw ) ,
+      # Wavenumber (fluid) =====================================================
+      k_f = acousticTS::kcalc( frequency ,
+                               body$h * sound_speed_sw ) ) ,
+    n_segments = shape$n_segments 
+  )
+  # Define stochastic recipe ===================================================
+  # First calculate new resampled body shape resolution ++++++++++++++++++++++++
+  N_f <- base::ceiling( n_segments_init * ( frequency / frequency_init ) * 
+                          ( shape$length / length_init ) )
+  N_f_vec <- base::ifelse( N_f > n_segments_init , 
+                           N_f , 
+                           n_segments_init )
+  N_f_idx <- base::unique(
+    N_f_vec
+  )
+  # Now we calculate the new phase standard deviation value ++++++++++++++++++++
+  phase_sd <- phase_sd_init * ( n_segments_init / N_f_vec ) * ( shape$length / length_init )
+  # Create stochastic recipe +++++++++++++++++++++++++++++++++++++++++++++++++++
+  stochastic_params <- lapply( 1 : length( N_f_idx ) ,
+                               FUN = function( i ) {
+                                 idx <- which( N_f_vec == N_f_idx[ i ] )
+                                 krill_new <- reforge( krill , 
+                                                       n_segments = N_f_idx[ i ] )
+                                 body <- extract( krill_new , "body" )
+                                 n_segments <- N_f_idx[ i ]
+                                 phase_sd <- phase_sd[ i ] 
+                                 acoustics <- model_params$acoustics[ idx , ]
+                                 return( list(
+                                   meta_params = data.frame(
+                                     n_iterations = n_iterations , 
+                                     N0 = n_segments_init , 
+                                     f0 = frequency_init , 
+                                     L0 = length_init , 
+                                     p0 = phase_sd_init
+                                   ) ,
+                                   body_params = body , 
+                                   n_segments = n_segments ,
+                                   acoustics = acoustics
+                                 ) )
+                               }
+  )
+  # Add model parameters slot to scattering object =============================
+  methods::slot( object ,
+                 "model_parameters" )$SDWBA <- base::list( parameters = stochastic_params ,
+                                                           medium = medium_params ,
+                                                           body = body )
+  # Add model results slot to scattering object ================================
+  methods::slot( object ,
+                 "model" )$SDWBA <- base::data.frame( frequency = frequency ,
+                                                      f_bs = base::rep( NA ,
+                                                                        base::length( frequency ) ) ,
+                                                      sigma_bs = base::rep( NA ,
+                                                                            base::length( frequency ) ) ,
+                                                      TS = base::rep( NA , 
+                                                                      base::length( frequency ) ) )
+  # Output =====================================================================
+  return( object )
+}
+################################################################################
+#' Initialize FLS-class object for SDWBA modeling
+#' @param object FLS-class object.
+#' @inheritParams dwba_initialize
+#' @export
+sdwba_curved_initialize <- function( object , 
+                                     frequency , 
+                                     sound_speed_sw = 1500 , 
+                                     density_sw = 1026 , 
+                                     n_iterations = 100 , 
+                                     n_segments_init = 14 , 
+                                     phase_sd_init = base::sqrt( 2 ) / 2 , 
+                                     length_init = 38.35e-3 , 
+                                     frequency_init = 120e3 ) {
+  # Parse metadata =============================================================
+  meta <- acousticTS::extract( object , "metadata" )
+  # Parse shape ================================================================
+  shape <- acousticTS::extract( object , "shape_parameters" )
+  # Parse body =================================================================
+  body <- acousticTS::extract( object , "body" )
+  # Define medium parameters ===================================================
+  medium_params <- base::data.frame( sound_speed = sound_speed_sw ,
+                                     density = density_sw )
+  # Define model parameters recipe =============================================
+  model_params <- base::list(
+    acoustics = base::data.frame(
+      frequency = frequency ,
+      # Wavenumber (medium) ====================================================
+      k_sw = acousticTS::kcalc( frequency ,
+                                sound_speed_sw ) ,
+      # Wavenumber (fluid) =====================================================
+      k_f = acousticTS::kcalc( frequency ,
+                               body$h * sound_speed_sw ) ) ,
+    n_segments = shape$n_segments 
+  )
+  # Define stochastic recipe ===================================================
+  # First calculate new resampled body shape resolution ++++++++++++++++++++++++
+  N_f <- base::ceiling( n_segments_init * ( frequency / frequency_init ) * 
+                          ( shape$length / length_init ) )
+  N_f_vec <- base::ifelse( N_f > n_segments_init , 
+                           N_f , 
+                           n_segments_init )
+  N_f_idx <- base::unique(
+    N_f_vec
+  )
+  # Now we calculate the new phase standard deviation value ++++++++++++++++++++
+  phase_sd <- phase_sd_init * ( n_segments_init / N_f_vec ) * ( shape$length / length_init )
+  # Create stochastic recipe +++++++++++++++++++++++++++++++++++++++++++++++++++
+  stochastic_params <- lapply( 1 : length( N_f_idx ) ,
+                               FUN = function( i ) {
+                                 idx <- which( N_f_vec == N_f_idx[ i ] )
+                                 krill_new <- reforge( krill , 
+                                                       n_segments = N_f_idx[ i ] )
+                                 body <- extract( krill_new , "body" )
+                                 n_segments <- N_f_idx[ i ]
+                                 phase_sd <- phase_sd[ i ] 
+                                 acoustics <- model_params$acoustics[ idx , ]
+                                 return( list(
+                                   meta_params = data.frame(
+                                     n_iterations = n_iterations , 
+                                     N0 = n_segments_init , 
+                                     f0 = frequency_init , 
+                                     L0 = length_init , 
+                                     p0 = phase_sd_init
+                                   ) ,
+                                   body_params = body , 
+                                   n_segments = n_segments ,
+                                   acoustics = acoustics
+                                 ) )
+                               }
+  )
+  # Add model parameters slot to scattering object =============================
+  methods::slot( object ,
+                 "model_parameters" )$SDWBA_curved <- base::list( parameters = stochastic_params ,
+                                                                  medium = medium_params ,
+                                                                  body = body )
+  # Add model results slot to scattering object ================================
+  methods::slot( object ,
+                 "model" )$SDWBA_curved <- base::data.frame( frequency = frequency ,
+                                                             f_bs = base::rep( NA ,
+                                                                               base::length( frequency ) ) ,
+                                                             sigma_bs = base::rep( NA ,
+                                                                                   base::length( frequency ) ) ,
+                                                             TS = base::rep( NA , 
+                                                                             base::length( frequency ) ) )
+  # Output =====================================================================
+  return( object )
+}
+################################################################################
 #' Initialize SBF-class object for KRM calculations.
 #'
 #' @param object SBF-class object

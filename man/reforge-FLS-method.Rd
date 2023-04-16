@@ -4,12 +4,24 @@
 \alias{reforge,FLS-method}
 \title{Reforge FLS-class object.}
 \usage{
-\S4method{reforge}{FLS}(object, new_length)
+\S4method{reforge}{FLS}(
+  object,
+  length = NA,
+  radius = NA,
+  length_radius_ratio_constant = T,
+  n_segments = NA
+)
 }
 \arguments{
 \item{object}{FLS-class object.}
 
-\item{full_size}{New body length resize.}
+\item{length}{New body length resize.}
+
+\item{radius}{New radius size}
+
+\item{length_radius_ratio_constant}{Keep length-to-radius ratio based on new length}
+
+\item{n_segments}{New number of segments}
 }
 \description{
 Reforge FLS-class object.

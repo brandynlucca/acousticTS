@@ -1,11 +1,29 @@
+################################################################################
+# FORGE FUNCTIONS FOR MANIPULATING SCATTERER SHAPES 
+################################################################################
+################################################################################
+# PRIMARY FORGE GENERATION FUNCTION 
+################################################################################
+# Forge scatterer object based on requested inputs 
+#' @param x Along-body, or x-axis, vector
+#' @param y Across-body, or y-axis, vector
+#' @param z Dorsoventral, or z-axis, vector
+#' @param a Radius vector 
+#' @param scatterer This sets the desired scatterer class, such as FLS or GAS.
+#' @param shape This will generate a canonical shape if something other than 
+#' "arbitrary" is input. 
+#' @export
+forge <- function( x , y , z , a , scatterer ,  shape = "arbitrary" ) {
+  
+}
+
 #' Resizing function for targets.
 #' @param object Scatterer-class object.
-#' @param ... Additional inputs.
 #' @rdname reforge
 #' @export
-setGeneric("reforge", function(object, ...)
-  standardGeneric("reforge"))
-
+setGeneric( "reforge" ,
+            function( object , ... )
+              standardGeneric( "reforge" ) )
 #' Resizing function for swimbladdered targets
 #' @param object SBF-class object.
 #' @param full_size new factored resize of body.
@@ -69,22 +87,79 @@ setMethod("reforge",
           })
 #' Reforge FLS-class object.
 #' @param object FLS-class object.
-#' @param full_size New body length resize.
+#' @param length  New body length resize.
+#' @param radius New radius size
+#' @param n_segments New number of segments
+#' @param length_radius_ratio_constant Keep length-to-radius ratio based on new length
 #' @export
 setMethod( "reforge",
            signature( object = "FLS" ) ,
-           function( object,
-                     new_length ) {
-             lscale <- new_length / acousticTS::extract( object , "shape_parameters" )$length
-             body_rpos <- acousticTS::extract( object , "body" )$rpos[ 1 : 3 , ]
-             radius <- acousticTS::extract( object , "body" )$radius
-             mscale <- base::cbind( base::c( 1 , 0 , 0 ) ,
-                                    base::c( 0 , 1 , 0 ) ,
-                                    base::c( 0 , 0 , 1 ) ) * lscale
-             body_rpos <- base::t( base::t( body_rpos ) %*% mscale )
-             radius <- radius * lscale
-             slot( object , "body")$rpos <- body_rpos
-             slot( object , "body")$radius <- radius
-             slot( object , "shape_parameters")$length <- new_length
+           function( object ,
+                     length = NA , 
+                     radius = NA , 
+                     length_radius_ratio_constant = T ,
+                     n_segments = NA ) {
+             ###################################################################
+             # Determine rescaling factors =====================================
+             # Determine new number of cylinders +++++++++++++++++++++++++++++++
+             if( ! missing( n_segments ) ) {
+               # Parse shape ===================================================
+               shape <- extract( object , "shape_parameters" )
+               # Parse body ====================================================
+               body <- extract( object , "body" )
+               x_new <- seq( from = body$rpos[ 1 , 1 ] , 
+                             to = body$rpos[ 1 , shape$n_segments ] , 
+                             length.out = n_segments )
+               rpos_new <- base::rbind(
+                 x_new , 
+                 base::t(
+                   base::sapply( 2 : base::nrow( body$rpos ) , 
+                                 FUN = function( i ) { 
+                                   stats::approx(
+                                     x = body$rpos[ 1 , ] ,
+                                     y = body$rpos[ i , ] ,
+                                     xout = x_new
+                                   )
+                                 }$y
+                   )
+                 )
+               )
+               radius_new <- stats::approx(
+                 x = body$rpos[ 1 , ] ,
+                 y = body$radius ,
+                 xout = x_new
+               )$y
+               # Update metadata +++++++++++++++++++++++++++++++++++++++++++++++
+               methods::slot( object , "body" )$rpos <- rpos_new
+               methods::slot( object , "body" )$radius <- radius_new
+               methods::slot( object , "shape_parameters" )$n_segments <- n_segments
+             }
+             # Determine new length ++++++++++++++++++++++++++++++++++++++++++
+             if( ! base::missing( length ) ) {
+               # Parse shape ===================================================
+               shape <- acousticTS::extract( object , "shape_parameters" )
+               # Parse body ====================================================
+               body <- acousticTS::extract( object , "body" )
+               new_scale <- length / shape$length
+               matrix_rescale <- base::diag( x = 1 , 
+                                             nrow = base::nrow( body$rpos ) ,
+                                             ncol = base::nrow( body$rpos ) ) * new_scale
+               rpos_new <- base::t( base::t( body$rpos ) %*% matrix_rescale )
+               # New radius based on constant ratio or adjust ++++++++++++++++++
+               if ( length_radius_ratio_constant ) {
+                 if( base::missing( radius ) ) {
+                   radius_new <- body$radius * new_scale
+                 } else {
+                   radius_rescale <- radius / shape$radius
+                   radius_new <- radius * radius_rescale
+                 }
+               }
+               # Update metadata +++++++++++++++++++++++++++++++++++++++++++++++
+               methods::slot( object , "body" )$rpos <- rpos_new
+               methods::slot( object , "body" )$radius <- radius_new
+               methods::slot( object , "shape_parameters" )$length <- base::max( rpos_new[ 1 , ] )
+               methods::slot( object , "shape_parameters" )$radius <- base::max( radius_new )
+             }
+             # Return object ===================================================
              return( object )
            } )

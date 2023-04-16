@@ -5,6 +5,8 @@
 \title{Wrapper function to model acoustic target strength}
 \usage{
 target_strength(object, frequency, model, ...)
+
+target_strength(object, frequency, model, ...)
 }
 \arguments{
 \item{object}{Scatterer-class object.}
@@ -17,4 +19,7 @@ target_strength(object, frequency, model, ...)
 }
 \description{
 Wrapper function to model acoustic target strength
+
+Wrapper function to model acoustic target strength when multiple models are
+defined.
 }
