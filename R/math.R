@@ -10,7 +10,37 @@
 #' @export
 along_sum <- function( rpos , iterations ) {
   output <- rpos[ , 1 : ( iterations - 1 ) ] + rpos[ , 2 : iterations ]
-  base::return( output )
+  return( output )
+}
+################################################################################
+#' Complex integration
+#' @param integral Integral function used for numerical integration via adaptive
+#' quadrature
+#' @param x Indexing argument for multi-row objects
+#' @param y Indexing argument for multi-column objects
+#' @rdname contour_integrate
+#' @export
+contour_integrate <- function( integral , x , y ) {
+  complex( real = integrate( function( s ) Re( integral( s , x , y ) ) ,
+                             lower = 0 , upper = 1 )$value ,
+           imaginary = integrate( function( s ) Im( integral( s , x , y ) ) ,
+                                  lower = 0 , upper = 1 )$value )
+}
+################################################################################
+#' Wrapper function incorporating phase deviation into contour integration
+#' @param integral Integral function used for numerical integration via adaptive
+#' quadrature
+#' @param x Indexing argument for multi-row objects
+#' @param y Indexing argument for multi-column objects
+#' @param n_iterations Number of phase deviations to average and summarize
+#' @param integral Integral function used for numerical integration via adaptive
+#' quadrature
+#' @rdname phase_integrate
+#' @export
+phase_integrate <- function( x , y , n_iterations , integral ) {
+  rng <- rnorm( n_iterations , 0 , 1 )
+  phase <- exp( 1i * rng * phase_sd )
+  contour_integrate( integral , x , y ) * phase
 }
 ################################################################################
 #' Convert between degrees and radians
@@ -38,6 +68,4 @@ degrees <- function( x ) x * 180.0 / pi
 #' Calculates the Euclidean norm of a vector.
 #' @rdname vecnorm
 #' @export
-vecnorm <- function( x ) {
-  base::return( base::sqrt( base::rowSums( x ^ 2 ) ) )
-}
+vecnorm <- function( x ) sqrt( rowSums( x * x ) )

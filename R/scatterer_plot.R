@@ -36,12 +36,12 @@ setMethod( f = "plot" ,
 #' @export
 plot_colors <- base::c( "black" ,
                         "azure4" ,
-                        "firebrick3" ,
-                        "orangered3" ,
-                        "sienna3" ,
                         "royalblue4" ,
+                        "firebrick3" ,
                         "steelblue3" ,
+                        "orangered3" ,
                         "darkolivegreen" ,
+                        "sienna3" ,
                         "cadetblue" )
 ################################################################################
 #' Plotting for CAL-class objects
@@ -209,19 +209,20 @@ fls_plot <- function( object,
                         lwd = 1.25 )
   } else if ( type == "model" ) {
     # Detect model selection ===================================================
-    models <- acousticTS::extract( object , "model" )
-    model_names <- base::names( models )
+    models <- extract( object , "model" )
+    model_names <- names( models )
     if ( base::length( model_names ) == 0 )
       stop( "ERROR: no model results detected in object." )
     # Extract body shape information ===========================================
-    shape <- acousticTS::extract( object , "body" )
+    shape <- extract( object , "body" )
     # Append model name ========================================================
-    models <- base::lapply( 1 : base::length( model_names ) ,
-                            FUN = function( x ) {
-                              base::transform( models[[x]] ,
-                                               model = model_names[x] ) } )
+    models <- lapply( 1 : length( model_names ) ,
+                      FUN = function( x ) {
+                        models[[ x ]] <- models[[ x ]][ c( "frequency" , "TS" ) ]
+                        transform( models[[ x ]] ,
+                                   model = model_names[ x ] ) } )
     # Convert into a data.frame ================================================
-    models_df <- base::do.call( "rbind" , models )
+    models_df <- do.call( "rbind" , models )
     # Define x-axis domain =====================================================
     # x_axis <- base::switch( x_units ,
     #                         frequency = base::unique( models_df$frequency ) * 1e-3 ,
@@ -236,7 +237,7 @@ fls_plot <- function( object,
                            k_sw = base::expression(italic(k[sw]*a) ) )
     # Define plot margins ======================================================
     graphics::par( ask = FALSE ,
-                   mar = base::c( 4.0 , 4.5 , 1.0 , 1.0 ) )
+                   mar = base::c( 5.0 , 5.5 , 2.0 , 3.5 ) )
     # Initiate plotting ========================================================
     graphics::plot( x = base::seq( from = base::min( x_axis ) ,
                                    to = base::max( x_axis ) ,
@@ -252,17 +253,25 @@ fls_plot <- function( object,
                     ylab = expression( "Target"~"strength"~("dB"~"re."~1~"m"^2) ) ,
                     yaxs = "i" ,
                     xaxs = "i" ,
-                    type = 'n' )
-   base::invisible( base::mapply( lines , x_mat , y_mat ,
-                                  col = plot_colors[ 1 : base::length( model_names ) ] ,
-                                  lwd = 2 ) )
-   graphics::legend( "topright" ,
-                     title = base::expression( bold("TS"~"model") ) ,
-                     title.adj = 0.05 ,
-                     legend = model_names ,
-                     lty = base::rep( 1 , base::length( model_names ) ) ,
-                     col = plot_colors[ 1 : base::length( model_names ) ] ,
-                     cex = 1.05 )
+                    xaxt = 'n' ,
+                    type = 'n' ,
+                    cex.axis = 1.3 ,
+                    cex.lab = 1.5 )
+    atx <- seq(par("xaxp")[1], par("xaxp")[2], (par("xaxp")[2] - par("xaxp")[1])/par("xaxp")[3])
+    axis( 1 , at = atx , 
+          labels = format( atx , scientific = F ) ,
+          cex.axis = 1.3 )
+    invisible( mapply( lines , x_mat , y_mat ,
+                       col = plot_colors[ 1 : base::length( model_names ) ] ,
+                       lwd = 4 ) )
+    legend( "bottomright" ,
+            title = expression( bold("TS"~"model") ) ,
+            title.adj = 0.05 ,
+            legend = model_names ,
+            lty = rep( 1 , length( model_names ) ) ,
+            col = plot_colors[ 1 : length( model_names ) ] ,
+            cex = 1.05 ,
+            lwd = 4 )
    }
   base::invisible( )
 }
