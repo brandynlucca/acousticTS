@@ -19,6 +19,7 @@ forge <- function( x , y , z , a , scatterer ,  shape = "arbitrary" ) {
 
 #' Resizing function for targets.
 #' @param object Scatterer-class object.
+#' @param ... Scatterer-specific arguments
 #' @rdname reforge
 #' @export
 setGeneric( "reforge" ,
@@ -151,7 +152,7 @@ setMethod( "reforge",
                    radius_new <- body$radius * new_scale
                  } else {
                    radius_rescale <- radius / shape$radius
-                   radius_new <- radius * radius_rescale
+                   radius_new <- body$radius * radius_rescale
                  }
                }
                # Update metadata +++++++++++++++++++++++++++++++++++++++++++++++

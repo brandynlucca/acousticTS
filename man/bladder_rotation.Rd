@@ -2,7 +2,7 @@
 % Please edit documentation in R/utilities.R
 \name{bladder_rotation}
 \alias{bladder_rotation}
-\title{Support rotatin function for KRM (swimbladder)}
+\title{Support rotation function for KRM (swimbladder)}
 \usage{
 bladder_rotation(sum_rpos, rpos, theta, k_length)
 }
@@ -16,5 +16,5 @@ bladder_rotation(sum_rpos, rpos, theta, k_length)
 \item{k_length}{Length of wavenumber vector}
 }
 \description{
-Support rotatin function for KRM (swimbladder)
+Support rotation function for KRM (swimbladder)
 }

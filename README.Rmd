@@ -1,5 +1,8 @@
 ---
 output: rmarkdown::github_document
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 ```{r, echo = FALSE}
@@ -11,43 +14,92 @@ knitr::opts_chunk$set(collapse=TRUE,
 
 # acousticTS
 
-Acoustic backscatter from a single target or organism is expressed as the 
-intensity of an echo typically denoted as the *backscattering cross-section* 
-(&sigma;~bs~, m^2^). Target strength (TS, dB re. 1 m^2^) is the logarithmic 
-representation of &sigma;~bs~ where: TS = 10 log~10~ (&sigma;~bs~). TS can 
-be used to convert integrated (e.g. nautical area scattering coefficient, S~A~,
-dB re. 1(m^2^ nmi^-2^) or volumetric backscatter (e.g. S~v~, dB re. 1 m^-1^) 
-collected from fisheries acoustic surveys into units of number density, such as 
-the volumetric density of a fish school (i.e. animals m^-3^). This parameter can 
-also aid in classifying backscatter based on the multifrequency response of 
-targets, such as separating likely echoes of large predatory fish from smaller
-prey. While there are several approaches for estimating TS, one common method is
-to apply physics-based models to predict theoretical TS that comprise exact and
-approximate solutions. The models provided in the `acousticTS` package can help
-provide TS estimates parameterized using broad statitsical distributions of 
-inputs. This package is in a constant state of development with updates to 
-the available model library, computational efficiency, and quality-of-life 
-improvements.
+Acoustic backscatter from a single target or organism is expressed as
+the intensity of an echo typically denoted as the *backscattering
+cross-section* (σ~bs~, m^2^). Target strength (TS, dB re. 1 m^2^) is the
+logarithmic representation of σ~bs~ where: TS = 10 log~10~ (σ~bs~). TS
+can be used to convert integrated (e.g. nautical area scattering
+coefficient, S~A~, dB re. 1(m^2^ nmi^-2^) or volumetric backscatter
+(e.g. S~v~, dB re. 1 m^-1^) collected from fisheries acoustic surveys
+into units of number density, such as the volumetric density of a fish
+school (i.e. animals m^-3^). This parameter can also aid in classifying
+backscatter based on the multifrequency response of targets, such as
+separating likely echoes of large predatory fish from smaller prey.
+While there are several approaches for estimating TS, one common method
+is to apply physics-based models to predict theoretical TS that comprise
+exact and approximate solutions. The models provided in the `acousticTS`
+package can help provide TS estimates parameterized using broad
+statitsical distributions of inputs. This package is in a constant state
+of development with updates to the available model library,
+computational efficiency, and quality-of-life improvements.
 
-## Installation
+## [Installation]{.underline}
 
-You can install the current released version of acousticTS via: 
+You can install the current released version of acousticTS via:
 
-```r
+``` r
 devtools::install_github("brandynlucca/acousticTS")
 ```
 
 Or you can install the development version of acousticTS like so:
 
-```r
+``` r
 devtools::install_github("brandynlucca/acousticTS@test-branch")
 ```
 
-## Examples
+## [Models currently available]{.underline}
 
-Below are examples of different models used to predict TS for a sardine with a 
-gas-filled swimbladder, a tungsten carbide calibration sphere, a crustacean 
-modeled as a prolate spheroid, and a generic gas-filled bubble. 
+#### Two-ray model for uniformly bent fluid-like cylinders ([DCM]{.underline})
+
+*Stanton, T.K., Clay, C.S., and Chu, D. (1993). Ray representation of
+sound scattering by weakly scattering deformed fluid cylinders: Simple
+physics and application to zooplankton. J. Acoust. Soc. Am., 94,
+3454-3462.*
+
+#### Distorted wave Born approximation ([DWBA]{.underline})
+
+*Stanton, T.K., Chu, D., and Wiebe, P.H. (1998). Sound scattering by
+several zooplankton groups. II. Scattering models. J. Acoust. Soc. Am.,
+103, 236-253.*
+
+#### \*\*Stochastic distorted wave Born approximation ([SDWBA]{.underline})
+
+*Demer, D.A., and Conti, S.G. 2003. Reconciling theoretical versus
+empirical target strengths of krill: effects of phase variability on the
+distorted-wave Born approximation. ICES J. Mar. Sci., 60, 429-434.*
+
+#### \*\*SDWBA for uniformly bent scatterers ([SDWBA_curved]{.underline})
+
+*Demer, D.A., and Conti, S.G. 2003. Reconciling theoretical versus
+empirical target strengths of krill: effects of phase variability on the
+distorted-wave Born approximation. ICES J. Mar. Sci., 60, 429-434.*
+
+*Stanton, T.K., Chu, D., and Wiebe, P.H. (1998). Sound scattering by
+several zooplankton groups. II. Scattering models. J. Acoust. Soc. Am.,
+103, 236-253.*
+
+#### \*\*Kirchoff-ray mode approximation ([KRM]{.underline})
+
+*Clay C.S. and Horne J.K. (1994). Acoustic models of fish: The Atlantic
+cod (Gadus morhua). J. Acoust. Soc. Am., 96, 1661-1668.*
+
+#### \*\*Modal series solution for gas-filled fluid spheres ([anderson_model]{.underline})
+
+*Anderson, V.C. (1950). Sound scattering from a fluid sphere. J. Acoust.
+Soc. Am., 22, 426-431.*
+
+#### \*\*Homogeneous solid sphere ([calibration]{.underline})
+
+*MacLennan D. N. (1981). The theory of solid spheres as sonar
+calibration targets. Scottish Fisheries Research No. 22, Department of
+Agriculture and Fisheries for Scotland.*
+
+## [Examples]{.underline}
+
+Below are examples of different models used to predict TS for a sardine
+with a gas-filled swimbladder, a tungsten carbide calibration sphere, a
+crustacean modeled as a prolate spheroid, and a generic gas-filled
+bubble.
 
 ### Kirchoff Ray-Mode approximation for a Sardine with a gas-filled swimbladder
 
@@ -84,7 +136,7 @@ plot(x = frequency * 1e-3,
 
 ### Calibration sphere
 
-```{r calibration} 
+```{r calibration}
 ### Let's create a calibration sphere 
 ### Default inputs here are a 38.1 mm diameter and a tungsten carbide 
 ### (WC) material properties.
@@ -110,7 +162,7 @@ plot(x = frequency * 1e-3,
 
 ### Fluid sphere (Anderson, 1950)
 
-``` {r bubble}
+```{r bubble}
 ### Let's create a gas-filled bubble with a raidus of 4 mm
 ### This defaults to a density contrast, g_body, of 0.0012
 ### This defaults to a soundspeed contrast, h_body, of 0.220
@@ -135,7 +187,7 @@ plot(x =  seq(1e3, 300e3, 0.5e3) * 1e-3,
 
 ### Fluid-like crustacean (prolate spheroid) using the distorted Born wave approximation (DWBA) and ray-based deformed cylinder model (DCM)
 
-``` {r crustacean}
+```{r crustacean}
 ### First let's create a prolate spheroid shape 
 ### 25 mm long with a length-to-radius ratio of 16
 crustacean_shape <- prolate_spheroid(length = 25e-3,

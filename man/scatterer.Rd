@@ -10,6 +10,15 @@ comprising different types of scatterers, such as fish with gas-filled
 swimbladders (\link[acousticTS]{SBF}) and fluid-like crustaceans
 (\link[acousticTS]{FLS}).
 }
+\section{Slots}{
+
+\describe{
+\item{\code{metadata}}{List containing relevant metadata}
+
+\item{\code{model_parameters}}{Model parameters necessary for predicting TS
+(placeholder)}
+}}
+
 \section{Data Organization}{
 
 \describe{

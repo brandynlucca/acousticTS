@@ -27,6 +27,8 @@ dcm_initialize(
 
 \item{radius_cylinder}{Optional input to override current shape radius.}
 
+\item{radius_curvature}{Numeric input for the radius of curvature}
+
 \item{radius_curvature_ratio}{Ratio between body length and the radius of
 curvature. Defaults to 3.0.}
 

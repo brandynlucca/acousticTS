@@ -8,6 +8,8 @@ reforge(object, ...)
 }
 \arguments{
 \item{object}{Scatterer-class object.}
+
+\item{...}{Scatterer-specific arguments}
 }
 \description{
 Resizing function for targets.
