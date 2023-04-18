@@ -1,5 +1,5 @@
 test_that("Compare calibration sphere model output at 38, 70, 120, and 200 kHz", {
-  cal_sphere <- cal_generate()
+  cal_sphere <- cal_generate( )
   # Class check
   expect_true(class(cal_sphere) == "CAL")
   # Parameterize model
@@ -15,9 +15,12 @@ test_that("Compare calibration sphere model output at 38, 70, 120, and 200 kHz",
   # Class check
   expect_true(class(cal_sphere_copy) == "CAL")
   # Extract model results
-  model_results <- extract(cal_sphere, "model")
-  ts_out <- round(model_results$TS, 2)
+  model_results <- extract(cal_sphere , "model")$calibration$TS
+  model_results2 <- extract(cal_sphere_copy , "model")$calibration$TS
+  ts_out <- round( model_results , 2 )
+  ts_out2 <- round( model_results2 , 2 )
+  expect_equal( ts_out , ts_out2 )
   # Check output
   # Should be -42.42, -41.44, -39.52, and -39.05 dB at 38, 70, 120, and 200 kHz
-  expect_equal(ts_out, c(-42.42, -41.44, -39.52, -39.05))
+  expect_equal( ts_out , c(-42.42, -41.44, -39.52, -39.05))
 })

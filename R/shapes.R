@@ -48,9 +48,10 @@ arbitrary <- function( x_body ,
 #' Creates a sphere.
 #' @param radius Object radius (m).
 #' @param n_segments Number of segments to discretize object shape. Defaults to
-#'    1e3 segments.
+#'    1e2 segments.
+#' @param diameter_units Default is "m" for meters
 #' @usage
-#' sphere(radius, n_segments)
+#' sphere(radius, n_segments, diameter_units )
 #' @return
 #' Creates position vector for a spherical object of a defined radius.
 #' @export
@@ -127,29 +128,31 @@ prolate_spheroid <- function(length,
 ################################################################################
 #' Creates a cylinder.
 #'
-#' @param length Length (m).
-#' @param radius Maximum/uniform radius (m).
+#' @param length_body Length (m).
+#' @param radius_body Maximum/uniform radius (m).
 #' @param length_radius_ratio Optional ratio input when radius is not explicitly
 #'    known.
 #' @param taper Optional input that is the degree of taper to round ends of
 #'    the cylinder.
 #' @param n_segments Number of segments to discretize object shape. Defaults to
 #'    1e2 segments.
+#' @param length_units Units (default is meters, "m").
 #' @usage
-#' cylinder(length, radius, length_radius_ratio, taper, n_segments)
+#' cylinder(length_body, radius_body, length_radius_ratio, 
+#' taper, n_segments, length_units)
 #' @return
 #' Creates the position vector for a tapered or untapered cylinder.
 #' @export
 cylinder <-  function( length_body ,
-                       radius_body = NULL ,
-                       length_radius_ratio = NULL ,
-                       taper = NULL ,
+                       radius_body ,
+                       length_radius_ratio ,
+                       taper ,
                        n_segments = 1e2 ,
                        length_units = "m" ) {
   # Define maximum radius ======================================================
-  if ( base::is.null( radius_body ) ) {
+  if ( missing( radius_body ) ) {
     max_radius <- length_body / length_radius_ratio
-  } else if ( !base::is.null( radius_body ) ) {
+  } else if ( missing( radius_body ) ) {
     max_radius <- radius_body
   } else {
     stop("Radius/width and/or length-to-radius ratio are missing.")
@@ -157,7 +160,7 @@ cylinder <-  function( length_body ,
   # Define normalized x-axis ===================================================
   x_n_axis <- base::seq( -1 , 1 , length.out = n_segments + 1 )
   # Define tapered radius vector, if applicable ================================
-  if ( !base::is.null( taper ) ) {
+  if ( ! missing( taper ) ) {
     tapering <- base::sqrt( 1 - x_n_axis ^ taper )
   } else {
     tapering <- base::rep( 1 , n_segments + 1 )
@@ -177,7 +180,7 @@ cylinder <-  function( length_body ,
     length_radius_ratio = base::max( position_matrix[ , 1 ] ) /
       base::max( radius_tapered ) ,
     n_segments = n_segments ,
-    taper_order = base::ifelse( base::is.null( taper ) ,
+    taper_order = base::ifelse( missing( taper ) ,
                                 NA ,
                                 taper ) ,
     length_units = length_units
@@ -291,24 +294,15 @@ polynomial_cylinder <- function(length,
 #' of Marine Science, 70(1): 204-214. https://doi.org/10.1093/icesjms/fss140
 #' @export
 create_shape <- function( shape , ... ) {
+  # Pull argument input names ==================================================
+  arg_pull <- as.list( match.call( ) )
   # Grab input arguments =======================================================
-  # args <- base::list( ... )
-  # Grab shape function arguments related to input =============================
-  # shargs <- base::names( base::formals( shape ) )
-  # Define shape output ========================================================
-  # shape_out <- switch( shape,
-  #                      cylinder = base::do.call( cylinder ,
-  #                                                args[ base::names( args ) %in% shargs ] ) ,
-  #                      polynomial_cylinder = base::do.call( polynomial_cylinder ,
-  #                                                           args[ base::names( args ) %in% shargs ] ) ,
-  #                      prolate_spheroid = base::do.call( prolate_spheroid ,
-  #                                                        args[ base::names( args ) %in% shargs ] ) ,
-  #                      sphere = base::do.call( sphere ,
-  #                                              args[ base::names( args ) %in% shargs ] ) )
-  shape_out <- switch( shape ,
-                       cylinder = cylinder( ... ) ,
-                       polynomial_cylinder = polynomial_cylinder( ... ) ,
-                       prolate_spheroid = prolate_spheroid( ... ) ,
-                       sphere = sphere( ... ) )
+  arg_list <- names( formals( shape ) )
+  # Filter out inappropriate parameters ========================================
+  arg_full <- arg_pull[ arg_list ] 
+  true_args <- Filter( Negate( is.null) , arg_full )
+  # Initialize =================================================================
+  shape_out <- do.call( shape , true_args )
+  # Return shape ===============================================================
   return( shape_out )
 }

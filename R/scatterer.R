@@ -6,7 +6,9 @@
 #' comprising different types of scatterers, such as fish with gas-filled
 #' swimbladders (\link[acousticTS]{SBF}) and fluid-like crustaceans
 #' (\link[acousticTS]{FLS}).
-#'
+#' @slot metadata List containing relevant metadata
+#' @slot model_parameters Model parameters necessary for predicting TS 
+#' (placeholder)
 #' @section Data Organization:
 #' \describe{
 #'    \item{\code{metadata}:}{A \code{list} comprising any identifying
@@ -67,7 +69,7 @@
 #' @rdname scatterer
 #' @export
 setClass("scatterer",
-         slots = base::c(
+         slots = c(
            metadata = "list" ,
            model_parameters = "list"
          )

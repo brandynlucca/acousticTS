@@ -24,8 +24,13 @@ fls_plot(
 
 \item{nudge_x}{x-axis nudge.}
 
+\item{aspect_ratio}{Aspect ratio setting ( defaults to "manual" for nudge_y
+and nudge_x to apply; otherwise, input "auto").}
+
 \item{x_units}{If "model" is selected, then toggle between frequency
 ("frequency", kHz) or ka ("ka").}
+
+\item{y_units}{y-axis data selection (e.g. TS, sigma_bs -- defaults to TS)}
 
 \item{...}{Additional plot inputs}
 }

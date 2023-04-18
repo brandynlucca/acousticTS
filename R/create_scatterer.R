@@ -219,8 +219,7 @@ fls_generate <- function( shape = "arbitrary" ,
                           theta_body = pi / 2 ,
                           ID = NULL ,
                           length_units = "m" ,
-                          theta_units = "radians" ,
-                          n_segments = 100 ) {
+                          theta_units = "radians" ) {
   # Collect shape information if provided ======================================
   if( base::class( shape )[1] != "shape" ) {
     if ( shape != "arbitrary" ) {
@@ -251,7 +250,7 @@ fls_generate <- function( shape = "arbitrary" ,
       length = base::max( shape_input@position_matrix[ , 1 ] , na.rm = T ) -
         base::min( shape_input@position_matrix[ , 1 ] , na.rm = T ) ,
       radius = base::max( shape_input@shape_parameters$radius , na.rm = T ) ,
-      n_segments = n_segments ,
+      n_segments = length( body$rpos[ 1 , ] ) ,
       length_units = length_units ,
       theta_units = theta_units ,
       shape = base::ifelse( base::class( shape ) == "character" ,

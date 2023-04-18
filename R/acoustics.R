@@ -125,6 +125,8 @@ target_strength <- function( object ,
                              model , ... ) {
   # Ignore model name case =====================================================
   model <- tolower( model )
+  # Pull argument input names ==================================================
+  arg_pull <- as.list( match.call( ) )
   if( length( model ) == 1 ) {
     # Initialize objects to input model parameters =============================
     object <- switch( model ,
@@ -133,18 +135,20 @@ target_strength <- function( object ,
                       calibration = calibration_initialize( object,
                                                             frequency , ... ) ,
                       dcm = dcm_initialize( object,
-                                            frequency ) ,
+                                            frequency , ... ) ,
                       dwba = dwba_initialize( object ,
-                                              frequency ) ,
+                                              frequency , ... ) ,
+                      dwba_curved = dwba_curved_initialize( object ,
+                                                            frequency ) ,
                       sdwba = sdwba_initialize( object ,
-                                                frequency ) ,
+                                                frequency , ... ) ,
                       sdwba_curved = sdwba_curved_initialize( object ,
-                                                              frequency ) ,
+                                                              frequency , ... ) ,
                       krm = krm_initialize( object ,
-                                            frequency ) ,
+                                            frequency , ... ) ,
                       stanton_high_pass = stanton_high_pass_initialize( object ,
                                                                         frequency , ... ) )
-    cat( toupper( model[ idx ] ) , "model for" , paste0( class(object) , "-object: " ,
+    cat( toupper( model ) , "model for" , paste0( class(object) , "-object: " ,
                                                          extract( object , "metadata" )$ID ) , "initialized.\n" )
     # Determine which model to use =============================================
     object <- switch( model,
@@ -152,6 +156,7 @@ target_strength <- function( object ,
                       calibration = calibration( object ) ,
                       dcm = DCM( object ) ,
                       dwba = DWBA( object ) ,
+                      dwba_curved = DWBA_curved( object ) ,
                       sdwba = SDWBA( object ) ,
                       sdwba_curved = SDWBA_curved( object ) ,
                       krm = KRM( object ) ,
@@ -163,23 +168,14 @@ target_strength <- function( object ,
       if( idx > length( model ) ) {
         break
       }
-      object <- switch( model[ idx ] ,
-                        anderson = anderson_initialize( object,
-                                                        frequency , ... ) ,
-                        calibration = calibration_initialize( object,
-                                                              frequency , ... ) ,
-                        dcm = dcm_initialize( object,
-                                              frequency ) ,
-                        dwba = dwba_initialize( object ,
-                                                frequency ) ,
-                        sdwba = sdwba_initialize( object ,
-                                                  frequency ) ,
-                        sdwba_curved = sdwba_curved_initialize( object ,
-                                                                frequency ) ,
-                        krm = krm_initialize( object ,
-                                              frequency ) ,
-                        stanton_high_pass = stanton_high_pass_initialize( object ,
-                                                                          frequency , ... ) )
+      # Pull correct formal arguments ==========================================
+      model_name <- paste0( model[ idx ] , "_initialize" )
+      arg_list <- names( formals( model_name ) )
+      # Filter out inappropriate parameters ====================================
+      arg_full <- arg_pull[ arg_list ] 
+      true_args <- Filter( Negate( is.null) , arg_full )
+      # Initialize =============================================================
+      object <- do.call( model_name , true_args )
       cat( toupper( model[ idx ] ) , "model for" , paste0( class(object) , "-object: " ,
                                                            extract( object , "metadata" )$ID ) , 
            "initialized.\n\n" )
@@ -193,65 +189,16 @@ target_strength <- function( object ,
       cat( "Beginning TS modeling via" , toupper( model[ idx ] ) , 
            "model for" , paste0( class(object) , "-object: " ,
                                  extract( object , "metadata" )$ID ) , "\n" )
-      object <- switch( model [ idx ],
-                        anderson = anderson_model( object ) ,
-                        calibration = calibration( object ) ,
-                        dcm = DCM( object ) ,
-                        dwba = DWBA( object ) ,
-                        sdwba = SDWBA( object ) ,
-                        sdwba_curved = SDWBA_curved( object ) ,
-                        krm = KRM( object ) ,
-                        stanton_high_pass = stanton_high_pass( object ) )
+      # Parse correct model name ===============================================
+      ts_model <- gsub("(_.*)" , "\\L\\1" , paste0( toupper( model[ idx ] ) ) , perl = T )
+      # Calculate modeled TS ===================================================
+      object <- do.call( ts_model , list( object ) )
       cat( toupper( model[ idx ] ) , "TS model predictions for" , paste0( class(object) , "-object: " ,
                                                                           extract( object , "metadata" )$ID ) , "complete.\n\n" )
       
       idx <- idx + 1
     }
   }
-  # Output object ==============================================================
-  return( object )
-}
-################################################################################
-#' Wrapper function to model acoustic target strength when multiple models are 
-#' defined.
-#' @param object Scatterer-class object.
-#' @param frequency Frequency (Hz).
-#' @param model Model name.
-#' @param ... Additional optional model inputs/parameters.
-#' @export
-target_strength <- function( object ,
-                             frequency ,
-                             model , ... ) {
-  # Ignore model name case =====================================================
-  model <- tolower( model )
-  # Initialize objects to input model parameters ===============================
-  object <- switch( model ,
-                    anderson = anderson_initialize( object,
-                                                    frequency , ... ) ,
-                    calibration = calibration_initialize( object,
-                                                          frequency , ... ) ,
-                    dcm = dcm_initialize( object,
-                                          frequency ) ,
-                    dwba = dwba_initialize( object ,
-                                            frequency ) ,
-                    sdwba = sdwba_initialize( object ,
-                                              frequency ) ,
-                    sdwba_curved = sdwba_curved_initialize( object ,
-                                                            frequency ) ,
-                    krm = krm_initialize( object ,
-                                          frequency ) ,
-                    stanton_high_pass = stanton_high_pass_initialize( object ,
-                                                                      frequency , ... ) )
-  # Determine which model to use ===============================================
-  object <- switch( model,
-                    anderson = anderson_model( object ) ,
-                    calibration = calibration( object ) ,
-                    dcm = DCM( object ) ,
-                    dwba = DWBA( object ) ,
-                    sdwba = SDWBA( object ) ,
-                    sdwba_curved = SDWBA_curved( object ) ,
-                    krm = KRM( object ) ,
-                    stanton_high_pass = stanton_high_pass( object ) )
   # Output object ==============================================================
   return( object )
 }

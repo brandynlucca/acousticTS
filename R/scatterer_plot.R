@@ -2,17 +2,19 @@
 # Generic for "plot(...)" for each scattering class object
 ################################################################################
 #' Method for what is printed for objects.
-#'
 #' @param x Scatterer-class object.
 #' @param type Toggle between body shape ("shape") or modeling results ("model")
 #' @param x_units If "model" is selected, then toggle between frequency
 #'    ("frequency", kHz) or ka ("ka").
 #' @param nudge_y y-axis nudge.
 #' @param nudge_x x-axis nudge.
+#' @param aspect_ratio Aspect ratio setting ( defaults to "manual" for nudge_y
+#' and nudge_x to apply; otherwise, input "auto").
+#' @param y_units y-axis data selection (e.g. TS, sigma_bs -- defaults to TS)
 #' @param ... Additional plot inputs
 #' @export
 setMethod( f = "plot" ,
-          methods::signature( x = "scatterer" ) ,
+          signature( x = "scatterer" , y = "missing" ) ,
           definition = function( x ,
                                  type = "shape" ,
                                  nudge_y = 1.1 ,
@@ -21,7 +23,7 @@ setMethod( f = "plot" ,
                                  x_units = "frequency",
                                  y_units = "TS" , ... ) {
             # Detect scatterer type ============================
-            sc_type <- base::class( x )
+            sc_type <- class( x )
 
             switch( sc_type,
                     CAL = cal_plot( x , type , nudge_y , nudge_x , x_units , ... ) ,
@@ -51,6 +53,9 @@ plot_colors <- base::c( "black" ,
 #'    ("frequency", kHz) or ka ("ka").
 #' @param nudge_y y-axis nudge.
 #' @param nudge_x x-axis nudge.
+#' @param aspect_ratio Aspect ratio setting ( defaults to "manual" for nudge_y
+#' and nudge_x to apply; otherwise, input "auto").
+#' @param y_units y-axis data selection (e.g. TS, sigma_bs -- defaults to TS)
 #' @param ... Additional plot inputs
 #' @export
 #' @import graphics
@@ -147,6 +152,9 @@ cal_plot <- function( object ,
 #'    ("frequency", kHz) or ka ("ka").
 #' @param nudge_y y-axis nudge.
 #' @param nudge_x x-axis nudge.
+#' @param aspect_ratio Aspect ratio setting ( defaults to "manual" for nudge_y
+#' and nudge_x to apply; otherwise, input "auto").
+#' @param y_units y-axis data selection (e.g. TS, sigma_bs -- defaults to TS)
 #' @param ... Additional plot inputs
 #' @import graphics
 #' @import stats
@@ -171,7 +179,7 @@ fls_plot <- function( object,
          oma = base::c( 1 , 1 , 1 , 0 ) ,
          mar = base::c( 5.0 , 4.5 , 1.5 , 2 ) )
     # Center shape =============================================================
-    body$rpos[ 3 , ] <- body$rpos[ 3 , ] - stats::median( body$rpos[ 3 , ] )
+    body$rpos[ 3 , ] <- body$rpos[ 3 , ] - median( body$rpos[ 3 , ] )
     # Adjust axes ==============================================================
     if ( aspect_ratio == "manual" ) {
       vert_lims <- base::c( min( body$rpos[ 3 , ] - body$radius ) * ( 1 - ( 1 - nudge_y ) ) ,
@@ -232,9 +240,9 @@ fls_plot <- function( object,
     y_axis <- models_df[ , base::which( base::colnames( models_df ) == y_units ) ]
     y_mat <- base::split( y_axis , models_df$model )
     col_axis <- plot_colors[ base::as.numeric( base::as.factor( models_df$model ) ) ]
-    x_lab <- base::switch( x_units ,
-                           frequency = "Frequency (Hz)" ,
-                           k_sw = base::expression(italic(k[sw]*a) ) )
+    x_lab <- switch( x_units ,
+                     frequency = "Frequency (Hz)" ,
+                     k_sw = expression(italic(k[sw]*a) ) )
     # Define plot margins ======================================================
     graphics::par( ask = FALSE ,
                    mar = base::c( 5.0 , 5.5 , 2.0 , 3.5 ) )
@@ -261,15 +269,16 @@ fls_plot <- function( object,
     axis( 1 , at = atx , 
           labels = format( atx , scientific = F ) ,
           cex.axis = 1.3 )
+    nm_names <- names( x_mat )
     invisible( mapply( lines , x_mat , y_mat ,
                        col = plot_colors[ 1 : base::length( model_names ) ] ,
                        lwd = 4 ) )
     legend( "bottomright" ,
             title = expression( bold("TS"~"model") ) ,
             title.adj = 0.05 ,
-            legend = model_names ,
-            lty = rep( 1 , length( model_names ) ) ,
-            col = plot_colors[ 1 : length( model_names ) ] ,
+            legend = nm_names ,
+            lty = rep( 1 , length( nm_names ) ) ,
+            col = plot_colors[ 1 : length( nm_names  ) ] ,
             cex = 1.05 ,
             lwd = 4 )
    }
@@ -282,6 +291,9 @@ fls_plot <- function( object,
 #'    ("frequency", kHz) or ka ("ka").
 #' @param nudge_y y-axis nudge.
 #' @param nudge_x x-axis nudge.
+#' @param aspect_ratio Aspect ratio setting ( defaults to "manual" for nudge_y
+#' and nudge_x to apply; otherwise, input "auto").
+#' @param y_units y-axis data selection (e.g. TS, sigma_bs -- defaults to TS)
 #' @param ... Additional plot inputs
 #' @import graphics
 #' @import stats
@@ -384,6 +396,9 @@ gas_plot <- function( object ,
 #'    ("frequency", kHz) or ka ("ka").
 #' @param nudge_y y-axis nudge.
 #' @param nudge_x x-axis nudge.
+#' @param aspect_ratio Aspect ratio setting ( defaults to "manual" for nudge_y
+#' and nudge_x to apply; otherwise, input "auto").
+#' @param y_units y-axis data selection (e.g. TS, sigma_bs -- defaults to TS)
 #' @export
 sbf_plot <- function(object,
                      type = "shape",

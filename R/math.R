@@ -35,9 +35,10 @@ contour_integrate <- function( integral , x , y ) {
 #' @param n_iterations Number of phase deviations to average and summarize
 #' @param integral Integral function used for numerical integration via adaptive
 #' quadrature
+#' @param phase_sd Phase standard deviation 
 #' @rdname phase_integrate
 #' @export
-phase_integrate <- function( x , y , n_iterations , integral ) {
+phase_integrate <- function( x , y , n_iterations , integral , phase_sd ) {
   rng <- rnorm( n_iterations , 0 , 1 )
   phase <- exp( 1i * rng * phase_sd )
   contour_integrate( integral , x , y ) * phase

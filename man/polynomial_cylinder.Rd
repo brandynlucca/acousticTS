@@ -7,10 +7,6 @@
 polynomial_cylinder(length, radius, n_segments, polynomial)
 }
 \arguments{
-\item{length}{Length (m).}
-
-\item{radius}{Maximum/uniform radius (m).}
-
 \item{n_segments}{Number of segments to discretize object shape. Defaults to
 1e2 segments.}
 

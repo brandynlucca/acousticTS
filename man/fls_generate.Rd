@@ -16,8 +16,7 @@ fls_generate(
   theta_body = pi/2,
   ID = NULL,
   length_units = "m",
-  theta_units = "radians",
-  n_segments = 100
+  theta_units = "radians"
 )
 }
 \arguments{

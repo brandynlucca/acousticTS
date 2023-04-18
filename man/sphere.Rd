@@ -4,13 +4,15 @@
 \alias{sphere}
 \title{Creates a sphere.}
 \usage{
-sphere(radius, n_segments)
+sphere(radius, n_segments, diameter_units )
 }
 \arguments{
 \item{radius}{Object radius (m).}
 
 \item{n_segments}{Number of segments to discretize object shape. Defaults to
-1e3 segments.}
+1e2 segments.}
+
+\item{diameter_units}{Default is "m" for meters}
 }
 \value{
 Creates position vector for a spherical object of a defined radius.

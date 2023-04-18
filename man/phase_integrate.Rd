@@ -4,7 +4,7 @@
 \alias{phase_integrate}
 \title{Wrapper function incorporating phase deviation into contour integration}
 \usage{
-phase_integrate(x, y, n_iterations, integral)
+phase_integrate(x, y, n_iterations, integral, phase_sd)
 }
 \arguments{
 \item{x}{Indexing argument for multi-row objects}
@@ -15,6 +15,8 @@ phase_integrate(x, y, n_iterations, integral)
 
 \item{integral}{Integral function used for numerical integration via adaptive
 quadrature}
+
+\item{phase_sd}{Phase standard deviation}
 }
 \description{
 Wrapper function incorporating phase deviation into contour integration
