@@ -103,6 +103,7 @@ sbf_generate <- function( x_body ,
 #' @param material Material-type for a solid sphere. See `Details` for available
 #' options. Default is tungsten carbide (WC).
 #' @param diameter Spherical diameter (m).
+#' @param n_segments Number of segments to discretize object shape.
 #' @param sound_speed_longitudinal Longitudinal sound speed (m/s).
 #' @param sound_speed_transversal Transversal sound speed (m/s).
 #' @param density_sphere Density (kg/m^3).
@@ -191,11 +192,15 @@ cal_generate <- function( material = "WC" ,
 # Create FLS-class object
 ################################################################################
 #' Manually generate a FLS object.
-#'
+#' @param shape Optional input argument that dictates shape-type, if desired, for
+#' generalized shapes.
 #' @param x_body Vector containing x-axis body (m) shape data.
 #' @param y_body Vector containing y-axis body (m) shape data.
 #' @param z_body Vector containing z-axis body (m) shape data.
+#' @param length_body Optional input for a generic length value input.
 #' @param radius_body Vector containing radii (m).
+#' @param n_segments Number of body segments.
+#' @param radius_curvature_ratio Length-to-curvature ratio (pc/L).
 #' @param g_body Density contrast.
 #' @param h_body Soundspeed contrast
 #' @param theta_body Orientation of the target relative to the transmit source
@@ -204,6 +209,7 @@ cal_generate <- function( material = "WC" ,
 #' @param theta_units Units used for orientation. Defaults to "radians".
 #' @param length_units Units used for position vector. Defaults to "m".
 #' @param ID Optional metadata entry.
+#' @param ... Additional parameters.
 #' @return
 #' Calls in an FLS-class object from a *.csv file
 #' @import methods
@@ -214,14 +220,16 @@ fls_generate <- function( shape = "arbitrary" ,
                           z_body = NULL ,
                           length_body = NULL ,
                           radius_body = NULL ,
+                          radius_curvature_ratio = NULL ,
+                          n_segments = 18 ,
                           g_body ,
                           h_body ,
                           theta_body = pi / 2 ,
                           ID = NULL ,
                           length_units = "m" ,
-                          theta_units = "radians" ) {
+                          theta_units = "radians" , ... ) {
   # Collect shape information if provided ======================================
-  if( base::class( shape )[1] != "shape" ) {
+  if( class( shape )[1] != "shape" ) {
     if ( shape != "arbitrary" ) {
       if ( base::is.null( length_body ) )
         base::stop( "Body shape is not appropriately parameterized." )
@@ -231,7 +239,7 @@ fls_generate <- function( shape = "arbitrary" ,
   }
   # Generate shape position matrix =============================================
   # Create body shape field ====================================================
-  if ( base::class( shape )[1] == "shape" ) {
+  if ( class( shape )[1] == "shape" ) {
     shape_input <- shape
   } else {
     if ( shape == "arbitrary" ) {
@@ -240,9 +248,15 @@ fls_generate <- function( shape = "arbitrary" ,
                                 z_body = z_body ,
                                 radius_body = radius_body )
     } else {
-      length_body <- length_body
-      radius_body <- radius_body
-      shape_input <- create_shape( shape , ... )
+      # Pull argument input names ==============================================
+      arg_pull <- as.list( match.call( ) )
+      # Grab input arguments ===================================================
+      arg_list <- names( formals( shape ) )
+      # Filter out inappropriate parameters ====================================
+      arg_full <- arg_pull[ arg_list ] 
+      true_args <- Filter( Negate( is.null) , arg_full )
+      # Initialize =============================================================
+      shape_input <- do.call( shape , true_args )
     }
   }
     # Define shape parameters ==================================================
@@ -250,7 +264,7 @@ fls_generate <- function( shape = "arbitrary" ,
       length = base::max( shape_input@position_matrix[ , 1 ] , na.rm = T ) -
         base::min( shape_input@position_matrix[ , 1 ] , na.rm = T ) ,
       radius = base::max( shape_input@shape_parameters$radius , na.rm = T ) ,
-      n_segments = length( body$rpos[ 1 , ] ) ,
+      n_segments = length( shape_input@position_matrix[ , 1 ]  ) ,
       length_units = length_units ,
       theta_units = theta_units ,
       shape = base::ifelse( base::class( shape ) == "character" ,
@@ -262,22 +276,23 @@ fls_generate <- function( shape = "arbitrary" ,
       }
     }
 
-    body <- base::list( rpos = base::t( shape_input@position_matrix ) ,
-                        radius = shape_input@shape_parameters$radius ,
-                        theta = theta_body ,
-                        g = g_body ,
-                        h = h_body )
+    body <- list( rpos = t.default( shape_input@position_matrix ) ,
+                  radius = shape_input@shape_parameters$radius ,
+                  radius_curvature_ratio = radius_curvature_ratio ,
+                  theta = theta_body ,
+                  g = g_body ,
+                  h = h_body )
   # Create metadata field ======================================================
   metadata <- base::list( ID = base::ifelse ( !base::is.null( ID ) ,
                                               ID ,
                                               "UID" ) )
   # Create FLS-class object ====================================================
-  return( methods::new( "FLS" ,
-                        metadata = metadata ,
-                        model_parameters = base::list( ) ,
-                        model = base::list( ) ,
-                        body = body ,
-                        shape_parameters = shape_parameters ) )
+  return( new( "FLS" ,
+               metadata = metadata ,
+               model_parameters = base::list( ) ,
+               model = base::list( ) ,
+               body = body ,
+               shape_parameters = shape_parameters ) )
 }
 ################################################################################
 # Create GAS-class object
@@ -286,19 +301,20 @@ fls_generate <- function( shape = "arbitrary" ,
 #'
 #' @inheritParams fls_generate
 #' @param shape Optional pre-made shape input. Default is a sphere.
-#' @param radius_body Optional average radius (m).
+#' @param radius Optional average radius (m).
 #' @param h_fluid Sound speed contrast of fluid relative to surrounding
 #' medium (h).
 #' @param g_fluid Density contrast of fluid relative to surrounding density (g).
 #' @param sound_speed_fluid Optional fluid sound speed (m/s).
 #' @param density_fluid Optional fluid density (m/s).
 #' @param radius_units Diameter units. Defaults to "m".
+#' @param n_segments Number of body segments.
 #' @return
-#' Creates a FLS-class object from a *.csv file
+#' Creates a GAS-class object from a *.csv file
 #' @import methods
 #' @export
 gas_generate <- function( shape = "sphere" ,
-                          radius_body = NULL ,
+                          radius ,
                           h_fluid = 0.2200 ,
                           g_fluid = 0.0012 ,
                           sound_speed_fluid = NULL ,
@@ -309,14 +325,18 @@ gas_generate <- function( shape = "sphere" ,
                           theta_units = "radians" ,
                           n_segments = 100 ) {
   # Collect shape information if provided ======================================
-  if ( base::is.null( radius_body ) & base::class( shape ) == "character" ) {
+  if ( base::is.null( radius ) & base::class( shape ) == "character" ) {
     stop( "Canonical shape generation requires 'double' input for radius_body argument." )
-    }
-  shape_input <- base::switch( base::class( shape )[1] ,
-                               shape = shape ,
-                               character = acousticTS::create_shape( shape = shape ,
-                                                                     radius = radius_body )
-                               )
+  }
+  # Pull argument input names ==================================================
+  arg_pull <- as.list( match.call( ) )
+  # Grab input arguments =======================================================
+  arg_list <- names( formals( shape ) )
+  # Filter out inappropriate parameters ========================================
+  arg_full <- arg_pull[ arg_list ] 
+  true_args <- Filter( Negate( is.null) , arg_full )
+  # Initialize =================================================================
+  shape_input <- do.call( shape , true_args )
   # Create metadata field ======================================================
   metadata <- base::list( ID = base::ifelse ( !base::is.null( ID ) ,
                                               ID ,
@@ -326,7 +346,7 @@ gas_generate <- function( shape = "sphere" ,
                       radius = base::ifelse( shape %in%
                                                base::c( "sphere" ,
                                                         "prolate_spheroid" ) ,
-                                             radius_body ,
+                                             radius ,
                                              base::mean(
                                                base::abs(
                                                  base::diff(
@@ -358,7 +378,6 @@ gas_generate <- function( shape = "sphere" ,
 # Create GAS-class object
 ################################################################################
 #' Generate ESS shape
-#'
 #' @inheritParams fls_generate
 #' @param radius_shell Radius of shell (m).
 #' @param shell_thickness Optional shell thickness (m).

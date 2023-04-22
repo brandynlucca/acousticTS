@@ -70,6 +70,38 @@ fls_show <- function( object ) {
                   " " ,
                   shape$theta_units ) )
 }
+#' show(...) for GAS_class objects
+#' @param object GAS-class object
+#' @export
+gas_show <- function ( object ) {
+  # Print out informational text ===============================================
+  # Parse metadata =============================================================
+  meta <- acousticTS::extract( object ,
+                               "metadata" )
+  # Parse shape ================================================================
+  shape <- acousticTS::extract( object ,
+                                "shape_parameters" )
+  # Parse body =================================================================
+  body <- acousticTS::extract( object ,
+                               "body" )
+  cat(
+    paste0( methods::is( object )[[ 1 ]], "-object" ) , "\n" ,
+    " Gas- and fluid-filled scatterer \n " ,
+    " ID:" , paste0( meta$ID ) , "\n" ,
+    "Body dimensions:\n" ,
+    " Diameter:" ,
+    paste0( shape$radius * 2 ,
+            " " ,
+            shape$radius_units ) , "\n" ,
+    " Radius:" ,
+    paste0( shape$radius ,
+            " " ,
+            shape$radius_units ) , "\n" ,
+    "Material properties:\n" ,
+    paste0( " g: " , round( .Internal( mean( body$g ) ) , 4 ) ) , "\n" ,
+    paste0( " h: " , round( .Internal( mean( body$h ) ) , 4 ) ) , "\n" 
+  )
+}
 #' show(...) for SBF-class objects.
 #' @param object SBF_class object.
 #' @export

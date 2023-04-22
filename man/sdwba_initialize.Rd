@@ -11,7 +11,7 @@ sdwba_initialize(
   density_sw = 1026,
   n_iterations = 100,
   n_segments_init = 14,
-  phase_sd_init = base::sqrt(2)/2,
+  phase_sd_init = sqrt(2)/2,
   length_init = 0.03835,
   frequency_init = 120000
 )
@@ -24,6 +24,16 @@ sdwba_initialize(
 \item{sound_speed_sw}{Seawater sound speed.}
 
 \item{density_sw}{Seawater density.}
+
+\item{n_iterations}{Number of iterations to repeat SDWBA}
+
+\item{n_segments_init}{Reference number of body segments}
+
+\item{phase_sd_init}{Reference phase deviation}
+
+\item{length_init}{Reference body length}
+
+\item{frequency_init}{Reference frequency}
 }
 \description{
 Initialize FLS-class object for SDWBA modeling

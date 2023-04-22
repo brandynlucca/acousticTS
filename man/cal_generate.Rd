@@ -36,6 +36,8 @@ options. Default is tungsten carbide (WC).}
 \item{diameter_units}{Units for diameter. Defaults to "m".}
 
 \item{theta_units}{Units for direction. Defaults to "radians".}
+
+\item{n_segments}{Number of segments to discretize object shape.}
 }
 \value{
 Generates a CAL-class object.

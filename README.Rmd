@@ -33,6 +33,12 @@ statitsical distributions of inputs. This package is in a constant state
 of development with updates to the available model library,
 computational efficiency, and quality-of-life improvements.
 
+_General DOI_
+https://doi.org/10.5281/zenodo.7600659
+
+_Latest release DOI_
+[![DOI](https://zenodo.org/badge/161965429.svg)](https://zenodo.org/badge/latestdoi/161965429)
+
 ## [Installation]{.underline}
 
 You can install the current released version of acousticTS via:
@@ -62,13 +68,13 @@ physics and application to zooplankton. J. Acoust. Soc. Am., 94,
 several zooplankton groups. II. Scattering models. J. Acoust. Soc. Am.,
 103, 236-253.*
 
-#### \*\*Stochastic distorted wave Born approximation ([SDWBA]{.underline})
+#### Stochastic distorted wave Born approximation ([SDWBA]{.underline})
 
 *Demer, D.A., and Conti, S.G. 2003. Reconciling theoretical versus
 empirical target strengths of krill: effects of phase variability on the
 distorted-wave Born approximation. ICES J. Mar. Sci., 60, 429-434.*
 
-#### \*\*SDWBA for uniformly bent scatterers ([SDWBA_curved]{.underline})
+#### SDWBA for uniformly bent scatterers ([SDWBA_curved]{.underline})
 
 *Demer, D.A., and Conti, S.G. 2003. Reconciling theoretical versus
 empirical target strengths of krill: effects of phase variability on the
@@ -78,17 +84,17 @@ distorted-wave Born approximation. ICES J. Mar. Sci., 60, 429-434.*
 several zooplankton groups. II. Scattering models. J. Acoust. Soc. Am.,
 103, 236-253.*
 
-#### \*\*Kirchoff-ray mode approximation ([KRM]{.underline})
+#### Kirchoff-ray mode approximation ([KRM]{.underline})
 
 *Clay C.S. and Horne J.K. (1994). Acoustic models of fish: The Atlantic
 cod (Gadus morhua). J. Acoust. Soc. Am., 96, 1661-1668.*
 
-#### \*\*Modal series solution for gas-filled fluid spheres ([anderson_model]{.underline})
+#### Modal series solution for gas-filled fluid spheres ([MSS_anderson]{.underline})
 
 *Anderson, V.C. (1950). Sound scattering from a fluid sphere. J. Acoust.
 Soc. Am., 22, 426-431.*
 
-#### \*\*Homogeneous solid sphere ([calibration]{.underline})
+#### Homogeneous solid sphere ([calibration]{.underline})
 
 *MacLennan D. N. (1981). The theory of solid spheres as sonar
 calibration targets. Scottish Fisheries Research No. 22, Department of
@@ -102,36 +108,23 @@ crustacean modeled as a prolate spheroid, and a generic gas-filled
 bubble.
 
 ### Kirchoff Ray-Mode approximation for a Sardine with a gas-filled swimbladder
-
 ```{r sardine}
-### Call in the library
-library(acousticTS)
+library( acousticTS )
 ### Call in the built-in sardine shape dataset
-data(sardine)
+data( sardine )
 ### Inspect the object
-print(sardine)
-plot(sardine)
+print( sardine )
+plot( sardine )
 ### We will now define a frequency range to predict TS over
-frequency <- seq(1e3, 400e3, 1e3)
+frequency <- seq( 1e3 , 400e3 , 1e3 )
 ### And now we use the target_strength(...) function to model TS for this fish
-sardine <- target_strength(sardine, 
-                           frequency = frequency, 
-                           model = "KRM")
-### Extract model results
-sardine_ts <- extract(sardine, "model")$KRM
-### This prints out the summed linear backscatter from the fluid-like bodily
-### tissues, soft tissue representing the swimbladder, the summation of these
-### two tissue-types, and TS.
-head(sardine_ts)
+sardine <- target_strength( sardine, 
+                            frequency = frequency, 
+                            model = "KRM" )
 ### Plot results
-par(mar=c(5,5,4,1)+.05)
-plot(x = frequency * 1e-3,
-     y = sardine_ts$TS,
-     type = 'l',
-     xlab = "Frequency (kHz)",
-     ylab = expression(Target~strength~(dB~re.~1~m^2)),
-     cex.lab = 1.5,
-     cex.axis = 1.3)
+plot( sardine, type = 'model' )
+### Extract model results
+sardine_ts <- extract( sardine , "model") $KRM
 ```
 
 ### Calibration sphere
@@ -140,24 +133,16 @@ plot(x = frequency * 1e-3,
 ### Let's create a calibration sphere 
 ### Default inputs here are a 38.1 mm diameter and a tungsten carbide 
 ### (WC) material properties.
-cal_sphere <- cal_generate()
+cal_sphere <- cal_generate( )
 ### We will use the same frequency range as the previous example
 ### Calculate TS
-cal_sphere <- target_strength(object = cal_sphere,
-                              frequency = frequency,
-                              model = "calibration")
+cal_sphere <- target_strength( object = cal_sphere,
+                               frequency = frequency,
+                               model = "calibration" )
+### Plot results
+plot( cal_sphere , type = 'model' )
 ### Extract model results
-calibration_ts <- extract(cal_sphere, "model")
-### Plot the results
-par(mar = c(5,5,4,1) + .05)
-plot(x = frequency * 1e-3,
-     y = calibration_ts$TS,
-     ylim = c(-60, -35),
-     type = 'l',
-     xlab = "Frequency (kHz)",
-     ylab = expression(Target~strength~(dB~re.~1~m^2)),
-     cex.lab = 1.5,
-     cex.axis = 1.3)
+calibration_ts <- extract( cal_sphere , "model" )$calibration
 ```
 
 ### Fluid sphere (Anderson, 1950)
@@ -166,23 +151,15 @@ plot(x = frequency * 1e-3,
 ### Let's create a gas-filled bubble with a raidus of 4 mm
 ### This defaults to a density contrast, g_body, of 0.0012
 ### This defaults to a soundspeed contrast, h_body, of 0.220
-bubble <- gas_generate(radius_body = 4e-3)
+bubble <- gas_generate( radius = 4e-3 ,
+                        ID = "gas bubble" )
+print( bubble )
 ### Model TS using the Anderson (1950) model
-bubble <- target_strength(bubble,
-                          frequency = seq(1e3, 300e3, 0.5e3),
-                          model = "anderson")
-### Extract model results
-bubble_ts <- extract(bubble, "model")$fluid_sphere$anderson
-### Plot the results
-par(mar = c(5,5,4,1) + .05)
-plot(x =  seq(1e3, 300e3, 0.5e3) * 1e-3,
-     y = bubble_ts$TS,
-     ylim = c(-60, -35),
-     type = 'l',
-     xlab = "Frequency (kHz)",
-     ylab = expression(Target~strength~(dB~re.~1~m^2)),
-     cex.lab = 1.5,
-     cex.axis = 1.3)
+bubble <- target_strength( bubble,
+                           frequency = seq( 1e3 , 300e3 , 0.5e3 ) ,
+                           model = "MSS_anderson" )
+### Plot results
+plot( bubble , type = 'model' )
 ```
 
 ### Fluid-like crustacean (prolate spheroid) using the distorted Born wave approximation (DWBA) and ray-based deformed cylinder model (DCM)
@@ -190,51 +167,22 @@ plot(x =  seq(1e3, 300e3, 0.5e3) * 1e-3,
 ```{r crustacean}
 ### First let's create a prolate spheroid shape 
 ### 25 mm long with a length-to-radius ratio of 16
-crustacean_shape <- prolate_spheroid(length = 25e-3,
-                                     length_radius_ratio = 16)
-### Create fluid-like scatterer (FLS) object -- broadside incidence
-crustacean <- fls_generate(x_body = crustacean_shape$rpos[, 1],
-                           y_body = crustacean_shape$rpos[, 2],
-                           z_body = crustacean_shape$rpos[, 3],
-                           radius_body = crustacean_shape$radius,
-                           g_body = 1.03,
-                           h_body = 1.02,
-                           theta_body = pi / 2)
-### Check shape parameters
-print(crustacean)
-### Plot shape
-plot(crustacean)
-### Model TS using the DWBA
-crustacean <- target_strength(crustacean,
-                              frequency = seq(1e3, 400e3, 1e3),
-                              model = "DWBA")
-### Model TS using the DCM
-crustacean <- target_strength(crustacean,
-                              frequency = seq(1e3, 400e3, 1e3),
-                              model = "DCM",
-                              radius_curvature_ratio = 3.3)
-### Extract both
-crustacean_dwba <- extract(crustacean, "model")$DWBA
-crustacean_dcm <- extract(crustacean, "model")$DCM
-### Plot both
-par(mar = c(5,5,4,1) + .05)
-plot(x = seq(1e3, 400e3, 1e3) * 1e-3,
-     y = crustacean_dwba$TS,
-     type = 'l',
-     xlab = "Frequency (kHz)",
-     ylab = expression(Target~strength~(dB~re.~1~m^2)),
-     cex.lab = 1.5,
-     cex.axis = 1.3,
-     lwd = 2)
-lines(x = seq(1e3, 400e3, 1e3) * 1e-3,
-      y = crustacean_dcm$TS,
-      col = 'red',
-      lwd = 2)
-legend(x = "bottomright",
-       legend = c("DWBA", "DCM"),
-       lty = c(1, 1),
-       lwd = c(4, 3.5),
-       col = c('black', 'red'),
-       cex = 1)
-
+crustacean <- fls_generate( shape = "prolate_spheroid" ,
+                            length_body = 25.0e-3 , 
+                            length_radius_ratio = 16 ,
+                            radius_curvature_ratio = 3.3 ,
+                            g_body = 1.03 ,
+                            h_body = 1.02 )
+print( crustacean )
+plot( crustacean )
+crustacean@body
+### Model TS using the ray-path deformed cylinder model (DCM), distorted wave
+### Born approximation (DWBA), the stochastic variation of the DWBA (SDWBA) , 
+### and specifically curved versions of both the DWBA and SDWBA 
+crustacean <- target_strength( crustacean ,
+                               frequency = seq( 1e3 , 200e3 , 1e3 ) ,
+                               model = c( "DCM" , "DWBA" , "SDWBA" ,
+                                          "DWBA_curved" , "SDWBA_curved" ) )
+### Plot results
+plot( crustacean , type = 'model' )
 ```

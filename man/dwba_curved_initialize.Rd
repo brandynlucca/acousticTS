@@ -9,6 +9,7 @@ dwba_curved_initialize(
   frequency,
   sound_speed_sw = 1500,
   density_sw = 1026,
+  radius_curvature_ratio = NULL,
   theta = pi/2
 )
 }
@@ -20,6 +21,11 @@ dwba_curved_initialize(
 \item{sound_speed_sw}{Seawater sound speed.}
 
 \item{density_sw}{Seawater density.}
+
+\item{radius_curvature_ratio}{Radius of curvature ratio (length-to-curvature
+ratio).}
+
+\item{theta}{Angle of incident soundwave (pi / 2 is broadside).}
 }
 \description{
 Initialize FLS-class object for TS modeling.

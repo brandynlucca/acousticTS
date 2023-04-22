@@ -11,22 +11,34 @@ fls_generate(
   z_body = NULL,
   length_body = NULL,
   radius_body = NULL,
+  radius_curvature_ratio = NULL,
+  n_segments = 18,
   g_body,
   h_body,
   theta_body = pi/2,
   ID = NULL,
   length_units = "m",
-  theta_units = "radians"
+  theta_units = "radians",
+  ...
 )
 }
 \arguments{
+\item{shape}{Optional input argument that dictates shape-type, if desired, for
+generalized shapes.}
+
 \item{x_body}{Vector containing x-axis body (m) shape data.}
 
 \item{y_body}{Vector containing y-axis body (m) shape data.}
 
 \item{z_body}{Vector containing z-axis body (m) shape data.}
 
+\item{length_body}{Optional input for a generic length value input.}
+
 \item{radius_body}{Vector containing radii (m).}
+
+\item{radius_curvature_ratio}{Length-to-curvature ratio (pc/L).}
+
+\item{n_segments}{Number of body segments.}
 
 \item{g_body}{Density contrast.}
 
@@ -41,6 +53,8 @@ Default value is pi/2; input should be in radians.}
 \item{length_units}{Units used for position vector. Defaults to "m".}
 
 \item{theta_units}{Units used for orientation. Defaults to "radians".}
+
+\item{...}{Additional parameters.}
 }
 \value{
 Calls in an FLS-class object from a *.csv file

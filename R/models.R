@@ -75,9 +75,9 @@ DWBA <- function( object ) {
   g <- body$g ; h <- body$h
   R <- 1 / ( g * h * h ) + 1 / g - 2
   # Calculate rotation matrix and update wavenumber matrix =====================
-  rotation_matrix <- base::matrix( base::c( base::cos( theta ) ,
-                                            0.0 ,
-                                            base::sin( theta ) ) ,
+  rotation_matrix <- base::matrix(  c( cos( theta ) ,
+                                      0.0 ,
+                                      sin( theta ) ) ,
                                    1 )
   k_sw_rot <- model$parameters$acoustics$k_sw %*% rotation_matrix
   # Calculate Euclidean norms ==================================================
@@ -156,9 +156,9 @@ DWBA_curved <- function( object ) {
   g <- body$g ; h <- body$h
   R <- 1 / ( g * h * h ) + 1 / g - 2
   # Calculate rotation matrix and update wavenumber matrix =====================
-  rotation_matrix <- base::matrix( base::c( base::cos( theta ) ,
-                                            0.0 ,
-                                            base::sin( theta ) ) ,
+  rotation_matrix <- base::matrix( c( cos( theta ) ,
+                                     0.0 ,
+                                     sin( theta ) ) ,
                                    1 )
   k_sw_rot <- model$parameters$acoustics$k_sw %*% rotation_matrix
   # Calculate Euclidean norms ==================================================
@@ -519,10 +519,7 @@ calibration <- function( object ) {
 ################################################################################
 #' Calculates the theoretical TS of a fluid sphere using an exact modal series
 #' solution proposed by Andersen (1950).
-#'
 #' @param object GAS- or SBF-class object.
-#' @usage
-#' anderson_model(object)
 #' @details
 #' Calculates the theoretical TS of a fluid sphere at a given frequency using
 #' an exact modal series solution.
@@ -532,10 +529,9 @@ calibration <- function( object ) {
 #' Anderson, V.C. (1950). Sound scattering from a fluid sphere. Journal of the
 #' Acoustical Society of America, 22, 426-431.
 #' @export
-anderson_model <- function(object) {
+MSS_anderson <- function( object ) {
   # Extract model parameters/inputs ============================================
-  model <- acousticTS::extract( object ,
-                                "model_parameters" )$anderson
+  model <- extract( object , "model_parameters" )$MSS_anderson
   # Multiple acoustic wavenumber by radius =====================================
   ## Medium ====================================================================
   k1a <- model$parameters$acoustics$k_sw * model$body$radius
@@ -543,21 +539,21 @@ anderson_model <- function(object) {
   k2a <- model$parameters$acoustics$k_f * model$body$radius
   # Set limit for iterations ===================================================
   m_limit <- model$parameters$ka_limit
-  m <- 0:m_limit
+  m <- 0 : m_limit
   # Convert ka vectors to matrices =============================================
-  ka1_m <- acousticTS::modal_matrix( k1a , m_limit )
-  ka2_m <- acousticTS::modal_matrix( k2a , m_limit )
+  ka1_m <- modal_matrix( k1a , m_limit )
+  ka2_m <- modal_matrix( k2a , m_limit )
   # Calculate modal series coefficient, b_m (or C_m) ===========================
   ## Material properties term ==================================================
   gh <- model$body$g * model$body$h
   # Numerator term =============================================================
-  N1 <- ( acousticTS::jsd( m , ka2_m ) * acousticTS::ys( m , ka1_m ) ) /
-    ( acousticTS::js( m , ka2_m ) * acousticTS::jsd( m , ka1_m ) )
-  N2 <- ( gh * acousticTS::ysd( m , ka1_m ) / acousticTS::jsd( m , ka1_m ) )
+  N1 <- ( jsd( m , ka2_m ) * ys( m , ka1_m ) ) /
+    ( js( m , ka2_m ) * jsd( m , ka1_m ) )
+  N2 <- ( gh * ysd( m , ka1_m ) / jsd( m , ka1_m ) )
   CN <- N1 - N2
   # Denominator term ===========================================================
-  D1 <- ( acousticTS::jsd( m , ka2_m ) * acousticTS::js( m , ka1_m ) ) /
-    ( acousticTS::js( m , ka2_m ) * acousticTS::jsd( m , ka1_m ) )
+  D1 <- ( jsd( m , ka2_m ) * js( m , ka1_m ) ) /
+    ( js( m , ka2_m ) * jsd( m , ka1_m ) )
   D2 <- gh
   CD <- D1 - D2
   # Finalize modal series coefficient ==========================================
@@ -565,20 +561,20 @@ anderson_model <- function(object) {
   b_m <- -1 / ( 1 + 1i * C_m )
   # Calculate linear scatter response ==========================================
   ## Sum across columns to complete modal series summation over frequency range=
-  f_j <- base::colSums( ( 2 * m + 1 ) * ( -1 ) ^ m * b_m )
+  f_j <- colSums( ( 2 * m + 1 ) * ( -1 ) ^ m * b_m )
   f_sphere <- -1i / model$parameters$acoustics$k_sw * f_j
   # Calculate linear scattering coefficient, sigma_bs ==========================
-  sigma_bs <- base::abs( f_sphere ) ^ 2
+  sigma_bs <- abs( f_sphere ) ^ 2
   # Calculate TS ===============================================================
-  TS <- 10 * base::log10( sigma_bs )
+  TS <- 10 * log10( sigma_bs )
   # Add results to scatterer object ============================================
-  methods::slot( object ,
-                 "model" )$anderson <- base::data.frame(
-                   frequency = model$parameters$acoustics$frequency ,
-                   ka = k1a ,
-                   f_bs = f_sphere ,
-                   sigma_bs = sigma_bs ,
-                   TS = TS )
+  slot( object ,
+        "model" )$MSS_anderson <- base::data.frame(
+          frequency = model$parameters$acoustics$frequency ,
+          ka = k1a ,
+          f_bs = f_sphere ,
+          sigma_bs = sigma_bs ,
+          TS = TS )
   # Return object ==============================================================
   return( object )
 }
@@ -600,14 +596,13 @@ anderson_model <- function(object) {
 #' @export
 KRM <- function( object ) {
   # Detect object class ========================================================
-  scatterer_type <- base::class( object )
+  scatterer_type <- class( object )
   # Extract model parameter inputs =============================================
-  model <- acousticTS::extract( object , "model_parameters" )$KRM
+  model <- extract( object , "model_parameters" )$KRM
   # Extract body parameters ====================================================
-  body <- acousticTS::extract( object , "body" )
+  body <- extract( object , "body" )
   # Calculate reflection coefficient for medium-body interface =================
-  R12 <- acousticTS::reflection_coefficient( model$medium ,
-                                             model$body )
+  R12 <- reflection_coefficient( model$medium , model$body )
   # Calculate transmission coefficient and its reverse =========================
   T12T21 <- 1 - R12 ^ 2
   # Sum across body position vector ============================================
@@ -619,8 +614,7 @@ KRM <- function( object ) {
                                            zL = body$rpos[ 5 , ] ) ,
                                            # zL = -body$radius ) ,
                         SBF = body$rpos )
-  body_rpos_sum <- acousticTS::along_sum( rpos ,
-                                          model$parameters$ns_b )
+  body_rpos_sum <- along_sum( rpos , model$parameters$ns_b )
   # Approximate radius of body cylinders =======================================
   a_body <- base::switch( scatterer_type ,
                           FLS = body_rpos_sum[ 2 , ] / 4 ,
@@ -732,29 +726,29 @@ KRM <- function( object ) {
 #' 122(6): 3304-3326.
 #'
 #' @export
-stanton_high_pass <- function(object) {
-  # Extract model parameters/inputs ============================================
-  model_params <- extract(object, "model_parameters")$stanton_high_pass
-  medium <- model_params$medium
-  acoustics <- model_params$acoustics
-  shell <- model_params$shell
-  # Multiply acoustic wavenumber by body radius ================================
-  k1a <- acoustics$k_sw * shell$radius
-  # Calculate Reflection Coefficient ===========================================
-  R <- R12(shell, medium)
-  # Calculate backscatter constant, alpha_pi
-  alpha_pi <- (1 - shell$g * shell$h^2) / (3 * shell$g * shell$h^2) +
-    (1 - shell$g) / (1 + 2 * shell$g)
-  # Define approximation constants, G_c and F_c ================================
-  F_c <- 1; G_c <- 1
-  # Caclulate numerator term ===================================================
-  num <- (shell$radius^2 * k1a^4 * alpha_pi^2 * G_c)
-  # Caclulate denominator term =================================================
-  dem <- (1 + (4 * k1a^4 * alpha_pi^2) / (R^2 * F_c))
-  # Calculate backscatter and return
-  f_bs <- num / dem
-  slot(object, "model")$stanton_high_pass <- data.frame(f_bs = f_bs,
-                                                        sigma_bs = abs(f_bs),
-                                                        TS = 10 * log10(abs(f_bs)))
-  return(object)
-}
+# stanton_high_pass <- function(object) {
+#   # Extract model parameters/inputs ============================================
+#   model_params <- extract(object, "model_parameters")$stanton_high_pass
+#   medium <- model_params$medium
+#   acoustics <- model_params$acoustics
+#   shell <- model_params$shell
+#   # Multiply acoustic wavenumber by body radius ================================
+#   k1a <- acoustics$k_sw * shell$radius
+#   # Calculate Reflection Coefficient ===========================================
+#   R <- R12(shell, medium)
+#   # Calculate backscatter constant, alpha_pi
+#   alpha_pi <- (1 - shell$g * shell$h^2) / (3 * shell$g * shell$h^2) +
+#     (1 - shell$g) / (1 + 2 * shell$g)
+#   # Define approximation constants, G_c and F_c ================================
+#   F_c <- 1; G_c <- 1
+#   # Caclulate numerator term ===================================================
+#   num <- (shell$radius^2 * k1a^4 * alpha_pi^2 * G_c)
+#   # Caclulate denominator term =================================================
+#   dem <- (1 + (4 * k1a^4 * alpha_pi^2) / (R^2 * F_c))
+#   # Calculate backscatter and return
+#   f_bs <- num / dem
+#   slot(object, "model")$stanton_high_pass <- data.frame(f_bs = f_bs,
+#                                                         sigma_bs = abs(f_bs),
+#                                                         TS = 10 * log10(abs(f_bs)))
+#   return(object)
+# }

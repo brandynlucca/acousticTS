@@ -34,12 +34,12 @@ brake_df <- function( body_df , radius_curvature , mode = "ratio" ) {
   L <- max( rpos[ 1 , ] )
   n_segments <- ncol( rpos )
   # Pull in value for use ======================================================
-  radius_curvature <- switch( mode ,
-                              ratio = radius_curvature , 
-                              measurement = radius_curvature / L )
+  radius_curvature_new <- switch( mode ,
+                                  ratio = radius_curvature , 
+                                  measurement = radius_curvature / L )
   # Estimate the position angle of the bent cylinder ===========================
   # Geometry described in Stanton (1989) for total arc length ++++++++++++++++++
-  gamma_max <- 0.5 / radius_curvature
+  gamma_max <- 0.5 / radius_curvature_new 
   # Simulate new x-axis over -1 to 1 ===========================================
   x_normal <- seq( from = -1 , to = 1 , length.out = n_segments )
   # Simulate arc positions =====================================================
@@ -54,7 +54,7 @@ brake_df <- function( body_df , radius_curvature , mode = "ratio" ) {
   # Calculate new arc length ===================================================
   arc_length <- sum( sqrt( diff( x_new ) * diff( x_new ) + diff( z_new ) * diff( z_new ) ) )
   # Determine position matrix direction ========================================
-  rpos_direction <- ifelse( which.max( body$rpos[ 1 , ] ) == 1 ,
+  rpos_direction <- ifelse( which.max( body_df$rpos[ 1 , ] ) == 1 ,
                             "REV" ,
                             "FWD" )
   x_direction <- switch( rpos_direction , 
@@ -157,7 +157,7 @@ body_rotation <- function( sum_rpos , rpos , theta , k_length ) {
 #' @param feature Feature of interest (e.g. body).
 #' @export
 extract <- function( object , feature ) {
-  base::return( methods::slot( object , feature ) )
+  return( slot( object , feature ) )
 }
 ################################################################################
 #' Format data for the modal series solution model into the appropriate matrix

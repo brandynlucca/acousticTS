@@ -20,6 +20,8 @@ dwba_initialize(
 \item{sound_speed_sw}{Seawater sound speed.}
 
 \item{density_sw}{Seawater density.}
+
+\item{theta}{Angle of incident soundwave (pi / 2 is broadside).}
 }
 \description{
 Initialize FLS-class object for TS modeling.

@@ -87,41 +87,55 @@ sphere <- function(  radius ,
 ################################################################################
 #' Creates a prolate spheroid.
 #'
-#' @param length Semi-major axis length (m).
-#' @param radius Semi-minor axis length (m). This can also be stylized as the
+#' @param length_body Semi-major axis length (m).
+#' @param radius_body Semi-minor axis length (m). This can also be stylized as the
 #'    "maximum radius" of the scattering object.
 #' @param length_radius_ratio Optional ratio input when radius is not explicitly
 #'    known.
 #' @param n_segments Number of segments to discretize object shape. Defaults to
-#'    1e2 segments.
-#' @usage
-#' prolate_spheroid(length, radius, length_radius_ratio, n_segments)
+#'    18 segments.
+#' @param length_units Units for body matrix (defaults to m).
+#' @param theta_units Units for body orientation (defaults to radians).
 #' @return
 #' Creates the position vector for a prolate spheroid object of defined
 #'    semi-major and -minor axes.
 #' @export
-prolate_spheroid <- function(length,
-                             radius,
-                             length_radius_ratio = NULL,
-                             n_segments = 1e2) {
+prolate_spheroid <- function( length_body ,
+                              radius_body ,
+                              length_radius_ratio = NULL ,
+                              n_segments = 18 ,
+                              length_units = "m" ,
+                              theta_units = "radians" ) {
   # Define maximum radius ======================================================
-  if(missing(radius) & !is.null(length_radius_ratio)) {
-    max_radius <- length / length_radius_ratio
-  }else if(!missing(radius)) {
-    max_radius <- radius
+  if ( missing( radius_body ) & ! is.null( length_radius_ratio ) ) {
+    max_radius <- length_body / length_radius_ratio
+  } else if ( ! missing( radius_body ) ) {
+    max_radius <- radius_body
   } else {
     stop("Radius/width and/or length-to-radius ratio are missing.")
   }
   # Define semi-major or x-axis ================================================
-  x_axis <- seq(0, length, length.out = n_segments + 1)
+  x_axis <- seq( 0 , length_body , length.out = n_segments + 1 )
   # Generate prolate spheroid shape ============================================
-  radius_output <- max_radius * sqrt(1 - ((x_axis - length / 2) / (length / 2))^2)
-  # Generate position vector, 'rpos' ===========================================
-  rpos <- list(rpos = data.frame(x = x_axis,
-                                 y = rep(0, length(x_axis)),
-                                 z = rep(0, length(x_axis))),
-               radius = radius_output)
-  return(rpos)
+  radius_output <- max_radius * sqrt(1 - ( ( x_axis - length_body / 2 ) / ( length_body / 2 ) ) ^ 2 )
+  # Generate position matrix ===================================================
+  position_matrix <- cbind( x = x_axis , 
+                            y = rep( 0 , length( x_axis ) ) ,
+                            z = rep( 0 , length( x_axis ) ) ,
+                            zU = radius_output ,
+                            zL = - rev( radius_output ) )
+  # Generate shape parameters list =============================================
+  shape_parameters <- list(
+    length = max( position_matrix[ , 1 ] ) ,
+    radius = radius_output ,
+    length_radius_ratio = max( position_matrix[ , 1 ] ) / max( radius_output ) ,
+    n_segments = n_segments ,
+    length_units = length_units
+  )
+  # Generate new shape object ==================================================
+  return( new( "shape" ,
+               position_matrix = position_matrix ,
+               shape_parameters = shape_parameters ) )
 }
 ################################################################################
 # Elongated cylinder
@@ -186,9 +200,9 @@ cylinder <-  function( length_body ,
     length_units = length_units
   )
   # Generate new shape object ==================================================
-  return( methods::new( "shape" ,
-                        position_matrix = position_matrix ,
-                        shape_parameters = shape_parameters ) )
+  return( new( "shape" ,
+               position_matrix = position_matrix ,
+               shape_parameters = shape_parameters ) )
 }
 ################################################################################
 # Polynomial cylinder

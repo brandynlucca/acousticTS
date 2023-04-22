@@ -6,7 +6,7 @@
 \usage{
 gas_generate(
   shape = "sphere",
-  radius_body = NULL,
+  radius,
   h_fluid = 0.22,
   g_fluid = 0.0012,
   sound_speed_fluid = NULL,
@@ -21,7 +21,7 @@ gas_generate(
 \arguments{
 \item{shape}{Optional pre-made shape input. Default is a sphere.}
 
-\item{radius_body}{Optional average radius (m).}
+\item{radius}{Optional average radius (m).}
 
 \item{h_fluid}{Sound speed contrast of fluid relative to surrounding
 medium (h).}
@@ -41,9 +41,11 @@ Default value is pi/2; input should be in radians.}
 \item{radius_units}{Diameter units. Defaults to "m".}
 
 \item{theta_units}{Units used for orientation. Defaults to "radians".}
+
+\item{n_segments}{Number of body segments.}
 }
 \value{
-Creates a FLS-class object from a *.csv file
+Creates a GAS-class object from a *.csv file
 }
 \description{
 Create GAS object

@@ -5,41 +5,41 @@
 ################################################################################
 #' Initialize GAS-object for modal series solution.
 #' @param object GAS-class object.
-#' @param radius_body Radius of sphere (m).
+#' @param radius Radius of sphere (m).
 #' @param g_body Density contrast for gas.
 #' @param h_body Sound speed contrast for gas.
 #' @param ka_limit Modal series limit (i.e. max "m"). The default is the maximum
 #'    ka + 10.
 #' @inheritParams krm_initialize
 #' @export
-anderson_initialize <- function(object ,
-                                        # Required input
-                                        frequency ,
-                                        # Optional body parameters
-                                        radius_body = NULL ,
-                                        g_body = NULL ,
-                                        h_body = NULL ,
-                                        # Optional medium inputs
-                                        sound_speed_sw = 1500 ,
-                                        density_sw = 1026 ,
-                                        # Optional modal series limit
-                                        ka_limit = NULL ) {
+mss_anderson_initialize <- function(object ,
+                                    # Required input
+                                    frequency ,
+                                    # Optional body parameters
+                                    radius = NULL ,
+                                    g_body = NULL ,
+                                    h_body = NULL ,
+                                    # Optional medium inputs
+                                    sound_speed_sw = 1500 ,
+                                    density_sw = 1026 ,
+                                    # Optional modal series limit
+                                    ka_limit = NULL ) {
   # Detect object class ========================================================
-  scatterer_type <- base::class( object )
+  scatterer_type <- class( object )
+  # Parse metadata =============================================================
+  meta <- extract( object , "metadata")
   # Parse shape ================================================================
-  shape <- acousticTS::extract( object ,
-                                "shape_parameters" )
+  shape <- extract( object , "shape_parameters" )
   # Parse body =================================================================
-  body <- acousticTS::extract( object ,
-                               "body" )
+  body <- extract( object , "body" )
   # Define medium parameters ===================================================
-  medium_params <- base::data.frame( sound_speed = sound_speed_sw ,
-                                     density = density_sw )
+  medium_params <- data.frame( sound_speed = sound_speed_sw ,
+                               density = density_sw )
   # Define body radii compatible w/ model ======================================
-  bladder <- base::switch( scatterer_type ,
-                           SBF = acousticTS::extract( object ,
-                                                      "bladder" ) ,
-                           GAS = body )
+  # bladder <- base::switch( scatterer_type ,
+  #                          SBF = acousticTS::extract( object ,
+  #                                                     "bladder" ) ,
+  #                          GAS = body )
   # # Equivalent spherical radius ================================================
   # if ( scatterer_type == "SBF" ) {
   #   # Equivalent volume ========================================================
@@ -48,9 +48,6 @@ anderson_initialize <- function(object ,
   # }
   # aesr <- base::switch( scatterer_type ,
   #                       )
-
-
-
   # Define model parameters recipe =============================================
   model_params <- base::list(
     acoustics = base::data.frame(
@@ -63,7 +60,7 @@ anderson_initialize <- function(object ,
                                body$h * sound_speed_sw ) ) ,
     ncyl_b = shape$n_segments )
   # Define ka limit ============================================================
-  ka_limit <- base::ifelse( !base::is.null( ka_limit ) ,
+  ka_limit <- base::ifelse( ! is.null( ka_limit ) ,
                             ka_limit ,
                             base::round(
                               base::max( model_params$acoustics$k_sw ) * body$radius ) + 20 )
@@ -76,13 +73,13 @@ anderson_initialize <- function(object ,
     theta = body$theta )
   # Add model parameters slot to scattering object =============================
   methods::slot( object ,
-                 "model_parameters" )$anderson <- base::list(
+                 "model_parameters" )$MSS_anderson <- base::list(
                    parameters = model_params ,
                    medium = medium_params ,
                    body = body_params )
   # Add model results slot to scattering object ================================
   methods::slot( object ,
-                 "model" )$anderson <- base::data.frame(
+                 "model" )$MSS_anderson <- base::data.frame(
                    frequency = frequency ,
                    sigma_bs = base::rep( NA ,
                                          length( frequency ) ) )
@@ -163,7 +160,7 @@ calibration_initialize <- function( object ,
 #' @param length Body length (m).
 #' @param g Density contrast.
 #' @param h Sound speed contrast.
-#' @param theta Body orientation relative to the indicent sound wave.
+#' @param theta Body orientation relative to the incident sound wave.
 #' @param sound_speed_sw Seawater sound speed
 #' (\ifelse{html}{\out{c<sub>body</sub>}}{\eqn{c_{body}}},
 #' m \ifelse{html}{\out{s<sup>-1</sup>}}{\eqn{s^{-1}}}).
@@ -205,9 +202,11 @@ dcm_initialize <- function(object,
                                                 mean = mean( body$radius, na.rm = T ) ,
                                                 median = median( body$radius, na.rm = T ) ) )
   # Calculate radius of curvature either based on user input or ratio ==========
-  radius_curvature <- base::ifelse( ! is.null( radius_curvature ) ,
-                                    radius_curvature,
-                                    shape$length * radius_curvature_ratio )
+  radius_curvature <- base::ifelse( is.null( radius_curvature ) ,
+                                    ifelse( ! is.null( body$radius_curvature_ratio ) ,
+                                            body$radius_curvature_ratio * shape$length , 
+                                            shape$length * radius_curvature_ratio ) ,
+                                    radius_curvature )
   # Fill in remaining model inputs required by DCM =============================
   # Orientation ================================================================
   theta <- base::ifelse( !base::is.null( theta ) , theta , body$theta )
@@ -227,25 +226,25 @@ dcm_initialize <- function(object,
                                    h = h ,
                                    alpha_B = alpha_B )
   # Define model dataframe for medium parameterization =========================
-  medium_params <- base::data.frame( sound_speed = sound_speed_sw ,
+  medium_params <-data.frame( sound_speed = sound_speed_sw ,
                                      density = density_sw )
   # Define model dataframe for acoustic parameterization =======================
-  model_params <- base::list(
-    acoustics = base::data.frame(
+  model_params <- list(
+    acoustics = data.frame(
       frequency = frequency ,
-      k_sw = acousticTS::kcalc( frequency , sound_speed_sw ) ,
-      k_b = acousticTS::kcalc( frequency , sound_speed_sw * h ) ) ,
+      k_sw = kcalc( frequency , sound_speed_sw ) ,
+      k_b = kcalc( frequency , sound_speed_sw * h ) ) ,
     n_s = shape$n_segments )
   # Tidy up model parameters to insert into object =============================
-  methods::slot( object ,
-                 "model_parameters" )$DCM <- base::list( parameters = model_params ,
-                                                         medium = medium_params ,
-                                                         body = body_params )
+  slot( object ,
+        "model_parameters" )$DCM <- list( parameters = model_params ,
+                                          medium = medium_params ,
+                                          body = body_params )
   # Add model results slot to scattering object ================================
-  methods::slot( object ,
-                 "model" )$DCM <- base::data.frame( frequency = frequency ,
-                                                    sigma_bs = base::rep( NA ,
-                                                                          base::length( frequency ) ) )
+  slot( object ,
+        "model" )$DCM <- data.frame( frequency = frequency ,
+                                     sigma_bs = rep( NA ,
+                                                     length( frequency ) ) )
   # Output =====================================================================
   return(object)
 }
@@ -253,6 +252,7 @@ dcm_initialize <- function(object,
 #' Initialize FLS-class object for TS modeling.
 #' @param object FLS-class object.
 #' @inheritParams krm_initialize
+#' @param theta Angle of incident soundwave (pi / 2 is broadside).
 #' @export
 dwba_initialize <- function( object ,
                              frequency ,
@@ -301,22 +301,27 @@ dwba_initialize <- function( object ,
 ################################################################################
 #' Initialize FLS-class object for TS modeling.
 #' @param object FLS-class object.
-#' @inheritParams krm_initialize
+#' @param radius_curvature_ratio Radius of curvature ratio (length-to-curvature 
+#' ratio).
+#' @inheritParams dwba_initialize
 #' @export
 dwba_curved_initialize <- function( object ,
                                     frequency ,
                                     sound_speed_sw = 1500 ,
                                     density_sw = 1026 ,
+                                    radius_curvature_ratio = NULL ,
                                     theta = pi / 2 ) {
   # Parse metadata =============================================================
-  meta <- acousticTS::extract( object , "metadata" )
+  meta <- extract( object , "metadata" )
   # Parse shape ================================================================
-  shape <- acousticTS::extract( object , "shape_parameters" )
+  shape <- extract( object , "shape_parameters" )
   # Parse body =================================================================
-  body <- acousticTS::extract( object , "body" )
+  body <- extract( object , "body" )
   # Bend body ==================================================================
   body <- brake( body , 
-                 radius_curvature = body$radius_curvature_ratio , 
+                 radius_curvature = ifelse( ! is.null( radius_curvature_ratio ) ,
+                                            radius_curvature_ratio , 
+                                            body$radius_curvature_ratio ) , 
                  mode = "ratio" )
   # Define medium parameters ===================================================
   medium_params <- base::data.frame( sound_speed = sound_speed_sw ,
@@ -359,6 +364,11 @@ dwba_curved_initialize <- function( object ,
 ################################################################################
 #' Initialize FLS-class object for SDWBA modeling
 #' @param object FLS-class object.
+#' @param n_iterations Number of iterations to repeat SDWBA
+#' @param n_segments_init Reference number of body segments
+#' @param phase_sd_init Reference phase deviation
+#' @param length_init Reference body length
+#' @param frequency_init Reference frequency
 #' @inheritParams dwba_initialize
 #' @export
 sdwba_initialize <- function( object , 
@@ -367,7 +377,7 @@ sdwba_initialize <- function( object ,
                               density_sw = 1026 , 
                               n_iterations = 100 , 
                               n_segments_init = 14 , 
-                              phase_sd_init = base::sqrt( 2 ) / 2 , 
+                              phase_sd_init = sqrt( 2 ) / 2 , 
                               length_init = 38.35e-3 , 
                               frequency_init = 120e3 ) {
   # Parse metadata =============================================================
@@ -460,8 +470,7 @@ sdwba_curved_initialize <- function( object ,
                                      density_sw = 1026 , 
                                      n_iterations = 100 , 
                                      n_segments_init = 14 , 
-                                     phase_sd_init ,
-                                     # phase_sd_init = base::sqrt( 2 ) / 2 , 
+                                     phase_sd_init = sqrt( 2 ) / 2 ,
                                      length_init = 38.35e-3 , 
                                      frequency_init = 120e3 ) {
   # Parse metadata =============================================================
@@ -477,7 +486,7 @@ sdwba_curved_initialize <- function( object ,
   object_copy <- object
   object_copy <- brake( object_copy ,
                         radius_curvature = body$radius_curvature_ratio , 
-                        mode )
+                        mode = "ratio" )
   # Define medium parameters ===================================================
   medium_params <- base::data.frame( sound_speed = sound_speed_sw ,
                                      density = density_sw )
@@ -511,99 +520,6 @@ sdwba_curved_initialize <- function( object ,
                                  idx <- which( N_f_vec == N_f_idx[ i ] )
                                  object_new <- reforge( object_copy , 
                                                         n_segments = N_f_idx[ i ] )
-                                 body <- extract( object_new , "body" )
-                                 n_segments <- N_f_idx[ i ]
-                                 phase_sd <- phase_sd[ i ] 
-                                 acoustics <- model_params$acoustics[ idx , ]
-                                 return( list(
-                                   meta_params = data.frame(
-                                     n_iterations = n_iterations , 
-                                     N0 = n_segments_init , 
-                                     f0 = frequency_init , 
-                                     L0 = length_init , 
-                                     p0 = phase_sd_init
-                                   ) ,
-                                   body_params = body , 
-                                   n_segments = n_segments ,
-                                   acoustics = acoustics
-                                 ) )
-                               }
-  )
-  # Add model parameters slot to scattering object =============================
-  methods::slot( object ,
-                 "model_parameters" )$SDWBA_curved <- base::list( parameters = stochastic_params ,
-                                                                  medium = medium_params ,
-                                                                  body = body )
-  # Add model results slot to scattering object ================================
-  methods::slot( object ,
-                 "model" )$SDWBA_curved <- base::data.frame( frequency = frequency ,
-                                                             f_bs = base::rep( NA ,
-                                                                               base::length( frequency ) ) ,
-                                                             sigma_bs = base::rep( NA ,
-                                                                                   base::length( frequency ) ) ,
-                                                             TS = base::rep( NA , 
-                                                                             base::length( frequency ) ) )
-  # Output =====================================================================
-  return( object )
-}
-################################################################################
-#' Initialize FLS-class object for SDWBA modeling
-#' @param object FLS-class object.
-#' @param n_iterations Number of iterations to repeat SDWBA
-#' @param n_segments_init Reference number of body segments
-#' @param phase_sd_init Reference phase deviation
-#' @param length_init Reference body length
-#' @param frequency_init Reference frequency
-#' @inheritParams dwba_initialize
-#' @export
-sdwba_curved_initialize <- function( object , 
-                                     frequency , 
-                                     sound_speed_sw = 1500 , 
-                                     density_sw = 1026 , 
-                                     n_iterations = 100 , 
-                                     n_segments_init = 14 , 
-                                     phase_sd_init = base::sqrt( 2 ) / 2 , 
-                                     length_init = 38.35e-3 , 
-                                     frequency_init = 120e3 ) {
-  # Parse metadata =============================================================
-  meta <- acousticTS::extract( object , "metadata" )
-  # Parse shape ================================================================
-  shape <- acousticTS::extract( object , "shape_parameters" )
-  # Parse body =================================================================
-  body <- acousticTS::extract( object , "body" )
-  # Define medium parameters ===================================================
-  medium_params <- base::data.frame( sound_speed = sound_speed_sw ,
-                                     density = density_sw )
-  # Define model parameters recipe =============================================
-  model_params <- base::list(
-    acoustics = base::data.frame(
-      frequency = frequency ,
-      # Wavenumber (medium) ====================================================
-      k_sw = acousticTS::kcalc( frequency ,
-                                sound_speed_sw ) ,
-      # Wavenumber (fluid) =====================================================
-      k_f = acousticTS::kcalc( frequency ,
-                               body$h * sound_speed_sw ) ) ,
-    n_segments = shape$n_segments 
-  )
-  # Define stochastic recipe ===================================================
-  # First calculate new resampled body shape resolution ++++++++++++++++++++++++
-  N_f <- base::ceiling( n_segments_init * ( frequency / frequency_init ) * 
-                          ( shape$length / length_init ) )
-  N_f_vec <- base::ifelse( N_f > n_segments_init , 
-                           N_f , 
-                           n_segments_init )
-  N_f_idx <- base::unique(
-    N_f_vec
-  )
-  # Now we calculate the new phase standard deviation value ++++++++++++++++++++
-  phase_sd <- phase_sd_init * ( n_segments_init / N_f_vec ) * ( shape$length / length_init )
-  # Create stochastic recipe +++++++++++++++++++++++++++++++++++++++++++++++++++
-  stochastic_params <- lapply( 1 : length( N_f_idx ) ,
-                               FUN = function( i ) {
-                                 idx <- which( N_f_vec == N_f_idx[ i ] )
-                                 object_new <- reforge( object , 
-                                                       n_segments = N_f_idx[ i ] )
                                  body <- extract( object_new , "body" )
                                  n_segments <- N_f_idx[ i ]
                                  phase_sd <- phase_sd[ i ] 
