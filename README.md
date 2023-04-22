@@ -22,9 +22,10 @@ distributions of inputs. This package is in a constant state of
 development with updates to the available model library, computational
 efficiency, and quality-of-life improvements.
 
-*General DOI* <https://doi.org/10.5281/zenodo.7600659>
-
 *Latest release DOI*
+<https://doi.org/10.5281/zenodo.7600659>
+
+*General DOI*
 [![DOI](https://zenodo.org/badge/161965429.svg)](https://zenodo.org/badge/latestdoi/161965429)
 
 ## Installation
