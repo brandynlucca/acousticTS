@@ -27,7 +27,7 @@ efficiency, and quality-of-life improvements.
 *Latest release DOI*
 [![DOI](https://zenodo.org/badge/161965429.svg)](https://zenodo.org/badge/latestdoi/161965429)
 
-## <u>Installation</u>
+## Installation
 
 You can install the current released version of acousticTS via:
 
@@ -310,5 +310,3 @@ crustacean <- target_strength( crustacean ,
 ### Plot results
 plot( crustacean , type = 'model' )
 ```
-
-<img src="README_figs/README-crustacean-2.png" width="672" />
