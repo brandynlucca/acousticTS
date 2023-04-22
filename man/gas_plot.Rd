@@ -7,9 +7,10 @@
 gas_plot(
   object,
   type = "shape",
-  nudge_y = 1,
-  nudge_x = 1,
+  nudge_y = 1.01,
+  nudge_x = 1.01,
   x_units = "frequency",
+  y_units = "TS",
   ...
 )
 }
@@ -25,12 +26,9 @@ gas_plot(
 \item{x_units}{If "model" is selected, then toggle between frequency
 ("frequency", kHz) or ka ("ka").}
 
+\item{y_units}{y-axis data selection (e.g. TS, sigma_bs -- defaults to TS).}
+
 \item{...}{Additional plot inputs}
-
-\item{aspect_ratio}{Aspect ratio setting ( defaults to "manual" for nudge_y
-and nudge_x to apply; otherwise, input "auto").}
-
-\item{y_units}{y-axis data selection (e.g. TS, sigma_bs -- defaults to TS)}
 }
 \description{
 Plotting for GAS-class objects

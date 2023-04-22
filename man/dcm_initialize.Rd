@@ -41,7 +41,7 @@ radius vector. Defaults to "max", but also accepts "mean" and "median".}
 
 \item{h}{Sound speed contrast.}
 
-\item{theta}{Body orientation relative to the indicent sound wave.}
+\item{theta}{Body orientation relative to the incident sound wave.}
 
 \item{sound_speed_sw}{Seawater sound speed
 (\ifelse{html}{\out{c<sub>body</sub>}}{\eqn{c_{body}}},

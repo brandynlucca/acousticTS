@@ -11,19 +11,7 @@ sdwba_curved_initialize(
   density_sw = 1026,
   n_iterations = 100,
   n_segments_init = 14,
-  phase_sd_init = base::sqrt(2)/2,
-  length_init = 0.03835,
-  frequency_init = 120000
-)
-
-sdwba_curved_initialize(
-  object,
-  frequency,
-  sound_speed_sw = 1500,
-  density_sw = 1026,
-  n_iterations = 100,
-  n_segments_init = 14,
-  phase_sd_init = base::sqrt(2)/2,
+  phase_sd_init = sqrt(2)/2,
   length_init = 0.03835,
   frequency_init = 120000
 )
@@ -48,7 +36,5 @@ sdwba_curved_initialize(
 \item{frequency_init}{Reference frequency}
 }
 \description{
-Initialize FLS-class object for SDWBA modeling
-
 Initialize FLS-class object for SDWBA modeling
 }

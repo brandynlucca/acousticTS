@@ -125,42 +125,58 @@ target_strength <- function( object ,
                              model , ... ) {
   # Ignore model name case =====================================================
   model <- tolower( model )
+  ts_model <- gsub("(_.*)" , "\\L\\1" , paste0( toupper( model ) ) , perl = T )
+  ts_model <- ifelse( ts_model == "CALIBRATION" , "calibration" , ts_model )
   # Pull argument input names ==================================================
   arg_pull <- as.list( match.call( ) )
   if( length( model ) == 1 ) {
     # Initialize objects to input model parameters =============================
-    object <- switch( model ,
-                      anderson = anderson_initialize( object,
-                                                      frequency , ... ) ,
-                      calibration = calibration_initialize( object,
-                                                            frequency , ... ) ,
-                      dcm = dcm_initialize( object,
-                                            frequency , ... ) ,
-                      dwba = dwba_initialize( object ,
-                                              frequency , ... ) ,
-                      dwba_curved = dwba_curved_initialize( object ,
-                                                            frequency ) ,
-                      sdwba = sdwba_initialize( object ,
-                                                frequency , ... ) ,
-                      sdwba_curved = sdwba_curved_initialize( object ,
-                                                              frequency , ... ) ,
-                      krm = krm_initialize( object ,
-                                            frequency , ... ) ,
-                      stanton_high_pass = stanton_high_pass_initialize( object ,
-                                                                        frequency , ... ) )
+    # Grab input arguments =====================================================
+    init_name <- paste0( model , "_initialize" )
+    arg_list <- names( formals( init_name ) )
+    # Filter out inappropriate parameters ======================================
+    arg_full <- arg_pull[ arg_list ] 
+    true_args <- Filter( Negate( is.null) , arg_full )
+    # Initialize ===============================================================
+    object_copy <- do.call( init_name , true_args )
+    slot( object ,
+          "model_parameters" )[ ts_model ] <- extract( object_copy , "model_parameters" )[ ts_model ]
+    slot( object ,
+          "model" )[ ts_model ] <- extract( object_copy , "model" )[ ts_model ]
+    
+    # object <- switch( model ,
+    #                   mss_anderson = mss_anderson_initialize( object,
+    #                                                           frequency , ... ) ,
+    #                   calibration = calibration_initialize( object,
+    #                                                         frequency , ... ) ,
+    #                   dcm = dcm_initialize( object,
+    #                                         frequency , ... ) ,
+    #                   dwba = dwba_initialize( object ,
+    #                                           frequency , ... ) ,
+    #                   dwba_curved = dwba_curved_initialize( object ,
+    #                                                         frequency ) ,
+    #                   sdwba = sdwba_initialize( object ,
+    #                                             frequency , ... ) ,
+    #                   sdwba_curved = sdwba_curved_initialize( object ,
+    #                                                           frequency , ... ) ,
+    #                   krm = krm_initialize( object ,
+    #                                         frequency , ... ) ,
+    #                   stanton_high_pass = stanton_high_pass_initialize( object ,
+    #                                                                     frequency , ... ) )
     cat( toupper( model ) , "model for" , paste0( class(object) , "-object: " ,
                                                          extract( object , "metadata" )$ID ) , "initialized.\n" )
     # Determine which model to use =============================================
-    object <- switch( model,
-                      anderson = anderson_model( object ) ,
-                      calibration = calibration( object ) ,
-                      dcm = DCM( object ) ,
-                      dwba = DWBA( object ) ,
-                      dwba_curved = DWBA_curved( object ) ,
-                      sdwba = SDWBA( object ) ,
-                      sdwba_curved = SDWBA_curved( object ) ,
-                      krm = KRM( object ) ,
-                      stanton_high_pass = stanton_high_pass( object ) )
+    # object <- switch( model,
+    #                   mss_anderson = MSS_anderson( object ) ,
+    #                   calibration = calibration( object ) ,
+    #                   dcm = DCM( object ) ,
+    #                   dwba = DWBA( object ) ,
+    #                   dwba_curved = DWBA_curved( object ) ,
+    #                   sdwba = SDWBA( object ) ,
+    #                   sdwba_curved = SDWBA_curved( object ) ,
+    #                   krm = KRM( object ) ,
+    #                   stanton_high_pass = stanton_high_pass( object ) )
+    object <- eval( parse( text = paste0( ts_model , "(object)" ) ) )
   } else {
     # Initialize objects to input model parameters =============================
     idx <- 1
@@ -175,7 +191,11 @@ target_strength <- function( object ,
       arg_full <- arg_pull[ arg_list ] 
       true_args <- Filter( Negate( is.null) , arg_full )
       # Initialize =============================================================
-      object <- do.call( model_name , true_args )
+      object_copy <- do.call( model_name , true_args )
+      slot( object ,
+            "model_parameters" )[ ts_model[ idx ] ] <- extract( object_copy , "model_parameters" )[ ts_model[ idx ] ]
+      slot( object ,
+            "model" )[ ts_model[ idx ] ] <- extract( object_copy , "model" )[ ts_model[ idx ] ]
       cat( toupper( model[ idx ] ) , "model for" , paste0( class(object) , "-object: " ,
                                                            extract( object , "metadata" )$ID ) , 
            "initialized.\n\n" )
@@ -190,9 +210,10 @@ target_strength <- function( object ,
            "model for" , paste0( class(object) , "-object: " ,
                                  extract( object , "metadata" )$ID ) , "\n" )
       # Parse correct model name ===============================================
-      ts_model <- gsub("(_.*)" , "\\L\\1" , paste0( toupper( model[ idx ] ) ) , perl = T )
+     
       # Calculate modeled TS ===================================================
-      object <- do.call( ts_model , list( object ) )
+      object <- eval( parse( text = paste0( ts_model[ idx ] , "(object)" ) ) )
+      # object_copy <- do.call( ts_model , list( object ) )
       cat( toupper( model[ idx ] ) , "TS model predictions for" , paste0( class(object) , "-object: " ,
                                                                           extract( object , "metadata" )$ID ) , "complete.\n\n" )
       

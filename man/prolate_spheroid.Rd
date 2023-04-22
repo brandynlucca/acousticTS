@@ -4,19 +4,30 @@
 \alias{prolate_spheroid}
 \title{Creates a prolate spheroid.}
 \usage{
-prolate_spheroid(length, radius, length_radius_ratio, n_segments)
+prolate_spheroid(
+  length_body,
+  radius_body,
+  length_radius_ratio = NULL,
+  n_segments = 18,
+  length_units = "m",
+  theta_units = "radians"
+)
 }
 \arguments{
-\item{length}{Semi-major axis length (m).}
+\item{length_body}{Semi-major axis length (m).}
 
-\item{radius}{Semi-minor axis length (m). This can also be stylized as the
+\item{radius_body}{Semi-minor axis length (m). This can also be stylized as the
 "maximum radius" of the scattering object.}
 
 \item{length_radius_ratio}{Optional ratio input when radius is not explicitly
 known.}
 
 \item{n_segments}{Number of segments to discretize object shape. Defaults to
-1e2 segments.}
+18 segments.}
+
+\item{length_units}{Units for body matrix (defaults to m).}
+
+\item{theta_units}{Units for body orientation (defaults to radians).}
 }
 \value{
 Creates the position vector for a prolate spheroid object of defined
