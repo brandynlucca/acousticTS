@@ -175,7 +175,6 @@ crustacean <- fls_generate( shape = "prolate_spheroid" ,
                             h_body = 1.02 )
 print( crustacean )
 plot( crustacean )
-crustacean@body
 ### Model TS using the ray-path deformed cylinder model (DCM), distorted wave
 ### Born approximation (DWBA), the stochastic variation of the DWBA (SDWBA) , 
 ### and specifically curved versions of both the DWBA and SDWBA 
