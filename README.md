@@ -27,14 +27,6 @@ efficiency, and quality-of-life improvements.
 *Latest release DOI*
 [![DOI](https://zenodo.org/badge/161965429.svg)](https://zenodo.org/badge/latestdoi/161965429)
 
-## <u>Installation</u>
-=======
-_General DOI_
-https://doi.org/10.5281/zenodo.7600659
-
-_Latest release DOI_
-[![DOI](https://zenodo.org/badge/161965429.svg)](https://zenodo.org/badge/latestdoi/161965429)
-
 ## Installation
 
 You can install the current released version of acousticTS via:
