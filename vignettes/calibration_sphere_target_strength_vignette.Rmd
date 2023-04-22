@@ -153,9 +153,9 @@ results.
 
 ```{r}
 # Extract model results
-model_results <- extract(cal_sphere, "model")
+model_results <- extract( cal_sphere, "model" )$calibration
 # Peek at the output from extract(...)
-head(model_results)
+head( model_results )
 
 ```
 
@@ -184,19 +184,19 @@ sphere_20 <- cal_generate(diameter = 20e-3)
 sphere_20 <- target_strength(object = sphere_20,
                              frequency = frequency,
                              model = "calibration")
-ts_mods_20 <- extract(sphere_20, "model")
+ts_mods_20 <- extract(sphere_20, "model")$calibration
 # 30 mm diameter sphere
 sphere_30 <- cal_generate(diameter = 30e-3)
 sphere_30 <- target_strength(object = sphere_30,
                              frequency = frequency,
                              model = "calibration")
-ts_mods_30 <- extract(sphere_30, "model")
+ts_mods_30 <- extract(sphere_30, "model")$calibration
 # 40 mm diameter sphere
 sphere_40 <- cal_generate(diameter = 40e-3)
 sphere_40 <- target_strength(object = sphere_40,
                              frequency = frequency,
                              model = "calibration")
-ts_mods_40 <- extract(sphere_40, "model")
+ts_mods_40 <- extract(sphere_40, "model")$calibration
 # Plot the three and compare
 plot(x = ts_mods_20$frequency*1e-3, 
      y = ts_mods_20$TS, 
@@ -231,31 +231,31 @@ legend("bottomright",
 
 ```{r fig.width = 8, fig.height = 4.5}
 # tungsten carbide
-ts_mods_WC <- extract(cal_sphere, "model")
+ts_mods_WC <- extract(cal_sphere, "model")$calibration
 # copper sphere
 sphere_copper <- cal_generate(material = "Cu")
 sphere_copper <- target_strength(object = sphere_copper,
                                  frequency = frequency,
                                  model = "calibration")
-ts_mods_Cu <- extract(sphere_copper, "model")
+ts_mods_Cu <- extract(sphere_copper, "model")$calibration
 # aluminum sphere
 sphere_aluminum <- cal_generate(material = "Al")
 sphere_aluminum <- target_strength(object = sphere_aluminum,
                                    frequency = frequency,
                                    model = "calibration")
-ts_mods_Al <- extract(sphere_aluminum, "model")
+ts_mods_Al <- extract(sphere_aluminum, "model")$calibration
 # brass sphere
 sphere_brass <- cal_generate(material = "brass")
 sphere_brass <- target_strength(object = sphere_brass,
                                 frequency = frequency,
                                 model = "calibration")
-ts_mods_brass <- extract(sphere_brass, "model")
+ts_mods_brass <- extract(sphere_brass, "model")$calibration
 # stainless steel sphere
 sphere_steel <- cal_generate(material = "steel")
 sphere_steel <- target_strength(object = sphere_steel,
                                 frequency = frequency,
                                 model = "calibration")
-ts_mods_steel<- extract(sphere_steel, "model")
+ts_mods_steel<- extract(sphere_steel, "model")$calibration
 # Plot each and compare
 par(ask = F,
     oma = c(1, 1, 1, 0),
