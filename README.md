@@ -310,5 +310,3 @@ crustacean <- target_strength( crustacean ,
 ### Plot results
 plot( crustacean , type = 'model' )
 ```
-
-<img src="README_figs/README-crustacean-2.png" width="672" />
