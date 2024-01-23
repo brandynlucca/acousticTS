@@ -2,21 +2,24 @@
 % Please edit documentation in R/acoustics.R
 \name{linear}
 \alias{linear}
-\alias{dB}
-\title{Convert backscatter values from log- to linear-domain}
+\alias{db}
+\title{Convert backscatter values from log- to linear-domain.}
 \usage{
 linear(value, coefficient = 10)
 
-dB(value, coefficient = 10)
+db(value, coefficient = 10)
 }
 \arguments{
 \item{value}{Logarithmic (e.g. TS) or linear (\eqn{\sigma_bs}) value}
 
-\item{coefficient}{Optional. Numeric coefficient preceding the logarithm. Default is 10.}
+\item{coefficient}{Optional. Numeric coefficient preceding the logarithm.
+Default is 10.}
 }
 \value{
-Calculates the acoustic wavenumber based on the sound speed of water
+Transforms the backscattering response into either the log (\code{db}) or
+linear (\code{linear}) domains.
 }
 \description{
-Convert backscatter values from log- to linear-domain
+The \code{linear(...)} function converts a given value into the linear domain, while
+the \code{db(...)} function converts inputs into the log domain.
 }

@@ -53,10 +53,10 @@ mss_anderson_initialize <- function(object ,
     acoustics = base::data.frame(
       frequency = frequency ,
       # Wavenumber (medium) ====================================================
-      k_sw = acousticTS::kcalc( frequency ,
+      k_sw = acousticTS::k( frequency ,
                                 sound_speed_sw ) ,
       # Wavenumber (fluid) =====================================================
-      k_f = acousticTS::kcalc( frequency ,
+      k_f = acousticTS::k( frequency ,
                                body$h * sound_speed_sw ) ) ,
     ncyl_b = shape$n_segments )
   # Define ka limit ============================================================
@@ -112,13 +112,13 @@ calibration_initialize <- function( object ,
     acoustics = base::data.frame(
       frequency = frequency ,
       # Wavenumber (medium) ====================================================
-      k_sw = acousticTS::kcalc( frequency ,
+      k_sw = acousticTS::k( frequency ,
                                 sound_speed_sw ) ,
       # Wavenumber (longitudinal axis) =========================================
-      k_l = acousticTS::kcalc( frequency ,
+      k_l = acousticTS::k( frequency ,
                                body$sound_speed_longitudinal ) ,
       # Wavenumber (tranversal axis) ===========================================
-      k_t = acousticTS::kcalc( frequency ,
+      k_t = acousticTS::k( frequency ,
                                body$sound_speed_transversal ) ) ,
     parameters = base::data.frame(
       ncyl_b = shape$n_segments )
@@ -232,8 +232,8 @@ dcm_initialize <- function(object,
   model_params <- list(
     acoustics = data.frame(
       frequency = frequency ,
-      k_sw = kcalc( frequency , sound_speed_sw ) ,
-      k_b = kcalc( frequency , sound_speed_sw * h ) ) ,
+      k_sw = k( frequency , sound_speed_sw ) ,
+      k_b = k( frequency , sound_speed_sw * h ) ) ,
     n_s = shape$n_segments )
   # Tidy up model parameters to insert into object =============================
   slot( object ,
@@ -273,11 +273,11 @@ dwba_initialize <- function( object ,
     acoustics = base::data.frame(
       frequency = frequency ,
       # Wavenumber (medium) ====================================================
-      k_sw = acousticTS::kcalc( frequency ,
-                                sound_speed_sw ) ,
+      k_sw = acousticTS::k( frequency ,
+                            sound_speed_sw ) ,
       # Wavenumber (fluid) =====================================================
-      k_f = acousticTS::kcalc( frequency ,
-                               body$h * sound_speed_sw ) ) ,
+      k_f = acousticTS::k( frequency ,
+                           body$h * sound_speed_sw ) ) ,
     ncyl_b = shape$n_segments )
   # Define body parameters recipe ==============================================
   body_params <- base::data.frame(
@@ -331,11 +331,11 @@ dwba_curved_initialize <- function( object ,
     acoustics = base::data.frame(
       frequency = frequency ,
       # Wavenumber (medium) ====================================================
-      k_sw = acousticTS::kcalc( frequency ,
-                                sound_speed_sw ) ,
+      k_sw = acousticTS::k( frequency ,
+                            sound_speed_sw ) ,
       # Wavenumber (fluid) =====================================================
-      k_f = acousticTS::kcalc( frequency ,
-                               body$h * sound_speed_sw ) ) ,
+      k_f = acousticTS::k( frequency ,
+                           body$h * sound_speed_sw ) ) ,
     ncyl_b = shape$n_segments )
   # Define body parameters recipe ==============================================
   body_params <- list(
@@ -394,10 +394,10 @@ sdwba_initialize <- function( object ,
     acoustics = base::data.frame(
       frequency = frequency ,
       # Wavenumber (medium) ====================================================
-      k_sw = acousticTS::kcalc( frequency ,
+      k_sw = acousticTS::k( frequency ,
                                 sound_speed_sw ) ,
       # Wavenumber (fluid) =====================================================
-      k_f = acousticTS::kcalc( frequency ,
+      k_f = acousticTS::k( frequency ,
                                body$h * sound_speed_sw ) ) ,
     n_segments = shape$n_segments 
   )
@@ -495,10 +495,10 @@ sdwba_curved_initialize <- function( object ,
     acoustics = base::data.frame(
       frequency = frequency ,
       # Wavenumber (medium) ====================================================
-      k_sw = acousticTS::kcalc( frequency ,
+      k_sw = acousticTS::k( frequency ,
                                 sound_speed_sw ) ,
       # Wavenumber (fluid) =====================================================
-      k_f = acousticTS::kcalc( frequency ,
+      k_f = acousticTS::k( frequency ,
                                body$h * sound_speed_sw ) ) ,
     n_segments = shape$n_segments 
   )
@@ -596,7 +596,7 @@ krm_initialize <- function( object ,
       # Frequency (Hz) =========================================================
       frequency = frequency ,
       # Wavenumber (medium) ====================================================
-      k_sw = acousticTS::kcalc( frequency ,
+      k_sw = acousticTS::k( frequency ,
                                 sound_speed_sw )
     )
   )
@@ -608,7 +608,7 @@ krm_initialize <- function( object ,
                                      density = density_sw * body$g ,
                                      sound_speed = sound_speed_sw * body$h )
     # Body wave number =========================================================
-    model_params$acoustics$k_b <- acousticTS::kcalc( frequency ,
+    model_params$acoustics$k_b <- acousticTS::k( frequency ,
                                                      sound_speed_sw * body$h )
     # Define body segment count ================================================
     model_params$ns_b <- base::ncol( body$rpos )
@@ -630,7 +630,7 @@ krm_initialize <- function( object ,
                                         density = bladder$density ,
                                         sound_speed = bladder$sound_speed )
     # Body wave number =========================================================
-    model_params$acoustics$k_b <- acousticTS::kcalc( frequency ,
+    model_params$acoustics$k_b <- acousticTS::k( frequency ,
                                                      body$sound_speed )
     # Define body segment count ================================================
     model_params$ns_b <- shape$body$n_segments
@@ -657,38 +657,47 @@ krm_initialize <- function( object ,
 #' @param h_shell Optional shell sound speed contrast.
 #' @inheritParams krm_initialize
 #' @export
-stanton_high_pass_initialize <- function(object,
-                                         frequency,
-                                         radius_shell = NULL,
-                                         g_shell = NULL,
-                                         h_shell = NULL,
-                                         sound_speed_sw = 1500,
-                                         density_sw = 1026) {
+high_pass_stanton_initialize <- function( object ,
+                                          frequency ,
+                                          radius_shell ,
+                                          g_shell ,
+                                          h_shell ,
+                                          sound_speed_sw = 1500 ,
+                                          density_sw = 1026 ) {
   # Extract model body parameters ==============================================
-  shell <- extract(object, "shell")
+  shell <- extract( object , "shell" )
   # Define medium parameters ===================================================
-  medium_params <- data.frame(sound_speed = sound_speed_sw,
-                              density = density_sw)
+  medium_params <- data.frame( sound_speed = sound_speed_sw ,
+                               density = density_sw )
   # Define acoustic parameters =================================================
-  acoustics <- data.frame(frequency = frequency,
-                          k_sw = kcalc(frequency, sound_speed_sw))
+  acoustics <- data.frame( frequency = frequency,
+                           k_sw = k( frequency , sound_speed_sw ) )
   acoustics$k_b <- acoustics$k_sw * extract(object, "shell")$h
   # Fill in remaining model inputs required by DCM =============================
-  radius <- ifelse(!is.null(radius_shell), radius_shell, shell$radius)
+  radius <- ifelse( ! missing( radius_shell ) , 
+                    radius_shell , 
+                    shell$radius )
   # Density contrast, g ========================================================
-  g <- ifelse(!is.null(g_shell), g_shell, shell$g)
+  g <- ifelse( ! missing( g_shell ) ,
+               g_shell ,
+               shell$g )
   # Sound speed contrast, h ====================================================
-  h <- ifelse(!is.null(h_shell), h_shell, shell$h)
+  h <- ifelse( ! missing( h_shell ) ,
+               h_shell ,
+               shell$h )
   # Define model dataframe for body parameterization ===========================
-  shell_params <- data.frame(radius = radius,
-                             diameter = radius * 2,
-                             g = g,
-                             h = h)
+  shell_params <- data.frame( radius = radius ,
+                              diameter = radius * 2 ,
+                              g = g ,
+                              h = h )
   # Tidy up model parameters to insert into object =============================
-  model_params <- list(shell = shell_params,
-                       medium = medium_params,
-                       acoustics = acoustics)
+  model_params <- list( shell = shell_params ,
+                        medium = medium_params ,
+                        acoustics = acoustics )
   # Define object and model parameters =========================================
-  slot(object, "model_parameters")$stanton_high_pass <- model_params
-  return(object)
+  slot( object , "model_parameters" )$high_pass_stanton <- model_params
+  slot( object , "model" )$high_pass_stanton <- data.frame( frequency ,
+                                                            sigma_bs = rep( NA ,
+                                                                            length( frequency ) ) )
+  return( object )
 }

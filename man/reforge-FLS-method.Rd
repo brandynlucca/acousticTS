@@ -4,13 +4,7 @@
 \alias{reforge,FLS-method}
 \title{Reforge FLS-class object.}
 \usage{
-\S4method{reforge}{FLS}(
-  object,
-  length = NA,
-  radius = NA,
-  length_radius_ratio_constant = T,
-  n_segments = NA
-)
+\S4method{reforge}{FLS}(object, length, radius, length_radius_ratio_constant = T, n_segments)
 }
 \arguments{
 \item{object}{FLS-class object.}

@@ -2,9 +2,9 @@
 % Please edit documentation in R/math.R
 \name{vecnorm}
 \alias{vecnorm}
-\title{Vectorized Euclidean norm function}
+\title{Calculates the Euclidean norm across each row of a given matrix.}
 \usage{
-vecnorm(x)
+vecnorm( x )
 }
 \arguments{
 \item{x}{A matrix with numeric, real values.}
@@ -13,10 +13,9 @@ vecnorm(x)
 Calculates the Euclidean norm of a vector.
 }
 \description{
-Vectorized Euclidean norm function
+Calculates the Euclidean norm across each row of a given matrix.
 }
 \examples{
-values <- matrix(c(1,2,3), ncol=3)
-vecnorm(values)
-# 3.741657
+values <- matrix( c( 1 , 2 , 3 ) , ncol = 3 )
+vecnorm( values ) # should yield 3.741657
 }

@@ -1,5 +1,7 @@
 ################################################################################
-# Generic for "plot(...)" for each scattering class object
+################################################################################
+# GENERIC PLOT FUNCTION FOR BODY SHAPES AND MODELS
+################################################################################
 ################################################################################
 #' Method for what is printed for objects.
 #' @param x Scatterer-class object.
@@ -25,7 +27,7 @@ setMethod( f = "plot" ,
                                  aspect_ratio = "manual" ,
                                  x_units = "frequency",
                                  y_units = "TS" , ... ) {
-            # Detect scatterer type ============================
+            # Detect scatterer type ============================================
             sc_type <- class( x )
 
             switch( sc_type,
@@ -35,19 +37,17 @@ setMethod( f = "plot" ,
                     GAS = gas_plot( x , type , nudge_y , nudge_x , x_units , y_units , ... ) )
           } )
 ################################################################################
-# Methods for "plot(...)" for each scattering class object
-################################################################################
 #' Base plotting color palette
+#' @description 
+#' Color palette vector referenced for plotting multiple models simultaneously.
+#' @rdname model_palette
 #' @export
-plot_colors <- base::c( "black" ,
-                        "azure4" ,
-                        "royalblue4" ,
-                        "firebrick3" ,
-                        "steelblue3" ,
-                        "orangered3" ,
-                        "darkolivegreen" ,
-                        "sienna3" ,
-                        "cadetblue" )
+model_palette <- c( "black" , "azure4" , "royalblue4" , "firebrick3" , "steelblue3" ,
+                    "orangered3" , "darkolivegreen" , "sienna3" , "cadetblue" )
+################################################################################
+################################################################################
+# ELASTIC SHELLED SCATTERERS
+################################################################################
 ################################################################################
 #' Plotting for CAL-class objects
 #' @param object CAL-class object.
@@ -142,7 +142,9 @@ cal_plot <- function( object ,
   invisible()
 }
 ################################################################################
-# Methods for "plot(...)" for each scattering class object
+################################################################################
+# FLUID-LIKE SCATTERERS
+################################################################################
 ################################################################################
 #' Plotting for FLS-class objects
 #' @param object FLS-class object.
@@ -238,7 +240,7 @@ fls_plot <- function( object,
     x_mat <- base::split( x_axis , models_df$model )
     y_axis <- models_df[ , base::which( base::colnames( models_df ) == y_units ) ]
     y_mat <- base::split( y_axis , models_df$model )
-    col_axis <- plot_colors[ base::as.numeric( base::as.factor( models_df$model ) ) ]
+    col_axis <- model_palette[ base::as.numeric( base::as.factor( models_df$model ) ) ]
     x_lab <- switch( x_units ,
                      frequency = "Frequency (Hz)" ,
                      k_sw = expression(italic(k[sw]*a) ) )
@@ -270,19 +272,24 @@ fls_plot <- function( object,
           cex.axis = 1.3 )
     nm_names <- names( x_mat )
     invisible( mapply( lines , x_mat , y_mat ,
-                       col = plot_colors[ 1 : base::length( model_names ) ] ,
+                       col = model_palette[ 1 : base::length( model_names ) ] ,
                        lwd = 4 ) )
     legend( "bottomright" ,
             title = expression( bold("TS"~"model") ) ,
             title.adj = 0.05 ,
             legend = nm_names ,
             lty = rep( 1 , length( nm_names ) ) ,
-            col = plot_colors[ 1 : length( nm_names  ) ] ,
+            col = model_palette[ 1 : length( nm_names  ) ] ,
             cex = 1.05 ,
             lwd = 4 )
    }
   base::invisible( )
 }
+################################################################################
+################################################################################
+# GAS-BEARING SCATTERERS
+################################################################################
+################################################################################
 #' Plotting for GAS-class objects
 #' @param object GAS-class object.
 #' @param type Toggle between body shape ("shape") or modeling results ("model")
@@ -359,7 +366,7 @@ gas_plot <- function( object ,
     x_mat <- base::split( x_axis , models_df$model )
     y_axis <- models_df[ , base::which( base::colnames( models_df ) == y_units ) ]
     y_mat <- base::split( y_axis , models_df$model )
-    col_axis <- plot_colors[ base::as.numeric( base::as.factor( models_df$model ) ) ]
+    col_axis <- model_palette[ base::as.numeric( base::as.factor( models_df$model ) ) ]
     x_lab <- switch( x_units ,
                      frequency = "Frequency (Hz)" ,
                      k_sw = expression(italic(k[sw]*a) ) )
@@ -391,19 +398,20 @@ gas_plot <- function( object ,
           cex.axis = 1.3 )
     nm_names <- names( x_mat )
     invisible( mapply( lines , x_mat , y_mat ,
-                       col = plot_colors[ 1 : base::length( model_names ) ] ,
+                       col = model_palette[ 1 : base::length( model_names ) ] ,
                        lwd = 4 ) )
     legend( "bottomright" ,
             title = expression( bold("TS"~"model") ) ,
             title.adj = 0.05 ,
             legend = nm_names ,
             lty = rep( 1 , length( nm_names ) ) ,
-            col = plot_colors[ 1 : length( nm_names  ) ] ,
+            col = model_palette[ 1 : length( nm_names  ) ] ,
             cex = 1.05 ,
             lwd = 4 )
   }
   invisible( )
 }
+################################################################################
 #' Plotting for SBF-class objects
 #' @param object SBF-class object.
 #' @param type Toggle between body shape ("shape") or modeling results ("model")
@@ -416,34 +424,34 @@ gas_plot <- function( object ,
 #' @param y_units y-axis data selection (e.g. TS, sigma_bs -- defaults to TS)
 #' @export
 sbf_plot <- function(object,
-                     type = "shape",
-                     nudge_y = 1.05,
-                     nudge_x = 1.01,
-                     x_units = "frequency") {
+                     type = "shape" ,
+                     nudge_y = 1.05 ,
+                     nudge_x = 1.01 ,
+                     x_units = "frequency" ) {
   # Retrieve default plot window parameters ===================
   opar <- par(no.readonly = TRUE)
   on.exit(par(opar))
   if(type == "shape") {
     # Extract body shape information ============================
-    body <- extract(object, "body")$rpos
+    body <- extract( object , "body" )$rpos
     # Extract bladder information ===============================
-    bladder <- extract(object, "bladder")$rpos
+    bladder <- extract( object , "bladder" )$rpos
     # Set up plot limits for each shape component ===============
-    ylow_lim <- min(body[4, ]) * (1 - (1 - nudge_y))
-    yhi_lim <- max(body[3, ]) * nudge_y
-    xlow_lim <- min(body[1, ]) * (1 - (1 - nudge_x))
-    xhi_lim <- max(body[1, ]) * nudge_x
+    ylow_lim <- min( body[ 4 , ] ) * ( 1 - ( 1 - nudge_y ) )
+    yhi_lim <- max( body[ 3 , ] ) * nudge_y
+    xlow_lim <- min( body[ 1 , ] ) * ( 1 - ( 1 - nudge_x ) )
+    xhi_lim <- max( body[ 1 , ] ) * nudge_x
     # Plot dorsoventral view =====================================
     par(ask = F,
         mfrow = c(2, 1),
         mar = c(2, 4.5, 1, 2),
         oma = c(1.5, 0.5, 0.5, 0))
     # Dorsal =====================================================
-    plot(x = body[1, ],
-         y = body[3, ],
+    plot(x = body[ 1 , ] ,
+         y = body[ 3 , ] ,
          type = 'l',
-         ylim = c(ylow_lim, yhi_lim),
-         xlim = c(xlow_lim, xhi_lim),
+         ylim = c( ylow_lim , yhi_lim ) ,
+         xlim = c( xlow_lim , xhi_lim ) ,
          xlab = "",
          ylab = "Height (m)",
          lwd = 4,

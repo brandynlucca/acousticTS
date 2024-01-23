@@ -4,7 +4,7 @@
 \alias{target_strength}
 \title{Wrapper function to model acoustic target strength}
 \usage{
-target_strength(object, frequency, model, ...)
+target_strength(object, frequency, model, verbose = F, ...)
 }
 \arguments{
 \item{object}{Scatterer-class object.}
@@ -12,6 +12,9 @@ target_strength(object, frequency, model, ...)
 \item{frequency}{Frequency (Hz).}
 
 \item{model}{Model name.}
+
+\item{verbose}{Prints current procedural step occurring from model initialization
+to calculating TS. Defaults to F.}
 
 \item{...}{Additional optional model inputs/parameters.}
 }

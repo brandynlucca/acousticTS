@@ -1,7 +1,10 @@
+################################################################################
+################################################################################
+# OVERALL SCATTERING OBJECTS
+################################################################################
+################################################################################
 #' Scattering-class objects.
-#'
 #' @description
-#'
 #' The \eqn{acousticTS} package uses a variety of defined S4-class objects
 #' comprising different types of scatterers, such as fish with gas-filled
 #' swimbladders (\link[acousticTS]{SBF}) and fluid-like crustaceans
@@ -74,98 +77,21 @@ setClass("scatterer",
            model_parameters = "list"
          )
 )
-#' Swimbladdered fish (SBF) object/class.
-#'
+################################################################################
+################################################################################
+# GAS/FLUID-FILLED SCATTERERS
+################################################################################
+################################################################################
+#' Generic gas-filled scatterer (GAS) object/class.
 #' @description
-#' A S4 class that provides slots to contain relevant animal metadata for
-#' parameterizing models for swimbladdered fish/scatterers (SBF)
-#' partitioend into two sets of discretized cylinders: the body and
-#' swimbladder. Both shapes comprise a position matrix, material properties
-#' (sound speed, c, and density, rho), orientation (theta), the overall body
-#' length of the animal, and the number of cylinders. This class is
-#' used within the KRM and GBZ model functions.
-#' @export
-SBF <- setClass("SBF",
-                slots=c(metadata="list",
-                        model_parameters="list",
-                        model="list",
-                        body="list",
-                        bladder="list",
-                        shape_parameters="list"),
-                contains="scatterer")
-
-#' Fluid-like scatterer (FLS) object/class.
-#'
-#' @description
-#' A S4 class that provides slots to contain relevant animal metadata for
-#' parameterizing models for fluid-like scatterers (FLS) partitioned into
-#' discretized cylinders. This, specifically, includes a position matrix,
-#' radius, material properties (g, h), orientation, animal shape, and body
-#' curvature. This class is used within the DWBA and DFCM model functions. In
-#' the future, this will also allow for converting one class of scatterer into
-#' another for seemless usage for model comparisons.
-#' @rdname FLS
-#' @export
-FLS <- setClass("FLS",
-                slots = base::c(
-                  metadata = "list" ,
-                  model_parameters = "list" ,
-                  model = "list" ,
-                  body = "list" ,
-                  shape_parameters = "list"
-                ) ,
-                contains = "scatterer"
-)
-#' Solid and calibration sphere (CAL) object/class.
-#'
-#' @description
-#' A S4 class that provides slots to contain relevant metadata for solid sphere
-#' objects belonging to the CAL-class scatterers.
-#' @param material Material-type for the soldi sphere. See 'Details' built-in
-#' material options.
-#' @param a Spherical radius (m).
-#' @param c1 Longitudinal sound speed (m/s).
-#' @param c2 Transversal sound speed (m/s).
-#' @param rho1 Density (kg/m^3)
-#'
-#' @details
-#' There are several options for the \strong{material} argument:
-#' \tabular{rlllll}{
-#'  \strong{Material} \tab \strong{Argumment} \tab \strong{c1} \tab \strong{c2}
-#'  \tab \strong{\eqn{\rho1}}\cr
-#'  \emph{Tungsten carbide} \tab "WC" \tab 6853 \tab 4171 \tab 8360\cr
-#'  \emph{Stainless steel} \tab "steel" \tab 5980 \tab 3297 \tab 7970\cr
-#'  \emph{Brass} \tab "brass" \tab 4372 \tab 2100 \tab 8360\cr
-#'  \emph{Copper} \tab "Cu" \tab 4760 \tab 2288.5 \tab 8947\cr
-#'  \emph{Aluminum} \tab "Al" \tab 6260 \tab 3080 \tab 2700\cr
-#' }
-#'
-#' @export
-CAL <- setClass("CAL",
-                slots = c(metadata = "list",
-                          model_parameters = "list",
-                          model = "list",
-                          body = "list",
-                          shape_parameters = "list"),
-                contains = "scatterer")
-
-#' Elastic shelled scatterer (ESS) object/class.
-#'
-#' @description
-#' A S4 class that provides slots to contain relevant metadata for elastic
-#' shelled scatterers/objects belonging to the ESS-class scatterers.
-#'
-#' @export
-ESS <- setClass("ESS",
-                slots=c(metadata = "list",
-                        model_parameters = "list",
-                        model = "list",
-                        shell = "list",
-                        body = "list",
-                        shape_parameters = "list"),
-                contains = "scatterer")
-
-#' GAS scatterer.
+#' A S4 class that provides slots to contain relevant metadata for gas-bearing 
+#' scatterers belonging to the GAS-class. This object can include simple gas-filled
+#' bubbles to other scatterers with gas occlusions, swimbladders, and other internal
+#' features, if applicable. The default behavior for this type of object is to 
+#' only reference the gaseous/fluid feature with excpetions that are model-dependent.
+#' See \link[acousticTS]{scatterer} for a more detailed description on how this 
+#' S4 object is organized.
+#' @rdname GAS
 #' @export
 GAS <- setClass("GAS",
                 slots = c( metadata = "list",
@@ -174,3 +100,84 @@ GAS <- setClass("GAS",
                            body = "list",
                            shape_parameters = "list" ),
                 contains = "scatterer")
+################################################################################
+#' Swimbladdered fish (SBF) object/class.
+#' @description
+#' A S4 class that provides slots to contain relevant animal metadata for
+#' parameterizing models for swimbladdered fish (SBF) that are partitioned into
+#' two sets of discretized cylinders: the body and the swimbladder. Both shapes
+#' comprise independent position matrices, material properties, orientations, 
+#' and other relevant shape-related data and metadata.See \link[acousticTS]{scatterer} 
+#' for a more detailed description on how this S4 object is organized.
+#' @rdname SBF
+#' @export
+SBF <- setClass( "SBF" ,
+                 slots = c( metadata = "list" ,
+                            model_parameters = "list" ,
+                            model = "list" ,
+                            body = "list" ,
+                            bladder = "list" ,
+                            shape_parameters = "list" ),
+                 contains = "GAS" )
+################################################################################
+################################################################################
+# ELASTIC-SHELLED SCATTERERS
+################################################################################
+################################################################################
+#' Elastic shelled scatterer (ESS) object/class.
+#' @description
+#' A S4 class that provides slots to contain relevant metadata for elastic
+#' shelled scatterers/objects belonging to the ESS-class. This object can be 
+#' created using values for both an outer shell and internal tissues, if applicable. 
+#' The default behavior for this type of this object is to only reference the outer
+#' shell with few exceptions that are model-dependent. See 
+#' \link[acousticTS]{scatterer} for a more detailed description on how this S4 
+#' object is organized.
+#' @rdname ESS
+#' @export
+ESS <- setClass("ESS",
+                slots = c( metadata = "list" ,
+                           model_parameters = "list" ,
+                           model = "list" ,
+                           shell = "list" ,
+                           body = "list" ,
+                           shape_parameters = "list" ) ,
+                contains = "scatterer" )
+################################################################################
+#' Solid and calibration sphere (CAL) object/class.
+#' @description
+#' A S4 class that provides slots to contain relevant metadata for solid sphere
+#' objects belonging to the CAL-class scatterers. This object is created using
+#' parameters specific to the outer shell. The default behavior of this object is
+#' to only reference these outer elastic shell properties with few exceptions that
+#' are model-dependent. See \link[acousticTS]{scatterer} for a more detailed 
+#' description on how this S4 object is organized.
+#' @rdname CAL
+#' @export
+CAL <- setClass( "CAL" ,
+                 slots = c(metadata = "list" ,
+                           model_parameters = "list" ,
+                           model = "list" ,
+                           body = "list" ,
+                           shape_parameters = "list" ) ,
+                 contains = "ESS" )
+################################################################################
+################################################################################
+# FLUID-LIKE SCATTERERS
+################################################################################
+################################################################################
+#' Fluid-like scatterer (FLS) object/class.
+#' @description
+#' A S4 class that provides slots to contain relevant metadata for scatterers 
+#' similar to the surrounding fluid medium (i.e fluid-like) belonging to 
+#' FLS-class scatterers. See \link[acousticTS]{scatterer} for a more detailed 
+#' description on how this S4 object is organized.
+#' @rdname FLS
+#' @export
+FLS <- setClass("FLS",
+                slots = c( metadata = "list" ,
+                           model_parameters = "list" ,
+                           model = "list" ,
+                           body = "list" ,
+                           shape_parameters = "list" ) ,
+                contains = "scatterer" )

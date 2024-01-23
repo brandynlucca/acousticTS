@@ -15,13 +15,14 @@ setMethod( f = "show" ,
            signature = "scatterer" ,
            definition = function( object ) {
 # Detect scatterer type ========================================================
-             sc_type <- base::class( object )
+             sc_type <- class( object )
 # Toggle through scatterer types ===============================================
              switch( sc_type ,
                      FLS = fls_show( object ),
                      SBF = sbf_show( object ) ,
                      CAL = cal_show( object ) ,
-                     GAS = gas_show( object ) )
+                     GAS = gas_show( object ) ,
+                     ESS = ess_show( object ) )
            } )
 ################################################################################
 #' show(...) for FLS-class objects.
@@ -200,4 +201,40 @@ cal_show <- function( object ) {
        paste0( round( body$theta , 3 ) ,
                " " ,
                shape$theta_units ) )
+}
+#' show(...) for ESS-class objects.
+#' @param object ESS-class object.
+#' @export
+ess_show <- function( object ) {
+  # Parse metadata =============================================================
+  meta <- acousticTS::extract( object ,
+                               "metadata")
+  # Parse shape ================================================================
+  shape <- acousticTS::extract( object ,
+                                "shape_parameters" )
+  # Parse body =================================================================
+  shell <- acousticTS::extract( object ,
+                                "shell" )
+  # Print object summary information ===========================================
+  cat( paste0( is( object )[[ 1 ]] , "-object" ) , "\n" ,
+       "Calibration sphere" , "\n" ,
+       " ID:" ,
+       paste0( meta$ID ) , "\n" ,
+       "Material:" ,
+       paste0( meta$Material ) , "\n" ,
+       " Shell sound speed contrast (h):" ,
+       paste0( shell$h ) , "\n" ,
+       " Shell density contrast (g):" ,
+       paste0( shell$g ) , "\n" ,
+       "Diameter:" ,
+       paste0( shape$body$diameter ,
+               " " ,
+               shape$body$length_units ) , "\n" ,
+       " Radius:" ,
+       paste0( shape$body$radius ,
+               " " ,
+               shape$body$length_units ) , "\n" ,
+       "Propagation direction of the incident sound wave:" ,
+       paste0( round(shell$theta , 3 ) ,
+               " radians" ) )
 }

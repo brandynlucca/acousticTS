@@ -7,9 +7,13 @@
 Pn(n, x)
 }
 \arguments{
-\item{n}{Polynomial degree.}
+\item{n}{Degree of Legendre polynomial}
 
-\item{x}{Interval bounded by -1 and 1}
+\item{x}{Real value}
+}
+\value{
+Returns a matrix array calculated by computing the outer product that generates
+a series of values when evaluated over a vector.
 }
 \description{
 Legendre Polynomial function (Pn) of the first kind.

@@ -18,8 +18,8 @@ cal_generate(
 )
 }
 \arguments{
-\item{material}{Material-type for a solid sphere. See \code{Details} for available
-options. Default is tungsten carbide (WC).}
+\item{material}{Material-type for the soldi sphere. See 'Details' built-in
+material options.}
 
 \item{diameter}{Spherical diameter (m).}
 
@@ -38,10 +38,30 @@ options. Default is tungsten carbide (WC).}
 \item{theta_units}{Units for direction. Defaults to "radians".}
 
 \item{n_segments}{Number of segments to discretize object shape.}
+
+\item{a}{Spherical radius (m).}
+
+\item{c1}{Longitudinal sound speed (m/s).}
+
+\item{c2}{Transversal sound speed (m/s).}
+
+\item{rho1}{Density (kg/m^3)}
 }
 \value{
 Generates a CAL-class object.
 }
 \description{
 Generate a CAL-class object.
+}
+\details{
+There are several options for the \strong{material} argument:
+\tabular{rlllll}{
+\strong{Material} \tab \strong{Argument} \tab \strong{c1} \tab \strong{c2}
+\tab \strong{\eqn{\rho1}}\cr
+\emph{Tungsten carbide} \tab "WC" \tab 6853 \tab 4171 \tab 14900\cr
+\emph{Stainless steel} \tab "steel" \tab 5980 \tab 3297 \tab 7970\cr
+\emph{Brass} \tab "brass" \tab 4372 \tab 2100 \tab 8360\cr
+\emph{Copper} \tab "Cu" \tab 4760 \tab 2288.5 \tab 8947\cr
+\emph{Aluminum} \tab "Al" \tab 6260 \tab 3080 \tab 2700\cr
+}
 }

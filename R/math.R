@@ -13,9 +13,9 @@ along_sum <- function( rpos , iterations ) {
   return( output )
 }
 ################################################################################
-#' Complex integration
-#' @param integral Integral function used for numerical integration via adaptive
-#' quadrature
+#' Numerical integration via adaptive quadrature of complex values
+#' @param integral Input integration function that is indexed so that it can be
+#' used within `base::apply`.
 #' @param x Indexing argument for multi-row objects
 #' @param y Indexing argument for multi-column objects
 #' @rdname contour_integrate
@@ -28,8 +28,8 @@ contour_integrate <- function( integral , x , y ) {
 }
 ################################################################################
 #' Wrapper function incorporating phase deviation into contour integration
-#' @param integral Integral function used for numerical integration via adaptive
-#' quadrature
+#' @param integral Input integration function that is indexed so that it can be
+#' used within `base::apply`
 #' @param x Indexing argument for multi-row objects
 #' @param y Indexing argument for multi-column objects
 #' @param n_iterations Number of phase deviations to average and summarize
@@ -44,27 +44,39 @@ phase_integrate <- function( x , y , n_iterations , integral , phase_sd ) {
   contour_integrate( integral , x , y ) * phase
 }
 ################################################################################
-#' Convert between degrees and radians
-#' @param x A real value in degrees or radians
-#' for radians.
+#' Convert angular measurements from radians to degrees
+#' @param x A real value in radians
 #' @usage
-#' radians( x )
 #' degrees( x )
+#' @examples
+#' orientation <- pi / 2 # radians
+#' degrees( orientation ) # this should return a value equal to 90 degrees
 #' @return
-#' Converts degrees to radians or radians to degrees
+#' Angle in degrees
+#' @rdname degrees
 #' @export
-radians <- function( x ) x * pi / 180.0
-#' @rdname radians
 degrees <- function( x ) x * 180.0 / pi
 ################################################################################
-#' Vectorized Euclidean norm function
+#' Convert angular measurements from degrees to radians.
+#' @param x A real value in degrees
+#' @usage
+#' radians( x )
+#' @examples
+#' orientation <- 90 # degrees
+#' radians( orientation ) # this should return a value equal to pi / 2 radians#' 
+#' @return
+#' Angle in radians.
+#' @rdname radians
+#' @export
+radians <- function( x ) x * pi / 180.0
+################################################################################
+#' Calculates the Euclidean norm across each row of a given matrix.
 #' @param x A matrix with numeric, real values.
 #' @usage
-#' vecnorm(x)
+#' vecnorm( x )
 #' @examples
-#' values <- matrix(c(1,2,3), ncol=3)
-#' vecnorm(values)
-#' # 3.741657
+#' values <- matrix( c( 1 , 2 , 3 ) , ncol = 3 )
+#' vecnorm( values ) # should yield 3.741657
 #' @return
 #' Calculates the Euclidean norm of a vector.
 #' @rdname vecnorm

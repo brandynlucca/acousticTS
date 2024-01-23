@@ -4,13 +4,13 @@
 \alias{jc}
 \alias{jcd}
 \alias{jcdd}
-\title{Wrapper function for the Cylindrical Bessel function of the first kind (Jc)}
+\title{Cylindrical Bessel function of the first kind and its respective derivatives}
 \usage{
-jc( l , n )
+jc(l, n)
 
-jcd( l , n )
+jcd(l, n)
 
-jcdd( l , n )
+jcdd(l, n)
 }
 \arguments{
 \item{l}{An integer or fractional order}
@@ -18,16 +18,14 @@ jcdd( l , n )
 \item{n}{A complex or real argument}
 }
 \value{
-Calculates the Cylindrical Bessel function of the first kind (J_a).
+Calculates the cylindrical Bessel function of the first kind (J_v) and its
+respective derivatives.
 }
 \description{
-Wrapper function for the Cylindrical Bessel function of the first kind (Jc)
-
-First derivative of the Cylindrical Bessel function of the first kind (Jcd)
-
-Second derivative of the Cylindrical Bessel function of the first kind (Jcdd)
+Calculate the cylindrical Bessel function of the first kind (jc) and both its
+first (jcd) and second (jcdd) derivatives.
 }
 \references{
-Amost D.E., "AMOS, A Portable Package for Bessel Functions of a Complex
+Amos D.E., "AMOS, A Portable Package for Bessel Functions of a Complex
 Argument and Nonnegative Order", http://netlib.org/amos
 }
