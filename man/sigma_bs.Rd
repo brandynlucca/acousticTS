@@ -2,16 +2,19 @@
 % Please edit documentation in R/acoustics.R
 \name{sigma_bs}
 \alias{sigma_bs}
-\title{Calculates the linear backscattering coefficient (sigma_bs)}
+\title{Calculates the linear backscattering coefficient (sigma_bs) from the linear
+scattering length, f_bs.}
 \usage{
-sigma_bs( f_bs )
+sigma_bs(f_bs)
 }
 \arguments{
 \item{f_bs}{Linear scattering length (m), or related expression}
 }
 \value{
-Returns the linear backscattering coefficient that can be converted to TS
+Returns the linear backscattering coefficient that can be then converted into
+TS.
 }
 \description{
-Calculates the linear backscattering coefficient (sigma_bs)
+Calculates the linear backscattering coefficient (sigma_bs) from the linear
+scattering length, f_bs.
 }

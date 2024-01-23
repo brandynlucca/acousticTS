@@ -1,15 +1,19 @@
 ################################################################################
+################################################################################
 # FUNCTIONS FOR GENERATIGN CANONICAL & PRE-DEFINED SHAPES
 ################################################################################
 ################################################################################
-# Define shape-class object
-################################################################################
-setClass(
-  "shape" ,
-  slots = base::c(
-    position_matrix = "matrix" ,
-    shape_parameters = "list" )
-)
+#' Generic scattering shape object used throughout this package.
+#' @description
+#' A S4 class that provides slots to contain relevant shape data and metadata for 
+#' a variety of arbitrary and canonical shapes and geoemtries. See 
+#' \link[acousticTS]{scatterer} for a more detailed description on how this S4
+#' object interacts with generic \link[acousticTS]{scatterer} objects.
+#' @rdname shape
+#' @export
+setClass( "shape" ,
+          slots = c(position_matrix = "matrix" ,
+                    shape_parameters = "list" ) )
 ################################################################################
 # Arbitrary (or pre-generated) body shape parameters
 ################################################################################
@@ -26,21 +30,19 @@ arbitrary <- function( x_body ,
                        z_body ,
                        radius_body ,
                        length_units = "m" ) {
-  position_matrix <- base::cbind( x = x_body ,
-                                  y = y_body ,
-                                  z = z_body ,
-                                  zU = z_body + radius_body ,
-                                  zL = z_body - radius_body )
+  position_matrix <- cbind( x = x_body ,
+                            y = y_body ,
+                            z = z_body ,
+                            zU = z_body + radius_body ,
+                            zL = z_body - radius_body )
   # Generate shape parameters list =============================================
-  shape_parameters <- list(
-    radius = radius_body ,
-    n_segments = base::length( x_body ) - 1 ,
-    diameter_units = length_units )
+  shape_parameters <- list( radius = radius_body , 
+                            n_segments = length( x_body ) - 1 ,
+                            diameter_units = length_units )
   # Generate new shape object ==================================================
   return( new( "shape" ,
                position_matrix = position_matrix ,
                shape_parameters = shape_parameters ) )
-
 }
 ################################################################################
 # Sphere
@@ -54,19 +56,18 @@ arbitrary <- function( x_body ,
 #' sphere(radius, n_segments, diameter_units )
 #' @return
 #' Creates position vector for a spherical object of a defined radius.
+#' @rdname sphere
 #' @export
 sphere <- function(  radius ,
                      n_segments = 1e2 ,
                      diameter_units = "m" ) {
   # Define semi-major or x-axis ================================================
   diameter <- radius * 2
-  semi_major <- base::seq(
-    from = 0 ,
-    to = diameter ,
-    length.out = n_segments + 1
-  )
+  semi_major <- seq( from = 0 ,
+                     to = diameter ,
+                     length.out = n_segments + 1 )
   # Along-semimajor radii ======================================================
-  along_radius <- sqrt( radius ^ 2 - ( semi_major - radius ) ^ 2 )
+  along_radius <- sqrt( radius * radius - ( semi_major - radius ) * ( semi_major - radius ) )
   # Generate position matrix ===================================================
   position_matrix <- cbind( x = semi_major ,
                             y1 = along_radius ,
@@ -99,6 +100,7 @@ sphere <- function(  radius ,
 #' @return
 #' Creates the position vector for a prolate spheroid object of defined
 #'    semi-major and -minor axes.
+#' @rdname prolate_spheroid
 #' @export
 prolate_spheroid <- function( length_body ,
                               radius_body ,
@@ -117,7 +119,8 @@ prolate_spheroid <- function( length_body ,
   # Define semi-major or x-axis ================================================
   x_axis <- seq( 0 , length_body , length.out = n_segments + 1 )
   # Generate prolate spheroid shape ============================================
-  radius_output <- max_radius * sqrt(1 - ( ( x_axis - length_body / 2 ) / ( length_body / 2 ) ) ^ 2 )
+  curved_x_axis <- ( ( x_axis - length_body / 2 ) / ( length_body / 2 ) ) 
+  radius_output <- max_radius * sqrt( 1 - curved_x_axis * curved_x_axis )
   # Generate position matrix ===================================================
   position_matrix <- cbind( x = x_axis , 
                             y = rep( 0 , length( x_axis ) ) ,
@@ -156,6 +159,7 @@ prolate_spheroid <- function( length_body ,
 #' taper, n_segments, length_units)
 #' @return
 #' Creates the position vector for a tapered or untapered cylinder.
+#' @rdname cylinder
 #' @export
 cylinder <-  function( length_body ,
                        radius_body ,
@@ -172,31 +176,31 @@ cylinder <-  function( length_body ,
     stop("Radius/width and/or length-to-radius ratio are missing.")
   }
   # Define normalized x-axis ===================================================
-  x_n_axis <- base::seq( -1 , 1 , length.out = n_segments + 1 )
+  x_n_axis <- seq( -1 , 1 , length.out = n_segments + 1 )
   # Define tapered radius vector, if applicable ================================
   if ( ! missing( taper ) ) {
-    tapering <- base::sqrt( 1 - x_n_axis ^ taper )
+    tapering <- sqrt( 1 - x_n_axis ^ taper )
   } else {
-    tapering <- base::rep( 1 , n_segments + 1 )
+    tapering <- rep( 1 , n_segments + 1 )
   }
   radius_tapered <- max_radius * tapering
   # Generate position matrix ===================================================
-  x_axis <- ( 1 - base::sqrt( 1 - x_n_axis ^ 2 ) )
-  position_matrix <- base::cbind( x = x_n_axis * length_body / 2 + length_body / 2 ,
-                                  y = base::rep( 0 , base::length( x_n_axis ) ) ,
-                                  z = base::rep( 0 , base::length( x_n_axis ) ) ,
-                                  zU = radius_tapered ,
-                                  zL = - base::rev( radius_tapered ) )
+  x_axis <- ( 1 - sqrt( 1 - x_n_axis * x_n_axis ) )
+  position_matrix <- cbind( x = x_n_axis * length_body / 2 + length_body / 2 ,
+                            y = rep( 0 , length( x_n_axis ) ) ,
+                            z = rep( 0 , length( x_n_axis ) ) ,
+                            zU = radius_tapered ,
+                            zL = - rev( radius_tapered ) )
   # Generate shape parameters list =============================================
-  shape_parameters <- base::list(
-    length = base::max( position_matrix[ , 1 ] ) ,
+  shape_parameters <- list(
+    length = max( position_matrix[ , 1 ] ) ,
     radius = radius_tapered ,
-    length_radius_ratio = base::max( position_matrix[ , 1 ] ) /
-      base::max( radius_tapered ) ,
+    length_radius_ratio = max( position_matrix[ , 1 ] ) /
+      max( radius_tapered ) ,
     n_segments = n_segments ,
-    taper_order = base::ifelse( missing( taper ) ,
-                                NA ,
-                                taper ) ,
+    taper_order = ifelse( missing( taper ) ,
+                          NA ,
+                          taper ) ,
     length_units = length_units
   )
   # Generate new shape object ==================================================
@@ -229,6 +233,7 @@ cylinder <-  function( length_body ,
 #' Smith, J.N., Ressler, P.H., and Warren, J.D. 2013. A distorted wave Born
 #' approximation target strength model for Bering Sea euphausiids. ICES Journal
 #' of Marine Science, 70(1): 204-214. https://doi.org/10.1093/icesjms/fss140
+#' @rdname polynomial_cylinder
 #' @export
 polynomial_cylinder <- function(length,
                                 radius,
@@ -306,6 +311,7 @@ polynomial_cylinder <- function(length,
 #' Smith, J.N., Ressler, P.H., and Warren, J.D. 2013. A distorted wave Born
 #' approximation target strength model for Bering Sea euphausiids. ICES Journal
 #' of Marine Science, 70(1): 204-214. https://doi.org/10.1093/icesjms/fss140
+#' @rdname create_shape
 #' @export
 create_shape <- function( shape , ... ) {
   # Pull argument input names ==================================================

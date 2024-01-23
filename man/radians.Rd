@@ -2,21 +2,20 @@
 % Please edit documentation in R/math.R
 \name{radians}
 \alias{radians}
-\alias{degrees}
-\title{Convert between degrees and radians}
+\title{Convert angular measurements from degrees to radians.}
 \usage{
 radians( x )
-degrees( x )
-
-degrees(x)
 }
 \arguments{
-\item{x}{A real value in degrees or radians
-for radians.}
+\item{x}{A real value in degrees}
 }
 \value{
-Converts degrees to radians or radians to degrees
+Angle in radians.
 }
 \description{
-Convert between degrees and radians
+Convert angular measurements from degrees to radians.
+}
+\examples{
+orientation <- 90 # degrees
+radians( orientation ) # this should return a value equal to pi / 2 radians#' 
 }

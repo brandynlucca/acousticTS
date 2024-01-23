@@ -1,6 +1,21 @@
 ################################################################################
 ################################################################################
-# Utility functions for data wrangling and organization
+# UTILITY FUNCTIONS FOR VARIOUS DATA WRANGLING AND MANIPULATION OPERATIONS
+################################################################################
+################################################################################
+# Accessor functions
+################################################################################
+################################################################################
+#' Primary accessor function for dredging specific data from scatterer objects
+#' @param object Scatterer-class object.
+#' @param feature Feature of interest (e.g. body).
+#' @export
+extract <- function( object , feature ) {
+  return( slot( object , feature ) )
+}
+################################################################################
+################################################################################
+# Uniformly bend body shape
 ################################################################################
 ################################################################################
 #' Support function for bending scatterer body shape and position matrix
@@ -150,14 +165,6 @@ body_rotation <- function( sum_rpos , rpos , theta , k_length ) {
   vbL <- ( ventral_sum * base::cos( theta ) + ventral_sum * base::sin( theta ) ) / 2
   delta_u <- base::diff( rpos[ 1 , ] ) * base::sin( theta )
   return( base::list( vbU = vbU , vbL = vbL , delta_u = delta_u ) )
-}
-################################################################################
-#' Primary accessor function for dredging specific data from scatterer objects
-#' @param object Scatterer-class object.
-#' @param feature Feature of interest (e.g. body).
-#' @export
-extract <- function( object , feature ) {
-  return( slot( object , feature ) )
 }
 ################################################################################
 #' Format data for the modal series solution model into the appropriate matrix

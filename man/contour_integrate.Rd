@@ -2,18 +2,18 @@
 % Please edit documentation in R/math.R
 \name{contour_integrate}
 \alias{contour_integrate}
-\title{Complex integration}
+\title{Numerical integration via adaptive quadrature of complex values}
 \usage{
 contour_integrate(integral, x, y)
 }
 \arguments{
-\item{integral}{Integral function used for numerical integration via adaptive
-quadrature}
+\item{integral}{Input integration function that is indexed so that it can be
+used within \code{base::apply}.}
 
 \item{x}{Indexing argument for multi-row objects}
 
 \item{y}{Indexing argument for multi-column objects}
 }
 \description{
-Complex integration
+Numerical integration via adaptive quadrature of complex values
 }

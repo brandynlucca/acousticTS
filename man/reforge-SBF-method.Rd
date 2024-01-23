@@ -4,7 +4,21 @@
 \alias{reforge,SBF-method}
 \title{Resizing function for swimbladdered targets}
 \usage{
-\S4method{reforge}{SBF}(object, full_size = 1, bladder_size = 1)
+\S4method{reforge}{SBF}(
+  object,
+  length_body = NA,
+  width_body = NA,
+  height_body = NA,
+  length_bladder = NA,
+  width_bladder = NA,
+  height_bladder = NA,
+  radius_body = NA,
+  bladder_inflation_factor = 1,
+  isometric_body = T,
+  isometric_bladder = T,
+  n_segments_body = NA,
+  n_segments_bladder = NA
+)
 }
 \arguments{
 \item{object}{SBF-class object.}

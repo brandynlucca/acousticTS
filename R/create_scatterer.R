@@ -111,6 +111,24 @@ sbf_generate <- function( x_body ,
 #' @param ID Optional metadata ID input.
 #' @param diameter_units Units for diameter. Defaults to "m".
 #' @param theta_units Units for direction. Defaults to "radians".
+#' @param material Material-type for the soldi sphere. See 'Details' built-in
+#' material options.
+#' @param a Spherical radius (m).
+#' @param c1 Longitudinal sound speed (m/s).
+#' @param c2 Transversal sound speed (m/s).
+#' @param rho1 Density (kg/m^3)
+#'
+#' @details
+#' There are several options for the \strong{material} argument:
+#' \tabular{rlllll}{
+#'  \strong{Material} \tab \strong{Argument} \tab \strong{c1} \tab \strong{c2}
+#'  \tab \strong{\eqn{\rho1}}\cr
+#'  \emph{Tungsten carbide} \tab "WC" \tab 6853 \tab 4171 \tab 14900\cr
+#'  \emph{Stainless steel} \tab "steel" \tab 5980 \tab 3297 \tab 7970\cr
+#'  \emph{Brass} \tab "brass" \tab 4372 \tab 2100 \tab 8360\cr
+#'  \emph{Copper} \tab "Cu" \tab 4760 \tab 2288.5 \tab 8947\cr
+#'  \emph{Aluminum} \tab "Al" \tab 6260 \tab 3080 \tab 2700\cr
+#' }
 #' @return
 #' Generates a CAL-class object.
 #' @export
@@ -387,19 +405,20 @@ gas_generate <- function( shape = "sphere" ,
 #' @param h_shell Sound speed contrast for the shell.
 #' @param theta_shell Object orientation relative to incident sound wave.
 #' @export
-ess_generate <- function(x_body = NULL,
-                         y_body = NULL,
-                         z_body = NULL,
-                         radius_shell,
-                         shell_thickness = NULL,
-                         g_fluid = NULL,
-                         h_fluid = NULL,
-                         g_shell,
-                         h_shell,
-                         theta_shell = pi / 2,
-                         ID = NULL,
-                         theta_units = "radians",
-                         length_units = "m") {
+ess_generate <- function( shape = "sphere" ,
+                          x_body = NULL ,
+                          y_body = NULL ,
+                          z_body = NULL ,
+                          radius_shell ,
+                          shell_thickness = NULL ,
+                          g_fluid = NULL ,
+                          h_fluid = NULL ,
+                          g_shell ,
+                          h_shell ,
+                          theta_shell = pi / 2 ,
+                          ID = NULL ,
+                          theta_units = "radians" ,
+                          length_units = "m" ) {
   # Create metadata field ======================================================
   metadata <- list(ID = ifelse(!is.null(ID), ID, "UID"))
   # Create shell shape field ===================================================

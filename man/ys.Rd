@@ -3,11 +3,11 @@
 \name{ys}
 \alias{ys}
 \alias{ysd}
-\title{Calculate spherical Bessel function of the second kind (ya)}
+\title{Spherical Bessel function of the second kind and its respective derivative}
 \usage{
-ys( l , n )
+ys(l, n)
 
-ysd( l , n )
+ysd(l, n)
 }
 \arguments{
 \item{l}{An integer or fractional order}
@@ -15,12 +15,13 @@ ysd( l , n )
 \item{n}{A complex or real argument}
 }
 \value{
-ys( l , n ) calculates the spherical Bessel function of the second kind (zbesy
-AMOS routine, y_v)
+Calculates the spherical Bessel function of the first kind (js) and its
+first (ysd) derivative.
 }
 \description{
-This function calculates the spherical Bessel functions of the second kind.
-Referenced from Amost D.E.,
-"AMOS, A Portable Package for Bessel Functions of a Complex Argument and
-Nonnegative Order", http://netlib.org/amos
+Spherical Bessel function of the second kind and its respective derivative
+}
+\references{
+Amos D.E., "AMOS, A Portable Package for Bessel Functions of a Complex
+Argument and Nonnegative Order", http://netlib.org/amos
 }

@@ -6,11 +6,8 @@
 \alias{FLS}
 \title{Fluid-like scatterer (FLS) object/class.}
 \description{
-A S4 class that provides slots to contain relevant animal metadata for
-parameterizing models for fluid-like scatterers (FLS) partitioned into
-discretized cylinders. This, specifically, includes a position matrix,
-radius, material properties (g, h), orientation, animal shape, and body
-curvature. This class is used within the DWBA and DFCM model functions. In
-the future, this will also allow for converting one class of scatterer into
-another for seemless usage for model comparisons.
+A S4 class that provides slots to contain relevant metadata for scatterers
+similar to the surrounding fluid medium (i.e fluid-like) belonging to
+FLS-class scatterers. See \link[acousticTS]{scatterer} for a more detailed
+description on how this S4 object is organized.
 }

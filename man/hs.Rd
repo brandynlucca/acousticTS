@@ -3,19 +3,25 @@
 \name{hs}
 \alias{hs}
 \alias{hsd}
-\title{Spherical Bessel function of the third kind (ha)}
+\title{Spherical Bessel function of the third kind and its respective derivative}
 \usage{
-hs( l , n )
+hs(l, n)
 
-hsd( l , n )
+hsd(l, n)
 }
 \arguments{
 \item{l}{An integer or fractional order}
 
 \item{n}{A complex or real argument}
 }
+\value{
+Calculates the spherical Bessel function of the third kind (hs) and its
+first (hsd) derivative.
+}
 \description{
-Spherical Bessel function of the third kind (ha)
-
-First derivative of the spherical Bessel function of the third kind (had)
+Spherical Bessel function of the third kind and its respective derivative
+}
+\references{
+Amos D.E., "AMOS, A Portable Package for Bessel Functions of a Complex
+Argument and Nonnegative Order", http://netlib.org/amos
 }

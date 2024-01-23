@@ -3,11 +3,11 @@
 \name{yc}
 \alias{yc}
 \alias{ycd}
-\title{Wrapper function for the Cylindrical Bessel (Neumann) function of the second kind (Yc)}
+\title{Cylindrical Bessel (Neumann) function of the second kind and its derivative}
 \usage{
-yc( l , n )
+yc(l, n)
 
-ycd( l , n )
+ycd(l, n)
 }
 \arguments{
 \item{l}{An integer or fractional order}
@@ -15,13 +15,14 @@ ycd( l , n )
 \item{n}{A complex or real argument}
 }
 \value{
-Calculates the Bessel function of the second kind (Y_v). Functions are
-referenced from Amost D.E., "AMOS, A Portable Package
-for Bessel Functions of a Complex Argument and Nonnegative Order",
-http://netlib.org/amos
+Calculates the cylindrical Bessel function of the first kind (Y_v) and its
+respective derivatives.
 }
 \description{
-Wrapper function for the Cylindrical Bessel (Neumann) function of the second kind (Yc)
-
-First derivative of Cylindrical Bessel function of the second kind (Ycd)
+Calculate the cylindrical Bessel function of the first kind (yc) and its
+first (ycd) derivatives.
+}
+\references{
+Amos D.E., "AMOS, A Portable Package for Bessel Functions of a Complex
+Argument and Nonnegative Order", http://netlib.org/amos
 }
