@@ -5,6 +5,7 @@
 \title{Generate ESS shape}
 \usage{
 ess_generate(
+  shape = "sphere",
   x_body = NULL,
   y_body = NULL,
   z_body = NULL,
@@ -21,6 +22,9 @@ ess_generate(
 )
 }
 \arguments{
+\item{shape}{Optional input argument that dictates shape-type, if desired, for
+generalized shapes.}
+
 \item{x_body}{Vector containing x-axis body (m) shape data.}
 
 \item{y_body}{Vector containing y-axis body (m) shape data.}
