@@ -1,0 +1,13 @@
+title: acousticTS
+description: Compute the acoustic target strengths of different scatterers
+url: https://brandynlucca.github.io/acousticTS/
+template:
+  bootstrap: 5
+navbar:
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "Reference"
+      href: reference/index.html
+    - text: "Articles"
+      href: articles/index.html
