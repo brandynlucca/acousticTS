@@ -125,7 +125,7 @@ print( sardine )
 plot( sardine )
 ```
 
-<img src="README_figs/README-sardine-1.png" width="672" />
+<img src="man/figures/README-sardine-1.png" width="672" />
 
 ``` r
 ### We will now define a frequency range to predict TS over
@@ -139,7 +139,7 @@ sardine <- target_strength( sardine,
 plot( sardine, type = 'model' )
 ```
 
-<img src="README_figs/README-sardine-2.png" width="672" />
+<img src="man/figures/README-sardine-2.png" width="672" />
 
 ``` r
 ### Extract model results
@@ -163,7 +163,7 @@ cal_sphere <- target_strength( object = cal_sphere,
 plot( cal_sphere , type = 'model' )
 ```
 
-<img src="README_figs/README-calibration-1.png" width="672" />
+<img src="man/figures/README-calibration-1.png" width="672" />
 
 ``` r
 ### Extract model results
@@ -197,7 +197,7 @@ bubble <- target_strength( bubble,
 plot( bubble , type = 'model' )
 ```
 
-<img src="README_figs/README-bubble-1.png" width="672" />
+<img src="man/figures/README-bubble-1.png" width="672" />
 
 ### Fluid-like crustacean (prolate spheroid) using the distorted Born wave approximation (DWBA) and ray-based deformed cylinder model (DCM)
 
@@ -229,7 +229,7 @@ print( crustacean )
 plot( crustacean )
 ```
 
-<img src="README_figs/README-crustacean-1.png" width="672" />
+<img src="man/figures/README-crustacean-1.png" width="672" />
 
 ``` r
 ### Model TS using the ray-path deformed cylinder model (DCM), distorted wave

@@ -6,6 +6,10 @@
 #' Along-matrix summing function
 #' @param rpos Position vector
 #' @param iterations Number of iterations
+#' @examples
+#' \dontrun{
+#' along_sum(matrix(c(1, 2, 3), c(1, 2, 3)), 2)
+#' }
 #' @rdname along_sum
 #' @export
 along_sum <- function( rpos , iterations ) {
