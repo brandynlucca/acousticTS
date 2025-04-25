@@ -69,8 +69,9 @@
 #'    \item{\code{Swimbladdered fish (SBF)}}{\link[acousticTS]{SBF}}
 #'    \item{\code{Elastic shell scatterers (ESS)}}{\link[acousticTS]{ESS}}
 #' }
+#' @name scatterer
 #' @rdname scatterer
-#' @export
+#' @exportClass scatterer
 setClass("scatterer",
          slots = c(
            metadata = "list" ,
