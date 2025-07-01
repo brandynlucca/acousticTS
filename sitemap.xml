@@ -37,6 +37,7 @@
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/cylinder.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/dcm_initialize.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/degrees.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/discover_reforge_params.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/dwba_curved_initialize.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/dwba_initialize.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/ess_generate.html</loc></url>
@@ -48,6 +49,7 @@
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/gas_generate.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/gas_plot.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/gas_show.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/get_TS.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/hc.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/high_pass_stanton.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/high_pass_stanton_initialize.html</loc></url>
@@ -63,6 +65,7 @@
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/linear.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/modal_matrix.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/model_palette.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/model_registry.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/mss_anderson_initialize.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/phase_integrate.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/plot.scatterer.html</loc></url>
@@ -79,13 +82,16 @@
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/sbf_generate.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/sbf_plot.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/sbf_show.html</loc></url>
-<url><loc>https://brandynlucca.github.io/acousticTS/reference/scatterer.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/scatterer-class.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/sdwba_curved_initialize.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/sdwba_initialize.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/sdwba_resample.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/segmentize.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/shape.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/shear.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/show-scatterer-method.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/sigma_bs.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/simulate_ts.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/sphere.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/target_strength.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/transmission_coefficient.html</loc></url>

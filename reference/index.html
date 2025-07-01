@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">acousticTS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -238,6 +238,12 @@
         <dd>Convert angular measurements from radians to degrees</dd>
       </dl><dl><dt>
 
+          <code><a href="discover_reforge_params.html">discover_reforge_params()</a></code>
+
+        </dt>
+        <dd>Get reforge parameters from known method signatures</dd>
+      </dl><dl><dt>
+
           <code><a href="dwba_curved_initialize.html">dwba_curved_initialize()</a></code>
 
         </dt>
@@ -388,6 +394,12 @@
         <dd>Base plotting color palette</dd>
       </dl><dl><dt>
 
+          <code><a href="model_registry.html">model_registry</a></code>
+
+        </dt>
+        <dd>Model registry: maps model names to their functions</dd>
+      </dl><dl><dt>
+
           <code><a href="mss_anderson_initialize.html">mss_anderson_initialize()</a></code>
 
         </dt>
@@ -451,7 +463,7 @@
           <code><a href="reforge.html">reforge()</a></code>
 
         </dt>
-        <dd>Resizing function for targets.</dd>
+        <dd>Resize or reparameterize a scatterer object</dd>
       </dl><dl><dt>
 
           <code><a href="rho.html">rho()</a></code>
@@ -484,10 +496,10 @@
         <dd>show(...) for SBF-class objects.</dd>
       </dl><dl><dt>
 
-          <code><a href="scatterer.html">scatterer</a></code>
+          <code><a href="scatterer-class.html">scatterer-class</a></code>
 
         </dt>
-        <dd>Scattering-class objects.</dd>
+        <dd>scatterer-class</dd>
       </dl><dl><dt>
 
           <code><a href="sdwba_curved_initialize.html">sdwba_curved_initialize()</a></code>
@@ -500,6 +512,18 @@
 
         </dt>
         <dd>Initialize FLS-class object for SDWBA modeling</dd>
+      </dl><dl><dt>
+
+          <code><a href="sdwba_resample.html">sdwba_resample()</a></code>
+
+        </dt>
+        <dd>Resample shape for SDWBA model with piecewise constant radius</dd>
+      </dl><dl><dt>
+
+          <code><a href="segmentize.html">segmentize()</a></code>
+
+        </dt>
+        <dd>Discretize vector into separate intervals of different length</dd>
       </dl><dl><dt>
 
           <code><a href="shape.html">shape-class</a></code>
@@ -524,6 +548,12 @@
 
         </dt>
         <dd>Calculates the linear backscattering coefficient (sigma_bs) from the linear scattering length, f_bs.</dd>
+      </dl><dl><dt>
+
+          <code><a href="simulate_ts.html">simulate_ts()</a></code>
+
+        </dt>
+        <dd>Simulate target strength (TS) with flexible parameterization and batching</dd>
       </dl><dl><dt>
 
           <code><a href="sphere.html">sphere()</a></code>
@@ -575,7 +605,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer></div>
