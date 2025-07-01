@@ -75,10 +75,10 @@ DWBA <- function( object ) {
   g <- body$g ; h <- body$h
   R <- 1 / ( g * h * h ) + 1 / g - 2
   # Calculate rotation matrix and update wavenumber matrix =====================
-  rotation_matrix <- matrix(  c( cos( theta ) ,
-                                 0.0 ,
-                                 sin( theta ) ) ,
-                              1 )
+  rotation_matrix <- matrix( c( cos( theta ) ,
+                                0.0 ,
+                                sin( theta ) ) ,
+                             1 )
   k_sw_rot <- model$parameters$acoustics$k_sw %*% rotation_matrix
   # Calculate Euclidean norms ==================================================
   k_sw_norm <- acousticTS::vecnorm( k_sw_rot )
@@ -159,7 +159,7 @@ DWBA_curved <- function( object ) {
   rotation_matrix <- matrix( c( cos( theta ) ,
                                 0.0 ,
                                 sin( theta ) ) ,
-                             1 )
+                              1 )
   k_sw_rot <- model$parameters$acoustics$k_sw %*% rotation_matrix
   # Calculate Euclidean norms ==================================================
   k_sw_norm <- acousticTS::vecnorm( k_sw_rot )
@@ -225,8 +225,8 @@ DWBA_curved <- function( object ) {
 #' @export
 SDWBA <- function( object ) {
   # Extract model parameters/inputs ============================================
-  model <- extract( object , "model_parameters" )$SDWBA
-  body <- extract( object , "body" )
+  model <- acousticTS::extract( object , "model_parameters" )$SDWBA
+  body <- acousticTS::extract( object , "body" )
   theta <- body$theta
   # Material properties calculation ============================================
   g <- body$g ; h <- body$h
@@ -261,16 +261,23 @@ SDWBA <- function( object ) {
     beta <- abs( alpha - pi / 2 )
     # Call in metrics ==========================================================
     phase_sd <- sub_params$meta_params$p0 
-    r0_diff_h <- r0_diff / h 
-    r0_h <- r0 / h
+    # r0_diff_h <- r0_diff / h
+    # r0_h <- r0 / h
     # Define integrand =========================================================
     integrand <- function( s , x , y ) {
-      rint_mat <- s * r0_diff_h[ , y ] + r0_h[ , y ]
-      rint_k1_h_mat <- k_sw_rot[ x , ] %*% rint_mat[ 1 : 3 ]
-      bessel <- jc( 1 , 2 * ( k_sw_norm[ x ] * rint_mat[ 4 ] *
+    # integrand <- function( s , x ) {
+      # rint_mat <- s * r0_diff_h[ , y ] + r0_h[ , y ]
+      rint_mat <- s * r0_diff[ , y ] + r0[ , y ]
+      # rint_k1_h_mat <- k_sw_rot[ x , ] %*% rint_mat[ 1 : 3 ]
+      rint_k1_h_mat <- k_sw_rot[ x , ] %*% rint_mat[ 1 : 3 ] / h
+      bessel <- jc( 1 , 2 * ( k_sw_norm[ x ] * rint_mat[ 4 ] / h *
                                 cos( beta[ x , y ] ) ) ) / cos( beta[ x , y ] )
-      fb_a <- k_sw_norm[ x ] / 4 * R * rint_mat[ 4 ] * h *
-        exp( 2i * rint_k1_h_mat ) * bessel * r0_diff_norm[ y ]
+      # bessel <- jc( 1 , 2 * ( k_sw_norm[ x ] * rint_mat[ 4 ] *
+      #                           cos( beta[ x , y ] ) ) ) / cos( beta[ x , y] )
+      # fb_a <- k_sw_norm[ x ] / 4 * R * rint_mat[ 4 ] * h *
+      #   exp( 2i * rint_k1_h_mat ) * bessel[y] * r0_diff_norm[ y ]
+      fb_a <- k_sw_norm[ x ] / 4 * R * rint_mat[ 4 ] * 
+        exp( 2i * rint_k1_h_mat ) * bessel * r0_diff_norm[ y ] 
       return( sum( fb_a , na.rm = T ) )
     } 
     # Vectorize integrand function =============================================
@@ -278,13 +285,13 @@ SDWBA <- function( object ) {
     stochastic_TS <- function( n_k , n_segments , n_iterations ) {
       sapply( 1 : n_k , 
               FUN = function( x ) {
-                cyl_phase <- sapply( 1 :  n_segments ,
-                                     FUN = function( y ) {
-                                       phase_integrate( x , y , 
-                                                        n_iterations , 
-                                                        integrand_vectorized ,
-                                                        phase_sd )
-                                     }
+                cyl_phase <- sapply( 1 : n_segments ,
+                  FUN = function( y ) {
+                    phase_integrate( x , y ,
+                                     n_iterations ,
+                                     integrand_vectorized ,
+                                     phase_sd )
+                    }
                 )
                 cyl_sum_phase <- rowSums( cyl_phase , na.rm = T )
                 cyl_sum_phase
@@ -756,3 +763,19 @@ high_pass_stanton <- function( object ) {
                                                               TS = 10 * log10( abs( f_bs ) ) )
       return( object )
 }
+################################################################################
+# Model registry/API
+################################################################################
+#' Model registry: maps model names to their functions
+#' @export
+model_registry <- list(
+  DCM = DCM,
+  DWBA = DWBA,
+  DWBA_curved = DWBA_curved,
+  SDWBA = SDWBA,
+  SDWBA_curved = SDWBA_curved,
+  calibration = calibration,
+  MSS_anderson = MSS_anderson,
+  KRM = KRM,
+  high_pass_stanton = high_pass_stanton
+)

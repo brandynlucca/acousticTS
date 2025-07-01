@@ -3,7 +3,8 @@
 # OVERALL SCATTERING OBJECTS
 ################################################################################
 ################################################################################
-#' Scattering-class objects.
+#' scatterer-class
+#'
 #' @description
 #' The \eqn{acousticTS} package uses a variety of defined S4-class objects
 #' comprising different types of scatterers, such as fish with gas-filled
@@ -69,9 +70,7 @@
 #'    \item{\code{Swimbladdered fish (SBF)}}{\link[acousticTS]{SBF}}
 #'    \item{\code{Elastic shell scatterers (ESS)}}{\link[acousticTS]{ESS}}
 #' }
-#' @name scatterer
-#' @rdname scatterer
-#' @exportClass scatterer
+#' @export
 setClass("scatterer",
          slots = c(
            metadata = "list" ,
@@ -90,8 +89,8 @@ setClass("scatterer",
 #' bubbles to other scatterers with gas occlusions, swimbladders, and other internal
 #' features, if applicable. The default behavior for this type of object is to 
 #' only reference the gaseous/fluid feature with excpetions that are model-dependent.
-#' See \link[acousticTS]{scatterer} for a more detailed description on how this 
-#' S4 object is organized.
+#' See \link[acousticTS]{scatterer-class} for a more detailed description on 
+#' how this S4 object is organized.
 #' @rdname GAS
 #' @export
 GAS <- setClass("GAS",
@@ -108,8 +107,9 @@ GAS <- setClass("GAS",
 #' parameterizing models for swimbladdered fish (SBF) that are partitioned into
 #' two sets of discretized cylinders: the body and the swimbladder. Both shapes
 #' comprise independent position matrices, material properties, orientations, 
-#' and other relevant shape-related data and metadata.See \link[acousticTS]{scatterer} 
-#' for a more detailed description on how this S4 object is organized.
+#' and other relevant shape-related data and metadata.See 
+#' \link[acousticTS]{scatterer-class} for a more detailed description on how 
+#' this S4 object is organized.
 #' @rdname SBF
 #' @export
 SBF <- setClass( "SBF" ,
@@ -132,8 +132,8 @@ SBF <- setClass( "SBF" ,
 #' created using values for both an outer shell and internal tissues, if applicable. 
 #' The default behavior for this type of this object is to only reference the outer
 #' shell with few exceptions that are model-dependent. See 
-#' \link[acousticTS]{scatterer} for a more detailed description on how this S4 
-#' object is organized.
+#' \link[acousticTS]{scatterer-class} for a more detailed description on how 
+#' this S4 object is organized.
 #' @rdname ESS
 #' @export
 ESS <- setClass("ESS",
@@ -151,8 +151,8 @@ ESS <- setClass("ESS",
 #' objects belonging to the CAL-class scatterers. This object is created using
 #' parameters specific to the outer shell. The default behavior of this object is
 #' to only reference these outer elastic shell properties with few exceptions that
-#' are model-dependent. See \link[acousticTS]{scatterer} for a more detailed 
-#' description on how this S4 object is organized.
+#' are model-dependent. See \link[acousticTS]{scatterer-class} for a more 
+#' detailed description on how this S4 object is organized.
 #' @rdname CAL
 #' @export
 CAL <- setClass( "CAL" ,
@@ -171,8 +171,8 @@ CAL <- setClass( "CAL" ,
 #' @description
 #' A S4 class that provides slots to contain relevant metadata for scatterers 
 #' similar to the surrounding fluid medium (i.e fluid-like) belonging to 
-#' FLS-class scatterers. See \link[acousticTS]{scatterer} for a more detailed 
-#' description on how this S4 object is organized.
+#' FLS-class scatterers. See \link[acousticTS]{scatterer-class} for a more 
+#' detailed description on how this S4 object is organized.
 #' @rdname FLS
 #' @export
 FLS <- setClass("FLS",

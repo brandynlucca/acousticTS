@@ -5,6 +5,8 @@
 ################################################################################
 #' Method for what is printed for objects.
 #' @param x Scatterer-class object.
+#' @param y Ignored (required for plot method signature).
+#' @param ... Additional arguments passed to plotting functions
 #' @param type Toggle between body shape ("shape") or modeling results ("model")
 #' @param x_units If "model" is selected, then toggle between frequency
 #'    ("frequency", kHz) or ka ("ka").
@@ -17,6 +19,8 @@
 #' @rdname plot.scatterer
 #' @export
 setGeneric( "plot" , function( x , y , ... ) standardGeneric( "plot" ) )
+#' @rdname plot.scatterer
+#' @export
 setMethod( f = "plot" ,
           signature = c( x = "scatterer" , y = "missing" ) ,
           definition = function( x ,
@@ -181,6 +185,15 @@ fls_plot <- function( object,
          mar = base::c( 5.0 , 4.5 , 1.5 , 2 ) )
     # Center shape =============================================================
     body$rpos[ 3 , ] <- body$rpos[ 3 , ] - median( body$rpos[ 3 , ] )
+    # Sort index ===============================================================
+    if ( body$rpos[ 1 , 1 ] > body$rpos[ 1, ncol( body$rpos ) ] ) {
+      body$rpos <- body$rpos[ , rev( seq_len( ncol( body$rpos ) ) ) ,
+                             drop = FALSE ]
+      if ( !is.null( body$radius ) ) body$radius <- rev( body$radius )
+      # sort_idx <- order(body$rpos[1, ])
+      # body$rpos <- body$rpos[, sort_idx, drop = FALSE]
+      # if (!is.null(body$radius)) body$radius <- body$radius[sort_idx]
+    }
     # Adjust axes ==============================================================
     if ( aspect_ratio == "manual" ) {
       vert_lims <- base::c( min( body$rpos[ 3 , ] - body$radius ) * ( 1 - ( 1 - nudge_y ) ) ,
@@ -190,32 +203,84 @@ fls_plot <- function( object,
                             base::max( body$rpos[ 1 ,  ]  )  * 0.10 )
     }
     # Begin plotting ===========================================================
-    graphics::plot( x = body$rpos[ 1 , ] ,
-                    y = body$rpos[ 3 , ] ,
-                    type = 'l' ,
-                    lwd = 4 ,
-                    cex.lab = 1.2 ,
-                    cex.axis = 1.2 ,
-                    xlab = "Length (mm)" ,
-                    ylab = "Thickness (mm)" ,
-                    ylim = vert_lims )
+    # graphics::plot( x = body$rpos[ 1 , ] ,
+    #                 y = body$rpos[ 3 , ] ,
+    #                 type = 'l' ,
+    #                 lwd = 4 ,
+    #                 cex.lab = 1.2 ,
+    #                 cex.axis = 1.2 ,
+    #                 xlab = "Length (m)" ,
+    #                 ylab = "Thickness (m)" ,
+    #                 ylim = vert_lims )
+    plot( body$rpos[ 1 , ] , body$rpos[ 3 , ] , type = 'n',
+          xlab = "Length (m)", ylab = "Thickness (m)",
+          ylim = c( min(body$rpos[ 3 , ] - body$radius ) * 1.1 ,
+                    max(body$rpos[ 3 , ] + body$radius ) * 1.1 ) )
     # Add lower perimeter of shape =============================================
-    graphics::lines( x = body$rpos[ 1 , ] ,
-                     y = body$rpos[ 3 , ] - body$radius ,
-                     lty = 1 ,
-                     lwd = 4 )
+    # graphics::lines( x = body$rpos[ 1 , ] ,
+    #                  y = body$rpos[ 3 , ] - body$radius ,
+    #                  lty = 1 ,
+    #                  lwd = 4 )
     # Add upper perimeter of shape =============================================
-    graphics::lines( x = body$rpos[ 1 , ] ,
-                     y = body$rpos[ 3 , ] + body$radius ,
-                     lty = 1 ,
-                     lwd = 4 )
+    # graphics::lines( x = body$rpos[ 1 , ] ,
+    #                  y = body$rpos[ 3 , ] + body$radius ,
+    #                  lty = 1 ,
+    #                  lwd = 4 )
     # Add body segments ========================================================
-    graphics::segments( x0 = body$rpos[ 1 , ] ,
-                        x1 = body$rpos[ 1 , ] ,
-                        y0 = body$rpos[ 3 , ] - body$radius ,
-                        y1 = body$rpos[ 3 , ] + body$radius ,
-                        lty = 3 ,
-                        lwd = 1.25 )
+    # graphics::segments( x0 = body$rpos[ 1 , ] ,
+    #                     x1 = body$rpos[ 1 , ] ,
+    #                     y0 = body$rpos[ 3 , ] - body$radius ,
+    #                     y1 = body$rpos[ 3 , ] + body$radius ,
+    #                     lty = 3 ,
+    #                     lwd = 1.25 )
+    # Draw angled "cylinders" for each segment =================================
+    n_segments <- acousticTS::extract( object , 
+                                       "shape_parameters" )$n_segments - 1
+    # count <- 0
+    # rc <- c()
+    # ---- Iterate =============================================================
+    for ( i in 1 : ( n_segments ) ) {
+      # ---- Leading coordinates
+      x0 <- body$rpos[ 1 , i ]
+      y0 <- body$rpos[ 3 , i ]
+      # ---- Trailing coordinates
+      x1 <- body$rpos[1 , i + 1 ]
+      y1 <- body$rpos[3 , i + 1 ]
+      # ---- Thickness
+      r <- body$radius[ i ]
+      # rc <- c(rc, r)
+      if ( r == 0 ) next
+      # cat(sprintf("Segment %d [%d, %d]: (%.6f, %.6f) -> (%.6f, %.6f), r=%.6f\n", 
+      #             i, order(body$rpos[1,])[i], order(body$rpos[1,])[i+1], x0, y0, x1, y1, r))
+      # ---- Direction vector
+      dx <- x1 - x0
+      dy <- y1 - y0
+      len <- sqrt( dx ^2 + dy ^2 )
+      # ---- Perpendicular vector (unit)
+      px <- - dy / len
+      py <- dx / len
+      # ---- Polygon nodes
+      xA <- x0 + r * px
+      yA <- y0 + r * py
+      xB <- x1 + r * px
+      yB <- y1 + r * py
+      xC <- x1 - r * px
+      yC <- y1 - r * py
+      xD <- x0 - r * px
+      yD <- y0 - r * py
+      # ---- Draw polygon
+      polygon(
+        x = c( xA , xB , xC , xD ),
+        y = c( yA , yB , yC , yD ),
+        col = adjustcolor( "gray50" , alpha.f = 0.6 ) ,
+        border = "black", lwd = 1
+      )
+      # count <- count + 1
+    }
+    # cat("Polygons drawn:", count, "\n")
+    # Draw centerline and points
+    lines(body$rpos[1, ], body$rpos[3, ], lwd = 3, col = "gray90")
+    points(body$rpos[1, ], body$rpos[3, ], pch = 1, col = "black", cex = 0.8)
   } else if ( type == "model" ) {
     # Detect model selection ===================================================
     models <- extract( object , "model" )
@@ -419,9 +484,6 @@ gas_plot <- function( object ,
 #'    ("frequency", kHz) or ka ("ka").
 #' @param nudge_y y-axis nudge.
 #' @param nudge_x x-axis nudge.
-#' @param aspect_ratio Aspect ratio setting ( defaults to "manual" for nudge_y
-#' and nudge_x to apply; otherwise, input "auto").
-#' @param y_units y-axis data selection (e.g. TS, sigma_bs -- defaults to TS)
 #' @export
 sbf_plot <- function(object,
                      type = "shape" ,

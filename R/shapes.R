@@ -7,8 +7,9 @@
 #' @description
 #' A S4 class that provides slots to contain relevant shape data and metadata for 
 #' a variety of arbitrary and canonical shapes and geoemtries. See 
-#' \link[acousticTS]{scatterer} for a more detailed description on how this S4
-#' object interacts with generic \link[acousticTS]{scatterer} objects.
+#' \link[acousticTS]{scatterer-class} for a more detailed description on how 
+#' this S4 object interacts with generic \link[acousticTS]{scatterer-class} 
+#' objects.
 #' @rdname shape
 #' @export
 setClass( "shape" ,
@@ -216,7 +217,7 @@ cylinder <-  function( length_body ,
 #' @param polynomial Polynomial coefficient vector.
 #' @inheritParams cylinder
 #' @usage
-#' polynomial_cylinder(length, radius, n_segments, polynomial)
+#' polynomial_cylinder(length_body, radius_body, n_segments, polynomial)
 #' @examples
 #' \dontrun{
 #' # We can use the polynomial coefficients defined in Smith et al. (2013) to
@@ -224,7 +225,7 @@ cylinder <-  function( length_body ,
 #' poly_vec <- c(0.83, 0.36, -2.10, -1.20, 0.63, 0.82, 0.64)
 #' # Create the position vector
 #' # This outputs a list containing "rpos" and "radius"
-#' pos <- polynomial_cylinder(length = 15e-3, radius = 2e-3, polynomial = poly_vec)
+#' pos <- polynomial_cylinder(length_body = 15e-3, radius_body = 2e-3, polynomial = poly_vec)
 #' str(pos)
 #' }
 #' @return
@@ -235,8 +236,8 @@ cylinder <-  function( length_body ,
 #' of Marine Science, 70(1): 204-214. https://doi.org/10.1093/icesjms/fss140
 #' @rdname polynomial_cylinder
 #' @export
-polynomial_cylinder <- function(length,
-                                radius,
+polynomial_cylinder <- function(length_body,
+                                radius_body,
                                 n_segments = 1e3,
                                 polynomial) {
   # Define normalized x-axis ===================================================
@@ -245,9 +246,9 @@ polynomial_cylinder <- function(length,
   n_order <- rev(seq_len(length(polynomial))) - 1
   poly_fun <- paste0(polynomial, paste0("*x_n_axis^", n_order), collapse = "+")
   # Define radius ==============================================================
-  radius_output <- abs(eval(parse(text = poly_fun))) * radius
+  radius_output <- abs(eval(parse(text = poly_fun))) * radius_body
   # Define output x-axis =======================================================
-  x_axis <- x_n_axis * length / 2 + length / 2
+  x_axis <- x_n_axis * length_body / 2 + length_body / 2
   # Generate position vector, 'rpos' ===========================================
   rpos <- list(rpos = data.frame(x = x_axis,
                                  y = rep(0, length(x_axis)),

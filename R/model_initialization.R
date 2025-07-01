@@ -417,9 +417,9 @@ sdwba_initialize <- function( object ,
   stochastic_params <- lapply( 1 : length( N_f_idx ) ,
                                FUN = function( i ) {
                                  idx <- which( N_f_vec == N_f_idx[ i ] )
-                                 object_new <- reforge( object , 
-                                                       n_segments = N_f_idx[ i ] )
-                                 body <- extract( object_new , "body" )
+                                 object_new <- sdwba_resample( object , 
+                                                               n_segments = N_f_idx[ i ] )
+                                 body <- acousticTS::extract( object_new , "body" )
                                  n_segments <- N_f_idx[ i ]
                                  phase_sd <- phase_sd[ i ] 
                                  acoustics <- model_params$acoustics[ idx , ]
@@ -480,9 +480,6 @@ sdwba_curved_initialize <- function( object ,
   # Parse body =================================================================
   body <- acousticTS::extract( object , "body" )
   # Bend body ==================================================================
-  body_curved <- brake( body , 
-                        radius_curvature = body$radius_curvature_ratio , 
-                        mode = "ratio" )
   object_copy <- object
   object_copy <- brake( object_copy ,
                         radius_curvature = body$radius_curvature_ratio , 
@@ -518,8 +515,8 @@ sdwba_curved_initialize <- function( object ,
   stochastic_params <- lapply( 1 : length( N_f_idx ) ,
                                FUN = function( i ) {
                                  idx <- which( N_f_vec == N_f_idx[ i ] )
-                                 object_new <- reforge( object_copy , 
-                                                        n_segments = N_f_idx[ i ] )
+                                 object_new <- sdwba_resample( object_copy , 
+                                                               n_segments = N_f_idx[ i ] )
                                  body <- extract( object_new , "body" )
                                  n_segments <- N_f_idx[ i ]
                                  phase_sd <- phase_sd[ i ] 

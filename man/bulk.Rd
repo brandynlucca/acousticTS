@@ -4,9 +4,11 @@
 \alias{bulk}
 \title{Calculate the bulk modulus (K).}
 \usage{
-bulk(E, G, nu)
+bulk(K, E, G, nu)
 }
 \arguments{
+\item{K}{Bulk modulus (GPa).}
+
 \item{E}{Young's modulus (GPa).}
 
 \item{G}{Shear modulus (GPa).}

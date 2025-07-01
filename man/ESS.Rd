@@ -11,6 +11,6 @@ shelled scatterers/objects belonging to the ESS-class. This object can be
 created using values for both an outer shell and internal tissues, if applicable.
 The default behavior for this type of this object is to only reference the outer
 shell with few exceptions that are model-dependent. See
-\link[acousticTS]{scatterer} for a more detailed description on how this S4
-object is organized.
+\link[acousticTS]{scatterer-class} for a more detailed description on how
+this S4 object is organized.
 }

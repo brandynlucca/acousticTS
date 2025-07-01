@@ -2,19 +2,31 @@
 % Please edit documentation in R/scatterer_plot.R
 \name{plot}
 \alias{plot}
+\alias{plot,scatterer,missing-method}
 \title{Method for what is printed for objects.}
 \usage{
 plot(x, y, ...)
+
+\S4method{plot}{scatterer,missing}(
+  x,
+  y,
+  type = "shape",
+  nudge_y = 1.1,
+  nudge_x = 1.05,
+  aspect_ratio = "manual",
+  x_units = "frequency",
+  y_units = "TS",
+  ...
+)
 }
 \arguments{
 \item{x}{Scatterer-class object.}
 
+\item{y}{Ignored (required for plot method signature).}
+
 \item{...}{Additional plot inputs}
 
 \item{type}{Toggle between body shape ("shape") or modeling results ("model")}
-
-\item{x_units}{If "model" is selected, then toggle between frequency
-("frequency", kHz) or ka ("ka").}
 
 \item{nudge_y}{y-axis nudge.}
 
@@ -22,6 +34,9 @@ plot(x, y, ...)
 
 \item{aspect_ratio}{Aspect ratio setting ( defaults to "manual" for nudge_y
 and nudge_x to apply; otherwise, input "auto").}
+
+\item{x_units}{If "model" is selected, then toggle between frequency
+("frequency", kHz) or ka ("ka").}
 
 \item{y_units}{y-axis data selection (e.g. TS, sigma_bs -- defaults to TS)}
 }

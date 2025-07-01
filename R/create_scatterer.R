@@ -113,10 +113,6 @@ sbf_generate <- function( x_body ,
 #' @param theta_units Units for direction. Defaults to "radians".
 #' @param material Material-type for the soldi sphere. See 'Details' built-in
 #' material options.
-#' @param a Spherical radius (m).
-#' @param c1 Longitudinal sound speed (m/s).
-#' @param c2 Transversal sound speed (m/s).
-#' @param rho1 Density (kg/m^3)
 #'
 #' @details
 #' There are several options for the \strong{material} argument:

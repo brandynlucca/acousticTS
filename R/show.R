@@ -79,7 +79,7 @@ gas_show <- function ( object ) {
   # Parse metadata =============================================================
   meta <- acousticTS::extract( object ,
                                "metadata" )
-  # Parse shape ================================================================
+  # Parse shape =============================== =================================
   shape <- acousticTS::extract( object ,
                                 "shape_parameters" )
   # Parse body =================================================================
@@ -99,8 +99,8 @@ gas_show <- function ( object ) {
             " " ,
             shape$radius_units ) , "\n" ,
     "Material properties:\n" ,
-    paste0( " g: " , round( .Internal( mean( body$g ) ) , 4 ) ) , "\n" ,
-    paste0( " h: " , round( .Internal( mean( body$h ) ) , 4 ) ) , "\n" 
+    paste0( " g: " , round( mean( body$g ) , 4 ) ) , "\n" ,
+    paste0( " h: " , round( mean( body$h ) , 4 ) ) , "\n" 
   )
 }
 #' show(...) for SBF-class objects.

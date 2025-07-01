@@ -7,6 +7,7 @@
 \description{
 A S4 class that provides slots to contain relevant shape data and metadata for
 a variety of arbitrary and canonical shapes and geoemtries. See
-\link[acousticTS]{scatterer} for a more detailed description on how this S4
-object interacts with generic \link[acousticTS]{scatterer} objects.
+\link[acousticTS]{scatterer-class} for a more detailed description on how
+this S4 object interacts with generic \link[acousticTS]{scatterer-class}
+objects.
 }

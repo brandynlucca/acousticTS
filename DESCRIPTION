@@ -1,7 +1,7 @@
 Package: acousticTS
 Title: Estimating acoustic target strength via physics-based scattering
     models
-Version: 1.0.0
+Version: 1.0.1
 Authors@R: 
     person("Brandyn", "Lucca", , "brandyn.lucca@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-3145-2969"))
@@ -36,6 +36,7 @@ Collate:
     'scatterer_reforge.R'
     'shapes.R'
     'show.R'
+    'simulation.R'
     'utilities.R'
 Depends:
     R (>= 4.0.0)
@@ -47,5 +48,6 @@ Config/testthat/edition: 3
 Imports: 
     graphics,
     methods,
+    pbapply,
     stats
 URL: https://brandynlucca.github.io/acousticTS/

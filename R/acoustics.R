@@ -129,6 +129,7 @@ pois <- function( K , E , G ) {
 #' moduli to calculate the Lamé's parameter. When more than two values are input, 
 #' the function will default to using Young's (E) and shear (G) moduli. This
 #' assumes that the input values represent 3D material properties.
+#' @param K Bulk modulus (GPa).
 #' @param E Young's modulus (GPa).
 #' @param G Shear modulus (GPa).
 #' @param nu Poisson's ratio (unitless).
@@ -136,7 +137,7 @@ pois <- function( K , E , G ) {
 #' Returns an estimate for the bulk modulus (K).
 #' @rdname bulk
 #' @export
-bulk <- function( E , G , nu ) {
+bulk <- function( K , E , G , nu ) {
   if ( missing( nu ) & ( ! missing( E ) & ! missing( G ) ) ) E * G / ( 3 * ( 3 * G - E ) )
   else if ( missing( E ) & ( ! missing( nu ) & ! missing( G ) ) ) 2 * G * ( 1 + nu ) / ( 3 * ( 1 - 2 * nu ) )
   else if ( missing( G ) & ( ! missing( nu ) & ! missing( E ) ) ) E / ( 3 * ( 1 - 2 * nu ) )
@@ -243,118 +244,95 @@ rho <- function( interface1 , interface2 ) ( interface2$density - interface1$den
 #' @param frequency Frequency (Hz).
 #' @param model Model name.
 #' @param verbose Prints current procedural step occurring from model initialization
-#' to calculating TS. Defaults to F.
+#' to calculating TS. Defaults to FALSE.
 #' @param ... Additional optional model inputs/parameters.
 #' @export
-target_strength <- function( object ,
-                             frequency ,
-                             model , 
-                             verbose = F , ... ) {
-  # Ignore model name case =====================================================
+target_strength <- function( object , frequency , model , verbose = FALSE , ... ) {
+  # Validate inputs ============================================================
+  if ( missing( object ) ) stop( "object is required" )
+  if ( missing( frequency ) ) stop( "frequency is required" ) 
+  if ( missing( model ) ) stop( "model is required" )
+  
+  # Store the object in a variable that won't conflict with model internals ===
+  target_object <- object
+  
+  # Capture all arguments including ... =======================================
+  arg_pull <- list( object = target_object , frequency = frequency , ... )
+  
+  # Handle model names (convert to uppercase for consistency) ==================
   model <- tolower( model )
   ts_model <- gsub( "(_.*)" , "\\L\\1" , paste0( toupper( model ) ) , perl = T )
   ts_model <- ifelse( ts_model %in% c( "CALIBRATION" ,
-                                      "HIGH_pass_stanton" ) , 
+                                       "HIGH_pass_stanton" ) , 
                       tolower( ts_model ) , 
                       ts_model )
-  # Pull argument input names ==================================================
-  arg_pull <- as.list( match.call( ) )
-  if( length( model ) == 1 ) {
-    # Initialize objects to input model parameters =============================
-    # Grab input arguments =====================================================
-    init_name <- paste0( model , "_initialize" )
-    arg_list <- names( formals( init_name ) )
-    # Filter out inappropriate parameters ======================================
-    arg_full <- arg_pull[ arg_list ] 
-    true_args <- Filter( Negate( is.null) , arg_full )
-    # Initialize ===============================================================
-    object_copy <- do.call( init_name , true_args )
-    slot( object ,
-          "model_parameters" )[ ts_model ] <- extract( object_copy , "model_parameters" )[ ts_model ]
-    slot( object ,
-          "model" )[ ts_model ] <- extract( object_copy , "model" )[ ts_model ]
+  
+  # Initialize objects to input model parameters ==============================
+  idx <- 1
+  repeat {
+    if( idx > length( model ) ) {
+      break
+    }
     
-    # object <- switch( model ,
-    #                   mss_anderson = mss_anderson_initialize( object,
-    #                                                           frequency , ... ) ,
-    #                   calibration = calibration_initialize( object,
-    #                                                         frequency , ... ) ,
-    #                   dcm = dcm_initialize( object,
-    #                                         frequency , ... ) ,
-    #                   dwba = dwba_initialize( object ,
-    #                                           frequency , ... ) ,
-    #                   dwba_curved = dwba_curved_initialize( object ,
-    #                                                         frequency ) ,
-    #                   sdwba = sdwba_initialize( object ,
-    #                                             frequency , ... ) ,
-    #                   sdwba_curved = sdwba_curved_initialize( object ,
-    #                                                           frequency , ... ) ,
-    #                   krm = krm_initialize( object ,
-    #                                         frequency , ... ) ,
-    #                   stanton_high_pass = stanton_high_pass_initialize( object ,
-    #                                                                     frequency , ... ) )
-    # cat( toupper( model ) , "model for" , paste0( class(object) , "-object: " ,
-    #                                                      extract( object , "metadata" )$ID ) , "initialized.\n" )
-    # Determine which model to use =============================================
-    # object <- switch( model,
-    #                   mss_anderson = MSS_anderson( object ) ,
-    #                   calibration = calibration( object ) ,
-    #                   dcm = DCM( object ) ,
-    #                   dwba = DWBA( object ) ,
-    #                   dwba_curved = DWBA_curved( object ) ,
-    #                   sdwba = SDWBA( object ) ,
-    #                   sdwba_curved = SDWBA_curved( object ) ,
-    #                   krm = KRM( object ) ,
-    #                   stanton_high_pass = stanton_high_pass( object ) )
-    object <- eval( parse( text = paste0( ts_model , "(object)" ) ) )
-  } else {
-    # Initialize objects to input model parameters =============================
-    idx <- 1
-    repeat {
-      if( idx > length( model ) ) {
-        break
-      }
-      # Pull correct formal arguments ==========================================
-      model_name <- paste0( model[ idx ] , "_initialize" )
-      arg_list <- names( formals( model_name ) )
-      # Filter out inappropriate parameters ====================================
-      arg_full <- arg_pull[ arg_list ] 
-      true_args <- Filter( Negate( is.null) , arg_full )
-      # Initialize =============================================================
-      object_copy <- do.call( model_name , true_args )
-      slot( object ,
-            "model_parameters" )[ ts_model[ idx ] ] <- extract( object_copy , "model_parameters" )[ ts_model[ idx ] ]
-      slot( object ,
-            "model" )[ ts_model[ idx ] ] <- extract( object_copy , "model" )[ ts_model[ idx ] ]
-      if ( verbose ) {
-        cat( toupper( model[ idx ] ) , "model for" , paste0( class(object) , "-object: " ,
-                                                             extract( object , "metadata" )$ID ) ,
-             "initialized.\n\n" )
-      }
-      idx <- idx + 1
+    # Pull correct formal arguments ==========================================
+    model_name <- paste0( model[ idx ] , "_initialize" )
+    
+    # Check if initialization function exists ================================
+    if ( !exists( model_name ) ) {
+      stop( "Initialization function " , model_name , " not found for model " , model[ idx ] )
     }
-    idx <- 1
-    repeat {
-      if( idx > length( model ) ) {
-        break
-      }
-      if ( verbose ) {
-        cat( "Beginning TS modeling via" , toupper( model[ idx ] ) ,
-             "model for" , paste0( class(object) , "-object: " ,
-                                   extract( object , "metadata" )$ID ) , "\n" )
-      }
-      # Parse correct model name ===============================================
-     
-      # Calculate modeled TS ===================================================
-      object <- eval( parse( text = paste0( ts_model[ idx ] , "(object)" ) ) )
-      if ( verbose ) {
-        object_copy <- do.call( ts_model , list( object ) )
-        cat( toupper( model[ idx ] ) , "TS model predictions for" , paste0( class(object) , "-object: " ,
-                                                                            extract( object , "metadata" )$ID ) , "complete.\n\n" )
-      }
-      idx <- idx + 1
+    
+    arg_list <- names( formals( model_name ) )
+    
+    # Filter out inappropriate parameters ====================================
+    arg_full <- arg_pull[ arg_list ] 
+    true_args <- Filter( Negate( is.null ) , arg_full )
+    
+    # Initialize ==============================================================
+    object_copy <- do.call( model_name , true_args )
+    
+    # Store model parameters and results =====================================
+    slot( target_object , "model_parameters" )[ ts_model[ idx ] ] <- extract( object_copy , "model_parameters" )[ ts_model[ idx ] ]
+    slot( target_object , "model" )[ ts_model[ idx ] ] <- extract( object_copy , "model" )[ ts_model[ idx ] ]
+    
+    if( verbose ) {
+      cat( toupper( model[ idx ] ) , "model for" , paste0( class( target_object ) , "-object: " ,
+                                                           extract( target_object , "metadata" )$ID ) ,
+           "initialized.\n\n" )
     }
+    
+    idx <- idx + 1
   }
+  
+  # Run the models =============================================================
+  idx <- 1
+  repeat {
+    if( idx > length( model ) ) {
+      break
+    }
+    
+    if( verbose ) {
+      cat( "Beginning TS modeling via" , toupper( model[ idx ] ) ,
+           "model for" , paste0( class( target_object ) , "-object: " ,
+                                 extract( target_object , "metadata" )$ID ) , "\n" )
+    }
+    
+    # Check if model function exists =========================================
+    if ( !exists( ts_model[ idx ] ) ) {
+      stop( "Model function " , ts_model[ idx ] , " not found" )
+    }
+    
+    # Calculate modeled TS using do.call instead of eval(parse(...)) =========
+    target_object <- do.call( ts_model[ idx ] , list( object = target_object ) )
+    
+    if( verbose ) {
+      cat( toupper( model[ idx ] ) , "TS model predictions for" , paste0( class( target_object ) , "-object: " ,
+                                                                          extract( target_object , "metadata" )$ID ) , "complete.\n\n" )
+    }
+    
+    idx <- idx + 1
+  }
+  
   # Output object ==============================================================
-  return( object )
+  return( target_object )
 }

@@ -4,9 +4,13 @@
 \alias{polynomial_cylinder}
 \title{Creates a polynomial deformed cylinder.}
 \usage{
-polynomial_cylinder(length, radius, n_segments, polynomial)
+polynomial_cylinder(length_body, radius_body, n_segments, polynomial)
 }
 \arguments{
+\item{length_body}{Length (m).}
+
+\item{radius_body}{Maximum/uniform radius (m).}
+
 \item{n_segments}{Number of segments to discretize object shape. Defaults to
 1e2 segments.}
 
@@ -25,7 +29,7 @@ Creates a polynomial deformed cylinder.
 poly_vec <- c(0.83, 0.36, -2.10, -1.20, 0.63, 0.82, 0.64)
 # Create the position vector
 # This outputs a list containing "rpos" and "radius"
-pos <- polynomial_cylinder(length = 15e-3, radius = 2e-3, polynomial = poly_vec)
+pos <- polynomial_cylinder(length_body = 15e-3, radius_body = 2e-3, polynomial = poly_vec)
 str(pos)
 }
 }
