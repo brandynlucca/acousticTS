@@ -285,18 +285,22 @@ SDWBA <- function( object ) {
     stochastic_TS <- function( n_k , n_segments , n_iterations ) {
       sapply( 1 : n_k , 
               FUN = function( x ) {
-                cyl_phase <- sapply( 1 : n_segments ,
-                  FUN = function( y ) {
-                    phase_integrate( x , y ,
-                                     n_iterations ,
-                                     integrand_vectorized ,
-                                     phase_sd )
-                    }
+                cyl_phase <- array(
+                  sapply( 1 : n_segments ,
+                          FUN = function( y ) {
+                            phase_integrate( x , y ,
+                                             n_iterations ,
+                                             integrand_vectorized ,
+                                             phase_sd )
+                          }
+                  ),
+                  dim = c( n_iterations , n_segments )
                 )
                 cyl_sum_phase <- rowSums( cyl_phase , na.rm = T )
                 cyl_sum_phase
               }
       ) -> phase_cyl
+      phase_cyl <- array( phase_cyl , dim = c( n_iterations , n_k ) )
       data.frame( f_bs = colMeans( phase_cyl ) ,
                   sigma_bs = colMeans( sigma_bs( phase_cyl ) ) ,
                   TS_mean = db( colMeans( sigma_bs( phase_cyl ) ) ) ,
@@ -387,18 +391,22 @@ SDWBA_curved <- function( object ) {
     stochastic_TS_c <- function( n_k , n_segments , n_iterations ) {
       sapply( 1 : n_k , 
               FUN = function( x ) {
-                cyl_phase <- sapply( 1 :  n_segments ,
-                                     FUN = function( y ) {
-                                       phase_integrate( x , y , 
-                                                        n_iterations , 
-                                                        integrand_vectorized_c ,
-                                                        phase_sd )
-                                     }
+                cyl_phase <- array( 
+                  sapply( 1 :  n_segments ,
+                          FUN = function( y ) {
+                            phase_integrate( x , y , 
+                                             n_iterations , 
+                                             integrand_vectorized_c ,
+                                             phase_sd )
+                            }
+                  ) ,
+                  dim = c( n_iterations , n_segments )
                 )
                 cyl_sum_phase <- rowSums( cyl_phase , na.rm = T )
                 cyl_sum_phase
               }
       ) -> phase_cyl
+      phase_cyl <- array( phase_cyl , dim = c( n_iterations , n_k ) )
       data.frame( f_bs = colMeans( phase_cyl ) ,
                   sigma_bs = colMeans( sigma_bs( phase_cyl ) ) ,
                   TS_mean = db( colMeans( sigma_bs( phase_cyl ) ) ) ,
