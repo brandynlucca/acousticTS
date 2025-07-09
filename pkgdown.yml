@@ -3,8 +3,10 @@ pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   calibration_sphere_target_strength_vignette: calibration_sphere_target_strength_vignette.html
+  dcm_deformed_cylinder_model_vignette: dcm_deformed_cylinder_model_vignette.html
+  dwba_fluid_like_scatterers_vignette: dwba_fluid_like_scatterers_vignette.html
   elastic_shelled_sphere_target_strength_vignette: elastic_shelled_sphere_target_strength_vignette.html
-last_built: 2025-07-09T01:24Z
+last_built: 2025-07-09T03:02Z
 urls:
   reference: https://brandynlucca.github.io/acousticTS/reference
   article: https://brandynlucca.github.io/acousticTS/articles
