@@ -36,6 +36,7 @@ setMethod( f = "plot" ,
 
             switch( sc_type,
                     CAL = cal_plot( x , type , nudge_y , nudge_x , x_units , ... ) ,
+                    ESS = ess_plot( x , type , nudge_y , nudge_x , x_units , ... ) ,
                     SBF = sbf_plot( x , type , nudge_y , nudge_x , x_units , ... ) ,
                     FLS = fls_plot( x , type , nudge_y , nudge_x , aspect_ratio , x_units , y_units ) ,
                     GAS = gas_plot( x , type , nudge_y , nudge_x , x_units , y_units , ... ) )
@@ -144,6 +145,161 @@ cal_plot <- function( object ,
     }
   }
   invisible()
+}
+#' Plotting for ESS-class objects
+#' @param object ESS-class object.
+#' @param type Toggle between body shape ("shape") or modeling results ("model")
+#' @param x_units If "model" is selected, then toggle between frequency
+#'    ("frequency", kHz) or ka ("ka").
+#' @param nudge_y y-axis nudge.
+#' @param nudge_x x-axis nudge.
+#' @param y_units y-axis data selection (e.g. TS, sigma_bs -- defaults to TS).
+#' @param ... Additional plot inputs
+#' @import graphics
+#' @import stats
+#' @import grDevices
+#' @export
+ess_plot <- function( object ,
+                      type = "shape" ,
+                      nudge_y = 1.02 ,
+                      nudge_x = 1.01 ,
+                      x_units = "frequency" ,
+                      y_units = "TS" , ... ) {
+  # Retrieve default plot window parameters ====================================
+  opar <- par( no.readonly = TRUE )
+  on.exit( par( opar ) )
+  if( type == "shape" ) {
+    # Extract shell shape information ==========================================
+    shell <- extract( object , "shell" )
+    # Center axis ==============================================================
+    shell$rpos[ , 1 ] <- shell$rpos[ , 1 ] - median( shell$rpos[ , 1 ] )
+    # Define plot margins ======================================================
+    par( ask = FALSE ,
+         oma = c( 1 , 1 , 1 , 0 ) ,
+         mar = c( 4 , 4.5 , 1 , 2 ) )
+    # Begin plotting ===========================================================
+    plot( x = shell$rpos[ , 1 ] ,
+          y = shell$rpos[ , 2 ] ,
+          type = 'l' ,
+          ylab = "Semi-minor diameter (m)" ,
+          xlab = "Semi-major diameter (m)" ,
+          lwd = 4 ,
+          cex.lab = 1.2 ,
+          cex.axis = 1.2 ,
+          ylim = base::c( min( shell$rpos[ , 3 ] ) * ( 1 - (1 - nudge_y ) ) ,
+                          max( -shell$rpos[ , 3 ] ) * nudge_y ) )
+    # Add lower perimeter of shape =============================================
+    lines( x = shell$rpos[ , 1 ] ,
+           y = shell$rpos[ , 3 ] ,
+           lty = 1 ,
+           lwd = 4 )
+    # Add shell segments =======================================================
+    segments( x0 = shell$rpos[ , 1 ] ,
+              x1 = shell$rpos[ , 1 ] ,
+              y0 = shell$rpos[ , 2 ] ,
+              y1 = shell$rpos[ , 3 ] ,
+              lty = 3 ,
+              lwd = 1.25 )
+    # Add internal fluid, if defined ===========================================
+    fluid <- extract( object , "fluid" )
+    # Only proceed is position matrix is defined +++++++++++++++++++++++++++++++
+    if ( "rpos" %in% names( fluid ) ) {
+      # Center +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      fluid$rpos[ , 1 ] <- fluid$rpos[ , 1 ] - median( fluid$rpos[ , 1 ] )
+      # Add upper perimeter of shape +++++++++++++++++++++++++++++++++++++++++++
+      lines( x = fluid$rpos[ , 1 ] ,
+             y = fluid$rpos[ , 2 ] ,
+             lty = 1 ,
+             lwd = 4 ,
+             col = "red" )
+      # Add lower perimeter of shape +++++++++++++++++++++++++++++++++++++++++++
+      lines( x = fluid$rpos[ , 1 ] ,
+             y = fluid$rpos[ , 3 ] ,
+             lty = 1 ,
+             lwd = 4 ,
+             col = "red" )
+      # Add shell segments +++++++++++++++++++++++++++++++++++++++++++++++++++++
+      segments( x0 = fluid$rpos[ , 1 ] ,
+                x1 = fluid$rpos[ , 1 ] ,
+                y0 = fluid$rpos[ , 2 ] ,
+                y1 = fluid$rpos[ , 3 ] ,
+                lty = 3 ,
+                lwd = 1.25 ,
+                col = "red" )
+      # Create legend ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      legend( x = "bottomright",
+              legend = c( "Shell" , "Fluid-like body" ) ,
+              lty = c(1, 1),
+              lwd = c(4, 3.5),
+              col = c( 'black', 'red' ),
+              cex = 0.95 )
+    }
+  } else if ( type == "model" ) {
+    # Detect model selection ===================================================
+    models <- extract( object , "model" )
+    model_names <- names( models )
+    if ( length( model_names ) == 0 ) {
+      stop( "ERROR: no model results detected in object." )
+    }
+    # Append model name ========================================================
+    models <- lapply( 1 : length( model_names ) ,
+                      FUN = function( x ) {
+                        models[[ x ]] <- models[[ x ]][ c( "frequency" , "TS" ) ]
+                        transform( models[[ x ]] ,
+                                   model = model_names[ x ] ) } )
+    # Convert into a data.frame ================================================
+    models_df <- do.call( "rbind" , models )
+    # Define x-axis domain =====================================================
+    x_axis <- models_df[ , base::which( base::colnames( models_df )  == x_units ) ]
+    x_mat <- base::split( x_axis , models_df$model )
+    y_axis <- models_df[ , base::which( base::colnames( models_df ) == y_units ) ]
+    y_mat <- base::split( y_axis , models_df$model )
+    col_axis <- model_palette[ base::as.numeric( base::as.factor( models_df$model ) ) ]
+    x_lab <- switch( x_units ,
+                     frequency = "Frequency (Hz)" ,
+                     k_sw = expression(italic(k[sw]*a) ) )
+    # Define plot margins ======================================================
+    graphics::par( ask = FALSE ,
+                   mar = base::c( 5.0 , 5.5 , 2.0 , 3.5 ) )
+    # Initiate plotting ========================================================
+    plot( x = seq( from = min( x_axis ) ,
+                   to = max( x_axis ) ,
+                   length.out = 2 ) ,
+          y = seq( from = min( y_axis ) ,
+                   to = max( y_axis ) ,
+                   length.out = 2 ) ,
+          xlim = c( min( x_axis ) * ( 1 - nudge_x ),
+                    max( x_axis ) * ( nudge_x ) ) ,
+          ylim = c( min( y_axis ) * ( 1 - ( 1 - nudge_y ) ) ,
+                    max( y_axis ) * ( 1 + ( 1 - nudge_y ) ) ) ,
+          xlab = x_lab ,
+          ylab = expression( "Target"~"strength"~("dB"~"re."~1~"m"^2) ) ,
+          yaxs = "i" ,
+          xaxs = "i" ,
+          xaxt = 'n' ,
+          type = 'n' ,
+          cex.axis = 1.3 ,
+          cex.lab = 1.5 )
+    atx <- seq( par("xaxp")[1] , 
+                par("xaxp")[2] , 
+                (par("xaxp")[2] - par("xaxp")[1])/par("xaxp")[3] )
+    axis( 1 , at = atx , 
+          labels = format( atx , scientific = F , justify = "left" ) ,
+          cex.axis = 1.3 )
+    nm_names <- names( x_mat )
+    invisible( mapply( lines , x_mat , y_mat ,
+                       col = model_palette[ 1 : base::length( model_names ) ] ,
+                       lwd = 4 ) )
+    legend( "bottomright" ,
+            title = expression( bold("TS"~"model") ) ,
+            title.adj = 0.05 ,
+            legend = nm_names ,
+            lty = rep( 1 , length( nm_names ) ) ,
+            col = model_palette[ 1 : length( nm_names  ) ] ,
+            cex = 1.05 ,
+            lwd = 4 )
+  }
+  invisible( )
 }
 ################################################################################
 ################################################################################
@@ -574,7 +730,7 @@ sbf_plot <- function(object,
            lty = c(1, 1),
            lwd = c(4, 3.5),
            col = c('black', 'red'),
-           cex = 0.95)
+           cex = 0.95 )
     # End dorsoventral view =====================================
     left_limit <- -max(body[2, ] / 2) * (1 - (1 - nudge_y))
     right_limit <- max(body[2, ] / 2) * (1 - (1 - nudge_y))

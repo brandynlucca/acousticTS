@@ -136,14 +136,14 @@ SBF <- setClass( "SBF" ,
 #' this S4 object is organized.
 #' @rdname ESS
 #' @export
-ESS <- setClass("ESS",
-                slots = c( metadata = "list" ,
-                           model_parameters = "list" ,
-                           model = "list" ,
-                           shell = "list" ,
-                           body = "list" ,
-                           shape_parameters = "list" ) ,
-                contains = "scatterer" )
+ESS <- setClass( "ESS",
+                 slots = c( metadata = "list" ,
+                            model_parameters = "list" ,
+                            model = "list" ,
+                            shell = "list" ,
+                            fluid = "list" ,
+                            shape_parameters = "list" ) ,
+                 contains = "scatterer" )
 ################################################################################
 #' Solid and calibration sphere (CAL) object/class.
 #' @description

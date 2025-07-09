@@ -324,7 +324,6 @@ fls_generate <- function( shape = "arbitrary" ,
 #' @param radius_units Diameter units. Defaults to "m".
 #' @param n_segments Number of body segments.
 #' @return
-#' Creates a GAS-class object from a *.csv file
 #' @import methods
 #' @export
 gas_generate <- function( shape = "sphere" ,
@@ -399,7 +398,12 @@ gas_generate <- function( shape = "sphere" ,
 #' @param h_fluid Optional sound speed contrast for fluid-like body.
 #' @param g_shell Density contrast for the shell.
 #' @param h_shell Sound speed contrast for the shell.
+#' @param E Young's modulus (Pa) of the shell material.
+#' @param nu Poisson's ratio (Dimensionless) of the shell material. 
+#' @param G Shear modulus (Pa) of the shell material.
+#' @param K Bulk modulus (Pa) of the shell material. 
 #' @param theta_shell Object orientation relative to incident sound wave.
+#' @return ESS-class object
 #' @export
 ess_generate <- function( shape = "sphere" ,
                           x_body = NULL ,
@@ -408,45 +412,166 @@ ess_generate <- function( shape = "sphere" ,
                           radius_shell ,
                           shell_thickness = NULL ,
                           g_fluid = NULL ,
+                          density_fluid = NULL ,
                           h_fluid = NULL ,
-                          g_shell ,
-                          h_shell ,
+                          sound_speed_fluid = NULL ,
+                          g_shell = NULL ,
+                          density_shell = NULL ,
+                          h_shell = NULL ,
+                          sound_speed_shell = NULL ,
+                          E = NULL ,
+                          G = NULL ,
+                          K = NULL ,
+                          nu = NULL ,
                           theta_shell = pi / 2 ,
                           ID = NULL ,
                           theta_units = "radians" ,
                           length_units = "m" ) {
   # Create metadata field ======================================================
-  metadata <- list(ID = ifelse(!is.null(ID), ID, "UID"))
-  # Create shell shape field ===================================================
-  if(is.null(x_body) & is.null(y_body) & is.null(z_body)) {
-    shell_rpos <- sphere(radius_shell)
+  metadata <- list( ID = ifelse( !is.null( ID ) , ID , "UID" ) )
+  # Create shape fields ========================================================
+  if ( class( shape )[ 1 ] == "shape" ) {
+    shell_rpos <- shape
   } else {
-    shell_rpos <- rbind(x = x_body,
-                        y = y_body,
-                        z = z_body)
+    if ( shape == "arbitrary" ) {
+      shell_rpos <- arbitrary( x_body = x_body ,
+                               y_body = y_body ,
+                               z_body = z_body ,
+                               radius_body = radius_shell )
+    } else {
+      # Pull argument input names ==============================================
+      arg_pull <- as.list( match.call( ) )
+      # Create container for different position matrices =======================
+      rpos <- list()
+      # Rename radius_shell to radius for shape functionality ==================
+      if ( "radius_shell" %in% names( arg_pull ) ) {
+        # Create copy ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        subarg_pull <- arg_pull
+        # Create shape +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        subarg_pull$radius <- arg_pull$radius_shell
+        # Grab input arguments +++++++++++++++++++++++++++++++++++++++++++++++++
+        arg_list <- names( formals( shape ) )
+        # Filter out inappropriate parameters ++++++++++++++++++++++++++++++++++
+        arg_full <- subarg_pull[ arg_list ] 
+        true_args <- Filter( Negate( is.null) , arg_full )
+        # Initialize +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        rpos[[ "shell" ]] <- do.call( shape , true_args )        
+      }
+      # Create radius_fluid, if present for shape functionality ================
+      if ( "shell_thickness" %in% names( arg_pull ) && 
+           !is.null( arg_pull$shell_thickness ) ) {
+        # Create copy ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        subarg_pull <- arg_pull
+        # Create shape +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        subarg_pull$radius <- arg_pull$radius_shell - arg_pull$shell_thickness
+        # Grab input arguments +++++++++++++++++++++++++++++++++++++++++++++++++
+        arg_list <- names( formals( shape ) )
+        # Filter out inappropriate parameters ++++++++++++++++++++++++++++++++++
+        arg_full <- subarg_pull[ arg_list ] 
+        true_args <- Filter( Negate( is.null) , arg_full )
+        # Initialize +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        rpos[[ "fluid" ]] <- do.call( shape , true_args )             
+      }
+    }
   }
-  shell <- list(rpos = shell_rpos,
-                radius = radius_shell,
-                g = g_shell,
-                h = h_shell,
-                theta = theta_shell,
-                shell_thickness = ifelse(!is.null(shell_thickness),
-                                         shell_thickness,
-                                         NA))
-  # Create body shape field ====================================================
-  body <- list(g = ifelse(!is.null(g_fluid), g_fluid, NA),
-               h = ifelse(!is.null(h_fluid), h_fluid, NA))
+  # Assign elastic properties ==================================================
+  elastic_params <- Filter( Negate( is.null ) , 
+                            list( E = E, nu = nu, G = G, K = K ) )
+  # Iterate through to calculate the requisite parameters ++++++++++++++++++++++
+  repeat {
+    param_len <- length( elastic_params )
+    if ( is.null( elastic_params$nu ) ) elastic_params$nu <- tryCatch(
+      pois( elastic_params$K , elastic_params$E , elastic_params$G ) , 
+      error = function( e ) NULL )
+    if ( is.null( elastic_params$K ) ) elastic_params$K <- tryCatch(
+      bulk( elastic_params$E , elastic_params$G , elastic_params$nu ) , 
+      error = function( e ) NULL )
+    if ( is.null( elastic_params$E ) ) elastic_params$E <- tryCatch(
+      young( elastic_params$K , elastic_params$G , elastic_params$nu ) , 
+      error = function( e ) NULL )
+    if ( is.null( elastic_params$G ) ) elastic_params$G <- tryCatch(
+      shear( elastic_params$K , elastic_params$E , elastic_params$nu ) , 
+      error = function( e ) NULL )
+    if ( is.null( elastic_params$lambda ) ) elastic_params$lambda <- tryCatch(
+      lame( elastic_params$K , elastic_params$E , elastic_params$G , 
+            elastic_params$nu ) , 
+      error = function( e ) NULL )
+    if ( length( elastic_params ) == param_len ) break
+  }
+  # Handle material properties =================================================
+  material_properties <- list()
+  # Validate parameter combinations ++++++++++++++++++++++++++++++++++++++++++++
+  conflicts <- list(
+    c( "g_shell" , "density_shell" ),
+    c( "h_shell" , "sound_speed_shell" ) , 
+    c( "g_fluid" , "density_fluid" ) ,
+    c( "h_fluid" , "sound_speed_fluid" )
+  )
+  for ( pair in conflicts ) {
+    if ( !is.null( get( pair[ 1 ] ) ) && !is.null( get( pair[ 2 ] ) ) ) {
+      stop( paste( "Cannot specify both" , pair[ 1 ] , "and", pair[ 2 ] ) )
+    }
+  }
+  # Shell material properties ++++++++++++++++++++++++++++++++++++++++++++++++++
+  material_properties[[ "shell" ]] <- c(
+    Filter( Negate( is.null ) , 
+            list( g = g_shell , density = density_shell , 
+                  h = h_shell , sound_speed = sound_speed_shell ) ) , 
+    elastic_params
+  )
+  # Fluid material properties ++++++++++++++++++++++++++++++++++++++++++++++++++
+  material_properties[[ "fluid" ]] <- Filter( 
+    Negate( is.null ) , 
+    list( g = g_fluid , density = density_fluid ,
+          h = h_fluid , sound_speed = sound_speed_fluid ) )
+  # Finalize shell slot ========================================================
+  shell <- c(
+    list(
+      rpos = rpos[[ "shell" ]]@position_matrix ,
+      radius = rpos[[ "shell" ]]@shape_parameters$radius ,
+      shell_thickness = ifelse( !is.null( shell_thickness ) ,
+                                shell_thickness ,
+                                NA ) ,
+      theta = theta_shell 
+    ) ,
+    material_properties[[ "shell" ]]
+  )
+  # Finalize fluid slot ========================================================
+  fluid <- c(
+    list(
+      rpos = if ( "fluid" %in% names( rpos ) ) {
+        rpos[[ "fluid" ]]@position_matrix
+      } else { NULL } ,
+      radius = if ( "fluid" %in% names( rpos ) ) {
+        rpos[[ "fluid" ]]@shape_parameters$radius
+      } else { NULL } ,
+      theta = theta_shell
+    ) ,
+    material_properties[[ "fluid" ]]
+  )
   # Shape parameters field =====================================================
-  shape_parameters <- list(body = list(diameter = radius_shell * 2,
-                                       radius = radius_shell,
-                                       ncyl = length(body$rpos[1, ]) - 1,
-                                       length_units = length_units))
+  shape_parameters <- list(
+    shell = list(
+      diameter = radius_shell * 2 ,
+      radius = radius_shell ,
+      length_units = length_units 
+    ) ,
+    fluid = list(
+      diameter = ifelse( is.null( fluid[[ "radius" ]] ) ,
+                         NA ,
+                         fluid[[ "radius" ]] * 2 ) ,
+      radius = ifelse( is.null( fluid[[ "radius" ]] ) ,
+                       NA ,
+                       fluid[[ "radius" ]] ) ,
+      length_units = length_units 
+    )
+  )
   # Create ESS-class object ====================================================
-  return(new("ESS",
-             metadata = metadata,
-             model_parameters = list(),
-             model = list(),
-             shell = shell,
-             body = body,
-             shape_parameters = shape_parameters))
+  return( new( "ESS" ,
+               metadata = metadata ,
+               model_parameters = list( ) ,
+               model = list( ) ,
+               shell = shell ,
+               fluid = fluid ,
+               shape_parameters = shape_parameters ) )
 }
