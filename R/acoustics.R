@@ -102,11 +102,11 @@ kappa <- function( interface1 , interface2 ) {
 # ELASTICITY CALCULATIONS AND EQUATIONS
 ################################################################################
 ################################################################################
-#' Calculate the Poisson's ratio (\eqn{\nu}).
+#' Calculate the Poisson's ratio (\eqn{\nu})
 #' @description
 #' Calculate the Poisson's ratio (\eqn{\nu}) from two of the three other elastic
-#' moduli to calculate the \enc{Lamé}{Lame}'s parameter. When more than two 
-#' values are input, the function will default to using the bulk (K) and 
+#' moduli to calculate the Lam&eacute;'s parameter. When more than two values are
+#' input, the function will default to using the bulk (K) and 
 #' Young's (E) moduli. This assumes that the input values represent 3D material 
 #' properties.
 #' @param K Bulk modulus (K, Pa).
@@ -115,6 +115,7 @@ kappa <- function( interface1 , interface2 ) {
 #' @return
 #' Returns a dimensionless ratio known as Poisson's ratio (\eqn{\nu}).
 #' @rdname pois
+#' @encoding UTF-8
 #' @export
 pois <- function( K = NULL , E = NULL , G = NULL ) {
   # Check inputs ===============================================================
@@ -140,7 +141,7 @@ pois <- function( K = NULL , E = NULL , G = NULL ) {
 #' Calculate the bulk modulus (K).
 #' @description
 #' Calculate the bulk modulus (K) from two of the three other elastic
-#' moduli to calculate the \enc{Lamé}{Lame}'s parameter. When more than two 
+#' moduli to calculate the Lam&eacute;s parameter. When more than two 
 #' values are input, the function will default to using Young's (E) and shear 
 #' (G) moduli. This assumes that the input values represent 3D material 
 #' properties.
@@ -149,6 +150,7 @@ pois <- function( K = NULL , E = NULL , G = NULL ) {
 #' @param nu Poisson's ratio (Dimensionless).
 #' @return
 #' Returns an estimate for the bulk modulus (K).
+#' @encoding UTF-8
 #' @rdname bulk
 #' @export
 bulk <- function( E = NULL , G = NULL , nu = NULL ) {
@@ -175,7 +177,7 @@ bulk <- function( E = NULL , G = NULL , nu = NULL ) {
 #' Calculate Young's modulus (E).
 #' @description
 #' Calculate the Young's modulus (E) from two of the three other elastic
-#' moduli to calculate the \enc{Lamé}{Lame}'s parameter. When more than two 
+#' moduli to calculate the Lam&eacute;'s parameter. When more than two 
 #' values are input, the function will default to using the bulk (K) and shear 
 #' (G) moduli. This assumes that the input values represent 3D material 
 #' properties.
@@ -184,6 +186,7 @@ bulk <- function( E = NULL , G = NULL , nu = NULL ) {
 #' @param nu Poisson's ratio (Dimensionless).
 #' @return
 #' Returns an estimate for the Young's modulus (E).
+#' @encoding UTF-8
 #' @rdname young
 #' @export
 young <- function( K = NULL , G = NULL , nu = NULL ) {
@@ -207,10 +210,10 @@ young <- function( K = NULL , G = NULL , nu = NULL ) {
   }
 }
 ################################################################################
-#' Calculate the shear modulus (G).
+#' Calculate the shear modulus (G)
 #' @description
 #' Calculate the shear modulus (G) from two of the three other elastic
-#' moduli to calculate the \enc{Lamé}{Lame}'s parameter. When more than two 
+#' moduli to calculate the Lam&eacute;'s parameter. When more than two 
 #' values are input, the function will default to using the bulk (K) and 
 #' Young's (E) moduli. This assumes that the input values represent 3D material 
 #' properties.
@@ -219,6 +222,7 @@ young <- function( K = NULL , G = NULL , nu = NULL ) {
 #' @param nu Poisson's ratio (Dimensionless).
 #' @return
 #' Returns an estimate for the shear modulus (G).
+#' @encoding UTF-8
 #' @rdname shear
 #' @export
 shear <- function( K = NULL , E = NULL , nu = NULL ) {
@@ -242,9 +246,10 @@ shear <- function( K = NULL , E = NULL , nu = NULL ) {
   }
 }
 ################################################################################
-#' Calculate \enc{Lamé}{Lame}'s first parameter (\eqn{\lambda}).
+#' @encoding UTF-8
+#' @title Calculate Lam&eacute;'s first parameter (\eqn{\lambda})
 #' @description
-#' Calculate \enc{Lamé}{Lame}'s first parameter (\eqn{\lambda}) from two of the 
+#' Calculate Lam&eacute;'s first parameter (\eqn{\lambda}) from two of the 
 #' four other elastic moduli. When more than two values are input, the function 
 #' will default to using the bulk (K) and Young's (E) moduli. This assumes that 
 #' the input values represent 3D material properties.
@@ -253,7 +258,7 @@ shear <- function( K = NULL , E = NULL , nu = NULL ) {
 #' @param G Shear modulus (Pa).
 #' @param nu Poisson's ratio (Dimensionless).
 #' @return
-#' Returns an \enc{Lamé}{Lame}'s first parameter (\eqn{\lambda}).
+#' Returns Lam&eacute;'s first parameter (\eqn{\lambda}).
 #' @rdname lame
 #' @export
 lame <- function( K , E , G , nu ) {
@@ -264,7 +269,7 @@ lame <- function( K , E , G , nu ) {
   if ( sum( provided ) < 2 ) {
     stop(
       paste0( "At least two elasticity moduli values are required to " ,
-              "calculate the Lamé parameter." )
+              "calculate the Lam\U00E9 parameter." )
     )
   }
   # Use first available combination ============================================
@@ -399,6 +404,7 @@ target_strength <- function( object , frequency , model , verbose = FALSE , ... 
 #' @param sound_speed_transversal Transversal sound speed in shell
 #' @param radius_shell Shell radius
 #' @param radius_fluid Fluid radius
+#' @keywords internal
 #' @return Matrix of ka values
 calculate_ka_matrix <- function( frequency , sound_speed_sw , 
                                  sound_speed_fluid , sound_speed_longitudinal , 
@@ -427,11 +433,12 @@ calculate_ka_matrix <- function( frequency , sound_speed_sw ,
 #' @param bessel_cache Cached Bessel function values
 #' @param ka_matrix_m Modal ka matrix
 #' @param m Modal vector
-#' @param lambda Lamé first parameter
+#' @param lambda Lam\'e's first parameter
 #' @param mu Shear modulus
 #' @param density_sw Seawater density
 #' @param density_shell Shell density
 #' @param density_fluid Fluid density
+#' @keywords internal
 #' @return List of alpha coefficients
 calculate_goodman_stern_alpha <- function( bessel_cache , ka_matrix_m , m , 
                                            lambda , mu , density_sw , 
@@ -504,6 +511,7 @@ calculate_goodman_stern_alpha <- function( bessel_cache , ka_matrix_m , m ,
 #' @param alpha Alpha coefficient list
 #' @param ka_matrix ka matrix
 #' @param m Modal vector
+#' @keywords internal
 #' @return List of boundary matrices for each frequency and modal order
 calculate_goodman_stern_boundary_matrices <- function( alpha , ka_matrix , m ) {
   # Create template matrices ==================================================

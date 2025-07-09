@@ -5,31 +5,29 @@
 \alias{krill}
 \title{Sample krill (Euphausia superba) shape taken from McGehee et al. (1998)}
 \format{
-A pre-generated FLS scatterer containing all information required for
-target strength modeling.
+A pre-generated FLS scatterer containing all information required for target strength modeling.
 \describe{
 \item{metadata}{Relevant and identifying metadata (\code{list}).}
 \item{model_parameters}{Container for specified model parameters (\code{list}).}
 \item{model}{Model outputs and results (\code{list}).}
-\item{body}{
+\item{body}{A list with elements:
 \itemize{
-\item{rpos:}{ Position matrix (x, y, z; m).}
-\item{radius:}{ Radius of each discrete cylinder along the position
-matrix (m).}
-\item{g:}{ Body density contrast relative to the surrounding medium.}
-\item{h:}{ Sound speed contrast relative to the surrounding medium.}
-\item{theta:}{ Body orientation relative to transmitting transducer (\ifelse{html}{\out{&theta;<sub>body</sub>}}{\eqn{\theta_{body}}}
-, rads)}}}
-\item{shape_parameters}{
+\item \code{rpos}: Position matrix (x, y, z; m).
+\item \code{radius}: Radius of each discrete cylinder (m).
+\item \code{g}: Body density contrast relative to medium.
+\item \code{h}: Sound speed contrast relative to medium.
+\item \code{theta}: Orientation angle (\eqn{\theta_{body}}, radians).
+}
+}
+\item{shape_parameters}{A list with:
 \itemize{
-\item{body}{
-\itemize{
-\item{length:}{ Body length (m).}
-\item{ncyl:}{ Number of discrete cylinders along body length.}
-\item{theta_units:}{ Units used for orientation of body.}
-\item{length_units:}{ Units used for body length.}}
-}}
-}}
+\item \code{length}: Body length (m).
+\item \code{ncyl}: Number of cylinders.
+\item \code{theta_units}: Unit of orientation.
+\item \code{length_units}: Unit of length.
+}
+}
+}
 }
 \usage{
 data(krill)

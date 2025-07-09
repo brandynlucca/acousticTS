@@ -2,9 +2,10 @@
 % Please edit documentation in R/shapes.R
 \name{polynomial_cylinder}
 \alias{polynomial_cylinder}
-\title{Creates a polynomial deformed cylinder.}
+\title{Creates a polynomial deformed cylinder}
 \usage{
-polynomial_cylinder(length_body, radius_body, n_segments, polynomial)
+polynomial_cylinder(length_body, radius_body, n_segments, polynomial, 
+length_units)
 }
 \arguments{
 \item{length_body}{Length (m).}
@@ -15,12 +16,14 @@ polynomial_cylinder(length_body, radius_body, n_segments, polynomial)
 1e2 segments.}
 
 \item{polynomial}{Polynomial coefficient vector.}
+
+\item{length_units}{Units (default is meters, "m").}
 }
 \value{
 Creates the position vector for a polynomial deformed cylinder.
 }
 \description{
-Creates a polynomial deformed cylinder.
+Creates a polynomial deformed cylinder
 }
 \examples{
 \dontrun{

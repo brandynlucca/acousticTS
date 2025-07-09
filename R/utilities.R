@@ -170,6 +170,7 @@ body_rotation <- function( sum_rpos , rpos , theta , k_length ) {
 #' Format data for the modal series solution model into the appropriate matrix
 #' @param v Vector input.
 #' @param limit Modal series limit.
+#' @keywords internal
 #' @export
 modal_matrix <- function( v , limit ) {
   base::return(

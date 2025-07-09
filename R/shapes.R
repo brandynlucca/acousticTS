@@ -212,12 +212,13 @@ cylinder <-  function( length_body ,
 ################################################################################
 # Polynomial cylinder
 ################################################################################
-#' Creates a polynomial deformed cylinder.
+#' Creates a polynomial deformed cylinder
 #'
-#' @param polynomial Polynomial coefficient vector.
 #' @inheritParams cylinder
+#' @param polynomial Polynomial coefficient vector.
 #' @usage
-#' polynomial_cylinder(length_body, radius_body, n_segments, polynomial)
+#' polynomial_cylinder(length_body, radius_body, n_segments, polynomial, 
+#' length_units)
 #' @examples
 #' \dontrun{
 #' # We can use the polynomial coefficients defined in Smith et al. (2013) to
@@ -238,7 +239,7 @@ cylinder <-  function( length_body ,
 #' @export
 polynomial_cylinder <- function(length_body,
                                 radius_body,
-                                n_segments = 1e3,
+                                n_segments = 1e2,
                                 polynomial ,
                                 length_units = "m" ) {
   # Define normalized x-axis ===================================================

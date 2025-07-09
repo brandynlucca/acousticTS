@@ -18,8 +18,7 @@ Calculates the theoretical TS of a shelled organism using the non-modal
 High Pass (HP) model
 }
 \references{
-Lavery, A.C., Wiebe, P.H., Stanton, T.K., Lawson, G.L., Benfield, M.C.,
-Copley, N. 2007. Determining dominant scatterers of sound in mixed
-zooplankton popuilations. The Journal of the Acoustical Society of America,
-122(6): 3304-3326.
+Stanton, T.K. (1989). Simple approximate formulas for backscattering of
+sound by spherical and elongated objects. The Journal of the Acoustical
+Society of America, 86, 1499-1510.
 }

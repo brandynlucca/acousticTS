@@ -22,7 +22,7 @@ calculate_goodman_stern_alpha(
 
 \item{m}{Modal vector}
 
-\item{lambda}{Lamé first parameter}
+\item{lambda}{Lam\'e's first parameter}
 
 \item{mu}{Shear modulus}
 
@@ -38,3 +38,4 @@ List of alpha coefficients
 \description{
 Calculate alpha coefficients for Goodman-Stern model
 }
+\keyword{internal}

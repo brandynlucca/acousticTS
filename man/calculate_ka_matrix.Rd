@@ -35,3 +35,4 @@ Matrix of ka values
 \description{
 Calculate ka matrix for Goodman and Stern (1962) model
 }
+\keyword{internal}

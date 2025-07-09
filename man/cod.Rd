@@ -3,7 +3,7 @@
 \docType{data}
 \name{cod}
 \alias{cod}
-\title{Sample sardine shape with fully inflated swimbladder.}
+\title{Sample code shape with fully inflated swimbladder.}
 \format{
 A pre-generated SBF scatterer containing all information required for
 target strength modeling.
@@ -11,40 +11,34 @@ target strength modeling.
 \item{metadata}{Relevant and identifying metadata (\code{list}).}
 \item{model_parameters}{Container for specified model parameters (\code{list}).}
 \item{model}{Model outputs and results (\code{list}).}
-\item{body}{
+\item{body}{List with:
 \itemize{
-\item{rpos:}{ Position matrix (x, yw, zU, zL; m).}
-\item{sound_speed:}{ Flesh sound speed (\ifelse{html}{\out{c<sub>body</sub>}}{\eqn{c_{body}}}, m \ifelse{html}{\out{s<sup>-1</sup>}}{\eqn{s^{-1}}})}
-\item{density:}{ Flesh density (\ifelse{html}{\out{&rho;<sub>body</sub>}}{\eqn{\rho_{body}}}, kg \ifelse{html}{\out{m<sup>3</sup>}}{\eqn{m^3}})}
-\item{theta:}{ Body orientation relative to transmitting transducer (\ifelse{html}{\out{&theta;<sub>body</sub>}}{\eqn{\theta_{body}}}
-, rads)}}}
-\item{bladder}{
+\item \code{rpos}: Position matrix (x, yw, zU, zL; m).
+\item \code{sound_speed}: Flesh sound speed (\eqn{c_{body}}, m/s).
+\item \code{density}: Flesh density (\eqn{\rho_{body}}, kg/m\eqn{^3}).
+\item \code{theta}: Orientation relative to transducer (\eqn{\theta_{body}}, radians).
+}
+}
+\item{bladder}{List with:
 \itemize{
-\item{rpos:}{ Position matrix (x, yw, zU, zL; m).}
-\item{sound_speed:}{ Flesh sound speed (\ifelse{html}{\out{c<sub>bladder</sub>}}{\eqn{c_{bladder}}}, m \ifelse{html}{\out{s<sup>-1</sup>}}{\eqn{s^{-1}}})}
-\item{density:}{ Flesh density (\ifelse{html}{\out{&rho;<sub>bladder</sub>}}{\eqn{\rho_{bladder}}}, kg \ifelse{html}{\out{m<sup>3</sup>}}{\eqn{m^3}})}
-\item{theta:}{ Body orientation relative to transmitting transducer (\ifelse{html}{\out{&theta;<sub>bladder</sub>}}{\eqn{\theta_{bladder}}}
-, rads)}}}
-\item{shape_parameters}{
+\item \code{rpos}: Position matrix (x, yw, zU, zL; m).
+\item \code{sound_speed}: Flesh sound speed (\eqn{c_{bladder}}, m/s).
+\item \code{density}: Flesh density (\eqn{\rho_{bladder}}, kg/m\eqn{^3}).
+\item \code{theta}: Orientation relative to transducer (\eqn{\theta_{bladder}}, radians).
+}
+}
+\item{shape_parameters}{Named list with:
 \itemize{
-\item{body}{
-\itemize{
-\item{length:}{ Body length (m).}
-\item{ncyl:}{ Number of discrete cylinders along body length.}
-\item{theta_units:}{ Units used for orientation of body.}
-\item{length_units:}{ Units used for body length.}}}
-\item{bladder}{
-\itemize{
-\item{length:}{ Bladder length (m).}
-\item{ncyl:}{ Number of discrete cylinders along swimbladder length.}
-\item{theta_units:}{ Units used for orientation of swimbladder.}
-\item{length_units:}{ Units used for swimbladder length.
-}}}}}}
+\item \code{body}: List with length (m), ncyl (int), theta_units (str), length_units (str).
+\item \code{bladder}: List with length (m), ncyl (int), theta_units (str), length_units (str).
+}
+}
+}
 }
 \usage{
 data(cod)
 }
 \description{
-Sample sardine shape with fully inflated swimbladder.
+Sample code shape with fully inflated swimbladder.
 }
 \keyword{datasets}

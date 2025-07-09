@@ -7,6 +7,7 @@
 #' @param rpos Position vector
 #' @param iterations Number of iterations
 #' @rdname along_sum
+#' @keywords internal
 #' @export
 along_sum <- function( rpos , iterations ) {
   output <- rpos[ , 1 : ( iterations - 1 ) ] + rpos[ , 2 : iterations ]
@@ -19,6 +20,7 @@ along_sum <- function( rpos , iterations ) {
 #' @param x Indexing argument for multi-row objects
 #' @param y Indexing argument for multi-column objects
 #' @rdname contour_integrate
+#' @keywords internal
 #' @export
 contour_integrate <- function( integral , x , y ) {
   complex( real = integrate( function( s ) Re( integral( s , x , y ) ) ,

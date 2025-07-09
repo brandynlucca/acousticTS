@@ -14,3 +14,4 @@ along_sum(rpos, iterations)
 \description{
 Along-matrix summing function
 }
+\keyword{internal}

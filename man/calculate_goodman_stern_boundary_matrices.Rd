@@ -19,3 +19,4 @@ List of boundary matrices for each frequency and modal order
 \description{
 Calculate boundary condition matrices for Goodman and Stern (1962) model
 }
+\keyword{internal}

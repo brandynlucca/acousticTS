@@ -14,3 +14,4 @@ modal_matrix(v, limit)
 \description{
 Format data for the modal series solution model into the appropriate matrix
 }
+\keyword{internal}
