@@ -1,4 +1,4 @@
-name: pkgdown-CI
+name: pkgdown
 
 on:
   push:
