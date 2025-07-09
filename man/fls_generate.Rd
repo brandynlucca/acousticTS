@@ -57,7 +57,7 @@ Default value is pi/2; input should be in radians.}
 \item{...}{Additional parameters.}
 }
 \value{
-Calls in an FLS-class object from a *.csv file
+FLS-class object
 }
 \description{
 Manually generate a FLS object.

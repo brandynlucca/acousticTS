@@ -4,21 +4,22 @@
 \alias{pois}
 \title{Calculate the Poisson's ratio (\eqn{\nu}).}
 \usage{
-pois(K, E, G)
+pois(K = NULL, E = NULL, G = NULL)
 }
 \arguments{
-\item{K}{Bulk modulus (K, GPa).}
+\item{K}{Bulk modulus (K, Pa).}
 
-\item{E}{Young's modulus (E, GPa).}
+\item{E}{Young's modulus (E, Pa).}
 
-\item{G}{Shear modulus (GPa).}
+\item{G}{Shear modulus (Pa).}
 }
 \value{
-Returns a unitless ratio known as Poisson's ratio (\eqn{\nu}).
+Returns a dimensionless ratio known as Poisson's ratio (\eqn{\nu}).
 }
 \description{
 Calculate the Poisson's ratio (\eqn{\nu}) from two of the three other elastic
-moduli to calculate the Lamé's parameter. When more than two values are input,
-the function will default to using the bulk (K) and Young's (E) moduli. This
-assumes that the input values represent 3D material properties.
+moduli to calculate the \enc{Lamé}{Lame}'s parameter. When more than two
+values are input, the function will default to using the bulk (K) and
+Young's (E) moduli. This assumes that the input values represent 3D material
+properties.
 }

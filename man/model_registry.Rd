@@ -5,7 +5,7 @@
 \alias{model_registry}
 \title{Model registry: maps model names to their functions}
 \format{
-An object of class \code{list} of length 9.
+An object of class \code{list} of length 10.
 }
 \usage{
 model_registry

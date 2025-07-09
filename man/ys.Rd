@@ -3,11 +3,14 @@
 \name{ys}
 \alias{ys}
 \alias{ysd}
+\alias{ysdd}
 \title{Spherical Bessel function of the second kind and its respective derivative}
 \usage{
 ys(l, n)
 
 ysd(l, n)
+
+ysdd(l, n)
 }
 \arguments{
 \item{l}{An integer or fractional order}
@@ -15,8 +18,8 @@ ysd(l, n)
 \item{n}{A complex or real argument}
 }
 \value{
-Calculates the spherical Bessel function of the first kind (js) and its
-first (ysd) derivative.
+Calculates the spherical Bessel function of the second kind (ys) and its
+first (ysd) and second (ysdd) derivatives.
 }
 \description{
 Spherical Bessel function of the second kind and its respective derivative

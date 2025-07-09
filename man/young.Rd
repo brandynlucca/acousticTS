@@ -4,21 +4,22 @@
 \alias{young}
 \title{Calculate Young's modulus (E).}
 \usage{
-young(K, G, nu)
+young(K = NULL, G = NULL, nu = NULL)
 }
 \arguments{
-\item{K}{Bulk modulus (GPa).}
+\item{K}{Bulk modulus (Pa).}
 
-\item{G}{Shear modulus (GPa).}
+\item{G}{Shear modulus (Pa).}
 
-\item{nu}{Poisson's ratio (unitless).}
+\item{nu}{Poisson's ratio (Dimensionless).}
 }
 \value{
 Returns an estimate for the Young's modulus (E).
 }
 \description{
 Calculate the Young's modulus (E) from two of the three other elastic
-moduli to calculate the Lamé's parameter. When more than two values are input,
-the function will default to using the bulk (K) and shear (G) moduli. This
-assumes that the input values represent 3D material properties.
+moduli to calculate the \enc{Lamé}{Lame}'s parameter. When more than two
+values are input, the function will default to using the bulk (K) and shear
+(G) moduli. This assumes that the input values represent 3D material
+properties.
 }

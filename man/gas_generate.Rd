@@ -45,7 +45,7 @@ Default value is pi/2; input should be in radians.}
 \item{n_segments}{Number of body segments.}
 }
 \value{
-Creates a GAS-class object from a *.csv file
+GAS-class object
 }
 \description{
 Create GAS object

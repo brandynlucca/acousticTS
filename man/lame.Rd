@@ -2,25 +2,25 @@
 % Please edit documentation in R/acoustics.R
 \name{lame}
 \alias{lame}
-\title{Calculate Lamé's first parameter (\eqn{\lambda}).}
+\title{Calculate \enc{Lamé}{Lame}'s first parameter (\eqn{\lambda}).}
 \usage{
 lame(K, E, G, nu)
 }
 \arguments{
-\item{K}{Bulk modulus (GPa).}
+\item{K}{Bulk modulus (Pa).}
 
-\item{E}{Young's modulus (GPa).}
+\item{E}{Young's modulus (Pa).}
 
-\item{G}{Shear modulus (GPa).}
+\item{G}{Shear modulus (Pa).}
 
-\item{nu}{Poisson's ratio (unitless).}
+\item{nu}{Poisson's ratio (Dimensionless).}
 }
 \value{
-Returns an Lamé's first parameter (\eqn{\lambda}).
+Returns an \enc{Lamé}{Lame}'s first parameter (\eqn{\lambda}).
 }
 \description{
-Calculate Lamé's first parameter (\eqn{\lambda}) from two of the four other
-elastic moduli. When more than two values are input, the function will default
-to using the bulk (K) and Young's (E) moduli. This assumes that the input
-values represent 3D material properties.
+Calculate \enc{Lamé}{Lame}'s first parameter (\eqn{\lambda}) from two of the
+four other elastic moduli. When more than two values are input, the function
+will default to using the bulk (K) and Young's (E) moduli. This assumes that
+the input values represent 3D material properties.
 }

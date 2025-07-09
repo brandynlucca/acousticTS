@@ -225,7 +225,7 @@ cal_generate <- function( material = "WC" ,
 #' @param ID Optional metadata entry.
 #' @param ... Additional parameters.
 #' @return
-#' Calls in an FLS-class object from a *.csv file
+#' FLS-class object
 #' @import methods
 #' @export
 fls_generate <- function( shape = "arbitrary" ,
@@ -324,6 +324,7 @@ fls_generate <- function( shape = "arbitrary" ,
 #' @param radius_units Diameter units. Defaults to "m".
 #' @param n_segments Number of body segments.
 #' @return
+#' GAS-class object
 #' @import methods
 #' @export
 gas_generate <- function( shape = "sphere" ,
@@ -395,9 +396,13 @@ gas_generate <- function( shape = "sphere" ,
 #' @param radius_shell Radius of shell (m).
 #' @param shell_thickness Optional shell thickness (m).
 #' @param g_fluid Optional density contrast for fluid-like body.
+#' @param density_fluid Optional density for fluid-like body (kg/m³).
 #' @param h_fluid Optional sound speed contrast for fluid-like body.
+#' @param sound_speed_fluid Optional sound speed for fluid-like body (m/s).
 #' @param g_shell Density contrast for the shell.
+#' @param density_shell Optional density for the shell (kg/m³).
 #' @param h_shell Sound speed contrast for the shell.
+#' @param sound_speed_shell Optional sound speed for the shell (m/s).
 #' @param E Young's modulus (Pa) of the shell material.
 #' @param nu Poisson's ratio (Dimensionless) of the shell material. 
 #' @param G Shear modulus (Pa) of the shell material.

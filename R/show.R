@@ -227,7 +227,7 @@ ess_show <- function( object ) {
   shell_material_text <- if( length( shell_material_props ) > 0 ) {
     prop_strings <- mapply( function( name , value ) {
       clean_name <- gsub( "_" , " " , name )  # Remove underscores
-      clean_name <- switch( clean_name ,
+      clean_name <- switch( EXPR = clean_name ,
                             "density" = "Density" ,
                             "sound speed" = "Sound speed" ,
                             "K" = "Bulk modulus (K)" ,
@@ -235,7 +235,7 @@ ess_show <- function( object ) {
                             "G" = "Shear modulus (G)" ,
                             "nu" = "Poisson's ratio" ,
                             clean_name )
-      units <- switch( name ,
+      units <- switch( EXPR = name ,
                        "density" = " kg m^-3" ,
                        "sound_speed" = " m s^-1" ,
                        "K" = " Pa" ,
@@ -252,7 +252,7 @@ ess_show <- function( object ) {
   fluid_material_props <- fluid[
     names( fluid ) %in% c( "sound_speed" , "density" , "g" , "h" )     
   ]
-  fluid_material_text <- if( length( shell_material_props ) > 0 ) {
+  fluid_material_text <- if( length( fluid_material_props ) > 0 ) {
     prop_strings <- mapply( function( name , value ) {
       clean_name <- gsub( "_" , " " , name )  # Remove underscores
       clean_name <- switch( clean_name ,

@@ -93,12 +93,11 @@ mss_anderson_initialize <- function(object ,
 ################################################################################
 #' Initialize ESS-object for modal series solution.
 #' @param object ESS-class object.
-#' @param radius Radius of sphere (m).
-#' @param g_body Density contrast for gas.
-#' @param h_body Sound speed contrast for gas.
+#' @param frequency Frequency vector (Hz).
+#' @param sound_speed_sw Seawater sound speed (m/s). Default: 1500.
+#' @param density_sw Seawater density (kg/m³). Default: 1026.
 #' @param m_limit Modal series limit (i.e. max "m"). The default is the maximum
 #'    ka + 10.
-#' @inheritParams krm_initialize
 #' @export
 mss_goodman_stern_initialize <- function( object ,
                                           frequency ,
