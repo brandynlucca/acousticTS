@@ -49,9 +49,17 @@
 <span>  <span class="va">radius_shell</span>,</span>
 <span>  shell_thickness <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  g_fluid <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  density_fluid <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  h_fluid <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">g_shell</span>,</span>
-<span>  <span class="va">h_shell</span>,</span>
+<span>  sound_speed_fluid <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  g_shell <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  density_shell <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  h_shell <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  sound_speed_shell <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  E <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  G <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  K <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  nu <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  theta_shell <span class="op">=</span> <span class="va">pi</span><span class="op">/</span><span class="fl">2</span>,</span>
 <span>  ID <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  theta_units <span class="op">=</span> <span class="st">"radians"</span>,</span>
@@ -92,16 +100,48 @@ generalized shapes.</p></dd>
 <dd><p>Optional density contrast for fluid-like body.</p></dd>
 
 
+<dt id="arg-density-fluid">density_fluid<a class="anchor" aria-label="anchor" href="#arg-density-fluid"></a></dt>
+<dd><p>Optional density for fluid-like body (kg/m³).</p></dd>
+
+
 <dt id="arg-h-fluid">h_fluid<a class="anchor" aria-label="anchor" href="#arg-h-fluid"></a></dt>
 <dd><p>Optional sound speed contrast for fluid-like body.</p></dd>
+
+
+<dt id="arg-sound-speed-fluid">sound_speed_fluid<a class="anchor" aria-label="anchor" href="#arg-sound-speed-fluid"></a></dt>
+<dd><p>Optional sound speed for fluid-like body (m/s).</p></dd>
 
 
 <dt id="arg-g-shell">g_shell<a class="anchor" aria-label="anchor" href="#arg-g-shell"></a></dt>
 <dd><p>Density contrast for the shell.</p></dd>
 
 
+<dt id="arg-density-shell">density_shell<a class="anchor" aria-label="anchor" href="#arg-density-shell"></a></dt>
+<dd><p>Optional density for the shell (kg/m³).</p></dd>
+
+
 <dt id="arg-h-shell">h_shell<a class="anchor" aria-label="anchor" href="#arg-h-shell"></a></dt>
 <dd><p>Sound speed contrast for the shell.</p></dd>
+
+
+<dt id="arg-sound-speed-shell">sound_speed_shell<a class="anchor" aria-label="anchor" href="#arg-sound-speed-shell"></a></dt>
+<dd><p>Optional sound speed for the shell (m/s).</p></dd>
+
+
+<dt id="arg-e">E<a class="anchor" aria-label="anchor" href="#arg-e"></a></dt>
+<dd><p>Young's modulus (Pa) of the shell material.</p></dd>
+
+
+<dt id="arg-g">G<a class="anchor" aria-label="anchor" href="#arg-g"></a></dt>
+<dd><p>Shear modulus (Pa) of the shell material.</p></dd>
+
+
+<dt id="arg-k">K<a class="anchor" aria-label="anchor" href="#arg-k"></a></dt>
+<dd><p>Bulk modulus (Pa) of the shell material.</p></dd>
+
+
+<dt id="arg-nu">nu<a class="anchor" aria-label="anchor" href="#arg-nu"></a></dt>
+<dd><p>Poisson's ratio (Dimensionless) of the shell material.</p></dd>
 
 
 <dt id="arg-theta-shell">theta_shell<a class="anchor" aria-label="anchor" href="#arg-theta-shell"></a></dt>
@@ -120,6 +160,10 @@ generalized shapes.</p></dd>
 <dd><p>Units used for position vector. Defaults to "m".</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>ESS-class object</p>
+    </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

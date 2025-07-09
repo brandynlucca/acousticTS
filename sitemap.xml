@@ -14,6 +14,7 @@
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/GAS.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/KRM.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/MSS_anderson.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/MSS_goodman_stern.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/Pn.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/SBF.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/SDWBA.html</loc></url>
@@ -29,6 +30,10 @@
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/cal_generate.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/cal_plot.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/cal_show.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/calculate_bessel_cache.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/calculate_goodman_stern_alpha.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/calculate_goodman_stern_boundary_matrices.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/calculate_ka_matrix.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/calibration.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/calibration_initialize.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/cod.html</loc></url>
@@ -41,6 +46,7 @@
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/dwba_curved_initialize.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/dwba_initialize.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/ess_generate.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/ess_plot.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/ess_show.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/extract.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/fls_generate.html</loc></url>
@@ -67,6 +73,7 @@
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/model_palette.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/model_registry.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/mss_anderson_initialize.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/mss_goodman_stern_initialize.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/phase_integrate.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/plot.scatterer.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/pois.html</loc></url>
