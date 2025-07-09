@@ -52,8 +52,7 @@ by McGehee et al. (1998).</p>
 
     <div class="section level2">
     <h2 id="format">Format<a class="anchor" aria-label="anchor" href="#format"></a></h2>
-    <p>A pre-generated FLS scatterer containing all information required for
-target strength modeling.</p><dl><dt>metadata</dt>
+    <p>A pre-generated FLS scatterer containing all information required for target strength modeling.</p><dl><dt>metadata</dt>
 <dd><p>Relevant and identifying metadata (<code>list</code>).</p></dd>
 
 <dt>model_parameters</dt>
@@ -63,25 +62,20 @@ target strength modeling.</p><dl><dt>metadata</dt>
 <dd><p>Model outputs and results (<code>list</code>).</p></dd>
 
 <dt>body</dt>
-<dd>
-<ul><li><p>rpos: Position matrix (x, y, z; m).</p></li>
-<li><p>radius: Radius of each discrete cylinder along the position
-matrix (m).</p></li>
-<li><p>g: Body density contrast relative to the surrounding medium.</p></li>
-<li><p>h: Sound speed contrast relative to the surrounding medium.</p></li>
-<li><p>theta: Body orientation relative to transmitting transducer (θ<sub>body</sub>
-, rads)</p></li>
+<dd><p>A list with elements:</p><ul><li><p><code>rpos</code>: Position matrix (x, y, z; m).</p></li>
+<li><p><code>radius</code>: Radius of each discrete cylinder (m).</p></li>
+<li><p><code>g</code>: Body density contrast relative to medium.</p></li>
+<li><p><code>h</code>: Sound speed contrast relative to medium.</p></li>
+<li><p><code>theta</code>: Orientation angle (\(\theta_{body}\), radians).</p></li>
 </ul></dd>
 
 <dt>shape_parameters</dt>
-<dd>
-<ul><li><p>body
-</p><ul><li><p>length: Body length (m).</p></li>
-<li><p>ncyl: Number of discrete cylinders along body length.</p></li>
-<li><p>theta_units: Units used for orientation of body.</p></li>
-<li><p>length_units: Units used for body length.</p></li>
-</ul></li>
+<dd><p>A list with:</p><ul><li><p><code>length</code>: Body length (m).</p></li>
+<li><p><code>ncyl</code>: Number of cylinders.</p></li>
+<li><p><code>theta_units</code>: Unit of orientation.</p></li>
+<li><p><code>length_units</code>: Unit of length.</p></li>
 </ul></dd>
+
 
 </dl></div>
 
