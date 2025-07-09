@@ -171,7 +171,7 @@ cylinder <-  function( length_body ,
   # Define maximum radius ======================================================
   if ( missing( radius_body ) ) {
     max_radius <- length_body / length_radius_ratio
-  } else if ( missing( radius_body ) ) {
+  } else if ( ! missing( radius_body ) ) {
     max_radius <- radius_body
   } else {
     stop("Radius/width and/or length-to-radius ratio are missing.")
@@ -239,7 +239,8 @@ cylinder <-  function( length_body ,
 polynomial_cylinder <- function(length_body,
                                 radius_body,
                                 n_segments = 1e3,
-                                polynomial) {
+                                polynomial ,
+                                length_units = "m" ) {
   # Define normalized x-axis ===================================================
   x_n_axis <- seq(-1, 1, length.out = n_segments + 1)
   # Evaluate polynomial coefficients ===========================================
@@ -250,11 +251,22 @@ polynomial_cylinder <- function(length_body,
   # Define output x-axis =======================================================
   x_axis <- x_n_axis * length_body / 2 + length_body / 2
   # Generate position vector, 'rpos' ===========================================
-  rpos <- list(rpos = data.frame(x = x_axis,
-                                 y = rep(0, length(x_axis)),
-                                 z = rep(0, length(x_axis))),
-               radius = radius_output)
-  return(rpos)
+  position_matrix <- cbind( x = x_axis ,
+                            y = rep( 0 , length( x_axis ) ) ,
+                            z = rep( 0 , length( x_axis ) ) )
+  # Generate shape parameters list =============================================
+  shape_parameters <- list(
+    length = max( position_matrix[ , 1 ] ) ,
+    radius = radius_output ,
+    length_radius_ratio = max( position_matrix[ , 1 ] ) /
+      max( radius_output ) ,
+    n_segments = n_segments ,
+    length_units = length_units
+  )
+  # Generate new shape object ==================================================
+  return( new( "shape" ,
+               position_matrix = position_matrix ,
+               shape_parameters = shape_parameters ) )
 }
 ################################################################################
 # Wrapper function for generating shape
