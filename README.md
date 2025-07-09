@@ -1,7 +1,7 @@
 
 # acousticTS
 
-[![DOI](https://zenodo.org/badge/161965429.svg)](https://zenodo.org/badge/latestdoi/161965429) [![Documentation](https://img.shields.io/badge/Latest_Documentation-cornflowerblue)](https://brandynlucca.github.io/acousticTS/)
+[![DOI](https://zenodo.org/badge/161965429.svg)](https://zenodo.org/badge/latestdoi/161965429) [![Documentation](https://img.shields.io/badge/Latest_Documentation-cornflowerblue)](https://brandynlucca.github.io/acousticTS/)  
 [![Build status](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml) [![Coverage](https://github.com/brandynlucca/acousticTS/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/test-coverage.yaml) [![Docs](https://github.com/brandynlucca/acousticTS/actions/workflows/document.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/document.yaml) [![pkgdown](https://github.com/brandynlucca/acousticTS/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/pkgdown.yaml) [![pages-build-deployment](https://github.com/brandynlucca/acousticTS/actions/workflows/pages/pages-build-deployment/badge.svg?branch=gh-pages)](https://github.com/brandynlucca/acousticTS/actions/workflows/pages/pages-build-deployment)
 
 Acoustic backscatter from a single target or organism is expressed as
