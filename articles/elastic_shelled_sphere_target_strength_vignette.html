@@ -6,7 +6,13 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Target strength for elastic shelled spheres • acousticTS</title>
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
+  window.MathJax = {
+    chtml: {
+      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
+    }
+  };
+</script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -252,7 +258,7 @@ of the Acoustical Society of America, 86, 1499-1510.&lt;/p&gt;"><sup>4</sup></a>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Plot TS as a function of frequency</span></span>
 <span><span class="fu"><a href="../reference/plot.scatterer.html">plot</a></span><span class="op">(</span><span class="va">shelled_sphere</span>, type <span class="op">=</span> <span class="st">"model"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="elastic_shelled_sphere_target_strength_vignette_files/figure-html/unnamed-chunk-5-1.png" width="576"></p>
+<p><img src="elastic_shelled_sphere_target_strength_vignette_files/figure-html/unnamed-chunk-5-1.png" width="768"></p>
 </div>
 </div>
 <div class="section level3">
@@ -334,6 +340,7 @@ properties and geometric parameters affect the target strength.</p>
 <span><span class="va">ts_thick</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">sphere_thick</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">$</span><span class="va">MSS_goodman_stern</span></span>
 <span></span>
 <span><span class="co"># Plot comparison</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>oma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.25</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, mar<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">4</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/plot.scatterer.html">plot</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ts_thin</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>, </span>
 <span>     y <span class="op">=</span> <span class="va">ts_thin</span><span class="op">$</span><span class="va">TS</span>, </span>
 <span>     type <span class="op">=</span> <span class="st">'l'</span>,</span>
@@ -392,6 +399,7 @@ properties and geometric parameters affect the target strength.</p>
 <span><span class="va">ts_heavy</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">sphere_heavy</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">$</span><span class="va">MSS_goodman_stern</span></span>
 <span></span>
 <span><span class="co"># Plot comparison</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>oma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.25</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, mar<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">4</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/plot.scatterer.html">plot</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ts_medium</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>, </span>
 <span>     y <span class="op">=</span> <span class="va">ts_medium</span><span class="op">$</span><span class="va">TS</span>, </span>
 <span>     type <span class="op">=</span> <span class="st">'l'</span>,</span>

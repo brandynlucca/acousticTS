@@ -6,7 +6,13 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Target strength modeling with the Deformed Cylinder Model (DCM) • acousticTS</title>
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
+  window.MathJax = {
+    chtml: {
+      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
+    }
+  };
+</script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -142,11 +148,11 @@ zooplankton organism:</p>
 <span><span class="co">##   Fluid-like scatterer </span></span>
 <span><span class="co">##    ID: UID </span></span>
 <span><span class="co">##  Body dimensions:</span></span>
-<span><span class="co">##   Length: 0.02 m (n = 51 cylinders) </span></span>
+<span><span class="co">##   Length: 0.02 m (n = 50 cylinders) </span></span>
 <span><span class="co">##   Mean radius: 0.0025 m </span></span>
 <span><span class="co">##   Max radius: 0.0025 m </span></span>
 <span><span class="co">##  Shape parameters:</span></span>
-<span><span class="co">##   Defined shape: arbitrary </span></span>
+<span><span class="co">##   Defined shape: Cylinder </span></span>
 <span><span class="co">##   L/a ratio: 8 </span></span>
 <span><span class="co">##   Taper order:  </span></span>
 <span><span class="co">##  Material properties:</span></span>
@@ -180,11 +186,11 @@ spheroid:</p>
 <span><span class="co">##   Fluid-like scatterer </span></span>
 <span><span class="co">##    ID: UID </span></span>
 <span><span class="co">##  Body dimensions:</span></span>
-<span><span class="co">##   Length: 0.018 m (n = 51 cylinders) </span></span>
+<span><span class="co">##   Length: 0.018 m (n = 50 cylinders) </span></span>
 <span><span class="co">##   Mean radius: 0.0015 m </span></span>
 <span><span class="co">##   Max radius: 0.002 m </span></span>
 <span><span class="co">##  Shape parameters:</span></span>
-<span><span class="co">##   Defined shape: arbitrary </span></span>
+<span><span class="co">##   Defined shape: ProlateSpheroid </span></span>
 <span><span class="co">##   L/a ratio: 9 </span></span>
 <span><span class="co">##   Taper order:  </span></span>
 <span><span class="co">##  Material properties:</span></span>
@@ -194,10 +200,10 @@ spheroid:</p>
 <p>Let’s visualize these shapes:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Plot both shapes for comparison</span></span>
-<span><span class="fu"><a href="../reference/plot.scatterer.html">plot</a></span><span class="op">(</span><span class="va">cylinder_scatterer</span>, type <span class="op">=</span> <span class="st">"shape"</span>, main <span class="op">=</span> <span class="st">"Cylinder"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/plot.scatterer.html">plot</a></span><span class="op">(</span><span class="va">cylinder_scatterer</span>, type <span class="op">=</span> <span class="st">"shape"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="dcm_deformed_cylinder_model_vignette_files/figure-html/unnamed-chunk-4-1.png" width="768"></p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot.scatterer.html">plot</a></span><span class="op">(</span><span class="va">prolate_scatterer</span>, type <span class="op">=</span> <span class="st">"shape"</span>, main <span class="op">=</span> <span class="st">"Prolate Spheroid"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot.scatterer.html">plot</a></span><span class="op">(</span><span class="va">prolate_scatterer</span>, type <span class="op">=</span> <span class="st">"shape"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="dcm_deformed_cylinder_model_vignette_files/figure-html/unnamed-chunk-4-2.png" width="768"></p>
 </div>
 </div>
@@ -311,6 +317,7 @@ explore this:</p>
 <span><span class="va">ts_original</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">cylinder_scatterer</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">$</span><span class="va">DCM</span></span>
 <span></span>
 <span><span class="co"># Plot comparison</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>oma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.25</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, mar<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">4</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/plot.scatterer.html">plot</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ts_original</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>, </span>
 <span>     y <span class="op">=</span> <span class="va">ts_original</span><span class="op">$</span><span class="va">TS</span>, </span>
 <span>     type <span class="op">=</span> <span class="st">'l'</span>,</span>
@@ -318,6 +325,7 @@ explore this:</p>
 <span>     lwd <span class="op">=</span> <span class="fl">2.5</span>,</span>
 <span>     xlab <span class="op">=</span> <span class="st">"Frequency (kHz)"</span>,</span>
 <span>     ylab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">Target</span><span class="op">~</span><span class="va">strength</span><span class="op">~</span><span class="op">(</span><span class="va">dB</span><span class="op">~</span><span class="va">re.</span><span class="op">~</span><span class="fl">1</span><span class="op">~</span><span class="va">m</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>     ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">115</span>, <span class="op">-</span><span class="fl">55</span><span class="op">)</span>,</span>
 <span>     cex.lab <span class="op">=</span> <span class="fl">1.3</span>, </span>
 <span>     cex.axis <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span></span>
 <span></span>
@@ -377,6 +385,7 @@ scatterer’s orientation:</p>
 <span><span class="va">ts_70</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">oblique_70</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">$</span><span class="va">DCM</span></span>
 <span></span>
 <span><span class="co"># Plot orientation comparison</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>oma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.25</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, mar<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">4</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/plot.scatterer.html">plot</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ts_broadside</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>, </span>
 <span>     y <span class="op">=</span> <span class="va">ts_broadside</span><span class="op">$</span><span class="va">TS</span>, </span>
 <span>     type <span class="op">=</span> <span class="st">'l'</span>,</span>
@@ -386,7 +395,7 @@ scatterer’s orientation:</p>
 <span>     ylab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">Target</span><span class="op">~</span><span class="va">strength</span><span class="op">~</span><span class="op">(</span><span class="va">dB</span><span class="op">~</span><span class="va">re.</span><span class="op">~</span><span class="fl">1</span><span class="op">~</span><span class="va">m</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>     cex.lab <span class="op">=</span> <span class="fl">1.3</span>, </span>
 <span>     cex.axis <span class="op">=</span> <span class="fl">1.2</span>,</span>
-<span>     ylim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">120</span>, <span class="op">-</span><span class="fl">50</span><span class="op">)</span><span class="op">)</span></span>
+<span>     ylim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">140</span>, <span class="op">-</span><span class="fl">60</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ts_80</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>,</span>
 <span>      y <span class="op">=</span> <span class="va">ts_80</span><span class="op">$</span><span class="va">TS</span>,</span>
@@ -433,6 +442,7 @@ scatterer’s orientation:</p>
 <span><span class="va">ts_large</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">large_scatterer</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">$</span><span class="va">DCM</span></span>
 <span></span>
 <span><span class="co"># Plot size comparison</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>oma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.25</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, mar<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">4</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/plot.scatterer.html">plot</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ts_small</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>, </span>
 <span>     y <span class="op">=</span> <span class="va">ts_small</span><span class="op">$</span><span class="va">TS</span>, </span>
 <span>     type <span class="op">=</span> <span class="st">'l'</span>,</span>
@@ -514,6 +524,7 @@ pattern</li>
 <span><span class="va">dcm_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">cylinder_scatterer</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">$</span><span class="va">DCM</span></span>
 <span></span>
 <span><span class="co"># Plot ka vs frequency to show the high-frequency regime</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>oma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.25</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, mar<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">4</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/plot.scatterer.html">plot</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">dcm_results</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>, </span>
 <span>     y <span class="op">=</span> <span class="va">dcm_results</span><span class="op">$</span><span class="va">ka</span>, </span>
 <span>     type <span class="op">=</span> <span class="st">'l'</span>,</span>

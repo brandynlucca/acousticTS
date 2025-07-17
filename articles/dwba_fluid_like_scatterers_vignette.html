@@ -6,7 +6,13 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>DWBA and SDWBA models for fluid-like scatterers • acousticTS</title>
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
+  window.MathJax = {
+    chtml: {
+      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
+    }
+  };
+</script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -138,11 +144,11 @@ complex curved forms.</p>
 <span><span class="co">##   Fluid-like scatterer </span></span>
 <span><span class="co">##    ID: UID </span></span>
 <span><span class="co">##  Body dimensions:</span></span>
-<span><span class="co">##   Length: 0.015 m (n = 51 cylinders) </span></span>
+<span><span class="co">##   Length: 0.015 m (n = 50 cylinders) </span></span>
 <span><span class="co">##   Mean radius: 0.002 m </span></span>
 <span><span class="co">##   Max radius: 0.002 m </span></span>
 <span><span class="co">##  Shape parameters:</span></span>
-<span><span class="co">##   Defined shape: arbitrary </span></span>
+<span><span class="co">##   Defined shape: Cylinder </span></span>
 <span><span class="co">##   L/a ratio: 7.5 </span></span>
 <span><span class="co">##   Taper order:  </span></span>
 <span><span class="co">##  Material properties:</span></span>
@@ -169,7 +175,7 @@ krill:</p>
 <span><span class="co">##   Fluid-like scatterer </span></span>
 <span><span class="co">##    ID: Antarctic Euphausia superba (McGehee et al., 1998) </span></span>
 <span><span class="co">##  Body dimensions:</span></span>
-<span><span class="co">##   Length: 0.041 m (n = 15 cylinders) </span></span>
+<span><span class="co">##   Length: 0.041 m (n = 14 cylinders) </span></span>
 <span><span class="co">##   Mean radius: 0.0013 m </span></span>
 <span><span class="co">##   Max radius: 0.002 m </span></span>
 <span><span class="co">##  Shape parameters:</span></span>
@@ -312,6 +318,7 @@ strength:</p>
 <span><span class="va">ts_original</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">cylinder_scatterer</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">$</span><span class="va">DWBA</span></span>
 <span></span>
 <span><span class="co"># Plot comparison</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>oma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.25</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, mar<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">4</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/plot.scatterer.html">plot</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ts_original</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>, </span>
 <span>     y <span class="op">=</span> <span class="va">ts_original</span><span class="op">$</span><span class="va">TS</span>, </span>
 <span>     type <span class="op">=</span> <span class="st">'l'</span>,</span>
@@ -320,7 +327,8 @@ strength:</p>
 <span>     xlab <span class="op">=</span> <span class="st">"Frequency (kHz)"</span>,</span>
 <span>     ylab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">Target</span><span class="op">~</span><span class="va">strength</span><span class="op">~</span><span class="op">(</span><span class="va">dB</span><span class="op">~</span><span class="va">re.</span><span class="op">~</span><span class="fl">1</span><span class="op">~</span><span class="va">m</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>     cex.lab <span class="op">=</span> <span class="fl">1.3</span>, </span>
-<span>     cex.axis <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span></span>
+<span>     cex.axis <span class="op">=</span> <span class="fl">1.2</span>,</span>
+<span>     ylim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">95</span>, <span class="op">-</span><span class="fl">50</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ts_high</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>,</span>
 <span>      y <span class="op">=</span> <span class="va">ts_high</span><span class="op">$</span><span class="va">TS</span>,</span>
@@ -378,6 +386,7 @@ relative to the incident sound wave. Let’s examine this effect:</p>
 <span><span class="va">ts_end_on</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">end_on</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">$</span><span class="va">DWBA</span></span>
 <span></span>
 <span><span class="co"># Plot orientation comparison</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>oma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.25</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, mar<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">4</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/plot.scatterer.html">plot</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ts_broadside</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>, </span>
 <span>     y <span class="op">=</span> <span class="va">ts_broadside</span><span class="op">$</span><span class="va">TS</span>, </span>
 <span>     type <span class="op">=</span> <span class="st">'l'</span>,</span>
@@ -386,7 +395,8 @@ relative to the incident sound wave. Let’s examine this effect:</p>
 <span>     xlab <span class="op">=</span> <span class="st">"Frequency (kHz)"</span>,</span>
 <span>     ylab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">Target</span><span class="op">~</span><span class="va">strength</span><span class="op">~</span><span class="op">(</span><span class="va">dB</span><span class="op">~</span><span class="va">re.</span><span class="op">~</span><span class="fl">1</span><span class="op">~</span><span class="va">m</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>     cex.lab <span class="op">=</span> <span class="fl">1.3</span>, </span>
-<span>     cex.axis <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span></span>
+<span>     cex.axis <span class="op">=</span> <span class="fl">1.2</span>,</span>
+<span>     ylim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">120</span>, <span class="op">-</span><span class="fl">55</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ts_oblique</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>,</span>
 <span>      y <span class="op">=</span> <span class="va">ts_oblique</span><span class="op">$</span><span class="va">TS</span>,</span>
@@ -453,6 +463,7 @@ Sea euphausiids&lt;/em&gt;. ICES Journal of Marine Science, 70(1): 204-214.&lt;/
 <span><span class="va">ts_poly</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">poly_scatterer</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">$</span><span class="va">DWBA_curved</span></span>
 <span><span class="va">ts_cylinder</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">cylinder_scatterer</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">$</span><span class="va">DWBA</span></span>
 <span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>oma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.25</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, mar<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">4</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/plot.scatterer.html">plot</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ts_cylinder</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>, </span>
 <span>     y <span class="op">=</span> <span class="va">ts_cylinder</span><span class="op">$</span><span class="va">TS</span>, </span>
 <span>     type <span class="op">=</span> <span class="st">'l'</span>,</span>
@@ -462,7 +473,8 @@ Sea euphausiids&lt;/em&gt;. ICES Journal of Marine Science, 70(1): 204-214.&lt;/
 <span>     xlab <span class="op">=</span> <span class="st">"Frequency (kHz)"</span>,</span>
 <span>     ylab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">Target</span><span class="op">~</span><span class="va">strength</span><span class="op">~</span><span class="op">(</span><span class="va">dB</span><span class="op">~</span><span class="va">re.</span><span class="op">~</span><span class="fl">1</span><span class="op">~</span><span class="va">m</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>     cex.lab <span class="op">=</span> <span class="fl">1.3</span>, </span>
-<span>     cex.axis <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span></span>
+<span>     cex.axis <span class="op">=</span> <span class="fl">1.2</span>,</span>
+<span>     ylim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">100</span>, <span class="op">-</span><span class="fl">55</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ts_poly</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>,</span>
 <span>      y <span class="op">=</span> <span class="va">ts_poly</span><span class="op">$</span><span class="va">TS</span>,</span>

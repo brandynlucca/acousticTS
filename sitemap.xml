@@ -8,7 +8,9 @@
 <url><loc>https://brandynlucca.github.io/acousticTS/articles/index.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/authors.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/index.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/Arbitrary-class.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/CAL.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/Cylinder-class.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/DCM.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/DWBA.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/DWBA_curved.html</loc></url>
@@ -19,9 +21,12 @@
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/MSS_anderson.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/MSS_goodman_stern.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/Pn.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/PolynomialCylinder-class.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/ProlateSpheroid-class.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/SBF.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/SDWBA.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/SDWBA_curved.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/Sphere-class.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/along_sum.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/arbitrary.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/bladder_rotation.html</loc></url>
@@ -92,7 +97,7 @@
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/sbf_generate.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/sbf_plot.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/sbf_show.html</loc></url>
-<url><loc>https://brandynlucca.github.io/acousticTS/reference/scatterer-class.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/scatterer.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/sdwba_curved_initialize.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/sdwba_initialize.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/sdwba_resample.html</loc></url>
