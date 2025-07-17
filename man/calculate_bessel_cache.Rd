@@ -17,3 +17,4 @@ Cached Bessel function values
 \description{
 Calculate Bessel function cache for the Goodman and Stern (1962) model
 }
+\keyword{internal}

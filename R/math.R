@@ -39,6 +39,7 @@ contour_integrate <- function( integral , x , y ) {
 #' quadrature
 #' @param phase_sd Phase standard deviation 
 #' @rdname phase_integrate
+#' @keywords internal
 #' @export
 phase_integrate <- function( x , y , n_iterations , integral , phase_sd ) {
   rng <- rnorm( n_iterations , 0 , 1 )
@@ -65,7 +66,7 @@ degrees <- function( x ) x * 180.0 / pi
 #' radians( x )
 #' @examples
 #' orientation <- 90 # degrees
-#' radians( orientation ) # this should return a value equal to pi / 2 radians#' 
+#' radians( orientation ) # this should return a value equal to pi / 2 radians 
 #' @return
 #' Angle in radians.
 #' @rdname radians
@@ -82,5 +83,6 @@ radians <- function( x ) x * pi / 180.0
 #' @return
 #' Calculates the Euclidean norm of a vector.
 #' @rdname vecnorm
+#' @keywords internal
 #' @export
 vecnorm <- function( x ) sqrt( rowSums( x * x ) )

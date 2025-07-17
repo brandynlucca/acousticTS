@@ -76,31 +76,33 @@ cal_plot <- function( object ,
     # Extract body shape information ===========================================
     body <- acousticTS::extract( object ,
                                  "body" )
+    # Along-semimajor radii ======================================================
+    along_radius <- sqrt( body$radius^2 - ( body$rpos[ , 1 ] - body$radius ) * ( body$rpos[ , 1 ] - body$radius ) )
     # Define plot margins ======================================================
     par( ask = FALSE ,
          oma = base::c( 1 , 1 , 1 , 0 ) ,
          mar = base::c( 3 , 4.5 , 1 , 2 ) )
     # Begin plotting ===========================================================
     plot( x = body$rpos[ , 1 ] ,
-          y = body$rpos[ , 2 ] ,
+          y = -along_radius ,
           type = 'l' ,
           ylab = "Semi-minor diameter (m)" ,
           xlab = "Semi-major dimaeter (m)" ,
           lwd = 4 ,
           cex.lab = 1.2 ,
           cex.axis = 1.2 ,
-          ylim = base::c( min( body$rpos[ , 3 ] ) * ( 1 - (1 - nudge_y ) ) ,
-                          max( -body$rpos[ , 3 ] ) * nudge_y ) )
+          ylim = base::c( min( body$rpos[ , 5 ] ) * ( 1 - (1 - nudge_y ) ) ,
+                          max( body$rpos[ , 4 ] ) * nudge_y ) )
     # Add lower perimeter of shape =============================================
     lines( x = body$rpos[ , 1 ] ,
-           y = body$rpos[ , 3 ] ,
+           y = along_radius ,
            lty = 1 ,
            lwd = 4 )
     # Add body segments ========================================================
     segments( x0 = body$rpos[ , 1 ] ,
               x1 = body$rpos[ , 1 ] ,
-              y0 = body$rpos[ , 2 ] ,
-              y1 = body$rpos[ , 3 ] ,
+              y0 = along_radius ,
+              y1 = -along_radius ,
               lty = 3 ,
               lwd = 1.25 )
   } else if (type == "model") {
@@ -171,6 +173,8 @@ ess_plot <- function( object ,
   if( type == "shape" ) {
     # Extract shell shape information ==========================================
     shell <- extract( object , "shell" )
+    # Along-semimajor radii ======================================================
+    along_radius <- sqrt( shell$radius^2 - ( shell$rpos[ , 1 ] - shell$radius ) * ( shell$rpos[ , 1 ] - shell$radius ) )
     # Center axis ==============================================================
     shell$rpos[ , 1 ] <- shell$rpos[ , 1 ] - median( shell$rpos[ , 1 ] )
     # Define plot margins ======================================================
@@ -179,50 +183,52 @@ ess_plot <- function( object ,
          mar = c( 4 , 4.5 , 1 , 2 ) )
     # Begin plotting ===========================================================
     plot( x = shell$rpos[ , 1 ] ,
-          y = shell$rpos[ , 2 ] ,
+          y = along_radius ,
           type = 'l' ,
           ylab = "Semi-minor diameter (m)" ,
           xlab = "Semi-major diameter (m)" ,
           lwd = 4 ,
           cex.lab = 1.2 ,
           cex.axis = 1.2 ,
-          ylim = base::c( min( shell$rpos[ , 3 ] ) * ( 1 - (1 - nudge_y ) ) ,
-                          max( -shell$rpos[ , 3 ] ) * nudge_y ) )
+          ylim = base::c( min( -along_radius ) * ( 1 - (1 - nudge_y ) ) ,
+                          max( along_radius ) * nudge_y ) )
     # Add lower perimeter of shape =============================================
     lines( x = shell$rpos[ , 1 ] ,
-           y = shell$rpos[ , 3 ] ,
+           y = -along_radius ,
            lty = 1 ,
            lwd = 4 )
     # Add shell segments =======================================================
     segments( x0 = shell$rpos[ , 1 ] ,
               x1 = shell$rpos[ , 1 ] ,
-              y0 = shell$rpos[ , 2 ] ,
-              y1 = shell$rpos[ , 3 ] ,
+              y0 = -along_radius ,
+              y1 = along_radius ,
               lty = 3 ,
               lwd = 1.25 )
     # Add internal fluid, if defined ===========================================
     fluid <- extract( object , "fluid" )
     # Only proceed is position matrix is defined +++++++++++++++++++++++++++++++
     if ( "rpos" %in% names( fluid ) ) {
+      # Along-semimajor radii ======================================================
+      along_radius_fl <- sqrt( fluid$radius^2 - ( fluid$rpos[ , 1 ] - fluid$radius ) * ( fluid$rpos[ , 1 ] - fluid$radius ) )
       # Center +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       fluid$rpos[ , 1 ] <- fluid$rpos[ , 1 ] - median( fluid$rpos[ , 1 ] )
       # Add upper perimeter of shape +++++++++++++++++++++++++++++++++++++++++++
       lines( x = fluid$rpos[ , 1 ] ,
-             y = fluid$rpos[ , 2 ] ,
+             y = along_radius_fl ,
              lty = 1 ,
              lwd = 4 ,
              col = "red" )
       # Add lower perimeter of shape +++++++++++++++++++++++++++++++++++++++++++
       lines( x = fluid$rpos[ , 1 ] ,
-             y = fluid$rpos[ , 3 ] ,
+             y = -along_radius_fl ,
              lty = 1 ,
              lwd = 4 ,
              col = "red" )
       # Add shell segments +++++++++++++++++++++++++++++++++++++++++++++++++++++
       segments( x0 = fluid$rpos[ , 1 ] ,
                 x1 = fluid$rpos[ , 1 ] ,
-                y0 = fluid$rpos[ , 2 ] ,
-                y1 = fluid$rpos[ , 3 ] ,
+                y0 = -along_radius_fl ,
+                y1 = along_radius_fl ,
                 lty = 3 ,
                 lwd = 1.25 ,
                 col = "red" )
@@ -335,25 +341,33 @@ fls_plot <- function( object,
     # Extract body shape information ===========================================
     body <- acousticTS::extract( object ,
                                  "body" )
+    # Extract generic shape information ========================================
+    shape_params <- extract( object , "shape_parameters" )
     # Define plot margins ======================================================
     par( ask = FALSE ,
          oma = base::c( 1 , 1 , 1 , 0 ) ,
          mar = base::c( 5.0 , 4.5 , 1.5 , 2 ) )
     # Center shape =============================================================
     body$rpos[ 3 , ] <- body$rpos[ 3 , ] - median( body$rpos[ 3 , ] )
+    # Get radius ===============================================================
+    if ( "radius_shape" %in% names( shape_params ) ) {
+      radius <- shape_params$radius_shape
+    } else {
+      radius <- body$radius
+    }
     # Sort index ===============================================================
     if ( body$rpos[ 1 , 1 ] > body$rpos[ 1, ncol( body$rpos ) ] ) {
       body$rpos <- body$rpos[ , rev( seq_len( ncol( body$rpos ) ) ) ,
                              drop = FALSE ]
-      if ( !is.null( body$radius ) ) body$radius <- rev( body$radius )
+      if ( !is.null( radius ) ) radius <- rev( radius )
       # sort_idx <- order(body$rpos[1, ])
       # body$rpos <- body$rpos[, sort_idx, drop = FALSE]
       # if (!is.null(body$radius)) body$radius <- body$radius[sort_idx]
     }
     # Adjust axes ==============================================================
     if ( aspect_ratio == "manual" ) {
-      vert_lims <- base::c( min( body$rpos[ 3 , ] - body$radius ) * ( 1 - ( 1 - nudge_y ) ) ,
-                            max( body$rpos[ 3 , ] + body$radius ) * nudge_y )
+      vert_lims <- base::c( min( body$rpos[ 3 , ] - radius ) * ( 1 - ( 1 - nudge_y ) ) ,
+                            max( body$rpos[ 3 , ] + radius ) * nudge_y )
     } else {
       vert_lims <- base::c( - base::max( body$rpos[ 1 , ]  )  * 0.10 ,
                             base::max( body$rpos[ 1 ,  ]  )  * 0.10 )
@@ -370,8 +384,8 @@ fls_plot <- function( object,
     #                 ylim = vert_lims )
     plot( body$rpos[ 1 , ] , body$rpos[ 3 , ] , type = 'n',
           xlab = "Length (m)", ylab = "Thickness (m)",
-          ylim = c( min(body$rpos[ 3 , ] - body$radius ) * 1.1 ,
-                    max(body$rpos[ 3 , ] + body$radius ) * 1.1 ) )
+          ylim = c( min(body$rpos[ 3 , ] - radius ) * 1.1 ,
+                    max(body$rpos[ 3 , ] + radius ) * 1.1 ) )
     # Add lower perimeter of shape =============================================
     # graphics::lines( x = body$rpos[ 1 , ] ,
     #                  y = body$rpos[ 3 , ] - body$radius ,
@@ -391,7 +405,7 @@ fls_plot <- function( object,
     #                     lwd = 1.25 )
     # Draw angled "cylinders" for each segment =================================
     n_segments <- acousticTS::extract( object , 
-                                       "shape_parameters" )$n_segments - 1
+                                       "shape_parameters" )$n_segments
     # count <- 0
     # rc <- c()
     # ---- Iterate =============================================================
@@ -403,7 +417,7 @@ fls_plot <- function( object,
       x1 <- body$rpos[1 , i + 1 ]
       y1 <- body$rpos[3 , i + 1 ]
       # ---- Thickness
-      r <- body$radius[ i ]
+      r <- radius[ i ]
       # rc <- c(rc, r)
       if ( r == 0 ) next
       # cat(sprintf("Segment %d [%d, %d]: (%.6f, %.6f) -> (%.6f, %.6f), r=%.6f\n", 

@@ -198,6 +198,7 @@ sphere_40 <- target_strength(object = sphere_40,
                              model = "calibration")
 ts_mods_40 <- extract(sphere_40, "model")$calibration
 # Plot the three and compare
+par(oma = c(0, 0.25, 0, 0), mar=c(5, 6, 4, 2))
 plot(x = ts_mods_20$frequency*1e-3, 
      y = ts_mods_20$TS, 
      type = 'l',

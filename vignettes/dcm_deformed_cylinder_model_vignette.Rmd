@@ -98,8 +98,8 @@ Let's visualize these shapes:
 
 ```{r fig.width = 8, fig.height = 5}
 # Plot both shapes for comparison
-plot(cylinder_scatterer, type = "shape", main = "Cylinder")
-plot(prolate_scatterer, type = "shape", main = "Prolate Spheroid")
+plot(cylinder_scatterer, type = "shape")
+plot(prolate_scatterer, type = "shape")
 ```
 
 # DCM model calculations
@@ -207,6 +207,7 @@ ts_low <- extract(low_contrast, "model")$DCM
 ts_original <- extract(cylinder_scatterer, "model")$DCM
 
 # Plot comparison
+par(oma = c(0, 0.25, 0, 0), mar=c(5, 6, 4, 2))
 plot(x = ts_original$frequency * 1e-3, 
      y = ts_original$TS, 
      type = 'l',
@@ -214,6 +215,7 @@ plot(x = ts_original$frequency * 1e-3,
      lwd = 2.5,
      xlab = "Frequency (kHz)",
      ylab = expression(Target~strength~(dB~re.~1~m^2)),
+     ylim = c(-115, -55),
      cex.lab = 1.3, 
      cex.axis = 1.2)
 
@@ -272,6 +274,7 @@ ts_80 <- extract(oblique_80, "model")$DCM
 ts_70 <- extract(oblique_70, "model")$DCM
 
 # Plot orientation comparison
+par(oma = c(0, 0.25, 0, 0), mar=c(5, 6, 4, 2))
 plot(x = ts_broadside$frequency * 1e-3, 
      y = ts_broadside$TS, 
      type = 'l',
@@ -281,7 +284,7 @@ plot(x = ts_broadside$frequency * 1e-3,
      ylab = expression(Target~strength~(dB~re.~1~m^2)),
      cex.lab = 1.3, 
      cex.axis = 1.2,
-     ylim=c(-120, -50))
+     ylim=c(-140, -60))
 
 lines(x = ts_80$frequency * 1e-3,
       y = ts_80$TS,
@@ -328,6 +331,7 @@ ts_medium <- extract(medium_scatterer, "model")$DCM
 ts_large <- extract(large_scatterer, "model")$DCM
 
 # Plot size comparison
+par(oma = c(0, 0.25, 0, 0), mar=c(5, 6, 4, 2))
 plot(x = ts_small$frequency * 1e-3, 
      y = ts_small$TS, 
      type = 'l',
@@ -393,6 +397,7 @@ The DCM incorporates several physical processes:
 dcm_results <- extract(cylinder_scatterer, "model")$DCM
 
 # Plot ka vs frequency to show the high-frequency regime
+par(oma = c(0, 0.25, 0, 0), mar=c(5, 6, 4, 2))
 plot(x = dcm_results$frequency * 1e-3, 
      y = dcm_results$ka, 
      type = 'l',

@@ -15,8 +15,7 @@ swimbladders (\link[acousticTS]{SBF}) and fluid-like crustaceans
 \describe{
 \item{\code{metadata}}{List containing relevant metadata}
 
-\item{\code{model_parameters}}{Model parameters necessary for predicting TS
-(placeholder)}
+\item{\code{model_parameters}}{Model parameters necessary for predicting TS}
 }}
 
 \section{Data Organization}{

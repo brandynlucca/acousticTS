@@ -27,6 +27,7 @@ Collate:
     'acoustics.R'
     'bessel.R'
     'create_scatterer.R'
+    'create_shape.R'
     'data.R'
     'math.R'
     'model_initialization.R'

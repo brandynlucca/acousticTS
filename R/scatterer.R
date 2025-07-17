@@ -12,7 +12,6 @@
 #' (\link[acousticTS]{FLS}).
 #' @slot metadata List containing relevant metadata
 #' @slot model_parameters Model parameters necessary for predicting TS 
-#' (placeholder)
 #' @section Data Organization:
 #' \describe{
 #'    \item{\code{metadata}:}{A \code{list} comprising any identifying
@@ -70,6 +69,7 @@
 #'    \item{\code{Swimbladdered fish (SBF)}}{\link[acousticTS]{SBF}}
 #'    \item{\code{Elastic shell scatterers (ESS)}}{\link[acousticTS]{ESS}}
 #' }
+#' @rdname scatterer
 #' @export
 setClass("scatterer",
          slots = c(
@@ -88,8 +88,8 @@ setClass("scatterer",
 #' scatterers belonging to the GAS-class. This object can include simple gas-filled
 #' bubbles to other scatterers with gas occlusions, swimbladders, and other internal
 #' features, if applicable. The default behavior for this type of object is to 
-#' only reference the gaseous/fluid feature with excpetions that are model-dependent.
-#' See \link[acousticTS]{scatterer-class} for a more detailed description on 
+#' only reference the gaseous/fluid feature with exceptions that are model-dependent.
+#' See \link[acousticTS]{scatterer} for a more detailed description on 
 #' how this S4 object is organized.
 #' @rdname GAS
 #' @export
@@ -107,8 +107,8 @@ GAS <- setClass("GAS",
 #' parameterizing models for swimbladdered fish (SBF) that are partitioned into
 #' two sets of discretized cylinders: the body and the swimbladder. Both shapes
 #' comprise independent position matrices, material properties, orientations, 
-#' and other relevant shape-related data and metadata.See 
-#' \link[acousticTS]{scatterer-class} for a more detailed description on how 
+#' and other relevant shape-related data and metadata. See 
+#' \link[acousticTS]{scatterer} for a more detailed description on how 
 #' this S4 object is organized.
 #' @rdname SBF
 #' @export
@@ -132,7 +132,7 @@ SBF <- setClass( "SBF" ,
 #' created using values for both an outer shell and internal tissues, if applicable. 
 #' The default behavior for this type of this object is to only reference the outer
 #' shell with few exceptions that are model-dependent. See 
-#' \link[acousticTS]{scatterer-class} for a more detailed description on how 
+#' \link[acousticTS]{scatterer} for a more detailed description on how 
 #' this S4 object is organized.
 #' @rdname ESS
 #' @export

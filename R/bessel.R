@@ -264,6 +264,7 @@ Pn <- function( n , x ) {
 #' @param ka_matrix_m Modal ka matrix
 #' @param m Modal vector
 #' @return Cached Bessel function values
+#' @keywords internal
 calculate_bessel_cache <- function( ka_matrix_m , m ) {
   # Define all Bessel functions to apply =======================================
   bessel_functions <- list(

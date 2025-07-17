@@ -144,8 +144,8 @@ cal_generate <- function( material = "WC" ,
                  ID ,
                  "Calibration sphere" ),
     Material = material )
-  # Create sphere object to define defintitions ================================
-  sphere_shape <- sphere( radius = diameter / 2 ,
+  # Create sphere object to define definitions =================================
+  sphere_shape <- sphere( radius_body = diameter / 2 ,
                           n_segments = n_segments ,
                           diameter_units = "m" )
   # Define calibration sphere body shape =======================================
@@ -189,7 +189,7 @@ cal_generate <- function( material = "WC" ,
   # Define shape parameters ====================================================
   shape_parameters <- base::list(
     diameter = diameter ,
-    radius = diameter / 2 ,
+    radius_body = diameter / 2 ,
     n_segments = n_segments ,
     diameter_units = diameter_units ,
     theta_units = theta_units
@@ -243,7 +243,7 @@ fls_generate <- function( shape = "arbitrary" ,
                           length_units = "m" ,
                           theta_units = "radians" , ... ) {
   # Collect shape information if provided ======================================
-  if( class( shape )[1] != "shape" ) {
+  if( !is( shape , "shape" ) ) {
     if ( shape != "arbitrary" ) {
       if ( base::is.null( length_body ) )
         base::stop( "Body shape is not appropriately parameterized." )
@@ -253,7 +253,7 @@ fls_generate <- function( shape = "arbitrary" ,
   }
   # Generate shape position matrix =============================================
   # Create body shape field ====================================================
-  if ( class( shape )[1] == "shape" ) {
+  if ( is( shape , "shape" ) ) {
     shape_input <- shape
   } else {
     if ( shape == "arbitrary" ) {
@@ -278,12 +278,17 @@ fls_generate <- function( shape = "arbitrary" ,
       length = base::max( shape_input@position_matrix[ , 1 ] , na.rm = T ) -
         base::min( shape_input@position_matrix[ , 1 ] , na.rm = T ) ,
       radius = base::max( shape_input@shape_parameters$radius , na.rm = T ) ,
-      n_segments = length( shape_input@position_matrix[ , 1 ]  ) ,
+      n_segments = length( shape_input@position_matrix[ , 1 ]  ) - 1 ,
       length_units = length_units ,
       theta_units = theta_units ,
-      shape = base::ifelse( base::class( shape ) == "character" ,
-                            shape ,
-                            "arbitrary" ) )
+      shape = base::ifelse( is.character( shape ) | is( shape, "arbitrary" ) ,
+                            "arbitrary" ,
+                            class( shape ) ) )
+    if ( is( shape , "Sphere" ) || ( is.character( shape ) && shape == "sphere" ) ) {
+      shape_parameters[[ "radius_shape" ]] <- extract( shape_input ,
+                                                       "shape_parameters" )$radius_shape
+    }
+    
     if( is.character( shape ) == T ){
       if ( shape == "cylinder" ) {
         shape_parameters$taper_order <- shape_input@shape_parameters$taper_order
@@ -435,7 +440,7 @@ ess_generate <- function( shape = "sphere" ,
   # Create metadata field ======================================================
   metadata <- list( ID = ifelse( !is.null( ID ) , ID , "UID" ) )
   # Create shape fields ========================================================
-  if ( class( shape )[ 1 ] == "shape" ) {
+  if ( is( shape , "shape" ) ) {
     shell_rpos <- shape
   } else {
     if ( shape == "arbitrary" ) {
@@ -453,7 +458,7 @@ ess_generate <- function( shape = "sphere" ,
         # Create copy ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         subarg_pull <- arg_pull
         # Create shape +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        subarg_pull$radius <- arg_pull$radius_shell
+        subarg_pull$radius_body <- arg_pull$radius_shell
         # Grab input arguments +++++++++++++++++++++++++++++++++++++++++++++++++
         arg_list <- names( formals( shape ) )
         # Filter out inappropriate parameters ++++++++++++++++++++++++++++++++++
@@ -468,7 +473,7 @@ ess_generate <- function( shape = "sphere" ,
         # Create copy ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         subarg_pull <- arg_pull
         # Create shape +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        subarg_pull$radius <- arg_pull$radius_shell - arg_pull$shell_thickness
+        subarg_pull$radius_body <- arg_pull$radius_shell - arg_pull$shell_thickness
         # Grab input arguments +++++++++++++++++++++++++++++++++++++++++++++++++
         arg_list <- names( formals( shape ) )
         # Filter out inappropriate parameters ++++++++++++++++++++++++++++++++++
