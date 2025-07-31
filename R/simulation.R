@@ -29,11 +29,16 @@
 #' require all necessary objects and packages to be exported to worker 
 #' processes. On Unix-like systems, forking is used, which is generally simpler.
 #' 
-#' @section Warning:
-#' \strong{WARNING:} Including too many parameters from \code{parameters} 
+#' @section Performance Issues:
+#' Including too many parameters from \code{parameters} 
 #' within \code{batch_by} may cause significant performance issues or cause 
 #' \code{R} to crash. If intensive simulations are required, consider breaking 
 #' them into more manageable chunks 
+#' 
+#' @section DEPRECATION WARNING:
+#' The `simulate_ts` function will be deprecated in future versions and will be 
+#' replaced by the `anneal` function in future versions. 
+#' 
 #' @importFrom pbapply pblapply
 #' @export
 simulate_ts <- function( object ,
@@ -45,10 +50,14 @@ simulate_ts <- function( object ,
                          parallel=TRUE ,
                          n_cores=parallel::detectCores() - 1 ,
                          verbose=TRUE ) {
-  
+  # Future deprecation warning =================================================
+  message(
+    "DeprecationWarning: The `simulate_ts` function will be replaced by the ",
+    "`anneal` function in future releases."
+  )
   # Validate that object is of the correct class ===============================
   stopifnot(
-    "'object' must be a 'scatterer'-based class"=inherits(object, "scatterer")
+    "'object' must be a 'scatterer'-based class"=inherits(object, "Scatterer")
   )
   # Validate model =============================================================
   unexpected_model <- model[ !( model %in% names( model_registry ) ) ]
@@ -141,7 +150,9 @@ simulate_ts <- function( object ,
     )
   )
   # ---- Bind to simulation grid +++++++++++++++++++++++++++++++++++++++++++++++
-  simulation_grid <- cbind( simulation_grid , parameter_matrix )
+  if( length( parameters ) > 0){
+    simulation_grid <- cbind( simulation_grid , parameter_matrix )
+  }
   # Run simulations ============================================================
   if( verbose ) {
     cat( "====================================\n" )
@@ -208,7 +219,7 @@ simulate_ts <- function( object ,
     seq_len( nrow( simulation_grid ) ) ,
     function( grid_index ) {
       get_TS( grid_index , object , parameters , simulation_grid , frequency , 
-            model )
+              model )
     } ,
     cl = cluster 
   )
