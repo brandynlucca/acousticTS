@@ -14,4 +14,9 @@ along_sum(rpos, iterations)
 \description{
 Along-matrix summing function
 }
+\examples{
+\dontrun{
+along_sum(matrix(c(1, 2, 3), c(1, 2, 3)), 2)
+}
+}
 \keyword{internal}
