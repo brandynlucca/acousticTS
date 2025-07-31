@@ -57,3 +57,6 @@ There are several options for the \strong{material} argument:
 \emph{Aluminum} \tab "Al" \tab 6260 \tab 3080 \tab 2700\cr
 }
 }
+\seealso{
+\code{\link{CAL}}
+}

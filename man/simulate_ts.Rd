@@ -62,11 +62,17 @@ require all necessary objects and packages to be exported to worker
 processes. On Unix-like systems, forking is used, which is generally simpler.
 }
 
-\section{Warning}{
+\section{Performance Issues}{
 
-\strong{WARNING:} Including too many parameters from \code{parameters}
+Including too many parameters from \code{parameters}
 within \code{batch_by} may cause significant performance issues or cause
 \code{R} to crash. If intensive simulations are required, consider breaking
 them into more manageable chunks
+}
+
+\section{DEPRECATION WARNING}{
+
+The \code{simulate_ts} function will be deprecated in future versions and will be
+replaced by the \code{anneal} function in future versions.
 }
 

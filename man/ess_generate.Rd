@@ -81,3 +81,6 @@ ESS-class object
 \description{
 Generate ESS shape
 }
+\seealso{
+\code{\link{ESS}}
+}

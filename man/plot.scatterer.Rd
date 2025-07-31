@@ -2,12 +2,12 @@
 % Please edit documentation in R/scatterer_plot.R
 \name{plot}
 \alias{plot}
-\alias{plot,scatterer,missing-method}
+\alias{plot,Scatterer,missing-method}
 \title{Method for what is printed for objects.}
 \usage{
 plot(x, y, ...)
 
-\S4method{plot}{scatterer,missing}(
+\S4method{plot}{Scatterer,missing}(
   x,
   y,
   type = "shape",

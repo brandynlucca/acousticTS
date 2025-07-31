@@ -62,3 +62,6 @@ FLS-class object
 \description{
 Manually generate a FLS object.
 }
+\seealso{
+\code{\link{FLS}}
+}

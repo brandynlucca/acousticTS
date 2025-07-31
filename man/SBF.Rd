@@ -11,6 +11,9 @@ parameterizing models for swimbladdered fish (SBF) that are partitioned into
 two sets of discretized cylinders: the body and the swimbladder. Both shapes
 comprise independent position matrices, material properties, orientations,
 and other relevant shape-related data and metadata. See
-\link[acousticTS]{scatterer} for a more detailed description on how
+\link{Scatterer} for a more detailed description on how
 this S4 object is organized.
+}
+\seealso{
+\link{Scatterer}
 }

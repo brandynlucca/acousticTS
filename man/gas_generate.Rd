@@ -50,3 +50,6 @@ GAS-class object
 \description{
 Create GAS object
 }
+\seealso{
+\code{\link{GAS}}
+}

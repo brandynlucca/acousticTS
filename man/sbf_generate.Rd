@@ -65,3 +65,6 @@ Generates a SBF-class object.
 \description{
 Manually generate a SBF-class object.
 }
+\seealso{
+\code{\link{SBF}}
+}
