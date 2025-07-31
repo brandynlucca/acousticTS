@@ -60,3 +60,4 @@ There are several options for the \strong{material} argument:
 \seealso{
 \code{\link{CAL}}
 }
+\keyword{scatterer_type_generation}

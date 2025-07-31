@@ -3,3 +3,79 @@ template:
   bootstrap: 5
   math-rendering: mathjax
 
+reference:
+- title: Scatterer types
+
+- subtitle: Scatterer classes
+  desc: >
+    General scattering classes that dictate expected parameters and compatibility with different classes of 
+    scattering models.
+  contents:
+  - Scatterer
+  - has_keyword("scatterer_type")
+
+- subtitle: Scatterer generation
+  desc: >
+    Functions that generate each of the supported scatterering classes.
+  contents:
+  - has_keyword("scatterer_type_generation")
+
+- title: Scatterer shapes
+
+- subtitle: Shape classes
+  desc: >
+    Generic shape classes used by various functions that provide the appropriate information for plotting, 
+    model parameterization, and other features.
+  contents:
+  - Shape
+  - has_keyword("shapes")
+
+- subtitle: Shape generation
+  desc: >
+    Generator functions for producing arbitrary or canonical shapes.
+  contents:
+  - create_shape
+  - has_keyword("shape_generation")
+
+- title: Scattering properties
+  desc: >
+    Functions used for computing different scattering properties (e.g. contrasts, impedances, coefficients) used 
+    in various scattering models.
+
+- subtitle: Elastic moduli for homogoneous isotropic materials
+  contents:
+  - has_keyword("elastic")
+
+- title: Mathematical functions
+  desc: >
+    Mathematical functions used throughout the `acousticTS` package.
+
+- subtitle: Bessel functions
+  contents:
+  - has_keyword("bessel1")
+  - has_keyword("bessel2")
+  - has_keyword("bessel3")
+
+- subtitle: Legendre functions
+  contents:
+  - has_keyword("legendre")
+
+- subtitle: Vector operations
+  contents:
+  - vecnorm
+
+- title: Conversion functions
+
+- subtitle: Acoustics
+  contents:
+  - linear
+
+- subtitle: Trigonometry
+  contents:
+  - degrees
+  - radians
+
+- title: internal
+  contents:
+  - lacks_concepts("null_concept")
+

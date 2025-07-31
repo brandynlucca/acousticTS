@@ -67,3 +67,4 @@ Manually generate a FLS object.
 \seealso{
 \code{\link{FLS}}
 }
+\keyword{scatterer_type_generation}

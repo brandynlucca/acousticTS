@@ -18,3 +18,4 @@ bladder_rotation(sum_rpos, rpos, theta, k_length)
 \description{
 Support rotation function for KRM (swimbladder)
 }
+\keyword{internal}

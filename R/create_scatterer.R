@@ -28,6 +28,8 @@
 #' Generates a SBF-class object.
 #' 
 #' @seealso \code{\link{SBF}}
+#' 
+#' @keywords scatterer_type_generation
 #' @export
 sbf_generate <- function( x_body ,
                           w_body ,
@@ -131,6 +133,8 @@ sbf_generate <- function( x_body ,
 #' Generates a CAL-class object.
 #' 
 #' @seealso \code{\link{CAL}}
+#' 
+#' @keywords scatterer_type_generation
 #' @export
 cal_generate <- function( material = "WC" ,
                           diameter = 38.1e-3 ,
@@ -234,6 +238,8 @@ cal_generate <- function( material = "WC" ,
 #' FLS-class object
 #' 
 #' @seealso \code{\link{FLS}}
+#' 
+#' @keywords scatterer_type_generation
 #' @import methods
 #' @export
 fls_generate <- function( shape = "arbitrary" ,
@@ -363,6 +369,7 @@ fls_generate <- function( shape = "arbitrary" ,
 #' 
 #' @seealso \code{\link{GAS}}
 #' 
+#' @keywords scatterer_type_generation
 #' @import methods
 #' @export
 gas_generate <- function( shape = "sphere" ,
@@ -450,6 +457,7 @@ gas_generate <- function( shape = "sphere" ,
 #' 
 #' @seealso \code{\link{ESS}}
 #' 
+#' @keywords scatterer_type_generation
 #' @export
 ess_generate <- function( shape = "sphere" ,
                           x_body = NULL ,

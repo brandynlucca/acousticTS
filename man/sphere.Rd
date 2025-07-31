@@ -23,3 +23,4 @@ Creates a sphere.
 \seealso{
 \code{\link{Sphere-class}}
 }
+\keyword{shape_generation}

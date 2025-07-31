@@ -32,3 +32,4 @@ Creates a cylinder.
 \seealso{
 \code{\link{Cylinder-class}}
 }
+\keyword{shape_generation}

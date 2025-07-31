@@ -84,3 +84,4 @@ Generate ESS shape
 \seealso{
 \code{\link{ESS}}
 }
+\keyword{scatterer_type_generation}

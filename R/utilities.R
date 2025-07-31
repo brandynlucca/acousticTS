@@ -23,6 +23,7 @@ extract <- function( object , feature ) {
 #' @param radius_curvature Radius of curvature that can be parameterized either 
 #' as a ratio relative to body length or actual measurement
 #' @param mode Either "ratio" or "measurement"
+#' 
 #' @rdname brake
 #' @export
 brake <- function( input , radius_curvature , mode = "ratio" ) {
@@ -41,6 +42,8 @@ brake <- function( input , radius_curvature , mode = "ratio" ) {
 #' @param radius_curvature Radius of curvature that can be parameterized either 
 #' as a ratio relative to body length or actual measurement
 #' @param mode Either "ratio" or "measurement"
+#' 
+#' @keywords internal
 #' @rdname brake_df
 #' @export
 brake_df <- function( body_df , radius_curvature , mode = "ratio" ) {
@@ -138,6 +141,7 @@ brake_scatterer <- function( object , radius_curvature , mode = "ratio" ) {
 ################################################################################
 #' Support rotation function for KRM (swimbladder)
 #' @inheritParams body_rotation
+#' @keywords internal
 #' @export
 bladder_rotation <- function(sum_rpos, rpos, theta, k_length){
   v <- (sum_rpos[1, ]*cos(theta) + sum_rpos[3, ]*sin(theta)) / 2
@@ -153,6 +157,7 @@ bladder_rotation <- function(sum_rpos, rpos, theta, k_length){
 #' @param rpos Position matrix
 #' @param theta Orientation angle
 #' @param k_length Length of wavenumber vector
+#' @keywords internal
 #' @export
 body_rotation <- function( sum_rpos , rpos , theta , k_length ) {
   dorsal_sum <- base::matrix( data = base::rep( sum_rpos[ 3 , ] , each = k_length ) ,

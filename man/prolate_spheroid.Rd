@@ -39,3 +39,4 @@ Creates a prolate spheroid.
 \seealso{
 \code{\link{ProlateSpheroid-class}}
 }
+\keyword{shape_generation}

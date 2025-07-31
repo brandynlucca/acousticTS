@@ -14,6 +14,10 @@
 #' @slot position_matrix Position matrix that provides the 2D representation of 
 #' the body shape
 #' @slot shape_parameters A list of additional shape specifications 
+#' 
+#' @keywords shapes
+#' @aliases Shape
+#' @name Shape
 #' @rdname Shape
 #' @export
 setClass( "Shape" ,
@@ -23,7 +27,9 @@ setClass( "Shape" ,
 # Arbitrary (or pre-generated) body shape
 ################################################################################
 #' Arbitrary body shape
-#' @name Arbitrary-class
+#' 
+#' @keywords shapes
+#' @name Arbitrary
 #' @rdname Arbitrary-class
 #' @export
 Arbitrary <- setClass( "Arbitrary" ,
@@ -32,7 +38,9 @@ Arbitrary <- setClass( "Arbitrary" ,
 # Sphere
 ################################################################################
 #' Spherical body shape
-#' @name Sphere-class
+#' 
+#' @keywords shapes
+#' @name Sphere
 #' @rdname Sphere-class
 #' @export
 Sphere <- setClass( "Sphere" ,
@@ -41,7 +49,9 @@ Sphere <- setClass( "Sphere" ,
 # Prolate spheroid
 ################################################################################
 #' Prolate spheroidal body shape
-#' @name ProlateSpheroid-class
+#' 
+#' @keywords shapes
+#' @name ProlateSpheroid
 #' @rdname ProlateSpheroid-class
 #' @export
 ProlateSpheroid <- setClass( "ProlateSpheroid" ,
@@ -50,7 +60,9 @@ ProlateSpheroid <- setClass( "ProlateSpheroid" ,
 # Cylinder
 ################################################################################
 #' Cylindrical body shape
-#' @name Cylinder-class
+#' 
+#' @keywords shapes
+#' @name Cylinder
 #' @rdname Cylinder-class
 #' @export
 Cylinder <- setClass( "Cylinder" ,
@@ -59,7 +71,9 @@ Cylinder <- setClass( "Cylinder" ,
 # Polynomial cylinder
 ################################################################################
 #' Cylindrical body shape deformed using a polynomial 
-#' @name PolynomialCylinder-class
+#' 
+#' @keywords shapes
+#' @name PolynomialCylinder
 #' @rdname PolynomialCylinder-class
 #' @export
 PolynomialCylinder <- setClass( "PolynomialCylinder" ,

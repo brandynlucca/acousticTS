@@ -4,7 +4,7 @@
 \alias{degrees}
 \title{Convert angular measurements from radians to degrees}
 \usage{
-degrees( x )
+degrees(x)
 }
 \arguments{
 \item{x}{A real value in radians}
@@ -16,6 +16,8 @@ Angle in degrees
 Convert angular measurements from radians to degrees
 }
 \examples{
+\dontrun{
 orientation <- pi / 2 # radians
-degrees( orientation ) # this should return a value equal to 90 degrees
+degrees(orientation) # this should return a value equal to 90 degrees
+}
 }

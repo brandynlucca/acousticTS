@@ -54,3 +54,4 @@ Create GAS object
 \seealso{
 \code{\link{GAS}}
 }
+\keyword{scatterer_type_generation}

@@ -14,6 +14,7 @@
 #' @param length_units Units for body length. Defaults to meters: "m"
 #' @seealso \code{\link{Arbitrary-class}}
 #' 
+#' @keywords shape_generation
 #' @rdname arbitrary
 #' @export
 arbitrary <- function( x_body ,
@@ -49,6 +50,7 @@ arbitrary <- function( x_body ,
 #' Creates position vector for a spherical object of a defined radius.
 #' @seealso \code{\link{Sphere-class}}
 #' 
+#' @keywords shape_generation
 #' @rdname sphere
 #' @importFrom utils head tail
 #' @export
@@ -109,6 +111,7 @@ sphere <- function( radius_body ,
 #'    semi-major and -minor axes.
 #' @seealso \code{\link{ProlateSpheroid-class}}
 #' 
+#' @keywords shape_generation
 #' @rdname prolate_spheroid
 #' @importFrom utils head tail
 #' @export
@@ -184,6 +187,7 @@ prolate_spheroid <- function( length_body ,
 #' Creates the position vector for a tapered or untapered cylinder.
 #' @seealso \code{\link{Cylinder-class}}
 #' 
+#' @keywords shape_generation
 #' @rdname cylinder
 #' @importFrom utils head tail
 #' @export
@@ -273,6 +277,7 @@ cylinder <-  function( length_body ,
 #' 
 #' @seealso \code{\link{PolynomialCylinder-class}}
 #' 
+#' @keywords shape_generation
 #' @rdname polynomial_cylinder
 #' @export
 polynomial_cylinder <- function(length_body,
@@ -363,6 +368,8 @@ polynomial_cylinder <- function(length_body,
 #' Smith, J.N., Ressler, P.H., and Warren, J.D. 2013. A distorted wave Born
 #' approximation target strength model for Bering Sea euphausiids. ICES Journal
 #' of Marine Science, 70(1): 204-214. https://doi.org/10.1093/icesjms/fss140
+#' 
+#' @keywords shape_generation
 #' @rdname create_shape
 #' @export
 create_shape <- function( shape , ... ) {

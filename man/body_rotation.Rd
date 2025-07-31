@@ -18,3 +18,4 @@ body_rotation(sum_rpos, rpos, theta, k_length)
 \description{
 Support rotating function for KRM (body)
 }
+\keyword{internal}

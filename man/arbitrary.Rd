@@ -23,3 +23,4 @@ Creates arbitrary body shape from user inputs
 \seealso{
 \code{\link{Arbitrary-class}}
 }
+\keyword{shape_generation}

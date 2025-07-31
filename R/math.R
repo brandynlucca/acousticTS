@@ -49,11 +49,11 @@ phase_integrate <- function( x , y , n_iterations , integral , phase_sd ) {
 ################################################################################
 #' Convert angular measurements from radians to degrees
 #' @param x A real value in radians
-#' @usage
-#' degrees( x )
 #' @examples
+#' \dontrun{
 #' orientation <- pi / 2 # radians
-#' degrees( orientation ) # this should return a value equal to 90 degrees
+#' degrees(orientation) # this should return a value equal to 90 degrees
+#' }
 #' @return
 #' Angle in degrees
 #' @rdname degrees
@@ -62,11 +62,9 @@ degrees <- function( x ) x * 180.0 / pi
 ################################################################################
 #' Convert angular measurements from degrees to radians.
 #' @param x A real value in degrees
-#' @usage
-#' radians( x )
 #' @examples
 #' orientation <- 90 # degrees
-#' radians( orientation ) # this should return a value equal to pi / 2 radians 
+#' radians(orientation) # this should return a value equal to pi / 2 radians 
 #' @return
 #' Angle in radians.
 #' @rdname radians
@@ -83,6 +81,5 @@ radians <- function( x ) x * pi / 180.0
 #' @return
 #' Calculates the Euclidean norm of a vector.
 #' @rdname vecnorm
-#' @keywords internal
 #' @export
 vecnorm <- function( x ) sqrt( rowSums( x * x ) )

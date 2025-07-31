@@ -114,6 +114,8 @@ kappa <- function( interface1 , interface2 ) {
 #' @param G Shear modulus (Pa).
 #' @return
 #' Returns a dimensionless ratio known as Poisson's ratio (\eqn{\nu}).
+#' 
+#' @keywords elastic
 #' @rdname pois
 #' @encoding UTF-8
 #' @export
@@ -151,6 +153,8 @@ pois <- function( K = NULL , E = NULL , G = NULL ) {
 #' @return
 #' Returns an estimate for the bulk modulus (K).
 #' @encoding UTF-8
+#' 
+#' @keywords elastic
 #' @rdname bulk
 #' @export
 bulk <- function( E = NULL , G = NULL , nu = NULL ) {
@@ -187,6 +191,8 @@ bulk <- function( E = NULL , G = NULL , nu = NULL ) {
 #' @return
 #' Returns an estimate for the Young's modulus (E).
 #' @encoding UTF-8
+#' 
+#' @keywords elastic
 #' @rdname young
 #' @export
 young <- function( K = NULL , G = NULL , nu = NULL ) {
@@ -223,6 +229,8 @@ young <- function( K = NULL , G = NULL , nu = NULL ) {
 #' @return
 #' Returns an estimate for the shear modulus (G).
 #' @encoding UTF-8
+#' 
+#' @keywords elastic
 #' @rdname shear
 #' @export
 shear <- function( K = NULL , E = NULL , nu = NULL ) {
@@ -259,6 +267,8 @@ shear <- function( K = NULL , E = NULL , nu = NULL ) {
 #' @param nu Poisson's ratio (Dimensionless).
 #' @return
 #' Returns Lam&eacute;'s first parameter (\eqn{\lambda}).
+#' 
+#' @keywords elastic
 #' @rdname lame
 #' @export
 lame <- function( K , E , G , nu ) {

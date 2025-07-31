@@ -24,3 +24,4 @@ values are input, the function will default to using the bulk (K) and shear
 (G) moduli. This assumes that the input values represent 3D material
 properties.
 }
+\keyword{elastic}

@@ -17,6 +17,8 @@
 #' @references
 #' Amos D.E., "AMOS, A Portable Package for Bessel Functions of a Complex
 #' Argument and Nonnegative Order", http://netlib.org/amos
+#' 
+#' @keywords bessel1
 #' @rdname jc
 #' @export
 jc <- function( l , n ) besselJ( n , l )
@@ -61,6 +63,8 @@ jcdd <- function( l , n ) {
 #' @references
 #' Amos D.E., "AMOS, A Portable Package for Bessel Functions of a Complex
 #' Argument and Nonnegative Order", http://netlib.org/amos
+#' 
+#' @keywords bessel2
 #' @rdname yc
 #' @export
 yc <- function( l , n ) besselY( n , l )
@@ -97,6 +101,8 @@ ycd <- function( l , n ) {
 #' @references
 #' Amos D.E., "AMOS, A Portable Package for Bessel Functions of a Complex
 #' Argument and Nonnegative Order", http://netlib.org/amos
+#' 
+#' @keywords bessel3
 #' @rdname hc
 #' @export
 hc <- function( l , n ) return( jc( l , n ) + 1i * yc( l , n ) )
@@ -116,6 +122,8 @@ hcd <- function( l, n ) return( ( l * hc( l , n ) / n - hc( l + 1 , n ) ) )
 #' @references
 #' Amos D.E., "AMOS, A Portable Package for Bessel Functions of a Complex
 #' Argument and Nonnegative Order", http://netlib.org/amos
+#' 
+#' @keywords bessel1
 #' @rdname js
 #' @export
 js <- function( l , n ) {
@@ -161,6 +169,8 @@ jsdd <- function( l , n ) {
 #' @references
 #' Amos D.E., "AMOS, A Portable Package for Bessel Functions of a Complex
 #' Argument and Nonnegative Order", http://netlib.org/amos
+#' 
+#' @keywords bessel2
 #' @rdname ys
 #' @export
 ys <- function( l , n ) {
@@ -208,6 +218,8 @@ ysdd <- function( l , n ) {
 #' @references
 #' Amos D.E., "AMOS, A Portable Package for Bessel Functions of a Complex
 #' Argument and Nonnegative Order", http://netlib.org/amos
+#' 
+#' @keywords bessel3
 #' @rdname hs
 #' @export
 hs <- function( l , n) return( sqrt( pi / ( 2 * n ) ) * hc( l + 0.5 , n ) )
@@ -224,6 +236,8 @@ hsd <- function( l , n ) return( - hs( l + 1 , n ) + ( l / n ) * hs( l , n ) )
 #' @return
 #' Returns a matrix array calculated by computing the outer product that generates
 #' a series of values when evaluated over a vector.
+#' 
+#' @keywords legendre
 #' @rdname Pn
 #' @export
 Pn <- function( n , x ) {

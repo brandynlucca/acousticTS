@@ -70,7 +70,9 @@
 #'    \item \code{Gas-filled scatterers} (\link{GAS})
 #'    \item \code{Swimbladdered fish} (\link{SBF})
 #' }
-#' @name Scatterer-class
+#' 
+#' @keywords scatterer_type
+#' @name Scatterer
 #' @aliases Scatterer
 #' @rdname Scatterer-class
 #' @export
@@ -97,6 +99,8 @@ setClass("Scatterer",
 #' 
 #' @seealso \code{\link{Scatterer}}
 #' 
+#' @keywords scatterer_type
+#' @name GAS
 #' @rdname GAS
 #' @export
 GAS <- setClass("GAS",
@@ -119,6 +123,8 @@ GAS <- setClass("GAS",
 #' 
 #' @seealso \link{Scatterer}
 #' 
+#' @keywords scatterer_type
+#' @name SBF
 #' @rdname SBF
 #' @export
 SBF <- setClass( "SBF" ,
@@ -146,6 +152,8 @@ SBF <- setClass( "SBF" ,
 #' 
 #' @seealso \link{Scatterer}
 #' 
+#' @keywords scatterer_type
+#' @name ESS
 #' @rdname ESS
 #' @export
 ESS <- setClass( "ESS",
@@ -168,6 +176,8 @@ ESS <- setClass( "ESS",
 #' 
 #' @seealso \link{Scatterer}
 #' 
+#' @keywords scatterer_type
+#' @name CAL
 #' @rdname CAL
 #' @export
 CAL <- setClass( "CAL" ,
@@ -191,6 +201,8 @@ CAL <- setClass( "CAL" ,
 #' 
 #' @seealso \link{Scatterer}
 #' 
+#' @keywords scatterer_type
+#' @name FLS
 #' @rdname FLS
 #' @export
 FLS <- setClass("FLS",

@@ -25,3 +25,4 @@ four other elastic moduli. When more than two values are input, the function
 will default to using the bulk (K) and Young's (E) moduli. This assumes that
 the input values represent 3D material properties.
 }
+\keyword{elastic}
