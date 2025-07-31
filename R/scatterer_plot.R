@@ -22,7 +22,7 @@ setGeneric( "plot" , function( x , y , ... ) standardGeneric( "plot" ) )
 #' @rdname plot.scatterer
 #' @export
 setMethod( f = "plot" ,
-          signature = c( x = "scatterer" , y = "missing" ) ,
+          signature = c( x = "Scatterer" , y = "missing" ) ,
           definition = function( x ,
                                  y ,
                                  type = "shape" ,

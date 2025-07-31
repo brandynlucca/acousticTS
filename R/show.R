@@ -12,7 +12,7 @@
 #' @import grDevices
 #' @export
 setMethod( f = "show" ,
-           signature = "scatterer" ,
+           signature = "Scatterer" ,
            definition = function( object ) {
 # Detect scatterer type ========================================================
              sc_type <- class( object )
