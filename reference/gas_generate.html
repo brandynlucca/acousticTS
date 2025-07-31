@@ -52,7 +52,7 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">gas_generate</span><span class="op">(</span></span>
 <span>  shape <span class="op">=</span> <span class="st">"sphere"</span>,</span>
-<span>  <span class="va">radius</span>,</span>
+<span>  <span class="va">radius_body</span>,</span>
 <span>  h_fluid <span class="op">=</span> <span class="fl">0.22</span>,</span>
 <span>  g_fluid <span class="op">=</span> <span class="fl">0.0012</span>,</span>
 <span>  sound_speed_fluid <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -73,8 +73,9 @@
 <dd><p>Optional pre-made shape input. Default is a sphere.</p></dd>
 
 
-<dt id="arg-radius">radius<a class="anchor" aria-label="anchor" href="#arg-radius"></a></dt>
-<dd><p>Optional average radius (m).</p></dd>
+<dt id="arg-radius-body">radius_body<a class="anchor" aria-label="anchor" href="#arg-radius-body"></a></dt>
+<dd><p>Radius (m). For non-canonical shapes, this would be the
+maximum or mean radius at the scatterer midsection.</p></dd>
 
 
 <dt id="arg-h-fluid">h_fluid<a class="anchor" aria-label="anchor" href="#arg-h-fluid"></a></dt>
@@ -119,6 +120,10 @@ Default value is pi/2; input should be in radians.</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>GAS-class object</p>
+    </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><code><a href="GAS.html">GAS</a></code></p></div>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

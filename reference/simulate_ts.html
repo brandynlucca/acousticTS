@@ -125,19 +125,26 @@ is a vector of values, simulations will be run for each value of length
     <h2 id="parallelization">Parallelization<a class="anchor" aria-label="anchor" href="#parallelization"></a></h2>
 
 
-<p>This function uses <code><a href="https://rdrr.io/pkg/pbapply/man/pbapply.html" class="external-link">pbapply::pblapply()</a></code> for parallelized simulation
+<p>This function uses <code><a href="https://peter.solymos.org/pbapply/reference/pbapply.html" class="external-link">pbapply::pblapply()</a></code> for parallelized simulation
 with progress bars. On Windows, parallelization uses PSOCK clusters, which
 require all necessary objects and packages to be exported to worker
 processes. On Unix-like systems, forking is used, which is generally simpler.</p>
     </div>
     <div class="section level2">
-    <h2 id="warning">Warning<a class="anchor" aria-label="anchor" href="#warning"></a></h2>
+    <h2 id="performance-issues">Performance Issues<a class="anchor" aria-label="anchor" href="#performance-issues"></a></h2>
 
 
-<p><strong>WARNING:</strong> Including too many parameters from <code>parameters</code>
+<p>Including too many parameters from <code>parameters</code>
 within <code>batch_by</code> may cause significant performance issues or cause
 <code>R</code> to crash. If intensive simulations are required, consider breaking
 them into more manageable chunks</p>
+    </div>
+    <div class="section level2">
+    <h2 id="deprecation-warning">DEPRECATION WARNING<a class="anchor" aria-label="anchor" href="#deprecation-warning"></a></h2>
+
+
+<p>The <code>simulate_ts</code> function will be deprecated in future versions and will be
+replaced by the <code>anneal</code> function in future versions.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

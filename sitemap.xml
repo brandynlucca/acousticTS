@@ -26,6 +26,7 @@
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/SBF.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/SDWBA.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/SDWBA_curved.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/Scatterer-class.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/Sphere-class.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/along_sum.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/arbitrary.html</loc></url>
@@ -97,7 +98,6 @@
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/sbf_generate.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/sbf_plot.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/sbf_show.html</loc></url>
-<url><loc>https://brandynlucca.github.io/acousticTS/reference/scatterer.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/sdwba_curved_initialize.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/sdwba_initialize.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/sdwba_resample.html</loc></url>
