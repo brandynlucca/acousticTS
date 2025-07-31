@@ -6,7 +6,7 @@
 \usage{
 gas_generate(
   shape = "sphere",
-  radius,
+  radius_body,
   h_fluid = 0.22,
   g_fluid = 0.0012,
   sound_speed_fluid = NULL,
@@ -21,7 +21,8 @@ gas_generate(
 \arguments{
 \item{shape}{Optional pre-made shape input. Default is a sphere.}
 
-\item{radius}{Optional average radius (m).}
+\item{radius_body}{Radius (m). For non-canonical shapes, this would be the
+maximum or mean radius at the scatterer midsection.}
 
 \item{h_fluid}{Sound speed contrast of fluid relative to surrounding
 medium (h).}

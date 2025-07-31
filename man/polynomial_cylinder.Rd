@@ -41,3 +41,6 @@ Smith, J.N., Ressler, P.H., and Warren, J.D. 2013. A distorted wave Born
 approximation target strength model for Bering Sea euphausiids. ICES Journal
 of Marine Science, 70(1): 204-214. https://doi.org/10.1093/icesjms/fss140
 }
+\seealso{
+\code{\link{PolynomialCylinder-class}}
+}

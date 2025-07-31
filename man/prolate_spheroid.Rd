@@ -36,3 +36,6 @@ semi-major and -minor axes.
 \description{
 Creates a prolate spheroid.
 }
+\seealso{
+\code{\link{ProlateSpheroid-class}}
+}

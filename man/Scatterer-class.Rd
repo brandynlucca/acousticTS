@@ -3,6 +3,7 @@
 \docType{class}
 \name{Scatterer-class}
 \alias{Scatterer-class}
+\alias{Scatterer}
 \title{Scatterer-class object for target strength estimation}
 \description{
 The \eqn{acousticTS} package uses a variety of defined S4-class objects

@@ -40,9 +40,11 @@ generalized shapes.}
 
 \item{n_segments}{Number of body segments.}
 
-\item{g_body}{Density contrast.}
+\item{g_body}{Density contrast. This can either be a single value (i.e.
+homogenous) or a vector of values (i.e. inhomogenous).}
 
-\item{h_body}{Soundspeed contrast}
+\item{h_body}{Soundspeed contrast. This can either be a single value (i.e.
+homogenous) or a vector of values (i.e. inhomogenous).}
 
 \item{theta_body}{Orientation of the target relative to the transmit source
 (\eqn{\theta}). Broadside incidence is considered 90 degrees, or pi/2.
