@@ -26,6 +26,8 @@
 #'
 #' @return
 #' Generates a SBF-class object.
+#' 
+#' @seealso \code{\link{SBF}}
 #' @export
 sbf_generate <- function( x_body ,
                           w_body ,
@@ -46,8 +48,8 @@ sbf_generate <- function( x_body ,
                           ID = NULL ) {
   # Generate shape position matrix =============================================
   # Create body shape field ====================================================
-  shape_body <- "arbitrary"
-  shape_bladder <- "arbitrary"
+  shape_body <- "Arbitrary"
+  shape_bladder <- "Arbitrary"
   # Define body shape ==========================================================
   body <- base::list( rpos = base::rbind( x = x_body[ !base::is.na( x_body ) ] ,
                                           w = w_body[ !base::is.na( w_body ) ] ,
@@ -69,14 +71,14 @@ sbf_generate <- function( x_body ,
     body = base::list(
       shape = base::ifelse( base::class( shape_body ) == "character" ,
                             shape_body ,
-                            "arbitrary" ) ,
+                            "Arbitrary" ) ,
       length = base::max( body$rpos[ 1 , ] ) ,
       n_segments = base::length( body$rpos[ 1 , ] )
     ) ,
     bladder = base::list(
       shape = base::ifelse( base::class( shape_bladder ) == "character" ,
                             shape_bladder ,
-                            "arbitrary" ) ,
+                            "Arbitrary" ) ,
       length = base::max( bladder$rpos[ 1 , ] ) - base::min( bladder$rpos[ 1 , ] ) ,
       n_segments = base::length( bladder$rpos[ 1 , ] )
     ) ,
@@ -127,6 +129,8 @@ sbf_generate <- function( x_body ,
 #' }
 #' @return
 #' Generates a CAL-class object.
+#' 
+#' @seealso \code{\link{CAL}}
 #' @export
 cal_generate <- function( material = "WC" ,
                           diameter = 38.1e-3 ,
@@ -215,8 +219,10 @@ cal_generate <- function( material = "WC" ,
 #' @param radius_body Vector containing radii (m).
 #' @param n_segments Number of body segments.
 #' @param radius_curvature_ratio Length-to-curvature ratio (pc/L).
-#' @param g_body Density contrast.
-#' @param h_body Soundspeed contrast
+#' @param g_body Density contrast. This can either be a single value (i.e. 
+#' homogenous) or a vector of values (i.e. inhomogenous).
+#' @param h_body Soundspeed contrast. This can either be a single value (i.e. 
+#' homogenous) or a vector of values (i.e. inhomogenous).
 #' @param theta_body Orientation of the target relative to the transmit source
 #' (\eqn{\theta}). Broadside incidence is considered 90 degrees, or pi/2.
 #' Default value is pi/2; input should be in radians.
@@ -226,6 +232,8 @@ cal_generate <- function( material = "WC" ,
 #' @param ... Additional parameters.
 #' @return
 #' FLS-class object
+#' 
+#' @seealso \code{\link{FLS}}
 #' @import methods
 #' @export
 fls_generate <- function( shape = "arbitrary" ,
@@ -243,7 +251,7 @@ fls_generate <- function( shape = "arbitrary" ,
                           length_units = "m" ,
                           theta_units = "radians" , ... ) {
   # Collect shape information if provided ======================================
-  if( !is( shape , "shape" ) ) {
+  if( !is( shape , "Shape" ) ) {
     if ( shape != "arbitrary" ) {
       if ( base::is.null( length_body ) )
         base::stop( "Body shape is not appropriately parameterized." )
@@ -253,7 +261,7 @@ fls_generate <- function( shape = "arbitrary" ,
   }
   # Generate shape position matrix =============================================
   # Create body shape field ====================================================
-  if ( is( shape , "shape" ) ) {
+  if ( is( shape , "Shape" ) ) {
     shape_input <- shape
   } else {
     if ( shape == "arbitrary" ) {
@@ -281,20 +289,41 @@ fls_generate <- function( shape = "arbitrary" ,
       n_segments = length( shape_input@position_matrix[ , 1 ]  ) - 1 ,
       length_units = length_units ,
       theta_units = theta_units ,
-      shape = base::ifelse( is.character( shape ) | is( shape, "arbitrary" ) ,
-                            "arbitrary" ,
+      shape = base::ifelse( is.character( shape ) | is( shape, "Arbitrary" ) ,
+                            "Arbitrary" ,
                             class( shape ) ) )
-    if ( is( shape , "Sphere" ) || ( is.character( shape ) && shape == "sphere" ) ) {
+    if ( is( shape , "Sphere" ) || ( is.character( shape ) && shape == "Sphere" ) ) {
       shape_parameters[[ "radius_shape" ]] <- extract( shape_input ,
                                                        "shape_parameters" )$radius_shape
     }
     
-    if( is.character( shape ) == T ){
+    if( is.character( shape ) ){
       if ( shape == "cylinder" ) {
         shape_parameters$taper_order <- shape_input@shape_parameters$taper_order
       }
     }
-
+    # Check material properties length =========================================
+    # g ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    if ( length( g_body ) > 1 && 
+         length( g_body ) != length( shape_input@position_matrix[ , 1 ] ) - 1 ){
+      stop(
+        paste0("Vector input for 'g_body' with ", length( g_body ) ,
+               " elements does not match the expected number of segments (",
+               length( shape_input@position_matrix[ , 1 ] ) - 1 , ")"
+        )
+      )
+    }
+    # h ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    if ( length( h_body ) > 1 && 
+         length( h_body ) != length( shape_input@position_matrix[ , 1 ] ) - 1 ){
+      stop(
+        paste0("Vector input for 'h_body' with ", length( h_body ) ,
+               " elements does not match the expected number of segments (",
+               length( shape_input@position_matrix[ , 1 ] ) - 1 , ")"
+        )
+      )
+    }
+    # Create body slot =========================================================
     body <- list( rpos = t.default( shape_input@position_matrix ) ,
                   radius = shape_input@shape_parameters$radius ,
                   radius_curvature_ratio = radius_curvature_ratio ,
@@ -320,7 +349,8 @@ fls_generate <- function( shape = "arbitrary" ,
 #'
 #' @inheritParams fls_generate
 #' @param shape Optional pre-made shape input. Default is a sphere.
-#' @param radius Optional average radius (m).
+#' @param radius_body Radius (m). For non-canonical shapes, this would be the 
+#' maximum or mean radius at the scatterer midsection.
 #' @param h_fluid Sound speed contrast of fluid relative to surrounding
 #' medium (h).
 #' @param g_fluid Density contrast of fluid relative to surrounding density (g).
@@ -330,10 +360,13 @@ fls_generate <- function( shape = "arbitrary" ,
 #' @param n_segments Number of body segments.
 #' @return
 #' GAS-class object
+#' 
+#' @seealso \code{\link{GAS}}
+#' 
 #' @import methods
 #' @export
 gas_generate <- function( shape = "sphere" ,
-                          radius ,
+                          radius_body ,
                           h_fluid = 0.2200 ,
                           g_fluid = 0.0012 ,
                           sound_speed_fluid = NULL ,
@@ -344,7 +377,7 @@ gas_generate <- function( shape = "sphere" ,
                           theta_units = "radians" ,
                           n_segments = 100 ) {
   # Collect shape information if provided ======================================
-  if ( base::is.null( radius ) & base::class( shape ) == "character" ) {
+  if ( base::is.null( radius_body ) & base::class( shape ) == "character" ) {
     stop( "Canonical shape generation requires 'double' input for radius_body argument." )
   }
   # Pull argument input names ==================================================
@@ -353,7 +386,7 @@ gas_generate <- function( shape = "sphere" ,
   arg_list <- names( formals( shape ) )
   # Filter out inappropriate parameters ========================================
   arg_full <- arg_pull[ arg_list ] 
-  true_args <- Filter( Negate( is.null) , arg_full )
+  true_args <- Filter( Negate( is.null ) , arg_full )
   # Initialize =================================================================
   shape_input <- do.call( shape , true_args )
   # Create metadata field ======================================================
@@ -365,7 +398,7 @@ gas_generate <- function( shape = "sphere" ,
                       radius = base::ifelse( shape %in%
                                                base::c( "sphere" ,
                                                         "prolate_spheroid" ) ,
-                                             radius ,
+                                             radius_body ,
                                              base::mean(
                                                base::abs(
                                                  base::diff(
@@ -377,13 +410,13 @@ gas_generate <- function( shape = "sphere" ,
                       h = h_fluid )
   # Define shape parameters ====================================================
   shape_parameters <- base::list(
-    radius = body$radius ,
+    radius_body = body$radius ,
     n_segments = n_segments ,
     radius_units = radius_units ,
     theta_units = theta_units ,
     shape = base::ifelse( base::class( shape ) == "character" ,
                           shape ,
-                          "arbitrary" )
+                          "Arbitrary" )
   )
   # Create GAS-class object ====================================================
   return( methods::new( "GAS" ,
@@ -414,6 +447,9 @@ gas_generate <- function( shape = "sphere" ,
 #' @param K Bulk modulus (Pa) of the shell material. 
 #' @param theta_shell Object orientation relative to incident sound wave.
 #' @return ESS-class object
+#' 
+#' @seealso \code{\link{ESS}}
+#' 
 #' @export
 ess_generate <- function( shape = "sphere" ,
                           x_body = NULL ,
@@ -440,10 +476,10 @@ ess_generate <- function( shape = "sphere" ,
   # Create metadata field ======================================================
   metadata <- list( ID = ifelse( !is.null( ID ) , ID , "UID" ) )
   # Create shape fields ========================================================
-  if ( is( shape , "shape" ) ) {
+  if ( is( shape , "Shape" ) ) {
     shell_rpos <- shape
   } else {
-    if ( shape == "arbitrary" ) {
+    if ( shape == "Arbitrary" ) {
       shell_rpos <- arbitrary( x_body = x_body ,
                                y_body = y_body ,
                                z_body = z_body ,

@@ -201,8 +201,8 @@ setMethod( "reforge",
                # Parse body ====================================================
                body <- extract( object , "body" )
                x_new <- seq( from = body$rpos[ 1 , 1 ] , 
-                             to = body$rpos[ 1 , shape$n_segments ] , 
-                             length.out = n_segments )
+                             to = body$rpos[ 1 , shape$n_segments + 1 ] , 
+                             length.out = n_segments + 1 )
                rpos_new <- rbind(
                  x_new , 
                  t.default(
@@ -222,7 +222,13 @@ setMethod( "reforge",
                slot( object , "body" )$radius <- radius_new
                slot( object , "shape_parameters" )$n_segments <- n_segments
              }
-             # Determine new length ++++++++++++++++++++++++++++++++++++++++++
+             # # Update material properties if needed ============================
+             # if ( length( body$g ) > 1 ) {
+             #  test = approx( x = body$rpos[ 1, ] , 
+             #          y = c( body$g, body$g[ length( body$g ) ] ) , 
+             #                 xout = x_new )$y
+             # }
+             # Determine new length ++++++++++++++++++++++++++++++++++++++++++++
              if( ! missing( length ) ) {
                # Parse shape ===================================================
                shape <- acousticTS::extract( object , "shape_parameters" )
@@ -258,6 +264,7 @@ setMethod( "reforge",
 #' @export
 discover_reforge_params <- function( object_class ) {
   switch( object_class ,
+
           "FLS" = c( "length" , "radius" , "length_radius_ratio_constant" , 
                      "n_segments" ) ,
           "SBF" = c( "length_body" , "width_body" , "height_body" , 

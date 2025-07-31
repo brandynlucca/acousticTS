@@ -12,6 +12,8 @@
 #' @param z_body z-axis (m)
 #' @param radius_body Radius (m)
 #' @param length_units Units for body length. Defaults to meters: "m"
+#' @seealso \code{\link{Arbitrary-class}}
+#' 
 #' @rdname arbitrary
 #' @export
 arbitrary <- function( x_body ,
@@ -45,6 +47,8 @@ arbitrary <- function( x_body ,
 #' sphere(radius_body, n_segments, diameter_units )
 #' @return
 #' Creates position vector for a spherical object of a defined radius.
+#' @seealso \code{\link{Sphere-class}}
+#' 
 #' @rdname sphere
 #' @importFrom utils head tail
 #' @export
@@ -103,6 +107,8 @@ sphere <- function( radius_body ,
 #' @return
 #' Creates the position vector for a prolate spheroid object of defined
 #'    semi-major and -minor axes.
+#' @seealso \code{\link{ProlateSpheroid-class}}
+#' 
 #' @rdname prolate_spheroid
 #' @importFrom utils head tail
 #' @export
@@ -176,6 +182,8 @@ prolate_spheroid <- function( length_body ,
 #' taper, n_segments, length_units)
 #' @return
 #' Creates the position vector for a tapered or untapered cylinder.
+#' @seealso \code{\link{Cylinder-class}}
+#' 
 #' @rdname cylinder
 #' @importFrom utils head tail
 #' @export
@@ -262,6 +270,9 @@ cylinder <-  function( length_body ,
 #' Smith, J.N., Ressler, P.H., and Warren, J.D. 2013. A distorted wave Born
 #' approximation target strength model for Bering Sea euphausiids. ICES Journal
 #' of Marine Science, 70(1): 204-214. https://doi.org/10.1093/icesjms/fss140
+#' 
+#' @seealso \code{\link{PolynomialCylinder-class}}
+#' 
 #' @rdname polynomial_cylinder
 #' @export
 polynomial_cylinder <- function(length_body,

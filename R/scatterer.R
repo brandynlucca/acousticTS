@@ -3,13 +3,13 @@
 # OVERALL SCATTERING OBJECTS
 ################################################################################
 ################################################################################
-#' scatterer-class
+#' Scatterer-class object for target strength estimation
 #'
 #' @description
 #' The \eqn{acousticTS} package uses a variety of defined S4-class objects
 #' comprising different types of scatterers, such as fish with gas-filled
-#' swimbladders (\link[acousticTS]{SBF}) and fluid-like crustaceans
-#' (\link[acousticTS]{FLS}).
+#' swimbladders (\link{SBF}) and fluid-like crustaceans
+#' (\link{FLS}).
 #' @slot metadata List containing relevant metadata
 #' @slot model_parameters Model parameters necessary for predicting TS 
 #' @section Data Organization:
@@ -63,15 +63,18 @@
 #'    }
 #'    }
 #' @section Supported Scatterers:
-#' \describe{
-#'    \item{\code{Calibration spheres (CAL)}}{\link[acousticTS]{CAL}}
-#'    \item{\code{Fluid-like scatterers (FLS)}}{\link[acousticTS]{FLS}}
-#'    \item{\code{Swimbladdered fish (SBF)}}{\link[acousticTS]{SBF}}
-#'    \item{\code{Elastic shell scatterers (ESS)}}{\link[acousticTS]{ESS}}
+#' \itemize{
+#'    \item \code{Calibration spheres} (\link{CAL})
+#'    \item \code{Elastic-shelled scatterers} (\link{ESS})
+#'    \item \code{Fluid-like scatterers} (\link{FLS})
+#'    \item \code{Gas-filled scatterers} (\link{GAS})
+#'    \item \code{Swimbladdered fish} (\link{SBF})
 #' }
-#' @rdname scatterer
+#' @name Scatterer-class
+#' @aliases Scatterer
+#' @rdname Scatterer-class
 #' @export
-setClass("scatterer",
+setClass("Scatterer",
          slots = c(
            metadata = "list" ,
            model_parameters = "list"
@@ -89,8 +92,11 @@ setClass("scatterer",
 #' bubbles to other scatterers with gas occlusions, swimbladders, and other internal
 #' features, if applicable. The default behavior for this type of object is to 
 #' only reference the gaseous/fluid feature with exceptions that are model-dependent.
-#' See \link[acousticTS]{scatterer} for a more detailed description on 
+#' See \link{Scatterer} for a more detailed description on 
 #' how this S4 object is organized.
+#' 
+#' @seealso \code{\link{Scatterer}}
+#' 
 #' @rdname GAS
 #' @export
 GAS <- setClass("GAS",
@@ -99,7 +105,7 @@ GAS <- setClass("GAS",
                            model = "list",
                            body = "list",
                            shape_parameters = "list" ),
-                contains = "scatterer")
+                contains = "Scatterer")
 ################################################################################
 #' Swimbladdered fish (SBF) object/class.
 #' @description
@@ -108,8 +114,11 @@ GAS <- setClass("GAS",
 #' two sets of discretized cylinders: the body and the swimbladder. Both shapes
 #' comprise independent position matrices, material properties, orientations, 
 #' and other relevant shape-related data and metadata. See 
-#' \link[acousticTS]{scatterer} for a more detailed description on how 
+#' \link{Scatterer} for a more detailed description on how 
 #' this S4 object is organized.
+#' 
+#' @seealso \link{Scatterer}
+#' 
 #' @rdname SBF
 #' @export
 SBF <- setClass( "SBF" ,
@@ -132,8 +141,11 @@ SBF <- setClass( "SBF" ,
 #' created using values for both an outer shell and internal tissues, if applicable. 
 #' The default behavior for this type of this object is to only reference the outer
 #' shell with few exceptions that are model-dependent. See 
-#' \link[acousticTS]{scatterer} for a more detailed description on how 
+#' \link{Scatterer} for a more detailed description on how 
 #' this S4 object is organized.
+#' 
+#' @seealso \link{Scatterer}
+#' 
 #' @rdname ESS
 #' @export
 ESS <- setClass( "ESS",
@@ -143,7 +155,7 @@ ESS <- setClass( "ESS",
                             shell = "list" ,
                             fluid = "list" ,
                             shape_parameters = "list" ) ,
-                 contains = "scatterer" )
+                 contains = "Scatterer" )
 ################################################################################
 #' Solid and calibration sphere (CAL) object/class.
 #' @description
@@ -151,8 +163,11 @@ ESS <- setClass( "ESS",
 #' objects belonging to the CAL-class scatterers. This object is created using
 #' parameters specific to the outer shell. The default behavior of this object is
 #' to only reference these outer elastic shell properties with few exceptions that
-#' are model-dependent. See \link[acousticTS]{scatterer-class} for a more 
+#' are model-dependent. See \link{Scatterer} for a more 
 #' detailed description on how this S4 object is organized.
+#' 
+#' @seealso \link{Scatterer}
+#' 
 #' @rdname CAL
 #' @export
 CAL <- setClass( "CAL" ,
@@ -171,8 +186,11 @@ CAL <- setClass( "CAL" ,
 #' @description
 #' A S4 class that provides slots to contain relevant metadata for scatterers 
 #' similar to the surrounding fluid medium (i.e fluid-like) belonging to 
-#' FLS-class scatterers. See \link[acousticTS]{scatterer-class} for a more 
+#' FLS-class scatterers. See \link{Scatterer} for a more 
 #' detailed description on how this S4 object is organized.
+#' 
+#' @seealso \link{Scatterer}
+#' 
 #' @rdname FLS
 #' @export
 FLS <- setClass("FLS",
@@ -181,4 +199,4 @@ FLS <- setClass("FLS",
                            model = "list" ,
                            body = "list" ,
                            shape_parameters = "list" ) ,
-                contains = "scatterer" )
+                contains = "Scatterer" )
