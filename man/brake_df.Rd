@@ -17,3 +17,4 @@ as a ratio relative to body length or actual measurement}
 \description{
 Support function for bending scatterer position matrix dataframe
 }
+\keyword{internal}

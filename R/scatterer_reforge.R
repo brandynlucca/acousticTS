@@ -4,23 +4,12 @@
 ################################################################################
 # PRIMARY FORGE GENERATION FUNCTION 
 ################################################################################
-#' Resizing function for targets.
-#' @param object Scatterer-class object.
-#' @param length_body Updated body length when applicable
-#' @param width_body Updated body width when applicable
-#' @param height_body Update body height/depth when applicable
-#' @param length_bladder Updated bladder length when applicable
-#' @param width_bladder Updated bladder width when applicable
-#' @param height_bladder Updated bladder height/depth when applicable
-#' @param radius_body Updated body radius when applicable
-#' @param radius_bladder Updated bladder radius when applicable 
-#' @param bladder_inflation_factor Proportional bladder volume
-#' @param body_bladder_ratio_constant Maintain body-to-bladder volume ratio when resizing
-#' @param length_radius_ratio_constant Maintain body-to-radius ratio when resizing
-#' @param n_segments_body Number of segments along the body
-#' @param n_segments_bladder Number of segments along the bladder
-#' @param ... Scatterer-specific arguments
-#' @rdname reforge
+#' Resize or reparameterize a scatterer object
+#'
+#' Generic function to resize or reparameterize a scatterer object.
+#'
+#' @param object A scatterer object.
+#' @param ... Additional arguments passed to specific methods.
 #' @export
 setGeneric( "reforge" ,
             function( object , ... )
@@ -28,8 +17,18 @@ setGeneric( "reforge" ,
 
 #' Resizing function for swimbladdered targets
 #' @param object SBF-class object.
-#' @param full_size new factored resize of body.
-#' @param bladder_size new factored resize of bladder.
+#' @param length_body Updated body length when applicable.
+#' @param width_body Updated body width when applicable.
+#' @param height_body Updated body height/depth when applicable.
+#' @param length_bladder Updated bladder length when applicable.
+#' @param width_bladder Updated bladder width when applicable.
+#' @param height_bladder Updated bladder height/depth when applicable.
+#' @param radius_body Updated body radius when applicable.
+#' @param bladder_inflation_factor Proportional bladder volume.
+#' @param isometric_body Logical; maintain isometric scaling for body.
+#' @param isometric_bladder Logical; maintain isometric scaling for bladder.
+#' @param n_segments_body Number of segments along the body.
+#' @param n_segments_bladder Number of segments along the bladder.
 #' @export
 setMethod( "reforge",
            signature( object = "SBF" ) ,
@@ -202,8 +201,8 @@ setMethod( "reforge",
                # Parse body ====================================================
                body <- extract( object , "body" )
                x_new <- seq( from = body$rpos[ 1 , 1 ] , 
-                             to = body$rpos[ 1 , shape$n_segments ] , 
-                             length.out = n_segments )
+                             to = body$rpos[ 1 , shape$n_segments + 1 ] , 
+                             length.out = n_segments + 1 )
                rpos_new <- rbind(
                  x_new , 
                  t.default(
@@ -223,7 +222,13 @@ setMethod( "reforge",
                slot( object , "body" )$radius <- radius_new
                slot( object , "shape_parameters" )$n_segments <- n_segments
              }
-             # Determine new length ++++++++++++++++++++++++++++++++++++++++++
+             # # Update material properties if needed ============================
+             # if ( length( body$g ) > 1 ) {
+             #  test = approx( x = body$rpos[ 1, ] , 
+             #          y = c( body$g, body$g[ length( body$g ) ] ) , 
+             #                 xout = x_new )$y
+             # }
+             # Determine new length ++++++++++++++++++++++++++++++++++++++++++++
              if( ! missing( length ) ) {
                # Parse shape ===================================================
                shape <- acousticTS::extract( object , "shape_parameters" )
@@ -252,3 +257,21 @@ setMethod( "reforge",
              # Return object ===================================================
              return( object )
            } )
+
+#' Get reforge parameters from known method signatures
+#' @param object_class Character string of object class
+#' @return Character vector of parameter names
+#' @export
+discover_reforge_params <- function( object_class ) {
+  switch( object_class ,
+
+          "FLS" = c( "length" , "radius" , "length_radius_ratio_constant" , 
+                     "n_segments" ) ,
+          "SBF" = c( "length_body" , "width_body" , "height_body" , 
+                     "length_bladder" , "width_bladder" , "height_bladder" ,
+                     "radius_body" , "bladder_inflation_factor" ,
+                     "isometric_body" , "isometric_bladder" ,
+                     "n_segments_body" , "n_segments_bladder" ) ,
+          character( 0 )  # Default for unknown classes
+  )
+}

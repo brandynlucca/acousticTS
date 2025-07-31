@@ -11,6 +11,7 @@
 #' along_sum(matrix(c(1, 2, 3), c(1, 2, 3)), 2)
 #' }
 #' @rdname along_sum
+#' @keywords internal
 #' @export
 along_sum <- function( rpos , iterations ) {
   output <- rpos[ , 1 : ( iterations - 1 ) ] + rpos[ , 2 : iterations ]
@@ -23,6 +24,7 @@ along_sum <- function( rpos , iterations ) {
 #' @param x Indexing argument for multi-row objects
 #' @param y Indexing argument for multi-column objects
 #' @rdname contour_integrate
+#' @keywords internal
 #' @export
 contour_integrate <- function( integral , x , y ) {
   complex( real = integrate( function( s ) Re( integral( s , x , y ) ) ,
@@ -41,6 +43,7 @@ contour_integrate <- function( integral , x , y ) {
 #' quadrature
 #' @param phase_sd Phase standard deviation 
 #' @rdname phase_integrate
+#' @keywords internal
 #' @export
 phase_integrate <- function( x , y , n_iterations , integral , phase_sd ) {
   rng <- rnorm( n_iterations , 0 , 1 )
@@ -50,11 +53,11 @@ phase_integrate <- function( x , y , n_iterations , integral , phase_sd ) {
 ################################################################################
 #' Convert angular measurements from radians to degrees
 #' @param x A real value in radians
-#' @usage
-#' degrees( x )
 #' @examples
+#' \dontrun{
 #' orientation <- pi / 2 # radians
-#' degrees( orientation ) # this should return a value equal to 90 degrees
+#' degrees(orientation) # this should return a value equal to 90 degrees
+#' }
 #' @return
 #' Angle in degrees
 #' @rdname degrees
@@ -63,11 +66,9 @@ degrees <- function( x ) x * 180.0 / pi
 ################################################################################
 #' Convert angular measurements from degrees to radians.
 #' @param x A real value in degrees
-#' @usage
-#' radians( x )
 #' @examples
 #' orientation <- 90 # degrees
-#' radians( orientation ) # this should return a value equal to pi / 2 radians#' 
+#' radians(orientation) # this should return a value equal to pi / 2 radians 
 #' @return
 #' Angle in radians.
 #' @rdname radians

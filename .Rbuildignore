@@ -4,7 +4,8 @@
 ^LICENSE\.md$
 ^doc$
 ^Meta$
-^\.github$
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
+^\.github$
+^\.pre-commit-config\.yaml$

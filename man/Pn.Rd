@@ -18,3 +18,4 @@ a series of values when evaluated over a vector.
 \description{
 Legendre Polynomial function (Pn) of the first kind.
 }
+\keyword{legendre}

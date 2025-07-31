@@ -12,7 +12,7 @@
 #' @import grDevices
 #' @export
 setMethod( f = "show" ,
-           signature = "scatterer" ,
+           signature = "Scatterer" ,
            definition = function( object ) {
 # Detect scatterer type ========================================================
              sc_type <- class( object )
@@ -79,7 +79,7 @@ gas_show <- function ( object ) {
   # Parse metadata =============================================================
   meta <- acousticTS::extract( object ,
                                "metadata" )
-  # Parse shape ================================================================
+  # Parse shape =============================== =================================
   shape <- acousticTS::extract( object ,
                                 "shape_parameters" )
   # Parse body =================================================================
@@ -99,8 +99,8 @@ gas_show <- function ( object ) {
             " " ,
             shape$radius_units ) , "\n" ,
     "Material properties:\n" ,
-    paste0( " g: " , round( .Internal( mean( body$g ) ) , 4 ) ) , "\n" ,
-    paste0( " h: " , round( .Internal( mean( body$h ) ) , 4 ) ) , "\n" 
+    paste0( " g: " , round( mean( body$g ) , 4 ) ) , "\n" ,
+    paste0( " h: " , round( mean( body$h ) , 4 ) ) , "\n" 
   )
 }
 #' show(...) for SBF-class objects.
@@ -212,29 +212,93 @@ ess_show <- function( object ) {
   # Parse shape ================================================================
   shape <- acousticTS::extract( object ,
                                 "shape_parameters" )
-  # Parse body =================================================================
+  # Parse shell ================================================================
   shell <- acousticTS::extract( object ,
                                 "shell" )
+  # Parse fluid ================================================================
+  fluid <- acousticTS::extract( object ,
+                                "fluid" )
+  # Create material properties string ==========================================
+  # Shell ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  shell_material_props <- shell[ 
+    names( shell ) %in% c( "sound_speed" , "density" , "g" , "h" , "K" , 
+                           "E" , "G" , "nu" ) 
+  ]
+  shell_material_text <- if( length( shell_material_props ) > 0 ) {
+    prop_strings <- mapply( function( name , value ) {
+      clean_name <- gsub( "_" , " " , name )  # Remove underscores
+      clean_name <- switch( EXPR = clean_name ,
+                            "density" = "Density" ,
+                            "sound speed" = "Sound speed" ,
+                            "K" = "Bulk modulus (K)" ,
+                            "E" = "Young's modulus (E)" ,
+                            "G" = "Shear modulus (G)" ,
+                            "nu" = "Poisson's ratio" ,
+                            clean_name )
+      units <- switch( EXPR = name ,
+                       "density" = " kg m^-3" ,
+                       "sound_speed" = " m s^-1" ,
+                       "K" = " Pa" ,
+                       "E" = " Pa" ,
+                       "G" = " Pa" ,
+                       "" )
+      paste0( clean_name , ": " , round( value , 4 ) , units )
+    } , names( shell_material_props ) , shell_material_props , SIMPLIFY = F )
+    paste( "   " , prop_strings , collapse = "\n " )
+  } else {
+    "   None specified"
+  }
+  # Internal fluids ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  fluid_material_props <- fluid[
+    names( fluid ) %in% c( "sound_speed" , "density" , "g" , "h" )     
+  ]
+  fluid_material_text <- if( length( fluid_material_props ) > 0 ) {
+    prop_strings <- mapply( function( name , value ) {
+      clean_name <- gsub( "_" , " " , name )  # Remove underscores
+      clean_name <- switch( clean_name ,
+                            "density" = "Density" ,
+                            "sound speed" = "Sound speed" ,
+                            clean_name )
+      units <- switch( name ,
+                       "density" = " kg m^-3" ,
+                       "sound_speed" = " m s^-1" ,
+                       "" )
+      paste0( clean_name , ": " , round( value , 4 ) , units )
+    } , names( fluid_material_props ) , fluid_material_props , SIMPLIFY = F )
+    paste( "   " , prop_strings , collapse = "\n " )
+  } else {
+    "   None specified"
+  }
   # Print object summary information ===========================================
   cat( paste0( is( object )[[ 1 ]] , "-object" ) , "\n" ,
-       "Calibration sphere" , "\n" ,
+       "Elastic-shelled scatterer" , "\n" ,
        " ID:" ,
        paste0( meta$ID ) , "\n" ,
        "Material:" ,
        paste0( meta$Material ) , "\n" ,
-       " Shell sound speed contrast (h):" ,
-       paste0( shell$h ) , "\n" ,
-       " Shell density contrast (g):" ,
-       paste0( shell$g ) , "\n" ,
-       "Diameter:" ,
-       paste0( shape$body$diameter ,
-               " " ,
-               shape$body$length_units ) , "\n" ,
-       " Radius:" ,
-       paste0( shape$body$radius ,
-               " " ,
-               shape$body$length_units ) , "\n" ,
+       "  Shell: \n" ,
+       shell_material_text , " \n" ,
+       "  Internal fluid-like body: \n" ,
+       fluid_material_text , " \n" ,
+       "Shape: \n" ,
+       "  Shell: \n" ,
+       "    Radius:" , paste0( shape$shell$radius , 
+                               " " , 
+                               shape$shell$length_units ) , " \n" ,
+       "    Diameter:" , paste0( shape$shell$diameter , 
+                                 " " , 
+                                 shape$shell$length_units ) , " \n" ,
+       "    Outer thickness:" , paste0( shell$shell_thickness , 
+                                        " " , 
+                                        shape$shell$length_units ) , "\n" ,
+       "  Internal fluid-like body: \n" ,
+       "    Radius:" , paste0( shape$fluid$radius , 
+                               " " , 
+                               shape$fluid$length_units ) , " \n" ,
+       "    Diameter:" , paste0( shape$fluid$diameter , 
+                                 " " , 
+                                 shape$shell$length_units ) , " \n" ,
        "Propagation direction of the incident sound wave:" ,
-       paste0( round(shell$theta , 3 ) ,
-               " radians" ) )
+       paste0( round(shell$theta , 3 ) , " radians" )
+  )
 }

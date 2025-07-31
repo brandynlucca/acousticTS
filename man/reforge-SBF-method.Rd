@@ -23,9 +23,29 @@
 \arguments{
 \item{object}{SBF-class object.}
 
-\item{full_size}{new factored resize of body.}
+\item{length_body}{Updated body length when applicable.}
 
-\item{bladder_size}{new factored resize of bladder.}
+\item{width_body}{Updated body width when applicable.}
+
+\item{height_body}{Updated body height/depth when applicable.}
+
+\item{length_bladder}{Updated bladder length when applicable.}
+
+\item{width_bladder}{Updated bladder width when applicable.}
+
+\item{height_bladder}{Updated bladder height/depth when applicable.}
+
+\item{radius_body}{Updated body radius when applicable.}
+
+\item{bladder_inflation_factor}{Proportional bladder volume.}
+
+\item{isometric_body}{Logical; maintain isometric scaling for body.}
+
+\item{isometric_bladder}{Logical; maintain isometric scaling for bladder.}
+
+\item{n_segments_body}{Number of segments along the body.}
+
+\item{n_segments_bladder}{Number of segments along the bladder.}
 }
 \description{
 Resizing function for swimbladdered targets

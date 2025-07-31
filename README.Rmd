@@ -13,7 +13,8 @@ knitr::opts_chunk$set(collapse=TRUE,
 ```
 
 # acousticTS
-
+[![DOI](https://zenodo.org/badge/161965429.svg)](https://zenodo.org/badge/latestdoi/161965429) [![Documentation](https://img.shields.io/badge/Latest_Documentation-blue)](https://brandynlucca.github.io/acousticTS/)
+[![Build status](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml) [![Coverage](https://github.com/brandynlucca/acousticTS/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/test-coverage.yaml) [![Docs](https://github.com/brandynlucca/acousticTS/actions/workflows/document.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/document.yaml) [![pkgdown](https://github.com/brandynlucca/acousticTS/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/pkgdown.yaml) [![pages-build-deployment](https://github.com/brandynlucca/acousticTS/actions/workflows/pages/pages-build-deployment/badge.svg?branch=gh-pages)](https://github.com/brandynlucca/acousticTS/actions/workflows/pages/pages-build-deployment)
 Acoustic backscatter from a single target or organism is expressed as
 the intensity of an echo typically denoted as the *backscattering
 cross-section* (σ~bs~, m^2^). Target strength (TS, dB re. 1 m^2^) is the
@@ -33,11 +34,6 @@ statitsical distributions of inputs. This package is in a constant state
 of development with updates to the available model library,
 computational efficiency, and quality-of-life improvements.
 
-*General DOI* <https://doi.org/10.5281/zenodo.7600659>
-
-*Latest release DOI*
-[![DOI](https://zenodo.org/badge/161965429.svg)](https://zenodo.org/badge/latestdoi/161965429)
-
 ## [Installation]{.underline}
 
 You can install the current released version of acousticTS via:
@@ -50,138 +46,4 @@ Or you can install the development version of acousticTS like so:
 
 ``` r
 devtools::install_github("brandynlucca/acousticTS@test-branch")
-```
-
-## [Models currently available]{.underline}
-
-#### Two-ray model for uniformly bent fluid-like cylinders ([DCM]{.underline})
-
-*Stanton, T.K., Clay, C.S., and Chu, D. (1993). Ray representation of
-sound scattering by weakly scattering deformed fluid cylinders: Simple
-physics and application to zooplankton. J. Acoust. Soc. Am., 94,
-3454-3462.*
-
-#### Distorted wave Born approximation ([DWBA]{.underline})
-
-*Stanton, T.K., Chu, D., and Wiebe, P.H. (1998). Sound scattering by
-several zooplankton groups. II. Scattering models. J. Acoust. Soc. Am.,
-103, 236-253.*
-
-#### Stochastic distorted wave Born approximation ([SDWBA]{.underline})
-
-*Demer, D.A., and Conti, S.G. 2003. Reconciling theoretical versus
-empirical target strengths of krill: effects of phase variability on the
-distorted-wave Born approximation. ICES J. Mar. Sci., 60, 429-434.*
-
-#### SDWBA for uniformly bent scatterers ([SDWBA_curved]{.underline})
-
-*Demer, D.A., and Conti, S.G. 2003. Reconciling theoretical versus
-empirical target strengths of krill: effects of phase variability on the
-distorted-wave Born approximation. ICES J. Mar. Sci., 60, 429-434.*
-
-*Stanton, T.K., Chu, D., and Wiebe, P.H. (1998). Sound scattering by
-several zooplankton groups. II. Scattering models. J. Acoust. Soc. Am.,
-103, 236-253.*
-
-#### Kirchoff-ray mode approximation ([KRM]{.underline})
-
-*Clay C.S. and Horne J.K. (1994). Acoustic models of fish: The Atlantic
-cod (Gadus morhua). J. Acoust. Soc. Am., 96, 1661-1668.*
-
-#### Modal series solution for gas-filled fluid spheres ([MSS_anderson]{.underline})
-
-*Anderson, V.C. (1950). Sound scattering from a fluid sphere. J. Acoust.
-Soc. Am., 22, 426-431.*
-
-#### Homogeneous solid sphere ([calibration]{.underline})
-
-*MacLennan D. N. (1981). The theory of solid spheres as sonar
-calibration targets. Scottish Fisheries Research No. 22, Department of
-Agriculture and Fisheries for Scotland.*
-
-## [Examples]{.underline}
-
-Below are examples of different models used to predict TS for a sardine
-with a gas-filled swimbladder, a tungsten carbide calibration sphere, a
-crustacean modeled as a prolate spheroid, and a generic gas-filled
-bubble.
-
-### Kirchoff Ray-Mode approximation for a Sardine with a gas-filled swimbladder
-
-```{r sardine}
-library( acousticTS )
-### Call in the built-in sardine shape dataset
-data( sardine )
-### Inspect the object
-print( sardine )
-plot( sardine )
-### We will now define a frequency range to predict TS over
-frequency <- seq( 1e3 , 400e3 , 1e3 )
-### And now we use the target_strength(...) function to model TS for this fish
-sardine <- target_strength( sardine, 
-                            frequency = frequency, 
-                            model = "KRM" )
-### Plot results
-plot( sardine, type = 'model' )
-### Extract model results
-sardine_ts <- extract( sardine , "model") $KRM
-```
-
-### Calibration sphere
-
-```{r calibration}
-### Let's create a calibration sphere 
-### Default inputs here are a 38.1 mm diameter and a tungsten carbide 
-### (WC) material properties.
-cal_sphere <- cal_generate( )
-### We will use the same frequency range as the previous example
-### Calculate TS
-cal_sphere <- target_strength( object = cal_sphere,
-                               frequency = frequency,
-                               model = "calibration" )
-### Plot results
-plot( cal_sphere , type = 'model' )
-### Extract model results
-calibration_ts <- extract( cal_sphere , "model" )$calibration
-```
-
-### Fluid sphere (Anderson, 1950)
-
-```{r bubble}
-### Let's create a gas-filled bubble with a raidus of 4 mm
-### This defaults to a density contrast, g_body, of 0.0012
-### This defaults to a soundspeed contrast, h_body, of 0.220
-bubble <- gas_generate( radius = 4e-3 ,
-                        ID = "gas bubble" )
-print( bubble )
-### Model TS using the Anderson (1950) model
-bubble <- target_strength( bubble,
-                           frequency = seq( 1e3 , 300e3 , 0.5e3 ) ,
-                           model = "MSS_anderson" )
-### Plot results
-plot( bubble , type = 'model' )
-```
-
-### Fluid-like crustacean (prolate spheroid) using the distorted Born wave approximation (DWBA) and ray-based deformed cylinder model (DCM)
-
-```{r crustacean}
-### First let's create a prolate spheroid shape 
-### 25 mm long with a length-to-radius ratio of 16
-crustacean <- fls_generate( shape = "prolate_spheroid" ,
-                            length_body = 25.0e-3 , 
-                            length_radius_ratio = 16 ,
-                            radius_curvature_ratio = 3.3 ,
-                            g_body = 1.03 ,
-                            h_body = 1.02 )
-print( crustacean )
-plot( crustacean )
-### Model TS using the ray-path deformed cylinder model (DCM), distorted wave
-### Born approximation (DWBA), the stochastic variation of the DWBA (SDWBA) , 
-### and specifically curved versions of both the DWBA and SDWBA 
-crustacean <- target_strength( crustacean ,
-                               frequency = seq( 1e3 , 200e3 , 1e3 ) ,
-                               model = c( "DCM" , "DWBA" , "SDWBA" ,
-                                          "DWBA_curved" , "SDWBA_curved" ) )
-### Plot results
-plot( crustacean , type = 'model' )
 ```

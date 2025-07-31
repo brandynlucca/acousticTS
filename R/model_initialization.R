@@ -87,6 +87,107 @@ mss_anderson_initialize <- function(object ,
   return( object )
 }
 ################################################################################
+################################################################################
+# Model initialization functions
+################################################################################
+################################################################################
+#' Initialize ESS-object for modal series solution.
+#' @param object ESS-class object.
+#' @param frequency Frequency vector (Hz).
+#' @param sound_speed_sw Seawater sound speed (m/s). Default: 1500.
+#' @param density_sw Seawater density (kg/m³). Default: 1026.
+#' @param m_limit Modal series limit (i.e. max "m"). The default is the maximum
+#'    ka + 10.
+#' @export
+mss_goodman_stern_initialize <- function( object ,
+                                          frequency ,
+                                          sound_speed_sw = 1500 ,
+                                          density_sw = 1026 ,
+                                          m_limit = NULL ) {
+  # Detect object class ========================================================
+  scatterer_type <- class( object )
+  # Parse metadata =============================================================
+  meta <- extract( object , "metadata")
+  # Parse shape ================================================================
+  shape <- extract( object , "shape_parameters" )
+  # Parse shell ================================================================
+  shell <- extract( object , "shell" )
+  # Parse fluid ================================================================
+  fluid <- extract( object , "fluid" )
+  # Calculate wavenumbers ======================================================
+  k1 <- k( frequency , sound_speed_sw )
+  # Define the maximum Modal series iterator limit =============================
+  m_limit <- ifelse( is.null( m_limit ) , 
+                     max( round( k1 * shell$radius ) ) + 10 , 
+                     m_limit )
+  # Define medium parameters ===================================================
+  medium_params <- data.frame( sound_speed = sound_speed_sw ,
+                               density = density_sw )
+  # Define model parameters recipe =============================================
+  model_params <- base::list(
+    acoustics = base::data.frame(
+      frequency = frequency ,
+      # Wavenumber (medium) ====================================================
+      k_sw = k1 
+    ) ,
+    m_limit = m_limit ,
+    m = 0 : m_limit
+  )
+  # Initialize lists for fluid and shell =======================================
+  shell_params <- list()
+  fluid_params <- list()
+  # Establish the correct material properties ==================================
+  # Shell ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  shell_params$sound_speed <- ifelse( "sound_speed" %in% names( shell ) ,
+                                      shell$sound_speed ,
+                                      ifelse( "h" %in% names( shell ) ,
+                                              shell$h * sound_speed_sw ,
+                                              NA ) )
+  shell_params$density <- ifelse( "density" %in% names( shell ) ,
+                                  shell$density ,
+                                  ifelse( "g" %in% names( shell ) ,
+                                          shell$g * density_sw ,
+                                          NA ) )
+  shell_params$nu <- ifelse( "nu" %in% names( shell ) , shell$nu , NA )
+  shell_params$K <- ifelse( "K" %in% names( shell ) , shell$K , NA )
+  shell_params$E <- ifelse( "E" %in% names( shell ) , shell$E , NA )
+  shell_params$G <- ifelse( "G" %in% names( shell ) , shell$G , NA )
+  shell_params$lambda <- ifelse( "lambda" %in% names( shell ) , 
+                                 shell$lambda , NA )
+  # Fluid ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  fluid_params$sound_speed <- ifelse( "sound_speed" %in% names( fluid ) ,
+                                      fluid$sound_speed ,
+                                      ifelse( "h" %in% names( fluid ) ,
+                                              fluid$h * sound_speed_sw ,
+                                              NA ) )
+  fluid_params$density <- ifelse( "density" %in% names( fluid ) ,
+                                  fluid$density ,
+                                  ifelse( "g" %in% names( fluid ) ,
+                                          fluid$g * density_sw ,
+                                          NA ) )
+  # Add morphometrics ==========================================================
+  # Shell ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  shell_params$radius <- shell$radius 
+  shell_params$shell_thickness <- shell$shell_thickness
+  # Fluid ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  fluid_params$radius <- fluid$radius
+  # Add model parameters slot to scattering object =============================
+  methods::slot( object ,
+                 "model_parameters" )$MSS_goodman_stern <- base::list(
+                   parameters = model_params ,
+                   shell = shell_params ,
+                   fluid = fluid_params ,
+                   medium = medium_params )
+  # Add model results slot to scattering object ================================
+  methods::slot( object ,
+                 "model" )$MSS_goodman_stern <- base::data.frame(
+                   frequency = frequency ,
+                   sigma_bs = base::rep( NA ,
+                                         length( frequency ) ) )
+  # Output =====================================================================
+  return( object )
+}
+################################################################################
 #' Initialize CAL-class object for modeling.
 #' @param object CAL-class object.
 #' @inheritParams krm_initialize
@@ -417,9 +518,9 @@ sdwba_initialize <- function( object ,
   stochastic_params <- lapply( 1 : length( N_f_idx ) ,
                                FUN = function( i ) {
                                  idx <- which( N_f_vec == N_f_idx[ i ] )
-                                 object_new <- reforge( object , 
-                                                       n_segments = N_f_idx[ i ] )
-                                 body <- extract( object_new , "body" )
+                                 object_new <- sdwba_resample( object , 
+                                                               n_segments = N_f_idx[ i ] )
+                                 body <- acousticTS::extract( object_new , "body" )
                                  n_segments <- N_f_idx[ i ]
                                  phase_sd <- phase_sd[ i ] 
                                  acoustics <- model_params$acoustics[ idx , ]
@@ -480,9 +581,6 @@ sdwba_curved_initialize <- function( object ,
   # Parse body =================================================================
   body <- acousticTS::extract( object , "body" )
   # Bend body ==================================================================
-  body_curved <- brake( body , 
-                        radius_curvature = body$radius_curvature_ratio , 
-                        mode = "ratio" )
   object_copy <- object
   object_copy <- brake( object_copy ,
                         radius_curvature = body$radius_curvature_ratio , 
@@ -518,8 +616,8 @@ sdwba_curved_initialize <- function( object ,
   stochastic_params <- lapply( 1 : length( N_f_idx ) ,
                                FUN = function( i ) {
                                  idx <- which( N_f_vec == N_f_idx[ i ] )
-                                 object_new <- reforge( object_copy , 
-                                                        n_segments = N_f_idx[ i ] )
+                                 object_new <- sdwba_resample( object_copy , 
+                                                               n_segments = N_f_idx[ i ] )
                                  body <- extract( object_new , "body" )
                                  n_segments <- N_f_idx[ i ]
                                  phase_sd <- phase_sd[ i ] 
@@ -672,24 +770,26 @@ high_pass_stanton_initialize <- function( object ,
   # Define acoustic parameters =================================================
   acoustics <- data.frame( frequency = frequency,
                            k_sw = k( frequency , sound_speed_sw ) )
-  acoustics$k_b <- acoustics$k_sw * extract(object, "shell")$h
-  # Fill in remaining model inputs required by DCM =============================
-  radius <- ifelse( ! missing( radius_shell ) , 
-                    radius_shell , 
-                    shell$radius )
-  # Density contrast, g ========================================================
-  g <- ifelse( ! missing( g_shell ) ,
-               g_shell ,
-               shell$g )
-  # Sound speed contrast, h ====================================================
-  h <- ifelse( ! missing( h_shell ) ,
-               h_shell ,
-               shell$h )
+  # Fill out material properties ===============================================
+  shell$h <- ifelse( "h" %in% names( shell ) ,
+                     shell$h ,
+                     ifelse( "sound_speed" %in% names( shell ) ,
+                             shell$sound_speed / medium_params$sound_speed ,
+                             NA )
+  )
+  shell$g <- ifelse( "g" %in% names( shell ) ,
+                     shell$g ,
+                     ifelse( "density" %in% names( shell ) ,
+                             shell$density / medium_params$density ,
+                             NA )
+  )
+  # Calculate wavenumber =======================================================
+  acoustics$k_b <- acoustics$k_sw * shell$h
   # Define model dataframe for body parameterization ===========================
-  shell_params <- data.frame( radius = radius ,
-                              diameter = radius * 2 ,
-                              g = g ,
-                              h = h )
+  shell_params <- data.frame( radius = shell$radius ,
+                              diameter = shell$radius * 2 ,
+                              g = shell$g ,
+                              h = shell$h )
   # Tidy up model parameters to insert into object =============================
   model_params <- list( shell = shell_params ,
                         medium = medium_params ,

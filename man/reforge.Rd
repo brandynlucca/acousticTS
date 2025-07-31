@@ -2,41 +2,15 @@
 % Please edit documentation in R/scatterer_reforge.R
 \name{reforge}
 \alias{reforge}
-\title{Resizing function for targets.}
+\title{Resize or reparameterize a scatterer object}
 \usage{
 reforge(object, ...)
 }
 \arguments{
-\item{object}{Scatterer-class object.}
+\item{object}{A scatterer object.}
 
-\item{...}{Scatterer-specific arguments}
-
-\item{length_body}{Updated body length when applicable}
-
-\item{width_body}{Updated body width when applicable}
-
-\item{height_body}{Update body height/depth when applicable}
-
-\item{length_bladder}{Updated bladder length when applicable}
-
-\item{width_bladder}{Updated bladder width when applicable}
-
-\item{height_bladder}{Updated bladder height/depth when applicable}
-
-\item{radius_body}{Updated body radius when applicable}
-
-\item{radius_bladder}{Updated bladder radius when applicable}
-
-\item{bladder_inflation_factor}{Proportional bladder volume}
-
-\item{body_bladder_ratio_constant}{Maintain body-to-bladder volume ratio when resizing}
-
-\item{length_radius_ratio_constant}{Maintain body-to-radius ratio when resizing}
-
-\item{n_segments_body}{Number of segments along the body}
-
-\item{n_segments_bladder}{Number of segments along the bladder}
+\item{...}{Additional arguments passed to specific methods.}
 }
 \description{
-Resizing function for targets.
+Generic function to resize or reparameterize a scatterer object.
 }

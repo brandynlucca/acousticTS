@@ -17,6 +17,8 @@
 #' @references
 #' Amos D.E., "AMOS, A Portable Package for Bessel Functions of a Complex
 #' Argument and Nonnegative Order", http://netlib.org/amos
+#' 
+#' @keywords bessel1
 #' @rdname jc
 #' @export
 jc <- function( l , n ) besselJ( n , l )
@@ -61,6 +63,8 @@ jcdd <- function( l , n ) {
 #' @references
 #' Amos D.E., "AMOS, A Portable Package for Bessel Functions of a Complex
 #' Argument and Nonnegative Order", http://netlib.org/amos
+#' 
+#' @keywords bessel2
 #' @rdname yc
 #' @export
 yc <- function( l , n ) besselY( n , l )
@@ -97,6 +101,8 @@ ycd <- function( l , n ) {
 #' @references
 #' Amos D.E., "AMOS, A Portable Package for Bessel Functions of a Complex
 #' Argument and Nonnegative Order", http://netlib.org/amos
+#' 
+#' @keywords bessel3
 #' @rdname hc
 #' @export
 hc <- function( l , n ) return( jc( l , n ) + 1i * yc( l , n ) )
@@ -116,6 +122,8 @@ hcd <- function( l, n ) return( ( l * hc( l , n ) / n - hc( l + 1 , n ) ) )
 #' @references
 #' Amos D.E., "AMOS, A Portable Package for Bessel Functions of a Complex
 #' Argument and Nonnegative Order", http://netlib.org/amos
+#' 
+#' @keywords bessel1
 #' @rdname js
 #' @export
 js <- function( l , n ) {
@@ -156,11 +164,13 @@ jsdd <- function( l , n ) {
 #' @param l An integer or fractional order
 #' @param n A complex or real argument
 #' @return
-#' Calculates the spherical Bessel function of the first kind (js) and its
-#' first (ysd) derivative.
+#' Calculates the spherical Bessel function of the second kind (ys) and its
+#' first (ysd) and second (ysdd) derivatives.
 #' @references
 #' Amos D.E., "AMOS, A Portable Package for Bessel Functions of a Complex
 #' Argument and Nonnegative Order", http://netlib.org/amos
+#' 
+#' @keywords bessel2
 #' @rdname ys
 #' @export
 ys <- function( l , n ) {
@@ -191,6 +201,13 @@ ys <- function( l , n ) {
 ysd <- function( l , n ) {
   return( l / n * ys( l , n ) - ys( l + 1 , n ) )
 }
+#' @rdname ys
+#' @export
+ysdd <- function( l , n ) {
+  return( -l / ( n ^ 2 ) * ys( l , n ) + 
+            l / n * ( l / n * ys( l , n ) - ys( l + 1 , n ) ) - 
+            ( ( l + 1 ) / n  * ys( l + 1 , n ) - ys( l + 2 , n ) ) )
+}
 ################################################################################
 #' Spherical Bessel function of the third kind and its respective derivative
 #' @param l An integer or fractional order
@@ -201,6 +218,8 @@ ysd <- function( l , n ) {
 #' @references
 #' Amos D.E., "AMOS, A Portable Package for Bessel Functions of a Complex
 #' Argument and Nonnegative Order", http://netlib.org/amos
+#' 
+#' @keywords bessel3
 #' @rdname hs
 #' @export
 hs <- function( l , n) return( sqrt( pi / ( 2 * n ) ) * hc( l + 0.5 , n ) )
@@ -217,6 +236,8 @@ hsd <- function( l , n ) return( - hs( l + 1 , n ) + ( l / n ) * hs( l , n ) )
 #' @return
 #' Returns a matrix array calculated by computing the outer product that generates
 #' a series of values when evaluated over a vector.
+#' 
+#' @keywords legendre
 #' @rdname Pn
 #' @export
 Pn <- function( n , x ) {
@@ -252,4 +273,39 @@ Pn <- function( n , x ) {
   Pn_vec <- Vectorize( Pn_internal )
   # Calculate outer product to generate vector of values =======================
   return( outer( n , x , Pn_vec ) )
+}
+#' Calculate Bessel function cache for the Goodman and Stern (1962) model
+#' @param ka_matrix_m Modal ka matrix
+#' @param m Modal vector
+#' @return Cached Bessel function values
+#' @keywords internal
+calculate_bessel_cache <- function( ka_matrix_m , m ) {
+  # Define all Bessel functions to apply =======================================
+  bessel_functions <- list(
+    js = js , jsd = jsd , jsdd = jsdd , 
+    ys = ys , ysd = ysd , ysdd = ysdd ,
+    hs = hs , hsd = hsd
+  )
+  # Map out the function assignment ============================================
+  bessel_map <- list(
+    k1a_shell = c( "js" , "jsd" , "hs", "hsd" ) ,
+    kLa_shell = c( "js", "jsd" , "jsdd" , "ys" , "ysd" , "ysdd" ) ,
+    kTa_shell = c( "js" , "jsd" , "jsdd" , "ys" , "ysd" , "ysdd" ) ,
+    kTa_fluid = c( "js" , "jsd" , "jsdd" , "ys" , "ysd" , "ysdd" ) ,
+    kLa_fluid = c( "js", "jsd" , "jsdd" , "ys", "ysd" , "ysdd" ) ,
+    k3a_fluid = c( "js", "jsd" ) 
+  )
+  # Pre-calculate the Bessel functions and their respective derivatives ========
+  bessel_cache <- lapply( names( ka_matrix_m ) , function( ka_m ) {
+    ka_series <- ka_matrix_m[[ ka_m ]]
+    bessel_match <- bessel_map[[ ka_m ]]
+    
+    # Calculate for only matching functions
+    lapply( bessel_functions[ bessel_match ] , function( func ) {
+      func( m , ka_series )
+    } )
+  } )
+  # Add the names ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  names( bessel_cache ) <- names( ka_matrix_m )
+  return( bessel_cache )
 }

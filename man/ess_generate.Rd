@@ -12,9 +12,17 @@ ess_generate(
   radius_shell,
   shell_thickness = NULL,
   g_fluid = NULL,
+  density_fluid = NULL,
   h_fluid = NULL,
-  g_shell,
-  h_shell,
+  sound_speed_fluid = NULL,
+  g_shell = NULL,
+  density_shell = NULL,
+  h_shell = NULL,
+  sound_speed_shell = NULL,
+  E = NULL,
+  G = NULL,
+  K = NULL,
+  nu = NULL,
   theta_shell = pi/2,
   ID = NULL,
   theta_units = "radians",
@@ -37,11 +45,27 @@ generalized shapes.}
 
 \item{g_fluid}{Optional density contrast for fluid-like body.}
 
+\item{density_fluid}{Optional density for fluid-like body (kg/m³).}
+
 \item{h_fluid}{Optional sound speed contrast for fluid-like body.}
+
+\item{sound_speed_fluid}{Optional sound speed for fluid-like body (m/s).}
 
 \item{g_shell}{Density contrast for the shell.}
 
+\item{density_shell}{Optional density for the shell (kg/m³).}
+
 \item{h_shell}{Sound speed contrast for the shell.}
+
+\item{sound_speed_shell}{Optional sound speed for the shell (m/s).}
+
+\item{E}{Young's modulus (Pa) of the shell material.}
+
+\item{G}{Shear modulus (Pa) of the shell material.}
+
+\item{K}{Bulk modulus (Pa) of the shell material.}
+
+\item{nu}{Poisson's ratio (Dimensionless) of the shell material.}
 
 \item{theta_shell}{Object orientation relative to incident sound wave.}
 
@@ -51,6 +75,13 @@ generalized shapes.}
 
 \item{length_units}{Units used for position vector. Defaults to "m".}
 }
+\value{
+ESS-class object
+}
 \description{
 Generate ESS shape
 }
+\seealso{
+\code{\link{ESS}}
+}
+\keyword{scatterer_type_generation}

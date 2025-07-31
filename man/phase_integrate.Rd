@@ -21,3 +21,4 @@ quadrature}
 \description{
 Wrapper function incorporating phase deviation into contour integration
 }
+\keyword{internal}

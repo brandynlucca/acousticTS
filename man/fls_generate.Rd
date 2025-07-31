@@ -40,9 +40,11 @@ generalized shapes.}
 
 \item{n_segments}{Number of body segments.}
 
-\item{g_body}{Density contrast.}
+\item{g_body}{Density contrast. This can either be a single value (i.e.
+homogenous) or a vector of values (i.e. inhomogenous).}
 
-\item{h_body}{Soundspeed contrast}
+\item{h_body}{Soundspeed contrast. This can either be a single value (i.e.
+homogenous) or a vector of values (i.e. inhomogenous).}
 
 \item{theta_body}{Orientation of the target relative to the transmit source
 (\eqn{\theta}). Broadside incidence is considered 90 degrees, or pi/2.
@@ -57,8 +59,12 @@ Default value is pi/2; input should be in radians.}
 \item{...}{Additional parameters.}
 }
 \value{
-Calls in an FLS-class object from a *.csv file
+FLS-class object
 }
 \description{
 Manually generate a FLS object.
 }
+\seealso{
+\code{\link{FLS}}
+}
+\keyword{scatterer_type_generation}

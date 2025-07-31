@@ -38,14 +38,6 @@ material options.}
 \item{theta_units}{Units for direction. Defaults to "radians".}
 
 \item{n_segments}{Number of segments to discretize object shape.}
-
-\item{a}{Spherical radius (m).}
-
-\item{c1}{Longitudinal sound speed (m/s).}
-
-\item{c2}{Transversal sound speed (m/s).}
-
-\item{rho1}{Density (kg/m^3)}
 }
 \value{
 Generates a CAL-class object.
@@ -65,3 +57,7 @@ There are several options for the \strong{material} argument:
 \emph{Aluminum} \tab "Al" \tab 6260 \tab 3080 \tab 2700\cr
 }
 }
+\seealso{
+\code{\link{CAL}}
+}
+\keyword{scatterer_type_generation}

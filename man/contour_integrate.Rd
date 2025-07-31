@@ -17,3 +17,4 @@ used within \code{base::apply}.}
 \description{
 Numerical integration via adaptive quadrature of complex values
 }
+\keyword{internal}
