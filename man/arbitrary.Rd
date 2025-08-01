@@ -21,6 +21,6 @@ arbitrary(x_body, y_body, z_body, radius_body, length_units = "m")
 Creates arbitrary body shape from user inputs
 }
 \seealso{
-\code{\link{Arbitrary-class}}
+\code{\link{Arbitrary}}
 }
 \keyword{shape_generation}

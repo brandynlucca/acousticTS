@@ -20,16 +20,6 @@ reference:
   contents:
   - has_keyword("scatterer_type_generation")
 
-- title: Scatterer shapes
-
-- subtitle: Shape classes
-  desc: >
-    Generic shape classes used by various functions that provide the appropriate information for plotting, 
-    model parameterization, and other features.
-  contents:
-  - Shape
-  - has_keyword("shapes")
-
 - subtitle: Shape generation
   desc: >
     Generator functions for producing arbitrary or canonical shapes.

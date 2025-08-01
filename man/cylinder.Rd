@@ -30,6 +30,6 @@ Creates the position vector for a tapered or untapered cylinder.
 Creates a cylinder.
 }
 \seealso{
-\code{\link{Cylinder-class}}
+\code{\link{Cylinder}}
 }
 \keyword{shape_generation}

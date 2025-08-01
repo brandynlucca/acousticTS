@@ -72,7 +72,7 @@
 #' }
 #' 
 #' @keywords scatterer_type
-#' @name Scatterer
+#' 
 #' @aliases Scatterer
 #' @rdname Scatterer-class
 #' @export
@@ -100,8 +100,8 @@ setClass("Scatterer",
 #' @seealso \code{\link{Scatterer}}
 #' 
 #' @keywords scatterer_type
-#' @name GAS
-#' @rdname GAS
+#'
+#' @rdname GAS-class
 #' @export
 GAS <- setClass("GAS",
                 slots = c( metadata = "list",
@@ -124,8 +124,8 @@ GAS <- setClass("GAS",
 #' @seealso \link{Scatterer}
 #' 
 #' @keywords scatterer_type
-#' @name SBF
-#' @rdname SBF
+#' 
+#' @rdname SBF-class
 #' @export
 SBF <- setClass( "SBF" ,
                  slots = c( metadata = "list" ,
@@ -153,8 +153,8 @@ SBF <- setClass( "SBF" ,
 #' @seealso \link{Scatterer}
 #' 
 #' @keywords scatterer_type
-#' @name ESS
-#' @rdname ESS
+#' 
+#' @rdname ESS-class
 #' @export
 ESS <- setClass( "ESS",
                  slots = c( metadata = "list" ,
@@ -177,8 +177,8 @@ ESS <- setClass( "ESS",
 #' @seealso \link{Scatterer}
 #' 
 #' @keywords scatterer_type
-#' @name CAL
-#' @rdname CAL
+#' 
+#' @rdname CAL-class
 #' @export
 CAL <- setClass( "CAL" ,
                  slots = c(metadata = "list" ,
@@ -202,8 +202,8 @@ CAL <- setClass( "CAL" ,
 #' @seealso \link{Scatterer}
 #' 
 #' @keywords scatterer_type
-#' @name FLS
-#' @rdname FLS
+#' 
+#' @rdname FLS-class
 #' @export
 FLS <- setClass("FLS",
                 slots = c( metadata = "list" ,

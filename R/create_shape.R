@@ -12,7 +12,7 @@
 #' @param z_body z-axis (m)
 #' @param radius_body Radius (m)
 #' @param length_units Units for body length. Defaults to meters: "m"
-#' @seealso \code{\link{Arbitrary-class}}
+#' @seealso \code{\link{Arbitrary}}
 #' 
 #' @keywords shape_generation
 #' @rdname arbitrary
@@ -48,7 +48,7 @@ arbitrary <- function( x_body ,
 #' sphere(radius_body, n_segments, diameter_units )
 #' @return
 #' Creates position vector for a spherical object of a defined radius.
-#' @seealso \code{\link{Sphere-class}}
+#' @seealso \code{\link{Sphere}}
 #' 
 #' @keywords shape_generation
 #' @rdname sphere
@@ -109,7 +109,7 @@ sphere <- function( radius_body ,
 #' @return
 #' Creates the position vector for a prolate spheroid object of defined
 #'    semi-major and -minor axes.
-#' @seealso \code{\link{ProlateSpheroid-class}}
+#' @seealso \code{\link{ProlateSpheroid}}
 #' 
 #' @keywords shape_generation
 #' @rdname prolate_spheroid
@@ -185,7 +185,7 @@ prolate_spheroid <- function( length_body ,
 #' taper, n_segments, length_units)
 #' @return
 #' Creates the position vector for a tapered or untapered cylinder.
-#' @seealso \code{\link{Cylinder-class}}
+#' @seealso \code{\link{Cylinder}}
 #' 
 #' @keywords shape_generation
 #' @rdname cylinder
@@ -275,7 +275,7 @@ cylinder <-  function( length_body ,
 #' approximation target strength model for Bering Sea euphausiids. ICES Journal
 #' of Marine Science, 70(1): 204-214. https://doi.org/10.1093/icesjms/fss140
 #' 
-#' @seealso \code{\link{PolynomialCylinder-class}}
+#' @seealso \code{\link{PolynomialCylinder}}
 #' 
 #' @keywords shape_generation
 #' @rdname polynomial_cylinder

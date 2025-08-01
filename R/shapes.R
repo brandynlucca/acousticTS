@@ -15,22 +15,27 @@
 #' the body shape
 #' @slot shape_parameters A list of additional shape specifications 
 #' 
-#' @keywords shapes
+#' @keywords shapes, internal
+#' 
+#' @rdname Shape-class
 #' @aliases Shape
-#' @name Shape
-#' @rdname Shape
+#' 
 #' @export
-setClass( "Shape" ,
-          slots = c(position_matrix = "matrix" ,
-                    shape_parameters = "list" ) )
+Shape <- setClass( "Shape" ,
+                   slots = c(position_matrix = "matrix" ,
+                             shape_parameters = "list" ) )
 ################################################################################
 # Arbitrary (or pre-generated) body shape
 ################################################################################
 #' Arbitrary body shape
 #' 
-#' @keywords shapes
-#' @name Arbitrary
+#' @seealso \code{\link{Shape}}
+#' 
+#' @keywords shapes, internal
+#'
 #' @rdname Arbitrary-class
+#' @aliases Arbitrary
+#' 
 #' @export
 Arbitrary <- setClass( "Arbitrary" ,
                        contains = "Shape" )
@@ -39,8 +44,11 @@ Arbitrary <- setClass( "Arbitrary" ,
 ################################################################################
 #' Spherical body shape
 #' 
-#' @keywords shapes
-#' @name Sphere
+#' @seealso \code{\link{Shape}}
+#' 
+#' @keywords shapes, internal
+#' 
+#' @aliases Sphere
 #' @rdname Sphere-class
 #' @export
 Sphere <- setClass( "Sphere" ,
@@ -50,8 +58,11 @@ Sphere <- setClass( "Sphere" ,
 ################################################################################
 #' Prolate spheroidal body shape
 #' 
-#' @keywords shapes
-#' @name ProlateSpheroid
+#' @seealso \code{\link{Shape}}
+#' 
+#' @keywords shapes, internal
+#' 
+#' @aliases ProlateSpheroid
 #' @rdname ProlateSpheroid-class
 #' @export
 ProlateSpheroid <- setClass( "ProlateSpheroid" ,
@@ -61,8 +72,11 @@ ProlateSpheroid <- setClass( "ProlateSpheroid" ,
 ################################################################################
 #' Cylindrical body shape
 #' 
-#' @keywords shapes
-#' @name Cylinder
+#' @seealso \code{\link{Shape}}
+#' 
+#' @keywords shapes, internal
+#'
+#' @aliases Cylinder
 #' @rdname Cylinder-class
 #' @export
 Cylinder <- setClass( "Cylinder" ,
@@ -72,8 +86,11 @@ Cylinder <- setClass( "Cylinder" ,
 ################################################################################
 #' Cylindrical body shape deformed using a polynomial 
 #' 
-#' @keywords shapes
-#' @name PolynomialCylinder
+#' @seealso \code{\link{Shape}}
+#' 
+#' @keywords shapes, internal
+#'
+#' @aliases PolynomialCylinder
 #' @rdname PolynomialCylinder-class
 #' @export
 PolynomialCylinder <- setClass( "PolynomialCylinder" ,

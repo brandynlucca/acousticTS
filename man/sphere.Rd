@@ -21,6 +21,6 @@ Creates position vector for a spherical object of a defined radius.
 Creates a sphere.
 }
 \seealso{
-\code{\link{Sphere-class}}
+\code{\link{Sphere}}
 }
 \keyword{shape_generation}

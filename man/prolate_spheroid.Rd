@@ -37,6 +37,6 @@ semi-major and -minor axes.
 Creates a prolate spheroid.
 }
 \seealso{
-\code{\link{ProlateSpheroid-class}}
+\code{\link{ProlateSpheroid}}
 }
 \keyword{shape_generation}

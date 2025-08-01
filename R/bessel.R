@@ -12,8 +12,8 @@
 #' @param l An integer or fractional order
 #' @param n A complex or real argument
 #' @return
-#' Calculates the cylindrical Bessel function of the first kind (J_v) and its
-#' respective derivatives.
+#' Calculates the cylindrical Bessel function of the first kind (\eqn{J_v}) and 
+#' its respective derivatives.
 #' @references
 #' Amos D.E., "AMOS, A Portable Package for Bessel Functions of a Complex
 #' Argument and Nonnegative Order", http://netlib.org/amos
@@ -51,15 +51,15 @@ jcdd <- function( l , n ) {
   return( 0.25 * ( jc( l - 2 , n ) - 2 * jc( l , n ) + jc( l + 2 , n ) ) )
 }
 ################################################################################
-#' Cylindrical Bessel (Neumann) function of the second kind and its derivative
+#' Cylindrical Bessel (Neumann) function of the second kind and its derivatives
 #' @description
 #' Calculate the cylindrical Bessel function of the first kind (yc) and its
 #' first (ycd) derivatives. 
 #' @param l An integer or fractional order
 #' @param n A complex or real argument
 #' @return
-#' Calculates the cylindrical Bessel function of the first kind (Y_v) and its
-#' respective derivatives.
+#' Calculates the cylindrical Bessel function of the first kind (\eqn{Y_v}) and 
+#' its respective derivatives.
 #' @references
 #' Amos D.E., "AMOS, A Portable Package for Bessel Functions of a Complex
 #' Argument and Nonnegative Order", http://netlib.org/amos
@@ -92,12 +92,12 @@ ycd <- function( l , n ) {
   return( result )
 }
 ################################################################################
-#' Cylindrical Bessel (Hankel) function of the third kind and its derivative
+#' Cylindrical Bessel (Hankel) function of the third kind and its derivatives
 #' @param l An integer or fractional order
 #' @param n A complex or real argument
 #' @return
-#' Calculates the cylindrical Bessel function of the first kind (H_v) and its
-#' respective derivatives.
+#' Calculates the cylindrical Bessel function of the first kind (\eqn{H_v}) and 
+#' its respective derivatives.
 #' @references
 #' Amos D.E., "AMOS, A Portable Package for Bessel Functions of a Complex
 #' Argument and Nonnegative Order", http://netlib.org/amos
@@ -305,7 +305,7 @@ calculate_bessel_cache <- function( ka_matrix_m , m ) {
       func( m , ka_series )
     } )
   } )
-  # Add the names ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  # Add the names ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   names( bessel_cache ) <- names( ka_matrix_m )
   return( bessel_cache )
 }

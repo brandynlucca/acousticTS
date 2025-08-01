@@ -18,8 +18,8 @@ jcdd(l, n)
 \item{n}{A complex or real argument}
 }
 \value{
-Calculates the cylindrical Bessel function of the first kind (J_v) and its
-respective derivatives.
+Calculates the cylindrical Bessel function of the first kind (\eqn{J_v}) and
+its respective derivatives.
 }
 \description{
 Calculate the cylindrical Bessel function of the first kind (jc) and both its

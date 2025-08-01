@@ -3,7 +3,7 @@
 \name{hc}
 \alias{hc}
 \alias{hcd}
-\title{Cylindrical Bessel (Hankel) function of the third kind and its derivative}
+\title{Cylindrical Bessel (Hankel) function of the third kind and its derivatives}
 \usage{
 hc(l, n)
 
@@ -15,11 +15,11 @@ hcd(l, n)
 \item{n}{A complex or real argument}
 }
 \value{
-Calculates the cylindrical Bessel function of the first kind (H_v) and its
-respective derivatives.
+Calculates the cylindrical Bessel function of the first kind (\eqn{H_v}) and
+its respective derivatives.
 }
 \description{
-Cylindrical Bessel (Hankel) function of the third kind and its derivative
+Cylindrical Bessel (Hankel) function of the third kind and its derivatives
 }
 \references{
 Amos D.E., "AMOS, A Portable Package for Bessel Functions of a Complex

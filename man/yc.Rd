@@ -3,7 +3,7 @@
 \name{yc}
 \alias{yc}
 \alias{ycd}
-\title{Cylindrical Bessel (Neumann) function of the second kind and its derivative}
+\title{Cylindrical Bessel (Neumann) function of the second kind and its derivatives}
 \usage{
 yc(l, n)
 
@@ -15,8 +15,8 @@ ycd(l, n)
 \item{n}{A complex or real argument}
 }
 \value{
-Calculates the cylindrical Bessel function of the first kind (Y_v) and its
-respective derivatives.
+Calculates the cylindrical Bessel function of the first kind (\eqn{Y_v}) and
+its respective derivatives.
 }
 \description{
 Calculate the cylindrical Bessel function of the first kind (yc) and its
