@@ -23,9 +23,9 @@ along_sum <- function( rpos , iterations ) {
 #' @keywords internal
 #' @export
 contour_integrate <- function( integral , x , y ) {
-  complex( real = integrate( function( s ) Re( integral( s , x , y ) ) ,
+  complex( real = stats::integrate( function( s ) Re( integral( s , x , y ) ) ,
                              lower = 0 , upper = 1 )$value ,
-           imaginary = integrate( function( s ) Im( integral( s , x , y ) ) ,
+           imaginary = stats::integrate( function( s ) Im( integral( s , x , y ) ) ,
                                   lower = 0 , upper = 1 )$value )
 }
 ################################################################################
@@ -42,7 +42,7 @@ contour_integrate <- function( integral , x , y ) {
 #' @keywords internal
 #' @export
 phase_integrate <- function( x , y , n_iterations , integral , phase_sd ) {
-  rng <- rnorm( n_iterations , 0 , 1 )
+  rng <- stats::rnorm( n_iterations , 0 , 1 )
   phase <- exp( 1i * rng * phase_sd )
   contour_integrate( integral , x , y ) * phase
 }

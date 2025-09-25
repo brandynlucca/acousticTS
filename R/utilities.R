@@ -11,7 +11,7 @@
 #' @param feature Feature of interest (e.g. body).
 #' @export
 extract <- function( object , feature ) {
-  return( slot( object , feature ) )
+  return( methods::slot( object , feature ) )
 }
 ################################################################################
 ################################################################################
@@ -127,6 +127,7 @@ brake_df <- function( body_df , radius_curvature , mode = "ratio" ) {
 #' as a ratio relative to body length or actual measurement
 #' @param mode Either "ratio" or "measurement"
 #' @rdname brake_scatterer
+#' @importFrom methods slot<-
 #' @export
 brake_scatterer <- function( object , radius_curvature , mode = "ratio" ) {
   # Extract object body shape ==================================================
@@ -267,7 +268,7 @@ sdwba_resample <- function(object, n_segments) {
   # Interpolate coordinates using splines (vectorized)
   rpos_interp <- apply( body$rpos[ 2 : 3 , ] , 
                        1 ,
-                       function( y ) spline( x = body$rpos[ 1 , ] , 
+                       function( y ) stats::spline( x = body$rpos[ 1 , ] , 
                                              y = y , 
                                              xout = x_new_seg )$y )
   # ---- And transpose

@@ -29,6 +29,7 @@
 #' 
 #' @seealso \code{\link{SBF}}
 #' 
+#' @importFrom methods new
 #' @keywords scatterer_type_generation
 #' @export
 sbf_generate <- function( x_body ,
@@ -93,12 +94,12 @@ sbf_generate <- function( x_body ,
                                               "UID" ) )
   # Create FLS-class object ====================================================
   return( methods::new( "SBF" ,
-                        metadata = metadata ,
-                        model_parameters = base::list( ) ,
-                        model = base::list( ) ,
-                        body = body ,
-                        bladder = bladder ,
-                        shape_parameters = shape_parameters ) )
+               metadata = metadata ,
+               model_parameters = base::list( ) ,
+               model = base::list( ) ,
+               body = body ,
+               bladder = bladder ,
+               shape_parameters = shape_parameters ) )
 }
 ################################################################################
 # Create CAL-class object
@@ -134,6 +135,7 @@ sbf_generate <- function( x_body ,
 #' 
 #' @seealso \code{\link{CAL}}
 #' 
+#' @importFrom methods new
 #' @keywords scatterer_type_generation
 #' @export
 cal_generate <- function( material = "WC" ,
@@ -203,7 +205,7 @@ cal_generate <- function( material = "WC" ,
     theta_units = theta_units
   )
   # Generate calibration sphere object =========================================
-  return( new( "CAL" ,
+  return( methods::new( "CAL" ,
                metadata = metadata ,
                model_parameters = base::list( ) ,
                model = base::list( ) ,
@@ -239,8 +241,8 @@ cal_generate <- function( material = "WC" ,
 #' 
 #' @seealso \code{\link{FLS}}
 #' 
+#' @importFrom methods new
 #' @keywords scatterer_type_generation
-#' @import methods
 #' @export
 fls_generate <- function( shape = "arbitrary" ,
                           x_body = NULL ,
@@ -257,7 +259,7 @@ fls_generate <- function( shape = "arbitrary" ,
                           length_units = "m" ,
                           theta_units = "radians" , ... ) {
   # Collect shape information if provided ======================================
-  if( !is( shape , "Shape" ) ) {
+  if( !methods::is( shape , "Shape" ) ) {
     if ( shape != "arbitrary" ) {
       if ( base::is.null( length_body ) )
         base::stop( "Body shape is not appropriately parameterized." )
@@ -267,7 +269,7 @@ fls_generate <- function( shape = "arbitrary" ,
   }
   # Generate shape position matrix =============================================
   # Create body shape field ====================================================
-  if ( is( shape , "Shape" ) ) {
+  if ( methods::is( shape , "Shape" ) ) {
     shape_input <- shape
   } else {
     if ( shape == "arbitrary" ) {
@@ -289,16 +291,16 @@ fls_generate <- function( shape = "arbitrary" ,
   }
     # Define shape parameters ==================================================
     shape_parameters <- base::list(
-      length = base::max( shape_input@position_matrix[ , 1 ] , na.rm = T ) -
-        base::min( shape_input@position_matrix[ , 1 ] , na.rm = T ) ,
-      radius = base::max( shape_input@shape_parameters$radius , na.rm = T ) ,
+      length = base::max( shape_input@position_matrix[ , 1 ] , na.rm = TRUE ) -
+        base::min( shape_input@position_matrix[ , 1 ] , na.rm = TRUE ) ,
+      radius = base::max( shape_input@shape_parameters$radius , na.rm = TRUE ) ,
       n_segments = length( shape_input@position_matrix[ , 1 ]  ) - 1 ,
       length_units = length_units ,
       theta_units = theta_units ,
-      shape = base::ifelse( is.character( shape ) | is( shape, "Arbitrary" ) ,
+      shape = base::ifelse( is.character( shape ) | methods::is( shape, "Arbitrary" ) ,
                             "Arbitrary" ,
                             class( shape ) ) )
-    if ( is( shape , "Sphere" ) || ( is.character( shape ) && shape == "Sphere" ) ) {
+    if ( methods::is( shape , "Sphere" ) || ( is.character( shape ) && shape == "Sphere" ) ) {
       shape_parameters[[ "radius_shape" ]] <- extract( shape_input ,
                                                        "shape_parameters" )$radius_shape
     }
@@ -341,7 +343,7 @@ fls_generate <- function( shape = "arbitrary" ,
                                               ID ,
                                               "UID" ) )
   # Create FLS-class object ====================================================
-  return( new( "FLS" ,
+  return( methods::new( "FLS" ,
                metadata = metadata ,
                model_parameters = base::list( ) ,
                model = base::list( ) ,
@@ -368,9 +370,9 @@ fls_generate <- function( shape = "arbitrary" ,
 #' GAS-class object
 #' 
 #' @seealso \code{\link{GAS}}
-#' 
+#'
+#' @importFrom methods new
 #' @keywords scatterer_type_generation
-#' @import methods
 #' @export
 gas_generate <- function( shape = "sphere" ,
                           radius_body ,
@@ -427,11 +429,11 @@ gas_generate <- function( shape = "sphere" ,
   )
   # Create GAS-class object ====================================================
   return( methods::new( "GAS" ,
-                        metadata = metadata ,
-                        model_parameters = base::list( ) ,
-                        model = base::list( ) ,
-                        body = body ,
-                        shape_parameters = shape_parameters ) )
+               metadata = metadata ,
+               model_parameters = base::list( ) ,
+               model = base::list( ) ,
+               body = body ,
+               shape_parameters = shape_parameters ) )
 }
 ################################################################################
 # Create GAS-class object
@@ -457,6 +459,7 @@ gas_generate <- function( shape = "sphere" ,
 #' 
 #' @seealso \code{\link{ESS}}
 #' 
+#' @importFrom methods new
 #' @keywords scatterer_type_generation
 #' @export
 ess_generate <- function( shape = "sphere" ,
@@ -484,7 +487,7 @@ ess_generate <- function( shape = "sphere" ,
   # Create metadata field ======================================================
   metadata <- list( ID = ifelse( !is.null( ID ) , ID , "UID" ) )
   # Create shape fields ========================================================
-  if ( is( shape , "Shape" ) ) {
+  if ( methods::is( shape , "Shape" ) ) {
     shell_rpos <- shape
   } else {
     if ( shape == "Arbitrary" ) {
@@ -621,7 +624,7 @@ ess_generate <- function( shape = "sphere" ,
     )
   )
   # Create ESS-class object ====================================================
-  return( new( "ESS" ,
+  return( methods::new( "ESS" ,
                metadata = metadata ,
                model_parameters = list( ) ,
                model = list( ) ,

@@ -42,8 +42,8 @@ setMethod( "reforge",
                      radius_body = NA ,
                      bladder_inflation_factor = 1.0 ,
                      # body_bladder_ratio_constant = T ,
-                     isometric_body = T ,
-                     isometric_bladder = T ,
+                     isometric_body = TRUE ,
+                     isometric_bladder = TRUE ,
                      n_segments_body = NA , 
                      n_segments_bladder = NA ) {
              ###################################################################
@@ -63,10 +63,10 @@ setMethod( "reforge",
                                   to = rpos_b[ 1 , shape$body$n_segments ] ,
                                   length.out = n_segments_body )
                rpos_body_new <- rbind( x_body_new ,
-                                       t.default(
+                                       t(
                                          sapply( 2 : nrow( rpos_b ) ,
                                                  FUN = function( i ) {
-                                                   approx( x = rpos_b[ 1 , ] ,
+                                                   stats::approx( x = rpos_b[ 1 , ] ,
                                                            y = rpos_b[ i , ] ,
                                                            xout = x_body_new ) }$y ) ) )
                rpos_b <- rpos_body_new
@@ -77,10 +77,10 @@ setMethod( "reforge",
                                      to = rpos_sb[ 1 , shape$bladder$n_segments ] ,
                                      length.out = n_segments_bladder )
                rpos_bladder_new <- rbind( x_bladder_new ,
-                                          t.default(
+                                          t(
                                             sapply( 2 : nrow( rpos_sb ) ,
                                                     FUN = function( i ) {
-                                                      approx( x = rpos_sb[ 1 , ] ,
+                                                      stats::approx( x = rpos_sb[ 1 , ] ,
                                                               y = rpos_sb[ i , ] ,
                                                               xout = x_bladder_new ) }$y ) ) )
                rpos_sb <- rpos_bladder_new
@@ -168,12 +168,12 @@ setMethod( "reforge",
              rpos_sb[ 3 , ] <- rpos_sb[ 3 , ] * bladder_inflation_factor
              rpos_sb[ 4 , ] <- rpos_sb[ 4 , ] * bladder_inflation_factor
              # Update object ===================================================
-             slot( object , "body" )$rpos <- rpos_b
-             slot( object , "bladder" )$rpos <- rpos_sb
-             slot( object , "shape_parameters" )$body$length <- max( rpos_b[ 1, ] )
-             slot( object , "shape_parameters" )$bladder$length <- max( rpos_sb[ 1 , ] )
-             slot( object , "shape_parameters" )$body$n_segments <- length( rpos_b[ 1 , ] )
-             slot( object , "shape_parameters" )$bladder$n_segments <- length( rpos_sb[ 1 , ] )
+             methods::slot( object , "body" )$rpos <- rpos_b
+             methods::slot( object , "bladder" )$rpos <- rpos_sb
+             methods::slot( object , "shape_parameters" )$body$length <- max( rpos_b[ 1, ] )
+             methods::slot( object , "shape_parameters" )$bladder$length <- max( rpos_sb[ 1 , ] )
+             methods::slot( object , "shape_parameters" )$body$n_segments <- length( rpos_b[ 1 , ] )
+             methods::slot( object , "shape_parameters" )$bladder$n_segments <- length( rpos_sb[ 1 , ] )
              # Return object ===================================================
              return( object )
            } )
@@ -190,7 +190,7 @@ setMethod( "reforge",
            function( object ,
                      length , 
                      radius , 
-                     length_radius_ratio_constant = T ,
+                     length_radius_ratio_constant = TRUE ,
                      n_segments ) {
              ###################################################################
              # Determine rescaling factors =====================================
@@ -205,22 +205,22 @@ setMethod( "reforge",
                              length.out = n_segments + 1 )
                rpos_new <- rbind(
                  x_new , 
-                 t.default(
+                 t(
                    sapply( 2 : nrow( body$rpos ) , 
                            FUN = function( i ) { 
-                             approx(x = body$rpos[ 1 , ] ,
+                             stats::approx(x = body$rpos[ 1 , ] ,
                                     y = body$rpos[ i , ] ,
                                     xout = x_new ) }$y
                    )
                  )
                )
-               radius_new <- approx( x = body$rpos[ 1 , ] ,
+               radius_new <- stats::approx( x = body$rpos[ 1 , ] ,
                                      y = body$radius ,
                                      xout = x_new )$y
                # Update metadata +++++++++++++++++++++++++++++++++++++++++++++++
-               slot( object , "body" )$rpos <- rpos_new
-               slot( object , "body" )$radius <- radius_new
-               slot( object , "shape_parameters" )$n_segments <- n_segments
+               methods::slot( object , "body" )$rpos <- rpos_new
+               methods::slot( object , "body" )$radius <- radius_new
+               methods::slot( object , "shape_parameters" )$n_segments <- n_segments
              }
              # # Update material properties if needed ============================
              # if ( length( body$g ) > 1 ) {
@@ -238,7 +238,7 @@ setMethod( "reforge",
                matrix_rescale <- diag( x = 1 , 
                                        nrow = nrow( body$rpos ) ,
                                        ncol = nrow( body$rpos ) ) * new_scale
-               rpos_new <- t.default( t.default( body$rpos ) %*% matrix_rescale )
+               rpos_new <- t( t( body$rpos ) %*% matrix_rescale )
                # New radius based on constant ratio or adjust ++++++++++++++++++
                if ( length_radius_ratio_constant ) {
                  if( missing( radius ) ) {
@@ -249,10 +249,10 @@ setMethod( "reforge",
                  }
                }
                # Update metadata +++++++++++++++++++++++++++++++++++++++++++++++
-               slot( object , "body" )$rpos <- rpos_new
-               slot( object , "body" )$radius <- radius_new
-               slot( object , "shape_parameters" )$length <- max( rpos_new[ 1 , ] )
-               slot( object , "shape_parameters" )$radius <- max( radius_new )
+               methods::slot( object , "body" )$rpos <- rpos_new
+               methods::slot( object , "body" )$radius <- radius_new
+               methods::slot( object , "shape_parameters" )$length <- max( rpos_new[ 1 , ] )
+               methods::slot( object , "shape_parameters" )$radius <- max( radius_new )
              }
              # Return object ===================================================
              return( object )

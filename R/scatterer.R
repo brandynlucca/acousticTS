@@ -46,7 +46,7 @@
 #'    swimbladder). Generally, each entry includes: overall body length, the
 #'    number of discrete cylinders that make up the shape (if applicable),
 #'    and the units related to both \ifelse{html}{\out{&theta;<sub>animal</sub>}}{\eqn{\theta_{animal}}}
-#'    (e.g. rad, \ifelse{html}{\out{&deg;}}{\eqn{\degree}}) and length (e.g. mm, m).}
+#'    (e.g. rad, \ifelse{html}{\out{&deg;}}{\eqn{^\circ}}) and length (e.g. mm, m).}
 #'    \item{\code{model_parameters}:}{A \code{list} that contains relevant model
 #'    parameterization once an object has been initialized for modeling
 #'    \ifelse{html}{\out{&sigma;<sub>bs</sub>}}{\eqn{\sigma_{bs}}}. This is typically

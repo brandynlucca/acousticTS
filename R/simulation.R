@@ -103,7 +103,7 @@ simulate_ts <- function( object ,
       lapply( batch_values , function( x ) seq_along( x ) ) ,
       stringsAsFactors = FALSE
     )
-    names( parameter_grid ) = paste0( names( batch_values ) , "_idx" )
+    names( parameter_grid ) <- paste0( names( batch_values ) , "_idx" )
     # ---- Create indexed dataframe ++++++++++++++++++++++++++++++++++++++++++++
     simulation_grid <- data.frame(
       realization = rep( 1 : n_realizations , times = nrow( parameter_grid ) ) ,
@@ -121,7 +121,7 @@ simulate_ts <- function( object ,
   # Simulate/map parameter values ==============================================
   parameter_names <- names(parameters)
   parameter_matrix <- as.data.frame(
-    setNames(
+    stats::setNames(
       lapply( parameter_names , function( param ) {
         value <- parameters[[ param ]]
         if( !is.null( batch_by ) && param %in% batch_by ) {
@@ -186,8 +186,8 @@ simulate_ts <- function( object ,
     parallel::clusterEvalQ(
       cluster , 
       {
-        library(acousticTS)
-        library(methods)
+        loadNamespace("acousticTS")
+        loadNamespace("methods")
         NULL
       }
     )
@@ -200,7 +200,7 @@ simulate_ts <- function( object ,
         # Intermediate variables
         "simulation_grid" ,
         # Functions
-        "discover_reforge_params" , "get_TS" , "reforge" , "target_strength"
+        "discover_reforge_params" , ".get_TS" , "reforge" , "target_strength"
       ) ,
       envir = environment( )
     )
@@ -218,7 +218,7 @@ simulate_ts <- function( object ,
   results_list <- pbapply::pblapply(
     seq_len( nrow( simulation_grid ) ) ,
     function( grid_index ) {
-      get_TS( grid_index , object , parameters , simulation_grid , frequency , 
+      .get_TS( grid_index , object , parameters , simulation_grid , frequency , 
               model )
     } ,
     cl = cluster 
@@ -228,7 +228,7 @@ simulate_ts <- function( object ,
   # ---- Get model names +++++++++++++++++++++++++++++++++++++++++++++++++++++++
   model_names <- names( results_list[[ 1 ]] )
   # ---- Concatenate into a single dataframe +++++++++++++++++++++++++++++++++++
-  final_result <- setNames(
+  final_result <- stats::setNames(
     lapply( model_names , 
             function( mod_name ) {
       model_data <- lapply( results_list , function( x ) x[[ mod_name ]])
@@ -270,7 +270,7 @@ simulate_ts <- function( object ,
 #' @seealso \code{\link{target_strength}}, \code{\link{reforge}}
 #'
 #' @keywords internal
-get_TS <- function( grid_index , 
+.get_TS <- function( grid_index , 
                     object ,
                     parameters ,
                     simulation_grid ,
@@ -299,13 +299,13 @@ get_TS <- function( grid_index ,
   for( param in names( parameter_values ) ) {
     tryCatch( {
       if( param %in% names( working_object@body ) ) {
-        slot( working_object , 
+        methods::slot( working_object , 
               "body" )[[ param ]] <- parameter_values[[ param ]]        
       }
     } , error = function( e ) {
       tryCatch( {
         if( param %in% names( working_object@bladder ) ) {
-          slot( working_object , 
+          methods::slot( working_object , 
                 "bladder" )[[ param ]] <- parameter_values[[ param ]]          
         }
       } , error = function( e ) NULL )

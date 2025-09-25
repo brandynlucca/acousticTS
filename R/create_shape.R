@@ -32,7 +32,7 @@ arbitrary <- function( x_body ,
                             n_segments = length( x_body ) - 1 ,
                             diameter_units = length_units )
   # Generate new shape object ==================================================
-  return( new( "Arbitrary" ,
+  return( methods::new( "Arbitrary" ,
                position_matrix = position_matrix ,
                shape_parameters = shape_parameters ) )
 }
@@ -52,7 +52,6 @@ arbitrary <- function( x_body ,
 #' 
 #' @keywords shape_generation
 #' @rdname sphere
-#' @importFrom utils head tail
 #' @export
 sphere <- function( radius_body ,
                     n_segments = 1e2 ,
@@ -65,9 +64,9 @@ sphere <- function( radius_body ,
   # Along-semimajor radii ======================================================
   along_radius <- sqrt( radius_body * radius_body - ( semi_major - radius_body ) * ( semi_major - radius_body ) )
   # Segment midpoints ==========================================================
-  x_mids <- ( head( semi_major , -1 ) + tail( semi_major , -1 ) ) / 2
+  x_mids <- ( utils::head( semi_major , -1 ) + utils::tail( semi_major , -1 ) ) / 2
   # Apply to the radii =========================================================
-  radius_output <-( head( along_radius , -1 ) + tail( along_radius , -1 ) ) / 2
+  radius_output <-( utils::head( along_radius , -1 ) + utils::tail( along_radius , -1 ) ) / 2
   # Assign "zeroth" radius =====================================================
   if ( which.max( semi_major ) == length( semi_major ) ) {
     x_edges <- rev( semi_major ) 
@@ -88,7 +87,7 @@ sphere <- function( radius_body ,
     n_segments = n_segments ,
     diameter_units = diameter_units )
   # Generate new shape object ==================================================
-  return( new( "Sphere" ,
+  return( methods::new( "Sphere" ,
                position_matrix = position_matrix ,
                shape_parameters = shape_parameters ) )
 }
@@ -113,7 +112,6 @@ sphere <- function( radius_body ,
 #' 
 #' @keywords shape_generation
 #' @rdname prolate_spheroid
-#' @importFrom utils head tail
 #' @export
 prolate_spheroid <- function( length_body ,
                               radius_body ,
@@ -133,7 +131,7 @@ prolate_spheroid <- function( length_body ,
   # x_axis <- seq( 0 , length_body , length.out = n_segments + 1 )
   x_edges <- seq( 0 , length_body , length.out = n_segments + 1 )
   # Get the segment midpoints ==================================================
-  x_mids <- ( head( x_edges , -1 ) + tail( x_edges , -1 ) ) / 2
+  x_mids <- ( utils::head( x_edges , -1 ) + utils::tail( x_edges , -1 ) ) / 2
   # Normalize the midpoints for ellipse ========================================
   curved_x_mids <- ( x_mids - length_body / 2 ) / ( length_body / 2 )
   # Compute the radius at each segment midpoint ================================
@@ -162,7 +160,7 @@ prolate_spheroid <- function( length_body ,
     length_units = length_units
   )
   # Generate new shape object ==================================================
-  return( new( "ProlateSpheroid" ,
+  return( methods::new( "ProlateSpheroid" ,
                position_matrix = position_matrix ,
                shape_parameters = shape_parameters ) )
 }
@@ -189,7 +187,6 @@ prolate_spheroid <- function( length_body ,
 #' 
 #' @keywords shape_generation
 #' @rdname cylinder
-#' @importFrom utils head tail
 #' @export
 cylinder <-  function( length_body ,
                        radius_body ,
@@ -216,9 +213,9 @@ cylinder <-  function( length_body ,
   radius_tapered <- max_radius * tapering
   # Segment midpoints ==========================================================
   x_edges <- x_n_axis * length_body / 2 + length_body / 2
-  x_mids <- ( head( x_edges , -1 ) + tail( x_edges , -1 ) ) / 2
+  x_mids <- ( utils::head( x_edges , -1 ) + utils::tail( x_edges , -1 ) ) / 2
   # Apply to the radii =========================================================
-  radius_mids <-( head( radius_tapered , -1 ) + tail( radius_tapered , -1 ) ) / 2
+  radius_mids <-( utils::head( radius_tapered , -1 ) + utils::tail( radius_tapered , -1 ) ) / 2
   # Assign "zeroth" radius =====================================================
   if ( which.max( x_edges ) == length( x_edges ) ) {
     x_edges <- rev( x_edges ) 
@@ -244,7 +241,7 @@ cylinder <-  function( length_body ,
     length_units = length_units
   )
   # Generate new shape object ==================================================
-  return( new( "Cylinder" ,
+  return( methods::new( "Cylinder" ,
                position_matrix = position_matrix ,
                shape_parameters = shape_parameters ) )
 }
@@ -308,7 +305,7 @@ polynomial_cylinder <- function(length_body,
     length_units = length_units
   )
   # Generate new shape object ==================================================
-  return( new( "PolynomialCylinder" ,
+  return( methods::new( "PolynomialCylinder" ,
                position_matrix = position_matrix ,
                shape_parameters = shape_parameters ) )
 }

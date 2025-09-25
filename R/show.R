@@ -7,9 +7,7 @@
 ################################################################################
 #' Generic function for show(...) for different scatterers.
 #' @param object Scattering object.
-#' @import graphics
-#' @import stats
-#' @import grDevices
+#' @importFrom methods setMethod show
 #' @export
 setMethod( f = "show" ,
            signature = "Scatterer" ,
@@ -177,7 +175,7 @@ cal_show <- function( object ) {
   body <- acousticTS::extract( object ,
                                "body" )
   # Print object summary information ===========================================
-  cat( paste0( is( object )[[ 1 ]] , "-object" ) , "\n" ,
+  cat( paste0( methods::is( object )[[ 1 ]] , "-object" ) , "\n" ,
        "Calibration sphere" , "\n" ,
        " ID:" ,
        paste0( meta$ID ) , "\n" ,
@@ -243,7 +241,7 @@ ess_show <- function( object ) {
                        "G" = " Pa" ,
                        "" )
       paste0( clean_name , ": " , round( value , 4 ) , units )
-    } , names( shell_material_props ) , shell_material_props , SIMPLIFY = F )
+    } , names( shell_material_props ) , shell_material_props , SIMPLIFY = FALSE )
     paste( "   " , prop_strings , collapse = "\n " )
   } else {
     "   None specified"
@@ -264,13 +262,13 @@ ess_show <- function( object ) {
                        "sound_speed" = " m s^-1" ,
                        "" )
       paste0( clean_name , ": " , round( value , 4 ) , units )
-    } , names( fluid_material_props ) , fluid_material_props , SIMPLIFY = F )
+    } , names( fluid_material_props ) , fluid_material_props , SIMPLIFY = FALSE )
     paste( "   " , prop_strings , collapse = "\n " )
   } else {
     "   None specified"
   }
   # Print object summary information ===========================================
-  cat( paste0( is( object )[[ 1 ]] , "-object" ) , "\n" ,
+  cat( paste0( methods::is( object )[[ 1 ]] , "-object" ) , "\n" ,
        "Elastic-shelled scatterer" , "\n" ,
        " ID:" ,
        paste0( meta$ID ) , "\n" ,

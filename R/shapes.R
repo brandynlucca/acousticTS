@@ -15,7 +15,7 @@
 #' the body shape
 #' @slot shape_parameters A list of additional shape specifications 
 #' 
-#' @keywords shapes, internal
+#' @keywords shapes internal
 #' 
 #' @rdname Shape-class
 #' @aliases Shape
@@ -31,7 +31,7 @@ Shape <- setClass( "Shape" ,
 #' 
 #' @seealso \code{\link{Shape}}
 #' 
-#' @keywords shapes, internal
+#' @keywords shapes internal
 #'
 #' @rdname Arbitrary-class
 #' @aliases Arbitrary
@@ -46,7 +46,7 @@ Arbitrary <- setClass( "Arbitrary" ,
 #' 
 #' @seealso \code{\link{Shape}}
 #' 
-#' @keywords shapes, internal
+#' @keywords shapes internal
 #' 
 #' @aliases Sphere
 #' @rdname Sphere-class
@@ -60,7 +60,7 @@ Sphere <- setClass( "Sphere" ,
 #' 
 #' @seealso \code{\link{Shape}}
 #' 
-#' @keywords shapes, internal
+#' @keywords shapes internal
 #' 
 #' @aliases ProlateSpheroid
 #' @rdname ProlateSpheroid-class
@@ -74,7 +74,7 @@ ProlateSpheroid <- setClass( "ProlateSpheroid" ,
 #' 
 #' @seealso \code{\link{Shape}}
 #' 
-#' @keywords shapes, internal
+#' @keywords shapes internal
 #'
 #' @aliases Cylinder
 #' @rdname Cylinder-class
@@ -88,7 +88,7 @@ Cylinder <- setClass( "Cylinder" ,
 #' 
 #' @seealso \code{\link{Shape}}
 #' 
-#' @keywords shapes, internal
+#' @keywords shapes internal
 #'
 #' @aliases PolynomialCylinder
 #' @rdname PolynomialCylinder-class

@@ -63,7 +63,6 @@ DCM <- function( object ) {
 #' Demer, D.A., and Conti, S.G. 2003. Reconciling theoretical versus empirical
 #' target strengths of krill: effects of phase variability on the distorted-wave
 #' Born approximation. ICES J. Mar. Sci., 60: 429-434.
-#' @import stats
 #' @export
 DWBA <- function( object ) {
   # Extract model parameters/inputs ============================================
@@ -87,15 +86,19 @@ DWBA <- function( object ) {
   # Calculate position matrix lags  ============================================
   rpos_diff <- t.default( diff( t.default( rpos ) ) )
   # Multiply wavenumber and body matrices ======================================
-  rpos_diff_k <- t.default( sapply( 1 : length( k_sw_norm ) ,
-                                    FUN = function( x ) {
-                                      colSums( rpos_diff[ 1 : 3 , ] *
-                                                 k_sw_rot[ x , ] )
-                                    } ) )
+  rpos_diff_k <- t(
+    vapply(
+      X = seq_along( k_sw_norm ) ,
+      FUN = function( x ) {
+        colSums( rpos_diff[ 1 : 3 , ] * k_sw_rot[ x , ] )
+      },
+      FUN.VALUE = numeric( ncol( rpos_diff ) )
+    )
+  )
   # Calculate Euclidean norms ==================================================
   rpos_diff_norm <- sqrt( colSums( rpos_diff[ 1 : 3 , ] * rpos_diff[ 1 : 3 , ] ) )
   # Estimate angles between body cylinders =====================================
-  alpha <- acos( rpos_diff_k / ( k_sw_norm %*% t.default( rpos_diff_norm ) ) )
+  alpha <- acos( rpos_diff_k / ( k_sw_norm %*% t( rpos_diff_norm ) ) )
   beta <- abs( alpha - pi / 2 )
   # Define integrand ===========================================================
   integrand <- function( s , x ) {
@@ -105,26 +108,30 @@ DWBA <- function( object ) {
                               cos( beta[ x , ] ) ) ) / cos( beta[ x , ] )
     fb_a <- k_sw_norm[ x ] / 4 * R * rint_mat[ 4 , ] * 
       exp( 2i * rint_k1_h_mat ) * bessel * rpos_diff_norm
-    return( sum( fb_a , na.rm = T ) )
+    return( sum( fb_a , na.rm = TRUE ) )
   }
   # Vectorize integrand function ===============================================
   integrand_vec <- Vectorize( integrand )
   # Calculate linear scatter response ==========================================
   f_bs <- rep( NA , length( k_sw_norm ) )
-  f_bs <- sapply( 1 : length( k_sw_norm ) ,
-                  FUN = function( x ) {
-                    # Real ===============================================
-                    Ri <- integrate( function( s ) {
-                      Re( integrand_vec( s , x ) ) } , 0 , 1 )$value
-                    # Real ===============================================
-                    Ii <- integrate( function( s ) {
-                      Im( integrand_vec( s , x ) ) } , 0 , 1 )$value
-                    # Return =============================================
-                    return( sqrt( Ri ^ 2 +  Ii ^ 2 ) ) } )
+  f_bs <- vapply( 
+    seq_along( k_sw_norm ) ,
+    FUN = function( x ) {
+      # Real ===================================================================
+      Ri <- stats::integrate( function( s ) {
+        Re( integrand_vec( s , x ) ) } , 0 , 1 )$value
+      # Real ===================================================================
+      Ii <- stats::integrate( function( s ) {
+        Im( integrand_vec( s , x ) ) } , 0 , 1 )$value
+      # Return =================================================================
+      sqrt( Ri ^ 2 +  Ii ^ 2 )
+      } ,
+    FUN.VALUE = numeric( 1 )
+  )
   # Update scatterer object ====================================================
-  slot( object, "model" )$DWBA <- data.frame(
+  methods::slot( object, "model" )$DWBA <- data.frame(
     frequency = model$parameters$acoustics$frequency ,
-    ka = model$parameters$acoustics$k_sw * median( model$body$radius ) ,
+    ka = model$parameters$acoustics$k_sw * stats::median( model$body$radius ) ,
     f_bs = f_bs ,
     sigma_bs = abs( f_bs ) * abs( f_bs ) ,
     TS = 10 * log10( abs( f_bs ) * abs( f_bs ) )
@@ -143,7 +150,6 @@ DWBA <- function( object ) {
 #' Demer, D.A., and Conti, S.G. 2003. Reconciling theoretical versus empirical
 #' target strengths of krill: effects of phase variability on the distorted-wave
 #' Born approximation. ICES J. Mar. Sci., 60: 429-434.
-#' @import stats
 #' @export
 DWBA_curved <- function( object ) {
   # Extract model parameters/inputs ============================================
@@ -166,17 +172,17 @@ DWBA_curved <- function( object ) {
   # Update position matrices  ==================================================
   rpos <- rbind( r0 , a = model$body$radius )
   # Calculate position matrix lags  ============================================
-  rpos_diff <- t.default( diff( t.default( rpos ) ) )
+  rpos_diff <- t( diff( t( rpos ) ) )
   # Multiply wavenumber and body matrices ======================================
-  rpos_diff_k <- t.default( sapply( 1 : length( k_sw_norm ) ,
-                                    FUN = function( x ) {
-                                      colSums( rpos_diff[ 1 : 3 , ] *
-                                                 k_sw_rot[ x , ] )
-                                    } ) )
+  rpos_diff_k <- t( sapply( 1 : length( k_sw_norm ) ,
+                            FUN = function( x ) {
+                              colSums( rpos_diff[ 1 : 3 , ] *
+                                         k_sw_rot[ x , ] )
+                              } ) )
   # Calculate Euclidean norms ==================================================
   rpos_diff_norm <- sqrt( colSums( rpos_diff[ 1 : 3 , ] * rpos_diff[ 1 : 3 , ] ) )
   # Estimate angles between body cylinders =====================================
-  alpha <- acos( rpos_diff_k / ( k_sw_norm %*% t.default( rpos_diff_norm ) ) )
+  alpha <- acos( rpos_diff_k / ( k_sw_norm %*% t( rpos_diff_norm ) ) )
   beta <- abs( alpha - pi / 2 )
   # Define integrand ===========================================================
   integrand <- function( s , x ) {
@@ -186,7 +192,7 @@ DWBA_curved <- function( object ) {
                               cos( beta[ x , ] ) ) ) / cos( beta[ x , ] )
     fb_a <- k_sw_norm[ x ] / 4 * R * rint_mat[ 4 , ] *
       exp( 2i * rint_k1_h_mat ) * bessel * rpos_diff_norm
-    return( sum( fb_a , na.rm = T ) )
+    return( sum( fb_a , na.rm = TRUE ) )
   }
   # Vectorize integrand function ===============================================
   integrand_vec <- Vectorize( integrand )
@@ -195,17 +201,17 @@ DWBA_curved <- function( object ) {
   f_bs <- sapply( 1 : length( k_sw_norm ) ,
                   FUN = function( x ) {
                     # Real ===============================================
-                    Ri <- integrate( function( s ) {
+                    Ri <- stats::integrate( function( s ) {
                       Re( integrand_vec( s , x ) ) } , 0 , 1 )$value
                     # Real ===============================================
-                    Ii <- integrate( function( s ) {
+                    Ii <- stats::integrate( function( s ) {
                       Im( integrand_vec( s , x ) ) } , 0 , 1 )$value
                     # Return =============================================
                     return( sqrt( Ri ^ 2 +  Ii ^ 2 ) ) } )
   # Update scatterer object ====================================================
-  slot( object, "model" )$DWBA_curved <- data.frame(
+  methods::slot( object, "model" )$DWBA_curved <- data.frame(
     frequency = model$parameters$acoustics$frequency ,
-    ka = model$parameters$acoustics$k_sw * median( model$body$radius ) ,
+    ka = model$parameters$acoustics$k_sw * stats::median( model$body$radius ) ,
     f_bs = f_bs ,
     sigma_bs = abs( f_bs ) * abs( f_bs ) ,
     TS = 10 * log10( abs( f_bs ) * abs( f_bs ) )
@@ -221,7 +227,6 @@ DWBA_curved <- function( object ) {
 #' Demer, D.A., and Conti, S.G. 2003. Reconciling theoretical versus empirical
 #' target strengths of krill: effects of phase variability on the distorted-wave
 #' Born approximation. ICES J. Mar. Sci., 60: 429-434.
-#' @import stats
 #' @export
 SDWBA <- function( object ) {
   # Extract model parameters/inputs ============================================
@@ -247,17 +252,17 @@ SDWBA <- function( object ) {
     r0 <- rbind( sub_params$body_params$rpos[ 1 : 3 , ] , 
                  sub_params$body_params$radius )
     # Calculate position matrix lags  ==========================================
-    r0_diff <- t.default( diff.default( t.default( r0 ) ) )
+    r0_diff <- t( diff( t( r0 ) ) )
     # Multiply wavenumber and body matrices ====================================
-    r0_diff_k <- t.default( sapply( 1 : length( k_sw_norm ) ,
-                                    FUN = function( x ) {
-                                      colSums( r0_diff[ 1 : 3 , ] *
-                                                 k_sw_rot[ x , ] )
-                                    } ) )
+    r0_diff_k <- t( sapply( 1 : length( k_sw_norm ) ,
+                            FUN = function( x ) {
+                              colSums( r0_diff[ 1 : 3 , ] *
+                                         k_sw_rot[ x , ] )
+                              } ) )
     # Calculate Euclidean norms ================================================
     r0_diff_norm <- sqrt( colSums( r0_diff[ 1 : 3 , ] * r0_diff[ 1 : 3 , ] ) )
     # Estimate angles between body cylinders ===================================
-    alpha <- acos( r0_diff_k / ( k_sw_norm %*% t.default( r0_diff_norm ) ) )
+    alpha <- acos( r0_diff_k / ( k_sw_norm %*% t( r0_diff_norm ) ) )
     beta <- abs( alpha - pi / 2 )
     # Call in metrics ==========================================================
     phase_sd <- sub_params$meta_params$p0 
@@ -278,33 +283,33 @@ SDWBA <- function( object ) {
       #   exp( 2i * rint_k1_h_mat ) * bessel[y] * r0_diff_norm[ y ]
       fb_a <- k_sw_norm[ x ] / 4 * R * rint_mat[ 4 ] * 
         exp( 2i * rint_k1_h_mat ) * bessel * r0_diff_norm[ y ] 
-      return( sum( fb_a , na.rm = T ) )
+      return( sum( fb_a , na.rm = TRUE) )
     } 
     # Vectorize integrand function =============================================
     integrand_vectorized <- Vectorize( integrand )
     stochastic_TS <- function( n_k , n_segments , n_iterations ) {
-      sapply( 1 : n_k , 
-              FUN = function( x ) {
-                cyl_phase <- array(
-                  sapply( 1 : n_segments ,
-                          FUN = function( y ) {
-                            phase_integrate( x , y ,
-                                             n_iterations ,
-                                             integrand_vectorized ,
-                                             phase_sd )
-                          }
-                  ),
-                  dim = c( n_iterations , n_segments )
-                )
-                cyl_sum_phase <- rowSums( cyl_phase , na.rm = T )
-                cyl_sum_phase
-              }
-      ) -> phase_cyl
+      phase_cyl <- sapply( 1 : n_k , 
+                           FUN = function( x ) {
+                             cyl_phase <- array(
+                               sapply( 1 : n_segments ,
+                                       FUN = function( y ) {
+                                         phase_integrate( x , y ,
+                                                          n_iterations ,
+                                                          integrand_vectorized ,
+                                                          phase_sd )
+                                         }
+                                       ),
+                               dim = c( n_iterations , n_segments )
+                               )
+                             cyl_sum_phase <- rowSums( cyl_phase , na.rm = TRUE )
+                             cyl_sum_phase
+                             }
+                           )
       phase_cyl <- array( phase_cyl , dim = c( n_iterations , n_k ) )
       data.frame( f_bs = colMeans( phase_cyl ) ,
                   sigma_bs = colMeans( sigma_bs( phase_cyl ) ) ,
                   TS_mean = db( colMeans( sigma_bs( phase_cyl ) ) ) ,
-                  TS_sd = db( apply( sigma_bs( phase_cyl ) , 2 , sd ) ) )
+                  TS_sd = db( apply( sigma_bs( phase_cyl ) , 2 , stats::sd ) ) )
     }
     # Calculate linear scatter response ========================================
     backscatter_df <- stochastic_TS( n_k = length( k_sw_norm ) , 
@@ -318,21 +323,20 @@ SDWBA <- function( object ) {
                               FUN = function( i ) SDWBA_resampled( i )
                       ) )
   # Update scatterer object ====================================================
-  slot( object , "model" )$SDWBA$f_bs <- results$f_bs
-  slot( object , "model" )$SDWBA$sigma_bs <- results$sigma_bs
-  slot( object , "model" )$SDWBA$TS <- results$TS_mean
-  slot( object , "model" )$SDWBA$TS_sd <- results$TS_sd
+  methods::slot( object , "model" )$SDWBA$f_bs <- results$f_bs
+  methods::slot( object , "model" )$SDWBA$sigma_bs <- results$sigma_bs
+  methods::slot( object , "model" )$SDWBA$TS <- results$TS_mean
+  methods::slot( object , "model" )$SDWBA$TS_sd <- results$TS_sd
   # Return object ==============================================================
   return( object )
 }
 #' Calculates the theoretical TS of a fluid-like scatterer at a given frequency
 #' using the stochastic distorted Born wave approximation (DWBA) model using 
-#' Eq. (6) froom Stanton et al. (1998).
+#' Eq. (6) from Stanton et al. (1998).
 #' @param object FLS-class scatterer.
 #' @references
 #' Stanton, T.K., Chu, D., and Wiebe, P.H. 1998. Sound scattering by several
 #' zooplankton groups. II. Scattering models. J. Acoust. Soc. Am., 103, 236-253.
-#' @import stats
 #' @rdname SDWBA_curved
 #' @export
 SDWBA_curved <- function( object ) {
@@ -384,33 +388,35 @@ SDWBA_curved <- function( object ) {
                                 cos( beta[ x , y ] ) ) ) / cos( beta[ x , y ] )
       fb_a <- k_sw_norm[ x ] / 4 * R * rint_mat[ 4 ] * h *
         exp( 2i * rint_k1_h_mat ) * bessel * r0_diff_norm[ y ]
-      return( sum( fb_a , na.rm = T ) )
+      return( sum( fb_a , na.rm = TRUE ) )
     } 
     # Vectorize integrand function =============================================
     integrand_vectorized_c <- Vectorize( integrand_c )
     stochastic_TS_c <- function( n_k , n_segments , n_iterations ) {
-      sapply( 1 : n_k , 
-              FUN = function( x ) {
-                cyl_phase <- array( 
-                  sapply( 1 :  n_segments ,
-                          FUN = function( y ) {
-                            phase_integrate( x , y , 
-                                             n_iterations , 
-                                             integrand_vectorized_c ,
-                                             phase_sd )
-                            }
-                  ) ,
-                  dim = c( n_iterations , n_segments )
-                )
-                cyl_sum_phase <- rowSums( cyl_phase , na.rm = T )
-                cyl_sum_phase
-              }
-      ) -> phase_cyl
+      phase_cyl <- sapply( 1 : n_k , 
+                           FUN = function( x ) {
+                             cyl_phase <- array( 
+                               sapply( 1 :  n_segments ,
+                                       FUN = function( y ) {
+                                         phase_integrate( 
+                                           x , y , 
+                                           n_iterations , 
+                                           integrand_vectorized_c ,
+                                           phase_sd 
+                                           )
+                                         }
+                                       ) ,
+                               dim = c( n_iterations , n_segments )
+                               )
+                             cyl_sum_phase <- rowSums( cyl_phase , na.rm = TRUE )
+                             cyl_sum_phase
+                             }
+                           )
       phase_cyl <- array( phase_cyl , dim = c( n_iterations , n_k ) )
       data.frame( f_bs = colMeans( phase_cyl ) ,
                   sigma_bs = colMeans( sigma_bs( phase_cyl ) ) ,
                   TS_mean = db( colMeans( sigma_bs( phase_cyl ) ) ) ,
-                  TS_sd = db( apply( sigma_bs( phase_cyl ) , 2 , sd ) ) )
+                  TS_sd = db( apply( sigma_bs( phase_cyl ) , 2 , stats::sd ) ) )
     }
     # Calculate linear scatter response ========================================
     backscatter_df <- stochastic_TS_c( n_k = length( k_sw_norm ) , 
@@ -424,10 +430,10 @@ SDWBA_curved <- function( object ) {
                               FUN = function( i ) SDWBA_resampled_c( i )
                       ) )
   # Update scatterer object ====================================================
-  slot( object , "model" )$SDWBA_curved$f_bs <- results$f_bs
-  slot( object , "model" )$SDWBA_curved$sigma_bs <- results$sigma_bs
-  slot( object , "model" )$SDWBA_curved$TS <- results$TS_mean
-  slot( object , "model" )$SDWBA_curved$TS_sd <- results$TS_sd
+  methods::slot( object , "model" )$SDWBA_curved$f_bs <- results$f_bs
+  methods::slot( object , "model" )$SDWBA_curved$sigma_bs <- results$sigma_bs
+  methods::slot( object , "model" )$SDWBA_curved$TS <- results$TS_mean
+  methods::slot( object , "model" )$SDWBA_curved$TS_sd <- results$TS_sd
   # Return object ==============================================================
   return( object )
 }
@@ -513,7 +519,7 @@ calibration <- function( object ) {
   sigma_bs <- f_bs * f_bs
   TS <- 10 * log10( sigma_bs )
   # Add results to scatterer object ============================================
-  slot( object ,
+  methods::slot( object ,
         "model" )$calibration <- data.frame(
           frequency = model$parameters$acoustics$frequency ,
           ka = ka_sw ,
@@ -582,7 +588,7 @@ MSS_anderson <- function( object ) {
   # Calculate TS ===============================================================
   TS <- 10 * log10( sigma_bs )
   # Add results to scatterer object ============================================
-  slot( object ,
+  methods::slot( object ,
         "model" )$MSS_anderson <- data.frame(
           frequency = model$parameters$acoustics$frequency ,
           ka = k1a ,
@@ -645,7 +651,7 @@ MSS_goodman_stern <- function( object ) {
   # Add the names ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   names( ka_matrix_m ) <- rownames( ka_matrix )
   # Pre-calculate and cache the Bessel function outputs ========================
-  bessel_cache <- calculate_bessel_cache( ka_matrix_m , m )
+  bessel_cache <- .calculate_bessel_cache( ka_matrix_m , m )
   # Compute the alpha coefficient matrix =======================================
   alpha <- calculate_goodman_stern_alpha( bessel_cache , ka_matrix_m , m ,
                                           lambda , G , model$medium$density ,
@@ -685,7 +691,7 @@ MSS_goodman_stern <- function( object ) {
   # Convert to sigma_bs ========================================================
   sigma_bs <- abs( f_bs )^2
   # Define MSS slot for ESS-type scatterer =====================================
-  slot( object , "model" )$MSS_goodman_stern <- data.frame( 
+  methods::slot( object , "model" )$MSS_goodman_stern <- data.frame( 
     frequency = model$parameters$acoustics$frequency ,
     ka_shell = model$parameters$acoustics$k_sw * radius_shell ,
     ka_fluid = model$parameters$acoustics$k_sw * radius_fluid ,
@@ -775,8 +781,8 @@ KRM <- function( object ) {
                            body_summation * exp_body ) )
   if ( scatterer_type == "FLS" ) {
     # Define KRM slot for FLS-type scatterer ===================================
-    slot( object , "model" )$KRM <- data.frame( frequency = model$parameters$acoustics$frequency ,
-                                                ka = model$parameters$acoustics$k_sw * median( a_body , na.rm = T ) ,
+    methods::slot( object , "model" )$KRM <- data.frame( frequency = model$parameters$acoustics$frequency ,
+                                                ka = model$parameters$acoustics$k_sw * stats::median( a_body , na.rm = TRUE ) ,
                                                 f_bs = f_body ,
                                                 sigma_bs = abs( f_body ) * abs( f_body ) ,
                                                 TS = 20 * log10( abs( f_body ) ) )
@@ -816,8 +822,8 @@ KRM <- function( object ) {
     # Estimate total backscattering length, f_bs ===============================
     f_bs <- f_body + f_bladder
     # Define KRM slot for FLS-type scatterer ===================================
-    slot( object , "model" )$KRM <- data.frame( frequency = model$parameters$acoustics$frequency ,
-                                                               ka = model$parameters$acoustics$k_sw * median( a_body , na.rm = T ) ,
+    methods::slot( object , "model" )$KRM <- data.frame( frequency = model$parameters$acoustics$frequency ,
+                                                               ka = model$parameters$acoustics$k_sw * stats::median( a_body , na.rm = TRUE ) ,
                                                                f_body = f_body ,
                                                                f_bladder = f_bladder ,
                                                                f_bs = f_bs ,
@@ -870,7 +876,7 @@ high_pass_stanton <- function( object ) {
                ( ( R * R ) * F_c ) )
     # Calculate backscatter and return
     f_bs <- num / dem
-    slot( object , "model" )$high_pass_stanton <- data.frame( 
+    methods::slot( object , "model" )$high_pass_stanton <- data.frame( 
       frequency = acoustics$frequency ,
       k1a = acoustics$k_sw * shell$radius ,
       k_s = acoustics$k_b ,

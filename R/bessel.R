@@ -38,11 +38,11 @@ jcd <- function( l , n ) {
   }
   jc_vec <- Vectorize( jc_internal )
   # Return based on input class ================================================
-  switch( class( n )[ 1 ] ,
-          numeric = jc_vec( l , n ) ,
-          matrix = apply( n , 2 , FUN = function( x ) {
-            jc_vec( l , x )
-          } ) ) -> result
+  result <- switch( class( n )[ 1 ] ,
+                    numeric = jc_vec( l , n ) ,
+                    matrix = apply( n , 2 , FUN = function( x ) {
+                      jc_vec( l , x )
+                      } ) )
   return( result )
 }
 #' @rdname jc
@@ -84,11 +84,11 @@ ycd <- function( l , n ) {
   }
   yc_vec <- Vectorize( yc_internal )
   # Return based on input class ================================================
-  switch( class( n )[ 1 ] ,
-          numeric = yc_vec( l , n ) ,
-          matrix = apply( n , 2 , FUN = function( x ) {
-            yc_vec( l , x )
-          } ) ) -> result
+  result <- switch( class( n )[ 1 ] ,
+                    numeric = yc_vec( l , n ) ,
+                    matrix = apply( n , 2 , FUN = function( x ) {
+                      yc_vec( l , x )
+                      } ) )
   return( result )
 }
 ################################################################################
@@ -128,7 +128,7 @@ hcd <- function( l, n ) return( ( l * hc( l , n ) / n - hc( l + 1 , n ) ) )
 #' @export
 js <- function( l , n ) {
   # Function check =============================================================
-  if ( ! is.numeric( l ) && ! numeric( n ) )
+  if ( ! is.numeric( l ) || ! is.numeric( n ) )
     stop( "Inputs must be numeric vectors." )
   # Internal function ==========================================================
   js_internal <- function( l , n ) {
@@ -140,11 +140,11 @@ js <- function( l , n ) {
   }
   js_vec <- Vectorize( js_internal )
   # Return based on input class ================================================
-  switch( class( n )[1] ,
-          numeric = js_vec( l , n ) ,
-          matrix = apply( n , 2 , FUN = function( x ) {
-            js_vec( l , x )
-          } ) ) -> result
+  result <- switch( class( n )[1] ,
+                    numeric = js_vec( l , n ) ,
+                    matrix = apply( n , 2 , FUN = function( x ) {
+                      js_vec( l , x )
+                      } ) )
   return( result )
 }
 #' @rdname js
@@ -175,25 +175,25 @@ jsdd <- function( l , n ) {
 #' @export
 ys <- function( l , n ) {
   # Function check =============================================================
-  if ( ! is.numeric( l ) && ! numeric( n ) )
+  if ( ! is.numeric( l ) || ! is.numeric( n ) )
     stop( "Inputs must be numeric vectors." )
   # Internal function ==========================================================
   ys_internal <- function( l , n ) {
     if( n > 0 ) {
       return( yc( l + 0.5 , n ) * sqrt( pi / ( 2 * n ) ) )
     }else if( n < 0 ){
-      return( - ( yc( l + 0.5 , n ) * sqrt (pi / ( 2 * n ) ) ) )
+      return( ( yc( l + 0.5 , -n ) * sqrt (pi / ( 2 * -n ) ) ) )
     }else if( n == 0 ){
       return( -Inf )
     }
   }
   ys_vec <- Vectorize( ys_internal )
   # Return based on input class ================================================
-  switch( class( n )[1] ,
-          numeric = ys_vec( l , n ) ,
-          matrix = apply( n , 2 , FUN = function( x ) {
-            ys_vec( l , x )
-          } ) ) -> result
+  result <- switch( class( n )[1] ,
+                    numeric = ys_vec( l , n ) ,
+                    matrix = apply( n , 2 , FUN = function( x ) {
+                      ys_vec( l , x )
+                      } ) )
   return( result )
 }
 #' @rdname ys
@@ -279,7 +279,7 @@ Pn <- function( n , x ) {
 #' @param m Modal vector
 #' @return Cached Bessel function values
 #' @keywords internal
-calculate_bessel_cache <- function( ka_matrix_m , m ) {
+.calculate_bessel_cache <- function( ka_matrix_m , m ) {
   # Define all Bessel functions to apply =======================================
   bessel_functions <- list(
     js = js , jsd = jsd , jsdd = jsdd , 

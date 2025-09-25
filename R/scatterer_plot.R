@@ -62,7 +62,6 @@ model_palette <- c( "black" , "azure4" , "royalblue4" , "firebrick3" , "steelblu
 #' @param nudge_y y-axis nudge.
 #' @param nudge_x x-axis nudge.
 #' @param ... Additional plot inputs
-#' @import graphics
 #' @export
 cal_plot <- function( object ,
                       type = "shape" ,
@@ -70,8 +69,8 @@ cal_plot <- function( object ,
                       nudge_x = 1.01 ,
                       x_units = "frequency" , ...) {
   # Retrieve default plot window parameters ====================================
-  opar <- par( no.readonly = TRUE )
-  on.exit( par( opar ) )
+  opar <- graphics::par( no.readonly = TRUE )
+  on.exit( graphics::par( opar ) )
   if( type == "shape" ) {
     # Extract body shape information ===========================================
     body <- acousticTS::extract( object ,
@@ -79,7 +78,7 @@ cal_plot <- function( object ,
     # Along-semimajor radii ======================================================
     along_radius <- sqrt( body$radius^2 - ( body$rpos[ , 1 ] - body$radius ) * ( body$rpos[ , 1 ] - body$radius ) )
     # Define plot margins ======================================================
-    par( ask = FALSE ,
+    graphics::par( ask = FALSE ,
          oma = base::c( 1 , 1 , 1 , 0 ) ,
          mar = base::c( 3 , 4.5 , 1 , 2 ) )
     # Begin plotting ===========================================================
@@ -94,12 +93,12 @@ cal_plot <- function( object ,
           ylim = base::c( min( body$rpos[ , 5 ] ) * ( 1 - (1 - nudge_y ) ) ,
                           max( body$rpos[ , 4 ] ) * nudge_y ) )
     # Add lower perimeter of shape =============================================
-    lines( x = body$rpos[ , 1 ] ,
+    graphics::lines( x = body$rpos[ , 1 ] ,
            y = along_radius ,
            lty = 1 ,
            lwd = 4 )
     # Add body segments ========================================================
-    segments( x0 = body$rpos[ , 1 ] ,
+    graphics::segments( x0 = body$rpos[ , 1 ] ,
               x1 = body$rpos[ , 1 ] ,
               y0 = along_radius ,
               y1 = -along_radius ,
@@ -128,7 +127,7 @@ cal_plot <- function( object ,
         x_lab <- expression(italic(k[t]*a))
       }
       # Plot results ===============================================
-      par(ask = F,
+      graphics::par(ask = FALSE ,
           mar = c(4, 4.5, 1, 1))
       plot(x = x_axis,
            y = TS,
@@ -157,9 +156,6 @@ cal_plot <- function( object ,
 #' @param nudge_x x-axis nudge.
 #' @param y_units y-axis data selection (e.g. TS, sigma_bs -- defaults to TS).
 #' @param ... Additional plot inputs
-#' @import graphics
-#' @import stats
-#' @import grDevices
 #' @export
 ess_plot <- function( object ,
                       type = "shape" ,
@@ -168,17 +164,17 @@ ess_plot <- function( object ,
                       x_units = "frequency" ,
                       y_units = "TS" , ... ) {
   # Retrieve default plot window parameters ====================================
-  opar <- par( no.readonly = TRUE )
-  on.exit( par( opar ) )
+  opar <- graphics::par( no.readonly = TRUE )
+  on.exit( graphics::par( opar ) )
   if( type == "shape" ) {
     # Extract shell shape information ==========================================
     shell <- extract( object , "shell" )
     # Along-semimajor radii ======================================================
     along_radius <- sqrt( shell$radius^2 - ( shell$rpos[ , 1 ] - shell$radius ) * ( shell$rpos[ , 1 ] - shell$radius ) )
     # Center axis ==============================================================
-    shell$rpos[ , 1 ] <- shell$rpos[ , 1 ] - median( shell$rpos[ , 1 ] )
+    shell$rpos[ , 1 ] <- shell$rpos[ , 1 ] - stats::median( shell$rpos[ , 1 ] )
     # Define plot margins ======================================================
-    par( ask = FALSE ,
+    graphics::par( ask = FALSE ,
          oma = c( 1 , 1 , 1 , 0 ) ,
          mar = c( 4 , 4.5 , 1 , 2 ) )
     # Begin plotting ===========================================================
@@ -193,12 +189,12 @@ ess_plot <- function( object ,
           ylim = base::c( min( -along_radius ) * ( 1 - (1 - nudge_y ) ) ,
                           max( along_radius ) * nudge_y ) )
     # Add lower perimeter of shape =============================================
-    lines( x = shell$rpos[ , 1 ] ,
+    graphics::lines( x = shell$rpos[ , 1 ] ,
            y = -along_radius ,
            lty = 1 ,
            lwd = 4 )
     # Add shell segments =======================================================
-    segments( x0 = shell$rpos[ , 1 ] ,
+    graphics::segments( x0 = shell$rpos[ , 1 ] ,
               x1 = shell$rpos[ , 1 ] ,
               y0 = -along_radius ,
               y1 = along_radius ,
@@ -211,21 +207,21 @@ ess_plot <- function( object ,
       # Along-semimajor radii ======================================================
       along_radius_fl <- sqrt( fluid$radius^2 - ( fluid$rpos[ , 1 ] - fluid$radius ) * ( fluid$rpos[ , 1 ] - fluid$radius ) )
       # Center +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      fluid$rpos[ , 1 ] <- fluid$rpos[ , 1 ] - median( fluid$rpos[ , 1 ] )
+      fluid$rpos[ , 1 ] <- fluid$rpos[ , 1 ] - stats::median( fluid$rpos[ , 1 ] )
       # Add upper perimeter of shape +++++++++++++++++++++++++++++++++++++++++++
-      lines( x = fluid$rpos[ , 1 ] ,
+      graphics::lines( x = fluid$rpos[ , 1 ] ,
              y = along_radius_fl ,
              lty = 1 ,
              lwd = 4 ,
              col = "red" )
       # Add lower perimeter of shape +++++++++++++++++++++++++++++++++++++++++++
-      lines( x = fluid$rpos[ , 1 ] ,
+      graphics::lines( x = fluid$rpos[ , 1 ] ,
              y = -along_radius_fl ,
              lty = 1 ,
              lwd = 4 ,
              col = "red" )
       # Add shell segments +++++++++++++++++++++++++++++++++++++++++++++++++++++
-      segments( x0 = fluid$rpos[ , 1 ] ,
+      graphics::segments( x0 = fluid$rpos[ , 1 ] ,
                 x1 = fluid$rpos[ , 1 ] ,
                 y0 = -along_radius_fl ,
                 y1 = along_radius_fl ,
@@ -233,7 +229,7 @@ ess_plot <- function( object ,
                 lwd = 1.25 ,
                 col = "red" )
       # Create legend ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      legend( x = "bottomright",
+      graphics::legend( x = "bottomright",
               legend = c( "Shell" , "Fluid-like body" ) ,
               lty = c(1, 1),
               lwd = c(4, 3.5),
@@ -286,17 +282,17 @@ ess_plot <- function( object ,
           type = 'n' ,
           cex.axis = 1.3 ,
           cex.lab = 1.5 )
-    atx <- seq( par("xaxp")[1] , 
-                par("xaxp")[2] , 
-                (par("xaxp")[2] - par("xaxp")[1])/par("xaxp")[3] )
-    axis( 1 , at = atx , 
-          labels = format( atx , scientific = F , justify = "left" ) ,
+    atx <- seq( graphics::par("xaxp")[1] , 
+                graphics::par("xaxp")[2] , 
+                (graphics::par("xaxp")[2] - graphics::par("xaxp")[1])/graphics::par("xaxp")[3] )
+    graphics::axis( 1 , at = atx , 
+          labels = format( atx , scientific = FALSE , justify = "left" ) ,
           cex.axis = 1.3 )
     nm_names <- names( x_mat )
-    invisible( mapply( lines , x_mat , y_mat ,
+    invisible( mapply( graphics::lines , x_mat , y_mat ,
                        col = model_palette[ 1 : base::length( model_names ) ] ,
                        lwd = 4 ) )
-    legend( "bottomright" ,
+    graphics::legend( "bottomright" ,
             title = expression( bold("TS"~"model") ) ,
             title.adj = 0.05 ,
             legend = nm_names ,
@@ -323,9 +319,6 @@ ess_plot <- function( object ,
 #' and nudge_x to apply; otherwise, input "auto").
 #' @param y_units y-axis data selection (e.g. TS, sigma_bs -- defaults to TS)
 #' @param ... Additional plot inputs
-#' @import graphics
-#' @import stats
-#' @import grDevices
 #' @export
 fls_plot <- function( object,
                       type = "shape" ,
@@ -344,11 +337,11 @@ fls_plot <- function( object,
     # Extract generic shape information ========================================
     shape_params <- extract( object , "shape_parameters" )
     # Define plot margins ======================================================
-    par( ask = FALSE ,
+    graphics::par( ask = FALSE ,
          oma = base::c( 1 , 1 , 1 , 0 ) ,
          mar = base::c( 5.0 , 4.5 , 1.5 , 2 ) )
     # Center shape =============================================================
-    body$rpos[ 3 , ] <- body$rpos[ 3 , ] - median( body$rpos[ 3 , ] )
+    body$rpos[ 3 , ] <- body$rpos[ 3 , ] - stats::median( body$rpos[ 3 , ] )
     # Get radius ===============================================================
     if ( "radius_shape" %in% names( shape_params ) ) {
       radius <- shape_params$radius_shape
@@ -439,18 +432,18 @@ fls_plot <- function( object,
       xD <- x0 - r * px
       yD <- y0 - r * py
       # ---- Draw polygon
-      polygon(
+      graphics::polygon(
         x = c( xA , xB , xC , xD ),
         y = c( yA , yB , yC , yD ),
-        col = adjustcolor( "gray50" , alpha.f = 0.6 ) ,
+        col = grDevices::adjustcolor( "gray50" , alpha.f = 0.6 ) ,
         border = "black", lwd = 1
       )
       # count <- count + 1
     }
     # cat("Polygons drawn:", count, "\n")
     # Draw centerline and points
-    lines(body$rpos[1, ], body$rpos[3, ], lwd = 3, col = "gray90")
-    points(body$rpos[1, ], body$rpos[3, ], pch = 1, col = "black", cex = 0.8)
+    graphics::lines(body$rpos[1, ], body$rpos[3, ], lwd = 3, col = "gray90")
+    graphics::points(body$rpos[1, ], body$rpos[3, ], pch = 1, col = "black", cex = 0.8)
   } else if ( type == "model" ) {
     # Detect model selection ===================================================
     models <- extract( object , "model" )
@@ -501,15 +494,15 @@ fls_plot <- function( object,
                     type = 'n' ,
                     cex.axis = 1.3 ,
                     cex.lab = 1.5 )
-    atx <- seq(par("xaxp")[1], par("xaxp")[2], (par("xaxp")[2] - par("xaxp")[1])/par("xaxp")[3])
-    axis( 1 , at = atx , 
-          labels = format( atx , scientific = F ) ,
+    atx <- seq(graphics::par("xaxp")[1], graphics::par("xaxp")[2], (graphics::par("xaxp")[2] - graphics::par("xaxp")[1])/graphics::par("xaxp")[3])
+    graphics::axis( 1 , at = atx , 
+          labels = format( atx , scientific = FALSE ) ,
           cex.axis = 1.3 )
     nm_names <- names( x_mat )
-    invisible( mapply( lines , x_mat , y_mat ,
+    invisible( mapply( graphics::lines , x_mat , y_mat ,
                        col = model_palette[ 1 : base::length( model_names ) ] ,
                        lwd = 4 ) )
-    legend( "bottomright" ,
+    graphics::legend( "bottomright" ,
             title = expression( bold("TS"~"model") ) ,
             title.adj = 0.05 ,
             legend = nm_names ,
@@ -534,9 +527,6 @@ fls_plot <- function( object,
 #' @param nudge_x x-axis nudge.
 #' @param y_units y-axis data selection (e.g. TS, sigma_bs -- defaults to TS).
 #' @param ... Additional plot inputs
-#' @import graphics
-#' @import stats
-#' @import grDevices
 #' @export
 gas_plot <- function( object ,
                       type = "shape" ,
@@ -545,13 +535,13 @@ gas_plot <- function( object ,
                       x_units = "frequency" ,
                       y_units = "TS" , ... ) {
   # Retrieve default plot window parameters ====================================
-  opar <- par( no.readonly = TRUE )
-  on.exit( par( opar ) )
+  opar <- graphics::par( no.readonly = TRUE )
+  on.exit( graphics::par( opar ) )
   if( type == "shape" ) {
     # Extract body shape information ===========================================
     body <- extract( object , "body" )
     # Define plot margins ======================================================
-    par( ask = FALSE ,
+    graphics::par( ask = FALSE ,
          oma = c( 1 , 1 , 1 , 0 ) ,
          mar = c( 3 , 4.5 , 1 , 2 ) )
     # Begin plotting ===========================================================
@@ -566,12 +556,12 @@ gas_plot <- function( object ,
           ylim = base::c( min( body$rpos[ , 3 ] ) * ( 1 - (1 - nudge_y ) ) ,
                           max( -body$rpos[ , 3 ] ) * nudge_y ) )
     # Add lower perimeter of shape =============================================
-    lines( x = body$rpos[ , 1 ] ,
+    graphics::lines( x = body$rpos[ , 1 ] ,
            y = body$rpos[ , 3 ] ,
            lty = 1 ,
            lwd = 4 )
     # Add body segments ========================================================
-    segments( x0 = body$rpos[ , 1 ] ,
+    graphics::segments( x0 = body$rpos[ , 1 ] ,
               x1 = body$rpos[ , 1 ] ,
               y0 = body$rpos[ , 2 ] ,
               y1 = body$rpos[ , 3 ] ,
@@ -627,15 +617,15 @@ gas_plot <- function( object ,
           type = 'n' ,
           cex.axis = 1.3 ,
           cex.lab = 1.5 )
-    atx <- seq(par("xaxp")[1], par("xaxp")[2], (par("xaxp")[2] - par("xaxp")[1])/par("xaxp")[3])
-    axis( 1 , at = atx , 
-          labels = format( atx , scientific = F ) ,
+    atx <- seq(graphics::par("xaxp")[1], graphics::par("xaxp")[2], (graphics::par("xaxp")[2] - graphics::par("xaxp")[1])/graphics::par("xaxp")[3])
+    graphics::axis( 1 , at = atx , 
+          labels = format( atx , scientific = FALSE ) ,
           cex.axis = 1.3 )
     nm_names <- names( x_mat )
-    invisible( mapply( lines , x_mat , y_mat ,
+    invisible( mapply( graphics::lines , x_mat , y_mat ,
                        col = model_palette[ 1 : base::length( model_names ) ] ,
                        lwd = 4 ) )
-    legend( "bottomright" ,
+    graphics::legend( "bottomright" ,
             title = expression( bold("TS"~"model") ) ,
             title.adj = 0.05 ,
             legend = nm_names ,
@@ -661,8 +651,8 @@ sbf_plot <- function(object,
                      nudge_x = 1.01 ,
                      x_units = "frequency" ) {
   # Retrieve default plot window parameters ===================
-  opar <- par(no.readonly = TRUE)
-  on.exit(par(opar))
+  opar <- graphics::par(no.readonly = TRUE)
+  on.exit( graphics::par( opar ) )
   if(type == "shape") {
     # Extract body shape information ============================
     body <- extract( object , "body" )$rpos
@@ -674,10 +664,10 @@ sbf_plot <- function(object,
     xlow_lim <- min( body[ 1 , ] ) * ( 1 - ( 1 - nudge_x ) )
     xhi_lim <- max( body[ 1 , ] ) * nudge_x
     # Plot dorsoventral view =====================================
-    par(ask = F,
-        mfrow = c(2, 1),
-        mar = c(2, 4.5, 1, 2),
-        oma = c(1.5, 0.5, 0.5, 0))
+    graphics::par( ask = FALSE ,
+         mfrow = c( 2 , 1 ) ,
+         mar = c( 2 , 4.5 , 1 , 2 ) ,
+         oma = c( 1.5 , 0.5 , 0.5 , 0 ) )
     # Dorsal =====================================================
     plot(x = body[ 1 , ] ,
          y = body[ 3 , ] ,
@@ -691,12 +681,12 @@ sbf_plot <- function(object,
          cex.lab = 1.2,
          cex.axis = 1.2)
     # Ventral ====================================================
-    lines(x = body[1, ],
+    graphics::lines(x = body[1, ],
           y = body[4, ],
           lty = 1,
           lwd = 4)
     # Connect anterior/posterior gaps =============================
-    segments(x0 = c(min(body[1, ]), max(body[1, ])),
+    graphics::segments(x0 = c(min(body[1, ]), max(body[1, ])),
              x1 = c(min(body[1, ]), max(body[1, ])),
              y0 = c(body[4, ][body[1, ] == min(body[1, ])],
                     body[4, ][body[1, ] == max(body[1, ])]),
@@ -706,24 +696,24 @@ sbf_plot <- function(object,
              lwd = 4,
              col = 'black')
     # Plot body segments  =========================================
-    segments(x0 = body[1, ], x1 = body[1, ], y0 = body[4, ], y1 = body[3, ],
+    graphics::segments(x0 = body[1, ], x1 = body[1, ], y0 = body[4, ], y1 = body[3, ],
              lty = 3,
              lwd = 1,
              col = 'gray30')
     # Ventral bladder ==============================================
-    lines(x = bladder[1, ],
+    graphics::lines(x = bladder[1, ],
           y = bladder[4, ],
           lty = 1,
           lwd = 3.5,
           col = 'red')
     # Dorsal bladder ================================================
-    lines(x = bladder[1, ],
+    graphics::lines(x = bladder[1, ],
           y = bladder[3, ],
           lty = 1,
           lwd = 3.5,
           col = 'red')
     # Connect anterior/posterior gaps =============================
-    segments(x0 = c(min(bladder[1, ]), max(bladder[1, ])),
+    graphics::segments(x0 = c(min(bladder[1, ]), max(bladder[1, ])),
              x1 = c(min(bladder[1, ]), max(bladder[1, ])),
              y0 = c(bladder[4, ][bladder[1, ] == min(bladder[1, ])],
                     bladder[4, ][bladder[1, ] == max(bladder[1, ])]),
@@ -733,13 +723,13 @@ sbf_plot <- function(object,
              lwd = 3.5,
              col = 'red')
     # Plot bladder segments ==========================================
-    segments(x0 = bladder[1, ], x1 = bladder[1, ],
+    graphics::segments(x0 = bladder[1, ], x1 = bladder[1, ],
              y0 = bladder[4, ], y1 = bladder[3, ],
              lty = 3,
              lwd = 1,
              col = 'red')
     # Create legend ==================================================
-    legend(x = "bottomright",
+    graphics::legend(x = "bottomright",
            legend = c("Body","Resonant feature"),
            lty = c(1, 1),
            lwd = c(4, 3.5),
@@ -758,12 +748,12 @@ sbf_plot <- function(object,
          cex.lab = 1.2,
          cex.axis = 1.2)
     # Opposite side ====================================================
-    lines(x = body[1, ],
+    graphics::lines(x = body[1, ],
           y = -body[2, ] / 2,
           lty = 1,
           lwd = 4)
     # Close ends ====================================================
-    segments(x0 = c(min(body[1, ]), max(body[1, ])),
+    graphics::segments(x0 = c(min(body[1, ]), max(body[1, ])),
              x1 = c(min(body[1, ]), max(body[1, ])),
              y0 = c(-body[2, ][body[1, ] == min(body[1, ])] / 2,
                     -body[2, ][body[1, ] == max(body[1, ])] / 2),
@@ -773,25 +763,25 @@ sbf_plot <- function(object,
              lwd = 4,
              col ='black')
     # Plot body segments ==========================================
-    segments(x0 = body[1, ], x1 = body[1, ],
+    graphics::segments(x0 = body[1, ], x1 = body[1, ],
              y0 = -body[2, ] / 2, y1 = body[2, ] / 2,
              lty = 3,
              lwd = 1,
              col = 'gray30')
     # Left bladder ==================================================
-    lines(x = bladder[1, ],
+    graphics::lines(x = bladder[1, ],
           y = bladder[2, ] / 2,
           lty = 1,
           lwd = 3.5,
           col = 'red')
     # Right bladder =================================================
-    lines(x = bladder[1, ],
+    graphics::lines(x = bladder[1, ],
           y = -bladder[2, ]/2,
           lty = 1,
           lwd = 3.5,
           col = 'red')
     # Close end of bladders =========================================
-    segments(x0 = c(min(bladder[1, ]), max(bladder[1, ])),
+    graphics::segments(x0 = c(min(bladder[1, ]), max(bladder[1, ])),
              x1 = c(min(bladder[1, ]), max(bladder[1, ])),
              y0 = c(bladder[2, ][bladder[1, ] == min(bladder[1, ])]/ 2,
                     bladder[2, ][bladder[1, ] == max(bladder[1, ])] / 2),
@@ -801,13 +791,13 @@ sbf_plot <- function(object,
              lwd = 3.5,
              col = 'red')
     # Plot bladder segments ==========================================
-    segments(x0 = bladder[1 ,], x1 = bladder[1, ],
+    graphics::segments(x0 = bladder[1 ,], x1 = bladder[1, ],
              y0 = -bladder[2, ] / 2, y1 = bladder[2, ] / 2,
              lty = 3,
              lwd = 1,
              col ='red')
     # Re-add x-axis text ==========================================
-    mtext('Along-body axis (m)',
+    graphics::mtext('Along-body axis (m)',
           side = 1,
           outer = TRUE,
           line = 0,
@@ -829,8 +819,8 @@ sbf_plot <- function(object,
         x_lab <- expression(italic(k[b]*L))
       }
       # Plot results ===============================================
-      par(ask = F,
-          mar = c(4, 4.5, 1, 1))
+      graphics::par( ask = FALSE,
+           mar = c(4, 4.5, 1, 1))
       plot(x = x_axis,
            y = TS,
            type = 'l',

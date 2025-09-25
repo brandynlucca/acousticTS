@@ -299,9 +299,9 @@ dcm_initialize <- function(object,
   radius_uniform <- base::ifelse( !base::is.null( radius_cylinder ) ,
                                   radius_cylinder,
                                   base::switch( radius_cylinder_fun ,
-                                                max = max( body$radius, na.rm = T ) ,
-                                                mean = mean( body$radius, na.rm = T ) ,
-                                                median = median( body$radius, na.rm = T ) ) )
+                                                max = max( body$radius, na.rm = TRUE ) ,
+                                                mean = mean( body$radius, na.rm = TRUE ) ,
+                                                median = stats::median( body$radius, na.rm = TRUE ) ) )
   # Calculate radius of curvature either based on user input or ratio ==========
   radius_curvature <- base::ifelse( is.null( radius_curvature ) ,
                                     ifelse( ! is.null( body$radius_curvature_ratio ) ,
@@ -337,12 +337,12 @@ dcm_initialize <- function(object,
       k_b = k( frequency , sound_speed_sw * h ) ) ,
     n_s = shape$n_segments )
   # Tidy up model parameters to insert into object =============================
-  slot( object ,
+  methods::slot( object ,
         "model_parameters" )$DCM <- list( parameters = model_params ,
                                           medium = medium_params ,
                                           body = body_params )
   # Add model results slot to scattering object ================================
-  slot( object ,
+  methods::slot( object ,
         "model" )$DCM <- data.frame( frequency = frequency ,
                                      sigma_bs = rep( NA ,
                                                      length( frequency ) ) )
@@ -795,8 +795,8 @@ high_pass_stanton_initialize <- function( object ,
                         medium = medium_params ,
                         acoustics = acoustics )
   # Define object and model parameters =========================================
-  slot( object , "model_parameters" )$high_pass_stanton <- model_params
-  slot( object , "model" )$high_pass_stanton <- data.frame( frequency ,
+  methods::slot( object , "model_parameters" )$high_pass_stanton <- model_params
+  methods::slot( object , "model" )$high_pass_stanton <- data.frame( frequency ,
                                                             sigma_bs = rep( NA ,
                                                                             length( frequency ) ) )
   return( object )

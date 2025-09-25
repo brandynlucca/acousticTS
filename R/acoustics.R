@@ -122,7 +122,7 @@ kappa <- function( interface1 , interface2 ) {
 pois <- function( K = NULL , E = NULL , G = NULL ) {
   # Check inputs ===============================================================
   inputs <- list( K = K , E = E , G = G )
-  provided <- !sapply( inputs , is.null )
+  provided <- !vapply(inputs, is.null, logical( 1 ) )
   # Checksum ===================================================================
   if ( sum( provided ) < 2 ) {
     stop(
@@ -143,7 +143,7 @@ pois <- function( K = NULL , E = NULL , G = NULL ) {
 #' Calculate the bulk modulus (K).
 #' @description
 #' Calculate the bulk modulus (K) from two of the three other elastic
-#' moduli to calculate the Lam&eacute;s parameter. When more than two 
+#' moduli to calculate the Lam&eacute;'s parameter. When more than two 
 #' values are input, the function will default to using Young's (E) and shear 
 #' (G) moduli. This assumes that the input values represent 3D material 
 #' properties.
@@ -160,7 +160,7 @@ pois <- function( K = NULL , E = NULL , G = NULL ) {
 bulk <- function( E = NULL , G = NULL , nu = NULL ) {
   # Check inputs ===============================================================
   inputs <- list( E = E , G = G , nu = nu )
-  provided <- !sapply( inputs , is.null )
+  provided <- !vapply( inputs , is.null , logical( 1 ) )
   # Checksum ===================================================================
   if ( sum( provided ) < 2 ) {
     stop(
@@ -198,7 +198,7 @@ bulk <- function( E = NULL , G = NULL , nu = NULL ) {
 young <- function( K = NULL , G = NULL , nu = NULL ) {
   # Check inputs ===============================================================
   inputs <- list( K = K , G = G , nu = nu )
-  provided <- !sapply( inputs , is.null )
+  provided <- !vapply( inputs , is.null , logical( 1 ) )
   # Checksum ===================================================================
   if ( sum( provided ) < 2 ) {
     stop(
@@ -236,7 +236,7 @@ young <- function( K = NULL , G = NULL , nu = NULL ) {
 shear <- function( K = NULL , E = NULL , nu = NULL ) {
   # Check inputs ===============================================================
   inputs <- list( K = K , E = E , nu = nu )
-  provided <- !sapply( inputs , is.null )
+  provided <- !vapply( inputs , is.null , logical( 1 ) )
   # Checksum ===================================================================
   if ( sum( provided ) < 2 ) {
     stop(
@@ -271,10 +271,10 @@ shear <- function( K = NULL , E = NULL , nu = NULL ) {
 #' @keywords elastic
 #' @rdname lame
 #' @export
-lame <- function( K , E , G , nu ) {
+lame <- function( K = NULL , E = NULL , G = NULL , nu = NULL ) {
   # Check inputs ===============================================================
   inputs <- list( K = K , E = E , G = G , nu = nu )
-  provided <- !sapply( inputs , is.null )
+  provided <- !vapply( inputs , is.null , logical( 1 ) )
   # Checksum ===================================================================
   if ( sum( provided ) < 2 ) {
     stop(
@@ -330,7 +330,7 @@ target_strength <- function( object , frequency , model , verbose = FALSE , ... 
   
   # Handle model names (convert to uppercase for consistency) ==================
   model <- tolower( model )
-  ts_model <- gsub( "(_.*)" , "\\L\\1" , paste0( toupper( model ) ) , perl = T )
+  ts_model <- gsub( "(_.*)" , "\\L\\1" , paste0( toupper( model ) ) , perl = TRUE )
   ts_model <- ifelse( ts_model %in% c( "CALIBRATION" ,
                                        "HIGH_pass_stanton" ) , 
                       tolower( ts_model ) , 
@@ -361,8 +361,8 @@ target_strength <- function( object , frequency , model , verbose = FALSE , ... 
     object_copy <- do.call( model_name , true_args )
     
     # Store model parameters and results =====================================
-    slot( target_object , "model_parameters" )[ ts_model[ idx ] ] <- extract( object_copy , "model_parameters" )[ ts_model[ idx ] ]
-    slot( target_object , "model" )[ ts_model[ idx ] ] <- extract( object_copy , "model" )[ ts_model[ idx ] ]
+    methods::slot( target_object , "model_parameters" )[ ts_model[ idx ] ] <- extract( object_copy , "model_parameters" )[ ts_model[ idx ] ]
+    methods::slot( target_object , "model" )[ ts_model[ idx ] ] <- extract( object_copy , "model" )[ ts_model[ idx ] ]
     
     if( verbose ) {
       cat( toupper( model[ idx ] ) , "model for" , paste0( class( target_object ) , "-object: " ,
@@ -528,87 +528,85 @@ calculate_goodman_stern_boundary_matrices <- function( alpha , ka_matrix , m ) {
   A_template_0 <- matrix( 0 , nrow = 4 , ncol = 4 )
   A_template_m <- matrix( 0 , nrow = 6 , ncol = 6 )
   # Create the boundary condition matrices for each frequency and modal order ==
-  boundary_matrices <- lapply( 1 : ncol( ka_matrix ) , function( freq_idx ) {
-    lapply( 1 : length( m ) , function( m_idx ) {
-      
-      # Case: m == 0 ============================================================
-      if ( m[ m_idx ] == 0 ) {
-        # Apply reduced template ================================================
-        A_numerator <- A_template_0
-        
-        # Numerator =============================================================
-        A_numerator[ 1 , 1 : 3 ] <- c(
-          alpha$a1[ m_idx , freq_idx ] , alpha$a12[ m_idx , freq_idx ] , 
-          alpha$a14[ m_idx , freq_idx ] 
-        )
-        A_numerator[ 2 , 1 : 3 ] <- c(
-          alpha$a2[ m_idx , freq_idx ] , alpha$a22[ m_idx , freq_idx ] , 
-          alpha$a24[ m_idx , freq_idx ]        
-        )
-        A_numerator[ 3 , 2 : 4 ] <- c(
-          alpha$a42[ m_idx , freq_idx ] , alpha$a44[ m_idx , freq_idx ] , 
-          alpha$a46[ m_idx , freq_idx ]        
-        )
-        A_numerator[ 4 , 2 : 4 ] <- c(
-          alpha$a52[ m_idx , freq_idx ] , alpha$a54[ m_idx , freq_idx ] , 
-          alpha$a56[ m_idx , freq_idx ]        
-        )
-        
-        # Denominator ===========================================================
-        A_denominator <- A_numerator
-        A_denominator[ 1 : 2 , 1 ] <- c( 
-          alpha$a11[ m_idx , freq_idx ] , alpha$a21[ m_idx , freq_idx ]
-        )
-        
-        return( 
+  boundary_matrices <- lapply( 
+    seq_len( ncol( ka_matrix ) ) , function( freq_idx ) {
+      lapply( seq_along( m ) , function( m_idx ) {
+        # Case: m == 0 =========================================================
+        if ( m[ m_idx ] == 0 ) {
+          # Apply reduced template =============================================
+          A_numerator <- A_template_0
+          
+          # Numerator ==========================================================
+          A_numerator[ 1 , 1 : 3 ] <- c(
+            alpha$a1[ m_idx , freq_idx ] , alpha$a12[ m_idx , freq_idx ] , 
+            alpha$a14[ m_idx , freq_idx ] 
+          )
+          A_numerator[ 2 , 1 : 3 ] <- c(
+            alpha$a2[ m_idx , freq_idx ] , alpha$a22[ m_idx , freq_idx ] , 
+            alpha$a24[ m_idx , freq_idx ]        
+          )
+          A_numerator[ 3 , 2 : 4 ] <- c(
+            alpha$a42[ m_idx , freq_idx ] , alpha$a44[ m_idx , freq_idx ] , 
+            alpha$a46[ m_idx , freq_idx ]        
+          )
+          A_numerator[ 4 , 2 : 4 ] <- c(
+            alpha$a52[ m_idx , freq_idx ] , alpha$a54[ m_idx , freq_idx ] , 
+            alpha$a56[ m_idx , freq_idx ]        
+          )
+          
+          # Denominator ========================================================
+          A_denominator <- A_numerator
+          A_denominator[ 1 : 2 , 1 ] <- c( 
+            alpha$a11[ m_idx , freq_idx ] , alpha$a21[ m_idx , freq_idx ]
+          )
+          
           list( A_numerator = A_numerator , A_denominator = A_denominator ) 
-        )
-      } else {
-        # Apply reduced template ================================================
-        A_numerator <- A_template_m
-        
-        # Numerator =============================================================
-        A_numerator[ 1 , 1 : 5 ] <- c(
-          alpha$a1[ m_idx , freq_idx ] , alpha$a12[ m_idx , freq_idx ] ,
-          alpha$a13[ m_idx , freq_idx ] , alpha$a14[ m_idx , freq_idx ] ,
-          alpha$a15[ m_idx , freq_idx ]
-        )
-        A_numerator[ 2 , 1 : 5 ] <- c(
-          alpha$a2[ m_idx , freq_idx ] , alpha$a22[ m_idx , freq_idx ] ,
-          alpha$a23[ m_idx , freq_idx ] , alpha$a24[ m_idx , freq_idx ] ,
-          alpha$a25[ m_idx , freq_idx ]
-        )
-        A_numerator[ 3 , 2 : 5 ] <- c(
-          alpha$a32[ m_idx , freq_idx ] , alpha$a33[ m_idx , freq_idx ] ,
-          alpha$a34[ m_idx , freq_idx ] , alpha$a35[ m_idx , freq_idx ]
-        )
-        A_numerator[ 4 , 2 : 6 ] <- c(
-          alpha$a42[ m_idx , freq_idx ] , alpha$a43[ m_idx , freq_idx ] ,
-          alpha$a44[ m_idx , freq_idx ] , alpha$a45[ m_idx , freq_idx ] ,
-          alpha$a46[ m_idx , freq_idx ]
-        )
-        A_numerator[ 5 , 2 : 6 ] <- c(
-          alpha$a52[ m_idx , freq_idx ] , alpha$a53[ m_idx , freq_idx ] ,
-          alpha$a54[ m_idx , freq_idx ] , alpha$a55[ m_idx , freq_idx ] ,
-          alpha$a56[ m_idx , freq_idx ]
-        )
-        A_numerator[ 6 , 2 : 5 ] <- c(
-          alpha$a62[ m_idx , freq_idx ] , alpha$a63[ m_idx , freq_idx ] ,
-          alpha$a64[ m_idx , freq_idx ] , alpha$a65[ m_idx , freq_idx ]
-        )
-        
-        # Denominator ===========================================================
-        A_denominator <- A_numerator
-        A_denominator[ 1 : 2 , 1 ] <- c( 
-          alpha$a11[ m_idx , freq_idx ] , alpha$a21[ m_idx , freq_idx ]
-        )
-        
-        return( 
+        } else {
+          # Apply reduced template =============================================
+          A_numerator <- A_template_m
+          
+          # Numerator ==========================================================
+          A_numerator[ 1 , 1 : 5 ] <- c(
+            alpha$a1[ m_idx , freq_idx ] , alpha$a12[ m_idx , freq_idx ] ,
+            alpha$a13[ m_idx , freq_idx ] , alpha$a14[ m_idx , freq_idx ] ,
+            alpha$a15[ m_idx , freq_idx ]
+          )
+          A_numerator[ 2 , 1 : 5 ] <- c(
+            alpha$a2[ m_idx , freq_idx ] , alpha$a22[ m_idx , freq_idx ] ,
+            alpha$a23[ m_idx , freq_idx ] , alpha$a24[ m_idx , freq_idx ] ,
+            alpha$a25[ m_idx , freq_idx ]
+          )
+          A_numerator[ 3 , 2 : 5 ] <- c(
+            alpha$a32[ m_idx , freq_idx ] , alpha$a33[ m_idx , freq_idx ] ,
+            alpha$a34[ m_idx , freq_idx ] , alpha$a35[ m_idx , freq_idx ]
+          )
+          A_numerator[ 4 , 2 : 6 ] <- c(
+            alpha$a42[ m_idx , freq_idx ] , alpha$a43[ m_idx , freq_idx ] ,
+            alpha$a44[ m_idx , freq_idx ] , alpha$a45[ m_idx , freq_idx ] ,
+            alpha$a46[ m_idx , freq_idx ]
+          )
+          A_numerator[ 5 , 2 : 6 ] <- c(
+            alpha$a52[ m_idx , freq_idx ] , alpha$a53[ m_idx , freq_idx ] ,
+            alpha$a54[ m_idx , freq_idx ] , alpha$a55[ m_idx , freq_idx ] ,
+            alpha$a56[ m_idx , freq_idx ]
+          )
+          A_numerator[ 6 , 2 : 5 ] <- c(
+            alpha$a62[ m_idx , freq_idx ] , alpha$a63[ m_idx , freq_idx ] ,
+            alpha$a64[ m_idx , freq_idx ] , alpha$a65[ m_idx , freq_idx ]
+          )
+          
+          # Denominator ========================================================
+          A_denominator <- A_numerator
+          A_denominator[ 1 : 2 , 1 ] <- c( 
+            alpha$a11[ m_idx , freq_idx ] , alpha$a21[ m_idx , freq_idx ]
+          )
+          
           list( A_numerator = A_numerator , A_denominator = A_denominator ) 
-        )
+        }        
       }
-    } )
-  } )
+      )
+    }
+  )
   
   return( boundary_matrices )
 }
