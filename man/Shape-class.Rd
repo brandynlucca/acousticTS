@@ -22,4 +22,4 @@ the body shape}
 }}
 
 \keyword{internal}
-\keyword{shapes,}
+\keyword{shapes}

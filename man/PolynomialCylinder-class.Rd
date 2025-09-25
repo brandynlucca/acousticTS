@@ -12,4 +12,4 @@ Cylindrical body shape deformed using a polynomial
 \code{\link{Shape}}
 }
 \keyword{internal}
-\keyword{shapes,}
+\keyword{shapes}

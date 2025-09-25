@@ -12,4 +12,4 @@ Arbitrary body shape
 \code{\link{Shape}}
 }
 \keyword{internal}
-\keyword{shapes,}
+\keyword{shapes}

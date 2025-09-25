@@ -14,8 +14,8 @@
   height_bladder = NA,
   radius_body = NA,
   bladder_inflation_factor = 1,
-  isometric_body = T,
-  isometric_bladder = T,
+  isometric_body = TRUE,
+  isometric_bladder = TRUE,
   n_segments_body = NA,
   n_segments_bladder = NA
 )

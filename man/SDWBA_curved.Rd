@@ -4,7 +4,7 @@
 \alias{SDWBA_curved}
 \title{Calculates the theoretical TS of a fluid-like scatterer at a given frequency
 using the stochastic distorted Born wave approximation (DWBA) model using
-Eq. (6) froom Stanton et al. (1998).}
+Eq. (6) from Stanton et al. (1998).}
 \usage{
 SDWBA_curved(object)
 }
@@ -14,7 +14,7 @@ SDWBA_curved(object)
 \description{
 Calculates the theoretical TS of a fluid-like scatterer at a given frequency
 using the stochastic distorted Born wave approximation (DWBA) model using
-Eq. (6) froom Stanton et al. (1998).
+Eq. (6) from Stanton et al. (1998).
 }
 \references{
 Stanton, T.K., Chu, D., and Wiebe, P.H. 1998. Sound scattering by several

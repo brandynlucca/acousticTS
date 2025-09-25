@@ -1,6 +1,6 @@
 Package: acousticTS
-Title: Estimating acoustic target strength via physics-based scattering
-    models
+Title: Estimating Acoustic Target Strength via Physics-Based Scattering
+    Models
 Version: 1.0.1
 Authors@R: 
     person("Brandyn", "Lucca", , "brandyn.lucca@gmail.com", role = c("aut", "cre"),
@@ -16,7 +16,7 @@ Description: Acoustic target strength (TS) represents the intensity of an
     One way to estimate TS is to use physics-based models to calculate
     theoretical TS that comprise exact and approximate solutions as well
     as analytical approaches. The models provided can help provide TS
-    estimates over broad statistical distirbutions of model parameters.
+    estimates over broad statistical distributions of model parameters.
 License: GPL-3 | file LICENSE
 Encoding: UTF-8
 Language: en
@@ -52,3 +52,4 @@ Imports:
     pbapply,
     stats
 URL: https://brandynlucca.github.io/acousticTS/
+BugReports: https://github.com/brandynlucca/acousticTS/issues
