@@ -258,7 +258,7 @@ sphere_steel <- target_strength(object = sphere_steel,
                                 model = "calibration")
 ts_mods_steel<- extract(sphere_steel, "model")$calibration
 # Plot each and compare
-par(ask = F,
+par(ask = FALSE,
     oma = c(1, 1, 1, 0),
     mar = c(3, 4.5, 1, 2))
 plot(x = ts_mods_WC$frequency*1e-3, 
