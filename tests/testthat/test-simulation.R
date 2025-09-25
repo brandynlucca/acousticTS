@@ -157,7 +157,7 @@ test_that("simulate_ts works with generating functions", {
   
   # Parameters with a generating function
   parameters <- list(
-    length = function() rnorm(1, mean = 40e-3, sd = 5e-3)
+    length = function() stats::rnorm(1, mean = 40e-3, sd = 5e-3)
   )
   
   # Run simulation

@@ -2,7 +2,7 @@ test_that("Compare calibration sphere model output at 38, 70, 120, and 200 kHz",
   library( acousticTS )
   cal_sphere <- acousticTS::cal_generate( )
   # Class check
-  expect_true(is(cal_sphere, "CAL"))
+  expect_true(methods::is(cal_sphere, "CAL"))
   # Parameterize model
   frequency <- c(38e3, 70e3, 120e3, 200e3)
   # Calculate TS; update original CAL object
@@ -14,7 +14,7 @@ test_that("Compare calibration sphere model output at 38, 70, 120, and 200 kHz",
                                                  frequency = frequency,
                                                  model = "calibration")
   # Class check
-  expect_true(is(cal_sphere_copy, "CAL"))
+  expect_true(methods::is(cal_sphere_copy, "CAL"))
   # Extract model results
   model_results <- acousticTS::extract(cal_sphere , "model")$calibration$TS
   model_results2 <- acousticTS::extract(cal_sphere_copy , "model")$calibration$TS

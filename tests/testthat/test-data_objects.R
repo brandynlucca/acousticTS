@@ -1,3 +1,5 @@
+# attachment::exclude()
+
 test_that("Data objects can be loaded and are of expected class types", {
   library(acousticTS)
   
