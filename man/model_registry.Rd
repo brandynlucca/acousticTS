@@ -3,7 +3,7 @@
 \docType{data}
 \name{model_registry}
 \alias{model_registry}
-\title{Model registry: maps model names to their functions}
+\title{Model registry: maps model names to their functions and related initializers}
 \format{
 An object of class \code{list} of length 10.
 }
@@ -11,6 +11,6 @@ An object of class \code{list} of length 10.
 model_registry
 }
 \description{
-Model registry: maps model names to their functions
+Model registry: maps model names to their functions and related initializers
 }
 \keyword{datasets}

@@ -26,7 +26,6 @@ Creates the position vector for a polynomial deformed cylinder.
 Creates a polynomial deformed cylinder
 }
 \examples{
-\dontrun{
 # We can use the polynomial coefficients defined in Smith et al. (2013) to
 # define the position vector of a sub-Arctic krill.
 poly_vec <- c(0.83, 0.36, -2.10, -1.20, 0.63, 0.82, 0.64)
@@ -37,7 +36,6 @@ pos <- polynomial_cylinder(
   polynomial = poly_vec
 )
 str(pos)
-}
 }
 \references{
 Smith, J.N., Ressler, P.H., and Warren, J.D. 2013. A distorted wave Born
