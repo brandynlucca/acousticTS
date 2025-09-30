@@ -14,43 +14,44 @@
 #' zooplankton groups. II. Scattering models. Journal of the Acoustical Society
 #' of America, 103(1), 236-253.
 #' @export
-DCM <- function( object ) {
+DCM <- function(object) {
   # Extract model parameters/inputs ============================================
-  model <- acousticTS::extract( object , "model_parameters" )$DCM
-  body <- acousticTS::extract( object , "body" )
+  model <- acousticTS::extract(object, "model_parameters")$DCM
+  body <- acousticTS::extract(object, "body")
   body$density <- model$medium$density * body$g
   body$sound_speed <- model$medium$sound_speed * body$h
   # Multiply acoustic wavenumber by body radius ================================
   k1a <- model$parameters$acoustics$k_sw * model$body$radius
-  k2a <- model$parameters$acoustics$k_b *model$ body$radius
+  k2a <- model$parameters$acoustics$k_b * model$ body$radius
   # Calculate Reflection Coefficient ===========================================
-  R12 <- acousticTS::reflection_coefficient( model$medium , body )
+  R12 <- acousticTS::reflection_coefficient(model$medium, body)
   # Calculate Transmission Coefficients ========================================
-  T12 <- 1 - R12 ; T21 <- 1 + R12
+  T12 <- 1 - R12
+  T21 <- 1 + R12
   # Calculate phase shift term for the ray model ===============================
-  mu <- ( -pi / 2 * k1a ) / ( k1a + 0.4 )
+  mu <- (-pi / 2 * k1a) / (k1a + 0.4)
   # Calculate Interference Term between echoes from front/back interfaces ======
-  I0 <- 1 - T12 * T21 * base::exp( 4i * k2a ) * base::exp( 1i * mu * k1a )
+  I0 <- 1 - T12 * T21 * base::exp(4i * k2a) * base::exp(1i * mu * k1a)
   # Calculate half-width of directivity pattern ================================
-  w12 <- base::sqrt( model$body$radius_curvature * model$body$radius)
+  w12 <- base::sqrt(model$body$radius_curvature * model$body$radius)
   # Apply shift to orientation required for this model =========================
   theta_shift <- body$theta - pi / 2
   # Calculate Taylor expansion of directivity function =========================
-  D_theta <- base::exp( - model$body$alpha_B *
-                          ( 2 * theta_shift * model$body$radius_curvature /
-                              model$body$length ) ^ 2 )
+  D_theta <- base::exp(-model$body$alpha_B *
+                         (2 * theta_shift * model$body$radius_curvature /
+                            model$body$length)^2)
   # Calculate linear backscatter function, f_bs ================================
-  f_bs <- 0.5 * w12 * R12 * base::exp( - 2i * k1a ) * I0 * D_theta
+  f_bs <- 0.5 * w12 * R12 * base::exp(-2i * k1a) * I0 * D_theta
   # Update scatterer object ====================================================
-  methods::slot( object, "model" )$DCM <- base::data.frame(
-    frequency = model$parameters$acoustics$frequency ,
-    ka = k1a ,
-    f_bs = f_bs ,
-    sigma_bs = base::abs( f_bs ) ^ 2 ,
-    TS = 10 * base::log10( base::abs( f_bs ) ^ 2 )
+  methods::slot(object, "model")$DCM <- base::data.frame(
+    frequency = model$parameters$acoustics$frequency,
+    ka = k1a,
+    f_bs = f_bs,
+    sigma_bs = base::abs(f_bs)^2,
+    TS = 10 * base::log10(base::abs(f_bs)^2)
   )
   # Return object ==============================================================
-  return( object )
+  object
 }
 #' Calculates the theoretical TS of a fluid-like scatterer at a given frequency
 #' using the distorted Born wave approximation (DWBA) model.
@@ -64,80 +65,87 @@ DCM <- function( object ) {
 #' target strengths of krill: effects of phase variability on the distorted-wave
 #' Born approximation. ICES J. Mar. Sci., 60: 429-434.
 #' @export
-DWBA <- function( object ) {
+DWBA <- function(object) {
   # Extract model parameters/inputs ============================================
-  model <- acousticTS::extract( object , "model_parameters" )$DWBA
-  body <- acousticTS::extract( object , "body" )
+  model <- acousticTS::extract(object, "model_parameters")$DWBA
+  body <- acousticTS::extract(object, "body")
   theta <- body$theta
-  r0 <- body$rpos[ 1 : 3 , ]
+  r0 <- body$rpos[1:3, ]
   # Material properties calculation ============================================
-  g <- body$g ; h <- body$h
-  R <- 1 / ( g * h * h ) + 1 / g - 2
+  g <- body$g
+  h <- body$h
+  R <- 1 / (g * h * h) + 1 / g - 2
   # Calculate rotation matrix and update wavenumber matrix =====================
-  rotation_matrix <- matrix( c( cos( theta ) ,
-                                0.0 ,
-                                sin( theta ) ) ,
-                             1 )
+  rotation_matrix <- matrix(
+    c(
+      cos(theta),
+      0.0,
+      sin(theta)
+    ),
+    1
+  )
   k_sw_rot <- model$parameters$acoustics$k_sw %*% rotation_matrix
   # Calculate Euclidean norms ==================================================
-  k_sw_norm <- acousticTS::vecnorm( k_sw_rot )
+  k_sw_norm <- acousticTS::vecnorm(k_sw_rot)
   # Update position matrices  ==================================================
-  rpos <- rbind( r0 , a = model$body$radius )
+  rpos <- rbind(r0, a = model$body$radius)
   # Calculate position matrix lags  ============================================
-  rpos_diff <- t.default( diff( t.default( rpos ) ) )
+  rpos_diff <- t(diff(t(rpos)))
   # Multiply wavenumber and body matrices ======================================
   rpos_diff_k <- t(
     vapply(
-      X = seq_along( k_sw_norm ) ,
-      FUN = function( x ) {
-        colSums( rpos_diff[ 1 : 3 , ] * k_sw_rot[ x , ] )
+      X = seq_along(k_sw_norm),
+      FUN = function(x) {
+        colSums(rpos_diff[1:3, ] * k_sw_rot[x, ])
       },
-      FUN.VALUE = numeric( ncol( rpos_diff ) )
+      FUN.VALUE = numeric(ncol(rpos_diff))
     )
   )
   # Calculate Euclidean norms ==================================================
-  rpos_diff_norm <- sqrt( colSums( rpos_diff[ 1 : 3 , ] * rpos_diff[ 1 : 3 , ] ) )
+  rpos_diff_norm <- sqrt(colSums(rpos_diff[1:3, ] * rpos_diff[1:3, ]))
   # Estimate angles between body cylinders =====================================
-  alpha <- acos( rpos_diff_k / ( k_sw_norm %*% t( rpos_diff_norm ) ) )
-  beta <- abs( alpha - pi / 2 )
+  alpha <- acos(rpos_diff_k / (k_sw_norm %*% t(rpos_diff_norm)))
+  beta <- abs(alpha - pi / 2)
   # Define integrand ===========================================================
-  integrand <- function( s , x ) {
-    rint_mat <- s * rpos_diff + rpos[ , 1 : ncol( rpos_diff ) ]
-    rint_k1_h_mat <- k_sw_rot[ x , ] %*% rint_mat[ 1 : 3 , ] / h
-    bessel <- jc( 1 , 2 * ( k_sw_norm[ x ] * rint_mat[ 4 , ] / h *
-                              cos( beta[ x , ] ) ) ) / cos( beta[ x , ] )
-    fb_a <- k_sw_norm[ x ] / 4 * R * rint_mat[ 4 , ] * 
-      exp( 2i * rint_k1_h_mat ) * bessel * rpos_diff_norm
-    return( sum( fb_a , na.rm = TRUE ) )
+  integrand <- function(s, x) {
+    rint_mat <- s * rpos_diff + rpos[, seq_len(ncol(rpos_diff))]
+    rint_k1_h_mat <- k_sw_rot[x, ] %*% rint_mat[1:3, ] / h
+    bessel <- jc(1, 2 * (k_sw_norm[x] * rint_mat[4, ] / h * 
+                           cos(beta[x, ]))) / cos(beta[x, ])
+    fb_a <- k_sw_norm[x] / 4 * R * rint_mat[4, ] * 
+      exp(2i * rint_k1_h_mat) * bessel * rpos_diff_norm
+    sum(fb_a, na.rm = TRUE)
   }
   # Vectorize integrand function ===============================================
-  integrand_vec <- Vectorize( integrand )
+  integrand_vec <- Vectorize(integrand)
   # Calculate linear scatter response ==========================================
-  f_bs <- rep( NA , length( k_sw_norm ) )
-  f_bs <- vapply( 
-    seq_along( k_sw_norm ) ,
-    FUN = function( x ) {
+  f_bs <- rep(NA, length(k_sw_norm))
+  f_bs <- vapply(
+    seq_along(k_sw_norm),
+    FUN = function(x) {
       # Real ===================================================================
-      Ri <- stats::integrate( function( s ) {
-        Re( integrand_vec( s , x ) ) } , 0 , 1 )$value
+      Ri <- stats::integrate(function(s) {
+        Re(integrand_vec(s, x))
+      }, 0, 1)$value
       # Real ===================================================================
-      Ii <- stats::integrate( function( s ) {
-        Im( integrand_vec( s , x ) ) } , 0 , 1 )$value
+      Ii <- stats::integrate(function(s) {
+        Im(integrand_vec(s, x))
+      }, 0, 1)$value
       # Return =================================================================
-      sqrt( Ri ^ 2 +  Ii ^ 2 )
-      } ,
-    FUN.VALUE = numeric( 1 )
+      sqrt(Ri^2 + Ii^2)
+    },
+    FUN.VALUE = numeric(1)
   )
   # Update scatterer object ====================================================
-  methods::slot( object, "model" )$DWBA <- data.frame(
-    frequency = model$parameters$acoustics$frequency ,
-    ka = model$parameters$acoustics$k_sw * stats::median( model$body$radius ) ,
-    f_bs = f_bs ,
-    sigma_bs = abs( f_bs ) * abs( f_bs ) ,
-    TS = 10 * log10( abs( f_bs ) * abs( f_bs ) )
+  methods::slot(object, "model")$DWBA <- data.frame(
+    frequency = model$parameters$acoustics$frequency,
+    ka = model$parameters$acoustics$k_sw * stats::median(model$body$radius),
+    f_bs = f_bs,
+    sigma_bs = abs(f_bs) * abs(f_bs),
+    TS = 10 * log10(abs(f_bs) * abs(f_bs))
   )
   # Return object ==============================================================
-  return( object )
+  object
 }
 #' Calculates the theoretical TS of a fluid-like scatterer at a given frequency
 #' using the distorted Born wave approximation (DWBA) model.
@@ -151,73 +159,84 @@ DWBA <- function( object ) {
 #' target strengths of krill: effects of phase variability on the distorted-wave
 #' Born approximation. ICES J. Mar. Sci., 60: 429-434.
 #' @export
-DWBA_curved <- function( object ) {
+DWBA_curved <- function(object) {
   # Extract model parameters/inputs ============================================
-  model <- acousticTS::extract( object , "model_parameters" )$DWBA_curved
-  body <- acousticTS::extract( object , "body" )
+  model <- acousticTS::extract(object, "model_parameters")$DWBA_curved
+  body <- acousticTS::extract(object, "body")
   # Parse position matrices ====================================================
-  r0 <- model$body$rpos[ 1 : 3 , ]
+  r0 <- model$body$rpos[1:3, ]
   theta <- model$body$theta
   # Material properties calculation ============================================
-  g <- body$g ; h <- body$h
-  R <- 1 / ( g * h * h ) + 1 / g - 2
+  g <- body$g
+  h <- body$h
+  R <- 1 / (g * h * h) + 1 / g - 2
   # Calculate rotation matrix and update wavenumber matrix =====================
-  rotation_matrix <- matrix( c( cos( theta ) ,
-                                0.0 ,
-                                sin( theta ) ) ,
-                              1 )
+  rotation_matrix <- matrix(
+    c(
+      cos(theta),
+      0.0,
+      sin(theta)
+    ),
+    1
+  )
   k_sw_rot <- model$parameters$acoustics$k_sw %*% rotation_matrix
   # Calculate Euclidean norms ==================================================
-  k_sw_norm <- acousticTS::vecnorm( k_sw_rot )
+  k_sw_norm <- acousticTS::vecnorm(k_sw_rot)
   # Update position matrices  ==================================================
-  rpos <- rbind( r0 , a = model$body$radius )
+  rpos <- rbind(r0, a = model$body$radius)
   # Calculate position matrix lags  ============================================
-  rpos_diff <- t( diff( t( rpos ) ) )
+  rpos_diff <- t(diff(t(rpos)))
   # Multiply wavenumber and body matrices ======================================
-  rpos_diff_k <- t( sapply( 1 : length( k_sw_norm ) ,
-                            FUN = function( x ) {
-                              colSums( rpos_diff[ 1 : 3 , ] *
-                                         k_sw_rot[ x , ] )
-                              } ) )
+  rpos_diff_k <- t(vapply(seq_along(k_sw_norm),
+    FUN = function(x) {
+      colSums(rpos_diff[1:3, ] * k_sw_rot[x, ])
+    },
+    FUN.VALUE = numeric(ncol(rpos_diff))
+  ))
   # Calculate Euclidean norms ==================================================
-  rpos_diff_norm <- sqrt( colSums( rpos_diff[ 1 : 3 , ] * rpos_diff[ 1 : 3 , ] ) )
+  rpos_diff_norm <- sqrt(colSums(rpos_diff[1:3, ] * rpos_diff[1:3, ]))
   # Estimate angles between body cylinders =====================================
-  alpha <- acos( rpos_diff_k / ( k_sw_norm %*% t( rpos_diff_norm ) ) )
-  beta <- abs( alpha - pi / 2 )
+  alpha <- acos(rpos_diff_k / (k_sw_norm %*% t(rpos_diff_norm)))
+  beta <- abs(alpha - pi / 2)
   # Define integrand ===========================================================
-  integrand <- function( s , x ) {
-    rint_mat <- s * rpos_diff + rpos[ , 1 : ncol( rpos_diff ) ]
-    rint_k1_h_mat <- k_sw_rot[ x , ] %*% rint_mat[ 1 : 3 , ] / h
-    bessel <- jc( 1 , 2 * ( k_sw_norm[ x ] * rint_mat[ 4 , ] / h *
-                              cos( beta[ x , ] ) ) ) / cos( beta[ x , ] )
-    fb_a <- k_sw_norm[ x ] / 4 * R * rint_mat[ 4 , ] *
-      exp( 2i * rint_k1_h_mat ) * bessel * rpos_diff_norm
-    return( sum( fb_a , na.rm = TRUE ) )
+  integrand <- function(s, x) {
+    rint_mat <- s * rpos_diff + rpos[, seq_len(ncol(rpos_diff))]
+    rint_k1_h_mat <- k_sw_rot[x, ] %*% rint_mat[1:3, ] / h
+    bessel <- jc(1, 2 * (k_sw_norm[x] * rint_mat[4, ] / h * 
+                           cos(beta[x, ]))) / cos(beta[x, ])
+    fb_a <- k_sw_norm[x] / 4 * R * rint_mat[4, ] *
+      exp(2i * rint_k1_h_mat) * bessel * rpos_diff_norm
+    sum(fb_a, na.rm = TRUE)
   }
   # Vectorize integrand function ===============================================
-  integrand_vec <- Vectorize( integrand )
+  integrand_vec <- Vectorize(integrand)
   # Calculate linear scatter response ==========================================
-  f_bs <- rep( NA , length( k_sw_norm ) )
-  f_bs <- sapply( 1 : length( k_sw_norm ) ,
-                  FUN = function( x ) {
-                    # Real ===============================================
-                    Ri <- stats::integrate( function( s ) {
-                      Re( integrand_vec( s , x ) ) } , 0 , 1 )$value
-                    # Real ===============================================
-                    Ii <- stats::integrate( function( s ) {
-                      Im( integrand_vec( s , x ) ) } , 0 , 1 )$value
-                    # Return =============================================
-                    return( sqrt( Ri ^ 2 +  Ii ^ 2 ) ) } )
+  f_bs <- rep(NA, length(k_sw_norm))
+  f_bs <- vapply(seq_along(k_sw_norm),
+    FUN = function(x) {
+      # Real ===============================================
+      Ri <- stats::integrate(function(s) {
+        Re(integrand_vec(s, x))
+      }, 0, 1)$value
+      # Real ===============================================
+      Ii <- stats::integrate(function(s) {
+        Im(integrand_vec(s, x))
+      }, 0, 1)$value
+      # Return =============================================
+      sqrt(Ri^2 + Ii^2)
+    },
+    FUN.VALUE = numeric(1)
+  )
   # Update scatterer object ====================================================
-  methods::slot( object, "model" )$DWBA_curved <- data.frame(
-    frequency = model$parameters$acoustics$frequency ,
-    ka = model$parameters$acoustics$k_sw * stats::median( model$body$radius ) ,
-    f_bs = f_bs ,
-    sigma_bs = abs( f_bs ) * abs( f_bs ) ,
-    TS = 10 * log10( abs( f_bs ) * abs( f_bs ) )
+  methods::slot(object, "model")$DWBA_curved <- data.frame(
+    frequency = model$parameters$acoustics$frequency,
+    ka = model$parameters$acoustics$k_sw * stats::median(model$body$radius),
+    f_bs = f_bs,
+    sigma_bs = abs(f_bs) * abs(f_bs),
+    TS = 10 * log10(abs(f_bs) * abs(f_bs))
   )
   # Return object ==============================================================
-  return( object )
+  object
 }
 #' Calculates the theoretical TS of a fluid-like scatterer at a given frequency
 #' using the stochastic distorted Born wave approximation (DWBA) model.
@@ -228,110 +247,129 @@ DWBA_curved <- function( object ) {
 #' target strengths of krill: effects of phase variability on the distorted-wave
 #' Born approximation. ICES J. Mar. Sci., 60: 429-434.
 #' @export
-SDWBA <- function( object ) {
+SDWBA <- function(object) {
   # Extract model parameters/inputs ============================================
-  model <- acousticTS::extract( object , "model_parameters" )$SDWBA
-  body <- acousticTS::extract( object , "body" )
+  model <- acousticTS::extract(object, "model_parameters")$SDWBA
+  body <- acousticTS::extract(object, "body")
   theta <- body$theta
   # Material properties calculation ============================================
-  g <- body$g ; h <- body$h
-  R <- 1 / ( g * h * h ) + 1 / g - 2
+  g <- body$g
+  h <- body$h
+  R <- 1 / (g * h * h) + 1 / g - 2
   # Calculate rotation matrix and update wavenumber matrix =====================
-  rotation_matrix <- matrix( c( cos( theta ) ,
-                                0.0 ,
-                                sin( theta ) ) ,
-                             1 )
-  SDWBA_resampled <- function( i ) {
+  rotation_matrix <- matrix(
+    c(
+      cos(theta),
+      0.0,
+      sin(theta)
+    ),
+    1
+  )
+  SDWBA_resampled <- function(i) {
     # Parse phase-specific parameters ==========================================
-    sub_params <- model$parameters[[ i ]]
+    sub_params <- model$parameters[[i]]
     # Calculate rotation matrix and update wavenumber matrix ===================
     k_sw_rot <- sub_params$acoustics$k_sw %*% rotation_matrix
     # Calculate Euclidean norms ================================================
-    k_sw_norm <- vecnorm( k_sw_rot )
+    k_sw_norm <- vecnorm(k_sw_rot)
     # Update position matrices  ================================================
-    r0 <- rbind( sub_params$body_params$rpos[ 1 : 3 , ] , 
-                 sub_params$body_params$radius )
+    r0 <- rbind(
+      sub_params$body_params$rpos[1:3, ],
+      sub_params$body_params$radius
+    )
     # Calculate position matrix lags  ==========================================
-    r0_diff <- t( diff( t( r0 ) ) )
+    r0_diff <- t(diff(t(r0)))
     # Multiply wavenumber and body matrices ====================================
-    r0_diff_k <- t( sapply( 1 : length( k_sw_norm ) ,
-                            FUN = function( x ) {
-                              colSums( r0_diff[ 1 : 3 , ] *
-                                         k_sw_rot[ x , ] )
-                              } ) )
+    r0_diff_k <- t(vapply(seq_along(k_sw_norm),
+      FUN = function(x) {
+        colSums(r0_diff[1:3, ] *
+                  k_sw_rot[x, ])
+      },
+      FUN.VALUE = numeric(ncol(r0_diff))
+    ))
     # Calculate Euclidean norms ================================================
-    r0_diff_norm <- sqrt( colSums( r0_diff[ 1 : 3 , ] * r0_diff[ 1 : 3 , ] ) )
+    r0_diff_norm <- sqrt(colSums(r0_diff[1:3, ] * r0_diff[1:3, ]))
     # Estimate angles between body cylinders ===================================
-    alpha <- acos( r0_diff_k / ( k_sw_norm %*% t( r0_diff_norm ) ) )
-    beta <- abs( alpha - pi / 2 )
+    alpha <- acos(r0_diff_k / (k_sw_norm %*% t(r0_diff_norm)))
+    beta <- abs(alpha - pi / 2)
     # Call in metrics ==========================================================
-    phase_sd <- sub_params$meta_params$p0 
+    phase_sd <- sub_params$meta_params$phase_sd
     # r0_diff_h <- r0_diff / h
     # r0_h <- r0 / h
     # Define integrand =========================================================
-    integrand <- function( s , x , y ) {
-    # integrand <- function( s , x ) {
+    integrand <- function(s, x, y) {
+      # integrand <- function( s , x ) {
       # rint_mat <- s * r0_diff_h[ , y ] + r0_h[ , y ]
-      rint_mat <- s * r0_diff[ , y ] + r0[ , y ]
+      rint_mat <- s * r0_diff[, y] + r0[, y]
       # rint_k1_h_mat <- k_sw_rot[ x , ] %*% rint_mat[ 1 : 3 ]
-      rint_k1_h_mat <- k_sw_rot[ x , ] %*% rint_mat[ 1 : 3 ] / h
-      bessel <- jc( 1 , 2 * ( k_sw_norm[ x ] * rint_mat[ 4 ] / h *
-                                cos( beta[ x , y ] ) ) ) / cos( beta[ x , y ] )
+      rint_k1_h_mat <- k_sw_rot[x, ] %*% rint_mat[1:3] / h
+      bessel <- jc(1, 2 * (k_sw_norm[x] * rint_mat[4] / h * 
+                             cos(beta[x, y]))) / cos(beta[x, y])
       # bessel <- jc( 1 , 2 * ( k_sw_norm[ x ] * rint_mat[ 4 ] *
       #                           cos( beta[ x , y ] ) ) ) / cos( beta[ x , y] )
       # fb_a <- k_sw_norm[ x ] / 4 * R * rint_mat[ 4 ] * h *
       #   exp( 2i * rint_k1_h_mat ) * bessel[y] * r0_diff_norm[ y ]
-      fb_a <- k_sw_norm[ x ] / 4 * R * rint_mat[ 4 ] * 
-        exp( 2i * rint_k1_h_mat ) * bessel * r0_diff_norm[ y ] 
-      return( sum( fb_a , na.rm = TRUE) )
-    } 
+      fb_a <- k_sw_norm[x] / 4 * R * rint_mat[4] *
+        exp(2i * rint_k1_h_mat) * bessel * r0_diff_norm[y]
+      sum(fb_a, na.rm = TRUE)
+    }
     # Vectorize integrand function =============================================
-    integrand_vectorized <- Vectorize( integrand )
-    stochastic_TS <- function( n_k , n_segments , n_iterations ) {
-      phase_cyl <- sapply( 1 : n_k , 
-                           FUN = function( x ) {
-                             cyl_phase <- array(
-                               sapply( 1 : n_segments ,
-                                       FUN = function( y ) {
-                                         phase_integrate( x , y ,
-                                                          n_iterations ,
-                                                          integrand_vectorized ,
-                                                          phase_sd )
-                                         }
-                                       ),
-                               dim = c( n_iterations , n_segments )
-                               )
-                             cyl_sum_phase <- rowSums( cyl_phase , na.rm = TRUE )
-                             cyl_sum_phase
-                             }
-                           )
-      phase_cyl <- array( phase_cyl , dim = c( n_iterations , n_k ) )
-      data.frame( f_bs = colMeans( phase_cyl ) ,
-                  sigma_bs = colMeans( sigma_bs( phase_cyl ) ) ,
-                  TS_mean = db( colMeans( sigma_bs( phase_cyl ) ) ) ,
-                  TS_sd = db( apply( sigma_bs( phase_cyl ) , 2 , stats::sd ) ) )
+    integrand_vectorized <- Vectorize(integrand)
+    stochastic_TS <- function(n_k, n_segments, n_iterations) {
+      phase_cyl <- vapply(seq_len(n_k),
+        FUN = function(x) {
+          cyl_phase <- array(
+            vapply(seq_len(n_segments),
+              FUN = function(y) {
+                phase_integrate(
+                  x, y,
+                  n_iterations,
+                  integrand_vectorized,
+                  phase_sd
+                )
+              },
+              FUN.VALUE = complex(n_iterations)
+            ),
+            dim = c(n_iterations, n_segments)
+          )
+          cyl_sum_phase <- rowSums(cyl_phase, na.rm = TRUE)
+          cyl_sum_phase
+        },
+        FUN.VALUE = complex(n_iterations)
+      )
+      phase_cyl <- array(phase_cyl, dim = c(n_iterations, n_k))
+      data.frame(
+        f_bs = colMeans(phase_cyl),
+        sigma_bs = colMeans(sigma_bs(phase_cyl)),
+        TS_mean = db(colMeans(sigma_bs(phase_cyl))),
+        TS_sd = db(apply(sigma_bs(phase_cyl), 2, stats::sd))
+      )
     }
     # Calculate linear scatter response ========================================
-    backscatter_df <- stochastic_TS( n_k = length( k_sw_norm ) , 
-                                     n_segments = sub_params$n_segments - 1 , 
-                                     n_iterations = sub_params$meta_params$n_iterations )
-    return( backscatter_df )
+    backscatter_df <- stochastic_TS(
+      n_k = length(k_sw_norm),
+      n_segments = sub_params$n_segments - 1,
+      n_iterations = sub_params$meta_params$n_iterations
+    )
+    backscatter_df
   }
   # Generate results dataframe by collating resampled results ==================
-  results <- do.call( "rbind" ,
-                      lapply( 1 : length( model$parameters ) ,
-                              FUN = function( i ) SDWBA_resampled( i )
-                      ) )
+  results <- do.call(
+    "rbind",
+    lapply(seq_along(model$parameters),
+      FUN = function(i) SDWBA_resampled(i)
+    )
+  )
   # Update scatterer object ====================================================
-  methods::slot( object , "model" )$SDWBA$f_bs <- results$f_bs
-  methods::slot( object , "model" )$SDWBA$sigma_bs <- results$sigma_bs
-  methods::slot( object , "model" )$SDWBA$TS <- results$TS_mean
-  methods::slot( object , "model" )$SDWBA$TS_sd <- results$TS_sd
+  methods::slot(object, "model")$SDWBA$f_bs <- results$f_bs
+  methods::slot(object, "model")$SDWBA$sigma_bs <- results$sigma_bs
+  methods::slot(object, "model")$SDWBA$TS <- results$TS_mean
+  methods::slot(object, "model")$SDWBA$TS_sd <- results$TS_sd
   # Return object ==============================================================
-  return( object )
+  object
 }
 #' Calculates the theoretical TS of a fluid-like scatterer at a given frequency
-#' using the stochastic distorted Born wave approximation (DWBA) model using 
+#' using the stochastic distorted Born wave approximation (DWBA) model using
 #' Eq. (6) from Stanton et al. (1998).
 #' @param object FLS-class scatterer.
 #' @references
@@ -339,103 +377,120 @@ SDWBA <- function( object ) {
 #' zooplankton groups. II. Scattering models. J. Acoust. Soc. Am., 103, 236-253.
 #' @rdname SDWBA_curved
 #' @export
-SDWBA_curved <- function( object ) {
+SDWBA_curved <- function(object) {
   # Extract model parameters/inputs ============================================
-  model <- acousticTS::extract( object , "model_parameters" )$SDWBA_curved
-  body <- acousticTS::extract( object , "body" )
+  model <- acousticTS::extract(object, "model_parameters")$SDWBA_curved
+  body <- acousticTS::extract(object, "body")
   # Parse position matrices ====================================================
   theta <- model$body$theta
   # Material properties calculation ============================================
-  g <- body$g ; h <- body$h
-  R <- 1 / ( g * h * h ) + 1 / g - 2
+  g <- body$g
+  h <- body$h
+  R <- 1 / (g * h * h) + 1 / g - 2
   # Calculate rotation matrix and update wavenumber matrix =====================
-  rotation_matrix <- matrix( c( cos( theta ) ,
-                                0.0 ,
-                                sin( theta ) ) ,
-                             1 )
-  SDWBA_resampled_c <- function( i ) {
+  rotation_matrix <- matrix(
+    c(
+      cos(theta),
+      0.0,
+      sin(theta)
+    ),
+    1
+  )
+  SDWBA_resampled_c <- function(i) {
     # Parse phase-specific parameters ==========================================
-    sub_params <- model$parameters[[ i ]]
+    sub_params <- model$parameters[[i]]
     # Calculate rotation matrix and update wavenumber matrix ===================
     k_sw_rot <- sub_params$acoustics$k_sw %*% rotation_matrix
     # Calculate Euclidean norms ================================================
-    k_sw_norm <- vecnorm( k_sw_rot )
+    k_sw_norm <- vecnorm(k_sw_rot)
     # Update position matrices  ================================================
-    r0 <- rbind( sub_params$body_params$rpos[ 1 : 3 , ] , 
-                 sub_params$body_params$radius )
+    r0 <- rbind(
+      sub_params$body_params$rpos[1:3, ],
+      sub_params$body_params$radius
+    )
     # Calculate position matrix lags  ==========================================
-    r0_diff <- t.default( diff.default( t.default( r0 ) ) )
+    r0_diff <- t(diff(t(r0)))
     # Multiply wavenumber and body matrices ====================================
-    r0_diff_k <- t.default( sapply( 1 : length( k_sw_norm ) ,
-                                    FUN = function( x ) {
-                                      colSums( r0_diff[ 1 : 3 , ] *
-                                                 k_sw_rot[ x , ] )
-                                    } ) )
+    r0_diff_k <- t(vapply(seq_along(k_sw_norm),
+      FUN = function(x) {
+        colSums(r0_diff[1:3, ] *
+                  k_sw_rot[x, ])
+      },
+      FUN.VALUE = numeric(ncol(r0_diff))
+    ))
     # Calculate Euclidean norms ================================================
-    r0_diff_norm <- sqrt( colSums( r0_diff[ 1 : 3 , ] * r0_diff[ 1 : 3 , ] ) )
+    r0_diff_norm <- sqrt(colSums(r0_diff[1:3, ] * r0_diff[1:3, ]))
     # Estimate angles between body cylinders ===================================
-    alpha <- acos( r0_diff_k / ( k_sw_norm %*% t.default( r0_diff_norm ) ) )
-    beta <- abs( alpha - pi / 2 )
+    alpha <- acos(r0_diff_k / (k_sw_norm %*% t(r0_diff_norm)))
+    beta <- abs(alpha - pi / 2)
     # Call in metrics ==========================================================
-    phase_sd <- sub_params$meta_params$p0 
-    r0_diff_h <- r0_diff / h 
+    phase_sd <- sub_params$meta_params$phase_sd
+    r0_diff_h <- r0_diff / h
     r0_h <- r0 / h
     # Define integrand =========================================================
-    integrand_c <- function( s , x , y ) {
-      rint_mat <- s * r0_diff_h[ , y ] + r0_h[ , y ]
-      rint_k1_h_mat <- k_sw_rot[ x , ] %*% rint_mat[ 1 : 3 ]
-      bessel <- jc( 1 , 2 * ( k_sw_norm[ x ] * rint_mat[ 4 ] *
-                                cos( beta[ x , y ] ) ) ) / cos( beta[ x , y ] )
-      fb_a <- k_sw_norm[ x ] / 4 * R * rint_mat[ 4 ] * h *
-        exp( 2i * rint_k1_h_mat ) * bessel * r0_diff_norm[ y ]
-      return( sum( fb_a , na.rm = TRUE ) )
-    } 
+    integrand_c <- function(s, x, y) {
+      rint_mat <- s * r0_diff_h[, y] + r0_h[, y]
+      rint_k1_h_mat <- k_sw_rot[x, ] %*% rint_mat[1:3]
+      bessel <- jc(1, 2 * (k_sw_norm[x] * rint_mat[4] * 
+                             cos(beta[x, y]))) / cos(beta[x, y])
+      fb_a <- k_sw_norm[x] / 4 * R * rint_mat[4] * h *
+        exp(2i * rint_k1_h_mat) * bessel * r0_diff_norm[y]
+      sum(fb_a, na.rm = TRUE)
+    }
     # Vectorize integrand function =============================================
-    integrand_vectorized_c <- Vectorize( integrand_c )
-    stochastic_TS_c <- function( n_k , n_segments , n_iterations ) {
-      phase_cyl <- sapply( 1 : n_k , 
-                           FUN = function( x ) {
-                             cyl_phase <- array( 
-                               sapply( 1 :  n_segments ,
-                                       FUN = function( y ) {
-                                         phase_integrate( 
-                                           x , y , 
-                                           n_iterations , 
-                                           integrand_vectorized_c ,
-                                           phase_sd 
-                                           )
-                                         }
-                                       ) ,
-                               dim = c( n_iterations , n_segments )
-                               )
-                             cyl_sum_phase <- rowSums( cyl_phase , na.rm = TRUE )
-                             cyl_sum_phase
-                             }
-                           )
-      phase_cyl <- array( phase_cyl , dim = c( n_iterations , n_k ) )
-      data.frame( f_bs = colMeans( phase_cyl ) ,
-                  sigma_bs = colMeans( sigma_bs( phase_cyl ) ) ,
-                  TS_mean = db( colMeans( sigma_bs( phase_cyl ) ) ) ,
-                  TS_sd = db( apply( sigma_bs( phase_cyl ) , 2 , stats::sd ) ) )
+    integrand_vectorized_c <- Vectorize(integrand_c)
+    stochastic_TS_c <- function(n_k, n_segments, n_iterations) {
+      phase_cyl <- vapply(seq_len(n_k),
+        FUN = function(x) {
+          cyl_phase <- array(
+            vapply(seq_len(n_segments),
+              FUN = function(y) {
+                phase_integrate(
+                  x, y,
+                  n_iterations,
+                  integrand_vectorized_c,
+                  phase_sd
+                )
+              },
+              FUN.VALUE = complex(n_iterations)
+            ),
+            dim = c(n_iterations, n_segments)
+          )
+          cyl_sum_phase <- rowSums(cyl_phase, na.rm = TRUE)
+          cyl_sum_phase
+        },
+        FUN.VALUE = complex(n_iterations)
+      )
+      phase_cyl <- array(phase_cyl, dim = c(n_iterations, n_k))
+      data.frame(
+        f_bs = colMeans(phase_cyl),
+        sigma_bs = colMeans(sigma_bs(phase_cyl)),
+        TS_mean = db(colMeans(sigma_bs(phase_cyl))),
+        TS_sd = db(apply(sigma_bs(phase_cyl), 2, stats::sd))
+      )
     }
     # Calculate linear scatter response ========================================
-    backscatter_df <- stochastic_TS_c( n_k = length( k_sw_norm ) , 
-                                       n_segments = sub_params$n_segments - 1 , 
-                                       n_iterations = sub_params$meta_params$n_iterations )
-    return( backscatter_df )
+    backscatter_df <- stochastic_TS_c(
+      n_k = length(k_sw_norm),
+      n_segments = sub_params$n_segments - 1,
+      n_iterations = sub_params$meta_params$n_iterations
+    )
+    backscatter_df
   }
   # Generate results dataframe by collating resampled results ==================
-  results <- do.call( "rbind" ,
-                      lapply( 1 : length( model$parameters ) ,
-                              FUN = function( i ) SDWBA_resampled_c( i )
-                      ) )
+  results <- do.call(
+    "rbind",
+    lapply(seq_along(model$parameters),
+      FUN = function(i) SDWBA_resampled_c(i)
+    )
+  )
   # Update scatterer object ====================================================
-  methods::slot( object , "model" )$SDWBA_curved$f_bs <- results$f_bs
-  methods::slot( object , "model" )$SDWBA_curved$sigma_bs <- results$sigma_bs
-  methods::slot( object , "model" )$SDWBA_curved$TS <- results$TS_mean
-  methods::slot( object , "model" )$SDWBA_curved$TS_sd <- results$TS_sd
+  methods::slot(object, "model")$SDWBA_curved$f_bs <- results$f_bs
+  methods::slot(object, "model")$SDWBA_curved$sigma_bs <- results$sigma_bs
+  methods::slot(object, "model")$SDWBA_curved$TS <- results$TS_mean
+  methods::slot(object, "model")$SDWBA_curved$TS_sd <- results$TS_sd
   # Return object ==============================================================
-  return( object )
+  object
 }
 ################################################################################
 # Primary scattering model for an elastic solid sphere (CAL)
@@ -450,85 +505,89 @@ SDWBA_curved <- function( object ) {
 #' @param object CAL-class object.
 #' @usage
 #' calibration(object)
-#' @return The theoretical acoustic target strength (TS, dB re. 1 \eqn{m^2})  of a
-#' solid sphere at a given frequency.
+#' @return The theoretical acoustic target strength (TS, dB re. 1 \eqn{m^2}) of
+#' a solid sphere at a given frequency.
 #' @references
 #' MacLennan D. N. (1981). The theory of solid spheres as sonar calibration
 #' targets. Scottish Fisheries Research No. 22, Department of Agriculture and
 #' Fisheries for Scotland.
 #' @export
-calibration <- function( object ) {
+calibration <- function(object) {
   # Extract model parameters/inputs ============================================
-  model <- acousticTS::extract( object ,
-                                "model_parameters" )$calibration
+  model <- acousticTS::extract(
+    object,
+    "model_parameters"
+  )$calibration
   ### Now we solve / calculate equations =======================================
   # Equations 6a -- weight wavenumber by radius ================================
   ka_sw <- model$parameters$acoustics$k_sw * model$body$radius
   ka_l <- model$parameters$acoustics$k_l * model$body$radius
   ka_t <- model$parameters$acoustics$k_t * model$body$radius
   # Set limit for iterations ===================================================
-  m_limit <- round( max( ka_sw ) ) + 10
+  m_limit <- round(max(ka_sw)) + 10
   # Create modal series number vector ==========================================
-  m <- 0 : m_limit
+  m <- 0:m_limit
   # Convert these vectors into matrices ========================================
-  ka_sw_m <- modal_matrix( ka_sw , m_limit )
-  ka_l_m <- modal_matrix( ka_l , m_limit )
-  ka_t_m <- modal_matrix( ka_t , m_limit )
+  ka_sw_m <- modal_matrix(ka_sw, m_limit)
+  ka_l_m <- modal_matrix(ka_l, m_limit)
+  ka_t_m <- modal_matrix(ka_t, m_limit)
   # Calculate Legendre polynomial ==============================================
-  Pl <- Pn( m , cos( model$body$theta ) )
+  Pl <- Pn(m, cos(model$body$theta))
   # Calculate spherical Bessel functions of first kind =========================
-  js_mat <- js( m , ka_sw_m )
-  js_mat_l <- js( m , ka_l_m )
-  js_mat_t <- js( m , ka_t_m )
+  js_mat <- js(m, ka_sw_m)
+  js_mat_l <- js(m, ka_l_m)
+  js_mat_t <- js(m, ka_t_m)
   # Calculate spherical Bessel functions of second kind ========================
-  ys_mat <- ys( m , ka_sw_m )
+  ys_mat <- ys(m, ka_sw_m)
   # Calculate first derivative of spheric Bessel functions of first kind =======
-  jsd_mat <- jsd( m , ka_sw_m )
-  jsd_mat_l <- jsd( m , ka_l_m )
-  jsd_mat_t <- jsd( m , ka_t_m )
+  jsd_mat <- jsd(m, ka_sw_m)
+  jsd_mat_l <- jsd(m, ka_l_m)
+  jsd_mat_t <- jsd(m, ka_t_m)
   # Calculate first derivative of spheric Bessel functions of second kind ======
-  ysd_mat <- ysd( m , ka_sw_m )
+  ysd_mat <- ysd(m, ka_sw_m)
   # Calculate density contrast =================================================
   g <- model$body$density / model$medium$density
   # Tangent functions ==========================================================
-  tan_sw <- - ka_sw_m * jsd_mat / js_mat
-  tan_l <- - ka_l_m * jsd_mat_l / js_mat_l
-  tan_t <- - ka_t_m * jsd_mat_t / js_mat_t
-  tan_beta <- - ka_sw_m * ysd_mat / ys_mat
-  tan_diff <- - js_mat / ys_mat
+  tan_sw <- -ka_sw_m * jsd_mat / js_mat
+  tan_l <- -ka_l_m * jsd_mat_l / js_mat_l
+  tan_t <- -ka_t_m * jsd_mat_t / js_mat_t
+  tan_beta <- -ka_sw_m * ysd_mat / ys_mat
+  tan_diff <- -js_mat / ys_mat
   # Difference terms ===========================================================
-  along_m <- ( m * m + m )
+  along_m <- (m * m + m)
   tan_l_add <- tan_l + 1
   tan_t_div <- along_m - 1 - ka_t_m * ka_t_m / 2 + tan_t
-  numerator <- ( tan_l / tan_l_add ) - ( along_m / tan_t_div )
-  denominator1 <- ( along_m - ka_t_m * ka_t_m / 2 + 2 * tan_l ) / tan_l_add
-  denominator2 <- along_m * ( tan_t + 1 ) / tan_t_div
+  numerator <- (tan_l / tan_l_add) - (along_m / tan_t_div)
+  denominator1 <- (along_m - ka_t_m * ka_t_m / 2 + 2 * tan_l) / tan_l_add
+  denominator2 <- along_m * (tan_t + 1) / tan_t_div
   denominator <- denominator1 - denominator2
-  ratio <- -0.5 * ( ka_t_m * ka_t_m ) * numerator / denominator
+  ratio <- -0.5 * (ka_t_m * ka_t_m) * numerator / denominator
   # Additional trig functions ==================================================
-  phi <- - ratio / g
-  eta_tan <- tan_diff * ( phi + tan_sw ) / ( phi + tan_beta )
-  cos_eta <- 1 / sqrt( 1 + eta_tan * eta_tan )
+  phi <- -ratio / g
+  eta_tan <- tan_diff * (phi + tan_sw) / (phi + tan_beta)
+  cos_eta <- 1 / sqrt(1 + eta_tan * eta_tan)
   sin_eta <- eta_tan * cos_eta
   # Fill in rest of Hickling (1962) equation ===================================
   f_j <- colSums(
-    ( 2 * m + 1 ) * Pl[ m + 1 ] * ( sin_eta * ( 1i * cos_eta - sin_eta ) )
+    (2 * m + 1) * Pl[m + 1] * (sin_eta * (1i * cos_eta - sin_eta))
   )
   # Calculate linear backscatter coefficient ===================================
-  f_bs <- abs( - 2i * f_j / ka_sw ) * model$body$radius / 2
+  f_bs <- abs(-2i * f_j / ka_sw) * model$body$radius / 2
   sigma_bs <- f_bs * f_bs
-  TS <- 10 * log10( sigma_bs )
+  TS <- 10 * log10(sigma_bs)
   # Add results to scatterer object ============================================
-  methods::slot( object ,
-        "model" )$calibration <- data.frame(
-          frequency = model$parameters$acoustics$frequency ,
-          ka = ka_sw ,
-          f_bs = f_bs ,
-          sigma_bs = sigma_bs ,
-          TS = TS
-        )
+  methods::slot(
+    object,
+    "model"
+  )$calibration <- data.frame(
+    frequency = model$parameters$acoustics$frequency,
+    ka = ka_sw,
+    f_bs = f_bs,
+    sigma_bs = sigma_bs,
+    TS = TS
+  )
   # Return object ==============================================================
-  return( object )
+  object
 }
 ################################################################################
 ################################################################################
@@ -549,9 +608,9 @@ calibration <- function( object ) {
 #' Anderson, V.C. (1950). Sound scattering from a fluid sphere. Journal of the
 #' Acoustical Society of America, 22, 426-431.
 #' @export
-MSS_anderson <- function( object ) {
+MSS_anderson <- function(object) {
   # Extract model parameters/inputs ============================================
-  model <- extract( object , "model_parameters" )$MSS_anderson
+  model <- extract(object, "model_parameters")$MSS_anderson
   # Multiple acoustic wavenumber by radius =====================================
   ## Medium ====================================================================
   k1a <- model$parameters$acoustics$k_sw * model$body$radius
@@ -559,44 +618,47 @@ MSS_anderson <- function( object ) {
   k2a <- model$parameters$acoustics$k_f * model$body$radius
   # Set limit for iterations ===================================================
   m_limit <- model$parameters$ka_limit
-  m <- 0 : m_limit
+  m <- 0:m_limit
   # Convert ka vectors to matrices =============================================
-  ka1_m <- modal_matrix( k1a , m_limit )
-  ka2_m <- modal_matrix( k2a , m_limit )
+  ka1_m <- modal_matrix(k1a, m_limit)
+  ka2_m <- modal_matrix(k2a, m_limit)
   # Calculate modal series coefficient, b_m (or C_m) ===========================
   ## Material properties term ==================================================
   gh <- model$body$g * model$body$h
   # Numerator term =============================================================
-  N1 <- ( jsd( m , ka2_m ) * ys( m , ka1_m ) ) /
-    ( js( m , ka2_m ) * jsd( m , ka1_m ) )
-  N2 <- ( gh * ysd( m , ka1_m ) / jsd( m , ka1_m ) )
+  N1 <- (jsd(m, ka2_m) * ys(m, ka1_m)) /
+    (js(m, ka2_m) * jsd(m, ka1_m))
+  N2 <- (gh * ysd(m, ka1_m) / jsd(m, ka1_m))
   CN <- N1 - N2
   # Denominator term ===========================================================
-  D1 <- ( jsd( m , ka2_m ) * js( m , ka1_m ) ) /
-    ( js( m , ka2_m ) * jsd( m , ka1_m ) )
+  D1 <- (jsd(m, ka2_m) * js(m, ka1_m)) /
+    (js(m, ka2_m) * jsd(m, ka1_m))
   D2 <- gh
   CD <- D1 - D2
   # Finalize modal series coefficient ==========================================
   C_m <- CN / CD
-  b_m <- -1 / ( 1 + 1i * C_m )
+  b_m <- -1 / (1 + 1i * C_m)
   # Calculate linear scatter response ==========================================
   ## Sum across columns to complete modal series summation over frequency range=
-  f_j <- colSums( ( 2 * m + 1 ) * ( -1 ) ^ m * b_m )
+  f_j <- colSums((2 * m + 1) * (-1)^m * b_m)
   f_sphere <- -1i / model$parameters$acoustics$k_sw * f_j
   # Calculate linear scattering coefficient, sigma_bs ==========================
-  sigma_bs <- abs( f_sphere ) * abs( f_sphere )
+  sigma_bs <- abs(f_sphere) * abs(f_sphere)
   # Calculate TS ===============================================================
-  TS <- 10 * log10( sigma_bs )
+  TS <- 10 * log10(sigma_bs)
   # Add results to scatterer object ============================================
-  methods::slot( object ,
-        "model" )$MSS_anderson <- data.frame(
-          frequency = model$parameters$acoustics$frequency ,
-          ka = k1a ,
-          f_bs = f_sphere ,
-          sigma_bs = sigma_bs ,
-          TS = TS )
+  methods::slot(
+    object,
+    "model"
+  )$MSS_anderson <- data.frame(
+    frequency = model$parameters$acoustics$frequency,
+    ka = k1a,
+    f_bs = f_sphere,
+    sigma_bs = sigma_bs,
+    TS = TS
+  )
   # Return object ==============================================================
-  return( object )
+  object
 }
 ################################################################################
 # Goodman and Stern (1962) modal series solution for elastic-shelled spheres
@@ -605,20 +667,21 @@ MSS_anderson <- function( object ) {
 #' series solution from Goodman and Stern (1962).
 #' @param object GAS- or SBF-class object.
 #' @details
-#' Calculates the theoretical TS of an elastic-shelled sphere using an exact 
+#' Calculates the theoretical TS of an elastic-shelled sphere using an exact
 #' modal series solution
 #' @return
 #' Target strength (TS, dB re: 1 m^2)
 #' @references
-#' Goodman, R.R., and Stern, R. (1962). Reflection and transmission of sound by 
+#' Goodman, R.R., and Stern, R. (1962). Reflection and transmission of sound by
 #' elastic spherical shells. The Journal of the Acoustical Society of America,
 #' 34, 338-344.
 #' @export
-MSS_goodman_stern <- function( object ) {
+MSS_goodman_stern <- function(object) {
   # Extract model parameters/inputs ============================================
-  model <- extract( object , "model_parameters" )$MSS_goodman_stern
+  model <- extract(object, "model_parameters")$MSS_goodman_stern
   # Get requisite elastic properties ===========================================
-  G <- model$shell$G ; lambda <- model$shell$lambda
+  G <- model$shell$G
+  lambda <- model$shell$lambda
   density_shell <- model$shell$density
   # Extract the required morphometrics =========================================
   radius_shell <- model$shell$radius
@@ -626,81 +689,85 @@ MSS_goodman_stern <- function( object ) {
   # Get the internal fluid density =============================================
   density_fluid <- model$fluid$density
   # Calculate shell sound speeds in the longitudinal and transverse directions =
-  sound_speed_longitudinal <- sqrt( ( lambda + 2 * G ) / density_shell )
-  sound_speed_transversal <- sqrt( G / density_shell )
+  sound_speed_longitudinal <- sqrt((lambda + 2 * G) / density_shell)
+  sound_speed_transversal <- sqrt(G / density_shell)
   # Calculate the associated wavenumbers =======================================
-  kL <- k( model$parameters$acoustics$frequency , sound_speed_longitudinal )
-  kT <- k( model$parameters$acoustics$frequency , sound_speed_transversal )
+  kL <- k(model$parameters$acoustics$frequency, sound_speed_longitudinal)
+  kT <- k(model$parameters$acoustics$frequency, sound_speed_transversal)
   # Calculate the reindexed ka values ==========================================
   ka_matrix <- calculate_ka_matrix(
-    model$parameters$acoustics$frequency ,
-    model$medium$sound_speed ,
-    model$fluid$sound_speed ,
-    sound_speed_longitudinal ,
-    sound_speed_transversal ,
-    radius_shell ,
+    model$parameters$acoustics$frequency,
+    model$medium$sound_speed,
+    model$fluid$sound_speed,
+    sound_speed_longitudinal,
+    sound_speed_transversal,
+    radius_shell,
     radius_fluid
   )
   # Get the modal series iterators =============================================
   m_limit <- model$parameters$m_limit
   m <- model$parameters$m
   # Expand the wavenumber matrix over the modal series limits ==================
-  ka_matrix_m <- lapply( rownames( ka_matrix ) , function( ka ) {
-    modal_matrix( ka_matrix[ ka , ], m_limit )
-  } )
+  ka_matrix_m <- lapply(rownames(ka_matrix), function(ka) {
+    modal_matrix(ka_matrix[ka, ], m_limit)
+  })
   # Add the names ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  names( ka_matrix_m ) <- rownames( ka_matrix )
+  names(ka_matrix_m) <- rownames(ka_matrix)
   # Pre-calculate and cache the Bessel function outputs ========================
-  bessel_cache <- .calculate_bessel_cache( ka_matrix_m , m )
+  bessel_cache <- .calculate_bessel_cache(ka_matrix_m, m)
   # Compute the alpha coefficient matrix =======================================
-  alpha <- calculate_goodman_stern_alpha( bessel_cache , ka_matrix_m , m ,
-                                          lambda , G , model$medium$density ,
-                                          density_shell , density_fluid )
+  alpha <- .goodman_stern_alpha(
+    bessel_cache, ka_matrix_m, m,
+    lambda, G, model$medium$density,
+    density_shell, density_fluid
+  )
   # Create the boundary conditions matrices ====================================
-  boundary_matrices <- calculate_goodman_stern_boundary_matrices( 
-    alpha , ka_matrix , m
+  boundary_matrices <- .goodman_stern_boundaries(
+    alpha, ka_matrix, m
   )
   # Compute the modal series coefficient (b_m) using Cramer's Rule =============
-  b_m <- lapply( 1 : length( boundary_matrices ) , function( freq_idx ) {
-    sapply( 1 : length( m ) , function( m_idx ) {
-      boundary_m <- boundary_matrices[[ freq_idx ]][[ m_idx ]]
+  b_m <- lapply(seq_along(boundary_matrices), function(freq_idx) {
+    vapply(seq_along(m), function(m_idx) {
+      boundary_m <- boundary_matrices[[freq_idx]][[m_idx]]
       # Calculate determinants using QR decomposition for numerical stability ++
-      det_numerator <- prod( 
-        abs (Re( diag( qr( boundary_m$A_numerator )$qr ) ) ) 
+      det_numerator <- prod(
+        abs(Re(diag(qr(boundary_m$A_numerator)$qr)))
       )
-      det_denominator <- prod( 
-        abs( Re( diag( qr( boundary_m$A_denominator )$qr ) ) ) 
+      det_denominator <- prod(
+        abs(Re(diag(qr(boundary_m$A_denominator)$qr)))
       )
       # Apply Cramer's rule: b_m = det(A_numerator) / det(A_denominator) +++++++
-      if ( det_denominator == 0 ) {
+      if (det_denominator == 0) {
         warning(
-          paste( "Zero denominator at frequency" , 
-                 freq_idx , "mode", m[ m_idx ] )
+          paste(
+            "Zero denominator at frequency",
+            freq_idx, "mode", m[m_idx]
+          )
         )
-        return( NA )
+        return(NA)
       }
-      
-      return( det_numerator / det_denominator )
-    } )
-  } )
+
+      det_numerator / det_denominator
+    }, FUN.VALUE = numeric(1))
+  })
   # Calculate the linear scattering coefficient, f_bs ==========================
-  f_bs <- -1i / model$parameters$acoustics$k_sw * 
-    sapply( 1 : length( b_m ) , function( ka_idx ) {
-      sum( ( -1 )^m * ( 2 * m + 1 ) * b_m[[ ka_idx ]] )
-    } )
+  f_bs <- -1i / model$parameters$acoustics$k_sw *
+    vapply(seq_along(b_m), function(ka_idx) {
+      sum((-1)^m * (2 * m + 1) * b_m[[ka_idx]])
+    }, FUN.VALUE = numeric(1))
   # Convert to sigma_bs ========================================================
-  sigma_bs <- abs( f_bs )^2
+  sigma_bs <- abs(f_bs)^2
   # Define MSS slot for ESS-type scatterer =====================================
-  methods::slot( object , "model" )$MSS_goodman_stern <- data.frame( 
-    frequency = model$parameters$acoustics$frequency ,
-    ka_shell = model$parameters$acoustics$k_sw * radius_shell ,
-    ka_fluid = model$parameters$acoustics$k_sw * radius_fluid ,
-    f_bs = f_bs ,
-    sigma_bs = sigma_bs ,
-    TS = db( sigma_bs )
+  methods::slot(object, "model")$MSS_goodman_stern <- data.frame(
+    frequency = model$parameters$acoustics$frequency,
+    ka_shell = model$parameters$acoustics$k_sw * radius_shell,
+    ka_fluid = model$parameters$acoustics$k_sw * radius_fluid,
+    f_bs = f_bs,
+    sigma_bs = sigma_bs,
+    TS = db(sigma_bs)
   )
   # Return object ==============================================================
-  return( object )
+  object
 }
 ################################################################################
 # Kirchoff-Ray Mode approximation
@@ -718,120 +785,156 @@ MSS_goodman_stern <- function( object ) {
 #' Clay C.S. and Horne J.K. (1994). Acoustic models of fish: The Atlantic cod
 #' (Gadus morhua). Journal of the Acoustical Society of AMerica, 96, 1661-1668.
 #' @export
-KRM <- function( object ) {
+KRM <- function(object) {
   # Detect object class ========================================================
-  scatterer_type <- class( object )
+  scatterer_type <- class(object)
   # Extract model parameter inputs =============================================
-  model <- extract( object , "model_parameters" )$KRM
+  model <- extract(object, "model_parameters")$KRM
   # Extract body parameters ====================================================
-  body <- extract( object , "body" )
+  body <- extract(object, "body")
   # Calculate reflection coefficient for medium-body interface =================
-  R12 <- reflection_coefficient( model$medium , model$body )
+  R12 <- reflection_coefficient(model$medium, model$body)
   # Calculate transmission coefficient and its reverse =========================
-  T12T21 <- 1 - R12  * R12
+  T12T21 <- 1 - R12 * R12
   # Sum across body position vector ============================================
-  rpos <- switch( scatterer_type ,
-                  FLS = rbind( x = body$rpos[ 1 , ] ,
-                               w = c( body$radius[ 2 ] ,
-                                      body$radius[ 2 : ( length( body$radius ) - 1 ) ] ,
-                                      body$radius[ ( length( body$radius ) ) - 1 ] ) * 2 ,
-                               zU =c( body$radius[ 2 ] ,
-                                      body$radius[ 2 : ( length( body$radius ) - 1 ) ] ,
-                                      body$radius[ ( length( body$radius ) ) - 1 ] ) ,
-                               zL = - c( body$radius[ 2 ] ,
-                                         body$radius[ 2 : ( length( body$radius ) - 1 ) ] ,
-                                         body$radius[ ( length( body$radius ) ) - 1 ] ) ) ,
-                  SBF = body$rpos )
-  body_rpos_sum <- along_sum( rpos , model$parameters$ns_b )
+  rpos <- switch(scatterer_type,
+    FLS = rbind(
+      x = body$rpos[1, ],
+      w = c(
+        body$radius[2],
+        body$radius[2:(length(body$radius) - 1)],
+        body$radius[(length(body$radius)) - 1]
+      ) * 2,
+      zU = c(
+        body$radius[2],
+        body$radius[2:(length(body$radius) - 1)],
+        body$radius[(length(body$radius)) - 1]
+      ),
+      zL = -c(
+        body$radius[2],
+        body$radius[2:(length(body$radius) - 1)],
+        body$radius[(length(body$radius)) - 1]
+      )
+    ),
+    SBF = body$rpos
+  )
+  body_rpos_sum <- along_sum(rpos, model$parameters$ns_b)
   # Approximate radius of body cylinders =======================================
-  a_body <- switch( scatterer_type ,
-                    FLS = body_rpos_sum[ 2 , ] / 4 ,
-                    SBF = body_rpos_sum[ 2 , ] / 4 )
+  a_body <- switch(scatterer_type,
+    FLS = body_rpos_sum[2, ] / 4,
+    SBF = body_rpos_sum[2, ] / 4
+  )
   # Combine wavenumber (k) and radii to calculate "ka" =========================
-  ka_body <- matrix( data = rep( a_body ,
-                                 each = length( model$parameters$acoustics$k_sw ) ) ,
-                     ncol = length( a_body ) ,
-                     nrow = length( model$parameters$acoustics$k_b ) ) * model$parameters$acoustics$k_b
+  ka_body <- matrix(
+    data = rep(a_body,
+      each = length(model$parameters$acoustics$k_sw)
+    ),
+    ncol = length(a_body),
+    nrow = length(model$parameters$acoustics$k_b)
+  ) * model$parameters$acoustics$k_b
   # Convert c-z coordinates to required u-v rotated coordinates ================
-  uv_body <- acousticTS::body_rotation( body_rpos_sum ,
-                                        body$rpos ,
-                                        body$theta ,
-                                        length( model$parameters$acoustics$k_sw ) )
+  uv_body <- acousticTS::body_rotation(
+    body_rpos_sum,
+    body$rpos,
+    body$theta,
+    length(model$parameters$acoustics$k_sw)
+  )
   # Calculate body empirical phase shift function ==============================
-  body_dorsal_sum <- switch( scatterer_type ,
-                             FLS = matrix( data = rep( body_rpos_sum[ 3 , ] ,
-                                                       each = length( model$parameters$acoustics$k_sw ) ) ,
-                                           ncol = length( body_rpos_sum[ 3 , ] ) ,
-                                           nrow = length( model$parameters$acoustics$k_sw ) ) / 2 ,
-                             SBF = matrix( data = rep( body_rpos_sum[ 3 , ] ,
-                                                       each = length( model$parameters$acoustics$k_sw ) ) ,
-                                           ncol = length( body_rpos_sum[ 3 , ] ) ,
-                                           nrow = length( model$parameters$acoustics$k_sw ) ) / 2 )
-  Psi_b <- - pi * model$parameters$acoustics$k_b * body_dorsal_sum /
-    (2 * ( model$parameters$acoustics$k_b * body_dorsal_sum + 0.4 ) )
+  body_dorsal_sum <- switch(scatterer_type,
+    FLS = matrix(
+      data = rep(body_rpos_sum[3, ],
+        each = length(model$parameters$acoustics$k_sw)
+      ),
+      ncol = length(body_rpos_sum[3, ]),
+      nrow = length(model$parameters$acoustics$k_sw)
+    ) / 2,
+    SBF = matrix(
+      data = rep(body_rpos_sum[3, ],
+        each = length(model$parameters$acoustics$k_sw)
+      ),
+      ncol = length(body_rpos_sum[3, ]),
+      nrow = length(model$parameters$acoustics$k_sw)
+    ) / 2
+  )
+  Psi_b <- -pi * model$parameters$acoustics$k_b * body_dorsal_sum /
+    (2 * (model$parameters$acoustics$k_b * body_dorsal_sum + 0.4))
   # Estimate natural log function (phase, etc.) ================================
-  exp_body <- exp( - 2i * model$parameters$acoustics$k_sw * uv_body$vbU ) -
-    T12T21 * exp( - 2i * model$parameters$acoustics$k_sw * uv_body$vbU +
-                    2i * model$parameters$acoustics$k_b *
-                    ( uv_body$vbU - uv_body$vbL ) + 1i * Psi_b )
+  exp_body <- exp(-2i * model$parameters$acoustics$k_sw * uv_body$vbU) -
+    T12T21 * exp(-2i * model$parameters$acoustics$k_sw * uv_body$vbU +
+                   2i * model$parameters$acoustics$k_b *
+                   (uv_body$vbU - uv_body$vbL) + 1i * Psi_b)
   # Resolve summation term =====================================================
-  body_summation <- sqrt( ka_body ) * uv_body$delta_u
+  body_summation <- sqrt(ka_body) * uv_body$delta_u
   # Calculate linear scattering length (m) =====================================
-  f_body <- rowSums( - ( ( 1i * ( R12 / ( 2 * sqrt( pi ) ) ) ) *
-                           body_summation * exp_body ) )
-  if ( scatterer_type == "FLS" ) {
+  f_body <- rowSums(-((1i * (R12 / (2 * sqrt(pi)))) *
+                        body_summation * exp_body))
+  if (scatterer_type == "FLS") {
     # Define KRM slot for FLS-type scatterer ===================================
-    methods::slot( object , "model" )$KRM <- data.frame( frequency = model$parameters$acoustics$frequency ,
-                                                ka = model$parameters$acoustics$k_sw * stats::median( a_body , na.rm = TRUE ) ,
-                                                f_bs = f_body ,
-                                                sigma_bs = abs( f_body ) * abs( f_body ) ,
-                                                TS = 20 * log10( abs( f_body ) ) )
-  } else if ( scatterer_type == "SBF" ) {
+    methods::slot(object, "model")$KRM <- data.frame(
+      frequency = model$parameters$acoustics$frequency,
+      ka = model$parameters$acoustics$k_sw *
+        stats::median(a_body, na.rm = TRUE),
+      f_bs = f_body,
+      sigma_bs = abs(f_body) * abs(f_body),
+      TS = 20 * log10(abs(f_body))
+    )
+  } else if (scatterer_type == "SBF") {
     #### Repeat process for bladder ============================================
     # Extract bladder parameters ===============================================
-    bladder <- acousticTS::extract( object , "bladder" )
+    bladder <- acousticTS::extract(object, "bladder")
     # Calculate reflection coefficient for bladder =============================
-    R23 <- acousticTS::reflection_coefficient( body ,
-                                               bladder )
+    R23 <- acousticTS::reflection_coefficient(
+      body,
+      bladder
+    )
     # Sum across body/swimbladder position vectors =============================
-    bladder_rpos_sum <- acousticTS::along_sum( bladder$rpos ,
-                                               model$parameters$ns_sb )
+    bladder_rpos_sum <- acousticTS::along_sum(
+      bladder$rpos,
+      model$parameters$ns_sb
+    )
     # Approximate radii of bladder discrete cylinders ==========================
-    a_bladder <- bladder_rpos_sum[ 2 , ] / 4
+    a_bladder <- bladder_rpos_sum[2, ] / 4
     # Combine wavenumber (k) and radii to calculate "ka" for bladder ===========
-    ka_bladder <- matrix( data = rep( a_bladder , each = length( model$parameters$acoustics$k_sw ) ) ,
-                          ncol = length( a_bladder ) ,
-                          nrow = length( model$parameters$acoustics$k_sw ) ) * model$parameters$acoustics$k_sw
+    ka_bladder <- matrix(
+      data = rep(a_bladder, each = length(model$parameters$acoustics$k_sw)),
+      ncol = length(a_bladder),
+      nrow = length(model$parameters$acoustics$k_sw)
+    ) * model$parameters$acoustics$k_sw
     # Calculate Kirchoff approximation empirical factor, A_sb ==================
-    A_sb <- ka_bladder / ( ka_bladder + 0.083 )
+    A_sb <- ka_bladder / (ka_bladder + 0.083)
     # Calculate empirical phase shift for a fluid cylinder, Psi_p ==============
-    Psi_p <- ka_bladder / ( 40 + ka_bladder ) - 1.05
+    Psi_p <- ka_bladder / (40 + ka_bladder) - 1.05
     # Convert x-z coordinates to requisite u-v rotated coordinates =============
-    uv_bladder <- acousticTS::bladder_rotation( bladder_rpos_sum ,
-                                                bladder$rpos ,
-                                                bladder$theta ,
-                                               length( model$parameters$acoustics$k_sw ) )
+    uv_bladder <- acousticTS::bladder_rotation(
+      bladder_rpos_sum,
+      bladder$rpos,
+      bladder$theta,
+      length(model$parameters$acoustics$k_sw)
+    )
     # Estimate natural log functions  ==========================================
-    exp_bladder <- exp( - 1i * ( 2 * model$parameters$acoustics$k_b *
-                                   uv_bladder$v + Psi_p ) ) * uv_bladder$delta_u
+    exp_bladder <- exp(-1i * (2 * model$parameters$acoustics$k_b *
+                                uv_bladder$v + Psi_p)) * uv_bladder$delta_u
     # Calculate the summation term =============================================
-    bladder_summation <- A_sb * sqrt( ( ka_bladder + 1 ) * sin( bladder$theta ) )
+    bladder_summation <- A_sb * sqrt((ka_bladder + 1) * sin(bladder$theta))
     # Estimate backscattering length, f_fluid/f_soft ===========================
-    f_bladder <- rowSums( - 1i * ( R23 * T12T21 ) / ( 2 * sqrt( pi ) ) *
-                            bladder_summation * exp_bladder )
+    f_bladder <- rowSums(-1i * (R23 * T12T21) / (2 * sqrt(pi)) *
+                           bladder_summation * exp_bladder)
     # Estimate total backscattering length, f_bs ===============================
     f_bs <- f_body + f_bladder
     # Define KRM slot for FLS-type scatterer ===================================
-    methods::slot( object , "model" )$KRM <- data.frame( frequency = model$parameters$acoustics$frequency ,
-                                                               ka = model$parameters$acoustics$k_sw * stats::median( a_body , na.rm = TRUE ) ,
-                                                               f_body = f_body ,
-                                                               f_bladder = f_bladder ,
-                                                               f_bs = f_bs ,
-                                                               sigma_bs = abs( f_bs ) * abs( f_bs ) ,
-                                                               TS = 20 * log10( abs( f_bs ) ) )
+    methods::slot(object, "model")$KRM <- data.frame(
+      frequency = model$parameters$acoustics$frequency,
+      ka = model$parameters$acoustics$k_sw *
+        stats::median(a_body, na.rm = TRUE),
+      f_body = f_body,
+      f_bladder = f_bladder,
+      f_bs = f_bs,
+      sigma_bs = abs(f_bs) * abs(f_bs),
+      TS = 20 * log10(abs(f_bs))
+    )
   }
   # Return object ==============================================================
-  return( object )
+  object
 }
 ################################################################################
 # Primary scattering model for an elastic shelled scatterers (ESS)
@@ -847,49 +950,50 @@ KRM <- function( object ) {
 #' @return
 #' Target strength (TS, dB re: 1 m^2)
 #' @references
-#' Stanton, T.K. (1989). Simple approximate formulas for backscattering of 
-#' sound by spherical and elongated objects. The Journal of the Acoustical 
-#' Society of America, 86, 1499-1510. 
+#' Stanton, T.K. (1989). Simple approximate formulas for backscattering of
+#' sound by spherical and elongated objects. The Journal of the Acoustical
+#' Society of America, 86, 1499-1510.
 #'
 #' @export
-high_pass_stanton <- function( object ) {
-    # Extract model parameters/inputs ==========================================
-    model_params <- extract( object , "model_parameters" )$high_pass_stanton
-    medium <- model_params$medium
-    acoustics <- model_params$acoustics
-    shell <- model_params$shell
-    # Multiply acoustic wavenumber by body radius ==============================
-    k1a <- acoustics$k_sw * shell$radius
-    # Calculate Reflection Coefficient =========================================
-    R <- ( shell$h * shell$g - 1 ) / ( shell$h * shell$g + 1 )
-    # Calculate backscatter constant, alpha_pi
-    alpha_pi <- (1 - shell$g * ( shell$h * shell$h ) ) / 
-      ( 3 * shell$g * ( shell$h * shell$h ) ) +
-      ( 1 - shell$g ) / ( 1 + 2 * shell$g )
-    # Define approximation constants, G_c and F_c ==============================
-    F_c <- 1; G_c <- 1
-    # Caclulate numerator term =================================================
-    num <- ( ( shell$radius * shell$radius ) * ( k1a * k1a * k1a * k1a ) * 
-               ( alpha_pi * alpha_pi ) * G_c)
-    # Caclulate denominator term ===============================================
-    dem <- ( 1 + ( 4 * ( k1a * k1a * k1a * k1a ) * ( alpha_pi * alpha_pi ) ) / 
-               ( ( R * R ) * F_c ) )
-    # Calculate backscatter and return
-    f_bs <- num / dem
-    methods::slot( object , "model" )$high_pass_stanton <- data.frame( 
-      frequency = acoustics$frequency ,
-      k1a = acoustics$k_sw * shell$radius ,
-      k_s = acoustics$k_b ,
-      f_bs = f_bs ,
-      sigma_bs = abs( f_bs ),
-      TS = 10 * log10( abs( f_bs ) ) 
-    )
-      return( object )
+high_pass_stanton <- function(object) {
+  # Extract model parameters/inputs ==========================================
+  model_params <- extract(object, "model_parameters")$high_pass_stanton
+  medium <- model_params$medium
+  acoustics <- model_params$acoustics
+  shell <- model_params$shell
+  # Multiply acoustic wavenumber by body radius ==============================
+  k1a <- acoustics$k_sw * shell$radius
+  # Calculate Reflection Coefficient =========================================
+  R <- (shell$h * shell$g - 1) / (shell$h * shell$g + 1)
+  # Calculate backscatter constant, alpha_pi
+  alpha_pi <- (1 - shell$g * (shell$h * shell$h)) /
+    (3 * shell$g * (shell$h * shell$h)) +
+    (1 - shell$g) / (1 + 2 * shell$g)
+  # Define approximation constants, G_c and F_c ==============================
+  F_c <- 1
+  G_c <- 1
+  # Caclulate numerator term =================================================
+  num <- ((shell$radius * shell$radius) * (k1a * k1a * k1a * k1a) *
+            (alpha_pi * alpha_pi) * G_c)
+  # Caclulate denominator term ===============================================
+  dem <- (1 + (4 * (k1a * k1a * k1a * k1a) * (alpha_pi * alpha_pi)) /
+            ((R * R) * F_c))
+  # Calculate backscatter and return
+  f_bs <- num / dem
+  methods::slot(object, "model")$high_pass_stanton <- data.frame(
+    frequency = acoustics$frequency,
+    k1a = acoustics$k_sw * shell$radius,
+    k_s = acoustics$k_b,
+    f_bs = f_bs,
+    sigma_bs = abs(f_bs),
+    TS = 10 * log10(abs(f_bs))
+  )
+  object
 }
 ################################################################################
 # Model registry/API
 ################################################################################
-#' Model registry: maps model names to their functions
+#' Model registry: maps model names to their functions and related initializers
 #' @export
 model_registry <- list(
   DCM = DCM,

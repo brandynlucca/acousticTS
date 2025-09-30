@@ -9,9 +9,9 @@
 #' @rdname along_sum
 #' @keywords internal
 #' @export
-along_sum <- function( rpos , iterations ) {
-  output <- rpos[ , 1 : ( iterations - 1 ) ] + rpos[ , 2 : iterations ]
-  return( output )
+along_sum <- function(rpos, iterations) {
+  output <- rpos[, 1:(iterations - 1)] + rpos[, 2:iterations]
+  output
 }
 ################################################################################
 #' Numerical integration via adaptive quadrature of complex values
@@ -22,11 +22,15 @@ along_sum <- function( rpos , iterations ) {
 #' @rdname contour_integrate
 #' @keywords internal
 #' @export
-contour_integrate <- function( integral , x , y ) {
-  complex( real = stats::integrate( function( s ) Re( integral( s , x , y ) ) ,
-                             lower = 0 , upper = 1 )$value ,
-           imaginary = stats::integrate( function( s ) Im( integral( s , x , y ) ) ,
-                                  lower = 0 , upper = 1 )$value )
+contour_integrate <- function(integral, x, y) {
+  complex(
+    real = stats::integrate(function(s) Re(integral(s, x, y)),
+      lower = 0, upper = 1
+    )$value,
+    imaginary = stats::integrate(function(s) Im(integral(s, x, y)),
+      lower = 0, upper = 1
+    )$value
+  )
 }
 ################################################################################
 #' Wrapper function incorporating phase deviation into contour integration
@@ -37,14 +41,14 @@ contour_integrate <- function( integral , x , y ) {
 #' @param n_iterations Number of phase deviations to average and summarize
 #' @param integral Integral function used for numerical integration via adaptive
 #' quadrature
-#' @param phase_sd Phase standard deviation 
+#' @param phase_sd Phase standard deviation
 #' @rdname phase_integrate
 #' @keywords internal
 #' @export
-phase_integrate <- function( x , y , n_iterations , integral , phase_sd ) {
-  rng <- stats::rnorm( n_iterations , 0 , 1 )
-  phase <- exp( 1i * rng * phase_sd )
-  contour_integrate( integral , x , y ) * phase
+phase_integrate <- function(x, y, n_iterations, integral, phase_sd) {
+  rng <- stats::rnorm(n_iterations, 0, 1)
+  phase <- exp(1i * rng * phase_sd)
+  contour_integrate(integral, x, y) * phase
 }
 ################################################################################
 #' Convert angular measurements from radians to degrees
@@ -58,28 +62,28 @@ phase_integrate <- function( x , y , n_iterations , integral , phase_sd ) {
 #' Angle in degrees
 #' @rdname degrees
 #' @export
-degrees <- function( x ) x * 180.0 / pi
+degrees <- function(x) x * 180.0 / pi
 ################################################################################
 #' Convert angular measurements from degrees to radians.
 #' @param x A real value in degrees
 #' @examples
 #' orientation <- 90 # degrees
-#' radians(orientation) # this should return a value equal to pi / 2 radians 
+#' radians(orientation) # this should return a value equal to pi / 2 radians
 #' @return
 #' Angle in radians.
 #' @rdname radians
 #' @export
-radians <- function( x ) x * pi / 180.0
+radians <- function(x) x * pi / 180.0
 ################################################################################
 #' Calculates the Euclidean norm across each row of a given matrix.
 #' @param x A matrix with numeric, real values.
 #' @usage
 #' vecnorm( x )
 #' @examples
-#' values <- matrix( c( 1 , 2 , 3 ) , ncol = 3 )
-#' vecnorm( values ) # should yield 3.741657
+#' values <- matrix(c(1, 2, 3), ncol = 3)
+#' vecnorm(values) # should yield 3.741657
 #' @return
 #' Calculates the Euclidean norm of a vector.
 #' @rdname vecnorm
 #' @export
-vecnorm <- function( x ) sqrt( rowSums( x * x ) )
+vecnorm <- function(x) sqrt(rowSums(x * x))
