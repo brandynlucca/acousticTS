@@ -1,0 +1,39 @@
+cff-version: 1.2.0
+message: 'To cite package "acousticTS" in publications use:'
+type: software
+license: GPL-3.0-only
+title: 'acousticTS: Estimating Acoustic Target Strength via Physics-Based Scattering
+  Models'
+version: 1.0.1
+identifiers:
+- type: doi
+  value: 10.5281/zenodo.7600660
+- type: url
+  value: https://brandynlucca.github.io/acousticTS/
+abstract: Acoustic target strength (TS) represents the intensity of an echo returning
+  from an individual scatterer such as bubbles, fish, or zooplankton. TS can be used
+  to convert integrated or volumetric backscatter collected from fisheries acoustic
+  surveys into units of number density (e.g. animals per m^3), abundance (e.g. number
+  of animals), and biomass (e.g. kg). This parameter can also be used to aid in classifying
+  backscatter, such as separating likely echoes of large predatory fish (e.g. adult
+  cod) from smaller prey (e.g. shrimp). One way to estimate TS is to use physics-based
+  models to calculate theoretical TS that comprise exact and approximate solutions
+  as well as analytical approaches. The models provided can help provide TS estimates
+  over broad statistical distributions of model parameters.
+authors:
+- family-names: Lucca
+  given-names: Brandyn
+  email: brandyn.lucca@gmail.com
+  orcid: https://orcid.org/0000-0003-3145-2969
+keywords:
+- active acoustics
+- backscatter modeling
+- target strength
+contact:
+- family-names: Lucca
+  given-names: Brandyn
+  email: brandyn.lucca@gmail.com
+  orcid: https://orcid.org/0000-0003-3145-2969
+doi: 10.5281/zenodo.7600660
+repository-code: https://github.com/brandynlucca/acousticTS
+url: https://brandynlucca.github.io/acousticTS/

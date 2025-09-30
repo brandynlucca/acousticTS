@@ -1,9 +1,14 @@
 
 # acousticTS
 
-[![DOI](https://zenodo.org/badge/161965429.svg)](https://zenodo.org/badge/latestdoi/161965429) [![Documentation](https://img.shields.io/badge/Latest_Documentation-cornflowerblue)](https://brandynlucca.github.io/acousticTS/)  
-[![Build status](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml) [![Coverage](https://github.com/brandynlucca/acousticTS/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/test-coverage.yaml) [![pkgdown](https://github.com/brandynlucca/acousticTS/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/pkgdown.yaml) [![pages-build-deployment](https://github.com/brandynlucca/acousticTS/actions/workflows/pages/pages-build-deployment/badge.svg?branch=gh-pages)](https://github.com/brandynlucca/acousticTS/actions/workflows/pages/pages-build-deployment)
-
+[![DOI](https://zenodo.org/badge/161965429.svg)](https://zenodo.org/badge/latestdoi/161965429)
+[![Documentation](https://img.shields.io/badge/Latest_Documentation-blue)](https://brandynlucca.github.io/acousticTS/)
+[![Build
+status](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml)
+[![Coverage](https://github.com/brandynlucca/acousticTS/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/test-coverage.yaml)
+[![Docs](https://github.com/brandynlucca/acousticTS/actions/workflows/document.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/document.yaml)
+[![pkgdown](https://github.com/brandynlucca/acousticTS/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/pkgdown.yaml)
+[![pages-build-deployment](https://github.com/brandynlucca/acousticTS/actions/workflows/pages/pages-build-deployment/badge.svg?branch=gh-pages)](https://github.com/brandynlucca/acousticTS/actions/workflows/pages/pages-build-deployment)
 Acoustic backscatter from a single target or organism is expressed as
 the intensity of an echo typically denoted as the *backscattering
 cross-section* (σ<sub>bs</sub>, m<sup>2</sup>). Target strength (TS, dB
@@ -25,7 +30,7 @@ distributions of inputs. This package is in a constant state of
 development with updates to the available model library, computational
 efficiency, and quality-of-life improvements.
 
-## Installation
+## <u>Installation</u>
 
 You can install the current released version of acousticTS via:
 
