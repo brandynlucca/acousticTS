@@ -6,4 +6,7 @@ articles:
   dcm_deformed_cylinder_model_vignette: dcm_deformed_cylinder_model_vignette.html
   dwba_fluid_like_scatterers_vignette: dwba_fluid_like_scatterers_vignette.html
   elastic_shelled_sphere_target_strength_vignette: elastic_shelled_sphere_target_strength_vignette.html
-last_built: 2025-09-30T16:38Z
+last_built: 2025-09-30T17:26Z
+urls:
+  reference: https://brandynlucca.github.io/acousticTS/reference
+  article: https://brandynlucca.github.io/acousticTS/articles
