@@ -16,6 +16,6 @@ Calculates the Euclidean norm of a vector.
 Calculates the Euclidean norm across each row of a given matrix.
 }
 \examples{
-values <- matrix( c( 1 , 2 , 3 ) , ncol = 3 )
-vecnorm( values ) # should yield 3.741657
+values <- matrix(c(1, 2, 3), ncol = 3)
+vecnorm(values) # should yield 3.741657
 }

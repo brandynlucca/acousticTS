@@ -16,8 +16,8 @@ prolate_spheroid(
 \arguments{
 \item{length_body}{Semi-major axis length (m).}
 
-\item{radius_body}{Semi-minor axis length (m). This can also be stylized as the
-"maximum radius" of the scattering object.}
+\item{radius_body}{Semi-minor axis length (m). This can also be stylized as
+the "maximum radius" of the scattering object.}
 
 \item{length_radius_ratio}{Optional ratio input when radius is not explicitly
 known.}

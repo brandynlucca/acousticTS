@@ -13,9 +13,9 @@ jcd(l, n)
 jcdd(l, n)
 }
 \arguments{
-\item{l}{An integer or fractional order}
+\item{l}{A real integer or fractional order}
 
-\item{n}{A complex or real argument}
+\item{n}{A real argument}
 }
 \value{
 Calculates the cylindrical Bessel function of the first kind (\eqn{J_v}) and

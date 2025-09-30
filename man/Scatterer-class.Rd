@@ -33,32 +33,40 @@ tilt/orientation, etc. For some scatterers, this may only include
 \code{body}, but other targets may have an additional parameter such as
 \code{bladder}. Generally, each entry includes:
 \itemize{
-\item{rpos}: the relevant position vector (\ifelse{html}{\out{r<sub>0</sub>}}{\eqn{r_{0}}})
+\item{rpos}: the relevant position vector
+(\ifelse{html}{\out{r<sub>0</sub>}}{\eqn{r_{0}}})
 that includes axes such as \code{x}, \code{y}, \code{z}, etc., that depend
 on the type of scatterer being used.
-\item{\code{radius}:} in some cases this includes the radius measurements for each
-cylinders depending on the type of scatterer object.
-\item{\code{theta}:} the orientation of the scatterer relative to the transmitting
-transducer or sound source (\ifelse{html}{\out{&theta;<sub>animal</sub>}}{\eqn{\theta_{animal}}})
-that can be represented either by degrees or radians, although all functions
-require radians.
-\item{\code{g, h}:} material properties that represent the density and sound speed
-contrasts (g and h, respectively) relative to the ambient/surrounding fluid.
-Some targets may instead have standard sound speed
-(\ifelse{html}{\out{c<sub>animal</sub>}}{\eqn{c_{animal}}}, m \ifelse{html}{\out{s<sup>-1</sup>}}{\eqn{s^{-1}}})
-and density (\ifelse{html}{\out{&rho;<sub>animal</sub>}}{\eqn{\rho_{animal}}}, kg \ifelse{html}{\out{m<sup>3</sup>}}{\eqn{m^3}}).
+\item{\code{radius}:} in some cases this includes the radius measurements
+for each cylinders depending on the type of scatterer object.
+\item{\code{theta}:} the orientation of the scatterer relative to the
+transmitting transducer or sound source
+(\ifelse{html}{\out{&theta;<sub>animal</sub>}}{\eqn{\theta_{animal}}})
+that can be represented either by degrees or radians, although all
+functions require radians.
+\item{\code{g, h}:} material properties that represent the density and
+sound speed contrasts (g and h, respectively) relative to the
+ambient/surrounding fluid. Some targets may instead have standard
+sound speed
+(\ifelse{html}{\out{c<sub>animal</sub>}}{\eqn{c_{animal}}},
+m \ifelse{html}{\out{s<sup>-1</sup>}}{\eqn{s^{-1}}})
+and density
+(\ifelse{html}{\out{&rho;<sub>animal</sub>}}{\eqn{\rho_{animal}}},
+kg \ifelse{html}{\out{m<sup>3</sup>}}{\eqn{m^3}}).
 }
 }
-\item{\code{shape_parameters}:}{A \code{list} that includes metadata pertaining
-to the shape of the scatterer and any other features of interest (e.g. gas-filled
-swimbladder). Generally, each entry includes: overall body length, the
-number of discrete cylinders that make up the shape (if applicable),
-and the units related to both \ifelse{html}{\out{&theta;<sub>animal</sub>}}{\eqn{\theta_{animal}}}
-(e.g. rad, \ifelse{html}{\out{&deg;}}{\eqn{^\circ}}) and length (e.g. mm, m).}
+\item{\code{shape_parameters}:}{A \code{list} that includes metadata
+pertaining to the shape of the scatterer and any other features of
+interest (e.g. gas-filled swimbladder). Generally, each entry includes:
+overall body length, the number of discrete cylinders that make up the
+shape (if applicable), and the units related to both
+\ifelse{html}{\out{&theta;<sub>animal</sub>}}{\eqn{\theta_{animal}}}
+(e.g. rad, \ifelse{html}{\out{&deg;}}{\eqn{^\circ}}) and length
+(e.g. mm, m).}
 \item{\code{model_parameters}:}{A \code{list} that contains relevant model
 parameterization once an object has been initialized for modeling
-\ifelse{html}{\out{&sigma;<sub>bs</sub>}}{\eqn{\sigma_{bs}}}. This is typically
-broken up into three categories:
+\ifelse{html}{\out{&sigma;<sub>bs</sub>}}{\eqn{\sigma_{bs}}}. This is
+typically broken up into three categories:
 \itemize{
 \item{\code{parameters}:} A \code{list} that includes information such as
 frequency (Hz), acoustic wavenumber (i.e. k), etc.
@@ -67,7 +75,8 @@ the material properties of the ambient medium.
 \item{\code{scatterer}:} A \code{list} containing summarized information
 used to parameterize certain scattering models.}}
 \item{\code{model}:}{A \code{list} that collects model results from one
-or more models in the linear domain (i.e. \ifelse{html}{\out{&sigma;<sub>bs</sub>}}{\eqn{\sigma_{bs}}}).
+or more models in the linear domain (i.e.
+\ifelse{html}{\out{&sigma;<sub>bs</sub>}}{\eqn{\sigma_{bs}}}).
 }
 }
 }

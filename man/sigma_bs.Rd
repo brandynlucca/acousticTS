@@ -11,8 +11,8 @@ sigma_bs(f_bs)
 \item{f_bs}{Linear scattering length (m), or related expression}
 }
 \value{
-Returns the linear backscattering coefficient that can be then converted into
-TS.
+Returns the linear backscattering coefficient that can be then converted
+into TS.
 }
 \description{
 Calculates the linear backscattering coefficient (sigma_bs) from the linear

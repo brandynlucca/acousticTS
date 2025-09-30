@@ -11,7 +11,8 @@ create_shape(shape, ...)
 \item{shape}{Shape. Details for shape specification are provided under
 'Details', including mandatory arguments.}
 
-\item{...}{Additional input arguments for subsequent shape generation functions.}
+\item{...}{Additional input arguments for subsequent shape generation
+functions.}
 }
 \value{
 Chu, D., Foote, K.G., and Stanton, T.K. 1993. Further analysis of target
@@ -29,16 +30,19 @@ A wrapper function that automatically creates generalized and/or canonical
 shapes for TS modeling.
 }
 \details{
-The \strong{shape} argument specifies what shape for the function to generate into
-the desired shape for TS modeling. Options currently include:
+The \strong{shape} argument specifies what shape for the function to
+generate the desired shape for TS modeling. Options currently include:
 \tabular{rlllll}{
 \tab \strong{Object shape} \tab \strong{shape = ...} \tab  \tab
 \strong{Parameters} \tab \strong{Root function}\cr
-\tab \emph{Discrete/tapered cylinder} \tab "cylinder" \tab \tab length, radius \tab
+\tab \emph{Discrete/tapered cylinder} \tab "cylinder" \tab
+\tab length, radius \tab
 \code{\link[=cylinder]{cylinder(...)}}\cr
-\tab \emph{Polynomial cylinder} \tab "polynomial_cylinder" \tab \tab length, radius, polynomial \tab
+\tab \emph{Polynomial cylinder} \tab "polynomial_cylinder" \tab
+\tab length, radius, polynomial \tab
 \code{\link[=polynomial_cylinder]{polynomial_cylinder(...)}}\cr
-\tab \emph{Prolate spheroid} \tab "prolate_spheroid" \tab \tab length, radius \tab
+\tab \emph{Prolate spheroid} \tab "prolate_spheroid" \tab
+\tab length, radius \tab
 \code{\link[=prolate_spheroid]{prolate_spheroid(...)}}\cr
 \tab \emph{Sphere} \tab "sphere" \tab \tab radius \tab
 \code{\link[=sphere]{sphere(...)}}\cr
@@ -48,16 +52,17 @@ the desired shape for TS modeling. Options currently include:
 \itemize{
 \item \strong{length}: the x-axis length of the shape.
 \item \strong{radius}: the radius of the shape when applicable.
-\item \strong{length_radius_ratio}: the length-to-radius ratio (L/A), which specifically
-refers to the radius at the mid-point of the cylinder and should be
-the maximum value. A typical L/A ratio in the literature is 16 for krill.
+\item \strong{length_radius_ratio}: the length-to-radius ratio (L/A), which
+specifically refers to the radius at the mid-point of the cylinder and
+should be the maximum value. A typical L/A ratio in the literature is 16
+for krill.
 \item \strong{taper}: the taper order (n), which parameterizes the tapering
 function reported by Chu \emph{et al.} (1993) to create a tapered cylinder.
 The tapering order will converge on a prolate and oblate spheroid when
 L > 2a and L < 2a, respectively, and n = 2. A typical taper order in the
 literature is 10.
-\item \strong{polynomial}: the vector of arbitrary polynomial coefficients to
-generate a deformed cylinder as reported by Smith \emph{et al.} (2013).
+\item \strong{polynomial}: the vector of arbitrary polynomial coefficients
+to generate a deformed cylinder as reported by Smith \emph{et al.} (2013).
 Although listed as a mandatory argument for the polynomial cylinder
 function, it has a default setting that uses the sixth-degree polynomial
 coefficients reported by Smith \emph{et al.} (2013).

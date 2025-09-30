@@ -3,16 +3,19 @@
 \name{hc}
 \alias{hc}
 \alias{hcd}
+\alias{hcdd}
 \title{Cylindrical Bessel (Hankel) function of the third kind and its derivatives}
 \usage{
 hc(l, n)
 
 hcd(l, n)
+
+hcdd(l, n)
 }
 \arguments{
-\item{l}{An integer or fractional order}
+\item{l}{A real integer or fractional order}
 
-\item{n}{A complex or real argument}
+\item{n}{A real argument}
 }
 \value{
 Calculates the cylindrical Bessel function of the first kind (\eqn{H_v}) and

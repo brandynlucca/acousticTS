@@ -19,7 +19,8 @@
 
 \item{radius}{New radius size}
 
-\item{length_radius_ratio_constant}{Keep length-to-radius ratio based on new length}
+\item{length_radius_ratio_constant}{Keep length-to-radius ratio based on new
+length}
 
 \item{n_segments}{New number of segments}
 }

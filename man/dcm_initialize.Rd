@@ -51,7 +51,8 @@ m \ifelse{html}{\out{s<sup>-1</sup>}}{\eqn{s^{-1}}}).}
 (\ifelse{html}{\out{&rho;<sub>body</sub>}}{\eqn{\rho_{body}}},
 kg \ifelse{html}{\out{m<sup>3</sup>}}{\eqn{m^3}})}
 
-\item{alpha_B}{Numerical coefficient (\ifelse{html}{\out{&alpha;<sub>B</sub>}}{\eqn{\alpha_{B}}}).}
+\item{alpha_B}{Numerical coefficient
+(\ifelse{html}{\out{&alpha;<sub>B</sub>}}{\eqn{\alpha_{B}}}).}
 }
 \description{
 Initialize object for modeling using the DCM.

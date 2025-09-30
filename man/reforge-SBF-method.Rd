@@ -6,46 +6,50 @@
 \usage{
 \S4method{reforge}{SBF}(
   object,
-  length_body = NA,
-  width_body = NA,
-  height_body = NA,
-  length_bladder = NA,
-  width_bladder = NA,
-  height_bladder = NA,
-  radius_body = NA,
-  bladder_inflation_factor = 1,
+  body_scale = NULL,
+  body_target = NULL,
+  swimbladder_scale = NULL,
+  swimbladder_target = NULL,
   isometric_body = TRUE,
-  isometric_bladder = TRUE,
-  n_segments_body = NA,
-  n_segments_bladder = NA
+  isometric_swimbladder = TRUE,
+  maintain_ratio = TRUE,
+  swimbladder_inflation_factor = 1,
+  n_segments_body = NULL,
+  n_segments_swimbladder = NULL
 )
 }
 \arguments{
 \item{object}{SBF-class object.}
 
-\item{length_body}{Updated body length when applicable.}
+\item{body_scale}{Proportional scaling to the body length, width, and height
+dimensions. When a single value is supplied, all dimensions are scaled using
+the same scaling factor. Otherwise, this input must be a named numeric
+vector.}
 
-\item{width_body}{Updated body width when applicable.}
+\item{body_target}{Target dimensions (m) for the body length, width, and
+height dimensions. This input must be a named numeric vector.}
 
-\item{height_body}{Updated body height/depth when applicable.}
+\item{swimbladder_scale}{Proportional scaling to the swimbladder length,
+width, and height dimensions. When a single value is supplied, all
+dimensions are scaled using the same scaling factor. Otherwise, this input
+must be a named numeric vector.}
 
-\item{length_bladder}{Updated bladder length when applicable.}
-
-\item{width_bladder}{Updated bladder width when applicable.}
-
-\item{height_bladder}{Updated bladder height/depth when applicable.}
-
-\item{radius_body}{Updated body radius when applicable.}
-
-\item{bladder_inflation_factor}{Proportional bladder volume.}
+\item{swimbladder_target}{Target dimensions (m) for the swimbladder length,
+width, and height dimensions. This input must be a named numeric vector.}
 
 \item{isometric_body}{Logical; maintain isometric scaling for body.}
 
-\item{isometric_bladder}{Logical; maintain isometric scaling for bladder.}
+\item{isometric_swimbladder}{Logical; maintain isometric scaling for bladder.}
+
+\item{maintain_ratio}{Maintain size ratio between body and
+swimbladder.}
+
+\item{swimbladder_inflation_factor}{Proportional swimbladder volume where
+the swimbladder x-axis origin and terminus are both held constant.}
 
 \item{n_segments_body}{Number of segments along the body.}
 
-\item{n_segments_bladder}{Number of segments along the bladder.}
+\item{n_segments_swimbladder}{Number of segments along the bladder.}
 }
 \description{
 Resizing function for swimbladdered targets

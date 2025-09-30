@@ -41,17 +41,24 @@ sbf_generate(
 
 \item{zL_bladder}{Vector containing ventral-bladder axis (m).}
 
-\item{sound_speed_body}{Flesh sound speed (\ifelse{html}{\out{c;<sub>body</sub>}}{\eqn{c_{body}}}, m \ifelse{html}{\out{s<sup>-1</sup>}}{\eqn{s^{-1}}}).}
+\item{sound_speed_body}{Flesh sound speed
+(\ifelse{html}{\out{c;<sub>body</sub>}}{\eqn{c_{body}}},
+m \ifelse{html}{\out{s<sup>-1</sup>}}{\eqn{s^{-1}}}).}
 
 \item{sound_speed_bladder}{Bladder sound speed (c, m \eqn{s^-1}.}
 
-\item{density_body}{Flesh density (\ifelse{html}{\out{&rho;<sub>body</sub>}}{\eqn{\rho_{body}}}, kg \ifelse{html}{\out{m<sup>3</sup>}}{\eqn{m^3}}).}
+\item{density_body}{Flesh density
+(\ifelse{html}{\out{&rho;<sub>body</sub>}}{\eqn{\rho_{body}}},
+kg \ifelse{html}{\out{m<sup>3</sup>}}{\eqn{m^3}}).}
 
-\item{density_bladder}{Bladder density (\eqn{\rho}, kg \ifelse{html}{\out{m<sup>3</sup>}}{\eqn{m^3}}).}
+\item{density_bladder}{Bladder density (\eqn{\rho},
+kg \ifelse{html}{\out{m<sup>3</sup>}}{\eqn{m^3}}).}
 
-\item{theta_body}{Angle of body relative to wavefront (\eqn{\theta_body}, radians).}
+\item{theta_body}{Angle of body relative to wavefront
+(\eqn{\theta_body}, radians).}
 
-\item{theta_bladder}{Angle of body relative to wavefront (\eqn{\theta_bladder}, radians).}
+\item{theta_bladder}{Angle of body relative to wavefront
+(\eqn{\theta_bladder}, radians).}
 
 \item{theta_units}{Angular units.}
 

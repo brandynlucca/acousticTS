@@ -11,8 +11,8 @@ calibration(object)
 \item{object}{CAL-class object.}
 }
 \value{
-The theoretical acoustic target strength (TS, dB re. 1 \eqn{m^2})  of a
-solid sphere at a given frequency.
+The theoretical acoustic target strength (TS, dB re. 1 \eqn{m^2}) of
+a solid sphere at a given frequency.
 }
 \description{
 This function is a wrapper around TS_calculate(...) that parametrizes the

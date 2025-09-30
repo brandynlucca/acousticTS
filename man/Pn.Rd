@@ -12,8 +12,8 @@ Pn(n, x)
 \item{x}{Real value}
 }
 \value{
-Returns a matrix array calculated by computing the outer product that generates
-a series of values when evaluated over a vector.
+Returns a matrix array calculated by computing the outer product that
+generates a series of values when evaluated over a vector.
 }
 \description{
 Legendre Polynomial function (Pn) of the first kind.

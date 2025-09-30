@@ -20,6 +20,6 @@ Transforms the backscattering response into either the log (\code{db}) or
 linear (\code{linear}) domains.
 }
 \description{
-The \code{linear(...)} function converts a given value into the linear domain, while
-the \code{db(...)} function converts inputs into the log domain.
+The \code{linear(...)} function converts a given value into the linear domain,
+while the \code{db(...)} function converts inputs into the log domain.
 }

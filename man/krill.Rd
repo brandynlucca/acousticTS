@@ -5,10 +5,12 @@
 \alias{krill}
 \title{Sample krill (Euphausia superba) shape taken from McGehee et al. (1998)}
 \format{
-A pre-generated FLS scatterer containing all information required for target strength modeling.
+A pre-generated FLS scatterer containing all information required
+for target strength modeling.
 \describe{
 \item{metadata}{Relevant and identifying metadata (\code{list}).}
-\item{model_parameters}{Container for specified model parameters (\code{list}).}
+\item{model_parameters}{Container for specified model parameters
+(\code{list}).}
 \item{model}{Model outputs and results (\code{list}).}
 \item{body}{A list with elements:
 \itemize{

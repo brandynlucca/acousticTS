@@ -6,7 +6,7 @@
 \usage{
 gas_generate(
   shape = "sphere",
-  radius_body,
+  radius_body = NULL,
   h_fluid = 0.22,
   g_fluid = 0.0012,
   sound_speed_fluid = NULL,

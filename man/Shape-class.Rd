@@ -6,8 +6,8 @@
 \alias{Shape}
 \title{Generic scattering shape object used throughout this package.}
 \description{
-A S4 class that provides slots to contain relevant shape data and metadata for
-a variety of arbitrary and canonical shapes and geometries. See
+A S4 class that provides slots to contain relevant shape data and metadata
+for a variety of arbitrary and canonical shapes and geometries. See
 \link{Scatterer} for a more detailed description on how
 this S4 object interacts with generic \link{Scatterer}
 objects.

@@ -34,9 +34,11 @@ krm_initialize(
 
 \item{sound_speed_swimbladder}{Optional gas sound speed input.}
 
-\item{theta_body}{Optional orientation input (relative to incident sound wave).}
+\item{theta_body}{Optional orientation input (relative to incident sound
+wave).}
 
-\item{theta_swimbladder}{Optional orientation input (relative to incident sound wave).}
+\item{theta_swimbladder}{Optional orientation input (relative to incident
+sound wave).}
 }
 \description{
 Initialize SBF-class object for KRM calculations.

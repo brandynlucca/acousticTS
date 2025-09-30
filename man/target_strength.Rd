@@ -13,8 +13,8 @@ target_strength(object, frequency, model, verbose = FALSE, ...)
 
 \item{model}{Model name.}
 
-\item{verbose}{Prints current procedural step occurring from model initialization
-to calculating TS. Defaults to FALSE.}
+\item{verbose}{Prints current procedural step occurring from model
+initialization to calculating TS. Defaults to FALSE.}
 
 \item{...}{Additional optional model inputs/parameters.}
 }

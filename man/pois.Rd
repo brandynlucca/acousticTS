@@ -19,9 +19,8 @@ Returns a dimensionless ratio known as Poisson's ratio (\eqn{\nu}).
 }
 \description{
 Calculate the Poisson's ratio (\eqn{\nu}) from two of the three other elastic
-moduli to calculate the Lamé's parameter. When more than two values are
-input, the function will default to using the bulk (K) and
-Young's (E) moduli. This assumes that the input values represent 3D material
-properties.
+moduli to calculate the Lamé's parameter. When more than two values
+are input, the function will default to using the bulk (K) and Young's (E)
+moduli. This assumes that the input values represent 3D material properties.
 }
 \keyword{elastic}

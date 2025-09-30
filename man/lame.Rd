@@ -5,7 +5,7 @@
 \alias{lame}
 \title{Calculate Lamé's first parameter (\eqn{\lambda})}
 \usage{
-lame(K, E, G, nu)
+lame(K = NULL, E = NULL, G = NULL, nu = NULL)
 }
 \arguments{
 \item{K}{Bulk modulus (Pa).}

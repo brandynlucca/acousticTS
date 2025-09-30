@@ -4,7 +4,7 @@
 \alias{cylinder}
 \title{Creates a cylinder.}
 \usage{
-cylinder(length_body, radius_body, length_radius_ratio, 
+cylinder(length_body, radius_body, length_radius_ratio,
 taper, n_segments, length_units)
 }
 \arguments{

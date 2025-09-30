@@ -15,15 +15,18 @@ A named list with the following components:
 \item \code{rpos}: Position matrix (x, yw, zU, zL; m).
 \item \code{sound_speed}: Flesh sound speed (\eqn{c_{body}}, m/s).
 \item \code{density}: Flesh density (\eqn{\rho_{body}}, kg/m\eqn{^3}).
-\item \code{theta}: Orientation relative to transducer (\eqn{\theta_{body}}, radians).
+\item \code{theta}: Orientation relative to transducer
+(\eqn{\theta_{body}}, radians).
 }
 }
 \item{bladder}{A list with:
 \itemize{
 \item \code{rpos}: Position matrix (x, yw, zU, zL; m).
 \item \code{sound_speed}: Bladder sound speed (\eqn{c_{bladder}}, m/s).
-\item \code{density}: Bladder density (\eqn{\rho_{bladder}}, kg/m\eqn{^3}).
-\item \code{theta}: Orientation relative to transducer (\eqn{\theta_{bladder}}, radians).
+\item \code{density}: Bladder density
+(\eqn{\rho_{bladder}}, kg/m\eqn{^3}).
+\item \code{theta}: Orientation relative to transducer
+(\eqn{\theta_{bladder}}, radians).
 }
 }
 \item{shape_parameters}{A named list with:

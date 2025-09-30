@@ -23,8 +23,8 @@ fls_generate(
 )
 }
 \arguments{
-\item{shape}{Optional input argument that dictates shape-type, if desired, for
-generalized shapes.}
+\item{shape}{Optional input argument that dictates shape-type, if desired,
+for generalized shapes.}
 
 \item{x_body}{Vector containing x-axis body (m) shape data.}
 

@@ -9,7 +9,7 @@ ess_generate(
   x_body = NULL,
   y_body = NULL,
   z_body = NULL,
-  radius_shell,
+  radius_shell = NULL,
   shell_thickness = NULL,
   g_fluid = NULL,
   density_fluid = NULL,
@@ -30,8 +30,8 @@ ess_generate(
 )
 }
 \arguments{
-\item{shape}{Optional input argument that dictates shape-type, if desired, for
-generalized shapes.}
+\item{shape}{Optional input argument that dictates shape-type, if desired,
+for generalized shapes.}
 
 \item{x_body}{Vector containing x-axis body (m) shape data.}
 
