@@ -54,10 +54,8 @@ phase_integrate <- function(x, y, n_iterations, integral, phase_sd) {
 #' Convert angular measurements from radians to degrees
 #' @param x A real value in radians
 #' @examples
-#' \dontrun{
 #' orientation <- pi / 2 # radians
 #' degrees(orientation) # this should return a value equal to 90 degrees
-#' }
 #' @return
 #' Angle in degrees
 #' @rdname degrees
