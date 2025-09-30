@@ -6,10 +6,12 @@ editor_options:
 ---
 
 ```{r, echo = FALSE}
-knitr::opts_chunk$set(collapse=TRUE, 
-                      comment="##", 
-                      fig.retina=2, 
-                      fig.path = "README_figs/README-")
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "##",
+  fig.retina = 2,
+  fig.path = "README_figs/README-"
+)
 ```
 
 # acousticTS
