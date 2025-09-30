@@ -131,17 +131,17 @@ zooplankton organism:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create a simple cylinder shape</span></span>
 <span><span class="va">cylinder_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cylinder.html">cylinder</a></span><span class="op">(</span></span>
-<span>  length_body <span class="op">=</span> <span class="fl">20e-3</span>,     <span class="co"># 20 mm length</span></span>
-<span>  radius_body <span class="op">=</span> <span class="fl">2.5e-3</span>,    <span class="co"># 2.5 mm radius</span></span>
-<span>  n_segments <span class="op">=</span> <span class="fl">50</span>          <span class="co"># 50 discrete segments</span></span>
+<span>  length_body <span class="op">=</span> <span class="fl">20e-3</span>, <span class="co"># 20 mm length</span></span>
+<span>  radius_body <span class="op">=</span> <span class="fl">2.5e-3</span>, <span class="co"># 2.5 mm radius</span></span>
+<span>  n_segments <span class="op">=</span> <span class="fl">50</span> <span class="co"># 50 discrete segments</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Create FLS object with the cylinder shape</span></span>
 <span><span class="va">cylinder_scatterer</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fls_generate.html">fls_generate</a></span><span class="op">(</span></span>
 <span>  shape <span class="op">=</span> <span class="va">cylinder_shape</span>,</span>
-<span>  g_body <span class="op">=</span> <span class="fl">1.06</span>,           <span class="co"># Density contrast (ρ_body/ρ_water)</span></span>
-<span>  h_body <span class="op">=</span> <span class="fl">1.06</span>,           <span class="co"># Sound speed contrast (c_body/c_water)</span></span>
-<span>  theta_body <span class="op">=</span> <span class="va">pi</span><span class="op">/</span><span class="fl">2</span>        <span class="co"># Broadside orientation</span></span>
+<span>  g_body <span class="op">=</span> <span class="fl">1.06</span>, <span class="co"># Density contrast (ρ_body/ρ_water)</span></span>
+<span>  h_body <span class="op">=</span> <span class="fl">1.06</span>, <span class="co"># Sound speed contrast (c_body/c_water)</span></span>
+<span>  theta_body <span class="op">=</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">2</span> <span class="co"># Broadside orientation</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Display the object</span></span>
@@ -156,7 +156,7 @@ zooplankton organism:</p>
 <span><span class="co">##  Shape parameters:</span></span>
 <span><span class="co">##   Defined shape: Cylinder </span></span>
 <span><span class="co">##   L/a ratio: 8 </span></span>
-<span><span class="co">##   Taper order:  </span></span>
+<span><span class="co">##   Taper order: NA </span></span>
 <span><span class="co">##  Material properties:</span></span>
 <span><span class="co">##   g: 1.06 </span></span>
 <span><span class="co">##   h: 1.06 </span></span>
@@ -170,17 +170,17 @@ spheroid:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create a prolate spheroid shape (more realistic for many zooplankton)</span></span>
 <span><span class="va">prolate_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/prolate_spheroid.html">prolate_spheroid</a></span><span class="op">(</span></span>
-<span>  length_body <span class="op">=</span> <span class="fl">18e-3</span>,     <span class="co"># 18 mm length</span></span>
-<span>  radius_body <span class="op">=</span> <span class="fl">2e-3</span>,      <span class="co"># 2 mm maximum radius</span></span>
+<span>  length_body <span class="op">=</span> <span class="fl">18e-3</span>, <span class="co"># 18 mm length</span></span>
+<span>  radius_body <span class="op">=</span> <span class="fl">2e-3</span>, <span class="co"># 2 mm maximum radius</span></span>
 <span>  n_segments <span class="op">=</span> <span class="fl">50</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Create FLS object with prolate spheroid shape</span></span>
 <span><span class="va">prolate_scatterer</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fls_generate.html">fls_generate</a></span><span class="op">(</span></span>
 <span>  shape <span class="op">=</span> <span class="va">prolate_shape</span>,</span>
-<span>  g_body <span class="op">=</span> <span class="fl">1.058</span>,          <span class="co"># Slightly different material properties</span></span>
+<span>  g_body <span class="op">=</span> <span class="fl">1.058</span>, <span class="co"># Slightly different material properties</span></span>
 <span>  h_body <span class="op">=</span> <span class="fl">1.058</span>,</span>
-<span>  theta_body <span class="op">=</span> <span class="va">pi</span><span class="op">/</span><span class="fl">2</span></span>
+<span>  theta_body <span class="op">=</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">2</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">prolate_scatterer</span></span></code></pre></div>
@@ -218,7 +218,7 @@ radius). Let’s calculate target strength over a frequency range
 appropriate for the DCM:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Define frequency vector focused on higher frequencies</span></span>
-<span><span class="va">frequency</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">100e3</span>, <span class="fl">1000e3</span>, <span class="fl">20e3</span><span class="op">)</span>  <span class="co"># 100 kHz to 1 MHz</span></span>
+<span><span class="va">frequency</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">100e3</span>, <span class="fl">1000e3</span>, <span class="fl">20e3</span><span class="op">)</span> <span class="co"># 100 kHz to 1 MHz</span></span>
 <span></span>
 <span><span class="co"># Calculate TS using DCM for cylinder</span></span>
 <span><span class="va">cylinder_scatterer</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/target_strength.html">target_strength</a></span><span class="op">(</span></span>
@@ -258,30 +258,35 @@ appropriate for the DCM:</p>
 <span><span class="va">ts_prolate</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">prolate_scatterer</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">$</span><span class="va">DCM</span></span>
 <span></span>
 <span><span class="co"># Create comparison plot</span></span>
-<span><span class="fu"><a href="../reference/plot.scatterer.html">plot</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ts_cylinder</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>, </span>
-<span>     y <span class="op">=</span> <span class="va">ts_cylinder</span><span class="op">$</span><span class="va">TS</span>, </span>
-<span>     type <span class="op">=</span> <span class="st">'l'</span>,</span>
-<span>     lty <span class="op">=</span> <span class="fl">1</span>, </span>
-<span>     lwd <span class="op">=</span> <span class="fl">2.5</span>,</span>
-<span>     col <span class="op">=</span> <span class="st">'cornflowerblue'</span>,</span>
-<span>     xlab <span class="op">=</span> <span class="st">"Frequency (kHz)"</span>,</span>
-<span>     ylab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">Target</span><span class="op">~</span><span class="va">strength</span><span class="op">~</span><span class="op">(</span><span class="va">dB</span><span class="op">~</span><span class="va">re.</span><span class="op">~</span><span class="fl">1</span><span class="op">~</span><span class="va">m</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>     cex.lab <span class="op">=</span> <span class="fl">1.3</span>, </span>
-<span>     cex.axis <span class="op">=</span> <span class="fl">1.2</span>,</span>
-<span>     main <span class="op">=</span> <span class="st">"DCM: Shape Comparison"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/plot.scatterer.html">plot</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">ts_cylinder</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">ts_cylinder</span><span class="op">$</span><span class="va">TS</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"l"</span>,</span>
+<span>  lty <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  lwd <span class="op">=</span> <span class="fl">2.5</span>,</span>
+<span>  col <span class="op">=</span> <span class="st">"cornflowerblue"</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="st">"Frequency (kHz)"</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">Target</span> <span class="op">~</span> <span class="va">strength</span> <span class="op">~</span> <span class="op">(</span><span class="va">dB</span> <span class="op">~</span> <span class="va">re.</span> <span class="op">~</span> <span class="fl">1</span> <span class="op">~</span> <span class="va">m</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  cex.lab <span class="op">=</span> <span class="fl">1.3</span>,</span>
+<span>  cex.axis <span class="op">=</span> <span class="fl">1.2</span>,</span>
+<span>  main <span class="op">=</span> <span class="st">"DCM: Shape Comparison"</span></span>
+<span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ts_prolate</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>,</span>
-<span>      y <span class="op">=</span> <span class="va">ts_prolate</span><span class="op">$</span><span class="va">TS</span>,</span>
-<span>      col <span class="op">=</span> <span class="st">'firebrick3'</span>,</span>
-<span>      lty <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>      lwd <span class="op">=</span> <span class="fl">2.5</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">ts_prolate</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">ts_prolate</span><span class="op">$</span><span class="va">TS</span>,</span>
+<span>  col <span class="op">=</span> <span class="st">"firebrick3"</span>,</span>
+<span>  lty <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  lwd <span class="op">=</span> <span class="fl">2.5</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"bottomright"</span>,</span>
-<span>       <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Cylinder"</span>, <span class="st">"Prolate Spheroid"</span><span class="op">)</span>,</span>
-<span>       lty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>,</span>
-<span>       lwd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.5</span>, <span class="fl">2.5</span><span class="op">)</span>,</span>
-<span>       col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'cornflowerblue'</span>, <span class="st">'firebrick3'</span><span class="op">)</span>,</span>
-<span>       cex <span class="op">=</span> <span class="fl">1.0</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Cylinder"</span>, <span class="st">"Prolate Spheroid"</span><span class="op">)</span>,</span>
+<span>  lty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>,</span>
+<span>  lwd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.5</span>, <span class="fl">2.5</span><span class="op">)</span>,</span>
+<span>  col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cornflowerblue"</span>, <span class="st">"firebrick3"</span><span class="op">)</span>,</span>
+<span>  cex <span class="op">=</span> <span class="fl">1.0</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="dcm_deformed_cylinder_model_vignette_files/figure-html/unnamed-chunk-8-1.png" width="768"></p>
 </div>
 </div>
@@ -297,16 +302,16 @@ explore this:</p>
 <code class="sourceCode R"><span><span class="co"># Create scatterers with different density contrasts</span></span>
 <span><span class="va">high_contrast</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fls_generate.html">fls_generate</a></span><span class="op">(</span></span>
 <span>  shape <span class="op">=</span> <span class="va">cylinder_shape</span>,</span>
-<span>  g_body <span class="op">=</span> <span class="fl">1.10</span>,    <span class="co"># Higher density contrast</span></span>
+<span>  g_body <span class="op">=</span> <span class="fl">1.10</span>, <span class="co"># Higher density contrast</span></span>
 <span>  h_body <span class="op">=</span> <span class="fl">1.06</span>,</span>
-<span>  theta_body <span class="op">=</span> <span class="va">pi</span><span class="op">/</span><span class="fl">2</span></span>
+<span>  theta_body <span class="op">=</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">2</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">low_contrast</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fls_generate.html">fls_generate</a></span><span class="op">(</span></span>
 <span>  shape <span class="op">=</span> <span class="va">cylinder_shape</span>,</span>
-<span>  g_body <span class="op">=</span> <span class="fl">1.02</span>,    <span class="co"># Lower density contrast  </span></span>
+<span>  g_body <span class="op">=</span> <span class="fl">1.02</span>, <span class="co"># Lower density contrast</span></span>
 <span>  h_body <span class="op">=</span> <span class="fl">1.06</span>,</span>
-<span>  theta_body <span class="op">=</span> <span class="va">pi</span><span class="op">/</span><span class="fl">2</span></span>
+<span>  theta_body <span class="op">=</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">2</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Calculate TS for both</span></span>
@@ -319,36 +324,43 @@ explore this:</p>
 <span><span class="va">ts_original</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">cylinder_scatterer</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">$</span><span class="va">DCM</span></span>
 <span></span>
 <span><span class="co"># Plot comparison</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>oma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.25</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, mar<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">4</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/plot.scatterer.html">plot</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ts_original</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>, </span>
-<span>     y <span class="op">=</span> <span class="va">ts_original</span><span class="op">$</span><span class="va">TS</span>, </span>
-<span>     type <span class="op">=</span> <span class="st">'l'</span>,</span>
-<span>     lty <span class="op">=</span> <span class="fl">1</span>, </span>
-<span>     lwd <span class="op">=</span> <span class="fl">2.5</span>,</span>
-<span>     xlab <span class="op">=</span> <span class="st">"Frequency (kHz)"</span>,</span>
-<span>     ylab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">Target</span><span class="op">~</span><span class="va">strength</span><span class="op">~</span><span class="op">(</span><span class="va">dB</span><span class="op">~</span><span class="va">re.</span><span class="op">~</span><span class="fl">1</span><span class="op">~</span><span class="va">m</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>     ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">115</span>, <span class="op">-</span><span class="fl">55</span><span class="op">)</span>,</span>
-<span>     cex.lab <span class="op">=</span> <span class="fl">1.3</span>, </span>
-<span>     cex.axis <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>oma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.25</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">4</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/plot.scatterer.html">plot</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">ts_original</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">ts_original</span><span class="op">$</span><span class="va">TS</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"l"</span>,</span>
+<span>  lty <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  lwd <span class="op">=</span> <span class="fl">2.5</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="st">"Frequency (kHz)"</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">Target</span> <span class="op">~</span> <span class="va">strength</span> <span class="op">~</span> <span class="op">(</span><span class="va">dB</span> <span class="op">~</span> <span class="va">re.</span> <span class="op">~</span> <span class="fl">1</span> <span class="op">~</span> <span class="va">m</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">115</span>, <span class="op">-</span><span class="fl">55</span><span class="op">)</span>,</span>
+<span>  cex.lab <span class="op">=</span> <span class="fl">1.3</span>,</span>
+<span>  cex.axis <span class="op">=</span> <span class="fl">1.2</span></span>
+<span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ts_high</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>,</span>
-<span>      y <span class="op">=</span> <span class="va">ts_high</span><span class="op">$</span><span class="va">TS</span>,</span>
-<span>      col <span class="op">=</span> <span class="st">'darkgoldenrod3'</span>,</span>
-<span>      lty <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>      lwd <span class="op">=</span> <span class="fl">2.5</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">ts_high</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">ts_high</span><span class="op">$</span><span class="va">TS</span>,</span>
+<span>  col <span class="op">=</span> <span class="st">"darkgoldenrod3"</span>,</span>
+<span>  lty <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  lwd <span class="op">=</span> <span class="fl">2.5</span></span>
+<span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ts_low</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>,</span>
-<span>      y <span class="op">=</span> <span class="va">ts_low</span><span class="op">$</span><span class="va">TS</span>,</span>
-<span>      col <span class="op">=</span> <span class="st">'darkseagreen4'</span>,</span>
-<span>      lty <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>      lwd <span class="op">=</span> <span class="fl">2.5</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">ts_low</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">ts_low</span><span class="op">$</span><span class="va">TS</span>,</span>
+<span>  col <span class="op">=</span> <span class="st">"darkseagreen4"</span>,</span>
+<span>  lty <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  lwd <span class="op">=</span> <span class="fl">2.5</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"bottomright"</span>,</span>
-<span>       <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"g = 1.06 (original)"</span>, <span class="st">"g = 1.10 (high)"</span>, <span class="st">"g = 1.02 (low)"</span><span class="op">)</span>,</span>
-<span>       lty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span>       lwd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.5</span>, <span class="fl">2.5</span>, <span class="fl">2.5</span><span class="op">)</span>,</span>
-<span>       col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'black'</span>, <span class="st">'darkgoldenrod3'</span>, <span class="st">'darkseagreen4'</span><span class="op">)</span>,</span>
-<span>       cex <span class="op">=</span> <span class="fl">1.0</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"g = 1.06 (original)"</span>, <span class="st">"g = 1.10 (high)"</span>, <span class="st">"g = 1.02 (low)"</span><span class="op">)</span>,</span>
+<span>  lty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>  lwd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.5</span>, <span class="fl">2.5</span>, <span class="fl">2.5</span><span class="op">)</span>,</span>
+<span>  col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"black"</span>, <span class="st">"darkgoldenrod3"</span>, <span class="st">"darkseagreen4"</span><span class="op">)</span>,</span>
+<span>  cex <span class="op">=</span> <span class="fl">1.0</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="dcm_deformed_cylinder_model_vignette_files/figure-html/unnamed-chunk-9-1.png" width="768"></p>
 </div>
 <div class="section level3">
@@ -361,19 +373,19 @@ scatterer’s orientation:</p>
 <span><span class="va">broadside</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fls_generate.html">fls_generate</a></span><span class="op">(</span></span>
 <span>  shape <span class="op">=</span> <span class="va">cylinder_shape</span>,</span>
 <span>  g_body <span class="op">=</span> <span class="fl">1.06</span>, h_body <span class="op">=</span> <span class="fl">1.06</span>,</span>
-<span>  theta_body <span class="op">=</span> <span class="va">pi</span><span class="op">/</span><span class="fl">2</span>    <span class="co"># 90° - broadside</span></span>
+<span>  theta_body <span class="op">=</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">2</span> <span class="co"># 90° - broadside</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">oblique_80</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fls_generate.html">fls_generate</a></span><span class="op">(</span></span>
 <span>  shape <span class="op">=</span> <span class="va">cylinder_shape</span>,</span>
 <span>  g_body <span class="op">=</span> <span class="fl">1.06</span>, h_body <span class="op">=</span> <span class="fl">1.06</span>,</span>
-<span>  theta_body <span class="op">=</span> <span class="fu"><a href="../reference/radians.html">radians</a></span><span class="op">(</span><span class="fl">80</span><span class="op">)</span>    <span class="co"># 80° - oblique</span></span>
+<span>  theta_body <span class="op">=</span> <span class="fu"><a href="../reference/radians.html">radians</a></span><span class="op">(</span><span class="fl">80</span><span class="op">)</span> <span class="co"># 80° - oblique</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">oblique_70</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fls_generate.html">fls_generate</a></span><span class="op">(</span></span>
 <span>  shape <span class="op">=</span> <span class="va">cylinder_shape</span>,</span>
 <span>  g_body <span class="op">=</span> <span class="fl">1.06</span>, h_body <span class="op">=</span> <span class="fl">1.06</span>,</span>
-<span>  theta_body <span class="op">=</span> <span class="fu"><a href="../reference/radians.html">radians</a></span><span class="op">(</span><span class="fl">70</span><span class="op">)</span>    <span class="co"># 70° - more oblique</span></span>
+<span>  theta_body <span class="op">=</span> <span class="fu"><a href="../reference/radians.html">radians</a></span><span class="op">(</span><span class="fl">70</span><span class="op">)</span> <span class="co"># 70° - more oblique</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Calculate TS for all orientations</span></span>
@@ -387,36 +399,43 @@ scatterer’s orientation:</p>
 <span><span class="va">ts_70</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">oblique_70</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">$</span><span class="va">DCM</span></span>
 <span></span>
 <span><span class="co"># Plot orientation comparison</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>oma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.25</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, mar<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">4</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/plot.scatterer.html">plot</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ts_broadside</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>, </span>
-<span>     y <span class="op">=</span> <span class="va">ts_broadside</span><span class="op">$</span><span class="va">TS</span>, </span>
-<span>     type <span class="op">=</span> <span class="st">'l'</span>,</span>
-<span>     lty <span class="op">=</span> <span class="fl">1</span>, </span>
-<span>     lwd <span class="op">=</span> <span class="fl">2.5</span>,</span>
-<span>     xlab <span class="op">=</span> <span class="st">"Frequency (kHz)"</span>,</span>
-<span>     ylab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">Target</span><span class="op">~</span><span class="va">strength</span><span class="op">~</span><span class="op">(</span><span class="va">dB</span><span class="op">~</span><span class="va">re.</span><span class="op">~</span><span class="fl">1</span><span class="op">~</span><span class="va">m</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>     cex.lab <span class="op">=</span> <span class="fl">1.3</span>, </span>
-<span>     cex.axis <span class="op">=</span> <span class="fl">1.2</span>,</span>
-<span>     ylim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">140</span>, <span class="op">-</span><span class="fl">60</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>oma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.25</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">4</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/plot.scatterer.html">plot</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">ts_broadside</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">ts_broadside</span><span class="op">$</span><span class="va">TS</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"l"</span>,</span>
+<span>  lty <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  lwd <span class="op">=</span> <span class="fl">2.5</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="st">"Frequency (kHz)"</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">Target</span> <span class="op">~</span> <span class="va">strength</span> <span class="op">~</span> <span class="op">(</span><span class="va">dB</span> <span class="op">~</span> <span class="va">re.</span> <span class="op">~</span> <span class="fl">1</span> <span class="op">~</span> <span class="va">m</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  cex.lab <span class="op">=</span> <span class="fl">1.3</span>,</span>
+<span>  cex.axis <span class="op">=</span> <span class="fl">1.2</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">140</span>, <span class="op">-</span><span class="fl">60</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ts_80</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>,</span>
-<span>      y <span class="op">=</span> <span class="va">ts_80</span><span class="op">$</span><span class="va">TS</span>,</span>
-<span>      col <span class="op">=</span> <span class="st">'darkgoldenrod2'</span>,</span>
-<span>      lty <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>      lwd <span class="op">=</span> <span class="fl">2.5</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">ts_80</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">ts_80</span><span class="op">$</span><span class="va">TS</span>,</span>
+<span>  col <span class="op">=</span> <span class="st">"darkgoldenrod2"</span>,</span>
+<span>  lty <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  lwd <span class="op">=</span> <span class="fl">2.5</span></span>
+<span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ts_70</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>,</span>
-<span>      y <span class="op">=</span> <span class="va">ts_70</span><span class="op">$</span><span class="va">TS</span>,</span>
-<span>      col <span class="op">=</span> <span class="st">'firebrick3'</span>,</span>
-<span>      lty <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>      lwd <span class="op">=</span> <span class="fl">2.5</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">ts_70</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">ts_70</span><span class="op">$</span><span class="va">TS</span>,</span>
+<span>  col <span class="op">=</span> <span class="st">"firebrick3"</span>,</span>
+<span>  lty <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  lwd <span class="op">=</span> <span class="fl">2.5</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"bottomright"</span>,</span>
-<span>       <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Broadside (90°)"</span>, <span class="st">"Oblique (80°)"</span>, <span class="st">"Oblique (70°)"</span><span class="op">)</span>,</span>
-<span>       lty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span>       lwd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.5</span>, <span class="fl">2.5</span>, <span class="fl">2.5</span><span class="op">)</span>,</span>
-<span>       col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'black'</span>, <span class="st">'darkgoldenrod2'</span>, <span class="st">'firebrick3'</span><span class="op">)</span>,</span>
-<span>       cex <span class="op">=</span> <span class="fl">1.0</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Broadside (90°)"</span>, <span class="st">"Oblique (80°)"</span>, <span class="st">"Oblique (70°)"</span><span class="op">)</span>,</span>
+<span>  lty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>  lwd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.5</span>, <span class="fl">2.5</span>, <span class="fl">2.5</span><span class="op">)</span>,</span>
+<span>  col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"black"</span>, <span class="st">"darkgoldenrod2"</span>, <span class="st">"firebrick3"</span><span class="op">)</span>,</span>
+<span>  cex <span class="op">=</span> <span class="fl">1.0</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="dcm_deformed_cylinder_model_vignette_files/figure-html/unnamed-chunk-10-1.png" width="768"></p>
 </div>
 <div class="section level3">
@@ -425,13 +444,37 @@ scatterer’s orientation:</p>
 <p>Let’s examine how organism size affects DCM predictions:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create scatterers of different sizes</span></span>
-<span><span class="va">small_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cylinder.html">cylinder</a></span><span class="op">(</span>length_body <span class="op">=</span> <span class="fl">10e-3</span>, radius_body <span class="op">=</span> <span class="fl">1.5e-3</span>, n_segments <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span>
-<span><span class="va">medium_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cylinder.html">cylinder</a></span><span class="op">(</span>length_body <span class="op">=</span> <span class="fl">20e-3</span>, radius_body <span class="op">=</span> <span class="fl">2.5e-3</span>, n_segments <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span>
-<span><span class="va">large_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cylinder.html">cylinder</a></span><span class="op">(</span>length_body <span class="op">=</span> <span class="fl">40e-3</span>, radius_body <span class="op">=</span> <span class="fl">4e-3</span>, n_segments <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span>
+<span><span class="va">small_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cylinder.html">cylinder</a></span><span class="op">(</span></span>
+<span>  length_body <span class="op">=</span> <span class="fl">10e-3</span>,</span>
+<span>  radius_body <span class="op">=</span> <span class="fl">1.5e-3</span>,</span>
+<span>  n_segments <span class="op">=</span> <span class="fl">50</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">medium_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cylinder.html">cylinder</a></span><span class="op">(</span></span>
+<span>  length_body <span class="op">=</span> <span class="fl">20e-3</span>,</span>
+<span>  radius_body <span class="op">=</span> <span class="fl">2.5e-3</span>,</span>
+<span>  n_segments <span class="op">=</span> <span class="fl">50</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">large_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cylinder.html">cylinder</a></span><span class="op">(</span></span>
+<span>  length_body <span class="op">=</span> <span class="fl">40e-3</span>,</span>
+<span>  radius_body <span class="op">=</span> <span class="fl">4e-3</span>,</span>
+<span>  n_segments <span class="op">=</span> <span class="fl">50</span></span>
+<span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">small_scatterer</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fls_generate.html">fls_generate</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="va">small_shape</span>, g_body <span class="op">=</span> <span class="fl">1.06</span>, h_body <span class="op">=</span> <span class="fl">1.06</span>, theta_body <span class="op">=</span> <span class="va">pi</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span></span>
-<span><span class="va">medium_scatterer</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fls_generate.html">fls_generate</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="va">medium_shape</span>, g_body <span class="op">=</span> <span class="fl">1.06</span>, h_body <span class="op">=</span> <span class="fl">1.06</span>, theta_body <span class="op">=</span> <span class="va">pi</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span></span>
-<span><span class="va">large_scatterer</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fls_generate.html">fls_generate</a></span><span class="op">(</span>shape <span class="op">=</span> <span class="va">large_shape</span>, g_body <span class="op">=</span> <span class="fl">1.06</span>, h_body <span class="op">=</span> <span class="fl">1.06</span>, theta_body <span class="op">=</span> <span class="va">pi</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span></span>
+<span><span class="va">small_scatterer</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fls_generate.html">fls_generate</a></span><span class="op">(</span></span>
+<span>  shape <span class="op">=</span> <span class="va">small_shape</span>,</span>
+<span>  g_body <span class="op">=</span> <span class="fl">1.06</span>, h_body <span class="op">=</span> <span class="fl">1.06</span>,</span>
+<span>  theta_body <span class="op">=</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">2</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">medium_scatterer</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fls_generate.html">fls_generate</a></span><span class="op">(</span></span>
+<span>  shape <span class="op">=</span> <span class="va">medium_shape</span>,</span>
+<span>  g_body <span class="op">=</span> <span class="fl">1.06</span>, h_body <span class="op">=</span> <span class="fl">1.06</span>,</span>
+<span>  theta_body <span class="op">=</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">2</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">large_scatterer</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fls_generate.html">fls_generate</a></span><span class="op">(</span></span>
+<span>  shape <span class="op">=</span> <span class="va">large_shape</span>,</span>
+<span>  g_body <span class="op">=</span> <span class="fl">1.06</span>, h_body <span class="op">=</span> <span class="fl">1.06</span>,</span>
+<span>  theta_body <span class="op">=</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">2</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Calculate TS</span></span>
 <span><span class="va">small_scatterer</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/target_strength.html">target_strength</a></span><span class="op">(</span><span class="va">small_scatterer</span>, <span class="va">frequency</span>, <span class="st">"DCM"</span><span class="op">)</span></span>
@@ -444,37 +487,44 @@ scatterer’s orientation:</p>
 <span><span class="va">ts_large</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">large_scatterer</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">$</span><span class="va">DCM</span></span>
 <span></span>
 <span><span class="co"># Plot size comparison</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>oma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.25</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, mar<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">4</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/plot.scatterer.html">plot</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ts_small</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>, </span>
-<span>     y <span class="op">=</span> <span class="va">ts_small</span><span class="op">$</span><span class="va">TS</span>, </span>
-<span>     type <span class="op">=</span> <span class="st">'l'</span>,</span>
-<span>     lty <span class="op">=</span> <span class="fl">1</span>, </span>
-<span>     lwd <span class="op">=</span> <span class="fl">2.5</span>,</span>
-<span>     col <span class="op">=</span> <span class="st">'cornflowerblue'</span>,</span>
-<span>     xlab <span class="op">=</span> <span class="st">"Frequency (kHz)"</span>,</span>
-<span>     ylab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">Target</span><span class="op">~</span><span class="va">strength</span><span class="op">~</span><span class="op">(</span><span class="va">dB</span><span class="op">~</span><span class="va">re.</span><span class="op">~</span><span class="fl">1</span><span class="op">~</span><span class="va">m</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>     cex.lab <span class="op">=</span> <span class="fl">1.3</span>, </span>
-<span>     cex.axis <span class="op">=</span> <span class="fl">1.2</span>,</span>
-<span>     ylim<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">100</span>, <span class="op">-</span><span class="fl">55</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>oma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.25</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">4</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/plot.scatterer.html">plot</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">ts_small</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">ts_small</span><span class="op">$</span><span class="va">TS</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"l"</span>,</span>
+<span>  lty <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  lwd <span class="op">=</span> <span class="fl">2.5</span>,</span>
+<span>  col <span class="op">=</span> <span class="st">"cornflowerblue"</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="st">"Frequency (kHz)"</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">Target</span> <span class="op">~</span> <span class="va">strength</span> <span class="op">~</span> <span class="op">(</span><span class="va">dB</span> <span class="op">~</span> <span class="va">re.</span> <span class="op">~</span> <span class="fl">1</span> <span class="op">~</span> <span class="va">m</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  cex.lab <span class="op">=</span> <span class="fl">1.3</span>,</span>
+<span>  cex.axis <span class="op">=</span> <span class="fl">1.2</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">100</span>, <span class="op">-</span><span class="fl">55</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ts_medium</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>,</span>
-<span>      y <span class="op">=</span> <span class="va">ts_medium</span><span class="op">$</span><span class="va">TS</span>,</span>
-<span>      col <span class="op">=</span> <span class="st">'darkgoldenrod3'</span>,</span>
-<span>      lty <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>      lwd <span class="op">=</span> <span class="fl">2.5</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">ts_medium</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">ts_medium</span><span class="op">$</span><span class="va">TS</span>,</span>
+<span>  col <span class="op">=</span> <span class="st">"darkgoldenrod3"</span>,</span>
+<span>  lty <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  lwd <span class="op">=</span> <span class="fl">2.5</span></span>
+<span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ts_large</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>,</span>
-<span>      y <span class="op">=</span> <span class="va">ts_large</span><span class="op">$</span><span class="va">TS</span>,</span>
-<span>      col <span class="op">=</span> <span class="st">'firebrick3'</span>,</span>
-<span>      lty <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>      lwd <span class="op">=</span> <span class="fl">2.5</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">ts_large</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">ts_large</span><span class="op">$</span><span class="va">TS</span>,</span>
+<span>  col <span class="op">=</span> <span class="st">"firebrick3"</span>,</span>
+<span>  lty <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  lwd <span class="op">=</span> <span class="fl">2.5</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"bottomright"</span>,</span>
-<span>       <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Small (10 mm)"</span>, <span class="st">"Medium (20 mm)"</span>, <span class="st">"Large (40 mm)"</span><span class="op">)</span>,</span>
-<span>       lty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span>       lwd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.5</span>, <span class="fl">2.5</span>, <span class="fl">2.5</span><span class="op">)</span>,</span>
-<span>       col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'cornflowerblue'</span>, <span class="st">'darkgoldenrod3'</span>, <span class="st">'firebrick3'</span><span class="op">)</span>,</span>
-<span>       cex <span class="op">=</span> <span class="fl">1.0</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Small (10 mm)"</span>, <span class="st">"Medium (20 mm)"</span>, <span class="st">"Large (40 mm)"</span><span class="op">)</span>,</span>
+<span>  lty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>  lwd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.5</span>, <span class="fl">2.5</span>, <span class="fl">2.5</span><span class="op">)</span>,</span>
+<span>  col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cornflowerblue"</span>, <span class="st">"darkgoldenrod3"</span>, <span class="st">"firebrick3"</span><span class="op">)</span>,</span>
+<span>  cex <span class="op">=</span> <span class="fl">1.0</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="dcm_deformed_cylinder_model_vignette_files/figure-html/unnamed-chunk-11-1.png" width="768"></p>
 </div>
 </div>
@@ -526,21 +576,23 @@ pattern</li>
 <span><span class="va">dcm_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">cylinder_scatterer</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">$</span><span class="va">DCM</span></span>
 <span></span>
 <span><span class="co"># Plot ka vs frequency to show the high-frequency regime</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>oma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.25</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, mar<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">4</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/plot.scatterer.html">plot</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">dcm_results</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>, </span>
-<span>     y <span class="op">=</span> <span class="va">dcm_results</span><span class="op">$</span><span class="va">ka</span>, </span>
-<span>     type <span class="op">=</span> <span class="st">'l'</span>,</span>
-<span>     lwd <span class="op">=</span> <span class="fl">2.5</span>,</span>
-<span>     col <span class="op">=</span> <span class="st">'cornflowerblue'</span>,</span>
-<span>     xlab <span class="op">=</span> <span class="st">"Frequency (kHz)"</span>,</span>
-<span>     ylab <span class="op">=</span> <span class="st">"ka (dimensionless)"</span>,</span>
-<span>     cex.lab <span class="op">=</span> <span class="fl">1.3</span>, </span>
-<span>     cex.axis <span class="op">=</span> <span class="fl">1.2</span>,</span>
-<span>     main <span class="op">=</span> <span class="st">"DCM: High-frequency parameter ka"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>oma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.25</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">4</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/plot.scatterer.html">plot</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">dcm_results</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">dcm_results</span><span class="op">$</span><span class="va">ka</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"l"</span>,</span>
+<span>  lwd <span class="op">=</span> <span class="fl">2.5</span>,</span>
+<span>  col <span class="op">=</span> <span class="st">"cornflowerblue"</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="st">"Frequency (kHz)"</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="st">"ka (dimensionless)"</span>,</span>
+<span>  cex.lab <span class="op">=</span> <span class="fl">1.3</span>,</span>
+<span>  cex.axis <span class="op">=</span> <span class="fl">1.2</span>,</span>
+<span>  main <span class="op">=</span> <span class="st">"DCM: High-frequency parameter ka"</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Add horizontal line at ka = 1 for reference</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>h <span class="op">=</span> <span class="fl">1</span>, lty <span class="op">=</span> <span class="fl">2</span>, col <span class="op">=</span> <span class="st">'firebrick3'</span>, lwd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/text.html" class="external-link">text</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">200</span>, y <span class="op">=</span> <span class="fl">1.5</span>, <span class="st">"ka = 1"</span>, col <span class="op">=</span> <span class="st">'firebrick3'</span>, cex <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>h <span class="op">=</span> <span class="fl">1</span>, lty <span class="op">=</span> <span class="fl">2</span>, col <span class="op">=</span> <span class="st">"firebrick3"</span>, lwd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/text.html" class="external-link">text</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">200</span>, y <span class="op">=</span> <span class="fl">1.5</span>, <span class="st">"ka = 1"</span>, col <span class="op">=</span> <span class="st">"firebrick3"</span>, cex <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span></span></code></pre></div>
 <p><img src="dcm_deformed_cylinder_model_vignette_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
 </div>
 </div>
@@ -626,14 +678,18 @@ into scattering mechanisms</li>
 affects the directivity pattern:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create objects with different curvature ratios</span></span>
-<span><span class="va">straight_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cylinder.html">cylinder</a></span><span class="op">(</span>length_body <span class="op">=</span> <span class="fl">20e-3</span>, radius_body <span class="op">=</span> <span class="fl">2.5e-3</span>, n_segments <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span>
+<span><span class="va">straight_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cylinder.html">cylinder</a></span><span class="op">(</span></span>
+<span>  length_body <span class="op">=</span> <span class="fl">20e-3</span>,</span>
+<span>  radius_body <span class="op">=</span> <span class="fl">2.5e-3</span>,</span>
+<span>  n_segments <span class="op">=</span> <span class="fl">50</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># For DCM, we can specify different radius of curvature ratios</span></span>
 <span><span class="co"># This will be handled in the DCM initialization</span></span>
 <span><span class="va">straight_scatterer</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fls_generate.html">fls_generate</a></span><span class="op">(</span></span>
 <span>  shape <span class="op">=</span> <span class="va">straight_shape</span>,</span>
 <span>  g_body <span class="op">=</span> <span class="fl">1.06</span>, h_body <span class="op">=</span> <span class="fl">1.06</span>,</span>
-<span>  theta_body <span class="op">=</span> <span class="va">pi</span><span class="op">/</span><span class="fl">2</span></span>
+<span>  theta_body <span class="op">=</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">2</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># The radius of curvature affects the directivity pattern width</span></span>

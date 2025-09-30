@@ -52,7 +52,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">polynomial_cylinder</span><span class="op">(</span><span class="va">length_body</span>, <span class="va">radius_body</span>, <span class="va">n_segments</span>, <span class="va">polynomial</span>, </span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">polynomial_cylinder</span><span class="op">(</span><span class="va">length_body</span>, <span class="va">radius_body</span>, <span class="va">n_segments</span>, <span class="va">polynomial</span>,</span>
 <span><span class="va">length_units</span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -104,7 +104,10 @@ of Marine Science, 70(1): 204-214. https://doi.org/10.1093/icesjms/fss140</p>
 <span class="r-in"><span><span class="va">poly_vec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.83</span>, <span class="fl">0.36</span>, <span class="op">-</span><span class="fl">2.10</span>, <span class="op">-</span><span class="fl">1.20</span>, <span class="fl">0.63</span>, <span class="fl">0.82</span>, <span class="fl">0.64</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Create the position vector</span></span></span>
 <span class="r-in"><span><span class="co"># This outputs a list containing "rpos" and "radius"</span></span></span>
-<span class="r-in"><span><span class="va">pos</span> <span class="op">&lt;-</span> <span class="fu">polynomial_cylinder</span><span class="op">(</span>length_body <span class="op">=</span> <span class="fl">15e-3</span>, radius_body <span class="op">=</span> <span class="fl">2e-3</span>, polynomial <span class="op">=</span> <span class="va">poly_vec</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">pos</span> <span class="op">&lt;-</span> <span class="fu">polynomial_cylinder</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  length_body <span class="op">=</span> <span class="fl">15e-3</span>, radius_body <span class="op">=</span> <span class="fl">2e-3</span>,</span></span>
+<span class="r-in"><span>  polynomial <span class="op">=</span> <span class="va">poly_vec</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">pos</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>

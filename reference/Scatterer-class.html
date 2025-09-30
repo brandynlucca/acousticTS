@@ -89,35 +89,43 @@ in any manner for book keeping purposes.</p></dd>
 relevant to the scatterer's position vector, material properties,
 tilt/orientation, etc. For some scatterers, this may only include
 <code>body</code>, but other targets may have an additional parameter such as
-<code>bladder</code>. Generally, each entry includes:</p><ul><li><p>rpos: the relevant position vector (r<sub>0</sub>)
+<code>bladder</code>. Generally, each entry includes:</p><ul><li><p>rpos: the relevant position vector
+(r<sub>0</sub>)
 that includes axes such as <code>x</code>, <code>y</code>, <code>z</code>, etc., that depend
 on the type of scatterer being used.</p></li>
-<li><p><code>radius</code>: in some cases this includes the radius measurements for each
-cylinders depending on the type of scatterer object.</p></li>
-<li><p><code>theta</code>: the orientation of the scatterer relative to the transmitting
-transducer or sound source (θ<sub>animal</sub>)
-that can be represented either by degrees or radians, although all functions
-require radians.</p></li>
-<li><p><code>g, h</code>: material properties that represent the density and sound speed
-contrasts (g and h, respectively) relative to the ambient/surrounding fluid.
-Some targets may instead have standard sound speed
-(c<sub>animal</sub>, m s<sup>-1</sup>)
-and density (ρ<sub>animal</sub>, kg m<sup>3</sup>).</p></li>
+<li><p><code>radius</code>: in some cases this includes the radius measurements
+for each cylinders depending on the type of scatterer object.</p></li>
+<li><p><code>theta</code>: the orientation of the scatterer relative to the
+transmitting transducer or sound source
+(θ<sub>animal</sub>)
+that can be represented either by degrees or radians, although all
+functions require radians.</p></li>
+<li><p><code>g, h</code>: material properties that represent the density and
+sound speed contrasts (g and h, respectively) relative to the
+ambient/surrounding fluid. Some targets may instead have standard
+sound speed
+(c<sub>animal</sub>,
+m s<sup>-1</sup>)
+and density
+(ρ<sub>animal</sub>,
+kg m<sup>3</sup>).</p></li>
 </ul></dd>
 
 <dt><code>shape_parameters</code>:</dt>
-<dd><p>A <code>list</code> that includes metadata pertaining
-to the shape of the scatterer and any other features of interest (e.g. gas-filled
-swimbladder). Generally, each entry includes: overall body length, the
-number of discrete cylinders that make up the shape (if applicable),
-and the units related to both θ<sub>animal</sub>
-(e.g. rad, °) and length (e.g. mm, m).</p></dd>
+<dd><p>A <code>list</code> that includes metadata
+pertaining to the shape of the scatterer and any other features of
+interest (e.g. gas-filled swimbladder). Generally, each entry includes:
+overall body length, the number of discrete cylinders that make up the
+shape (if applicable), and the units related to both
+θ<sub>animal</sub>
+(e.g. rad, °) and length
+(e.g. mm, m).</p></dd>
 
 <dt><code>model_parameters</code>:</dt>
 <dd><p>A <code>list</code> that contains relevant model
 parameterization once an object has been initialized for modeling
-σ<sub>bs</sub>. This is typically
-broken up into three categories:</p><ul><li><p><code>parameters</code>: A <code>list</code> that includes information such as
+σ<sub>bs</sub>. This is
+typically broken up into three categories:</p><ul><li><p><code>parameters</code>: A <code>list</code> that includes information such as
 frequency (Hz), acoustic wavenumber (i.e. k), etc.</p></li>
 <li><p><code>medium</code>: A <code>data.frame</code> including information such as
 the material properties of the ambient medium.</p></li>
@@ -127,7 +135,8 @@ used to parameterize certain scattering models.</p></li>
 
 <dt><code>model</code>:</dt>
 <dd><p>A <code>list</code> that collects model results from one
-or more models in the linear domain (i.e. σ<sub>bs</sub>).</p></dd>
+or more models in the linear domain (i.e.
+σ<sub>bs</sub>).</p></dd>
 
 
 </dl></div>

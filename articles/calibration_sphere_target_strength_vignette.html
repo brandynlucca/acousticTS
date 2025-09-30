@@ -187,7 +187,7 @@ within <code>cal_generate(...)</code> such as:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create calibration sphere object</span></span>
 <span><span class="va">cal_sphere</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cal_generate.html">cal_generate</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co"># this is equivalent to: cal_sphere &lt;- cal_generate(material = "WC", diameter = 38.1e-3)</span></span></code></pre></div>
+<span><span class="co"># this is equivalent to: cal_generate(material = "WC", diameter = 38.1e-3)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="calculating-a-ts-frequency-spectrum-for-the-calibration-sphere">Calculating a TS-frequency spectrum for the calibration sphere<a class="anchor" aria-label="anchor" href="#calculating-a-ts-frequency-spectrum-for-the-calibration-sphere"></a>
@@ -208,16 +208,20 @@ the same variable, or can be used to generate a copy of the original
 <code>CAL</code> object that now includes model parameter and results as
 a built-in field.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Define frequency vector </span></span>
+<code class="sourceCode R"><span><span class="co"># Define frequency vector</span></span>
 <span><span class="va">frequency</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1e3</span>, <span class="fl">600e3</span>, <span class="fl">1e3</span><span class="op">)</span></span>
 <span><span class="co"># Calculate TS; update original CAL object</span></span>
-<span><span class="va">cal_sphere</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/target_strength.html">target_strength</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">cal_sphere</span>,</span>
-<span>                              frequency <span class="op">=</span> <span class="va">frequency</span>, </span>
-<span>                              model <span class="op">=</span> <span class="st">"calibration"</span><span class="op">)</span></span>
+<span><span class="va">cal_sphere</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/target_strength.html">target_strength</a></span><span class="op">(</span></span>
+<span>  object <span class="op">=</span> <span class="va">cal_sphere</span>,</span>
+<span>  frequency <span class="op">=</span> <span class="va">frequency</span>,</span>
+<span>  model <span class="op">=</span> <span class="st">"calibration"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co"># Calculate TS; store in a new CAL object</span></span>
-<span><span class="va">cal_sphere_copy</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/target_strength.html">target_strength</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">cal_sphere</span>,</span>
-<span>                                   frequency <span class="op">=</span> <span class="va">frequency</span>, </span>
-<span>                                   model <span class="op">=</span> <span class="st">"calibration"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">cal_sphere_copy</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/target_strength.html">target_strength</a></span><span class="op">(</span></span>
+<span>  object <span class="op">=</span> <span class="va">cal_sphere</span>,</span>
+<span>  frequency <span class="op">=</span> <span class="va">frequency</span>,</span>
+<span>  model <span class="op">=</span> <span class="st">"calibration"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="extracting-model-results">Extracting model results<a class="anchor" aria-label="anchor" href="#extracting-model-results"></a>
@@ -291,9 +295,9 @@ sphere’s radius.</p>
 to extract our model results.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Extract model results</span></span>
-<span><span class="va">model_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract.html">extract</a></span><span class="op">(</span> <span class="va">cal_sphere</span>, <span class="st">"model"</span> <span class="op">)</span><span class="op">$</span><span class="va">calibration</span></span>
+<span><span class="va">model_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">cal_sphere</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">$</span><span class="va">calibration</span></span>
 <span><span class="co"># Peek at the output from extract(...)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span> <span class="va">model_results</span> <span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">model_results</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##   frequency         ka         f_bs     sigma_bs        TS</span></span>
 <span><span class="co">## 1      1000 0.07979645 9.444014e-05 8.918941e-09 -80.49687</span></span>
 <span><span class="co">## 2      2000 0.15959291 3.738998e-04 1.398010e-07 -68.54490</span></span>
@@ -344,50 +348,63 @@ experiments.</p>
 <code class="sourceCode R"><span><span class="co"># Generate models for calibration spheres</span></span>
 <span><span class="co"># 20 mm diameter sphere</span></span>
 <span><span class="va">sphere_20</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cal_generate.html">cal_generate</a></span><span class="op">(</span>diameter <span class="op">=</span> <span class="fl">20e-3</span><span class="op">)</span></span>
-<span><span class="va">sphere_20</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/target_strength.html">target_strength</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">sphere_20</span>,</span>
-<span>                             frequency <span class="op">=</span> <span class="va">frequency</span>,</span>
-<span>                             model <span class="op">=</span> <span class="st">"calibration"</span><span class="op">)</span></span>
+<span><span class="va">sphere_20</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/target_strength.html">target_strength</a></span><span class="op">(</span></span>
+<span>  object <span class="op">=</span> <span class="va">sphere_20</span>,</span>
+<span>  frequency <span class="op">=</span> <span class="va">frequency</span>,</span>
+<span>  model <span class="op">=</span> <span class="st">"calibration"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">ts_mods_20</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">sphere_20</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">$</span><span class="va">calibration</span></span>
 <span><span class="co"># 30 mm diameter sphere</span></span>
 <span><span class="va">sphere_30</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cal_generate.html">cal_generate</a></span><span class="op">(</span>diameter <span class="op">=</span> <span class="fl">30e-3</span><span class="op">)</span></span>
-<span><span class="va">sphere_30</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/target_strength.html">target_strength</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">sphere_30</span>,</span>
-<span>                             frequency <span class="op">=</span> <span class="va">frequency</span>,</span>
-<span>                             model <span class="op">=</span> <span class="st">"calibration"</span><span class="op">)</span></span>
+<span><span class="va">sphere_30</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/target_strength.html">target_strength</a></span><span class="op">(</span></span>
+<span>  object <span class="op">=</span> <span class="va">sphere_30</span>,</span>
+<span>  frequency <span class="op">=</span> <span class="va">frequency</span>,</span>
+<span>  model <span class="op">=</span> <span class="st">"calibration"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">ts_mods_30</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">sphere_30</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">$</span><span class="va">calibration</span></span>
 <span><span class="co"># 40 mm diameter sphere</span></span>
 <span><span class="va">sphere_40</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cal_generate.html">cal_generate</a></span><span class="op">(</span>diameter <span class="op">=</span> <span class="fl">40e-3</span><span class="op">)</span></span>
-<span><span class="va">sphere_40</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/target_strength.html">target_strength</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">sphere_40</span>,</span>
-<span>                             frequency <span class="op">=</span> <span class="va">frequency</span>,</span>
-<span>                             model <span class="op">=</span> <span class="st">"calibration"</span><span class="op">)</span></span>
+<span><span class="va">sphere_40</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/target_strength.html">target_strength</a></span><span class="op">(</span></span>
+<span>  object <span class="op">=</span> <span class="va">sphere_40</span>,</span>
+<span>  frequency <span class="op">=</span> <span class="va">frequency</span>,</span>
+<span>  model <span class="op">=</span> <span class="st">"calibration"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">ts_mods_40</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">sphere_40</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">$</span><span class="va">calibration</span></span>
 <span><span class="co"># Plot the three and compare</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>oma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.25</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, mar<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">4</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/plot.scatterer.html">plot</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ts_mods_20</span><span class="op">$</span><span class="va">frequency</span><span class="op">*</span><span class="fl">1e-3</span>, </span>
-<span>     y <span class="op">=</span> <span class="va">ts_mods_20</span><span class="op">$</span><span class="va">TS</span>, </span>
-<span>     type <span class="op">=</span> <span class="st">'l'</span>,</span>
-<span>     lty <span class="op">=</span> <span class="fl">1</span>, </span>
-<span>     lwd <span class="op">=</span> <span class="fl">2.5</span>,</span>
-<span>     xlab <span class="op">=</span> <span class="st">"Frequency (kHz)"</span>,</span>
-<span>     ylab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">Target</span><span class="op">~</span><span class="va">strength</span><span class="op">~</span><span class="op">(</span><span class="va">dB</span><span class="op">~</span><span class="va">re.</span><span class="op">~</span><span class="fl">1</span><span class="op">~</span><span class="va">m</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>     cex.lab <span class="op">=</span> <span class="fl">1.3</span>, </span>
-<span>     cex.axis <span class="op">=</span> <span class="fl">1.2</span>,</span>
-<span>     ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">70</span>, <span class="op">-</span><span class="fl">30</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ts_mods_30</span><span class="op">$</span><span class="va">frequency</span><span class="op">*</span><span class="fl">1e-3</span>,</span>
-<span>      y <span class="op">=</span> <span class="va">ts_mods_30</span><span class="op">$</span><span class="va">TS</span>,</span>
-<span>      col <span class="op">=</span> <span class="st">'red'</span>,</span>
-<span>      lty <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>      lwd <span class="op">=</span> <span class="fl">2.5</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ts_mods_40</span><span class="op">$</span><span class="va">frequency</span><span class="op">*</span><span class="fl">1e-3</span>,</span>
-<span>      y <span class="op">=</span> <span class="va">ts_mods_40</span><span class="op">$</span><span class="va">TS</span>,</span>
-<span>      col <span class="op">=</span> <span class="st">'blue'</span>,</span>
-<span>      lty <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>      lwd <span class="op">=</span> <span class="fl">2.5</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>oma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.25</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">6</span>, <span class="fl">4</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/plot.scatterer.html">plot</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">ts_mods_20</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">ts_mods_20</span><span class="op">$</span><span class="va">TS</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"l"</span>,</span>
+<span>  lty <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  lwd <span class="op">=</span> <span class="fl">2.5</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="st">"Frequency (kHz)"</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">Target</span> <span class="op">~</span> <span class="va">strength</span> <span class="op">~</span> <span class="op">(</span><span class="va">dB</span> <span class="op">~</span> <span class="va">re.</span> <span class="op">~</span> <span class="fl">1</span> <span class="op">~</span> <span class="va">m</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  cex.lab <span class="op">=</span> <span class="fl">1.3</span>,</span>
+<span>  cex.axis <span class="op">=</span> <span class="fl">1.2</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">70</span>, <span class="op">-</span><span class="fl">30</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">ts_mods_30</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">ts_mods_30</span><span class="op">$</span><span class="va">TS</span>,</span>
+<span>  col <span class="op">=</span> <span class="st">"red"</span>,</span>
+<span>  lty <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  lwd <span class="op">=</span> <span class="fl">2.5</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">ts_mods_40</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">ts_mods_40</span><span class="op">$</span><span class="va">TS</span>,</span>
+<span>  col <span class="op">=</span> <span class="st">"blue"</span>,</span>
+<span>  lty <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  lwd <span class="op">=</span> <span class="fl">2.5</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"bottomright"</span>,</span>
-<span>       <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"20 mm"</span>,<span class="st">"30 mm"</span>, <span class="st">"40 mm"</span><span class="op">)</span>,</span>
-<span>       lty<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span>       lwd<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.5</span>, <span class="fl">2.5</span>, <span class="fl">2.5</span><span class="op">)</span>,</span>
-<span>       col<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'black'</span>, <span class="st">'red'</span>, <span class="st">'blue'</span><span class="op">)</span>,</span>
-<span>       cex<span class="op">=</span><span class="fl">1.1</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"20 mm"</span>, <span class="st">"30 mm"</span>, <span class="st">"40 mm"</span><span class="op">)</span>,</span>
+<span>  lty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>  lwd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.5</span>, <span class="fl">2.5</span>, <span class="fl">2.5</span><span class="op">)</span>,</span>
+<span>  col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"black"</span>, <span class="st">"red"</span>, <span class="st">"blue"</span><span class="op">)</span>,</span>
+<span>  cex <span class="op">=</span> <span class="fl">1.1</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="calibration_sphere_target_strength_vignette_files/figure-html/unnamed-chunk-5-1.png" width="768"></p>
 </div>
 <div class="section level3">
@@ -398,68 +415,89 @@ experiments.</p>
 <span><span class="va">ts_mods_WC</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">cal_sphere</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">$</span><span class="va">calibration</span></span>
 <span><span class="co"># copper sphere</span></span>
 <span><span class="va">sphere_copper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cal_generate.html">cal_generate</a></span><span class="op">(</span>material <span class="op">=</span> <span class="st">"Cu"</span><span class="op">)</span></span>
-<span><span class="va">sphere_copper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/target_strength.html">target_strength</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">sphere_copper</span>,</span>
-<span>                                 frequency <span class="op">=</span> <span class="va">frequency</span>,</span>
-<span>                                 model <span class="op">=</span> <span class="st">"calibration"</span><span class="op">)</span></span>
+<span><span class="va">sphere_copper</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/target_strength.html">target_strength</a></span><span class="op">(</span></span>
+<span>  object <span class="op">=</span> <span class="va">sphere_copper</span>,</span>
+<span>  frequency <span class="op">=</span> <span class="va">frequency</span>,</span>
+<span>  model <span class="op">=</span> <span class="st">"calibration"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">ts_mods_Cu</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">sphere_copper</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">$</span><span class="va">calibration</span></span>
 <span><span class="co"># aluminum sphere</span></span>
 <span><span class="va">sphere_aluminum</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cal_generate.html">cal_generate</a></span><span class="op">(</span>material <span class="op">=</span> <span class="st">"Al"</span><span class="op">)</span></span>
-<span><span class="va">sphere_aluminum</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/target_strength.html">target_strength</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">sphere_aluminum</span>,</span>
-<span>                                   frequency <span class="op">=</span> <span class="va">frequency</span>,</span>
-<span>                                   model <span class="op">=</span> <span class="st">"calibration"</span><span class="op">)</span></span>
+<span><span class="va">sphere_aluminum</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/target_strength.html">target_strength</a></span><span class="op">(</span></span>
+<span>  object <span class="op">=</span> <span class="va">sphere_aluminum</span>,</span>
+<span>  frequency <span class="op">=</span> <span class="va">frequency</span>,</span>
+<span>  model <span class="op">=</span> <span class="st">"calibration"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">ts_mods_Al</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">sphere_aluminum</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">$</span><span class="va">calibration</span></span>
 <span><span class="co"># brass sphere</span></span>
 <span><span class="va">sphere_brass</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cal_generate.html">cal_generate</a></span><span class="op">(</span>material <span class="op">=</span> <span class="st">"brass"</span><span class="op">)</span></span>
-<span><span class="va">sphere_brass</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/target_strength.html">target_strength</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">sphere_brass</span>,</span>
-<span>                                frequency <span class="op">=</span> <span class="va">frequency</span>,</span>
-<span>                                model <span class="op">=</span> <span class="st">"calibration"</span><span class="op">)</span></span>
+<span><span class="va">sphere_brass</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/target_strength.html">target_strength</a></span><span class="op">(</span></span>
+<span>  object <span class="op">=</span> <span class="va">sphere_brass</span>,</span>
+<span>  frequency <span class="op">=</span> <span class="va">frequency</span>,</span>
+<span>  model <span class="op">=</span> <span class="st">"calibration"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">ts_mods_brass</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">sphere_brass</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">$</span><span class="va">calibration</span></span>
 <span><span class="co"># stainless steel sphere</span></span>
 <span><span class="va">sphere_steel</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/cal_generate.html">cal_generate</a></span><span class="op">(</span>material <span class="op">=</span> <span class="st">"steel"</span><span class="op">)</span></span>
-<span><span class="va">sphere_steel</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/target_strength.html">target_strength</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">sphere_steel</span>,</span>
-<span>                                frequency <span class="op">=</span> <span class="va">frequency</span>,</span>
-<span>                                model <span class="op">=</span> <span class="st">"calibration"</span><span class="op">)</span></span>
-<span><span class="va">ts_mods_steel</span><span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">sphere_steel</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">$</span><span class="va">calibration</span></span>
+<span><span class="va">sphere_steel</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/target_strength.html">target_strength</a></span><span class="op">(</span></span>
+<span>  object <span class="op">=</span> <span class="va">sphere_steel</span>,</span>
+<span>  frequency <span class="op">=</span> <span class="va">frequency</span>,</span>
+<span>  model <span class="op">=</span> <span class="st">"calibration"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">ts_mods_steel</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">sphere_steel</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">$</span><span class="va">calibration</span></span>
 <span><span class="co"># Plot each and compare</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>ask <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>    oma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>,</span>
-<span>    mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4.5</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/plot.scatterer.html">plot</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ts_mods_WC</span><span class="op">$</span><span class="va">frequency</span><span class="op">*</span><span class="fl">1e-3</span>, </span>
-<span>     y <span class="op">=</span> <span class="va">ts_mods_WC</span><span class="op">$</span><span class="va">TS</span>, </span>
-<span>     type <span class="op">=</span> <span class="st">'l'</span>,</span>
-<span>     lty <span class="op">=</span> <span class="fl">1</span>, </span>
-<span>     lwd <span class="op">=</span> <span class="fl">2.5</span>,</span>
-<span>     xlab <span class="op">=</span> <span class="st">"Frequency (kHz)"</span>,</span>
-<span>     ylab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">Target</span><span class="op">~</span><span class="va">strength</span><span class="op">~</span><span class="op">(</span><span class="va">dB</span><span class="op">~</span><span class="va">re.</span><span class="op">~</span><span class="fl">1</span><span class="op">~</span><span class="va">m</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>     cex.lab <span class="op">=</span> <span class="fl">1.3</span>, </span>
-<span>     cex.axis <span class="op">=</span> <span class="fl">1.2</span>,</span>
-<span>     ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">90</span>, <span class="op">-</span><span class="fl">30</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ts_mods_Cu</span><span class="op">$</span><span class="va">frequency</span><span class="op">*</span><span class="fl">1e-3</span>,</span>
-<span>      y <span class="op">=</span> <span class="va">ts_mods_Cu</span><span class="op">$</span><span class="va">TS</span>,</span>
-<span>      col <span class="op">=</span> <span class="st">'red'</span>,</span>
-<span>      lty <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>      lwd <span class="op">=</span> <span class="fl">2.5</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ts_mods_Al</span><span class="op">$</span><span class="va">frequency</span><span class="op">*</span><span class="fl">1e-3</span>,</span>
-<span>      y <span class="op">=</span> <span class="va">ts_mods_Al</span><span class="op">$</span><span class="va">TS</span>,</span>
-<span>      col <span class="op">=</span> <span class="st">'blue'</span>,</span>
-<span>      lty <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>      lwd <span class="op">=</span> <span class="fl">2.5</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ts_mods_brass</span><span class="op">$</span><span class="va">frequency</span><span class="op">*</span><span class="fl">1e-3</span>,</span>
-<span>      y <span class="op">=</span> <span class="va">ts_mods_brass</span><span class="op">$</span><span class="va">TS</span>,</span>
-<span>      col <span class="op">=</span> <span class="st">'green'</span>,</span>
-<span>      lty <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>      lwd <span class="op">=</span> <span class="fl">2.5</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ts_mods_steel</span><span class="op">$</span><span class="va">frequency</span><span class="op">*</span><span class="fl">1e-3</span>,</span>
-<span>      y <span class="op">=</span> <span class="va">ts_mods_steel</span><span class="op">$</span><span class="va">TS</span>,</span>
-<span>      col <span class="op">=</span> <span class="st">'orange'</span>,</span>
-<span>      lty <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>      lwd <span class="op">=</span> <span class="fl">2.5</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span></span>
+<span>  ask <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  oma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>,</span>
+<span>  mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4.5</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/plot.scatterer.html">plot</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">ts_mods_WC</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">ts_mods_WC</span><span class="op">$</span><span class="va">TS</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"l"</span>,</span>
+<span>  lty <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  lwd <span class="op">=</span> <span class="fl">2.5</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="st">"Frequency (kHz)"</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/expression.html" class="external-link">expression</a></span><span class="op">(</span><span class="va">Target</span> <span class="op">~</span> <span class="va">strength</span> <span class="op">~</span> <span class="op">(</span><span class="va">dB</span> <span class="op">~</span> <span class="va">re.</span> <span class="op">~</span> <span class="fl">1</span> <span class="op">~</span> <span class="va">m</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  cex.lab <span class="op">=</span> <span class="fl">1.3</span>,</span>
+<span>  cex.axis <span class="op">=</span> <span class="fl">1.2</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">90</span>, <span class="op">-</span><span class="fl">30</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">ts_mods_Cu</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">ts_mods_Cu</span><span class="op">$</span><span class="va">TS</span>,</span>
+<span>  col <span class="op">=</span> <span class="st">"red"</span>,</span>
+<span>  lty <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  lwd <span class="op">=</span> <span class="fl">2.5</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">ts_mods_Al</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">ts_mods_Al</span><span class="op">$</span><span class="va">TS</span>,</span>
+<span>  col <span class="op">=</span> <span class="st">"blue"</span>,</span>
+<span>  lty <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  lwd <span class="op">=</span> <span class="fl">2.5</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">ts_mods_brass</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">ts_mods_brass</span><span class="op">$</span><span class="va">TS</span>,</span>
+<span>  col <span class="op">=</span> <span class="st">"green"</span>,</span>
+<span>  lty <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  lwd <span class="op">=</span> <span class="fl">2.5</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">ts_mods_steel</span><span class="op">$</span><span class="va">frequency</span> <span class="op">*</span> <span class="fl">1e-3</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">ts_mods_steel</span><span class="op">$</span><span class="va">TS</span>,</span>
+<span>  col <span class="op">=</span> <span class="st">"orange"</span>,</span>
+<span>  lty <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  lwd <span class="op">=</span> <span class="fl">2.5</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html" class="external-link">legend</a></span><span class="op">(</span><span class="st">"bottomright"</span>,</span>
-<span>       <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"WC"</span>,<span class="st">"Cu"</span>, <span class="st">"Al"</span>, <span class="st">"Brass"</span>, <span class="st">"Steel"</span><span class="op">)</span>,</span>
-<span>       lty<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>,</span>
-<span>       lwd<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.5</span>, <span class="fl">2.5</span>, <span class="fl">2.5</span>, <span class="fl">2.5</span>, <span class="fl">2.5</span><span class="op">)</span>,</span>
-<span>       col<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'black'</span>, <span class="st">'red'</span>, <span class="st">'blue'</span>, <span class="st">'green'</span>, <span class="st">'orange'</span><span class="op">)</span>,</span>
-<span>       cex<span class="op">=</span><span class="fl">1.1</span><span class="op">)</span>  </span></code></pre></div>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"WC"</span>, <span class="st">"Cu"</span>, <span class="st">"Al"</span>, <span class="st">"Brass"</span>, <span class="st">"Steel"</span><span class="op">)</span>,</span>
+<span>  lty <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>  lwd <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2.5</span>, <span class="fl">2.5</span>, <span class="fl">2.5</span>, <span class="fl">2.5</span>, <span class="fl">2.5</span><span class="op">)</span>,</span>
+<span>  col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"black"</span>, <span class="st">"red"</span>, <span class="st">"blue"</span>, <span class="st">"green"</span>, <span class="st">"orange"</span><span class="op">)</span>,</span>
+<span>  cex <span class="op">=</span> <span class="fl">1.1</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="calibration_sphere_target_strength_vignette_files/figure-html/unnamed-chunk-6-1.png" width="768"></p>
 </div>
 </div>

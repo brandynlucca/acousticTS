@@ -68,7 +68,8 @@ shapes for TS modeling.</p>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Additional input arguments for subsequent shape generation functions.</p></dd>
+<dd><p>Additional input arguments for subsequent shape generation
+functions.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -84,22 +85,23 @@ of Marine Science, 70(1): 204-214. https://doi.org/10.1093/icesjms/fss140</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The <strong>shape</strong> argument specifies what shape for the function to generate into
-the desired shape for TS modeling. Options currently include:</p><table class="table table"><tr><td></td><td><strong>Object shape</strong></td><td><strong>shape = ...</strong></td><td></td><td><strong>Parameters</strong></td><td><strong>Root function</strong></td></tr><tr><td></td><td><em>Discrete/tapered cylinder</em></td><td>"cylinder"</td><td></td><td>length, radius</td><td><code><a href="cylinder.html">cylinder(...)</a></code></td></tr><tr><td></td><td><em>Polynomial cylinder</em></td><td>"polynomial_cylinder"</td><td></td><td>length, radius, polynomial</td><td><code><a href="polynomial_cylinder.html">polynomial_cylinder(...)</a></code></td></tr><tr><td></td><td><em>Prolate spheroid</em></td><td>"prolate_spheroid"</td><td></td><td>length, radius</td><td><code><a href="prolate_spheroid.html">prolate_spheroid(...)</a></code></td></tr><tr><td></td><td><em>Sphere</em></td><td>"sphere"</td><td></td><td>radius</td><td><code><a href="sphere.html">sphere(...)</a></code></td></tr></table><div class="section">
+    <p>The <strong>shape</strong> argument specifies what shape for the function to
+generate the desired shape for TS modeling. Options currently include:</p><table class="table table"><tr><td></td><td><strong>Object shape</strong></td><td><strong>shape = ...</strong></td><td></td><td><strong>Parameters</strong></td><td><strong>Root function</strong></td></tr><tr><td></td><td><em>Discrete/tapered cylinder</em></td><td>"cylinder"</td><td></td><td>length, radius</td><td><code><a href="cylinder.html">cylinder(...)</a></code></td></tr><tr><td></td><td><em>Polynomial cylinder</em></td><td>"polynomial_cylinder"</td><td></td><td>length, radius, polynomial</td><td><code><a href="polynomial_cylinder.html">polynomial_cylinder(...)</a></code></td></tr><tr><td></td><td><em>Prolate spheroid</em></td><td>"prolate_spheroid"</td><td></td><td>length, radius</td><td><code><a href="prolate_spheroid.html">prolate_spheroid(...)</a></code></td></tr><tr><td></td><td><em>Sphere</em></td><td>"sphere"</td><td></td><td>radius</td><td><code><a href="sphere.html">sphere(...)</a></code></td></tr></table><div class="section">
 <h3 id="model-parameter-definitions">Model Parameter Definitions<a class="anchor" aria-label="anchor" href="#model-parameter-definitions"></a></h3>
 
 <ul><li><p><strong>length</strong>: the x-axis length of the shape.</p></li>
 <li><p><strong>radius</strong>: the radius of the shape when applicable.</p></li>
-<li><p><strong>length_radius_ratio</strong>: the length-to-radius ratio (L/A), which specifically
-refers to the radius at the mid-point of the cylinder and should be
-the maximum value. A typical L/A ratio in the literature is 16 for krill.</p></li>
+<li><p><strong>length_radius_ratio</strong>: the length-to-radius ratio (L/A), which
+specifically refers to the radius at the mid-point of the cylinder and
+should be the maximum value. A typical L/A ratio in the literature is 16
+for krill.</p></li>
 <li><p><strong>taper</strong>: the taper order (n), which parameterizes the tapering
 function reported by Chu <em>et al.</em> (1993) to create a tapered cylinder.
 The tapering order will converge on a prolate and oblate spheroid when
 L &gt; 2a and L &lt; 2a, respectively, and n = 2. A typical taper order in the
 literature is 10.</p></li>
-<li><p><strong>polynomial</strong>: the vector of arbitrary polynomial coefficients to
-generate a deformed cylinder as reported by Smith <em>et al.</em> (2013).
+<li><p><strong>polynomial</strong>: the vector of arbitrary polynomial coefficients
+to generate a deformed cylinder as reported by Smith <em>et al.</em> (2013).
 Although listed as a mandatory argument for the polynomial cylinder
 function, it has a default setting that uses the sixth-degree polynomial
 coefficients reported by Smith <em>et al.</em> (2013).</p></li>

@@ -55,18 +55,16 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for class 'SBF'</span></span>
 <span><span class="fu"><a href="reforge.html">reforge</a></span><span class="op">(</span></span>
 <span>  <span class="va">object</span>,</span>
-<span>  length_body <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>  width_body <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>  height_body <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>  length_bladder <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>  width_bladder <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>  height_bladder <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>  radius_body <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>  bladder_inflation_factor <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  body_scale <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  body_target <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  swimbladder_scale <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  swimbladder_target <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  isometric_body <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  isometric_bladder <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  n_segments_body <span class="op">=</span> <span class="cn">NA</span>,</span>
-<span>  n_segments_bladder <span class="op">=</span> <span class="cn">NA</span></span>
+<span>  isometric_swimbladder <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  maintain_ratio <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  swimbladder_inflation_factor <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  n_segments_body <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  n_segments_swimbladder <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -78,51 +76,53 @@
 <dd><p>SBF-class object.</p></dd>
 
 
-<dt id="arg-length-body">length_body<a class="anchor" aria-label="anchor" href="#arg-length-body"></a></dt>
-<dd><p>Updated body length when applicable.</p></dd>
+<dt id="arg-body-scale">body_scale<a class="anchor" aria-label="anchor" href="#arg-body-scale"></a></dt>
+<dd><p>Proportional scaling to the body length, width, and height
+dimensions. When a single value is supplied, all dimensions are scaled using
+the same scaling factor. Otherwise, this input must be a named numeric
+vector.</p></dd>
 
 
-<dt id="arg-width-body">width_body<a class="anchor" aria-label="anchor" href="#arg-width-body"></a></dt>
-<dd><p>Updated body width when applicable.</p></dd>
+<dt id="arg-body-target">body_target<a class="anchor" aria-label="anchor" href="#arg-body-target"></a></dt>
+<dd><p>Target dimensions (m) for the body length, width, and
+height dimensions. This input must be a named numeric vector.</p></dd>
 
 
-<dt id="arg-height-body">height_body<a class="anchor" aria-label="anchor" href="#arg-height-body"></a></dt>
-<dd><p>Updated body height/depth when applicable.</p></dd>
+<dt id="arg-swimbladder-scale">swimbladder_scale<a class="anchor" aria-label="anchor" href="#arg-swimbladder-scale"></a></dt>
+<dd><p>Proportional scaling to the swimbladder length,
+width, and height dimensions. When a single value is supplied, all
+dimensions are scaled using the same scaling factor. Otherwise, this input
+must be a named numeric vector.</p></dd>
 
 
-<dt id="arg-length-bladder">length_bladder<a class="anchor" aria-label="anchor" href="#arg-length-bladder"></a></dt>
-<dd><p>Updated bladder length when applicable.</p></dd>
-
-
-<dt id="arg-width-bladder">width_bladder<a class="anchor" aria-label="anchor" href="#arg-width-bladder"></a></dt>
-<dd><p>Updated bladder width when applicable.</p></dd>
-
-
-<dt id="arg-height-bladder">height_bladder<a class="anchor" aria-label="anchor" href="#arg-height-bladder"></a></dt>
-<dd><p>Updated bladder height/depth when applicable.</p></dd>
-
-
-<dt id="arg-radius-body">radius_body<a class="anchor" aria-label="anchor" href="#arg-radius-body"></a></dt>
-<dd><p>Updated body radius when applicable.</p></dd>
-
-
-<dt id="arg-bladder-inflation-factor">bladder_inflation_factor<a class="anchor" aria-label="anchor" href="#arg-bladder-inflation-factor"></a></dt>
-<dd><p>Proportional bladder volume.</p></dd>
+<dt id="arg-swimbladder-target">swimbladder_target<a class="anchor" aria-label="anchor" href="#arg-swimbladder-target"></a></dt>
+<dd><p>Target dimensions (m) for the swimbladder length,
+width, and height dimensions. This input must be a named numeric vector.</p></dd>
 
 
 <dt id="arg-isometric-body">isometric_body<a class="anchor" aria-label="anchor" href="#arg-isometric-body"></a></dt>
 <dd><p>Logical; maintain isometric scaling for body.</p></dd>
 
 
-<dt id="arg-isometric-bladder">isometric_bladder<a class="anchor" aria-label="anchor" href="#arg-isometric-bladder"></a></dt>
+<dt id="arg-isometric-swimbladder">isometric_swimbladder<a class="anchor" aria-label="anchor" href="#arg-isometric-swimbladder"></a></dt>
 <dd><p>Logical; maintain isometric scaling for bladder.</p></dd>
+
+
+<dt id="arg-maintain-ratio">maintain_ratio<a class="anchor" aria-label="anchor" href="#arg-maintain-ratio"></a></dt>
+<dd><p>Maintain size ratio between body and
+swimbladder.</p></dd>
+
+
+<dt id="arg-swimbladder-inflation-factor">swimbladder_inflation_factor<a class="anchor" aria-label="anchor" href="#arg-swimbladder-inflation-factor"></a></dt>
+<dd><p>Proportional swimbladder volume where
+the swimbladder x-axis origin and terminus are both held constant.</p></dd>
 
 
 <dt id="arg-n-segments-body">n_segments_body<a class="anchor" aria-label="anchor" href="#arg-n-segments-body"></a></dt>
 <dd><p>Number of segments along the body.</p></dd>
 
 
-<dt id="arg-n-segments-bladder">n_segments_bladder<a class="anchor" aria-label="anchor" href="#arg-n-segments-bladder"></a></dt>
+<dt id="arg-n-segments-swimbladder">n_segments_swimbladder<a class="anchor" aria-label="anchor" href="#arg-n-segments-swimbladder"></a></dt>
 <dd><p>Number of segments along the bladder.</p></dd>
 
 </dl></div>
