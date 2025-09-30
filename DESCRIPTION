@@ -19,7 +19,7 @@ Description: Acoustic target strength (TS) represents the intensity of an
     estimates over broad statistical distributions of model parameters.
 License: GPL-3 | file LICENSE
 Encoding: UTF-8
-Language: en
+Language: en-US
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
