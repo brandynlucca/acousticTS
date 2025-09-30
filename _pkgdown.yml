@@ -1,71 +1,25 @@
-url: https://brandynlucca.github.io/acousticTS/
 template:
   bootstrap: 5
-  math-rendering: mathjax
+  light-switch: false
+navbar:
+  title: ~
+  type: default
+  structure:
+    left:  [intro, reference, articles, tutorials, news, contributing]
+    right: [search, github]
+  components:
+    news:
+      text: Changelog
+      href: news/index.html
+    contributing:
+      text: Contributing
+      menu:
+      - text: Contributing
+        href: CONTRIBUTING.html
+      - text: Code of conduct
+        href: CODE_OF_CONDUCT.html
 
-reference:
-- title: Scatterer types
-
-- subtitle: Scatterer classes
-  desc: >
-    General scattering classes that dictate expected parameters and compatibility with different classes of 
-    scattering models.
-  contents:
-  - Scatterer
-  - has_keyword("scatterer_type")
-
-- subtitle: Scatterer generation
-  desc: >
-    Functions that generate each of the supported scatterering classes.
-  contents:
-  - has_keyword("scatterer_type_generation")
-
-- subtitle: Shape generation
-  desc: >
-    Generator functions for producing arbitrary or canonical shapes.
-  contents:
-  - create_shape
-  - has_keyword("shape_generation")
-
-- title: Scattering properties
-  desc: >
-    Functions used for computing different scattering properties (e.g. contrasts, impedances, coefficients) used 
-    in various scattering models.
-
-- subtitle: Elastic moduli for homogoneous isotropic materials
-  contents:
-  - has_keyword("elastic")
-
-- title: Mathematical functions
-  desc: >
-    Mathematical functions used throughout the `acousticTS` package.
-
-- subtitle: Bessel functions
-  contents:
-  - has_keyword("bessel1")
-  - has_keyword("bessel2")
-  - has_keyword("bessel3")
-
-- subtitle: Legendre functions
-  contents:
-  - has_keyword("legendre")
-
-- subtitle: Vector operations
-  contents:
-  - vecnorm
-
-- title: Conversion functions
-
-- subtitle: Acoustics
-  contents:
-  - linear
-
-- subtitle: Trigonometry
-  contents:
-  - degrees
-  - radians
-
-- title: internal
-  contents:
-  - lacks_concepts("null_concept")
-
+authors:
+  Research Institute for Nature and Forest (INBO):
+    href: "https://www.vlaanderen.be/inbo/en-gb"
+    html: "<img src='https://inbo.github.io/checklist/reference/figures/logo-en.png' height=24 alt='logo of the Research Institute for Nature and Forest (INBO)'>"

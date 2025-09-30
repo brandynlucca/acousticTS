@@ -18,9 +18,24 @@ Description: Acoustic target strength (TS) represents the intensity of an
     as analytical approaches. The models provided can help provide TS
     estimates over broad statistical distributions of model parameters.
 License: GPL-3 | file LICENSE
+URL: https://brandynlucca.github.io/acousticTS/
+BugReports: https://github.com/brandynlucca/acousticTS/issues
+Depends:
+    R (>= 4.0.0)
+Imports: 
+    graphics,
+    methods,
+    pbapply,
+    stats
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+VignetteBuilder: 
+    knitr
+Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en-US
-VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Collate: 
@@ -39,17 +54,3 @@ Collate:
     'show.R'
     'simulation.R'
     'utilities.R'
-Depends:
-    R (>= 4.0.0)
-Suggests: 
-    testthat (>= 3.0.0),
-    rmarkdown,
-    knitr
-Config/testthat/edition: 3
-Imports: 
-    graphics,
-    methods,
-    pbapply,
-    stats
-URL: https://brandynlucca.github.io/acousticTS/
-BugReports: https://github.com/brandynlucca/acousticTS/issues
