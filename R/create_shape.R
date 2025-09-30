@@ -274,7 +274,6 @@ cylinder <- function(length_body,
 #' polynomial_cylinder(length_body, radius_body, n_segments, polynomial,
 #' length_units)
 #' @examples
-#' \dontrun{
 #' # We can use the polynomial coefficients defined in Smith et al. (2013) to
 #' # define the position vector of a sub-Arctic krill.
 #' poly_vec <- c(0.83, 0.36, -2.10, -1.20, 0.63, 0.82, 0.64)
@@ -285,7 +284,6 @@ cylinder <- function(length_body,
 #'   polynomial = poly_vec
 #' )
 #' str(pos)
-#' }
 #' @return
 #' Creates the position vector for a polynomial deformed cylinder.
 #' @references
