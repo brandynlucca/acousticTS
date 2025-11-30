@@ -6,9 +6,9 @@
 \usage{
 prolate_spheroid(
   length_body,
-  radius_body,
+  radius_body = NULL,
   length_radius_ratio = NULL,
-  n_segments = 18,
+  n_segments = 100,
   length_units = "m",
   theta_units = "radians"
 )

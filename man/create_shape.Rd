@@ -15,15 +15,7 @@ create_shape(shape, ...)
 functions.}
 }
 \value{
-Chu, D., Foote, K.G., and Stanton, T.K. 1993. Further analysis of target
-strength measurements of Antarctic krill at 38 and 120 kHz: Comparison and
-deformed cylinder model and inference of orientation distribution. The
-Journal of the Acoustical Society of America, 93(5): 2985-2988.
-https://doi.org/10.1121/1.405818
-
-Smith, J.N., Ressler, P.H., and Warren, J.D. 2013. A distorted wave Born
-approximation target strength model for Bering Sea euphausiids. ICES Journal
-of Marine Science, 70(1): 204-214. https://doi.org/10.1093/icesjms/fss140
+A \code{\link{Shape}} object.
 }
 \description{
 A wrapper function that automatically creates generalized and/or canonical
