@@ -74,24 +74,24 @@ setMethod(
         "Specify only one of swimbladder_scale or swimbladder_target, not both."
       )
     }
-    if (((!is.null(body_scale) && length(body_scale) > 1) || 
-         (!is.null(body_target) && length(body_target) > 1)) &&
-      isometric_body) {
-      message(
-        "Hidden State Change Warning:\n ",
-        "Multiple axes specified in body_scale/body_target: ",
-        "'isometric_body' will be ignored for those axes."
-      )
-    }
-    if (((!is.null(swimbladder_scale) && length(swimbladder_scale) > 1) || 
-         (!is.null(swimbladder_target) && length(swimbladder_target) > 1)) &&
-      isometric_swimbladder) {
-      message(
-        "Hidden State Change Warning:\n ",
-        "Multiple axes specified in swimbladder_scale/swimbladder_target: ",
-        "'isometric_swimbladder' will be ignored for those axes."
-      )
-    }
+    # if (((!is.null(body_scale) && length(body_scale) > 1) || 
+    #      (!is.null(body_target) && length(body_target) > 1)) &&
+    #   isometric_body) {
+    #   message(
+    #     "Hidden State Change Warning:\n ",
+    #     "Multiple axes specified in body_scale/body_target: ",
+    #     "'isometric_body' will be ignored for those axes."
+    #   )
+    # }
+    # if (((!is.null(swimbladder_scale) && length(swimbladder_scale) > 1) || 
+    #      (!is.null(swimbladder_target) && length(swimbladder_target) > 1)) &&
+    #   isometric_swimbladder) {
+    #   message(
+    #     "Hidden State Change Warning:\n ",
+    #     "Multiple axes specified in swimbladder_scale/swimbladder_target: ",
+    #     "'isometric_swimbladder' will be ignored for those axes."
+    #   )
+    # }
     if ((!is.null(body_scale) || !is.null(body_target)) && 
         (!is.null(swimbladder_scale) || !is.null(swimbladder_target)) &&
       maintain_ratio) {
@@ -107,7 +107,12 @@ setMethod(
     get_scale_vector <- function(scale = NULL, target = NULL, dims) {
       # Return nothing if target is not used
       if (is.null(target)) {
-        return(scale)
+        return(
+          list(
+            suffix = "_scale",
+            scale = scale 
+          )
+        )
       }
 
       # Override with target values if given
@@ -115,7 +120,10 @@ setMethod(
       for (nm in names(target)) {
         out[nm] <- target[nm] / dims[nm]
       }
-      out
+      list(
+        suffix = "_target",
+        scale = out
+      )
     }
 
     validate_target <- function(target, name) {
@@ -274,30 +282,50 @@ setMethod(
     bladder_relative_start <- bladder$rpos[1, 1] / original_body_length
     ############################################################################
     # Process target parameters ================================================
-    body_target <- validate_target(body_target, "body_target")
-    body_scale <- get_scale_vector(body_scale, body_target, body_dims)
-    swimbladder_target <- validate_target(
-      swimbladder_target,
-      "swimbladder_target"
+    # body_target <- validate_target(body_target, "body_target")
+    body_target <- .validate_dimensions_target(
+      body_target,
+      "body_target",
+      c("length", "width", "height")
     )
-    swimbladder_scale <- get_scale_vector(
+    body_scale_lst <- get_scale_vector(body_scale, body_target, body_dims)
+    swimbladder_target <- .validate_dimensions_target(
+      swimbladder_target,
+      "swimbladder_target",
+      c("length", "width", "height")
+    )
+    swimbladder_scale_lst <- get_scale_vector(
       swimbladder_scale,
       swimbladder_target,
       bladder_dims
     )
     ############################################################################
     # Process scaling parameters ===============================================
-    body_scales <- validate_scale(
-      body_scale,
-      "body_scale",
-      isometric_body,
-      "isometric_body"
+    # body_scales <- validate_scale(
+    #   body_scale,
+    #   "body_scale",
+    #   isometric_body,
+    #   "isometric_body"
+    # )
+    body_scales <- .validate_dimension_scaling(
+      dims=body_scale_lst$scale, 
+      dims_name=paste0("body", body_scale_lst$suffix),
+      valid_dims=c("length", "width", "height"),
+      isometry=isometric_body,
+      iso_name="isometric_body"
     )
-    bladder_scales <- validate_scale(
-      swimbladder_scale,
-      "swimbladder_scale",
-      isometric_swimbladder,
-      "isometric_swimbladder"
+    # bladder_scales <- validate_scale(
+    #   swimbladder_scale,
+    #   "swimbladder_scale",
+    #   isometric_swimbladder,
+    #   "isometric_swimbladder"
+    # )
+    bladder_scales <- .validate_dimension_scaling(
+      dims=swimbladder_scale_lst$scale,
+      dims_name=paste0("swimbladder", swimbladder_scale_lst$suffix),
+      valid_dims=c("length", "width", "height"),
+      isometry=isometric_swimbladder,
+      iso_name="isometric_swimbladder"
     )
     ############################################################################
     # Apply ratio maintenance logic ============================================

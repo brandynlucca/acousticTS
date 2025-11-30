@@ -3,6 +3,322 @@
 # UTILITY FUNCTIONS FOR VARIOUS DATA WRANGLING AND MANIPULATION OPERATIONS
 ################################################################################
 ################################################################################
+# Internal Helper Functions
+################################################################################
+################################################################################
+#' Calculate maximum radius from explicit value or ratio
+#' 
+#' Internal helper function to standardize radius calculation logic across
+#' shape creation functions.
+#' 
+#' @param radius Explicit radius value (can be NULL)
+#' @param length Body length
+#' @param length_radius_ratio Length-to-radius ratio (can be NULL)
+#' @return Calculated radius
+#' @keywords internal
+.calculate_max_radius <- function(radius, length, length_radius_ratio) {
+  if (!is.null(radius)) {
+    return(radius)
+  }
+  
+  if (!is.null(length_radius_ratio)) {
+    return(length / length_radius_ratio)
+  }
+  
+  stop(
+    "Either 'radius' or 'length_radius_ratio' must be provided.",
+    call. = FALSE
+  )
+}
+
+#' Validate dimensional parameter (target or scale)
+#' 
+#' Internal helper to validate named numeric vectors used in reforge operations.
+#' 
+#' @param param The parameter to validate
+#' @param param_name Name of the parameter (for error messages)
+#' @param valid_names Character vector of valid dimension names
+#' @param allow_scalar Whether to allow scalar values
+#' @param require_names Whether named vectors are required
+#' @return Validated parameter (invisibly)
+#' @keywords internal
+.validate_dimension_param <- function(dims, 
+                                      dims_name, 
+                                      valid_dims,
+                                      isometry,
+                                      iso_name) {
+  # No dimensions provided
+  if (is.null(dims)) return(NULL)
+  
+  # Check if dimensions are all numeric
+  if (!is.numeric(dims)) {
+    stop("'", dims_name, "' must be numeric.", call. = FALSE)
+  }
+  
+  # Handle scalar case where `isometry=TRUE`
+  if (length(dims) == 1 && isometry && 
+      (is.null(names(dims)) || all(names(dims) %in% valid_dims)) ) {
+    return(stats::setNames(rep(dims, length(valid_dims)), valid_dims))
+  }
+  
+  # Check for missing names
+  if (is.null(names(dims))) {
+    stop(
+      sprintf(
+        paste0(
+          "'%s' must either be a scalar or a named vector with dimensions: %s."
+        ),
+        dims_name,
+        paste0("'", valid_dims, "'", collapse=", ")
+      ),
+      call.=FALSE
+    )
+  }
+  
+  # Handle vector case where `isometry=TRUE`
+  if (length(dims) > 1 && isometry) {
+    # ---- Get the names
+    input_names <- names(dims)
+    stop(
+      sprintf(
+        paste0(
+          "'%s' contains more than 1 dimension while '%s' is TRUE. When TRUE ",
+          "'%s' must be a scalar value."
+        ),
+        dims_name,
+        iso_name,
+        dims_name
+      ),
+      call. = FALSE
+    )
+  }
+  
+  # Check for invalid names
+  invalid_dims <- setdiff(names(dims), valid_dims)
+  if (length(invalid_dims) > 0) {
+    stop(
+      sprintf(
+        paste0(
+          "'%s' has one or more invalid dimensions: %s. ",
+          "Expected dimensions are: %s."
+        ),
+        dims_name,
+        paste0("'", invalid_dims, "'", collapse=", "),
+        paste0("'", valid_dims, "'", collapse=", ")
+      ),
+      call. = FALSE
+    )
+  }
+  
+  # Handle scalar case where `isometry=FALSE`
+  if (!isometry) {
+    if (is.null(names(dims))) {
+      stop(
+        sprintf(
+          paste0(
+            "When '%s' is FALSE, '%s' must be a named vector with at least ",
+            "one of the following dimensions: %s."
+          ),
+          iso_name,
+          dims_name,
+          paste0("'", valid_dims, "'", collapse=", ")
+        ),
+        call. = FALSE
+      )      
+    }
+    # ---- Initialize vector
+    output_dims <- stats::setNames(rep(1, length(valid_dims)), valid_dims)
+    # ---- Override and return
+    output_dims[names(dims)] <- dims
+    return(output_dims)
+  }
+  
+  dims
+}
+
+.validate_dimensions_target <- function(dims, dims_name, valid_dims) {
+  
+  # No dimensions provided
+  if (is.null(dims)) return(NULL)
+  
+  # Check for missing names
+  if (is.null(names(dims))) {
+    stop(
+      sprintf(
+        paste0(
+          "'%s' must either be a scalar or a named vector with dimensions: %s."
+        ),
+        dims_name,
+        paste0("'", valid_dims, "'", collapse=", ")
+      ),
+      call.=FALSE
+    )
+  }
+  
+  dims
+}
+
+
+#' Extract common initialization components
+#' 
+#' Internal helper to extract shape, body, and medium parameters from scatterer
+#' objects during model initialization.
+#' 
+#' @param object Scatterer object
+#' @param sound_speed_sw Sound speed in seawater (m/s)
+#' @param density_sw Density of seawater (kg/m^3)
+#' @return List with shape, body, and medium components
+#' @keywords internal
+.init_common <- function(object, sound_speed_sw = 1500, density_sw = 1026) {
+  list(
+    shape = extract(object, "shape_parameters"),
+    body = extract(object, "body"),
+    medium = data.frame(
+      sound_speed = sound_speed_sw,
+      density = density_sw
+    )
+  )
+}
+
+#' Calculate all relevant wavenumbers
+#' 
+#' Internal helper to calculate wavenumbers for multiple sound speeds.
+#' 
+#' @param frequency Frequency vector (Hz)
+#' @param sound_speeds Named list of sound speeds (m/s)
+#' @return Named list of wavenumber vectors
+#' @keywords internal
+#' @noRd
+.calc_wavenumbers <- function(frequency, sound_speeds) {
+  stats::setNames(
+    lapply(sound_speeds, function(c) k(frequency, c)),
+    names(sound_speeds)
+  )
+}
+
+#' Define null-coalescing operator
+#' 
+#' Returns first argument if not NULL and not NA, otherwise returns second.
+#' 
+#' @param a First value
+#' @param b Fallback value
+#' @return a if not NULL/NA, otherwise b
+#' @keywords internal
+`%||%` <- function(a, b) {
+  if (!is.null(a) && !is.na(a)) a else b
+}
+
+#' Extract material properties with fallback logic
+#' 
+#' Internal helper to extract material properties from ESS components with
+#' contrast-based fallback calculations.
+#' 
+#' @param component Material component (shell, fluid, etc.)
+#' @param ref_sound_speed Reference sound speed for contrast conversion
+#' @param ref_density Reference density for contrast conversion
+#' @return List of material properties
+#' @keywords internal
+.extract_material_props <- function(component, ref_sound_speed = NULL, 
+                                    ref_density = NULL) {
+  # Helper for property extraction with fallback
+  get_prop <- function(direct, contrast, ref_val, default = NA) {
+    if (!is.null(component[[direct]])) {
+      return(component[[direct]])
+    }
+    if (!is.null(component[[contrast]]) && !is.null(ref_val)) {
+      return(component[[contrast]] * ref_val)
+    }
+    return(default)
+  }
+  
+  list(
+    sound_speed = get_prop("sound_speed", "h", ref_sound_speed),
+    density = get_prop("density", "g", ref_density),
+    nu = component$nu %||% NA,
+    K = component$K %||% NA,
+    E = component$E %||% NA,
+    G = component$G %||% NA,
+    lambda = component$lambda %||% NA
+  )
+}
+
+#' Validate elastic moduli inputs
+#' 
+#' Internal helper to validate that sufficient elastic moduli are provided
+#' for calculations.
+#' 
+#' @param ... Named elastic parameters (K, E, G, nu)
+#' @param min_required Minimum number of non-NULL parameters
+#' @param param_name Name of parameter being calculated (for error message)
+#' @return Character vector of provided parameter names
+#' @keywords internal
+.validate_elastic_inputs <- function(..., min_required = 2, param_name = NULL) {
+  inputs <- list(...)
+  provided <- !vapply(inputs, is.null, logical(1))
+  
+  if (sum(provided) < min_required) {
+    msg <- sprintf(
+      "At least %d elasticity moduli values are required",
+      min_required
+    )
+    if (!is.null(param_name)) {
+      msg <- paste(msg, "to calculate", param_name)
+    }
+    stop(msg, ".", call. = FALSE)
+  }
+  
+  names(provided)[provided]
+}
+
+#' Resolve parameter value for simulation grid
+#' 
+#' Internal helper to resolve parameter values in simulate_ts based on type
+#' (batch, function, scalar, vector).
+#' 
+#' @param param_name Parameter name
+#' @param param_value Parameter value (scalar, vector, or function)
+#' @param batch_by Batch parameter names
+#' @param batch_values Batch parameter values
+#' @param grid_size Simulation grid size
+#' @param simulation_grid Simulation grid data frame
+#' @return Resolved parameter vector
+#' @keywords internal
+.resolve_param_value <- function(param_name, param_value, batch_by, 
+                                batch_values, grid_size, simulation_grid) {
+  # Batch parameter case
+  if (!is.null(batch_by) && param_name %in% batch_by) {
+    idx <- simulation_grid[[paste0(param_name, "_idx")]]
+    return(batch_values[[param_name]][idx])
+  }
+  
+  # Function generator case
+  if (is.function(param_value)) {
+    return(replicate(grid_size, param_value()))
+  }
+  
+  # Scalar case
+  if (length(param_value) == 1) {
+    return(rep(param_value, grid_size))
+  }
+  
+  # Vector case (must match grid size)
+  if (length(param_value) == grid_size) {
+    return(param_value)
+  }
+  
+  # Error case
+  sim_type <- if (is.null(batch_by)) "realizations" else "batched realizations"
+  stop(
+    sprintf(
+      "Length of parameter '%s' [%d] does not match number of %s [%d].",
+      param_name, length(param_value), sim_type, grid_size
+    ),
+    call. = FALSE
+  )
+}
+
+################################################################################
+################################################################################
 # Accessor functions
 ################################################################################
 ################################################################################

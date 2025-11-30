@@ -3,6 +3,12 @@
 # Model initialization functions
 ################################################################################
 ################################################################################
+# Helper functions
+################################################################################
+
+################################################################################
+# Initialization functions
+################################################################################
 #' Initialize GAS-object for modal series solution.
 #' @param object GAS-class object.
 #' @param radius Radius of sphere (m).
@@ -989,5 +995,445 @@ high_pass_stanton_initialize <- function(object,
       length(frequency)
     )
   )
+  return(object)
+}
+################################################################################
+#' Initialize object for the modal series solution for a prolate spheroid
+psms_initialize <- function(object,
+                            frequency,
+                            phi_body = pi,
+                            boundary = "liquid_filled",
+                            simplify_Amn = FALSE,
+                            sound_speed_sw = 1500,
+                            density_sw = 1026) {
+  # Detect object class ========================================================
+  scatterer_type <- class(object)
+  # Detect object shape ========================================================
+  scatterer_shape <- extract(object, "shape_parameters")
+  # Validate shape +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  if (scatterer_shape$shape != "ProlateSpheroid") {
+    stop(
+      "The modal series solution for a prolate spheroid requires scatterer to ",
+      "be shape-type 'ProlateSpheroid'. Input scatterer is shape-type ",
+      paste0("'", scatterer_shape, "'.")
+    )
+  }
+  # Parse body =================================================================
+  body <- extract(object, "body")
+  # Define medium parameters ===================================================
+  medium_params <- data.frame(
+    sound_speed = sound_speed_sw,
+    density = density_sw
+  )
+  # Define model parameters recipe =============================================
+  model_params <- base::list(
+    acoustics = base::data.frame(
+      frequency = frequency,
+      # Wavenumber (medium) ====================================================
+      k_sw = acousticTS::k(
+        frequency,
+        sound_speed_sw
+      ),
+      # Wavenumber (fluid) =====================================================
+      k_f = acousticTS::k(
+        frequency,
+        body$h * sound_speed_sw
+      )
+    )
+  )
+  # Determine expansion coefficient Amn method =================================
+  # Validate method ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  if (!(boundary %in% c("liquid_filled", "fixed_rigid", "pressure_release"))) {
+    stop(
+      "Only the following values for 'method' are available in this ",
+      "implementation of the prolate spheroid modal series solution: ",
+      "'liquid_filled' (default), 'fixed_rigid', 'pressure_release'."
+    )
+  }
+  # Assign method ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  model_params$Amn_method <- switch(
+    boundary,
+    liquid_filled = ifelse(simplify_Amn, "Amn_liquid_simplify", "Amn_liquid"),
+    fixed_rigid = "Amn_fixed_rigid",
+    pressure_release = "Amn_pressure_release"
+  )
+  # Compute body parameters ====================================================
+  body_params <- list(
+    # Prolate spheroidal coordinate 'xi'++++++++++++++++++++++++++++++++++++++++
+    xi = 1 / sqrt(
+      1 - (scatterer_shape$radius / (scatterer_shape$length / 2))^2
+    ),
+    # Roll angle 'phi' (incident direction) ++++++++++++++++++++++++++++++++++++
+    phi_body = phi_body,
+    # Roll angle 'phi' (scattering direction) ++++++++++++++++++++++++++++++++++
+    phi_scatter = phi_body + pi,
+    # Theta angle 'theta' (incident direction) +++++++++++++++++++++++++++++++++
+    theta_body = body$theta,
+    # Theta angle 'theta' (scattering direction) +++++++++++++++++++++++++++++++
+    theta_scatter = pi - body$theta,
+    # Density ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    density = body$g * density_sw
+  )
+  # Focal length 'q' +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  body_params$q = scatterer_shape$length / 2 / body_params$xi
+  # Compute the reduced frequency for the surrounding medium ===================
+  model_params$acoustics$chi_sw <- model_params$acoustics$k_sw * body_params$q
+  # Compute the reduced frequency for the scatterer body =======================
+  model_params$acoustics$chi_body <- model_params$acoustics$k_f * body_params$q
+  # Define limits for 'm' and 'n' iterators ====================================
+  model_params$acoustics$m_max <- ceiling(
+    2 * model_params$acoustics$k_sw * scatterer_shape$radius
+  )
+  model_params$acoustics$n_max <- model_params$acoustics$m_max +
+    ceiling(model_params$acoustics$chi_sw / 2)
+  # Add model parameters slot to scattering object =============================
+  methods::slot(
+    object,
+    "model_parameters"
+  )$PSMS <- base::list(
+    parameters = model_params,
+    medium = medium_params,
+    body = body_params
+  )
+  # Add model results slot to scattering object ================================
+  methods::slot(
+    object,
+    "model"
+  )$PSMS <- base::data.frame(
+    frequency = frequency,
+    sigma_bs = base::rep(
+      NA,
+      length(frequency)
+    )
+  )
+  # Output =====================================================================
+  return(object)
+}
+################################################################################
+#' Initialize object for the modal series solution for a finite cylinder
+fcms_initialize <- function(object,
+                            frequency,
+                            boundary = "liquid_filled",
+                            sound_speed_sw = 1500,
+                            density_sw = 1026,
+                            m_limit = NULL) {
+  # Detect object class ========================================================
+  scatterer_type <- class(object)
+  # Detect object shape ========================================================
+  scatterer_shape <- extract(object, "shape_parameters")
+  # Validate shape +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  if (scatterer_shape$shape != "Cylinder") {
+    stop(
+      "The modal series solution for a finite cylinder requires scatterer to ",
+      "be shape-type 'Cylinder'. Input scatterer is shape-type ",
+      paste0("'", scatterer_shape, "'.")
+    )
+  }
+  # Parse body =================================================================
+  body <- extract(object, "body")
+  # Define medium parameters ===================================================
+  medium_params <- data.frame(
+    sound_speed = sound_speed_sw,
+    density = density_sw
+  )
+  # Define model parameters recipe =============================================
+  model_params <- list(
+    acoustics = data.frame(
+      frequency = frequency,
+      # Wavenumber (medium) ====================================================
+      k_sw = acousticTS::k(
+        frequency,
+        sound_speed_sw
+      ),
+      # Wavenumber (fluid) =====================================================
+      k_f = acousticTS::k(
+        frequency,
+        body$h * sound_speed_sw
+      )
+    )
+  )
+  # Determine expansion coefficient Bm method ==================================
+  # Validate method ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  if (!(boundary %in% c(
+    "liquid_filled", "fixed_rigid", "pressure_release", "gas_filled"
+  ))) {
+    stop(
+      "Only the following values for 'boundary' are available in this ",
+      "implementation of the finite cylinder modal series solution: ",
+      "'liquid_filled' (default), 'gas_filled', 'fixed_rigid',
+      'pressure_release'."
+    )
+  }
+  # Assign method ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  model_params$Bm_method <- switch(
+    boundary,
+    liquid_filled = "Bm_fluid",
+    gas_filled = "Bm_fluid",
+    fixed_rigid = "Bm_rigid",
+    pressure_release = "Bm_pressure_release"
+  )
+  # Compute body parameters ====================================================
+  body_params <- list(
+    # Prolate spheroidal coordinate 'xi'++++++++++++++++++++++++++++++++++++++++
+    length_body = scatterer_shape$length,
+    # Radius 'radius' ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    radius_body = scatterer_shape$radius,
+    # Theta angle 'theta' (incident direction) +++++++++++++++++++++++++++++++++
+    theta_body = body$theta,
+    # Material properties
+    g_body = body$g,
+    h_body = body$h
+  )
+  # Define limits for 'm' modal series iterator ================================
+  # ka + 10 seems to be an appropriate modal truncation ++++++++++++++++++++++++
+  if (!is.null(m_limit)) {
+    model_params$acoustics$m_max <- m_limit
+  } else {
+    model_params$acoustics$m_max <- ceiling(
+      model_params$acoustics$k_sw * scatterer_shape$radius
+    ) + 10
+  }
+  # Add model parameters slot to scattering object =============================
+  methods::slot(
+    object,
+    "model_parameters"
+  )$FCMS <- list(
+    parameters = model_params,
+    medium = medium_params,
+    body = body_params
+  )
+  # Add model results slot to scattering object ================================
+  methods::slot(
+    object,
+    "model"
+  )$FCMS <- data.frame(
+    frequency = frequency,
+    sigma_bs = rep(
+      NA,
+      length(frequency)
+    )
+  )
+  # Output =====================================================================
+  return(object)
+}
+################################################################################
+#' Initialize object for the modal series solution for a sphere
+sphms_initialize <- function(object,
+                             frequency,
+                             boundary = NULL,
+                             sound_speed_sw = 1500,
+                             density_sw = 1026,
+                             m_limit = NULL) {
+
+  # Detect object class ========================================================
+  scatterer_type <- class(object)
+  # Detect object shape ========================================================
+  scatterer_shape <- extract(object, "shape_parameters")
+  # Validate shape +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  if (scatterer_shape$shape != "sphere") {
+    stop(
+      "The modal series solution for a sphere requires scatterer to be ",
+      "shape-type 'Sphere'. Input scatterer is shape-type ",
+      paste0("'", scatterer_shape, "'.")
+    )
+  }
+  # Define medium parameters ===================================================
+  medium_params <- data.frame(
+    sound_speed = sound_speed_sw,
+    density = density_sw
+  )
+  # Determine expansion coefficient Bm method ==================================
+  # Validate method ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  if(is.null(boundary)){
+    # Set default boundary +++++++++++++++++++++++++++++++++++++++++++++++++++
+    boundary <- switch(
+      class(object),
+      CAL = stop(
+        "Use 'model='calibration'' when modeling the TS of a solid sphere."
+      ),
+      ESS = "shelled_liquid",
+      FLS = "liquid_filled",
+      GAS = "gas_filled",
+      SBF = "gas_filled",
+      is(object, "ESS")
+    )
+  }
+  if (!(boundary %in% c(
+    "liquid_filled", "fixed_rigid", "pressure_release", "gas_filled",
+    "shelled_pressure_release", "shelled_liquid", "shelled_gas"
+  ))) {
+    # Check boundary compatibility with scattering class +++++++++++++++++++++++
+    # ESS ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    if (
+      is(object, "ESS") &
+      !(boundary %in%
+        c("shelled_pressure_release", "shelled_liquid", "shelled_gas")
+      )
+    ) {
+      stop(
+        "Only the following values for 'boundary' are available in this ",
+        "implementation of the sphere modal series solution for the ",
+        "'ESS'-class: ",
+        "'shelled_pressure_release', 'shelled_liquid', 'shelled_gas'. Input ",
+        "boundary is ", paste0("'", boundary, "'.")
+      )
+    } else if (
+      # All others +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      boundary %in%
+      c(
+        "shelled_pressure_release", "shelled_liquid", "shelled_gas"
+      )
+    ) {
+      stop(
+        "Only the following values for 'boundary' are available in this ",
+        "implementation of the sphere modal series solution for the ",
+        paste0("'", class(object)[1], "'-class:" ),
+        "'fixed_rigid', 'pressure_release', 'liquid_filled', 'gas_filled'."
+      )
+    }
+  }
+  # Assign method ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  model_params <- list()
+  model_params$Bm_method <- switch(
+    boundary,
+    liquid_filled = "Bm_fluid",
+    gas_filled = "Bm_fluid",
+    fixed_rigid = "Bm_rigid",
+    pressure_release = "Bm_pressure_release",
+    shelled_pressure_release = "Bm_shelled_pressure_release",
+    shelled_liquid = "Bm_shelled_fluid",
+    shelled_gas = "Bm_shelled_fluid"
+  )
+  # Compute body parameters ====================================================
+  # Material properties: body/shell-to-seawater interface ++++++++++++++++++++++
+  g21 <- switch(
+    class(object),
+    ESS = ifelse(
+      "density" %in% names(extract(object, "shell")),
+      extract(object, "shell")$density / density_sw,
+      extract(object, "shell")$g
+    ),
+    extract(object, "body")$g
+  )
+  h21 <- switch(
+    class(object),
+    ESS = ifelse(
+      "sound_speed" %in% names(extract(object, "shell")),
+      extract(object, "shell")$sound_speed / sound_speed_sw,
+      extract(object, "shell")$h
+    ),
+    extract(object, "body")$h
+  )
+  # Material properties: fluid-to-shell interface ++++++++++++++++++++++++++++++
+  g32 <- switch(
+    class(object),
+    ESS = ifelse(
+      "density" %in% names(extract(object, "shell")),
+      extract(object, "fluid")$density/(g21 * density_sw),
+      (extract(object, "fluid")$g * density_sw)/(g21 * density_sw)
+    ),
+    NA
+  )
+  h32 <- switch(
+    class(object),
+    ESS = ifelse(
+      "sound_speed" %in% names(extract(object, "fluid")),
+      extract(object, "fluid")$sound_speed / (h21 * sound_speed_sw),
+      (extract(object, "fluid")$h * sound_speed_sw) / (h21 * sound_speed_sw)
+    ),
+    NA
+  )
+  # Material properties: fluid-to-seawater interface +++++++++++++++++++++++++++
+  g31 <- switch(
+    class(object),
+    ESS = ifelse(
+      "density" %in% names(extract(object, "shell")),
+      extract(object, "fluid")$density / density_sw,
+      extract(object, "fluid")$g
+    ),
+    ifelse(
+      "density" %in% names(extract(object, "body")),
+      extract(object, "body")$density / density_sw,
+      extract(object, "body")$g
+    )
+  )
+  h31 <- switch(
+    class(object),
+    ESS = ifelse(
+      "sound_speed" %in% names(extract(object, "fluid")),
+      extract(object, "fluid")$density / density_sw,
+      extract(object, "fluid")$g
+    ),
+    ifelse(
+      "sound_speed" %in% names(extract(object, "body")),
+      extract(object, "body")$sound_speed / sound_speed_sw,
+      extract(object, "body")$h
+    )
+  )
+  # Outer radius +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  radius_shell <- switch(
+    class(object),
+    ESS = extract(object, "shell")$radius,
+    NA
+  )
+  radius_fluid <- switch(
+    class(object),
+    ESS = extract(object, "fluid")$radius,
+    extract(object, "body")$radius
+  )
+  # Add to list ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  body_params <- list(
+    g21 = g21, g32 = g32, g31 = g31,
+    h21 = h21, h32 = h32, h31 = h31,
+    radius_shell = radius_shell,
+    radius_fluid = radius_fluid
+  )
+  # Define model parameters recipe =============================================
+  acoustics = data.frame(
+    frequency = frequency,
+    # Wavenumber (medium) ====================================================
+    k_sw = acousticTS::k(
+      frequency,
+      sound_speed_sw
+    )
+  )
+  # Wavenumber at shell-to-seawater interface ++++++++++++++++++++++++++++++++++
+  acoustics$k_shell <- acoustics$k_sw / h21
+  # Wavenumber at fluid-to-shell interface +++++++++++++++++++++++++++++++++++++
+  acoustics$k_fluid <- acoustics$k_shell / h32
+  model_params$acoustics <- acoustics
+  # Define limits for 'm' modal series iterator ================================
+  if (!is.null(m_limit)) {
+    model_params$acoustics$m_limit <- m_limit
+  } else if(!is.na(radius_shell)){
+    model_params$acoustics$m_limit <- round(
+      model_params$acoustics$k_sw * radius_shell + 20
+    )
+  } else {
+    model_params$acoustics$m_limit <- round(
+      model_params$acoustics$k_sw * radius_fluid + 20
+    )
+  }
+  # Add model parameters slot to scattering object =============================
+  methods::slot(
+    object,
+    "model_parameters"
+  )$SPHMS <- list(
+    parameters = model_params,
+    medium = medium_params,
+    body = body_params
+  )
+  # Add model results slot to scattering object ================================
+  methods::slot(
+    object,
+    "model"
+  )$SPHMS <- data.frame(
+    frequency = frequency,
+    sigma_bs = rep(
+      NA,
+      length(frequency)
+    )
+  )
+  # Output =====================================================================
   return(object)
 }

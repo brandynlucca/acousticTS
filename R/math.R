@@ -85,3 +85,97 @@ radians <- function(x) x * pi / 180.0
 #' @rdname vecnorm
 #' @export
 vecnorm <- function(x) sqrt(rowSums(x * x))
+################################################################################
+#' Compute the Neumann factor \eqn{\nu_{n}}
+#'
+#' The Neumann factor, denoted \eqn{\nu_{n}}, is a simple multiplicative
+#' constant commonly used in spherical or spheroidal function theory. It
+#' accounts for the symmetry of cosine terms or the duplication of even-order
+#' contributions in integrals.
+#'
+#' Formally, the Neumann factor is defined as:
+#' \deqn{
+#'   \eta_n = \begin{cases}
+#'     1, & n = 0, \\
+#'     2, & n > 0.
+#'   \end{cases}
+#' }
+#'
+#' @param x An integer iterator.
+#'
+#' @details
+#' This factor frequently appears in the normalization of spherical Bessel
+#' functions, Legendre expansions, and spheroidal wave functions. It is not
+#' related to the "von Neumann ordinals" used in set theory.
+#'
+#' @return A numeric vector of the same length as `x`, containing values of
+#' \eqn{\eta_x}, each equal to 1 or 2.
+#'
+#' @examples
+#' neumann(0) # should return 1
+#' neumann(1) # should return 2
+#' neumann(2) # should return 2
+#'
+#' # Vectorized use:
+#' neumann(0:4)
+#'
+#' @export
+neumann <- function(x) {
+  # Validation =================================================================
+  if (any(x < 0 | !x %% 1 == 0)) {
+    stop(
+      paste0(
+        "Value 'x', ", x, ", must be an integer greater than or equal to 0."
+      )
+    )
+  }
+  # Compute ====================================================================
+  ifelse(x == 0, 1, 2)
+}
+################################################################################
+#' Gauss–Legendre nodes and weights
+#'
+#' Compute Gauss–Legendre quadrature nodes and weights on an interval
+#' \eqn{[a,~b]}.
+#'
+#' @param n Number of quadrature nodes (n >= 1).
+#' @param a Left endpoint of the integration interval.
+#' @param b Right endpoint of the integration interval (b > a).
+#'
+#' @return A list with components:
+#' \describe{
+#'   \item{nodes}{Quadrature abscissae \eqn{x_i} in \eqn{[a,~b]}.}
+#'   \item{weights}{Quadrature weights \eqn{w_i} such that
+#'     \eqn{\int_a^b f(x)\,dx \approx \sum_{i=1}^n w_i\,f(x_i).}}
+#' }
+#'
+#' @details
+#' Gauss–Legendre quadrature provides exact integration for polynomials of
+#' degree up to \eqn{2n-1} using n nodes and weights chosen as the roots of the
+#' Legendre polynomial \eqn{P_n(x)} on the canonical interval \eqn{[-1,1]}. For
+#' a general interval \eqn{[a,b]} the mapping
+#' \deqn{x = \tfrac{a+b}{2} + \tfrac{b-a}{2}\,t,\quad t\in[-1,1],}
+#' transforms canonical nodes \eqn{t_i} to \eqn{x_i} and scales weights by
+#' \deqn{w_i = \tfrac{b-a}{2}\,w_i^{(0)},}
+#' where \eqn{w_i^{(0)}} are the standard weights on \eqn{[-1,1]}.
+#'
+#' This wrapper performs basic argument validation and calls the C++ routine
+#' to obtain nodes and weights with high accuracy for moderate \code{n}.
+#'
+#' @references
+#' Davis, P. J., & Rabinowitz, P. (2007). Methods of Numerical Integration
+#' (2nd ed.).
+#'
+#' @export
+gauss_legendre <- function(n, a = -1, b = 1) {
+  # Validation =================================================================
+  if (!is.numeric(n) || length(n) != 1 || n < 1 && n%%1 != 0) {
+    stop("n must be a positive integer")
+  }
+  if (!is.numeric(a) || !is.numeric(b) || length(a) != 1 || length(b) != 1) {
+    stop("a and b must be numeric scalars")
+  }
+  if (b <= a) stop("b must be greater than a")
+  # Get nodes and their weights ================================================
+  gauss_legendre_cpp(n = n, a = a, b = b)
+}

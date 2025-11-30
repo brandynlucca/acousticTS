@@ -338,7 +338,7 @@ fls_generate <- function(shape = "arbitrary",
     shape_parameters[["shape"]] <- paste0(class(shape_input))
   }
 
-  if (methods::is(shape, "Sphere") || 
+  if (methods::is(shape, "Sphere") ||
       (is.character(shape) && shape == "sphere")) {
     shape_parameters[["radius_shape"]] <- extract(
       shape_input,
@@ -346,13 +346,13 @@ fls_generate <- function(shape = "arbitrary",
     )$radius_shape
   }
 
-  if ((is.character(shape) && shape == "cylinder") || 
+  if ((is.character(shape) && shape == "cylinder") ||
       methods::is(shape, "Cylinder")) {
     shape_parameters$taper_order <- shape_input@shape_parameters$taper_order
   }
   # Check material properties length =========================================
   # g ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  if (length(g_body) > 1 && 
+  if (length(g_body) > 1 &&
       length(g_body) != length(shape_input@position_matrix[, 1]) - 1) {
     stop(
       paste0(
@@ -363,7 +363,7 @@ fls_generate <- function(shape = "arbitrary",
     )
   }
   # h ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  if (length(h_body) > 1 && 
+  if (length(h_body) > 1 &&
       length(h_body) != length(shape_input@position_matrix[, 1]) - 1) {
     stop(
       paste0(
@@ -560,24 +560,23 @@ ess_generate <- function(shape = "sphere",
       # Pull argument input names ==============================================
       arg_pull <- as.list(match.call())
       # Rename radius_shell to radius for shape functionality ==================
-      if ("radius_shell" %in% names(arg_pull)) {
+      if ("radius_shell" %in% names(arg_pull) && !is.null(radius_shell)) {
         # Create copy ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         subarg_pull <- arg_pull
         # Create shape +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        subarg_pull$radius_body <- arg_pull$radius_shell
+        subarg_pull$radius_body <- radius_shell
         # Filter out inappropriate parameters ++++++++++++++++++++++++++++++++++
         true_args <- .filter_shape_args(shape, subarg_pull)
         # Initialize +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         rpos[["shell"]] <- do.call(shape, true_args)
       }
       # Create radius_fluid, if present for shape functionality ================
-      if ("shell_thickness" %in% names(arg_pull) && 
+      if ("shell_thickness" %in% names(arg_pull) &&
           !is.null(arg_pull$shell_thickness)) {
         # Create copy ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         subarg_pull <- arg_pull
         # Create shape +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        subarg_pull$radius_body <- arg_pull$radius_shell -
-          arg_pull$shell_thickness
+        subarg_pull$radius_body <- radius_shell - shell_thickness
         # Filter out inappropriate parameters ++++++++++++++++++++++++++++++++++
         true_args <- .filter_shape_args(shape, subarg_pull)
         # Initialize +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -708,6 +707,10 @@ ess_generate <- function(shape = "sphere",
         fluid[["radius"]]
       ),
       length_units = length_units
+    ),
+    shape = ifelse(class(shape) == "character",
+                   shape,
+                   "Arbitrary"
     )
   )
   # Create ESS-class object ====================================================

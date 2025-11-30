@@ -70,7 +70,7 @@ sphere <- function(radius_body,
   )
   # Along-semimajor radii ======================================================
   along_radius <- sqrt(radius_body * radius_body -
-                         (semi_major - radius_body) * 
+                         (semi_major - radius_body) *
                          (semi_major - radius_body))
   # Apply to the radii =========================================================
   radius_output <- (utils::head(along_radius, -1) +
@@ -126,19 +126,15 @@ sphere <- function(radius_body,
 #' @rdname prolate_spheroid
 #' @export
 prolate_spheroid <- function(length_body,
-                             radius_body,
+                             radius_body = NULL,
                              length_radius_ratio = NULL,
-                             n_segments = 18,
+                             n_segments = 100,
                              length_units = "m",
                              theta_units = "radians") {
   # Define maximum radius ======================================================
-  if (missing(radius_body) && !is.null(length_radius_ratio)) {
-    max_radius <- length_body / length_radius_ratio
-  } else if (!missing(radius_body)) {
-    max_radius <- radius_body
-  } else {
-    stop("Radius/width and/or length-to-radius ratio are missing.")
-  }
+  max_radius <- .calculate_max_radius(
+    radius_body, length_body, length_radius_ratio
+  )
   # Define semi-major or x-axis ================================================
   x_edges <- seq(0, length_body, length.out = n_segments + 1)
   # Get the segment midpoints ==================================================
@@ -147,6 +143,8 @@ prolate_spheroid <- function(length_body,
   curved_x_mids <- (x_mids - length_body / 2) / (length_body / 2)
   # Compute the radius at each segment midpoint ================================
   radius_output <- max_radius * sqrt(1 - curved_x_mids^2)
+  max_idx <- which.max(radius_output)
+  radius_output[max_idx] <- max_radius
   # Assign "zeroth" radius =====================================================
   if (which.max(x_edges) == length(x_edges)) {
     x_edges <- rev(x_edges)
@@ -206,16 +204,9 @@ cylinder <- function(length_body,
                      n_segments = 1e2,
                      length_units = "m") {
   # Define maximum radius ======================================================
-  if (is.null(radius_body) && !is.null(length_radius_ratio)) {
-    max_radius <- length_body / length_radius_ratio
-  } else if (!is.null(radius_body)) {
-    max_radius <- radius_body
-  } else {
-    stop(
-      "Radius and/or length-to-radius ratio information is required to ",
-      "generate a cylinder shape."
-    )
-  }
+  max_radius <- .calculate_max_radius(
+    radius_body, length_body, length_radius_ratio
+  )
   # Define normalized x-axis ===================================================
   x_n_axis <- seq(-1, 1, length.out = n_segments + 1)
   # Define tapered radius vector, if applicable ================================
@@ -228,7 +219,7 @@ cylinder <- function(length_body,
   # Segment midpoints ==========================================================
   x_edges <- x_n_axis * length_body / 2 + length_body / 2
   # Apply to the radii =========================================================
-  radius_mids <- (utils::head(radius_tapered, -1) + 
+  radius_mids <- (utils::head(radius_tapered, -1) +
                     utils::tail(radius_tapered, -1)) / 2
   # Assign "zeroth" radius =====================================================
   if (which.max(x_edges) == length(x_edges)) {
@@ -383,15 +374,7 @@ polynomial_cylinder <- function(length_body,
 #' }
 #'
 #' @return
-#' Chu, D., Foote, K.G., and Stanton, T.K. 1993. Further analysis of target
-#' strength measurements of Antarctic krill at 38 and 120 kHz: Comparison and
-#' deformed cylinder model and inference of orientation distribution. The
-#' Journal of the Acoustical Society of America, 93(5): 2985-2988.
-#' https://doi.org/10.1121/1.405818
-#'
-#' Smith, J.N., Ressler, P.H., and Warren, J.D. 2013. A distorted wave Born
-#' approximation target strength model for Bering Sea euphausiids. ICES Journal
-#' of Marine Science, 70(1): 204-214. https://doi.org/10.1093/icesjms/fss140
+#' A \code{\link{Shape}} object.
 #'
 #' @keywords shape_generation
 #' @rdname create_shape

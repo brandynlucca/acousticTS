@@ -110,9 +110,9 @@ DWBA <- function(object) {
   integrand <- function(s, x) {
     rint_mat <- s * rpos_diff + rpos[, seq_len(ncol(rpos_diff))]
     rint_k1_h_mat <- k_sw_rot[x, ] %*% rint_mat[1:3, ] / h
-    bessel <- jc(1, 2 * (k_sw_norm[x] * rint_mat[4, ] / h * 
+    bessel <- jc(1, 2 * (k_sw_norm[x] * rint_mat[4, ] / h *
                            cos(beta[x, ]))) / cos(beta[x, ])
-    fb_a <- k_sw_norm[x] / 4 * R * rint_mat[4, ] * 
+    fb_a <- k_sw_norm[x] / 4 * R * rint_mat[4, ] *
       exp(2i * rint_k1_h_mat) * bessel * rpos_diff_norm
     sum(fb_a, na.rm = TRUE)
   }
@@ -202,7 +202,7 @@ DWBA_curved <- function(object) {
   integrand <- function(s, x) {
     rint_mat <- s * rpos_diff + rpos[, seq_len(ncol(rpos_diff))]
     rint_k1_h_mat <- k_sw_rot[x, ] %*% rint_mat[1:3, ] / h
-    bessel <- jc(1, 2 * (k_sw_norm[x] * rint_mat[4, ] / h * 
+    bessel <- jc(1, 2 * (k_sw_norm[x] * rint_mat[4, ] / h *
                            cos(beta[x, ]))) / cos(beta[x, ])
     fb_a <- k_sw_norm[x] / 4 * R * rint_mat[4, ] *
       exp(2i * rint_k1_h_mat) * bessel * rpos_diff_norm
@@ -303,7 +303,7 @@ SDWBA <- function(object) {
       rint_mat <- s * r0_diff[, y] + r0[, y]
       # rint_k1_h_mat <- k_sw_rot[ x , ] %*% rint_mat[ 1 : 3 ]
       rint_k1_h_mat <- k_sw_rot[x, ] %*% rint_mat[1:3] / h
-      bessel <- jc(1, 2 * (k_sw_norm[x] * rint_mat[4] / h * 
+      bessel <- jc(1, 2 * (k_sw_norm[x] * rint_mat[4] / h *
                              cos(beta[x, y]))) / cos(beta[x, y])
       # bessel <- jc( 1 , 2 * ( k_sw_norm[ x ] * rint_mat[ 4 ] *
       #                           cos( beta[ x , y ] ) ) ) / cos( beta[ x , y] )
@@ -431,7 +431,7 @@ SDWBA_curved <- function(object) {
     integrand_c <- function(s, x, y) {
       rint_mat <- s * r0_diff_h[, y] + r0_h[, y]
       rint_k1_h_mat <- k_sw_rot[x, ] %*% rint_mat[1:3]
-      bessel <- jc(1, 2 * (k_sw_norm[x] * rint_mat[4] * 
+      bessel <- jc(1, 2 * (k_sw_norm[x] * rint_mat[4] *
                              cos(beta[x, y]))) / cos(beta[x, y])
       fb_a <- k_sw_norm[x] / 4 * R * rint_mat[4] * h *
         exp(2i * rint_k1_h_mat) * bessel * r0_diff_norm[y]
@@ -660,6 +660,71 @@ MSS_anderson <- function(object) {
   # Return object ==============================================================
   object
 }
+
+#' Calculate Bessel function cache for the Goodman and Stern (1962) model
+#' @param ka_matrix_m Modal ka matrix
+#' @param m Modal vector
+#' @return Cached Bessel function values
+#' @keywords internal
+#' @noRd
+.calculate_bessel_cache <- function(ka_matrix_m, m) {
+  # # Define all Bessel functions to apply =======================================
+  # bessel_functions <- list(
+  #   js = js, jsd = jsd, jsdd = jsdd,
+  #   ys = ys, ysd = ysd, ysdd = ysdd,
+  #   hs = hs, hsd = hsd
+  # )
+  # # Map out the function assignment ============================================
+  # bessel_map <- list(
+  #   k1a_shell = c("js", "jsd", "hs", "hsd"),
+  #   kLa_shell = c("js", "jsd", "jsdd", "ys", "ysd", "ysdd"),
+  #   kTa_shell = c("js", "jsd", "jsdd", "ys", "ysd", "ysdd"),
+  #   kTa_fluid = c("js", "jsd", "jsdd", "ys", "ysd", "ysdd"),
+  #   kLa_fluid = c("js", "jsd", "jsdd", "ys", "ysd", "ysdd"),
+  #   k3a_fluid = c("js", "jsd")
+  # )
+  # # Pre-calculate the Bessel functions and their respective derivatives ========
+  # bessel_cache <- lapply(row.names(ka_matrix), function(ka_m) {
+  #   ka_series <- ka_matrix[ka_m, ]
+  #   bessel_match <- bessel_map[[ka_m]]
+  #
+  #   # Calculate for only matching functions
+  #   lapply(bessel_functions[bessel_match], function(func) {
+  #     func(m, ka_series)
+  #   })
+  # })
+  # # Add the names ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  # names(bessel_cache) <- row.names(ka_matrix)
+  # bessel_cache
+  # Define all Bessel functions to apply =======================================
+  bessel_functions <- list(
+    js = js_old, jsd = jsd_old, jsdd = jsdd_old,
+    ys = ys_old, ysd = ysd_old, ysdd = ysdd_old,
+    hs = hs_old, hsd = hsd_old
+  )
+  # Map out the function assignment ============================================
+  bessel_map <- list(
+    k1a_shell = c("js", "jsd", "hs", "hsd"),
+    kLa_shell = c("js", "jsd", "jsdd", "ys", "ysd", "ysdd"),
+    kTa_shell = c("js", "jsd", "jsdd", "ys", "ysd", "ysdd"),
+    kTa_fluid = c("js", "jsd", "jsdd", "ys", "ysd", "ysdd"),
+    kLa_fluid = c("js", "jsd", "jsdd", "ys", "ysd", "ysdd"),
+    k1a_fluid = c("js", "jsd")
+  )
+  # Pre-calculate the Bessel functions and their respective derivatives ========
+  bessel_cache <- lapply(names(ka_matrix_m), function(ka_m) {
+    ka_series <- ka_matrix_m[[ka_m]]
+    bessel_match <- bessel_map[[ka_m]]
+
+    # Calculate for only matching functions
+    lapply(bessel_functions[bessel_match], function(func) {
+      func(m, ka_series)
+    })
+  })
+  # Add the names ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  names(bessel_cache) <- row.names(ka_matrix)
+  bessel_cache
+}
 ################################################################################
 # Goodman and Stern (1962) modal series solution for elastic-shelled spheres
 ################################################################################
@@ -695,7 +760,7 @@ MSS_goodman_stern <- function(object) {
   kL <- k(model$parameters$acoustics$frequency, sound_speed_longitudinal)
   kT <- k(model$parameters$acoustics$frequency, sound_speed_transversal)
   # Calculate the reindexed ka values ==========================================
-  ka_matrix <- calculate_ka_matrix(
+  ka_matrix <- .calculate_ka_matrix(
     model$parameters$acoustics$frequency,
     model$medium$sound_speed,
     model$fluid$sound_speed,
@@ -703,6 +768,20 @@ MSS_goodman_stern <- function(object) {
     sound_speed_transversal,
     radius_shell,
     radius_fluid
+  )
+
+  ANS <- goodman_stern_bm_cpp(
+    ka_matrix["k1a_shell",],
+    ka_matrix["kLa_shell",],
+    ka_matrix["kTa_shell",],
+    ka_matrix["kLa_fluid",],
+    ka_matrix["kTa_fluid",],
+    ka_matrix["k1a_fluid",],
+    m,
+    lambda,
+    G,
+    model$medium$density / density_shell,
+    density_fluid / density_shell
   )
   # Get the modal series iterators =============================================
   m_limit <- model$parameters$m_limit
@@ -725,17 +804,25 @@ MSS_goodman_stern <- function(object) {
   boundary_matrices <- .goodman_stern_boundaries(
     alpha, ka_matrix, m
   )
+
+  complex_det <-function(M) {
+    prod(eigen(M, only.values = TRUE)$values)
+  }
+
   # Compute the modal series coefficient (b_m) using Cramer's Rule =============
   b_m <- lapply(seq_along(boundary_matrices), function(freq_idx) {
     vapply(seq_along(m), function(m_idx) {
       boundary_m <- boundary_matrices[[freq_idx]][[m_idx]]
-      # Calculate determinants using QR decomposition for numerical stability ++
-      det_numerator <- prod(
-        abs(Re(diag(qr(boundary_m$A_numerator)$qr)))
-      )
-      det_denominator <- prod(
-        abs(Re(diag(qr(boundary_m$A_denominator)$qr)))
-      )
+      # # Calculate determinants using QR decomposition for numerical stability ++
+      # det_numerator <- prod(
+      #   abs(Re(diag(qr(boundary_m$A_numerator)$qr)))
+      # )
+      # det_denominator <- prod(
+      #   abs(Re(diag(qr(boundary_m$A_denominator)$qr)))
+      # )
+      det_numerator <- complex_det(boundary_m$A_numerator)
+      det_denominator <- complex_det(boundary_m$A_denominator)
+
       # Apply Cramer's rule: b_m = det(A_numerator) / det(A_denominator) +++++++
       if (det_denominator == 0) {
         warning(
@@ -748,15 +835,40 @@ MSS_goodman_stern <- function(object) {
       }
 
       det_numerator / det_denominator
-    }, FUN.VALUE = numeric(1))
+    }, FUN.VALUE = complex(1))
   })
   # Calculate the linear scattering coefficient, f_bs ==========================
   f_bs <- -1i / model$parameters$acoustics$k_sw *
     vapply(seq_along(b_m), function(ka_idx) {
       sum((-1)^m * (2 * m + 1) * b_m[[ka_idx]])
-    }, FUN.VALUE = numeric(1))
+    }, FUN.VALUE = complex(1))
+
+  # m <- 0:m_limit
+  # prefactors <- ifelse(m == 0, -1, -1i^m * (2*m + 1))
+  #
+  # f_bs <- (1 / model$parameters$acoustics$k_sw) * vapply(seq_along(b_m), function(ka_idx) {
+  #   sum(prefactors * b_m[[ka_idx]])
+  # }, FUN.VALUE = complex(1))
   # Convert to sigma_bs ========================================================
   sigma_bs <- abs(f_bs)^2
+  result_cpp <- ANS
+  fbs_from_cpp <- vapply(seq_len(nrow(result_cpp)), function(i) {
+    -1i / model$parameters$acoustics$k_sw[i] * sum((-1)^m * (2 * m + 1) * result_cpp[i, ])
+  }, FUN.VALUE = complex(1))
+  sigma_bs_from_cpp <- abs(fbs_from_cpp)^2
+
+  TS <- 10 * log10(sigma_bs)
+  TS_from_cpp <- 10 * log10(sigma_bs_from_cpp)
+
+  plot(frequency * 1e-3, TS, col="red", type='l')
+  lines(frequency * 1e-3, TS_from_cpp, col="blue")
+  lines(frequency * 1e-3, shelled_sphere@model$high_pass_stanton$TS, col="gray40")
+
+
+  f_bs_from_cpp <- -1i / model$parameters$acoustics$k_sw *
+    vapply(seq_along(b_m), function(ka_idx) {
+      sum((-1)^m * (2 * m + 1) * b_m[[ka_idx]])
+    }, FUN.VALUE = numeric(1))
   # Define MSS slot for ESS-type scatterer =====================================
   methods::slot(object, "model")$MSS_goodman_stern <- data.frame(
     frequency = model$parameters$acoustics$frequency,
@@ -991,6 +1103,423 @@ high_pass_stanton <- function(object) {
   object
 }
 ################################################################################
+# Utility scattering models for multiple classes
+################################################################################
+################################################################################
+# Fine cylinder modal series solution
+################################################################################
+FCMS <- function(object) {
+  # Extract model parameters/inputs ============================================
+  model_params <- extract(object, "model_parameters")$FCMS
+  parameters <- model_params$parameters
+  acoustics <- parameters$acoustics
+  medium <- model_params$medium
+  body <- model_params$body
+  # Pull out maximum 'm' specifically ==========================================
+  m_max <- acoustics$m_max
+  # Pre-allocate Neumann factors ===============================================
+  nu <- lapply(
+    seq_len(nrow(acoustics)),
+    function(f) neumann(0:acoustics$m_max[f])
+  )
+  # Compute kL and ka ==========================================================
+  k1L <- body$length_body * acoustics$k_sw
+  k1a <- acoustics$k_sw * sin(body$theta) * body$radius_body
+  k2a <- acoustics$k_sw * sin(body$theta) / body$h * body$radius_body
+  # Combine material properties ================================================
+  gh <- body$g * body$h
+  # Resolve modal series coefficient calculation method ========================
+  if (parameters$Bm_method == "Bm_fluid") {
+    .bm_wrap <- function(f) {
+      # Get m vector ===========================================================
+      m <- 0:m_max[f]
+      # Convert to modal matrices ==============================================
+      k1a_m <- modal_matrix(k1a[f], max(m))
+      k2a_m <- modal_matrix(k2a[f], max(m))
+      # Compute numerator for the boundary coefficient Cm ======================
+      Cm_num <- (jcd(m, k2a_m)*yc(m, k1a_m)) /
+        (jc(m, k2a_m)*jcd(m, k1a_m)) -
+        gh*(ycd(m, k1a_m)/jcd(m, k1a_m))
+      # Compute denominator for the boundary coefficient Cm ====================
+      Cm_denom <- (jcd(m, k2a_m)*jc(m, k1a_m)) /
+        (jc(m, k2a_m)*jcd(m, k1a_m)) - gh
+      # Resolve Cm =============================================================
+      Cm <- Cm_num / Cm_denom
+      # Return Bm
+      1i^(m+1) * (-nu[[f]] * 1i^(m) / (1 + 1i * Cm))
+    }
+  } else if (parameters$Bm_method == "Bm_rigid") {
+    .bm_wrap <- function(f) {
+      # Get m vector ===========================================================
+      m <- 0:m_max[f]
+      # Convert to modal matrix ================================================
+      k1a_m <- modal_matrix(k1a[f], max(m))
+      # Return Bm ==============================================================
+      (-1)^m * nu[[f]] * (jcd(m, k1a_m) / hcd(m, k1a_m))
+    }
+  } else {
+    .bm_wrap <- function(f) {
+      # Get m vector ===========================================================
+      m <- 0:m_max[f]
+      # Convert to modal matrix ================================================
+      k1a_m <- modal_matrix(k1a[f], max(m))
+      # Return Bm ==============================================================
+      (-1)^m * nu[[f]] * (jc(m, k1a_m) / hc(m, k1a_m))
+    }
+  }
+  fc_bm <- lapply(seq_len(nrow(acoustics)), FUN = function(f) .bm_wrap(f))
+  # Compute the linear scattering coefficient, f_bs ============================
+  f_bs <- vapply(
+    seq_len(nrow(acoustics)),
+    FUN = function(f) {
+      if (parameters$Bm_method == "Bm_fluid") {
+        -body$length_body / pi *
+          (sin(k1L[f] * cos(body$theta_body)) /
+             (k1L[f] * cos(body$theta_body))) *
+          sum(fc_bm[[f]])
+      } else {
+        1i * body$length_body / pi *
+          (sin(k1L[f] * cos(body$theta_body)) /
+             (k1L[f] * cos(body$theta_body))) *
+          sum(fc_bm[[f]])
+      }
+    },
+    FUN.VALUE = complex(1)
+  )
+  # Calculate backscatter and return ===========================================
+  # Compute sigma_bs +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  o_bs <- abs(f_bs)
+  methods::slot(object, "model")$FCMS <- data.frame(
+    frequency = acoustics$frequency,
+    f_bs = f_bs,
+    sigma_bs = o_bs,
+    TS = 20 * log10(o_bs)
+  )
+  object
+}
+
+################################################################################
+# Sphere modal series solution
+################################################################################
+SPHMS <- function(object) {
+  # Extract model parameters/inputs ============================================
+  model_params <- extract(object, "model_parameters")$SPHMS
+  parameters <- model_params$parameters
+  acoustics <- parameters$acoustics
+  medium <- model_params$medium
+  body <- model_params$body
+  # Pull out maximum 'm' specifically ==========================================
+  m_limit <- acoustics$m_limit
+  # Compute Delta (shell thickness) =============================================
+  b_delta <- body$radius_shell - body$radius_fluid
+  # Compute ka and kb ==========================================================
+  k1a <- acoustics$k_sw * body$radius_shell
+  k2a <- acoustics$k_shell * body$radius_shell
+  k2b <- acoustics$k_shell * body$radius_fluid
+  k3b <- acoustics$k_fluid * body$radius_fluid
+  # Define the boundary expansion coefficient method ===========================
+  .bm_wrap <- switch(
+    parameters$Bm_method,
+    Bm_rigid = function(f) .sphms_bm_rigid(k1a[f], m_limit[f]),
+    Bm_pressure_release = function(f) .sphms_bm_prelease(k1a[f], m_limit[f]) ,
+    Bm_fluid = function(f) {
+      .sphms_bm_fluid(k1a[f], k2a[f], body$g31, body$h31, m_limit[f])
+    },
+    Bm_shelled_pressure_release = function(f) {
+      .sphms_bm_shelled_prelease(
+        k1a[f], k2a[f], k2b[f], body$g31, body$h31, m_limit[f]
+      )
+    },
+    Bm_shelled_fluid = function(f) {
+      .sphms_bm_shelled_fluid(
+        k1a[f], k2a[f], k2b[f], k3b[f], body$g21, body$g32, body$h21, body$h32,
+        m_limit[f]
+      )
+    }
+  )
+  sph_bm <- vapply(seq_len(nrow(acoustics)),
+                   FUN = function(f) .bm_wrap(f),
+                   FUN.VALUE = complex(1))
+  # Compute the linear scattering coefficient, f_bs ============================
+  f_bs <- -1i / acoustics$k_sw * sph_bm
+  # Calculate backscatter and return ===========================================
+  # Compute sigma_bs +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  o_bs <- abs(f_bs)
+  methods::slot(object, "model")$SPHMS <- data.frame(
+    frequency = acoustics$frequency,
+    f_bs = f_bs,
+    sigma_bs = o_bs,
+    TS = 20 * log10(o_bs)
+  )
+  object
+}
+
+.sphms_bm_rigid <- function(k1a, m_limit) {
+  # Expand k1a into matrix =====================================================
+  k1a_m <- modal_matrix(k1a, m_limit)
+  # Expand modal series iterator ===============================================
+  m <- 0:m_limit
+  # Calculate the expansion coefficient, A_m ===================================
+  Am <- -(jsd(m_limit, k1a_m) / hsd(m_limit, k1a_m))
+  # Return the entire boundary modal term ======================================
+  sum((2 * m + 1) * (-1)^m * Am)
+}
+
+.sphms_bm_prelease <- function(k1a, m_limit) {
+  # Expand k1a into matrix =====================================================
+  k1a_m <- modal_matrix(k1a, m_limit)
+  # Expand modal series iterator ===============================================
+  m <- 0:m_limit
+  # Calculate the expansion coefficient, A_m ===================================
+  Am <- -(js(m_limit, k1a_m) / hs(m_limit, k1a_m))
+  # Return the entire boundary modal term ======================================
+  sum((2 * m + 1) * (-1)^m * Am)
+}
+
+.sphms_bm_fluid <- function(k1a, k2a, g31, h31, m_limit) {
+  # Expand ka into matrices ====================================================
+  k1a_m <- modal_matrix(k1a, m_limit)
+  k3a_m <- modal_matrix(k3a, m_limit)
+  # Expand modal series iterator ===============================================
+  m <- 0:m_limit
+  # Get material properties product ============================================
+  gh <- g31 * h31
+  # Calculate expansion ceofficient, C_m =======================================
+  # Numerator ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  cm_num <- (jsd(m, k3a_m) * ys(m, k1a_m)) / (js(m, k3a_m) * jsd(m, k1a_m)) -
+    (gh * ysd(m, k1a_m) / jsd(m, k1a_m))
+  # Denominator ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  cm_denom <- (jsd(m, k3a_m) * js(m, k1a_m)) / (js(m, k3a_m) * jsd(m, k1a_m)) -
+    gh
+  # Quotient +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  cm <- cm_num / cm_denom
+  # Calculate the expansion coefficient, A_m ===================================
+  Am <- (-1 / (1 + 1i * cm))
+  # Return the entire boundary modal term ======================================
+  sum((2 * m + 1) * (-1)^m * Am)
+}
+
+.sphms_bm_shelled_prelease <- function(k1a, k2a, k2b, g31, h31, m_limit) {
+  # Expand ka into matrices ====================================================
+  k1a_m <- modal_matrix(k1a, m_limit)
+  k2a_m <- modal_matrix(k2a, m_limit)
+  k2b_m <- modal_matrix(k2b, m_limit)
+  # Expand modal series iterator ===============================================
+  m <- 0:m_limit
+  # Get material properties product ============================================
+  gh <- g31 * h31
+  # Calculate the expansion coefficient, A_m ===================================
+  # Compute elements for boundary matrix +++++++++++++++++++++++++++++++++++++++
+  a11 <- -hs(m, k1a_m)
+  a12 <- js(m, k1a_m)
+  a21 <- -g21 * h21 * hsd(m, k1a_m)
+  b1 <- js(m, k1a_m)
+  b2 <- jsd(m, k1a_m) * g21 * h21
+  d1 <- js(m, k2a_m) * ys(m, k2b_m) - js(m, k2b_m) * ys(m, k2a_m)
+  d2 <- jsd(m, k2a_m) * ys(m, k2b_m) - js(m, k2b_m) * ysd(m, k2a_m)
+  # Calculate coefficient ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  Am <- (b1 * d2 - d1 * b2) / (a11 * d2 - d1 * a21)
+  # Return the entire boundary modal term ======================================
+  sum((2 * m + 1) * (-1)^m * Am)
+}
+
+.sphms_bm_shelled_fluid <- function(
+    k1a, k2a, k2b, k3b, g21, g32, h21, h32, m_limit
+) {
+  # Expand modal series iterator ===============================================
+  m <- 0:m_limit
+  # Expand ka into matrices ====================================================
+  k1a_m <- modal_matrix(k1a, m_limit)
+  k2a_m <- modal_matrix(k2a, m_limit)
+  k2b_m <- modal_matrix(k2b, m_limit)
+  k3b_m <- modal_matrix(k3b, m_limit)
+  # Get material properties product ============================================
+  gh <- g31 * h31
+  # Calculate the expansion coefficient, A_m ===================================
+  # Compute elements for boundary matrix +++++++++++++++++++++++++++++++++++++++
+  a11 <- -hs(m, k1a_m)
+  a12 <- js(m, k2a_m)
+  a13 <- ys(m, k2a_m)
+  a21 <- -g21 * h21 * hsd(m, k1a_m)
+  a22 <- jsd(m, k2a_m)
+  a23 <- ysd(m, k2a_m)
+  a32 <- js(m, k2b_m) * jsd(m, k3b_m) - g32 * h32 * jsd(m, k2b_m) * js(m, k3b_m)
+  a33 <- ys(m, k2b_m) * jsd(m, k3b_m) - g32 * h32 * ysd(m, k2b_m) * js(m, k3b_m)
+  b1 <- js(m, k1a_m)
+  b2 <- jsd(m, k1a_m) * g21 * h21
+  # Calculate coefficient ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  Am <- (b1*a22*a33 + a13*b2*a32 - a12*b2*a33 - b1*a23*a32) /
+    (a11*a22*a33 + a13*a21*a32 - a12*a21*a33 - a11*a23*a32)
+  # Return the entire boundary modal term ======================================
+  sum((2 * m + 1) * (-1)^m * Am)
+}
+
+################################################################################
+# Prolate spheroid modal series solution
+################################################################################
+#' Calculates the theoretical target strength of a prolate spheroid using a
+#' modal series solution
+#'
+#' @param object Prolate spheroid object.
+#' @return
+#' Target strength (TS, dB re: 1 m^2)
+#' @references
+#' Furusawa, M. (1988). Prolate spheroidal models for predicting general trends
+#' of fish target strength. Journal of the Acoustical Society of Japan, 9:
+#' 13-24.
+#'
+#' @export
+PSMS <- function(object) {
+  # Extract model parameters/inputs ============================================
+  model_params <- extract(object, "model_parameters")$PSMS
+  parameters <- model_params$parameters
+  acoustics <- parameters$acoustics
+  medium <- model_params$medium
+  body <- model_params$body
+  # Pre-allocate Neumann factors ===============================================
+  nu <- lapply(
+    seq_len(nrow(acoustics)),
+    function(f) neumann(0:acoustics$m_max[f])
+  )
+  # Pre-allocate azimuthal phase relations =====================================
+  azimuth <- lapply(
+    seq_len(nrow(acoustics)),
+    function(f) {
+      cos(0:acoustics$m_max[f] * (body$phi_body - body$phi_scatter))
+    }
+  )
+  # Compute the expansion matrix Amn ===========================================
+  if (parameters$Amn_method == "Amn_liquid_simplify") {
+    .amn_wrap <- function(f) {
+      # Compute using the simplified expression from Eq. 5 (Furusawa, 1988) ++++
+      liquid_spheroidal_simplified_expansion(
+        acoustics$m_max[f], acoustics$n_max[f], acoustics$chi_sw[f],
+        acoustics$chi_body[f], body$xi, medium$density, body$density
+      )$amn
+    }
+  } else if (parameters$Amn_method == "Amn_liquid") {
+    .amn_wrap <- function(f) {
+      # Compute the kernel matrices for a liquid-filled spheroidal scatterer +++
+      kernels <- liquid_spheroidal_kernels(
+        acoustics$m_max[f], acoustics$n_max[f], acoustics$chi_sw[f],
+        acoustics$chi_body[f], body$theta_body, body$xi,
+        body$density, medium$density
+      )
+      # Solve for the expansion coefficient Amn ++++++++++++++++++++++++++++++++
+      solve_liquid_spheroidal_Amn(
+        kernels$K1_kernel, kernels$K3_kernel
+      )
+    }
+  } else if (parameters$Amn_method == "Amn_pressure_release") {
+    .amn_wrap <- function(f) {
+      # Compute the external radial incident wave function +++++++++++++++++++++
+      R_incident <- radial_external_incoming_matrix(
+        acoustics$m_max[f],
+        acoustics$n_max[f], acoustics$chi_sw[f], body$xi
+      )
+      # Compute the external radial scattering wave function +++++++++++++++++++
+      R_scattering <- radial_external_scattering_matrix(
+        acoustics$m_max[f],
+        acoustics$n_max[f], acoustics$chi_sw[f], body$xi
+      )
+      # Compute the expansion matrix +++++++++++++++++++++++++++++++++++++++++++
+      - R_incident$value / R_scattering$value
+    }
+  } else {
+    .amn_wrap <- function(f) {
+      # Compute the first deriv of the external radial incident wave function ++
+      dR_incident <- radial_external_incoming_matrix(
+        acoustics$m_max[f],
+        acoustics$n_max[f], acoustics$chi_sw[f], body$xi
+      )
+      # Compute the first deriv of the external radial scattering wave function
+      dR_scattering <- radial_external_scattering_matrix(
+        acoustics$m_max[f],
+        acoustics$n_max[f], acoustics$chi_sw[f], body$xi
+      )
+      # Compute the expansion matrix +++++++++++++++++++++++++++++++++++++++++++
+      - dR_incident$derivative / dR_scattering$derivative
+    }
+  }
+  ps_amn <- lapply(
+    seq_len(nrow(acoustics)),
+    FUN = function(f) .amn_wrap(f)
+  )
+  # Compute the linear scattering coefficient, f_bs ============================
+  f_bs <- vapply(
+    seq_len(nrow(acoustics)),
+    FUN = function(f){
+      .psms_fbs(
+        nu[[f]], azimuth[[f]], acoustics$m_max[f], acoustics$n_max[f],
+        acoustics$chi_sw[f],
+        body$theta_body, body$theta_scatter, ps_amn[[f]],
+        ifelse(
+          parameters$Amn_method %in% c("Amn_liquid", "Amn_liquid_simplified"),
+          TRUE,
+          FALSE
+          )
+      )
+    },
+    FUN.VALUE = complex(1)
+  )
+  # Calculate backscatter and return ===========================================
+  # Compute sigma_bs +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  o_bs <- abs(-2i / acoustics$k_sw * f_bs)
+  methods::slot(object, "model")$PSMS <- data.frame(
+    frequency = acoustics$frequency,
+    f_bs = f_bs,
+    sigma_bs = o_bs,
+    TS = 20 * log10(o_bs)
+  )
+  object
+}
+
+.psms_fbs <- function(nu, azimuth, m_max, n_max, chi_sw, theta_body,
+                      theta_scatter, ps_amn, list2mat = FALSE) {
+  # Pre-compute the product of the regular and scatter Smn matrices ============
+  smn_matrix <- outer(
+    0:m_max, 0:n_max,
+    Vectorize(function(m, n) {
+      if (n < m) return(NA)
+      # Regular
+      Smn(m, n, chi_sw, cos(theta_body), normalize = TRUE)$value *
+        # Scattering
+        Smn(m, n, chi_sw, cos(theta_scatter), normalize = TRUE)$value
+    })
+  )
+
+  # Convert list to matrix if defined ==========================================
+  if (list2mat) {
+    # Get the matrix dimensions and pre-allocated 'Amn_matrix' +++++++++++++++++
+    smn_matrix_dims <- dim(smn_matrix)
+    nrows <- smn_matrix_dims[1]
+    ncols <- smn_matrix_dims[2]
+    Amn_matrix <- matrix(0 + 0i,
+                         nrow = nrows,
+                         ncol = ncols)
+    # Reshape Amn list into matrix +++++++++++++++++++++++++++++++++++++++++++++
+    seq_dim <- seq_len(min(length(ps_amn), nrows))
+    Amn_rows <- vapply(
+      seq_dim, FUN = function(r) {
+        vec <- complex(length = ncols)
+        am_vec <- as.vector(ps_amn[[r]])
+        if (length(am_vec) > 0L) {
+          end_col <- min(smn_matrix_dims[2], r + length(am_vec) - 1L)
+          cols <- r:end_col
+          vec[cols] <- am_vec[seq_len(length(cols))]
+        }
+        vec
+      }, FUN.VALUE = complex(smn_matrix_dims[2]), USE.NAMES = FALSE
+    )
+    Amn_matrix[seq_dim, ] <- t(Amn_rows)
+  } else {
+    Amn_matrix <- ps_amn
+  }
+  # Calculate the linear scattering coefficient ================================
+  sum(nu * smn_matrix * Amn_matrix * azimuth, na.rm = TRUE)
+}
+
+################################################################################
 # Model registry/API
 ################################################################################
 #' Model registry: maps model names to their functions and related initializers
@@ -1005,5 +1534,7 @@ model_registry <- list(
   MSS_anderson = MSS_anderson,
   MSS_goodman_stern = MSS_goodman_stern,
   KRM = KRM,
-  high_pass_stanton = high_pass_stanton
+  high_pass_stanton = high_pass_stanton,
+  PSMS = PSMS,
+  FCMS = FCMS
 )
