@@ -8,13 +8,13 @@ test_that(
     # Parameterize model
     frequency <- c(38e3, 70e3, 120e3, 200e3)
     # Calculate TS; update original CAL object
-    cal_sphere <- acousticTS::target_strength(
+    cal_sphere <- target_strength(
       object = cal_sphere,
       frequency = frequency,
       model = "calibration"
     )
     # Calculate TS; store in a new CAL object
-    cal_sphere_copy <- acousticTS::target_strength(
+    cal_sphere_copy <- target_strength(
       object = cal_sphere,
       frequency = frequency,
       model = "calibration"

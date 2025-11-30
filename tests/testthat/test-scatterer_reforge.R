@@ -171,92 +171,25 @@ test_that("`reforge('SBF')` correctly updates body shape", {
     new_sblength
   )
   # ---- Case: Defining length and width -> overrides `isometric_body`
-  suppressMessages({
-    body_expand <- reforge(sardine, body_scale = c(length = 4, width = 1.5))
-  })
-  expect_message(
+  expect_error(
     reforge(sardine, body_scale = c(length = 4, width = 1.5)),
     paste0(
-      "Multiple axes specified in body_scale/body_target: 'isometric_body' ",
-      "will be ignored for those axes.."
+      "'body_scale' contains more than 1 dimension while 'isometric_body' ",
+      "is TRUE. When TRUE 'body_scale' must be a scalar value."
     )
-  )
-
-  new_length <- extract(body_expand, "shape_parameters")$body$length
-  new_width <- max(extract(body_expand, "body")$rpos[2, ])
-  z_pos <- extract(body_expand, "body")$rpos[3:4, ]
-  new_height <- max(head(z_pos, 1) - tail(z_pos, 1))
-  expect_equal(new_length, orig_length * 4)
-  expect_equal(new_width, orig_width * 1.5)
-  expect_equal(new_height, orig_height)
-  expect_equal(
-    extract(body_expand, "shape_parameters")$body$length,
-    new_length
-  )
-
-  new_sblength <- extract(body_expand, "shape_parameters")$bladder$length
-  new_sbwidth <- max(extract(body_expand, "bladder")$rpos[2, ])
-  z_sbpos <- extract(body_expand, "bladder")$rpos[3:4, ]
-  new_sbheight <- max(head(z_sbpos, 1) - tail(z_sbpos, 1))
-
-  expect_equal(new_sblength, orig_sblength * 4)
-  expect_equal(new_sbwidth, orig_sbwidth * 1.5)
-  expect_equal(new_sbheight, orig_sbheight)
-  expect_equal(
-    extract(body_expand, "shape_parameters")$bladder$length,
-    new_sblength
   )
   # ---- Case: Defining length, width, and height -> overrides `isometric_body`
-  suppressMessages({
-    body_expand <- reforge(sardine, body_scale = c(
-      length = 4,
-      width = 1.5, height = 2.0
-    ))
-  })
-  expect_message(
-    reforge(sardine, body_scale = c(length = 4, width = 1.5)),
+  expect_error(
+    reforge(sardine, body_scale = c(length = 4, width = 1.5, height = 2)),
     paste0(
-      "Multiple axes specified in body_scale/body_target: 'isometric_body' ",
-      "will be ignored for those axes."
+      "'body_scale' contains more than 1 dimension while 'isometric_body' ",
+      "is TRUE. When TRUE 'body_scale' must be a scalar value."
     )
-  )
-
-  new_length <- extract(body_expand, "shape_parameters")$body$length
-  new_width <- max(extract(body_expand, "body")$rpos[2, ])
-  z_pos <- extract(body_expand, "body")$rpos[3:4, ]
-  new_height <- max(head(z_pos, 1) - tail(z_pos, 1))
-  expect_equal(new_length, orig_length * 4)
-  expect_equal(new_width, orig_width * 1.5)
-  expect_equal(new_height, orig_height * 2)
-  expect_equal(
-    extract(body_expand, "shape_parameters")$body$length,
-    new_length
-  )
-
-  new_sblength <- extract(body_expand, "shape_parameters")$bladder$length
-  new_sbwidth <- max(extract(body_expand, "bladder")$rpos[2, ])
-  z_sbpos <- extract(body_expand, "bladder")$rpos[3:4, ]
-  new_sbheight <- max(head(z_sbpos, 1) - tail(z_sbpos, 1))
-
-  expect_equal(new_sblength, orig_sblength * 4)
-  expect_equal(new_sbwidth, orig_sbwidth * 1.5)
-  expect_equal(new_sbheight, orig_sbheight * 2)
-  expect_equal(
-    extract(body_expand, "shape_parameters")$bladder$length,
-    new_sblength
   )
   # ---- Case: Repeat previous but drop 'isometric_body'
-  suppressMessages({
-    body_expand <- reforge(sardine,
-      body_scale = c(length = 4, width = 1.5, height = 2.0),
-      isometric_body = FALSE
-    )
-  })
-  expect_no_message(
-    reforge(sardine,
-      body_scale = c(length = 4, width = 1.5, height = 2.0),
-      isometric_body = FALSE
-    )
+  body_expand <- reforge(sardine,
+    body_scale = c(length = 4, width = 1.5, height = 2.0),
+    isometric_body = FALSE
   )
 
   new_length <- extract(body_expand, "shape_parameters")$body$length
@@ -284,19 +217,11 @@ test_that("`reforge('SBF')` correctly updates body shape", {
     new_sblength
   )
   # ---- Case: Repeat previous but drop 'maintain_ratio'
-  suppressMessages({
-    body_expand <- reforge(sardine,
-      body_scale = c(length = 4, width = 1.5, height = 2.0),
-      isometric_body = FALSE,
-      maintain_ratio = FALSE
-    )
-  })
-  expect_no_message(
-    reforge(sardine,
-      body_scale = c(length = 4, width = 1.5, height = 2.0),
-      isometric_body = FALSE,
-      maintain_ratio = FALSE
-    )
+  body_expand <- reforge(
+    sardine,
+    body_scale = c(length = 4, width = 1.5, height = 2.0),
+    isometric_body = FALSE,
+    maintain_ratio = FALSE
   )
 
   new_length <- extract(body_expand, "shape_parameters")$body$length
@@ -384,105 +309,37 @@ test_that("`reforge('SBF')` correctly updates body shape", {
     new_sblength
   )
   # ---- Case: Defining length and width -> overrides `isometric_body`
-  suppressMessages({
-    bladder_expand <- reforge(sardine,
-      swimbladder_scale = c(length = 4, width = 1.5)
-    )
-  })
-  expect_message(
-    reforge(sardine,
+  expect_error(
+    reforge(
+      sardine,
       swimbladder_scale = c(length = 4, width = 1.5)
     ),
     paste0(
-      "Multiple axes specified in swimbladder_scale/swimbladder_target: ",
-      "'isometric_swimbladder' will be ignored for those axes."
+      "'swimbladder_scale' contains more than 1 dimension while ",
+      "'isometric_swimbladder' is TRUE. When TRUE 'swimbladder_scale' must ",
+      "be a scalar value."
     )
-  )
-
-  new_length <- extract(bladder_expand, "shape_parameters")$body$length
-  new_width <- max(extract(bladder_expand, "body")$rpos[2, ])
-  z_pos <- extract(bladder_expand, "body")$rpos[3:4, ]
-  new_height <- max(head(z_pos, 1) - tail(z_pos, 1))
-  expect_equal(new_length, orig_length * 4)
-  expect_equal(new_width, orig_width * 1.5)
-  expect_equal(new_height, orig_height)
-  expect_equal(
-    extract(bladder_expand, "shape_parameters")$body$length,
-    new_length
-  )
-
-  new_sblength <- extract(bladder_expand, "shape_parameters")$bladder$length
-  new_sbwidth <- max(extract(bladder_expand, "bladder")$rpos[2, ])
-  z_sbpos <- extract(bladder_expand, "bladder")$rpos[3:4, ]
-  new_sbheight <- max(head(z_sbpos, 1) - tail(z_sbpos, 1))
-
-  expect_equal(new_sblength, orig_sblength * 4)
-  expect_equal(new_sbwidth, orig_sbwidth * 1.5)
-  expect_equal(new_sbheight, orig_sbheight)
-  expect_equal(
-    extract(bladder_expand, "shape_parameters")$bladder$length,
-    new_sblength
   )
   # ---- Case: Defining length, width, and height -> overrides `isometric_body`
-  suppressMessages({
-    bladder_expand <- reforge(sardine,
-      swimbladder_scale = c(
-        length = 4,
-        width = 1.5,
-        height = 2.0
-      )
-    )
-  })
-  expect_message(
+  expect_error(
     reforge(sardine,
       swimbladder_scale = c(length = 4, width = 1.5, height = 2.0)
     ),
     paste0(
-      "Multiple axes specified in swimbladder_scale/swimbladder_target: ",
-      "'isometric_swimbladder' will be ignored for those axes."
+      "'swimbladder_scale' contains more than 1 dimension while ",
+      "'isometric_swimbladder' is TRUE. When TRUE 'swimbladder_scale' must ",
+      "be a scalar value."
     )
-  )
-
-  new_length <- extract(bladder_expand, "shape_parameters")$body$length
-  new_width <- max(extract(bladder_expand, "body")$rpos[2, ])
-  z_pos <- extract(bladder_expand, "body")$rpos[3:4, ]
-  new_height <- max(head(z_pos, 1) - tail(z_pos, 1))
-  expect_equal(new_length, orig_length * 4)
-  expect_equal(new_width, orig_width * 1.5)
-  expect_equal(new_height, orig_height * 2)
-  expect_equal(
-    extract(bladder_expand, "shape_parameters")$body$length,
-    new_length
-  )
-
-  new_sblength <- extract(bladder_expand, "shape_parameters")$bladder$length
-  new_sbwidth <- max(extract(bladder_expand, "bladder")$rpos[2, ])
-  z_sbpos <- extract(bladder_expand, "bladder")$rpos[3:4, ]
-  new_sbheight <- max(head(z_sbpos, 1) - tail(z_sbpos, 1))
-
-  expect_equal(new_sblength, orig_sblength * 4)
-  expect_equal(new_sbwidth, orig_sbwidth * 1.5)
-  expect_equal(new_sbheight, orig_sbheight * 2)
-  expect_equal(
-    extract(bladder_expand, "shape_parameters")$bladder$length,
-    new_sblength
   )
   # ---- Case: Repeat previous but drop 'isometric_swimbladder'
-  suppressMessages({
-    bladder_expand <- reforge(sardine,
-      swimbladder_scale = c(
-        length = 4,
-        width = 1.5,
-        height = 2.0
-      ),
-      isometric_swimbladder = FALSE
-    )
-  })
-  expect_no_message(
-    reforge(sardine,
-      swimbladder_scale = c(length = 4, width = 1.5, height = 2.0),
-      isometric_swimbladder = FALSE
-    )
+  bladder_expand <- reforge(
+    sardine,
+    swimbladder_scale = c(
+      length = 4,
+      width = 1.5,
+      height = 2.0
+    ),
+    isometric_swimbladder = FALSE
   )
 
   new_length <- extract(bladder_expand, "shape_parameters")$body$length
@@ -511,7 +368,8 @@ test_that("`reforge('SBF')` correctly updates body shape", {
   )
   # ---- Case: Repeat previous but drop 'maintain_ratio'
   suppressWarnings({
-    bladder_expand <- reforge(sardine,
+    bladder_expand <- reforge(
+      sardine,
       swimbladder_scale = c(
         length = 4,
         width = 1.5,
@@ -561,11 +419,17 @@ test_that("`reforge('SBF')` correctly updates body shape", {
   # ---- Case: unnamed numeric -> Error
   expect_error(
     reforge(sardine, body_target = 1),
-    "body_target must be a named numeric vector."
+    paste0(
+      "'body_target' must either be a scalar or a named vector with ",
+      "dimensions: 'length', 'width', 'height'."
+    )
   )
   expect_error(
     reforge(sardine, swimbladder_target = 1),
-    "swimbladder_target must be a named numeric vector."
+    paste0(
+      "'swimbladder_target' must either be a scalar or a named vector with ",
+      "dimensions: 'length', 'width', 'height'."
+    )
   )
   # ---- Case: Defining just length -> applies uniformly across dimensions
   body_expand <- reforge(sardine, body_target = c(length = 0.8))
@@ -596,103 +460,33 @@ test_that("`reforge('SBF')` correctly updates body shape", {
     new_sblength
   )
   # # ---- Case: Defining length and width -> overrides `isometric_body`
-  suppressMessages({
-    body_expand <- reforge(sardine, body_target = c(length = 0.8, width = 0.4))
-  })
-  expect_message(
+  expect_error(
     reforge(sardine, body_target = c(length = 0.8, width = 0.4)),
     paste0(
-      "Multiple axes specified in body_scale/body_target: 'isometric_body' ",
-      "will be ignored for those axes.."
+      "'body_target' contains more than 1 dimension while 'isometric_body' ",
+      "is TRUE. When TRUE 'body_target' must be a scalar value."
     )
   )
 
-  new_length <- extract(body_expand, "shape_parameters")$body$length
-  new_width <- max(extract(body_expand, "body")$rpos[2, ])
-  scaling_width_ratio <- new_width / orig_width
-  z_pos <- extract(body_expand, "body")$rpos[3:4, ]
-  new_height <- max(head(z_pos, 1) - tail(z_pos, 1))
-  expect_equal(new_length, orig_length * scaling_length_ratio)
-  expect_equal(new_width, orig_width * scaling_width_ratio)
-  expect_equal(new_height, orig_height)
-  expect_equal(
-    extract(body_expand, "shape_parameters")$body$length,
-    new_length
-  )
-
-  new_sblength <- extract(body_expand, "shape_parameters")$bladder$length
-  new_sbwidth <- max(extract(body_expand, "bladder")$rpos[2, ])
-  z_sbpos <- extract(body_expand, "bladder")$rpos[3:4, ]
-  new_sbheight <- max(head(z_sbpos, 1) - tail(z_sbpos, 1))
-
-  expect_equal(new_sblength, orig_sblength * scaling_length_ratio)
-  expect_equal(new_sbwidth, orig_sbwidth * scaling_width_ratio)
-  expect_equal(new_sbheight, orig_sbheight)
-  expect_equal(
-    extract(body_expand, "shape_parameters")$bladder$length,
-    new_sblength
-  )
-  # # ---- Case: Defining length/width/height -> overrides `isometric_body`
-  suppressMessages({
-    body_expand <- reforge(sardine,
-      body_target = c(
-        length = 0.8,
-        width = 0.4,
-        height = 0.1
-      )
-    )
-  })
-  expect_message(
+  # ---- Case: Defining length/width/height -> overrides `isometric_body`
+  expect_error(
     reforge(sardine, body_target = c(length = 0.8, width = 0.4, height = 0.1)),
     paste0(
-      "Multiple axes specified in body_scale/body_target: 'isometric_body' ",
-      "will be ignored for those axes."
+      "'body_target' contains more than 1 dimension while 'isometric_body' ",
+      "is TRUE. When TRUE 'body_target' must be a scalar value."
     )
-  )
-
-  new_length <- extract(body_expand, "shape_parameters")$body$length
-  new_width <- max(extract(body_expand, "body")$rpos[2, ])
-  z_pos <- extract(body_expand, "body")$rpos[3:4, ]
-  new_height <- max(head(z_pos, 1) - tail(z_pos, 1))
-  scaling_height_ratio <- new_height / orig_height
-  expect_equal(new_length, orig_length * scaling_length_ratio)
-  expect_equal(new_width, orig_width * scaling_width_ratio)
-  expect_equal(new_height, orig_height * scaling_height_ratio)
-  expect_equal(
-    extract(body_expand, "shape_parameters")$body$length,
-    new_length
-  )
-
-  new_sblength <- extract(body_expand, "shape_parameters")$bladder$length
-  new_sbwidth <- max(extract(body_expand, "bladder")$rpos[2, ])
-  z_sbpos <- extract(body_expand, "bladder")$rpos[3:4, ]
-  new_sbheight <- max(head(z_sbpos, 1) - tail(z_sbpos, 1))
-
-  expect_equal(new_sblength, orig_sblength * scaling_length_ratio)
-  expect_equal(new_sbwidth, orig_sbwidth * scaling_width_ratio)
-  expect_equal(new_sbheight, orig_sbheight * scaling_height_ratio)
-  expect_equal(
-    extract(body_expand, "shape_parameters")$bladder$length,
-    new_sblength
   )
   # ---- Case: Repeat previous but drop 'isometric_body'
-  suppressMessages({
-    body_expand <- reforge(sardine,
-      body_target = c(length = 0.8, width = 0.4, height = 0.1),
-      isometric_body = FALSE
-    )
-  })
-  expect_no_message(
-    reforge(sardine,
-      body_target = c(length = 0.8, width = 0.4, height = 0.1),
-      isometric_body = FALSE
-    )
+  body_expand <- reforge(sardine,
+    body_target = c(length = 0.8, width = 0.4, height = 0.1),
+    isometric_body = FALSE
   )
 
   new_length <- extract(body_expand, "shape_parameters")$body$length
   new_width <- max(extract(body_expand, "body")$rpos[2, ])
   z_pos <- extract(body_expand, "body")$rpos[3:4, ]
   new_height <- max(head(z_pos, 1) - tail(z_pos, 1))
+  scaling_width_ratio <- new_width / orig_width
   scaling_height_ratio <- new_height / orig_height
   expect_equal(new_length, orig_length * scaling_length_ratio)
   expect_equal(new_width, orig_width * scaling_width_ratio)
@@ -715,19 +509,10 @@ test_that("`reforge('SBF')` correctly updates body shape", {
     new_sblength
   )
   # ---- Case: Repeat previous but drop 'maintain_ratio'
-  suppressMessages({
-    body_expand <- reforge(sardine,
-      body_target = c(length = 0.8, width = 0.4, height = 0.1),
-      isometric_body = FALSE,
-      maintain_ratio = FALSE
-    )
-  })
-  expect_no_message(
-    reforge(sardine,
-      body_target = c(length = 0.8, width = 0.4, height = 0.1),
-      isometric_body = FALSE,
-      maintain_ratio = FALSE
-    )
+  body_expand <- reforge(sardine,
+    body_target = c(length = 0.8, width = 0.4, height = 0.1),
+    isometric_body = FALSE,
+    maintain_ratio = FALSE
   )
 
   new_length <- extract(body_expand, "shape_parameters")$body$length
@@ -789,105 +574,35 @@ test_that("`reforge('SBF')` correctly updates body shape", {
     new_sblength
   )
   # ---- Case: Defining length and width -> overrides `isometric_body`
-  suppressMessages({
-    bladder_expand <- reforge(sardine,
-      swimbladder_target = c(length = 0.2, width = 0.3)
-    )
-  })
-  expect_message(
+  expect_error(
     reforge(sardine,
       swimbladder_target = c(length = 0.2, width = 0.3)
     ),
     paste0(
-      "Multiple axes specified in swimbladder_scale/swimbladder_target: ",
-      "'isometric_swimbladder' will be ignored for those axes."
+      "'swimbladder_target' contains more than 1 dimension while ",
+      "'isometric_swimbladder' is TRUE. When TRUE 'swimbladder_target' must ",
+      "be a scalar value."
     )
-  )
-
-  new_length <- extract(bladder_expand, "shape_parameters")$body$length
-  new_width <- max(extract(bladder_expand, "body")$rpos[2, ])
-  z_pos <- extract(bladder_expand, "body")$rpos[3:4, ]
-  new_height <- max(head(z_pos, 1) - tail(z_pos, 1))
-  expect_equal(new_length, orig_length * scaling_length_ratio)
-  expect_equal(new_width, orig_width * scaling_width_ratio)
-  expect_equal(new_height, orig_height)
-  expect_equal(
-    extract(bladder_expand, "shape_parameters")$body$length,
-    new_length
-  )
-
-  new_sblength <- extract(bladder_expand, "shape_parameters")$bladder$length
-  new_sbwidth <- max(extract(bladder_expand, "bladder")$rpos[2, ])
-  z_sbpos <- extract(bladder_expand, "bladder")$rpos[3:4, ]
-  new_sbheight <- max(head(z_sbpos, 1) - tail(z_sbpos, 1))
-
-  expect_equal(new_sblength, orig_sblength * scaling_length_ratio)
-  expect_equal(new_sbwidth, orig_sbwidth * scaling_width_ratio)
-  expect_equal(new_sbheight, orig_sbheight)
-  expect_equal(
-    extract(bladder_expand, "shape_parameters")$bladder$length,
-    new_sblength
   )
   # ---- Case: Defining length, width, and height -> overrides `isometric_body`
-  suppressMessages({
-    bladder_expand <- reforge(sardine,
-      swimbladder_target = c(
-        length = 0.2,
-        width = 0.3,
-        height = 0.1
-      )
-    )
-  })
-  expect_message(
+  expect_error(
     reforge(sardine,
       swimbladder_target = c(length = 0.2, width = 0.3, height = 0.1)
     ),
     paste0(
-      "Multiple axes specified in swimbladder_scale/swimbladder_target: ",
-      "'isometric_swimbladder' will be ignored for those axes."
+      "'swimbladder_target' contains more than 1 dimension while ",
+      "'isometric_swimbladder' is TRUE. When TRUE 'swimbladder_target' must ",
+      "be a scalar value."
     )
-  )
-
-  new_length <- extract(bladder_expand, "shape_parameters")$body$length
-  new_width <- max(extract(bladder_expand, "body")$rpos[2, ])
-  z_pos <- extract(bladder_expand, "body")$rpos[3:4, ]
-  new_height <- max(head(z_pos, 1) - tail(z_pos, 1))
-  expect_equal(new_length, orig_length * scaling_length_ratio)
-  expect_equal(new_width, orig_width * scaling_width_ratio)
-  expect_equal(new_height, orig_height * scaling_height_ratio)
-  expect_equal(
-    extract(bladder_expand, "shape_parameters")$body$length,
-    new_length
-  )
-
-  new_sblength <- extract(bladder_expand, "shape_parameters")$bladder$length
-  new_sbwidth <- max(extract(bladder_expand, "bladder")$rpos[2, ])
-  z_sbpos <- extract(bladder_expand, "bladder")$rpos[3:4, ]
-  new_sbheight <- max(head(z_sbpos, 1) - tail(z_sbpos, 1))
-
-  expect_equal(new_sblength, orig_sblength * scaling_length_ratio)
-  expect_equal(new_sbwidth, orig_sbwidth * scaling_width_ratio)
-  expect_equal(new_sbheight, orig_sbheight * scaling_height_ratio)
-  expect_equal(
-    extract(bladder_expand, "shape_parameters")$bladder$length,
-    new_sblength
   )
   # ---- Case: Repeat previous but drop 'isometric_swimbladder'
-  suppressMessages({
-    bladder_expand <- reforge(sardine,
-      swimbladder_target = c(
-        length = 0.2,
-        width = 0.3,
-        height = 0.1
-      ),
-      isometric_swimbladder = FALSE
-    )
-  })
-  expect_no_message(
-    reforge(sardine,
-      swimbladder_target = c(length = 0.2, width = 0.3, height = 0.1),
-      isometric_swimbladder = FALSE
-    )
+  bladder_expand <- reforge(sardine,
+    swimbladder_target = c(
+      length = 0.2,
+      width = 0.3,
+      height = 0.1
+    ),
+    isometric_swimbladder = FALSE
   )
 
   new_length <- extract(bladder_expand, "shape_parameters")$body$length
@@ -1102,11 +817,11 @@ test_that("`reforge('SBF')` correctly updates body shape", {
   # ---- Case: Single invalid dimension
   expect_error(
     reforge(sardine, body_scale = c(invalid_dim = 2)),
-    "Invalid body_scale names. Use: length, width, height."
+    "'body_scale' has one or more invalid dimensions: 'invalid_dim'."
   )
   expect_error(
     reforge(sardine, body_target = c(invalid_dim = 2)),
-    "Invalid body_target names. Use: length, width, height."
+    "'body_target' has one or more invalid dimensions: 'invalid_dim'."
   )
   # ---- Case: Multiple invalid dimensions
   expect_error(
@@ -1115,7 +830,10 @@ test_that("`reforge('SBF')` correctly updates body shape", {
       body_scale = c(length = 2, invalid_dim1 = 2, invalid_dim2 = 2),
       isometric_body = FALSE
     ),
-    "Invalid body_scale names. Use: length, width, height."
+    paste0(
+      "'body_scale' has one or more invalid dimensions: ",
+      "'invalid_dim1', 'invalid_dim2'."
+    )
   )
   # ---- Case: Body scale & target
   expect_error(
@@ -1131,35 +849,36 @@ test_that("`reforge('SBF')` correctly updates body shape", {
   expect_error(
     reforge(sardine, body_scale = c(1, 2, 3), isometric_body = FALSE),
     paste0(
-      "body_scale must be a single number or named vector with ",
-      "length/width/height"
+      "'body_scale' must either be a scalar or a named vector with ",
+      "dimensions: 'length', 'width', 'height'."
     )
   )
   # ---- Case: Unspecified swimbladder dimensions
   expect_error(
-    reforge(sardine,
+    reforge(
+      sardine,
       swimbladder_scale = c(1, 2, 3),
       isometric_swimbladder = FALSE
     ),
     paste0(
-      "swimbladder_scale must be a single number or named vector with ",
-      "length/width/height"
+      "'swimbladder_scale' must either be a scalar or a named vector with ",
+      "dimensions: 'length', 'width', 'height'."
     )
   )
   # ---- Case: Unspecified body scale without isometry
   expect_error(
     reforge(sardine, body_scale = 1, isometric_body = FALSE),
     paste0(
-      "body_scale must be a named vector with length/width/height when ",
-      "isometric_body is FALSE."
+      "'body_scale' must either be a scalar or a named vector with ",
+      "dimensions: 'length', 'width', 'height'."
     )
   )
   # ---- Case: Unspecified swimbladder scale without isometry
   expect_error(
     reforge(sardine, swimbladder_scale = 1, isometric_swimbladder = FALSE),
     paste0(
-      "swimbladder_scale must be a named vector with length/width/height ",
-      "when isometric_swimbladder is FALSE."
+      "'swimbladder_scale' must either be a scalar or a named vector ",
+      "with dimensions: 'length', 'width', 'height'."
     )
   )
 })
