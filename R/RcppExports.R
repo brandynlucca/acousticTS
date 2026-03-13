@@ -53,24 +53,12 @@ gauss_legendre_cpp <- function(n, a = -1.0, b = 1.0) {
     .Call(`_acousticTS_gauss_legendre_cpp`, n, a, b)
 }
 
-debug_bessel_values <- function(kLa_s, m) {
-    .Call(`_acousticTS_debug_bessel_values`, kLa_s, m)
+elastic_shell_boundary_conditions_old <- function(k1a, kLa_shell, kTa_shell, kLa_fluid, kTa_fluid, k3a_fluid, m_vec, lambda, mu, rho_ratio_sw, rho_ratio_fl) {
+    .Call(`_acousticTS_elastic_shell_boundary_conditions_old`, k1a, kLa_shell, kTa_shell, kLa_fluid, kTa_fluid, k3a_fluid, m_vec, lambda, mu, rho_ratio_sw, rho_ratio_fl)
 }
 
-det6x6_from_R <- function(M) {
-    .Call(`_acousticTS_det6x6_from_R`, M)
-}
-
-debug_determinants <- function(k1a, kLa_s, kTa_s, kLa_f, kTa_f, k3a, lambda, mu, rho_ratio_sw, rho_ratio_fl, m) {
-    .Call(`_acousticTS_debug_determinants`, k1a, kLa_s, kTa_s, kLa_f, kTa_f, k3a, lambda, mu, rho_ratio_sw, rho_ratio_fl, m)
-}
-
-debug_matrix_m1_f1 <- function(k1a, kLa_s, kTa_s, kLa_f, kTa_f, k3a, lambda, mu, rho_ratio_sw, rho_ratio_fl) {
-    .Call(`_acousticTS_debug_matrix_m1_f1`, k1a, kLa_s, kTa_s, kLa_f, kTa_f, k3a, lambda, mu, rho_ratio_sw, rho_ratio_fl)
-}
-
-goodman_stern_bm_cpp <- function(k1a, kLa_shell, kTa_shell, kLa_fluid, kTa_fluid, k3a_fluid, m_vec, lambda, mu, rho_ratio_sw, rho_ratio_fl) {
-    .Call(`_acousticTS_goodman_stern_bm_cpp`, k1a, kLa_shell, kTa_shell, kLa_fluid, kTa_fluid, k3a_fluid, m_vec, lambda, mu, rho_ratio_sw, rho_ratio_fl)
+elastic_shell_boundary_conditions <- function(ka_matrix, m_limit, lambda, mu, rho_ratio_sw, rho_ratio_fl) {
+    .Call(`_acousticTS_elastic_shell_boundary_conditions`, ka_matrix, m_limit, lambda, mu, rho_ratio_sw, rho_ratio_fl)
 }
 
 Pn_cpp <- function(n, x) {
@@ -89,55 +77,15 @@ Qn_deriv_cpp <- function(n, x, k) {
     .Call(`_acousticTS_Qn_deriv_cpp`, n, x, k)
 }
 
-safe_cprofcn <- function(c, m, lnum, arg, ioprad, iopnorm, iopang, x1) {
-    .Call(`_acousticTS_safe_cprofcn`, c, m, lnum, arg, ioprad, iopnorm, iopang, x1)
+Smn_cpp <- function(m, n, c, arg, normalize = FALSE, precision = "double") {
+    .Call(`_acousticTS_Smn_cpp`, m, n, c, arg, normalize, precision)
 }
 
-Smn_cpp <- function(m, n, c, arg, normalize = FALSE) {
-    .Call(`_acousticTS_Smn_cpp`, m, n, c, arg, normalize)
+Rmn_cpp <- function(m, n, c, x1, kind = 1L, precision = "double") {
+    .Call(`_acousticTS_Rmn_cpp`, m, n, c, x1, kind, precision)
 }
 
-Smn_cpp_safe <- function(m, n, c, arg, normalize = FALSE) {
-    .Call(`_acousticTS_Smn_cpp_safe`, m, n, c, arg, normalize)
-}
-
-Rmn_cpp <- function(m, n, c, x1, kind = 1L) {
-    .Call(`_acousticTS_Rmn_cpp`, m, n, c, x1, kind)
-}
-
-liquid_spheroidal_expansion_matrix <- function(m_max, n_max, chi_sw, chi_body, nodes, weights) {
-    .Call(`_acousticTS_liquid_spheroidal_expansion_matrix`, m_max, n_max, chi_sw, chi_body, nodes, weights)
-}
-
-safe_liquid_spheroidal_expansion_matrix <- function(m_max, n_max, chi_sw, chi_body, nodes, weights) {
-    .Call(`_acousticTS_safe_liquid_spheroidal_expansion_matrix`, m_max, n_max, chi_sw, chi_body, nodes, weights)
-}
-
-radial_external_incoming_matrix <- function(m_max, n_max, chi_sw, xi) {
-    .Call(`_acousticTS_radial_external_incoming_matrix`, m_max, n_max, chi_sw, xi)
-}
-
-radial_external_scattering_matrix <- function(m_max, n_max, chi_sw, xi) {
-    .Call(`_acousticTS_radial_external_scattering_matrix`, m_max, n_max, chi_sw, xi)
-}
-
-radial_internal_incoming_matrix <- function(m_max, n_max, chi_body, xi) {
-    .Call(`_acousticTS_radial_internal_incoming_matrix`, m_max, n_max, chi_body, xi)
-}
-
-boundary_coupling_regular_diag <- function(m_max, n_max, density_body, density_sw, Rmn_e1_matrix, Rmn_i1_matrix) {
-    .Call(`_acousticTS_boundary_coupling_regular_diag`, m_max, n_max, density_body, density_sw, Rmn_e1_matrix, Rmn_i1_matrix)
-}
-
-boundary_coupling_scattering_diag <- function(m_max, n_max, density_body, density_sw, Rmn_e3_matrix, Rmn_i1_matrix) {
-    .Call(`_acousticTS_boundary_coupling_scattering_diag`, m_max, n_max, density_body, density_sw, Rmn_e3_matrix, Rmn_i1_matrix)
-}
-
-liquid_spheroidal_kernel_matrices <- function(m_max, n_max, chi_sw, chi_body, xi, density_body, density_sw, nodes, weights, smn_matrix) {
-    .Call(`_acousticTS_liquid_spheroidal_kernel_matrices`, m_max, n_max, chi_sw, chi_body, xi, density_body, density_sw, nodes, weights, smn_matrix)
-}
-
-liquid_spheroidal_simplified_expansion <- function(m_max, n_max, chi_sw, chi_body, xi, density_sw, density_body) {
-    .Call(`_acousticTS_liquid_spheroidal_simplified_expansion`, m_max, n_max, chi_sw, chi_body, xi, density_sw, density_body)
+prolate_spheroid_fbs <- function(acoustics, body, medium, integration_pts, precision = "double", Amn_method = "Amn_fluid") {
+    .Call(`_acousticTS_prolate_spheroid_fbs`, acoustics, body, medium, integration_pts, precision, Amn_method)
 }
 

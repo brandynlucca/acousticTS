@@ -2,15 +2,19 @@
 % Please edit documentation in R/bessel-cylindrical.R
 \name{yc}
 \alias{yc}
-\alias{ycdk}
 \alias{ycd}
-\title{Cylindrical Bessel (Neumann) Function of the Second Kind and Its Derivatives}
+\alias{ycdd}
+\alias{ycdk}
+\title{Cylindrical Bessel function of the second kind, \eqn{Y_\nu(x)}, and its
+respective derivatives}
 \usage{
 yc(l, n)
 
-ycdk(l, n, k)
-
 ycd(l, n)
+
+ycdd(l, n)
+
+ycdk(l, n, k)
 }
 \arguments{
 \item{l}{Numeric. The order (\eqn{\nu}) of the Bessel function. Must be
@@ -20,12 +24,16 @@ purely real; complex orders are not supported.}
 function. Supports purely real or purely imaginary values. General complex
 arguments (\eqn{x + iy} with \eqn{x \neq 0} and \eqn{y \neq 0}) are not
 supported.}
+
+\item{k}{Non-negative integer. The order of the derivative for \code{ycdk}.}
 }
 \value{
 A complex vector containing:
 \itemize{
 \item \code{yc}: \eqn{Y_\nu(z)}
 \item \code{ycd}: \eqn{Y'_\nu(z)} (first derivative)
+\item \code{ycdd}: \eqn{Y''_\nu(z)} (second derivative)
+\item \code{ycdk}: \eqn{Y_\nu^{(k)}(z)} (k-th derivative)
 }
 }
 \description{
@@ -62,6 +70,12 @@ and \eqn{y \neq 0}): \strong{Not supported}.
 \item For negative real arguments:
 \eqn{Y_\nu(-x) = \cos(\pi\nu) Y_\nu(x) + \sin(\pi\nu) J_\nu(x)}.
 \item For integer order \eqn{n}: \eqn{Y_n(-x) = (-1)^n Y_n(x)}.
+\item k-th derivative (DLMF 10.6.1):
+\deqn{
+          \frac{d^k}{dz^k} Y_\nu(z) = \frac{1}{2^k} \sum_{j=0}^{k} (-1)^j
+          \binom{k}{j}
+           Y_{\nu - k + 2j}(z)
+        }
 }
 
 \strong{Derivative:}

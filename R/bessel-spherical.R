@@ -3,34 +3,40 @@
 ################################################################################
 
 ################################################################################
-#' Spherical Bessel Function of the First Kind and Its Derivatives
+#' Spherical Bessel function of the first kind, \eqn{j_\nu(z)}, and its
+#' respective derivatives
 #'
 #' @description
-#' Computes the spherical Bessel function of the first kind (\eqn{j_l(z)}) and
-#' its first (\code{jsd}) and second (\code{jsdd}) derivatives.
+#' Computes the spherical Bessel function of the first kind (\eqn{j_\nu(z)}) 
+#' and its k-th derivative.
 #'
 #' @details
 #' The spherical Bessel function of the first kind is related to the cylindrical
 #' Bessel function by:
-#' \deqn{j_l(z) = \sqrt{\frac{\pi}{2z}} J_{l+1/2}(z)}
+#' \deqn{j_\nu(z) = \sqrt{\frac{\pi}{2z}} J_{\nu+1/2}(z)}
 #'
 #' where \eqn{J_\nu(z)} is the cylindrical Bessel function of the first kind.
 #'
 #' The spherical Bessel functions satisfy the differential equation:
-#' \deqn{z^2 \frac{d^2 j_l}{dz^2} + 2z \frac{dj_l}{dz} + [z^2 - l(l+1)] j_l = 0}
+#' \deqn{
+#'  z^2 \frac{d^2 j_\nu}{dz^2} + 
+#'  2z \frac{dj_\nu}{dz} + [z^2 - l(l+1)] j_\nu = 0
+#' }
 #'
 #' **Special cases:**
 #' \itemize{
-#'   \item \eqn{j_l(0) = 0} for all \eqn{l}.
+#'   \item \eqn{j_\nu(0) = 0} for all \eqn{\nu}.
 #'   \item \eqn{j_0(z) = \frac{\sin(z)}{z}}
 #'   \item \eqn{j_1(z) = \frac{\sin(z)}{z^2} - \frac{\cos(z)}{z}}
 #' }
 #'
 #' **Derivatives:**
 #' \itemize{
-#'   \item First derivative: \eqn{j'_l(z) = j_{l-1}(z) - \frac{l+1}{z} j_l(z)}
-#'   \item Second derivative: \eqn{j''_l(z) = \frac{(l+1)(l+2) - z^2}{z^2}
-#'   j_l(z) - \frac{2}{z} j_{l-1}(z)}
+#'   \item First derivative: \eqn{
+#'    j'_\nu(z) = j_{\nu-1}(z) - \frac{\nu+1}{z} j_\nu(z)
+#'   }
+#'   \item Second derivative: \eqn{j''_\nu(z) = \frac{(\nu+1)(\nu+2) - z^2}{z^2}
+#'   j_\nu(z) - \frac{2}{z} j_{\nu-1}(z)}
 #' }
 #'
 #' @param l Numeric. The order of the spherical Bessel function. Can be integer
@@ -41,9 +47,8 @@
 #' @return
 #' A numeric vector or matrix (matching the input structure) containing:
 #' \itemize{
-#'   \item \code{js}: \eqn{j_l(z)}
-#'   \item \code{jsd}: \eqn{j'_l(z)} (first derivative)
-#'   \item \code{jsdd}: \eqn{j''_l(z)} (second derivative)
+#'   \item \code{js}: \eqn{j_\nu(z)}
+#'   \item \code{jsdk}: \eqn{j^{(k)'}_l(z)} (k-th derivative)
 #' }
 #'
 #' @examples
@@ -61,10 +66,10 @@
 #' js(1, matrix(1:6, nrow = 2))
 #'
 #' # First derivative
-#' jsd(1, 2)
+#' jsdk(1, 2, 1)
 #'
 #' # Second derivative
-#' jsdd(1, 2)
+#' jsdk(1, 2, 2)
 #'
 #' @references
 #' Abramowitz, M. and Stegun, I.A. (Eds.). (1964). \emph{Handbook of
@@ -92,106 +97,61 @@ js <- function(l, n) {
     stop("Inputs must be numeric vectors.")
   }
   js_cpp(l, n)
-  # Internal function ==========================================================
-  # js_internal <- function(l, n) {
-  #   if (n == 0) {
-  #     0
-  #   } else {
-  #     jc(l + 0.5, n) * sqrt(pi / (2 * n))
-  #   }
-  # }
-  # js_vec <- Vectorize(js_internal)
-  # # Return based on input class ================================================
-  # switch(class(n)[1],
-  #        numeric = js_vec(l, n),
-  #        matrix = apply(n, 2, FUN = function(x) {
-  #          js_vec(l, x)
-  #        })
-  # )
 }
-
-js_old <- function(l, n) {
-  # Internal function ==========================================================
-  js_internal <- function(l, n) {
-    if (n == 0) {
-      0
-    } else {
-      jc_old(l + 0.5, n) * sqrt(pi / (2 * n))
-    }
-  }
-  js_vec <- Vectorize(js_internal)
-  # Return based on input class ================================================
-  switch(class(n)[1],
-         numeric = js_vec(l, n),
-         matrix = apply(n, 2, FUN = function(x) {
-           js_vec(l, x)
-         })
-  )
-}
-
 #' @rdname js
-#' @export
+#' @keywords internal
+#' @noRd
 jsd <- function(l, n) {
   js_deriv_cpp(l, n, 1)
 }
-
-jsd_old <- function(l, n) {
-  ifelse(n == 0,
-         0,
-         js_old(l - 1, n) - (l + 1) / n * js_old(l, n)
-  )
-}
-
-
 #' @rdname js
-#' @export
+#' @keywords internal
+#' @noRd
 jsdd <- function(l, n) {
   js_deriv_cpp(l, n, 2)
-  # (1 / (n^2) *
-  #    ((l + 1) * (l + 2) - n^2) * js(l, n) -
-  #    2 / n * js(l - 1, n))
 }
-
-jsdd_old <- function(l, n) {
-  (1 / (n^2) *
-     ((l + 1) * (l + 2) - n^2) * js_old(l, n) -
-     2 / n * js_old(l - 1, n))
-}
-
+#' @rdname js
+#' @export
 jsdk <- function(l, n, k) {
   js_deriv_cpp(l, n, k)
 }
 ################################################################################
-#' Spherical Bessel Function of the Second Kind and Its Derivatives
+#' Spherical Bessel function of the second kind, \eqn{y_\nu(z)}, and its
+#' respective derivatives
 #'
 #' @description
-#' Computes the spherical Bessel function of the second kind (\eqn{y_l(z)}),
-#' also known as the spherical Neumann function, and its first (\code{ysd}) and
-#' second (\code{ysdd}) derivatives.
+#' Computes the spherical Bessel function of the second kind (\eqn{y_\nu(z)}),
+#' also known as the spherical Neumann function, and its k-th derivatives.
 #'
 #' @details
 #' The spherical Bessel function of the second kind is related to the
 #' cylindrical Bessel function by:
-#' \deqn{y_l(z) = \sqrt{\frac{\pi}{2z}} Y_{l+1/2}(z)}
+#' 
+#' \deqn{y_\nu(z) = \sqrt{\frac{\pi}{2z}} Y_{\nu+1/2}(z)}
 #'
 #' where \eqn{Y_\nu(z)} is the cylindrical Bessel function of the second kind.
 #'
 #' The spherical Bessel functions satisfy the same differential equation as
-#' \eqn{j_l(z)}:
-#' \deqn{z^2 \frac{d^2 y_l}{dz^2} + 2z \frac{dy_l}{dz} + [z^2 - l(l+1)] y_l = 0}
+#' \eqn{j_\nu(z)}:
+#' \deqn{
+#'  z^2 \frac{d^2 y_\nu}{dz^2} + 2z \frac{dy_\nu}{dz} + 
+#'  [z^2 - \nu(\nu+1)] y_\nu = 0
+#' }
 #'
 #' **Special cases:**
 #' \itemize{
-#'   \item \eqn{y_l(0) = -\infty} (singularity at the origin).
+#'   \item \eqn{y_\nu(0) = -\infty} (singularity at the origin).
 #'   \item \eqn{y_0(z) = -\frac{\cos(z)}{z}}
 #'   \item \eqn{y_1(z) = -\frac{\cos(z)}{z^2} - \frac{\sin(z)}{z}}
 #' }
 #'
 #' **Derivatives:**
 #' \itemize{
-#'   \item First derivative: \eqn{y'_l(z) = \frac{l}{z} y_l(z) - y_{l+1}(z)}
-#'   \item Second derivative: \eqn{y''_l(z) = -\frac{l}{z^2} y_l(z) +
-#'   \frac{l}{z} y'_l(z) - y'_{l+1}(z)}
+#'   \item First derivative: \eqn{
+#'    y'_\nu(z) = \frac{\nu}{z} y_\nu(z) - y_{\nu+1}(z)
+#'  }
+#'   \item Second derivative: \eqn{y''_\nu(z) = -\frac{\nu}{z^2} y_\nu(z) +
+#'   \frac{\nu}{z} y'_\nu(z) - y'_{\nu+1}(z)}
 #' }
 #'
 #' @param l Numeric. The order of the spherical Bessel function. Can be integer
@@ -202,9 +162,8 @@ jsdk <- function(l, n, k) {
 #' @return
 #' A numeric vector or matrix (matching the input structure) containing:
 #' \itemize{
-#'   \item \code{ys}: \eqn{y_l(z)}
-#'   \item \code{ysd}: \eqn{y'_l(z)} (first derivative)
-#'   \item \code{ysdd}: \eqn{y''_l(z)} (second derivative)
+#'   \item \code{ys}: \eqn{y_\nu(z)}
+#'   \item \code{ysd}: \eqn{y^{(k)'}_l(z)} (k-th derivative)
 #' }
 #'
 #' @examples
@@ -222,10 +181,16 @@ jsdk <- function(l, n, k) {
 #' ys(0, 0)  # Returns -Inf
 #'
 #' # First derivative
-#' ysd(1, 2)
+#' ysdk(1, 2, 1)
 #'
 #' # Second derivative
-#' ysdd(1, 2)
+#' ysdk(1, 2, 2)
+#'
+#' # 3rd derivative
+#' ysdk(1, 1, 3)
+#' 
+#' # 4th derivative
+#' ysdk(1, 1, 4)
 #'
 #' @references
 #' Abramowitz, M. and Stegun, I.A. (Eds.). (1964). \emph{Handbook of
@@ -253,100 +218,50 @@ ys <- function(l, n) {
     stop("Inputs must be numeric vectors.")
   }
   ys_cpp(l, n)
-  # Internal function ==========================================================
-  # ys_internal <- function(l, n) {
-  #   if (n > 0) {
-  #     yc(l + 0.5, n) * sqrt(pi / (2 * n))
-  #   } else if (n < 0) {
-  #     (yc(l + 0.5, -n) * sqrt(pi / (2 * -n)))
-  #   } else if (n == 0) {
-  #     -Inf
-  #   }
-  # }
-  # ys_vec <- Vectorize(ys_internal)
-  # # Return based on input class ================================================
-  # switch(class(n)[1],
-  #        numeric = ys_vec(l, n),
-  #        matrix = apply(n, 2, FUN = function(x) {
-  #          ys_vec(l, x)
-  #        })
-  # )
 }
-
-ys_old <- function(l, n) {
-  # Internal function ==========================================================
-  ys_internal <- function(l, n) {
-    if (n > 0) {
-      yc_old(l + 0.5, n) * sqrt(pi / (2 * n))
-    } else if (n < 0) {
-      (yc_old(l + 0.5, -n) * sqrt(pi / (2 * -n)))
-    } else if (n == 0) {
-      -Inf
-    }
-  }
-  ys_vec <- Vectorize(ys_internal)
-  # Return based on input class ================================================
-  switch(class(n)[1],
-         numeric = ys_vec(l, n),
-         matrix = apply(n, 2, FUN = function(x) {
-           ys_vec(l, x)
-         })
-  )
-}
-
 #' @rdname ys
-#' @export
+#' @keywords internal
+#' @noRd
 ysd <- function(l, n) {
   ys_deriv_cpp(l, n, 1)
-  # ifelse(n == 0,
-  #        -Inf,
-  #        l / n * ys(l, n) - ys(l + 1, n)
-  # )
 }
-
-ysd_old <- function(l, n) {
-  ifelse(n == 0,
-         -Inf,
-         l / n * ys_old(l, n) - ys_old(l + 1, n)
-  )
-}
-
 #' @rdname ys
-#' @export
+#' @keywords internal
+#' @noRd
 ysdd <- function(l, n) {
   ys_deriv_cpp(l, n, 2)
-  # (-l / (n^2) * ys(l, n) +
-  #    l / n * (l / n * ys(l, n) - ys(l + 1, n)) -
-  #    ((l + 1) / n * ys(l + 1, n) - ys(l + 2, n)))
 }
-
-ysdd_old <- function(l, n) {
-  (-l / (n^2) * ys_old(l, n) +
-     l / n * (l / n * ys_old(l, n) - ys_old(l + 1, n)) -
-     ((l + 1) / n * ys_old(l + 1, n) - ys_old(l + 2, n)))
+#' @rdname ys
+#' @export
+ysdk <- function(l, n, k) {
+  ys_deriv_cpp(l, n, k)
 }
 ################################################################################
-#' Spherical Hankel Function of the First Kind and Its Derivative
+#' Spherical Bessel function of the third kind (Hankel), \eqn{h_\nu(x)}, and its
+#' respective derivatives
 #'
 #' @description
-#' Computes the spherical Hankel function of the first kind (\eqn{h^{(1)}_l(z)})
-#' and its first derivative (\code{hsd}).
+#' Computes the spherical Hankel function of the first kind 
+#' (\eqn{h^{(1)}_\nu(z)}) and its first-th derivative.
 #'
 #' @details
 #' The spherical Hankel function of the first kind is defined as:
-#' \deqn{h^{(1)}_l(z) = j_l(z) + i y_l(z)}
+#' \deqn{h^{(1)}_\nu(z) = j_\nu(z) + i y_\nu(z)}
 #'
-#' where \eqn{j_l(z)} is the spherical Bessel function of the first kind and
-#' \eqn{y_l(z)} is the spherical Bessel function of the second kind.
+#' where \eqn{j_\nu(z)} is the spherical Bessel function of the first kind and
+#' \eqn{y_\nu(z)} is the spherical Bessel function of the second kind.
 #'
 #' It is related to the cylindrical Hankel function by:
-#' \deqn{h^{(1)}_l(z) = \sqrt{\frac{\pi}{2z}} H^{(1)}_{l+1/2}(z)}
+#' \deqn{h^{(1)}_\nu(z) = \sqrt{\frac{\pi}{2z}} H^{(1)}_{\nu+1/2}(z)}
 #'
 #' The spherical Hankel functions are used extensively in scattering theory
 #' to represent outgoing spherical waves.
 #'
 #' **Derivative:**
-#' \deqn{\frac{d}{dz}h^{(1)}_l(z) = \frac{l}{z} h^{(1)}_l(z) - h^{(1)}_{l+1}(z)}
+#' \deqn{
+#'  \frac{d}{dz}h^{(1)}_\nu(z) = \frac{\nu}{z} h^{(1)}_\nu(z) 
+#'  - h^{(1)}_{\nu+1}(z)
+#' }
 #'
 #' @param l Numeric. The order of the spherical Hankel function. Can be integer
 #'   or fractional.
@@ -355,8 +270,8 @@ ysdd_old <- function(l, n) {
 #' @return
 #' A complex vector containing:
 #' \itemize{
-#'   \item \code{hs}: \eqn{h^{(1)}_l(z)}
-#'   \item \code{hsd}: \eqn{\frac{d}{dz}h^{(1)}_l(z)} (first derivative)
+#'   \item \code{hs}: \eqn{h^{(1)}_\nu(z)}
+#'   \item \code{hsdK}: \eqn{\frac{d}{dz^k}h^{(1)}_l(z)} (k-th derivative)
 #' }
 #'
 #' @examples
@@ -371,7 +286,7 @@ ysdd_old <- function(l, n) {
 #' hs(0, c(1, 2, 3))
 #'
 #' # First derivative
-#' hsd(1, 2)
+#' hsdk(1, 2, 1)
 #'
 #' @references
 #' Abramowitz, M. and Stegun, I.A. (Eds.). (1964). \emph{Handbook of
@@ -394,21 +309,22 @@ ysdd_old <- function(l, n) {
 #' @rdname hs
 #' @export
 hs <- function(l, n) {
-  # sqrt(pi / (2 * n)) * hc(l + 0.5, n)
   hs_cpp(l, n)
 }
-
-hs_old <- function(l, n) {
-  sqrt(pi / (2 * n)) * hc_old(l + 0.5, n)
-}
-
 #' @rdname hs
-#' @export
+#' @keywords internal
+#' @noRd
 hsd <- function(l, n) {
-  # -hs(l + 1, n) + (l / n) * hs(l, n)
   hs_deriv_cpp(l, n, 1)
 }
-
-hsd_old <- function(l, n) {
-  -hs_old(l + 1, n) + (l / n) * hs_old(l, n)
+#' @rdname hs
+#' @keywords internal
+#' @noRd
+hsdd <- function(l, n) {
+  hs_deriv_cpp(l, n, 2)
+}
+#' @rdname hs
+#' @export
+hsdk <- function(l, n, k) {
+  hs_deriv_cpp(l, n, 1)
 }

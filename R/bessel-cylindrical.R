@@ -2,16 +2,17 @@
 # Cyndrical Bessel functions
 ################################################################################
 ################################################################################
-#' Cylindrical Bessel function of the first kind, \eqn{J_\nu(x)} and its
+#' Cylindrical Bessel function of the first kind, \eqn{J_\nu(z)}, and its
 #' respective derivatives
 #'
 #' @description
 #' Computes the cylindrical Bessel function of the first kind (\eqn{J_\nu(z)})
-#' and its first (\code{jcd}) and second (\code{jcdd}) derivatives.
+#' and its k-th derivatives.
 #'
 #' @details
 #' The cylindrical Bessel function of the first kind satisfies Bessel's
 #' differential equation:
+#' 
 #' \deqn{z^2 \frac{d^2 J_\nu}{dz^2} + z \frac{dJ_\nu}{dz} + (z^2 - \nu^2) J
 #' _\nu = 0}
 #'
@@ -43,6 +44,11 @@
 #'   J_\nu(z)}
 #'   \item Second derivative: \eqn{J''_\nu(z) = \frac{1}{4}\left[J_{\nu-2}(z) -
 #'   2J_\nu(z) + J_{\nu+2}(z)\right]}
+#'   \item k-th derivative (DLMF 10.6.1):
+#'         \deqn{
+#'           \frac{d^k}{dz^k} J_\nu(z) = \frac{1}{2^k} \sum_{j=0}^{k} (-1)^j
+#'            \binom{k}{j} J_{\nu - k + 2j}(z)
+#'         }
 #' }
 #'
 #' @param l Numeric. The order (\eqn{\nu}) of the Bessel function. Must be
@@ -51,6 +57,7 @@
 #'   function. Supports purely real or purely imaginary values. General complex
 #'   arguments (\eqn{x + iy} with \eqn{x \neq 0} and \eqn{y \neq 0}) are not
 #'   supported.
+#' @param k Non-negative integer. The order of the derivative for \code{jcdk}.
 #'
 #' @return
 #' A complex vector containing:
@@ -58,6 +65,7 @@
 #'   \item \code{jc}: \eqn{J_\nu(z)}
 #'   \item \code{jcd}: \eqn{J'_\nu(z)} (first derivative)
 #'   \item \code{jcdd}: \eqn{J''_\nu(z)} (second derivative)
+#'   \item \code{jcdk}: \eqn{J_\nu^{(k)}(z)} (k-th derivative)
 #' }
 #'
 #' @examples
@@ -107,55 +115,29 @@
 #' @rdname jc
 #' @export
 jc <- function(l, n) {
-  # besselJ(l, n)
   jc_cpp(n, l)
-  # jc_cpp(n, l)
 }
-
-jc_old <- function(l, n) {
-  besselJ(n, l)
-
+#' @rdname jc
+#' @keywords internal
+#' @noRd
+jcd <- function(l, n) {
+  jc_deriv_cpp(n, l, 1)
 }
-
-
-#' @rdname jcdk
+#' @rdname jc
+#' @keywords internal
+#' @noRd
+jcdd <- function(l, n) {
+  jc_deriv_cpp(n, l, 2)
+}
+#' @rdname jc
 #' @export
 jcdk <- function(l, n, k) {
-  jc_deriv_cpp(l, n, k)
-}
-
-#' @rdname jc
-#' @export
-jcd <- function(l, n) {
-  jc_internal <- function(l, n) {
-    if (n == 0) {
-      if (l == 1) {
-        0.5
-      } else {
-        0.0
-      }
-    } else {
-      jc(l - 1, n) - (l / n) * jc(l, n)
-    }
-  }
-  jc_vec <- Vectorize(jc_internal)
-  # Return based on input class ================================================
-  switch(class(n)[1],
-         numeric = jc_vec(l, n),
-         matrix = apply(n, 2, FUN = function(x) {
-           jc_vec(l, x)
-         })
-  )
-}
-
-#' @rdname jc
-#' @export
-jcdd <- function(l, n) {
-  0.25 * (jc(l - 2, n) - 2 * jc(l, n) + jc(l + 2, n))
+  jc_deriv_cpp(n, l, k)
 }
 
 ################################################################################
-#' Cylindrical Bessel (Neumann) Function of the Second Kind and Its Derivatives
+#' Cylindrical Bessel function of the second kind, \eqn{Y_\nu(x)}, and its
+#' respective derivatives
 #'
 #' @description
 #' Computes the cylindrical Bessel function of the second kind
@@ -191,6 +173,12 @@ jcdd <- function(l, n) {
 #'   \item For negative real arguments:
 #'         \eqn{Y_\nu(-x) = \cos(\pi\nu) Y_\nu(x) + \sin(\pi\nu) J_\nu(x)}.
 #'   \item For integer order \eqn{n}: \eqn{Y_n(-x) = (-1)^n Y_n(x)}.
+#'   \item k-th derivative (DLMF 10.6.1):
+#'         \deqn{
+#'           \frac{d^k}{dz^k} Y_\nu(z) = \frac{1}{2^k} \sum_{j=0}^{k} (-1)^j
+#'           \binom{k}{j}
+#'            Y_{\nu - k + 2j}(z)
+#'         }
 #' }
 #'
 #' **Derivative:**
@@ -202,12 +190,15 @@ jcdd <- function(l, n) {
 #'   function. Supports purely real or purely imaginary values. General complex
 #'   arguments (\eqn{x + iy} with \eqn{x \neq 0} and \eqn{y \neq 0}) are not
 #'   supported.
+#' @param k Non-negative integer. The order of the derivative for \code{ycdk}.
 #'
 #' @return
 #' A complex vector containing:
 #' \itemize{
 #'   \item \code{yc}: \eqn{Y_\nu(z)}
 #'   \item \code{ycd}: \eqn{Y'_\nu(z)} (first derivative)
+#'   \item \code{ycdd}: \eqn{Y''_\nu(z)} (second derivative)
+#'   \item \code{ycdk}: \eqn{Y_\nu^{(k)}(z)} (k-th derivative)
 #' }
 #'
 #' @examples
@@ -256,43 +247,28 @@ jcdd <- function(l, n) {
 #' @export
 yc <- function(l, n) {
   yc_cpp(n, l)
-  # besselY(n, l)
 }
-
-yc_old <- function(l, n) besselY(n, l)
-
+#' @rdname yc
+#' @keywords internal
+#' @noRd
+ycd <- function(l, n) {
+  yc_deriv_cpp(n, l, 1)
+}
+#' @rdname yc
+#' @keywords internal
+#' @noRd
+ycdd <- function(l, n) {
+  yc_deriv_cpp(n, l, 2)
+}
 #' @rdname yc
 #' @export
 ycdk <- function(l, n, k) {
-  yc_deriv_cpp(l, n, k)
-}
-
-#' @rdname yc
-#' @export
-ycd <- function(l, n) {
-  yc_internal <- function(l, n) {
-    if (n == 0.0) {
-      if (l == 1) {
-        0.5
-      } else {
-        0.0
-      }
-    } else {
-      yc(l - 1, n) - (l / n) * yc(l, n)
-    }
-  }
-  yc_vec <- Vectorize(yc_internal)
-  # Return based on input class ================================================
-  switch(class(n)[1],
-         numeric = yc_vec(l, n),
-         matrix = apply(n, 2, FUN = function(x) {
-           yc_vec(l, x)
-         })
-  )
+  yc_deriv_cpp(n, l, k)
 }
 
 ################################################################################
-#' Cylindrical Hankel Function of the First Kind and Its Derivatives
+#' Cylindrical Bessel function of the third kind (Hankel), \eqn{H_\nu(x)}, and
+#' its respective derivatives
 #'
 #' @description
 #' Computes the cylindrical Hankel function of the first kind
@@ -322,7 +298,8 @@ ycd <- function(l, n) {
 #'         H^{(1)}_{\nu+1}(z)}
 #'   \item Second derivative:
 #'         \eqn{\frac{d^2}{dz^2}H^{(1)}_\nu(z) = H^{(1)}_{\nu-2}(z) -
-#'         \frac{2\nu-1}{z} H^{(1)}_{\nu-1}(z) + \frac{\nu^2+\nu}{z^2} H^{(1)}_\nu(z)}
+#'         \frac{2\nu-1}{z} H^{(1)}_{\nu-1}(z) + \frac{\nu^2+\nu}{z^2}
+#'         H^{(1)}_\nu(z)}
 #'   \item k-th derivative (DLMF 10.6.1):
 #'         \eqn{\frac{d^k}{dz^k}H^{(1)}_\nu(z) = \frac{1}{2^k} \sum_{j=0}^{k}
 #'         (-1)^j \binom{k}{j} H^{(1)}_{\nu-k+2j}(z)}
@@ -365,9 +342,9 @@ ycd <- function(l, n) {
 #' hcdk(1, 2, 3)  # Third derivative
 #'
 #' @references
-#' Abramowitz, M. and Stegun, I.A. (Eds.). (1964). \emph{Handbook of Mathematical
-#' Functions with Formulas, Graphs, and Mathematical Tables}. National Bureau
-#' of Standards, Applied Mathematics Series 55. Chapter 9.
+#' Abramowitz, M. and Stegun, I.A. (Eds.). (1964). \emph{Handbook of
+#' Mathematical Functions with Formulas, Graphs, and Mathematical Tables}.
+#' National Bureau of Standards, Applied Mathematics Series 55. Chapter 9.
 #'
 #' NIST Digital Library of Mathematical Functions.
 #' \url{https://dlmf.nist.gov/}
@@ -387,56 +364,21 @@ ycd <- function(l, n) {
 #' @export
 hc <- function(l, n) {
   hc_cpp(n, l)
-  # jc(l, n) + 1i * yc(l, n)
 }
-
-hc_old <- function(l, n) {
-  jc_old(l, n) + 1i * yc_old(l, n)
-}
-
 #' @rdname hc
-#' @export
+#' @keywords internal
+#' @noRd
 hcd <- function(l, n) {
-  (l * hc(l, n) / n - hc(l + 1, n))
+  hc_deriv_cpp(n, l, 1)
 }
-
 #' @rdname hc
-#' @export
+#' @keywords internal 
+#' @noRd
 hcdd <- function(l, n) {
-  hcdd_internal <- function(l, n) {
-    if (n == 0) {
-      stop(
-        paste0(
-          "Second derivative for the cylindrical Hankel function of the ",
-          "first kind is not defined at n = 0."
-        )
-      )
-    }
-    hc(l - 2, n) -
-      ((2 * l - 1) / n) * hc(l - 1, n) +
-      ((l^2 + l) / (n^2)) * hc(l, n)
-  }
-  hcdd_vec <- Vectorize(hcdd_internal)
-  switch(class(n)[1],
-         numeric = hcdd_vec(l, n),
-         matrix = apply(n, 2, function(x) hcdd_vec(l, x))
-  )
+  hc_deriv_cpp(n, l, 2)
 }
-
 #' @rdname hc
 #' @export
 hcdk <- function(l, n, k) {
-  # hc_deriv_cp(n, l, k)
-  hcdk_internal <- function(l, n, k) {
-    sum <- 0
-    for (j in 0:k) {
-      sum <- sum + (-1)^j * choose(k, j) * hc(l - k + 2 * j, n)
-    }
-    sum / (2^k)
-  }
-  hcdk_vec <- Vectorize(function(l, n) hcdk_internal(l, n, k))
-  switch(class(n)[1],
-         numeric = hcdk_vec(l, n),
-         matrix = apply(n, 2, function(x) hcdk_vec(l, x))
-  )
+  hc_deriv_cpp(n, l, k)
 }

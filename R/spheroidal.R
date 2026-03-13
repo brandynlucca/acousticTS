@@ -7,6 +7,11 @@
 #' \eqn{\eta} for given order \eqn{m}, degree \eqn{n}, size parameter \eqn{c},
 #' and angular coordinate \eqn{\eta}.
 #'
+#' This function is an R wrapper for compiled C++ code, which in turn calls the
+#' underlying Fortran library (\code{prolate_swf}) for high-performance numerical
+#' computation. All heavy computation is performed in compiled code for speed and
+#' accuracy.
+#'
 #' @details
 #' The prolate spheroidal angular functions are solutions to the angular part
 #' of the scalar Helmholtz equation in prolate spheroidal coordinates. They
@@ -30,25 +35,34 @@
 #' the functions are scaled to have unity norm.
 #'
 #' **Implementation:**
-#' This function is a wrapper for the Fortran subroutine \code{profcn} from the
+#' This function is an R wrapper for a compiled C++ interface (\code{Smn_cpp}),
+#' which itself wraps the Fortran subroutine \code{profcn} from the
 #' \code{prolate_swf} library developed by Arnie Lee Van Buren and Jeffrey
-#' Boisvert.  The underlying algorithm uses a combination of forward and
+#' Boisvert. The underlying algorithm uses a combination of forward and
 #' backward recursion with the Bouwkamp eigenvalue method for high accuracy
-#' across wide parameter ranges.
+#' across wide parameter ranges. The C++ layer manages memory, precision selection, and data
+#' conversion between R and Fortran for robust and efficient computation.
 #'
 #' @param m Non-negative integer. The order of the spheroidal function (\eqn{m
 #' \geq 0}).
 #' @param n Non-negative integer. The degree of the spheroidal function (\eqn{n
 #' \geq m}).
-#' @param c Numeric. The size parameter (also denoted \eqn{\gamma} in some
-#' references), equal to \eqn{kd/2} where \eqn{k} is the wavenumber and \eqn{d}
-#' is the interfocal distance.
+#' @param c Numeric. The scalar size parameter.
 #' @param eta Numeric vector. The angular coordinate(s) at which to evaluate the
 #'   function. Must satisfy \eqn{|\eta| \leq 1}.
 #' @param normalize Logical. If \code{TRUE}, the angular functions are
 #' normalized to have unity norm. If \code{FALSE} (default), the
 #' Meixner-Schäfke normalization is used.
-#'
+#' @param precision Character. Either \code{"double"} (default) or \code{"quad"}. Controls the 
+#' floating-point precision used in the underlying Fortran computation. 
+#'   \describe{
+#'     \item{\code{"double"}}{Uses standard double-precision (64-bit) arithmetic. Fastest and 
+#'      sufficient for most applications.}
+#'     \item{\code{"quad"}}{Uses quadruple-precision (128-bit) arithmetic for higher numerical 
+#'      accuracy in challenging parameter regimes (e.g., large \eqn{m}, \eqn{n}, or near 
+#'      singularities). Computation is significantly slower.}
+#'   }
+
 #' @return A list containing:
 #' \describe{
 #'   \item{\code{value}}{Numeric vector of function values \eqn{S_{mn}^{(1)}(c,
@@ -66,6 +80,12 @@
 #'
 #' # With unity normalization
 #' Smn(m = 1, n = 1, c = 2, eta = 0.3, normalize = TRUE)
+#'
+#' # Double precision (default)
+#' Smn(m = 2, n = 3, c = 1, eta = 0.5, precision = "double")
+#' 
+#' # Quad precision
+#' Smn(m = 2, n = 3, c = 1, eta = 0.5, precision = "quad")
 #'
 #' @references
 #' Van Buren, A. L. and Boisvert, J. E. "Prolate Spheroidal Wave Functions."
@@ -86,16 +106,25 @@
 #' @useDynLib acousticTS, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
 #' @export
-Smn <- function(m, n, c, eta, normalize = FALSE) {
+Smn <- function(m, n, c, eta, normalize = FALSE, precision = "double") {
   # Validation =================================================================
+  if (!is.numeric(n) || !all(n%%1 == 0)) {
+    stop("'n' must be a real integer, or a vector of real integers.")
+  }
+  if (!is.numeric(m) || !all(m%%1 == 0)) {
+    stop("'m' must be a real integer, or a vector of real integers.")
+  }
   if (!is.numeric(eta)) {
-    stop("'eta' must be a real number, or vector of real numbers.")
+    stop("'eta' must be a real number, or a vector of real numbers.")
   }
   if (!is.numeric(c) || length(c) > 1) {
     stop("'c' must be a single, real number.")
   }
+  if (! precision %in% c("double", "quad")) {
+    stop("'precision' must either be 'double' (default) or 'quad'.")
+  }
   # Run compiled function ======================================================
-  Smn_cpp(m, n, c, eta, normalize)
+  Smn_cpp(m, n, c, eta, normalize, precision)
 }
 
 #' Prolate Spheroidal Radial Functions
@@ -106,6 +135,11 @@ Smn <- function(m, n, c, eta, normalize = FALSE) {
 #' (\eqn{R_{mn}^{(3)}}), and fourth (\eqn{R_{mn}^{(4)}}) kinds and their first
 #' derivatives with respect to \eqn{\xi} for given order \eqn{m}, degree
 #' \eqn{n}, size parameter \eqn{c}, and radial coordinate \eqn{\xi}.
+#'
+#' This function is an R wrapper for compiled C++ code, which in turn calls the
+#' underlying Fortran library (\code{prolate_swf}) for high-performance numerical
+#' computation. All heavy computation is performed in compiled code for speed and
+#' accuracy.
 #'
 #' @details
 #' The prolate spheroidal radial functions are solutions to the radial part
@@ -145,30 +179,35 @@ Smn <- function(m, n, c, eta, normalize = FALSE) {
 #' \eqn{c \rightarrow 0}.
 #'
 #' **Implementation:**
-#' This function is a wrapper for the Fortran subroutine \code{profcn} from the
+#' This function is an R wrapper for a compiled C++ interface (\code{Rmn_cpp}),
+#' which itself wraps the Fortran subroutine \code{profcn} from the
 #' \code{prolate_swf} library developed by Arnie Lee Van Buren and Jeffrey
-#' Boisvert. The underlying algorithm employs multiple methods including:
-#' \itemize{
-#'   \item Spherical Bessel function expansions
-#'   \item Legendre function expansions with joining factors
-#'   \item Neumann function expansions
-#'   \item Numerical integration methods
-#' }
-#' to achieve high accuracy across wide parameter ranges.
+#' Boisvert. The underlying algorithm uses a combination of forward and
+#' backward recursion with the Bouwkamp eigenvalue method for high accuracy
+#' across wide parameter ranges. The C++ layer manages memory, precision selection, and data
+#' conversion between R and Fortran for robust and efficient computation.
 #'
 #' @param m Non-negative integer. The order of the spheroidal function (\eqn{m
 #' \geq 0}).
 #' @param n Non-negative integer. The degree of the spheroidal function (\eqn{n
 #' \geq m}).
-#' @param c Numeric. The size parameter (also denoted \eqn{\gamma} in some
-#' references), equal to \eqn{kd/2} where \eqn{k} is the wavenumber and \eqn{d}
-#' is the interfocal distance.
+#' @param c Numeric. The scalar size parameter (also denoted \eqn{\gamma} in some
+#' references).
 #' @param xi Numeric. The radial coordinate at which to evaluate the function.
 #'   Must satisfy \eqn{\xi \geq 1}.
 #' @param kind Integer. Specifies which kind of radial function to compute:
 #'   \code{1} (first kind), \code{2} (second kind), \code{3} (third
 #'   kind/outgoing), or \code{4} (fourth kind/incoming). Default is \code{1}.
-#'
+#' @param precision Character. Either \code{"double"} (default) or \code{"quad"}. Controls the 
+#'   floating-point precision used in the underlying Fortran computation. 
+#'   \describe{
+#'     \item{\code{"double"}}{Uses standard double-precision (64-bit) arithmetic. Fastest and 
+#'      sufficient for most applications.}
+#'     \item{\code{"quad"}}{Uses quadruple-precision (128-bit) arithmetic for higher numerical 
+#'        accuracy in challenging parameter regimes (e.g., large \eqn{m}, \eqn{n}, \eqn{c}, or near 
+#'        singularities). Computation is significantly slower.}
+#'   }
+
 #' @return A list containing:
 #' \describe{
 #'   \item{\code{value}}{The function value \eqn{R_{mn}^{(k)}(c, \xi)}. Real for
@@ -190,6 +229,12 @@ Smn <- function(m, n, c, eta, normalize = FALSE) {
 #'
 #' # Fourth kind (incoming) radial function
 #' Rmn(m = 1, n = 1, c = 2, xi = 1.2, kind = 4)
+#' 
+#' # Double precision (default)
+#' Rmn(m = 2, n = 3, c = 1, xi = 1.5)
+#'
+#' # Quad precision
+#' Rmn(m = 2, n = 3, c = 1, xi = 1.5, precision = "quad")
 #'
 #' @references
 #' Van Buren, A. L. and Boisvert, J. E. "Prolate Spheroidal Wave Functions."
@@ -210,13 +255,22 @@ Smn <- function(m, n, c, eta, normalize = FALSE) {
 #' @useDynLib acousticTS, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
 #' @export
-Rmn <- function(m, n, c, xi, kind = 1) {
+Rmn <- function(m, n, c, xi, kind = 1, precision = "double") {
   # Validation =================================================================
+  if (!is.numeric(n) || !all(n%%1 == 0)) {
+    stop("'n' must be a real integer, or a vector of real integers.")
+  }
+  if (!is.numeric(m) || !all(m%%1 == 0)) {
+    stop("'m' must be a real integer, or a vector of real integers.")
+  }
   if (!is.numeric(c) || length(c) > 1) {
     stop("'c' must be a single, real number.")
   }
   if (!is.numeric(xi) || length(xi) > 1) {
     stop("'xi' must be a single, real number.")
+  }
+  if (! precision %in% c("double", "quad")) {
+    stop("'precision' must either be 'double' (default) or 'quad'.")
   }
   # Run compiled function ======================================================
   Rmn_cpp(m, n, c, xi, kind)

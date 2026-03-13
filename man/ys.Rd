@@ -2,15 +2,13 @@
 % Please edit documentation in R/bessel-spherical.R
 \name{ys}
 \alias{ys}
-\alias{ysd}
-\alias{ysdd}
-\title{Spherical Bessel Function of the Second Kind and Its Derivatives}
+\alias{ysdk}
+\title{Spherical Bessel function of the second kind, \eqn{y_\nu(x)}, and its
+respective derivatives}
 \usage{
 ys(l, n)
 
-ysd(l, n)
-
-ysdd(l, n)
+ysdk(l, n, k)
 }
 \arguments{
 \item{l}{Numeric. The order of the spherical Bessel function. Can be integer
@@ -76,6 +74,12 @@ ysd(1, 2)
 
 # Second derivative
 ysdd(1, 2)
+
+# k-th derivative
+# - 3rd derivative
+ysdk(1, 1, 3)
+# - 4th derivative
+ysdk(1, 1, 4)
 
 }
 \references{

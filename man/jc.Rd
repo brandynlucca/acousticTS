@@ -4,7 +4,8 @@
 \alias{jc}
 \alias{jcd}
 \alias{jcdd}
-\title{Cylindrical Bessel function of the first kind, \eqn{J_\nu(x)} and its
+\alias{jcdk}
+\title{Cylindrical Bessel function of the first kind, \eqn{J_\nu(x)}, and its
 respective derivatives}
 \usage{
 jc(l, n)
@@ -12,6 +13,8 @@ jc(l, n)
 jcd(l, n)
 
 jcdd(l, n)
+
+jcdk(l, n, k)
 }
 \arguments{
 \item{l}{Numeric. The order (\eqn{\nu}) of the Bessel function. Must be
@@ -21,6 +24,8 @@ purely real; complex orders are not supported.}
 function. Supports purely real or purely imaginary values. General complex
 arguments (\eqn{x + iy} with \eqn{x \neq 0} and \eqn{y \neq 0}) are not
 supported.}
+
+\item{k}{Non-negative integer. The order of the derivative for \code{jcdk}.}
 }
 \value{
 A complex vector containing:
@@ -28,11 +33,13 @@ A complex vector containing:
 \item \code{jc}: \eqn{J_\nu(z)}
 \item \code{jcd}: \eqn{J'_\nu(z)} (first derivative)
 \item \code{jcdd}: \eqn{J''_\nu(z)} (second derivative)
+\item \code{jcdk}: \eqn{J_\nu^{(k)}(z)} (k-th derivative)
 }
 }
 \description{
 Computes the cylindrical Bessel function of the first kind (\eqn{J_\nu(z)})
-and its first (\code{jcd}) and second (\code{jcdd}) derivatives.
+and its first (\code{jcd}), second (\code{jcdd}), and k-th (\code{jcdk})
+derivatives.
 }
 \details{
 The cylindrical Bessel function of the first kind satisfies Bessel's
@@ -68,6 +75,11 @@ and \eqn{y \neq 0}): \strong{Not supported}.
   J_\nu(z)}
 \item Second derivative: \eqn{J''_\nu(z) = \frac{1}{4}\left[J_{\nu-2}(z) -
   2J_\nu(z) + J_{\nu+2}(z)\right]}
+\item k-th derivative (DLMF 10.6.1):
+\deqn{
+          \frac{d^k}{dz^k} J_\nu(z) = \frac{1}{2^k} \sum_{j=0}^{k} (-1)^j
+           \binom{k}{j} J_{\nu - k + 2j}(z)
+        }
 }
 }
 \examples{

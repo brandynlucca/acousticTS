@@ -2,15 +2,13 @@
 % Please edit documentation in R/bessel-spherical.R
 \name{js}
 \alias{js}
-\alias{jsd}
-\alias{jsdd}
-\title{Spherical Bessel Function of the First Kind and Its Derivatives}
+\alias{jsdk}
+\title{Spherical Bessel function of the first kind, \eqn{j_\nu(x)}, and its
+respective derivatives}
 \usage{
 js(l, n)
 
-jsd(l, n)
-
-jsdd(l, n)
+jsdk(l, n, k)
 }
 \arguments{
 \item{l}{Numeric. The order of the spherical Bessel function. Can be integer

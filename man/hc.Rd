@@ -5,7 +5,8 @@
 \alias{hcd}
 \alias{hcdd}
 \alias{hcdk}
-\title{Cylindrical Hankel Function of the First Kind and Its Derivatives}
+\title{Cylindrical Bessel function of the third kind (Hankel), \eqn{H_\nu(x)}, and
+its respective derivatives}
 \usage{
 hc(l, n)
 
@@ -62,7 +63,8 @@ Since \eqn{H^{(1)}_\nu(z)} is computed from \eqn{J_\nu(z)} and
         H^{(1)}_{\nu+1}(z)}
 \item Second derivative:
 \eqn{\frac{d^2}{dz^2}H^{(1)}_\nu(z) = H^{(1)}_{\nu-2}(z) -
-        \frac{2\nu-1}{z} H^{(1)}_{\nu-1}(z) + \frac{\nu^2+\nu}{z^2} H^{(1)}_\nu(z)}
+        \frac{2\nu-1}{z} H^{(1)}_{\nu-1}(z) + \frac{\nu^2+\nu}{z^2}
+        H^{(1)}_\nu(z)}
 \item k-th derivative (DLMF 10.6.1):
 \eqn{\frac{d^k}{dz^k}H^{(1)}_\nu(z) = \frac{1}{2^k} \sum_{j=0}^{k}
         (-1)^j \binom{k}{j} H^{(1)}_{\nu-k+2j}(z)}
@@ -90,9 +92,9 @@ hcdk(1, 2, 3)  # Third derivative
 
 }
 \references{
-Abramowitz, M. and Stegun, I.A. (Eds.). (1964). \emph{Handbook of Mathematical
-Functions with Formulas, Graphs, and Mathematical Tables}. National Bureau
-of Standards, Applied Mathematics Series 55. Chapter 9.
+Abramowitz, M. and Stegun, I.A. (Eds.). (1964). \emph{Handbook of
+Mathematical Functions with Formulas, Graphs, and Mathematical Tables}.
+National Bureau of Standards, Applied Mathematics Series 55. Chapter 9.
 
 NIST Digital Library of Mathematical Functions.
 \url{https://dlmf.nist.gov/}

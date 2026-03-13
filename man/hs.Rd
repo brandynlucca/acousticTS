@@ -2,12 +2,13 @@
 % Please edit documentation in R/bessel-spherical.R
 \name{hs}
 \alias{hs}
-\alias{hsd}
-\title{Spherical Hankel Function of the First Kind and Its Derivative}
+\alias{hsdk}
+\title{Spherical Bessel function of the third kind (Hankel), \eqn{h_\nu(x)}, and its
+respective derivatives}
 \usage{
 hs(l, n)
 
-hsd(l, n)
+hsdk(l, n, k)
 }
 \arguments{
 \item{l}{Numeric. The order of the spherical Hankel function. Can be integer

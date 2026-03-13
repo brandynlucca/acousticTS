@@ -2,36 +2,26 @@
 % Please edit documentation in R/harmonics.R
 \name{Qn}
 \alias{Qn}
-\alias{Qndk}
 \title{Legendre Function of the Second Kind, \eqn{Q_\nu(x)}}
 \usage{
 Qn(n, x)
-
-Qndk(n, x, k = 1L)
 }
 \arguments{
-\item{n}{Numeric vector. Degree (order) of the Legendre function.}
+\item{n}{Numeric vector. Degree (order) of the Legendre function. Can be
+integer or fractional (e.g., 0, 1, 2.5, 3.7).}
 
-\item{x}{Numeric vector. Real argument(s) at which to evaluate the
-derivative. Avoid \eqn{x = \pm 1}.}
-
-\item{k}{Integer. Order of the derivative (\eqn{k \geq 0}). Default is 1.}
+\item{x}{Numeric vector. Real argument(s) at which to evaluate the function.
+Valid for all real values. Note that \eqn{x = \pm 1} are singularities.}
 }
 \value{
 A complex matrix of dimension \code{length(n)} by \code{length(x)}, where
 element \code{[i, j]} contains \eqn{Q_{n_i}(x_j)}. For \eqn{|x| < 1}, the
 imaginary part is zero.
-
-A complex matrix of dimension \code{length(n)} by \code{length(x)}, where
-element \code{[i, j]} contains \eqn{\frac{d^k}{dx^k} Q_{n_i}(x_j)}.
 }
 \description{
 Computes the Legendre function of the second kind, \eqn{Q_\nu(x)}, for
 real order \eqn{\nu} (integer or fractional) and real argument \eqn{x}.
 Returns complex values when \eqn{|x| > 1}.
-
-Computes the \eqn{k}-th derivative of the Legendre function of the second
-kind, \eqn{\frac{d^k}{dx^k} Q_\nu(x)}, with respect to the argument \eqn{x}.
 }
 \details{
 The Legendre function of the second kind satisfies the same differential
@@ -43,7 +33,8 @@ but represents the linearly independent second solution.
 
 \strong{For \eqn{|x| < 1} (real result):}
 \itemize{
-\item For integer order \eqn{n}: Uses the C++ Boost library implementation
+\item For integer order \eqn{n}: Uses the \code{C++} \code{Boost} library
+implementation
 \item For fractional order \eqn{\nu}: Uses the Ferrers identity
 \deqn{Q_\nu(x) = \frac{\pi}{2 \sin(\pi \nu)} \left[ \cos(\pi \nu)
         P_\nu(x) - P_\nu(-x) \right]}
@@ -59,24 +50,12 @@ Returns infinity (singularity).
         \sqrt{x^2-1} \cosh t)^{\nu+1}}}
 \item Imaginary part: \deqn{\text{Im}[Q_\nu(x)] = -\frac{\pi}{2} P_\nu(x)}
 }
-
-Derivatives are computed using central finite differences:
-\deqn{\frac{dQ_\nu}{dx} \approx \frac{Q_\nu(x+h) - Q_\nu(x-h)}{2h}}
-
-Higher-order derivatives use the generalized finite difference stencil with
-binomial coefficients.
-
-For \eqn{|x| > 1}, the result is complex since \eqn{Q_\nu(x)} is complex
-in that domain.
-
-\strong{Singularities:} The function \eqn{Q_\nu(x)} has logarithmic singularities
-at \eqn{x = \pm 1}. Derivatives near these points will have reduced accuracy
-or may be undefined.
 }
 \note{
-Derivatives are computed via finite differences with step size
-\eqn{h = 10^{-6}}. Accuracy is typically 4-6 significant digits for
-first derivatives, less for higher orders.
+This function calls underlying \eqn{C++} code via \code{Rcpp} for
+both performance and , which is used both for computational efficiency and
+to support different cases for both order and argument that are not
+readily available in \code{R}.
 }
 \examples{
 # Single values
@@ -100,22 +79,6 @@ Qn(c(1, 2, 3.5), c(2, 3.5))
 # Singularity at x = 1
 Qn(1, 1)
 
-# First derivative of Q_1(x) at x = 0.5
-Qndk(1, 0.5, 1)
-
-# Compare with numerical derivative
-h <- 1e-6
-(Qn(1, 0.5 + h) - Qn(1, 0.5 - h)) / (2 * h)
-
-# Second derivative
-Qndk(2, 0.5, 2)
-
-# Multiple orders
-Qndk(c(1, 2, 3), 0.5, 1)
-
-# Complex result for |x| > 1
-Qndk(1, 2.0, 1)
-
 }
 \references{
 Abramowitz, M. and Stegun, I. A. (1972). \emph{Handbook of Mathematical
@@ -125,16 +88,10 @@ Chapter 8: Legendre Functions.
 
 NIST Digital Library of Mathematical Functions.
 \url{https://dlmf.nist.gov/14}
-
-Abramowitz, M. and Stegun, I. A. (1972). \emph{Handbook of Mathematical
-Functions}. Dover Publications. Chapter 8: Legendre Functions.
 }
 \seealso{
+\code{\link{Qndk}} for the k\if{html}{\out{<sup>}}th\if{html}{\out{</sup>}} derivative of the Legendre
+polynomial of the second kind,
 \code{\link{Pn}} for Legendre functions of the first kind.
-
-\code{\link{Qn}} for the Legendre function itself.
-\code{\link{Pndk}} for derivatives of the Legendre function of the first
-kind.
 }
-\keyword{derivative}
 \keyword{legendre}
