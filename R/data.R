@@ -122,3 +122,7 @@
 #' }
 #' @usage data(krill)
 "krill"
+
+#' Benchmark model outputs from Jech et al. (2015)
+#' @usage data(benchmark_ts)
+"benchmark_ts"
