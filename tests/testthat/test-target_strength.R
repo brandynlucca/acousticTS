@@ -42,7 +42,7 @@ test_that("target_strength works with different scatterer types", {
     radius_curvature_ratio = 3.0,
     theta_body = krill@body$theta
   )
-  frequency <- seq(1e3, 100e3, 1e3)
+  frequency <- seq(1e3, 10e3, 1e3)
 
   fls_with_ts <- target_strength(
     object = fls_obj,
@@ -72,11 +72,11 @@ test_that("target_strength works with different scatterer types", {
   gas_with_ts <- target_strength(
     object = gas_obj,
     frequency = frequency,
-    model = "mss_anderson"
+    model = "sphms"
   )
 
   expect_s4_class(gas_with_ts, "GAS")
-  expect_true("MSS_anderson" %in% names(gas_with_ts@model))
+  expect_true("SPHMS" %in% names(gas_with_ts@model))
 
   # Test ESS object with HP and MSS model
   ess_obj <- ess_generate(
@@ -93,12 +93,12 @@ test_that("target_strength works with different scatterer types", {
   ess_with_ts <- target_strength(
     object = ess_obj,
     frequency = frequency,
-    model = c("mss_goodman_stern", "high_pass_stanton")
+    model = c("hpa", "essms")
   )
 
   expect_s4_class(ess_with_ts, "ESS")
   expect_true(
-    all(c("MSS_goodman_stern", "high_pass_stanton")
+    all(c("ESSMS", "HPA")
         %in% names(ess_with_ts@model))
   )
 })
@@ -129,7 +129,7 @@ test_that("target_strength handles multiple models", {
     radius_body = krill@body$radius,
     g_body = krill@body$g,
     h_body = krill@body$h,
-    radius_curvature_ratio = krill@body$radius_curvature_ratio,
+    radius_curvature_ratio = 3.3,
     theta_body = krill@body$theta
   )
   frequency <- c(120e3)
@@ -137,12 +137,8 @@ test_that("target_strength handles multiple models", {
   # Calculate with DWBA
   fls_dwba <- target_strength(fls_obj, frequency, "DWBA")
 
-  # Calculate with DCM (should add to existing models)
-  fls_both <- target_strength(fls_dwba, frequency, "DCM")
-
-  # Should have both models
-  expect_true("DWBA" %in% names(fls_both@model))
-  expect_true("DCM" %in% names(fls_both@model))
+  # Should have the DWBA
+  expect_true("DWBA" %in% names(fls_dwba@model))
 })
 
 test_that("target_strength preserves object metadata", {

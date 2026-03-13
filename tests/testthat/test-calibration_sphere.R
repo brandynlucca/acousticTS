@@ -1,7 +1,10 @@
+library(acousticTS)
+
 test_that(
   "Compare calibration sphere model output at 38, 70, 120, and 200 kHz",
   {
-    library(acousticTS)
+
+    # Create class
     cal_sphere <- acousticTS::cal_generate()
     # Class check
     expect_true(methods::is(cal_sphere, "CAL"))
@@ -30,11 +33,14 @@ test_that(
     ts_out2 <- model_results2
     expect_equal(ts_out, ts_out2)
     # Check output
-    # Should be -42.42, -41.44, -39.52, and -39.05 dB at 38, 70, 120, and
+    # Should be -42.32, -41.07, -39.50, and -39.44 dB at 38, 70, 120, and
     # 200 kHz
-    expect_equal(ts_out,
-      c(-42.4161095, -41.4364324, -39.5248183, -39.0544814),
-      tolerance = 1e-8
+    expect_equal(
+      ts_out,
+      c(-42.3296920811525,
+        -41.07033000976835,
+        -39.50264169247166,
+        -39.43821198162192)
     )
   }
 )

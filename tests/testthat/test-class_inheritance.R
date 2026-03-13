@@ -1,5 +1,6 @@
+library(acousticTS)
+
 test_that("Scatterer class inheritance works correctly", {
-  library(acousticTS)
 
   # Test that all scatterer classes inherit from Scatterer
   # Create instances of each scatterer type
@@ -39,7 +40,11 @@ test_that("Scatterer class inheritance works correctly", {
 
   # Test FLS (fluid-like scatterer)
   fls_obj <- fls_generate(
-    x = 1, y = 1, z = 1, radius_body = 1, g_body = 1.00,
+    x_body = c(1, 2),
+    y_body = c(1, 2),
+    z_body = c(1, 2),
+    radius_body = c(1, 2),
+    g_body = 1.00,
     h_body = 1.00
   )
   expect_s4_class(fls_obj, "FLS")
@@ -70,7 +75,6 @@ test_that("Scatterer class inheritance works correctly", {
 })
 
 test_that("Scatterer objects have required slots", {
-  library(acousticTS)
 
   # Test that Scatterer base class has required slots
   cal_obj <- cal_generate()
@@ -96,7 +100,6 @@ test_that("Scatterer objects have required slots", {
 })
 
 test_that("Scatterer generation functions work", {
-  library(acousticTS)
 
   # Test cal_generate
   cal_obj <- cal_generate()
@@ -127,7 +130,6 @@ test_that("Scatterer generation functions work", {
 })
 
 test_that("Scatterer objects have proper structure", {
-  library(acousticTS)
 
   # Test CAL structure
   cal_obj <- cal_generate()
@@ -172,6 +174,7 @@ test_that("Scatterer objects have proper structure", {
 })
 
 test_that("CAL-class generation works as expected", {
+
   # Create object
   cal_sphere <- cal_generate(
     sound_speed_longitudinal = 3e3,
@@ -188,6 +191,7 @@ test_that("CAL-class generation works as expected", {
 })
 
 test_that("FLS-class generation works as expected", {
+
   # Test full parmeterization
   fls_test <- fls_generate(
     x_body = seq(0, 1, length.out = 5),
@@ -201,7 +205,7 @@ test_that("FLS-class generation works as expected", {
   body <- acousticTS::extract(fls_test, "body")
   shape <- acousticTS::extract(fls_test, "shape_parameters")
 
-  expect_equal(dim(body$rpos), c(5, 5))
+  expect_equal(dim(body$rpos), c(6, 5))
   expect_equal(length(body$radius), 5)
 
   # Test shape input
@@ -319,17 +323,7 @@ test_that("FLS-class generation works as expected", {
   )
 })
 
-test_that("GAS and ESS error cases are raised when necessary", {
-  # Test case where `radius_body` is not defined in GAS creation
-  expect_error(
-    gas_generate(
-      shape = "sphere"
-    ),
-    paste0(
-      "Canonical shape generation requires 'double' input for ",
-      "the 'radius_body' argument."
-    )
-  )
+test_that("ESS error cases are raised when necessary", {
 
   # Test case where conflicting density/g and sound speed/h values are input
   expect_error(

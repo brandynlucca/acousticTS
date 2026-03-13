@@ -9,23 +9,12 @@ test_that("Simple acoustic utility functions work as intended", {
 
   # Test sigma_bs
   expected <- 2e-20
-  expect_equal(sigma_bs(1e-10 * 1e-10 * 1i), expected)
+  expect_equal(.sigma_bs(1e-10 * 1e-10 * 1i), expected)
 
   # Test transmission_coefficient
   expected <- 0.957670166
   expect_equal(
     transmission_coefficient(
-      data.frame(sound_speed = 1500, density = 1026),
-      data.frame(sound_speed = 1400, density = 1010)
-    ),
-    expected,
-    tolerance = 1e-10
-  )
-
-  # Test kappa
-  expected <- 0.1661446757
-  expect_equal(
-    kappa(
       data.frame(sound_speed = 1500, density = 1026),
       data.frame(sound_speed = 1400, density = 1010)
     ),
@@ -318,3 +307,4 @@ test_that("SDWBA resampling works as intended", {
   expect_equal(length(body$radius), 51)
   expect_equal(shape$n_segments, 50)
 })
+

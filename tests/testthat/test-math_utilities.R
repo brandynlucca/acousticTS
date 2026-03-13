@@ -1,5 +1,6 @@
+library(acousticTS)
+
 test_that("Mathematical utility functions work correctly", {
-  library(acousticTS)
 
   # Test along_sum function
   rpos <- matrix(c(1, 2, 3, 4, 5, 6), nrow = 2, ncol = 3)
@@ -33,7 +34,6 @@ test_that("Mathematical utility functions work correctly", {
 })
 
 test_that("Complex integration functions work", {
-  library(acousticTS)
 
   # Test contour_integrate with a simple function
   # Define a simple complex function for testing

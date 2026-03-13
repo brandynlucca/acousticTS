@@ -1,5 +1,6 @@
+library(acousticTS)
+
 test_that("simulate_ts function works with empty parameters", {
-  library(acousticTS)
 
   # Test with a simple CAL object
   cal_obj <- cal_generate()
@@ -45,9 +46,8 @@ test_that("simulate_ts function works with empty parameters", {
 })
 
 test_that("simulate_ts function works with single sets of parameters", {
-  library(acousticTS)
 
-  # Test with a simple CAL object
+    # Test with a simple CAL object
   data(krill)
   frequency <- c(38e3, 120e3)
 
@@ -107,7 +107,6 @@ test_that("simulate_ts function works with single sets of parameters", {
 })
 
 test_that("simulate_ts works with batch_by parameter", {
-  library(acousticTS)
 
   # Test batching with different parameter values
   data(krill)
@@ -151,7 +150,6 @@ test_that("simulate_ts works with batch_by parameter", {
 })
 
 test_that("simulate_ts works with generating functions", {
-  library(acousticTS)
 
   # Test with a generating function
   data(krill)
@@ -193,7 +191,6 @@ test_that("simulate_ts works with generating functions", {
 })
 
 test_that("simulate_ts works with multiple generating functions", {
-  library(acousticTS)
 
   # Test with distribution parameters
   data(krill)
@@ -229,7 +226,6 @@ test_that("simulate_ts works with multiple generating functions", {
 })
 
 test_that("simulate_ts handles mixed parameter types", {
-  library(acousticTS)
 
   # Test mixing single values, vectors, and generating functions
   data(krill)
@@ -268,7 +264,6 @@ test_that("simulate_ts handles mixed parameter types", {
 })
 
 test_that("simulate_ts validates inputs correctly", {
-  library(acousticTS)
 
   # Test mixing single values, vectors, and generating functions
   data(krill)
@@ -301,7 +296,6 @@ test_that("simulate_ts validates inputs correctly", {
 })
 
 test_that("simulate_ts works with parallel processing", {
-  library(acousticTS)
 
   # Test mixing single values, vectors, and generating functions
   data(krill)

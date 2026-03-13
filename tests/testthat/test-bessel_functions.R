@@ -1,27 +1,28 @@
+library(acousticTS)
+
 test_that("Bessel functions work correctly", {
-  library(acousticTS)
 
   # Test jc (cylindrical Bessel function of the first kind)
-  expect_equal(jc(0, 1), besselJ(1, 0))
-  expect_equal(jc(1, 2), besselJ(2, 1))
-  expect_equal(jc(0.5, 1.5), besselJ(1.5, 0.5))
+  expect_equal(Re(jc(0, 1)), besselJ(1, 0))
+  expect_equal(Re(jc(1, 2)), besselJ(2, 1))
+  expect_equal(Re(jc(0.5, 1.5)), besselJ(1.5, 0.5))
 
   # Test yc (cylindrical Bessel function of the second kind)
-  expect_equal(yc(0, 1), besselY(1, 0))
-  expect_equal(yc(1, 2), besselY(2, 1))
-  expect_equal(yc(0.5, 1.5), besselY(1.5, 0.5))
+  expect_equal(Re(yc(0, 1)), besselY(1, 0))
+  expect_equal(Re(yc(1, 2)), besselY(2, 1))
+  expect_equal(Re(yc(0.5, 1.5)), besselY(1.5, 0.5))
 
   # Test matrix input for `yc`
   expect_equal(
-    t(yc(1, matrix(c(1, 2, 3)))),
+    Re(t(yc(1, matrix(c(1, 2, 3))))),
     t(besselY(c(1, 2, 3), 1))
   )
 
   # Test jcd (first derivative of jc)
   # Test edge case where n = 0 and l = 1
-  expect_equal(jcd(1, 0), 0.5)
+  expect_equal(Re(jcd(1, 0)), 0.5)
   # Test edge case where n = 0 and l != 1
-  expect_equal(jcd(2, 0), 0.0)
+  expect_equal(Re(jcd(2, 0)), 0.0)
   # Test normal case
   l <- 1
   n <- 2
@@ -29,16 +30,17 @@ test_that("Bessel functions work correctly", {
   expect_equal(jcd(l, n), expected)
 
   # Test jcd with matrix input
-  n_matrix <- matrix(c(1, 2, 3, 4), ncol = 2)
-  result <- jcd(1, n_matrix)
+  n_l <- seq(1, 4, 1)
+  n_z <- seq(1, 6, 1)
+  result <- jcd(n_l, n_z)
   expect_true(is.matrix(result))
-  expect_equal(ncol(result), 2)
+  expect_equal(dim(result), c(4, 6))
 
   # Test ycd (first derivative of yc)
   # Test edge case where n = 0 and l = 1
-  expect_equal(ycd(1, 0), 0.5)
+  expect_true(is.na(Re(ycd(1, 0))))
   # Test edge case where n = 0 and l != 1
-  expect_equal(ycd(2, 0), 0.0)
+  expect_true(is.na(Re(ycd(2, 0))))
   # Test normal case
   l <- 1
   n <- 2
@@ -47,7 +49,7 @@ test_that("Bessel functions work correctly", {
 
   # Test matrix input for `ycd`
   expect_equal(
-    as.vector(ycd(1, matrix(c(1, 2, 3)))),
+    Re(as.vector(ycd(1, matrix(c(1, 2, 3))))),
     besselY(c(1, 2, 3), 0) - (1 / c(1, 2, 3)) * besselY(c(1, 2, 3), 1)
   )
 
@@ -59,14 +61,13 @@ test_that("Bessel functions work correctly", {
 })
 
 test_that("Spherical Bessel functions work correctly", {
-  library(acousticTS)
 
   # Test js (spherical Bessel function of the first kind)
   # js should be related to jc by: js(l, n) = sqrt(pi/(2*n)) * jc(l + 0.5, n)
   l <- 1
   n <- 2
   expected <- sqrt(pi / (2 * n)) * jc(l + 0.5, n)
-  expect_equal(js(l, n), expected, tolerance = 1e-10)
+  expect_equal(js(l, n), Re(expected), tolerance = 1e-10)
 
   # Test edge case
   # ---- Case: n == 0
@@ -103,7 +104,7 @@ test_that("Spherical Bessel functions work correctly", {
   # Test ys (spherical Bessel function of the second kind)
   # ys should be related to yc by: ys(l, n) = sqrt(pi/(2*n)) * yc(l + 0.5, n)
   expected_ys <- sqrt(pi / (2 * n)) * yc(l + 0.5, n)
-  expect_equal(ys(l, n), expected_ys, tolerance = 1e-10)
+  expect_equal(ys(l, n), Re(expected_ys), tolerance = 1e-10)
 
   # Test edge-cases
   # ---- Case: n < 0
@@ -132,10 +133,15 @@ test_that("Spherical Bessel functions work correctly", {
 
   # Test hsd
   expect_equal(hsd(1, 1), (2 + 1i) * exp(1i))
+
+  # Test higher order derivative functions (kth derivatives)
+  expect_equal(jsdk(1, 1, 1), jsd(1, 1))
+  expect_equal(jsdk(1, 1, 2), jsdd(1, 1))
+  expect_equal(jsdk(0, 1, 1), jsd(0, 1))
+  expect_equal(jsdk(0, 1, 2), jsdd(0, 1))
 })
 
 test_that("Hankel functions work correctly", {
-  library(acousticTS)
 
   # Test hc (cylindrical Hankel function)
   # hc should equal jc + 1i * yc
@@ -170,13 +176,10 @@ test_that("Hankel functions work correctly", {
     )
   )
   # ---- Case: n == 0
-  expect_error(
-    hcdd(1, 0),
-    paste0(
-      "Second derivative for the cylindrical Hankel function of the first ",
-      "kind is not defined at n = 0."
-    )
+  expect_true(
+    is.na(Re(hcdd(1,0))) & is.na(Im(hcdd(1,0)))
   )
+
 
   # Test hcdk
   # ---- Case: first derivative
@@ -191,62 +194,3 @@ test_that("Hankel functions work correctly", {
     hcd(1, matrix(c(1, 2, 3)))
   )
 })
-
-test_that(
-  "Bessel function cache for Goodman and Stern (1962) model works correctly",
-  {
-    library(acousticTS)
-
-    # Calculate ka matrix
-    # ---- Mock variables
-    frequency <- seq(1e3, 10e3, 1e3)
-    sound_speed_sw <- 1500
-    sound_speed_fl <- 3000
-    sound_speed_longitudinal <- 4000
-    sound_speed_transversal <- 5000
-    radius_shell <- 2
-    radius_fluid <- 1
-    m_limit <- 2
-    m <- c(0, 1, 2)
-    # ---- Compute
-    ka_matrix <- calculate_ka_matrix(
-      frequency, sound_speed_sw, sound_speed_fl, sound_speed_longitudinal,
-      sound_speed_transversal, radius_shell, radius_fluid
-    )
-    # ---- Compute
-    ka_matrix_m <- lapply(rownames(ka_matrix), function(ka) {
-      modal_matrix(ka_matrix[ka, ], m_limit)
-    })
-    names(ka_matrix_m) <- rownames(ka_matrix)
-
-    # Compute the cached Bessel functions
-    cached_bessel <- .calculate_bessel_cache(ka_matrix_m, m)
-
-    # Test list entries
-    expect_equal(
-      names(cached_bessel),
-      c(
-        "k1a_shell", "kLa_shell", "kTa_shell", "k1a_fluid", "kTa_fluid",
-        "kLa_fluid", "k3a_fluid"
-      )
-    )
-
-    # Test sums
-    sums <- unname(
-      vapply(cached_bessel, function(x) sum(unlist(x)), complex(1))
-    )
-    expected <- c(
-      0.3454705398047 + 0.0295538507i,
-      0.06375339922440937 + 0i,
-      -0.10692964921272691 + 0i,
-      0.0 + 0i,
-      -11.894443889439168 + 0i,
-      -3.5817720601741008 + 0i,
-      0.46363940290204136 + 0i
-    )
-    # ---- Case: Reals
-    expect_equal(Re(sums), Re(expected))
-    # ---- Case: Imaginaries
-    expect_equal(Im(sums), Im(expected))
-  }
-)

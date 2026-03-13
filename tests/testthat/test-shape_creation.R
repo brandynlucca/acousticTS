@@ -32,7 +32,6 @@ test_that("Shape creation functions work correctly", {
 })
 
 test_that("Prolate spheroid creation works", {
-  library(acousticTS)
 
   # Test prolate spheroid
   length_body <- 0.1 # 10 cm
@@ -92,12 +91,11 @@ test_that("Prolate spheroid creation works", {
   # Test error for under-specified shape info
   expect_error(
     prolate_spheroid(length_body = length_body),
-    "Radius/width and/or length-to-radius ratio are missing."
+    "Either 'radius' or 'length_radius_ratio' must be provided."
   )
 })
 
 test_that("Cylinder creation works", {
-  library(acousticTS)
 
   # Test cylinder
   length_body <- 0.08
@@ -129,8 +127,7 @@ test_that("Cylinder creation works", {
   expect_error(
     cylinder(length_body = 1),
     paste0(
-      "Radius and/or length-to-radius ratio information is required ",
-      "to generate a cylinder shape."
+      "Either 'radius' or 'length_radius_ratio' must be provided."
     )
   )
 })
@@ -158,7 +155,7 @@ test_that("Arbitrary shape creation works", {
 
   # Check position matrix structure
   expect_true(is.matrix(arbitrary_obj@position_matrix))
-  expect_equal(ncol(arbitrary_obj@position_matrix), 5)
+  expect_equal(ncol(arbitrary_obj@position_matrix), 6)
   expect_equal(nrow(arbitrary_obj@position_matrix), length(x_body))
 })
 
