@@ -60,7 +60,7 @@ simulate_ts <- function(object,
     "'object' must be a 'scatterer'-based class" = inherits(object, "Scatterer")
   )
   # Validate model =============================================================
-  unexpected_model <- model[!(model %in% names(model_registry))]
+  unexpected_model <- model[!(model %in% names(.get_models()))]
   if (length(unexpected_model) > 0) {
     stop(
       "The following user-defined models are not supported by `acousticTS`: ",
