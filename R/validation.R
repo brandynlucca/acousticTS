@@ -7,19 +7,20 @@
 #'
 #' Internal helper to validate named numeric vectors used in reforge operations.
 #'
-#' @param param The parameter to validate
-#' @param param_name Name of the parameter (for error messages)
-#' @param valid_names Character vector of valid dimension names
-#' @param allow_scalar Whether to allow scalar values
-#' @param require_names Whether named vectors are required
+#' @param dims The dimensions of the parameter defined for rescaling
+#' @param dims_name Name of dimension
+#' @param valid_dims Character vector of valid dimension names
+#' @param isometry Boolean argument defining whether to isometrically rescale 
+#' all dimensions in the shape
+#' @param iso_name Name of dimension used for isometric rescaling when toggled
 #' @return Validated parameter (invisibly)
 #' @keywords internal
 #' @noRd
 .validate_dimension_scaling <- function(dims,
-                                      dims_name,
-                                      valid_dims,
-                                      isometry,
-                                      iso_name) {
+                                        dims_name,
+                                        valid_dims,
+                                        isometry,
+                                        iso_name) {
   # No dimensions provided
   if (is.null(dims)) return(NULL)
 
@@ -108,28 +109,6 @@
 
   dims
 }
-
-.validate_dimensions_target <- function(dims, dims_name, valid_dims) {
-
-  # No dimensions provided
-  if (is.null(dims)) return(NULL)
-
-  # Check for missing names
-  if (is.null(names(dims))) {
-    stop(
-      sprintf(
-        paste0(
-          "'%s' must either be a scalar or a named vector with dimensions: %s."
-        ),
-        dims_name,
-        paste0("'", valid_dims, "'", collapse=", ")
-      ),
-      call.=FALSE
-    )
-  }
-
-  dims
-}
 #' Validate elastic moduli inputs
 #'
 #' Internal helper to validate that sufficient elastic moduli are provided
@@ -140,6 +119,7 @@
 #' @param param_name Name of parameter being calculated (for error message)
 #' @return Character vector of provided parameter names
 #' @keywords internal
+#' @noRd
 .validate_elastic_inputs <- function(..., min_required = 2, param_name = NULL) {
   inputs <- list(...)
   provided <- !vapply(inputs, is.null, logical(1))
@@ -159,7 +139,13 @@
 }
 
 #' Validate brake/bending parameters
+#' @param body_df Dataframe containing shape information
+#' @param radius_curvature Curvature defined by the radius of an overlapping 
+#' osculating circle. This can either be an absolute or ratio quantity.
+#' @param mode Domain of radius of curvature quantity that can either be a 
+#' ratio or an absolute quantity
 #' @keywords internal
+#' @noRd
 .validate_brake_params <- function(body_df, radius_curvature, mode) {
   if (!is.list(body_df) || is.null(body_df$rpos) || !is.matrix(body_df$rpos)) {
     stop("Body shape information must be a list with a matrix element 'rpos'.",
@@ -181,6 +167,7 @@
 #' @param model_name Model name (e.g., "calibration", "dwba")
 #' @return List with model, parameters, and shape data
 #' @keywords internal
+#' @noRd
 .validate_and_extract_model <- function(object, model_name) {
   models <- extract(object, "model")
   if (length(models) == 0) {
