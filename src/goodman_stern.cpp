@@ -1,5 +1,4 @@
-// [[Rcpp::depends(RcppArmadillo)]]
-#include <RcppArmadillo.h>
+#include <Rcpp.h>
 #include <cmath>
 #include <complex>
 #include <vector>
@@ -142,56 +141,13 @@ std::complex<double> det6x6_scaled(std::complex<double> A[6][6]) {
             }
         }
     }
-    
+
     // Multiply back the row scales
     for (int i = 0; i < 6; ++i) {
         det *= row_scales[i];
     }
     
     return det * std::complex<double>(sign, 0.0);
-}
-
-std::complex<double> det6x6_eigen(std::complex<double> A[6][6]) {
-    arma::cx_mat M(6, 6);
-    for (int i = 0; i < 6; ++i) {
-        for (int j = 0; j < 6; ++j) {
-            M(i, j) = A[i][j];
-        }
-    }
-    arma::cx_vec eigval = arma::eig_gen(M);
-    return arma::prod(eigval);
-}
-
-// [[Rcpp::export]]
-List debug_bessel_values(double kLa_s, int m) {
-    double js = js_single_impl(m, kLa_s);
-    double ys = ys_single_impl(m, kLa_s);
-    double jsdd = js_deriv_single_impl(m, kLa_s, 2);
-    double ysdd = ys_deriv_single_impl(m, kLa_s, 2);
-    
-    return List::create(
-        Named("js") = js,
-        Named("ys") = ys,
-        Named("jsdd") = jsdd,
-        Named("ysdd") = ysdd
-    );
-}
-
-// [[Rcpp::export]]
-std::complex<double> det6x6_from_R(ComplexMatrix M) {
-    if (M.nrow() != 6 || M.ncol() != 6) {
-        stop("Matrix must be 6x6");
-    }
-    
-    std::complex<double> A[6][6];
-    for (int i = 0; i < 6; ++i) {
-        for (int j = 0; j < 6; ++j) {
-            Rcomplex rc = M(i, j);
-            A[i][j] = std::complex<double>(rc.r, rc.i);
-        }
-    }
-    
-    return det6x6_scaled(A);  // was det6x6_eigen
 }
 
 // =============================================================================
@@ -346,255 +302,12 @@ std::complex<double> compute_single_bm(
     return b_m;
 }
 
-// [[Rcpp::export]]
-ComplexVector debug_determinants(
-    double k1a, double kLa_s, double kTa_s,
-    double kLa_f, double kTa_f, double k3a,
-    double lambda, double mu,
-    double rho_ratio_sw, double rho_ratio_fl,
-    int m
-) {
-    double m_dbl = static_cast<double>(m);
-    double m_m_plus_1 = m_dbl * (m_dbl + 1.0);
-    double lambda_plus_2mu = lambda + 2.0 * mu;
-    
-    // Compute all Bessel functions
-    double js_k1a = js_single_impl(m, k1a);
-    double jsd_k1a = js_deriv_single_impl(m, k1a, 1);
-    std::complex<double> hs_k1a = hs_single_impl(m, k1a);
-    std::complex<double> hsd_k1a = hs_deriv_single_impl(m, k1a, 1);
-    
-    double js_kLa_s = js_single_impl(m, kLa_s);
-    double ys_kLa_s = ys_single_impl(m, kLa_s);
-    double jsd_kLa_s = js_deriv_single_impl(m, kLa_s, 1);
-    double ysd_kLa_s = ys_deriv_single_impl(m, kLa_s, 1);
-    double jsdd_kLa_s = js_deriv_single_impl(m, kLa_s, 2);
-    double ysdd_kLa_s = ys_deriv_single_impl(m, kLa_s, 2);
-    
-    double js_kTa_s = js_single_impl(m, kTa_s);
-    double ys_kTa_s = ys_single_impl(m, kTa_s);
-    double jsd_kTa_s = js_deriv_single_impl(m, kTa_s, 1);
-    double ysd_kTa_s = ys_deriv_single_impl(m, kTa_s, 1);
-    double jsdd_kTa_s = js_deriv_single_impl(m, kTa_s, 2);
-    double ysdd_kTa_s = ys_deriv_single_impl(m, kTa_s, 2);
-    
-    double js_kLa_f = js_single_impl(m, kLa_f);
-    double ys_kLa_f = ys_single_impl(m, kLa_f);
-    double jsd_kLa_f = js_deriv_single_impl(m, kLa_f, 1);
-    double ysd_kLa_f = ys_deriv_single_impl(m, kLa_f, 1);
-    double jsdd_kLa_f = js_deriv_single_impl(m, kLa_f, 2);
-    double ysdd_kLa_f = ys_deriv_single_impl(m, kLa_f, 2);
-    
-    double js_kTa_f = js_single_impl(m, kTa_f);
-    double ys_kTa_f = ys_single_impl(m, kTa_f);
-    double jsd_kTa_f = js_deriv_single_impl(m, kTa_f, 1);
-    double ysd_kTa_f = ys_deriv_single_impl(m, kTa_f, 1);
-    double jsdd_kTa_f = js_deriv_single_impl(m, kTa_f, 2);
-    double ysdd_kTa_f = ys_deriv_single_impl(m, kTa_f, 2);
-    
-    double js_k3a = js_single_impl(m, k3a);
-    double jsd_k3a = js_deriv_single_impl(m, k3a, 1);
-    
-    double kTa_s_sq = kTa_s * kTa_s;
-    double kTa_f_sq = kTa_f * kTa_f;
-    
-    // Compute alpha coefficients
-    double a1 = js_k1a * rho_ratio_sw;
-    double a2 = k1a * jsd_k1a;
-    std::complex<double> a11 = hs_k1a * rho_ratio_sw;
-    std::complex<double> a21 = k1a * hsd_k1a;
-    
-    double a12 = (lambda * js_kLa_s - 2.0 * mu * jsdd_kLa_s) / lambda_plus_2mu;
-    double a22 = kLa_s * jsd_kLa_s;
-    double a32 = 2.0 * (kLa_s * jsd_kLa_s - js_kLa_s);
-    double a42 = (lambda * js_kLa_f - 2.0 * mu * jsdd_kLa_f) / lambda_plus_2mu;
-    double a52 = kLa_f * jsd_kLa_f;
-    double a62 = 2.0 * (kLa_f * jsd_kLa_f - js_kLa_f);
-    
-    double a13 = -2.0 * m_m_plus_1 / kTa_s_sq * (kTa_s * jsd_kTa_s - js_kTa_s);
-    double a23 = m_m_plus_1 * js_kTa_s;
-    double a33 = kTa_s_sq * jsdd_kTa_s + (m_dbl + 2.0) * (m_dbl - 1.0) * js_kTa_s;
-    double a43 = -2.0 * m_m_plus_1 / kTa_f_sq * (kTa_f * jsd_kTa_f - js_kTa_f);
-    double a53 = m_m_plus_1 * js_kTa_f;
-    double a63 = kTa_f_sq * jsdd_kTa_f + (m_dbl + 2.0) * (m_dbl - 1.0) * js_kTa_f;
-    
-    double a14 = (lambda * ys_kLa_s - 2.0 * mu * ysdd_kLa_s) / lambda_plus_2mu;
-    double a24 = kLa_s * ysd_kLa_s;
-    double a34 = 2.0 * (kLa_s * ysd_kLa_s - ys_kLa_s);
-    double a44 = (lambda * ys_kLa_f - 2.0 * mu * ysdd_kLa_f) / lambda_plus_2mu;
-    double a54 = kLa_f * ysd_kLa_f;
-    double a64 = 2.0 * (kLa_f * ysd_kLa_f - ys_kLa_f);
-    
-    double a15 = -2.0 * m_m_plus_1 / kTa_s_sq * (kTa_s * ysd_kTa_s - ys_kTa_s);
-    double a25 = m_m_plus_1 * ys_kTa_s;
-    double a35 = kTa_s_sq * ysdd_kTa_s + (m_dbl + 2.0) * (m_dbl - 1.0) * ys_kTa_s;
-    double a45 = -2.0 * m_m_plus_1 / kTa_f_sq * (kTa_f * ysd_kTa_f - ys_kTa_f);
-    double a55 = m_m_plus_1 * ys_kTa_f;
-    double a65 = kTa_f_sq * ysdd_kTa_f + (m_dbl + 2.0) * (m_dbl - 1.0) * ys_kTa_f;
-    
-    double a46 = js_k3a * rho_ratio_fl;
-    double a56 = k3a * jsd_k3a;
-    
-    // Build 6x6 matrix
-    std::complex<double> A_num[6][6] = {
-        {a1,  a12, a13, a14, a15, 0.0},
-        {a2,  a22, a23, a24, a25, 0.0},
-        {0.0, a32, a33, a34, a35, 0.0},
-        {0.0, a42, a43, a44, a45, a46},
-        {0.0, a52, a53, a54, a55, a56},
-        {0.0, a62, a63, a64, a65, 0.0}
-    };
-    
-    std::complex<double> A_den[6][6];
-    for (int i = 0; i < 6; ++i) {
-        for (int j = 0; j < 6; ++j) {
-            A_den[i][j] = A_num[i][j];
-        }
-    }
-    A_den[0][0] = a11;
-    A_den[1][0] = a21;
-    
-    std::complex<double> det_num = det6x6(A_num);
-    std::complex<double> det_den = det6x6(A_den);
-    std::complex<double> bm = det_num / det_den;
-    
-    ComplexVector result(3);
-    result[0] = to_Rcomplex(det_num);
-    result[1] = to_Rcomplex(det_den);
-    result[2] = to_Rcomplex(bm);
-    
-    return result;
-}
-
-// [[Rcpp::export]]
-List debug_matrix_m1_f1(
-    double k1a, double kLa_s, double kTa_s,
-    double kLa_f, double kTa_f, double k3a,
-    double lambda, double mu,
-    double rho_ratio_sw, double rho_ratio_fl
-) {
-    int m = 1;
-    double m_dbl = 1.0;
-    double m_m_plus_1 = 2.0;
-    double lambda_plus_2mu = lambda + 2.0 * mu;
-    
-    // Compute spherical Bessel functions
-    double js_k1a = js_single_impl(m, k1a);
-    double jsd_k1a = js_deriv_single_impl(m, k1a, 1);
-    std::complex<double> hs_k1a = hs_single_impl(m, k1a);
-    std::complex<double> hsd_k1a = hs_deriv_single_impl(m, k1a, 1);
-    
-    double js_kLa_s = js_single_impl(m, kLa_s);
-    double ys_kLa_s = ys_single_impl(m, kLa_s);
-    double jsd_kLa_s = js_deriv_single_impl(m, kLa_s, 1);
-    double ysd_kLa_s = ys_deriv_single_impl(m, kLa_s, 1);
-    double jsdd_kLa_s = js_deriv_single_impl(m, kLa_s, 2);
-    double ysdd_kLa_s = ys_deriv_single_impl(m, kLa_s, 2);
-    
-    double js_kTa_s = js_single_impl(m, kTa_s);
-    double ys_kTa_s = ys_single_impl(m, kTa_s);
-    double jsd_kTa_s = js_deriv_single_impl(m, kTa_s, 1);
-    double ysd_kTa_s = ys_deriv_single_impl(m, kTa_s, 1);
-    double jsdd_kTa_s = js_deriv_single_impl(m, kTa_s, 2);
-    double ysdd_kTa_s = ys_deriv_single_impl(m, kTa_s, 2);
-    
-    double js_kLa_f = js_single_impl(m, kLa_f);
-    double ys_kLa_f = ys_single_impl(m, kLa_f);
-    double jsd_kLa_f = js_deriv_single_impl(m, kLa_f, 1);
-    double ysd_kLa_f = ys_deriv_single_impl(m, kLa_f, 1);
-    double jsdd_kLa_f = js_deriv_single_impl(m, kLa_f, 2);
-    double ysdd_kLa_f = ys_deriv_single_impl(m, kLa_f, 2);
-    
-    double js_kTa_f = js_single_impl(m, kTa_f);
-    double ys_kTa_f = ys_single_impl(m, kTa_f);
-    double jsd_kTa_f = js_deriv_single_impl(m, kTa_f, 1);
-    double ysd_kTa_f = ys_deriv_single_impl(m, kTa_f, 1);
-    double jsdd_kTa_f = js_deriv_single_impl(m, kTa_f, 2);
-    double ysdd_kTa_f = ys_deriv_single_impl(m, kTa_f, 2);
-    
-    double js_k3a = js_single_impl(m, k3a);
-    double jsd_k3a = js_deriv_single_impl(m, k3a, 1);
-    
-    double kTa_s_sq = kTa_s * kTa_s;
-    double kTa_f_sq = kTa_f * kTa_f;
-    
-    // Compute alpha coefficients
-    double a1 = js_k1a * rho_ratio_sw;
-    double a2 = k1a * jsd_k1a;
-    std::complex<double> a11 = hs_k1a * rho_ratio_sw;
-    std::complex<double> a21 = k1a * hsd_k1a;
-    
-    double a12 = (lambda * js_kLa_s - 2.0 * mu * jsdd_kLa_s) / lambda_plus_2mu;
-    double a22 = kLa_s * jsd_kLa_s;
-    double a32 = 2.0 * (kLa_s * jsd_kLa_s - js_kLa_s);
-    double a42 = (lambda * js_kLa_f - 2.0 * mu * jsdd_kLa_f) / lambda_plus_2mu;
-    double a52 = kLa_f * jsd_kLa_f;
-    double a62 = 2.0 * (kLa_f * jsd_kLa_f - js_kLa_f);
-    
-    double a13 = -2.0 * m_m_plus_1 / kTa_s_sq * (kTa_s * jsd_kTa_s - js_kTa_s);
-    double a23 = m_m_plus_1 * js_kTa_s;
-    double a33 = kTa_s_sq * jsdd_kTa_s + (m_dbl + 2.0) * (m_dbl - 1.0) * js_kTa_s;
-    double a43 = -2.0 * m_m_plus_1 / kTa_f_sq * (kTa_f * jsd_kTa_f - js_kTa_f);
-    double a53 = m_m_plus_1 * js_kTa_f;
-    double a63 = kTa_f_sq * jsdd_kTa_f + (m_dbl + 2.0) * (m_dbl - 1.0) * js_kTa_f;
-    
-    double a14 = (lambda * ys_kLa_s - 2.0 * mu * ysdd_kLa_s) / lambda_plus_2mu;
-    double a24 = kLa_s * ysd_kLa_s;
-    double a34 = 2.0 * (kLa_s * ysd_kLa_s - ys_kLa_s);
-    double a44 = (lambda * ys_kLa_f - 2.0 * mu * ysdd_kLa_f) / lambda_plus_2mu;
-    double a54 = kLa_f * ysd_kLa_f;
-    double a64 = 2.0 * (kLa_f * ysd_kLa_f - ys_kLa_f);
-    
-    double a15 = -2.0 * m_m_plus_1 / kTa_s_sq * (kTa_s * ysd_kTa_s - ys_kTa_s);
-    double a25 = m_m_plus_1 * ys_kTa_s;
-    double a35 = kTa_s_sq * ysdd_kTa_s + (m_dbl + 2.0) * (m_dbl - 1.0) * ys_kTa_s;
-    double a45 = -2.0 * m_m_plus_1 / kTa_f_sq * (kTa_f * ysd_kTa_f - ys_kTa_f);
-    double a55 = m_m_plus_1 * ys_kTa_f;
-    double a65 = kTa_f_sq * ysdd_kTa_f + (m_dbl + 2.0) * (m_dbl - 1.0) * ys_kTa_f;
-    
-    double a46 = js_k3a * rho_ratio_sw;
-    double a56 = k3a * jsd_k3a;
-    
-    return List::create(
-        Named("a1") = a1,
-        Named("a2") = a2,
-        Named("a11") = a11,
-        Named("a21") = a21,
-        Named("a12") = a12,
-        Named("a22") = a22,
-        Named("a32") = a32,
-        Named("a42") = a42,
-        Named("a52") = a52,
-        Named("a62") = a62,
-        Named("a13") = a13,
-        Named("a23") = a23,
-        Named("a33") = a33,
-        Named("a43") = a43,
-        Named("a53") = a53,
-        Named("a63") = a63,
-        Named("a14") = a14,
-        Named("a24") = a24,
-        Named("a34") = a34,
-        Named("a44") = a44,
-        Named("a54") = a54,
-        Named("a64") = a64,
-        Named("a15") = a15,
-        Named("a25") = a25,
-        Named("a35") = a35,
-        Named("a45") = a45,
-        Named("a55") = a55,
-        Named("a65") = a65,
-        Named("a46") = a46,
-        Named("a56") = a56
-    );
-}
-
 // =============================================================================
 // Main exported function: compute b_m for all frequencies and modal orders
 // Returns a complex matrix (n_freq x n_m) of b_m values
 // =============================================================================
 // [[Rcpp::export]]
-ComplexMatrix goodman_stern_bm_cpp(
+ComplexMatrix elastic_shell_boundary_conditions_old(
     NumericVector k1a,       // k_sw * radius_shell for each frequency
     NumericVector kLa_shell, // kL * radius_shell
     NumericVector kTa_shell, // kT * radius_shell
@@ -622,6 +335,51 @@ ComplexMatrix goodman_stern_bm_cpp(
                 lambda, mu, rho_ratio_sw, rho_ratio_fl
             );
             result(f, mi) = to_Rcomplex(bm);
+        }
+    }
+    
+    return result;
+}
+// [[Rcpp::export]]
+ComplexMatrix elastic_shell_boundary_conditions(
+    NumericMatrix ka_matrix, // rows: "k1a_shell", "kLa_shell", ..., columns: freq
+    IntegerVector m_limit, // length n_freq, each entry is the max m for that freq
+    double lambda,
+    double mu,
+    double rho_ratio_sw,     // density_sw / density_shell
+    double rho_ratio_fl      // density_fluid / density_shell
+) {
+    int n_freq = ka_matrix.ncol();
+    int m_max = Rcpp::max(m_limit);
+    ComplexMatrix result(n_freq, m_max + 1);
+
+    // Row indices for ka_matrix
+    int idx_k1a_shell = 0;
+    int idx_kLa_shell = 1;
+    int idx_kTa_shell = 2;
+    int idx_kLa_fluid = 5;
+    int idx_kTa_fluid = 4;
+    int idx_k3a_fluid = 6;
+
+    for (int f = 0; f < n_freq; ++f) {
+        int m_limit_f = m_limit[f];
+        for (int m = 0; m <= m_max; ++m) {
+            if (m <= m_limit_f) {
+                std::complex<double> bm = compute_single_bm(
+                    m,
+                    ka_matrix(idx_k1a_shell, f),
+                    ka_matrix(idx_kLa_shell, f),
+                    ka_matrix(idx_kTa_shell, f),
+                    ka_matrix(idx_kLa_fluid, f),
+                    ka_matrix(idx_kTa_fluid, f),
+                    ka_matrix(idx_k3a_fluid, f),
+                    lambda, mu, rho_ratio_sw, rho_ratio_fl
+                );
+                result(f, m) = Rcpp::ComplexVector::get_na();
+                result(f, m) = to_Rcomplex(bm);
+            } else {
+                result(f, m) = Rcpp::ComplexVector::get_na();
+            }
         }
     }
     

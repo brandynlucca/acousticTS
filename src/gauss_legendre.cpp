@@ -75,19 +75,3 @@ List gauss_legendre_cpp(int n, double a = -1.0, double b = 1.0) {
     return List::create(Named("nodes") = nodes_mapped,
                         Named("weights") = weights_mapped);
 }
-
-// Optional test main
-#ifdef GAUSS_LEGENDRE_TEST
-#include <iostream>
-int main() {
-    int n = 5;
-    std::vector<double> nodes, weights;
-    gauss_legendre(n, nodes, weights);
-    std::cout << "Nodes:\n";
-    for (auto x : nodes) std::cout << x << " ";
-    std::cout << "\nWeights:\n";
-    for (auto w : weights) std::cout << w << " ";
-    std::cout << std::endl;
-    return 0;
-}
-#endif

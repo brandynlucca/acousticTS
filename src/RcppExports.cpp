@@ -174,73 +174,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// debug_bessel_values
-List debug_bessel_values(double kLa_s, int m);
-RcppExport SEXP _acousticTS_debug_bessel_values(SEXP kLa_sSEXP, SEXP mSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< double >::type kLa_s(kLa_sSEXP);
-    Rcpp::traits::input_parameter< int >::type m(mSEXP);
-    rcpp_result_gen = Rcpp::wrap(debug_bessel_values(kLa_s, m));
-    return rcpp_result_gen;
-END_RCPP
-}
-// det6x6_from_R
-std::complex<double> det6x6_from_R(ComplexMatrix M);
-RcppExport SEXP _acousticTS_det6x6_from_R(SEXP MSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< ComplexMatrix >::type M(MSEXP);
-    rcpp_result_gen = Rcpp::wrap(det6x6_from_R(M));
-    return rcpp_result_gen;
-END_RCPP
-}
-// debug_determinants
-ComplexVector debug_determinants(double k1a, double kLa_s, double kTa_s, double kLa_f, double kTa_f, double k3a, double lambda, double mu, double rho_ratio_sw, double rho_ratio_fl, int m);
-RcppExport SEXP _acousticTS_debug_determinants(SEXP k1aSEXP, SEXP kLa_sSEXP, SEXP kTa_sSEXP, SEXP kLa_fSEXP, SEXP kTa_fSEXP, SEXP k3aSEXP, SEXP lambdaSEXP, SEXP muSEXP, SEXP rho_ratio_swSEXP, SEXP rho_ratio_flSEXP, SEXP mSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< double >::type k1a(k1aSEXP);
-    Rcpp::traits::input_parameter< double >::type kLa_s(kLa_sSEXP);
-    Rcpp::traits::input_parameter< double >::type kTa_s(kTa_sSEXP);
-    Rcpp::traits::input_parameter< double >::type kLa_f(kLa_fSEXP);
-    Rcpp::traits::input_parameter< double >::type kTa_f(kTa_fSEXP);
-    Rcpp::traits::input_parameter< double >::type k3a(k3aSEXP);
-    Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
-    Rcpp::traits::input_parameter< double >::type mu(muSEXP);
-    Rcpp::traits::input_parameter< double >::type rho_ratio_sw(rho_ratio_swSEXP);
-    Rcpp::traits::input_parameter< double >::type rho_ratio_fl(rho_ratio_flSEXP);
-    Rcpp::traits::input_parameter< int >::type m(mSEXP);
-    rcpp_result_gen = Rcpp::wrap(debug_determinants(k1a, kLa_s, kTa_s, kLa_f, kTa_f, k3a, lambda, mu, rho_ratio_sw, rho_ratio_fl, m));
-    return rcpp_result_gen;
-END_RCPP
-}
-// debug_matrix_m1_f1
-List debug_matrix_m1_f1(double k1a, double kLa_s, double kTa_s, double kLa_f, double kTa_f, double k3a, double lambda, double mu, double rho_ratio_sw, double rho_ratio_fl);
-RcppExport SEXP _acousticTS_debug_matrix_m1_f1(SEXP k1aSEXP, SEXP kLa_sSEXP, SEXP kTa_sSEXP, SEXP kLa_fSEXP, SEXP kTa_fSEXP, SEXP k3aSEXP, SEXP lambdaSEXP, SEXP muSEXP, SEXP rho_ratio_swSEXP, SEXP rho_ratio_flSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< double >::type k1a(k1aSEXP);
-    Rcpp::traits::input_parameter< double >::type kLa_s(kLa_sSEXP);
-    Rcpp::traits::input_parameter< double >::type kTa_s(kTa_sSEXP);
-    Rcpp::traits::input_parameter< double >::type kLa_f(kLa_fSEXP);
-    Rcpp::traits::input_parameter< double >::type kTa_f(kTa_fSEXP);
-    Rcpp::traits::input_parameter< double >::type k3a(k3aSEXP);
-    Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
-    Rcpp::traits::input_parameter< double >::type mu(muSEXP);
-    Rcpp::traits::input_parameter< double >::type rho_ratio_sw(rho_ratio_swSEXP);
-    Rcpp::traits::input_parameter< double >::type rho_ratio_fl(rho_ratio_flSEXP);
-    rcpp_result_gen = Rcpp::wrap(debug_matrix_m1_f1(k1a, kLa_s, kTa_s, kLa_f, kTa_f, k3a, lambda, mu, rho_ratio_sw, rho_ratio_fl));
-    return rcpp_result_gen;
-END_RCPP
-}
-// goodman_stern_bm_cpp
-ComplexMatrix goodman_stern_bm_cpp(NumericVector k1a, NumericVector kLa_shell, NumericVector kTa_shell, NumericVector kLa_fluid, NumericVector kTa_fluid, NumericVector k3a_fluid, IntegerVector m_vec, double lambda, double mu, double rho_ratio_sw, double rho_ratio_fl);
-RcppExport SEXP _acousticTS_goodman_stern_bm_cpp(SEXP k1aSEXP, SEXP kLa_shellSEXP, SEXP kTa_shellSEXP, SEXP kLa_fluidSEXP, SEXP kTa_fluidSEXP, SEXP k3a_fluidSEXP, SEXP m_vecSEXP, SEXP lambdaSEXP, SEXP muSEXP, SEXP rho_ratio_swSEXP, SEXP rho_ratio_flSEXP) {
+// elastic_shell_boundary_conditions_old
+ComplexMatrix elastic_shell_boundary_conditions_old(NumericVector k1a, NumericVector kLa_shell, NumericVector kTa_shell, NumericVector kLa_fluid, NumericVector kTa_fluid, NumericVector k3a_fluid, IntegerVector m_vec, double lambda, double mu, double rho_ratio_sw, double rho_ratio_fl);
+RcppExport SEXP _acousticTS_elastic_shell_boundary_conditions_old(SEXP k1aSEXP, SEXP kLa_shellSEXP, SEXP kTa_shellSEXP, SEXP kLa_fluidSEXP, SEXP kTa_fluidSEXP, SEXP k3a_fluidSEXP, SEXP m_vecSEXP, SEXP lambdaSEXP, SEXP muSEXP, SEXP rho_ratio_swSEXP, SEXP rho_ratio_flSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -255,7 +191,23 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type mu(muSEXP);
     Rcpp::traits::input_parameter< double >::type rho_ratio_sw(rho_ratio_swSEXP);
     Rcpp::traits::input_parameter< double >::type rho_ratio_fl(rho_ratio_flSEXP);
-    rcpp_result_gen = Rcpp::wrap(goodman_stern_bm_cpp(k1a, kLa_shell, kTa_shell, kLa_fluid, kTa_fluid, k3a_fluid, m_vec, lambda, mu, rho_ratio_sw, rho_ratio_fl));
+    rcpp_result_gen = Rcpp::wrap(elastic_shell_boundary_conditions_old(k1a, kLa_shell, kTa_shell, kLa_fluid, kTa_fluid, k3a_fluid, m_vec, lambda, mu, rho_ratio_sw, rho_ratio_fl));
+    return rcpp_result_gen;
+END_RCPP
+}
+// elastic_shell_boundary_conditions
+ComplexMatrix elastic_shell_boundary_conditions(NumericMatrix ka_matrix, IntegerVector m_limit, double lambda, double mu, double rho_ratio_sw, double rho_ratio_fl);
+RcppExport SEXP _acousticTS_elastic_shell_boundary_conditions(SEXP ka_matrixSEXP, SEXP m_limitSEXP, SEXP lambdaSEXP, SEXP muSEXP, SEXP rho_ratio_swSEXP, SEXP rho_ratio_flSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type ka_matrix(ka_matrixSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type m_limit(m_limitSEXP);
+    Rcpp::traits::input_parameter< double >::type lambda(lambdaSEXP);
+    Rcpp::traits::input_parameter< double >::type mu(muSEXP);
+    Rcpp::traits::input_parameter< double >::type rho_ratio_sw(rho_ratio_swSEXP);
+    Rcpp::traits::input_parameter< double >::type rho_ratio_fl(rho_ratio_flSEXP);
+    rcpp_result_gen = Rcpp::wrap(elastic_shell_boundary_conditions(ka_matrix, m_limit, lambda, mu, rho_ratio_sw, rho_ratio_fl));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -309,209 +261,51 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// safe_cprofcn
-Rcpp::List safe_cprofcn(double c, int m, int lnum, Rcpp::NumericVector arg, int ioprad, int iopnorm, int iopang, double x1);
-RcppExport SEXP _acousticTS_safe_cprofcn(SEXP cSEXP, SEXP mSEXP, SEXP lnumSEXP, SEXP argSEXP, SEXP iopradSEXP, SEXP iopnormSEXP, SEXP iopangSEXP, SEXP x1SEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< double >::type c(cSEXP);
-    Rcpp::traits::input_parameter< int >::type m(mSEXP);
-    Rcpp::traits::input_parameter< int >::type lnum(lnumSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type arg(argSEXP);
-    Rcpp::traits::input_parameter< int >::type ioprad(iopradSEXP);
-    Rcpp::traits::input_parameter< int >::type iopnorm(iopnormSEXP);
-    Rcpp::traits::input_parameter< int >::type iopang(iopangSEXP);
-    Rcpp::traits::input_parameter< double >::type x1(x1SEXP);
-    rcpp_result_gen = Rcpp::wrap(safe_cprofcn(c, m, lnum, arg, ioprad, iopnorm, iopang, x1));
-    return rcpp_result_gen;
-END_RCPP
-}
 // Smn_cpp
-Rcpp::List Smn_cpp(int m, int n, double c, Rcpp::NumericVector arg, bool normalize);
-RcppExport SEXP _acousticTS_Smn_cpp(SEXP mSEXP, SEXP nSEXP, SEXP cSEXP, SEXP argSEXP, SEXP normalizeSEXP) {
+Rcpp::List Smn_cpp(Rcpp::IntegerVector m, Rcpp::IntegerVector n, double c, Rcpp::NumericVector arg, bool normalize, std::string precision);
+RcppExport SEXP _acousticTS_Smn_cpp(SEXP mSEXP, SEXP nSEXP, SEXP cSEXP, SEXP argSEXP, SEXP normalizeSEXP, SEXP precisionSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type m(mSEXP);
-    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type m(mSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type n(nSEXP);
     Rcpp::traits::input_parameter< double >::type c(cSEXP);
     Rcpp::traits::input_parameter< Rcpp::NumericVector >::type arg(argSEXP);
     Rcpp::traits::input_parameter< bool >::type normalize(normalizeSEXP);
-    rcpp_result_gen = Rcpp::wrap(Smn_cpp(m, n, c, arg, normalize));
-    return rcpp_result_gen;
-END_RCPP
-}
-// Smn_cpp_safe
-Rcpp::List Smn_cpp_safe(int m, int n, double c, Rcpp::NumericVector arg, bool normalize);
-RcppExport SEXP _acousticTS_Smn_cpp_safe(SEXP mSEXP, SEXP nSEXP, SEXP cSEXP, SEXP argSEXP, SEXP normalizeSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type m(mSEXP);
-    Rcpp::traits::input_parameter< int >::type n(nSEXP);
-    Rcpp::traits::input_parameter< double >::type c(cSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type arg(argSEXP);
-    Rcpp::traits::input_parameter< bool >::type normalize(normalizeSEXP);
-    rcpp_result_gen = Rcpp::wrap(Smn_cpp_safe(m, n, c, arg, normalize));
+    Rcpp::traits::input_parameter< std::string >::type precision(precisionSEXP);
+    rcpp_result_gen = Rcpp::wrap(Smn_cpp(m, n, c, arg, normalize, precision));
     return rcpp_result_gen;
 END_RCPP
 }
 // Rmn_cpp
-Rcpp::List Rmn_cpp(int m, int n, double c, double x1, int kind);
-RcppExport SEXP _acousticTS_Rmn_cpp(SEXP mSEXP, SEXP nSEXP, SEXP cSEXP, SEXP x1SEXP, SEXP kindSEXP) {
+Rcpp::List Rmn_cpp(Rcpp::IntegerVector m, Rcpp::IntegerVector n, double c, double x1, int kind, std::string precision);
+RcppExport SEXP _acousticTS_Rmn_cpp(SEXP mSEXP, SEXP nSEXP, SEXP cSEXP, SEXP x1SEXP, SEXP kindSEXP, SEXP precisionSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type m(mSEXP);
-    Rcpp::traits::input_parameter< int >::type n(nSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type m(mSEXP);
+    Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type n(nSEXP);
     Rcpp::traits::input_parameter< double >::type c(cSEXP);
     Rcpp::traits::input_parameter< double >::type x1(x1SEXP);
     Rcpp::traits::input_parameter< int >::type kind(kindSEXP);
-    rcpp_result_gen = Rcpp::wrap(Rmn_cpp(m, n, c, x1, kind));
+    Rcpp::traits::input_parameter< std::string >::type precision(precisionSEXP);
+    rcpp_result_gen = Rcpp::wrap(Rmn_cpp(m, n, c, x1, kind, precision));
     return rcpp_result_gen;
 END_RCPP
 }
-// liquid_spheroidal_expansion_matrix
-Rcpp::List liquid_spheroidal_expansion_matrix(int m_max, int n_max, double chi_sw, double chi_body, Rcpp::NumericVector nodes, Rcpp::NumericVector weights);
-RcppExport SEXP _acousticTS_liquid_spheroidal_expansion_matrix(SEXP m_maxSEXP, SEXP n_maxSEXP, SEXP chi_swSEXP, SEXP chi_bodySEXP, SEXP nodesSEXP, SEXP weightsSEXP) {
+// prolate_spheroid_fbs
+Rcpp::ComplexVector prolate_spheroid_fbs(Rcpp::DataFrame acoustics, Rcpp::DataFrame body, Rcpp::DataFrame medium, Rcpp::List integration_pts, std::string precision, std::string Amn_method);
+RcppExport SEXP _acousticTS_prolate_spheroid_fbs(SEXP acousticsSEXP, SEXP bodySEXP, SEXP mediumSEXP, SEXP integration_ptsSEXP, SEXP precisionSEXP, SEXP Amn_methodSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type m_max(m_maxSEXP);
-    Rcpp::traits::input_parameter< int >::type n_max(n_maxSEXP);
-    Rcpp::traits::input_parameter< double >::type chi_sw(chi_swSEXP);
-    Rcpp::traits::input_parameter< double >::type chi_body(chi_bodySEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type nodes(nodesSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type weights(weightsSEXP);
-    rcpp_result_gen = Rcpp::wrap(liquid_spheroidal_expansion_matrix(m_max, n_max, chi_sw, chi_body, nodes, weights));
-    return rcpp_result_gen;
-END_RCPP
-}
-// safe_liquid_spheroidal_expansion_matrix
-Rcpp::List safe_liquid_spheroidal_expansion_matrix(int m_max, int n_max, double chi_sw, double chi_body, Rcpp::NumericVector nodes, Rcpp::NumericVector weights);
-RcppExport SEXP _acousticTS_safe_liquid_spheroidal_expansion_matrix(SEXP m_maxSEXP, SEXP n_maxSEXP, SEXP chi_swSEXP, SEXP chi_bodySEXP, SEXP nodesSEXP, SEXP weightsSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type m_max(m_maxSEXP);
-    Rcpp::traits::input_parameter< int >::type n_max(n_maxSEXP);
-    Rcpp::traits::input_parameter< double >::type chi_sw(chi_swSEXP);
-    Rcpp::traits::input_parameter< double >::type chi_body(chi_bodySEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type nodes(nodesSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type weights(weightsSEXP);
-    rcpp_result_gen = Rcpp::wrap(safe_liquid_spheroidal_expansion_matrix(m_max, n_max, chi_sw, chi_body, nodes, weights));
-    return rcpp_result_gen;
-END_RCPP
-}
-// radial_external_incoming_matrix
-Rcpp::List radial_external_incoming_matrix(int m_max, int n_max, double chi_sw, double xi);
-RcppExport SEXP _acousticTS_radial_external_incoming_matrix(SEXP m_maxSEXP, SEXP n_maxSEXP, SEXP chi_swSEXP, SEXP xiSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type m_max(m_maxSEXP);
-    Rcpp::traits::input_parameter< int >::type n_max(n_maxSEXP);
-    Rcpp::traits::input_parameter< double >::type chi_sw(chi_swSEXP);
-    Rcpp::traits::input_parameter< double >::type xi(xiSEXP);
-    rcpp_result_gen = Rcpp::wrap(radial_external_incoming_matrix(m_max, n_max, chi_sw, xi));
-    return rcpp_result_gen;
-END_RCPP
-}
-// radial_external_scattering_matrix
-Rcpp::List radial_external_scattering_matrix(int m_max, int n_max, double chi_sw, double xi);
-RcppExport SEXP _acousticTS_radial_external_scattering_matrix(SEXP m_maxSEXP, SEXP n_maxSEXP, SEXP chi_swSEXP, SEXP xiSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type m_max(m_maxSEXP);
-    Rcpp::traits::input_parameter< int >::type n_max(n_maxSEXP);
-    Rcpp::traits::input_parameter< double >::type chi_sw(chi_swSEXP);
-    Rcpp::traits::input_parameter< double >::type xi(xiSEXP);
-    rcpp_result_gen = Rcpp::wrap(radial_external_scattering_matrix(m_max, n_max, chi_sw, xi));
-    return rcpp_result_gen;
-END_RCPP
-}
-// radial_internal_incoming_matrix
-Rcpp::List radial_internal_incoming_matrix(int m_max, int n_max, double chi_body, double xi);
-RcppExport SEXP _acousticTS_radial_internal_incoming_matrix(SEXP m_maxSEXP, SEXP n_maxSEXP, SEXP chi_bodySEXP, SEXP xiSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type m_max(m_maxSEXP);
-    Rcpp::traits::input_parameter< int >::type n_max(n_maxSEXP);
-    Rcpp::traits::input_parameter< double >::type chi_body(chi_bodySEXP);
-    Rcpp::traits::input_parameter< double >::type xi(xiSEXP);
-    rcpp_result_gen = Rcpp::wrap(radial_internal_incoming_matrix(m_max, n_max, chi_body, xi));
-    return rcpp_result_gen;
-END_RCPP
-}
-// boundary_coupling_regular_diag
-Rcpp::List boundary_coupling_regular_diag(int m_max, int n_max, double density_body, double density_sw, Rcpp::List Rmn_e1_matrix, Rcpp::List Rmn_i1_matrix);
-RcppExport SEXP _acousticTS_boundary_coupling_regular_diag(SEXP m_maxSEXP, SEXP n_maxSEXP, SEXP density_bodySEXP, SEXP density_swSEXP, SEXP Rmn_e1_matrixSEXP, SEXP Rmn_i1_matrixSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type m_max(m_maxSEXP);
-    Rcpp::traits::input_parameter< int >::type n_max(n_maxSEXP);
-    Rcpp::traits::input_parameter< double >::type density_body(density_bodySEXP);
-    Rcpp::traits::input_parameter< double >::type density_sw(density_swSEXP);
-    Rcpp::traits::input_parameter< Rcpp::List >::type Rmn_e1_matrix(Rmn_e1_matrixSEXP);
-    Rcpp::traits::input_parameter< Rcpp::List >::type Rmn_i1_matrix(Rmn_i1_matrixSEXP);
-    rcpp_result_gen = Rcpp::wrap(boundary_coupling_regular_diag(m_max, n_max, density_body, density_sw, Rmn_e1_matrix, Rmn_i1_matrix));
-    return rcpp_result_gen;
-END_RCPP
-}
-// boundary_coupling_scattering_diag
-Rcpp::List boundary_coupling_scattering_diag(int m_max, int n_max, double density_body, double density_sw, Rcpp::List Rmn_e3_matrix, Rcpp::List Rmn_i1_matrix);
-RcppExport SEXP _acousticTS_boundary_coupling_scattering_diag(SEXP m_maxSEXP, SEXP n_maxSEXP, SEXP density_bodySEXP, SEXP density_swSEXP, SEXP Rmn_e3_matrixSEXP, SEXP Rmn_i1_matrixSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type m_max(m_maxSEXP);
-    Rcpp::traits::input_parameter< int >::type n_max(n_maxSEXP);
-    Rcpp::traits::input_parameter< double >::type density_body(density_bodySEXP);
-    Rcpp::traits::input_parameter< double >::type density_sw(density_swSEXP);
-    Rcpp::traits::input_parameter< Rcpp::List >::type Rmn_e3_matrix(Rmn_e3_matrixSEXP);
-    Rcpp::traits::input_parameter< Rcpp::List >::type Rmn_i1_matrix(Rmn_i1_matrixSEXP);
-    rcpp_result_gen = Rcpp::wrap(boundary_coupling_scattering_diag(m_max, n_max, density_body, density_sw, Rmn_e3_matrix, Rmn_i1_matrix));
-    return rcpp_result_gen;
-END_RCPP
-}
-// liquid_spheroidal_kernel_matrices
-Rcpp::List liquid_spheroidal_kernel_matrices(int m_max, int n_max, double chi_sw, double chi_body, double xi, double density_body, double density_sw, Rcpp::NumericVector nodes, Rcpp::NumericVector weights, Rcpp::NumericMatrix smn_matrix);
-RcppExport SEXP _acousticTS_liquid_spheroidal_kernel_matrices(SEXP m_maxSEXP, SEXP n_maxSEXP, SEXP chi_swSEXP, SEXP chi_bodySEXP, SEXP xiSEXP, SEXP density_bodySEXP, SEXP density_swSEXP, SEXP nodesSEXP, SEXP weightsSEXP, SEXP smn_matrixSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type m_max(m_maxSEXP);
-    Rcpp::traits::input_parameter< int >::type n_max(n_maxSEXP);
-    Rcpp::traits::input_parameter< double >::type chi_sw(chi_swSEXP);
-    Rcpp::traits::input_parameter< double >::type chi_body(chi_bodySEXP);
-    Rcpp::traits::input_parameter< double >::type xi(xiSEXP);
-    Rcpp::traits::input_parameter< double >::type density_body(density_bodySEXP);
-    Rcpp::traits::input_parameter< double >::type density_sw(density_swSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type nodes(nodesSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type weights(weightsSEXP);
-    Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type smn_matrix(smn_matrixSEXP);
-    rcpp_result_gen = Rcpp::wrap(liquid_spheroidal_kernel_matrices(m_max, n_max, chi_sw, chi_body, xi, density_body, density_sw, nodes, weights, smn_matrix));
-    return rcpp_result_gen;
-END_RCPP
-}
-// liquid_spheroidal_simplified_expansion
-Rcpp::List liquid_spheroidal_simplified_expansion(int m_max, int n_max, double chi_sw, double chi_body, double xi, double density_sw, double density_body);
-RcppExport SEXP _acousticTS_liquid_spheroidal_simplified_expansion(SEXP m_maxSEXP, SEXP n_maxSEXP, SEXP chi_swSEXP, SEXP chi_bodySEXP, SEXP xiSEXP, SEXP density_swSEXP, SEXP density_bodySEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type m_max(m_maxSEXP);
-    Rcpp::traits::input_parameter< int >::type n_max(n_maxSEXP);
-    Rcpp::traits::input_parameter< double >::type chi_sw(chi_swSEXP);
-    Rcpp::traits::input_parameter< double >::type chi_body(chi_bodySEXP);
-    Rcpp::traits::input_parameter< double >::type xi(xiSEXP);
-    Rcpp::traits::input_parameter< double >::type density_sw(density_swSEXP);
-    Rcpp::traits::input_parameter< double >::type density_body(density_bodySEXP);
-    rcpp_result_gen = Rcpp::wrap(liquid_spheroidal_simplified_expansion(m_max, n_max, chi_sw, chi_body, xi, density_sw, density_body));
+    Rcpp::traits::input_parameter< Rcpp::DataFrame >::type acoustics(acousticsSEXP);
+    Rcpp::traits::input_parameter< Rcpp::DataFrame >::type body(bodySEXP);
+    Rcpp::traits::input_parameter< Rcpp::DataFrame >::type medium(mediumSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type integration_pts(integration_ptsSEXP);
+    Rcpp::traits::input_parameter< std::string >::type precision(precisionSEXP);
+    Rcpp::traits::input_parameter< std::string >::type Amn_method(Amn_methodSEXP);
+    rcpp_result_gen = Rcpp::wrap(prolate_spheroid_fbs(acoustics, body, medium, integration_pts, precision, Amn_method));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -530,28 +324,15 @@ static const R_CallMethodDef CallEntries[] = {
     {"_acousticTS_ys_deriv_cpp", (DL_FUNC) &_acousticTS_ys_deriv_cpp, 3},
     {"_acousticTS_hs_deriv_cpp", (DL_FUNC) &_acousticTS_hs_deriv_cpp, 3},
     {"_acousticTS_gauss_legendre_cpp", (DL_FUNC) &_acousticTS_gauss_legendre_cpp, 3},
-    {"_acousticTS_debug_bessel_values", (DL_FUNC) &_acousticTS_debug_bessel_values, 2},
-    {"_acousticTS_det6x6_from_R", (DL_FUNC) &_acousticTS_det6x6_from_R, 1},
-    {"_acousticTS_debug_determinants", (DL_FUNC) &_acousticTS_debug_determinants, 11},
-    {"_acousticTS_debug_matrix_m1_f1", (DL_FUNC) &_acousticTS_debug_matrix_m1_f1, 10},
-    {"_acousticTS_goodman_stern_bm_cpp", (DL_FUNC) &_acousticTS_goodman_stern_bm_cpp, 11},
+    {"_acousticTS_elastic_shell_boundary_conditions_old", (DL_FUNC) &_acousticTS_elastic_shell_boundary_conditions_old, 11},
+    {"_acousticTS_elastic_shell_boundary_conditions", (DL_FUNC) &_acousticTS_elastic_shell_boundary_conditions, 6},
     {"_acousticTS_Pn_cpp", (DL_FUNC) &_acousticTS_Pn_cpp, 2},
     {"_acousticTS_Pn_deriv_cpp", (DL_FUNC) &_acousticTS_Pn_deriv_cpp, 3},
     {"_acousticTS_Qn_cpp", (DL_FUNC) &_acousticTS_Qn_cpp, 2},
     {"_acousticTS_Qn_deriv_cpp", (DL_FUNC) &_acousticTS_Qn_deriv_cpp, 3},
-    {"_acousticTS_safe_cprofcn", (DL_FUNC) &_acousticTS_safe_cprofcn, 8},
-    {"_acousticTS_Smn_cpp", (DL_FUNC) &_acousticTS_Smn_cpp, 5},
-    {"_acousticTS_Smn_cpp_safe", (DL_FUNC) &_acousticTS_Smn_cpp_safe, 5},
-    {"_acousticTS_Rmn_cpp", (DL_FUNC) &_acousticTS_Rmn_cpp, 5},
-    {"_acousticTS_liquid_spheroidal_expansion_matrix", (DL_FUNC) &_acousticTS_liquid_spheroidal_expansion_matrix, 6},
-    {"_acousticTS_safe_liquid_spheroidal_expansion_matrix", (DL_FUNC) &_acousticTS_safe_liquid_spheroidal_expansion_matrix, 6},
-    {"_acousticTS_radial_external_incoming_matrix", (DL_FUNC) &_acousticTS_radial_external_incoming_matrix, 4},
-    {"_acousticTS_radial_external_scattering_matrix", (DL_FUNC) &_acousticTS_radial_external_scattering_matrix, 4},
-    {"_acousticTS_radial_internal_incoming_matrix", (DL_FUNC) &_acousticTS_radial_internal_incoming_matrix, 4},
-    {"_acousticTS_boundary_coupling_regular_diag", (DL_FUNC) &_acousticTS_boundary_coupling_regular_diag, 6},
-    {"_acousticTS_boundary_coupling_scattering_diag", (DL_FUNC) &_acousticTS_boundary_coupling_scattering_diag, 6},
-    {"_acousticTS_liquid_spheroidal_kernel_matrices", (DL_FUNC) &_acousticTS_liquid_spheroidal_kernel_matrices, 10},
-    {"_acousticTS_liquid_spheroidal_simplified_expansion", (DL_FUNC) &_acousticTS_liquid_spheroidal_simplified_expansion, 7},
+    {"_acousticTS_Smn_cpp", (DL_FUNC) &_acousticTS_Smn_cpp, 6},
+    {"_acousticTS_Rmn_cpp", (DL_FUNC) &_acousticTS_Rmn_cpp, 6},
+    {"_acousticTS_prolate_spheroid_fbs", (DL_FUNC) &_acousticTS_prolate_spheroid_fbs, 6},
     {NULL, NULL, 0}
 };
 

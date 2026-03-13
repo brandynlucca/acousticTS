@@ -7,7 +7,7 @@ using namespace Rcpp;
 
 // Define PI and Tolerance for consistency
 const double pi = M_PI; 
-const double tol = 1.490116e-08; 
+const double tol = 1e-300; 
 const std::complex<double> i_unit(0.0, 1.0);
 
 // --------------------------------------------------------------------------
@@ -251,57 +251,11 @@ double js_deriv_single_impl(int li, double zi, int k) {
     std::vector<double> D(k + 1);
     D[0] = j_l;
     D[1] = jp_l;
-    
-    // Use the ODE: j'' = -(2/z) j' + [l(l+1)/z^2 - 1] j
-    // Differentiate to get higher derivatives
-    // Let a = -2/z, b = l(l+1)/z^2 - 1
-    // j'' = a*j' + b*j
-    // j''' = a'*j' + a*j'' + b'*j + b*j'
-    //      = a*j'' + (a' + b)*j' + b'*j
-    // where a' = 2/z^2, b' = -2*l(l+1)/z^3
-    
+
     // General pattern using Leibniz rule on j'' = a*j' + b*j:
     // j^(n) = sum over terms involving j^(i) for i < n
-    
-    // Simpler: compute iteratively using the recurrence from the ODE
+    // Compute iteratively using the recurrence from the ODE
     for (int n = 2; n <= k; ++n) {
-        // From z^2 j'' + 2z j' + (z^2 - l(l+1)) j = 0
-        // Differentiate (n-2) times using Leibniz rule:
-        // sum_{i=0}^{n-2} C(n-2,i) * [d^i(z^2) * j^(n-i) + d^i(2z) * j^(n-1-i) + d^i(z^2-l(l+1)) * j^(n-2-i)] = 0
-        
-        // d^i(z^2):  i=0: z^2, i=1: 2z, i=2: 2, i>=3: 0
-        // d^i(2z):   i=0: 2z, i=1: 2, i>=2: 0
-        // d^i(z^2):  i=0: z^2, i=1: 2z, i=2: 2, i>=3: 0 (same as above, -l(l+1) is constant)
-        
-        // For n=2: z^2 j'' + 2z j' + (z^2 - l(l+1)) j = 0
-        //          j'' = -(2/z) j' - (1 - l(l+1)/z^2) j
-        
-        // For n=3: differentiate the ODE once
-        // z^2 j''' + 2z j'' + 2z j'' + 2 j' + (z^2 - l(l+1)) j' + 2z j = 0
-        // z^2 j''' + 4z j'' + (z^2 - l(l+1) + 2) j' + 2z j = 0
-        // j''' = -(4/z) j'' - (1 - l(l+1)/z^2 + 2/z^2) j' - (2/z) j
-        
-        // This is getting complicated. Let's use a cleaner matrix approach.
-        // Actually, let's just directly implement the pattern.
-        
-        // From the ODE: j'' = -2/z * j' + (l(l+1)/z^2 - 1) * j
-        // Define coefficients that change with each differentiation
-        
-        // Use numerical differentiation of the recurrence
-        // Actually, the cleanest is to compute j^(n) from the relation:
-        // j^(n)_l can be expressed as linear combination of j_m for m in some range
-        
-        // Let me use the explicit formula approach instead
-        // Actually, let's compute using the generating relation
-        
-        // Alternative: use the relation j''_l = [l(l-1)/z^2 - 1] j_l + (2/z) j_{l+1}
-        // which comes from combining the two recurrence relations
-        
-        // j''_l = j'_{l-1} - (l+1)/z * j'_l + (l+1)/z^2 * j_l
-        // Need j'_{l-1} = j_{l-2} - l/z * j_{l-1}  (if l >= 2)
-        // This requires more Bessel values
-        
-        // Let's just use the ODE directly for second derivative and iterate
         // j'' = -(2/z) j' + [l(l+1)/z^2 - 1] j
         
         if (n == 2) {
@@ -311,34 +265,13 @@ double js_deriv_single_impl(int li, double zi, int k) {
             // z^2 D[n] + 2(n-2) z D[n-1] + (n-2)(n-3) D[n-2]
             //   + 2z D[n-1] + 2(n-2) D[n-2] 
             //   + (z^2 - ll1) D[n-2] + 2(n-2) z D[n-3] + (n-2)(n-3) D[n-4] = 0
-            // 
-            // Collecting for n >= 4:
-            // z^2 D[n] + 2(n-1) z D[n-1] + [(n-2)(n-3) + 2(n-2) + z^2 - ll1] D[n-2] 
-            //          + 2(n-2) z D[n-3] + (n-2)(n-3) D[n-4] = 0
-            //
-            // Hmm, getting complex. Let me just hard-code up to a reasonable k.
-            
-            // For now, use a numerical differentiation approach based on the ODE
-            // j^(n) = -(2/z) j^(n-1) + (ll1/z^2 - 1) j^(n-2) 
-            //       + correction terms from differentiating -2/z and ll1/z^2 - 1
-            
-            // d/dz[-2/z] = 2/z^2
-            // d/dz[ll1/z^2 - 1] = -2*ll1/z^3
-            // d^2/dz^2[-2/z] = -4/z^3
-            // d^2/dz^2[ll1/z^2 - 1] = 6*ll1/z^4
-            
-            // This is the Leibniz rule application
-            // Let a(z) = -2/z, b(z) = ll1/z^2 - 1
-            // j'' = a*j' + b*j
-            // j^(n) = sum_{i=0}^{n-2} C(n-2,i) [a^(i) j^(n-1-i) + b^(i) j^(n-2-i)]
-            
+                        
             double sum = 0.0;
             double binom = 1.0;
             for (int i = 0; i <= n - 2; ++i) {
                 if (i > 0) binom = binom * (n - 2 - i + 1) / i;
                 
-                // a^(i) = (-1)^i * (i+1)! * (-2) / z^{i+1} = (-1)^{i+1} * 2 * (i+1)! / z^{i+1}
-                // Actually: d^i/dz^i [-2/z] = (-2) * (-1)^i * i! / z^{i+1} = 2 * (-1)^{i+1} * i! / z^{i+1}
+                // d^i/dz^i [-2/z] = (-2) * (-1)^i * i! / z^{i+1} = 2 * (-1)^{i+1} * i! / z^{i+1}
                 double a_i = 2.0 * (i % 2 == 0 ? -1.0 : 1.0);
                 double fact_i = 1.0;
                 for (int f = 1; f <= i; ++f) fact_i *= f;

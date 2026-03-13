@@ -1,7 +1,6 @@
 // [[Rcpp::depends(BH)]]
 #include <Rcpp.h>
 #include <boost/math/special_functions/legendre.hpp>
-#include <boost/math/special_functions/gamma.hpp>
 #include <complex>
 #include <cmath>
 
@@ -134,35 +133,15 @@ NumericMatrix Pn_deriv_cpp(NumericVector n, NumericVector x, int k) {
             double xj = x[j];
             
             // For integer n, use the relation:
-            // d^k/dx^k P_n(x) is related to associated Legendre P_n^k(x)
-            // d^k P_n / dx^k = ((1-x^2)^(-k/2)) * P_n^k(x) * factor
-            // But more directly, use recurrence or Boost
-            
+            // d^k/dx^k P_n(x) is related to associated Legendre P_n^k(x)           
             if (is_integer && k > ni_int) {
                 // k-th derivative of polynomial of degree n is 0 if k > n
                 result(i, j) = 0.0;
             } else if (is_integer) {
-                // Use the formula:
-                // d^k P_n / dx^k = (2^k * n! / (n-k)!) * sum terms
-                // Or use the associated Legendre connection:
-                // d^k P_n(x) / dx^k = (-1)^k * (1-x^2)^(-k/2) * P_n^k(x) 
-                //                      (for |x| < 1, with appropriate phase)
-                
-                // More stable: use recurrence
-                // P_n^(k)(x) = (1/(1-x^2)) * [(n+k-1)(n-k+2) P_{n-1}^(k-1) 
-                //              - (n+1)x P_n^(k-1)]  ... complex recurrence
-                
-                // Simplest: numerical differentiation via finite differences
-                // or use Boost's associated Legendre
-                
                 // Using Boost associated Legendre:
                 // d^k P_n / dx^k at interior points can be computed as:
                 double val;
                 if (std::abs(xj * xj - 1.0) < 1e-10) {
-                    // At endpoints x = ±1, use known formulas
-                    // P_n^(k)(1) = n!/(2^k (n-k)!) * product terms
-                    // For k=1: P'_n(1) = n(n+1)/2
-                    // For k=2: P''_n(1) = (n-1)n(n+1)(n+2)/8
                     // General: product_{j=0}^{k-1} (n-j)(n+1+j) / (2^k * k!)
                     double prod = 1.0;
                     for (int m = 0; m < k; ++m) {
@@ -178,10 +157,7 @@ NumericMatrix Pn_deriv_cpp(NumericVector n, NumericVector x, int k) {
                     }
                 } else {
                     // Interior point: use associated Legendre
-                    // d^k P_n(x)/dx^k = C_nk * (1-x^2)^(-k/2) * P_n^k(x)
-                    // where C_nk involves factorials
-                    // Actually: P_n^m(x) = (-1)^m (1-x^2)^(m/2) d^m P_n/dx^m
-                    // So: d^m P_n/dx^m = (-1)^m (1-x^2)^(-m/2) P_n^m(x)
+                    // d^m P_n/dx^m = (-1)^m (1-x^2)^(-m/2) P_n^m(x)
                     
                     double assoc_legendre = boost::math::legendre_p(ni_int, k, xj);
                     double sign = (k % 2 == 0) ? 1.0 : -1.0;
@@ -191,7 +167,7 @@ NumericMatrix Pn_deriv_cpp(NumericVector n, NumericVector x, int k) {
                 result(i, j) = val;
             } else {
                 // Fractional order: use numerical differentiation
-                // This is more complex; for now, use finite differences
+                // This is more complex --> use finite differences
                 double h = 1e-6;
                 if (k == 1) {
                     NumericVector x_plus = NumericVector::create(xj + h);
@@ -394,56 +370,3 @@ ComplexMatrix Qn_deriv_cpp(NumericVector n, NumericVector x, int k) {
     
     return result;
 }
-// double Qn_cpp(double nu, double x) {
-//     if(!(x > -1.0 && x < 1.0)) stop("x must be in (-1,1)");
-
-//     // Integer nu: call Boost directly
-//     double nint = std::round(nu);
-//     if(std::abs(nu - nint) < 1e-14) {
-//         return legendre_q(static_cast<unsigned>(nint), x);
-//     }
-
-//     // Fractional nu: use Ferrers identity
-//     double P_x  = ferrers_P(nu,  x);
-//     double P_nx = ferrers_P(nu, -x);
-
-//     double sinpi = std::sin(M_PI * nu);
-//     double cospi = std::cos(M_PI * nu);
-
-//     double Q = (M_PI / (2.0 * sinpi)) * (cospi * P_x - P_nx);
-
-//     return Q;
-// }
-
-// NumericMatrix Pn_cpp(IntegerVector n, NumericVector x) {
-//   int N = n.size();
-//   int X = x.size();
-//   NumericMatrix result(N, X);
-
-//   for (int i = 0; i < N; ++i) {
-//     // Check: n is integer and non-negative
-//     int ni = n[i];
-//     if (ni < 0 || ni != floor(ni)) {
-//         stop("'n' must be a non-negative integer.");
-//     }
-//     for (int j = 0; j < X; ++j) {
-//       double xj = x[j];
-//       if (ni == 0) {
-//         result(i, j) = 1.0;
-//       } else if (ni == 1) {
-//         result(i, j) = xj;
-//       } else {
-//         double Pn_2 = 1.0;
-//         double Pn_1 = xj;
-//         double Pn_val = 0.0;
-//         for (int k = 2; k <= ni; ++k) {
-//           Pn_val = ((2.0 * k - 1.0) * xj * Pn_1 - (k - 1.0) * Pn_2) / k;
-//           Pn_2 = Pn_1;
-//           Pn_1 = Pn_val;
-//         }
-//         result(i, j) = Pn_val;
-//       }
-//     }
-//   }
-//   return result;
-// }
