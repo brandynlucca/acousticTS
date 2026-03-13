@@ -5,7 +5,7 @@
 \title{Prolate Spheroidal Angular Function of the First Kind, \eqn{S^{1}_{mn}(c,
 \eta)}}
 \usage{
-Smn(m, n, c, eta, normalize = FALSE)
+Smn(m, n, c, eta, normalize = FALSE, precision = "double")
 }
 \arguments{
 \item{m}{Non-negative integer. The order of the spheroidal function (\eqn{m
@@ -14,9 +14,7 @@ Smn(m, n, c, eta, normalize = FALSE)
 \item{n}{Non-negative integer. The degree of the spheroidal function (\eqn{n
 \geq m}).}
 
-\item{c}{Numeric. The size parameter (also denoted \eqn{\gamma} in some
-references), equal to \eqn{kd/2} where \eqn{k} is the wavenumber and \eqn{d}
-is the interfocal distance.}
+\item{c}{Numeric. The scalar size parameter.}
 
 \item{eta}{Numeric vector. The angular coordinate(s) at which to evaluate the
 function. Must satisfy \eqn{|\eta| \leq 1}.}
@@ -24,6 +22,16 @@ function. Must satisfy \eqn{|\eta| \leq 1}.}
 \item{normalize}{Logical. If \code{TRUE}, the angular functions are
 normalized to have unity norm. If \code{FALSE} (default), the
 Meixner-Schäfke normalization is used.}
+
+\item{precision}{Character. Either \code{"double"} (default) or \code{"quad"}. Controls the
+floating-point precision used in the underlying Fortran computation.
+\describe{
+\item{\code{"double"}}{Uses standard double-precision (64-bit) arithmetic. Fastest and
+sufficient for most applications.}
+\item{\code{"quad"}}{Uses quadruple-precision (128-bit) arithmetic for higher numerical
+accuracy in challenging parameter regimes (e.g., large \eqn{m}, \eqn{n}, or near
+singularities). Computation is significantly slower.}
+}}
 }
 \value{
 A list containing:
@@ -39,6 +47,11 @@ Computes the prolate spheroidal angular function of the first kind,
 \eqn{S_{mn}^{(1)}(c, \eta)}, and its first derivative with respect to
 \eqn{\eta} for given order \eqn{m}, degree \eqn{n}, size parameter \eqn{c},
 and angular coordinate \eqn{\eta}.
+
+This function is an R wrapper for compiled C++ code, which in turn calls the
+underlying Fortran library (\code{prolate_swf}) for high-performance numerical
+computation. All heavy computation is performed in compiled code for speed and
+accuracy.
 }
 \details{
 The prolate spheroidal angular functions are solutions to the angular part
@@ -63,11 +76,13 @@ corresponding associated Legendre functions. When \code{normalize = TRUE},
 the functions are scaled to have unity norm.
 
 \strong{Implementation:}
-This function is a wrapper for the Fortran subroutine \code{profcn} from the
+This function is an R wrapper for a compiled C++ interface (\code{Smn_cpp}),
+which itself wraps the Fortran subroutine \code{profcn} from the
 \code{prolate_swf} library developed by Arnie Lee Van Buren and Jeffrey
-Boisvert.  The underlying algorithm uses a combination of forward and
+Boisvert. The underlying algorithm uses a combination of forward and
 backward recursion with the Bouwkamp eigenvalue method for high accuracy
-across wide parameter ranges.
+across wide parameter ranges. The C++ layer manages memory, precision selection, and data
+conversion between R and Fortran for robust and efficient computation.
 }
 \examples{
 # Single evaluation
@@ -78,6 +93,12 @@ Smn(m = 0, n = 2, c = 5, eta = c(-0.5, 0, 0.5))
 
 # With unity normalization
 Smn(m = 1, n = 1, c = 2, eta = 0.3, normalize = TRUE)
+
+# Double precision (default)
+Smn(m = 2, n = 3, c = 1, eta = 0.5, precision = "double")
+
+# Quad precision
+Smn(m = 2, n = 3, c = 1, eta = 0.5, precision = "quad")
 
 }
 \references{

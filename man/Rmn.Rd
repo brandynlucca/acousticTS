@@ -4,7 +4,7 @@
 \alias{Rmn}
 \title{Prolate Spheroidal Radial Functions}
 \usage{
-Rmn(m, n, c, xi, kind = 1)
+Rmn(m, n, c, xi, kind = 1, precision = "double")
 }
 \arguments{
 \item{m}{Non-negative integer. The order of the spheroidal function (\eqn{m
@@ -13,9 +13,8 @@ Rmn(m, n, c, xi, kind = 1)
 \item{n}{Non-negative integer. The degree of the spheroidal function (\eqn{n
 \geq m}).}
 
-\item{c}{Numeric. The size parameter (also denoted \eqn{\gamma} in some
-references), equal to \eqn{kd/2} where \eqn{k} is the wavenumber and \eqn{d}
-is the interfocal distance.}
+\item{c}{Numeric. The scalar size parameter (also denoted \eqn{\gamma} in some
+references).}
 
 \item{xi}{Numeric. The radial coordinate at which to evaluate the function.
 Must satisfy \eqn{\xi \geq 1}.}
@@ -23,6 +22,16 @@ Must satisfy \eqn{\xi \geq 1}.}
 \item{kind}{Integer. Specifies which kind of radial function to compute:
 \code{1} (first kind), \code{2} (second kind), \code{3} (third
 kind/outgoing), or \code{4} (fourth kind/incoming). Default is \code{1}.}
+
+\item{precision}{Character. Either \code{"double"} (default) or \code{"quad"}. Controls the
+floating-point precision used in the underlying Fortran computation.
+\describe{
+\item{\code{"double"}}{Uses standard double-precision (64-bit) arithmetic. Fastest and
+sufficient for most applications.}
+\item{\code{"quad"}}{Uses quadruple-precision (128-bit) arithmetic for higher numerical
+accuracy in challenging parameter regimes (e.g., large \eqn{m}, \eqn{n}, \eqn{c}, or near
+singularities). Computation is significantly slower.}
+}}
 }
 \value{
 A list containing:
@@ -40,6 +49,11 @@ Computes the prolate spheroidal radial functions of the first
 (\eqn{R_{mn}^{(3)}}), and fourth (\eqn{R_{mn}^{(4)}}) kinds and their first
 derivatives with respect to \eqn{\xi} for given order \eqn{m}, degree
 \eqn{n}, size parameter \eqn{c}, and radial coordinate \eqn{\xi}.
+
+This function is an R wrapper for compiled C++ code, which in turn calls the
+underlying Fortran library (\code{prolate_swf}) for high-performance numerical
+computation. All heavy computation is performed in compiled code for speed and
+accuracy.
 }
 \details{
 The prolate spheroidal radial functions are solutions to the radial part
@@ -79,16 +93,13 @@ radial functions reduce to spherical Bessel/Neumann functions as
 \eqn{c \rightarrow 0}.
 
 \strong{Implementation:}
-This function is a wrapper for the Fortran subroutine \code{profcn} from the
+This function is an R wrapper for a compiled C++ interface (\code{Rmn_cpp}),
+which itself wraps the Fortran subroutine \code{profcn} from the
 \code{prolate_swf} library developed by Arnie Lee Van Buren and Jeffrey
-Boisvert. The underlying algorithm employs multiple methods including:
-\itemize{
-\item Spherical Bessel function expansions
-\item Legendre function expansions with joining factors
-\item Neumann function expansions
-\item Numerical integration methods
-}
-to achieve high accuracy across wide parameter ranges.
+Boisvert. The underlying algorithm uses a combination of forward and
+backward recursion with the Bouwkamp eigenvalue method for high accuracy
+across wide parameter ranges. The C++ layer manages memory, precision selection, and data
+conversion between R and Fortran for robust and efficient computation.
 }
 \examples{
 # First kind radial function
@@ -102,6 +113,12 @@ Rmn(m = 1, n = 1, c = 2, xi = 1.2, kind = 3)
 
 # Fourth kind (incoming) radial function
 Rmn(m = 1, n = 1, c = 2, xi = 1.2, kind = 4)
+
+# Double precision (default)
+Rmn(m = 2, n = 3, c = 1, xi = 1.5)
+
+# Quad precision
+Rmn(m = 2, n = 3, c = 1, xi = 1.5, precision = "quad")
 
 }
 \references{

@@ -1,9 +1,6 @@
 ################################################################################
 # Constants used throughout the acousticTS package
 ################################################################################
-# Floating point epsilon
-.EPS <- 1e-12
-
 # Broadside incidence angle (radians)
 .BROADSIDE_ORIENTATION_DEFAULT <- pi/2
 
@@ -20,10 +17,10 @@
 .AIR_DENSITY_CONTRAST_DEFAULT <- 0.0012
 
 # Seawater sound speed (m/s)
-.SEAWATER_SOUND_SPEED_DEFAULT <- 1500
+.SEAWATER_SOUND_SPEED_DEFAULT <- 1477.3
 
 # Seawater density (kg/m^3)
-.SEAWATER_DENSITY_DEFAULT <- 1026
+.SEAWATER_DENSITY_DEFAULT <- 1026.8
 
 # Aragonite shear sound speed (m/s)
 .ARAGONITE_SOUND_SPEED_S_DEFAULT <- 3750

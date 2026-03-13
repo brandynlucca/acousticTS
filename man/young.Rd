@@ -15,13 +15,16 @@ young(K = NULL, G = NULL, nu = NULL)
 \item{nu}{Poisson's ratio (Dimensionless).}
 }
 \value{
-Returns an estimate for the Young's modulus (E).
+Young's modulus (E, Pa).
 }
 \description{
-Calculate the Young's modulus (E) from two of the three other elastic
-moduli to calculate the Lamé's parameter. When more than two
-values are input, the function will default to using the bulk (K) and shear
-(G) moduli. This assumes that the input values represent 3D material
-properties.
+Calculates Young's modulus (E) from two of the three other elastic moduli:
+bulk modulus (K), shear modulus (G), or Poisson's ratio (\eqn{\nu}).
+Assumes 3D material properties.
+
+The relationships used are:
+\deqn{E = \frac{9KG}{3K + G}}
+\deqn{E = 3K(1 - 2\nu)}
+\deqn{E = 2G(1 + \nu)}
 }
 \keyword{elastic}

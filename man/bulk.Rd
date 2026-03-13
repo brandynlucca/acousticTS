@@ -15,13 +15,16 @@ bulk(E = NULL, G = NULL, nu = NULL)
 \item{nu}{Poisson's ratio (Dimensionless).}
 }
 \value{
-Returns an estimate for the bulk modulus (K).
+Bulk modulus (K, Pa).
 }
 \description{
-Calculate the bulk modulus (K) from two of the three other elastic
-moduli to calculate the Lamé's parameter. When more than two
-values are input, the function will default to using Young's (E) and shear
-(G) moduli. This assumes that the input values represent 3D material
-properties.
+Calculates the bulk modulus (K) from two of the three other elastic moduli:
+Young's modulus (E), shear modulus (G), or Poisson's ratio (\eqn{\nu}).
+Assumes 3D material properties.
+
+The relationships used are:
+\deqn{K = \frac{E G}{3(3G - E)}}
+\deqn{K = \frac{2G(1 + \nu)}{3(1 - 2\nu)}}
+\deqn{K = \frac{E}{3(1 - 2\nu)}}
 }
 \keyword{elastic}

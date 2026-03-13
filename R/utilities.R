@@ -7,168 +7,76 @@
 ################################################################################
 ################################################################################
 #' Calculate maximum radius from explicit value or ratio
-#' 
+#'
 #' Internal helper function to standardize radius calculation logic across
 #' shape creation functions.
-#' 
+#'
 #' @param radius Explicit radius value (can be NULL)
 #' @param length Body length
 #' @param length_radius_ratio Length-to-radius ratio (can be NULL)
 #' @return Calculated radius
 #' @keywords internal
+#' @noRd
 .calculate_max_radius <- function(radius, length, length_radius_ratio) {
   if (!is.null(radius)) {
     return(radius)
   }
-  
+
   if (!is.null(length_radius_ratio)) {
     return(length / length_radius_ratio)
   }
-  
+
   stop(
     "Either 'radius' or 'length_radius_ratio' must be provided.",
     call. = FALSE
   )
 }
 
-#' Validate dimensional parameter (target or scale)
-#' 
-#' Internal helper to validate named numeric vectors used in reforge operations.
-#' 
-#' @param param The parameter to validate
-#' @param param_name Name of the parameter (for error messages)
-#' @param valid_names Character vector of valid dimension names
-#' @param allow_scalar Whether to allow scalar values
-#' @param require_names Whether named vectors are required
-#' @return Validated parameter (invisibly)
+#' Derive density and sound speed contrasts from absolute properties
+#'
+#' Prefer explicit contrasts `g`/`h` when present; otherwise compute them
+#' relative to the provided medium properties when absolute density and/or
+#' sound speed are available.
+#'
+#' @param body List-like object containing optional `g`, `h`, `density`,
+#'   and `sound_speed` entries.
+#' @param medium_sound_speed Surrounding-medium sound speed.
+#' @param medium_density Surrounding-medium density.
+#' @return Named list with elements `g` and `h` (may be NA if insufficient
+#'   information was provided).
 #' @keywords internal
-.validate_dimension_param <- function(dims, 
-                                      dims_name, 
-                                      valid_dims,
-                                      isometry,
-                                      iso_name) {
-  # No dimensions provided
-  if (is.null(dims)) return(NULL)
-  
-  # Check if dimensions are all numeric
-  if (!is.numeric(dims)) {
-    stop("'", dims_name, "' must be numeric.", call. = FALSE)
+#' @noRd
+.derive_contrasts <- function(body, medium_sound_speed, medium_density) {
+  h <- if (!is.null(body$h)) {
+    body$h
+  } else if (!is.null(body$sound_speed)) {
+    body$sound_speed / medium_sound_speed
+  } else {
+    NA
   }
-  
-  # Handle scalar case where `isometry=TRUE`
-  if (length(dims) == 1 && isometry && 
-      (is.null(names(dims)) || all(names(dims) %in% valid_dims)) ) {
-    return(stats::setNames(rep(dims, length(valid_dims)), valid_dims))
-  }
-  
-  # Check for missing names
-  if (is.null(names(dims))) {
-    stop(
-      sprintf(
-        paste0(
-          "'%s' must either be a scalar or a named vector with dimensions: %s."
-        ),
-        dims_name,
-        paste0("'", valid_dims, "'", collapse=", ")
-      ),
-      call.=FALSE
-    )
-  }
-  
-  # Handle vector case where `isometry=TRUE`
-  if (length(dims) > 1 && isometry) {
-    # ---- Get the names
-    input_names <- names(dims)
-    stop(
-      sprintf(
-        paste0(
-          "'%s' contains more than 1 dimension while '%s' is TRUE. When TRUE ",
-          "'%s' must be a scalar value."
-        ),
-        dims_name,
-        iso_name,
-        dims_name
-      ),
-      call. = FALSE
-    )
-  }
-  
-  # Check for invalid names
-  invalid_dims <- setdiff(names(dims), valid_dims)
-  if (length(invalid_dims) > 0) {
-    stop(
-      sprintf(
-        paste0(
-          "'%s' has one or more invalid dimensions: %s. ",
-          "Expected dimensions are: %s."
-        ),
-        dims_name,
-        paste0("'", invalid_dims, "'", collapse=", "),
-        paste0("'", valid_dims, "'", collapse=", ")
-      ),
-      call. = FALSE
-    )
-  }
-  
-  # Handle scalar case where `isometry=FALSE`
-  if (!isometry) {
-    if (is.null(names(dims))) {
-      stop(
-        sprintf(
-          paste0(
-            "When '%s' is FALSE, '%s' must be a named vector with at least ",
-            "one of the following dimensions: %s."
-          ),
-          iso_name,
-          dims_name,
-          paste0("'", valid_dims, "'", collapse=", ")
-        ),
-        call. = FALSE
-      )      
-    }
-    # ---- Initialize vector
-    output_dims <- stats::setNames(rep(1, length(valid_dims)), valid_dims)
-    # ---- Override and return
-    output_dims[names(dims)] <- dims
-    return(output_dims)
-  }
-  
-  dims
-}
 
-.validate_dimensions_target <- function(dims, dims_name, valid_dims) {
-  
-  # No dimensions provided
-  if (is.null(dims)) return(NULL)
-  
-  # Check for missing names
-  if (is.null(names(dims))) {
-    stop(
-      sprintf(
-        paste0(
-          "'%s' must either be a scalar or a named vector with dimensions: %s."
-        ),
-        dims_name,
-        paste0("'", valid_dims, "'", collapse=", ")
-      ),
-      call.=FALSE
-    )
+  g <- if (!is.null(body$g)) {
+    body$g
+  } else if (!is.null(body$density)) {
+    body$density / medium_density
+  } else {
+    NA
   }
-  
-  dims
-}
 
+  list(g = g, h = h)
+}
 
 #' Extract common initialization components
-#' 
+#'
 #' Internal helper to extract shape, body, and medium parameters from scatterer
 #' objects during model initialization.
-#' 
+#'
 #' @param object Scatterer object
 #' @param sound_speed_sw Sound speed in seawater (m/s)
 #' @param density_sw Density of seawater (kg/m^3)
 #' @return List with shape, body, and medium components
 #' @keywords internal
+#' @noRd
 .init_common <- function(object, sound_speed_sw = 1500, density_sw = 1026) {
   list(
     shape = extract(object, "shape_parameters"),
@@ -181,9 +89,9 @@
 }
 
 #' Calculate all relevant wavenumbers
-#' 
+#'
 #' Internal helper to calculate wavenumbers for multiple sound speeds.
-#' 
+#'
 #' @param frequency Frequency vector (Hz)
 #' @param sound_speeds Named list of sound speeds (m/s)
 #' @return Named list of wavenumber vectors
@@ -191,34 +99,53 @@
 #' @noRd
 .calc_wavenumbers <- function(frequency, sound_speeds) {
   stats::setNames(
-    lapply(sound_speeds, function(c) k(frequency, c)),
+    lapply(sound_speeds, function(c) wavenumber(frequency, c)),
     names(sound_speeds)
   )
 }
 
-#' Define null-coalescing operator
-#' 
+#' Null-coalescing operator
+#'
 #' Returns first argument if not NULL and not NA, otherwise returns second.
-#' 
+#'
 #' @param a First value
 #' @param b Fallback value
 #' @return a if not NULL/NA, otherwise b
 #' @keywords internal
+#' @noRd
 `%||%` <- function(a, b) {
   if (!is.null(a) && !is.na(a)) a else b
 }
 
+#' Return real part if imaginary part is (numerically) zero, else return complex
+#' @param x Complex value, vector, or matrix
+#' @return Numeric if imaginary part is zero, else complex
+#' @keywords internal
+#' @noRd
+`%R%` <- function(x, tol = .Machine$double.eps) {
+  if (is.complex(x)) {
+    if (all(abs(Im(x)) < tol)) {
+      return(Re(x))
+    } else {
+      return(x)
+    }
+  } else {
+    return(x)
+  }
+}
+
 #' Extract material properties with fallback logic
-#' 
+#'
 #' Internal helper to extract material properties from ESS components with
 #' contrast-based fallback calculations.
-#' 
+#'
 #' @param component Material component (shell, fluid, etc.)
 #' @param ref_sound_speed Reference sound speed for contrast conversion
 #' @param ref_density Reference density for contrast conversion
 #' @return List of material properties
 #' @keywords internal
-.extract_material_props <- function(component, ref_sound_speed = NULL, 
+#' @noRd
+.extract_material_props <- function(component, ref_sound_speed = NULL,
                                     ref_density = NULL) {
   # Helper for property extraction with fallback
   get_prop <- function(direct, contrast, ref_val, default = NA) {
@@ -230,7 +157,7 @@
     }
     return(default)
   }
-  
+
   list(
     sound_speed = get_prop("sound_speed", "h", ref_sound_speed),
     density = get_prop("density", "g", ref_density),
@@ -242,39 +169,11 @@
   )
 }
 
-#' Validate elastic moduli inputs
-#' 
-#' Internal helper to validate that sufficient elastic moduli are provided
-#' for calculations.
-#' 
-#' @param ... Named elastic parameters (K, E, G, nu)
-#' @param min_required Minimum number of non-NULL parameters
-#' @param param_name Name of parameter being calculated (for error message)
-#' @return Character vector of provided parameter names
-#' @keywords internal
-.validate_elastic_inputs <- function(..., min_required = 2, param_name = NULL) {
-  inputs <- list(...)
-  provided <- !vapply(inputs, is.null, logical(1))
-  
-  if (sum(provided) < min_required) {
-    msg <- sprintf(
-      "At least %d elasticity moduli values are required",
-      min_required
-    )
-    if (!is.null(param_name)) {
-      msg <- paste(msg, "to calculate", param_name)
-    }
-    stop(msg, ".", call. = FALSE)
-  }
-  
-  names(provided)[provided]
-}
-
 #' Resolve parameter value for simulation grid
-#' 
+#'
 #' Internal helper to resolve parameter values in simulate_ts based on type
 #' (batch, function, scalar, vector).
-#' 
+#'
 #' @param param_name Parameter name
 #' @param param_value Parameter value (scalar, vector, or function)
 #' @param batch_by Batch parameter names
@@ -283,29 +182,30 @@
 #' @param simulation_grid Simulation grid data frame
 #' @return Resolved parameter vector
 #' @keywords internal
-.resolve_param_value <- function(param_name, param_value, batch_by, 
+#' @noRd
+.resolve_param_value <- function(param_name, param_value, batch_by,
                                 batch_values, grid_size, simulation_grid) {
   # Batch parameter case
   if (!is.null(batch_by) && param_name %in% batch_by) {
     idx <- simulation_grid[[paste0(param_name, "_idx")]]
     return(batch_values[[param_name]][idx])
   }
-  
+
   # Function generator case
   if (is.function(param_value)) {
     return(replicate(grid_size, param_value()))
   }
-  
+
   # Scalar case
   if (length(param_value) == 1) {
     return(rep(param_value, grid_size))
   }
-  
+
   # Vector case (must match grid size)
   if (length(param_value) == grid_size) {
     return(param_value)
   }
-  
+
   # Error case
   sim_type <- if (is.null(batch_by)) "realizations" else "batched realizations"
   stop(
@@ -322,15 +222,85 @@
 # Accessor functions
 ################################################################################
 ################################################################################
-#' Primary accessor function for dredging specific data from scatterer objects
+#' Primary accessor function for extracting specific features and layers from 
+#' Scatterer objects
+#' 
 #' @param object Scatterer-class object.
-#' @param feature Feature of interest (e.g. body).
+#' @param feature Feature(s) of interest (e.g. body). This can either be a 
+#' scalar string, or a vector of names. When a vector is supplied, the function 
+#' recursively accesses the Scatterer object using the 'feature' vector as a 
+#' directory. For example, \code{feature = c("body", "rpos", "x")} would 
+#' extract the 'x' coordinate of the position matrix ('rpos') from the 'body' 
+#' scattering parameters.
+#'
+#' @keywords utility
+#' @rdname extract
+#'
 #' @export
 extract <- function(object, feature) {
-  if (!methods::.hasSlot(object, feature)) {
-    stop(sprintf("Scattering object does not have slot '%s'", feature))
+  # Initialize top layer =======================================================
+  layer <- object
+  # Initialize failure state for error messaging ===============================
+  fail_state <- FALSE
+  accum_feature <- c()
+  # ============================================================================
+  # Recursively move through feature(s) -- treats as a directory path when 
+  # provided a vector
+  for (sub_layer in feature) {
+    accum_feature <- c(accum_feature, sub_layer)
+    if (is(layer, "Scatterer")) {
+      # Scatterer object +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      if (!methods::.hasSlot(layer, sub_layer)) {
+        stop(sprintf("Scattering object does not have slot '%s'.", sub_layer))
+      }
+      
+      layer <- methods::slot(layer, sub_layer)
+    } else if (is.list(layer)) {
+      # List +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      if (! sub_layer %in% names(layer)) {
+        fail_state <- TRUE 
+        break
+      }
+      
+      layer <- layer[[sub_layer]]
+    } else if (is.matrix(layer)) {
+      # Matrix +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      # Check across row names +++++++++++++++++++++++++++++++++++++++++++++++++
+      is_rows <- sub_layer %in% row.names(layer)
+      # Check across column names ++++++++++++++++++++++++++++++++++++++++++++++
+      is_cols <- sub_layer %in% colnames(layer)
+      
+      if (is_rows) {
+        layer <- layer[sub_layer,]
+      } else if (is_cols) {
+        layer <- layer[,sub_layer]
+      } else {
+        fail_state <- TRUE
+        break
+      }
+    } else if (is.vector(layer)) {
+      # Named vector +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      if (!sub_layer %in% names(layer)) {
+        fail_state <- TRUE
+        break
+      }
+      
+      layer <- layer[sub_layer]
+    }
   }
-  methods::slot(object, feature)
+  # Return output (error if failed, otherwise the defined layer) ===============
+  if (fail_state) {
+    stop(
+      sprintf("No feature '%s' ", sub_layer),
+      sprintf(
+        "found at the path '%s' ", 
+        paste(accum_feature, collapse=" -> ")
+      ),
+      "within the supplied Scatterer object."
+    )
+  } else {
+    layer
+  }
 }
 ################################################################################
 ################################################################################
@@ -338,20 +308,21 @@ extract <- function(object, feature) {
 ################################################################################
 ################################################################################
 #' Support function for bending scatterer body shape and position matrix
-#' @param input Dataframe or scatterer-class object
+#' @param object Dataframe or scatterer-class object
 #' @param radius_curvature Radius of curvature that can be parameterized either
 #' as a ratio relative to body length or actual measurement
 #' @param mode Either "ratio" or "measurement"
 #'
+#' @keywords shape manipulator
 #' @rdname brake
 #' @export
-brake <- function(input, radius_curvature, mode = "ratio") {
+brake <- function(object, radius_curvature, mode = "ratio") {
   # Check object type ==========================================================
   class_type <- typeof(input)
   # Bend shape =================================================================
   output <- switch(class_type,
-    list = brake_df(input, radius_curvature, mode),
-    S4 = brake_scatterer(input, radius_curvature, mode)
+    list = brake_df(object, radius_curvature, mode),
+    S4 = brake_scatterer(object, radius_curvature, mode)
   )
   # Return output ==============================================================
   return(output)
@@ -365,7 +336,7 @@ brake <- function(input, radius_curvature, mode = "ratio") {
 #'
 #' @keywords internal
 #' @rdname brake_df
-#' @export
+#' @noRd
 brake_df <- function(body_df, radius_curvature, mode = "ratio") {
   # Input validation ===========================================================
   if (
@@ -456,6 +427,7 @@ brake_df <- function(body_df, radius_curvature, mode = "ratio") {
   body_df_new <- body_df
   body_df_new$rpos <- rpos
   body_df_new$arc_length <- total_arc_length
+  body_df_new$radius_curvature_ratio <- radius_curvature_new
   # Return object ==============================================================
   return(body_df_new)
 }
@@ -467,7 +439,7 @@ brake_df <- function(body_df, radius_curvature, mode = "ratio") {
 #' @param mode Either "ratio" or "measurement"
 #' @rdname brake_scatterer
 #' @importFrom methods slot<-
-#' @export
+#' @noRd
 brake_scatterer <- function(object, radius_curvature, mode = "ratio") {
   # Extract object body shape ==================================================
   body <- extract(object, "body")
@@ -482,7 +454,7 @@ brake_scatterer <- function(object, radius_curvature, mode = "ratio") {
 #' Support rotation function for KRM (swimbladder)
 #' @inheritParams body_rotation
 #' @keywords internal
-#' @export
+#' @noRd
 bladder_rotation <- function(sum_rpos, rpos, theta, k_length) {
   v <- (sum_rpos[1, ] * cos(theta) + sum_rpos[3, ] * sin(theta)) / 2
   v <- matrix(
@@ -500,21 +472,21 @@ bladder_rotation <- function(sum_rpos, rpos, theta, k_length) {
 #' @param theta Orientation angle
 #' @param k_length Length of wavenumber vector
 #' @keywords internal
-#' @export
+#' @noRd
 body_rotation <- function(sum_rpos, rpos, theta, k_length) {
-  dorsal_sum <- base::matrix(
-    data = base::rep(sum_rpos[3, ], each = k_length),
-    ncol = base::length(sum_rpos[3, ]),
+  dorsal_sum <- matrix(
+    data = rep(sum_rpos[3, ], each = k_length),
+    ncol = length(sum_rpos[3, ]),
     nrow = k_length
   )
-  ventral_sum <- base::matrix(
-    data = base::rep(sum_rpos[4, ], each = k_length),
-    ncol = base::length(sum_rpos[4, ]),
+  ventral_sum <- matrix(
+    data = rep(sum_rpos[4, ], each = k_length),
+    ncol = length(sum_rpos[4, ]),
     nrow = k_length
   )
-  vbU <- (dorsal_sum * base::cos(theta) + dorsal_sum * base::sin(theta)) / 2
-  vbL <- (ventral_sum * base::cos(theta) + ventral_sum * base::sin(theta)) / 2
-  delta_u <- base::diff(rpos[1, ]) * base::sin(theta)
+  vbU <- (dorsal_sum * cos(theta) + dorsal_sum * sin(theta)) / 2
+  vbL <- (ventral_sum * cos(theta) + ventral_sum * sin(theta)) / 2
+  delta_u <- diff(rpos[1, ]) * sin(theta)
   list(vbU = vbU, vbL = vbL, delta_u = delta_u)
 }
 ################################################################################
@@ -523,6 +495,7 @@ body_rotation <- function(sum_rpos, rpos, theta, k_length) {
 #' @param limit Modal series limit.
 #' @keywords internal
 #' @export
+#' @noRd
 modal_matrix <- function(v, limit) {
   matrix(
     data = rep(v, each = limit + 1),
@@ -534,7 +507,7 @@ modal_matrix <- function(v, limit) {
 #' Discretize vector into separate intervals of different length
 #' @param x1 Desired vector/interval
 #' @param x0 Original or initial vector/interval
-#' @export
+#' @noRd
 segmentize <- function(x1, x0) {
   # For each consecutive pair of original coordinates
   segments_to_update <- Map(function(start, end) {
@@ -582,7 +555,7 @@ segmentize <- function(x1, x0) {
 #' @param n_segments Number of segments in the resampled shape
 #'
 #' @return FLS object with resampled shape
-#' @export
+#' @noRd
 sdwba_resample <- function(object, n_segments) {
   # Check input
   if (!inherits(object, "FLS")) {
@@ -660,11 +633,5 @@ sdwba_resample <- function(object, n_segments) {
   object@shape_parameters$n_segments <- n_segments
   object@shape_parameters$length <- abs(diff(range(new_rpos[1, ])))
 
-  object
-}
-
-
-# MOCK
-spoof_initialize <- function(object) {
   object
 }

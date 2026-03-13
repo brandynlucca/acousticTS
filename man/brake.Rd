@@ -4,10 +4,10 @@
 \alias{brake}
 \title{Support function for bending scatterer body shape and position matrix}
 \usage{
-brake(input, radius_curvature, mode = "ratio")
+brake(object, radius_curvature, mode = "ratio")
 }
 \arguments{
-\item{input}{Dataframe or scatterer-class object}
+\item{object}{Dataframe or scatterer-class object}
 
 \item{radius_curvature}{Radius of curvature that can be parameterized either
 as a ratio relative to body length or actual measurement}
@@ -17,3 +17,5 @@ as a ratio relative to body length or actual measurement}
 \description{
 Support function for bending scatterer body shape and position matrix
 }
+\keyword{manipulator}
+\keyword{shape}

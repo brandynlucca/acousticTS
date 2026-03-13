@@ -15,12 +15,16 @@ pois(K = NULL, E = NULL, G = NULL)
 \item{G}{Shear modulus (Pa).}
 }
 \value{
-Returns a dimensionless ratio known as Poisson's ratio (\eqn{\nu}).
+Poisson's ratio (\eqn{\nu}), dimensionless.
 }
 \description{
-Calculate the Poisson's ratio (\eqn{\nu}) from two of the three other elastic
-moduli to calculate the Lamé's parameter. When more than two values
-are input, the function will default to using the bulk (K) and Young's (E)
-moduli. This assumes that the input values represent 3D material properties.
+Calculates Poisson's ratio (\eqn{\nu}) from two of the three other elastic
+moduli: bulk modulus (K), Young's modulus (E), or shear modulus (G).
+Assumes 3D material properties.
+
+The relationships used are:
+\deqn{\nu = \frac{E}{2G} - 1}
+\deqn{\nu = \frac{3K - 2G}{2(3K + G)}}
+\deqn{\nu = \frac{3K - E}{6K}}
 }
 \keyword{elastic}

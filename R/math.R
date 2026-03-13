@@ -8,20 +8,24 @@
 #' @param iterations Number of iterations
 #' @rdname along_sum
 #' @keywords internal
-#' @export
+#' @noRd
 along_sum <- function(rpos, iterations) {
-  output <- rpos[, 1:(iterations - 1)] + rpos[, 2:iterations]
-  output
+  if (iterations < 2) {
+    stop("along_sum requires at least 2 columns to sum", call. = FALSE)
+  }
+  lhs <- rpos[, 1:(iterations - 1), drop = FALSE]
+  rhs <- rpos[, 2:iterations, drop = FALSE]
+  lhs + rhs
 }
 ################################################################################
 #' Numerical integration via adaptive quadrature of complex values
 #' @param integral Input integration function that is indexed so that it can be
-#' used within `base::apply`.
+#' used within `apply`.
 #' @param x Indexing argument for multi-row objects
 #' @param y Indexing argument for multi-column objects
 #' @rdname contour_integrate
 #' @keywords internal
-#' @export
+#' @noRd
 contour_integrate <- function(integral, x, y) {
   complex(
     real = stats::integrate(function(s) Re(integral(s, x, y)),
@@ -35,7 +39,7 @@ contour_integrate <- function(integral, x, y) {
 ################################################################################
 #' Wrapper function incorporating phase deviation into contour integration
 #' @param integral Input integration function that is indexed so that it can be
-#' used within `base::apply`
+#' used within `apply`
 #' @param x Indexing argument for multi-row objects
 #' @param y Indexing argument for multi-column objects
 #' @param n_iterations Number of phase deviations to average and summarize
@@ -44,7 +48,7 @@ contour_integrate <- function(integral, x, y) {
 #' @param phase_sd Phase standard deviation
 #' @rdname phase_integrate
 #' @keywords internal
-#' @export
+#' @noRd
 phase_integrate <- function(x, y, n_iterations, integral, phase_sd) {
   rng <- stats::rnorm(n_iterations, 0, 1)
   phase <- exp(1i * rng * phase_sd)

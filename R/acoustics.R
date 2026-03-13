@@ -5,35 +5,57 @@
 # GENERIC ACOUSTIC VARIABLES
 ################################################################################
 ################################################################################
-#' Calculate the acoustic wavenumber (k) based on the sound speed of water.
-#' @param sound_speed Sound speed (c, m/s)
+#' Calculate the acoustic wavenumber (\eqn{k}) for a given frequency and sound 
+#' speed.
+#' 
+#' @description
+#' Calculates the acoustic wavenumber (\eqn{k}) for a given frequency and sound 
+#' speed in water. The wavenumber is defined as:
+#' \deqn{k = \frac{2\pi f}{c}}
+#' where \eqn{f} is the frequency (Hz) and \eqn{c} is the sound speed 
+#' (\eqn{ms^{-1}}).
+#' The wavenumber describes the spatial frequency of a sound wave and is 
+#' fundamental in acoustic calculations.
+#'
+#' @param sound_speed Sound speed (c, \eqn{m~s^{-1}})
 #' @param frequency Frequency (f, Hz)
 #' @return
 #' Calculates the acoustic wavenumber (k) based on the sound speed of water.
-#' @rdname k
+#' @rdname wavenumber
 #' @export
-k <- function(frequency, sound_speed) 2 * pi * frequency / sound_speed
+wavenumber <- function(frequency, sound_speed) 2 * pi * frequency / sound_speed
 ################################################################################
-#' Calculates the linear backscattering coefficient (sigma_bs) from the linear
-#' scattering length, f_bs.
+#' Calculates the linear backscattering coefficient (\eqn{\sigma_\text{bs}}) 
+#' from the linear scattering length/coefficient, \eqn{f_\text{bs}}.
 #' @param f_bs Linear scattering length (m), or related expression
 #' @return
 #' Returns the linear backscattering coefficient that can be then converted
 #' into TS.
-#' @rdname sigma_bs
-#' @export
-sigma_bs <- function(f_bs) abs(f_bs) * abs(f_bs)
+#' @keywords internal
+#' @noRd
+.sigma_bs <- function(f_bs) abs(f_bs) * abs(f_bs)
 ################################################################################
-#' Convert backscatter values from log- to linear-domain.
+#' Convert between logarithmic (dB) and linear domains for backscatter values.
+#'
 #' @description
-#' The `linear(...)` function converts a given value into the linear domain,
-#' while the `db(...)` function converts inputs into the log domain.
-#' @param value Logarithmic (e.g. TS) or linear (\eqn{\sigma_bs}) value
-#' @param coefficient Optional. Numeric coefficient preceding the logarithm.
+#' The `linear` function converts a value from the logarithmic (dB) domain to 
+#' the linear domain, while the `db` function converts a value from the linear 
+#' domain to the logarithmic (dB) domain. These are commonly used for target 
+#' strength (TS) and backscattering coefficient (\eqn{\sigma_{bs}}) conversions.
+#'
+#' The conversions are defined as:
+#' \deqn{\text{linear}(x) = c^{x / c}}
+#' \deqn{\text{db}(x) = c \log_c(x)}
+#' where \eqn{c} is the coefficient (default 10).
+#'
+#' @param value Numeric value to convert. For `linear`, this is a logarithmic 
+#' value (e.g., dB TS); for `db`, this is a linear value (e.g., 
+#' \eqn{\sigma_{bs}}).
+#' @param coefficient Optional. Numeric coefficient (base) for the logarithm. 
 #' Default is 10.
 #' @return
-#' Transforms the backscattering response into either the log (`db`) or
-#' linear (`linear`) domains.
+#' For `linear`, returns the value converted to the linear domain. For `db`, 
+#' returns the value converted to the logarithmic (dB) domain.
 #' @rdname linear
 #' @export
 linear <- function(value, coefficient = 10) {
@@ -55,7 +77,7 @@ db <- function(value, coefficient = 10) {
 #' @param interface2 Dataframe object containing density (kg/m^3) and sound
 #' speed (m/s) values for a boundary/interface (2)
 #' @param mode Two options: coefficient calculation for "DWBA" and "KRM"
-#' @export
+#' @noRd
 reflection_coefficient <- function(interface1, interface2, mode = "DWBA") {
   # Calculate acoustic impedance of the first interface ========================
   Z1 <- interface1$density * interface1$sound_speed
@@ -67,35 +89,40 @@ reflection_coefficient <- function(interface1, interface2, mode = "DWBA") {
   return(R)
 }
 ################################################################################
-#' Transmission coefficient for transmission between two mediums
-#' @param interface1 Dataframe object containing density (kg/m^3) and sound
-#' speed (m/s) values for a boundary/interface (1)
-#' @param interface2 Dataframe object containing density (kg/m^3) and sound
-#' speed (m/s) values for a boundary/interface (2)
+#' Calculate she compressibility (\eqn{\kappa}) of a scattering 
+#' boundary/interface.
+#' 
+#' @description
+#' Calculates the compressibility contrast (\eqn{\kappa}) between a scattering 
+#' interface and the surrounding medium. Compressibility is defined as:
+
+#' \deqn{
+#'  K = \frac{1}{\rho c^2}
+#' }
+#' where \eqn{\rho} is density (\eqn{kg~m^{-3}}) and \eqn{c} is sound speed 
+#' (\eqn{m~s^{-1}}).
+#'
+#' The compressibility contrast is then:
+#' \deqn{
+#'  \kappa = \frac{K_2 - K_1}{K_1}
+#' }
+#'
+#' where \eqn{K_1} is the compressibility of the medium and \eqn{K_2} is that 
+#' of the target interface.
+#'
+#' @param medium Dataframe object containing density (\eqn{kgm^{-3}}) and 
+#' sound speed (\eqn{ms^{-1}}) values for a fluid medium external to a 
+#' scattering interface (e.g., seawater).
+#' @param target Dataframe object containing density (\eqn{kgm^{-3}}) and 
+#' sound speed (\eqn{ms^{-1}}) values for a target boundary.
+#' 
+#' @return Compressibility contrast (\eqn{\kappa}), dimensionless.
 #' @export
-transmission_coefficient <- function(interface1, interface2) {
-  # Calculate acoustic impedance of the first interface ========================
-  Z1 <- interface1$density * interface1$sound_speed
-  # Calculate acoustic impedance of the second interface =======================
-  Z2 <- interface2$density * interface2$sound_speed
-  # Calculate the reflection coefficient =======================================
-  T12 <- (2 * (Z2 / Z1)) / (1 + (Z2 / Z1))
-  # Output =====================================================================
-  T12
-}
-################################################################################
-#' Calculate the compressibility material properties of a scatterer's tissue or
-#' shell (kappa)
-#' @param interface1 Dataframe object containing density (kg/m^3) and sound
-#' speed (m/s) values for a boundary/interface (1)
-#' @param interface2 Dataframe object containing density (kg/m^3) and sound
-#' speed (m/s) values for a boundary/interface (2)
-#' @export
-kappa <- function(interface1, interface2) {
+compressibility <- function(medium, target) {
   # Calculate acoustic compressibility of the first interface ==================
-  K1 <- (interface1$density * interface1$sound_speed^2)^(-1)
+  K1 <- (medium$density * medium$sound_speed^2)^(-1)
   # Calculate acoustic compressibility of the second interface =================
-  K2 <- (interface2$density * interface2$sound_speed^2)^(-1)
+  K2 <- (target$density * target$sound_speed^2)^(-1)
   # Calculate the reflection coefficient =======================================
   gamma_kappa <- (K2 - K1) / K1
   # Output =====================================================================
@@ -106,18 +133,23 @@ kappa <- function(interface1, interface2) {
 # ELASTICITY CALCULATIONS AND EQUATIONS
 ################################################################################
 ################################################################################
-#' Calculate the Poisson's ratio (\eqn{\nu})
+#' @title Calculate the Poisson's ratio (\eqn{\nu})
+#' 
 #' @description
-#' Calculate the Poisson's ratio (\eqn{\nu}) from two of the three other elastic
-#' moduli to calculate the Lam&eacute;'s parameter. When more than two values
-#' are input, the function will default to using the bulk (K) and Young's (E)
-#' moduli. This assumes that the input values represent 3D material properties.
+#' Calculates Poisson's ratio (\eqn{\nu}) from two of the three other elastic 
+#' moduli: bulk modulus (K), Young's modulus (E), or shear modulus (G). 
+#' Assumes 3D material properties.
+#'
+#' The relationships used are:
+#' \deqn{\nu = \frac{E}{2G} - 1}
+#' \deqn{\nu = \frac{3K - 2G}{2(3K + G)}}
+#' \deqn{\nu = \frac{3K - E}{6K}}
+#' 
 #' @param K Bulk modulus (K, Pa).
 #' @param E Young's modulus (E, Pa).
 #' @param G Shear modulus (Pa).
-#' @return
-#' Returns a dimensionless ratio known as Poisson's ratio (\eqn{\nu}).
-#'
+#' @return Poisson's ratio (\eqn{\nu}), dimensionless.
+#' 
 #' @keywords elastic
 #' @rdname pois
 #' @encoding UTF-8
@@ -146,19 +178,24 @@ pois <- function(K = NULL, E = NULL, G = NULL) {
 }
 ################################################################################
 #' Calculate the bulk modulus (K).
+#' 
 #' @description
-#' Calculate the bulk modulus (K) from two of the three other elastic
-#' moduli to calculate the Lam&eacute;'s parameter. When more than two
-#' values are input, the function will default to using Young's (E) and shear
-#' (G) moduli. This assumes that the input values represent 3D material
-#' properties.
+#' Calculates the bulk modulus (K) from two of the three other elastic moduli:
+#' Young's modulus (E), shear modulus (G), or Poisson's ratio (\eqn{\nu}).
+#' Assumes 3D material properties.
+#'
+#' The relationships used are:
+#' \deqn{K = \frac{E G}{3(3G - E)}}
+#' \deqn{K = \frac{2G(1 + \nu)}{3(1 - 2\nu)}}
+#' \deqn{K = \frac{E}{3(1 - 2\nu)}}
+#' 
 #' @param E Young's modulus (Pa).
 #' @param G Shear modulus (Pa).
 #' @param nu Poisson's ratio (Dimensionless).
-#' @return
-#' Returns an estimate for the bulk modulus (K).
+#' 
+#' @return Bulk modulus (K, Pa).
+#' 
 #' @encoding UTF-8
-#'
 #' @keywords elastic
 #' @rdname bulk
 #' @export
@@ -186,19 +223,24 @@ bulk <- function(E = NULL, G = NULL, nu = NULL) {
 }
 ################################################################################
 #' Calculate Young's modulus (E).
+#' 
 #' @description
-#' Calculate the Young's modulus (E) from two of the three other elastic
-#' moduli to calculate the Lam&eacute;'s parameter. When more than two
-#' values are input, the function will default to using the bulk (K) and shear
-#' (G) moduli. This assumes that the input values represent 3D material
-#' properties.
+#' Calculates Young's modulus (E) from two of the three other elastic moduli:
+#' bulk modulus (K), shear modulus (G), or Poisson's ratio (\eqn{\nu}).
+#' Assumes 3D material properties.
+#'
+#' The relationships used are:
+#' \deqn{E = \frac{9KG}{3K + G}}
+#' \deqn{E = 3K(1 - 2\nu)}
+#' \deqn{E = 2G(1 + \nu)}
+#' 
 #' @param K Bulk modulus (Pa).
 #' @param G Shear modulus (Pa).
 #' @param nu Poisson's ratio (Dimensionless).
-#' @return
-#' Returns an estimate for the Young's modulus (E).
+#' 
+#' @return Young's modulus (E, Pa).
+#' 
 #' @encoding UTF-8
-#'
 #' @keywords elastic
 #' @rdname young
 #' @export
@@ -226,19 +268,24 @@ young <- function(K = NULL, G = NULL, nu = NULL) {
 }
 ################################################################################
 #' Calculate the shear modulus (G)
+#' 
 #' @description
-#' Calculate the shear modulus (G) from two of the three other elastic
-#' moduli to calculate the Lam&eacute;'s parameter. When more than two
-#' values are input, the function will default to using the bulk (K) and
-#' Young's (E) moduli. This assumes that the input values represent 3D material
-#' properties.
+#' #' Calculates the shear modulus (G) from two of the three other elastic 
+#' moduli: bulk modulus (K), Young's modulus (E), or Poisson's ratio 
+#' (\eqn{\nu}). Assumes 3D material properties.
+#'
+#' The relationships used are:
+#' \deqn{G = \frac{3KE}{9K - E}}
+#' \deqn{G = \frac{3K(1 - 2\nu)}{2(1 + \nu)}}
+#' \deqn{G = \frac{E}{2(1 + \nu)}}
+#' 
 #' @param K Bulk modulus (Pa).
 #' @param E Young's modulus (Pa).
 #' @param nu Poisson's ratio (Dimensionless).
-#' @return
-#' Returns an estimate for the shear modulus (G).
+#' 
+#' @return Shear modulus (G, Pa).
+#' 
 #' @encoding UTF-8
-#'
 #' @keywords elastic
 #' @rdname shear
 #' @export
@@ -267,17 +314,25 @@ shear <- function(K = NULL, E = NULL, nu = NULL) {
 ################################################################################
 #' @encoding UTF-8
 #' @title Calculate Lam&eacute;'s first parameter (\eqn{\lambda})
+#' 
 #' @description
-#' Calculate Lam&eacute;'s first parameter (\eqn{\lambda}) from two of the
-#' four other elastic moduli. When more than two values are input, the function
-#' will default to using the bulk (K) and Young's (E) moduli. This assumes that
-#' the input values represent 3D material properties.
+#' Calculates Lam&eacute;'s first parameter (\eqn{\lambda}) from two of the 
+#' four other elastic moduli: bulk modulus (K), Young's modulus (E), shear 
+#' modulus (G), or Poisson's ratio (\eqn{\nu}). Assumes 3D material properties.
+#'
+#' The relationships used are:
+#' \deqn{\lambda = K - \frac{2G}{3}}
+#' \deqn{\lambda = \frac{E\nu}{(1 + \nu)(1 - 2\nu)}}
+#' \deqn{\lambda = \frac{2G\nu}{1 - 2\nu}}
+#' \deqn{\lambda = \frac{3K\nu}{1 + \nu}}
+#' \deqn{\lambda = \frac{3K(3K - E)}{9K - E}}
+#' \deqn{\lambda = \frac{G(E - 2G)}{3G - E}}
+#' 
 #' @param K Bulk modulus (Pa).
 #' @param E Young's modulus (Pa).
 #' @param G Shear modulus (Pa).
 #' @param nu Poisson's ratio (Dimensionless).
-#' @return
-#' Returns Lam&eacute;'s first parameter (\eqn{\lambda}).
+#' @return Lam&eacute;'s first parameter (\eqn{\lambda}, Pa).
 #'
 #' @keywords elastic
 #' @rdname lame
@@ -309,18 +364,6 @@ lame <- function(K = NULL, E = NULL, G = NULL, nu = NULL) {
   } else if (provided["E"] && provided["G"]) {
     return(G * (E - 2 * G) / (3 * G - E))
   }
-}
-################################################################################
-################################################################################
-#' Calculate the mass density material properties of a scatterer's tissue or
-#' shell (kappa)
-#' @param interface1 Dataframe object containing density (kg/m^3) and sound
-#' speed (m/s) values for a boundary/interface (1)
-#' @param interface2 Dataframe object containing density (kg/m^3) and sound
-#' speed (m/s) values for a boundary/interface (2)
-#' @export
-rho <- function(interface1, interface2) {
-  (interface2$density - interface1$density) / interface2$density
 }
 ################################################################################
 #' Wrapper function to model acoustic target strength
@@ -461,10 +504,10 @@ target_strength <- function(object, frequency, model, verbose = FALSE, ...) {
                                  sound_speed_fluid, sound_speed_longitudinal,
                                  sound_speed_transversal,
                                  radius_shell, radius_fluid) {
-  k1 <- k(frequency, sound_speed_sw)
-  k3 <- k(frequency, sound_speed_fluid)
-  kL <- k(frequency, sound_speed_longitudinal)
-  kT <- k(frequency, sound_speed_transversal)
+  k1 <- wavenumber(frequency, sound_speed_sw)
+  k3 <- wavenumber(frequency, sound_speed_fluid)
+  kL <- wavenumber(frequency, sound_speed_longitudinal)
+  kT <- wavenumber(frequency, sound_speed_transversal)
 
   ka_matrix <- rbind(
     k1a_shell = k1 * radius_shell,
@@ -478,374 +521,34 @@ target_strength <- function(object, frequency, model, verbose = FALSE, ...) {
 
   ka_matrix
 }
-
-#' Calculate alpha coefficients for Goodman-Stern model
-#' @param bessel_cache Cached Bessel function values
-#' @param ka_matrix_m Modal ka matrix
-#' @param m Modal vector
-#' @param lambda Lam\'e's first parameter
-#' @param mu Shear modulus
-#' @param density_sw Seawater density
-#' @param density_shell Shell density
-#' @param density_fluid Fluid density
-#' @return List of alpha coefficients
-#' @keywords internal
-#' @noRd
-.goodman_stern_alpha <- function(bessel_cache, ka_matrix_m, m,
-                                 lambda, mu, density_sw,
-                                 density_shell, density_fluid) {
-  # Compute the alpha values needed for the boundary matrices ==================
-  a1 <- bessel_cache$k1a_shell$js * density_sw / density_shell
-  a2 <- ka_matrix_m$k1a_shell * bessel_cache$k1a_shell$jsd
-  a11 <- bessel_cache$k1a_shell$hs * density_sw / density_shell
-  a21 <- ka_matrix_m$k1a_shell * bessel_cache$k1a_shell$hsd
-  a12 <- (lambda * bessel_cache$kLa_shell$js -
-            2 * mu * bessel_cache$kLa_shell$jsdd) / (lambda + 2 * mu)
-  a22 <- ka_matrix_m$kLa_shell * bessel_cache$kLa_shell$jsd
-  a32 <- 2 * (ka_matrix_m$kLa_shell *
-                bessel_cache$kLa_shell$jsd - bessel_cache$kLa_shell$js)
-  a42 <- (lambda * bessel_cache$kLa_fluid$js -
-            2 * mu * bessel_cache$kLa_fluid$jsdd) / (lambda + 2 * mu)
-  a52 <- ka_matrix_m$kLa_fluid * bessel_cache$kLa_fluid$jsd
-  a62 <- 2 * (ka_matrix_m$kLa_fluid *
-                bessel_cache$kLa_fluid$jsd - bessel_cache$kLa_fluid$js)
-  a13 <- -2 * m * (m + 1) * ka_matrix_m$kTa_shell^(-2) *
-    (ka_matrix_m$kTa_shell *
-       bessel_cache$kTa_shell$jsd - bessel_cache$kTa_shell$js)
-  a23 <- m * (m + 1) * bessel_cache$kTa_shell$js
-  a33 <- ka_matrix_m$kTa_shell^2 *
-    bessel_cache$kTa_shell$jsdd + (m + 2) * (m - 1) * bessel_cache$kTa_shell$js
-  a43 <- -2 * m * (m + 1) * ka_matrix_m$kTa_fluid^(-2) *
-    (ka_matrix_m$kTa_fluid *
-       bessel_cache$kTa_fluid$jsd - bessel_cache$kTa_fluid$js)
-  a53 <- m * (m + 1) * bessel_cache$kTa_fluid$js
-  a63 <- ka_matrix_m$kTa_fluid^2 *
-    bessel_cache$kTa_fluid$jsdd + (m + 2) * (m - 1) *
-      bessel_cache$kTa_fluid$js
-  a14 <- (lambda * bessel_cache$kLa_shell$ys -
-            2 * mu * bessel_cache$kLa_shell$ysdd) / (lambda + 2 * mu)
-  a24 <- ka_matrix_m$kLa_shell * bessel_cache$kLa_shell$ysd
-  a34 <- 2 * (ka_matrix_m$kLa_shell *
-                bessel_cache$kLa_shell$ysd - bessel_cache$kLa_shell$ys)
-  a44 <- (lambda * bessel_cache$kLa_fluid$ys - 2 * mu *
-            bessel_cache$kLa_fluid$ysdd) / (lambda + 2 * mu)
-  a54 <- ka_matrix_m$kLa_fluid * bessel_cache$kLa_fluid$ysd
-  a64 <- 2 * (ka_matrix_m$kLa_fluid *
-                bessel_cache$kLa_fluid$ysd - bessel_cache$kLa_fluid$ys)
-  a15 <- -2 * m * (m + 1) * ka_matrix_m$kTa_shell^(-2) *
-    (ka_matrix_m$kTa_shell *
-       bessel_cache$kTa_shell$ysd - bessel_cache$kTa_shell$ys)
-  a25 <- m * (m + 1) * bessel_cache$kTa_shell$ys
-  a35 <- ka_matrix_m$kTa_shell^2 * bessel_cache$kTa_shell$ysdd +
-    (m + 2) * (m - 1) * bessel_cache$kTa_shell$ys
-  a45 <- -2 * m * (m + 1) * ka_matrix_m$kTa_fluid^(-2) *
-    (ka_matrix_m$kTa_fluid * bessel_cache$kTa_fluid$ysd -
-       bessel_cache$kTa_fluid$ys)
-  a55 <- m * (m + 1) * bessel_cache$kTa_fluid$ys
-  a65 <- ka_matrix_m$kTa_fluid^2 *
-    bessel_cache$kTa_fluid$ysdd + (m + 2) * (m - 1) *
-    bessel_cache$kTa_fluid$ys
-  a46 <- bessel_cache$k1a_fluid$js * density_sw / density_shell
-  a56 <- ka_matrix_m$k1a_fluid * bessel_cache$k1a_fluid$jsd
-  # Format and return list =====================================================
-  list(
-    a1 = a1, a2 = a2, a11 = a11, a21 = a21,
-    a12 = a12, a22 = a22, a32 = a32, a42 = a42, a52 = a52, a62 = a62,
-    a13 = a13, a23 = a23, a33 = a33, a43 = a43, a53 = a53, a63 = a63,
-    a14 = a14, a24 = a24, a34 = a34, a44 = a44, a54 = a54, a64 = a64,
-    a15 = a15, a25 = a25, a35 = a35, a45 = a45, a55 = a55, a65 = a65,
-    a46 = a46, a56 = a56
-  )
-}
-#' Calculate boundary condition matrices for Goodman and Stern (1962) model
-#' @param alpha Alpha coefficient list
-#' @param ka_matrix ka matrix
-#' @param m Modal vector
-#' @keywords internal
-#' @return List of boundary matrices for each frequency and modal order
-#' @noRd
-.goodman_stern_boundaries <- function(alpha, ka_matrix, m) {
-  # Create template matrices ==================================================
-  A_template_0 <- matrix(0, nrow = 4, ncol = 4)
-  A_template_m <- matrix(0, nrow = 6, ncol = 6)
-  # Create the boundary condition matrices for each frequency and modal order ==
-  boundary_matrices <- lapply(
-    seq_len(ncol(ka_matrix)), function(freq_idx) {
-      lapply(seq_along(m), function(m_idx) {
-        # Case: m == 0 =========================================================
-        if (m[m_idx] == 0) {
-          # Apply reduced template =============================================
-          A_numerator <- A_template_0
-
-          # Numerator ==========================================================
-          A_numerator[1, 1:3] <- c(
-            alpha$a1[m_idx, freq_idx], alpha$a12[m_idx, freq_idx],
-            alpha$a14[m_idx, freq_idx]
-          )
-          A_numerator[2, 1:3] <- c(
-            alpha$a2[m_idx, freq_idx], alpha$a22[m_idx, freq_idx],
-            alpha$a24[m_idx, freq_idx]
-          )
-          A_numerator[3, 2:4] <- c(
-            alpha$a42[m_idx, freq_idx], alpha$a44[m_idx, freq_idx],
-            alpha$a46[m_idx, freq_idx]
-          )
-          A_numerator[4, 2:4] <- c(
-            alpha$a52[m_idx, freq_idx], alpha$a54[m_idx, freq_idx],
-            alpha$a56[m_idx, freq_idx]
-          )
-
-          # Denominator ========================================================
-          A_denominator <- A_numerator
-          A_denominator[1:2, 1] <- c(
-            alpha$a11[m_idx, freq_idx], alpha$a21[m_idx, freq_idx]
-          )
-
-          list(A_numerator = A_numerator, A_denominator = A_denominator)
-        } else {
-          # Apply reduced template =============================================
-          A_numerator <- A_template_m
-
-          # Numerator ==========================================================
-          A_numerator[1, 1:5] <- c(
-            alpha$a1[m_idx, freq_idx], alpha$a12[m_idx, freq_idx],
-            alpha$a13[m_idx, freq_idx], alpha$a14[m_idx, freq_idx],
-            alpha$a15[m_idx, freq_idx]
-          )
-          A_numerator[2, 1:5] <- c(
-            alpha$a2[m_idx, freq_idx], alpha$a22[m_idx, freq_idx],
-            alpha$a23[m_idx, freq_idx], alpha$a24[m_idx, freq_idx],
-            alpha$a25[m_idx, freq_idx]
-          )
-          A_numerator[3, 2:5] <- c(
-            alpha$a32[m_idx, freq_idx], alpha$a33[m_idx, freq_idx],
-            alpha$a34[m_idx, freq_idx], alpha$a35[m_idx, freq_idx]
-          )
-          A_numerator[4, 2:6] <- c(
-            alpha$a42[m_idx, freq_idx], alpha$a43[m_idx, freq_idx],
-            alpha$a44[m_idx, freq_idx], alpha$a45[m_idx, freq_idx],
-            alpha$a46[m_idx, freq_idx]
-          )
-          A_numerator[5, 2:6] <- c(
-            alpha$a52[m_idx, freq_idx], alpha$a53[m_idx, freq_idx],
-            alpha$a54[m_idx, freq_idx], alpha$a55[m_idx, freq_idx],
-            alpha$a56[m_idx, freq_idx]
-          )
-          A_numerator[6, 2:5] <- c(
-            alpha$a62[m_idx, freq_idx], alpha$a63[m_idx, freq_idx],
-            alpha$a64[m_idx, freq_idx], alpha$a65[m_idx, freq_idx]
-          )
-
-          # Denominator ========================================================
-          A_denominator <- A_numerator
-          A_denominator[1:2, 1] <- c(
-            alpha$a11[m_idx, freq_idx], alpha$a21[m_idx, freq_idx]
-          )
-
-          list(A_numerator = A_numerator, A_denominator = A_denominator)
-        }
-      })
-    }
-  )
-
-  boundary_matrices
-}
 ################################################################################
 #' Solve Expansion Coefficients for a Liquid-Filled Spheroidal Scatterer
 #'
 #' @description
-#' Computes the modal expansion coefficients \eqn{A_{mn}} for acoustic scattering
-#' from a liquid-filled prolate spheroidal body using a truncated singular value
-#' decomposition (SVD) pseudoinverse approach.
+#' Computes the modal expansion coefficients \eqn{A_{mn}} for acoustic 
+#' scattering from a liquid-filled prolate spheroidal body using a truncated 
+#' singular value decomposition (SVD) pseudoinverse approach.
 #'
 #' @details
 #' This function solves the linear system arising from matching boundary
 #' conditions at the surface of a liquid-filled spheroidal scatterer. The
 #' expansion coefficients  \eqn{A_{mn}} relate the scattered field to the
-#' incident field through the  spheroidal wave function expansion.
-#'
-#' **Mathematical formulation:**
-#'
-#' The boundary conditions lead to a linear system for each azimuthal mode
-#' \eqn{m}:  \deqn{K^{(3)} A = b}
-#'
-#' where:
-#' \itemize{
-#'   \item \eqn{K^{(3)}} is the scattering kernel matrix of dimension \eqn{L
-#'   \times N}
-#'   \item \eqn{A} is the vector of unknown expansion coefficients
-#'   \item \eqn{b = -\sum_n K^{(1)}_{l,n}} is the right-hand side formed from
-#'   row sums f the incident field kernel
-#' }
-#'
-#' **SVD-based solution:**
-#'
-#' The solution uses the Moore-Penrose pseudoinverse computed via truncated SVD.
-#' Given the SVD decomposition \eqn{K^{(3)} = U \Sigma V^*}, the pseudoinverse
-#' is:
-#' \deqn{K^{(3)+} = V \Sigma^+ U^*}
-#'
-#' where \eqn{\Sigma^+} contains the reciprocals of singular values above a
-#' numerical tolerance:
-#' \deqn{\sigma_i^+ = \begin{cases} 1/\sigma_i & \sigma_i > \tau \\ 0 &
-#' \text{otherwise} \end{cases}}
-#'
-#' The tolerance is computed as:
-#' \deqn{\tau = \max(\dim(K^{(3)})) \cdot \max_i(\sigma_i) \cdot \varepsilon}
-#'
-
-#' where \eqn{\varepsilon} is machine precision (\code{.Machine$double.eps}).
-#'
-#' This yields the minimum-norm least-squares solution, which is appropriate for
-#' potentially rank-deficient systems arising from truncated modal expansions.
-#'
-#' @param K1 Complex matrix or list of complex matrices. The incident field
-#' kernel matrix \eqn{K^{(1)}_{l,n}} for a single azimuthal mode \eqn{m}, or a
-#' list of such matrices indexed by \eqn{m = 0, 1, \ldots, m_{\max}}.
-#' @param K3 Complex matrix or list of complex matrices. The scattered field
-#' kernel matrix \eqn{K^{(3)}_{l,n}} for a single azimuthal mode \eqn{m}, or a
-#' list of such matrices indexed by \eqn{m = 0, 1, \ldots, m_{\max}}.
-#'
-#' @return
-#' If \code{K1} and \code{K3} are matrices: a complex column vector of expansion
-#' coefficients \eqn{A_{mn}} (dimension \eqn{N \times 1}).
-#'
-#' If \code{K1} and \code{K3} are lists: a list of complex column vectors, one
-#' for each azimuthal mode \eqn{m}.
-#'
-#' @examples
-#' # Example with single matrices (m = 0)
-#' K1 <- matrix(complex(real = rnorm(9), imaginary = rnorm(9)), nrow = 3)
-#' K3 <- matrix(complex(real = rnorm(9), imaginary = rnorm(9)), nrow = 3)
-#' A <- solve_liquid_spheroidal_Amn(K1, K3)
-#'
-#' # Example with list of matrices (multiple m values)
-#' K1_list <- list(
-#'   matrix(complex(real = rnorm(9), imaginary = rnorm(9)), nrow = 3),
-#'   matrix(complex(real = rnorm(4), imaginary = rnorm(4)), nrow = 2)
-#' )
-#' K3_list <- list(
-#'   matrix(complex(real = rnorm(9), imaginary = rnorm(9)), nrow = 3),
-#'   matrix(complex(real = rnorm(4), imaginary = rnorm(4)), nrow = 2)
-#' )
-#' A_list <- solve_liquid_spheroidal_Amn(K1_list, K3_list)
-#'
-#' @references
-#' Furusawa, M. (1988). "Prolate spheroidal models for predicting general trends
-#' of fish target strength." \emph{Journal of the Acoustical Society of Japan
-#' (E)}, 9(1), 13-24.
-#'
-#' Golub, G. H. and Van Loan, C. F. (2013). \emph{Matrix Computations} (4th
-#' ed.). Johns Hopkins University Press.
-#'
-#' Ye, Z. (1997). "A novel approach to sound scattering by cylinders of finite
-#' length." \emph{Journal of the Acoustical Society of America}, 102(2),
-#' 877-884.
-#'
-#' @seealso
-#' \code{\link{Smn}} for prolate spheroidal angular functions,
-#' \code{\link{Rmn}} for prolate spheroidal radial functions.
-#'
-#' @export
-solve_liquid_spheroidal_Amn <- function(K1, K3) {
-  # Validator ==================================================================
-  if (!(is.list(K1) & is.list(K3)) & !(is.matrix(K1) & is.matrix(K3))) {
-    stop("K1 and K3 must share the same type (list or matrix).")
-  }
-  # Helper function ============================================================
-  .compute_A <- function(K1m, K3m) {
-    # Validator ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    if (!is.matrix(K1m) || !is.matrix(K3m)) {
-      stop("K1/K3 elements must both be matrices.")
-    }
-    if (any(dim(K1m) != dim(K3m))) {
-      stop(
-        "K1/K3 elements must share the same dimensions ",
-        paste0("[K1: (", dim(K1m)[1], ", ", dim(K1m)[2], ");"),
-        paste0(" K3: (", dim(K3m)[1], ", ", dim(K3m)[2], ")].")
-      )
-    }
-    # Compute right-hand side "b" matrix +++++++++++++++++++++++++++++++++++++++
-    b <- -rowSums(K1m)
-    # Compute coefficients required for Moore-Penrose pseudoinverse ++++++++++++
-    s <- svd(K3m)
-    # Compute numerical threshold for values > 0 +++++++++++++++++++++++++++++++
-    tol <- max(dim(K3m)) * max(s$d) * .Machine$double.eps
-    # Compute the truncated SVD inverse of parameter Sigma +++++++++++++++++++++
-    d_inv <- ifelse(s$d > tol, 1 / s$d, 0)
-    # Compute Moore-Penrose pseudoinverse of K3 with truncation ++++++++++++++++
-    K3_pinv <- s$v %*% diag(d_inv, nrow = length(d_inv)) %*% Conj(t(s$u))
-    # Solve the expansion coefficient ++++++++++++++++++++++++++++++++++++++++++
-    K3_pinv %*% matrix(b, ncol = 1)
-  }
-  # Compute across list of matrices ============================================
-  if (is.list(K1) & is.list(K3)) {
-    # Validation +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    if (length(K1) != length(K3)) {
-      stop(
-        "K1 and K3 must lists of equal length ",
-        paste0("[K1: ", length(K1), "; K3: ", length(K3), "]")
-      )
-    }
-    # Compute for each list element ++++++++++++++++++++++++++++++++++++++++++++
-    result <- lapply(seq_along(K1), function(m) .compute_A(K1[[m]], K3[[m]]))
-    return(result)
-  }
-  # Compute for paired matrices ================================================
-  .compute_A(K1, K3)
-}
-################################################################################
-#' Compute the kernel regular (\eqn{K_{nl}^{m(1)}}) and scattering
-#' (\eqn{K_{nl}^{m(3)}}) matrices for a liquid spheroid scattering
-#'
-#' @param m_max Maximum azimuthal order m (>= 0) used to iterate the
-#' modal series solution.
-#' @param n_max Maximum degree n (>= m_max).
-#' @param chi_sw Reduced frequency for the surrounding medium.
-#' @param chi_body Reduced frequency for the body / interior.
-#' @param theta_body Orientation of the prolate spheroid relative to the
-#' incident sound wave.
-#' @param xi Prolate spheroidal coordinate (\eqn{|{\xi}| \geq 1}).
-#' @param density_scatterer Density of the scatterer (\eqn{kg~m^{-3}}).
-#' @param density_sw Density of the surrounding medium (\eqn{m~s^{-1}}).
-#' @param n_integration Number of integration points used for Gauss-Legendre
-#' quadrature.
-#'
-#' @return A named list with two elements:
-#' \item{K1_kernel}{list of length \code{m_max + 1}; each element is a complex
-#' matrix (rows = l, cols = n) containing \eqn{K^{m(1)}_{nl}} for that m.}
-#' \item{K3_kernel}{list of length \code{m_max + 1}; each element is a complex
-#' matrix (rows = l, cols = n) containing \eqn{K^{m(3)}_{nl}} for that m.}
-#'
-#' @details
-#' This wrapper calls the underlying C++ implementation to produce the kernel
-#' matrices used to form the linear systems for the scattering coefficients
-#' \eqn{A_{mn}} specific liquid-filled prolate spheroids.
-#' @export
-liquid_spheroidal_kernels <- function(
-    m_max, n_max,
-    chi_sw, chi_body, theta, xi,
-    density_scatterer, density_sw,
-    n_integration=128
+#' incident field through the spheroidal wave function expansion.
+#' @keywords internal
+#' @noRd
+prolate_spheroidal_kernels <- function(
+    acoustics,
+    body,
+    medium,
+    boundary_method,
+    n_integration = 128,
+    precision = "double"
 ) {
-  # Validation =================================================================
-  if (m_max < 0 | n_max < 0) {
-    stop("'m_max' and 'n_max' must both be greater than 0.")
-  }
   # Generate nodes and weights for quadrature ==================================
-  quad_pts <- gauss_legendre(n=n_integration, a=-1, b=1)
-  # Pre-compute the prolate spheroidal anglular functions of the first kind ====
-  smn_matrix <- outer(
-    0:m_max, 0:n_max,
-    Vectorize(function(m, n) {
-      if (n < m) return(NA)
-      Smn(m, n, chi_sw, cos(theta), normalize=TRUE)$value
-    })
-  )
-  # Compute the liquid spheroidal kernel matrices K1 and K3 ====================
-  liquid_spheroidal_kernel_matrices(
-    m_max, n_max, chi_sw, chi_body, xi, density_scatterer, density_sw,
-    quad_pts$nodes, quad_pts$weights, smn_matrix
+  quad_pts <- gauss_legendre(n = n_integration, a = -1, b = 1)
+  # Calculate the linear scattering coefficient, fbs ===========================
+  prolate_spheroid_fbs(
+    acoustics, body, medium, quad_pts, precision, boundary_method
   )
 }
 
