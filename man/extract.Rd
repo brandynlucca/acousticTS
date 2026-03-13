@@ -2,15 +2,23 @@
 % Please edit documentation in R/utilities.R
 \name{extract}
 \alias{extract}
-\title{Primary accessor function for dredging specific data from scatterer objects}
+\title{Primary accessor function for extracting specific features and layers from
+Scatterer objects}
 \usage{
 extract(object, feature)
 }
 \arguments{
 \item{object}{Scatterer-class object.}
 
-\item{feature}{Feature of interest (e.g. body).}
+\item{feature}{Feature(s) of interest (e.g. body). This can either be a
+scalar string, or a vector of names. When a vector is supplied, the function
+recursively accesses the Scatterer object using the 'feature' vector as a
+directory. For example, \code{feature = c("body", "rpos", "x")} would
+extract the 'x' coordinate of the position matrix ('rpos') from the 'body'
+scattering parameters.}
 }
 \description{
-Primary accessor function for dredging specific data from scatterer objects
+Primary accessor function for extracting specific features and layers from
+Scatterer objects
 }
+\keyword{utility}
