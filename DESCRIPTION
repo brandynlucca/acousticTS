@@ -29,7 +29,6 @@ Imports:
     pbapply,
     stats,
     Rcpp,
-    BH
 LinkingTo:
     Rcpp, BH, RcppArmadillo
 Suggests: 
@@ -54,13 +53,24 @@ Collate:
     'data.R'
     'harmonics.R'
     'math.R'
-    'model_initialization.R'
-    'models.R'
+    'models.R'    
+    'model-dwba.R'
+    'model-essms.R'
+    'model-fcms.R'
+    'model-hpa.R'
+    'model-krm.R'
+    'model-psms.R'
+    'model-sdwba.R'
+    'model-soems.R'
+    'model-sphms.R'
+    'model-trcm.R'
+    'pkg-docs.R'
     'scatterer.R'
     'scatterer_plot.R'
     'scatterer_reforge.R'
     'shapes.R'
     'show.R'
     'simulation.R'
+    'spheroidal.R'
     'utilities.R'
     'validation.R'

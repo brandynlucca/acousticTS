@@ -1,7 +1,24 @@
 url: https://brandynlucca.github.io/acousticTS/
 template:
+  # params:
+  #   math_method: mathjax
   bootstrap: 5
-  math-rendering: mathjax
+  math-rendering: katex
+
+articles:
+- title: Boundary conditions
+  navbar: Boundary conditions
+  contents:
+  - boundary_conditions
+- title: Solid elastic (calibration) sphere
+  navbar: Solid elastic (calibration) sphere
+  contents:
+  - calibration/calibration-theory
+  - calibration/calibration-implementation
+- title: Elastic-shelled sphere
+  navbar: Elastic-shelled sphere
+  contents:
+  - essms/essms-theory
 
 reference:
 - title: Scatterer types
@@ -12,7 +29,12 @@ reference:
     scattering models.
   contents:
   - Scatterer
-  - has_keyword("scatterer_type")
+  - CAL
+  - ESS
+  - GAS
+  - FLS
+  - SBF
+
 
 - subtitle: Scatterer generation
   desc: >
@@ -28,7 +50,11 @@ reference:
     model parameterization, and other features.
   contents:
   - Shape
-  - has_keyword("shapes")
+  - Arbitrary
+  - Cylinder
+  - PolynomialCylinder
+  - ProlateSpheroid
+  - Sphere
 
 - subtitle: Shape generation
   desc: >
@@ -50,15 +76,26 @@ reference:
   desc: >
     Mathematical functions used throughout the `acousticTS` package.
 
-- subtitle: Bessel functions
+- subtitle: Bessel functions (cylindrical)
   contents:
-  - has_keyword("bessel1")
-  - has_keyword("bessel2")
-  - has_keyword("bessel3")
+  - jc
+  - yc
+  - hc
+
+- title: Bessel functions (spherical)
+  contents:
+  - js
+  - ys
+  - hs
 
 - subtitle: Legendre functions
   contents:
   - has_keyword("legendre")
+
+- subtitle: Spheroidal wave functions
+  contents:
+  - Smn
+  - Rmn
 
 - subtitle: Vector operations
   contents:
