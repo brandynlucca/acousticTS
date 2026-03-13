@@ -47,25 +47,25 @@ fls_show <- function(object) {
     "body"
   )
   # Print object summary information ===========================================
-  base::cat(
-    base::paste0(methods::is(object)[[1]], "-object"), "\n",
+  cat(
+    paste0(methods::is(object)[[1]], "-object"), "\n",
     " Fluid-like scatterer \n ",
     " ID:",
-    base::paste0(meta$ID), "\n",
+    paste0(meta$ID), "\n",
     "Body dimensions:\n",
-    " Length:", base::paste0(
-      base::round(shape$length, 3),
+    " Length:", paste0(
+      round(shape$length, 3),
       " ",
       shape$length_units
     ),
-    base::paste0("(n = ", shape$n_segments, " cylinders)"), "\n",
-    " Mean radius:", base::paste0(
-      base::round(base::mean(body$radius), 4),
+    paste0("(n = ", shape$n_segments, " cylinders)"), "\n",
+    " Mean radius:", paste0(
+      round(mean(body$radius), 4),
       " ",
       shape$length_units
     ), "\n",
-    " Max radius:", base::paste0(
-      base::round(base::max(body$radius), 4),
+    " Max radius:", paste0(
+      round(max(body$radius), 4),
       " ",
       shape$length_units
     ), "\n",
@@ -73,15 +73,15 @@ fls_show <- function(object) {
     " Defined shape:",
     paste0(shape$shape), "\n",
     " L/a ratio:",
-    base::paste0(base::round(shape$length / shape$radius, 1)), "\n",
+    paste0(round(shape$length / shape$radius, 1)), "\n",
     " Taper order:",
-    base::paste0(shape$taper_order), "\n",
+    paste0(shape$taper_order), "\n",
     "Material properties:\n",
-    base::paste0(" g: ", base::round(base::mean(body$g), 4)), "\n",
-    base::paste0(" h: ", base::round(base::mean(body$h), 4)), "\n",
+    paste0(" g: ", round(mean(body$g), 4)), "\n",
+    paste0(" h: ", round(mean(body$h), 4)), "\n",
     "Body orientation (relative to transducer face/axis):",
-    base::paste0(
-      base::round(body$theta, 3),
+    paste0(
+      round(body$theta, 3),
       " ",
       shape$theta_units
     )
@@ -155,61 +155,61 @@ sbf_show <- function(object) {
     "bladder"
   )
   # Print object summary information ===========================================
-  base::cat(
-    base::paste0(methods::is(object)[[1]], "-object"), "\n",
+  cat(
+    paste0(methods::is(object)[[1]], "-object"), "\n",
     " Fluid-like scatterer \n ",
     " ID:",
-    base::paste0(meta$ID), "\n",
+    paste0(meta$ID), "\n",
     "Body dimensions:\n",
-    " Length:", base::paste0(
-      base::round(shape$body$length, 3),
+    " Length:", paste0(
+      round(shape$body$length, 3),
       " ",
       shape$length_units
     ),
-    base::paste0("(n = ", shape$body$n_segments, " cylinders)"), "\n",
-    " Mean radius:", base::paste0(
-      base::round(base::mean(body$rpos[2, ] / 2), 4),
+    paste0("(n = ", shape$body$n_segments, " cylinders)"), "\n",
+    " Mean radius:", paste0(
+      round(mean(body$rpos[2, ] / 2), 4),
       " ",
       shape$length_units
     ), "|",
-    "Max radius:", base::paste0(
-      base::round(base::max(body$rpos[2, ] / 2), 4),
+    "Max radius:", paste0(
+      round(max(body$rpos[2, ] / 2), 4),
       " ",
       shape$length_units
     ), "\n",
     "Bladder dimensions:\n",
-    " Length:", base::paste0(
-      base::round(shape$bladder$length, 3),
+    " Length:", paste0(
+      round(shape$bladder$length, 3),
       " ",
       shape$length_units
     ),
-    base::paste0("(n = ", shape$bladder$n_segments, " cylinders)"), "\n",
-    " Mean radius:", base::paste0(
-      base::round(base::mean(bladder$rpos[2, ] / 2), 4),
+    paste0("(n = ", shape$bladder$n_segments, " cylinders)"), "\n",
+    " Mean radius:", paste0(
+      round(mean(bladder$rpos[2, ] / 2), 4),
       " ",
       shape$length_units
     ), "|",
-    "Max radius:", base::paste0(
-      base::round(base::max(bladder$rpos[2, ] / 2), 4),
+    "Max radius:", paste0(
+      round(max(bladder$rpos[2, ] / 2), 4),
       " ",
       shape$length_units
     ), "\n",
     "Body material properties:\n",
-    base::paste0(" Density: ", base::round(base::mean(body$density), 4)),
+    paste0(" Density: ", round(mean(body$density), 4)),
     "kg m^-3", "|",
-    base::paste0("Sound speed: ", base::round(base::mean(body$sound_speed), 4)),
+    paste0("Sound speed: ", round(mean(body$sound_speed), 4)),
     "m s^-1", "\n",
     "Bladder fluid material properties:\n",
-    base::paste0(" Density: ", base::round(base::mean(bladder$density), 4)),
+    paste0(" Density: ", round(mean(bladder$density), 4)),
     "kg m^-3", "|",
-    base::paste0("Sound speed: ", base::round(
-      base::mean(bladder$sound_speed),
+    paste0("Sound speed: ", round(
+      mean(bladder$sound_speed),
       4
     )),
     "m s^-1", "\n",
     "Body orientation (relative to transducer face/axis):",
-    base::paste0(
-      base::round(body$theta, 3),
+    paste0(
+      round(body$theta, 3),
       " ",
       shape$theta_units
     )

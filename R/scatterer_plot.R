@@ -16,40 +16,70 @@
 #' and nudge_x to apply; otherwise, input "auto").
 #' @param y_units y-axis data selection (e.g. TS, sigma_bs -- defaults to TS)
 #' @param ... Additional plot inputs
-#' @rdname plot.scatterer
+#' 
+#' @rdname plot.Scatterer
+#' @aliases plot.Scatterer
+#' 
+#' @keywords utility, plotting
 #' @export
-setGeneric("plot", function(x, y, ...) standardGeneric("plot"))
-#' @rdname plot.scatterer
-#' @export
-setMethod(
-  f = "plot",
-  signature = c(x = "Scatterer", y = "missing"),
-  definition = function(x,
-                        y,
-                        type = "shape",
-                        nudge_y = 1.1,
-                        nudge_x = 1.05,
-                        aspect_ratio = "manual",
-                        x_units = "frequency",
-                        y_units = "TS", ...) {
-    # Detect scatterer type ============================================
-    sc_type <- class(x)
-
-    switch(sc_type,
-      CAL = cal_plot(x, type, nudge_y, nudge_x, x_units, ...),
-      ESS = ess_plot(x, type, nudge_y, nudge_x, x_units, ...),
-      SBF = sbf_plot(x, type, nudge_y, nudge_x, x_units, ...),
-      FLS = fls_plot(x, type, nudge_y, nudge_x, aspect_ratio, x_units, y_units),
-      GAS = gas_plot(x, type, nudge_y, nudge_x, x_units, y_units, ...)
-    )
-  }
-)
+plot.Scatterer <- function(x,
+                           y = NULL,
+                           type = "shape",
+                           nudge_y = 1.1,
+                           nudge_x = 1.05,
+                           aspect_ratio = "manual",
+                           x_units = "frequency",
+                           y_units = "TS", ...) {
+  # Detect scatterer type ======================================================
+  sc_type <- class(x)
+  # Switch to sub-class-specific plotting method ===============================
+  switch(sc_type,
+         CAL = cal_plot(
+           x, type, nudge_y, nudge_x, aspect_ratio, x_units, y_units, ...
+         ),
+         ESS = ess_plot(
+           x, type, nudge_y, nudge_x, aspect_ratio, x_units, y_units, ...
+         ),
+         SBF = sbf_plot(
+           x, type, nudge_y, nudge_x, aspect_ratio, x_units, y_units, ...
+         ),
+         FLS = fls_plot(
+           x, type, nudge_y, nudge_x, aspect_ratio, x_units, y_units, ...
+         ),
+         GAS = gas_plot(
+           x, type, nudge_y, nudge_x, aspect_ratio, x_units, y_units, ...
+         )
+  )
+}
+# setMethod(
+#   f = "plot",
+#   signature = c(x = "Scatterer", y="missing"),
+#   definition = function(x,
+#                         y,
+#                         type = "shape",
+#                         nudge_y = 1.1,
+#                         nudge_x = 1.05,
+#                         aspect_ratio = "manual",
+#                         x_units = "frequency",
+#                         y_units = "TS", ...) {
+#     # Detect scatterer type ============================================
+#     sc_type <- class(x)
+# 
+#     switch(sc_type,
+#       CAL = cal_plot(x, type, nudge_y, nudge_x, x_units, ...),
+#       ESS = ess_plot(x, type, nudge_y, nudge_x, x_units, ...),
+#       SBF = sbf_plot(x, type, nudge_y, nudge_x, x_units, ...),
+#       FLS = fls_plot(x, type, nudge_y, nudge_x, aspect_ratio, x_units, y_units),
+#       GAS = gas_plot(x, type, nudge_y, nudge_x, x_units, y_units, ...)
+#     )
+#   }
+# )
 ################################################################################
 #' Base plotting color palette
 #' @description
 #' Color palette vector referenced for plotting multiple models simultaneously.
 #' @rdname model_palette
-#' @export
+#' @noRd
 model_palette <- c(
   "black", "azure4", "royalblue4", "firebrick3", "steelblue3",
   "orangered3", "darkolivegreen", "sienna3", "cadetblue"
@@ -88,8 +118,8 @@ cal_plot <- function(object,
     # Define plot margins ======================================================
     graphics::par(
       ask = FALSE,
-      oma = base::c(1, 1, 1, 0),
-      mar = base::c(3, 4.5, 1, 2)
+      oma = c(1, 1, 1, 0),
+      mar = c(3, 4.5, 1, 2)
     )
     # Begin plotting ===========================================================
     plot(
@@ -101,7 +131,7 @@ cal_plot <- function(object,
       lwd = 4,
       cex.lab = 1.2,
       cex.axis = 1.2,
-      ylim = base::c(
+      ylim = c(
         min(body$rpos[, 5]) * (1 - (1 - nudge_y)),
         max(body$rpos[, 4]) * nudge_y
       )
@@ -162,7 +192,7 @@ cal_plot <- function(object,
         cex.lab = 1.2,
         cex.axis = 1.2,
         xlim = c(
-          base::abs(min(x_axis) * (1 - (1 + nudge_x))),
+          abs(min(x_axis) * (1 - (1 + nudge_x))),
           max(x_axis) * (nudge_x)
         ),
         ylim = c(
@@ -185,7 +215,7 @@ cal_plot <- function(object,
 #' @param nudge_x x-axis nudge.
 #' @param y_units y-axis data selection (e.g. TS, sigma_bs -- defaults to TS).
 #' @param ... Additional plot inputs
-#' @export
+#' @noRd
 ess_plot <- function(object,
                      type = "shape",
                      nudge_y = 1.02,
@@ -219,7 +249,7 @@ ess_plot <- function(object,
       lwd = 4,
       cex.lab = 1.2,
       cex.axis = 1.2,
-      ylim = base::c(
+      ylim = c(
         min(-along_radius) * (1 - (1 - nudge_y)),
         max(along_radius) * nudge_y
       )
@@ -294,21 +324,24 @@ ess_plot <- function(object,
       stop("ERROR: no model results detected in object.")
     }
     # Append model name ========================================================
-    models <- lapply(seq_along(model_names),
-      FUN = function(x) {
-        models[[x]] <- models[[x]][c("frequency", "TS")]
-        transform(models[[x]],
-          model = model_names[x]
+    models <- lapply(
+      seq_along(model_names),
+      function(x) {
+        data.frame(
+          frequency = models[[x]]$frequency,
+          TS = models[[x]]$TS,
+          model = model_names[[x]],
+          stringsAsFactors = FALSE
         )
       }
     )
     # Convert into a data.frame ================================================
     models_df <- do.call("rbind", models)
     # Define x-axis domain =====================================================
-    x_axis <- models_df[, base::which(base::colnames(models_df) == x_units)]
-    x_mat <- base::split(x_axis, models_df$model)
-    y_axis <- models_df[, base::which(base::colnames(models_df) == y_units)]
-    y_mat <- base::split(y_axis, models_df$model)
+    x_axis <- models_df[, which(colnames(models_df) == x_units)]
+    x_mat <- split(x_axis, models_df$model)
+    y_axis <- models_df[, which(colnames(models_df) == y_units)]
+    y_mat <- split(y_axis, models_df$model)
     col_axis <- model_palette[as.numeric(as.factor(models_df$model))]
     x_lab <- switch(x_units,
       frequency = "Frequency (Hz)",
@@ -317,7 +350,7 @@ ess_plot <- function(object,
     # Define plot margins ======================================================
     graphics::par(
       ask = FALSE,
-      mar = base::c(5.0, 5.5, 2.0, 3.5)
+      mar = c(5.0, 5.5, 2.0, 3.5)
     )
     # Initiate plotting ========================================================
     plot(
@@ -392,7 +425,7 @@ ess_plot <- function(object,
 #' and nudge_x to apply; otherwise, input "auto").
 #' @param y_units y-axis data selection (e.g. TS, sigma_bs -- defaults to TS)
 #' @param ... Additional plot inputs
-#' @export
+#' @noRd
 fls_plot <- function(object,
                      type = "shape",
                      nudge_y = 1.05,
@@ -402,7 +435,7 @@ fls_plot <- function(object,
                      y_units = "TS", ...) {
   # Retrieve default plot window parameters ====================================
   opar <- graphics::par(no.readonly = TRUE)
-  base::on.exit(graphics::par(opar))
+  on.exit(graphics::par(opar))
   if (type == "shape") {
     # Extract body shape information ===========================================
     body <- acousticTS::extract(
@@ -414,8 +447,8 @@ fls_plot <- function(object,
     # Define plot margins ======================================================
     graphics::par(
       ask = FALSE,
-      oma = base::c(1, 1, 1, 0),
-      mar = base::c(5.0, 4.5, 1.5, 2)
+      oma = c(1, 1, 1, 0),
+      mar = c(5.0, 4.5, 1.5, 2)
     )
     # Center shape =============================================================
     body$rpos[3, ] <- body$rpos[3, ] - stats::median(body$rpos[3, ])
@@ -437,14 +470,14 @@ fls_plot <- function(object,
     }
     # Adjust axes ==============================================================
     if (aspect_ratio == "manual") {
-      vert_lims <- base::c(
+      vert_lims <- c(
         min(body$rpos[3, ] - radius) * (1 - (1 - nudge_y)),
         max(body$rpos[3, ] + radius) * nudge_y
       )
     } else {
-      vert_lims <- base::c(
-        -base::max(body$rpos[1, ]) * 0.10,
-        base::max(body$rpos[1, ]) * 0.10
+      vert_lims <- c(
+        -max(body$rpos[1, ]) * 0.10,
+        max(body$rpos[1, ]) * 0.10
       )
     }
     # Begin plotting ===========================================================
@@ -541,7 +574,7 @@ fls_plot <- function(object,
     # Detect model selection ===================================================
     models <- extract(object, "model")
     model_names <- names(models)
-    if (base::length(model_names) == 0) {
+    if (length(model_names) == 0) {
       stop("ERROR: no model results detected in object.")
     }
     # Extract body shape information ===========================================
@@ -558,13 +591,13 @@ fls_plot <- function(object,
     # Convert into a data.frame ================================================
     models_df <- do.call("rbind", models)
     # Define x-axis domain =====================================================
-    # x_axis <- base::switch( x_units ,
+    # x_axis <- switch( x_units ,
     #                         frequency = unique( models_df$frequency ) * 1e-3 ,
     #                         k_sw = unique( models_df$ka ) )
-    x_axis <- models_df[, base::which(base::colnames(models_df) == x_units)]
-    x_mat <- base::split(x_axis, models_df$model)
-    y_axis <- models_df[, base::which(base::colnames(models_df) == y_units)]
-    y_mat <- base::split(y_axis, models_df$model)
+    x_axis <- models_df[, which(colnames(models_df) == x_units)]
+    x_mat <- split(x_axis, models_df$model)
+    y_axis <- models_df[, which(colnames(models_df) == y_units)]
+    y_mat <- split(y_axis, models_df$model)
     col_axis <- model_palette[as.numeric(as.factor(models_df$model))]
     x_lab <- switch(x_units,
       frequency = "Frequency (Hz)",
@@ -573,27 +606,27 @@ fls_plot <- function(object,
     # Define plot margins ======================================================
     graphics::par(
       ask = FALSE,
-      mar = base::c(5.0, 5.5, 2.0, 3.5)
+      mar = c(5.0, 5.5, 2.0, 3.5)
     )
     # Initiate plotting ========================================================
     graphics::plot(
-      x = base::seq(
-        from = base::min(x_axis),
-        to = base::max(x_axis),
+      x = seq(
+        from = min(x_axis),
+        to = max(x_axis),
         length.out = 2
       ),
-      y = base::seq(
-        from = base::min(y_axis),
-        to = base::max(y_axis),
+      y = seq(
+        from = min(y_axis),
+        to = max(y_axis),
         length.out = 2
       ),
-      xlim = base::c(
-        base::min(x_axis) * (1 - nudge_x),
-        base::max(x_axis) * (nudge_x)
+      xlim = c(
+        min(x_axis) * (1 - nudge_x),
+        max(x_axis) * (nudge_x)
       ),
-      ylim = base::c(
-        base::min(y_axis) * (1 - (1 - nudge_y)),
-        base::max(y_axis) * (1 + (1 - nudge_y))
+      ylim = c(
+        min(y_axis) * (1 - (1 - nudge_y)),
+        max(y_axis) * (1 + (1 - nudge_y))
       ),
       xlab = x_lab,
       ylab = expression("Target" ~ "strength" ~ ("dB" ~ "re." ~ 1 ~ "m"^2)),
@@ -629,7 +662,7 @@ fls_plot <- function(object,
       lwd = 4
     )
   }
-  base::invisible()
+  invisible()
 }
 ################################################################################
 ################################################################################
@@ -645,7 +678,7 @@ fls_plot <- function(object,
 #' @param nudge_x x-axis nudge.
 #' @param y_units y-axis data selection (e.g. TS, sigma_bs -- defaults to TS).
 #' @param ... Additional plot inputs
-#' @export
+#' @noRd
 gas_plot <- function(object,
                      type = "shape",
                      nudge_y = 1.01,
@@ -674,7 +707,7 @@ gas_plot <- function(object,
       lwd = 4,
       cex.lab = 1.2,
       cex.axis = 1.2,
-      ylim = base::c(
+      ylim = c(
         min(body$rpos[, 3]) * (1 - (1 - nudge_y)),
         max(-body$rpos[, 3]) * nudge_y
       )
@@ -716,13 +749,13 @@ gas_plot <- function(object,
     # Convert into a data.frame ================================================
     models_df <- do.call("rbind", models)
     # Define x-axis domain =====================================================
-    # x_axis <- base::switch( x_units ,
+    # x_axis <- switch( x_units ,
     #                         frequency = unique( models_df$frequency ) * 1e-3 ,
-    #                         k_sw = base::unique( models_df$ka ) )
-    x_axis <- models_df[, base::which(base::colnames(models_df) == x_units)]
-    x_mat <- base::split(x_axis, models_df$model)
-    y_axis <- models_df[, base::which(base::colnames(models_df) == y_units)]
-    y_mat <- base::split(y_axis, models_df$model)
+    #                         k_sw = unique( models_df$ka ) )
+    x_axis <- models_df[, which(colnames(models_df) == x_units)]
+    x_mat <- split(x_axis, models_df$model)
+    y_axis <- models_df[, which(colnames(models_df) == y_units)]
+    y_mat <- split(y_axis, models_df$model)
     x_lab <- switch(x_units,
       frequency = "Frequency (Hz)",
       k_sw = expression(italic(k[sw] * a))
@@ -730,7 +763,7 @@ gas_plot <- function(object,
     # Define plot margins ======================================================
     graphics::par(
       ask = FALSE,
-      mar = base::c(5.0, 5.5, 2.0, 3.5)
+      mar = c(5.0, 5.5, 2.0, 3.5)
     )
     # Initiate plotting ========================================================
     plot(
@@ -796,7 +829,7 @@ gas_plot <- function(object,
 #'    ("frequency", kHz) or ka ("ka").
 #' @param nudge_y y-axis nudge.
 #' @param nudge_x x-axis nudge.
-#' @export
+#' @noRd
 sbf_plot <- function(object,
                      type = "shape",
                      nudge_y = 1.05,

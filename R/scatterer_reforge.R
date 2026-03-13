@@ -14,7 +14,7 @@
 setGeneric(
   "reforge",
   function(object, ...) {
-    standardGeneric("reforge")
+    object
   }
 )
 
@@ -57,8 +57,8 @@ setMethod(
            n_segments_swimbladder = NULL) {
     ############################################################################
     # Validation ===============================================================
-    if (is.null(body_scale) && is.null(swimbladder_scale) && 
-        is.null(body_target) && is.null(swimbladder_target) && 
+    if (is.null(body_scale) && is.null(swimbladder_scale) &&
+        is.null(body_target) && is.null(swimbladder_target) &&
         is.null(n_segments_body) && is.null(n_segments_swimbladder) &&
       swimbladder_inflation_factor == 1.0) {
       stop(
@@ -74,7 +74,7 @@ setMethod(
         "Specify only one of swimbladder_scale or swimbladder_target, not both."
       )
     }
-    # if (((!is.null(body_scale) && length(body_scale) > 1) || 
+    # if (((!is.null(body_scale) && length(body_scale) > 1) ||
     #      (!is.null(body_target) && length(body_target) > 1)) &&
     #   isometric_body) {
     #   message(
@@ -83,7 +83,7 @@ setMethod(
     #     "'isometric_body' will be ignored for those axes."
     #   )
     # }
-    # if (((!is.null(swimbladder_scale) && length(swimbladder_scale) > 1) || 
+    # if (((!is.null(swimbladder_scale) && length(swimbladder_scale) > 1) ||
     #      (!is.null(swimbladder_target) && length(swimbladder_target) > 1)) &&
     #   isometric_swimbladder) {
     #   message(
@@ -92,7 +92,7 @@ setMethod(
     #     "'isometric_swimbladder' will be ignored for those axes."
     #   )
     # }
-    if ((!is.null(body_scale) || !is.null(body_target)) && 
+    if ((!is.null(body_scale) || !is.null(body_target)) &&
         (!is.null(swimbladder_scale) || !is.null(swimbladder_target)) &&
       maintain_ratio) {
       maintain_ratio <- FALSE
@@ -110,7 +110,7 @@ setMethod(
         return(
           list(
             suffix = "_scale",
-            scale = scale 
+            scale = scale
           )
         )
       }
@@ -130,8 +130,8 @@ setMethod(
       if (is.null(target)) {
         return(NULL)
       }
-      if (!is.numeric(target) || 
-          is.null(names(target)) || 
+      if (!is.numeric(target) ||
+          is.null(names(target)) ||
           any(names(target) == "")) {
         stop(paste(name, "must be a named numeric vector."))
       }
@@ -308,7 +308,7 @@ setMethod(
     #   "isometric_body"
     # )
     body_scales <- .validate_dimension_scaling(
-      dims=body_scale_lst$scale, 
+      dims=body_scale_lst$scale,
       dims_name=paste0("body", body_scale_lst$suffix),
       valid_dims=c("length", "width", "height"),
       isometry=isometric_body,
@@ -396,15 +396,17 @@ setMethod(
 #' @param n_segments New number of segments
 #' @param length_radius_ratio_constant Keep length-to-radius ratio based on new
 #' length
+#' 
+#' @keywords keyword
 #' @export
 setMethod(
   "reforge",
   signature(object = "FLS"),
   function(object,
-           length,
-           radius,
+           length = NULL,
+           radius = NULL,
            length_radius_ratio_constant = TRUE,
-           n_segments) {
+           n_segments = NULL) {
     ###################################################################
     # Parse shape =====================================================
     shape <- acousticTS::extract(object, "shape_parameters")
@@ -412,7 +414,7 @@ setMethod(
     body <- acousticTS::extract(object, "body")
     # Determine rescaling factors =====================================
     # Determine new number of cylinders +++++++++++++++++++++++++++++++
-    if (!missing(n_segments)) {
+    if (!is.null(n_segments)) {
       x_new <- seq(
         from = body$rpos[1, 1],
         to = body$rpos[1, shape$n_segments + 1],
@@ -429,7 +431,7 @@ setMethod(
                 xout = x_new
               )$y
             },
-            FUN.VALUE = numeric(base::length(x_new))
+            FUN.VALUE = numeric(length(x_new))
           )
         )
       )
@@ -450,7 +452,7 @@ setMethod(
     #                 xout = x_new )$y
     # }
     # Determine new length ++++++++++++++++++++++++++++++++++++++++++++
-    if (!missing(length)) {
+    if (!is.null(length)) {
       new_scale <- length / shape$length
       matrix_rescale <- diag(
         x = 1,
@@ -474,7 +476,7 @@ setMethod(
       methods::slot(object, "shape_parameters")$length <- max(rpos_new[1, ])
     }
     # Determine new radius ++++++++++++++++++++++++++++++++++++++++++++
-    if (!missing(radius)) {
+    if (!is.null(radius)) {
       new_scale <- radius / shape$radius
       vector_rescale <- body$radius * new_scale
       methods::slot(object, "body")$radius <- vector_rescale
