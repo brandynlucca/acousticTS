@@ -5,23 +5,29 @@
 \title{Manually generate a SBF-class object.}
 \usage{
 sbf_generate(
-  x_body,
-  w_body,
-  zU_body,
-  zL_body,
-  x_bladder,
-  w_bladder,
-  zU_bladder,
-  zL_bladder,
-  sound_speed_body,
-  sound_speed_bladder,
-  density_body,
-  density_bladder,
+  x_body = NULL,
+  w_body = NULL,
+  zU_body = NULL,
+  zL_body = NULL,
+  x_bladder = NULL,
+  w_bladder = NULL,
+  zU_bladder = NULL,
+  zL_bladder = NULL,
+  sound_speed_body = NULL,
+  sound_speed_bladder = NULL,
+  g_body = NULL,
+  h_body = NULL,
+  g_bladder = NULL,
+  h_bladder = NULL,
+  density_body = NULL,
+  density_bladder = NULL,
   theta_body = pi/2,
   theta_bladder = pi/2,
   theta_units = "radians",
   length_units = "m",
-  ID = NULL
+  ID = NULL,
+  body_shape = NULL,
+  bladder_shape = NULL
 )
 }
 \arguments{
@@ -45,7 +51,15 @@ sbf_generate(
 (\ifelse{html}{\out{c;<sub>body</sub>}}{\eqn{c_{body}}},
 m \ifelse{html}{\out{s<sup>-1</sup>}}{\eqn{s^{-1}}}).}
 
-\item{sound_speed_bladder}{Bladder sound speed (c, m \eqn{s^-1}.}
+\item{sound_speed_bladder}{Bladder sound speed (c, m \eqn{s^-1}).}
+
+\item{g_body}{Body density contrast.}
+
+\item{h_body}{Body sound speed contrast.}
+
+\item{g_bladder}{Bladder density contrast.}
+
+\item{h_bladder}{Bladder sound speed contrast.}
 
 \item{density_body}{Flesh density
 (\ifelse{html}{\out{&rho;<sub>body</sub>}}{\eqn{\rho_{body}}},
@@ -57,20 +71,66 @@ kg \ifelse{html}{\out{m<sup>3</sup>}}{\eqn{m^3}}).}
 \item{theta_body}{Angle of body relative to wavefront
 (\eqn{\theta_body}, radians).}
 
-\item{theta_bladder}{Angle of body relative to wavefront
+\item{theta_bladder}{Angle of bladder relative to wavefront
 (\eqn{\theta_bladder}, radians).}
 
 \item{theta_units}{Angular units.}
 
-\item{length_units}{Angular units.}
+\item{length_units}{Length units.}
 
-\item{ID}{Angular units.}
+\item{ID}{Optional metadata identifier.}
+
+\item{body_shape}{Optional pre-built Shape for the body; overrides
+x_body/w_body/zU_body/zL_body if supplied.}
+
+\item{bladder_shape}{Optional pre-built Shape for the bladder; overrides
+x_bladder/w_bladder/zU_bladder/zL_bladder if supplied.}
 }
 \value{
 Generates a SBF-class object.
 }
 \description{
 Manually generate a SBF-class object.
+}
+\details{
+Body/bladder width vectors (\code{w_body}, \code{w_bladder}) default to zeros when
+missing. Resulting \code{rpos} matrices always carry the row names
+x_body, w_body, zU_body, zL_body for the body and x_bladder, w_bladder,
+zU_bladder, zL_bladder for the bladder.
+}
+\examples{
+# Manual body/bladder coordinates
+sbf_generate(
+  x_body = seq(0, 0.1, length.out = 5),
+  w_body = rep(0, 5),
+  zU_body = seq(0.001, 0.002, length.out = 5),
+  zL_body = -seq(0.001, 0.002, length.out = 5),
+  x_bladder = seq(0.02, 0.09, length.out = 4),
+  w_bladder = rep(0, 4),
+  zU_bladder = rep(0.0015, 4),
+  zL_bladder = rep(-0.0015, 4),
+  sound_speed_body = 1500,
+  sound_speed_bladder = 340,
+  density_body = 1040,
+  density_bladder = 1.2
+)
+
+# Using pre-built shapes
+body_shape <- arbitrary(
+  x_body = c(0, 0.1), zU_body = c(0.001, 0.002),
+  zL_body = c(-0.001, -0.002)
+)
+bladder_shape <- arbitrary(
+  x_bladder = c(0.02, 0.09), w_bladder = c(0, 0),
+  zU_bladder = c(0.0015, 0.0015),
+  zL_bladder = c(-0.0015, -0.0015)
+)
+sbf_generate(
+  body_shape = body_shape, bladder_shape = bladder_shape,
+  sound_speed_body = 1500, sound_speed_bladder = 340,
+  density_body = 1040, density_bladder = 1.2
+)
+
 }
 \seealso{
 \code{\link{SBF}}

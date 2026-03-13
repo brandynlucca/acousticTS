@@ -81,6 +81,20 @@ ESS-class object
 \description{
 Generate ESS shape
 }
+\examples{
+shell <- sphere(radius_body = 0.03, n_segments = 80)
+ess_generate(
+  shape = shell,
+  shell_thickness = 0.001,
+  density_shell = 1050,
+  sound_speed_shell = 2350,
+  density_fluid = 1030,
+  sound_speed_fluid = 1500,
+  E = 3.5e9,
+  nu = 0.34
+)
+
+}
 \seealso{
 \code{\link{ESS}}
 }

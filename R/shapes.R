@@ -16,9 +16,8 @@
 #'
 #' @keywords shapes internal
 #'
+#' @name Shape
 #' @rdname Shape-class
-#' @aliases Shape
-#'
 #' @export
 Shape <- setClass("Shape",
   slots = c(
@@ -35,9 +34,8 @@ Shape <- setClass("Shape",
 #'
 #' @keywords shapes internal
 #'
+#' @name Arbitrary
 #' @rdname Arbitrary-class
-#' @aliases Arbitrary
-#'
 #' @export
 Arbitrary <- setClass("Arbitrary",
   contains = "Shape"
@@ -51,7 +49,7 @@ Arbitrary <- setClass("Arbitrary",
 #'
 #' @keywords shapes internal
 #'
-#' @aliases Sphere
+#' @name Sphere
 #' @rdname Sphere-class
 #' @export
 Sphere <- setClass("Sphere",
@@ -66,7 +64,7 @@ Sphere <- setClass("Sphere",
 #'
 #' @keywords shapes internal
 #'
-#' @aliases ProlateSpheroid
+#' @name ProlateSpheroid
 #' @rdname ProlateSpheroid-class
 #' @export
 ProlateSpheroid <- setClass("ProlateSpheroid",
@@ -81,7 +79,7 @@ ProlateSpheroid <- setClass("ProlateSpheroid",
 #'
 #' @keywords shapes internal
 #'
-#' @aliases Cylinder
+#' @name Cylinder
 #' @rdname Cylinder-class
 #' @export
 Cylinder <- setClass("Cylinder",
@@ -96,7 +94,7 @@ Cylinder <- setClass("Cylinder",
 #'
 #' @keywords shapes internal
 #'
-#' @aliases PolynomialCylinder
+#' @name PolynomialCylinder
 #' @rdname PolynomialCylinder-class
 #' @export
 PolynomialCylinder <- setClass("PolynomialCylinder",

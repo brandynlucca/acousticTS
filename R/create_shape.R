@@ -7,40 +7,131 @@
 # Arbitrary (or pre-generated) body shape parameters
 ################################################################################
 #' Creates arbitrary body shape from user inputs
-#' @param x_body x-axis (m)
-#' @param y_body y-axis (m)
-#' @param z_body z-axis (m)
-#' @param radius_body Radius (m)
+#' @param ... Any coordinate or parameter vectors (e.g., x_body, y_body,
+#'   z_body, radius_body, w_body, zU_body, zL_body, custom_*). Inputs are
+#'   stored and padded to a common length; validation happens downstream in
+#'   model-specific code.
 #' @param length_units Units for body length. Defaults to meters: "m"
+#' @examples
+#' # Symmetric arbitrary shape using x/y/z + radius
+#' arbitrary(
+#'   x_body = c(0, 0.01), y_body = c(0, 0), z_body = c(0, 0),
+#'   radius_body = c(0, 0.002)
+#' )
+#'
+#' # Dorsal/ventral style inputs
+#' arbitrary(
+#'   x_body = c(0, 0.015),
+#'   w_body = c(0.005, 0.0075),
+#'   zU_body = c(0.001, 0.002),
+#'   zL_body = c(-0.001, -0.002)
+#' )
 #' @seealso \code{\link{Arbitrary}}
 #'
 #' @keywords shape_generation
 #' @rdname arbitrary
 #' @export
-arbitrary <- function(x_body,
-                      y_body,
-                      z_body,
-                      radius_body,
+arbitrary <- function(...,
                       length_units = "m") {
-  position_matrix <- cbind(
-    x = x_body,
-    y = y_body,
-    z = z_body,
-    zU = z_body + radius_body,
-    zL = z_body - radius_body
-  )
-  # Generate shape parameters list =============================================
+  # Gather arguments ===========================================================
+  args <- list(...)
+  coord_names <- names(args)
+  # If an rpos matrix is provided, use it directly =============================
+  if (!is.null(args$rpos) && is.matrix(args$rpos)) {
+    position_matrix <- args$rpos
+  } else {
+    # Collect all numeric vectors; pad to common length ========================
+    numeric_vecs <- args[vapply(args, is.numeric, logical(1))]
+    # Check coordinate aliases =================================================
+    all_aliases <- Filter(Negate(is.null), list(
+      x = .validate_coord_aliases(coord_names, "^x"),
+      y = .validate_coord_aliases(coord_names, "^y"),
+      w = .validate_coord_aliases(coord_names, "^w"),
+      z = .validate_coord_aliases(coord_names, "^z(?![UL])"),
+      zU = .validate_coord_aliases(coord_names, "^(zU)"),
+      zL = .validate_coord_aliases(coord_names, "^(zL)"),
+      a = .validate_coord_aliases(coord_names,
+                                  "^radius(?!_curvature)\\w*")
+    ))
+    if (length(all_aliases) < 2) {
+      stop(
+        "'Arbitrary' shape-class requires at least two numeric vectors with ",
+        "valid coordinates (e.g., 'x_body' and 'radius_body'). Current ",
+        "detected coordinates from input: '",
+        paste(unlist(all_aliases), collapse="', '"), "'.",
+        call. = FALSE
+      )
+    }
+    # Default column order hint: prioritize common names when present ==========
+    position_matrix <- do.call(cbind, numeric_vecs[unlist(all_aliases)])
+    colnames(position_matrix) <- names(all_aliases)
+  }
+  # Update shape parameters ====================================================
   shape_parameters <- list(
-    radius = radius_body,
-    n_segments = length(x_body) - 1,
+    n_segments = max(nrow(position_matrix) - 1, 1),
+    length_units = length_units,
     diameter_units = length_units
   )
-  # Generate new shape object ==================================================
-  return(methods::new("Arbitrary",
+  # Check for radius +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  if ("a" %in% colnames(position_matrix)) {
+    shape_parameters$radius <- position_matrix[, "a"]
+  } else {
+    shape_parameters$radius <- NA
+  }
+  # Back-fill zU and zL if not already present -- assuming uniformity ++++++++++
+  is_zU <- "zU" %in% colnames(position_matrix)
+  is_zL <- "zL" %in% colnames(position_matrix)
+  is_a <- "a" %in% colnames(position_matrix)
+  if (is_a & !is_zU & !is_zL) {
+    position_matrix <- cbind(
+      position_matrix,
+      cbind(zU=position_matrix[,"a"], zL=-position_matrix[,"a"])
+    )
+  } else if(is_a & !is_zU & is_zL) {
+    position_matrix <- cbind(
+      position_matrix,
+      cbind(zU=-position_matrix[,"zL"])
+    )
+  } else if(is_a & is_zU & !is_zL) {
+    position_matrix <- cbind(
+      position_matrix,
+      cbind(zL=-position_matrix[,"zU"])
+    )
+  }
+  shape_parameters <- c(
+    shape_parameters,
+    list(
+      mean_radius = mean(shape_parameters$radius),
+      max_radius = max(shape_parameters$radius)
+    )
+  )
+  # Generate new shape objects =================================================
+  methods::new(
+    "Arbitrary",
     position_matrix = position_matrix,
     shape_parameters = shape_parameters
-  ))
+  )
 }
+
+.validate_coord_aliases <- function(x, pattern) {
+  # Extract ====================================================================
+  mask <- grepl(pattern, x, perl = TRUE)
+  aliases <- x[mask]
+  # Validate length ============================================================
+  if (length(aliases) > 1) {
+    stop(
+      "The following arbitrary entries overlap and are ambiguous. There ",
+      "should only be 1 entry corresponding to 'x', 'y', 'z', 'zU', and/or ",
+      "'zL'. The following overlapped: '",
+      paste(aliases, collapse = "', '"),
+      "'."
+    )
+  } else if(length(aliases) == 0) {
+    return(NULL)
+  }
+  aliases
+}
+
 ################################################################################
 # Sphere
 ################################################################################
@@ -49,6 +140,8 @@ arbitrary <- function(x_body,
 #' @param n_segments Number of segments to discretize object shape. Defaults to
 #'    1e2 segments.
 #' @param diameter_units Default is "m" for meters
+#' @examples
+#' sphere(radius_body = 0.01, n_segments = 50)
 #' @usage
 #' sphere(radius_body, n_segments, diameter_units )
 #' @return
@@ -109,14 +202,22 @@ sphere <- function(radius_body,
 #' Creates a prolate spheroid.
 #'
 #' @param length_body Semi-major axis length (m).
+#' @param semimajor_length Optional alias for semi-major axis length (m).
 #' @param radius_body Semi-minor axis length (m). This can also be stylized as
 #'    the "maximum radius" of the scattering object.
+#' @param semiminor_length Optional alias for semi-minor axis length (m).
 #' @param length_radius_ratio Optional ratio input when radius is not explicitly
 #'    known.
 #' @param n_segments Number of segments to discretize object shape. Defaults to
 #'    18 segments.
 #' @param length_units Units for body matrix (defaults to m).
-#' @param theta_units Units for body orientation (defaults to radians).
+#' @examples
+#' prolate_spheroid(
+#'   length_body = 0.04, radius_body = 0.004, n_segments = 60
+#' )
+#' prolate_spheroid(
+#'   semimajor_length = 0.05, semiminor_length = 0.003
+#' )
 #' @return
 #' Creates the position vector for a prolate spheroid object of defined
 #'    semi-major and -minor axes.
@@ -125,22 +226,34 @@ sphere <- function(radius_body,
 #' @keywords shape_generation
 #' @rdname prolate_spheroid
 #' @export
-prolate_spheroid <- function(length_body,
+prolate_spheroid <- function(length_body = NULL,
                              radius_body = NULL,
                              length_radius_ratio = NULL,
+                             semimajor_length = NULL,
+                             semiminor_length = NULL,
                              n_segments = 100,
-                             length_units = "m",
-                             theta_units = "radians") {
+                             length_units = "m") {
+  # Allow alternative argument names for clarity ===============================
+  length_val <- if (!is.null(semimajor_length)) {
+    semimajor_length * 2
+  } else {
+    length_body
+  }
+  radius_val <- if (!is.null(semiminor_length)) {
+    semiminor_length
+  } else {
+    radius_body
+  }
   # Define maximum radius ======================================================
   max_radius <- .calculate_max_radius(
-    radius_body, length_body, length_radius_ratio
+    radius_val, length_val, length_radius_ratio
   )
   # Define semi-major or x-axis ================================================
-  x_edges <- seq(0, length_body, length.out = n_segments + 1)
+  x_edges <- seq(0, length_val, length.out = n_segments + 1)
   # Get the segment midpoints ==================================================
   x_mids <- (utils::head(x_edges, -1) + utils::tail(x_edges, -1)) / 2
   # Normalize the midpoints for ellipse ========================================
-  curved_x_mids <- (x_mids - length_body / 2) / (length_body / 2)
+  curved_x_mids <- (x_mids - length_val / 2) / (length_val / 2)
   # Compute the radius at each segment midpoint ================================
   radius_output <- max_radius * sqrt(1 - curved_x_mids^2)
   max_idx <- which.max(radius_output)
@@ -163,6 +276,8 @@ prolate_spheroid <- function(length_body,
   shape_parameters <- list(
     length = max(position_matrix[, 1]),
     radius = radius_output,
+    semimajor_length = max(position_matrix[, 1]) / 2,
+    semiminor_length = max(radius_output),
     length_radius_ratio = max(position_matrix[, 1]) / max(radius_output),
     n_segments = n_segments,
     length_units = length_units
@@ -187,6 +302,8 @@ prolate_spheroid <- function(length_body,
 #' @param n_segments Number of segments to discretize object shape. Defaults to
 #'    1e2 segments.
 #' @param length_units Units (default is meters, "m").
+#' @examples
+#' cylinder(length_body = 0.05, radius_body = 0.003, n_segments = 80)
 #' @usage
 #' cylinder(length_body, radius_body, length_radius_ratio,
 #' taper, n_segments, length_units)
@@ -201,6 +318,7 @@ cylinder <- function(length_body,
                      radius_body = NULL,
                      length_radius_ratio = NULL,
                      taper = NULL,
+                     radius_curvature_ratio = NULL,
                      n_segments = 1e2,
                      length_units = "m") {
   # Define maximum radius ======================================================
@@ -246,6 +364,9 @@ cylinder <- function(length_body,
       NA,
       taper
     ),
+    radius_curvature_ratio = ifelse(is.null(radius_curvature_ratio),
+                                    NA,
+                                    radius_curvature_ratio),
     length_units = length_units
   )
   # Generate new shape object ==================================================
@@ -332,6 +453,14 @@ polynomial_cylinder <- function(length_body,
 #'    'Details', including mandatory arguments.
 #' @param ... Additional input arguments for subsequent shape generation
 #' functions.
+#' @examples
+#' create_shape("sphere", radius_body = 0.01)
+#' create_shape(
+#'   "prolate_spheroid", length_body = 0.04, radius_body = 0.004
+#' )
+#' create_shape(
+#'   "cylinder", length_body = 0.05, radius_body = 0.003
+#' )
 #'
 #' @details
 #' The \strong{shape} argument specifies what shape for the function to

@@ -61,4 +61,14 @@ coefficients reported by Smith \emph{et al.} (2013).
 }
 }
 }
+\examples{
+create_shape("sphere", radius_body = 0.01)
+create_shape(
+  "prolate_spheroid", length_body = 0.04, radius_body = 0.004
+)
+create_shape(
+  "cylinder", length_body = 0.05, radius_body = 0.003
+)
+
+}
 \keyword{shape_generation}

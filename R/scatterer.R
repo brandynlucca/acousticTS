@@ -6,7 +6,7 @@
 #' Scatterer-class object for target strength estimation
 #'
 #' @description
-#' The \eqn{acousticTS} package uses a variety of defined S4-class objects
+#' The \code{acousticTS} package uses a variety of defined S4-class objects
 #' comprising different types of scatterers, such as fish with gas-filled
 #' swimbladders (\link{SBF}) and fluid-like crustaceans
 #' (\link{FLS}).
@@ -82,7 +82,7 @@
 #'
 #' @keywords scatterer_type
 #'
-#' @aliases Scatterer
+#' @name Scatterer
 #' @rdname Scatterer-class
 #' @export
 setClass("Scatterer",
@@ -110,6 +110,7 @@ setClass("Scatterer",
 #'
 #' @keywords scatterer_type
 #'
+#' @name GAS
 #' @rdname GAS-class
 #' @export
 GAS <- setClass("GAS",
@@ -137,6 +138,7 @@ GAS <- setClass("GAS",
 #'
 #' @keywords scatterer_type
 #'
+#' @name SBF
 #' @rdname SBF-class
 #' @export
 SBF <- setClass("SBF",
@@ -168,7 +170,8 @@ SBF <- setClass("SBF",
 #' @seealso \link{Scatterer}
 #'
 #' @keywords scatterer_type
-#'
+#' 
+#' @name ESS
 #' @rdname ESS-class
 #' @export
 ESS <- setClass("ESS",
@@ -196,6 +199,7 @@ ESS <- setClass("ESS",
 #'
 #' @keywords scatterer_type
 #'
+#' @name CAL
 #' @rdname CAL-class
 #' @export
 CAL <- setClass("CAL",
@@ -224,6 +228,7 @@ CAL <- setClass("CAL",
 #'
 #' @keywords scatterer_type
 #'
+#' @name FLS
 #' @rdname FLS-class
 #' @export
 FLS <- setClass("FLS",

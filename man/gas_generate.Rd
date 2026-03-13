@@ -6,7 +6,6 @@
 \usage{
 gas_generate(
   shape = "sphere",
-  radius_body = NULL,
   h_fluid = 0.22,
   g_fluid = 0.0012,
   sound_speed_fluid = NULL,
@@ -15,14 +14,12 @@ gas_generate(
   ID = NULL,
   radius_units = "m",
   theta_units = "radians",
-  n_segments = 100
+  n_segments = 100,
+  ...
 )
 }
 \arguments{
 \item{shape}{Optional pre-made shape input. Default is a sphere.}
-
-\item{radius_body}{Radius (m). For non-canonical shapes, this would be the
-maximum or mean radius at the scatterer midsection.}
 
 \item{h_fluid}{Sound speed contrast of fluid relative to surrounding
 medium (h).}
@@ -44,12 +41,21 @@ Default value is pi/2; input should be in radians.}
 \item{theta_units}{Units used for orientation. Defaults to "radians".}
 
 \item{n_segments}{Number of body segments.}
+
+\item{...}{Additional parameters.}
+
+\item{radius_body}{Radius (m). For non-canonical shapes, this would be the
+maximum or mean radius at the scatterer midsection.}
 }
 \value{
 GAS-class object
 }
 \description{
 Create GAS object
+}
+\examples{
+shape_gas <- sphere(radius_body = 0.01, n_segments = 60)
+gas_generate(shape = shape_gas, g_fluid = 0.0012, h_fluid = 0.22)
 }
 \seealso{
 \code{\link{GAS}}

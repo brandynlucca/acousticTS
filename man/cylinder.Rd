@@ -29,6 +29,9 @@ Creates the position vector for a tapered or untapered cylinder.
 \description{
 Creates a cylinder.
 }
+\examples{
+cylinder(length_body = 0.05, radius_body = 0.003, n_segments = 80)
+}
 \seealso{
 \code{\link{Cylinder}}
 }

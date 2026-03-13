@@ -13,8 +13,10 @@ fls_generate(
   radius_body = NULL,
   radius_curvature_ratio = NULL,
   n_segments = 18,
-  g_body,
-  h_body,
+  g_body = NULL,
+  h_body = NULL,
+  density_body = NULL,
+  sound_speed_body = NULL,
   theta_body = pi/2,
   ID = NULL,
   length_units = "m",
@@ -46,6 +48,11 @@ homogenous) or a vector of values (i.e. inhomogenous).}
 \item{h_body}{Soundspeed contrast. This can either be a single value (i.e.
 homogenous) or a vector of values (i.e. inhomogenous).}
 
+\item{density_body}{Absolute density (kg/m^3) if contrasts are not supplied.}
+
+\item{sound_speed_body}{Absolute sound speed (m/s) if contrasts are not
+supplied.}
+
 \item{theta_body}{Orientation of the target relative to the transmit source
 (\eqn{\theta}). Broadside incidence is considered 90 degrees, or pi/2.
 Default value is pi/2; input should be in radians.}
@@ -63,6 +70,20 @@ FLS-class object
 }
 \description{
 Manually generate a FLS object.
+}
+\details{
+Material properties can be provided either as contrasts (\code{g_body}/\code{h_body})
+or as absolute density/sound speed (\code{density_body}/\code{sound_speed_body}).
+Downstream models will derive contrasts automatically when only absolute
+values are supplied.
+}
+\examples{
+shape <- prolate_spheroid(
+  length_body = 0.04, radius_body = 0.004, n_segments = 50
+)
+fls_generate(
+  shape = shape, density_body = 1045, sound_speed_body = 1520
+)
 }
 \seealso{
 \code{\link{FLS}}
