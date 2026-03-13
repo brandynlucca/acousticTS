@@ -1,6 +1,5 @@
 ---
-title: "Target strength for a calibration sphere"
-author: "Brandyn Lucca (https://orcid.org/0000-0003-3145-2969)"
+title: "Implementation"
 output:
   rmarkdown::html_vignette:
     toc: true
@@ -16,57 +15,26 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
 ---
 
-# Introduction 
-
-Echosounders are often calibrated using standard targets that comprise strong
-scatterers with target strengths (TS, dB re. 1 m^2^) that are relatively 
-straightforward to model and predict[^1]. Typically, this comprises
-a tungsten carbide (chemical formula: WC) sphere, but elastic spheres consisting
-of other materials (e.g. aluminum, Al) can also be used[^2]. 
-
-[^1]: Foote, K.G. (**1990**). *Spheres for calibration an eleven-frequency acoustic
-measurement system*. J. Cons. int. Explor. Mer., 46: 284-286. 
-
-[^2]: Hickling, R. (**1962**). *Analysis of echoes from a solid elastic sphere in water*.
-J. Acoust. Soc. Am., 45: 1582-1592. 
-
 # acousticTS implementation
 
-The `acousticTS` package adapts the series of equations described in the 
-literature[^3] that provide a solution of wave equations based on the classical
-theory of elasticity. The object-based approach in `acousticTS` makes this 
-relatively straightforward by minimizing the amount of manual coding end-users
-must write. 
+The `acousticTS` package adapts the series of equations described in the literature[^3] that provide a solution of wave equations based on the classical theory of elasticity. The object-based approach in `acousticTS` makes this relatively straightforward by minimizing the amount of manual coding end-users must write. 
 
-[^3]: MacLennan, D.N. (**1981**). *Target strength measurements on metal spheres*. 
-Scottis Fish. Res. Rep., 25, 11 pp. 
+
 
 ## Calibration sphere object generation
 
-First, a calibration sphere object has to be created. This is represented by the
-`CAL` object class that contains slots for `metadata`, `model_parameters`, 
-`model` results, `body` for sphere dimensions and material properties, and
-`shape_parameters` for shape-specific metadata. This object can be created using
-the `cal_generate(...)` function that has two required arguments: `material` and 
-`diameter`. The default diameter is 38.1 mm, or 38.1e^-3^ m. The `diameter` input
-is intended to be in meters.The `material` argument comprises five default 
-options that automatically include their respective longitudinal and transversal 
-sound speeds (m s^-1^) and material density (kg m^-3^): 
+First, a calibration sphere object has to be created. This is represented by the `CAL` object class that contains  slots for `metadata`, `model_parameters`, `model` results, `body` for sphere dimensions and material properties, and `shape_parameters` for shape-specific metadata. This object can be created using the `cal_generate(...)` function that has two required arguments: `material` and `diameter`. The default diameter is 38.1 mm, or 38.1e^-3^ m. The `diameter` input is intended to be in meters.The `material` argument comprises five default options that automatically include their respective longitudinal ($c_l$) and transversal ($c_t$) sound speeds (m s^-1^) and material density ($\rho$, kg m^-3^):
 
 
-| Material | Argument value | Longitudinal sound speed (c~l~) | Transversal sound speed (c~t~) | Density ($\rho$) |
+| Material | Argument value | $c_\ell$ | $c_\tau$ | $\rho$ |
 | ----------- | ----------- | ----------- | ----------- | ----------- |
-| Tungsten carbide | "WC" | 6853 | 4171 | 8360 |
-| Aluminum | "Al" | 6260 | 3080 | 2070 |
-| Stainless steel | "steel" | 5980 | 3297 | 7970 |
-| Brass | "brass" | 4372 | 2100 | 8360 |
-| Copper | "Cu" | 4760 | 2288.5 |8947 |
+| Tungsten carbide | `"WC"` | 6853 | 4171 | 8360 |
+| Aluminum | `"Al"` | 6260 | 3080 | 2070 |
+| Stainless steel | `"steel"` | 5980 | 3297 | 7970 |
+| Brass | `"brass"` | 4372 | 2100 | 8360 |
+| Copper | `"Cu"` | 4760 | 2288.5 |8947 |
 
-Alternatively, you can define your own material properties by assigning values to 
-`sound_speed_longitudinal`, `sound_speed_transversal`, and `density_sphere` within
-`cal_generate(...)` such as: 
-
-`cal_generate(..., density_sphere = 1026)`
+Alternatively, you can define your own material properties by assigning values to `sound_speed_longitudinal`, `sound_speed_transversal`, and `density_sphere` within `cal_generate(...)`.
 
 When using the default arguments: 
 
@@ -80,17 +48,7 @@ cal_sphere <- cal_generate()
 
 ## Calculating a TS-frequency spectrum for the calibration sphere
 
-With the calibration sphere object generated, TS can be calculated via the 
-`target_strength(...)` function, which is a wrapper function that generally
-allows for multiple models to be applied to a single scatterer when needed. In 
-this case, there are three required arguments to calculate TS: `object`, 
-`frequency`, and `model`. The `object` argument simply refers to the `CAL` object
-that we created before (i.e. `cal_sphere`). Frequency (via `frequency`) can be 
-a `vector` of values (Hz). Model is a `string` input that refers to the model 
-end-users would like to use, which would be `model = "calibration"` in this case.
-This will update the current `CAL` object when assigned to the same variable, 
-or can be used to generate a copy of the original `CAL` object that now includes
-model parameter and results as a built-in field.
+With the calibration sphere object generated, TS can be calculated via the `target_strength(...)` function, which is a wrapper function that generally allows for multiple models to be applied to a single scatterer when needed. In this case, there are three required arguments to calculate TS: `object`, `frequency`, and `model`. The `object` argument simply refers to the `CAL` object that we created before (i.e. `cal_sphere`). Frequency (via `frequency`) can be a `vector` of values (Hz). Model is a `string` input that refers to the model end-users would like to use, which would be `model = "calibration"` (*or* `model = "SOEMS"`) in this case. This will update the current `CAL` object when assigned to the same variable, or can be used to generate a copy of the original `CAL` object that now includes model parameter and results as a built-in field.
 
 
 ```{r} 
@@ -109,6 +67,8 @@ cal_sphere_copy <- target_strength(
   model = "calibration"
 )
 ```
+
+
 
 ## Extracting model results
 

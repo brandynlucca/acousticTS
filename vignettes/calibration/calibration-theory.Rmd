@@ -1,0 +1,269 @@
+---
+title: "Theory"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: true
+    fig_caption: yes
+    fig_width: 3.5
+    fig_height: 3.5
+    dpi: 200
+    dev.args: list(pointsize=11)
+template:
+  bootstrap: 5
+  math-rendering: mathjax
+vignette: >
+  %\VignetteIndexEntry{Target strength for a calibration sphere}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# Introduction 
+
+Echosounders are often calibrated using standard targets that comprise strong scatterers with target strengths (TS, dB re. 1 m^2^) that are relatively straightforward to model and predict[^1]. Typically, this comprises a tungsten carbide (chemical formula: WC) sphere, but elastic spheres consisting of other materials (e.g. aluminum, Al) can also be used[^2].
+
+[^1]: Foote, K.G. (**1990**). *Spheres for calibration an eleven-frequency acoustic measurement system*. J. Cons. int. Explor. Mer., 46: 284-286. 
+
+[^2]: Hickling, R. (**1962**). *Analysis of echoes from a solid elastic sphere in water*. J. Acoust. Soc. Am., 45: 1582-1592. 
+
+[^3]: MacLennan, D.N. (**1981**). *Target strength measurements on metal spheres*. Scottis Fish. Res. Rep., 25, 11 pp. 
+
+[^4]: Faran, J.J. (**1951**). *Sound scattering by solid cylinders and spheres*. J. Acoust. Soc. Am., 23: 405-418.
+
+[^5]: Rudgers, A.J. (**1969**). *Acoustic pulses scattered by a rigid sphere immersed in a fluid*. J. Acoust. Soc. Am., 45: 900-910.
+
+[^6]: Achenbach, J.D. (**1973**). *Wave propagation in elastic solids* (Vol. 16). North-Holland.
+
+# Solid elastic sphere theory
+
+The modal series solution for a solid elastic sphere scattering model is formulated by solving coupled wave equations in a fluid medium surrounding an elastic solid. The key property that enables this modal series solution is that, after appropriate variable transformations, all governing equations reduce to Helmholtz equations that are separable in spherical coordinates[^6]. 
+
+## Reduction to Helmholtz equations
+
+In the surrounding fluid, the acoustic pressure field $p(\mathbf{x}, \omega)$ satisfies:
+
+$$
+  \nabla^2p + k^2_{1}p = 0,
+$$
+
+where $\omega$ is the angular frequency, $\mathbf{x} = (r, \theta, \varphi)$ is the position vector in spherical coordinates, $c_1$ is the fluid sound speed, and $k_1 = \frac{\omega}{c_1}$ is the acoustic wavenumber. The gradient, $\nabla$, is the vector differential operator defined by:
+
+$$
+  \nabla = 
+    \left( 
+      \frac{\partial}{\partial x} , \frac{\partial}{\partial y} , \frac{\partial}{\partial z}
+    \right).
+$$
+
+Within the solid elastic sphere, the displacement field $\mathbf{u}(\mathbf{x}, \omega)$ satisfies the Navier equation:
+
+$$
+  (\lambda + 2\mu) \nabla(\nabla \cdot \mathbf{u}) - \mu \nabla \times (\nabla \times \mathbf{u}) + \rho_2 \omega^2 \mathbf{u} = 0,
+$$
+
+where $\lambda$ and $\mu$ are the Lamé elastic constants and $\rho_2$ is the mass density of the solid sphere. Applying the Hemholtz decomposition, $\mathbf{u}$ can be calculated via:
+
+$$
+  \mathbf{u} = \nabla \phi + \nabla \times \mathbf{\Psi},
+$$
+
+which separates the elastic displacement into a compressional/longitudinal ($\phi$) and shear/transverse ($\mathbf{\Psi}$) potential. Substituting these quantities yields two independent Hemholtz equations:
+
+$$
+  \nabla^2 \phi + k_\ell^2 \phi = 0, \quad
+  \nabla^2 \mathbf{\Psi} + k_\tau^2 \mathbf{\Psi} = 0,
+$$
+
+where $k_\ell$ and $k_\tau$ are the longitudinal and transverse wavenumbers, respectively. 
+
+## Separability of the Hemholtz equation in spherical coordinates
+
+For a sphere centered at the origin, the Hemholtz equation provides solutions that can be written as products of single-variable functions:
+
+$$
+  \psi(r, \theta, \varphi) = R(r) \Theta(\theta) \mathbf{\Phi}(\varphi).
+$$
+
+This separation leads to angular eigenfunctions that are spherical harmonics, $Y^n_m(\theta, \varphi)$, and radial functions that are spherical Bessel or Hankel functions. Thus the separable solutions take the form:
+
+$$
+  \psi(r, \theta, \varphi) = \sum_{m=0}^\infty \sum_{n = -m}^m R_m(r) Y_{m}^n(\theta, \varphi),
+$$
+
+where the radial solutions ($R_m(r)$) correspond to $j_m(kr)$ and $h_m^{(1)}(kr)$ for the regular solutions and outgoing waves, respectively. In this notation, $m$ represents the angular mode number and $n$ is the azimuthal order.
+
+
+ For axisymmetric plane-wave incidence, the dependence on $\varphi$ vanishes and the solution reduces to a Legendre expansion:
+
+$$
+  \psi(r, \theta) = 
+    \sum_{m=0}^\infty R_m(r) P_m(\cos \theta),
+$$
+
+where $P_m$ is the Legendre polynomial of degree $m$. Consequently, the spatial dependence of each field can be decomposed into independent radial and angular parts.
+
+## Modal expansions of the acoustic and elastic fields
+
+Because the angular functions $P_m(\cos \theta)$ are orthogonal, the boundary conditions at surface $r = a$ decouple by angular order:
+
+$$
+  \int\limits_{-1}^1 P_n(\mu) P_m(\mu) d\mu = 0 ~ \text{for } n \neq m, \quad \mu = \cos \theta
+$$
+
+where $a$ is the sphere radius. The boundary conditions then enforce:
+
+$$
+  \begin{align*}
+    \mathbf{u}_2(r) &= \mathbf{u}_1(r) ~ \text{(continuity of normal displacement)} , \\
+    \sigma_2(rr) &= -p_1 ~ \text{(continuity of normal stress)} , \\
+    \sigma_2(r\theta) &= 0 ~ \text{(zero tangential stress)} ,
+  \end{align*}
+$$
+
+where $\sigma$ denotes the Cauchy stress tensor describing internal forces in the solid, $\sigma_2(rr)$ is its component along the radial direction in spherical coordinates (i.e., the normal stress on a spherical surface), and $\sigma_2(r \theta)$ is the shear stress along the polar direction $\theta$ of the sphere.
+
+This model incorporates copmressional and shear waves within the calibration sphere alongside the boundary conditions at the sphere-medium interface to compute the far-field acoustic backscatter. Since the full elastodynamic scattering problem is separable for an elastic sphere immersed in a fluid, the natural eigenfunctions are spherical harmonics. These boundary conditions can then be projected onto the basis of Legendre polynomials due to the assumed orthogonality whereby each angular mode $n$ interacts only with itself. Thus:
+
+$$
+\int\limits_{-1}^1 P_m(\cos \theta)\underbrace{(\text{boundary condition})}_{\text{function of }\theta}  d(\cos \theta),
+$$
+
+which provides a linear system for that mode $n$ alone, independent of other modes $m \neq n$. This modal decoupling ensures no cross-coupling between different $n$. BEcause each mode is independent, the total solution can be rewritten as a sum over modes:
+
+$$
+  \begin{align*}
+    p_1(r, \theta) &= 
+      \sum\limits_{m=0}^\infty A_m j_m(k_1r) P_m(\cos \theta) ~ \text{(incident acoustic field)} , \\
+    p_\ell(r, \theta) &=
+      \sum\limits_{m=0}^\infty A_m h_m^{(1)}(k_1r) P_m(\cos \theta) ~ \text{(scattered acoustic field)} ,
+  \end{align*}
+$$
+
+where $A_n$ and $B_n$ are known incident field coefficients and unknown scattering coefficients, respectively. Similarly, the elastic potentials are:
+
+$$
+  \begin{align*}
+    \phi(r, \theta) &=
+      \sum\limits_{n=0}^\infty C_m j_m(k_\tau r) P_m(\cos \theta) , \\
+    \mathbf{\Psi}(r, \theta) &= 
+      \sum\limits_{n=0}^\infty D_m j_m(k_\ell r) P_m(\cos \theta) ,
+  \end{align*}
+$$
+
+where $C_m$ and $D_m$ are unknown internal elastic coefficients. Given the boundary conditions, a linear system for each mode $m$ is produced:
+
+$$
+  \mathbf{M}_m 
+  \left[
+    \begin{matrix}
+      B_m \\ C_m \\ D_m
+    \end{matrix}
+  \right] = \mathbf{F}_m,
+$$
+
+where $\mathbf{M}_m$ is a mode-dependent coefficient matrix and $\mathbf{F}_m$ is a forcing vector determined by the incident field. This linear system is used to solve for $B_m$, which is ultimately the scattering coefficient for that mode, as a function of the incident field and material properties.
+
+## Far-field scattering
+
+For a plane wave incident along polar coordinate $z$, the acoustic pressure is expressed as[^2]:
+
+$$
+  \begin{align*}
+    p_\text{inc}(r, \theta) &= P_0 \frac{e^{-i k_1 \mathcal{D}}}{\mathcal{D}} \\
+    &= ik_1 P_0 \sum\limits_{m=0}^\infty (2m + 1) (-1)^n j_m(k_1r) h_m(k_1 r_0) P_m(\cos \theta), \quad (0 < r < r_0),
+  \end{align*}
+$$
+
+where $\mathcal{D}$ represents the additive effect of $r$ and stress components, $i$ is an imaginary number ($i=\sqrt{-1}$), and $P_0$ is the amplitude of pressure in the incident wave. In the far-field, $r \to \infty$ which means that the asymptotic forms of the Hankel function and $\frac{e^{-i k_1 \mathcal{D}}}{\mathcal{D}}$ term can be used:
+
+$$
+  \begin{align*}
+    \frac{e^{-i k_1 \mathcal{D}}}{\mathcal{D}} &\sim 
+      e^{ik_1 r_0} \frac{e^{i k_1 r \cos \theta}}{r_0}, \\
+    h_m^{(1)}(k_1r_0) &\sim (-i)^{m+1} \frac{e^{i k_1 r_0}}{k_1r_0}.
+  \end{align*}
+$$
+
+These limits consequently simplify $p_\text{inc}$ to:
+
+$$
+  \begin{align*}
+    p_\text{inc}(r, \theta) &= P_0 e^{ik_1 r \cos \theta} \\
+    &= P_0 \sum\limits_{m=0}^\infty (2m + 1) i^m j_m(k_1 r) P_m(\cos \theta).
+  \end{align*}
+$$
+
+The scattered acoustic field can be expressed as a sum of partial waves:
+
+$$
+  p_\text{scat}(r, \theta) =
+    P_0 \sum\limits_{n=0}^\infty B_m h_m^{(1)}(k_1 r) P_m(\cos \theta).
+$$
+
+In the backscattering direction where $\theta = \pi$, the Legendre polynomials simplify to:
+
+$$
+  P_m(\cos \pi) =
+    P_m(-1) =
+      (-1)^m.
+$$
+
+It is convenient to define a phase-shift angle, $\eta_m$, of the $m$th scattered wave to compute $B_m$[^5]. This phase-shift angle is expressed using:
+
+$$
+  \tan \eta_m = 
+    \tan \delta_m(k_1a) 
+    \left[
+      \frac{
+        \tan \Phi_m + \tan \alpha_m(k_1 a)
+      }{
+        \tan \Phi_m + \tan \beta_m(k_1 a)
+      }
+    \right],
+$$
+
+where $\alpha_m$, $\beta_m$, and $\delta_m$ are the scattering phase-angles, and $\Phi_m$ is the boundary impedance phase-angle. These angles are defined as:
+
+$$
+  \begin{align*}
+    \delta_m(k_1a) &= \tan^{-1} \left[ \frac{-j_m(k_1a)}{y_m(k_1a)} \right] ,\\
+    \alpha_m(k_1a) &= \tan^{-1} \left[ \frac{-k_1 a ~j^\prime_m(k_1a)}{y_m(k_1a)} \right] ,\\
+    \beta_m(k_1a) &= \tan^{-1} \left[ \frac{-k_1 a ~y^\prime_m(k_1a)}{y_m(k_1a)} \right] , \\
+    \tan \Phi_m &= -\frac{\rho_1}{\rho_2} \tan \zeta_m(k_\ell a, \sigma),
+  \end{align*}
+$$
+
+where $\zeta_m(k_\ell a, \sigma)$ is the scattering phase angle[^4].
+
+Once obtained, $B_n$ is:
+
+$$
+  B_m = 
+    k_1 (-1)^m (2n + 1) h_m(k_1 r_0) \sin \eta_m e^{-i \eta_m}.
+$$
+
+By imposing Neumann boundary conditions at the sphere's surface (i.e., a hard or rigid boundary), then the form function can be derived:
+
+$$
+  \mathcal{f}_\text{scat}(k_1 a) =
+    -2 \frac{k_1 r}{k_1 a} e^{i k_1 r}
+    \sum\limits_{m=0}^\infty (-i)^{m+1} h_m^{(2)}(k_1 r) (-1)^m (2m + 1) \sin \eta_m e^{i \eta_m}.
+$$
+
+This can be further simplified to derive the far-field expression in the backscattering direction given $\theta \to \theta$ and $r \to \infty$:
+
+$$
+  \mathcal{f}_\text{bs}(k_1 a) =
+      -\frac{2}{k_1a}
+      \sum\limits_{m=0}^\infty (-1)^m (2m + 1) \sin \eta_m e^{i \eta_m}.
+$$
+
+This linear scattering coefficient needs to be re-scaled to obtain $\sigma_\text{bs}$ and subsequently $\textit{TS}$[^3] using the sphere radius:
+
+$$
+  \begin{align*}
+    \sigma_\text{bs} &= \pi a^2 | f_\text{bs}(k_1 a) |^2 , \\
+    \textit{TS} &= 10 \log_{10} \frac{\sigma_\text{bs}}{4 \pi}. 
+  \end{align*}
+$$
+

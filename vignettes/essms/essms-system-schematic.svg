@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="420" viewBox="0 0 900 420">
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,5 L0,10 Z" fill="#222" />
+    </marker>
+    <style>
+      .label { font: 18px Arial, sans-serif; fill: #111; font-weight: 600; }
+      .small { font: 15px Arial, sans-serif; fill: #111; font-weight: 600; }
+      .axis { stroke: #222; stroke-width: 2; marker-end: url(#arrow); }
+      .wave { stroke: #222; stroke-width: 2; fill: none; }
+      .ringOuter { fill: #d9d9d9; stroke: #222; stroke-width: 2; }
+      .ringInner { fill: #ffffff; stroke: #222; stroke-width: 2; }
+      .core { fill: #f2f2f2; stroke: #222; stroke-width: 2; }
+      .guide { stroke: #888; stroke-width: 1.5; stroke-dasharray: 6 4; }
+      .arc { stroke: #222; stroke-width: 2; fill: none; }
+    </style>
+  </defs>
+
+  <!-- Incident plane wave (moved closer) -->
+  <path class="wave" d="M170,210 C195,190 220,230 245,210 C270,190 295,230 320,210" />
+  <path class="wave" d="M170,250 C195,230 220,270 245,250 C270,230 295,270 320,250" />
+  <line class="axis" x1="150" y1="230" x2="335" y2="230" />
+
+  <!-- Spherical shell schematic -->
+  <circle class="ringOuter" cx="520" cy="220" r="130" />
+  <circle class="ringInner" cx="520" cy="220" r="80" />
+  <circle class="core" cx="520" cy="220" r="40" />
+
+  <!-- Radii guides removed per request -->
+
+  <!-- Cartesian axes (x, y, z) -->
+  <line class="axis" x1="520" y1="220" x2="640" y2="220" />
+  <line class="axis" x1="520" y1="220" x2="520" y2="90" />
+  <line class="axis" x1="520" y1="220" x2="450" y2="290" />
+  <text class="small" x="655" y="228">x</text>
+  <text class="small" x="506" y="78">z</text>
+  <text class="small" x="428" y="315">y</text>
+
+  <!-- Spherical coordinates (r, theta, varphi) -->
+  <line class="axis" x1="520" y1="220" x2="600" y2="150" />
+  <text class="small" x="605" y="150">r</text>
+  <path class="arc" d="M560,220 A40,40 0 0 1 590,190" />
+  <text class="small" x="595" y="195">θ</text>
+  <path class="arc" d="M520,260 A40,16 0 1 0 560,260" />
+  <text class="small" x="562" y="275">φ</text>
+
+  <!-- Titles removed per request -->
+</svg>

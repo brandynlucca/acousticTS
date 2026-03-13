@@ -1,0 +1,201 @@
+---
+title: "Scattering boundary conditions"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: true
+    fig_caption: yes
+    fig_width: 3.5
+    fig_height: 3.5
+    dpi: 200
+    dev.args: list(pointsize=11)
+vignette: >
+  %\VignetteIndexEntry{Target strength for a calibration sphere}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# Simple boundaries
+
+## Fixed rigid
+
+A fixed rigid boundary represents the limiting case of a scatterer whose surface displacement vanishes everywhere in response to an incident acoustic field. In the surrounding inviscid fluid, the acoustic pressure $p(\mathbf{x}, t)$ and particle velocity $\mathbf{v}(\mathbf{x}, t)$ are related by the linearized Euler equation:
+
+$$
+    \rho \frac{\partial \mathbf{v}}{\partial t} = 
+        -\nabla p,
+$$
+
+where $\rho$ is the fluid density and $p$ is the incident acoustic pressure. The normal component of the particle velocity at a surface with outward unit normal vector $\mathbf{n}$ is given by:
+
+$$
+    v_n = \mathbf{v} \cdot \mathbf{n}. 
+$$
+
+The defining physical property of this boundary is infinite mechanical impedance, defined as the ratio of acoustic pressure to the normal component of particle velocity at the surface:
+
+$$
+    Z_s = \frac{p}{v_n}.
+$$
+
+In the rigid limit, the surface cannot move, so the normal component of the particle velocity must vanish:
+
+$$
+    v_n = 0 ~ \text{on the surface}.
+$$
+
+Using the Euler equation, this implies that the normal derivative of pressure vanishes such that:
+
+$$
+    \frac{\partial p}{\partial n} = \nabla p \cdot \textbf{n} = 0.
+$$
+
+The acoustic field in the surrounding fluid must therefore satisfy a Neumann boundary condition at the scatterer surface, which constrains the admissible solutions of the Helmholtz equation:
+
+$$
+    \nabla^2 p + k^2p = 0.
+$$
+
+By eliminating any component that produces normal velocity at the surface. In modal scattering formulations, this condition directly determines the phase shift of each partial wave by enforcing zero radial displacement at the scatterer boundary. In the high frequency limit, this boundary produces specular reflection with no phase inversion. If the surface is sufficiently smooth and large relative to the acoustic wavelength, then this boundary condition permits specular reflection in the geometric (high-frequency) limit. 
+
+## Pressure release
+
+A pressure release boundary represents the limiting case of a mechanically soft surface that cannot sustain normal stress. In this case, the mechanical impedance approaches zero:
+
+$$
+    Z_s = \frac{p}{v_n} \to 0.
+$$
+
+The only way for this condition to be satisfied for finite normal velocity is for the acoustic pressure to vanish at the boundary:
+
+$$
+    p = 0 ~ \text{on the surface}.
+$$
+
+This Dirichlet boundary condition elminates all solutions of the Helmholtz equation that have nonzero pressure at the surface. Physically, this corresponds to a boundary that instantaneously relieves pressure fluctuations through free motion or compression, such as a gas interface or an air-backed surface. In scattering theory, this boundary condition imposes a phase reversal of the reflected field relative to a rigid boundary. In partial wave expansions, this condition determines the scattering coefficients by enforcing zero pressure at the surface rather than zero radial velocity.
+
+## Fluid-filled
+
+For a fluid-filled scatterer, the interior region supports an acoustic field governed by its own Helmholtz equation:
+
+$$
+    \nabla^2 p_\text{interior} + k^2_\text{interior}p_\text{interior} = 0,
+$$
+
+where:
+
+$$
+    k_\text{interior} = \frac{\omega}{c_\text{interior}}.
+$$
+
+At the interface between the interior and exterior fluids, conservation of momentum and mass requires continuity of normal stress and normal particle velocity where:
+
+$$
+    p_\text{interior} = p_\text{exterior}, \quad \mathbf{v}_\text{interior} \cdot \mathbf{n} = \mathbf{v}_\text{exterior} \cdot \mathbf{n}.
+$$
+
+Using the linearized Euler equation in each medium, the velocity continuity condition becomes a constraint on the normal pressure gradients weighted by density:
+
+$$
+    \mathbf{v} = -\frac{1}{i \omega \rho} \nabla p.
+$$
+
+These two conditions couple the interior and exterior acoustic fields and determine the scattering coefficients through a system of equations for each angular mode.
+
+# Inelastic shelled boundaries
+
+## Pressure release interior
+
+In this configuration, the shell is assumed to be inelastic, meaning it does not support elastic wave propagation and does not deform according to Hooke’s law. The shell therefore acts as a kinematic constraint rather than a dynamic elastic medium. At the shell exterior interface, continuity of pressure and normal velocity with the surrounding fluid is enforced:
+
+$$
+    p_\text{shell} = p_\text{exterior}, \quad v_{n, \text{shell}} = v_{n, \text{exterior}}.
+$$
+
+At the shell-interior interface, the pressure must vanish since the interior is pressure release:
+
+$$
+    p_\text{shell} = 0, \quad v_{n,\text{shell}} \neq 0
+$$
+
+These conditions imply that the shell must transmit normal motion while sustaining a pressure gradient across its thickness. In scattering formulations, this produces modified boundary conditions that differ from both rigid and fluid filled cases and can lead to enhanced low frequency resonances.
+
+## Fluid-filled interior
+
+For an inelastic shell enclosing a fluid-filled interior, the shell is assumed to have infinite mechanical impedance and therefore zero normal displacement:
+
+$$
+    v_{n, \text{shell}} = 0.
+$$
+
+This imposes a Neumann boundary condition on the acoustic field at the shell-exterior interface:
+
+$$
+    \frac{\partial p_\text{shell}}{\partial n} = 0.
+$$
+
+At the shell-interior interface, the interior fluid must satisfy continuity of pressure and normal velocity with the shell:
+
+$$
+    p_\text{shell} = p_\text{exterior}, \quad v_{n, \text{shell}} = v_{n, \text{exterior}} = 0.
+$$
+
+The interior fluid therefore experiences a rigid boundary while still supporting compressional waves. This configuration produces internal cavity resonances whose coupling to the exterior field is mediated entirely through the rigid shell constraint.
+
+# Elastic shelled boundaries
+
+An elastic shell supports both longitudinal ($\ell$) and transverse ($\tau$) elastic waves. The displacement field, $\mathbf{u}(\mathbf{x}, t)$, within the shell satisfies the Navier equation:
+
+$$
+    (\lambda + 2 \mu) \nabla (\nabla \cdot \mathbf{u}) - \mu \nabla \times (\nabla \times \mathbf{u}) + \rho_\text{interior} \frac{\partial^2 \mathbf{u}}{\partial t^2} = 0,
+$$
+
+where  $\lambda$ and $\mu$ are the Lamé parameters. Using the Helmholtz decomposition:
+
+$$
+    \mathbf{u} = \nabla \phi + \nabla \times \mathbf{\Psi},
+$$
+
+the problem separates into longitudinal and transverse Helmholtz equations with wavenumbers:
+
+$$
+    k_\ell = \frac{\omega}{c_\ell}, \quad k_\tau = \frac{\omega}{c_\tau}.
+$$
+
+The associated sound speeds are:
+
+$$
+    c_\ell = \sqrt{
+        \frac{\lambda + 2 \mu}{p_\text{interior}}
+    }, \quad c_\tau = \sqrt{\frac{\mu}{p_\text{interior}}}.
+$$
+
+At the shell-fluid interfaces, continuity of normal displacement and normal stress must be enforced. The radial stress component, $\sigma_{rr}$, is obstained from the elastic stress tensor:
+
+$$
+    \sigma_{ij} = 
+        \lambda \delta_{ij} \nabla \cdot \mathbf{u} + 2 \mu \varepsilon_{ij},
+    \quad
+    \varepsilon_{ij} =
+        \frac{1}{2} \left( 
+            \frac{\partial u_i}{\partial x_j} + \frac{\partial u_j}{\partial x_i}
+        \right) .
+$$
+
+The boundary conditions therefore become:
+
+$$
+    p_\text{fluid} = \sigma_{rr}, \quad v_{n, \text{fluid}} = \frac{\partial u_r}{\partial t}.
+$$
+
+These conditions couple the acoustic field to both compressional/longitudinal and shear/transverse waves in the shell and lead to a system of equations for each angular mode. This formulation generalized rigid and inelastic shell models and produces rich resonance structure. 
+
+# Weak, fluid-like
+
+The acoustic response from a weak scatterer is dominated by the surrounding fluid where the scatterer does not impose a significant impedance contrast. In this regime: 
+
+$$
+    p_\text{exterior} \approx p_\text{interior}.
+$$
+
+The scattered field is weak and primarily arises from small density and compressibility contrasts.
