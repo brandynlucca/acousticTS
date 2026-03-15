@@ -1,4 +1,5 @@
 ^.*\.Rproj$
+^\.Renviron$
 ^CITATION\.cff$
 ^LICENSE.md$
 ^LICENSE\.md$

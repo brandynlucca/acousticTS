@@ -2,7 +2,7 @@
 # acousticTS
 
 <p align="center">
-	<img src="man/figures/logo.svg" alt="acousticTS hex logo" width="240" />
+	<img src="man/figures/logo_source.svg" alt="acousticTS hex logo" width="240" />
 </p>
 
 [![DOI](https://zenodo.org/badge/161965429.svg)](https://zenodo.org/badge/latestdoi/161965429)
