@@ -1,5 +1,5 @@
 
-# acousticTS <img src="man/figures/logo.png" align="right" height="258" alt="acousticTS hex logo" />
+# acousticTS <img src="man/figures/logo.png" align="right" height="158" alt="acousticTS hex logo" />
 
 [![DOI](https://doi.org/10.5281/zenodo.7855558.svg)](https://doi.org/10.5281/zenodo.7855558)
 [![Documentation](https://img.shields.io/badge/Latest_Documentation-blue)](https://brandynlucca.github.io/acousticTS/)
