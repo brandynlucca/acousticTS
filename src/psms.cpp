@@ -2113,33 +2113,10 @@ std::vector<std::vector<std::complex<T>>> simplified_fluid_Amn_expansion_matrix(
         radial_internal_kind1.value, radial_internal_kind1.derivative
     );
 
-    // Compute simplified Amn expansion matrix
-    std::vector<std::vector<std::complex<T>>> Amn(m_max + 1);
-    for (int m = 0; m <= m_max; ++m) {
-        int size = n_max - m + 1;
-        Amn[m].resize(
-            size * size, 
-            std::complex<T>(
-                std::numeric_limits<T>::quiet_NaN(), std::numeric_limits<T>::quiet_NaN()
-            )
-        );
-        for (int li = 0; li < size; ++li) {
-            for (int ni = 0; ni < size; ++ni) {
-                int idx = li * size + ni;
-                auto e3 = E3_coupling[m][idx];
-                auto e1 = E1_coupling[m][idx];
-                if (is_na_real(e1.real()) || is_na_real(e1.imag()) || e1 == std::complex<T>(0, 0)) {
-                    Amn[m][idx] = std::complex<T>(
-                        std::numeric_limits<T>::quiet_NaN(), std::numeric_limits<T>::quiet_NaN()
-                    );
-                } else {
-                    Amn[m][idx] = -e1 / e3;
-                }
-            }
-        }
-    }
-
-    // Convert to rectangular (m_max+1) x (n_max+1) matrix, NA for n < m
+    // Compute simplified Amn expansion matrix directly from diagonal of E1/E3.
+    // The simplified method (Furusawa 1988, Eq. 5) is A_{mn} = -E1[m][n] / E3[m][n]
+    // for each (m, n) independently. E1_coupling and E3_coupling are indexed as
+    // [m][n] with n from 0 to n_max -- access them directly, no size*size needed.
     std::vector<std::vector<std::complex<T>>> Amn_mat(
         m_max + 1, 
         std::vector<std::complex<T>>(
@@ -2149,17 +2126,18 @@ std::vector<std::vector<std::complex<T>>> simplified_fluid_Amn_expansion_matrix(
         )
     );
     for (int m = 0; m <= m_max; ++m) {
-        int size = n_max - m + 1;
-        for (int i = 0; i < size; ++i) {
-            int n = m + i;
-            // Diagonal element in the (size x size) matrix is at [i * size + i]
-            auto val = Amn[m][i * size + i];
-            if (is_na_real(val.real()) || is_na_real(val.imag())) {
+        for (int n = m; n <= n_max; ++n) {
+            std::complex<T> e1 = E1_coupling[m][n];
+            std::complex<T> e3 = E3_coupling[m][n];
+            if (is_na_real(e1.real()) || is_na_real(e1.imag()) ||
+                e1 == std::complex<T>(0, 0) ||
+                is_na_real(e3.real()) || is_na_real(e3.imag()) ||
+                e3 == std::complex<T>(0, 0)) {
                 Amn_mat[m][n] = std::complex<T>(
                     std::numeric_limits<T>::quiet_NaN(), std::numeric_limits<T>::quiet_NaN()
                 );
             } else {
-                Amn_mat[m][n] = val;
+                Amn_mat[m][n] = -e1 / e3;
             }
         }
     }

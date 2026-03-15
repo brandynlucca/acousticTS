@@ -2718,15 +2718,16 @@ end if
     if(m == 1) go to 80
     dold = qnsum
     doldd = qndsum
-     do 60 j = 2, m
-     dnew = dold * enrneg(m - j + 1) * qr(imxp - j - j + 1) * qr(imxp - j - j + 2)
-     qnsum = qnsum + dnew
-     if(dnew > 0.0e0_knd) qnsump = qnsump + dnew
-     dnewd = doldd * enrneg(m - j + 1) * qdr(imxp - j - j + 1) * qdr(imxp - j - j + 2)
-     qndsum = qndsum + dnewd
-     if(dnewd > 0.0e0_knd) qndsump = qndsump + dnewd
-     dold = dnew
-60    doldd = dnewd
+     do j = 2, m
+       dnew = dold * enrneg(m - j + 1) * qr(imxp - j - j + 1) * qr(imxp - j - j + 2)
+       qnsum = qnsum + dnew
+       if(dnew > 0.0e0_knd) qnsump = qnsump + dnew
+       dnewd = doldd * enrneg(m - j + 1) * qdr(imxp - j - j + 1) * qdr(imxp - j - j + 2)
+       qndsum = qndsum + dnewd
+       if(dnewd > 0.0e0_knd) qndsump = qndsump + dnewd
+       dold = dnew
+       doldd = dnewd
+     end do
 70   nsqnsum = 0
     if(qnsum * qnsump /= 0.0e0_knd) nsqnsum= &
              int(log10(abs(qnsump / qnsum)))
@@ -5178,8 +5179,9 @@ end if
 !  functions required for the four types of integrals
     twomi = 1.0e0_knd
     if(m == 0) go to 110
-     do 100 n = 1, m
-100    twomi = twomi * (n + n - 1) / (n + n)
+     do n = 1, m
+       twomi = twomi * (n + n - 1) / (n + n)
+     end do
 110   continue
     arg = c * sqrt(x1 * (x1 + 2.0e0_knd))
     darg = 1.0e0_knd / arg
