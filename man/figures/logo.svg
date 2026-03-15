@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1380" role="img" aria-labelledby="title desc">
+  <title id="title">acousticTS hex logo</title>
+  <desc id="desc">Hexagonal logo with sonar beams, a fish silhouette, and acoustic target strength lettering.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0e334f"/>
+      <stop offset="55%" stop-color="#136a85"/>
+      <stop offset="100%" stop-color="#d7efe9"/>
+    </linearGradient>
+    <linearGradient id="beam" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#8ef0ff" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#8ef0ff" stop-opacity="0.95"/>
+    </linearGradient>
+    <linearGradient id="fishFill" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffd166"/>
+      <stop offset="100%" stop-color="#f08c2b"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#082033" flood-opacity="0.35"/>
+    </filter>
+    <clipPath id="hexClip">
+      <path d="M600 45 L1085 325 L1085 885 L600 1165 L115 885 L115 325 Z"/>
+    </clipPath>
+  </defs>
+
+  <path d="M600 20 L1107 313 L1107 899 L600 1192 L93 899 L93 313 Z" fill="#f4efe5"/>
+  <path d="M600 58 L1074 332 L1074 880 L600 1154 L126 880 L126 332 Z" fill="url(#bg)"/>
+
+  <g clip-path="url(#hexClip)">
+    <path d="M0 940 C220 860 360 830 600 850 C805 868 980 922 1200 1040 L1200 1380 L0 1380 Z" fill="#b9dfd6" fill-opacity="0.78"/>
+    <path d="M0 1010 C245 940 435 935 620 968 C860 1012 1010 1080 1200 1210 L1200 1380 L0 1380 Z" fill="#86c7bc" fill-opacity="0.75"/>
+
+    <g opacity="0.9">
+      <circle cx="248" cy="542" r="18" fill="#dff7ff"/>
+      <circle cx="248" cy="542" r="88" fill="none" stroke="#dff7ff" stroke-width="10" stroke-opacity="0.42"/>
+      <circle cx="248" cy="542" r="164" fill="none" stroke="#dff7ff" stroke-width="8" stroke-opacity="0.28"/>
+      <circle cx="248" cy="542" r="238" fill="none" stroke="#dff7ff" stroke-width="6" stroke-opacity="0.18"/>
+    </g>
+
+    <path d="M245 512 L245 572 L842 720 L842 364 Z" fill="url(#beam)" opacity="0.82"/>
+    <path d="M245 528 L245 556 L938 665 L938 420 Z" fill="url(#beam)" opacity="0.32"/>
+
+    <g filter="url(#shadow)">
+      <path d="M408 592 C520 498 700 476 815 530 C858 548 894 573 930 612 C879 626 854 650 835 690 C783 784 649 840 529 823 C456 813 396 780 343 724 C375 687 395 645 408 592 Z" fill="url(#fishFill)"/>
+      <path d="M342 724 C292 736 252 762 211 803 C220 733 235 680 259 635 C290 666 316 696 342 724 Z" fill="#f08c2b"/>
+      <path d="M636 565 C708 548 792 565 851 612 C809 631 785 657 764 694 C740 735 706 768 661 792 C620 813 572 824 529 823 C456 813 396 780 343 724 C375 687 395 645 408 592 C470 593 557 585 636 565 Z" fill="#ffbe55" fill-opacity="0.45"/>
+      <circle cx="788" cy="598" r="12" fill="#16344b"/>
+      <path d="M827 609 C852 611 875 622 892 642" fill="none" stroke="#16344b" stroke-width="9" stroke-linecap="round"/>
+      <path d="M561 537 C575 560 582 588 580 620" fill="none" stroke="#c86b1f" stroke-width="10" stroke-linecap="round"/>
+      <path d="M622 531 C638 557 647 592 645 629" fill="none" stroke="#c86b1f" stroke-width="10" stroke-linecap="round"/>
+    </g>
+
+    <g opacity="0.62">
+      <path d="M860 615 C897 635 926 667 944 705" fill="none" stroke="#fff5d0" stroke-width="9" stroke-linecap="round"/>
+      <path d="M888 597 C933 622 968 663 987 714" fill="none" stroke="#fff5d0" stroke-width="7" stroke-linecap="round"/>
+      <path d="M910 575 C963 605 1005 655 1024 718" fill="none" stroke="#fff5d0" stroke-width="5" stroke-linecap="round"/>
+    </g>
+  </g>
+
+  <path d="M600 58 L1074 332 L1074 880 L600 1154 L126 880 L126 332 Z" fill="none" stroke="#0a2033" stroke-width="26"/>
+  <path d="M600 83 L1053 344 L1053 868 L600 1129 L147 868 L147 344 Z" fill="none" stroke="#f7f3e8" stroke-width="7" stroke-opacity="0.72"/>
+
+  <text x="600" y="975" text-anchor="middle" font-family="Trebuchet MS, DejaVu Sans, Arial, sans-serif" font-size="112" font-weight="700" letter-spacing="1.8" fill="#ffffff" stroke="#04131f" stroke-width="8" paint-order="stroke fill">acoustic</text>
+  <text x="600" y="1060" text-anchor="middle" font-family="Trebuchet MS, DejaVu Sans, Arial, sans-serif" font-size="132" font-weight="800" fill="#ffe08a" stroke="#04131f" stroke-width="10" paint-order="stroke fill">TS</text>
+</svg>
