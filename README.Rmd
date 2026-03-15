@@ -14,16 +14,9 @@ knitr::opts_chunk$set(
 )
 ```
 
-# acousticTS <img src="man/figures/logo.png" align="right" height="138" alt="acousticTS hex logo" />
-
----
-
+# acousticTS <img src="man/figures/logo.png" align="right" height="258" alt="acousticTS hex logo" />
 
 [![DOI](https://doi.org/10.5281/zenodo.7855558.svg)](https://doi.org/10.5281/zenodo.7855558) [![Documentation](https://img.shields.io/badge/Latest_Documentation-blue)](https://brandynlucca.github.io/acousticTS/) [![Build status](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml) [![Coverage](https://github.com/brandynlucca/acousticTS/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/test-coverage.yaml)
-
----
-
-
 
 ## Overview
 
@@ -33,9 +26,9 @@ $$
   TS = 10 \log_{10}(\sigma_\text{bs})
 $$
 
-TS is used to:
+$TS$ is used to:
 
-- Convert integrated backscatter (e.g. $S_A$, NASC) or volumetric backscatter ($S_v$) into number density or biomass
+- Convert integrated backscatter (e.g. $S_\text{A}$, NASC) or volumetric backscatter ($S_\text{V}$) into number density or biomass
 - Classify backscatter by species or taxon based on multi-frequency response
 - Parameterize and evaluate physics-based scattering models over statistical distributions of organism size and orientation
 
