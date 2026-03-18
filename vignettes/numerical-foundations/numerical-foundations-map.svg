@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 420" role="img" aria-labelledby="title desc">
+  <title id="title">Numerical foundations map</title>
+  <desc id="desc">Diagram linking geometry-matched bases to truncation, quadrature, and conditioning questions.</desc>
+  <style>
+    .title { font: 700 28px Georgia, serif; fill: #18324a; }
+    .body { font: 400 18px Georgia, serif; fill: #18324a; }
+    .small { font: 400 15px Georgia, serif; fill: #35546b; }
+    .box { fill: #f7fbfe; stroke: #5d91b6; stroke-width: 2.5; rx: 18; ry: 18; }
+    .accent { fill: #fff7ea; stroke: #c48b41; stroke-width: 2.5; rx: 18; ry: 18; }
+    .line { stroke: #557f9a; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+  </style>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#557f9a"/>
+    </marker>
+  </defs>
+  <text x="40" y="48" class="title">Geometry matching simplifies the physics, but numerics still decide robustness</text>
+  <rect x="40" y="100" width="250" height="220" class="box"/>
+  <text x="70" y="140" class="body">Geometry-matched bases</text>
+  <text x="70" y="174" class="small">sphere to spherical functions</text>
+  <text x="70" y="200" class="small">cylinder to cylindrical functions</text>
+  <text x="70" y="226" class="small">prolate spheroid to spheroidal functions</text>
+  <text x="70" y="266" class="small">the boundary-value problem reduces</text>
+  <text x="70" y="288" class="small">to modal coefficients and small systems</text>
+  <rect x="365" y="80" width="250" height="100" class="accent"/>
+  <text x="395" y="120" class="body">Truncation</text>
+  <text x="395" y="148" class="small">larger acoustic size requires more modes</text>
+  <rect x="365" y="210" width="250" height="100" class="accent"/>
+  <text x="395" y="250" class="body">Quadrature and overlaps</text>
+  <text x="395" y="278" class="small">kernel integrals and coupling terms</text>
+  <rect x="690" y="100" width="250" height="220" class="box"/>
+  <text x="720" y="140" class="body">Stability questions</text>
+  <text x="720" y="174" class="small">conditioning of truncated systems</text>
+  <text x="720" y="200" class="small">sensitivity to precision and controls</text>
+  <text x="720" y="226" class="small">distinguishing oscillatory physics from</text>
+  <text x="720" y="248" class="small">numerical artifacts</text>
+  <path d="M290 180 C325 180 335 130 365 130" class="line"/>
+  <path d="M290 230 C325 230 335 260 365 260" class="line"/>
+  <path d="M615 130 C650 130 655 155 690 175" class="line"/>
+  <path d="M615 260 C650 260 655 235 690 220" class="line"/>
+</svg>

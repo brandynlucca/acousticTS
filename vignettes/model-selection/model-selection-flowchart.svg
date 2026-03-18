@@ -1,0 +1,1366 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="1254.573"
+   height="1000.5848"
+   viewBox="0 0 1254.573 1000.5848"
+   version="1.1"
+   id="svg63"
+   sodipodi:docname="model-selection-flowchart.svg"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview63"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.51235278"
+     inkscape:cx="1013.9498"
+     inkscape:cy="371.81412"
+     inkscape:window-width="1920"
+     inkscape:window-height="1057"
+     inkscape:window-x="3832"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="a132" />
+  <rect
+     width="1254.573"
+     height="1000.5848"
+     fill="#fbfaf5"
+     id="rect1"
+     x="2.0701754"
+     y="-1.0350877"
+     style="stroke-width:0.897454" />
+  <rect
+     x="12.323317"
+     y="818.21802"
+     width="400.61536"
+     height="127.90191"
+     rx="14"
+     ry="14"
+     class="legend-panel"
+     id="legend-panel"
+     style="fill:#fffdf7;stroke:#203040;stroke-width:1.8981" />
+  <text
+     x="28.274267"
+     y="844.16901"
+     class="legend-title"
+     id="legend-title"
+     style="font-weight:bold;font-size:19px;font-family:Georgia, serif;fill:#203040">Legend</text>
+  <rect
+     x="28.274267"
+     y="858.16901"
+     width="72"
+     height="24"
+     rx="6"
+     ry="6"
+     class="node"
+     id="legend-node"
+     style="fill:#eef0de;stroke:#203040;stroke-width:2.5" />
+  <text
+     x="112.27427"
+     y="875.16901"
+     class="legend-note"
+     id="legend-node-text"
+     style="font-size:15px;font-family:Georgia, serif;fill:#203040;-inkscape-font-specification:'Georgia, serif, Normal';font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"><tspan
+       sodipodi:role="line"
+       id="tspan142">Context/outcome</tspan></text>
+  <polygon
+     points="236,64 216,52 236,40 256,52 "
+     class="choice"
+     id="legend-choice"
+     style="fill:#dce8ea;stroke:#0f5c5c;stroke-width:2.5"
+     transform="translate(19.453825,818.16901)" />
+  <text
+     x="290.27426"
+     y="875.16901"
+     class="legend-note"
+     id="legend-choice-text"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan145"
+       x="290.27426"
+       y="875.16901">Decision</tspan></text>
+  <rect
+     x="28.274267"
+     y="892.16901"
+     width="72"
+     height="24"
+     rx="6"
+     ry="6"
+     class="exact"
+     id="legend-exact"
+     style="fill:#d9ece4;stroke:#1f6a4d;stroke-width:2.5" />
+  <text
+     x="112.27427"
+     y="909.16901"
+     class="legend-note"
+     id="legend-exact-text"
+     style="font-size:15px;font-family:Georgia, serif;fill:#203040;-inkscape-font-specification:'Georgia, serif, Normal';font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"><tspan
+       sodipodi:role="line"
+       id="tspan143">Exact solution</tspan></text>
+  <rect
+     x="234.27426"
+     y="892.16901"
+     width="72"
+     height="24"
+     rx="6"
+     ry="6"
+     class="approx"
+     id="legend-approx"
+     style="fill:#f5e7d8;stroke:#7a3f0e;stroke-width:2.5" />
+  <text
+     x="318.27426"
+     y="909.16901"
+     class="legend-note"
+     id="legend-approx-text"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan144"
+       x="318.27426"
+       y="909.16901">Approximate</tspan></text>
+  <text
+     x="28.964325"
+     y="934.92926"
+     class="legend-note"
+     id="legend-note-1"
+     style="font-size:15px;font-family:Georgia, serif;fill:#203040;-inkscape-font-specification:'Georgia, serif, Italic';font-weight:normal;font-style:italic;font-stretch:normal;font-variant:normal;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">Model boxes are clickable in the rendered site.</text>
+  <path
+     d="m 418.70116,217.91541 h -43.96197 l 0.20772,50.51873"
+     class="line"
+     id="path6"
+     sodipodi:nodetypes="ccc" />
+  <path
+     d="m 754.05315,218.19614 h 235.96197 l -0.20772,61.96902"
+     class="line"
+     id="path96"
+     sodipodi:nodetypes="ccc" />
+  <polygon
+     points="430,362 370,304 430,246 670,246 730,304 670,362 "
+     class="choice"
+     id="polygon4"
+     transform="matrix(1.0385047,0,0,0.88458113,16.05591,-50.807141)"
+     style="stroke-width:2.60836;stroke-dasharray:none" />
+  <defs
+     id="defs1">
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect126"
+       is_visible="true"
+       lpeversion="1"
+       nodesatellites_param="F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1"
+       radius="0"
+       unit="px"
+       method="auto"
+       mode="F"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+    <marker
+       id="arrow"
+       markerWidth="12"
+       markerHeight="12"
+       refX="10"
+       refY="6"
+       orient="auto">
+      <path
+         d="M 0,0 12,6 0,12 Z"
+         fill="#203040"
+         id="path1" />
+    </marker>
+    <style
+       id="style1">
+      .title { font-family: Georgia, serif; font-size: 30px; fill: #203040; }
+      .label { font-family: Georgia, serif; font-size: 20px; fill: #203040; }
+      .small { font-family: Georgia, serif; font-size: 17px; fill: #203040; }
+      .node { fill: #eef0de; stroke: #203040; stroke-width: 2.5; }
+      .choice { fill: #dce8ea; stroke: #0f5c5c; stroke-width: 2.5; }
+      .approx { fill: #f5e7d8; stroke: #7a3f0e; stroke-width: 2.5; }
+      .exact { fill: #d9ece4; stroke: #1f6a4d; stroke-width: 2.5; }
+      .line { stroke: #203040; stroke-width: 2.8; fill: none; marker-end: url(#arrow); }
+    </style>
+    <marker
+       id="arrow-9"
+       markerWidth="12"
+       markerHeight="12"
+       refX="10"
+       refY="6"
+       orient="auto">
+      <path
+         d="M 0,0 12,6 0,12 Z"
+         fill="#203040"
+         id="path1-4" />
+    </marker>
+  </defs>
+  <text
+     x="401.09009"
+     y="29.656868"
+     class="title"
+     id="text1">General model-selection flowchart</text>
+  <text
+     x="168.32713"
+     y="61.656868"
+     class="small"
+     id="text2">Use this as a screening guide, not a deterministic rule. Several branches intentionally end with more than one viable model.</text>
+  <g
+     id="g63"
+     style="stroke-width:2.5;stroke-dasharray:none"
+     transform="translate(152.75293,-24.343132)">
+    <rect
+       x="55.269711"
+       y="104.33754"
+       width="244.36852"
+       height="54.187134"
+       rx="13.745729"
+       class="node"
+       id="rect2"
+       style="stroke-width:2.5;stroke-dasharray:none"
+       ry="13.745729" />
+    <text
+       x="66.643974"
+       y="124.69919"
+       class="label"
+       id="text3"
+       style="stroke-width:2.5;stroke-dasharray:none">Start with the scatterer</text>
+    <text
+       x="66.78167"
+       y="144.89207"
+       class="small"
+       id="text4"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040;stroke-width:2.5;stroke-dasharray:none"><tspan
+         sodipodi:role="line"
+         id="tspan63"
+         x="66.78167"
+         y="144.89207">Shape, material, and use case</tspan></text>
+  </g>
+  <path
+     d="m 452.39114,107.08787 h 122.32745 l -0.56215,53.1538"
+     class="line"
+     id="path4"
+     sodipodi:nodetypes="ccc" />
+  <text
+     x="431.4343"
+     y="212.11505"
+     class="label"
+     id="text5"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan97"
+       x="431.4343"
+       y="212.11505">Is there a geometry-specific model?</tspan><tspan
+       sodipodi:role="line"
+       id="tspan98"
+       x="431.4343"
+       y="237.11505">Sphere, prolate spheroid, cylinder</tspan></text>
+  <text
+     x="374.6875"
+     y="213.72089"
+     class="small"
+     id="text7"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan65"
+       x="374.6875"
+       y="213.72089">Yes</tspan></text>
+  <path
+     d="m 496.41374,294.1481 h 68"
+     class="line"
+     id="path7"
+     sodipodi:nodetypes="cc" />
+  <a
+     id="a1"
+     href="../psms/psms-theory.html"
+     target="_top"
+     transform="translate(105.14928,47.605239)">
+    <g
+       id="g69"
+       transform="translate(-0.78177202)">
+      <rect
+         x="103.30112"
+         y="388.48447"
+         width="64.070175"
+         height="25.614033"
+         rx="5.6951265"
+         class="exact"
+         id="rect8"
+         ry="5.6951265" />
+      <text
+         x="112.68752"
+         y="407.19333"
+         class="small"
+         id="text18">PSMS</text>
+    </g>
+  </a>
+  <path
+     d="m 1089.4487,927.36303 h 68"
+     class="line"
+     id="path130"
+     sodipodi:nodetypes="cc" />
+  <path
+     d="m 721.04873,927.36303 h -68"
+     class="line"
+     id="path132"
+     sodipodi:nodetypes="cc" />
+  <g
+     id="g130"
+     transform="translate(62.75293,-24.343132)">
+    <polygon
+       points="762,1012 494,1012 434,950 494,888 762,888 822,950 "
+       class="choice"
+       id="polygon34"
+       transform="matrix(1.0016636,0,0,0.60868109,211.01558,373.35623)" />
+    <text
+       x="839.65991"
+       y="950.4939"
+       class="label"
+       id="text35"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#203040"><tspan
+         sodipodi:role="line"
+         id="tspan129"
+         x="839.65991"
+         y="950.4939">Do unresolved posture, roughness, or</tspan><tspan
+         sodipodi:role="line"
+         id="tspan130"
+         x="839.65991"
+         y="975.4939">internal variability matter?</tspan></text>
+  </g>
+  <rect
+     x="476.10696"
+     y="756.56189"
+     width="291.54648"
+     height="92.885124"
+     rx="16"
+     class="node"
+     id="rect56"
+     ry="16" />
+  <g
+     id="g137"
+     transform="translate(457.23064,-327.92661)">
+    <text
+       x="30.252317"
+       y="1105.1299"
+       class="label"
+       id="text57">No single preferred model</text>
+    <text
+       x="165.30798"
+       y="1126.2987"
+       class="small"
+       id="text58"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#203040"><tspan
+         sodipodi:role="line"
+         id="tspan15"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+         x="165.30798"
+         y="1126.2987">Reconsider geometry simplification,</tspan><tspan
+         sodipodi:role="line"
+         id="tspan16"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+         x="165.30798"
+         y="1147.6788">boundary condition, the type of</tspan><tspan
+         sodipodi:role="line"
+         id="tspan17"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+         x="165.30798"
+         y="1169.059">model needed, or different software.</tspan></text>
+  </g>
+  <text
+     x="111.78948"
+     y="986.46436"
+     class="small"
+     id="text61"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan139"
+       x="111.78948"
+       y="986.46436"><tspan
+   style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   id="tspan141">Disclaimer:</tspan> this flowchart suggests where the acousticTS is the strongest, not that every case has a unique model. User-discretion is advised.</tspan></text>
+  <path
+     d="m 266.82909,294.12602 h -49.96218 v 66.2204"
+     class="line"
+     id="path66"
+     sodipodi:nodetypes="ccc" />
+  <path
+     d="m 188.85248,384.75925 h -49.96255 l 3.7e-4,60.46437"
+     class="line"
+     id="path71"
+     sodipodi:nodetypes="ccc" />
+  <path
+     d="m 266.09013,384.75887 h 175.9028 l -2.7e-4,40.17994"
+     class="line"
+     id="path86"
+     sodipodi:nodetypes="ccc" />
+  <g
+     id="g71"
+     transform="translate(125.15059,9.188756)">
+    <polygon
+       points="670,362 430,362 370,304 430,246 670,246 730,304 "
+       class="choice"
+       id="polygon65"
+       transform="matrix(0.28974301,0,0,0.29949403,-67.707696,284.35299)"
+       style="stroke-width:8.48671;stroke-dasharray:none" />
+    <text
+       x="55.991779"
+       y="380.78979"
+       class="label"
+       id="text66"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+         sodipodi:role="line"
+         id="tspan66"
+         x="55.991779"
+         y="380.78979">Sphere?</tspan></text>
+  </g>
+  <text
+     x="140.65179"
+     y="378.54324"
+     class="small"
+     id="text67"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan67"
+       x="140.65179"
+       y="378.54324">Yes</tspan></text>
+  <text
+     x="220.02371"
+     y="290.71216"
+     class="small"
+     id="text68"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan68"
+       x="220.02371"
+       y="290.71216">No</tspan></text>
+  <path
+     d="M 346.58881,448.89673 H 278.5888"
+     class="line"
+     id="path87"
+     sodipodi:nodetypes="cc" />
+  <path
+     d="m 505.60969,448.97885 h 49.96218 v 23.23761 H 433.48293 c -0.0155,21.12288 -0.019,20.24575 -0.0796,41.36855"
+     class="line"
+     id="path88"
+     sodipodi:nodetypes="ccccc" />
+  <polygon
+     points="430,246 670,246 730,304 670,362 430,362 370,304 "
+     class="choice"
+     id="polygon68"
+     transform="matrix(0.53002137,0,0,0.29949403,150.4809,357.85054)"
+     style="stroke-width:6.27479;stroke-dasharray:none" />
+  <text
+     x="365.59839"
+     y="454.28735"
+     class="label"
+     id="text17">Prolate spheroid?</text>
+  <a
+     id="a69"
+     transform="translate(152.75293,-24.343132)" />
+  <polygon
+     points="370,304 430,246 670,246 730,304 670,362 430,362 "
+     class="choice"
+     id="polygon3"
+     transform="matrix(0.72393819,0,0,0.33454872,-23.13074,192.45772)"
+     style="stroke-width:5.07995;stroke-dasharray:none" />
+  <text
+     x="265.12314"
+     y="299.62573"
+     class="label"
+     id="text6"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan6"
+       x="265.12314"
+       y="299.62573">Need a fast trend model?</tspan></text>
+  <text
+     x="507.03836"
+     y="288.24719"
+     class="small"
+     id="text64"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan7"
+       x="507.03836"
+       y="288.24719">Yes</tspan></text>
+  <a
+     id="a70"
+     href="../hpa/hpa-theory.html"
+     target="_top"
+     transform="translate(170.75293,-24.343132)">
+    <g
+       id="g70"
+       transform="translate(0,-2.3915157)">
+      <rect
+         x="400.5108"
+         y="306.69849"
+         width="60.683079"
+         height="28.368519"
+         rx="4.2214313"
+         class="approx"
+         id="rect21"
+         ry="4.2214313" />
+      <text
+         x="411.04654"
+         y="328.36038"
+         class="label"
+         id="text70"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+           sodipodi:role="line"
+           id="tspan70"
+           x="411.04654"
+           y="328.36038">HPA</tspan></text>
+    </g>
+  </a>
+  <path
+     d="m 227.06807,493.3581 h 68.00001"
+     class="line"
+     id="path74"
+     sodipodi:nodetypes="cc" />
+  <path
+     d="M 68.723402,493.35226 H 18.76122 v 51.23761 h 120.08893 c 0.0155,21.12288 0.019,20.24575 0.0795,41.36855"
+     class="line"
+     id="path76"
+     sodipodi:nodetypes="ccccc" />
+  <polygon
+     points="730,304 670,362 430,362 370,304 430,246 670,246 "
+     class="choice"
+     id="polygon71"
+     transform="matrix(0.49441068,0,0,0.70757062,-133.09077,278.25663)"
+     style="stroke-width:4.2268;stroke-dasharray:none" />
+  <text
+     x="74.709579"
+     y="475.9407"
+     class="label"
+     id="text71"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17.3333px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan72"
+       x="74.709579"
+       y="475.9407">Fluid-filled?</tspan><tspan
+       sodipodi:role="line"
+       id="tspan73"
+       x="74.709579"
+       y="497.6073">Fixed rigid?</tspan><tspan
+       sodipodi:role="line"
+       id="tspan74"
+       x="74.709579"
+       y="519.27393">Pressure release?</tspan></text>
+  <text
+     x="233.20731"
+     y="489.54358"
+     class="small"
+     id="text75"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan75"
+       x="233.20731"
+       y="489.54358">Yes</tspan></text>
+  <a
+     id="a76"
+     href="../sphms/sphms-theory.html"
+     target="_top"
+     transform="translate(152.75293,-18.343132)">
+    <g
+       id="g76">
+      <rect
+         x="149.16515"
+         y="498.89423"
+         width="74.80497"
+         height="25.614033"
+         rx="6.6493301"
+         class="exact"
+         id="rect75"
+         ry="6.6493301" />
+      <text
+         x="158.55154"
+         y="517.60309"
+         class="small"
+         id="text76"
+         style="font-size:17px;font-family:Georgia, serif;fill:#203040"><tspan
+           sodipodi:role="line"
+           id="tspan76"
+           x="158.55154"
+           y="517.60309">SPHMS</tspan></text>
+    </g>
+  </a>
+  <text
+     x="23.869812"
+     y="487.93835"
+     class="small"
+     id="text77"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan77"
+       x="23.869812"
+       y="487.93835">No</tspan></text>
+  <path
+     d="M 68.723402,622.93578 H 18.76122 v 51.41012 h 134.65971 c 0.0155,21.12288 -0.0606,20.59078 0,41.71358"
+     class="line"
+     id="path79"
+     sodipodi:nodetypes="ccccc" />
+  <path
+     d="m 227.06807,623.01307 h 68.00001"
+     class="line"
+     id="path81"
+     sodipodi:nodetypes="cc" />
+  <polygon
+     points="370,304 430,246 670,246 730,304 670,362 430,362 "
+     class="choice"
+     id="polygon77"
+     transform="matrix(0.52819663,0,0,0.51810802,-151.52552,465.29938)"
+     style="stroke-width:4.77895;stroke-dasharray:none" />
+  <text
+     x="21.627121"
+     y="619.41956"
+     class="small"
+     id="text80"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan80"
+       x="21.627121"
+       y="619.41956">No</tspan></text>
+  <text
+     x="67.566368"
+     y="614.56744"
+     class="small"
+     id="text78"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan78"
+       x="67.566368"
+       y="614.56744">Solid elastic?</tspan><tspan
+       sodipodi:role="line"
+       id="tspan79"
+       x="67.566368"
+       y="635.81744">Calibration sphere?</tspan></text>
+  <path
+     d="m 227.06807,739.70313 h 68.00001"
+     class="line"
+     id="path82"
+     sodipodi:nodetypes="cc" />
+  <path
+     d="M 107.45532,739.6677 H 57.49313 v 63.33717 h 411.82143"
+     class="line"
+     id="path138"
+     sodipodi:nodetypes="cccc" />
+  <polygon
+     points="670,246 730,304 670,362 430,362 370,304 430,246 "
+     class="choice"
+     id="polygon80"
+     transform="matrix(0.44139452,0,0,0.29949403,-88.70926,648.66855)"
+     style="stroke-width:6.87595;stroke-dasharray:none" />
+  <text
+     x="96.557724"
+     y="747.14636"
+     class="label"
+     id="text12"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan81"
+       x="96.557724"
+       y="747.14636">Elastic shell?</tspan></text>
+  <text
+     x="237.20731"
+     y="619.19855"
+     class="small"
+     id="text82"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan82"
+       x="237.20731"
+       y="619.19855">Yes</tspan></text>
+  <text
+     x="237.20731"
+     y="735.88861"
+     class="small"
+     id="text83"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan83"
+       x="237.20731"
+       y="735.88861">Yes</tspan></text>
+  <a
+     id="a84"
+     href="../calibration/calibration-theory.html"
+     target="_top"
+     transform="translate(152.75293,111.31184)">
+    <g
+       id="g84">
+      <rect
+         x="149.16515"
+         y="498.89423"
+         width="66.524269"
+         height="25.614033"
+         rx="5.9132676"
+         class="exact"
+         id="rect83"
+         ry="5.9132676" />
+      <text
+         x="153.07156"
+         y="517.60309"
+         class="small"
+         id="text84"
+         style="font-size:17px;font-family:Georgia, serif;fill:#203040"><tspan
+           sodipodi:role="line"
+           id="tspan84"
+           x="153.07156"
+           y="517.60309">SOEMS</tspan></text>
+    </g>
+  </a>
+  <a
+     id="a85"
+     href="../essms/essms-theory.html"
+     target="_top"
+     transform="translate(152.75293,228.28262)">
+    <g
+       id="g85">
+      <rect
+         x="149.16515"
+         y="498.89423"
+         width="62.383919"
+         height="25.614033"
+         rx="5.5452366"
+         class="exact"
+         id="rect84"
+         ry="5.5452366" />
+      <text
+         x="153.07156"
+         y="517.60309"
+         class="small"
+         id="text85"
+         style="font-size:17px;font-family:Georgia, serif;fill:#203040"><tspan
+           sodipodi:role="line"
+           id="tspan85"
+           x="153.07156"
+           y="517.60309">ESSMS</tspan></text>
+    </g>
+  </a>
+  <text
+     x="315.33954"
+     y="445.77319"
+     class="small"
+     id="text87"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan87"
+       x="315.33954"
+       y="445.77319">Yes</tspan></text>
+  <text
+     x="351.5343"
+     y="379.16245"
+     class="small"
+     id="text88"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan88"
+       x="351.5343"
+       y="379.16245">No</tspan></text>
+  <text
+     x="536.04816"
+     y="445.3425"
+     class="small"
+     id="text89"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan89"
+       x="536.04816"
+       y="445.3425">No</tspan></text>
+  <path
+     d="m 357.16785,537.6885 h -49.96218 v 25.23761 h 140.08894 c 0.0155,21.12288 0.019,69.22164 0.0796,90.34444"
+     class="line"
+     id="path90"
+     sodipodi:nodetypes="ccccc" />
+  <g
+     id="g90"
+     transform="translate(153.44299,3.656868)">
+    <polygon
+       points="430,362 370,304 430,246 670,246 730,304 670,362 "
+       class="choice"
+       id="polygon89"
+       transform="matrix(0.53002137,0,0,0.29949403,-11.242788,442.79222)"
+       style="stroke-width:6.27479;stroke-dasharray:none" />
+    <text
+       x="212.15541"
+       y="539.34503"
+       class="label"
+       id="text90"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+         sodipodi:role="line"
+         id="tspan90"
+         x="212.15541"
+         y="539.34503">Finite cylinder?</tspan></text>
+  </g>
+  <text
+     x="310.58911"
+     y="534.51733"
+     class="small"
+     id="text91"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan91"
+       x="310.58911"
+       y="534.51733">Yes</tspan></text>
+  <path
+     d="M 346.58881,678.3792 H 278.5888"
+     class="line"
+     id="path93"
+     sodipodi:nodetypes="cc" />
+  <path
+     d="m 542.98879,678.37918 h 70.2541"
+     class="line"
+     id="path94"
+     sodipodi:nodetypes="cc" />
+  <g
+     id="g23"
+     transform="translate(0,1.2680825)">
+    <polygon
+       points="670,246 730,304 670,362 430,362 370,304 430,246 "
+       class="choice"
+       id="polygon91"
+       transform="matrix(0.60790261,0,0,0.32018394,113.07579,579.72103)"
+       style="stroke-width:5.85773;stroke-dasharray:none" />
+    <text
+       x="357.79126"
+       y="684.46906"
+       class="label"
+       id="text92"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+         sodipodi:role="line"
+         id="tspan92"
+         x="357.79126"
+         y="684.46906">Need exact solution?</tspan></text>
+  </g>
+  <a
+     id="a93"
+     href="../fcms/fcms-theory.html"
+     target="_top"
+     transform="translate(105.14928,277.60524)">
+    <g
+       id="g93"
+       transform="translate(-0.78177202)">
+      <rect
+         x="103.30112"
+         y="388.48447"
+         width="64.070175"
+         height="25.614033"
+         rx="5.6951265"
+         class="exact"
+         id="rect92"
+         ry="5.6951265" />
+      <text
+         x="112.68752"
+         y="407.19333"
+         class="small"
+         id="text93">FCMS</text>
+    </g>
+  </a>
+  <text
+     x="311.13489"
+     y="675.25568"
+     class="small"
+     id="text94"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan93"
+       x="311.13489"
+       y="675.25568">Yes</tspan></text>
+  <a
+     id="a95"
+     href="../trcm/trcm-theory.html"
+     target="_top"
+     transform="translate(218.84006,359.88797)">
+    <g
+       id="g95"
+       transform="translate(0,-2.3915157)">
+      <rect
+         x="400.5108"
+         y="306.69849"
+         width="71.835236"
+         height="28.368519"
+         rx="4.9972329"
+         class="approx"
+         id="rect94"
+         ry="4.9972329" />
+      <text
+         x="407.91278"
+         y="327.8017"
+         class="label"
+         id="text95"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+           sodipodi:role="line"
+           id="tspan94"
+           x="407.91278"
+           y="327.8017">TRCM</tspan></text>
+    </g>
+  </a>
+  <text
+     x="558.89661"
+     y="675.66479"
+     class="small"
+     id="text96"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan95"
+       x="558.89661"
+       y="675.66479">No</tspan></text>
+  <text
+     x="819.83533"
+     y="211.81885"
+     class="small"
+     id="text97"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan96"
+       x="819.83533"
+       y="211.81885">No</tspan></text>
+  <path
+     d="m 799.46493,307.97487 h -93.74 c 0,0 0.28448,18.72344 0,43.29653"
+     class="line"
+     id="path102"
+     sodipodi:nodetypes="ccc" />
+  <path
+     d="m 1178.571,307.90092 h 39.9622 v 35.23761 h -178.0888 c -0.015,21.12288 -0.019,77.28669 -0.08,98.40949"
+     class="line"
+     id="path105"
+     sodipodi:nodetypes="ccccc" />
+  <g
+     id="g102"
+     transform="translate(261.77704,-22.879297)">
+    <polygon
+       points="730,304 670,362 430,362 370,304 430,246 670,246 "
+       class="choice"
+       id="polygon98"
+       transform="matrix(1.089393,0,0,0.37843753,129.08421,215.75372)"
+       style="stroke-width:3.89359;stroke-dasharray:none" />
+    <text
+       x="563.68842"
+       y="336.75189"
+       class="label"
+       id="text99"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+         sodipodi:role="line"
+         id="tspan99"
+         x="563.68842"
+         y="336.75189">Is the body elongated and fluid-like?</tspan></text>
+  </g>
+  <path
+     d="M 592.17026,389.18928 H 478.13244 V 363.95167 H 376.04351 c -7.8e-4,-1.06438 -0.002,-14.05259 -0.002,-14.9723 -0.0137,-17.33212 -0.0198,-10.33783 -0.0772,-30.39625"
+     class="line"
+     id="path103"
+     sodipodi:nodetypes="ccccsc" />
+  <path
+     d="m 865.08895,388.75949 h 43.96218 V 427.9971 H 702.96219 c -0.0155,21.12288 -0.019,300.59197 -0.0796,321.71477"
+     class="line"
+     id="path104"
+     sodipodi:nodetypes="ccccc" />
+  <g
+     id="g101"
+     transform="translate(102.94007,-30.434212)">
+    <polygon
+       points="370,304 430,246 670,246 730,304 670,362 430,362 "
+       class="choice"
+       id="polygon99"
+       transform="matrix(0.98154417,0,0,0.53531965,62.511253,256.86756)"
+       style="stroke-width:3.44887;stroke-dasharray:none" />
+    <text
+       x="604.17682"
+       y="413.88037"
+       class="label"
+       id="text100"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#203040"><tspan
+         sodipodi:role="line"
+         id="tspan100"
+         x="604.17682"
+         y="413.88037">Can geometry be simplified to a</tspan><tspan
+         sodipodi:role="line"
+         id="tspan101"
+         x="604.17682"
+         y="438.88037">canonical shape?</tspan></text>
+  </g>
+  <text
+     x="746.73163"
+     y="304.97397"
+     class="small"
+     id="text102"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan102"
+       x="746.73163"
+       y="304.97397">No</tspan></text>
+  <text
+     x="492.59863"
+     y="384.68292"
+     class="small"
+     id="text103"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan103"
+       x="492.59863"
+       y="384.68292">Yes</tspan></text>
+  <text
+     x="884.48651"
+     y="384.43307"
+     class="small"
+     id="text104"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan104"
+       x="884.48651"
+       y="384.43307">No</tspan></text>
+  <text
+     x="1189.5706"
+     y="303.49515"
+     class="small"
+     id="text105"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan105"
+       x="1189.5706"
+       y="303.49515">Yes</tspan></text>
+  <path
+     d="M 881.12973,478.90535 H 813.12972"
+     class="line"
+     id="path109"
+     sodipodi:nodetypes="cc" />
+  <path
+     d="m 1178.571,479.12077 h 39.9622 v 35.23761 h -126.0888 c -0.015,21.12288 -0.019,15.28669 -0.08,36.40949"
+     class="line"
+     id="path112"
+     sodipodi:nodetypes="ccccc" />
+  <g
+     id="g107"
+     transform="translate(447.98543,59.347677)">
+    <polygon
+       points="430,362 370,304 430,246 670,246 730,304 670,362 "
+       class="choice"
+       id="polygon105"
+       transform="matrix(0.86332088,0,0,0.53531965,106.14225,256.86756)"
+       style="stroke-width:3.67744;stroke-dasharray:none" />
+    <text
+       x="580.99805"
+       y="414.50024"
+       class="label"
+       id="text107"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#203040"><tspan
+         sodipodi:role="line"
+         id="tspan22"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+         x="580.99805"
+         y="414.50024">Body plus internal feature?</tspan><tspan
+         sodipodi:role="line"
+         id="tspan23"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+         x="580.99805"
+         y="439.65335">e.g. swimbladder</tspan></text>
+  </g>
+  <a
+     id="a111"
+     href="../krm/krm-theory.html"
+     target="_top"
+     transform="translate(343.40132,160.41412)">
+    <g
+       id="g111"
+       transform="translate(0,-2.3915157)">
+      <rect
+         x="400.51083"
+         y="306.69849"
+         width="62.174419"
+         height="28.368519"
+         rx="4.3251762"
+         class="approx"
+         id="rect110"
+         ry="4.3251762" />
+      <text
+         x="408.32169"
+         y="327.8017"
+         class="label"
+         id="text111"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+           sodipodi:role="line"
+           id="tspan111"
+           x="408.32169"
+           y="327.8017">KRM</tspan></text>
+    </g>
+  </a>
+  <text
+     x="845.48895"
+     y="476.02579"
+     class="small"
+     id="text110"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan110"
+       x="845.48895"
+       y="476.02579">Yes</tspan></text>
+  <text
+     x="1189.5706"
+     y="475.49515"
+     class="small"
+     id="text112"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan112"
+       x="1189.5706"
+       y="475.49515">No</tspan></text>
+  <path
+     d="m 1178.571,576.58459 h 33.9622 V 735.8222 h -200.0888 c -0.015,21.12288 -0.019,19.00086 -0.08,40.12366"
+     class="line"
+     id="path118"
+     sodipodi:nodetypes="ccccc" />
+  <path
+     d="M 1108.2993,576.47593 H 921.60193 v 38.10353"
+     class="line"
+     id="path119"
+     sodipodi:nodetypes="ccc" />
+  <g
+     id="g114"
+     transform="translate(504.88601,164.88168)">
+    <g
+       id="g115"
+       transform="translate(0,3.1994744)">
+      <polygon
+         points="670,362 430,362 370,304 430,246 670,246 730,304 "
+         class="choice"
+         id="polygon112"
+         transform="matrix(0.52820857,0,0,0.3415201,291.14408,304.74168)"
+         style="stroke-width:5.88611;stroke-dasharray:none" />
+      <text
+         x="582.51849"
+         y="414.43005"
+         class="label"
+         id="text114"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#203040"><tspan
+           sodipodi:role="line"
+           id="tspan115"
+           x="582.51849"
+           y="414.43005">Weak scattering?</tspan></text>
+    </g>
+  </g>
+  <path
+     d="m 834.80474,808.61587 h -35.06581 v -82.352 h 192.237 75.74327 l -0.6498,-89.7956 -78.30939,-54.13202 -25.15808,0.13968 v 32.10353"
+     class="line"
+     id="path126"
+     sodipodi:nodetypes="ccccccccc" />
+  <path
+     d="M 840.31095,648.27287 H 774.83593 V 545.32543 c 0.0205,-15.12294 -0.0341,-30.24572 -0.0794,-45.36855"
+     class="line"
+     id="path122"
+     sodipodi:nodetypes="cccc" />
+  <path
+     d="m 1172.7157,808.84643 h 49.9622 v 35.23761 H 912.58903 c -0.015,21.12293 -0.019,19.00083 -0.08,40.12363"
+     class="line"
+     id="path127"
+     sodipodi:nodetypes="ccccc" />
+  <g
+     id="g125"
+     transform="translate(76.75293,17.656868)">
+    <polygon
+       points="762,1012 494,1012 434,950 494,888 762,888 822,950 "
+       class="choice"
+       id="polygon123"
+       transform="matrix(0.9593364,0,0,0.43016672,334.76534,382.34375)" />
+    <text
+       x="943.21094"
+       y="781.32214"
+       class="small"
+       id="text51"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#203040"><tspan
+         sodipodi:role="line"
+         id="tspan124"
+         x="943.21094"
+         y="781.32214"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">Can be approximated by a</tspan><tspan
+         sodipodi:role="line"
+         id="tspan125"
+         x="943.21094"
+         y="802.57214"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">high-frequency locally cylindrical body?</tspan></text>
+  </g>
+  <path
+     d="m 1015.7172,648.35067 h 41.9622 v 33.23761 H 737.59056 c -0.015,21.12288 -0.019,47.00079 -0.08,68.12359"
+     class="line"
+     id="path125"
+     sodipodi:nodetypes="ccccc" />
+  <g
+     id="g122"
+     transform="translate(264.74934,32.802066)">
+    <polygon
+       points="370,304 430,246 670,246 730,304 670,362 430,362 "
+       class="choice"
+       id="polygon116"
+       transform="matrix(0.61682019,0,0,0.46564741,317.33814,473.9142)"
+       style="stroke-width:4.66478;stroke-dasharray:none" />
+    <text
+       x="658.22272"
+       y="614.93475"
+       class="label"
+       id="text116"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#203040"><tspan
+         sodipodi:role="line"
+         id="tspan121"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+         x="658.22272"
+         y="614.93475">Smooth, convex scattering</tspan><tspan
+         sodipodi:role="line"
+         id="tspan122"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+         x="658.22272"
+         y="635.05725">surface?</tspan></text>
+  </g>
+  <text
+     x="1182.4653"
+     y="573.30389"
+     class="small"
+     id="text119"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan119"
+       x="1182.4653"
+       y="573.30389">Yes</tspan></text>
+  <text
+     x="941.14655"
+     y="573.52295"
+     class="small"
+     id="text120"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan120"
+       x="941.14655"
+       y="573.52295">No</tspan></text>
+  <text
+     x="780.29596"
+     y="643.0199"
+     class="small"
+     id="text123"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan123"
+       x="780.29596"
+       y="643.0199">Yes</tspan></text>
+  <text
+     x="1032.0326"
+     y="645.07001"
+     class="small"
+     id="text126"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan126"
+       x="1032.0326"
+       y="645.07001">No</tspan></text>
+  <text
+     x="804.38702"
+     y="805.19525"
+     class="small"
+     id="text127"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan127"
+       x="804.38702"
+       y="805.19525">No</tspan></text>
+  <text
+     x="1195.5062"
+     y="803.09338"
+     class="small"
+     id="text128"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan128"
+       x="1195.5062"
+       y="803.09338">Yes</tspan></text>
+  <text
+     x="1099.5879"
+     y="923.30457"
+     class="small"
+     id="text131"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan131"
+       x="1099.5879"
+       y="923.30457">Yes</tspan></text>
+  <a
+     id="a132"
+     href="../sdwba/sdwba-theory.html"
+     target="_top"
+     transform="translate(763.78791,608.87181)">
+    <g
+       id="g132"
+       transform="translate(0,-2.3915157)">
+      <rect
+         x="400.70279"
+         y="306.89044"
+         width="83.87236"
+         height="27.984589"
+         rx="4.3251762"
+         class="approx"
+         id="rect131"
+         ry="4.3251762" />
+      <text
+         x="408.32169"
+         y="327.8017"
+         class="label"
+         id="text132"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+           sodipodi:role="line"
+           id="tspan132"
+           x="408.32169"
+           y="327.8017">SDWBA</tspan></text>
+    </g>
+  </a>
+  <text
+     x="684.78638"
+     y="924.02881"
+     class="small"
+     id="text133"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan133"
+       x="684.78638"
+       y="924.02881">No</tspan></text>
+  <a
+     id="a134"
+     href="../dwba/dwba-theory.html"
+     target="_top"
+     transform="translate(168.45483,608.87182)">
+    <g
+       id="g134"
+       transform="translate(0,-2.3915157)">
+      <rect
+         x="400.65366"
+         y="306.84131"
+         width="77.139366"
+         height="28.082829"
+         rx="4.3251762"
+         class="approx"
+         id="rect133"
+         ry="4.3251762" />
+      <text
+         x="408.32169"
+         y="327.8017"
+         class="label"
+         id="text134"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+           sodipodi:role="line"
+           id="tspan134"
+           x="408.32169"
+           y="327.8017">DWBA</tspan></text>
+    </g>
+  </a>
+  <text
+     x="29.627121"
+     y="736.39545"
+     class="small"
+     id="text138"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+       sodipodi:role="line"
+       id="tspan138"
+       x="29.627121"
+       y="736.39545">No</tspan></text>
+</svg>

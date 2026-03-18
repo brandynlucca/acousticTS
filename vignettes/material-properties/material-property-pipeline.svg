@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 360" role="img" aria-labelledby="title desc">
+  <title id="title">Material property pipeline</title>
+  <desc id="desc">Diagram showing how literature properties and medium properties lead to contrasts, elastic constants, and model inputs.</desc>
+  <style>
+    .title { font: 700 28px Georgia, serif; fill: #18324a; }
+    .body { font: 400 18px Georgia, serif; fill: #18324a; }
+    .small { font: 400 15px Georgia, serif; fill: #34566f; }
+    .blue { fill: #f5fbff; stroke: #5d91b6; stroke-width: 2.5; rx: 18; ry: 18; }
+    .sand { fill: #fff7ea; stroke: #c38a43; stroke-width: 2.5; rx: 18; ry: 18; }
+    .line { stroke: #5d91b6; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+  </style>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#5d91b6"/>
+    </marker>
+  </defs>
+  <text x="40" y="48" class="title">Property bookkeeping is a pipeline, not a single number lookup</text>
+  <rect x="40" y="90" width="210" height="190" class="blue"/>
+  <text x="70" y="130" class="body">Source information</text>
+  <text x="70" y="164" class="small">density and sound speed</text>
+  <text x="70" y="190" class="small">or elastic moduli from literature</text>
+  <text x="70" y="228" class="small">keep units explicit</text>
+  <text x="70" y="250" class="small">Pa, kg m^-3, m s^-1</text>
+  <rect x="385" y="90" width="210" height="190" class="sand"/>
+  <text x="415" y="130" class="body">Derived quantities</text>
+  <text x="415" y="164" class="small">contrasts `g` and `h`</text>
+  <text x="415" y="190" class="small">impedance, compressibility</text>
+  <text x="415" y="216" class="small">Lam\'e, bulk, shear, Young</text>
+  <text x="415" y="254" class="small">check physical consistency</text>
+  <rect x="730" y="90" width="210" height="190" class="blue"/>
+  <text x="760" y="130" class="body">Model-ready inputs</text>
+  <text x="760" y="164" class="small">scatterer constructors</text>
+  <text x="760" y="190" class="small">boundary interpretation</text>
+  <text x="760" y="216" class="small">frequency-dependent modeling</text>
+  <text x="760" y="254" class="small">debug with utility checks first</text>
+  <path d="M250 185 C305 185 330 185 385 185" class="line"/>
+  <path d="M595 185 C650 185 675 185 730 185" class="line"/>
+</svg>
