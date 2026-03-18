@@ -1,0 +1,162 @@
+---
+title: "Implementation"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: true
+    fig_caption: yes
+    fig_width: 3.5
+    fig_height: 3.5
+    dpi: 200
+    dev.args: list(pointsize=11)
+vignette: >
+  %\VignetteIndexEntry{HPA implementation}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# acousticTS implementation
+
+The `acousticTS` package uses object-based scatterers, so the HPA workflow follows the same broad pattern used throughout the package: define the geometry, attach fluid-like material properties, evaluate the model over the frequency range of interest, and then inspect the returned results carefully enough to confirm that the approximation is being used in a sensible way. For HPA, the most important additional choice is the approximation method: `johnson` for the compact sphere form, or `stanton` for the broader family of sphere, prolate-spheroid, and cylinder-style approximations.
+
+This matters because HPA is an asymptotic model family rather than an exact solution family. The implementation should therefore be read as a workflow for setting up and checking an approximation, not as a black-box replacement for every modal or boundary-value model in the package.
+
+## Object generation
+
+The Johnson and Stanton sphere formulations can be compared using the same spherical `FLS` object.
+
+```{r}
+library(acousticTS)
+
+sphere_shape <- sphere(
+  radius_body = 4e-3,
+  n_segments = 80
+)
+
+fluid_sphere <- fls_generate(
+  shape = sphere_shape,
+  density_body = 1045,
+  sound_speed_body = 1520,
+  theta_body = pi / 2
+)
+
+fluid_sphere
+```
+
+This object definition is already carrying most of the physical assumptions. The shape is spherical, the interior is treated as fluid-like, and the orientation is broadside. For a sphere, orientation has no effect on the scattering itself, but keeping it explicit is still useful because it reinforces the fact that the same package workflow is shared across anisotropic shapes where orientation does matter.
+
+## Calculating a TS-frequency spectrum
+
+```{r}
+frequency <- seq(18e3, 200e3, by = 7e3)
+
+hpa_johnson <- target_strength(
+  object = fluid_sphere,
+  frequency = frequency,
+  model = "hpa",
+  method = "johnson"
+)
+
+
+hpa_stanton <- target_strength(
+  object = fluid_sphere,
+  frequency = frequency,
+  model = "hpa",
+  method = "stanton"
+)
+```
+
+These two calls are useful as a first implementation check because they keep the target fixed while changing only the approximation formula. That isolates the effect of the HPA method choice itself. If the two curves disagree materially, the difference should be interpreted as a difference in asymptotic construction, not as a difference in target geometry or material bookkeeping.
+
+The selected frequency range should also be interpreted in light of the approximation. HPA is most informative when readers want the broad frequency response of a weakly contrasting target over a moderate or wide range. It is not designed to reproduce fine resonant structure mode by mode. If the scientific question depends on narrow resonances or exact boundary-condition physics, another model may be more appropriate.
+
+## Extracting model results
+
+Model results can be extracted either visually or directly through `extract()`.
+
+### Plotting results
+
+```{r fig.width = 6}
+plot(hpa_stanton, type = "model")
+```
+
+### Accessing results
+
+```{r}
+johnson_results <- extract(hpa_johnson, "model")$HPA
+stanton_results <- extract(hpa_stanton, "model")$HPA
+
+head(johnson_results)
+head(stanton_results)
+```
+
+At this stage, it helps to inspect more than just the plotted curve. Readers should check that the result object contains the expected frequencies, that the returned target-strength levels are physically plausible for the assumed target size and contrast, and that comparisons are being made in the intended domain. HPA results are often discussed in `TS`, but for some comparisons it is more informative to examine `sigma_bs` in the linear domain as well.
+
+## Comparing Johnson and Stanton sphere solutions
+
+```{r fig.width = 8, fig.height = 4.5}
+par(oma = c(0, 0.25, 0, 0), mar = c(5, 6, 4, 2))
+plot(
+  x = johnson_results$frequency * 1e-3,
+  y = johnson_results$TS,
+  type = "l",
+  lty = 1,
+  lwd = 2.5,
+  xlab = "Frequency (kHz)",
+  ylab = expression(Target ~ strength ~ (dB ~ re. ~ 1 ~ m^2)),
+  cex.lab = 1.3,
+  cex.axis = 1.2
+)
+lines(x = stanton_results$frequency * 1e-3, y = stanton_results$TS, col = "firebrick3", lty = 1, lwd = 2.5)
+legend(
+  "bottomright",
+  legend = c("Johnson sphere", "Stanton sphere"),
+  col = c("black", "firebrick3"),
+  lwd = 2.5,
+  lty = c(1, 1),
+  cex = 1.0,
+  bty = "n"
+)
+```
+
+This comparison is most useful as a model-behavior check. Because the geometry and material properties are the same, any difference between the curves reflects the difference between Johnson's compact sphere interpolation and Stanton's more general asymptotic form. That makes the comparison a good way to judge whether the added flexibility of the Stanton formulation materially changes the interpretation over the frequency band of interest.
+
+## Using the Stanton form for an elongated object
+
+The Stanton implementation is the one to use when the shape is not spherical.
+
+```{r}
+cylinder_shape <- cylinder(
+  length_body = 25e-3,
+  radius_body = 2e-3,
+  n_segments = 60
+)
+
+elongated_object <- fls_generate(
+  shape = cylinder_shape,
+  density_body = 1045,
+  sound_speed_body = 1520,
+  theta_body = pi / 2
+)
+
+elongated_object <- target_strength(
+  object = elongated_object,
+  frequency = frequency,
+  model = "hpa",
+  method = "stanton",
+  deviation_fun = 1,
+  null_fun = 1
+)
+
+head(extract(elongated_object, "model")$HPA)
+```
+
+This second example shows one of the main reasons the Stanton form is useful in practice. It extends the same asymptotic logic to elongated shapes without forcing the user into a sphere-only approximation. That does not make it exact for every elongated target, but it does allow gross geometric effects such as aspect ratio and orientation to enter the approximation in a structured way.
+
+When fitting HPA behavior to measurements, the first quantities to revisit are usually:
+
+1. the shape choice, because the geometric prefactor is part of the approximation itself,
+2. the orientation, because elongated targets can change coherence and projected response substantially with angle, and
+3. the empirical `deviation_fun` and `null_fun`, because those control how aggressively the approximation departs from the default smooth-response form.
+
+Those checks are especially helpful when HPA is being used alongside more detailed models. A disagreement does not automatically mean the HPA run is wrong. It may simply indicate that the question has moved beyond the regime where an asymptotic interpolation is the most informative representation.

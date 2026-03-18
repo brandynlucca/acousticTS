@@ -1,0 +1,152 @@
+---
+title: "Implementation"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: true
+    fig_caption: yes
+    fig_width: 3.5
+    fig_height: 3.5
+    dpi: 200
+    dev.args: list(pointsize=11)
+vignette: >
+  %\VignetteIndexEntry{PSMS implementation}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# acousticTS implementation
+
+The `acousticTS` package uses object-based scatterers so the same implementation pattern carries across models: create a scatterer, run `target_strength()`, inspect the stored model output, and then compare a small set of physically important inputs. For PSMS, the main additional choices are the boundary condition, the incident roll angle `phi_body`, and, for fluid-filled cases, the numerical settings used in the kernel integrals and linear solves.
+
+That last point is especially important for PSMS. Unlike some of the simpler modal models, the fluid-filled prolate spheroidal calculation can make numerical settings part of the practical interpretation of the run. The geometry and material properties still define the target, but convergence-related controls help determine how faithfully the truncated spheroidal system has been solved.
+
+## Prolate spheroid object generation
+
+```{r}
+library(acousticTS)
+
+prolate_shape <- prolate_spheroid(
+  length_body = 40e-3,
+  radius_body = 4e-3,
+  n_segments = 100
+)
+
+prolate_object <- fls_generate(
+  shape = prolate_shape,
+  density_body = 1045,
+  sound_speed_body = 1520,
+  theta_body = pi / 2
+)
+
+prolate_object
+```
+
+This object setup is doing more than creating an elongated target. It is declaring that a prolate spheroid is the intended geometric idealization. That is a stronger statement than simply saying the object is elongated. A reader should use PSMS when the prolate spheroidal geometry itself is physically meaningful, not merely when a target looks somewhat longer than it is wide.
+
+## Calculating a TS-frequency spectrum
+
+```{r}
+frequency <- seq(38e3, 120e3, by = 8e3)
+
+prolate_object <- target_strength(
+  object = prolate_object,
+  frequency = frequency,
+  model = "psms",
+  boundary = "liquid_filled",
+  phi_body = pi,
+  n_integration = 128,
+  simplify_Amn = TRUE
+)
+```
+
+This example chooses the fluid-filled boundary because it shows the most demanding PSMS workflow. The `boundary` argument determines the physical interface conditions, `phi_body` controls the roll orientation used in the spheroidal geometry, and `n_integration` together with `simplify_Amn` affects how the coupled fluid-filled system is evaluated numerically.
+
+For rigid and pressure-release boundaries, the PSMS bookkeeping is simpler because the modal coefficients remain effectively diagonal by retained degree. For fluid-filled runs, the numerical settings deserve more attention because the overlap integrals and dense solves are part of the practical calculation.
+
+::: {.caution data-title="Quad precision and fluid-filled PSMS"}
+If `precision = "quad"` is requested together with a fluid-filled or gas-filled PSMS run and `simplify_Amn = FALSE`, the package currently issues a warning. The reason is implementation-specific but important for interpretation: the special-function and kernel calculations can use quadruple-precision arithmetic, but the boundary-kernel linear system is still solved with a divide-and-conquer SVD implementation that is limited to double precision at present.
+
+In practical terms, this means the effective accuracy of the final modal coefficients cannot exceed double precision even though other parts of the calculation are being evaluated more accurately. Quad precision can still help by reducing error earlier in the pipeline, especially in the special-function and overlap-integral evaluations, but it should not be interpreted as making the entire fluid-filled PSMS solve uniformly quadruple-precision.
+
+This matters most when readers are judging convergence, comparing very small differences between neighboring runs, or interpreting error estimates. If a fluid-filled PSMS result obtained with `precision = "quad"` differs only at a level that is comparable to double-precision numerical noise, that difference should be interpreted cautiously. The safer reading is that the upstream arithmetic was refined, but the final dense solve still imposes a double-precision ceiling on the reliability of very small residuals and very fine-grained curve differences.
+:::
+
+## Extracting model results
+
+Model results can be extracted either visually or directly through `extract()`.
+
+### Plotting results
+
+```{r fig.width = 6}
+plot(prolate_object, type = "shape")
+plot(prolate_object, type = "model")
+```
+
+### Accessing results
+
+```{r}
+psms_results <- extract(prolate_object, "model")$PSMS
+head(psms_results)
+```
+
+At this point, readers should confirm more than the existence of a plotted response. It is worth checking that the requested boundary was actually the one used, that the returned frequencies match the intended grid, and that the resulting spectrum behaves plausibly for a prolate fluid-filled target rather than showing obvious signs of under-resolved numerical structure.
+
+## Comparing fluid-filled and rigid boundaries
+
+The boundary condition changes the coefficient solve without changing the outer geometry, so it is a straightforward first comparison when checking whether a prolate spheroid is being parameterized consistently.
+
+```{r fig.width = 8, fig.height = 4.5}
+rigid_prolate <- fls_generate(
+  shape = prolate_shape,
+  density_body = 1045,
+  sound_speed_body = 1520,
+  theta_body = pi / 2
+)
+
+rigid_prolate <- target_strength(
+  object = rigid_prolate,
+  frequency = frequency,
+  model = "psms",
+  boundary = "fixed_rigid",
+  phi_body = pi
+)
+
+ts_fluid <- extract(prolate_object, "model")$PSMS
+ts_rigid <- extract(rigid_prolate, "model")$PSMS
+
+par(oma = c(0, 0.25, 0, 0), mar = c(5, 6, 4, 2))
+plot(
+  x = ts_fluid$frequency * 1e-3,
+  y = ts_fluid$TS,
+  type = "l",
+  lty = 1,
+  lwd = 2.5,
+  xlab = "Frequency (kHz)",
+  ylab = expression(Target ~ strength ~ (dB ~ re. ~ 1 ~ m^2)),
+  cex.lab = 1.3,
+  cex.axis = 1.2,
+  ylim = c(-80, -30)
+)
+lines(x = ts_rigid$frequency * 1e-3, y = ts_rigid$TS, col = "firebrick3", lty = 1, lwd = 2.5)
+legend(
+  "bottomright",
+  legend = c("Liquid filled", "Fixed rigid"),
+  col = c("black", "firebrick3"),
+  lwd = 2.5,
+  lty = c(1, 1),
+  cex = 1.0,
+  bty = "n"
+)
+```
+
+This comparison is useful because it isolates one of the main PSMS decisions without changing the geometric idealization. If the rigid and fluid-filled curves differ substantially, that is not a sign of inconsistency by itself. It is evidence that the boundary physics is materially affecting the prolate-spheroidal response, which is exactly the kind of sensitivity the model is meant to expose.
+
+For practical PSMS work, the first controls to revisit are usually:
+
+1. the boundary condition, because it changes the coefficient problem fundamentally,
+2. the orientation arguments such as `phi_body`, because spheroidal geometry is anisotropic,
+3. `n_integration`, because the overlap integrals must be resolved accurately, and
+4. `simplify_Amn` and `precision`, because they affect the stability and cost of the fluid-filled solve.
+
+Those are the settings to revisit first when a spectrum appears unexpectedly noisy, unexpectedly sensitive, or unexpectedly expensive to evaluate.

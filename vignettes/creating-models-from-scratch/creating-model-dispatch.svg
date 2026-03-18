@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" role="img" aria-labelledby="title desc">
+  <title id="title">Dispatch flow for a new acousticTS model</title>
+  <desc id="desc">Diagram showing target_strength dispatching to tsl_initialize and then TSL, with model parameters and model results stored on the object.</desc>
+  <defs>
+    <style>
+      .bg { fill: #faf7f0; }
+      .panel { fill: #fffdfa; stroke: #2d2b28; stroke-width: 2; }
+      .box { fill: #dbe8f2; stroke: #2d2b28; stroke-width: 2.2; rx: 14; ry: 14; }
+      .box2 { fill: #e9f0df; stroke: #2d2b28; stroke-width: 2.2; rx: 14; ry: 14; }
+      .box3 { fill: #f2e3d2; stroke: #2d2b28; stroke-width: 2.2; rx: 14; ry: 14; }
+      .arrow { stroke: #8a5c34; stroke-width: 3.2; fill: none; marker-end: url(#arr); }
+      .head { font: 700 22px Georgia, "Times New Roman", serif; fill: #1f1d1a; }
+      .txt { font: 18px Georgia, "Times New Roman", serif; fill: #2d2b28; }
+      .small { font: 16px Georgia, "Times New Roman", serif; fill: #4f473f; }
+      .mono { font: 17px "Courier New", monospace; fill: #0f4e60; }
+    </style>
+    <marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a5c34"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="960" height="300"/>
+  <rect class="panel" x="24" y="24" width="912" height="252" rx="16" ry="16"/>
+  <text class="head" x="480" y="58" text-anchor="middle">A new model only needs an initializer and a model function</text>
+
+  <rect class="box" x="56" y="106" width="220" height="96" rx="14" ry="14"/>
+  <text class="txt" x="166" y="144" text-anchor="middle">User calls</text>
+  <text class="mono" x="166" y="172" text-anchor="middle">target_strength(..., model = "tsl")</text>
+
+  <rect class="box2" x="370" y="106" width="220" height="96" rx="14" ry="14"/>
+  <text class="txt" x="480" y="144" text-anchor="middle">Initializer</text>
+  <text class="mono" x="480" y="172" text-anchor="middle">tsl_initialize()</text>
+  <text class="small" x="480" y="194" text-anchor="middle">stores $TSL parameters and empty results</text>
+
+  <rect class="box3" x="684" y="106" width="220" height="96" rx="14" ry="14"/>
+  <text class="txt" x="794" y="144" text-anchor="middle">Model solver</text>
+  <text class="mono" x="794" y="172" text-anchor="middle">TSL()</text>
+  <text class="small" x="794" y="194" text-anchor="middle">fills $TSL with computed output</text>
+
+  <line class="arrow" x1="276" y1="154" x2="370" y2="154"/>
+  <line class="arrow" x1="590" y1="154" x2="684" y2="154"/>
+
+  <text class="small" x="480" y="244" text-anchor="middle">Naming is the key convention: lower-case model name for initialization, upper-case model label for execution.</text>
+</svg>

@@ -17,14 +17,13 @@ vignette: >
 
 # acousticTS implementation
 
-The `acousticTS` package adapts the series of equations described in the literature[^3] that provide a solution of wave equations based on the classical theory of elasticity. The object-based approach in `acousticTS` makes this relatively straightforward by minimizing the amount of manual coding end-users must write. 
+The calibration workflow in `acousticTS` is designed to be short and explicit. A user first creates a calibration sphere object, then evaluates the calibration model over a chosen frequency grid, and finally inspects or plots the stored results. The object-based design is useful here because the sphere dimensions, elastic material properties, medium properties, and model outputs remain attached to the same object throughout the workflow.
 
+# Calibration sphere object generation
 
+The calibration target is represented by the `CAL` object class. This object stores metadata, model parameters, model results, body properties, and shape-specific information in one place. In practical terms, that means the sphere can be built once and then reused for plotting, comparison, and repeated model runs without reconstructing the target from scratch each time.
 
-## Calibration sphere object generation
-
-First, a calibration sphere object has to be created. This is represented by the `CAL` object class that contains  slots for `metadata`, `model_parameters`, `model` results, `body` for sphere dimensions and material properties, and `shape_parameters` for shape-specific metadata. This object can be created using the `cal_generate(...)` function that has two required arguments: `material` and `diameter`. The default diameter is 38.1 mm, or 38.1e^-3^ m. The `diameter` input is intended to be in meters.The `material` argument comprises five default options that automatically include their respective longitudinal ($c_l$) and transversal ($c_t$) sound speeds (m s^-1^) and material density ($\rho$, kg m^-3^):
-
+A calibration sphere object is created with `cal_generate()`. The two most important user-facing arguments are `material` and `diameter`. The default diameter is 38.1 mm, written in the package as `38.1e-3` m, and the diameter input is always interpreted in meters. The `material` argument provides several common defaults whose longitudinal sound speed, transverse sound speed, and density are supplied automatically.
 
 | Material | Argument value | $c_\ell$ | $c_\tau$ | $\rho$ |
 | ----------- | ----------- | ----------- | ----------- | ----------- |
@@ -32,35 +31,34 @@ First, a calibration sphere object has to be created. This is represented by the
 | Aluminum | `"Al"` | 6260 | 3080 | 2070 |
 | Stainless steel | `"steel"` | 5980 | 3297 | 7970 |
 | Brass | `"brass"` | 4372 | 2100 | 8360 |
-| Copper | `"Cu"` | 4760 | 2288.5 |8947 |
+| Copper | `"Cu"` | 4760 | 2288.5 | 8947 |
 
-Alternatively, you can define your own material properties by assigning values to `sound_speed_longitudinal`, `sound_speed_transversal`, and `density_sphere` within `cal_generate(...)`.
+If a sphere material is not one of those defaults, the object can still be created by supplying the material properties directly. The important point is that the calibration sphere is treated as a solid elastic target, so both longitudinal and transverse wave speeds are part of the definition.
 
-When using the default arguments: 
+When using the defaults:
 
 ```{r}
-# Call in package library
 library(acousticTS)
-# Create calibration sphere object
+
 cal_sphere <- cal_generate()
-# this is equivalent to: cal_generate(material = "WC", diameter = 38.1e-3)
+# equivalent to: cal_generate(material = "WC", diameter = 38.1e-3)
 ```
 
-## Calculating a TS-frequency spectrum for the calibration sphere
+# Calculating a target-strength spectrum
 
-With the calibration sphere object generated, TS can be calculated via the `target_strength(...)` function, which is a wrapper function that generally allows for multiple models to be applied to a single scatterer when needed. In this case, there are three required arguments to calculate TS: `object`, `frequency`, and `model`. The `object` argument simply refers to the `CAL` object that we created before (i.e. `cal_sphere`). Frequency (via `frequency`) can be a `vector` of values (Hz). Model is a `string` input that refers to the model end-users would like to use, which would be `model = "calibration"` (*or* `model = "SOEMS"`) in this case. This will update the current `CAL` object when assigned to the same variable, or can be used to generate a copy of the original `CAL` object that now includes model parameter and results as a built-in field.
+Once the calibration sphere object has been created, target strength is computed with `target_strength()`. In this workflow, the core inputs are `object`, `frequency`, and `model`. The `object` argument is the `CAL` object, `frequency` is usually a vector of values in Hz, and `model` should be `"calibration"` or `"SOEMS"`.
 
+The most important practical point is that `target_strength()` returns the updated object. Reassigning to the same object is convenient when the goal is to keep working with a single sphere definition. Assigning to a new object is useful when several model runs or parameter sets need to be kept side by side.
 
-```{r} 
-# Define frequency vector
+```{r}
 frequency <- seq(1e3, 600e3, 1e3)
-# Calculate TS; update original CAL object
+
 cal_sphere <- target_strength(
   object = cal_sphere,
   frequency = frequency,
   model = "calibration"
 )
-# Calculate TS; store in a new CAL object
+
 cal_sphere_copy <- target_strength(
   object = cal_sphere,
   frequency = frequency,
@@ -68,81 +66,49 @@ cal_sphere_copy <- target_strength(
 )
 ```
 
+# Inspecting model results
 
+Model results can be inspected visually or accessed directly with `extract()`. Both approaches are useful. Plotting is the fastest way to check whether the spectrum behaves plausibly, while direct extraction is the best way to compare outputs, build custom graphics, or verify the numerical quantities being stored.
 
-## Extracting model results
+## Plotting results
 
-Model results can be extracted either just visually, or can be directly accessed
-using the `extract(...)` function. 
-
-### Plotting results
-
-This approach uses the `plot(...)` generic function with additional arguments
-for toggling the plot output. The additional arguments to include here are:
-
-- `type = "shape"` *or* `type = "model"`
-- `nudge_y = 1.05` *(default)*
-- `nudge_x = 1.01` *(default)*
-- `x_units = "frequency"` *or* `x_units = "k_sw"` *or* 
-`x_units = "k_l"` *or* `x_units = "k_t"`
-
-Setting `type = "model"` will parse the model results (i.e. TS). The two `nudge_` 
-arguments allow the end-user to nudge to *x*- and *y*-axes as they see fit. The
-`x_units` argument defaults to `x_units = "frequency"`, but setting it to equal 
-`"k_sw"`, `"k_l"`, or `"k_t"` will set TS to be a function of the wavenumber of 
-seawater, longitudinal axis of sphere, and transversal axis of sphere, 
-respectively multiplied by the sphere's radius. 
+The `plot()` method can be used to display either the sphere geometry or the modeled output. For calibration work, the most common use is `type = "model"`, which plots the stored target-strength spectrum. The optional `x_units` argument can also be used to display the horizontal axis in terms of frequency or in terms of radius-scaled wavenumber.
 
 ```{r fig.width = 6}
-# Plot TS as a function of frequency (kHz)
 plot(cal_sphere, type = "model", ylim = c(-70, -30))
-# Plot TS as a function of k[sw]*radius, or k[sw]*a
 plot(cal_sphere, type = "model", x_units = "k_sw", ylim = c(-70, -30))
-# Plot TS as a function of k[l]*radius, or k[sw]*a
 plot(cal_sphere, type = "model", x_units = "k_l", ylim = c(-70, -30))
-# Plot TS as a function of k[t]*radius, or k[sw]*a
 plot(cal_sphere, type = "model", x_units = "k_t", ylim = c(-70, -30))
-# Nudge the x-axis more
-plot(cal_sphere, type = "model", ylim = c(-70, -30))
-# Nudge the y-axis more
-plot(cal_sphere, type = "model", ylim = c(-70, -30))
 ```
 
-### Accessing results
+Those alternatives are useful for different reasons. Frequency is the natural axis for practical calibration work, while the radius-scaled wavenumber views are useful when comparing spheres of different diameters or different materials on a common nondimensional scale.
 
-The model results can also be directly accessed via `extract(...)` which has the
-two arguments `object` and `feature`. In this case, `object` refers to our `CAL`
-object, `cal_sphere`, and we can set `feature = "model"` to extract our model
-results. 
+## Accessing results
+
+The model results can also be accessed directly with `extract()`. For the calibration workflow, `feature = "model"` returns a data frame containing the stored spectral outputs.
 
 ```{r}
-# Extract model results
 model_results <- extract(cal_sphere, "model")$calibration
-# Peek at the output from extract(...)
 head(model_results)
 ```
 
-Here we get seven columns formatted as a `data.frame` object: 
+The extracted data frame includes the working frequency grid, the ambient acoustic-size variable `ka`, the reported backscattering length `f_bs`, the backscattering cross-section `sigma_bs`, and target strength `TS`. In the current calibration workflow, these quantities are related by:
 
-- `frequency`: transmit frequency (Hz)
-- `k_sw`: acoustic wavenumber for seawater/ambient fluid
-- `k_l`: longitudinal axis acoustic wavenumber of sphere
-- `k_t`: transversal axis acoustic wavenumber of sphere
-- `f_bs`: the complex form function output
-- `sigma_bs`: the acoustic cross-section for an elastic sphere (m^2^) where: 
-$\sigma_{bs} = \pi a^2 ~|f_{bs}|^2$
-- `TS`: the target strength (dB re. 1 m^2^) for an elastic sphere where: 
-$TS = 10log_{10}(\frac{\sigma_{bs}}{4 \pi})$
+$$
+\sigma_{\mathrm{bs}} = |f_{\mathrm{bs}}|^2,
+\qquad
+\mathit{TS} = 10 \log_{10}\left(\sigma_{\mathrm{bs}}\right).
+$$
 
-# Material property and sphere shape comparisons
+That relationship is worth stating clearly because calibration literature is not always written with the same normalization. The implementation page should therefore be read together with the theory page when the dimensional meaning of the reported quantities matters.
 
-This implementation also allows for comparisons among different model parameters
-and diameters suited for specific calibration experiments. 
+# Material property and diameter comparisons
+
+One advantage of the calibration workflow is that it becomes easy to compare spheres that differ only in diameter or material. Those comparisons are useful because they show how the resonance pattern shifts when the sphere size changes and how the elastic response changes when the material parameters change.
 
 ## Comparing different diameters
+
 ```{r fig.width = 8, fig.height = 4.5}
-# Generate models for calibration spheres
-# 20 mm diameter sphere
 sphere_20 <- cal_generate(diameter = 20e-3)
 sphere_20 <- target_strength(
   object = sphere_20,
@@ -150,7 +116,7 @@ sphere_20 <- target_strength(
   model = "calibration"
 )
 ts_mods_20 <- extract(sphere_20, "model")$calibration
-# 30 mm diameter sphere
+
 sphere_30 <- cal_generate(diameter = 30e-3)
 sphere_30 <- target_strength(
   object = sphere_30,
@@ -158,7 +124,7 @@ sphere_30 <- target_strength(
   model = "calibration"
 )
 ts_mods_30 <- extract(sphere_30, "model")$calibration
-# 40 mm diameter sphere
+
 sphere_40 <- cal_generate(diameter = 40e-3)
 sphere_40 <- target_strength(
   object = sphere_40,
@@ -166,7 +132,7 @@ sphere_40 <- target_strength(
   model = "calibration"
 )
 ts_mods_40 <- extract(sphere_40, "model")$calibration
-# Plot the three and compare
+
 par(oma = c(0, 0.25, 0, 0), mar = c(5, 6, 4, 2))
 plot(
   x = ts_mods_20$frequency * 1e-3,
@@ -180,21 +146,10 @@ plot(
   cex.axis = 1.2,
   ylim = c(-70, -30)
 )
-lines(
-  x = ts_mods_30$frequency * 1e-3,
-  y = ts_mods_30$TS,
-  col = "red",
-  lty = 1,
-  lwd = 2.5
-)
-lines(
-  x = ts_mods_40$frequency * 1e-3,
-  y = ts_mods_40$TS,
-  col = "blue",
-  lty = 1,
-  lwd = 2.5
-)
-legend("bottomright",
+lines(ts_mods_30$frequency * 1e-3, ts_mods_30$TS, col = "red", lty = 1, lwd = 2.5)
+lines(ts_mods_40$frequency * 1e-3, ts_mods_40$TS, col = "blue", lty = 1, lwd = 2.5)
+legend(
+  "bottomright",
   c("20 mm", "30 mm", "40 mm"),
   lty = c(1, 1, 1),
   lwd = c(2.5, 2.5, 2.5),
@@ -203,12 +158,13 @@ legend("bottomright",
 )
 ```
 
+Diameter changes alter the acoustic-size scaling directly, so the resonance structure shifts across the frequency axis even when the sphere material is unchanged. That is one reason calibration practice is usually tied to standard diameters rather than to an abstract material class alone.
+
 ## Comparing different materials
 
 ```{r fig.width = 8, fig.height = 4.5}
-# tungsten carbide
 ts_mods_WC <- extract(cal_sphere, "model")$calibration
-# copper sphere
+
 sphere_copper <- cal_generate(material = "Cu")
 sphere_copper <- target_strength(
   object = sphere_copper,
@@ -216,7 +172,7 @@ sphere_copper <- target_strength(
   model = "calibration"
 )
 ts_mods_Cu <- extract(sphere_copper, "model")$calibration
-# aluminum sphere
+
 sphere_aluminum <- cal_generate(material = "Al")
 sphere_aluminum <- target_strength(
   object = sphere_aluminum,
@@ -224,7 +180,7 @@ sphere_aluminum <- target_strength(
   model = "calibration"
 )
 ts_mods_Al <- extract(sphere_aluminum, "model")$calibration
-# brass sphere
+
 sphere_brass <- cal_generate(material = "brass")
 sphere_brass <- target_strength(
   object = sphere_brass,
@@ -232,7 +188,7 @@ sphere_brass <- target_strength(
   model = "calibration"
 )
 ts_mods_brass <- extract(sphere_brass, "model")$calibration
-# stainless steel sphere
+
 sphere_steel <- cal_generate(material = "steel")
 sphere_steel <- target_strength(
   object = sphere_steel,
@@ -240,7 +196,7 @@ sphere_steel <- target_strength(
   model = "calibration"
 )
 ts_mods_steel <- extract(sphere_steel, "model")$calibration
-# Plot each and compare
+
 par(
   ask = FALSE,
   oma = c(1, 1, 1, 0),
@@ -258,35 +214,12 @@ plot(
   cex.axis = 1.2,
   ylim = c(-90, -30)
 )
-lines(
-  x = ts_mods_Cu$frequency * 1e-3,
-  y = ts_mods_Cu$TS,
-  col = "red",
-  lty = 1,
-  lwd = 2.5
-)
-lines(
-  x = ts_mods_Al$frequency * 1e-3,
-  y = ts_mods_Al$TS,
-  col = "blue",
-  lty = 1,
-  lwd = 2.5
-)
-lines(
-  x = ts_mods_brass$frequency * 1e-3,
-  y = ts_mods_brass$TS,
-  col = "green",
-  lty = 1,
-  lwd = 2.5
-)
-lines(
-  x = ts_mods_steel$frequency * 1e-3,
-  y = ts_mods_steel$TS,
-  col = "orange",
-  lty = 1,
-  lwd = 2.5
-)
-legend("bottomright",
+lines(ts_mods_Cu$frequency * 1e-3, ts_mods_Cu$TS, col = "red", lty = 1, lwd = 2.5)
+lines(ts_mods_Al$frequency * 1e-3, ts_mods_Al$TS, col = "blue", lty = 1, lwd = 2.5)
+lines(ts_mods_brass$frequency * 1e-3, ts_mods_brass$TS, col = "green", lty = 1, lwd = 2.5)
+lines(ts_mods_steel$frequency * 1e-3, ts_mods_steel$TS, col = "orange", lty = 1, lwd = 2.5)
+legend(
+  "bottomright",
   c("WC", "Cu", "Al", "Brass", "Steel"),
   lty = c(1, 1, 1, 1, 1),
   lwd = c(2.5, 2.5, 2.5, 2.5, 2.5),
@@ -295,8 +228,8 @@ legend("bottomright",
 )
 ```
 
-# Future development
+Material comparisons are especially informative because they isolate the role of elastic wave speeds and density from the purely geometric role of sphere size. A tungsten carbide sphere and an aluminum sphere of the same diameter do not simply differ by a vertical offset. Their resonance structure can also shift because the interior compressional and shear wave speeds have changed.
 
-Stay tuned for new methods enabling backscatter simulations for calibration 
-spheres of different materials, sizes, etc., from a single function rather than 
-repeating the same dataflow.
+# Closing note
+
+Calibration spheres are one of the cleanest places in the package to see the full object-to-model workflow in action. A well-defined object is created, a canonical model is applied, and the outputs can then be compared across diameter, material, or frequency range with very little ambiguity about what the target actually is.

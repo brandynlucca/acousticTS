@@ -1,0 +1,155 @@
+---
+title: "Implementation"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: true
+    fig_caption: yes
+    fig_width: 3.5
+    fig_height: 3.5
+    dpi: 200
+    dev.args: list(pointsize=11)
+vignette: >
+  %\VignetteIndexEntry{KRM implementation}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# acousticTS implementation
+
+The `acousticTS` package uses object-based scatterers, so the KRM workflow follows the same broad structure used elsewhere in the package: define the geometry, attach material meaning to the body and any internal inclusion, evaluate the model over the desired frequency range, and then inspect the returned response carefully enough to understand what part of the target is driving it. For KRM, the main structural choice is whether the target is represented as a fluid-like body only or as a body plus an internal strongly contrasting inclusion such as a swimbladder.
+
+This matters because KRM is not just a body-shape model. It is a composite body-plus-inclusion model. Readers should therefore treat object construction as part of the scientific interpretation rather than just a data-formatting step.
+
+## Fish-like object generation
+
+The example below creates a simple body shape and an embedded swimbladder shape with `arbitrary()` and passes both to `sbf_generate()`.
+
+```{r}
+library(acousticTS)
+
+body_shape <- arbitrary(
+  x_body = c(0.00, 0.04, 0.09, 0.15, 0.22, 0.28),
+  w_body = c(0.00, 0.018, 0.028, 0.030, 0.018, 0.00),
+  zU_body = c(0.000, 0.010, 0.016, 0.017, 0.010, 0.000),
+  zL_body = c(0.000, -0.010, -0.016, -0.017, -0.010, 0.000)
+)
+
+bladder_shape <- arbitrary(
+  x_bladder = c(0.06, 0.10, 0.14, 0.18, 0.21),
+  w_bladder = c(0.00, 0.008, 0.012, 0.008, 0.00),
+  zU_bladder = c(0.000, 0.004, 0.006, 0.004, 0.000),
+  zL_bladder = c(0.000, -0.004, -0.006, -0.004, 0.000)
+)
+
+fish_object <- sbf_generate(
+  body_shape = body_shape,
+  bladder_shape = bladder_shape,
+  density_body = 1070,
+  sound_speed_body = 1570,
+  density_bladder = 1.2,
+  sound_speed_bladder = 340,
+  theta_body = pi / 2,
+  theta_bladder = pi / 2
+)
+
+fish_object
+```
+
+This object already encodes the key KRM assumptions. The body and bladder are described separately, their material properties are assigned separately, and the orientation of each is carried explicitly. That separation is important because the KRM assigns different scattering logic to weakly contrasting body tissue and to the strongly contrasting internal inclusion. If the geometry or placement of the bladder is unrealistic, the model may still run, but the interpretation of the result will no longer match the intended biological target.
+
+## Calculating a TS-frequency spectrum
+
+```{r}
+frequency <- seq(18e3, 120e3, by = 6e3)
+
+fish_object <- target_strength(
+  object = fish_object,
+  frequency = frequency,
+  model = "krm"
+)
+```
+
+This call evaluates the composite KRM response over the requested frequency grid. As with other approximations, it is worth choosing the grid with the interpretation in mind. A broader sweep is useful for seeing how the body-only and bladder-dominated regimes compare, while a narrower and finer grid may be more useful when the question is how strongly the bladder alters the spectrum over a particular band of interest.
+
+## Extracting model results
+
+Model results can be extracted either visually or directly through `extract()`.
+
+### Plotting results
+
+```{r fig.width = 6}
+plot(fish_object, type = "shape")
+plot(fish_object, type = "model")
+```
+
+### Accessing results
+
+```{r}
+krm_results <- extract(fish_object, "model")$KRM
+head(krm_results)
+```
+
+At this stage, it is worth confirming more than the presence of a plotted curve. Readers should check that the returned frequencies match the request, that the target-strength scale is plausible for the assumed fish size and material contrasts, and that the result is being interpreted as a coherent composite response rather than as an isolated body or isolated bladder term.
+
+## Comparing body-only and body-plus-swimbladder cases
+
+The most common practical comparison in KRM work is the contribution of the swimbladder relative to the fluid-like body.
+
+```{r fig.width = 8, fig.height = 4.5}
+body_only_object <- fls_generate(
+  shape = body_shape,
+  density_body = 1070,
+  sound_speed_body = 1570,
+  theta_body = pi / 2
+)
+
+body_only_object <- target_strength(
+  object = body_only_object,
+  frequency = frequency,
+  model = "krm"
+)
+
+ts_body_only <- extract(body_only_object, "model")$KRM
+ts_body_and_bladder <- extract(fish_object, "model")$KRM
+
+par(oma = c(0, 0.25, 0, 0), mar = c(5, 6, 4, 2))
+plot(
+  x = ts_body_only$frequency * 1e-3,
+  y = ts_body_only$TS,
+  type = "l",
+  lty = 1,
+  lwd = 2.5,
+  xlab = "Frequency (kHz)",
+  ylab = expression(Target ~ strength ~ (dB ~ re. ~ 1 ~ m^2)),
+  cex.lab = 1.3,
+  cex.axis = 1.2,
+  ylim = c(-70, -20)
+)
+lines(
+  x = ts_body_and_bladder$frequency * 1e-3,
+  y = ts_body_and_bladder$TS,
+  col = "firebrick3",
+  lty = 1,
+  lwd = 2.5
+)
+legend(
+  "bottomright",
+  legend = c("Body only", "Body plus swimbladder"),
+  col = c("black", "firebrick3"),
+  lwd = 2.5,
+  lty = c(1, 1),
+  cex = 1.0,
+  bty = "n"
+)
+```
+
+This comparison is often the most informative first diagnostic because it isolates the physical reason the KRM exists. Holding the body geometry fixed while adding or removing the internal inclusion shows whether the total response is dominated by weakly scattering tissue, by the strong internal contrast, or by coherent interaction between both contributions.
+
+For practical KRM work, the first inputs to revisit are usually:
+
+1. the body and bladder geometry, because the model assumes a sensible locally cylindrical segmentation,
+2. the relative placement and scale of the bladder inside the body, because that strongly affects the composite interpretation, and
+3. the material contrasts assigned to both regions, because they control whether the body remains weakly scattering and whether the bladder remains the dominant internal inclusion.
+
+For more realistic biological examples, the bundled `cod` and `sardine` datasets are the natural next objects to inspect because they already package body and swimbladder geometry in the format expected by the model.

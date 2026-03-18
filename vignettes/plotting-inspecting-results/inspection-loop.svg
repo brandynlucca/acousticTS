@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 360" role="img" aria-labelledby="title desc">
+  <title id="title">Inspection loop</title>
+  <desc id="desc">Diagram showing the inspection loop from shape plotting to model plotting and extraction.</desc>
+  <style>
+    .title { font: 700 28px Georgia, serif; fill: #18324a; }
+    .body { font: 400 18px Georgia, serif; fill: #18324a; }
+    .small { font: 400 15px Georgia, serif; fill: #35546b; }
+    .box { fill: #f7fbfe; stroke: #5d91b6; stroke-width: 2.5; rx: 18; ry: 18; }
+    .accent { fill: #fff7ea; stroke: #c48b41; stroke-width: 2.5; rx: 18; ry: 18; }
+    .line { stroke: #557f9a; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+  </style>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#557f9a"/>
+    </marker>
+  </defs>
+  <text x="40" y="48" class="title">Inspection is a loop: geometry first, stored outputs next, publication plots last</text>
+  <rect x="40" y="120" width="230" height="120" class="box"/>
+  <text x="70" y="162" class="body">`plot(..., type = "shape")`</text>
+  <text x="70" y="190" class="small">confirm geometry, segmentation,</text>
+  <text x="70" y="212" class="small">orientation, and obvious unit mistakes</text>
+  <rect x="375" y="120" width="230" height="120" class="accent"/>
+  <text x="405" y="162" class="body">`show()` and `extract()`</text>
+  <text x="405" y="190" class="small">inspect stored parameters, model names,</text>
+  <text x="405" y="212" class="small">and numerical outputs</text>
+  <rect x="710" y="120" width="230" height="120" class="box"/>
+  <text x="740" y="162" class="body">`plot(..., type = "model")`</text>
+  <text x="740" y="190" class="small">compare TS, sigma_bs, or amplitudes</text>
+  <text x="740" y="212" class="small">on a shared frequency grid</text>
+  <path d="M270 180 C310 180 335 180 375 180" class="line"/>
+  <path d="M605 180 C645 180 670 180 710 180" class="line"/>
+</svg>
