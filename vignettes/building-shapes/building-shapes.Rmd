@@ -1,0 +1,66 @@
+---
+title: "Building Shapes"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: true
+    fig_caption: yes
+    dpi: 200
+    dev.args: list(pointsize=11)
+vignette: >
+  %\VignetteIndexEntry{Building shapes}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# Introduction
+
+Geometry is the first major decision in the package. Before choosing a scatterer class or a target-strength model, it is usually worth deciding whether the target is best represented as a canonical shape or as a segmented arbitrary body. That decision is not just cosmetic. It determines how faithfully the object matches a theory family, how much geometric detail is preserved, and how easy it will be to interpret the response later.
+
+The important point is that shape construction is not yet the stage where material contrasts or boundary conditions are fixed. At this point the user is deciding only how the body is described geometrically. That separation is intentional. It keeps the geometric question distinct from the physical one and makes it easier to evaluate whether a later result is being driven by morphology, by material properties, or by model assumptions.
+
+![Shape-selection spectrum](building-shapes-spectrum.svg)
+
+# Why geometry choice matters
+
+The geometry chosen at this stage strongly influences which later models are natural and which approximations are defensible. A canonical geometry can align very well with an exact or modal-series model, while a segmented arbitrary geometry can align better with a morphology-preserving approximation. Neither option is automatically more correct. The right choice depends on whether the main goal is to preserve measured shape, to stay close to a canonical theory family, or to build a deliberately simplified object for comparison and intuition.
+
+This is why the package keeps shape construction upstream of scatterer generation and model selection. A good workflow begins by deciding how much geometric structure needs to survive into the acoustic problem.
+
+# Canonical shape generators
+
+The package includes several geometry constructors for canonical targets: `sphere()` for spherical bodies, `cylinder()` for straight cylindrical bodies, `prolate_spheroid()` for smooth elongated bodies, and `polynomial_cylinder()` for parameterized cylindrical profiles. The convenience wrapper `create_shape()` can be used when the goal is to dispatch to one of these canonical builders through a single interface.
+
+Canonical shapes are especially useful when the geometry itself is part of the model assumption. A spherical target is naturally paired with a spherical theory family, a smooth prolate body aligns naturally with a spheroidal theory family, and a straight finite cylinder aligns naturally with cylindrical model families. In those cases, using a canonical shape is not only convenient. It is often the most physically interpretable choice because the geometry and the mathematical basis are consistent with each other.
+
+Canonical geometry is also useful for comparison studies. If the goal is to understand how two model families differ under controlled conditions, a simple sphere, cylinder, or spheroid often provides a cleaner starting point than a highly detailed arbitrary outline.
+
+# Arbitrary and measured shapes
+
+When measured body coordinates or bespoke outlines are available, `arbitrary()` is often the most flexible starting point. Arbitrary shapes are particularly important for elongated biological targets whose centerline and cross-sectional variation are more important than exact canonical separability. In those situations, preserving the morphology may matter more than matching a canonical coordinate system.
+
+This is one of the main geometric tradeoffs in the package. A canonical shape may offer stronger mathematical alignment with an exact theory family, but it may smooth away anatomical features that are important for an approximate segmented model. An arbitrary shape may preserve those features better, but it may no longer support the same geometry-matched analytical simplifications. The right choice depends on what the reader wants the geometry to do in the later acoustic interpretation.
+
+The second figure is useful here because it makes that tradeoff explicit. The further a body departs from a separable canonical surface, the stronger the case becomes for preserving the measured morphology rather than forcing the target into an overly simple idealized form.
+
+# Choosing the right level of geometric detail
+
+More detail is not automatically better. Canonical modal models benefit from geometry that matches the separable coordinate system. Segmented approximate models benefit from geometry that matches the intended physical approximation. Screening or exploratory work often benefits from a simpler geometry first, because simpler objects make it easier to distinguish broad physical trends from geometric complications.
+
+That is why the package treats shape construction as a deliberate modeling choice rather than as a purely technical preprocessing step. A very detailed geometry can be helpful when the scientific question depends on curvature, taper, segmentation, or anatomy. The same level of detail can be unnecessary, or even misleading, if the chosen model assumes a much simpler geometry than the object actually contains.
+
+# A practical way to choose
+
+One useful way to think about shape choice is to ask what aspect of the target must be preserved for the later model run to be meaningful. If near-isotropic roundness is the important feature, a sphere is usually enough. If the target is smooth and elongated with no sharp geometric transitions, a prolate spheroid may capture the essential structure well. If the body is straight and approximately constant in radius, a finite cylinder may be the most natural simplification. If curvature, taper, segmentation, or anatomy are central to the question, an arbitrary or segmented representation is usually the better starting point.
+
+This way of choosing keeps the geometry tied to the scientific purpose rather than to habit. It also makes later model selection much easier, because the most defensible model families often become obvious once the geometry has been chosen for the right reason.
+
+# What to check before moving on
+
+Before turning a shape into a scatterer, it is worth checking whether the geometry is serving the intended role. The object should preserve the body features that matter acoustically, but it should not be more complicated than the planned model interpretation can actually use. Segment density, radius variation, curvature, and overall dimensions should all be visually and numerically sensible. If the object is meant to approximate a canonical surface, it should do so clearly rather than ambiguously.
+
+Those checks help prevent a common mistake in acoustic workflows: building a geometry that is internally reasonable, but poorly aligned with the later physical and mathematical assumptions.
+
+# Recommended next step
+
+The next step after geometry construction is usually [building scatterers](../building-scatterers/building-scatterers.html), where material properties, contrasts, and target type are added to the geometric object. That is the stage where a shape becomes a model-ready acoustic target.

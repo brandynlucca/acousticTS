@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 420" role="img" aria-labelledby="title desc">
+  <title id="title">Example data workflow map</title>
+  <desc id="desc">Diagram showing bundled example objects feeding learning, comparison, and validation workflows.</desc>
+  <style>
+    .title { font: 700 28px Georgia, serif; fill: #18324a; }
+    .body { font: 400 18px Georgia, serif; fill: #18324a; }
+    .small { font: 400 15px Georgia, serif; fill: #35546b; }
+    .box { fill: #f6fbff; stroke: #5e8fb1; stroke-width: 2.5; rx: 18; ry: 18; }
+    .mid { fill: #fff8ef; stroke: #c48b41; stroke-width: 2.5; rx: 18; ry: 18; }
+    .line { stroke: #557f9a; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+  </style>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#557f9a"/>
+    </marker>
+  </defs>
+  <text x="40" y="48" class="title">Bundled data support more than a first demo</text>
+  <rect x="40" y="90" width="220" height="230" class="box"/>
+  <text x="70" y="128" class="body">Bundled objects</text>
+  <text x="70" y="168" class="small">`sardine`</text>
+  <text x="70" y="198" class="small">`cod`</text>
+  <text x="70" y="228" class="small">`krill`</text>
+  <text x="70" y="258" class="small">`benchmark_ts`</text>
+  <text x="70" y="296" class="small">shared targets and stored</text>
+  <text x="70" y="318" class="small">reference responses</text>
+  <rect x="380" y="90" width="240" height="90" class="mid"/>
+  <text x="410" y="130" class="body">Learning workflows</text>
+  <text x="410" y="158" class="small">plot, inspect, and run a first</text>
+  <text x="410" y="180" class="small">model without building geometry first</text>
+  <rect x="380" y="210" width="240" height="90" class="mid"/>
+  <text x="410" y="250" class="body">Model comparison</text>
+  <text x="410" y="278" class="small">compare assumptions on a shared</text>
+  <text x="410" y="300" class="small">target definition</text>
+  <rect x="700" y="120" width="240" height="150" class="box"/>
+  <text x="730" y="160" class="body">Validation and teaching</text>
+  <text x="730" y="192" class="small">benchmark curves expose setup errors,</text>
+  <text x="730" y="214" class="small">numerical drift, and mismatched</text>
+  <text x="730" y="236" class="small">boundary assumptions</text>
+  <path d="M260 156 C308 156 328 136 380 136" class="line"/>
+  <path d="M260 250 C308 250 328 255 380 255" class="line"/>
+  <path d="M620 136 C660 136 670 155 700 175" class="line"/>
+  <path d="M620 255 C660 255 670 225 700 205" class="line"/>
+</svg>
