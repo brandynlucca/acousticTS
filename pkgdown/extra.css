@@ -1,0 +1,164 @@
+/* Hide default sidebar components if they persist */
+.contents nav {
+  display: none;
+}
+
+/* Sidebar Styling */
+#pkgdown-sidebar {
+  padding: 20px;
+  border-right: 1px solid #eee;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sidebar-category button {
+  font-weight: bold;
+  color: #333;
+  text-decoration: none;
+}
+
+.sidebar-category ul {
+  padding-left: 10px;
+}
+
+.sidebar-category a {
+  display: block;
+  padding: 2px 0;
+  color: #666;
+  text-decoration: none;
+}
+
+.sidebar-category a:hover {
+  color: #007bff;
+}
+
+/* --- SHARED BASE STYLES --- */
+/* --- SHARED STRUCTURE --- */
+div.tip, section.tip, div.caution, section.caution, div.danger, section.danger, 
+div.note, section.note, div.seealso, section.seealso, 
+div.attention, section.attention, div.bug, section.bug, div.todo, section.todo, 
+div.example, section.example, div.help, section.help, div.experiment, section.experiment {
+  border: 1px solid #d1d5da !important;
+  border-radius: 6px !important;
+  margin: 1.5em 0 !important;
+  padding: 0 !important; 
+  overflow: hidden !important;
+  display: block !important;
+  border-left-width: 6px !important;
+  border-left-style: solid !important;
+}
+
+/* THE HEADER BARS */
+div.tip::before, section.tip::before, div.caution::before, section.caution::before,
+div.danger::before, section.danger::before, div.note::before, section.note::before,
+div.seealso::before, section.seealso::before, 
+div.attention::before, section.attention::before, div.bug::before, section.bug::before,
+div.todo::before, section.todo::before, div.example::before, section.example::before,
+div.help::before, section.help::before, div.experiment::before, section.experiment::before {
+  display: block !important;
+  color: #ffffff !important;
+  padding: 10px 15px !important;
+  font-weight: 700 !important;
+  font-size: 0.9rem !important;
+  line-height: 1.2 !important;
+  border-bottom: 1px solid rgba(0,0,0,0.1) !important;
+}
+
+/* THE BODY CONTENT PADDING */
+div.tip > *, section.tip > *, div.caution > *, section.caution > *, div.danger > *, section.danger > *, 
+div.note > *, section.note > *, div.seealso > *, section.seealso > *, 
+div.attention > *, section.attention > *, div.bug > *, section.bug > *, div.todo > *, section.todo > *, 
+div.example > *, section.example > *, div.help > *, section.help > *, div.experiment > *, section.experiment > * {
+  padding-left: 15px !important;
+  padding-right: 15px !important;
+  margin-top: 12px !important;
+  margin-bottom: 12px !important;
+  color: #24292e !important;
+}
+
+/* --- UNIQUE COLOR MAPPING --- */
+
+/* 1. TIP - Forest */
+div.tip, section.tip { background-color: #e4f7e7 !important; border-left-color: #5fb488 !important; }
+div.tip::before, section.tip::before { background-color: #002f17 !important; content: "💡 Tip" !important; }
+div.tip[data-title]::before, section.tip[data-title]::before { content: "💡 " attr(data-title) !important; }
+
+/* 2. CAUTION - Amber */
+div.caution, section.caution { background-color: #fff9e6 !important; border-left-color: #e6b800 !important; }
+div.caution::before, section.caution::before { background-color: #4d3d00 !important; content: "⚠️ Caution" !important; }
+div.caution[data-title]::before, section.caution[data-title]::before { content: "⚠️ " attr(data-title) !important; }
+
+/* 3. DANGER - Crimson */
+div.danger, section.danger { background-color: #ffebe6 !important; border-left-color: #cc3300 !important; }
+div.danger::before, section.danger::before { background-color: #4d1400 !important; content: "🚫 Danger" !important; }
+div.danger[data-title]::before, section.danger[data-title]::before { content: "🚫 " attr(data-title) !important; }
+
+/* 4. NOTE - Deep Blue */
+div.note, section.note { background-color: #e7f3ff !important; border-left-color: #5fa1b4 !important; }
+div.note::before, section.note::before { background-color: #001d2f !important; content: "📝 Note" !important; }
+div.note[data-title]::before, section.note[data-title]::before { content: "📝 " attr(data-title) !important; }
+
+/* 5. SEEALSO - Teal */
+div.seealso, section.seealso { background-color: #e6fffa !important; border-left-color: #38b2ac !important; }
+div.seealso::before, section.seealso::before { background-color: #234e52 !important; content: "🔗 See Also" !important; }
+div.seealso[data-title]::before, section.seealso[data-title]::before { content: "🔗 " attr(data-title) !important; }
+
+/* 6. ATTENTION - Bright Orange */
+div.attention, section.attention { background-color: #fffaf0 !important; border-left-color: #ed8936 !important; }
+div.attention::before, section.attention::before { background-color: #7b341e !important; content: "🔔 Attention" !important; }
+div.attention[data-title]::before, section.attention[data-title]::before { content: "🔔 " attr(data-title) !important; }
+
+/* 7. BUG - Rose */
+div.bug, section.bug { background-color: #fff5f7 !important; border-left-color: #f66581 !important; }
+div.bug::before, section.bug::before { background-color: #700c23 !important; content: "🐛 Bug" !important; }
+div.bug[data-title]::before, section.bug[data-title]::before { content: "🐛 " attr(data-title) !important; }
+
+/* 8. TODO - Slate */
+div.todo, section.todo { background-color: #f8fafc !important; border-left-color: #64748b !important; }
+div.todo::before, section.todo::before { background-color: #1e293b !important; content: "✅ Todo" !important; }
+div.todo[data-title]::before, section.todo[data-title]::before { content: "✅ " attr(data-title) !important; }
+
+/* 9. EXAMPLE - Indigo */
+div.example, section.example { background-color: #f0f1ff !important; border-left-color: #667eea !important; }
+div.example::before, section.example::before { background-color: #2d3748 !important; content: "📋 Example" !important; }
+div.example[data-title]::before, section.example[data-title]::before { content: "📋 " attr(data-title) !important; }
+
+/* 10. HELP - Cyan */
+div.help, section.help { background-color: #e0fcff !important; border-left-color: #00b5d8 !important; }
+div.help::before, section.help::before { background-color: #086070 !important; content: "❓ Help" !important; }
+div.help[data-title]::before, section.help[data-title]::before { content: "❓ " attr(data-title) !important; }
+
+/* 11. EXPERIMENT - Violet */
+div.experiment, section.experiment { background-color: #faf5ff !important; border-left-color: #b794f4 !important; }
+div.experiment::before, section.experiment::before { background-color: #44337a !important; content: "🧪 Experiment" !important; }
+div.experiment[data-title]::before, section.experiment[data-title]::before { content: "🧪 " attr(data-title) !important; }
+
+/* --- COLLAPSIBLE CODE --- */
+details.code-drop {
+  border: 1px solid #d1d5da !important;
+  border-left: 6px solid #24292e !important;
+  border-radius: 6px !important;
+  background: #f8fafc !important;
+  margin: 1.5em 0 !important;
+  overflow: hidden !important;
+}
+
+details.code-drop summary {
+  padding: 10px 15px !important;
+  background: #24292e !important;
+  color: white !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  list-style: none !important;
+}
+
+details.code-drop summary::-webkit-details-marker {
+  display: none !important;
+}
+
+details.code-drop pre {
+  margin: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 15px !important;
+}
