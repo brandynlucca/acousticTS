@@ -369,10 +369,57 @@ lame <- function(K = NULL, E = NULL, G = NULL, nu = NULL) {
 #' Wrapper function to model acoustic target strength
 #' @param object Scatterer-class object.
 #' @param frequency Frequency (Hz).
-#' @param model Model name.
+#' @param model Model name. Available models currently include
+#'   \code{"dwba"} (\code{\link{DWBA}}),
+#'   \code{"sdwba"} (\code{\link{SDWBA}}),
+#'   \code{"fcms"} (\code{\link{FCMS}}),
+#'   \code{"hpa"} (\code{\link{HPA}}),
+#'   \code{"krm"} (\code{\link{KRM}}),
+#'   \code{"psms"} (\code{\link{PSMS}}),
+#'   \code{"sphms"} (\code{\link{SPHMS}}),
+#'   \code{"essms"} (\code{\link{ESSMS}}),
+#'   \code{"trcm"} (\code{\link{TRCM}}), and
+#'   \code{"calibration"} / \code{"soems"} (\code{\link{SOEMS}}).
 #' @param verbose Prints current procedural step occurring from model
 #' initialization to calculating TS. Defaults to FALSE.
 #' @param ... Additional optional model inputs/parameters.
+#' @details
+#' This is the main high-level entry point for running target-strength models in
+#' \code{acousticTS}. The supplied scatterer object is checked, the requested
+#' model or models are initialized, and the resulting outputs are stored back on
+#' the same object.
+#'
+#' The available model families span exact modal-series solutions and
+#' approximation-based solutions. Readers should consult the model-specific help
+#' topics for the physical assumptions, valid object types, boundary-condition
+#' options, and model-specific arguments used by each implementation:
+#'
+#' \itemize{
+#'   \item \code{\link{DWBA}} for the distorted-wave Born approximation
+#'   applied to weakly scattering fluid-like bodies.
+#'   \item \code{\link{SDWBA}} for the stochastic distorted-wave Born
+#'   approximation.
+#'   \item \code{\link{FCMS}} for the finite cylinder modal series solution.
+#'   \item \code{\link{HPA}} for the high-pass approximation family.
+#'   \item \code{\link{KRM}} for the Kirchhoff-Ray Mode model.
+#'   \item \code{\link{PSMS}} for the prolate spheroidal modal series
+#'   solution.
+#'   \item \code{\link{SPHMS}} for the spherical modal series solution.
+#'   \item \code{\link{ESSMS}} for the elastic-shelled spherical modal series
+#'   solution.
+#'   \item \code{\link{TRCM}} for the two-ray cylindrical model.
+#'   \item \code{\link{SOEMS}} for the solid elastic calibration-sphere model,
+#'   accessed through \code{"calibration"} or \code{"soems"}.
+#' }
+#'
+#' Model-specific inputs are passed through \code{...}. For example, some models
+#' require a \code{boundary} argument, \code{HPA} uses a \code{method}
+#' argument, and several models expose additional numerical controls.
+#' @seealso
+#' \code{\link{DWBA}}, \code{\link{SDWBA}}, \code{\link{FCMS}},
+#' \code{\link{HPA}}, \code{\link{KRM}}, \code{\link{PSMS}},
+#' \code{\link{SPHMS}}, \code{\link{ESSMS}}, \code{\link{TRCM}},
+#' \code{\link{SOEMS}}
 #' @export
 target_strength <- function(object, frequency, model, verbose = FALSE, ...) {
   # Validate inputs ============================================================
@@ -537,12 +584,12 @@ target_strength <- function(object, frequency, model, verbose = FALSE, ...) {
 #' @keywords internal
 #' @noRd
 prolate_spheroidal_kernels <- function(
-    acoustics,
-    body,
-    medium,
-    boundary_method,
-    n_integration = 128,
-    precision = "double"
+  acoustics,
+  body,
+  medium,
+  boundary_method,
+  n_integration = 128,
+  precision = "double"
 ) {
   # Generate nodes and weights for quadrature ==================================
   quad_pts <- gauss_legendre(n = n_integration, a = -1, b = 1)
@@ -551,4 +598,3 @@ prolate_spheroidal_kernels <- function(
     acoustics, body, medium, quad_pts, precision, boundary_method
   )
 }
-
