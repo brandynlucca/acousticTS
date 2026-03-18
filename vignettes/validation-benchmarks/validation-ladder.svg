@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="340" viewBox="0 0 920 340">
+  <rect width="920" height="340" fill="#fbfaf5"/>
+  <text x="48" y="48" font-family="Georgia, serif" font-size="28" fill="#203040">Validation ladder</text>
+  <rect x="120" y="234" width="680" height="48" rx="14" fill="#d4e7e7" stroke="#0f5c5c" stroke-width="4"/>
+  <text x="340" y="266" font-family="Georgia, serif" font-size="24" fill="#203040">1. Object and unit sanity checks</text>
+  <rect x="170" y="164" width="580" height="48" rx="14" fill="#eef0de" stroke="#7a6a2a" stroke-width="4"/>
+  <text x="324" y="196" font-family="Georgia, serif" font-size="24" fill="#203040">2. Known limits and asymptotic behavior</text>
+  <rect x="220" y="94" width="480" height="48" rx="14" fill="#f3dfcf" stroke="#a35d24" stroke-width="4"/>
+  <text x="302" y="126" font-family="Georgia, serif" font-size="24" fill="#203040">3. Benchmark or published comparison</text>
+  <text x="208" y="314" font-family="Georgia, serif" font-size="20" fill="#203040">The higher the step, the more confidence that an unusual result is physical rather than a setup mistake.</text>
+</svg>

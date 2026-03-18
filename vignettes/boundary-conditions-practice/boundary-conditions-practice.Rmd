@@ -1,0 +1,42 @@
+---
+title: "Boundary Conditions in Practice"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: true
+    fig_caption: yes
+    dpi: 200
+    dev.args: list(pointsize=11)
+vignette: >
+  %\VignetteIndexEntry{Boundary conditions in practice}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# Introduction
+
+The companion [boundary conditions article](../boundary_conditions.html) defines the main boundary types mathematically. This article is the applied counterpart: how those boundary types affect practical model choice and interpretation.
+
+# Why boundary choice matters
+
+Boundary condition is one of the main reasons that two geometrically similar targets can require very different models. The same sphere may be treated as rigid, pressure-release, fluid-filled, elastic-shelled, or calibration-like depending on the physical problem.
+
+# Practical mapping
+
+As a first approximation:
+
+- rigid or pressure-release canonical bodies point toward `SPHMS`, `PSMS`, or `FCMS`,
+- fluid-filled canonical bodies point toward the same modal families with fluid continuity conditions,
+- elastic shells point toward `ESSMS`,
+- weak fluid-like bodies point toward `DWBA`, `SDWBA`, or `HPA`,
+- high-frequency fluid-interface approximations point toward `TRCM` or the body term of `KRM`.
+
+# Common failure mode
+
+One of the most common mistakes is to select a geometry-matched model while silently mismatching the boundary regime. That usually produces a mathematically valid answer to the wrong physical question.
+
+# Related reading
+
+- [Choosing a model](../model-selection/model-selection.html)
+- [Material properties and acoustic utilities](../material-properties/material-properties.html)
+- all model-specific theory pages.
