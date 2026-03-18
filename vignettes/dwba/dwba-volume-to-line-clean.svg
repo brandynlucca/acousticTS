@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 340" role="img" aria-labelledby="title desc">
+  <title id="title">DWBA volume to line reduction</title>
+  <desc id="desc">Diagram showing the reduction of the weak-scattering volume integral to a centerline integral with cross-sectional response folded into each segment.</desc>
+  <style>
+    .bg { fill: #fcfbf5; }
+    .head { font: 700 28px Georgia, serif; fill: #1f3345; }
+    .body { font: 18px Georgia, serif; fill: #1f3345; }
+    .small { font: 15px Georgia, serif; fill: #42576a; }
+    .shape { fill: #dcecea; stroke: #3c7f80; stroke-width: 2.5; }
+    .lineform { stroke: #0f5c5c; stroke-width: 8; fill: none; stroke-linecap: round; }
+    .box { fill: #fffdfa; stroke: #7b8f9c; stroke-width: 2; rx: 16; ry: 16; }
+    .arrow { stroke: #1f3345; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+  </style>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1f3345"/>
+    </marker>
+  </defs>
+  <rect class="bg" width="980" height="340"/>
+  <text x="36" y="42" class="head">How the 3D DWBA volume integral becomes a 1D centerline integral</text>
+
+  <rect x="42" y="84" width="292" height="212" class="box"/>
+  <text x="66" y="120" class="body">Volume description</text>
+  <ellipse cx="188" cy="188" rx="112" ry="48" class="shape"/>
+  <path d="M92 188 C134 150, 196 148, 244 188 C280 216, 308 214, 320 188" class="lineform"/>
+  <text x="66" y="258" class="small">Each interior point carries contrast(r)</text>
+  <text x="66" y="280" class="small">times the phase factor exp(2 i k_2 . r).</text>
+
+  <line x1="334" y1="190" x2="494" y2="190" class="arrow"/>
+  <text x="358" y="166" class="body">integrate over each circular section</text>
+  <text x="400" y="214" class="small">dV to ds</text>
+
+  <rect x="536" y="84" width="392" height="212" class="box"/>
+  <text x="560" y="120" class="body">Line-integral description</text>
+  <path d="M566 188 C628 142, 706 144, 768 188 C814 220, 862 220, 904 190" class="lineform"/>
+  <circle cx="726" cy="170" r="7" fill="#bb4d00"/>
+  <text x="742" y="176" class="body">segment j</text>
+  <text x="560" y="250" class="small">Each segment keeps its local contrast, phase,</text>
+  <text x="560" y="272" class="small">radius, and Bessel cross-sectional factor.</text>
+</svg>

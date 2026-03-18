@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 360" role="img" aria-labelledby="title desc">
+  <title id="title">DWBA phase bookkeeping</title>
+  <desc id="desc">Diagram showing how each point in a weakly scattering body contributes a contrast-weighted complex term whose phase is set by the interior wavenumber and whose coherent sum gives the backscattering amplitude.</desc>
+  <style>
+    .bg { fill: #faf7ef; }
+    .head { font: 700 28px Georgia, serif; fill: #1f3345; }
+    .body { font: 18px Georgia, serif; fill: #1f3345; }
+    .small { font: 15px Georgia, serif; fill: #405365; }
+    .box { fill: #fffdfa; stroke: #577d88; stroke-width: 2.5; rx: 18; ry: 18; }
+    .bodyfill { fill: #dcecea; stroke: #3c7f80; stroke-width: 3; }
+    .phase { fill: #bb4d00; stroke: #7d3200; stroke-width: 1.5; }
+    .arrow { stroke: #1f3345; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+  </style>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1f3345"/>
+    </marker>
+  </defs>
+  <rect class="bg" width="980" height="360"/>
+  <text x="36" y="42" class="head">DWBA phase bookkeeping along a weakly scattering body</text>
+
+  <rect x="34" y="84" width="252" height="214" class="box"/>
+  <text x="58" y="122" class="body">1. Incident wave crosses the body</text>
+  <text x="58" y="154" class="small">The material contrast is weak, so each</text>
+  <text x="58" y="176" class="small">interior point contributes only a small</text>
+  <text x="58" y="198" class="small">first-order scattering term.</text>
+  <line x1="62" y1="238" x2="220" y2="238" class="arrow"/>
+  <text x="58" y="228" class="small">incident direction</text>
+  <ellipse cx="178" cy="238" rx="62" ry="26" class="bodyfill"/>
+
+  <rect x="364" y="84" width="252" height="214" class="box"/>
+  <text x="388" y="122" class="body">2. Each point carries a complex phase</text>
+  <text x="388" y="154" class="small">The DWBA uses the interior wavenumber</text>
+  <text x="388" y="176" class="small">to evaluate phase accumulation across</text>
+  <text x="388" y="198" class="small">the body before the return is summed.</text>
+  <ellipse cx="490" cy="238" rx="92" ry="34" class="bodyfill"/>
+  <circle cx="438" cy="238" r="7" class="phase"/>
+  <circle cx="490" cy="238" r="7" class="phase"/>
+  <circle cx="548" cy="238" r="7" class="phase"/>
+  <text x="424" y="280" class="small">contrast(r) exp(2 i k_2 . r)</text>
+
+  <rect x="694" y="84" width="252" height="214" class="box"/>
+  <text x="718" y="122" class="body">3. Coherent summation produces f_bs</text>
+  <text x="718" y="154" class="small">Backscatter is not a local quantity.</text>
+  <text x="718" y="176" class="small">It is the phase-coherent sum over all</text>
+  <text x="718" y="198" class="small">interior contributions.</text>
+  <text x="720" y="246" class="body">f_bs ~ integral contrast(r)</text>
+  <text x="720" y="272" class="body">      exp(2 i k_2 . r) dV</text>
+
+  <path d="M286 192 C318 192, 334 192, 364 192" class="arrow"/>
+  <path d="M616 192 C648 192, 664 192, 694 192" class="arrow"/>
+</svg>

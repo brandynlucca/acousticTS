@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 480" role="img" aria-labelledby="title desc">
+  <title id="title">DWBA centerline geometry</title>
+  <desc id="desc">Diagram defining the DWBA centerline point, local tangent, radius, and tilt angle relative to the incident direction.</desc>
+  <style>
+    .bg { fill: #fcfaf4; }
+    .head { font: 700 28px Georgia, serif; fill: #1f3345; }
+    .body { font: 18px Georgia, serif; fill: #1f3345; }
+    .small { font: 15px Georgia, serif; fill: #43576a; }
+    .curve { stroke: #0f5c5c; stroke-width: 8; fill: none; stroke-linecap: round; }
+    .section { stroke: #0f5c5c; stroke-width: 6; fill: none; stroke-linecap: round; }
+    .fill { stroke: none; fill: #dcecea; opacity: 0.85; }
+    .arrow { stroke: #1f3345; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+    .accent { stroke: #bb4d00; stroke-width: 4; fill: none; marker-end: url(#arrow2); }
+    .muted { stroke: #6a7e8f; stroke-width: 3; fill: none; }
+  </style>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1f3345"/>
+    </marker>
+    <marker id="arrow2" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#bb4d00"/>
+    </marker>
+  </defs>
+  <rect class="bg" width="980" height="480"/>
+  <text x="36" y="42" class="head">Centerline geometry used in the reduced DWBA integral</text>
+
+  <text x="48" y="102" class="body">incident direction k-hat</text>
+  <line x1="52" y1="126" x2="280" y2="126" class="arrow"/>
+  <line x1="52" y1="170" x2="280" y2="170" class="arrow"/>
+  <line x1="52" y1="214" x2="280" y2="214" class="arrow"/>
+
+  <path d="M304 286 C394 204, 524 204, 614 284 C684 346, 786 350, 914 264" class="curve"/>
+  <path d="M470 306 C516 262, 564 262, 612 306" class="fill"/>
+  <path d="M470 306 C516 262, 564 262, 612 306" class="section"/>
+
+  <circle cx="552" cy="284" r="7" fill="#bb4d00"/>
+  <text x="568" y="278" class="body">r_pos(s)</text>
+
+  <line x1="552" y1="284" x2="628" y2="238" class="accent"/>
+  <text x="640" y="238" class="body">local tangent t-hat(s)</text>
+
+  <line x1="552" y1="284" x2="552" y2="340" class="muted"/>
+  <line x1="552" y1="284" x2="523" y2="232" class="muted"/>
+  <path d="M545 259 A32 32 0 0 1 552 316" class="muted"/>
+  <text x="486" y="224" class="body">beta_tilt(s)</text>
+
+  <line x1="488" y1="308" x2="488" y2="352" stroke="#7a4a1d" stroke-width="4"/>
+  <line x1="516" y1="324" x2="516" y2="368" stroke="#7a4a1d" stroke-width="4"/>
+  <text x="532" y="364" class="body">a(s)</text>
+
+  <text x="302" y="420" class="body">The reduced integral follows the centerline.</text>
+  <text x="302" y="446" class="small">Each short segment contributes its own contrast, phase, local radius, and tilt angle.</text>
+</svg>
