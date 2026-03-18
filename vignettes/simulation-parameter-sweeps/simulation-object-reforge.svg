@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 340" role="img" aria-labelledby="title desc">
+  <title id="title">Simulation object reforge workflow</title>
+  <desc id="desc">Schematic showing a baseline object being transformed into multiple geometry states before model execution in a simulation study.</desc>
+  <defs>
+    <style>
+      .bg { fill: #fbf8f1; }
+      .panel { fill: #fffdf8; stroke: #273128; stroke-width: 2; rx: 16; }
+      .heading { font: 700 22px Georgia, "Times New Roman", serif; fill: #1f2520; }
+      .label { font: 17px Georgia, "Times New Roman", serif; fill: #1f2520; }
+      .body { fill: none; stroke: #0f5c5c; stroke-width: 7; stroke-linecap: round; }
+      .body2 { fill: none; stroke: #4d8a78; stroke-width: 7; stroke-linecap: round; }
+      .body3 { fill: none; stroke: #8a5c34; stroke-width: 7; stroke-linecap: round; }
+      .arrow { stroke: #273128; stroke-width: 2.5; marker-end: url(#arr); fill: none; }
+      .code { font: 17px "Courier New", monospace; fill: #0d4c52; }
+    </style>
+    <marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#273128"/>
+    </marker>
+  </defs>
+  <rect class="bg" width="960" height="340"/>
+  <rect class="panel" x="24" y="24" width="912" height="292" rx="16"/>
+
+  <text class="heading" x="480" y="58" text-anchor="middle">Morphology-affecting sweeps derive new target states from one baseline object</text>
+
+  <path class="body" d="M88 180 C132 142, 184 142, 232 180 S322 218, 370 180"/>
+  <text class="label" x="228" y="228" text-anchor="middle">baseline object</text>
+  <text class="code" x="228" y="252" text-anchor="middle">obj_sbf</text>
+
+  <path class="arrow" d="M392 176 C430 176, 448 176, 484 176"/>
+  <text class="code" x="438" y="158" text-anchor="middle">reforge()</text>
+
+  <path class="body2" d="M534 170 C574 150, 628 150, 676 170 S754 188, 808 170"/>
+  <path class="body3" d="M534 214 C582 168, 638 168, 690 214 S770 252, 820 214"/>
+
+  <text class="label" x="680" y="136" text-anchor="middle">state A: scaled length / bladder factor</text>
+  <text class="label" x="690" y="280" text-anchor="middle">state B: different target dimensions</text>
+
+  <path class="arrow" d="M828 170 C850 170, 860 170, 882 170"/>
+  <path class="arrow" d="M828 214 C850 214, 860 214, 882 214"/>
+
+  <text class="label" x="884" y="176">run model</text>
+  <text class="label" x="884" y="220">store cell-wise output</text>
+</svg>

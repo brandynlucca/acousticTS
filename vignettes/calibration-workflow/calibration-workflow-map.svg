@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 260" role="img" aria-labelledby="title desc">
+  <title id="title">Calibration workflow map</title>
+  <desc id="desc">Four-stage calibration workflow from nominal sphere specification through property verification, model execution, and reference-curve interpretation.</desc>
+  <defs>
+    <style>
+      .bg{fill:#f8f3ea}.box{fill:#fffdfa;stroke:#2f2822;stroke-width:2.1;rx:16;ry:16}.head{font:700 21px Georgia, serif;fill:#1f1a16}.txt{font:15px Georgia, serif;fill:#2f2822}.small{font:13px Georgia, serif;fill:#564b40}.arrow{stroke:#564b40;stroke-width:2.4;fill:none;marker-end:url(#m)}
+    </style>
+    <marker id="m" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#564b40"/></marker>
+  </defs>
+  <rect width="980" height="260" class="bg"/>
+  <text x="28" y="40" class="head">Calibration as a reference workflow rather than a generic scattering run</text>
+  <rect x="24" y="74" width="206" height="150" class="box"/>
+  <text x="44" y="104" class="txt">1. Define the sphere</text>
+  <text x="44" y="136" class="small">Diameter, material identity,</text>
+  <text x="44" y="156" class="small">and medium assumptions.</text>
+  <rect x="268" y="74" width="206" height="150" class="box"/>
+  <text x="288" y="104" class="txt">2. Verify properties</text>
+  <text x="288" y="136" class="small">Density, wave speeds,</text>
+  <text x="288" y="156" class="small">and derived elastic constants.</text>
+  <rect x="512" y="74" width="206" height="150" class="box"/>
+  <text x="532" y="104" class="txt">3. Run the model</text>
+  <text x="532" y="136" class="small">Use the instrument frequency grid</text>
+  <text x="532" y="156" class="small">and inspect sensitivity.</text>
+  <rect x="756" y="74" width="206" height="150" class="box"/>
+  <text x="776" y="104" class="txt">4. Interpret as reference</text>
+  <text x="776" y="136" class="small">Compare against standards and</text>
+  <text x="776" y="156" class="small">treat mismatches as diagnostic.</text>
+  <path d="M230 149 C246 149,252 149,268 149" class="arrow"/>
+  <path d="M474 149 C490 149,496 149,512 149" class="arrow"/>
+  <path d="M718 149 C734 149,740 149,756 149" class="arrow"/>
+</svg>

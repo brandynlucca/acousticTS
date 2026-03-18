@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" role="img" aria-labelledby="title desc">
+  <title id="title">Simulation batch cells</title>
+  <desc id="desc">Schematic showing how batch_by creates Cartesian parameter cells and n_realizations repeats simulations within each cell.</desc>
+  <defs>
+    <style>
+      .bg { fill: #fbf8f1; }
+      .panel { fill: #fffdf8; stroke: #28322a; stroke-width: 2; rx: 16; }
+      .heading { font: 700 22px Georgia, "Times New Roman", serif; fill: #1f2520; }
+      .label { font: 17px Georgia, "Times New Roman", serif; fill: #1f2520; }
+      .math { font: italic 19px Georgia, "Times New Roman", serif; fill: #0d4c52; }
+      .cell { fill: #e7f3ef; stroke: #4d8a78; stroke-width: 2; }
+      .rep { fill: #f7eadc; stroke: #8a5c34; stroke-width: 2; }
+      .arrow { stroke: #28322a; stroke-width: 2.5; marker-end: url(#arr); fill: none; }
+    </style>
+    <marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#28322a"/>
+    </marker>
+  </defs>
+  <rect class="bg" width="960" height="360"/>
+  <rect class="panel" x="24" y="24" width="912" height="312" rx="16"/>
+
+  <text class="heading" x="230" y="58" text-anchor="middle">Outer design from `batch_by`</text>
+  <text class="heading" x="730" y="58" text-anchor="middle">Inner repetition from `n_realizations`</text>
+
+  <text class="label" x="84" y="108">Example:</text>
+  <text class="math" x="170" y="108">&#952; &#8712; {&#952;1, &#952;2, &#952;3}</text>
+  <text class="math" x="170" y="136">&#961; &#8712; {&#961;1, &#961;2}</text>
+
+  <rect class="cell" x="76" y="164" width="86" height="56"/>
+  <rect class="cell" x="172" y="164" width="86" height="56"/>
+  <rect class="cell" x="268" y="164" width="86" height="56"/>
+  <rect class="cell" x="76" y="230" width="86" height="56"/>
+  <rect class="cell" x="172" y="230" width="86" height="56"/>
+  <rect class="cell" x="268" y="230" width="86" height="56"/>
+
+  <text class="label" x="119" y="198" text-anchor="middle">(&#952;1, &#961;1)</text>
+  <text class="label" x="215" y="198" text-anchor="middle">(&#952;2, &#961;1)</text>
+  <text class="label" x="311" y="198" text-anchor="middle">(&#952;3, &#961;1)</text>
+  <text class="label" x="119" y="264" text-anchor="middle">(&#952;1, &#961;2)</text>
+  <text class="label" x="215" y="264" text-anchor="middle">(&#952;2, &#961;2)</text>
+  <text class="label" x="311" y="264" text-anchor="middle">(&#952;3, &#961;2)</text>
+
+  <path class="arrow" d="M392 196 C442 196, 470 196, 518 196"/>
+
+  <rect class="rep" x="566" y="132" width="106" height="46" rx="8"/>
+  <rect class="rep" x="566" y="190" width="106" height="46" rx="8"/>
+  <rect class="rep" x="566" y="248" width="106" height="46" rx="8"/>
+  <text class="label" x="619" y="161" text-anchor="middle">cell k, run 1</text>
+  <text class="label" x="619" y="219" text-anchor="middle">cell k, run 2</text>
+  <text class="label" x="619" y="277" text-anchor="middle">cell k, run 3</text>
+
+  <path class="arrow" d="M676 155 C708 155, 720 155, 748 155"/>
+  <path class="arrow" d="M676 213 C708 213, 720 213, 748 213"/>
+  <path class="arrow" d="M676 271 C708 271, 720 271, 748 271"/>
+
+  <rect class="rep" x="754" y="132" width="128" height="46" rx="8"/>
+  <rect class="rep" x="754" y="190" width="128" height="46" rx="8"/>
+  <rect class="rep" x="754" y="248" width="128" height="46" rx="8"/>
+  <text class="label" x="818" y="161" text-anchor="middle">stored output 1</text>
+  <text class="label" x="818" y="219" text-anchor="middle">stored output 2</text>
+  <text class="label" x="818" y="277" text-anchor="middle">stored output 3</text>
+
+  <text class="label" x="730" y="317" text-anchor="middle">Each Cartesian design cell is repeated for the requested number of realizations.</text>
+</svg>

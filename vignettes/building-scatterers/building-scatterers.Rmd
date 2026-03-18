@@ -1,0 +1,66 @@
+---
+title: "Building scatterers"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: true
+    fig_caption: yes
+    dpi: 200
+    dev.args: list(pointsize=11)
+vignette: >
+  %\VignetteIndexEntry{Building scatterers}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# Introduction
+
+Once a geometry exists, it still has to be assigned a physical interpretation before most models in `acousticTS` can be run. That is the role of a scatterer object. A shape answers the geometric question, but a scatterer answers the acoustic one: what is the target made of, which interfaces matter, how should the surrounding medium be interpreted, and which class of model assumptions is meant to apply?
+
+This distinction matters because the same outline can support several different physical interpretations. A smooth elongated body might be treated as a weakly scattering fluid-like target, as a gas-filled inclusion, or as part of a composite fish-like target with an internal swimbladder. The geometry by itself does not decide among those cases. Scatterer construction is the step where the reader turns a geometric description into a model-ready acoustic object.
+
+<object type="image/svg+xml" data="building-scatterers-map.svg" style="width:100%;" aria-label="Conceptual layers"></object>
+
+# Why scatterer construction is separate from shape construction
+
+The package separates shape generation from scatterer generation so that geometry can be reused across several physical scenarios. That separation is more than a software convenience. It mirrors the modeling logic used throughout the package. In acoustics, geometry and material contrast are related, but they are not the same thing. A user may want to ask how the same body behaves when interpreted as fluid-like rather than gas-filled, or how a measured outline behaves when modeled with a simple weak-scattering approximation versus a more specialized composite model.
+
+Keeping those stages separate also reduces ambiguity. When the object is built in two steps, it becomes much easier to see whether a later disagreement comes from geometry, from material properties, or from model choice. That is one of the central design ideas behind the package.
+
+# Main generator families
+
+The most important constructors are `fls_generate()` for fluid-like segmented bodies, `gas_generate()` for gas-filled simple bodies, `sbf_generate()` for fish-like body-plus-internal-structure targets, `ess_generate()` for elastic-shelled spheres, and `cal_generate()` for calibration spheres. Each constructor packages geometry, material properties, metadata, units, and model-ready parameter fields into a single scatterer object, but they do so for different acoustic interpretations.
+
+`fls_generate()` is the general fluid-like constructor and is often the right starting point for weakly scattering elongated targets used with `DWBA`, `SDWBA`, `HPA`, `TRCM`, or other fluid-like workflows. `gas_generate()` is more specialized. It is intended for simple gas-filled objects where the dominant acoustic contrast comes from the gas-fluid interface. `sbf_generate()` is meant for composite fish-like targets where body and internal structures, especially a swimbladder, need to be represented together rather than collapsed into one homogeneous body. `ess_generate()` is reserved for elastic shelled spheres, where shell thickness and elastic material properties are central to the physics. `cal_generate()` is the constructor for standard calibration spheres, where the target is not a biological body at all but a well-defined solid sphere used for reference and validation work.
+
+The practical consequence is that constructor choice should be driven by the interface physics that matter most, not only by the overall silhouette of the target.
+
+# Matching class to target type
+
+The scatterer class should match the intended physical interpretation, not just the geometry. For example, a smooth elongated body may be represented geometrically by a prolate spheroid, but its scatterer class still depends on whether it is being treated as fluid-like, gas-filled, or composite. That distinction is the reason the decision guide branches from a single geometric starting point into several different scatterer families. The package is asking not only what the target looks like, but also which material interfaces and internal components are meant to matter acoustically.
+
+This is where many avoidable workflow errors begin. A target can have a reasonable geometric representation and still be assigned to the wrong scatterer class. When that happens, the later model run may appear to fail even though the real problem is that the object was given the wrong physical meaning. For that reason, it is often worth pausing at the scatterer-construction stage and checking whether the object class truly matches the intended boundary interpretation and internal structure.
+
+# Common parameter groups
+
+Most scatterer generators require some combination of geometry or a pre-built `Shape`, density and sound-speed information or their contrasts, orientation, unit declarations, and optional metadata identifiers. That recurring structure is intentional. It means that once a scatterer has been built correctly, the same object can later be passed through one or several compatible models without rebuilding it from scratch.
+
+One of the most important practical decisions at this stage is whether to parameterize the object with absolute properties or with contrasts. In many workflows the package can derive contrasts internally when only absolute density and sound speed are supplied, which is convenient when the underlying data come from direct measurements or literature tables. In other workflows, the scientifically natural description is already contrast-based, especially for weakly scattering or gas-filled approximations. The important point is not that one representation is always better, but that the chosen representation should remain physically consistent with the surrounding medium and with the intended model assumptions.
+
+Orientation and units matter here as well. Scatterer construction is often where body angle, segment spacing, diameter units, and other bookkeeping fields first become fixed. If those are wrong at this stage, the later model output may look implausible for reasons that have nothing to do with the mathematics of the model itself.
+
+# A practical way to think about the constructors
+
+One useful mental model is that scatterer constructors define the acoustic identity of the object. If the question is about a weakly contrasting body, start from the fluid-like constructor. If the dominant physics is a gas interface, use the gas-filled constructor. If the target is explicitly composite, use the constructor that keeps those components separate. If the target is a canonical shell or a calibration sphere, use the constructor written for that specific physics rather than forcing the object into a more generic class.
+
+That approach keeps the workflow honest. It also makes later model selection much easier, because compatible model families become apparent as soon as the scatterer class is chosen. In that sense, good scatterer construction is already the beginning of good model selection.
+
+# What to check before moving on
+
+Before running a model, it is worth checking a few simple things. The geometry should be the one you intended to build. The scatterer class should match the physical target type rather than just the body outline. Material properties or contrasts should be internally consistent. Orientation and units should be explicit. If the target is composite, the components that matter acoustically should still be represented separately rather than accidentally collapsed into one homogeneous body.
+
+Those checks are simple, but they have a large payoff. Many apparent modeling problems are actually scatterer-construction problems discovered too late.
+
+# Recommended next step
+
+After building a scatterer, the next action is usually to run a compatible model and inspect `TS`, `sigma_bs`, or any stored intermediate outputs needed for interpretation. The practical continuation of this article is [running target strength models](../running-models/running-models.html), while the conceptual continuation is [choosing a model](../model-selection/model-selection.html).

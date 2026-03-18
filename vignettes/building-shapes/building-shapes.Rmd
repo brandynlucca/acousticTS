@@ -1,5 +1,5 @@
 ---
-title: "Building Shapes"
+title: "Building shapes"
 output:
   rmarkdown::html_vignette:
     toc: true

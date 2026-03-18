@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 340" role="img" aria-labelledby="title desc">
+  <title id="title">Simulation execution layout</title>
+  <desc id="desc">Schematic comparing serial and parallel scheduling of the same simulation job table.</desc>
+  <defs>
+    <style>
+      .bg { fill: #fbf8f1; }
+      .panel { fill: #fffdf8; stroke: #273128; stroke-width: 2; rx: 16; }
+      .heading { font: 700 22px Georgia, "Times New Roman", serif; fill: #1f2520; }
+      .label { font: 17px Georgia, "Times New Roman", serif; fill: #1f2520; }
+      .job { fill: #e7f3ef; stroke: #4d8a78; stroke-width: 2; rx: 8; }
+      .worker { fill: #eef1f8; stroke: #516f9a; stroke-width: 2; rx: 10; }
+      .arrow { stroke: #273128; stroke-width: 2.3; marker-end: url(#arr); fill: none; }
+    </style>
+    <marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#273128"/>
+    </marker>
+  </defs>
+  <rect class="bg" width="960" height="340"/>
+  <rect class="panel" x="24" y="24" width="912" height="292" rx="16"/>
+  <text class="heading" x="480" y="58" text-anchor="middle">Serial and parallel runs use the same logical job table</text>
+
+  <text class="heading" x="222" y="100" text-anchor="middle">Serial</text>
+  <rect class="worker" x="88" y="118" width="268" height="162" rx="10"/>
+  <rect class="job" x="134" y="142" width="176" height="32" rx="8"/>
+  <rect class="job" x="134" y="186" width="176" height="32" rx="8"/>
+  <rect class="job" x="134" y="230" width="176" height="32" rx="8"/>
+  <text class="label" x="222" y="163" text-anchor="middle">job 1</text>
+  <text class="label" x="222" y="207" text-anchor="middle">job 2</text>
+  <text class="label" x="222" y="251" text-anchor="middle">job 3</text>
+
+  <text class="heading" x="706" y="100" text-anchor="middle">Parallel</text>
+  <rect class="worker" x="474" y="126" width="126" height="146" rx="10"/>
+  <rect class="worker" x="618" y="126" width="126" height="146" rx="10"/>
+  <rect class="worker" x="762" y="126" width="126" height="146" rx="10"/>
+  <text class="label" x="537" y="150" text-anchor="middle">worker 1</text>
+  <text class="label" x="681" y="150" text-anchor="middle">worker 2</text>
+  <text class="label" x="825" y="150" text-anchor="middle">worker 3</text>
+  <rect class="job" x="492" y="176" width="90" height="32" rx="8"/>
+  <rect class="job" x="636" y="176" width="90" height="32" rx="8"/>
+  <rect class="job" x="780" y="176" width="90" height="32" rx="8"/>
+  <text class="label" x="537" y="197" text-anchor="middle">job 1</text>
+  <text class="label" x="681" y="197" text-anchor="middle">job 2</text>
+  <text class="label" x="825" y="197" text-anchor="middle">job 3</text>
+
+  <path class="arrow" d="M356 198 C396 198, 420 198, 458 198"/>
+  <text class="label" x="480" y="302" text-anchor="middle">Scheduling changes with `parallel = TRUE`, but the simulated parameter cells and realizations do not.</text>
+</svg>

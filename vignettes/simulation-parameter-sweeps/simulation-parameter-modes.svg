@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 330" role="img" aria-labelledby="title desc">
+  <title id="title">Simulation parameter modes</title>
+  <desc id="desc">Schematic showing fixed values, explicit vectors, and generating functions as the three main parameter specification modes for simulate_ts.</desc>
+  <defs>
+    <style>
+      .bg { fill: #fbf8f1; }
+      .panel { fill: #fffdf8; stroke: #263129; stroke-width: 2; rx: 16; }
+      .heading { font: 700 22px Georgia, "Times New Roman", serif; fill: #1f2520; }
+      .label { font: 18px Georgia, "Times New Roman", serif; fill: #1f2520; }
+      .small { font: 16px Georgia, "Times New Roman", serif; fill: #1f2520; }
+      .code { font: 17px "Courier New", monospace; fill: #0d4c52; }
+      .box { fill: #e7f3ef; stroke: #4d8a78; stroke-width: 2.5; }
+      .box2 { fill: #f9efe2; stroke: #8a5c34; stroke-width: 2.5; }
+      .box3 { fill: #e9eef8; stroke: #516f9a; stroke-width: 2.5; }
+    </style>
+  </defs>
+  <rect class="bg" width="960" height="330"/>
+
+  <rect class="panel" x="24" y="24" width="286" height="282" rx="16"/>
+  <text class="heading" x="167" y="56" text-anchor="middle">Fixed value</text>
+  <rect class="box" x="74" y="92" width="186" height="44" rx="10"/>
+  <text class="code" x="167" y="120" text-anchor="middle">density_body = 1045</text>
+  <rect class="box" x="74" y="164" width="186" height="32" rx="10"/>
+  <rect class="box" x="74" y="208" width="186" height="32" rx="10"/>
+  <rect class="box" x="74" y="252" width="186" height="32" rx="10"/>
+  <text class="small" x="167" y="185" text-anchor="middle">same value in every run</text>
+  <text class="small" x="167" y="229" text-anchor="middle">no realization-level variation</text>
+  <text class="small" x="167" y="273" text-anchor="middle">pure constant input</text>
+
+  <rect class="panel" x="337" y="24" width="286" height="282" rx="16"/>
+  <text class="heading" x="480" y="56" text-anchor="middle">Explicit vector</text>
+  <rect class="box2" x="389" y="90" width="182" height="48" rx="10"/>
+  <text class="code" x="480" y="120" text-anchor="middle">theta = [t1, t2, t3, ...]</text>
+  <rect class="box2" x="389" y="166" width="42" height="42" rx="8"/>
+  <rect class="box2" x="443" y="166" width="42" height="42" rx="8"/>
+  <rect class="box2" x="497" y="166" width="42" height="42" rx="8"/>
+  <rect class="box2" x="551" y="166" width="42" height="42" rx="8"/>
+  <text class="small" x="480" y="238" text-anchor="middle">known sequence of levels</text>
+  <text class="small" x="480" y="264" text-anchor="middle">often used for deterministic sweeps</text>
+
+  <rect class="panel" x="650" y="24" width="286" height="282" rx="16"/>
+  <text class="heading" x="793" y="56" text-anchor="middle">Generating function</text>
+  <rect class="box3" x="704" y="90" width="178" height="48" rx="10"/>
+  <text class="code" x="793" y="120" text-anchor="middle">function() rnorm(1, ...)</text>
+  <rect class="box3" x="696" y="166" width="58" height="42" rx="8"/>
+  <rect class="box3" x="764" y="166" width="58" height="42" rx="8"/>
+  <rect class="box3" x="832" y="166" width="58" height="42" rx="8"/>
+  <text class="small" x="725" y="193" text-anchor="middle">draw 1</text>
+  <text class="small" x="793" y="193" text-anchor="middle">draw 2</text>
+  <text class="small" x="861" y="193" text-anchor="middle">draw 3</text>
+  <text class="small" x="793" y="238" text-anchor="middle">new value generated per realization</text>
+  <text class="small" x="793" y="264" text-anchor="middle">used for uncertainty propagation</text>
+</svg>
