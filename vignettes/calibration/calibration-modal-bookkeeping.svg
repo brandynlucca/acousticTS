@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 320" role="img" aria-labelledby="title desc">
+  <title id="title">Calibration modal bookkeeping</title>
+  <desc id="desc">Pipeline from incident partial waves through elastic phase shifts to the backscattering quantities reported by the calibration model.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8f4ec; }
+      .box { fill: #fffdfa; stroke: #302923; stroke-width: 2.4; rx: 18; ry: 18; }
+      .accent1 { fill: #dfe8f5; }
+      .accent2 { fill: #f9e0cf; }
+      .accent3 { fill: #e2f0e1; }
+      .txt { font: 16px Georgia, serif; fill: #2f2822; }
+      .head { font: 700 22px Georgia, serif; fill: #1f1a16; }
+      .small { font: 14px Georgia, serif; fill: #4e443b; }
+      .arrow { stroke: #4e443b; stroke-width: 2.5; fill: none; marker-end: url(#m); }
+    </style>
+    <marker id="m" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4e443b"/>
+    </marker>
+  </defs>
+  <rect class="bg" width="920" height="320"/>
+  <text x="34" y="42" class="head">How the calibration sphere series turns into reported output</text>
+  <rect x="32" y="76" width="246" height="186" class="box accent1"/>
+  <text x="52" y="110" class="txt">1. Expand the incident plane wave</text>
+  <text x="52" y="140" class="small">Each order m contributes a spherical</text>
+  <text x="52" y="161" class="small">Bessel term j_m(k_1 r) P_m(cos theta).</text>
+  <text x="52" y="196" class="small">Inside the sphere, both longitudinal</text>
+  <text x="52" y="217" class="small">and shear responses must be matched.</text>
+
+  <rect x="336" y="76" width="246" height="186" class="box accent2"/>
+  <text x="356" y="110" class="txt">2. Match the surface conditions</text>
+  <text x="356" y="140" class="small">The elastic boundary problem yields</text>
+  <text x="356" y="161" class="small">a real phase lag eta_m for each order.</text>
+  <text x="356" y="196" class="small">The partial-wave contribution is</text>
+  <text x="356" y="221" class="small">sin(eta_m) exp(i eta_m).</text>
+
+  <rect x="640" y="76" width="248" height="186" class="box accent3"/>
+  <text x="660" y="110" class="txt">3. Sum, rescale, and report</text>
+  <text x="660" y="140" class="small">The mode sum gives the far-field</text>
+  <text x="660" y="161" class="small">backscattering series in ka.</text>
+  <text x="660" y="196" class="small">The reported linear length is f_bs,</text>
+  <text x="660" y="217" class="small">followed by sigma_bs = |f_bs|^2</text>
+  <text x="660" y="238" class="small">and TS = 10 log10(sigma_bs).</text>
+
+  <path d="M278 169 C300 169, 312 169, 336 169" class="arrow"/>
+  <path d="M582 169 C604 169, 616 169, 640 169" class="arrow"/>
+</svg>

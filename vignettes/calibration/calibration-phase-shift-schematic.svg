@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 420" role="img" aria-labelledby="title desc">
+  <title id="title">Modal phase-shift bookkeeping for a solid sphere</title>
+  <desc id="desc">Schematic showing that each incident partial wave is matched at the sphere boundary and returned as an outgoing partial wave whose complex coefficient is parameterized by the modal phase shift eta_m.</desc>
+  <style>
+    .bg { fill: #faf6ef; }
+    .head { font: 700 24px Georgia, serif; fill: #23314a; }
+    .body { font: 17px Georgia, serif; fill: #2d2a26; }
+    .small { font: 15px Georgia, serif; fill: #46576f; }
+    .box { fill: #fffdfa; stroke: #4e6b93; stroke-width: 2.6; rx: 18; ry: 18; }
+    .sphere { fill: #dfe7f3; stroke: #4e6b93; stroke-width: 3; }
+    .incident { stroke: #8f2d56; stroke-width: 4; fill: none; }
+    .outgoing { stroke: #1f6f5f; stroke-width: 4; fill: none; }
+    .link { stroke: #c48b1f; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+    .arrow { stroke: #4f4a44; stroke-width: 2.6; fill: none; marker-end: url(#arrow); }
+  </style>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4f4a44"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="760" height="420"/>
+  <text x="380" y="40" text-anchor="middle" class="head">Modal phase-shift bookkeeping for a solid sphere</text>
+
+  <circle cx="220" cy="208" r="96" class="sphere"/>
+  <circle cx="220" cy="208" r="4" fill="#4e6b93"/>
+  <text x="220" y="332" text-anchor="middle" class="small">solid elastic sphere</text>
+  <text x="220" y="354" text-anchor="middle" class="small">boundary conditions couple fluid,</text>
+  <text x="220" y="376" text-anchor="middle" class="small">longitudinal, and shear motions</text>
+
+  <line x1="54" y1="208" x2="124" y2="208" class="incident"/>
+  <polygon points="124,208 111,201 111,215" fill="#8f2d56"/>
+  <text x="54" y="184" class="body">incident partial wave</text>
+  <text x="54" y="236" class="small">j_m(k_1 r) P_m(cos theta)</text>
+
+  <line x1="316" y1="208" x2="438" y2="208" class="outgoing"/>
+  <polygon points="438,208 425,201 425,215" fill="#1f6f5f"/>
+  <text x="448" y="184" class="body">outgoing partial wave</text>
+  <text x="448" y="236" class="small">B_m h_m^(1)(k_1 r) P_m(cos theta)</text>
+
+  <rect x="462" y="104" width="240" height="90" class="box"/>
+  <text x="482" y="136" class="body">Phase-shift parameterization</text>
+  <text x="482" y="164" class="small">B_m is written through the factor</text>
+  <text x="482" y="186" class="small">sin(eta_m) exp(i eta_m)</text>
+
+  <path d="M430 190 C470 170 470 162 462 158" class="link"/>
+  <text x="396" y="170" class="body">eta_m</text>
+
+  <path d="M124 260 C165 286 274 286 316 260" class="arrow"/>
+  <text x="220" y="286" text-anchor="middle" class="small">matching at r = a is done mode by mode</text>
+</svg>
