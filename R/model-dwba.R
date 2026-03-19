@@ -221,66 +221,15 @@ DWBA <- function(object) {
   g <- mean(model_body$g)
   h <- mean(model_body$h)
   R <- 1 / (g * h * h) + 1 / g - 2
-  # Calculate rotation matrix and update wavenumber matrix =====================
-  rotation_matrix <- matrix(
-    c(
-      cos(theta),
-      0.0,
-      sin(theta)
-    ),
-    1
-  )
-  k_sw_rot <- model$parameters$acoustics$k_sw %*% rotation_matrix
-  # Calculate Euclidean norms ==================================================
-  k_sw_norm <- acousticTS::vecnorm(k_sw_rot)
   # Update position matrices  ==================================================
   rpos <- rbind(r0, a = model$body$radius)
-  # Calculate position matrix lags  ============================================
-  rpos_diff <- t(diff(t(rpos)))
-  # Multiply wavenumber and body matrices ======================================
-  rpos_diff_k <- t(
-    vapply(
-      X = seq_along(k_sw_norm),
-      FUN = function(x) {
-        colSums(rpos_diff[1:3, ] * k_sw_rot[x, ])
-      },
-      FUN.VALUE = numeric(ncol(rpos_diff))
-    )
-  )
-  # Calculate Euclidean norms ==================================================
-  rpos_diff_norm <- sqrt(colSums(rpos_diff[1:3, ] * rpos_diff[1:3, ]))
-  # Estimate angles between body cylinders =====================================
-  alpha <- acos(rpos_diff_k / (k_sw_norm %*% t(rpos_diff_norm)))
-  beta <- abs(alpha - pi / 2)
-  # Define integrand ===========================================================
-  integrand <- function(s, x) {
-    rint_mat <- s * rpos_diff + rpos[, seq_len(ncol(rpos_diff))]
-    rint_k1_h_mat <- k_sw_rot[x, ] %*% rint_mat[1:3, ] / h
-    bessel <- jc(1, 2 * (k_sw_norm[x] * rint_mat[4, ] / h *
-                           cos(beta[x, ]))) / cos(beta[x, ])
-    fb_a <- k_sw_norm[x] / 4 * R * rint_mat[4, ] *
-      exp(2i * rint_k1_h_mat) * bessel * rpos_diff_norm
-    sum(fb_a, na.rm = TRUE)
-  }
-  # Vectorize integrand function ===============================================
-  integrand_vec <- Vectorize(integrand)
   # Calculate linear scatter response ==========================================
-  f_bs <- rep(NA, length(k_sw_norm))
-  f_bs <- vapply(
-    seq_along(k_sw_norm),
-    FUN = function(x) {
-      # Real ===================================================================
-      Ri <- stats::integrate(function(s) {
-        Re(integrand_vec(s, x))
-      }, 0, 1)$value
-      # Real ===================================================================
-      Ii <- stats::integrate(function(s) {
-        Im(integrand_vec(s, x))
-      }, 0, 1)$value
-      # Return =================================================================
-      sqrt(Ri^2 + Ii^2)
-    },
-    FUN.VALUE = numeric(1)
+  f_bs <- dwba_fbs_cpp(
+    rpos = rpos,
+    k_sw = model$parameters$acoustics$k_sw,
+    theta = theta,
+    h = h,
+    R = R
   )
   # Update scatterer object ====================================================
   methods::slot(object, "model")$DWBA <- data.frame(
@@ -395,62 +344,15 @@ DWBA_curved <- function(object) {
   g <- body$g
   h <- body$h
   R <- 1 / (g * h * h) + 1 / g - 2
-  # Calculate rotation matrix and update wavenumber matrix =====================
-  rotation_matrix <- matrix(
-    c(
-      cos(theta),
-      0.0,
-      sin(theta)
-    ),
-    1
-  )
-  k_sw_rot <- model$parameters$acoustics$k_sw %*% rotation_matrix
-  # Calculate Euclidean norms ==================================================
-  k_sw_norm <- acousticTS::vecnorm(k_sw_rot)
   # Update position matrices  ==================================================
   rpos <- rbind(r0, a = model$body$radius)
-  # Calculate position matrix lags  ============================================
-  rpos_diff <- t(diff(t(rpos)))
-  # Multiply wavenumber and body matrices ======================================
-  rpos_diff_k <- t(vapply(seq_along(k_sw_norm),
-                          FUN = function(x) {
-                            colSums(rpos_diff[1:3, ] * k_sw_rot[x, ])
-                          },
-                          FUN.VALUE = numeric(ncol(rpos_diff))
-  ))
-  # Calculate Euclidean norms ==================================================
-  rpos_diff_norm <- sqrt(colSums(rpos_diff[1:3, ] * rpos_diff[1:3, ]))
-  # Estimate angles between body cylinders =====================================
-  alpha <- acos(rpos_diff_k / (k_sw_norm %*% t(rpos_diff_norm)))
-  beta <- abs(alpha - pi / 2)
-  # Define integrand ===========================================================
-  integrand <- function(s, x) {
-    rint_mat <- s * rpos_diff + rpos[, seq_len(ncol(rpos_diff))]
-    rint_k1_h_mat <- k_sw_rot[x, ] %*% rint_mat[1:3, ] / h
-    bessel <- jc(1, 2 * (k_sw_norm[x] * rint_mat[4, ] / h *
-                           cos(beta[x, ]))) / cos(beta[x, ])
-    fb_a <- k_sw_norm[x] / 4 * R * rint_mat[4, ] *
-      exp(2i * rint_k1_h_mat) * bessel * rpos_diff_norm
-    sum(fb_a, na.rm = TRUE)
-  }
-  # Vectorize integrand function ===============================================
-  integrand_vec <- Vectorize(integrand)
   # Calculate linear scatter response ==========================================
-  f_bs <- rep(NA, length(k_sw_norm))
-  f_bs <- vapply(seq_along(k_sw_norm),
-                 FUN = function(x) {
-                   # Real ===============================================
-                   Ri <- stats::integrate(function(s) {
-                     Re(integrand_vec(s, x))
-                   }, 0, 1)$value
-                   # Real ===============================================
-                   Ii <- stats::integrate(function(s) {
-                     Im(integrand_vec(s, x))
-                   }, 0, 1)$value
-                   # Return =============================================
-                   sqrt(Ri^2 + Ii^2)
-                 },
-                 FUN.VALUE = numeric(1)
+  f_bs <- dwba_fbs_cpp(
+    rpos = rpos,
+    k_sw = model$parameters$acoustics$k_sw,
+    theta = theta,
+    h = h,
+    R = R
   )
   # Update scatterer object ====================================================
   methods::slot(object, "model")$DWBA_curved <- data.frame(

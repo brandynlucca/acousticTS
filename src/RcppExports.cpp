@@ -161,6 +161,24 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// dwba_fbs_cpp
+NumericVector dwba_fbs_cpp(NumericMatrix rpos, NumericVector k_sw, double theta, double h, double R, int subdivisions, double rel_tol, double abs_tol);
+RcppExport SEXP _acousticTS_dwba_fbs_cpp(SEXP rposSEXP, SEXP k_swSEXP, SEXP thetaSEXP, SEXP hSEXP, SEXP RSEXP, SEXP subdivisionsSEXP, SEXP rel_tolSEXP, SEXP abs_tolSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type rpos(rposSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type k_sw(k_swSEXP);
+    Rcpp::traits::input_parameter< double >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< double >::type h(hSEXP);
+    Rcpp::traits::input_parameter< double >::type R(RSEXP);
+    Rcpp::traits::input_parameter< int >::type subdivisions(subdivisionsSEXP);
+    Rcpp::traits::input_parameter< double >::type rel_tol(rel_tolSEXP);
+    Rcpp::traits::input_parameter< double >::type abs_tol(abs_tolSEXP);
+    rcpp_result_gen = Rcpp::wrap(dwba_fbs_cpp(rpos, k_sw, theta, h, R, subdivisions, rel_tol, abs_tol));
+    return rcpp_result_gen;
+END_RCPP
+}
 // gauss_legendre_cpp
 List gauss_legendre_cpp(int n, double a, double b);
 RcppExport SEXP _acousticTS_gauss_legendre_cpp(SEXP nSEXP, SEXP aSEXP, SEXP bSEXP) {
@@ -323,6 +341,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_acousticTS_js_deriv_cpp", (DL_FUNC) &_acousticTS_js_deriv_cpp, 3},
     {"_acousticTS_ys_deriv_cpp", (DL_FUNC) &_acousticTS_ys_deriv_cpp, 3},
     {"_acousticTS_hs_deriv_cpp", (DL_FUNC) &_acousticTS_hs_deriv_cpp, 3},
+    {"_acousticTS_dwba_fbs_cpp", (DL_FUNC) &_acousticTS_dwba_fbs_cpp, 8},
     {"_acousticTS_gauss_legendre_cpp", (DL_FUNC) &_acousticTS_gauss_legendre_cpp, 3},
     {"_acousticTS_elastic_shell_boundary_conditions_old", (DL_FUNC) &_acousticTS_elastic_shell_boundary_conditions_old, 11},
     {"_acousticTS_elastic_shell_boundary_conditions", (DL_FUNC) &_acousticTS_elastic_shell_boundary_conditions, 6},

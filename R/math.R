@@ -173,7 +173,7 @@ neumann <- function(x) {
 #' @export
 gauss_legendre <- function(n, a = -1, b = 1) {
   # Validation =================================================================
-  if (!is.numeric(n) || length(n) != 1 || n < 1 && n%%1 != 0) {
+  if (!is.numeric(n) || length(n) != 1 || n < 1 || n %% 1 != 0) {
     stop("n must be a positive integer")
   }
   if (!is.numeric(a) || !is.numeric(b) || length(a) != 1 || length(b) != 1) {

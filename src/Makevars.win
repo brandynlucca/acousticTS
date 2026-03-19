@@ -7,6 +7,7 @@ PKG_FCFLAGS = -O3 -fPIC -cpp
 
 OBJECTS = RcppExports.o \
 	bessel.o \
+	dwba.o \
 	goodman_stern.o \
 	gauss_legendre.o \
 	legendre.o \
