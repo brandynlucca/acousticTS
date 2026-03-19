@@ -1,5 +1,6 @@
 #include <Rcpp.h>
 #include <R_ext/Applic.h>
+#include <R_ext/Utils.h>
 #include <cmath>
 #include <complex>
 #include <limits>
@@ -18,6 +19,7 @@ struct DwbaIntegrandData {
     std::vector<double> dphase;
     std::vector<double> cos_beta;
     bool imaginary = false;
+    int segment = -1;
     double k_over_h = 0.0;
 };
 
@@ -30,12 +32,14 @@ inline double clamp_unit(double x) {
 void dwba_integrand_eval(double *x, int n, void *ex) {
     auto *data = static_cast<DwbaIntegrandData*>(ex);
     int n_seg = static_cast<int>(data->a0.size());
+    int j_start = (data->segment >= 0) ? data->segment : 0;
+    int j_end = (data->segment >= 0) ? data->segment + 1 : n_seg;
 
     for (int i = 0; i < n; ++i) {
         double s = x[i];
         std::complex<double> total(0.0, 0.0);
 
-        for (int j = 0; j < n_seg; ++j) {
+        for (int j = j_start; j < j_end; ++j) {
             double a_s = data->a0[j] + s * data->da[j];
             double phase_s = data->phase0[j] + s * data->dphase[j];
             double z_s = 2.0 * data->k_over_h * a_s * data->cos_beta[j];
@@ -98,10 +102,10 @@ double dwba_quadpack_integral(DwbaIntegrandData &data,
     return result;
 }
 
-} // namespace
+}
 
 // [[Rcpp::export]]
-NumericVector dwba_fbs_cpp(NumericMatrix rpos,
+ComplexVector dwba_fbs_cpp(NumericMatrix rpos,
                            NumericVector k_sw,
                            double theta,
                            double h,
@@ -124,7 +128,7 @@ NumericVector dwba_fbs_cpp(NumericMatrix rpos,
 
     int n_freq = k_sw.size();
     int n_seg = rpos.ncol() - 1;
-    NumericVector out(n_freq, NA_REAL);
+    ComplexVector out(n_freq);
 
     double cos_theta = std::cos(theta);
     double sin_theta = std::sin(theta);
@@ -147,7 +151,7 @@ NumericVector dwba_fbs_cpp(NumericMatrix rpos,
     }
 
     for (int i = 0; i < n_freq; ++i) {
-        if (i % 32 == 0) Rcpp::checkUserInterrupt();
+        if (i % 32 == 0) R_CheckUserInterrupt();
 
         double k = k_sw[i];
         double kx = k * cos_theta;
@@ -193,7 +197,109 @@ NumericVector dwba_fbs_cpp(NumericMatrix rpos,
             data, rel_tol, abs_tol, subdivisions
         );
 
-        out[i] = std::sqrt(real_part * real_part + imag_part * imag_part);
+        out[i] = to_Rcomplex(std::complex<double>(real_part, imag_part));
+    }
+
+    return out;
+}
+
+// [[Rcpp::export]]
+ComplexMatrix dwba_segment_integrals_cpp(NumericMatrix rpos,
+                                         NumericVector k_sw,
+                                         double theta,
+                                         double h,
+                                         double R,
+                                         int subdivisions = 100,
+                                         double rel_tol = 0.0001220703125,
+                                         double abs_tol = 0.0001220703125) {
+    if (rpos.nrow() != 4) {
+        stop("'rpos' must be a 4 x n matrix with x, y, z, and radius rows.");
+    }
+    if (rpos.ncol() < 2) {
+        stop("'rpos' must contain at least two points.");
+    }
+    if (subdivisions < 1) {
+        stop("'subdivisions' must be a positive integer.");
+    }
+    if (h == 0.0) {
+        stop("'h' must be non-zero.");
+    }
+
+    int n_freq = k_sw.size();
+    int n_seg = rpos.ncol() - 1;
+    ComplexMatrix out(n_freq, n_seg);
+
+    double cos_theta = std::cos(theta);
+    double sin_theta = std::sin(theta);
+
+    std::vector<double> dx(n_seg), dy(n_seg), dz(n_seg), da(n_seg), seglen(n_seg);
+    std::vector<double> x0(n_seg), y0(n_seg), z0(n_seg), a0(n_seg);
+
+    for (int j = 0; j < n_seg; ++j) {
+        x0[j] = rpos(0, j);
+        y0[j] = rpos(1, j);
+        z0[j] = rpos(2, j);
+        a0[j] = rpos(3, j);
+
+        dx[j] = rpos(0, j + 1) - rpos(0, j);
+        dy[j] = rpos(1, j + 1) - rpos(1, j);
+        dz[j] = rpos(2, j + 1) - rpos(2, j);
+        da[j] = rpos(3, j + 1) - rpos(3, j);
+
+        seglen[j] = std::sqrt(dx[j] * dx[j] + dy[j] * dy[j] + dz[j] * dz[j]);
+    }
+
+    for (int i = 0; i < n_freq; ++i) {
+        if (i % 16 == 0) R_CheckUserInterrupt();
+
+        double k = k_sw[i];
+        double kx = k * cos_theta;
+        double ky = 0.0;
+        double kz = k * sin_theta;
+
+        DwbaIntegrandData data;
+        data.a0 = a0;
+        data.da = da;
+        data.pref.resize(n_seg);
+        data.phase0.resize(n_seg);
+        data.dphase.resize(n_seg);
+        data.cos_beta.resize(n_seg);
+        data.k_over_h = k / h;
+
+        for (int j = 0; j < n_seg; ++j) {
+            double dot = dx[j] * kx + dy[j] * ky + dz[j] * kz;
+            double denom = k * seglen[j];
+            double cos_alpha = (denom == 0.0) ? 0.0 : clamp_unit(dot / denom);
+            double cos_beta = std::sqrt(std::max(0.0, 1.0 - cos_alpha * cos_alpha));
+
+            if (cos_beta == 0.0) {
+                stop(
+                    "DWBA geometry produced cos(beta) = 0 for segment %d at frequency index %d.",
+                    j + 1,
+                    i + 1
+                );
+            }
+
+            data.cos_beta[j] = cos_beta;
+            data.pref[j] = (k / 4.0) * R * seglen[j];
+            data.phase0[j] = (x0[j] * kx + y0[j] * ky + z0[j] * kz) / h;
+            data.dphase[j] = (dx[j] * kx + dy[j] * ky + dz[j] * kz) / h;
+        }
+
+        for (int j = 0; j < n_seg; ++j) {
+            data.segment = j;
+            data.imaginary = false;
+            double real_part = dwba_quadpack_integral(
+                data, rel_tol, abs_tol, subdivisions
+            );
+
+            data.imaginary = true;
+            double imag_part = dwba_quadpack_integral(
+                data, rel_tol, abs_tol, subdivisions
+            );
+
+            out(i, j) = to_Rcomplex(std::complex<double>(real_part, imag_part));
+        }
     }
 
     return out;

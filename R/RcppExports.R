@@ -53,6 +53,10 @@ dwba_fbs_cpp <- function(rpos, k_sw, theta, h, R, subdivisions = 100L, rel_tol =
     .Call(`_acousticTS_dwba_fbs_cpp`, rpos, k_sw, theta, h, R, subdivisions, rel_tol, abs_tol)
 }
 
+dwba_segment_integrals_cpp <- function(rpos, k_sw, theta, h, R, subdivisions = 100L, rel_tol = 0.0001220703125, abs_tol = 0.0001220703125) {
+    .Call(`_acousticTS_dwba_segment_integrals_cpp`, rpos, k_sw, theta, h, R, subdivisions, rel_tol, abs_tol)
+}
+
 gauss_legendre_cpp <- function(n, a = -1.0, b = 1.0) {
     .Call(`_acousticTS_gauss_legendre_cpp`, n, a, b)
 }

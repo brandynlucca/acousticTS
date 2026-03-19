@@ -268,6 +268,70 @@ sdwba_initialize <- function(object,
 }
 
 
+#' Summarize stochastic SDWBA realizations from deterministic segment integrals
+#' @param segment_integrals Complex matrix with one row per frequency and one
+#' column per body segment.
+#' @param phase_sd Phase standard deviation in radians.
+#' @param n_iterations Number of stochastic realizations.
+#' @keywords internal
+#' @noRd
+sdwba_stochastic_summary <- function(segment_integrals, phase_sd, n_iterations) {
+  n_k <- nrow(segment_integrals)
+  n_segments <- ncol(segment_integrals)
+  phase_cyl <- vapply(
+    seq_len(n_k),
+    FUN = function(x) {
+      cyl_phase <- array(
+        vapply(
+          seq_len(n_segments),
+          FUN = function(y) {
+            phase_rng <- stats::rnorm(n_iterations, mean = 0, sd = 1)
+            segment_integrals[x, y] * exp(1i * phase_rng * phase_sd)
+          },
+          FUN.VALUE = complex(n_iterations)
+        ),
+        dim = c(n_iterations, n_segments)
+      )
+      rowSums(cyl_phase, na.rm = TRUE)
+    },
+    FUN.VALUE = complex(n_iterations)
+  )
+  phase_cyl <- array(phase_cyl, dim = c(n_iterations, n_k))
+  data.frame(
+    f_bs = colMeans(phase_cyl),
+    sigma_bs = colMeans(.sigma_bs(phase_cyl)),
+    TS_mean = db(colMeans(.sigma_bs(phase_cyl))),
+    TS_sd = db(apply(.sigma_bs(phase_cyl), 2, stats::sd))
+  )
+}
+
+#' Evaluate one resampled SDWBA group
+#' @param sub_params One element from the SDWBA resampling recipe.
+#' @param theta Incident angle in radians.
+#' @param R Weak-scattering contrast factor.
+#' @param h Sound-speed contrast.
+#' @keywords internal
+#' @noRd
+sdwba_resampled_backscatter <- function(sub_params, theta, R, h) {
+  rpos <- rbind(
+    sub_params$body_params$rpos[1:3, ],
+    sub_params$body_params$radius
+  )
+  segment_integrals <- dwba_segment_integrals_cpp(
+    rpos = rpos,
+    k_sw = sub_params$acoustics$k_sw,
+    theta = theta,
+    h = h,
+    R = R
+  )
+  sdwba_stochastic_summary(
+    segment_integrals = segment_integrals,
+    phase_sd = sub_params$meta_params$phase_sd,
+    n_iterations = sub_params$meta_params$n_iterations
+  )
+}
+
+
 #' Calculates the theoretical TS of a fluid-like scatterer at a given frequency
 #' using the stochastic distorted Born wave approximation (DWBA) model.
 #' @param object FLS-class scatterer.
@@ -281,102 +345,14 @@ SDWBA <- function(object) {
   g <- body$g
   h <- body$h
   R <- 1 / (g * h * h) + 1 / g - 2
-  # Calculate rotation matrix and update wavenumber matrix =====================
-  rotation_matrix <- matrix(
-    c(
-      cos(theta),
-      0.0,
-      sin(theta)
-    ),
-    1
-  )
   SDWBA_resampled <- function(i) {
-    # Parse phase-specific parameters ==========================================
     sub_params <- model$parameters[[i]]
-    # Calculate rotation matrix and update wavenumber matrix ===================
-    k_sw_rot <- sub_params$acoustics$k_sw %*% rotation_matrix
-    # Calculate Euclidean norms ================================================
-    k_sw_norm <- vecnorm(k_sw_rot)
-    # Update position matrices  ================================================
-    r0 <- rbind(
-      sub_params$body_params$rpos[1:3, ],
-      sub_params$body_params$radius
+    sdwba_resampled_backscatter(
+      sub_params = sub_params,
+      theta = theta,
+      R = R,
+      h = h
     )
-    # Calculate position matrix lags  ==========================================
-    r0_diff <- t(diff(t(r0)))
-    # Multiply wavenumber and body matrices ====================================
-    r0_diff_k <- t(vapply(seq_along(k_sw_norm),
-                          FUN = function(x) {
-                            colSums(r0_diff[1:3, ] *
-                                      k_sw_rot[x, ])
-                          },
-                          FUN.VALUE = numeric(ncol(r0_diff))
-    ))
-    # Calculate Euclidean norms ================================================
-    r0_diff_norm <- sqrt(colSums(r0_diff[1:3, ] * r0_diff[1:3, ]))
-    # Estimate angles between body cylinders ===================================
-    alpha <- acos(r0_diff_k / (k_sw_norm %*% t(r0_diff_norm)))
-    beta <- abs(alpha - pi / 2)
-    # Call in metrics ==========================================================
-    phase_sd <- sub_params$meta_params$phase_sd
-    # r0_diff_h <- r0_diff / h
-    # r0_h <- r0 / h
-    # Define integrand =========================================================
-    integrand <- function(s, x, y) {
-      # integrand <- function( s , x ) {
-      # rint_mat <- s * r0_diff_h[ , y ] + r0_h[ , y ]
-      rint_mat <- s * r0_diff[, y] + r0[, y]
-      # rint_k1_h_mat <- k_sw_rot[ x , ] %*% rint_mat[ 1 : 3 ]
-      rint_k1_h_mat <- k_sw_rot[x, ] %*% rint_mat[1:3] / h
-      bessel <- jc(1, 2 * (k_sw_norm[x] * rint_mat[4] / h *
-                             cos(beta[x, y]))) / cos(beta[x, y])
-      # bessel <- jc( 1 , 2 * ( k_sw_norm[ x ] * rint_mat[ 4 ] *
-      #                           cos( beta[ x , y ] ) ) ) / cos( beta[ x , y] )
-      # fb_a <- k_sw_norm[ x ] / 4 * R * rint_mat[ 4 ] * h *
-      #   exp( 2i * rint_k1_h_mat ) * bessel[y] * r0_diff_norm[ y ]
-      fb_a <- k_sw_norm[x] / 4 * R * rint_mat[4] *
-        exp(2i * rint_k1_h_mat) * bessel * r0_diff_norm[y]
-      sum(fb_a, na.rm = TRUE)
-    }
-    # Vectorize integrand function =============================================
-    integrand_vectorized <- Vectorize(integrand)
-    stochastic_TS <- function(n_k, n_segments, n_iterations) {
-      phase_cyl <- vapply(seq_len(n_k),
-                          FUN = function(x) {
-                            cyl_phase <- array(
-                              vapply(seq_len(n_segments),
-                                     FUN = function(y) {
-                                       phase_integrate(
-                                         x, y,
-                                         n_iterations,
-                                         integrand_vectorized,
-                                         phase_sd
-                                       )
-                                     },
-                                     FUN.VALUE = complex(n_iterations)
-                              ),
-                              dim = c(n_iterations, n_segments)
-                            )
-                            cyl_sum_phase <- rowSums(cyl_phase, na.rm = TRUE)
-                            cyl_sum_phase
-                          },
-                          FUN.VALUE = complex(n_iterations)
-      )
-      phase_cyl <- array(phase_cyl, dim = c(n_iterations, n_k))
-      data.frame(
-        f_bs = colMeans(phase_cyl),
-        sigma_bs = colMeans(.sigma_bs(phase_cyl)),
-        TS_mean = db(colMeans(.sigma_bs(phase_cyl))),
-        TS_sd = db(apply(.sigma_bs(phase_cyl), 2, stats::sd))
-      )
-    }
-    # Calculate linear scatter response ========================================
-    backscatter_df <- stochastic_TS(
-      n_k = length(k_sw_norm),
-      n_segments = sub_params$n_segments - 1,
-      n_iterations = sub_params$meta_params$n_iterations
-    )
-    backscatter_df
   }
   # Generate results dataframe by collating resampled results ==================
   results <- do.call(
@@ -533,95 +509,14 @@ SDWBA_curved <- function(object) {
   g <- body$g
   h <- body$h
   R <- 1 / (g * h * h) + 1 / g - 2
-  # Calculate rotation matrix and update wavenumber matrix =====================
-  rotation_matrix <- matrix(
-    c(
-      cos(theta),
-      0.0,
-      sin(theta)
-    ),
-    1
-  )
   SDWBA_resampled_c <- function(i) {
-    # Parse phase-specific parameters ==========================================
     sub_params <- model$parameters[[i]]
-    # Calculate rotation matrix and update wavenumber matrix ===================
-    k_sw_rot <- sub_params$acoustics$k_sw %*% rotation_matrix
-    # Calculate Euclidean norms ================================================
-    k_sw_norm <- vecnorm(k_sw_rot)
-    # Update position matrices  ================================================
-    r0 <- rbind(
-      sub_params$body_params$rpos[1:3, ],
-      sub_params$body_params$radius
+    sdwba_resampled_backscatter(
+      sub_params = sub_params,
+      theta = theta,
+      R = R,
+      h = h
     )
-    # Calculate position matrix lags  ==========================================
-    r0_diff <- t(diff(t(r0)))
-    # Multiply wavenumber and body matrices ====================================
-    r0_diff_k <- t(vapply(seq_along(k_sw_norm),
-                          FUN = function(x) {
-                            colSums(r0_diff[1:3, ] *
-                                      k_sw_rot[x, ])
-                          },
-                          FUN.VALUE = numeric(ncol(r0_diff))
-    ))
-    # Calculate Euclidean norms ================================================
-    r0_diff_norm <- sqrt(colSums(r0_diff[1:3, ] * r0_diff[1:3, ]))
-    # Estimate angles between body cylinders ===================================
-    alpha <- acos(r0_diff_k / (k_sw_norm %*% t(r0_diff_norm)))
-    beta <- abs(alpha - pi / 2)
-    # Call in metrics ==========================================================
-    phase_sd <- sub_params$meta_params$phase_sd
-    r0_diff_h <- r0_diff / h
-    r0_h <- r0 / h
-    # Define integrand =========================================================
-    integrand_c <- function(s, x, y) {
-      rint_mat <- s * r0_diff_h[, y] + r0_h[, y]
-      rint_k1_h_mat <- k_sw_rot[x, ] %*% rint_mat[1:3]
-      bessel <- jc(1, 2 * (k_sw_norm[x] * rint_mat[4] *
-                             cos(beta[x, y]))) / cos(beta[x, y])
-      fb_a <- k_sw_norm[x] / 4 * R * rint_mat[4] * h *
-        exp(2i * rint_k1_h_mat) * bessel * r0_diff_norm[y]
-      sum(fb_a, na.rm = TRUE)
-    }
-    # Vectorize integrand function =============================================
-    integrand_vectorized_c <- Vectorize(integrand_c)
-    stochastic_TS_c <- function(n_k, n_segments, n_iterations) {
-      phase_cyl <- vapply(seq_len(n_k),
-                          FUN = function(x) {
-                            cyl_phase <- array(
-                              vapply(seq_len(n_segments),
-                                     FUN = function(y) {
-                                       phase_integrate(
-                                         x, y,
-                                         n_iterations,
-                                         integrand_vectorized_c,
-                                         phase_sd
-                                       )
-                                     },
-                                     FUN.VALUE = complex(n_iterations)
-                              ),
-                              dim = c(n_iterations, n_segments)
-                            )
-                            cyl_sum_phase <- rowSums(cyl_phase, na.rm = TRUE)
-                            cyl_sum_phase
-                          },
-                          FUN.VALUE = complex(n_iterations)
-      )
-      phase_cyl <- array(phase_cyl, dim = c(n_iterations, n_k))
-      data.frame(
-        f_bs = colMeans(phase_cyl),
-        sigma_bs = colMeans(.sigma_bs(phase_cyl)),
-        TS_mean = db(colMeans(.sigma_bs(phase_cyl))),
-        TS_sd = db(apply(.sigma_bs(phase_cyl), 2, stats::sd))
-      )
-    }
-    # Calculate linear scatter response ========================================
-    backscatter_df <- stochastic_TS_c(
-      n_k = length(k_sw_norm),
-      n_segments = sub_params$n_segments - 1,
-      n_iterations = sub_params$meta_params$n_iterations
-    )
-    backscatter_df
   }
   # Generate results dataframe by collating resampled results ==================
   results <- do.call(
