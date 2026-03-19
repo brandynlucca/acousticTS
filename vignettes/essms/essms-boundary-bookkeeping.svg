@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 360" role="img" aria-labelledby="title desc">
+  <title id="title">ESSMS boundary bookkeeping</title>
+  <desc id="desc">Mode-wise bookkeeping for an elastic shelled sphere, showing the outer radius, inner radius, and the six scalar boundary conditions that feed the scattering coefficient.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8f3ea; }
+      .panel { fill: #fffdfa; stroke: #2f2822; stroke-width: 2.4; rx: 18; ry: 18; }
+      .shell { fill: #e7def4; }
+      .fluid { fill: #dcecf5; }
+      .inner { fill: #f7e4cc; }
+      .head { font: 700 22px Georgia, serif; fill: #1f1a16; }
+      .txt { font: 16px Georgia, serif; fill: #2f2822; }
+      .small { font: 14px Georgia, serif; fill: #51463c; }
+      .arrow { stroke: #51463c; stroke-width: 2.5; fill: none; marker-end: url(#m); }
+      .brace { stroke: #7a6c61; stroke-width: 2; fill: none; }
+    </style>
+    <marker id="m" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#51463c"/>
+    </marker>
+  </defs>
+
+  <rect width="980" height="360" class="bg"/>
+  <text x="34" y="42" class="head">How one angular order m becomes one boundary-value system</text>
+
+  <rect x="42" y="86" width="330" height="226" class="panel"/>
+  <circle cx="207" cy="199" r="98" class="fluid" stroke="#2f2822" stroke-width="2.4"/>
+  <circle cx="207" cy="199" r="66" class="shell" stroke="#2f2822" stroke-width="2.4"/>
+  <circle cx="207" cy="199" r="42" class="inner" stroke="#2f2822" stroke-width="2.4"/>
+  <text x="252" y="126" class="txt">r = a</text>
+  <text x="232" y="169" class="txt">shell</text>
+  <text x="170" y="205" class="txt">interior</text>
+  <text x="252" y="206" class="txt">r = b</text>
+  <text x="88" y="286" class="small">Exterior fluid</text>
+  <text x="186" y="286" class="small">Elastic shell</text>
+  <text x="282" y="286" class="small">Interior fluid</text>
+
+  <rect x="416" y="86" width="246" height="226" class="panel"/>
+  <text x="438" y="120" class="txt">At the outer radius r = a:</text>
+  <text x="458" y="152" class="small">pressure continuity</text>
+  <text x="458" y="175" class="small">radial-velocity continuity</text>
+  <text x="458" y="198" class="small">zero shear traction</text>
+  <text x="438" y="238" class="txt">At the inner radius r = b:</text>
+  <text x="458" y="270" class="small">pressure continuity</text>
+  <text x="458" y="293" class="small">radial-velocity continuity</text>
+  <text x="458" y="316" class="small">zero shear traction</text>
+
+  <rect x="706" y="86" width="232" height="226" class="panel"/>
+  <text x="726" y="120" class="txt">Unknowns for order m</text>
+  <text x="726" y="154" class="small">Aₘ⁽¹⁾ exterior scattered wave</text>
+  <text x="726" y="177" class="small">Aₘ⁽²⁾, Bₘ⁽²⁾ longitudinal shell terms</text>
+  <text x="726" y="200" class="small">Cₘ⁽²⁾, Dₘ transverse shell terms</text>
+  <text x="726" y="223" class="small">Aₘ⁽³⁾ interior acoustic term</text>
+  <text x="726" y="264" class="txt">Result</text>
+  <text x="726" y="290" class="small">Solve one 6 × 6 system</text>
+  <text x="726" y="313" class="small">then place Aₘ⁽¹⁾ in the far-field sum</text>
+
+  <path d="M372 199 C392 199, 396 199, 416 199" class="arrow"/>
+  <path d="M662 199 C682 199, 686 199, 706 199" class="arrow"/>
+</svg>
