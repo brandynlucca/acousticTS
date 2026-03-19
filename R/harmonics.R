@@ -6,7 +6,7 @@
 #'
 #' @description
 #' Computes the Legendre polynomial of the first kind, \eqn{P_\nu(x)}, for
-#' real order \eqn{\nu} (integer or fractional) and real argument \eqn{x}. 
+#' real order \eqn{\nu} (integer or fractional) and real argument \eqn{x}.
 #'
 #' @details
 #' The Legendre polynomial of the first kind satisfies the differential
@@ -56,11 +56,10 @@
 #' Pn(c(0.5, 2, -3), c(1, -2.5, 3))
 #'
 #' @note
-#' This function calls underlying \eqn{C++} code via \code{Rcpp} for 
-#' both performance and , which is used both for computational efficiency and 
-#' to support different cases for both order and argument that are not 
-#' readily available in \code{R}.
-#' 
+#' This function calls underlying \eqn{C++} code via \code{Rcpp} for
+#' computational efficiency and  to support different cases for both order and
+#' argument that are not readily available in \code{R}.
+#'
 #' @references
 #' Abramowitz, M. and Stegun, I. A. (1972). \emph{Handbook of Mathematical
 #' Functions with Formulas, Graphs, and Mathematical Tables}. Dover
@@ -70,8 +69,8 @@
 #' NIST Digital Library of Mathematical Functions.
 #' \url{https://dlmf.nist.gov/14}
 #'
-#' @seealso 
-#' \code{\link{Pndk}} for the k<sup>th</sup> derivative of the Legendre 
+#' @seealso
+#' \code{\link{Pndk}} for the k<sup>th</sup> derivative of the Legendre
 #' polynomial of the first kind,
 #' \code{\link{Qn}} for Legendre functions of the second kind.
 #'
@@ -108,7 +107,7 @@ Pn <- function(n, x) {
 #' polynomials:
 #' \deqn{\frac{d^m P_n(x)}{dx^m} = \frac{1}{(1-x^2)^{m/2}} P_n^m(x)}
 #'
-#' where \eqn{P_n^m(x)} is the associated Legendre polynomial (the \code{Boost} 
+#' where \eqn{P_n^m(x)} is the associated Legendre polynomial (the \code{Boost}
 #' \code{C++} uses Condon-Shortley phase convention).
 #'
 #' At the endpoints \eqn{x = \pm 1}, the known closed-form expressions are used:
@@ -173,12 +172,11 @@ Pn <- function(n, x) {
 #' accuracy (typically 4-6 significant digits) compared to integer orders.
 #' A warning is issued for higher-order derivatives (\eqn{k > 1}) of
 #' fractional orders.
-#' 
-#' This function calls underlying \eqn{C++} code via \code{Rcpp} for 
-#' both performance and , which is used both for computational efficiency and 
-#' to support different cases for both order and argument that are not 
-#' readily available in \code{R}.
-#' 
+#'
+#' This function calls underlying \eqn{C++} code via \code{Rcpp} for
+#' computational efficiency and  to support different cases for both order and
+#' argument that are not readily available in \code{R}.
+#'
 #' @seealso
 #' \code{\link{Pn}} for the Legendre polynomial of the first kind.
 #'
@@ -223,7 +221,7 @@ Pndk <- function(n, x, k = 1L) {
 #'
 #' **For \eqn{|x| < 1} (real result):**
 #' \itemize{
-#'   \item For integer order \eqn{n}: Uses the \code{C++} \code{Boost} library 
+#'   \item For integer order \eqn{n}: Uses the \code{C++} \code{Boost} library
 #'   implementation
 #'   \item For fractional order \eqn{\nu}: Uses the Ferrers identity
 #'         \deqn{Q_\nu(x) = \frac{\pi}{2 \sin(\pi \nu)} \left[ \cos(\pi \nu)
@@ -272,13 +270,12 @@ Pndk <- function(n, x, k = 1L) {
 #'
 #' # Singularity at x = 1
 #' Qn(1, 1)
-#' 
+#'
 #' @note
-#' This function calls underlying \eqn{C++} code via \code{Rcpp} for 
-#' both performance and , which is used both for computational efficiency and 
-#' to support different cases for both order and argument that are not 
-#' readily available in \code{R}.
-#' 
+#' This function calls underlying \eqn{C++} code via \code{Rcpp} for
+#' computational efficiency and  to support different cases for both order and
+#' argument that are not readily available in \code{R}.
+#'
 #' @references
 #' Abramowitz, M. and Stegun, I. A. (1972). \emph{Handbook of Mathematical
 #' Functions with Formulas, Graphs, and Mathematical Tables}. Dover
@@ -288,8 +285,8 @@ Pndk <- function(n, x, k = 1L) {
 #' NIST Digital Library of Mathematical Functions.
 #' \url{https://dlmf.nist.gov/14}
 #'
-#' @seealso 
-#' \code{\link{Qndk}} for the k<sup>th</sup> derivative of the Legendre 
+#' @seealso
+#' \code{\link{Qndk}} for the k<sup>th</sup> derivative of the Legendre
 #' polynomial of the second kind,
 #' \code{\link{Pn}} for Legendre functions of the first kind.
 #'
@@ -370,11 +367,10 @@ Qn <- function(n, x) {
 #' Derivatives are computed via finite differences with step size
 #' \eqn{h = 10^{-6}}. Accuracy is typically 4-6 significant digits for
 #' first derivatives, less for higher orders.
-#' 
-#' This function calls underlying \eqn{C++} code via \code{Rcpp} for 
-#' both performance and , which is used both for computational efficiency and 
-#' to support different cases for both order and argument that are not 
-#' readily available in \code{R}.
+#'
+#' This function calls underlying \eqn{C++} code via \code{Rcpp} for
+#' computational efficiency and  to support different cases for both order and
+#' argument that are not readily available in \code{R}.
 #'
 #' @useDynLib acousticTS, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
