@@ -213,12 +213,13 @@ dwba_initialize <- function(object,
 DWBA <- function(object) {
   # Extract model parameters/inputs ============================================
   model <- acousticTS::extract(object, "model_parameters")$DWBA
+  model_body <- acousticTS::extract(model, "body")
   body <- acousticTS::extract(object, "body")
   theta <- body$theta
   r0 <- body$rpos[1:3, ]
   # Material properties calculation ============================================
-  g <- body$g
-  h <- body$h
+  g <- mean(model_body$g)
+  h <- mean(model_body$h)
   R <- 1 / (g * h * h) + 1 / g - 2
   # Calculate rotation matrix and update wavenumber matrix =====================
   rotation_matrix <- matrix(

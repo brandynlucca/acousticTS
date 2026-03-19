@@ -44,17 +44,19 @@ setGeneric(
 setMethod(
   "reforge",
   signature(object = "SBF"),
-  function(object,
-           body_scale = NULL,
-           body_target = NULL,
-           swimbladder_scale = NULL,
-           swimbladder_target = NULL,
-           isometric_body = TRUE,
-           isometric_swimbladder = TRUE,
-           maintain_ratio = TRUE,
-           swimbladder_inflation_factor = 1.0,
-           n_segments_body = NULL,
-           n_segments_swimbladder = NULL) {
+  function(
+    object,
+    body_scale = NULL,
+    body_target = NULL,
+    swimbladder_scale = NULL,
+    swimbladder_target = NULL,
+    isometric_body = TRUE,
+    isometric_swimbladder = TRUE,
+    maintain_ratio = TRUE,
+    swimbladder_inflation_factor = 1.0,
+    n_segments_body = NULL,
+    n_segments_swimbladder = NULL
+  ) {
     ############################################################################
     # Validation ===============================================================
     if (is.null(body_scale) && is.null(swimbladder_scale) &&
@@ -74,24 +76,6 @@ setMethod(
         "Specify only one of swimbladder_scale or swimbladder_target, not both."
       )
     }
-    # if (((!is.null(body_scale) && length(body_scale) > 1) ||
-    #      (!is.null(body_target) && length(body_target) > 1)) &&
-    #   isometric_body) {
-    #   message(
-    #     "Hidden State Change Warning:\n ",
-    #     "Multiple axes specified in body_scale/body_target: ",
-    #     "'isometric_body' will be ignored for those axes."
-    #   )
-    # }
-    # if (((!is.null(swimbladder_scale) && length(swimbladder_scale) > 1) ||
-    #      (!is.null(swimbladder_target) && length(swimbladder_target) > 1)) &&
-    #   isometric_swimbladder) {
-    #   message(
-    #     "Hidden State Change Warning:\n ",
-    #     "Multiple axes specified in swimbladder_scale/swimbladder_target: ",
-    #     "'isometric_swimbladder' will be ignored for those axes."
-    #   )
-    # }
     if ((!is.null(body_scale) || !is.null(body_target)) &&
         (!is.null(swimbladder_scale) || !is.null(swimbladder_target)) &&
       maintain_ratio) {
@@ -123,65 +107,6 @@ setMethod(
       list(
         suffix = "_target",
         scale = out
-      )
-    }
-
-    validate_target <- function(target, name) {
-      if (is.null(target)) {
-        return(NULL)
-      }
-      if (!is.numeric(target) ||
-          is.null(names(target)) ||
-          any(names(target) == "")) {
-        stop(paste(name, "must be a named numeric vector."))
-      }
-      valid_names <- c("length", "width", "height")
-      if (!all(names(target) %in% valid_names)) {
-        stop(paste("Invalid", name, "names. Use: length, width, height."))
-      }
-      target
-    }
-
-    validate_scale <- function(scale, name, isometry, iso_name) {
-      valid_names <- c("length", "width", "height")
-      if (is.null(scale)) {
-        return(NULL)
-      }
-      if (is.numeric(scale) && length(scale) == 1 && isometry) {
-        if (!all(names(scale) %in% valid_names)) {
-          stop(paste("Invalid", name, "names. Use: length, width, height."))
-        }
-        return(c(
-          length = unname(scale),
-          width = unname(scale),
-          height = unname(scale)
-        ))
-      }
-      if (is.numeric(scale) &&
-          length(scale) == 1 && !isometry &&
-          is.null(names(scale))) {
-        stop(
-          paste(
-            name,
-            "must be a named vector with length/width/height when",
-            iso_name,
-            "is FALSE."
-          )
-        )
-      }
-      if (is.numeric(scale) && !is.null(names(scale))) {
-        if (!all(names(scale) %in% valid_names)) {
-          stop(paste("Invalid", name, "names. Use: length, width, height."))
-        }
-        result <- c(length = 1, width = 1, height = 1)
-        result[names(scale)] <- scale
-        return(result)
-      }
-      stop(
-        paste(
-          name,
-          "must be a single number or named vector with length/width/height"
-        )
       )
     }
 
@@ -301,12 +226,6 @@ setMethod(
     )
     ############################################################################
     # Process scaling parameters ===============================================
-    # body_scales <- validate_scale(
-    #   body_scale,
-    #   "body_scale",
-    #   isometric_body,
-    #   "isometric_body"
-    # )
     body_scales <- .validate_dimension_scaling(
       dims=body_scale_lst$scale,
       dims_name=paste0("body", body_scale_lst$suffix),
@@ -314,12 +233,6 @@ setMethod(
       isometry=isometric_body,
       iso_name="isometric_body"
     )
-    # bladder_scales <- validate_scale(
-    #   swimbladder_scale,
-    #   "swimbladder_scale",
-    #   isometric_swimbladder,
-    #   "isometric_swimbladder"
-    # )
     bladder_scales <- .validate_dimension_scaling(
       dims=swimbladder_scale_lst$scale,
       dims_name=paste0("swimbladder", swimbladder_scale_lst$suffix),
@@ -389,6 +302,300 @@ setMethod(
   }
 )
 ################################################################################
+#' Reforge GAS-class object
+#'
+#' Resize a gas-filled scatterer by applying an isometric scale factor or
+#' specifying a target maximum radius.  Optionally re-discretize the body
+#' representation to a new segment count.  The underlying shape (sphere,
+#' prolate spheroid, cylinder, arbitrary, etc.) is preserved; scaling is
+#' applied uniformly to all axes of the position matrix.
+#'
+#' @param object GAS-class object.
+#' @param scale Single positive scalar applied isometrically to every axis of
+#'   the position matrix.  Mutually exclusive with \code{radius_target}.
+#' @param radius_target Target \emph{maximum} body radius (m).  The scale
+#'   factor is derived as \code{radius_target / max(current_radius)}.  Mutually
+#'   exclusive with \code{scale}.
+#' @param n_segments New number of discrete segments.  All position-matrix
+#'   columns are re-interpolated along the x-axis.
+#' @return Modified GAS-class object.
+#' @export
+setMethod(
+  "reforge",
+  signature(object = "GAS"),
+  function(object,
+           scale = NULL,
+           radius_target = NULL,
+           n_segments = NULL) {
+    ############################################################################
+    # Validation ===============================================================
+    if (is.null(scale) && is.null(radius_target) && is.null(n_segments)) {
+      stop(
+        "Must specify at least one of: scale, radius_target, or n_segments.",
+        call. = FALSE
+      )
+    }
+    if (!is.null(scale) && !is.null(radius_target)) {
+      stop("Specify only one of scale or radius_target, not both.", call. = FALSE)
+    }
+    if (!is.null(scale) &&
+        (!is.numeric(scale) || length(scale) != 1 || scale <= 0)) {
+      stop("'scale' must be a single positive number.", call. = FALSE)
+    }
+    if (!is.null(radius_target) &&
+        (!is.numeric(radius_target) || length(radius_target) != 1 ||
+         radius_target <= 0)) {
+      stop("'radius_target' must be a single positive number.", call. = FALSE)
+    }
+    if (!is.null(n_segments) &&
+        (!is.numeric(n_segments) || length(n_segments) != 1 || n_segments < 1)) {
+      stop("'n_segments' must be a single positive integer.", call. = FALSE)
+    }
+    ############################################################################
+    body  <- acousticTS::extract(object, "body")
+    shape <- acousticTS::extract(object, "shape_parameters")
+    rpos  <- body$rpos
+    # radius may be a scalar (sphere) or a per-point vector (cylinder, etc.)
+    current_radius <- shape$radius
+    current_max_r  <- max(current_radius, na.rm = TRUE)
+    # Derive scale from radius_target if given =================================
+    if (!is.null(radius_target)) scale <- radius_target / current_max_r
+    ############################################################################
+    # Resample segments first ==================================================
+    # Interpolate every non-x column so that arbitrary shapes are handled.
+    if (!is.null(n_segments)) {
+      rpos <- .resample_rpos(rpos, as.integer(n_segments) + 1L)
+      methods::slot(object, "shape_parameters")$n_segments <- as.integer(n_segments)
+    }
+    ############################################################################
+    # Apply scale ==============================================================
+    if (!is.null(scale)) {
+      rpos           <- rpos * scale
+      new_radius     <- current_radius * scale
+      methods::slot(object, "body")$radius             <- new_radius
+      methods::slot(object, "shape_parameters")$radius  <- new_radius
+      methods::slot(object, "shape_parameters")$length  <-
+        max(rpos[, 1]) - min(rpos[, 1])
+    }
+    methods::slot(object, "body")$rpos <- rpos
+    return(object)
+  }
+)
+################################################################################
+#' Reforge CAL-class object
+#'
+#' Resize a calibration sphere by applying an isometric scale factor or
+#' specifying a target diameter.  Optionally re-discretize to a new segment
+#' count.  CAL objects are always spheres, so the position matrix follows
+#' the \code{sphere()} convention (n_points x 5: x, y, z, zU, zL).
+#'
+#' @param object CAL-class object.
+#' @param scale Single positive scale factor applied isometrically. Mutually
+#'   exclusive with \code{diameter_target}.
+#' @param diameter_target Target sphere diameter (m). Derives the scale factor
+#'   internally. Mutually exclusive with \code{scale}.
+#' @param n_segments New number of discrete segments along the major axis.
+#' @return Modified CAL-class object.
+#' @export
+setMethod(
+  "reforge",
+  signature(object = "CAL"),
+  function(object,
+           scale = NULL,
+           diameter_target = NULL,
+           n_segments = NULL) {
+    ############################################################################
+    # Validation ===============================================================
+    if (is.null(scale) && is.null(diameter_target) && is.null(n_segments)) {
+      stop(
+        "Must specify at least one of: scale, diameter_target, or n_segments.",
+        call. = FALSE
+      )
+    }
+    if (!is.null(scale) && !is.null(diameter_target)) {
+      stop("Specify only one of scale or diameter_target, not both.",
+           call. = FALSE)
+    }
+    if (!is.null(scale) &&
+        (!is.numeric(scale) || length(scale) != 1 || scale <= 0)) {
+      stop("'scale' must be a single positive number.", call. = FALSE)
+    }
+    if (!is.null(diameter_target) &&
+        (!is.numeric(diameter_target) || length(diameter_target) != 1 ||
+         diameter_target <= 0)) {
+      stop("'diameter_target' must be a single positive number.", call. = FALSE)
+    }
+    if (!is.null(n_segments) &&
+        (!is.numeric(n_segments) || length(n_segments) != 1 || n_segments < 1)) {
+      stop("'n_segments' must be a single positive integer.", call. = FALSE)
+    }
+    ############################################################################
+    body  <- acousticTS::extract(object, "body")
+    shape <- acousticTS::extract(object, "shape_parameters")
+    rpos  <- body$rpos
+    # CAL is always a sphere; radius is a scalar stored in shape_parameters
+    current_radius <- shape$radius_body %||% shape$radius
+    # Derive scale from diameter_target if given ================================
+    if (!is.null(diameter_target)) scale <- (diameter_target / 2) / current_radius
+    ############################################################################
+    # Resample segments first ==================================================
+    if (!is.null(n_segments)) {
+      rpos <- .resample_rpos(rpos, as.integer(n_segments) + 1L)
+      methods::slot(object, "shape_parameters")$n_segments <- as.integer(n_segments)
+    }
+    ############################################################################
+    # Apply scale ==============================================================
+    if (!is.null(scale)) {
+      rpos           <- rpos * scale
+      new_radius     <- current_radius * scale
+      methods::slot(object, "body")$radius               <- new_radius
+      methods::slot(object, "body")$diameter             <- new_radius * 2
+      methods::slot(object, "shape_parameters")$radius   <- new_radius
+      methods::slot(object, "shape_parameters")$diameter <- new_radius * 2
+    }
+    methods::slot(object, "body")$rpos <- rpos
+    return(object)
+  }
+)
+################################################################################
+#' Reforge ESS-class object
+#'
+#' Resize an elastic-shelled scatterer by applying an isometric scale factor or
+#' specifying a target maximum shell radius.  Shell thickness can be updated
+#' independently, which rescales the fluid body so that the maximum fluid radius
+#' equals \code{new_max_shell_radius - shell_thickness} (matching the convention
+#' in \code{\link{ess_generate}}).  The underlying shape (sphere, prolate
+#' spheroid, cylinder, etc.) is preserved for both shell and fluid bodies;
+#' scaling is applied uniformly to all axes of each position matrix.
+#'
+#' @param object ESS-class object.
+#' @param scale Single positive scalar applied isometrically to the shell (and
+#'   fluid body, if present).  Mutually exclusive with \code{radius_target}.
+#' @param radius_target Target \emph{maximum} outer shell radius (m).  Scale
+#'   factor derived as \code{radius_target / max(current_shell_radius)}.
+#'   Mutually exclusive with \code{scale}.
+#' @param shell_thickness New shell wall thickness (m).  The fluid body is
+#'   rescaled so its maximum radius equals
+#'   \code{new_max_shell_radius - shell_thickness}.  Can be combined with
+#'   \code{scale}/\code{radius_target} or used alone.
+#' @param n_segments New number of discrete segments.  All columns of both the
+#'   shell and fluid position matrices are re-interpolated along the x-axis.
+#' @return Modified ESS-class object.
+#' @export
+setMethod(
+  "reforge",
+  signature(object = "ESS"),
+  function(object,
+           scale = NULL,
+           radius_target = NULL,
+           shell_thickness = NULL,
+           n_segments = NULL) {
+    ############################################################################
+    # Validation ===============================================================
+    if (is.null(scale) && is.null(radius_target) &&
+        is.null(shell_thickness) && is.null(n_segments)) {
+      stop(
+        paste0("Must specify at least one of: scale, radius_target, ",
+               "shell_thickness, or n_segments."),
+        call. = FALSE
+      )
+    }
+    if (!is.null(scale) && !is.null(radius_target)) {
+      stop("Specify only one of scale or radius_target, not both.", call. = FALSE)
+    }
+    if (!is.null(scale) &&
+        (!is.numeric(scale) || length(scale) != 1 || scale <= 0)) {
+      stop("'scale' must be a single positive number.", call. = FALSE)
+    }
+    if (!is.null(radius_target) &&
+        (!is.numeric(radius_target) || length(radius_target) != 1 ||
+         radius_target <= 0)) {
+      stop("'radius_target' must be a single positive number.", call. = FALSE)
+    }
+    if (!is.null(shell_thickness) &&
+        (!is.numeric(shell_thickness) || length(shell_thickness) != 1 ||
+         shell_thickness <= 0)) {
+      stop("'shell_thickness' must be a single positive number.", call. = FALSE)
+    }
+    if (!is.null(n_segments) &&
+        (!is.numeric(n_segments) || length(n_segments) != 1 || n_segments < 1)) {
+      stop("'n_segments' must be a single positive integer.", call. = FALSE)
+    }
+    ############################################################################
+    shell      <- acousticTS::extract(object, "shell")
+    fluid      <- acousticTS::extract(object, "fluid")
+    shape      <- acousticTS::extract(object, "shape_parameters")
+    rpos_shell <- shell$rpos
+    rpos_fluid <- fluid$rpos           # may be NULL
+    # radius may be a scalar (sphere) or a per-point vector (cylinder, etc.)
+    curr_shell_r     <- shape$shell$radius
+    curr_shell_max_r <- max(curr_shell_r, na.rm = TRUE)
+    curr_fluid_r     <- shape$fluid$radius  # may be NA or a vector
+    curr_fluid_max_r <- if (!is.null(curr_fluid_r) && !all(is.na(curr_fluid_r)))
+      max(curr_fluid_r, na.rm = TRUE) else NA_real_
+    # Derive scale from radius_target if given =================================
+    if (!is.null(radius_target)) scale <- radius_target / curr_shell_max_r
+    ############################################################################
+    # Resample segments first ==================================================
+    # .resample_rpos() is defined in utilities.R
+    if (!is.null(n_segments)) {
+      n_new      <- as.integer(n_segments) + 1L
+      rpos_shell <- .resample_rpos(rpos_shell, n_new)
+      if (!is.null(rpos_fluid))
+        rpos_fluid <- .resample_rpos(rpos_fluid, n_new)
+      methods::slot(object, "shape_parameters")$n_segments <- as.integer(n_segments)
+    }
+    ############################################################################
+    # Apply scale to shell =====================================================
+    if (!is.null(scale)) {
+      rpos_shell      <- rpos_shell * scale
+      new_shell_r     <- curr_shell_r * scale
+      new_shell_max_r <- curr_shell_max_r * scale
+      methods::slot(object, "shell")$radius                    <- new_shell_r
+      methods::slot(object, "shape_parameters")$shell$radius   <- new_shell_r
+      methods::slot(object, "shape_parameters")$shell$diameter <- new_shell_r * 2
+      # Scale fluid if present ------------------------------------------------
+      if (!is.null(rpos_fluid) && !is.na(curr_fluid_max_r)) {
+        if (!is.null(shell_thickness)) {
+          # Fluid scaled so max_fluid_radius = new_shell_max_r - shell_thickness
+          # (same convention as ess_generate)
+          new_fluid_max_r <- new_shell_max_r - shell_thickness
+          if (new_fluid_max_r <= 0)
+            stop("shell_thickness exceeds new shell radius.", call. = FALSE)
+          fluid_scale <- new_fluid_max_r / curr_fluid_max_r
+          rpos_fluid  <- rpos_fluid * fluid_scale
+          new_fluid_r <- curr_fluid_r * fluid_scale
+          methods::slot(object, "shell")$shell_thickness <- shell_thickness
+        } else {
+          rpos_fluid  <- rpos_fluid * scale
+          new_fluid_r <- curr_fluid_r * scale
+        }
+        methods::slot(object, "fluid")$radius                    <- new_fluid_r
+        methods::slot(object, "shape_parameters")$fluid$radius   <- new_fluid_r
+        methods::slot(object, "shape_parameters")$fluid$diameter <- new_fluid_r * 2
+      }
+    } else if (!is.null(shell_thickness)) {
+      # Thickness-only update: rescale fluid, leave shell unchanged ============
+      new_fluid_max_r <- curr_shell_max_r - shell_thickness
+      if (new_fluid_max_r <= 0)
+        stop("shell_thickness exceeds shell radius.", call. = FALSE)
+      if (!is.null(rpos_fluid) && !is.na(curr_fluid_max_r)) {
+        fluid_scale <- new_fluid_max_r / curr_fluid_max_r
+        rpos_fluid  <- rpos_fluid * fluid_scale
+        new_fluid_r <- curr_fluid_r * fluid_scale
+        methods::slot(object, "fluid")$radius                    <- new_fluid_r
+        methods::slot(object, "shape_parameters")$fluid$radius   <- new_fluid_r
+        methods::slot(object, "shape_parameters")$fluid$diameter <- new_fluid_r * 2
+      }
+      methods::slot(object, "shell")$shell_thickness <- shell_thickness
+    }
+    methods::slot(object, "shell")$rpos <- rpos_shell
+    if (!is.null(rpos_fluid))
+      methods::slot(object, "fluid")$rpos <- rpos_fluid
+    return(object)
+  }
+)
+################################################################################
 #' Reforge FLS-class object.
 #' @param object FLS-class object.
 #' @param length  New body length resize.
@@ -407,82 +614,71 @@ setMethod(
            radius = NULL,
            length_radius_ratio_constant = TRUE,
            n_segments = NULL) {
-    ###################################################################
-    # Parse shape =====================================================
+    ############################################################################
+    # Validation ===============================================================
+    if (is.null(length) && is.null(radius) && is.null(n_segments)) {
+      stop(
+        "Must specify at least one of: length, radius, or n_segments.",
+        call. = FALSE
+      )
+    }
+    ############################################################################
+    # Extract shape and body ===================================================
     shape <- acousticTS::extract(object, "shape_parameters")
-    # Parse body ======================================================
-    body <- acousticTS::extract(object, "body")
-    # Determine rescaling factors =====================================
-    # Determine new number of cylinders +++++++++++++++++++++++++++++++
+    body  <- acousticTS::extract(object, "body")
+    # Working copies updated progressively so later blocks always see
+    # the current (possibly resampled / scaled) state.
+    rpos  <- body$rpos
+    radii <- body$radius
+    ############################################################################
+    # Resample to new segment count ============================================
+    # .resample_rpos_rows() is defined in utilities.R
     if (!is.null(n_segments)) {
-      x_new <- seq(
-        from = body$rpos[1, 1],
-        to = body$rpos[1, shape$n_segments + 1],
-        length.out = n_segments + 1
-      )
-      rpos_new <- rbind(
-        x_new,
-        t(
-          vapply(2:nrow(body$rpos),
-            FUN = function(i) {
-              stats::approx(
-                x = body$rpos[1, ],
-                y = body$rpos[i, ],
-                xout = x_new
-              )$y
-            },
-            FUN.VALUE = numeric(length(x_new))
-          )
-        )
-      )
-      radius_new <- stats::approx(
-        x = body$rpos[1, ],
-        y = body$radius,
-        xout = x_new
-      )$y
-      # Update metadata +++++++++++++++++++++++++++++++++++++++++++++++
-      methods::slot(object, "body")$rpos <- rpos_new
-      methods::slot(object, "body")$radius <- radius_new
+      n_new  <- as.integer(n_segments) + 1L
+      x_new  <- seq(rpos[1, 1], rpos[1, ncol(rpos)], length.out = n_new)
+      radii  <- stats::approx(x = rpos[1, ], y = radii, xout = x_new)$y
+      rpos   <- .resample_rpos_rows(rpos, n_new)
       methods::slot(object, "shape_parameters")$n_segments <- n_segments
     }
-    # # Update material properties if needed ============================
-    # if ( length( body$g ) > 1 ) {
-    #  test = approx( x = body$rpos[ 1, ] ,
-    #          y = c( body$g, body$g[ length( body$g ) ] ) ,
-    #                 xout = x_new )$y
-    # }
-    # Determine new length ++++++++++++++++++++++++++++++++++++++++++++
+    ############################################################################
+    # Rescale length ===========================================================
     if (!is.null(length)) {
       new_scale <- length / shape$length
-      matrix_rescale <- diag(
-        x = 1,
-        nrow = nrow(body$rpos),
-        ncol = nrow(body$rpos)
-      ) * new_scale
-      rpos_new <- t(t(body$rpos) %*% matrix_rescale)
-      # New radius based on constant ratio or adjust ++++++++++++++++++
       if (length_radius_ratio_constant) {
-        if (missing(radius)) {
-          radius_new <- body$radius * new_scale
+        # Isometric: scale all axes (x, y/z centerline path, radius rows).
+        rpos  <- rpos * new_scale
+        # Radius vector: follow length scale unless caller also supplied radius.
+        if (is.null(radius)) {
+          radii <- radii * new_scale
         } else {
-          radius_rescale <- radius / shape$radius
-          radius_new <- body$radius * radius_rescale
+          r_scale <- radius / shape$radius
+          radii   <- radii * r_scale
+          # Correct the already-scaled radius rows in rpos so they match.
+          correction <- r_scale / new_scale
+          if (nrow(rpos) >= 4)
+            rpos[seq(4L, nrow(rpos)), ] <- rpos[seq(4L, nrow(rpos)), ] * correction
         }
-        methods::slot(object, "body")$radius <- radius_new
-        methods::slot(object, "shape_parameters")$radius <- max(radius_new)
+        methods::slot(object, "shape_parameters")$radius <- max(radii)
+      } else {
+        # Length-only: move the x-axis while leaving the radius rows intact.
+        rpos[1L, ] <- rpos[1L, ] * new_scale
       }
-      # Update metadata +++++++++++++++++++++++++++++++++++++++++++++++
-      methods::slot(object, "body")$rpos <- rpos_new
-      methods::slot(object, "shape_parameters")$length <- max(rpos_new[1, ])
+      methods::slot(object, "shape_parameters")$length <-
+        rpos[1L, ncol(rpos)] - rpos[1L, 1L]
     }
-    # Determine new radius ++++++++++++++++++++++++++++++++++++++++++++
-    if (!is.null(radius)) {
-      new_scale <- radius / shape$radius
-      vector_rescale <- body$radius * new_scale
-      methods::slot(object, "body")$radius <- vector_rescale
-      methods::slot(object, "shape_parameters")$radius <- max(vector_rescale)
+    ############################################################################
+    # Rescale radius (standalone — only when length was not specified) =========
+    if (!is.null(radius) && is.null(length)) {
+      r_scale <- radius / shape$radius
+      radii   <- radii * r_scale
+      if (nrow(rpos) >= 4)
+        rpos[seq(4L, nrow(rpos)), ] <- rpos[seq(4L, nrow(rpos)), ] * r_scale
+      methods::slot(object, "shape_parameters")$radius <- max(radii)
     }
-    # Return object ===================================================
+    ############################################################################
+    # Flush working copies to slots ============================================
+    methods::slot(object, "body")$rpos   <- rpos
+    methods::slot(object, "body")$radius <- radii
     return(object)
   }
 )
@@ -504,6 +700,9 @@ setMethod(
       "isometric_body", "isometric_swimbladder", "maintain_ratio",
       "n_segments_body", "n_segments_swimbladder"
     ),
+    "GAS" = c("scale", "radius_target", "n_segments"),
+    "CAL" = c("scale", "diameter_target", "n_segments"),
+    "ESS" = c("scale", "radius_target", "shell_thickness", "n_segments"),
     character(0) # Default for unknown classes
   )
 }

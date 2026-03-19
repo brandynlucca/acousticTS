@@ -4,6 +4,11 @@
 ################################################################################
 # Methods for "show(...)" for each scattering class object
 ################################################################################
+# Safe display helper: returns "NA" string for NULL/all-NA vectors
+.show_mean <- function(x) {
+  if (is.null(x) || all(is.na(x))) return("NA")
+  round(mean(x, na.rm = TRUE), 4)
+}
 ################################################################################
 #' Generic function for show(...) for different scatterers.
 #' @param object Scattering object.
@@ -75,10 +80,10 @@ fls_show <- function(object) {
     " L/a ratio:",
     paste0(round(shape$length / shape$radius, 1)), "\n",
     " Taper order:",
-    paste0(shape$taper_order), "\n",
+    paste0(shape$taper_order %||% "N/A"), "\n",
     "Material properties:\n",
-    paste0(" g: ", round(mean(body$g), 4)), "\n",
-    paste0(" h: ", round(mean(body$h), 4)), "\n",
+    paste0(" g: ", .show_mean(body$g)), "\n",
+    paste0(" h: ", .show_mean(body$h)), "\n",
     "Body orientation (relative to transducer face/axis):",
     paste0(
       round(body$theta, 3),
@@ -125,8 +130,8 @@ gas_show <- function(object) {
       shape$radius_units
     ), "\n",
     "Material properties:\n",
-    paste0(" g: ", round(mean(body$g), 4)), "\n",
-    paste0(" h: ", round(mean(body$h), 4)), "\n"
+    paste0(" g: ", .show_mean(body$g)), "\n",
+    paste0(" h: ", .show_mean(body$h)), "\n"
   )
 }
 #' show(...) for SBF-class objects.
@@ -157,7 +162,7 @@ sbf_show <- function(object) {
   # Print object summary information ===========================================
   cat(
     paste0(methods::is(object)[[1]], "-object"), "\n",
-    " Fluid-like scatterer \n ",
+    " Swimbladdered fish (SBF) \n ",
     " ID:",
     paste0(meta$ID), "\n",
     "Body dimensions:\n",
@@ -195,17 +200,14 @@ sbf_show <- function(object) {
       shape$length_units
     ), "\n",
     "Body material properties:\n",
-    paste0(" Density: ", round(mean(body$density), 4)),
+    paste0(" Density: ", .show_mean(body$density)),
     "kg m^-3", "|",
-    paste0("Sound speed: ", round(mean(body$sound_speed), 4)),
+    paste0("Sound speed: ", .show_mean(body$sound_speed)),
     "m s^-1", "\n",
     "Bladder fluid material properties:\n",
-    paste0(" Density: ", round(mean(bladder$density), 4)),
+    paste0(" Density: ", .show_mean(bladder$density)),
     "kg m^-3", "|",
-    paste0("Sound speed: ", round(
-      mean(bladder$sound_speed),
-      4
-    )),
+    paste0("Sound speed: ", .show_mean(bladder$sound_speed)),
     "m s^-1", "\n",
     "Body orientation (relative to transducer face/axis):",
     paste0(
@@ -387,7 +389,7 @@ ess_show <- function(object) {
     "    Diameter:", paste0(
       shape$fluid$diameter,
       " ",
-      shape$shell$length_units
+      shape$fluid$length_units
     ), " \n",
     "Propagation direction of the incident sound wave:",
     paste0(round(shell$theta, 3), " radians")

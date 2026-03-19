@@ -3,6 +3,41 @@
 # Validation support functions
 ################################################################################
 ################################################################################
+#' Validate a named target-dimension vector used in reforge operations
+#'
+#' Internal helper that checks \code{target} is a named numeric vector whose
+#' names are drawn from \code{valid_dims}.
+#'
+#' @param target Named numeric vector of target dimensions (e.g. length, width).
+#' @param target_name String used in error messages to identify the argument.
+#' @param valid_dims Character vector of acceptable dimension names.
+#' @return \code{target} unchanged, or \code{NULL} if \code{target} is
+#'   \code{NULL}.
+#' @keywords internal
+#' @noRd
+.validate_dimensions_target <- function(target, target_name, valid_dims) {
+  if (is.null(target)) return(NULL)
+  if (!is.numeric(target)) {
+    stop(paste0("'", target_name, "' must be numeric."), call. = FALSE)
+  }
+  if (is.null(names(target)) || any(names(target) == "")) {
+    stop(paste0("'", target_name, "' must be a named numeric vector."),
+         call. = FALSE)
+  }
+  invalid <- setdiff(names(target), valid_dims)
+  if (length(invalid) > 0) {
+    stop(
+      sprintf(
+        "'%s' has invalid dimension names: %s. Valid names are: %s.",
+        target_name,
+        paste0("'", invalid, "'", collapse = ", "),
+        paste0("'", valid_dims, "'", collapse = ", ")
+      ),
+      call. = FALSE
+    )
+  }
+  target
+}
 #' Validate dimensional parameter (target or scale)
 #'
 #' Internal helper to validate named numeric vectors used in reforge operations.

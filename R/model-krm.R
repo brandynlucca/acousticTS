@@ -364,32 +364,23 @@ KRM <- function(object) {
   T12T21 <- 1 - R12 * R12
   # Sum across body position vector ============================================
   rpos <- switch(scatterer_type,
-                 FLS = rbind(
-                   x = body$rpos[1, ],
-                   w = c(
-                     body$radius[2],
-                     body$radius[2:(length(body$radius) - 1)],
-                     body$radius[(length(body$radius)) - 1]
-                   ) * 2,
-                   zU = c(
-                     body$radius[2],
-                     body$radius[2:(length(body$radius) - 1)],
-                     body$radius[(length(body$radius)) - 1]
-                   ),
-                   zL = -c(
-                     body$radius[2],
-                     body$radius[2:(length(body$radius) - 1)],
-                     body$radius[(length(body$radius)) - 1]
-                   )
-                 ),
+                 FLS = if ("w" %in% rownames(body$rpos)) {
+                   # Arbitrary shape: body$rpos already has x, w, zU, zL rows
+                   body$rpos
+                 } else {
+                   # Analytical shape (cylinder, prolate spheroid): build from
+                   # body$radius, shifting away the zero-cap at the first point
+                   n_r <- length(body$radius)
+                   r <- c(body$radius[2],
+                          body$radius[2:(n_r - 1)],
+                          body$radius[n_r - 1])
+                   rbind(x = body$rpos[1, ], w = r * 2, zU = r, zL = -r)
+                 },
                  SBF = body$rpos
   )
   body_rpos_sum <- along_sum(rpos, model$parameters$ns_b)
   # Approximate radius of body cylinders =======================================
-  a_body <- switch(scatterer_type,
-                   FLS = body_rpos_sum[2, ] / 4,
-                   SBF = body_rpos_sum[2, ] / 4
-  )
+  a_body <- body_rpos_sum[2, ] / 4
   # Combine wavenumber (k) and radii to calculate "ka" =========================
   ka_body <- matrix(
     data = rep(a_body,
@@ -399,31 +390,21 @@ KRM <- function(object) {
     nrow = length(model$parameters$acoustics$k_b)
   ) * model$parameters$acoustics$k_b
   # Convert c-z coordinates to required u-v rotated coordinates ================
-  uv_body <- acousticTS::body_rotation(
+  uv_body <- body_rotation(
     body_rpos_sum,
     body$rpos,
     body$theta,
     length(model$parameters$acoustics$k_sw)
   )
   # Calculate body empirical phase shift function ==============================
-  body_dorsal_sum <- switch(scatterer_type,
-                            FLS = matrix(
-                              data = rep(
-                                body_rpos_sum[3, ],
-                                each = length(model$parameters$acoustics$k_sw)
-                              ),
-                              ncol = length(body_rpos_sum[3, ]),
-                              nrow = length(model$parameters$acoustics$k_sw)
-                            ) / 2,
-                            SBF = matrix(
-                              data = rep(
-                                body_rpos_sum[3, ],
-                                each = length(model$parameters$acoustics$k_sw)
-                              ),
-                              ncol = length(body_rpos_sum[3, ]),
-                              nrow = length(model$parameters$acoustics$k_sw)
-                            ) / 2
-  )
+  body_dorsal_sum <- matrix(
+    data = rep(
+      body_rpos_sum[3, ],
+      each = length(model$parameters$acoustics$k_sw)
+    ),
+    ncol = length(body_rpos_sum[3, ]),
+    nrow = length(model$parameters$acoustics$k_sw)
+  ) / 2
   Psi_b <- -pi * model$parameters$acoustics$k_b * body_dorsal_sum /
     (2 * (model$parameters$acoustics$k_b * body_dorsal_sum + 0.4))
   # Estimate natural log function (phase, etc.) ================================
@@ -451,12 +432,12 @@ KRM <- function(object) {
     # Extract bladder parameters ===============================================
     bladder <- acousticTS::extract(object, "bladder")
     # Calculate reflection coefficient for bladder =============================
-    R23 <- acousticTS::reflection_coefficient(
+    R23 <- reflection_coefficient(
       body,
       bladder
     )
     # Sum across body/swimbladder position vectors =============================
-    bladder_rpos_sum <- acousticTS::along_sum(
+    bladder_rpos_sum <- along_sum(
       bladder$rpos,
       model$parameters$ns_sb
     )
@@ -473,7 +454,7 @@ KRM <- function(object) {
     # Calculate empirical phase shift for a fluid cylinder, Psi_p ==============
     Psi_p <- ka_bladder / (40 + ka_bladder) - 1.05
     # Convert x-z coordinates to requisite u-v rotated coordinates =============
-    uv_bladder <- acousticTS::bladder_rotation(
+    uv_bladder <- bladder_rotation(
       bladder_rpos_sum,
       bladder$rpos,
       bladder$theta,

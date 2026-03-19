@@ -126,27 +126,17 @@ trcm_initialize <- function(object,
     body_params$radius_curvature <- NA
   }
   # Fill out material properties ===============================================
-  body_params$h <- ifelse(
-    "h" %in% names(body),
-    body$h,
-    ifelse("sound_speed" %in% names(body),
-           body$sound_speed / medium_params$sound_speed,
-           NA)
-  )
-  body_params$g <- ifelse(
-    "g" %in% names(body),
-    body$g,
-    ifelse("density" %in% names(body),
-           body$density / medium_params$density,
-           NA)
-  )
+  body_params$h <- body$h %||%
+    if (!is.null(body$sound_speed)) body$sound_speed / medium_params$sound_speed else NA
+  body_params$g <- body$g %||%
+    if (!is.null(body$density)) body$density / medium_params$density else NA
   # Define model parameters ====================================================
   model_params <- list(
     acoustics = data.frame(
       frequency = frequency,
       lambda = sound_speed_sw / frequency,
       k_sw = acousticTS::wavenumber(frequency, sound_speed_sw),
-      k_b = acousticTS::wavenumber(frequency, sound_speed_sw * body$h)
+      k_b = acousticTS::wavenumber(frequency, sound_speed_sw * body_params$h)
     ),
     stationary_phase = stationary_phase
   )
@@ -182,7 +172,7 @@ trcm_initialize <- function(object,
   # Compute the linear scattering length, f_bs =================================
   (-1i / (2 * sqrt(pi))) * exp(1i * pi / 4) *
     exp(-2i * k1 * a * cos(theta_shift)) * l * sqrt(k1 * a * cos(theta_shift)) *
-    r * sinc_directivity * I
+    r * sinc_directivity * I_term
 }
 
 
@@ -192,38 +182,39 @@ trcm_initialize <- function(object,
   # Stationary phase correction ================================================
   if (stationary_phase) {
     # Update the interference term +++++++++++++++++++++++++++++++++++++++++++++
-    I_term <- 1 - I * exp(4i * k2 * a)
+    I_term <- 1 - I * exp(4i * k2a)
     # Simplified equivalent bent cylinder length +++++++++++++++++++++++++++++++
     return(
       sqrt(rho_c * l * lambda / 2) * exp(1i * pi / 4) *
-        .trcm_straight(k1, l, a, r, I_term, 0) / l
+        .trcm_straight(k1, k2a, l, a, r, I_term, 0) / l
     )
-  } else {
-    # Update the interference term +++++++++++++++++++++++++++++++++++++++++++++
-    I_term <- 1 - I * exp(4i * k2a * cos(theta_shift))
   }
   # Get the maximum curvature ==================================================
-  rc <- rho_c * l
   gamma_max <- l / (2 * rho_c)
+  z_max <- rho_c * (1 - cos(gamma_max))
+  A <- z_max / a
+  B <- l / a
   # Integrate over curvature to get the equivalent length ======================
-  integrand <- function(gamma, k1, rc) {
-    exp(1i * k1 * rc * gamma^2)
+  integrand <- function(x, k1, A, B, a) {
+    exp(1i * 8 * k1 * A * x^2 / (B^2 * a))
   }
   # Integration is done over all k1 ++++++++++++++++++++++++++++++++++++++++++++
-  lebc_scalar <- function(k1, rc, lower, upper) {
-    real_part <- integrate(function(x) Re(integrand(x, k1, rc)),
+  lebc_scalar <- function(k1, A, B, a, lower, upper) {
+    real_part <- integrate(function(x) Re(integrand(x, k1, A, B, a)),
                            lower, upper)$value
-    imag_part <- integrate(function(x) Im(integrand(x, k1, rc)),
+    imag_part <- integrate(function(x) Im(integrand(x, k1, A, B, a)),
                            lower, upper)$value
     real_part + 1i * imag_part
   }
   lebc <- vapply(k1, lebc_scalar,
                  complex(1),
-                 rc = rc,
-                 lower = -gamma_max,
-                 upper = gamma_max)
+                 A = A,
+                 B = B,
+                 a = a,
+                 lower = -l / 2,
+                 upper = l / 2)
   # Compute the linear scattering strength, f_bs ===============================
-  lebc * .trcm_straight(k1, l, a, r, I_term, theta_shift) / l
+  lebc * .trcm_straight(k1, k2a, l, a, r, I, theta_shift) / l
 }
 
 TRCM <- function(object) {

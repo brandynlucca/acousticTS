@@ -252,20 +252,10 @@ psms_initialize <- function(object,
   # Parse body =================================================================
   body <- extract(object, "body")
   # Derive contrasts from absolute properties when needed ======================
-  body_h <- if (!is.null(body$h)) {
-    body$h
-  } else if (!is.null(body$sound_speed)) {
-    body$sound_speed / sound_speed_sw
-  } else {
-    NA
-  }
-  body_g <- if (!is.null(body$g)) {
-    body$g
-  } else if (!is.null(body$density)) {
-    body$density / density_sw
-  } else {
-    NA
-  }
+  body_h <- body$h %||%
+    if (!is.null(body$sound_speed)) body$sound_speed / sound_speed_sw else NA
+  body_g <- body$g %||%
+    if (!is.null(body$density)) body$density / density_sw else NA
   body$h <- body_h
   body$g <- body_g
   # Define medium parameters ===================================================

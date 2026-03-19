@@ -425,9 +425,19 @@ fls_generate <- function(shape = "arbitrary",
   # Define shape parameters ==================================================
   pos_mat <- acousticTS::extract(shape_input, "position_matrix")
   shape_params <- acousticTS::extract(shape_input, "shape_parameters")
+  # Determine representative radius: prefer explicit radius, fall back to zU
+  .fls_max_radius <- if (!all(is.na(shape_params$radius))) {
+    max(shape_params$radius, na.rm = TRUE)
+  } else if ("zU" %in% colnames(pos_mat) && "zL" %in% colnames(pos_mat)) {
+    max(pos_mat[, "zU"] - pos_mat[, "zL"], na.rm = TRUE)
+  } else if ("w" %in% colnames(pos_mat)) {
+    max(pos_mat[, "w"], na.rm = TRUE) / 2
+  } else {
+    NA_real_
+  }
   shape_parameters <- list(
     length = max(pos_mat[, 1], na.rm = TRUE) - min(pos_mat[, 1], na.rm = TRUE),
-    radius = max(shape_params$radius, na.rm = TRUE),
+    radius = .fls_max_radius,
     n_segments = length(pos_mat[, 1]) - 1,
     length_units = length_units,
     theta_units = theta_units

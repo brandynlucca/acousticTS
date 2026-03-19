@@ -234,49 +234,12 @@ essms_initialize <- function(object,
     )
   )
   # Initialize lists for fluid and shell =======================================
-  shell_params <- list()
-  fluid_params <- list()
   # Establish the correct material properties ==================================
-  # Shell ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  shell_params$sound_speed <- ifelse("sound_speed" %in% names(shell),
-                                     shell$sound_speed,
-                                     ifelse("h" %in% names(shell),
-                                            shell$h * sound_speed_sw,
-                                            NA
-                                     )
-  )
-  shell_params$density <- ifelse("density" %in% names(shell),
-                                 shell$density,
-                                 ifelse("g" %in% names(shell),
-                                        shell$g * density_sw,
-                                        NA
-                                 )
-  )
-  shell_params$nu <- ifelse("nu" %in% names(shell), shell$nu, NA)
-  shell_params$K <- ifelse("K" %in% names(shell), shell$K, NA)
-  shell_params$E <- ifelse("E" %in% names(shell), shell$E, NA)
-  shell_params$G <- ifelse("G" %in% names(shell), shell$G, NA)
-  shell_params$lambda <- ifelse("lambda" %in% names(shell),
-                                shell$lambda, NA
-  )
-  # Fluid ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  fluid_params$sound_speed <- ifelse("sound_speed" %in% names(fluid),
-                                     fluid$sound_speed,
-                                     ifelse("h" %in% names(fluid),
-                                            fluid$h * sound_speed_sw,
-                                            NA
-                                     )
-  )
-  fluid_params$density <- ifelse("density" %in% names(fluid),
-                                 fluid$density,
-                                 ifelse("g" %in% names(fluid),
-                                        fluid$g * density_sw,
-                                        NA
-                                 )
-  )
+  shell_params <- .extract_material_props(shell, sound_speed_sw, density_sw)
+  fluid_params <- .extract_material_props(fluid, sound_speed_sw, density_sw)
   # Add morphometrics ==========================================================
   # Shell ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  shell_params$radius <- shell$radius
+  shell_params$radius          <- shell$radius
   shell_params$shell_thickness <- shell$shell_thickness
   # Fluid ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   fluid_params$radius <- fluid$radius

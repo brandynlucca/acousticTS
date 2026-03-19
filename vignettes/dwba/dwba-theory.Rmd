@@ -17,7 +17,7 @@ vignette: >
 
 # Introduction
 
-The distorted wave Born approximation (DWBA) is a first-order scattering model for weakly scattering fluid-like bodies. It is most useful when the material contrasts are small enough that the total acoustic field inside the body remains close to the incident field, but the geometry is sufficiently extended that phase accumulation along the body cannot be ignored[^1,^2]. In that regime, a purely local approximation is too crude, while a full boundary-value solution is often unnecessary or unavailable.
+The distorted wave Born approximation (DWBA) is a first-order scattering model for weakly scattering fluid-like bodies. It is most useful when the material contrasts are small enough that the total acoustic field inside the body remains close to the incident field, but the geometry is sufficiently extended that phase accumulation along the body cannot be ignored[^1][^2]. In that regime, a purely local approximation is too crude, while a full boundary-value solution is often unnecessary or unavailable.
 
 For elongated zooplankton and similar organisms, the most important consequence of the DWBA is that a three-dimensional volume scattering problem can be reduced to a one-dimensional integral along the body axis. That simplification is not an ad hoc shortcut. It follows from the weak-scattering approximation together with an elongated axisymmetric body representation.
 

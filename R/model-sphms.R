@@ -164,37 +164,16 @@ sphms_initialize <- function(object,
   } else {
     acousticTS::extract(object, "body")
   }
-  if (!is.null(exterior$g)) {
-    g_exterior <- exterior$g
-  } else if (!is.null(exterior$density)) {
-    g_exterior <- exterior$density / density_sw
-  } else {
-    g_exterior <- NA_real_
-  }
-  if (!is.null(exterior$h)) {
-    h_exterior <- exterior$h
-  } else if (!is.null(exterior$sound_speed)) {
-    h_exterior <- exterior$sound_speed / sound_speed_sw
-  } else {
-    h_exterior <- NA_real_
-  }
+  g_exterior <- exterior$g %||%
+    if (!is.null(exterior$density)) exterior$density / density_sw else NA_real_
+  h_exterior <- exterior$h %||%
+    if (!is.null(exterior$sound_speed)) exterior$sound_speed / sound_speed_sw else NA_real_
   # Material properties: body/shell-to-seawater interface ++++++++++++++++++++++
   if (class(object) == "ESS") {
-    if ("density" %in% names(exterior)) {
-      g21 <- exterior$density / density_sw
-    } else if (!is.null(exterior$g)) {
-      g21 <- exterior$g
-    } else {
-      g21 <- NA_real_
-    }
-
-    if ("sound_speed" %in% names(exterior)) {
-      h21 <- exterior$sound_speed / sound_speed_sw
-    } else if (!is.null(exterior$h)) {
-      h21 <- exterior$h
-    } else {
-      h21 <- NA_real_
-    }
+    g21 <- if (!is.null(exterior$density)) exterior$density / density_sw else
+      exterior$g %||% NA_real_
+    h21 <- if (!is.null(exterior$sound_speed)) exterior$sound_speed / sound_speed_sw else
+      exterior$h %||% NA_real_
   } else {
     g21 <- g_exterior
     h21 <- h_exterior
@@ -202,43 +181,20 @@ sphms_initialize <- function(object,
   # Material properties: fluid-to-shell interface ++++++++++++++++++++++++++++++
   if (is(object, "ESS")) {
     fluid <- acousticTS::extract(object, "fluid")
-
-    if ("density" %in% names(fluid)) {
-      g32 <- fluid$density / (g21 * density_sw)
-    } else if (!is.null(fluid$g)) {
-      g32 <- (fluid$g * density_sw) / (g21 * density_sw)
-    } else {
-      g32 <- NA_real_
-    }
-
-    if ("sound_speed" %in% names(fluid)) {
-      h32 <- fluid$sound_speed / (h21 * sound_speed_sw)
-    } else if (!is.null(fluid$h)) {
-      h32 <- (fluid$h * sound_speed_sw) / (h21 * sound_speed_sw)
-    } else {
-      h32 <- NA_real_
-    }
+    g32 <- if (!is.null(fluid$density)) fluid$density / (g21 * density_sw) else
+      if (!is.null(fluid$g)) fluid$g / g21 else NA_real_
+    h32 <- if (!is.null(fluid$sound_speed)) fluid$sound_speed / (h21 * sound_speed_sw) else
+      if (!is.null(fluid$h)) fluid$h / h21 else NA_real_
   } else {
     g32 <- NA_real_
     h32 <- NA_real_
   }
   # Material properties: fluid-to-seawater interface +++++++++++++++++++++++++++
   if (is(object, "ESS")) {
-    if ("density" %in% names(fluid)) {
-      g31 <- fluid$density / density_sw
-    } else if (!is.null(fluid$g)) {
-      g31 <- fluid$g
-    } else {
-      g31 <- NA_real_
-    }
-
-    if ("sound_speed" %in% names(fluid)) {
-      h31 <- fluid$sound_speed / sound_speed_sw
-    } else if (!is.null(fluid$h)) {
-      h31 <- fluid$h
-    } else {
-      h31 <- NA_real_
-    }
+    g31 <- if (!is.null(fluid$density)) fluid$density / density_sw else
+      fluid$g %||% NA_real_
+    h31 <- if (!is.null(fluid$sound_speed)) fluid$sound_speed / sound_speed_sw else
+      fluid$h %||% NA_real_
   } else {
     g31 <- g21
     h31 <- h21

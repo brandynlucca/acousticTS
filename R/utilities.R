@@ -219,6 +219,57 @@
 
 ################################################################################
 ################################################################################
+# Position matrix resampling utilities
+################################################################################
+################################################################################
+#' Resample a column-major position matrix to a new number of points
+#'
+#' Interpolates all non-x columns of a position matrix stored as
+#' n_points x ncols (column 1 = x-axis) along the x-axis via linear
+#' approximation.  Used by the GAS, CAL, and ESS reforge methods.
+#'
+#' @param rpos Numeric matrix (n_points x ncol), column 1 is the x-axis.
+#' @param n_new Target number of rows in the output matrix.
+#' @return Resampled numeric matrix with dimensions n_new x ncol.
+#' @keywords internal
+#' @noRd
+.resample_rpos <- function(rpos, n_new) {
+  x_old    <- rpos[, 1]
+  x_new    <- seq(x_old[1], x_old[nrow(rpos)], length.out = n_new)
+  rpos_out <- matrix(0, nrow = n_new, ncol = ncol(rpos))
+  if (!is.null(colnames(rpos))) colnames(rpos_out) <- colnames(rpos)
+  rpos_out[, 1] <- x_new
+  for (j in seq_len(ncol(rpos))[-1]) {
+    rpos_out[, j] <- stats::approx(x_old, rpos[, j], xout = x_new)$y
+  }
+  rpos_out
+}
+
+#' Resample a row-major position matrix to a new number of points
+#'
+#' Interpolates all non-x rows of a position matrix stored as
+#' nrows x n_points (row 1 = x-axis) along the x-axis via linear
+#' approximation.  Used by the FLS reforge method.
+#'
+#' @param rpos Numeric matrix (nrow x n_points), row 1 is the x-axis.
+#' @param n_new Target number of columns in the output matrix.
+#' @return Resampled numeric matrix with dimensions nrow x n_new.
+#' @keywords internal
+#' @noRd
+.resample_rpos_rows <- function(rpos, n_new) {
+  x_new    <- seq(rpos[1, 1], rpos[1, ncol(rpos)], length.out = n_new)
+  rpos_out <- rbind(
+    x_new,
+    t(vapply(2:nrow(rpos), function(i) {
+      stats::approx(rpos[1, ], rpos[i, ], xout = x_new)$y
+    }, FUN.VALUE = numeric(n_new)))
+  )
+  if (!is.null(rownames(rpos))) rownames(rpos_out) <- rownames(rpos)
+  rpos_out
+}
+
+################################################################################
+################################################################################
 # Accessor functions
 ################################################################################
 ################################################################################
@@ -248,12 +299,19 @@ extract <- function(object, feature) {
   # provided a vector
   for (sub_layer in feature) {
     accum_feature <- c(accum_feature, sub_layer)
-    if (is(layer, "Scatterer")) {
+    if (methods::is(layer, "Scatterer")) {
       # Scatterer object +++++++++++++++++++++++++++++++++++++++++++++++++++++++
       if (!methods::.hasSlot(layer, sub_layer)) {
         stop(sprintf("Scattering object does not have slot '%s'.", sub_layer))
       }
-      
+
+      layer <- methods::slot(layer, sub_layer)
+    } else if (methods::is(layer, "Shape")) {
+      # Shape object +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      if (!methods::.hasSlot(layer, sub_layer)) {
+        stop(sprintf("Shape object does not have slot '%s'.", sub_layer))
+      }
+
       layer <- methods::slot(layer, sub_layer)
     } else if (is.list(layer)) {
       # List +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -318,7 +376,7 @@ extract <- function(object, feature) {
 #' @export
 brake <- function(object, radius_curvature, mode = "ratio") {
   # Check object type ==========================================================
-  class_type <- typeof(input)
+  class_type <- typeof(object)
   # Bend shape =================================================================
   output <- switch(class_type,
     list = brake_df(object, radius_curvature, mode),
@@ -442,7 +500,7 @@ brake_df <- function(body_df, radius_curvature, mode = "ratio") {
 #' @noRd
 brake_scatterer <- function(object, radius_curvature, mode = "ratio") {
   # Extract object body shape ==================================================
-  body <- extract(object, "body")
+  body <- acousticTS::extract(object, "body")
   # Pull in value for use ======================================================
   body_curved <- brake_df(body, radius_curvature, mode)
   # Update object ==============================================================

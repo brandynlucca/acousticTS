@@ -35,45 +35,27 @@ plot.Scatterer <- function(x,
   # Switch to sub-class-specific plotting method ===============================
   switch(sc_type,
          CAL = cal_plot(
-           x, type, nudge_y, nudge_x, aspect_ratio, x_units, y_units, ...
+           object = x, type = type, nudge_y = nudge_y, nudge_x = nudge_x,
+           x_units = x_units, ...
          ),
          ESS = ess_plot(
-           x, type, nudge_y, nudge_x, aspect_ratio, x_units, y_units, ...
+           object = x, type = type, nudge_y = nudge_y, nudge_x = nudge_x,
+           x_units = x_units, y_units = y_units, ...
          ),
          SBF = sbf_plot(
-           x, type, nudge_y, nudge_x, aspect_ratio, x_units, y_units, ...
+           object = x, type = type, nudge_y = nudge_y, nudge_x = nudge_x,
+           aspect_ratio = aspect_ratio, x_units = x_units, y_units = y_units, ...
          ),
          FLS = fls_plot(
-           x, type, nudge_y, nudge_x, aspect_ratio, x_units, y_units, ...
+           object = x, type = type, nudge_y = nudge_y, nudge_x = nudge_x,
+           aspect_ratio = aspect_ratio, x_units = x_units, y_units = y_units, ...
          ),
          GAS = gas_plot(
-           x, type, nudge_y, nudge_x, aspect_ratio, x_units, y_units, ...
+           object = x, type = type, nudge_y = nudge_y, nudge_x = nudge_x,
+           x_units = x_units, y_units = y_units, ...
          )
   )
 }
-# setMethod(
-#   f = "plot",
-#   signature = c(x = "Scatterer", y="missing"),
-#   definition = function(x,
-#                         y,
-#                         type = "shape",
-#                         nudge_y = 1.1,
-#                         nudge_x = 1.05,
-#                         aspect_ratio = "manual",
-#                         x_units = "frequency",
-#                         y_units = "TS", ...) {
-#     # Detect scatterer type ============================================
-#     sc_type <- class(x)
-# 
-#     switch(sc_type,
-#       CAL = cal_plot(x, type, nudge_y, nudge_x, x_units, ...),
-#       ESS = ess_plot(x, type, nudge_y, nudge_x, x_units, ...),
-#       SBF = sbf_plot(x, type, nudge_y, nudge_x, x_units, ...),
-#       FLS = fls_plot(x, type, nudge_y, nudge_x, aspect_ratio, x_units, y_units),
-#       GAS = gas_plot(x, type, nudge_y, nudge_x, x_units, y_units, ...)
-#     )
-#   }
-# )
 ################################################################################
 #' Base plotting color palette
 #' @description
@@ -127,7 +109,7 @@ cal_plot <- function(object,
       y = -along_radius,
       type = "l",
       ylab = "Semi-minor diameter (m)",
-      xlab = "Semi-major dimaeter (m)",
+      xlab = "Semi-major diameter (m)",
       lwd = 4,
       cex.lab = 1.2,
       cex.axis = 1.2,
@@ -443,7 +425,7 @@ fls_plot <- function(object,
       "body"
     )
     # Extract generic shape information ========================================
-    shape_params <- extract(object, "shape_parameters")
+    shape_params <- acousticTS::extract(object, "shape_parameters")
     # Define plot margins ======================================================
     graphics::par(
       ask = FALSE,
@@ -455,8 +437,13 @@ fls_plot <- function(object,
     # Get radius ===============================================================
     if ("radius_shape" %in% names(shape_params)) {
       radius <- shape_params$radius_shape
-    } else {
+    } else if (!is.null(body$radius) && !all(is.na(body$radius))) {
       radius <- body$radius
+    } else if ("zU" %in% rownames(body$rpos)) {
+      # Arbitrary shape with dorsal/ventral rows: use zU as half-thickness
+      radius <- body$rpos["zU", ]
+    } else {
+      radius <- rep(0, ncol(body$rpos))
     }
     # Sort index ===============================================================
     if (body$rpos[1, 1] > body$rpos[1, ncol(body$rpos)]) {
@@ -516,10 +503,7 @@ fls_plot <- function(object,
     #                     lty = 3 ,
     #                     lwd = 1.25 )
     # Draw angled "cylinders" for each segment =================================
-    n_segments <- acousticTS::extract(
-      object,
-      "shape_parameters"
-    )$n_segments
+    n_segments <- shape_params$n_segments
     # count <- 0
     # rc <- c()
     # ---- Iterate =============================================================
@@ -691,6 +675,12 @@ gas_plot <- function(object,
   if (type == "shape") {
     # Extract body shape information ===========================================
     body <- extract(object, "body")
+    shape <- acousticTS::extract(object, "shape_parameters")
+    # Along-semimajor radii (same geometric approach as cal_plot) ==============
+    along_radius <- sqrt(
+      shape$radius^2 - (body$rpos[, 1] - shape$radius) *
+        (body$rpos[, 1] - shape$radius)
+    )
     # Define plot margins ======================================================
     graphics::par(
       ask = FALSE,
@@ -700,22 +690,22 @@ gas_plot <- function(object,
     # Begin plotting ===========================================================
     plot(
       x = body$rpos[, 1],
-      y = body$rpos[, 2],
+      y = along_radius,
       type = "l",
-      ylab = "Semi-minor diameter (m)",
-      xlab = "Semi-major dimaeter (m)",
+      ylab = "Semi-minor radius (m)",
+      xlab = "Semi-major axis (m)",
       lwd = 4,
       cex.lab = 1.2,
       cex.axis = 1.2,
       ylim = c(
-        min(body$rpos[, 3]) * (1 - (1 - nudge_y)),
-        max(-body$rpos[, 3]) * nudge_y
+        min(-along_radius) * (1 - (1 - nudge_y)),
+        max(along_radius) * nudge_y
       )
     )
     # Add lower perimeter of shape =============================================
     graphics::lines(
       x = body$rpos[, 1],
-      y = body$rpos[, 3],
+      y = -along_radius,
       lty = 1,
       lwd = 4
     )
@@ -723,8 +713,8 @@ gas_plot <- function(object,
     graphics::segments(
       x0 = body$rpos[, 1],
       x1 = body$rpos[, 1],
-      y0 = body$rpos[, 2],
-      y1 = body$rpos[, 3],
+      y0 = along_radius,
+      y1 = -along_radius,
       lty = 3,
       lwd = 1.25
     )
@@ -834,7 +824,9 @@ sbf_plot <- function(object,
                      type = "shape",
                      nudge_y = 1.05,
                      nudge_x = 1.01,
-                     x_units = "frequency") {
+                     aspect_ratio = "manual",
+                     x_units = "frequency",
+                     y_units = "TS", ...) {
   # Retrieve default plot window parameters ===================
   opar <- graphics::par(no.readonly = TRUE)
   on.exit(graphics::par(opar))
@@ -1041,47 +1033,69 @@ sbf_plot <- function(object,
       cex = 1.2
     )
   } else if (type == "model") {
-    if (length(extract(object, "model")) == 0) {
+    # Detect model selection ===================================================
+    models <- extract(object, "model")
+    model_names <- names(models)
+    if (length(model_names) == 0) {
       stop("ERROR: no model results detected in object.")
-    } else {
-      # Extract body shape information ============================
-      shape <- extract(object, "body")
-      # Extract model results ====================================
-      TS <- extract(object, "model")$KRM$TS
-      x_axis_domain <- extract(object, "model_parameters")$KRM$parameters
-      if (x_units == "frequency") {
-        x_axis <- x_axis_domain$acoustics$frequency * 1e-3
-        x_lab <- "Frequency (kHz)"
-      } else if (x_units == "k_b") {
-        x_axis <- x_axis_domain$acoustics$k_sw * max(shape$rpos[1, ])
-        x_lab <- expression(italic(k[b] * L))
-      }
-      # Plot results ===============================================
-      graphics::par(
-        ask = FALSE,
-        mar = c(4, 4.5, 1, 1)
-      )
-      plot(
-        x = x_axis,
-        y = TS,
-        type = "l",
-        xlab = x_lab,
-        ylab = expression(Target ~ strength ~ (dB ~ re. ~ 1 ~ m^2)),
-        lwd = 2.5,
-        cex.lab = 1.2,
-        cex.axis = 1.2,
-        xlim = c(
-          min(x_axis) * (1 - nudge_x),
-          max(x_axis) * (nudge_x)
-        ),
-        ylim = c(
-          min(TS) * (1 - (1 - nudge_y)),
-          max(TS) * (1 + (1 - nudge_y))
-        ),
-        xaxs = "i",
-        yaxs = "i"
-      )
     }
+    # Append model name ========================================================
+    models <- lapply(seq_along(model_names),
+      FUN = function(x) {
+        models[[x]] <- models[[x]][c("frequency", "TS")]
+        transform(models[[x]], model = model_names[x])
+      }
+    )
+    # Convert into a data.frame ================================================
+    models_df <- do.call("rbind", models)
+    # Define x-axis domain =====================================================
+    x_axis <- models_df[, which(colnames(models_df) == x_units)]
+    x_mat <- split(x_axis, models_df$model)
+    y_axis <- models_df[, which(colnames(models_df) == y_units)]
+    y_mat <- split(y_axis, models_df$model)
+    x_lab <- switch(x_units,
+      frequency = "Frequency (Hz)",
+      k_sw = expression(italic(k[sw] * a))
+    )
+    # Define plot margins ======================================================
+    graphics::par(
+      ask = FALSE,
+      mar = c(5.0, 5.5, 2.0, 3.5)
+    )
+    # Initiate plotting ========================================================
+    graphics::plot(
+      x = seq(from = min(x_axis), to = max(x_axis), length.out = 2),
+      y = seq(from = min(y_axis), to = max(y_axis), length.out = 2),
+      xlim = c(min(x_axis) * (1 - nudge_x), max(x_axis) * (nudge_x)),
+      ylim = c(
+        min(y_axis) * (1 - (1 - nudge_y)),
+        max(y_axis) * (1 + (1 - nudge_y))
+      ),
+      xlab = x_lab,
+      ylab = expression("Target" ~ "strength" ~ ("dB" ~ "re." ~ 1 ~ "m"^2)),
+      yaxs = "i", xaxs = "i", xaxt = "n", type = "n",
+      cex.axis = 1.3, cex.lab = 1.5
+    )
+    atx <- seq(
+      graphics::par("xaxp")[1], graphics::par("xaxp")[2],
+      (graphics::par("xaxp")[2] - graphics::par("xaxp")[1]) /
+        graphics::par("xaxp")[3]
+    )
+    graphics::axis(1,
+      at = atx, labels = format(atx, scientific = FALSE), cex.axis = 1.3
+    )
+    nm_names <- names(x_mat)
+    invisible(mapply(graphics::lines, x_mat, y_mat,
+      col = model_palette[seq_len(length(model_names))], lwd = 4
+    ))
+    graphics::legend("bottomright",
+      title = expression(bold("TS" ~ "model")),
+      title.adj = 0.05,
+      legend = nm_names,
+      lty = rep(1, length(nm_names)),
+      col = model_palette[seq_len(length(nm_names))],
+      cex = 1.05, lwd = 4
+    )
   }
   invisible()
 }

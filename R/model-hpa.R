@@ -252,20 +252,10 @@ hpa_initialize <- function(object,
     density = density_sw
   )
   # Derive contrasts from absolute properties when needed ======================
-  body_h <- if (!is.null(body$h)) {
-    body$h
-  } else if (!is.null(body$sound_speed)) {
-    body$sound_speed / medium_params$sound_speed
-  } else {
-    NA
-  }
-  body_g <- if (!is.null(body$g)) {
-    body$g
-  } else if (!is.null(body$density)) {
-    body$density / medium_params$density
-  } else {
-    NA
-  }
+  body_h <- body$h %||%
+    if (!is.null(body$sound_speed)) body$sound_speed / medium_params$sound_speed else NA
+  body_g <- body$g %||%
+    if (!is.null(body$density)) body$density / medium_params$density else NA
   body$h <- body_h
   body$g <- body_g
   # Define model parameters recipe =============================================
@@ -292,24 +282,17 @@ hpa_initialize <- function(object,
     body,
     list(
       theta = body$theta,
-      shape = shape_params$shape
+      shape = shape_params$shape,
+      length = if ("body" %in% names(shape_params)) {
+        shape_params$body$length
+      } else {
+        shape_params$length
+      }
     )
   )
   # Fill out material properties ===============================================
-  body_params$h <- ifelse(
-      "h" %in% names(body),
-      body_h,
-      ifelse("sound_speed" %in% names(body),
-        body$sound_speed / medium_params$sound_speed,
-        NA)
-  )
-  body_params$g <- ifelse(
-      "g" %in% names(body),
-      body_g,
-      ifelse("density" %in% names(body),
-        body$density / medium_params$density,
-        NA)
-  )
+  body_params$h <- body_h
+  body_params$g <- body_g
   # Add model parameters slot to scattering object =============================
   methods::slot(
     object,
@@ -354,7 +337,12 @@ hpa_initialize <- function(object,
 #' @noRd
 .johnson_hp <- function(acoustics, body, alpha) {
   # Calculate ka ===============================================================
-  ka <- acoustics$k_sw * body$radius
+  if (length(body$radius) > 1) {
+    a <- max(body$radius)
+  } else {
+    a <- body$radius
+  }
+  ka <- acoustics$k_sw * a
   # Calculate sigma_bs =========================================================
   (body$radius^2 * ka^4 * alpha^2) / (1 + 1.5 * ka^4)
 }
@@ -378,16 +366,18 @@ hpa_initialize <- function(object,
 #' @noRd
 .stanton_cylinder <- function(k, l, a, theta, rho_c, r, alpha, gnull, fdevs) {
   # Special case: bent cylinder ================================================
-  if (!is.na(rho_c)) {
-    # Compute the literal radius of curvature ++++++++++++++++++++++++++++++++++
-    r_c <- rho_c * l
-    # Compute effective length of bent cylinder ++++++++++++++++++++++++++++++++
-    H <- 0.5 + 0.5 * rho_c * sin(1 / rho_c)
-    # Compute sigma_bs +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    return(
-      (0.25 * l^2 * ka^4 * alpha^2 * H^2 * gnull) /
-        (1 + (l^2 * ka^4 * alpha^2 * H^2) / (r_c * a * r^2 * fdevs))
-    )
+  if (!is.null(rho_c)) {
+    if (!is.na(rho_c)) {
+      # Compute the literal radius of curvature ++++++++++++++++++++++++++++++++
+      r_c <- rho_c * l
+      # Compute effective length of bent cylinder ++++++++++++++++++++++++++++++
+      H <- 0.5 + 0.5 * rho_c * sin(1 / rho_c)
+      # Compute sigma_bs +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+      return(
+        (0.25 * l^2 * ka^4 * alpha^2 * H^2 * gnull) /
+          (1 + (l^2 * ka^4 * alpha^2 * H^2) / (r_c * a * r^2 * fdevs))
+      )
+    }
   }
   # Compute the effective length based on tilt angle ===========================
   s <- sin(k * l * cos(theta)) / (k * l * cos(theta))
@@ -403,7 +393,12 @@ hpa_initialize <- function(object,
 #' @noRd
 .stanton_hp <- function(acoustics, body, parameters, alpha) {
   # Calculate ka ===============================================================
-  ka <- acoustics$k_sw * body$radius
+  if (length(body$radius) > 1) {
+    a <- max(body$radius)
+  } else {
+    a <- body$radius
+  }
+  ka <- acoustics$k_sw * a
   # Resolve empirical terms, G (nulls) and F (deviation) =======================
   # G ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   if (is.function(parameters$null_fun)) {
@@ -422,9 +417,9 @@ hpa_initialize <- function(object,
   # Compute sigma_bs ===========================================================
   switch(
     body$shape,
-    Sphere = .stanton_sphere(body$radius, ka, r, alpha, gnull, fdevs),
+    Sphere = .stanton_sphere(a, ka, r, alpha, gnull, fdevs),
     Cylinder = .stanton_cylinder(
-      acoustics$k_sw, body$length, body$radius, body$theta,
+      acoustics$k_sw, body$length, a, body$theta,
       body$radius_curvature_ratio, r, alpha, gnull, fdevs
       ),
     ProlateSpheroid = .stanton_prolate_spheroid(
