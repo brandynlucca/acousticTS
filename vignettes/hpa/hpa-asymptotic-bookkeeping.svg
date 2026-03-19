@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" role="img" aria-labelledby="title desc">
+  <title id="title">HPA asymptotic bookkeeping</title>
+  <desc id="desc">Schematic showing how the high-pass approximation combines a Rayleigh numerator with a bounded high-frequency denominator and optional Stanton correction factors.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8f3ea; }
+      .panel { fill: #fffdfa; stroke: #2f2822; stroke-width: 2.1; rx: 16; ry: 16; }
+      .head { font: 700 21px Georgia, serif; fill: #1f1a16; }
+      .txt { font: 15px Georgia, serif; fill: #2f2822; }
+      .small { font: 13px Georgia, serif; fill: #564b40; }
+      .curve { stroke: #9d5d2e; stroke-width: 3.2; fill: none; }
+      .arrow { stroke: #564b40; stroke-width: 2.4; fill: none; marker-end: url(#m); }
+    </style>
+    <marker id="m" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#564b40"/></marker>
+  </defs>
+  <rect width="960" height="300" class="bg"/>
+  <text x="28" y="40" class="head">How the high-pass approximation is assembled from two asymptotic ideas</text>
+  <rect x="24" y="68" width="276" height="204" class="panel"/>
+  <text x="46" y="96" class="txt">Low-frequency requirement</text>
+  <text x="46" y="132" class="small">σ_bs must begin with the Rayleigh scaling</text>
+  <text x="46" y="153" class="small">(ka)^4 α².</text>
+  <path d="M62 234 C120 226, 152 206, 258 122" class="curve"/>
+
+  <rect x="342" y="68" width="276" height="204" class="panel"/>
+  <text x="364" y="96" class="txt">High-frequency requirement</text>
+  <text x="364" y="132" class="small">The response should saturate instead of</text>
+  <text x="364" y="153" class="small">growing without bound.</text>
+  <path d="M380 216 C450 156, 504 140, 580 140" class="curve"/>
+
+  <rect x="660" y="68" width="276" height="204" class="panel"/>
+  <text x="682" y="96" class="txt">Stanton corrections</text>
+  <text x="682" y="132" class="small">G adjusts the numerator where nulls or</text>
+  <text x="682" y="153" class="small">shape effects matter.</text>
+  <text x="682" y="184" class="small">F adjusts the denominator and therefore</text>
+  <text x="682" y="205" class="small">the transition between the two limits.</text>
+
+  <path d="M300 170 C318 170, 324 170, 342 170" class="arrow"/>
+  <path d="M618 170 C636 170, 642 170, 660 170" class="arrow"/>
+</svg>

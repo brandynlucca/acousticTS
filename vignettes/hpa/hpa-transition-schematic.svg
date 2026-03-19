@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="460" viewBox="0 0 900 460">
+  <rect width="900" height="460" fill="#fbfaf5"/>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 z" fill="#203040"/>
+    </marker>
+  </defs>
+  <text x="58" y="58" font-family="Georgia, serif" font-size="26" fill="#203040">HPA interpolation between Rayleigh and specular limits</text>
+  <line x1="90" y1="372" x2="810" y2="372" stroke="#203040" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="110" y1="392" x2="110" y2="86" stroke="#203040" stroke-width="3" marker-end="url(#arrow)"/>
+  <text x="748" y="404" font-family="Georgia, serif" font-size="22" fill="#203040">ka</text>
+  <text x="48" y="112" font-family="Georgia, serif" font-size="22" fill="#203040">sigma<tspan baseline-shift="sub" font-size="70%">bs</tspan></text>
+
+  <path d="M132 348 C190 338, 245 312, 302 258 S420 144, 520 122 S678 120, 784 126" fill="none" stroke="#0f5c5c" stroke-width="7"/>
+  <path d="M130 352 C188 350, 236 338, 284 300" fill="none" stroke="#bb4d00" stroke-width="4" stroke-dasharray="8 6"/>
+  <line x1="535" y1="126" x2="786" y2="126" stroke="#bb4d00" stroke-width="4" stroke-dasharray="8 6"/>
+
+  <text x="194" y="288" font-family="Georgia, serif" font-size="22" fill="#bb4d00">Rayleigh numerator ~ (ka)^4 alpha<tspan baseline-shift="sub" font-size="70%">pi</tspan><tspan baseline-shift="super" font-size="70%">2</tspan></text>
+  <text x="566" y="110" font-family="Georgia, serif" font-size="22" fill="#bb4d00">bounded high-frequency plateau ~ R^2 F</text>
+  <text x="356" y="192" font-family="Georgia, serif" font-size="22" fill="#203040">denominator suppresses nonphysical growth</text>
+  <line x1="430" y1="204" x2="492" y2="148" stroke="#203040" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <rect x="560" y="260" width="248" height="96" rx="14" fill="#eef0de" stroke="#7a3f0e" stroke-width="2"/>
+  <text x="580" y="292" font-family="Georgia, serif" font-size="22" fill="#203040">G modifies numerator</text>
+  <text x="580" y="322" font-family="Georgia, serif" font-size="22" fill="#203040">F modifies denominator</text>
+</svg>
