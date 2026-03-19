@@ -391,6 +391,13 @@ sdwba_curved_initialize <- function(object,
                                     phase_sd_init = sqrt(2) / 2,
                                     length_init = 38.35e-3,
                                     frequency_init = 120e3) {
+  .Deprecated(
+    msg = paste(
+      "`SDWBA_curved` is deprecated.",
+      "Apply `brake()` to the scatterer first, then run `SDWBA`",
+      "or `target_strength(..., model = \"sdwba\")`."
+    )
+  )
   # Parse shape ================================================================
   shape <- acousticTS::extract(object, "shape_parameters")
   # Parse body =================================================================

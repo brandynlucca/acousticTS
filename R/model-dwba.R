@@ -258,6 +258,13 @@ dwba_curved_initialize <- function(object,
                                    density_sw = 1026,
                                    radius_curvature_ratio = NULL,
                                    theta = pi / 2) {
+  .Deprecated(
+    msg = paste(
+      "`DWBA_curved` is deprecated.",
+      "Apply `brake()` to the scatterer first, then run `DWBA`",
+      "or `target_strength(..., model = \"dwba\")`."
+    )
+  )
   # Parse shape ================================================================
   shape <- extract(object, "shape_parameters")
   # Parse body =================================================================

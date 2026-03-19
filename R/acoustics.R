@@ -414,7 +414,10 @@ lame <- function(K = NULL, E = NULL, G = NULL, nu = NULL) {
 #'
 #' Model-specific inputs are passed through \code{...}. For example, some models
 #' require a \code{boundary} argument, \code{HPA} uses a \code{method}
-#' argument, and several models expose additional numerical controls.
+#' argument, and several models expose additional numerical controls. The legacy
+#' curved-entry wrappers \code{"dwba_curved"} and \code{"sdwba_curved"} are
+#' deprecated; apply \code{\link{brake}} to the scatterer first, then run
+#' \code{"dwba"} or \code{"sdwba"} on the curved object.
 #' @seealso
 #' \code{\link{DWBA}}, \code{\link{SDWBA}}, \code{\link{FCMS}},
 #' \code{\link{HPA}}, \code{\link{KRM}}, \code{\link{PSMS}},
