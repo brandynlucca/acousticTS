@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="430" viewBox="0 0 900 430">
+  <rect width="900" height="430" fill="#fbfaf5"/>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 z" fill="#203040"/>
+    </marker>
+  </defs>
+  <text x="48" y="78" font-family="Georgia, serif" font-size="24" fill="#203040">incident wave</text>
+  <line x1="52" y1="108" x2="228" y2="108" stroke="#203040" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="52" y1="148" x2="228" y2="148" stroke="#203040" stroke-width="4" marker-end="url(#arrow)"/>
+
+  <path d="M265 220 C320 140, 465 120, 624 176 C694 201, 746 219, 801 214 C734 265, 649 296, 536 302 C402 309, 309 280, 265 220 z" fill="#d6e3b3" stroke="#546b2a" stroke-width="4"/>
+  <path d="M420 222 C468 194, 546 194, 616 222 C566 250, 498 256, 420 222 z" fill="#f1d28b" stroke="#9b6a1f" stroke-width="4"/>
+
+  <line x1="320" y1="165" x2="320" y2="285" stroke="#5a6b7a" stroke-dasharray="7 7" stroke-width="2"/>
+  <line x1="392" y1="145" x2="392" y2="294" stroke="#5a6b7a" stroke-dasharray="7 7" stroke-width="2"/>
+  <line x1="470" y1="133" x2="470" y2="300" stroke="#5a6b7a" stroke-dasharray="7 7" stroke-width="2"/>
+  <line x1="548" y1="138" x2="548" y2="296" stroke="#5a6b7a" stroke-dasharray="7 7" stroke-width="2"/>
+  <line x1="626" y1="156" x2="626" y2="286" stroke="#5a6b7a" stroke-dasharray="7 7" stroke-width="2"/>
+
+  <text x="286" y="332" font-family="Georgia, serif" font-size="22" fill="#203040">stack of locally cylindrical body segments</text>
+
+  <line x1="384" y1="92" x2="472" y2="176" stroke="#8c3f19" stroke-width="4" marker-end="url(#arrow)"/>
+  <text x="294" y="82" font-family="Georgia, serif" font-size="22" fill="#8c3f19">coherent sum of body and inclusion returns</text>
+
+  <text x="452" y="192" font-family="Georgia, serif" font-size="22" fill="#203040">dominant internal structure</text>
+  <text x="458" y="218" font-family="Georgia, serif" font-size="18" fill="#5a6b7a">examples: bladder, liver, spine</text>
+</svg>

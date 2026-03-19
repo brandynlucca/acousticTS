@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" role="img" aria-labelledby="title desc">
+  <title id="title">KRM coordinate bookkeeping</title>
+  <desc id="desc">Schematic showing the original body coordinates, rotated projected coordinates, and upper and lower body surfaces used in the KRM segment formulas.</desc>
+  <defs>
+    <style>
+      .bg { fill: #faf7f0; }
+      .panel { fill: #fffdf8; stroke: #243026; stroke-width: 2; rx: 16; }
+      .body { fill: #cfe6de; stroke: #165a50; stroke-width: 3; }
+      .axis { stroke: #243026; stroke-width: 2.5; }
+      .rot { stroke: #8a5c2f; stroke-width: 2.5; stroke-dasharray: 7 6; }
+      .guide { stroke: #6c756c; stroke-width: 2; stroke-dasharray: 5 5; }
+      .label { font: 18px Georgia, "Times New Roman", serif; fill: #1d241f; }
+      .math { font: italic 19px Georgia, "Times New Roman", serif; fill: #0f4850; }
+      .heading { font: 700 20px Georgia, "Times New Roman", serif; fill: #1d241f; }
+    </style>
+  </defs>
+  <rect class="bg" x="0" y="0" width="960" height="360"/>
+
+  <rect class="panel" x="24" y="28" width="912" height="304" rx="16"/>
+  <text class="heading" x="480" y="58" text-anchor="middle">KRM segment geometry in original and rotated coordinates</text>
+
+  <path class="body" d="M118 204 C180 150, 280 132, 410 150 C510 164, 626 146, 760 182 C790 190, 818 204, 840 204 C818 204, 790 218, 760 226 C626 262, 510 244, 410 258 C280 276, 180 258, 118 204 Z"/>
+
+  <line class="axis" x1="110" y1="282" x2="422" y2="282"/>
+  <line class="axis" x1="110" y1="282" x2="110" y2="88"/>
+  <text class="math" x="432" y="288">x</text>
+  <text class="math" x="98" y="92">z</text>
+
+  <line class="rot" x1="258" y1="282" x2="474" y2="122"/>
+  <line class="rot" x1="258" y1="282" x2="170" y2="110"/>
+  <text class="math" x="482" y="124">u</text>
+  <text class="math" x="162" y="108">v</text>
+
+  <line class="guide" x1="520" y1="150" x2="520" y2="258"/>
+  <line class="guide" x1="606" y1="146" x2="606" y2="244"/>
+  <line class="guide" x1="520" y1="116" x2="606" y2="116"/>
+  <text class="math" x="563" y="108" text-anchor="middle">&#916;u<tspan baseline-shift="sub" font-size="15">j</tspan></text>
+
+  <line class="guide" x1="690" y1="170" x2="690" y2="236"/>
+  <text class="math" x="704" y="176">z<tspan baseline-shift="sub" font-size="15">U,j</tspan></text>
+  <text class="math" x="704" y="236">z<tspan baseline-shift="sub" font-size="15">L,j</tspan></text>
+
+  <circle cx="563" cy="204" r="4.5" fill="#8a5c2f"/>
+  <text class="math" x="576" y="201">v<tspan baseline-shift="sub" font-size="15">j</tspan></text>
+
+  <text class="label" x="214" y="316">Original outline is parameterized along x with upper and lower surfaces.</text>
+  <text class="label" x="700" y="316" text-anchor="middle">Scattering bookkeeping uses projected length, phase coordinate, and local thickness.</text>
+</svg>

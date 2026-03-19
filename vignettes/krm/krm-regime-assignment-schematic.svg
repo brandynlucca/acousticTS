@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 320" role="img" aria-labelledby="title desc">
+  <title id="title">KRM regime assignment</title>
+  <desc id="desc">Schematic showing that the KRM assigns weakly scattering body segments and strongly contrasting swimbladder segments to different acoustic approximations.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f7f2e9; }
+      .panel { fill: #fffdfa; stroke: #2f2822; stroke-width: 2.2; rx: 16; ry: 16; }
+      .body { fill: #d8e8d8; stroke: #2f2822; stroke-width: 2.2; }
+      .bladder { fill: #f7d7ae; stroke: #2f2822; stroke-width: 2.2; }
+      .head { font: 700 21px Georgia, serif; fill: #1f1a16; }
+      .txt { font: 15px Georgia, serif; fill: #2f2822; }
+      .small { font: 13px Georgia, serif; fill: #564b40; }
+      .arrow { stroke: #564b40; stroke-width: 2.4; fill: none; marker-end: url(#m); }
+    </style>
+    <marker id="m" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#564b40"/>
+    </marker>
+  </defs>
+  <rect width="960" height="320" class="bg"/>
+  <text x="28" y="40" class="head">Why the KRM uses different approximations for different components</text>
+  <rect x="24" y="68" width="334" height="220" class="panel"/>
+  <path d="M68 177 C130 120, 230 120, 312 177 C230 234, 130 234, 68 177 z" class="body"/>
+  <ellipse cx="190" cy="177" rx="54" ry="24" class="bladder"/>
+  <text x="72" y="100" class="txt">Single geometric target</text>
+  <text x="72" y="246" class="small">The body and embedded inclusion share one geometry,</text>
+  <text x="72" y="266" class="small">but they do not share one useful acoustic regime.</text>
+
+  <rect x="392" y="68" width="248" height="220" class="panel"/>
+  <text x="414" y="98" class="txt">Body branch</text>
+  <text x="414" y="128" class="small">weak contrast</text>
+  <text x="414" y="149" class="small">smooth locally cylindrical surface</text>
+  <text x="414" y="170" class="small">specular plus first through-body path</text>
+  <text x="414" y="212" class="txt">Assigned model piece</text>
+  <text x="414" y="236" class="small">Kirchhoff-ray body sum</text>
+
+  <rect x="674" y="68" width="262" height="220" class="panel"/>
+  <text x="696" y="98" class="txt">Swimbladder branch</text>
+  <text x="696" y="128" class="small">strong contrast</text>
+  <text x="696" y="149" class="small">small ka: low-order cylindrical mode</text>
+  <text x="696" y="170" class="small">larger ka: local Kirchhoff approximation</text>
+  <text x="696" y="212" class="txt">Assigned model piece</text>
+  <text x="696" y="236" class="small">Modal or Kirchhoff bladder term</text>
+
+  <path d="M358 177 C372 177, 378 177, 392 177" class="arrow"/>
+  <path d="M358 177 C500 46, 586 46, 674 177" class="arrow"/>
+</svg>
