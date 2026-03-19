@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" role="img" aria-labelledby="title desc">
+  <title id="title">FCMS cross-section and axis factorization</title>
+  <desc id="desc">Schematic showing the exact cylindrical cross-section problem separated from the finite-length axial coherence factor in the finite cylinder modal series solution.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f7f2ea; }
+      .panel { fill: #fffdfa; stroke: #2f2822; stroke-width: 2.1; rx: 16; ry: 16; }
+      .head { font: 700 21px Georgia, serif; fill: #1f1a16; }
+      .txt { font: 15px Georgia, serif; fill: #2f2822; }
+      .small { font: 13px Georgia, serif; fill: #564b40; }
+      .cyl { fill: #dce8f4; stroke: #2f2822; stroke-width: 2; }
+      .arrow { stroke: #564b40; stroke-width: 2.4; fill: none; marker-end: url(#m); }
+    </style>
+    <marker id="m" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#564b40"/></marker>
+  </defs>
+  <rect width="960" height="300" class="bg"/>
+  <text x="28" y="40" class="head">What is exact and what is approximate in the finite-cylinder construction</text>
+  <rect x="24" y="68" width="286" height="204" class="panel"/>
+  <text x="46" y="96" class="txt">Cross-section</text>
+  <circle cx="168" cy="168" r="58" class="cyl"/>
+  <text x="78" y="240" class="small">Exact cylindrical modal boundary problem</text>
+
+  <rect x="338" y="68" width="286" height="204" class="panel"/>
+  <text x="360" y="96" class="txt">Axis</text>
+  <rect x="392" y="154" width="178" height="26" class="cyl"/>
+  <text x="376" y="240" class="small">Finite-length coherence factor</text>
+  <text x="376" y="260" class="small">sin(kL cos θ)/(kL cos θ)</text>
+
+  <rect x="652" y="68" width="284" height="204" class="panel"/>
+  <text x="674" y="96" class="txt">Combined FCMS response</text>
+  <rect x="706" y="154" width="178" height="26" class="cyl"/>
+  <text x="674" y="240" class="small">Cross-sectional modal sum multiplied</text>
+  <text x="674" y="260" class="small">by the axial sinc factor.</text>
+
+  <path d="M310 170 C322 170, 326 170, 338 170" class="arrow"/>
+  <path d="M624 170 C636 170, 640 170, 652 170" class="arrow"/>
+</svg>

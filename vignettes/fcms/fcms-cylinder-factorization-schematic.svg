@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="430" viewBox="0 0 900 430">
+  <rect width="900" height="430" fill="#fbfaf5"/>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M0,0 L12,6 L0,12 z" fill="#203040"/>
+    </marker>
+  </defs>
+  <text x="58" y="56" font-family="Georgia, serif" font-size="26" fill="#203040">Finite-cylinder factorization</text>
+  <line x1="74" y1="144" x2="262" y2="144" stroke="#203040" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="74" y1="184" x2="262" y2="184" stroke="#203040" stroke-width="4" marker-end="url(#arrow)"/>
+  <text x="76" y="116" font-family="Georgia, serif" font-size="22" fill="#203040">incident wave</text>
+
+  <rect x="292" y="144" width="366" height="126" rx="28" fill="#d4e7e7" stroke="#0f5c5c" stroke-width="6"/>
+  <ellipse cx="292" cy="207" rx="30" ry="63" fill="#d4e7e7" stroke="#0f5c5c" stroke-width="6"/>
+  <ellipse cx="658" cy="207" rx="30" ry="63" fill="#d4e7e7" stroke="#0f5c5c" stroke-width="6"/>
+
+  <line x1="292" y1="304" x2="658" y2="304" stroke="#7a3f0e" stroke-width="3" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+  <text x="456" y="338" font-family="Georgia, serif" font-size="22" fill="#7a3f0e">L</text>
+
+  <line x1="474" y1="207" x2="474" y2="144" stroke="#7a3f0e" stroke-width="3" marker-end="url(#arrow)"/>
+  <text x="488" y="176" font-family="Georgia, serif" font-size="22" fill="#7a3f0e">a</text>
+
+  <circle cx="474" cy="207" r="48" fill="none" stroke="#5a6b7a" stroke-width="3" stroke-dasharray="8 6"/>
+  <line x1="524" y1="194" x2="568" y2="182" stroke="#5a6b7a" stroke-width="2"/>
+  <text x="580" y="188" font-family="Georgia, serif" font-size="22" fill="#203040">cross-section modes</text>
+  <text x="580" y="216" font-family="Georgia, serif" font-size="20" fill="#203040">J<tspan baseline-shift="sub" font-size="70%">m</tspan>, H<tspan baseline-shift="sub" font-size="70%">m</tspan><tspan baseline-shift="super" font-size="70%">(1)</tspan></text>
+
+  <path d="M698 126 C748 112, 790 126, 828 152" fill="none" stroke="#bb4d00" stroke-width="4" marker-end="url(#arrow)"/>
+  <text x="690" y="98" font-family="Georgia, serif" font-size="22" fill="#203040">axial phase factor</text>
+  <text x="654" y="126" font-family="Georgia, serif" font-size="20" fill="#203040">sin(kL cos theta)/(kL cos theta)</text>
+
+  <text x="228" y="382" font-family="Georgia, serif" font-size="24" fill="#203040">exact modal physics on the circular cross-section, finite-length coherence along the cylinder axis</text>
+</svg>

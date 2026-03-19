@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" role="img" aria-labelledby="title desc">
+  <title id="title">FCMS cylinder geometry and coordinates</title>
+  <desc id="desc">Schematic showing a finite straight cylinder of radius a and length L, with axis direction, incident-wave angle theta, and the separation between transverse wavenumber K and axial phase variation.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f7f2ea; }
+      .panel { fill: #fffdfa; stroke: #2f2822; stroke-width: 2.1; }
+      .head { font: 700 22px Georgia, "Times New Roman", serif; fill: #1f1a16; }
+      .txt { font: 18px Georgia, "Times New Roman", serif; fill: #2f2822; }
+      .small { font: 16px Georgia, "Times New Roman", serif; fill: #564b40; }
+      .math { font: italic 20px Georgia, "Times New Roman", serif; fill: #0f4e60; }
+      .cyl { fill: #dce8f4; stroke: #2f2822; stroke-width: 2.5; }
+      .axis { stroke: #2f2822; stroke-width: 2.6; }
+      .guide { stroke: #6b655f; stroke-width: 2; stroke-dasharray: 6 6; fill: none; }
+      .ray { stroke: #8a5c34; stroke-width: 3.2; fill: none; marker-end: url(#arr1); }
+      .kvec { stroke: #4f7d5c; stroke-width: 3.2; fill: none; marker-end: url(#arr2); }
+    </style>
+    <marker id="arr1" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a5c34"/>
+    </marker>
+    <marker id="arr2" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4f7d5c"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="960" height="360"/>
+  <rect class="panel" x="24" y="24" width="912" height="312" rx="16" ry="16"/>
+  <text class="head" x="480" y="58" text-anchor="middle">Cylinder geometry and scale separation in the FCMS reduction</text>
+
+  <ellipse class="cyl" cx="322" cy="190" rx="28" ry="74"/>
+  <rect class="cyl" x="322" y="116" width="284" height="148"/>
+  <ellipse class="cyl" cx="606" cy="190" rx="28" ry="74"/>
+
+  <line class="axis" x1="250" y1="190" x2="676" y2="190"/>
+  <text class="math" x="684" y="196">z</text>
+
+  <line class="guide" x1="322" y1="286" x2="606" y2="286"/>
+  <line class="guide" x1="322" y1="278" x2="322" y2="294"/>
+  <line class="guide" x1="606" y1="278" x2="606" y2="294"/>
+  <text class="math" x="464" y="310" text-anchor="middle">L</text>
+
+  <line class="guide" x1="464" y1="190" x2="464" y2="116"/>
+  <text class="math" x="476" y="154">a</text>
+
+  <line class="ray" x1="102" y1="102" x2="274" y2="160"/>
+  <text class="txt" x="98" y="82">incident wave</text>
+  <text class="math" x="100" y="110">k</text>
+
+  <line class="kvec" x1="274" y1="160" x2="430" y2="160"/>
+  <text class="math" x="350" y="148">K = k sin &#952;</text>
+
+  <path class="guide" d="M334 190 A62 62 0 0 0 286 141"/>
+  <text class="math" x="300" y="168">&#952;</text>
+
+  <text class="small" x="700" y="134">cross-sectional modal problem uses</text>
+  <text class="math" x="700" y="158">K a</text>
+  <text class="small" x="700" y="210">finite-axis coherence uses</text>
+  <text class="math" x="700" y="234">k L cos &#952;</text>
+
+  <text class="small" x="84" y="330">Radius enters through the exact cylindrical boundary-value problem, while length enters through the separate axial coherence factor.</text>
+</svg>
