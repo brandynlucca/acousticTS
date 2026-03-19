@@ -23,7 +23,7 @@ This page gathers the main boundary families that recur throughout the theory ar
 
 <object type="image/svg+xml" data="boundary-conditions-overview.svg" style="width:100%;" aria-label="Boundary-condition overview"></object>
 
-The schematic above is a reading guide rather than a replacement for the derivations. It organizes the main boundary families according to the field quantity constrained most directly at the interface: pressure, normal velocity, layered acoustic transmission, or elastic traction.
+The main boundary families separate most naturally according to the field quantity constrained most directly at the interface: pressure, normal velocity, layered acoustic transmission, or elastic traction.
 
 # Simple boundaries
 
@@ -199,7 +199,7 @@ $$
         + k_{\text{interior}}^2 p_{\text{interior}} = 0,
 $$
 
-with:
+The associated interior wavenumber is:
 
 $$
     k_{\text{interior}} = \frac{\omega}{c_{\text{interior}}},

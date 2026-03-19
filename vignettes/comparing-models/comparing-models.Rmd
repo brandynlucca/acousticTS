@@ -82,7 +82,7 @@ $$
 \right|,
 $$
 
-and:
+The corresponding linear-domain root mean square error is:
 
 $$
 \mathrm{RMSE}_{\sigma} =
@@ -108,7 +108,7 @@ TS_{1,j} - TS_{2,j}
 \right|,
 $$
 
-and:
+The corresponding logarithmic-domain root mean square error is:
 
 $$
 \mathrm{RMSE}_{TS} =

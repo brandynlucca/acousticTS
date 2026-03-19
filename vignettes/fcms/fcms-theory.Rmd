@@ -24,7 +24,7 @@ This structure is also the main conceptual point a reader should carry away from
 1. an exact two-dimensional modal solution for the circular cross-section, and
 2. a finite-length axial phase integral that accounts for the coherent summation of contributions along a segment of length $L$.
 
-The rigid, pressure-release, and fluid-filled cylindrical boundaries used below are summarized separately in the companion [boundary conditions article](../boundary_conditions.html), but the present vignette shows how those boundary conditions enter the cylindrical coefficients and how those coefficients are folded into the finite-cylinder backscatter.
+In the cross-sectional problem, a rigid cylinder enforces zero normal velocity at $r = a$, a pressure-release cylinder enforces zero pressure there, and a fluid-filled cylinder enforces continuity of pressure and normal velocity between the exterior and interior media. The role of this vignette is to show how those cylindrical boundary conditions determine the coefficients $B_m$ and how the resulting cross-sectional response is combined with finite-axis coherence.
 
 # Physical basis of the FCMS
 
@@ -48,11 +48,7 @@ The FCMS is therefore exact with respect to the circular cross-section but appro
 
 ![Cylinder geometry and coordinate bookkeeping for the FCMS reduction.](fcms-coordinate-geometry-clean.svg)
 
-The first figure makes the factorization explicit: the circular cross-section carries the cylindrical modal physics through the coefficients $B_m$, while the axial extent $L$ and orientation angle $\theta$ produce the separate coherence factor $\sin(kL\cos\theta)/(kL\cos\theta)$ used later in the finite-cylinder reduction.
-
-The second figure emphasizes the same separation from a numerical point of view. The circumference problem is where the boundary condition is handled exactly, while the finite axis enters only through a one-dimensional coherence factor. That distinction is what makes the FCMS much simpler than a fully three-dimensional endcap-resolving boundary-value problem.
-
-The third figure then handles a different task. It is the geometry map for the reduction itself: radius $a$, length $L$, incidence angle $\theta$, transverse wavenumber $K = k\sin\theta$, and the axial phase scale $kL\cos\theta$. Keeping this figure separate from the factorization schematics makes the page easier to read because the conceptual decomposition and the coordinate bookkeeping are no longer being asked to do the same job.
+The construction therefore has two distinct layers. The circular cross-section determines the cylindrical modal coefficients $B_m$. The finite axis of length $L$ and the orientation angle $\theta$ contribute the separate coherence factor $\sin(kL\cos\theta)/(kL\cos\theta)$. Radius $a$, transverse wavenumber $K = k\sin\theta$, and the axial phase scale $kL\cos\theta$ are the variables that keep those two layers connected without turning them into the same approximation.
 
 # Finite-cylinder reduction
 
@@ -88,7 +84,7 @@ This is the origin of the finite-length directivity factor. It is exactly the sa
 Therefore the backscattering amplitude is written as:
 
 $$
-  f_{bs} = -\frac{L}{\pi}
+  \mathcal{f}_\text{bs} = -\frac{L}{\pi}
   \frac{\sin(kL\cos\theta)}{kL\cos\theta}
   \sum_{m=0}^{\infty} i^{m+1}B_m.
 $$
@@ -113,7 +109,7 @@ $$
   \frac{\partial^2 p}{\partial r^2} + \frac{1}{r}\frac{\partial p}{\partial r} + \frac{1}{r^2}\frac{\partial^2 p}{\partial\phi^2} + K^2p = 0.
 $$
 
-Seek a separated solution:
+Writing the cross-sectional field as a product of radial and angular factors:
 
 $$
   p(r,\phi) = R(r)\Phi(\phi).
@@ -200,7 +196,7 @@ $$
   J_m'(Ka) + B_m H_m^{(1)\prime}(Ka)=0.
 $$
 
-Therefore:
+The rigid-boundary coefficient is therefore:
 
 $$
   B_m = -\frac{J_m'(Ka)}{H_m^{(1)\prime}(Ka)}.
@@ -226,7 +222,7 @@ $$
   J_m(Ka) + B_m H_m^{(1)}(Ka)=0,
 $$
 
-so:
+The pressure-release coefficient is therefore:
 
 $$
   B_m = -\frac{J_m(Ka)}{H_m^{(1)}(Ka)}.
@@ -289,7 +285,7 @@ $$
   gh\frac{J_m'(K'a)}{J_m(K'a)}J_m(Ka)-J_m'(Ka).
 $$
 
-Thus:
+Solving for the exterior scattering coefficient gives:
 
 $$
   B_m =
@@ -309,7 +305,7 @@ $$
   B_m = -\frac{\epsilon_m}{1+iC_m},
 $$
 
-where:
+The auxiliary ratio is:
 
 $$
   C_m =
@@ -349,13 +345,13 @@ It is also helpful to remember what truncation does and does not mean physically
 Once the modal sum is evaluated:
 
 $$
-  \sigma_{bs} = |f_{bs}|^2,
+  \sigma_\text{bs} = |\mathcal{f}_\text{bs}|^2,
 $$
 
-and:
+The corresponding target strength is:
 
 $$
-  TS = 10\log_{10}(\sigma_{bs}).
+  TS = 10\log_{10}(\sigma_\text{bs}).
 $$
 
 # Mathematical assumptions

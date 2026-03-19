@@ -77,7 +77,7 @@ The distinction matters because it separates deterministic sweeps from uncertain
 
 ![Three parameter-specification modes in `simulate_ts()`: fixed constants, explicit vectors, and per-realization generating functions.](simulation-parameter-modes.svg)
 
-The figure makes the bookkeeping distinction explicit. Fixed values are copied into every run unchanged. Explicit vectors supply a known sequence of values. Generating functions do not provide a pre-listed table at all. They create a new draw whenever a realization is built. That difference is what separates a design grid from on-the-fly uncertainty propagation.
+Fixed values are copied into every run unchanged. Explicit vectors supply a known sequence of values. Generating functions do not provide a pre-listed table at all. They create a new draw whenever a realization is built. That difference is what separates a design grid from on-the-fly uncertainty propagation.
 
 ```{r eval = FALSE}
 parameters = list(
@@ -148,7 +148,7 @@ This is one of the cleanest ways to keep a morphology-sensitivity analysis tied 
 
 ![Object-modifying simulation workflow, where baseline geometry is reforged into a family of derived target states before model execution.](simulation-object-reforge.svg)
 
-This schematic is important because morphology-affecting parameters do not behave like ordinary scalar metadata. They change the working target itself before the model is run. That means the resulting simulations should be interpreted as distinct geometric states derived from one baseline object, not as repeated evaluations of a single unchanged shape.
+Morphology-affecting parameters do not behave like ordinary scalar metadata. They change the working target itself before the model is run. The resulting simulations should therefore be interpreted as distinct geometric states derived from one baseline object, not as repeated evaluations of a single unchanged shape.
 
 # When simulation is useful
 
@@ -201,7 +201,7 @@ res_parallel <- simulate_ts(
 
 ![Execution layout for serial and parallel simulation runs, emphasizing the same logical job table with different scheduling.](simulation-execution-layout.svg)
 
-The execution schematic is meant to clarify that parallelization changes scheduling, not interpretation. The same batched cells and realization-level jobs still exist. Parallel execution simply distributes them across workers. That is why debugging is often easier in serial mode first, even when the final production run is parallel.
+Parallelization changes scheduling, not interpretation. The same batched cells and realization-level jobs still exist. Parallel execution simply distributes them across workers. That is why debugging is often easier in serial mode first, even when the final production run is parallel.
 
 # Practical cautions
 

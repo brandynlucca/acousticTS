@@ -304,4 +304,4 @@ This normalization is important because calibration references are sometimes wri
 
 ![Calibration sphere modal bookkeeping from partial waves to reported backscatter quantities.](calibration-modal-bookkeeping.svg)
 
-The bookkeeping figure summarizes that progression. The incident plane wave is decomposed into modal terms, each mode acquires an elastic phase shift at the sphere surface, the far-field series is summed, and the final result is reported as a linear backscattering length, a backscattering cross-section, and target strength.
+The modal bookkeeping proceeds in a fixed order. The incident plane wave is decomposed into modal terms, each mode acquires an elastic phase shift at the sphere surface, the far-field series is summed, and the final result is reported as a linear backscattering length, a backscattering cross-section, and target strength.

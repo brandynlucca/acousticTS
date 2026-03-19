@@ -27,13 +27,11 @@ In a full boundary-value formulation, the same problem would be represented eith
 
 ![Asymptotic bookkeeping behind the HPA: Rayleigh numerator, bounded denominator, and Stanton correction factors.](hpa-asymptotic-bookkeeping.svg)
 
-The figure is meant to be read with the equations that follow: the left branch is the Rayleigh numerator proportional to $(ka)^4\alpha_\pi^2$, the plateau is the bounded large-$ka$ scale set by reflection, and the labeled $\mathcal{F}$ and $\mathcal{G}$ terms indicate where corrections from Stanton (1990)[^3] corrections alter the denominator and numerator, respectively.
+The HPA is built from three pieces. The low-frequency branch is the Rayleigh numerator proportional to $(ka)^4\alpha_\pi^2$. The large-$ka$ behavior is controlled by a bounded denominator scaled by interface reflection. The Stanton corrections $\mathcal{F}$ and $\mathcal{G}$ modify those leading limits without turning the model into a full boundary-value solution.
 
-The second figure makes the bookkeeping more explicit. The HPA is easiest to interpret once the reader sees that it is not trying to solve a full boundary-value problem directly. Instead, it enforces one asymptotic requirement at small $ka$, another at large $ka$, and then uses the denominator together with $\mathcal{F}$ and $\mathcal{G}$ to connect those limits smoothly.
+![HPA geometry factors for spheres, prolate spheroids, straight cylinders, and bent cylinders.](hpa-geometry-factors.svg)
 
-![HPA geometry factors for spheres, straight cylinders, and bent cylinders.](hpa-geometry-factors.svg)
-
-This third schematic isolates the geometry-dependent factors that often get lost when the formulas are read too quickly. The sphere uses a single radius scale. The straight-cylinder form combines the transverse size parameter $Ka$ with the finite-length directivity factor $s$. The bent-cylinder form replaces that straight-axis directivity by the curvature factor $\mathcal{H}$. Seeing those factors side by side helps clarify that the HPA family is not one equation with minor symbol changes, but a set of related asymptotic forms with different geometric bookkeeping.
+Geometry enters through distinct bookkeeping for each shape family. A sphere uses a single radius scale. A prolate spheroid uses the corresponding spheroidal size factor. A straight cylinder combines the transverse size parameter $Ka$ with the finite-length directivity factor $s$. A bent cylinder replaces that straight-axis factor with the curvature term $\mathcal{H}$. The HPA family is therefore not one equation with minor symbol changes, but a set of related asymptotic forms with different geometric bookkeeping.
 
 # Low-frequency scattering ingredients
 
@@ -84,7 +82,7 @@ These coefficients arise by expanding the boundary conditions for weak contrast 
 For a fluid sphere of radius $a$, the Rayleigh backscattering cross-section has the form:
 
 $$
-  \sigma_{bs} \sim a^2 (ka)^4 \alpha_{\pi s}^2
+  \sigma_\text{bs} \sim a^2 (ka)^4 \alpha_{\pi s}^2
   \qquad \text{as } ka \to 0.
 $$
 
@@ -95,36 +93,34 @@ This fixes the numerator of any interpolation formula that is to reproduce the c
 Johnson (1977)[^1] introduced the simplest rational completion of that numerator by writing:
 
 $$
-  \sigma_{bs} =
+  \sigma_\text{bs} =
   \frac{a^2 (ka)^4 \alpha_{\pi s}^2}{1 + \tfrac{3}{2}(ka)^4}.
 $$
 
 The derivation is not an exact resummation of the full modal series. Rather, it is a two-limit construction. The numerator enforces the Rayleigh law, while the denominator suppresses the nonphysical growth that would occur if the $(ka)^4$ term were extrapolated to large argument. That is the central idea behind the model and the reason the term "approximation" has to be taken seriously here: the HPA is deliberately shaped to match limiting behavior, not to reproduce every intermediate-frequency feature of an exact solution.
 
-Two limits follow immediately.
-
-If:
+Two limits follow immediately. In the Rayleigh regime, where:
 
 $$
   ka \ll 1,
 $$
 
-then the denominator tends to 1 and:
+the denominator tends to unity, so the cross-section reduces to:
 
 $$
-  \sigma_{bs} \sim a^2 (ka)^4 \alpha_{\pi s}^2.
+  \sigma_\text{bs} \sim a^2 (ka)^4 \alpha_{\pi s}^2.
 $$
 
-If:
+In the large-$ka$ limit, where:
 
 $$
   ka \gg 1,
 $$
 
-then:
+the same expression tends toward:
 
 $$
-  \sigma_{bs} \to \frac{2}{3}a^2,
+  \sigma_\text{bs} \to \frac{2}{3}a^2,
 $$
 
 so the response approaches a bounded geometric scale instead of diverging.
@@ -144,7 +140,7 @@ These terms are phenomenological. They do not arise from the first few algebraic
 For a sphere, the generalized expression from Stanton (1990)[^3] is:
 
 $$
-  \sigma_{bs} =
+  \sigma_\text{bs} =
   \frac{a^2 (ka)^4 \alpha_{\pi s}^2 \mathcal{G}}{
     1 + \dfrac{4(ka)^4 \alpha_{\pi s}^2}{\mathcal{R}^2 \mathcal{F}}
   }.
@@ -157,7 +153,7 @@ The low-frequency numerator is still the Rayleigh term. The denominator is now w
 For a prolate spheroid of total length $L$, the corresponding formula is:
 
 $$
-  \sigma_{bs} =
+  \sigma_\text{bs} =
   \frac{\tfrac{1}{9}L^2 (ka)^4 \alpha_{\pi c}^2 \mathcal{G}}{
     1 + \dfrac{\tfrac{16}{9}(ka)^4 \alpha_{\pi c}^2}{\mathcal{R}^2 \mathcal{F}}
   }.
@@ -182,7 +178,7 @@ $$
 The resulting cross-section is:
 
 $$
-  \sigma_{bs} =
+  \sigma_\text{bs} =
   \frac{\tfrac{1}{4}L^2 (Ka)^4 \alpha_{\pi c}^2 s^2 \mathcal{G}}{
     1 + \dfrac{\pi (Ka)^3 \alpha_{\pi c}^2}{\mathcal{R}^2 \mathcal{F}}
   }.
@@ -202,7 +198,7 @@ $$
 This yields:
 
 $$
-  \sigma_{bs} =
+  \sigma_\text{bs} =
   \frac{\tfrac{1}{4}L^2 (ka)^4 \alpha_{\pi c}^2 \mathcal{H}^2 \mathcal{G}}{
     1 + \dfrac{L^2 (ka)^4 \alpha_{\pi c}^2 \mathcal{H}^2}{\rho_c a \, \mathcal{R}^2 \mathcal{F}}
   }.

@@ -19,7 +19,7 @@ vignette: >
 
 The stochastic distorted wave Born approximation (SDWBA) begins with the same weak-scattering derivation as the deterministic DWBA, then modifies the phase structure of the coherent sum to account for unresolved variability in body shape, posture, and internal structure.[^1][^2][^3]
 
-The same weak fluid-like boundary assumptions summarized in the companion [boundary conditions article](../boundary_conditions.html) apply here before the stochastic phase extension is introduced.
+The deterministic part of the derivation still assumes a weakly scattering fluid-like body, so the local scattering strength is controlled by small density and compressibility contrasts in the same way as in the DWBA. The stochastic extension is introduced only after that weak-contrast amplitude model has been established.
 
 The central idea is simple. The deterministic DWBA assumes that the phase of the contribution from every local body segment is known exactly. For live organisms, that assumption is often too strong. If small geometric perturbations alter the optical path length across the body, then the coherent interference pattern predicted by the deterministic model becomes too sharp. The SDWBA models that mismatch as a random perturbation of the segment phases.
 
@@ -32,9 +32,10 @@ The important point is that the stochastic term is not introduced as an unrelate
 For an elongated fluid-like body, the DWBA gives the backscattering amplitude as a line integral along the centerline:
 
 $$
-  f_{bs} = \frac{k_1}{4}
+  \mathcal{f}_\text{bs} = \frac{k_1}{4}
   \int
   \left(\gamma_\kappa - \gamma_\rho\right)
+  a(s)
   e^{2 i \mathbf{k}_2 \cdot \mathbf{r}_{pos}(s)}
   \frac{J_1\!\left(2 k_2 a(s) \cos\beta_{tilt}(s)\right)}{\cos\beta_{tilt}(s)}
   \, ds.
@@ -44,17 +45,18 @@ All notation is identical to the deterministic DWBA. The material contrasts dete
 
 ## Discretized coherent sum
 
-After segmenting the body into $N$ short elements, the same expression is written as
+After segmenting the body into $N$ short elements, the same expression is written as:
 
 $$
-  f_{bs}(\theta) \approx \sum_{j=1}^{N} q_j(\theta),
+  \mathcal{f}_\text{bs}(\theta) \approx \sum_{j=1}^{N} q_j(\theta),
 $$
 
-where
+The deterministic segment contribution is:
 
 $$
   q_j(\theta) = \frac{k_1}{4}
   \left(\gamma_\kappa - \gamma_\rho\right)_j
+  a_j
   e^{2 i \mathbf{k}_2 \cdot \mathbf{r}_j}
   \frac{J_1\!\left(2 k_2 a_j \cos\beta_j\right)}{\cos\beta_j}
   \Delta s_j.
@@ -68,7 +70,7 @@ The deterministic sum assumes that the segment geometry $(\mathbf{r}_j, a_j, \be
 
 First, real body surfaces are not exactly smooth or axisymmetric. Second, internal material contrasts can vary on scales smaller than the model resolution. Third, organism posture changes from one realization to the next even at fixed macroscopic orientation.
 
-Each of these effects modifies the phase more strongly than it modifies the amplitude. If the total path length to and from a segment changes by $\delta \ell_j$, the associated phase perturbation is approximately
+Each of these effects modifies the phase more strongly than it modifies the amplitude. If the total path length to and from a segment changes by $\delta \ell_j$, the associated phase perturbation is approximately:
 
 $$
   \varphi_j \approx 2 k_2 \delta \ell_j.
@@ -80,10 +82,10 @@ Thus the dominant uncertainty enters as random phase fluctuation rather than as 
 
 ## Randomized segment sum
 
-The SDWBA replaces the deterministic coherent sum by
+The SDWBA replaces the deterministic coherent sum by:
 
 $$
-  f_{bs}^{(m)}(\theta) = \sum_{j=1}^{N} q_j(\theta)e^{i\varphi_j^{(m)}},
+  \mathcal{f}_\text{bs}^{(m)}(\theta) = \sum_{j=1}^{N} q_j(\theta)e^{i\varphi_j^{(m)}},
 $$
 
 where $m$ indexes a stochastic realization and $\varphi_j^{(m)}$ is the random phase assigned to segment $j$ in that realization.
@@ -100,13 +102,11 @@ The mean is taken to be zero so that the stochastic model perturbs coherence wit
 
 ![How increasing phase variance moves the SDWBA from a coherent segment sum toward an incoherent intensity sum.](sdwba-coherence-regimes.svg)
 
-The schematic above is tied directly to the stochastic phase model: the labeled $q_j$ are the deterministic DWBA segment contributions, the perturbed segment markers indicate the unresolved path-length offsets $\delta \ell_j$, and the attached phase factors $e^{i\varphi_j}$ represent the resulting realization-specific correction to the deterministic phase. This is the key geometric interpretation of the SDWBA. The model is not randomizing segment amplitudes arbitrarily. It is randomizing the phase implied by a slightly perturbed effective path length.
-
-The second schematic is meant to answer a different question. The first one explains how the random phase is inserted into the deterministic sum. The second one shows what that insertion does qualitatively as $\sigma_\varphi$ increases. Readers often understand the ensemble-average formula more quickly once they see that the self-terms remain intact while the organized interference pattern across segments is progressively suppressed.
+The deterministic DWBA segment term $q_j$ is retained, but its phase is perturbed through unresolved path-length offsets $\delta \ell_j$, which produce realization-specific factors $e^{i\varphi_j}$. The model is therefore not randomizing segment amplitudes arbitrarily. It is randomizing the phase implied by a slightly perturbed effective path length. As $\sigma_\varphi$ increases, self-terms remain intact while organized interference across segments is progressively suppressed, and the ensemble response moves from a coherent sum toward an incoherent intensity-like limit.
 
 ## Why Gaussian phase noise is used
 
-The Gaussian choice is mathematically convenient and physically reasonable when the phase perturbation is the sum of many small unresolved contributions. By the central limit principle, the cumulative phase error then tends toward a normal distribution even if the underlying geometric perturbations are not themselves Gaussian.
+The Gaussian choice is mathematically convenient and physically reasonable when the phase perturbation is the sum of many small unresolved contributions. By the central limit theorem, the cumulative phase error then tends toward a normal distribution even if the underlying geometric perturbations are not themselves Gaussian.
 
 The zero-mean Gaussian phase model also produces a closed form for the expected coherence factor:
 
@@ -122,30 +122,30 @@ It is also helpful to connect this directly to the path-length picture introduce
 
 ## Expansion of the squared magnitude
 
-The physically relevant quantity is the ensemble-averaged backscattering cross-section
+The physically relevant quantity is the ensemble-averaged backscattering cross-section:
 
 $$
-  \langle \sigma_{bs}(\theta) \rangle = \mathbb{E}\!\left[\left|f_{bs}(\theta)\right|^2\right].
+  \langle \sigma_\text{bs}(\theta) \rangle = \mathbb{E}\!\left[\left|\mathcal{f}_\text{bs}(\theta)\right|^2\right].
 $$
 
-Substituting the randomized segment sum gives
+Substituting the randomized segment sum gives:
 
 $$
-  \left|f_{bs}\right|^2
+  \left|\mathcal{f}_\text{bs}\right|^2
   = \sum_{j=1}^{N} |q_j|^2
   + \sum_{j \ne \ell} q_j q_\ell^* e^{i(\varphi_j - \varphi_\ell)}.
 $$
 
-Taking the ensemble average yields
+Taking the ensemble average yields:
 
 $$
-  \langle \sigma_{bs} \rangle
+  \langle \sigma_\text{bs} \rangle
   = \sum_{j=1}^{N} |q_j|^2
   + \sum_{j \ne \ell} q_j q_\ell^* \,
     \mathbb{E}\!\left[e^{i(\varphi_j - \varphi_\ell)}\right].
 $$
 
-If the phase perturbations are independent and identically distributed with variance $\sigma_\varphi^2$, then
+When the phase perturbations are independent and identically distributed with variance $\sigma_\varphi^2$, the coherence factor becomes:
 
 $$
   \mathbb{E}\!\left[e^{i(\varphi_j - \varphi_\ell)}\right]
@@ -153,10 +153,10 @@ $$
   = e^{-\sigma_\varphi^2}.
 $$
 
-Therefore,
+Under that assumption, the ensemble-averaged cross-section becomes:
 
 $$
-  \langle \sigma_{bs} \rangle
+  \langle \sigma_\text{bs} \rangle
   = \sum_{j=1}^{N} |q_j|^2
   + e^{-\sigma_\varphi^2}
     \sum_{j \ne \ell} q_j q_\ell^*.
@@ -166,38 +166,36 @@ This equation makes the stochastic mechanism explicit. The self-terms remain unc
 
 ## Deterministic and incoherent limits
 
-Two limiting cases follow immediately.
-
-If
+Two limiting cases follow immediately. When the phase disorder tends to zero, the stochastic coherence factor approaches unity:
 
 $$
   \sigma_\varphi \to 0,
 $$
 
-then
+Under that limit, the coherence factor satisfies:
 
 $$
   e^{-\sigma_\varphi^2} \to 1,
 $$
 
-and the deterministic DWBA is recovered.
+so the deterministic DWBA is recovered.
 
-If
+When the phase disorder becomes very large, the coherence factor is suppressed completely:
 
 $$
   \sigma_\varphi \to \infty,
 $$
 
-then
+Under that limit, the coherence factor satisfies:
 
 $$
   e^{-\sigma_\varphi^2} \to 0,
 $$
 
-and only the incoherent sum of segment intensities survives:
+In that limit, only the incoherent sum of segment intensities survives:
 
 $$
-  \langle \sigma_{bs} \rangle \to \sum_{j=1}^{N}|q_j|^2.
+  \langle \sigma_\text{bs} \rangle \to \sum_{j=1}^{N}|q_j|^2.
 $$
 
 The SDWBA therefore interpolates continuously between a fully coherent and a partially incoherent scattering model.
@@ -207,16 +205,16 @@ The SDWBA therefore interpolates continuously between a fully coherent and a par
 In practice, the ensemble average is approximated by repeated stochastic realizations:
 
 $$
-  \langle \sigma_{bs}(\theta) \rangle
+  \langle \sigma_\text{bs}(\theta) \rangle
   \approx \frac{1}{M}
   \sum_{m=1}^{M}
-  \left|f_{bs}^{(m)}(\theta)\right|^2,
+  \left|\mathcal{f}_\text{bs}^{(m)}(\theta)\right|^2,
 $$
 
 where $M$ is the number of realizations. The target strength is then defined from the averaged linear cross-section:
 
 $$
-  TS = 10\log_{10}\!\left(\langle \sigma_{bs}(\theta) \rangle\right).
+  TS = 10\log_{10}\!\left(\langle \sigma_\text{bs}(\theta) \rangle\right).
 $$
 
 This ordering matters. The average is taken in linear units before conversion to decibels.
@@ -231,7 +229,7 @@ For that reason, the SDWBA uses a scale-invariant prescription in which the refe
 
 ## Segment scaling law
 
-Let $(N_0, f_0, L_0)$ denote a reference segmentation, frequency, and body length. Then the number of segments used at frequency $f$ and body length $L$ is taken to scale as
+Let $(N_0, f_0, L_0)$ denote a reference segmentation, frequency, and body length. Then the number of segments used at frequency $f$ and body length $L$ is taken to scale as:
 
 $$
   N(f,L) = N_0 \frac{fL}{f_0 L_0}.
@@ -247,7 +245,7 @@ $$
   \operatorname{sd}_\varphi(f) \, f = \operatorname{sd}_{\varphi_0} f_0.
 $$
 
-Using the segment scaling law above gives the operational relationship
+Using the segment scaling law above gives the operational relationship:
 
 $$
   \operatorname{sd}_\varphi(f,L)

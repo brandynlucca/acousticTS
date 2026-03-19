@@ -134,7 +134,7 @@ $$
   p(\mathbf{r}') \approx e^{i\mathbf{k}_2\cdot\mathbf{r}'},
 $$
 
-with:
+The corresponding interior wavevector is:
 
 $$
   \mathbf{k}_2 = k_2\hat{\mathbf{k}},
@@ -164,14 +164,14 @@ For clarity and compactness, this distinction is not carried forward here. The p
 To first order, the backscattering amplitude becomes:
 
 $$
-  f_{bs} = 
+  \mathcal{f}_\text{bs} = 
     \frac{k_1^2}{4\pi} \iiint_V \left(\gamma_\kappa - \gamma_\rho \cos^2\beta\right) e^{2 i \mathbf{k}_2 \cdot \mathbf{r}} \, dV,
 $$
 
 where $\mathbf{k}_2$ is the interior propagation vector and $\beta$ is the local angle between the propagation direction and the body tangent. In the standard elongated-body form, this angular dependence is absorbed into the effective cross-sectional response, allowing the integrand to be written in the simplified isotropic contrast form:
 
 $$
-  f_{bs} = 
+  \mathcal{f}_\text{bs} = 
     \frac{k_1}{4\pi}
     \iiint_V
     \left(\gamma_\kappa - \gamma_\rho\right)
@@ -251,7 +251,7 @@ $$
 \int_0^{2 \pi} e^{i z \cos \varphi} \, d\varphi = 2 \pi J_0(z).
 $$
 
-With:
+Using the substitution:
 
 $$
 z = 2 k_2 r_\perp \cos \beta_{\mathrm{tilt}}(s),
@@ -275,7 +275,7 @@ $$
   \frac{a J_1(ba)}{b}.
 $$
 
-Taking:
+Applying that identity with:
 
 $$
 b = 2 k_2 \cos \beta_{\mathrm{tilt}}(s),
@@ -372,7 +372,7 @@ J_1(z) \sim \frac{z}{2}
 \qquad \text{as } z \to 0.
 $$
 
-Therefore:
+This asymptotic relation implies the removable-limit result:
 
 $$
 \frac{

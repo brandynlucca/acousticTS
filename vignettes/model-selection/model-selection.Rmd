@@ -31,7 +31,7 @@ The most important principle is that model selection should follow the target an
 
 <object type="image/svg+xml" data="model-selection-flowchart.svg" style="width:100%;" aria-label="General model-selection flowchart"></object>
 
-Because model choice is often driven as much by boundary condition as by geometry, this guide should be read together with the companion [boundary conditions article](../boundary_conditions.html).
+Boundary condition is often as decisive as geometry in this decision process. A spherical pressure-release cavity, a fluid-filled sphere, and an elastic shell may look similar at gross scale while belonging to different model families because the interface physics is different in each case.
 
 # Core principle
 

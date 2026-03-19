@@ -41,7 +41,7 @@ When measured body coordinates or bespoke outlines are available, `arbitrary()` 
 
 This is one of the main geometric tradeoffs in the package. A canonical shape may offer stronger mathematical alignment with an exact theory family, but it may smooth away anatomical features that are important for an approximate segmented model. An arbitrary shape may preserve those features better, but it may no longer support the same geometry-matched analytical simplifications. The right choice depends on what the reader wants the geometry to do in the later acoustic interpretation.
 
-The second figure is useful here because it makes that tradeoff explicit. The further a body departs from a separable canonical surface, the stronger the case becomes for preserving the measured morphology rather than forcing the target into an overly simple idealized form.
+The further a body departs from a separable canonical surface, the stronger the case becomes for preserving the measured morphology rather than forcing the target into an overly simple idealized form.
 
 # Choosing the right level of geometric detail
 

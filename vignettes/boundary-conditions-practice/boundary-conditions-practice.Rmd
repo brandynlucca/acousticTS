@@ -15,7 +15,7 @@ vignette: >
 
 # Introduction
 
-The companion [boundary conditions article](../boundary_conditions.html) defines the main boundary types mathematically. This article is the applied counterpart: how those boundary types affect practical model choice and interpretation.
+This article turns the mathematical boundary statements used throughout the theory pages into practical consequences for model choice and interpretation.
 
 # Why boundary choice matters
 

@@ -19,7 +19,7 @@ vignette: >
 
 The Kirchhoff-Ray Mode (KRM) model is a composite scattering theory for elongated fish-like bodies. Its defining assumption is that different anatomical components can occupy different acoustic regimes. The fish body is treated with a Kirchhoff-ray approximation appropriate for a weakly contrasting, smoothly varying, elongated fluid-like body, while the swimbladder is treated either by a low-order modal approximation when its acoustic size is small or by a Kirchhoff approximation when it is larger.[^1][^2][^3]
 
-Its body and swimbladder components rest on fluid-like and fluid-interface assumptions that overlap with the simple and weak fluid-like cases summarized in the companion [boundary conditions article](../boundary_conditions.html).
+Its body term therefore uses weak fluid-like tissue contrasts at a fluid interface, while its swimbladder term uses a much stronger gas-tissue contrast that can support either a low-order modal response or a higher-frequency Kirchhoff response. The same target is intentionally split across approximation regimes because the dominant scattering mechanisms of tissue and gas are not the same.
 
 The name of the model follows directly from that hybrid structure: Kirchhoff for the geometric body treatment, ray for the body traversal terms, and mode for the low-frequency cylindrical contribution retained for the swimbladder. The point of the model is not that one approximation is universally best, but that a fish-like target naturally mixes a weakly scattering body with a much stronger internal inclusion. The KRM is designed to keep those two physical roles distinct rather than forcing the entire target into a single approximation regime.
 
@@ -27,7 +27,7 @@ The name of the model follows directly from that hybrid structure: Kirchhoff for
 
 ![KRM approximation assignment for weakly scattering body tissue and strongly contrasting internal inclusion.](krm-regime-assignment-schematic.svg)
 
-The figure separates the two physical ingredients of the KRM used later in the derivation: the body is represented as a chain of short locally cylindrical Kirchhoff segments, while the swimbladder is the component that is assigned either the low-order modal treatment or the higher-frequency local Kirchhoff term.
+The model is built from two different physical pieces. The body is represented as a chain of short locally cylindrical Kirchhoff segments, whereas the internal inclusion is the component assigned either a low-order modal treatment or a higher-frequency local Kirchhoff term.
 
 ::: {.note data-title="Swimbladders aren't a requirement"}
 Although the swimbladder is the canonical internal scatterer in fisheries applications, the KRM formulation does not require a gas-filled inclusion. The internal term more generally represents any region of strong acoustic contrast embedded within a weakly scattering body. In the absence of such a feature, the model reduces naturally to the body-only Kirchhoff-ray formulation.
@@ -41,21 +41,21 @@ The starting point for the KRM body contribution is the Kirchhoff approximation 
 
 For a locally cylindrical fish body this means that a short segment can be treated as a small fluid cylinder whose scattering is dominated by specular reflection and a transmitted path through the body. The scattered field from the full body is then built by coherently summing the contributions of many such short segments.
 
-In Kirchhoff form, the scattered pressure amplitude may be written schematically as a surface integral over the insonified body,
+In Kirchhoff form, the scattered pressure amplitude may be written schematically as a surface integral over the insonified body:
 
 $$
-  f_{bs} \propto \int_S \left[p\frac{\partial G}{\partial n} - G\frac{\partial p}{\partial n}\right] dS,
+  \mathcal{f}_\text{bs} \propto \int_S \left[p\frac{\partial G}{\partial n} - G\frac{\partial p}{\partial n}\right] dS,
 $$
 
 where $G$ is the exterior Green's function and $n$ is the outward normal. The Kirchhoff approximation replaces $p$ and $\partial p/\partial n$ on each local patch by the corresponding tangent-plane values. For a smooth specular patch, stationary phase then reduces this surface integral to a local contribution proportional to the square root of acoustic size.
 
-For a short cylindrical segment this produces a local amplitude of the form
+For a short cylindrical segment this produces a local amplitude of the form:
 
 $$
-  d f_{K} \sim -i\frac{(ka\sin\theta)^{1/2}}{2\sqrt{\pi}}e^{-i2kz_U}\,du,
+  d f_{K} \sim -i\frac{(k a\sin\theta)^{1/2}}{2\sqrt{\pi}} e^{-i2k z_U}\,du,
 $$
 
-where $du$ is projected segment length and $z_U$ is the upper-surface phase coordinate. The KRM body contribution starts from this Kirchhoff term and then augments it by the first transmitted traversal through the body.
+where $du$ is projected segment length, $a$ is local radius, $k$ is the water wavenumber, $\theta$ is the angle of incidence, and $z_U$ is the upper-surface coordinate of the segment. The KRM body contribution starts from this leading Kirchhoff term and then augments it by the first transmitted traversal through the body.
 
 ## Why a hybrid body-swimbladder model is needed
 
@@ -67,7 +67,7 @@ That distinction is the main conceptual reason the KRM exists. If one forced the
 
 ## Rotated coordinates
 
-Let the body axis be described by axial coordinate $x$ and dorsoventral coordinate $z$, with incident angle $\theta$. The geometry is transformed into rotated coordinates aligned with the incident wave through
+Let the body axis be described by axial coordinate $x$ and dorsoventral coordinate $z$, with incident angle $\theta$. The geometry is transformed into rotated coordinates aligned with the incident wave through:
 
 $$
   u(j) = x(j)\sin\theta - z(j)\cos\theta,
@@ -83,7 +83,7 @@ The quantity $u(j)$ measures projected location across the insonified length, wh
 
 ![KRM coordinate bookkeeping for projected segment length, phase coordinate, and body thickness.](krm-coordinate-bookkeeping.svg)
 
-The schematic makes the bookkeeping explicit. The axial body description is given in the original $(x,z)$ frame, but scattering is accumulated in the rotated $(u,v)$ frame aligned with the insonifying wave. The quantities $z_U$ and $z_L$ denote the upper and lower surfaces used in the two-path body term, while $\Delta u_j$ is the projected segment length that weights each local contribution.
+Scattering is accumulated in the rotated $(u,v)$ frame aligned with the insonifying wave even though the body description begins in $(x,z)$. The quantities $z_U$ and $z_L$ denote the upper and lower surfaces used in the two-path body term, while $\Delta u_j$ is the projected segment length that weights each local contribution.
 
 ## Segment lengths and radii
 
@@ -93,7 +93,7 @@ $$
   \Delta u_j = [x(j+1)-x(j)]\sin\theta,
 $$
 
-which follows the original KRM formulation. This expression is a slender-body approximation to the exact relation $\Delta u_j = u(j + 1) - u(j)$ in which the contribution from the cross-sectional variation, $\left[ z(j + 1) - z(j) \right] \cos \theta$, is neglected. The approximation assumes that the body is smoothly varying and primarily parameterized along its axis, so that changes in $z$ over a short segment are small compared with changes in $x$. Under this assumption, the projected length is controlled by the axial extent of the segment, consistent with the one-dimensional segmentation used in the KRM body formulation. The effective radius of the short locally cylindrical segment is
+which follows the original KRM formulation. This expression is a slender-body approximation to the exact relation $\Delta u_j = u(j + 1) - u(j)$ in which the contribution from the cross-sectional variation, $\left[ z(j + 1) - z(j) \right] \cos \theta$, is neglected. The approximation assumes that the body is smoothly varying and primarily parameterized along its axis, so that changes in $z$ over a short segment are small compared with changes in $x$. Under this assumption, the projected length is controlled by the axial extent of the segment, consistent with the one-dimensional segmentation used in the KRM body formulation. The effective radius of the short locally cylindrical segment is:
 
 $$
   a_j = \frac{w(j)+w(j+1)}{4},
@@ -105,7 +105,7 @@ where $w$ is local width. These definitions are the geometric ingredients needed
 
 ## Interface coefficients
 
-Treat the body as a fluid-like medium embedded in water. Let the reflection coefficient at the water-body interface be $\mathcal{R}_{wb}$. The transmitted ray that crosses the body and exits again carries the two-way transmission factor
+Treat the body as a fluid-like medium embedded in water. Let the reflection coefficient at the water-body interface be $\mathcal{R}_{wb}$. The transmitted ray that crosses the body and exits again carries the two-way transmission factor:
 
 $$
   \mathcal{T}_{wb}\mathcal{T}_{bw} = 1-\mathcal{R}_{wb}^2.
@@ -123,7 +123,7 @@ $$
   Z_B = \rho_B c_B.
 $$
 
-The corresponding transmission coefficients satisfy
+The corresponding transmission coefficients satisfy:
 
 $$
   \mathcal{T}_{wb} = 1+\mathcal{R}_{wb},
@@ -131,7 +131,7 @@ $$
   \mathcal{T}_{bw} = 1-\mathcal{R}_{wb},
 $$
 
-so that
+These transmission formulas imply the two-way traversal identity:
 
 $$
   \mathcal{T}_{wb}\mathcal{T}_{bw} = 1-\mathcal{R}_{wb}^2.
@@ -139,47 +139,47 @@ $$
 
 ## Kirchhoff reduction of a short segment
 
-For a short locally cylindrical segment, the Kirchhoff approximation implies that the scattering amplitude is obtained by integrating the local specular contribution over the projected illuminated area. Stationary-phase reduction of that surface integral gives an amplitude proportional to the square root of the local acoustic size and to the projected segment length. That is the origin of the factor
+For a short locally cylindrical segment, the Kirchhoff approximation implies that the scattering amplitude is obtained by integrating the local specular contribution over the projected illuminated area. Stationary-phase reduction of that surface integral gives an amplitude proportional to the square root of the local acoustic size and to the projected segment length. That is the origin of the factor:
 
 $$
-  \frac{(ka_j\sin\theta)^{1/2}}{2\sqrt{\pi}}\Delta u_j.
+  \frac{(k a_j\sin\theta)^{1/2}}{2\sqrt{\pi}}\Delta u_j.
 $$
 
 Thus the square-root dependence is not arbitrary. It is the standard stationary-phase scaling of a specular high-frequency contribution from a smooth curved segment.
 
 ## Near-surface and through-body rays
 
-Each short body segment contributes two principal coherent terms. The first is a direct reflection from the dorsal surface. The second enters the body, propagates through it, reflects internally, and exits again. If $z_{U,j}$ and $z_{L,j}$ denote the dorsal and ventral surfaces of the segment in the rotated frame, then the two contributions are
+Each short body segment contributes two principal coherent terms. The first is a direct reflection from the dorsal surface. The second enters the body, propagates through it, reflects internally, and exits again. Retaining the standard KRM notation, the upper surface is denoted by $z_{U,j}$, while $v_j$ and $v_{L,j}$ are the rotated-coordinate quantities used in the through-body phase bookkeeping. The two contributions are:
 
 $$
-  \mathcal{R}_{wb} e^{-i2kz_{U,j}},
+  \mathcal{R}_{wb} e^{-i2k z_{U,j}},
 $$
 
-and
+The transmitted-return contribution is:
 
 $$
   \mathcal{T}_{wb}\mathcal{T}_{bw}
-  e^{-i2kz_{U,j} + i2k_B(z_{U,j}-z_{L,j}) + i\psi_B}.
+  e^{-i2k z_{U,j} + i2k_B(w_j-v_j-v_{L,j}) + i\psi_{B,j}},
 $$
 
 Here $k$ is the wavenumber in water and $k_B$ is the wavenumber in the body medium. The first phase term locates the segment in the external field, while the second term includes the additional propagation through the body thickness.
 
 The KRM body term is therefore a two-path approximation derived from Kirchhoff geometry. The local segment behaves like a short fluid slab: one contribution reflects from the first interface, while the other accumulates additional phase by traversing the body and returning. Higher-order internal traversals are neglected, which is one reason the model remains compact.
 
-If the local body thickness in the incident direction is $z_{U,j}-z_{L,j}$, then the internal traversal phase is
+In the compact KRM notation, the internal traversal phase is written as:
 
 $$
-  2k_B(z_{U,j}-z_{L,j}),
+  2k_B(w_j-v_j-v_{L,j}),
 $$
 
-so the coherent local bracket becomes
+so the coherent local bracket becomes:
 
 $$
   \left[
-    \mathcal{R}_{wb} e^{-i2kz_{U,j}}
+    \mathcal{R}_{wb} e^{-i2k z_{U,j}}
     -
     \mathcal{T}_{wb}\mathcal{T}_{bw}
-    e^{-i2kz_{U,j}+i2k_B(z_{U,j}-z_{L,j})+i\psi_B}
+    e^{-i2k z_{U,j}+i2k_B(w_j-v_j-v_{L,j})+i\psi_{B,j}}
   \right].
 $$
 
@@ -191,27 +191,27 @@ This is the explicit bridge from Kirchhoff surface scattering to the KRM body fo
 
 ![KRM two-path body ray schematic](krm-body-ray-schematic.svg)
 
-The figure isolates the same two paths retained analytically: the near-surface reflected term and the first transmitted traversal through the body thickness. The KRM body expression is the coherent sum of those two contributions after local Kirchhoff scaling.
+The KRM body expression is the coherent sum of two local paths: a near-surface reflected contribution and a first transmitted traversal through the body thickness, both multiplied by the same Kirchhoff scaling for the segment.
 
 ## Segment amplitude scaling
 
 The body segment is treated as a short locally cylindrical reflector. Kirchhoff asymptotics therefore gives amplitude factor proportional to the square root of local acoustic size:
 
 $$
-  \frac{(ka_j\sin\theta)^{1/2}}{2\sqrt{\pi}}.
+  \frac{(k a_j\sin\theta)^{1/2}}{2\sqrt{\pi}},
 $$
 
-Multiplying by the projected segment length $\Delta u_j$ gives the segment scattering length
+Multiplying by the projected segment length $\Delta u_j$ gives the segment scattering length:
 
 $$
   \mathcal{L}_{B,j} \approx
-  -i\frac{(ka_j\sin\theta)^{1/2}}{2\sqrt{\pi}}
+  -i\frac{(k a_j\sin\theta)^{1/2}}{2\sqrt{\pi}}
   \Delta u_j
   \left[
-    \mathcal{R}_{wb} e^{-i2kz_{U,j}}
+    \mathcal{R}_{wb} e^{-i2k z_{U,j}}
     -
     \mathcal{T}_{wb}\mathcal{T}_{bw}
-    e^{-i2kz_{U,j}+i2k_B(z_{U,j}-z_{L,j})+i\psi_B}
+    e^{-i2k z_{U,j}+i2k_B(w_j-v_j-v_{L,j})+i\psi_{B,j}}
   \right].
 $$
 
@@ -220,10 +220,10 @@ $$
 An empirical phase correction is introduced to improve agreement with finite-wavelength behavior across intermediate acoustic sizes:
 
 $$
-  \psi_B = -\frac{\pi k_B z_U}{2(k_B z_U + 0.4)}.
+  \psi_{B,j} = -\frac{\pi k_B z_{U,j}}{2(k_B z_{U,j} + 0.4)},
 $$
 
-As with other hybrid fisheries-acoustics formulas, this term compensates for the fact that a strict geometric traversal phase alone does not adequately describe the finite-wavelength body contribution over the full practical range.
+where $z_{U,j}$ is the segment-averaged upper-surface coordinate used in the body bookkeeping. As with other hybrid fisheries-acoustics formulas, this term compensates for the fact that a strict geometric traversal phase alone does not adequately describe the finite-wavelength body contribution over the full practical range.
 
 ## Coherent sum over the body
 
@@ -239,13 +239,13 @@ Thus body scattering is treated as a one-dimensional array of locally cylindrica
 
 ## Low-frequency modal approximation
 
-When the swimbladder acoustic size is small, the scattering is dominated by the azimuthally symmetric ($m = 0$) mode, which may include resonance effects but does not require a sharp resonance. The swimbladder scattering length is then approximated by
+In the classical KRM description, when the swimbladder acoustic size is small, the scattering is dominated by the azimuthally symmetric ($m = 0$) mode. The swimbladder scattering length is then approximated by:
 
 $$
   L_M(ka)\big|_{m=0} = e^{i(\chi-\pi/4)}\frac{L_e}{\pi}\frac{\sin\Delta}{\Delta}b_0,
 $$
 
-where $L_e$ is an effective length, $\Delta$ is the same finite-length phase parameter used in short-cylinder scattering, and
+where $L_e$ is an effective length, $\Delta$ is the same finite-length phase parameter used in short-cylinder scattering, and:
 
 $$
   b_0 = -\frac{1}{1+iC_0}.
@@ -255,64 +255,64 @@ The coefficient $b_0$ is the zeroth-order cylindrical scattering coefficient obt
 
 This point is essential to the logic of the KRM. The modal term is not merely another empirical correction. It comes from the low-frequency partial-wave description of a gas-filled cylinder, for which the azimuthally symmetric mode dominates as $ka \to 0$.
 
-To see this explicitly, begin with the cylindrical expansions
+For the low-frequency swimbladder term, the relevant local scattering problem is not gas in water. It is gas inside body tissue. Accordingly, let the surrounding body medium be region 2 and the internal gas be region 3. The modal derivation then begins with the cylindrical expansions:
 
 $$
-  p_{inc}(r,\phi) = \sum_{m=0}^{\infty} \epsilon_m i^m J_m(kr)\cos(m\phi),
-$$
-
-$$
-  p_{scat}(r,\phi) = \sum_{m=0}^{\infty} \epsilon_m i^m b_m H_m^{(1)}(kr)\cos(m\phi),
+  p_{2,inc}(r,\phi) = \sum_{m=0}^{\infty} \epsilon_m i^m J_m(k_2 r)\cos(m\phi),
 $$
 
 $$
-  p_{int}(r,\phi) = \sum_{m=0}^{\infty} \epsilon_m i^m c_m J_m(k_g r)\cos(m\phi).
-$$
-
-Pressure continuity and normal-velocity continuity at the gas boundary $r=a$ give, for each mode $m$,
-
-$$
-  J_m(ka)+b_mH_m^{(1)}(ka)=c_mJ_m(k_ga),
+  p_{2,scat}(r,\phi) = \sum_{m=0}^{\infty} \epsilon_m i^m b_m H_m^{(1)}(k_2 r)\cos(m\phi),
 $$
 
 $$
-  \frac{1}{\rho_w}\left[J_m'(ka)+b_mH_m^{(1)\prime}(ka)\right]
-  = \frac{1}{\rho_g}\frac{k_g}{k}c_mJ_m'(k_ga).
+  p_{3}(r,\phi) = \sum_{m=0}^{\infty} \epsilon_m i^m c_m J_m(k_3 r)\cos(m\phi).
 $$
 
-Eliminating $c_m$ gives the usual fluid-cylinder coefficient. In the long-wavelength limit, the $m=0$ term dominates, so one retains only
+Pressure continuity and normal-velocity continuity at the gas boundary $r=a$ give, for each mode $m$:
+
+$$
+  J_m(k_2 a)+b_mH_m^{(1)}(k_2 a)=c_mJ_m(k_3 a),
+$$
+
+$$
+  \frac{1}{\rho_2}\left[J_m'(k_2 a)+b_mH_m^{(1)\prime}(k_2 a)\right]
+  = \frac{1}{\rho_3}\frac{k_3}{k_2}c_mJ_m'(k_3 a).
+$$
+
+Eliminating $c_m$ gives the usual fluid-cylinder coefficient. In the long-wavelength limit, the $m=0$ term dominates, so one retains only:
 
 $$
   b_0 = -\frac{1}{1+iC_0},
 $$
 
-with
+The auxiliary coefficient entering the low-frequency modal term is:
 
 $$
   C_0 =
   \frac{
-    \dfrac{J_0'(k_g a)}{J_0(k_g a)}Y_0(ka) - gh\,Y_0'(ka)
+    \dfrac{J_0'(k_3 a)}{J_0(k_3 a)}Y_0(k_2 a) - gh\,Y_0'(k_2 a)
   }{
-    \dfrac{J_0'(k_g a)}{J_0(k_g a)}J_0(ka) - gh\,J_0'(ka)
+    \dfrac{J_0'(k_3 a)}{J_0(k_3 a)}J_0(k_2 a) - gh\,J_0'(k_2 a)
   },
 $$
 
-where $g=\rho_g/\rho_w$ and $h=c_g/c_w$ for the gas-filled cylinder. The low-frequency KRM bladder term therefore inherits its coefficient directly from the same pressure-continuity and normal-velocity conditions used in cylindrical modal theory. The additional KRM simplification is only the truncation to the azimuthally symmetric mode when $ka \ll 1$.
+where $g=\rho_3/\rho_2$ and $h=c_3/c_2$ for the gas-filled cylinder embedded in body tissue. The low-frequency KRM bladder term therefore inherits its coefficient directly from the same pressure-continuity and normal-velocity conditions used in cylindrical modal theory. The additional KRM simplification is only the truncation to the azimuthally symmetric mode when $ka \ll 1$.
 
-which is the modal ingredient used in the KRM swimbladder contribution.
+This $b_0$ coefficient is the modal ingredient used in the low-frequency KRM swimbladder contribution.
 
 ## High-frequency Kirchhoff approximation for the swimbladder
 
-When the swimbladder is no longer acoustically small, the same local-Kirchhoff logic used for the body is applied to the swimbladder. The segment contribution becomes
+When the swimbladder is no longer acoustically small, the same local-Kirchhoff logic used for the body is applied to the swimbladder. The segment contribution becomes:
 
 $$
   \mathcal{L}_{SB,j} \approx
   -i\frac{A_{SB,j}[(k_Ba_j+1)\sin\theta]^{1/2}}{2\sqrt{\pi}}
   \Delta u_j\mathcal{R}_{bc}\mathcal{T}_{wb}
-  e^{-i(2k_Bv_j+\psi_p)},
+  e^{-i(2k_Bv_j+\psi_{p,j})},
 $$
 
-where $\mathcal{R}_{bc}$ is the body-to-bladder reflection coefficient.
+where $\mathcal{R}_{bc}$ is the body-to-bladder reflection coefficient and $v_j$ is the rotated phase coordinate of segment $j$.
 
 Thus the KRM assigns the swimbladder to one of two regimes. In the long-wavelength regime it is treated by the leading cylindrical mode. In the larger-size regime it is treated as a chain of locally specular segments. The model is hybrid because it explicitly switches the physical description according to which asymptotic regime is more appropriate.
 
@@ -320,23 +320,23 @@ This is also the point at which readers should be careful about interpretation. 
 
 ## Swimbladder amplitude and phase corrections
 
-The empirical amplitude correction is
+The empirical amplitude correction is:
 
 $$
-  A_{SB} = \frac{ka}{ka+0.083},
+  A_{SB,j} = \frac{k a_j}{k a_j+0.083},
 $$
 
-and the phase correction is
+and the phase correction is:
 
 $$
-  \psi_p = \frac{ka}{40+ka}-1.05.
+  \psi_{p,j} = \frac{k a_j}{40+k a_j}-1.05.
 $$
 
 As in the body term, these corrections account for the finite-wavelength transition between strict long-wavelength modal behavior and the regime in which a Kirchhoff treatment becomes reasonable.
 
 ## Coherent swimbladder sum
 
-The total swimbladder contribution is
+The total swimbladder contribution is:
 
 $$
   f_{bladder} = \sum_{j=1}^{N_s}\mathcal{L}_{SB,j},
@@ -349,22 +349,22 @@ or, in the low-frequency regime, by the corresponding modal expression if the sw
 The total scattering length is the coherent sum of body and swimbladder terms:
 
 $$
-  f_{bs} = f_{body}+f_{bladder}.
+  \mathcal{f}_\text{bs} = f_{body}+f_{bladder},
 $$
 
-The backscattering cross-section is therefore
+The backscattering cross-section is therefore:
 
 $$
-  \sigma_{bs} = |f_{bs}|^2,
+  \sigma_\text{bs} = |\mathcal{f}_\text{bs}|^2,
 $$
 
-and the target strength is
+and the target strength is:
 
 $$
-  TS = 20\log_{10}|f_{bs}|.
+  TS = 20\log_{10}|\mathcal{f}_\text{bs}|.
 $$
 
-The logarithmic definition uses $20\log_{10}$ because $f_{bs}$ is a scattering length rather than a cross-section.
+The logarithmic definition uses $20\log_{10}$ because $\mathcal{f}_\text{bs}$ is a scattering length rather than a cross-section.
 
 # Mathematical assumptions
 

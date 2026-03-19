@@ -135,7 +135,7 @@ This is often the most honest description for biological targets, because postur
 
 ![Coherence regimes schematic](combining-coherence-schematic.svg)
 
-The figure is a compact map of those three regimes. Full coherence retains fixed relative phase and therefore full interference, incoherent averaging randomizes the phase enough that cross terms vanish in the mean, and partial coherence damps but does not eliminate them.
+Full coherence retains fixed relative phase and therefore full interference, incoherent averaging randomizes the phase enough that cross terms vanish in the mean, and partial coherence damps but does not eliminate them.
 
 # What must be true before coherent summation is plausible
 
