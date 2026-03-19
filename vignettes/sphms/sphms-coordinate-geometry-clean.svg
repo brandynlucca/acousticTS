@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="title desc">
+  <title id="title">Spherical coordinates and modal bookkeeping</title>
+  <desc id="desc">Cleaner SPHMS schematic showing a sphere of radius a, the polar angle theta, incident-wave direction, and the separation between exterior and interior radial basis functions.</desc>
+  <defs>
+    <style>
+      .bg { fill: #fbf8f1; }
+      .panel { fill: #fffdf8; stroke: #28322a; stroke-width: 2; }
+      .sphere { fill: #dbe9ef; stroke: #0f5c5c; stroke-width: 5; }
+      .axis { stroke: #223127; stroke-width: 2.5; }
+      .guide { stroke: #6c756d; stroke-width: 2; stroke-dasharray: 6 6; fill: none; }
+      .ray { stroke: #8a5c34; stroke-width: 3; marker-end: url(#arr1); fill: none; }
+      .out { stroke: #4d8a78; stroke-width: 3; marker-end: url(#arr2); fill: none; }
+      .heading { font: 700 23px Georgia, "Times New Roman", serif; fill: #1f2520; }
+      .label { font: 18px Georgia, "Times New Roman", serif; fill: #1f2520; }
+      .math { font: italic 20px Georgia, "Times New Roman", serif; fill: #0d4c52; }
+      .small { font: 16px Georgia, "Times New Roman", serif; fill: #1f2520; }
+    </style>
+    <marker id="arr1" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a5c34"/>
+    </marker>
+    <marker id="arr2" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4d8a78"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="960" height="420"/>
+  <rect class="panel" x="24" y="24" width="912" height="372" rx="16" ry="16"/>
+  <text class="heading" x="480" y="58" text-anchor="middle">Spherical coordinates and partial-wave bookkeeping</text>
+
+  <line class="axis" x1="162" y1="210" x2="740" y2="210"/>
+  <line class="axis" x1="456" y1="348" x2="456" y2="72"/>
+  <text class="math" x="746" y="216">z</text>
+  <text class="math" x="464" y="82">x</text>
+
+  <circle class="sphere" cx="456" cy="210" r="114"/>
+  <line class="guide" x1="456" y1="210" x2="554" y2="138"/>
+  <path class="guide" d="M524 210 A68 68 0 0 0 553 156"/>
+  <text class="math" x="524" y="172">&#952;</text>
+  <text class="small" x="576" y="146">polar angle</text>
+
+  <line class="ray" x1="94" y1="130" x2="264" y2="190"/>
+  <text class="label" x="92" y="108">incident plane wave</text>
+  <text class="math" x="92" y="138">e^{i k_1 z}</text>
+
+  <line class="ray" x1="456" y1="210" x2="570" y2="210"/>
+  <text class="math" x="510" y="194">a</text>
+  <text class="small" x="580" y="196">boundary r = a</text>
+
+  <path class="out" d="M560 152 C648 122, 730 112, 834 96"/>
+  <path class="out" d="M570 210 C668 210, 746 226, 840 256"/>
+  <path class="out" d="M552 268 C636 312, 724 324, 824 336"/>
+  <text class="small" x="724" y="78">exterior scattered basis</text>
+  <text class="math" x="724" y="102">A_n h_n^{(1)}(k_1 r) P_n(cos&#952;)</text>
+
+  <text class="small" x="246" y="294">interior or regular basis</text>
+  <text class="math" x="246" y="320">j_n(k r) P_n(cos&#952;)</text>
+
+  <text class="small" x="114" y="360">The spherical surface keeps the angular basis matched, so each n-mode remains decoupled.</text>
+  <text class="small" x="114" y="382">SPHMS differs by boundary condition, not by a change in the underlying spherical coordinate geometry.</text>
+</svg>

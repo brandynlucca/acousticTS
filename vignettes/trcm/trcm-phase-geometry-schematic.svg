@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 300" role="img" aria-labelledby="title desc">
+  <title id="title">TRCM phase geometry</title>
+  <desc id="desc">Straight-cylinder cross-section showing the near-face reflection and the transmitted traversal retained in the two-ray cylinder model.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8f3ea; }
+      .panel { fill: #fffdfa; stroke: #2f2822; stroke-width: 2.1; rx: 16; ry: 16; }
+      .head { font: 700 21px Georgia, serif; fill: #1f1a16; }
+      .txt { font: 15px Georgia, serif; fill: #2f2822; }
+      .small { font: 13px Georgia, serif; fill: #564b40; }
+      .cyl { fill: #dbe8f2; stroke: #2f2822; stroke-width: 2.1; }
+      .ray1 { stroke: #9d5d2e; stroke-width: 3; fill: none; marker-end: url(#m1); }
+      .ray2 { stroke: #3a6c8e; stroke-width: 3; fill: none; marker-end: url(#m2); }
+    </style>
+    <marker id="m1" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#9d5d2e"/></marker>
+    <marker id="m2" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#3a6c8e"/></marker>
+  </defs>
+  <rect width="920" height="300" class="bg"/>
+  <text x="26" y="40" class="head">The two retained paths in the straight-cylinder interference factor</text>
+  <rect x="24" y="62" width="872" height="214" class="panel"/>
+  <circle cx="410" cy="169" r="74" class="cyl"/>
+  <path d="M118 155 L336 155" class="ray1"/>
+  <path d="M336 155 L212 112" class="ray1"/>
+  <path d="M118 191 L336 191" class="ray2"/>
+  <path d="M336 191 C402 248, 494 248, 560 191" class="ray2"/>
+  <path d="M560 191 C494 90, 402 90, 336 191" class="ray2"/>
+  <path d="M336 191 L212 228" class="ray2"/>
+  <text x="72" y="112" class="txt">incident wave</text>
+  <text x="222" y="102" class="small">near-face reflection</text>
+  <text x="580" y="205" class="small">first transmitted traversal</text>
+  <text x="372" y="86" class="small">radius a</text>
+  <text x="618" y="108" class="small">additional phase: 4k₂a cos θ_shift</text>
+  <text x="618" y="132" class="small">multiplied by T₁₂T₂₁ exp(iμ)</text>
+</svg>

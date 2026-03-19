@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="title desc">
+  <title id="title">TRCM curvature and coherence</title>
+  <desc id="desc">Schematic showing how a bent cylinder reduces axial coherence by introducing quadratic phase variation away from the stationary-phase region.</desc>
+  <defs>
+    <style>
+      .bg { fill: #faf7f0; }
+      .panel { fill: #fffdfa; stroke: #2d2b28; stroke-width: 2; }
+      .head { font: 700 23px Georgia, "Times New Roman", serif; fill: #1f1d1a; }
+      .txt { font: 18px Georgia, "Times New Roman", serif; fill: #2d2b28; }
+      .small { font: 16px Georgia, "Times New Roman", serif; fill: #4f473f; }
+      .math { font: italic 20px Georgia, "Times New Roman", serif; fill: #0f4e60; }
+      .axis { stroke: #4f473f; stroke-width: 2.5; }
+      .body { fill: none; stroke: #0f5c5c; stroke-width: 18; stroke-linecap: round; }
+      .beam { stroke: #8a5c34; stroke-width: 3.5; fill: none; marker-end: url(#arr); }
+      .phase { fill: none; stroke: #6f6a64; stroke-width: 2.2; stroke-dasharray: 5 6; }
+      .focus { fill: #c35a1a; }
+    </style>
+    <marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a5c34"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="960" height="420"/>
+  <rect class="panel" x="24" y="24" width="912" height="372" rx="16" ry="16"/>
+  <text class="head" x="480" y="58" text-anchor="middle">Curvature changes coherent axial length in the bent-cylinder extension</text>
+
+  <path class="body" d="M158 282 C282 226, 408 176, 532 156 C650 138, 740 152, 812 188"/>
+  <line class="beam" x1="78" y1="156" x2="278" y2="156"/>
+  <line class="beam" x1="78" y1="204" x2="278" y2="204"/>
+  <line class="beam" x1="78" y1="252" x2="278" y2="252"/>
+  <text class="txt" x="78" y="128">incident wave</text>
+
+  <circle class="focus" cx="520" cy="160" r="7"/>
+  <text class="small" x="542" y="150">stationary-phase region</text>
+  <text class="small" x="542" y="174">local broadside patch dominates</text>
+
+  <path class="phase" d="M280 282 Q360 230 440 190"/>
+  <path class="phase" d="M520 160 Q630 150 760 182"/>
+  <text class="small" x="276" y="306">larger phase mismatch away from the stationary point</text>
+
+  <line class="axis" x1="180" y1="332" x2="812" y2="332"/>
+  <line class="axis" x1="180" y1="324" x2="180" y2="340"/>
+  <line class="axis" x1="812" y1="324" x2="812" y2="340"/>
+  <text class="math" x="486" y="356" text-anchor="middle">L</text>
+  <text class="small" x="198" y="384">Curvature does not replace the local two-ray cross-section. It limits how much of the axis adds coherently,</text>
+  <text class="small" x="198" y="404">which is why the bent-body correction appears as an equivalent complex length L_ebc.</text>
+</svg>

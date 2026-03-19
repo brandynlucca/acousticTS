@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-labelledby="title desc">
+  <title id="title">TRCM straight-cylinder two-ray geometry</title>
+  <desc id="desc">Schematic showing the near-face reflection and the first diameter-traversing return retained by the two-ray cylinder model, with radius, shifted angle, and phase labels.</desc>
+  <defs>
+    <style>
+      .bg { fill: #faf7f0; }
+      .panel { fill: #fffdfa; stroke: #2d2b28; stroke-width: 2; }
+      .head { font: 700 23px Georgia, "Times New Roman", serif; fill: #1f1d1a; }
+      .txt { font: 18px Georgia, "Times New Roman", serif; fill: #2d2b28; }
+      .small { font: 16px Georgia, "Times New Roman", serif; fill: #4f473f; }
+      .math { font: italic 20px Georgia, "Times New Roman", serif; fill: #0f4e60; }
+      .cyl { fill: #dbe8f2; stroke: #2d2b28; stroke-width: 3; }
+      .guide { stroke: #6f6a64; stroke-width: 2; stroke-dasharray: 6 6; fill: none; }
+      .ray1 { stroke: #935321; stroke-width: 4; fill: none; marker-end: url(#m1); }
+      .ray2 { stroke: #3f6f8e; stroke-width: 4; fill: none; marker-end: url(#m2); }
+    </style>
+    <marker id="m1" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#935321"/>
+    </marker>
+    <marker id="m2" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#3f6f8e"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="960" height="420"/>
+  <rect class="panel" x="24" y="24" width="912" height="372" rx="16" ry="16"/>
+  <text class="head" x="480" y="58" text-anchor="middle">Straight-cylinder cross-section retained by TRCM</text>
+
+  <circle class="cyl" cx="472" cy="212" r="112"/>
+  <line class="guide" x1="360" y1="212" x2="584" y2="212"/>
+  <line class="guide" x1="472" y1="100" x2="472" y2="324"/>
+
+  <line class="ray1" x1="92" y1="178" x2="360" y2="178"/>
+  <line class="ray1" x1="360" y1="178" x2="230" y2="136"/>
+  <text class="txt" x="90" y="150">incident wave</text>
+  <text class="small" x="208" y="118">near-face reflection</text>
+
+  <line class="ray2" x1="92" y1="246" x2="360" y2="246"/>
+  <polyline class="ray2" points="360,246 584,246 584,178 360,178 230,286"/>
+  <text class="small" x="604" y="178">first transmitted return</text>
+  <text class="small" x="604" y="202">diameter traversal and far-side reflection</text>
+
+  <line class="guide" x1="472" y1="212" x2="568" y2="148"/>
+  <path class="guide" d="M540 212 A68 68 0 0 0 568 170"/>
+  <text class="math" x="540" y="182">&#952;_shift</text>
+
+  <line class="guide" x1="472" y1="212" x2="584" y2="212"/>
+  <text class="math" x="522" y="196">a</text>
+  <text class="small" x="602" y="236">extra phase: 4 k_2 a cos &#952;_shift</text>
+  <text class="small" x="602" y="260">through-body prefactor: T_12 T_21 exp(i &#956;)</text>
+
+  <text class="small" x="118" y="356">TRCM keeps the prompt reflection and the first through-body return, then lets those two paths interfere coherently.</text>
+</svg>

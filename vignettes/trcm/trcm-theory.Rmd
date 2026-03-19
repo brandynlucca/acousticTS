@@ -1,0 +1,301 @@
+---
+title: "Theory"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: true
+    fig_caption: yes
+    fig_width: 3.5
+    fig_height: 3.5
+    dpi: 200
+    dev.args: list(pointsize=11)
+vignette: >
+  %\VignetteIndexEntry{Two-ray cylinder model (TRCM) theory}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# Introduction
+
+The two-ray cylinder model (TRCM) is a high-frequency approximation for elongated fluid-like bodies. It assumes that the dominant backscatter from a locally cylindrical body is produced by two coherent contributions: a prompt reflection from the near interface and a second contribution that enters the body, traverses the diameter, reflects from the far interface, and returns with additional phase.[^1][^2][^3] The model is therefore asymptotic from the outset. It does not attempt to represent low-order resonances or a full internal reverberation series. Instead, it keeps only the first two physically important specular paths and asks how they interfere.
+
+The fluid-interface reflection and transmission terms used here are consistent with the simple fluid-filled boundary picture summarized in the companion [boundary conditions article](../boundary_conditions.html), even though the TRCM itself is a high-frequency reduction rather than a full boundary-value solution. In that sense, the model sits between a geometric picture and a fluid-interface calculation: the interface coefficient comes from fluid acoustics, while the overall amplitude and directivity come from high-frequency asymptotics for an elongated body.
+
+![Straight-cylinder cross-section and the two retained TRCM paths.](trcm-two-ray-geometry-clean.svg)
+
+![Curvature changes axial coherence length, not the local two-ray cross-sectional physics.](trcm-curvature-coherence-clean.svg)
+
+The first schematic corresponds directly to the two terms retained in the interference factor: the near-face reflection and the transmitted path that crosses the diameter, reflects, and returns with phase $4 k_2 a \cos \theta_{shift}$. The second schematic separates the curved-body extension from the cross-sectional ray picture. It shows that TRCM handles bending by changing how much of the body axis adds coherently, while the local reflection and diameter-traversal bookkeeping are still inherited from the straight-cylinder construction.
+
+# Physical basis of the TRCM
+
+## High-frequency starting point
+
+The TRCM begins from the same physical picture as other Kirchhoff-type high-frequency models: when a smooth fluid body is acoustically large, the scattered field is dominated by contributions from specular regions of the surface. For an elongated locally cylindrical body, the strongest backscatter comes from those parts of the cross-section for which the incident and scattered directions are symmetric about the local outward normal. The model then truncates the internal path bookkeeping very aggressively. It assumes that one prompt reflected path and one first traversing internal path carry most of the coherent backscatter.
+
+This is the key reason the TRCM is useful and also the key reason it can fail. It is useful because the dominant oscillatory structure of many elongated weakly curved fluid-like bodies is often controlled by interference between those two contributions. It can fail when the body is not locally cylindrical, when the acoustic size is not large enough, or when neglected internal paths and resonance structure are no longer small corrections.
+
+## From multiple internal paths to a two-ray interference factor
+
+A more complete internal-reflection picture would contain a geometric series of transmitted paths with phases corresponding to repeated diameter traversals. In that fuller expansion, the prompt near-face reflection is used as the reference contribution. The TRCM then retains one additional internal term, namely the first through-body return with relative complex weight:
+
+$$
+  T_{12} T_{21} e^{i \mu} e^{4 i k_2 a \cos \theta_{shift}}
+$$
+
+Here $T_{12}$ and $T_{21}$ are the transmission coefficients from the exterior fluid into the cylinder and back out again, $\mu$ is an empirical phase correction, $k_2$ is the interior wavenumber, $a$ is the cylinder radius, and $\theta_{shift}$ is the broadside-referenced incidence angle. The coherent sum of the retained paths is therefore:
+
+$$
+  I_{term}
+  =
+  1 - T_{12} T_{21} e^{i \mu} e^{4 i k_2 a \cos \theta_{shift}}
+$$
+
+The leading $1$ corresponds to the prompt near-face reflection. The second term corresponds to the first transmitted return. The interference factor therefore says that the prompt reflected contribution is being used as the reference term, while the traversing return is phase-shifted and amplitude-weighted before the two are added coherently.
+
+# Straight-cylinder derivation
+
+## Acoustic contrasts and interface coefficient
+
+Let medium 1 denote the surrounding fluid and medium 2 denote the cylinder interior. Let $\rho_1$ and $c_1$ be the exterior density and sound speed, and let $\rho_2$ and $c_2$ be the corresponding interior quantities. Define the density and sound-speed contrasts by:
+
+$$
+  g = \frac{\rho_2}{\rho_1},
+  \qquad
+  h = \frac{c_2}{c_1}
+$$
+
+The exterior and interior wavenumbers are then:
+
+$$
+  k_1 = \frac{\omega}{c_1},
+  \qquad
+  k_2 = \frac{\omega}{c_2}
+$$
+
+where $\omega$ is angular frequency. At normal incidence on a fluid-fluid interface, the pressure reflection coefficient is:
+
+$$
+  r = \frac{g h - 1}{g h + 1}
+$$
+
+This coefficient controls the prompt reflected contribution. The corresponding transmission coefficients used in the TRCM bookkeeping are:
+
+$$
+  T_{12} = 1 - r,
+  \qquad
+  T_{21} = 1 + r
+$$
+
+The factor $T_{12} T_{21}$ therefore weights the path that enters the body, traverses it, and exits again.
+
+## Geometry and shifted angle
+
+Consider a locally straight cylinder of radius $a$ and length $L$. Let $\theta$ denote the body orientation measured in the package convention, and define the broadside-referenced angle by:
+
+$$
+  \theta_{shift} = \theta - \frac{\pi}{2}
+$$
+
+This shifted angle is the one that appears naturally in the straight-cylinder TRCM formulas. At $\theta_{shift} = 0$, the body is at broadside and the two-ray picture is most strongly expressed. As $|\theta_{shift}|$ increases, the axial directivity factor suppresses the response and the specular broadside interpretation becomes progressively less useful.
+
+## Diameter-traversal phase
+
+The direct ray reflects from the near face. The second ray penetrates the cylinder, traverses the projected diameter twice, and accumulates additional phase:
+
+$$
+  4 k_2 a \cos \theta_{shift}
+$$
+
+The through-body contribution therefore carries the factor:
+
+$$
+  e^{4 i k_2 a \cos \theta_{shift}}
+$$
+
+This is the part of the TRCM that readers usually want a picture for, because the algebraic phase factor becomes much easier to interpret once the diameter traversal has been drawn explicitly. It is simply the two-way interior optical path associated with the first transmitted return.
+
+## Empirical phase correction
+
+The simple geometric path difference above does not fully account for finite-wavelength behavior near the transition out of the strict geometric regime. A corrective phase term is therefore introduced:
+
+$$
+  \mu = -\frac{(\pi / 2) k_1 a}{k_1 a + 0.4}
+$$
+
+The through-body contribution is then multiplied by:
+
+$$
+  e^{i \mu}
+$$
+
+This term is an empirical phase adjustment rather than a separate ray path. Its role is to shift the phase of the through-body contribution so that the two-ray approximation better matches the finite-frequency behavior described in the Stanton-model literature.
+
+## Interference factor
+
+Combining transmission and phase accumulation yields the two-ray interference factor:
+
+$$
+  I_{term}
+  =
+  1 - T_{12} T_{21} e^{i \mu} e^{4 i k_2 a \cos \theta_{shift}}
+$$
+
+The leading $1$ corresponds to the near-interface reflection. The second term corresponds to the first transmitted return. Destructive or constructive interference occurs according to the phase difference between those two retained paths.
+
+## Finite-length directivity
+
+The straight cylinder also has a finite longitudinal extent $L$. If the scattered phase is integrated over a uniformly illuminated body axis, the axial phase increment is:
+
+$$
+  \Delta = k_1 L \sin \theta_{shift}
+$$
+
+The resulting finite-length directivity factor is:
+
+$$
+  s = \frac{\sin \Delta}{\Delta}
+$$
+
+This is the standard sinc directivity factor for coherent integration over a finite segment. It is the exact result of integrating a constant-amplitude phase factor along the axis, and it explains why the straight-cylinder response decays rapidly once the body rotates away from broadside.
+
+## High-frequency amplitude scaling
+
+Kirchhoff-type specular approximations for smooth convex surfaces produce an amplitude proportional to the square root of local acoustic size. For the TRCM straight-cylinder construction, that gives the factor:
+
+$$
+  \sqrt{k_1 a \cos \theta_{shift}}
+$$
+
+The phase of a one-dimensional stationary-phase contribution contributes the additional factor:
+
+$$
+  e^{i \pi / 4}
+$$
+
+The free-space phase accumulated to the near interface and back contributes:
+
+$$
+  e^{-2 i k_1 a \cos \theta_{shift}}
+$$
+
+Putting all of these ingredients together gives the straight-cylinder scattering amplitude:
+
+$$
+  f_{bs}^{straight}
+  =
+  -\frac{i}{2 \sqrt{\pi}}
+  e^{i \pi / 4}
+  e^{-2 i k_1 a \cos \theta_{shift}}
+  L \sqrt{k_1 a \cos \theta_{shift}}
+  \, r \, s \, I_{term}
+$$
+
+Every component of this formula has a separate interpretation: $r$ comes from the fluid-fluid interface conditions, $s$ comes from axial phase integration, the square-root factor and $e^{i \pi / 4}$ come from high-frequency specular asymptotics, and $I_{term}$ comes from the coherent sum of the two retained cross-sectional rays.
+
+# Curved-cylinder extension
+
+## Curvature as a coherence problem
+
+If the cylinder is bent smoothly, contributions from different axial positions no longer share the same phase as in the straight case. The bent-body extension therefore modifies the coherent axial accumulation, not the local cross-sectional two-ray physics. In other words, the same local reflection coefficient, transmission coefficients, and diameter-traversal phase are retained, but the effective coherent length of the body is reduced by curvature-induced phase variation.
+
+For a local circular arc, the phase mismatch relative to the dominant stationary-phase region is quadratic to leading order. One convenient asymptotic representation is:
+
+$$
+  L_{ebc}(k_1)
+  =
+  \int_{-\gamma_{max}}^{\gamma_{max}}
+  e^{i k_1 r_c \gamma^2}
+  \, d \gamma
+$$
+
+where:
+
+$$
+  r_c = \rho_c,
+  \qquad
+  \gamma_{max} = \frac{L}{2 \rho_c}
+$$
+
+Here $\rho_c$ is the physical radius of curvature and $\gamma$ is a local curvature-angle coordinate measuring position along the bent axis. This form makes the Fresnel-type structure of the bent-body correction explicit.
+
+## Bent-body amplitude
+
+The bent-cylinder backscatter is obtained by replacing the coherent length $L$ in the straight-cylinder result with the curvature-modified equivalent length $L_{ebc}$:
+
+$$
+  f_{bs}^{curved}
+  =
+  L_{ebc}
+  \frac{f_{bs}^{straight}}{L}
+$$
+
+This expression states the main physical idea behind the curved TRCM: curvature does not replace the local two-ray interference law, but it does reduce the span of the axis over which those local contributions remain phase-aligned.
+
+## Numerical form of the curvature integral
+
+A practical numerical form of the coherent-length correction evaluates the complex integral over axial coordinate rather than curvature angle. Writing $x$ for axial position along the body, one may use a kernel of the form:
+
+$$
+  L_{ebc}(k_1)
+  =
+  \int_{-L/2}^{L/2}
+  \exp \left[
+    i \,
+    \frac{8 k_1 z_{max}}{L^2}
+    x^2
+  \right]
+  d x
+$$
+
+where:
+
+$$
+  z_{max}
+  =
+  \rho_c
+  \left(
+    1 - \cos \gamma_{max}
+  \right),
+  \qquad
+  \gamma_{max}
+  =
+  \frac{L}{2 \rho_c}
+$$
+
+This is still a quadratic-phase coherence correction. It simply expresses the same bent-body idea in the axial coordinate rather than in curvature angle.
+
+## Stationary-phase reduction
+
+When the bent-body phase oscillates rapidly, the quadratic-phase integral admits a stationary-phase approximation. For a quadratic kernel one obtains:
+
+$$
+  L_{ebc}
+  \approx
+  \sqrt{\frac{\rho_c L \lambda}{2}}
+  e^{i \pi / 4}
+$$
+
+where $\lambda = 2 \pi / k_1$ is wavelength. This is the standard stationary-phase reduction of the bent-body coherence integral.
+
+At exact broadside, this stationary-phase branch is naturally centered on the dominant specular region of the bent body, so the local two-ray factor is evaluated at $\theta_{shift} = 0$.
+
+# Mathematical assumptions
+
+The TRCM depends on the following assumptions:
+
+1. The body is acoustically large enough that specular contributions dominate over low-order resonance structure.
+2. A locally cylindrical geometry is adequate for the part of the target that controls the backscatter.
+3. Two coherent paths dominate the cross-sectional return: the prompt reflection and the first through-body return.
+4. The boundary is fluid-like, so fluid-fluid reflection and transmission are the right interface coefficients to use.
+5. Curvature varies slowly enough that the bent-body phase correction can be represented by a quadratic coherence integral or its stationary-phase reduction.
+
+Under these assumptions the TRCM captures the main oscillatory structure associated with two-ray interference, but it is not intended to reproduce a full modal or reverberant description of a finite fluid cylinder.
+
+## References
+
+[^1]: Stanton, T. K., Chu, D., Wiebe, P. H., and Clay, C. S. (1993). Average echoes from randomly oriented random-length finite cylinders: zooplankton models. *The Journal of the Acoustical Society of America*, 94, 3463-3472.
+
+[^2]: Stanton, T. K., Chu, D., Wiebe, P. H., Martin, L. V., and Eastwood, R. L. (1998). Sound scattering by several zooplankton groups. I. Experimental determination of dominant scattering mechanisms. *The Journal of the Acoustical Society of America*, 103, 225-235.
+
+[^3]: Stanton, T. K., Chu, D., and Wiebe, P. H. (1998). Sound scattering by several zooplankton groups. II. Scattering models. *The Journal of the Acoustical Society of America*, 103, 236-253.
