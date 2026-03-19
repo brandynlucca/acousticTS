@@ -52,3 +52,19 @@ test_that("Complex integration functions work", {
   # Test that the result is complex
   expect_true(is.complex(result))
 })
+
+test_that(
+  "Gauss-Legendre quadrature validates n and supports the one-node rule", 
+  {
+
+    gl1 <- gauss_legendre(1)
+
+    expect_equal(gl1$nodes, 0)
+    expect_equal(gl1$weights, 2)
+
+    expect_error(
+      gauss_legendre(1.5),
+      "n must be a positive integer"
+    )
+  }
+)

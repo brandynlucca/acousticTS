@@ -6,7 +6,13 @@ using namespace Rcpp;
 
 // Implementation of Gauss-Legendre quadrature
 void gauss_legendre(int n, std::vector<double>& nodes, std::vector<double>& weights) {
-    if (n < 2) throw std::runtime_error("n must be >= 2");
+    if (n < 1) throw std::runtime_error("n must be >= 1");
+
+    if (n == 1) {
+        nodes = {0.0};
+        weights = {2.0};
+        return;
+    }
 
     nodes.resize(n);
     weights.resize(n);
