@@ -19,29 +19,32 @@ or fractional.}
 \value{
 A complex vector containing:
 \itemize{
-\item \code{hs}: \eqn{h^{(1)}_l(z)}
-\item \code{hsd}: \eqn{\frac{d}{dz}h^{(1)}_l(z)} (first derivative)
+\item \code{hs}: \eqn{h^{(1)}_\nu(z)}
+\item \code{hsdK}: \eqn{\frac{d}{dz^k}h^{(1)}_l(z)} (k-th derivative)
 }
 }
 \description{
-Computes the spherical Hankel function of the first kind (\eqn{h^{(1)}_l(z)})
-and its first derivative (\code{hsd}).
+Computes the spherical Hankel function of the first kind
+(\eqn{h^{(1)}_\nu(z)}) and its first-th derivative.
 }
 \details{
 The spherical Hankel function of the first kind is defined as:
-\deqn{h^{(1)}_l(z) = j_l(z) + i y_l(z)}
+\deqn{h^{(1)}_\nu(z) = j_\nu(z) + i y_\nu(z)}
 
-where \eqn{j_l(z)} is the spherical Bessel function of the first kind and
-\eqn{y_l(z)} is the spherical Bessel function of the second kind.
+where \eqn{j_\nu(z)} is the spherical Bessel function of the first kind and
+\eqn{y_\nu(z)} is the spherical Bessel function of the second kind.
 
 It is related to the cylindrical Hankel function by:
-\deqn{h^{(1)}_l(z) = \sqrt{\frac{\pi}{2z}} H^{(1)}_{l+1/2}(z)}
+\deqn{h^{(1)}_\nu(z) = \sqrt{\frac{\pi}{2z}} H^{(1)}_{\nu+1/2}(z)}
 
 The spherical Hankel functions are used extensively in scattering theory
 to represent outgoing spherical waves.
 
 \strong{Derivative:}
-\deqn{\frac{d}{dz}h^{(1)}_l(z) = \frac{l}{z} h^{(1)}_l(z) - h^{(1)}_{l+1}(z)}
+\deqn{
+ \frac{d}{dz}h^{(1)}_\nu(z) = \frac{\nu}{z} h^{(1)}_\nu(z) 
+ - h^{(1)}_{\nu+1}(z)
+}
 }
 \examples{
 # Spherical Hankel function
@@ -55,7 +58,7 @@ hs(0.5, 3)
 hs(0, c(1, 2, 3))
 
 # First derivative
-hsd(1, 2)
+hsdk(1, 2, 1)
 
 }
 \references{

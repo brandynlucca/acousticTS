@@ -2,17 +2,11 @@
 % Please edit documentation in R/bessel-cylindrical.R
 \name{jc}
 \alias{jc}
-\alias{jcd}
-\alias{jcdd}
 \alias{jcdk}
-\title{Cylindrical Bessel function of the first kind, \eqn{J_\nu(x)}, and its
+\title{Cylindrical Bessel function of the first kind, \eqn{J_\nu(z)}, and its
 respective derivatives}
 \usage{
 jc(l, n)
-
-jcd(l, n)
-
-jcdd(l, n)
 
 jcdk(l, n, k)
 }
@@ -38,12 +32,12 @@ A complex vector containing:
 }
 \description{
 Computes the cylindrical Bessel function of the first kind (\eqn{J_\nu(z)})
-and its first (\code{jcd}), second (\code{jcdd}), and k-th (\code{jcdk})
-derivatives.
+and its k-th derivatives.
 }
 \details{
 The cylindrical Bessel function of the first kind satisfies Bessel's
 differential equation:
+
 \deqn{z^2 \frac{d^2 J_\nu}{dz^2} + z \frac{dJ_\nu}{dz} + (z^2 - \nu^2) J
 _\nu = 0}
 

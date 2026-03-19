@@ -3,7 +3,7 @@
 \name{js}
 \alias{js}
 \alias{jsdk}
-\title{Spherical Bessel function of the first kind, \eqn{j_\nu(x)}, and its
+\title{Spherical Bessel function of the first kind, \eqn{j_\nu(z)}, and its
 respective derivatives}
 \usage{
 js(l, n)
@@ -20,37 +20,41 @@ function. If a matrix is provided, the function is applied column-wise.}
 \value{
 A numeric vector or matrix (matching the input structure) containing:
 \itemize{
-\item \code{js}: \eqn{j_l(z)}
-\item \code{jsd}: \eqn{j'_l(z)} (first derivative)
-\item \code{jsdd}: \eqn{j''_l(z)} (second derivative)
+\item \code{js}: \eqn{j_\nu(z)}
+\item \code{jsdk}: \eqn{j^{(k)'}_l(z)} (k-th derivative)
 }
 }
 \description{
-Computes the spherical Bessel function of the first kind (\eqn{j_l(z)}) and
-its first (\code{jsd}) and second (\code{jsdd}) derivatives.
+Computes the spherical Bessel function of the first kind (\eqn{j_\nu(z)})
+and its k-th derivative.
 }
 \details{
 The spherical Bessel function of the first kind is related to the cylindrical
 Bessel function by:
-\deqn{j_l(z) = \sqrt{\frac{\pi}{2z}} J_{l+1/2}(z)}
+\deqn{j_\nu(z) = \sqrt{\frac{\pi}{2z}} J_{\nu+1/2}(z)}
 
 where \eqn{J_\nu(z)} is the cylindrical Bessel function of the first kind.
 
 The spherical Bessel functions satisfy the differential equation:
-\deqn{z^2 \frac{d^2 j_l}{dz^2} + 2z \frac{dj_l}{dz} + [z^2 - l(l+1)] j_l = 0}
+\deqn{
+ z^2 \frac{d^2 j_\nu}{dz^2} + 
+ 2z \frac{dj_\nu}{dz} + [z^2 - l(l+1)] j_\nu = 0
+}
 
 \strong{Special cases:}
 \itemize{
-\item \eqn{j_l(0) = 0} for all \eqn{l}.
+\item \eqn{j_\nu(0) = 0} for all \eqn{\nu}.
 \item \eqn{j_0(z) = \frac{\sin(z)}{z}}
 \item \eqn{j_1(z) = \frac{\sin(z)}{z^2} - \frac{\cos(z)}{z}}
 }
 
 \strong{Derivatives:}
 \itemize{
-\item First derivative: \eqn{j'_l(z) = j_{l-1}(z) - \frac{l+1}{z} j_l(z)}
-\item Second derivative: \eqn{j''_l(z) = \frac{(l+1)(l+2) - z^2}{z^2}
-  j_l(z) - \frac{2}{z} j_{l-1}(z)}
+\item First derivative: \eqn{
+   j'_\nu(z) = j_{\nu-1}(z) - \frac{\nu+1}{z} j_\nu(z)
+  }
+\item Second derivative: \eqn{j''_\nu(z) = \frac{(\nu+1)(\nu+2) - z^2}{z^2}
+  j_\nu(z) - \frac{2}{z} j_{\nu-1}(z)}
 }
 }
 \examples{
@@ -68,10 +72,10 @@ js(0, c(1, 2, 3))
 js(1, matrix(1:6, nrow = 2))
 
 # First derivative
-jsd(1, 2)
+jsdk(1, 2, 1)
 
 # Second derivative
-jsdd(1, 2)
+jsdk(1, 2, 2)
 
 }
 \references{

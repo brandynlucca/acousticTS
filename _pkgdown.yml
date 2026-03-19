@@ -1,24 +1,180 @@
 url: https://brandynlucca.github.io/acousticTS/
+
 template:
-  # params:
-  #   math_method: mathjax
   bootstrap: 5
   math-rendering: katex
+  assets:
+    - pkgdown/extra.css
+
+navbar:
+  structure:
+    left: [intro, shapes, models, scatmods, advanced, foundation, theory, reference, news]
+    right: [github]
+  components:
+    intro:
+      text: Getting Started
+      menu:
+        - text: "Quick Start"
+          href: articles/getting-started/getting-started.html
+        - text: "Package Concepts"
+          href: articles/package-concepts/package-concepts.html
+        - text: "Example Data"
+          href: articles/example-data/example-data.html
+    shapes:
+      text: Building scatterers
+      menu:
+        - text: "Building Shapes"
+          href: articles/building-shapes/building-shapes.html
+        - text: "Building Scatterers"
+          href: articles/building-scatterers/building-scatterers.html
+        - text: "Shape Manipulation"
+          href: articles/shape-manipulation-reforging/shape-manipulation-reforging.html
+    models:
+      text: Model selection
+      menu:
+        - text: "Running Models"
+          href: articles/running-models/running-models.html
+        - text: "Model Selection"
+          href: articles/model-selection/model-selection.html
+        - text: "Comparing Models"
+          href: articles/comparing-models/comparing-models.html
+    scatmods:
+      text: Using models
+      menu:
+        - text: "Spherical modal series solution (MSS)"
+          href: articles/sphms/sphms-implementation.html
+        - text: "Finite cylinder MSS"
+          href: articles/fcms/fcms-implementation.html
+        - text: "Prolate spheroid MSS"
+          href: articles/psms/psms-implementation.html
+        - text: "Elastic-shelled sphere MSS"
+          href: articles/essms/essms-implementation.html
+        - text: "Solid elastic sphere MSS"
+          href: articles/calibration/calibration-implementation.html
+        - text: "Distorted wave Born approximation (DWBA)"
+          href: articles/dwba/dwba-implementation.html
+        - text: "Stochastic DWBA"
+          href: articles/sdwba/sdwba-implementation.html
+        - text: "Kirchoff-ray Mode"
+          href: articles/krm/krm-implementation.html
+        - text: "High-pass approximation"
+          href: articles/hpa/hpa-implementation.html
+        - text: "Two-ray cylinder"
+          href: articles/trcm/trcm-implementation.html
+    advanced:
+      text: Advanced
+      menu:
+        - text: "Visualizing results"
+          href: articles/plotting-inspecting-results.html
+        - text: "Simulation sweeps"
+          href: articles/simulation-parameter-sweeps/simulation-parameter-sweeps.html
+        - text: "Creating models from scratch"
+          href: articles/creating-models-from-scratch/creating-models-from-scratch.html
+        - text: "Calibration workflow"
+          href: articles/calibration-workflow/calibration-workflow.html
+        - text: "Combining models"
+          href: articles/combining-components/combining-components.html
+        - text: "Validating models"
+          href: articles/validation-benchmarks/validation-benchmarks.html
+        - text: "Troubleshooting"
+          href: articles/faq-troubleshooting/faq-troubleshooting.html
+    foundation:
+      text: Foundations
+      menu:
+        - text: "Numerical methods"
+          href: articles/numerical-foundations/numerical-foundations.html
+        - text: "Boundary conditions"
+          href: articles/boundary_conditions.html
+        - text: "Boundary conditions in practice"
+          href: articles/boundary-conditions-practice/boundary-conditions-practice.html
+        - text: "Material properties"
+          href: articles/material-properties/material-properties.html
+    theory:
+      text: Theoretical models
+      menu:
+        - text: "Spherical modal series solution (MSS)"
+          href: articles/sphms/sphms-theory.html
+        - text: "Finite cylinder MSS"
+          href: articles/fcms/fcms-theory.html
+        - text: "Prolate spheroid MSS"
+          href: articles/psms/psms-theory.html
+        - text: "Elastic-shelled sphere MSS"
+          href: articles/essms/essms-theory.html
+        - text: "Solid elastic sphere MSS"
+          href: articles/calibration/calibration-theory.html
+        - text: "Distorted wave Born approximation (DWBA)"
+          href: articles/dwba/dwba-theory.html
+        - text: "Stochastic DWBA"
+          href: articles/sdwba/sdwba-theory.html
+        - text: "Kirchoff-ray Mode"
+          href: articles/krm/krm-theory.html
+        - text: "High-pass approximation"
+          href: articles/hpa/hpa-theory.html
+        - text: "Two-ray cylinder"
+          href: articles/trcm/trcm-theory.html      
+
+    reference:
+      text: Reference
+      href: reference/index.html
+    github:
+      icon: fab fa-github
+      href: https://github.com/brandynlucca/acousticTS/
 
 articles:
-- title: Boundary conditions
-  navbar: Boundary conditions
-  contents:
-  - boundary_conditions
-- title: Solid elastic (calibration) sphere
-  navbar: Solid elastic (calibration) sphere
-  contents:
-  - calibration/calibration-theory
-  - calibration/calibration-implementation
-- title: Elastic-shelled sphere
-  navbar: Elastic-shelled sphere
-  contents:
-  - essms/essms-theory
+  - title: Getting Started
+    contents:
+      - getting-started/getting-started
+      - package-concepts/package-concepts
+      - example-data/example-data
+
+  - title: Core Workflow
+    contents:
+      - building-shapes/building-shapes
+      - building-scatterers/building-scatterers
+      - running-models/running-models
+      - plotting-inspecting-results/plotting-inspecting-results
+
+  - title: Modal Series Solutions (Theory & Implementation)
+    contents:
+      - sphms/sphms-implementation
+      - sphms/sphms-theory
+      - fcms/fcms-implementation
+      - fcms/fcms-theory
+      - psms/psms-implementation
+      - psms/psms-theory
+      - calibration/calibration-implementation
+      - calibration/calibration-theory
+      - essms/essms-implementation
+      - essms/essms-theory
+
+  - title: High-Frequency & Ray-Based Models
+    contents:
+      - dwba/dwba-implementation
+      - dwba/dwba-theory
+      - sdwba/sdwba-implementation
+      - sdwba/sdwba-theory
+      - krm/krm-implementation
+      - krm/krm-theory
+      - hpa/hpa-implementation
+      - hpa/hpa-theory
+      - trcm/trcm-implementation
+      - trcm/trcm-theory
+
+  - title: Analysis & Advanced Topics
+    contents:
+      - model-selection/model-selection
+      - comparing-models/comparing-models
+      - simulation-parameter-sweeps/simulation-parameter-sweeps
+      - creating-models-from-scratch/creating-models-from-scratch
+      - combining-components/combining-components
+      - shape-manipulation-reforging/shape-manipulation-reforging
+      - calibration-workflow/calibration-workflow
+      - boundary-conditions-practice/boundary-conditions-practice
+      - validation-benchmarks/validation-benchmarks
+      - faq-troubleshooting/faq-troubleshooting
+      - numerical-foundations/numerical-foundations
+      - boundary_conditions
+      - material-properties/material-properties
 
 reference:
 - title: Scatterer types

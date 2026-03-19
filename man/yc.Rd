@@ -2,17 +2,11 @@
 % Please edit documentation in R/bessel-cylindrical.R
 \name{yc}
 \alias{yc}
-\alias{ycd}
-\alias{ycdd}
 \alias{ycdk}
 \title{Cylindrical Bessel function of the second kind, \eqn{Y_\nu(x)}, and its
 respective derivatives}
 \usage{
 yc(l, n)
-
-ycd(l, n)
-
-ycdd(l, n)
 
 ycdk(l, n, k)
 }

@@ -2,17 +2,11 @@
 % Please edit documentation in R/bessel-cylindrical.R
 \name{hc}
 \alias{hc}
-\alias{hcd}
-\alias{hcdd}
 \alias{hcdk}
 \title{Cylindrical Bessel function of the third kind (Hankel), \eqn{H_\nu(x)}, and
 its respective derivatives}
 \usage{
 hc(l, n)
-
-hcd(l, n)
-
-hcdd(l, n)
 
 hcdk(l, n, k)
 }

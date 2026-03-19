@@ -11,7 +11,17 @@ target_strength(object, frequency, model, verbose = FALSE, ...)
 
 \item{frequency}{Frequency (Hz).}
 
-\item{model}{Model name.}
+\item{model}{Model name. Available models currently include
+\code{"dwba"} (\code{\link{DWBA}}),
+\code{"sdwba"} (\code{\link{SDWBA}}),
+\code{"fcms"} (\code{\link{FCMS}}),
+\code{"hpa"} (\code{\link{HPA}}),
+\code{"krm"} (\code{\link{KRM}}),
+\code{"psms"} (\code{\link{PSMS}}),
+\code{"sphms"} (\code{\link{SPHMS}}),
+\code{"essms"} (\code{\link{ESSMS}}),
+\code{"trcm"} (\code{\link{TRCM}}), and
+\code{"calibration"} / \code{"soems"} (\code{\link{SOEMS}}).}
 
 \item{verbose}{Prints current procedural step occurring from model
 initialization to calculating TS. Defaults to FALSE.}
@@ -20,4 +30,43 @@ initialization to calculating TS. Defaults to FALSE.}
 }
 \description{
 Wrapper function to model acoustic target strength
+}
+\details{
+This is the main high-level entry point for running target-strength models in
+\code{acousticTS}. The supplied scatterer object is checked, the requested
+model or models are initialized, and the resulting outputs are stored back on
+the same object.
+
+The available model families span exact modal-series solutions and
+approximation-based solutions. Readers should consult the model-specific help
+topics for the physical assumptions, valid object types, boundary-condition
+options, and model-specific arguments used by each implementation:
+
+\itemize{
+\item \code{\link{DWBA}} for the distorted-wave Born approximation
+applied to weakly scattering fluid-like bodies.
+\item \code{\link{SDWBA}} for the stochastic distorted-wave Born
+approximation.
+\item \code{\link{FCMS}} for the finite cylinder modal series solution.
+\item \code{\link{HPA}} for the high-pass approximation family.
+\item \code{\link{KRM}} for the Kirchhoff-Ray Mode model.
+\item \code{\link{PSMS}} for the prolate spheroidal modal series
+solution.
+\item \code{\link{SPHMS}} for the spherical modal series solution.
+\item \code{\link{ESSMS}} for the elastic-shelled spherical modal series
+solution.
+\item \code{\link{TRCM}} for the two-ray cylindrical model.
+\item \code{\link{SOEMS}} for the solid elastic calibration-sphere model,
+accessed through \code{"calibration"} or \code{"soems"}.
+}
+
+Model-specific inputs are passed through \code{...}. For example, some models
+require a \code{boundary} argument, \code{HPA} uses a \code{method}
+argument, and several models expose additional numerical controls.
+}
+\seealso{
+\code{\link{DWBA}}, \code{\link{SDWBA}}, \code{\link{FCMS}},
+\code{\link{HPA}}, \code{\link{KRM}}, \code{\link{PSMS}},
+\code{\link{SPHMS}}, \code{\link{ESSMS}}, \code{\link{TRCM}},
+\code{\link{SOEMS}}
 }

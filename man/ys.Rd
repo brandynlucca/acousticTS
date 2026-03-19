@@ -3,7 +3,7 @@
 \name{ys}
 \alias{ys}
 \alias{ysdk}
-\title{Spherical Bessel function of the second kind, \eqn{y_\nu(x)}, and its
+\title{Spherical Bessel function of the second kind, \eqn{y_\nu(z)}, and its
 respective derivatives}
 \usage{
 ys(l, n)
@@ -20,39 +20,43 @@ function. If a matrix is provided, the function is applied column-wise.}
 \value{
 A numeric vector or matrix (matching the input structure) containing:
 \itemize{
-\item \code{ys}: \eqn{y_l(z)}
-\item \code{ysd}: \eqn{y'_l(z)} (first derivative)
-\item \code{ysdd}: \eqn{y''_l(z)} (second derivative)
+\item \code{ys}: \eqn{y_\nu(z)}
+\item \code{ysd}: \eqn{y^{(k)'}_l(z)} (k-th derivative)
 }
 }
 \description{
-Computes the spherical Bessel function of the second kind (\eqn{y_l(z)}),
-also known as the spherical Neumann function, and its first (\code{ysd}) and
-second (\code{ysdd}) derivatives.
+Computes the spherical Bessel function of the second kind (\eqn{y_\nu(z)}),
+also known as the spherical Neumann function, and its k-th derivatives.
 }
 \details{
 The spherical Bessel function of the second kind is related to the
 cylindrical Bessel function by:
-\deqn{y_l(z) = \sqrt{\frac{\pi}{2z}} Y_{l+1/2}(z)}
+
+\deqn{y_\nu(z) = \sqrt{\frac{\pi}{2z}} Y_{\nu+1/2}(z)}
 
 where \eqn{Y_\nu(z)} is the cylindrical Bessel function of the second kind.
 
 The spherical Bessel functions satisfy the same differential equation as
-\eqn{j_l(z)}:
-\deqn{z^2 \frac{d^2 y_l}{dz^2} + 2z \frac{dy_l}{dz} + [z^2 - l(l+1)] y_l = 0}
+\eqn{j_\nu(z)}:
+\deqn{
+ z^2 \frac{d^2 y_\nu}{dz^2} + 2z \frac{dy_\nu}{dz} + 
+ [z^2 - \nu(\nu+1)] y_\nu = 0
+}
 
 \strong{Special cases:}
 \itemize{
-\item \eqn{y_l(0) = -\infty} (singularity at the origin).
+\item \eqn{y_\nu(0) = -\infty} (singularity at the origin).
 \item \eqn{y_0(z) = -\frac{\cos(z)}{z}}
 \item \eqn{y_1(z) = -\frac{\cos(z)}{z^2} - \frac{\sin(z)}{z}}
 }
 
 \strong{Derivatives:}
 \itemize{
-\item First derivative: \eqn{y'_l(z) = \frac{l}{z} y_l(z) - y_{l+1}(z)}
-\item Second derivative: \eqn{y''_l(z) = -\frac{l}{z^2} y_l(z) +
-  \frac{l}{z} y'_l(z) - y'_{l+1}(z)}
+\item First derivative: \eqn{
+   y'_\nu(z) = \frac{\nu}{z} y_\nu(z) - y_{\nu+1}(z)
+ }
+\item Second derivative: \eqn{y''_\nu(z) = -\frac{\nu}{z^2} y_\nu(z) +
+  \frac{\nu}{z} y'_\nu(z) - y'_{\nu+1}(z)}
 }
 }
 \examples{
@@ -70,15 +74,15 @@ ys(0, c(1, 2, 3))
 ys(0, 0)  # Returns -Inf
 
 # First derivative
-ysd(1, 2)
+ysdk(1, 2, 1)
 
 # Second derivative
-ysdd(1, 2)
+ysdk(1, 2, 2)
 
-# k-th derivative
-# - 3rd derivative
+# 3rd derivative
 ysdk(1, 1, 3)
-# - 4th derivative
+
+# 4th derivative
 ysdk(1, 1, 4)
 
 }
