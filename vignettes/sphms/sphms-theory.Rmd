@@ -42,28 +42,28 @@ where $k = \omega/c$. In spherical coordinates $(r,\theta,\varphi)$, the Laplaci
 $$
   \nabla^2 p =
   \frac{1}{r^2}\frac{\partial}{\partial r}
-  \left(r^2\frac{\partial p}{\partial r}\right)
-  + \frac{1}{r^2 \sin\theta}\frac{\partial}{\partial \theta}
-  \left(\sin\theta\frac{\partial p}{\partial \theta}\right)
-  + \frac{1}{r^2\sin^2\theta}\frac{\partial^2 p}{\partial \varphi^2}.
+  \left(r^2\frac{\partial p}{\partial r}\right) +
+  \frac{1}{r^2 \sin\theta}\frac{\partial}{\partial \theta}
+  \left(\sin\theta\frac{\partial p}{\partial \theta}\right) +
+  \frac{1}{r^2\sin^2\theta}\frac{\partial^2 p}{\partial \varphi^2}.
 $$
 
 For axisymmetric incidence, the field is independent of $\varphi$, so the last term vanishes.
 
 ## Separation of variables
 
-Write the axisymmetric pressure as a product of radial and angular factors:
+The axisymmetric pressure can be expressed as a product of radial and angular factors:
 
 $$
-  p(r,\theta) = R(r)\Theta(\theta).
+  p(r,\theta) = R(r)\Theta(\theta),
 $$
 
-Substituting this product into the Helmholtz equation and separating radial from angular dependence gives:
+where $R(r)$ represents the radial dependence of the pressure field and $\Theta(\theta)$ represents the angular dependence. Substituting this product into the Helmholtz equation and separating radial from angular dependence gives:
 
 $$
   \frac{1}{R}\frac{d}{dr}
-  \left(r^2\frac{dR}{dr}\right) + k^2r^2
-  = - \frac{1}{\Theta\sin\theta}
+  \left(r^2\frac{dR}{dr}\right) + k^2r^2 = 
+    -\frac{1}{\Theta\sin\theta}
       \frac{d}{d\theta}\left(\sin\theta\frac{d\Theta}{d\theta}\right).
 $$
 
@@ -72,8 +72,8 @@ Because the left-hand side depends only on $r$ and the right-hand side depends o
 $$
   \frac{1}{\sin\theta}
   \frac{d}{d\theta}
-  \left(\sin\theta\frac{d\Theta}{d\theta}\right)
-  + n(n+1)\Theta = 0,
+  \left(\sin\theta\frac{d\Theta}{d\theta}\right) +
+  n(n+1)\Theta = 0,
 $$
 
 whose regular solutions are the Legendre polynomials:
@@ -85,8 +85,8 @@ $$
 The radial equation takes the form:
 
 $$
-  \frac{d}{dr}\left(r^2\frac{dR}{dr}\right)
-  + \left(k^2r^2 - n(n+1)\right)R = 0,
+  \frac{d}{dr}\left(r^2\frac{dR}{dr}\right) +
+  \left(k^2r^2 - n(n+1)\right)R = 0,
 $$
 
 whose independent solutions are the spherical Bessel, Neumann, and Hankel functions. The essential point is that spherical geometry keeps the angular order $n$ separated exactly. That is why each partial wave can be solved independently once the boundary condition is imposed.
@@ -96,8 +96,8 @@ whose independent solutions are the spherical Bessel, Neumann, and Hankel functi
 The angular modes decouple because the Legendre polynomials satisfy:
 
 $$
-  \int_{-1}^{1} P_m(\mu)P_n(\mu)\,d\mu
-  = \frac{2}{2n+1}\delta_{mn}.
+  \int_{-1}^{1} P_m(\mu)P_n(\mu)\,d\mu =
+    \frac{2}{2n+1}\delta_{mn}.
 $$
 
 This orthogonality is the key step that turns the continuous boundary conditions into independent equations for each order $n$.
@@ -109,19 +109,19 @@ This orthogonality is the key step that turns the continuous boundary conditions
 Let $P_0$ denote the incident pressure amplitude. A plane wave propagating along the polar axis is expanded as:
 
 $$
-  p_{1,inc}(r,\theta)
+  p_{1,\text{inc}}(r,\theta)
   = P_0 e^{ik_1r\cos\theta}
-  = P_0\sum_{n=0}^{\infty}(2n+1)i^n j_n(k_1r)P_n(\cos\theta).
+  = P_0\sum_{n=0}^{\infty}(2n+1)i^n \text{j}_n(k_1r)P_n(\cos\theta).
 $$
 
-The use of $j_n$ is the spherical analogue of using a regular interior radial basis in other modal solutions. Although the incident plane wave is physically defined in the exterior region, its modal expansion is written in terms of the regular spherical Bessel functions because those are the nonsingular basis functions associated with the separated radial equation.
+The use of $\text{j}_n$ is the spherical analogue of using a regular interior radial basis in other modal solutions. Although the incident plane wave is physically defined in the exterior region, its modal expansion is written in terms of the regular spherical Bessel functions because those are the nonsingular basis functions associated with the separated radial equation.
 
 ## Exterior scattered field
 
 The exterior scattered field must satisfy the Sommerfeld radiation condition and is therefore expanded in outgoing spherical Hankel functions:
 
 $$
-  p_{1,scat}(r,\theta)
+  p_{1,\text{scat}}(r,\theta)
   = P_0\sum_{n=0}^{\infty}(2n+1)i^n A_n h_n^{(1)}(k_1r)P_n(\cos\theta).
 $$
 
@@ -139,7 +139,7 @@ $$
 the scattered field becomes:
 
 $$
-  p_{1,scat}(r,\theta) \sim
+  p_{1,\text{scat}}(r,\theta) \sim
   P_0\frac{e^{ik_1r}}{r}
   \left[-\frac{i}{k_1}
   \sum_{n=0}^{\infty}(2n+1)A_nP_n(\cos\theta)
@@ -160,19 +160,19 @@ $$
 For a rigid sphere of radius $a$, the normal fluid velocity vanishes at the surface. Since particle velocity is proportional to the normal derivative of pressure, the boundary condition is:
 
 $$
-  \left.\frac{\partial}{\partial r}(p_{1,inc}+p_{1,scat})\right|_{r=a} = 0.
+  \left.\frac{\partial}{\partial r}(p_{1,\text{inc}}+p_{1,\text{scat}})\right|_{r=a} = 0.
 $$
 
 Substituting the modal expansions and using orthogonality gives, for each order $n$:
 
 $$
-  j_n'(k_1a) + A_n h_n^{(1)\,'}(k_1a) = 0.
+  \text{j}_n'(k_1a) + A_n h_n^{(1)\,'}(k_1a) = 0.
 $$
 
 This boundary condition gives the scattered partial-wave coefficient:
 
 $$
-  A_n = -\frac{j_n'(k_1a)}{h_n^{(1)\,'}(k_1a)}.
+  A_n = -\frac{\text{j}_n'(k_1a)}{h_n^{(1)\,'}(k_1a)}.
 $$
 
 ## Pressure-release sphere
@@ -180,19 +180,19 @@ $$
 For a pressure-release boundary, the total pressure vanishes at the surface:
 
 $$
-  p_{1,inc}(a,\theta) + p_{1,scat}(a,\theta) = 0.
+  p_{1,\text{inc}}(a,\theta) + p_{1,\text{scat}}(a,\theta) = 0.
 $$
 
 Substitution of the modal expansions gives, mode by mode:
 
 $$
-  j_n(k_1a) + A_n h_n^{(1)}(k_1a) = 0.
+  \text{j}_n(k_1a) + A_n h_n^{(1)}(k_1a) = 0.
 $$
 
 This boundary condition gives the scattered partial-wave coefficient:
 
 $$
-  A_n = -\frac{j_n(k_1a)}{h_n^{(1)}(k_1a)}.
+  A_n = -\frac{\text{j}_n(k_1a)}{h_n^{(1)}(k_1a)}.
 $$
 
 ## Fluid-filled and gas-filled sphere
@@ -200,7 +200,7 @@ $$
 For a fluid or gas interior, the pressure inside the sphere must remain finite at the origin, so the interior field is expanded in regular spherical Bessel functions. Writing the interior density and wavenumber as $\rho_3$ and $k_3$, the interior field becomes:
 
 $$
-  p_3(r,\theta) = P_0\sum_{n=0}^{\infty}(2n+1)i^n B_n j_n(k_3r)P_n(\cos\theta).
+  p_3(r,\theta) = P_0\sum_{n=0}^{\infty}(2n+1)i^n B_n \text{j}_n(k_3r)P_n(\cos\theta).
 $$
 
 At $r = a$, pressure and normal velocity are continuous. In region-indexed notation, the pressure condition is:
@@ -216,31 +216,30 @@ $$
   = \frac{1}{\rho_3}\frac{\partial p_3}{\partial r}.
 $$
 
-Since the exterior total pressure is $p_1 = p_{1,inc} + p_{1,scat}$, substituting the modal expansions gives, for each order $n$:
+Since the exterior total pressure is $p_1 = p_{1,\text{inc}} + p_{1,\text{scat}}$, substituting the modal expansions gives, for each order $n$:
 
 $$
-  j_n(k_1a) + A_n h_n^{(1)}(k_1a) = B_n j_n(k_3a),
+  \text{j}_n(k_1a) + A_n h_n^{(1)}(k_1a) = B_n \text{j}_n(k_3a),
 $$
 
 $$
-  \frac{k_1}{\rho_1}\left[j_n'(k_1a) + A_n h_n^{(1)\,'}(k_1a)\right]
-  = \frac{k_3}{\rho_3}B_n j_n'(k_3a).
+  \frac{k_1}{\rho_1}\left[\text{j}_n'(k_1a) + A_n h_n^{(1)\,'}(k_1a)\right]
+  = \frac{k_3}{\rho_3}B_n \text{j}_n'(k_3a).
 $$
 
 Solving the pressure-continuity equation for the interior coefficient gives:
 
 $$
-  B_n = \frac{j_n(k_1 a) + A_n h_n^{(1)}(k_1 a)}{j_n(k_3 a)}.
+  B_n = \frac{\text{j}_n(k_1 a) + A_n h_n^{(1)}(k_1 a)}{\text{j}_n(k_3 a)}.
 $$
 
 Substituting that result into the velocity condition yields:
 
 $$
-  j_n'(k_1 a) + A_n h_n^{(1)\,'}(k_1 a)
-  =
-  \frac{\rho_1 k_3}{\rho_3 k_1}
-  \frac{j_n'(k_3 a)}{j_n(k_3 a)}
-  \left[j_n(k_1 a) + A_n h_n^{(1)}(k_1 a)\right].
+  \text{j}_n'(k_1 a) + A_n h_n^{(1)\,'}(k_1 a) =
+    \frac{\rho_1 k_3}{\rho_3 k_1}
+    \frac{\text{j}_n'(k_3 a)}{\text{j}_n(k_3 a)}
+    \left[\text{j}_n(k_1 a) + A_n h_n^{(1)}(k_1 a)\right].
 $$
 
 Now define the density and sound-speed contrasts by:
@@ -257,15 +256,14 @@ $$
   A_n
   \left[
     h_n^{(1)\,'}(k_1 a)
-    - \frac{1}{gh}
-      \frac{j_n'(k_3 a)}{j_n(k_3 a)}
+      -\frac{1}{gh}
+      \frac{\text{j}_n'(k_3 a)}{\text{j}_n(k_3 a)}
       h_n^{(1)}(k_1 a)
-  \right]
-  =
+  \right] =
   \frac{1}{gh}
-  \frac{j_n'(k_3 a)}{j_n(k_3 a)}
-  j_n(k_1 a)
-  - j_n'(k_1 a).
+  \frac{\text{j}_n'(k_3 a)}{\text{j}_n(k_3 a)}
+  \text{j}_n(k_1 a)
+  -\text{j}_n'(k_1 a).
 $$
 
 The scattered partial-wave coefficient can therefore be written explicitly as:
@@ -273,11 +271,11 @@ The scattered partial-wave coefficient can therefore be written explicitly as:
 $$
   A_n =
   \frac{
-    \dfrac{1}{gh}\dfrac{j_n'(k_3 a)}{j_n(k_3 a)}j_n(k_1 a)
-    - j_n'(k_1 a)
+    \dfrac{1}{gh}\dfrac{\text{j}_n'(k_3 a)}{\text{j}_n(k_3 a)}\text{j}_n(k_1 a)
+    - \text{j}_n'(k_1 a)
   }{
     h_n^{(1)\,'}(k_1 a)
-    - \dfrac{1}{gh}\dfrac{j_n'(k_3 a)}{j_n(k_3 a)}h_n^{(1)}(k_1 a)
+    - \dfrac{1}{gh}\dfrac{\text{j}_n'(k_3 a)}{\text{j}_n(k_3 a)}h_n^{(1)}(k_1 a)
   }.
 $$
 

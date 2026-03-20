@@ -1,5 +1,5 @@
 ---
-title: "Implementation"
+title: "HPA implementation"
 output:
   rmarkdown::html_vignette:
     toc: true
@@ -141,7 +141,7 @@ elongated_object <- fls_generate(
 
 elongated_object <- target_strength(
   object = elongated_object,
-  frequency = frequency,
+  frequency = seq(18e3, 200e3, by = 7e3),
   model = "hpa",
   method = "stanton",
   deviation_fun = 1,

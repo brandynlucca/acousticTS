@@ -19,7 +19,7 @@ Geometry is the first major decision in the package. Before choosing a scatterer
 
 The important point is that shape construction is not yet the stage where material contrasts or boundary conditions are fixed. At this point the user is deciding only how the body is described geometrically. That separation is intentional. It keeps the geometric question distinct from the physical one and makes it easier to evaluate whether a later result is being driven by morphology, by material properties, or by model assumptions.
 
-![Shape-selection spectrum](building-shapes-spectrum.svg)
+<object type="image/svg+xml" data="building-shapes-spectrum.svg" style="width:100%;" aria-label="Shape-selection spectrum"></object>
 
 # Why geometry choice matters
 

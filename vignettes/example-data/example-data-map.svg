@@ -1,7 +1,42 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 420" role="img" aria-labelledby="title desc">
-  <title id="title">Example data workflow map</title>
-  <desc id="desc">Diagram showing bundled example objects feeding learning, comparison, and validation workflows.</desc>
-  <style>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 920.7207 204.23422"
+   role="img"
+   aria-labelledby="title desc"
+   version="1.1"
+   id="svg21"
+   sodipodi:docname="example-data-map.svg"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   width="920.7207"
+   height="204.23422"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview21"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.90612245"
+     inkscape:cx="492.20721"
+     inkscape:cy="280.86712"
+     inkscape:window-width="1920"
+     inkscape:window-height="1057"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg21" />
+  <title
+     id="title">Example data workflow map</title>
+  <desc
+     id="desc">Diagram showing bundled example objects feeding learning, comparison, and validation workflows.</desc>
+  <style
+     id="style1">
     .title { font: 700 28px Georgia, serif; fill: #18324a; }
     .body { font: 400 18px Georgia, serif; fill: #18324a; }
     .small { font: 400 15px Georgia, serif; fill: #35546b; }
@@ -9,35 +44,195 @@
     .mid { fill: #fff8ef; stroke: #c48b41; stroke-width: 2.5; rx: 18; ry: 18; }
     .line { stroke: #557f9a; stroke-width: 3; fill: none; marker-end: url(#arrow); }
   </style>
-  <defs>
-    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
-      <path d="M0,0 L10,5 L0,10 z" fill="#557f9a"/>
+  <defs
+     id="defs1">
+    <marker
+       id="arrow"
+       markerWidth="10"
+       markerHeight="10"
+       refX="8"
+       refY="5"
+       orient="auto">
+      <path
+         d="M 0,0 10,5 0,10 Z"
+         fill="#557f9a"
+         id="path1" />
     </marker>
   </defs>
-  <text x="40" y="48" class="title">Bundled data support more than a first demo</text>
-  <rect x="40" y="90" width="220" height="230" class="box"/>
-  <text x="70" y="128" class="body">Bundled objects</text>
-  <text x="70" y="168" class="small">`sardine`</text>
-  <text x="70" y="198" class="small">`cod`</text>
-  <text x="70" y="228" class="small">`krill`</text>
-  <text x="70" y="258" class="small">`benchmark_ts`</text>
-  <text x="70" y="296" class="small">shared targets and stored</text>
-  <text x="70" y="318" class="small">reference responses</text>
-  <rect x="380" y="90" width="240" height="90" class="mid"/>
-  <text x="410" y="130" class="body">Learning workflows</text>
-  <text x="410" y="158" class="small">plot, inspect, and run a first</text>
-  <text x="410" y="180" class="small">model without building geometry first</text>
-  <rect x="380" y="210" width="240" height="90" class="mid"/>
-  <text x="410" y="250" class="body">Model comparison</text>
-  <text x="410" y="278" class="small">compare assumptions on a shared</text>
-  <text x="410" y="300" class="small">target definition</text>
-  <rect x="700" y="120" width="240" height="150" class="box"/>
-  <text x="730" y="160" class="body">Validation and teaching</text>
-  <text x="730" y="192" class="small">benchmark curves expose setup errors,</text>
-  <text x="730" y="214" class="small">numerical drift, and mismatched</text>
-  <text x="730" y="236" class="small">boundary assumptions</text>
-  <path d="M260 156 C308 156 328 136 380 136" class="line"/>
-  <path d="M260 250 C308 250 328 255 380 255" class="line"/>
-  <path d="M620 136 C660 136 670 155 700 175" class="line"/>
-  <path d="M620 255 C660 255 670 225 700 205" class="line"/>
+  <rect
+     width="920.7207"
+     height="204.23422"
+     fill="#fbfaf5"
+     id="rect1-9"
+     x="0"
+     y="0"
+     style="stroke-width:0.999998" />
+  <text
+     x="303.39355"
+     y="27.783783"
+     class="title"
+     id="text1"
+     style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:28px;line-height:normal;font-family:Georgia, serif">Bundled data support</text>
+  <path
+     d="m 210.47426,88.880633 c 48,0 68,-20.000003 120,-20.000003"
+     class="line"
+     id="path18"
+     sodipodi:nodetypes="cc" />
+  <path
+     d="m 210.47426,147.53153 c 48,0 68,20 120,20"
+     class="line"
+     id="path24"
+     sodipodi:nodetypes="cc" />
+  <rect
+     x="6.8153152"
+     y="69.783783"
+     width="204.40894"
+     height="95.777115"
+     class="box"
+     id="rect1" />
+  <text
+     x="11.453434"
+     y="87.49427"
+     class="body"
+     id="text2"
+     style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:18px;line-height:normal;font-family:Georgia, serif;fill:#18324a">Bundled <tspan
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;font-family:'Courier New';-inkscape-font-specification:'Courier New, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   id="tspan25">.RData</tspan> objects</text>
+  <text
+     x="11.958805"
+     y="100.96185"
+     class="small"
+     id="text3"
+     style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:15px;line-height:normal;font-family:'Courier New';-inkscape-font-specification:'Courier New, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#35546b"><tspan
+       sodipodi:role="line"
+       id="tspan21"
+       x="11.958805"
+       y="100.96185">sardine</tspan><tspan
+       sodipodi:role="line"
+       id="tspan22"
+       x="11.958805"
+       y="119.71185">cod</tspan><tspan
+       sodipodi:role="line"
+       id="tspan23"
+       x="11.958805"
+       y="138.46185">krill</tspan><tspan
+       sodipodi:role="line"
+       id="tspan24"
+       x="11.958805"
+       y="157.21185">benchmark_ts</tspan></text>
+  <g
+     id="g33"
+     transform="translate(-42.275745,-47.970719)">
+    <rect
+       x="380"
+       y="90"
+       width="250.48424"
+       height="60.202702"
+       class="mid"
+       id="rect8" />
+    <text
+       x="383.86261"
+       y="106.82433"
+       class="body"
+       id="text9"
+       style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:18px;line-height:normal;font-family:Georgia, serif">Learning workflows</text>
+    <text
+       x="384.61713"
+       y="123.23649"
+       class="small"
+       id="text10"
+       style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:15px;line-height:normal;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#35546b"><tspan
+         sodipodi:role="line"
+         id="tspan26"
+         x="384.61713"
+         y="123.23649">Plot, inspect, test models without</tspan><tspan
+         sodipodi:role="line"
+         id="tspan27"
+         x="384.61713"
+         y="141.98648">building custom <tspan
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;font-family:'Courier New';-inkscape-font-specification:'Courier New, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   id="tspan28">Scatterer</tspan> objects</tspan></text>
+  </g>
+  <g
+     id="g41"
+     transform="translate(-33.184685,-20.216217)">
+    <path
+       d="m 621.39319,92.346847 c 40,0 50,19.000003 80,39.000003"
+       class="line"
+       id="path20" />
+    <path
+       d="m 621.39295,184.49775 c 40,0 50,-19 80,-39"
+       class="line"
+       id="path33" />
+  </g>
+  <g
+     id="g32"
+     transform="translate(-42.275745,-75.819967)">
+    <rect
+       x="380"
+       y="210"
+       width="250.48399"
+       height="60.202999"
+       class="mid"
+       id="rect11" />
+    <text
+       x="382.40991"
+       y="226.82433"
+       class="body"
+       id="text12"
+       style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:18px;line-height:normal;font-family:Georgia, serif">Model comparison</text>
+    <text
+       x="382.29712"
+       y="241.58109"
+       class="small"
+       id="text13"
+       style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:15px;line-height:normal;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#35546b"><tspan
+         sodipodi:role="line"
+         id="tspan31"
+         x="382.29712"
+         y="241.58109">Compare assumptions on</tspan><tspan
+         sodipodi:role="line"
+         id="tspan32"
+         x="382.29712"
+         y="260.33109">standardized and shared targets</tspan></text>
+  </g>
+  <g
+     id="g40"
+     transform="translate(-25.549193,-51.686935)">
+    <rect
+       x="700"
+       y="120"
+       width="240"
+       height="99.786034"
+       class="box"
+       id="rect14" />
+    <text
+       x="703.62622"
+       y="138.85873"
+       class="body"
+       id="text15"
+       style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:18px;line-height:normal;font-family:Georgia, serif">Validation and teaching</text>
+    <text
+       x="704.06531"
+       y="154.47748"
+       class="small"
+       id="text16"
+       style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:15px;line-height:normal;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#35546b"><tspan
+         sodipodi:role="line"
+         id="tspan37"
+         x="704.06531"
+         y="154.47748">Benchmark curves can expose</tspan><tspan
+         sodipodi:role="line"
+         id="tspan38"
+         x="704.06531"
+         y="173.22748">setup errors, numerical drifts, and</tspan><tspan
+         sodipodi:role="line"
+         id="tspan39"
+         x="704.06531"
+         y="191.97748">mismatched boundary</tspan><tspan
+         sodipodi:role="line"
+         id="tspan40"
+         x="704.06531"
+         y="210.72748">assumptions</tspan></text>
+  </g>
 </svg>

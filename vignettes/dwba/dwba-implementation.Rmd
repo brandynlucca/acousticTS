@@ -1,5 +1,5 @@
 ---
-title: "Implementation"
+title: "DWBA implementation"
 output:
   rmarkdown::html_vignette:
     toc: true
@@ -15,7 +15,7 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
 ---
 
-# acousticTS implementation
+# DWBA implementation
 
 The `acousticTS` implementation of deterministic DWBA follows the same object-based pattern used throughout the package. A fluid-like scatterer is constructed first, the model is then run through `target_strength()`, and the resulting backscattering quantities are stored back onto the same object. That workflow is especially useful for the DWBA because the model depends not only on material contrasts, but also on the discretized body geometry and the orientation assigned to the object.
 
