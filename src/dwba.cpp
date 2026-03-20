@@ -23,6 +23,19 @@ struct DwbaIntegrandData {
     double k_over_h = 0.0;
 };
 
+inline std::complex<double> dwba_bessel_over_cosbeta(double k_over_h,
+                                                     double a_s,
+                                                     double cos_beta) {
+    if (std::abs(cos_beta) <= std::sqrt(std::numeric_limits<double>::epsilon())) {
+        // Removable limit of J1(z) / cos(beta) as cos(beta) -> 0, with
+        // z = 2 * (k / h) * a(s) * cos(beta).
+        return std::complex<double>(k_over_h * a_s, 0.0);
+    }
+
+    double z_s = 2.0 * k_over_h * a_s * cos_beta;
+    return jc_single_impl(std::complex<double>(z_s, 0.0), 1.0) / cos_beta;
+}
+
 inline double clamp_unit(double x) {
     if (x > 1.0) return 1.0;
     if (x < -1.0) return -1.0;
@@ -42,11 +55,9 @@ void dwba_integrand_eval(double *x, int n, void *ex) {
         for (int j = j_start; j < j_end; ++j) {
             double a_s = data->a0[j] + s * data->da[j];
             double phase_s = data->phase0[j] + s * data->dphase[j];
-            double z_s = 2.0 * data->k_over_h * a_s * data->cos_beta[j];
-
-            std::complex<double> bessel =
-                jc_single_impl(std::complex<double>(z_s, 0.0), 1.0) /
-                data->cos_beta[j];
+            std::complex<double> bessel = dwba_bessel_over_cosbeta(
+                data->k_over_h, a_s, data->cos_beta[j]
+            );
 
             total += data->pref[j] * a_s *
                 std::exp(std::complex<double>(0.0, 2.0 * phase_s)) *
@@ -173,14 +184,6 @@ ComplexVector dwba_fbs_cpp(NumericMatrix rpos,
             double cos_alpha = (denom == 0.0) ? 0.0 : clamp_unit(dot / denom);
             double cos_beta = std::sqrt(std::max(0.0, 1.0 - cos_alpha * cos_alpha));
 
-            if (cos_beta == 0.0) {
-                stop(
-                    "DWBA geometry produced cos(beta) = 0 for segment %d at frequency index %d.",
-                    j + 1,
-                    i + 1
-                );
-            }
-
             data.cos_beta[j] = cos_beta;
             data.pref[j] = (k / 4.0) * R * seglen[j];
             data.phase0[j] = (x0[j] * kx + y0[j] * ky + z0[j] * kz) / h;
@@ -271,14 +274,6 @@ ComplexMatrix dwba_segment_integrals_cpp(NumericMatrix rpos,
             double denom = k * seglen[j];
             double cos_alpha = (denom == 0.0) ? 0.0 : clamp_unit(dot / denom);
             double cos_beta = std::sqrt(std::max(0.0, 1.0 - cos_alpha * cos_alpha));
-
-            if (cos_beta == 0.0) {
-                stop(
-                    "DWBA geometry produced cos(beta) = 0 for segment %d at frequency index %d.",
-                    j + 1,
-                    i + 1
-                );
-            }
 
             data.cos_beta[j] = cos_beta;
             data.pref[j] = (k / 4.0) * R * seglen[j];
