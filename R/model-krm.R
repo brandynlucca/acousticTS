@@ -326,6 +326,11 @@ krm_initialize <- function(object,
       frequency,
       body$sound_speed
     )
+    # Bladder wave number ======================================================
+    model_params$acoustics$k_sb <- acousticTS::wavenumber(
+      frequency,
+      bladder$sound_speed
+    )
     # Define body segment count ================================================
     model_params$ns_b <- shape$body$n_segments
     # Define bladder segment count =============================================
@@ -347,6 +352,80 @@ krm_initialize <- function(object,
   )
   # Output =====================================================================
   return(object)
+}
+################################################################################
+.krm_bladder_geometry <- function(rpos, theta) {
+  # Parse bladder coordinate vectors ==========================================
+  x <- rpos[1, ]
+  w <- rpos[2, ]
+  z_u <- rpos[3, ]
+  z_l <- rpos[4, ]
+  # Resolve local axial spacing ===============================================
+  dx <- diff(x)
+  # Summarize adjacent-cylinder geometry ======================================
+  sum_rpos <- along_sum(rpos, ncol(rpos))
+  center_z <- (sum_rpos[3, ] + sum_rpos[4, ]) / 4
+  v_mid <- sum_rpos[1, ] * cos(theta) / 2 + center_z * sin(theta)
+  # Approximate local semi-axes at each segment end ===========================
+  half_width0 <- w[-length(w)] / 2
+  half_width1 <- w[-1] / 2
+  half_height0 <- (z_u[-length(z_u)] - z_l[-length(z_l)]) / 2
+  half_height1 <- (z_u[-1] - z_l[-1]) / 2
+  # Estimate linear taper across each segment =================================
+  dx_safe <- ifelse(abs(dx) < sqrt(.Machine$double.eps), NA_real_, dx)
+  width_slope <- (half_width1 - half_width0) / dx_safe
+  height_slope <- (half_height1 - half_height0) / dx_safe
+  # Integrate local elliptical-cylinder volume =================================
+  dv <- pi * abs(
+    half_height0 * half_width0 * dx +
+      (height_slope * half_width0 + width_slope * half_height0) * dx^2 / 2 +
+      height_slope * width_slope * dx^3 / 3
+  )
+  # Convert local volume to equivalent cylinder radius ========================
+  a_eq <- sqrt(dv / (pi * abs(dx)))
+  a_eq_fallback <- sqrt(pmax(
+    ((half_width0 + half_width1) / 2) * ((half_height0 + half_height1) / 2),
+    0
+  ))
+  # Replace degenerate segments with averaged cross-sectional radii ============
+  bad_idx <- !is.finite(a_eq)
+  if (any(bad_idx)) {
+    a_eq[bad_idx] <- a_eq_fallback[bad_idx]
+  }
+  # Resolve whole-bladder equivalent-cylinder dimensions ======================
+  length_eq <- max(x, na.rm = TRUE) - min(x, na.rm = TRUE)
+  a_eq_total <- sqrt(sum(dv, na.rm = TRUE) / (pi * length_eq))
+  # Return geometry bookkeeping ===============================================
+  list(
+    sum_rpos = sum_rpos,
+    delta_x = dx,
+    v_mid = v_mid,
+    a_eq = a_eq,
+    length_eq = length_eq,
+    a_eq_total = a_eq_total
+  )
+}
+################################################################################
+.krm_low_mode_b0 <- function(k_medium, k_bladder, a_eq, g13, h13) {
+  # Combine acoustic size terms for exterior and bladder media ================
+  k2a <- outer(k_medium, a_eq)
+  k3a <- outer(k_bladder, a_eq)
+  # Evaluate cylindrical Bessel terms entering the m = 0 mode coefficient =====
+  J0_2 <- jc(0, k2a)
+  Y0_2 <- yc(0, k2a)
+  J0p_2 <- jcd(0, k2a)
+  Y0p_2 <- ycd(0, k2a)
+  J0_3 <- jc(0, k3a)
+  J0p_3 <- jcd(0, k3a)
+  # Resolve the modal boundary-condition coefficient C0 =======================
+  ratio_3 <- J0p_3 / J0_3
+  C0 <- (
+    ratio_3 * Y0_2 - g13 * h13 * Y0p_2
+  ) / (
+    ratio_3 * J0_2 - g13 * h13 * J0p_2
+  )
+  # Convert C0 to the breathing-mode scattering coefficient ===================
+  -1 / (1 + 1i * C0)
 }
 
 #' Calculates the theoretical TS using Kirchoff-ray Mode approximation.
@@ -436,19 +515,20 @@ KRM <- function(object) {
       body,
       bladder
     )
-    # Sum across body/swimbladder position vectors =============================
-    bladder_rpos_sum <- along_sum(
-      bladder$rpos,
-      model$parameters$ns_sb
-    )
+    # Summarize swimbladder geometry ===========================================
+    bladder_geom <- .krm_bladder_geometry(bladder$rpos, bladder$theta)
+    bladder_rpos_sum <- bladder_geom$sum_rpos
     # Approximate radii of bladder discrete cylinders ==========================
     a_bladder <- bladder_rpos_sum[2, ] / 4
+    a_bladder_eq <- bladder_geom$a_eq
     # Combine wavenumber (k) and radii to calculate "ka" for bladder ===========
     ka_bladder <- matrix(
       data = rep(a_bladder, each = length(model$parameters$acoustics$k_sw)),
       ncol = length(a_bladder),
       nrow = length(model$parameters$acoustics$k_sw)
     ) * model$parameters$acoustics$k_sw
+    ka_bladder_eq <- model$parameters$acoustics$k_sw * bladder_geom$a_eq_total
+    low_ka_mask <- is.finite(ka_bladder_eq) & ka_bladder_eq <= 0.15
     # Calculate Kirchoff approximation empirical factor, A_sb ==================
     A_sb <- ka_bladder / (ka_bladder + 0.083)
     # Calculate empirical phase shift for a fluid cylinder, Psi_p ==============
@@ -465,9 +545,40 @@ KRM <- function(object) {
                                 uv_bladder$v + Psi_p)) * uv_bladder$delta_u
     # Calculate the summation term =============================================
     bladder_summation <- A_sb * sqrt((ka_bladder + 1) * sin(bladder$theta))
+    bladder_high <- -1i * (R23 * T12T21) / (2 * sqrt(pi)) *
+      bladder_summation * exp_bladder
+
+    g13 <- bladder$density / model$medium$density
+    h13 <- bladder$sound_speed / model$medium$sound_speed
+    b0 <- .krm_low_mode_b0(
+      k_medium = model$parameters$acoustics$k_sw,
+      k_bladder = model$parameters$acoustics$k_sb,
+      a_eq = bladder_geom$a_eq_total,
+      g13 = g13,
+      h13 = h13
+    )
+    dx_matrix <- matrix(
+      data = rep(bladder_geom$delta_x,
+                 each = length(model$parameters$acoustics$k_sw)),
+      ncol = length(bladder_geom$delta_x),
+      nrow = length(model$parameters$acoustics$k_sw)
+    )
+    phase_low <- rowSums(
+      exp(2i * outer(model$parameters$acoustics$k_sw, bladder_geom$v_mid)) *
+        dx_matrix,
+      na.rm = TRUE
+    ) / bladder_geom$length_eq
+    Delta_low <- model$parameters$acoustics$k_sw *
+      bladder_geom$length_eq * cos(bladder$theta)
+    sinc_low <- rep(1, length(Delta_low))
+    nz_delta <- abs(Delta_low) > sqrt(.Machine$double.eps)
+    sinc_low[nz_delta] <- sin(Delta_low[nz_delta]) / Delta_low[nz_delta]
+    bladder_low <- -1i / pi * bladder_geom$length_eq * sinc_low *
+      b0 * phase_low
+
+    f_bladder <- rowSums(bladder_high)
+    f_bladder[low_ka_mask] <- bladder_low[low_ka_mask]
     # Estimate backscattering length, f_fluid/f_soft ===========================
-    f_bladder <- rowSums(-1i * (R23 * T12T21) / (2 * sqrt(pi)) *
-                           bladder_summation * exp_bladder)
     # Estimate total backscattering length, f_bs ===============================
     f_bs <- f_body + f_bladder
     # Define KRM slot for FLS-type scatterer ===================================
