@@ -127,7 +127,7 @@ vecnorm <- function(x) sqrt(rowSums(x * x))
 neumann <- function(x) {
   # Validation =================================================================
   invalid_vals <- x < 0 | x %% 1 != 0
-  if (invalid_vals) {
+  if (any(invalid_vals)) {
     if (length(invalid_vals) > 1) {
       stop(
         "All values in vector 'x' must be non-negative integers."
