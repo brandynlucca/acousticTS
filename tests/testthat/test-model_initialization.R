@@ -112,7 +112,10 @@ test_that("dwba_curved_initialize works correctly", {
   frequency <- c(120e3)
 
   # Initialize DWBA curved model
-  fls_initialized <- dwba_curved_initialize(fls_obj, frequency = frequency)
+  expect_warning(
+    fls_initialized <- dwba_curved_initialize(fls_obj, frequency = frequency),
+    "deprecated"
+  )
 
   # Check that object is still FLS class
   expect_s4_class(fls_initialized, "FLS")
@@ -192,7 +195,10 @@ test_that("sdwba_curved_initialize works correctly", {
   frequency <- c(120e3)
 
   # Initialize SDWBA curved model
-  fls_initialized <- sdwba_curved_initialize(fls_obj, frequency = frequency)
+  expect_warning(
+    fls_initialized <- sdwba_curved_initialize(fls_obj, frequency = frequency),
+    "deprecated"
+  )
 
   # Check that object is still FLS class
   expect_s4_class(fls_initialized, "FLS")

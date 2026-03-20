@@ -44,10 +44,13 @@ test_that("target_strength works with different scatterer types", {
   )
   frequency <- seq(1e3, 10e3, 1e3)
 
-  fls_with_ts <- target_strength(
-    object = fls_obj,
-    frequency = frequency,
-    model = c("SDWBA", "SDWBA_curved", "DWBA", "KRM")
+  expect_warning(
+    fls_with_ts <- target_strength(
+      object = fls_obj,
+      frequency = frequency,
+      model = c("SDWBA", "SDWBA_curved", "DWBA", "KRM")
+    ),
+    "deprecated"
   )
 
   expect_s4_class(fls_with_ts, "FLS")

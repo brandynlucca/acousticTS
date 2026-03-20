@@ -92,14 +92,17 @@ test_that("simulate_ts function works with single sets of parameters", {
   expect_false(all(unique(result_df$TS) == unique(reference_df$TS)))
 
   # Pass undefined variable (i.e. not already within the object)
-  result_curved <- simulate_ts(
-    object = krill,
-    frequency = frequency,
-    model = "DWBA_curved",
-    n_realizations = 1,
-    parameters = list(radius_curvature_ratio = 3),
-    parallel = FALSE,
-    verbose = FALSE
+  expect_warning(
+    result_curved <- simulate_ts(
+      object = krill,
+      frequency = frequency,
+      model = "DWBA_curved",
+      n_realizations = 1,
+      parameters = list(radius_curvature_ratio = 3),
+      parallel = FALSE,
+      verbose = FALSE
+    ),
+    "deprecated"
   )
 
   # Check values
