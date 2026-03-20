@@ -365,6 +365,8 @@ hpa_initialize <- function(object,
 #' Stanton (1989) high-pass model for cylinders.
 #' @noRd
 .stanton_cylinder <- function(k, l, a, theta, rho_c, r, alpha, gnull, fdevs) {
+  # Compute ka =================================================================
+  ka <- k * a
   # Special case: bent cylinder ================================================
   if (!is.null(rho_c)) {
     if (!is.na(rho_c)) {
@@ -382,7 +384,7 @@ hpa_initialize <- function(object,
   # Compute the effective length based on tilt angle ===========================
   s <- sin(k * l * cos(theta)) / (k * l * cos(theta))
   # Compute the wavenumber*radius based on the tilt angle ======================
-  Ka <- k * sin(theta) * a
+  Ka <- ka * sin(theta)
   # Compute sigma_bs ===========================================================
   (0.25 * l^2 * Ka^4 * alpha^2 * s^2 * gnull) /
     (1 + (pi * Ka^3 * alpha^2) / (r^2 * fdevs))
