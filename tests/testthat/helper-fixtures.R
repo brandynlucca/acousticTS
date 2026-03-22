@@ -116,11 +116,18 @@ fixture_ps <- function(boundary_type) {
                                          radius_body = radius_body,
                                          g_body = NA,
                                          h_body = NA),
-         liquid_filled = fls_generate(
-           shape="prolate_spheroid",
+         gas_filled = gas_generate(
+           shape = "prolate_spheroid",
            length_body = length_body,
            radius_body = radius_body,
-           g_body = 1028.9 / density_sw,
+           density_fluid = 1.24,
+           sound_speed_fluid = 345.0
+         ),
+         liquid_filled = fls_generate(
+          shape="prolate_spheroid",
+          length_body = length_body,
+          radius_body = radius_body,
+          g_body = 1028.9 / density_sw,
            h_body = 1480.3 / sound_speed_sw
          )
   )

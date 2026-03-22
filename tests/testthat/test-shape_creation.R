@@ -52,10 +52,10 @@ test_that("Prolate spheroid creation works", {
   expect_equal(prolate_obj@shape_parameters$length, length_body)
   expect_equal(prolate_obj@shape_parameters$radius,
     c(
-      0.00000000, 0.00718022, 0.01200000, 0.01490712, 0.01691810,
-      0.01833030, 0.01927578, 0.01982142, 0.02000000, 0.01982142,
-      0.01927578, 0.01833030, 0.01691810, 0.01490712, 0.01200000,
-      0.00718022
+      0.00000000, 0.00997775, 0.01359739, 0.01600000, 0.01768867,
+      0.01885618, 0.01959592, 0.01995551, 0.01995551, 0.01959592,
+      0.01885618, 0.01768867, 0.01600000, 0.01359739, 0.00997775,
+      0.00000000
     ),
     tolerance = 1e-6
   )
@@ -78,10 +78,10 @@ test_that("Prolate spheroid creation works", {
   expect_equal(prolate_obj@shape_parameters$length, length_body)
   expect_equal(prolate_obj@shape_parameters$radius,
     c(
-      0.000000000, 0.001795055, 0.003000000, 0.003726780,
-      0.004229526, 0.004582576, 0.004818944, 0.004955356,
-      0.005000000, 0.004955356, 0.004818944, 0.004582576,
-      0.004229526, 0.003726780, 0.003000000, 0.001795055
+      0.000000000, 0.002494438, 0.003399346, 0.004000000,
+      0.004422166, 0.004714045, 0.004898979, 0.004988877,
+      0.004988877, 0.004898979, 0.004714045, 0.004422166,
+      0.004000000, 0.003399346, 0.002494438, 0.000000000
     ),
     tolerance = 1e-6
   )
@@ -115,7 +115,7 @@ test_that("Cylinder creation works", {
   expect_equal(cylinder_obj@shape_parameters$length, length_body)
   expect_equal(
     cylinder_obj@shape_parameters$radius,
-    c(0.0, rep(radius_body, n_segments))
+    rep(radius_body, n_segments + 1)
   )
   expect_equal(cylinder_obj@shape_parameters$n_segments, n_segments)
 
@@ -157,6 +157,116 @@ test_that("Arbitrary shape creation works", {
   expect_true(is.matrix(arbitrary_obj@position_matrix))
   expect_equal(ncol(arbitrary_obj@position_matrix), 6)
   expect_equal(nrow(arbitrary_obj@position_matrix), length(x_body))
+})
+
+test_that("Canonical KRM profiles match the common benchmark geometries after reversal", {
+  krm_common_shape <- function(shape, n_points = 30L) {
+    ang <- seq(-pi / 2, pi / 2, length.out = n_points)
+
+    switch(
+      shape,
+      sphere = data.frame(
+        x = 0.01 * (sin(ang) + 1),
+        w = 0.02 * cos(ang),
+        zU = 0.01 * cos(ang),
+        zL = -0.01 * cos(ang)
+      ),
+      prolate = data.frame(
+        x = 0.07 * (sin(ang) + 1),
+        w = 0.02 * cos(ang),
+        zU = 0.01 * cos(ang),
+        zL = -0.01 * cos(ang)
+      ),
+      cylinder = data.frame(
+        x = seq(0, 0.07, length.out = n_points),
+        w = rep(0.02, n_points),
+        zU = rep(0.01, n_points),
+        zL = rep(-0.01, n_points)
+      )
+    )
+  }
+
+  for (shape_name in c("sphere", "prolate", "cylinder")) {
+    obj <- switch(
+      shape_name,
+      sphere = fls_generate(
+        sphere(radius_body = 0.01, n_segments = 29),
+        density_body = 1028.9,
+        sound_speed_body = 1480.3
+      ),
+      prolate = fls_generate(
+        prolate_spheroid(
+          length_body = 0.14,
+          radius_body = 0.01,
+          n_segments = 29
+        ),
+        density_body = 1028.9,
+        sound_speed_body = 1480.3
+      ),
+      cylinder = fls_generate(
+        cylinder(
+          length_body = 0.07,
+          radius_body = 0.01,
+          n_segments = 29
+        ),
+        density_body = 1028.9,
+        sound_speed_body = 1480.3
+      )
+    )
+    profiled <- acousticTS:::.krm_profile_object(obj)
+    body <- profiled@body$rpos
+    acoustic <- data.frame(x = rev(body["x", ]),
+                           w = rev(body["w", ]),
+                           zU = rev(body["zU", ]),
+                           zL = rev(body["zL", ]))
+
+    expect_equal(acoustic, krm_common_shape(shape_name), tolerance = 1e-12)
+  }
+})
+
+test_that("arbitrary FLS radius metadata uses semi-diameter for zU/zL inputs", {
+  obj <- fls_generate(
+    arbitrary(
+      x_body = c(0, 0.01, 0.02),
+      w_body = c(0, 0.01, 0),
+      zU_body = c(0, 0.005, 0),
+      zL_body = c(0, -0.005, 0)
+    ),
+    density_body = 1028.9,
+    sound_speed_body = 1480.3
+  )
+
+  expect_equal(obj@shape_parameters$radius, 0.005)
+})
+
+test_that("gas_generate preserves absolute fluid properties when supplied", {
+  obj <- gas_generate(
+    shape = "sphere",
+    radius_body = 0.01,
+    density_fluid = 1.24,
+    sound_speed_fluid = 345
+  )
+
+  expect_null(obj@body$g)
+  expect_null(obj@body$h)
+  expect_equal(obj@body$density, 1.24)
+  expect_equal(obj@body$sound_speed, 345)
+})
+
+test_that("gas_generate preserves canonical prolate metadata for modal-series models", {
+  obj <- gas_generate(
+    shape = "prolate_spheroid",
+    length_body = 0.14,
+    radius_body = 0.01,
+    density_fluid = 1.24,
+    sound_speed_fluid = 345
+  )
+
+  expect_equal(obj@shape_parameters$length, 0.14)
+  expect_equal(obj@shape_parameters$radius, 0.01)
+  expect_equal(obj@shape_parameters$semimajor_length, 0.07)
+  expect_equal(obj@shape_parameters$semiminor_length, 0.01)
+  expect_length(obj@body$radius, 101)
 })
 
 test_that("'polyonmial_cylinder' function works", {

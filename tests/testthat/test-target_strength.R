@@ -27,10 +27,48 @@ test_that("target_strength function works correctly", {
   expect_true(all(!is.na(cal_with_ts@model$calibration$TS)))
 })
 
+test_that("calibration sphere modal sum converges at high ka", {
+  cal_obj <- cal_generate(material = "WC", diameter = 38.1e-3)
+
+  cal_with_ts <- target_strength(
+    object = cal_obj,
+    frequency = 350e3,
+    model = "calibration",
+    sound_speed_sw = 1477.3,
+    density_sw = 1026.8
+  )
+
+  expect_equal(
+    cal_with_ts@model$calibration$TS,
+    -44.2348898912626,
+    tolerance = 1e-10
+  )
+})
+
+test_that("calibration sphere can use the legacy fixed modal cutoff", {
+  cal_obj <- cal_generate(material = "WC", diameter = 38.1e-3)
+
+  cal_with_ts <- target_strength(
+    object = cal_obj,
+    frequency = 350e3,
+    model = "calibration",
+    sound_speed_sw = 1477.3,
+    density_sw = 1026.8,
+    adaptive = FALSE
+  )
+
+  expect_equal(
+    cal_with_ts@model$calibration$TS,
+    -44.2348180844783,
+    tolerance = 1e-10
+  )
+})
+
 test_that("target_strength works with different scatterer types", {
   # Test with FLS object and DWBA/SDWBA/KRM model
   data(krill, package = "acousticTS")
   data(sardine, package = "acousticTS")
+  data(cod, package = "acousticTS")
 
   fls_obj <- fls_generate(
     x = krill@body$rpos[1, ],
@@ -68,6 +106,23 @@ test_that("target_strength works with different scatterer types", {
 
   expect_s4_class(sardine_with_ts, "SBF")
   expect_true("KRM" %in% names(sardine_with_ts@model))
+
+  cod_with_ts <- target_strength(
+    object = cod,
+    frequency = frequency,
+    model = "KRM"
+  )
+
+  expect_s4_class(cod_with_ts, "SBF")
+  expect_true("KRM" %in% names(cod_with_ts@model))
+  expect_equal(
+    cod_with_ts@model_parameters$KRM$parameters$ns_b,
+    ncol(cod@body$rpos)
+  )
+  expect_equal(
+    cod_with_ts@model_parameters$KRM$parameters$ns_sb,
+    ncol(cod@bladder$rpos)
+  )
 
   # Test with GAS object and MSS Anderson (1950) model
   gas_obj <- gas_generate(radius_body = 1e-3)
