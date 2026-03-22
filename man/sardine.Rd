@@ -49,11 +49,26 @@ A named list with the following components:
 }
 }
 }
+\source{
+NOAA Fisheries KRM model reference collection
+(\url{https://www.fisheries.noaa.gov/data-tools/krm-model}) and the
+archived \code{echoSMs} resource set
+(\url{https://github.com/ices-tools-dev/echoSMs}).
+}
 \usage{
 data(sardine)
 }
 \description{
 A pre-generated SBF scatterer containing all information required for
-target strength modeling.
+target strength modeling. The packaged geometry follows the sardine entry
+distributed through the NOAA Fisheries KRM reference collection and
+archived in the \code{echoSMs} resources. The object metadata identifies the
+target as \emph{Sardinops sagax caerulea} following Conti and Demer (2003).
+}
+\references{
+Conti, S.G., and Demer, D.A. (2003). Wide-bandwidth acoustical
+characterization of anchovy and sardine from reverberation measurements in
+an echoic tank. \emph{ICES Journal of Marine Science}, 60, 617-624.
+\doi{10.1016/S1054-3139(03)00056-0}
 }
 \keyword{datasets}

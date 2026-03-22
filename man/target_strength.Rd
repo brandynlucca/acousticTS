@@ -13,6 +13,7 @@ target_strength(object, frequency, model, verbose = FALSE, ...)
 
 \item{model}{Model name. Available models currently include
 \code{"dwba"} (\code{\link{DWBA}}),
+\code{"pcdwba"} (\code{\link{PCDWBA}}),
 \code{"sdwba"} (\code{\link{SDWBA}}),
 \code{"fcms"} (\code{\link{FCMS}}),
 \code{"hpa"} (\code{\link{HPA}}),
@@ -20,6 +21,7 @@ target_strength(object, frequency, model, verbose = FALSE, ...)
 \code{"psms"} (\code{\link{PSMS}}),
 \code{"sphms"} (\code{\link{SPHMS}}),
 \code{"essms"} (\code{\link{ESSMS}}),
+\code{"vesms"} (\code{\link{VESMS}}),
 \code{"trcm"} (\code{\link{TRCM}}), and
 \code{"calibration"} / \code{"soems"} (\code{\link{SOEMS}}).}
 
@@ -45,6 +47,8 @@ options, and model-specific arguments used by each implementation:
 \itemize{
 \item \code{\link{DWBA}} for the distorted-wave Born approximation
 applied to weakly scattering fluid-like bodies.
+\item \code{\link{PCDWBA}} for the phase-compensated distorted-wave Born
+approximation applied to elongated fluid-like bodies.
 \item \code{\link{SDWBA}} for the stochastic distorted-wave Born
 approximation.
 \item \code{\link{FCMS}} for the finite cylinder modal series solution.
@@ -55,6 +59,8 @@ solution.
 \item \code{\link{SPHMS}} for the spherical modal series solution.
 \item \code{\link{ESSMS}} for the elastic-shelled spherical modal series
 solution.
+\item \code{\link{VESMS}} for the viscous-elastic spherical scattering
+model applied to gas-filled elastic shells with an external viscous layer.
 \item \code{\link{TRCM}} for the two-ray cylindrical model.
 \item \code{\link{SOEMS}} for the solid elastic calibration-sphere model,
 accessed through \code{"calibration"} or \code{"soems"}.
@@ -62,11 +68,14 @@ accessed through \code{"calibration"} or \code{"soems"}.
 
 Model-specific inputs are passed through \code{...}. For example, some models
 require a \code{boundary} argument, \code{HPA} uses a \code{method}
-argument, and several models expose additional numerical controls.
+argument, and several models expose additional numerical controls. The legacy
+curved-entry wrappers \code{"dwba_curved"} and \code{"sdwba_curved"} are
+deprecated; apply \code{\link{brake}} to the scatterer first, then run
+\code{"dwba"} or \code{"sdwba"} on the curved object.
 }
 \seealso{
-\code{\link{DWBA}}, \code{\link{SDWBA}}, \code{\link{FCMS}},
+\code{\link{DWBA}}, \code{\link{PCDWBA}}, \code{\link{SDWBA}}, \code{\link{FCMS}},
 \code{\link{HPA}}, \code{\link{KRM}}, \code{\link{PSMS}},
-\code{\link{SPHMS}}, \code{\link{ESSMS}}, \code{\link{TRCM}},
+\code{\link{SPHMS}}, \code{\link{ESSMS}}, \code{\link{VESMS}}, \code{\link{TRCM}},
 \code{\link{SOEMS}}
 }

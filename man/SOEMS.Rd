@@ -19,7 +19,8 @@ target_strength(
   ...,
   model="calibration",
   sound_speed_sw,
-  density_sw
+  density_sw,
+  adaptive = TRUE
 )
 }
 }
@@ -29,6 +30,10 @@ target_strength(
 \describe{
 \item{\code{sound_speed_sw}}{Seawater sound speed (\eqn{m~s^{-1}}).}
 \item{\code{density_sw}}{Seawater density (\eqn{kg~m^{-3}}).}
+\item{\code{adaptive}}{Logical. If \code{TRUE}, extend the partial-wave
+sum beyond the initial \eqn{\mathrm{round}(ka)+10} modal cap until the
+tail term falls below the internal convergence threshold. If
+\code{FALSE}, use the original fixed modal cutoff only.}
 }
 }
 

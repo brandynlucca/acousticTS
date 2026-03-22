@@ -53,9 +53,8 @@ Returns infinity (singularity).
 }
 \note{
 This function calls underlying \eqn{C++} code via \code{Rcpp} for
-both performance and , which is used both for computational efficiency and
-to support different cases for both order and argument that are not
-readily available in \code{R}.
+computational efficiency and  to support different cases for both order and
+argument that are not readily available in \code{R}.
 }
 \examples{
 # Single values

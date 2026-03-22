@@ -145,10 +145,11 @@ dwba_initialize <- function(object,
                             frequency,
                             sound_speed_sw = 1500,
                             density_sw = 1026) {
+  object_profiled <- .dwba_profile_object(object)
   # Parse shape ================================================================
-  shape <- acousticTS::extract(object, "shape_parameters")
+  shape <- acousticTS::extract(object_profiled, "shape_parameters")
   # Parse body =================================================================
-  body <- acousticTS::extract(object, "body")
+  body <- acousticTS::extract(object_profiled, "body")
   contrasts <- .derive_contrasts(body, sound_speed_sw, density_sw)
   body$h <- body_h <- contrasts$h
   body$g <- body_g <- contrasts$g
@@ -175,7 +176,8 @@ dwba_initialize <- function(object,
     ncyl_b = shape$n_segments
   )
   # Define body parameters recipe ==============================================
-  body_params <- data.frame(
+  body_params <- list(
+    rpos = body$rpos,
     radius = body$radius,
     h = body_h,
     g = body_g,
@@ -214,16 +216,15 @@ DWBA <- function(object) {
   # Extract model parameters/inputs ============================================
   model <- acousticTS::extract(object, "model_parameters")$DWBA
   model_body <- acousticTS::extract(model, "body")
-  body <- acousticTS::extract(object, "body")
-  theta <- body$theta
-  r0 <- body$rpos[1:3, ]
-  # Material properties calculation ============================================
+  theta <- model_body$theta
+  r0 <- model_body$rpos[1:3, , drop = FALSE]
+  # Material properties calculation ==========================================
   g <- mean(model_body$g)
   h <- mean(model_body$h)
   R <- 1 / (g * h * h) + 1 / g - 2
-  # Update position matrices  ==================================================
+  # Update position matrices  =================================================
   rpos <- rbind(r0, a = model$body$radius)
-  # Calculate linear scatter response ==========================================
+  # Calculate linear scatter response ========================================
   f_bs <- dwba_fbs_cpp(
     rpos = rpos,
     k_sw = model$parameters$acoustics$k_sw,

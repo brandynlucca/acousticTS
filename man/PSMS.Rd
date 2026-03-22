@@ -22,6 +22,7 @@ target_strength(
   model="psms",
   phi_body,
   boundary,
+  adaptive,
   simplify_Amn,
   precision,
   n_integration,
@@ -40,6 +41,15 @@ One of \code{"fixed_rigid"}, \code{"pressure_release"},
 \code{"liquid_filled"}, or \code{"gas_filled"}. See the
 \link[=boundary_conditions]{boundary conditions documentation} for more
 details on these different boundary conditions.}
+\item{\code{adaptive}}{A boolean argument controlling whether the PSMS
+backend is allowed to stop once the retained modal tail becomes
+numerically negligible and to choose an adaptive quadrature order for full
+fluid- or gas-filled overlap integrals. When \code{FALSE} (default), the
+implementation uses the published hard truncation rule and a fixed
+quadrature order unless the user overrides it directly. When
+\code{TRUE}, the hard \eqn{m_{\max}} and \eqn{n_{\max}} rules remain the
+upper bounds, but the backscatter implementation is allowed to stop early
+once the retained tail is both numerically small and gradient-flat.}
 \item{\code{simplify_Amn}}{A boolean argument that flags whether or not to
 use the simplified calculation for the exansion matrix, \eqn{A_{mn}}, for a
 fluid-filled scatterer. See Theory for the mathematical formulation and
@@ -53,7 +63,11 @@ two choices: \code{"double"} for double-precision (64-bit) and
 double- and quadruple-precision usages are implemented.}
 \item{\code{n_integration}}{An integer argument that informs the model how
 many integration points will be used to calculate \eqn{\alpha_{mn}^{m}},
-which is numerically calculated using Gauss-Legendre quadrature. See
+which is numerically calculated using Gauss-Legendre quadrature. When left
+as \code{NULL}, the model uses 96 integration points unless
+\code{adaptive = TRUE}, in which case a reduced-frequency-based
+quadrature rule is selected internally for the full fluid- or gas-filled
+solve. See
 \link{gauss_legendre} for a full description of how \code{n_integration} is
 used. \strong{Note:} this argument \strong{only} applies to when
 \code{boundary = "liquid_filled"} or \code{boundary = "gas_filled"}. It is
@@ -142,10 +156,11 @@ and
   S_{mn}(h_1, \eta) d\eta
 }
 
-In practice, these kernel matrices are solved using sets of least-squares
-linear equations to determine \eqn{A_{mn}}. This uses a divide-and-conquer
-singular value decomposition (SVD) algorithm, which is robust and efficient
-for large or ill-conditioned systems.
+In practice, these kernel matrices are solved numerically to determine
+\eqn{A_{mn}}. The implementation uses compiled dense linear algebra and
+keeps the fluid-filled solve in the requested arithmetic so that the
+linear-system stage does not become detached from the rest of the chosen
+precision pathway.
 
 In the case that \eqn{h_0 \approx h_1}, \eqn{\alpha_{mn}^{m} \approx 0} for
 \eqn{n \neq l}, and a much simplified expression is derived:
@@ -177,9 +192,10 @@ increasingly large and unwieldy kernel matrices required for solving the
 fluid-filled expansion matrices (\eqn{A_{mn}}). Consequently, this can
 result in the model taking an impractical amount of time to compute
 \eqn{f_\infty(\theta, \phi | \theta', \phi')}. \code{C++} helps reduce this
-burden compared to a pure \code{R} implementation. The algorithm also
-benefits from utilizing the \code{Armadillo} linear algebra library native
-to \code{C++} (specifically the divide-and-conquer SVD algorithm).
+burden compared to a pure \code{R} implementation. The current implementation
+uses compiled matrix algebra throughout, applies backscatter parity to avoid
+recomputing one of the two angular \eqn{S_{mn}} matrices, and solves the
+fluid-filled kernel system natively in the requested arithmetic.
 
 \if{html}{\out{<u>}}\strong{Precision}\if{html}{\out{</u>}}
 
@@ -192,12 +208,10 @@ where the difference between double- (64-bit) and quadruple-precision
 (128-bit) can contribute to differences in target strength of more than 1
 dB. While \code{R}-packages like \code{Rmpfr} provide access to the
 (\code{GNU}) \code{MPFR C} library, the (\code{GCC}) \code{libquadmath C++}
-library. \if{html}{\out{<u>}}\strong{Importantly: when using the \code{PSMS} model for fluid-filled
-prolate spheroids, the SVD algorithm from \code{Armadillo} is limited to
-double-precision, which means that the numerical precision of the model is
-limited to double even when \code{precision = "quad"}.}\if{html}{\out{</u>}} This is planned
-to be addressed in the future by implementing a two-sided Jacobi SVD
-algorithm that is compatible with quadruple-precision.
+library. Quad precision nevertheless remains much more computationally
+intensive than double precision because the spheroidal function evaluations,
+overlap integrals, and kernel systems all grow rapidly with
+\eqn{m_{\max}} and \eqn{n_{\max}}.
 }
 
 \references{

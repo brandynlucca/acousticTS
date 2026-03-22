@@ -294,7 +294,7 @@ ESSMS <- function(object) {
   sound_speed_transversal <- sqrt(G / density_shell)
   # Calculate the associated wavenumbers =======================================
   kL <- wavenumber(acoustics$frequency, sound_speed_longitudinal)
-  kT <- wavenumber(frequency, sound_speed_transversal)
+  kT <- wavenumber(acoustics$frequency, sound_speed_transversal)
   # Calculate the reindexed ka values ==========================================
   ka_matrix <- .calculate_ka_matrix(
     acoustics$frequency,

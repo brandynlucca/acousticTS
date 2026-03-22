@@ -5,16 +5,21 @@
 .get_models <- function() {
   list(
     DWBA = DWBA,
+    PCDWBA = PCDWBA,
     DWBA_curved = DWBA_curved,
     SDWBA = SDWBA,
     SDWBA_curved = SDWBA_curved,
     calibration = calibration,
     SOEMS = calibration,
     ESSMS = ESSMS,
+    VESMS = VESMS,
     SPHMS = SPHMS,
     KRM = KRM,
     HPA = HPA,
     PSMS = PSMS,
-    FCMS = FCMS
+    FCMS = FCMS,
+    BCMS = BCMS,
+    ECMS = ECMS,
+    TRCM = TRCM
   )
 }

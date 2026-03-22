@@ -166,10 +166,11 @@ sdwba_initialize <- function(object,
                              phase_sd_init = sqrt(2) / 2,
                              length_init = 38.35e-3,
                              frequency_init = 120e3) {
+  object_profiled <- .dwba_profile_object(object)
   # Parse shape ================================================================
-  shape <- acousticTS::extract(object, "shape_parameters")
+  shape <- acousticTS::extract(object_profiled, "shape_parameters")
   # Parse body =================================================================
-  body <- acousticTS::extract(object, "body")
+  body <- acousticTS::extract(object_profiled, "body")
   contrasts <- .derive_contrasts(body, sound_speed_sw, density_sw)
   body$h <- body_h <- contrasts$h
   body$g <- body_g <- contrasts$g
@@ -213,7 +214,7 @@ sdwba_initialize <- function(object,
   stochastic_params <- lapply(seq_along(N_f_idx),
                               FUN = function(i) {
                                 idx <- which(N_f_vec == N_f_idx[i])
-                                object_new <- sdwba_resample(object,
+                                object_new <- sdwba_resample(object_profiled,
                                                              n_segments = N_f_idx[i]
                                 )
                                 body <- acousticTS::extract(object_new, "body")
@@ -339,11 +340,11 @@ sdwba_resampled_backscatter <- function(sub_params, theta, R, h) {
 SDWBA <- function(object) {
   # Extract model parameters/inputs ============================================
   model <- acousticTS::extract(object, "model_parameters")$SDWBA
-  body <- acousticTS::extract(object, "body")
-  theta <- body$theta
+  model_body <- acousticTS::extract(model, "body")
+  theta <- model_body$theta
   # Material properties calculation ============================================
-  g <- body$g
-  h <- body$h
+  g <- model_body$g
+  h <- model_body$h
   R <- 1 / (g * h * h) + 1 / g - 2
   SDWBA_resampled <- function(i) {
     sub_params <- model$parameters[[i]]

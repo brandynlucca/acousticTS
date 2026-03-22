@@ -162,7 +162,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // dwba_fbs_cpp
-NumericVector dwba_fbs_cpp(NumericMatrix rpos, NumericVector k_sw, double theta, double h, double R, int subdivisions, double rel_tol, double abs_tol);
+ComplexVector dwba_fbs_cpp(NumericMatrix rpos, NumericVector k_sw, double theta, double h, double R, int subdivisions, double rel_tol, double abs_tol);
 RcppExport SEXP _acousticTS_dwba_fbs_cpp(SEXP rposSEXP, SEXP k_swSEXP, SEXP thetaSEXP, SEXP hSEXP, SEXP RSEXP, SEXP subdivisionsSEXP, SEXP rel_tolSEXP, SEXP abs_tolSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -176,6 +176,24 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type rel_tol(rel_tolSEXP);
     Rcpp::traits::input_parameter< double >::type abs_tol(abs_tolSEXP);
     rcpp_result_gen = Rcpp::wrap(dwba_fbs_cpp(rpos, k_sw, theta, h, R, subdivisions, rel_tol, abs_tol));
+    return rcpp_result_gen;
+END_RCPP
+}
+// dwba_segment_integrals_cpp
+ComplexMatrix dwba_segment_integrals_cpp(NumericMatrix rpos, NumericVector k_sw, double theta, double h, double R, int subdivisions, double rel_tol, double abs_tol);
+RcppExport SEXP _acousticTS_dwba_segment_integrals_cpp(SEXP rposSEXP, SEXP k_swSEXP, SEXP thetaSEXP, SEXP hSEXP, SEXP RSEXP, SEXP subdivisionsSEXP, SEXP rel_tolSEXP, SEXP abs_tolSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type rpos(rposSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type k_sw(k_swSEXP);
+    Rcpp::traits::input_parameter< double >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< double >::type h(hSEXP);
+    Rcpp::traits::input_parameter< double >::type R(RSEXP);
+    Rcpp::traits::input_parameter< int >::type subdivisions(subdivisionsSEXP);
+    Rcpp::traits::input_parameter< double >::type rel_tol(rel_tolSEXP);
+    Rcpp::traits::input_parameter< double >::type abs_tol(abs_tolSEXP);
+    rcpp_result_gen = Rcpp::wrap(dwba_segment_integrals_cpp(rpos, k_sw, theta, h, R, subdivisions, rel_tol, abs_tol));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -312,8 +330,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // prolate_spheroid_fbs
-Rcpp::ComplexVector prolate_spheroid_fbs(Rcpp::DataFrame acoustics, Rcpp::DataFrame body, Rcpp::DataFrame medium, Rcpp::List integration_pts, std::string precision, std::string Amn_method);
-RcppExport SEXP _acousticTS_prolate_spheroid_fbs(SEXP acousticsSEXP, SEXP bodySEXP, SEXP mediumSEXP, SEXP integration_ptsSEXP, SEXP precisionSEXP, SEXP Amn_methodSEXP) {
+Rcpp::ComplexVector prolate_spheroid_fbs(Rcpp::DataFrame acoustics, Rcpp::DataFrame body, Rcpp::DataFrame medium, Rcpp::List integration_pts, std::string precision, std::string Amn_method, bool adaptive);
+RcppExport SEXP _acousticTS_prolate_spheroid_fbs(SEXP acousticsSEXP, SEXP bodySEXP, SEXP mediumSEXP, SEXP integration_ptsSEXP, SEXP precisionSEXP, SEXP Amn_methodSEXP, SEXP adaptiveSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -323,7 +341,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::List >::type integration_pts(integration_ptsSEXP);
     Rcpp::traits::input_parameter< std::string >::type precision(precisionSEXP);
     Rcpp::traits::input_parameter< std::string >::type Amn_method(Amn_methodSEXP);
-    rcpp_result_gen = Rcpp::wrap(prolate_spheroid_fbs(acoustics, body, medium, integration_pts, precision, Amn_method));
+    Rcpp::traits::input_parameter< bool >::type adaptive(adaptiveSEXP);
+    rcpp_result_gen = Rcpp::wrap(prolate_spheroid_fbs(acoustics, body, medium, integration_pts, precision, Amn_method, adaptive));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -342,6 +361,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_acousticTS_ys_deriv_cpp", (DL_FUNC) &_acousticTS_ys_deriv_cpp, 3},
     {"_acousticTS_hs_deriv_cpp", (DL_FUNC) &_acousticTS_hs_deriv_cpp, 3},
     {"_acousticTS_dwba_fbs_cpp", (DL_FUNC) &_acousticTS_dwba_fbs_cpp, 8},
+    {"_acousticTS_dwba_segment_integrals_cpp", (DL_FUNC) &_acousticTS_dwba_segment_integrals_cpp, 8},
     {"_acousticTS_gauss_legendre_cpp", (DL_FUNC) &_acousticTS_gauss_legendre_cpp, 3},
     {"_acousticTS_elastic_shell_boundary_conditions_old", (DL_FUNC) &_acousticTS_elastic_shell_boundary_conditions_old, 11},
     {"_acousticTS_elastic_shell_boundary_conditions", (DL_FUNC) &_acousticTS_elastic_shell_boundary_conditions, 6},
@@ -351,7 +371,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_acousticTS_Qn_deriv_cpp", (DL_FUNC) &_acousticTS_Qn_deriv_cpp, 3},
     {"_acousticTS_Smn_cpp", (DL_FUNC) &_acousticTS_Smn_cpp, 6},
     {"_acousticTS_Rmn_cpp", (DL_FUNC) &_acousticTS_Rmn_cpp, 6},
-    {"_acousticTS_prolate_spheroid_fbs", (DL_FUNC) &_acousticTS_prolate_spheroid_fbs, 6},
+    {"_acousticTS_prolate_spheroid_fbs", (DL_FUNC) &_acousticTS_prolate_spheroid_fbs, 7},
     {NULL, NULL, 0}
 };
 

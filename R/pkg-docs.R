@@ -133,7 +133,7 @@
 #' @section Elastic shelled boundaries:
 #' \strong{Elastic shell boundary}
 #'
-#' \emph{Models: \code{\link{ESSMS}}}
+#' \emph{Models: \code{\link{ESSMS}}, \code{\link{VESMS}}}
 #'
 #' An elastic shell encasing a fluid or gas-filled interior. The shell is
 #' assumed to have finite thickness and elastic properties defined by
@@ -176,8 +176,9 @@
 #' @section Weak scattering:
 #' \strong{Fluid-like boundary}
 #'
-#' \emph{Models: \code{\link{DWBA}}, \code{\link{FCMS}}, \code{\link{KRM}},
-#' \code{\link{PSMS}}, \code{\link{SDWBA}}, \code{\link{SPHMS}}}
+#' \emph{Models: \code{\link{DWBA}}, \code{\link{PCDWBA}}, \code{\link{FCMS}},
+#' \code{\link{BCMS}}, \code{\link{KRM}}, \code{\link{PSMS}}, \code{\link{SDWBA}},
+#' \code{\link{SPHMS}}}
 #'
 #' Represents a scatterer whose acoustic response is dominated by the
 #' surrounding fluid, i.e., the scatterer does not present a significant

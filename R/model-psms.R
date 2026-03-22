@@ -16,6 +16,7 @@
 #'   model="psms",
 #'   phi_body,
 #'   boundary,
+#'   adaptive,
 #'   simplify_Amn,
 #'   precision,
 #'   n_integration,
@@ -32,6 +33,15 @@
 #'     \code{"liquid_filled"}, or \code{"gas_filled"}. See the
 #'     \link[=boundary_conditions]{boundary conditions documentation} for more
 #'     details on these different boundary conditions.}
+#'   \item{\code{adaptive}}{A boolean argument controlling whether the PSMS
+#'   backend is allowed to stop once the retained modal tail becomes
+#'   numerically negligible and to choose an adaptive quadrature order for full
+#'   fluid- or gas-filled overlap integrals. When \code{FALSE} (default), the
+#'   implementation uses the published hard truncation rule and a fixed
+#'   quadrature order unless the user overrides it directly. When
+#'   \code{TRUE}, the hard \eqn{m_{\max}} and \eqn{n_{\max}} rules remain the
+#'   upper bounds, but the backscatter implementation is allowed to stop early
+#'   once the retained tail is both numerically small and gradient-flat.}
 #'   \item{\code{simplify_Amn}}{A boolean argument that flags whether or not to
 #'   use the simplified calculation for the exansion matrix, \eqn{A_{mn}}, for a
 #'   fluid-filled scatterer. See Theory for the mathematical formulation and
@@ -45,7 +55,11 @@
 #'   double- and quadruple-precision usages are implemented.}
 #'   \item{\code{n_integration}}{An integer argument that informs the model how
 #'   many integration points will be used to calculate \eqn{\alpha_{mn}^{m}},
-#'   which is numerically calculated using Gauss-Legendre quadrature. See
+  #'   which is numerically calculated using Gauss-Legendre quadrature. When left
+  #'   as \code{NULL}, the model uses 96 integration points unless
+  #'   \code{adaptive = TRUE}, in which case a reduced-frequency-based
+  #'   quadrature rule is selected internally for the full fluid- or gas-filled
+  #'   solve. See
 #'   \link{gauss_legendre} for a full description of how \code{n_integration} is
 #'   used. **Note:** this argument **only** applies to when
 #'   \code{boundary = "liquid_filled"} or \code{boundary = "gas_filled"}. It is
@@ -132,10 +146,11 @@
 #'   S_{mn}(h_1, \eta) d\eta
 #' }
 #'
-#' In practice, these kernel matrices are solved using sets of least-squares
-#' linear equations to determine \eqn{A_{mn}}. This uses a divide-and-conquer
-#' singular value decomposition (SVD) algorithm, which is robust and efficient
-#' for large or ill-conditioned systems.
+#' In practice, these kernel matrices are solved numerically to determine
+#' \eqn{A_{mn}}. The implementation uses compiled dense linear algebra and
+#' keeps the fluid-filled solve in the requested arithmetic so that the
+#' linear-system stage does not become detached from the rest of the chosen
+#' precision pathway.
 #'
 #' In the case that \eqn{h_0 \approx h_1}, \eqn{\alpha_{mn}^{m} \approx 0} for
 #' \eqn{n \neq l}, and a much simplified expression is derived:
@@ -165,9 +180,10 @@
 #' fluid-filled expansion matrices (\eqn{A_{mn}}). Consequently, this can
 #' result in the model taking an impractical amount of time to compute
 #' \eqn{f_\infty(\theta, \phi | \theta', \phi')}. \code{C++} helps reduce this
-#' burden compared to a pure \code{R} implementation. The algorithm also
-#' benefits from utilizing the \code{Armadillo} linear algebra library native
-#' to \code{C++} (specifically the divide-and-conquer SVD algorithm).
+#' burden compared to a pure \code{R} implementation. The current implementation
+#' uses compiled matrix algebra throughout, applies backscatter parity to avoid
+#' recomputing one of the two angular \eqn{S_{mn}} matrices, and solves the
+#' fluid-filled kernel system natively in the requested arithmetic.
 #'
 #' <u>**Precision**</u>
 #'
@@ -180,12 +196,10 @@
 #' (128-bit) can contribute to differences in target strength of more than 1
 #' dB. While \code{R}-packages like \code{Rmpfr} provide access to the
 #' (\code{GNU}) \code{MPFR C} library, the (\code{GCC}) \code{libquadmath C++}
-#' library. <u>**Importantly: when using the \code{PSMS} model for fluid-filled
-#' prolate spheroids, the SVD algorithm from \code{Armadillo} is limited to
-#' double-precision, which means that the numerical precision of the model is
-#' limited to double even when \code{precision = "quad"}.**</u> This is planned
-#' to be addressed in the future by implementing a two-sided Jacobi SVD
-#' algorithm that is compatible with quadruple-precision.
+#' library. Quad precision nevertheless remains much more computationally
+#' intensive than double precision because the spheroidal function evaluations,
+#' overlap integrals, and kernel systems all grow rapidly with
+#' \eqn{m_{\max}} and \eqn{n_{\max}}.
 #'
 #' @seealso
 #' \code{\link{target_strength}}, \code{\link{FLS}}, \code{\link{GAS}},
@@ -221,8 +235,11 @@ NULL
 #' @param frequency Frequency vector (Hz).
 #' @param phi_body Body rotation angle (radians).
 #' @param boundary Boundary condition.
+#' @param adaptive Apply adaptive modal-tail truncation and quadrature selection.
 #' @param precision Numerical precision.
-#' @param n_integration Number of integration points.
+  #' @param n_integration Number of integration points. When left as `NULL`, the
+  #' model uses 96 integration points unless `adaptive = TRUE`, in which case a
+  #' reduced-frequency-based rule is used internally for full fluid- or gas-filled runs.
 #' @param simplify_Amn Calculate the boundary expansion coefficient using a
 #' simplified formulation.
 #' @param sound_speed_sw Seawater sound speed (m/s).
@@ -232,8 +249,9 @@ psms_initialize <- function(object,
                             frequency,
                             phi_body = pi,
                             boundary = "liquid_filled",
+                            adaptive = FALSE,
                             precision = "double",
-                            n_integration = 128,
+                            n_integration = NULL,
                             simplify_Amn = FALSE,
                             sound_speed_sw = 1500,
                             density_sw = 1026) {
@@ -279,7 +297,8 @@ psms_initialize <- function(object,
       )
     ),
     precision = precision,
-    n_integration = n_integration
+    n_integration = n_integration,
+    adaptive = adaptive
   )
   # Determine expansion coefficient Amn method =================================
   # Validate method ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -299,16 +318,9 @@ psms_initialize <- function(object,
     stop(
       "'precision' must be either 'double' or 'quad'."
     )
-  } else if (precision == "quad" &
-             boundary %in% c("liquid_filled", "gas_filled") &
-             !simplify_Amn) {
-    warning(
-      "The linear system of equations for the boundary kernel matrices is ",
-      "solved using a divide-and-conquer SVD implementation that is limited ",
-      "to double precision. Consequently, even when quad precision arithmetic ",
-      "is used elsewhere, the effective numerical accuracy of the solution ",
-      "cannot exceed double precision."
-    )
+  }
+  if (!is.logical(adaptive) || length(adaptive) != 1 || is.na(adaptive)) {
+    stop("'adaptive' must be either TRUE or FALSE.")
   }
   # Assign method ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   model_params$Amn_method <- switch(
@@ -343,12 +355,39 @@ psms_initialize <- function(object,
   model_params$acoustics$chi_sw <- model_params$acoustics$k_sw * body_params$q
   # Compute the reduced frequency for the scatterer body =======================
   model_params$acoustics$chi_body <- model_params$acoustics$k_f * body_params$q
+  # Determine quadrature order =================================================
+  use_adaptive_quadrature <- isTRUE(adaptive) && identical(model_params$Amn_method, "Amn_fluid")
+  if (use_adaptive_quadrature) {
+    if (!is.null(n_integration)) {
+      warning(
+        "'n_integration' is ignored when 'adaptive = TRUE' for the full fluid- or gas-filled PSMS solve."
+      )
+    }
+    n_integration <- NULL
+  } else if (is.null(n_integration)) {
+    n_integration <- 96L
+  }
+  if (!is.null(n_integration)) {
+    if (
+      !is.numeric(n_integration) ||
+      length(n_integration) != 1 ||
+      is.na(n_integration) ||
+      n_integration < 1 ||
+      n_integration %% 1 != 0
+    ) {
+      stop("'n_integration' must be a single positive integer.")
+    }
+    n_integration <- as.integer(n_integration)
+  } else {
+    n_integration <- NA_integer_
+  }
+  model_params$n_integration <- n_integration
   # Define limits for 'm' and 'n' iterators ====================================
   model_params$acoustics$m_max <- ceiling(
     2 * model_params$acoustics$k_sw * scatterer_shape$radius
   )
   model_params$acoustics$n_max <- model_params$acoustics$m_max +
-    ceiling(model_params$acoustics$chi_sw / 2)
+    ceiling(0.5 * model_params$acoustics$chi_sw)
   # Add model parameters slot to scattering object =============================
   methods::slot(
     object,
@@ -387,7 +426,7 @@ PSMS <- function(object) {
   # Compute the linear scattering coefficient, f_bs ============================
   f_bs <- prolate_spheroidal_kernels(
     acoustics, body, medium, parameters$Amn_method, parameters$n_integration,
-    parameters$precision
+    parameters$precision, parameters$adaptive
   )
   # Calculate backscatter and return ===========================================
   # Compute sigma_bs +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

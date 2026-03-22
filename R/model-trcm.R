@@ -175,20 +175,7 @@ trcm_initialize <- function(object,
     r * sinc_directivity * I_term
 }
 
-
-.trcm_curved <- function(
-    k1, k2a, lambda, l, a, rho_c, r, I, theta_shift, stationary_phase
-  ) {
-  # Stationary phase correction ================================================
-  if (stationary_phase) {
-    # Update the interference term +++++++++++++++++++++++++++++++++++++++++++++
-    I_term <- 1 - I * exp(4i * k2a)
-    # Simplified equivalent bent cylinder length +++++++++++++++++++++++++++++++
-    return(
-      sqrt(rho_c * l * lambda / 2) * exp(1i * pi / 4) *
-        .trcm_straight(k1, k2a, l, a, r, I_term, 0) / l
-    )
-  }
+.trcm_equivalent_length_fresnel <- function(k1, l, a, rho_c) {
   # Get the maximum curvature ==================================================
   gamma_max <- l / (2 * rho_c)
   z_max <- rho_c * (1 - cos(gamma_max))
@@ -200,19 +187,46 @@ trcm_initialize <- function(object,
   }
   # Integration is done over all k1 ++++++++++++++++++++++++++++++++++++++++++++
   lebc_scalar <- function(k1, A, B, a, lower, upper) {
-    real_part <- integrate(function(x) Re(integrand(x, k1, A, B, a)),
-                           lower, upper)$value
-    imag_part <- integrate(function(x) Im(integrand(x, k1, A, B, a)),
-                           lower, upper)$value
+    real_part <- integrate(
+      function(x) Re(integrand(x, k1, A, B, a)),
+      lower,
+      upper
+    )$value
+    imag_part <- integrate(
+      function(x) Im(integrand(x, k1, A, B, a)),
+      lower,
+      upper
+    )$value
     real_part + 1i * imag_part
   }
-  lebc <- vapply(k1, lebc_scalar,
-                 complex(1),
-                 A = A,
-                 B = B,
-                 a = a,
-                 lower = -l / 2,
-                 upper = l / 2)
+  vapply(
+    k1,
+    lebc_scalar,
+    complex(1),
+    A = A,
+    B = B,
+    a = a,
+    lower = -l / 2,
+    upper = l / 2
+  )
+}
+
+.trcm_equivalent_length_stationary_phase <- function(lambda, l, rho_c) {
+  sqrt(rho_c * lambda / 2) * exp(1i * pi / 4)
+}
+
+.trcm_curved <- function(
+    k1, k2a, lambda, l, a, rho_c, r, I, theta_shift, stationary_phase
+  ) {
+  # Stationary phase correction ================================================
+  if (stationary_phase) {
+    # Simplified equivalent bent cylinder length +++++++++++++++++++++++++++++++
+    return(
+      .trcm_equivalent_length_stationary_phase(lambda, l, rho_c) *
+        .trcm_straight(k1, k2a, l, a, r, I, 0) / l
+    )
+  }
+  lebc <- .trcm_equivalent_length_fresnel(k1, l, a, rho_c)
   # Compute the linear scattering strength, f_bs ===============================
   lebc * .trcm_straight(k1, k2a, l, a, r, I, theta_shift) / l
 }

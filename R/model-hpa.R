@@ -368,8 +368,7 @@ hpa_initialize <- function(object,
   # Compute ka =================================================================
   ka <- k * a
   # Special case: bent cylinder ================================================
-  if (!is.null(rho_c)) {
-    if (!is.na(rho_c)) {
+  if (length(rho_c) > 0 && !all(is.na(rho_c))) {
       # Compute the literal radius of curvature ++++++++++++++++++++++++++++++++
       r_c <- rho_c * l
       # Compute effective length of bent cylinder ++++++++++++++++++++++++++++++
@@ -379,7 +378,6 @@ hpa_initialize <- function(object,
         (0.25 * l^2 * ka^4 * alpha^2 * H^2 * gnull) /
           (1 + (l^2 * ka^4 * alpha^2 * H^2) / (r_c * a * r^2 * fdevs))
       )
-    }
   }
   # Compute the effective length based on tilt angle ===========================
   s <- sin(k * l * cos(theta)) / (k * l * cos(theta))

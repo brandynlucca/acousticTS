@@ -27,7 +27,8 @@ target_strength(
   ...,
   model="krm",
   sound_speed_sw,
-  density_sw
+  density_sw,
+  krm_variant = "lowcontrast"
 )
 }
 }
@@ -38,6 +39,14 @@ target_strength(
 \describe{
 \item{\code{sound_speed_sw}}{Seawater sound speed (\eqn{m~s^{-1}}).}
 \item{\code{density_sw}}{Seawater density (\eqn{kg~m^{-3}}).}
+\item{\code{krm_variant}}{Swimbladder-medium convention for combined
+body-plus-bladder targets. Use \code{"lowcontrast"} for the low-contrast
+approximation \eqn{k_B \approx k} in both swimbladder regimes,
+\code{"body_embedded"} for the literal body-embedded interpretation of
+Clay and Horne (1994), or \code{"mixed"} for the intermediate convention
+in which the high-\eqn{ka} swimbladder term uses the body medium but the
+low-\eqn{ka} breathing-mode term uses the low-contrast approximation.
+This argument is ignored for fluid-only body targets.}
 }
 }
 
@@ -57,7 +66,7 @@ are transformed into a rotated system according to:
  }
 \deqn{
    v(j) = x(j) \cos \theta + z(j) \sin \theta,
- }#'
+ }
 \deqn{
    \Delta u_j = [x(j+1) - x(j)] \sin \theta,
  }
@@ -78,25 +87,28 @@ scatterer segments:
 \deqn{
    \mathcal{L} =
      \sum\limits_{b=1}^{N_b} \mathcal{L}_{B,b} +
-     \sum\\limits_{s=1}^{N_s} \mathcal{L}_{SB,s},
+     \sum\limits_{s=1}^{N_s} \mathcal{L}_{SB,s},
  }
 
-where \eqn{\mathcal{S}_{B,b}} is the contribution from the \eqn{b}-th body
+where \eqn{\mathcal{L}_{B,b}} is the contribution from the \eqn{b}-th body
 segment and \eqn{\mathcal{L}_{SB,s}} is from the \eqn{s}-th swimbladder
 segment. For body segments:
 
 \deqn{
-   \mathcal{L}_{B,b} \approx -i \frac{(ka_B \sin \theta)^{1/2}}{2\sqrt{\pi}}
-   \Delta u_b [\mathcal{R}_{wb} e^{-i2kz_U} -
-   \mathcal{T}_{wb}\mathcal{T}_{bw}
-   e^{-i2k z_U + i 2 k_B (w_b - v_b - v_L) + i \psi_B}],
+   \mathcal{L}_{B,b} \approx -i \frac{\mathcal{R}_{wb}}{2\sqrt{\pi}}
+   (k a_b)^{1/2} \Delta u_b \left[
+     e^{-i2k v_{U,b}} -
+     \mathcal{T}_{wb}\mathcal{T}_{bw}
+     e^{-i2k v_{U,b} + i 2 k_B (v_{U,b} - v_{L,b}) + i \psi_{B,b}}
+   \right],
  }
 
 where \eqn{\mathcal{R}_{wb}} and \eqn{\mathcal{T}_{wb}} are reflection and
 transmission coefficients at the water-body interface, \eqn{k} is the
-wavenumber in water, and \eqn{k_B} in the body. The upper/lower surface
-coordinates are \eqn{z_U} and \eqn{z_L}, and \eqn{\psi_B} is an empirical
-phase correction.
+wavenumber in water, and \eqn{k_B} in the body. The quantities
+\eqn{v_{U,b}} and \eqn{v_{L,b}} are the rotated upper- and lower-surface
+coordinates of the \eqn{b}-th segment, \eqn{\Delta u_b = [x(b+1)-x(b)]
+\sin\theta}, and \eqn{\psi_{B,b}} is an empirical phase correction.
 
 The scattering from the swimbladder depends on the dimensionless frequency
 parameter \eqn{ka_e}, \eqn{a_e} is the equivalent swimbladder radius. For low
@@ -117,19 +129,45 @@ and  boundary conditions of the swimbladder. For higher frequencies
 \eqn{ka \ge 0.15}), the Kirchhoff-ray approximation is used:
 
 \deqn{
- \mathcal{L}_{SB,s} \approx -i \frac{A_{SB,s}
- [(k_B a_s + 1)\sin\theta]^{1/2}}{2\sqrt{\pi}} \Delta u_s
- \mathcal{R}_{bc} \mathcal{T}_{wb} e^{-i (2 k_B v_s + \psi_p)}.
+ \mathcal{L}_{SB,s} \approx -i \frac{\mathcal{R}_{bc}
+ \mathcal{T}_{wb}\mathcal{T}_{bw}}{2\sqrt{\pi}} A_{SB,s}
+ [(k a_s + 1)\sin\theta]^{1/2} \Delta u_s
+ e^{-i (2 k_B v_s + \psi_{p,s})}.
 }
 
 Here, \eqn{a_s} and \eqn{v_s} are the averaged radius and longitudinal
 position for  the segment, \eqn{\mathcal{R}_{bc}} is the reflection
 coefficient at the body-cylinder interface, and \eqn{A_{SB,s}} and
-\eqn{\psi_p)} are empirical amplitude and phase adjustments, respectively.
+\eqn{\psi_{p,s}} are empirical amplitude and phase adjustments,
+respectively.
+}
 
-This hybrid approach ensures that the KRM model correctly captures the
-low-frequency  resonance of the swimbladder while maintaining high-frequency
-accuracy via the Kirchhoff-ray mode approximation.
+\section{Swimbladder medium conventions}{
+
+Clay and Horne (1994) derive the swimbladder term for a gas-filled inclusion
+embedded in body tissue, but also note that the low body-water contrast can
+justify the approximation \eqn{k_B \approx k}. For combined body-plus-
+bladder targets, \code{acousticTS} exposes that choice through
+\code{krm_variant}:
+
+\describe{
+\item{\code{"body_embedded"}}{Use the body medium for both the
+high-\eqn{ka} Kirchhoff swimbladder term and the low-\eqn{ka}
+breathing-mode term. This is the most literal interpretation of the
+body-embedded swimbladder geometry in Clay and Horne (1994).}
+\item{\code{"mixed"}}{Use the body medium for the high-\eqn{ka}
+swimbladder term but the water approximation for the low-\eqn{ka}
+breathing-mode term. This follows the later mixed convention discussed in
+the fisheries-acoustics literature.}
+\item{\code{"lowcontrast"}}{Use the low-contrast approximation
+\eqn{k_B \approx k} for both swimbladder regimes, i.e. evaluate both the
+high-\eqn{ka} and low-\eqn{ka} swimbladder terms with the external-medium
+wavenumber rather than the body-medium wavenumber.}
+}
+
+These named variants make the swimbladder-medium assumption explicit while
+keeping the public API tied to the scientific interpretation rather than to
+implementation-specific knob names.
 
 \strong{Assumptions and limitations}
 
