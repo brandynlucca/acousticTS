@@ -93,7 +93,7 @@ Rmn_cpp <- function(m, n, c, x1, kind = 1L, precision = "double") {
     .Call(`_acousticTS_Rmn_cpp`, m, n, c, x1, kind, precision)
 }
 
-prolate_spheroid_fbs <- function(acoustics, body, medium, integration_pts, precision = "double", Amn_method = "Amn_fluid") {
-    .Call(`_acousticTS_prolate_spheroid_fbs`, acoustics, body, medium, integration_pts, precision, Amn_method)
+prolate_spheroid_fbs <- function(acoustics, body, medium, integration_pts, precision = "double", Amn_method = "Amn_fluid", adaptive = FALSE) {
+    .Call(`_acousticTS_prolate_spheroid_fbs`, acoustics, body, medium, integration_pts, precision, Amn_method, adaptive)
 }
 

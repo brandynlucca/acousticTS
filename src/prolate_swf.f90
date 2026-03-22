@@ -6,21 +6,426 @@ module prolate_swf
  use param
 #endif
 
+ ! ---------------------------------------------------------------------------
+ ! Lightweight caches for repeated Legendre- and quadrature-related work.
+ ! The PSMS backend frequently asks for nearby spheroidal orders at the same
+ ! size parameter, so caching these auxiliary tables avoids rebuilding the same
+ ! support arrays on every call into profcn.
+ ! Modified by: Brandyn M. Lucca; March 2026
+ ! ---------------------------------------------------------------------------
+ integer, parameter :: pleg_cache_slots = 48
+ integer, parameter :: qleg_cache_slots = 48
+
+ type :: pleg_cache_entry
+   logical :: valid = .false.
+   integer :: m = -1
+   integer :: iopd = -1
+   integer :: narg = 0
+   integer :: maxt = 0
+   integer :: maxp = 0
+   integer :: lim = 0
+   integer :: ndec = 0
+   integer :: nex = 0
+   real(knd), allocatable :: barg(:)
+   real(knd), allocatable :: pr(:,:), pdr(:,:)
+   real(knd), allocatable :: pdnorm(:), pnorm(:)
+   integer, allocatable :: ipdnorm(:), ipnorm(:)
+   real(knd), allocatable :: alpha(:), beta(:), gamma(:)
+   real(knd), allocatable :: coefa(:), coefb(:), coefc(:), coefd(:), coefe(:)
+ end type
+
+ type :: qleg_cache_entry
+   logical :: valid = .false.
+   integer :: m = -1
+   integer :: lnum = 0
+   integer :: limq = 0
+   integer :: maxq = 0
+   integer :: ndec = 0
+   integer :: iqdml = 0
+   integer :: iqml = 0
+   integer :: itermpq = 0
+   real(knd) :: x1 = 0.0_knd
+   real(knd) :: qdml = 0.0_knd
+   real(knd) :: qml = 0.0_knd
+   real(knd) :: termpq = 0.0_knd
+   real(knd), allocatable :: qdr(:), qr(:), qdl(:), ql(:)
+   integer, allocatable :: iqdl(:), iql(:)
+ end type
+
+ type :: gauss_cache_entry
+   logical :: valid = .false.
+   integer :: ndec = 0
+   integer :: n = 0
+   real(knd), allocatable :: x(:), w(:)
+ end type
+
+ type(pleg_cache_entry), save :: pleg_cache(pleg_cache_slots)
+ type(qleg_cache_entry), save :: qleg_cache(qleg_cache_slots)
+ type(gauss_cache_entry), save :: gauss_cache
+ integer, save :: pleg_cache_next = 1
+ integer, save :: qleg_cache_next = 1
+
  contains
+
+  logical function cache_real_equal(a, b)
+    real(knd), intent(in) :: a, b
+    real(knd) :: scale, tol
+
+    ! Use a precision-scaled tolerance so cache lookup is robust to the small
+    ! roundoff differences introduced by repeated calls from C++.
+    scale = max(1.0_knd, max(abs(a), abs(b)))
+    tol = 64.0_knd * epsilon(1.0_knd) * scale
+    cache_real_equal = abs(a - b) <= tol
+  end function
+
+  logical function cache_real_vector_equal(a, b, n)
+    real(knd), intent(in) :: a(:), b(:)
+    integer, intent(in) :: n
+    integer :: i
+
+    cache_real_vector_equal = .false.
+    if(size(a) < n .or. size(b) < n) return
+    do i = 1, n
+      if(.not. cache_real_equal(a(i), b(i))) return
+    end do
+    cache_real_vector_equal = .true.
+  end function
+
+  subroutine clear_pleg_cache_slot(idx)
+    integer, intent(in) :: idx
+
+    ! Reset and deallocate one cache slot before it is reused.
+    pleg_cache(idx)%valid = .false.
+    pleg_cache(idx)%m = -1
+    pleg_cache(idx)%iopd = -1
+    pleg_cache(idx)%narg = 0
+    pleg_cache(idx)%maxt = 0
+    pleg_cache(idx)%maxp = 0
+    pleg_cache(idx)%lim = 0
+    pleg_cache(idx)%ndec = 0
+    pleg_cache(idx)%nex = 0
+    if(allocated(pleg_cache(idx)%barg)) deallocate(pleg_cache(idx)%barg)
+    if(allocated(pleg_cache(idx)%pr)) deallocate(pleg_cache(idx)%pr)
+    if(allocated(pleg_cache(idx)%pdr)) deallocate(pleg_cache(idx)%pdr)
+    if(allocated(pleg_cache(idx)%pdnorm)) deallocate(pleg_cache(idx)%pdnorm)
+    if(allocated(pleg_cache(idx)%pnorm)) deallocate(pleg_cache(idx)%pnorm)
+    if(allocated(pleg_cache(idx)%ipdnorm)) deallocate(pleg_cache(idx)%ipdnorm)
+    if(allocated(pleg_cache(idx)%ipnorm)) deallocate(pleg_cache(idx)%ipnorm)
+    if(allocated(pleg_cache(idx)%alpha)) deallocate(pleg_cache(idx)%alpha)
+    if(allocated(pleg_cache(idx)%beta)) deallocate(pleg_cache(idx)%beta)
+    if(allocated(pleg_cache(idx)%gamma)) deallocate(pleg_cache(idx)%gamma)
+    if(allocated(pleg_cache(idx)%coefa)) deallocate(pleg_cache(idx)%coefa)
+    if(allocated(pleg_cache(idx)%coefb)) deallocate(pleg_cache(idx)%coefb)
+    if(allocated(pleg_cache(idx)%coefc)) deallocate(pleg_cache(idx)%coefc)
+    if(allocated(pleg_cache(idx)%coefd)) deallocate(pleg_cache(idx)%coefd)
+    if(allocated(pleg_cache(idx)%coefe)) deallocate(pleg_cache(idx)%coefe)
+  end subroutine
+
+  integer function find_pleg_cache(m, iopd, ndec, nex, barg, narg, maxt, lim, maxp)
+    integer, intent(in) :: m, iopd, ndec, nex, narg, maxt, lim, maxp
+    real(knd), intent(in) :: barg(:)
+    integer :: i
+
+    ! Only reuse a slot when the order, options, precision metadata, argument
+    ! vector, and retained dimensions are all compatible.
+    find_pleg_cache = 0
+    do i = 1, pleg_cache_slots
+      if(.not. pleg_cache(i)%valid) cycle
+      if(pleg_cache(i)%m /= m) cycle
+      if(pleg_cache(i)%iopd /= iopd) cycle
+      if(pleg_cache(i)%ndec /= ndec) cycle
+      if(pleg_cache(i)%nex /= nex) cycle
+      if(pleg_cache(i)%narg /= narg) cycle
+      if(pleg_cache(i)%maxt /= maxt) cycle
+      if(pleg_cache(i)%lim < lim) cycle
+      if(pleg_cache(i)%maxp < maxp) cycle
+      if(.not. cache_real_vector_equal(pleg_cache(i)%barg, barg, narg)) cycle
+      find_pleg_cache = i
+      return
+    end do
+  end function
+
+  subroutine load_pleg_cache(idx, maxt, narg, lim, maxp, barg, pr, pdr, pdnorm, ipdnorm, pnorm, ipnorm, alpha, beta, gamma, coefa, coefb, coefc, coefd, coefe)
+    integer, intent(in) :: idx, maxt, narg, lim, maxp
+    real(knd), intent(out) :: barg(maxt), pr(maxt, maxp), pdr(maxt, maxp), pdnorm(maxt), pnorm(maxt), alpha(maxp), beta(maxp), gamma(maxp), coefa(maxp), coefb(maxp), coefc(maxp), coefd(maxp), coefe(maxp)
+    integer, intent(out) :: ipdnorm(maxt), ipnorm(maxt)
+
+    ! Copy cached arrays back into the caller's workspaces.
+    barg(1:narg) = pleg_cache(idx)%barg(1:narg)
+    pr(1:maxt, 1:lim) = pleg_cache(idx)%pr(1:maxt, 1:lim)
+    pdr(1:maxt, 1:lim) = pleg_cache(idx)%pdr(1:maxt, 1:lim)
+    pdnorm(1:maxt) = pleg_cache(idx)%pdnorm(1:maxt)
+    ipdnorm(1:maxt) = pleg_cache(idx)%ipdnorm(1:maxt)
+    pnorm(1:maxt) = pleg_cache(idx)%pnorm(1:maxt)
+    ipnorm(1:maxt) = pleg_cache(idx)%ipnorm(1:maxt)
+    alpha(1:lim) = pleg_cache(idx)%alpha(1:lim)
+    beta(1:lim) = pleg_cache(idx)%beta(1:lim)
+    gamma(1:lim) = pleg_cache(idx)%gamma(1:lim)
+    coefa(1:lim) = pleg_cache(idx)%coefa(1:lim)
+    coefb(1:lim) = pleg_cache(idx)%coefb(1:lim)
+    coefc(1:lim) = pleg_cache(idx)%coefc(1:lim)
+    coefd(1:lim) = pleg_cache(idx)%coefd(1:lim)
+    coefe(1:lim) = pleg_cache(idx)%coefe(1:lim)
+  end subroutine
+
+  subroutine store_pleg_cache(m, iopd, ndec, nex, barg, narg, maxt, lim, maxp, pr, pdr, pdnorm, ipdnorm, pnorm, ipnorm, alpha, beta, gamma, coefa, coefb, coefc, coefd, coefe)
+    integer, intent(in) :: m, iopd, ndec, nex, narg, maxt, lim, maxp
+    real(knd), intent(in) :: barg(maxt), pr(maxt, maxp), pdr(maxt, maxp), pdnorm(maxt), pnorm(maxt), alpha(maxp), beta(maxp), gamma(maxp), coefa(maxp), coefb(maxp), coefc(maxp), coefd(maxp), coefe(maxp)
+    integer, intent(in) :: ipdnorm(maxt), ipnorm(maxt)
+    integer :: idx
+
+    ! Reuse a matching slot when possible; otherwise take a free or round-robin
+    ! replacement slot.
+    idx = find_pleg_cache(m, iopd, ndec, nex, barg, narg, maxt, lim, maxp)
+    if(idx == 0) then
+      idx = 1
+      do while(idx <= pleg_cache_slots)
+        if(.not. pleg_cache(idx)%valid) exit
+        idx = idx + 1
+      end do
+      if(idx > pleg_cache_slots) then
+        idx = pleg_cache_next
+        pleg_cache_next = pleg_cache_next + 1
+        if(pleg_cache_next > pleg_cache_slots) pleg_cache_next = 1
+      end if
+    end if
+
+    call clear_pleg_cache_slot(idx)
+    allocate(pleg_cache(idx)%barg(narg))
+    allocate(pleg_cache(idx)%pr(maxt, maxp))
+    allocate(pleg_cache(idx)%pdr(maxt, maxp))
+    allocate(pleg_cache(idx)%pdnorm(maxt))
+    allocate(pleg_cache(idx)%pnorm(maxt))
+    allocate(pleg_cache(idx)%ipdnorm(maxt))
+    allocate(pleg_cache(idx)%ipnorm(maxt))
+    allocate(pleg_cache(idx)%alpha(maxp))
+    allocate(pleg_cache(idx)%beta(maxp))
+    allocate(pleg_cache(idx)%gamma(maxp))
+    allocate(pleg_cache(idx)%coefa(maxp))
+    allocate(pleg_cache(idx)%coefb(maxp))
+    allocate(pleg_cache(idx)%coefc(maxp))
+    allocate(pleg_cache(idx)%coefd(maxp))
+    allocate(pleg_cache(idx)%coefe(maxp))
+
+    pleg_cache(idx)%valid = .true.
+    pleg_cache(idx)%m = m
+    pleg_cache(idx)%iopd = iopd
+    pleg_cache(idx)%narg = narg
+    pleg_cache(idx)%maxt = maxt
+    pleg_cache(idx)%maxp = maxp
+    pleg_cache(idx)%lim = lim
+    pleg_cache(idx)%ndec = ndec
+    pleg_cache(idx)%nex = nex
+    pleg_cache(idx)%barg(1:narg) = barg(1:narg)
+    pleg_cache(idx)%pr = 0.0_knd
+    pleg_cache(idx)%pdr = 0.0_knd
+    pleg_cache(idx)%alpha = 0.0_knd
+    pleg_cache(idx)%beta = 0.0_knd
+    pleg_cache(idx)%gamma = 0.0_knd
+    pleg_cache(idx)%coefa = 0.0_knd
+    pleg_cache(idx)%coefb = 0.0_knd
+    pleg_cache(idx)%coefc = 0.0_knd
+    pleg_cache(idx)%coefd = 0.0_knd
+    pleg_cache(idx)%coefe = 0.0_knd
+    pleg_cache(idx)%pr(1:maxt, 1:lim) = pr(1:maxt, 1:lim)
+    pleg_cache(idx)%pdr(1:maxt, 1:lim) = pdr(1:maxt, 1:lim)
+    pleg_cache(idx)%pdnorm(1:maxt) = pdnorm(1:maxt)
+    pleg_cache(idx)%pnorm(1:maxt) = pnorm(1:maxt)
+    pleg_cache(idx)%ipdnorm(1:maxt) = ipdnorm(1:maxt)
+    pleg_cache(idx)%ipnorm(1:maxt) = ipnorm(1:maxt)
+    pleg_cache(idx)%alpha(1:lim) = alpha(1:lim)
+    pleg_cache(idx)%beta(1:lim) = beta(1:lim)
+    pleg_cache(idx)%gamma(1:lim) = gamma(1:lim)
+    pleg_cache(idx)%coefa(1:lim) = coefa(1:lim)
+    pleg_cache(idx)%coefb(1:lim) = coefb(1:lim)
+    pleg_cache(idx)%coefc(1:lim) = coefc(1:lim)
+    pleg_cache(idx)%coefd(1:lim) = coefd(1:lim)
+    pleg_cache(idx)%coefe(1:lim) = coefe(1:lim)
+  end subroutine
+
+  subroutine pleg_cached(m, lim, maxp, limcsav, iopd, ndec, nex, barg, narg, maxt, pr, pdr, pdnorm, ipdnorm, pnorm, ipnorm, alpha, beta, gamma, coefa, coefb, coefc, coefd, coefe)
+    integer, intent(in) :: m, lim, maxp, iopd, ndec, nex, narg, maxt
+    integer, intent(inout) :: limcsav
+    real(knd), intent(inout) :: barg(maxt)
+    real(knd), intent(out) :: pr(maxt, maxp), pdr(maxt, maxp), pdnorm(maxt), pnorm(maxt), alpha(maxp), beta(maxp), gamma(maxp), coefa(maxp), coefb(maxp), coefc(maxp), coefd(maxp), coefe(maxp)
+    integer, intent(out) :: ipdnorm(maxt), ipnorm(maxt)
+    integer :: idx
+
+    ! Cached wrapper around pleg: load when available, otherwise compute once
+    ! and store for later calls at the same settings.
+    idx = find_pleg_cache(m, iopd, ndec, nex, barg, narg, maxt, lim, maxp)
+    if(idx /= 0) then
+      call load_pleg_cache(idx, maxt, narg, lim, maxp, barg, pr, pdr, pdnorm, ipdnorm, pnorm, ipnorm, alpha, beta, gamma, coefa, coefb, coefc, coefd, coefe)
+      limcsav = max(limcsav, lim)
+      return
+    end if
+
+    call pleg(m, lim, maxp, limcsav, iopd, ndec, nex, barg, narg, maxt, pr, pdr, pdnorm, ipdnorm, pnorm, ipnorm, alpha, beta, gamma, coefa, coefb, coefc, coefd, coefe)
+    call store_pleg_cache(m, iopd, ndec, nex, barg, narg, maxt, lim, maxp, pr, pdr, pdnorm, ipdnorm, pnorm, ipnorm, alpha, beta, gamma, coefa, coefb, coefc, coefd, coefe)
+  end subroutine
+
+  subroutine clear_qleg_cache_slot(idx)
+    integer, intent(in) :: idx
+
+    qleg_cache(idx)%valid = .false.
+    qleg_cache(idx)%m = -1
+    qleg_cache(idx)%lnum = 0
+    qleg_cache(idx)%limq = 0
+    qleg_cache(idx)%maxq = 0
+    qleg_cache(idx)%ndec = 0
+    qleg_cache(idx)%iqdml = 0
+    qleg_cache(idx)%iqml = 0
+    qleg_cache(idx)%itermpq = 0
+    qleg_cache(idx)%x1 = 0.0_knd
+    qleg_cache(idx)%qdml = 0.0_knd
+    qleg_cache(idx)%qml = 0.0_knd
+    qleg_cache(idx)%termpq = 0.0_knd
+    if(allocated(qleg_cache(idx)%qdr)) deallocate(qleg_cache(idx)%qdr)
+    if(allocated(qleg_cache(idx)%qr)) deallocate(qleg_cache(idx)%qr)
+    if(allocated(qleg_cache(idx)%qdl)) deallocate(qleg_cache(idx)%qdl)
+    if(allocated(qleg_cache(idx)%ql)) deallocate(qleg_cache(idx)%ql)
+    if(allocated(qleg_cache(idx)%iqdl)) deallocate(qleg_cache(idx)%iqdl)
+    if(allocated(qleg_cache(idx)%iql)) deallocate(qleg_cache(idx)%iql)
+  end subroutine
+
+  integer function find_qleg_cache(m, lnum, limq, maxq, x1, ndec)
+    integer, intent(in) :: m, lnum, limq, maxq, ndec
+    real(knd), intent(in) :: x1
+    integer :: i
+
+    find_qleg_cache = 0
+    do i = 1, qleg_cache_slots
+      if(.not. qleg_cache(i)%valid) cycle
+      if(qleg_cache(i)%m /= m) cycle
+      if(qleg_cache(i)%ndec /= ndec) cycle
+      if(.not. cache_real_equal(qleg_cache(i)%x1, x1)) cycle
+      if(qleg_cache(i)%lnum < lnum) cycle
+      if(qleg_cache(i)%limq < limq) cycle
+      if(qleg_cache(i)%maxq < maxq) cycle
+      find_qleg_cache = i
+      return
+    end do
+  end function
+
+  subroutine store_qleg_cache(m, lnum, limq, maxq, x1, ndec, qdr, qdml, iqdml, qdl, iqdl, qr, qml, iqml, ql, iql, termpq, itermpq)
+    integer, intent(in) :: m, lnum, limq, maxq, ndec, iqdml, iqml, itermpq
+    real(knd), intent(in) :: x1, qdr(maxq), qdml, qdl(lnum), qr(maxq), qml, ql(lnum), termpq
+    integer, intent(in) :: iqdl(lnum), iql(lnum)
+    integer :: idx
+
+    idx = find_qleg_cache(m, lnum, limq, maxq, x1, ndec)
+    if(idx == 0) then
+      idx = 1
+      do while(idx <= qleg_cache_slots)
+        if(.not. qleg_cache(idx)%valid) exit
+        idx = idx + 1
+      end do
+      if(idx > qleg_cache_slots) then
+        idx = qleg_cache_next
+        qleg_cache_next = qleg_cache_next + 1
+        if(qleg_cache_next > qleg_cache_slots) qleg_cache_next = 1
+      end if
+    end if
+
+    call clear_qleg_cache_slot(idx)
+    allocate(qleg_cache(idx)%qdr(maxq))
+    allocate(qleg_cache(idx)%qr(maxq))
+    allocate(qleg_cache(idx)%qdl(lnum))
+    allocate(qleg_cache(idx)%ql(lnum))
+    allocate(qleg_cache(idx)%iqdl(lnum))
+    allocate(qleg_cache(idx)%iql(lnum))
+
+    qleg_cache(idx)%valid = .true.
+    qleg_cache(idx)%m = m
+    qleg_cache(idx)%lnum = lnum
+    qleg_cache(idx)%limq = limq
+    qleg_cache(idx)%maxq = maxq
+    qleg_cache(idx)%ndec = ndec
+    qleg_cache(idx)%x1 = x1
+    qleg_cache(idx)%qdml = qdml
+    qleg_cache(idx)%iqdml = iqdml
+    qleg_cache(idx)%qml = qml
+    qleg_cache(idx)%iqml = iqml
+    qleg_cache(idx)%termpq = termpq
+    qleg_cache(idx)%itermpq = itermpq
+    qleg_cache(idx)%qdr(1:maxq) = qdr(1:maxq)
+    qleg_cache(idx)%qr(1:maxq) = qr(1:maxq)
+    qleg_cache(idx)%qdl(1:lnum) = qdl(1:lnum)
+    qleg_cache(idx)%ql(1:lnum) = ql(1:lnum)
+    qleg_cache(idx)%iqdl(1:lnum) = iqdl(1:lnum)
+    qleg_cache(idx)%iql(1:lnum) = iql(1:lnum)
+  end subroutine
+
+  subroutine qleg_cached(m, lnum, limq, maxq, x1, ndec, qdr, qdml, iqdml, qdl, iqdl, qr, qml, iqml, ql, iql, termpq, itermpq)
+    integer, intent(in) :: m, lnum, limq, maxq, ndec
+    real(knd), intent(in) :: x1
+    real(knd), intent(out) :: qdr(maxq), qdml, qdl(lnum), qr(maxq), qml, ql(lnum), termpq
+    integer, intent(out) :: iqdml, iqdl(lnum), iqml, iql(lnum), itermpq
+    integer :: idx
+
+    idx = find_qleg_cache(m, lnum, limq, maxq, x1, ndec)
+    if(idx /= 0) then
+      qdr(1:maxq) = qleg_cache(idx)%qdr(1:maxq)
+      qr(1:maxq) = qleg_cache(idx)%qr(1:maxq)
+      qdl(1:lnum) = qleg_cache(idx)%qdl(1:lnum)
+      ql(1:lnum) = qleg_cache(idx)%ql(1:lnum)
+      iqdl(1:lnum) = qleg_cache(idx)%iqdl(1:lnum)
+      iql(1:lnum) = qleg_cache(idx)%iql(1:lnum)
+      qdml = qleg_cache(idx)%qdml
+      iqdml = qleg_cache(idx)%iqdml
+      qml = qleg_cache(idx)%qml
+      iqml = qleg_cache(idx)%iqml
+      termpq = qleg_cache(idx)%termpq
+      itermpq = qleg_cache(idx)%itermpq
+      return
+    end if
+
+    call qleg(m, lnum, limq, maxq, x1, ndec, qdr, qdml, iqdml, qdl, iqdl, qr, qml, iqml, ql, iql, termpq, itermpq)
+    call store_qleg_cache(m, lnum, limq, maxq, x1, ndec, qdr, qdml, iqdml, qdl, iqdl, qr, qml, iqml, ql, iql, termpq, itermpq)
+  end subroutine
+
+  subroutine gauss_cached(ndec, n, x, w)
+    integer, intent(in) :: ndec, n
+    real(knd), intent(out) :: x(n), w(n)
+
+    if(gauss_cache%valid) then
+      if(gauss_cache%ndec == ndec .and. gauss_cache%n == n) then
+        x(1:n) = gauss_cache%x(1:n)
+        w(1:n) = gauss_cache%w(1:n)
+        return
+      end if
+      if(allocated(gauss_cache%x)) deallocate(gauss_cache%x)
+      if(allocated(gauss_cache%w)) deallocate(gauss_cache%w)
+    end if
+
+    call gauss(ndec, n, x, w)
+    allocate(gauss_cache%x(n))
+    allocate(gauss_cache%w(n))
+    gauss_cache%valid = .true.
+    gauss_cache%ndec = ndec
+    gauss_cache%n = n
+    gauss_cache%x(1:n) = x(1:n)
+    gauss_cache%w(1:n) = w(1:n)
+  end subroutine
 
   subroutine profcn(c, m, lnum, ioprad, x1, iopang, iopnorm, narg, arg, &
            r1c, ir1e, r1dc, ir1de, r2c, &
            ir2e, r2dc, ir2de, naccr, &
            s1c, is1e, s1dc, is1de, naccs)
 
-!      version 1.15 Dec 2023
+!      version March 2026
 !
 !  Subroutine version of the fortran program profcn originally developed
 !  about 2000 by arnie lee van buren and jeffrey boisvert. Updated
 !  several times since then. For more information see the GitHub
 !  repository: GitHub.com/MathieuandSpheroidalWaveFunctions/Prolate_swf.
 !  Especially see the readme file, example input and output files and two
-!  journal articles describing the methods used in profcn.
+!  journal articles describing the methods used in profcn. These subroutines 
+!  were modified by Brandyn M. Lucca to improve computational efficiency and 
+!  compatibility with the psms.cpp C++ interface used by the acousticTS 
+!  R-package. The scaffolding for the actual calculations and numerical 
+!  methods otherwise remain mostly the same as version 1.15 (Dec 2023) of 
+!  this file.
 !
 !  purpose:     To calculate the first and second kind prolate
 !               radial functions r1 and r2 and their first
@@ -150,6 +555,11 @@ module prolate_swf
     integer, intent (out)  :: ir1e(lnum), ir1de(lnum), ir2e(lnum), ir2de(lnum), &
                   is1e(lnum, narg), is1de(lnum, narg), naccr(lnum), &
                   naccs(lnum, narg)
+    real(knd) :: qr1_tmp(lnum, 1), qr1d_tmp(lnum, 1), qr2_tmp(lnum, 1), qr2d_tmp(lnum, 1), &
+                 s1_tmp(lnum, narg, 1), s1d_tmp(lnum, narg, 1)
+    integer :: ir1_tmp(lnum, 1), ir1d_tmp(lnum, 1), ir2_tmp(lnum, 1), ir2d_tmp(lnum, 1), &
+               nar_tmp(lnum, 1), is1_tmp(lnum, narg, 1), is1d_tmp(lnum, narg, 1), &
+               naccs_tmp(lnum, narg, 1)
 
 !       Here is where the user sets kindd, the value for kind that
 !       corresponds to double precision data on the users computer.
@@ -162,12 +572,12 @@ module prolate_swf
 5    kindd = 8
     kindq = 16
 
-!       set the minimum desired accuray minacc to 10 for real*8
+!       set the minimum desired accuray minacc to 8 for real*8
 !       arithmetic and to 15 for real*16 arithmetic. These can be
 !       changed if desired. See the readme file.
 
     if(knd == kindd) minacc = 8
-    if(knd == kindq) minacc = 15
+    if(knd == kindq) minacc = 8
 
 !       ndec: the maximum number of decimal digits available in real(knd)
 !             arithmetic.
@@ -203,7 +613,99 @@ module prolate_swf
     neta = 993
     ngau = 200
     if(ioprad == 2) then
-      lnump = max(lnum + maxm, 1000)
+      lnump = max(lnum + maxm, 64)
+      if(x1 >= 0.00065e0_knd) maxn = 2 * (lnump * (-18.5e0_knd - 20.e0_knd * &
+              log10(x1)) + 5 * ndec + 4 * maxm + c + 5000) + maxm + 5
+
+      if(x1 > 0.08e0_knd) maxn = 2 * (lnump * (0.5e0_knd - 3.0e0_knd * &
+              log10(x1)) + 5 * ndec + 4 * maxm + c + 1000) + maxm + 5
+
+      if(x1 > 1.0e0_knd) maxn = 2 * (lnump * 0.5e0_knd + 5 * ndec &
+              + 4 * maxm + c + 500) + maxm + 5
+      maxp = max(maxn, maxp)
+      if(x1 < 1.0e-3_knd) ngau = 200 - 50 * int(log10(x1) - 1.0e-30_knd)
+      if(x1 < 1.0e-10_knd) ngau = 250 - 50 * int(log10(x1) - 1.0e-30_knd)
+      if(x1 < 1.0e-11_knd) ngau =1200
+      if(x1 < 1.0e-12_knd) ngau =2400
+      if(x1 <= 0.5e0_knd) maxpdr = maxpdr + int(2.e0_knd * c + 100.0e0_knd * x1) + 400
+    end if
+    maxq = maxint + maxm + maxm
+    maxdr = maxpdr / 2 + 1
+    maxp = max(maxp, maxpdr)
+    maxd = maxp / 2 + 1
+    maxlp = lnum + maxm + 5
+    maxmp = maxm +5
+    maxt = 1
+    jnenmax = 10
+    if(iopang /= 0) maxt = narg
+
+     call main (mmin, minc, mnum, lnum, c, ioprad, iopang, iopnorm, minacc, &
+          x1, ngau, arg, narg, neta, maxd, maxdr, maxint, maxj, maxlp, &
+          maxm, maxmp, maxn, maxp, maxpdr, maxq, maxt, jnenmax, &
+          kindd, kindq, ndec, nex, qr1_tmp, ir1_tmp, qr1d_tmp, ir1d_tmp, &
+          qr2_tmp, ir2_tmp, qr2d_tmp, ir2d_tmp, nar_tmp, s1_tmp, is1_tmp, &
+          s1d_tmp, is1d_tmp, naccs_tmp)
+
+    r1c = qr1_tmp(:, 1)
+    ir1e = ir1_tmp(:, 1)
+    r1dc = qr1d_tmp(:, 1)
+    ir1de = ir1d_tmp(:, 1)
+    r2c = qr2_tmp(:, 1)
+    ir2e = ir2_tmp(:, 1)
+    r2dc = qr2d_tmp(:, 1)
+    ir2de = ir2d_tmp(:, 1)
+    naccr = nar_tmp(:, 1)
+    s1c = s1_tmp(:, :, 1)
+    is1e = is1_tmp(:, :, 1)
+    s1dc = s1d_tmp(:, :, 1)
+    is1de = is1d_tmp(:, :, 1)
+    naccs = naccs_tmp(:, :, 1)
+
+    end subroutine
+
+  subroutine profcn_batch(c, m_start, m_count, lnum, ioprad, x1, iopang, iopnorm, narg, arg, &
+           r1c, ir1e, r1dc, ir1de, r2c, &
+           ir2e, r2dc, ir2de, naccr, &
+           s1c, is1e, s1dc, is1de, naccs)
+
+!  purpose:     Batched wrapper around profcn for consecutive orders
+!               m = m_start, ..., m_start + m_count - 1.
+!               The underlying mathematics is unchanged; the benefit is that
+!               setup inside main can be amortized across several nearby orders.
+
+    real(knd), intent (in) :: c, x1, arg(narg)
+    integer, intent (in)  :: m_start, m_count, lnum, ioprad, iopang, iopnorm, narg
+    real(knd), intent (out) :: r1c(lnum, m_count), r1dc(lnum, m_count), &
+                  r2c(lnum, m_count), r2dc(lnum, m_count), &
+                  s1c(lnum, narg, m_count), s1dc(lnum, narg, m_count)
+    integer, intent (out)  :: ir1e(lnum, m_count), ir1de(lnum, m_count), &
+                  ir2e(lnum, m_count), ir2de(lnum, m_count), naccr(lnum, m_count), &
+                  is1e(lnum, narg, m_count), is1de(lnum, narg, m_count), &
+                  naccs(lnum, narg, m_count)
+5    kindd = 8
+    kindq = 16
+
+    if(knd == kindd) minacc = 8
+    if(knd == kindq) minacc = 8
+
+    ndec = precision(c)
+    nex = range(c) - 1
+
+    ! Request a consecutive block of orders from main.
+    mnum = m_count
+    mmin = m_start
+    minc = 1
+    maxm = mmin + minc * (mnum - 1)
+
+    maxint = lnum + 3 * ndec + int(c) + 5
+    maxj = maxint + maxm
+    maxp = maxint
+    maxn = maxp + maxm
+    maxpdr = 4 * ndec + 5
+    neta = 993
+    ngau = 200
+    if(ioprad == 2) then
+      lnump = max(lnum + maxm, 64)
       if(x1 >= 0.00065e0_knd) maxn = 2 * (lnump * (-18.5e0_knd - 20.e0_knd * &
               log10(x1)) + 5 * ndec + 4 * maxm + c + 5000) + maxm + 5
 
@@ -402,14 +904,15 @@ module prolate_swf
     character chr
 !
 !  integer and real(knd) arrays with dimension lnum
-    dimension iqdl(lnum), iql(lnum), ifajo(lnum), nar(lnum)
+    dimension iqdl(lnum), iql(lnum), ifajo(lnum)
     real(knd) qdl(lnum), ql(lnum), fajo(lnum), eig(lnum)
-    dimension ir1(lnum), ir1d(lnum), ir2(lnum), ir2d(lnum)
-    real(knd) qr1(lnum), qr1d(lnum), qr2(lnum), qr2d(lnum)
+    dimension ir1(lnum, mnum), ir1d(lnum, mnum), ir2(lnum, mnum), ir2d(lnum, mnum), &
+             nar(lnum, mnum)
+    real(knd) qr1(lnum, mnum), qr1d(lnum, mnum), qr2(lnum, mnum), qr2d(lnum, mnum)
 !
 !  real(knd) and integer arrays with dimensions lnum and narg
-    real(knd) s1(lnum, narg), s1d(lnum, narg)
-    dimension is1(lnum, narg), is1d(lnum, narg), nas(lnum, narg)
+    real(knd) s1(lnum, narg, mnum), s1d(lnum, narg, mnum)
+    dimension is1(lnum, narg, mnum), is1d(lnum, narg, mnum), nas(lnum, narg, mnum)
 !
 !  real(knd) arrays with dimension maxd
     real(knd) enr(maxd), bliste(maxd), gliste(maxd), &
@@ -560,7 +1063,7 @@ end if
       if((limps1 + 3) > maxp) limps1 = maxp - 3
       iopd = 0
       if(iopang == 2) iopd = 1
-      call pleg(m, limps1, maxp, limcsav, iopd, ndec, nex, barg, narg, &
+      call pleg_cached(m, limps1, maxp, limcsav, iopd, ndec, nex, barg, narg, &
            maxt, pr, pdr, pdnorm, ipdnorm, pnorm, ipnorm, alpha, &
            beta, gamma, coefa, coefb, coefc, coefd, coefe)
       limcsav = limps1
@@ -658,7 +1161,7 @@ end if
        if(iopleg == 2) limdleg = jleg + jleg + 20 + int(sqrt(c))
        if(iopleg /= 0) limd = max(limd, limdleg)
        limdneu = limd
-       lplus = max(l, 1000)
+       lplus = max(l, lnum + maxm)
        if(x1 >= 0.00065e0_knd) limdneu = 2 * ((lplus) * (-18.5e0_knd- &
                     20.0e0_knd * log10(x1))+ &
                     5 * ndec + 4 * m + c + 01000)
@@ -777,14 +1280,14 @@ end if
        eigvalp = eigval
 !
 !  determine prolate radial functions of the first kind
-       qr1(li) = 0.0e0_knd
-       qr1d(li) = 0.0e0_knd
-       ir1(li) = 0
-       ir1d(li) = 0
-       qr2(li) = 0.0e0_knd
-       qr2d(li) = 0.0e0_knd
-       ir2(li) = 0
-       ir2d(li) = 0
+       qr1(li, mi) = 0.0e0_knd
+       qr1d(li, mi) = 0.0e0_knd
+       ir1(li, mi) = 0
+       ir1d(li, mi) = 0
+       qr2(li, mi) = 0.0e0_knd
+       qr2d(li, mi) = 0.0e0_knd
+       ir2(li, mi) = 0
+       ir2d(li, mi) = 0
        if(ioprad == 0) go to 720
 if (debug) then
        write(40, 178)
@@ -905,7 +1408,7 @@ end if
        if(iopint == 0) go to 230
        if(iopint == 2) go to 190
        limint = lnum + 3 * ndec + int(c)
-       if(igau == 0) call gauss(ndec, ngau, xr, wr)
+       if(igau == 0) call gauss_cached(ndec, ngau, xr, wr)
        igau = 1
        ngqs = 10
        if(c > 2000.0e0_knd) ngqs = ngqs * (c / 2000.0e0_knd)* &
@@ -985,7 +1488,7 @@ end if
        xin(1) = x
        limpleg = limdr + limdr
        iopd = 3
-       call pleg(m, limpleg, maxp, limcsav, iopd, ndec, nex, xin, 1, maxt, &
+       call pleg_cached(m, limpleg, maxp, limcsav, iopd, ndec, nex, xin, 1, maxt, &
             prat, pdrat, pdnorma, ipdnorma, pnorma, ipnorma, &
             alpha, beta, gamma, coefa, coefb, coefc, coefd, coefe)
        limcsav = max(limcsav, limpleg)
@@ -994,7 +1497,7 @@ end if
         pdrx(jj) = pdrat(1, jj)
         end do
 250      limq = lnum + 3 * ndec + int(c)
-       call qleg(m, lnum, limq, maxq, x1, ndec, qdr, qdml, iqdml, qdl, &
+       call qleg_cached(m, lnum, limq, maxq, x1, ndec, qdr, qdml, iqdml, qdl, &
             iqdl, qr, qml, iqml, ql, iql, termpq, itermpq)
        fajo(1) = c / (rm2 - 1.0e0_knd)
        ifajo(1) = 0
@@ -1090,7 +1593,7 @@ end if
        if(iopneu == 2) go to 380
        if(ibflag1 == 1) go to 370
        ibflag1 = 1
-       lnump = max(lnum + maxm, 1000)
+       lnump = max(lnum + maxm, 64)
        limn1 = 2 * (lnump * (-18.5e0_knd - 20.0e0_knd * log10(x1))+ &
           5 * ndec + 4 * m + c + 01000) + maxm
        if(x1 > 0.08e0_knd) limn1 = 2 * (lnump * (0.5e0_knd - 3.0e0_knd* &
@@ -1103,7 +1606,7 @@ end if
              sneudr)
 370      if(ibflag2 == 1) go to 380
        ibflag2 = 1
-       lp = max(lnum + m, 1000)
+       lp = max(lnum + m, 64)
        limp1 = 2 * (lp * (-18.5e0_knd - 20.0e0_knd * log10(x1))+ &
           5 * ndec + 4 * m + c + 01000)
        if(x1 > 0.08e0_knd) limp1 = 2 * (lp * (0.5e0_knd - 3.0e0_knd* &
@@ -1123,7 +1626,7 @@ end if
        ipcoefn = int(apcoefn)
        pcoefn = 10.0e0_knd ** (apcoefn - ipcoefn)
 380      continue
-       lplus = max(l, 1000)
+       lplus = max(l, lnum + maxm)
        limneu = 2 * ((lplus) * (-18.5e0_knd - 20.0e0_knd * log10(x1))+ &
            5 * ndec + 4 * m + c + 01000)
        if(x1 > 0.08e0_knd) limneu = 2 * ((lplus) * (0.5e0_knd- &
@@ -1218,7 +1721,7 @@ end if
        netainp = 1
        etainp(1) = eta(nee)
        xlninp(1) = xln(nee)
-       lplus = max(l, 1000)
+       lplus = max(l, lnum + maxm)
        limn = 2 * ((lplus) * (-18.5e0_knd - 20.0e0_knd * log10(x1))+ &
           5 * ndec + 10 * incnee + 4 * m + c + 05000) + m
        if(x1 > 0.08e0_knd) limn = 2 * ((lplus) * (0.5e0_knd- &
@@ -1279,7 +1782,7 @@ end if
 520       continue
        jelimsv(jnencur) = jelim
        iopd = 3
-       call pleg(m, limp, maxp, limcsav, iopd, ndec, nex, xlninp, &
+       call pleg_cached(m, limp, maxp, limcsav, iopd, ndec, nex, xlninp, &
             netainp, maxt, prat, pdrat, pdnorma, ipdnorma, pnorma, &
             ipnorma, alpha, beta, gamma, coefa, coefb, coefc, &
             coefd, coefe)
@@ -1294,7 +1797,7 @@ end if
        limpd = 2 * (lnum + int(c) + ndec)
        if(limpd > limp) limpd = limp
        iopd = 2
-       call pleg(m, limpd, maxp, limcsav, iopd, ndec, nex, etainp, &
+       call pleg_cached(m, limpd, maxp, limcsav, iopd, ndec, nex, etainp, &
             netainp, maxt, prat, pdrat, pdnorma, ipdnorma, pnorma, &
             ipnorma, alpha, beta, gamma, coefa, coefb, coefc, &
             coefd, coefe)
@@ -1372,7 +1875,7 @@ end if
        pdcoefe = pdcoefe * 10.0e0_knd ** (-iterm)
        ipdcoefe = ipdcoefe + iterm
 560      continue
-       lplus = max(l, 1000)
+       lplus = max(l, lnum + maxm)
        limeta = 2 * ((lplus) * (-18.5e0_knd - 20.0e0_knd * log10(x1))+ &
            5 * ndec + 4 * m + c + 05000)
        if(x1 > 0.08e0_knd) limeta = 2 * ((lplus) * (0.50e0_knd- &
@@ -1531,16 +2034,16 @@ if (output) then
 690      format(1x, i6, 2x, 4(f17.14, 1x, i6, 2x), i2, a)
 710      format(1x, i6, 2x, 2(f17.14, 1x, i6, 2x))
 end if
-       qr1(li) = r1c
-       ir1(li) = ir1e
-       qr1d(li) = r1dc
-       ir1d(li) = ir1de
+       qr1(li, mi) = r1c
+       ir1(li, mi) = ir1e
+       qr1d(li, mi) = r1dc
+       ir1d(li, mi) = ir1de
         if(ioprad == 2) then
-        qr2(li) = r2c
-        ir2(li) = ir2e
-        qr2d(li) = r2dc
-        ir2d(li) = ir2de
-        nar(li) = naccr
+        qr2(li, mi) = r2c
+        ir2(li, mi) = ir2e
+        qr2d(li, mi) = r2dc
+        ir2d(li, mi) = ir2de
+        nar(li, mi) = naccr
         end if
        if(ioprad /= 2) go to 720
        if(lowacc > naccr) lowacc = naccr
@@ -1579,11 +2082,11 @@ end if
              ptempe, iptempe, ptempo, iptempo, dmlms, idmlmse, &
              s1c, is1e, s1dc, is1de, dmlms1, idmlms1e, naccs, jang)
         do 810 jarg = 1, narg
-        s1(li, jarg) = s1c(jarg)
-        s1d(li, jarg) = s1dc(jarg)
-        is1(li, jarg) = is1e(jarg)
-        is1d(li, jarg) = is1de(jarg)
-        nas(li, jarg) = naccs(jarg)
+        s1(li, jarg, mi) = s1c(jarg)
+        s1d(li, jarg, mi) = s1dc(jarg)
+        is1(li, jarg, mi) = is1e(jarg)
+        is1d(li, jarg, mi) = is1de(jarg)
+        nas(li, jarg, mi) = naccs(jarg)
 if (debug) then
         if(knd == kindd) write(50, 740) barg(jarg), naccs(jarg)
         if(knd == kindq) write(50, 745) barg(jarg), naccs(jarg)
@@ -1748,20 +2251,22 @@ end if
      if(l == (m + 1)) go to 10
      ptempe(k) = pr(k, 1)
      iptempe(k) = 0
+     ptemp(k) = ptempe(k)
+     iptemp(k) = 0
+     if(iopang /= 2) go to 20
      pdtempe(k) = pdr(k, 1)
      ipdtempe(k) = 0
-     ptemp(k) = ptempe(k)
      pdtemp(k) = pdtempe(k)
-     iptemp(k) = 0
      ipdtemp(k) = 0
      go to 20
 10    ptempo(k) = pr(k, 2)
      iptempo(k) = 0
+     ptemp(k) = ptempo(k)
+     iptemp(k) = 0
+     if(iopang /= 2) go to 20
      pdtempo(k) = pdr(k, 2)
      ipdtempo(k) = 0
-     ptemp(k) = ptempo(k)
      pdtemp(k) = pdtempo(k)
-     iptemp(k) = 0
      ipdtemp(k) = 0
 20    continue
 30   continue
@@ -1779,6 +2284,7 @@ end if
      iptempe(k) = iptempe(k) + 10
 40    ptemp(k) = ptempe(k)
      iptemp(k) = iptempe(k)
+     if(iopang /= 2) go to 100
      if(abs(barg(k)) < adec) go to 100
      pdtempe(k) = pdtempe(k) * pdr(k, l - m + 1)
      if(abs(pdtempe(k)) < 1.0e+10_knd) go to 50
@@ -1794,6 +2300,7 @@ end if
      iptempo(k) = iptempo(k) + 10
 70    ptemp(k) = ptempo(k)
      iptemp(k) = iptempo(k)
+     if(iopang /= 2) go to 100
 80    pdtempo(k) = pdtempo(k) * pdr(k, l - m + 1)
      if(abs(pdtempo(k)) < 1.0e+10_knd) go to 90
      pdtempo(k) = pdtempo(k) * (1.0e-10_knd)
@@ -5559,6 +6066,7 @@ subroutine profcn_cpp_interface(c, m, lnum, ioprad, x1, iopang, iopnorm, narg, a
     use iso_c_binding
     implicit none
 
+    ! Thin ISO C binding wrapper used by psms.cpp for single-order requests.
     real(knd), intent(in) :: c, x1, arg(*)
     integer, intent(in) :: m, lnum, ioprad, iopang, iopnorm, narg
     real(knd), intent(out) :: r1c(lnum), r1dc(lnum), r2c(lnum), r2dc(lnum), &
@@ -5574,6 +6082,39 @@ subroutine profcn_cpp_interface(c, m, lnum, ioprad, x1, iopang, iopnorm, narg, a
 end subroutine profcn_cpp_interface_quad
 #else
 end subroutine profcn_cpp_interface
+#endif
+
+! Batched C interface
+#ifdef USE_QUAD
+subroutine profcn_cpp_interface_batch_quad(c, m_start, m_count, lnum, ioprad, x1, iopang, iopnorm, narg, arg, &
+#else
+subroutine profcn_cpp_interface_batch(c, m_start, m_count, lnum, ioprad, x1, iopang, iopnorm, narg, arg, &
+#endif
+           r1c, ir1e, r1dc, ir1de, r2c, ir2e, r2dc, ir2de, naccr, &
+           s1c, is1e, s1dc, is1de, naccs) bind(C)
+
+    use iso_c_binding
+    implicit none
+
+    ! Thin ISO C binding wrapper used by psms.cpp for batched m-block requests.
+    real(knd), intent(in) :: c, x1, arg(*)
+    integer, intent(in) :: m_start, m_count, lnum, ioprad, iopang, iopnorm, narg
+    real(knd), intent(out) :: r1c(lnum, m_count), r1dc(lnum, m_count), &
+                              r2c(lnum, m_count), r2dc(lnum, m_count), &
+                              s1c(lnum, narg, m_count), s1dc(lnum, narg, m_count)
+    integer, intent(out) :: ir1e(lnum, m_count), ir1de(lnum, m_count), &
+                            ir2e(lnum, m_count), ir2de(lnum, m_count), naccr(lnum, m_count), &
+                            is1e(lnum, narg, m_count), is1de(lnum, narg, m_count), &
+                            naccs(lnum, narg, m_count)
+
+    call profcn_batch(c, m_start, m_count, lnum, ioprad, x1, iopang, iopnorm, narg, arg, &
+                      r1c, ir1e, r1dc, ir1de, r2c, ir2e, r2dc, ir2de, naccr, &
+                      s1c, is1e, s1dc, is1de, naccs)
+
+#ifdef USE_QUAD
+end subroutine profcn_cpp_interface_batch_quad
+#else
+end subroutine profcn_cpp_interface_batch
 #endif
 
 #ifdef USE_QUAD
