@@ -2,7 +2,7 @@
 % Please edit documentation in R/create_scatterer.R
 \name{ess_generate}
 \alias{ess_generate}
-\title{Generate ESS shape}
+\title{Generate an ESS-class object}
 \usage{
 ess_generate(
   shape = "sphere",
@@ -30,8 +30,9 @@ ess_generate(
 )
 }
 \arguments{
-\item{shape}{Optional input argument that dictates shape-type, if desired,
-for generalized shapes.}
+\item{shape}{Pre-built \code{Shape} object describing the outer shell geometry.
+Legacy character dispatch such as \code{"sphere"} is retained for backward
+compatibility.}
 
 \item{x_body}{Vector containing x-axis body (m) shape data.}
 
@@ -79,7 +80,19 @@ for generalized shapes.}
 ESS-class object
 }
 \description{
-Generate ESS shape
+Generate an ESS-class object
+}
+\details{
+The preferred workflow is to build the shell geometry first as a \code{Shape}
+object and pass it through \code{shape}. Legacy constructor pathways that mix a
+shape name with raw coordinates or canonical size arguments remain supported
+for backward compatibility. Material properties for both the shell and the
+inner fluid may be supplied either as contrasts or as absolute values, but
+each property pair must use only one representation.
+
+Scatterer constructors store geometry in meters and orientations in radians.
+\code{length_units} and \code{theta_units} are retained as compatibility arguments, but
+non-SI values are normalized to the package-standard representation.
 }
 \examples{
 shell <- sphere(radius_body = 0.03, n_segments = 80)

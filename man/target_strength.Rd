@@ -13,9 +13,12 @@ target_strength(object, frequency, model, verbose = FALSE, ...)
 
 \item{model}{Model name. Available models currently include
 \code{"dwba"} (\code{\link{DWBA}}),
+\code{"bbfm"} (\code{\link{BBFM}}),
 \code{"pcdwba"} (\code{\link{PCDWBA}}),
 \code{"sdwba"} (\code{\link{SDWBA}}),
 \code{"fcms"} (\code{\link{FCMS}}),
+\code{"bcms"} (\code{\link{BCMS}}),
+\code{"ecms"} (\code{\link{ECMS}}),
 \code{"hpa"} (\code{\link{HPA}}),
 \code{"krm"} (\code{\link{KRM}}),
 \code{"psms"} (\code{\link{PSMS}}),
@@ -47,11 +50,15 @@ options, and model-specific arguments used by each implementation:
 \itemize{
 \item \code{\link{DWBA}} for the distorted-wave Born approximation
 applied to weakly scattering fluid-like bodies.
+\item \code{\link{BBFM}} for a composite flesh-plus-backbone model that
+combines a DWBA flesh term with an elastic-cylinder backbone term.
 \item \code{\link{PCDWBA}} for the phase-compensated distorted-wave Born
 approximation applied to elongated fluid-like bodies.
 \item \code{\link{SDWBA}} for the stochastic distorted-wave Born
 approximation.
 \item \code{\link{FCMS}} for the finite cylinder modal series solution.
+\item \code{\link{BCMS}} for the bent-cylinder modal series solution.
+\item \code{\link{ECMS}} for the elastic-cylinder modal series solution.
 \item \code{\link{HPA}} for the high-pass approximation family.
 \item \code{\link{KRM}} for the Kirchhoff-Ray Mode model.
 \item \code{\link{PSMS}} for the prolate spheroidal modal series
@@ -74,8 +81,8 @@ deprecated; apply \code{\link{brake}} to the scatterer first, then run
 \code{"dwba"} or \code{"sdwba"} on the curved object.
 }
 \seealso{
-\code{\link{DWBA}}, \code{\link{PCDWBA}}, \code{\link{SDWBA}}, \code{\link{FCMS}},
-\code{\link{HPA}}, \code{\link{KRM}}, \code{\link{PSMS}},
+\code{\link{DWBA}}, \code{\link{BBFM}}, \code{\link{PCDWBA}}, \code{\link{SDWBA}}, \code{\link{FCMS}},
+\code{\link{BCMS}}, \code{\link{ECMS}}, \code{\link{HPA}}, \code{\link{KRM}}, \code{\link{PSMS}},
 \code{\link{SPHMS}}, \code{\link{ESSMS}}, \code{\link{VESMS}}, \code{\link{TRCM}},
 \code{\link{SOEMS}}
 }

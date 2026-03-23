@@ -187,7 +187,7 @@ shell.
 \strong{Fluid-like boundary}
 
 \emph{Models: \code{\link{DWBA}}, \code{\link{PCDWBA}}, \code{\link{FCMS}},
-\code{\link{KRM}}, \code{\link{PSMS}}, \code{\link{SDWBA}},
+\code{\link{BCMS}}, \code{\link{KRM}}, \code{\link{PSMS}}, \code{\link{SDWBA}},
 \code{\link{SPHMS}}}
 
 Represents a scatterer whose acoustic response is dominated by the

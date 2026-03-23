@@ -2,7 +2,7 @@
 % Please edit documentation in R/create_scatterer.R
 \name{sbf_generate}
 \alias{sbf_generate}
-\title{Manually generate a SBF-class object.}
+\title{Generate a SBF-class object.}
 \usage{
 sbf_generate(
   x_body = NULL,
@@ -90,9 +90,15 @@ x_bladder/w_bladder/zU_bladder/zL_bladder if supplied.}
 Generates a SBF-class object.
 }
 \description{
-Manually generate a SBF-class object.
+Generate a SBF-class object.
 }
 \details{
+The recommended interface is to supply pre-built \code{Shape} objects through
+\code{body_shape} and \code{bladder_shape}, then specify material properties through
+either contrasts (\verb{g_*}, \verb{h_*}) or absolute density/sound-speed values.
+Legacy coordinate-vector inputs are retained for backward compatibility and
+are converted internally to \code{Shape} objects before the scatterer is built.
+
 Body/bladder width vectors (\code{w_body}, \code{w_bladder}) default to zeros when
 missing. Resulting \code{rpos} matrices always carry the row names
 x_body, w_body, zU_body, zL_body for the body and x_bladder, w_bladder,

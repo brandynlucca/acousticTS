@@ -6,9 +6,15 @@
 \alias{ecms}
 \title{Elastic cylinder modal series (ECMS) solution}
 \description{
-Computes backscatter from a finite elastic cylinder by combining the
-phase-shift solution for an infinite elastic cylinder with the finite-length
-coherence factor used for normal and near-normal incidence.
+Computes backscatter from straight and uniformly bent finite elastic
+cylinders by combining the phase-shift solution for an infinite elastic
+cylinder with the finite-length coherence factor used for normal and
+near-normal incidence, plus the Fresnel coherence correction used for
+uniformly bent cylinders. In the current package class system, the elastic
+cylinder is carried most naturally by an \code{ESS}-class cylinder within
+the broader elastic-based \code{ELA} family, with the elastic-cylinder
+properties stored on the shell slot. Legacy \code{FLS}-class cylinders are
+also accepted as geometry carriers for backward compatibility.
 }
 \section{Usage}{
 
@@ -50,6 +56,15 @@ Faran, J.J. (1951). Sound scattering by solid cylinders and spheres.
 Stanton, T.K. (1988). Sound scattering by cylinders of finite length. II.
 Elastic cylinders. \emph{The Journal of the Acoustical Society of America},
 83: 64-67.
+
+Stanton, T.K. (1989). Sound scattering by cylinders of finite length. III.
+Deformed cylinders. \emph{The Journal of the Acoustical Society of America},
+86: 691-705.
+
+Gorska, N., Ona, E., and Korneliussen, R. (2005). Acoustic backscattering by
+Atlantic mackerel as being representative of fish that lack a swimbladder.
+Backscattering by individual fish. \emph{ICES Journal of Marine Science},
+62: 984-995.
 }
 \keyword{acoustics}
 \keyword{models}

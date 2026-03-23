@@ -162,3 +162,131 @@ details.code-drop pre {
   border-radius: 0 !important;
   padding: 15px !important;
 }
+
+/* --- MODEL LIBRARY TAGS AND LOCAL NAV --- */
+.model-tag {
+  display: inline-block;
+  padding: 0.16rem 0.58rem;
+  margin-right: 0.4rem;
+  margin-bottom: 0.35rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.model-tag::before {
+  margin-right: 0.32rem;
+}
+
+.model-tag.experimental {
+  background: #f3e8ff;
+  color: #5b21b6;
+  border-color: #d8b4fe;
+}
+
+.model-tag.experimental::before {
+  content: "🧪";
+}
+
+.model-tag.established {
+  background: #ecfdf5;
+  color: #166534;
+  border-color: #86efac;
+}
+
+.model-tag.established::before {
+  content: "📏";
+}
+
+.model-tag.validated {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-color: #93c5fd;
+}
+
+.model-tag.validated::before {
+  content: "🔁";
+}
+
+.model-tag.unvalidated {
+  background: #fff7ed;
+  color: #9a3412;
+  border-color: #fdba74;
+}
+
+.model-tag.unvalidated::before {
+  content: "❓";
+}
+
+.model-status-line {
+  margin: 0.35rem 0 1rem 0;
+}
+
+.model-status-line p {
+  margin: 0;
+}
+
+.model-nav {
+  margin: 1rem 0 1.5rem 0;
+  padding: 0.9rem 1rem;
+  border: 1px solid #d6d3d1;
+  border-left: 5px solid #5b6b7a;
+  border-radius: 8px;
+  background: #fcfbf7;
+}
+
+.model-nav-title {
+  margin: 0 0 0.4rem 0;
+  font-weight: 700;
+  color: #203040;
+}
+
+.model-nav-title p {
+  margin: 0;
+}
+
+.model-nav-links {
+  margin: 0;
+}
+
+.model-nav-links p {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1rem;
+}
+
+.model-nav-links a {
+  display: inline-block;
+}
+
+.model-library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0 1.5rem 0;
+}
+
+.model-card {
+  border: 1px solid #ddd7ca;
+  border-radius: 10px;
+  background: #fffdf8;
+  padding: 1rem;
+}
+
+.model-card h3,
+.model-card h4 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.model-card p {
+  margin-bottom: 0.75rem;
+}
+
+.model-card > p:first-of-type {
+  margin-top: 0;
+}

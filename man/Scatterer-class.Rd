@@ -83,6 +83,9 @@ or more models in the linear domain (i.e.
 \section{Supported Scatterers}{
 
 \itemize{
+\item \code{Elastic-based scatterers} (\link{ELA})
+\item \code{Composite multi-component scatterers} (\link{CSC})
+\item \code{Backboned fish} (\link{BBF})
 \item \code{Calibration spheres} (\link{CAL})
 \item \code{Elastic-shelled scatterers} (\link{ESS})
 \item \code{Fluid-like scatterers} (\link{FLS})

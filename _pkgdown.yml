@@ -8,7 +8,7 @@ template:
 
 navbar:
   structure:
-    left: [intro, shapes, models, scatmods, advanced, foundation, theory, reference, news]
+    left: [intro, build, run, library, workflows, numerics, developers, reference, news]
     right: [github]
   components:
     intro:
@@ -20,8 +20,8 @@ navbar:
           href: articles/package-concepts/package-concepts.html
         - text: "Example Data"
           href: articles/example-data/example-data.html
-    shapes:
-      text: Building scatterers
+    build:
+      text: Build Targets
       menu:
         - text: "Building Shapes"
           href: articles/building-shapes/building-shapes.html
@@ -29,57 +29,31 @@ navbar:
           href: articles/building-scatterers/building-scatterers.html
         - text: "Shape Manipulation"
           href: articles/shape-manipulation-reforging/shape-manipulation-reforging.html
-    models:
-      text: Model selection
+    run:
+      text: Run Models
       menu:
         - text: "Running Models"
           href: articles/running-models/running-models.html
-        - text: "Model Selection"
+        - text: "Choosing a Model"
           href: articles/model-selection/model-selection.html
         - text: "Comparing Models"
           href: articles/comparing-models/comparing-models.html
-    scatmods:
-      text: Using models
-      menu:
-        - text: "Spherical modal series solution (MSS)"
-          href: articles/sphms/sphms-implementation.html
-        - text: "Finite cylinder MSS"
-          href: articles/fcms/fcms-implementation.html
-        - text: "Prolate spheroid MSS"
-          href: articles/psms/psms-implementation.html
-        - text: "Elastic-shelled sphere MSS"
-          href: articles/essms/essms-implementation.html
-        - text: "Solid elastic sphere MSS"
-          href: articles/calibration/calibration-implementation.html
-        - text: "Distorted wave Born approximation (DWBA)"
-          href: articles/dwba/dwba-implementation.html
-        - text: "Stochastic DWBA"
-          href: articles/sdwba/sdwba-implementation.html
-        - text: "Kirchoff-ray Mode"
-          href: articles/krm/krm-implementation.html
-        - text: "High-pass approximation"
-          href: articles/hpa/hpa-implementation.html
-        - text: "Two-ray cylinder"
-          href: articles/trcm/trcm-implementation.html
-    advanced:
-      text: Advanced
+    library:
+      text: Model Library
+      href: articles/model-library/model-library.html
+    workflows:
+      text: Workflows
       menu:
         - text: "Visualizing results"
           href: articles/plotting-inspecting-results.html
         - text: "Simulation sweeps"
           href: articles/simulation-parameter-sweeps/simulation-parameter-sweeps.html
-        - text: "Creating models from scratch"
-          href: articles/creating-models-from-scratch/creating-models-from-scratch.html
         - text: "Calibration workflow"
           href: articles/calibration-workflow/calibration-workflow.html
-        - text: "Combining models"
-          href: articles/combining-components/combining-components.html
         - text: "Validating models"
           href: articles/validation-benchmarks/validation-benchmarks.html
-        - text: "Troubleshooting"
-          href: articles/faq-troubleshooting/faq-troubleshooting.html
-    foundation:
-      text: Foundations
+    numerics:
+      text: Numerics
       menu:
         - text: "Numerical methods"
           href: articles/numerical-foundations/numerical-foundations.html
@@ -89,29 +63,17 @@ navbar:
           href: articles/boundary-conditions-practice/boundary-conditions-practice.html
         - text: "Material properties"
           href: articles/material-properties/material-properties.html
-    theory:
-      text: Theoretical models
+    developers:
+      text: Developers
       menu:
-        - text: "Spherical modal series solution (MSS)"
-          href: articles/sphms/sphms-theory.html
-        - text: "Finite cylinder MSS"
-          href: articles/fcms/fcms-theory.html
-        - text: "Prolate spheroid MSS"
-          href: articles/psms/psms-theory.html
-        - text: "Elastic-shelled sphere MSS"
-          href: articles/essms/essms-theory.html
-        - text: "Solid elastic sphere MSS"
-          href: articles/calibration/calibration-theory.html
-        - text: "Distorted wave Born approximation (DWBA)"
-          href: articles/dwba/dwba-theory.html
-        - text: "Stochastic DWBA"
-          href: articles/sdwba/sdwba-theory.html
-        - text: "Kirchoff-ray Mode"
-          href: articles/krm/krm-theory.html
-        - text: "High-pass approximation"
-          href: articles/hpa/hpa-theory.html
-        - text: "Two-ray cylinder"
-          href: articles/trcm/trcm-theory.html      
+        - text: "Creating models"
+          href: articles/creating-models-from-scratch/creating-models-from-scratch.html
+        - text: "Combining components"
+          href: articles/combining-components/combining-components.html
+        - text: "Shape manipulation"
+          href: articles/shape-manipulation-reforging/shape-manipulation-reforging.html
+        - text: "Troubleshooting"
+          href: articles/faq-troubleshooting/faq-troubleshooting.html
 
     reference:
       text: Reference
@@ -127,54 +89,90 @@ articles:
       - package-concepts/package-concepts
       - example-data/example-data
 
-  - title: Core Workflow
+  - title: Build Targets
     contents:
       - building-shapes/building-shapes
       - building-scatterers/building-scatterers
+      - shape-manipulation-reforging/shape-manipulation-reforging
+
+  - title: Run Models
+    contents:
       - running-models/running-models
-      - plotting-inspecting-results/plotting-inspecting-results
-
-  - title: Modal Series Solutions (Theory & Implementation)
-    contents:
-      - sphms/sphms-implementation
-      - sphms/sphms-theory
-      - fcms/fcms-implementation
-      - fcms/fcms-theory
-      - psms/psms-implementation
-      - psms/psms-theory
-      - calibration/calibration-implementation
-      - calibration/calibration-theory
-      - essms/essms-implementation
-      - essms/essms-theory
-
-  - title: High-Frequency & Ray-Based Models
-    contents:
-      - dwba/dwba-implementation
-      - dwba/dwba-theory
-      - sdwba/sdwba-implementation
-      - sdwba/sdwba-theory
-      - krm/krm-implementation
-      - krm/krm-theory
-      - hpa/hpa-implementation
-      - hpa/hpa-theory
-      - trcm/trcm-implementation
-      - trcm/trcm-theory
-
-  - title: Analysis & Advanced Topics
-    contents:
       - model-selection/model-selection
       - comparing-models/comparing-models
+      - plotting-inspecting-results/plotting-inspecting-results
+
+  - title: Model Library
+    contents:
+      - model-library/model-library
+
+  - title: Modal-Series Families
+    contents:
+      - sphms/index
+      - sphms/sphms-implementation
+      - sphms/sphms-theory
+      - fcms/index
+      - fcms/fcms-implementation
+      - fcms/fcms-theory
+      - psms/index
+      - psms/psms-implementation
+      - psms/psms-theory
+      - calibration/index
+      - calibration/calibration-implementation
+      - calibration/calibration-theory
+      - essms/index
+      - essms/essms-implementation
+      - essms/essms-theory
+      - bcms/index
+      - bcms/bcms-implementation
+      - bcms/bcms-theory
+      - ecms/index
+      - ecms/ecms-implementation
+      - ecms/ecms-theory
+
+  - title: Approximation and Composite Families
+    contents:
+      - dwba/index
+      - dwba/dwba-implementation
+      - dwba/dwba-theory
+      - sdwba/index
+      - sdwba/sdwba-implementation
+      - sdwba/sdwba-theory
+      - krm/index
+      - krm/krm-implementation
+      - krm/krm-theory
+      - hpa/index
+      - hpa/hpa-implementation
+      - hpa/hpa-theory
+      - trcm/index
+      - trcm/trcm-implementation
+      - trcm/trcm-theory
+      - pcdwba/index
+      - pcdwba/pcdwba-implementation
+      - pcdwba/pcdwba-theory
+      - vesm/index
+      - vesm/vesm-implementation
+      - vesm/vesm-theory
+      - bbfm/index
+
+  - title: Workflows
+    contents:
       - simulation-parameter-sweeps/simulation-parameter-sweeps
-      - creating-models-from-scratch/creating-models-from-scratch
-      - combining-components/combining-components
-      - shape-manipulation-reforging/shape-manipulation-reforging
       - calibration-workflow/calibration-workflow
-      - boundary-conditions-practice/boundary-conditions-practice
       - validation-benchmarks/validation-benchmarks
-      - faq-troubleshooting/faq-troubleshooting
+
+  - title: Numerics and Physics
+    contents:
       - numerical-foundations/numerical-foundations
       - boundary_conditions
+      - boundary-conditions-practice/boundary-conditions-practice
       - material-properties/material-properties
+
+  - title: Developer Guides
+    contents:
+      - creating-models-from-scratch/creating-models-from-scratch
+      - combining-components/combining-components
+      - faq-troubleshooting/faq-troubleshooting
 
 reference:
 - title: Scatterer types
@@ -185,6 +183,9 @@ reference:
     scattering models.
   contents:
   - Scatterer
+  - CSC
+  - ELA
+  - BBF
   - CAL
   - ESS
   - GAS

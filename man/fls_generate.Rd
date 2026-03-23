@@ -2,7 +2,7 @@
 % Please edit documentation in R/create_scatterer.R
 \name{fls_generate}
 \alias{fls_generate}
-\title{Manually generate a FLS object.}
+\title{Generate a FLS-class object.}
 \usage{
 fls_generate(
   shape = "arbitrary",
@@ -25,8 +25,9 @@ fls_generate(
 )
 }
 \arguments{
-\item{shape}{Optional input argument that dictates shape-type, if desired,
-for generalized shapes.}
+\item{shape}{Pre-built \code{Shape} object describing the target geometry. Legacy
+character dispatch such as \code{"sphere"} or \code{"arbitrary"} is retained for
+backward compatibility.}
 
 \item{x_body}{Vector containing x-axis body (m) shape data.}
 
@@ -69,13 +70,25 @@ Default value is pi/2; input should be in radians.}
 FLS-class object
 }
 \description{
-Manually generate a FLS object.
+Generate a FLS-class object.
 }
 \details{
-Material properties can be provided either as contrasts (\code{g_body}/\code{h_body})
-or as absolute density/sound speed (\code{density_body}/\code{sound_speed_body}).
-Downstream models will derive contrasts automatically when only absolute
+The preferred workflow is to build a geometry first with \code{sphere()},
+\code{cylinder()}, \code{prolate_spheroid()}, or \code{arbitrary()}, then pass that \code{Shape}
+object to \code{fls_generate()}. Material properties can be supplied either as
+contrasts (\code{g_body}/\code{h_body}) or as absolute density/sound-speed values
+(\code{density_body}/\code{sound_speed_body}), but not both for the same property
+pair. Downstream models derive contrasts automatically when only absolute
 values are supplied.
+
+The older constructor pattern that mixes a shape name with raw coordinate
+vectors is still supported for compatibility. Internally, those inputs are
+first resolved to a \code{Shape} object so that the resulting \code{FLS} object uses
+the same geometry contract as the explicit shape-first workflow.
+
+Scatterer constructors store geometry in meters and orientations in radians.
+\code{length_units} and \code{theta_units} are retained as compatibility arguments, but
+non-SI values are normalized to the package-standard representation.
 }
 \examples{
 shape <- prolate_spheroid(

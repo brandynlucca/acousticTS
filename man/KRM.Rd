@@ -140,6 +140,20 @@ position for  the segment, \eqn{\mathcal{R}_{bc}} is the reflection
 coefficient at the body-cylinder interface, and \eqn{A_{SB,s}} and
 \eqn{\psi_{p,s}} are empirical amplitude and phase adjustments,
 respectively.
+
+For body-plus-swimbladder targets, the default coherent KRM combines the
+two complex scattering lengths as:
+
+\deqn{
+  f_{bs}^{(\mathrm{coh})} = f_{body} + f_{bladder},
+}
+
+which gives:
+
+\deqn{
+  \sigma_{bs}^{(\mathrm{coh})} =
+  \left|f_{body} + f_{bladder}\right|^2.
+}
 }
 
 \section{Swimbladder medium conventions}{

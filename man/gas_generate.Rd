@@ -2,7 +2,7 @@
 % Please edit documentation in R/create_scatterer.R
 \name{gas_generate}
 \alias{gas_generate}
-\title{Create GAS object}
+\title{Generate a GAS-class object}
 \usage{
 gas_generate(
   shape = "sphere",
@@ -19,7 +19,9 @@ gas_generate(
 )
 }
 \arguments{
-\item{shape}{Optional pre-made shape input. Default is a sphere.}
+\item{shape}{Pre-built \code{Shape} object describing the gas-filled geometry.
+Legacy character dispatch such as \code{"sphere"} is retained for backward
+compatibility.}
 
 \item{h_fluid}{Sound speed contrast of fluid relative to surrounding
 medium (h).}
@@ -51,7 +53,17 @@ maximum or mean radius at the scatterer midsection.}
 GAS-class object
 }
 \description{
-Create GAS object
+Generate a GAS-class object
+}
+\details{
+The preferred workflow is to supply a pre-built \code{Shape} object and then
+describe the internal gas by either contrasts (\code{g_fluid}, \code{h_fluid}) or
+absolute density/sound-speed values (\code{density_fluid}, \code{sound_speed_fluid}).
+Legacy character-based shape dispatch remains available for compatibility.
+
+Scatterer constructors store geometry in meters and orientations in radians.
+\code{radius_units} and \code{theta_units} are retained as compatibility arguments, but
+non-SI values are normalized to the package-standard representation.
 }
 \examples{
 shape_gas <- sphere(radius_body = 0.01, n_segments = 60)
