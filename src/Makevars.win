@@ -15,7 +15,8 @@ OBJECTS = RcppExports.o \
 	param_quad.o \
 	prolate_swf.o \
 	prolate_swf_quad.o \
-	psms.o
+	psms.o \
+	vesms.o
 
 all: $(SHLIB)
 
