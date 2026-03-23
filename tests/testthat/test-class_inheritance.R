@@ -5,21 +5,24 @@ test_that("Scatterer class inheritance works correctly", {
   # Test that all scatterer classes inherit from Scatterer
   # Create instances of each scatterer type
 
-  # Test CAL (calibration sphere) - inherits from ESS
+  # Test CAL (calibration sphere) - inherits from ELA
   cal_obj <- cal_generate()
   expect_s4_class(cal_obj, "CAL")
-  expect_s4_class(cal_obj, "ESS") # CAL inherits from ESS
-  expect_s4_class(cal_obj, "Scatterer") # ESS inherits from Scatterer
+  expect_s4_class(cal_obj, "ELA") # CAL inherits from ELA
+  expect_s4_class(cal_obj, "Scatterer") # ELA inherits from Scatterer
+  expect_false(methods::is(cal_obj, "ESS")) # CAL is no longer treated as ESS
 
   # Test ESS (elastic shelled sphere)
   ess_obj <- ess_generate(radius_shell = 1)
   expect_s4_class(ess_obj, "ESS")
-  expect_s4_class(ess_obj, "Scatterer") # ESS inherits from Scatterer
+  expect_s4_class(ess_obj, "ELA") # ESS inherits from ELA
+  expect_s4_class(ess_obj, "Scatterer") # ELA inherits from Scatterer
 
   # Test ESS where input is a pre-made shape
   ess_obj <- ess_generate(shape = sphere(radius_body = 1))
   expect_s4_class(ess_obj, "ESS")
-  expect_s4_class(ess_obj, "Scatterer") # ESS inherits from Scatterer
+  expect_s4_class(ess_obj, "ELA") # ESS inherits from ELA
+  expect_s4_class(ess_obj, "Scatterer") # ELA inherits from Scatterer
 
   # Test ESS where input is an arbitrary shape
   arb_shape <- cylinder(length_body = 1, radius_body = 0.2)
@@ -31,7 +34,8 @@ test_that("Scatterer class inheritance works correctly", {
     radius_shell = arb_shape@shape_parameters$radius
   )
   expect_s4_class(ess_obj, "ESS")
-  expect_s4_class(ess_obj, "Scatterer") # ESS inherits from Scatterer
+  expect_s4_class(ess_obj, "ELA") # ESS inherits from ELA
+  expect_s4_class(ess_obj, "Scatterer") # ELA inherits from Scatterer
 
   # Test GAS (gas-filled scatterer)
   gas_obj <- gas_generate(radius_body = 1)
@@ -72,6 +76,32 @@ test_that("Scatterer class inheritance works correctly", {
   expect_s4_class(sbf_obj, "SBF")
   expect_s4_class(sbf_obj, "GAS") # SBF inherits from GAS
   expect_s4_class(sbf_obj, "Scatterer") # GAS inherits from Scatterer
+
+  # Test BBF (backboned fish) - inherits from CSC
+  body_shape <- arbitrary(
+    x_body = c(0, 0.05, 0.10),
+    zU_body = c(0.001, 0.004, 0.001),
+    zL_body = c(-0.001, -0.004, -0.001)
+  )
+  backbone_shape <- cylinder(
+    length_body = 0.06,
+    radius_body = 0.0005,
+    n_segments = 20
+  )
+
+  bbf_obj <- bbf_generate(
+    body_shape = body_shape,
+    backbone_shape = backbone_shape,
+    density_body = 1070,
+    sound_speed_body = 1570,
+    density_backbone = 1900,
+    sound_speed_longitudinal_backbone = 3500,
+    sound_speed_transversal_backbone = 1700
+  )
+
+  expect_s4_class(bbf_obj, "BBF")
+  expect_s4_class(bbf_obj, "CSC")
+  expect_s4_class(bbf_obj, "Scatterer")
 })
 
 test_that("Scatterer objects have required slots", {

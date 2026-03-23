@@ -75,11 +75,11 @@ test_that("Spherical Bessel functions work correctly", {
 
   # Test error case
   # ---- Case: non-numeric 'l'
-  expect_error(js("1", 1), "Inputs must be numeric vectors.")
+  expect_error(js("1", 1), "Inputs must be numeric or complex vectors.")
   # ---- Case: non-numeric 'n'
-  expect_error(js(1, "1"), "Inputs must be numeric vectors.")
+  expect_error(js(1, "1"), "Inputs must be numeric or complex vectors.")
   # ---- Case: non-numeric 'l' and 'n'
-  expect_error(js("1", "1"), "Inputs must be numeric vectors.")
+  expect_error(js("1", "1"), "Inputs must be numeric or complex vectors.")
 
   # Test jsd
   # ---- Case: Single value
@@ -114,11 +114,11 @@ test_that("Spherical Bessel functions work correctly", {
 
   # Test error case
   # ---- Case: non-numeric 'l'
-  expect_error(ys("1", 1), "Inputs must be numeric vectors.")
+  expect_error(ys("1", 1), "Inputs must be numeric or complex vectors.")
   # ---- Case: non-numeric 'n'
-  expect_error(ys(1, "1"), "Inputs must be numeric vectors.")
+  expect_error(ys(1, "1"), "Inputs must be numeric or complex vectors.")
   # ---- Case: non-numeric 'l' and 'n'
-  expect_error(ys("1", "1"), "Inputs must be numeric vectors.")
+  expect_error(ys("1", "1"), "Inputs must be numeric or complex vectors.")
 
   # Test ysd
   expect_equal(ysd(1, 1), 2 * sin(1) + cos(1))
@@ -139,6 +139,51 @@ test_that("Spherical Bessel functions work correctly", {
   expect_equal(jsdk(1, 1, 2), jsdd(1, 1))
   expect_equal(jsdk(0, 1, 1), jsd(0, 1))
   expect_equal(jsdk(0, 1, 2), jsdd(0, 1))
+})
+
+test_that("Spherical Bessel functions support complex arguments", {
+  z <- 1 + 0.5i
+
+  expect_equal(
+    js(0, z),
+    sin(z) / z,
+    tolerance = 1e-12
+  )
+  expect_equal(
+    js(1, z),
+    sin(z) / z^2 - cos(z) / z,
+    tolerance = 1e-12
+  )
+  expect_equal(
+    ys(0, z),
+    -cos(z) / z,
+    tolerance = 1e-12
+  )
+  expect_equal(
+    ys(1, z),
+    -cos(z) / z^2 - sin(z) / z,
+    tolerance = 1e-12
+  )
+  expect_equal(
+    hs(1, z),
+    js(1, z) + 1i * ys(1, z),
+    tolerance = 1e-12
+  )
+  expect_equal(
+    jsd(0, z),
+    -js(1, z),
+    tolerance = 1e-12
+  )
+  expect_equal(
+    ysd(0, z),
+    -ys(1, z),
+    tolerance = 1e-12
+  )
+  expect_equal(
+    hsd(0, z),
+    -hs(1, z),
+    tolerance = 1e-12
+  )
 })
 
 test_that("Hankel functions work correctly", {

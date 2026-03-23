@@ -44,6 +44,22 @@ test_that("Generic show method works for all scatterer types", {
     density_body = 1070, density_bladder = 1.24
   )
   expect_error(suppressAllOutput(show(sbf_obj)), NA)
+
+  # Test show method for BBF objects
+  bbf_obj <- bbf_generate(
+    body_shape = arbitrary(
+      x_body = c(0, 0.04, 0.08),
+      zU_body = c(0.001, 0.003, 0.001),
+      zL_body = c(-0.001, -0.003, -0.001)
+    ),
+    backbone_shape = cylinder(length_body = 0.05, radius_body = 0.0005),
+    density_body = 1070,
+    sound_speed_body = 1570,
+    density_backbone = 1900,
+    sound_speed_longitudinal_backbone = 3500,
+    sound_speed_transversal_backbone = 1700
+  )
+  expect_error(suppressAllOutput(show(bbf_obj)), NA)
 })
 
 test_that("Plot methods work for scatterer objects", {
@@ -90,6 +106,56 @@ test_that("Plot methods work for scatterer objects", {
     density_body = 1070, density_bladder = 1.24
   )
   expect_error(suppressPlot(plot(sbf_obj)), NA)
+
+  # Test plot method for BBF objects
+  bbf_obj <- bbf_generate(
+    body_shape = arbitrary(
+      x_body = c(0, 0.04, 0.08),
+      zU_body = c(0.001, 0.003, 0.001),
+      zL_body = c(-0.001, -0.003, -0.001)
+    ),
+    backbone_shape = cylinder(length_body = 0.05, radius_body = 0.0005),
+    density_body = 1070,
+    sound_speed_body = 1570,
+    density_backbone = 1900,
+    sound_speed_longitudinal_backbone = 3500,
+    sound_speed_transversal_backbone = 1700
+  )
+  expect_error(suppressPlot(plot(bbf_obj)), NA)
+})
+
+test_that("Model plotting works for computed scatterer objects", {
+  suppressPlot <- function(expr) {
+    pdf(NULL)
+    on.exit(dev.off())
+    invisible(force(expr))
+  }
+
+  prolate_obj <- fls_generate(
+    shape = prolate_spheroid(
+      length_body = 0.08,
+      radius_body = 0.01,
+      n_segments = 40
+    ),
+    density_body = 1070,
+    sound_speed_body = 1570
+  )
+
+  prolate_obj <- target_strength(
+    object = prolate_obj,
+    frequency = seq(38000, 78000, by = 8000),
+    model = "PSMS",
+    boundary = "liquid_filled",
+    phi_body = pi,
+    n_integration = 96,
+    simplify_Amn = TRUE
+  )
+
+  expect_true(all(is.finite(prolate_obj@model$PSMS$TS)))
+  expect_error(suppressPlot({
+    plot(prolate_obj, type = "shape")
+    plot(prolate_obj, type = "model")
+  }), NA)
 })
 
 test_that("Extract method works for scatterer objects", {

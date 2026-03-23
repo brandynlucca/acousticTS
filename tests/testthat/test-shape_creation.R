@@ -213,7 +213,7 @@ test_that("Canonical KRM profiles match the common benchmark geometries after re
         sound_speed_body = 1480.3
       )
     )
-    profiled <- acousticTS:::.krm_profile_object(obj)
+    profiled <- acousticTS:::.as_krm_profile(obj)
     body <- profiled@body$rpos
     acoustic <- data.frame(x = rev(body["x", ]),
                            w = rev(body["w", ]),
@@ -267,6 +267,120 @@ test_that("gas_generate preserves canonical prolate metadata for modal-series mo
   expect_equal(obj@shape_parameters$semimajor_length, 0.07)
   expect_equal(obj@shape_parameters$semiminor_length, 0.01)
   expect_length(obj@body$radius, 101)
+})
+
+test_that("scatterer constructors prefer explicit Shape inputs and normalize units", {
+  fls_obj <- fls_generate(
+    shape = cylinder(
+      length_body = 0.08,
+      radius_body = 0.01,
+      n_segments = 12
+    ),
+    g_body = 1.04,
+    h_body = 1.02,
+    length_units = "cm",
+    theta_units = "degrees"
+  )
+
+  expect_equal(fls_obj@shape_parameters$length_units, "m")
+  expect_equal(fls_obj@shape_parameters$theta_units, "radians")
+
+  sbf_obj <- sbf_generate(
+    body_shape = arbitrary(
+      x_body = c(0, 0.02, 0.04),
+      zU_body = c(0.001, 0.003, 0.001),
+      zL_body = c(-0.001, -0.003, -0.001)
+    ),
+    bladder_shape = arbitrary(
+      x_bladder = c(0.01, 0.02, 0.03),
+      zU_bladder = c(0.0004, 0.0007, 0.0004),
+      zL_bladder = c(-0.0004, -0.0007, -0.0004)
+    ),
+    g_body = 1.04,
+    h_body = 1.02,
+    g_bladder = 0.0012,
+    h_bladder = 0.22,
+    length_units = "cm",
+    theta_units = "degrees"
+  )
+
+  expect_equal(sbf_obj@shape_parameters$length_units, "m")
+  expect_equal(sbf_obj@shape_parameters$theta_units, "radians")
+  expect_equal(rownames(sbf_obj@body$rpos), c("x_body", "w_body", "zU_body", "zL_body"))
+  expect_equal(
+    rownames(sbf_obj@bladder$rpos),
+    c("x_bladder", "w_bladder", "zU_bladder", "zL_bladder")
+  )
+})
+
+test_that("explicit shapes override legacy coordinate inputs in composite constructors", {
+  body_shape <- arbitrary(
+    x_body = c(0, 0.02, 0.04),
+    zU_body = c(0.001, 0.003, 0.001),
+    zL_body = c(-0.001, -0.003, -0.001)
+  )
+  bladder_shape <- arbitrary(
+    x_bladder = c(0.01, 0.02, 0.03),
+    zU_bladder = c(0.0004, 0.0007, 0.0004),
+    zL_bladder = c(-0.0004, -0.0007, -0.0004)
+  )
+
+  sbf_obj <- sbf_generate(
+    x_body = c(10, 20),
+    zU_body = c(10, 20),
+    zL_body = c(-10, -20),
+    x_bladder = c(30, 40),
+    zU_bladder = c(30, 40),
+    zL_bladder = c(-30, -40),
+    body_shape = body_shape,
+    bladder_shape = bladder_shape,
+    g_body = 1.04,
+    h_body = 1.02,
+    g_bladder = 0.0012,
+    h_bladder = 0.22
+  )
+
+  expect_equal(
+    as.numeric(sbf_obj@body$rpos["x_body", ]),
+    acousticTS::extract(body_shape, "position_matrix")[, "x"]
+  )
+  expect_equal(
+    as.numeric(sbf_obj@bladder$rpos["x_bladder", ]),
+    acousticTS::extract(bladder_shape, "position_matrix")[, "x"]
+  )
+})
+
+test_that("scatterer constructors reject mixed contrast and absolute property inputs", {
+  expect_error(
+    fls_generate(
+      shape = sphere(radius_body = 0.01, n_segments = 20),
+      g_body = 1.04,
+      density_body = 1070,
+      h_body = 1.02
+    ),
+    "Cannot specify both g_body and density_body"
+  )
+
+  expect_error(
+    sbf_generate(
+      body_shape = arbitrary(
+        x_body = c(0, 0.02, 0.04),
+        zU_body = c(0.001, 0.003, 0.001),
+        zL_body = c(-0.001, -0.003, -0.001)
+      ),
+      bladder_shape = arbitrary(
+        x_bladder = c(0.01, 0.02, 0.03),
+        zU_bladder = c(0.0004, 0.0007, 0.0004),
+        zL_bladder = c(-0.0004, -0.0007, -0.0004)
+      ),
+      g_body = 1.04,
+      h_body = 1.02,
+      g_bladder = 0.0012,
+      density_bladder = 1.24,
+      h_bladder = 0.22
+    ),
+    "Cannot specify both g_bladder and density_bladder"
+  )
 })
 
 test_that("'polyonmial_cylinder' function works", {
