@@ -1,5 +1,5 @@
 ---
-title: "Simulation and parameter Sweeps"
+title: "Simulation and Parameter Sweeps"
 output:
   rmarkdown::html_vignette:
     toc: true
@@ -8,7 +8,7 @@ output:
     dpi: 200
     dev.args: list(pointsize=11)
 vignette: >
-  %\VignetteIndexEntry{Simulation and parameter sweeps}
+  %\VignetteIndexEntry{Simulation and Parameter Sweeps}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---
@@ -27,7 +27,7 @@ The main current simulation interface is `simulate_ts()`. It supports repeated d
 
 In other words, `simulate_ts()` is a workflow wrapper around repeated `target_strength()` calls. It does not replace the usual model layer. It automates the process of rebuilding a set of parameters, optionally reworking the object, running the model, and collecting the outputs into a set of tidy result tables.
 
-```{r eval = FALSE}
+```{r eval = TRUE}
 library(acousticTS)
 
 shape_obj <- cylinder(
@@ -45,7 +45,7 @@ obj <- fls_generate(
 res <- simulate_ts(
   object = obj,
   frequency = seq(38e3, 120e3, by = 6e3),
-  model = "dwba",
+  model = "DWBA",
   n_realizations = 5,
   parameters = list(
     theta_body = function() runif(1, min = 0.5 * pi, max = pi),
@@ -79,7 +79,7 @@ The distinction matters because it separates deterministic sweeps from uncertain
 
 Fixed values are copied into every run unchanged. Explicit vectors supply a known sequence of values. Generating functions do not provide a pre-listed table at all. They create a new draw whenever a realization is built. That difference is what separates a design grid from on-the-fly uncertainty propagation.
 
-```{r eval = FALSE}
+```{r eval = TRUE}
 parameters = list(
   theta_body = seq(0.5 * pi, pi, length.out = 5),
   density_body = function() rnorm(1, mean = 1045, sd = 5),
@@ -98,11 +98,11 @@ The most important conceptual distinction in the interface is the difference bet
 
 Suppose `theta_body` and `density_body` are both placed in `batch_by`. Then the simulation does not treat them as uncertain draws around one target. It treats them as a design grid whose combinations are all run separately.
 
-```{r eval = FALSE}
+```{r eval = TRUE}
 res_grid <- simulate_ts(
   object = obj,
   frequency = seq(38e3, 120e3, by = 6e3),
-  model = c("dwba", "sdwba"),
+  model = c("DWBA", "SDWBA"),
   n_realizations = 3,
   parameters = list(
     theta_body = seq(0.5 * pi, pi, length.out = 4),
@@ -130,17 +130,39 @@ The current simulation code supports two broad cases:
 
 This means `simulate_ts()` can be used not just for orientation or density perturbations, but also for controlled morphology studies.
 
-```{r eval = FALSE}
+```{r eval = TRUE}
+body_shape <- arbitrary(
+  x_body = c(0.00, 0.02, 0.05, 0.08),
+  zU_body = c(0.001, 0.004, 0.004, 0.001),
+  zL_body = c(-0.001, -0.004, -0.004, -0.001)
+)
+
+bladder_shape <- arbitrary(
+  x_bladder = c(0.02, 0.04, 0.06),
+  zU_bladder = c(0.0012, 0.0018, 0.0012),
+  zL_bladder = c(-0.0012, -0.0018, -0.0012)
+)
+
+obj_sbf <- sbf_generate(
+  body_shape = body_shape,
+  bladder_shape = bladder_shape,
+  density_body = 1045,
+  sound_speed_body = 1520,
+  density_bladder = 1.2,
+  sound_speed_bladder = 343
+)
+
 res_shape <- simulate_ts(
   object = obj_sbf,
   frequency = seq(38e3, 120e3, by = 6e3),
-  model = "dwba",
+  model = "DWBA",
   n_realizations = 2,
   parameters = list(
     body_scale = c(0.9, 1.1),
     swimbladder_inflation_factor = c(0.8, 1.2)
   ),
-  batch_by = c("body_scale", "swimbladder_inflation_factor")
+  batch_by = c("body_scale", "swimbladder_inflation_factor"),
+  parallel = FALSE
 )
 ```
 
@@ -165,10 +187,10 @@ In practice, this means simulation is less about "making the model stochastic" a
 
 The returned list is model-centered. Each element is a data frame that carries the realization index, any batched parameters, and the model outputs. That organization is deliberate: it makes downstream plotting or aggregation straightforward.
 
-```{r eval = FALSE}
+```{r eval = TRUE}
 names(res_grid)
-head(res_grid$dwba)
-head(res_grid$sdwba)
+head(res_grid$DWBA)
+head(res_grid$SDWBA)
 ```
 
 Common downstream summaries include:
@@ -191,7 +213,7 @@ For this reason, `parallel = FALSE` is often the right default while debugging a
 res_parallel <- simulate_ts(
   object = obj,
   frequency = seq(38e3, 120e3, by = 2e3),
-  model = "dwba",
+  model = "DWBA",
   n_realizations = 100,
   parameters = list(theta_body = function() runif(1, 0.5 * pi, pi)),
   parallel = TRUE,

@@ -446,6 +446,54 @@ test_that("simulate_ts works with PSOCK clusters when n_cores > 1", {
   expect_equal(result_parallel$DWBA$TS, result_sequential$DWBA$TS)
 })
 
+test_that("simulate_ts supports theta_body for FLS objects in PSOCK mode", {
+  skip_on_cran()
+
+  obj <- fls_generate(
+    shape = cylinder(
+      length_body = 0.05,
+      radius_body = 0.003,
+      n_segments = 80
+    ),
+    density_body = 1045,
+    sound_speed_body = 1520
+  )
+
+  frequency <- seq(38e3, 50e3, by = 2e3)
+  parameters <- list(
+    theta_body = function() {
+      set.seed(999)
+      runif(1, min = 0.5 * pi, max = pi)
+    }
+  )
+
+  result_parallel <- simulate_ts(
+    object = obj,
+    frequency = frequency,
+    model = "DWBA",
+    n_realizations = 4,
+    parameters = parameters,
+    parallel = TRUE,
+    n_cores = 2,
+    verbose = FALSE
+  )
+
+  result_sequential <- simulate_ts(
+    object = obj,
+    frequency = frequency,
+    model = "dwba",
+    n_realizations = 4,
+    parameters = parameters,
+    parallel = FALSE,
+    verbose = FALSE
+  )
+
+  expect_true("DWBA" %in% names(result_parallel))
+  expect_true("DWBA" %in% names(result_sequential))
+  expect_equal(result_parallel$DWBA$theta_body, result_sequential$DWBA$theta_body)
+  expect_equal(result_parallel$DWBA$TS, result_sequential$DWBA$TS)
+})
+
 test_that("Simulation errors are raised as expected", {
   # Test mixing single values, vectors, and generating functions
   data(krill)

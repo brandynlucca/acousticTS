@@ -60,7 +60,9 @@ simulate_ts <- function(object,
     "'object' must be a 'scatterer'-based class" = inherits(object, "Scatterer")
   )
   # Validate model =============================================================
-  unexpected_model <- model[!(model %in% names(.get_models()))]
+  normalized_model <- .normalize_simulation_models(model)
+  unexpected_model <- model[!(normalized_model %in%
+    .normalize_simulation_models(names(.get_models())))]
   if (length(unexpected_model) > 0) {
     stop(
       "The following user-defined models are not supported by `acousticTS`: ",
@@ -110,9 +112,9 @@ simulate_ts <- function(object,
       realization = rep(seq_len(n_realizations), times = nrow(parameter_grid)),
       parameter_grid[rep(seq_len(nrow(parameter_grid)),
                          each = n_realizations
-                         ), , drop = FALSE],
+      ), , drop = FALSE],
       row.names = NULL
-      )
+    )
   } else {
     # ---- Non-batched case for dataframe ++++++++++++++++++++++++++++++++++++++
     simulation_grid <- data.frame(
@@ -185,31 +187,52 @@ simulate_ts <- function(object,
       cat("Preparing parallelized simulations\n")
       cat("Number of cores:", paste0(n_cores), "\n")
     }
+    package_path <- .resolve_simulation_package_path()
     # ---- Set up cluster ++++++++++++++++++++++++++++++++++++++++++++++++++++++
     cluster <- parallel::makeCluster(n_cores)
     on.exit(parallel::stopCluster(cluster))
     if (verbose) print(cluster)
     # ---- Make sure appropriate libraries are loaded ++++++++++++++++++++++++++
-    parallel::clusterEvalQ(
+    parallel::clusterCall(
       cluster,
-      {
-        loadNamespace("acousticTS")
+      function(path) {
+        if (!is.null(path) &&
+          requireNamespace("pkgload", quietly = TRUE) &&
+          file.exists(file.path(path, "DESCRIPTION"))) {
+          pkgload::load_all(
+            path = path,
+            quiet = TRUE,
+            helpers = FALSE,
+            attach_testthat = FALSE,
+            export_all = FALSE
+          )
+        } else {
+          loadNamespace("acousticTS")
+        }
         loadNamespace("methods")
         NULL
-      }
+      },
+      package_path
     )
     # ---- Export the required objects/functions to each core ++++++++++++++++++
     parallel::clusterExport(
       cluster,
       c(
         # Arguments
-        "object", "frequency", "model",
+        "object", "frequency", "normalized_model",
         # Intermediate variables
-        "simulation_grid",
-        # Functions
-        ".discover_reforge_params", ".get_TS", "reforge", "target_strength"
+        "simulation_grid"
       ),
       envir = environment()
+    )
+    parallel::clusterExport(
+      cluster,
+      c(
+        # Functions
+        ".discover_reforge_params", ".get_TS", "reforge", "target_strength",
+        "extract"
+      ),
+      envir = asNamespace("acousticTS")
     )
     # ---- Sequential approach +++++++++++++++++++++++++++++++++++++++++++++++++
   } else {
@@ -227,7 +250,7 @@ simulate_ts <- function(object,
     function(grid_index) {
       .get_TS(
         grid_index, object, parameters, simulation_grid, frequency,
-        model
+        normalized_model
       )
     },
     cl = cluster
@@ -258,6 +281,43 @@ simulate_ts <- function(object,
     cat("====================================\n")
   }
   return(final_result)
+}
+
+#' Normalize simulation model names to the strings accepted by target_strength()
+#' @param model Character vector of model names.
+#' @keywords internal
+#' @noRd
+.normalize_simulation_models <- function(model) {
+  normalized_model <- tolower(model)
+  normalized_model[normalized_model == "soems"] <- "calibration"
+  normalized_model
+}
+
+#' Resolve the development package path for worker-side loading when available
+#' @keywords internal
+#' @noRd
+.resolve_simulation_package_path <- function() {
+  search_dir <- normalizePath(".", winslash = "/", mustWork = TRUE)
+
+  repeat {
+    desc_path <- file.path(search_dir, "DESCRIPTION")
+    if (file.exists(desc_path)) {
+      desc <- tryCatch(read.dcf(desc_path), error = function(e) NULL)
+      if (!is.null(desc) &&
+        "Package" %in% colnames(desc) &&
+        identical(unname(desc[1, "Package"]), "acousticTS")) {
+        return(search_dir)
+      }
+    }
+
+    parent_dir <- dirname(search_dir)
+    if (identical(parent_dir, search_dir)) {
+      break
+    }
+    search_dir <- parent_dir
+  }
+
+  NULL
 }
 
 #' Run a single simulation for a given parameter grid index
