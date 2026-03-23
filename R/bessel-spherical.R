@@ -93,27 +93,43 @@
 #' @export
 js <- function(l, n) {
   # Function check =============================================================
-  if (!is.numeric(l) || !is.numeric(n)) {
-    stop("Inputs must be numeric vectors.")
+  if (!is.numeric(l) || !(is.numeric(n) || is.complex(n))) {
+    stop("Inputs must be numeric or complex vectors.")
   }
-  js_cpp(l, n)
+  if (is.complex(n)) {
+    js_complex_cpp(as.integer(l), as.complex(n))
+  } else {
+    js_cpp(l, n)
+  }
 }
 #' @rdname js
 #' @keywords internal
 #' @noRd
 jsd <- function(l, n) {
-  js_deriv_cpp(l, n, 1)
+  if (is.complex(n)) {
+    js_complex_deriv_cpp(as.integer(l), as.complex(n), 1)
+  } else {
+    js_deriv_cpp(l, n, 1)
+  }
 }
 #' @rdname js
 #' @keywords internal
 #' @noRd
 jsdd <- function(l, n) {
-  js_deriv_cpp(l, n, 2)
+  if (is.complex(n)) {
+    js_complex_deriv_cpp(as.integer(l), as.complex(n), 2)
+  } else {
+    js_deriv_cpp(l, n, 2)
+  }
 }
 #' @rdname js
 #' @export
 jsdk <- function(l, n, k) {
-  js_deriv_cpp(l, n, k)
+  if (is.complex(n)) {
+    js_complex_deriv_cpp(as.integer(l), as.complex(n), k)
+  } else {
+    js_deriv_cpp(l, n, k)
+  }
 }
 ################################################################################
 #' Spherical Bessel function of the second kind, \eqn{y_\nu(z)}, and its
@@ -214,27 +230,43 @@ jsdk <- function(l, n, k) {
 #' @export
 ys <- function(l, n) {
   # Function check =============================================================
-  if (!is.numeric(l) || !is.numeric(n)) {
-    stop("Inputs must be numeric vectors.")
+  if (!is.numeric(l) || !(is.numeric(n) || is.complex(n))) {
+    stop("Inputs must be numeric or complex vectors.")
   }
-  ys_cpp(l, n)
+  if (is.complex(n)) {
+    ys_complex_cpp(as.integer(l), as.complex(n))
+  } else {
+    ys_cpp(l, n)
+  }
 }
 #' @rdname ys
 #' @keywords internal
 #' @noRd
 ysd <- function(l, n) {
-  ys_deriv_cpp(l, n, 1)
+  if (is.complex(n)) {
+    ys_complex_deriv_cpp(as.integer(l), as.complex(n), 1)
+  } else {
+    ys_deriv_cpp(l, n, 1)
+  }
 }
 #' @rdname ys
 #' @keywords internal
 #' @noRd
 ysdd <- function(l, n) {
-  ys_deriv_cpp(l, n, 2)
+  if (is.complex(n)) {
+    ys_complex_deriv_cpp(as.integer(l), as.complex(n), 2)
+  } else {
+    ys_deriv_cpp(l, n, 2)
+  }
 }
 #' @rdname ys
 #' @export
 ysdk <- function(l, n, k) {
-  ys_deriv_cpp(l, n, k)
+  if (is.complex(n)) {
+    ys_complex_deriv_cpp(as.integer(l), as.complex(n), k)
+  } else {
+    ys_deriv_cpp(l, n, k)
+  }
 }
 ################################################################################
 #' Spherical Bessel function of the third kind (Hankel), \eqn{h_\nu(x)}, and its
@@ -309,22 +341,38 @@ ysdk <- function(l, n, k) {
 #' @rdname hs
 #' @export
 hs <- function(l, n) {
-  hs_cpp(l, n)
+  if (is.complex(n)) {
+    hs_complex_cpp(as.integer(l), as.complex(n))
+  } else {
+    hs_cpp(l, n)
+  }
 }
 #' @rdname hs
 #' @keywords internal
 #' @noRd
 hsd <- function(l, n) {
-  hs_deriv_cpp(l, n, 1)
+  if (is.complex(n)) {
+    hs_complex_deriv_cpp(as.integer(l), as.complex(n), 1)
+  } else {
+    hs_deriv_cpp(l, n, 1)
+  }
 }
 #' @rdname hs
 #' @keywords internal
 #' @noRd
 hsdd <- function(l, n) {
-  hs_deriv_cpp(l, n, 2)
+  if (is.complex(n)) {
+    hs_complex_deriv_cpp(as.integer(l), as.complex(n), 2)
+  } else {
+    hs_deriv_cpp(l, n, 2)
+  }
 }
 #' @rdname hs
 #' @export
 hsdk <- function(l, n, k) {
-  hs_deriv_cpp(l, n, 1)
+  if (is.complex(n)) {
+    hs_complex_deriv_cpp(as.integer(l), as.complex(n), k)
+  } else {
+    hs_deriv_cpp(l, n, k)
+  }
 }
