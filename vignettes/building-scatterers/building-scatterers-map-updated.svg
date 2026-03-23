@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">Updated scatterer-class map</title>
+  <desc id="desc">Scatterer generation and inheritance diagram for acousticTS classes.</desc>
+  <defs>
+    <style>
+      .bg { fill: #fbfaf5; }
+      .title { font: 700 28px Georgia, serif; fill: #203040; }
+      .subtitle { font: 16px Georgia, serif; fill: #203040; }
+      .label { font: 18px Georgia, serif; fill: #203040; }
+      .small { font: 15px Georgia, serif; fill: #203040; }
+      .line { stroke: #203040; stroke-width: 2.8; fill: none; marker-end: url(#arrow); }
+      .group { fill: #f8f3e7; stroke: #b9ab83; stroke-width: 2.5; }
+      .shape { fill: #d4e7e7; stroke: #0f5c5c; stroke-width: 3; }
+      .generator { fill: #eef0de; stroke: #7a6a2a; stroke-width: 2.6; }
+      .class { fill: #e8eff7; stroke: #325d88; stroke-width: 2.6; }
+      .parent { fill: #dce8ea; stroke: #0f5c5c; stroke-width: 2.8; }
+    </style>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M 0 0 L 12 6 L 0 12 z" fill="#203040"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1200" height="760" class="bg"/>
+  <text x="290" y="42" class="title">From geometry to scatterer class</text>
+  <text x="92" y="72" class="subtitle">The updated map separates generator functions from class inheritance, so the class structure is explicit rather than implied.</text>
+
+  <rect x="48" y="112" width="210" height="68" rx="16" ry="16" class="shape"/>
+  <text x="106" y="144" class="label">Shape input</text>
+  <text x="75" y="168" class="small">canonical or measured geometry</text>
+
+  <line x1="258" y1="146" x2="340" y2="146" class="line"/>
+
+  <rect x="345" y="92" width="808" height="190" rx="18" ry="18" class="group"/>
+  <text x="372" y="122" class="label">Generator layer</text>
+
+  <a href="../building-scatterers/building-scatterers.html" target="_top">
+    <rect x="382" y="152" width="150" height="56" rx="12" ry="12" class="generator"/>
+    <text x="413" y="185" class="label">fls_generate</text>
+  </a>
+  <a href="../building-scatterers/building-scatterers.html" target="_top">
+    <rect x="560" y="152" width="150" height="56" rx="12" ry="12" class="generator"/>
+    <text x="592" y="185" class="label">gas_generate</text>
+  </a>
+  <a href="../building-scatterers/building-scatterers.html" target="_top">
+    <rect x="738" y="152" width="150" height="56" rx="12" ry="12" class="generator"/>
+    <text x="770" y="185" class="label">ess_generate</text>
+  </a>
+  <a href="../building-scatterers/building-scatterers.html" target="_top">
+    <rect x="916" y="152" width="150" height="56" rx="12" ry="12" class="generator"/>
+    <text x="949" y="185" class="label">cal_generate</text>
+  </a>
+
+  <a href="../building-scatterers/building-scatterers.html" target="_top">
+    <rect x="470" y="220" width="150" height="56" rx="12" ry="12" class="generator"/>
+    <text x="504" y="253" class="label">sbf_generate</text>
+  </a>
+  <a href="../building-scatterers/building-scatterers.html" target="_top">
+    <rect x="648" y="220" width="150" height="56" rx="12" ry="12" class="generator"/>
+    <text x="682" y="253" class="label">bbf_generate</text>
+  </a>
+
+  <line x1="457" y1="208" x2="457" y2="320" class="line"/>
+  <line x1="635" y1="208" x2="635" y2="320" class="line"/>
+  <line x1="813" y1="208" x2="813" y2="320" class="line"/>
+  <line x1="991" y1="208" x2="991" y2="320" class="line"/>
+  <line x1="545" y1="276" x2="545" y2="320" class="line"/>
+  <line x1="723" y1="276" x2="723" y2="320" class="line"/>
+
+  <rect x="422" y="340" width="330" height="74" rx="14" ry="14" class="parent"/>
+  <text x="542" y="372" class="label">Scatterer</text>
+  <text x="472" y="396" class="small">common parent for package scatterer objects</text>
+
+  <line x1="586" y1="414" x2="586" y2="474" class="line"/>
+  <line x1="586" y1="474" x2="250" y2="474" class="line"/>
+  <line x1="586" y1="474" x2="460" y2="474" class="line"/>
+  <line x1="586" y1="474" x2="720" y2="474" class="line"/>
+  <line x1="586" y1="474" x2="940" y2="474" class="line"/>
+
+  <a href="../../reference/FLS-class.html" target="_top">
+    <rect x="170" y="494" width="160" height="56" rx="12" ry="12" class="class"/>
+    <text x="229" y="527" class="label">FLS</text>
+  </a>
+  <a href="../../reference/GAS-class.html" target="_top">
+    <rect x="380" y="494" width="160" height="56" rx="12" ry="12" class="class"/>
+    <text x="438" y="527" class="label">GAS</text>
+  </a>
+  <a href="../../reference/CSC-class.html" target="_top">
+    <rect x="640" y="494" width="160" height="56" rx="12" ry="12" class="class"/>
+    <text x="697" y="527" class="label">CSC</text>
+  </a>
+  <a href="../../reference/ELA-class.html" target="_top">
+    <rect x="860" y="494" width="160" height="56" rx="12" ry="12" class="class"/>
+    <text x="919" y="527" class="label">ELA</text>
+  </a>
+
+  <text x="178" y="577" class="small">fluid-like segmented bodies</text>
+  <text x="400" y="577" class="small">gas-filled simple targets</text>
+  <text x="660" y="577" class="small">composite scatterer parent</text>
+  <text x="872" y="577" class="small">elastic scatterer parent</text>
+
+  <line x1="720" y1="550" x2="720" y2="622" class="line"/>
+  <line x1="720" y1="622" x2="630" y2="622" class="line"/>
+  <line x1="720" y1="622" x2="810" y2="622" class="line"/>
+
+  <line x1="940" y1="550" x2="940" y2="622" class="line"/>
+  <line x1="940" y1="622" x2="880" y2="622" class="line"/>
+  <line x1="940" y1="622" x2="1060" y2="622" class="line"/>
+
+  <a href="../../reference/SBF-class.html" target="_top">
+    <rect x="520" y="642" width="150" height="56" rx="12" ry="12" class="class"/>
+    <text x="572" y="675" class="label">SBF</text>
+  </a>
+  <a href="../../reference/BBF-class.html" target="_top">
+    <rect x="700" y="642" width="150" height="56" rx="12" ry="12" class="class"/>
+    <text x="752" y="675" class="label">BBF</text>
+  </a>
+  <a href="../../reference/ESS-class.html" target="_top">
+    <rect x="860" y="642" width="150" height="56" rx="12" ry="12" class="class"/>
+    <text x="910" y="675" class="label">ESS</text>
+  </a>
+  <a href="../../reference/CAL-class.html" target="_top">
+    <rect x="1040" y="642" width="150" height="56" rx="12" ry="12" class="class"/>
+    <text x="1090" y="675" class="label">CAL</text>
+  </a>
+
+  <text x="536" y="725" class="small">SBF keeps body plus internal inclusion together.</text>
+  <text x="758" y="725" class="small">BBF keeps body plus backbone together.</text>
+  <text x="916" y="725" class="small">ELA branches into ESS and CAL.</text>
+</svg>

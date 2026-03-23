@@ -1,0 +1,27 @@
+---
+title: "SDWBA"
+output:
+  rmarkdown::html_vignette:
+    toc: false
+    number_sections: false
+    fig_caption: yes
+vignette: >
+  %\VignetteIndexEntry{SDWBA}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+# Overview
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  status = c("benchmarked", "validated"),
+  pages = c(
+    Overview = "index.html",
+    Implementation = "sdwba-implementation.html",
+    Theory = "sdwba-theory.html"
+  )
+)
+```
+
+
+

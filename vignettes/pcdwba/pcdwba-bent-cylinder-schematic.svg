@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="360" viewBox="0 0 900 360">
+  <rect width="900" height="360" fill="#fcfbf7"/>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#1f2933"/>
+    </marker>
+    <marker id="blue-arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#295d8a"/>
+    </marker>
+  </defs>
+
+  <text x="40" y="44" font-size="28" font-family="Georgia, serif" fill="#1f2933">Uniformly bent, tapered cylinder used by the phase-compensated DWBA</text>
+
+  <path d="M110 215 C 240 120, 420 110, 560 150 C 650 175, 740 205, 810 225"
+        fill="none" stroke="#3d6b35" stroke-width="18" stroke-linecap="round"/>
+  <path d="M118 224 C 240 140, 420 130, 552 167 C 645 193, 733 220, 800 238"
+        fill="none" stroke="#97b67d" stroke-width="7" stroke-linecap="round" opacity="0.8"/>
+
+  <path d="M135 210 L 160 180" stroke="#295d8a" stroke-width="5" marker-end="url(#blue-arrow)"/>
+  <path d="M315 160 L 342 129" stroke="#295d8a" stroke-width="5" marker-end="url(#blue-arrow)"/>
+  <path d="M515 154 L 539 126" stroke="#295d8a" stroke-width="5" marker-end="url(#blue-arrow)"/>
+  <text x="145" y="170" font-size="22" font-family="Georgia, serif" fill="#295d8a">local tilt</text>
+
+  <line x1="50" y1="86" x2="210" y2="86" stroke="#1f2933" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="50" y1="118" x2="210" y2="118" stroke="#1f2933" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="50" y1="150" x2="210" y2="150" stroke="#1f2933" stroke-width="4" marker-end="url(#arrow)"/>
+  <text x="54" y="70" font-size="22" font-family="Georgia, serif" fill="#1f2933">incident plane wave</text>
+
+  <path d="M230 250 A 170 170 0 0 1 516 93" fill="none" stroke="#b04d2f" stroke-width="3" stroke-dasharray="8 6"/>
+  <text x="405" y="68" font-size="22" font-family="Georgia, serif" fill="#b04d2f">&#961;<tspan baseline-shift="sub" font-size="16">c</tspan></text>
+
+  <line x1="110" y1="285" x2="810" y2="285" stroke="#5c6670" stroke-width="2.5" stroke-dasharray="6 6"/>
+  <line x1="150" y1="275" x2="150" y2="295" stroke="#5c6670" stroke-width="3"/>
+  <line x1="770" y1="275" x2="770" y2="295" stroke="#5c6670" stroke-width="3"/>
+  <text x="446" y="316" font-size="24" font-family="Georgia, serif" fill="#1f2933">L</text>
+
+  <text x="594" y="135" font-size="23" font-family="Georgia, serif" fill="#1f2933">phase term</text>
+  <text x="596" y="160" font-size="20" font-family="Georgia, serif" fill="#1f2933">exp[i k<tspan baseline-shift="sub" font-size="14">f</tspan>(r<tspan baseline-shift="sub" font-size="14">0</tspan>/h) cos(&#947; - &#952;)]</text>
+
+  <text x="585" y="204" font-size="23" font-family="Georgia, serif" fill="#1f2933">tapered radius</text>
+  <text x="586" y="229" font-size="20" font-family="Georgia, serif" fill="#1f2933">a(s) = a<tspan baseline-shift="sub" font-size="14">0</tspan> &#120017;(s)</text>
+</svg>

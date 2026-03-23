@@ -1,0 +1,24 @@
+---
+title: "BCMS"
+output:
+  rmarkdown::html_vignette:
+    toc: false
+    number_sections: false
+    fig_caption: yes
+vignette: >
+  %\VignetteIndexEntry{BCMS}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+# Overview
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  status = c("experimental", "unvalidated"),
+  pages = c(
+    Implementation = "bcms-implementation.html",
+    Theory = "bcms-theory.html"
+  )
+)
+```
+
+

@@ -1,5 +1,5 @@
 ---
-title: "Implementation"
+title: "SPHMS implementation"
 output:
   rmarkdown::html_vignette:
     toc: true
@@ -16,6 +16,17 @@ vignette: >
 ---
 
 # acousticTS implementation
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  status = c("benchmarked"),
+  pages = c(
+    Overview = "index.html",
+    Implementation = "sphms-implementation.html",
+    Theory = "sphms-theory.html"
+  )
+)
+```
 
 The `acousticTS` package uses object-based scatterers so the same implementation pattern carries across models: create a scatterer, run `target_strength()`, inspect the stored model output, and then compare a small set of physically important inputs. For SPHMS, the object must be spherical and the main model choice is the boundary condition.
 
@@ -145,3 +156,27 @@ legend(
 This comparison is especially helpful because it isolates the role of the boundary condition cleanly. The outer radius is the same in all three runs. What changes is the interface physics: suppressed normal motion, vanishing surface pressure, or a highly compressible gas-filled interior. That makes the resulting differences much easier to interpret than if geometry and boundary were changed simultaneously.
 
 For fluid-filled spheres, the same implementation pattern applies; the main change is the selected `boundary` and the interior material properties. In practical SPHMS work, the first controls to revisit are usually the sphere radius, the selected boundary condition, and the medium-to-interior contrasts, because those are the inputs that determine the modal coefficient problem most directly.
+
+## Benchmark comparisons
+
+SPHMS can be compared directly against the Jech benchmark definitions stored in `benchmark_ts`. The summary below uses the full spherical benchmark grid. Elapsed times are representative values from the current machine rather than universal expectations.
+
+| Boundary | Max abs. delta TS (dB) | Mean abs. delta TS (dB) | Elapsed (s) |
+|:--|--:|--:|--:|
+| `fixed_rigid` | 0.00497 | 0.00246 | 0.03 |
+| `pressure_release` | 0.00500 | 0.00243 | 0.09 |
+| `gas_filled` | 0.00499 | 0.00263 | 0.06 |
+| `liquid_filled` | 0.00492 | 0.00241 | 0.11 |
+
+All four spherical boundary types remain very close to the benchmark family over the full grid, with the current implementation staying within about 0.005 dB in the worst case.
+
+SPHMS does expose one additional numerical control, `m_limit`, so it is worth checking how aggressively the modal cap can be reduced before the liquid-filled benchmark fit starts to move. The table below keeps the same weakly scattering liquid-filled benchmark and only changes that truncation cap.
+
+| Boundary | `m_limit` | Max abs. delta TS (dB) | Mean abs. delta TS (dB) | Elapsed (s) |
+|:--|:--|--:|--:|--:|
+| `liquid_filled` | default rule | 0.00492 | 0.00241 | 0.07 |
+| `liquid_filled` | `20` | 0.52550 | 0.00640 | 0.14 |
+| `liquid_filled` | `10` | 58.24225 | 8.07819 | 0.02 |
+
+That pattern is useful because it shows that SPHMS is not especially tolerant of aggressive modal under-truncation, even though the wall-clock time can drop. The benchmarked spherical branches therefore do not need the same kind of configuration matrix as PSMS. Boundary choice is the main physical switch, and `m_limit` is best treated as a guarded numerical override rather than as a routine tuning knob.
+

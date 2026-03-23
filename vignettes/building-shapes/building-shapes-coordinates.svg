@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 940" role="img" aria-labelledby="title desc">
+  <title id="title">Coordinate conventions for canonical and arbitrary shapes</title>
+  <desc id="desc">Four-panel schematic showing the coordinate systems used for sphere, cylinder, prolate spheroid, and arbitrary shapes.</desc>
+  <defs>
+    <style>
+      .panel { fill: #fbfaf6; stroke: #d8d3c4; stroke-width: 2; }
+      .title { font: 700 28px Helvetica, Arial, sans-serif; fill: #1f2933; }
+      .body { font: 20px Helvetica, Arial, sans-serif; fill: #1f2933; }
+      .note { font: 18px Helvetica, Arial, sans-serif; fill: #44515e; }
+      .axis { stroke: #5b6b7a; stroke-width: 3; }
+      .shape { fill: none; stroke: #1b5e7a; stroke-width: 5; }
+      .guide { fill: none; stroke: #94a3b8; stroke-width: 2.5; stroke-dasharray: 8 7; }
+      .dim { fill: none; stroke: #ba6b1b; stroke-width: 3; }
+      .focus { fill: #ba6b1b; }
+      .cross { fill: #eef4f7; stroke: #1b5e7a; stroke-width: 3; }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5b6b7a"/>
+    </marker>
+    <marker id="dimarrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#ba6b1b"/>
+    </marker>
+  </defs>
+
+  <rect x="20" y="20" width="650" height="410" rx="20" class="panel"/>
+  <rect x="730" y="20" width="650" height="410" rx="20" class="panel"/>
+  <rect x="20" y="470" width="650" height="430" rx="20" class="panel"/>
+  <rect x="730" y="470" width="650" height="430" rx="20" class="panel"/>
+
+  <text x="55" y="70" class="title">Sphere</text>
+  <line x1="120" y1="225" x2="515" y2="225" class="axis" marker-end="url(#arrow)"/>
+  <line x1="300" y1="360" x2="300" y2="95" class="axis" marker-end="url(#arrow)"/>
+  <text x="525" y="232" class="body">x</text>
+  <text x="308" y="105" class="body">z</text>
+  <circle cx="300" cy="225" r="96" class="shape"/>
+  <line x1="300" y1="225" x2="396" y2="225" class="dim" marker-start="url(#dimarrow)" marker-end="url(#dimarrow)"/>
+  <text x="340" y="214" class="body">a</text>
+  <line x1="360" y1="129" x2="360" y2="321" class="guide"/>
+  <text x="345" y="121" class="body">x_i</text>
+  <text x="372" y="148" class="body">zU(x_i)</text>
+  <text x="372" y="316" class="body">zL(x_i)</text>
+  <text x="105" y="392" class="note">Profile stored on x with upper and lower bounds in z.</text>
+  <text x="105" y="418" class="note">For a sphere: zU(x) = +sqrt(a^2 - x^2), zL(x) = -sqrt(a^2 - x^2).</text>
+
+  <text x="765" y="70" class="title">Cylinder</text>
+  <line x1="800" y1="225" x2="1245" y2="225" class="axis" marker-end="url(#arrow)"/>
+  <line x1="975" y1="360" x2="975" y2="95" class="axis" marker-end="url(#arrow)"/>
+  <text x="1255" y="232" class="body">x</text>
+  <text x="983" y="105" class="body">z</text>
+  <path d="M 860 145 L 1090 145 L 1090 305 L 860 305 Z" class="shape"/>
+  <line x1="970" y1="145" x2="970" y2="305" class="guide"/>
+  <text x="952" y="132" class="body">x_i</text>
+  <text x="982" y="158" class="body">zU(x_i) = +a</text>
+  <text x="982" y="301" class="body">zL(x_i) = -a</text>
+  <line x1="1128" y1="225" x2="1128" y2="145" class="dim" marker-start="url(#dimarrow)" marker-end="url(#dimarrow)"/>
+  <text x="1140" y="191" class="body">a</text>
+  <line x1="860" y1="333" x2="1090" y2="333" class="dim" marker-start="url(#dimarrow)" marker-end="url(#dimarrow)"/>
+  <text x="968" y="360" class="body">L</text>
+  <text x="790" y="392" class="note">Straight cylinders use the same x-z profile framing.</text>
+  <text x="790" y="418" class="note">Polynomial cylinders keep this coordinate system but let a vary with x.</text>
+
+  <text x="55" y="520" class="title">Prolate spheroid</text>
+  <line x1="120" y1="675" x2="515" y2="675" class="axis" marker-end="url(#arrow)"/>
+  <line x1="300" y1="810" x2="300" y2="545" class="axis" marker-end="url(#arrow)"/>
+  <text x="525" y="682" class="body">x</text>
+  <text x="308" y="555" class="body">z</text>
+  <ellipse cx="300" cy="675" rx="170" ry="96" class="shape"/>
+  <line x1="300" y1="675" x2="470" y2="675" class="dim" marker-start="url(#dimarrow)" marker-end="url(#dimarrow)"/>
+  <text x="380" y="664" class="body">a</text>
+  <line x1="300" y1="675" x2="300" y2="579" class="dim" marker-start="url(#dimarrow)" marker-end="url(#dimarrow)"/>
+  <text x="312" y="632" class="body">b</text>
+  <line x1="365" y1="579" x2="365" y2="771" class="guide"/>
+  <text x="350" y="567" class="body">x_i</text>
+  <text x="377" y="598" class="body">zU(x_i)</text>
+  <text x="377" y="766" class="body">zL(x_i)</text>
+  <circle cx="440" cy="675" r="6" class="focus"/>
+  <line x1="300" y1="675" x2="440" y2="675" class="dim" marker-start="url(#dimarrow)" marker-end="url(#dimarrow)"/>
+  <text x="364" y="708" class="body">q</text>
+  <text x="105" y="842" class="note">Semimajor axis a lies along x, semiminor axis b along z.</text>
+  <text x="105" y="868" class="note">The focal half-distance is q = sqrt(a^2 - b^2).</text>
+
+  <text x="765" y="520" class="title">Arbitrary profile</text>
+  <line x1="790" y1="675" x2="1265" y2="675" class="axis" marker-end="url(#arrow)"/>
+  <line x1="935" y1="830" x2="935" y2="535" class="axis" marker-end="url(#arrow)"/>
+  <text x="1275" y="682" class="body">x</text>
+  <text x="943" y="545" class="body">z</text>
+  <path d="M 815 675 C 870 585, 930 560, 995 590 C 1045 612, 1115 565, 1185 645" class="shape"/>
+  <path d="M 815 675 C 875 755, 930 785, 995 745 C 1055 710, 1120 740, 1185 688" class="shape"/>
+  <line x1="1015" y1="592" x2="1015" y2="743" class="guide"/>
+  <text x="998" y="579" class="body">x_i</text>
+  <text x="1027" y="607" class="body">zU(x_i)</text>
+  <text x="1027" y="739" class="body">zL(x_i)</text>
+
+  <ellipse cx="1190" cy="555" rx="62" ry="42" class="cross"/>
+  <line x1="1120" y1="555" x2="1265" y2="555" class="axis" marker-end="url(#arrow)"/>
+  <line x1="1190" y1="622" x2="1190" y2="485" class="axis" marker-end="url(#arrow)"/>
+  <text x="1270" y="562" class="body">y</text>
+  <text x="1198" y="495" class="body">z</text>
+  <line x1="1128" y1="555" x2="1252" y2="555" class="dim" marker-start="url(#dimarrow)" marker-end="url(#dimarrow)"/>
+  <text x="1162" y="542" class="body">w(x_i)</text>
+  <line x1="1190" y1="555" x2="1252" y2="555" class="dim" marker-start="url(#dimarrow)" marker-end="url(#dimarrow)"/>
+  <text x="1210" y="585" class="body">a(x_i) = w(x_i)/2</text>
+
+  <text x="785" y="842" class="note">The side profile is stored on x with zU(x) and zL(x).</text>
+  <text x="785" y="868" class="note">When present, w(x) stores the transverse span along y at each x.</text>
+</svg>

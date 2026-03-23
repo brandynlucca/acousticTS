@@ -23,6 +23,18 @@ This distinction matters because "exact" in a modeling article and "numerically 
 
 <object type="image/svg+xml" data="numerical-foundations-map.svg" style="width:100%;" aria-label="Numerical foundations map"></object>
 
+# Package numerical policy
+
+The package follows a simple numerical policy so that model arguments are not left to imply solver behavior silently.
+
+First, compiled backends are preferred whenever the special functions or linear algebra become a meaningful part of the runtime or stability of the model. That is why the cylindrical, spherical, shell, and spheroidal workflows lean on `C++` and `Fortran` support once the calculations move beyond small scalar expressions. Pure `R` implementations remain appropriate for lightweight algebra, initialization, and orchestration, but the intended default for numerically heavy kernels is the compiled path.
+
+Second, adaptive numerical controls are used when a fixed cutoff is known to leave visible truncation error in normal package usage. The clearest example is `SOEMS`, where `adaptive = TRUE` extends the modal sum until the tail contribution is negligible. When an adaptive switch is exposed publicly, the package keeps the legacy fixed option only so that older calculations remain reproducible.
+
+Third, precision toggles are used only where double precision has a clear, model-dependent failure mode. In practice, that mostly matters for the spheroidal models. `PSMS` can use quadruple precision because the spheroidal basis and the dense fluid-filled kernel systems can become numerically delicate at higher acoustic size. By contrast, most of the spherical and cylindrical families are intended to remain in double precision unless a paper or benchmark comparison shows that higher precision is materially changing the answer.
+
+Fourth, a difference in numerical settings should be interpreted as a difference in how faithfully the same mathematical problem is being solved, not as a difference in target definition. Changing `adaptive`, quadrature order, or precision does not create a new scatterer. It changes the numerical resolution of the calculation. That is why these settings should be checked through stability tests rather than tuned opportunistically to chase a preferred spectrum.
+
 # Main ingredients
 
 The numerical backbone of the package includes cylindrical and spherical Bessel and Hankel functions, Legendre and associated angular functions, spheroidal wave functions, quadrature rules for overlap integrals, modal truncation rules, and small linear systems or, in some cases, dense truncated matrix solves. Those ingredients appear in different combinations across the package. `SPHMS` and `FCMS` rely on canonical Bessel and Hankel expansions. `PSMS` adds spheroidal wave functions and overlap integrals. `ESSMS` layers elastic-shell algebra on top of spherical modal structure. Approximate models such as `HPA`, `DWBA`, and `TRCM` use simpler algebra, but still depend on acoustic size, phase, and geometry-dependent numerical evaluation.

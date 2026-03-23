@@ -1,5 +1,5 @@
 ---
-title: "Implementation"
+title: "Elastic-shelled sphere implementation"
 output:
   rmarkdown::html_vignette:
     toc: true
@@ -16,6 +16,17 @@ vignette: >
 ---
 
 # acousticTS implementation
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  status = c("unvalidated"),
+  pages = c(
+    Overview = "index.html",
+    Implementation = "essms-implementation.html",
+    Theory = "essms-theory.html"
+  )
+)
+```
 
 The `acousticTS` package uses object-based scatterers so the same implementation pattern carries across models: create a scatterer, run `target_strength()`, inspect the stored model output, and then compare a small set of physically important inputs. For `ESSMS`, the required object class is `ESS`, which combines a spherical shell, an optional internal fluid, and the elastic constants required for the shell solution.
 
@@ -137,3 +148,31 @@ legend(
 ```
 
 When you move from a tutorial object to a real calibration or biological shell, the next quantities to revisit are the shell elastic constants and the shell-to-fluid property contrast, because those control where the strongest modal features occur.
+
+## Benchmark source and current status
+
+ESSMS does have a direct benchmark source in the Jech shell-sphere family. At the moment, though, the current full-grid ESSMS sweep is still a status check rather than a usable delta table because the present implementation does not return finite `TS` values across the benchmark grid.
+
+| ESSMS case | Finite benchmark points matched | Max abs. delta TS (dB) | Mean abs. delta TS (dB) | Elapsed (s) | Current status |
+|:--|--:|:--|:--|--:|:--|
+| Pressure-release interior shell | 0 | `NA` | `NA` | 0.05 | no finite full-grid TS |
+| Gas-interior shell | 0 | `NA` | `NA` | 0.07 | no finite full-grid TS |
+| Weakly scattering fluid-interior shell | 0 | `NA` | `NA` | 0.05 | no finite full-grid TS |
+
+So the benchmarking story for ESSMS is currently very simple. The external benchmark family exists and is the right one to use, but the current implementation still needs numerical stabilization before this page can present the same kind of benchmark-accuracy table shown for SPHMS, FCMS, and PSMS.
+
+ESSMS also exposes `m_limit`, so the obvious next question is whether the absence of finite full-grid values is just an overly aggressive truncation choice. The table below checks that directly.
+
+| ESSMS case | `m_limit` | Finite benchmark points matched | Elapsed (s) | Current status |
+|:--|:--|--:|--:|:--|
+| Pressure-release interior shell | default rule | 0 | 0.04 | no finite full-grid TS |
+| Pressure-release interior shell | `40` | 0 | 0.12 | no finite full-grid TS |
+| Pressure-release interior shell | `20` | 0 | 0.05 | no finite full-grid TS |
+| Gas-interior shell | default rule | 0 | 0.05 | no finite full-grid TS |
+| Gas-interior shell | `40` | 0 | 0.13 | no finite full-grid TS |
+| Gas-interior shell | `20` | 0 | 0.07 | no finite full-grid TS |
+| Weakly scattering fluid-interior shell | default rule | 0 | 0.06 | no finite full-grid TS |
+| Weakly scattering fluid-interior shell | `40` | 0 | 0.14 | no finite full-grid TS |
+| Weakly scattering fluid-interior shell | `20` | 0 | 0.06 | no finite full-grid TS |
+
+That check matters because it rules out the easiest explanation. The present ESSMS full-grid benchmark failure is not just a consequence of picking the wrong modal cap in the implementation examples. Changing `m_limit` over a broad range does not recover a usable Jech shell-sphere comparison table yet.

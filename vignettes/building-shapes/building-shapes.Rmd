@@ -35,6 +35,22 @@ Canonical shapes are especially useful when the geometry itself is part of the m
 
 Canonical geometry is also useful for comparison studies. If the goal is to understand how two model families differ under controlled conditions, a simple sphere, cylinder, or spheroid often provides a cleaner starting point than a highly detailed arbitrary outline.
 
+For most readers, the direct generators are also the clearest interface because they make the resulting shape class explicit at the call site. `create_shape()` is still useful, but it is best treated as a thin convenience dispatcher rather than the main pedagogical path.
+
+# Coordinate conventions by shape
+
+The package stores shape geometry in a way that is consistent across models, but it is easier to read those objects once the coordinate conventions are made explicit. The schematic below shows the profile view used by the canonical shapes and the side-profile plus cross-section interpretation used by arbitrary shapes.
+
+<object type="image/svg+xml" data="building-shapes-coordinates.svg" style="width:100%;" aria-label="Coordinate conventions for canonical and arbitrary shapes"></object>
+
+For `sphere()`, the geometry is most naturally interpreted as a profile in the `x-z` plane with a single radius `a`. At any axial coordinate `x_i`, the upper and lower boundaries are `zU(x_i)` and `zL(x_i)`. For a perfect sphere, those are the positive and negative branches of the same circular boundary.
+
+For `cylinder()`, the profile is still expressed in `x-z`, but the upper and lower limits are constant over the body length. In other words, `zU(x) = +a` and `zL(x) = -a` for the straight cylindrical section. `polynomial_cylinder()` uses the same coordinate framing, but lets the radius vary smoothly with `x`.
+
+For `prolate_spheroid()`, the semimajor axis lies along `x` and the semiminor axis lies along `z`. The focal half-distance `q` appears naturally in the prolate spheroidal coordinate system, so it is worth showing explicitly even when the object is generated from the more intuitive axis lengths.
+
+For `arbitrary()`, the stored side profile is again defined along `x`, with `zU(x)` and `zL(x)` describing the upper and lower body bounds. When a transverse width `w(x)` is present, it describes the span of the body in the orthogonal `y` direction at the same axial station. In KRM-style uses, that width can also be represented as a local radius `a(x) = w(x) / 2` when the cross-section is being treated as a disc or ellipse.
+
 # Arbitrary and measured shapes
 
 When measured body coordinates or bespoke outlines are available, `arbitrary()` is often the most flexible starting point. Arbitrary shapes are particularly important for elongated biological targets whose centerline and cross-sectional variation are more important than exact canonical separability. In those situations, preserving the morphology may matter more than matching a canonical coordinate system.

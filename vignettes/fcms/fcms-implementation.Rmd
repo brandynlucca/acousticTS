@@ -1,5 +1,5 @@
 ---
-title: "Implementation"
+title: "FCMS implementation"
 output:
   rmarkdown::html_vignette:
     toc: true
@@ -16,6 +16,17 @@ vignette: >
 ---
 
 # acousticTS implementation
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  status = c("benchmarked"),
+  pages = c(
+    Overview = "index.html",
+    Implementation = "fcms-implementation.html",
+    Theory = "fcms-theory.html"
+  )
+)
+```
 
 The `acousticTS` package uses object-based scatterers, so the FCMS workflow follows the same broad pattern used elsewhere in the package: construct a geometry, attach the material properties needed for a cylindrical scatterer, evaluate target strength over the frequencies of interest, and then inspect how the result changes when the physically important assumptions are changed. For FCMS, the most important assumptions are usually the cylinder radius, cylinder length, orientation, and the boundary condition used to represent the cylinder interior.
 
@@ -136,3 +147,27 @@ For practical FCMS work, the first additional controls to revisit are usually:
 3. the modal truncation limit `m_limit`, because larger acoustic size requires more retained cylindrical orders for stable convergence.
 
 Those checks are especially important when comparing FCMS with other models. A fair comparison should keep the cylinder geometry, orientation convention, medium properties, and reporting domain consistent before any disagreement is interpreted as a model effect.
+
+## Benchmark comparisons
+
+FCMS can also be compared directly against the Jech cylindrical benchmark family stored in `benchmark_ts`. The table below uses the full cylindrical benchmark grid. Elapsed times are representative values from the current machine.
+
+| Boundary | Max abs. delta TS (dB) | Mean abs. delta TS (dB) | Elapsed (s) |
+|:--|--:|--:|--:|
+| `fixed_rigid` | 0.19454 | 0.00914 | 0.01 |
+| `pressure_release` | 0.00780 | 0.00263 | 0.03 |
+| `gas_filled` | 0.00499 | 0.00245 | 0.05 |
+| `liquid_filled` | 0.11453 | 0.00512 | 0.05 |
+
+The pressure-release and gas-filled cases remain very close to the benchmark family across the full frequency grid. The larger residuals are confined to the fixed-rigid and liquid-filled branches, where the finite-cylinder benchmark curves show somewhat deeper minima than the present implementation at a small number of frequencies.
+
+The main additional numerical switch in FCMS is `m_limit`, so the natural follow-up check is the same one used for SPHMS: hold the liquid-filled benchmark definition fixed and inspect how strongly the benchmark fit depends on a reduced modal cap.
+
+| Boundary | `m_limit` | Max abs. delta TS (dB) | Mean abs. delta TS (dB) | Elapsed (s) |
+|:--|:--|--:|--:|--:|
+| `liquid_filled` | default rule | 0.11453 | 0.00512 | 0.05 |
+| `liquid_filled` | `20` | 0.12618 | 0.00547 | 0.09 |
+| `liquid_filled` | `10` | 43.09805 | 4.29035 | 0.01 |
+
+That sensitivity check shows why the FCMS page does not need a large PSMS-style configuration matrix. The physically meaningful benchmark branches are the boundary conditions themselves. The extra argument is a modal truncation cap, and the benchmark comparison shows that it can be pushed somewhat, but not recklessly, before the cylindrical modal sum is no longer trustworthy.
+

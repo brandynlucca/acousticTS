@@ -1,0 +1,190 @@
+---
+title: "Viscous-elastic spherical scattering model"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: true
+    fig_caption: yes
+    fig_width: 3.5
+    fig_height: 3.5
+    dpi: 200
+    dev.args: list(pointsize=11)
+template:
+  bootstrap: 5
+  math-rendering: mathjax
+vignette: >
+  %\VignetteIndexEntry{Viscous-elastic spherical scattering model}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# Introduction
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  status = c("experimental", "validated"),
+  pages = c(
+    Overview = "index.html",
+    Implementation = "vesm-implementation.html",
+    Theory = "vesm-theory.html"
+  )
+)
+```
+
+The viscous-elastic spherical model describes a layered target in which a gas core is surrounded by an elastic shell, that shell is itself surrounded by a viscous layer, and the whole target is immersed in seawater. Khodabandeloo et al. (2021) used this structure to represent gas-bearing mesopelagic fish in a way that retains the resonance physics of the gas inclusion while also accounting for damping and phase shifts introduced by the surrounding soft tissue[^1]. In practical terms, the model sits between a simple bubble-like treatment and a purely elastic shell model: it preserves the layered mechanics explicitly.
+
+This layered geometry is still spherical, so the governing fields can be separated by angular order. That makes the model a modal-series construction, but a more elaborate one than a plain fluid sphere or elastic shell because four regions must be matched simultaneously.
+
+[^1]: Khodabandeloo, B., Agersted, M.D., Klevjer, T., Macaulay, G.J., and Melle, W. (**2021**). *Estimating target strength and physical characteristics of gas-bearing mesopelagic fish from wideband in situ echoes using a viscous-elastic scattering model*. J. Acoust. Soc. Am., 149: 673-691.
+
+[^2]: Feuillade, C., and Nero, R.W. (**1998**). *A viscous-elastic swimbladder model for describing enhanced-frequency resonance scattering from fish*. J. Acoust. Soc. Am., 103: 3245-3255.
+
+[^3]: Anson, D.S., and Chivers, R.C. (**1993**). *An irregular frequencies solution to acoustic scattering by elastic spheres*. J. Acoust. Soc. Am., 93: 118-123.
+
+# Layered geometry
+
+The model uses four nested spherical regions:
+
+1. surrounding seawater
+2. an outer viscous layer
+3. an elastic shell
+4. an inner gas core
+
+The associated radii are:
+
+$$
+R_2 > R_3 > R_4,
+$$
+
+where $R_2$ is the outer radius of the viscous layer, $R_3$ is the outer radius of the elastic shell, and $R_4$ is the gas-core radius.
+
+When the outer viscous radius is not supplied directly, Khodabandeloo et al. (2021) estimate it from a neutral-buoyancy balance:
+
+$$
+R_2 =
+R_4
+\left(
+1 + \frac{\rho_1 - \rho_4}{\rho_2 - \rho_1}
+\right)^{1/3},
+$$
+
+where $\rho_1$ is seawater density, $\rho_2$ is viscous-layer density, and $\rho_4$ is gas-core density.
+
+```{r echo = FALSE, out.width = "85%", fig.align = "center", fig.cap = "Layered spherical bookkeeping for the viscous-elastic model."}
+knitr::include_graphics("vesm-layered-sphere-schematic.svg")
+```
+
+This bookkeeping matters because the model treats each region with a different wave family:
+
+- seawater and the gas core support acoustic compressional motion only
+- the viscous layer supports a damped compressional branch and a damped shear branch
+- the elastic shell supports compressional and shear elastic waves
+
+# Region-specific wave numbers
+
+In the surrounding seawater, the acoustic wave number is the usual
+
+$$
+k_1 = \frac{\omega}{c_1},
+$$
+
+where $\omega$ is angular frequency and $c_1$ is the seawater sound speed.
+
+Inside the viscous layer, the effective compressional and shear wave numbers are complex-valued. Using the notation of Khodabandeloo et al. (2021), the combined viscous coefficient is
+
+$$
+f_2 = g_2 + \frac{4}{3}\ell_2,
+$$
+
+and the corresponding wave numbers are
+
+$$
+k_{c2} =
+\frac{\omega}{c_2}
+\left(
+1 - i \omega \frac{f_2}{\rho_2 c_2^2}
+\right)^{-1/2},
+$$
+
+$$
+k_{s2} =
+(1+i)\sqrt{\frac{\omega \rho_2}{2 g_2}},
+$$
+
+where $c_2$, $\rho_2$, $g_2$, and $\ell_2$ denote the viscous-layer compressional speed, density, shear viscosity, and bulk viscosity, respectively.
+
+Inside the elastic shell, the longitudinal and transverse wave numbers are
+
+$$
+k_{c3} = \omega \sqrt{\frac{\rho_3}{\lambda_3 + 2 \mu_3}},
+\qquad
+k_{s3} = \omega \sqrt{\frac{\rho_3}{\mu_3}},
+$$
+
+where $\lambda_3$ and $\mu_3$ are the Lam\'e parameters of the shell and $\rho_3$ is shell density.
+
+Inside the gas core, the acoustic wave number is
+
+$$
+k_4 = \frac{\omega}{c_4}.
+$$
+
+The model therefore combines one real acoustic branch outside, two complex viscous branches in the soft layer, two elastic branches in the shell, and one real acoustic branch in the gas core.
+
+# Modal expansion
+
+Because the geometry is spherical, each region can be expanded in Legendre modes. The incident and scattered acoustic fields in the surrounding water use regular and outgoing spherical functions:
+
+$$
+p_1(r,\theta) =
+\sum_{m=0}^{\infty}
+\left[
+A_m^{(\mathrm{inc})} j_m(k_1 r) +
+A_m^{(\mathrm{sc})} h_m^{(1)}(k_1 r)
+\right]
+P_m(\cos \theta).
+$$
+
+The viscous and elastic regions are built from analogous modal sums, but with both compressional and shear potentials. For each angular order $m$, the coefficients are determined by matching displacement, velocity, normal stress, and tangential stress conditions across the interfaces at $r = R_2$, $r = R_3$, and $r = R_4$.
+
+That bookkeeping leads to a separate linear system for each angular order:
+
+$$
+\mathbf{M}_m \mathbf{x}_m = \mathbf{F}_m.
+$$
+
+For the monopole term ($m = 0$), the system reduces to a $6 \times 6$ problem. For higher modes ($m \ge 1$), the coupled compressional and shear terms yield a $10 \times 10$ system. The backscattering contribution of each mode is then assembled from the outer-region scattering coefficient and the far-field spherical Hankel term.
+
+# Backscatter assembly
+
+Once the mode-specific coefficients are known, the far-field backscattering amplitude is written as
+
+$$
+f_{\mathrm{bs}} =
+\sum_{m=0}^{M}
+A_m^{(\mathrm{sc})} (-1)^m h_m^{(1)}(k_1 r_{\infty}),
+$$
+
+with $r_{\infty}$ treated as a far-field reference distance. The linear backscattering cross-section and target strength follow the usual relations:
+
+$$
+\sigma_{\mathrm{bs}} = \left|f_{\mathrm{bs}}\right|^2,
+\qquad
+\mathrm{TS} = 10 \log_{10}\left(\sigma_{\mathrm{bs}}\right).
+$$
+
+In the `acousticTS` implementation, the model reports all three quantities explicitly: the complex backscattering amplitude, the linear cross-section, and target strength in dB.
+
+# Relation to the `acousticTS` object model
+
+`acousticTS` uses `ESS` objects as the underlying container for this model. That means:
+
+- the `fluid` slot holds the inner gas core
+- the `shell` slot holds the elastic shell
+- the outer viscous layer is supplied as model arguments at run time
+
+This mapping is useful because it lets the viscous-elastic model reuse the existing elastic-shell object infrastructure instead of introducing a second overlapping scatterer class. When no viscous-layer radius is supplied explicitly, the implementation estimates $R_2$ from the neutral-buoyancy relation used by Khodabandeloo et al. (2021, Eq. 18).
+
+# Closing note
+
+Conceptually, the model is best viewed as a layered spherical modal series with viscous damping in the outer biological layer and elastic wave conversion in the shell. That combination is what allows it to capture both low-frequency gas-dominated behavior and higher-frequency shell-viscous modulation in a single spherical framework.

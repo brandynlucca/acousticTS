@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="380" viewBox="0 0 900 380">
+  <rect width="900" height="380" fill="#fcfbf7"/>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#1f2933"/>
+    </marker>
+  </defs>
+
+  <text x="38" y="42" font-size="28" font-family="Georgia, serif" fill="#1f2933">Bent-cylinder modal-series bookkeeping</text>
+
+  <text x="64" y="92" font-size="24" font-family="Georgia, serif" fill="#1f2933">Straight cylinder</text>
+  <rect x="84" y="142" width="260" height="36" rx="18" fill="#658a49"/>
+  <line x1="60" y1="160" x2="344" y2="160" stroke="#29465b" stroke-width="3.5" marker-end="url(#arrow)"/>
+  <text x="58" y="136" font-size="20" font-family="Georgia, serif" fill="#29465b">broadside wave</text>
+  <line x1="92" y1="228" x2="344" y2="228" stroke="#5c6670" stroke-width="2.5"/>
+  <line x1="92" y1="218" x2="92" y2="238" stroke="#5c6670" stroke-width="3"/>
+  <line x1="344" y1="218" x2="344" y2="238" stroke="#5c6670" stroke-width="3"/>
+  <text x="214" y="260" font-size="22" font-family="Georgia, serif" fill="#1f2933">L</text>
+  <text x="116" y="305" font-size="20" font-family="Georgia, serif" fill="#1f2933">Exact finite-cylinder modal sum</text>
+
+  <text x="510" y="92" font-size="24" font-family="Georgia, serif" fill="#1f2933">Uniformly bent cylinder</text>
+  <path d="M508 188 C 596 124, 710 123, 804 176" fill="none" stroke="#658a49" stroke-width="20" stroke-linecap="round"/>
+  <path d="M520 240 A 170 170 0 0 1 792 131" fill="none" stroke="#b04d2f" stroke-width="3" stroke-dasharray="8 6"/>
+  <text x="636" y="124" font-size="22" font-family="Georgia, serif" fill="#b04d2f">&#961;<tspan baseline-shift="sub" font-size="16">c</tspan></text>
+  <line x1="474" y1="160" x2="804" y2="160" stroke="#29465b" stroke-width="3.5" marker-end="url(#arrow)"/>
+  <text x="472" y="136" font-size="20" font-family="Georgia, serif" fill="#29465b">broadside wave</text>
+  <text x="540" y="305" font-size="20" font-family="Georgia, serif" fill="#1f2933">Curvature enters through the Fresnel coherence length</text>
+  <text x="614" y="334" font-size="22" font-family="Georgia, serif" fill="#1f2933">L<tspan baseline-shift="sub" font-size="16">ebc</tspan></text>
+</svg>

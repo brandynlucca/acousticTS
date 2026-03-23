@@ -1,5 +1,5 @@
 ---
-title: "Theory"
+title: "Elastic-shelled sphere modal series (ESSMS) theory"
 output:
   rmarkdown::html_vignette:
     toc: true
@@ -16,6 +16,17 @@ vignette: >
 ---
 
 # Introduction
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  status = c("unvalidated"),
+  pages = c(
+    Overview = "index.html",
+    Implementation = "essms-implementation.html",
+    Theory = "essms-theory.html"
+  )
+)
+```
 
 An elastic shell is a solid scattering structure that supports both longitudinal ($\ell$) and transverse ($\tau$) wave within the shell material and encloses a fluid interior. The presence of multiple wave types and two fluid-solid interfaces leads to several distinct scattering mechanisms. 
 

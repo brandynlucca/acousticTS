@@ -29,7 +29,9 @@ The flowchart below is therefore intended as a screening guide rather than as a 
 
 The most important principle is that model selection should follow the target and the scientific question, not just model familiarity. A model can be mathematically sophisticated and still be the wrong starting point if its geometry, boundary assumptions, or approximation regime do not match the target. Conversely, a simpler model can be the better first choice if it captures the dominant physics of the question being asked.
 
-<object type="image/svg+xml" data="model-selection-flowchart.svg" style="width:100%;" aria-label="General model-selection flowchart"></object>
+<object type="image/svg+xml" data="model-selection-flowchart-revised.svg" style="width:100%;" aria-label="Revised general model-selection flowchart"></object>
+
+The revised chart removes a few false dichotomies that were starting to creep into the earlier version. Composite internal structure, canonical geometry, and asymptotic screening are now treated as separate decisions rather than as a single forced branch. That makes room for families such as `BBFM`, `BCMS`, `ECMS`, `PCDWBA`, and `VESM`, and it also makes clearer that `HPA`, `SDWBA`, and `TRCM` are often neighboring screening or regime-specific alternatives rather than absolute replacements for the more geometry-matched families. Experimental families are shown in a separate color so they remain visible without being confused with the longer-established model paths.
 
 Boundary condition is often as decisive as geometry in this decision process. A spherical pressure-release cavity, a fluid-filled sphere, and an elastic shell may look similar at gross scale while belonging to different model families because the interface physics is different in each case.
 

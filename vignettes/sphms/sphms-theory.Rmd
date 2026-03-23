@@ -1,5 +1,5 @@
 ---
-title: "Theory"
+title: "Spherical modal series solution (SPHMS) theory"
 output:
   rmarkdown::html_vignette:
     toc: true
@@ -16,6 +16,17 @@ vignette: >
 ---
 
 # Introduction
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  status = c("benchmarked"),
+  pages = c(
+    Overview = "index.html",
+    Implementation = "sphms-implementation.html",
+    Theory = "sphms-theory.html"
+  )
+)
+```
 
 The sphere is the classical geometry for which the acoustic scattering problem can be solved exactly by separation of variables. Because the Helmholtz equation separates in spherical coordinates, the incident, scattered, and interior fields can be expanded in spherical eigenfunctions, and the boundary conditions reduce to independent algebraic equations for each angular order.[^1][^2][^3]
 
@@ -324,3 +335,4 @@ Those assumptions are what make the sphere the natural reference problem for val
 [^2]: Faran, J. J. (1951). Sound scattering by solid cylinders and spheres. *The Journal of the Acoustical Society of America*, 23, 405-418.
 
 [^3]: Hickling, R. (1962). Analysis of echoes from a solid elastic sphere in water. *The Journal of the Acoustical Society of America*, 34, 1582-1592.
+

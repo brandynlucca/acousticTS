@@ -1,0 +1,202 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1220" role="img" aria-labelledby="title desc">
+  <title id="title">Revised model-selection flowchart</title>
+  <desc id="desc">Decision flowchart showing established and experimental acousticTS model families with clickable model boxes.</desc>
+  <defs>
+    <style>
+      .bg { fill: #fbfaf5; }
+      .title { font: 700 30px Georgia, serif; fill: #203040; }
+      .subtitle { font: italic 17px Georgia, serif; fill: #203040; }
+      .label { font: 19px Georgia, serif; fill: #203040; }
+      .small { font: 16px Georgia, serif; fill: #203040; }
+      .box { stroke-width: 2.6; rx: 12; ry: 12; }
+      .context { fill: #eef0de; stroke: #203040; }
+      .decision { fill: #dce8ea; stroke: #0f5c5c; stroke-width: 2.6; }
+      .exact { fill: #d9ece4; stroke: #1f6a4d; }
+      .approx { fill: #f5e7d8; stroke: #7a3f0e; }
+      .experimental { fill: #f3e8ff; stroke: #6d28d9; }
+      .line { stroke: #203040; stroke-width: 2.8; fill: none; marker-end: url(#arrow); }
+      .dash { stroke-dasharray: 8 6; }
+    </style>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M 0 0 L 12 6 L 0 12 z" fill="#203040"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1400" height="1220" class="bg"/>
+  <text x="380" y="44" class="title">Revised model-selection flowchart</text>
+  <text x="125" y="76" class="subtitle">The main change is that composite structure, canonical geometry, and screening approximations are treated as separate questions rather than one forced dichotomy.</text>
+
+  <rect x="60" y="1020" width="510" height="150" rx="14" ry="14" fill="#fffdf7" stroke="#203040" stroke-width="1.8"/>
+  <text x="82" y="1050" class="label">Legend</text>
+  <rect x="82" y="1068" width="72" height="24" class="box context"/>
+  <text x="168" y="1086" class="small">Context / regime screen</text>
+  <polygon points="288,1080 314,1058 340,1080 314,1102" class="decision"/>
+  <text x="360" y="1086" class="small">Decision point</text>
+  <rect x="82" y="1110" width="72" height="24" class="box exact"/>
+  <text x="168" y="1128" class="small">Established geometry-matched / modal</text>
+  <rect x="82" y="1142" width="72" height="24" class="box approx"/>
+  <text x="168" y="1160" class="small">Established approximation / asymptotic</text>
+  <rect x="350" y="1110" width="72" height="24" class="box experimental"/>
+  <text x="438" y="1128" class="small">Experimental model family</text>
+
+  <rect x="470" y="118" width="300" height="60" class="box context"/>
+  <text x="530" y="145" class="label">Start with the target</text>
+  <text x="520" y="168" class="small">shape, boundary, internal structure</text>
+
+  <line x1="620" y1="178" x2="620" y2="236" class="line"/>
+  <polygon points="620,236 760,310 620,384 480,310" class="decision"/>
+  <text x="548" y="300" class="label">Is composite internal</text>
+  <text x="523" y="324" class="label">structure acoustically central?</text>
+  <text x="774" y="314" class="small">yes</text>
+  <text x="622" y="410" class="small">no</text>
+
+  <line x1="760" y1="310" x2="1040" y2="310" class="line"/>
+  <polygon points="1040,310 1175,380 1040,450 905,380" class="decision"/>
+  <text x="965" y="372" class="label">Swimbladder-like gas</text>
+  <text x="975" y="396" class="label">inclusion present?</text>
+  <text x="1188" y="384" class="small">yes</text>
+  <text x="1042" y="476" class="small">no</text>
+
+  <a href="../krm/index.html" target="_top">
+    <rect x="1205" y="350" width="145" height="58" class="box approx"/>
+    <text x="1256" y="384" class="label">KRM</text>
+  </a>
+
+  <line x1="1040" y1="450" x2="1040" y2="530" class="line"/>
+  <a href="../bbfm/index.html" target="_top">
+    <rect x="960" y="532" width="160" height="62" class="box experimental"/>
+    <text x="1011" y="566" class="label">BBFM</text>
+  </a>
+
+  <line x1="620" y1="384" x2="620" y2="468" class="line"/>
+  <polygon points="620,468 792,546 620,624 448,546" class="decision"/>
+  <text x="518" y="540" class="label">Is a canonical geometry-matched</text>
+  <text x="534" y="564" class="label">solution still physically defensible?</text>
+  <text x="805" y="552" class="small">yes</text>
+  <text x="622" y="650" class="small">no</text>
+
+  <line x1="792" y1="546" x2="1160" y2="546" class="line"/>
+  <polygon points="1160,546 1290,610 1160,674 1030,610" class="decision"/>
+  <text x="1093" y="603" class="label">Which canonical</text>
+  <text x="1103" y="627" class="label">family fits best?</text>
+
+  <line x1="620" y1="624" x2="620" y2="714" class="line"/>
+  <polygon points="620,714 778,790 620,866 462,790" class="decision"/>
+  <text x="525" y="782" class="label">Which approximation family</text>
+  <text x="508" y="806" class="label">captures the dominant mechanism?</text>
+
+  <!-- canonical branch outputs -->
+  <line x1="1230" y1="610" x2="1300" y2="610" class="line"/>
+  <rect x="1140" y="740" width="120" height="56" class="box context"/>
+  <text x="1174" y="774" class="label">Sphere</text>
+  <rect x="1010" y="740" width="120" height="56" class="box context"/>
+  <text x="1018" y="774" class="label">Prolate</text>
+  <rect x="1270" y="740" width="120" height="56" class="box context"/>
+  <text x="1290" y="774" class="label">Cylinder</text>
+  <line x1="1160" y1="674" x2="1160" y2="740" class="line"/>
+  <line x1="1130" y1="674" x2="1070" y2="740" class="line"/>
+  <line x1="1190" y1="674" x2="1330" y2="740" class="line"/>
+
+  <!-- sphere sub-branch -->
+  <line x1="1200" y1="796" x2="1200" y2="850" class="line"/>
+  <polygon points="1200,850 1320,910 1200,970 1080,910" class="decision"/>
+  <text x="1112" y="904" class="label">Which spherical</text>
+  <text x="1123" y="928" class="label">boundary physics?</text>
+  <a href="../sphms/index.html" target="_top">
+    <rect x="930" y="1010" width="150" height="58" class="box exact"/>
+    <text x="972" y="1044" class="label">SPHMS</text>
+  </a>
+  <a href="../calibration/index.html" target="_top">
+    <rect x="1115" y="1010" width="150" height="58" class="box exact"/>
+    <text x="1158" y="1044" class="label">SOEMS</text>
+  </a>
+  <a href="../essms/index.html" target="_top">
+    <rect x="1300" y="1010" width="150" height="58" class="box exact"/>
+    <text x="1343" y="1044" class="label">ESSMS</text>
+  </a>
+  <a href="../vesm/index.html" target="_top">
+    <rect x="1115" y="1090" width="150" height="58" class="box experimental"/>
+    <text x="1165" y="1124" class="label">VESM</text>
+  </a>
+  <line x1="1130" y1="970" x2="1005" y2="1010" class="line"/>
+  <line x1="1200" y1="970" x2="1190" y2="1010" class="line"/>
+  <line x1="1270" y1="970" x2="1375" y2="1010" class="line"/>
+  <line x1="1200" y1="970" x2="1190" y2="1090" class="line dash"/>
+
+  <!-- prolate -->
+  <line x1="1070" y1="796" x2="1070" y2="884" class="line"/>
+  <a href="../psms/index.html" target="_top">
+    <rect x="990" y="892" width="150" height="58" class="box exact"/>
+    <text x="1036" y="926" class="label">PSMS</text>
+  </a>
+  <line x1="1070" y1="950" x2="1070" y2="1010" class="line dash"/>
+  <a href="../hpa/index.html" target="_top">
+    <rect x="900" y="1090" width="150" height="58" class="box approx"/>
+    <text x="952" y="1124" class="label">HPA</text>
+  </a>
+
+  <!-- cylinder -->
+  <line x1="1330" y1="796" x2="1330" y2="850" class="line"/>
+  <polygon points="1330,850 1450,910 1330,970 1210,910" class="decision"/>
+  <text x="1260" y="904" class="label">Elastic or bent</text>
+  <text x="1262" y="928" class="label">cylinder needed?</text>
+  <a href="../fcms/index.html" target="_top">
+    <rect x="1210" y="1010" width="150" height="58" class="box exact"/>
+    <text x="1257" y="1044" class="label">FCMS</text>
+  </a>
+  <a href="../ecms/index.html" target="_top">
+    <rect x="1375" y="1010" width="150" height="58" class="box experimental"/>
+    <text x="1422" y="1044" class="label">ECMS</text>
+  </a>
+  <a href="../bcms/index.html" target="_top">
+    <rect x="1375" y="1090" width="150" height="58" class="box experimental"/>
+    <text x="1422" y="1124" class="label">BCMS</text>
+  </a>
+  <line x1="1290" y1="970" x2="1285" y2="1010" class="line"/>
+  <line x1="1370" y1="970" x2="1450" y2="1010" class="line"/>
+  <line x1="1330" y1="970" x2="1450" y2="1090" class="line dash"/>
+  <a href="../trcm/index.html" target="_top">
+    <rect x="1210" y="1090" width="150" height="58" class="box approx"/>
+    <text x="1258" y="1124" class="label">TRCM</text>
+  </a>
+  <a href="../hpa/index.html" target="_top">
+    <rect x="1375" y="1170" width="150" height="42" class="box approx"/>
+    <text x="1427" y="1197" class="small">HPA</text>
+  </a>
+
+  <!-- approximation branch -->
+  <line x1="620" y1="866" x2="620" y2="930" class="line"/>
+  <rect x="390" y="940" width="210" height="64" class="box context"/>
+  <text x="426" y="972" class="label">Weakly scattering</text>
+  <text x="446" y="996" class="label">elongated body</text>
+  <rect x="620" y="940" width="210" height="64" class="box context"/>
+  <text x="675" y="972" class="label">Bent weakly</text>
+  <text x="662" y="996" class="label">scattering body</text>
+  <rect x="850" y="940" width="210" height="64" class="box context"/>
+  <text x="886" y="972" class="label">Fast asymptotic</text>
+  <text x="898" y="996" class="label">screening</text>
+  <line x1="620" y1="866" x2="495" y2="940" class="line"/>
+  <line x1="620" y1="866" x2="725" y2="940" class="line"/>
+  <line x1="620" y1="866" x2="955" y2="940" class="line dash"/>
+
+  <a href="../dwba/index.html" target="_top">
+    <rect x="345" y="1070" width="150" height="58" class="box approx"/>
+    <text x="390" y="1104" class="label">DWBA</text>
+  </a>
+  <a href="../sdwba/index.html" target="_top">
+    <rect x="510" y="1070" width="150" height="58" class="box approx"/>
+    <text x="548" y="1104" class="label">SDWBA</text>
+  </a>
+  <a href="../pcdwba/index.html" target="_top">
+    <rect x="655" y="1070" width="170" height="58" class="box experimental"/>
+    <text x="690" y="1104" class="label">PCDWBA</text>
+  </a>
+  <a href="../hpa/index.html" target="_top">
+    <rect x="870" y="1070" width="150" height="58" class="box approx"/>
+    <text x="922" y="1104" class="label">HPA</text>
+  </a>
+  <line x1="495" y1="1004" x2="420" y2="1070" class="line"/>
+  <line x1="495" y1="1004" x2="585" y2="1070" class="line dash"/>
+  <line x1="725" y1="1004" x2="740" y2="1070" class="line"/>
+  <line x1="955" y1="1004" x2="945" y2="1070" class="line"/>
+</svg>

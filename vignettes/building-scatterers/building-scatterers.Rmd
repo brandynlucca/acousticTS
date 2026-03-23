@@ -19,7 +19,7 @@ Once a geometry exists, it still has to be assigned a physical interpretation be
 
 This distinction matters because the same outline can support several different physical interpretations. A smooth elongated body might be treated as a weakly scattering fluid-like target, as a gas-filled inclusion, or as part of a composite fish-like target with an internal swimbladder. The geometry by itself does not decide among those cases. Scatterer construction is the step where the reader turns a geometric description into a model-ready acoustic object.
 
-<object type="image/svg+xml" data="building-scatterers-map.svg" style="width:100%;" aria-label="Conceptual layers"></object>
+<object type="image/svg+xml" data="building-scatterers-map-updated.svg" style="width:100%;" aria-label="Updated scatterer-generation and class-hierarchy map"></object>
 
 # Why scatterer construction is separate from shape construction
 
@@ -34,6 +34,29 @@ The most important constructors are `fls_generate()` for fluid-like segmented bo
 `fls_generate()` is the general fluid-like constructor and is often the right starting point for weakly scattering elongated targets used with `DWBA`, `SDWBA`, `HPA`, `TRCM`, or other fluid-like workflows. `gas_generate()` is more specialized. It is intended for simple gas-filled objects where the dominant acoustic contrast comes from the gas-fluid interface. `sbf_generate()` is meant for composite fish-like targets where body and internal structures, especially a swimbladder, need to be represented together rather than collapsed into one homogeneous body. `ess_generate()` is reserved for elastic shelled spheres, where shell thickness and elastic material properties are central to the physics. `cal_generate()` is the constructor for standard calibration spheres, where the target is not a biological body at all but a well-defined solid sphere used for reference and validation work.
 
 The practical consequence is that constructor choice should be driven by the interface physics that matter most, not only by the overall silhouette of the target.
+
+The updated map above now makes the class hierarchy explicit as well. `Scatterer` remains the common parent, but composite targets now branch through `CSC`, elastic-target families branch through `ELA`, and the swimbladder-bearing and backbone-bearing composite targets are separated into `SBF` and `BBF` rather than being implied by one generic fish-only path. That makes the difference between generator choice and class inheritance much more transparent.
+
+# Recommended constructor convention
+
+The clearest workflow is now:
+
+1. Build geometry with a `Shape` constructor.
+2. Pass that geometry into the relevant scatterer constructor.
+3. Supply material properties either as contrasts or as absolute values.
+
+In practice, that means the public convention is:
+
+- single-component targets: `shape = <Shape>`
+- composite targets: `body_shape = <Shape>`, `bladder_shape = <Shape>`, or `backbone_shape = <Shape>`
+
+For example, a fluid-like target should usually be built with a call like `fls_generate(shape = my_shape, ...)`, not by asking `fls_generate()` to also invent the geometry internally. Likewise, `sbf_generate()` is clearest when the body and swimbladder are built separately and passed in explicitly as `body_shape` and `bladder_shape`.
+
+Older entry points are still available for compatibility. A constructor may still accept raw coordinate vectors or a character shape label such as `"sphere"` or `"arbitrary"`. Those paths are retained so that older scripts continue to run, but internally they are now normalized to the same `Shape`-first geometry contract as the explicit workflow.
+
+The same simplification applies to units. Scatterer constructors are standardized to meters for geometry and radians for orientation. Compatibility arguments like `length_units`, `radius_units`, `diameter_units`, and `theta_units` are still accepted, but the stored scatterer representation is normalized to SI units.
+
+Material inputs remain flexible by design. For each component, density and sound speed may be supplied either as contrasts (`g_*`, `h_*`) or as absolute properties (`density_*`, `sound_speed_*`). That flexibility is useful and does not add the same kind of cognitive overhead as overloading the geometry interface.
 
 # Matching class to target type
 

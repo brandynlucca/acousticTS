@@ -1,5 +1,5 @@
 ---
-title: "Theory"
+title: "Target strength for a calibration sphere"
 output:
   rmarkdown::html_vignette:
     toc: true
@@ -19,6 +19,17 @@ vignette: >
 ---
 
 # Introduction
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  status = c("benchmarked", "validated"),
+  pages = c(
+    Overview = "index.html",
+    Implementation = "calibration-implementation.html",
+    Theory = "calibration-theory.html"
+  )
+)
+```
 
 Echosounders are commonly calibrated with standard targets whose acoustic response is strong, repeatable, and sufficiently well understood that the backscattering level can be predicted independently of the instrument being calibrated[^1]. In fisheries and ocean-acoustics work, that standard target is often a tungsten carbide sphere, although aluminum, steel, brass, and copper spheres are also used in some settings[^2][^3]. The reason a solid sphere is so useful is not only that it is mechanically robust. It is also one of the few practically important targets for which the full elastic scattering problem remains separable in spherical coordinates.
 
@@ -305,3 +316,4 @@ This normalization is important because calibration references are sometimes wri
 ![Calibration sphere modal bookkeeping from partial waves to reported backscatter quantities.](calibration-modal-bookkeeping.svg)
 
 The modal bookkeeping proceeds in a fixed order. The incident plane wave is decomposed into modal terms, each mode acquires an elastic phase shift at the sphere surface, the far-field series is summed, and the final result is reported as a linear backscattering length, a backscattering cross-section, and target strength.
+

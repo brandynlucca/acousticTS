@@ -1,0 +1,174 @@
+---
+title: "Bent cylinder modal series solution"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: true
+    fig_caption: yes
+    fig_width: 3.5
+    fig_height: 3.5
+    dpi: 200
+    dev.args: list(pointsize=11)
+vignette: >
+  %\VignetteIndexEntry{Bent cylinder modal series solution}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# acousticTS implementation
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  status = c("experimental", "unvalidated"),
+  pages = c(
+    Overview = "index.html",
+    Implementation = "bcms-implementation.html",
+    Theory = "bcms-theory.html"
+  )
+)
+```
+
+The bent-cylinder modal-series solution is available through `target_strength(..., model = "bcms")`. For the straight branch, the implementation should reduce exactly to the finite-cylinder modal-series solution. For the bent branch, it should reduce to the straight finite-cylinder result multiplied by the Fresnel coherence factor implied by Stanton (1989, Eq. 25-26).
+
+That is the implementation check used here. No separate public local BCMS package was identified, so the comparison is carried out against the governing straight-cylinder modal series and the direct bent-cylinder coherence construction.
+
+# Reference case
+
+The comparison uses a weakly scattering liquid-filled cylinder with:
+
+- length `10.5 mm`
+- radius `1 mm`
+- curvature ratio `rho_c / L = 1.5` for the bent case
+- density contrast `g = 1.0357`
+- sound-speed contrast `h = 1.0279`
+- broadside incidence
+- `12-400 kHz` in `2 kHz` steps
+
+The straight and bent objects are:
+
+```{r}
+library(acousticTS)
+
+density_sw <- 1026.8
+sound_speed_sw <- 1477.3
+
+straight_object <- fls_generate(
+  shape = cylinder(
+    length_body = 10.5e-3,
+    radius_body = 1e-3,
+    n_segments = 401
+  ),
+  density_body = density_sw * 1.0357,
+  sound_speed_body = sound_speed_sw * 1.0279,
+  theta_body = pi / 2
+)
+
+bent_object <- fls_generate(
+  shape = cylinder(
+    length_body = 10.5e-3,
+    radius_body = 1e-3,
+    radius_curvature_ratio = 1.5,
+    n_segments = 401
+  ),
+  density_body = density_sw * 1.0357,
+  sound_speed_body = sound_speed_sw * 1.0279,
+  theta_body = pi / 2
+)
+```
+
+# Summary
+
+```{r echo = FALSE}
+bcms_summary <- utils::read.csv(
+  file.path("..", "..", "scratch", "bcms_reference_compare_summary.csv")
+)
+
+knitr::kable(
+  bcms_summary,
+  digits = 6,
+  col.names = c(
+    "Case",
+    "Max abs. delta TS (dB)",
+    "Mean abs. delta TS (dB)",
+    "f at max delta (kHz)",
+    "acousticTS impl.",
+    "acousticTS elapsed (s)",
+    "f min (kHz)",
+    "f max (kHz)",
+    "Step (kHz)",
+    "Reference impl.",
+    "Reference elapsed (s)",
+    "Ref. f min (kHz)",
+    "Ref. f max (kHz)",
+    "Ref. step (kHz)"
+  )
+)
+```
+
+Both branches agree exactly on the shared grid. That is the expected outcome for a model that is defined directly in terms of those two reference constructions.
+
+## Spectrum overlays
+
+```{r fig.width = 8, fig.height = 8}
+bcms_compare <- utils::read.csv(
+  file.path("..", "..", "scratch", "bcms_reference_compare.csv")
+)
+bcms_compare <- bcms_compare[order(bcms_compare$case, bcms_compare$frequency_hz), ]
+
+straight_df <- subset(bcms_compare, case == "straight")
+bent_df <- subset(bcms_compare, case == "bent")
+
+par(mfrow = c(2, 2), mar = c(4, 4.5, 2, 1))
+
+plot(
+  straight_df$frequency_khz,
+  straight_df$TS_reference,
+  type = "l",
+  lwd = 2.5,
+  col = "black",
+  xlab = "",
+  ylab = expression(Target ~ strength ~ (dB ~ re. ~ 1 ~ m^2)),
+  main = "Straight cylinder"
+)
+lines(straight_df$frequency_khz, straight_df$TS_acousticts, col = "#0b6e4f", lwd = 2)
+
+plot(
+  straight_df$frequency_khz,
+  straight_df$TS_acousticts - straight_df$TS_reference,
+  type = "l",
+  lwd = 2,
+  col = "#0b6e4f",
+  xlab = "Frequency (kHz)",
+  ylab = expression(Delta * TS ~ (dB)),
+  main = "Straight delta"
+)
+abline(h = 0, lty = 3, col = "grey50")
+
+plot(
+  bent_df$frequency_khz,
+  bent_df$TS_reference,
+  type = "l",
+  lwd = 2.5,
+  col = "black",
+  xlab = "",
+  ylab = expression(Target ~ strength ~ (dB ~ re. ~ 1 ~ m^2)),
+  main = "Bent cylinder"
+)
+lines(bent_df$frequency_khz, bent_df$TS_acousticts, col = "#0b6e4f", lwd = 2)
+
+plot(
+  bent_df$frequency_khz,
+  bent_df$TS_acousticts - bent_df$TS_reference,
+  type = "l",
+  lwd = 2,
+  col = "#0b6e4f",
+  xlab = "Frequency (kHz)",
+  ylab = expression(Delta * TS ~ (dB)),
+  main = "Bent delta"
+)
+abline(h = 0, lty = 3, col = "grey50")
+```
+
+# Closing note
+
+This implementation page is intentionally narrow. `BCMS` is not trying to introduce a new scattering kernel. It is trying to reproduce a very specific relationship between a straight finite-cylinder modal sum and a bent-cylinder coherence correction. The exact agreement above shows that the code is honoring that structure.

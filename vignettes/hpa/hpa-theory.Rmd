@@ -1,5 +1,5 @@
 ---
-title: "Theory"
+title: "High-pass approximation (HPA) theory"
 output:
   rmarkdown::html_vignette:
     toc: true
@@ -16,6 +16,17 @@ vignette: >
 ---
 
 # Introduction
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  status = c("benchmarked"),
+  pages = c(
+    Overview = "index.html",
+    Implementation = "hpa-implementation.html",
+    Theory = "hpa-theory.html"
+  )
+)
+```
 
 The high-pass approximation (HPA) is not an exact boundary-value solution. It is a compact asymptotic model constructed so that the low-frequency limit matches the Rayleigh expansion of weakly scattering bodies, while the large-$ka$ limit remains bounded and approaches a reflection-controlled scale.[^1][^2][^3] The model is therefore best understood as an interpolation between two physically distinct regimes rather than as a direct solution of the governing boundary-value problem at all frequencies.
 
@@ -125,9 +136,9 @@ $$
 
 so the response approaches a bounded geometric scale instead of diverging.
 
-# Stanton (1990) generalization
+# Stanton (1989) generalization
 
-Stanton (1990)[^3] extended the same logic to a broader class of shapes by matching a low-frequency scattering term to a reflected-wave asymptote and then introducing empirical correction factors where needed. In this broader setting, the geometric prefactors and directivity terms become just as important as the material contrasts because they determine how the same asymptotic logic is adapted to spheres, spheroids, straight cylinders, and bent cylinders.
+Stanton (1989)[^3] extended the same logic to a broader class of shapes by matching a low-frequency scattering term to a reflected-wave asymptote and then introducing empirical correction factors where needed. In this broader setting, the geometric prefactors and directivity terms become just as important as the material contrasts because they determine how the same asymptotic logic is adapted to spheres, spheroids, straight cylinders, and bent cylinders.
 
 ## Deviation and null functions
 
@@ -137,7 +148,7 @@ These terms are phenomenological. They do not arise from the first few algebraic
 
 ## Spherical form
 
-For a sphere, the generalized expression from Stanton (1990)[^3] is:
+For a sphere, the generalized expression from Stanton (1989)[^3] is:
 
 $$
   \sigma_\text{bs} =
@@ -146,7 +157,7 @@ $$
   }.
 $$
 
-The low-frequency numerator is still the Rayleigh term. The denominator is now written so that the high-frequency scale is set explicitly by the reflection coefficient $\mathcal{R}$. Compared with Johnson (1977; 1978)[^1][^2] simpler form, the version from Stanton (1990)[^3] makes the reflection-controlled nature of the large-$ka$ limit more explicit and leaves room for the correction factors $\mathcal{F}$ and $\mathcal{G}$.
+The low-frequency numerator is still the Rayleigh term. The denominator is now written so that the high-frequency scale is set explicitly by the reflection coefficient $\mathcal{R}$. Compared with the simpler form of Johnson (1977; 1978)[^1][^2], the version from Stanton (1989)[^3] makes the reflection-controlled nature of the large-$ka$ limit more explicit and leaves room for the correction factors $\mathcal{F}$ and $\mathcal{G}$.
 
 ## Prolate spheroid form
 
@@ -229,3 +240,4 @@ The strength of the HPA is that it compresses those asymptotic ideas into simple
 [^2]: Johnson, R. K. (1978). Erratum: Sound scattering from a fluid sphere revisited. *The Journal of the Acoustical Society of America*, 63, 626.
 
 [^3]: Stanton, T. K. (1989). Simple approximate formulas for backscattering of sound by spherical and elongated objects. *The Journal of the Acoustical Society of America*, 86, 1499-1510.
+

@@ -35,7 +35,7 @@ The following example shows a compact but realistic package workflow. It builds 
 library(acousticTS)
 
 # 1. Create a geometry
-shape <- sphere(radius = 0.05)
+sphere_shape <- sphere(radius_body = 0.05)
 
 # 2. Create a scatterer by attaching acoustic contrasts
 gas_sphere <- gas_generate(
@@ -63,11 +63,13 @@ This short example already contains the main package logic. The geometry is crea
 
 In practice, most workflows differ only in the scatterer constructor and the model-specific arguments. A fluid-like elongated body may use `fls_generate()` and `DWBA`, a shell problem may use `ess_generate()` and `ESSMS`, and a calibration sphere may use `cal_generate()` and the calibration model. The package structure stays the same even when the acoustics do not. That consistency is deliberate. It allows readers to learn one workflow pattern and then reuse it across different geometries and model families.
 
+The recommended pattern is to build geometry first and then hand that geometry to the scatterer constructor. In other words, `sphere()`, `cylinder()`, `prolate_spheroid()`, and `arbitrary()` answer the geometric question, while `fls_generate()`, `gas_generate()`, `sbf_generate()`, `bbf_generate()`, and `ess_generate()` answer the physical one. Older shorthand pathways still exist for compatibility, but the shape-first workflow is the clearest one to learn and the least ambiguous one to debug.
+
 # Core concepts and objects
 
 Understanding three core concepts makes the rest of the documentation much easier to navigate. A `Shape` is geometry only, whether that geometry is canonical, segmented, or imported from measured coordinates. A scatterer object is the physically interpreted target, meaning that it combines geometry with contrasts, densities, sound speeds, elastic properties, orientations, and any additional metadata needed by the model layer. Model results are then stored back onto that same object, typically as `TS`, `sigma_bs`, complex amplitudes, and model-specific bookkeeping fields.
 
-The most common shape builders are `sphere()`, `cylinder()`, `prolate_spheroid()`, and `arbitrary()`. The most common scatterer constructors are `fls_generate()`, `sbf_generate()`, `gas_generate()`, `ess_generate()`, and `cal_generate()`. These answer two different questions. Shape builders answer "what is the geometry?" Scatterer constructors answer "what is the target physically?" That distinction matters because the same geometry may support several different physical interpretations, while the same physical interpretation may sometimes be explored over several different geometries.
+The most common shape builders are `sphere()`, `cylinder()`, `prolate_spheroid()`, and `arbitrary()`. The most common scatterer constructors are `fls_generate()`, `sbf_generate()`, `bbf_generate()`, `gas_generate()`, `ess_generate()`, and `cal_generate()`. These answer two different questions. Shape builders answer "what is the geometry?" Scatterer constructors answer "what is the target physically?" That distinction matters because the same geometry may support several different physical interpretations, while the same physical interpretation may sometimes be explored over several different geometries.
 
 It also helps to think of the package objects as progressively more informative descriptions of the same target. A shape alone is only a geometric scaffold. A scatterer object is the first stage at which the target becomes acoustically meaningful. A modeled object is then a target together with the consequences of a specific modeling assumption. Keeping those layers conceptually separate makes it easier to diagnose problems. If something looks wrong, the mistake may be geometric, physical, numerical, or interpretive, and those are best checked in that order.
 

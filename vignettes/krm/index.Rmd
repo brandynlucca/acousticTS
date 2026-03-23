@@ -1,0 +1,27 @@
+---
+title: "KRM"
+output:
+  rmarkdown::html_vignette:
+    toc: false
+    number_sections: false
+    fig_caption: yes
+vignette: >
+  %\VignetteIndexEntry{KRM}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+# Overview
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  status = c("benchmarked", "validated"),
+  pages = c(
+    Overview = "index.html",
+    Implementation = "krm-implementation.html",
+    Theory = "krm-theory.html"
+  )
+)
+```
+
+
+

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="360" viewBox="0 0 900 360">
+  <rect width="900" height="360" fill="#fcfbf7"/>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#1f2933"/>
+    </marker>
+  </defs>
+
+  <text x="44" y="44" font-size="28" font-family="Georgia, serif" fill="#1f2933">Finite elastic cylinder at broadside incidence</text>
+
+  <line x1="48" y1="114" x2="220" y2="114" stroke="#1f2933" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="48" y1="146" x2="220" y2="146" stroke="#1f2933" stroke-width="4" marker-end="url(#arrow)"/>
+  <line x1="48" y1="178" x2="220" y2="178" stroke="#1f2933" stroke-width="4" marker-end="url(#arrow)"/>
+  <text x="52" y="96" font-size="22" font-family="Georgia, serif" fill="#1f2933">incident acoustic field</text>
+
+  <rect x="260" y="120" width="420" height="90" rx="45" fill="#7898b1"/>
+  <rect x="278" y="138" width="384" height="54" rx="27" fill="#9fc0d8"/>
+
+  <line x1="470" y1="120" x2="470" y2="210" stroke="#e9f1f6" stroke-width="3" stroke-dasharray="7 6"/>
+  <line x1="260" y1="255" x2="680" y2="255" stroke="#5c6670" stroke-width="2.5"/>
+  <line x1="260" y1="245" x2="260" y2="265" stroke="#5c6670" stroke-width="3"/>
+  <line x1="680" y1="245" x2="680" y2="265" stroke="#5c6670" stroke-width="3"/>
+  <text x="466" y="287" font-size="22" font-family="Georgia, serif" fill="#1f2933">L</text>
+
+  <line x1="724" y1="165" x2="770" y2="165" stroke="#5c6670" stroke-width="2.5"/>
+  <text x="782" y="172" font-size="22" font-family="Georgia, serif" fill="#1f2933">a</text>
+
+  <text x="306" y="108" font-size="22" font-family="Georgia, serif" fill="#1f2933">outer fluid</text>
+  <text x="408" y="171" font-size="24" font-family="Georgia, serif" fill="#143b53">elastic solid</text>
+
+  <text x="246" y="323" font-size="20" font-family="Georgia, serif" fill="#1f2933">Modal phase shifts from the elastic cylinder are combined with the finite-length</text>
+  <text x="334" y="347" font-size="20" font-family="Georgia, serif" fill="#1f2933">coherence factor sin(kL cos&#952;) / (kL cos&#952;)</text>
+</svg>

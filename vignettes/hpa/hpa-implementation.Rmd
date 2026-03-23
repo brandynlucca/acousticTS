@@ -17,13 +17,24 @@ vignette: >
 
 # acousticTS implementation
 
-The `acousticTS` package uses object-based scatterers, so the HPA workflow follows the same broad pattern used throughout the package: define the geometry, attach fluid-like material properties, evaluate the model over the frequency range of interest, and then inspect the returned results carefully enough to confirm that the approximation is being used in a sensible way. For HPA, the most important additional choice is the approximation method: `johnson` for the compact sphere form, or `stanton` for the broader family of sphere, prolate-spheroid, and cylinder-style approximations.
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  status = c("benchmarked"),
+  pages = c(
+    Overview = "index.html",
+    Implementation = "hpa-implementation.html",
+    Theory = "hpa-theory.html"
+  )
+)
+```
+
+The `acousticTS` package uses object-based scatterers, so the HPA workflow follows the same broad pattern used throughout the package: define the geometry, attach fluid-like material properties, evaluate the model over the frequency range of interest, and then inspect the returned results carefully enough to confirm that the approximation is being used in a sensible way. For HPA, the most important additional choice is the approximation method: `johnson` for the compact sphere expression of Johnson (1977; 1978), or `stanton` for the broader sphere, prolate-spheroid, and cylinder approximations of Stanton (1989).
 
 This matters because HPA is an asymptotic model family rather than an exact solution family. The implementation should therefore be read as a workflow for setting up and checking an approximation, not as a black-box replacement for every modal or boundary-value model in the package.
 
 ## Object generation
 
-The Johnson and Stanton sphere formulations can be compared using the same spherical `FLS` object.
+The Johnson (1977; 1978) and Stanton (1989) sphere formulations can be compared using the same spherical `FLS` object.
 
 ```{r}
 library(acousticTS)
@@ -92,7 +103,7 @@ head(stanton_results)
 
 At this stage, it helps to inspect more than just the plotted curve. Readers should check that the result object contains the expected frequencies, that the returned target-strength levels are physically plausible for the assumed target size and contrast, and that comparisons are being made in the intended domain. HPA results are often discussed in `TS`, but for some comparisons it is more informative to examine `sigma_bs` in the linear domain as well.
 
-## Comparing Johnson and Stanton sphere solutions
+## Comparing Johnson (1977; 1978) and Stanton (1989) sphere formulations
 
 ```{r fig.width = 8, fig.height = 4.5}
 par(oma = c(0, 0.25, 0, 0), mar = c(5, 6, 4, 2))
@@ -110,7 +121,7 @@ plot(
 lines(x = stanton_results$frequency * 1e-3, y = stanton_results$TS, col = "firebrick3", lty = 1, lwd = 2.5)
 legend(
   "bottomright",
-  legend = c("Johnson sphere", "Stanton sphere"),
+  legend = c("Johnson (1977; 1978)", "Stanton (1989)"),
   col = c("black", "firebrick3"),
   lwd = 2.5,
   lty = c(1, 1),
@@ -119,11 +130,11 @@ legend(
 )
 ```
 
-This comparison is most useful as a model-behavior check. Because the geometry and material properties are the same, any difference between the curves reflects the difference between Johnson's compact sphere interpolation and Stanton's more general asymptotic form. That makes the comparison a good way to judge whether the added flexibility of the Stanton formulation materially changes the interpretation over the frequency band of interest.
+This comparison is most useful as a model-behavior check. Because the geometry and material properties are the same, any difference between the curves reflects the difference between the compact sphere interpolation of Johnson (1977; 1978) and the more general asymptotic form of Stanton (1989). That makes the comparison a good way to judge whether the added flexibility of the Stanton (1989) formulation materially changes the interpretation over the frequency band of interest.
 
-## Using the Stanton form for an elongated object
+## Using the Stanton (1989) elongated-body formulation
 
-The Stanton implementation is the one to use when the shape is not spherical.
+The `stanton` method is the one to use when the shape is not spherical.
 
 ```{r}
 cylinder_shape <- cylinder(
@@ -151,7 +162,7 @@ elongated_object <- target_strength(
 head(extract(elongated_object, "model")$HPA)
 ```
 
-This second example shows one of the main reasons the Stanton form is useful in practice. It extends the same asymptotic logic to elongated shapes without forcing the user into a sphere-only approximation. That does not make it exact for every elongated target, but it does allow gross geometric effects such as aspect ratio and orientation to enter the approximation in a structured way.
+This second example shows one of the main reasons the Stanton (1989) formulation is useful in practice. It extends the same asymptotic logic to elongated shapes without forcing the user into a sphere-only approximation. That does not make it exact for every elongated target, but it does allow gross geometric effects such as aspect ratio and orientation to enter the approximation in a structured way.
 
 When fitting HPA behavior to measurements, the first quantities to revisit are usually:
 
@@ -160,3 +171,33 @@ When fitting HPA behavior to measurements, the first quantities to revisit are u
 3. the empirical `deviation_fun` and `null_fun`, because those control how aggressively the approximation departs from the default smooth-response form.
 
 Those checks are especially helpful when HPA is being used alongside more detailed models. A disagreement does not automatically mean the HPA run is wrong. It may simply indicate that the question has moved beyond the regime where an asymptotic interpolation is the most informative representation.
+
+## Benchmark and reference comparisons
+
+HPA is an approximation family, not an exact boundary-value solution, so the most transparent comparison is against the weakly scattering benchmark curves summarized by Jech et al. (2015). The table below uses the corresponding sphere, prolate-spheroid, and cylinder target definitions and shows how the current HPA implementations compare with those benchmark series. Elapsed times are representative values from the current machine.
+
+| Case | Max abs. delta TS (dB) | Mean abs. delta TS (dB) | Elapsed (s) |
+|:--|--:|--:|--:|
+| Johnson (1977; 1978) sphere | 42.20232 | 6.34274 | 0.00 |
+| Stanton (1989) sphere | 35.46445 | 5.48942 | 0.01 |
+| Stanton (1989) prolate spheroid | 46.13636 | 5.57418 | 0.01 |
+| Stanton (1989) cylinder | 46.97943 | 5.65639 | 0.00 |
+
+Those numbers make the role of HPA very clear. It is extremely fast, but it is not a mode-by-mode benchmark reproducer. Its value is in reproducing broad asymptotic trend and scale, not in matching the exact benchmark null structure or narrow resonant detail of the benchmark curves summarized by Jech et al. (2015).
+
+The other documented HPA arguments, `deviation_fun` and `null_fun`, are empirical fitting controls rather than canonical benchmark switches. Johnson (1977; 1978), Stanton (1989), and Jech et al. (2015) do not prescribe a single authoritative benchmark parameterization for those functions, so this implementation page keeps them at their neutral value of `1` when reporting benchmark deltas. That leaves `method` and target geometry as the defensible comparison dimensions for validation.
+
+If those arguments are explored at all, the cleanest workflow is to treat that as a separate sensitivity or calibration exercise after the neutral benchmark comparison has already been reported. In other words, first ask whether the base asymptotic formula behaves sensibly with `deviation_fun = 1` and `null_fun = 1`; only then ask whether a user-specified empirical adjustment improves agreement with a particular measured dataset.
+
+As a separate implementation sanity check, the `acousticTS` HPA paths were compared against the literal Johnson (1977; 1978) and Stanton (1989) algebra over `12-400 kHz` in `2 kHz` steps using the same weakly scattering sphere, prolate spheroid, and cylinder definitions. Those direct algebra checks were effectively exact for practical purposes, with maximum absolute differences of `2.98e-13 dB` for the Johnson sphere, `4.69e-13 dB` for the Stanton sphere, `1.28e-13 dB` for the Stanton prolate spheroid, and `8.53e-14 dB` for the Stanton cylinder. The local `echoSMs::HPModel` fluid-filled sphere path also matched the Stanton sphere check on the same order, but its current fluid-filled prolate-spheroid and cylinder branches error before returning a spectrum, so the direct published-formula comparison is the cleaner elongated-shape sanity check in the present repository state.
+
+## References
+
+Johnson, R. K. (1977). Sound scattering from a fluid sphere revisited. *The Journal of the Acoustical Society of America*, 61, 375-377.
+
+Johnson, R. K. (1978). Sound scattering from a fluid sphere: intermediate frequencies. *The Journal of the Acoustical Society of America*, 64, 1498-1505.
+
+Jech, J. M., Horne, J. K., Chu, D., Demer, D. A., Francis, D. T. I., Gorska, N., Jones, B., Lavery, A. C., Stanton, T. K., and Reeder, D. B. (2015). Comparisons among ten models of acoustic backscattering used in aquatic ecosystem research. *The Journal of the Acoustical Society of America*, 138, 3742-3764.
+
+Stanton, T. K. (1989). Simple approximate formulas for backscattering of sound by spherical and elongated objects. *The Journal of the Acoustical Society of America*, 86, 1499-1510.
+

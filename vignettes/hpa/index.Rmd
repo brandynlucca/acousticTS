@@ -1,0 +1,27 @@
+---
+title: "HPA"
+output:
+  rmarkdown::html_vignette:
+    toc: false
+    number_sections: false
+    fig_caption: yes
+vignette: >
+  %\VignetteIndexEntry{HPA}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+# Overview
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  status = c("benchmarked"),
+  pages = c(
+    Overview = "index.html",
+    Implementation = "hpa-implementation.html",
+    Theory = "hpa-theory.html"
+  )
+)
+```
+
+
+

@@ -1,5 +1,5 @@
 ---
-title: "Theory"
+title: "Distorted wave Born approximation (DWBA) theory"
 output:
   rmarkdown::html_vignette:
     toc: true
@@ -16,6 +16,17 @@ vignette: >
 ---
 
 # Introduction
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  status = c("benchmarked", "validated"),
+  pages = c(
+    Overview = "index.html",
+    Implementation = "dwba-implementation.html",
+    Theory = "dwba-theory.html"
+  )
+)
+```
 
 The distorted wave Born approximation (DWBA) is a first-order scattering model for weakly scattering fluid-like bodies. It is most useful when the material contrasts are small enough that the total acoustic field inside the body remains close to the incident field, but the geometry is sufficiently extended that phase accumulation along the body cannot be ignored[^1][^2]. In that regime, a purely local approximation is too crude, while a full boundary-value solution is often unnecessary or unavailable.
 
@@ -448,3 +459,4 @@ These assumptions explain both the strength and the limitations of the DWBA. It 
 [^1]: Morse, P. M., and Ingard, K. U. (1968). *Theoretical Acoustics*. Princeton University Press.
 
 [^2]: Stanton, T. K., Chu, D., and Wiebe, P. H. (1998). Sound scattering by several zooplankton groups. II. Scattering models. *The Journal of the Acoustical Society of America*, 103, 236-253.
+

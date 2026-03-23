@@ -1,0 +1,131 @@
+---
+title: "Model library"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: true
+    fig_caption: yes
+vignette: >
+  %\VignetteIndexEntry{Model library}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# Introduction
+
+The package now contains enough model families that the site works better when the model pages are treated as a library rather than as a flat list in the top navigation. This page is the main entry point for that library.
+
+## Model-status policy
+
+Status tags are used conservatively and intentionally:
+
+- <span class="model-tag established">Benchmarked</span> means the family has a documented comparison against a canonical benchmark ladder or published benchmark values.
+- <span class="model-tag validated">Validated</span> means the family has a documented comparison against at least one external implementation or software package.
+- <span class="model-tag experimental">Experimental</span> means the family is available to use, but its interface and implementation details should still be treated as more provisional than the older established families.
+- <span class="model-tag unvalidated">Unvalidated</span> means the package site does not yet document either a benchmark comparison or an external implementation comparison for that family.
+
+These statuses are not all mutually exclusive:
+
+- `Benchmarked` and `Validated` are evidence tags and can appear together.
+- `Experimental` is a lifecycle tag and can coexist with either evidence tag.
+- `Unvalidated` is reserved for families lacking both evidence tags, so it should not be combined with `Benchmarked` or `Validated`.
+
+# Modal-series families
+
+## [SPHMS](../sphms/index.html)
+
+<span class="model-tag established">Benchmarked</span>
+
+Spherical modal-series solution for canonical spherical targets.
+
+## [FCMS](../fcms/index.html)
+
+<span class="model-tag established">Benchmarked</span>
+
+Finite-cylinder modal-series solution for straight cylindrical targets.
+
+## [PSMS](../psms/index.html)
+
+<span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span>
+
+Prolate-spheroidal modal-series solution for smooth elongated canonical bodies.
+
+## [SOEMS](../calibration/index.html)
+
+<span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span>
+
+Solid elastic spherical model used mainly for calibration spheres.
+
+## [ESSMS](../essms/index.html)
+
+<span class="model-tag unvalidated">Unvalidated</span>
+
+Elastic-shelled spherical family for layered shell targets.
+
+## [BCMS](../bcms/index.html)
+
+<span class="model-tag experimental">Experimental</span> <span class="model-tag unvalidated">Unvalidated</span>
+
+Bent-cylinder modal-series family for straight and uniformly bent cylinders.
+
+## [ECMS](../ecms/index.html)
+
+<span class="model-tag experimental">Experimental</span> <span class="model-tag unvalidated">Unvalidated</span>
+
+Elastic-cylinder modal-series family for fully elastic solid cylinders.
+
+# Approximation and ray-based families
+
+## [DWBA](../dwba/index.html)
+
+<span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span>
+
+Weak-scattering elongated-body approximation for fluid-like targets.
+
+## [SDWBA](../sdwba/index.html)
+
+<span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span>
+
+Stochastic DWBA family for unresolved phase variability.
+
+## [KRM](../krm/index.html)
+
+<span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span>
+
+Kirchhoff-ray mode model for segmented fish-like body-plus-inclusion targets.
+
+## [HPA](../hpa/index.html)
+
+<span class="model-tag established">Benchmarked</span>
+
+High-pass approximation for compact asymptotic screening.
+
+## [TRCM](../trcm/index.html)
+
+<span class="model-tag established">Benchmarked</span>
+
+Two-ray cylindrical family for high-frequency locally cylindrical targets.
+
+## [PCDWBA](../pcdwba/index.html)
+
+<span class="model-tag experimental">Experimental</span> <span class="model-tag validated">Validated</span>
+
+Phase-compensated DWBA for bent weakly scattering targets.
+
+# Composite and emerging families
+
+## [BBFM](../bbfm/index.html)
+
+<span class="model-tag experimental">Experimental</span> <span class="model-tag unvalidated">Unvalidated</span>
+
+Composite flesh-plus-backbone family for swimbladder-less fish-like targets.
+
+## [VESM](../vesm/index.html)
+
+<span class="model-tag experimental">Experimental</span> <span class="model-tag validated">Validated</span>
+
+Viscous-elastic layered-sphere family for gas-core, shell, and viscous-layer targets.
+
+# How to use this page
+
+Each family page is intended to be the local navigation hub for that model family. Use the family page to move between overview, theory, implementation, and related package pages, rather than relying on a long global theory or implementation menu.

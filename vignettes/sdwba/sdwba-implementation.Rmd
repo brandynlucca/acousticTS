@@ -1,5 +1,5 @@
 ---
-title: "Implementation"
+title: "SDWBA implementation"
 output:
   rmarkdown::html_vignette:
     toc: true
@@ -16,6 +16,17 @@ vignette: >
 ---
 
 # acousticTS implementation
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  status = c("benchmarked", "validated"),
+  pages = c(
+    Overview = "index.html",
+    Implementation = "sdwba-implementation.html",
+    Theory = "sdwba-theory.html"
+  )
+)
+```
 
 The `acousticTS` package uses object-based scatterers so the same implementation pattern carries across models: create a scatterer, run `target_strength()`, inspect the stored model output, and then compare a small set of physically important inputs. For SDWBA, the required object class is still `FLS`, but `target_strength()` also receives stochastic controls for phase variability and resampling.
 
@@ -167,3 +178,47 @@ For practical SDWBA work, the first controls to revisit are usually:
 2. `n_iterations`, because too few realizations can leave the ensemble average noisy,
 3. `n_segments_init`, `length_init`, and `frequency_init`, because together they define the scale-invariant reference for segmentation and phase variability, and
 4. the underlying `FLS` geometry itself, because the stochastic phase model does not compensate for a poorly chosen deterministic target description.
+
+## Published reference comparisons
+
+SDWBA should be judged against the exact modal-series `Benchmark` column in the Jech weakly scattering sphere, prolate-spheroid, and cylinder files. The table below reports that direct comparison together with the representative runtime on the current machine.
+
+| Geometry | Max abs. delta vs benchmark (dB) | Mean abs. delta vs benchmark (dB) | Elapsed (s) |
+|:--|--:|--:|--:|
+| Weakly scattering sphere | 10.08475 | 0.35609 | 0.72 |
+| Weakly scattering prolate spheroid | 2.05918 | 0.07638 | 3.58 |
+| Weakly scattering cylinder | 2.07406 | 0.15895 | 1.91 |
+
+These runs use the same stochastic reference values throughout the benchmark set: `N0 = 50`, `phase_sd_init = sqrt(2) / 32`, `L0 = 38.35 mm`, `f0 = 120 kHz`, and `n_iterations = 100`.
+
+For SDWBA, the most important additional implementation control is `n_iterations`, because it determines how well the stochastic ensemble average is actually resolved numerically. The table below keeps the same Jech targets and changes only `n_iterations`.
+
+| Geometry | `n_iterations` | Max abs. delta vs benchmark (dB) | Mean abs. delta vs benchmark (dB) | Elapsed (s) |
+|:--|--:|--:|--:|--:|
+| Weakly scattering sphere | 25 | 9.30458 | 0.34871 | 0.58 |
+| Weakly scattering sphere | 100 | 10.08475 | 0.35609 | 0.63 |
+| Weakly scattering sphere | 500 | 9.97080 | 0.35343 | 1.11 |
+| Weakly scattering prolate spheroid | 25 | 1.26004 | 0.06948 | 3.08 |
+| Weakly scattering prolate spheroid | 100 | 2.05918 | 0.07638 | 3.63 |
+| Weakly scattering prolate spheroid | 500 | 1.28403 | 0.07107 | 6.50 |
+| Weakly scattering cylinder | 25 | 2.07406 | 0.15899 | 1.75 |
+| Weakly scattering cylinder | 100 | 2.07406 | 0.15895 | 2.03 |
+| Weakly scattering cylinder | 500 | 2.07403 | 0.15895 | 3.39 |
+
+That sensitivity table is useful because it shows two things at once. First, the runtime cost does scale with the number of stochastic realizations, just as the implementation description says it should. Second, once the reference stochastic parameters are fixed, simply driving `n_iterations` upward does not force SDWBA onto the exact benchmark family. It mainly stabilizes the ensemble average around the stochastic approximation itself.
+
+## Bundled krill implementation comparison
+
+The bundled `krill` object serves a different role from the canonical weakly scattering targets above. Here the goal is not to compare against an exact modal-series solution, but to compare the same stored krill geometry across four SDWBA implementations using a common frequency grid, a common broadside incidence, and the same stochastic reference values used for the benchmark calculations (`N0 = 50`, `phase_sd_init = sqrt(2) / 32`, `L0 = 38.35 mm`, `f0 = 120 kHz`, `n_iterations = 100`).
+
+| Comparison | Mean abs. delta TS (dB) | Max abs. delta TS (dB) |
+|:--|--:|--:|
+| `acousticTS` vs `echoSMs` | 1.70257 | 30.63630 |
+| `acousticTS` vs CCAMLR MATLAB | 0.06978 | 0.18270 |
+| `acousticTS` vs NOAA HTML | 0.06158 | 0.52846 |
+| `echoSMs` vs CCAMLR MATLAB | 1.74808 | 30.72119 |
+| `echoSMs` vs NOAA HTML | 1.69189 | 30.27117 |
+| CCAMLR MATLAB vs NOAA HTML | 0.13036 | 0.65798 |
+
+Those values should be read as implementation differences rather than benchmark errors. All four calculations use the same bundled krill dimensions and the same initial stochastic reference values, but they do not use the same stochastic convention. In the current external implementations, both the CCAMLR MATLAB code and the NOAA HTML code square the phase term in the stochastic multiplier, while `acousticTS` keeps the paper-style linear phase standard deviation and `echoSMs` follows its own direct stochastic-phase application. So the bundled krill comparison is complementary to the canonical tables above: one set checks the stochastic model against published weakly scattering reference cases, and the other checks how the same biological krill geometry separates across existing SDWBA implementations.
+

@@ -1,0 +1,24 @@
+---
+title: "ESSMS"
+output:
+  rmarkdown::html_vignette:
+    toc: false
+    number_sections: false
+    fig_caption: yes
+vignette: >
+  %\VignetteIndexEntry{ESSMS}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+# Overview
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  status = c("unvalidated"),
+  pages = c(
+    Implementation = "essms-implementation.html",
+    Theory = "essms-theory.html"
+  )
+)
+```
+
+

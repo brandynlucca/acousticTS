@@ -1,5 +1,5 @@
 ---
-title: "Theory"
+title: "Two-ray cylinder model (TRCM) theory"
 output:
   rmarkdown::html_vignette:
     toc: true
@@ -16,6 +16,17 @@ vignette: >
 ---
 
 # Introduction
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  status = c("benchmarked"),
+  pages = c(
+    Overview = "index.html",
+    Implementation = "trcm-implementation.html",
+    Theory = "trcm-theory.html"
+  )
+)
+```
 
 The two-ray cylinder model (TRCM) is a high-frequency approximation for elongated fluid-like bodies. It assumes that the dominant backscatter from a locally cylindrical body is produced by two coherent contributions: a prompt reflection from the near interface and a second contribution that enters the body, traverses the diameter, reflects from the far interface, and returns with additional phase.[^1][^2][^3] The model is therefore asymptotic from the outset. It does not attempt to represent low-order resonances or a full internal reverberation series. Instead, it keeps only the first two physically important specular paths and asks how they interfere.
 
@@ -312,7 +323,7 @@ When the bent-body phase oscillates rapidly, a common asymptotic replacement for
 $$
 	L_{ebc}
 	\approx
-	\sqrt{\frac{\rho_c L \lambda}{2}}
+	\sqrt{\frac{\rho_c \lambda}{2}}
 	e^{i \pi / 4},
 $$
 
@@ -324,7 +335,7 @@ $$
 	\mathcal{f}_\text{bs}^{(curved,\,sp)}
 	\approx
 	\frac{1}{L}
-	\sqrt{\frac{\rho_c L \lambda}{2}}
+	\sqrt{\frac{\rho_c \lambda}{2}}
 	e^{i \pi / 4}
 	\mathcal{f}_\text{bs}^{(straight)} \Big|_{\hat{\theta} = 0}.
 $$
@@ -348,3 +359,4 @@ Under these assumptions the TRCM captures the main oscillatory structure associa
 [^2]: Stanton, T. K., Chu, D., Wiebe, P. H., Martin, L. V., and Eastwood, R. L. (1998). Sound scattering by several zooplankton groups. I. Experimental determination of dominant scattering mechanisms. *The Journal of the Acoustical Society of America*, 103, 225-235.
 
 [^3]: Stanton, T. K., Chu, D., and Wiebe, P. H. (1998). Sound scattering by several zooplankton groups. II. Scattering models. *The Journal of the Acoustical Society of America*, 103, 236-253.
+
