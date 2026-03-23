@@ -109,6 +109,37 @@ test_that("simulate_ts function works with single sets of parameters", {
   expect_false(all(result_curved$DWBA_curved$TS == reference_df$TS))
 })
 
+test_that("simulate_ts accepts model names case-insensitively", {
+
+  data(krill)
+  frequency <- c(38e3, 120e3)
+  parameters <- list(length = 20e-3)
+
+  result_upper <- simulate_ts(
+    object = krill,
+    frequency = frequency,
+    model = "DWBA",
+    n_realizations = 1,
+    parameters = parameters,
+    parallel = FALSE,
+    verbose = FALSE
+  )
+
+  result_lower <- simulate_ts(
+    object = krill,
+    frequency = frequency,
+    model = "dwba",
+    n_realizations = 1,
+    parameters = parameters,
+    parallel = FALSE,
+    verbose = FALSE
+  )
+
+  expect_true("DWBA" %in% names(result_upper))
+  expect_true("DWBA" %in% names(result_lower))
+  expect_equal(result_upper$DWBA$TS, result_lower$DWBA$TS)
+})
+
 test_that("simulate_ts works with batch_by parameter", {
 
   # Test batching with different parameter values
@@ -373,6 +404,46 @@ test_that("simulate_ts works with parallel processing", {
   # Ensure that values are not duplicated
   expect_true(length(unique(gen_df$TS)) == 2)
   expect_true(all(gen_df$TS != sequential_df$TS))
+})
+
+test_that("simulate_ts works with PSOCK clusters when n_cores > 1", {
+  skip_on_cran()
+
+  data(krill)
+  frequency <- c(38e3, 70e3)
+
+  parameters <- list(
+    length = 20e-3,
+    theta = function() {
+      set.seed(999)
+      runif(1, min = 0, max = pi)
+    }
+  )
+
+  result_parallel <- simulate_ts(
+    object = krill,
+    frequency = frequency,
+    model = "dwba",
+    n_realizations = 4,
+    parameters = parameters,
+    parallel = TRUE,
+    n_cores = 2,
+    verbose = FALSE
+  )
+
+  result_sequential <- simulate_ts(
+    object = krill,
+    frequency = frequency,
+    model = "DWBA",
+    n_realizations = 4,
+    parameters = parameters,
+    parallel = FALSE,
+    verbose = FALSE
+  )
+
+  expect_true("DWBA" %in% names(result_parallel))
+  expect_true("DWBA" %in% names(result_sequential))
+  expect_equal(result_parallel$DWBA$TS, result_sequential$DWBA$TS)
 })
 
 test_that("Simulation errors are raised as expected", {

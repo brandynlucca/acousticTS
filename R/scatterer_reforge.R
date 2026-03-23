@@ -18,6 +18,145 @@ setGeneric(
   }
 )
 
+#' Resolve scaling vector from direct scale or target dimensions
+#' @param scale Optional direct scaling input.
+#' @param target Optional named target-dimension input.
+#' @param dims Named vector of current component dimensions.
+#' @keywords internal
+#' @noRd
+.reforge_scale_vector <- function(scale = NULL, target = NULL, dims) {
+  if (is.null(target)) {
+    return(list(suffix = "_scale", scale = scale))
+  }
+
+  out <- c()
+  for (nm in names(target)) {
+    out[nm] <- target[nm] / dims[nm]
+  }
+
+  list(suffix = "_target", scale = out)
+}
+
+#' Derive length/width/height from a row-major component position matrix
+#' @param rpos Row-major position matrix.
+#' @param length Optional externally supplied length override.
+#' @keywords internal
+#' @noRd
+.reforge_component_dimensions <- function(rpos, length = NULL) {
+  c(
+    length = if (!is.null(length)) {
+      length
+    } else {
+      .shape_length(position_matrix = rpos, row_major = TRUE)
+    },
+    width = max(rpos[2, ], na.rm = TRUE),
+    height = max(
+      .shape_height_profile(position_matrix = rpos, row_major = TRUE),
+      na.rm = TRUE
+    )
+  )
+}
+
+#' Apply named axis scalings to a row-major component position matrix
+#' @param rpos Row-major position matrix.
+#' @param scales Named vector with length/width/height multipliers.
+#' @keywords internal
+#' @noRd
+.reforge_apply_axis_scaling <- function(rpos, scales) {
+  if (is.null(scales)) {
+    return(rpos)
+  }
+
+  if (scales["length"] != 1) {
+    anchor <- rpos[1, 1]
+    rpos[1, ] <- anchor + (rpos[1, ] - anchor) * scales["length"]
+  }
+
+  if (nrow(rpos) >= 2 && scales["width"] != 1) {
+    rpos[2, ] <- rpos[2, ] * scales["width"]
+  }
+
+  if (nrow(rpos) >= 3 && scales["height"] != 1) {
+    rpos[3, ] <- rpos[3, ] * scales["height"]
+    if (nrow(rpos) >= 4) {
+      rpos[4, ] <- rpos[4, ] * scales["height"]
+    }
+  }
+
+  rpos
+}
+
+#' Resample a row-major component position matrix to a new point count
+#' @param rpos Row-major position matrix.
+#' @param n_points Target number of points.
+#' @keywords internal
+#' @noRd
+.reforge_resample_rows <- function(rpos, n_points) {
+  if (is.null(n_points)) {
+    return(rpos)
+  }
+
+  .resample_rpos_rows(rpos, as.integer(n_points))
+}
+
+#' Express an internal component start position relative to its parent length
+#' @param component_rpos Row-major internal-component position matrix.
+#' @param parent_rpos Row-major parent-component position matrix.
+#' @keywords internal
+#' @noRd
+.reforge_relative_start <- function(component_rpos, parent_rpos) {
+  parent_x <- .shape_x(parent_rpos, row_major = TRUE)
+  (component_rpos[1, 1] - min(parent_x, na.rm = TRUE)) /
+    .shape_length(position_matrix = parent_rpos, row_major = TRUE)
+}
+
+#' Reposition an internal component to preserve its relative body start
+#' @param component_rpos Row-major internal-component position matrix.
+#' @param relative_start Relative start position along the parent length.
+#' @param parent_rpos Row-major parent-component position matrix.
+#' @keywords internal
+#' @noRd
+.reforge_shift_to_relative_start <- function(component_rpos,
+                                             relative_start,
+                                             parent_rpos) {
+  parent_x <- .shape_x(parent_rpos, row_major = TRUE)
+  new_start <- min(parent_x, na.rm = TRUE) +
+    relative_start * .shape_length(position_matrix = parent_rpos, row_major = TRUE)
+  shift_amount <- new_start - component_rpos[1, 1]
+  component_rpos[1, ] <- component_rpos[1, ] + shift_amount
+  component_rpos
+}
+
+#' Warn if an internal component exceeds its containing body bounds
+#' @param rpos_b Row-major body position matrix.
+#' @param rpos_i Row-major internal-component position matrix.
+#' @keywords internal
+#' @noRd
+.reforge_check_internal_containment <- function(rpos_b, rpos_i) {
+  x_grid <- seq(
+    max(min(rpos_b[1, ]), min(rpos_i[1, ])),
+    min(max(rpos_b[1, ]), max(rpos_i[1, ])),
+    length.out = 200
+  )
+
+  interp <- function(x, y) stats::approx(x, y, xout = x_grid, rule = 2)$y
+
+  body_y <- interp(rpos_b[1, ], rpos_b[2, ])
+  body_zU <- interp(rpos_b[1, ], rpos_b[3, ])
+  body_zL <- interp(rpos_b[1, ], rpos_b[4, ])
+
+  inner_y <- interp(rpos_i[1, ], rpos_i[2, ])
+  inner_zU <- interp(rpos_i[1, ], rpos_i[3, ])
+  inner_zL <- interp(rpos_i[1, ], rpos_i[4, ])
+
+  contained <- (inner_y <= body_y) & (inner_y >= -body_y) &
+    (inner_zU <= body_zU) & (inner_zL >= body_zL)
+
+  if (!all(contained)) {
+    warning("Swimbladder exceeds body bounds at some positions.")
+  }
+}
+
 #' Resizing function for swimbladdered targets
 #' @param object SBF-class object.
 #' @param body_scale Proportional scaling to the body length, width, and height
@@ -87,97 +226,6 @@ setMethod(
       )
     }
     ############################################################################
-    # Helpers ==================================================================
-    get_scale_vector <- function(scale = NULL, target = NULL, dims) {
-      # Return nothing if target is not used
-      if (is.null(target)) {
-        return(
-          list(
-            suffix = "_scale",
-            scale = scale
-          )
-        )
-      }
-
-      # Override with target values if given
-      out <- c()
-      for (nm in names(target)) {
-        out[nm] <- target[nm] / dims[nm]
-      }
-      list(
-        suffix = "_target",
-        scale = out
-      )
-    }
-
-    apply_scaling <- function(rpos, scales, dims) {
-      if (is.null(scales)) {
-        return(rpos)
-      }
-
-      # Scale length from anchor point (preserve relative position)
-      if (scales["length"] != 1) {
-        anchor <- rpos[1, 1]
-        rpos[1, ] <- anchor + (rpos[1, ] - anchor) * scales["length"]
-      }
-
-      # Scale width and height directly
-      if (nrow(rpos) >= 2 && scales["width"] != 1) {
-        rpos[2, ] <- rpos[2, ] * scales["width"]
-      }
-      if (nrow(rpos) >= 3 && scales["height"] != 1) {
-        rpos[3, ] <- rpos[3, ] * scales["height"]
-        if (nrow(rpos) >= 4) rpos[4, ] <- rpos[4, ] * scales["height"]
-      }
-
-      rpos
-    }
-
-    interpolate_segments <- function(rpos, n_segments) {
-      if (is.null(n_segments)) {
-        return(rpos)
-      }
-
-      x_new <- seq(rpos[1, 1], rpos[1, ncol(rpos)], length.out = n_segments)
-      rpos_new <- rbind(
-        x_new,
-        t(vapply(2:nrow(rpos), function(i) {
-          stats::approx(x = rpos[1, ], y = rpos[i, ], xout = x_new)$y
-        }, FUN.VALUE = numeric(length(x_new))))
-      )
-      rpos_new
-    }
-
-    check_swimbladder_containment <- function(rpos_b, rpos_sb) {
-      # rpos_b: body rpos matrix
-      # rpos_sb: swimbladder rpos matrix
-
-      # Define a common x grid over the overlap of body and bladder
-      x_grid <- seq(
-        max(min(rpos_b[1, ]), min(rpos_sb[1, ])),
-        min(max(rpos_b[1, ]), max(rpos_sb[1, ])),
-        length.out = 200
-      )
-
-      interp <- function(x, y) stats::approx(x, y, xout = x_grid, rule = 2)$y
-
-      body_y <- interp(rpos_b[1, ], rpos_b[2, ])
-      body_zU <- interp(rpos_b[1, ], rpos_b[3, ])
-      body_zL <- interp(rpos_b[1, ], rpos_b[4, ])
-
-      bladder_y <- interp(rpos_sb[1, ], rpos_sb[2, ])
-      bladder_zU <- interp(rpos_sb[1, ], rpos_sb[3, ])
-      bladder_zL <- interp(rpos_sb[1, ], rpos_sb[4, ])
-
-      # Check: width (y) and height (z) containment at each x
-      contained <- (bladder_y <= body_y) & (bladder_y >= -body_y) &
-        (bladder_zU <= body_zU) & (bladder_zL >= body_zL)
-
-      if (!all(contained)) {
-        warning("Swimbladder exceeds body bounds at some positions.")
-      }
-    }
-    ############################################################################
     # Extract components =======================================================
     body <- acousticTS::extract(object, "body")
     bladder <- acousticTS::extract(object, "bladder")
@@ -186,25 +234,18 @@ setMethod(
     rpos_sb <- bladder$rpos
     ############################################################################
     # Calculate current dimensions =============================================
-    body_height <- max(rpos_b[3, ] - rpos_b[4, ])
-    body_dims <- c(
-      length = shape$body$length,
-      width = max(rpos_b[2, ]),
-      height = body_height
+    body_dims <- .reforge_component_dimensions(
+      rpos_b,
+      length = shape$body$length
     )
-    bladder_height <- max(rpos_sb[3, ] - rpos_sb[4, ])
-    bladder_dims <- c(
-      length = ifelse(is.null(shape$bladder$length),
-        max(rpos_sb[1, ]) - min(rpos_sb[1, ]),
-        shape$bladder$length
-      ),
-      width = max(rpos_sb[2, ]),
-      height = bladder_height
+    bladder_dims <- .reforge_component_dimensions(
+      rpos_sb,
+      length = shape$bladder$length %||%
+        .shape_length(position_matrix = rpos_sb, row_major = TRUE)
     )
     ############################################################################
     # Calculate swimbladder origin relative to body position ===================
-    original_body_length <- shape$body$length
-    bladder_relative_start <- bladder$rpos[1, 1] / original_body_length
+    bladder_relative_start <- .reforge_relative_start(rpos_sb, rpos_b)
     ############################################################################
     # Process target parameters ================================================
     # body_target <- validate_target(body_target, "body_target")
@@ -213,13 +254,13 @@ setMethod(
       "body_target",
       c("length", "width", "height")
     )
-    body_scale_lst <- get_scale_vector(body_scale, body_target, body_dims)
+    body_scale_lst <- .reforge_scale_vector(body_scale, body_target, body_dims)
     swimbladder_target <- .validate_dimensions_target(
       swimbladder_target,
       "swimbladder_target",
       c("length", "width", "height")
     )
-    swimbladder_scale_lst <- get_scale_vector(
+    swimbladder_scale_lst <- .reforge_scale_vector(
       swimbladder_scale,
       swimbladder_target,
       bladder_dims
@@ -251,22 +292,20 @@ setMethod(
     }
     ############################################################################
     # Interpolate segments first (before scaling)  =============================
-    rpos_b <- interpolate_segments(rpos_b, n_segments_body)
-    rpos_sb <- interpolate_segments(rpos_sb, n_segments_swimbladder)
+    rpos_b <- .reforge_resample_rows(rpos_b, n_segments_body)
+    rpos_sb <- .reforge_resample_rows(rpos_sb, n_segments_swimbladder)
     ############################################################################
     # Apply scaling ============================================================
-    rpos_b <- apply_scaling(rpos_b, body_scales, body_dims)
-    rpos_sb <- apply_scaling(rpos_sb, bladder_scales, bladder_dims)
+    rpos_b <- .reforge_apply_axis_scaling(rpos_b, body_scales)
+    rpos_sb <- .reforge_apply_axis_scaling(rpos_sb, bladder_scales)
     ############################################################################
     # Adjust swimbladder position within scaled body if needed =================
     if (!is.null(body_scales) && body_scales["length"] != 1) {
-      new_body_length <- max(rpos_b[1, ])
-      new_bladder_start <- bladder_relative_start * new_body_length
-
-      # Shift entire bladder to new relative position
-      current_bladder_start <- rpos_sb[1, 1]
-      shift_amount <- new_bladder_start - current_bladder_start
-      rpos_sb[1, ] <- rpos_sb[1, ] + shift_amount
+      rpos_sb <- .reforge_shift_to_relative_start(
+        rpos_sb,
+        bladder_relative_start,
+        rpos_b
+      )
     }
     ############################################################################
     # Apply bladder inflation factor ===========================================
@@ -286,15 +325,19 @@ setMethod(
     }
     ############################################################################
     # Validate swimbladder containment =========================================
-    check_swimbladder_containment(rpos_b, rpos_sb)
+    .reforge_check_internal_containment(rpos_b, rpos_sb)
     ############################################################################
     # Update object ============================================================
     methods::slot(object, "body")$rpos <- rpos_b
     methods::slot(object, "bladder")$rpos <- rpos_sb
-    methods::slot(object, "shape_parameters")$body$length <- max(rpos_b[1, ]) -
-      min(rpos_b[1, ])
-    methods::slot(object, "shape_parameters")$bladder$length <-
-      max(rpos_sb[1, ]) - min(rpos_sb[1, ])
+    methods::slot(object, "shape_parameters")$body$length <- .shape_length(
+      position_matrix = rpos_b,
+      row_major = TRUE
+    )
+    methods::slot(object, "shape_parameters")$bladder$length <- .shape_length(
+      position_matrix = rpos_sb,
+      row_major = TRUE
+    )
     methods::slot(object, "shape_parameters")$body$n_segments <- ncol(rpos_b)
     methods::slot(object, "shape_parameters")$bladder$n_segments <-
       ncol(rpos_sb)
@@ -537,7 +580,7 @@ setMethod(
     if (!is.null(radius_target)) scale <- radius_target / curr_shell_max_r
     ############################################################################
     # Resample segments first ==================================================
-    # .resample_rpos() is defined in utilities.R
+    # .resample_rpos() is defined in utilities-geometry.R
     if (!is.null(n_segments)) {
       n_new      <- as.integer(n_segments) + 1L
       rpos_shell <- .resample_rpos(rpos_shell, n_new)
@@ -632,7 +675,7 @@ setMethod(
     radii <- body$radius
     ############################################################################
     # Resample to new segment count ============================================
-    # .resample_rpos_rows() is defined in utilities.R
+    # .resample_rpos_rows() is defined in utilities-geometry.R
     if (!is.null(n_segments)) {
       n_new  <- as.integer(n_segments) + 1L
       x_new  <- seq(rpos[1, 1], rpos[1, ncol(rpos)], length.out = n_new)
@@ -664,7 +707,7 @@ setMethod(
         rpos[1L, ] <- rpos[1L, ] * new_scale
       }
       methods::slot(object, "shape_parameters")$length <-
-        rpos[1L, ncol(rpos)] - rpos[1L, 1L]
+        abs(diff(range(rpos[1L, ])))
     }
     ############################################################################
     # Rescale radius (standalone — only when length was not specified) =========

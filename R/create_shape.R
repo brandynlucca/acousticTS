@@ -156,24 +156,20 @@ sphere <- function(radius_body,
                    diameter_units = "m") {
   # Define semi-major or x-axis ================================================
   diameter <- radius_body * 2
-  semi_major <- seq(
+  x_nodes <- seq(
     from = 0,
     to = diameter,
     length.out = n_segments + 1
   )
   # Along-semimajor radii ======================================================
-  along_radius <- sqrt(radius_body * radius_body -
-                         (semi_major - radius_body) *
-                         (semi_major - radius_body))
-  # Apply to the radii =========================================================
-  radius_output <- (utils::head(along_radius, -1) +
-                      utils::tail(along_radius, -1)) / 2
-  # Assign "zeroth" radius =====================================================
-  if (which.max(semi_major) == length(semi_major)) {
-    x_edges <- rev(semi_major)
-    radius_output <- rev(radius_output)
-    }
-  radius_output <- c(0.0, radius_output)
+  radius_output <- sqrt(pmax(
+    radius_body * radius_body -
+      (x_nodes - radius_body) * (x_nodes - radius_body),
+    0
+  ))
+  # Maintain the historical trailing-to-leading x ordering =====================
+  x_edges <- rev(x_nodes)
+  radius_output <- rev(radius_output)
   # Generate position matrix ===================================================
   position_matrix <- cbind(
     x = x_edges,
@@ -249,36 +245,29 @@ prolate_spheroid <- function(length_body = NULL,
     radius_val, length_val, length_radius_ratio
   )
   # Define semi-major or x-axis ================================================
-  x_edges <- seq(0, length_val, length.out = n_segments + 1)
-  # Get the segment midpoints ==================================================
-  x_mids <- (utils::head(x_edges, -1) + utils::tail(x_edges, -1)) / 2
-  # Normalize the midpoints for ellipse ========================================
-  curved_x_mids <- (x_mids - length_val / 2) / (length_val / 2)
-  # Compute the radius at each segment midpoint ================================
-  radius_output <- max_radius * sqrt(1 - curved_x_mids^2)
-  max_idx <- which.max(radius_output)
-  radius_output[max_idx] <- max_radius
-  # Assign "zeroth" radius =====================================================
-  if (which.max(x_edges) == length(x_edges)) {
-    x_edges <- rev(x_edges)
-    radius_output <- rev(radius_output)
-  }
-  radius_output <- c(0.0, radius_output)
+  x_nodes <- seq(0, length_val, length.out = n_segments + 1)
+  # Normalize the node positions for ellipse ==================================
+  curved_x_nodes <- (x_nodes - length_val / 2) / (length_val / 2)
+  # Compute the radius at each node ============================================
+  radius_output <- max_radius * sqrt(pmax(1 - curved_x_nodes^2, 0))
+  # Maintain the historical trailing-to-leading x ordering =====================
+  x_edges <- rev(x_nodes)
+  radius_output <- rev(radius_output)
   # Generate position matrix ===================================================
   position_matrix <- cbind(
     x = x_edges,
     y = rep(0, length(x_edges)),
     z = rep(0, length(x_edges)),
     zU = radius_output,
-    zL = -rev(radius_output)
+    zL = -radius_output
   )
   # Generate shape parameters list =============================================
   shape_parameters <- list(
     length = max(position_matrix[, 1]),
     radius = radius_output,
     semimajor_length = max(position_matrix[, 1]) / 2,
-    semiminor_length = max(radius_output),
-    length_radius_ratio = max(position_matrix[, 1]) / max(radius_output),
+    semiminor_length = max_radius,
+    length_radius_ratio = max(position_matrix[, 1]) / max_radius,
     n_segments = n_segments,
     length_units = length_units
   )
@@ -329,22 +318,15 @@ cylinder <- function(length_body,
   x_n_axis <- seq(-1, 1, length.out = n_segments + 1)
   # Define tapered radius vector, if applicable ================================
   if (!is.null(taper)) {
-    tapering <- sqrt(1 - x_n_axis^taper)
+    tapering <- sqrt(pmax(1 - x_n_axis^taper, 0))
   } else {
     tapering <- rep(1, n_segments + 1)
   }
-  radius_tapered <- max_radius * tapering
-  # Segment midpoints ==========================================================
-  x_edges <- x_n_axis * length_body / 2 + length_body / 2
-  # Apply to the radii =========================================================
-  radius_mids <- (utils::head(radius_tapered, -1) +
-                    utils::tail(radius_tapered, -1)) / 2
-  # Assign "zeroth" radius =====================================================
-  if (which.max(x_edges) == length(x_edges)) {
-    x_edges <- rev(x_edges)
-    radius_mids <- rev(radius_mids)
-  }
-  radius_output <- c(0.0, radius_mids)
+  radius_output <- max_radius * tapering
+  x_nodes <- x_n_axis * length_body / 2 + length_body / 2
+  # Maintain the historical trailing-to-leading x ordering =====================
+  x_edges <- rev(x_nodes)
+  radius_output <- rev(radius_output)
   # Generate position matrix ===================================================
   position_matrix <- cbind(
     x = x_edges,
@@ -357,8 +339,7 @@ cylinder <- function(length_body,
   shape_parameters <- list(
     length = max(position_matrix[, 1]),
     radius = radius_output,
-    length_radius_ratio = max(position_matrix[, 1]) /
-      max(radius_output),
+    length_radius_ratio = max(position_matrix[, 1]) / max_radius,
     n_segments = n_segments,
     taper_order = ifelse(is.null(taper),
       NA,

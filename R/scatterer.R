@@ -73,6 +73,9 @@
 #'    }
 #' @section Supported Scatterers:
 #' \itemize{
+#'    \item \code{Elastic-based scatterers} (\link{ELA})
+#'    \item \code{Composite multi-component scatterers} (\link{CSC})
+#'    \item \code{Backboned fish} (\link{BBF})
 #'    \item \code{Calibration spheres} (\link{CAL})
 #'    \item \code{Elastic-shelled scatterers} (\link{ESS})
 #'    \item \code{Fluid-like scatterers} (\link{FLS})
@@ -90,6 +93,66 @@ setClass("Scatterer",
     metadata = "list",
     model_parameters = "list"
   )
+)
+################################################################################
+################################################################################
+# ELASTIC-BASED SCATTERERS
+################################################################################
+################################################################################
+#' Elastic-based scatterer (ELA) object/class.
+#' @description
+#' A shared parent S4 class for elastic-based scatterers. The \code{ELA}-class
+#' collects the slots common to solid elastic targets such as calibration
+#' spheres (\link{CAL}) and elastic-shelled targets (\link{ESS}), without
+#' implying a particular internal structure such as a shell or homogeneous
+#' elastic solid. See \link{Scatterer} for a more detailed description of the
+#' shared object organization.
+#'
+#' @seealso \link{Scatterer}, \link{CAL}, \link{ESS}
+#'
+#' @keywords scatterer_type
+#'
+#' @name ELA
+#' @rdname ELA-class
+#' @export
+ELA <- setClass("ELA",
+  slots = c(
+    model = "list",
+    shape_parameters = "list"
+  ),
+  contains = "Scatterer"
+)
+################################################################################
+################################################################################
+# COMPOSITE MULTI-COMPONENT SCATTERERS
+################################################################################
+################################################################################
+#' Composite scatterer (CSC) object/class.
+#' @description
+#' A shared parent S4 class for composite scatterers that retain a primary body
+#' component together with one or more additional anatomically distinct
+#' sub-components. The \code{CSC}-class is intended to provide modular
+#' scaffolding for multi-component biological targets, such as
+#' swimbladder-bearing fish and swimbladder-less fish represented as flesh plus
+#' backbone. It stores the primary body, a general component list, the shared
+#' model output slot, and shape metadata without implying any one specific
+#' resonant or elastic inclusion type.
+#'
+#' @seealso \link{Scatterer}, \link{SBF}, \link{BBF}
+#'
+#' @keywords scatterer_type
+#'
+#' @name CSC
+#' @rdname CSC-class
+#' @export
+CSC <- setClass("CSC",
+  slots = c(
+    model = "list",
+    body = "list",
+    shape_parameters = "list",
+    components = "list"
+  ),
+  contains = "Scatterer"
 )
 ################################################################################
 ################################################################################
@@ -153,6 +216,30 @@ SBF <- setClass("SBF",
   contains = "GAS"
 )
 ################################################################################
+#' Backboned fish (BBF) object/class.
+#' @description
+#' A S4 class that stores a fluid-like flesh component together with an explicit
+#' elastic backbone component for swimbladder-less fish applications where those
+#' two structures should remain separate. The body and backbone each retain
+#' their own geometry, orientations, and material properties. This class is
+#' intended to support composite flesh-plus-backbone model development and
+#' future extensions where additional internal structures may need to be carried
+#' alongside the body.
+#'
+#' @seealso \link{Scatterer}, \link{CSC}
+#'
+#' @keywords scatterer_type
+#'
+#' @name BBF
+#' @rdname BBF-class
+#' @export
+BBF <- setClass("BBF",
+  slots = c(
+    backbone = "list"
+  ),
+  contains = "CSC"
+)
+################################################################################
 ################################################################################
 # ELASTIC-SHELLED SCATTERERS
 ################################################################################
@@ -163,7 +250,8 @@ SBF <- setClass("SBF",
 #' shelled scatterers/objects belonging to the ESS-class. This object can be
 #' created using values for both an outer shell and internal tissues, if
 #' applicable. The default behavior for this type of this object is to only
-#' reference the outer shell with few exceptions that are model-dependent. See
+#' reference the outer shell with few exceptions that are model-dependent.
+#' \code{ESS} inherits from the broader elastic-based \link{ELA} class. See
 #' \link{Scatterer} for a more detailed description on how this S4 object is
 #' organized.
 #'
@@ -176,14 +264,10 @@ SBF <- setClass("SBF",
 #' @export
 ESS <- setClass("ESS",
   slots = c(
-    metadata = "list",
-    model_parameters = "list",
-    model = "list",
     shell = "list",
-    fluid = "list",
-    shape_parameters = "list"
+    fluid = "list"
   ),
-  contains = "Scatterer"
+  contains = "ELA"
 )
 ################################################################################
 #' Solid and calibration sphere (CAL) object/class.
@@ -192,8 +276,11 @@ ESS <- setClass("ESS",
 #' objects belonging to the CAL-class scatterers. This object is created using
 #' parameters specific to the outer shell. The default behavior of this object
 #' is to only reference these outer elastic shell properties with few
-#' exceptions that are model-dependent. See \link{Scatterer} for a more
-#' detailed description on how this S4 object is organized.
+#' exceptions that are model-dependent. \code{CAL} inherits from the broader
+#' elastic-based \link{ELA} class rather than from \link{ESS}, because
+#' calibration targets are solid elastic bodies rather than elastic shells. See
+#' \link{Scatterer} for a more detailed description on how this S4 object is
+#' organized.
 #'
 #' @seealso \link{Scatterer}
 #'
@@ -204,13 +291,9 @@ ESS <- setClass("ESS",
 #' @export
 CAL <- setClass("CAL",
   slots = c(
-    metadata = "list",
-    model_parameters = "list",
-    model = "list",
-    body = "list",
-    shape_parameters = "list"
+    body = "list"
   ),
-  contains = "ESS"
+  contains = "ELA"
 )
 ################################################################################
 ################################################################################

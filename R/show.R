@@ -9,6 +9,184 @@
   if (is.null(x) || all(is.na(x))) return("NA")
   round(mean(x, na.rm = TRUE), 4)
 }
+# Centralized named-property rendering for show() methods
+.show_property_block <- function(properties,
+                                 label_map = character(),
+                                 unit_map = character(),
+                                 none_text = "   None specified") {
+  if (length(properties) == 0) {
+    return(none_text)
+  }
+
+  prop_strings <- mapply(function(name, value) {
+    clean_name <- if (name %in% names(label_map)) {
+      label_map[[name]]
+    } else {
+      gsub("_", " ", name)
+    }
+    units <- if (name %in% names(unit_map)) unit_map[[name]] else ""
+    paste0(clean_name, ": ", round(value, 4), units)
+  }, names(properties), properties, SIMPLIFY = FALSE)
+
+  paste("   ", prop_strings, collapse = "\n ")
+}
+
+.show_emit <- function(lines) {
+  cat(paste(lines, collapse = "\n"))
+}
+
+.show_section_lines <- function(title, ...) {
+  c(paste0(title, ":"), ...)
+}
+
+.show_header_lines <- function(object, descriptor, meta) {
+  c(
+    paste0(methods::is(object)[[1]], "-object"),
+    paste0(" ", descriptor),
+    paste0(" ID:", meta$ID)
+  )
+}
+
+.show_summary_lines <- function(object, descriptor, meta, ...) {
+  c(
+    .show_header_lines(object, descriptor, meta),
+    ...
+  )
+}
+
+.show_dimension_lines <- function(section_name,
+                                  length_value,
+                                  units,
+                                  n_segments = NULL,
+                                  mean_radius = NULL,
+                                  max_radius = NULL,
+                                  segment_label = "cylinders") {
+  length_line <- paste0(
+    " Length:",
+    round(length_value, 3),
+    " ",
+    units,
+    if (!is.null(n_segments)) {
+      paste0("(n = ", n_segments, " ", segment_label, ")")
+    } else {
+      ""
+    }
+  )
+
+  lines <- c(paste0(section_name, ":"), length_line)
+  if (!is.null(mean_radius)) {
+    lines <- c(lines,
+      paste0(" Mean radius:", round(mean_radius, 4), " ", units)
+    )
+  }
+  if (!is.null(max_radius)) {
+    lines <- c(lines,
+      paste0(" Max radius:", round(max_radius, 4), " ", units)
+    )
+  }
+
+  lines
+}
+
+.show_orientation_line <- function(label, theta, theta_units) {
+  paste0(label, round(theta, 3), " ", theta_units)
+}
+
+.show_density_speed_line <- function(prefix,
+                                     density,
+                                     sound_speed,
+                                     density_units = "kg m^-3",
+                                     sound_speed_units = "m s^-1") {
+  paste0(
+    prefix,
+    " Density: ", .show_mean(density),
+    " ", density_units, " | Sound speed: ", .show_mean(sound_speed),
+    " ", sound_speed_units
+  )
+}
+
+.show_elastic_speed_line <- function(prefix,
+                                     density,
+                                     sound_speed_longitudinal,
+                                     sound_speed_transversal,
+                                     density_units = "kg m^-3",
+                                     speed_units = "m s^-1") {
+  paste0(
+    prefix,
+    " Density: ", .show_mean(density),
+    " ", density_units,
+    " | cL: ", .show_mean(sound_speed_longitudinal),
+    " ", speed_units,
+    " | cT: ", .show_mean(sound_speed_transversal),
+    " ", speed_units
+  )
+}
+
+.show_shape_section <- function(section_name,
+                                shape_meta,
+                                units,
+                                radius_values = NULL,
+                                segment_label = "segments") {
+  mean_radius <- if (!is.null(radius_values)) {
+    mean(radius_values, na.rm = TRUE)
+  } else {
+    NULL
+  }
+  max_radius <- if (!is.null(radius_values)) {
+    max(radius_values, na.rm = TRUE)
+  } else {
+    NULL
+  }
+
+  .show_dimension_lines(
+    section_name = section_name,
+    length_value = shape_meta$length,
+    units = units,
+    n_segments = shape_meta$n_segments,
+    mean_radius = mean_radius,
+    max_radius = max_radius,
+    segment_label = segment_label
+  )
+}
+
+.show_fluid_material_section <- function(section_name,
+                                         density = NULL,
+                                         sound_speed = NULL,
+                                         g = NULL,
+                                         h = NULL) {
+  if ((!is.null(density) && !all(is.na(density))) ||
+      (!is.null(sound_speed) && !all(is.na(sound_speed)))) {
+    return(.show_section_lines(
+      section_name,
+      .show_density_speed_line(
+        prefix = "",
+        density = density,
+        sound_speed = sound_speed
+      )
+    ))
+  }
+
+  .show_section_lines(
+    section_name,
+    paste0(" g: ", .show_mean(g)),
+    paste0(" h: ", .show_mean(h))
+  )
+}
+
+.show_elastic_material_section <- function(section_name,
+                                           density,
+                                           sound_speed_longitudinal,
+                                           sound_speed_transversal) {
+  .show_section_lines(
+    section_name,
+    .show_elastic_speed_line(
+      prefix = "",
+      density = density,
+      sound_speed_longitudinal = sound_speed_longitudinal,
+      sound_speed_transversal = sound_speed_transversal
+    )
+  )
+}
 ################################################################################
 #' Generic function for show(...) for different scatterers.
 #' @param object Scattering object.
@@ -24,6 +202,7 @@ setMethod(
     switch(sc_type,
       FLS = fls_show(object),
       SBF = sbf_show(object),
+      BBF = bbf_show(object),
       CAL = cal_show(object),
       GAS = gas_show(object),
       ESS = ess_show(object)
@@ -35,240 +214,179 @@ setMethod(
 #' @param object FLS-class object.
 #' @export
 fls_show <- function(object) {
-  # Print out informational text ===============================================
-  # Parse metadata =============================================================
-  meta <- acousticTS::extract(
-    object,
-    "metadata"
-  )
-  # Parse shape ================================================================
-  shape <- acousticTS::extract(
-    object,
-    "shape_parameters"
-  )
-  # Parse body =================================================================
-  body <- acousticTS::extract(
-    object,
-    "body"
-  )
-  # Print object summary information ===========================================
-  cat(
-    paste0(methods::is(object)[[1]], "-object"), "\n",
-    " Fluid-like scatterer \n ",
-    " ID:",
-    paste0(meta$ID), "\n",
-    "Body dimensions:\n",
-    " Length:", paste0(
-      round(shape$length, 3),
-      " ",
-      shape$length_units
+  meta <- acousticTS::extract(object, "metadata")
+  shape <- acousticTS::extract(object, "shape_parameters")
+  body <- acousticTS::extract(object, "body")
+  radius_values <- if (!is.null(body$radius) && !all(is.na(body$radius))) {
+    body$radius
+  } else {
+    .shape_radius_profile(body = body, row_major = TRUE, error_context = "FLS body")
+  }
+
+  .show_emit(.show_summary_lines(
+    object, "Fluid-like scatterer ", meta,
+    .show_shape_section(
+      section_name = "Body dimensions",
+      shape_meta = shape,
+      units = shape$length_units,
+      radius_values = radius_values,
+      segment_label = "cylinders"
     ),
-    paste0("(n = ", shape$n_segments, " cylinders)"), "\n",
-    " Mean radius:", paste0(
-      round(mean(body$radius), 4),
-      " ",
-      shape$length_units
-    ), "\n",
-    " Max radius:", paste0(
-      round(max(body$radius), 4),
-      " ",
-      shape$length_units
-    ), "\n",
-    "Shape parameters:\n",
-    " Defined shape:",
-    paste0(shape$shape), "\n",
-    " L/a ratio:",
-    paste0(round(shape$length / shape$radius, 1)), "\n",
-    " Taper order:",
-    paste0(shape$taper_order %||% "N/A"), "\n",
-    "Material properties:\n",
-    paste0(" g: ", .show_mean(body$g)), "\n",
-    paste0(" h: ", .show_mean(body$h)), "\n",
-    "Body orientation (relative to transducer face/axis):",
-    paste0(
-      round(body$theta, 3),
-      " ",
+    "Shape parameters:",
+    paste0(" Defined shape:", shape$shape),
+    paste0(" L/a ratio:", round(shape$length / shape$radius, 1)),
+    paste0(" Taper order:", shape$taper_order %||% "N/A"),
+    .show_fluid_material_section(
+      section_name = "Material properties",
+      density = body$density,
+      sound_speed = body$sound_speed,
+      g = body$g,
+      h = body$h
+    ),
+    .show_orientation_line(
+      "Body orientation (relative to transducer face/axis):",
+      body$theta,
       shape$theta_units
     )
-  )
+  ))
 }
 #' show(...) for GAS_class objects
 #' @param object GAS-class object
 #' @export
 gas_show <- function(object) {
-  # Print out informational text ===============================================
-  # Parse metadata =============================================================
-  meta <- acousticTS::extract(
-    object,
-    "metadata"
-  )
-  # Parse shape ================================================================
-  shape <- acousticTS::extract(
-    object,
-    "shape_parameters"
-  )
-  # Parse body =================================================================
-  body <- acousticTS::extract(
-    object,
-    "body"
-  )
-  cat(
-    paste0(methods::is(object)[[1]], "-object"), "\n",
-    " Gas- and fluid-filled scatterer \n ",
-    " ID:", paste0(meta$ID), "\n",
-    "Body dimensions:\n",
-    " Diameter:",
-    paste0(
-      shape$radius * 2,
-      " ",
-      shape$radius_units
-    ), "\n",
-    " Radius:",
-    paste0(
-      shape$radius,
-      " ",
-      shape$radius_units
-    ), "\n",
-    "Material properties:\n",
-    paste0(" g: ", .show_mean(body$g)), "\n",
-    paste0(" h: ", .show_mean(body$h)), "\n"
-  )
+  meta <- acousticTS::extract(object, "metadata")
+  shape <- acousticTS::extract(object, "shape_parameters")
+  body <- acousticTS::extract(object, "body")
+
+  .show_emit(.show_summary_lines(
+    object, "Gas- and fluid-filled scatterer ", meta,
+    .show_section_lines(
+      "Body dimensions",
+      paste0(" Diameter:", shape$radius * 2, " ", shape$radius_units),
+      paste0(" Radius:", shape$radius, " ", shape$radius_units)
+    ),
+    .show_fluid_material_section(
+      section_name = "Material properties",
+      density = body$density,
+      sound_speed = body$sound_speed,
+      g = body$g,
+      h = body$h
+    )
+  ))
 }
 #' show(...) for SBF-class objects.
 #' @param object SBF_class object.
 #' @export
 sbf_show <- function(object) {
-  # Print out informational text ===============================================
-  # Parse metadata =============================================================
-  meta <- acousticTS::extract(
-    object,
-    "metadata"
-  )
-  # Parse shape ================================================================
-  shape <- acousticTS::extract(
-    object,
-    "shape_parameters"
-  )
-  # Parse body =================================================================
-  body <- acousticTS::extract(
-    object,
-    "body"
-  )
-  # Parse bladder ==============================================================
-  bladder <- acousticTS::extract(
-    object,
-    "bladder"
-  )
-  # Print object summary information ===========================================
-  cat(
-    paste0(methods::is(object)[[1]], "-object"), "\n",
-    " Swimbladdered fish (SBF) \n ",
-    " ID:",
-    paste0(meta$ID), "\n",
-    "Body dimensions:\n",
-    " Length:", paste0(
-      round(shape$body$length, 3),
-      " ",
-      shape$length_units
+  meta <- acousticTS::extract(object, "metadata")
+  shape <- acousticTS::extract(object, "shape_parameters")
+  body <- acousticTS::extract(object, "body")
+  bladder <- acousticTS::extract(object, "bladder")
+
+  .show_emit(.show_summary_lines(
+    object, "Swimbladdered fish (SBF) ", meta,
+    .show_shape_section(
+      section_name = "Body dimensions",
+      shape_meta = shape$body,
+      units = shape$length_units,
+      radius_values = body$rpos[2, ] / 2,
+      segment_label = "cylinders"
     ),
-    paste0("(n = ", shape$body$n_segments, " cylinders)"), "\n",
-    " Mean radius:", paste0(
-      round(mean(body$rpos[2, ] / 2), 4),
-      " ",
-      shape$length_units
-    ), "|",
-    "Max radius:", paste0(
-      round(max(body$rpos[2, ] / 2), 4),
-      " ",
-      shape$length_units
-    ), "\n",
-    "Bladder dimensions:\n",
-    " Length:", paste0(
-      round(shape$bladder$length, 3),
-      " ",
-      shape$length_units
+    .show_shape_section(
+      section_name = "Bladder dimensions",
+      shape_meta = shape$bladder,
+      units = shape$length_units,
+      radius_values = bladder$rpos[2, ] / 2,
+      segment_label = "cylinders"
     ),
-    paste0("(n = ", shape$bladder$n_segments, " cylinders)"), "\n",
-    " Mean radius:", paste0(
-      round(mean(bladder$rpos[2, ] / 2), 4),
-      " ",
-      shape$length_units
-    ), "|",
-    "Max radius:", paste0(
-      round(max(bladder$rpos[2, ] / 2), 4),
-      " ",
-      shape$length_units
-    ), "\n",
-    "Body material properties:\n",
-    paste0(" Density: ", .show_mean(body$density)),
-    "kg m^-3", "|",
-    paste0("Sound speed: ", .show_mean(body$sound_speed)),
-    "m s^-1", "\n",
-    "Bladder fluid material properties:\n",
-    paste0(" Density: ", .show_mean(bladder$density)),
-    "kg m^-3", "|",
-    paste0("Sound speed: ", .show_mean(bladder$sound_speed)),
-    "m s^-1", "\n",
-    "Body orientation (relative to transducer face/axis):",
-    paste0(
-      round(body$theta, 3),
-      " ",
+    .show_fluid_material_section(
+      section_name = "Body material properties",
+      density = body$density,
+      sound_speed = body$sound_speed,
+      g = body$g,
+      h = body$h
+    ),
+    .show_fluid_material_section(
+      section_name = "Bladder fluid material properties",
+      density = bladder$density,
+      sound_speed = bladder$sound_speed,
+      g = bladder$g,
+      h = bladder$h
+    ),
+    .show_orientation_line(
+      "Body orientation (relative to transducer face/axis):",
+      body$theta,
       shape$theta_units
     )
-  )
+  ))
+}
+#' show(...) for BBF-class objects.
+#' @param object BBF-class object.
+#' @export
+bbf_show <- function(object) {
+  meta <- acousticTS::extract(object, "metadata")
+  shape <- acousticTS::extract(object, "shape_parameters")
+  body <- acousticTS::extract(object, "body")
+  backbone <- acousticTS::extract(object, "backbone")
+
+  .show_emit(.show_summary_lines(
+    object, "Backboned fish (BBF) ", meta,
+    .show_shape_section(
+      section_name = "Body dimensions",
+      shape_meta = shape$body,
+      units = shape$length_units,
+      radius_values = body$radius,
+      segment_label = "segments"
+    ),
+    .show_shape_section(
+      section_name = "Backbone dimensions",
+      shape_meta = shape$backbone,
+      units = shape$length_units,
+      radius_values = backbone$radius,
+      segment_label = "segments"
+    ),
+    .show_fluid_material_section(
+      section_name = "Body material properties",
+      density = body$density,
+      sound_speed = body$sound_speed,
+      g = body$g,
+      h = body$h
+    ),
+    .show_elastic_material_section(
+      section_name = "Backbone elastic properties",
+      density = backbone$density,
+      sound_speed_longitudinal = backbone$sound_speed_longitudinal,
+      sound_speed_transversal = backbone$sound_speed_transversal
+    ),
+    paste0(
+      "Body orientation:", round(body$theta, 3), " ", shape$theta_units,
+      " | Backbone orientation:",
+      round(backbone$theta, 3), " ", shape$theta_units
+    )
+  ))
 }
 #' show(...) for CAL-class objects.
 #' @param object CAL-class object.
 #' @export
 cal_show <- function(object) {
-  # Parse metadata =============================================================
-  meta <- acousticTS::extract(
-    object,
-    "metadata"
-  )
-  # Parse shape ================================================================
-  shape <- acousticTS::extract(
-    object,
-    "shape_parameters"
-  )
-  # Parse body =================================================================
-  body <- acousticTS::extract(
-    object,
-    "body"
-  )
-  # Print object summary information ===========================================
-  cat(
-    paste0(methods::is(object)[[1]], "-object"), "\n",
-    "Calibration sphere", "\n",
-    " ID:",
-    paste0(meta$ID), "\n",
-    "Material:",
-    paste0(meta$Material), "\n",
-    " Sphere longitudinal sound speed:",
-    paste0(body$sound_speed_longitudinal), "m/s", "\n",
-    " Sphere transversal sound speed:",
-    paste0(body$sound_speed_transversal), "m/s", "\n",
-    " Sphere density:",
-    paste0(body$density), "kg/m^3", "\n",
-    "Diameter:",
-    paste0(
-      shape$diameter,
-      " ",
-      shape$diameter_units
-    ), "\n",
-    " Radius:",
-    paste0(
-      shape$radius,
-      " ",
-      shape$diameter_units
-    ), "\n",
-    "Propagation direction of the incident sound wave:",
-    paste0(
-      round(body$theta, 3),
-      " ",
+  meta <- acousticTS::extract(object, "metadata")
+  shape <- acousticTS::extract(object, "shape_parameters")
+  body <- acousticTS::extract(object, "body")
+
+  .show_emit(.show_summary_lines(
+    object, "Calibration sphere", meta,
+    paste0("Material:", meta$Material),
+    paste0(" Sphere longitudinal sound speed:", body$sound_speed_longitudinal, "m/s"),
+    paste0(" Sphere transversal sound speed:", body$sound_speed_transversal, "m/s"),
+    paste0(" Sphere density:", body$density, "kg/m^3"),
+    paste0("Diameter:", shape$diameter, " ", shape$diameter_units),
+    paste0(" Radius:", shape$radius, " ", shape$diameter_units),
+    .show_orientation_line(
+      "Propagation direction of the incident sound wave:",
+      body$theta,
       shape$theta_units
     )
-  )
+  ))
 }
 #' show(...) for ESS-class objects.
 #' @param object ESS-class object.
@@ -302,55 +420,39 @@ ess_show <- function(object) {
       "E", "G", "nu"
     )
   ]
-  shell_material_text <- if (length(shell_material_props) > 0) {
-    prop_strings <- mapply(function(name, value) {
-      clean_name <- gsub("_", " ", name) # Remove underscores
-      clean_name <- switch(EXPR = clean_name,
-        "density" = "Density",
-        "sound speed" = "Sound speed",
-        "K" = "Bulk modulus (K)",
-        "E" = "Young's modulus (E)",
-        "G" = "Shear modulus (G)",
-        "nu" = "Poisson's ratio",
-        clean_name
-      )
-      units <- switch(EXPR = name,
-        "density" = " kg m^-3",
-        "sound_speed" = " m s^-1",
-        "K" = " Pa",
-        "E" = " Pa",
-        "G" = " Pa",
-        ""
-      )
-      paste0(clean_name, ": ", round(value, 4), units)
-    }, names(shell_material_props), shell_material_props, SIMPLIFY = FALSE)
-    paste("   ", prop_strings, collapse = "\n ")
-  } else {
-    "   None specified"
-  }
+  shell_material_text <- .show_property_block(
+    shell_material_props,
+    label_map = c(
+      density = "Density",
+      sound_speed = "Sound speed",
+      K = "Bulk modulus (K)",
+      E = "Young's modulus (E)",
+      G = "Shear modulus (G)",
+      nu = "Poisson's ratio"
+    ),
+    unit_map = c(
+      density = " kg m^-3",
+      sound_speed = " m s^-1",
+      K = " Pa",
+      E = " Pa",
+      G = " Pa"
+    )
+  )
   # Internal fluids ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   fluid_material_props <- fluid[
     names(fluid) %in% c("sound_speed", "density", "g", "h")
   ]
-  fluid_material_text <- if (length(fluid_material_props) > 0) {
-    prop_strings <- mapply(function(name, value) {
-      clean_name <- gsub("_", " ", name) # Remove underscores
-      clean_name <- switch(clean_name,
-        "density" = "Density",
-        "sound speed" = "Sound speed",
-        clean_name
-      )
-      units <- switch(name,
-        "density" = " kg m^-3",
-        "sound_speed" = " m s^-1",
-        ""
-      )
-      paste0(clean_name, ": ", round(value, 4), units)
-    }, names(fluid_material_props), fluid_material_props, SIMPLIFY = FALSE)
-    paste("   ", prop_strings, collapse = "\n ")
-  } else {
-    "   None specified"
-  }
+  fluid_material_text <- .show_property_block(
+    fluid_material_props,
+    label_map = c(
+      density = "Density",
+      sound_speed = "Sound speed"
+    ),
+    unit_map = c(
+      density = " kg m^-3",
+      sound_speed = " m s^-1"
+    )
+  )
   # Print object summary information ===========================================
   cat(
     paste0(methods::is(object)[[1]], "-object"), "\n",
