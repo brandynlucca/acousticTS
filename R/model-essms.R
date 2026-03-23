@@ -219,17 +219,10 @@ essms_initialize <- function(object,
   } else {
     m_limit
   }
-  # Define medium parameters ===================================================
-  medium_params <- data.frame(
-    sound_speed = sound_speed_sw,
-    density = density_sw
-  )
   # Define model parameters recipe =============================================
   model_params <- list(
-    acoustics = data.frame(
-      frequency = frequency,
-      # Wavenumber (medium) ====================================================
-      k_sw = k1,
+    acoustics = transform(
+      .init_acoustics_df(frequency, k_sw = sound_speed_sw),
       m_limit = m_limit
     )
   )
@@ -243,29 +236,17 @@ essms_initialize <- function(object,
   shell_params$shell_thickness <- shell$shell_thickness
   # Fluid ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   fluid_params$radius <- fluid$radius
-  # Add model parameters slot to scattering object =============================
-  methods::slot(
-    object,
-    "model_parameters"
-  )$ESSMS <- list(
-    parameters = model_params,
-    shell = shell_params,
-    fluid = fluid_params,
-    medium = medium_params
-  )
-  # Add model results slot to scattering object ================================
-  methods::slot(
-    object,
-    "model"
-  )$ESSMS <- data.frame(
+  .init_model_slots(
+    object = object,
+    model_name = "ESSMS",
     frequency = frequency,
-    sigma_bs = rep(
-      NA,
-      length(frequency)
+    model_parameters = list(
+      parameters = model_params,
+      shell = shell_params,
+      fluid = fluid_params,
+      medium = .init_medium_params(sound_speed_sw, density_sw)
     )
   )
-  # Output =====================================================================
-  return(object)
 }
 
 #' Calculates the theoretical TS of an elastic-shelled sphere using the modal

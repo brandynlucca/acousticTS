@@ -5,6 +5,7 @@
 .get_models <- function() {
   list(
     DWBA = DWBA,
+    BBFM = BBFM,
     PCDWBA = PCDWBA,
     DWBA_curved = DWBA_curved,
     SDWBA = SDWBA,

@@ -89,6 +89,20 @@ reflection_coefficient <- function(interface1, interface2, mode = "DWBA") {
   return(R)
 }
 ################################################################################
+#' Plane wave/plane interface transmission coefficient
+#' @param interface1 Dataframe object containing density (kg/m^3) and sound
+#' speed (m/s) values for a boundary/interface (1)
+#' @param interface2 Dataframe object containing density (kg/m^3) and sound
+#' speed (m/s) values for a boundary/interface (2)
+#' @param mode Two options: coefficient calculation for "DWBA" and "KRM"
+#' @return Pressure-amplitude transmission coefficient at normal incidence.
+#' @export
+transmission_coefficient <- function(interface1, interface2, mode = "DWBA") {
+  Z1 <- interface1$density * interface1$sound_speed
+  Z2 <- interface2$density * interface2$sound_speed
+  2 * Z2 / (Z1 + Z2)
+}
+################################################################################
 #' Calculate she compressibility (\eqn{\kappa}) of a scattering 
 #' boundary/interface.
 #' 
@@ -127,6 +141,19 @@ compressibility <- function(medium, target) {
   gamma_kappa <- (K2 - K1) / K1
   # Output =====================================================================
   gamma_kappa
+}
+################################################################################
+#' Calculate the density contrast (\eqn{\rho}) of a scattering boundary
+#'
+#' @param medium Dataframe object containing density (\eqn{kgm^{-3}}) and
+#' sound speed (\eqn{ms^{-1}}) values for the external medium.
+#' @param target Dataframe object containing density (\eqn{kgm^{-3}}) and
+#' sound speed (\eqn{ms^{-1}}) values for the target boundary.
+#' @return Density contrast, defined as
+#'   \eqn{(\rho_{target} - \rho_{medium})/\rho_{target}}.
+#' @export
+rho <- function(medium, target) {
+  (target$density - medium$density) / target$density
 }
 ################################################################################
 ################################################################################
@@ -371,13 +398,18 @@ lame <- function(K = NULL, E = NULL, G = NULL, nu = NULL) {
 #' @param frequency Frequency (Hz).
 #' @param model Model name. Available models currently include
 #'   \code{"dwba"} (\code{\link{DWBA}}),
+#'   \code{"bbfm"} (\code{\link{BBFM}}),
+#'   \code{"pcdwba"} (\code{\link{PCDWBA}}),
 #'   \code{"sdwba"} (\code{\link{SDWBA}}),
 #'   \code{"fcms"} (\code{\link{FCMS}}),
+#'   \code{"bcms"} (\code{\link{BCMS}}),
+#'   \code{"ecms"} (\code{\link{ECMS}}),
 #'   \code{"hpa"} (\code{\link{HPA}}),
 #'   \code{"krm"} (\code{\link{KRM}}),
 #'   \code{"psms"} (\code{\link{PSMS}}),
 #'   \code{"sphms"} (\code{\link{SPHMS}}),
 #'   \code{"essms"} (\code{\link{ESSMS}}),
+#'   \code{"vesms"} (\code{\link{VESMS}}),
 #'   \code{"trcm"} (\code{\link{TRCM}}), and
 #'   \code{"calibration"} / \code{"soems"} (\code{\link{SOEMS}}).
 #' @param verbose Prints current procedural step occurring from model
@@ -397,9 +429,15 @@ lame <- function(K = NULL, E = NULL, G = NULL, nu = NULL) {
 #' \itemize{
 #'   \item \code{\link{DWBA}} for the distorted-wave Born approximation
 #'   applied to weakly scattering fluid-like bodies.
+#'   \item \code{\link{BBFM}} for a composite flesh-plus-backbone model that
+#'   combines a DWBA flesh term with an elastic-cylinder backbone term.
+#'   \item \code{\link{PCDWBA}} for the phase-compensated distorted-wave Born
+#'   approximation applied to elongated fluid-like bodies.
 #'   \item \code{\link{SDWBA}} for the stochastic distorted-wave Born
 #'   approximation.
 #'   \item \code{\link{FCMS}} for the finite cylinder modal series solution.
+#'   \item \code{\link{BCMS}} for the bent-cylinder modal series solution.
+#'   \item \code{\link{ECMS}} for the elastic-cylinder modal series solution.
 #'   \item \code{\link{HPA}} for the high-pass approximation family.
 #'   \item \code{\link{KRM}} for the Kirchhoff-Ray Mode model.
 #'   \item \code{\link{PSMS}} for the prolate spheroidal modal series
@@ -407,6 +445,8 @@ lame <- function(K = NULL, E = NULL, G = NULL, nu = NULL) {
 #'   \item \code{\link{SPHMS}} for the spherical modal series solution.
 #'   \item \code{\link{ESSMS}} for the elastic-shelled spherical modal series
 #'   solution.
+#'   \item \code{\link{VESMS}} for the viscous-elastic spherical scattering
+#'   model applied to gas-filled elastic shells with an external viscous layer.
 #'   \item \code{\link{TRCM}} for the two-ray cylindrical model.
 #'   \item \code{\link{SOEMS}} for the solid elastic calibration-sphere model,
 #'   accessed through \code{"calibration"} or \code{"soems"}.
@@ -419,9 +459,9 @@ lame <- function(K = NULL, E = NULL, G = NULL, nu = NULL) {
 #' deprecated; apply \code{\link{brake}} to the scatterer first, then run
 #' \code{"dwba"} or \code{"sdwba"} on the curved object.
 #' @seealso
-#' \code{\link{DWBA}}, \code{\link{SDWBA}}, \code{\link{FCMS}},
-#' \code{\link{HPA}}, \code{\link{KRM}}, \code{\link{PSMS}},
-#' \code{\link{SPHMS}}, \code{\link{ESSMS}}, \code{\link{TRCM}},
+#' \code{\link{DWBA}}, \code{\link{BBFM}}, \code{\link{PCDWBA}}, \code{\link{SDWBA}}, \code{\link{FCMS}},
+#' \code{\link{BCMS}}, \code{\link{ECMS}}, \code{\link{HPA}}, \code{\link{KRM}}, \code{\link{PSMS}},
+#' \code{\link{SPHMS}}, \code{\link{ESSMS}}, \code{\link{VESMS}}, \code{\link{TRCM}},
 #' \code{\link{SOEMS}}
 #' @export
 target_strength <- function(object, frequency, model, verbose = FALSE, ...) {
@@ -586,18 +626,120 @@ target_strength <- function(object, frequency, model, verbose = FALSE, ...) {
 #' incident field through the spheroidal wave function expansion.
 #' @keywords internal
 #' @noRd
-prolate_spheroidal_kernels <- function(
+.psms_adaptive_n_integration <- function(
+  chi_sw,
+  chi_body,
+  m_max,
+  n_max,
+  precision
+) {
+  chi_max <- pmax(abs(chi_sw), abs(chi_body))
+  step_n <- 8L
+  floor_n <- if (identical(precision, "quad")) 32L else 24L
+  cap_n <- 96L
+
+  # The overlap quadrature must resolve the same angular content that drives the
+  # retained PSMS modal system. Use the hard truncation ceilings as the main
+  # difficulty scale, with a smaller reduced-frequency bonus for the sharper
+  # high-chi oscillations that appear in the angular products.
+  modal_difficulty <- 0.75 * n_max + 0.25 * m_max
+  chi_bonus <- if (identical(precision, "quad")) {
+    0.10 * sqrt(pmax(chi_max, 1))
+  } else {
+    0.05 * sqrt(pmax(chi_max, 1))
+  }
+
+  n_integration <- step_n * ceiling((modal_difficulty + chi_bonus) / step_n)
+  n_integration <- pmax(floor_n, pmin(cap_n, n_integration))
+
+  as.integer(n_integration)
+}
+
+.prolate_spheroidal_kernels_fixed <- function(
   acoustics,
   body,
   medium,
   boundary_method,
-  n_integration = 128,
-  precision = "double"
+  n_integration = 96,
+  precision = "double",
+  adaptive = FALSE
 ) {
   # Generate nodes and weights for quadrature ==================================
   quad_pts <- gauss_legendre(n = n_integration, a = -1, b = 1)
   # Calculate the linear scattering coefficient, fbs ===========================
   prolate_spheroid_fbs(
-    acoustics, body, medium, quad_pts, precision, boundary_method
+    acoustics, body, medium, quad_pts, precision, boundary_method, adaptive,
+    FALSE
+  )
+}
+
+.prolate_spheroidal_kernels_adaptive <- function(
+  acoustics,
+  body,
+  medium,
+  boundary_method,
+  precision = "double",
+  adaptive = TRUE
+) {
+  n_by_freq <- .psms_adaptive_n_integration(
+    chi_sw = acoustics$chi_sw,
+    chi_body = acoustics$chi_body,
+    m_max = acoustics$m_max,
+    n_max = acoustics$n_max,
+    precision = precision
+  )
+  f_bs <- complex(length = nrow(acoustics))
+
+  for (n_integration_i in sort(unique(n_by_freq))) {
+    idx <- which(n_by_freq == n_integration_i)
+    f_bs[idx] <- .prolate_spheroidal_kernels_fixed(
+      acoustics = acoustics[idx, , drop = FALSE],
+      body = body,
+      medium = medium,
+      boundary_method = boundary_method,
+      n_integration = n_integration_i,
+      precision = precision,
+      adaptive = adaptive
+    )
+  }
+
+  attr(f_bs, "n_integration") <- n_by_freq
+  f_bs
+}
+
+prolate_spheroidal_kernels <- function(
+  acoustics,
+  body,
+  medium,
+  boundary_method,
+  n_integration = 96,
+  precision = "double",
+  adaptive = FALSE
+) {
+  if (isTRUE(adaptive) && identical(boundary_method, "Amn_fluid")) {
+    return(
+      .prolate_spheroidal_kernels_adaptive(
+        acoustics = acoustics,
+        body = body,
+        medium = medium,
+        boundary_method = boundary_method,
+        precision = precision,
+        adaptive = adaptive
+      )
+    )
+  }
+
+  if (is.null(n_integration) || (length(n_integration) == 1 && is.na(n_integration))) {
+    n_integration <- 96L
+  }
+
+  .prolate_spheroidal_kernels_fixed(
+    acoustics = acoustics,
+    body = body,
+    medium = medium,
+    boundary_method = boundary_method,
+    n_integration = n_integration,
+    precision = precision,
+    adaptive = adaptive
   )
 }

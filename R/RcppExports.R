@@ -49,6 +49,30 @@ hs_deriv_cpp <- function(l, z, k) {
     .Call(`_acousticTS_hs_deriv_cpp`, l, z, k)
 }
 
+js_complex_cpp <- function(l, z) {
+    .Call(`_acousticTS_js_complex_cpp`, l, z)
+}
+
+ys_complex_cpp <- function(l, z) {
+    .Call(`_acousticTS_ys_complex_cpp`, l, z)
+}
+
+hs_complex_cpp <- function(l, z) {
+    .Call(`_acousticTS_hs_complex_cpp`, l, z)
+}
+
+js_complex_deriv_cpp <- function(l, z, k) {
+    .Call(`_acousticTS_js_complex_deriv_cpp`, l, z, k)
+}
+
+ys_complex_deriv_cpp <- function(l, z, k) {
+    .Call(`_acousticTS_ys_complex_deriv_cpp`, l, z, k)
+}
+
+hs_complex_deriv_cpp <- function(l, z, k) {
+    .Call(`_acousticTS_hs_complex_deriv_cpp`, l, z, k)
+}
+
 dwba_fbs_cpp <- function(rpos, k_sw, theta, h, R, subdivisions = 100L, rel_tol = 0.0001220703125, abs_tol = 0.0001220703125) {
     .Call(`_acousticTS_dwba_fbs_cpp`, rpos, k_sw, theta, h, R, subdivisions, rel_tol, abs_tol)
 }
@@ -93,7 +117,11 @@ Rmn_cpp <- function(m, n, c, x1, kind = 1L, precision = "double") {
     .Call(`_acousticTS_Rmn_cpp`, m, n, c, x1, kind, precision)
 }
 
-prolate_spheroid_fbs <- function(acoustics, body, medium, integration_pts, precision = "double", Amn_method = "Amn_fluid", adaptive = FALSE) {
-    .Call(`_acousticTS_prolate_spheroid_fbs`, acoustics, body, medium, integration_pts, precision, Amn_method, adaptive)
+prolate_spheroid_fbs <- function(acoustics, body, medium, integration_pts, precision = "double", Amn_method = "Amn_fluid", adaptive = FALSE, vectorized = FALSE) {
+    .Call(`_acousticTS_prolate_spheroid_fbs`, acoustics, body, medium, integration_pts, precision, Amn_method, adaptive, vectorized)
+}
+
+vesms_backscatter_cpp <- function(frequency, m_limit, density_sw, density_viscous, density_shell, density_gas, sound_speed_sw, sound_speed_viscous, sound_speed_gas, radius_viscous, radius_shell, radius_gas, shear_viscosity_viscous, bulk_viscosity_viscous, shear_modulus_shell, lambda_shell) {
+    .Call(`_acousticTS_vesms_backscatter_cpp`, frequency, m_limit, density_sw, density_viscous, density_shell, density_gas, sound_speed_sw, sound_speed_viscous, sound_speed_gas, radius_viscous, radius_shell, radius_gas, shear_viscosity_viscous, bulk_viscosity_viscous, shear_modulus_shell, lambda_shell)
 }
 

@@ -2,6 +2,7 @@
 #include <cmath>
 #include <complex>
 #include <vector>
+#include <boost/math/special_functions/bessel.hpp>
 #include "bessel_helpers.h" 
 using namespace Rcpp;
 
@@ -9,6 +10,14 @@ using namespace Rcpp;
 const double pi = M_PI; 
 const double tol = 1e-300; 
 const std::complex<double> i_unit(0.0, 1.0);
+
+inline double modified_bessel_i_impl(double nu, double x) {
+    return boost::math::cyl_bessel_i(nu, x);
+}
+
+inline double modified_bessel_k_impl(double nu, double x) {
+    return boost::math::cyl_bessel_k(nu, x);
+}
 
 // --------------------------------------------------------------------------
 // Helper: Calculate i^n
@@ -34,8 +43,6 @@ bool should_return_matrix(int size1, int size2) {
 // Helper: Compute single J_nu(z) value
 // --------------------------------------------------------------------------
 std::complex<double> jc_single_impl(std::complex<double> zi, double nui) {
-    Rcpp::Function R_besselI("besselI");
-    
     double zi_real = zi.real();
     double zi_imag = zi.imag();
     
@@ -73,7 +80,7 @@ std::complex<double> jc_single_impl(std::complex<double> zi, double nui) {
         double y_val = zi_imag;
         double abs_y = std::abs(y_val);
         
-        double I_nu_abs_y = Rcpp::as<double>(R_besselI(abs_y, nui, Named("expon.scaled") = false));
+        double I_nu_abs_y = modified_bessel_i_impl(nui, abs_y);
         
         std::complex<double> exp_factor;
         if (is_integer) {
@@ -101,9 +108,6 @@ std::complex<double> jc_single_impl(std::complex<double> zi, double nui) {
 // Helper: Compute single Y_nu(z) value
 // --------------------------------------------------------------------------
 std::complex<double> yc_single_impl(std::complex<double> zi, double nui) {
-    Rcpp::Function R_besselI("besselI");
-    Rcpp::Function R_besselK("besselK");
-    
     double zi_real = zi.real();
     double zi_imag = zi.imag();
     
@@ -135,8 +139,8 @@ std::complex<double> yc_single_impl(std::complex<double> zi, double nui) {
         double y_val = zi_imag;
         double abs_y = std::abs(y_val);
         
-        double I_nu_abs_y = Rcpp::as<double>(R_besselI(abs_y, nui, Named("expon.scaled") = false));
-        double K_nu_abs_y = Rcpp::as<double>(R_besselK(abs_y, nui, Named("expon.scaled") = false));
+        double I_nu_abs_y = modified_bessel_i_impl(nui, abs_y);
+        double K_nu_abs_y = modified_bessel_k_impl(nui, abs_y);
         
         std::complex<double> factor1_exp = std::exp(-i_unit * pi * nui / 2.0);
         std::complex<double> term1 = i_unit * factor1_exp * I_nu_abs_y;
@@ -200,6 +204,71 @@ std::complex<double> hs_single_impl(int li, double zi) {
     std::complex<double> J = jc_single_impl(std::complex<double>(zi, 0.0), nu);
     std::complex<double> Y = yc_single_impl(std::complex<double>(zi, 0.0), nu);
     return std::sqrt(pi / (2.0 * zi)) * (J + i_unit * Y);
+}
+
+// --------------------------------------------------------------------------
+// Helper: Compute single complex spherical j_l(z) value
+// --------------------------------------------------------------------------
+std::complex<double> js_single_complex_impl(int li, std::complex<double> zi) {
+    if (std::abs(zi) < tol) {
+        return (li == 0) ? std::complex<double>(1.0, 0.0) : std::complex<double>(0.0, 0.0);
+    }
+
+    std::complex<double> j0 = std::sin(zi) / zi;
+    if (li == 0) {
+        return j0;
+    }
+
+    std::complex<double> j1 = std::sin(zi) / (zi * zi) - std::cos(zi) / zi;
+    if (li == 1) {
+        return j1;
+    }
+
+    std::complex<double> jm1 = j0;
+    std::complex<double> jn = j1;
+    for (int n = 1; n < li; ++n) {
+        std::complex<double> jp1 = ((2.0 * n + 1.0) / zi) * jn - jm1;
+        jm1 = jn;
+        jn = jp1;
+    }
+
+    return jn;
+}
+
+// --------------------------------------------------------------------------
+// Helper: Compute single complex spherical y_l(z) value
+// --------------------------------------------------------------------------
+std::complex<double> ys_single_complex_impl(int li, std::complex<double> zi) {
+    if (std::abs(zi) < tol) {
+        return std::complex<double>(R_NaN, R_NaN);
+    }
+
+    std::complex<double> y0 = -std::cos(zi) / zi;
+    if (li == 0) {
+        return y0;
+    }
+
+    std::complex<double> y1 = -std::cos(zi) / (zi * zi) - std::sin(zi) / zi;
+    if (li == 1) {
+        return y1;
+    }
+
+    std::complex<double> ym1 = y0;
+    std::complex<double> yn = y1;
+    for (int n = 1; n < li; ++n) {
+        std::complex<double> yp1 = ((2.0 * n + 1.0) / zi) * yn - ym1;
+        ym1 = yn;
+        yn = yp1;
+    }
+
+    return yn;
+}
+
+// --------------------------------------------------------------------------
+// Helper: Compute single complex spherical h_l(z) value
+// --------------------------------------------------------------------------
+std::complex<double> hs_single_complex_impl(int li, std::complex<double> zi) {
+    return js_single_complex_impl(li, zi) + i_unit * ys_single_complex_impl(li, zi);
 }
 
 // --------------------------------------------------------------------------
@@ -476,6 +545,228 @@ std::complex<double> hs_deriv_single_impl(int li, double zi, int k) {
         }
     }
     
+    return D[k];
+}
+
+// --------------------------------------------------------------------------
+// Helper: Compute complex spherical j_l(z) derivatives
+// --------------------------------------------------------------------------
+std::complex<double> js_deriv_single_complex_impl(int li, std::complex<double> zi, int k) {
+    if (k == 0) {
+        return js_single_complex_impl(li, zi);
+    }
+
+    if (std::abs(zi) < tol) {
+        if (k == 1 && li == 1) return std::complex<double>(1.0 / 3.0, 0.0);
+        if (k == 2 && li == 0) return std::complex<double>(-1.0 / 3.0, 0.0);
+        if (k == 2 && li == 2) return std::complex<double>(2.0 / 15.0, 0.0);
+        return std::complex<double>(0.0, 0.0);
+    }
+
+    std::complex<double> z = zi;
+    std::complex<double> z2 = z * z;
+    double ll1 = static_cast<double>(li) * (li + 1.0);
+
+    std::complex<double> j_l = js_single_complex_impl(li, z);
+    std::complex<double> jp_l;
+    if (li == 0) {
+        jp_l = -js_single_complex_impl(1, z);
+    } else {
+        std::complex<double> j_lm1 = js_single_complex_impl(li - 1, z);
+        jp_l = j_lm1 - static_cast<double>(li + 1) / z * j_l;
+    }
+
+    if (k == 1) {
+        return jp_l;
+    }
+
+    std::vector<std::complex<double> > D(k + 1);
+    D[0] = j_l;
+    D[1] = jp_l;
+
+    for (int n = 2; n <= k; ++n) {
+        if (n == 2) {
+            D[2] = -(2.0 / z) * D[1] + (ll1 / z2 - 1.0) * D[0];
+        } else {
+            std::complex<double> sum(0.0, 0.0);
+            double binom = 1.0;
+            for (int i = 0; i <= n - 2; ++i) {
+                if (i > 0) binom = binom * (n - 2 - i + 1) / i;
+
+                double fact_i = 1.0;
+                for (int f = 1; f <= i; ++f) fact_i *= f;
+                std::complex<double> a_i = 2.0 * (i % 2 == 0 ? -1.0 : 1.0) *
+                    fact_i / std::pow(z, i + 1);
+
+                std::complex<double> b_i;
+                if (i == 0) {
+                    b_i = ll1 / z2 - 1.0;
+                } else {
+                    double prod = 1.0;
+                    for (int j = 0; j < i; ++j) prod *= -(2.0 + j);
+                    b_i = ll1 * prod / std::pow(z, 2 + i);
+                }
+
+                int idx_a = n - 1 - i;
+                int idx_b = n - 2 - i;
+
+                if (idx_a >= 0 && idx_a < static_cast<int>(D.size())) {
+                    sum += binom * a_i * D[idx_a];
+                }
+                if (idx_b >= 0 && idx_b < static_cast<int>(D.size())) {
+                    sum += binom * b_i * D[idx_b];
+                }
+            }
+            D[n] = sum;
+        }
+    }
+
+    return D[k];
+}
+
+// --------------------------------------------------------------------------
+// Helper: Compute complex spherical y_l(z) derivatives
+// --------------------------------------------------------------------------
+std::complex<double> ys_deriv_single_complex_impl(int li, std::complex<double> zi, int k) {
+    if (k == 0) {
+        return ys_single_complex_impl(li, zi);
+    }
+
+    if (std::abs(zi) < tol) {
+        return std::complex<double>(R_NaN, R_NaN);
+    }
+
+    std::complex<double> z = zi;
+    std::complex<double> z2 = z * z;
+    double ll1 = static_cast<double>(li) * (li + 1.0);
+
+    std::complex<double> y_l = ys_single_complex_impl(li, z);
+    std::complex<double> yp_l;
+    if (li == 0) {
+        yp_l = -ys_single_complex_impl(1, z);
+    } else {
+        std::complex<double> y_lm1 = ys_single_complex_impl(li - 1, z);
+        yp_l = y_lm1 - static_cast<double>(li + 1) / z * y_l;
+    }
+
+    if (k == 1) {
+        return yp_l;
+    }
+
+    std::vector<std::complex<double> > D(k + 1);
+    D[0] = y_l;
+    D[1] = yp_l;
+
+    for (int n = 2; n <= k; ++n) {
+        if (n == 2) {
+            D[2] = -(2.0 / z) * D[1] + (ll1 / z2 - 1.0) * D[0];
+        } else {
+            std::complex<double> sum(0.0, 0.0);
+            double binom = 1.0;
+            for (int i = 0; i <= n - 2; ++i) {
+                if (i > 0) binom = binom * (n - 2 - i + 1) / i;
+
+                double fact_i = 1.0;
+                for (int f = 1; f <= i; ++f) fact_i *= f;
+                std::complex<double> a_i = 2.0 * (i % 2 == 0 ? -1.0 : 1.0) *
+                    fact_i / std::pow(z, i + 1);
+
+                std::complex<double> b_i;
+                if (i == 0) {
+                    b_i = ll1 / z2 - 1.0;
+                } else {
+                    double prod = 1.0;
+                    for (int j = 0; j < i; ++j) prod *= -(2.0 + j);
+                    b_i = ll1 * prod / std::pow(z, 2 + i);
+                }
+
+                int idx_a = n - 1 - i;
+                int idx_b = n - 2 - i;
+
+                if (idx_a >= 0 && idx_a < static_cast<int>(D.size())) {
+                    sum += binom * a_i * D[idx_a];
+                }
+                if (idx_b >= 0 && idx_b < static_cast<int>(D.size())) {
+                    sum += binom * b_i * D[idx_b];
+                }
+            }
+            D[n] = sum;
+        }
+    }
+
+    return D[k];
+}
+
+// --------------------------------------------------------------------------
+// Helper: Compute complex spherical h_l(z) derivatives
+// --------------------------------------------------------------------------
+std::complex<double> hs_deriv_single_complex_impl(int li, std::complex<double> zi, int k) {
+    if (k == 0) {
+        return hs_single_complex_impl(li, zi);
+    }
+
+    if (std::abs(zi) < tol) {
+        return std::complex<double>(R_NaN, R_NaN);
+    }
+
+    std::complex<double> z = zi;
+    std::complex<double> z2 = z * z;
+    double ll1 = static_cast<double>(li) * (li + 1.0);
+
+    std::complex<double> h_l = hs_single_complex_impl(li, z);
+    std::complex<double> hp_l;
+    if (li == 0) {
+        hp_l = -hs_single_complex_impl(1, z);
+    } else {
+        std::complex<double> h_lm1 = hs_single_complex_impl(li - 1, z);
+        hp_l = h_lm1 - static_cast<double>(li + 1) / z * h_l;
+    }
+
+    if (k == 1) {
+        return hp_l;
+    }
+
+    std::vector<std::complex<double> > D(k + 1);
+    D[0] = h_l;
+    D[1] = hp_l;
+
+    for (int n = 2; n <= k; ++n) {
+        if (n == 2) {
+            D[2] = -(2.0 / z) * D[1] + (ll1 / z2 - 1.0) * D[0];
+        } else {
+            std::complex<double> sum(0.0, 0.0);
+            double binom = 1.0;
+            for (int i = 0; i <= n - 2; ++i) {
+                if (i > 0) binom = binom * (n - 2 - i + 1) / i;
+
+                double fact_i = 1.0;
+                for (int f = 1; f <= i; ++f) fact_i *= f;
+                std::complex<double> a_i = 2.0 * (i % 2 == 0 ? -1.0 : 1.0) *
+                    fact_i / std::pow(z, i + 1);
+
+                std::complex<double> b_i;
+                if (i == 0) {
+                    b_i = ll1 / z2 - 1.0;
+                } else {
+                    double prod = 1.0;
+                    for (int j = 0; j < i; ++j) prod *= -(2.0 + j);
+                    b_i = ll1 * prod / std::pow(z, 2 + i);
+                }
+
+                int idx_a = n - 1 - i;
+                int idx_b = n - 2 - i;
+
+                if (idx_a >= 0 && idx_a < static_cast<int>(D.size())) {
+                    sum += binom * a_i * D[idx_a];
+                }
+                if (idx_b >= 0 && idx_b < static_cast<int>(D.size())) {
+                    sum += binom * b_i * D[idx_b];
+                }
+            }
+            D[n] = sum;
+        }
+    }
+
     return D[k];
 }
 
@@ -1033,6 +1324,219 @@ SEXP hs_deriv_cpp(IntegerVector l, NumericVector z, int k) {
             double zi = z[i % z_size];
             std::complex<double> val = hs_deriv_single_impl(li, zi, k);
             result[i] = to_Rcomplex(val);
+        }
+        return result;
+    }
+}
+
+// --------------------------------------------------------------------------
+// 13. Complex spherical Bessel j_l(z)
+// --------------------------------------------------------------------------
+// [[Rcpp::export]]
+SEXP js_complex_cpp(IntegerVector l, ComplexVector z) {
+    int l_size = l.size();
+    int z_size = z.size();
+
+    if (should_return_matrix(l_size, z_size)) {
+        ComplexMatrix result(l_size, z_size);
+
+        for (int i = 0; i < l_size; ++i) {
+            int li = l[i];
+            for (int j = 0; j < z_size; ++j) {
+                std::complex<double> zi(z[j].r, z[j].i);
+                result(i, j) = to_Rcomplex(js_single_complex_impl(li, zi));
+            }
+        }
+        return result;
+    } else {
+        int N = std::max(l_size, z_size);
+        ComplexVector result(N);
+
+        for (int i = 0; i < N; ++i) {
+            int li = l[i % l_size];
+            std::complex<double> zi(z[i % z_size].r, z[i % z_size].i);
+            result[i] = to_Rcomplex(js_single_complex_impl(li, zi));
+        }
+        return result;
+    }
+}
+
+// --------------------------------------------------------------------------
+// 14. Complex spherical Bessel y_l(z)
+// --------------------------------------------------------------------------
+// [[Rcpp::export]]
+SEXP ys_complex_cpp(IntegerVector l, ComplexVector z) {
+    int l_size = l.size();
+    int z_size = z.size();
+
+    if (should_return_matrix(l_size, z_size)) {
+        ComplexMatrix result(l_size, z_size);
+
+        for (int i = 0; i < l_size; ++i) {
+            int li = l[i];
+            for (int j = 0; j < z_size; ++j) {
+                std::complex<double> zi(z[j].r, z[j].i);
+                result(i, j) = to_Rcomplex(ys_single_complex_impl(li, zi));
+            }
+        }
+        return result;
+    } else {
+        int N = std::max(l_size, z_size);
+        ComplexVector result(N);
+
+        for (int i = 0; i < N; ++i) {
+            int li = l[i % l_size];
+            std::complex<double> zi(z[i % z_size].r, z[i % z_size].i);
+            result[i] = to_Rcomplex(ys_single_complex_impl(li, zi));
+        }
+        return result;
+    }
+}
+
+// --------------------------------------------------------------------------
+// 15. Complex spherical Hankel h_l(z)
+// --------------------------------------------------------------------------
+// [[Rcpp::export]]
+SEXP hs_complex_cpp(IntegerVector l, ComplexVector z) {
+    int l_size = l.size();
+    int z_size = z.size();
+
+    if (should_return_matrix(l_size, z_size)) {
+        ComplexMatrix result(l_size, z_size);
+
+        for (int i = 0; i < l_size; ++i) {
+            int li = l[i];
+            for (int j = 0; j < z_size; ++j) {
+                std::complex<double> zi(z[j].r, z[j].i);
+                result(i, j) = to_Rcomplex(hs_single_complex_impl(li, zi));
+            }
+        }
+        return result;
+    } else {
+        int N = std::max(l_size, z_size);
+        ComplexVector result(N);
+
+        for (int i = 0; i < N; ++i) {
+            int li = l[i % l_size];
+            std::complex<double> zi(z[i % z_size].r, z[i % z_size].i);
+            result[i] = to_Rcomplex(hs_single_complex_impl(li, zi));
+        }
+        return result;
+    }
+}
+
+// --------------------------------------------------------------------------
+// 16. Complex spherical Bessel j_l - k-th derivative
+// --------------------------------------------------------------------------
+// [[Rcpp::export]]
+SEXP js_complex_deriv_cpp(IntegerVector l, ComplexVector z, int k) {
+    if (k < 0) {
+        Rcpp::stop("Derivative order k must be non-negative");
+    }
+    if (k == 0) {
+        return js_complex_cpp(l, z);
+    }
+
+    int l_size = l.size();
+    int z_size = z.size();
+
+    if (should_return_matrix(l_size, z_size)) {
+        ComplexMatrix result(l_size, z_size);
+
+        for (int i = 0; i < l_size; ++i) {
+            int li = l[i];
+            for (int j = 0; j < z_size; ++j) {
+                std::complex<double> zi(z[j].r, z[j].i);
+                result(i, j) = to_Rcomplex(js_deriv_single_complex_impl(li, zi, k));
+            }
+        }
+        return result;
+    } else {
+        int N = std::max(l_size, z_size);
+        ComplexVector result(N);
+
+        for (int i = 0; i < N; ++i) {
+            int li = l[i % l_size];
+            std::complex<double> zi(z[i % z_size].r, z[i % z_size].i);
+            result[i] = to_Rcomplex(js_deriv_single_complex_impl(li, zi, k));
+        }
+        return result;
+    }
+}
+
+// --------------------------------------------------------------------------
+// 17. Complex spherical Bessel y_l - k-th derivative
+// --------------------------------------------------------------------------
+// [[Rcpp::export]]
+SEXP ys_complex_deriv_cpp(IntegerVector l, ComplexVector z, int k) {
+    if (k < 0) {
+        Rcpp::stop("Derivative order k must be non-negative");
+    }
+    if (k == 0) {
+        return ys_complex_cpp(l, z);
+    }
+
+    int l_size = l.size();
+    int z_size = z.size();
+
+    if (should_return_matrix(l_size, z_size)) {
+        ComplexMatrix result(l_size, z_size);
+
+        for (int i = 0; i < l_size; ++i) {
+            int li = l[i];
+            for (int j = 0; j < z_size; ++j) {
+                std::complex<double> zi(z[j].r, z[j].i);
+                result(i, j) = to_Rcomplex(ys_deriv_single_complex_impl(li, zi, k));
+            }
+        }
+        return result;
+    } else {
+        int N = std::max(l_size, z_size);
+        ComplexVector result(N);
+
+        for (int i = 0; i < N; ++i) {
+            int li = l[i % l_size];
+            std::complex<double> zi(z[i % z_size].r, z[i % z_size].i);
+            result[i] = to_Rcomplex(ys_deriv_single_complex_impl(li, zi, k));
+        }
+        return result;
+    }
+}
+
+// --------------------------------------------------------------------------
+// 18. Complex spherical Hankel h_l - k-th derivative
+// --------------------------------------------------------------------------
+// [[Rcpp::export]]
+SEXP hs_complex_deriv_cpp(IntegerVector l, ComplexVector z, int k) {
+    if (k < 0) {
+        Rcpp::stop("Derivative order k must be non-negative");
+    }
+    if (k == 0) {
+        return hs_complex_cpp(l, z);
+    }
+
+    int l_size = l.size();
+    int z_size = z.size();
+
+    if (should_return_matrix(l_size, z_size)) {
+        ComplexMatrix result(l_size, z_size);
+
+        for (int i = 0; i < l_size; ++i) {
+            int li = l[i];
+            for (int j = 0; j < z_size; ++j) {
+                std::complex<double> zi(z[j].r, z[j].i);
+                result(i, j) = to_Rcomplex(hs_deriv_single_complex_impl(li, zi, k));
+            }
+        }
+        return result;
+    } else {
+        int N = std::max(l_size, z_size);
+        ComplexVector result(N);
+
+        for (int i = 0; i < N; ++i) {
+            int li = l[i % l_size];
+            std::complex<double> zi(z[i % z_size].r, z[i % z_size].i);
+            result[i] = to_Rcomplex(hs_deriv_single_complex_impl(li, zi, k));
         }
         return result;
     }

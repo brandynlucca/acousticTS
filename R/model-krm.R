@@ -132,6 +132,20 @@
 #' \eqn{\psi_{p,s}} are empirical amplitude and phase adjustments,
 #' respectively.
 #'
+#' For body-plus-swimbladder targets, the default coherent KRM combines the
+#' two complex scattering lengths as:
+#'
+#' \deqn{
+#'   f_{bs}^{(\mathrm{coh})} = f_{body} + f_{bladder},
+#' }
+#'
+#' which gives:
+#'
+#' \deqn{
+#'   \sigma_{bs}^{(\mathrm{coh})} =
+#'   \left|f_{body} + f_{bladder}\right|^2.
+#' }
+#'
 #' @section Swimbladder medium conventions:
 #' Clay and Horne (1994) derive the swimbladder term for a gas-filled inclusion
 #' embedded in body tissue, but also note that the low body-water contrast can
@@ -283,122 +297,124 @@ krm_initialize <- function(object,
   body <- acousticTS::extract(object, "body")
   # Parse shape ================================================================
   shape <- acousticTS::extract(object, "shape_parameters")
-  # Helper to complete contrast/absolute pairs =================================
-  fill_props <- function(comp, medium_sound_speed, medium_density) {
-    # derive contrasts if missing
-    if (is.null(comp$g) && !is.null(comp$density)) {
-      comp$g <- comp$density / medium_density
-    }
-    if (is.null(comp$h) && !is.null(comp$sound_speed)) {
-      comp$h <- comp$sound_speed / medium_sound_speed
-    }
-    # derive absolutes if missing
-    if (is.null(comp$density) && !is.null(comp$g)) {
-      comp$density <- comp$g * medium_density
-    }
-    if (is.null(comp$sound_speed) && !is.null(comp$h)) {
-      comp$sound_speed <- comp$h * medium_sound_speed
-    }
-    comp
-  }
   # Derive contrasts from absolute properties when needed =====================
   contrasts <- .derive_contrasts(body, sound_speed_sw, density_sw)
   body$h <- if (!is.null(body$h)) body$h else contrasts$h
   body$g <- if (!is.null(body$g)) body$g else contrasts$g
-  body <- fill_props(body, sound_speed_sw, density_sw)
+  body <- .complete_material_props(body, sound_speed_sw, density_sw)
   # Define medium parameters ===================================================
-  medium_params <- data.frame(
-    sound_speed = sound_speed_sw,
-    density = density_sw
-  )
+  medium_params <- .init_medium_params(sound_speed_sw, density_sw)
   # Define model parameters recipe =============================================
   model_params <- list(
-    acoustics = data.frame(
-      # Frequency (Hz) =========================================================
-      frequency = frequency,
-      # Wavenumber (medium) ====================================================
-      k_sw = acousticTS::wavenumber(
-        frequency,
-        sound_speed_sw
-      )
+    acoustics = .init_acoustics_df(
+      frequency,
+      k_sw = sound_speed_sw
     )
   )
   # Class-specific model parameters ============================================
   if (scatterer_type == "FLS") {
-    # Define body parameters recipe ============================================
-    body_params <- data.frame(
-      length = shape$length,
-      theta = body$theta,
-      density = density_sw * body$g,
-      sound_speed = sound_speed_sw * body$h
-    )
-    # Body wave number =========================================================
-    model_params$acoustics$k_b <- acousticTS::wavenumber(
-      frequency,
-      sound_speed_sw * body$h
-    )
-    # Define body segment count ================================================
-    model_params$ns_b <- ncol(body$rpos)
-    # Slot new model parameters input for KRM ==================================
-    methods::slot(object, "model_parameters")$KRM <- list(
-      parameters = model_params,
-      medium = medium_params,
-      body = body_params,
-      variant = krm_variant
+    model_parameters <- .krm_initialize_fls(
+      body = body,
+      shape = shape,
+      model_params = model_params,
+      medium_params = medium_params,
+      sound_speed_sw = sound_speed_sw,
+      density_sw = density_sw,
+      krm_variant = krm_variant
     )
   } else if (scatterer_type == "SBF") {
-    # Define body parameters recipe ============================================
-    body_params <- data.frame(
-      length = shape$body$length,
-      theta = body$theta,
-      density = body$density,
-      sound_speed = body$sound_speed
-    )
-    # Pull bladder information =================================================
-    bladder <- acousticTS::extract(object, "bladder")
-    bladder <- fill_props(bladder, sound_speed_sw, density_sw)
-    body <- fill_props(body, sound_speed_sw, density_sw)
-    # Define bladder parameters recipe =========================================
-    bladder_params <- data.frame(
-      length = shape$bladder$length,
-      theta = bladder$theta,
-      density = bladder$density,
-      sound_speed = bladder$sound_speed
-    )
-    # Body wave number =========================================================
-    model_params$acoustics$k_b <- acousticTS::wavenumber(
-      frequency,
-      body$sound_speed
-    )
-    # Bladder wave number ======================================================
-    model_params$acoustics$k_sb <- acousticTS::wavenumber(
-      frequency,
-      bladder$sound_speed
-    )
-    # Define segment counts directly from the stored geometry so legacy SBF
-    # objects that carry `ncyl` instead of `n_segments` still initialize.
-    model_params$ns_b <- ncol(body$rpos)
-    # Define bladder segment count =============================================
-    model_params$ns_sb <- ncol(bladder$rpos)
-    # Slot new model parameters input for KRM ==================================
-    methods::slot(object, "model_parameters")$KRM <- list(
-      parameters = model_params,
-      medium = medium_params,
-      body = body_params,
-      bladder = bladder_params,
-      variant = krm_variant
+    model_parameters <- .krm_initialize_sbf(
+      object = object,
+      body = body,
+      shape = shape,
+      model_params = model_params,
+      medium_params = medium_params,
+      sound_speed_sw = sound_speed_sw,
+      density_sw = density_sw,
+      krm_variant = krm_variant
     )
   }
-  # Slot new model output for KRM ==============================================
-  methods::slot(object, "model")$KRM <- data.frame(frequency,
-                                                   sigma_bs = rep(
-                                                     NA,
-                                                     length(frequency)
-                                                   )
+
+  .init_model_slots(
+    object = object,
+    model_name = "KRM",
+    frequency = frequency,
+    model_parameters = model_parameters
   )
-# Output =====================================================================
-  return(object)
 }
+################################################################################
+.krm_initialize_fls <- function(body,
+                                shape,
+                                model_params,
+                                medium_params,
+                                sound_speed_sw,
+                                density_sw,
+                                krm_variant) {
+  body_params <- data.frame(
+    length = shape$length,
+    theta = body$theta,
+    density = density_sw * body$g,
+    sound_speed = sound_speed_sw * body$h
+  )
+
+  model_params$acoustics$k_b <- wavenumber(frequency = model_params$acoustics$frequency,
+                                           sound_speed = sound_speed_sw * body$h)
+  model_params$ns_b <- ncol(body$rpos)
+
+  list(
+    parameters = model_params,
+    medium = medium_params,
+    body = body_params,
+    variant = krm_variant
+  )
+}
+
+################################################################################
+.krm_initialize_sbf <- function(object,
+                                body,
+                                shape,
+                                model_params,
+                                medium_params,
+                                sound_speed_sw,
+                                density_sw,
+                                krm_variant) {
+  bladder <- acousticTS::extract(object, "bladder")
+  bladder <- .complete_material_props(bladder, sound_speed_sw, density_sw)
+  body <- .complete_material_props(body, sound_speed_sw, density_sw)
+
+  body_params <- data.frame(
+    length = shape$body$length,
+    theta = body$theta,
+    density = body$density,
+    sound_speed = body$sound_speed
+  )
+  bladder_params <- data.frame(
+    length = shape$bladder$length,
+    theta = bladder$theta,
+    density = bladder$density,
+    sound_speed = bladder$sound_speed
+  )
+
+  model_params$acoustics$k_b <- wavenumber(
+    frequency = model_params$acoustics$frequency,
+    sound_speed = body$sound_speed
+  )
+  model_params$acoustics$k_sb <- wavenumber(
+    frequency = model_params$acoustics$frequency,
+    sound_speed = bladder$sound_speed
+  )
+  model_params$ns_b <- ncol(body$rpos)
+  model_params$ns_sb <- ncol(bladder$rpos)
+
+  list(
+    parameters = model_params,
+    medium = medium_params,
+    body = body_params,
+    bladder = bladder_params,
+    variant = krm_variant
+  )
+}
+
 ################################################################################
 .krm_variant_settings <- function(krm_variant = c("lowcontrast",
                                                   "mixed",
@@ -511,210 +527,293 @@ krm_initialize <- function(object,
   -1 / (1 + 1i * C0)
 }
 
-#' Calculates the theoretical TS using Kirchoff-ray Mode approximation.
-#' @noRd
-KRM <- function(object) {
-  # Detect object class ========================================================
-  scatterer_type <- class(object)
-  if (inherits(object, "FLS")) {
-    object <- .krm_profile_object(object)
-  }
-  # Extract model parameter inputs =============================================
-  model <- extract(object, "model_parameters")$KRM
-  # Extract body parameters ====================================================
-  body <- extract(object, "body")
-  # Calculate reflection coefficient for medium-body interface =================
-  R12 <- reflection_coefficient(model$medium, model$body)
-  # Calculate transmission coefficient and its reverse =========================
-  T12T21 <- 1 - R12 * R12
-  # Sum across body position vector ============================================
-  rpos <- switch(scatterer_type,
-                FLS = if ("w" %in% rownames(body$rpos)) {
-                  # Arbitrary shape: body$rpos already has x, w, zU, zL rows
-                  body$rpos
-                } else {
-                  radius_profile <- .dwba_body_radius(body)
-                  rbind(x = body$rpos[1, ],
-                        w = radius_profile * 2,
-                        zU = radius_profile,
-                        zL = -radius_profile)
-                },
-                SBF = body$rpos
+################################################################################
+.krm_body_rpos <- function(body, scatterer_type) {
+  switch(scatterer_type,
+    FLS = if ("w" %in% rownames(body$rpos)) {
+      body$rpos
+    } else {
+      radius_profile <- .dwba_body_radius(body)
+      rbind(
+        x = body$rpos[1, ],
+        w = radius_profile * 2,
+        zU = radius_profile,
+        zL = -radius_profile
+      )
+    },
+    SBF = body$rpos
   )
+}
+
+################################################################################
+.krm_body_term <- function(model, body, scatterer_type) {
+  rpos <- .krm_body_rpos(body, scatterer_type)
   body_rpos_sum <- along_sum(rpos, model$parameters$ns_b)
-  # Approximate radius of body cylinders =======================================
   a_body <- body_rpos_sum[2, ] / 4
-  # Combine medium wavenumber (k) and radii to calculate "ka" ==================
+
   ka_body <- matrix(
-    data = rep(a_body,
-               each = length(model$parameters$acoustics$k_sw)
-    ),
+    data = rep(a_body, each = length(model$parameters$acoustics$k_sw)),
     ncol = length(a_body),
     nrow = length(model$parameters$acoustics$k_sw)
   ) * model$parameters$acoustics$k_sw
-  # Convert c-z coordinates to required u-v rotated coordinates ================
+
   uv_body <- body_rotation(
     body_rpos_sum,
     body$rpos,
     body$theta,
     length(model$parameters$acoustics$k_sw)
   )
-  # Calculate body empirical phase shift function ==============================
+
   body_dorsal_sum <- matrix(
-    data = rep(
-      body_rpos_sum[3, ],
-      each = length(model$parameters$acoustics$k_sw)
-    ),
+    data = rep(body_rpos_sum[3, ], each = length(model$parameters$acoustics$k_sw)),
     ncol = length(body_rpos_sum[3, ]),
     nrow = length(model$parameters$acoustics$k_sw)
   ) / 2
   Psi_b <- -pi * model$parameters$acoustics$k_b * body_dorsal_sum /
     (2 * (model$parameters$acoustics$k_b * body_dorsal_sum + 0.4))
-  # Estimate natural log function (phase, etc.) ================================
+
+  R12 <- reflection_coefficient(model$medium, model$body)
+  T12T21 <- 1 - R12 * R12
+
   exp_body <- exp(-2i * model$parameters$acoustics$k_sw * uv_body$vbU) -
-    T12T21 * exp(-2i * model$parameters$acoustics$k_sw * uv_body$vbU +
-                   2i * model$parameters$acoustics$k_b *
-                   (uv_body$vbU - uv_body$vbL) + 1i * Psi_b)
-  # Resolve summation term =====================================================
+    T12T21 * exp(
+      -2i * model$parameters$acoustics$k_sw * uv_body$vbU +
+        2i * model$parameters$acoustics$k_b * (uv_body$vbU - uv_body$vbL) +
+        1i * Psi_b
+    )
+
   delta_u_body <- matrix(
-    data = rep(uv_body$delta_u,
-               each = length(model$parameters$acoustics$k_sw)),
+    data = rep(uv_body$delta_u, each = length(model$parameters$acoustics$k_sw)),
     ncol = length(uv_body$delta_u),
     nrow = length(model$parameters$acoustics$k_sw)
   )
   body_summation <- sqrt(ka_body) * delta_u_body
-  # Calculate linear scattering length (m) =====================================
-  f_body <- rowSums(-((1i * (R12 / (2 * sqrt(pi)))) *
-                        body_summation * exp_body))
-  if (scatterer_type == "FLS") {
-    # Define KRM slot for FLS-type scatterer ===================================
-    methods::slot(object, "model")$KRM <- data.frame(
-      frequency = model$parameters$acoustics$frequency,
-      ka = model$parameters$acoustics$k_sw *
-        stats::median(a_body, na.rm = TRUE),
-      f_bs = f_body,
-      sigma_bs = abs(f_body) * abs(f_body),
-      TS = 20 * log10(abs(f_body))
-    )
-  } else if (scatterer_type == "SBF") {
-    krm_variant <- model$variant
-    if (is.null(krm_variant)) {
-      krm_variant <- .krm_variant_settings("lowcontrast")
-    }
-    k_bladder_high <- if (identical(krm_variant$high_ka_medium, "body")) {
+
+  list(
+    f_body = rowSums(
+      -((1i * (R12 / (2 * sqrt(pi)))) * body_summation * exp_body)
+    ),
+    a_body = a_body,
+    R12 = R12,
+    T12T21 = T12T21
+  )
+}
+
+################################################################################
+.krm_variant_media <- function(model, krm_variant) {
+  if (is.null(krm_variant)) {
+    krm_variant <- .krm_variant_settings("lowcontrast")
+  }
+
+  list(
+    k_bladder_high = if (identical(krm_variant$high_ka_medium, "body")) {
       model$parameters$acoustics$k_b
     } else {
       model$parameters$acoustics$k_sw
-    }
-    k_bladder_low <- if (identical(krm_variant$low_ka_medium, "body")) {
+    },
+    k_bladder_low = if (identical(krm_variant$low_ka_medium, "body")) {
       model$parameters$acoustics$k_b
     } else {
       model$parameters$acoustics$k_sw
-    }
-    low_density <- if (identical(krm_variant$low_ka_medium, "body")) {
+    },
+    low_density = if (identical(krm_variant$low_ka_medium, "body")) {
       model$body$density
     } else {
       model$medium$density
-    }
-    low_sound_speed <- if (identical(krm_variant$low_ka_medium, "body")) {
+    },
+    low_sound_speed = if (identical(krm_variant$low_ka_medium, "body")) {
       model$body$sound_speed
     } else {
       model$medium$sound_speed
     }
-    #### Repeat process for bladder ============================================
-    # Extract bladder parameters ===============================================
-    bladder <- acousticTS::extract(object, "bladder")
-    # Calculate reflection coefficient for bladder =============================
-    R23 <- reflection_coefficient(
-      body,
-      bladder
-    )
-    # Summarize swimbladder geometry ===========================================
-    bladder_geom <- .krm_bladder_geometry(bladder$rpos, bladder$theta)
-    bladder_rpos_sum <- bladder_geom$sum_rpos
-    # Approximate radii of bladder discrete cylinders ==========================
-    a_bladder <- bladder_rpos_sum[2, ] / 4
-    a_bladder_eq <- bladder_geom$a_eq
-    # Combine wavenumber (k) and radii to calculate "ka" for bladder ===========
-    ka_bladder_empirical <- matrix(
-      data = rep(a_bladder, each = length(model$parameters$acoustics$k_sw)),
-      ncol = length(a_bladder),
-      nrow = length(model$parameters$acoustics$k_sw)
-    ) * model$parameters$acoustics$k_sw
-    ka_bladder <- matrix(
-      data = rep(a_bladder, each = length(model$parameters$acoustics$k_sw)),
-      ncol = length(a_bladder),
-      nrow = length(model$parameters$acoustics$k_sw)
-    ) * k_bladder_high
-    ka_bladder_eq <- k_bladder_low * bladder_geom$a_eq_total
-    low_ka_mask <- is.finite(ka_bladder_eq) & ka_bladder_eq <= 0.15
-    # Calculate Kirchoff approximation empirical factor, A_sb ==================
-    A_sb <- ka_bladder_empirical / (ka_bladder_empirical + 0.083)
-    # Calculate empirical phase shift for a fluid cylinder, Psi_p ==============
-    Psi_p <- ka_bladder_empirical / (40 + ka_bladder_empirical) - 1.05
-    # Convert x-z coordinates to requisite u-v rotated coordinates =============
-    uv_bladder <- bladder_rotation(
-      bladder_rpos_sum,
-      bladder$rpos,
-      bladder$theta,
-      length(model$parameters$acoustics$k_sw)
-    )
-    # Estimate natural log functions  ==========================================
-    delta_u_bladder <- matrix(
-      data = rep(uv_bladder$delta_u,
-                 each = length(model$parameters$acoustics$k_sw)),
-      ncol = length(uv_bladder$delta_u),
-      nrow = length(model$parameters$acoustics$k_sw)
-    )
-    exp_bladder <- exp(-1i * (2 * k_bladder_high *
-                                uv_bladder$v + Psi_p)) * delta_u_bladder
-    # Calculate the summation term =============================================
-    bladder_summation <- A_sb * sqrt((ka_bladder + 1) * sin(bladder$theta))
-    bladder_high <- -1i * (R23 * T12T21) / (2 * sqrt(pi)) *
-      bladder_summation * exp_bladder
+  )
+}
 
-    g13 <- bladder$density / low_density
-    h13 <- bladder$sound_speed / low_sound_speed
-    b0 <- .krm_low_mode_b0(
-      k_medium = k_bladder_low,
-      k_bladder = model$parameters$acoustics$k_sb,
-      a_eq = bladder_geom$a_eq_total,
-      g13 = g13,
-      h13 = h13
-    )
-    dx_matrix <- matrix(
-      data = rep(bladder_geom$delta_x,
-                 each = length(model$parameters$acoustics$k_sw)),
-      ncol = length(bladder_geom$delta_x),
-      nrow = length(model$parameters$acoustics$k_sw)
-    )
-    phase_low <- rowSums(
-      exp(2i * outer(k_bladder_low, bladder_geom$v_mid)) *
-        dx_matrix,
-      na.rm = TRUE
-    ) / bladder_geom$length_eq
-    Delta_low <- k_bladder_low * bladder_geom$length_eq * cos(bladder$theta)
-    sinc_low <- rep(1, length(Delta_low))
-    nz_delta <- abs(Delta_low) > sqrt(.Machine$double.eps)
-    sinc_low[nz_delta] <- sin(Delta_low[nz_delta]) / Delta_low[nz_delta]
-    bladder_low <- -1i / pi * bladder_geom$length_eq * sinc_low *
-      b0 * phase_low
+################################################################################
+.krm_swimbladder_high_term <- function(model,
+                                       bladder,
+                                       bladder_geom,
+                                       R23,
+                                       T12T21,
+                                       k_bladder_high) {
+  bladder_rpos_sum <- bladder_geom$sum_rpos
+  a_bladder <- bladder_rpos_sum[2, ] / 4
 
-    f_bladder <- rowSums(bladder_high)
-    f_bladder[low_ka_mask] <- bladder_low[low_ka_mask]
-    # Estimate backscattering length, f_fluid/f_soft ===========================
-    # Estimate total backscattering length, f_bs ===============================
-    f_bs <- f_body + f_bladder
+  ka_bladder_empirical <- matrix(
+    data = rep(a_bladder, each = length(model$parameters$acoustics$k_sw)),
+    ncol = length(a_bladder),
+    nrow = length(model$parameters$acoustics$k_sw)
+  ) * model$parameters$acoustics$k_sw
+  ka_bladder <- matrix(
+    data = rep(a_bladder, each = length(model$parameters$acoustics$k_sw)),
+    ncol = length(a_bladder),
+    nrow = length(model$parameters$acoustics$k_sw)
+  ) * k_bladder_high
+
+  A_sb <- ka_bladder_empirical / (ka_bladder_empirical + 0.083)
+  Psi_p <- ka_bladder_empirical / (40 + ka_bladder_empirical) - 1.05
+
+  uv_bladder <- bladder_rotation(
+    bladder_rpos_sum,
+    bladder$rpos,
+    bladder$theta,
+    length(model$parameters$acoustics$k_sw)
+  )
+  delta_u_bladder <- matrix(
+    data = rep(uv_bladder$delta_u, each = length(model$parameters$acoustics$k_sw)),
+    ncol = length(uv_bladder$delta_u),
+    nrow = length(model$parameters$acoustics$k_sw)
+  )
+  exp_bladder <- exp(-1i * (2 * k_bladder_high * uv_bladder$v + Psi_p)) *
+    delta_u_bladder
+  bladder_summation <- A_sb * sqrt((ka_bladder + 1) * sin(bladder$theta))
+
+  list(
+    f = rowSums(
+      -1i * (R23 * T12T21) / (2 * sqrt(pi)) *
+        bladder_summation * exp_bladder
+    ),
+    ka_bladder_eq = NULL
+  )
+}
+
+################################################################################
+.krm_swimbladder_low_term <- function(model,
+                                      bladder,
+                                      bladder_geom,
+                                      k_bladder_low,
+                                      low_density,
+                                      low_sound_speed) {
+  ka_bladder_eq <- k_bladder_low * bladder_geom$a_eq_total
+
+  g13 <- bladder$density / low_density
+  h13 <- bladder$sound_speed / low_sound_speed
+  b0 <- .krm_low_mode_b0(
+    k_medium = k_bladder_low,
+    k_bladder = model$parameters$acoustics$k_sb,
+    a_eq = bladder_geom$a_eq_total,
+    g13 = g13,
+    h13 = h13
+  )
+
+  dx_matrix <- matrix(
+    data = rep(bladder_geom$delta_x, each = length(model$parameters$acoustics$k_sw)),
+    ncol = length(bladder_geom$delta_x),
+    nrow = length(model$parameters$acoustics$k_sw)
+  )
+  phase_low <- rowSums(
+    exp(2i * outer(k_bladder_low, bladder_geom$v_mid)) * dx_matrix,
+    na.rm = TRUE
+  ) / bladder_geom$length_eq
+  Delta_low <- k_bladder_low * bladder_geom$length_eq * cos(bladder$theta)
+  sinc_low <- rep(1, length(Delta_low))
+  nz_delta <- abs(Delta_low) > sqrt(.Machine$double.eps)
+  sinc_low[nz_delta] <- sin(Delta_low[nz_delta]) / Delta_low[nz_delta]
+
+  list(
+    f = -1i / pi * bladder_geom$length_eq * sinc_low * b0 * phase_low,
+    low_ka_mask = is.finite(ka_bladder_eq) & ka_bladder_eq <= 0.15
+  )
+}
+
+################################################################################
+.krm_swimbladder_term <- function(model, body, bladder, krm_variant) {
+  media <- .krm_variant_media(model, krm_variant)
+  R23 <- reflection_coefficient(body, bladder)
+  bladder_geom <- .krm_bladder_geometry(bladder$rpos, bladder$theta)
+
+  high_term <- .krm_swimbladder_high_term(
+    model = model,
+    bladder = bladder,
+    bladder_geom = bladder_geom,
+    R23 = R23,
+    T12T21 = 1 - reflection_coefficient(model$medium, model$body)^2,
+    k_bladder_high = media$k_bladder_high
+  )
+  low_term <- .krm_swimbladder_low_term(
+    model = model,
+    bladder = bladder,
+    bladder_geom = bladder_geom,
+    k_bladder_low = media$k_bladder_low,
+    low_density = media$low_density,
+    low_sound_speed = media$low_sound_speed
+  )
+
+  f_bladder <- high_term$f
+  f_bladder[low_term$low_ka_mask] <- low_term$f[low_term$low_ka_mask]
+  f_bladder
+}
+
+################################################################################
+.krm_combine_terms <- function(f_body, f_bladder = NULL) {
+  if (is.null(f_bladder)) {
+    sigma_bs <- abs(f_body) * abs(f_body)
+    return(list(
+      f_bs = f_body,
+      sigma_bs = sigma_bs,
+      TS = 20 * log10(abs(f_body))
+    ))
+  }
+
+  f_bs <- f_body + f_bladder
+  sigma_body <- abs(f_body) * abs(f_body)
+  sigma_bladder <- abs(f_bladder) * abs(f_bladder)
+  sigma_bs <- abs(f_bs) * abs(f_bs)
+
+  list(
+    f_bs = f_bs,
+    sigma_body = sigma_body,
+    sigma_bladder = sigma_bladder,
+    sigma_bs = sigma_bs,
+    TS = 10 * log10(sigma_bs)
+  )
+}
+
+#' Calculates the theoretical TS using Kirchoff-ray Mode approximation.
+#' @noRd
+KRM <- function(object) {
+  # Detect object class ========================================================
+  scatterer_type <- class(object)
+  if (inherits(object, "FLS")) {
+    object <- .as_krm_profile(object)
+  }
+  # Extract model parameter inputs =============================================
+  model <- extract(object, "model_parameters")$KRM
+  # Extract body parameters ====================================================
+  body <- extract(object, "body")
+  body_terms <- .krm_body_term(model, body, scatterer_type)
+  if (scatterer_type == "FLS") {
+    totals <- .krm_combine_terms(body_terms$f_body)
     # Define KRM slot for FLS-type scatterer ===================================
     methods::slot(object, "model")$KRM <- data.frame(
       frequency = model$parameters$acoustics$frequency,
       ka = model$parameters$acoustics$k_sw *
-        stats::median(a_body, na.rm = TRUE),
-      f_body = f_body,
+        stats::median(body_terms$a_body, na.rm = TRUE),
+      f_bs = totals$f_bs,
+      sigma_bs = totals$sigma_bs,
+      TS = totals$TS
+    )
+  } else if (scatterer_type == "SBF") {
+    bladder <- acousticTS::extract(object, "bladder")
+    f_bladder <- .krm_swimbladder_term(
+      model = model,
+      body = body,
+      bladder = bladder,
+      krm_variant = model$variant
+    )
+    totals <- .krm_combine_terms(body_terms$f_body, f_bladder)
+    # Define KRM slot for FLS-type scatterer ===================================
+    methods::slot(object, "model")$KRM <- data.frame(
+      frequency = model$parameters$acoustics$frequency,
+      ka = model$parameters$acoustics$k_sw *
+        stats::median(body_terms$a_body, na.rm = TRUE),
+      f_body = body_terms$f_body,
       f_bladder = f_bladder,
-      f_bs = f_bs,
-      sigma_bs = abs(f_bs) * abs(f_bs),
-      TS = 20 * log10(abs(f_bs))
+      sigma_body = totals$sigma_body,
+      sigma_bladder = totals$sigma_bladder,
+      f_bs = totals$f_bs,
+      sigma_bs = totals$sigma_bs,
+      TS = totals$TS
     )
   }
   # Return object ==============================================================

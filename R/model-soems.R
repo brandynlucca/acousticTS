@@ -112,30 +112,13 @@ calibration_initialize <- function(
     object,
     "body"
   )
-  # Define medium parameters ===================================================
-  medium_params <- data.frame(
-    sound_speed = sound_speed_sw,
-    density = density_sw
-  )
   # Define model parameters recipe =============================================
   model_params <- list(
-    acoustics = data.frame(
-      frequency = frequency,
-      # Wavenumber (medium) ====================================================
-      k_sw = acousticTS::wavenumber(
-        frequency,
-        sound_speed_sw
-      ),
-      # Wavenumber (longitudinal axis) =========================================
-      k_l = acousticTS::wavenumber(
-        frequency,
-        body$sound_speed_longitudinal
-      ),
-      # Wavenumber (tranversal axis) ===========================================
-      k_t = acousticTS::wavenumber(
-        frequency,
-        body$sound_speed_transversal
-      )
+    acoustics = .init_acoustics_df(
+      frequency,
+      k_sw = sound_speed_sw,
+      k_l = body$sound_speed_longitudinal,
+      k_t = body$sound_speed_transversal
     ),
     parameters = data.frame(
       ncyl_b = shape$n_segments,
@@ -151,28 +134,16 @@ calibration_initialize <- function(
     density = body$density,
     theta = body$theta
   )
-  # Add model parameters slot to scattering object =============================
-  methods::slot(
-    object,
-    "model_parameters"
-  )$calibration <- list(
-    parameters = model_params,
-    medium = medium_params,
-    body = body_params
-  )
-  # Add model results slot to scattering object ================================
-  methods::slot(
-    object,
-    "model"
-  )$calibration <- data.frame(
+  .init_model_slots(
+    object = object,
+    model_name = "calibration",
     frequency = frequency,
-    sigma_bs = rep(
-      NA,
-      length(frequency)
+    model_parameters = list(
+      parameters = model_params,
+      medium = .init_medium_params(sound_speed_sw, density_sw),
+      body = body_params
     )
   )
-  # Output =====================================================================
-  return(object)
 }
 
 #' Calculates theoretical TS of a solid sphere of a certain material at a given

@@ -203,7 +203,7 @@ NULL
     )
   }
 
-  object <- .dwba_profile_object(object)
+  object <- .as_dwba_profile(object)
   shape <- extract(object, "shape_parameters")
   body <- extract(object, "body")
   body$radius <- .dwba_body_radius(body)
@@ -303,36 +303,30 @@ pcdwba_initialize <- function(object,
     sound_speed = sound_speed_sw,
     density = density_sw
   )
-
-  methods::slot(object, "model_parameters")$PCDWBA <- list(
-    parameters = list(
-      acoustics = data.frame(
-        frequency = frequency,
-        k_sw = wavenumber(frequency, sound_speed_sw)
+  .init_model_slots(
+    object = object,
+    model_name = "PCDWBA",
+    frequency = frequency,
+    model_parameters = list(
+      parameters = list(
+        acoustics = .init_acoustics_df(frequency, k_sw = sound_speed_sw)
+      ),
+      medium = medium_params,
+      body = list(
+        theta = body$theta,
+        h = body$h,
+        g = body$g,
+        Cb = Cb,
+        taper = geometry$taper,
+        theta_tilt = geometry$theta_tilt,
+        gamma_t = geometry$gamma_t,
+        dr_norm = geometry$dr_norm,
+        r_pos = geometry$r_pos,
+        length_body = geometry$length_body,
+        radius = prepared$max_radius
       )
-    ),
-    medium = medium_params,
-    body = list(
-      theta = body$theta,
-      h = body$h,
-      g = body$g,
-      Cb = Cb,
-      taper = geometry$taper,
-      theta_tilt = geometry$theta_tilt,
-      gamma_t = geometry$gamma_t,
-      dr_norm = geometry$dr_norm,
-      r_pos = geometry$r_pos,
-      length_body = geometry$length_body,
-      radius = prepared$max_radius
     )
   )
-
-  methods::slot(object, "model")$PCDWBA <- data.frame(
-    frequency = frequency,
-    sigma_bs = rep(NA_real_, length(frequency))
-  )
-
-  object
 }
 
 #' Phase-compensated distorted wave Born approximation.

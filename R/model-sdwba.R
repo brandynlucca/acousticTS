@@ -166,33 +166,21 @@ sdwba_initialize <- function(object,
                              phase_sd_init = sqrt(2) / 2,
                              length_init = 38.35e-3,
                              frequency_init = 120e3) {
-  object_profiled <- .dwba_profile_object(object)
+  object_profiled <- .as_dwba_profile(object)
   # Parse shape ================================================================
   shape <- acousticTS::extract(object_profiled, "shape_parameters")
   # Parse body =================================================================
-  body <- acousticTS::extract(object_profiled, "body")
-  contrasts <- .derive_contrasts(body, sound_speed_sw, density_sw)
-  body$h <- body_h <- contrasts$h
-  body$g <- body_g <- contrasts$g
-  # Define medium parameters ===================================================
-  medium_params <- data.frame(
-    sound_speed = sound_speed_sw,
-    density = density_sw
+  body <- .hydrate_contrasts(
+    acousticTS::extract(object_profiled, "body"),
+    sound_speed_sw,
+    density_sw
   )
   # Define model parameters recipe =============================================
   model_params <- list(
-    acoustics = data.frame(
-      frequency = frequency,
-      # Wavenumber (medium) ====================================================
-      k_sw = acousticTS::wavenumber(
-        frequency,
-        sound_speed_sw
-      ),
-      # Wavenumber (fluid) =====================================================
-      k_f = acousticTS::wavenumber(
-        frequency,
-        body_h * sound_speed_sw
-      )
+    acoustics = .init_acoustics_df(
+      frequency,
+      k_sw = sound_speed_sw,
+      k_f = body$h * sound_speed_sw
     ),
     n_segments = shape$n_segments
   )
@@ -236,36 +224,17 @@ sdwba_initialize <- function(object,
                                 )
                               }
   )
-  # Add model parameters slot to scattering object =============================
-  methods::slot(
-    object,
-    "model_parameters"
-  )$SDWBA <- list(
-    parameters = stochastic_params,
-    medium = medium_params,
-    body = body
-  )
-  # Add model results slot to scattering object ================================
-  methods::slot(
-    object,
-    "model"
-  )$SDWBA <- data.frame(
+  .init_model_slots(
+    object = object,
+    model_name = "SDWBA",
     frequency = frequency,
-    f_bs = rep(
-      NA,
-      length(frequency)
+    model_parameters = list(
+      parameters = stochastic_params,
+      medium = .init_medium_params(sound_speed_sw, density_sw),
+      body = body
     ),
-    sigma_bs = rep(
-      NA,
-      length(frequency)
-    ),
-    TS = rep(
-      NA,
-      length(frequency)
-    )
+    result_cols = c("f_bs", "sigma_bs", "TS")
   )
-  # Output =====================================================================
-  return(object)
 }
 
 

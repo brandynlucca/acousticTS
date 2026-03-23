@@ -91,11 +91,7 @@ sphms_initialize <- function(object,
       paste0("'", scatterer_shape, "'.")
     )
   }
-  # Define medium parameters ===================================================
-  medium_params <- data.frame(
-    sound_speed = sound_speed_sw,
-    density = density_sw
-  )
+  medium_params <- .init_medium_params(sound_speed_sw, density_sw)
   # Determine expansion coefficient Bm method ==================================
   # Validate method ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   if(is.null(boundary)){
@@ -218,14 +214,7 @@ sphms_initialize <- function(object,
     radius_fluid = radius_fluid
   )
   # Define model parameters recipe =============================================
-  acoustics <- data.frame(
-    frequency = frequency,
-    # Wavenumber (medium) ====================================================
-    k_sw = acousticTS::wavenumber(
-      frequency,
-      sound_speed_sw
-    )
-  )
+  acoustics <- .init_acoustics_df(frequency, k_sw = sound_speed_sw)
   # Wavenumber at shell-to-seawater interface ++++++++++++++++++++++++++++++++++
   acoustics$k_shell <- acoustics$k_sw / h21
   # Wavenumber at fluid-to-shell interface +++++++++++++++++++++++++++++++++++++
@@ -247,28 +236,16 @@ sphms_initialize <- function(object,
       model_params$acoustics$k_sw * radius_fluid + 20
     )
   }
-  # Add model parameters slot to scattering object =============================
-  methods::slot(
-    object,
-    "model_parameters"
-  )$SPHMS <- list(
-    parameters = model_params,
-    medium = medium_params,
-    body = body_params
-  )
-  # Add model results slot to scattering object ================================
-  methods::slot(
-    object,
-    "model"
-  )$SPHMS <- data.frame(
+  .init_model_slots(
+    object = object,
+    model_name = "SPHMS",
     frequency = frequency,
-    sigma_bs = rep(
-      NA,
-      length(frequency)
+    model_parameters = list(
+      parameters = model_params,
+      medium = medium_params,
+      body = body_params
     )
   )
-  # Output =====================================================================
-  return(object)
 }
 
 
@@ -329,44 +306,30 @@ SPHMS <- function(object) {
 #' @keywords internal
 #' @noRd
 .sphms_bm_rigid <- function(k1a, m_limit) {
-  # Get maximum m_limit ========================================================
   m_max <- max(m_limit)
-  # Calculate the expansion coefficient, A_m ===================================
-  Am <- mapply(FUN = function(k1a, ml) {
-    # Expand modal series iterator +++++++++++++++++++++++++++++++++++++++++++++
-    m <- 0:ml
-    # Calculate coeficient +++++++++++++++++++++++++++++++++++++++++++++++++++++
-    Am <- -(jsd(m, k1a) / hsd(m, k1a))
-    if (length(Am) < (m_max + 1)) {
-      difference <- (m_max + 1) - length(Am)
-      Am <- c(Am, rep(NA, difference))
-    }
-    Am
-  }, k1a, m_limit)
-  # Return the entire boundary modal term ======================================
-  colSums((2 * (0:m_max) + 1) * (-1)^(0:m_max) * Am, na.rm = TRUE)
+  Am <- .modal_series_apply(
+    m_limit = m_limit,
+    FUN = function(k1a, ml) {
+      -(jsd(0:ml, k1a) / hsd(0:ml, k1a))
+    },
+    k1a = k1a
+  )
+  .modal_weighted_sum(Am, (2 * (0:m_max) + 1) * (-1)^(0:m_max))
 }
 
 #' Helper function for pressure release sphere
 #' @keywords internal
 #' @noRd
 .sphms_bm_prelease <- function(k1a, m_limit) {
-  # Get maximum m_limit ========================================================
   m_max <- max(m_limit)
-  # Calculate the expansion coefficient, A_m ===================================
-  Am <- mapply(FUN = function(k1a, ml) {
-    # Expand modal series iterator +++++++++++++++++++++++++++++++++++++++++++++
-    m <- 0:ml
-    # Calculate coeficient +++++++++++++++++++++++++++++++++++++++++++++++++++++
-    Am <- -(js(m, k1a) / hs(m, k1a))
-    if (length(Am) < (m_max + 1)) {
-      difference <- (m_max + 1) - length(Am)
-      Am <- c(Am, rep(NA, difference))
-    }
-    Am
-  }, k1a, m_limit)
-  # Return the entire boundary modal term ======================================
-  colSums((2 * (0:m_max) + 1) * (-1)^(0:m_max) * Am, na.rm = TRUE)
+  Am <- .modal_series_apply(
+    m_limit = m_limit,
+    FUN = function(k1a, ml) {
+      -(js(0:ml, k1a) / hs(0:ml, k1a))
+    },
+    k1a = k1a
+  )
+  .modal_weighted_sum(Am, (2 * (0:m_max) + 1) * (-1)^(0:m_max))
 }
 
 #' Helper function for fluid sphere
@@ -375,36 +338,29 @@ SPHMS <- function(object) {
 .sphms_bm_fluid <- function(k1a, k3a, g31, h31, m_limit) {
   # Get material properties product ============================================
   gh <- g31 * h31
-  # Get maxmimum m_limit =======================================================
   m_max <- max(m_limit)
-  # Calculate expansion ceofficient, C_m =======================================
-  # Numerator ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  cm_num <- mapply(function(k1a, k3a, ml) {
-    m <- 0:ml
-    num <- (jsd(m, k3a) * ys(m, k1a)) / (js(m, k3a) * jsd(m, k1a)) -
-      (gh * ysd(m, k1a) / jsd(m, k1a))
-    if (length(num) < (m_max + 1)) {
-      difference <- (m_max + 1) - length(num)
-      num <- c(num, rep(NA, difference))
-    }
-    num
-  }, k1a, k3a, m_limit)
-  # Denominator ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  cm_denom <- mapply(function(k1a, k3a, ml) {
-    m <- 0:ml
-    denom <- (jsd(m, k3a) * js(m, k1a)) / (js(m, k3a) * jsd(m, k1a)) - gh
-    if (length(denom) < (m_max + 1)) {
-      difference <- (m_max + 1) - length(denom)
-      denom <- c(denom, rep(NA, difference))
-    }
-    denom
-  }, k1a, k3a, m_limit)
-  # Quotient +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  cm_num <- .modal_series_apply(
+    m_limit = m_limit,
+    FUN = function(k1a, k3a, ml) {
+      m <- 0:ml
+      (jsd(m, k3a) * ys(m, k1a)) / (js(m, k3a) * jsd(m, k1a)) -
+        (gh * ysd(m, k1a) / jsd(m, k1a))
+    },
+    k1a = k1a,
+    k3a = k3a
+  )
+  cm_denom <- .modal_series_apply(
+    m_limit = m_limit,
+    FUN = function(k1a, k3a, ml) {
+      m <- 0:ml
+      (jsd(m, k3a) * js(m, k1a)) / (js(m, k3a) * jsd(m, k1a)) - gh
+    },
+    k1a = k1a,
+    k3a = k3a
+  )
   cm <- cm_num / cm_denom
-  # Calculate the expansion coefficient, A_m ===================================
   Am <- (-1 / (1 + 1i * cm))
-  # Return the entire boundary modal term ======================================
-  colSums((2 * (0:m_max) + 1) * (-1)^(0:m_max) * Am, na.rm = TRUE)
+  .modal_weighted_sum(Am, (2 * (0:m_max) + 1) * (-1)^(0:m_max))
 }
 
 #' Helper function for shelled pressure release sphere

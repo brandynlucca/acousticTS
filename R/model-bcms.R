@@ -91,10 +91,7 @@ bcms_initialize <- function(object,
     )
   }
 
-  body <- extract(object, "body")
-  contrasts <- .derive_contrasts(body, sound_speed_sw, density_sw)
-  body$h <- contrasts$h
-  body$g <- contrasts$g
+  body <- .hydrate_contrasts(extract(object, "body"), sound_speed_sw, density_sw)
 
   if (!is.null(shape$radius_curvature_ratio) &&
       !is.na(shape$radius_curvature_ratio) &&
@@ -112,59 +109,54 @@ bcms_initialize <- function(object,
     )
   }
 
-  medium_params <- data.frame(
-    sound_speed = sound_speed_sw,
-    density = density_sw
-  )
-
   if (is.null(m_limit)) {
     m_limit <- ceiling(
       wavenumber(frequency, sound_speed_sw) * shape$radius
     ) + 10
   }
 
-  methods::slot(object, "model_parameters")$BCMS <- list(
-    parameters = list(
-      acoustics = data.frame(
-        frequency = frequency,
-        lambda = sound_speed_sw / frequency,
-        k_sw = wavenumber(frequency, sound_speed_sw),
-        k_f = wavenumber(frequency, sound_speed_sw * body$h),
-        m_limit = m_limit
+  .init_model_slots(
+    object = object,
+    model_name = "BCMS",
+    frequency = frequency,
+    model_parameters = list(
+      parameters = list(
+        acoustics = transform(
+          .init_acoustics_df(
+            frequency,
+            k_sw = sound_speed_sw,
+            k_f = sound_speed_sw * body$h
+          ),
+          lambda = sound_speed_sw / frequency,
+          m_limit = m_limit
+        ),
+        Bm_method = switch(
+          boundary,
+          liquid_filled = "Bm_fluid",
+          gas_filled = "Bm_fluid",
+          fixed_rigid = "Bm_rigid",
+          pressure_release = "Bm_pressure_release"
+        ),
+        boundary = boundary
       ),
-      Bm_method = switch(
-        boundary,
-        liquid_filled = "Bm_fluid",
-        gas_filled = "Bm_fluid",
-        fixed_rigid = "Bm_rigid",
-        pressure_release = "Bm_pressure_release"
-      ),
-      boundary = boundary
-    ),
-    medium = medium_params,
-    body = list(
-      length = shape$length,
-      radius = shape$radius,
-      theta = body$theta,
-      g = body$g,
-      h = body$h,
-      is_bent = !is.null(shape$radius_curvature_ratio) &&
-        !is.na(shape$radius_curvature_ratio),
-      radius_curvature = if (!is.null(shape$radius_curvature_ratio) &&
-                             !is.na(shape$radius_curvature_ratio)) {
-        shape$radius_curvature_ratio * shape$length
-      } else {
-        NA_real_
-      }
+      medium = .init_medium_params(sound_speed_sw, density_sw),
+      body = list(
+        length = shape$length,
+        radius = shape$radius,
+        theta = body$theta,
+        g = body$g,
+        h = body$h,
+        is_bent = !is.null(shape$radius_curvature_ratio) &&
+          !is.na(shape$radius_curvature_ratio),
+        radius_curvature = if (!is.null(shape$radius_curvature_ratio) &&
+                               !is.na(shape$radius_curvature_ratio)) {
+          shape$radius_curvature_ratio * shape$length
+        } else {
+          NA_real_
+        }
+      )
     )
   )
-
-  methods::slot(object, "model")$BCMS <- data.frame(
-    frequency = frequency,
-    sigma_bs = rep(NA_real_, length(frequency))
-  )
-
-  object
 }
 
 #' @noRd

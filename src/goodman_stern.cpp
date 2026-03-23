@@ -375,7 +375,6 @@ ComplexMatrix elastic_shell_boundary_conditions(
                     ka_matrix(idx_k3a_fluid, f),
                     lambda, mu, rho_ratio_sw, rho_ratio_fl
                 );
-                result(f, m) = Rcpp::ComplexVector::get_na();
                 result(f, m) = to_Rcomplex(bm);
             } else {
                 result(f, m) = Rcpp::ComplexVector::get_na();

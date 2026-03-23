@@ -145,33 +145,21 @@ dwba_initialize <- function(object,
                             frequency,
                             sound_speed_sw = 1500,
                             density_sw = 1026) {
-  object_profiled <- .dwba_profile_object(object)
+  object_profiled <- .as_dwba_profile(object)
   # Parse shape ================================================================
   shape <- acousticTS::extract(object_profiled, "shape_parameters")
   # Parse body =================================================================
-  body <- acousticTS::extract(object_profiled, "body")
-  contrasts <- .derive_contrasts(body, sound_speed_sw, density_sw)
-  body$h <- body_h <- contrasts$h
-  body$g <- body_g <- contrasts$g
-  # Define medium parameters ===================================================
-  medium_params <- data.frame(
-    sound_speed = sound_speed_sw,
-    density = density_sw
+  body <- .hydrate_contrasts(
+    acousticTS::extract(object_profiled, "body"),
+    sound_speed_sw,
+    density_sw
   )
   # Define model parameters recipe =============================================
   model_params <- list(
-    acoustics = data.frame(
-      frequency = frequency,
-      # Wavenumber (medium) ====================================================
-      k_sw = acousticTS::wavenumber(
-        frequency,
-        sound_speed_sw
-      ),
-      # Wavenumber (fluid) =====================================================
-      k_f = acousticTS::wavenumber(
-        frequency,
-        body_h * sound_speed_sw
-      )
+    acoustics = .init_acoustics_df(
+      frequency,
+      k_sw = sound_speed_sw,
+      k_f = body$h * sound_speed_sw
     ),
     ncyl_b = shape$n_segments
   )
@@ -179,32 +167,20 @@ dwba_initialize <- function(object,
   body_params <- list(
     rpos = body$rpos,
     radius = body$radius,
-    h = body_h,
-    g = body_g,
+    h = body$h,
+    g = body$g,
     theta = body$theta
   )
-  # Add model parameters slot to scattering object =============================
-  methods::slot(
-    object,
-    "model_parameters"
-  )$DWBA <- list(
-    parameters = model_params,
-    medium = medium_params,
-    body = body_params
-  )
-  # Add model results slot to scattering object ================================
-  methods::slot(
-    object,
-    "model"
-  )$DWBA <- data.frame(
+  .init_model_slots(
+    object = object,
+    model_name = "DWBA",
     frequency = frequency,
-    sigma_bs = rep(
-      NA,
-      length(frequency)
+    model_parameters = list(
+      parameters = model_params,
+      medium = .init_medium_params(sound_speed_sw, density_sw),
+      body = body_params
     )
   )
-  # Output =====================================================================
-  return(object)
 }
 
 #' Calculates the theoretical TS of a fluid-like scatterer at a given frequency

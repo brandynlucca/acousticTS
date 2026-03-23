@@ -268,33 +268,16 @@ psms_initialize <- function(object,
     )
   }
   # Parse body =================================================================
-  body <- extract(object, "body")
-  # Derive contrasts from absolute properties when needed ======================
-  body_h <- body$h %||%
-    if (!is.null(body$sound_speed)) body$sound_speed / sound_speed_sw else NA
-  body_g <- body$g %||%
-    if (!is.null(body$density)) body$density / density_sw else NA
-  body$h <- body_h
-  body$g <- body_g
-  # Define medium parameters ===================================================
-  medium_params <- data.frame(
-    sound_speed = sound_speed_sw,
-    density = density_sw
-  )
+  body <- .hydrate_contrasts(extract(object, "body"), sound_speed_sw, density_sw)
+  body_h <- body$h
+  body_g <- body$g
+  medium_params <- .init_medium_params(sound_speed_sw, density_sw)
   # Define model parameters recipe =============================================
   model_params <- list(
-    acoustics = data.frame(
-      frequency = frequency,
-      # Wavenumber (medium) ====================================================
-      k_sw = acousticTS::wavenumber(
-        frequency,
-        sound_speed_sw
-      ),
-      # Wavenumber (fluid) =====================================================
-      k_f = acousticTS::wavenumber(
-        frequency,
-        body_h * sound_speed_sw
-      )
+    acoustics = .init_acoustics_df(
+      frequency,
+      k_sw = sound_speed_sw,
+      k_f = body_h * sound_speed_sw
     ),
     precision = precision,
     n_integration = n_integration,
@@ -388,28 +371,16 @@ psms_initialize <- function(object,
   )
   model_params$acoustics$n_max <- model_params$acoustics$m_max +
     ceiling(0.5 * model_params$acoustics$chi_sw)
-  # Add model parameters slot to scattering object =============================
-  methods::slot(
-    object,
-    "model_parameters"
-  )$PSMS <- list(
-    parameters = model_params,
-    medium = medium_params,
-    body = body_params
-  )
-  # Add model results slot to scattering object ================================
-  methods::slot(
-    object,
-    "model"
-  )$PSMS <- data.frame(
+  .init_model_slots(
+    object = object,
+    model_name = "PSMS",
     frequency = frequency,
-    sigma_bs = rep(
-      NA,
-      length(frequency)
+    model_parameters = list(
+      parameters = model_params,
+      medium = medium_params,
+      body = body_params
     )
   )
-  # Output =====================================================================
-  return(object)
 }
 
 

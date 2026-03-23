@@ -21,17 +21,24 @@
     stop(paste0("'", target_name, "' must be numeric."), call. = FALSE)
   }
   if (is.null(names(target)) || any(names(target) == "")) {
-    stop(paste0("'", target_name, "' must be a named numeric vector."),
-         call. = FALSE)
+    stop(
+      sprintf(
+        paste0(
+          "'%s' must either be a scalar or a named vector with dimensions: %s."
+        ),
+        target_name,
+        paste0("'", valid_dims, "'", collapse = ", ")
+      ),
+      call. = FALSE
+    )
   }
   invalid <- setdiff(names(target), valid_dims)
   if (length(invalid) > 0) {
     stop(
       sprintf(
-        "'%s' has invalid dimension names: %s. Valid names are: %s.",
+        "'%s' has one or more invalid dimensions: %s.",
         target_name,
-        paste0("'", invalid, "'", collapse = ", "),
-        paste0("'", valid_dims, "'", collapse = ", ")
+        paste0("'", invalid, "'", collapse = ", ")
       ),
       call. = FALSE
     )

@@ -85,10 +85,7 @@ trcm_initialize <- function(object,
                             density_sw = 1026,
                             stationary_phase = FALSE) {
   # Define medium parameters early for contrast calculations ===================
-  medium_params <- data.frame(
-    sound_speed = sound_speed_sw,
-    density = density_sw
-  )
+  medium_params <- .init_medium_params(sound_speed_sw, density_sw)
   # Parse shape ================================================================
   shape_params <- acousticTS::extract(object, "shape_parameters")
   # Validate scatterer and shape types =========================================
@@ -132,32 +129,26 @@ trcm_initialize <- function(object,
     if (!is.null(body$density)) body$density / medium_params$density else NA
   # Define model parameters ====================================================
   model_params <- list(
-    acoustics = data.frame(
-      frequency = frequency,
-      lambda = sound_speed_sw / frequency,
-      k_sw = acousticTS::wavenumber(frequency, sound_speed_sw),
-      k_b = acousticTS::wavenumber(frequency, sound_speed_sw * body_params$h)
+    acoustics = transform(
+      .init_acoustics_df(
+        frequency,
+        k_sw = sound_speed_sw,
+        k_b = sound_speed_sw * body_params$h
+      ),
+      lambda = sound_speed_sw / frequency
     ),
     stationary_phase = stationary_phase
   )
-  # Store model parameters =====================================================
-  methods::slot(
-    object,
-    "model_parameters"
-  )$TRCM <- list(
-    parameters = model_params,
-    medium = medium_params,
-    body = body_params
-  )
-  # Initialize model results slot ==============================================
-  methods::slot(
-    object,
-    "model"
-  )$TRCM <- data.frame(
+  .init_model_slots(
+    object = object,
+    model_name = "TRCM",
     frequency = frequency,
-    sigma_bs = rep(NA, length(frequency))
+    model_parameters = list(
+      parameters = model_params,
+      medium = medium_params,
+      body = body_params
+    )
   )
-  object
 }
 
 .trcm_straight <- function(k1, k2a, l, a, r, I, theta_shift) {

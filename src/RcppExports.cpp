@@ -161,6 +161,81 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// js_complex_cpp
+SEXP js_complex_cpp(IntegerVector l, ComplexVector z);
+RcppExport SEXP _acousticTS_js_complex_cpp(SEXP lSEXP, SEXP zSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerVector >::type l(lSEXP);
+    Rcpp::traits::input_parameter< ComplexVector >::type z(zSEXP);
+    rcpp_result_gen = Rcpp::wrap(js_complex_cpp(l, z));
+    return rcpp_result_gen;
+END_RCPP
+}
+// ys_complex_cpp
+SEXP ys_complex_cpp(IntegerVector l, ComplexVector z);
+RcppExport SEXP _acousticTS_ys_complex_cpp(SEXP lSEXP, SEXP zSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerVector >::type l(lSEXP);
+    Rcpp::traits::input_parameter< ComplexVector >::type z(zSEXP);
+    rcpp_result_gen = Rcpp::wrap(ys_complex_cpp(l, z));
+    return rcpp_result_gen;
+END_RCPP
+}
+// hs_complex_cpp
+SEXP hs_complex_cpp(IntegerVector l, ComplexVector z);
+RcppExport SEXP _acousticTS_hs_complex_cpp(SEXP lSEXP, SEXP zSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerVector >::type l(lSEXP);
+    Rcpp::traits::input_parameter< ComplexVector >::type z(zSEXP);
+    rcpp_result_gen = Rcpp::wrap(hs_complex_cpp(l, z));
+    return rcpp_result_gen;
+END_RCPP
+}
+// js_complex_deriv_cpp
+SEXP js_complex_deriv_cpp(IntegerVector l, ComplexVector z, int k);
+RcppExport SEXP _acousticTS_js_complex_deriv_cpp(SEXP lSEXP, SEXP zSEXP, SEXP kSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerVector >::type l(lSEXP);
+    Rcpp::traits::input_parameter< ComplexVector >::type z(zSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    rcpp_result_gen = Rcpp::wrap(js_complex_deriv_cpp(l, z, k));
+    return rcpp_result_gen;
+END_RCPP
+}
+// ys_complex_deriv_cpp
+SEXP ys_complex_deriv_cpp(IntegerVector l, ComplexVector z, int k);
+RcppExport SEXP _acousticTS_ys_complex_deriv_cpp(SEXP lSEXP, SEXP zSEXP, SEXP kSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerVector >::type l(lSEXP);
+    Rcpp::traits::input_parameter< ComplexVector >::type z(zSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    rcpp_result_gen = Rcpp::wrap(ys_complex_deriv_cpp(l, z, k));
+    return rcpp_result_gen;
+END_RCPP
+}
+// hs_complex_deriv_cpp
+SEXP hs_complex_deriv_cpp(IntegerVector l, ComplexVector z, int k);
+RcppExport SEXP _acousticTS_hs_complex_deriv_cpp(SEXP lSEXP, SEXP zSEXP, SEXP kSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerVector >::type l(lSEXP);
+    Rcpp::traits::input_parameter< ComplexVector >::type z(zSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    rcpp_result_gen = Rcpp::wrap(hs_complex_deriv_cpp(l, z, k));
+    return rcpp_result_gen;
+END_RCPP
+}
 // dwba_fbs_cpp
 ComplexVector dwba_fbs_cpp(NumericMatrix rpos, NumericVector k_sw, double theta, double h, double R, int subdivisions, double rel_tol, double abs_tol);
 RcppExport SEXP _acousticTS_dwba_fbs_cpp(SEXP rposSEXP, SEXP k_swSEXP, SEXP thetaSEXP, SEXP hSEXP, SEXP RSEXP, SEXP subdivisionsSEXP, SEXP rel_tolSEXP, SEXP abs_tolSEXP) {
@@ -330,8 +405,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // prolate_spheroid_fbs
-Rcpp::ComplexVector prolate_spheroid_fbs(Rcpp::DataFrame acoustics, Rcpp::DataFrame body, Rcpp::DataFrame medium, Rcpp::List integration_pts, std::string precision, std::string Amn_method, bool adaptive);
-RcppExport SEXP _acousticTS_prolate_spheroid_fbs(SEXP acousticsSEXP, SEXP bodySEXP, SEXP mediumSEXP, SEXP integration_ptsSEXP, SEXP precisionSEXP, SEXP Amn_methodSEXP, SEXP adaptiveSEXP) {
+Rcpp::ComplexVector prolate_spheroid_fbs(Rcpp::DataFrame acoustics, Rcpp::DataFrame body, Rcpp::DataFrame medium, Rcpp::List integration_pts, std::string precision, std::string Amn_method, bool adaptive, bool vectorized);
+RcppExport SEXP _acousticTS_prolate_spheroid_fbs(SEXP acousticsSEXP, SEXP bodySEXP, SEXP mediumSEXP, SEXP integration_ptsSEXP, SEXP precisionSEXP, SEXP Amn_methodSEXP, SEXP adaptiveSEXP, SEXP vectorizedSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -342,7 +417,34 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< std::string >::type precision(precisionSEXP);
     Rcpp::traits::input_parameter< std::string >::type Amn_method(Amn_methodSEXP);
     Rcpp::traits::input_parameter< bool >::type adaptive(adaptiveSEXP);
-    rcpp_result_gen = Rcpp::wrap(prolate_spheroid_fbs(acoustics, body, medium, integration_pts, precision, Amn_method, adaptive));
+    Rcpp::traits::input_parameter< bool >::type vectorized(vectorizedSEXP);
+    rcpp_result_gen = Rcpp::wrap(prolate_spheroid_fbs(acoustics, body, medium, integration_pts, precision, Amn_method, adaptive, vectorized));
+    return rcpp_result_gen;
+END_RCPP
+}
+// vesms_backscatter_cpp
+ComplexVector vesms_backscatter_cpp(NumericVector frequency, IntegerVector m_limit, double density_sw, double density_viscous, double density_shell, double density_gas, double sound_speed_sw, double sound_speed_viscous, double sound_speed_gas, double radius_viscous, double radius_shell, double radius_gas, double shear_viscosity_viscous, double bulk_viscosity_viscous, double shear_modulus_shell, double lambda_shell);
+RcppExport SEXP _acousticTS_vesms_backscatter_cpp(SEXP frequencySEXP, SEXP m_limitSEXP, SEXP density_swSEXP, SEXP density_viscousSEXP, SEXP density_shellSEXP, SEXP density_gasSEXP, SEXP sound_speed_swSEXP, SEXP sound_speed_viscousSEXP, SEXP sound_speed_gasSEXP, SEXP radius_viscousSEXP, SEXP radius_shellSEXP, SEXP radius_gasSEXP, SEXP shear_viscosity_viscousSEXP, SEXP bulk_viscosity_viscousSEXP, SEXP shear_modulus_shellSEXP, SEXP lambda_shellSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type frequency(frequencySEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type m_limit(m_limitSEXP);
+    Rcpp::traits::input_parameter< double >::type density_sw(density_swSEXP);
+    Rcpp::traits::input_parameter< double >::type density_viscous(density_viscousSEXP);
+    Rcpp::traits::input_parameter< double >::type density_shell(density_shellSEXP);
+    Rcpp::traits::input_parameter< double >::type density_gas(density_gasSEXP);
+    Rcpp::traits::input_parameter< double >::type sound_speed_sw(sound_speed_swSEXP);
+    Rcpp::traits::input_parameter< double >::type sound_speed_viscous(sound_speed_viscousSEXP);
+    Rcpp::traits::input_parameter< double >::type sound_speed_gas(sound_speed_gasSEXP);
+    Rcpp::traits::input_parameter< double >::type radius_viscous(radius_viscousSEXP);
+    Rcpp::traits::input_parameter< double >::type radius_shell(radius_shellSEXP);
+    Rcpp::traits::input_parameter< double >::type radius_gas(radius_gasSEXP);
+    Rcpp::traits::input_parameter< double >::type shear_viscosity_viscous(shear_viscosity_viscousSEXP);
+    Rcpp::traits::input_parameter< double >::type bulk_viscosity_viscous(bulk_viscosity_viscousSEXP);
+    Rcpp::traits::input_parameter< double >::type shear_modulus_shell(shear_modulus_shellSEXP);
+    Rcpp::traits::input_parameter< double >::type lambda_shell(lambda_shellSEXP);
+    rcpp_result_gen = Rcpp::wrap(vesms_backscatter_cpp(frequency, m_limit, density_sw, density_viscous, density_shell, density_gas, sound_speed_sw, sound_speed_viscous, sound_speed_gas, radius_viscous, radius_shell, radius_gas, shear_viscosity_viscous, bulk_viscosity_viscous, shear_modulus_shell, lambda_shell));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -360,6 +462,12 @@ static const R_CallMethodDef CallEntries[] = {
     {"_acousticTS_js_deriv_cpp", (DL_FUNC) &_acousticTS_js_deriv_cpp, 3},
     {"_acousticTS_ys_deriv_cpp", (DL_FUNC) &_acousticTS_ys_deriv_cpp, 3},
     {"_acousticTS_hs_deriv_cpp", (DL_FUNC) &_acousticTS_hs_deriv_cpp, 3},
+    {"_acousticTS_js_complex_cpp", (DL_FUNC) &_acousticTS_js_complex_cpp, 2},
+    {"_acousticTS_ys_complex_cpp", (DL_FUNC) &_acousticTS_ys_complex_cpp, 2},
+    {"_acousticTS_hs_complex_cpp", (DL_FUNC) &_acousticTS_hs_complex_cpp, 2},
+    {"_acousticTS_js_complex_deriv_cpp", (DL_FUNC) &_acousticTS_js_complex_deriv_cpp, 3},
+    {"_acousticTS_ys_complex_deriv_cpp", (DL_FUNC) &_acousticTS_ys_complex_deriv_cpp, 3},
+    {"_acousticTS_hs_complex_deriv_cpp", (DL_FUNC) &_acousticTS_hs_complex_deriv_cpp, 3},
     {"_acousticTS_dwba_fbs_cpp", (DL_FUNC) &_acousticTS_dwba_fbs_cpp, 8},
     {"_acousticTS_dwba_segment_integrals_cpp", (DL_FUNC) &_acousticTS_dwba_segment_integrals_cpp, 8},
     {"_acousticTS_gauss_legendre_cpp", (DL_FUNC) &_acousticTS_gauss_legendre_cpp, 3},
@@ -371,7 +479,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_acousticTS_Qn_deriv_cpp", (DL_FUNC) &_acousticTS_Qn_deriv_cpp, 3},
     {"_acousticTS_Smn_cpp", (DL_FUNC) &_acousticTS_Smn_cpp, 6},
     {"_acousticTS_Rmn_cpp", (DL_FUNC) &_acousticTS_Rmn_cpp, 6},
-    {"_acousticTS_prolate_spheroid_fbs", (DL_FUNC) &_acousticTS_prolate_spheroid_fbs, 7},
+    {"_acousticTS_prolate_spheroid_fbs", (DL_FUNC) &_acousticTS_prolate_spheroid_fbs, 8},
+    {"_acousticTS_vesms_backscatter_cpp", (DL_FUNC) &_acousticTS_vesms_backscatter_cpp, 16},
     {NULL, NULL, 0}
 };
 

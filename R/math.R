@@ -7,8 +7,7 @@
 #' @param rpos Position vector
 #' @param iterations Number of iterations
 #' @rdname along_sum
-#' @keywords internal
-#' @noRd
+#' @export
 along_sum <- function(rpos, iterations) {
   if (iterations < 2) {
     stop("along_sum requires at least 2 columns to sum", call. = FALSE)

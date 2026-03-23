@@ -139,29 +139,13 @@ fcms_initialize <- function(object,
     )
   }
   # Parse body =================================================================
-  body <- extract(object, "body")
-  contrasts <- .derive_contrasts(body, sound_speed_sw, density_sw)
-  body$h <- body_h <- contrasts$h
-  body$g <- body_g <- contrasts$g
-  # Define medium parameters ===================================================
-  medium_params <- data.frame(
-    sound_speed = sound_speed_sw,
-    density = density_sw
-  )
+  body <- .hydrate_contrasts(extract(object, "body"), sound_speed_sw, density_sw)
   # Define model parameters recipe =============================================
   model_params <- list(
-    acoustics = data.frame(
-      frequency = frequency,
-      # Wavenumber (medium) ====================================================
-      k_sw = acousticTS::wavenumber(
-        frequency,
-        sound_speed_sw
-      ),
-      # Wavenumber (fluid) =====================================================
-      k_f = acousticTS::wavenumber(
-        frequency,
-        body_h * sound_speed_sw
-      )
+    acoustics = .init_acoustics_df(
+      frequency,
+      k_sw = sound_speed_sw,
+      k_f = body$h * sound_speed_sw
     )
   )
   # Determine expansion coefficient Bm method ==================================
@@ -193,8 +177,8 @@ fcms_initialize <- function(object,
     # Theta angle 'theta' (incident direction) +++++++++++++++++++++++++++++++++
     theta_body = body$theta,
     # Material properties
-    g_body = body_g,
-    h_body = body_h
+    g_body = body$g,
+    h_body = body$h
   )
   # Define limits for 'm' modal series iterator ================================
   # ka + 10 seems to be an appropriate modal truncation ++++++++++++++++++++++++
@@ -205,28 +189,16 @@ fcms_initialize <- function(object,
       model_params$acoustics$k_sw * scatterer_shape$radius
     ) + 10
   }
-  # Add model parameters slot to scattering object =============================
-  methods::slot(
-    object,
-    "model_parameters"
-  )$FCMS <- list(
-    parameters = model_params,
-    medium = medium_params,
-    body = body_params
-  )
-  # Add model results slot to scattering object ================================
-  methods::slot(
-    object,
-    "model"
-  )$FCMS <- data.frame(
+  .init_model_slots(
+    object = object,
+    model_name = "FCMS",
     frequency = frequency,
-    sigma_bs = rep(
-      NA,
-      length(frequency)
+    model_parameters = list(
+      parameters = model_params,
+      medium = .init_medium_params(sound_speed_sw, density_sw),
+      body = body_params
     )
   )
-  # Output =====================================================================
-  return(object)
 }
 
 #' Finite cylinder modal series (FCMS) solution
@@ -291,21 +263,14 @@ FCMS <- function(object) {
 #' finite cylinder.
 #' @noRd
 .fcms_bm_fixed_rigid <- function(k1a, nu, m_limit) {
-  # Get max m_limit ============================================================
-  m_max <- max(m_limit)
-  # Resolve boundary coefficient ===============================================
-  Bm <- mapply(FUN = function(k1a, ml) {
-    # Get m vector =============================================================
-    m <- 0:ml
-    # Return Bm ================================================================
-    Bm <- (jcd(m, k1a) / hcd(m, k1a))
-    if (length(Bm) < (m_max + 1)) {
-      difference <- (m_max + 1) - length(Bm)
-      Bm <- c(Bm, rep(NA, difference))
-    }
-    (-1)^(0:m_max) * nu * Bm
-  }, k1a, m_limit)
-  Bm
+  weights <- (-1)^(0:max(m_limit)) * nu
+  .modal_series_apply(
+    m_limit = m_limit,
+    FUN = function(k1a, ml) {
+      jcd(0:ml, k1a) / hcd(0:ml, k1a)
+    },
+    k1a = k1a
+  ) * weights
 }
 
 
@@ -313,45 +278,34 @@ FCMS <- function(object) {
 #' pressure-release finite cylinder.
 #' @noRd
 .fcms_bm_pressure_release <- function(k1a, nu, m_limit) {
-  # Get max m_limit ============================================================
-  m_max <- max(m_limit)
-  # Resolve boundary coefficient ===============================================
-  Bm <- mapply(FUN = function(k1a, ml) {
-    # Get m vector =============================================================
-    m <- 0:ml
-    # Return Bm ================================================================
-    Bm <- (jc(m, k1a) / hc(m, k1a))
-    if (length(Bm) < (m_max + 1)) {
-      difference <- (m_max + 1) - length(Bm)
-      Bm <- c(Bm, rep(NA, difference))
-    }
-    (-1)^(0:m_max) * nu * Bm
-  }, k1a, m_limit)
-  Bm
+  weights <- (-1)^(0:max(m_limit)) * nu
+  .modal_series_apply(
+    m_limit = m_limit,
+    FUN = function(k1a, ml) {
+      jc(0:ml, k1a) / hc(0:ml, k1a)
+    },
+    k1a = k1a
+  ) * weights
 }
 
 #' Helper function that calculates the boundary conditions for a fluid-filled
 #' finite cylinder.
 #' @noRd
 .fcms_bm_fluid <- function(k1a, k2a, gh, nu, m_limit) {
-  # Get maximum m_limit ========================================================
   m_max <- max(m_limit)
-  # Compute Cm coefficient =====================================================
-  Cm <- mapply(FUN = function(k1a, k2a, gh, ml) {
-    # Get m vector =============================================================
-    m <- 0:ml
-    # Compute numerator for the boundary coefficient Cm ========================
-    Cm_num <- (jcd(m, k2a)*yc(m, k1a)) /(jc(m, k2a)*jcd(m, k1a)) -
-      gh*(ycd(m, k1a)/jcd(m, k1a))
-    # Compute denominator for the boundary coefficient Cm ======================
-    Cm_denom <- (jcd(m, k2a)*jc(m, k1a)) / (jc(m, k2a)*jcd(m, k1a)) - gh
-    # Resolve Cm ===============================================================
-    Cm <- Cm_num / Cm_denom
-    if (length(Cm) < (m_max + 1)) {
-      difference <- (m_max + 1) - length(Cm)
-      Cm <- c(Cm, rep(NA, difference))
-    }
-    Cm
-  }, k1a, k2a, gh, m_limit)
+  Cm <- .modal_series_apply(
+    m_limit = m_limit,
+    FUN = function(k1a, k2a, gh, ml) {
+      m <- 0:ml
+      cm_num <- (jcd(m, k2a) * yc(m, k1a)) / (jc(m, k2a) * jcd(m, k1a)) -
+        gh * (ycd(m, k1a) / jcd(m, k1a))
+      cm_denom <- (jcd(m, k2a) * jc(m, k1a)) /
+        (jc(m, k2a) * jcd(m, k1a)) - gh
+      cm_num / cm_denom
+    },
+    k1a = k1a,
+    k2a = k2a,
+    gh = gh
+  )
   1i^((0:m_max) + 1) * (-nu * 1i^(0:m_max) / (1 + 1i * Cm))
 }

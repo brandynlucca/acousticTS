@@ -246,32 +246,14 @@ hpa_initialize <- function(object,
       paste0("'", scatterer_shape, "'.")
     )
   }
-  # Define medium parameters ===================================================
-  medium_params <- data.frame(
-    sound_speed = sound_speed_sw,
-    density = density_sw
-  )
-  # Derive contrasts from absolute properties when needed ======================
-  body_h <- body$h %||%
-    if (!is.null(body$sound_speed)) body$sound_speed / medium_params$sound_speed else NA
-  body_g <- body$g %||%
-    if (!is.null(body$density)) body$density / medium_params$density else NA
-  body$h <- body_h
-  body$g <- body_g
+  medium_params <- .init_medium_params(sound_speed_sw, density_sw)
+  body <- .hydrate_contrasts(body, medium_params$sound_speed, medium_params$density)
   # Define model parameters recipe =============================================
   model_params <- list(
-    acoustics = data.frame(
-      frequency = frequency,
-      # Wavenumber (medium) ====================================================
-      k_sw = acousticTS::wavenumber(
-        frequency,
-        sound_speed_sw
-      ),
-      # Wavenumber (fluid) =====================================================
-      k_f = acousticTS::wavenumber(
-        frequency,
-        body_h * sound_speed_sw
-      )
+    acoustics = .init_acoustics_df(
+      frequency,
+      k_sw = sound_speed_sw,
+      k_f = body$h * sound_speed_sw
     ),
     deviation_fun = deviation_fun,
     null_fun = null_fun,
@@ -291,29 +273,18 @@ hpa_initialize <- function(object,
     )
   )
   # Fill out material properties ===============================================
-  body_params$h <- body_h
-  body_params$g <- body_g
-  # Add model parameters slot to scattering object =============================
-  methods::slot(
-    object,
-    "model_parameters"
-  )$HPA <- list(
-    parameters = model_params,
-    medium = medium_params,
-    body = body_params
-  )
-  # Add model results slot to scattering object ================================
-  methods::slot(
-    object,
-    "model"
-  )$HPA <- data.frame(
+  body_params$h <- body$h
+  body_params$g <- body$g
+  .init_model_slots(
+    object = object,
+    model_name = "HPA",
     frequency = frequency,
-    sigma_bs = rep(
-      NA,
-      length(frequency)
+    model_parameters = list(
+      parameters = model_params,
+      medium = medium_params,
+      body = body_params
     )
   )
-  object
 }
 
 #' Auxiliary variable term, alpha, used in the high-pass models proposed by

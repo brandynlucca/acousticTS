@@ -4,9 +4,15 @@
 #' Elastic cylinder modal series (ECMS) solution
 #'
 #' @description
-#' Computes backscatter from a finite elastic cylinder by combining the
-#' phase-shift solution for an infinite elastic cylinder with the finite-length
-#' coherence factor used for normal and near-normal incidence.
+#' Computes backscatter from straight and uniformly bent finite elastic
+#' cylinders by combining the phase-shift solution for an infinite elastic
+#' cylinder with the finite-length coherence factor used for normal and
+#' near-normal incidence, plus the Fresnel coherence correction used for
+#' uniformly bent cylinders. In the current package class system, the elastic
+#' cylinder is carried most naturally by an \code{ESS}-class cylinder within
+#' the broader elastic-based \code{ELA} family, with the elastic-cylinder
+#' properties stored on the shell slot. Legacy \code{FLS}-class cylinders are
+#' also accepted as geometry carriers for backward compatibility.
 #'
 #' @section Usage:
 #' This model is accessed via:
@@ -45,6 +51,15 @@
 #' Elastic cylinders. \emph{The Journal of the Acoustical Society of America},
 #' 83: 64-67.
 #'
+#' Stanton, T.K. (1989). Sound scattering by cylinders of finite length. III.
+#' Deformed cylinders. \emph{The Journal of the Acoustical Society of America},
+#' 86: 691-705.
+#'
+#' Gorska, N., Ona, E., and Korneliussen, R. (2005). Acoustic backscattering by
+#' Atlantic mackerel as being representative of fish that lack a swimbladder.
+#' Backscattering by individual fish. \emph{ICES Journal of Marine Science},
+#' 62: 984-995.
+#'
 #' @name ECMS
 #' @aliases ecms ECMS
 #' @docType data
@@ -62,11 +77,11 @@ ecms_initialize <- function(object,
                             sound_speed_transversal_body = NULL,
                             m_limit = NULL) {
   shape <- extract(object, "shape_parameters")
+  shape_core <- if (methods::is(object, "ESS")) shape$shell else shape
 
-  if (!methods::is(object, "FLS")) {
+  if (!(methods::is(object, "ESS") || methods::is(object, "FLS"))) {
     stop(
-      "ECMS currently requires a fluid-like ('FLS') cylinder scatterer to ",
-      "supply the geometry."
+      "ECMS requires a cylindrical 'ESS' or legacy cylindrical 'FLS' scatterer."
     )
   }
 
@@ -78,34 +93,66 @@ ecms_initialize <- function(object,
     )
   }
 
-  body <- extract(object, "body")
-  rho_body <- density_body %||% body$density
-  cL_body <- sound_speed_longitudinal_body %||% body$sound_speed_longitudinal
-  cT_body <- sound_speed_transversal_body %||% body$sound_speed_transversal
+  elastic_comp <- if (methods::is(object, "ESS")) {
+    extract(object, "shell")
+  } else {
+    extract(object, "body")
+  }
+  rho_body <- density_body %||% elastic_comp$density
+  cL_body <- sound_speed_longitudinal_body %||%
+    elastic_comp$sound_speed_longitudinal
+  cT_body <- sound_speed_transversal_body %||%
+    elastic_comp$sound_speed_transversal
 
   if (is.null(rho_body)) {
     stop(
-      "ECMS requires 'density_body', either stored on the scatterer or passed ",
-      "directly to target_strength()."
+      "ECMS requires the elastic-cylinder density, either stored on the ",
+      "scatterer or passed directly as 'density_body'."
     )
   }
   if (is.null(cL_body) || is.null(cT_body)) {
     stop(
-      "ECMS requires both 'sound_speed_longitudinal_body' and ",
-      "'sound_speed_transversal_body'."
+      "ECMS requires both the longitudinal and transversal wave speeds, ",
+      "either stored on the scatterer or passed directly to target_strength()."
     )
   }
 
-  if (abs(body$theta - pi / 2) > pi / 18) {
+  if (abs(elastic_comp$theta - pi / 2) > pi / 18) {
     warning(
       "ECMS is intended for broadside or near-broadside incidence."
+    )
+  }
+
+  if (!is.null(shape_core$radius_curvature_ratio) &&
+      !is.na(shape_core$radius_curvature_ratio) &&
+      abs(elastic_comp$theta - pi / 2) > pi / 18) {
+    warning(
+      "ECMS bent-cylinder correction is intended for broadside or near-",
+      "broadside incidence."
     )
   }
 
   k_sw <- wavenumber(frequency, sound_speed_sw)
   k_l <- wavenumber(frequency, cL_body)
   k_t <- wavenumber(frequency, cT_body)
-  ka_max <- pmax(k_sw, k_l, k_t) * shape$radius * abs(sin(body$theta))
+  radius_body <- if (!is.null(shape_core$radius)) {
+    shape_core$radius
+  } else {
+    elastic_comp$radius
+  }
+  if (length(radius_body) > 1) {
+    radius_body <- max(radius_body, na.rm = TRUE)
+  }
+  length_body <- shape_core$length
+  if (is.null(length_body)) {
+    length_body <- diff(range(elastic_comp$rpos["x", ], na.rm = TRUE))
+  }
+  curvature_ratio <- if (!is.null(shape_core$radius_curvature_ratio)) {
+    shape_core$radius_curvature_ratio
+  } else {
+    NA_real_
+  }
+  ka_max <- pmax(k_sw, k_l, k_t) * radius_body * abs(sin(elastic_comp$theta))
   if (is.null(m_limit)) {
     m_limit <- ceiling(ka_max) + 10
   }
@@ -125,12 +172,19 @@ ecms_initialize <- function(object,
       density = density_sw
     ),
     body = list(
-      length = shape$length,
-      radius = shape$radius,
-      theta = body$theta,
+      length = length_body,
+      radius = radius_body,
+      theta = elastic_comp$theta,
       density = rho_body,
       sound_speed_longitudinal = cL_body,
-      sound_speed_transversal = cT_body
+      sound_speed_transversal = cT_body,
+      is_bent = !is.null(curvature_ratio) && !is.na(curvature_ratio),
+      radius_curvature = if (!is.null(curvature_ratio) &&
+                             !is.na(curvature_ratio)) {
+        curvature_ratio * length_body
+      } else {
+        NA_real_
+      }
     )
   )
 
@@ -217,6 +271,11 @@ ecms_initialize <- function(object,
   -(length_body / pi) * sinc_factor * modal_sum
 }
 
+#' @noRd
+.ecms_equivalent_length_fresnel <- function(k1, l, a, rho_c) {
+  .trcm_equivalent_length_fresnel(k1 = k1, l = l, a = a, rho_c = rho_c)
+}
+
 #' Elastic cylinder modal series solution.
 #' @noRd
 ECMS <- function(object) {
@@ -225,7 +284,7 @@ ECMS <- function(object) {
   body <- model$body
   medium <- model$medium
 
-  f_bs <- mapply(
+  straight_f_bs <- mapply(
     FUN = .ecms_backscatter_scalar,
     k_sw = acoustics$k_sw,
     k_l = acoustics$k_l,
@@ -239,6 +298,18 @@ ECMS <- function(object) {
       density_body = body$density
     )
   )
+
+  f_bs <- if (isTRUE(body$is_bent)) {
+    lebc <- .ecms_equivalent_length_fresnel(
+      k1 = acoustics$k_sw,
+      l = body$length,
+      a = body$radius,
+      rho_c = body$radius_curvature
+    )
+    lebc * straight_f_bs / body$length
+  } else {
+    straight_f_bs
+  }
 
   sigma_bs <- abs(f_bs)^2
 
