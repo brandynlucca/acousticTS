@@ -60,7 +60,8 @@
 #'  \deqn{
 #'    f_{bs} = \frac{k_1}{4} \int_{r_{pos}} (\gamma_\kappa - \gamma_\rho)
 #'    e^{2i k_2 \cdot r_{pos}}
-#'    \frac{\text{J}_1(2 k_2 a \cos \beta_{tilt})}{\cos \beta_{tilt}} |dr_{pos}|,
+#'    \frac{\text{J}_1(2 k_2 a \cos \beta_{tilt})}{\cos \beta_{tilt}}
+#'    |dr_{pos}|,
 #'  }
 #'
 #' where \eqn{a} is the local radius and \eqn{\beta_{tilt}} the local tilt
@@ -132,7 +133,7 @@
 #' @name DWBA
 #' @aliases dwba DWBA dwba_curved DWBA_CURVED
 #' @docType data
-#' @keywords models acoustics
+#' @keywords models acoustics internal
 NULL
 
 #' Initialize FLS-class object for TS modeling.
@@ -194,13 +195,13 @@ DWBA <- function(object) {
   model_body <- acousticTS::extract(model, "body")
   theta <- model_body$theta
   r0 <- model_body$rpos[1:3, , drop = FALSE]
-  # Material properties calculation ==========================================
+  # Material properties calculation ============================================
   g <- mean(model_body$g)
   h <- mean(model_body$h)
   R <- 1 / (g * h * h) + 1 / g - 2
-  # Update position matrices  =================================================
+  # Update position matrices  ==================================================
   rpos <- rbind(r0, a = model$body$radius)
-  # Calculate linear scatter response ========================================
+  # Calculate linear scatter response ==========================================
   f_bs <- dwba_fbs_cpp(
     rpos = rpos,
     k_sw = model$parameters$acoustics$k_sw,
