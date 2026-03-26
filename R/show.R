@@ -4,9 +4,12 @@
 ################################################################################
 # Methods for "show(...)" for each scattering class object
 ################################################################################
-# Safe display helper: returns "NA" string for NULL/all-NA vectors
+#' Safe display helper: returns "NA" string for NULL/all-NA vectors
+#' @noRd
 .show_mean <- function(x) {
+  # Return a printable NA token for missing inputs =============================
   if (is.null(x) || all(is.na(x))) return("NA")
+  # Otherwise return the rounded mean ==========================================
   round(mean(x, na.rm = TRUE), 4)
 }
 # Centralized named-property rendering for show() methods
@@ -14,10 +17,11 @@
                                  label_map = character(),
                                  unit_map = character(),
                                  none_text = "   None specified") {
+  # Return the fallback text for empty property blocks =========================
   if (length(properties) == 0) {
     return(none_text)
   }
-
+  # Format each named property with labels and units ===========================
   prop_strings <- mapply(function(name, value) {
     clean_name <- if (name %in% names(label_map)) {
       label_map[[name]]
@@ -27,19 +31,24 @@
     units <- if (name %in% names(unit_map)) unit_map[[name]] else ""
     paste0(clean_name, ": ", round(value, 4), units)
   }, names(properties), properties, SIMPLIFY = FALSE)
-
+  # Join the formatted property lines ==========================================
   paste("   ", prop_strings, collapse = "\n ")
 }
 
+#' Show emit helper
+#' @noRd
 .show_emit <- function(lines) {
+  # Emit one preformatted show() block =========================================
   cat(paste(lines, collapse = "\n"))
 }
 
 .show_section_lines <- function(title, ...) {
+  # Prefix a block of lines with the section title =============================
   c(paste0(title, ":"), ...)
 }
 
 .show_header_lines <- function(object, descriptor, meta) {
+  # Build the shared object header lines =======================================
   c(
     paste0(methods::is(object)[[1]], "-object"),
     paste0(" ", descriptor),
@@ -47,13 +56,18 @@
   )
 }
 
+#' Show summary appending helper
+#' @noRd
 .show_summary_lines <- function(object, descriptor, meta, ...) {
+  # Combine the header and body sections =======================================
   c(
     .show_header_lines(object, descriptor, meta),
     ...
   )
 }
 
+#' Show dimensions helper
+#' @noRd
 .show_dimension_lines <- function(section_name,
                                   length_value,
                                   units,
@@ -61,6 +75,7 @@
                                   mean_radius = NULL,
                                   max_radius = NULL,
                                   segment_label = "cylinders") {
+  # Build the primary length line ==============================================
   length_line <- paste0(
     " Length:",
     round(length_value, 3),
@@ -72,7 +87,7 @@
       ""
     }
   )
-
+  # Append the optional radius summaries =======================================
   lines <- c(paste0(section_name, ":"), length_line)
   if (!is.null(mean_radius)) {
     lines <- c(lines,
@@ -88,15 +103,18 @@
   lines
 }
 
+#' Show orientation line helper
+#' @noRd
 .show_orientation_line <- function(label, theta, theta_units) {
+  # Format one orientation line ================================================
   paste0(label, round(theta, 3), " ", theta_units)
 }
-
 .show_density_speed_line <- function(prefix,
                                      density,
                                      sound_speed,
                                      density_units = "kg m^-3",
                                      sound_speed_units = "m s^-1") {
+  # Format one fluid-material summary line =====================================
   paste0(
     prefix,
     " Density: ", .show_mean(density),
@@ -105,12 +123,15 @@
   )
 }
 
+#' Show elastic material properties helper
+#' @noRd
 .show_elastic_speed_line <- function(prefix,
                                      density,
                                      sound_speed_longitudinal,
                                      sound_speed_transversal,
                                      density_units = "kg m^-3",
                                      speed_units = "m s^-1") {
+  # Format one elastic-material summary line ===================================
   paste0(
     prefix,
     " Density: ", .show_mean(density),
@@ -127,6 +148,7 @@
                                 units,
                                 radius_values = NULL,
                                 segment_label = "segments") {
+  # Summarize the available radius statistics ==================================
   mean_radius <- if (!is.null(radius_values)) {
     mean(radius_values, na.rm = TRUE)
   } else {
@@ -137,7 +159,7 @@
   } else {
     NULL
   }
-
+  # Delegate the shared dimension formatting ===================================
   .show_dimension_lines(
     section_name = section_name,
     length_value = shape_meta$length,
@@ -149,11 +171,28 @@
   )
 }
 
+#' Show component radius helper
+#' @noRd
+.show_component_radius_values <- function(component,
+                                          fallback_context = "component") {
+  # Prefer explicitly stored radius values =====================================
+  if (!is.null(component$radius) && !all(is.na(component$radius))) {
+    return(component$radius)
+  }
+  # Otherwise reconstruct the radius profile from geometry =====================
+  .shape_radius_profile(
+    body = component,
+    row_major = TRUE,
+    error_context = fallback_context
+  )
+}
+
 .show_fluid_material_section <- function(section_name,
                                          density = NULL,
                                          sound_speed = NULL,
                                          g = NULL,
                                          h = NULL) {
+  # Prefer absolute density and sound-speed values when present ================
   if ((!is.null(density) && !all(is.na(density))) ||
       (!is.null(sound_speed) && !all(is.na(sound_speed)))) {
     return(.show_section_lines(
@@ -165,7 +204,7 @@
       )
     ))
   }
-
+  # Otherwise print the stored contrast values =================================
   .show_section_lines(
     section_name,
     paste0(" g: ", .show_mean(g)),
@@ -173,10 +212,13 @@
   )
 }
 
+#' Show summary elastic material properties helper
+#' @noRd
 .show_elastic_material_section <- function(section_name,
                                            density,
                                            sound_speed_longitudinal,
                                            sound_speed_transversal) {
+  # Format one elastic-material section ========================================
   .show_section_lines(
     section_name,
     .show_elastic_speed_line(
@@ -191,6 +233,7 @@
 #' Generic function for show(...) for different scatterers.
 #' @param object Scattering object.
 #' @importFrom methods setMethod show
+#' @keywords internal
 #' @export
 setMethod(
   f = "show",
@@ -212,16 +255,13 @@ setMethod(
 ################################################################################
 #' show(...) for FLS-class objects.
 #' @param object FLS-class object.
+#' @keywords internal
 #' @export
 fls_show <- function(object) {
   meta <- acousticTS::extract(object, "metadata")
   shape <- acousticTS::extract(object, "shape_parameters")
   body <- acousticTS::extract(object, "body")
-  radius_values <- if (!is.null(body$radius) && !all(is.na(body$radius))) {
-    body$radius
-  } else {
-    .shape_radius_profile(body = body, row_major = TRUE, error_context = "FLS body")
-  }
+  radius_values <- .show_component_radius_values(body, "FLS body")
 
   .show_emit(.show_summary_lines(
     object, "Fluid-like scatterer ", meta,
@@ -252,6 +292,7 @@ fls_show <- function(object) {
 }
 #' show(...) for GAS_class objects
 #' @param object GAS-class object
+#' @keywords internal
 #' @export
 gas_show <- function(object) {
   meta <- acousticTS::extract(object, "metadata")
@@ -276,6 +317,7 @@ gas_show <- function(object) {
 }
 #' show(...) for SBF-class objects.
 #' @param object SBF_class object.
+#' @keywords internal
 #' @export
 sbf_show <- function(object) {
   meta <- acousticTS::extract(object, "metadata")
@@ -289,14 +331,14 @@ sbf_show <- function(object) {
       section_name = "Body dimensions",
       shape_meta = shape$body,
       units = shape$length_units,
-      radius_values = body$rpos[2, ] / 2,
+      radius_values = .show_component_radius_values(body, "SBF body"),
       segment_label = "cylinders"
     ),
     .show_shape_section(
       section_name = "Bladder dimensions",
       shape_meta = shape$bladder,
       units = shape$length_units,
-      radius_values = bladder$rpos[2, ] / 2,
+      radius_values = .show_component_radius_values(bladder, "SBF bladder"),
       segment_label = "cylinders"
     ),
     .show_fluid_material_section(
@@ -322,6 +364,7 @@ sbf_show <- function(object) {
 }
 #' show(...) for BBF-class objects.
 #' @param object BBF-class object.
+#' @keywords internal
 #' @export
 bbf_show <- function(object) {
   meta <- acousticTS::extract(object, "metadata")
@@ -335,14 +378,14 @@ bbf_show <- function(object) {
       section_name = "Body dimensions",
       shape_meta = shape$body,
       units = shape$length_units,
-      radius_values = body$radius,
+      radius_values = .show_component_radius_values(body, "BBF body"),
       segment_label = "segments"
     ),
     .show_shape_section(
       section_name = "Backbone dimensions",
       shape_meta = shape$backbone,
       units = shape$length_units,
-      radius_values = backbone$radius,
+      radius_values = .show_component_radius_values(backbone, "BBF backbone"),
       segment_label = "segments"
     ),
     .show_fluid_material_section(
@@ -367,6 +410,7 @@ bbf_show <- function(object) {
 }
 #' show(...) for CAL-class objects.
 #' @param object CAL-class object.
+#' @keywords internal
 #' @export
 cal_show <- function(object) {
   meta <- acousticTS::extract(object, "metadata")
@@ -376,8 +420,12 @@ cal_show <- function(object) {
   .show_emit(.show_summary_lines(
     object, "Calibration sphere", meta,
     paste0("Material:", meta$Material),
-    paste0(" Sphere longitudinal sound speed:", body$sound_speed_longitudinal, "m/s"),
-    paste0(" Sphere transversal sound speed:", body$sound_speed_transversal, "m/s"),
+    paste0(" Sphere longitudinal sound speed:",
+           body$sound_speed_longitudinal,
+           "m/s"),
+    paste0(" Sphere transversal sound speed:",
+           body$sound_speed_transversal,
+           "m/s"),
     paste0(" Sphere density:", body$density, "kg/m^3"),
     paste0("Diameter:", shape$diameter, " ", shape$diameter_units),
     paste0(" Radius:", shape$radius, " ", shape$diameter_units),
@@ -390,6 +438,7 @@ cal_show <- function(object) {
 }
 #' show(...) for ESS-class objects.
 #' @param object ESS-class object.
+#' @keywords internal
 #' @export
 ess_show <- function(object) {
   # Parse metadata =============================================================
@@ -412,8 +461,7 @@ ess_show <- function(object) {
     object,
     "fluid"
   )
-  # Create material properties string ==========================================
-  # Shell ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  # Create the shell material summary ==========================================
   shell_material_props <- shell[
     names(shell) %in% c(
       "sound_speed", "density", "g", "h", "K",
@@ -438,7 +486,7 @@ ess_show <- function(object) {
       G = " Pa"
     )
   )
-  # Internal fluids ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  # Create the internal-fluid material summary =================================
   fluid_material_props <- fluid[
     names(fluid) %in% c("sound_speed", "density", "g", "h")
   ]
