@@ -190,7 +190,7 @@
 #' @name ESSMS
 #' @aliases essms ESSMS
 #' @docType data
-#' @keywords models acoustics
+#' @keywords models acoustics internal
 NULL
 
 #' Initialize ESS-object for modal series solution.
@@ -247,6 +247,39 @@ essms_initialize <- function(object,
       medium = .init_medium_params(sound_speed_sw, density_sw)
     )
   )
+}
+
+#' Calculate ka matrix for Goodman and Stern (1962) model
+#' @param frequency Frequency vector
+#' @param sound_speed_sw Seawater sound speed
+#' @param sound_speed_fluid Fluid sound speed
+#' @param sound_speed_longitudinal Longitudinal sound speed in shell
+#' @param sound_speed_transversal Transversal sound speed in shell
+#' @param radius_shell Shell radius
+#' @param radius_fluid Fluid radius
+#' @return Matrix of ka values
+#' @keywords internal
+#' @noRd
+.calculate_ka_matrix <- function(frequency, sound_speed_sw,
+                                 sound_speed_fluid, sound_speed_longitudinal,
+                                 sound_speed_transversal,
+                                 radius_shell, radius_fluid) {
+  # Calculate layer-specific wave numbers ======================================
+  k1 <- wavenumber(frequency, sound_speed_sw)
+  k3 <- wavenumber(frequency, sound_speed_fluid)
+  kL <- wavenumber(frequency, sound_speed_longitudinal)
+  kT <- wavenumber(frequency, sound_speed_transversal)
+  # Bind into collective matrix ================================================
+  ka_matrix <- rbind(
+    k1a_shell = k1 * radius_shell,
+    kLa_shell = kL * radius_shell,
+    kTa_shell = kT * radius_shell,
+    k1a_fluid = k1 * radius_fluid,
+    kTa_fluid = kT * radius_fluid,
+    kLa_fluid = kL * radius_fluid,
+    k3a_fluid = k3 * radius_fluid
+  )
+  ka_matrix
 }
 
 #' Calculates the theoretical TS of an elastic-shelled sphere using the modal
