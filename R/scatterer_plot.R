@@ -3,23 +3,52 @@
 # GENERIC PLOT FUNCTION FOR BODY SHAPES AND MODELS
 ################################################################################
 ################################################################################
-#' Method for what is printed for objects.
+#' Plot scatterer geometry, stored model results, or stored TMM scattering views
+#'
+#' @description
+#' S3 plotting method for `Scatterer` objects. Depending on `type`, the method
+#' draws the target geometry, one or more stored model curves, or a stored
+#' single-target `TMM` scattering slice / map when the object was computed with
+#' retained T-matrix state.
+#'
 #' @param x Scatterer-class object.
-#' @param y Ignored (required for plot method signature).
-#' @param ... Additional arguments passed to plotting functions
-#' @param type Toggle between body shape ("shape") or modeling results ("model")
-#' @param x_units If "model" is selected, then toggle between frequency
-#'    ("frequency", kHz) or ka ("ka").
-#' @param nudge_y y-axis nudge.
-#' @param nudge_x x-axis nudge.
-#' @param aspect_ratio Aspect ratio setting ( defaults to "manual" for nudge_y
-#' and nudge_x to apply; otherwise, input "auto").
-#' @param y_units y-axis data selection (e.g. TS, sigma_bs -- defaults to TS)
-#' @param ... Additional plot inputs
-#' 
+#' @param y Ignored (required for the base `plot()` method signature).
+#' @param type Plot mode. Use `"shape"` for the stored geometry, `"model"` for
+#'   the currently stored model output, or `"scattering"` for stored `TMM`
+#'   angular products.
+#' @param nudge_y Multiplicative vertical padding applied to automatically
+#'   derived y-axis limits.
+#' @param nudge_x Multiplicative horizontal padding applied to automatically
+#'   derived x-axis limits.
+#' @param aspect_ratio Aspect-ratio control for supported shape plots. Use
+#'   `"manual"` to honor `nudge_x` / `nudge_y`, or `"auto"` to let the plotting
+#'   helper derive the aspect ratio directly.
+#' @param x_units Horizontal-axis convention for `type = "model"`. Supported
+#'   values depend on the stored model family and typically include
+#'   `"frequency"` and geometry-scaled wavenumber variants such as `"ka"`.
+#' @param y_units Stored response quantity for `type = "model"` or
+#'   `type = "scattering"`. Typical values include `"TS"` and `"sigma_bs"`.
+#' @param ... Additional arguments passed through to the class-specific plotting
+#'   helpers. For stored `TMM` scattering plots, this includes controls such as
+#'   `frequency`, `vary`, `polar`, and `heatmap`.
+#'
+#' @return Called for its side effect of drawing a plot; returns the input
+#'   invisibly.
+#'
+#' @details
+#' This method dispatches to the relevant scatterer-class plotting helper:
+#' `cal_plot()`, `ess_plot()`, `sbf_plot()`, `bbf_plot()`, `fls_plot()`, or
+#' `gas_plot()`. The supported `type` values therefore depend on what has been
+#' stored on the object. For example, `type = "model"` requires the object to
+#' already contain model output, and `type = "scattering"` currently applies
+#' only to stored `TMM` results.
+#'
+#' @seealso [extract()], [target_strength()], [tmm_scattering()],
+#'   [tmm_scattering_grid()]
+#'
 #' @rdname plot.Scatterer
 #' @aliases plot.Scatterer
-#' 
+#'
 #' @keywords utility, plotting
 #' @export
 plot.Scatterer <- function(x,
@@ -77,13 +106,15 @@ model_palette <- c(
 ################################################################################
 #' Plotting for CAL-class objects
 #' @param object CAL-class object.
-#' @param type Toggle between body shape ("shape") or modeling results ("model")
+#' @param type Toggle between body shape (`"shape"`), modeling results
+#'   (`"model"`), or stored TMM angular slices (`"scattering"`).
 #' @param x_units If "model" is selected, then toggle between frequency
 #'    ("frequency", kHz) or ka ("ka").
 #' @param nudge_y y-axis nudge.
 #' @param nudge_x x-axis nudge.
 #' @param ... Additional plot inputs
-#' @export
+#' @keywords internal
+#' @noRd
 cal_plot <- function(object,
                      type = "shape",
                      nudge_y = 1.01,
@@ -224,7 +255,8 @@ ess_plot <- function(object,
 ################################################################################
 #' Plotting for FLS-class objects
 #' @param object FLS-class object.
-#' @param type Toggle between body shape ("shape") or modeling results ("model")
+#' @param type Toggle between body shape (`"shape"`), modeling results
+#'   (`"model"`), or stored TMM angular slices (`"scattering"`).
 #' @param x_units If "model" is selected, then toggle between frequency
 #'    ("frequency", kHz) or ka ("ka").
 #' @param nudge_y y-axis nudge.
@@ -245,146 +277,26 @@ fls_plot <- function(object,
   opar <- graphics::par(no.readonly = TRUE)
   on.exit(graphics::par(opar))
   if (type == "shape") {
-    # Extract body shape information ===========================================
-    body <- acousticTS::extract(
-      object,
-      "body"
-    )
-    # Extract generic shape information ========================================
+    body <- acousticTS::extract(object, "body")
     shape_params <- acousticTS::extract(object, "shape_parameters")
-    # Define plot margins ======================================================
-    graphics::par(
-      ask = FALSE,
-      oma = c(1, 1, 1, 0),
-      mar = c(5.0, 4.5, 1.5, 2)
-    )
-    # Center shape =============================================================
-    body$rpos[3, ] <- body$rpos[3, ] - stats::median(body$rpos[3, ])
-    # Get radius ===============================================================
-    if ("radius_shape" %in% names(shape_params)) {
-      radius <- shape_params$radius_shape
-    } else if (!is.null(body$radius) && !all(is.na(body$radius))) {
-      radius <- body$radius
-    } else if ("zU" %in% rownames(body$rpos)) {
-      # Arbitrary shape with dorsal/ventral rows: use zU as half-thickness
-      radius <- body$rpos["zU", ]
-    } else {
-      radius <- rep(0, ncol(body$rpos))
-    }
-    # Sort index ===============================================================
-    if (body$rpos[1, 1] > body$rpos[1, ncol(body$rpos)]) {
-      body$rpos <- body$rpos[, rev(seq_len(ncol(body$rpos))),
-        drop = FALSE
-      ]
-      if (!is.null(radius)) radius <- rev(radius)
-      # sort_idx <- order(body$rpos[1, ])
-      # body$rpos <- body$rpos[, sort_idx, drop = FALSE]
-      # if (!is.null(body$radius)) body$radius <- body$radius[sort_idx]
-    }
-    # Adjust axes ==============================================================
-    if (aspect_ratio == "manual") {
-      vert_lims <- c(
-        min(body$rpos[3, ] - radius) * (1 - (1 - nudge_y)),
-        max(body$rpos[3, ] + radius) * nudge_y
-      )
-    } else {
-      vert_lims <- c(
-        -max(body$rpos[1, ]) * 0.10,
-        max(body$rpos[1, ]) * 0.10
-      )
-    }
-    # Begin plotting ===========================================================
-    # graphics::plot( x = body$rpos[ 1 , ] ,
-    #                 y = body$rpos[ 3 , ] ,
-    #                 type = 'l' ,
-    #                 lwd = 4 ,
-    #                 cex.lab = 1.2 ,
-    #                 cex.axis = 1.2 ,
-    #                 xlab = "Length (m)" ,
-    #                 ylab = "Thickness (m)" ,
-    #                 ylim = vert_lims )
-    plot(body$rpos[1, ], body$rpos[3, ],
-      type = "n",
-      xlab = "Length (m)", ylab = "Thickness (m)",
-      ylim = c(
-        min(body$rpos[3, ] - radius) * 1.1,
-        max(body$rpos[3, ] + radius) * 1.1
-      )
-    )
-    # Add lower perimeter of shape =============================================
-    # graphics::lines( x = body$rpos[ 1 , ] ,
-    #                  y = body$rpos[ 3 , ] - body$radius ,
-    #                  lty = 1 ,
-    #                  lwd = 4 )
-    # Add upper perimeter of shape =============================================
-    # graphics::lines( x = body$rpos[ 1 , ] ,
-    #                  y = body$rpos[ 3 , ] + body$radius ,
-    #                  lty = 1 ,
-    #                  lwd = 4 )
-    # Add body segments ========================================================
-    # graphics::segments( x0 = body$rpos[ 1 , ] ,
-    #                     x1 = body$rpos[ 1 , ] ,
-    #                     y0 = body$rpos[ 3 , ] - body$radius ,
-    #                     y1 = body$rpos[ 3 , ] + body$radius ,
-    #                     lty = 3 ,
-    #                     lwd = 1.25 )
-    # Draw angled "cylinders" for each segment =================================
-    n_segments <- shape_params$n_segments
-    # count <- 0
-    # rc <- c()
-    # ---- Iterate =============================================================
-    for (i in 1:(n_segments)) {
-      # ---- Leading coordinates
-      x0 <- body$rpos[1, i]
-      y0 <- body$rpos[3, i]
-      # ---- Trailing coordinates
-      x1 <- body$rpos[1, i + 1]
-      y1 <- body$rpos[3, i + 1]
-      # ---- Thickness
-      r <- radius[i]
-      # rc <- c(rc, r)
-      if (r == 0) next
-      # cat(sprintf("Segment %d [%d, %d]: (%.6f, %.6f) -> (%.6f, %.6f),
-      # r=%.6f\n",
-      #             i, order(body$rpos[1,])[i], order(body$rpos[1,])[i+1],
-      # x0, y0, x1, y1, r))
-      # ---- Direction vector
-      dx <- x1 - x0
-      dy <- y1 - y0
-      len <- sqrt(dx^2 + dy^2)
-      # ---- Perpendicular vector (unit)
-      px <- -dy / len
-      py <- dx / len
-      # ---- Polygon nodes
-      xA <- x0 + r * px
-      yA <- y0 + r * py
-      xB <- x1 + r * px
-      yB <- y1 + r * py
-      xC <- x1 - r * px
-      yC <- y1 - r * py
-      xD <- x0 - r * px
-      yD <- y0 - r * py
-      # ---- Draw polygon
-      graphics::polygon(
-        x = c(xA, xB, xC, xD),
-        y = c(yA, yB, yC, yD),
-        col = grDevices::adjustcolor("gray50", alpha.f = 0.6),
-        border = "black", lwd = 1
-      )
-      # count <- count + 1
-    }
-    # cat("Polygons drawn:", count, "\n")
-    # Draw centerline and points
-    graphics::lines(body$rpos[1, ], body$rpos[3, ], lwd = 3, col = "gray90")
-    graphics::points(body$rpos[1, ], body$rpos[3, ],
-      pch = 1, col = "black",
-      cex = 0.8
+    .plot_row_major_segmented_body(
+      rpos = body$rpos,
+      shape_parameters = shape_params,
+      nudge_y = nudge_y,
+      aspect_ratio = aspect_ratio
     )
   } else if (type == "model") {
     .plot_model_results(
       .collect_model_plot_data(object, x_units = x_units, y_units = y_units),
       nudge_y = nudge_y,
       nudge_x = nudge_x
+    )
+  } else if (type == "scattering") {
+    .plot_tmm_scattering_slice(
+      object = object,
+      nudge_y = nudge_y,
+      nudge_x = nudge_x,
+      ...
     )
   }
   invisible()
@@ -432,6 +344,13 @@ gas_plot <- function(object,
       ),
       nudge_y = nudge_y,
       nudge_x = nudge_x
+    )
+  } else if (type == "scattering") {
+    .plot_tmm_scattering_slice(
+      object = object,
+      nudge_y = nudge_y,
+      nudge_x = nudge_x,
+      ...
     )
   }
   invisible()
@@ -481,7 +400,8 @@ sbf_plot <- function(object,
 ################################################################################
 #' Plotting for BBF-class objects
 #' @param object BBF-class object.
-#' @param type Toggle between body shape ("shape") or modeling results ("model")
+#' @param type Toggle between body shape (`"shape"`), modeling results
+#'   (`"model"`), or stored TMM angular slices (`"scattering"`).
 #' @param x_units If "model" is selected, then toggle between frequency
 #'    ("frequency", kHz) or ka ("ka").
 #' @param nudge_y y-axis nudge.

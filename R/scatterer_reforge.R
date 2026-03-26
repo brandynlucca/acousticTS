@@ -6,10 +6,37 @@
 ################################################################################
 #' Resize or reparameterize a scatterer object
 #'
-#' Generic function to resize or reparameterize a scatterer object.
+#' @description
+#' Generic function for rescaling or otherwise reparameterizing an existing
+#' scatterer while preserving its class semantics. The class-specific methods
+#' handle the component bookkeeping needed to keep the resulting object
+#' structurally valid after lengths, widths, heights, shell thicknesses, or
+#' related geometry descriptors are changed.
 #'
 #' @param object A scatterer object.
 #' @param ... Additional arguments passed to specific methods.
+#'
+#' @details
+#' `reforge()` is the package's main post-construction geometry-adjustment
+#' tool. It is useful when a target should be modified in place rather than
+#' rebuilt from scratch. The available method-specific arguments depend on the
+#' scatterer class and typically include direct scale factors and/or target
+#' dimensions for length, width, or height.
+#'
+#' @return A scatterer of the same broad class as `object`, rebuilt with the
+#'   requested geometric changes.
+#'
+#' @seealso [extract()], [plot.Scatterer()], [brake()]
+#'
+#' @examples
+#' obj <- fls_generate(
+#'   shape = sphere(radius_body = 0.01, n_segments = 40),
+#'   density_body = 1045,
+#'   sound_speed_body = 1520
+#' )
+#'
+#' bigger_obj <- reforge(obj, length = 0.03)
+#' extract(bigger_obj, c("shape_parameters", "length"))
 #' @export
 setGeneric(
   "reforge",
@@ -25,15 +52,18 @@ setGeneric(
 #' @keywords internal
 #' @noRd
 .reforge_scale_vector <- function(scale = NULL, target = NULL, dims) {
+  # Preserve the direct scaling pathway when no targets are supplied ===========
   if (is.null(target)) {
     return(list(suffix = "_scale", scale = scale))
   }
 
+  # Convert named target dimensions into multiplicative scale factors ==========
   out <- c()
   for (nm in names(target)) {
     out[nm] <- target[nm] / dims[nm]
   }
 
+  # Return the normalized scaling specification ================================
   list(suffix = "_target", scale = out)
 }
 
@@ -43,13 +73,16 @@ setGeneric(
 #' @keywords internal
 #' @noRd
 .reforge_component_dimensions <- function(rpos, length = NULL) {
+  # Recover the width profile needed for scalar component summaries ============
+  width_profile <- .shape_width_profile(position_matrix = rpos, row_major = TRUE)
+  # Return length, width, and height for the current component =================
   c(
     length = if (!is.null(length)) {
       length
     } else {
       .shape_length(position_matrix = rpos, row_major = TRUE)
     },
-    width = max(rpos[2, ], na.rm = TRUE),
+    width = max(abs(width_profile), na.rm = TRUE),
     height = max(
       .shape_height_profile(position_matrix = rpos, row_major = TRUE),
       na.rm = TRUE
@@ -63,26 +96,69 @@ setGeneric(
 #' @keywords internal
 #' @noRd
 .reforge_apply_axis_scaling <- function(rpos, scales) {
+  # Leave the component untouched when no scaling was requested ================
   if (is.null(scales)) {
     return(rpos)
   }
 
-  if (scales["length"] != 1) {
-    anchor <- rpos[1, 1]
-    rpos[1, ] <- anchor + (rpos[1, ] - anchor) * scales["length"]
-  }
+  # Validate the row-major component matrix before editing it ==================
+  .validate_geometry_contract(
+    rpos,
+    storage = "profile_row_major",
+    context = "Reforge component matrix"
+  )
 
-  if (nrow(rpos) >= 2 && scales["width"] != 1) {
-    rpos[2, ] <- rpos[2, ] * scales["width"]
-  }
-
-  if (nrow(rpos) >= 3 && scales["height"] != 1) {
-    rpos[3, ] <- rpos[3, ] * scales["height"]
-    if (nrow(rpos) >= 4) {
-      rpos[4, ] <- rpos[4, ] * scales["height"]
+  # Resolve row indices from the internal profile schema =======================
+  row_idx <- function(candidates) {
+    idx <- match(candidates, rownames(rpos), nomatch = 0)
+    idx <- idx[idx > 0]
+    if (length(idx) == 0) {
+      integer(0)
+    } else {
+      idx[1]
     }
   }
 
+  # Rescale the axial coordinate relative to its leading anchor point ==========
+  if (scales["length"] != 1) {
+    x_idx <- row_idx(.geometry_contract_schema()$profile_row_major$x)
+    anchor <- rpos[x_idx, 1]
+    rpos[x_idx, ] <- anchor + (rpos[x_idx, ] - anchor) * scales["length"]
+  }
+
+  # Rescale the lateral width profile when present =============================
+  if (scales["width"] != 1) {
+    w_idx <- row_idx(.geometry_contract_schema()$profile_row_major$w)
+    if (length(w_idx) > 0) {
+      rpos[w_idx, ] <- rpos[w_idx, ] * scales["width"]
+    }
+  }
+
+  # Rescale the vertical profile while preserving its local centerline =========
+  if (scales["height"] != 1) {
+    z_idx <- row_idx(c("z", "z_body", "z_bladder"))
+    zU_idx <- row_idx(.geometry_contract_schema()$profile_row_major$zU)
+    zL_idx <- row_idx(.geometry_contract_schema()$profile_row_major$zL)
+
+    if (length(zU_idx) > 0 && length(zL_idx) > 0) {
+      z_center <- if (length(z_idx) > 0) {
+        rpos[z_idx, ]
+      } else {
+        (rpos[zU_idx, ] + rpos[zL_idx, ]) / 2
+      }
+      half_height <- (rpos[zU_idx, ] - rpos[zL_idx, ]) / 2
+      half_height <- half_height * scales["height"]
+      rpos[zU_idx, ] <- z_center + half_height
+      rpos[zL_idx, ] <- z_center - half_height
+      if (length(z_idx) > 0) {
+        rpos[z_idx, ] <- z_center
+      }
+    } else if (length(z_idx) > 0) {
+      rpos[z_idx, ] <- rpos[z_idx, ] * scales["height"]
+    }
+  }
+
+  # Return the scaled component matrix =========================================
   rpos
 }
 
@@ -92,10 +168,12 @@ setGeneric(
 #' @keywords internal
 #' @noRd
 .reforge_resample_rows <- function(rpos, n_points) {
+  # Preserve the original component when no resampling was requested ===========
   if (is.null(n_points)) {
     return(rpos)
   }
 
+  # Resample the row-major profile to the requested node count =================
   .resample_rpos_rows(rpos, as.integer(n_points))
 }
 
@@ -105,8 +183,21 @@ setGeneric(
 #' @keywords internal
 #' @noRd
 .reforge_relative_start <- function(component_rpos, parent_rpos) {
+  # Validate the internal and parent component matrices ========================
+  .validate_geometry_contract(
+    component_rpos,
+    storage = "profile_row_major",
+    context = "Internal component matrix"
+  )
+  .validate_geometry_contract(
+    parent_rpos,
+    storage = "profile_row_major",
+    context = "Parent component matrix"
+  )
+  # Express the internal start point relative to the parent length =============
+  component_x <- .shape_x(component_rpos, row_major = TRUE)
   parent_x <- .shape_x(parent_rpos, row_major = TRUE)
-  (component_rpos[1, 1] - min(parent_x, na.rm = TRUE)) /
+  (component_x[1] - min(parent_x, na.rm = TRUE)) /
     .shape_length(position_matrix = parent_rpos, row_major = TRUE)
 }
 
@@ -119,11 +210,29 @@ setGeneric(
 .reforge_shift_to_relative_start <- function(component_rpos,
                                              relative_start,
                                              parent_rpos) {
+  # Validate the internal and parent component matrices ========================
+  .validate_geometry_contract(
+    component_rpos,
+    storage = "profile_row_major",
+    context = "Internal component matrix"
+  )
+  .validate_geometry_contract(
+    parent_rpos,
+    storage = "profile_row_major",
+    context = "Parent component matrix"
+  )
+  # Convert the stored relative start back into an absolute x offset ===========
   parent_x <- .shape_x(parent_rpos, row_major = TRUE)
+  component_x <- .shape_x(component_rpos, row_major = TRUE)
   new_start <- min(parent_x, na.rm = TRUE) +
     relative_start * .shape_length(position_matrix = parent_rpos, row_major = TRUE)
-  shift_amount <- new_start - component_rpos[1, 1]
-  component_rpos[1, ] <- component_rpos[1, ] + shift_amount
+  shift_amount <- new_start - component_x[1]
+  x_idx <- match(.geometry_contract_schema()$profile_row_major$x, rownames(component_rpos),
+    nomatch = 0
+  )
+  x_idx <- x_idx[x_idx > 0][1]
+  component_rpos[x_idx, ] <- component_rpos[x_idx, ] + shift_amount
+  # Return the shifted internal component ======================================
   component_rpos
 }
 
@@ -133,21 +242,37 @@ setGeneric(
 #' @keywords internal
 #' @noRd
 .reforge_check_internal_containment <- function(rpos_b, rpos_i) {
+  # Validate the body and internal profile matrices ============================
+  .validate_geometry_contract(
+    rpos_b,
+    storage = "profile_row_major",
+    context = "Body profile matrix"
+  )
+  .validate_geometry_contract(
+    rpos_i,
+    storage = "profile_row_major",
+    context = "Internal profile matrix"
+  )
+
+  # Interpolate both profiles onto a shared axial grid =========================
+  body_fields <- .profile_fields(rpos_b)
+  inner_fields <- .profile_fields(rpos_i)
   x_grid <- seq(
-    max(min(rpos_b[1, ]), min(rpos_i[1, ])),
-    min(max(rpos_b[1, ]), max(rpos_i[1, ])),
+    max(min(body_fields$x), min(inner_fields$x)),
+    min(max(body_fields$x), max(inner_fields$x)),
     length.out = 200
   )
 
   interp <- function(x, y) stats::approx(x, y, xout = x_grid, rule = 2)$y
 
-  body_y <- interp(rpos_b[1, ], rpos_b[2, ])
-  body_zU <- interp(rpos_b[1, ], rpos_b[3, ])
-  body_zL <- interp(rpos_b[1, ], rpos_b[4, ])
+  # Compare the interpolated envelopes along the shared grid ===================
+  body_y <- interp(body_fields$x, body_fields$w)
+  body_zU <- interp(body_fields$x, body_fields$zU)
+  body_zL <- interp(body_fields$x, body_fields$zL)
 
-  inner_y <- interp(rpos_i[1, ], rpos_i[2, ])
-  inner_zU <- interp(rpos_i[1, ], rpos_i[3, ])
-  inner_zL <- interp(rpos_i[1, ], rpos_i[4, ])
+  inner_y <- interp(inner_fields$x, inner_fields$w)
+  inner_zU <- interp(inner_fields$x, inner_fields$zU)
+  inner_zL <- interp(inner_fields$x, inner_fields$zL)
 
   contained <- (inner_y <= body_y) & (inner_y >= -body_y) &
     (inner_zU <= body_zU) & (inner_zL >= body_zL)
@@ -179,6 +304,7 @@ setGeneric(
 #' @param isometric_swimbladder Logical; maintain isometric scaling for bladder.
 #' @param n_segments_body Number of segments along the body.
 #' @param n_segments_swimbladder Number of segments along the bladder.
+#' @keywords internal
 #' @export
 setMethod(
   "reforge",
@@ -291,7 +417,7 @@ setMethod(
       }
     }
     ############################################################################
-    # Interpolate segments first (before scaling)  =============================
+    # Interpolate segments first (before scaling) ==============================
     rpos_b <- .reforge_resample_rows(rpos_b, n_segments_body)
     rpos_sb <- .reforge_resample_rows(rpos_sb, n_segments_swimbladder)
     ############################################################################
@@ -362,6 +488,7 @@ setMethod(
 #' @param n_segments New number of discrete segments.  All position-matrix
 #'   columns are re-interpolated along the x-axis.
 #' @return Modified GAS-class object.
+#' @keywords internal
 #' @export
 setMethod(
   "reforge",
@@ -439,6 +566,7 @@ setMethod(
 #'   internally. Mutually exclusive with \code{scale}.
 #' @param n_segments New number of discrete segments along the major axis.
 #' @return Modified CAL-class object.
+#' @keywords internal
 #' @export
 setMethod(
   "reforge",
@@ -478,7 +606,7 @@ setMethod(
     rpos  <- body$rpos
     # CAL is always a sphere; radius is a scalar stored in shape_parameters
     current_radius <- shape$radius_body %||% shape$radius
-    # Derive scale from diameter_target if given ================================
+    # Derive scale from diameter_target if given ===============================
     if (!is.null(diameter_target)) scale <- (diameter_target / 2) / current_radius
     ############################################################################
     # Resample segments first ==================================================
@@ -524,6 +652,7 @@ setMethod(
 #' @param n_segments New number of discrete segments.  All columns of both the
 #'   shell and fluid position matrices are re-interpolated along the x-axis.
 #' @return Modified ESS-class object.
+#' @keywords internal
 #' @export
 setMethod(
   "reforge",
@@ -646,8 +775,8 @@ setMethod(
 #' @param n_segments New number of segments
 #' @param length_radius_ratio_constant Keep length-to-radius ratio based on new
 #' length
-#' 
-#' @keywords keyword
+#'
+#' @keywords internal
 #' @export
 setMethod(
   "reforge",
@@ -732,6 +861,7 @@ setMethod(
 #' @keywords internal
 #' @noRd
 .discover_reforge_params <- function(object_class) {
+  # Return the known public parameter set for each scatterer class =============
   switch(object_class,
     "FLS" = c(
       "length", "radius", "length_radius_ratio_constant",
