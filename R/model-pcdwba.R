@@ -48,11 +48,12 @@
 #' @name PCDWBA
 #' @aliases pcdwba PCDWBA
 #' @docType data
-#' @keywords models acoustics
+#' @keywords models acoustics internal
 NULL
 
 #' @noRd
 .pcdwba_axis_row <- function(rpos, candidates, default = NULL) {
+  # Match the first available candidate axis ===================================
   if (!is.null(rownames(rpos))) {
     idx <- match(candidates, rownames(rpos), nomatch = 0L)
     idx <- idx[idx > 0L]
@@ -60,7 +61,7 @@ NULL
       return(idx[1])
     }
   }
-
+  # Fall back to the requested default =========================================
   if (is.null(default)) {
     return(NULL)
   }
@@ -70,9 +71,10 @@ NULL
 
 #' @noRd
 .pcdwba_is_straight <- function(body) {
+  # Resolve the transverse axis if present =====================================
   rpos <- body$rpos
   z_idx <- .pcdwba_axis_row(rpos, c("z", "z_body"), default = NULL)
-
+  # Treat missing transverse offsets as straight ===============================
   if (is.null(z_idx)) {
     return(TRUE)
   }
@@ -82,6 +84,7 @@ NULL
 
 #' @noRd
 .pcdwba_node_property <- function(x, n_nodes, label) {
+  # Recycle scalar properties to all nodes =====================================
   if (length(x) == 1L) {
     return(rep(as.numeric(x), n_nodes))
   }
@@ -93,7 +96,7 @@ NULL
   if (length(x) == n_nodes - 1L) {
     return(c(as.numeric(x[1]), as.numeric(x)))
   }
-
+  # Reject incompatible property lengths =======================================
   stop(
     "PCDWBA requires '", label, "' to be scalar, nodewise, or segmentwise. ",
     "Received length ", length(x), " for ", n_nodes, " nodes."
@@ -104,6 +107,7 @@ NULL
 .pcdwba_regular_geometry <- function(n_nodes,
                                      radius_curvature_ratio,
                                      taper_order = NA_real_) {
+  # Build the normalized bent-cylinder centerline ==============================
   gamma <- 0.5 / radius_curvature_ratio
   norm_ratio <- radius_curvature_ratio * 2
   z <- seq(-1, 1, length.out = n_nodes)
@@ -112,12 +116,12 @@ NULL
   } else {
     sqrt(pmax(1 - z^taper_order, 0))
   }
-
+  # Convert the arc to normalized x-z coordinates ==============================
   z_curved <- sin(gamma) * z
   x_curved <- 1 - sqrt(pmax(1 - z_curved^2, 0))
   x_norm <- x_curved * norm_ratio
   z_norm <- z_curved * norm_ratio
-
+  # Derive the local tilt and path-length terms ================================
   gamma_t <- atan2(z_norm, x_norm)
   dz <- diff(z_norm)
   dx <- diff(x_norm) + .Machine$double.eps
@@ -138,6 +142,7 @@ NULL
 
 #' @noRd
 .pcdwba_profile_geometry <- function(body) {
+  # Resolve the profile axes from the stored geometry ==========================
   rpos <- body$rpos
   n_nodes <- ncol(rpos)
 
@@ -150,7 +155,7 @@ NULL
   } else {
     as.numeric(rpos[z_idx, ])
   }
-
+  # Compute the physical and normalized centerline geometry ====================
   dx_phys <- diff(x_long)
   dz_phys <- diff(z_trans)
   length_body <- sum(sqrt(dx_phys^2 + dz_phys^2))
@@ -165,7 +170,7 @@ NULL
   x_norm <- 2 * transverse / length_body
   z_norm <- 2 * longitudinal / length_body
   taper <- .dwba_body_radius(body) / max(.dwba_body_radius(body))
-
+  # Derive the local tilt and path-length terms ================================
   gamma_t <- atan2(z_norm, x_norm)
   dz <- diff(z_norm)
   dx <- diff(x_norm) + .Machine$double.eps
@@ -189,6 +194,7 @@ NULL
 .pcdwba_prepare_geometry <- function(object,
                                      radius_curvature = NULL,
                                      radius_curvature_ratio = NULL) {
+  # Validate the scatterer and curvature inputs ================================
   if (!methods::is(object, "FLS")) {
     stop(
       "PCDWBA requires a fluid-like scatterer ('FLS'). Input scatterer is type '",
@@ -202,7 +208,7 @@ NULL
       "for PCDWBA."
     )
   }
-
+  # Convert the input object to a DWBA-style profile ===========================
   object <- .as_dwba_profile(object)
   shape <- extract(object, "shape_parameters")
   body <- extract(object, "body")
@@ -213,7 +219,7 @@ NULL
   if (!is.finite(max_radius) || max_radius <= 0) {
     stop("PCDWBA requires a positive body radius.")
   }
-
+  # Resolve the effective curvature ratio ======================================
   x_idx <- .pcdwba_axis_row(body$rpos, c("x", "x_body"), default = 1L)
   z_idx <- .pcdwba_axis_row(body$rpos, c("z", "z_body"), default = NULL)
   z_pos <- if (is.null(z_idx)) {
@@ -238,7 +244,7 @@ NULL
   } else {
     NA_real_
   }
-
+  # Build the regular or profile-derived geometry terms ========================
   if (!is.na(effective_ratio) &&
       identical(shape$shape, "Cylinder")) {
     geometry <- .pcdwba_regular_geometry(
@@ -272,6 +278,7 @@ pcdwba_initialize <- function(object,
                               density_sw = 1026,
                               radius_curvature = NULL,
                               radius_curvature_ratio = NULL) {
+  # Prepare the geometry and resolve the active profile ========================
   prepared <- .pcdwba_prepare_geometry(
     object = object,
     radius_curvature = radius_curvature,
@@ -280,6 +287,7 @@ pcdwba_initialize <- function(object,
   object <- prepared$object
   geometry <- prepared$geometry
   body <- extract(object, "body")
+  # Derive nodewise contrasts and scattering strength ==========================
   contrasts <- .derive_contrasts(body, sound_speed_sw, density_sw)
   body$h <- .pcdwba_node_property(
     contrasts$h,
@@ -295,10 +303,10 @@ pcdwba_initialize <- function(object,
   if (anyNA(body$h) || anyNA(body$g)) {
     stop("PCDWBA requires finite density and sound-speed contrasts.")
   }
-
+  # Compute the DWBA material contrast factor ==================================
   Cb <- (1 - body$g * body$h * body$h) / (body$g * body$h * body$h) -
     (body$g - 1) / body$g
-
+  # Store the PCDWBA initialization recipe =====================================
   medium_params <- data.frame(
     sound_speed = sound_speed_sw,
     density = density_sw
@@ -332,12 +340,13 @@ pcdwba_initialize <- function(object,
 #' Phase-compensated distorted wave Born approximation.
 #' @noRd
 PCDWBA <- function(object) {
+  # Extract the stored PCDWBA inputs ===========================================
   model <- extract(object, "model_parameters")$PCDWBA
   acoustics <- model$parameters$acoustics
   body <- model$body
   theta <- body$theta
   eps <- .Machine$double.eps
-
+  # Evaluate the normalized phase-compensated amplitude ========================
   f_norm <- vapply(seq_len(nrow(acoustics)), function(i) {
     k_sw <- acoustics$k_sw[i]
     X2 <- k_sw * body$radius * body$taper / body$h
@@ -348,7 +357,7 @@ PCDWBA <- function(object) {
     term2 <- (X2^2) * (besselJ(arg, 1) / arg) * phase
     sum(term2 * term1) + eps
   }, complex(1))
-
+  # Scale to the full backscatter and store the results ========================
   f_bs <- f_norm * body$length_body
   sigma_bs <- abs(f_bs)^2
 
