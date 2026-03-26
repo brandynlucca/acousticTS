@@ -109,7 +109,7 @@
 #' @name FCMS
 #' @aliases fcms FCMS
 #' @docType data
-#' @keywords models acoustics
+#' @keywords models acoustics internal
 NULL
 
 #' Initialize Scatterer-class object for the modal series solution for a finite
@@ -139,7 +139,8 @@ fcms_initialize <- function(object,
     )
   }
   # Parse body =================================================================
-  body <- .hydrate_contrasts(extract(object, "body"), sound_speed_sw, density_sw)
+  body <- .hydrate_contrasts(extract(object, "body"),
+                             sound_speed_sw, density_sw)
   # Define model parameters recipe =============================================
   model_params <- list(
     acoustics = .init_acoustics_df(
@@ -263,7 +264,9 @@ FCMS <- function(object) {
 #' finite cylinder.
 #' @noRd
 .fcms_bm_fixed_rigid <- function(k1a, nu, m_limit) {
+  # Precompute the rigid-cylinder modal weights ================================
   weights <- (-1)^(0:max(m_limit)) * nu
+  # Evaluate the rigid boundary-condition coefficients =========================
   .modal_series_apply(
     m_limit = m_limit,
     FUN = function(k1a, ml) {
@@ -278,7 +281,9 @@ FCMS <- function(object) {
 #' pressure-release finite cylinder.
 #' @noRd
 .fcms_bm_pressure_release <- function(k1a, nu, m_limit) {
+  # Precompute the soft-cylinder modal weights =================================
   weights <- (-1)^(0:max(m_limit)) * nu
+  # Evaluate the pressure-release coefficients =================================
   .modal_series_apply(
     m_limit = m_limit,
     FUN = function(k1a, ml) {
@@ -292,7 +297,9 @@ FCMS <- function(object) {
 #' finite cylinder.
 #' @noRd
 .fcms_bm_fluid <- function(k1a, k2a, gh, nu, m_limit) {
+  # Resolve the largest retained modal order ===================================
   m_max <- max(m_limit)
+  # Build the fluid-cylinder Cm coefficients ===================================
   Cm <- .modal_series_apply(
     m_limit = m_limit,
     FUN = function(k1a, k2a, gh, ml) {
@@ -307,5 +314,6 @@ FCMS <- function(object) {
     k2a = k2a,
     gh = gh
   )
+  # Convert Cm into the retained Bm coefficients ===============================
   1i^((0:m_max) + 1) * (-nu * 1i^(0:m_max) / (1 + 1i * Cm))
 }
