@@ -25,3 +25,9 @@ renv/library
 inst/doc
 scratch/
 .vscode/
+Rplots.pdf
+tests/testthat/Rplots.pdf
+src/*.dll
+src/*.o
+src/*.mod
+vignettes/*/figure/

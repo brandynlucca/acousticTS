@@ -26,3 +26,8 @@
 ^pkgdown$
 ^scratch$
 ^.vscode$
+^Rplots\.pdf$
+^tests/testthat/Rplots\.pdf$
+^src/.*\.(dll|o|mod)$
+^vignettes/.*/figure$
+^vignettes/.*/figure/.*
