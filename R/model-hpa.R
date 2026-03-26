@@ -170,7 +170,7 @@
 #' @name HP
 #' @aliases hpa HPA high_pass HIGH_PASS
 #' @docType data
-#' @keywords models acoustics
+#' @keywords models acoustics internal
 NULL
 
 #' Initialize Scatterer-class object for the high-pass approximation model
