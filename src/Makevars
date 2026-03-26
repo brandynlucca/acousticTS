@@ -1,7 +1,5 @@
-PKG_LIBS += $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
-PKG_CXXFLAGS += -Wno-ignored-attributes -Wno-pedantic -w
-
-PKG_FCFLAGS = -O3 -fPIC -cpp
+PKG_LIBS = $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
+FPPFLAGS = -cpp
 
 OBJECTS = RcppExports.o \
 	bessel.o \
@@ -14,6 +12,7 @@ OBJECTS = RcppExports.o \
 	prolate_swf.o \
 	prolate_swf_quad.o \
 	psms.o \
+	tmm.o \
 	vesms.o
 
 all: $(SHLIB)
@@ -22,16 +21,16 @@ clean:
 	rm -f *.o *.mod $(SHLIB)
 
 param.o: param.f90
-	$(FC) $(PKG_FCFLAGS) -c param.f90 -o param.o
+	$(FC) $(ALL_FFLAGS) $(FPPFLAGS) -c param.f90 -o param.o
 
 param_quad.o: param_quad.f90
-	$(FC) $(PKG_FCFLAGS) -c param_quad.f90 -o param_quad.o
+	$(FC) $(ALL_FFLAGS) $(FPPFLAGS) -c param_quad.f90 -o param_quad.o
 
 prolate_swf.o: prolate_swf.f90 param.o
-	$(FC) $(PKG_FCFLAGS) -c prolate_swf.f90 -o prolate_swf.o
+	$(FC) $(ALL_FFLAGS) $(FPPFLAGS) -c prolate_swf.f90 -o prolate_swf.o
 
 prolate_swf_quad.o: prolate_swf.f90 param_quad.o
-	$(FC) $(PKG_FCFLAGS) -DUSE_QUAD -c prolate_swf.f90 -o prolate_swf_quad.o
+	$(FC) $(ALL_FFLAGS) $(FPPFLAGS) -DUSE_QUAD -c prolate_swf.f90 -o prolate_swf_quad.o
 
 psms.o: psms.cpp prolate_swf.o prolate_swf_quad.o
 	$(CXX) $(ALL_CPPFLAGS) $(ALL_CXXFLAGS) -c psms.cpp -o psms.o
