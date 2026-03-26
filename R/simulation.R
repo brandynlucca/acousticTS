@@ -15,13 +15,40 @@
 #' @param verbose Logical; whether to print progress and status messages to the
 #' console. Default is \code{TRUE}.
 #'
-#' @return A data frame (or list of data frames) with simulation results.
+#' @return
+#' A data frame when a single model is requested, or a named list of data
+#' frames when multiple models are requested. Each returned data frame contains
+#' the realized parameter values together with the modeled acoustic output for
+#' each simulated run.
 #'
 #' @details
-#' For example, if \code{batch_by = "length"} and \code{parameters["length"]}
-#' is a vector of values, simulations will be run for each value of length
-#' \code{n_realizations} times. If multiple parameters are specified in
-#' \code{batch_by}, batching will occur over all combinations of their values.
+#' `simulate_ts()` is a workflow wrapper around repeated `target_strength()`
+#' calls. It supports three broad parameter modes inside `parameters`:
+#'
+#' \itemize{
+#'   \item scalars that are recycled across every realization,
+#'   \item explicit vectors that are either aligned with the full simulation
+#'   grid or with one or more batched dimensions, and
+#'   \item generating functions that are re-evaluated for each realization.
+#' }
+#'
+#' If \code{batch_by = "length"} and \code{parameters[["length"]]} is a vector
+#' of candidate values, then simulations are run for each length value,
+#' repeated \code{n_realizations} times. When multiple parameters are supplied
+#' through \code{batch_by}, the function builds the full Cartesian grid of
+#' those parameter values and runs the requested number of realizations inside
+#' each batch cell.
+#'
+#' Parameter names are interpreted in the same way they would be if supplied
+#' directly to \code{target_strength()} or to the relevant object constructor /
+#' \code{reforge()} path. This means \code{simulate_ts()} can be used for:
+#'
+#' \itemize{
+#'   \item orientation perturbations,
+#'   \item material-property perturbations,
+#'   \item morphology studies that trigger shape rebuilding or reforging, and
+#'   \item side-by-side comparisons across one or more model families.
+#' }
 #'
 #' @section Parallelization:
 #' This function uses \code{pbapply::pblapply()} for parallelized simulation
@@ -35,9 +62,33 @@
 #' \code{R} to crash. If intensive simulations are required, consider breaking
 #' them into more manageable chunks
 #'
-#' @section DEPRECATION WARNING:
-#' The `simulate_ts` function will be deprecated in future versions and will be
-#' replaced by the `anneal` function in future versions.
+#' @examples
+#' shape_obj <- cylinder(
+#'   length_body = 0.05,
+#'   radius_body = 0.003,
+#'   n_segments = 40
+#' )
+#'
+#' obj <- fls_generate(
+#'   shape = shape_obj,
+#'   density_body = 1045,
+#'   sound_speed_body = 1520
+#' )
+#'
+#' res <- simulate_ts(
+#'   object = obj,
+#'   frequency = seq(38e3, 50e3, by = 6e3),
+#'   model = "dwba",
+#'   n_realizations = 2,
+#'   parameters = list(
+#'     theta_body = function() runif(1, min = 0.5 * pi, max = pi),
+#'     density_body = 1045
+#'   ),
+#'   parallel = FALSE,
+#'   verbose = FALSE
+#' )
+#'
+#' head(res)
 #'
 #' @importFrom pbapply pblapply
 #' @export
@@ -50,15 +101,15 @@ simulate_ts <- function(object,
                         parallel = TRUE,
                         n_cores = parallel::detectCores() - 1,
                         verbose = TRUE) {
-  # Future deprecation warning =================================================
-  message(
-    "DeprecationWarning: The `simulate_ts` function will be replaced by the ",
-    "`anneal` function in future releases."
-  )
   # Validate that object is of the correct class ===============================
   stopifnot(
     "'object' must be a 'scatterer'-based class" = inherits(object, "Scatterer")
   )
+  parallel <- isTRUE(parallel) &&
+    is.numeric(n_cores) &&
+    length(n_cores) == 1 &&
+    !is.na(n_cores) &&
+    n_cores > 1
   # Validate model =============================================================
   normalized_model <- .normalize_simulation_models(model)
   unexpected_model <- model[!(normalized_model %in%
@@ -127,29 +178,14 @@ simulate_ts <- function(object,
   parameter_matrix <- as.data.frame(
     stats::setNames(
       lapply(parameter_names, function(param) {
-        value <- parameters[[param]]
-        if (!is.null(batch_by) && param %in% batch_by) {
-          batch_values[[param]][
-            simulation_grid[[paste0(param, "_idx")]]
-          ]
-        } else if (is.function(value)) {
-          replicate(nrow(simulation_grid), value())
-        } else if (length(value) == 1) {
-          rep(value, nrow(simulation_grid))
-        } else if (length(value) == nrow(simulation_grid)) {
-          value
-        } else {
-          sim_type <- ifelse(is.null(batch_by),
-            "realizations",
-            "batched realizations"
-          )
-          stop(
-            paste0(
-              "Length of parameter '", param, "' does not match number of ",
-              sim_type, " [n=", nrow(simulation_grid), "]."
-            )
-          )
-        }
+        .resolve_param_value(
+          param_name = param,
+          param_value = parameters[[param]],
+          batch_by = batch_by,
+          batch_values = if (!is.null(batch_by)) batch_values else NULL,
+          grid_size = nrow(simulation_grid),
+          simulation_grid = simulation_grid
+        )
       }),
       parameter_names
     )
