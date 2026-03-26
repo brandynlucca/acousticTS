@@ -12,7 +12,7 @@
 #' @details
 #' The cylindrical Bessel function of the first kind satisfies Bessel's
 #' differential equation:
-#' 
+#'
 #' \deqn{z^2 \frac{d^2 J_\nu}{dz^2} + z \frac{dJ_\nu}{dz} + (z^2 - \nu^2) J
 #' _\nu = 0}
 #'
@@ -63,8 +63,8 @@
 #' A complex vector containing:
 #' \itemize{
 #'   \item \code{jc}: \eqn{J_\nu(z)}
-#'   \item \code{jcd}: \eqn{J'_\nu(z)} (first derivative)
-#'   \item \code{jcdd}: \eqn{J''_\nu(z)} (second derivative)
+#'   \item \code{jcdk(..., k = 1)}: \eqn{J'_\nu(z)} (first derivative)
+#'   \item \code{jcdk(..., k = 2)}: \eqn{J''_\nu(z)} (second derivative)
 #'   \item \code{jcdk}: \eqn{J_\nu^{(k)}(z)} (k-th derivative)
 #' }
 #'
@@ -87,10 +87,10 @@
 #' jc(2, 3i)
 #'
 #' # First derivative
-#' jcd(1, 2)
+#' jcdk(1, 2, 1)
 #'
 #' # Second derivative
-#' jcdd(1, 2)
+#' jcdk(1, 2, 2)
 #'
 #' @references
 #' Abramowitz, M. and Stegun, I.A. (Eds.). (1964). \emph{Handbook of
@@ -121,12 +121,14 @@ jc <- function(l, n) {
 #' @keywords internal
 #' @noRd
 jcd <- function(l, n) {
+  # Internal helper function ===================================================
   jc_deriv_cpp(n, l, 1)
 }
 #' @rdname jc
 #' @keywords internal
 #' @noRd
 jcdd <- function(l, n) {
+  # Internal helper function ===================================================
   jc_deriv_cpp(n, l, 2)
 }
 #' @rdname jc
@@ -142,7 +144,7 @@ jcdk <- function(l, n, k) {
 #' @description
 #' Computes the cylindrical Bessel function of the second kind
 #' (\eqn{Y_\nu(z)}), also known as the Neumann function or Weber function, and
-#' its first derivative (\code{ycd}).
+#' its derivatives through \code{ycdk()}.
 #'
 #' @details
 #' The cylindrical Bessel function of the second kind satisfies the same
@@ -196,8 +198,8 @@ jcdk <- function(l, n, k) {
 #' A complex vector containing:
 #' \itemize{
 #'   \item \code{yc}: \eqn{Y_\nu(z)}
-#'   \item \code{ycd}: \eqn{Y'_\nu(z)} (first derivative)
-#'   \item \code{ycdd}: \eqn{Y''_\nu(z)} (second derivative)
+#'   \item \code{ycdk(..., k = 1)}: \eqn{Y'_\nu(z)} (first derivative)
+#'   \item \code{ycdk(..., k = 2)}: \eqn{Y''_\nu(z)} (second derivative)
 #'   \item \code{ycdk}: \eqn{Y_\nu^{(k)}(z)} (k-th derivative)
 #' }
 #'
@@ -220,7 +222,7 @@ jcdk <- function(l, n, k) {
 #' yc(0, 0)  # Returns -Inf
 #'
 #' # First derivative
-#' ycd(1, 2)
+#' ycdk(1, 2, 1)
 #'
 #' @references
 #' Abramowitz, M. and Stegun, I.A. (Eds.). (1964).
@@ -252,12 +254,14 @@ yc <- function(l, n) {
 #' @keywords internal
 #' @noRd
 ycd <- function(l, n) {
+  # Internal helper function ===================================================
   yc_deriv_cpp(n, l, 1)
 }
 #' @rdname yc
 #' @keywords internal
 #' @noRd
 ycdd <- function(l, n) {
+  # Internal helper function ===================================================
   yc_deriv_cpp(n, l, 2)
 }
 #' @rdname yc
@@ -272,8 +276,7 @@ ycdk <- function(l, n, k) {
 #'
 #' @description
 #' Computes the cylindrical Hankel function of the first kind
-#' (\eqn{H^{(1)}_\nu(z)}) and its first (\code{hcd}), second (\code{hcdd}),
-#' and k-th (\code{hcdk}) derivatives.
+#' (\eqn{H^{(1)}_\nu(z)}) and its derivatives through \code{hcdk()}.
 #'
 #' @details
 #' The Hankel function of the first kind is defined as:
@@ -316,8 +319,10 @@ ycdk <- function(l, n, k) {
 #' A complex vector containing:
 #' \itemize{
 #'   \item \code{hc}: \eqn{H^{(1)}_\nu(z)}
-#'   \item \code{hcd}: \eqn{\frac{d}{dz}H^{(1)}_\nu(z)} (first derivative)
-#'   \item \code{hcdd}: \eqn{\frac{d^2}{dz^2}H^{(1)}_\nu(z)} (second derivative)
+#'   \item \code{hcdk(..., k = 1)}: \eqn{\frac{d}{dz}H^{(1)}_\nu(z)}
+#'   (first derivative)
+#'   \item \code{hcdk(..., k = 2)}: \eqn{\frac{d^2}{dz^2}H^{(1)}_\nu(z)}
+#'   (second derivative)
 #'   \item \code{hcdk}: \eqn{\frac{d^k}{dz^k}H^{(1)}_\nu(z)} (k-th derivative)
 #' }
 #'
@@ -333,10 +338,10 @@ ycdk <- function(l, n, k) {
 #' hc(1, 1i)
 #'
 #' # First derivative
-#' hcd(1, 2)
+#' hcdk(1, 2, 1)
 #'
 #' # Second derivative
-#' hcdd(1, 2)
+#' hcdk(1, 2, 2)
 #'
 #' # k-th derivative
 #' hcdk(1, 2, 3)  # Third derivative
@@ -369,12 +374,14 @@ hc <- function(l, n) {
 #' @keywords internal
 #' @noRd
 hcd <- function(l, n) {
+  # Internal helper function ===================================================
   hc_deriv_cpp(n, l, 1)
 }
 #' @rdname hc
-#' @keywords internal 
+#' @keywords internal
 #' @noRd
 hcdd <- function(l, n) {
+  # Internal helper function ===================================================
   hc_deriv_cpp(n, l, 2)
 }
 #' @rdname hc

@@ -40,8 +40,9 @@
 #' \code{prolate_swf} library developed by Arnie Lee Van Buren and Jeffrey
 #' Boisvert. The underlying algorithm uses a combination of forward and
 #' backward recursion with the Bouwkamp eigenvalue method for high accuracy
-#' across wide parameter ranges. The C++ layer manages memory, precision selection, and data
-#' conversion between R and Fortran for robust and efficient computation.
+#' across wide parameter ranges. The C++ layer manages memory, precision
+#' selection, and data conversion between R and Fortran for robust and
+#' efficient computation.
 #'
 #' @param m Non-negative integer. The order of the spheroidal function (\eqn{m
 #' \geq 0}).
@@ -53,14 +54,16 @@
 #' @param normalize Logical. If \code{TRUE}, the angular functions are
 #' normalized to have unity norm. If \code{FALSE} (default), the
 #' Meixner-Schäfke normalization is used.
-#' @param precision Character. Either \code{"double"} (default) or \code{"quad"}. Controls the 
-#' floating-point precision used in the underlying Fortran computation. 
+#' @param precision Character. Either \code{"double"} (default) or
+#' \code{"quad"}. Controls the  floating-point precision used in the underlying
+#' Fortran computation.
 #'   \describe{
-#'     \item{\code{"double"}}{Uses standard double-precision (64-bit) arithmetic. Fastest and 
-#'      sufficient for most applications.}
-#'     \item{\code{"quad"}}{Uses quadruple-precision (128-bit) arithmetic for higher numerical 
-#'      accuracy in challenging parameter regimes (e.g., large \eqn{m}, \eqn{n}, or near 
-#'      singularities). Computation is significantly slower.}
+#'     \item{\code{"double"}}{Uses standard double-precision (64-bit)
+#'     arithmetic. Fastest and  sufficient for most applications.}
+#'     \item{\code{"quad"}}{Uses quadruple-precision (128-bit) arithmetic for
+#'     higher numerical  accuracy in challenging parameter regimes (e.g., large
+#'     \eqn{m}, \eqn{n}, or near  singularities). Computation is significantly
+#'     slower.}
 #'   }
 
 #' @return A list containing:
@@ -83,7 +86,7 @@
 #'
 #' # Double precision (default)
 #' Smn(m = 2, n = 3, c = 1, eta = 0.5, precision = "double")
-#' 
+#'
 #' # Quad precision
 #' Smn(m = 2, n = 3, c = 1, eta = 0.5, precision = "quad")
 #'
@@ -137,9 +140,9 @@ Smn <- function(m, n, c, eta, normalize = FALSE, precision = "double") {
 #' \eqn{n}, size parameter \eqn{c}, and radial coordinate \eqn{\xi}.
 #'
 #' This function is an R wrapper for compiled C++ code, which in turn calls the
-#' underlying Fortran library (\code{prolate_swf}) for high-performance numerical
-#' computation. All heavy computation is performed in compiled code for speed and
-#' accuracy.
+#' underlying Fortran library (\code{prolate_swf}) for high-performance
+#' numerical computation. All heavy computation is performed in compiled code
+#' for speed and accuracy.
 #'
 #' @details
 #' The prolate spheroidal radial functions are solutions to the radial part
@@ -184,8 +187,9 @@ Smn <- function(m, n, c, eta, normalize = FALSE, precision = "double") {
 #' \code{prolate_swf} library developed by Arnie Lee Van Buren and Jeffrey
 #' Boisvert. The underlying algorithm uses a combination of forward and
 #' backward recursion with the Bouwkamp eigenvalue method for high accuracy
-#' across wide parameter ranges. The C++ layer manages memory, precision selection, and data
-#' conversion between R and Fortran for robust and efficient computation.
+#' across wide parameter ranges. The C++ layer manages memory, precision
+#' selection, and data conversion between R and Fortran for robust and
+#' efficient computation.
 #'
 #' @param m Non-negative integer. The order of the spheroidal function (\eqn{m
 #' \geq 0}).
@@ -198,14 +202,16 @@ Smn <- function(m, n, c, eta, normalize = FALSE, precision = "double") {
 #' @param kind Integer. Specifies which kind of radial function to compute:
 #'   \code{1} (first kind), \code{2} (second kind), \code{3} (third
 #'   kind/outgoing), or \code{4} (fourth kind/incoming). Default is \code{1}.
-#' @param precision Character. Either \code{"double"} (default) or \code{"quad"}. Controls the 
-#'   floating-point precision used in the underlying Fortran computation. 
+#' @param precision Character. Either \code{"double"} (default) or
+#' \code{"quad"}. Controls the  floating-point precision used in the underlying
+#' Fortran computation.
 #'   \describe{
-#'     \item{\code{"double"}}{Uses standard double-precision (64-bit) arithmetic. Fastest and 
-#'      sufficient for most applications.}
-#'     \item{\code{"quad"}}{Uses quadruple-precision (128-bit) arithmetic for higher numerical 
-#'        accuracy in challenging parameter regimes (e.g., large \eqn{m}, \eqn{n}, \eqn{c}, or near 
-#'        singularities). Computation is significantly slower.}
+#'     \item{\code{"double"}}{Uses standard double-precision (64-bit)
+#'     arithmetic. Fastest and  sufficient for most applications.}
+#'     \item{\code{"quad"}}{Uses quadruple-precision (128-bit) arithmetic for
+#'     higher numerical  accuracy in challenging parameter regimes (e.g., large
+#'     \eqn{m}, \eqn{n}, \eqn{c}, or near  singularities). Computation is
+#'     significantly slower.}
 #'   }
 
 #' @return A list containing:
@@ -229,7 +235,7 @@ Smn <- function(m, n, c, eta, normalize = FALSE, precision = "double") {
 #'
 #' # Fourth kind (incoming) radial function
 #' Rmn(m = 1, n = 1, c = 2, xi = 1.2, kind = 4)
-#' 
+#'
 #' # Double precision (default)
 #' Rmn(m = 2, n = 3, c = 1, xi = 1.5)
 #'

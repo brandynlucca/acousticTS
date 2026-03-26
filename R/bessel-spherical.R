@@ -7,7 +7,7 @@
 #' respective derivatives
 #'
 #' @description
-#' Computes the spherical Bessel function of the first kind (\eqn{j_\nu(z)}) 
+#' Computes the spherical Bessel function of the first kind (\eqn{j_\nu(z)})
 #' and its k-th derivative.
 #'
 #' @details
@@ -19,7 +19,7 @@
 #'
 #' The spherical Bessel functions satisfy the differential equation:
 #' \deqn{
-#'  z^2 \frac{d^2 j_\nu}{dz^2} + 
+#'  z^2 \frac{d^2 j_\nu}{dz^2} +
 #'  2z \frac{dj_\nu}{dz} + [z^2 - l(l+1)] j_\nu = 0
 #' }
 #'
@@ -43,6 +43,7 @@
 #'   or fractional.
 #' @param n Numeric or matrix. The argument (\eqn{z}) at which to evaluate the
 #'   function. If a matrix is provided, the function is applied column-wise.
+#' @param k Non-negative integer. The order of the derivative for \code{jsdk}.
 #'
 #' @return
 #' A numeric vector or matrix (matching the input structure) containing:
@@ -96,6 +97,7 @@ js <- function(l, n) {
   if (!is.numeric(l) || !(is.numeric(n) || is.complex(n))) {
     stop("Inputs must be numeric or complex vectors.")
   }
+  # Complex argument handling ==================================================
   if (is.complex(n)) {
     js_complex_cpp(as.integer(l), as.complex(n))
   } else {
@@ -106,6 +108,7 @@ js <- function(l, n) {
 #' @keywords internal
 #' @noRd
 jsd <- function(l, n) {
+  # Internal helper function ===================================================
   if (is.complex(n)) {
     js_complex_deriv_cpp(as.integer(l), as.complex(n), 1)
   } else {
@@ -116,6 +119,7 @@ jsd <- function(l, n) {
 #' @keywords internal
 #' @noRd
 jsdd <- function(l, n) {
+  # Internal helper function ===================================================
   if (is.complex(n)) {
     js_complex_deriv_cpp(as.integer(l), as.complex(n), 2)
   } else {
@@ -142,7 +146,7 @@ jsdk <- function(l, n, k) {
 #' @details
 #' The spherical Bessel function of the second kind is related to the
 #' cylindrical Bessel function by:
-#' 
+#'
 #' \deqn{y_\nu(z) = \sqrt{\frac{\pi}{2z}} Y_{\nu+1/2}(z)}
 #'
 #' where \eqn{Y_\nu(z)} is the cylindrical Bessel function of the second kind.
@@ -150,7 +154,7 @@ jsdk <- function(l, n, k) {
 #' The spherical Bessel functions satisfy the same differential equation as
 #' \eqn{j_\nu(z)}:
 #' \deqn{
-#'  z^2 \frac{d^2 y_\nu}{dz^2} + 2z \frac{dy_\nu}{dz} + 
+#'  z^2 \frac{d^2 y_\nu}{dz^2} + 2z \frac{dy_\nu}{dz} +
 #'  [z^2 - \nu(\nu+1)] y_\nu = 0
 #' }
 #'
@@ -174,6 +178,7 @@ jsdk <- function(l, n, k) {
 #'   or fractional.
 #' @param n Numeric or matrix. The argument (\eqn{z}) at which to evaluate the
 #'   function. If a matrix is provided, the function is applied column-wise.
+#' @param k Non-negative integer. The order of the derivative for \code{ysdk}.
 #'
 #' @return
 #' A numeric vector or matrix (matching the input structure) containing:
@@ -204,7 +209,7 @@ jsdk <- function(l, n, k) {
 #'
 #' # 3rd derivative
 #' ysdk(1, 1, 3)
-#' 
+#'
 #' # 4th derivative
 #' ysdk(1, 1, 4)
 #'
@@ -233,6 +238,7 @@ ys <- function(l, n) {
   if (!is.numeric(l) || !(is.numeric(n) || is.complex(n))) {
     stop("Inputs must be numeric or complex vectors.")
   }
+  # Complex argument handling ==================================================
   if (is.complex(n)) {
     ys_complex_cpp(as.integer(l), as.complex(n))
   } else {
@@ -243,6 +249,7 @@ ys <- function(l, n) {
 #' @keywords internal
 #' @noRd
 ysd <- function(l, n) {
+  # Internal helper function ===================================================
   if (is.complex(n)) {
     ys_complex_deriv_cpp(as.integer(l), as.complex(n), 1)
   } else {
@@ -253,6 +260,7 @@ ysd <- function(l, n) {
 #' @keywords internal
 #' @noRd
 ysdd <- function(l, n) {
+  # Internal helper function ===================================================
   if (is.complex(n)) {
     ys_complex_deriv_cpp(as.integer(l), as.complex(n), 2)
   } else {
@@ -273,7 +281,7 @@ ysdk <- function(l, n, k) {
 #' respective derivatives
 #'
 #' @description
-#' Computes the spherical Hankel function of the first kind 
+#' Computes the spherical Hankel function of the first kind
 #' (\eqn{h^{(1)}_\nu(z)}) and its first-th derivative.
 #'
 #' @details
@@ -291,13 +299,14 @@ ysdk <- function(l, n, k) {
 #'
 #' **Derivative:**
 #' \deqn{
-#'  \frac{d}{dz}h^{(1)}_\nu(z) = \frac{\nu}{z} h^{(1)}_\nu(z) 
+#'  \frac{d}{dz}h^{(1)}_\nu(z) = \frac{\nu}{z} h^{(1)}_\nu(z)
 #'  - h^{(1)}_{\nu+1}(z)
 #' }
 #'
 #' @param l Numeric. The order of the spherical Hankel function. Can be integer
 #'   or fractional.
 #' @param n Numeric. The argument (\eqn{z}) at which to evaluate the function.
+#' @param k Non-negative integer. The order of the derivative for \code{hsdk}.
 #'
 #' @return
 #' A complex vector containing:
@@ -341,6 +350,7 @@ ysdk <- function(l, n, k) {
 #' @rdname hs
 #' @export
 hs <- function(l, n) {
+  # Complex argument handling ==================================================
   if (is.complex(n)) {
     hs_complex_cpp(as.integer(l), as.complex(n))
   } else {
@@ -351,6 +361,7 @@ hs <- function(l, n) {
 #' @keywords internal
 #' @noRd
 hsd <- function(l, n) {
+  # Internal helper function ===================================================
   if (is.complex(n)) {
     hs_complex_deriv_cpp(as.integer(l), as.complex(n), 1)
   } else {
@@ -361,6 +372,7 @@ hsd <- function(l, n) {
 #' @keywords internal
 #' @noRd
 hsdd <- function(l, n) {
+  # Internal helper function ===================================================
   if (is.complex(n)) {
     hs_complex_deriv_cpp(as.integer(l), as.complex(n), 2)
   } else {
