@@ -121,6 +121,22 @@ prolate_spheroid_fbs <- function(acoustics, body, medium, integration_pts, preci
     .Call(`_acousticTS_prolate_spheroid_fbs`, acoustics, body, medium, integration_pts, precision, Amn_method, adaptive, vectorized)
 }
 
+prolate_spheroid_tmatrix_cpp <- function(acoustics, body, medium, integration_pts, precision = "double", Amn_method = "Amn_fluid") {
+    .Call(`_acousticTS_prolate_spheroid_tmatrix_cpp`, acoustics, body, medium, integration_pts, precision, Amn_method)
+}
+
+prolate_spheroid_scattering_from_tmatrix_cpp <- function(acoustics, t_matrix, theta_body, phi_body, theta_scatter, phi_scatter, precision = "double") {
+    .Call(`_acousticTS_prolate_spheroid_scattering_from_tmatrix_cpp`, acoustics, t_matrix, theta_body, phi_body, theta_scatter, phi_scatter, precision)
+}
+
+prolate_spheroid_scattering_grid_from_tmatrix_cpp <- function(acoustics, t_matrix, theta_body, phi_body, theta_scatter, phi_scatter, precision = "double") {
+    .Call(`_acousticTS_prolate_spheroid_scattering_grid_from_tmatrix_cpp`, acoustics, t_matrix, theta_body, phi_body, theta_scatter, phi_scatter, precision)
+}
+
+tmm_backscatter_cpp <- function(frequency, theta_body, shape, shape_values, boundary, sound_speed_sw, density_sw, density_body, sound_speed_body, n_max) {
+    .Call(`_acousticTS_tmm_backscatter_cpp`, frequency, theta_body, shape, shape_values, boundary, sound_speed_sw, density_sw, density_body, sound_speed_body, n_max)
+}
+
 vesms_backscatter_cpp <- function(frequency, m_limit, density_sw, density_viscous, density_shell, density_gas, sound_speed_sw, sound_speed_viscous, sound_speed_gas, radius_viscous, radius_shell, radius_gas, shear_viscosity_viscous, bulk_viscosity_viscous, shear_modulus_shell, lambda_shell) {
     .Call(`_acousticTS_vesms_backscatter_cpp`, frequency, m_limit, density_sw, density_viscous, density_shell, density_gas, sound_speed_sw, sound_speed_viscous, sound_speed_gas, radius_viscous, radius_shell, radius_gas, shear_viscosity_viscous, bulk_viscosity_viscous, shear_modulus_shell, lambda_shell)
 }
