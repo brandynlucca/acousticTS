@@ -13,32 +13,26 @@ test_that("Scatterer class inheritance works correctly", {
   expect_false(methods::is(cal_obj, "ESS")) # CAL is no longer treated as ESS
 
   # Test ESS (elastic shelled sphere)
-  ess_obj <- ess_generate(radius_shell = 1)
+  ess_obj <- ess_generate(shape = sphere(radius_body = 1, n_segments = 80))
   expect_s4_class(ess_obj, "ESS")
   expect_s4_class(ess_obj, "ELA") # ESS inherits from ELA
   expect_s4_class(ess_obj, "Scatterer") # ELA inherits from Scatterer
 
   # Test ESS where input is a pre-made shape
-  ess_obj <- ess_generate(shape = sphere(radius_body = 1))
+  ess_obj <- ess_generate(shape = sphere(radius_body = 1, n_segments = 80))
   expect_s4_class(ess_obj, "ESS")
   expect_s4_class(ess_obj, "ELA") # ESS inherits from ELA
   expect_s4_class(ess_obj, "Scatterer") # ELA inherits from Scatterer
 
   # Test ESS where input is an arbitrary shape
   arb_shape <- cylinder(length_body = 1, radius_body = 0.2)
-  ess_obj <- ess_generate(
-    shape = "arbitrary",
-    x_body = arb_shape@position_matrix[, 1],
-    y_body = arb_shape@position_matrix[, 2],
-    z_body = arb_shape@position_matrix[, 3],
-    radius_shell = arb_shape@shape_parameters$radius
-  )
+  ess_obj <- ess_generate(shape = arb_shape)
   expect_s4_class(ess_obj, "ESS")
   expect_s4_class(ess_obj, "ELA") # ESS inherits from ELA
   expect_s4_class(ess_obj, "Scatterer") # ELA inherits from Scatterer
 
   # Test GAS (gas-filled scatterer)
-  gas_obj <- gas_generate(radius_body = 1)
+  gas_obj <- gas_generate(shape = sphere(radius_body = 1, n_segments = 80))
   expect_s4_class(gas_obj, "GAS")
   expect_s4_class(gas_obj, "Scatterer") # GAS inherits from Scatterer
 
@@ -117,7 +111,7 @@ test_that("Scatterer objects have required slots", {
   expect_type(model_params, "list")
 
   # Test with different scatterer types
-  gas_obj <- gas_generate(radius_body = 1)
+  gas_obj <- gas_generate(shape = sphere(radius_body = 1, n_segments = 80))
   expect_true("metadata" %in% slotNames(gas_obj))
   expect_true("model_parameters" %in% slotNames(gas_obj))
 
@@ -141,12 +135,12 @@ test_that("Scatterer generation functions work", {
   expect_equal(cal_obj_custom@metadata$ID, "TestSphere")
 
   # Test ess_generate
-  ess_obj <- ess_generate(radius_shell = 1)
+  ess_obj <- ess_generate(shape = sphere(radius_body = 1, n_segments = 80))
   expect_s4_class(ess_obj, "ESS")
   expect_equal(ess_obj@metadata$ID, "UID")
 
   # Test gas_generate
-  gas_obj <- gas_generate(radius_body = 1)
+  gas_obj <- gas_generate(shape = sphere(radius_body = 1, n_segments = 80))
   expect_s4_class(gas_obj, "GAS")
   expect_equal(gas_obj@metadata$ID, "UID")
 
@@ -167,7 +161,7 @@ test_that("Scatterer objects have proper structure", {
   expect_type(cal_obj@body, "list")
 
   # Test GAS structure
-  gas_obj <- gas_generate(radius_body = 1)
+  gas_obj <- gas_generate(shape = sphere(radius_body = 1, n_segments = 80))
   expect_true("body" %in% slotNames(gas_obj))
   expect_type(gas_obj@body, "list")
 
@@ -263,11 +257,13 @@ test_that("FLS-class generation works as expected", {
   expect_equal(shape$radius, max(tcyl@shape_parameters$radius))
   expect_equal(shape$taper_order, 10)
 
-  # Test internal shape generation
+  # Test shape-first cylinder input
   fls_cyl <- fls_generate(
-    shape = "cylinder",
-    length_body = 0.5,
-    length_radius_ratio = 20,
+    shape = cylinder(
+      length_body = 0.5,
+      radius_body = 0.025,
+      n_segments = 100
+    ),
     h_body = 1,
     g_body = 1
   )
@@ -317,7 +313,8 @@ test_that("FLS-class generation works as expected", {
   # Test expected errors
   # ---- Case: Empty[x_body]
   expect_error(
-    fls_generate(), "Body shape is not appropriately parameterized."
+    fls_generate(),
+    "Supply 'shape' as a pre-built Shape object, or provide explicit profile coordinates"
   )
   # ---- Case: Different g count
   expect_error(
@@ -357,11 +354,19 @@ test_that("ESS error cases are raised when necessary", {
 
   # Test case where conflicting density/g and sound speed/h values are input
   expect_error(
-    ess_generate(radius_shell = 1, h_shell = 1, sound_speed_shell = 1700),
+    ess_generate(
+      shape = sphere(radius_body = 1, n_segments = 80),
+      h_shell = 1,
+      sound_speed_shell = 1700
+    ),
     "Cannot specify both h_shell and sound_speed_shell"
   )
   expect_error(
-    ess_generate(radius_shell = 1, g_shell = 1, density_shell = 1700),
+    ess_generate(
+      shape = sphere(radius_body = 1, n_segments = 80),
+      g_shell = 1,
+      density_shell = 1700
+    ),
     "Cannot specify both g_shell and density_shell"
   )
 })

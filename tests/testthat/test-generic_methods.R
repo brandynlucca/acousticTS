@@ -12,11 +12,11 @@ test_that("Generic show method works for all scatterer types", {
   expect_error(suppressAllOutput(show(cal_obj)), NA)
 
   # Test show method for ESS objects
-  ess_obj <- ess_generate(radius_shell = 1)
+  ess_obj <- ess_generate(shape = sphere(radius_body = 1, n_segments = 80))
   expect_error(suppressAllOutput(show(ess_obj)), NA)
 
   # Test show method for GAS objects
-  gas_obj <- gas_generate(radius_body = 1)
+  gas_obj <- gas_generate(shape = sphere(radius_body = 1, n_segments = 80))
   expect_error(suppressAllOutput(show(gas_obj)), NA)
 
   # Test show method for FLS objects
@@ -85,7 +85,7 @@ test_that("Plot methods work for scatterer objects", {
   expect_error(suppressPlot(plot(fls_obj)), NA)
 
   # Test plot method for GAS objects
-  gas_obj <- gas_generate(radius_body = 1)
+  gas_obj <- gas_generate(shape = sphere(radius_body = 1, n_segments = 80))
   expect_error(suppressPlot(plot(gas_obj)), NA)
 
   # Test plot method for SBF objects
@@ -181,7 +181,7 @@ test_that("Extract method works for scatterer objects", {
   fls_metadata <- extract(fls_obj, "metadata")
   expect_type(fls_metadata, "list")
 
-  gas_obj <- gas_generate(radius_body = 1)
+  gas_obj <- gas_generate(shape = sphere(radius_body = 1, n_segments = 80))
   gas_body <- extract(gas_obj, "body")
   expect_type(gas_body, "list")
 
@@ -195,7 +195,7 @@ test_that("Extract method works for scatterer objects", {
 test_that("Show method works for scatterer objects", {
   # Create ESS object
   ess_obj <- ess_generate(
-    radius_shell = 1
+    shape = sphere(radius_body = 1, n_segments = 80)
   )
   # ---- Expected console output
   expected <- paste(
@@ -224,7 +224,7 @@ test_that("Show method works for scatterer objects", {
 
   # Create ESS object
   ess_obj <- ess_generate(
-    radius_shell = 1,
+    shape = sphere(radius_body = 1, n_segments = 80),
     shell_thickness = 1e-3,
     sound_speed_shell = 3750,
     sound_speed_fluid = 1575,

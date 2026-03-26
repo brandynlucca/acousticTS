@@ -241,8 +241,7 @@ test_that("arbitrary FLS radius metadata uses semi-diameter for zU/zL inputs", {
 
 test_that("gas_generate preserves absolute fluid properties when supplied", {
   obj <- gas_generate(
-    shape = "sphere",
-    radius_body = 0.01,
+    shape = sphere(radius_body = 0.01, n_segments = 60),
     density_fluid = 1.24,
     sound_speed_fluid = 345
   )
@@ -255,9 +254,11 @@ test_that("gas_generate preserves absolute fluid properties when supplied", {
 
 test_that("gas_generate preserves canonical prolate metadata for modal-series models", {
   obj <- gas_generate(
-    shape = "prolate_spheroid",
-    length_body = 0.14,
-    radius_body = 0.01,
+    shape = prolate_spheroid(
+      length_body = 0.14,
+      radius_body = 0.01,
+      n_segments = 100
+    ),
     density_fluid = 1.24,
     sound_speed_fluid = 345
   )
@@ -269,40 +270,82 @@ test_that("gas_generate preserves canonical prolate metadata for modal-series mo
   expect_length(obj@body$radius, 101)
 })
 
-test_that("scatterer constructors prefer explicit Shape inputs and normalize units", {
-  fls_obj <- fls_generate(
-    shape = cylinder(
-      length_body = 0.08,
-      radius_body = 0.01,
-      n_segments = 12
-    ),
-    g_body = 1.04,
-    h_body = 1.02,
-    length_units = "cm",
-    theta_units = "degrees"
+test_that("ess_generate derives the internal fluid shape from explicit Shape inputs", {
+  shell_shape <- sphere(radius_body = 1, n_segments = 40)
+
+  obj <- ess_generate(
+    shape = shell_shape,
+    shell_thickness = 1e-3,
+    density_shell = 2565,
+    sound_speed_shell = 3750,
+    density_fluid = 1077.3,
+    sound_speed_fluid = 1575,
+    K = 70e9,
+    nu = 0.32
   )
+
+  expect_true(is.matrix(obj@fluid$rpos))
+  expect_equal(obj@shape_parameters$shell$radius, 1)
+  expect_equal(obj@shape_parameters$fluid$radius, 0.999)
+  expect_equal(obj@shape_parameters$fluid$diameter, 1.998)
+})
+
+test_that("scatterer constructors prefer explicit Shape inputs and warn on deprecated unit args", {
+  collect_warnings <- function(expr) {
+    messages <- character()
+    value <- withCallingHandlers(
+      expr,
+      warning = function(w) {
+        messages <<- c(messages, conditionMessage(w))
+        invokeRestart("muffleWarning")
+      }
+    )
+    list(value = value, warnings = messages)
+  }
+
+  fls_capture <- collect_warnings(
+    fls_generate(
+      shape = cylinder(
+        length_body = 0.08,
+        radius_body = 0.01,
+        n_segments = 12
+      ),
+      g_body = 1.04,
+      h_body = 1.02,
+      length_units = "cm",
+      theta_units = "degrees"
+    )
+  )
+  fls_obj <- fls_capture$value
+  expect_true(all(grepl("deprecated and ignored", fls_capture$warnings)))
+  expect_equal(length(fls_capture$warnings), 2)
 
   expect_equal(fls_obj@shape_parameters$length_units, "m")
   expect_equal(fls_obj@shape_parameters$theta_units, "radians")
 
-  sbf_obj <- sbf_generate(
-    body_shape = arbitrary(
-      x_body = c(0, 0.02, 0.04),
-      zU_body = c(0.001, 0.003, 0.001),
-      zL_body = c(-0.001, -0.003, -0.001)
-    ),
-    bladder_shape = arbitrary(
-      x_bladder = c(0.01, 0.02, 0.03),
-      zU_bladder = c(0.0004, 0.0007, 0.0004),
-      zL_bladder = c(-0.0004, -0.0007, -0.0004)
-    ),
-    g_body = 1.04,
-    h_body = 1.02,
-    g_bladder = 0.0012,
-    h_bladder = 0.22,
-    length_units = "cm",
-    theta_units = "degrees"
+  sbf_capture <- collect_warnings(
+    sbf_generate(
+      body_shape = arbitrary(
+        x_body = c(0, 0.02, 0.04),
+        zU_body = c(0.001, 0.003, 0.001),
+        zL_body = c(-0.001, -0.003, -0.001)
+      ),
+      bladder_shape = arbitrary(
+        x_bladder = c(0.01, 0.02, 0.03),
+        zU_bladder = c(0.0004, 0.0007, 0.0004),
+        zL_bladder = c(-0.0004, -0.0007, -0.0004)
+      ),
+      g_body = 1.04,
+      h_body = 1.02,
+      g_bladder = 0.0012,
+      h_bladder = 0.22,
+      length_units = "cm",
+      theta_units = "degrees"
+    )
   )
+  sbf_obj <- sbf_capture$value
+  expect_true(all(grepl("deprecated and ignored", sbf_capture$warnings)))
+  expect_equal(length(sbf_capture$warnings), 2)
 
   expect_equal(sbf_obj@shape_parameters$length_units, "m")
   expect_equal(sbf_obj@shape_parameters$theta_units, "radians")
@@ -310,6 +353,93 @@ test_that("scatterer constructors prefer explicit Shape inputs and normalize uni
   expect_equal(
     rownames(sbf_obj@bladder$rpos),
     c("x_bladder", "w_bladder", "zU_bladder", "zL_bladder")
+  )
+})
+
+test_that("scatterer constructors accept explicit manual coordinates without shape strings", {
+  obj <- fls_generate(
+    x_body = c(0, 0.01, 0.02),
+    y_body = c(0, 0, 0),
+    z_body = c(0, 0, 0),
+    radius_body = c(0.001, 0.002, 0.001),
+    density_body = 1028.9,
+    sound_speed_body = 1480.3
+  )
+
+  expect_s4_class(obj, "FLS")
+  expect_equal(obj@shape_parameters$shape, "Arbitrary")
+})
+
+test_that("character shape dispatch remains available but warns in scatterer constructors", {
+  expect_warning(
+    fls_generate(
+      shape = "cylinder",
+      length_body = 0.08,
+      radius_body = 0.01,
+      g_body = 1.04,
+      h_body = 1.02
+    ),
+    "Character-based 'shape' dispatch"
+  )
+
+  expect_warning(
+    gas_generate(
+      shape = "sphere",
+      radius_body = 0.01,
+      density_fluid = 1.24,
+      sound_speed_fluid = 345
+    ),
+    "Character-based 'shape' dispatch"
+  )
+
+  expect_warning(
+    ess_generate(
+      shape = "sphere",
+      radius_shell = 0.03,
+      shell_thickness = 0.001,
+      density_shell = 1050,
+      sound_speed_shell = 2350,
+      density_fluid = 1030,
+      sound_speed_fluid = 1500,
+      E = 3.5e9,
+      nu = 0.34
+    ),
+    "Character-based 'shape' dispatch"
+  )
+})
+
+test_that("Oblate spheroid creation works", {
+  length_body <- 0.012
+  radius_body <- 0.01
+  n_segments <- 12
+
+  oblate_obj <- oblate_spheroid(
+    length_body = length_body,
+    radius_body = radius_body,
+    n_segments = n_segments
+  )
+
+  expect_s4_class(oblate_obj, "OblateSpheroid")
+  expect_s4_class(oblate_obj, "Shape")
+  expect_equal(oblate_obj@shape_parameters$length, length_body)
+  expect_equal(oblate_obj@shape_parameters$semimajor_length, radius_body)
+  expect_equal(oblate_obj@shape_parameters$semiminor_length, length_body / 2)
+  expect_equal(oblate_obj@shape_parameters$n_segments, n_segments)
+  expect_true(is.matrix(oblate_obj@position_matrix))
+  expect_equal(ncol(oblate_obj@position_matrix), 5)
+  expect_equal(max(oblate_obj@shape_parameters$radius), radius_body, tolerance = 1e-12)
+
+  oblate_ratio <- oblate_spheroid(
+    length_body = length_body,
+    length_radius_ratio = length_body / radius_body,
+    n_segments = n_segments
+  )
+  expect_s4_class(oblate_ratio, "OblateSpheroid")
+  expect_equal(max(oblate_ratio@shape_parameters$radius), radius_body, tolerance = 1e-12)
+
+  expect_error(
+    oblate_spheroid(length_body = 0.04, radius_body = 0.01),
+    "Use 'prolate_spheroid\\(\\)'"
   )
 })
 
@@ -416,6 +546,14 @@ test_that("create_shape wrapper function works", {
   )
   expect_s4_class(cylinder_via_wrapper, "Cylinder")
   expect_equal(cylinder_via_wrapper@shape_parameters$length, 0.06)
+
+  oblate_via_wrapper <- create_shape("oblate_spheroid",
+    length_body = 0.012,
+    radius_body = 0.01,
+    n_segments = 10
+  )
+  expect_s4_class(oblate_via_wrapper, "OblateSpheroid")
+  expect_equal(oblate_via_wrapper@shape_parameters$semimajor_length, 0.01)
 
   # Test error for invalid shape type
   expect_error(create_shape("invalid_shape", radius_body = 0.01),

@@ -45,6 +45,22 @@ test_that("simulate_ts function works with empty parameters", {
   expect_equal(unique(result_df$TS), unique(reference_df$TS))
 })
 
+test_that("simulate_ts is the stable simulation entry point", {
+  cal_obj <- cal_generate()
+
+  expect_silent(
+    simulate_ts(
+      object = cal_obj,
+      frequency = 38e3,
+      model = "calibration",
+      n_realizations = 1,
+      parameters = list(),
+      parallel = FALSE,
+      verbose = FALSE
+    )
+  )
+})
+
 test_that("simulate_ts function works with single sets of parameters", {
 
     # Test with a simple CAL object

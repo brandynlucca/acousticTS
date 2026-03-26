@@ -239,7 +239,7 @@ test_that("Rotation functions for the KRM work correctly", {
   bladder_sums <- acousticTS::along_sum(sb$rpos, 5)
 
   # Test body rotation
-  rotated_body <- acousticTS::body_rotation(
+  rotated_body <- acousticTS:::body_rotation(
     body_sums, body$rpos, pi / 4, 10
   )
 
@@ -265,7 +265,7 @@ test_that("Rotation functions for the KRM work correctly", {
   )
 
   # Test bladder rotation
-  rotated_bladder <- acousticTS::bladder_rotation(
+  rotated_bladder <- acousticTS:::bladder_rotation(
     bladder_sums, sb$rpos, pi / 4, 10
   )
 

@@ -125,7 +125,7 @@ test_that("target_strength works with different scatterer types", {
   )
 
   # Test with GAS object and MSS Anderson (1950) model
-  gas_obj <- gas_generate(radius_body = 1e-3)
+  gas_obj <- gas_generate(shape = sphere(radius_body = 1e-3, n_segments = 80))
 
   gas_with_ts <- target_strength(
     object = gas_obj,
@@ -138,6 +138,7 @@ test_that("target_strength works with different scatterer types", {
 
   # Test ESS object with HP and MSS model
   ess_obj <- ess_generate(
+    shape = sphere(radius_body = 10e-3, n_segments = 80),
     radius_shell = 10e-3, # 10 mm outer radius
     shell_thickness = 1e-3, # 1 mm shell thickness
     sound_speed_shell = 3750, # Shell sound speed (m/s)
@@ -199,6 +200,86 @@ test_that("target_strength handles multiple models", {
   expect_true("DWBA" %in% names(fls_dwba@model))
 })
 
+test_that("target_strength applies shared and model-specific arguments cleanly", {
+  data(krill, package = "acousticTS")
+
+  fls_obj <- fls_generate(
+    x = krill@body$rpos[1, ],
+    y = krill@body$rpos[2, ],
+    z = krill@body$rpos[3, ],
+    radius_body = krill@body$radius,
+    g_body = krill@body$g,
+    h_body = krill@body$h,
+    radius_curvature_ratio = 3.3,
+    theta_body = krill@body$theta
+  )
+
+  out <- target_strength(
+    object = fls_obj,
+    frequency = 120e3,
+    model = c("dwba", "sdwba"),
+    density_sw = 1026,
+    sound_speed_sw = 1478,
+    model_args = list(
+      sdwba = c(
+        n_iterations = 5,
+        n_segments_init = 14,
+        phase_sd_init = 0.77,
+        length_init = 38.35e-3,
+        frequency_init = 120e3
+      )
+    )
+  )
+
+  expect_true(all(c("DWBA", "SDWBA") %in% names(out@model)))
+  expect_equal(out@model_parameters$DWBA$medium$density, 1026)
+  expect_equal(out@model_parameters$SDWBA$medium$density, 1026)
+  expect_equal(
+    out@model_parameters$SDWBA$parameters[[1]]$meta_params$p0,
+    0.77
+  )
+  expect_equal(
+    out@model_parameters$SDWBA$parameters[[1]]$meta_params$n_iterations,
+    5
+  )
+})
+
+test_that("target_strength lets model_args override shared arguments", {
+  data(krill, package = "acousticTS")
+
+  fls_obj <- fls_generate(
+    x = krill@body$rpos[1, ],
+    y = krill@body$rpos[2, ],
+    z = krill@body$rpos[3, ],
+    radius_body = krill@body$radius,
+    g_body = krill@body$g,
+    h_body = krill@body$h,
+    radius_curvature_ratio = 3.3,
+    theta_body = krill@body$theta
+  )
+
+  out <- target_strength(
+    object = fls_obj,
+    frequency = 120e3,
+    model = c("dwba", "sdwba"),
+    density_sw = 1026,
+    sound_speed_sw = 1478,
+    model_args = list(
+      SDWBA = list(
+        density_sw = 1027,
+        n_iterations = 5,
+        n_segments_init = 14,
+        phase_sd_init = 0.77,
+        length_init = 38.35e-3,
+        frequency_init = 120e3
+      )
+    )
+  )
+
+  expect_equal(out@model_parameters$DWBA$medium$density, 1026)
+  expect_equal(out@model_parameters$SDWBA$medium$density, 1027)
+})
+
 test_that("target_strength preserves object metadata", {
   # Test that metadata is preserved after target_strength calculation
   cal_obj <- cal_generate(ID = "TestSphere")
@@ -239,10 +320,30 @@ test_that("Expected error states for target_strength", {
     "Initialization function invalid_initialize not found for model invalid"
   )
 
-  # Test partial initialize-model function pairing
+  # Test missing initialize-model function pairing
   expect_error(
     target_strength(object = krill, frequency = 120e3, model = "spoof"),
-    "Model function SPOOF not found"
+    "Initialization function spoof_initialize not found for model spoof|Model function SPOOF not found"
+  )
+
+  expect_error(
+    target_strength(
+      object = krill,
+      frequency = 120e3,
+      model = "dwba",
+      model_args = list(sdwba = list(phase_sd_init = 0.77))
+    ),
+    "'model_args' contains entries for model\\(s\\) not requested in 'model'"
+  )
+
+  expect_error(
+    target_strength(
+      object = krill,
+      frequency = 120e3,
+      model = "dwba",
+      model_args = list(dwba = 1:3)
+    ),
+    "must be either a named list or a named atomic vector"
   )
 })
 

@@ -183,3 +183,7 @@ test_that("Gas-filled prolate spheroid PSMS returns finite values on the benchma
   expect_length(ts_vals, length(frequency))
   expect_true(all(is.finite(ts_vals)))
 })
+
+test_that("internal modal helpers do not leak into the public API", {
+  expect_false("modal_matrix" %in% getNamespaceExports("acousticTS"))
+})

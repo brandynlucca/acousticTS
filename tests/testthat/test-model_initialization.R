@@ -27,7 +27,7 @@ test_that("calibration_initialize works correctly", {
 test_that("sphms_initialize works correctly", {
 
   # Test mss_anderson_initialize for GAS objects
-  gas_obj <- gas_generate(radius_body = 1)
+  gas_obj <- gas_generate(shape = sphere(radius_body = 1, n_segments = 80))
   frequency <- c(38e3, 120e3)
 
   # Initialize MSS Anderson model
@@ -51,7 +51,7 @@ test_that("sphms_initialize works correctly", {
 test_that("essms_initialize works correctly", {
 
   # Test mss_goodman_stern_initialize for ESS objects
-  ess_obj <- ess_generate(radius_shell = 1)
+  ess_obj <- ess_generate(shape = sphere(radius_body = 1, n_segments = 80))
   frequency <- c(70e3, 200e3)
 
   # Initialize MSS Goodman-Stern model

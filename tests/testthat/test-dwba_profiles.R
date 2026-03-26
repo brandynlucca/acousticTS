@@ -36,27 +36,30 @@ library(acousticTS)
   switch(
     shape_name,
     sphere = fls_generate(
-      shape = "sphere",
-      radius_body = 0.01,
-      n_segments = n_segments,
+      shape = sphere(
+        radius_body = 0.01,
+        n_segments = n_segments
+      ),
       theta_body = pi / 2,
       density_body = 1028.9,
       sound_speed_body = 1480.3
     ),
     prolate_spheroid = fls_generate(
-      shape = "prolate_spheroid",
-      length_body = 0.14,
-      radius_body = 0.01,
-      n_segments = n_segments,
+      shape = prolate_spheroid(
+        length_body = 0.14,
+        radius_body = 0.01,
+        n_segments = n_segments
+      ),
       theta_body = pi / 2,
       density_body = 1028.9,
       sound_speed_body = 1480.3
     ),
     cylinder = fls_generate(
-      shape = "cylinder",
-      length_body = 0.07,
-      radius_body = 0.01,
-      n_segments = n_segments,
+      shape = cylinder(
+        length_body = 0.07,
+        radius_body = 0.01,
+        n_segments = n_segments
+      ),
       theta_body = pi / 2,
       density_body = 1028.9,
       sound_speed_body = 1480.3
