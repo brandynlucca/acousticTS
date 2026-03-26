@@ -52,4 +52,5 @@ Deformed cylinders. \emph{The Journal of the Acoustical Society of America},
 86, 691-705.
 }
 \keyword{acoustics}
+\keyword{internal}
 \keyword{models}

@@ -12,3 +12,4 @@
 \description{
 Generic function for show(...) for different scatterers.
 }
+\keyword{internal}

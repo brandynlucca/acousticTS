@@ -12,3 +12,4 @@ gas_show(object)
 \description{
 show(...) for GAS_class objects
 }
+\keyword{internal}

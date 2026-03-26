@@ -11,6 +11,34 @@ reforge(object, ...)
 
 \item{...}{Additional arguments passed to specific methods.}
 }
+\value{
+A scatterer of the same broad class as \code{object}, rebuilt with the
+requested geometric changes.
+}
 \description{
-Generic function to resize or reparameterize a scatterer object.
+Generic function for rescaling or otherwise reparameterizing an existing
+scatterer while preserving its class semantics. The class-specific methods
+handle the component bookkeeping needed to keep the resulting object
+structurally valid after lengths, widths, heights, shell thicknesses, or
+related geometry descriptors are changed.
+}
+\details{
+\code{reforge()} is the package's main post-construction geometry-adjustment
+tool. It is useful when a target should be modified in place rather than
+rebuilt from scratch. The available method-specific arguments depend on the
+scatterer class and typically include direct scale factors and/or target
+dimensions for length, width, or height.
+}
+\examples{
+obj <- fls_generate(
+  shape = sphere(radius_body = 0.01, n_segments = 40),
+  density_body = 1045,
+  sound_speed_body = 1520
+)
+
+bigger_obj <- reforge(obj, length = 0.03)
+extract(bigger_obj, c("shape_parameters", "length"))
+}
+\seealso{
+\code{\link[=extract]{extract()}}, \code{\link[=plot.Scatterer]{plot.Scatterer()}}, \code{\link[=brake]{brake()}}
 }

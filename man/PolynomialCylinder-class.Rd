@@ -3,6 +3,7 @@
 \docType{class}
 \name{PolynomialCylinder}
 \alias{PolynomialCylinder}
+\alias{PolynomialCylinder-class}
 \title{Cylindrical body shape deformed using a polynomial}
 \description{
 Cylindrical body shape deformed using a polynomial

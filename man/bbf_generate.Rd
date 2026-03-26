@@ -62,9 +62,11 @@ geometry (m).}
 \item{z_offset_backbone}{Dorsoventral translation applied to the backbone
 geometry (m).}
 
-\item{theta_units}{Angular units.}
+\item{theta_units}{Compatibility argument. Scatterer constructors now assume
+radians and ignore non-SI alternatives.}
 
-\item{length_units}{Length units.}
+\item{length_units}{Compatibility argument. Scatterer constructors now assume
+meters and ignore non-SI alternatives.}
 
 \item{ID}{Optional metadata identifier.}
 }

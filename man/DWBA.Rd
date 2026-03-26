@@ -69,7 +69,8 @@ the volume integral reduces to a line intergral along the body axis:
 \deqn{
    f_{bs} = \frac{k_1}{4} \int_{r_{pos}} (\gamma_\kappa - \gamma_\rho)
    e^{2i k_2 \cdot r_{pos}}
-   \frac{\text{J}_1(2 k_2 a \cos \beta_{tilt})}{\cos \beta_{tilt}} |dr_{pos}|,
+   \frac{\text{J}_1(2 k_2 a \cos \beta_{tilt})}{\cos \beta_{tilt}}
+   |dr_{pos}|,
  }
 
 where \eqn{a} is the local radius and \eqn{\beta_{tilt}} the local tilt
@@ -141,4 +142,5 @@ more details on how weak scattering relates to other boundary conditions,
 \code{\link{target_strength}}, \code{\link{FLS}}
 }
 \keyword{acoustics}
+\keyword{internal}
 \keyword{models}

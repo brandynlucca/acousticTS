@@ -3,6 +3,7 @@
 \docType{class}
 \name{Shape}
 \alias{Shape}
+\alias{Shape-class}
 \title{Generic scattering shape object used throughout this package.}
 \description{
 A S4 class that provides slots to contain relevant shape data and metadata

@@ -72,4 +72,5 @@ Society of America, 103: 236-253.
 \code{\link{cylinder}}
 }
 \keyword{acoustics}
+\keyword{internal}
 \keyword{models}

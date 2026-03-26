@@ -3,6 +3,7 @@
 \docType{class}
 \name{ESS}
 \alias{ESS}
+\alias{ESS-class}
 \title{Elastic shelled scatterer (ESS) object/class.}
 \description{
 A S4 class that provides slots to contain relevant metadata for elastic

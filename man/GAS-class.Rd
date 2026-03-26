@@ -3,6 +3,7 @@
 \docType{class}
 \name{GAS}
 \alias{GAS}
+\alias{GAS-class}
 \title{Generic gas-filled scatterer (GAS) object/class.}
 \description{
 A S4 class that provides slots to contain relevant metadata for gas-bearing

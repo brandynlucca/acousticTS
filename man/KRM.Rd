@@ -284,4 +284,5 @@ more details on fluid-like scattering assumptions,
 \code{\link{target_strength}}, \code{\link{SBF}}, \code{\link{FLS}}
 }
 \keyword{acoustics}
+\keyword{internal}
 \keyword{models}

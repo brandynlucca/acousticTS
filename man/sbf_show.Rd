@@ -12,3 +12,4 @@ sbf_show(object)
 \description{
 show(...) for SBF-class objects.
 }
+\keyword{internal}

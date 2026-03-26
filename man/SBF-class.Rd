@@ -3,6 +3,7 @@
 \docType{class}
 \name{SBF}
 \alias{SBF}
+\alias{SBF-class}
 \title{Swimbladdered fish (SBF) object/class.}
 \description{
 A S4 class that provides slots to contain relevant animal metadata for

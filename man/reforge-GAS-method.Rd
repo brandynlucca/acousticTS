@@ -29,3 +29,4 @@ representation to a new segment count.  The underlying shape (sphere,
 prolate spheroid, cylinder, arbitrary, etc.) is preserved; scaling is
 applied uniformly to all axes of the position matrix.
 }
+\keyword{internal}

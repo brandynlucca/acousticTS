@@ -33,9 +33,11 @@ material options.}
 
 \item{ID}{Optional metadata ID input.}
 
-\item{diameter_units}{Units for diameter. Defaults to "m".}
+\item{diameter_units}{Compatibility argument. \code{cal_generate()} now assumes
+meters and ignores non-SI alternatives.}
 
-\item{theta_units}{Units for direction. Defaults to "radians".}
+\item{theta_units}{Compatibility argument. \code{cal_generate()} now assumes
+radians and ignores non-SI alternatives.}
 
 \item{n_segments}{Number of segments to discretize object shape.}
 }

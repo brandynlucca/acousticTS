@@ -3,6 +3,7 @@
 \docType{class}
 \name{BBF}
 \alias{BBF}
+\alias{BBF-class}
 \title{Backboned fish (BBF) object/class.}
 \description{
 A S4 class that stores a fluid-like flesh component together with an explicit

@@ -4,7 +4,7 @@
 \alias{sphere}
 \title{Creates a sphere.}
 \usage{
-sphere(radius_body, n_segments, diameter_units )
+sphere(radius_body, n_segments = 100, diameter_units = "m")
 }
 \arguments{
 \item{radius_body}{Object radius (m).}

@@ -15,6 +15,8 @@ hsdk(l, n, k)
 or fractional.}
 
 \item{n}{Numeric. The argument (\eqn{z}) at which to evaluate the function.}
+
+\item{k}{Non-negative integer. The order of the derivative for \code{hsdk}.}
 }
 \value{
 A complex vector containing:
@@ -42,7 +44,7 @@ to represent outgoing spherical waves.
 
 \strong{Derivative:}
 \deqn{
- \frac{d}{dz}h^{(1)}_\nu(z) = \frac{\nu}{z} h^{(1)}_\nu(z) 
+ \frac{d}{dz}h^{(1)}_\nu(z) = \frac{\nu}{z} h^{(1)}_\nu(z)
  - h^{(1)}_{\nu+1}(z)
 }
 }

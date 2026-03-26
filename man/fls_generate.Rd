@@ -5,7 +5,7 @@
 \title{Generate a FLS-class object.}
 \usage{
 fls_generate(
-  shape = "arbitrary",
+  shape = NULL,
   x_body = NULL,
   y_body = NULL,
   z_body = NULL,
@@ -25,9 +25,11 @@ fls_generate(
 )
 }
 \arguments{
-\item{shape}{Pre-built \code{Shape} object describing the target geometry. Legacy
-character dispatch such as \code{"sphere"} or \code{"arbitrary"} is retained for
-backward compatibility.}
+\item{shape}{Pre-built \code{Shape} object describing the target geometry. If
+omitted, explicit profile coordinates such as \code{x_body}, \code{y_body}, and
+\code{z_body} are treated as the manual geometry pathway. Legacy character
+dispatch such as \code{"sphere"} or \code{"arbitrary"} is retained only for backward
+compatibility and is now deprecated.}
 
 \item{x_body}{Vector containing x-axis body (m) shape data.}
 
@@ -60,9 +62,11 @@ Default value is pi/2; input should be in radians.}
 
 \item{ID}{Optional metadata entry.}
 
-\item{length_units}{Units used for position vector. Defaults to "m".}
+\item{length_units}{Compatibility argument. Scatterer constructors now assume
+meters and ignore non-SI alternatives.}
 
-\item{theta_units}{Units used for orientation. Defaults to "radians".}
+\item{theta_units}{Compatibility argument. Scatterer constructors now assume
+radians and ignore non-SI alternatives.}
 
 \item{...}{Additional parameters.}
 }
@@ -81,10 +85,15 @@ contrasts (\code{g_body}/\code{h_body}) or as absolute density/sound-speed value
 pair. Downstream models derive contrasts automatically when only absolute
 values are supplied.
 
-The older constructor pattern that mixes a shape name with raw coordinate
-vectors is still supported for compatibility. Internally, those inputs are
-first resolved to a \code{Shape} object so that the resulting \code{FLS} object uses
-the same geometry contract as the explicit shape-first workflow.
+The only supported public geometry paths are now:
+\enumerate{
+\item supply a pre-built \code{Shape} object, or
+\item supply explicit profile coordinates directly to the constructor.
+}
+
+Character-based shape dispatch is retained only as a compatibility pathway
+and is now deprecated. Internally, every pathway is resolved to the same
+\code{Shape}-first geometry contract before the \code{FLS} object is built.
 
 Scatterer constructors store geometry in meters and orientations in radians.
 \code{length_units} and \code{theta_units} are retained as compatibility arguments, but

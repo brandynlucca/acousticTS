@@ -3,6 +3,7 @@
 \docType{class}
 \name{CAL}
 \alias{CAL}
+\alias{CAL-class}
 \title{Solid and calibration sphere (CAL) object/class.}
 \description{
 A S4 class that provides slots to contain relevant metadata for solid sphere

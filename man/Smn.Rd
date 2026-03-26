@@ -23,14 +23,16 @@ function. Must satisfy \eqn{|\eta| \leq 1}.}
 normalized to have unity norm. If \code{FALSE} (default), the
 Meixner-Schäfke normalization is used.}
 
-\item{precision}{Character. Either \code{"double"} (default) or \code{"quad"}. Controls the
-floating-point precision used in the underlying Fortran computation.
+\item{precision}{Character. Either \code{"double"} (default) or
+\code{"quad"}. Controls the  floating-point precision used in the underlying
+Fortran computation.
 \describe{
-\item{\code{"double"}}{Uses standard double-precision (64-bit) arithmetic. Fastest and
-sufficient for most applications.}
-\item{\code{"quad"}}{Uses quadruple-precision (128-bit) arithmetic for higher numerical
-accuracy in challenging parameter regimes (e.g., large \eqn{m}, \eqn{n}, or near
-singularities). Computation is significantly slower.}
+\item{\code{"double"}}{Uses standard double-precision (64-bit)
+arithmetic. Fastest and  sufficient for most applications.}
+\item{\code{"quad"}}{Uses quadruple-precision (128-bit) arithmetic for
+higher numerical  accuracy in challenging parameter regimes (e.g., large
+\eqn{m}, \eqn{n}, or near  singularities). Computation is significantly
+slower.}
 }}
 }
 \value{
@@ -81,8 +83,9 @@ which itself wraps the Fortran subroutine \code{profcn} from the
 \code{prolate_swf} library developed by Arnie Lee Van Buren and Jeffrey
 Boisvert. The underlying algorithm uses a combination of forward and
 backward recursion with the Bouwkamp eigenvalue method for high accuracy
-across wide parameter ranges. The C++ layer manages memory, precision selection, and data
-conversion between R and Fortran for robust and efficient computation.
+across wide parameter ranges. The C++ layer manages memory, precision
+selection, and data conversion between R and Fortran for robust and
+efficient computation.
 }
 \examples{
 # Single evaluation

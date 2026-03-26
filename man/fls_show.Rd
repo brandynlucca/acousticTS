@@ -12,3 +12,4 @@ fls_show(object)
 \description{
 show(...) for FLS-class objects.
 }
+\keyword{internal}

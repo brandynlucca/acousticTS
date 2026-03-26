@@ -16,6 +16,8 @@ or fractional.}
 
 \item{n}{Numeric or matrix. The argument (\eqn{z}) at which to evaluate the
 function. If a matrix is provided, the function is applied column-wise.}
+
+\item{k}{Non-negative integer. The order of the derivative for \code{ysdk}.}
 }
 \value{
 A numeric vector or matrix (matching the input structure) containing:
@@ -39,7 +41,7 @@ where \eqn{Y_\nu(z)} is the cylindrical Bessel function of the second kind.
 The spherical Bessel functions satisfy the same differential equation as
 \eqn{j_\nu(z)}:
 \deqn{
- z^2 \frac{d^2 y_\nu}{dz^2} + 2z \frac{dy_\nu}{dz} + 
+ z^2 \frac{d^2 y_\nu}{dz^2} + 2z \frac{dy_\nu}{dz} +
  [z^2 - \nu(\nu+1)] y_\nu = 0
 }
 

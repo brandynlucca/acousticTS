@@ -23,14 +23,16 @@ Must satisfy \eqn{\xi \geq 1}.}
 \code{1} (first kind), \code{2} (second kind), \code{3} (third
 kind/outgoing), or \code{4} (fourth kind/incoming). Default is \code{1}.}
 
-\item{precision}{Character. Either \code{"double"} (default) or \code{"quad"}. Controls the
-floating-point precision used in the underlying Fortran computation.
+\item{precision}{Character. Either \code{"double"} (default) or
+\code{"quad"}. Controls the  floating-point precision used in the underlying
+Fortran computation.
 \describe{
-\item{\code{"double"}}{Uses standard double-precision (64-bit) arithmetic. Fastest and
-sufficient for most applications.}
-\item{\code{"quad"}}{Uses quadruple-precision (128-bit) arithmetic for higher numerical
-accuracy in challenging parameter regimes (e.g., large \eqn{m}, \eqn{n}, \eqn{c}, or near
-singularities). Computation is significantly slower.}
+\item{\code{"double"}}{Uses standard double-precision (64-bit)
+arithmetic. Fastest and  sufficient for most applications.}
+\item{\code{"quad"}}{Uses quadruple-precision (128-bit) arithmetic for
+higher numerical  accuracy in challenging parameter regimes (e.g., large
+\eqn{m}, \eqn{n}, \eqn{c}, or near  singularities). Computation is
+significantly slower.}
 }}
 }
 \value{
@@ -51,9 +53,9 @@ derivatives with respect to \eqn{\xi} for given order \eqn{m}, degree
 \eqn{n}, size parameter \eqn{c}, and radial coordinate \eqn{\xi}.
 
 This function is an R wrapper for compiled C++ code, which in turn calls the
-underlying Fortran library (\code{prolate_swf}) for high-performance numerical
-computation. All heavy computation is performed in compiled code for speed and
-accuracy.
+underlying Fortran library (\code{prolate_swf}) for high-performance
+numerical computation. All heavy computation is performed in compiled code
+for speed and accuracy.
 }
 \details{
 The prolate spheroidal radial functions are solutions to the radial part
@@ -98,8 +100,9 @@ which itself wraps the Fortran subroutine \code{profcn} from the
 \code{prolate_swf} library developed by Arnie Lee Van Buren and Jeffrey
 Boisvert. The underlying algorithm uses a combination of forward and
 backward recursion with the Bouwkamp eigenvalue method for high accuracy
-across wide parameter ranges. The C++ layer manages memory, precision selection, and data
-conversion between R and Fortran for robust and efficient computation.
+across wide parameter ranges. The C++ layer manages memory, precision
+selection, and data conversion between R and Fortran for robust and
+efficient computation.
 }
 \examples{
 # First kind radial function

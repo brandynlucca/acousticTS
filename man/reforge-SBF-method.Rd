@@ -54,3 +54,4 @@ the swimbladder x-axis origin and terminus are both held constant.}
 \description{
 Resizing function for swimbladdered targets
 }
+\keyword{internal}

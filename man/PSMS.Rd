@@ -237,4 +237,5 @@ GitHub repository:
 \code{\link{prolate_spheroid}}, \code{\link{Smn}}, \code{\link{Rmn}}
 }
 \keyword{acoustics}
+\keyword{internal}
 \keyword{models}

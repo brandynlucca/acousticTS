@@ -26,3 +26,4 @@ specifying a target diameter.  Optionally re-discretize to a new segment
 count.  CAL objects are always spheres, so the position matrix follows
 the \code{sphere()} convention (n_points x 5: x, y, z, zU, zL).
 }
+\keyword{internal}

@@ -3,6 +3,7 @@
 \docType{class}
 \name{FLS}
 \alias{FLS}
+\alias{FLS-class}
 \title{Fluid-like scatterer (FLS) object/class.}
 \description{
 A S4 class that provides slots to contain relevant metadata for scatterers

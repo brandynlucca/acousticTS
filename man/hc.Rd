@@ -24,15 +24,16 @@ arguments are not supported.}
 A complex vector containing:
 \itemize{
 \item \code{hc}: \eqn{H^{(1)}_\nu(z)}
-\item \code{hcd}: \eqn{\frac{d}{dz}H^{(1)}_\nu(z)} (first derivative)
-\item \code{hcdd}: \eqn{\frac{d^2}{dz^2}H^{(1)}_\nu(z)} (second derivative)
+\item \code{hcdk(..., k = 1)}: \eqn{\frac{d}{dz}H^{(1)}_\nu(z)}
+(first derivative)
+\item \code{hcdk(..., k = 2)}: \eqn{\frac{d^2}{dz^2}H^{(1)}_\nu(z)}
+(second derivative)
 \item \code{hcdk}: \eqn{\frac{d^k}{dz^k}H^{(1)}_\nu(z)} (k-th derivative)
 }
 }
 \description{
 Computes the cylindrical Hankel function of the first kind
-(\eqn{H^{(1)}_\nu(z)}) and its first (\code{hcd}), second (\code{hcdd}),
-and k-th (\code{hcdk}) derivatives.
+(\eqn{H^{(1)}_\nu(z)}) and its derivatives through \code{hcdk()}.
 }
 \details{
 The Hankel function of the first kind is defined as:
@@ -76,10 +77,10 @@ hc(0.5, 3)
 hc(1, 1i)
 
 # First derivative
-hcd(1, 2)
+hcdk(1, 2, 1)
 
 # Second derivative
-hcdd(1, 2)
+hcdk(1, 2, 2)
 
 # k-th derivative
 hcdk(1, 2, 3)  # Third derivative

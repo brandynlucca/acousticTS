@@ -64,4 +64,5 @@ The Acoustical Society of America, 22: 426–431.
 \code{\link{ESS}}, \code{\link{Sphere}}, \code{\link{sphere}}
 }
 \keyword{acoustics}
+\keyword{internal}
 \keyword{models}

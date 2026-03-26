@@ -2,7 +2,7 @@
 % Please edit documentation in R/scatterer_plot.R
 \name{plot.Scatterer}
 \alias{plot.Scatterer}
-\title{Method for what is printed for objects.}
+\title{Plot scatterer geometry, stored model results, or stored TMM scattering views}
 \usage{
 \method{plot}{Scatterer}(
   x,
@@ -19,26 +19,54 @@
 \arguments{
 \item{x}{Scatterer-class object.}
 
-\item{y}{Ignored (required for plot method signature).}
+\item{y}{Ignored (required for the base \code{plot()} method signature).}
 
-\item{type}{Toggle between body shape ("shape") or modeling results ("model")}
+\item{type}{Plot mode. Use \code{"shape"} for the stored geometry, \code{"model"} for
+the currently stored model output, or \code{"scattering"} for stored \code{TMM}
+angular products.}
 
-\item{nudge_y}{y-axis nudge.}
+\item{nudge_y}{Multiplicative vertical padding applied to automatically
+derived y-axis limits.}
 
-\item{nudge_x}{x-axis nudge.}
+\item{nudge_x}{Multiplicative horizontal padding applied to automatically
+derived x-axis limits.}
 
-\item{aspect_ratio}{Aspect ratio setting ( defaults to "manual" for nudge_y
-and nudge_x to apply; otherwise, input "auto").}
+\item{aspect_ratio}{Aspect-ratio control for supported shape plots. Use
+\code{"manual"} to honor \code{nudge_x} / \code{nudge_y}, or \code{"auto"} to let the plotting
+helper derive the aspect ratio directly.}
 
-\item{x_units}{If "model" is selected, then toggle between frequency
-("frequency", kHz) or ka ("ka").}
+\item{x_units}{Horizontal-axis convention for \code{type = "model"}. Supported
+values depend on the stored model family and typically include
+\code{"frequency"} and geometry-scaled wavenumber variants such as \code{"ka"}.}
 
-\item{y_units}{y-axis data selection (e.g. TS, sigma_bs -- defaults to TS)}
+\item{y_units}{Stored response quantity for \code{type = "model"} or
+\code{type = "scattering"}. Typical values include \code{"TS"} and \code{"sigma_bs"}.}
 
-\item{...}{Additional plot inputs}
+\item{...}{Additional arguments passed through to the class-specific plotting
+helpers. For stored \code{TMM} scattering plots, this includes controls such as
+\code{frequency}, \code{vary}, \code{polar}, and \code{heatmap}.}
+}
+\value{
+Called for its side effect of drawing a plot; returns the input
+invisibly.
 }
 \description{
-Method for what is printed for objects.
+S3 plotting method for \code{Scatterer} objects. Depending on \code{type}, the method
+draws the target geometry, one or more stored model curves, or a stored
+single-target \code{TMM} scattering slice / map when the object was computed with
+retained T-matrix state.
+}
+\details{
+This method dispatches to the relevant scatterer-class plotting helper:
+\code{cal_plot()}, \code{ess_plot()}, \code{sbf_plot()}, \code{bbf_plot()}, \code{fls_plot()}, or
+\code{gas_plot()}. The supported \code{type} values therefore depend on what has been
+stored on the object. For example, \code{type = "model"} requires the object to
+already contain model output, and \code{type = "scattering"} currently applies
+only to stored \code{TMM} results.
+}
+\seealso{
+\code{\link[=extract]{extract()}}, \code{\link[=target_strength]{target_strength()}}, \code{\link[=tmm_scattering]{tmm_scattering()}},
+\code{\link[=tmm_scattering_grid]{tmm_scattering_grid()}}
 }
 \keyword{plotting}
 \keyword{utility,}

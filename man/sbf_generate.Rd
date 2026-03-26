@@ -74,9 +74,11 @@ kg \ifelse{html}{\out{m<sup>3</sup>}}{\eqn{m^3}}).}
 \item{theta_bladder}{Angle of bladder relative to wavefront
 (\eqn{\theta_bladder}, radians).}
 
-\item{theta_units}{Angular units.}
+\item{theta_units}{Compatibility argument. Scatterer constructors now assume
+radians and ignore non-SI alternatives.}
 
-\item{length_units}{Length units.}
+\item{length_units}{Compatibility argument. Scatterer constructors now assume
+meters and ignore non-SI alternatives.}
 
 \item{ID}{Optional metadata identifier.}
 
@@ -98,6 +100,8 @@ The recommended interface is to supply pre-built \code{Shape} objects through
 either contrasts (\verb{g_*}, \verb{h_*}) or absolute density/sound-speed values.
 Legacy coordinate-vector inputs are retained for backward compatibility and
 are converted internally to \code{Shape} objects before the scatterer is built.
+Character-based shape dispatch is deprecated; build the component geometry
+first with a \code{Shape} constructor and then pass the resulting \code{Shape} object.
 
 Body/bladder width vectors (\code{w_body}, \code{w_bladder}) default to zeros when
 missing. Resulting \code{rpos} matrices always carry the row names

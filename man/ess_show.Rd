@@ -12,3 +12,4 @@ ess_show(object)
 \description{
 show(...) for ESS-class objects.
 }
+\keyword{internal}

@@ -33,6 +33,7 @@ LinkingTo:
     Rcpp, BH, RcppArmadillo
 Suggests: 
     knitr,
+    pkgload,
     rmarkdown,
     testthat (>= 3.0.0)
 VignetteBuilder: 
@@ -66,11 +67,21 @@ Collate:
     'model-hpa.R'
     'model-krm.R'
     'model-psms.R'
+    'model-tmm-helpers.R'
+    'model-tmm-spherical.R'
+    'model-tmm-spheroidal.R'
+    'model-tmm.R'
+    'tmm-scattering.R'
+    'tmm-orientation.R'
+    'tmm-diagnostics.R'
+    'tmm-bistatic.R'
+    'tmm-plotting.R'
     'model-sdwba.R'
     'model-soems.R'
     'model-sphms.R'
     'model-trcm.R'
     'pkg-docs.R'
+    'validation-registry.R'
     'pkgdown-helpers.R'
     'scatterer.R'
     'scatterer_plot.R'
@@ -84,4 +95,5 @@ Collate:
     'utilities-modal.R'
     'utilities-plotting.R'
     'utilities-geometry.R'
+    'canonicalize_shape.R'
     'validation.R'

@@ -12,3 +12,4 @@ cal_show(object)
 \description{
 show(...) for CAL-class objects.
 }
+\keyword{internal}

@@ -53,4 +53,5 @@ from randomly oriented random-length finite cylinders: zooplankton models.
 \emph{The Journal of the Acoustical Society of America}, 94: 3463-3472.
 }
 \keyword{acoustics}
+\keyword{internal}
 \keyword{models}

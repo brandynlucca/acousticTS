@@ -153,4 +153,5 @@ more details on weak scattering assumptions,
 \code{\link{target_strength}}, \code{\link{FLS}}, \code{\link{DWBA}}
 }
 \keyword{acoustics}
+\keyword{internal}
 \keyword{models}

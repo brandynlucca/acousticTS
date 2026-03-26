@@ -25,15 +25,15 @@ supported.}
 A complex vector containing:
 \itemize{
 \item \code{yc}: \eqn{Y_\nu(z)}
-\item \code{ycd}: \eqn{Y'_\nu(z)} (first derivative)
-\item \code{ycdd}: \eqn{Y''_\nu(z)} (second derivative)
+\item \code{ycdk(..., k = 1)}: \eqn{Y'_\nu(z)} (first derivative)
+\item \code{ycdk(..., k = 2)}: \eqn{Y''_\nu(z)} (second derivative)
 \item \code{ycdk}: \eqn{Y_\nu^{(k)}(z)} (k-th derivative)
 }
 }
 \description{
 Computes the cylindrical Bessel function of the second kind
 (\eqn{Y_\nu(z)}), also known as the Neumann function or Weber function, and
-its first derivative (\code{ycd}).
+its derivatives through \code{ycdk()}.
 }
 \details{
 The cylindrical Bessel function of the second kind satisfies the same
@@ -94,7 +94,7 @@ yc(2, 3i)
 yc(0, 0)  # Returns -Inf
 
 # First derivative
-ycd(1, 2)
+ycdk(1, 2, 1)
 
 }
 \references{

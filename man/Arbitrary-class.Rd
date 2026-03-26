@@ -3,6 +3,7 @@
 \docType{class}
 \name{Arbitrary}
 \alias{Arbitrary}
+\alias{Arbitrary-class}
 \title{Arbitrary body shape}
 \description{
 Arbitrary body shape

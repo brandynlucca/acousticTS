@@ -93,4 +93,5 @@ Fisheries for Scotland.
 \code{\link{sphere}}
 }
 \keyword{acoustics}
+\keyword{internal}
 \keyword{models}

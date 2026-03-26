@@ -179,4 +179,5 @@ sound by spherical and elongated objects. The Journal of the Acoustical
 Society of America, 86: 1499-1510.
 }
 \keyword{acoustics}
+\keyword{internal}
 \keyword{models}

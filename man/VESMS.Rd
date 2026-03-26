@@ -79,4 +79,5 @@ acoustic scattering by elastic spheres. \emph{The Journal of the Acoustical
 Society of America}, 93, 118-123.
 }
 \keyword{acoustics}
+\keyword{internal}
 \keyword{models}

@@ -3,6 +3,7 @@
 \docType{class}
 \name{ProlateSpheroid}
 \alias{ProlateSpheroid}
+\alias{ProlateSpheroid-class}
 \title{Prolate spheroidal body shape}
 \description{
 Prolate spheroidal body shape

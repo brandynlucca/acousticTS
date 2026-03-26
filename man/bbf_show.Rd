@@ -12,3 +12,4 @@ bbf_show(object)
 \description{
 show(...) for BBF-class objects.
 }
+\keyword{internal}

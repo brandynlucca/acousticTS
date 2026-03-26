@@ -4,8 +4,9 @@
 \alias{cylinder}
 \title{Creates a cylinder.}
 \usage{
-cylinder(length_body, radius_body, length_radius_ratio,
-taper, n_segments, length_units)
+cylinder(length_body, radius_body = NULL, length_radius_ratio = NULL,
+  taper = NULL, radius_curvature_ratio = NULL, n_segments = 100,
+  length_units = "m")
 }
 \arguments{
 \item{length_body}{Length (m).}
@@ -17,6 +18,9 @@ known.}
 
 \item{taper}{Optional input that is the degree of taper to round ends of
 the cylinder.}
+
+\item{radius_curvature_ratio}{Optional curvature ratio metadata for rounded
+cylinder-end workflows.}
 
 \item{n_segments}{Number of segments to discretize object shape. Defaults to
 1e2 segments.}

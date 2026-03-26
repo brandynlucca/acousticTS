@@ -3,6 +3,7 @@
 \docType{class}
 \name{Cylinder}
 \alias{Cylinder}
+\alias{Cylinder-class}
 \title{Cylindrical body shape}
 \description{
 Cylindrical body shape

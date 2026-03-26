@@ -3,6 +3,7 @@
 \docType{class}
 \name{ELA}
 \alias{ELA}
+\alias{ELA-class}
 \title{Elastic-based scatterer (ELA) object/class.}
 \description{
 A shared parent S4 class for elastic-based scatterers. The \code{ELA}-class

@@ -33,6 +33,9 @@ generate the desired shape for TS modeling. Options currently include:
 \tab \emph{Polynomial cylinder} \tab "polynomial_cylinder" \tab
 \tab length, radius, polynomial \tab
 \code{\link[=polynomial_cylinder]{polynomial_cylinder(...)}}\cr
+\tab \emph{Oblate spheroid} \tab "oblate_spheroid" \tab
+\tab length, radius \tab
+\code{\link[=oblate_spheroid]{oblate_spheroid(...)}}\cr
 \tab \emph{Prolate spheroid} \tab "prolate_spheroid" \tab
 \tab length, radius \tab
 \code{\link[=prolate_spheroid]{prolate_spheroid(...)}}\cr
@@ -65,6 +68,9 @@ coefficients reported by Smith \emph{et al.} (2013).
 create_shape("sphere", radius_body = 0.01)
 create_shape(
   "prolate_spheroid", length_body = 0.04, radius_body = 0.004
+)
+create_shape(
+  "oblate_spheroid", length_body = 0.012, radius_body = 0.01
 )
 create_shape(
   "cylinder", length_body = 0.05, radius_body = 0.003

@@ -25,8 +25,8 @@ supported.}
 A complex vector containing:
 \itemize{
 \item \code{jc}: \eqn{J_\nu(z)}
-\item \code{jcd}: \eqn{J'_\nu(z)} (first derivative)
-\item \code{jcdd}: \eqn{J''_\nu(z)} (second derivative)
+\item \code{jcdk(..., k = 1)}: \eqn{J'_\nu(z)} (first derivative)
+\item \code{jcdk(..., k = 2)}: \eqn{J''_\nu(z)} (second derivative)
 \item \code{jcdk}: \eqn{J_\nu^{(k)}(z)} (k-th derivative)
 }
 }
@@ -95,10 +95,10 @@ jc(1, 1i)
 jc(2, 3i)
 
 # First derivative
-jcd(1, 2)
+jcdk(1, 2, 1)
 
 # Second derivative
-jcdd(1, 2)
+jcdk(1, 2, 2)
 
 }
 \references{

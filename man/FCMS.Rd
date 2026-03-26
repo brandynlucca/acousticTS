@@ -112,4 +112,5 @@ Deformed cylinders. The Journal of the Acoustical Society of America, 85:
 \code{\link{Cylinder}}, \code{\link{cylinder}}
 }
 \keyword{acoustics}
+\keyword{internal}
 \keyword{models}

@@ -3,6 +3,7 @@
 \docType{class}
 \name{CSC}
 \alias{CSC}
+\alias{CSC-class}
 \title{Composite scatterer (CSC) object/class.}
 \description{
 A shared parent S4 class for composite scatterers that retain a primary body

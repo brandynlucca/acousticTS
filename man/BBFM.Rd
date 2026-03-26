@@ -75,4 +75,5 @@ zooplankton groups. II. Scattering models. \emph{The Journal of the
 Acoustical Society of America}, 103: 236-253.
 }
 \keyword{acoustics}
+\keyword{internal}
 \keyword{models}
