@@ -17,8 +17,9 @@
 #' @keywords shapes internal
 #'
 #' @name Shape
+#' @aliases Shape-class
 #' @rdname Shape-class
-#' @export
+#' @exportClass Shape
 Shape <- setClass("Shape",
   slots = c(
     position_matrix = "matrix",
@@ -35,8 +36,9 @@ Shape <- setClass("Shape",
 #' @keywords shapes internal
 #'
 #' @name Arbitrary
+#' @aliases Arbitrary-class
 #' @rdname Arbitrary-class
-#' @export
+#' @exportClass Arbitrary
 Arbitrary <- setClass("Arbitrary",
   contains = "Shape"
 )
@@ -50,8 +52,9 @@ Arbitrary <- setClass("Arbitrary",
 #' @keywords shapes internal
 #'
 #' @name Sphere
+#' @aliases Sphere-class
 #' @rdname Sphere-class
-#' @export
+#' @exportClass Sphere
 Sphere <- setClass("Sphere",
   contains = "Shape"
 )
@@ -65,9 +68,26 @@ Sphere <- setClass("Sphere",
 #' @keywords shapes internal
 #'
 #' @name ProlateSpheroid
+#' @aliases ProlateSpheroid-class
 #' @rdname ProlateSpheroid-class
-#' @export
+#' @exportClass ProlateSpheroid
 ProlateSpheroid <- setClass("ProlateSpheroid",
+  contains = "Shape"
+)
+################################################################################
+# Oblate spheroid
+################################################################################
+#' Oblate spheroidal body shape
+#'
+#' @seealso \code{\link{Shape}}
+#'
+#' @keywords shapes internal
+#'
+#' @name OblateSpheroid
+#' @aliases OblateSpheroid-class
+#' @rdname OblateSpheroid-class
+#' @exportClass OblateSpheroid
+OblateSpheroid <- setClass("OblateSpheroid",
   contains = "Shape"
 )
 ################################################################################
@@ -80,8 +100,9 @@ ProlateSpheroid <- setClass("ProlateSpheroid",
 #' @keywords shapes internal
 #'
 #' @name Cylinder
+#' @aliases Cylinder-class
 #' @rdname Cylinder-class
-#' @export
+#' @exportClass Cylinder
 Cylinder <- setClass("Cylinder",
   contains = "Shape"
 )
@@ -95,8 +116,9 @@ Cylinder <- setClass("Cylinder",
 #' @keywords shapes internal
 #'
 #' @name PolynomialCylinder
+#' @aliases PolynomialCylinder-class
 #' @rdname PolynomialCylinder-class
-#' @export
+#' @exportClass PolynomialCylinder
 PolynomialCylinder <- setClass("PolynomialCylinder",
   contains = "Cylinder"
 )

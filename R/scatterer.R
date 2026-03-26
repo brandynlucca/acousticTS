@@ -86,8 +86,9 @@
 #' @keywords scatterer_type
 #'
 #' @name Scatterer
+#' @aliases Scatterer-class
 #' @rdname Scatterer-class
-#' @export
+#' @exportClass Scatterer
 setClass("Scatterer",
   slots = c(
     metadata = "list",
@@ -113,8 +114,9 @@ setClass("Scatterer",
 #' @keywords scatterer_type
 #'
 #' @name ELA
+#' @aliases ELA-class
 #' @rdname ELA-class
-#' @export
+#' @exportClass ELA
 ELA <- setClass("ELA",
   slots = c(
     model = "list",
@@ -143,8 +145,9 @@ ELA <- setClass("ELA",
 #' @keywords scatterer_type
 #'
 #' @name CSC
+#' @aliases CSC-class
 #' @rdname CSC-class
-#' @export
+#' @exportClass CSC
 CSC <- setClass("CSC",
   slots = c(
     model = "list",
@@ -174,8 +177,9 @@ CSC <- setClass("CSC",
 #' @keywords scatterer_type
 #'
 #' @name GAS
+#' @aliases GAS-class
 #' @rdname GAS-class
-#' @export
+#' @exportClass GAS
 GAS <- setClass("GAS",
   slots = c(
     metadata = "list",
@@ -202,8 +206,9 @@ GAS <- setClass("GAS",
 #' @keywords scatterer_type
 #'
 #' @name SBF
+#' @aliases SBF-class
 #' @rdname SBF-class
-#' @export
+#' @exportClass SBF
 SBF <- setClass("SBF",
   slots = c(
     metadata = "list",
@@ -231,8 +236,9 @@ SBF <- setClass("SBF",
 #' @keywords scatterer_type
 #'
 #' @name BBF
+#' @aliases BBF-class
 #' @rdname BBF-class
-#' @export
+#' @exportClass BBF
 BBF <- setClass("BBF",
   slots = c(
     backbone = "list"
@@ -260,8 +266,9 @@ BBF <- setClass("BBF",
 #' @keywords scatterer_type
 #' 
 #' @name ESS
+#' @aliases ESS-class
 #' @rdname ESS-class
-#' @export
+#' @exportClass ESS
 ESS <- setClass("ESS",
   slots = c(
     shell = "list",
@@ -287,8 +294,9 @@ ESS <- setClass("ESS",
 #' @keywords scatterer_type
 #'
 #' @name CAL
+#' @aliases CAL-class
 #' @rdname CAL-class
-#' @export
+#' @exportClass CAL
 CAL <- setClass("CAL",
   slots = c(
     body = "list"
@@ -312,8 +320,9 @@ CAL <- setClass("CAL",
 #' @keywords scatterer_type
 #'
 #' @name FLS
+#' @aliases FLS-class
 #' @rdname FLS-class
-#' @export
+#' @exportClass FLS
 FLS <- setClass("FLS",
   slots = c(
     metadata = "list",
