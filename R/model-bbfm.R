@@ -69,11 +69,12 @@
 #' @name BBFM
 #' @aliases bbfm BBFM
 #' @docType data
-#' @keywords models acoustics
+#' @keywords models acoustics internal
 NULL
 
 #' @noRd
 .bbfm_make_fls <- function(component, shape_parameters, id = "UID") {
+  # Rewrap one component as an FLS object ======================================
   methods::new("FLS",
     metadata = list(ID = id),
     model_parameters = list(),
@@ -85,7 +86,9 @@ NULL
 
 #' @noRd
 .bbfm_centroid_projection <- function(component) {
+  # Pull the stored component geometry =========================================
   rpos <- component$rpos
+  # Estimate the centroid in the x-z plane =====================================
   x_center <- if ("x" %in% rownames(rpos)) {
     mean(range(rpos["x", ], na.rm = TRUE))
   } else {
@@ -96,7 +99,7 @@ NULL
   } else {
     0
   }
-
+  # Project the centroid onto the incident direction ===========================
   x_center * cos(component$theta) + z_center * sin(component$theta)
 }
 
@@ -107,6 +110,7 @@ bbfm_initialize <- function(object,
                             sound_speed_sw = .SEAWATER_SOUND_SPEED_DEFAULT,
                             density_sw = .SEAWATER_DENSITY_DEFAULT,
                             m_limit = NULL) {
+  # Validate the composite scatterer type ======================================
   if (!methods::is(object, "BBF")) {
     stop(
       "BBFM requires a 'BBF' composite scatterer. Input scatterer is type '",
@@ -114,12 +118,12 @@ bbfm_initialize <- function(object,
       call. = FALSE
     )
   }
-
+  # Extract the stored scatterer fields ========================================
   metadata <- extract(object, "metadata")
   shape <- extract(object, "shape_parameters")
   body <- extract(object, "body")
   backbone <- extract(object, "backbone")
-
+  # Validate the flesh and backbone inputs =====================================
   if (is.null(body$density) && is.null(body$g)) {
     stop(
       "BBFM requires the flesh body to carry either absolute density ",
@@ -143,7 +147,7 @@ bbfm_initialize <- function(object,
       call. = FALSE
     )
   }
-
+  # Rebuild temporary model-specific component objects =========================
   body_object <- .bbfm_make_fls(
     component = body,
     shape_parameters = shape$body,
@@ -154,7 +158,7 @@ bbfm_initialize <- function(object,
     shape_parameters = shape$backbone,
     id = paste0(metadata$ID, "_backbone")
   )
-
+  # Store the BBFM initialization recipe =======================================
   methods::slot(object, "model_parameters")$BBFM <- list(
     parameters = list(
       frequency = frequency,
@@ -168,7 +172,7 @@ bbfm_initialize <- function(object,
       backbone = backbone_object
     )
   )
-
+  # Initialize the output model slot ===========================================
   methods::slot(object, "model")$BBFM <- data.frame(
     frequency = frequency,
     sigma_bs = rep(NA_real_, length(frequency))
@@ -180,9 +184,10 @@ bbfm_initialize <- function(object,
 #' Body-backbone composite model.
 #' @noRd
 BBFM <- function(object) {
+  # Extract the stored BBFM inputs =============================================
   model <- extract(object, "model_parameters")$BBFM
   params <- model$parameters
-
+  # Evaluate the flesh contribution with DWBA ==================================
   body_object <- target_strength(
     object = model$components$body,
     frequency = params$frequency,
@@ -190,7 +195,7 @@ BBFM <- function(object) {
     sound_speed_sw = params$sound_speed_sw,
     density_sw = params$density_sw
   )
-
+  # Evaluate the backbone contribution with ECMS ===============================
   backbone_component <- extract(model$components$backbone, "body")
   backbone_object <- target_strength(
     object = model$components$backbone,
@@ -203,7 +208,7 @@ BBFM <- function(object) {
     sound_speed_transversal_body = backbone_component$sound_speed_transversal,
     m_limit = params$m_limit
   )
-
+  # Align the backbone phase with the body frame ===============================
   body_results <- extract(body_object, "model")$DWBA
   backbone_results <- extract(backbone_object, "model")$ECMS
   phase_shift <- exp(
@@ -212,11 +217,12 @@ BBFM <- function(object) {
     )
   )
   f_backbone_aligned <- backbone_results$f_bs * phase_shift
+  # Combine amplitudes and cross sections ======================================
   f_bs <- body_results$f_bs + f_backbone_aligned
   sigma_body <- abs(body_results$f_bs)^2
   sigma_backbone <- abs(f_backbone_aligned)^2
   sigma_bs <- abs(f_bs)^2
-
+  # Store the final BBFM results ===============================================
   methods::slot(object, "model")$BBFM <- data.frame(
     frequency = params$frequency,
     ka_body = body_results$ka,
