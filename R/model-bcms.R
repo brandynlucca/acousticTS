@@ -49,7 +49,7 @@
 #' @name BCMS
 #' @aliases bcms BCMS
 #' @docType data
-#' @keywords models acoustics
+#' @keywords models acoustics internal
 NULL
 
 #' Initialize scatterer-class object for the bent cylinder modal series model.
@@ -61,8 +61,9 @@ bcms_initialize <- function(object,
                             density_sw = .SEAWATER_DENSITY_DEFAULT,
                             stationary_phase = FALSE,
                             m_limit = NULL) {
+  # Extract the stored shape metadata ==========================================
   shape <- extract(object, "shape_parameters")
-
+  # Validate the required cylinder geometry ====================================
   if (shape$shape != "Cylinder") {
     stop(
       "The bent cylinder modal series solution requires scatterer to be ",
@@ -90,8 +91,9 @@ bcms_initialize <- function(object,
       "'pressure_release' are available in this implementation of BCMS."
     )
   }
-
-  body <- .hydrate_contrasts(extract(object, "body"), sound_speed_sw, density_sw)
+  # Hydrate the body contrasts and warn on limited regimes =====================
+  body <- .hydrate_contrasts(extract(object, "body"),
+                             sound_speed_sw, density_sw)
 
   if (!is.null(shape$radius_curvature_ratio) &&
       !is.na(shape$radius_curvature_ratio) &&
@@ -108,13 +110,13 @@ bcms_initialize <- function(object,
       "bent-cylinder modal-series form only."
     )
   }
-
+  # Resolve the modal truncation limit =========================================
   if (is.null(m_limit)) {
     m_limit <- ceiling(
       wavenumber(frequency, sound_speed_sw) * shape$radius
     ) + 10
   }
-
+  # Store the BCMS initialization recipe =======================================
   .init_model_slots(
     object = object,
     model_name = "BCMS",
@@ -161,25 +163,26 @@ bcms_initialize <- function(object,
 
 #' @noRd
 .bcms_straight_fbs <- function(acoustics, body, bm_method) {
+  # Precompute the modal indexing terms ========================================
   m_max <- max(acoustics$m_limit)
   nu <- neumann(0:m_max)
-
+  # Build the angular and size parameters ======================================
   k1L <- body$length * acoustics$k_sw
   k1a <- acoustics$k_sw * sin(body$theta) * body$radius
   k2a <- acoustics$k_sw * sin(body$theta) / body$h * body$radius
   gh <- body$g * body$h
-
+  # Evaluate the boundary-condition coefficients ===============================
   Bm <- switch(
     bm_method,
     Bm_fluid = .fcms_bm_fluid(k1a, k2a, gh, nu, acoustics$m_limit),
     Bm_rigid = .fcms_bm_fixed_rigid(k1a, nu, acoustics$m_limit),
     Bm_pressure_release = .fcms_bm_pressure_release(k1a, nu, acoustics$m_limit)
   )
-
+  # Coerce the modal coefficients to a matrix ==================================
   if (!is.matrix(Bm)) {
     Bm <- t(as.matrix(Bm))
   }
-
+  # Combine the coherent prefactor and modal sum ===============================
   prefactor <- body$length / pi *
     sin(k1L * cos(body$theta)) / (k1L * cos(body$theta))
 
@@ -198,16 +201,17 @@ bcms_initialize <- function(object,
 #' Bent cylinder modal series solution.
 #' @noRd
 BCMS <- function(object) {
+  # Extract the stored BCMS inputs =============================================
   model <- extract(object, "model_parameters")$BCMS
   acoustics <- model$parameters$acoustics
   body <- model$body
-
+  # Evaluate the straight-cylinder reference amplitude =========================
   straight_fbs <- .bcms_straight_fbs(
     acoustics = acoustics,
     body = body,
     bm_method = model$parameters$Bm_method
   )
-
+  # Apply the bent-cylinder coherence correction when needed ===================
   f_bs <- if (body$is_bent) {
     lebc <- .bcms_equivalent_length_fresnel(
       k1 = acoustics$k_sw,
@@ -219,7 +223,7 @@ BCMS <- function(object) {
   } else {
     straight_fbs
   }
-
+  # Store the final BCMS results ===============================================
   sigma_bs <- abs(f_bs)^2
 
   methods::slot(object, "model")$BCMS <- data.frame(
