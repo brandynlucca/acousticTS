@@ -227,7 +227,7 @@
 #' @name PSMS
 #' @aliases psms PSMS
 #' @docType data
-#' @keywords models acoustics
+#' @keywords models acoustics internal
 NULL
 
 #' Initialize object for the modal series solution for a prolate spheroid
@@ -383,6 +383,150 @@ psms_initialize <- function(object,
   )
 }
 
+################################################################################
+#' Adaptive integrator for the PSMS when using the adaptive PSMS.
+#' @keywords internal
+#' @noRd
+.psms_adaptive_n_integration <- function(
+    chi_sw,
+    chi_body,
+    m_max,
+    n_max,
+    precision
+) {
+  # Initialize the parameterization required for Gauss-Legendre quadrature =====
+  chi_max <- pmax(abs(chi_sw), abs(chi_body))
+  step_n <- 8L
+  floor_n <- if (identical(precision, "quad")) 32L else 24L
+  cap_n <- 96L
+  # The overlap quadrature must resolve the same angular content that drives the
+  # retained PSMS modal system. Use the hard truncation ceilings as the main
+  # difficulty scale, with a smaller reduced-frequency bonus for the sharper
+  # high-chi oscillations that appear in the angular products. =================
+  modal_difficulty <- 0.75 * n_max + 0.25 * m_max
+  chi_bonus <- if (identical(precision, "quad")) {
+    0.10 * sqrt(pmax(chi_max, 1))
+  } else {
+    0.05 * sqrt(pmax(chi_max, 1))
+  }
+  # Estimate integration node count ============================================
+  n_integration <- step_n * ceiling((modal_difficulty + chi_bonus) / step_n)
+  n_integration <- pmax(floor_n, pmin(cap_n, n_integration))
+
+  as.integer(n_integration)
+}
+
+#' Traditional kernel solver for the PSMS.
+#' @keywords internal
+#' @noRd
+.prolate_spheroidal_kernels_fixed <- function(
+    acoustics,
+    body,
+    medium,
+    boundary_method,
+    n_integration = 96,
+    precision = "double",
+    adaptive = FALSE
+) {
+  # Generate nodes and weights for quadrature ==================================
+  quad_pts <- gauss_legendre(n = n_integration, a = -1, b = 1)
+  # Calculate the linear scattering coefficient, fbs ===========================
+  prolate_spheroid_fbs(
+    acoustics, body, medium, quad_pts, precision, boundary_method, adaptive,
+    FALSE
+  )
+}
+
+#' Adaptive kernel solver for the PSMS.
+#' @keywords internal
+#' @noRd
+.prolate_spheroidal_kernels_adaptive <- function(
+    acoustics,
+    body,
+    medium,
+    boundary_method,
+    precision = "double",
+    adaptive = TRUE
+) {
+  # Frequency-specific integration node count ==================================
+  n_by_freq <- .psms_adaptive_n_integration(
+    chi_sw = acoustics$chi_sw,
+    chi_body = acoustics$chi_body,
+    m_max = acoustics$m_max,
+    n_max = acoustics$n_max,
+    precision = precision
+  )
+  # Pre-allocate the grouped frequency output ==================================
+  f_bs <- complex(length.out = nrow(acoustics))
+  # Solve each shared quadrature block once ====================================
+  for (n_integration_i in sort(unique(n_by_freq))) {
+    idx <- which(n_by_freq == n_integration_i)
+    f_bs[idx] <- .prolate_spheroidal_kernels_fixed(
+      acoustics = acoustics[idx, , drop = FALSE],
+      body = body,
+      medium = medium,
+      boundary_method = boundary_method,
+      n_integration = n_integration_i,
+      precision = precision,
+      adaptive = adaptive
+    )
+  }
+  # Attach the chosen quadrature order to the output ===========================
+  attr(f_bs, "n_integration") <- n_by_freq
+  f_bs
+}
+
+#' Solve Expansion Coefficients for a Liquid-Filled Spheroidal Scatterer
+#'
+#' @description
+#' Computes the modal expansion coefficients \eqn{A_{mn}} for acoustic
+#' scattering from a liquid-filled prolate spheroidal body using a truncated
+#' singular value decomposition (SVD) pseudoinverse approach.
+#'
+#' @details
+#' This function solves the linear system arising from matching boundary
+#' conditions at the surface of a liquid-filled spheroidal scatterer. The
+#' expansion coefficients  \eqn{A_{mn}} relate the scattered field to the
+#' incident field through the spheroidal wave function expansion.
+#' @keywords internal
+#' @noRd
+prolate_spheroidal_kernels <- function(
+    acoustics,
+    body,
+    medium,
+    boundary_method,
+    n_integration = 96,
+    precision = "double",
+    adaptive = FALSE
+) {
+  # Use the adaptive grouped solver for full fluid penetrable cases ============
+  if (isTRUE(adaptive) && identical(boundary_method, "Amn_fluid")) {
+    return(
+      .prolate_spheroidal_kernels_adaptive(
+        acoustics = acoustics,
+        body = body,
+        medium = medium,
+        boundary_method = boundary_method,
+        precision = precision,
+        adaptive = adaptive
+      )
+    )
+  }
+  # Normalize missing quadrature input =========================================
+  if (is.null(n_integration) || (length(n_integration) == 1 && is.na(n_integration))) {
+    n_integration <- 96L
+  }
+  # Fall back to the fixed-order kernel solver =================================
+  .prolate_spheroidal_kernels_fixed(
+    acoustics = acoustics,
+    body = body,
+    medium = medium,
+    boundary_method = boundary_method,
+    n_integration = n_integration,
+    precision = precision,
+    adaptive = adaptive
+  )
+}
 
 #' Calculates the theoretical target strength of a prolate spheroid using a
 #' modal series solution
