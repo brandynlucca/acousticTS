@@ -63,7 +63,7 @@
 #' @name ECMS
 #' @aliases ecms ECMS
 #' @docType data
-#' @keywords models acoustics
+#' @keywords models acoustics internal
 NULL
 
 #' Initialize scatterer-class object for the elastic cylinder modal series model.
@@ -76,9 +76,10 @@ ecms_initialize <- function(object,
                             sound_speed_longitudinal_body = NULL,
                             sound_speed_transversal_body = NULL,
                             m_limit = NULL) {
+  # Extract the shape metadata and active cylinder geometry ====================
   shape <- extract(object, "shape_parameters")
   shape_core <- if (methods::is(object, "ESS")) shape$shell else shape
-
+  # Validate the supported scatterer and shape types ===========================
   if (!(methods::is(object, "ESS") || methods::is(object, "FLS"))) {
     stop(
       "ECMS requires a cylindrical 'ESS' or legacy cylindrical 'FLS' scatterer."
@@ -92,7 +93,7 @@ ecms_initialize <- function(object,
       shape$shape, "'."
     )
   }
-
+  # Resolve the elastic-cylinder material properties ===========================
   elastic_comp <- if (methods::is(object, "ESS")) {
     extract(object, "shell")
   } else {
@@ -103,7 +104,7 @@ ecms_initialize <- function(object,
     elastic_comp$sound_speed_longitudinal
   cT_body <- sound_speed_transversal_body %||%
     elastic_comp$sound_speed_transversal
-
+  # Validate the required elastic inputs =======================================
   if (is.null(rho_body)) {
     stop(
       "ECMS requires the elastic-cylinder density, either stored on the ",
@@ -116,7 +117,7 @@ ecms_initialize <- function(object,
       "either stored on the scatterer or passed directly to target_strength()."
     )
   }
-
+  # Warn when the incidence leaves the supported regime ========================
   if (abs(elastic_comp$theta - pi / 2) > pi / 18) {
     warning(
       "ECMS is intended for broadside or near-broadside incidence."
@@ -131,7 +132,7 @@ ecms_initialize <- function(object,
       "broadside incidence."
     )
   }
-
+  # Build the acoustic size parameters and truncation ==========================
   k_sw <- wavenumber(frequency, sound_speed_sw)
   k_l <- wavenumber(frequency, cL_body)
   k_t <- wavenumber(frequency, cT_body)
@@ -156,7 +157,7 @@ ecms_initialize <- function(object,
   if (is.null(m_limit)) {
     m_limit <- ceiling(ka_max) + 10
   }
-
+  # Store the ECMS initialization recipe =======================================
   methods::slot(object, "model_parameters")$ECMS <- list(
     parameters = list(
       acoustics = data.frame(
@@ -192,17 +193,19 @@ ecms_initialize <- function(object,
     frequency = frequency,
     sigma_bs = rep(NA_real_, length(frequency))
   )
-
+  # Return the initialized scatterer ===========================================
   object
 }
 
 #' @noRd
 .ecms_safe_divide <- function(numerator, denominator, eps = 1e-12) {
+  # Replace near-zero denominators with signed epsilons ========================
   denominator_adj <- ifelse(
     abs(denominator) < eps,
     ifelse(Re(denominator) < 0, -eps, eps),
     denominator
   )
+  # Return the stabilized quotient =============================================
   numerator / denominator_adj
 }
 
@@ -216,11 +219,12 @@ ecms_initialize <- function(object,
                                      density_sw,
                                      density_body,
                                      m_limit) {
+  # Reject unsupported end-on incidence ========================================
   sin_theta <- abs(sin(theta_body))
   if (sin_theta < 1e-10) {
     stop("ECMS is not implemented for end-on incidence.")
   }
-
+  # Define the exterior and interior size parameters ===========================
   x1 <- k_l * radius_body * sin_theta
   x2 <- k_t * radius_body * sin_theta
   x3 <- k_sw * radius_body * sin_theta
@@ -228,12 +232,12 @@ ecms_initialize <- function(object,
   m <- 0:m_limit
   nu <- neumann(m)
   m2 <- m^2
-
+  # Evaluate the cylindrical Bessel functions ==================================
   J1 <- jc(m, x1)
   J2 <- jc(m, x2)
   J3 <- jc(m, x3)
   Y3 <- yc(m, x3)
-
+  # Build the elastic-cylinder phase-shift algebra =============================
   tan_alpha1 <- -.ecms_safe_divide(x1 * jcd(m, x1), J1)
   tan_alpha2 <- -.ecms_safe_divide(x2 * jcd(m, x2), J2)
   tan_alpha3 <- -.ecms_safe_divide(x3 * jcd(m, x3), J3)
@@ -257,14 +261,14 @@ ecms_initialize <- function(object,
     tan_phi + tan_alpha3,
     tan_phi + tan_beta3
   )
-
+  # Convert the phase shifts into the modal sum ================================
   cos_eta <- 1 / sqrt(1 + tan_eta^2)
   sin_eta <- tan_eta * cos_eta
   modal_sum <- sum(
     (-1)^m * nu * sin_eta * (cos_eta - 1i * sin_eta),
     na.rm = TRUE
   )
-
+  # Apply the finite-length coherence factor ===================================
   A <- k_sw * length_body * cos(theta_body)
   sinc_factor <- if (abs(A) < 1e-10) 1 else sin(A) / A
 
@@ -279,11 +283,12 @@ ecms_initialize <- function(object,
 #' Elastic cylinder modal series solution.
 #' @noRd
 ECMS <- function(object) {
+  # Extract the stored ECMS inputs =============================================
   model <- extract(object, "model_parameters")$ECMS
   acoustics <- model$parameters$acoustics
   body <- model$body
   medium <- model$medium
-
+  # Evaluate the straight-cylinder backscatter amplitudes ======================
   straight_f_bs <- mapply(
     FUN = .ecms_backscatter_scalar,
     k_sw = acoustics$k_sw,
@@ -298,7 +303,7 @@ ECMS <- function(object) {
       density_body = body$density
     )
   )
-
+  # Apply the bent-cylinder coherence correction when needed ===================
   f_bs <- if (isTRUE(body$is_bent)) {
     lebc <- .ecms_equivalent_length_fresnel(
       k1 = acoustics$k_sw,
@@ -310,7 +315,7 @@ ECMS <- function(object) {
   } else {
     straight_f_bs
   }
-
+  # Store the final ECMS results ===============================================
   sigma_bs <- abs(f_bs)^2
 
   methods::slot(object, "model")$ECMS <- data.frame(
