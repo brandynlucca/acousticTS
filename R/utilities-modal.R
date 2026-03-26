@@ -11,16 +11,19 @@
 #' @keywords internal
 #' @noRd
 .pad_modal_terms <- function(x, target_length, fill = NA) {
+  # Truncate vectors that already exceed the requested modal cutoff ============
   if (length(x) >= target_length) {
     return(x[seq_len(target_length)])
   }
 
+  # Promote the fill value to complex storage when needed ======================
   fill_value <- if (is.complex(x) || is.complex(fill)) {
     as.complex(fill)
   } else {
     fill
   }
 
+  # Pad the coefficient vector out to the common target length =================
   c(x, rep(fill_value, target_length - length(x)))
 }
 
@@ -34,6 +37,7 @@
 #' @keywords internal
 #' @noRd
 .modal_series_apply <- function(m_limit, FUN, ..., fill = NA) {
+  # Resolve the common retained modal length across all frequencies ============
   target_length <- max(m_limit) + 1L
   out <- mapply(
     FUN = function(ml, ...) {
@@ -44,10 +48,12 @@
     SIMPLIFY = TRUE
   )
 
+  # Restore matrix structure when only one frequency is evaluated ==============
   if (is.null(dim(out))) {
     out <- matrix(out, nrow = target_length)
   }
 
+  # Return the padded modal matrix =============================================
   out
 }
 
@@ -59,6 +65,7 @@
 #' @keywords internal
 #' @noRd
 .modal_weighted_sum <- function(coeff_matrix, weights, na.rm = TRUE) {
+  # Apply the mode weights row-wise before summing by frequency ================
   colSums(sweep(coeff_matrix, 1, weights, FUN = "*"), na.rm = na.rm)
 }
 
@@ -67,9 +74,9 @@
 #' @param v Vector input.
 #' @param limit Modal series limit.
 #' @keywords internal
-#' @export
 #' @noRd
 modal_matrix <- function(v, limit) {
+  # Replicate one frequency vector into the common modal matrix layout =========
   matrix(
     data = rep(v, each = limit + 1),
     ncol = length(v),

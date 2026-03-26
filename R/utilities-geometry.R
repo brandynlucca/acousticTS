@@ -10,34 +10,19 @@
 #' @keywords internal
 #' @noRd
 .shape_x <- function(position_matrix, row_major = FALSE) {
+  # Validate the position-matrix input before resolving the x axis =============
   if (!is.matrix(position_matrix)) {
     stop("'position_matrix' must be a matrix.", call. = FALSE)
   }
 
-  if (row_major) {
-    if (!is.null(rownames(position_matrix))) {
-      x_idx <- match(c("x", "x_body", "x_bladder"), rownames(position_matrix),
-        nomatch = 0
-      )
-      x_idx <- x_idx[x_idx > 0]
-      if (length(x_idx) > 0) {
-        return(as.numeric(position_matrix[x_idx[1], ]))
-      }
-    }
-    return(as.numeric(position_matrix[1, ]))
-  }
-
-  if (!is.null(colnames(position_matrix))) {
-    x_idx <- match(c("x", "x_body", "x_bladder"), colnames(position_matrix),
-      nomatch = 0
-    )
-    x_idx <- x_idx[x_idx > 0]
-    if (length(x_idx) > 0) {
-      return(as.numeric(position_matrix[, x_idx[1]]))
-    }
-  }
-
-  as.numeric(position_matrix[, 1])
+  # Return the canonical x-axis values from the geometry contract ==============
+  .geometry_axis_values(
+    position_matrix,
+    axis = "x",
+    row_major = row_major,
+    default = if (row_major) position_matrix[1, ] else position_matrix[, 1],
+    context = "Position matrix"
+  )
 }
 
 #' Return the index order corresponding to a canonical x-axis orientation
@@ -46,9 +31,11 @@
 #' @keywords internal
 #' @noRd
 .canonicalize_x_order <- function(x, decreasing = FALSE) {
+  # Validate the x-axis input before ordering it ===============================
   if (!is.numeric(x)) {
     stop("'x' must be numeric.", call. = FALSE)
   }
+  # Return the stable x-order permutation ======================================
   order(x, seq_along(x), decreasing = decreasing, na.last = TRUE)
 }
 
@@ -62,6 +49,7 @@
 .canonicalize_position_matrix <- function(position_matrix,
                                           row_major = FALSE,
                                           decreasing = FALSE) {
+  # Resolve the canonical x-order permutation for the position matrix ==========
   ord <- .canonicalize_x_order(
     .shape_x(position_matrix, row_major = row_major),
     decreasing = decreasing
@@ -83,11 +71,13 @@
 .shape_length <- function(position_matrix = NULL,
                           body = NULL,
                           row_major = FALSE) {
+  # Fall back to the body profile when a body list is supplied =================
   if (!is.null(body)) {
     position_matrix <- body$rpos
     row_major <- TRUE
   }
 
+  # Return the total x-extent of the profile ===================================
   x_vals <- .shape_x(position_matrix, row_major = row_major)
   abs(diff(range(x_vals, na.rm = TRUE)))
 }
@@ -108,6 +98,7 @@
                                   row_major = FALSE,
                                   allow_scalar = TRUE,
                                   error_context = "shape") {
+  # Resolve body-style inputs into the shared position-matrix pathway ==========
   if (!is.null(body)) {
     position_matrix <- body$rpos
     row_major <- TRUE
@@ -116,6 +107,7 @@
     explicit_radius <- NULL
   }
 
+  # Define the explicit-radius fallback used by several geometry sources =======
   n_nodes <- if (row_major) ncol(position_matrix) else nrow(position_matrix)
 
   resolve_explicit <- function(values) {
@@ -132,12 +124,14 @@
     NULL
   }
 
+  # Prefer explicit radius values already stored on the body ===================
   radius_profile <- resolve_explicit(explicit_radius)
   if (!is.null(radius_profile)) {
     return(radius_profile)
   }
 
   if (!is.null(shape_parameters)) {
+    # Fall back to radius information stored on the shape parameters ===========
     radius_profile <- resolve_explicit(shape_parameters$radius_shape)
     if (!is.null(radius_profile)) {
       return(radius_profile)
@@ -149,39 +143,50 @@
     }
   }
 
-  if (row_major) {
-    rn <- rownames(position_matrix)
-    if (!is.null(rn) && all(c("zU", "zL") %in% rn)) {
-      return(as.numeric(abs(position_matrix["zU", ] - position_matrix["zL", ]) / 2))
-    }
-    if (!is.null(rn) && all(c("zU_body", "zL_body") %in% rn)) {
-      return(as.numeric(abs(position_matrix["zU_body", ] - position_matrix["zL_body", ]) / 2))
-    }
-    if (!is.null(rn) && all(c("zU_bladder", "zL_bladder") %in% rn)) {
-      return(as.numeric(abs(position_matrix["zU_bladder", ] - position_matrix["zL_bladder", ]) / 2))
-    }
-    if (!is.null(rn) && "w" %in% rn) {
-      return(as.numeric(abs(position_matrix["w", ]) / 2))
-    }
-    if (!is.null(rn) && "w_body" %in% rn) {
-      return(as.numeric(abs(position_matrix["w_body", ]) / 2))
-    }
-    if (!is.null(rn) && "w_bladder" %in% rn) {
-      return(as.numeric(abs(position_matrix["w_bladder", ]) / 2))
-    }
-  } else {
-    cn <- colnames(position_matrix)
-    if (!is.null(cn) && "a" %in% cn) {
-      return(as.numeric(abs(position_matrix[, "a"])))
-    }
-    if (!is.null(cn) && all(c("zU", "zL") %in% cn)) {
-      return(as.numeric(abs(position_matrix[, "zU"] - position_matrix[, "zL"]) / 2))
-    }
-    if (!is.null(cn) && "w" %in% cn) {
-      return(as.numeric(abs(position_matrix[, "w"]) / 2))
-    }
+  # Recover a named radius axis from the position matrix when available ========
+  radius_axis <- .geometry_axis_values(
+    position_matrix,
+    axis = "radius",
+    row_major = row_major,
+    default = NULL,
+    context = error_context
+  )
+  if (!is.null(radius_axis)) {
+    return(abs(radius_axis))
   }
 
+  # Derive radius from zU/zL profile envelopes when present ====================
+  zU <- .geometry_axis_values(
+    position_matrix,
+    axis = "zU",
+    row_major = row_major,
+    default = NULL,
+    context = error_context
+  )
+  zL <- .geometry_axis_values(
+    position_matrix,
+    axis = "zL",
+    row_major = row_major,
+    default = NULL,
+    context = error_context
+  )
+  if (!is.null(zU) && !is.null(zL)) {
+    return(abs(zU - zL) / 2)
+  }
+
+  # Fall back to half the width profile when only w is available ===============
+  width <- .geometry_axis_values(
+    position_matrix,
+    axis = "w",
+    row_major = row_major,
+    default = NULL,
+    context = error_context
+  )
+  if (!is.null(width)) {
+    return(abs(width) / 2)
+  }
+
+  # Stop when no radius-like information can be recovered ======================
   stop(
     "Unable to resolve the nodewise radius profile for ",
     error_context,
@@ -199,32 +204,25 @@
                                  body = NULL,
                                  row_major = FALSE,
                                  allow_scalar = TRUE) {
+  # Resolve body-style inputs into the shared position-matrix pathway ==========
   if (!is.null(body)) {
     position_matrix <- body$rpos
     row_major <- TRUE
   }
 
-  if (row_major) {
-    rn <- rownames(position_matrix)
-    if (!is.null(rn) && "w" %in% rn) {
-      return(as.numeric(position_matrix["w", ]))
-    }
-    if (!is.null(rn) && "w_body" %in% rn) {
-      return(as.numeric(position_matrix["w_body", ]))
-    }
-    if (!is.null(rn) && "w_bladder" %in% rn) {
-      return(as.numeric(position_matrix["w_bladder", ]))
-    }
-  } else {
-    cn <- colnames(position_matrix)
-    if (!is.null(cn) && "w" %in% cn) {
-      return(as.numeric(position_matrix[, "w"]))
-    }
-    if (!is.null(cn) && "y" %in% cn) {
-      return(as.numeric(position_matrix[, "y"]))
-    }
+  # Prefer an explicit width axis when one exists ==============================
+  width <- .geometry_axis_values(
+    position_matrix,
+    axis = "w",
+    row_major = row_major,
+    default = NULL,
+    context = "width derivation"
+  )
+  if (!is.null(width)) {
+    return(width)
   }
 
+  # Otherwise derive width from the radius profile =============================
   2 * .shape_radius_profile(
     position_matrix = position_matrix,
     shape_parameters = shape_parameters,
@@ -244,29 +242,32 @@
                                   body = NULL,
                                   row_major = FALSE,
                                   allow_scalar = TRUE) {
+  # Resolve body-style inputs into the shared position-matrix pathway ==========
   if (!is.null(body)) {
     position_matrix <- body$rpos
     row_major <- TRUE
   }
 
-  if (row_major) {
-    rn <- rownames(position_matrix)
-    if (!is.null(rn) && all(c("zU", "zL") %in% rn)) {
-      return(as.numeric(position_matrix["zU", ] - position_matrix["zL", ]))
-    }
-    if (!is.null(rn) && all(c("zU_body", "zL_body") %in% rn)) {
-      return(as.numeric(position_matrix["zU_body", ] - position_matrix["zL_body", ]))
-    }
-    if (!is.null(rn) && all(c("zU_bladder", "zL_bladder") %in% rn)) {
-      return(as.numeric(position_matrix["zU_bladder", ] - position_matrix["zL_bladder", ]))
-    }
-  } else {
-    cn <- colnames(position_matrix)
-    if (!is.null(cn) && all(c("zU", "zL") %in% cn)) {
-      return(as.numeric(position_matrix[, "zU"] - position_matrix[, "zL"]))
-    }
+  # Prefer explicit upper and lower height envelopes when available ============
+  zU <- .geometry_axis_values(
+    position_matrix,
+    axis = "zU",
+    row_major = row_major,
+    default = NULL,
+    context = "height derivation"
+  )
+  zL <- .geometry_axis_values(
+    position_matrix,
+    axis = "zL",
+    row_major = row_major,
+    default = NULL,
+    context = "height derivation"
+  )
+  if (!is.null(zU) && !is.null(zL)) {
+    return(zU - zL)
   }
 
+  # Otherwise derive height from the radius profile ============================
   2 * .shape_radius_profile(
     position_matrix = position_matrix,
     shape_parameters = shape_parameters,
@@ -289,14 +290,17 @@
 #' @keywords internal
 #' @noRd
 .resample_rpos <- function(rpos, n_new) {
+  # Build the new x-axis grid spanning the original profile ====================
   x_old <- rpos[, 1]
   x_new <- seq(x_old[1], x_old[nrow(rpos)], length.out = n_new)
   rpos_out <- matrix(0, nrow = n_new, ncol = ncol(rpos))
   if (!is.null(colnames(rpos))) colnames(rpos_out) <- colnames(rpos)
   rpos_out[, 1] <- x_new
+  # Interpolate each non-x column onto the new grid ============================
   for (j in seq_len(ncol(rpos))[-1]) {
     rpos_out[, j] <- stats::approx(x_old, rpos[, j], xout = x_new)$y
   }
+  # Return the resampled column-major position matrix ==========================
   rpos_out
 }
 
@@ -312,7 +316,9 @@
 #' @keywords internal
 #' @noRd
 .resample_rpos_rows <- function(rpos, n_new) {
+  # Build the new x-axis grid spanning the original profile ====================
   x_new <- seq(rpos[1, 1], rpos[1, ncol(rpos)], length.out = n_new)
+  # Interpolate each non-x row onto the new grid ===============================
   rpos_out <- rbind(
     x_new,
     t(vapply(2:nrow(rpos), function(i) {
@@ -320,6 +326,7 @@
     }, FUN.VALUE = numeric(n_new)))
   )
   if (!is.null(rownames(rpos))) rownames(rpos_out) <- rownames(rpos)
+  # Return the resampled row-major position matrix =============================
   rpos_out
 }
 
@@ -334,6 +341,7 @@
 #' @rdname brake
 #' @export
 brake <- function(object, radius_curvature, mode = "ratio") {
+  # Dispatch the bend helper according to the input object type ================
   class_type <- typeof(object)
   output <- switch(class_type,
     list = brake_df(object, radius_curvature, mode),
@@ -353,6 +361,7 @@ brake <- function(object, radius_curvature, mode = "ratio") {
 #' @rdname brake_df
 #' @noRd
 brake_df <- function(body_df, radius_curvature, mode = "ratio") {
+  # Validate the body data frame and requested curvature inputs ================
   if (
     !is.list(body_df) || is.null(body_df$rpos) || !is.matrix(body_df$rpos)
   ) {
@@ -365,6 +374,7 @@ brake_df <- function(body_df, radius_curvature, mode = "ratio") {
     stop("Radius-of-curvature 'mode' must be either 'ratio' or 'measurement'.")
   }
 
+  # Recover the working geometry and normalize the curvature mode ==============
   rpos <- body_df$rpos
   if (ncol(rpos) < 2) {
     stop("Position matrix 'rpos' must have at least two columns.")
@@ -377,6 +387,7 @@ brake_df <- function(body_df, radius_curvature, mode = "ratio") {
     measurement = radius_curvature / L
   )
 
+  # Warn when the arc angle becomes too coarse for the segment count ===========
   arc_angle_per_segment <- L / (radius_curvature_new * L * (n_segments - 1))
   if (arc_angle_per_segment > pi / 8) {
     warning(
@@ -390,6 +401,7 @@ brake_df <- function(body_df, radius_curvature, mode = "ratio") {
     )
   }
 
+  # Construct the bent centerline geometry along the osculating circle =========
   gamma_max <- 0.5 / radius_curvature_new
   theta <- seq(-gamma_max, gamma_max, length.out = n_segments)
   x_new <- (radius_curvature_new * L) * sin(theta) + (L / 2)
@@ -405,6 +417,7 @@ brake_df <- function(body_df, radius_curvature, mode = "ratio") {
     FWD = -z_new
   )
 
+  # Recompute the arc length and curvature-center distances ====================
   arc_lengths <- vapply(seq_len(length(x_direction) - 1), function(i) {
     chord_length <- sqrt(
       (x_direction[i + 1] - x_direction[i])^2 +
@@ -429,6 +442,7 @@ brake_df <- function(body_df, radius_curvature, mode = "ratio") {
     )
   }
 
+  # Update the body data frame with the curved geometry ========================
   rpos[c(1, 3), ] <- rbind(x_direction, z_direction)
   body_df_new <- body_df
   body_df_new$rpos <- rpos
@@ -445,8 +459,10 @@ brake_df <- function(body_df, radius_curvature, mode = "ratio") {
 #' @param mode Either "ratio" or "measurement"
 #' @rdname brake_scatterer
 #' @importFrom methods slot<-
+#' @keywords internal
 #' @noRd
 brake_scatterer <- function(object, radius_curvature, mode = "ratio") {
+  # Apply the body-data-frame brake helper and write it back into the object ===
   body <- acousticTS::extract(object, "body")
   body_curved <- brake_df(body, radius_curvature, mode)
   slot(object, "body") <- body_curved
@@ -456,8 +472,10 @@ brake_scatterer <- function(object, radius_curvature, mode = "ratio") {
 ################################################################################
 #' Support rotation function for KRM (swimbladder)
 #' @inheritParams body_rotation
-#' @export
+#' @keywords internal
+#' @noRd
 bladder_rotation <- function(sum_rpos, rpos, theta, k_length) {
+  # Rotate the swimbladder midpoint coordinates into the KRM frame =============
   v <- (sum_rpos[1, ] * cos(theta) + sum_rpos[3, ] * sin(theta)) / 2
   v <- matrix(
     data = rep(v, each = k_length),
@@ -465,6 +483,7 @@ bladder_rotation <- function(sum_rpos, rpos, theta, k_length) {
     nrow = k_length
   )
   delta_u <- diff(rpos[1, ]) * sin(theta)
+  # Return the rotated coordinate and segment-length terms =====================
   list(v = v, delta_u = delta_u)
 }
 
@@ -474,8 +493,10 @@ bladder_rotation <- function(sum_rpos, rpos, theta, k_length) {
 #' @param rpos Position matrix
 #' @param theta Orientation angle
 #' @param k_length Length of wavenumber vector
-#' @export
+#' @keywords internal
+#' @noRd
 body_rotation <- function(sum_rpos, rpos, theta, k_length) {
+  # Expand the summed coordinates across the requested wavenumber grid =========
   axial_sum <- matrix(
     data = rep(sum_rpos[1, ], each = k_length),
     ncol = length(sum_rpos[1, ]),
@@ -491,9 +512,11 @@ body_rotation <- function(sum_rpos, rpos, theta, k_length) {
     ncol = length(sum_rpos[4, ]),
     nrow = k_length
   )
+  # Rotate the dorsal and ventral body surfaces into the KRM frame =============
   vbU <- (axial_sum * cos(theta) + dorsal_sum * sin(theta)) / 2
   vbL <- (axial_sum * cos(theta) + ventral_sum * sin(theta)) / 2
   delta_u <- diff(rpos[1, ]) * sin(theta)
+  # Return the rotated body coordinates and segment-length terms ===============
   list(vbU = vbU, vbL = vbL, delta_u = delta_u)
 }
 
@@ -503,6 +526,7 @@ body_rotation <- function(sum_rpos, rpos, theta, k_length) {
 #' @param x0 Original or initial vector/interval
 #' @noRd
 segmentize <- function(x1, x0) {
+  # Identify each interval that needs to be repartitioned ======================
   segments_to_update <- Map(function(start, end) {
     points_between <- which(x1 < start & x1 > end)
 
@@ -524,10 +548,12 @@ segmentize <- function(x1, x0) {
     logical(1)
   )]
 
+  # Update the target grid interval by interval ================================
   lapply(segments_to_update, function(update) {
     x1[update$indices] <<- update$values
   })
 
+  # Return the repartitioned vector ============================================
   x1
 }
 
@@ -537,6 +563,7 @@ segmentize <- function(x1, x0) {
 #' @keywords internal
 #' @noRd
 .dwba_body_radius <- function(body) {
+  # Recover the nodewise radius profile used by DWBA-style models ==============
   .shape_radius_profile(
     body = body,
     row_major = TRUE,
@@ -550,6 +577,7 @@ segmentize <- function(x1, x0) {
 #' @keywords internal
 #' @noRd
 .as_dwba_profile <- function(object) {
+  # Recover the body and shape metadata used to build the DWBA profile =========
   body <- acousticTS::extract(object, "body")
   shape <- acousticTS::extract(object, "shape_parameters")
   shape_class <- if ("shape" %in% names(shape)) shape$shape else NULL
@@ -562,6 +590,7 @@ segmentize <- function(x1, x0) {
   canonical_shape <- !is.null(shape_class) &&
     shape_class %in% c("Sphere", "ProlateSpheroid", "Cylinder")
 
+  # Preserve noncanonical or already-curved shapes as explicit profiles ========
   if (!canonical_shape || !is_straight_centerline) {
     body$radius <- .shape_radius_profile(
       body = body,
@@ -572,6 +601,7 @@ segmentize <- function(x1, x0) {
     return(object)
   }
 
+  # Rebuild the canonical node grid for the recognized shape family ============
   n_nodes <- shape$n_segments + 1
   decreasing_x <- body$rpos[1, 1] > body$rpos[1, ncol(body$rpos)]
   x_nodes <- body$rpos[1, ]
@@ -579,6 +609,7 @@ segmentize <- function(x1, x0) {
   z_nodes <- rep(0, n_nodes)
   x_center <- mean(range(body$rpos[1, ]))
 
+  # Evaluate the canonical radius profile for the requested shape ==============
   radius_nodes <- switch(
     shape_class,
     Sphere = {
@@ -634,6 +665,7 @@ segmentize <- function(x1, x0) {
     }
   )
 
+  # Write the rebuilt DWBA profile back into the object ========================
   body$rpos <- rbind(
     x = x_nodes,
     y = y_nodes,
@@ -651,6 +683,7 @@ segmentize <- function(x1, x0) {
 #' @keywords internal
 #' @noRd
 .dwba_profile_object <- function(object) {
+  # Preserve the historical helper alias used by older code ====================
   .as_dwba_profile(object)
 }
 
@@ -660,6 +693,7 @@ segmentize <- function(x1, x0) {
 #' @keywords internal
 #' @noRd
 .as_krm_profile <- function(object) {
+  # Recover the body and shape metadata used to build the KRM profile ==========
   body <- acousticTS::extract(object, "body")
   shape <- acousticTS::extract(object, "shape_parameters")
   shape_class <- if ("shape" %in% names(shape)) shape$shape else NULL
@@ -672,6 +706,7 @@ segmentize <- function(x1, x0) {
   canonical_shape <- !is.null(shape_class) &&
     shape_class %in% c("Sphere", "ProlateSpheroid", "Cylinder")
 
+  # Preserve noncanonical or already-curved shapes as explicit profiles ========
   if (!canonical_shape || !is_straight_centerline) {
     body$radius <- .shape_radius_profile(
       body = body,
@@ -689,8 +724,10 @@ segmentize <- function(x1, x0) {
     return(object)
   }
 
+  # Rebuild the canonical node grid for the recognized shape family ============
   n_nodes <- shape$n_segments + 1
 
+  # Evaluate the canonical KRM radius profile for the requested shape ==========
   prof <- switch(
     shape_class,
     Sphere = {
@@ -742,6 +779,7 @@ segmentize <- function(x1, x0) {
     }
   )
 
+  # Write the rebuilt KRM profile back into the object =========================
   body$rpos <- rbind(
     x = rev(prof$x),
     w = rev(prof$radius * 2),
@@ -758,6 +796,7 @@ segmentize <- function(x1, x0) {
 #' @keywords internal
 #' @noRd
 .krm_profile_object <- function(object) {
+  # Preserve the historical helper alias used by older code ====================
   .as_krm_profile(object)
 }
 
@@ -775,14 +814,17 @@ segmentize <- function(x1, x0) {
 #' @param n_segments Number of segments in the resampled shape
 #'
 #' @return FLS object with resampled shape
+#' @keywords internal
 #' @noRd
 sdwba_resample <- function(object, n_segments) {
+  # Validate the object class and rebuild its explicit DWBA profile ============
   if (!inherits(object, "FLS")) {
     stop("Object must be of class FLS")
   }
 
   object <- .as_dwba_profile(object)
 
+  # Recover the original profile and build the new x grid ======================
   body <- extract(object, "body")
   orig_rpos <- body$rpos
   orig_x <- orig_rpos[1, ]
@@ -793,9 +835,11 @@ sdwba_resample <- function(object, n_segments) {
     length.out = n_segments + 1
   )
 
+  # Align resampled nodes to existing interior breakpoints when possible =======
   x_nearest <- vapply(orig_x, function(x) which.min(abs(x - x_new)), integer(1))
   x_new[x_nearest[2:(n_orig - 1)]] <- orig_x[2:(n_orig - 1)]
 
+  # Repartition the new grid and interpolate the centerline coordinates ========
   x_new_seg <- segmentize(x_new, orig_x)
   new_rpos <- rbind(x = x_new_seg)
 
@@ -815,6 +859,7 @@ sdwba_resample <- function(object, n_segments) {
     t(rpos_interp)
   )
 
+  # Assign piecewise-constant radii over the new segment layout ================
   new_radius <- numeric(n_segments + 1)
   decreasing <- orig_x[1] > orig_x[length(orig_x)]
   lapply(1:(n_orig - 1), function(i) {
@@ -828,6 +873,7 @@ sdwba_resample <- function(object, n_segments) {
     new_radius[indices] <<- body$radius[i + 1]
   })
 
+  # Rebuild the profile envelopes and update the scatterer slots ===============
   new_rpos <- rbind(
     new_rpos,
     rbind(

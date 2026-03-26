@@ -15,14 +15,17 @@
 #' @keywords internal
 #' @noRd
 .calculate_max_radius <- function(radius, length, length_radius_ratio) {
+  # Return the explicit radius when it is already available ====================
   if (!is.null(radius)) {
     return(radius)
   }
 
+  # Derive the radius from the supplied length-to-radius ratio =================
   if (!is.null(length_radius_ratio)) {
     return(length / length_radius_ratio)
   }
 
+  # Stop when neither radius pathway is available ==============================
   stop(
     "Either 'radius' or 'length_radius_ratio' must be provided.",
     call. = FALSE
@@ -39,6 +42,7 @@
 #' @keywords internal
 #' @noRd
 `%||%` <- function(a, b) {
+  # Return the left-hand value unless it is NULL or NA =========================
   if (!is.null(a) && !is.na(a)) a else b
 }
 
@@ -48,6 +52,7 @@
 #' @keywords internal
 #' @noRd
 `%R%` <- function(x, tol = .Machine$double.eps) {
+  # Collapse purely real complex inputs back onto the numeric scale ============
   if (is.complex(x)) {
     if (all(abs(Im(x)) < tol)) {
       return(Re(x))
@@ -75,23 +80,28 @@
 #' @noRd
 .resolve_param_value <- function(param_name, param_value, batch_by,
                                  batch_values, grid_size, simulation_grid) {
+  # Resolve values from the active batch grid when batching is enabled =========
   if (!is.null(batch_by) && param_name %in% batch_by) {
     idx <- simulation_grid[[paste0(param_name, "_idx")]]
     return(batch_values[[param_name]][idx])
   }
 
+  # Draw one fresh value per realization for stochastic generators =============
   if (is.function(param_value)) {
     return(replicate(grid_size, param_value()))
   }
 
+  # Recycle scalar inputs across the whole simulation grid =====================
   if (length(param_value) == 1) {
     return(rep(param_value, grid_size))
   }
 
+  # Accept vectors that already match the full simulation size =================
   if (length(param_value) == grid_size) {
     return(param_value)
   }
 
+  # Reject ambiguous vector lengths before model construction ==================
   sim_type <- if (is.null(batch_by)) "realizations" else "batched realizations"
   stop(
     sprintf(
@@ -107,8 +117,14 @@
 # Accessor functions
 ################################################################################
 ################################################################################
-#' Primary accessor function for extracting specific features and layers from
-#' Scatterer objects
+#' Extract nested components, slots, or matrix/vector fields from package objects
+#'
+#' @description
+#' Convenience accessor for reaching into `Scatterer` and `Shape` objects
+#' without spelling out direct slot access repeatedly. `extract()` can also walk
+#' through nested lists, matrices, and named vectors, which makes it useful for
+#' pulling model outputs, component properties, or position-matrix fields from a
+#' common interface.
 #'
 #' @param object Scatterer-class object.
 #' @param feature Feature(s) of interest (e.g. body). This can either be a
@@ -118,15 +134,31 @@
 #' extract the 'x' coordinate of the position matrix ('rpos') from the 'body'
 #' scattering parameters.
 #'
+#' @return The extracted object, slot, list element, matrix row/column, or
+#'   vector element identified by `feature`.
+#'
+#' @examples
+#' obj <- fls_generate(
+#'   shape = sphere(radius_body = 0.01, n_segments = 40),
+#'   density_body = 1045,
+#'   sound_speed_body = 1520
+#' )
+#'
+#' extract(obj, "body")
+#' extract(obj, c("body", "density"))
+#' extract(obj, c("shape_parameters", "shape"))
+#'
 #' @keywords utility
 #' @rdname extract
 #'
 #' @export
 extract <- function(object, feature) {
+  # Initialize the traversal state used to walk the nested object ==============
   layer <- object
   fail_state <- FALSE
   accum_feature <- c()
 
+  # Traverse one feature token at a time through the supported containers ======
   for (sub_layer in feature) {
     accum_feature <- c(accum_feature, sub_layer)
     if (methods::is(layer, "Scatterer")) {
@@ -167,6 +199,7 @@ extract <- function(object, feature) {
     }
   }
 
+  # Report the deepest missing path when traversal fails =======================
   if (fail_state) {
     stop(
       sprintf("No feature '%s' ", sub_layer),
@@ -177,6 +210,7 @@ extract <- function(object, feature) {
       "within the supplied Scatterer object."
     )
   } else {
+    # Return the resolved nested value =========================================
     layer
   }
 }

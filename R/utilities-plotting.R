@@ -13,6 +13,7 @@
 .collect_model_plot_data <- function(object,
                                      x_units = "frequency",
                                      y_units = "TS") {
+  # Recover all model outputs currently stored on the scatterer ================
   models <- extract(object, "model")
   model_names <- names(models)
 
@@ -20,6 +21,7 @@
     stop("ERROR: no model results detected in object.", call. = FALSE)
   }
 
+  # Validate the requested plotting columns for each model output ==============
   required_cols <- unique(c("frequency", x_units, y_units))
   model_frames <- lapply(seq_along(model_names), function(i) {
     model_df <- models[[i]]
@@ -41,12 +43,14 @@
     model_df
   })
 
+  # Combine the model outputs and build the plotting labels ====================
   models_df <- do.call("rbind", model_frames)
   models_df$model <- factor(models_df$model, levels = model_names)
 
   x_axis <- models_df[[x_units]]
   y_axis <- models_df[[y_units]]
 
+  # Return the split vectors and axis labels used by the generic plotter =======
   list(
     x_axis = x_axis,
     y_axis = y_axis,
@@ -77,6 +81,7 @@
                                 nudge_y = 1.05,
                                 nudge_x = 1.01,
                                 mar = c(5.0, 5.5, 2.0, 3.5)) {
+  # Initialize the plotting device and empty plotting window ===================
   graphics::par(ask = FALSE, mar = mar)
 
   graphics::plot(
@@ -108,6 +113,7 @@
     cex.lab = 1.5
   )
 
+  # Draw the x-axis ticks explicitly to avoid scientific notation noise ========
   atx <- seq(
     graphics::par("xaxp")[1], graphics::par("xaxp")[2],
     (graphics::par("xaxp")[2] - graphics::par("xaxp")[1]) /
@@ -120,6 +126,7 @@
     cex.axis = 1.3
   )
 
+  # Draw one result curve per stored model =====================================
   invisible(mapply(
     graphics::lines,
     plot_data$x_mat,
@@ -128,6 +135,7 @@
     lwd = 4
   ))
 
+  # Add the model legend after drawing all curves ==============================
   graphics::legend(
     "bottomright",
     title = expression(bold("TS" ~ "model")),
@@ -157,10 +165,12 @@
                                    unit_map = character(),
                                    digits = 4L,
                                    indent = "    ") {
+  # Return early when there are no properties to format ========================
   if (length(properties) == 0) {
     return(character())
   }
 
+  # Format each named property with the requested labels and units =============
   vapply(names(properties), function(name) {
     value <- properties[[name]]
     label <- if (name %in% names(label_map)) {
@@ -184,6 +194,7 @@
                                        shape_parameters = NULL,
                                        center_x = FALSE,
                                        error_context = "shape") {
+  # Recover the centered x coordinates and nodewise radius profile =============
   x <- .shape_x(position_matrix, row_major = FALSE)
   radius <- .shape_radius_profile(
     position_matrix = position_matrix,
@@ -192,10 +203,12 @@
     error_context = error_context
   )
 
+  # Center the x axis around its midpoint when requested =======================
   if (center_x) {
     x <- x - stats::median(x, na.rm = TRUE)
   }
 
+  # Return the outline coordinates used by downstream plotting helpers =========
   list(x = x, radius = radius)
 }
 
@@ -233,12 +246,14 @@
                                        cex_lab = 1.2,
                                        cex_axis = 1.2,
                                        ...) {
+  # Build the outline coordinates for the supplied axisymmetric geometry =======
   outline <- .axisymmetric_outline_data(
     position_matrix = position_matrix,
     shape_parameters = shape_parameters,
     center_x = center_x
   )
 
+  # Initialize the plot when requested =========================================
   if (init) {
     graphics::par(
       ask = FALSE,
@@ -262,6 +277,7 @@
       ...
     )
   } else {
+    # Add the upper outline onto an existing plotting device ===================
     graphics::lines(
       x = outline$x,
       y = outline$radius,
@@ -271,6 +287,7 @@
     )
   }
 
+  # Draw the mirrored lower outline and the segment guide lines ================
   graphics::lines(
     x = outline$x,
     y = -outline$radius,
@@ -288,7 +305,129 @@
     col = segment_col
   )
 
+  # Return the outline coordinates invisibly ===================================
   invisible(outline)
+}
+
+#' Plot a segmented row-major body outline using the canonical geometry helpers
+#' @param rpos Row-major position matrix.
+#' @param shape_parameters Optional shape-parameter list.
+#' @param nudge_y y-axis nudge factor.
+#' @param aspect_ratio Plot aspect-ratio mode.
+#' @param xlab x-axis label.
+#' @param ylab y-axis label.
+#' @keywords internal
+#' @noRd
+.plot_row_major_segmented_body <- function(rpos,
+                                           shape_parameters = NULL,
+                                           nudge_y = 1.05,
+                                           aspect_ratio = "manual",
+                                           xlab = "Length (m)",
+                                           ylab = "Thickness (m)") {
+  # Canonicalize the row-major geometry and recover its key profiles ===========
+  rpos <- .canonicalize_position_matrix(rpos, row_major = TRUE)
+  x <- .shape_x(rpos, row_major = TRUE)
+  radius <- .shape_radius_profile(
+    position_matrix = rpos,
+    shape_parameters = shape_parameters,
+    row_major = TRUE,
+    error_context = "segmented body plot"
+  )
+  zU <- .geometry_axis_values(
+    rpos,
+    axis = "zU",
+    row_major = TRUE,
+    default = NULL,
+    context = "segmented body plot"
+  )
+  zL <- .geometry_axis_values(
+    rpos,
+    axis = "zL",
+    row_major = TRUE,
+    default = NULL,
+    context = "segmented body plot"
+  )
+  z_center <- if (!is.null(rownames(rpos)) &&
+      any(c("z", "z_body", "z_bladder") %in% rownames(rpos))) {
+    .extract_shape_component_row(
+      rpos,
+      c("z", "z_body", "z_bladder"),
+      default = rep(0, ncol(rpos))
+    )
+  } else if (!is.null(zU) && !is.null(zL)) {
+    (zU + zL) / 2
+  } else {
+    rep(0, length(x))
+  }
+
+  # Resolve the plotting limits for the requested aspect-ratio mode ============
+  if (aspect_ratio == "manual") {
+    vert_lims <- c(
+      min(z_center - radius, na.rm = TRUE) * (1 - (1 - nudge_y)),
+      max(z_center + radius, na.rm = TRUE) * nudge_y
+    )
+  } else {
+    max_x <- max(abs(x), na.rm = TRUE)
+    vert_lims <- c(-max_x * 0.10, max_x * 0.10)
+  }
+
+  # Initialize the plot before drawing each body segment polygon ===============
+  graphics::par(
+    ask = FALSE,
+    oma = c(1, 1, 1, 0),
+    mar = c(5.0, 4.5, 1.5, 2)
+  )
+  graphics::plot(
+    x,
+    z_center,
+    type = "n",
+    xlab = xlab,
+    ylab = ylab,
+    ylim = vert_lims
+  )
+
+  # Draw one quadrilateral per body segment using the local normal direction ===
+  for (i in seq_len(length(x) - 1L)) {
+    x0 <- x[i]
+    y0 <- z_center[i]
+    x1 <- x[i + 1L]
+    y1 <- z_center[i + 1L]
+    r <- radius[i]
+
+    if (!is.finite(r) || r <= 0) {
+      next
+    }
+
+    dx <- x1 - x0
+    dy <- y1 - y0
+    len <- sqrt(dx^2 + dy^2)
+    if (!is.finite(len) || len <= 0) {
+      next
+    }
+
+    px <- -dy / len
+    py <- dx / len
+    xA <- x0 + r * px
+    yA <- y0 + r * py
+    xB <- x1 + r * px
+    yB <- y1 + r * py
+    xC <- x1 - r * px
+    yC <- y1 - r * py
+    xD <- x0 - r * px
+    yD <- y0 - r * py
+
+    graphics::polygon(
+      x = c(xA, xB, xC, xD),
+      y = c(yA, yB, yC, yD),
+      col = grDevices::adjustcolor("gray50", alpha.f = 0.6),
+      border = "black",
+      lwd = 1
+    )
+  }
+
+  # Overlay the segmented centerline and node markers ==========================
+  graphics::lines(x, z_center, lwd = 3, col = "gray90")
+  graphics::points(x, z_center, pch = 1, col = "black", cex = 0.8)
 }
 
 #' Resolve plotting fields for a row-major profile component
@@ -297,8 +436,10 @@
 #' @keywords internal
 #' @noRd
 .component_profile_outline <- function(rpos, radius = NULL) {
+  # Recover the canonical x/z/w fields for the requested component =============
   fields <- .profile_fields(rpos)
 
+  # Fall back to the radius-derived width when no width profile is present =====
   if (is.null(radius)) {
     radius <- .shape_radius_profile(
       position_matrix = rpos,
@@ -312,6 +453,7 @@
     width <- 2 * radius
   }
 
+  # Return the outline fields used by the two-panel component plot =============
   list(
     x = fields$x,
     zU = fields$zU,
@@ -341,6 +483,7 @@
                                            secondary_col = "red",
                                            nudge_y = 1.05,
                                            nudge_x = 1.01) {
+  # Recover the outline data for the primary and optional secondary component ==
   primary <- .component_profile_outline(primary_rpos, radius = primary_radius)
   secondary <- if (!is.null(secondary_rpos)) {
     .component_profile_outline(secondary_rpos, radius = secondary_radius)
@@ -348,11 +491,13 @@
     NULL
   }
 
+  # Resolve the plotting limits shared by both component panels ================
   ylow_lim <- min(primary$zL, na.rm = TRUE) * (1 - (1 - nudge_y))
   yhi_lim <- max(primary$zU, na.rm = TRUE) * nudge_y
   xlow_lim <- min(primary$x, na.rm = TRUE) * (1 - (1 - nudge_x))
   xhi_lim <- max(primary$x, na.rm = TRUE) * nudge_x
 
+  # Initialize the shared two-panel layout =====================================
   graphics::par(
     ask = FALSE,
     mfrow = c(2, 1),
@@ -360,6 +505,7 @@
     oma = c(1.5, 0.5, 0.5, 0)
   )
 
+  # Draw the height panel and optional secondary component =====================
   graphics::plot(
     x = primary$x,
     y = primary$zU,
@@ -404,6 +550,7 @@
     )
   }
 
+  # Draw the width panel and optional secondary component ======================
   left_limit <- -max(primary$half_width, na.rm = TRUE) * (1 - (1 - nudge_y))
   right_limit <- max(primary$half_width, na.rm = TRUE) * (1 - (1 - nudge_y))
 
