@@ -75,18 +75,21 @@
 #' @name VESMS
 #' @aliases vesms VESMS
 #' @docType data
-#' @keywords models acoustics
+#' @keywords models acoustics internal
 NULL
 
 #' @noRd
 .vesms_is_spherical <- function(object) {
+  # Extract the stored shape tag ===============================================
   shape <- extract(object, "shape_parameters")
   shape_tag <- shape$shape %||% ""
+  # Detect sphere-like shape labels ============================================
   any(grepl("sphere", tolower(as.character(shape_tag))))
 }
 
 #' @noRd
 .vesms_validate_outer_radius <- function(radius_viscous, radius_shell) {
+  # Validate the viscous-layer outer radius ====================================
   if (!is.numeric(radius_viscous) ||
       length(radius_viscous) != 1L ||
       !is.finite(radius_viscous) ||
@@ -96,7 +99,7 @@ NULL
       "than the shell radius."
     )
   }
-
+  # Return the validated outer radius ==========================================
   radius_viscous
 }
 
@@ -105,6 +108,7 @@ NULL
                                   density_sw,
                                   density_viscous,
                                   density_gas) {
+  # Compute the neutral-buoyancy denominator ===================================
   denom <- density_viscous - density_sw
   if (!is.finite(denom) || abs(denom) <= sqrt(.Machine$double.eps)) {
     stop(
@@ -113,7 +117,7 @@ NULL
       "'radius_viscous' or 'viscous_thickness' explicitly."
     )
   }
-
+  # Return the implied neutral-buoyancy outer radius ===========================
   radius_gas * (1 + (density_sw - density_gas) / denom)^(1 / 3)
 }
 
@@ -141,6 +145,7 @@ vesms_initialize <- function(object,
                              radius_viscous = NULL,
                              viscous_thickness = NULL,
                              m_limit = NULL) {
+  # Validate the supported scatterer and geometry ==============================
   if (!methods::is(object, "ESS")) {
     stop(
       "VESMS currently requires an elastic-shelled scatterer ('ESS'). Input ",
@@ -151,14 +156,14 @@ vesms_initialize <- function(object,
   if (!.vesms_is_spherical(object)) {
     stop("VESMS currently requires a spherical ESS geometry.")
   }
-
+  # Validate mutually exclusive viscous-layer controls =========================
   if (!is.null(radius_viscous) && !is.null(viscous_thickness)) {
     stop(
       "Specify at most one of 'radius_viscous' or 'viscous_thickness' for ",
       "VESMS."
     )
   }
-
+  # Extract shell and gas-core material properties =============================
   shell <- .extract_material_props(
     extract(object, "shell"),
     sound_speed_sw,
@@ -173,7 +178,7 @@ vesms_initialize <- function(object,
   shell$radius <- extract(object, "shell")$radius
   shell$shell_thickness <- extract(object, "shell")$shell_thickness
   fluid$radius <- extract(object, "fluid")$radius
-
+  # Validate the shell and gas-core geometry/material state ====================
   if (is.null(shell$radius) || is.null(fluid$radius) ||
       !is.finite(shell$radius) || !is.finite(fluid$radius) ||
       fluid$radius >= shell$radius) {
@@ -211,7 +216,7 @@ vesms_initialize <- function(object,
       "finite density and sound speed."
     )
   }
-
+  # Validate the required viscous-layer inputs =================================
   if (missing(sound_speed_viscous) ||
       missing(density_viscous) ||
       missing(shear_viscosity_viscous)) {
@@ -229,7 +234,7 @@ vesms_initialize <- function(object,
       "shear viscosity."
     )
   }
-
+  # Resolve the viscous-layer material properties ==============================
   bulk_viscosity_viscous <- if (is.null(bulk_viscosity_viscous)) {
     shear_viscosity_viscous
   } else {
@@ -239,7 +244,7 @@ vesms_initialize <- function(object,
   if (!is.finite(bulk_viscosity_viscous) || bulk_viscosity_viscous < 0) {
     stop("VESMS requires a finite non-negative bulk viscosity.")
   }
-
+  # Resolve the viscous-layer outer radius =====================================
   radius_viscous <- if (!is.null(radius_viscous)) {
     .vesms_validate_outer_radius(radius_viscous, shell$radius)
   } else if (!is.null(viscous_thickness)) {
@@ -255,7 +260,7 @@ vesms_initialize <- function(object,
       shell$radius
     )
   }
-
+  # Resolve the modal truncation limit =========================================
   m_limit <- if (is.null(m_limit)) {
     pmax(2L, round(wavenumber(frequency, sound_speed_sw) * radius_viscous) + 10L)
   } else {
@@ -274,13 +279,13 @@ vesms_initialize <- function(object,
       "one value per frequency."
     )
   }
-
+  # Build the acoustic bookkeeping table =======================================
   acoustics <- data.frame(
     frequency = frequency,
     k_sw = wavenumber(frequency, sound_speed_sw),
     m_limit = m_limit
   )
-
+  # Store the VESMS initialization recipe ======================================
   methods::slot(object, "model_parameters")$VESMS <- list(
     parameters = list(acoustics = acoustics),
     medium = data.frame(
@@ -297,23 +302,25 @@ vesms_initialize <- function(object,
     shell = shell,
     fluid = fluid
   )
-
+  # Initialize the VESMS output slot ===========================================
   methods::slot(object, "model")$VESMS <- data.frame(
     frequency = frequency,
     sigma_bs = rep(NA_real_, length(frequency))
   )
-
+  # Return the initialized scatterer ===========================================
   object
 }
 
 #' @noRd
 VESMS <- function(object) {
+  # Extract the stored VESMS inputs ============================================
   model <- extract(object, "model_parameters")$VESMS
   acoustics <- model$parameters$acoustics
   medium <- model$medium
   viscous <- model$viscous
   shell <- model$shell
   fluid <- model$fluid
+  # Evaluate the viscous-elastic backscatter kernel ============================
   f_bs <- vesms_backscatter_cpp(
     frequency = acoustics$frequency,
     m_limit = as.integer(acoustics$m_limit),
@@ -332,7 +339,7 @@ VESMS <- function(object) {
     shear_modulus_shell = shell$G,
     lambda_shell = shell$lambda
   )
-
+  # Store the final VESMS results ==============================================
   sigma_bs <- .sigma_bs(f_bs)
 
   methods::slot(object, "model")$VESMS <- data.frame(
