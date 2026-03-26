@@ -142,8 +142,6 @@ arbitrary <- function(...,
 #' @param diameter_units Default is "m" for meters
 #' @examples
 #' sphere(radius_body = 0.01, n_segments = 50)
-#' @usage
-#' sphere(radius_body, n_segments, diameter_units )
 #' @return
 #' Creates position vector for a spherical object of a defined radius.
 #' @seealso \code{\link{Sphere}}
@@ -278,6 +276,100 @@ prolate_spheroid <- function(length_body = NULL,
   ))
 }
 ################################################################################
+# Oblate spheroid
+################################################################################
+#' Creates an oblate spheroid.
+#'
+#' @param length_body Body-axis length (m).
+#' @param semiminor_length Optional alias for body-axis semi-length (m).
+#' @param radius_body Maximum equatorial radius (m).
+#' @param semimajor_length Optional alias for maximum equatorial radius (m).
+#' @param length_radius_ratio Optional ratio input when radius is not explicitly
+#'    known.
+#' @param n_segments Number of segments to discretize object shape. Defaults to
+#'    100 segments.
+#' @param length_units Units for body matrix (defaults to m).
+#' @examples
+#' oblate_spheroid(
+#'   length_body = 0.012, radius_body = 0.01, n_segments = 60
+#' )
+#' oblate_spheroid(
+#'   semiminor_length = 0.006, semimajor_length = 0.01
+#' )
+#' @return
+#' Creates the position vector for an oblate spheroid object of defined
+#'    body-axis length and maximum equatorial radius.
+#' @seealso \code{\link{OblateSpheroid}}
+#'
+#' @keywords shape_generation
+#' @rdname oblate_spheroid
+#' @export
+oblate_spheroid <- function(length_body = NULL,
+                            radius_body = NULL,
+                            length_radius_ratio = NULL,
+                            semimajor_length = NULL,
+                            semiminor_length = NULL,
+                            n_segments = 100,
+                            length_units = "m") {
+  # Allow alternative argument names for clarity ===============================
+  length_val <- if (!is.null(semiminor_length)) {
+    semiminor_length * 2
+  } else {
+    length_body
+  }
+  radius_val <- if (!is.null(semimajor_length)) {
+    semimajor_length
+  } else {
+    radius_body
+  }
+  # Define maximum radius ======================================================
+  max_radius <- .calculate_max_radius(
+    radius_val, length_val, length_radius_ratio
+  )
+  # Validate oblate aspect ratio ===============================================
+  if ((length_val / 2) > max_radius) {
+    stop(
+      "'OblateSpheroid' requires the body-axis semi-length to be <= the ",
+      "equatorial radius. Use 'prolate_spheroid()' when the body axis is the ",
+      "major axis.",
+      call. = FALSE
+    )
+  }
+  # Define along-body node positions ===========================================
+  x_nodes <- seq(0, length_val, length.out = n_segments + 1)
+  # Normalize the node positions for ellipse ==================================
+  axial_half_length <- length_val / 2
+  curved_x_nodes <- (x_nodes - axial_half_length) / axial_half_length
+  # Compute the radius at each node ============================================
+  radius_output <- max_radius * sqrt(pmax(1 - curved_x_nodes^2, 0))
+  # Maintain the historical trailing-to-leading x ordering =====================
+  x_edges <- rev(x_nodes)
+  radius_output <- rev(radius_output)
+  # Generate position matrix ===================================================
+  position_matrix <- cbind(
+    x = x_edges,
+    y = rep(0, length(x_edges)),
+    z = rep(0, length(x_edges)),
+    zU = radius_output,
+    zL = -radius_output
+  )
+  # Generate shape parameters list =============================================
+  shape_parameters <- list(
+    length = max(position_matrix[, 1]),
+    radius = radius_output,
+    semimajor_length = max_radius,
+    semiminor_length = axial_half_length,
+    length_radius_ratio = max(position_matrix[, 1]) / max_radius,
+    n_segments = n_segments,
+    length_units = length_units
+  )
+  # Generate new shape object ==================================================
+  return(methods::new("OblateSpheroid",
+    position_matrix = position_matrix,
+    shape_parameters = shape_parameters
+  ))
+}
+################################################################################
 # Elongated cylinder
 ################################################################################
 #' Creates a cylinder.
@@ -288,14 +380,16 @@ prolate_spheroid <- function(length_body = NULL,
 #'    known.
 #' @param taper Optional input that is the degree of taper to round ends of
 #'    the cylinder.
+#' @param radius_curvature_ratio Optional curvature ratio metadata for rounded
+#'    cylinder-end workflows.
 #' @param n_segments Number of segments to discretize object shape. Defaults to
 #'    1e2 segments.
 #' @param length_units Units (default is meters, "m").
+#' @usage cylinder(length_body, radius_body = NULL, length_radius_ratio = NULL,
+#'   taper = NULL, radius_curvature_ratio = NULL, n_segments = 100,
+#'   length_units = "m")
 #' @examples
 #' cylinder(length_body = 0.05, radius_body = 0.003, n_segments = 80)
-#' @usage
-#' cylinder(length_body, radius_body, length_radius_ratio,
-#' taper, n_segments, length_units)
 #' @return
 #' Creates the position vector for a tapered or untapered cylinder.
 #' @seealso \code{\link{Cylinder}}
@@ -363,9 +457,6 @@ cylinder <- function(length_body,
 #'
 #' @inheritParams cylinder
 #' @param polynomial Polynomial coefficient vector.
-#' @usage
-#' polynomial_cylinder(length_body, radius_body, n_segments, polynomial,
-#' length_units)
 #' @examples
 #' # We can use the polynomial coefficients defined in Smith et al. (2013) to
 #' # define the position vector of a sub-Arctic krill.
@@ -440,6 +531,9 @@ polynomial_cylinder <- function(length_body,
 #'   "prolate_spheroid", length_body = 0.04, radius_body = 0.004
 #' )
 #' create_shape(
+#'   "oblate_spheroid", length_body = 0.012, radius_body = 0.01
+#' )
+#' create_shape(
 #'   "cylinder", length_body = 0.05, radius_body = 0.003
 #' )
 #'
@@ -455,6 +549,9 @@ polynomial_cylinder <- function(length_body,
 #'  \tab \emph{Polynomial cylinder} \tab "polynomial_cylinder" \tab
 #'  \tab length, radius, polynomial \tab
 #'  \code{\link[=polynomial_cylinder]{polynomial_cylinder(...)}}\cr
+#'  \tab \emph{Oblate spheroid} \tab "oblate_spheroid" \tab
+#'  \tab length, radius \tab
+#'  \code{\link[=oblate_spheroid]{oblate_spheroid(...)}}\cr
 #'  \tab \emph{Prolate spheroid} \tab "prolate_spheroid" \tab
 #'  \tab length, radius \tab
 #'  \code{\link[=prolate_spheroid]{prolate_spheroid(...)}}\cr

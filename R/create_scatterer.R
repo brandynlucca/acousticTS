@@ -31,8 +31,10 @@
 #' (\eqn{\theta_body}, radians).
 #' @param theta_bladder Angle of bladder relative to wavefront
 #' (\eqn{\theta_bladder}, radians).
-#' @param theta_units Angular units.
-#' @param length_units Length units.
+#' @param theta_units Compatibility argument. Scatterer constructors now assume
+#'   radians and ignore non-SI alternatives.
+#' @param length_units Compatibility argument. Scatterer constructors now assume
+#'   meters and ignore non-SI alternatives.
 #' @param ID Optional metadata identifier.
 #' @param body_shape Optional pre-built Shape for the body; overrides
 #'   x_body/w_body/zU_body/zL_body if supplied.
@@ -44,6 +46,8 @@
 #' either contrasts (`g_*`, `h_*`) or absolute density/sound-speed values.
 #' Legacy coordinate-vector inputs are retained for backward compatibility and
 #' are converted internally to `Shape` objects before the scatterer is built.
+#' Character-based shape dispatch is deprecated; build the component geometry
+#' first with a `Shape` constructor and then pass the resulting `Shape` object.
 #'
 #' Body/bladder width vectors (`w_body`, `w_bladder`) default to zeros when
 #' missing. Resulting `rpos` matrices always carry the row names
@@ -113,11 +117,13 @@ sbf_generate <- function(x_body = NULL,
                          ID = NULL,
                          body_shape = NULL,
                          bladder_shape = NULL) {
+  # Normalize constructor units ===============================================
   units <- .normalize_scatterer_units(
     theta_units = theta_units,
     length_units = length_units,
     context = "SBF"
   )
+  # Validate body and bladder material inputs =================================
   .validate_component_material_inputs(
     g = g_body,
     density = density_body,
@@ -132,7 +138,7 @@ sbf_generate <- function(x_body = NULL,
     sound_speed = sound_speed_bladder,
     component_label = "bladder"
   )
-
+  # Resolve body and bladder shape inputs =====================================
   body_shape_obj <- .resolve_profile_component_shape(
     shape_obj = body_shape,
     suffix = "body",
@@ -149,6 +155,7 @@ sbf_generate <- function(x_body = NULL,
     zU = zU_bladder,
     zL = zL_bladder
   )
+  # Create body slot ===========================================================
   body <- .build_fluid_profile_component(
     shape_obj = body_shape_obj,
     suffix = "body",
@@ -158,6 +165,7 @@ sbf_generate <- function(x_body = NULL,
     g = g_body,
     h = h_body
   )
+  # Create bladder slot ========================================================
   bladder <- .build_fluid_profile_component(
     shape_obj = bladder_shape_obj,
     suffix = "bladder",
@@ -167,6 +175,7 @@ sbf_generate <- function(x_body = NULL,
     g = g_bladder,
     h = h_bladder
   )
+  # Define shape parameters ====================================================
   shape_parameters <- list(
     body = .shape_common_parameters(
       shape_input = body_shape_obj,
@@ -179,7 +188,9 @@ sbf_generate <- function(x_body = NULL,
     length_units = units$length_units,
     theta_units = units$theta_units
   )
+  # Create metadata field ======================================================
   metadata <- .scatterer_metadata(ID = ID)
+  # Create SBF-class object ====================================================
   return(methods::new("SBF",
     metadata = metadata,
     model_parameters = list(),
@@ -219,8 +230,10 @@ sbf_generate <- function(x_body = NULL,
 #'   geometry (m).
 #' @param z_offset_backbone Dorsoventral translation applied to the backbone
 #'   geometry (m).
-#' @param theta_units Angular units.
-#' @param length_units Length units.
+#' @param theta_units Compatibility argument. Scatterer constructors now assume
+#'   radians and ignore non-SI alternatives.
+#' @param length_units Compatibility argument. Scatterer constructors now assume
+#'   meters and ignore non-SI alternatives.
 #' @param ID Optional metadata identifier.
 #'
 #' @details
@@ -276,11 +289,13 @@ bbf_generate <- function(body_shape,
                          theta_units = "radians",
                          length_units = "m",
                          ID = NULL) {
+  # Normalize constructor units ================================================
   units <- .normalize_scatterer_units(
     theta_units = theta_units,
     length_units = length_units,
     context = "BBF"
   )
+  # Validate body and backbone shape inputs ====================================
   if (!methods::is(body_shape, "Shape")) {
     stop("'body_shape' must be a pre-built Shape object.", call. = FALSE)
   }
@@ -291,7 +306,7 @@ bbf_generate <- function(body_shape,
       call. = FALSE
     )
   }
-
+  # Validate body material properties ==========================================
   .validate_component_material_inputs(
     g = g_body,
     density = density_body,
@@ -299,16 +314,7 @@ bbf_generate <- function(body_shape,
     sound_speed = sound_speed_body,
     component_label = "body"
   )
-
-  translate_shape <- function(shape_obj, x_offset = 0, z_offset = 0) {
-    pos <- acousticTS::extract(shape_obj, "position_matrix")
-    if ("x" %in% colnames(pos)) pos[, "x"] <- pos[, "x"] + x_offset
-    if ("z" %in% colnames(pos)) pos[, "z"] <- pos[, "z"] + z_offset
-    if ("zU" %in% colnames(pos)) pos[, "zU"] <- pos[, "zU"] + z_offset
-    if ("zL" %in% colnames(pos)) pos[, "zL"] <- pos[, "zL"] + z_offset
-    pos
-  }
-
+  # Create body slot ===========================================================
   body_pos <- acousticTS::extract(body_shape, "position_matrix")
   body_shape_params <- acousticTS::extract(body_shape, "shape_parameters")
   body_radius_profile <- .shape_radius_profile(
@@ -325,13 +331,14 @@ bbf_generate <- function(body_shape,
     h = h_body,
     radius = body_radius_profile
   )
-
-  backbone_pos <- translate_shape(
-    backbone_shape,
+  # Create backbone slot =======================================================
+  backbone_pos <- .translate_shape_position_matrix(
+    acousticTS::extract(backbone_shape, "position_matrix"),
     x_offset = x_offset_backbone,
     z_offset = z_offset_backbone
   )
-  backbone_shape_params <- acousticTS::extract(backbone_shape, "shape_parameters")
+  backbone_shape_params <- acousticTS::extract(backbone_shape,
+                                               "shape_parameters")
   backbone <- .build_row_major_elastic_component(
     shape_obj = backbone_shape,
     theta = theta_backbone,
@@ -341,7 +348,7 @@ bbf_generate <- function(body_shape,
     radius = backbone_shape_params$radius,
     position_matrix_override = backbone_pos
   )
-
+  # Define shape parameters ====================================================
   shape_parameters <- list(
     body = .append_shape_specific_parameters(
       list(
@@ -366,9 +373,9 @@ bbf_generate <- function(body_shape,
     length_units = units$length_units,
     theta_units = units$theta_units
   )
-
+  # Create metadata field ======================================================
   metadata <- .scatterer_metadata(ID = ID)
-
+  # Create BBF-class object ====================================================
   return(methods::new("BBF",
     metadata = metadata,
     model_parameters = list(),
@@ -392,8 +399,10 @@ bbf_generate <- function(body_shape,
 #' @param density_sphere Density (kg/m^3).
 #' @param theta_sphere Backscattering direction (Default: pi radians).
 #' @param ID Optional metadata ID input.
-#' @param diameter_units Units for diameter. Defaults to "m".
-#' @param theta_units Units for direction. Defaults to "radians".
+#' @param diameter_units Compatibility argument. `cal_generate()` now assumes
+#'   meters and ignores non-SI alternatives.
+#' @param theta_units Compatibility argument. `cal_generate()` now assumes
+#'   radians and ignores non-SI alternatives.
 #' @param material Material-type for the soldi sphere. See 'Details' built-in
 #' material options.
 #' @examples
@@ -514,9 +523,11 @@ cal_generate <- function(material = "WC",
 # Create FLS-class object
 ################################################################################
 #' Generate a FLS-class object.
-#' @param shape Pre-built `Shape` object describing the target geometry. Legacy
-#'   character dispatch such as `"sphere"` or `"arbitrary"` is retained for
-#'   backward compatibility.
+#' @param shape Pre-built `Shape` object describing the target geometry. If
+#'   omitted, explicit profile coordinates such as `x_body`, `y_body`, and
+#'   `z_body` are treated as the manual geometry pathway. Legacy character
+#'   dispatch such as `"sphere"` or `"arbitrary"` is retained only for backward
+#'   compatibility and is now deprecated.
 #' @param x_body Vector containing x-axis body (m) shape data.
 #' @param y_body Vector containing y-axis body (m) shape data.
 #' @param z_body Vector containing z-axis body (m) shape data.
@@ -534,8 +545,10 @@ cal_generate <- function(material = "WC",
 #' @param theta_body Orientation of the target relative to the transmit source
 #' (\eqn{\theta}). Broadside incidence is considered 90 degrees, or pi/2.
 #' Default value is pi/2; input should be in radians.
-#' @param theta_units Units used for orientation. Defaults to "radians".
-#' @param length_units Units used for position vector. Defaults to "m".
+#' @param theta_units Compatibility argument. Scatterer constructors now assume
+#'   radians and ignore non-SI alternatives.
+#' @param length_units Compatibility argument. Scatterer constructors now assume
+#'   meters and ignore non-SI alternatives.
 #' @param ID Optional metadata entry.
 #' @param ... Additional parameters.
 #' @examples
@@ -557,10 +570,13 @@ cal_generate <- function(material = "WC",
 #' pair. Downstream models derive contrasts automatically when only absolute
 #' values are supplied.
 #'
-#' The older constructor pattern that mixes a shape name with raw coordinate
-#' vectors is still supported for compatibility. Internally, those inputs are
-#' first resolved to a `Shape` object so that the resulting `FLS` object uses
-#' the same geometry contract as the explicit shape-first workflow.
+#' The only supported public geometry paths are now:
+#' 1. supply a pre-built `Shape` object, or
+#' 2. supply explicit profile coordinates directly to the constructor.
+#'
+#' Character-based shape dispatch is retained only as a compatibility pathway
+#' and is now deprecated. Internally, every pathway is resolved to the same
+#' `Shape`-first geometry contract before the `FLS` object is built.
 #'
 #' Scatterer constructors store geometry in meters and orientations in radians.
 #' `length_units` and `theta_units` are retained as compatibility arguments, but
@@ -571,7 +587,7 @@ cal_generate <- function(material = "WC",
 #' @importFrom methods new
 #' @keywords scatterer_type_generation
 #' @export
-fls_generate <- function(shape = "arbitrary",
+fls_generate <- function(shape = NULL,
                          x_body = NULL,
                          y_body = NULL,
                          z_body = NULL,
@@ -587,22 +603,24 @@ fls_generate <- function(shape = "arbitrary",
                          ID = NULL,
                          length_units = "m",
                          theta_units = "radians", ...) {
+  arg_pull <- lapply(as.list(match.call()), eval, parent.frame())
+  # Normalize constructor units ================================================
   units <- .normalize_scatterer_units(
     theta_units = theta_units,
     length_units = length_units,
     context = "FLS"
   )
-  # Collect shape information if provided =====================================
-  if (!methods::is(shape, "Shape") && shape == "arbitrary") {
-    if (
-      (is.null(x_body) && is.null(y_body) && is.null(z_body)) &&
-        is.null(length_body)
-    ) {
-      stop("Body shape is not appropriately parameterized.")
-    }
+  # Validate shape input pathway ===============================================
+  if (!methods::is(shape, "Shape") &&
+      (is.null(shape) || identical(shape, "arbitrary")) &&
+      !.has_explicit_profile_coordinates(arg_pull)) {
+    stop(
+      "Supply 'shape' as a pre-built Shape object, or provide explicit ",
+      "profile coordinates such as x_body/y_body/z_body.",
+      call. = FALSE
+    )
   }
-  # Generate shape position matrix ============================================
-  arg_pull <- lapply(as.list(match.call()), eval, parent.frame())
+  # Resolve body shape input ===================================================
   shape_input <- .resolve_scatterer_shape_input(shape, arg_pull)
   pos_mat <- acousticTS::extract(shape_input, "position_matrix")
   shape_params <- acousticTS::extract(shape_input, "shape_parameters")
@@ -615,7 +633,7 @@ fls_generate <- function(shape = "arbitrary",
       theta_units = units$theta_units
     )
   )
-  # Check material properties length/availability ============================
+  # Validate material properties ==============================================
   .validate_component_material_inputs(
     g = g_body,
     density = density_body,
@@ -623,49 +641,14 @@ fls_generate <- function(shape = "arbitrary",
     sound_speed = sound_speed_body,
     component_label = "body"
   )
-  # g / density length checks -------------------------------------------------
-  if (!is.null(g_body) && length(g_body) > 1 &&
-      length(g_body) != length(shape_input@position_matrix[, 1]) - 1) {
-    stop(
-      paste0(
-        "Vector input for 'g_body' with ", length(g_body),
-        " elements does not match the expected number of segments (",
-        length(shape_input@position_matrix[, 1]) - 1, ")"
-      )
-    )
-  }
-  if (!is.null(density_body) && length(density_body) > 1 &&
-      length(density_body) != length(shape_input@position_matrix[, 1]) - 1) {
-    stop(
-      paste0(
-        "Vector input for 'density_body' with ", length(density_body),
-        " elements does not match the expected number of segments (",
-        length(shape_input@position_matrix[, 1]) - 1, ")"
-      )
-    )
-  }
-  # h / sound speed length checks --------------------------------------------
-  if (!is.null(h_body) && length(h_body) > 1 &&
-      length(h_body) != length(shape_input@position_matrix[, 1]) - 1) {
-    stop(
-      paste0(
-        "Vector input for 'h_body' with ", length(h_body),
-        " elements does not match the expected number of segments (",
-        length(shape_input@position_matrix[, 1]) - 1, ")"
-      )
-    )
-  }
-  if (!is.null(sound_speed_body) && length(sound_speed_body) > 1 &&
-      length(sound_speed_body) != length(shape_input@position_matrix[, 1]) - 1) {
-    stop(
-      paste0(
-        "Vector input for 'sound_speed_body' with ", length(sound_speed_body),
-        " elements does not match the expected number of segments (",
-        length(shape_input@position_matrix[, 1]) - 1, ")"
-      )
-    )
-  }
-  # Create body slot =========================================================
+  .validate_fls_segmented_material_lengths(
+    shape_obj = shape_input,
+    g = g_body,
+    density = density_body,
+    h = h_body,
+    sound_speed = sound_speed_body
+  )
+  # Create body slot ===========================================================
   body <- .build_row_major_fluid_component(
     shape_obj = shape_input,
     theta = theta_body,
@@ -692,10 +675,11 @@ fls_generate <- function(shape = "arbitrary",
 ################################################################################
 #' Generate a GAS-class object
 #'
-#' @inheritParams fls_generate
-#' @param shape Pre-built `Shape` object describing the gas-filled geometry.
-#'   Legacy character dispatch such as `"sphere"` is retained for backward
-#'   compatibility.
+#' @param shape Pre-built `Shape` object describing the gas-filled geometry. If
+#'   omitted, explicit profile coordinates such as `x_body`, `y_body`, and
+#'   `z_body` are treated as the manual geometry pathway. Legacy character
+#'   dispatch such as `"sphere"` is retained only for backward compatibility
+#'   and is now deprecated.
 #' @param radius_body Radius (m). For non-canonical shapes, this would be the
 #' maximum or mean radius at the scatterer midsection.
 #' @param h_fluid Sound speed contrast of fluid relative to surrounding
@@ -703,16 +687,30 @@ fls_generate <- function(shape = "arbitrary",
 #' @param g_fluid Density contrast of fluid relative to surrounding density (g).
 #' @param sound_speed_fluid Optional fluid sound speed (m/s).
 #' @param density_fluid Optional fluid density (m/s).
-#' @param radius_units Diameter units. Defaults to "m".
+#' @param theta_body Orientation of the target relative to the incident wave
+#'   (radians).
+#' @param ID Optional metadata identifier.
+#' @param radius_units Compatibility argument. `gas_generate()` now assumes
+#'   meters and ignores non-SI alternatives.
+#' @param theta_units Compatibility argument. Scatterer constructors now assume
+#'   radians and ignore non-SI alternatives.
 #' @param n_segments Number of body segments.
+#' @usage gas_generate(shape = NULL, radius_body = NULL, h_fluid = 0.22,
+#'   g_fluid = 0.0012, sound_speed_fluid = NULL, density_fluid = NULL,
+#'   theta_body = pi/2, ID = NULL, radius_units = "m",
+#'   theta_units = "radians", n_segments = 100, ...)
+#' @param ... Additional manual profile arguments or legacy canonical shape
+#'   arguments used by the compatibility geometry pathway, such as `x_body`,
+#'   `y_body`, `z_body`, `radius_body`, `length_body`, or `taper`.
 #' @examples
 #' shape_gas <- sphere(radius_body = 0.01, n_segments = 60)
 #' gas_generate(shape = shape_gas, g_fluid = 0.0012, h_fluid = 0.22)
 #' @details
-#' The preferred workflow is to supply a pre-built `Shape` object and then
-#' describe the internal gas by either contrasts (`g_fluid`, `h_fluid`) or
-#' absolute density/sound-speed values (`density_fluid`, `sound_speed_fluid`).
-#' Legacy character-based shape dispatch remains available for compatibility.
+#' The preferred workflow is to supply a pre-built `Shape` object or explicit
+#' profile coordinates and then describe the internal gas by either contrasts
+#' (`g_fluid`, `h_fluid`) or absolute density/sound-speed values
+#' (`density_fluid`, `sound_speed_fluid`). Character-based shape dispatch
+#' remains available only as a compatibility pathway and is now deprecated.
 #'
 #' Scatterer constructors store geometry in meters and orientations in radians.
 #' `radius_units` and `theta_units` are retained as compatibility arguments, but
@@ -726,7 +724,8 @@ fls_generate <- function(shape = "arbitrary",
 #' @importFrom methods new
 #' @keywords scatterer_type_generation
 #' @export
-gas_generate <- function(shape = "sphere",
+gas_generate <- function(shape = NULL,
+                         radius_body = NULL,
                          h_fluid = 0.2200,
                          g_fluid = 0.0012,
                          sound_speed_fluid = NULL,
@@ -736,15 +735,18 @@ gas_generate <- function(shape = "sphere",
                          radius_units = "m",
                          theta_units = "radians",
                          n_segments = 100, ...) {
+  # Normalize constructor units ================================================
   units <- .normalize_scatterer_units(
     theta_units = theta_units,
     radius_units = radius_units,
     context = "GAS"
   )
+  # Validate fluid material inputs =============================================
   call_args <- names(as.list(match.call(expand.dots = FALSE)))
   h_supplied <- "h_fluid" %in% call_args
   g_supplied <- "g_fluid" %in% call_args
-  c_supplied <- "sound_speed_fluid" %in% call_args && !is.null(sound_speed_fluid)
+  c_supplied <- "sound_speed_fluid" %in%
+    call_args && !is.null(sound_speed_fluid)
   rho_supplied <- "density_fluid" %in% call_args && !is.null(density_fluid)
   .validate_component_material_inputs(
     g = if (g_supplied) g_fluid else NULL,
@@ -754,10 +756,10 @@ gas_generate <- function(shape = "sphere",
     component_label = "fluid",
     require_one = FALSE
   )
-
-  # Collect shape information if provided ======================================
+  # Resolve body shape input ===================================================
   arg_pull <- lapply(as.list(match.call()), eval, parent.frame())
   shape_input <- .resolve_scatterer_shape_input(shape, arg_pull)
+  # Create metadata field ======================================================
   metadata <- .scatterer_metadata(ID = ID)
   # Create body shape field ====================================================
   body <- .build_column_major_fluid_component(
@@ -768,6 +770,7 @@ gas_generate <- function(shape = "sphere",
     g = if (rho_supplied) NULL else g_fluid,
     h = if (c_supplied) NULL else h_fluid
   )
+  # Define shape parameters ====================================================
   shape_parameters <- .shape_common_parameters(
     shape_input = shape_input,
     requested_shape = shape,
@@ -791,9 +794,11 @@ gas_generate <- function(shape = "sphere",
 ################################################################################
 #' Generate an ESS-class object
 #' @inheritParams fls_generate
-#' @param shape Pre-built `Shape` object describing the outer shell geometry.
-#'   Legacy character dispatch such as `"sphere"` is retained for backward
-#'   compatibility.
+#' @param shape Pre-built `Shape` object describing the outer shell geometry. If
+#'   omitted, explicit shell profile coordinates such as `x_body`, `y_body`,
+#'   and `z_body` are treated as the manual geometry pathway. Legacy character
+#'   dispatch such as `"sphere"` is retained only for backward compatibility and
+#'   is now deprecated.
 #' @param radius_shell Radius of shell (m).
 #' @param shell_thickness Optional shell thickness (m).
 #' @param g_fluid Optional density contrast for fluid-like body.
@@ -811,11 +816,11 @@ gas_generate <- function(shape = "sphere",
 #' @param theta_shell Object orientation relative to incident sound wave.
 #' @details
 #' The preferred workflow is to build the shell geometry first as a `Shape`
-#' object and pass it through `shape`. Legacy constructor pathways that mix a
-#' shape name with raw coordinates or canonical size arguments remain supported
-#' for backward compatibility. Material properties for both the shell and the
-#' inner fluid may be supplied either as contrasts or as absolute values, but
-#' each property pair must use only one representation.
+#' object and pass it through `shape`, or to supply explicit shell profile
+#' coordinates directly. Character-based shape dispatch remains available only
+#' as a compatibility pathway and is now deprecated. Material properties for
+#' both the shell and the inner fluid may be supplied either as contrasts or as
+#' absolute values, but each property pair must use only one representation.
 #'
 #' Scatterer constructors store geometry in meters and orientations in radians.
 #' `length_units` and `theta_units` are retained as compatibility arguments, but
@@ -840,7 +845,7 @@ gas_generate <- function(shape = "sphere",
 #' @importFrom methods new
 #' @keywords scatterer_type_generation
 #' @export
-ess_generate <- function(shape = "sphere",
+ess_generate <- function(shape = NULL,
                          x_body = NULL,
                          y_body = NULL,
                          z_body = NULL,
@@ -862,86 +867,33 @@ ess_generate <- function(shape = "sphere",
                          ID = NULL,
                          theta_units = "radians",
                          length_units = "m") {
+  # Normalize constructor units ================================================
   units <- .normalize_scatterer_units(
     theta_units = theta_units,
     length_units = length_units,
     context = "ESS"
   )
+  # Create metadata field ======================================================
   metadata <- .scatterer_metadata(ID = ID)
-  # Create container for different position matrices ===========================
-  rpos <- list()
-  # Create shape fields ========================================================
-  if (methods::is(shape, "Shape")) {
-    rpos[["shell"]] <- shape
-  } else {
-    arg_pull <- arg_pull <- lapply(as.list(match.call()), eval, parent.frame())
-    # Build shell shape --------------------------------------------------------
-    if (shape == "arbitrary") {
-      rpos[["shell"]] <- arbitrary(
-        x_body = x_body,
-        y_body = y_body,
-        z_body = z_body,
-        radius_body = radius_shell
-      )
-    } else {
-      # Reuse shape resolver for shell
-      shell_call <- arg_pull
-      shell_call$radius_body <- radius_shell
-      rpos[["shell"]] <- .resolve_scatterer_shape_input(shape, shell_call)
-      # Optional inner fluid shape when thickness provided
-      if (!is.null(shell_thickness)) {
-        fluid_call <- arg_pull
-        fluid_call$radius_body <- radius_shell - shell_thickness
-        rpos[["fluid"]] <- .resolve_scatterer_shape_input(shape, fluid_call)
-      }
-    }
-  }
-  # Assign elastic properties ==================================================
-  elastic_params <- Filter(
+  # Resolve shell and fluid shape inputs =======================================
+  arg_pull <- lapply(as.list(match.call()), eval, parent.frame())
+  rpos <- Filter(
     Negate(is.null),
-    list(E = E, nu = nu, G = G, K = K)
+    .resolve_ess_shape_components(
+      shape = shape,
+      arguments = arg_pull,
+      radius_shell = radius_shell,
+      shell_thickness = shell_thickness,
+      x_body = x_body,
+      y_body = y_body,
+      z_body = z_body
+    )
   )
-  # Iterate through to calculate the requisite parameters ++++++++++++++++++++++
-  repeat {
-    param_len <- length(elastic_params)
-    if (is.null(elastic_params$nu)) {
-      elastic_params$nu <- tryCatch(
-        pois(elastic_params$K, elastic_params$E, elastic_params$G),
-        error = function(e) NULL
-      )
-    }
-    if (is.null(elastic_params$K)) {
-      elastic_params$K <- tryCatch(
-        bulk(elastic_params$E, elastic_params$G, elastic_params$nu),
-        error = function(e) NULL
-      )
-    }
-    if (is.null(elastic_params$E)) {
-      elastic_params$E <- tryCatch(
-        young(elastic_params$K, elastic_params$G, elastic_params$nu),
-        error = function(e) NULL
-      )
-    }
-    if (is.null(elastic_params$G)) {
-      elastic_params$G <- tryCatch(
-        shear(elastic_params$K, elastic_params$E, elastic_params$nu),
-        error = function(e) NULL
-      )
-    }
-    if (is.null(elastic_params$lambda)) {
-      elastic_params$lambda <- tryCatch(
-        lame(
-          elastic_params$K, elastic_params$E, elastic_params$G,
-          elastic_params$nu
-        ),
-        error = function(e) NULL
-      )
-    }
-    if (length(elastic_params) == param_len) break
-  }
-  # Handle material properties =================================================
+  # Assign elastic properties ==================================================
+  elastic_params <- .complete_elastic_moduli(E = E, G = G, K = K, nu = nu)
+  # Initialize material property containers ====================================
   material_properties <- list()
-  # Validate parameter combinations ++++++++++++++++++++++++++++++++++++++++++++
+  # Validate shell and fluid material inputs ===================================
   .validate_component_material_inputs(
     g = g_shell,
     density = density_shell,
@@ -958,7 +910,7 @@ ess_generate <- function(shape = "sphere",
     component_label = "fluid",
     require_one = FALSE
   )
-  # Shell material properties ++++++++++++++++++++++++++++++++++++++++++++++++++
+  # Define shell material properties ===========================================
   material_properties[["shell"]] <- c(
     Filter(
       Negate(is.null),
@@ -969,7 +921,7 @@ ess_generate <- function(shape = "sphere",
     ),
     elastic_params
   )
-  # Fluid material properties ++++++++++++++++++++++++++++++++++++++++++++++++++
+  # Define fluid material properties ===========================================
   material_properties[["fluid"]] <- Filter(
     Negate(is.null),
     list(
@@ -977,7 +929,6 @@ ess_generate <- function(shape = "sphere",
       h = h_fluid, sound_speed = sound_speed_fluid
     )
   )
-
   # Finalize shell slot ========================================================
   shell <- c(
     list(
@@ -1008,21 +959,9 @@ ess_generate <- function(shape = "sphere",
     ),
     material_properties[["fluid"]]
   )
-  # Shape parameters field =====================================================
+  # Define shape parameters ====================================================
   normalize_ess_shape_params <- function(params) {
-    if (is.null(params$diameter)) {
-      if (!is.null(params$diameter_shape)) {
-        params$diameter <- params$diameter_shape
-      } else if (!is.null(params$radius)) {
-        radius_vals <- params$radius
-        params$diameter <- if (length(radius_vals) == 1) {
-          radius_vals * 2
-        } else {
-          max(radius_vals, na.rm = TRUE) * 2
-        }
-      }
-    }
-    params
+    .normalize_shape_diameter(params)
   }
 
   shell_shape_params <- c(
@@ -1062,31 +1001,51 @@ ess_generate <- function(shape = "sphere",
 ################################################################################
 # Helper function
 ################################################################################
-#' Filter shape arguments
+#' Resolve shape-specific class assignment
 #' @param shape_fun Shape-generating function.
 #' @param arguments Input functions that will parameterize the shape-generating
 #' function via 'shape_fun'.
-#' @return Filtered argument list.
+#' @return Shape-class object.
 #'
 #' @keywords internal
 #' @noRd
 .resolve_shape <- function(shape_fun, arguments) {
+  # Pass if already Shape-class ================================================
   if (methods::is(shape_fun, "Shape")) {
     return(shape_fun)
   }
-  # Resolve function object if character supplied
-  fun_obj <- if (is.character(shape_fun)) get(shape_fun, mode = "function") else shape_fun
-  shape_name <- if (is.character(shape_fun)) shape_fun else deparse(substitute(shape_fun))
+  # Resolve function object if character supplied [LEGACY] =====================
+  fun_obj <- if (is.character(shape_fun)) {
+    get(shape_fun, mode = "function")
+  } else {
+    shape_fun
+  }
+  shape_name <- if (is.character(shape_fun)) {
+    shape_fun
+  } else {
+    deparse(substitute(shape_fun))
+  }
+  # Validate kwargs ============================================================
   .validate_shape_requirements(shape_name, arguments)
   if (shape_fun != "arbitrary") {
     true_args <- .filter_shape_args(fun_obj, arguments)
   } else {
     true_args <- arguments
   }
+
   do.call(fun_obj, true_args)
 }
 
+#' Validate Shape-class-specific kwargs
+#' @param shape_name Name of proposed Shape-class.
+#' @param arguments Input functions that will parameterize the shape-generating
+#' function via 'shape_fun'.
+#' @return Shape-class object.
+#'
+#' @keywords internal
+#' @noRd
 .validate_shape_requirements <- function(shape_name, arguments) {
+  # Format inputs to get Shape-class generator =================================
   name <- tolower(shape_name)
   missing_arg <- function(key) {
     if (!(key %in% names(arguments))) return(TRUE)
@@ -1094,6 +1053,7 @@ ess_generate <- function(shape = "sphere",
     is.null(value) || (is.atomic(value) && all(is.na(value)))
   }
   stop_missing <- function(msg) stop(msg, call. = FALSE)
+  # Toggle through the valid Shape-classes =====================================
   switch(
     name,
     sphere = {
@@ -1106,17 +1066,43 @@ ess_generate <- function(shape = "sphere",
         stop_missing("Cylinder requires 'length_body'.")
       }
       if (missing_arg("radius_body") && missing_arg("length_radius_ratio")) {
-        stop_missing("Cylinder requires either 'radius_body' or 'length_radius_ratio'.")
+        stop_missing(
+          "Cylinder requires either 'radius_body' or 'length_radius_ratio'."
+        )
       }
     },
     prolate_spheroid = {
-      length_missing <- missing_arg("length_body") && missing_arg("semimajor_length")
-      radius_missing <- missing_arg("radius_body") && missing_arg("semiminor_length")
+      length_missing <- missing_arg("length_body") &&
+        missing_arg("semimajor_length")
+      radius_missing <- missing_arg("radius_body") &&
+        missing_arg("semiminor_length")
       if (length_missing) {
-        stop_missing("Prolate spheroid requires 'length_body' or 'semimajor_length'.")
+        stop_missing(
+          "Prolate spheroid requires 'length_body' or 'semimajor_length'."
+        )
       }
       if (radius_missing && missing_arg("length_radius_ratio")) {
-        stop_missing("Prolate spheroid requires 'radius_body', 'semiminor_length', or 'length_radius_ratio'.")
+        stop_missing(
+          "Prolate spheroid requires 'radius_body', 'semiminor_length', or ",
+          "'length_radius_ratio'."
+        )
+      }
+    },
+    oblate_spheroid = {
+      length_missing <- missing_arg("length_body") &&
+        missing_arg("semiminor_length")
+      radius_missing <- missing_arg("radius_body") &&
+        missing_arg("semimajor_length")
+      if (length_missing) {
+        stop_missing(
+          "Oblate spheroid requires 'length_body' or 'semiminor_length'."
+        )
+      }
+      if (radius_missing && missing_arg("length_radius_ratio")) {
+        stop_missing(
+          "Oblate spheroid requires 'radius_body', 'semimajor_length', or ",
+          "'length_radius_ratio'."
+        )
       }
     },
     polynomial_cylinder = {
@@ -1137,6 +1123,14 @@ ess_generate <- function(shape = "sphere",
   )
 }
 
+#' Filter shape arguments
+#' @param shape_fun Shape-generating function.
+#' @param arguments Input functions that will parameterize the shape-generating
+#' function via 'shape_fun'.
+#' @return Filtered argument list.
+#'
+#' @keywords internal
+#' @noRd
 .filter_shape_args <- function(shape_fun, arguments) {
   # ============================================================================
   # Get argument names
