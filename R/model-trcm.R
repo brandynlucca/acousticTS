@@ -69,7 +69,7 @@
 #' @name TRCM
 #' @aliases trcm TRCM
 #' @docType data
-#' @keywords models acoustics
+#' @keywords models acoustics internal
 NULL
 
 #' Initialize Scatterer-class object for the two-ray model
@@ -151,6 +151,9 @@ trcm_initialize <- function(object,
   )
 }
 
+#' Helper function for handling the straight-cylinder form for TRCM.
+#' @keywords internal
+#' @noRd
 .trcm_straight <- function(k1, k2a, l, a, r, I, theta_shift) {
   # Calculate wavenumber-length and -radius products ===========================
   k1l <- k1 * l
@@ -166,6 +169,9 @@ trcm_initialize <- function(object,
     r * sinc_directivity * I_term
 }
 
+#' Helper function for handling the Fresnel integration for equivalent length
+#' @keywords internal
+#' @noRd
 .trcm_equivalent_length_fresnel <- function(k1, l, a, rho_c) {
   # Get the maximum curvature ==================================================
   gamma_max <- l / (2 * rho_c)
@@ -178,12 +184,12 @@ trcm_initialize <- function(object,
   }
   # Integration is done over all k1 ++++++++++++++++++++++++++++++++++++++++++++
   lebc_scalar <- function(k1, A, B, a, lower, upper) {
-    real_part <- integrate(
+    real_part <- stats::integrate(
       function(x) Re(integrand(x, k1, A, B, a)),
       lower,
       upper
     )$value
-    imag_part <- integrate(
+    imag_part <- stats::integrate(
       function(x) Im(integrand(x, k1, A, B, a)),
       lower,
       upper
@@ -202,10 +208,16 @@ trcm_initialize <- function(object,
   )
 }
 
+#' Helper function for handling the bent cylinder stationary phase
+#' @keywords internal
+#' @noRd
 .trcm_equivalent_length_stationary_phase <- function(lambda, l, rho_c) {
   sqrt(rho_c * lambda / 2) * exp(1i * pi / 4)
 }
 
+#' Helper function for handling the bent-cylinder form for TRCM.
+#' @keywords internal
+#' @noRd
 .trcm_curved <- function(
     k1, k2a, lambda, l, a, rho_c, r, I, theta_shift, stationary_phase
   ) {
@@ -222,6 +234,11 @@ trcm_initialize <- function(object,
   lebc * .trcm_straight(k1, k2a, l, a, r, I, theta_shift) / l
 }
 
+#' Calculates the theoretical TS of a fluid-like straight or bent cylinder at a
+#' given frequency using the two-ray path finite cylinder model.
+#'
+#' @param object FLS-class scatterer.
+#' @noRd
 TRCM <- function(object) {
   # Extract model parameters ===================================================
   model <- acousticTS::extract(object, "model_parameters")$TRCM

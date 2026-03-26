@@ -315,7 +315,7 @@ psms_initialize <- function(object,
   )
   # Compute body parameters ====================================================
   body_params <- list(
-    # Prolate spheroidal coordinate 'xi'++++++++++++++++++++++++++++++++++++++++
+    # Prolate spheroidal coordinate 'xi' +++++++++++++++++++++++++++++++++++++++
     xi = 1 / sqrt(
       1 - (scatterer_shape$radius / (scatterer_shape$length / 2))^2
     ),

@@ -171,7 +171,7 @@ fcms_initialize <- function(object,
   )
   # Compute body parameters ====================================================
   body_params <- list(
-    # Prolate spheroidal coordinate 'xi'++++++++++++++++++++++++++++++++++++++++
+    # Prolate spheroidal coordinate 'xi' +++++++++++++++++++++++++++++++++++++++
     length_body = scatterer_shape$length,
     # Radius 'radius' ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     radius_body = scatterer_shape$radius,
