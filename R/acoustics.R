@@ -5,16 +5,16 @@
 # GENERIC ACOUSTIC VARIABLES
 ################################################################################
 ################################################################################
-#' Calculate the acoustic wavenumber (\eqn{k}) for a given frequency and sound 
+#' Calculate the acoustic wavenumber (\eqn{k}) for a given frequency and sound
 #' speed.
-#' 
+#'
 #' @description
-#' Calculates the acoustic wavenumber (\eqn{k}) for a given frequency and sound 
+#' Calculates the acoustic wavenumber (\eqn{k}) for a given frequency and sound
 #' speed in water. The wavenumber is defined as:
 #' \deqn{k = \frac{2\pi f}{c}}
-#' where \eqn{f} is the frequency (Hz) and \eqn{c} is the sound speed 
+#' where \eqn{f} is the frequency (Hz) and \eqn{c} is the sound speed
 #' (\eqn{ms^{-1}}).
-#' The wavenumber describes the spatial frequency of a sound wave and is 
+#' The wavenumber describes the spatial frequency of a sound wave and is
 #' fundamental in acoustic calculations.
 #'
 #' @param sound_speed Sound speed (c, \eqn{m~s^{-1}})
@@ -25,7 +25,7 @@
 #' @export
 wavenumber <- function(frequency, sound_speed) 2 * pi * frequency / sound_speed
 ################################################################################
-#' Calculates the linear backscattering coefficient (\eqn{\sigma_\text{bs}}) 
+#' Calculates the linear backscattering coefficient (\eqn{\sigma_\text{bs}})
 #' from the linear scattering length/coefficient, \eqn{f_\text{bs}}.
 #' @param f_bs Linear scattering length (m), or related expression
 #' @return
@@ -38,9 +38,9 @@ wavenumber <- function(frequency, sound_speed) 2 * pi * frequency / sound_speed
 #' Convert between logarithmic (dB) and linear domains for backscatter values.
 #'
 #' @description
-#' The `linear` function converts a value from the logarithmic (dB) domain to 
-#' the linear domain, while the `db` function converts a value from the linear 
-#' domain to the logarithmic (dB) domain. These are commonly used for target 
+#' The `linear` function converts a value from the logarithmic (dB) domain to
+#' the linear domain, while the `db` function converts a value from the linear
+#' domain to the logarithmic (dB) domain. These are commonly used for target
 #' strength (TS) and backscattering coefficient (\eqn{\sigma_{bs}}) conversions.
 #'
 #' The conversions are defined as:
@@ -48,13 +48,13 @@ wavenumber <- function(frequency, sound_speed) 2 * pi * frequency / sound_speed
 #' \deqn{\text{db}(x) = c \log_c(x)}
 #' where \eqn{c} is the coefficient (default 10).
 #'
-#' @param value Numeric value to convert. For `linear`, this is a logarithmic 
-#' value (e.g., dB TS); for `db`, this is a linear value (e.g., 
+#' @param value Numeric value to convert. For `linear`, this is a logarithmic
+#' value (e.g., dB TS); for `db`, this is a linear value (e.g.,
 #' \eqn{\sigma_{bs}}).
-#' @param coefficient Optional. Numeric coefficient (base) for the logarithm. 
+#' @param coefficient Optional. Numeric coefficient (base) for the logarithm.
 #' Default is 10.
 #' @return
-#' For `linear`, returns the value converted to the linear domain. For `db`, 
+#' For `linear`, returns the value converted to the linear domain. For `db`,
 #' returns the value converted to the logarithmic (dB) domain.
 #' @rdname linear
 #' @export
@@ -103,17 +103,17 @@ transmission_coefficient <- function(interface1, interface2, mode = "DWBA") {
   2 * Z2 / (Z1 + Z2)
 }
 ################################################################################
-#' Calculate she compressibility (\eqn{\kappa}) of a scattering 
+#' Calculate she compressibility (\eqn{\kappa}) of a scattering
 #' boundary/interface.
-#' 
+#'
 #' @description
-#' Calculates the compressibility contrast (\eqn{\kappa}) between a scattering 
+#' Calculates the compressibility contrast (\eqn{\kappa}) between a scattering
 #' interface and the surrounding medium. Compressibility is defined as:
 
 #' \deqn{
 #'  K = \frac{1}{\rho c^2}
 #' }
-#' where \eqn{\rho} is density (\eqn{kg~m^{-3}}) and \eqn{c} is sound speed 
+#' where \eqn{\rho} is density (\eqn{kg~m^{-3}}) and \eqn{c} is sound speed
 #' (\eqn{m~s^{-1}}).
 #'
 #' The compressibility contrast is then:
@@ -121,15 +121,15 @@ transmission_coefficient <- function(interface1, interface2, mode = "DWBA") {
 #'  \kappa = \frac{K_2 - K_1}{K_1}
 #' }
 #'
-#' where \eqn{K_1} is the compressibility of the medium and \eqn{K_2} is that 
+#' where \eqn{K_1} is the compressibility of the medium and \eqn{K_2} is that
 #' of the target interface.
 #'
-#' @param medium Dataframe object containing density (\eqn{kgm^{-3}}) and 
-#' sound speed (\eqn{ms^{-1}}) values for a fluid medium external to a 
+#' @param medium Dataframe object containing density (\eqn{kgm^{-3}}) and
+#' sound speed (\eqn{ms^{-1}}) values for a fluid medium external to a
 #' scattering interface (e.g., seawater).
-#' @param target Dataframe object containing density (\eqn{kgm^{-3}}) and 
+#' @param target Dataframe object containing density (\eqn{kgm^{-3}}) and
 #' sound speed (\eqn{ms^{-1}}) values for a target boundary.
-#' 
+#'
 #' @return Compressibility contrast (\eqn{\kappa}), dimensionless.
 #' @export
 compressibility <- function(medium, target) {
@@ -161,22 +161,22 @@ rho <- function(medium, target) {
 ################################################################################
 ################################################################################
 #' @title Calculate the Poisson's ratio (\eqn{\nu})
-#' 
+#'
 #' @description
-#' Calculates Poisson's ratio (\eqn{\nu}) from two of the three other elastic 
-#' moduli: bulk modulus (K), Young's modulus (E), or shear modulus (G). 
+#' Calculates Poisson's ratio (\eqn{\nu}) from two of the three other elastic
+#' moduli: bulk modulus (K), Young's modulus (E), or shear modulus (G).
 #' Assumes 3D material properties.
 #'
 #' The relationships used are:
 #' \deqn{\nu = \frac{E}{2G} - 1}
 #' \deqn{\nu = \frac{3K - 2G}{2(3K + G)}}
 #' \deqn{\nu = \frac{3K - E}{6K}}
-#' 
+#'
 #' @param K Bulk modulus (K, Pa).
 #' @param E Young's modulus (E, Pa).
 #' @param G Shear modulus (Pa).
 #' @return Poisson's ratio (\eqn{\nu}), dimensionless.
-#' 
+#'
 #' @keywords elastic
 #' @rdname pois
 #' @encoding UTF-8
@@ -205,7 +205,7 @@ pois <- function(K = NULL, E = NULL, G = NULL) {
 }
 ################################################################################
 #' Calculate the bulk modulus (K).
-#' 
+#'
 #' @description
 #' Calculates the bulk modulus (K) from two of the three other elastic moduli:
 #' Young's modulus (E), shear modulus (G), or Poisson's ratio (\eqn{\nu}).
@@ -215,13 +215,13 @@ pois <- function(K = NULL, E = NULL, G = NULL) {
 #' \deqn{K = \frac{E G}{3(3G - E)}}
 #' \deqn{K = \frac{2G(1 + \nu)}{3(1 - 2\nu)}}
 #' \deqn{K = \frac{E}{3(1 - 2\nu)}}
-#' 
+#'
 #' @param E Young's modulus (Pa).
 #' @param G Shear modulus (Pa).
 #' @param nu Poisson's ratio (Dimensionless).
-#' 
+#'
 #' @return Bulk modulus (K, Pa).
-#' 
+#'
 #' @encoding UTF-8
 #' @keywords elastic
 #' @rdname bulk
@@ -250,7 +250,7 @@ bulk <- function(E = NULL, G = NULL, nu = NULL) {
 }
 ################################################################################
 #' Calculate Young's modulus (E).
-#' 
+#'
 #' @description
 #' Calculates Young's modulus (E) from two of the three other elastic moduli:
 #' bulk modulus (K), shear modulus (G), or Poisson's ratio (\eqn{\nu}).
@@ -260,13 +260,13 @@ bulk <- function(E = NULL, G = NULL, nu = NULL) {
 #' \deqn{E = \frac{9KG}{3K + G}}
 #' \deqn{E = 3K(1 - 2\nu)}
 #' \deqn{E = 2G(1 + \nu)}
-#' 
+#'
 #' @param K Bulk modulus (Pa).
 #' @param G Shear modulus (Pa).
 #' @param nu Poisson's ratio (Dimensionless).
-#' 
+#'
 #' @return Young's modulus (E, Pa).
-#' 
+#'
 #' @encoding UTF-8
 #' @keywords elastic
 #' @rdname young
@@ -295,23 +295,23 @@ young <- function(K = NULL, G = NULL, nu = NULL) {
 }
 ################################################################################
 #' Calculate the shear modulus (G)
-#' 
+#'
 #' @description
-#' #' Calculates the shear modulus (G) from two of the three other elastic 
-#' moduli: bulk modulus (K), Young's modulus (E), or Poisson's ratio 
+#' #' Calculates the shear modulus (G) from two of the three other elastic
+#' moduli: bulk modulus (K), Young's modulus (E), or Poisson's ratio
 #' (\eqn{\nu}). Assumes 3D material properties.
 #'
 #' The relationships used are:
 #' \deqn{G = \frac{3KE}{9K - E}}
 #' \deqn{G = \frac{3K(1 - 2\nu)}{2(1 + \nu)}}
 #' \deqn{G = \frac{E}{2(1 + \nu)}}
-#' 
+#'
 #' @param K Bulk modulus (Pa).
 #' @param E Young's modulus (Pa).
 #' @param nu Poisson's ratio (Dimensionless).
-#' 
+#'
 #' @return Shear modulus (G, Pa).
-#' 
+#'
 #' @encoding UTF-8
 #' @keywords elastic
 #' @rdname shear
@@ -341,10 +341,10 @@ shear <- function(K = NULL, E = NULL, nu = NULL) {
 ################################################################################
 #' @encoding UTF-8
 #' @title Calculate Lam&eacute;'s first parameter (\eqn{\lambda})
-#' 
+#'
 #' @description
-#' Calculates Lam&eacute;'s first parameter (\eqn{\lambda}) from two of the 
-#' four other elastic moduli: bulk modulus (K), Young's modulus (E), shear 
+#' Calculates Lam&eacute;'s first parameter (\eqn{\lambda}) from two of the
+#' four other elastic moduli: bulk modulus (K), Young's modulus (E), shear
 #' modulus (G), or Poisson's ratio (\eqn{\nu}). Assumes 3D material properties.
 #'
 #' The relationships used are:
@@ -354,7 +354,7 @@ shear <- function(K = NULL, E = NULL, nu = NULL) {
 #' \deqn{\lambda = \frac{3K\nu}{1 + \nu}}
 #' \deqn{\lambda = \frac{3K(3K - E)}{9K - E}}
 #' \deqn{\lambda = \frac{G(E - 2G)}{3G - E}}
-#' 
+#'
 #' @param K Bulk modulus (Pa).
 #' @param E Young's modulus (Pa).
 #' @param G Shear modulus (Pa).
@@ -414,6 +414,12 @@ lame <- function(K = NULL, E = NULL, G = NULL, nu = NULL) {
 #'   \code{"calibration"} / \code{"soems"} (\code{\link{SOEMS}}).
 #' @param verbose Prints current procedural step occurring from model
 #' initialization to calculating TS. Defaults to FALSE.
+#' @param model_args Optional named list of per-model argument bundles. Each
+#'   list name should match one of the requested model names
+#'   case-insensitively, and each value should be either a named list or a
+#'   named atomic vector of arguments to apply only to that model. When the
+#'   same argument is supplied both through `...` and through
+#'   `model_args[[model_name]]`, the model-specific entry takes precedence.
 #' @param ... Additional optional model inputs/parameters.
 #' @details
 #' This is the main high-level entry point for running target-strength models in
@@ -447,35 +453,60 @@ lame <- function(K = NULL, E = NULL, G = NULL, nu = NULL) {
 #'   solution.
 #'   \item \code{\link{VESMS}} for the viscous-elastic spherical scattering
 #'   model applied to gas-filled elastic shells with an external viscous layer.
+#'   \item \code{\link{TMM}} for the single-target transition-matrix family.
 #'   \item \code{\link{TRCM}} for the two-ray cylindrical model.
 #'   \item \code{\link{SOEMS}} for the solid elastic calibration-sphere model,
 #'   accessed through \code{"calibration"} or \code{"soems"}.
 #' }
 #'
-#' Model-specific inputs are passed through \code{...}. For example, some models
-#' require a \code{boundary} argument, \code{HPA} uses a \code{method}
-#' argument, and several models expose additional numerical controls. The legacy
-#' curved-entry wrappers \code{"dwba_curved"} and \code{"sdwba_curved"} are
-#' deprecated; apply \code{\link{brake}} to the scatterer first, then run
-#' \code{"dwba"} or \code{"sdwba"} on the curved object.
+#' Model-specific inputs are usually passed through \code{...}. For example,
+#' some models require a \code{boundary} argument, \code{HPA} uses a
+#' \code{method} argument, and several models expose additional numerical
+#' controls. When several models are requested together, shared arguments may be
+#' supplied through \code{...} and per-model overrides may be supplied through
+#' \code{model_args}. This is useful when different models should share the same
+#' seawater properties but only one of them needs an extra stochastic or
+#' numerical control:
+#'
+#' \preformatted{
+#' target_strength(
+#'   object,
+#'   frequency,
+#'   model = c("dwba", "sdwba"),
+#'   density_sw = 1026,
+#'   sound_speed_sw = 1478,
+#'   model_args = list(
+#'     sdwba = list(phase_sd_init = 0.77)
+#'   )
+#' )
+#' }
+#'
+#' The legacy curved-entry wrappers \code{"dwba_curved"} and
+#' \code{"sdwba_curved"} are deprecated; apply \code{\link{brake}} to the
+#' scatterer first, then run \code{"dwba"} or \code{"sdwba"} on the curved
+#' object. Model names are normalized internally, so case-insensitive inputs
+#' such as \code{"DWBA"} and \code{"dwba"} resolve to the same family.
 #' @seealso
-#' \code{\link{DWBA}}, \code{\link{BBFM}}, \code{\link{PCDWBA}}, \code{\link{SDWBA}}, \code{\link{FCMS}},
-#' \code{\link{BCMS}}, \code{\link{ECMS}}, \code{\link{HPA}}, \code{\link{KRM}}, \code{\link{PSMS}},
-#' \code{\link{SPHMS}}, \code{\link{ESSMS}}, \code{\link{VESMS}}, \code{\link{TRCM}},
-#' \code{\link{SOEMS}}
+#' \code{\link{DWBA}}, \code{\link{BBFM}}, \code{\link{PCDWBA}},
+#' \code{\link{SDWBA}}, \code{\link{FCMS}}, \code{\link{BCMS}},
+#' \code{\link{ECMS}}, \code{\link{HPA}}, \code{\link{KRM}}, \code{\link{PSMS}},
+#' \code{\link{SPHMS}}, \code{\link{ESSMS}}, \code{\link{VESMS}},
+#' \code{\link{TMM}}, \code{\link{TRCM}}, \code{\link{SOEMS}}
 #' @export
-target_strength <- function(object, frequency, model, verbose = FALSE, ...) {
+target_strength <- function(object,
+                            frequency,
+                            model,
+                            verbose = FALSE,
+                            model_args = NULL,
+                            ...) {
   # Validate inputs ============================================================
   if (missing(object)) stop("Scattering object ('object') is required")
   if (missing(frequency)) stop("Frequency (Hz) ('frequency') is required")
   if (missing(model)) stop("Target strength model ('model') is required")
-
   # Store the object in a variable that won't conflict with model internals ====
   target_object <- object
-
   # Capture all arguments including ... ========================================
-  arg_pull <- list(object = target_object, frequency = frequency, ...)
-
+  shared_args <- list(object = target_object, frequency = frequency, ...)
   # Handle model names (convert to uppercase for consistency) ==================
   model <- tolower(model)
   ts_model <- gsub("(_.*)", "\\L\\1", paste0(toupper(model)), perl = TRUE)
@@ -486,17 +517,15 @@ target_strength <- function(object, frequency, model, verbose = FALSE, ...) {
   tolower(ts_model),
   ts_model
   )
-
+  model_args <- .normalize_target_strength_model_args(model_args, model)
   # Initialize objects to input model parameters ==============================
   idx <- 1
   repeat {
     if (idx > length(model)) {
       break
     }
-
     # Pull correct formal arguments ==========================================
     model_name <- paste0(model[idx], "_initialize")
-
     # Check if initialization function exists ================================
     if (!exists(model_name)) {
       stop(
@@ -506,13 +535,14 @@ target_strength <- function(object, frequency, model, verbose = FALSE, ...) {
         model[idx]
       )
     }
-
     # Filter out inappropriate parameters ====================================
+    arg_pull <- .merge_target_strength_args(
+      shared_args,
+      model_args[[model[idx]]]
+    )
     true_args <- .filter_shape_args(model_name, arg_pull)
-
     # Initialize ==============================================================
     object_copy <- do.call(model_name, true_args)
-
     # Store model parameters and results =====================================
     methods::slot(
       target_object,
@@ -539,14 +569,12 @@ target_strength <- function(object, frequency, model, verbose = FALSE, ...) {
 
     idx <- idx + 1
   }
-
   # Run the models =============================================================
   idx <- 1
   repeat {
     if (idx > length(model)) {
       break
     }
-
     if (verbose) {
       cat(
         "Beginning TS modeling via", toupper(model[idx]),
@@ -556,12 +584,10 @@ target_strength <- function(object, frequency, model, verbose = FALSE, ...) {
         ), "\n"
       )
     }
-
     # Check if model function exists ===========================================
     if (!exists(ts_model[idx])) {
       stop("Model function ", ts_model[idx], " not found")
     }
-
     # Calculate modeled TS using do.call instead of eval(parse(...)) ===========
     target_object <- do.call(ts_model[idx], list(object = target_object))
 
@@ -571,175 +597,110 @@ target_strength <- function(object, frequency, model, verbose = FALSE, ...) {
         extract(target_object, "metadata")$ID
       ), "complete.\n\n")
     }
-
     idx <- idx + 1
   }
-
   # Output object ==============================================================
   return(target_object)
 }
 
-#' Calculate ka matrix for Goodman and Stern (1962) model
-#' @param frequency Frequency vector
-#' @param sound_speed_sw Seawater sound speed
-#' @param sound_speed_fluid Fluid sound speed
-#' @param sound_speed_longitudinal Longitudinal sound speed in shell
-#' @param sound_speed_transversal Transversal sound speed in shell
-#' @param radius_shell Shell radius
-#' @param radius_fluid Fluid radius
-#' @return Matrix of ka values
+#' Normalize per-model argument bundles supplied to target_strength()
 #' @keywords internal
 #' @noRd
-.calculate_ka_matrix <- function(frequency, sound_speed_sw,
-                                 sound_speed_fluid, sound_speed_longitudinal,
-                                 sound_speed_transversal,
-                                 radius_shell, radius_fluid) {
-  k1 <- wavenumber(frequency, sound_speed_sw)
-  k3 <- wavenumber(frequency, sound_speed_fluid)
-  kL <- wavenumber(frequency, sound_speed_longitudinal)
-  kT <- wavenumber(frequency, sound_speed_transversal)
-
-  ka_matrix <- rbind(
-    k1a_shell = k1 * radius_shell,
-    kLa_shell = kL * radius_shell,
-    kTa_shell = kT * radius_shell,
-    k1a_fluid = k1 * radius_fluid,
-    kTa_fluid = kT * radius_fluid,
-    kLa_fluid = kL * radius_fluid,
-    k3a_fluid = k3 * radius_fluid
-  )
-
-  ka_matrix
-}
-################################################################################
-#' Solve Expansion Coefficients for a Liquid-Filled Spheroidal Scatterer
-#'
-#' @description
-#' Computes the modal expansion coefficients \eqn{A_{mn}} for acoustic 
-#' scattering from a liquid-filled prolate spheroidal body using a truncated 
-#' singular value decomposition (SVD) pseudoinverse approach.
-#'
-#' @details
-#' This function solves the linear system arising from matching boundary
-#' conditions at the surface of a liquid-filled spheroidal scatterer. The
-#' expansion coefficients  \eqn{A_{mn}} relate the scattered field to the
-#' incident field through the spheroidal wave function expansion.
-#' @keywords internal
-#' @noRd
-.psms_adaptive_n_integration <- function(
-  chi_sw,
-  chi_body,
-  m_max,
-  n_max,
-  precision
-) {
-  chi_max <- pmax(abs(chi_sw), abs(chi_body))
-  step_n <- 8L
-  floor_n <- if (identical(precision, "quad")) 32L else 24L
-  cap_n <- 96L
-
-  # The overlap quadrature must resolve the same angular content that drives the
-  # retained PSMS modal system. Use the hard truncation ceilings as the main
-  # difficulty scale, with a smaller reduced-frequency bonus for the sharper
-  # high-chi oscillations that appear in the angular products.
-  modal_difficulty <- 0.75 * n_max + 0.25 * m_max
-  chi_bonus <- if (identical(precision, "quad")) {
-    0.10 * sqrt(pmax(chi_max, 1))
-  } else {
-    0.05 * sqrt(pmax(chi_max, 1))
+.normalize_target_strength_model_args <- function(model_args,
+                                                  requested_models) {
+  # Gather models to validate kwargs ===========================================
+  requested_models <- unique(tolower(requested_models))
+  # Revert to default values ===================================================
+  if (is.null(model_args)) {
+    out <- vector("list", length(requested_models))
+    names(out) <- requested_models
+    return(out)
   }
-
-  n_integration <- step_n * ceiling((modal_difficulty + chi_bonus) / step_n)
-  n_integration <- pmax(floor_n, pmin(cap_n, n_integration))
-
-  as.integer(n_integration)
-}
-
-.prolate_spheroidal_kernels_fixed <- function(
-  acoustics,
-  body,
-  medium,
-  boundary_method,
-  n_integration = 96,
-  precision = "double",
-  adaptive = FALSE
-) {
-  # Generate nodes and weights for quadrature ==================================
-  quad_pts <- gauss_legendre(n = n_integration, a = -1, b = 1)
-  # Calculate the linear scattering coefficient, fbs ===========================
-  prolate_spheroid_fbs(
-    acoustics, body, medium, quad_pts, precision, boundary_method, adaptive,
-    FALSE
-  )
-}
-
-.prolate_spheroidal_kernels_adaptive <- function(
-  acoustics,
-  body,
-  medium,
-  boundary_method,
-  precision = "double",
-  adaptive = TRUE
-) {
-  n_by_freq <- .psms_adaptive_n_integration(
-    chi_sw = acoustics$chi_sw,
-    chi_body = acoustics$chi_body,
-    m_max = acoustics$m_max,
-    n_max = acoustics$n_max,
-    precision = precision
-  )
-  f_bs <- complex(length = nrow(acoustics))
-
-  for (n_integration_i in sort(unique(n_by_freq))) {
-    idx <- which(n_by_freq == n_integration_i)
-    f_bs[idx] <- .prolate_spheroidal_kernels_fixed(
-      acoustics = acoustics[idx, , drop = FALSE],
-      body = body,
-      medium = medium,
-      boundary_method = boundary_method,
-      n_integration = n_integration_i,
-      precision = precision,
-      adaptive = adaptive
+  # This internal helper only handles lists ====================================
+  if (!is.list(model_args)) {
+    stop("'model_args' must be a named list.", call. = FALSE)
+  }
+  # Validate specific kwargs ===================================================
+  model_arg_names <- names(model_args)
+  if (is.null(model_arg_names) || any(!nzchar(model_arg_names))) {
+    stop("'model_args' must be a named list keyed by model name.",
+         call. = FALSE)
+  }
+  # Check for argname conflicts ================================================
+  normalized_names <- tolower(model_arg_names)
+  if (anyDuplicated(normalized_names)) {
+    stop(
+      "'model_args' contains duplicate model entries after case normalization.",
+      call. = FALSE
+    )
+  }
+  # Superfluous kwargs check ===================================================
+  unknown_models <- setdiff(normalized_names, requested_models)
+  if (length(unknown_models) > 0) {
+    stop(
+      "'model_args' contains entries for model(s) not requested in 'model': ",
+      paste(sprintf("'%s'", unknown_models), collapse = ", "),
+      ".",
+      call. = FALSE
+    )
+  }
+  # Push model-specific kwarg lists into vector and coerce into expected format
+  out <- vector("list", length(requested_models))
+  names(out) <- requested_models
+  for (i in seq_along(model_args)) {
+    out[[normalized_names[i]]] <- .coerce_target_strength_model_argset(
+      model_args[[i]],
+      model_name = normalized_names[i]
     )
   }
 
-  attr(f_bs, "n_integration") <- n_by_freq
-  f_bs
+  out
 }
 
-prolate_spheroidal_kernels <- function(
-  acoustics,
-  body,
-  medium,
-  boundary_method,
-  n_integration = 96,
-  precision = "double",
-  adaptive = FALSE
-) {
-  if (isTRUE(adaptive) && identical(boundary_method, "Amn_fluid")) {
-    return(
-      .prolate_spheroidal_kernels_adaptive(
-        acoustics = acoustics,
-        body = body,
-        medium = medium,
-        boundary_method = boundary_method,
-        precision = precision,
-        adaptive = adaptive
+#' Coerce one target_strength() per-model argument entry into a named list
+#' @keywords internal
+#' @noRd
+.coerce_target_strength_model_argset <- function(x, model_name) {
+  # Return empty set ===========================================================
+  if (is.null(x)) {
+    return(list())
+  }
+  # Compile and validate list-supplied kwargs ==================================
+  if (is.list(x)) {
+    if (!is.null(names(x)) && any(!nzchar(names(x)))) {
+      stop(
+        "The 'model_args' entry for model '", model_name,
+        "' must use named arguments only.",
+        call. = FALSE
       )
-    )
+    }
+    return(Filter(Negate(is.null), x))
+  }
+  # Non-list named kwarg converted to list =====================================
+  if (is.atomic(x) && !is.null(names(x)) && all(nzchar(names(x)))) {
+    return(as.list(x))
   }
 
-  if (is.null(n_integration) || (length(n_integration) == 1 && is.na(n_integration))) {
-    n_integration <- 96L
-  }
-
-  .prolate_spheroidal_kernels_fixed(
-    acoustics = acoustics,
-    body = body,
-    medium = medium,
-    boundary_method = boundary_method,
-    n_integration = n_integration,
-    precision = precision,
-    adaptive = adaptive
+  stop(
+    "The 'model_args' entry for model '", model_name,
+    "' must be either a named list or a named atomic vector.",
+    call. = FALSE
   )
+}
+
+#' Merge shared and per-model argument bundles for target_strength()
+#' @keywords internal
+#' @noRd
+.merge_target_strength_args <- function(shared_args,
+                                        model_specific_args = NULL) {
+  # Consolidate model-specific and list-grouped model kwargs ===================
+  out <- shared_args
+  if (is.null(model_specific_args) || length(model_specific_args) == 0) {
+    return(out)
+  }
+  for (nm in names(model_specific_args)) {
+    out[[nm]] <- model_specific_args[[nm]]
+  }
+
+  out
 }
