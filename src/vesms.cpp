@@ -10,6 +10,9 @@ static const double vesms_pi = M_PI;
 static const double vesms_tol = 1e-12;
 static const std::complex<double> vesms_i(0.0, 1.0);
 
+// Solve one dense modal boundary system. Try the fast direct solver first,
+// then the full Armadillo solve, and finally fall back to a pseudoinverse if
+// the matrix is close to singular.
 static arma::cx_vec vesms_solve_system_impl(const arma::cx_mat& M, const arma::cx_vec& F) {
     arma::cx_vec sol;
 
@@ -35,6 +38,9 @@ static arma::cx_vec vesms_solve_system_impl(const arma::cx_mat& M, const arma::c
     );
 }
 
+// Assemble and solve the coupled viscous-layer / elastic-shell / gas-core
+// boundary system for one spherical harmonic order. The returned value is the
+// exterior scattered-field coefficient for that mode.
 static std::complex<double> vesms_single_mode_impl(
     int order,
     double omega,
@@ -53,6 +59,8 @@ static std::complex<double> vesms_single_mode_impl(
     double shear_modulus_shell,
     double lambda_shell
 ) {
+    // Convert each physical layer into the compressional and shear
+    // wavenumbers used in the modal boundary conditions.
     double k1 = omega / sound_speed_sw;
     double phi2 = bulk_viscosity_viscous + 4.0 * shear_viscosity_viscous / 3.0;
     std::complex<double> kc2 = (omega / sound_speed_viscous) *
@@ -69,6 +77,9 @@ static std::complex<double> vesms_single_mode_impl(
     double ks3 = omega * std::sqrt(density_shell / shear_modulus_shell);
     double k4 = omega / sound_speed_gas;
 
+    // Precompute the spherical Bessel/Hankel values and derivatives at every
+    // layer boundary so the linear-system assembly below mirrors the analytic
+    // boundary equations directly.
     std::complex<double> j_k1_R2 = js_single_complex_impl(order, k1 * radius_viscous);
     std::complex<double> jd_k1_R2 = js_deriv_single_complex_impl(order, k1 * radius_viscous, 1);
     std::complex<double> h_k1_R2 = hs_single_complex_impl(order, k1 * radius_viscous);
@@ -134,6 +145,8 @@ static std::complex<double> vesms_single_mode_impl(
     std::complex<double> jd_k4_R4 = js_deriv_single_complex_impl(order, k4 * radius_gas, 1);
 
     if (order == 0) {
+        // The monopole case decouples from the tangential/shear terms, so a
+        // reduced 6 x 6 system is sufficient.
         arma::cx_mat M(6, 6, arma::fill::zeros);
         arma::cx_vec F(6, arma::fill::zeros);
 
@@ -176,6 +189,8 @@ static std::complex<double> vesms_single_mode_impl(
         return vesms_solve_system_impl(M, F)(0);
     }
 
+    // Higher orders retain both compressional and shear contributions in the
+    // viscous layer and elastic shell, which yields the full 10 x 10 system.
     arma::cx_mat M(10, 10, arma::fill::zeros);
     arma::cx_vec F(10, arma::fill::zeros);
     double mm = -static_cast<double>(order) * (order + 1.0);
@@ -317,6 +332,8 @@ ComplexVector vesms_backscatter_cpp(
         double k_sw = 2.0 * vesms_pi * frequency[i] / sound_speed_sw;
         std::complex<double> f_bs(0.0, 0.0);
 
+        // Sum the retained modal coefficients into the far-field backscatter
+        // amplitude for this frequency.
         for (int m = 0; m <= m_limit[i]; ++m) {
             std::complex<double> A1 = vesms_single_mode_impl(
                 m,

@@ -7,6 +7,8 @@
 // ============================================================================
 template<typename T>
 struct SmnResult {
+    // Angular values S_mn(c, eta) and their eta-derivatives evaluated at the
+    // requested arguments.
     std::vector<T> value;
     std::vector<T> derivative;
 };
@@ -34,6 +36,8 @@ SmnResult<T> Smn_scalar(
     out.value.resize(narg);
     out.derivative.resize(narg);
     
+    // profcn stores the angular output in degree-major blocks for each eta.
+    // Unpack that layout into plain vectors for the single (m, n) request.
     for (int i = 0; i < narg; ++i) {
         int offset = idx + i * lnum;
         
@@ -70,6 +74,8 @@ SmnResult<T> Smn_scalar(
 // ============================================================================
 template<typename T>
 struct SmnMatrixResult {
+    // Rows correspond to the requested modal combinations, and each row stores
+    // all angular evaluation points for that combination.
     std::vector<std::vector<T>> value;
     std::vector<std::vector<T>> derivative;
 };
@@ -108,8 +114,7 @@ SmnMatrixResult<T> Smn_matrix(
 
     SmnMatrixResult<T> out;
 
-    // ------------------------------------------------------------------
-    // CASE: Scalar (size[m] == size[n] == 1)
+    // Scalar case: evaluate one (m, n) pair at every eta value.
     if (m_len == 1 && n_len == 1) {
         if (n[0] < m[0])
             throw std::invalid_argument("'n' must be >= 'm'.");
@@ -119,8 +124,8 @@ SmnMatrixResult<T> Smn_matrix(
         return out;
     }
 
-    // ------------------------------------------------------------------
-    // CASE: Scalar m, vector n (size[m] == 1 != size[n])
+    // Shared-order case: one m with multiple degrees n. A single profcn call
+    // can serve the whole degree vector.
     if (m_len == 1 && n_len > 1) {
         int m_val = m[0];
         int n_min = *std::min_element(n.begin(), n.end());
@@ -160,8 +165,8 @@ SmnMatrixResult<T> Smn_matrix(
         return out;
     }
 
-    // ------------------------------------------------------------------
-    // CASE: Pairwise vector m, vector n (size[m] > 1 == size[n])
+    // Pairwise case: each m[i] is matched with n[i]. Group by unique m so the
+    // expensive profcn setup can be reused within each order block.
     if (m_len == n_len) {
         for (int i = 0; i < m_len; ++i)
             if (n[i] < m[i])
@@ -221,9 +226,8 @@ SmnMatrixResult<T> Smn_matrix(
         return out;
     }
 
-    // ------------------------------------------------------------------
-    // CASE: Vector m, vector n (size[m] != size[n])
-    // Outer product
+    // Outer-product case: evaluate every requested order against every
+    // requested degree and eta.
     out.value.resize(m_len, std::vector<T>(n_len * eta_len));
     out.derivative.resize(m_len, std::vector<T>(n_len * eta_len));
     for (int i = 0; i < m_len; ++i) {
@@ -283,6 +287,8 @@ Rcpp::List Smn_cpp_to_rcpp_list(
     int n_len,
     int eta_len
 ) {
+    // Convert the templated storage layout back to the matrix/vector shapes
+    // expected by the public R wrapper.
     // Case: scalar m, vector n, scalar eta
     if (m_len == 1 && n_len > 1 && eta_len == 1) {
         Rcpp::NumericVector values(n_len), derivatives(n_len);

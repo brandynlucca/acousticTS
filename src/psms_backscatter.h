@@ -7,24 +7,31 @@
 // ----------------------------------------------------------------------------
 template<typename T>
 struct RadialMatrixResult {
+    // Real radial functions and their xi-derivatives on the retained
+    // spheroidal modal grid.
     std::vector<std::vector<T>> value;
     std::vector<std::vector<T>> derivative;
 };
 
 template<typename T>
 struct RadialComplexMatrixResult {
+    // Complex outgoing/incoming radial functions and derivatives on the same
+    // modal grid.
     std::vector<std::vector<std::complex<T>>> value;
     std::vector<std::vector<std::complex<T>>> derivative;
 };
 
 template<typename T>
 struct ExternalRadialResult {
+    // Exterior incident and scattered radial ingredients evaluated on the body
+    // boundary.
     RadialMatrixResult<T> incident;
     RadialComplexMatrixResult<T> scattering;
 };
 
 template<typename T>
 struct ExternalBoundaryResult {
+    // Exterior angular basis values together with the matching radial terms.
     std::vector<std::vector<T>> smn;
     ExternalRadialResult<T> radial;
 };
@@ -201,6 +208,8 @@ std::vector<std::vector<std::complex<T>>> boundary_coupling_incident_matrix(
     const std::vector<std::vector<T>>& smn_matrix
 ) {
     std::vector<std::vector<std::complex<T>>> result(m_max + 1);
+    // Assemble E^{m(1)} by combining the exterior incident field with the
+    // interior regular field at the boundary.
     for (int m = 0; m <= m_max; ++m) {
         int size = n_max - m + 1;
         std::vector<std::complex<T>> mat(size * size, std::complex<T>(0, 0));
@@ -239,6 +248,8 @@ std::vector<std::vector<std::complex<T>>> boundary_coupling_scattering_matrix(
     const std::vector<std::vector<T>>& smn_matrix
 ) {
     std::vector<std::vector<std::complex<T>>> result(m_max + 1);
+    // Assemble E^{m(3)} by combining the exterior scattered field with the
+    // interior regular field at the boundary.
     for (int m = 0; m <= m_max; ++m) {
         int size = n_max - m + 1;
         std::vector<std::complex<T>> mat(size * size, std::complex<T>(0, 0));
@@ -281,7 +292,8 @@ std::vector<std::vector<std::complex<T>>> simplified_boundary_coupling_incident_
     const std::vector<std::vector<T>>& i1_val_mat,
     const std::vector<std::vector<T>>& i1_der_mat
 ) {
-    // Compute lower trianglular result
+    // The simplified path discards degree coupling and keeps only the diagonal
+    // entries of the incident coupling matrix.
     std::vector<std::vector<std::complex<T>>> lower(m_max + 1);
     for (int m = 0; m <= m_max; ++m) {
         int size = n_max - m + 1;
@@ -333,7 +345,8 @@ std::vector<std::vector<std::complex<T>>> simplified_boundary_coupling_scatterin
     const std::vector<std::vector<T>>& i1_val_mat,
     const std::vector<std::vector<T>>& i1_der_mat
 ) {
-    // Compute lower trianglular result
+    // The simplified path discards degree coupling and keeps only the diagonal
+    // entries of the scattered coupling matrix.
     std::vector<std::vector<std::complex<T>>> lower(m_max + 1);
     for (int m = 0; m <= m_max; ++m) {
         int size = n_max - m + 1;
@@ -390,6 +403,8 @@ std::vector<std::vector<std::complex<T>>> kernel_incident_rhs(
     const std::vector<std::vector<std::complex<T>>>& E1_coupling
 ) {
     std::vector<std::vector<std::complex<T>>> result(m_max + 1);
+    // Collapse the incident kernel into the right-hand side of the modal
+    // system for each retained order m.
     for (int m = 0; m <= m_max; ++m) {
         int size = n_max - m + 1;
         std::vector<std::complex<T>> rhs(size, std::complex<T>(0, 0));
@@ -420,6 +435,31 @@ std::vector<std::vector<std::complex<T>>> kernel_incident_rhs(
 }
 
 template<typename T>
+std::vector<std::vector<std::complex<T>>> kernel_incident_matrix(
+    int m_max,
+    int n_max,
+    const std::vector<std::vector<std::vector<T>>>& expansion_matrix,
+    const std::vector<std::vector<std::complex<T>>>& E1_coupling
+) {
+    std::vector<std::vector<std::complex<T>>> result(m_max + 1);
+    // Build the dense incident-side kernel block for each retained order.
+    for (int m = 0; m <= m_max; ++m) {
+        int size = n_max - m + 1;
+        std::vector<std::complex<T>> mat(size * size, std::complex<T>(0, 0));
+        for (int li = 0; li < size; ++li) {
+            for (int ni = 0; ni < size; ++ni) {
+                int n = m + ni;
+                T alpha = expansion_matrix[m][li][ni];
+                std::complex<T> E1_nl = E1_coupling[m][li * size + ni];
+                mat[li * size + ni] = -imaginary_unit_power<T>(n) * alpha * E1_nl;
+            }
+        }
+        result[m] = mat;
+    }
+    return result;
+}
+
+template<typename T>
 std::vector<std::vector<std::complex<T>>> kernel_scattering_matrix(
     int m_max,
     int n_max,
@@ -428,6 +468,7 @@ std::vector<std::vector<std::complex<T>>> kernel_scattering_matrix(
     const std::vector<std::vector<std::complex<T>>>& E3_coupling
 ) {
     std::vector<std::vector<std::complex<T>>> result(m_max + 1);
+    // Build the dense scattered-side kernel block for each retained order.
     for (int m = 0; m <= m_max; ++m) {
         int size = n_max - m + 1;
         std::vector<std::complex<T>> mat(size * size, std::complex<T>(0, 0));
@@ -474,7 +515,7 @@ std::vector<std::vector<T>> compute_smn_matrix(
     T eta_scalar,
     bool normalize = true
 ) {
-    // Result is (m_max+1) x (n_max+1) matrix, NA (quiet_NaN) where n < m
+    // Result is (m_max+1) x (n_max+1), with quiet_NaN placeholders where n<m.
     std::vector<std::vector<T>> result(
         m_max + 1, std::vector<T>(n_max + 1, std::numeric_limits<T>::quiet_NaN())
     );
@@ -533,7 +574,8 @@ std::vector<std::vector<std::vector<T>>> alpha_integration_coefficient(
             }
         }
 
-        // Build coef_mat (size x size)
+        // Build the overlap matrix that maps interior angular modes onto the
+        // exterior basis at the selected quadrature rule.
         std::vector<std::vector<T>> coef_mat(size, std::vector<T>(size, T(0)));
         for (int li = 0; li < size; ++li) {
             for (int ni = 0; ni < size; ++ni) {
@@ -551,6 +593,7 @@ std::vector<std::vector<std::vector<T>>> alpha_integration_coefficient(
 
 template<typename T>
 struct FullFluidPrepResult {
+    // Full set of precomputed ingredients for the batched fluid/gas solve.
     std::vector<std::vector<T>> smn_body;
     ExternalRadialResult<T> radial_external;
     RadialMatrixResult<T> radial_internal;
@@ -695,6 +738,7 @@ FullFluidPrepResult<T> prepare_full_fluid_boundary_data(
 // -----------------------------------------------------------
 template<typename T>
 struct KernelResult {
+    // Right-hand sides and scattered kernels for the per-order dense solves.
     std::vector<std::vector<std::complex<T>>> rhs;
     std::vector<std::vector<std::complex<T>>> K3_kernel;
 };
@@ -1179,6 +1223,188 @@ std::vector<std::vector<std::complex<T>>> simplified_fluid_Amn_expansion_matrix(
     );
 }
 
+template<typename T>
+std::vector<std::vector<std::complex<T>>> diagonal_tmatrix_blocks_from_expansion(
+    int m_max,
+    int n_max,
+    const std::vector<std::vector<std::complex<T>>>& Amn
+) {
+    std::vector<std::vector<std::complex<T>>> blocks(m_max + 1);
+    // Convert the rectangular A_mn storage into diagonal T-matrix blocks,
+    // since the pressure-release and rigid pathways decouple by degree.
+    for (int m = 0; m <= m_max; ++m) {
+        int size = n_max - m + 1;
+        blocks[m].assign(size * size, std::complex<T>(0, 0));
+        for (int n = m; n <= n_max; ++n) {
+            std::complex<T> val = Amn[m][n];
+            if (is_na_real(val.real()) || is_na_real(val.imag())) {
+                continue;
+            }
+            int idx = n - m;
+            blocks[m][idx * size + idx] = val;
+        }
+    }
+    return blocks;
+}
+
+template<typename T>
+std::vector<std::vector<std::complex<T>>> diagonal_tmatrix_blocks_from_triangular(
+    int m_max,
+    int n_max,
+    const std::vector<std::vector<std::complex<T>>>& Amn_tri
+) {
+    std::vector<std::vector<std::complex<T>>> blocks(m_max + 1);
+    // Convert the lower-triangular storage into square diagonal blocks.
+    for (int m = 0; m <= m_max; ++m) {
+        int size = n_max - m + 1;
+        blocks[m].assign(size * size, std::complex<T>(0, 0));
+        for (int i = 0; i < size; ++i) {
+            std::complex<T> val = Amn_tri[m][i];
+            if (is_na_real(val.real()) || is_na_real(val.imag())) {
+                continue;
+            }
+            blocks[m][i * size + i] = val;
+        }
+    }
+    return blocks;
+}
+
+template<typename T>
+std::vector<std::vector<std::complex<T>>> psms_tmatrix_blocks(
+    int m_max,
+    int n_max,
+    T chi_sw,
+    T chi_body,
+    T xi,
+    T density_body,
+    T density_sw,
+    const std::vector<T>& nodes,
+    const std::vector<T>& weights,
+    const std::string& Amn_method
+) {
+    if (Amn_method == "Amn_fixed_rigid") {
+        return diagonal_tmatrix_blocks_from_expansion<T>(
+            m_max, n_max,
+            fixed_rigid_Amn_expansion_matrix<T>(m_max, n_max, chi_sw, xi)
+        );
+    }
+
+    if (Amn_method == "Amn_pressure_release") {
+        return diagonal_tmatrix_blocks_from_expansion<T>(
+            m_max, n_max,
+            pressure_release_Amn_expansion_matrix<T>(m_max, n_max, chi_sw, xi)
+        );
+    }
+
+    if (Amn_method == "Amn_fluid_simplify") {
+        // For the full fluid and simplified-fluid retained-block routes, keep
+        // all retained diagonal modes active before building the kernels.
+        std::vector<std::vector<T>> smn_active(
+            m_max + 1, std::vector<T>(n_max + 1, std::numeric_limits<T>::quiet_NaN())
+        );
+        for (int m = 0; m <= m_max; ++m) {
+            for (int n = m; n <= n_max; ++n) {
+                smn_active[m][n] = T(1);
+            }
+        }
+        auto radial_external = radial_external_matrices<T>(
+            m_max, n_max, chi_sw, xi, smn_active
+        );
+        return diagonal_tmatrix_blocks_from_triangular<T>(
+            m_max, n_max,
+            simplified_fluid_Amn_triangular<T>(
+                m_max, n_max, chi_sw, chi_body, xi, density_body, density_sw,
+                radial_external
+            )
+        );
+    }
+
+    std::vector<std::vector<T>> smn_active(
+        m_max + 1, std::vector<T>(n_max + 1, std::numeric_limits<T>::quiet_NaN())
+    );
+    for (int m = 0; m <= m_max; ++m) {
+        for (int n = m; n <= n_max; ++n) {
+            smn_active[m][n] = T(1);
+        }
+    }
+    auto radial_external = radial_external_matrices<T>(
+        m_max, n_max, chi_sw, xi, smn_active
+    );
+    auto expansion_matrix = alpha_integration_coefficient<T>(
+        m_max, n_max, chi_sw, chi_body, nodes, weights
+    );
+    auto radial_internal = radial_internal_incident_matrix<T>(
+        m_max, n_max, chi_body, xi
+    );
+    auto E1_coupling = boundary_coupling_incident_matrix<T>(
+        m_max, n_max, density_body, density_sw,
+        radial_external.incident.value, radial_external.incident.derivative,
+        radial_internal.value, radial_internal.derivative,
+        smn_active
+    );
+    auto E3_coupling = boundary_coupling_scattering_matrix<T>(
+        m_max, n_max, density_body, density_sw,
+        radial_external.scattering.value, radial_external.scattering.derivative,
+        radial_internal.value, radial_internal.derivative,
+        smn_active
+    );
+    auto K1_kernel = kernel_incident_matrix<T>(
+        m_max, n_max, expansion_matrix, E1_coupling
+    );
+    auto K3_kernel = kernel_scattering_matrix<T>(
+        m_max, n_max, smn_active, expansion_matrix, E3_coupling
+    );
+
+    return solve_fluid_t_blocks<T>(K1_kernel, K3_kernel);
+}
+
+template<typename T>
+std::complex<T> compute_fbs_from_tmatrix_blocks(
+    int m_max,
+    int n_max,
+    const std::vector<T>& azimuth,
+    const std::vector<std::vector<T>>& smn_body_matrix,
+    const std::vector<std::vector<T>>& smn_scatter_matrix,
+    const std::vector<std::vector<std::complex<T>>>& T_blocks
+) {
+    std::complex<T> fbs_sum(0, 0), c(0, 0);
+
+    // Multiply each retained T-matrix block by the incident angular vector,
+    // then project the result onto the scattered angular basis.
+    for (int m = 0; m <= m_max; ++m) {
+        int size = n_max - m + 1;
+        T nu_m = (m == 0) ? T(1) : T(2);
+
+        for (int li = 0; li < size; ++li) {
+            int ell = m + li;
+            T smn_scatter = smn_scatter_matrix[m][ell];
+            if (is_na_real(smn_scatter)) {
+                continue;
+            }
+
+            std::complex<T> coeff(0, 0);
+            for (int ni = 0; ni < size; ++ni) {
+                int n = m + ni;
+                T smn_incident = smn_body_matrix[m][n];
+                std::complex<T> T_val = T_blocks[m][li * size + ni];
+                if (is_na_real(smn_incident) ||
+                    is_na_real(T_val.real()) || is_na_real(T_val.imag())) {
+                    continue;
+                }
+                coeff += T_val * smn_incident;
+            }
+
+            std::complex<T> term = nu_m * azimuth[m] * smn_scatter * coeff;
+            std::complex<T> y = term - c;
+            std::complex<T> t = fbs_sum + y;
+            c = (t - fbs_sum) - y;
+            fbs_sum = t;
+        }
+    }
+
+    return fbs_sum;
+}
+
 // ============================================================================
 // LINEAR SCATTERING COEFFICIENT
 // ----------------------------------------------------------------------------
@@ -1404,6 +1630,7 @@ std::complex<T> compute_fbs_backscatter_triangular(
 
 template<typename T>
 inline T psms_modal_rel_tol() {
+    // Relative tolerance used by the adaptive modal stopping rule.
     return static_cast<T>(1e-8L);
 }
 
@@ -1416,6 +1643,7 @@ inline __float128 psms_modal_rel_tol<__float128>() {
 
 template<typename T>
 inline T psms_modal_abs_tol() {
+    // Absolute floor used by the adaptive modal stopping rule.
     return static_cast<T>(1e-12L);
 }
 
@@ -1434,6 +1662,8 @@ inline bool psms_modal_band_is_negligible(
     T prev_band_abs,
     T max_band
 ) {
+    // Treat a whole m-band as negligible only after the band has entered the
+    // small-signal regime and stopped changing appreciably.
     if (m < 2 || m >= m_max || prev_band_abs <= T(0)) {
         return false;
     }
@@ -1451,6 +1681,7 @@ inline bool psms_modal_term_is_negligible(
     T prev_term_abs,
     T max_term
 ) {
+    // Apply the same idea within a single m-band to the degree-by-degree tail.
     if (idx < 4 || idx >= max_idx || prev_term_abs <= T(0)) {
         return false;
     }
@@ -1755,6 +1986,8 @@ std::complex<T> psms_backscatter_fluid_adaptive(
             }
 
             if (adaptive) {
+                // Use a cheap proxy to decide whether the modal tail can be
+                // truncated before the dense kernel system is assembled.
                 T max_proxy = T(0);
                 T prev_proxy = T(-1);
                 int n_small_proxy = 0;
@@ -1951,6 +2184,7 @@ std::complex<T> psms_fbs(
     T chi_body,
     T xi,
     T theta_body,
+    T theta_scatter,
     T phi_body,
     T phi_scatter,
     T density_body,
@@ -1962,16 +2196,19 @@ std::complex<T> psms_fbs(
     bool vectorized = false
 ) {
     T eta_body = preccos(theta_body);
+    T eta_scatter = preccos(theta_scatter);
+    T pi_val = preccos(T(-1));
     bool is_backscatter =
+        precabs(theta_scatter - (pi_val - theta_body)) <= T(64) * preceps<T>() &&
         precabs(preccos(phi_body - phi_scatter) + T(1)) <= T(64) * preceps<T>();
 
-    if (Amn_method == "Amn_fixed_rigid") {
+    if (is_backscatter && Amn_method == "Amn_fixed_rigid") {
         return psms_backscatter_fixed_rigid<T>(
             m_max, n_max, chi_sw, xi, eta_body, adaptive
         );
     }
 
-    if (Amn_method == "Amn_pressure_release") {
+    if (is_backscatter && Amn_method == "Amn_pressure_release") {
         return psms_backscatter_pressure_release<T>(
             m_max, n_max, chi_sw, xi, eta_body, adaptive
         );
@@ -2055,7 +2292,9 @@ std::complex<T> psms_fbs(
 
     // Compute azimuth angle factors
     auto azimuth = compute_azimuth<T>(m_max, phi_body, phi_scatter);
-    auto smn_scatter_matrix = reflect_smn_matrix<T>(smn_body_matrix);
+    auto smn_scatter_matrix = compute_smn_matrix<T>(
+        m_max, n_max, chi_sw, eta_scatter, true
+    );
 
     // Compute linear scattering coefficient
     return compute_fbs<T>(

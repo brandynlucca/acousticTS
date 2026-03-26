@@ -11,6 +11,9 @@ using namespace Rcpp;
 
 namespace {
 
+// Carry the geometry-dependent quantities needed by the QUADPACK callback.
+// Precomputing these terms once per frequency avoids rebuilding the same
+// segment metadata every time the integrator samples the interval.
 struct DwbaIntegrandData {
     std::vector<double> a0;
     std::vector<double> da;
@@ -23,6 +26,9 @@ struct DwbaIntegrandData {
     double k_over_h = 0.0;
 };
 
+// Evaluate the cylindrical-Bessel factor that appears in the DWBA line
+// integral. When cos(beta) is close to zero, use the removable limit instead
+// of the raw expression to avoid catastrophic cancellation.
 inline std::complex<double> dwba_bessel_over_cosbeta(double k_over_h,
                                                      double a_s,
                                                      double cos_beta) {
@@ -42,6 +48,9 @@ inline double clamp_unit(double x) {
     return x;
 }
 
+// QUADPACK callback. The input vector x contains the current integration
+// abscissae; on return it is overwritten with either the real or imaginary
+// part of the complex DWBA integrand.
 void dwba_integrand_eval(double *x, int n, void *ex) {
     auto *data = static_cast<DwbaIntegrandData*>(ex);
     int n_seg = static_cast<int>(data->a0.size());
@@ -68,6 +77,8 @@ void dwba_integrand_eval(double *x, int n, void *ex) {
     }
 }
 
+// Thin wrapper around R's QUADPACK entry point so the same adaptive integral
+// can be reused for the real and imaginary parts of the DWBA amplitude.
 double dwba_quadpack_integral(DwbaIntegrandData &data,
                               double rel_tol,
                               double abs_tol,
@@ -144,6 +155,8 @@ ComplexVector dwba_fbs_cpp(NumericMatrix rpos,
     double cos_theta = std::cos(theta);
     double sin_theta = std::sin(theta);
 
+    // Convert the sampled centerline/radius representation into segment-level
+    // differences so the line integral can be evaluated over a unit interval.
     std::vector<double> dx(n_seg), dy(n_seg), dz(n_seg), da(n_seg), seglen(n_seg);
     std::vector<double> x0(n_seg), y0(n_seg), z0(n_seg), a0(n_seg);
 
@@ -164,6 +177,8 @@ ComplexVector dwba_fbs_cpp(NumericMatrix rpos,
     for (int i = 0; i < n_freq; ++i) {
         if (i % 32 == 0) R_CheckUserInterrupt();
 
+        // Build the per-frequency phase and orientation terms that stay fixed
+        // while QUADPACK samples the segment parameter.
         double k = k_sw[i];
         double kx = k * cos_theta;
         double ky = 0.0;
@@ -190,6 +205,8 @@ ComplexVector dwba_fbs_cpp(NumericMatrix rpos,
             data.dphase[j] = (dx[j] * kx + dy[j] * ky + dz[j] * kz) / h;
         }
 
+        // Integrate the real and imaginary parts separately because QUADPACK
+        // works with real-valued callbacks.
         data.imaginary = false;
         double real_part = dwba_quadpack_integral(
             data, rel_tol, abs_tol, subdivisions
@@ -255,6 +272,8 @@ ComplexMatrix dwba_segment_integrals_cpp(NumericMatrix rpos,
     for (int i = 0; i < n_freq; ++i) {
         if (i % 16 == 0) R_CheckUserInterrupt();
 
+        // Rebuild the shared frequency-dependent prefactors once, then let the
+        // callback isolate one segment at a time.
         double k = k_sw[i];
         double kx = k * cos_theta;
         double ky = 0.0;
@@ -282,6 +301,8 @@ ComplexMatrix dwba_segment_integrals_cpp(NumericMatrix rpos,
         }
 
         for (int j = 0; j < n_seg; ++j) {
+            // Restrict the callback to a single segment so the returned matrix
+            // exposes the contribution of each segment to the total amplitude.
             data.segment = j;
             data.imaginary = false;
             double real_part = dwba_quadpack_integral(

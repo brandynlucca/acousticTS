@@ -7,6 +7,8 @@
 // ============================================================================
 template<typename T>
 struct RmnResult {
+    // Real-valued kind-1 and kind-2 radial functions plus validity flags used
+    // when building outgoing/incoming combinations.
     T val1;
     T der1;
     T val2;
@@ -17,6 +19,7 @@ struct RmnResult {
 
 template<typename T>
 struct RadialValue {
+    // Packed real and imaginary radial components for one (m, n) entry.
     T val_real;
     T der_real;
     T val_imag;
@@ -31,6 +34,9 @@ struct RadialValue {
 // combined into outgoing/incoming-wave conventions.
 template<typename T>
 RmnResult<T> Rmn_higher_order(int m, int n, int lnum, T c, T x1) {
+    // profcn returns the first- and second-kind radial functions separately.
+    // Reconstruct those ingredients here so the caller can assemble kinds 3
+    // and 4 as outgoing/incoming combinations.
     int iopnorm = 0, iopang = 0;
     std::vector<T> arg = {T(1)};
     int idx = n - m;
@@ -145,7 +151,8 @@ std::pair<std::complex<T>, std::complex<T>> Rmn_scalar(
             Rd = (*der)[idx] * pwde;
         }
 
-        // Specific numeric stability check for Rmn[2]
+        // Rmn(2) can underflow to a meaningless all-zero pair in extreme
+        // cases. Mark those as invalid instead of letting them propagate.
         if (kind == 2) {
             const T tiny = T(1e-300);
             bool R_bad = !std::isfinite(static_cast<double>(R)) ||
@@ -180,6 +187,8 @@ std::pair<std::complex<T>, std::complex<T>> Rmn_scalar(
 // ============================================================================
 template<typename T>
 struct RmnMatrixResult {
+    // value and derivative use the same modal layout as Smn_matrix: rows are
+    // modal requests and columns are degree or outer-product entries.
     std::vector<std::vector<std::complex<T>>> value;
     std::vector<std::vector<std::complex<T>>> derivative;
 };
@@ -203,6 +212,8 @@ RadialValue<T> extract_radial_from_batch(
     RadialValue<T> out;
 
     if (kind == 1 || kind == 2) {
+        // Real kinds read directly from the profcn storage arrays after the
+        // base-10 exponents have been applied.
         const std::vector<T> *rc, *rdc;
         const std::vector<int> *ie, *ide;
         if (kind == 1) {
@@ -247,7 +258,8 @@ RadialValue<T> extract_radial_from_batch(
         return out;
     }
 
-    // Higher orders - Rmn[3] and Rmn[4]
+    // Higher orders rebuild the outgoing/incoming combinations from the
+    // stored kind-1 and kind-2 components.
     T pw1 = 1;
     if (result1.ir1e.size() > static_cast<size_t>(idx) &&
         !is_na_int(result1.ir1e[idx])) {
@@ -395,8 +407,7 @@ RmnMatrixResult<T> Rmn_matrix(
     out.value.resize(m_len, std::vector<std::complex<T>>(n_len));
     out.derivative.resize(m_len, std::vector<std::complex<T>>(n_len));
 
-    // ------------------------------------------------------------------
-    // CASE: Scalar (size[m] == size[n] == 1)
+    // Scalar case: evaluate one order and one degree.
     if (m_len == 1 && n_len == 1) {
         if (n[0] < m[0])
             throw std::invalid_argument("'n' must be >= 'm'.");
@@ -406,8 +417,7 @@ RmnMatrixResult<T> Rmn_matrix(
         return out;
     }
 
-    // ------------------------------------------------------------------
-    // CASE: Scalar m, vector n (size[m] == 1 != size[n])
+    // Shared-order case: one m with multiple degree requests.
     if (m_len == 1 && n_len > 1) {
         int m_val = m[0];
         int n_min = *std::min_element(n.begin(), n.end());
@@ -443,8 +453,8 @@ RmnMatrixResult<T> Rmn_matrix(
         return out;
     }
 
-    // ------------------------------------------------------------------
-    // CASE: Pairwise vector m, vector n (size[m] > 1 == size[n])
+    // Pairwise case: each m[i] is matched with n[i]. Group by unique m so the
+    // profcn setup can be reused within each order block.
     if (m_len == n_len) {
         for (int i = 0; i < m_len; ++i)
             if (n[i] < m[i])
@@ -485,9 +495,7 @@ RmnMatrixResult<T> Rmn_matrix(
         return out;
     }
 
-    // ------------------------------------------------------------------
-    // CASE: Vector m, vector n (size[m] != size[n])
-    // Outer product
+    // Outer-product case: evaluate every requested order against every degree.
     for (int i = 0; i < m_len; ++i) {
         int m_val = m[i];
         int n_max = *std::max_element(n.begin(), n.end());

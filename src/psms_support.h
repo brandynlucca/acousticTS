@@ -16,6 +16,8 @@ std::vector<T> compute_azimuth(int m_max, T phi_body, T phi_scatter) {
 
 template<typename T>
 inline std::complex<T> imaginary_unit_power(int n) {
+    // Exact powers of i appear throughout the spheroidal modal sums. Evaluate
+    // them algebraically instead of with std::pow.
     switch (((n % 4) + 4) % 4) {
         case 0:
             return std::complex<T>(T(1), T(0));
@@ -37,6 +39,8 @@ inline T extract_angular_value_from_batch(
     int lnum = 0,
     int arg_idx = 0
 ) {
+    // profcn stores angular values plus base-10 exponents. Apply the exponent
+    // immediately so callers always see the physical-scale quantity.
     int offset = idx;
     if (lnum > 0) {
         offset += arg_idx * lnum;
@@ -69,6 +73,8 @@ inline bool is_na_real<__float128>(__float128 x) {
 
 template<typename T>
 inline void scale_profcn_component(std::vector<T>& values, std::vector<int>& exponents) {
+    // Normalize mantissa/exponent pairs in place so downstream code can treat
+    // the arrays as ordinary floating-point values.
     size_t n = std::min(values.size(), exponents.size());
     for (size_t i = 0; i < n; ++i) {
         if (is_na_int(exponents[i])) {
@@ -105,6 +111,7 @@ inline Rcomplex to_Rcomplex(const std::complex<__float128>& z) {
 // faults that can crash the program or the Rcpp interface
 // ============================================================================
 struct ProfcnResultDouble {
+    // Direct mirror of the double-precision profcn output arrays.
     std::vector<double> r1c, r1dc, r2c, r2dc;
     std::vector<int> ir1e, ir1de, ir2e, ir2de, naccr;
     std::vector<double> s1c, s1dc;
@@ -164,6 +171,7 @@ ProfcnResultDouble cprofcn_double(
 // ============================================================================
 #ifdef __GNUC__
 struct ProfcnResultQuad {
+    // Quad-precision mirror of the profcn output arrays.
     std::vector<__float128> r1c, r1dc, r2c, r2dc;
     std::vector<int> ir1e, ir1de, ir2e, ir2de, naccr;
     std::vector<__float128> s1c, s1dc;
@@ -228,6 +236,7 @@ ProfcnResultQuad cprofcn_quad(
 
 template<typename T>
 struct ProfcnBatchResult {
+    // Batched profcn layout for a block of neighboring m values.
     int lnum = 0;
     int narg = 0;
     int m_count = 0;
@@ -361,6 +370,7 @@ inline size_t profcn_batch_radial_offset(
     int m_idx,
     int lnum
 ) {
+    // Radial terms are packed as contiguous m-blocks.
     return static_cast<size_t>(l_idx) + static_cast<size_t>(lnum) * static_cast<size_t>(m_idx);
 }
 
@@ -372,6 +382,7 @@ inline size_t profcn_batch_angular_offset(
     int lnum,
     int narg
 ) {
+    // Angular terms are packed as (degree, argument, order-within-block).
     return static_cast<size_t>(l_idx) +
         static_cast<size_t>(lnum) * (
             static_cast<size_t>(arg_idx) +
@@ -399,12 +410,14 @@ inline T extract_angular_value_from_mblock(
 
 template<typename T>
 inline int psms_profcn_mblock_chunk_size() {
+    // Default chunk size for double precision.
     return 8;
 }
 
 #ifdef __GNUC__
 template<>
 inline int psms_profcn_mblock_chunk_size<__float128>() {
+    // Smaller quad chunks limit temporary-buffer growth.
     return 4;
 }
 #endif
@@ -439,6 +452,8 @@ ProfcnBatchResult<T> cprofcn_mblock(
 
 template<typename T>
 inline void normalize_profcn_result(ProfcnResult<T>& result) {
+    // Convert any mantissa/exponent storage returned by profcn into plain
+    // values so the rest of the code can ignore exponent bookkeeping.
     scale_profcn_component(result.r1c, result.ir1e);
     scale_profcn_component(result.r1dc, result.ir1de);
     scale_profcn_component(result.r2c, result.ir2e);
@@ -498,6 +513,7 @@ inline ProfcnResult<double> cprofcn<double>(
     const std::vector<double>& arg,
     int ioprad, int iopnorm, int iopang, double x1
 ) {
+    // Double-precision dispatcher for the scalar profcn wrapper.
     ProfcnResultDouble raw = cprofcn_double(c, m, lnum, arg, ioprad, iopnorm, iopang, x1);
 
     ProfcnResult<double> out;
@@ -530,6 +546,7 @@ inline ProfcnResult<__float128> cprofcn<__float128>(
     const std::vector<__float128>& arg,
     int ioprad, int iopnorm, int iopang, __float128 x1
 ) {
+    // Quad-precision dispatcher for the scalar profcn wrapper.
     ProfcnResultQuad raw = cprofcn_quad(c, m, lnum, arg, ioprad, iopnorm, iopang, x1);
 
     ProfcnResult<__float128> out;

@@ -17,7 +17,7 @@ std::complex<double> det4x4(std::complex<double> A[4][4]) {
     std::complex<double> det(0.0, 0.0);
     
     for (int i = 0; i < 4; ++i) {
-        // 3x3 minor
+        // Expand along the first row and build the corresponding 3 x 3 minor.
         std::complex<double> minor[3][3];
         for (int j = 1; j < 4; ++j) {
             int col = 0;
@@ -55,7 +55,7 @@ std::complex<double> det6x6(std::complex<double> A[6][6]) {
     int sign = 1;
     
     for (int k = 0; k < 6; ++k) {
-        // Find pivot
+        // Partial pivoting keeps the elimination stable for the shell systems.
         int pivot = k;
         double max_val = std::abs(LU[k][k]);
         for (int i = k + 1; i < 6; ++i) {
@@ -92,7 +92,8 @@ std::complex<double> det6x6(std::complex<double> A[6][6]) {
 std::complex<double> det6x6_scaled(std::complex<double> A[6][6]) {
     std::complex<double> LU[6][6];
     
-    // Scale each row by its max absolute value
+    // Scale each row by its largest entry before elimination so determinant
+    // evaluation remains usable across very different modal magnitudes.
     double row_scales[6];
     for (int i = 0; i < 6; ++i) {
         double max_val = 0.0;
@@ -160,11 +161,14 @@ std::complex<double> compute_single_bm(
     double lambda, double mu,
     double rho_ratio_sw, double rho_ratio_fl
 ) {
+    // Precompute repeated modal prefactors from the Goodman-Stern
+    // determinant formulation.
     double m_dbl = static_cast<double>(m);
     double m_m_plus_1 = m_dbl * (m_dbl + 1.0);
     double lambda_plus_2mu = lambda + 2.0 * mu;
     
-    // Compute spherical Bessel functions using the single-value helpers
+    // Evaluate every spherical Bessel/Hankel term needed by the boundary
+    // determinants at the shell-fluid and shell-water interfaces.
     double js_k1a = js_single_impl(m, k1a);
     double jsd_k1a = js_deriv_single_impl(m, k1a, 1);
     std::complex<double> hs_k1a = hs_single_impl(m, k1a);
@@ -201,7 +205,8 @@ std::complex<double> compute_single_bm(
     double js_k3a = js_single_impl(m, k3a);
     double jsd_k3a = js_deriv_single_impl(m, k3a, 1);
     
-    // Compute alpha coefficients
+    // Translate the special-function values into the alpha coefficients used
+    // directly in the determinant expressions.
     double a1 = js_k1a * rho_ratio_sw;
     double a2 = k1a * jsd_k1a;
     std::complex<double> a11 = hs_k1a * rho_ratio_sw;
@@ -244,7 +249,7 @@ std::complex<double> compute_single_bm(
     std::complex<double> b_m;
     
     if (m == 0) {
-        // 4x4 matrix for m = 0
+        // The monopole case collapses to the reduced 4 x 4 determinant pair.
         std::complex<double> A_num[4][4] = {
             {a1,  a12, a14, 0.0},
             {a2,  a22, a24, 0.0},
@@ -270,7 +275,7 @@ std::complex<double> compute_single_bm(
             b_m = det_num / det_den;
         }
     } else {
-        // 6x6 matrix for m > 0
+        // Higher modes retain the full 6 x 6 determinant system.
         std::complex<double> A_num[6][6] = {
             {a1,  a12, a13, a14, a15, 0.0},
             {a2,  a22, a23, a24, a25, 0.0},
@@ -326,6 +331,7 @@ ComplexMatrix elastic_shell_boundary_conditions_old(
     ComplexMatrix result(n_freq, n_m);
     
     for (int f = 0; f < n_freq; ++f) {
+        // Evaluate one modal coefficient per requested order and frequency.
         for (int mi = 0; mi < n_m; ++mi) {
             int m = m_vec[mi];
             std::complex<double> bm = compute_single_bm(
@@ -365,6 +371,8 @@ ComplexMatrix elastic_shell_boundary_conditions(
         int m_limit_f = m_limit[f];
         for (int m = 0; m <= m_max; ++m) {
             if (m <= m_limit_f) {
+                // Reuse the scalar determinant solver inside a frequency-aware
+                // truncation wrapper.
                 std::complex<double> bm = compute_single_bm(
                     m,
                     ka_matrix(idx_k1a_shell, f),

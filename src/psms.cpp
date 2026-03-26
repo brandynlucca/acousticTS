@@ -156,6 +156,8 @@ Rcpp::List Smn_cpp(
     Rcpp::IntegerVector n, double c, Rcpp::NumericVector arg,
     bool normalize = false, std::string precision = "double"
 ) {
+    // Normalize the R inputs once, then dispatch to the precision-specific
+    // angular evaluator and convert the result back to the public R shape.
     std::vector<int> m_vec = Rcpp::as<std::vector<int>>(m);
     std::vector<int> n_vec = Rcpp::as<std::vector<int>>(n);
     int m_len = m_vec.size();
@@ -202,6 +204,8 @@ Rcpp::List Rmn_cpp(
     int kind = 1,
     std::string precision = "double"
 ) {
+    // Mirror the public R interface while keeping the heavy radial evaluation
+    // in the templated C++ backend.
     std::vector<int> m_vec = Rcpp::as<std::vector<int>>(m);
     std::vector<int> n_vec = Rcpp::as<std::vector<int>>(n);
     int m_len = m_vec.size();
@@ -336,20 +340,21 @@ Rcpp::ComplexVector prolate_spheroid_fbs(
     bool adaptive = false,
     bool vectorized = false
 ) {
-    // Extract acoustic parameters
+    // Extract the frequency-dependent modal and acoustic state.
     std::vector<double> chi_sw = Rcpp::as<std::vector<double>>(acoustics["chi_sw"]);
     std::vector<double> chi_body = Rcpp::as<std::vector<double>>(acoustics["chi_body"]);
     std::vector<int> m_max = Rcpp::as<std::vector<int>>(acoustics["m_max"]);
     std::vector<int> n_max = Rcpp::as<std::vector<int>>(acoustics["n_max"]);
 
-    // Extract body parameters
+    // Extract the target geometry and scattering angles.
     double xi = body["xi"];
     double theta_body = body["theta_body"];
+    double theta_scatter = body["theta_scatter"];
     double phi_body = body["phi_body"];
     double phi_scatter = body["phi_scatter"];
     double density_body = body["density"];
 
-    // Extract medium parameters
+    // Extract the surrounding-medium density used in the boundary terms.
     double density_sw = medium["density"];
     
     // Extract the quadrature rule used for overlap integrals in the fluid/gas
@@ -375,6 +380,7 @@ Rcpp::ComplexVector prolate_spheroid_fbs(
                 static_cast<__float128>(chi_body[f]),
                 static_cast<__float128>(xi),
                 static_cast<__float128>(theta_body),
+                static_cast<__float128>(theta_scatter),
                 static_cast<__float128>(phi_body),
                 static_cast<__float128>(phi_scatter),
                 static_cast<__float128>(density_body),
@@ -394,7 +400,7 @@ Rcpp::ComplexVector prolate_spheroid_fbs(
             auto fbs = psms_fbs<double>(
                 m_max[f], n_max[f],
                 chi_sw[f], chi_body[f], xi,
-                theta_body, phi_body, phi_scatter,
+                theta_body, theta_scatter, phi_body, phi_scatter,
                 density_body, density_sw,
                 nodes_vec, weights_vec,
                 Amn_method, adaptive, vectorized
@@ -403,4 +409,346 @@ Rcpp::ComplexVector prolate_spheroid_fbs(
         }
     }
     return Rcpp::wrap(f_bs_out);
+}
+
+template<typename T>
+Rcpp::List prolate_tmatrix_blocks_to_rcpp(
+    int m_max,
+    int n_max,
+    const std::vector<std::vector<std::complex<T>>>& t_blocks
+) {
+    // Store each retained m-block as a square complex matrix together with the
+    // corresponding degree sequence so the R-side post-processing helpers can
+    // reconstruct the modal geometry later on.
+    Rcpp::List blocks(m_max + 1);
+    for (int m = 0; m <= m_max; ++m) {
+        int size = n_max - m + 1;
+        Rcpp::ComplexMatrix block_mat(size, size);
+        for (int row = 0; row < size; ++row) {
+            for (int col = 0; col < size; ++col) {
+                block_mat(row, col) = to_Rcomplex(t_blocks[m][row * size + col]);
+            }
+        }
+        blocks[m] = Rcpp::List::create(
+            Rcpp::Named("m") = m,
+            Rcpp::Named("n_seq") = Rcpp::seq(m, n_max),
+            Rcpp::Named("T") = block_mat
+        );
+    }
+    blocks.attr("coordinate_system") = "spheroidal";
+    return blocks;
+}
+
+// Build and optionally retain the spheroidal T-matrix blocks used by the
+// prolate branch, then evaluate the requested scattering geometry from those
+// retained blocks.
+// [[Rcpp::export]]
+Rcpp::List prolate_spheroid_tmatrix_cpp(
+    Rcpp::DataFrame acoustics,
+    Rcpp::DataFrame body,
+    Rcpp::DataFrame medium,
+    Rcpp::List integration_pts,
+    std::string precision = "double",
+    std::string Amn_method = "Amn_fluid"
+) {
+    std::vector<double> chi_sw = Rcpp::as<std::vector<double>>(acoustics["chi_sw"]);
+    std::vector<double> chi_body = Rcpp::as<std::vector<double>>(acoustics["chi_body"]);
+    std::vector<int> m_max = Rcpp::as<std::vector<int>>(acoustics["m_max"]);
+    std::vector<int> n_max = Rcpp::as<std::vector<int>>(acoustics["n_max"]);
+
+    double xi = body["xi"];
+    double theta_body = body["theta_body"];
+    double theta_scatter = body["theta_scatter"];
+    double phi_body = body["phi_body"];
+    double phi_scatter = body["phi_scatter"];
+    double density_body = body["density"];
+    double density_sw = medium["density"];
+
+    Rcpp::NumericVector nodes = integration_pts["nodes"];
+    Rcpp::NumericVector weights = integration_pts["weights"];
+
+    int n_freq = acoustics.nrows();
+    Rcpp::ComplexVector f_scat(n_freq);
+    Rcpp::List t_store(n_freq);
+
+    if (precision == "quad") {
+#ifdef __GNUC__
+        std::vector<__float128> nodes_q(nodes.size()), weights_q(weights.size());
+        for (int i = 0; i < nodes.size(); ++i) nodes_q[i] = static_cast<__float128>(nodes[i]);
+        for (int i = 0; i < weights.size(); ++i) weights_q[i] = static_cast<__float128>(weights[i]);
+
+        for (int f = 0; f < n_freq; ++f) {
+            auto t_blocks = psms_tmatrix_blocks<__float128>(
+                m_max[f], n_max[f],
+                static_cast<__float128>(chi_sw[f]),
+                static_cast<__float128>(chi_body[f]),
+                static_cast<__float128>(xi),
+                static_cast<__float128>(density_body),
+                static_cast<__float128>(density_sw),
+                nodes_q, weights_q,
+                Amn_method
+            );
+            auto smn_inc = compute_smn_matrix<__float128>(
+                m_max[f], n_max[f], static_cast<__float128>(chi_sw[f]),
+                preccos(static_cast<__float128>(theta_body)), true
+            );
+            auto smn_scat = compute_smn_matrix<__float128>(
+                m_max[f], n_max[f], static_cast<__float128>(chi_sw[f]),
+                preccos(static_cast<__float128>(theta_scatter)), true
+            );
+            auto azimuth = compute_azimuth<__float128>(
+                m_max[f],
+                static_cast<__float128>(phi_body),
+                static_cast<__float128>(phi_scatter)
+            );
+
+            auto f_val = compute_fbs_from_tmatrix_blocks<__float128>(
+                m_max[f], n_max[f], azimuth, smn_inc, smn_scat, t_blocks
+            );
+            f_scat[f] = to_Rcomplex(f_val);
+            t_store[f] = prolate_tmatrix_blocks_to_rcpp<__float128>(
+                m_max[f], n_max[f], t_blocks
+            );
+        }
+#else
+        Rcpp::stop("Quad precision requires GCC and libquadmath.");
+#endif
+    } else {
+        std::vector<double> nodes_vec = Rcpp::as<std::vector<double>>(nodes);
+        std::vector<double> weights_vec = Rcpp::as<std::vector<double>>(weights);
+
+        for (int f = 0; f < n_freq; ++f) {
+            auto t_blocks = psms_tmatrix_blocks<double>(
+                m_max[f], n_max[f], chi_sw[f], chi_body[f], xi,
+                density_body, density_sw, nodes_vec, weights_vec, Amn_method
+            );
+            auto smn_inc = compute_smn_matrix<double>(
+                m_max[f], n_max[f], chi_sw[f], preccos(theta_body), true
+            );
+            auto smn_scat = compute_smn_matrix<double>(
+                m_max[f], n_max[f], chi_sw[f], preccos(theta_scatter), true
+            );
+            auto azimuth = compute_azimuth<double>(m_max[f], phi_body, phi_scatter);
+
+            auto f_val = compute_fbs_from_tmatrix_blocks<double>(
+                m_max[f], n_max[f], azimuth, smn_inc, smn_scat, t_blocks
+            );
+            f_scat[f] = to_Rcomplex(f_val);
+            t_store[f] = prolate_tmatrix_blocks_to_rcpp<double>(
+                m_max[f], n_max[f], t_blocks
+            );
+        }
+    }
+
+    return Rcpp::List::create(
+        Rcpp::Named("f_scat") = f_scat,
+        Rcpp::Named("t_matrix") = t_store
+    );
+}
+
+namespace {
+
+template<typename T>
+std::vector<std::vector<std::complex<T>>> prolate_tmatrix_blocks_from_rcpp(
+    const Rcpp::List& blocks
+) {
+    // Recover the retained T-matrix blocks from the R-side storage layout used
+    // by prolate_tmatrix_blocks_to_rcpp().
+    int m_max = blocks.size() - 1;
+    std::vector<std::vector<std::complex<T>>> t_blocks(m_max + 1);
+
+    for (int m = 0; m <= m_max; ++m) {
+        Rcpp::List block = blocks[m];
+        Rcpp::ComplexMatrix block_mat = block["T"];
+        int n_row = block_mat.nrow();
+        int n_col = block_mat.ncol();
+        t_blocks[m].resize(n_row * n_col, std::complex<T>(0, 0));
+
+        for (int row = 0; row < n_row; ++row) {
+            for (int col = 0; col < n_col; ++col) {
+                Rcomplex z = block_mat(row, col);
+                t_blocks[m][row * n_col + col] = std::complex<T>(
+                    static_cast<T>(z.r),
+                    static_cast<T>(z.i)
+                );
+            }
+        }
+    }
+
+    return t_blocks;
+}
+
+template<typename T>
+std::complex<T> prolate_scattering_from_retained_blocks_single(
+    const Rcpp::List& blocks,
+    T chi_sw,
+    T k_sw,
+    T theta_body,
+    T phi_body,
+    T theta_scatter,
+    T phi_scatter
+) {
+    // Rebuild the incident and scattered angular factors for the requested
+    // geometry, then evaluate the stored spheroidal T-matrix blocks directly.
+    int m_max = blocks.size() - 1;
+    Rcpp::List last_block = blocks[m_max];
+    Rcpp::IntegerVector n_seq_last = last_block["n_seq"];
+    int n_max = n_seq_last[n_seq_last.size() - 1];
+
+    auto t_blocks = prolate_tmatrix_blocks_from_rcpp<T>(blocks);
+    auto smn_inc = compute_smn_matrix<T>(m_max, n_max, chi_sw, preccos(theta_body), true);
+    auto smn_scat = compute_smn_matrix<T>(m_max, n_max, chi_sw, preccos(theta_scatter), true);
+    auto azimuth = compute_azimuth<T>(m_max, phi_body, phi_scatter);
+    auto raw_sum = compute_fbs_from_tmatrix_blocks<T>(
+        m_max, n_max, azimuth, smn_inc, smn_scat, t_blocks
+    );
+
+    return std::complex<T>(0, -T(2) / k_sw) * raw_sum;
+}
+
+template<typename T>
+Rcpp::ComplexMatrix prolate_scattering_grid_from_retained_blocks_single(
+    const Rcpp::List& blocks,
+    T chi_sw,
+    T k_sw,
+    T theta_body,
+    T phi_body,
+    const std::vector<T>& theta_scatter,
+    const std::vector<T>& phi_scatter
+) {
+    // Precompute the scattered-angle angular basis for every theta slice, then
+    // sweep over azimuth and evaluate the retained blocks pointwise.
+    int m_max = blocks.size() - 1;
+    Rcpp::List last_block = blocks[m_max];
+    Rcpp::IntegerVector n_seq_last = last_block["n_seq"];
+    int n_max = n_seq_last[n_seq_last.size() - 1];
+
+    auto t_blocks = prolate_tmatrix_blocks_from_rcpp<T>(blocks);
+    auto smn_inc = compute_smn_matrix<T>(m_max, n_max, chi_sw, preccos(theta_body), true);
+
+    std::vector<std::vector<std::vector<T>>> smn_scat(theta_scatter.size());
+    for (size_t i = 0; i < theta_scatter.size(); ++i) {
+        smn_scat[i] = compute_smn_matrix<T>(
+            m_max, n_max, chi_sw, preccos(theta_scatter[i]), true
+        );
+    }
+
+    Rcpp::ComplexMatrix f_grid(theta_scatter.size(), phi_scatter.size());
+    for (size_t i = 0; i < theta_scatter.size(); ++i) {
+        for (size_t j = 0; j < phi_scatter.size(); ++j) {
+            auto azimuth = compute_azimuth<T>(m_max, phi_body, phi_scatter[j]);
+            auto raw_sum = compute_fbs_from_tmatrix_blocks<T>(
+                m_max, n_max, azimuth, smn_inc, smn_scat[i], t_blocks
+            );
+            f_grid(i, j) = to_Rcomplex(std::complex<T>(0, -T(2) / k_sw) * raw_sum);
+        }
+    }
+
+    return f_grid;
+}
+
+} // namespace
+
+// Evaluate the stored prolate retained blocks in compiled code so the
+// post-processing path uses the same spheroidal-function precision as the
+// original boundary solve instead of rebuilding the angular factors in R.
+// [[Rcpp::export]]
+Rcpp::ComplexVector prolate_spheroid_scattering_from_tmatrix_cpp(
+    Rcpp::DataFrame acoustics,
+    Rcpp::List t_matrix,
+    double theta_body,
+    double phi_body,
+    double theta_scatter,
+    double phi_scatter,
+    std::string precision = "double"
+) {
+    // Evaluate one retained block set per frequency at a single scattering
+    // geometry.
+    std::vector<double> chi_sw = Rcpp::as<std::vector<double>>(acoustics["chi_sw"]);
+    std::vector<double> k_sw = Rcpp::as<std::vector<double>>(acoustics["k_sw"]);
+    int n_freq = acoustics.nrows();
+    Rcpp::ComplexVector f_scat(n_freq);
+
+    if (precision == "quad") {
+#ifdef __GNUC__
+        for (int f = 0; f < n_freq; ++f) {
+            f_scat[f] = to_Rcomplex(
+                prolate_scattering_from_retained_blocks_single<__float128>(
+                    t_matrix[f],
+                    static_cast<__float128>(chi_sw[f]),
+                    static_cast<__float128>(k_sw[f]),
+                    static_cast<__float128>(theta_body),
+                    static_cast<__float128>(phi_body),
+                    static_cast<__float128>(theta_scatter),
+                    static_cast<__float128>(phi_scatter)
+                )
+            );
+        }
+#else
+        Rcpp::stop("Quad precision requires GCC and libquadmath.");
+#endif
+    } else {
+        for (int f = 0; f < n_freq; ++f) {
+            f_scat[f] = to_Rcomplex(
+                prolate_scattering_from_retained_blocks_single<double>(
+                    t_matrix[f],
+                    chi_sw[f],
+                    k_sw[f],
+                    theta_body,
+                    phi_body,
+                    theta_scatter,
+                    phi_scatter
+                )
+            );
+        }
+    }
+
+    return f_scat;
+}
+
+// Evaluate one retained prolate T-matrix block set over a full
+// theta-scatter/phi-scatter grid in compiled code.
+// [[Rcpp::export]]
+Rcpp::ComplexMatrix prolate_spheroid_scattering_grid_from_tmatrix_cpp(
+    Rcpp::DataFrame acoustics,
+    Rcpp::List t_matrix,
+    double theta_body,
+    double phi_body,
+    Rcpp::NumericVector theta_scatter,
+    Rcpp::NumericVector phi_scatter,
+    std::string precision = "double"
+) {
+    // Evaluate the first retained-frequency block over a full
+    // theta_scatter/phi_scatter grid.
+    double chi_sw = Rcpp::as<std::vector<double>>(acoustics["chi_sw"])[0];
+    double k_sw = Rcpp::as<std::vector<double>>(acoustics["k_sw"])[0];
+
+    if (precision == "quad") {
+#ifdef __GNUC__
+        std::vector<__float128> theta_q(theta_scatter.size()), phi_q(phi_scatter.size());
+        for (int i = 0; i < theta_scatter.size(); ++i) theta_q[i] = static_cast<__float128>(theta_scatter[i]);
+        for (int j = 0; j < phi_scatter.size(); ++j) phi_q[j] = static_cast<__float128>(phi_scatter[j]);
+        return prolate_scattering_grid_from_retained_blocks_single<__float128>(
+            t_matrix,
+            static_cast<__float128>(chi_sw),
+            static_cast<__float128>(k_sw),
+            static_cast<__float128>(theta_body),
+            static_cast<__float128>(phi_body),
+            theta_q,
+            phi_q
+        );
+#else
+        Rcpp::stop("Quad precision requires GCC and libquadmath.");
+#endif
+    }
+
+    return prolate_scattering_grid_from_retained_blocks_single<double>(
+        t_matrix,
+        chi_sw,
+        k_sw,
+        theta_body,
+        phi_body,
+        Rcpp::as<std::vector<double>>(theta_scatter),
+        Rcpp::as<std::vector<double>>(phi_scatter)
+    );
 }

@@ -117,6 +117,8 @@ std::vector<std::vector<std::complex<T>>> expand_Amn_triangular(
 
 template<typename T>
 struct LUPFactorization {
+    // Combined LU factors together with the row/column permutations used by
+    // the complete-pivoting decomposition.
     std::vector<std::complex<T>> lu;
     std::vector<int> row_piv;
     std::vector<int> col_piv;
@@ -211,6 +213,8 @@ std::vector<std::complex<T>> lup_solve(
     const LUPFactorization<T>& fac,
     const std::vector<std::complex<T>>& b
 ) {
+    // Apply the stored permutations, perform forward substitution through L,
+    // then backward substitution through U.
     int n = static_cast<int>(fac.row_piv.size());
     std::vector<std::complex<T>> x_perm(n), x(n), y(n);
 
@@ -242,6 +246,7 @@ std::vector<std::complex<T>> matvec_product(
     const std::vector<std::complex<T>>& x,
     int n
 ) {
+    // Dense matrix-vector product on the flattened row-major kernel storage.
     std::vector<std::complex<T>> out(n, std::complex<T>(0, 0));
     for (int i = 0; i < n; ++i) {
         std::complex<T> sum(0, 0);
@@ -473,6 +478,106 @@ std::vector<std::vector<std::complex<T>>> solve_fluid_Amn(
     const std::vector<std::vector<std::complex<T>>>& K3_kernel
 ) {
     return solve_fluid_Amn_divide_and_conquer<T>(rhs, K3_kernel);
+}
+
+template<typename T>
+std::vector<std::vector<std::complex<T>>> solve_fluid_t_blocks_native(
+    const std::vector<std::vector<std::complex<T>>>& K1_kernel,
+    const std::vector<std::vector<std::complex<T>>>& K3_kernel
+) {
+    int m_max = static_cast<int>(K3_kernel.size()) - 1;
+    std::vector<std::vector<std::complex<T>>> result(m_max + 1);
+
+    // Each retained order m produces one dense block solve for the T-matrix
+    // block associated with that order.
+    for (int m = 0; m <= m_max; ++m) {
+        int size = static_cast<int>(std::sqrt(K3_kernel[m].size()));
+        auto fac = lup_decompose<T>(K3_kernel[m], size);
+        if (fac.singular) {
+            throw std::runtime_error("Fluid kernel system is singular or ill-conditioned");
+        }
+
+        std::vector<std::complex<T>> block(size * size, std::complex<T>(0, 0));
+        for (int col = 0; col < size; ++col) {
+            std::vector<std::complex<T>> rhs_col(size, std::complex<T>(0, 0));
+            for (int row = 0; row < size; ++row) {
+                rhs_col[row] = K1_kernel[m][row * size + col];
+            }
+            auto sol_col = lup_solve(fac, rhs_col);
+            for (int row = 0; row < size; ++row) {
+                block[row * size + col] = sol_col[row];
+            }
+        }
+
+        result[m] = block;
+    }
+
+    return result;
+}
+
+template<>
+inline std::vector<std::vector<std::complex<double>>> solve_fluid_t_blocks_native<double>(
+    const std::vector<std::vector<std::complex<double>>>& K1_kernel,
+    const std::vector<std::vector<std::complex<double>>>& K3_kernel
+) {
+    int m_max = static_cast<int>(K3_kernel.size()) - 1;
+    std::vector<std::vector<std::complex<double>>> result(m_max + 1);
+
+    // The double-precision specialization uses Armadillo first, then falls
+    // back to an SVD pseudoinverse if the direct solve is unstable.
+    for (int m = 0; m <= m_max; ++m) {
+        int size = static_cast<int>(std::sqrt(K3_kernel[m].size()));
+        arma::Mat<std::complex<double>> K3_arma(size, size);
+        arma::Mat<std::complex<double>> K1_arma(size, size);
+        for (int row = 0; row < size; ++row) {
+            for (int col = 0; col < size; ++col) {
+                K3_arma(row, col) = K3_kernel[m][row * size + col];
+                K1_arma(row, col) = K1_kernel[m][row * size + col];
+            }
+        }
+
+        arma::Mat<std::complex<double>> block;
+        bool ok = arma::solve(block, K3_arma, K1_arma, arma::solve_opts::fast);
+        if (!ok || !block.is_finite()) {
+            ok = arma::solve(block, K3_arma, K1_arma);
+        }
+        if (!ok || !block.is_finite()) {
+            arma::Mat<std::complex<double>> U, V;
+            arma::Col<double> s;
+            bool svd_ok = arma::svd(U, s, V, K3_arma);
+            if (!svd_ok) {
+                throw std::runtime_error("SVD failed");
+            }
+            double tol =
+                std::max(size, size) * s.max() * std::numeric_limits<double>::epsilon();
+            arma::Col<double> d_inv(s.n_elem);
+            for (arma::uword i = 0; i < s.n_elem; ++i) {
+                d_inv(i) = (s(i) > tol) ? (1.0 / s(i)) : 0.0;
+            }
+            arma::Mat<std::complex<double>> diag_dinv = arma::diagmat(
+                arma::conv_to<arma::Col<std::complex<double>>>::from(d_inv)
+            );
+            block = V * diag_dinv * U.t() * K1_arma;
+        }
+
+        std::vector<std::complex<double>> out_block(size * size, std::complex<double>(0, 0));
+        for (int row = 0; row < size; ++row) {
+            for (int col = 0; col < size; ++col) {
+                out_block[row * size + col] = block(row, col);
+            }
+        }
+        result[m] = std::move(out_block);
+    }
+
+    return result;
+}
+
+template<typename T>
+std::vector<std::vector<std::complex<T>>> solve_fluid_t_blocks(
+    const std::vector<std::vector<std::complex<T>>>& K1_kernel,
+    const std::vector<std::vector<std::complex<T>>>& K3_kernel
+) {
+    return solve_fluid_t_blocks_native<T>(K1_kernel, K3_kernel);
 }
 
 #ifdef __GNUC__

@@ -10,7 +10,8 @@ using boost::math::legendre_q;
 using boost::math::legendre_p;
 using std::complex;
 
-// Convert std::complex<double> or double to Rcomplex
+// Convert the internal std::complex representation used by the special-
+// function code into the Rcomplex layout expected by Rcpp.
 Rcomplex toRcomplex(const std::complex<double>& z) {
     Rcomplex r;
     r.r = z.real();
@@ -18,7 +19,9 @@ Rcomplex toRcomplex(const std::complex<double>& z) {
     return r;
 }
 
-// Hypergeometric 2F1 series (complex)
+// Evaluate the Gauss hypergeometric series directly. The series is only used
+// in the fractional-order Ferrers P helper, so the implementation favors
+// clarity over a more elaborate continuation strategy.
 complex<double> hyper2F1_series(double a, double b, double c, complex<double> z) {
     const int max_iter = 20000;
     const double tol = 1e-14;
@@ -34,14 +37,16 @@ complex<double> hyper2F1_series(double a, double b, double c, complex<double> z)
     return sum;
 }
 
-// Ferrers P function for fractional nu (|x| <= 1)
+// Ferrers P_nu(x) on [-1, 1], expressed through the hypergeometric form.
 double ferrers_P(double nu, double x) {
     complex<double> z((1.0 - x)/2.0, 0.0);
     complex<double> F = hyper2F1_series(-nu, nu+1.0, 1.0, z);
     return std::real(F);
 }
 
-// Numerical integral for P_nu(x) for fractional nu and |x| > 1
+// Numerical contour-style integral used for fractional Legendre P when the
+// order is non-integer. The same helper is used on and off the canonical
+// interval by switching the branch of the square-root term.
 double P_fractional_complex_integral(double nu, double x) {
     const int N = 4000; // integration points
     double h = 2.0 * M_PI / N;
@@ -81,7 +86,7 @@ NumericMatrix Pn_cpp(NumericVector n, NumericVector x) {
             double xj = x[j];
 
             if(isInt) {
-                // Integer recurrence
+                // Integer degrees use the standard three-term recurrence.
                 int ni_int = static_cast<int>(std::round(ni));
                 if(ni_int == 0) result(i,j) = 1.0;
                 else if(ni_int == 1) result(i,j) = xj;
@@ -97,7 +102,7 @@ NumericMatrix Pn_cpp(NumericVector n, NumericVector x) {
                     result(i,j) = Pn_val;
                 }
             } else {
-                // Fractional nu: use complex integral for all x
+                // Fractional degrees fall back to the integral helper.
                 result(i,j) = P_fractional_complex_integral(ni, xj);
             }
         }
@@ -166,8 +171,7 @@ NumericMatrix Pn_deriv_cpp(NumericVector n, NumericVector x, int k) {
                 }
                 result(i, j) = val;
             } else {
-                // Fractional order: use numerical differentiation
-                // This is more complex --> use finite differences
+                // Fractional-order derivatives are approximated numerically.
                 double h = 1e-6;
                 if (k == 1) {
                     NumericVector x_plus = NumericVector::create(xj + h);
@@ -177,8 +181,7 @@ NumericMatrix Pn_deriv_cpp(NumericVector n, NumericVector x, int k) {
                     double fm = Pn_cpp(ni_vec, x_minus)(0, 0);
                     result(i, j) = (fp - fm) / (2.0 * h);
                 } else {
-                    // Higher derivatives via repeated finite diff (less accurate)
-                    // For production, would need better approach
+                    // Higher derivatives use a simple finite-difference stencil.
                     Rcpp::warning("Fractional order derivatives k>1 use finite differences");
                     NumericVector ni_vec = NumericVector::create(ni);
                     double sum = 0.0;
@@ -201,7 +204,9 @@ NumericMatrix Pn_deriv_cpp(NumericVector n, NumericVector x, int k) {
     return result;
 }
 
-// Numerical integral for P_nu(x) for fractional nu and |x| > 1
+// Fractional-order helper for Q_nu(x). The implementation mirrors the P_nu
+// helper but switches formulas according to whether x lies inside or outside
+// the canonical interval.
 double Q_fractional_complex_integral(double nu, double x) {
     const int N = 4000;
     
@@ -254,7 +259,7 @@ Rcpp::ComplexMatrix Qn_cpp(NumericVector nu, NumericVector x) {
             }
             
             if(std::abs(x_val) < 1.0) {
-                // |x| < 1: real result
+                // On the canonical interval, Q_nu is real-valued.
                 double nint = std::round(nu_val);
                 bool is_integer = std::abs(nu_val - nint) < 1e-14;
                 
@@ -262,7 +267,8 @@ Rcpp::ComplexMatrix Qn_cpp(NumericVector nu, NumericVector x) {
                 if(is_integer) {
                     Q = legendre_q(static_cast<unsigned>(nint), x_val);
                 } else {
-                    // Fractional nu: use Ferrers identity
+                    // Fractional degrees use the Ferrers identity relating
+                    // Q_nu to P_nu(x) and P_nu(-x).
                     double P_x  = ferrers_P(nu_val, x_val);
                     double P_nx = ferrers_P(nu_val, -x_val);
                     double sinpi = std::sin(M_PI * nu_val);
@@ -273,9 +279,9 @@ Rcpp::ComplexMatrix Qn_cpp(NumericVector nu, NumericVector x) {
                 result(i,j).r = Q;
                 result(i,j).i = 0.0;
             } else {
-                // |x| > 1: complex result
+                // Outside [-1, 1], Q_nu generally becomes complex-valued.
                 
-                // Compute real part: integral_0^inf [dt / (x + sqrt(x^2-1)*cosh(t))^(nu+1)]
+                // The real part comes from the decaying integral form.
                 const int N_integ = 10000;
                 double t_max = 30.0;
                 double h = t_max / N_integ;
@@ -290,7 +296,8 @@ Rcpp::ComplexMatrix Qn_cpp(NumericVector nu, NumericVector x) {
                 
                 double Q_real = sum * h;
                 
-                // Imaginary part: -pi/2 * P_nu(x)
+                // The imaginary part follows from the branch-cut jump and is
+                // proportional to P_nu(x).
                 NumericVector nu_single = NumericVector::create(nu_val);
                 NumericVector x_single = NumericVector::create(x_val);
                 double P_nu_x = Pn_cpp(nu_single, x_single)(0, 0);
@@ -323,8 +330,8 @@ ComplexMatrix Qn_deriv_cpp(NumericVector n, NumericVector x, int k) {
         return Qn_cpp(n, x);
     }
     
-    // For Q_n, use finite differences (Q_n is more complex)
-    // Could also use: Q_n^m(x) relations similar to P_n^m
+    // Q_n derivatives are evaluated numerically here because the branch
+    // structure makes the closed-form relations less convenient to maintain.
     double h = 1e-6;
     
     for (int i = 0; i < N; ++i) {
@@ -334,7 +341,7 @@ ComplexMatrix Qn_deriv_cpp(NumericVector n, NumericVector x, int k) {
             double xj = x[j];
             
             if (k == 1) {
-                // Central difference
+                // First derivative via a central finite difference.
                 NumericVector x_plus = NumericVector::create(xj + h);
                 NumericVector x_minus = NumericVector::create(xj - h);
                 
@@ -348,7 +355,7 @@ ComplexMatrix Qn_deriv_cpp(NumericVector n, NumericVector x, int k) {
                 result(i, j).r = deriv.real();
                 result(i, j).i = deriv.imag();
             } else {
-                // Higher derivatives via finite difference stencil
+                // Higher derivatives via a symmetric finite-difference stencil.
                 std::complex<double> sum(0.0, 0.0);
                 for (int m = 0; m <= k; ++m) {
                     double binom = 1.0;

@@ -2,7 +2,7 @@
 % Please edit documentation in R/math.R
 \name{gauss_legendre}
 \alias{gauss_legendre}
-\title{Gauss–Legendre nodes and weights}
+\title{Gauss-Legendre nodes and weights}
 \usage{
 gauss_legendre(n, a = -1, b = 1)
 }
@@ -22,11 +22,11 @@ A list with components:
 }
 }
 \description{
-Compute Gauss–Legendre quadrature nodes and weights on an interval
+Compute Gauss-Legendre quadrature nodes and weights on an interval
 \eqn{[a,~b]}.
 }
 \details{
-Gauss–Legendre quadrature provides exact integration for polynomials of
+Gauss-Legendre quadrature provides exact integration for polynomials of
 degree up to \eqn{2n-1} using n nodes and weights chosen as the roots of the
 Legendre polynomial \eqn{P_n(x)} on the canonical interval \eqn{[-1,1]}. For
 a general interval \eqn{[a,b]} the mapping
@@ -35,8 +35,10 @@ transforms canonical nodes \eqn{t_i} to \eqn{x_i} and scales weights by
 \deqn{w_i = \tfrac{b-a}{2}\,w_i^{(0)},}
 where \eqn{w_i^{(0)}} are the standard weights on \eqn{[-1,1]}.
 
-This wrapper performs basic argument validation and calls the C++ routine
-to obtain nodes and weights with high accuracy for moderate \code{n}.
+This wrapper performs basic argument validation and calls the compiled
+routine that constructs the canonical rule and rescales it to \eqn{[a,b]}.
+The resulting nodes and weights are reused throughout the package wherever
+overlap or collocation integrals are evaluated numerically.
 }
 \references{
 Davis, P. J., & Rabinowitz, P. (2007). Methods of Numerical Integration
