@@ -86,7 +86,7 @@
 #' @name SOEMS
 #' @aliases soems SOEMS calibration CALIBRATION
 #' @docType data
-#' @keywords models acoustics
+#' @keywords models acoustics internal
 NULL
 
 #' Initialize CAL-class object for modeling.
@@ -236,7 +236,7 @@ calibration <- function(object) {
       )
       # Extend the modal sum until the tail term is negligible =================
       if (adaptive) {
-        while (Mod(tail(terms, 1L)) > modal_tol && ml < max_modal_order) {
+        while (Mod(utils::tail(terms, 1L)) > modal_tol && ml < max_modal_order) {
           ml <- ml + 1L
           terms <- c(
             terms,
