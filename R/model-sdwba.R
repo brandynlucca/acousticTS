@@ -143,7 +143,7 @@
 #' @name SDWBA
 #' @aliases sdwba SDWBA sdwba_curved SDWBA_CURVED
 #' @docType data
-#' @keywords models acoustics
+#' @keywords models acoustics internal
 NULL
 
 #' Initialize FLS-class object for SDWBA modeling
