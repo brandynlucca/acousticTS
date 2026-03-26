@@ -58,7 +58,7 @@
 #' @name SPHMS
 #' @aliases sphms SPHMS
 #' @docType data
-#' @keywords models acoustics
+#' @keywords models acoustics internal
 NULL
 
 #' Initialize object for the modal series solution for a sphere
@@ -94,19 +94,25 @@ sphms_initialize <- function(object,
   medium_params <- .init_medium_params(sound_speed_sw, density_sw)
   # Determine expansion coefficient Bm method ==================================
   # Validate method ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  if(is.null(boundary)){
+  if (is.null(boundary)) {
     # Set default boundary +++++++++++++++++++++++++++++++++++++++++++++++++++
-    boundary <- switch(
-      class(object),
-      CAL = stop(
+    boundary <- if (methods::is(object, "CAL")) {
+      stop(
         "Use 'model='calibration'' when modeling the TS of a solid sphere."
-      ),
-      ESS = "shelled_liquid",
-      FLS = "liquid_filled",
-      GAS = "gas_filled",
-      SBF = "gas_filled",
-      is(object, "ESS")
-    )
+      )
+    } else if (methods::is(object, "ESS")) {
+      "shelled_liquid"
+    } else if (methods::is(object, "FLS")) {
+      "liquid_filled"
+    } else if (methods::is(object, "GAS") || methods::is(object, "SBF")) {
+      "gas_filled"
+    } else {
+      stop(
+        "Could not infer a default SPHMS boundary for scatterer class '",
+        class(object)[1], "'.",
+        call. = FALSE
+      )
+    }
   }
   if (!(boundary %in% c(
     "liquid_filled", "fixed_rigid", "pressure_release", "gas_filled",
@@ -115,7 +121,7 @@ sphms_initialize <- function(object,
     # Check boundary compatibility with scattering class +++++++++++++++++++++++
     # ESS ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     if (
-      is(object, "ESS") &
+      methods::is(object, "ESS") &
       !(boundary %in%
         c("shelled_pressure_release", "shelled_liquid", "shelled_gas")
       )
@@ -165,7 +171,7 @@ sphms_initialize <- function(object,
   h_exterior <- exterior$h %||%
     if (!is.null(exterior$sound_speed)) exterior$sound_speed / sound_speed_sw else NA_real_
   # Material properties: body/shell-to-seawater interface ++++++++++++++++++++++
-  if (class(object) == "ESS") {
+  if (methods::is(object, "ESS")) {
     g21 <- if (!is.null(exterior$density)) exterior$density / density_sw else
       exterior$g %||% NA_real_
     h21 <- if (!is.null(exterior$sound_speed)) exterior$sound_speed / sound_speed_sw else
@@ -175,7 +181,7 @@ sphms_initialize <- function(object,
     h21 <- h_exterior
   }
   # Material properties: fluid-to-shell interface ++++++++++++++++++++++++++++++
-  if (is(object, "ESS")) {
+  if (methods::is(object, "ESS")) {
     fluid <- acousticTS::extract(object, "fluid")
     g32 <- if (!is.null(fluid$density)) fluid$density / (g21 * density_sw) else
       if (!is.null(fluid$g)) fluid$g / g21 else NA_real_
@@ -186,7 +192,7 @@ sphms_initialize <- function(object,
     h32 <- NA_real_
   }
   # Material properties: fluid-to-seawater interface +++++++++++++++++++++++++++
-  if (is(object, "ESS")) {
+  if (methods::is(object, "ESS")) {
     g31 <- if (!is.null(fluid$density)) fluid$density / density_sw else
       fluid$g %||% NA_real_
     h31 <- if (!is.null(fluid$sound_speed)) fluid$sound_speed / sound_speed_sw else
