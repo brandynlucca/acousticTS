@@ -508,15 +508,24 @@ Special functions and numerical helpers used throughout the package.
 - [Validation and benchmark
   reproduction](https://brandynlucca.github.io/acousticTS/articles/validation-benchmarks/validation-benchmarks.md):
 
-### Bibliography
-
-- [Vignette
-  Bibliography](https://brandynlucca.github.io/acousticTS/articles/bibliography/bibliography.md):
-
 ### Model Library
 
 - [Model
   library](https://brandynlucca.github.io/acousticTS/articles/model-library/model-library.md):
+
+### Developer Guides
+
+- [Creating a Model from
+  Scratch](https://brandynlucca.github.io/acousticTS/articles/creating-models-from-scratch/creating-models-from-scratch.md):
+- [Combining Scattering
+  Components](https://brandynlucca.github.io/acousticTS/articles/combining-components/combining-components.md):
+- [FAQ and
+  Troubleshooting](https://brandynlucca.github.io/acousticTS/articles/faq-troubleshooting/faq-troubleshooting.md):
+
+### Bibliography
+
+- [Vignette
+  Bibliography](https://brandynlucca.github.io/acousticTS/articles/bibliography/bibliography.md):
 
 ### Exact, Modal-Series, and T-Matrix Families
 
@@ -603,12 +612,3 @@ Special functions and numerical helpers used throughout the package.
   model](https://brandynlucca.github.io/acousticTS/articles/bbfm/bbfm-implementation.md):
 - [Body-backbone fish
   model](https://brandynlucca.github.io/acousticTS/articles/bbfm/bbfm-theory.md):
-
-### Developer Guides
-
-- [Creating a Model from
-  Scratch](https://brandynlucca.github.io/acousticTS/articles/creating-models-from-scratch/creating-models-from-scratch.md):
-- [Combining Scattering
-  Components](https://brandynlucca.github.io/acousticTS/articles/combining-components/combining-components.md):
-- [FAQ and
-  Troubleshooting](https://brandynlucca.github.io/acousticTS/articles/faq-troubleshooting/faq-troubleshooting.md):
