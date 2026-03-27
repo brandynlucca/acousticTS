@@ -1096,8 +1096,7 @@ FluidAmnResult<T> fluid_Amn_triangular(
     const std::vector<T>& weights,
     bool vectorized = false
 ) {
-#ifdef __GNUC__
-    if constexpr (std::is_same_v<T, __float128>) {
+    if constexpr (is_quad_precision_v<T>) {
         // Quad precision benefits the most from the batched pathway because the
         // spheroidal backend is the dominant cost.
         return fluid_Amn_triangular_batched<T>(
@@ -1105,7 +1104,6 @@ FluidAmnResult<T> fluid_Amn_triangular(
             nodes, weights
         );
     }
-#endif
     if constexpr (std::is_same_v<T, double>) {
         if (vectorized) {
             return fluid_Amn_triangular_vectorized_double(
@@ -1634,12 +1632,10 @@ inline T psms_modal_rel_tol() {
     return static_cast<T>(1e-8L);
 }
 
-#ifdef __GNUC__
 template<>
-inline __float128 psms_modal_rel_tol<__float128>() {
-    return static_cast<__float128>(1e-14L);
+inline acousticts_quad_t psms_modal_rel_tol<acousticts_quad_t>() {
+    return static_cast<acousticts_quad_t>(1e-14L);
 }
-#endif
 
 template<typename T>
 inline T psms_modal_abs_tol() {
@@ -1647,12 +1643,10 @@ inline T psms_modal_abs_tol() {
     return static_cast<T>(1e-12L);
 }
 
-#ifdef __GNUC__
 template<>
-inline __float128 psms_modal_abs_tol<__float128>() {
-    return static_cast<__float128>(1e-18L);
+inline acousticts_quad_t psms_modal_abs_tol<acousticts_quad_t>() {
+    return static_cast<acousticts_quad_t>(1e-18L);
 }
-#endif
 
 template<typename T>
 inline bool psms_modal_band_is_negligible(
@@ -1927,16 +1921,14 @@ std::vector<std::complex<T>> solve_fluid_mode_system(
     return out;
 }
 
-#ifdef __GNUC__
 template<>
-std::vector<std::complex<__float128>> solve_fluid_mode_system<__float128>(
-    const std::vector<std::complex<__float128>>& K3_kernel,
-    const std::vector<std::complex<__float128>>& rhs,
+std::vector<std::complex<acousticts_quad_t>> solve_fluid_mode_system<acousticts_quad_t>(
+    const std::vector<std::complex<acousticts_quad_t>>& K3_kernel,
+    const std::vector<std::complex<acousticts_quad_t>>& rhs,
     int size
 ) {
-    return solve_linear_system_lup_refined<__float128>(K3_kernel, rhs, size);
+    return solve_linear_system_lup_refined<acousticts_quad_t>(K3_kernel, rhs, size);
 }
-#endif
 
 template<typename T>
 std::complex<T> psms_backscatter_fluid_adaptive(
@@ -2214,8 +2206,7 @@ std::complex<T> psms_fbs(
         );
     }
 
-#ifdef __GNUC__
-    if constexpr (std::is_same_v<T, __float128>) {
+    if constexpr (is_quad_precision_v<T>) {
         if (is_backscatter && Amn_method == "Amn_fluid") {
             return psms_backscatter_fluid_adaptive<T>(
                 m_max, n_max, chi_sw, chi_body, xi, eta_body,
@@ -2223,7 +2214,6 @@ std::complex<T> psms_fbs(
             );
         }
     }
-#endif
 
     // Determine appropriate Amn expansion matrix computation
     std::vector<std::vector<std::complex<T>>> Amn;

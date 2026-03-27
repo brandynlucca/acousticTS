@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 // ============================================================================
 // HELPER FUNCTIONS
@@ -55,22 +55,6 @@ inline T extract_angular_value_from_batch(
     return std::numeric_limits<T>::quiet_NaN();
 }
 
-inline bool is_na_int(int x) {
-    return x == NA_INTEGER;
-}
-
-template<typename T>
-inline bool is_na_real(T x) {
-    return std::isnan(x);
-}
-
-#ifdef __GNUC__
-template<>
-inline bool is_na_real<__float128>(__float128 x) {
-    return isnanq(x);
-}
-#endif
-
 template<typename T>
 inline void scale_profcn_component(std::vector<T>& values, std::vector<int>& exponents) {
     // Normalize mantissa/exponent pairs in place so downstream code can treat
@@ -86,23 +70,6 @@ inline void scale_profcn_component(std::vector<T>& values, std::vector<int>& exp
         exponents[i] = 0;
     }
 }
-
-// ---- Helper: convert std::complex<double> to Rcomplex ----
-inline Rcomplex to_Rcomplex(const std::complex<double>& z) {
-    Rcomplex out;
-    out.r = z.real();
-    out.i = z.imag();
-    return out;
-}
-
-#ifdef __GNUC__
-inline Rcomplex to_Rcomplex(const std::complex<__float128>& z) {
-    Rcomplex out;
-    out.r = static_cast<double>(z.real());
-    out.i = static_cast<double>(z.imag());
-    return out;
-}
-#endif
 
 // ============================================================================
 // PROLATE SPHEROIDAL WAVE FUNCTION - PROFCN [DOUBLE]
@@ -169,24 +136,24 @@ ProfcnResultDouble cprofcn_double(
 // This adds a safety net by padding the vector sizes to avoid segmentation 
 // faults that can crash the program or the Rcpp interface
 // ============================================================================
-#ifdef __GNUC__
+#if ACOUSTICTS_HAVE_QUADMATH
 struct ProfcnResultQuad {
     // Quad-precision mirror of the profcn output arrays.
-    std::vector<__float128> r1c, r1dc, r2c, r2dc;
+    std::vector<acousticts_quad_t> r1c, r1dc, r2c, r2dc;
     std::vector<int> ir1e, ir1de, ir2e, ir2de, naccr;
-    std::vector<__float128> s1c, s1dc;
+    std::vector<acousticts_quad_t> s1c, s1dc;
     std::vector<int> is1e, is1de, naccs;
 };
 
 ProfcnResultQuad cprofcn_quad(
-    __float128 c,
+    acousticts_quad_t c,
     int m,
     int lnum,
-    const std::vector<__float128>& arg,
+    const std::vector<acousticts_quad_t>& arg,
     int ioprad,
     int iopnorm,
     int iopang,
-    __float128 x1
+    acousticts_quad_t x1
 ) {
     int narg = std::max<int>(arg.size(), 1);
 
@@ -209,11 +176,11 @@ ProfcnResultQuad cprofcn_quad(
     result.is1de.resize(lnum * narg, 0);
     result.naccs.resize(lnum * narg, 0);
     
-    std::vector<__float128> arg_c = arg;
+    std::vector<acousticts_quad_t> arg_c = arg;
 
     // Convert scalars to quad precision
-    __float128 c_q = c;
-    __float128 x1_q = x1;
+    acousticts_quad_t c_q = c;
+    acousticts_quad_t x1_q = x1;
     int m_q = m;
     int lnum_q = lnum;
     int ioprad_q = ioprad;
@@ -300,20 +267,20 @@ inline ProfcnBatchResult<double> cprofcn_batch_double(
     return result;
 }
 
-#ifdef __GNUC__
-inline ProfcnBatchResult<__float128> cprofcn_batch_quad(
-    __float128 c,
+#if ACOUSTICTS_HAVE_QUADMATH
+inline ProfcnBatchResult<acousticts_quad_t> cprofcn_batch_quad(
+    acousticts_quad_t c,
     int m_start,
     int m_count,
     int lnum,
-    const std::vector<__float128>& arg,
+    const std::vector<acousticts_quad_t>& arg,
     int ioprad,
     int iopnorm,
     int iopang,
-    __float128 x1
+    acousticts_quad_t x1
 ) {
     int narg = std::max<int>(arg.size(), 1);
-    ProfcnBatchResult<__float128> result;
+    ProfcnBatchResult<acousticts_quad_t> result;
     result.lnum = lnum;
     result.narg = narg;
     result.m_count = m_count;
@@ -335,9 +302,9 @@ inline ProfcnBatchResult<__float128> cprofcn_batch_quad(
     result.is1de.resize(angular_size, 0);
     result.naccs.resize(angular_size, 0);
 
-    std::vector<__float128> arg_c = arg;
-    __float128 c_q = c;
-    __float128 x1_q = x1;
+    std::vector<acousticts_quad_t> arg_c = arg;
+    acousticts_quad_t c_q = c;
+    acousticts_quad_t x1_q = x1;
     int m_start_q = m_start;
     int m_count_q = m_count;
     int lnum_q = lnum;
@@ -414,13 +381,11 @@ inline int psms_profcn_mblock_chunk_size() {
     return 8;
 }
 
-#ifdef __GNUC__
 template<>
-inline int psms_profcn_mblock_chunk_size<__float128>() {
+inline int psms_profcn_mblock_chunk_size<acousticts_quad_t>() {
     // Smaller quad chunks limit temporary-buffer growth.
     return 4;
 }
-#endif
 
 // ============================================================================
 // PROLATE SPHEROIDAL WAVE FUNCTION - PROFCN [PRIMARY WRAPPER]
@@ -479,22 +444,65 @@ inline ProfcnBatchResult<double> cprofcn_mblock<double>(
     return cprofcn_batch_double(c, m_start, m_count, lnum, arg, ioprad, iopnorm, iopang, x1);
 }
 
-#ifdef __GNUC__
 template<>
-inline ProfcnBatchResult<__float128> cprofcn_mblock<__float128>(
-    __float128 c,
+inline ProfcnBatchResult<acousticts_quad_t> cprofcn_mblock<acousticts_quad_t>(
+    acousticts_quad_t c,
     int m_start,
     int m_count,
     int lnum,
-    const std::vector<__float128>& arg,
+    const std::vector<acousticts_quad_t>& arg,
     int ioprad,
     int iopnorm,
     int iopang,
-    __float128 x1
+    acousticts_quad_t x1
 ) {
+#if ACOUSTICTS_HAVE_QUADMATH
     return cprofcn_batch_quad(c, m_start, m_count, lnum, arg, ioprad, iopnorm, iopang, x1);
-}
+#else
+    std::vector<double> arg_double(arg.size());
+    for (size_t i = 0; i < arg.size(); ++i) {
+        arg_double[i] = quad_to_double(arg[i]);
+    }
+
+    auto raw = cprofcn_batch_double(
+        quad_to_double(c),
+        m_start,
+        m_count,
+        lnum,
+        arg_double,
+        ioprad,
+        iopnorm,
+        iopang,
+        quad_to_double(x1)
+    );
+
+    ProfcnBatchResult<acousticts_quad_t> out;
+    out.lnum = raw.lnum;
+    out.narg = raw.narg;
+    out.m_count = raw.m_count;
+    out.ir1e = raw.ir1e;
+    out.ir1de = raw.ir1de;
+    out.ir2e = raw.ir2e;
+    out.ir2de = raw.ir2de;
+    out.naccr = raw.naccr;
+    out.is1e = raw.is1e;
+    out.is1de = raw.is1de;
+    out.naccs = raw.naccs;
+    out.r1c.reserve(raw.r1c.size());
+    out.r1dc.reserve(raw.r1dc.size());
+    out.r2c.reserve(raw.r2c.size());
+    out.r2dc.reserve(raw.r2dc.size());
+    out.s1c.reserve(raw.s1c.size());
+    out.s1dc.reserve(raw.s1dc.size());
+    for (double value : raw.r1c) out.r1c.push_back(double_to_quad(value));
+    for (double value : raw.r1dc) out.r1dc.push_back(double_to_quad(value));
+    for (double value : raw.r2c) out.r2c.push_back(double_to_quad(value));
+    for (double value : raw.r2dc) out.r2dc.push_back(double_to_quad(value));
+    for (double value : raw.s1c) out.s1c.push_back(double_to_quad(value));
+    for (double value : raw.s1dc) out.s1dc.push_back(double_to_quad(value));
+    return out;
 #endif
+}
 
 // Forward declare the template interface
 template<typename T>
@@ -539,17 +547,17 @@ inline ProfcnResult<double> cprofcn<double>(
 // -----------------------------------------------------------
 // PRIMARY WRAPPER SPECIALIZATION - CPROFCN [QUAD]
 // -----------------------------------------------------------
-#ifdef __GNUC__
 template<>
-inline ProfcnResult<__float128> cprofcn<__float128>(
-    __float128 c, int m, int lnum,
-    const std::vector<__float128>& arg,
-    int ioprad, int iopnorm, int iopang, __float128 x1
+inline ProfcnResult<acousticts_quad_t> cprofcn<acousticts_quad_t>(
+    acousticts_quad_t c, int m, int lnum,
+    const std::vector<acousticts_quad_t>& arg,
+    int ioprad, int iopnorm, int iopang, acousticts_quad_t x1
 ) {
+#if ACOUSTICTS_HAVE_QUADMATH
     // Quad-precision dispatcher for the scalar profcn wrapper.
     ProfcnResultQuad raw = cprofcn_quad(c, m, lnum, arg, ioprad, iopnorm, iopang, x1);
 
-    ProfcnResult<__float128> out;
+    ProfcnResult<acousticts_quad_t> out;
     out.r1c   = std::move(raw.r1c);
     out.r1dc  = std::move(raw.r1dc);
     out.r2c   = std::move(raw.r2c);
@@ -567,7 +575,46 @@ inline ProfcnResult<__float128> cprofcn<__float128>(
     normalize_profcn_result(out);
 
     return out;
-}
+#else
+    std::vector<double> arg_double(arg.size());
+    for (size_t i = 0; i < arg.size(); ++i) {
+        arg_double[i] = quad_to_double(arg[i]);
+    }
+
+    auto raw = cprofcn<double>(
+        quad_to_double(c),
+        m,
+        lnum,
+        arg_double,
+        ioprad,
+        iopnorm,
+        iopang,
+        quad_to_double(x1)
+    );
+
+    ProfcnResult<acousticts_quad_t> out;
+    out.ir1e = raw.ir1e;
+    out.ir1de = raw.ir1de;
+    out.ir2e = raw.ir2e;
+    out.ir2de = raw.ir2de;
+    out.naccr = raw.naccr;
+    out.is1e = raw.is1e;
+    out.is1de = raw.is1de;
+    out.naccs = raw.naccs;
+    out.r1c.reserve(raw.r1c.size());
+    out.r1dc.reserve(raw.r1dc.size());
+    out.r2c.reserve(raw.r2c.size());
+    out.r2dc.reserve(raw.r2dc.size());
+    out.s1c.reserve(raw.s1c.size());
+    out.s1dc.reserve(raw.s1dc.size());
+    for (double value : raw.r1c) out.r1c.push_back(double_to_quad(value));
+    for (double value : raw.r1dc) out.r1dc.push_back(double_to_quad(value));
+    for (double value : raw.r2c) out.r2c.push_back(double_to_quad(value));
+    for (double value : raw.r2dc) out.r2dc.push_back(double_to_quad(value));
+    for (double value : raw.s1c) out.s1c.push_back(double_to_quad(value));
+    for (double value : raw.s1dc) out.s1dc.push_back(double_to_quad(value));
+    return out;
 #endif
+}
 
 // ============================================================================

@@ -34,7 +34,8 @@ corresponding differential cross section, and its level in dB.
 }
 \description{
 Evaluates the far-field scattering amplitude from a previously computed
-\code{TMM} object using the stored T-matrix blocks. This allows the same retained
+\code{TMM} object using the stored transition-matrix blocks. This allows the same
+retained
 modal operator to be reused for arbitrary single-target incident and
 receive-angle combinations without rebuilding the boundary solve.
 }

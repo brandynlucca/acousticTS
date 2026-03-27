@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 // EXPANSION COEFFICIENT MATRIX SOLVERS
 // -----------------------------------------------------------
@@ -580,15 +580,14 @@ std::vector<std::vector<std::complex<T>>> solve_fluid_t_blocks(
     return solve_fluid_t_blocks_native<T>(K1_kernel, K3_kernel);
 }
 
-#ifdef __GNUC__
 template<>
-std::vector<std::vector<std::complex<__float128>>> solve_fluid_Amn<__float128>(
-    const std::vector<std::vector<std::complex<__float128>>>& rhs,
-    const std::vector<std::vector<std::complex<__float128>>>& K3_kernel
+std::vector<std::vector<std::complex<acousticts_quad_t>>>
+solve_fluid_Amn<acousticts_quad_t>(
+    const std::vector<std::vector<std::complex<acousticts_quad_t>>>& rhs,
+    const std::vector<std::vector<std::complex<acousticts_quad_t>>>& K3_kernel
 ) {
-    return solve_fluid_Amn_native<__float128>(rhs, K3_kernel);
+    return solve_fluid_Amn_native<acousticts_quad_t>(rhs, K3_kernel);
 }
-#endif
 
 // Two-sided Jacobi SVD
 // template<typename T>

@@ -12,10 +12,7 @@
 #include <stdexcept>
 #include <type_traits>
 #include <vector>
-#ifdef __GNUC__
-// #include <boost/multiprecision/float128.hpp>
-#include <quadmath.h>
-#endif
+#include "precision.h"
 
 // ============================================================================
 // FORTRAN INTERFACES - DOUBLE AND QUAD PRECISION
@@ -36,111 +33,34 @@ extern "C" {
     );
 
     // Quad precision
-#ifdef __GNUC__
+#if ACOUSTICTS_HAVE_QUADMATH
     // Quad precision interface
     void profcn_cpp_interface_quad(
-        __float128* c, int* m, int* lnum, int* ioprad, __float128* x1, int* iopang, int* iopnorm, 
-        int* narg, __float128* arg, __float128* r1c, int* ir1e, __float128* r1dc, int* ir1de, 
-        __float128* r2c, int* ir2e, __float128* r2dc, int* ir2de, int* naccr,
-        __float128* s1c, int* is1e, __float128* s1dc, int* is1de, int* naccs
+        acousticts_quad_t* c, int* m, int* lnum, int* ioprad, acousticts_quad_t* x1,
+        int* iopang, int* iopnorm, int* narg, acousticts_quad_t* arg,
+        acousticts_quad_t* r1c, int* ir1e, acousticts_quad_t* r1dc, int* ir1de,
+        acousticts_quad_t* r2c, int* ir2e, acousticts_quad_t* r2dc, int* ir2de,
+        int* naccr, acousticts_quad_t* s1c, int* is1e, acousticts_quad_t* s1dc,
+        int* is1de, int* naccs
     );
     void profcn_cpp_interface_batch_quad(
-        __float128* c, int* m_start, int* m_count, int* lnum, int* ioprad, __float128* x1,
-        int* iopang, int* iopnorm, int* narg, __float128* arg, __float128* r1c, int* ir1e,
-        __float128* r1dc, int* ir1de, __float128* r2c, int* ir2e, __float128* r2dc, int* ir2de,
-        int* naccr, __float128* s1c, int* is1e, __float128* s1dc, int* is1de, int* naccs
+        acousticts_quad_t* c, int* m_start, int* m_count, int* lnum, int* ioprad,
+        acousticts_quad_t* x1, int* iopang, int* iopnorm, int* narg,
+        acousticts_quad_t* arg, acousticts_quad_t* r1c, int* ir1e,
+        acousticts_quad_t* r1dc, int* ir1de, acousticts_quad_t* r2c, int* ir2e,
+        acousticts_quad_t* r2dc, int* ir2de, int* naccr, acousticts_quad_t* s1c,
+        int* is1e, acousticts_quad_t* s1dc, int* is1de, int* naccs
     );
 
     // Quad precision math functions
-    __float128 powq(__float128, __float128);
+    acousticts_quad_t powq(acousticts_quad_t, acousticts_quad_t);
 #endif
 }
-
-// ============================================================================
-// QUAD PRECISION HELPERS
-// ============================================================================
-// The spheroidal backend often stores values as mantissas plus base-10
-// exponents to avoid overflow and underflow. These helpers provide the
-// precision-aware scalar operations needed to reconstruct ordinary values in
-// either double or quadruple precision.
-template<typename T>
-inline T pow10_typed(int exponent);
-
-template<>
-inline double pow10_typed<double>(int exponent) {
-    if (exponent == 0) return 1.0;
-    return std::pow(10.0, static_cast<double>(exponent));
-}
-
-#ifdef __GNUC__
-// Keep the explicit double <-> quad conversions in one place so the rest of
-// the PSMS implementation can remain templated and readable.
-inline __float128 double_to_quad(double x) {
-    return static_cast<__float128>(x);
-}
-
-inline double quad_to_double(__float128 x) {
-    return static_cast<double>(x);
-}
-
-template<>
-inline __float128 pow10_typed<__float128>(int exponent) {
-    if (exponent == 0) return double_to_quad(1.0);
-    return powq(double_to_quad(10.0), double_to_quad(static_cast<double>(exponent)));
-}
-#endif
-
-template<typename T>
-inline T preccos(T x) { return std::cos(x); }
-#ifdef __GNUC__
-template<>
-inline __float128 preccos(__float128 x) { return cosq(x); }
-#endif
-
-template<typename T>
-inline T precsqrt(T x) { return std::sqrt(x); }
-#ifdef __GNUC__
-template<>
-inline __float128 precsqrt(__float128 x) { return sqrtq(x); }
-#endif
-
-template<typename T>
-inline T precabs(T x) { return std::abs(x); }
-#ifdef __GNUC__
-template<>
-inline __float128 precabs(__float128 x) { return fabsq(x); }
-#endif
-
-template<typename T>
-inline T preceps() { return std::numeric_limits<T>::epsilon(); }
-#ifdef __GNUC__
-template<>
-inline __float128 preceps<__float128>() {
-    static const __float128 one = static_cast<__float128>(1.0);
-    static const __float128 two = static_cast<__float128>(2.0);
-    static const __float128 eps = nextafterq(one, two) - one;
-    return eps;
-}
-#endif
-
-template<typename T>
-inline T complex_abs_sq(const std::complex<T>& z) {
-    return z.real() * z.real() + z.imag() * z.imag();
-}
-
 template<typename T>
 struct ProfcnResult;
 
 template<typename T>
 struct ProfcnBatchResult;
-
-inline bool is_na_int(int x);
-
-template<typename T>
-inline bool is_na_real(T x);
-
-template<typename T>
-inline void scale_profcn_component(std::vector<T>& values, std::vector<int>& exponents);
 
 // Internal PSMS support layer: special-function wrappers, profcn batching,
 // exponent rescaling helpers, and precision-agnostic scaffolding.
@@ -170,17 +90,13 @@ Rcpp::List Smn_cpp(
         Rcpp::stop("'eta' must have at least one element.");
 
     if (precision == "quad") {
-#ifndef __GNUC__
-        Rcpp::stop("Quad precision requires GCC compilation.");
-#else
-        std::vector<__float128> eta_quad(eta_len);
+        std::vector<acousticts_quad_t> eta_quad(eta_len);
         for (int i = 0; i < eta_len; ++i)
-            eta_quad[i] = static_cast<__float128>(arg[i]);
-        auto res = Smn_matrix<__float128>(
-            m_vec, n_vec, static_cast<__float128>(c), eta_quad, normalize
+            eta_quad[i] = static_cast<acousticts_quad_t>(arg[i]);
+        auto res = Smn_matrix<acousticts_quad_t>(
+            m_vec, n_vec, static_cast<acousticts_quad_t>(c), eta_quad, normalize
         );
         return Smn_cpp_to_rcpp_list(res, m_len, n_len, eta_len);
-#endif
     } else if (precision == "double") {
         std::vector<double> eta_vec = Rcpp::as<std::vector<double>>(arg);
         auto res = Smn_matrix<double>(m_vec, n_vec, c, eta_vec, normalize);
@@ -212,12 +128,9 @@ Rcpp::List Rmn_cpp(
     int n_len = n_vec.size();
 
     if (precision == "quad") {
-#ifndef __GNUC__
-        Rcpp::stop("Quad precision requires GCC compilation.");
-#else
-        __float128 c_q = static_cast<__float128>(c);
-        __float128 x1_q = static_cast<__float128>(x1);
-        auto res = Rmn_matrix<__float128>(m_vec, n_vec, c_q, x1_q, kind);
+        acousticts_quad_t c_q = static_cast<acousticts_quad_t>(c);
+        acousticts_quad_t x1_q = static_cast<acousticts_quad_t>(x1);
+        auto res = Rmn_matrix<acousticts_quad_t>(m_vec, n_vec, c_q, x1_q, kind);
 
         if (kind == 3 || kind == 4) {
             if (m_len == 1 || n_len == 1) {
@@ -266,7 +179,6 @@ Rcpp::List Rmn_cpp(
                 );
             }
         }
-#endif
     } else if (precision == "double") {
         auto res = Rmn_matrix<double>(m_vec, n_vec, c, x1, kind);
         if (kind == 3 || kind == 4) {
@@ -366,33 +278,29 @@ Rcpp::ComplexVector prolate_spheroid_fbs(
     std::vector<Rcomplex> f_bs_out(n_freq);
 
     if (precision == "quad") {
-#ifdef __GNUC__
-        std::vector<__float128> nodes_q(nodes.size()), weights_q(weights.size());
-        for (int i = 0; i < nodes.size(); ++i) nodes_q[i] = static_cast<__float128>(nodes[i]);
-        for (int i = 0; i < weights.size(); ++i) weights_q[i] = static_cast<__float128>(weights[i]);
+        std::vector<acousticts_quad_t> nodes_q(nodes.size()), weights_q(weights.size());
+        for (int i = 0; i < nodes.size(); ++i) nodes_q[i] = static_cast<acousticts_quad_t>(nodes[i]);
+        for (int i = 0; i < weights.size(); ++i) weights_q[i] = static_cast<acousticts_quad_t>(weights[i]);
         for (int f = 0; f < n_freq; ++f) {
             // Each frequency is independent, so the wrapper simply dispatches
             // one retained PSMS solve per frequency and stores the resulting
             // complex backscatter amplitude.
-            auto fbs = psms_fbs<__float128>(
+            auto fbs = psms_fbs<acousticts_quad_t>(
                 m_max[f], n_max[f],
-                static_cast<__float128>(chi_sw[f]),
-                static_cast<__float128>(chi_body[f]),
-                static_cast<__float128>(xi),
-                static_cast<__float128>(theta_body),
-                static_cast<__float128>(theta_scatter),
-                static_cast<__float128>(phi_body),
-                static_cast<__float128>(phi_scatter),
-                static_cast<__float128>(density_body),
-                static_cast<__float128>(density_sw),
+                static_cast<acousticts_quad_t>(chi_sw[f]),
+                static_cast<acousticts_quad_t>(chi_body[f]),
+                static_cast<acousticts_quad_t>(xi),
+                static_cast<acousticts_quad_t>(theta_body),
+                static_cast<acousticts_quad_t>(theta_scatter),
+                static_cast<acousticts_quad_t>(phi_body),
+                static_cast<acousticts_quad_t>(phi_scatter),
+                static_cast<acousticts_quad_t>(density_body),
+                static_cast<acousticts_quad_t>(density_sw),
                 nodes_q, weights_q,
                 Amn_method, adaptive, vectorized
             );
             f_bs_out[f] = to_Rcomplex(fbs);
         }
-#else
-        Rcpp::stop("Quad precision requires GCC and libquadmath.");
-#endif
     } else {
         std::vector<double> nodes_vec = Rcpp::as<std::vector<double>>(nodes);
         std::vector<double> weights_vec = Rcpp::as<std::vector<double>>(weights);
@@ -410,7 +318,6 @@ Rcpp::ComplexVector prolate_spheroid_fbs(
     }
     return Rcpp::wrap(f_bs_out);
 }
-
 template<typename T>
 Rcpp::List prolate_tmatrix_blocks_to_rcpp(
     int m_max,
@@ -472,47 +379,43 @@ Rcpp::List prolate_spheroid_tmatrix_cpp(
     Rcpp::List t_store(n_freq);
 
     if (precision == "quad") {
-#ifdef __GNUC__
-        std::vector<__float128> nodes_q(nodes.size()), weights_q(weights.size());
-        for (int i = 0; i < nodes.size(); ++i) nodes_q[i] = static_cast<__float128>(nodes[i]);
-        for (int i = 0; i < weights.size(); ++i) weights_q[i] = static_cast<__float128>(weights[i]);
+        std::vector<acousticts_quad_t> nodes_q(nodes.size()), weights_q(weights.size());
+        for (int i = 0; i < nodes.size(); ++i) nodes_q[i] = static_cast<acousticts_quad_t>(nodes[i]);
+        for (int i = 0; i < weights.size(); ++i) weights_q[i] = static_cast<acousticts_quad_t>(weights[i]);
 
         for (int f = 0; f < n_freq; ++f) {
-            auto t_blocks = psms_tmatrix_blocks<__float128>(
+            auto t_blocks = psms_tmatrix_blocks<acousticts_quad_t>(
                 m_max[f], n_max[f],
-                static_cast<__float128>(chi_sw[f]),
-                static_cast<__float128>(chi_body[f]),
-                static_cast<__float128>(xi),
-                static_cast<__float128>(density_body),
-                static_cast<__float128>(density_sw),
+                static_cast<acousticts_quad_t>(chi_sw[f]),
+                static_cast<acousticts_quad_t>(chi_body[f]),
+                static_cast<acousticts_quad_t>(xi),
+                static_cast<acousticts_quad_t>(density_body),
+                static_cast<acousticts_quad_t>(density_sw),
                 nodes_q, weights_q,
                 Amn_method
             );
-            auto smn_inc = compute_smn_matrix<__float128>(
-                m_max[f], n_max[f], static_cast<__float128>(chi_sw[f]),
-                preccos(static_cast<__float128>(theta_body)), true
+            auto smn_inc = compute_smn_matrix<acousticts_quad_t>(
+                m_max[f], n_max[f], static_cast<acousticts_quad_t>(chi_sw[f]),
+                preccos(static_cast<acousticts_quad_t>(theta_body)), true
             );
-            auto smn_scat = compute_smn_matrix<__float128>(
-                m_max[f], n_max[f], static_cast<__float128>(chi_sw[f]),
-                preccos(static_cast<__float128>(theta_scatter)), true
+            auto smn_scat = compute_smn_matrix<acousticts_quad_t>(
+                m_max[f], n_max[f], static_cast<acousticts_quad_t>(chi_sw[f]),
+                preccos(static_cast<acousticts_quad_t>(theta_scatter)), true
             );
-            auto azimuth = compute_azimuth<__float128>(
+            auto azimuth = compute_azimuth<acousticts_quad_t>(
                 m_max[f],
-                static_cast<__float128>(phi_body),
-                static_cast<__float128>(phi_scatter)
+                static_cast<acousticts_quad_t>(phi_body),
+                static_cast<acousticts_quad_t>(phi_scatter)
             );
 
-            auto f_val = compute_fbs_from_tmatrix_blocks<__float128>(
+            auto f_val = compute_fbs_from_tmatrix_blocks<acousticts_quad_t>(
                 m_max[f], n_max[f], azimuth, smn_inc, smn_scat, t_blocks
             );
             f_scat[f] = to_Rcomplex(f_val);
-            t_store[f] = prolate_tmatrix_blocks_to_rcpp<__float128>(
+            t_store[f] = prolate_tmatrix_blocks_to_rcpp<acousticts_quad_t>(
                 m_max[f], n_max[f], t_blocks
             );
         }
-#else
-        Rcpp::stop("Quad precision requires GCC and libquadmath.");
-#endif
     } else {
         std::vector<double> nodes_vec = Rcpp::as<std::vector<double>>(nodes);
         std::vector<double> weights_vec = Rcpp::as<std::vector<double>>(weights);
@@ -670,23 +573,19 @@ Rcpp::ComplexVector prolate_spheroid_scattering_from_tmatrix_cpp(
     Rcpp::ComplexVector f_scat(n_freq);
 
     if (precision == "quad") {
-#ifdef __GNUC__
         for (int f = 0; f < n_freq; ++f) {
             f_scat[f] = to_Rcomplex(
-                prolate_scattering_from_retained_blocks_single<__float128>(
+                prolate_scattering_from_retained_blocks_single<acousticts_quad_t>(
                     t_matrix[f],
-                    static_cast<__float128>(chi_sw[f]),
-                    static_cast<__float128>(k_sw[f]),
-                    static_cast<__float128>(theta_body),
-                    static_cast<__float128>(phi_body),
-                    static_cast<__float128>(theta_scatter),
-                    static_cast<__float128>(phi_scatter)
+                    static_cast<acousticts_quad_t>(chi_sw[f]),
+                    static_cast<acousticts_quad_t>(k_sw[f]),
+                    static_cast<acousticts_quad_t>(theta_body),
+                    static_cast<acousticts_quad_t>(phi_body),
+                    static_cast<acousticts_quad_t>(theta_scatter),
+                    static_cast<acousticts_quad_t>(phi_scatter)
                 )
             );
         }
-#else
-        Rcpp::stop("Quad precision requires GCC and libquadmath.");
-#endif
     } else {
         for (int f = 0; f < n_freq; ++f) {
             f_scat[f] = to_Rcomplex(
@@ -724,22 +623,18 @@ Rcpp::ComplexMatrix prolate_spheroid_scattering_grid_from_tmatrix_cpp(
     double k_sw = Rcpp::as<std::vector<double>>(acoustics["k_sw"])[0];
 
     if (precision == "quad") {
-#ifdef __GNUC__
-        std::vector<__float128> theta_q(theta_scatter.size()), phi_q(phi_scatter.size());
-        for (int i = 0; i < theta_scatter.size(); ++i) theta_q[i] = static_cast<__float128>(theta_scatter[i]);
-        for (int j = 0; j < phi_scatter.size(); ++j) phi_q[j] = static_cast<__float128>(phi_scatter[j]);
-        return prolate_scattering_grid_from_retained_blocks_single<__float128>(
+        std::vector<acousticts_quad_t> theta_q(theta_scatter.size()), phi_q(phi_scatter.size());
+        for (int i = 0; i < theta_scatter.size(); ++i) theta_q[i] = static_cast<acousticts_quad_t>(theta_scatter[i]);
+        for (int j = 0; j < phi_scatter.size(); ++j) phi_q[j] = static_cast<acousticts_quad_t>(phi_scatter[j]);
+        return prolate_scattering_grid_from_retained_blocks_single<acousticts_quad_t>(
             t_matrix,
-            static_cast<__float128>(chi_sw),
-            static_cast<__float128>(k_sw),
-            static_cast<__float128>(theta_body),
-            static_cast<__float128>(phi_body),
+            static_cast<acousticts_quad_t>(chi_sw),
+            static_cast<acousticts_quad_t>(k_sw),
+            static_cast<acousticts_quad_t>(theta_body),
+            static_cast<acousticts_quad_t>(phi_body),
             theta_q,
             phi_q
         );
-#else
-        Rcpp::stop("Quad precision requires GCC and libquadmath.");
-#endif
     }
 
     return prolate_scattering_grid_from_retained_blocks_single<double>(

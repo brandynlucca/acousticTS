@@ -54,8 +54,9 @@ path for spheroidal targets, or \code{NULL} for other shapes.}
 }
 }
 \description{
-Reuses the stored T-matrix blocks to compute a compact set of numerical and
-physics-based diagnostics for one or more stored frequencies. The summary
+Reuses the stored transition-matrix blocks to compute a compact set of
+numerical and physics-based diagnostics for one or more stored frequencies.
+The summary
 combines:
 
 \itemize{
@@ -63,7 +64,8 @@ combines:
 \item reciprocity residuals under incident/receive-angle exchange,
 \item an optical-theorem residual based on forward scattering and the
 integrated differential cross section,
-\item block-level conditioning indicators from the stored T-matrix blocks,
+\item block-level conditioning indicators from the stored
+transition-matrix blocks,
 \item and, for prolate/oblate targets, an equal-volume sphere-to-spheroid
 continuation path that checks whether the monostatic response deforms
 smoothly away from the exact sphere limit.

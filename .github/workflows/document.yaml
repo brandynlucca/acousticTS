@@ -28,14 +28,17 @@ jobs:
         with:
           use-public-rspm: true
 
+      - name: Install Fortran toolchain
+        run: sudo apt-get update && sudo apt-get install -y gfortran
+
       - name: Install dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::roxygen2
+          extra-packages: any::devtools, any::roxygen2, local::.
           needs: roxygen2
 
       - name: Document
-        run: roxygen2::roxygenise()
+        run: devtools::document(quiet = TRUE)
         shell: Rscript {0}
 
       - name: Commit and push changes

@@ -223,7 +223,6 @@ simulate_ts <- function(object,
       cat("Preparing parallelized simulations\n")
       cat("Number of cores:", paste0(n_cores), "\n")
     }
-    package_path <- .resolve_simulation_package_path()
     # ---- Set up cluster ++++++++++++++++++++++++++++++++++++++++++++++++++++++
     cluster <- parallel::makeCluster(n_cores)
     on.exit(parallel::stopCluster(cluster))
@@ -231,24 +230,11 @@ simulate_ts <- function(object,
     # ---- Make sure appropriate libraries are loaded ++++++++++++++++++++++++++
     parallel::clusterCall(
       cluster,
-      function(path) {
-        if (!is.null(path) &&
-          requireNamespace("pkgload", quietly = TRUE) &&
-          file.exists(file.path(path, "DESCRIPTION"))) {
-          pkgload::load_all(
-            path = path,
-            quiet = TRUE,
-            helpers = FALSE,
-            attach_testthat = FALSE,
-            export_all = FALSE
-          )
-        } else {
-          loadNamespace("acousticTS")
-        }
+      function() {
+        loadNamespace("acousticTS")
         loadNamespace("methods")
         NULL
-      },
-      package_path
+      }
     )
     # ---- Export the required objects/functions to each core ++++++++++++++++++
     parallel::clusterExport(
@@ -327,33 +313,6 @@ simulate_ts <- function(object,
   normalized_model <- tolower(model)
   normalized_model[normalized_model == "soems"] <- "calibration"
   normalized_model
-}
-
-#' Resolve the development package path for worker-side loading when available
-#' @keywords internal
-#' @noRd
-.resolve_simulation_package_path <- function() {
-  search_dir <- normalizePath(".", winslash = "/", mustWork = TRUE)
-
-  repeat {
-    desc_path <- file.path(search_dir, "DESCRIPTION")
-    if (file.exists(desc_path)) {
-      desc <- tryCatch(read.dcf(desc_path), error = function(e) NULL)
-      if (!is.null(desc) &&
-        "Package" %in% colnames(desc) &&
-        identical(unname(desc[1, "Package"]), "acousticTS")) {
-        return(search_dir)
-      }
-    }
-
-    parent_dir <- dirname(search_dir)
-    if (identical(parent_dir, search_dir)) {
-      break
-    }
-    search_dir <- parent_dir
-  }
-
-  NULL
 }
 
 #' Run a single simulation for a given parameter grid index

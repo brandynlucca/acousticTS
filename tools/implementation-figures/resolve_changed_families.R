@@ -1,21 +1,25 @@
-script_arg <- commandArgs(trailingOnly = FALSE)
-script_file <- sub(
-  "^--file=",
-  "",
-  script_arg[grep("^--file=", script_arg)][1]
-)
-if (is.na(script_file) || !nzchar(script_file)) {
-  script_file <- file.path(
-    "tools",
-    "implementation-figures",
-    "resolve_changed_families.R"
+if (file.exists("DESCRIPTION")) {
+  repo_root <- normalizePath(".", winslash = "/", mustWork = TRUE)
+} else {
+  script_arg <- commandArgs(trailingOnly = FALSE)
+  script_file <- sub(
+    "^--file=",
+    "",
+    script_arg[grep("^--file=", script_arg)][1]
+  )
+  if (is.na(script_file) || !nzchar(script_file)) {
+    script_file <- file.path(
+      "tools",
+      "implementation-figures",
+      "resolve_changed_families.R"
+    )
+  }
+  repo_root <- normalizePath(
+    file.path(dirname(script_file), "..", ".."),
+    winslash = "/",
+    mustWork = FALSE
   )
 }
-repo_root <- normalizePath(
-  file.path(dirname(script_file), "..", ".."),
-  winslash = "/",
-  mustWork = FALSE
-)
 setwd(repo_root)
 
 manifest <- utils::read.csv(

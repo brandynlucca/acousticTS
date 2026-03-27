@@ -103,7 +103,7 @@ SmnMatrixResult<T> Smn_matrix(
     for (int ni : n)
         if (ni < 0) throw std::invalid_argument("All 'n' values must be >= 0.");
     for (T e : eta)
-        if (std::abs(e) > 1.0) {
+        if (precabs(e) > T(1)) {
             throw std::invalid_argument("|eta| must be <= 1 for the angular prolate domain.");
         }
 

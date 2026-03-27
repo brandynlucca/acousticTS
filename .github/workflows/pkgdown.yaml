@@ -29,6 +29,9 @@ jobs:
         with:
           use-public-rspm: true
 
+      - name: Install Fortran toolchain
+        run: sudo apt-get update && sudo apt-get install -y gfortran
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::pkgdown, local::.

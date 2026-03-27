@@ -157,7 +157,7 @@ std::pair<std::complex<T>, std::complex<T>> Rmn_scalar(
             const T tiny = T(1e-300);
             bool R_bad = !std::isfinite(static_cast<double>(R)) ||
                         !std::isfinite(static_cast<double>(Rd)) ||
-                        (std::abs(R) < tiny && std::abs(Rd) < tiny);
+                        (precabs(R) < tiny && precabs(Rd) < tiny);
             if (R_bad) {
                 R = std::numeric_limits<T>::quiet_NaN();
                 Rd = std::numeric_limits<T>::quiet_NaN();
@@ -249,7 +249,7 @@ RadialValue<T> extract_radial_from_batch(
             const T tiny = T(1e-300);
             bool bad = !std::isfinite(static_cast<double>(out.val_real)) ||
                     !std::isfinite(static_cast<double>(out.der_real)) ||
-                    (std::abs(out.val_real) < tiny && std::abs(out.der_real) < tiny);
+                    (precabs(out.val_real) < tiny && precabs(out.der_real) < tiny);
             if (bad) {
                 out.val_real = std::numeric_limits<T>::quiet_NaN();
                 out.der_real = std::numeric_limits<T>::quiet_NaN();
@@ -305,7 +305,7 @@ RadialValue<T> extract_radial_from_batch(
     const T tiny = T(1e-300);
     bool bad = !std::isfinite(static_cast<double>(out.val_imag)) ||
             !std::isfinite(static_cast<double>(out.der_imag)) ||
-            (std::abs(out.val_imag) < tiny && std::abs(out.der_imag) < tiny);
+            (precabs(out.val_imag) < tiny && precabs(out.der_imag) < tiny);
     if (bad) {
         out.val_imag = std::numeric_limits<T>::quiet_NaN();
         out.der_imag = std::numeric_limits<T>::quiet_NaN();
@@ -342,7 +342,7 @@ RadialValue<T> extract_radial_from_mblock(
             const T tiny = T(1e-300);
             bool bad = !std::isfinite(static_cast<double>(out.val_real)) ||
                 !std::isfinite(static_cast<double>(out.der_real)) ||
-                (std::abs(out.val_real) < tiny && std::abs(out.der_real) < tiny);
+                (precabs(out.val_real) < tiny && precabs(out.der_real) < tiny);
             if (bad) {
                 out.val_real = std::numeric_limits<T>::quiet_NaN();
                 out.der_real = std::numeric_limits<T>::quiet_NaN();
@@ -375,7 +375,7 @@ RadialValue<T> extract_radial_from_mblock(
     const T tiny = T(1e-300);
     bool bad = !std::isfinite(static_cast<double>(out.val_imag)) ||
         !std::isfinite(static_cast<double>(out.der_imag)) ||
-        (std::abs(out.val_imag) < tiny && std::abs(out.der_imag) < tiny);
+        (precabs(out.val_imag) < tiny && precabs(out.der_imag) < tiny);
     if (bad) {
         out.val_imag = std::numeric_limits<T>::quiet_NaN();
         out.der_imag = std::numeric_limits<T>::quiet_NaN();
