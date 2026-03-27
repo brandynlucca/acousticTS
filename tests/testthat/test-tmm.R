@@ -1,5 +1,11 @@
 library(acousticTS)
 
+.with_null_pdf_device <- function(expr) {
+  grDevices::pdf(NULL)
+  on.exit(grDevices::dev.off(), add = TRUE)
+  invisible(force(expr))
+}
+
 test_that("TMM matches SPHMS across multiple sphere sizes and boundary cases", {
   density_sw <- 1026.8
   sound_speed_sw <- 1477.3
@@ -662,12 +668,6 @@ test_that("TMM orientation distributions normalize and agree with explicit avera
 })
 
 test_that("TMM scattering plots work from stored blocks", {
-  suppressPlot <- function(expr) {
-    pdf(NULL)
-    on.exit(dev.off())
-    invisible(force(expr))
-  }
-
   density_sw <- 1026.8
   sound_speed_sw <- 1477.3
 
@@ -686,7 +686,7 @@ test_that("TMM scattering plots work from stored blocks", {
     store_t_matrix = TRUE
   )
   expect_error(
-    suppressPlot(
+    .with_null_pdf_device(
       plot(
         sphere_object,
         type = "scattering",
@@ -697,7 +697,7 @@ test_that("TMM scattering plots work from stored blocks", {
     NA
   )
   expect_error(
-    suppressPlot(
+    .with_null_pdf_device(
       plot(
         sphere_object,
         type = "scattering",
@@ -725,7 +725,7 @@ test_that("TMM scattering plots work from stored blocks", {
     store_t_matrix = TRUE
   )
   expect_error(
-    suppressPlot(
+    .with_null_pdf_device(
       plot(
         prolate_object,
         type = "scattering",
@@ -737,7 +737,7 @@ test_that("TMM scattering plots work from stored blocks", {
     NA
   )
   expect_error(
-    suppressPlot(
+    .with_null_pdf_device(
       plot(
         prolate_object,
         type = "scattering",
@@ -770,7 +770,9 @@ test_that("TMM scattering plots require stored blocks", {
   )
 
   expect_error(
-    plot(object, type = "scattering", frequency = 38e3),
+    .with_null_pdf_device(
+      plot(object, type = "scattering", frequency = 38e3)
+    ),
     "Stored T-matrix blocks are required"
   )
 })
@@ -1220,14 +1222,16 @@ test_that("Cylinder TMM rejects unsupported general-angle stored scattering requ
   )
 
   expect_error(
-    suppressWarnings(plot(
-      object,
-      type = "scattering",
-      frequency = 70e3,
-      polar = TRUE,
-      n_theta = 21,
-      n_phi = 41
-    )),
+    .with_null_pdf_device(
+      suppressWarnings(plot(
+        object,
+        type = "scattering",
+        frequency = 70e3,
+        polar = TRUE,
+        n_theta = 21,
+        n_phi = 41
+      ))
+    ),
     "Stored cylindrical TMM grid evaluations are not available yet"
   )
 })

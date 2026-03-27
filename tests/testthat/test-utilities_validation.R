@@ -205,7 +205,7 @@ test_that("validation helpers enforce expected argument contracts", {
   )
   expect_error(
     acousticTS:::.validate_elastic_inputs(K = 1, E = NULL, G = NULL, nu = NULL),
-    "At least 2 elasticity moduli values are required."
+    "At least two elasticity moduli values are required."
   )
   expect_error(
     acousticTS:::.validate_elastic_inputs(
@@ -215,7 +215,10 @@ test_that("validation helpers enforce expected argument contracts", {
       nu = NULL,
       param_name = "Young's modulus"
     ),
-    "At least 2 elasticity moduli values are required to calculate Young's modulus."
+    paste0(
+      "At least two elasticity moduli values are required to calculate ",
+      "Young's modulus."
+    )
   )
 })
 
