@@ -248,9 +248,8 @@ America, 96: 1661-1668.
 
 ## See also
 
-See the [boundary conditions
-documentation](https://brandynlucca.github.io/acousticTS/reference/boundary_conditions.md)
-for more details on fluid-like scattering assumptions,
+See the boundary conditions documentation for more details on fluid-like
+scattering assumptions,
 [`target_strength`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md),
 [`SBF`](https://brandynlucca.github.io/acousticTS/reference/SBF-class.md),
 [`FLS`](https://brandynlucca.github.io/acousticTS/reference/FLS-class.md)

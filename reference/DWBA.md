@@ -117,9 +117,7 @@ Acoustical Society of America, 103, 236-253.
 
 ## See also
 
-See the [boundary conditions
-documentation](https://brandynlucca.github.io/acousticTS/reference/boundary_conditions.md)
-for more details on how weak scattering relates to other boundary
-conditions,
+See the boundary conditions documentation for more details on how weak
+scattering relates to other boundary conditions,
 [`target_strength`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md),
 [`FLS`](https://brandynlucca.github.io/acousticTS/reference/FLS-class.md)

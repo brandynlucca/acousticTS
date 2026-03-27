@@ -178,8 +178,6 @@ material-property conversions.
 
 ### Acoustic quantities and coefficients
 
-- [`boundary_conditions`](https://brandynlucca.github.io/acousticTS/reference/boundary_conditions.md)
-  : Boundary conditions for scatterers
 - [`wavenumber()`](https://brandynlucca.github.io/acousticTS/reference/wavenumber.md)
   : Calculate the acoustic wavenumber (\\k\\) for a given frequency and
   sound speed.

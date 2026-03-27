@@ -154,10 +154,8 @@ shelled bodies. The Journal of the Acoustical Society of America, 88:
 
 ## See also
 
-See the [boundary conditions
-documentation](https://brandynlucca.github.io/acousticTS/reference/boundary_conditions.md)
-for more details on how elastic-shelled scattering relates to other
-boundary conditions,
+See the boundary conditions documentation for more details on how
+elastic-shelled scattering relates to other boundary conditions,
 [`target_strength`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md),
 [`ESS`](https://brandynlucca.github.io/acousticTS/reference/ESS-class.md),
 [`Sphere`](https://brandynlucca.github.io/acousticTS/reference/Sphere-class.md),

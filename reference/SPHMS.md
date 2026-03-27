@@ -27,9 +27,8 @@ This model is accessed via:
   Boundary condition at a spherical surface. One of `"fixed_rigid"`,
   `"pressure_release"`, `"liquid_filled"`, `"gas_filled"`,
   `"shelled_pressure_release"`, `"shelled_liquid"`, or `"shelled_gas"`.
-  See the [boundary conditions
-  documentation](https://brandynlucca.github.io/acousticTS/reference/boundary_conditions.md)
-  for more details on these different boundary conditions.
+  See the boundary conditions documentation for more details on these
+  different boundary conditions.
 
 - `sound_speed_sw`:
 

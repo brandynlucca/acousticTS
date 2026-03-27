@@ -36,9 +36,8 @@ This model is accessed via:
 
   Boundary condition at the cylinder surface. One of `"fixed_rigid"`,
   `"pressure_release"`, `"liquid_filled"`, or `"gas_filled"`. See the
-  [boundary conditions
-  documentation](https://brandynlucca.github.io/acousticTS/reference/boundary_conditions.md)
-  for more details on these different boundary conditions.
+  boundary conditions documentation for more details on these different
+  boundary conditions.
 
 - `adaptive`:
 
