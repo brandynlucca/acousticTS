@@ -47,6 +47,30 @@ jobs:
           use-public-rspm: true
           error-on: '"error"'
 
+      - name: Install Linux Fortran toolchain
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y gfortran
+
+      - name: Install macOS GNU toolchain
+        if: runner.os == 'macOS'
+        run: |
+          brew update
+          brew install gcc
+
+      - name: Configure macOS Fortran compiler
+        if: runner.os == 'macOS'
+        run: |
+          GFORTRAN=$(ls /opt/homebrew/bin/gfortran-* 2>/dev/null | sort -V | tail -1)
+          if [ -z "$GFORTRAN" ]; then
+            GFORTRAN=$(ls /usr/local/bin/gfortran-* 2>/dev/null | sort -V | tail -1)
+          fi
+          mkdir -p ~/.R
+          {
+            echo "FC=$GFORTRAN"
+            echo "F77=$GFORTRAN"
+          } >> ~/.R/Makevars
+        shell: bash
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck

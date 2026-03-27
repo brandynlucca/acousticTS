@@ -586,7 +586,13 @@ solve_fluid_Amn<acousticts_quad_t>(
     const std::vector<std::vector<std::complex<acousticts_quad_t>>>& rhs,
     const std::vector<std::vector<std::complex<acousticts_quad_t>>>& K3_kernel
 ) {
+#if ACOUSTICTS_HAVE_QUADMATH
     return solve_fluid_Amn_native<acousticts_quad_t>(rhs, K3_kernel);
+#else
+    return solve_fluid_Amn_divide_and_conquer<acousticts_quad_t>(
+        rhs, K3_kernel
+    );
+#endif
 }
 
 // Two-sided Jacobi SVD

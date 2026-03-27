@@ -224,7 +224,8 @@ inline ProfcnBatchResult<double> cprofcn_batch_double(
     int ioprad,
     int iopnorm,
     int iopang,
-    double x1
+    double x1,
+    bool scale = true
 ) {
     int narg = std::max<int>(arg.size(), 1);
     ProfcnBatchResult<double> result;
@@ -258,12 +259,14 @@ inline ProfcnBatchResult<double> cprofcn_batch_double(
         result.s1dc.data(), result.is1de.data(), result.naccs.data()
     );
 
-    scale_profcn_component(result.r1c, result.ir1e);
-    scale_profcn_component(result.r1dc, result.ir1de);
-    scale_profcn_component(result.r2c, result.ir2e);
-    scale_profcn_component(result.r2dc, result.ir2de);
-    scale_profcn_component(result.s1c, result.is1e);
-    scale_profcn_component(result.s1dc, result.is1de);
+    if (scale) {
+        scale_profcn_component(result.r1c, result.ir1e);
+        scale_profcn_component(result.r1dc, result.ir1de);
+        scale_profcn_component(result.r2c, result.ir2e);
+        scale_profcn_component(result.r2dc, result.ir2de);
+        scale_profcn_component(result.s1c, result.is1e);
+        scale_profcn_component(result.s1dc, result.is1de);
+    }
     return result;
 }
 
@@ -473,7 +476,8 @@ inline ProfcnBatchResult<acousticts_quad_t> cprofcn_mblock<acousticts_quad_t>(
         ioprad,
         iopnorm,
         iopang,
-        quad_to_double(x1)
+        quad_to_double(x1),
+        false
     );
 
     ProfcnBatchResult<acousticts_quad_t> out;
@@ -500,6 +504,12 @@ inline ProfcnBatchResult<acousticts_quad_t> cprofcn_mblock<acousticts_quad_t>(
     for (double value : raw.r2dc) out.r2dc.push_back(double_to_quad(value));
     for (double value : raw.s1c) out.s1c.push_back(double_to_quad(value));
     for (double value : raw.s1dc) out.s1dc.push_back(double_to_quad(value));
+    scale_profcn_component(out.r1c, out.ir1e);
+    scale_profcn_component(out.r1dc, out.ir1de);
+    scale_profcn_component(out.r2c, out.ir2e);
+    scale_profcn_component(out.r2dc, out.ir2de);
+    scale_profcn_component(out.s1c, out.is1e);
+    scale_profcn_component(out.s1dc, out.is1de);
     return out;
 #endif
 }

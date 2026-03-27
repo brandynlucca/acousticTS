@@ -1874,7 +1874,7 @@ std::complex<T> psms_backscatter_fixed_rigid(
 // Double precision uses the Armadillo SVD path here; quad precision dispatches
 // to the native LUP-refined solve below.
 template<typename T>
-std::vector<std::complex<T>> solve_fluid_mode_system(
+std::vector<std::complex<T>> solve_fluid_mode_system_svd(
     const std::vector<std::complex<T>>& K3_kernel,
     const std::vector<std::complex<T>>& rhs,
     int size
@@ -1921,13 +1921,26 @@ std::vector<std::complex<T>> solve_fluid_mode_system(
     return out;
 }
 
+template<typename T>
+std::vector<std::complex<T>> solve_fluid_mode_system(
+    const std::vector<std::complex<T>>& K3_kernel,
+    const std::vector<std::complex<T>>& rhs,
+    int size
+) {
+    return solve_fluid_mode_system_svd<T>(K3_kernel, rhs, size);
+}
+
 template<>
 std::vector<std::complex<acousticts_quad_t>> solve_fluid_mode_system<acousticts_quad_t>(
     const std::vector<std::complex<acousticts_quad_t>>& K3_kernel,
     const std::vector<std::complex<acousticts_quad_t>>& rhs,
     int size
 ) {
+#if ACOUSTICTS_HAVE_QUADMATH
     return solve_linear_system_lup_refined<acousticts_quad_t>(K3_kernel, rhs, size);
+#else
+    return solve_fluid_mode_system_svd<acousticts_quad_t>(K3_kernel, rhs, size);
+#endif
 }
 
 template<typename T>
@@ -2206,6 +2219,7 @@ std::complex<T> psms_fbs(
         );
     }
 
+#if ACOUSTICTS_HAVE_QUADMATH
     if constexpr (is_quad_precision_v<T>) {
         if (is_backscatter && Amn_method == "Amn_fluid") {
             return psms_backscatter_fluid_adaptive<T>(
@@ -2214,6 +2228,7 @@ std::complex<T> psms_fbs(
             );
         }
     }
+#endif
 
     // Determine appropriate Amn expansion matrix computation
     std::vector<std::vector<std::complex<T>>> Amn;
