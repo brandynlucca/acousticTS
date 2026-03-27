@@ -22,7 +22,7 @@ vignette: >
 
 ```{r model_family_header, echo=FALSE, results='asis'}
 acousticTS:::.model_family_header(
-  status = c("benchmarked", "validated"),
+  family = "calibration",
   pages = c(
     Overview = "index.html",
     Implementation = "calibration-implementation.html",
@@ -58,16 +58,16 @@ $$
 where $\omega$ is the angular frequency, $\mathbf{x} = (r, \theta, \varphi)$ is the position vector in spherical coordinates, $c_1$ is the fluid sound speed, and $k_1 = \frac{\omega}{c_1}$ is the acoustic wavenumber. The gradient, $\nabla$, is the vector differential operator defined by:
 
 $$
-  \nabla = 
-    \left( 
-      \frac{\partial}{\partial x} , \frac{\partial}{\partial y} , \frac{\partial}{\partial z}
-    \right).
+  \nabla =
+    \left(
+  \frac{\partial}{\partial x} , \frac{\partial}{\partial y} , \frac{\partial}{\partial z}
+  \right).
 $$
 
 Within the solid elastic sphere, the displacement field $\mathbf{u}(\mathbf{x}, \omega)$ satisfies the Navier equation:
 
 $$
-(\lambda + 2 \mu)\nabla(\nabla \cdot \mathbf{u}) - \mu \nabla \times (\nabla \times \mathbf{u}) + \rho_2 \omega^2 \mathbf{u} = 0,
+  (\lambda + 2 \mu)\nabla(\nabla \cdot \mathbf{u}) - \mu \nabla \times (\nabla \times \mathbf{u}) + \rho_2 \omega^2 \mathbf{u} = 0,
 $$
 
 where $\lambda$ and $\mu$ are the Lamé elastic constants and $\rho_2$ is the sphere density. The elastic field is then decomposed into compressional and shear potentials:
@@ -79,9 +79,9 @@ $$
 After that decomposition, the interior problem separates into two Helmholtz equations:
 
 $$
-\nabla^2 \phi + k_\ell^2 \phi = 0,
-\qquad
-\nabla^2 \mathbf{\Psi} + k_\tau^2 \mathbf{\Psi} = 0,
+  \nabla^2 \phi + k_\ell^2 \phi = 0,
+  \qquad
+  \nabla^2 \mathbf{\Psi} + k_\tau^2 \mathbf{\Psi} = 0,
 $$
 
 where $k_\ell$ and $k_\tau$ are the longitudinal and transverse wavenumbers, respectively. The key point is that the sphere supports two distinct elastic wave families internally, and both must satisfy the boundary conditions at the fluid-solid interface.
@@ -122,7 +122,7 @@ where $a$ is the sphere radius. The boundary conditions then enforce:
 
 $$
   \begin{align*}
-    \mathbf{u}_2(r) &= \mathbf{u}_1(r) ~ \text{(continuity of normal displacement)} , \\
+  \mathbf{u}_2(r) &= \mathbf{u}_1(r) ~ \text{(continuity of normal displacement)} , \\
     \sigma_2(rr) &= -p_1 ~ \text{(continuity of normal stress)} , \\
     \sigma_2(r\theta) &= 0 ~ \text{(zero tangential stress)} ,
   \end{align*}
@@ -141,11 +141,11 @@ where $h_m^{(1)}$ is the outgoing spherical Hankel function and $B_m$ is the sca
 The interior elastic potentials are expanded with regular spherical Bessel functions:
 
 $$
-\phi(r,\theta) =
-\sum_{m=0}^{\infty} C_m j_m(k_\ell r) P_m(\cos \theta),
-\qquad
-\mathbf{\Psi}(r,\theta) =
-\sum_{m=0}^{\infty} D_m j_m(k_\tau r) P_m(\cos \theta).
+  \phi(r,\theta) =
+    \sum_{m=0}^{\infty} C_m j_m(k_\ell r) P_m(\cos \theta),
+  \qquad
+  \mathbf{\Psi}(r,\theta) =
+    \sum_{m=0}^{\infty} D_m j_m(k_\tau r) P_m(\cos \theta).
 $$
 
 The unknown coefficients $B_m$, $C_m$, and $D_m$ are determined by the boundary conditions at the sphere surface.
@@ -165,11 +165,11 @@ $$
 These conditions couple the exterior acoustic field to the compressional and shear motions inside the sphere. After projection onto a single Legendre mode, the boundary conditions reduce to a small linear algebra problem for each angular order:
 
 $$
-  \mathbf{M}_m 
+  \mathbf{M}_m
   \left[
-    \begin{matrix}
-      B_m \\ C_m \\ D_m
-    \end{matrix}
+  \begin{matrix}
+  B_m \\ C_m \\ D_m
+  \end{matrix}
   \right] = \mathbf{F}_m,
 $$
 
@@ -181,7 +181,7 @@ For a plane wave incident along polar coordinate $z$, the acoustic pressure is e
 
 $$
   \begin{align*}
-    p_\text{inc}(r, \theta) &= P_0 \frac{e^{-i k_1 \mathcal{D}}}{\mathcal{D}} \\
+  p_\text{inc}(r, \theta) &= P_0 \frac{e^{-i k_1 \mathcal{D}}}{\mathcal{D}} \\
     &= ik_1 P_0 \sum\limits_{m=0}^\infty (2m + 1) (-1)^n j_m(k_1r) h_m(k_1 r_0) P_m(\cos \theta), \quad (0 < r < r_0),
   \end{align*}
 $$
@@ -189,7 +189,7 @@ $$
 where $k_1 = \omega / c_1$ is the acoustic wavenumber in the surrounding fluid, $P_0$ is the incident pressure amplitude, and the function $\mathcal{D}$ is defined explicitly as: 
 
 $$ 
-  \mathcal{D} = \left(r_0^2 + 2 r r_0 \cos \theta + r^2 \right)^{1/2}. 
+  \mathcal{D} = \left(r_0^2 + 2 r r_0 \cos \theta + r^2 \right)^{1/2}.
 $$
 
 Here, $r$ is the radial distance from the origin to the field point, $r_0$ is the distance from the origin to the source point, and $\theta$ is the polar angle measured from the positive $z$-axis to the position vector of the field point. The source is taken to lie along the negative $z$-axis. The quantity $\mathcal{D}$ therefore represents the distance between the source and the field point.
@@ -198,35 +198,35 @@ Here, $r$ is the radial distance from the origin to the field point, $r_0$ is th
 
 Using the spherical-wave addition theorem, the incident field can be expanded as: 
 $$ 
-  p_\text{inc}(r, \theta) = 
-    i k_1 P_0 \sum\limits_{m=0}^\infty (2m + 1)(-1)^m j_m(k_1 r)\, h_m^{(1)}(k_1 r_0)\, P_m(\cos \theta), \quad (0 < r < r_0). 
+  p_\text{inc}(r, \theta) =
+    i k_1 P_0 \sum\limits_{m=0}^\infty (2m + 1)(-1)^m j_m(k_1 r)\, h_m^{(1)}(k_1 r_0)\, P_m(\cos \theta), \quad (0 < r < r_0).
 $$ 
 
 In the limit that the source is far from the scattering region ($r_0 \to \infty$), the incident field approaches a plane wave. This allows $h^{(1)}_m(k_1r_0)$ and $\frac{e^{-i k_1 \mathcal{D}}}{\mathcal{D}}$ to be expressed using asymptotic forms: 
 $$ 
-  h_m^{(1)}(k_1 r_0) \sim (-i)^{m+1} \frac{e^{i k_1 r_0}}{k_1 r_0}, 
-  \qquad 
-  \frac{e^{-i k_1 \mathcal{D}}}{\mathcal{D}} \sim e^{i k_1 r_0} \frac{e^{i k_1 r \cos \theta}}{r_0}. 
+  h_m^{(1)}(k_1 r_0) \sim (-i)^{m+1} \frac{e^{i k_1 r_0}}{k_1 r_0},
+  \qquad
+  \frac{e^{-i k_1 \mathcal{D}}}{\mathcal{D}} \sim e^{i k_1 r_0} \frac{e^{i k_1 r \cos \theta}}{r_0}.
 $$ 
 
 Consequently, the incident field reduces to: 
 $$ 
-  p_\text{inc}(r, \theta) = P_0 e^{i k_1 r \cos \theta}, 
+  p_\text{inc}(r, \theta) = P_0 e^{i k_1 r \cos \theta},
 $$ 
 
 which has the standard plane-wave expansion: 
 
 $$ 
-  p_\text{inc}(r, \theta) = 
-    P_0 \sum\limits_{m=0}^\infty (2m + 1) i^m j_m(k_1 r) P_m(\cos \theta). 
+  p_\text{inc}(r, \theta) =
+    P_0 \sum\limits_{m=0}^\infty (2m + 1) i^m j_m(k_1 r) P_m(\cos \theta).
 $$
 
 where $\mathcal{D}$ represents the additive effect of $r$ and stress components, $i$ is an imaginary number ($i=\sqrt{-1}$), and $P_0$ is the amplitude of pressure in the incident wave. In the far-field, $r \to \infty$ which means that the asymptotic forms of the Hankel function and $\frac{e^{-i k_1 \mathcal{D}}}{\mathcal{D}}$ term can be used:
 
 $$
   \begin{align*}
-    \frac{e^{-i k_1 \mathcal{D}}}{\mathcal{D}} &\sim 
-      e^{ik_1 r_0} \frac{e^{i k_1 r \cos \theta}}{r_0}, \\
+  \frac{e^{-i k_1 \mathcal{D}}}{\mathcal{D}} &\sim
+  e^{ik_1 r_0} \frac{e^{i k_1 r \cos \theta}}{r_0}, \\
     h_m^{(1)}(k_1r_0) &\sim (-i)^{m+1} \frac{e^{i k_1 r_0}}{k_1r_0}.
   \end{align*}
 $$
@@ -235,7 +235,7 @@ These limits consequently simplify $p_\text{inc}$ to:
 
 $$
   \begin{align*}
-    p_\text{inc}(r, \theta) &= P_0 e^{ik_1 r \cos \theta} \\
+  p_\text{inc}(r, \theta) &= P_0 e^{ik_1 r \cos \theta} \\
     &= P_0 \sum\limits_{m=0}^\infty (2m + 1) i^m j_m(k_1 r) P_m(\cos \theta).
   \end{align*}
 $$
@@ -248,34 +248,34 @@ It is often more informative to parameterize each partial wave by a real phase s
 
 The scattered acoustic field can be expressed as a sum of partial waves: 
 $$ 
-  p_\text{scat}(r, \theta) = 
-    P_0 \sum\limits_{m=0}^\infty B_m h_m^{(1)}(k_1 r) P_m(\cos \theta). 
+  p_\text{scat}(r, \theta) =
+    P_0 \sum\limits_{m=0}^\infty B_m h_m^{(1)}(k_1 r) P_m(\cos \theta).
 $$
 
 In the backscattering direction where $\theta = \pi$, the Legendre polynomials simplify to: 
 
 $$ 
-  P_m(\cos \pi) = P_m(-1) = (-1)^m. 
+  P_m(\cos \pi) = P_m(-1) = (-1)^m.
 $$ 
 
 It is convenient to define a phase-shift angle, $\eta_m$, of the $m$th scattered wave to compute $B_m$[^5]. For each angular order, the exterior field can be recast as a regular spherical solution plus an outgoing partial wave. Matching that combination to the elastic boundary conditions determines the relative phase of the outgoing term, so the scattering problem may be parameterized by a real phase shift rather than by an unconstrained complex coefficient. This phase-shift angle is expressed using: 
 $$ 
-  \tan \eta_m = 
-    \tan \delta_m(k_1a) \left[ \frac{ \tan \Phi_m + \tan \alpha_m(k_1 a) }{ \tan \Phi_m + \tan \beta_m(k_1 a) } \right], 
+  \tan \eta_m =
+    \tan \delta_m(k_1a) \left[ \frac{ \tan \Phi_m + \tan \alpha_m(k_1 a) }{ \tan \Phi_m + \tan \beta_m(k_1 a) } \right],
 $$
 
 where $\alpha_m$, $\beta_m$, and $\delta_m$ are the scattering phase-angles, and $\Phi_m$ is the boundary impedance phase-angle. These angles are defined as: 
 $$ 
-  \begin{align*} 
-    \delta_m(k_1a) &= 
-      \tan^{-1} \left[ \frac{-j_m(k_1a)}{y_m(k_1a)} \right] ,\\ 
-    \alpha_m(k_1a) &= 
-      \tan^{-1} \left[ \frac{-k_1 a ~j^\prime_m(k_1a)}{y_m(k_1a)} \right] ,\\ 
-    \beta_m(k_1a) &= 
-      \tan^{-1} \left[ \frac{-k_1 a ~y^\prime_m(k_1a)}{y_m(k_1a)} \right] , \\ 
-    \tan \Phi_m &= 
-      -\frac{\rho_1}{\rho_2} \tan \zeta_m(k_\ell a, \sigma), 
-  \end{align*} 
+  \begin{align*}
+  \delta_m(k_1a) &=
+    \tan^{-1} \left[ \frac{-j_m(k_1a)}{y_m(k_1a)} \right] ,\\
+    \alpha_m(k_1a) &=
+    \tan^{-1} \left[ \frac{-k_1 a ~j^\prime_m(k_1a)}{y_m(k_1a)} \right] ,\\
+    \beta_m(k_1a) &=
+    \tan^{-1} \left[ \frac{-k_1 a ~y^\prime_m(k_1a)}{y_m(k_1a)} \right] , \\
+    \tan \Phi_m &=
+    -\frac{\rho_1}{\rho_2} \tan \zeta_m(k_\ell a, \sigma),
+  \end{align*}
 $$ 
 
 where $\zeta_m(k_\ell a, \sigma)$ is the boundary-impedance phase angle induced by the elastic interior[^4]. Once obtained, $B_m$ is: $$ B_m = k_1 (-1)^m (2m + 1) h_m^{(1)}(k_1 r_0) \sin \eta_m e^{-i \eta_m}. $$
@@ -283,15 +283,15 @@ where $\zeta_m(k_\ell a, \sigma)$ is the boundary-impedance phase angle induced 
 By imposing Neumann boundary conditions at the sphere's surface (i.e., a hard or rigid boundary), then the form function can be derived: 
 
 $$ 
-  \mathcal{f}_\infty(k_1 a) = 
-    -2 \frac{k_1 r}{k_1 a} e^{i k_1 r} \sum\limits_{m=0}^\infty (-i)^{m+1} h_m^{(2)}(k_1 r) (-1)^m (2m + 1) \sin \eta_m e^{i \eta_m}. 
+  \mathcal{f}_\infty(k_1 a) =
+    -2 \frac{k_1 r}{k_1 a} e^{i k_1 r} \sum\limits_{m=0}^\infty (-i)^{m+1} h_m^{(2)}(k_1 r) (-1)^m (2m + 1) \sin \eta_m e^{i \eta_m}.
 $$
 
 This can be further simplified to derive the far-field expression in the backscattering direction in the far-field limit $r \to \infty$: 
 
 $$ 
-  \mathcal{f}_\text{bs}(k_1 a) = 
-    -\frac{2}{k_1a} \sum\limits_{m=0}^\infty (-1)^m (2m + 1) \sin \eta_m e^{i \eta_m}. 
+  \mathcal{f}_\text{bs}(k_1 a) =
+    -\frac{2}{k_1a} \sum\limits_{m=0}^\infty (-1)^m (2m + 1) \sin \eta_m e^{i \eta_m}.
 $$
 
 The details vary by notation across the literature, but the interpretation is the same: the sphere material and elastic wave speeds determine a modal phase lag, and the total backscatter is a coherent sum over those lagged partial waves.
@@ -307,7 +307,7 @@ $$
 Target strength is then reported as[^3]:
 
 $$
-  \mathit{TS} = 
+  \mathit{TS} =
     10 \log_{10} \frac{\sigma_{\mathrm{bs}}}{4 \pi}.
 $$
 

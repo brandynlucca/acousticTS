@@ -1,8 +1,44 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" role="img" aria-labelledby="title desc">
-  <title id="title">HPA asymptotic bookkeeping</title>
-  <desc id="desc">Schematic showing how the high-pass approximation combines a Rayleigh numerator with a bounded high-frequency denominator and optional Stanton correction factors.</desc>
-  <defs>
-    <style>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 860.54053 240.54053"
+   role="img"
+   aria-labelledby="title desc"
+   version="1.1"
+   id="svg13"
+   sodipodi:docname="hpa-asymptotic-bookkeeping.svg"
+   width="860.54053"
+   height="240.54053"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview13"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.925"
+     inkscape:cx="485.94595"
+     inkscape:cy="217.83784"
+     inkscape:window-width="1920"
+     inkscape:window-height="1057"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg13" />
+  <title
+     id="title">HPA asymptotic bookkeeping</title>
+  <desc
+     id="desc">Schematic showing how the high-pass approximation combines a Rayleigh numerator with a bounded high-frequency denominator and optional Stanton correction factors.</desc>
+  <defs
+     id="defs1">
+    <style
+       id="style1">
       .bg { fill: #f8f3ea; }
       .panel { fill: #fffdfa; stroke: #2f2822; stroke-width: 2.1; rx: 16; ry: 16; }
       .head { font: 700 21px Georgia, serif; fill: #1f1a16; }
@@ -11,29 +47,172 @@
       .curve { stroke: #9d5d2e; stroke-width: 3.2; fill: none; }
       .arrow { stroke: #564b40; stroke-width: 2.4; fill: none; marker-end: url(#m); }
     </style>
-    <marker id="m" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#564b40"/></marker>
+    <marker
+       id="m"
+       markerWidth="10"
+       markerHeight="10"
+       refX="8"
+       refY="5"
+       orient="auto">
+      <path
+         d="M 0,0 10,5 0,10 Z"
+         fill="#564b40"
+         id="path1" />
+    </marker>
   </defs>
-  <rect width="960" height="300" class="bg"/>
-  <text x="28" y="40" class="head">How the high-pass approximation is assembled from two asymptotic ideas</text>
-  <rect x="24" y="68" width="276" height="204" class="panel"/>
-  <text x="46" y="96" class="txt">Low-frequency requirement</text>
-  <text x="46" y="132" class="small">σ_bs must begin with the Rayleigh scaling</text>
-  <text x="46" y="153" class="small">(ka)^4 α².</text>
-  <path d="M62 234 C120 226, 152 206, 258 122" class="curve"/>
-
-  <rect x="342" y="68" width="276" height="204" class="panel"/>
-  <text x="364" y="96" class="txt">High-frequency requirement</text>
-  <text x="364" y="132" class="small">The response should saturate instead of</text>
-  <text x="364" y="153" class="small">growing without bound.</text>
-  <path d="M380 216 C450 156, 504 140, 580 140" class="curve"/>
-
-  <rect x="660" y="68" width="276" height="204" class="panel"/>
-  <text x="682" y="96" class="txt">Stanton corrections</text>
-  <text x="682" y="132" class="small">G adjusts the numerator where nulls or</text>
-  <text x="682" y="153" class="small">shape effects matter.</text>
-  <text x="682" y="184" class="small">F adjusts the denominator and therefore</text>
-  <text x="682" y="205" class="small">the transition between the two limits.</text>
-
-  <path d="M300 170 C318 170, 324 170, 342 170" class="arrow"/>
-  <path d="M618 170 C636 170, 642 170, 660 170" class="arrow"/>
+  <rect
+     width="860.54053"
+     height="240.54053"
+     class="bg"
+     id="rect1"
+     x="0"
+     y="0"
+     style="stroke-width:0.999995" />
+  <text
+     x="30.137207"
+     y="28.594595"
+     class="head"
+     id="text1"
+     style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:21px;line-height:normal;font-family:Georgia, serif">How the high-pass approximation is assembled from two asymptotic ideas</text>
+  <rect
+     x="16.972971"
+     y="51.142815"
+     width="243.02702"
+     height="171.56757"
+     class="panel"
+     id="rect2" />
+  <text
+     x="45.081451"
+     y="70.594597"
+     class="txt"
+     id="text2"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;line-height:normal;font-family:Georgia, serif">Low-frequency requirement</text>
+  <text
+     x="23.565481"
+     y="89.29731"
+     class="small"
+     id="text3"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13px;line-height:normal;font-family:Georgia, serif">σ<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan13">bs</tspan> must begin with the Rayleigh scaling</text>
+  <text
+     x="117.08472"
+     y="105.43244"
+     class="small"
+     id="text4"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13px;line-height:normal;font-family:Georgia, serif">(ka)<tspan
+   style="font-size:65%;baseline-shift:super"
+   id="tspan14">4</tspan>α²</text>
+  <path
+     d="M 59.341083,213.01955 C 105.94684,206.24432 131.66037,189.30622 216.83641,118.16624"
+     class="curve"
+     id="path4" />
+  <g
+     id="g22"
+     transform="translate(-66.072997,-25.405619)">
+    <rect
+       x="374.97299"
+       y="76.548218"
+       width="243.02699"
+       height="171.56799"
+       class="panel"
+       id="rect4" />
+    <text
+       x="400.9567"
+       y="96"
+       class="txt"
+       id="text5"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;line-height:normal;font-family:Georgia, serif">High-frequency requirement</text>
+    <text
+       x="495.99454"
+       y="114.70906"
+       class="small"
+       id="text6"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13px;line-height:0.9;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#564b40"><tspan
+         sodipodi:role="line"
+         id="tspan15"
+         x="495.99454"
+         y="114.70906"
+         style="line-height:0.9">The response should saturate instead of</tspan><tspan
+         sodipodi:role="line"
+         id="tspan16"
+         x="495.99454"
+         y="126.40906"
+         style="line-height:0.9">growing without limits.</tspan></text>
+    <path
+       d="m 397.00712,216 c 70,-60 124,-76 200,-76"
+       class="curve"
+       id="path7" />
+  </g>
+  <g
+     id="g24"
+     transform="translate(-59.173015,-25.405405)">
+    <rect
+       x="660"
+       y="76.548218"
+       width="243.02699"
+       height="171.56799"
+       class="panel"
+       id="rect7" />
+    <text
+       x="692.82819"
+       y="95.875488"
+       class="txt"
+       id="text8"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;line-height:normal;font-family:Georgia, serif">Stanton (1989) corrections</text>
+    <text
+       x="781.30402"
+       y="114.70271"
+       class="small"
+       id="text9"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13px;line-height:0.9;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#564b40"><tspan
+         sodipodi:role="line"
+         id="tspan18"
+         x="781.30402"
+         y="114.70271"
+         style="line-height:0.9"><tspan
+   style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   id="tspan23">G</tspan> adjusts the numerator where nulls or</tspan><tspan
+         sodipodi:role="line"
+         id="tspan19"
+         x="781.30402"
+         y="126.40271"
+         style="line-height:0.9">shape effects matter</tspan></text>
+    <text
+       x="784.34076"
+       y="144.54054"
+       class="small"
+       id="text11"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13px;line-height:0.9;font-family:Georgia, serif;text-align:center;text-anchor:middle;fill:#564b40"><tspan
+         sodipodi:role="line"
+         id="tspan21"
+         x="784.34076"
+         y="144.54054"
+         style="line-height:0.9"><tspan
+   style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   id="tspan24">F</tspan> adjusts the denominator and therefore</tspan><tspan
+         sodipodi:role="line"
+         id="tspan22"
+         x="784.34076"
+         y="156.24054"
+         style="line-height:0.9">the transition between the two limits.</tspan></text>
+  </g>
+  <path
+     d="m 261.05,136.92659 c 18,0 24,0 42,0"
+     class="arrow"
+     id="path12" />
+  <path
+     d="m 552.97699,136.92659 c 18,0 24,0 42,0"
+     class="arrow"
+     id="path13" />
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13px;line-height:0.9;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;writing-mode:vertical-lr;direction:rtl;fill:#2f2822;stroke:#759cc7;stroke-width:2;stroke-linejoin:round;stroke-dasharray:2, 4"
+     x="444.32434"
+     y="110.81081"
+     id="text17"><tspan
+       sodipodi:role="line"
+       id="tspan17"
+       x="444.32434"
+       y="110.81081"></tspan></text>
 </svg>

@@ -19,7 +19,7 @@ vignette: >
 
 ```{r model_family_header, echo=FALSE, results='asis'}
 acousticTS:::.model_family_header(
-  status = c("unvalidated"),
+  family = "essms",
   pages = c(
     Overview = "index.html",
     Implementation = "essms-implementation.html",
@@ -30,6 +30,10 @@ acousticTS:::.model_family_header(
 
 The `acousticTS` package uses object-based scatterers so the same implementation pattern carries across models: create a scatterer, run `target_strength()`, inspect the stored model output, and then compare a small set of physically important inputs. For `ESSMS`, the required object class is `ESS`, which combines a spherical shell, an optional internal fluid, and the elastic constants required for the shell solution.
 
+::: {.caution data-title="Current ESSMS status"}
+`ESSMS` remains unvalidated in the package. The benchmark family exists, but the current implementation still does not return finite full-grid `TS` values across those shell-sphere comparison sweeps, so this page is documenting behavior and limitations rather than benchmark-grade agreement.
+:::
+
 ## Elastic-shelled sphere object generation
 
 An `ESS` object can be created with `ess_generate()`. For the implementation below, the shell is described by its outer radius and thickness, while the shell material is described by density, sound speed, and elastic constants. The inner fluid can be provided using either contrasts or absolute material properties.
@@ -37,8 +41,10 @@ An `ESS` object can be created with `ess_generate()`. For the implementation bel
 ```{r}
 library(acousticTS)
 
+sphere_shape <- sphere(radius_body = 10e-3, n_segments = 80)
+
 shelled_sphere <- ess_generate(
-  shape = "sphere",
+  shape = sphere_shape,
   radius_shell = 10e-3,
   shell_thickness = 0.8e-3,
   density_shell = 2565,
@@ -72,9 +78,8 @@ Model results can be extracted either visually or directly through `extract()`.
 
 ### Plotting results
 
-```{r fig.width = 6}
-plot(shelled_sphere, type = "shape")
-# plot(shelled_sphere, type = "model")
+```{r echo=FALSE, out.width='49%', fig.align='center', fig.alt='Pre-rendered ESSMS example plot showing the shelled-sphere geometry used in the implementation example.'}
+knitr::include_graphics("essms-shape-plot.png")
 ```
 
 ### Accessing results
@@ -86,70 +91,19 @@ head(essms_results)
 
 The extracted `data.frame` contains the modeled frequency, complex backscattering amplitude `f_bs`, backscattering cross-section `sigma_bs`, and target strength `TS`.
 
-## Comparing shell thicknesses
+## Comparison workflows
+
+### Shell-thickness sensitivity
 
 Shell thickness strongly affects the resonance structure of the ESSMS solution, so it is a natural first comparison when testing a new parameterization.
 
-```{r fig.width = 8, fig.height = 4.5}
-sphere_thin <- ess_generate(
-  shape = "sphere",
-  radius_shell = 10e-3,
-  shell_thickness = 0.4e-3,
-  density_shell = 2565,
-  sound_speed_shell = 3750,
-  density_fluid = 1077.3,
-  sound_speed_fluid = 1575,
-  E = 7.0e10,
-  nu = 0.32
-)
-
-sphere_thick <- ess_generate(
-  shape = "sphere",
-  radius_shell = 10e-3,
-  shell_thickness = 1.2e-3,
-  density_shell = 2565,
-  sound_speed_shell = 3750,
-  density_fluid = 1077.3,
-  sound_speed_fluid = 1575,
-  E = 7.0e10,
-  nu = 0.32
-)
-
-sphere_thin <- target_strength(sphere_thin, frequency, "essms")
-sphere_thick <- target_strength(sphere_thick, frequency, "essms")
-
-ts_base <- extract(shelled_sphere, "model")$ESSMS
-ts_thin <- extract(sphere_thin, "model")$ESSMS
-ts_thick <- extract(sphere_thick, "model")$ESSMS
-
-par(oma = c(0, 0.25, 0, 0), mar = c(5, 6, 4, 2))
-plot(
-  x = ts_base$frequency * 1e-3,
-  y = ts_base$TS,
-  type = "l",
-  lty = 1,
-  lwd = 2.5,
-  xlab = "Frequency (kHz)",
-  ylab = expression(Target ~ strength ~ (dB ~ re. ~ 1 ~ m^2)),
-  cex.lab = 1.3,
-  cex.axis = 1.2
-)
-lines(x = ts_thin$frequency * 1e-3, y = ts_thin$TS, col = "royalblue4", lty = 1, lwd = 2.5)
-lines(x = ts_thick$frequency * 1e-3, y = ts_thick$TS, col = "firebrick3", lty = 1, lwd = 2.5)
-legend(
-  "bottomright",
-  legend = c("0.8 mm shell", "0.4 mm shell", "1.2 mm shell"),
-  col = c("black", "royalblue4", "firebrick3"),
-  lwd = 2.5,
-  lty = c(1, 1, 1),
-  cex = 1.0,
-  bty = "n"
-)
+```{r echo=FALSE, out.width='85%', fig.align='center', fig.alt='Pre-rendered ESSMS shell-thickness comparison for thin, baseline, and thick shell cases over the same frequency sweep.'}
+knitr::include_graphics("essms-thickness-comparison.png")
 ```
 
 When you move from a tutorial object to a real calibration or biological shell, the next quantities to revisit are the shell elastic constants and the shell-to-fluid property contrast, because those control where the strongest modal features occur.
 
-## Benchmark source and current status
+### Benchmark source and current status
 
 ESSMS does have a direct benchmark source in the Jech shell-sphere family. At the moment, though, the current full-grid ESSMS sweep is still a status check rather than a usable delta table because the present implementation does not return finite `TS` values across the benchmark grid.
 

@@ -1,8 +1,42 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 940" role="img" aria-labelledby="title desc">
-  <title id="title">Coordinate conventions for canonical and arbitrary shapes</title>
-  <desc id="desc">Four-panel schematic showing the coordinate systems used for sphere, cylinder, prolate spheroid, and arbitrary shapes.</desc>
-  <defs>
-    <style>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 1400 940"
+   role="img"
+   aria-labelledby="title desc"
+   version="1.1"
+   id="svg46"
+   sodipodi:docname="building-shapes-coordinates.svg"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview46"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1.2863325"
+     inkscape:cx="930.16383"
+     inkscape:cy="394.53251"
+     inkscape:window-width="1920"
+     inkscape:window-height="1057"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg46" />
+  <title
+     id="title">Coordinate conventions for canonical and arbitrary shapes</title>
+  <desc
+     id="desc">Four-panel schematic showing the coordinate systems used for sphere, cylinder, prolate spheroid, and arbitrary shapes.</desc>
+  <defs
+     id="defs2">
+    <style
+       id="style1">
       .panel { fill: #fbfaf6; stroke: #d8d3c4; stroke-width: 2; }
       .title { font: 700 28px Helvetica, Arial, sans-serif; fill: #1f2933; }
       .body { font: 20px Helvetica, Arial, sans-serif; fill: #1f2933; }
@@ -14,93 +48,597 @@
       .focus { fill: #ba6b1b; }
       .cross { fill: #eef4f7; stroke: #1b5e7a; stroke-width: 3; }
     </style>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5b6b7a"/>
+    <marker
+       id="arrow"
+       viewBox="0 0 10 10"
+       refX="9"
+       refY="5"
+       markerWidth="8"
+       markerHeight="8"
+       orient="auto-start-reverse">
+      <path
+         d="M 0 0 L 10 5 L 0 10 z"
+         fill="#5b6b7a"
+         id="path1" />
     </marker>
-    <marker id="dimarrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#ba6b1b"/>
+    <marker
+       id="dimarrow"
+       viewBox="0 0 10 10"
+       refX="7.682992"
+       refY="4.942739"
+       markerWidth="8"
+       markerHeight="8"
+       orient="auto-start-reverse"
+       preserveAspectRatio="xMidYMid">
+      <path
+         d="M 0,0 10,5 0,10 Z"
+         fill="#ba6b1b"
+         id="path2" />
     </marker>
   </defs>
-
-  <rect x="20" y="20" width="650" height="410" rx="20" class="panel"/>
-  <rect x="730" y="20" width="650" height="410" rx="20" class="panel"/>
-  <rect x="20" y="470" width="650" height="430" rx="20" class="panel"/>
-  <rect x="730" y="470" width="650" height="430" rx="20" class="panel"/>
-
-  <text x="55" y="70" class="title">Sphere</text>
-  <line x1="120" y1="225" x2="515" y2="225" class="axis" marker-end="url(#arrow)"/>
-  <line x1="300" y1="360" x2="300" y2="95" class="axis" marker-end="url(#arrow)"/>
-  <text x="525" y="232" class="body">x</text>
-  <text x="308" y="105" class="body">z</text>
-  <circle cx="300" cy="225" r="96" class="shape"/>
-  <line x1="300" y1="225" x2="396" y2="225" class="dim" marker-start="url(#dimarrow)" marker-end="url(#dimarrow)"/>
-  <text x="340" y="214" class="body">a</text>
-  <line x1="360" y1="129" x2="360" y2="321" class="guide"/>
-  <text x="345" y="121" class="body">x_i</text>
-  <text x="372" y="148" class="body">zU(x_i)</text>
-  <text x="372" y="316" class="body">zL(x_i)</text>
-  <text x="105" y="392" class="note">Profile stored on x with upper and lower bounds in z.</text>
-  <text x="105" y="418" class="note">For a sphere: zU(x) = +sqrt(a^2 - x^2), zL(x) = -sqrt(a^2 - x^2).</text>
-
-  <text x="765" y="70" class="title">Cylinder</text>
-  <line x1="800" y1="225" x2="1245" y2="225" class="axis" marker-end="url(#arrow)"/>
-  <line x1="975" y1="360" x2="975" y2="95" class="axis" marker-end="url(#arrow)"/>
-  <text x="1255" y="232" class="body">x</text>
-  <text x="983" y="105" class="body">z</text>
-  <path d="M 860 145 L 1090 145 L 1090 305 L 860 305 Z" class="shape"/>
-  <line x1="970" y1="145" x2="970" y2="305" class="guide"/>
-  <text x="952" y="132" class="body">x_i</text>
-  <text x="982" y="158" class="body">zU(x_i) = +a</text>
-  <text x="982" y="301" class="body">zL(x_i) = -a</text>
-  <line x1="1128" y1="225" x2="1128" y2="145" class="dim" marker-start="url(#dimarrow)" marker-end="url(#dimarrow)"/>
-  <text x="1140" y="191" class="body">a</text>
-  <line x1="860" y1="333" x2="1090" y2="333" class="dim" marker-start="url(#dimarrow)" marker-end="url(#dimarrow)"/>
-  <text x="968" y="360" class="body">L</text>
-  <text x="790" y="392" class="note">Straight cylinders use the same x-z profile framing.</text>
-  <text x="790" y="418" class="note">Polynomial cylinders keep this coordinate system but let a vary with x.</text>
-
-  <text x="55" y="520" class="title">Prolate spheroid</text>
-  <line x1="120" y1="675" x2="515" y2="675" class="axis" marker-end="url(#arrow)"/>
-  <line x1="300" y1="810" x2="300" y2="545" class="axis" marker-end="url(#arrow)"/>
-  <text x="525" y="682" class="body">x</text>
-  <text x="308" y="555" class="body">z</text>
-  <ellipse cx="300" cy="675" rx="170" ry="96" class="shape"/>
-  <line x1="300" y1="675" x2="470" y2="675" class="dim" marker-start="url(#dimarrow)" marker-end="url(#dimarrow)"/>
-  <text x="380" y="664" class="body">a</text>
-  <line x1="300" y1="675" x2="300" y2="579" class="dim" marker-start="url(#dimarrow)" marker-end="url(#dimarrow)"/>
-  <text x="312" y="632" class="body">b</text>
-  <line x1="365" y1="579" x2="365" y2="771" class="guide"/>
-  <text x="350" y="567" class="body">x_i</text>
-  <text x="377" y="598" class="body">zU(x_i)</text>
-  <text x="377" y="766" class="body">zL(x_i)</text>
-  <circle cx="440" cy="675" r="6" class="focus"/>
-  <line x1="300" y1="675" x2="440" y2="675" class="dim" marker-start="url(#dimarrow)" marker-end="url(#dimarrow)"/>
-  <text x="364" y="708" class="body">q</text>
-  <text x="105" y="842" class="note">Semimajor axis a lies along x, semiminor axis b along z.</text>
-  <text x="105" y="868" class="note">The focal half-distance is q = sqrt(a^2 - b^2).</text>
-
-  <text x="765" y="520" class="title">Arbitrary profile</text>
-  <line x1="790" y1="675" x2="1265" y2="675" class="axis" marker-end="url(#arrow)"/>
-  <line x1="935" y1="830" x2="935" y2="535" class="axis" marker-end="url(#arrow)"/>
-  <text x="1275" y="682" class="body">x</text>
-  <text x="943" y="545" class="body">z</text>
-  <path d="M 815 675 C 870 585, 930 560, 995 590 C 1045 612, 1115 565, 1185 645" class="shape"/>
-  <path d="M 815 675 C 875 755, 930 785, 995 745 C 1055 710, 1120 740, 1185 688" class="shape"/>
-  <line x1="1015" y1="592" x2="1015" y2="743" class="guide"/>
-  <text x="998" y="579" class="body">x_i</text>
-  <text x="1027" y="607" class="body">zU(x_i)</text>
-  <text x="1027" y="739" class="body">zL(x_i)</text>
-
-  <ellipse cx="1190" cy="555" rx="62" ry="42" class="cross"/>
-  <line x1="1120" y1="555" x2="1265" y2="555" class="axis" marker-end="url(#arrow)"/>
-  <line x1="1190" y1="622" x2="1190" y2="485" class="axis" marker-end="url(#arrow)"/>
-  <text x="1270" y="562" class="body">y</text>
-  <text x="1198" y="495" class="body">z</text>
-  <line x1="1128" y1="555" x2="1252" y2="555" class="dim" marker-start="url(#dimarrow)" marker-end="url(#dimarrow)"/>
-  <text x="1162" y="542" class="body">w(x_i)</text>
-  <line x1="1190" y1="555" x2="1252" y2="555" class="dim" marker-start="url(#dimarrow)" marker-end="url(#dimarrow)"/>
-  <text x="1210" y="585" class="body">a(x_i) = w(x_i)/2</text>
-
-  <text x="785" y="842" class="note">The side profile is stored on x with zU(x) and zL(x).</text>
-  <text x="785" y="868" class="note">When present, w(x) stores the transverse span along y at each x.</text>
+  <rect
+     x="20"
+     y="19.450293"
+     width="650"
+     height="410"
+     rx="20"
+     class="panel"
+     id="rect2"
+     ry="20" />
+  <rect
+     x="730"
+     y="20"
+     width="650"
+     height="410"
+     rx="20"
+     class="panel"
+     id="rect3" />
+  <rect
+     x="20"
+     y="470"
+     width="650"
+     height="430"
+     rx="20"
+     class="panel"
+     id="rect4" />
+  <rect
+     x="728.07605"
+     y="470.13742"
+     width="650"
+     height="430"
+     rx="20"
+     class="panel"
+     id="rect5"
+     ry="20" />
+  <text
+     x="55"
+     y="70"
+     class="title"
+     id="text5">Sphere</text>
+  <line
+     x1="120"
+     y1="225"
+     x2="515"
+     y2="225"
+     class="axis"
+     marker-end="url(#arrow)"
+     id="line5" />
+  <line
+     x1="300"
+     y1="360"
+     x2="300"
+     y2="78.842422"
+     class="axis"
+     marker-end="url(#arrow)"
+     id="line6" />
+  <text
+     x="521.90057"
+     y="230.18555"
+     class="body"
+     id="text6"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:normal;font-family:Helvetica, Arial, sans-serif">x</text>
+  <text
+     x="295.01953"
+     y="72.964912"
+     class="body"
+     id="text7"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:normal;font-family:Helvetica, Arial, sans-serif">z</text>
+  <circle
+     cx="300"
+     cy="225"
+     r="96"
+     class="shape"
+     id="circle7" />
+  <line
+     x1="307.02896"
+     y1="225"
+     x2="387.87161"
+     y2="225"
+     class="dim"
+     marker-start="url(#dimarrow)"
+     marker-end="url(#dimarrow)"
+     id="line7" />
+  <text
+     x="341.95224"
+     y="220.04678"
+     class="body"
+     id="text8"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:normal;font-family:Helvetica, Arial, sans-serif;fill:#ba6b1b;fill-opacity:1">a</text>
+  <line
+     x1="360"
+     y1="129"
+     x2="360"
+     y2="321"
+     class="guide"
+     id="line8" />
+  <text
+     x="353.92383"
+     y="121"
+     class="body"
+     id="text9"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:normal;font-family:Helvetica, Arial, sans-serif;fill:#94a3b8;fill-opacity:1">x<tspan
+   style="font-size:65%;baseline-shift:sub;fill:#94a3b8;fill-opacity:1"
+   id="tspan46">i</tspan></text>
+  <text
+     x="248.71346"
+     y="119.41521"
+     class="body"
+     id="text10"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:normal;font-family:Helvetica, Arial, sans-serif">z<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan47">U</tspan>(x<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan48">i</tspan>)</text>
+  <text
+     x="250.87166"
+     y="341.08771"
+     class="body"
+     id="text11"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:normal;font-family:Helvetica, Arial, sans-serif">z<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan50">L</tspan>(x<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan49">i</tspan>)</text>
+  <text
+     x="105"
+     y="392"
+     class="note"
+     id="text12">Profile stored on x with upper and lower bounds in z.</text>
+  <text
+     x="105"
+     y="418"
+     class="note"
+     id="text13"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;line-height:normal;font-family:Helvetica, Arial, sans-serif">For a sphere: z<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan51">U</tspan>(x) = (a<tspan
+   style="font-size:65%;baseline-shift:super"
+   id="tspan53">2</tspan> - x<tspan
+   style="font-size:65%;baseline-shift:super"
+   id="tspan54">2</tspan>)<tspan
+   style="font-size:65%;baseline-shift:super"
+   id="tspan52">1/2</tspan>, z<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan55">L</tspan>(x) = -(a<tspan
+   style="font-size:65%;baseline-shift:super"
+   id="tspan56">2</tspan> - x<tspan
+   style="font-size:65%;baseline-shift:super"
+   id="tspan57">2</tspan>)<tspan
+   style="font-size:65%;baseline-shift:super"
+   id="tspan58">1/2</tspan>.</text>
+  <text
+     x="765"
+     y="70"
+     class="title"
+     id="text14">Cylinder</text>
+  <line
+     x1="800"
+     y1="225"
+     x2="1245"
+     y2="225"
+     class="axis"
+     marker-end="url(#arrow)"
+     id="line14" />
+  <line
+     x1="975.00006"
+     y1="360.00003"
+     x2="975.00006"
+     y2="89.007492"
+     class="axis"
+     marker-end="url(#arrow)"
+     id="line15" />
+  <text
+     x="1255"
+     y="232"
+     class="body"
+     id="text15">x</text>
+  <text
+     x="970.01959"
+     y="83.561401"
+     class="body"
+     id="text16"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:normal;font-family:Helvetica, Arial, sans-serif">z</text>
+  <path
+     d="M 860 145 L 1090 145 L 1090 305 L 860 305 Z"
+     class="shape"
+     id="path16" />
+  <line
+     x1="913.99994"
+     y1="131.00673"
+     x2="913.99994"
+     y2="319.77066"
+     class="guide"
+     id="line16" />
+  <text
+     x="979.27911"
+     y="134.67787"
+     class="body"
+     id="text18"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:normal;font-family:Helvetica, Arial, sans-serif">z<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan60">U</tspan>(x<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan61">i</tspan>) = a</text>
+  <text
+     x="978.15204"
+     y="325.99341"
+     class="body"
+     id="text19"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:normal;font-family:Helvetica, Arial, sans-serif">z<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan62">L</tspan>(x<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan63">i</tspan>) = -a</text>
+  <line
+     x1="1053.7894"
+     y1="218.24341"
+     x2="1053.7894"
+     y2="151.75661"
+     class="dim"
+     marker-start="url(#dimarrow)"
+     marker-end="url(#dimarrow)"
+     id="line19" />
+  <line
+     x1="867.8653"
+     y1="288.47369"
+     x2="1082.1348"
+     y2="288.47369"
+     class="dim"
+     marker-start="url(#dimarrow)"
+     marker-end="url(#dimarrow)"
+     id="line20" />
+  <text
+     x="1032.3158"
+     y="284.69006"
+     class="body"
+     id="text21"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:normal;font-family:Helvetica, Arial, sans-serif;fill:#ba6b1b;fill-opacity:1">L</text>
+  <text
+     x="790"
+     y="392"
+     class="note"
+     id="text22">Straight cylinders use the same x-z profile framing.</text>
+  <text
+     x="790"
+     y="418"
+     class="note"
+     id="text23">Polynomial cylinders keep this coordinate system but let a vary with x.</text>
+  <text
+     x="55"
+     y="520"
+     class="title"
+     id="text24">Prolate spheroid</text>
+  <line
+     x1="120"
+     y1="675"
+     x2="515"
+     y2="675"
+     class="axis"
+     marker-end="url(#arrow)"
+     id="line24" />
+  <line
+     x1="300"
+     y1="810"
+     x2="300"
+     y2="532.67212"
+     class="axis"
+     marker-end="url(#arrow)"
+     id="line25" />
+  <text
+     x="525"
+     y="680.18555"
+     class="body"
+     id="text25"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:normal;font-family:Helvetica, Arial, sans-serif">x</text>
+  <text
+     x="295.01953"
+     y="527.4519"
+     class="body"
+     id="text26"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:normal;font-family:Helvetica, Arial, sans-serif">z</text>
+  <ellipse
+     cx="300"
+     cy="675"
+     rx="170"
+     ry="96"
+     class="shape"
+     id="ellipse26" />
+  <line
+     x1="305.56891"
+     y1="675"
+     x2="461.90454"
+     y2="675"
+     class="dim"
+     marker-start="url(#dimarrow)"
+     marker-end="url(#dimarrow)"
+     id="line26" />
+  <line
+     x1="300"
+     y1="669.31384"
+     x2="300"
+     y2="585.46356"
+     class="dim"
+     marker-start="url(#dimarrow)"
+     marker-end="url(#dimarrow)"
+     id="line27" />
+  <text
+     x="304.30411"
+     y="635.57312"
+     class="body"
+     id="text28"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:normal;font-family:Helvetica, Arial, sans-serif;fill:#ba6b1b;fill-opacity:1">b</text>
+  <line
+     x1="365"
+     y1="561.11969"
+     x2="365"
+     y2="803.65094"
+     class="guide"
+     id="line28" />
+  <circle
+     cx="410.3158"
+     cy="675"
+     r="6"
+     class="focus"
+     id="circle31"
+     style="fill:#103748;fill-opacity:1" />
+  <text
+     x="404.67838"
+     y="695.35675"
+     class="body"
+     id="text32"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:normal;font-family:Helvetica, Arial, sans-serif;fill:#103748;fill-opacity:1">q</text>
+  <text
+     x="105"
+     y="842"
+     class="note"
+     id="text33">Semimajor axis a lies along x, semiminor axis b along z.</text>
+  <text
+     x="105"
+     y="868"
+     class="note"
+     id="text34"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;line-height:normal;font-family:Helvetica, Arial, sans-serif">The focal half-distance is q = (a<tspan
+   style="font-size:65%;baseline-shift:super"
+   id="tspan65">2</tspan> - b<tspan
+   style="font-size:65%;baseline-shift:super"
+   id="tspan66">2</tspan>)<tspan
+   style="font-size:65%;baseline-shift:super"
+   id="tspan64">1/2</tspan>.</text>
+  <text
+     x="765"
+     y="520"
+     class="title"
+     id="text35">Arbitrary profile</text>
+  <line
+     x1="790"
+     y1="675"
+     x2="1265"
+     y2="675"
+     class="axis"
+     marker-end="url(#arrow)"
+     id="line35" />
+  <line
+     x1="1063"
+     y1="811.30994"
+     x2="1063"
+     y2="534.84918"
+     class="axis"
+     marker-end="url(#arrow)"
+     id="line36" />
+  <text
+     x="1275"
+     y="682"
+     class="body"
+     id="text36">x</text>
+  <text
+     x="1057.807"
+     y="532.35675"
+     class="body"
+     id="text37"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:normal;font-family:Helvetica, Arial, sans-serif">z</text>
+  <path
+     d="M 815 675 C 870 585, 930 560, 995 590 C 1045 612, 1115 565, 1185 645"
+     class="shape"
+     id="path37" />
+  <path
+     d="M 815 675 C 875 755, 930 785, 995 745 C 1055 710, 1120 740, 1185 688"
+     class="shape"
+     id="path38" />
+  <line
+     x1="1015"
+     y1="567.90051"
+     x2="1015"
+     y2="763.6012"
+     class="guide"
+     id="line38" />
+  <ellipse
+     cx="1190"
+     cy="555"
+     rx="62"
+     ry="42"
+     class="cross"
+     id="ellipse40" />
+  <line
+     x1="1085.9181"
+     y1="555"
+     x2="1293.7356"
+     y2="555"
+     class="axis"
+     marker-end="url(#arrow)"
+     id="line40" />
+  <line
+     x1="1190"
+     y1="622"
+     x2="1190"
+     y2="485"
+     class="axis"
+     marker-end="url(#arrow)"
+     id="line41" />
+  <text
+     x="1296.9357"
+     y="558.15204"
+     class="body"
+     id="text41"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:normal;font-family:Helvetica, Arial, sans-serif">y</text>
+  <text
+     x="1198"
+     y="495"
+     class="body"
+     id="text42">z</text>
+  <text
+     x="1247.4656"
+     y="531.91876"
+     class="body"
+     id="text43"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:normal;font-family:Helvetica, Arial, sans-serif;fill:#94a3b8;fill-opacity:1">w(x<tspan
+   style="font-size:65%;baseline-shift:sub;fill:#94a3b8;fill-opacity:1"
+   id="tspan81">i</tspan>)</text>
+  <text
+     x="1250.8015"
+     y="584.66376"
+     class="body"
+     id="text44"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:normal;font-family:Helvetica, Arial, sans-serif;fill:#94a3b8;fill-opacity:1">a(x<tspan
+   style="font-size:65%;baseline-shift:sub;fill:#94a3b8;fill-opacity:1"
+   id="tspan82">i</tspan>)</text>
+  <text
+     x="785"
+     y="842"
+     class="note"
+     id="text45"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;line-height:normal;font-family:Helvetica, Arial, sans-serif">The side profile is stored on x with z<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan74">U</tspan>(x) and z<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan75">L</tspan>(x).</text>
+  <text
+     x="785"
+     y="868"
+     class="note"
+     id="text46">When present, w(x) stores the transverse span along y at each x.</text>
+  <text
+     x="907.92377"
+     y="123.19883"
+     class="body"
+     id="text59"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:normal;font-family:Helvetica, Arial, sans-serif;fill:#94a3b8;fill-opacity:1">x<tspan
+   style="font-size:65%;baseline-shift:sub;fill:#94a3b8;fill-opacity:1"
+   id="tspan59">i</tspan></text>
+  <text
+     x="1057.6715"
+     y="190.91229"
+     class="body"
+     id="text60"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:normal;font-family:Helvetica, Arial, sans-serif;fill:#ba6b1b;fill-opacity:1">a</text>
+  <text
+     x="376.93542"
+     y="669.38629"
+     class="body"
+     id="text66"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:normal;font-family:Helvetica, Arial, sans-serif;fill:#ba6b1b;fill-opacity:1">a</text>
+  <text
+     x="358.92383"
+     y="554.01398"
+     class="body"
+     id="text67"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:normal;font-family:Helvetica, Arial, sans-serif;fill:#94a3b8;fill-opacity:1">x<tspan
+   style="font-size:65%;baseline-shift:sub;fill:#94a3b8;fill-opacity:1"
+   id="tspan67">i</tspan></text>
+  <text
+     x="250.09425"
+     y="791.5368"
+     class="body"
+     id="text71"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:normal;font-family:Helvetica, Arial, sans-serif">z<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan70">L</tspan>(x<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan71">i</tspan>)</text>
+  <text
+     x="247.27164"
+     y="569.86432"
+     class="body"
+     id="text73"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:normal;font-family:Helvetica, Arial, sans-serif">z<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan72">U</tspan>(x<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan73">i</tspan>)</text>
+  <text
+     x="1008.9238"
+     y="560.61047"
+     class="body"
+     id="text76"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:normal;font-family:Helvetica, Arial, sans-serif;fill:#94a3b8;fill-opacity:1">x<tspan
+   style="font-size:65%;baseline-shift:sub;fill:#94a3b8;fill-opacity:1"
+   id="tspan76">i</tspan></text>
+  <text
+     x="1068.6302"
+     y="585.86786"
+     class="body"
+     id="text78"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:normal;font-family:Helvetica, Arial, sans-serif">z<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan77">U</tspan>(x<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan78">i</tspan>)</text>
+  <text
+     x="1068.4813"
+     y="741.00555"
+     class="body"
+     id="text80"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:normal;font-family:Helvetica, Arial, sans-serif">z<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan79">L</tspan>(x<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan80">i</tspan>)</text>
+  <line
+     x1="1229.8472"
+     y1="528.29474"
+     x2="1141.6865"
+     y2="528.29474"
+     class="guide"
+     id="line82" />
+  <line
+     x1="1235.2214"
+     y1="579.20117"
+     x2="1191.5872"
+     y2="579.20117"
+     class="guide"
+     id="line83" />
+  <line
+     x1="900.5235"
+     y1="591.5575"
+     x2="900.5235"
+     y2="673.17432"
+     class="guide"
+     id="line84" />
+  <text
+     x="880.29858"
+     y="574.41815"
+     class="body"
+     id="text84"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:normal;font-family:Helvetica, Arial, sans-serif;fill:#94a3b8;fill-opacity:1">b(x<tspan
+   style="font-size:65%;baseline-shift:sub;fill:#94a3b8;fill-opacity:1"
+   id="tspan84">i</tspan>)</text>
 </svg>

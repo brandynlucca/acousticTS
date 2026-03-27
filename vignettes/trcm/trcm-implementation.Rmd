@@ -19,7 +19,7 @@ vignette: >
 
 ```{r model_family_header, echo=FALSE, results='asis'}
 acousticTS:::.model_family_header(
-  status = c("benchmarked"),
+  family = "trcm",
   pages = c(
     Overview = "index.html",
     Implementation = "trcm-implementation.html",
@@ -31,6 +31,10 @@ acousticTS:::.model_family_header(
 The `acousticTS` package uses object-based scatterers so the same implementation pattern carries across models: create a scatterer, run `target_strength()`, inspect the stored model output, and then compare a small set of physically important inputs. For TRCM, the required object class is `FLS` with a cylindrical shape and fluid-like material properties.
 
 TRCM should be read as a fast high-frequency interpretation tool, not as a general-purpose cylinder solver. The implementation assumes that the cross-sectional scattering is well summarized by the two retained rays described in the theory vignette, and it uses the body axis only to impose finite-length directivity and, when present, curvature-driven coherence loss. That means the most important implementation decisions are geometric and interpretive: whether the organism is locally cylindrical, whether the fluid-like boundary assumption is defensible, and whether the frequency range is high enough that a two-ray asymptotic model is credible.
+
+::: {.caution data-title="Approximation regime"}
+TRCM is a high-frequency asymptotic model. It is most useful when the target is well approximated by a locally cylindrical weakly scattering body and the scientific question is about broad interference/directivity structure rather than exact modal behavior.
+:::
 
 ## Cylinder object generation
 
@@ -75,9 +79,8 @@ Model results can be extracted either visually or directly through `extract()`.
 
 ### Plotting results
 
-```{r fig.width = 6}
-plot(straight_cylinder, type = "shape")
-plot(straight_cylinder, type = "model")
+```{r echo=FALSE, out.width=c('49%','49%'), fig.align='center', fig.alt='Pre-rendered TRCM example plots showing the straight-cylinder geometry and its stored target-strength spectrum.'}
+knitr::include_graphics(c("trcm-shape-plot.png", "trcm-model-plot.png"))
 ```
 
 These plots should be used as a first consistency check. The shape plot confirms that the body really is the simple cylindrical target the TRCM expects, while the model plot shows whether the interference oscillations and overall level look physically plausible for the chosen radius, contrasts, and frequency range.
@@ -91,65 +94,21 @@ head(trcm_results)
 
 The extracted result contains the scattering amplitude `f_bs`, the backscattering cross section `sigma_bs`, and target strength `TS`. In TRCM those quantities are especially worth checking together because an apparently minor change in phase can move the model between constructive and destructive interference. A smooth change in geometry can therefore produce a large local change in `TS`, even when the underlying contrasts have barely changed.
 
-## Comparing straight and bent cylinders
+## Comparison workflows
+
+### Straight versus bent cylinders
 
 Curvature is one of the main practical controls in the TRCM workflow, so it is useful to compare a straight cylinder with a bent one that keeps the same length and local radius. That comparison is physically informative because the bent-body correction does not introduce a new reflection law. Instead, it changes the equivalent coherent length of the body axis. A straight-versus-bent comparison therefore isolates how much of the observed spectral structure is being supported by long-range axial coherence.
 
-```{r fig.width = 8, fig.height = 4.5}
-bent_cylinder_shape <- cylinder(
-  length_body = 20e-3,
-  radius_body = 1.5e-3,
-  radius_curvature_ratio = 7,
-  n_segments = 60
-)
-
-bent_cylinder <- fls_generate(
-  shape = bent_cylinder_shape,
-  density_body = 1045,
-  sound_speed_body = 1520,
-  theta_body = pi / 2
-)
-
-bent_cylinder <- target_strength(
-  object = bent_cylinder,
-  frequency = frequency,
-  model = "trcm",
-  stationary_phase = TRUE
-)
-
-ts_straight <- acousticTS::extract(straight_cylinder, "model")$TRCM
-ts_bent <- acousticTS::extract(bent_cylinder, "model")$TRCM
-
-par(oma = c(0, 0.25, 0, 0), mar = c(5, 6, 4, 2))
-plot(
-  x = ts_straight$frequency * 1e-3,
-  y = ts_straight$TS,
-  type = "l",
-  lty = 1,
-  lwd = 2.5,
-  xlab = "Frequency (kHz)",
-  ylab = expression(Target ~ strength ~ (dB ~ re. ~ 1 ~ m^2)),
-  cex.lab = 1.3,
-  cex.axis = 1.2,
-  ylim = c(-120, -75)
-)
-lines(x = ts_bent$frequency * 1e-3, y = ts_bent$TS, col = "firebrick3", lty = 1, lwd = 2.5)
-legend(
-  "bottomright",
-  legend = c("Straight cylinder", "Bent cylinder"),
-  col = c("black", "firebrick3"),
-  lwd = 2.5,
-  lty = c(1, 1),
-  cex = 1.0,
-  bty = "n"
-)
+```{r echo=FALSE, out.width='85%', fig.align='center', fig.alt='Pre-rendered TRCM comparison between straight and bent cylinders over the same frequency sweep.'}
+knitr::include_graphics("trcm-straight-vs-bent.png")
 ```
 
 When `stationary_phase = TRUE`, the bent-cylinder correction uses the asymptotic equivalent-length approximation rather than numerically integrating the curvature-induced quadratic phase term along the axis. That option is fastest and is usually appropriate when the body is gently curved and acoustically large enough that the stationary-phase picture is already the right one. When the inferred bent-body effect seems to be carrying the whole answer, it is worth rerunning with `stationary_phase = FALSE` to check whether the simpler asymptotic branch is exaggerating or suppressing the coherence loss.
 
 For ray-based use cases, the next parameters to revisit are curvature and body orientation, since those control the interference and directivity structure more strongly than small changes in the fluid contrasts. If a TRCM spectrum changes radically under modest orientation or curvature adjustments, that sensitivity is part of the model interpretation rather than a post-processing nuisance.
 
-## Reference comparisons
+### Reference comparisons
 
 TRCM spans two geometry regimes, so the implementation checks should do the same. The straight-cylinder branch can still be compared against the canonical weakly scattering cylinder reference curve. The bent-cylinder branch is compared against the broadside bent-cylinder construction implied by Stanton (1989, Eq. 25-26): the straight finite-cylinder modal coefficient sum is retained, and curvature enters through the exact Fresnel-type coherence integral along the bent axis. In the table below, that bent reference uses the uniformly bent weak-fluid cylinder setup discussed by Stanton (1989) and Stanton et al. (1993): `L/a = 10.5`, `rho_c/L = 1.5`, `g = 1.0357`, `h = 1.0279`, and `ka` spanning `0.1` to `10`.
 
@@ -162,4 +121,3 @@ TRCM spans two geometry regimes, so the implementation checks should do the same
 This split is much more faithful to the underlying approximation structure. The straight-cylinder row checks the ordinary two-ray reduction against the canonical constant-radius cylinder case. The two bent-cylinder rows then test the curvature bookkeeping separately: the full Fresnel-integral branch and the asymptotic stationary-phase shortcut are each evaluated against the same FCMS-derived bent-cylinder reference problem from Stanton's Eq. 25-26 construction.
 
 The stationary-phase shortcut is therefore no longer being judged against a straight-cylinder benchmark that it was never meant to represent. Its remaining error should be read as the cost of using an asymptotic bent-body replacement for the full curvature integral, not as evidence that curvature itself is being mishandled.
-

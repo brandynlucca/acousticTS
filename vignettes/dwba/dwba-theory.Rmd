@@ -19,7 +19,7 @@ vignette: >
 
 ```{r model_family_header, echo=FALSE, results='asis'}
 acousticTS:::.model_family_header(
-  status = c("benchmarked", "validated"),
+  family = "dwba",
   pages = c(
     Overview = "index.html",
     Implementation = "dwba-implementation.html",
@@ -32,21 +32,29 @@ The distorted wave Born approximation (DWBA) is a first-order scattering model f
 
 For elongated zooplankton and similar organisms, the most important consequence of the DWBA is that a three-dimensional volume scattering problem can be reduced to a one-dimensional integral along the body axis. That simplification is not an ad hoc shortcut. It follows from the weak-scattering approximation together with an elongated axisymmetric body representation.
 
+Throughout this page, medium `1` is the surrounding seawater and medium `2` is
+the body interior, following the shared package conventions summarized in the
+[acoustic scattering primer](../acoustic-scattering-primer/acoustic-scattering-primer.html)
+and [notation guide](../notation-and-symbols/notation-and-symbols.html).
+
 # Weak-scattering formulation
 
 ## Governing equation in a heterogeneous fluid
 
-Consider a lossless fluid with harmonic time dependence proportional to $e^{-i \omega t}$. Let the time dependence be harmonic, proprtional to $e^{-i \omega t}$. The linearized equations of motion are defined as: surrounding water be medium 1 with density $\rho_1$, sound speed $c_1$, compressibility $\kappa_1 = (\rho_1 c_1^2)^{-1}$, and wavenumber:
+Consider a lossless fluid with harmonic time dependence proportional to
+$e^{-i \omega t}$. Let the surrounding seawater be medium `1`, with density
+$\rho_1$, sound speed $c_1$, compressibility
+$\kappa_1 = (\rho_1 c_1^2)^{-1}$, and wavenumber:
 
 $$
   \begin{align*}
-    \rho(\mathbf{x})\frac{\partial \mathbf{v}}{\partial t} &= -\nabla p, \\
+  \rho(\mathbf{x})\frac{\partial \mathbf{v}}{\partial t} &= -\nabla p, \\
     \frac{\partial \rho'}{\partial t} + \rho(\mathbf{x}) \, \nabla \cdot \mathbf{v} &= 0 \\
     p &= c^2(\mathbf{x}) \, \rho'.
   \end{align*}
 $$
 
-Eliminating particle velocity $\mathbf{v}$ and density perturbation $\rho'$ gives an acoustic equation in a heterogeneous medium. When the medium is decomposed into a homogeneous background plus a localized perturbation, the pressure field satisfies an inhomogeneous Helmholtz equation whose source term is produced by departures of density and compressibility from the background fluid.
+Eliminating particle velocity $\mathbf{v}$ and density perturbation $\rho'$ gives an acoustic equation in a heterogeneous medium. When the medium is decomposed into a homogeneous background plus a localized perturbation, the pressure field satisfies an inhomogeneous Helmholtz equation whose source term is produced by departures of density and compressibility from the background fluid:
 
 $$
   k_1 = \frac{\omega}{c_1}.
@@ -71,25 +79,25 @@ where $Q(\mathbf{r})$ is a source term supported only inside the body volume. Th
 The body differs from the surrounding fluid through density and compressibility contrasts. In the notation used for the DWBA, those are written as:
 
 $$
-\gamma_\kappa = \frac{\kappa_2 - \kappa_1}{\kappa_1},
-\qquad
-\gamma_\rho = \frac{\rho_2 - \rho_1}{\rho_2}.
+  \gamma_\kappa = \frac{\kappa_2 - \kappa_1}{\kappa_1},
+  \qquad
+  \gamma_\rho = \frac{\rho_2 - \rho_1}{\rho_2}.
 $$
 
 It is also common to use the contrast ratios:
 
 $$
-g = \frac{\rho_2}{\rho_1},
-\qquad
-h = \frac{c_2}{c_1}.
+  g_{21} = \frac{\rho_2}{\rho_1},
+  \qquad
+  h_{21} = \frac{c_2}{c_1}.
 $$
 
 These parameterizations are related by:
 
 $$
-\gamma_\kappa = \frac{1}{g h^2} - 1,
-\qquad
-\gamma_\rho = 1 - \frac{1}{g}.
+  \gamma_\kappa = \frac{1}{g_{21} h_{21}^2} - 1,
+  \qquad
+  \gamma_\rho = 1 - \frac{1}{g_{21}}.
 $$
 
 The weak-scattering assumption is precisely the assumption that these contrasts are small in magnitude:
@@ -110,8 +118,8 @@ $$
   p(\mathbf{r}) =
     p_{\mathrm{inc}}(\mathbf{r}) +
     \iiint_V
-    G_1(\mathbf{r},\mathbf{r}')
-    Q(\mathbf{r}') \, dV'.
+  G_1(\mathbf{r},\mathbf{r}')
+  Q(\mathbf{r}') \, dV'.
 $$
 
 For a homogeneous background fluid, the scalar Green's function is:
@@ -119,10 +127,10 @@ For a homogeneous background fluid, the scalar Green's function is:
 $$
   G_1(\mathbf{r},\mathbf{r}') =
     \frac{
-    e^{i k_1 |\mathbf{r} - \mathbf{r}'|}
-    }{
-    4 \pi |\mathbf{r} - \mathbf{r}'|
-    },
+  e^{i k_1 |\mathbf{r} - \mathbf{r}'|}
+  }{
+  4 \pi |\mathbf{r} - \mathbf{r}'|
+  },
 $$
 
 which satisfies:
@@ -156,8 +164,8 @@ $$
 In far-field backscatter, the outgoing Green's function contributes the return phase from each interior point to the receiver: 
 
 $$
-  |\mathbf{r}-\mathbf{r}'| 
-    = r - \hat{\mathbf{r}}\cdot\mathbf{r}' + O(r^{-1})
+  |\mathbf{r}-\mathbf{r}'| =
+    r - \hat{\mathbf{r}}\cdot\mathbf{r}' + O(r^{-1})
   \qquad (r \to \infty).
 $$
 
@@ -175,18 +183,18 @@ For clarity and compactness, this distinction is not carried forward here. The p
 To first order, the backscattering amplitude becomes:
 
 $$
-  \mathcal{f}_\text{bs} = 
+  \mathcal{f}_\text{bs} =
     \frac{k_1^2}{4\pi} \iiint_V \left(\gamma_\kappa - \gamma_\rho \cos^2\beta\right) e^{2 i \mathbf{k}_2 \cdot \mathbf{r}} \, dV,
 $$
 
 where $\mathbf{k}_2$ is the interior propagation vector and $\beta$ is the local angle between the propagation direction and the body tangent. In the standard elongated-body form, this angular dependence is absorbed into the effective cross-sectional response, allowing the integrand to be written in the simplified isotropic contrast form:
 
 $$
-  \mathcal{f}_\text{bs} = 
+  \mathcal{f}_\text{bs} =
     \frac{k_1}{4\pi}
-    \iiint_V
-    \left(\gamma_\kappa - \gamma_\rho\right)
-    e^{2 i \mathbf{k}_2 \cdot \mathbf{r}} \, dV.
+  \iiint_V
+  \left(\gamma_\kappa - \gamma_\rho\right)
+  e^{2 i \mathbf{k}_2 \cdot \mathbf{r}} \, dV.
 $$
 
 The essential physical idea is that each differential volume element contributes a small complex amplitude and the measured backscatter is the coherent sum of those contributions. The ordinary Born approximation would use the same coherent volume sum but with background-medium phase. The DWBA differs precisely in the choice of internal reference phase.
@@ -201,7 +209,7 @@ The essential physical idea is that each differential volume element contributes
 Suppose the body is elongated and approximately axisymmetric. Let its centerline be parameterized by arclength $s$ through a position vector:
 
 $$
-\mathbf{r}_{\mathrm{pos}}(s),
+  \mathbf{r}_{\mathrm{pos}}(s),
 $$
 
 and let the local cross-sectional radius be $a(s)$. A small volume element is then expressed as a circular cross-section carried along the centerline. The tangent unit vector is:
@@ -209,7 +217,7 @@ and let the local cross-sectional radius be $a(s)$. A small volume element is th
 $$
   \hat{\mathbf{t}}(s) =
     \frac{d \mathbf{r}_{\mathrm{pos}} / ds}
-    {|d \mathbf{r}_{\mathrm{pos}} / ds|}.
+  {|d \mathbf{r}_{\mathrm{pos}} / ds|}.
 $$
 
 The local tilt angle relative to the incident direction is then defined by:
@@ -230,26 +238,26 @@ In the reduced formulation, the labeled point $\mathbf{r}_{\mathrm{pos}}(s)$ sup
 At each arclength location, introduce local cylindrical coordinates $(r_\perp,\varphi,s)$ so that:
 
 $$
-dV = r_\perp \, dr_\perp \, d\varphi \, ds.
+  dV = r_\perp \, dr_\perp \, d\varphi \, ds.
 $$
 
 Within a short segment the centerline phase is approximated by the phase at the segment center, while the residual phase variation across the cross-section is retained explicitly. If the body contrasts are locally uniform across each section and the section is circular, then the volume integral separates into an axial phase factor and a cross-sectional diffraction integral:
 
 $$
-f_{\mathrm{bs}} =
-\frac{k_1}{4 \pi}
-\int
-e^{2 i \mathbf{k}_2 \cdot \mathbf{r}_{\mathrm{pos}}(s)}
-\left[
-\int_0^{2 \pi}
-\int_0^{a(s)}
-\left(
-\gamma_\kappa - \gamma_\rho
-\right)
-e^{2 i k_2 r_\perp \cos \beta_{\mathrm{tilt}}(s) \cos \varphi}
-r_\perp \, dr_\perp \, d\varphi
-\right]
-ds.
+  f_{\mathrm{bs}} =
+    \frac{k_1}{4 \pi}
+  \int
+  e^{2 i \mathbf{k}_2 \cdot \mathbf{r}_{\mathrm{pos}}(s)}
+  \left[
+  \int_0^{2 \pi}
+  \int_0^{a(s)}
+  \left(
+  \gamma_\kappa - \gamma_\rho
+  \right)
+  e^{2 i k_2 r_\perp \cos \beta_{\mathrm{tilt}}(s) \cos \varphi}
+  r_\perp \, dr_\perp \, d\varphi
+  \right]
+  ds.
 $$
 
 The body is therefore reduced to a coherent sum of local cross-sectional responses distributed along the centerline. Moreover, if the material properties contrast does nto vary across the local section, it can be taken outside the inner integral.
@@ -259,13 +267,13 @@ The body is therefore reduced to a coherent sum of local cross-sectional respons
 The azimuthal integral is evaluated with the standard Bessel identity:
 
 $$
-\int_0^{2 \pi} e^{i z \cos \varphi} \, d\varphi = 2 \pi J_0(z).
+  \int_0^{2 \pi} e^{i z \cos \varphi} \, d\varphi = 2 \pi J_0(z).
 $$
 
 Using the substitution:
 
 $$
-z = 2 k_2 r_\perp \cos \beta_{\mathrm{tilt}}(s),
+  z = 2 k_2 r_\perp \cos \beta_{\mathrm{tilt}}(s),
 $$
 
 the cross-sectional integral becomes:
@@ -283,13 +291,13 @@ The remaining radial integral uses:
 
 $$
   \int_0^a r J_0(br) \, dr =
-  \frac{a J_1(ba)}{b}.
+    \frac{a J_1(ba)}{b}.
 $$
 
 Applying that identity with:
 
 $$
-b = 2 k_2 \cos \beta_{\mathrm{tilt}}(s),
+  b = 2 k_2 \cos \beta_{\mathrm{tilt}}(s),
 $$
 
 gives the familiar Bessel factor:
@@ -302,13 +310,13 @@ $$
   \right)
   r_\perp \, dr_\perp =
     \pi a(s)
-    \frac{
-    J_1\!\left(
-    2 k_2 a(s) \cos \beta_{\mathrm{tilt}}(s)
-    \right)
-    }{
-    k_2 \cos \beta_{\mathrm{tilt}}(s)
-    }.
+  \frac{
+  J_1\!\left(
+  2 k_2 a(s) \cos \beta_{\mathrm{tilt}}(s)
+  \right)
+  }{
+  k_2 \cos \beta_{\mathrm{tilt}}(s)
+  }.
 $$
 
 This is the exact origin of the cylindrical Bessel factor in the reduced DWBA expression. It is not inserted empirically. It appears because the cross-section is assumed circular and the phase varies linearly across that disk.
@@ -322,21 +330,21 @@ Substituting the evaluated cross-sectional factor into the volume expression yie
 $$
   f_{\mathrm{bs}} =
     \frac{k_1}{4}
-    \int
-    \left(
-    \gamma_\kappa - \gamma_\rho
-    \right)
-    e^{2 i \mathbf{k}_2 \cdot \mathbf{r}_{\mathrm{pos}}(s)}
-    \frac{
-    J_1\!\left(
-    2 k_2 a(s) \cos \beta_{\mathrm{tilt}}(s)
-    \right)
-    }{
-    \cos \beta_{\mathrm{tilt}}(s)
-    }
-    \left|
-    d \mathbf{r}_{\mathrm{pos}}(s)
-    \right|.
+  \int
+  \left(
+  \gamma_\kappa - \gamma_\rho
+  \right)
+  e^{2 i \mathbf{k}_2 \cdot \mathbf{r}_{\mathrm{pos}}(s)}
+  \frac{
+  J_1\!\left(
+  2 k_2 a(s) \cos \beta_{\mathrm{tilt}}(s)
+  \right)
+  }{
+  \cos \beta_{\mathrm{tilt}}(s)
+  }
+  \left|
+  d \mathbf{r}_{\mathrm{pos}}(s)
+  \right|.
 $$
 
 If $s$ is true arclength, then $|d \mathbf{r}_{\mathrm{pos}}(s)| = ds$ and the expression becomes:
@@ -344,26 +352,26 @@ If $s$ is true arclength, then $|d \mathbf{r}_{\mathrm{pos}}(s)| = ds$ and the e
 $$
   f_{\mathrm{bs}} =
     \frac{k_1}{4}
-    \int
-    \left(
-    \gamma_\kappa - \gamma_\rho
-    \right)
-    e^{2 i \mathbf{k}_2 \cdot \mathbf{r}_{\mathrm{pos}}(s)}
-    \frac{
-    J_1\!\left(
-    2 k_2 a(s) \cos \beta_{\mathrm{tilt}}(s)
-    \right)
-    }{
-    \cos \beta_{\mathrm{tilt}}(s)
-    }
-    \, ds.
+  \int
+  \left(
+  \gamma_\kappa - \gamma_\rho
+  \right)
+  e^{2 i \mathbf{k}_2 \cdot \mathbf{r}_{\mathrm{pos}}(s)}
+  \frac{
+  J_1\!\left(
+  2 k_2 a(s) \cos \beta_{\mathrm{tilt}}(s)
+  \right)
+  }{
+  \cos \beta_{\mathrm{tilt}}(s)
+  }
+  \, ds.
 $$
 
 Each factor now has a direct interpretation:
 
 $$
   \begin{align*}
-    \gamma_\kappa - \gamma_\rho &\Rightarrow \text{material property contrast} \\
+  \gamma_\kappa - \gamma_\rho &\Rightarrow \text{material property contrast} \\
     e^{2 i \mathbf{k}_2 \cdot \mathbf{r}_{pos}(s)} &\Rightarrow \text{two-way propagation phase} \\
     \frac{J_1\!\left(2 k_2 a(s) \cos\beta_{tilt}(s)\right)}{\cos\beta_{tilt}(s)} &\Rightarrow \text{exact cross-sectional diffraction}.
   \end{align*}
@@ -379,24 +387,24 @@ At broadside incidence, the projected cross-sections remain large over much of t
 The apparent singularity as $\cos \beta_{\mathrm{tilt}} \to 0$ is removable because:
 
 $$
-J_1(z) \sim \frac{z}{2}
-\qquad \text{as } z \to 0.
+  J_1(z) \sim \frac{z}{2}
+  \qquad \text{as } z \to 0.
 $$
 
 This asymptotic relation implies the removable-limit result:
 
 $$
-\frac{
-J_1\!\left(
-2 k_2 a \cos \beta
-\right)
-}{
-\cos \beta
-}
-\to
-k_2 a
-\qquad
-\text{as } \cos \beta \to 0.
+  \frac{
+  J_1\!\left(
+  2 k_2 a \cos \beta
+  \right)
+  }{
+  \cos \beta
+  }
+  \to
+  k_2 a
+  \qquad
+  \text{as } \cos \beta \to 0.
 $$
 
 So the DWBA remains finite in the end-on limit. The line-integral form is therefore well behaved even when the projected section becomes very small.
@@ -405,20 +413,20 @@ If the body is discretized into short segments, the integral is approximated by:
 
 $$
   \mathcal{f}_{\text{bs}} \approx
-    \frac{k_1}{4}
-    \sum_{j=1}^{N}
-    \left(
-    \gamma_\kappa - \gamma_\rho
-    \right)_j
-    e^{2 i \mathbf{k}_2 \cdot \mathbf{r}_j}
-    \frac{
-    J_1\!\left(
-    2 k_2 a_j \cos \beta_j
-    \right)
-    }{
-    \cos \beta_j
-    }
-    \Delta s_j.
+  \frac{k_1}{4}
+  \sum_{j=1}^{N}
+  \left(
+  \gamma_\kappa - \gamma_\rho
+  \right)_j
+  e^{2 i \mathbf{k}_2 \cdot \mathbf{r}_j}
+  \frac{
+  J_1\!\left(
+  2 k_2 a_j \cos \beta_j
+  \right)
+  }{
+  \cos \beta_j
+  }
+  \Delta s_j.
 $$
 
 This discrete form makes the physical interpretation especially clear. The DWBA is a coherent sum over body segments. Its frequency structure arises from interference among segment contributions, not from any single local term acting alone.
@@ -428,17 +436,17 @@ This discrete form makes the physical interpretation especially clear. The DWBA 
 Once the complex amplitude is known, the backscattering cross-section is:
 
 $$
-  \sigma_{\text{bs}} = 
+  \sigma_{\text{bs}} =
     |\mathcal{f}_{\text{bs}}|^2,
 $$
 
 and target strength is:
 
 $$
-  \mathit{TS} = 
+  \mathit{TS} =
     10 \log_{10}\left(
-    \sigma_{\text{bs}}
-    \right).
+  \sigma_{\text{bs}}
+  \right).
 $$
 
 If an orientation distribution is prescribed, the quantity that should be averaged is the linear backscattering cross-section rather than the logarithmic target strength.

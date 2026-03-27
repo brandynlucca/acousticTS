@@ -8,7 +8,7 @@ output:
     dpi: 200
     dev.args: list(pointsize=11)
 vignette: >
-  %\VignetteIndexEntry{FAQ and troubleshooting}
+  %\VignetteIndexEntry{FAQ and Troubleshooting}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---

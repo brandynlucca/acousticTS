@@ -13,12 +13,48 @@ vignette: >
 # Overview
 ```{r model_family_header, echo=FALSE, results='asis'}
 acousticTS:::.model_family_header(
-  status = c("experimental", "unvalidated"),
+  family = "bcms",
   pages = c(
+    Overview = "index.html",
     Implementation = "bcms-implementation.html",
     Theory = "bcms-theory.html"
   )
 )
 ```
 
+```{r bcms_overview, echo=FALSE, results='asis'}
+acousticTS:::.model_family_overview(
+  family = "bcms",
+  summary = paste(
+    "The bent cylinder modal series solution (`BCMS`) extends the straight",
+    "finite-cylinder modal family to uniformly bent cylinders by keeping the",
+    "straight cross-sectional modal physics and modifying only the along-axis",
+    "coherence."
+  ),
+  core_idea = paste(
+    "Start from the finite-cylinder modal backscatter of a straight cylinder,",
+    "then replace the straight-axis coherent length by the curved equivalent",
+    "coherent length derived for a uniformly bent axis."
+  ),
+  best_for = c(
+    "Uniformly bent fluid-like cylinders near broadside",
+    "Curvature studies where the straight cylinder modal content remains the right local kernel",
+    "Problems where a full curved-body rederivation is unnecessary or unavailable"
+  ),
+  supports = c(
+    "Bent `Cylinder` geometries represented through a curvature ratio",
+    "Monostatic near-broadside target strength",
+    "The same fluid boundary families carried by the straight-cylinder modal kernel"
+  ),
+  assumptions = c(
+    "Uniform curvature",
+    "Near-broadside incidence",
+    "Curvature modifies coherence along the axis but not the local cross-sectional modal physics"
+  ),
+  reading = c(
+    "[Implementation](bcms-implementation.html): usage and current reference checks",
+    "[Theory](bcms-theory.html): bent-axis coherence integrals and relation to the straight-cylinder modal kernel"
+  )
+)
+```
 

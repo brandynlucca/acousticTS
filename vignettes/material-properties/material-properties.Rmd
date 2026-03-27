@@ -8,7 +8,7 @@ output:
     dpi: 200
     dev.args: list(pointsize=11)
 vignette: >
-  %\VignetteIndexEntry{Material properties and acoustic utilities}
+  %\VignetteIndexEntry{Material Properties and Acoustic Utilities}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---

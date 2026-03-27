@@ -19,7 +19,7 @@ vignette: >
 
 ```{r model_family_header, echo=FALSE, results='asis'}
 acousticTS:::.model_family_header(
-  status = c("benchmarked"),
+  family = "fcms",
   pages = c(
     Overview = "index.html",
     Implementation = "fcms-implementation.html",
@@ -80,9 +80,8 @@ Model results can be extracted either visually or directly through `extract()`.
 
 ### Plotting results
 
-```{r fig.width = 6}
-plot(cylinder_object, type = "shape")
-plot(cylinder_object, type = "model")
+```{r echo=FALSE, out.width=c('49%','49%'), fig.align='center', fig.alt='Pre-rendered FCMS example plots showing the finite-cylinder geometry and its stored target-strength spectrum.'}
+knitr::include_graphics(c("fcms-shape-plot.png", "fcms-model-plot.png"))
 ```
 
 ### Accessing results
@@ -94,48 +93,12 @@ head(fcms_results)
 
 At this stage, it is worth checking more than whether the model ran. Readers should confirm that the returned frequencies match the requested grid, that the target-strength values vary over a plausible range for the assumed cylinder, and that the results are being interpreted in the intended domain. FCMS output is often discussed in `TS`, but the underlying backscattering physics lives in the linear amplitude and cross-section quantities from which `TS` is derived.
 
-## Comparing liquid-filled and rigid cylinders
+## Comparison workflows
 
-```{r fig.width = 8, fig.height = 4.5}
-rigid_cylinder <- fls_generate(
-  shape = cylinder_shape,
-  density_body = 1045,
-  sound_speed_body = 1520,
-  theta_body = pi / 2
-)
+### Boundary conditions
 
-rigid_cylinder <- target_strength(
-  object = rigid_cylinder,
-  frequency = frequency,
-  model = "fcms",
-  boundary = "fixed_rigid"
-)
-
-ts_fluid <- extract(cylinder_object, "model")$FCMS
-ts_rigid <- extract(rigid_cylinder, "model")$FCMS
-
-par(oma = c(0, 0.25, 0, 0), mar = c(5, 6, 4, 2))
-plot(
-  x = ts_fluid$frequency * 1e-3,
-  y = ts_fluid$TS,
-  type = "l",
-  lty = 1,
-  lwd = 2.5,
-  xlab = "Frequency (kHz)",
-  ylab = expression(Target ~ strength ~ (dB ~ re. ~ 1 ~ m^2)),
-  cex.lab = 1.3,
-  cex.axis = 1.2
-)
-lines(x = ts_rigid$frequency * 1e-3, y = ts_rigid$TS, col = "firebrick3", lty = 1, lwd = 2.5)
-legend(
-  "bottomright",
-  legend = c("Liquid filled", "Fixed rigid"),
-  col = c("black", "firebrick3"),
-  lwd = 2.5,
-  lty = c(1, 1),
-  cex = 1.0,
-  bty = "n"
-)
+```{r echo=FALSE, out.width='85%', fig.align='center', fig.alt='Pre-rendered FCMS comparison between liquid-filled and fixed-rigid finite cylinders over the same frequency sweep.'}
+knitr::include_graphics("fcms-boundary-comparison.png")
 ```
 
 This comparison is useful because it isolates one of the most consequential FCMS decisions. Holding the geometry fixed and changing the boundary condition shows how much of the response is being driven by the circular shape itself and how much is being driven by the assumed interface physics. If two boundary choices produce materially different spectra, then the physical interpretation of the target interior is a first-order modeling decision rather than a minor sensitivity check.
@@ -148,7 +111,7 @@ For practical FCMS work, the first additional controls to revisit are usually:
 
 Those checks are especially important when comparing FCMS with other models. A fair comparison should keep the cylinder geometry, orientation convention, medium properties, and reporting domain consistent before any disagreement is interpreted as a model effect.
 
-## Benchmark comparisons
+### Benchmark comparisons
 
 FCMS can also be compared directly against the Jech cylindrical benchmark family stored in `benchmark_ts`. The table below uses the full cylindrical benchmark grid. Elapsed times are representative values from the current machine.
 
@@ -161,6 +124,19 @@ FCMS can also be compared directly against the Jech cylindrical benchmark family
 
 The pressure-release and gas-filled cases remain very close to the benchmark family across the full frequency grid. The larger residuals are confined to the fixed-rigid and liquid-filled branches, where the finite-cylinder benchmark curves show somewhat deeper minima than the present implementation at a small number of frequencies.
 
+### Cross-software implementation checks
+
+The same four cylindrical boundary definitions were also compared directly against the locally available `echoSMs` finite-cylinder implementation. This check serves a different purpose from the benchmark table above. It asks whether the software implementations agree with each other on the same finite-cylinder problem, and whether the remaining benchmark residual is shared rather than unique to `acousticTS`.
+
+| Boundary | Mean abs. delta `acousticTS` vs `echoSMs` (dB) | Max abs. delta `acousticTS` vs `echoSMs` (dB) | Mean abs. delta `echoSMs` vs benchmark (dB) | Max abs. delta `echoSMs` vs benchmark (dB) |
+|:--|--:|--:|--:|--:|
+| `fixed_rigid` | 7.14e-09 | 1.64e-07 | 0.00914 | 0.19454 |
+| `pressure_release` | 6.97e-09 | 1.59e-07 | 0.00263 | 0.00780 |
+| `gas_filled` | 6.96e-09 | 1.59e-07 | 0.00245 | 0.00499 |
+| `liquid_filled` | 4.36e-09 | 2.62e-07 | 0.00512 | 0.11453 |
+
+The key point is that `acousticTS` and `echoSMs` collapse onto the same FCMS spectra to practical machine precision across all four boundary types. That means the larger fixed-rigid and liquid-filled benchmark residuals reported above are shared against the benchmark curve rather than being a disagreement between the two software implementations.
+
 The main additional numerical switch in FCMS is `m_limit`, so the natural follow-up check is the same one used for SPHMS: hold the liquid-filled benchmark definition fixed and inspect how strongly the benchmark fit depends on a reduced modal cap.
 
 | Boundary | `m_limit` | Max abs. delta TS (dB) | Mean abs. delta TS (dB) | Elapsed (s) |
@@ -170,4 +146,3 @@ The main additional numerical switch in FCMS is `m_limit`, so the natural follow
 | `liquid_filled` | `10` | 43.09805 | 4.29035 | 0.01 |
 
 That sensitivity check shows why the FCMS page does not need a large PSMS-style configuration matrix. The physically meaningful benchmark branches are the boundary conditions themselves. The extra argument is a modal truncation cap, and the benchmark comparison shows that it can be pushed somewhat, but not recklessly, before the cylindrical modal sum is no longer trustworthy.
-

@@ -19,7 +19,7 @@ vignette: >
 
 ```{r model_family_header, echo=FALSE, results='asis'}
 acousticTS:::.model_family_header(
-  status = c("experimental", "unvalidated"),
+  family = "bcms",
   pages = c(
     Overview = "index.html",
     Implementation = "bcms-implementation.html",
@@ -28,59 +28,171 @@ acousticTS:::.model_family_header(
 )
 ```
 
-The bent-cylinder modal-series solution is a hybrid construction. For a straight finite cylinder, the backscatter comes from the exact finite-cylinder modal coefficient sum described by Stanton (1988)[^1]. For a uniformly bent cylinder near broadside, Stanton (1989) showed that the curvature enters through a coherence integral along the bent axis rather than by rebuilding the full cross-sectional modal kernel from scratch[^2]. The `BCMS` implementation follows that split directly.
+The bent-cylinder modal series solution (`BCMS`) is a curvature-aware extension
+of the straight finite-cylinder modal family developed by Stanton for
+finite-length cylinders near broadside.[^1][^2] The physical idea is simple:
+curvature modifies the way different parts of the cylinder remain coherent with
+one another, but it does not replace the local cross-sectional scattering
+physics with a completely different kernel.
 
-[^1]: Stanton, T.K. (**1988**). *Sound scattering by cylinders of finite length. I. Fluid cylinders*. J. Acoust. Soc. Am., 83: 55-63.
+That separation leads to a two-level theory:
 
-[^2]: Stanton, T.K. (**1989**). *Sound scattering by cylinders of finite length. III. Deformed cylinders*. J. Acoust. Soc. Am., 86: 691-705.
+1. a straight finite-cylinder modal backscatter kernel, and
+2. a curvature-dependent coherent-length correction applied to that kernel.
 
-# Straight and bent branches
+The present page follows the package-wide indexing convention: medium `1` is
+the surrounding seawater and medium `2` is the cylinder interior.
 
-The model is easiest to understand as two connected branches:
+[^1]: Stanton, T.K. (**1988**). *Sound scattering by cylinders of finite length. I. Fluid cylinders*. *The Journal of the Acoustical Society of America*, 83: 55-63.
 
-1. a straight-cylinder modal series,
-2. a bent-cylinder coherence correction applied to that straight result.
+[^2]: Stanton, T.K. (**1989**). *Sound scattering by cylinders of finite length. III. Deformed cylinders*. *The Journal of the Acoustical Society of America*, 86: 691-705.
 
-```{r echo = FALSE, out.width = "92%", fig.align = "center", fig.cap = "BCMS keeps the straight finite-cylinder modal sum and applies a Fresnel coherence correction for the bent case."}
+# Straight-cylinder starting point
+
+## Local cross-sectional modal content
+
+`BCMS` inherits its local cross-sectional response from the straight
+finite-cylinder modal series. For a circular cylinder of radius $a$ and length
+$L$, the near-broadside backscattering amplitude can be written schematically
+as:
+
+$$
+  f_{\mathrm{bs}}^{(\mathrm{straight})} =
+    \frac{L}{\pi}
+  \frac{\sin(k_1 L \cos\theta)}
+  {k_1 L \cos\theta}
+  \sum_{m=0}^{\infty}
+  (-1)^m \epsilon_m B_m.
+$$
+
+Here $k_1 = \omega/c_1$ is the seawater wavenumber, $\theta$ is the incidence
+angle measured relative to the cylinder axis, $\epsilon_m$ is the Neumann
+factor, and $B_m$ is the straight-cylinder modal coefficient of order $m$.
+
+The details of $B_m$ depend on the boundary condition. For fluid-like cylinders,
+those coefficients are the same ones derived in the
+[FCMS theory page](../fcms/fcms-theory.html). `BCMS` does not replace those
+coefficients. It reuses them.
+
+## Why curvature can be isolated
+
+For a gently and uniformly bent cylinder near broadside, the local radius and
+cross-sectional boundary condition still look straight at the scale of the
+cross-sectional modal solve. What changes is the two-way phase accumulated by
+different points along the curved axis.
+
+That is the central approximation of `BCMS`: curvature is treated as an
+axial-coherence problem, not as a new cross-sectional boundary-value problem.
+
+# Uniformly bent geometry
+
+## Centerline and curvature
+
+Let $s \in [-L/2, L/2]$ denote arc length along the cylinder centerline, and
+let $\kappa = 1/\rho_c$ denote the constant curvature, where $\rho_c$ is the
+radius of curvature. A convenient planar representation of the bent centerline
+is:
+
+$$
+  \mathbf{r}_c(s) =
+    \begin{bmatrix}
+  \rho_c \sin(s/\rho_c) \\
+    0 \\
+    \rho_c \left[1 - \cos(s/\rho_c)\right]
+  \end{bmatrix}.
+$$
+
+up to a rigid translation that does not affect the coherent integral.
+
+The local tangent direction is then:
+
+$$
+  \hat{\mathbf{t}}(s) =
+    \frac{d\mathbf{r}_c}{ds} =
+    \begin{bmatrix}
+  \cos(s/\rho_c) \\
+    0 \\
+    \sin(s/\rho_c)
+  \end{bmatrix}.
+$$
+
+```{r echo = FALSE, out.width = "92%", fig.align = "center", fig.cap = "BCMS keeps the straight finite-cylinder modal sum and modifies only the along-axis coherence for a uniformly bent centerline."}
 knitr::include_graphics("bcms-cylinder-schematic.svg")
 ```
 
-For the straight cylinder, the far-field backscattering amplitude is the ordinary finite-cylinder sum
+## Broadside phase bookkeeping
+
+For monostatic backscatter, each point on the centerline contributes a two-way
+phase proportional to its projection onto the backscatter direction. If
+$\hat{\mathbf{q}}$ denotes the relevant unit look direction, the coherent
+length is:
 
 $$
-f_{bs}^{(\mathrm{straight})}
-\propto
-\frac{L}{\pi}
-\frac{\sin(kL\cos\theta)}{kL\cos\theta}
-\sum_m B_m,
+  L_{\mathrm{ebc}} =
+    \int_{-L/2}^{L/2}
+  \exp\left[
+  2 i k_1 \hat{\mathbf{q}}\cdot \mathbf{r}_c(s)
+  \right] ds.
 $$
 
-where the modal coefficients $B_m$ depend on the boundary condition and the interior material properties.
+When the centerline is straight, $\mathbf{r}_c(s)$ becomes linear in $s$ and
+this integral reduces to the ordinary sinc-style axial factor. For a bent
+centerline, the phase becomes nonlinear in $s$, which is why the coherence is
+reduced even when the local cylinder physics is unchanged.
 
-# Bent-cylinder coherence length
+# Equivalent coherent length and Fresnel form
 
-For a uniformly bent cylinder near broadside, Stanton (1989, Eq. 25-26) retains the straight-cylinder modal content and introduces curvature through a coherent integration along the arc. In the present implementation that correction is written as
+For a uniformly bent cylinder near broadside, Stanton's reduction writes the
+bent amplitude as:
 
 $$
-f_{bs}^{(\mathrm{bent})}
-=
-\frac{L_{ebc}}{L}
-f_{bs}^{(\mathrm{straight})},
+  f_{\mathrm{bs}}^{(\mathrm{bent})} =
+    \frac{L_{\mathrm{ebc}}}{L}
+  f_{\mathrm{bs}}^{(\mathrm{straight})}.
 $$
 
-where $L_{ebc}$ is the complex equivalent coherent length of the bent cylinder.
+The curvature therefore enters only through the ratio $L_{\mathrm{ebc}}/L$.
+This quantity is often called the equivalent coherent length because it says
+how much of the nominal straight-cylinder length remains phase coherent once
+the axis is bent.
 
-The key point is that `BCMS` uses the Fresnel-integral form of that coherence correction. The stationary-phase limit is an asymptotic shortcut for sufficiently high frequency and sufficiently gentle bending, but it is not the core bent-cylinder modal-series form. That is why the stationary-phase approximation belongs naturally with the asymptotic cylindrical models rather than inside `BCMS` itself.
+For constant curvature, the phase in the axial integral is quadratic in the
+near-broadside reduction, so $L_{\mathrm{ebc}}$ can be expressed through
+Fresnel integrals. The exact Fresnel form is useful computationally because it
+avoids having to re-discretize the entire axis for each frequency. More
+importantly, it makes the physics explicit: if curvature is weak or frequency
+is low, the phase varies slowly and $L_{\mathrm{ebc}} \approx L$; if curvature
+is stronger or frequency is higher, different portions of the bent axis
+dephase and the coherent length decreases.
 
-# Relation to `FCMS`
+# Backscatter and target strength
 
-Because the bent-cylinder correction multiplies the straight finite-cylinder response, `BCMS` collapses to `FCMS` immediately when the curvature is removed. That identity is a useful implementation check:
+Once the straight modal kernel and bent coherent-length factor are known, the
+backscattering cross-section and target strength follow the standard monostatic
+definitions:
 
-- straight cylinder: `BCMS = FCMS`
-- bent cylinder: `BCMS = (L_{ebc}/L) * FCMS`
+$$
+  \sigma_{\mathrm{bs}} =
+    \left|f_{\mathrm{bs}}^{(\mathrm{bent})}\right|^2,
+  \qquad
+  \mathrm{TS} =
+    10\log_{10}\left(\sigma_{\mathrm{bs}}\right).
+$$
 
-This relationship is what the implementation page uses as its primary reference check.
+The curved cylinder therefore differs from the straight cylinder through a
+complex coherence multiplier, not through a new definition of target strength.
 
-# Closing note
+# Mathematical assumptions
 
-`BCMS` is therefore best viewed as a curvature-aware extension of the finite-cylinder modal-series family rather than a separate modal kernel. The cross-sectional physics stays in the straight-cylinder modal coefficients. Curvature modifies the along-axis coherence.
+The family rests on a narrow but physically useful set of assumptions:
+
+1. the cross-section remains circular,
+2. the curvature is uniform,
+3. the target is treated near broadside,
+4. the straight-cylinder modal coefficients remain the correct local kernel,
+5. curvature modifies only the axial phase coherence.
+
+These assumptions are why `BCMS` is best understood as a curvature extension of
+`FCMS`, not as a completely separate exact modal family. Its strength is that
+it preserves the modal physics of the straight cylinder while still accounting
+for the first-order way in which a bent axis destroys coherence.

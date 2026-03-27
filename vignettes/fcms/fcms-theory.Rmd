@@ -19,7 +19,7 @@ vignette: >
 
 ```{r model_family_header, echo=FALSE, results='asis'}
 acousticTS:::.model_family_header(
-  status = c("benchmarked"),
+  family = "fcms",
   pages = c(
     Overview = "index.html",
     Implementation = "fcms-implementation.html",
@@ -37,6 +37,9 @@ This structure is also the main conceptual point a reader should carry away from
 
 In the cross-sectional problem, a rigid cylinder enforces zero normal velocity at $r = a$, a pressure-release cylinder enforces zero pressure there, and a fluid-filled cylinder enforces continuity of pressure and normal velocity between the exterior and interior media. The role of this vignette is to show how those cylindrical boundary conditions determine the coefficients $B_m$ and how the resulting cross-sectional response is combined with finite-axis coherence.
 
+The medium numbering follows the shared package convention: medium `1` is the
+surrounding seawater and medium `2` is the cylinder interior.
+
 # Physical basis of the FCMS
 
 ## Infinite-cylinder scattering as the local starting point
@@ -53,11 +56,7 @@ This factorization is most natural when the cylinder is straight, of constant ra
 
 The FCMS is therefore exact with respect to the circular cross-section but approximate with respect to the endcaps. That distinction matters physically. If the scientific question depends mainly on how material contrast and radius control the modal structure of the circular cross-section, FCMS is often very useful. If the question depends strongly on detailed end geometry or on full three-dimensional coupling near the cylinder tips, then the separated finite-axis factor becomes the main approximation to keep in mind.
 
-![FCMS factorization schematic](fcms-cylinder-factorization-schematic.svg)
-
 ![Exact cylindrical cross-section physics combined with approximate finite-axis coherence in the FCMS construction.](fcms-cross-section-and-axis-schematic.svg)
-
-![Cylinder geometry and coordinate bookkeeping for the FCMS reduction.](fcms-coordinate-geometry-clean.svg)
 
 The construction therefore has two distinct layers. The circular cross-section determines the cylindrical modal coefficients $B_m$. The finite axis of length $L$ and the orientation angle $\theta$ contribute the separate coherence factor $\sin(kL\cos\theta)/(kL\cos\theta)$. Radius $a$, transverse wavenumber $K = k\sin\theta$, and the axial phase scale $kL\cos\theta$ are the variables that keep those two layers connected without turning them into the same approximation.
 
@@ -81,13 +80,15 @@ $$
 
 Thus the cross-sectional scattering depends on the transverse size parameter $Ka$, while the finite-length directivity depends on the longitudinal phase difference $kL\cos\theta$. This separation of scale variables is one of the simplest ways to understand the model: radius enters through the cylindrical boundary-value problem, whereas length enters through coherent summation along the axis.
 
+![Cylinder geometry and coordinate bookkeeping for the FCMS reduction.](fcms-coordinate-geometry-clean.svg)
+
 ## Axial integration
 
 If the cross-sectional scattering amplitude is taken to be uniform along the cylinder, then integrating the two-way phase factor along the axis gives:
 
 $$
-  \int_{-L/2}^{L/2} e^{2ikz\cos\theta}\,dz
-  = L\frac{\sin(kL\cos\theta)}{kL\cos\theta}.
+  \int_{-L/2}^{L/2} e^{2ikz\cos\theta}\,dz =
+    L\frac{\sin(kL\cos\theta)}{kL\cos\theta}.
 $$
 
 This is the origin of the finite-length directivity factor. It is exactly the same sinc response that appears whenever a uniformly weighted segment is integrated coherently. The argument $kL\cos\theta$ states how much phase is accumulated from one end of the cylinder to the other in the backscattering geometry.
@@ -182,8 +183,8 @@ Explicitly, the orthogonality relation is:
 
 $$
   \int_0^{2\pi} \cos(m\phi)\cos(n\phi)\,d\phi =
-  \begin{cases}
-    2\pi, & m=n=0, \\
+    \begin{cases}
+  2\pi, & m=n=0, \\
     \pi, & m=n\ge 1, \\
     0, & m\ne n.
   \end{cases}
@@ -247,15 +248,15 @@ $$
 
 ## Fluid-filled cylinder
 
-For a fluid-filled cylinder, the interior field must also be expanded because the incident wave excites pressure fluctuations inside the cylinder as well as outside it. Let $\rho_1$ and $c_1$ denote the exterior density and sound speed, and let $\rho_2$ and $c_2$ denote the corresponding interior properties. Define the density contrast $g=\rho_2/\rho_1$ and sound-speed contrast $h=c_2/c_1$.
+For a fluid-filled cylinder, the interior field must also be expanded because the incident wave excites pressure fluctuations inside the cylinder as well as outside it. Let $\rho_1$ and $c_1$ denote the exterior density and sound speed, and let $\rho_2$ and $c_2$ denote the corresponding interior properties. Define the density contrast $g_{21}=\rho_2/\rho_1$ and sound-speed contrast $h_{21}=c_2/c_1$.
 
 The interior transverse wavenumber is then:
 
 $$
-  K' = \frac{K}{h},
+  K' = \frac{K}{h_{21}},
 $$
 
-where $h=c_2/c_1$ is sound-speed contrast. The interior field is then written as:
+where $h_{21}=c_2/c_1$ is sound-speed contrast. The interior field is then written as:
 
 $$
   p_{int}(r,\phi) = \sum_{m=0}^{\infty}\epsilon_m i^m C_m^{(int)} J_m(K'r)\cos(m\phi).
@@ -270,8 +271,8 @@ $$
 and continuity of normal velocity gives:
 
 $$
-  \frac{1}{\rho_1}\left[J_m'(Ka)+B_m H_m^{(1)\prime}(Ka)\right]
-  = \frac{1}{\rho_2}\frac{K'}{K}C_m^{(int)}J_m'(K'a).
+  \frac{1}{\rho_1}\left[J_m'(Ka)+B_m H_m^{(1)\prime}(Ka)\right] =
+    \frac{1}{\rho_2}\frac{K'}{K}C_m^{(int)}J_m'(K'a).
 $$
 
 Solving the pressure-continuity equation for the interior coefficient gives:
@@ -283,25 +284,25 @@ $$
 Substituting this into the velocity condition gives:
 
 $$
-  J_m'(Ka)+B_mH_m^{(1)\prime}(Ka) = 
-    gh\,\frac{J_m'(K'a)}{J_m(K'a)}
-    \left[J_m(Ka)+B_mH_m^{(1)}(Ka)\right],
+  J_m'(Ka)+B_mH_m^{(1)\prime}(Ka) =
+    g_{21}h_{21}\,\frac{J_m'(K'a)}{J_m(K'a)}
+  \left[J_m(Ka)+B_mH_m^{(1)}(Ka)\right],
 $$
 
-where $g=\rho_2/\rho_1$ and $h=c_2/c_1$. Rearranging yields:
+where $g_{21}=\rho_2/\rho_1$ and $h_{21}=c_2/c_1$. Rearranging yields:
 
 $$
   B_m
-  \left[H_m^{(1)\prime}(Ka)-gh\frac{J_m'(K'a)}{J_m(K'a)}H_m^{(1)}(Ka)\right] =
-  gh\frac{J_m'(K'a)}{J_m(K'a)}J_m(Ka)-J_m'(Ka).
+  \left[H_m^{(1)\prime}(Ka)-g_{21}h_{21}\frac{J_m'(K'a)}{J_m(K'a)}H_m^{(1)}(Ka)\right] =
+    g_{21}h_{21}\frac{J_m'(K'a)}{J_m(K'a)}J_m(Ka)-J_m'(Ka).
 $$
 
 Solving for the exterior scattering coefficient gives:
 
 $$
   B_m =
-  \frac{gh\dfrac{J_m'(K'a)}{J_m(K'a)}J_m(Ka)-J_m'(Ka)}
-       {H_m^{(1)\prime}(Ka)-gh\dfrac{J_m'(K'a)}{J_m(K'a)}H_m^{(1)}(Ka)}.
+    \frac{g_{21}h_{21}\dfrac{J_m'(K'a)}{J_m(K'a)}J_m(Ka)-J_m'(Ka)}
+  {H_m^{(1)\prime}(Ka)-g_{21}h_{21}\dfrac{J_m'(K'a)}{J_m(K'a)}H_m^{(1)}(Ka)}.
 $$
 
 After expressing the Hankel function as:
@@ -320,12 +321,12 @@ The auxiliary ratio is:
 
 $$
   C_m =
-  \frac{
-    \left[J_m'(K'a)Y_m(Ka)\right]/\left[J_m(K'a)J_m'(Ka)\right]
-    - gh\left[Y_m'(Ka)/J_m'(Ka)\right]
+    \frac{
+  \left[J_m'(K'a)Y_m(Ka)\right]/\left[J_m(K'a)J_m'(Ka)\right] -
+    g_{21}h_{21}\left[Y_m'(Ka)/J_m'(Ka)\right]
   }{
-    \left[J_m'(K'a)J_m(Ka)\right]/\left[J_m(K'a)J_m'(Ka)\right]
-    - gh
+  \left[J_m'(K'a)J_m(Ka)\right]/\left[J_m(K'a)J_m'(Ka)\right] -
+    g_{21}h_{21}
   }.
 $$
 

@@ -17,7 +17,7 @@ vignette: >
 
 Geometry is the first major decision in the package. Before choosing a scatterer class or a target-strength model, it is usually worth deciding whether the target is best represented as a canonical shape or as a segmented arbitrary body. That decision is not just cosmetic. It determines how faithfully the object matches a theory family, how much geometric detail is preserved, and how easy it will be to interpret the response later.
 
-The important point is that shape construction is not yet the stage where material contrasts or boundary conditions are fixed. At this point the user is deciding only how the body is described geometrically. That separation is intentional. It keeps the geometric question distinct from the physical one and makes it easier to evaluate whether a later result is being driven by morphology, by material properties, or by model assumptions.
+The important point is that shape construction is not yet the stage where material contrasts or boundary conditions are fixed. At this stage, only the geometric description of the target is being chosen. That separation is intentional. It keeps the geometric question distinct from the physical one and makes it easier to evaluate later whether a modeled response is being driven by morphology, by material properties, or by model assumptions.
 
 <object type="image/svg+xml" data="building-shapes-spectrum.svg" style="width:100%;" aria-label="Shape-selection spectrum"></object>
 
@@ -35,7 +35,7 @@ Canonical shapes are especially useful when the geometry itself is part of the m
 
 Canonical geometry is also useful for comparison studies. If the goal is to understand how two model families differ under controlled conditions, a simple sphere, cylinder, or spheroid often provides a cleaner starting point than a highly detailed arbitrary outline.
 
-For most readers, the direct generators are also the clearest interface because they make the resulting shape class explicit at the call site. `create_shape()` is still useful, but it is best treated as a thin convenience dispatcher rather than the main pedagogical path.
+The direct generators are usually the clearest interface because they make the resulting shape class explicit at the call site. `create_shape()` is still useful, but it is best treated as a thin convenience dispatcher rather than as the main pedagogical path.
 
 # Coordinate conventions by shape
 
@@ -55,9 +55,30 @@ For `arbitrary()`, the stored side profile is again defined along `x`, with `zU(
 
 When measured body coordinates or bespoke outlines are available, `arbitrary()` is often the most flexible starting point. Arbitrary shapes are particularly important for elongated biological targets whose centerline and cross-sectional variation are more important than exact canonical separability. In those situations, preserving the morphology may matter more than matching a canonical coordinate system.
 
-This is one of the main geometric tradeoffs in the package. A canonical shape may offer stronger mathematical alignment with an exact theory family, but it may smooth away anatomical features that are important for an approximate segmented model. An arbitrary shape may preserve those features better, but it may no longer support the same geometry-matched analytical simplifications. The right choice depends on what the reader wants the geometry to do in the later acoustic interpretation.
+This is one of the main geometric tradeoffs in the package. A canonical shape may offer stronger mathematical alignment with an exact theory family, but it may smooth away anatomical features that are important for an approximate segmented model. An arbitrary shape may preserve those features better, but it may no longer support the same geometry-matched analytical simplifications. The right choice depends on what role the geometry must play in the later acoustic interpretation.
 
 The further a body departs from a separable canonical surface, the stronger the case becomes for preserving the measured morphology rather than forcing the target into an overly simple idealized form.
+
+# Canonical surrogates from measured shapes
+
+Sometimes the right workflow is not to choose between a measured shape and a canonical one at the beginning, but to use both on purpose. A measured or segmented outline can be preserved first as an `Arbitrary` shape and then reduced explicitly to a canonical surrogate when the goal is to run a shape-specific model such as `SPHMS`, `PSMS`, or `FCMS`.
+
+That is what `canonicalize_shape()` is for. It takes an existing `Shape` object and fits one of the supported canonical targets:
+
+- `Sphere`
+- `Cylinder`
+- `ProlateSpheroid`
+- `OblateSpheroid`
+
+This step is deliberately explicit rather than automatic. There is no single universally correct way to turn a biological or measured target into a canonical surface. Some workflows want to preserve length and enclosed volume, while others want the canonical profile that best matches the measured radius variation. `canonicalize_shape()` therefore reports fit diagnostics rather than hiding the approximation inside the later model call.
+
+In practice, this means a workflow such as:
+
+1. build or import the measured shape,
+2. canonicalize it transparently,
+3. then run the shape-specific model on the canonical surrogate.
+
+That pattern keeps the model assumptions honest. The later `PSMS` or `FCMS` result can then be interpreted as the response of the fitted canonical surrogate, not as though the original irregular target had somehow become exactly separable in spheroidal or cylindrical coordinates.
 
 # Choosing the right level of geometric detail
 
@@ -67,7 +88,7 @@ That is why the package treats shape construction as a deliberate modeling choic
 
 # A practical way to choose
 
-One useful way to think about shape choice is to ask what aspect of the target must be preserved for the later model run to be meaningful. If near-isotropic roundness is the important feature, a sphere is usually enough. If the target is smooth and elongated with no sharp geometric transitions, a prolate spheroid may capture the essential structure well. If the body is straight and approximately constant in radius, a finite cylinder may be the most natural simplification. If curvature, taper, segmentation, or anatomy are central to the question, an arbitrary or segmented representation is usually the better starting point.
+A practical way to think about shape choice is to ask what aspect of the target must be preserved for the later model run to remain meaningful. If near-isotropic roundness is the important feature, a sphere is usually sufficient. If the target is smooth and elongated with no sharp geometric transitions, a prolate spheroid may capture the essential structure well. If the body is straight and approximately constant in radius, a finite cylinder may be the most natural simplification. If curvature, taper, segmentation, or anatomy are central to the question, an arbitrary or segmented representation is usually the better starting point.
 
 This way of choosing keeps the geometry tied to the scientific purpose rather than to habit. It also makes later model selection much easier, because the most defensible model families often become obvious once the geometry has been chosen for the right reason.
 

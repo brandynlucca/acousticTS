@@ -1,31 +1,210 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 260" role="img" aria-labelledby="title desc">
-  <title id="title">Calibration workflow map</title>
-  <desc id="desc">Four-stage calibration workflow from nominal sphere specification through property verification, model execution, and reference-curve interpretation.</desc>
-  <defs>
-    <style>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 954.24792 108.60907"
+   role="img"
+   aria-labelledby="title desc"
+   version="1.1"
+   id="svg15"
+   sodipodi:docname="calibration-workflow-map.svg"
+   width="954.24792"
+   height="108.60907"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview15"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1.2814507"
+     inkscape:cx="476.80338"
+     inkscape:cy="44.090656"
+     inkscape:window-width="1920"
+     inkscape:window-height="1057"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg15" />
+  <title
+     id="title">Calibration workflow map</title>
+  <desc
+     id="desc">Four-stage calibration workflow from nominal sphere specification through property verification, model execution, and reference-curve interpretation.</desc>
+  <defs
+     id="defs1">
+    <style
+       id="style1">
       .bg{fill:#f8f3ea}.box{fill:#fffdfa;stroke:#2f2822;stroke-width:2.1;rx:16;ry:16}.head{font:700 21px Georgia, serif;fill:#1f1a16}.txt{font:15px Georgia, serif;fill:#2f2822}.small{font:13px Georgia, serif;fill:#564b40}.arrow{stroke:#564b40;stroke-width:2.4;fill:none;marker-end:url(#m)}
     </style>
-    <marker id="m" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#564b40"/></marker>
+    <marker
+       id="m"
+       markerWidth="10"
+       markerHeight="10"
+       refX="8"
+       refY="5"
+       orient="auto">
+      <path
+         d="M 0,0 10,5 0,10 Z"
+         fill="#564b40"
+         id="path1" />
+    </marker>
   </defs>
-  <rect width="980" height="260" class="bg"/>
-  <text x="28" y="40" class="head">Calibration as a reference workflow rather than a generic scattering run</text>
-  <rect x="24" y="74" width="206" height="150" class="box"/>
-  <text x="44" y="104" class="txt">1. Define the sphere</text>
-  <text x="44" y="136" class="small">Diameter, material identity,</text>
-  <text x="44" y="156" class="small">and medium assumptions.</text>
-  <rect x="268" y="74" width="206" height="150" class="box"/>
-  <text x="288" y="104" class="txt">2. Verify properties</text>
-  <text x="288" y="136" class="small">Density, wave speeds,</text>
-  <text x="288" y="156" class="small">and derived elastic constants.</text>
-  <rect x="512" y="74" width="206" height="150" class="box"/>
-  <text x="532" y="104" class="txt">3. Run the model</text>
-  <text x="532" y="136" class="small">Use the instrument frequency grid</text>
-  <text x="532" y="156" class="small">and inspect sensitivity.</text>
-  <rect x="756" y="74" width="206" height="150" class="box"/>
-  <text x="776" y="104" class="txt">4. Interpret as reference</text>
-  <text x="776" y="136" class="small">Compare against standards and</text>
-  <text x="776" y="156" class="small">treat mismatches as diagnostic.</text>
-  <path d="M230 149 C246 149,252 149,268 149" class="arrow"/>
-  <path d="M474 149 C490 149,496 149,512 149" class="arrow"/>
-  <path d="M718 149 C734 149,740 149,756 149" class="arrow"/>
+  <rect
+     width="954.24792"
+     height="108.60907"
+     class="bg"
+     id="rect1"
+     x="0"
+     y="0"
+     style="stroke-width:0.999998" />
+  <text
+     x="88.336853"
+     y="29.855247"
+     class="head"
+     id="text1"
+     style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:21px;line-height:0.9;font-family:Georgia, serif">Calibration as a reference workflow rather than a generic scattering run</text>
+  <g
+     id="g29"
+     transform="translate(-9.2544174,-30.153774)">
+    <path
+       d="m 216.84136,100.993 c 19.00135,0 26.12686,0 45.12821,0"
+       class="arrow"
+       id="path13" />
+    <g
+       id="g24">
+      <rect
+         x="24"
+         y="74"
+         width="192.757"
+         height="53.986"
+         class="box"
+         id="rect2" />
+      <text
+         x="28.782871"
+         y="89.953423"
+         class="txt"
+         id="text2"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;line-height:0.9;font-family:Georgia, serif">1. Define the sphere</text>
+      <text
+         x="29.145664"
+         y="107.12647"
+         class="small"
+         id="text3"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13px;line-height:0.9;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#564b40"><tspan
+           sodipodi:role="line"
+           id="tspan18"
+           x="29.145664"
+           y="107.12647">Diameter, material properties,</tspan><tspan
+           sodipodi:role="line"
+           id="tspan19"
+           x="29.145664"
+           y="118.82647">elastic properties</tspan></text>
+    </g>
+    <path
+       d="m 460.97934,100.993 c 18.94895,0 26.05481,0 45.00376,0"
+       class="arrow"
+       id="path14" />
+    <g
+       id="g25">
+      <rect
+         x="268"
+         y="74"
+         width="192.757"
+         height="53.986"
+         class="box"
+         id="rect4" />
+      <text
+         x="272.78287"
+         y="89.953423"
+         class="txt"
+         id="text5"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;line-height:0.9;font-family:Georgia, serif">2. Verify properties</text>
+      <text
+         x="273.1315"
+         y="107.12647"
+         class="small"
+         id="text6"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13px;line-height:0.9;font-family:Georgia, serif"><tspan
+           sodipodi:role="line"
+           id="tspan15"
+           x="273.1315"
+           y="107.12647">Density, sound speeds, elastic</tspan><tspan
+           sodipodi:role="line"
+           id="tspan16"
+           x="273.1315"
+           y="118.82647">constants</tspan></text>
+    </g>
+    <path
+       d="m 704.84137,100.993 c 19.05311,0 26.19803,0 45.25113,0"
+       class="arrow"
+       id="path15" />
+    <g
+       id="g27">
+      <rect
+         x="512"
+         y="74"
+         width="192.757"
+         height="53.986"
+         class="box"
+         id="rect7" />
+      <text
+         x="518"
+         y="90.239067"
+         class="txt"
+         id="text8"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;line-height:0.9;font-family:Georgia, serif">3. Run the model</text>
+      <g
+         id="g26">
+        <text
+           x="517.99902"
+           y="107.13282"
+           class="small"
+           id="text9"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13px;line-height:0.9;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#564b40"><tspan
+             sodipodi:role="line"
+             id="tspan21"
+             x="517.99902"
+             y="107.13282">Use the instrument frequency</tspan><tspan
+             sodipodi:role="line"
+             id="tspan22"
+             x="517.99902"
+             y="118.83282">grid and inspect sensitivity</tspan></text>
+      </g>
+    </g>
+    <g
+       id="g28">
+      <rect
+         x="756"
+         y="74"
+         width="192.75676"
+         height="53.986488"
+         class="box"
+         id="rect10" />
+      <text
+         x="760"
+         y="89.953423"
+         class="txt"
+         id="text11"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;line-height:0.9;font-family:Georgia, serif">4. Interpret as reference</text>
+      <text
+         x="759.86377"
+         y="107.12647"
+         class="small"
+         id="text12"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13px;line-height:0.9;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#564b40"><tspan
+           sodipodi:role="line"
+           id="tspan23"
+           x="759.86377"
+           y="107.12647">Compare against standards and</tspan><tspan
+           sodipodi:role="line"
+           id="tspan24"
+           x="759.86377"
+           y="118.82647">treat mismatches as diagnostic</tspan></text>
+    </g>
+  </g>
 </svg>

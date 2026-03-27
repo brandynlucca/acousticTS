@@ -8,7 +8,7 @@ output:
     dpi: 200
     dev.args: list(pointsize=11)
 vignette: >
-  %\VignetteIndexEntry{Numerical foundations and special functions}
+  %\VignetteIndexEntry{Numerical Foundations and Special Functions}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---
@@ -79,7 +79,7 @@ In `acousticTS`, those functions are evaluated through the `profcn` backend in `
 
 One detail that is easy to miss from the outside is that the Fortran backend stores many spheroidal quantities in mantissa-and-base-10-exponent form rather than as a single floating-point number. This is a stability device. High-order prolate spheroidal functions can become so large or so small that a naive single-number representation would overflow or underflow before the scaled value of interest is assembled. The `C++` layer therefore reconstructs the ordinary numeric value only after the backend evaluation is complete.
 
-The package also avoids repeatedly redoing the expensive backend setup when several nearby spheroidal values are needed. Rather than calling the Fortran routine separately for every single \((m,n)\) query, the `psms.cpp` wrappers request blocks of retained orders and then extract the required angular or radial entries from that batched result. This is especially useful internally because the exported `Smn()` and `Rmn()` functions and the PSMS model code rely on the same backend and therefore benefit from the same blockwise evaluation strategy.
+The package also avoids repeatedly redoing the expensive backend setup when several nearby spheroidal values are needed. Rather than calling the Fortran routine separately for every single $(m,n)$ query, the `psms.cpp` wrappers request blocks of retained orders and then extract the required angular or radial entries from that batched result. This is especially useful internally because the exported `Smn()` and `Rmn()` functions and the PSMS model code rely on the same backend and therefore benefit from the same blockwise evaluation strategy.
 
 For `Smn()`, the main numerical tasks are:
 

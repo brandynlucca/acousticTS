@@ -19,7 +19,7 @@ vignette: >
 
 ```{r model_family_header, echo=FALSE, results='asis'}
 acousticTS:::.model_family_header(
-  status = c("benchmarked", "validated"),
+  family = "krm",
   pages = c(
     Overview = "index.html",
     Implementation = "krm-implementation.html",
@@ -32,9 +32,9 @@ The Kirchhoff-Ray Mode (KRM) model is a composite scattering theory for elongate
 
 Its body term therefore uses weak fluid-like tissue contrasts at a fluid interface, while its swimbladder term uses a much stronger gas-tissue contrast that can support either a low-order modal response or a higher-frequency Kirchhoff response. The same target is intentionally split across approximation regimes because the dominant scattering mechanisms of tissue and gas are not the same.
 
-The name of the model follows directly from that hybrid structure: Kirchhoff for the geometric body treatment, ray for the body traversal terms, and mode for the low-frequency cylindrical contribution retained for the swimbladder. The point of the model is not that one approximation is universally best, but that a fish-like target naturally mixes a weakly scattering body with a much stronger internal inclusion. The KRM is designed to keep those two physical roles distinct rather than forcing the entire target into a single approximation regime.
+The name of the model follows directly from that hybrid structure: Kirchhoff for the geometric body treatment, ray for the body traversal terms, and mode for the low-frequency cylindrical (or **elliptic cylindrical**) contribution retained for the swimbladder. The point of the model is not that one approximation is universally best, but that a fish-like target naturally mixes a weakly scattering body with a much stronger internal inclusion. The KRM is designed to keep those two physical roles distinct rather than forcing the entire target into a single approximation regime.
 
-![KRM segmented-body schematic](krm-segmented-body-schematic.svg)
+Throughout this page, seawater is medium `1`, the body tissue is medium `2`, and a strongly contrasting internal inclusion such as a gas-filled swimbladder is medium `3`.
 
 ![KRM approximation assignment for weakly scattering body tissue and strongly contrasting internal inclusion.](krm-regime-assignment-schematic.svg)
 
@@ -84,7 +84,7 @@ $$
   u(j) = x(j)\sin\theta - z(j)\cos\theta,
 $$
 
-and
+and:
 
 $$
   v(j) = x(j)\cos\theta + z(j)\sin\theta.
@@ -187,10 +187,9 @@ so the coherent local bracket becomes:
 
 $$
   \left[
-    \mathcal{R}_{wb} e^{-i2k v_{U,j}}
-    -
+  \mathcal{R}_{wb} e^{-i2k v_{U,j}} -
     \mathcal{T}_{wb}\mathcal{T}_{bw}
-    e^{-i2k v_{U,j}+i2k_B(v_{U,j}-v_{L,j})+i\psi_{B,j}}
+  e^{-i2k v_{U,j}+i2k_B(v_{U,j}-v_{L,j})+i\psi_{B,j}}
   \right].
 $$
 
@@ -198,11 +197,7 @@ $$
 The relative sign arises from phase conventions in the transmission and internal reflection process and is retained here to match the standard KRM formulation.
 :::
 
-This is the explicit bridge from Kirchhoff surface scattering to the KRM body formula: start from the leading specular contribution, retain the first through-body transmitted return, and neglect higher multiple internal traversals.
-
-![KRM two-path body ray schematic](krm-body-ray-schematic.svg)
-
-The KRM body expression is the coherent sum of two local paths: a near-surface reflected contribution and a first transmitted traversal through the body thickness, both multiplied by the same Kirchhoff scaling for the segment.
+This is the explicit bridge from Kirchhoff surface scattering to the KRM body formula: start from the leading specular contribution, retain the first through-body transmitted return, and neglect higher multiple internal traversals. The KRM body expression is the coherent sum of two local paths: a near-surface reflected contribution and a first transmitted traversal through the body thickness, both multiplied by the same Kirchhoff scaling for the segment.
 
 ## Segment amplitude scaling
 
@@ -220,10 +215,9 @@ $$
   (k a_j)^{1/2}
   \Delta u_j
   \left[
-    e^{-i2k v_{U,j}}
-    -
+  e^{-i2k v_{U,j}} -
     \mathcal{T}_{wb}\mathcal{T}_{bw}
-    e^{-i2k v_{U,j}+i2k_B(v_{U,j}-v_{L,j})+i\psi_{B,j}}
+  e^{-i2k v_{U,j}+i2k_B(v_{U,j}-v_{L,j})+i\psi_{B,j}}
   \right].
 $$
 
@@ -270,46 +264,43 @@ This point is essential to the logic of the KRM. The modal term is not merely an
 For the low-frequency swimbladder term, the relevant local scattering problem is not gas in water. It is gas inside body tissue. Accordingly, let the surrounding body medium be region 2 and the internal gas be region 3. The modal derivation then begins with the cylindrical expansions:
 
 $$
-  p_{2,inc}(r,\phi) = \sum_{m=0}^{\infty} \epsilon_m i^m J_m(k_2 r)\cos(m\phi),
-$$
-
-$$
-  p_{2,scat}(r,\phi) = \sum_{m=0}^{\infty} \epsilon_m i^m b_m H_m^{(1)}(k_2 r)\cos(m\phi),
-$$
-
-$$
+  p_{2,inc}(r,\phi) =
+    \sum_{m=0}^{\infty} \epsilon_m i^m J_m(k_2 r)\cos(m\phi),
+  \qquad
+  p_{2,scat}(r,\phi) =
+    \sum_{m=0}^{\infty} \epsilon_m i^m b_m H_m^{(1)}(k_2 r)\cos(m\phi),
+  \qquad
   p_{3}(r,\phi) = \sum_{m=0}^{\infty} \epsilon_m i^m c_m J_m(k_3 r)\cos(m\phi).
 $$
 
 Pressure continuity and normal-velocity continuity at the gas boundary $r=a$ give, for each mode $m$:
 
 $$
-  J_m(k_2 a)+b_mH_m^{(1)}(k_2 a)=c_mJ_m(k_3 a),
+  J_m(k_2 a) + b_m H_m^{(1)}(k_2 a) = c_m J_m(k_3 a),
+  \qquad
+  \frac{1}{\rho_2}\left[J_m'(k_2 a)+b_mH_m^{(1)\prime}(k_2 a)\right] =
+    \frac{1}{\rho_3}\frac{k_3}{k_2}c_mJ_m'(k_3 a).
 $$
 
-$$
-  \frac{1}{\rho_2}\left[J_m'(k_2 a)+b_mH_m^{(1)\prime}(k_2 a)\right]
-  = \frac{1}{\rho_3}\frac{k_3}{k_2}c_mJ_m'(k_3 a).
-$$
-
-Eliminating $c_m$ gives the usual fluid-cylinder coefficient. In the long-wavelength limit, the $m=0$ term dominates, so one retains only:
+Eliminating $c_m$ gives the usual fluid-cylinder coefficient. In the
+long-wavelength limit, the $m=0$ term dominates, so one retains only:
 
 $$
-  b_0 = -\frac{1}{1+iC_0},
+  b_0 = -\frac{1}{1+iC_0}
 $$
 
 The auxiliary coefficient entering the low-frequency modal term is:
 
 $$
   C_0 =
-  \frac{
-    \dfrac{J_0'(k_3 a)}{J_0(k_3 a)}Y_0(k_2 a) - gh\,Y_0'(k_2 a)
+    \frac{
+  \dfrac{J_0'(k_3 a)}{J_0(k_3 a)}Y_0(k_2 a) - g_{32}h_{32}\,Y_0'(k_2 a)
   }{
-    \dfrac{J_0'(k_3 a)}{J_0(k_3 a)}J_0(k_2 a) - gh\,J_0'(k_2 a)
-  },
+  \dfrac{J_0'(k_3 a)}{J_0(k_3 a)}J_0(k_2 a) - g_{32}h_{32}\,J_0'(k_2 a)
+  }
 $$
 
-where $g=\rho_3/\rho_2$ and $h=c_3/c_2$ for the gas-filled cylinder embedded in body tissue. The low-frequency KRM bladder term therefore inherits its coefficient directly from the same pressure-continuity and normal-velocity conditions used in cylindrical modal theory. The additional KRM simplification is only the truncation to the azimuthally symmetric mode when $ka \ll 1$.
+where $g_{32}=\rho_3/\rho_2$ and $h_{32}=c_3/c_2$ for the gas-filled cylinder embedded in body tissue. The low-frequency KRM bladder term therefore inherits its coefficient directly from the same pressure-continuity and normal-velocity conditions used in cylindrical modal theory. The additional KRM simplification is only the truncation to the azimuthally symmetric mode when $ka \ll 1$.
 
 This $b_0$ coefficient is the modal ingredient used in the low-frequency KRM swimbladder contribution.
 
@@ -322,7 +313,7 @@ $$
   -i\frac{\mathcal{R}_{bc}\mathcal{T}_{wb}\mathcal{T}_{bw}}{2\sqrt{\pi}}
   A_{SB,j}[(k a_j+1)\sin\theta]^{1/2}
   \Delta u_j
-  e^{-i(2k_Bv_j+\psi_{p,j})},
+  e^{-i(2k_Bv_j+\psi_{p,j})}
 $$
 
 where $\mathcal{R}_{bc}$ is the body-to-bladder reflection coefficient and $v_j$ is the rotated phase coordinate of segment $j$.
@@ -336,13 +327,13 @@ This is also the point at which readers should be careful about interpretation. 
 The empirical amplitude correction is:
 
 $$
-  A_{SB,j} = \frac{k a_j}{k a_j+0.083},
+  A_{SB,j} = \frac{k a_j}{k a_j+0.083}
 $$
 
 and the phase correction is:
 
 $$
-  \psi_{p,j} = \frac{k a_j}{40+k a_j}-1.05.
+  \psi_{p,j} = \frac{k a_j}{40+k a_j}-1.05
 $$
 
 As in the body term, these corrections account for the finite-wavelength transition between strict long-wavelength modal behavior and the regime in which a Kirchhoff treatment becomes reasonable.
@@ -352,7 +343,7 @@ As in the body term, these corrections account for the finite-wavelength transit
 The total swimbladder contribution is:
 
 $$
-  f_{bladder} = \sum_{j=1}^{N_s}\mathcal{L}_{SB,j},
+  f_{bladder} = \sum_{j=1}^{N_s}\mathcal{L}_{SB,j}
 $$
 
 or, in the low-frequency regime, by the corresponding modal expression if the swimbladder is treated as a short resonant cylinder.
@@ -362,13 +353,13 @@ or, in the low-frequency regime, by the corresponding modal expression if the sw
 The total scattering length is the coherent sum of body and swimbladder terms:
 
 $$
-  \mathcal{f}_\text{bs} = f_{body}+f_{bladder},
+  \mathcal{f}_\text{bs} = f_{body}+f_{bladder}
 $$
 
 The backscattering cross-section is therefore:
 
 $$
-  \sigma_\text{bs} = |\mathcal{f}_\text{bs}|^2,
+  \sigma_\text{bs} = |\mathcal{f}_\text{bs}|^2
 $$
 
 and the target strength is:

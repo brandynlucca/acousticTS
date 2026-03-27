@@ -8,7 +8,7 @@ output:
     dpi: 200
     dev.args: list(pointsize=11)
 vignette: >
-  %\VignetteIndexEntry{Creating a model from scratch}
+  %\VignetteIndexEntry{Creating a Model from Scratch}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---
@@ -221,7 +221,7 @@ When creating a new model, the following rules are the ones most likely to preve
 3. Both functions must store and retrieve values under the same slot name, such as `$TSL`.
 4. The initializer should prepare parameters and an empty result table, not perform the actual model calculation.
 5. The model function should return the updated object after filling in the result table.
-6. Any extra arguments the user supplies through `target_strength(..., model = "tsl", ...)` need to appear as formal arguments in `tsl_initialize()`.
+6. Any extra arguments the user supplies either through `target_strength(..., model = "tsl", ...)` or through `target_strength(..., model_args = list(tsl = list(...)))` need to appear as formal arguments in `tsl_initialize()`.
 
 # Where to go next
 

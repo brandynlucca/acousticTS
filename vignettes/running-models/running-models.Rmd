@@ -60,6 +60,38 @@ Additional arguments are model-specific and are forwarded through `...`. For exa
 
 This structure is important because it makes the function call read like a compact statement of the modeling problem. The object says what the target is. The frequency vector says where the target is being interrogated acoustically. The model name says which physical approximation or exact solution family is being applied. Model-specific arguments then refine that statement rather than replacing it.
 
+# Shared and model-specific argument bundles
+
+When only one model is being run, the ordinary `...` interface is usually sufficient. The more delicate case is when several models are requested together. In that situation, some inputs are genuinely shared across all requested models, while others belong only to one model family.
+
+`target_strength()` therefore supports both:
+
+- shared arguments through `...`
+- model-specific argument bundles through `model_args`
+
+```{r eval = FALSE}
+comparison_obj <- target_strength(
+  object = scatterer_obj,
+  frequency = frequency,
+  model = c("dwba", "sdwba"),
+  density_sw = 1026,
+  sound_speed_sw = 1478,
+  model_args = list(
+    sdwba = list(
+      n_iterations = 100,
+      n_segments_init = 14,
+      phase_sd_init = sqrt(2) / 2,
+      length_init = 38.35e-3,
+      frequency_init = 120e3
+    )
+  )
+)
+```
+
+This pattern avoids duplicating truly shared inputs such as medium properties, while keeping model-specific controls attached only to the relevant model. If the same argument appears in both places, the entry in `model_args[[model_name]]` takes precedence for that model.
+
+That is usually the safer pattern whenever the requested models share some argument names but not the full same interpretation of every keyword.
+
 # Typical outputs
 
 Most models ultimately produce some combination of:
@@ -105,6 +137,8 @@ names(extract(comparison_obj, "model"))
 This works because `target_strength()` initializes the requested model, stores its parameterization in `model_parameters`, then stores the result in `model`. The original object remains the anchor that keeps geometry, material properties, and results tied together.
 
 That design makes model comparison much cleaner than a workflow built around disconnected result tables. When several models are run on the same object, the geometry and material assumptions remain fixed in one place. This reduces the chance that a model comparison is accidentally turned into a comparison of slightly different targets.
+
+When the same multi-model call needs distinct controls, `model_args` keeps those differences explicit without forcing every extra argument into the shared `...` bundle. That is especially helpful when one requested model needs additional stochastic, numerical, or boundary-condition inputs that the others do not use.
 
 # Choosing a model call
 

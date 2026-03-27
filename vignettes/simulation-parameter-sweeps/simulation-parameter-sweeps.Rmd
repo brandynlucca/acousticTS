@@ -80,7 +80,7 @@ The distinction matters because it separates deterministic sweeps from uncertain
 Fixed values are copied into every run unchanged. Explicit vectors supply a known sequence of values. Generating functions do not provide a pre-listed table at all. They create a new draw whenever a realization is built. That difference is what separates a design grid from on-the-fly uncertainty propagation.
 
 ```{r eval = TRUE}
-parameters = list(
+parameters <- list(
   theta_body = seq(0.5 * pi, pi, length.out = 5),
   density_body = function() rnorm(1, mean = 1045, sd = 5),
   sound_speed_body = 1520

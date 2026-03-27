@@ -19,7 +19,7 @@ vignette: >
 
 ```{r model_family_header, echo=FALSE, results='asis'}
 acousticTS:::.model_family_header(
-  status = c("experimental", "unvalidated"),
+  family = "ecms",
   pages = c(
     Overview = "index.html",
     Implementation = "ecms-implementation.html",
@@ -34,9 +34,13 @@ The elastic-cylinder modal-series solution is available through `target_strength
 - `sound_speed_longitudinal_body`
 - `sound_speed_transversal_body`
 
-No separate public local ECMS package was identified during this pass, so the implementation check here uses an independent direct transcription of the Faran-Stanton algebra rather than a package-to-package comparison.
+The current implementation check uses an independent direct transcription of the Faran-Stanton algebra rather than a package-to-package comparison. That is useful for confirming that the package code path reproduces the intended elastic-cylinder algebra on a shared grid, but it is not a substitute for an external benchmark ladder or a separate public software implementation.
 
-# Reference case
+::: {.experiment data-title="Current validation"}
+`ECMS` is still marked unvalidated because the current check is an independent algebra transcription rather than an external benchmark ladder or separate public software implementation.
+:::
+
+## Reference case
 
 The reference cylinder uses:
 
@@ -79,69 +83,50 @@ elastic_cylinder <- target_strength(
 head(extract(elastic_cylinder, "model")$ECMS)
 ```
 
-# Summary
+## Implementation check
 
 ```{r echo = FALSE}
 ecms_summary <- utils::read.csv(
-  file.path("..", "..", "scratch", "ecms_reference_compare_summary.csv")
+  file.path(
+    "..",
+    "..",
+    "tools",
+    "implementation-figures",
+    "data",
+    "ecms_reference_compare_summary.csv"
+  )
 )
 
 knitr::kable(
-  ecms_summary,
+  data.frame(
+    Metric = c(
+      "Max abs. delta TS (dB)",
+      "Mean abs. delta TS (dB)",
+      "Frequency at max delta (kHz)",
+      "acousticTS elapsed (s)",
+      "Direct transcription elapsed (s)"
+    ),
+    Value = c(
+      ecms_summary$max_abs_delta_TS_dB,
+      ecms_summary$mean_abs_delta_TS_dB,
+      ecms_summary$frequency_at_max_delta_kHz,
+      ecms_summary$elapsed_acousticts_s,
+      ecms_summary$elapsed_reference_s
+    )
+  ),
   digits = 6,
-  col.names = c(
-    "Comparison",
-    "Max abs. delta TS (dB)",
-    "Mean abs. delta TS (dB)",
-    "f at max delta (kHz)",
-    "acousticTS elapsed (s)",
-    "Reference elapsed (s)"
-  )
+  col.names = c("Diagnostic", "Value")
 )
 ```
 
-The direct transcription and the package output coincide exactly on the shared grid.
+This is not presented as a benchmark. It is an implementation identity check: the package output and the independent algebra transcription coincide on the shared grid, so the current `ECMS` code path is reproducing the stated elastic-cylinder series rather than drifting numerically from it.
 
-## Spectrum overlay
+### Spectrum overlay
 
-```{r fig.width = 8, fig.height = 6}
-ecms_compare <- utils::read.csv(
-  file.path("..", "..", "scratch", "ecms_reference_compare.csv")
-)
-ecms_compare <- ecms_compare[order(ecms_compare$frequency_hz), ]
-
-par(mfrow = c(2, 1), mar = c(4, 4.5, 2, 1))
-
-plot(
-  ecms_compare$frequency_khz,
-  ecms_compare$TS_reference,
-  type = "l",
-  lwd = 2.5,
-  col = "black",
-  xlab = "",
-  ylab = expression(Target ~ strength ~ (dB ~ re. ~ 1 ~ m^2))
-)
-lines(ecms_compare$frequency_khz, ecms_compare$TS_acousticts, col = "#0b6e4f", lwd = 2)
-legend(
-  "bottomleft",
-  legend = c("Direct reference", "acousticTS"),
-  col = c("black", "#0b6e4f"),
-  lwd = c(2.5, 2),
-  bty = "n"
-)
-
-plot(
-  ecms_compare$frequency_khz,
-  ecms_compare$TS_acousticts - ecms_compare$TS_reference,
-  type = "l",
-  lwd = 2,
-  col = "#0b6e4f",
-  xlab = "Frequency (kHz)",
-  ylab = expression(Delta * TS ~ (dB))
-)
-abline(h = 0, lty = 3, col = "grey50")
+```{r echo=FALSE, out.width='85%', fig.align='center', fig.alt='Pre-rendered ECMS comparison showing the direct reference spectrum, the acousticTS spectrum, and the residual across frequency.'}
+knitr::include_graphics("ecms-reference-comparison.png")
 ```
 
-# Closing note
+## Closing note
 
-This comparison is intentionally literal. The goal here is not to compare one software package to another. It is to show that the code path in `acousticTS` reproduces the elastic-cylinder algebra it claims to implement, across a full frequency band rather than only at a few checkpoint frequencies.
+The point of this page is therefore narrower than the benchmarked modal-series families. `ECMS` is not being claimed here as externally validated. What is being documented is that the package reproduces the elastic-cylinder algebra it claims to implement, across a full frequency band rather than only at a few checkpoint frequencies.

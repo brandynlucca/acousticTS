@@ -19,7 +19,7 @@ vignette: >
 
 ```{r model_family_header, echo=FALSE, results='asis'}
 acousticTS:::.model_family_header(
-  status = c("benchmarked", "validated"),
+  family = "psms",
   pages = c(
     Overview = "index.html",
     Implementation = "psms-implementation.html",
@@ -80,7 +80,7 @@ For rigid and pressure-release boundaries, the PSMS bookkeeping is simpler becau
 ::: {.caution data-title="Quad precision and fluid-filled PSMS"}
 If `precision = "quad"` is requested, the main practical warning is cost. Quad precision remains substantially slower than double precision because the spheroidal functions, overlap integrals, and kernel matrices all grow quickly with acoustic size. That is true for every PSMS boundary, and it is especially important for full fluid-filled or gas-filled runs with `simplify_Amn = FALSE`.
 
-The implementation reduces some of that burden by batching spheroidal-function calls over blocks of \(m\), reusing the incident angular matrix to construct the backscatter angular matrix through parity, and avoiding unnecessary rectangular expansions of triangular modal data. Even with those savings, high-\(ka\) PSMS sweeps in quad precision can take a very long time.
+The implementation reduces some of that burden by batching spheroidal-function calls over blocks of $m$, reusing the incident angular matrix to construct the backscatter angular matrix through parity, and avoiding unnecessary rectangular expansions of triangular modal data. Even with those savings, high-$ka$ PSMS sweeps in quad precision can take a very long time.
 
 That means `precision = "quad"` should be read as a tool for difficult cases, not as a universal default. It is most useful when the double-precision solution shows visible instability at higher modal limits or when benchmark agreement deteriorates at larger reduced frequencies. When the double-precision and quadruple-precision curves already agree to within the scientific tolerance of interest, the faster double-precision path is usually the more practical choice.
 :::
@@ -89,13 +89,13 @@ That means `precision = "quad"` should be read as a tool for difficult cases, no
 
 The `adaptive` argument is now the main switch that separates a fully literal retained-mode evaluation from a more pragmatic backscatter evaluation. The important point is that `adaptive = TRUE` does not redefine the PSMS mathematics. It changes how aggressively the implementation is allowed to stop once the retained modal tail has already become numerically inactive.
 
-The hard modal limits remain the same in both modes. The initialization step still defines
-:
+The hard modal limits remain the same in both modes. The initialization step still defines:
+
 $$
   m_{\max} = \left\lceil 2 k_0 b \right\rceil,
 $$
-and
-:
+and:
+
 $$
   n_{\max} = m_{\max} + \left\lceil \frac{h_0}{2} \right\rceil.
 $$
@@ -106,21 +106,21 @@ That adaptive logic operates in three layers.
 
 1. For the full fluid-filled and gas-filled backscatter solve, `adaptive = TRUE` owns the overlap quadrature order internally. In that path, a user-supplied `n_integration` is ignored on purpose. The implementation uses the retained modal ceilings themselves as the main difficulty scale, with a smaller bonus from the larger of `|chi_sw|` and `|chi_body|`. Lower modal difficulty therefore gets fewer quadrature nodes, while harder runs climb toward the same hard cap used by the literal path. This makes the quadrature rule general to the retained PSMS problem rather than tied to one particular example geometry.
 
-2. Inside each retained azimuthal order \(m\), the backscatter evaluators monitor the sizes of successive modal terms in \(n\). The code only stops the inner tail if the current term remains below a numerical cutoff and its magnitude gradient relative to the previous term has also flattened. In other words, the rule is not "small enough once." It is "small enough and no longer recovering."
+2. Inside each retained azimuthal order $m$, the backscatter evaluators monitor the sizes of successive modal terms in $n$. The code only stops the inner tail if the current term remains below a numerical cutoff and its magnitude gradient relative to the previous term has also flattened. In other words, the rule is not "small enough once." It is "small enough and no longer recovering."
 
-3. Across \(m\), the same idea is applied to whole \(m\)-band contributions. Several successive \(m\)-bands must be both negligible and gradient-flat before the outer tail is stopped. This is what allows `adaptive = TRUE` to matter not only for `liquid_filled` and `gas_filled`, but also for `fixed_rigid` and `pressure_release`.
+3. Across $m$, the same idea is applied to whole $m$-band contributions. Several successive $m$-bands must be both negligible and gradient-flat before the outer tail is stopped. This is what allows `adaptive = TRUE` to matter not only for `liquid_filled` and `gas_filled`, but also for `fixed_rigid` and `pressure_release`.
 
-For the full fluid-filled and gas-filled backscatter paths, there is one additional adaptive step before the dense system is even built for a given \(m\). The code forms a cheap proxy from the angular and radial factors and uses that proxy to decide whether the far tail in \(n\) is already inactive. If it is, the expensive overlap and kernel system is only built for the shorter active part of the retained degree range.
+For the full fluid-filled and gas-filled backscatter paths, there is one additional adaptive step before the dense system is even built for a given $m$. The code forms a cheap proxy from the angular and radial factors and uses that proxy to decide whether the far tail in $n$ is already inactive. If it is, the expensive overlap and kernel system is only built for the shorter active part of the retained degree range.
 
 The cutoffs themselves are precision-aware. The relative tolerance used in the modal-tail checks remains tighter in quadruple precision than in double precision, and an absolute floor is also enforced so that the adaptive rule remains meaningful even when the accumulated sum is very small. This is why `adaptive = TRUE` should be read as a convergence-aware shortcut rather than as a looser approximation.
 
-Two practical consequences follow from that design. First, `adaptive = TRUE` is most useful for backscatter spectra, which are the main PSMS workflow exposed by the package. Second, the runtime gain is usually largest for the full fluid and gas problems, because that is where early tail trimming can also reduce the size of the dense per-\(m\) systems rather than only the final modal summation.
+Two practical consequences follow from that design. First, `adaptive = TRUE` is most useful for backscatter spectra, which are the main PSMS workflow exposed by the package. Second, the runtime gain is usually largest for the full fluid and gas problems, because that is where early tail trimming can also reduce the size of the dense per-$m$ systems rather than only the final modal summation.
 
 The safest way to use the switch is:
 
 1. leave `adaptive = FALSE` when reproducing a benchmark or performing a strict convergence study,
 2. use `adaptive = TRUE` when you want a faster exploratory backscatter sweep,
-3. and then compare the two if the high-\(ka\) part of the spectrum will be interpreted closely.
+3. and then compare the two if the high-$ka$ part of the spectrum will be interpreted closely.
 
 The code below shows the two usage patterns explicitly.
 
@@ -226,9 +226,11 @@ The benchmark table already shows that the full liquid-filled PSMS solve can sep
 ```{r fig.width = 7.5, fig.height = 5.5}
 precision_freq <- c(12e3, 18e3, 38e3, 70e3, 100e3)
 precision_obj <- fls_generate(
-  shape = "prolate_spheroid",
-  length_body = 0.14,
-  radius_body = 0.01,
+  shape = prolate_spheroid(
+    length_body = 0.14,
+    radius_body = 0.01,
+    n_segments = 80
+  ),
   theta_body = pi / 2,
   density_body = 1028.9,
   sound_speed_body = 1480.3
@@ -269,45 +271,10 @@ precision_df <- data.frame(
   quad_ts = precision_quad@model$PSMS$TS
 )
 precision_df$delta_ts <- precision_df$double_ts - precision_df$quad_ts
+```
 
-par(mfrow = c(2, 1), mar = c(4.3, 4.8, 2, 1), oma = c(0, 0.2, 0, 0))
-plot(
-  precision_df$k0b,
-  precision_df$double_ts,
-  type = "b",
-  pch = 16,
-  lwd = 2,
-  xlab = expression(k[0] * b),
-  ylab = expression(Target ~ strength ~ (dB ~ re. ~ 1 ~ m^2)),
-  col = "black"
-)
-lines(
-  precision_df$k0b,
-  precision_df$quad_ts,
-  type = "b",
-  pch = 1,
-  lwd = 2,
-  col = "firebrick3"
-)
-legend(
-  "bottomleft",
-  legend = c("double", "quad"),
-  col = c("black", "firebrick3"),
-  pch = c(16, 1),
-  lwd = 2,
-  bty = "n"
-)
-plot(
-  precision_df$k0b,
-  precision_df$delta_ts,
-  type = "b",
-  pch = 16,
-  lwd = 2,
-  xlab = expression(k[0] * b),
-  ylab = expression(Delta ~ TS[double - quad] ~ (dB)),
-  col = "steelblue4"
-)
-abline(h = 0, lty = 3, col = "grey50")
+```{r echo=FALSE, out.width='85%', fig.align='center', fig.alt='Pre-rendered PSMS precision comparison showing double- and quadruple-precision spectra versus reduced size together with the double-minus-quadruple residual.'}
+knitr::include_graphics("psms-precision-drift.png")
 ```
 
 For this full liquid-filled run, the double- and quadruple-precision curves are effectively indistinguishable through `k_0 b < 1`, differ by only about `1.4e-07 dB` at `38 kHz`, then separate to about `0.01 dB` by `70 kHz` (`k_0 b â‰ˆ 2.98`) and to about `1.02 dB` by `100 kHz` (`k_0 b â‰ˆ 4.25`). That is the practical reason the benchmark table above starts to favor quadruple precision once the retained PSMS system moves into the higher-frequency penetrable regime.
@@ -323,7 +290,7 @@ Absolute runtime depends strongly on the local machine, compiler, BLAS/LAPACK se
 5. `g++`
 
 The timed frequency grid was the same one used in the benchmark table:
-:
+
 $$
   12,\; 18,\; 38,\; 70,\; 120,\; 200,\; 250,\; 300,\; 333,\; 400\ \text{kHz}.
 $$
@@ -360,7 +327,7 @@ The practical interpretation is straightforward:
 1. The rigid and pressure-release PSMS paths are comparatively cheap, even in quadruple precision, because they avoid the dense overlap-driven fluid solve.
 2. The full liquid-filled solve with `simplify_Amn = FALSE` is still by far the most expensive configuration in this benchmark set.
 3. The gas-filled rows are much cheaper here because the currently benchmarked gas-filled frequency range is short (`12-40 kHz`) and does not drive the same modal growth as the liquid-filled `12-400 kHz` sweep.
-4. The current adaptive liquid-filled path is faster because it combines a smaller modal-content-based quadrature rule at lower reduced frequency with earlier \(n\)- and \(m\)-tail termination inside the backscatter assembly.
+4. The current adaptive liquid-filled path is faster because it combines a smaller modal-content-based quadrature rule at lower reduced frequency with earlier $n$- and $m$-tail termination inside the backscatter assembly.
 5. On this machine and grid, that reduces the full liquid-filled quad run from about `59.7 s` to about `48.3 s` without materially changing benchmark agreement.
 6. The same statement is not automatically true in double precision: the adaptive full liquid-filled double run is faster here, but the benchmark table above shows that it also drifts much farther from the benchmark curve.
 7. In this adaptive liquid-filled quad comparison, the internally selected quadrature orders were `32, 32, 32, 32, 32, 48, 56, 64, 72, 88`; that sequence is shown in the frequency-by-frequency table above because it is an internal implementation detail, not a user-specified input.
@@ -388,9 +355,8 @@ Model results can be extracted either visually or directly through `extract()`.
 
 ### Plotting results
 
-```{r fig.width = 6}
-plot(prolate_object, type = "shape")
-# plot(prolate_object, type = "model")
+```{r echo=FALSE, out.width='49%', fig.align='center', fig.alt='Pre-rendered PSMS shape plot for the example prolate spheroid geometry.'}
+knitr::include_graphics("psms-shape-plot.png")
 ```
 
 ### Accessing results
@@ -406,48 +372,8 @@ At this point, readers should confirm more than the existence of a plotted respo
 
 The boundary condition changes the coefficient solve without changing the outer geometry, so it is a straightforward first comparison when checking whether a prolate spheroid is being parameterized consistently.
 
-```{r fig.width = 8, fig.height = 4.5}
-rigid_prolate <- fls_generate(
-  shape = prolate_shape,
-  density_body = 1045,
-  sound_speed_body = 1520,
-  theta_body = pi / 2
-)
-
-rigid_prolate <- target_strength(
-  object = rigid_prolate,
-  frequency = frequency,
-  model = "psms",
-  boundary = "fixed_rigid",
-  phi_body = pi
-)
-
-ts_fluid <- extract(prolate_object, "model")$PSMS
-ts_rigid <- extract(rigid_prolate, "model")$PSMS
-
-par(oma = c(0, 0.25, 0, 0), mar = c(5, 6, 4, 2))
-plot(
-  x = ts_fluid$frequency * 1e-3,
-  y = ts_fluid$TS,
-  type = "l",
-  lty = 1,
-  lwd = 2.5,
-  xlab = "Frequency (kHz)",
-  ylab = expression(Target ~ strength ~ (dB ~ re. ~ 1 ~ m^2)),
-  cex.lab = 1.3,
-  cex.axis = 1.2,
-  ylim = c(-80, -30)
-)
-lines(x = ts_rigid$frequency * 1e-3, y = ts_rigid$TS, col = "firebrick3", lty = 1, lwd = 2.5)
-legend(
-  "bottomright",
-  legend = c("Liquid filled", "Fixed rigid"),
-  col = c("black", "firebrick3"),
-  lwd = 2.5,
-  lty = c(1, 1),
-  cex = 1.0,
-  bty = "n"
-)
+```{r echo=FALSE, out.width='85%', fig.align='center', fig.alt='Pre-rendered PSMS comparison between liquid-filled and fixed-rigid prolate spheroid spectra over the same frequency sweep.'}
+knitr::include_graphics("psms-boundary-comparison.png")
 ```
 
 This comparison is useful because it isolates one of the main PSMS decisions without changing the geometric idealization. If the rigid and fluid-filled curves differ substantially, that is not a sign of inconsistency by itself. It is evidence that the boundary physics is materially affecting the prolate-spheroidal response, which is exactly the kind of sensitivity the model is meant to expose.

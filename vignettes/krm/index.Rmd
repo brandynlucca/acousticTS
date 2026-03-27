@@ -14,7 +14,7 @@ vignette: >
 
 ```{r model_family_header, echo=FALSE, results='asis'}
 acousticTS:::.model_family_header(
-  status = c("benchmarked", "validated"),
+  family = "krm",
   pages = c(
     Overview = "index.html",
     Implementation = "krm-implementation.html",
@@ -23,5 +23,41 @@ acousticTS:::.model_family_header(
 )
 ```
 
-
+```{r krm_overview, echo=FALSE, results='asis'}
+acousticTS:::.model_family_overview(
+  family = "krm",
+  summary = paste(
+    "The Kirchhoff-ray mode model (`KRM`) is the package's composite fish",
+    "family for targets whose body and swimbladder occupy different acoustic",
+    "regimes. It keeps a weakly contrasting ray-style body treatment and a",
+    "separate swimbladder treatment that switches between low-mode and",
+    "high-frequency behavior."
+  ),
+  core_idea = paste(
+    "Treat the fish body with a Kirchhoff-style short-segment approximation,",
+    "treat the swimbladder with a simplified cylinder-based modal or",
+    "high-frequency branch depending on acoustic size, and combine the complex",
+    "component amplitudes coherently."
+  ),
+  best_for = c(
+    "Gas-bearing fish whose body and swimbladder should not be modeled by the same exact family",
+    "Fish-like profile data represented by segmented body and bladder outlines",
+    "Practical fisheries workflows where composite body-plus-swimbladder structure matters"
+  ),
+  supports = c(
+    "`SBF` composite scatterers",
+    "Body contrasts relative to seawater as medium `1` and swimbladder contrasts relative to the body in the local bladder subproblem",
+    "Monostatic composite target strength"
+  ),
+  assumptions = c(
+    "Short-segment ray-style treatment of the body",
+    "Simplified swimbladder physics chosen by acoustic size regime",
+    "Coherent component combination without a full coupled body-bladder boundary-value solve"
+  ),
+  reading = c(
+    "[Implementation](krm-implementation.html): scatterer setup, spectra, and validation tables",
+    "[Theory](krm-theory.html): body Kirchhoff reduction, swimbladder mode/ray branches, and coherent composite sum"
+  )
+)
+```
 

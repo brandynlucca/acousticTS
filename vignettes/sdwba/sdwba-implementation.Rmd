@@ -19,7 +19,7 @@ vignette: >
 
 ```{r model_family_header, echo=FALSE, results='asis'}
 acousticTS:::.model_family_header(
-  status = c("benchmarked", "validated"),
+  family = "sdwba",
   pages = c(
     Overview = "index.html",
     Implementation = "sdwba-implementation.html",
@@ -82,8 +82,8 @@ Model results can be extracted either visually or directly through `extract()`.
 
 ### Plotting results
 
-```{r fig.width = 6}
-plot(stochastic_scatterer, type = "model")
+```{r echo=FALSE, out.width='49%', fig.align='center', fig.alt='Pre-rendered SDWBA example plot showing the stored stochastic target-strength spectrum.'}
+knitr::include_graphics("sdwba-model-plot.png")
 ```
 
 ### Accessing results
@@ -100,72 +100,14 @@ The SDWBA results include the same main fields as DWBA plus `TS_sd`, which summa
 
 That additional field is important for interpretation. A smoothed mean `TS` curve by itself does not tell the reader whether the stochastic realizations were tightly clustered or broadly dispersed. `TS_sd` provides that missing context and helps distinguish between a stable partially incoherent prediction and one that is still strongly realization-dependent.
 
-## Comparing phase standard deviations
+## Comparison workflows
+
+### Phase-disorder sensitivity
 
 One practical way to tune the SDWBA is to compare a smaller and larger phase standard deviation while keeping the geometry fixed.
 
-```{r fig.width = 8, fig.height = 4.5}
-sdwba_low_phase <- fls_generate(
-  shape = cylinder_shape,
-  g_body = 1.058,
-  h_body = 1.058,
-  theta_body = pi / 2
-)
-
-sdwba_high_phase <- fls_generate(
-  shape = cylinder_shape,
-  g_body = 1.058,
-  h_body = 1.058,
-  theta_body = pi / 2
-)
-
-sdwba_low_phase <- target_strength(
-  sdwba_low_phase,
-  frequency,
-  "sdwba",
-  n_iterations = 30,
-  n_segments_init = 14,
-  phase_sd_init = 0.25,
-  length_init = 15e-3,
-  frequency_init = 120e3
-)
-
-sdwba_high_phase <- target_strength(
-  sdwba_high_phase,
-  frequency,
-  "sdwba",
-  n_iterations = 30,
-  n_segments_init = 14,
-  phase_sd_init = 0.9,
-  length_init = 15e-3,
-  frequency_init = 120e3
-)
-
-ts_low_phase <- extract(sdwba_low_phase, "model")$SDWBA
-ts_high_phase <- extract(sdwba_high_phase, "model")$SDWBA
-
-par(oma = c(0, 0.25, 0, 0), mar = c(5, 6, 4, 2))
-plot(
-  x = ts_low_phase$frequency * 1e-3,
-  y = ts_low_phase$TS,
-  type = "l",
-  lty = 1,
-  lwd = 2.5,
-  xlab = "Frequency (kHz)",
-  ylab = expression(Target ~ strength ~ (dB ~ re. ~ 1 ~ m^2)),
-  cex.lab = 1.3,
-  cex.axis = 1.2
-)
-lines(x = ts_high_phase$frequency * 1e-3, y = ts_high_phase$TS, col = "firebrick3", lty = 1, lwd = 2.5)
-legend(
-  "bottomright",
-  legend = c("phase_sd_init = 0.25", "phase_sd_init = 0.9"),
-  col = c("black", "firebrick3"),
-  lwd = 2.5,
-  lty = c(1, 1),
-  cex = 1.0,
-  bty = "n"
-)
+```{r echo=FALSE, out.width='85%', fig.align='center', fig.alt='Pre-rendered SDWBA comparison showing how the spectrum changes when the phase-disorder standard deviation is increased.'}
+knitr::include_graphics("sdwba-phase-comparison.png")
 ```
 
 In practical krill-style applications, `phase_sd_init`, `length_init`, and `frequency_init` should be treated as a linked parameterization rather than as independent tuning knobs.
@@ -179,7 +121,7 @@ For practical SDWBA work, the first controls to revisit are usually:
 3. `n_segments_init`, `length_init`, and `frequency_init`, because together they define the scale-invariant reference for segmentation and phase variability, and
 4. the underlying `FLS` geometry itself, because the stochastic phase model does not compensate for a poorly chosen deterministic target description.
 
-## Published reference comparisons
+### Published reference comparisons
 
 SDWBA should be judged against the exact modal-series `Benchmark` column in the Jech weakly scattering sphere, prolate-spheroid, and cylinder files. The table below reports that direct comparison together with the representative runtime on the current machine.
 
@@ -207,7 +149,7 @@ For SDWBA, the most important additional implementation control is `n_iterations
 
 That sensitivity table is useful because it shows two things at once. First, the runtime cost does scale with the number of stochastic realizations, just as the implementation description says it should. Second, once the reference stochastic parameters are fixed, simply driving `n_iterations` upward does not force SDWBA onto the exact benchmark family. It mainly stabilizes the ensemble average around the stochastic approximation itself.
 
-## Bundled krill implementation comparison
+### Bundled krill implementation comparison
 
 The bundled `krill` object serves a different role from the canonical weakly scattering targets above. Here the goal is not to compare against an exact modal-series solution, but to compare the same stored krill geometry across four SDWBA implementations using a common frequency grid, a common broadside incidence, and the same stochastic reference values used for the benchmark calculations (`N0 = 50`, `phase_sd_init = sqrt(2) / 32`, `L0 = 38.35 mm`, `f0 = 120 kHz`, `n_iterations = 100`).
 
@@ -221,4 +163,3 @@ The bundled `krill` object serves a different role from the canonical weakly sca
 | CCAMLR MATLAB vs NOAA HTML | 0.13036 | 0.65798 |
 
 Those values should be read as implementation differences rather than benchmark errors. All four calculations use the same bundled krill dimensions and the same initial stochastic reference values, but they do not use the same stochastic convention. In the current external implementations, both the CCAMLR MATLAB code and the NOAA HTML code square the phase term in the stochastic multiplier, while `acousticTS` keeps the paper-style linear phase standard deviation and `echoSMs` follows its own direct stochastic-phase application. So the bundled krill comparison is complementary to the canonical tables above: one set checks the stochastic model against published weakly scattering reference cases, and the other checks how the same biological krill geometry separates across existing SDWBA implementations.
-

@@ -14,7 +14,7 @@ vignette: >
 
 ```{r model_family_header, echo=FALSE, results='asis'}
 acousticTS:::.model_family_header(
-  status = c("benchmarked"),
+  family = "fcms",
   pages = c(
     Overview = "index.html",
     Implementation = "fcms-implementation.html",
@@ -23,5 +23,41 @@ acousticTS:::.model_family_header(
 )
 ```
 
-
+```{r fcms_overview, echo=FALSE, results='asis'}
+acousticTS:::.model_family_overview(
+  family = "fcms",
+  summary = paste(
+    "The finite cylinder modal series solution (`FCMS`) is the package's",
+    "geometry-matched cylinder family for straight circular cylinders.",
+    "It keeps the exact cylindrical-harmonic treatment of the cross-section",
+    "and closes the finite-length problem with the standard near-broadside",
+    "coherence factor."
+  ),
+  core_idea = paste(
+    "Solve the circular cross-section exactly in cylindrical partial waves,",
+    "then multiply by the finite-length directivity factor that accounts for",
+    "the coherent addition along the cylinder axis."
+  ),
+  best_for = c(
+    "Straight finite cylinders near broadside",
+    "Rigid, pressure-release, liquid-filled, and gas-filled cylinder comparisons",
+    "Reference checks for cylinder-like targets before using higher-level approximations"
+  ),
+  supports = c(
+    "`Cylinder` shapes on `FLS` or `GAS` objects",
+    "Near-broadside monostatic target strength",
+    "Fluid and gas interiors parameterized relative to seawater as medium `1`"
+  ),
+  assumptions = c(
+    "Circular cross-section and straight centerline",
+    "Broadside or near-broadside incidence",
+    "Homogeneous interior material properties for penetrable cases",
+    "No elastic shear support in the interior"
+  ),
+  reading = c(
+    "[Implementation](fcms-implementation.html): spectra, result extraction, and comparison tables",
+    "[Theory](fcms-theory.html): cylindrical modal reduction, boundary conditions, and finite-length factorization"
+  )
+)
+```
 

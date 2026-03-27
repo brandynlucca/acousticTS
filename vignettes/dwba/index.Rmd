@@ -14,7 +14,7 @@ vignette: >
 
 ```{r model_family_header, echo=FALSE, results='asis'}
 acousticTS:::.model_family_header(
-  status = c("benchmarked", "validated"),
+  family = "dwba",
   pages = c(
     Overview = "index.html",
     Implementation = "dwba-implementation.html",
@@ -23,5 +23,40 @@ acousticTS:::.model_family_header(
 )
 ```
 
-
+```{r dwba_overview, echo=FALSE, results='asis'}
+acousticTS:::.model_family_overview(
+  family = "dwba",
+  summary = paste(
+    "The distorted wave Born approximation (`DWBA`) is the package's main",
+    "weak-scattering fluid-body model for elongated targets that are no",
+    "longer well represented by a single canonical sphere, cylinder, or",
+    "spheroid."
+  ),
+  core_idea = paste(
+    "Treat the target as a weak perturbation of the surrounding fluid, retain",
+    "the two-way phase accumulation along the body, and integrate the local",
+    "cross-sectional response over a segmented centerline."
+  ),
+  best_for = c(
+    "Weakly scattering fluid-like elongated bodies",
+    "Zooplankton-like or swimbladder-less flesh-body calculations where density and sound-speed contrasts remain modest",
+    "Arbitrary profiles that do not fit a single canonical exact geometry"
+  ),
+  supports = c(
+    "`FLS` objects with canonical or arbitrary shapes",
+    "Material contrasts expressed naturally as $g_{21}$ and $h_{21}$ relative to seawater",
+    "Segmented body-axis integrations in the monostatic backscatter setting"
+  ),
+  assumptions = c(
+    "Small density and sound-speed contrasts",
+    "First-order Born linearization",
+    "Single scattering with no strong internal reverberation",
+    "Fluid-like, non-elastic interior response"
+  ),
+  reading = c(
+    "[Implementation](dwba-implementation.html): object workflows, spectra, and validation tables",
+    "[Theory](dwba-theory.html): Born linearization, contrast term, and centerline integral"
+  )
+)
+```
 

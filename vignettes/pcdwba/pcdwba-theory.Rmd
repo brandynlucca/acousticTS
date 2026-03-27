@@ -19,7 +19,7 @@ vignette: >
 
 ```{r model_family_header, echo=FALSE, results='asis'}
 acousticTS:::.model_family_header(
-  status = c("experimental", "validated"),
+  family = "pcdwba",
   pages = c(
     Overview = "index.html",
     Implementation = "pcdwba-implementation.html",
@@ -28,65 +28,217 @@ acousticTS:::.model_family_header(
 )
 ```
 
-The phase-compensated distorted wave Born approximation extends the ordinary weak-scattering DWBA to bodies whose centerlines are curved rather than straight. Chu and Ye (1999) introduced the model for bistatic scattering from weakly scattering elongated targets, and Stanton (1989) supplied the uniformly bent cylinder geometry that is commonly used to parameterize those targets[^1][^2]. In practical fisheries acoustics, that combination is useful for zooplankton-like targets whose curvature is large enough to matter but whose density and sound-speed contrasts remain small enough for a Born-type treatment to stay sensible.
+The phase-compensated distorted wave Born approximation (`PCDWBA`) extends the
+ordinary `DWBA` to elongated bodies whose centerlines are curved rather than
+straight.[^1][^2] It preserves the same weak-scattering local kernel used for
+slender fluid-like bodies, but it replaces the straight-body phase bookkeeping
+by a centerline-dependent phase that follows the bent geometry explicitly.
 
-[^1]: Chu, D., and Ye, Z. (**1999**). *A phase-compensated distorted wave Born approximation representation of the bistatic scattering by weakly scattering objects: Application to zooplankton*. J. Acoust. Soc. Am., 106: 1732-1743.
+The family therefore sits conceptually between two extremes: it is more
+physical than treating a curved body as if it were straight, but it remains a
+Born-type perturbation model rather than a full curved-body boundary-value
+solution.
 
-[^2]: Stanton, T.K. (**1989**). *Sound scattering by cylinders of finite length. III. Deformed cylinders*. J. Acoust. Soc. Am., 86: 691-705.
+The notation below follows the shared package conventions: medium `1` is the
+surrounding seawater and medium `2` is the weakly scattering body.
 
-# Uniformly bent, tapered geometry
+[^1]: Chu, D., and Ye, Z. (**1999**). *A phase-compensated distorted wave Born approximation representation of the bistatic scattering by weakly scattering objects: Application to zooplankton*. *The Journal of the Acoustical Society of America*, 106: 1732-1743.
 
-The canonical geometry is a uniformly bent cylinder with tapered ends. Its centerline is wrapped around an osculating circle of radius $\rho_c$, while the radius tapers smoothly toward the ends through a dimensionless taper function $\mathcal{T}(s)$. The curvature is usually reported in normalized form as $\rho_c/L$, where $L$ is body length.
+[^2]: Stanton, T.K. (**1989**). *Sound scattering by cylinders of finite length. III. Deformed cylinders*. *The Journal of the Acoustical Society of America*, 86: 691-705.
 
-```{r echo = FALSE, out.width = "90%", fig.align = "center", fig.cap = "Uniformly bent geometry and local phase bookkeeping used by the phase-compensated DWBA."}
-knitr::include_graphics("pcdwba-bent-cylinder-schematic.svg")
-```
+# Weak-scattering starting point
 
-For the regularly tapered canonical case, the normalized centerline coordinates can be written in terms of a curvature angle $\gamma = 0.5/(\rho_c/L)$ and a normalized longitudinal coordinate $z \in [-1, 1]$. The taper then scales the local body radius while the bent centerline determines both the local phase origin and the local tilt angle along the body.
+## Born contrast term
 
-# Contrast term
-
-The model inherits the same weak-scattering contrast bookkeeping used in the straight DWBA. The local reflection factor is
-
-$$
-C_b =
-\frac{1 - g h^2}{g h^2} -
-\frac{g - 1}{g},
-$$
-
-where $g = \rho_b/\rho_{sw}$ is the density contrast and $h = c_b/c_{sw}$ is the sound-speed contrast. When $g$ and $h$ both remain close to unity, this contrast factor stays small and the Born approximation remains the relevant asymptotic regime.
-
-# Phase-compensated sum
-
-For backscatter, the model can be written as a discrete sum along the bent body:
+`PCDWBA` inherits its material-contrast physics from the ordinary distorted
+wave Born approximation. For a fluid-like body in seawater, the density and
+sound-speed contrasts are:
 
 $$
-f_{bs}
-
-\propto
-\sum_j
-\left(\frac{k a_j}{h}\right)^2
-\frac{J_1\!\left(2(k a_j/h)\,|\cos(\beta_j-\theta)|\right)}
-     {2(k a_j/h)\,|\cos(\beta_j-\theta)|}
-\exp\!\left[
-i\,kL\left(\frac{r_j}{h}\right)\cos(\gamma_j-\theta)
-\right]
-C_b\,\Delta r_j,
+  g_{21} = \frac{\rho_2}{\rho_1},
+  \qquad
+  h_{21} = \frac{c_2}{c_1},
 $$
 
-where $a_j$ is the local tapered radius, $\beta_j$ is the local body-tilt angle, $r_j$ and $\gamma_j$ describe the bent-centerline position, and $\Delta r_j$ is the local spacing along that centerline. The cylindrical Bessel term retains the local cross-sectional response, while the exponential phase factor is what distinguishes the phase-compensated model from the straight-body DWBA.
+where $\rho_1$, $c_1$ are the surrounding-fluid density and sound speed and
+$\rho_2$, $c_2$ are the corresponding body properties.
 
-# Relation to the `acousticTS` object model
+The standard fluid-like contrast factor is then:
 
-`acousticTS` applies `PCDWBA` to `FLS` objects. Canonical cylinders can be bent either at shape construction time or at model call time through a supplied curvature ratio. Arbitrary fluid-like profiles can also be used as long as they resolve a meaningful centerline and nodewise radius profile. Internally, the model reduces everything to:
+$$
+  C_{21} =
+    \frac{1 - g_{21} h_{21}^2}{g_{21} h_{21}^2} -
+    \frac{g_{21} - 1}{g_{21}}.
+$$
 
-- a centerline position vector,
-- a local tilt-angle vector,
-- a local taper/radius vector, and
-- nodewise contrast terms.
+The approximation is most defensible when $g_{21}$ and $h_{21}$ remain close to
+unity, so that the total field inside the body remains close to the distorted
+incident field.
 
-That means the curved canonical geometry and a hand-built arbitrary profile are treated in the same mathematical form once the geometry has been reduced to those nodewise quantities.
+## Volume-integral viewpoint
 
-# Closing note
+In the general Born picture, the scattered field is written as a volume
+integral over the target:
 
-Conceptually, the model is best viewed as a curved-body extension of the ordinary DWBA rather than a separate scattering family. The cross-sectional response still comes from the weak-fluid cylindrical kernel. What changes is the phase bookkeeping along a curved axis, which is why the implementation lives most naturally alongside the other DWBA models in the package.
+$$
+  p^{\mathrm{sca}}(\mathbf{r})
+  \propto
+  \int_V
+  C_{21}(\mathbf{r}')
+  \,
+  G_1(\mathbf{r},\mathbf{r}')
+  \,
+  p^{\mathrm{ref}}(\mathbf{r}')
+  \,
+  dV',
+$$
+
+where $G_1$ is the Green's function of the exterior medium and
+$p^{\mathrm{ref}}$ is the chosen reference field. For slender bodies, this
+three-dimensional integral is reduced by separating the local cross-sectional
+response from the phase accumulated along the body axis.
+
+# Curved centerline geometry
+
+## Centerline parameterization
+
+Let $s$ denote arc length along the body centerline and let
+$\mathbf{r}_c(s)$ denote the corresponding centerline position. The local body
+radius is $a(s)$, and the local tangent angle is $\beta(s)$.
+
+For a uniformly bent canonical body, the centerline is wrapped around an
+osculating circle of radius $\rho_c$, with curvature $\kappa = 1/\rho_c$. A
+taper function may also scale the local radius toward the ends, but that taper
+only changes the local cross-sectional factor; it does not alter the phase
+logic that motivates `PCDWBA`.
+
+## Why curvature matters
+
+In a straight-body `DWBA`, the two-way phase factor depends only on the axial
+position along a straight line. Once the body bends, two points with the same
+arc-length separation no longer have the same projection onto the incident or
+receive directions. That means a curved target cannot be described correctly by
+the same straight-axis phase term unless the curvature is negligible.
+
+# Local cylindrical reduction
+
+At each centerline location, the body is approximated locally by a circular
+cylinder with radius $a(s)$. The azimuthal integration over that local
+cross-section produces the same Bessel-type factor that appears in slender-body
+Born models:
+
+$$
+  \frac{J_1\!\left(2 k_2 a(s)\, \chi(s)\right)}
+  {2 k_2 a(s)\, \chi(s)},
+$$
+
+Here $J_1$ is the cylindrical Bessel function of the first kind,
+$k_2 = \omega / c_2 = k_1 / h_{21}$ is the body wavenumber, and $\chi(s)$ is
+the local projection factor set by the incident and receive directions
+relative to the local tangent.
+
+For monostatic backscatter, this projection reduces to a local cosine term
+involving the body orientation and tangent angle.
+
+# Phase-compensated line integral
+
+## General curved-body form
+
+After the local cross-sectional reduction, the scattered field becomes a
+centerline integral. In monostatic form, the backscattering amplitude can be
+written schematically as:
+
+$$
+  f_{\mathrm{bs}}
+  \propto
+  \int_{-L/2}^{L/2}
+  C_{21}(s)
+  \left(\frac{k_2 a(s)}{1}\right)^2
+  \frac{J_1\!\left(2 k_2 a(s)\, \chi(s)\right)}
+  {2 k_2 a(s)\, \chi(s)}
+  \exp\!\left[
+  2 i k_1 \hat{\mathbf{q}}\cdot \mathbf{r}_c(s)
+  \right]
+  ds,
+$$
+
+where $\hat{\mathbf{q}}$ denotes the backscatter direction.
+
+The crucial ingredient is the phase factor:
+
+$$
+  \exp\!\left[
+  2 i k_1 \hat{\mathbf{q}}\cdot \mathbf{r}_c(s)
+  \right].
+$$
+
+This is what makes the model phase compensated: the phase is evaluated on the
+actual curved centerline rather than on a fictitiously straight axis.
+
+## Discrete form
+
+In segmented form, the same model appears as:
+
+$$
+  f_{\mathrm{bs}}
+  \propto
+  \sum_j
+  C_{21,j}
+  \left(k_2 a_j\right)^2
+  \frac{J_1\!\left(2 k_2 a_j \chi_j\right)}
+  {2 k_2 a_j \chi_j}
+  \exp\!\left[
+  2 i k_1 \hat{\mathbf{q}}\cdot \mathbf{r}_{c,j}
+  \right]
+  \Delta s_j,
+$$
+
+where the index $j$ labels body segments and $\Delta s_j$ is the local
+centerline spacing.
+
+This is the form most directly useful for irregular profiles, because it treats
+curvature, taper, and segment spacing in the same centerline-aligned framework.
+
+# Relation to straight `DWBA`
+
+If the centerline becomes straight, then $\mathbf{r}_c(s)$ reduces to a linear
+function of $s$ and the phase-compensated expression collapses to the ordinary
+straight-body `DWBA`.
+
+That limiting behavior is important physically: `DWBA` is the straight-axis
+weak-scattering limit, while `PCDWBA` is the curved-axis weak-scattering
+extension.
+
+The two models therefore differ in phase bookkeeping, not in the local
+cross-sectional contrast physics.
+
+# Backscatter and target strength
+
+Once the complex backscattering amplitude has been assembled from the curved
+centerline sum, the standard monostatic outputs are:
+
+$$
+  \sigma_{\mathrm{bs}} = \left|f_{\mathrm{bs}}\right|^2,
+  \qquad
+  \mathrm{TS} = 10 \log_{10}\left(\sigma_{\mathrm{bs}}\right).
+$$
+
+No new reporting convention is introduced by the curvature correction. The
+change is entirely in the underlying phase-sensitive amplitude.
+
+# Assumptions and regime
+
+`PCDWBA` rests on the following assumptions:
+
+1. weak fluid-like material contrast,
+2. slender-body reduction to a local cylindrical kernel,
+3. single scattering,
+4. curvature enters through centerline phase rather than through a new exact
+   cross-sectional boundary solve,
+5. the target is described meaningfully by a centerline and local radius
+   profile.
+
+That is why `PCDWBA` should be read as a curved-body extension of `DWBA`, not
+as a new exact geometry family. Its main purpose is to keep the part of the
+physics that `DWBA` misses first when the body bends: the geometry-dependent
+coherent phase.

@@ -13,12 +13,48 @@ vignette: >
 # Overview
 ```{r model_family_header, echo=FALSE, results='asis'}
 acousticTS:::.model_family_header(
-  status = c("experimental", "validated"),
+  family = "vesm",
   pages = c(
+    Overview = "index.html",
     Implementation = "vesm-implementation.html",
     Theory = "vesm-theory.html"
   )
 )
 ```
 
+```{r vesm_overview, echo=FALSE, results='asis'}
+acousticTS:::.model_family_overview(
+  family = "vesm",
+  summary = paste(
+    "The viscous-elastic spherical model (`VESM`) is a layered spherical",
+    "resonance family for a gas core surrounded by an elastic shell and an",
+    "outer viscous biological layer."
+  ),
+  core_idea = paste(
+    "Solve the spherical layered problem mode by mode, with acoustic waves in",
+    "the exterior and gas core, viscous compressional/shear branches in the",
+    "soft outer layer, and elastic longitudinal/transverse waves in the shell."
+  ),
+  best_for = c(
+    "Gas-bearing mesopelagic-fish style layered spheres",
+    "Problems where gas resonance, shell elasticity, and viscous damping all matter simultaneously",
+    "Wideband spherical resonance studies beyond a simple bubble or shell-only idealization"
+  ),
+  supports = c(
+    "`ESS` spherical objects with an explicit shell and inner gas core plus viscous-layer model arguments",
+    "Four-region spherical bookkeeping with seawater as medium `1`",
+    "Monostatic layered resonance calculations"
+  ),
+  assumptions = c(
+    "Spherical symmetry",
+    "Homogeneous material properties within each layer",
+    "Linear acoustics and linear elasticity",
+    "Layered spherical interfaces with no nonspherical posture or geometry effects"
+  ),
+  reading = c(
+    "[Implementation](vesm-implementation.html): layered-object workflow and benchmark comparisons",
+    "[Theory](vesm-theory.html): full layered spherical field structure, interface conditions, and mode-wise systems"
+  )
+)
+```
 

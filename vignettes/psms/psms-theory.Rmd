@@ -19,7 +19,7 @@ vignette: >
 
 ```{r model_family_header, echo=FALSE, results='asis'}
 acousticTS:::.model_family_header(
-  status = c("benchmarked", "validated"),
+  family = "psms",
   pages = c(
     Overview = "index.html",
     Implementation = "psms-implementation.html",
@@ -54,13 +54,9 @@ Let $q$ denote the semifocal length of the spheroid, and let $(\xi,\eta,\phi)$ b
 
 $$
   x = q\sqrt{(\xi^2-1)(1-\eta^2)}\cos\phi,
-$$
-
-$$
+  \qquad
   y = q\sqrt{(\xi^2-1)(1-\eta^2)}\sin\phi,
-$$
-
-$$
+  \qquad
   z = q\xi\eta.
 $$
 
@@ -98,9 +94,7 @@ Eliminating $q$ gives:
 
 $$
   \xi_1 = \left[1-\left(\frac{b}{a}\right)^2\right]^{-1/2},
-$$
-
-$$
+  \qquad
   q = \frac{a}{\xi_1}.
 $$
 
@@ -112,9 +106,10 @@ Thus $\xi_1$ is the natural shape parameter of the spheroid, while $q$ sets the 
 
 The boundary is imposed on $\xi = \xi_1$, with the focal points at $\pm q$ fixing the prolate geometry and the semi-axes $a$ and $b$ setting the physical scale. In the rigid and pressure-release cases, one exterior spheroidal basis is sufficient, so each retained degree stays effectively local. In the fluid-filled and gas-filled cases, the interior and exterior reduced frequencies differ, so the angular bases no longer match exactly and the overlap integrals become the mechanism that couples degrees together.
 
-![Projection of exterior angular modes onto the interior spheroidal basis in the fluid-filled PSMS system.](psms-overlap-projection-schematic.svg)
+<!-- ![Projection of exterior angular modes onto the interior spheroidal basis in
+the fluid-filled PSMS system.](psms-overlap-projection-schematic.svg) -->
 
-The projection step is the part of the interior-fluid derivation that makes the PSMS algebra noticeably harder. The exterior angular basis is complete for the exterior reduced frequency $\mathbb{k}_1$, and the interior basis is complete for the interior reduced frequency $\mathbb{k}_1$, but those two families are not identical when $\mathbb{k}_1 \ne \mathbb{k}_1$. The overlap matrix is therefore the bridge between two valid but nonidentical angular descriptions of the same boundary data.
+The projection step is the part of the interior-fluid derivation that makes the PSMS algebra noticeably harder. The exterior angular basis is complete for the exterior reduced frequency $\mathbb{k}_1$, and the interior basis is complete for the interior reduced frequency $\mathbb{k}_2$, but those two families are not identical when $\mathbb{k}_1 \ne \mathbb{k}_2$. The overlap matrix is therefore the bridge between two valid but nonidentical angular descriptions of the same boundary data.
 
 ## Reduced frequency
 
@@ -133,19 +128,19 @@ This parameter plays the same qualitative role in spheroidal scattering that $ka
 In any homogeneous region, the pressure satisfies:
 
 $$
-  \nabla^2 p + k^2p = 0.
+  \nabla^2 p + k^2p = 0
 $$
 
 Write the pressure as a product of radial, angular, and azimuthal factors:
 
 $$
-  p(\xi,\eta,\phi) = R(\xi)S(\eta)\Phi(\phi).
+  p(\xi,\eta,\phi) = R(\xi)S(\eta)\Phi(\phi)
 $$
 
 Substituting this product into the Helmholtz equation in prolate spheroidal coordinates yields three ordinary differential equations. The azimuthal dependence gives:
 
 $$
-  \Phi(\phi) = \cos m\phi \quad \text{or} \quad \sin m\phi,
+  \Phi(\phi) = \cos m\phi \quad \text{or} \quad \sin m\phi
 $$
 
 with integer order $m \ge 0$. The remaining equations define the angular spheroidal functions $S_{mn}(h,\eta)$ and the radial spheroidal functions $R_{mn}^{(i)}(h,\xi)$, where $n \ge m$ is degree.
@@ -155,19 +150,19 @@ The separation succeeds because the metric factors of prolate spheroidal coordin
 Written explicitly, the Helmholtz operator in prolate spheroidal coordinates gives:
 
 $$
-  \frac{\partial}{\partial\xi}\left[(\xi^2-1)\frac{\partial p}{\partial\xi}\right] + \frac{\partial}{\partial\eta}\left[(1-\eta^2)\frac{\partial p}{\partial\eta}\right] + \frac{\xi^2-\eta^2}{(\xi^2-1)(1-\eta^2)}\frac{\partial^2 p}{\partial\phi^2} + \mathbb{k}^2(\xi^2-\eta^2)p = 0.
+  \frac{\partial}{\partial\xi}\left[(\xi^2-1)\frac{\partial p}{\partial\xi}\right] + \frac{\partial}{\partial\eta}\left[(1-\eta^2)\frac{\partial p}{\partial\eta}\right] + \frac{\xi^2-\eta^2}{(\xi^2-1)(1-\eta^2)}\frac{\partial^2 p}{\partial\phi^2} + \mathbb{k}^2(\xi^2-\eta^2)p = 0
 $$
 
 Substituting $p = RS\Phi$ and dividing by $RS\Phi$ gives:
 
 $$
-  \frac{1}{R}\frac{d}{d\xi}\left[(\xi^2-1)\frac{dR}{d\xi}\right] + \mathbb{k}^2\xi^2 + \frac{1}{S}\frac{d}{d\eta}\left[(1-\eta^2)\frac{dS}{d\eta}\right] - \mathbb{k}^2\eta^2 + \frac{1}{\Phi}\frac{\xi^2-\eta^2}{(\xi^2-1)(1-\eta^2)}\frac{d^2\Phi}{d\phi^2} = 0.
+  \frac{1}{R}\frac{d}{d\xi}\left[(\xi^2-1)\frac{dR}{d\xi}\right] + \mathbb{k}^2\xi^2 + \frac{1}{S}\frac{d}{d\eta}\left[(1-\eta^2)\frac{dS}{d\eta}\right] - \mathbb{k}^2\eta^2 + \frac{1}{\Phi}\frac{\xi^2-\eta^2}{(\xi^2-1)(1-\eta^2)}\frac{d^2\Phi}{d\phi^2} = 0
 $$
 
 The azimuthal dependence is separated by imposing:
 
 $$
-  \frac{1}{\Phi}\frac{d^2\Phi}{d\phi^2} = -m^2,
+  \frac{1}{\Phi}\frac{d^2\Phi}{d\phi^2} = -m^2
 $$
 
 and separating the remaining $\xi$ and $\eta$ dependence with eigenvalue $\lambda_{mn}(h)$ produces the radial and angular equations stated below.
@@ -177,7 +172,7 @@ and separating the remaining $\xi$ and $\eta$ dependence with eigenvalue $\lambd
 The angular function satisfies:
 
 $$
-  \frac{d}{d\eta}\left[(1-\eta^2)\frac{dS}{d\eta}\right] + \left(\lambda_{mn}(\mathbb{k}) - \mathbb{k}^2\eta^2 - \frac{m^2}{1-\eta^2}\right)S = 0,
+  \frac{d}{d\eta}\left[(1-\eta^2)\frac{dS}{d\eta}\right] + \left(\lambda_{mn}(\mathbb{k}) - \mathbb{k}^2\eta^2 - \frac{m^2}{1-\eta^2}\right)S = 0
 $$
 
 where $\lambda_{mn}(h)$ is the separation constant. When $h \to 0$, this reduces to the associated Legendre equation, so the spheroidal angular functions reduce smoothly to Legendre functions.
@@ -187,7 +182,7 @@ where $\lambda_{mn}(h)$ is the separation constant. When $h \to 0$, this reduces
 The radial function satisfies:
 
 $$
-  \frac{d}{d\xi}\left[(\xi^2-1)\frac{dR}{d\xi}\right] - \left(\lambda_{mn}(\mathbb{k}) - \mathbb{k}^2\xi^2 + \frac{m^2}{\xi^2-1}\right)R = 0.
+  \frac{d}{d\xi}\left[(\xi^2-1)\frac{dR}{d\xi}\right] - \left(\lambda_{mn}(\mathbb{k}) - \mathbb{k}^2\xi^2 + \frac{m^2}{\xi^2-1}\right)R = 0
 $$
 
 Its independent solutions are the radial spheroidal functions of the first, second, third, and fourth kinds. For scattering, the first and third kinds play the same roles as regular Bessel and outgoing Hankel functions in spherical theory.
@@ -204,7 +199,7 @@ $$
   S_{mn}^{(1)}(\mathbb{k}_1,\cos\theta')
   S_{mn}^{(1)}(\mathbb{k}_1,\eta)
   R_{mn}^{(1)}(\mathbb{k}_1,\xi)
-  \cos m(\phi-\phi').
+  \cos m(\phi-\phi')
 $$
 
 This is the spheroidal analogue of the spherical plane-wave expansion. It is the starting point for every boundary-condition derivation because it expresses the known incident field in the same basis used for the unknown scattered field.
@@ -212,16 +207,16 @@ This is the spheroidal analogue of the spherical plane-wave expansion. It is the
 The scattered and interior fields are expanded in the same angular structure but with different radial functions:
 
 $$
-\begin{align*}
+  \begin{align*}
   p_{1,\text{scat}} &=
     2\sum_{m=0}^{\infty}\sum_{n=m}^{\infty} \frac{\epsilon_m i^n}{N_{mn}(\mathbb{k}_1)}
-    S_{mn}^{(1)}(\mathbb{k}_1,\cos\theta')
-    A_{mn}S_{mn}^{(1)}(\mathbb{k}_1,\eta)R_{mn}^{(3)}(\mathbb{k}_1,\xi), \\
-  p_{2, \text{interior}} &=
+  S_{mn}^{(1)}(\mathbb{k}_1,\cos\theta')
+  A_{mn}S_{mn}^{(1)}(\mathbb{k}_1,\eta)R_{mn}^{(3)}(\mathbb{k}_1,\xi), \\
+    p_{2, \text{interior}} &=
     2\sum_{m=0}^{\infty}\sum_{\ell=m}^{\infty} \frac{\epsilon_m i^\ell}{N_{m\ell}(\mathbb{k}_2)}
-    B_{m\ell}S_{m\ell}^{(1)}(\mathbb{k}_2,\eta)R_{m\ell}^{(1)}(\mathbb{k}_2,\xi) 
-    \cos m(\phi-\phi').
-\end{align*}
+  B_{m\ell}S_{m\ell}^{(1)}(\mathbb{k}_2,\eta)R_{m\ell}^{(1)}(\mathbb{k}_2,\xi)
+  \cos m(\phi-\phi').
+  \end{align*}
 $$
 
 These are the full modal expansions from which the pressure-release, rigid, fluid-filled, and gas-filled boundary systems follow. The important bookkeeping point is that the exterior incident and scattered fields share the same reduced frequency $\mathbb{k}_1$, whereas the interior field carries $\mathbb{k}_1$. That single difference is what later forces the projection step in the interior-fluid case.
@@ -232,13 +227,13 @@ The scattered far-field amplitude is expanded as:
 
 $$
   f_\infty(\theta,\phi\mid\theta',\phi') =
-  \frac{-2i}{k_2}
+    \frac{-2i}{k_2}
   \sum_{m=0}^{\infty}\sum_{n=m}^{\infty}
   \frac{\epsilon_m}{N_{mn}(\mathbb{k}_1)}
   S_{mn}^{(1)}(\mathbb{k}_1,\cos\theta')
   A_{mn}
   S_{mn}^{(1)}(\mathbb{k}_1,\cos\theta)
-  \cos m(\phi-\phi').
+  \cos m(\phi-\phi')
 $$
 
 Here $N_{mn}(\mathbb{k}_1)$ is the norm of the angular function, $\epsilon_m$ is the Neumann factor, and $A_{mn}$ is the modal scattering coefficient determined by the boundary conditions.
@@ -250,7 +245,7 @@ For monostatic backscatter:
 $$
   \theta' = \pi-\theta,
   \qquad
-  \phi' = \pi + \phi.
+  \phi' = \pi + \phi
 $$
 
 These relations substitute directly into the angular factors of the far-field amplitude.
@@ -262,13 +257,13 @@ These relations substitute directly into the angular factors of the far-field am
 For a pressure-release boundary, the total pressure vanishes on the surface $\xi = \xi_1$. If the incident field is expanded in regular radial functions $R_{mn}^{(1)}$ and the scattered field in outgoing functions $R_{mn}^{(3)}$, then for each $(m,n)$:
 
 $$
-  R_{mn}^{(1)}(\mathbb{k}_1,\xi_1) + A_{mn}R_{mn}^{(3)}(\mathbb{k}_1,\xi_1) = 0.
+  R_{mn}^{(1)}(\mathbb{k}_1,\xi_1) + A_{mn}R_{mn}^{(3)}(\mathbb{k}_1,\xi_1) = 0
 $$
 
 This boundary condition gives the modal coefficient:
 
 $$
-  A_{mn} = -\frac{R_{mn}^{(1)}(\mathbb{k}_1,\xi_1)}{R_{mn}^{(3)}(\mathbb{k}_1,\xi_1)}.
+  A_{mn} = -\frac{R_{mn}^{(1)}(\mathbb{k}_1,\xi_1)}{R_{mn}^{(3)}(\mathbb{k}_1,\xi_1)}
 $$
 
 ## Fixed-rigid spheroid
@@ -276,19 +271,19 @@ $$
 For a rigid boundary, the normal velocity vanishes, so the derivative with respect to the radial spheroidal coordinate must vanish on the surface. Thus:
 
 $$
-  \frac{\partial}{\partial\xi}R_{mn}^{(1)}(\mathbb{k}_1,\xi_1) + A_{mn}\frac{\partial}{\partial\xi}R_{mn}^{(3)}(\mathbb{k}_1,\xi_1) = 0,
+  \frac{\partial}{\partial\xi}R_{mn}^{(1)}(\mathbb{k}_1,\xi_1) + A_{mn}\frac{\partial}{\partial\xi}R_{mn}^{(3)}(\mathbb{k}_1,\xi_1) = 0
 $$
 
 This condition gives the corresponding modal coefficient:
 
 $$
-  A_{mn} = -\frac{R_{mn}^{(1)\prime}(\mathbb{k}_1,\xi_1)}{R_{mn}^{(3)\prime}(\mathbb{k}_1,\xi_1)}.
+  A_{mn} = -\frac{R_{mn}^{(1)\prime}(\mathbb{k}_1,\xi_1)}{R_{mn}^{(3)\prime}(\mathbb{k}_1,\xi_1)}
 $$
 
 These two cases are summarized compactly as:
 
 $$
-  A_{mn} = -\frac{\Delta R_{mn}^{(1)}(\mathbb{k}_1,\xi_1)}{\Delta R_{mn}^{(3)}(\mathbb{k}_1,\xi_1)},
+  A_{mn} = -\frac{\Delta R_{mn}^{(1)}(\mathbb{k}_1,\xi_1)}{\Delta R_{mn}^{(3)}(\mathbb{k}_1,\xi_1)}
 $$
 
 where $\Delta = 1$ for pressure release and $\Delta = \partial/\partial\xi$ for a rigid boundary.
@@ -302,20 +297,20 @@ Here $\mathbb{k}_1 = k_1 q$ and $\mathbb{k}_1 = k_2 q$ are the exterior and inte
 Let the exterior scattered coefficients be $A_{mn}$ and the interior coefficients be $B_{m\ell}$. With exterior total pressure $p_1 = p_{1,\text{inc}} + p_{1,\text{scat}}$ and interior pressure $p_1$, pressure continuity at $\xi = \xi_1$ gives:
 
 $$
-\begin{align*}
-  &\sum_{n=m}^{\infty} A_{mn}S_{mn}^{(1)}(\mathbb{k}_1,\eta)R_{mn}^{(3)}(\mathbb{k}_1,\xi_1) + 
-  \sum_{n=m}^{\infty} S_{mn}^{(1)}(\mathbb{k}_1,\eta)R_{mn}^{(1)}(\mathbb{k}_1,\xi_1) \\
-  &= \sum_{\ell=m}^{\infty} B_{m\ell}S_{m\ell}^{(1)}(\mathbb{k}_1,\eta)R_{m\ell}^{(1)}(\mathbb{k}_1,\xi_1).
-\end{align*}
+  \begin{align*}
+  &\sum_{n=m}^{\infty} A_{mn}S_{mn}^{(1)}(\mathbb{k}_1,\eta)R_{mn}^{(3)}(\mathbb{k}_1,\xi_1) +
+    \sum_{n=m}^{\infty} S_{mn}^{(1)}(\mathbb{k}_1,\eta)R_{mn}^{(1)}(\mathbb{k}_1,\xi_1) \\
+    &= \sum_{\ell=m}^{\infty} B_{m\ell}S_{m\ell}^{(1)}(\mathbb{k}_1,\eta)R_{m\ell}^{(1)}(\mathbb{k}_1,\xi_1).
+  \end{align*}
 $$
 
 Normal-velocity continuity gives the corresponding derivative condition:
 
 $$
-\begin{align*}
+  \begin{align*}
   &\frac{1}{\rho_1}\sum_{n=m}^{\infty} A_{mn}S_{mn}^{(1)}(\mathbb{k}_1,\eta)R_{mn}^{(3)\prime}(\mathbb{k}_1,\xi_1) + \frac{1}{\rho_1}\sum_{n=m}^{\infty} S_{mn}^{(1)}(\mathbb{k}_1,\eta)R_{mn}^{(1)\prime}(\mathbb{k}_1,\xi_1) \\
-  &= \frac{1}{\rho_2}\sum_{\ell=m}^{\infty} B_{m\ell}S_{m\ell}^{(1)}(\mathbb{k}_2,\eta)R_{m\ell}^{(1)\prime}(\mathbb{k}_2,\xi_1).
-\end{align*}
+    &= \frac{1}{\rho_2}\sum_{\ell=m}^{\infty} B_{m\ell}S_{m\ell}^{(1)}(\mathbb{k}_2,\eta)R_{m\ell}^{(1)\prime}(\mathbb{k}_2,\xi_1).
+  \end{align*}
 $$
 
 To solve these equations, one projects onto the interior angular basis using orthogonality. This introduces overlap integrals of the form:
@@ -323,7 +318,7 @@ To solve these equations, one projects onto the interior angular basis using ort
 $$
   \alpha_{n\ell}^m = \frac{1}{N_{m\ell}(\mathbb{k}_2)}
   \int_{-1}^{1}
-  S_{mn}^{(1)}(\mathbb{k}_1,\eta)S_{m\ell}^{(1)}(\mathbb{k}_2,\eta)\,d\eta.
+  S_{mn}^{(1)}(\mathbb{k}_1,\eta)S_{m\ell}^{(1)}(\mathbb{k}_2,\eta)\,d\eta
 $$
 
 These coefficients measure how strongly an exterior mode $(m,n)$ couples to an interior mode $(m,\ell)$. The projection step is the exact analogue of multiplying a spherical expansion by a Legendre polynomial and integrating over angle. The difference is that because the exterior and interior spheroidal bases correspond to different reduced frequencies, the resulting overlap matrix is no longer diagonal.
@@ -331,8 +326,8 @@ These coefficients measure how strongly an exterior mode $(m,n)$ couples to an i
 The angular orthogonality relation for a fixed reduced frequency is:
 
 $$
-  \int_{-1}^{1} S_{mn}^{(1)}(h,\eta)S_{m\ell}^{(1)}(h,\eta)\,d\eta
-  = N_{mn}(h)\delta_{n\ell}.
+  \int_{-1}^{1} S_{mn}^{(1)}(h,\eta)S_{m\ell}^{(1)}(h,\eta)\,d\eta =
+    N_{mn}(h)\delta_{n\ell}
 $$
 
 When $\mathbb{k}_1 \ne \mathbb{k}_2$, this orthogonality does not diagonalize the mixed products between the two media, which is exactly why the overlap coefficients $\alpha_{n\ell}^m$ appear.
@@ -340,25 +335,25 @@ When $\mathbb{k}_1 \ne \mathbb{k}_2$, this orthogonality does not diagonalize th
 After eliminating the interior coefficients, one obtains a coupled linear system in the exterior coefficients of the form:
 
 $$
-  \sum_{n=m}^{\infty} K_{n\ell}^{m(3)}A_{mn} + \sum_{n=m}^{\infty}K_{n\ell}^{m(1)} = 0,
+  \sum_{n=m}^{\infty} K_{n\ell}^{m(3)}A_{mn} + \sum_{n=m}^{\infty}K_{n\ell}^{m(1)} = 0
 $$
 
 where the kernels are built from the overlap coefficients and the radial boundary combinations. A convenient factorization of those kernels is:
 
 $$
   K_{n\ell}^{m(z)} =
-  \frac{i^n}{N_{mn}(\mathbb{k}_1)}
+    \frac{i^n}{N_{mn}(\mathbb{k}_1)}
   S_{mn}^{(1)}(\mathbb{k}_1,\cos\theta')
   \alpha_{n\ell}^{m}
-  E_{n\ell}^{m(z)},
+  E_{n\ell}^{m(z)}
 $$
 
 The boundary combination entering that factorization is:
 
 $$
   E_{n\ell}^{m(z)} = R_{mn}^{(z)}(\mathbb{k}_1,\xi_1) - \frac{\rho_2}{\rho_1}
-    \frac{R_{m\ell}^{(1)}(\mathbb{k}_2,\xi_1)}{R_{m\ell}^{(1)\prime}(\mathbb{k}_2,\xi_1)}
-    R_{mn}^{(z)\prime}(\mathbb{k}_1,\xi_1).
+  \frac{R_{m\ell}^{(1)}(\mathbb{k}_2,\xi_1)}{R_{m\ell}^{(1)\prime}(\mathbb{k}_2,\xi_1)}
+  R_{mn}^{(z)\prime}(\mathbb{k}_1,\xi_1)
 $$
 
 This is the precise place where the interior-fluid spheroidal problem becomes harder than the spherical one: the mismatch between $\mathbb{k}_1$ and $\mathbb{k}_2$ causes mode coupling through the overlap integrals $\alpha_{n\ell}^m$. That statement matters physically as well as numerically. The overlap coefficients are not an arbitrary technical complication added after the fact. They are the direct mathematical expression of the fact that the interior and exterior media support different spheroidal angular bases on the same boundary.
@@ -368,13 +363,13 @@ This is the precise place where the interior-fluid spheroidal problem becomes ha
 If the interior and exterior reduced frequencies are close, the two angular bases are nearly the same and the overlap matrix becomes nearly diagonal. Under that near-matching condition:
 
 $$
-  \alpha_{n\ell}^m \approx 0 \quad \text{for } n \ne \ell,
+  \alpha_{n\ell}^m \approx 0 \quad \text{for } n \ne \ell
 $$
 
 so the system decouples approximately by degree. The modal coefficient then reduces to:
 
 $$
-  A_{mn} = -\frac{E_{nn}^{m(1)}}{E_{nn}^{m(3)}}.
+  A_{mn} = -\frac{E_{nn}^{m(1)}}{E_{nn}^{m(3)}}
 $$
 
 This approximation is the statement that each exterior mode couples mainly to the interior mode of the same degree. It should therefore be read as a near-matching-medium simplification, not as a general property of fluid-filled or gas-filled spheroidal scattering.
@@ -386,7 +381,7 @@ The exact solution is a double infinite series in $m$ and $n$. In practice, it i
 $$
   m_{max} = \lceil 2k_1b \rceil,
   \qquad
-  n_{max} = m_{max} + \left\lceil \frac{\mathbb{k}_1}{2} \right\rceil.
+  n_{max} = m_{max} + \left\lceil \frac{\mathbb{k}_1}{2} \right\rceil
 $$
 
 These truncation rules express the same principle as in spherical scattering: the number of required modes grows with acoustic size.
@@ -399,15 +394,15 @@ After truncation, the infinite coupled system becomes a finite dense linear syst
 
 $$
   \mathbf{a}^{(m)} =
-  \begin{bmatrix}
-    A_{mm} & A_{m,m+1} & \cdots & A_{mN_m}
-  \end{bmatrix}^T.
+    \begin{bmatrix}
+  A_{mm} & A_{m,m+1} & \cdots & A_{mN_m}
+  \end{bmatrix}^T
 $$
 
 The projected boundary equations can then be written as:
 
 $$
-  \mathbf{M}^{(m)}\mathbf{a}^{(m)} = \mathbf{b}^{(m)},
+  \mathbf{M}^{(m)}\mathbf{a}^{(m)} = \mathbf{b}^{(m)}
 $$
 
 with entries:
@@ -415,7 +410,7 @@ with entries:
 $$
   M_{\ell n}^{(m)} = K_{n\ell}^{m(3)},
   \qquad
-  b_{\ell}^{(m)} = -\sum_{n=m}^{N_m} K_{n\ell}^{m(1)}.
+  b_{\ell}^{(m)} = -\sum_{n=m}^{N_m} K_{n\ell}^{m(1)}
 $$
 
 The matrix is generally dense rather than diagonal because every retained exterior mode can couple to several interior modes through the overlap coefficients $\alpha_{n\ell}^m$. In other words, truncation converts the analytic mode-coupling statement into an ordinary finite-dimensional linear algebra problem.
@@ -427,7 +422,7 @@ The overlap coefficients are themselves integrals on $[-1,1]$:
 $$
   \alpha_{n\ell}^m = \frac{1}{N_{m\ell}(\mathbb{k}_2)}
   \int_{-1}^{1}
-  S_{mn}^{(1)}(\mathbb{k}_1,\eta)S_{m\ell}^{(1)}(\mathbb{k}_2,\eta)\,d\eta.
+  S_{mn}^{(1)}(\mathbb{k}_1,\eta)S_{m\ell}^{(1)}(\mathbb{k}_2,\eta)\,d\eta
 $$
 
 For the truncated system these integrals are evaluated numerically, typically by Gauss-Legendre quadrature. That is, one replaces the integral by a weighted sum over quadrature nodes $\eta_j$:
@@ -435,7 +430,7 @@ For the truncated system these integrals are evaluated numerically, typically by
 $$
   \alpha_{n\ell}^m \approx \frac{1}{N_{m\ell}(\mathbb{k}_2)}
   \sum_{j=1}^{J} w_j
-  S_{mn}^{(1)}(\mathbb{k}_1,\eta_j)S_{m\ell}^{(1)}(\mathbb{k}_2,\eta_j).
+  S_{mn}^{(1)}(\mathbb{k}_1,\eta_j)S_{m\ell}^{(1)}(\mathbb{k}_2,\eta_j)
 $$
 
 This step is mathematically natural because the overlap integrals are smooth on the finite interval and must be evaluated repeatedly for many pairs $(n,\ell)$. It is also one of the points at which numerical settings become part of the practical model specification.
@@ -445,13 +440,13 @@ This step is mathematically natural because the overlap integrals are smooth on 
 Once $\mathbf{M}^{(m)}$ and $\mathbf{b}^{(m)}$ are assembled, the truncated coefficients are obtained by solving the dense system for each $m$. Near resonances, or when the interior and exterior bases become nearly linearly dependent after truncation, $\mathbf{M}^{(m)}$ can be poorly conditioned. A stable approach is therefore to compute a singular-value decomposition:
 
 $$
-  \mathbf{M}^{(m)} = \mathbf{U}\mathbf{\Sigma}\mathbf{V}^*,
+  \mathbf{M}^{(m)} = \mathbf{U}\mathbf{\Sigma}\mathbf{V}^*
 $$
 
 and form a pseudoinverse solution:
 
 $$
-  \mathbf{a}^{(m)} = \mathbf{V}\mathbf{\Sigma}^{+}\mathbf{U}^*\mathbf{b}^{(m)}.
+  \mathbf{a}^{(m)} = \mathbf{V}\mathbf{\Sigma}^{+}\mathbf{U}^*\mathbf{b}^{(m)}
 $$
 
 Very small singular values are discarded relative to the dominant singular value, which suppresses spurious growth associated with the truncated near-null directions. In practical terms, the SVD step separates the physically meaningful modal content from numerical noise introduced by truncation and basis mismatch. The weak-coupling approximation described above is recovered when the overlap matrix is already close to diagonal. In that limit, $\mathbf{M}^{(m)}$ is nearly diagonal as well, and the full matrix solve collapses back to the simpler term-by-term ratio for $A_{mn}$.
@@ -461,7 +456,7 @@ Very small singular values are discarded relative to the dominant singular value
 Once the modal coefficients are known, the far-field amplitude is evaluated. The backscattering cross-section then becomes:
 
 $$
-  \sigma_\text{bs} = |f_\infty|^2,
+  \sigma_\text{bs} = |f_\infty|^2
 $$
 
 with target strength:

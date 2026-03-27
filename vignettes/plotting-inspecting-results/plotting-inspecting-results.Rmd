@@ -8,7 +8,7 @@ output:
     dpi: 200
     dev.args: list(pointsize=11)
 vignette: >
-  %\VignetteIndexEntry{Plotting and inspecting results}
+  %\VignetteIndexEntry{Plotting and Inspecting Results}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---
@@ -18,8 +18,6 @@ vignette: >
 The package stores geometry, parameters, and model outputs in nested scatterer objects. That design is useful only if the contents can be inspected and visualized efficiently. This article is the companion guide to those object-level operations.
 
 Inspection is more than a cosmetic last step. In practice, it is one of the main safeguards against carrying an incorrect target, an unintended model choice, or a misleading output representation into later analysis. A clean line plot is not automatically a trustworthy result. Readers often learn more from a short inspection pass than from immediately producing a polished figure.
-
-<object type="image/svg+xml" data="inspection-loop.svg" style="width:100%;" aria-label="Inspection loop"></object>
 
 # Main tools
 

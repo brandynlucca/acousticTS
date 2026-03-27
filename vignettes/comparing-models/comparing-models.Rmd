@@ -8,7 +8,7 @@ output:
     dpi: 200
     dev.args: list(pointsize=11)
 vignette: >
-  %\VignetteIndexEntry{comparing models on the same target}
+  %\VignetteIndexEntry{Comparing models on the same target}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---
@@ -74,25 +74,25 @@ Once two model outputs have been aligned on the same grid, it is often useful to
 When the question is about energetic or scattering-strength agreement, those metrics are usually more meaningful in the linear domain. In that setting, one compares `sigma_bs` values directly and computes quantities such as:
 
 $$
-\mathrm{MAD}_{\sigma} =
-\frac{1}{N}
-\sum_{j=1}^{N}
-\left|
-\sigma_{\mathrm{bs},1,j} - \sigma_{\mathrm{bs},2,j}
-\right|,
+  \mathrm{MAD}_{\sigma} =
+    \frac{1}{N}
+  \sum_{j=1}^{N}
+  \left|
+  \sigma_{\mathrm{bs},1,j} - \sigma_{\mathrm{bs},2,j}
+  \right|,
 $$
 
 The corresponding linear-domain root mean square error is:
 
 $$
-\mathrm{RMSE}_{\sigma} =
-\left[
-\frac{1}{N}
-\sum_{j=1}^{N}
-\left(
-\sigma_{\mathrm{bs},1,j} - \sigma_{\mathrm{bs},2,j}
-\right)^2
-\right]^{1/2}.
+  \mathrm{RMSE}_{\sigma} =
+    \left[
+  \frac{1}{N}
+  \sum_{j=1}^{N}
+  \left(
+  \sigma_{\mathrm{bs},1,j} - \sigma_{\mathrm{bs},2,j}
+  \right)^2
+  \right]^{1/2}.
 $$
 
 These linear-domain summaries are the more natural choice when the goal is to compare scattering strength, when later averaging is expected, or when one wants differences to scale directly with the physical size of the backscattering response. They are also the safer choice when comparing model fits to linear-domain observations or when the workflow later combines or averages responses across realizations.
@@ -100,25 +100,25 @@ These linear-domain summaries are the more natural choice when the goal is to co
 By contrast, when the question is about agreement in reported target strength, then it is reasonable to compare in the logarithmic domain and compute quantities such as:
 
 $$
-\mathrm{MAD}_{TS} =
-\frac{1}{N}
-\sum_{j=1}^{N}
-\left|
-TS_{1,j} - TS_{2,j}
-\right|,
+  \mathrm{MAD}_{TS} =
+    \frac{1}{N}
+  \sum_{j=1}^{N}
+  \left|
+  TS_{1,j} - TS_{2,j}
+  \right|,
 $$
 
 The corresponding logarithmic-domain root mean square error is:
 
 $$
-\mathrm{RMSE}_{TS} =
-\left[
-\frac{1}{N}
-\sum_{j=1}^{N}
-\left(
-TS_{1,j} - TS_{2,j}
-\right)^2
-\right]^{1/2}.
+  \mathrm{RMSE}_{TS} =
+    \left[
+  \frac{1}{N}
+  \sum_{j=1}^{N}
+  \left(
+  TS_{1,j} - TS_{2,j}
+  \right)^2
+  \right]^{1/2}.
 $$
 
 These dB-domain summaries are often the more interpretable choice when the comparison is tied to reporting practice, calibration-style tolerances, or questions framed explicitly in terms of target strength rather than linear scattering cross-section.

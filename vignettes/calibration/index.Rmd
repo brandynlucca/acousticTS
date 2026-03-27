@@ -14,7 +14,7 @@ vignette: >
 
 ```{r model_family_header, echo=FALSE, results='asis'}
 acousticTS:::.model_family_header(
-  status = c("benchmarked", "validated"),
+  family = "calibration",
   pages = c(
     Overview = "index.html",
     Implementation = "calibration-implementation.html",
@@ -23,5 +23,41 @@ acousticTS:::.model_family_header(
 )
 ```
 
-
+```{r calibration_overview, echo=FALSE, results='asis'}
+acousticTS:::.model_family_overview(
+  family = "calibration",
+  summary = paste(
+    "`SOEMS` is the package's elastic solid-sphere family for standard-target",
+    "calibration work. It follows the classic solid elastic sphere literature",
+    "and is intended for metal calibration spheres whose compressional and",
+    "shear wave physics matter directly."
+  ),
+  core_idea = paste(
+    "Expand the exterior acoustic field and the interior elastic displacement",
+    "field in spherical modes, enforce pressure, normal-velocity, and traction",
+    "conditions at the sphere surface, and reconstruct the far-field",
+    "backscatter from the resulting phase-shifted partial waves."
+  ),
+  best_for = c(
+    "Calibration spheres made of tungsten carbide, copper, aluminum, steel, or similar elastic solids",
+    "Frequency-response calculations for standard-target calibration workflows",
+    "Benchmarking elastic spherical scattering against literature values"
+  ),
+  supports = c(
+    "`CAL` objects representing homogeneous elastic spheres",
+    "Solid elastic interiors with both longitudinal and shear wave support",
+    "Medium `1` as seawater and medium `2` as the elastic solid sphere"
+  ),
+  assumptions = c(
+    "Perfectly spherical homogeneous solid target",
+    "Linear elasticity in the solid interior",
+    "Inviscid exterior fluid",
+    "No shell or internal cavity"
+  ),
+  reading = c(
+    "[Implementation](calibration-implementation.html): calibration workflows and benchmark comparisons",
+    "[Theory](calibration-theory.html): elastic-sphere modal theory and phase-shift representation"
+  )
+)
+```
 

@@ -1,5 +1,5 @@
 ---
-title: "Validation and Benchmark Reproduction"
+title: "Validation and benchmark reproduction"
 output:
   rmarkdown::html_vignette:
     toc: true
@@ -35,6 +35,37 @@ head(benchmark_ts$frequency_spectra$index$frequency)
 ```
 
 The benchmark cases currently emphasize canonical exact or near-exact comparison problems: `SPHMS` sphere cases with several boundary conditions, `FCMS` finite-cylinder cases, and `PSMS` prolate-spheroid cases. That combination is useful because it spans several canonical geometries and several different numerical mechanisms. In practice, these resources let a user ask two related but different questions. The first is whether a known reference problem can be reproduced. The second is whether a new workflow still behaves consistently when anchored to a trusted canonical case.
+
+# Validation registry snapshot
+
+The package now also keeps a small internal validation registry so the family-page badges, model-library summaries, and validation evidence can be drawn from one source rather than maintained separately.
+
+## Family statuses
+
+```{r validation_status_table, echo=FALSE}
+knitr::kable(
+  acousticTS:::.validation_family_status_table(),
+  align = c("l", "l", "l")
+)
+```
+
+## Benchmark evidence
+
+```{r benchmark_evidence_table, echo=FALSE}
+knitr::kable(
+  acousticTS:::.validation_evidence_table(type = "benchmark"),
+  align = c("l", "l", "l", "l", "l")
+)
+```
+
+## External-comparison evidence
+
+```{r external_evidence_table, echo=FALSE}
+knitr::kable(
+  acousticTS:::.validation_evidence_table(type = "external"),
+  align = c("l", "l", "l", "l", "l")
+)
+```
 
 # What validation means in this package
 

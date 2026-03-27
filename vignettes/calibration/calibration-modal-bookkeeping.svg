@@ -1,8 +1,44 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 320" role="img" aria-labelledby="title desc">
-  <title id="title">Calibration modal bookkeeping</title>
-  <desc id="desc">Pipeline from incident partial waves through elastic phase shifts to the backscattering quantities reported by the calibration model.</desc>
-  <defs>
-    <style>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 882.7027 218.46848"
+   role="img"
+   aria-labelledby="title desc"
+   version="1.1"
+   id="svg18"
+   sodipodi:docname="calibration-modal-bookkeeping.svg"
+   width="882.7027"
+   height="218.46848"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview18"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.96521739"
+     inkscape:cx="346.03604"
+     inkscape:cy="212.90541"
+     inkscape:window-width="1920"
+     inkscape:window-height="1057"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg18" />
+  <title
+     id="title">Calibration modal bookkeeping</title>
+  <desc
+     id="desc">Pipeline from incident partial waves through elastic phase shifts to the backscattering quantities reported by the calibration model.</desc>
+  <defs
+     id="defs1">
+    <style
+       id="style1">
       .bg { fill: #f8f4ec; }
       .box { fill: #fffdfa; stroke: #302923; stroke-width: 2.4; rx: 18; ry: 18; }
       .accent1 { fill: #dfe8f5; }
@@ -13,34 +49,198 @@
       .small { font: 14px Georgia, serif; fill: #4e443b; }
       .arrow { stroke: #4e443b; stroke-width: 2.5; fill: none; marker-end: url(#m); }
     </style>
-    <marker id="m" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
-      <path d="M0,0 L10,5 L0,10 z" fill="#4e443b"/>
+    <marker
+       id="m"
+       markerWidth="10"
+       markerHeight="10"
+       refX="8"
+       refY="5"
+       orient="auto">
+      <path
+         d="M 0,0 10,5 0,10 Z"
+         fill="#4e443b"
+         id="path1" />
     </marker>
   </defs>
-  <rect class="bg" width="920" height="320"/>
-  <text x="34" y="42" class="head">How the calibration sphere series turns into reported output</text>
-  <rect x="32" y="76" width="246" height="186" class="box accent1"/>
-  <text x="52" y="110" class="txt">1. Expand the incident plane wave</text>
-  <text x="52" y="140" class="small">Each order m contributes a spherical</text>
-  <text x="52" y="161" class="small">Bessel term j_m(k_1 r) P_m(cos theta).</text>
-  <text x="52" y="196" class="small">Inside the sphere, both longitudinal</text>
-  <text x="52" y="217" class="small">and shear responses must be matched.</text>
-
-  <rect x="336" y="76" width="246" height="186" class="box accent2"/>
-  <text x="356" y="110" class="txt">2. Match the surface conditions</text>
-  <text x="356" y="140" class="small">The elastic boundary problem yields</text>
-  <text x="356" y="161" class="small">a real phase lag eta_m for each order.</text>
-  <text x="356" y="196" class="small">The partial-wave contribution is</text>
-  <text x="356" y="221" class="small">sin(eta_m) exp(i eta_m).</text>
-
-  <rect x="640" y="76" width="248" height="186" class="box accent3"/>
-  <text x="660" y="110" class="txt">3. Sum, rescale, and report</text>
-  <text x="660" y="140" class="small">The mode sum gives the far-field</text>
-  <text x="660" y="161" class="small">backscattering series in ka.</text>
-  <text x="660" y="196" class="small">The reported linear length is f_bs,</text>
-  <text x="660" y="217" class="small">followed by sigma_bs = |f_bs|^2</text>
-  <text x="660" y="238" class="small">and TS = 10 log10(sigma_bs).</text>
-
-  <path d="M278 169 C300 169, 312 169, 336 169" class="arrow"/>
-  <path d="M582 169 C604 169, 616 169, 640 169" class="arrow"/>
+  <rect
+     class="bg"
+     width="882.7027"
+     height="218.46848"
+     id="rect1"
+     x="0"
+     y="0"
+     style="stroke-width:0.999994" />
+  <path
+     d="m 260.68339,129.347 c 17.71735,0 27.38135,0 46.70936,0"
+     class="arrow"
+     id="path17" />
+  <text
+     x="100.31258"
+     y="26.156012"
+     class="head"
+     id="text1"
+     style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:22px;line-height:normal;font-family:Georgia, serif">How the calibration sphere series turns into reported output</text>
+  <rect
+     x="9.5627193"
+     y="60.156013"
+     width="250.92799"
+     height="138.382"
+     class="box accent1"
+     id="rect2" />
+  <text
+     x="15.950106"
+     y="78.097458"
+     class="txt"
+     id="text2"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;line-height:normal;font-family:Georgia, serif">1. Expand the incident plane wave</text>
+  <text
+     x="16.385653"
+     y="102.70105"
+     class="small"
+     id="text3"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;line-height:normal;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#4e443b"><tspan
+       sodipodi:role="line"
+       id="tspan27"
+       x="16.385653"
+       y="102.70105">Each order m contributes a spherical</tspan><tspan
+       sodipodi:role="line"
+       id="tspan28"
+       x="16.385653"
+       y="120.20106">Bessel term: <tspan
+   style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   id="tspan32">j</tspan><tspan
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;baseline-shift:sub"
+   id="tspan33">m</tspan><tspan
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   id="tspan37">(k</tspan><tspan
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;baseline-shift:sub"
+   id="tspan35">1</tspan><tspan
+   id="tspan41"
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">r)</tspan><tspan
+   style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   id="tspan38">P</tspan><tspan
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;baseline-shift:sub"
+   id="tspan34">m</tspan><tspan
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   id="tspan39">(cos θ)</tspan>.</tspan><tspan
+       sodipodi:role="line"
+       id="tspan29"
+       x="16.385653"
+       y="137.70105"></tspan><tspan
+       sodipodi:role="line"
+       id="tspan30"
+       x="16.385653"
+       y="155.20105">Inside the sphere, both longitudinal</tspan><tspan
+       sodipodi:role="line"
+       id="tspan31"
+       x="16.385653"
+       y="172.70105">and shear responses must be matched.</tspan></text>
+  <path
+     d="m 564.78241,129.34701 c 17.67107,0 27.30982,0 46.58737,0"
+     class="arrow"
+     id="path18" />
+  <rect
+     x="313.56271"
+     y="60.156013"
+     width="250.92799"
+     height="138.382"
+     class="box accent2"
+     id="rect6" />
+  <text
+     x="319.56271"
+     y="78.10527"
+     class="txt"
+     id="text7"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;line-height:normal;font-family:Georgia, serif">2. Match the surface conditions</text>
+  <text
+     x="320.31955"
+     y="102.70105"
+     class="small"
+     id="text8"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;line-height:normal;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#4e443b"><tspan
+       sodipodi:role="line"
+       id="tspan42"
+       x="320.31955"
+       y="102.70105">The elastic boundary problem yields</tspan><tspan
+       sodipodi:role="line"
+       id="tspan43"
+       x="320.31955"
+       y="120.20106">a real phase lag η<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan51">m</tspan> for each order.</tspan><tspan
+       sodipodi:role="line"
+       id="tspan44"
+       x="320.31955"
+       y="137.70105"></tspan><tspan
+       sodipodi:role="line"
+       id="tspan45"
+       x="320.31955"
+       y="155.20105">The partial-wave contribution is:</tspan><tspan
+       sodipodi:role="line"
+       id="tspan46"
+       x="320.31955"
+       y="172.70105">sin(η<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan48">m</tspan>) e<tspan
+   style="font-size:65%;baseline-shift:super"
+   id="tspan49">(i η<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan50">m</tspan>)</tspan>.</tspan></text>
+  <rect
+     x="617.56281"
+     y="60.156013"
+     width="250.92801"
+     height="138.38217"
+     class="box accent3"
+     id="rect11" />
+  <text
+     x="623.56274"
+     y="78.097458"
+     class="txt"
+     id="text12"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;line-height:normal;font-family:Georgia, serif">3. Sum, rescale, and report</text>
+  <text
+     x="623.96021"
+     y="102.70789"
+     class="small"
+     id="text13"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;line-height:normal;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#4e443b"><tspan
+       sodipodi:role="line"
+       id="tspan52"
+       x="623.96021"
+       y="102.70789">The mode sum gives the far-field</tspan><tspan
+       sodipodi:role="line"
+       id="tspan53"
+       x="623.96021"
+       y="120.20789">backscattering series in ka.</tspan><tspan
+       sodipodi:role="line"
+       id="tspan54"
+       x="623.96021"
+       y="137.70789" /><tspan
+       sodipodi:role="line"
+       id="tspan55"
+       x="623.96021"
+       y="155.20789">The reported linear length is <tspan
+   style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   id="tspan63">f</tspan><tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan62">bs</tspan>,</tspan><tspan
+       sodipodi:role="line"
+       id="tspan56"
+       x="623.96021"
+       y="172.70789">followed by sigmabs = |<tspan
+   style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   id="tspan59">f</tspan><tspan
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:65%;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;baseline-shift:sub"
+   id="tspan60">bs</tspan>|<tspan
+   style="font-size:65%;baseline-shift:super"
+   id="tspan66">2</tspan></tspan><tspan
+       sodipodi:role="line"
+       id="tspan57"
+       x="623.96021"
+       y="190.20789">and TS = 10log<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan64">10</tspan>(σ<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan65">bs</tspan>).</tspan></text>
 </svg>

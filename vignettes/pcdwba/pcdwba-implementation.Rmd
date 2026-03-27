@@ -19,7 +19,7 @@ vignette: >
 
 ```{r model_family_header, echo=FALSE, results='asis'}
 acousticTS:::.model_family_header(
-  status = c("experimental", "validated"),
+  family = "pcdwba",
   pages = c(
     Overview = "index.html",
     Implementation = "pcdwba-implementation.html",
@@ -35,7 +35,11 @@ This page checks the implementation against two source-level references:
 - the `pcdwba_fbs` routine in the local `echopop` source tree,
 - the bent-cylinder DWBA routines in the local `ZooScatR` source tree.
 
-# Reference case
+::: {.experiment data-title="Validation scope"}
+`PCDWBA` is validated here against source-level reference implementations rather than against a separate published benchmark table. The `ZooScatR` source agrees exactly on the shared case, while the remaining `echopop` drift is attributable to that implementation's interpolated Bessel evaluation.
+:::
+
+## Reference case
 
 The comparison uses a single reproducible bent-cylinder case:
 
@@ -78,11 +82,19 @@ pcdwba_object <- target_strength(
 head(extract(pcdwba_object, "model")$PCDWBA)
 ```
 
-# Comparison summary
+## Validation outputs
+### Comparison summary
 
 ```{r echo = FALSE}
 pcdwba_summary <- utils::read.csv(
-  file.path("..", "..", "scratch", "pcdwba_reference_compare_summary.csv")
+  file.path(
+    "..",
+    "..",
+    "tools",
+    "implementation-figures",
+    "data",
+    "pcdwba_reference_compare_summary.csv"
+  )
 )
 
 knitr::kable(
@@ -98,11 +110,18 @@ knitr::kable(
 
 The `ZooScatR` source-level reconstruction and `acousticTS` are indistinguishable on this grid. The `echopop` comparison remains close as well, but it is not at machine precision because that implementation evaluates the cylindrical Bessel term through interpolation rather than a direct nodewise call. On this grid, the largest mismatch occurs near `112 kHz`; replacing the interpolated `J_1(x)/x` evaluation with a direct call collapses that residual onto the `acousticTS` / `ZooScatR` curve. So the remaining drift is numerical, not geometrical.
 
-## Timings
+### Timings
 
 ```{r echo = FALSE}
 pcdwba_timing <- utils::read.csv(
-  file.path("..", "..", "scratch", "pcdwba_reference_compare_timing.csv")
+  file.path(
+    "..",
+    "..",
+    "tools",
+    "implementation-figures",
+    "data",
+    "pcdwba_reference_compare_timing.csv"
+  )
 )
 
 knitr::kable(
@@ -119,67 +138,12 @@ knitr::kable(
 )
 ```
 
-## Spectrum overlay
+### Spectrum overlay
 
-```{r fig.width = 8, fig.height = 6}
-pcdwba_compare <- utils::read.csv(
-  file.path("..", "..", "scratch", "pcdwba_reference_compare.csv")
-)
-pcdwba_compare <- pcdwba_compare[order(pcdwba_compare$frequency_hz), ]
-
-par(mfrow = c(2, 1), mar = c(4, 4.5, 2, 1))
-
-plot(
-  pcdwba_compare$frequency_khz,
-  pcdwba_compare$TS_zooscatr,
-  type = "l",
-  lwd = 2.5,
-  col = "black",
-  xlab = "",
-  ylab = expression(Target ~ strength ~ (dB ~ re. ~ 1 ~ m^2))
-)
-lines(pcdwba_compare$frequency_khz, pcdwba_compare$TS_acousticts, col = "#0b6e4f", lwd = 2)
-lines(pcdwba_compare$frequency_khz, pcdwba_compare$TS_echopop, col = "#b2472f", lwd = 2, lty = 2)
-legend(
-  "bottomleft",
-  legend = c("ZooScatR source", "acousticTS", "echopop"),
-  col = c("black", "#0b6e4f", "#b2472f"),
-  lwd = c(2.5, 2, 2),
-  lty = c(1, 1, 2),
-  bty = "n"
-)
-
-plot(
-  pcdwba_compare$frequency_khz,
-  pcdwba_compare$TS_acousticts - pcdwba_compare$TS_zooscatr,
-  type = "l",
-  lwd = 2,
-  col = "#0b6e4f",
-  xlab = "Frequency (kHz)",
-  ylab = expression(Delta * TS ~ (dB)),
-  ylim = range(c(
-    pcdwba_compare$TS_acousticts - pcdwba_compare$TS_zooscatr,
-    pcdwba_compare$TS_acousticts - pcdwba_compare$TS_echopop
-  ))
-)
-lines(
-  pcdwba_compare$frequency_khz,
-  pcdwba_compare$TS_acousticts - pcdwba_compare$TS_echopop,
-  col = "#b2472f",
-  lwd = 2,
-  lty = 2
-)
-abline(h = 0, lty = 3, col = "grey50")
-legend(
-  "topright",
-  legend = c("acousticTS - ZooScatR source", "acousticTS - echopop"),
-  col = c("#0b6e4f", "#b2472f"),
-  lwd = 2,
-  lty = c(1, 2),
-  bty = "n"
-)
+```{r echo=FALSE, out.width='85%', fig.align='center', fig.alt='Pre-rendered PCDWBA comparison showing ZooScatR, acousticTS, and echopop spectra together with the acousticTS residuals against the two references.'}
+knitr::include_graphics("pcdwba-reference-comparison.png")
 ```
 
-# Closing note
+## Closing note
 
 This is the kind of implementation check that matters for a phase-compensated bent-cylinder solver. The comparison is not just against a benchmark curve. It is against two independently written source routines that share the same governing model. On this reference case, `acousticTS` reproduces the direct ZooScatR-style calculation exactly and stays very close to the `echopop` implementation across the full frequency band.

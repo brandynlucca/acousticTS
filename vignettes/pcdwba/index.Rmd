@@ -13,12 +13,48 @@ vignette: >
 # Overview
 ```{r model_family_header, echo=FALSE, results='asis'}
 acousticTS:::.model_family_header(
-  status = c("experimental", "validated"),
+  family = "pcdwba",
   pages = c(
+    Overview = "index.html",
     Implementation = "pcdwba-implementation.html",
     Theory = "pcdwba-theory.html"
   )
 )
 ```
 
+```{r pcdwba_overview, echo=FALSE, results='asis'}
+acousticTS:::.model_family_overview(
+  family = "pcdwba",
+  summary = paste(
+    "The phase-compensated distorted wave Born approximation (`PCDWBA`) is the",
+    "curved-body extension of the weak-scattering `DWBA`. It keeps the same",
+    "local fluid-like cylindrical kernel but corrects the along-body phase",
+    "accumulation for a bent centerline."
+  ),
+  core_idea = paste(
+    "Write the weak-scattering backscatter as a sum over local cross-sections",
+    "along a bent body, and retain the position- and tilt-dependent phase that",
+    "would be lost by treating the target as straight."
+  ),
+  best_for = c(
+    "Weakly scattering elongated targets with meaningful curvature",
+    "Bent zooplankton-like bodies parameterized by a centerline and local radius profile",
+    "Curved-body problems where a straight `DWBA` is too restrictive"
+  ),
+  supports = c(
+    "Canonical bent cylinders and arbitrary fluid-like centerline profiles",
+    "Weak-contrast notation relative to seawater as $g_{21}$ and $h_{21}$",
+    "Monostatic and phase-sensitive curved-body backscatter calculations"
+  ),
+  assumptions = c(
+    "Born-type weak-scattering regime",
+    "Curvature modifies phase bookkeeping but not the local weak-fluid kernel",
+    "Single scattering from an elongated fluid-like target"
+  ),
+  reading = c(
+    "[Implementation](pcdwba-implementation.html): object workflow and comparison results",
+    "[Theory](pcdwba-theory.html): bent-centerline parameterization and phase-compensated weak-scattering sum"
+  )
+)
+```
 

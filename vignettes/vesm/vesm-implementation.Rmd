@@ -17,13 +17,26 @@ vignette: >
 
 # acousticTS implementation
 
-<span class="model-tag experimental">Experimental</span> <span class="model-tag validated">Validated</span>
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  family = "vesm",
+  pages = c(
+    Overview = "index.html",
+    Implementation = "vesm-implementation.html",
+    Theory = "vesm-theory.html"
+  )
+)
+```
 
 The viscous-elastic spherical model is available through `target_strength(..., model = "vesms")`. The implementation is built on top of `ESS` objects so that the gas core and elastic shell are stored in the same object framework already used by the elastic-shelled sphere model. The additional viscous layer is then supplied through model arguments at run time.
 
 This page focuses on a single reproducible reference case that mirrors the original Khodabandeloo et al. (2021) Python workflow bundled in the local `ViscousElasticModel` directory. The goal is not to restate that code line by line. It is to show how the same layered target is built in `acousticTS`, how the model is called, and how closely the resulting spectrum matches the original implementation over a broader frequency range.
 
-# Building the reference object
+::: {.experiment data-title="Validation scope"}
+`VESMS` is benchmarked here against the original reference Python implementation over a dense frequency sweep. That is strong software-to-software validation for the documented spherical case, but it is still narrower than the older modal-series families with long-standing benchmark ladders.
+:::
+
+## Building the reference object
 
 The reference case uses:
 
@@ -50,9 +63,10 @@ radius_shell <- radius_gas + 0.02e-3
 shear_shell <- 0.2e6
 lambda_shell <- 2.4e9
 bulk_shell <- lambda_shell + 2 * shear_shell / 3
+sphere_shape <- sphere(radius_body = radius_shell, n_segments = 80)
 
 vesm_object <- ess_generate(
-  shape = "sphere",
+  shape = sphere_shape,
   radius_shell = radius_shell,
   shell_thickness = radius_shell - radius_gas,
   density_shell = 1040,
@@ -63,7 +77,7 @@ vesm_object <- ess_generate(
 )
 ```
 
-# Running the model
+## Running the model
 
 The original workflow retains the `m = 0, 1, 2` terms. In `acousticTS`, the corresponding setting is `m_limit = 2`. If no outer viscous radius is supplied, `VESMS` estimates it from the neutral-buoyancy relation described on the theory page.
 
@@ -93,7 +107,8 @@ The stored output includes:
 - the linear backscattering cross-section `sigma_bs`
 - target strength `TS`
 
-# Comparison to the original VESM implementation
+## Validation outputs
+### Comparison to the original VESM implementation
 
 For the implementation check below, the same reference geometry and material properties were run through:
 
@@ -111,7 +126,14 @@ After regenerating the benchmark against the current compiled `acousticTS` imple
 
 ```{r echo = FALSE}
 vesm_summary <- utils::read.csv(
-  file.path("..", "..", "scratch", "vesm_reference_compare_summary.csv")
+  file.path(
+    "..",
+    "..",
+    "tools",
+    "implementation-figures",
+    "data",
+    "vesm_reference_compare_summary.csv"
+  )
 )
 
 knitr::kable(
@@ -133,55 +155,28 @@ knitr::kable(
 
 The largest mismatch on this grid remains well below `0.1 dB`, and the mean absolute difference stays below `0.01 dB`. That is strong agreement for a layered modal-series model with complex viscous wave numbers and near-singular higher-order solves at some frequencies.
 
-## Spectrum overlay
+### Spectrum overlay
 
-```{r fig.width = 8, fig.height = 6}
-vesm_compare <- utils::read.csv(
-  file.path("..", "..", "scratch", "vesm_reference_compare.csv")
-)
-
-par(mfrow = c(2, 1), mar = c(4, 4.5, 2, 1), oma = c(0, 0, 0, 0))
-
-plot(
-  vesm_compare$frequency * 1e-3,
-  vesm_compare$TS_original,
-  type = "l",
-  lwd = 2.5,
-  col = "black",
-  xlab = "Frequency (kHz)",
-  ylab = expression(Target ~ strength ~ (dB ~ re. ~ 1 ~ m^2))
-)
-lines(
-  vesm_compare$frequency * 1e-3,
-  vesm_compare$TS_acousticts,
-  col = "#0b6e4f",
-  lwd = 2
-)
-legend(
-  "bottomleft",
-  legend = c("Original VESM", "acousticTS"),
-  col = c("black", "#0b6e4f"),
-  lwd = c(2.5, 2),
-  bty = "n"
-)
-
-plot(
-  vesm_compare$frequency * 1e-3,
-  vesm_compare$delta_TS,
-  type = "l",
-  lwd = 2,
-  col = "#a12a2a",
-  xlab = "Frequency (kHz)",
-  ylab = expression(Delta * TS ~ (dB))
-)
-abline(h = 0, lty = 2, col = "grey45")
+```{r echo=FALSE, out.width='85%', fig.align='center', fig.alt='Pre-rendered VESM comparison showing the original reference spectrum, the acousticTS spectrum, and the residual across frequency.'}
+knitr::include_graphics("vesm-reference-comparison.png")
 ```
 
 The upper panel shows that the two spectra are visually superposed across the full comparison band. The lower panel makes the small residual drift easier to see. In this case the largest difference occurs near `60 kHz` and reaches `0.05598 dB`, which remains small relative to the scale of the full spectrum.
 
-## A few explicit checkpoints
+### A few explicit checkpoints
 
 ```{r echo = FALSE}
+vesm_compare <- utils::read.csv(
+  file.path(
+    "..",
+    "..",
+    "tools",
+    "implementation-figures",
+    "data",
+    "vesm_reference_compare.csv"
+  )
+)
+
 checkpoint_df <- subset(
   vesm_compare,
   frequency %in% c(1000, 38000, 60000, 120000, 150000)
@@ -200,10 +195,10 @@ knitr::kable(
 )
 ```
 
-# Practical note on modal truncation
+## Practical note on modal truncation
 
 This comparison was run with `m_limit = 2` because that is the modal content retained by the original reference implementation used here. For exploratory work at larger acoustic size, `acousticTS` can retain more modes by increasing `m_limit` or by leaving it unspecified so the model uses its default frequency-dependent cutoff.
 
-# Closing note
+## Closing note
 
 The implementation check is useful because the viscous-elastic model is numerically more delicate than the simpler spherical modal-series models in the package. The agreement shown here reflects the current `acousticTS` implementation after the compiled VESMS backend and shared complex spherical-Bessel updates, and it indicates that the model is reproducing the intended layered-reference behavior across a meaningful frequency range rather than only at a few isolated checkpoints.

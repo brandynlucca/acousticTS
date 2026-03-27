@@ -19,7 +19,7 @@ vignette: >
 
 ```{r model_family_header, echo=FALSE, results='asis'}
 acousticTS:::.model_family_header(
-  status = c("benchmarked"),
+  family = "sphms",
   pages = c(
     Overview = "index.html",
     Implementation = "sphms-implementation.html",
@@ -40,8 +40,7 @@ The example below uses a gas-filled sphere so the same geometry can be reused fo
 library(acousticTS)
 
 sphere_shape <- sphere(
-  radius_body = 5e-3,
-  n_segments = 80
+  radius_body = 1e-3
 )
 
 gas_sphere <- gas_generate(
@@ -59,7 +58,7 @@ This setup is a good example of the geometry-versus-physics distinction that run
 ## Calculating a TS-frequency spectrum
 
 ```{r}
-frequency <- seq(18e3, 120e3, by = 6e3)
+frequency <- seq(1e3, 100e3, by = 1e3)
 
 gas_sphere <- target_strength(
   object = gas_sphere,
@@ -77,9 +76,8 @@ Model results can be extracted either visually or directly through `extract()`.
 
 ### Plotting results
 
-```{r fig.width = 6}
-plot(gas_sphere, type = "shape")
-plot(gas_sphere, type = "model")
+```{r echo=FALSE, out.width=c('49%','49%'), fig.align='center', fig.alt='Pre-rendered SPHMS example plots showing the spherical geometry and its stored gas-filled target-strength spectrum.'}
+knitr::include_graphics(c("sphms-shape-plot.png", "sphms-model-plot.png"))
 ```
 
 ### Accessing results
@@ -91,73 +89,21 @@ head(sphms_results)
 
 At this stage, readers should confirm that the returned output matches the intended spherical problem. A gas-filled run should usually look materially different from a rigid or pressure-release run of the same size, especially when the contrast is strong. This is also a good point to confirm that the frequency grid and reporting variables are the ones needed for the later comparison.
 
-## Comparing boundary conditions
+## Comparison workflows
+
+### Boundary conditions
 
 Because the geometry is fixed, boundary-condition comparisons are a clean way to understand what part of the response is due to the interface assumption rather than the size of the sphere itself.
 
-```{r fig.width = 8, fig.height = 4.5}
-rigid_sphere <- fls_generate(
-  shape = sphere_shape,
-  density_body = 1045,
-  sound_speed_body = 1520,
-  theta_body = pi / 2
-)
-
-pressure_release_sphere <- fls_generate(
-  shape = sphere_shape,
-  density_body = 1045,
-  sound_speed_body = 1520,
-  theta_body = pi / 2
-)
-
-rigid_sphere <- target_strength(
-  rigid_sphere,
-  frequency,
-  "sphms",
-  boundary = "fixed_rigid"
-)
-
-pressure_release_sphere <- target_strength(
-  pressure_release_sphere,
-  frequency,
-  "sphms",
-  boundary = "pressure_release"
-)
-
-ts_rigid <- extract(rigid_sphere, "model")$SPHMS
-ts_pressure_release <- extract(pressure_release_sphere, "model")$SPHMS
-ts_gas <- extract(gas_sphere, "model")$SPHMS
-
-par(oma = c(0, 0.25, 0, 0), mar = c(5, 6, 4, 2))
-plot(
-  x = ts_rigid$frequency * 1e-3,
-  y = ts_rigid$TS,
-  type = "l",
-  lty = 1,
-  lwd = 2.5,
-  xlab = "Frequency (kHz)",
-  ylab = expression(Target ~ strength ~ (dB ~ re. ~ 1 ~ m^2)),
-  cex.lab = 1.3,
-  cex.axis = 1.2
-)
-lines(x = ts_pressure_release$frequency * 1e-3, y = ts_pressure_release$TS, col = "royalblue4", lty = 1, lwd = 2.5)
-lines(x = ts_gas$frequency * 1e-3, y = ts_gas$TS, col = "firebrick3", lty = 1, lwd = 2.5)
-legend(
-  "bottomright",
-  legend = c("Fixed rigid", "Pressure release", "Gas filled"),
-  col = c("black", "royalblue4", "firebrick3"),
-  lwd = 2.5,
-  lty = c(1, 1, 1),
-  cex = 1.0,
-  bty = "n"
-)
+```{r echo=FALSE, out.width='85%', fig.align='center', fig.alt='Pre-rendered SPHMS boundary-condition comparison for the same sphere under fixed-rigid, pressure-release, and gas-filled assumptions.'}
+knitr::include_graphics("sphms-boundary-comparison.png")
 ```
 
 This comparison is especially helpful because it isolates the role of the boundary condition cleanly. The outer radius is the same in all three runs. What changes is the interface physics: suppressed normal motion, vanishing surface pressure, or a highly compressible gas-filled interior. That makes the resulting differences much easier to interpret than if geometry and boundary were changed simultaneously.
 
 For fluid-filled spheres, the same implementation pattern applies; the main change is the selected `boundary` and the interior material properties. In practical SPHMS work, the first controls to revisit are usually the sphere radius, the selected boundary condition, and the medium-to-interior contrasts, because those are the inputs that determine the modal coefficient problem most directly.
 
-## Benchmark comparisons
+### Benchmark comparisons
 
 SPHMS can be compared directly against the Jech benchmark definitions stored in `benchmark_ts`. The summary below uses the full spherical benchmark grid. Elapsed times are representative values from the current machine rather than universal expectations.
 
@@ -170,6 +116,19 @@ SPHMS can be compared directly against the Jech benchmark definitions stored in 
 
 All four spherical boundary types remain very close to the benchmark family over the full grid, with the current implementation staying within about 0.005 dB in the worst case.
 
+### Cross-software implementation checks
+
+For the penetrable spherical cases, the current `acousticTS` implementation can also be checked directly against the locally available `KRMr` and `echoSMs` sphere solvers. Those checks serve a different purpose from the Jech benchmark table above: they verify that the software implementations agree when they are solving the same penetrable spherical problem, rather than only asking how closely any one implementation tracks the benchmark family.
+
+| Boundary | Comparison | Mean abs. delta TS (dB) | Max abs. delta TS (dB) |
+|:--|:--|--:|--:|
+| `gas_filled` | `acousticTS` vs `KRMr` | 3.21e-14 | 2.21e-12 |
+| `gas_filled` | `acousticTS` vs `echoSMs` | 1.71e-13 | 1.52e-11 |
+| `liquid_filled` | `acousticTS` vs `KRMr` | 5.70e-12 | 1.30e-10 |
+| `liquid_filled` | `acousticTS` vs `echoSMs` | 3.68e-11 | 3.37e-09 |
+
+Those values show that the penetrable SPHMS branches are effectively identical across the three implementations on the shared spherical definitions. In other words, the small residuals reported against the benchmark family above are not an `acousticTS`-specific artifact. They are shared by the matched software implementations solving the same gas-filled and liquid-filled sphere problems.
+
 SPHMS does expose one additional numerical control, `m_limit`, so it is worth checking how aggressively the modal cap can be reduced before the liquid-filled benchmark fit starts to move. The table below keeps the same weakly scattering liquid-filled benchmark and only changes that truncation cap.
 
 | Boundary | `m_limit` | Max abs. delta TS (dB) | Mean abs. delta TS (dB) | Elapsed (s) |
@@ -179,4 +138,3 @@ SPHMS does expose one additional numerical control, `m_limit`, so it is worth ch
 | `liquid_filled` | `10` | 58.24225 | 8.07819 | 0.02 |
 
 That pattern is useful because it shows that SPHMS is not especially tolerant of aggressive modal under-truncation, even though the wall-clock time can drop. The benchmarked spherical branches therefore do not need the same kind of configuration matrix as PSMS. Boundary choice is the main physical switch, and `m_limit` is best treated as a guarded numerical override rather than as a routine tuning knob.
-

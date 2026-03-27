@@ -19,7 +19,7 @@ vignette: >
 
 ```{r model_family_header, echo=FALSE, results='asis'}
 acousticTS:::.model_family_header(
-  status = c("benchmarked"),
+  family = "hpa",
   pages = c(
     Overview = "index.html",
     Implementation = "hpa-implementation.html",
@@ -40,8 +40,6 @@ In a full boundary-value formulation, the same problem would be represented eith
 
 The HPA is built from three pieces. The low-frequency branch is the Rayleigh numerator proportional to $(ka)^4\alpha_\pi^2$. The large-$ka$ behavior is controlled by a bounded denominator scaled by interface reflection. The Stanton corrections $\mathcal{F}$ and $\mathcal{G}$ modify those leading limits without turning the model into a full boundary-value solution.
 
-![HPA geometry factors for spheres, prolate spheroids, straight cylinders, and bent cylinders.](hpa-geometry-factors.svg)
-
 Geometry enters through distinct bookkeeping for each shape family. A sphere uses a single radius scale. A prolate spheroid uses the corresponding spheroidal size factor. A straight cylinder combines the transverse size parameter $Ka$ with the finite-length directivity factor $s$. A bent cylinder replaces that straight-axis factor with the curvature term $\mathcal{H}$. The HPA family is therefore not one equation with minor symbol changes, but a set of related asymptotic forms with different geometric bookkeeping.
 
 # Low-frequency scattering ingredients
@@ -51,9 +49,9 @@ Geometry enters through distinct bookkeeping for each shape family. A sphere use
 Let the surrounding medium be labeled 1 and the scatterer 2. Define the density and sound-speed contrasts by:
 
 $$
-  g = \frac{\rho_2}{\rho_1},
+  g_{21} = \frac{\rho_2}{\rho_1},
   \qquad
-  h = \frac{c_2}{c_1}.
+  h_{21} = \frac{c_2}{c_1}.
 $$
 
 These are the two material ratios that enter the long-wavelength expansion for a fluid-like body. In the HPA they appear only through low-frequency contrast coefficients and through the reflection coefficient used to control the high-frequency scale. That is one reason the model remains compact: it does not attempt to carry the full spatial structure of the exact boundary-value solution.
@@ -63,7 +61,7 @@ These are the two material ratios that enter the long-wavelength expansion for a
 At sufficiently large acoustic size, the dominant contribution is associated with reflection from the body surface. The normal-incidence reflection coefficient is therefore introduced as:
 
 $$
-  \mathcal{R} = \frac{gh - 1}{gh + 1}.
+  \mathcal{R} = \frac{g_{21}h_{21} - 1}{g_{21}h_{21} + 1}.
 $$
 
 This quantity appears in the denominator of the HPA because the high-frequency asymptote is governed by interface reflection rather than by the small-contrast polarizability term that controls the Rayleigh regime. The reflection coefficient is therefore not a small-$ka$ ingredient. It is the scale-setting quantity that keeps the large-$ka$ response physically bounded.
@@ -75,13 +73,13 @@ In the low-frequency limit, the scattering amplitude of a weakly contrasting bod
 For a sphere, the material coefficient multiplying that low-frequency term is:
 
 $$
-  \alpha_{\pi s} = \frac{1 - gh^2}{3gh^2} + \frac{1 - g}{1 + 2g}.
+  \alpha_{\pi s} = \frac{1 - g_{21}h_{21}^2}{3g_{21}h_{21}^2} + \frac{1 - g_{21}}{1 + 2g_{21}}.
 $$
 
 For a cylinder, and more generally for elongated bodies in the cylindrical limit, the corresponding coefficient is:
 
 $$
-  \alpha_{\pi c} = \frac{1 - gh^2}{2gh^2} + \frac{1 - g}{1 + g}.
+  \alpha_{\pi c} = \frac{1 - g_{21}h_{21}^2}{2g_{21}h_{21}^2} + \frac{1 - g_{21}}{1 + g_{21}}.
 $$
 
 These coefficients arise by expanding the boundary conditions for weak contrast and retaining the leading backscattering contribution to the scattered field. Their role is specific to the Rayleigh regime. They say how strongly the body departs from the surrounding medium when the acoustic wavelength is large compared with the target dimensions.
@@ -105,7 +103,7 @@ Johnson (1977)[^1] introduced the simplest rational completion of that numerator
 
 $$
   \sigma_\text{bs} =
-  \frac{a^2 (ka)^4 \alpha_{\pi s}^2}{1 + \tfrac{3}{2}(ka)^4}.
+    \frac{a^2 (ka)^4 \alpha_{\pi s}^2}{1 + \tfrac{3}{2}(ka)^4}.
 $$
 
 The derivation is not an exact resummation of the full modal series. Rather, it is a two-limit construction. The numerator enforces the Rayleigh law, while the denominator suppresses the nonphysical growth that would occur if the $(ka)^4$ term were extrapolated to large argument. That is the central idea behind the model and the reason the term "approximation" has to be taken seriously here: the HPA is deliberately shaped to match limiting behavior, not to reproduce every intermediate-frequency feature of an exact solution.
@@ -144,7 +142,7 @@ Stanton (1989)[^3] extended the same logic to a broader class of shapes by match
 
 Two multiplicative functions are introduced: $\mathcal{F}$ and $\mathcal{G}$. $\mathcal{F}$ modifies the denominator and therefore controls the transition between the Rayleigh and large-$ka$ regimes. $\mathcal{G}$ adjusts the numerator to account for destructive-interference minima and shape-dependent departures from the simplest interpolation.
 
-These terms are phenomenological. They do not arise from the first few algebraic steps of the governing differential equation. They enter after the asymptotic structure has already been identified. Readers should therefore interpret them as correction factors layered onto the asymptotic backbone, not as exact modal quantities with independent physical meaning at the same level as $g$, $h$, or $\mathcal{R}$.
+These terms are phenomenological. They do not arise from the first few algebraic steps of the governing differential equation. They enter after the asymptotic structure has already been identified. Readers should therefore interpret them as correction factors layered onto the asymptotic backbone, not as exact modal quantities with independent physical meaning at the same level as $g_{21}$, $h_{21}$, or $\mathcal{R}$.
 
 ## Spherical form
 
@@ -152,8 +150,8 @@ For a sphere, the generalized expression from Stanton (1989)[^3] is:
 
 $$
   \sigma_\text{bs} =
-  \frac{a^2 (ka)^4 \alpha_{\pi s}^2 \mathcal{G}}{
-    1 + \dfrac{4(ka)^4 \alpha_{\pi s}^2}{\mathcal{R}^2 \mathcal{F}}
+    \frac{a^2 (ka)^4 \alpha_{\pi s}^2 \mathcal{G}}{
+  1 + \dfrac{4(ka)^4 \alpha_{\pi s}^2}{\mathcal{R}^2 \mathcal{F}}
   }.
 $$
 
@@ -165,8 +163,8 @@ For a prolate spheroid of total length $L$, the corresponding formula is:
 
 $$
   \sigma_\text{bs} =
-  \frac{\tfrac{1}{9}L^2 (ka)^4 \alpha_{\pi c}^2 \mathcal{G}}{
-    1 + \dfrac{\tfrac{16}{9}(ka)^4 \alpha_{\pi c}^2}{\mathcal{R}^2 \mathcal{F}}
+    \frac{\tfrac{1}{9}L^2 (ka)^4 \alpha_{\pi c}^2 \mathcal{G}}{
+  1 + \dfrac{\tfrac{16}{9}(ka)^4 \alpha_{\pi c}^2}{\mathcal{R}^2 \mathcal{F}}
   }.
 $$
 
@@ -190,8 +188,8 @@ The resulting cross-section is:
 
 $$
   \sigma_\text{bs} =
-  \frac{\tfrac{1}{4}L^2 (Ka)^4 \alpha_{\pi c}^2 s^2 \mathcal{G}}{
-    1 + \dfrac{\pi (Ka)^3 \alpha_{\pi c}^2}{\mathcal{R}^2 \mathcal{F}}
+    \frac{\tfrac{1}{4}L^2 (Ka)^4 \alpha_{\pi c}^2 s^2 \mathcal{G}}{
+  1 + \dfrac{\pi (Ka)^3 \alpha_{\pi c}^2}{\mathcal{R}^2 \mathcal{F}}
   }.
 $$
 
@@ -210,8 +208,8 @@ This yields:
 
 $$
   \sigma_\text{bs} =
-  \frac{\tfrac{1}{4}L^2 (ka)^4 \alpha_{\pi c}^2 \mathcal{H}^2 \mathcal{G}}{
-    1 + \dfrac{L^2 (ka)^4 \alpha_{\pi c}^2 \mathcal{H}^2}{\rho_c a \, \mathcal{R}^2 \mathcal{F}}
+    \frac{\tfrac{1}{4}L^2 (ka)^4 \alpha_{\pi c}^2 \mathcal{H}^2 \mathcal{G}}{
+  1 + \dfrac{L^2 (ka)^4 \alpha_{\pi c}^2 \mathcal{H}^2}{\rho_c a \, \mathcal{R}^2 \mathcal{F}}
   }.
 $$
 
