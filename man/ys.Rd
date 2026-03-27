@@ -73,7 +73,7 @@ ys(0.5, 3)
 ys(0, c(1, 2, 3))
 
 # Singularity at origin
-ys(0, 0)  # Returns -Inf
+ys(0, 0) # Returns -Inf
 
 # First derivative
 ysdk(1, 2, 1)

@@ -83,7 +83,7 @@ hcdk(1, 2, 1)
 hcdk(1, 2, 2)
 
 # k-th derivative
-hcdk(1, 2, 3)  # Third derivative
+hcdk(1, 2, 3) # Third derivative
 
 }
 \references{

@@ -91,7 +91,7 @@ yc(1, 1i)
 yc(2, 3i)
 
 # Singularity at origin
-yc(0, 0)  # Returns -Inf
+yc(0, 0) # Returns -Inf
 
 # First derivative
 ycdk(1, 2, 1)
