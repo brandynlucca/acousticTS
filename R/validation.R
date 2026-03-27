@@ -167,9 +167,16 @@
   provided <- !vapply(inputs, is.null, logical(1))
 
   if (sum(provided) < min_required) {
+    # Preserve the historical "At least two ..." wording used in public errors
+    min_required_label <- if (identical(min_required, 2L) ||
+                              identical(min_required, 2)) {
+      "two"
+    } else {
+      as.character(min_required)
+    }
     msg <- sprintf(
-      "At least %d elasticity moduli values are required",
-      min_required
+      "At least %s elasticity moduli values are required",
+      min_required_label
     )
     if (!is.null(param_name)) {
       msg <- paste(msg, "to calculate", param_name)
