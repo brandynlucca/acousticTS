@@ -1,25 +1,57 @@
-if (file.exists("DESCRIPTION")) {
-  repo_root <- normalizePath(".", winslash = "/", mustWork = TRUE)
-} else {
+find_repo_root <- function(start_dir) {
+  search_dir <- normalizePath(start_dir, winslash = "/", mustWork = FALSE)
+
+  while (nzchar(search_dir) && dir.exists(search_dir)) {
+    desc_path <- file.path(search_dir, "DESCRIPTION")
+    manifest_path <- file.path(
+      search_dir,
+      "tools",
+      "implementation-figures",
+      "manifest.csv"
+    )
+    if (file.exists(desc_path) && file.exists(manifest_path)) {
+      return(normalizePath(search_dir, winslash = "/", mustWork = TRUE))
+    }
+
+    parent_dir <- dirname(search_dir)
+    if (identical(parent_dir, search_dir)) {
+      break
+    }
+    search_dir <- parent_dir
+  }
+
+  NULL
+}
+
+repo_root <- find_repo_root(getwd())
+
+if (is.null(repo_root)) {
+  workspace <- Sys.getenv("GITHUB_WORKSPACE", unset = "")
+  if (nzchar(workspace)) {
+    repo_root <- find_repo_root(workspace)
+  }
+}
+
+if (is.null(repo_root)) {
   script_arg <- commandArgs(trailingOnly = FALSE)
   script_file <- sub(
     "^--file=",
     "",
     script_arg[grep("^--file=", script_arg)][1]
   )
-  if (is.na(script_file) || !nzchar(script_file)) {
-    script_file <- file.path(
-      "tools",
-      "implementation-figures",
-      "resolve_changed_families.R"
-    )
+  if (!is.na(script_file) && nzchar(script_file)) {
+    repo_root <- find_repo_root(dirname(script_file))
   }
-  repo_root <- normalizePath(
-    file.path(dirname(script_file), "..", ".."),
-    winslash = "/",
-    mustWork = FALSE
+}
+
+if (is.null(repo_root)) {
+  stop(
+    "Could not locate the acousticTS repository root from the current ",
+    "working directory or workflow environment.",
+    call. = FALSE
   )
 }
+
 setwd(repo_root)
 
 manifest <- utils::read.csv(

@@ -57,15 +57,26 @@ jobs:
           brew update
           brew install gcc
 
-      - name: Configure macOS Fortran compiler
+      - name: Configure macOS GNU toolchain
         if: runner.os == 'macOS'
         run: |
+          GXX=$(ls /opt/homebrew/bin/g++-* 2>/dev/null | sort -V | tail -1)
           GFORTRAN=$(ls /opt/homebrew/bin/gfortran-* 2>/dev/null | sort -V | tail -1)
+          if [ -z "$GXX" ]; then
+            GXX=$(ls /usr/local/bin/g++-* 2>/dev/null | sort -V | tail -1)
+          fi
           if [ -z "$GFORTRAN" ]; then
             GFORTRAN=$(ls /usr/local/bin/gfortran-* 2>/dev/null | sort -V | tail -1)
           fi
+          GCC=${GXX/g++/gcc}
           mkdir -p ~/.R
           {
+            echo "CC=$GCC"
+            echo "CXX=$GXX"
+            echo "CXX11=$GXX"
+            echo "CXX14=$GXX"
+            echo "CXX17=$GXX"
+            echo "CXX17STD=-std=gnu++17"
             echo "FC=$GFORTRAN"
             echo "F77=$GFORTRAN"
           } >> ~/.R/Makevars

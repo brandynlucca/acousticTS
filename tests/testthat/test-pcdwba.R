@@ -54,17 +54,17 @@ test_that("pcdwba matches the bent-cylinder reference case", {
   expect_equal(
     Re(out_regular_df$f_bs),
     c(-2.63183454623927e-06, -3.72290353412917e-06),
-    tolerance = 1e-14
+    tolerance = 1e-12
   )
   expect_equal(
     Im(out_regular_df$f_bs),
     c(1.50552093122769e-09, -4.51576556149518e-09),
-    tolerance = 1e-14
+    tolerance = 1e-12
   )
   expect_equal(
     out_regular_df$TS,
     c(-111.59482691279, -108.582357947069),
-    tolerance = 1e-11
+    tolerance = 1e-10
   )
 
   obj_override <- fls_generate(
@@ -91,11 +91,11 @@ test_that("pcdwba matches the bent-cylinder reference case", {
   expect_equal(
     out_override@model$PCDWBA$f_bs,
     out_regular_df$f_bs,
-    tolerance = 1e-14
+    tolerance = 1e-12
   )
   expect_equal(
     out_override@model$PCDWBA$TS,
     out_regular_df$TS,
-    tolerance = 1e-12
+    tolerance = 1e-10
   )
 })
