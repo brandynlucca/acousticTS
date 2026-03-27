@@ -22,6 +22,8 @@ jobs:
           - {name: 'ubuntu-latest (devel)', r: 'devel', clang: false, experimental: true}
           - {name: 'ubuntu-clang (release)', r: 'release', clang: true, experimental: false}
           - {name: 'ubuntu-clang (devel)', r: 'devel', clang: true, experimental: true}
+          - {name: 'windows-latest (devel)', r: 'devel', clang: false, experimental: true, os: 'windows-latest'}
+          - {name: 'ubuntu-latest (no-suggests)', r: 'release', clang: false, experimental: false, _R_CHECK_DEPENDS_ONLY_: true}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -51,6 +53,11 @@ jobs:
       - name: Configure clang toolchain
         if: matrix.config.clang
         run: |
+          GCC_INCLUDE=$(gcc -print-file-name=include)
+          GFORTRAN_LIB=$(gfortran -print-file-name=libgfortran.a)
+          QUADMATH_LIB=$(gfortran -print-file-name=libquadmath.a)
+          GFORTRAN_LIBDIR=$(dirname "$GFORTRAN_LIB")
+          QUADMATH_LIBDIR=$(dirname "$QUADMATH_LIB")
           mkdir -p ~/.R
           cat > ~/.R/Makevars <<'EOF'
           CC=clang
@@ -62,6 +69,10 @@ jobs:
           FC=gfortran
           F77=gfortran
           EOF
+          {
+            echo "PKG_CPPFLAGS=-I$GCC_INCLUDE"
+            echo "PKG_LIBS+=-L$GFORTRAN_LIBDIR -L$QUADMATH_LIBDIR"
+          } >> ~/.R/Makevars
         shell: bash
 
       - uses: r-lib/actions/setup-r-dependencies@v2

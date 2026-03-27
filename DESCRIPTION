@@ -84,7 +84,6 @@ Collate:
     'model-soems.R'
     'model-sphms.R'
     'model-trcm.R'
-    'pkg-docs.R'
     'validation-registry.R'
     'pkgdown-helpers.R'
     'scatterer.R'

@@ -13,7 +13,7 @@
 // toolchains that do not provide __float128 or libquadmath.
 #ifndef ACOUSTICTS_HAVE_QUADMATH
 #if defined(__has_include)
-#if __has_include(<quadmath.h>)
+#if __has_include(<quadmath.h>) && defined(__SIZEOF_FLOAT128__)
 #define ACOUSTICTS_HAVE_QUADMATH 1
 #else
 #define ACOUSTICTS_HAVE_QUADMATH 0
