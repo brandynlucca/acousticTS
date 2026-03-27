@@ -7,6 +7,9 @@ output:
     fig_caption: yes
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{Running target strength models}
   %\VignetteEncoding{UTF-8}
@@ -15,7 +18,11 @@ vignette: >
 
 # Introduction
 
-Model execution in `acousticTS` is organized around the target object rather than around detached parameter tables. A model reads the scatterer geometry and properties, applies a chosen theoretical or approximate formulation, and stores the resulting outputs back onto the object.
+The execution patterns shown here are designed to make it easy to reproduce the same kinds of spectra and angle-series comparisons reported in benchmark and software papers [@jech_etal_2015; @gastauer_zooscatrspan_2019].
+
+
+
+Model execution in acousticTS is organized around the target object rather than around detached parameter tables. A model reads the scatterer geometry and properties, applies a chosen theoretical or approximate formulation, and stores the resulting outputs back onto the object.
 
 This article is the practical bridge between object construction and result interpretation. It does not try to explain the derivation of any one model. Instead, it explains how model calls are structured, how multiple models can be run on the same object, and how to interpret the stored output consistently.
 

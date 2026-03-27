@@ -31,7 +31,7 @@
     .normalize_simulation_models(names(.get_models())))]
   if (length(unexpected_model) > 0) {
     stop(
-      "The following user-defined models are not supported by `acousticTS`: ",
+      "The following user-defined models are not supported by acousticTS: ",
       paste(unexpected_model, collapse = ", ")
     )
   }

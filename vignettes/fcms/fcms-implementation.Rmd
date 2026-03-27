@@ -9,6 +9,9 @@ output:
     fig_height: 3.5
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{FCMS implementation}
   %\VignetteEncoding{UTF-8}
@@ -28,7 +31,10 @@ acousticTS:::.model_family_header(
 )
 ```
 
-The `acousticTS` package uses object-based scatterers, so the FCMS workflow follows the same broad pattern used elsewhere in the package: construct a geometry, attach the material properties needed for a cylindrical scatterer, evaluate target strength over the frequencies of interest, and then inspect how the result changes when the physically important assumptions are changed. For FCMS, the most important assumptions are usually the cylinder radius, cylinder length, orientation, and the boundary condition used to represent the cylinder interior.
+
+These pages follow the finite-cylinder modal-series literature for straight circular cylinders near broadside [@stanton_sound_1988; @stanton_sound_1989].
+
+The acousticTS package uses object-based scatterers, so the FCMS workflow follows the same broad pattern used elsewhere in the package: construct a geometry, attach the material properties needed for a cylindrical scatterer, evaluate target strength over the frequencies of interest, and then inspect how the result changes when the physically important assumptions are changed. For FCMS, the most important assumptions are usually the cylinder radius, cylinder length, orientation, and the boundary condition used to represent the cylinder interior.
 
 The point of this implementation page is therefore not just to show which commands run. It is to show how the model is set up in a way that remains interpretable. A reader should be able to look at the input object and understand what geometric and material assumptions were actually passed into the FCMS calculation.
 
@@ -126,16 +132,16 @@ The pressure-release and gas-filled cases remain very close to the benchmark fam
 
 ### Cross-software implementation checks
 
-The same four cylindrical boundary definitions were also compared directly against the locally available `echoSMs` finite-cylinder implementation. This check serves a different purpose from the benchmark table above. It asks whether the software implementations agree with each other on the same finite-cylinder problem, and whether the remaining benchmark residual is shared rather than unique to `acousticTS`.
+The same four cylindrical boundary definitions were also compared directly against the locally available `echoSMs` finite-cylinder implementation. This check serves a different purpose from the benchmark table above. It asks whether the software implementations agree with each other on the same finite-cylinder problem, and whether the remaining benchmark residual is shared rather than unique to acousticTS.
 
-| Boundary | Mean abs. delta `acousticTS` vs `echoSMs` (dB) | Max abs. delta `acousticTS` vs `echoSMs` (dB) | Mean abs. delta `echoSMs` vs benchmark (dB) | Max abs. delta `echoSMs` vs benchmark (dB) |
+| Boundary | Mean abs. delta acousticTS vs `echoSMs` (dB) | Max abs. delta acousticTS vs `echoSMs` (dB) | Mean abs. delta `echoSMs` vs benchmark (dB) | Max abs. delta `echoSMs` vs benchmark (dB) |
 |:--|--:|--:|--:|--:|
 | `fixed_rigid` | 7.14e-09 | 1.64e-07 | 0.00914 | 0.19454 |
 | `pressure_release` | 6.97e-09 | 1.59e-07 | 0.00263 | 0.00780 |
 | `gas_filled` | 6.96e-09 | 1.59e-07 | 0.00245 | 0.00499 |
 | `liquid_filled` | 4.36e-09 | 2.62e-07 | 0.00512 | 0.11453 |
 
-The key point is that `acousticTS` and `echoSMs` collapse onto the same FCMS spectra to practical machine precision across all four boundary types. That means the larger fixed-rigid and liquid-filled benchmark residuals reported above are shared against the benchmark curve rather than being a disagreement between the two software implementations.
+The key point is that acousticTS and `echoSMs` collapse onto the same FCMS spectra to practical machine precision across all four boundary types. That means the larger fixed-rigid and liquid-filled benchmark residuals reported above are shared against the benchmark curve rather than being a disagreement between the two software implementations.
 
 The main additional numerical switch in FCMS is `m_limit`, so the natural follow-up check is the same one used for SPHMS: hold the liquid-filled benchmark definition fixed and inspect how strongly the benchmark fit depends on a reduced modal cap.
 

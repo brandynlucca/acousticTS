@@ -9,6 +9,9 @@ output:
     fig_height: 3.5
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{Combining Scattering Components}
   %\VignetteEncoding{UTF-8}
@@ -16,6 +19,10 @@ vignette: >
 ---
 
 # Introduction
+
+Component combination becomes most important in fish-like targets where anatomically distinct regions scatter in different regimes [@clay_horne_1994; @gorska_etal_2005; @stanton_acoustic_1996].
+
+
 
 It is often tempting to build a composite target by running two canonical models separately and then combining the results. In a few restricted cases, that can be a useful first approximation. In many others, it fails for exactly the reasons that make scattering a wave problem rather than a bookkeeping exercise. The issue is not simply that there are several subcomponents. The issue is that the total response depends on how those components share phase, how they are positioned relative to one another, and whether they are weakly interacting enough that isolated calculations remain meaningful.
 
@@ -206,7 +213,7 @@ In practice, this means the reported `TS` should first be converted back to a li
 
 # Connection to package workflows
 
-This cautionary logic is exactly why `acousticTS` distinguishes between comparing models and combining components. Comparing models asks how different formulations behave on the same target. Combining components asks whether separate subtargets can be turned into one composite prediction. Those are not interchangeable tasks. A model-comparison workflow can often be rigorous with matched inputs, while a component-combination workflow usually requires much stronger physical assumptions.
+This cautionary logic is exactly why acousticTS distinguishes between comparing models and combining components. Comparing models asks how different formulations behave on the same target. Combining components asks whether separate subtargets can be turned into one composite prediction. Those are not interchangeable tasks. A model-comparison workflow can often be rigorous with matched inputs, while a component-combination workflow usually requires much stronger physical assumptions.
 
 # Final rule
 

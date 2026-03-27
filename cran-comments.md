@@ -22,7 +22,7 @@
     * gcc15
 
 ## Note on R-devel
-* Some additional experimental R-devel environments encountered upstream dependency installation failures under the current R-devel toolchain, not failures in `acousticTS` itself.
+* Some additional experimental R-devel environments encountered upstream dependency installation failures under the current R-devel toolchain, not failures in acousticTS itself.
 
 ## Reverse dependencies
 

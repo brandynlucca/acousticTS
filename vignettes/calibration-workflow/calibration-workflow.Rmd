@@ -7,6 +7,9 @@ output:
     fig_caption: yes
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{Calibration workflow}
   %\VignetteEncoding{UTF-8}
@@ -14,6 +17,10 @@ vignette: >
 ---
 
 # Introduction
+
+This workflow is designed around the standard-target calibration literature for elastic reference spheres [@dragonette_calibration_1981; @foote_spheres_1990; @maclennan_theory_1981].
+
+
 
 The package already contains substantial theory for calibration spheres. This page is the practical counterpart. Its purpose is to show how calibration-related objects and model outputs fit into an actual user workflow, and why calibration targets should not be treated as though they were just another convenient canonical scatterer.
 

@@ -7,6 +7,9 @@ output:
     fig_caption: yes
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{Comparing models on the same target}
   %\VignetteEncoding{UTF-8}
@@ -15,7 +18,11 @@ vignette: >
 
 # Introduction
 
-One of the strongest uses of `acousticTS` is not simply running a single model, but asking how several models behave on the same target description. That is often the clearest way to separate geometric effects from boundary-condition effects and approximation effects. A well-designed comparison can show whether two models are telling the same physical story in different mathematical languages or whether they are diverging because they are built for genuinely different regimes.
+Cross-model comparison is most informative when the candidate families are read against broader reviews and inter-model benchmark studies [@jech_etal_2015; @stanton_acoustic_1996].
+
+
+
+One of the strongest uses of acousticTS is not simply running a single model, but asking how several models behave on the same target description. That is often the clearest way to separate geometric effects from boundary-condition effects and approximation effects. A well-designed comparison can show whether two models are telling the same physical story in different mathematical languages or whether they are diverging because they are built for genuinely different regimes.
 
 At the same time, model comparison is easy to do badly. If two models are run on different geometries, different frequency grids, different material assumptions, or different reporting quantities, the resulting curves may still be interesting, but they no longer isolate model behavior alone. At that point the comparison has become a mixture of model differences and setup differences, which is a much harder thing to interpret honestly.
 

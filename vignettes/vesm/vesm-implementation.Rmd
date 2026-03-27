@@ -9,6 +9,9 @@ output:
     fig_height: 3.5
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{Viscous-elastic spherical scattering model}
   %\VignetteEncoding{UTF-8}
@@ -28,12 +31,15 @@ acousticTS:::.model_family_header(
 )
 ```
 
+
+These pages are motivated by layered gas-bearing fish scattering models and viscous resonance broadening [@khodabandeloo_estimating_2021; @feuillade_nero_1998].
+
 The viscous-elastic spherical model is available through `target_strength(..., model = "vesms")`. The implementation is built on top of `ESS` objects so that the gas core and elastic shell are stored in the same object framework already used by the elastic-shelled sphere model. The additional viscous layer is then supplied through model arguments at run time.
 
-This page focuses on a single reproducible reference case that mirrors the original Khodabandeloo et al. (2021) Python workflow bundled in the local `ViscousElasticModel` directory. The goal is not to restate that code line by line. It is to show how the same layered target is built in `acousticTS`, how the model is called, and how closely the resulting spectrum matches the original implementation over a broader frequency range.
+This page focuses on a single reproducible reference case that implemented the model presented by Khodabandeloo et al. (2021) in Python. The goal is not to restate that code line by line. It is to show how the same layered target is built in acousticTS, how the model is called, and how closely the resulting spectrum matches the original implementation over a broader frequency range.
 
 ::: {.experiment data-title="Validation scope"}
-`VESMS` is benchmarked here against the original reference Python implementation over a dense frequency sweep. That is strong software-to-software validation for the documented spherical case, but it is still narrower than the older modal-series families with long-standing benchmark ladders.
+`VESMS` is benchmarked here against a reference Python implementation over a dense frequency sweep. That is strong across-language validation for the documented spherical case, but it is still narrower than the older modal-series families with long-standing benchmark ladders. Moreover, both implementations were authored by the same individual.
 :::
 
 ## Building the reference object
@@ -79,7 +85,7 @@ vesm_object <- ess_generate(
 
 ## Running the model
 
-The original workflow retains the `m = 0, 1, 2` terms. In `acousticTS`, the corresponding setting is `m_limit = 2`. If no outer viscous radius is supplied, `VESMS` estimates it from the neutral-buoyancy relation described on the theory page.
+The original workflow retains the `m = 0, 1, 2` terms. In acousticTS, the corresponding setting is `m_limit = 2`. If no outer viscous radius is supplied, `VESMS` estimates it from the neutral-buoyancy relation described on the theory page.
 
 ```{r}
 frequency <- seq(1e3, 150e3, by = 1e3)
@@ -113,16 +119,16 @@ The stored output includes:
 For the implementation check below, the same reference geometry and material properties were run through:
 
 - `acousticTS::VESMS`
-- the original Python VESM implementation from the local `ViscousElasticModel` source
+- bespoke Python implementation
 
 The comparison uses a shared `1-150 kHz` grid with `1 kHz` spacing and the same retained modal orders (`m = 0, 1, 2`).
 
-After regenerating the benchmark against the current compiled `acousticTS` implementation, the reference case gives:
+After regenerating the benchmark against the current compiled acousticTS implementation, the reference case gives:
 
 - max abs. delta TS = `0.05598 dB`
 - mean abs. delta TS = `0.00885 dB`
 - frequency at max abs. delta = `60 kHz`
-- elapsed time = `0.79 s` for `acousticTS` and `0.98 s` for the original Python implementation
+- elapsed time = `0.79 s` for acousticTS and `0.98 s` for the Python implementation
 
 ```{r echo = FALSE}
 vesm_summary <- utils::read.csv(
@@ -142,13 +148,13 @@ knitr::kable(
   col.names = c(
     "Comparison",
     "N frequency",
-    "f min (kHz)",
-    "f max (kHz)",
-    "Max abs. delta TS (dB)",
-    "Mean abs. delta TS (dB)",
-    "f at max delta (kHz)",
+    "$f$ min (kHz)",
+    "$f$ max (kHz)",
+    "Max $| \\Delta |~\\textit{TS}$ (dB)",
+    "Mean $| \\Delta |~\\textit{TS}$ (dB)",
+    "$f$ at max $| \\Delta |~\\textit{TS}$ (kHz)",
     "acousticTS elapsed (s)",
-    "Original elapsed (s)"
+    "Python elapsed (s)"
   )
 )
 ```
@@ -188,8 +194,8 @@ knitr::kable(
   col.names = c(
     "Frequency (Hz)",
     "acousticTS TS (dB)",
-    "Original TS (dB)",
-    "Delta TS (dB)",
+    "Python TS (dB)",
+    "$\\Delta~\\textit{TS}$ (dB)",
     "Abs. delta TS (dB)"
   )
 )
@@ -197,8 +203,8 @@ knitr::kable(
 
 ## Practical note on modal truncation
 
-This comparison was run with `m_limit = 2` because that is the modal content retained by the original reference implementation used here. For exploratory work at larger acoustic size, `acousticTS` can retain more modes by increasing `m_limit` or by leaving it unspecified so the model uses its default frequency-dependent cutoff.
+This comparison was run with `m_limit = 2` because that is the modal content retained by the original reference implementation used here. For exploratory work at larger acoustic size, acousticTS can retain more modes by increasing `m_limit` or by leaving it unspecified so the model uses its default frequency-dependent cutoff.
 
 ## Closing note
 
-The implementation check is useful because the viscous-elastic model is numerically more delicate than the simpler spherical modal-series models in the package. The agreement shown here reflects the current `acousticTS` implementation after the compiled VESMS backend and shared complex spherical-Bessel updates, and it indicates that the model is reproducing the intended layered-reference behavior across a meaningful frequency range rather than only at a few isolated checkpoints.
+The implementation check is useful because the viscous-elastic model is numerically more delicate than the simpler spherical modal-series models in the package. The agreement shown here reflects the current acousticTS implementation after the compiled VESMS backend and shared complex spherical-Bessel updates, and it indicates that the model is reproducing the intended layered-reference behavior across a meaningful frequency range rather than only at a few isolated checkpoints.

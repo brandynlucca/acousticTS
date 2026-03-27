@@ -7,6 +7,9 @@ output:
     fig_caption: yes
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{FAQ and Troubleshooting}
   %\VignetteEncoding{UTF-8}
@@ -14,6 +17,10 @@ vignette: >
 ---
 
 # Introduction
+
+Many common modeling pathologies are simply violations of the asymptotic, boundary, or material assumptions documented in the core scattering texts [@medwin_fundamentals_1998; @morse_theoretical_1986].
+
+
 
 Many problems that look like model failures are really workflow failures: wrong units, wrong boundary assumption, wrong target class, inconsistent material properties, or an interpretation error about what quantity is being combined or plotted. This page collects the issues that are most likely to surface first and arranges them in the order that is usually most efficient for debugging.
 

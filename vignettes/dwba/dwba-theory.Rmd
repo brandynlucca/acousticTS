@@ -9,6 +9,9 @@ output:
     fig_height: 3.5
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{Distorted wave Born approximation (DWBA) theory}
   %\VignetteEncoding{UTF-8}
@@ -28,7 +31,7 @@ acousticTS:::.model_family_header(
 )
 ```
 
-The distorted wave Born approximation (DWBA) is a first-order scattering model for weakly scattering fluid-like bodies. It is most useful when the material contrasts are small enough that the total acoustic field inside the body remains close to the incident field, but the geometry is sufficiently extended that phase accumulation along the body cannot be ignored[^1][^2]. In that regime, a purely local approximation is too crude, while a full boundary-value solution is often unnecessary or unavailable.
+The distorted wave Born approximation (DWBA) is a first-order scattering model for weakly scattering fluid-like bodies. It is most useful when the material contrasts are small enough that the total acoustic field inside the body remains close to the incident field, but the geometry is sufficiently extended that phase accumulation along the body cannot be ignored [@morse_theoretical_1986; @stanton_sound_1998i]. In that regime, a purely local approximation is too crude, while a full boundary-value solution is often unnecessary or unavailable.
 
 For elongated zooplankton and similar organisms, the most important consequence of the DWBA is that a three-dimensional volume scattering problem can be reduced to a one-dimensional integral along the body axis. That simplification is not an ad hoc shortcut. It follows from the weak-scattering approximation together with an elongated axisymmetric body representation.
 
@@ -463,8 +466,4 @@ The derivation above rests on a specific chain of assumptions:
 6. Multiple scattering within the body is neglected beyond first order.
 
 These assumptions explain both the strength and the limitations of the DWBA. It is physically grounded for weakly contrasting fluid-like bodies, but it is not intended for rigid shells, elastic skeletons, or strongly resonant structures.
-
-[^1]: Morse, P. M., and Ingard, K. U. (1968). *Theoretical Acoustics*. Princeton University Press.
-
-[^2]: Stanton, T. K., Chu, D., and Wiebe, P. H. (1998). Sound scattering by several zooplankton groups. II. Scattering models. *The Journal of the Acoustical Society of America*, 103, 236-253.
 

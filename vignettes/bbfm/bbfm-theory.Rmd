@@ -9,6 +9,9 @@ output:
     fig_height: 3.5
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{Body-backbone fish model}
   %\VignetteEncoding{UTF-8}
@@ -27,6 +30,9 @@ acousticTS:::.model_family_header(
   )
 )
 ```
+
+
+This family is best read alongside the swimbladder-less fish and composite-scatterer literature that motivates explicit flesh-body and backbone terms [@gorska_etal_2005; @stanton_sound_1998-1; @clay_horne_1994].
 
 The body-backbone fish model (`BBFM`) is a composite scattering family for
 swimbladder-less targets whose flesh body and backbone should remain explicit,

@@ -7,6 +7,9 @@ output:
     fig_caption: yes
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{Notation and symbols}
   %\VignetteEncoding{UTF-8}
@@ -14,6 +17,10 @@ vignette: >
 ---
 
 # Introduction
+
+The notation on this page follows standard scattering texts for Helmholtz, elastic-wave, and basis-expansion formulations [@morse_theoretical_1986; @flammer_spheroidal_1957; @waterman_t_2009].
+
+
 
 This page is the compact notation guide for the package theory articles. The
 model-family pages still define symbols locally when needed, but the symbols

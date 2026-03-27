@@ -9,6 +9,9 @@ output:
     fig_height: 3.5
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{Elastic-shelled sphere implementation}
   %\VignetteEncoding{UTF-8}
@@ -28,7 +31,10 @@ acousticTS:::.model_family_header(
 )
 ```
 
-The `acousticTS` package uses object-based scatterers so the same implementation pattern carries across models: create a scatterer, run `target_strength()`, inspect the stored model output, and then compare a small set of physically important inputs. For `ESSMS`, the required object class is `ESS`, which combines a spherical shell, an optional internal fluid, and the elastic constants required for the shell solution.
+
+These pages are grounded in the classical elastic-shell scattering literature for fluid-filled spherical shells [@goodman_reflection_1962; @faran_sound_1951; @stanton_sound_1990].
+
+The acousticTS package uses object-based scatterers so the same implementation pattern carries across models: create a scatterer, run `target_strength()`, inspect the stored model output, and then compare a small set of physically important inputs. For `ESSMS`, the required object class is `ESS`, which combines a spherical shell, an optional internal fluid, and the elastic constants required for the shell solution.
 
 ::: {.caution data-title="Current ESSMS status"}
 `ESSMS` remains unvalidated in the package. The benchmark family exists, but the current implementation still does not return finite full-grid `TS` values across those shell-sphere comparison sweeps, so this page is documenting behavior and limitations rather than benchmark-grade agreement.

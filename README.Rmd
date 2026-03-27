@@ -155,7 +155,7 @@ data(benchmark_ts)
 
 ## Citation
 
-If you use `acousticTS` in published work, please cite:
+If you use acousticTS in published work, please cite:
 
 ```{r citation, eval=FALSE}
 citation("acousticTS")

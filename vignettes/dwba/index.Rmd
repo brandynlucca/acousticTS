@@ -5,6 +5,9 @@ output:
     toc: false
     number_sections: false
     fig_caption: yes
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{DWBA}
   %\VignetteEncoding{UTF-8}
@@ -22,6 +25,9 @@ acousticTS:::.model_family_header(
   )
 )
 ```
+
+
+These pages follow the weak-scattering elongated-body formulation and later applied fisheries-acoustics usage of the distorted-wave Born approximation [@morse_theoretical_1986; @stanton_sound_1998-1; @gastauer_zooscatrspan_2019].
 
 ```{r dwba_overview, echo=FALSE, results='asis'}
 acousticTS:::.model_family_overview(

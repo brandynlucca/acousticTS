@@ -7,6 +7,9 @@ output:
     fig_caption: yes
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{Building shapes}
   %\VignetteEncoding{UTF-8}
@@ -14,6 +17,10 @@ vignette: >
 ---
 
 # Introduction
+
+The shape pathways on this page are most useful when read against the canonical geometries that dominate the scattering literature, especially spheres, cylinders, spheroids, and piecewise elongated bodies [@waterman_t_2009; @flammer_spheroidal_1957; @stanton_sound_1988].
+
+
 
 Geometry is the first major decision in the package. Before choosing a scatterer class or a target-strength model, it is usually worth deciding whether the target is best represented as a canonical shape or as a segmented arbitrary body. That decision is not just cosmetic. It determines how faithfully the object matches a theory family, how much geometric detail is preserved, and how easy it will be to interpret the response later.
 

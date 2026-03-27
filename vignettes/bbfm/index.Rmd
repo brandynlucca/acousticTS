@@ -5,6 +5,9 @@ output:
     toc: false
     number_sections: false
     fig_caption: yes
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{BBFM}
   %\VignetteEncoding{UTF-8}
@@ -23,6 +26,9 @@ acousticTS:::.model_family_header(
   )
 )
 ```
+
+
+This family is best read alongside the swimbladder-less fish and composite-scatterer literature that motivates explicit flesh-body and backbone terms [@gorska_etal_2005; @stanton_sound_1998-1; @clay_horne_1994].
 
 ```{r bbfm_overview, echo=FALSE, results='asis'}
 acousticTS:::.model_family_overview(
@@ -76,7 +82,7 @@ embedded elastic structure rather than a positioned component surrogate.
 - and future fully coupled body-plus-backbone solvers that are not yet in the
   package.
 
-That is why the family belongs in `acousticTS` even before a more complete
+That is why the family belongs in acousticTS even before a more complete
 composite solver exists: it gives a physically interpretable way to keep the
 two dominant anatomical components explicit in one coherent target-strength
 calculation.

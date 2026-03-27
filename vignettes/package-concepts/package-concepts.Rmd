@@ -7,6 +7,9 @@ output:
     fig_caption: yes
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{Package concepts}
   %\VignetteEncoding{UTF-8}
@@ -15,7 +18,11 @@ vignette: >
 
 # Introduction
 
-The package is easiest to use once three ideas are kept separate: geometry, physical target type, and scattering model. Those three ideas are related, but they are not interchangeable. Many practical mistakes in `acousticTS` come from confusing one of those layers with another, such as treating a shape as if it were already a physical scatterer, or treating a model name as if it defined the target itself.
+The package concepts reflect the same divide between exact solutions, asymptotic approximations, and organism-specific composites seen in the scattering literature [@jech_etal_2015; @stanton_acoustic_1996].
+
+
+
+The package is easiest to use once three ideas are kept separate: geometry, physical target type, and scattering model. Those three ideas are related, but they are not interchangeable. Many practical mistakes in acousticTS come from confusing one of those layers with another, such as treating a shape as if it were already a physical scatterer, or treating a model name as if it defined the target itself.
 
 <object type="image/svg+xml" data="package-concepts-architecture.svg" style="width:100%;" aria-label="Conceptual layers"></object>
 
@@ -75,7 +82,7 @@ That separation is valuable because it keeps debugging ordered. Readers can insp
 
 # Models as separate layers
 
-Models in `acousticTS` are not the same thing as scatterers. A model is a mathematical mapping from the scatterer description and acoustic conditions to predicted backscatter. This is why the package can support multiple models for the same target. A fluid-like elongated object might be explored with `DWBA`, `SDWBA`, `TRCM`, `HPA`, or another more canonical model depending on the question being asked and the approximation regime that is defensible.
+Models in acousticTS are not the same thing as scatterers. A model is a mathematical mapping from the scatterer description and acoustic conditions to predicted backscatter. This is why the package can support multiple models for the same target. A fluid-like elongated object might be explored with `DWBA`, `SDWBA`, `TRCM`, `HPA`, or another more canonical model depending on the question being asked and the approximation regime that is defensible.
 
 This separation is one of the most useful design choices in the package because it means you do not have to rebuild the target every time you ask a different modeling question. One object can support several model runs, provided the geometry and physical interpretation are compatible with those models.
 

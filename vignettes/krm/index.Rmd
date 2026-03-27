@@ -5,6 +5,9 @@ output:
     toc: false
     number_sections: false
     fig_caption: yes
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{KRM}
   %\VignetteEncoding{UTF-8}
@@ -22,6 +25,9 @@ acousticTS:::.model_family_header(
   )
 )
 ```
+
+
+These pages follow the composite body-plus-swimbladder fish modeling literature initiated for cod and later generalized in open software implementations [@clay_1991; @clay_horne_1994; @sven_gastauer_svengastauerkrmr_2025].
 
 ```{r krm_overview, echo=FALSE, results='asis'}
 acousticTS:::.model_family_overview(

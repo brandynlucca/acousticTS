@@ -12,6 +12,9 @@ output:
 template:
   bootstrap: 5
   math-rendering: mathjax
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{Viscous-elastic spherical scattering model}
   %\VignetteEncoding{UTF-8}
@@ -36,7 +39,7 @@ gas core is surrounded first by an elastic shell and then by a viscous
 biological layer before the whole target is embedded in seawater. In the
 mesopelagic-fish setting of Khodabandeloo et al. (2021), those layers represent
 gas, a mechanically stiffer shell-like inclusion, and soft tissue whose
-viscosity damps and broadens the gas-driven resonance.[^1][^2]
+viscosity damps and broadens the gas-driven resonance [@khodabandeloo_estimating_2021; @feuillade_nero_1998].
 
 This family is still spherical, so the angular dependence remains separable.
 What makes it more intricate than `SPHMS`, `ESSMS`, or a simple bubble model is
@@ -48,10 +51,6 @@ The notation here follows the shared package convention introduced in the
 and [notation guide](../notation-and-symbols/notation-and-symbols.html): medium
 `1` is the surrounding seawater, medium `2` is the viscous outer layer, medium
 `3` is the elastic shell, and medium `4` is the gas core.
-
-[^1]: Khodabandeloo, B., Agersted, M.D., Klevjer, T., Macaulay, G.J., and Melle, W. (**2021**). *Estimating target strength and physical characteristics of gas-bearing mesopelagic fish from wideband in situ echoes using a viscous-elastic scattering model*. *The Journal of the Acoustical Society of America*, 149: 673-691.
-
-[^2]: Feuillade, C., and Nero, R.W. (**1998**). *A viscous-elastic swimbladder model for describing enhanced-frequency resonance scattering from fish*. *The Journal of the Acoustical Society of America*, 103: 3245-3255.
 
 # Layered geometry and medium indexing
 

@@ -9,6 +9,9 @@ output:
     fig_height: 3.5
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{Prolate spheroidal modal series solution (PSMS) theory}
   %\VignetteEncoding{UTF-8}
@@ -28,7 +31,7 @@ acousticTS:::.model_family_header(
 )
 ```
 
-The prolate spheroidal modal series solution (PSMS) is the natural exact-separation analogue of spherical partial-wave theory for elongated bodies whose surface is better approximated by a prolate spheroid than by a sphere or cylinder. The essential fact is that the Helmholtz equation is separable in prolate spheroidal coordinates, so the incident, scattered, and interior fields can all be expanded in spheroidal angular and radial wave functions.[^1][^2][^3]
+The prolate spheroidal modal series solution (PSMS) is the natural exact-separation analogue of spherical partial-wave theory for elongated bodies whose surface is better approximated by a prolate spheroid than by a sphere or cylinder. The essential fact is that the Helmholtz equation is separable in prolate spheroidal coordinates, so the incident, scattered, and interior fields can all be expanded in spheroidal angular and radial wave functions [@spence_scattering_1951; @furusawa_prolate_1988; @flammer_spheroidal_1957].
 
 The rigid case enforces zero normal velocity on $\xi = \xi_1$, the pressure-release case enforces zero pressure there, and the fluid-filled or gas-filled cases enforce continuity of pressure and normal velocity between the exterior and interior media. In the PSMS itself, the rigid and pressure-release cases remain comparatively simple because only the exterior basis is involved. The fluid-filled and gas-filled cases use the same interior-fluid algebra, but with different interior material properties and therefore different reduced frequencies. That basis mismatch is what makes the coupled interior problem harder.
 
@@ -479,11 +482,4 @@ The PSMS derivation rests on the following assumptions:
 
 The great advantage of the PSMS is that the geometry is matched directly. The mathematical cost is the appearance of spheroidal special functions and mode coupling in the interior-fluid case. That tradeoff is exactly what makes the model valuable: it keeps a much closer relationship to a truly prolate geometry than a sphere- or cylinder-based substitute, but it pays for that fidelity with more complicated basis functions, overlap integrals, and linear algebra.
 
-## References
-
-[^1]: Spencer, R. D., and Granger, S. (1951). The scattering of sound from a prolate spheroid. *The Journal of the Acoustical Society of America*, 23, 701-706.
-
-[^2]: Furusawa, M. (1988). Prolate spheroidal models for predicting general trends of fish target strength. *Journal of the Acoustical Society of Japan*, 9, 13-24.
-
-[^3]: Flammer, C. (1957). *Spheroidal Wave Functions*. Stanford University Press.
 

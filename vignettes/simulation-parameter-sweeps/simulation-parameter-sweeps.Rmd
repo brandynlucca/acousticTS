@@ -7,6 +7,9 @@ output:
     fig_caption: yes
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{Simulation and Parameter Sweeps}
   %\VignetteEncoding{UTF-8}
@@ -14,6 +17,10 @@ vignette: >
 ---
 
 # Introduction
+
+Parameter sweeps are especially useful when a model has to be interpreted over the orientation, size, and contrast ranges emphasized in benchmark and survey studies [@jech_etal_2015; @demer_new_2005].
+
+
 
 Single deterministic model runs are useful, but many acoustic questions are inherently distributional. The package therefore includes simulation tools for repeated realizations, parameter batching, and ensemble summaries.
 

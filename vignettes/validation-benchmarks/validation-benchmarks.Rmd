@@ -7,6 +7,9 @@ output:
     fig_caption: yes
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{Validation and benchmark reproduction}
   %\VignetteEncoding{UTF-8}
@@ -15,7 +18,11 @@ vignette: >
 
 # Introduction
 
-Modeling packages become much more useful when users can distinguish a physically surprising result from a setup error. Validation pages help provide that context. In `acousticTS`, validation is not a single check with a single threshold. It is a layered workflow that begins with object and unit sanity, then moves to canonical benchmark reproduction, and finally asks whether the numerical behavior is stable enough that any remaining discrepancy deserves physical interpretation.
+The validation workflow on this page is grounded in inter-model benchmark comparisons and open-software reproductions [@jech_etal_2015; @demer_validation_2003; @gastauer_zooscatrspan_2019; @sven_gastauer_svengastauerkrmr_2025; @betcke_bempp-cl_2021].
+
+
+
+Modeling packages become much more useful when users can distinguish a physically surprising result from a setup error. Validation pages help provide that context. In acousticTS, validation is not a single check with a single threshold. It is a layered workflow that begins with object and unit sanity, then moves to canonical benchmark reproduction, and finally asks whether the numerical behavior is stable enough that any remaining discrepancy deserves physical interpretation.
 
 ![Validation ladder](validation-ladder.svg)
 
@@ -69,7 +76,7 @@ knitr::kable(
 
 # What validation means in this package
 
-Validation in `acousticTS` is best understood as at least four related layers of evidence.
+Validation in acousticTS is best understood as at least four related layers of evidence.
 
 First, the object and setup have to be internally consistent. The geometry must be the one the user thinks was created, the material properties must be in the correct units, the model must be appropriate for the target class and boundary interpretation, and the frequency grid and orientation convention must match the intended analysis. If any of that is wrong, benchmark disagreement says very little.
 

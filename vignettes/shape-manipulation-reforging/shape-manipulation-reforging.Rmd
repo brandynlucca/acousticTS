@@ -7,6 +7,9 @@ output:
     fig_caption: yes
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{Shape Manipulation and Reforging}
   %\VignetteEncoding{UTF-8}
@@ -14,6 +17,10 @@ vignette: >
 ---
 
 # Introduction
+
+Shape manipulation matters because many published target representations are built from segmented or reformatted coordinate sets rather than from canonical closed forms [@clay_horne_1994; @gastauer_australianantarcticdivisionzooscatr_2019].
+
+
 
 Real workflows often begin with a target description that is close to useful but not quite in the form required for the next model or comparison step. The package includes tools for reshaping, bending, or otherwise transforming existing objects rather than rebuilding them from scratch.
 

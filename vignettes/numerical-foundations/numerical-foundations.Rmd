@@ -7,6 +7,9 @@ output:
     fig_caption: yes
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{Numerical Foundations and Special Functions}
   %\VignetteEncoding{UTF-8}
@@ -14,6 +17,10 @@ vignette: >
 ---
 
 # Introduction
+
+The numerical choices documented here are motivated by the special-function and basis-expansion structure of the underlying scattering literature [@flammer_spheroidal_1957; @waterman_t_2009; @betcke_bempp-cl_2021].
+
+
 
 Several of the package models are mathematically exact only because they are written in special-function bases adapted to canonical geometries. This article is the high-level guide to those numerical ingredients.
 
@@ -75,7 +82,7 @@ This is why `PSMS` often deserves more numerical scrutiny than the simpler canon
 
 For the prolate spheroidal basis, the most important numerical objects are the angular wave functions `Smn()` and the radial wave functions `Rmn()`. Those are the actual special-function building blocks that the rest of the spheroidal models depend on, so it is useful to separate their evaluation from the later model-specific algebra.
 
-In `acousticTS`, those functions are evaluated through the `profcn` backend in `src/prolate_swf.f90`, with the corresponding `C++` wrappers in `src/psms.cpp` handling the extraction and rescaling needed by the exported `Smn()` and `Rmn()` interfaces. That split of responsibility matters because the Fortran routine computes a large family of spheroidal quantities at once, while the package-level functions usually want one specific angular or radial quantity and, often, its derivative.
+In acousticTS, those functions are evaluated through the `profcn` backend in `src/prolate_swf.f90`, with the corresponding `C++` wrappers in `src/psms.cpp` handling the extraction and rescaling needed by the exported `Smn()` and `Rmn()` interfaces. That split of responsibility matters because the Fortran routine computes a large family of spheroidal quantities at once, while the package-level functions usually want one specific angular or radial quantity and, often, its derivative.
 
 One detail that is easy to miss from the outside is that the Fortran backend stores many spheroidal quantities in mantissa-and-base-10-exponent form rather than as a single floating-point number. This is a stability device. High-order prolate spheroidal functions can become so large or so small that a naive single-number representation would overflow or underflow before the scaled value of interest is assembled. The `C++` layer therefore reconstructs the ordinary numeric value only after the backend evaluation is complete.
 

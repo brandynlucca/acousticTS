@@ -9,6 +9,9 @@ output:
     fig_height: 3.5
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{Phase-compensated distorted wave Born approximation}
   %\VignetteEncoding{UTF-8}
@@ -30,7 +33,7 @@ acousticTS:::.model_family_header(
 
 The phase-compensated distorted wave Born approximation (`PCDWBA`) extends the
 ordinary `DWBA` to elongated bodies whose centerlines are curved rather than
-straight.[^1][^2] It preserves the same weak-scattering local kernel used for
+straight [@chu_phase-compensated_1999; @stanton_sound_1989]. It preserves the same weak-scattering local kernel used for
 slender fluid-like bodies, but it replaces the straight-body phase bookkeeping
 by a centerline-dependent phase that follows the bent geometry explicitly.
 
@@ -41,10 +44,6 @@ solution.
 
 The notation below follows the shared package conventions: medium `1` is the
 surrounding seawater and medium `2` is the weakly scattering body.
-
-[^1]: Chu, D., and Ye, Z. (**1999**). *A phase-compensated distorted wave Born approximation representation of the bistatic scattering by weakly scattering objects: Application to zooplankton*. *The Journal of the Acoustical Society of America*, 106: 1732-1743.
-
-[^2]: Stanton, T.K. (**1989**). *Sound scattering by cylinders of finite length. III. Deformed cylinders*. *The Journal of the Acoustical Society of America*, 86: 691-705.
 
 # Weak-scattering starting point
 

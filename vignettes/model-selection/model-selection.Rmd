@@ -9,6 +9,9 @@ output:
     fig_height: 6.2
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{Choosing a model}
   %\VignetteEncoding{UTF-8}
@@ -16,6 +19,10 @@ vignette: >
 ---
 
 # Introduction
+
+Model selection in this package mirrors the broader literature: match geometry, material contrast, and anatomical complexity before worrying about computational detail [@jech_etal_2015; @clay_horne_1994; @stanton_acoustic_1996].
+
+
 
 There is no single deterministic rule that maps every scatterer to exactly one model. In practice, model choice depends on at least five questions:
 

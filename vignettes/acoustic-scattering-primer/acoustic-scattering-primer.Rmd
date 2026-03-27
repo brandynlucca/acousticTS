@@ -7,6 +7,9 @@ output:
     fig_caption: yes
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{Acoustic Scattering Primer}
   %\VignetteEncoding{UTF-8}
@@ -14,6 +17,10 @@ vignette: >
 ---
 
 # Introduction
+
+The notation and reporting conventions on this page follow standard time-harmonic scattering texts and elastic-wave treatments [@medwin_fundamentals_1998; @morse_theoretical_1986; @achenbach_wave_1973].
+
+
 
 This article is the shared physics starting point for the model-family theory
 pages. The goal is to make the recurring acoustic field definitions,

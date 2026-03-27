@@ -174,7 +174,7 @@
       "benchmark",
       "external",
       "note",
-      "external",
+      "note",
       "benchmark", "external", "external", "note"
     ),
     source = c(

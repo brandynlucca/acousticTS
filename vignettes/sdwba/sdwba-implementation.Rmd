@@ -9,6 +9,9 @@ output:
     fig_height: 3.5
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{SDWBA implementation}
   %\VignetteEncoding{UTF-8}
@@ -28,7 +31,10 @@ acousticTS:::.model_family_header(
 )
 ```
 
-The `acousticTS` package uses object-based scatterers so the same implementation pattern carries across models: create a scatterer, run `target_strength()`, inspect the stored model output, and then compare a small set of physically important inputs. For SDWBA, the required object class is still `FLS`, but `target_strength()` also receives stochastic controls for phase variability and resampling.
+
+These pages connect krill-body DWBA models to phase variability, orientation effects, and practical survey use [@demer_reconciling_2003; @demer_validation_2003; @conti_improved_2006; @demer_new_2005].
+
+The acousticTS package uses object-based scatterers so the same implementation pattern carries across models: create a scatterer, run `target_strength()`, inspect the stored model output, and then compare a small set of physically important inputs. For SDWBA, the required object class is still `FLS`, but `target_strength()` also receives stochastic controls for phase variability and resampling.
 
 The important implementation point is that the SDWBA does not replace the underlying DWBA geometry. It uses the same fluid-like target description and then layers a stochastic phase model onto the segment contributions. In practice, that means the object-building step remains deterministic, while the model call is where unresolved variability is introduced.
 
@@ -155,11 +161,11 @@ The bundled `krill` object serves a different role from the canonical weakly sca
 
 | Comparison | Mean abs. delta TS (dB) | Max abs. delta TS (dB) |
 |:--|--:|--:|
-| `acousticTS` vs `echoSMs` | 1.70257 | 30.63630 |
-| `acousticTS` vs CCAMLR MATLAB | 0.06978 | 0.18270 |
-| `acousticTS` vs NOAA HTML | 0.06158 | 0.52846 |
+| acousticTS vs `echoSMs` | 1.70257 | 30.63630 |
+| acousticTS vs CCAMLR MATLAB | 0.06978 | 0.18270 |
+| acousticTS vs NOAA HTML | 0.06158 | 0.52846 |
 | `echoSMs` vs CCAMLR MATLAB | 1.74808 | 30.72119 |
 | `echoSMs` vs NOAA HTML | 1.69189 | 30.27117 |
 | CCAMLR MATLAB vs NOAA HTML | 0.13036 | 0.65798 |
 
-Those values should be read as implementation differences rather than benchmark errors. All four calculations use the same bundled krill dimensions and the same initial stochastic reference values, but they do not use the same stochastic convention. In the current external implementations, both the CCAMLR MATLAB code and the NOAA HTML code square the phase term in the stochastic multiplier, while `acousticTS` keeps the paper-style linear phase standard deviation and `echoSMs` follows its own direct stochastic-phase application. So the bundled krill comparison is complementary to the canonical tables above: one set checks the stochastic model against published weakly scattering reference cases, and the other checks how the same biological krill geometry separates across existing SDWBA implementations.
+Those values should be read as implementation differences rather than benchmark errors. All four calculations use the same bundled krill dimensions and the same initial stochastic reference values, but they do not use the same stochastic convention. In the current external implementations, both the CCAMLR MATLAB code and the NOAA HTML code square the phase term in the stochastic multiplier, while acousticTS keeps the paper-style linear phase standard deviation and `echoSMs` follows its own direct stochastic-phase application. So the bundled krill comparison is complementary to the canonical tables above: one set checks the stochastic model against published weakly scattering reference cases, and the other checks how the same biological krill geometry separates across existing SDWBA implementations.

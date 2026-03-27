@@ -9,6 +9,9 @@ output:
     fig_height: 3.5
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{DWBA implementation}
   %\VignetteEncoding{UTF-8}
@@ -28,7 +31,10 @@ acousticTS:::.model_family_header(
 )
 ```
 
-The `acousticTS` implementation of deterministic DWBA follows the same object-based pattern used throughout the package. A fluid-like scatterer is constructed first, the model is then run through `target_strength()`, and the resulting backscattering quantities are stored back onto the same object. That workflow is especially useful for the DWBA because the model depends not only on material contrasts, but also on the discretized body geometry and the orientation assigned to the object.
+
+These pages follow the weak-scattering elongated-body formulation and later applied fisheries-acoustics usage of the distorted-wave Born approximation [@morse_theoretical_1986; @stanton_sound_1998-1; @gastauer_zooscatrspan_2019].
+
+The acousticTS implementation of deterministic DWBA follows the same object-based pattern used throughout the package. A fluid-like scatterer is constructed first, the model is then run through `target_strength()`, and the resulting backscattering quantities are stored back onto the same object. That workflow is especially useful for the DWBA because the model depends not only on material contrasts, but also on the discretized body geometry and the orientation assigned to the object.
 
 ## Fluid-like scatterer object generation
 
@@ -140,8 +146,8 @@ The bundled `krill` object serves a different role from the canonical modal-seri
 
 | Comparison | Mean abs. delta TS (dB) | Max abs. delta TS (dB) |
 |:--|--:|--:|
-| `acousticTS` vs published McGehee MATLAB implementation | 1.23e-05 | 4.33e-05 |
-| `acousticTS` vs independent DWBA implementation | 0.42284 | 1.01167 |
+| acousticTS vs published McGehee MATLAB implementation | 1.23e-05 | 4.33e-05 |
+| acousticTS vs independent DWBA implementation | 0.42284 | 1.01167 |
 | Independent DWBA implementation vs published McGehee MATLAB implementation | 0.42284 | 1.01167 |
 
-On this bundled krill geometry, `acousticTS` reproduces the published McGehee MATLAB implementation essentially exactly, while the independent implementation remains within about 1 dB of the same spectrum but does not collapse onto the published curve. That makes the canonical modal-series table above and the bundled krill comparison complementary: one checks exact isolated-shape behavior, and the other checks a published segmented-body DWBA target.
+On this bundled krill geometry, acousticTS reproduces the published McGehee MATLAB implementation essentially exactly, while the independent implementation remains within about 1 dB of the same spectrum but does not collapse onto the published curve. That makes the canonical modal-series table above and the bundled krill comparison complementary: one checks exact isolated-shape behavior, and the other checks a published segmented-body DWBA target.

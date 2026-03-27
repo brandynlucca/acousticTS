@@ -5,6 +5,9 @@ output:
     toc: false
     number_sections: false
     fig_caption: yes
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{HPA}
   %\VignetteEncoding{UTF-8}
@@ -22,6 +25,9 @@ acousticTS:::.model_family_header(
   )
 )
 ```
+
+
+These pages follow Johnson's asymptotic fluid-sphere formulation and Stanton's generalized approximate backscatter formulas [@johnson_sound_1977; @stanton_1989].
 
 ```{r hpa_overview, echo=FALSE, results='asis'}
 acousticTS:::.model_family_overview(

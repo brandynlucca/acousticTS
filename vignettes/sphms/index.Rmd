@@ -5,6 +5,9 @@ output:
     toc: false
     number_sections: false
     fig_caption: yes
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{SPHMS}
   %\VignetteEncoding{UTF-8}
@@ -22,6 +25,9 @@ acousticTS:::.model_family_header(
   )
 )
 ```
+
+
+These pages follow the classical exact sphere literature for fluid, elastic, and approximate shell limits [@anderson_sound_1950; @faran_sound_1951; @hickling_analysis_1962].
 
 ```{r sphms_overview, echo=FALSE, results='asis'}
 acousticTS:::.model_family_overview(

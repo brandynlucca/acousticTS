@@ -9,6 +9,9 @@ output:
     fig_height: 3.5
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{Stochastic distorted wave Born approximation (SDWBA) theory}
   %\VignetteEncoding{UTF-8}
@@ -28,7 +31,7 @@ acousticTS:::.model_family_header(
 )
 ```
 
-The stochastic distorted wave Born approximation (SDWBA) begins with the same weak-scattering derivation as the deterministic DWBA, then modifies the phase structure of the coherent sum to account for unresolved variability in body shape, posture, and internal structure.[^1][^2][^3]
+The stochastic distorted wave Born approximation (SDWBA) begins with the same weak-scattering derivation as the deterministic DWBA, then modifies the phase structure of the coherent sum to account for unresolved variability in body shape, posture, and internal structure [@demer_reconciling_2003; @conti_improved_2006; @stanton_sound_1998i].
 
 The deterministic part of the derivation still assumes a weakly scattering fluid-like body, so the local scattering strength is controlled by small density and compressibility contrasts in the same way as in the DWBA. The stochastic extension is introduced only after that weak-contrast amplitude model has been established.
 
@@ -276,11 +279,4 @@ The SDWBA inherits all assumptions of the deterministic DWBA and adds a small se
 
 These assumptions explain the role of the SDWBA. It does not replace the underlying scattering physics. It softens the coherence structure of the deterministic model when unresolved morphology or posture would otherwise make the predicted interference pattern unrealistically sharp.
 
-## References
-
-[^1]: Demer, D. A., and Conti, S. G. (2003). Reconciling theoretical versus empirical target strengths of krill: effects of phase variability on the distorted-wave Born approximation. *ICES Journal of Marine Science*, 60, 429-434.
-
-[^2]: Conti, S. G., and Demer, D. A. (2006). Improved parameterization of the SDWBA for estimating krill target strength. *ICES Journal of Marine Science*, 63, 928-935.
-
-[^3]: Stanton, T. K., Chu, D., and Wiebe, P. H. (1998). Sound scattering by several zooplankton groups. II. Scattering models. *The Journal of the Acoustical Society of America*, 103, 236-253.
 

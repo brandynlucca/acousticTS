@@ -9,6 +9,9 @@ output:
     fig_height: 3.5
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{Scattering boundary conditions}
   %\VignetteEncoding{UTF-8}
@@ -16,6 +19,10 @@ vignette: >
 ---
 
 # Introduction
+
+The boundary families summarized here correspond to the classical fluid, rigid, elastic, shell, and viscous-interface scattering literature [@anderson_sound_1950; @faran_sound_1951; @goodman_reflection_1962; @feuillade_nero_1998].
+
+
 
 Boundary conditions are the mathematical statements that turn a general wave equation into a specific scattering problem. In target-strength modeling, they specify what the target surface can and cannot do in response to the incident sound field. A boundary may be perfectly rigid, perfectly pressure releasing, fluid transmitting, weakly contrasting, or dynamically elastic. Those are not just different algebraic cases. They are different physical idealizations, and they produce different scattering mechanisms even for the same gross geometry.
 

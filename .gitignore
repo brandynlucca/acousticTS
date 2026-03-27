@@ -21,6 +21,7 @@
 /doc/
 Rplots.pdf
 docs
+dev/
 inst/doc
 libs
 output

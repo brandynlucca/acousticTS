@@ -5,6 +5,9 @@ output:
     toc: true
     number_sections: true
     fig_caption: yes
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{Model library}
   %\VignetteEncoding{UTF-8}
@@ -12,6 +15,10 @@ vignette: >
 ---
 
 # Introduction
+
+The family library is easiest to navigate when read against model-comparison reviews, organism-focused scattering surveys, and companion open-source modeling ecosystems [@jech_etal_2015; @stanton_acoustic_1996; @brandyn_lucca_osoceanacousticsechopop_2026].
+
+
 
 The package now contains enough model families that the site works better when the model pages are treated as a library rather than as a flat list in the top navigation. This page is the main entry point for that library.
 

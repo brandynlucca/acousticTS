@@ -7,6 +7,9 @@ output:
     fig_caption: yes
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{Building scatterers}
   %\VignetteEncoding{UTF-8}
@@ -15,7 +18,11 @@ vignette: >
 
 # Introduction
 
-Once a geometry exists, it still has to be assigned a physical interpretation before most models in `acousticTS` can be run. That is the role of a scatterer object. A shape answers the geometric question, but a scatterer answers the acoustic one: what is the target made of, which interfaces matter, how should the surrounding medium be interpreted, and which class of model assumptions is meant to apply?
+The scatterer classes in `acousticTS` are organized around target types that recur across fisheries and zooplankton acoustics, from calibration spheres to weakly scattering elongated bodies and composite fish targets [@foote_spheres_1990; @stanton_acoustic_1996; @clay_horne_1994].
+
+
+
+Once a geometry exists, it still has to be assigned a physical interpretation before most models in acousticTS can be run. That is the role of a scatterer object. A shape answers the geometric question, but a scatterer answers the acoustic one: what is the target made of, which interfaces matter, how should the surrounding medium be interpreted, and which class of model assumptions is meant to apply?
 
 This distinction matters because the same outline can support several different physical interpretations. A smooth elongated body might be treated as a weakly scattering fluid-like target, as a gas-filled inclusion, or as part of a composite fish-like target with an internal swimbladder. The geometry by itself does not decide among those cases. Scatterer construction is the step where the reader turns a geometric description into a model-ready acoustic object.
 

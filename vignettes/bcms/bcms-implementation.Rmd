@@ -9,6 +9,9 @@ output:
     fig_height: 3.5
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{Bent cylinder modal series solution}
   %\VignetteEncoding{UTF-8}
@@ -27,6 +30,9 @@ acousticTS:::.model_family_header(
   )
 )
 ```
+
+
+This family follows the deformed-cylinder and coherence-corrected cylinder literature for weakly scattering elongated bodies [@stanton_sound_1989; @stanton_sound_1988].
 
 The bent-cylinder modal-series solution is available through `target_strength(..., model = "bcms")`. It is intended for slender, weakly scattering cylinders whose cross-section is still well represented by the finite-cylinder modal-series family, but whose centerline curvature reduces backscattering coherence relative to the straight-cylinder case.
 
@@ -52,7 +58,7 @@ Two geometries are compared:
 - a straight finite cylinder
 - a bent cylinder with `rho_c / L = 1.5`
 
-In `acousticTS`, the objects are built as:
+In acousticTS, the objects are built as:
 
 ```{r}
 library(acousticTS)

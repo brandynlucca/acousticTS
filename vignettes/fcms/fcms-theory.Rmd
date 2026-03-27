@@ -9,6 +9,9 @@ output:
     fig_height: 3.5
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{Finite cylinder modal series solution (FCMS) theory}
   %\VignetteEncoding{UTF-8}
@@ -28,7 +31,7 @@ acousticTS:::.model_family_header(
 )
 ```
 
-The finite cylinder modal series solution (FCMS) is one of the standard ways to represent acoustic backscatter from straight cylinders of finite length.[^1][^2] Its appeal is that it retains the exact cylindrical-harmonic treatment of the circular cross-section while replacing the fully three-dimensional endcap problem with a finite-axis coherence factor. That combination makes the model substantially more informative than a purely asymptotic ray-style approximation, while still remaining much simpler than a complete three-dimensional elastic boundary-value treatment.
+The finite cylinder modal series solution (FCMS) is one of the standard ways to represent acoustic backscatter from straight cylinders of finite length [@stanton_sound_1988; @stanton_sound_1989]. Its appeal is that it retains the exact cylindrical-harmonic treatment of the circular cross-section while replacing the fully three-dimensional endcap problem with a finite-axis coherence factor. That combination makes the model substantially more informative than a purely asymptotic ray-style approximation, while still remaining much simpler than a complete three-dimensional elastic boundary-value treatment.
 
 This structure is also the main conceptual point a reader should carry away from the model. The FCMS is not derived by separating variables for the entire finite cylinder, because a finite cylinder with endcaps is not globally separable in cylindrical coordinates. Instead, it is assembled from two pieces:
 
@@ -379,8 +382,4 @@ The FCMS rests on several assumptions:
 These assumptions explain both the strength and the limitation of the FCMS. It captures boundary-condition physics around the cylinder surface exactly within the cross-sectional modal description, but it treats the finite length through a separated directivity factor rather than through a fully three-dimensional separable solution.
 
 For readers using the model in practice, the most important consequence is that FCMS is best interpreted as a cylinder model with exact circular-boundary physics and approximate finite-length physics. That is a meaningful and often very useful balance, but it also tells us when caution is needed: strongly nonuniform radii, strongly influential endcaps, or material distributions that vary along the axis are outside the ideal assumptions under which the factorized representation is most defensible.
-
-[^1]: Stanton, T. K. (1988). Sound scattering by cylinders of finite length. I. Fluid cylinders. *The Journal of the Acoustical Society of America*, 83, 55-63.
-
-[^2]: Stanton, T. K. (1989). Sound scattering by cylinders of finite length. III. Deformed cylinders. *The Journal of the Acoustical Society of America*, 85, 232-237.
 

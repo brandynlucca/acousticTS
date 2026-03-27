@@ -7,6 +7,9 @@ output:
     fig_caption: yes
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{Getting started with acousticTS}
   %\VignetteEncoding{UTF-8}
@@ -15,7 +18,11 @@ vignette: >
  
 # Introduction
 
-This documentation is meant to be the first practical stop for readers who are new to `acousticTS`. The package covers several different target-strength models, several target classes, and several ways of building geometry, so the documentation can look broad at first glance. The easiest way to make that structure manageable is to keep one idea in mind from the beginning: the package separates geometry, physical interpretation, model choice, and result inspection on purpose. Those are related decisions, but they are not the same decision.
+The package workflow is meant to help users move between the same geometry, material, and model-choice questions that structure the broader fisheries-acoustics literature [@jech_etal_2015; @stanton_acoustic_1996; @medwin_fundamentals_1998].
+
+
+
+This documentation is meant to be the first practical stop for readers who are new to acousticTS. The package covers several different target-strength models, several target classes, and several ways of building geometry, so the documentation can look broad at first glance. The easiest way to make that structure manageable is to keep one idea in mind from the beginning: the package separates geometry, physical interpretation, model choice, and result inspection on purpose. Those are related decisions, but they are not the same decision.
 
 At the broadest level, every workflow moves through four layers. A `Shape` describes geometry only. A `Scatterer` object adds material properties, boundary interpretation, and metadata. A model call computes the backscattering response across a chosen frequency or acoustic-size range. Inspection and plotting then make it possible to decide whether the result is physically sensible before moving on to comparison, validation, or larger parameter sweeps. New users usually find the package much easier to navigate once those layers are kept conceptually separate.
 

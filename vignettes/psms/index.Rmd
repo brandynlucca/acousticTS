@@ -5,6 +5,9 @@ output:
     toc: false
     number_sections: false
     fig_caption: yes
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{PSMS}
   %\VignetteEncoding{UTF-8}
@@ -22,6 +25,9 @@ acousticTS:::.model_family_header(
   )
 )
 ```
+
+
+These pages are rooted in exact spheroidal-coordinate separations and later fisheries-acoustics use of prolate-spheroid models [@spence_scattering_1951; @flammer_spheroidal_1957; @furusawa_prolate_1988].
 
 ```{r psms_overview, echo=FALSE, results='asis'}
 acousticTS:::.model_family_overview(

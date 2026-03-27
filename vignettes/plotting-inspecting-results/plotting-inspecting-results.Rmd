@@ -7,6 +7,9 @@ output:
     fig_caption: yes
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{Plotting and Inspecting Results}
   %\VignetteEncoding{UTF-8}
@@ -14,6 +17,10 @@ vignette: >
 ---
 
 # Introduction
+
+Plot inspection is most useful when curves are read against known benchmark shapes, resonances, and asymptotic regimes from the published scattering literature [@foote_spheres_1990; @jech_etal_2015].
+
+
 
 The package stores geometry, parameters, and model outputs in nested scatterer objects. That design is useful only if the contents can be inspected and visualized efficiently. This article is the companion guide to those object-level operations.
 

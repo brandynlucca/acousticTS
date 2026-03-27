@@ -9,6 +9,9 @@ output:
     fig_height: 3.5
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{PSMS implementation}
   %\VignetteEncoding{UTF-8}
@@ -28,7 +31,10 @@ acousticTS:::.model_family_header(
 )
 ```
 
-The `acousticTS` package uses object-based scatterers so the same implementation pattern carries across models: create a scatterer, run `target_strength()`, inspect the stored model output, and then compare a small set of physically important inputs. For PSMS, the main additional choices are the boundary condition, the incident roll angle `phi_body`, and the numerical settings that control how the retained spheroidal system is actually evaluated.
+
+These pages are rooted in exact spheroidal-coordinate separations and later fisheries-acoustics use of prolate-spheroid models [@spence_scattering_1951; @flammer_spheroidal_1957; @furusawa_prolate_1988].
+
+The acousticTS package uses object-based scatterers so the same implementation pattern carries across models: create a scatterer, run `target_strength()`, inspect the stored model output, and then compare a small set of physically important inputs. For PSMS, the main additional choices are the boundary condition, the incident roll angle `phi_body`, and the numerical settings that control how the retained spheroidal system is actually evaluated.
 
 That last point is especially important for PSMS. Unlike some of the simpler modal models, the prolate spheroidal calculation can make numerical settings part of the practical interpretation of the run. The geometry and material properties still define the target, but convergence-related controls help determine how faithfully the truncated spheroidal system has been solved.
 
@@ -334,11 +340,11 @@ The practical interpretation is straightforward:
 
 ## Cross-software implementation checks
 
-Beyond the published benchmark curves, it is also useful to check whether the same prolate-spheroid definitions produce comparable spectra in other locally available implementations. The table below uses the shared `12, 18, 38, 70, 100 kHz` frequency set so that the cross-software check reaches more informative reduced frequencies while still remaining computationally manageable. The `acousticTS` settings are the same ones used for the main benchmark-quality run here: `precision = "quad"`, `adaptive = FALSE`, `simplify_Amn = FALSE`, `n_integration = 96`, and `phi_body = pi`.
+Beyond the published benchmark curves, it is also useful to check whether the same prolate-spheroid definitions produce comparable spectra in other locally available implementations. The table below uses the shared `12, 18, 38, 70, 100 kHz` frequency set so that the cross-software check reaches more informative reduced frequencies while still remaining computationally manageable. The acousticTS settings are the same ones used for the main benchmark-quality run here: `precision = "quad"`, `adaptive = FALSE`, `simplify_Amn = FALSE`, `n_integration = 96`, and `phi_body = pi`.
 
 `Prol_Spheroid` only treats penetrable prolate spheroids, so its cells are `N/A` for `fixed_rigid` and `pressure_release`. The table separates the original and vectorized `Prol_Spheroid` branches because the numerical agreement is nearly identical while the runtime is not.
 
-| Case | Frequency set (kHz) | Max abs. delta TS vs `echoSMs` (dB) | Mean abs. delta TS vs `echoSMs` (dB) | Max abs. delta TS vs `Prol_Spheroid` original (dB) | Mean abs. delta TS vs `Prol_Spheroid` original (dB) | Max abs. delta TS vs `Prol_Spheroid` vectorized (dB) | Mean abs. delta TS vs `Prol_Spheroid` vectorized (dB) | `acousticTS` elapsed (s) | `echoSMs` elapsed (s) | `Prol_Spheroid` original elapsed (s) | `Prol_Spheroid` vectorized elapsed (s) |
+| Case | Frequency set (kHz) | Max abs. delta TS vs `echoSMs` (dB) | Mean abs. delta TS vs `echoSMs` (dB) | Max abs. delta TS vs `Prol_Spheroid` original (dB) | Mean abs. delta TS vs `Prol_Spheroid` original (dB) | Max abs. delta TS vs `Prol_Spheroid` vectorized (dB) | Mean abs. delta TS vs `Prol_Spheroid` vectorized (dB) | acousticTS elapsed (s) | `echoSMs` elapsed (s) | `Prol_Spheroid` original elapsed (s) | `Prol_Spheroid` vectorized elapsed (s) |
 |:--|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
 | `fixed_rigid` | `12, 18, 38, 70, 100` | `0.49692` | `0.10091` | `N/A` | `N/A` | `N/A` | `N/A` | `0.86` | `0.34` | `N/A` | `N/A` |
 | `pressure_release` | `12, 18, 38, 70, 100` | `0.08619` | `0.01757` | `N/A` | `N/A` | `N/A` | `N/A` | `0.93` | `0.33` | `N/A` | `N/A` |

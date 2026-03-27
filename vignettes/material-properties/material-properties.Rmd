@@ -7,6 +7,9 @@ output:
     fig_caption: yes
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{Material Properties and Acoustic Utilities}
   %\VignetteEncoding{UTF-8}
@@ -14,6 +17,10 @@ vignette: >
 ---
 
 # Introduction
+
+The property conventions on this page follow standard acoustics and elastic-wave references used throughout underwater scattering theory [@medwin_fundamentals_1998; @achenbach_wave_1973].
+
+
 
 Many modeling errors are not caused by the scattering model itself. They are caused by incorrect material properties, inconsistent contrasts, or unit conversion mistakes. This article collects the supporting acoustic-property functions that feed the model layer and explains how to think about them physically before they are ever passed into a target-strength model.
 
@@ -35,7 +42,7 @@ That separation matters because a workflow can fail at any of those stages. A us
 
 # Contrasts versus absolute properties
 
-One of the most useful design choices in `acousticTS` is that many constructors and models accept either contrasts or absolute properties. A density contrast such as `g_body` expresses target density relative to the surrounding medium, while a sound-speed contrast such as `h_body` expresses target sound speed relative to the surrounding medium. Absolute properties such as `density_body` and `sound_speed_body` can often be supplied instead, with contrasts derived internally.
+One of the most useful design choices in acousticTS is that many constructors and models accept either contrasts or absolute properties. A density contrast such as `g_body` expresses target density relative to the surrounding medium, while a sound-speed contrast such as `h_body` expresses target sound speed relative to the surrounding medium. Absolute properties such as `density_body` and `sound_speed_body` can often be supplied instead, with contrasts derived internally.
 
 This flexibility is convenient, but it also means a user should be deliberate about which representation is being supplied. The package can often derive missing pieces, but it cannot rescue physically inconsistent inputs. If absolute properties imply one contrast and the manually supplied contrast implies another, the inconsistency belongs to the setup rather than to the scattering model.
 

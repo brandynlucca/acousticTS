@@ -9,6 +9,9 @@ output:
     fig_height: 3.5
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{TRCM implementation}
   %\VignetteEncoding{UTF-8}
@@ -28,7 +31,10 @@ acousticTS:::.model_family_header(
 )
 ```
 
-The `acousticTS` package uses object-based scatterers so the same implementation pattern carries across models: create a scatterer, run `target_strength()`, inspect the stored model output, and then compare a small set of physically important inputs. For TRCM, the required object class is `FLS` with a cylindrical shape and fluid-like material properties.
+
+These pages come from the high-frequency elongated-body literature and later fish and zooplankton applications [@stanton_etal_1993; @stanton_sound_1998; @stanton_sound_1998-1].
+
+The acousticTS package uses object-based scatterers so the same implementation pattern carries across models: create a scatterer, run `target_strength()`, inspect the stored model output, and then compare a small set of physically important inputs. For TRCM, the required object class is `FLS` with a cylindrical shape and fluid-like material properties.
 
 TRCM should be read as a fast high-frequency interpretation tool, not as a general-purpose cylinder solver. The implementation assumes that the cross-sectional scattering is well summarized by the two retained rays described in the theory vignette, and it uses the body axis only to impose finite-length directivity and, when present, curvature-driven coherence loss. That means the most important implementation decisions are geometric and interpretive: whether the organism is locally cylindrical, whether the fluid-like boundary assumption is defensible, and whether the frequency range is high enough that a two-ray asymptotic model is credible.
 

@@ -9,6 +9,9 @@ output:
     fig_height: 3.5
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{TMM theory}
   %\VignetteEncoding{UTF-8}
@@ -28,11 +31,11 @@ acousticTS:::.model_family_header(
 )
 ```
 
-The transition matrix method (`TMM`) is a basis-expansion view of scattering. Instead of solving directly for the scattered pressure in physical space, one expands both the incident and scattered fields in complete wave bases and then asks for the linear map between the two coefficient vectors. That map is the transition matrix, or T-matrix.[^1]
+The transition matrix method (`TMM`) is a basis-expansion view of scattering. Instead of solving directly for the scattered pressure in physical space, one expands both the incident and scattered fields in complete wave bases and then asks for the linear map between the two coefficient vectors. That map is the transition matrix, or T-matrix [@waterman_new_1969].
 
 For a single target, that point of view is valuable even before one thinks about multiple scattering. Once the target response is represented in a basis-to-basis form, the same mathematical object can in principle support monostatic scattering, bistatic scattering, rotations, and later orientation averaging.
 
-For smooth axisymmetric targets, the most natural basis depends on the geometry. A sphere is naturally represented in spherical coordinates, while a prolate spheroid is naturally represented in prolate spheroidal coordinates. Oblate spheroids can still be handled in a spherical-wave T-matrix framework by enforcing the boundary conditions on the actual surface $r(\theta)$, but the surface geometry then enters explicitly through the boundary operator. Finite cylinders are different again: the sidewall-endcap junctions make a purely spherical retained operator much less natural than a cylindrical modal basis, especially once one wants reliable angular products away from the simplest monostatic setting.[^2][^3][^4][^7]
+For smooth axisymmetric targets, the most natural basis depends on the geometry. A sphere is naturally represented in spherical coordinates, while a prolate spheroid is naturally represented in prolate spheroidal coordinates. Oblate spheroids can still be handled in a spherical-wave T-matrix framework by enforcing the boundary conditions on the actual surface $r(\theta)$, but the surface geometry then enters explicitly through the boundary operator. Finite cylinders are different again: the sidewall-endcap junctions make a purely spherical retained operator much less natural than a cylindrical modal basis, especially once one wants reliable angular products away from the simplest monostatic setting [@varadan_computation_1982; @ganesh_far_2008; @ganesh_numerically_2022; @waterman_t_2009].
 
 Unless stated otherwise, medium `1` is the surrounding seawater and medium `2` is the target interior.
 
@@ -60,7 +63,7 @@ $$
   \mathbf{f} = \mathbf{T}\mathbf{a}.
 $$
 
-For axisymmetric targets, the azimuthal order decouples. The T-matrix can therefore be organized into independent $m$-blocks, and the monostatic backscatter amplitude is reconstructed from those blocks after the incident plane-wave coefficients have been determined.[^1][^2]
+For axisymmetric targets, the azimuthal order decouples. The T-matrix can therefore be organized into independent $m$-blocks, and the monostatic backscatter amplitude is reconstructed from those blocks after the incident plane-wave coefficients have been determined [@waterman_new_1969; @varadan_computation_1982].
 
 ## Boundary conditions
 
@@ -168,7 +171,7 @@ $$
   \right).
 $$
 
-This simply states that a ray from the origin first meets either an end-cap plane or the cylindrical side wall. The resulting $r(\theta)$ is continuous but not differentiable where the side wall and end-cap meet, which is one reason finite cylinders are numerically less forgiving than smooth spheres or spheroids in a spherical-basis T-matrix treatment.[^7]
+This simply states that a ray from the origin first meets either an end-cap plane or the cylindrical side wall. The resulting $r(\theta)$ is continuous but not differentiable where the side wall and end-cap meet, which is one reason finite cylinders are numerically less forgiving than smooth spheres or spheroids in a spherical-basis T-matrix treatment [@waterman_t_2009].
 
 ## Monostatic reconstruction
 
@@ -194,7 +197,7 @@ The main obstacle for cylinders is geometric non-smoothness. A sphere or smooth 
 
 ## Why spherical coordinates are not the best exact basis
 
-A prolate spheroid is not a constant-$r$ surface. So while spherical-wave expansions can still be written down, they do not align naturally with the geometry. This is exactly the regime where the classic spheroidal-coordinate literature becomes relevant.[^2][^4][^5]
+A prolate spheroid is not a constant-$r$ surface. So while spherical-wave expansions can still be written down, they do not align naturally with the geometry. This is exactly the regime where the classic spheroidal-coordinate literature becomes relevant [@varadan_computation_1982; @ganesh_numerically_2022; @hackman_application_1984].
 
 For the single-target scalar acoustic problem, it is more natural to use prolate spheroidal coordinates and write the target surface as a single coordinate surface $\xi = \xi_1$. That is also the natural starting point for a geometry-matched T-matrix formulation.
 
@@ -243,7 +246,7 @@ In a homogeneous region, the separated pressure field is written as the product 
 
 The resulting field expansion has the same logical structure as the generic T-matrix expression above, but the basis is now geometry-matched.
 
-For rigid and pressure-release prolates, the retained degrees remain effectively local in the exact spheroidal basis. For liquid- and gas-filled prolates, the interior and exterior reduced frequencies differ, so the angular bases no longer match exactly. This introduces overlap-driven coupling between retained degrees, exactly as in the exact prolate spheroidal modal-series solution.[^5][^6]
+For rigid and pressure-release prolates, the retained degrees remain effectively local in the exact spheroidal basis. For liquid- and gas-filled prolates, the interior and exterior reduced frequencies differ, so the angular bases no longer match exactly. This introduces overlap-driven coupling between retained degrees, exactly as in the exact prolate spheroidal modal-series solution [@hackman_application_1984; @spence_scattering_1951; @furusawa_prolate_1988].
 
 ## T-matrix interpretation in a geometry-matched basis
 
@@ -251,10 +254,3 @@ The essential mathematical point is that the T-matrix concept does not depend on
 
 For spheres, the geometry-matched basis is spherical. For prolate spheroids, the geometry-matched basis is spheroidal. In both cases, the T-matrix interpretation is the same: the target response is represented as a linear map from incident modal amplitudes to scattered modal amplitudes in the basis natural to that geometry.
 
-[^1]: Waterman (1969).
-[^2]: Varadan et al. (1982).
-[^3]: Ganesh and Hawkins (2008).
-[^4]: Ganesh and Hawkins (2022).
-[^5]: Hackman (1984).
-[^6]: Spencer and Granger (1951); Furusawa (1988).
-[^7]: Waterman (2009).

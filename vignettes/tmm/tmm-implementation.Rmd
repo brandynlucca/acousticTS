@@ -9,6 +9,9 @@ output:
     fig_height: 3.5
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{TMM implementation}
   %\VignetteEncoding{UTF-8}
@@ -28,7 +31,10 @@ acousticTS:::.model_family_header(
 )
 ```
 
-The `acousticTS` package uses object-based scatterers, so the `TMM` workflow follows the same broad structure used elsewhere in the package: define the geometry, attach the material interpretation, evaluate target strength over the frequency range of interest, and then inspect the returned response carefully enough to understand what the model is actually buying you.
+
+These pages follow the coefficient-map view of scattering and later numerical implementations for axisymmetric bodies [@waterman_new_1969; @waterman_t_2009; @ganesh_numerically_2022].
+
+The acousticTS package uses object-based scatterers, so the `TMM` workflow follows the same broad structure used elsewhere in the package: define the geometry, attach the material interpretation, evaluate target strength over the frequency range of interest, and then inspect the returned response carefully enough to understand what the model is actually buying you.
 
 ## Why use `TMM` over `SPHMS` or `PSMS`?
 
@@ -243,7 +249,7 @@ knitr::include_graphics("tmm-scattering-slice.png")
 
 This is useful when the question is no longer just "what is the monostatic target strength?" but also "how does the same stored transition matrix distribute scattering over receive angle at a fixed frequency?" That is exactly the kind of post-processing that is natural in a T-matrix workflow and comparatively awkward in the purely direct exact-family formulations.
 
-All of the `tmm_scattering()`-style helpers use the **body-fixed angular coordinates** of the canonical axisymmetric target, not arbitrary world-frame directions. For the built-in prolate, oblate, and cylinder shapes in `acousticTS`, the symmetry axis is the body `x`-axis. So when these helpers are compared against an external BEM/FEM slice generated in a world `x-y` plane, the world directions need to be converted to the body-fixed `(\theta, \phi)` convention before the comparison is apples-to-apples.
+All of the `tmm_scattering()`-style helpers use the **body-fixed angular coordinates** of the canonical axisymmetric target, not arbitrary world-frame directions. For the built-in prolate, oblate, and cylinder shapes in acousticTS, the symmetry axis is the body `x`-axis. So when these helpers are compared against an external BEM/FEM slice generated in a world `x-y` plane, the world directions need to be converted to the body-fixed `(\theta, \phi)` convention before the comparison is apples-to-apples.
 
 ### Higher-level bistatic summaries
 

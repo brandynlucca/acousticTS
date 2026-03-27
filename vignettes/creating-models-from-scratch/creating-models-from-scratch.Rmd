@@ -7,6 +7,9 @@ output:
     fig_caption: yes
     dpi: 200
     dev.args: list(pointsize=11)
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
 vignette: >
   %\VignetteIndexEntry{Creating a Model from Scratch}
   %\VignetteEncoding{UTF-8}
@@ -15,7 +18,11 @@ vignette: >
 
 # Introduction
 
-One of the most useful features of `acousticTS` is that a new target-strength model does not need a large registration framework. The package's `target_strength()` wrapper already handles the dispatch pattern. To add a new model, the minimum requirement is that two functions exist and follow the expected naming convention:
+Building a model from scratch is easiest when the geometry, basis, and approximation regime stay aligned with the canonical scattering literature [@morse_theoretical_1986; @waterman_t_2009].
+
+
+
+One of the most useful features of acousticTS is that a new target-strength model does not need a large registration framework. The package's `target_strength()` wrapper already handles the dispatch pattern. To add a new model, the minimum requirement is that two functions exist and follow the expected naming convention:
 
 1. A lower-case initialization function named `*_initialize()`
 2. A model function whose name is literally the model name in the form that `target_strength()` will call
