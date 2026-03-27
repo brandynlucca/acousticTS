@@ -1,0 +1,4 @@
+"comparison","max_abs_delta_TS_dB","mean_abs_delta_TS_dB"
+"acousticTS vs echopop",0.0739469803065447,0.00112330642291454
+"acousticTS vs ZooScatR-source",9.9475983006414e-13,1.04711561059383e-14
+"echopop vs ZooScatR-source",0.0739469803065447,0.00112330642290407

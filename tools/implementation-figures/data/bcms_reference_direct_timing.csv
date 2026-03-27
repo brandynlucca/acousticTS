@@ -1,0 +1,3 @@
+"case","implementation","elapsed_s","frequency_min_khz","frequency_max_khz","frequency_step_khz"
+"straight","FCMS-reference",0.03,12,400,2
+"bent","Stanton-1989-reference",0.02,12,400,2
