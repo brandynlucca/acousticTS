@@ -10,7 +10,7 @@ permissions: read-all
 
 jobs:
   pre-cran-check:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.config.os }}
     name: ${{ matrix.config.name }}
     continue-on-error: ${{ matrix.config.experimental }}
 
@@ -18,12 +18,12 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {name: 'ubuntu-latest (release)', r: 'release', clang: false, experimental: false}
-          - {name: 'ubuntu-latest (devel)', r: 'devel', clang: false, experimental: true}
-          - {name: 'ubuntu-clang (release)', r: 'release', clang: true, experimental: false}
-          - {name: 'ubuntu-clang (devel)', r: 'devel', clang: true, experimental: true}
-          - {name: 'windows-latest (devel)', r: 'devel', clang: false, experimental: true, os: 'windows-latest'}
-          - {name: 'ubuntu-latest (no-suggests)', r: 'release', clang: false, experimental: false, _R_CHECK_DEPENDS_ONLY_: true}
+          - {name: 'ubuntu-latest (release)', os: 'ubuntu-latest', r: 'release', clang: false, experimental: false}
+          - {name: 'ubuntu-latest (devel)', os: 'ubuntu-latest', r: 'devel', clang: false, experimental: true}
+          - {name: 'ubuntu-clang (release)', os: 'ubuntu-latest', r: 'release', clang: true, experimental: false}
+          - {name: 'ubuntu-clang (devel)', os: 'ubuntu-latest', r: 'devel', clang: true, experimental: true}
+          - {name: 'windows-latest (devel)', os: 'windows-latest', r: 'devel', clang: false, experimental: true}
+          - {name: 'ubuntu-latest (no-suggests)', os: 'ubuntu-latest', r: 'release', clang: false, experimental: false, _R_CHECK_DEPENDS_ONLY_: true}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -43,6 +43,7 @@ jobs:
           use-public-rspm: ${{ matrix.config.r != 'devel' }}
 
       - name: Install Linux build tools
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y gfortran qpdf ghostscript
@@ -51,28 +52,21 @@ jobs:
           fi
 
       - name: Configure clang toolchain
-        if: matrix.config.clang
+        if: runner.os == 'Linux' && matrix.config.clang
         run: |
           GCC_INCLUDE=$(gcc -print-file-name=include)
-          GFORTRAN_LIB=$(gfortran -print-file-name=libgfortran.a)
-          QUADMATH_LIB=$(gfortran -print-file-name=libquadmath.a)
-          GFORTRAN_LIBDIR=$(dirname "$GFORTRAN_LIB")
-          QUADMATH_LIBDIR=$(dirname "$QUADMATH_LIB")
           mkdir -p ~/.R
-          cat > ~/.R/Makevars <<'EOF'
+          cat > ~/.R/Makevars <<EOF
           CC=clang
           CXX=clang++
           CXX11=clang++
           CXX14=clang++
           CXX17=clang++
           CXX17STD=-std=gnu++17
+          CPPFLAGS=-idirafter ${GCC_INCLUDE}
           FC=gfortran
           F77=gfortran
           EOF
-          {
-            echo "CPATH=$GCC_INCLUDE"
-            echo "LIBRARY_PATH=$GFORTRAN_LIBDIR:$QUADMATH_LIBDIR"
-          } >> "$GITHUB_ENV"
         shell: bash
 
       - uses: r-lib/actions/setup-r-dependencies@v2
