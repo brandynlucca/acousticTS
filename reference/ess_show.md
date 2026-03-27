@@ -13,3 +13,8 @@ ess_show(object)
 - object:
 
   ESS-class object.
+
+## Value
+
+Called for its side effect of printing a formatted summary; invisibly
+returns `NULL`.

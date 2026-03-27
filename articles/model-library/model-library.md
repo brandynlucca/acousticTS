@@ -23,7 +23,7 @@ These statuses are not all mutually exclusive: - `Benchmarked` and
 `Validated` are evidence tags and can appear together. - `Experimental`
 is a lifecycle tag and can coexist with either evidence tag. -
 `Unvalidated` is reserved for families lacking both evidence tags, so it
-should not be combined with `Benchmarked` or `Validated`.
+should not be combined with other evidence tags.
 
 ## Modal-series families
 

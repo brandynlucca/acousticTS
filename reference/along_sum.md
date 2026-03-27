@@ -17,3 +17,7 @@ along_sum(rpos, iterations)
 - iterations:
 
   Number of iterations
+
+## Value
+
+A numeric matrix containing the adjacent column sums of `rpos`.

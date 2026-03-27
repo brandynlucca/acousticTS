@@ -13,3 +13,8 @@ sbf_show(object)
 - object:
 
   SBF_class object.
+
+## Value
+
+Called for its side effect of printing a formatted summary; invisibly
+returns `NULL`.

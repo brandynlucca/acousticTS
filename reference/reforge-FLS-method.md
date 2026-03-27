@@ -8,10 +8,10 @@ Reforge FLS-class object.
 # S4 method for class 'FLS'
 reforge(
   object,
-  length,
-  radius,
+  length = NULL,
+  radius = NULL,
   length_radius_ratio_constant = TRUE,
-  n_segments
+  n_segments = NULL
 )
 ```
 

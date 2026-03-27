@@ -1,8 +1,6 @@
-# Derivative of the Legendre Function of the Second Kind
+# Derivative of the Legendre function of the second kind
 
-Computes the \\k\\-th derivative of the Legendre function of the second
-kind, \\\frac{d^k}{dx^k} Q\_\nu(x)\\, with respect to the argument
-\\x\\.
+Derivative of the Legendre function of the second kind
 
 ## Usage
 
@@ -29,21 +27,6 @@ Qndk(n, x, k = 1L)
 
 A complex matrix of dimension `length(n)` by `length(x)`, where element
 `[i, j]` contains \\\frac{d^k}{dx^k} Q\_{n_i}(x_j)\\.
-
-## Details
-
-Derivatives are computed using central finite differences:
-\$\$\frac{dQ\_\nu}{dx} \approx \frac{Q\_\nu(x+h) - Q\_\nu(x-h)}{2h}\$\$
-
-Higher-order derivatives use the generalized finite difference stencil
-with binomial coefficients.
-
-For \\\|x\| \> 1\\, the result is complex since \\Q\_\nu(x)\\ is complex
-in that domain.
-
-**Singularities:** The function \\Q\_\nu(x)\\ has logarithmic
-singularities at \\x = \pm 1\\. Derivatives near these points will have
-reduced accuracy or may be undefined.
 
 ## Note
 

@@ -1,22 +1,26 @@
-# Calculate the mass density material properties of a scatterer's tissue or shell (kappa)
+# Calculate the density contrast (\\\rho\\) of a scattering boundary
 
-Calculate the mass density material properties of a scatterer's tissue
-or shell (kappa)
+Calculate the density contrast (\\\rho\\) of a scattering boundary
 
 ## Usage
 
 ``` r
-rho(interface1, interface2)
+rho(medium, target)
 ```
 
 ## Arguments
 
-- interface1:
+- medium:
 
-  Dataframe object containing density (kg/m^3) and sound speed (m/s)
-  values for a boundary/interface (1)
+  Dataframe object containing density (\\kgm^{-3}\\) and sound speed
+  (\\ms^{-1}\\) values for the external medium.
 
-- interface2:
+- target:
 
-  Dataframe object containing density (kg/m^3) and sound speed (m/s)
-  values for a boundary/interface (2)
+  Dataframe object containing density (\\kgm^{-3}\\) and sound speed
+  (\\ms^{-1}\\) values for the target boundary.
+
+## Value
+
+Density contrast, defined as \\(\rho\_{target} -
+\rho\_{medium})/\rho\_{target}\\.

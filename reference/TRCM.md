@@ -12,9 +12,9 @@ bodies such as zooplankton, particularly at high frequencies where the
 acoustic wavelength is much smaller than the organism size. The model
 supports both straight and bent cylinders, with the bent cylinder
 formulation incorporating the radius of curvature to account for body
-shape effects on the directivity pattern. For more details, see the
-[expanded documentation on the two-ray cylinder
-model](https://brandynlucca.github.io/acousticTS/articles/trcm/trcm-theory.html).
+shape effects on the directivity pattern. For a fuller derivation and
+implementation discussion, see
+`vignette("trcm-theory", package = "acousticTS")`.
 
 ## Usage
 

@@ -1,6 +1,6 @@
-# Gauss–Legendre nodes and weights
+# Gauss-Legendre nodes and weights
 
-Compute Gauss–Legendre quadrature nodes and weights on an interval
+Compute Gauss-Legendre quadrature nodes and weights on an interval
 \\\[a,~b\]\\.
 
 ## Usage
@@ -38,14 +38,12 @@ A list with components:
 
 ## Details
 
-Gauss–Legendre quadrature provides exact integration for polynomials of
+Gauss-Legendre quadrature provides exact integration for polynomials of
 degree up to \\2n-1\\ using n nodes and weights chosen as the roots of
 the Legendre polynomial \\P_n(x)\\ on the canonical interval
-\\\[-1,1\]\\. For a general interval \\\[a,b\]\\ the mapping \$\$x =
-\tfrac{a+b}{2} + \tfrac{b-a}{2}\\t,\quad t\in\[-1,1\],\$\$ transforms
-canonical nodes \\t_i\\ to \\x_i\\ and scales weights by \$\$w_i =
-\tfrac{b-a}{2}\\w_i^{(0)},\$\$ where \\w_i^{(0)}\\ are the standard
-weights on \\\[-1,1\]\\.
+\\\[-1,1\]\\. For a general interval \\\[a,b\]\\ the canonical nodes are
+shifted and rescaled onto \\\[a,b\]\\, and the weights are scaled by
+\\(b-a)/2\\.
 
 This wrapper performs basic argument validation and calls the C++
 routine to obtain nodes and weights with high accuracy for moderate `n`.

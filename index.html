@@ -6,19 +6,21 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Estimating Acoustic Target Strength via Physics-Based Scattering Models • acousticTS</title>
-<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
-  window.MathJax = {
-    chtml: {
-      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
-    }
-  };
-</script><script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" sizes="any" href="favicon.ico">
+<link rel="manifest" href="site.webmanifest">
+<!-- katex math --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script><script src="katex-auto.js"></script><script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Estimating Acoustic Target Strength via Physics-Based Scattering Models">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><link href="extra.css" rel="stylesheet">
+<meta property="og:title" content="Estimating Acoustic Target Strength via Physics-Based Scattering Models">
 <meta name="description" content="Acoustic target strength (TS) represents the intensity of an echo returning from an individual scatterer such as bubbles, fish, or zooplankton. TS can be used to convert integrated or volumetric backscatter collected from fisheries acoustic surveys into units of number density (e.g. animals per m^3), abundance (e.g. number of animals), and biomass (e.g. kg). This parameter can also be used to aid in classifying backscatter, such as separating likely echoes of large predatory fish (e.g. adult cod) from smaller prey (e.g. shrimp). One way to estimate TS is to use physics-based models to calculate theoretical TS that comprise exact and approximate solutions as well as analytical approaches. The models provided can help provide TS estimates over broad statistical distributions of model parameters.">
 <meta property="og:description" content="Acoustic target strength (TS) represents the intensity of an echo returning from an individual scatterer such as bubbles, fish, or zooplankton. TS can be used to convert integrated or volumetric backscatter collected from fisheries acoustic surveys into units of number density (e.g. animals per m^3), abundance (e.g. number of animals), and biomass (e.g. kg). This parameter can also be used to aid in classifying backscatter, such as separating likely echoes of large predatory fish (e.g. adult cod) from smaller prey (e.g. shrimp). One way to estimate TS is to use physics-based models to calculate theoretical TS that comprise exact and approximate solutions as well as analytical approaches. The models provided can help provide TS estimates over broad statistical distributions of model parameters.">
+<meta property="og:image" content="https://brandynlucca.github.io/acousticTS/logo.png">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -37,23 +39,59 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/calibration_sphere_target_strength_vignette.html">Target strength for a calibration sphere</a></li>
-    <li><a class="dropdown-item" href="articles/dcm_deformed_cylinder_model_vignette.html">Target strength modeling with the Deformed Cylinder Model (DCM)</a></li>
-    <li><a class="dropdown-item" href="articles/dwba_fluid_like_scatterers_vignette.html">DWBA and SDWBA models for fluid-like scatterers</a></li>
-    <li><a class="dropdown-item" href="articles/elastic_shelled_sphere_target_strength_vignette.html">Target strength for elastic shelled spheres</a></li>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-getting-started" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Getting Started</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-getting-started">
+<li><a class="dropdown-item" href="articles/getting-started/getting-started.html">Quick Start</a></li>
+    <li><a class="dropdown-item" href="articles/package-concepts/package-concepts.html">Package Concepts</a></li>
+    <li><a class="dropdown-item" href="articles/example-data/example-data.html">Example Data</a></li>
   </ul>
 </li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-physics-primer" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Physics Primer</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-physics-primer">
+<li><a class="dropdown-item" href="articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
+    <li><a class="dropdown-item" href="articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+    <li><a class="dropdown-item" href="articles/boundary_conditions.html">Boundary conditions</a></li>
+    <li><a class="dropdown-item" href="articles/material-properties/material-properties.html">Material properties</a></li>
+    <li><a class="dropdown-item" href="articles/numerical-foundations/numerical-foundations.html">Numerical methods</a></li>
+  </ul>
+</li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-build-targets" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Build Targets</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-build-targets">
+<li><a class="dropdown-item" href="articles/building-shapes/building-shapes.html">Building Shapes</a></li>
+    <li><a class="dropdown-item" href="articles/building-scatterers/building-scatterers.html">Building Scatterers</a></li>
+    <li><a class="dropdown-item" href="articles/shape-manipulation-reforging/shape-manipulation-reforging.html">Shape Manipulation</a></li>
+  </ul>
+</li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-run-models" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Run Models</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-run-models">
+<li><a class="dropdown-item" href="articles/running-models/running-models.html">Running Models</a></li>
+    <li><a class="dropdown-item" href="articles/model-selection/model-selection.html">Choosing a Model</a></li>
+    <li><a class="dropdown-item" href="articles/comparing-models/comparing-models.html">Comparing Models</a></li>
+    <li><a class="dropdown-item" href="articles/plotting-inspecting-results/plotting-inspecting-results.html">Visualizing results</a></li>
+    <li><a class="dropdown-item" href="articles/simulation-parameter-sweeps/simulation-parameter-sweeps.html">Simulation sweeps</a></li>
+    <li><a class="dropdown-item" href="articles/calibration-workflow/calibration-workflow.html">Calibration workflow</a></li>
+    <li><a class="dropdown-item" href="articles/validation-benchmarks/validation-benchmarks.html">Validating models</a></li>
+  </ul>
+</li>
+<li class="nav-item"><a class="nav-link" href="articles/model-library/model-library.html">Model Library</a></li>
+<li class="nav-item"><a class="nav-link" href="articles/bibliography/bibliography.html">Bibliography</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-developers" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Developers</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-developers">
+<li><a class="dropdown-item" href="articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
+    <li><a class="dropdown-item" href="articles/combining-components/combining-components.html">Combining components</a></li>
+    <li><a class="dropdown-item" href="articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
+  </ul>
+</li>
+<li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
 <li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
-<li class="nav-item"><form class="form-inline" role="search">
- <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json">
-</form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
 
@@ -62,19 +100,267 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="acousticts">acousticTS<a class="anchor" aria-label="anchor" href="#acousticts"></a>
-</h1></div>
-<p><a href="https://zenodo.org/badge/latestdoi/161965429" class="external-link"><img src="https://zenodo.org/badge/161965429.svg" alt="DOI"></a> <a href="https://brandynlucca.github.io/acousticTS/"><img src="https://img.shields.io/badge/Latest_Documentation-blue" alt="Documentation"></a> <a href="https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml/badge.svg" alt="Build status"></a> <a href="https://github.com/brandynlucca/acousticTS/actions/workflows/test-coverage.yaml" class="external-link"><img src="https://github.com/brandynlucca/acousticTS/actions/workflows/test-coverage.yaml/badge.svg" alt="Coverage"></a> <a href="https://github.com/brandynlucca/acousticTS/actions/workflows/document.yaml" class="external-link"><img src="https://github.com/brandynlucca/acousticTS/actions/workflows/document.yaml/badge.svg" alt="Docs"></a> <a href="https://github.com/brandynlucca/acousticTS/actions/workflows/pkgdown.yaml" class="external-link"><img src="https://github.com/brandynlucca/acousticTS/actions/workflows/pkgdown.yaml/badge.svg" alt="pkgdown"></a> <a href="https://github.com/brandynlucca/acousticTS/actions/workflows/pages/pages-build-deployment" class="external-link"><img src="https://github.com/brandynlucca/acousticTS/actions/workflows/pages/pages-build-deployment/badge.svg?branch=gh-pages" alt="pages-build-deployment"></a> Acoustic backscatter from a single target or organism is expressed as the intensity of an echo typically denoted as the <em>backscattering cross-section</em> (σ<sub>bs</sub>, m<sup>2</sup>). Target strength (TS, dB re. 1 m<sup>2</sup>) is the logarithmic representation of σ<sub>bs</sub> where: TS = 10 log<sub>10</sub> (σ<sub>bs</sub>). TS can be used to convert integrated (e.g. nautical area scattering coefficient, S<sub>A</sub>, dB re. 1(m<sup>2</sup> nmi<sup>-2</sup>) or volumetric backscatter (e.g. S<sub>v</sub>, dB re. 1 m<sup>-1</sup>) collected from fisheries acoustic surveys into units of number density, such as the volumetric density of a fish school (i.e. animals m<sup>-3</sup>). This parameter can also aid in classifying backscatter based on the multifrequency response of targets, such as separating likely echoes of large predatory fish from smaller prey. While there are several approaches for estimating TS, one common method is to apply physics-based models to predict theoretical TS that comprise exact and approximate solutions. The models provided in the <code>acousticTS</code> package can help provide TS estimates parameterized using broad statitsical distributions of inputs. This package is in a constant state of development with updates to the available model library, computational efficiency, and quality-of-life improvements.</p>
+<div class="page-header">
+<img src="logo.png" class="logo" alt=""><h1 id="acousticts-">acousticTS <a class="anchor" aria-label="anchor" href="#acousticts-"></a>
+</h1>
+</div>
+<p><a href="https://doi.org/10.5281/zenodo.7855558" class="external-link"><img src="https://doi.org/10.5281/zenodo.7855558.svg" alt="DOI"></a> <a href="https://brandynlucca.github.io/acousticTS/"><img src="https://img.shields.io/badge/Latest_Documentation-blue" alt="Documentation"></a> <a href="https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml/badge.svg" alt="Build status"></a> <a href="https://github.com/brandynlucca/acousticTS/actions/workflows/test-coverage.yaml" class="external-link"><img src="https://github.com/brandynlucca/acousticTS/actions/workflows/test-coverage.yaml/badge.svg" alt="Coverage"></a></p>
 <div class="section level2">
-<h2 id="installation">
-<u>Installation</u><a class="anchor" aria-label="anchor" href="#installation"></a>
+<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>You can install the current released version of acousticTS via:</p>
+<p>acousticTS is an R package for estimating the acoustic target strength (TS) of aquatic organisms and objects using physics-based scattering models. It supports a range of scatterer types: fluid-like bodies (e.g., fish, zooplankton), gas-filled bodies (e.g. swimbladders), elastic shells (e.g. pteropods, euphausiids), and calibration spheres. It further provides a unified interface for parameterizing, running, and comparing models across frequencies, orientations, and morphologies. Acoustic backscatter from a single target is expressed as the <em>backscattering cross-section</em> (<span class="math inline">\sigma_\text{bs}</span>, m²). Target strength (<span class="math inline">TS</span>, dB re. 1 m²) is its logarithmic form:</p>
+<p><span class="math display">
+  TS = 10 \log_{10}(\sigma_\text{bs})
+</span></p>
+<p><span class="math inline">TS</span> is used to:</p>
+<ul>
+<li>Convert integrated backscatter (e.g. <span class="math inline">S_\mathrm{A}</span>, NASC) or volumetric backscatter (<span class="math inline">S_\text{V}</span>) into number density or biomass</li>
+<li>Classify backscatter by species or taxon based on multi-frequency response</li>
+<li>Parameterize and evaluate physics-based scattering models over statistical distributions of organism size and orientation</li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<p>Install the latest release from GitHub:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"brandynlucca/acousticTS"</span><span class="op">)</span></span></code></pre></div>
-<p>Or you can install the development version of acousticTS like so:</p>
+<code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"brandynlucca/acousticTS"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="scatterer-classes">Scatterer classes<a class="anchor" aria-label="anchor" href="#scatterer-classes"></a>
+</h2>
+<p>acousticTS organizes targets into five <code>S4</code> classes:</p>
+<table class="table">
+<colgroup>
+<col width="9%">
+<col width="36%">
+<col width="54%">
+</colgroup>
+<thead><tr class="header">
+<th>Class</th>
+<th>Description</th>
+<th>Example taxa</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>FLS</code></td>
+<td>Fluid-like scatterer</td>
+<td>Euphausiids, myctophids, decapod shrimp</td>
+</tr>
+<tr class="even">
+<td><code>SBF</code></td>
+<td>Swimbladder-bearing fish</td>
+<td>Herring, cod, sardine</td>
+</tr>
+<tr class="odd">
+<td><code>GAS</code></td>
+<td>Gas-filled body</td>
+<td>Siphonophore pneumatophores</td>
+</tr>
+<tr class="even">
+<td><code>ESS</code></td>
+<td>Elastic-shelled scatterer</td>
+<td>Pteropods, juvenile bivalves</td>
+</tr>
+<tr class="odd">
+<td><code>CAL</code></td>
+<td>Calibration sphere</td>
+<td>Tungsten carbide, copper spheres</td>
+</tr>
+</tbody>
+</table>
+<p>Each class stores a shape (position matrix + morphometrics), body material properties (density and sound speed contrasts), and model results in a structured <code>S4</code> object.</p>
+</div>
+<div class="section level2">
+<h2 id="models">Models<a class="anchor" aria-label="anchor" href="#models"></a>
+</h2>
+<table class="table">
+<thead><tr class="header">
+<th>Model</th>
+<th>Abbreviation</th>
+<th>Scatterer type</th>
+<th>Boundary</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Distorted-wave Born approximation</td>
+<td><code>DWBA</code></td>
+<td>FLS</td>
+<td>Fluid</td>
+</tr>
+<tr class="even">
+<td>Stochastic DWBA</td>
+<td><code>SDWBA</code></td>
+<td>FLS</td>
+<td>Fluid</td>
+</tr>
+<tr class="odd">
+<td>Kirchhoff-ray mode</td>
+<td><code>KRM</code></td>
+<td>FLS, SBF</td>
+<td>Fluid + gas</td>
+</tr>
+<tr class="even">
+<td>High-pass approximation</td>
+<td><code>HPA</code></td>
+<td>FLS, GAS</td>
+<td>Fluid / gas</td>
+</tr>
+<tr class="odd">
+<td>Two-ray cylinder model</td>
+<td><code>TRCM</code></td>
+<td>FLS</td>
+<td>Fluid</td>
+</tr>
+<tr class="even">
+<td>Modal series solution (sphere)</td>
+<td><code>SPHMS</code></td>
+<td>CAL, ESS</td>
+<td>Multiple</td>
+</tr>
+<tr class="odd">
+<td>Modal series solution (prolate spheroid)</td>
+<td><code>PSMS</code></td>
+<td>FLS</td>
+<td>Fluid</td>
+</tr>
+<tr class="even">
+<td>Modal series solution (elastic shell)</td>
+<td><code>ESSMS</code></td>
+<td>ESS</td>
+<td>Elastic</td>
+</tr>
+<tr class="odd">
+<td>Finite-cylinder modal series</td>
+<td><code>FCMS</code></td>
+<td>CAL</td>
+<td>Rigid / fluid</td>
+</tr>
+<tr class="even">
+<td>Resonance model (gas sphere)</td>
+<td><code>SOEMS</code></td>
+<td>GAS, CAL</td>
+<td>Gas</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level2">
+<h2 id="quick-start">Quick start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
+</h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"brandynlucca/acousticTS@test-branch"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://brandynlucca.github.io/acousticTS/">acousticTS</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Build a fluid-like scatterer (e.g. krill) with a cylinder shape</span></span>
+<span><span class="va">krill</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/cylinder.html">cylinder</a></span><span class="op">(</span></span>
+<span>  length <span class="op">=</span> <span class="fl">0.03</span>,          <span class="co"># 30 mm body length</span></span>
+<span>  radius <span class="op">=</span> <span class="fl">0.003</span>,         <span class="co"># 3 mm max radius</span></span>
+<span>  g <span class="op">=</span> <span class="fl">1.0357</span>,             <span class="co"># density contrast</span></span>
+<span>  h <span class="op">=</span> <span class="fl">1.0279</span>,             <span class="co"># sound speed contrast</span></span>
+<span>  theta <span class="op">=</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">2</span>          <span class="co"># broadside incidence</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Run the DWBA model from 1 kHz to 300 kHz</span></span>
+<span><span class="va">krill</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/target_strength.html">target_strength</a></span><span class="op">(</span><span class="va">krill</span>, frequency <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1e3</span>, <span class="fl">300e3</span>, by <span class="op">=</span> <span class="fl">1e3</span><span class="op">)</span>,</span>
+<span>                          model <span class="op">=</span> <span class="st">"DWBA"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Plot TS vs frequency</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">krill</span>, type<span class="op">=</span><span class="st">"model"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="shapes-and-reforging">Shapes and reforging<a class="anchor" aria-label="anchor" href="#shapes-and-reforging"></a>
+</h2>
+<p>Scatterer shapes are created via dedicated constructors:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Cylinder (used by FLS / CAL)</span></span>
+<span><span class="va">fish_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/cylinder.html">cylinder</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fl">0.25</span>, radius <span class="op">=</span> <span class="fl">0.02</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Prolate spheroid (used by FLS / PSMS)</span></span>
+<span><span class="va">ps_shape</span>   <span class="op">&lt;-</span> <span class="fu"><a href="reference/prolate_spheroid.html">prolate_spheroid</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fl">0.02</span>, radius <span class="op">=</span> <span class="fl">0.002</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Arbitrary shape from digitized position matrix</span></span>
+<span><span class="va">arb_shape</span>  <span class="op">&lt;-</span> <span class="fu"><a href="reference/arbitrary.html">arbitrary</a></span><span class="op">(</span>rpos <span class="op">=</span> <span class="va">my_matrix</span><span class="op">)</span></span></code></pre></div>
+<p>Existing scatterer objects can be resized or re-discretized without reconstructing them from scratch using <code><a href="reference/reforge.html">reforge()</a></code>:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Rescale a krill to 40 mm</span></span>
+<span><span class="va">krill_40mm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/reforge.html">reforge</a></span><span class="op">(</span><span class="va">krill</span>, length <span class="op">=</span> <span class="fl">0.04</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Change segment count</span></span>
+<span><span class="va">krill_fine</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/reforge.html">reforge</a></span><span class="op">(</span><span class="va">krill</span>, n_segments <span class="op">=</span> <span class="fl">200</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="configuring-simulations">Configuring simulations<a class="anchor" aria-label="anchor" href="#configuring-simulations"></a>
+</h2>
+<p><code><a href="reference/simulate_ts.html">simulate_ts()</a></code> runs repeated model evaluations across distributions of input parameters, supporting both vectorized and batch modes:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_ts.html">simulate_ts</a></span><span class="op">(</span></span>
+<span>  <span class="va">krill</span>,</span>
+<span>  model <span class="op">=</span> <span class="st">"DWBA"</span>,</span>
+<span>  frequency <span class="op">=</span> <span class="fl">120e3</span>,</span>
+<span>  n <span class="op">=</span> <span class="fl">1000</span>,</span>
+<span>  parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    theta <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">pi</span> <span class="op">/</span> <span class="fl">2</span>, <span class="va">pi</span> <span class="op">/</span> <span class="fl">18</span><span class="op">)</span>,</span>
+<span>    length <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.03</span>, <span class="fl">0.003</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="built-in-datasets">Built-in datasets<a class="anchor" aria-label="anchor" href="#built-in-datasets"></a>
+</h2>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr class="header">
+<th>Dataset</th>
+<th>Description</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>krill</code></td>
+<td>Antarctic krill (<em>Euphausia superba</em>) shape and material properties</td>
+</tr>
+<tr class="even">
+<td><code>cod</code></td>
+<td>Atlantic cod (<em>Gadus morhua</em>) shape and swimbladder</td>
+</tr>
+<tr class="odd">
+<td><code>sardine</code></td>
+<td>Pacific sardine (<em>Sardinops sagax</em>) shape and swimbladder</td>
+</tr>
+<tr class="even">
+<td><code>benchmark_ts</code></td>
+<td>Benchmark TS values for model validation</td>
+</tr>
+</tbody>
+</table>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">krill</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">cod</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">sardine</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">benchmark_ts</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
+</h2>
+<p>If you use <code>acousticTS</code> in published work, please cite:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/citation.html" class="external-link">citation</a></span><span class="op">(</span><span class="st">"acousticTS"</span><span class="op">)</span></span></code></pre></div>
+<blockquote>
+<p>Lucca, B. (2023). acousticTS: Estimating Acoustic Target Strength via Physics-Based Scattering Models. <a href="https://doi.org/10.5281/zenodo.7600660" class="external-link uri">https://doi.org/10.5281/zenodo.7600660</a></p>
+</blockquote>
+</div>
+<div class="section level2">
+<h2 id="contributing-and-bug-reports">Contributing and bug reports<a class="anchor" aria-label="anchor" href="#contributing-and-bug-reports"></a>
+</h2>
+<p>Bug reports and feature requests are welcome via the <a href="https://github.com/brandynlucca/acousticTS/issues" class="external-link">GitHub Issues page</a>. Please include a minimal reproducible example when reporting bugs.</p>
+</div>
+<div class="section level2">
+<h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
+</h2>
+<p>GPL-3. See <a href="LICENSE">LICENSE</a> for details.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
@@ -105,7 +391,7 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Brandyn Lucca <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0003-3145-2969" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Brandyn Lucca <br><small class="roles"> Author, maintainer, copyright holder </small> <a href="https://orcid.org/0000-0003-3145-2969" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 </ul>
 </div>
 

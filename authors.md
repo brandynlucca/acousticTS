@@ -2,7 +2,7 @@
 
 ## Authors
 
-- **Brandyn Lucca**. Author, maintainer.
+- **Brandyn Lucca**. Author, maintainer, copyright holder.
   [](https://orcid.org/0000-0003-3145-2969)
 
 ## Citation
