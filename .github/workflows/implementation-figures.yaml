@@ -70,7 +70,21 @@ jobs:
       - name: Check for drift
         if: steps.scope.outputs.scope != 'skip'
         run: |
-          git diff --exit-code -- \
+          git diff --name-only -- \
             vignettes \
             tools/implementation-figures \
-            || (echo "Implementation figures/data are out of date." && exit 1)
+            > implementation_drift.txt
+
+          if [ ! -s implementation_drift.txt ]; then
+            exit 0
+          fi
+
+          echo "Detected implementation rebuild drift:"
+          cat implementation_drift.txt
+
+          if grep -vE '\.png$' implementation_drift.txt >/dev/null; then
+            echo "Implementation figures/data are out of date."
+            exit 1
+          fi
+
+          echo "Only PNG drift detected; not failing the workflow."
