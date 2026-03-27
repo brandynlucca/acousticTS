@@ -11,8 +11,13 @@
     return(seq_along(available))
   }
   # Validate the requested frequencies =========================================
-  if (!is.numeric(frequency) || !length(frequency) || any(!is.finite(frequency))) {
-    stop("'frequency' must be NULL or a numeric vector of finite values in Hz.", call. = FALSE)
+  if (!is.numeric(frequency) ||
+      !length(frequency) ||
+      any(!is.finite(frequency))) {
+    stop(
+      "'frequency' must be NULL or a numeric vector of finite values in Hz.",
+      call. = FALSE
+    )
   }
 
   idx <- vapply(
@@ -58,8 +63,15 @@
   }
 
   for (nm in required_cols) {
-    if (!is.numeric(reciprocity_pairs[[nm]]) || any(!is.finite(reciprocity_pairs[[nm]]))) {
-      stop("'", nm, "' in 'reciprocity_pairs' must be finite numeric angles in radians.", call. = FALSE)
+    if (!is.numeric(reciprocity_pairs[[nm]]) ||
+        any(!is.finite(reciprocity_pairs[[nm]]))) {
+      stop(
+        "'",
+        nm,
+        "' in 'reciprocity_pairs' must be finite numeric angles in ",
+        "radians.",
+        call. = FALSE
+      )
     }
   }
 
@@ -278,8 +290,16 @@
       data.frame(
         frequency = df$frequency[1],
         continuation_target_aspect_ratio = df$target_aspect_ratio[1],
-        continuation_max_abs_step_TS = if (length(ts_diff)) max(abs(ts_diff)) else 0,
-        continuation_max_abs_second_diff_TS = if (length(ts_second_diff)) max(abs(ts_second_diff)) else 0,
+        continuation_max_abs_step_TS = if (length(ts_diff)) {
+          max(abs(ts_diff))
+        } else {
+          0
+        },
+        continuation_max_abs_second_diff_TS = if (length(ts_second_diff)) {
+          max(abs(ts_second_diff))
+        } else {
+          0
+        },
         continuation_any_nonfinite = any(!is.finite(df$TS))
       )
     }
@@ -326,26 +346,26 @@
   }
 
   valid_blocks <- Filter(
-    function(block) is.list(block) && !is.null(block$T),
+    function(block) is.list(block) && !is.null(block[["T"]]),
     t_blocks
   )
   if (!length(valid_blocks)) {
     return(empty)
   }
-  # Summarize each retained T-matrix block =====================================
+  # Summarize each retained transition-matrix block ============================
   out <- lapply(
     valid_blocks,
     function(block) {
-      T_block <- block$T
-      den <- sqrt(sum(Mod(T_block)^2))
+      t_block <- block[["T"]]
+      den <- sqrt(sum(Mod(t_block)^2))
       transpose_residual <- if (!is.finite(den) || den == 0) {
         0
       } else {
-        sqrt(sum(Mod(T_block - t(T_block))^2)) / den
+        sqrt(sum(Mod(t_block - t(t_block))^2)) / den
       }
 
       rcond_value <- block$rcond_lhs %||% tryCatch(
-        rcond(T_block),
+        rcond(t_block),
         error = function(...) NA_real_
       )
 
@@ -392,11 +412,287 @@
   max(Mod(f_forward - f_reverse) / denom)
 }
 
+.tmm_validate_diagnostic_grid <- function(n_theta, n_phi) {
+  # Validate the theta-grid control ===========================================
+  if (!is.numeric(n_theta) || length(n_theta) != 1 || !is.finite(n_theta) ||
+      n_theta < 5 || n_theta %% 1 != 0) {
+    stop("'n_theta' must be a single integer >= 5.", call. = FALSE)
+  }
+  # Validate the phi-grid control =============================================
+  if (!is.numeric(n_phi) || length(n_phi) != 1 || !is.finite(n_phi) ||
+      n_phi < 5 || n_phi %% 1 != 0) {
+    stop("'n_phi' must be a single integer >= 5.", call. = FALSE)
+  }
+  # Return the validated grid sizes ===========================================
+  list(n_theta = as.integer(n_theta), n_phi = as.integer(n_phi))
+}
+
+.tmm_monostatic_residuals <- function(object,
+                                      model_params,
+                                      frequency_idx,
+                                      shape_parameters,
+                                      theta_body,
+                                      phi_body) {
+  # Evaluate the monostatic scattering point ==================================
+  f_mono <- .tmm_scattering_points(
+    model_params = model_params,
+    frequency_idx = frequency_idx,
+    shape_parameters = shape_parameters,
+    theta_body = theta_body,
+    phi_body = phi_body,
+    theta_scatter = pi - theta_body,
+    phi_scatter = (phi_body + pi) %% (2 * pi)
+  )[1]
+  # Compare against the stored backscatter amplitude ===========================
+  stored_f_bs <- acousticTS::extract(object, "model")$TMM$f_bs[frequency_idx]
+  mono_abs <- Mod(f_mono - stored_f_bs)
+  mono_rel <- mono_abs / max(Mod(stored_f_bs), .Machine$double.eps)
+  # Return the monostatic residual summary ====================================
+  list(abs = mono_abs, rel = mono_rel)
+}
+
+.tmm_optical_theorem_metrics <- function(model_params,
+                                         acoustics,
+                                         frequency_idx,
+                                         shape_parameters,
+                                         theta_body,
+                                         phi_body,
+                                         n_theta,
+                                         n_phi) {
+  # Skip optical-theorem checks outside the spherical branch ==================
+  if (!identical(model_params$parameters$coordinate_system, "spherical")) {
+    return(list(
+      sigma_total = NA_real_,
+      sigma_ext = NA_real_,
+      optical_sign = NA_real_,
+      optical_rel = NA_real_
+    ))
+  }
+  # Build the angular scattering grid =========================================
+  theta_grid <- seq(0, pi, length.out = n_theta)
+  phi_grid <- seq(0, 2 * pi, length.out = n_phi)
+  sigma_grid <- .sigma_bs(
+    .tmm_scattering_grid_matrix(
+      model_params = model_params,
+      frequency_idx = frequency_idx,
+      shape_parameters = shape_parameters,
+      theta_body = theta_body,
+      phi_body = phi_body,
+      theta_scatter = theta_grid,
+      phi_scatter = phi_grid
+    )
+  )
+  sigma_total <- .tmm_total_scattering_cross_section(
+    theta_scatter = theta_grid,
+    phi_scatter = phi_grid,
+    sigma_scat = sigma_grid
+  )
+  # Evaluate the forward amplitude used in the optical theorem ================
+  f_forward <- .tmm_scattering_points(
+    model_params = model_params,
+    frequency_idx = frequency_idx,
+    shape_parameters = shape_parameters,
+    theta_body = theta_body,
+    phi_body = phi_body,
+    theta_scatter = theta_body,
+    phi_scatter = phi_body
+  )[1]
+  sigma_ext_raw <- (4 * pi / acoustics$k_sw[frequency_idx]) * Im(f_forward)
+  optical_sign <- if (
+    abs(sigma_total - sigma_ext_raw) <= abs(sigma_total + sigma_ext_raw)
+  ) {
+    1
+  } else {
+    -1
+  }
+  sigma_ext <- optical_sign * sigma_ext_raw
+  optical_rel <- abs(sigma_total - sigma_ext) /
+    max(abs(sigma_total), abs(sigma_ext), .Machine$double.eps)
+  # Return the optical-theorem summary ========================================
+  list(
+    sigma_total = sigma_total,
+    sigma_ext = sigma_ext,
+    optical_sign = optical_sign,
+    optical_rel = optical_rel
+  )
+}
+
+.tmm_block_summary <- function(block_df) {
+  # Estimate block conditioning from the stored summaries =====================
+  min_rcond <- if (nrow(block_df)) min(block_df$rcond, na.rm = TRUE) else {
+    NA_real_
+  }
+  if (!is.finite(min_rcond)) {
+    min_rcond <- NA_real_
+  }
+  max_cond <- if (is.na(min_rcond) || min_rcond <= 0) Inf else 1 / min_rcond
+  max_transpose <- if (nrow(block_df)) {
+    max(block_df$transpose_residual, na.rm = TRUE)
+  } else {
+    NA_real_
+  }
+  # Return the block-conditioning summary =====================================
+  list(
+    min_rcond = min_rcond,
+    max_cond = max_cond,
+    max_transpose = max_transpose
+  )
+}
+
+.tmm_continuation_metrics <- function(continuation_summary, frequency_value) {
+  # Return missing continuation metrics when no path is available =============
+  if (is.null(continuation_summary)) {
+    return(list(
+      target_aspect_ratio = NA_real_,
+      max_abs_step_TS = NA_real_,
+      max_abs_second_diff_TS = NA_real_,
+      any_nonfinite = NA
+    ))
+  }
+  # Recover the continuation row for the active frequency =====================
+  continuation_row <- continuation_summary[
+    continuation_summary$frequency == frequency_value,
+    ,
+    drop = FALSE
+  ]
+  if (!nrow(continuation_row)) {
+    return(list(
+      target_aspect_ratio = NA_real_,
+      max_abs_step_TS = NA_real_,
+      max_abs_second_diff_TS = NA_real_,
+      any_nonfinite = NA
+    ))
+  }
+  # Return the continuation diagnostics =======================================
+  list(
+    target_aspect_ratio =
+      continuation_row$continuation_target_aspect_ratio[1],
+    max_abs_step_TS = continuation_row$continuation_max_abs_step_TS[1],
+    max_abs_second_diff_TS =
+      continuation_row$continuation_max_abs_second_diff_TS[1],
+    any_nonfinite = continuation_row$continuation_any_nonfinite[1]
+  )
+}
+
+.tmm_reciprocity_metric <- function(model_params,
+                                    frequency_idx,
+                                    shape_parameters,
+                                    reciprocity_pairs) {
+  # Cylindrical retained branches skip the spherical reciprocity test =========
+  if (identical(model_params$parameters$coordinate_system, "cylindrical")) {
+    return(NA_real_)
+  }
+  # Evaluate the reciprocity residual for the active frequency ================
+  .tmm_reciprocity_residual(
+    model_params = model_params,
+    frequency_idx = frequency_idx,
+    shape_parameters = shape_parameters,
+    reciprocity_pairs = reciprocity_pairs
+  )
+}
+
+.tmm_frequency_summary_row <- function(shape_type,
+                                       parameters,
+                                       frequency_value,
+                                       mono,
+                                       reciprocity_rel,
+                                       optical,
+                                       block_summary,
+                                       continuation_metrics) {
+  # Assemble the scalar diagnostics for a single frequency ====================
+  data.frame(
+    shape = shape_type,
+    coordinate_system = parameters$coordinate_system,
+    boundary = parameters$boundary,
+    frequency = frequency_value,
+    monostatic_abs_residual = mono$abs,
+    monostatic_rel_residual = mono$rel,
+    reciprocity_rel_residual = reciprocity_rel,
+    sigma_total = optical$sigma_total,
+    sigma_ext = optical$sigma_ext,
+    optical_theorem_sign = optical$optical_sign,
+    optical_theorem_rel_residual = optical$optical_rel,
+    min_block_rcond = block_summary$min_rcond,
+    max_block_cond_est = block_summary$max_cond,
+    max_block_transpose_residual = block_summary$max_transpose,
+    continuation_target_aspect_ratio =
+      continuation_metrics$target_aspect_ratio,
+    continuation_max_abs_step_TS =
+      continuation_metrics$max_abs_step_TS,
+    continuation_max_abs_second_diff_TS =
+      continuation_metrics$max_abs_second_diff_TS,
+    continuation_any_nonfinite = continuation_metrics$any_nonfinite
+  )
+}
+
+.tmm_frequency_diagnostics <- function(object,
+                                       model_params,
+                                       parameters,
+                                       acoustics,
+                                       shape_parameters,
+                                       shape_type,
+                                       frequency_idx,
+                                       theta_body,
+                                       phi_body,
+                                       reciprocity_pairs,
+                                       continuation_summary,
+                                       n_theta,
+                                       n_phi) {
+  # Recover the stored blocks and active frequency ============================
+  frequency_value <- acoustics$frequency[frequency_idx]
+  block_df <- .tmm_block_metrics(parameters$t_matrix[[frequency_idx]])
+  # Evaluate the scalar diagnostic components =================================
+  mono <- .tmm_monostatic_residuals(
+    object = object,
+    model_params = model_params,
+    frequency_idx = frequency_idx,
+    shape_parameters = shape_parameters,
+    theta_body = theta_body,
+    phi_body = phi_body
+  )
+  reciprocity_rel <- .tmm_reciprocity_metric(
+    model_params = model_params,
+    frequency_idx = frequency_idx,
+    shape_parameters = shape_parameters,
+    reciprocity_pairs = reciprocity_pairs
+  )
+  optical <- .tmm_optical_theorem_metrics(
+    model_params = model_params,
+    acoustics = acoustics,
+    frequency_idx = frequency_idx,
+    shape_parameters = shape_parameters,
+    theta_body = theta_body,
+    phi_body = phi_body,
+    n_theta = n_theta,
+    n_phi = n_phi
+  )
+  block_summary <- .tmm_block_summary(block_df)
+  continuation_metrics <- .tmm_continuation_metrics(
+    continuation_summary = continuation_summary,
+    frequency_value = frequency_value
+  )
+  # Return the block diagnostics and scalar summary row =======================
+  list(
+    block_df = block_df,
+    summary_row = .tmm_frequency_summary_row(
+      shape_type = shape_type,
+      parameters = parameters,
+      frequency_value = frequency_value,
+      mono = mono,
+      reciprocity_rel = reciprocity_rel,
+      optical = optical,
+      block_summary = block_summary,
+      continuation_metrics = continuation_metrics
+    )
+  )
+}
+
 #' Diagnostics for stored single-target TMM solutions
 #'
 #' @description
-#' Reuses the stored T-matrix blocks to compute a compact set of numerical and
-#' physics-based diagnostics for one or more stored frequencies. The summary
+#' Reuses the stored transition-matrix blocks to compute a compact set of
+#' numerical and physics-based diagnostics for one or more stored frequencies.
+#' The summary
 #' combines:
 #'
 #' \itemize{
@@ -404,7 +700,8 @@
 #'   \item reciprocity residuals under incident/receive-angle exchange,
 #'   \item an optical-theorem residual based on forward scattering and the
 #'   integrated differential cross section,
-#'   \item block-level conditioning indicators from the stored T-matrix blocks,
+#'   \item block-level conditioning indicators from the stored
+#'   transition-matrix blocks,
 #'   \item and, for prolate/oblate targets, an equal-volume sphere-to-spheroid
 #'   continuation path that checks whether the monostatic response deforms
 #'   smoothly away from the exact sphere limit.
@@ -465,15 +762,7 @@ tmm_diagnostics <- function(object,
   defaults <- model_params$body
   shape_parameters <- acousticTS::extract(object, "shape_parameters")
   shape_type <- shape_parameters$shape
-  # Validate the grid controls =================================================
-  if (!is.numeric(n_theta) || length(n_theta) != 1 || !is.finite(n_theta) ||
-      n_theta < 5 || n_theta %% 1 != 0) {
-    stop("'n_theta' must be a single integer >= 5.", call. = FALSE)
-  }
-  if (!is.numeric(n_phi) || length(n_phi) != 1 || !is.finite(n_phi) ||
-      n_phi < 5 || n_phi %% 1 != 0) {
-    stop("'n_phi' must be a single integer >= 5.", call. = FALSE)
-  }
+  grid <- .tmm_validate_diagnostic_grid(n_theta = n_theta, n_phi = n_phi)
   # Resolve the active angles, frequencies, and continuation path ==============
   theta_body <- .tmm_scalar_angle(theta_body, defaults$theta_body, "theta_body")
   phi_body <- .tmm_scalar_angle(phi_body, defaults$phi_body %||% pi, "phi_body")
@@ -491,107 +780,23 @@ tmm_diagnostics <- function(object,
   # Evaluate the diagnostics for each stored frequency =========================
   for (i in seq_along(freq_idx)) {
     idx <- freq_idx[i]
-    freq_val <- acoustics$frequency[idx]
-    t_blocks <- parameters$t_matrix[[idx]]
-    block_df <- .tmm_block_metrics(t_blocks)
-    block_metrics[[i]] <- block_df
-
-    f_mono <- .tmm_scattering_points(
+    freq_diag <- .tmm_frequency_diagnostics(
+      object = object,
       model_params = model_params,
-      frequency_idx = idx,
+      parameters = parameters,
+      acoustics = acoustics,
       shape_parameters = shape_parameters,
+      shape_type = shape_type,
+      frequency_idx = idx,
       theta_body = theta_body,
       phi_body = phi_body,
-      theta_scatter = pi - theta_body,
-      phi_scatter = (phi_body + pi) %% (2 * pi)
-    )[1]
-    stored_f_bs <- acousticTS::extract(object, "model")$TMM$f_bs[idx]
-    mono_abs <- Mod(f_mono - stored_f_bs)
-    mono_rel <- mono_abs / max(Mod(stored_f_bs), .Machine$double.eps)
-
-    reciprocity_rel <- if (identical(parameters$coordinate_system, "cylindrical")) {
-      NA_real_
-    } else {
-      .tmm_reciprocity_residual(
-        model_params = model_params,
-        frequency_idx = idx,
-        shape_parameters = shape_parameters,
-        reciprocity_pairs = reciprocity_pairs
-      )
-    }
-
-    sigma_total <- NA_real_
-    sigma_ext <- NA_real_
-    optical_sign <- NA_real_
-    optical_rel <- NA_real_
-    if (identical(parameters$coordinate_system, "spherical")) {
-      theta_grid <- seq(0, pi, length.out = n_theta)
-      phi_grid <- seq(0, 2 * pi, length.out = n_phi)
-      grid <- .tmm_scattering_grid_matrix(
-        model_params = model_params,
-        frequency_idx = idx,
-        shape_parameters = shape_parameters,
-        theta_body = theta_body,
-        phi_body = phi_body,
-        theta_scatter = theta_grid,
-        phi_scatter = phi_grid
-      )
-      sigma_grid <- .sigma_bs(grid)
-      sigma_total <- .tmm_total_scattering_cross_section(
-        theta_scatter = theta_grid,
-        phi_scatter = phi_grid,
-        sigma_scat = sigma_grid
-      )
-      f_forward <- .tmm_scattering_points(
-        model_params = model_params,
-        frequency_idx = idx,
-        shape_parameters = shape_parameters,
-        theta_body = theta_body,
-        phi_body = phi_body,
-        theta_scatter = theta_body,
-        phi_scatter = phi_body
-      )[1]
-      sigma_ext_raw <- (4 * pi / acoustics$k_sw[idx]) * Im(f_forward)
-      optical_sign <- if (
-        abs(sigma_total - sigma_ext_raw) <= abs(sigma_total + sigma_ext_raw)
-      ) 1 else -1
-      sigma_ext <- optical_sign * sigma_ext_raw
-      optical_rel <- abs(sigma_total - sigma_ext) /
-        max(abs(sigma_total), abs(sigma_ext), .Machine$double.eps)
-    }
-
-    min_rcond <- if (nrow(block_df)) min(block_df$rcond, na.rm = TRUE) else NA_real_
-    if (!is.finite(min_rcond)) {
-      min_rcond <- NA_real_
-    }
-    max_cond <- if (is.na(min_rcond) || min_rcond <= 0) Inf else 1 / min_rcond
-    max_transpose <- if (nrow(block_df)) max(block_df$transpose_residual, na.rm = TRUE) else NA_real_
-    continuation_row <- if (!is.null(continuation_summary)) {
-      continuation_summary[continuation_summary$frequency == freq_val, , drop = FALSE]
-    } else {
-      NULL
-    }
-    # Store the scalar diagnostics for this frequency ==========================
-    summary_rows[[i]] <- data.frame(
-      shape = shape_type,
-      coordinate_system = parameters$coordinate_system,
-      boundary = parameters$boundary,
-      frequency = freq_val,
-      monostatic_abs_residual = mono_abs,
-      monostatic_rel_residual = mono_rel,
-      reciprocity_rel_residual = reciprocity_rel,
-      sigma_total = sigma_total,
-      sigma_ext = sigma_ext,
-      optical_theorem_sign = optical_sign,
-      optical_theorem_rel_residual = optical_rel,
-      min_block_rcond = min_rcond,
-      max_block_cond_est = max_cond,
-      max_block_transpose_residual = max_transpose,
-      continuation_target_aspect_ratio = if (is.null(continuation_row) || !nrow(continuation_row)) NA_real_ else continuation_row$continuation_target_aspect_ratio[1],
-      continuation_max_abs_step_TS = if (is.null(continuation_row) || !nrow(continuation_row)) NA_real_ else continuation_row$continuation_max_abs_step_TS[1],
-      continuation_max_abs_second_diff_TS = if (is.null(continuation_row) || !nrow(continuation_row)) NA_real_ else continuation_row$continuation_max_abs_second_diff_TS[1],
-      continuation_any_nonfinite = if (is.null(continuation_row) || !nrow(continuation_row)) NA else continuation_row$continuation_any_nonfinite[1]
+      reciprocity_pairs = reciprocity_pairs,
+      continuation_summary = continuation_summary,
+      n_theta = grid$n_theta,
+      n_phi = grid$n_phi
     )
+    block_metrics[[i]] <- freq_diag$block_df
+    summary_rows[[i]] <- freq_diag$summary_row
   }
   # Name the block metrics and return the full diagnostic bundle ===============
   names(block_metrics) <- as.character(acoustics$frequency[freq_idx])

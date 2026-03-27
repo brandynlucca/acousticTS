@@ -501,11 +501,17 @@
   if (methods::is(shape_input, "ProlateSpheroid")) {
     shape_params$semimajor_length <- input_params$semimajor_length
     shape_params$semiminor_length <- input_params$semiminor_length
+    if (!is.null(input_params$radius) && length(input_params$radius) > 1) {
+      shape_params$radius_shape <- input_params$radius
+    }
   }
 
   if (methods::is(shape_input, "OblateSpheroid")) {
     shape_params$semimajor_length <- input_params$semimajor_length
     shape_params$semiminor_length <- input_params$semiminor_length
+    if (!is.null(input_params$radius) && length(input_params$radius) > 1) {
+      shape_params$radius_shape <- input_params$radius
+    }
   }
 
   # Append any cylinder-specific taper or curvature bookkeeping ================
@@ -516,11 +522,12 @@
     }
   }
 
-  # Preserve any nodewise spherical radius profile when available ==============
-  if (methods::is(shape_input, "Sphere")) {
-    if ("radius_shape" %in% names(input_params)) {
-      shape_params$radius_shape <- input_params$radius_shape
-    }
+  # Preserve any nodewise radius/diameter profiles when available =============
+  if ("radius_shape" %in% names(input_params)) {
+    shape_params$radius_shape <- input_params$radius_shape
+  }
+  if ("diameter_shape" %in% names(input_params)) {
+    shape_params$diameter_shape <- input_params$diameter_shape
   }
 
   # Resolve the user-facing shape label and return the updated list ============

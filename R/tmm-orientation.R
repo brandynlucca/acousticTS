@@ -27,15 +27,28 @@
   }
 
   # Validate the numeric angle and weight columns ==============================
-  if (!is.numeric(distribution$theta_body) || any(!is.finite(distribution$theta_body))) {
-    stop("'distribution$theta_body' must be finite numeric angles in radians.", call. = FALSE)
+  if (!is.numeric(distribution$theta_body) ||
+      any(!is.finite(distribution$theta_body))) {
+    stop(
+      "'distribution$theta_body' must be finite numeric angles in radians.",
+      call. = FALSE
+    )
   }
-  if (!is.numeric(distribution$phi_body) || any(!is.finite(distribution$phi_body))) {
-    stop("'distribution$phi_body' must be finite numeric angles in radians.", call. = FALSE)
+  if (!is.numeric(distribution$phi_body) ||
+      any(!is.finite(distribution$phi_body))) {
+    stop(
+      "'distribution$phi_body' must be finite numeric angles in radians.",
+      call. = FALSE
+    )
   }
-  if (!is.numeric(distribution$weights) || any(!is.finite(distribution$weights)) ||
+  if (!is.numeric(distribution$weights) ||
+      any(!is.finite(distribution$weights)) ||
       any(distribution$weights < 0) || sum(distribution$weights) <= 0) {
-    stop("'distribution$weights' must be finite, non-negative, and sum to a positive value.", call. = FALSE)
+    stop(
+      "'distribution$weights' must be finite, non-negative, and sum to a ",
+      "positive value.",
+      call. = FALSE
+    )
   }
 
   # Normalize the weights onto a proper averaging distribution =================
@@ -51,10 +64,12 @@
                                       upper = NULL,
                                       name = "theta_body") {
   # Validate the supplied density values against the theta grid ================
-  if (!is.numeric(density_values) || length(density_values) != length(theta_body) ||
+  if (!is.numeric(density_values) ||
+      length(density_values) != length(theta_body) ||
       any(!is.finite(density_values)) || any(density_values < 0)) {
-    stop(
-      "'density_values' must be a non-negative numeric vector with the same length as '",
+        stop(
+      "'density_values' must be a non-negative numeric vector with the ",
+      "same length as '",
       name,
       "'.",
       call. = FALSE
@@ -62,7 +77,12 @@
   }
 
   # Convert the density into cell-integrated quadrature weights ================
-  interval_weights <- .tmm_interval_weights(theta_body, lower = lower, upper = upper, name = name)
+  interval_weights <- .tmm_interval_weights(
+    theta_body,
+    lower = lower,
+    upper = upper,
+    name = name
+  )
   weights <- density_values * interval_weights
   if (sum(weights) <= 0) {
     stop("Orientation weights must sum to a positive value.", call. = FALSE)
@@ -124,95 +144,47 @@ tmm_orientation_distribution <- function(distribution = c(
                                          n_theta = 91) {
   # Resolve and validate the requested distribution family =====================
   distribution <- match.arg(distribution)
-
-  if (!is.numeric(n_theta) || length(n_theta) != 1 || !is.finite(n_theta) ||
-      n_theta < 1 || n_theta %% 1 != 0) {
-    stop("'n_theta' must be a single positive integer.", call. = FALSE)
-  }
+  n_theta <- .tmm_validate_orientation_n_theta(n_theta)
 
   # Build the requested theta grid and associated normalized weights ===========
-  if (distribution == "quadrature") {
-    if (is.null(theta_body)) {
-      stop("'theta_body' must be supplied for 'distribution = \"quadrature\"'.", call. = FALSE)
-    }
-    theta_body <- .tmm_angle_vector(theta_body, lower = 0, upper = pi, name = "theta_body")
-    if (is.null(weights)) {
-      weights <- rep(1 / length(theta_body), length(theta_body))
-    } else {
-      if (!is.numeric(weights) || length(weights) != length(theta_body) ||
-          any(!is.finite(weights)) || any(weights < 0) || sum(weights) <= 0) {
+  orientation <- switch(
+    distribution,
+    quadrature = {
+      if (is.null(theta_body)) {
         stop(
-          "'weights' must be a non-negative numeric vector with the same length as 'theta_body'.",
+          "'theta_body' must be supplied for ",
+          "'distribution = \"quadrature\"'.",
           call. = FALSE
         )
       }
-      weights <- weights / sum(weights)
-    }
-  } else if (distribution == "pdf") {
-    if (is.null(theta_body)) {
-      stop("'theta_body' must be supplied for 'distribution = \"pdf\"'.", call. = FALSE)
-    }
-    theta_body <- .tmm_angle_vector(theta_body, lower = 0, upper = pi, name = "theta_body")
-    density_values <- if (is.function(pdf)) {
-      as.numeric(pdf(theta_body))
-    } else {
-      pdf
-    }
-    weights <- .tmm_distribution_weights(theta_body, density_values, name = "theta_body")
-  } else if (distribution == "uniform") {
-    if (!is.numeric(lower) || !is.numeric(upper) || length(lower) != 1 || length(upper) != 1 ||
-        !is.finite(lower) || !is.finite(upper) || lower < 0 || upper > pi || lower >= upper) {
-      stop(
-        "'lower' and 'upper' must define a finite interval inside [0, pi] for the uniform orientation distribution.",
-        call. = FALSE
-      )
-    }
-    theta_body <- seq(lower, upper, length.out = n_theta)
-    weights <- .tmm_distribution_weights(
-      theta_body = theta_body,
-      density_values = rep(1, length(theta_body)),
+      .tmm_orientation_quadrature(theta_body, weights)
+    },
+    pdf = {
+      if (is.null(theta_body)) {
+        stop(
+          "'theta_body' must be supplied for ",
+          "'distribution = \"pdf\"'.",
+          call. = FALSE
+        )
+      }
+      .tmm_orientation_pdf(theta_body, pdf)
+    },
+    uniform = .tmm_orientation_uniform(lower, upper, n_theta),
+    normal = .tmm_orientation_normal_density(mean_theta, sd_theta, n_theta),
+    truncated_normal = .tmm_orientation_truncated_normal(
+      mean_theta = mean_theta,
+      sd_theta = sd_theta,
       lower = lower,
       upper = upper,
-      name = "theta_body"
+      n_theta = n_theta
     )
-  } else if (distribution == "normal") {
-    if (!is.numeric(mean_theta) || length(mean_theta) != 1 || !is.finite(mean_theta) ||
-        !is.numeric(sd_theta) || length(sd_theta) != 1 || !is.finite(sd_theta) || sd_theta <= 0) {
-      stop("'mean_theta' and 'sd_theta' must be finite numeric scalars and 'sd_theta' must be > 0.", call. = FALSE)
-    }
-    theta_body <- seq(0, pi, length.out = n_theta)
-    weights <- .tmm_distribution_weights(
-      theta_body = theta_body,
-      density_values = stats::dnorm(theta_body, mean = mean_theta, sd = sd_theta),
-      lower = 0,
-      upper = pi,
-      name = "theta_body"
-    )
-  } else if (distribution == "truncated_normal") {
-    if (!is.numeric(mean_theta) || length(mean_theta) != 1 || !is.finite(mean_theta) ||
-        !is.numeric(sd_theta) || length(sd_theta) != 1 || !is.finite(sd_theta) || sd_theta <= 0 ||
-        !is.numeric(lower) || !is.numeric(upper) || length(lower) != 1 || length(upper) != 1 ||
-        !is.finite(lower) || !is.finite(upper) || lower < 0 || upper > pi || lower >= upper) {
-      stop(
-        "'truncated_normal' requires finite 'mean_theta', positive 'sd_theta', and a valid interval [lower, upper] inside [0, pi].",
-        call. = FALSE
-      )
-    }
-    theta_body <- seq(lower, upper, length.out = n_theta)
-    weights <- .tmm_distribution_weights(
-      theta_body = theta_body,
-      density_values = stats::dnorm(theta_body, mean = mean_theta, sd = sd_theta),
-      lower = lower,
-      upper = upper,
-      name = "theta_body"
-    )
-  }
+  )
+
+  theta_body <- orientation$theta_body
+  weights <- orientation$weights
 
   # Expand the azimuth input to the resolved theta grid ========================
-  phi_body <- rep_len(phi_body, length(theta_body))
-  if (!is.numeric(phi_body) || any(!is.finite(phi_body))) {
-    stop("'phi_body' must be a finite numeric scalar or vector.", call. = FALSE)
-  }
+  phi_body <- .tmm_resolve_orientation_phi(phi_body, length(theta_body))
 
   # Return the standardized orientation-distribution data frame ================
   distribution_df <- data.frame(
@@ -221,7 +193,10 @@ tmm_orientation_distribution <- function(distribution = c(
     weights = weights,
     distribution = distribution
   )
-  class(distribution_df) <- c("TMMOrientationDistribution", class(distribution_df))
+  class(distribution_df) <- c(
+    "TMMOrientationDistribution",
+    class(distribution_df)
+  )
   distribution_df
 }
 
@@ -245,8 +220,8 @@ tmm_orientation_distribution <- function(distribution = c(
 #' @param phi_scatter Receive azimuth angle(s) (radians). Either scalar or the
 #'   same length as `theta_body`. Defaults to the monostatic direction.
 #' @param distribution Optional orientation distribution created by
-#'   \code{\link{tmm_orientation_distribution}}. When supplied, it overrides the direct
-#'   `theta_body`, `weights`, and `phi_body` inputs.
+#'   \code{\link{tmm_orientation_distribution}}. When supplied, it overrides
+#'   the direct `theta_body`, `weights`, and `phi_body` inputs.
 #'
 #' @return A data frame containing the frequency, the orientation-averaged
 #'   differential backscattering cross section and the corresponding
@@ -270,8 +245,14 @@ tmm_average_orientation <- function(object,
     phi_body <- distribution$phi_body
     weights <- distribution$weights
   } else {
-    if (!is.numeric(theta_body) || !length(theta_body) || any(!is.finite(theta_body))) {
-      stop("'theta_body' must be a non-empty numeric vector of angles in radians.", call. = FALSE)
+    if (!is.numeric(theta_body) ||
+        !length(theta_body) ||
+        any(!is.finite(theta_body))) {
+      stop(
+        "'theta_body' must be a non-empty numeric vector of angles in ",
+        "radians.",
+        call. = FALSE
+      )
     }
 
     n_angles <- length(theta_body)
@@ -283,10 +264,13 @@ tmm_average_orientation <- function(object,
     if (is.null(weights)) {
       weights <- rep(1 / n_angles, n_angles)
     } else {
-      if (!is.numeric(weights) || length(weights) != n_angles || any(!is.finite(weights)) ||
+      if (!is.numeric(weights) ||
+          length(weights) != n_angles ||
+          any(!is.finite(weights)) ||
           any(weights < 0) || sum(weights) <= 0) {
         stop(
-          "'weights' must be a non-negative numeric vector with the same length as 'theta_body'.",
+          "'weights' must be a non-negative numeric vector with the same ",
+          "length as 'theta_body'.",
           call. = FALSE
         )
       }

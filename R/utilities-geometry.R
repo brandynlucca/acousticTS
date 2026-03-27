@@ -466,6 +466,12 @@ brake_scatterer <- function(object, radius_curvature, mode = "ratio") {
   body <- acousticTS::extract(object, "body")
   body_curved <- brake_df(body, radius_curvature, mode)
   slot(object, "body") <- body_curved
+  # Mirror the curvature metadata onto the stored shape parameters ============
+  if ("shape_parameters" %in% slotNames(object)) {
+    shape_parameters <- methods::slot(object, "shape_parameters")
+    shape_parameters$radius_curvature_ratio <- body_curved$radius_curvature_ratio
+    methods::slot(object, "shape_parameters") <- shape_parameters
+  }
   return(object)
 }
 

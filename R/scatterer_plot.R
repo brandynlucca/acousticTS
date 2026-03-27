@@ -120,9 +120,7 @@ cal_plot <- function(object,
                      nudge_y = 1.01,
                      nudge_x = 1.01,
                      x_units = "frequency", ...) {
-  # Retrieve default plot window parameters ====================================
-  opar <- graphics::par(no.readonly = TRUE)
-  on.exit(graphics::par(opar))
+  # Respect caller-managed panel layouts by avoiding a full par() reset =======
   if (type == "shape") {
     body <- acousticTS::extract(
       object,
@@ -130,7 +128,7 @@ cal_plot <- function(object,
     )
     .plot_axisymmetric_outline(
       position_matrix = body$rpos,
-      shape_parameters = list(radius = body$radius),
+      shape_parameters = acousticTS::extract(object, "shape_parameters"),
       xlab = "Semi-major diameter (m)",
       ylab = "Semi-minor diameter (m)",
       lwd = 4,
@@ -206,14 +204,13 @@ ess_plot <- function(object,
                      nudge_x = 1.01,
                      x_units = "frequency",
                      y_units = "TS", ...) {
-  # Retrieve default plot window parameters ====================================
-  opar <- graphics::par(no.readonly = TRUE)
-  on.exit(graphics::par(opar))
+  # Respect caller-managed panel layouts by avoiding a full par() reset =======
   if (type == "shape") {
     shell <- extract(object, "shell")
+    shell_shape <- acousticTS::extract(object, "shape_parameters")$shell
     .plot_axisymmetric_outline(
       position_matrix = shell$rpos,
-      shape_parameters = list(radius = shell$radius),
+      shape_parameters = shell_shape,
       xlab = "Semi-major diameter (m)",
       ylab = "Semi-minor diameter (m)",
       nudge_y = nudge_y,
@@ -222,9 +219,10 @@ ess_plot <- function(object,
     )
     fluid <- extract(object, "fluid")
     if ("rpos" %in% names(fluid)) {
+      fluid_shape <- acousticTS::extract(object, "shape_parameters")$fluid
       .plot_axisymmetric_outline(
         position_matrix = fluid$rpos,
-        shape_parameters = list(radius = fluid$radius),
+        shape_parameters = fluid_shape,
         col = "red",
         segment_col = "red",
         center_x = TRUE,
@@ -273,9 +271,7 @@ fls_plot <- function(object,
                      aspect_ratio = "manual",
                      x_units = "frequency",
                      y_units = "TS", ...) {
-  # Retrieve default plot window parameters ====================================
-  opar <- graphics::par(no.readonly = TRUE)
-  on.exit(graphics::par(opar))
+  # Respect caller-managed panel layouts by avoiding a full par() reset =======
   if (type == "shape") {
     body <- acousticTS::extract(object, "body")
     shape_params <- acousticTS::extract(object, "shape_parameters")
@@ -322,9 +318,7 @@ gas_plot <- function(object,
                      nudge_x = 1.01,
                      x_units = "frequency",
                      y_units = "TS", ...) {
-  # Retrieve default plot window parameters ====================================
-  opar <- graphics::par(no.readonly = TRUE)
-  on.exit(graphics::par(opar))
+  # Respect caller-managed panel layouts by avoiding a full par() reset =======
   if (type == "shape") {
     body <- extract(object, "body")
     shape <- acousticTS::extract(object, "shape_parameters")
@@ -371,9 +365,7 @@ sbf_plot <- function(object,
                      aspect_ratio = "manual",
                      x_units = "frequency",
                      y_units = "TS", ...) {
-  # Retrieve default plot window parameters ===================
-  opar <- graphics::par(no.readonly = TRUE)
-  on.exit(graphics::par(opar))
+  # Respect caller-managed panel layouts by avoiding a full par() reset =======
   if (type == "shape") {
     .plot_profile_component_panels(
       primary_rpos = extract(object, "body")$rpos,
@@ -417,8 +409,7 @@ bbf_plot <- function(object,
                      aspect_ratio = "manual",
                      x_units = "frequency",
                      y_units = "TS", ...) {
-  opar <- graphics::par(no.readonly = TRUE)
-  on.exit(graphics::par(opar))
+  # Respect caller-managed panel layouts by avoiding a full par() reset =======
 
   if (type == "shape") {
     body_component <- extract(object, "body")

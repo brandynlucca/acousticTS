@@ -70,6 +70,14 @@
   )
 }
 
+#' Detect whether the current graphics device is using a multi-panel layout
+#' @keywords internal
+#' @noRd
+.has_active_multi_panel_layout <- function() {
+  layout_dims <- graphics::par("mfg")[3:4]
+  prod(layout_dims) > 1
+}
+
 #' Plot model-result curves for scatterers with multiple model outputs
 #' @param plot_data Output from `.collect_model_plot_data()`.
 #' @param nudge_y y-axis nudge factor.
@@ -82,7 +90,11 @@
                                 nudge_x = 1.01,
                                 mar = c(5.0, 5.5, 2.0, 3.5)) {
   # Initialize the plotting device and empty plotting window ===================
-  graphics::par(ask = FALSE, mar = mar)
+  if (.has_active_multi_panel_layout()) {
+    graphics::par(ask = FALSE)
+  } else {
+    graphics::par(ask = FALSE, mar = mar)
+  }
 
   graphics::plot(
     x = seq(
@@ -255,11 +267,15 @@
 
   # Initialize the plot when requested =========================================
   if (init) {
-    graphics::par(
-      ask = FALSE,
-      oma = c(1, 1, 1, 0),
-      mar = mar
-    )
+    if (.has_active_multi_panel_layout()) {
+      graphics::par(ask = FALSE)
+    } else {
+      graphics::par(
+        ask = FALSE,
+        oma = c(1, 1, 1, 0),
+        mar = mar
+      )
+    }
     graphics::plot(
       x = outline$x,
       y = outline$radius,
@@ -372,11 +388,15 @@
   }
 
   # Initialize the plot before drawing each body segment polygon ===============
-  graphics::par(
-    ask = FALSE,
-    oma = c(1, 1, 1, 0),
-    mar = c(5.0, 4.5, 1.5, 2)
-  )
+  if (.has_active_multi_panel_layout()) {
+    graphics::par(ask = FALSE)
+  } else {
+    graphics::par(
+      ask = FALSE,
+      oma = c(1, 1, 1, 0),
+      mar = c(5.0, 4.5, 1.5, 2)
+    )
+  }
   graphics::plot(
     x,
     z_center,
@@ -392,9 +412,14 @@
     y0 <- z_center[i]
     x1 <- x[i + 1L]
     y1 <- z_center[i + 1L]
-    r <- radius[i]
+    r0 <- radius[i]
+    r1 <- radius[i + 1L]
 
-    if (!is.finite(r) || r <= 0) {
+    if ((!is.finite(r0) || r0 < 0) && (!is.finite(r1) || r1 < 0)) {
+      next
+    }
+
+    if ((!is.finite(r0) || r0 <= 0) && (!is.finite(r1) || r1 <= 0)) {
       next
     }
 
@@ -407,14 +432,16 @@
 
     px <- -dy / len
     py <- dx / len
-    xA <- x0 + r * px
-    yA <- y0 + r * py
-    xB <- x1 + r * px
-    yB <- y1 + r * py
-    xC <- x1 - r * px
-    yC <- y1 - r * py
-    xD <- x0 - r * px
-    yD <- y0 - r * py
+    r0 <- if (is.finite(r0) && r0 > 0) r0 else 0
+    r1 <- if (is.finite(r1) && r1 > 0) r1 else 0
+    xA <- x0 + r0 * px
+    yA <- y0 + r0 * py
+    xB <- x1 + r1 * px
+    yB <- y1 + r1 * py
+    xC <- x1 - r1 * px
+    yC <- y1 - r1 * py
+    xD <- x0 - r0 * px
+    yD <- y0 - r0 * py
 
     graphics::polygon(
       x = c(xA, xB, xC, xD),
