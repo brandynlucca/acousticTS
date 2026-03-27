@@ -36,7 +36,7 @@ One of \code{"fixed_rigid"}, \code{"pressure_release"},
 \code{"liquid_filled"}, \code{"gas_filled"},
 \code{"shelled_pressure_release"}, \code{"shelled_liquid"}, or
 \code{"shelled_gas"}. See the
-\link[=boundary_conditions]{boundary conditions documentation} for more
+boundary conditions documentation for more
 details on these different boundary conditions.}
 \item{\code{sound_speed_sw}}{Seawater sound speed (\eqn{m~s^{-1}}).}
 \item{\code{density_sw}}{Seawater density (\eqn{kg~m^{-3}}).}

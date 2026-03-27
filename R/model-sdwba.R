@@ -122,7 +122,7 @@
 #' expected target strength.
 #'
 #' @seealso
-#' See the \link[=boundary_conditions]{boundary conditions documentation} for
+#' See the boundary conditions documentation for
 #' more details on weak scattering assumptions,
 #' \code{\link{target_strength}}, \code{\link{FLS}}, \code{\link{DWBA}}
 #'

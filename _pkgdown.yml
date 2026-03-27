@@ -292,7 +292,6 @@ reference:
 
   - subtitle: Acoustic quantities and coefficients
     contents:
-      - boundary_conditions
       - wavenumber
       - linear
       - transmission_coefficient

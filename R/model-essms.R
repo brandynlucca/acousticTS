@@ -169,7 +169,7 @@
 #' most practical cases.
 #'
 #' @seealso
-#' See the \link[=boundary_conditions]{boundary conditions documentation} for
+#' See the boundary conditions documentation for
 #' more details on how elastic-shelled scattering relates to other boundary
 #' conditions,
 #' \code{\link{target_strength}}, \code{\link{ESS}}, \code{\link{Sphere}},

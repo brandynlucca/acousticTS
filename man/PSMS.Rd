@@ -39,7 +39,7 @@ target_strength(
 \item{\code{boundary}}{Boundary condition at the cylinder surface.
 One of \code{"fixed_rigid"}, \code{"pressure_release"},
 \code{"liquid_filled"}, or \code{"gas_filled"}. See the
-\link[=boundary_conditions]{boundary conditions documentation} for more
+boundary conditions documentation for more
 details on these different boundary conditions.}
 \item{\code{adaptive}}{A boolean argument controlling whether the PSMS
 backend is allowed to stop once the retained modal tail becomes

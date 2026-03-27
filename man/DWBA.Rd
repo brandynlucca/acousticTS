@@ -137,7 +137,7 @@ zooplankton groups. II. Scattering models. The Journal of the Acoustical
 Society of America, 103, 236-253.
 }
 \seealso{
-See the \link[=boundary_conditions]{boundary conditions documentation} for
+See the boundary conditions documentation for
 more details on how weak scattering relates to other boundary conditions,
 \code{\link{target_strength}}, \code{\link{FLS}}
 }

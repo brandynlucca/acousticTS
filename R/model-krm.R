@@ -250,7 +250,7 @@
 #' scattering amplitude and target strength.
 #'
 #' @seealso
-#' See the \link[=boundary_conditions]{boundary conditions documentation} for
+#' See the boundary conditions documentation for
 #' more details on fluid-like scattering assumptions,
 #' \code{\link{target_strength}}, \code{\link{SBF}}, \code{\link{FLS}}
 #'

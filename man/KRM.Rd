@@ -279,7 +279,7 @@ Clay, C.S., and Horne, J.K. (1994). Acoustic models of fish: The Atlantic cod
 1661-1668.
 }
 \seealso{
-See the \link[=boundary_conditions]{boundary conditions documentation} for
+See the boundary conditions documentation for
 more details on fluid-like scattering assumptions,
 \code{\link{target_strength}}, \code{\link{SBF}}, \code{\link{FLS}}
 }

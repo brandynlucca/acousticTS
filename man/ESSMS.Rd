@@ -190,7 +190,7 @@ Stanton, T.K. (1990). Sound scattering by spherical and elongated shelled
 bodies. The Journal of the Acoustical Society of America, 88: 1619-1633.
 }
 \seealso{
-See the \link[=boundary_conditions]{boundary conditions documentation} for
+See the boundary conditions documentation for
 more details on how elastic-shelled scattering relates to other boundary
 conditions,
 \code{\link{target_strength}}, \code{\link{ESS}}, \code{\link{Sphere}},
