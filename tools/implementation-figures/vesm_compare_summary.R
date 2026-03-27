@@ -41,6 +41,7 @@ summary_df <- data.frame(
   elapsed_acousticts_s = timing_acousticts$elapsed_s[1],
   elapsed_original_s = timing_original$elapsed_s[1]
 )
+summary_df <- impl_round_timing_columns(summary_df)
 
 write.csv(
   summary_df,

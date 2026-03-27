@@ -1,2 +1,2 @@
 "comparison","max_abs_delta_TS_dB","mean_abs_delta_TS_dB","frequency_at_max_delta_kHz","elapsed_acousticts_s","elapsed_reference_s"
-"acousticTS vs direct reference",0,0,12,0.0800000000000001,0.06
+"acousticTS vs direct reference",0,0,12,0.08,0.03

@@ -44,28 +44,66 @@ straight_object <- fls_generate(
   theta_body = pi / 2
 )
 
-elapsed_straight <- system.time({
-  straight_ref <- target_strength(
-    straight_object,
-    frequency = frequency,
-    model = "fcms",
-    boundary = "liquid_filled",
-    density_sw = density_sw,
-    sound_speed_sw = sound_speed_sw
+timing_path <- file.path(data_dir, "bcms_reference_direct_timing.csv")
+
+if (impl_should_refresh_timings() || !file.exists(timing_path)) {
+  elapsed_straight <- system.time({
+    straight_ref <- target_strength(
+      straight_object,
+      frequency = frequency,
+      model = "fcms",
+      boundary = "liquid_filled",
+      density_sw = density_sw,
+      sound_speed_sw = sound_speed_sw
+    )
+  })["elapsed"]
+
+  elapsed_bent <- system.time({
+    lebc <- .equivalent_length_fresnel_ref(
+      k1 = 2 * pi * frequency / sound_speed_sw,
+      l = length_body,
+      a = radius_body,
+      rho_c = radius_curvature
+    )
+  })["elapsed"]
+
+  timing_reference <- data.frame(
+    case = c("straight", "bent"),
+    implementation = c("FCMS-reference", "Stanton-1989-reference"),
+    elapsed_s = c(as.numeric(elapsed_straight), as.numeric(elapsed_bent)),
+    frequency_min_khz = min(frequency) * 1e-3,
+    frequency_max_khz = max(frequency) * 1e-3,
+    frequency_step_khz = 2
   )
-})["elapsed"]
+  timing_reference <- impl_round_timing_columns(timing_reference)
+
+  write.csv(
+    timing_reference,
+    timing_path,
+    row.names = FALSE
+  )
+} else {
+  timing_reference <- read.csv(timing_path)
+}
+
+straight_ref <- target_strength(
+  straight_object,
+  frequency = frequency,
+  model = "fcms",
+  boundary = "liquid_filled",
+  density_sw = density_sw,
+  sound_speed_sw = sound_speed_sw
+)
 
 straight_f_bs <- extract(straight_ref, "model")$FCMS$f_bs
 straight_ts <- extract(straight_ref, "model")$FCMS$TS
 
-elapsed_bent <- system.time({
-  lebc <- .equivalent_length_fresnel_ref(
-    k1 = 2 * pi * frequency / sound_speed_sw,
-    l = length_body,
-    a = radius_body,
-    rho_c = radius_curvature
-  )
-})["elapsed"]
+lebc <- .equivalent_length_fresnel_ref(
+  k1 = 2 * pi * frequency / sound_speed_sw,
+  l = length_body,
+  a = radius_body,
+  rho_c = radius_curvature
+)
 
 bent_f_bs <- lebc * straight_f_bs / length_body
 bent_sigma_bs <- abs(bent_f_bs)^2
@@ -95,19 +133,6 @@ write.csv(
     )
   ),
   file.path(data_dir, "bcms_reference_direct.csv"),
-  row.names = FALSE
-)
-
-write.csv(
-  data.frame(
-    case = c("straight", "bent"),
-    implementation = c("FCMS-reference", "Stanton-1989-reference"),
-    elapsed_s = c(as.numeric(elapsed_straight), as.numeric(elapsed_bent)),
-    frequency_min_khz = min(frequency) * 1e-3,
-    frequency_max_khz = max(frequency) * 1e-3,
-    frequency_step_khz = 2
-  ),
-  file.path(data_dir, "bcms_reference_direct_timing.csv"),
   row.names = FALSE
 )
 
@@ -152,12 +177,13 @@ summary_df <- do.call(
 
 timing_df <- merge(
   read.csv(file.path(data_dir, "bcms_reference_acousticts_timing.csv")),
-  read.csv(file.path(data_dir, "bcms_reference_direct_timing.csv")),
+  timing_reference,
   by = "case",
   suffixes = c("_acousticts", "_reference")
 )
 
 summary_df <- merge(summary_df, timing_df, by = "case")
+summary_df <- impl_round_timing_columns(summary_df)
 
 write.csv(
   summary_df,

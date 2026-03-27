@@ -1,6 +1,7 @@
 source("tools/implementation-figures/helpers/common.R")
 impl_load_all()
 data_dir <- impl_data_path("")
+output_path <- file.path(data_dir, "calibration_wc381_timing_compare.csv")
 
 calc_old_ts <- function(freq) {
   obj <- cal_generate(material = 'WC', diameter = 38.1e-3)
@@ -51,20 +52,29 @@ calc_new_ts <- function(freq) {
 }
 
 freq <- seq(1e3, 360e3, 1e3)
-old_times <- numeric(5)
-new_times <- numeric(5)
-for (i in seq_len(5)) {
-  old_times[i] <- system.time(calc_old_ts(freq))[['elapsed']]
-  new_times[i] <- system.time(calc_new_ts(freq))[['elapsed']]
+
+if (impl_should_refresh_timings() || !file.exists(output_path)) {
+  old_times <- numeric(5)
+  new_times <- numeric(5)
+  for (i in seq_len(5)) {
+    old_times[i] <- system.time(calc_old_ts(freq))[['elapsed']]
+    new_times[i] <- system.time(calc_new_ts(freq))[['elapsed']]
+  }
+  res <- data.frame(
+    version = c('old_fixed_cutoff', 'new_adaptive_cutoff'),
+    mean_elapsed_s = c(mean(old_times), mean(new_times)),
+    median_elapsed_s = c(median(old_times), median(new_times)),
+    min_elapsed_s = c(min(old_times), min(new_times)),
+    max_elapsed_s = c(max(old_times), max(new_times))
+  )
+  res <- impl_round_timing_columns(res)
+
+  write.csv(
+    res,
+    output_path,
+    row.names = FALSE
+  )
+} else {
+  res <- read.csv(output_path)
 }
-res <- data.frame(version = c('old_fixed_cutoff', 'new_adaptive_cutoff'),
-                  mean_elapsed_s = c(mean(old_times), mean(new_times)),
-                  median_elapsed_s = c(median(old_times), median(new_times)),
-                  min_elapsed_s = c(min(old_times), min(new_times)),
-                  max_elapsed_s = c(max(old_times), max(new_times)))
-write.csv(
-  res,
-  file.path(data_dir, 'calibration_wc381_timing_compare.csv'),
-  row.names = FALSE
-)
 print(res)

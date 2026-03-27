@@ -115,3 +115,24 @@ impl_sort_compare_df <- function(df) {
   row_idx <- do.call(order, c(order_args, list(na.last = TRUE)))
   df[row_idx, , drop = FALSE]
 }
+
+impl_should_refresh_timings <- function() {
+  refresh_override <- tolower(
+    Sys.getenv("ACOUSTICTS_IMPL_REFRESH_TIMINGS", unset = "")
+  )
+
+  identical(refresh_override, "true") ||
+    !nzchar(Sys.getenv("CI", unset = ""))
+}
+
+impl_round_timing_columns <- function(df, digits = 6) {
+  timing_cols <- grep("elapsed", names(df), value = TRUE)
+
+  for (col in timing_cols) {
+    if (is.numeric(df[[col]])) {
+      df[[col]] <- round(df[[col]], digits = digits)
+    }
+  }
+
+  df
+}

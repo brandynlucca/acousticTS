@@ -8,7 +8,7 @@ template:
 
 navbar:
   structure:
-    left: [intro, physics, build, run, library, workflows, numerics, developers, reference, news]
+    left: [intro, physics, build, run, library, bibliography, developers, reference, news]
     right: [github]
   components:
     intro:
@@ -51,12 +51,6 @@ navbar:
           href: articles/model-selection/model-selection.html
         - text: "Comparing Models"
           href: articles/comparing-models/comparing-models.html
-    library:
-      text: Model Library
-      href: articles/model-library/model-library.html
-    workflows:
-      text: Workflows
-      menu:
         - text: "Visualizing results"
           href: articles/plotting-inspecting-results/plotting-inspecting-results.html
         - text: "Simulation sweeps"
@@ -65,6 +59,12 @@ navbar:
           href: articles/calibration-workflow/calibration-workflow.html
         - text: "Validating models"
           href: articles/validation-benchmarks/validation-benchmarks.html
+    library:
+      text: Model Library
+      href: articles/model-library/model-library.html
+    bibliography:
+      text: Bibliography
+      href: articles/bibliography/bibliography.html
     developers:
       text: Developers
       menu:
@@ -109,6 +109,14 @@ articles:
       - running-models/running-models
       - model-selection/model-selection
       - comparing-models/comparing-models
+      - plotting-inspecting-results/plotting-inspecting-results
+      - simulation-parameter-sweeps/simulation-parameter-sweeps
+      - calibration-workflow/calibration-workflow
+      - validation-benchmarks/validation-benchmarks
+
+  - title: Bibliography
+    contents:
+      - bibliography/bibliography
 
   - title: Model Library
     contents:
@@ -167,13 +175,6 @@ articles:
       - bbfm/index
       - bbfm/bbfm-implementation
       - bbfm/bbfm-theory
-
-  - title: Workflows
-    contents:
-      - plotting-inspecting-results/plotting-inspecting-results
-      - simulation-parameter-sweeps/simulation-parameter-sweeps
-      - calibration-workflow/calibration-workflow
-      - validation-benchmarks/validation-benchmarks
 
   - title: Developer Guides
     contents:

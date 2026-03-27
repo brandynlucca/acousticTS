@@ -82,9 +82,9 @@ jobs:
           echo "Detected implementation rebuild drift:"
           cat implementation_drift.txt
 
-          if grep -vE '\.png$' implementation_drift.txt >/dev/null; then
+          if grep -vE '(\.png$|_timing[^/]*\.csv$|_compare_summary\.csv$)' implementation_drift.txt >/dev/null; then
             echo "Implementation figures/data are out of date."
             exit 1
           fi
 
-          echo "Only PNG drift detected; not failing the workflow."
+          echo "Only PNG or timing-derived drift detected; not failing the workflow."

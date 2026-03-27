@@ -102,7 +102,41 @@ k_l <- 2 * pi * frequency / sound_speed_longitudinal_body
 k_t <- 2 * pi * frequency / sound_speed_transversal_body
 m_limit <- ceiling(pmax(k_sw, k_l, k_t) * radius_body * abs(sin(theta_body))) + 10
 
-elapsed <- system.time({
+timing_path <- file.path(data_dir, "ecms_reference_direct_timing.csv")
+
+if (impl_should_refresh_timings() || !file.exists(timing_path)) {
+  elapsed <- system.time({
+    f_bs <- mapply(
+      FUN = .ecms_reference_scalar,
+      k_sw = k_sw,
+      k_l = k_l,
+      k_t = k_t,
+      m_limit = m_limit,
+      MoreArgs = list(
+        length_body = length_body,
+        radius_body = radius_body,
+        theta_body = theta_body,
+        density_sw = density_sw,
+        density_body = density_body
+      )
+    )
+  })["elapsed"]
+
+  timing_reference <- data.frame(
+    implementation = "direct-reference",
+    elapsed_s = as.numeric(elapsed),
+    frequency_min_khz = min(frequency) * 1e-3,
+    frequency_max_khz = max(frequency) * 1e-3,
+    frequency_step_khz = 2
+  )
+  timing_reference <- impl_round_timing_columns(timing_reference)
+
+  write.csv(
+    timing_reference,
+    timing_path,
+    row.names = FALSE
+  )
+} else {
   f_bs <- mapply(
     FUN = .ecms_reference_scalar,
     k_sw = k_sw,
@@ -117,7 +151,8 @@ elapsed <- system.time({
       density_body = density_body
     )
   )
-})["elapsed"]
+  timing_reference <- read.csv(timing_path)
+}
 
 sigma_bs <- abs(f_bs)^2
 ts_db <- 10 * log10(sigma_bs)
@@ -136,22 +171,9 @@ write.csv(
   row.names = FALSE
 )
 
-write.csv(
-  data.frame(
-    implementation = "direct-reference",
-    elapsed_s = as.numeric(elapsed),
-    frequency_min_khz = min(frequency) * 1e-3,
-    frequency_max_khz = max(frequency) * 1e-3,
-    frequency_step_khz = 2
-  ),
-  file.path(data_dir, "ecms_reference_direct_timing.csv"),
-  row.names = FALSE
-)
-
 acoustic_df <- read.csv(file.path(data_dir, "ecms_reference_acousticts.csv"))
 reference_df <- read.csv(file.path(data_dir, "ecms_reference_direct.csv"))
 timing_acoustic <- read.csv(file.path(data_dir, "ecms_reference_acousticts_timing.csv"))
-timing_reference <- read.csv(file.path(data_dir, "ecms_reference_direct_timing.csv"))
 
 merged <- merge(
   acoustic_df,
@@ -174,17 +196,20 @@ write.csv(
   row.names = FALSE
 )
 
+summary_df <- data.frame(
+  comparison = "acousticTS vs direct reference",
+  max_abs_delta_TS_dB = max(abs(merged$TS_acousticts - merged$TS_reference)),
+  mean_abs_delta_TS_dB = mean(abs(merged$TS_acousticts - merged$TS_reference)),
+  frequency_at_max_delta_kHz = merged$frequency_khz[
+    which.max(abs(merged$TS_acousticts - merged$TS_reference))
+  ],
+  elapsed_acousticts_s = timing_acoustic$elapsed_s,
+  elapsed_reference_s = timing_reference$elapsed_s
+)
+summary_df <- impl_round_timing_columns(summary_df)
+
 write.csv(
-  data.frame(
-    comparison = "acousticTS vs direct reference",
-    max_abs_delta_TS_dB = max(abs(merged$TS_acousticts - merged$TS_reference)),
-    mean_abs_delta_TS_dB = mean(abs(merged$TS_acousticts - merged$TS_reference)),
-    frequency_at_max_delta_kHz = merged$frequency_khz[
-      which.max(abs(merged$TS_acousticts - merged$TS_reference))
-    ],
-    elapsed_acousticts_s = timing_acoustic$elapsed_s,
-    elapsed_reference_s = timing_reference$elapsed_s
-  ),
+  summary_df,
   file.path(data_dir, "ecms_reference_compare_summary.csv"),
   row.names = FALSE
 )

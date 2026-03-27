@@ -56,6 +56,7 @@ pairwise <- data.frame(
 )
 
 timing_long <- rbind(timing_acoustic, timing_echo, timing_zoo)
+timing_long <- impl_round_timing_columns(timing_long)
 
 write.csv(
   pairwise,
