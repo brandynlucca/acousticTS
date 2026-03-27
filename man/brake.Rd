@@ -14,6 +14,10 @@ as a ratio relative to body length or actual measurement}
 
 \item{mode}{Either "ratio" or "measurement"}
 }
+\value{
+A bent version of \code{object}, returned as the same broad object
+type with updated geometry and curvature metadata.
+}
 \description{
 Support function for bending scatterer body shape and position matrix
 }

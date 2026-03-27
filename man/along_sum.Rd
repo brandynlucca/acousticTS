@@ -11,6 +11,10 @@ along_sum(rpos, iterations)
 
 \item{iterations}{Number of iterations}
 }
+\value{
+A numeric matrix containing the adjacent column sums of
+\code{rpos}.
+}
 \description{
 Along-matrix summing function
 }

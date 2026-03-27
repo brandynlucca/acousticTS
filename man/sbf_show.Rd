@@ -9,6 +9,10 @@ sbf_show(object)
 \arguments{
 \item{object}{SBF_class object.}
 }
+\value{
+Called for its side effect of printing a formatted summary;
+invisibly returns \code{NULL}.
+}
 \description{
 show(...) for SBF-class objects.
 }

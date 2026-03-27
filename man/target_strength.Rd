@@ -47,6 +47,10 @@ same argument is supplied both through \code{...} and through
 
 \item{...}{Additional optional model inputs/parameters.}
 }
+\value{
+The input scatterer object with requested model parameters, model
+outputs, and target strength results stored in its model slots.
+}
 \description{
 Wrapper function to model acoustic target strength
 }

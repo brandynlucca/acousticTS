@@ -1,22 +1,61 @@
 impl_set_repo_root <- function() {
-  if (file.exists("DESCRIPTION")) {
-    return(invisible(normalizePath(".", winslash = "/", mustWork = FALSE)))
+  has_repo_root <- function(path) {
+    file.exists(file.path(path, "DESCRIPTION")) &&
+      file.exists(file.path(
+        path,
+        "tools",
+        "implementation-figures",
+        "manifest.csv"
+      ))
   }
+
+  parent_dir <- function(path) {
+    normalizePath(file.path(path, ".."), winslash = "/", mustWork = FALSE)
+  }
+
+  search_upward <- function(start_path) {
+    current <- normalizePath(start_path, winslash = "/", mustWork = FALSE)
+    repeat {
+      if (has_repo_root(current)) {
+        return(current)
+      }
+
+      next_path <- parent_dir(current)
+      if (identical(next_path, current)) {
+        return(NULL)
+      }
+      current <- next_path
+    }
+  }
+
+  search_roots <- character()
+
+  if (nzchar(Sys.getenv("GITHUB_WORKSPACE", unset = ""))) {
+    search_roots <- c(search_roots, Sys.getenv("GITHUB_WORKSPACE"))
+  }
+
+  search_roots <- c(search_roots, getwd())
 
   args <- commandArgs(FALSE)
   file_arg <- args[grep("^--file=", args)]
-
   if (length(file_arg) == 1L) {
-    script_path <- normalizePath(sub("^--file=", "", file_arg))
-    repo_root <- normalizePath(
-      file.path(dirname(script_path), "..", "..", ".."),
-      winslash = "/",
-      mustWork = FALSE
-    )
-    setwd(repo_root)
+    search_roots <- c(search_roots, dirname(sub("^--file=", "", file_arg)))
   }
 
-  invisible(normalizePath(".", winslash = "/", mustWork = FALSE))
+  search_roots <- unique(search_roots[nzchar(search_roots)])
+  for (root in search_roots) {
+    repo_root <- search_upward(root)
+    if (!is.null(repo_root)) {
+      setwd(repo_root)
+      return(invisible(repo_root))
+    }
+  }
+
+  stop(
+    "Could not locate the repository root containing ",
+    "'tools/implementation-figures/manifest.csv'.",
+    call. = FALSE
+  )
 }
 
 impl_load_all <- function() {

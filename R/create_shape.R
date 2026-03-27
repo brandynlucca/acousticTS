@@ -26,6 +26,8 @@
 #'   zU_body = c(0.001, 0.002),
 #'   zL_body = c(-0.001, -0.002)
 #' )
+#' @return An \code{\link{Arbitrary}} shape object containing the padded
+#'   position matrix and stored shape metadata.
 #' @seealso \code{\link{Arbitrary}}
 #'
 #' @keywords shape_generation

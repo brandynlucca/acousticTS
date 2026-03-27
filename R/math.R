@@ -6,6 +6,8 @@
 #' Along-matrix summing function
 #' @param rpos Position vector
 #' @param iterations Number of iterations
+#' @return A numeric matrix containing the adjacent column sums of
+#'   \code{rpos}.
 #' @rdname along_sum
 #' @export
 along_sum <- function(rpos, iterations) {

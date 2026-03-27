@@ -486,6 +486,8 @@ lame <- function(K = NULL, E = NULL, G = NULL, nu = NULL) {
 #' scatterer first, then run \code{"dwba"} or \code{"sdwba"} on the curved
 #' object. Model names are normalized internally, so case-insensitive inputs
 #' such as \code{"DWBA"} and \code{"dwba"} resolve to the same family.
+#' @return The input scatterer object with requested model parameters, model
+#'   outputs, and target strength results stored in its model slots.
 #' @seealso
 #' \code{\link{DWBA}}, \code{\link{BBFM}}, \code{\link{PCDWBA}},
 #' \code{\link{SDWBA}}, \code{\link{FCMS}}, \code{\link{BCMS}},

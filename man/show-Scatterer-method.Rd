@@ -9,6 +9,10 @@
 \arguments{
 \item{object}{Scattering object.}
 }
+\value{
+Called for its side effect of printing a formatted summary;
+invisibly returns \code{NULL}.
+}
 \description{
 Generic function for show(...) for different scatterers.
 }

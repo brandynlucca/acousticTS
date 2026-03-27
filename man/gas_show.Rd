@@ -9,6 +9,10 @@ gas_show(object)
 \arguments{
 \item{object}{GAS-class object}
 }
+\value{
+Called for its side effect of printing a formatted summary;
+invisibly returns \code{NULL}.
+}
 \description{
 show(...) for GAS_class objects
 }

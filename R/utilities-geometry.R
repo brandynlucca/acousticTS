@@ -336,7 +336,8 @@
 #' @param radius_curvature Radius of curvature that can be parameterized either
 #' as a ratio relative to body length or actual measurement
 #' @param mode Either "ratio" or "measurement"
-#'
+#' @return A bent version of \code{object}, returned as the same broad object
+#'   type with updated geometry and curvature metadata.
 #' @keywords shape manipulator
 #' @rdname brake
 #' @export

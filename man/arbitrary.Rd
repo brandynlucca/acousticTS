@@ -14,6 +14,10 @@ model-specific code.}
 
 \item{length_units}{Units for body length. Defaults to meters: "m"}
 }
+\value{
+An \code{\link{Arbitrary}} shape object containing the padded
+position matrix and stored shape metadata.
+}
 \description{
 Creates arbitrary body shape from user inputs
 }

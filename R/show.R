@@ -232,6 +232,8 @@
 ################################################################################
 #' Generic function for show(...) for different scatterers.
 #' @param object Scattering object.
+#' @return Called for its side effect of printing a formatted summary;
+#'   invisibly returns \code{NULL}.
 #' @importFrom methods setMethod show
 #' @keywords internal
 #' @export
@@ -255,6 +257,8 @@ setMethod(
 ################################################################################
 #' show(...) for FLS-class objects.
 #' @param object FLS-class object.
+#' @return Called for its side effect of printing a formatted summary;
+#'   invisibly returns \code{NULL}.
 #' @keywords internal
 #' @export
 fls_show <- function(object) {
@@ -292,6 +296,8 @@ fls_show <- function(object) {
 }
 #' show(...) for GAS_class objects
 #' @param object GAS-class object
+#' @return Called for its side effect of printing a formatted summary;
+#'   invisibly returns \code{NULL}.
 #' @keywords internal
 #' @export
 gas_show <- function(object) {
@@ -317,6 +323,8 @@ gas_show <- function(object) {
 }
 #' show(...) for SBF-class objects.
 #' @param object SBF_class object.
+#' @return Called for its side effect of printing a formatted summary;
+#'   invisibly returns \code{NULL}.
 #' @keywords internal
 #' @export
 sbf_show <- function(object) {
@@ -364,6 +372,8 @@ sbf_show <- function(object) {
 }
 #' show(...) for BBF-class objects.
 #' @param object BBF-class object.
+#' @return Called for its side effect of printing a formatted summary;
+#'   invisibly returns \code{NULL}.
 #' @keywords internal
 #' @export
 bbf_show <- function(object) {
@@ -410,6 +420,8 @@ bbf_show <- function(object) {
 }
 #' show(...) for CAL-class objects.
 #' @param object CAL-class object.
+#' @return Called for its side effect of printing a formatted summary;
+#'   invisibly returns \code{NULL}.
 #' @keywords internal
 #' @export
 cal_show <- function(object) {
@@ -438,6 +450,8 @@ cal_show <- function(object) {
 }
 #' show(...) for ESS-class objects.
 #' @param object ESS-class object.
+#' @return Called for its side effect of printing a formatted summary;
+#'   invisibly returns \code{NULL}.
 #' @keywords internal
 #' @export
 ess_show <- function(object) {
