@@ -66,13 +66,6 @@ straight_shape <- cylinder(
   n_segments = 401
 )
 
-bent_shape <- cylinder(
-  length_body = 10.5e-3,
-  radius_body = 1e-3,
-  radius_curvature_ratio = 1.5,
-  n_segments = 401
-)
-
 straight_object <- fls_generate(
   shape = straight_shape,
   density_body = density_sw * 1.0357,
@@ -80,11 +73,9 @@ straight_object <- fls_generate(
   theta_body = pi / 2
 )
 
-bent_object <- fls_generate(
-  shape = bent_shape,
-  density_body = density_sw * 1.0357,
-  sound_speed_body = sound_speed_sw * 1.0279,
-  theta_body = pi / 2
+bent_object <- brake(
+  straight_object,
+  radius_curvature = 1.5
 )
 
 straight_object
