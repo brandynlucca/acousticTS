@@ -196,6 +196,43 @@ test_that("BCMS infers default boundaries and guards limited options", {
   )
 })
 
+test_that("brake() propagates cylinder curvature metadata into BCMS inputs", {
+  density_sw <- 1026.8
+  sound_speed_sw <- 1477.3
+
+  straight <- fls_generate(
+    shape = cylinder(
+      length_body = 10.5e-3,
+      radius_body = 1e-3,
+      n_segments = 401
+    ),
+    density_body = density_sw * 1.0357,
+    sound_speed_body = sound_speed_sw * 1.0279,
+    theta_body = pi / 2
+  )
+
+  bent <- brake(straight, radius_curvature = 1.5)
+
+  expect_equal(bent@shape_parameters$radius_curvature_ratio, 1.5)
+  expect_equal(bent@body$radius_curvature_ratio, 1.5)
+
+  bent_bcms <- target_strength(
+    object = bent,
+    frequency = 38e3,
+    model = "bcms",
+    density_sw = density_sw,
+    sound_speed_sw = sound_speed_sw
+  )
+
+  expect_true(
+    isTRUE(bent_bcms@model_parameters$BCMS$body$is_bent)
+  )
+  expect_equal(
+    bent_bcms@model_parameters$BCMS$body$radius_curvature,
+    1.5 * bent_bcms@shape_parameters$length
+  )
+})
+
 test_that("ECMS reproduces straight and bent elastic-cylinder coherence bookkeeping", {
   length_body <- 0.04
   radius_body <- 0.005
