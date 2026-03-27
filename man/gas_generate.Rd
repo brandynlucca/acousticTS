@@ -2,24 +2,19 @@
 % Please edit documentation in R/create_scatterer.R
 \name{gas_generate}
 \alias{gas_generate}
-\title{Create GAS object}
+\title{Generate a GAS-class object}
 \usage{
-gas_generate(
-  shape = "sphere",
-  radius_body = NULL,
-  h_fluid = 0.22,
-  g_fluid = 0.0012,
-  sound_speed_fluid = NULL,
-  density_fluid = NULL,
-  theta_body = pi/2,
-  ID = NULL,
-  radius_units = "m",
-  theta_units = "radians",
-  n_segments = 100
-)
+gas_generate(shape = NULL, radius_body = NULL, h_fluid = 0.22,
+  g_fluid = 0.0012, sound_speed_fluid = NULL, density_fluid = NULL,
+  theta_body = pi/2, ID = NULL, radius_units = "m",
+  theta_units = "radians", n_segments = 100, ...)
 }
 \arguments{
-\item{shape}{Optional pre-made shape input. Default is a sphere.}
+\item{shape}{Pre-built \code{Shape} object describing the gas-filled geometry. If
+omitted, explicit profile coordinates such as \code{x_body}, \code{y_body}, and
+\code{z_body} are treated as the manual geometry pathway. Legacy character
+dispatch such as \code{"sphere"} is retained only for backward compatibility
+and is now deprecated.}
 
 \item{radius_body}{Radius (m). For non-canonical shapes, this would be the
 maximum or mean radius at the scatterer midsection.}
@@ -33,23 +28,43 @@ medium (h).}
 
 \item{density_fluid}{Optional fluid density (m/s).}
 
-\item{theta_body}{Orientation of the target relative to the transmit source
-(\eqn{\theta}). Broadside incidence is considered 90 degrees, or pi/2.
-Default value is pi/2; input should be in radians.}
+\item{theta_body}{Orientation of the target relative to the incident wave
+(radians).}
 
-\item{ID}{Optional metadata entry.}
+\item{ID}{Optional metadata identifier.}
 
-\item{radius_units}{Diameter units. Defaults to "m".}
+\item{radius_units}{Compatibility argument. \code{gas_generate()} now assumes
+meters and ignores non-SI alternatives.}
 
-\item{theta_units}{Units used for orientation. Defaults to "radians".}
+\item{theta_units}{Compatibility argument. Scatterer constructors now assume
+radians and ignore non-SI alternatives.}
 
 \item{n_segments}{Number of body segments.}
+
+\item{...}{Additional manual profile arguments or legacy canonical shape
+arguments used by the compatibility geometry pathway, such as \code{x_body},
+\code{y_body}, \code{z_body}, \code{radius_body}, \code{length_body}, or \code{taper}.}
 }
 \value{
 GAS-class object
 }
 \description{
-Create GAS object
+Generate a GAS-class object
+}
+\details{
+The preferred workflow is to supply a pre-built \code{Shape} object or explicit
+profile coordinates and then describe the internal gas by either contrasts
+(\code{g_fluid}, \code{h_fluid}) or absolute density/sound-speed values
+(\code{density_fluid}, \code{sound_speed_fluid}). Character-based shape dispatch
+remains available only as a compatibility pathway and is now deprecated.
+
+Scatterer constructors store geometry in meters and orientations in radians.
+\code{radius_units} and \code{theta_units} are retained as compatibility arguments, but
+non-SI values are normalized to the package-standard representation.
+}
+\examples{
+shape_gas <- sphere(radius_body = 0.01, n_segments = 60)
+gas_generate(shape = shape_gas, g_fluid = 0.0012, h_fluid = 0.22)
 }
 \seealso{
 \code{\link{GAS}}

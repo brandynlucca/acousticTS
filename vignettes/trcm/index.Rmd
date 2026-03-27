@@ -1,0 +1,61 @@
+---
+title: "TRCM"
+output:
+  rmarkdown::html_vignette:
+    toc: false
+    number_sections: false
+    fig_caption: yes
+vignette: >
+  %\VignetteIndexEntry{TRCM}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+# Overview
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  family = "trcm",
+  pages = c(
+    Overview = "index.html",
+    Implementation = "trcm-implementation.html",
+    Theory = "trcm-theory.html"
+  )
+)
+```
+
+```{r trcm_overview, echo=FALSE, results='asis'}
+acousticTS:::.model_family_overview(
+  family = "trcm",
+  summary = paste(
+    "The two-ray cylinder model (`TRCM`) is a high-frequency asymptotic family",
+    "for elongated fluid-like bodies. It retains only two dominant coherent",
+    "paths: a prompt near-side reflection and a through-body path that returns",
+    "after an internal reflection."
+  ),
+  core_idea = paste(
+    "Replace the full internal reverberation problem by the first two",
+    "physically important ray paths and compute the target strength from their",
+    "interference, combined with a finite-length directivity factor."
+  ),
+  best_for = c(
+    "High-frequency elongated fluid-like targets",
+    "Cylinder-like bodies whose scattering is dominated by specular path interference",
+    "Fast asymptotic estimates when a full modal or perturbative solve is unnecessary"
+  ),
+  supports = c(
+    "Straight and bent cylindrical-style branches",
+    "Contrast notation relative to seawater as medium `1`",
+    "Monostatic high-frequency backscatter estimates"
+  ),
+  assumptions = c(
+    "High-frequency regime",
+    "Only two dominant coherent internal/external paths are retained",
+    "No low-order resonances or full internal multiple scattering series"
+  ),
+  reading = c(
+    "[Implementation](trcm-implementation.html): usage and comparison workflows",
+    "[Theory](trcm-theory.html): two-ray geometry, interference factor, and finite-length directivity"
+  )
+)
+```
+

@@ -1,0 +1,30 @@
+---
+title: "Model library"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: true
+    fig_caption: yes
+vignette: >
+  %\VignetteIndexEntry{Model library}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# Introduction
+
+The package now contains enough model families that the site works better when the model pages are treated as a library rather than as a flat list in the top navigation. This page is the main entry point for that library.
+
+## Model-status policy
+
+```{r model_status_policy, echo=FALSE, results='asis'}
+acousticTS:::.validation_status_policy()
+```
+
+```{r model_library_listing, echo=FALSE, results='asis'}
+acousticTS:::.validation_model_library()
+```
+
+# How to use this page
+
+Each family page is intended to be the local navigation hub for that model family. Use the family page to move between overview, theory, implementation, and related package pages, rather than relying on a long global theory or implementation menu.

@@ -4,20 +4,126 @@
 \alias{target_strength}
 \title{Wrapper function to model acoustic target strength}
 \usage{
-target_strength(object, frequency, model, verbose = FALSE, ...)
+target_strength(
+  object,
+  frequency,
+  model,
+  verbose = FALSE,
+  model_args = NULL,
+  ...
+)
 }
 \arguments{
 \item{object}{Scatterer-class object.}
 
 \item{frequency}{Frequency (Hz).}
 
-\item{model}{Model name.}
+\item{model}{Model name. Available models currently include
+\code{"dwba"} (\code{\link{DWBA}}),
+\code{"bbfm"} (\code{\link{BBFM}}),
+\code{"pcdwba"} (\code{\link{PCDWBA}}),
+\code{"sdwba"} (\code{\link{SDWBA}}),
+\code{"fcms"} (\code{\link{FCMS}}),
+\code{"bcms"} (\code{\link{BCMS}}),
+\code{"ecms"} (\code{\link{ECMS}}),
+\code{"hpa"} (\code{\link{HPA}}),
+\code{"krm"} (\code{\link{KRM}}),
+\code{"psms"} (\code{\link{PSMS}}),
+\code{"sphms"} (\code{\link{SPHMS}}),
+\code{"essms"} (\code{\link{ESSMS}}),
+\code{"vesms"} (\code{\link{VESMS}}),
+\code{"trcm"} (\code{\link{TRCM}}), and
+\code{"calibration"} / \code{"soems"} (\code{\link{SOEMS}}).}
 
 \item{verbose}{Prints current procedural step occurring from model
 initialization to calculating TS. Defaults to FALSE.}
 
+\item{model_args}{Optional named list of per-model argument bundles. Each
+list name should match one of the requested model names
+case-insensitively, and each value should be either a named list or a
+named atomic vector of arguments to apply only to that model. When the
+same argument is supplied both through \code{...} and through
+\code{model_args[[model_name]]}, the model-specific entry takes precedence.}
+
 \item{...}{Additional optional model inputs/parameters.}
+}
+\value{
+The input scatterer object with requested model parameters, model
+outputs, and target strength results stored in its model slots.
 }
 \description{
 Wrapper function to model acoustic target strength
+}
+\details{
+This is the main high-level entry point for running target-strength models in
+\code{acousticTS}. The supplied scatterer object is checked, the requested
+model or models are initialized, and the resulting outputs are stored back on
+the same object.
+
+The available model families span exact modal-series solutions and
+approximation-based solutions. Readers should consult the model-specific help
+topics for the physical assumptions, valid object types, boundary-condition
+options, and model-specific arguments used by each implementation:
+
+\itemize{
+\item \code{\link{DWBA}} for the distorted-wave Born approximation
+applied to weakly scattering fluid-like bodies.
+\item \code{\link{BBFM}} for a composite flesh-plus-backbone model that
+combines a DWBA flesh term with an elastic-cylinder backbone term.
+\item \code{\link{PCDWBA}} for the phase-compensated distorted-wave Born
+approximation applied to elongated fluid-like bodies.
+\item \code{\link{SDWBA}} for the stochastic distorted-wave Born
+approximation.
+\item \code{\link{FCMS}} for the finite cylinder modal series solution.
+\item \code{\link{BCMS}} for the bent-cylinder modal series solution.
+\item \code{\link{ECMS}} for the elastic-cylinder modal series solution.
+\item \code{\link{HPA}} for the high-pass approximation family.
+\item \code{\link{KRM}} for the Kirchhoff-Ray Mode model.
+\item \code{\link{PSMS}} for the prolate spheroidal modal series
+solution.
+\item \code{\link{SPHMS}} for the spherical modal series solution.
+\item \code{\link{ESSMS}} for the elastic-shelled spherical modal series
+solution.
+\item \code{\link{VESMS}} for the viscous-elastic spherical scattering
+model applied to gas-filled elastic shells with an external viscous layer.
+\item \code{\link{TMM}} for the single-target transition-matrix family.
+\item \code{\link{TRCM}} for the two-ray cylindrical model.
+\item \code{\link{SOEMS}} for the solid elastic calibration-sphere model,
+accessed through \code{"calibration"} or \code{"soems"}.
+}
+
+Model-specific inputs are usually passed through \code{...}. For example,
+some models require a \code{boundary} argument, \code{HPA} uses a
+\code{method} argument, and several models expose additional numerical
+controls. When several models are requested together, shared arguments may be
+supplied through \code{...} and per-model overrides may be supplied through
+\code{model_args}. This is useful when different models should share the same
+seawater properties but only one of them needs an extra stochastic or
+numerical control:
+
+\preformatted{
+target_strength(
+  object,
+  frequency,
+  model = c("dwba", "sdwba"),
+  density_sw = 1026,
+  sound_speed_sw = 1478,
+  model_args = list(
+    sdwba = list(phase_sd_init = 0.77)
+  )
+)
+}
+
+The legacy curved-entry wrappers \code{"dwba_curved"} and
+\code{"sdwba_curved"} are deprecated; apply \code{\link{brake}} to the
+scatterer first, then run \code{"dwba"} or \code{"sdwba"} on the curved
+object. Model names are normalized internally, so case-insensitive inputs
+such as \code{"DWBA"} and \code{"dwba"} resolve to the same family.
+}
+\seealso{
+\code{\link{DWBA}}, \code{\link{BBFM}}, \code{\link{PCDWBA}},
+\code{\link{SDWBA}}, \code{\link{FCMS}}, \code{\link{BCMS}},
+\code{\link{ECMS}}, \code{\link{HPA}}, \code{\link{KRM}}, \code{\link{PSMS}},
+\code{\link{SPHMS}}, \code{\link{ESSMS}}, \code{\link{VESMS}},
+\code{\link{TMM}}, \code{\link{TRCM}}, \code{\link{SOEMS}}
 }

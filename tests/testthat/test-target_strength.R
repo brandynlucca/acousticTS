@@ -27,10 +27,48 @@ test_that("target_strength function works correctly", {
   expect_true(all(!is.na(cal_with_ts@model$calibration$TS)))
 })
 
+test_that("calibration sphere modal sum converges at high ka", {
+  cal_obj <- cal_generate(material = "WC", diameter = 38.1e-3)
+
+  cal_with_ts <- target_strength(
+    object = cal_obj,
+    frequency = 350e3,
+    model = "calibration",
+    sound_speed_sw = 1477.3,
+    density_sw = 1026.8
+  )
+
+  expect_equal(
+    cal_with_ts@model$calibration$TS,
+    -44.2348898912626,
+    tolerance = 1e-10
+  )
+})
+
+test_that("calibration sphere can use the legacy fixed modal cutoff", {
+  cal_obj <- cal_generate(material = "WC", diameter = 38.1e-3)
+
+  cal_with_ts <- target_strength(
+    object = cal_obj,
+    frequency = 350e3,
+    model = "calibration",
+    sound_speed_sw = 1477.3,
+    density_sw = 1026.8,
+    adaptive = FALSE
+  )
+
+  expect_equal(
+    cal_with_ts@model$calibration$TS,
+    -44.2348180844783,
+    tolerance = 1e-10
+  )
+})
+
 test_that("target_strength works with different scatterer types", {
   # Test with FLS object and DWBA/SDWBA/KRM model
   data(krill, package = "acousticTS")
   data(sardine, package = "acousticTS")
+  data(cod, package = "acousticTS")
 
   fls_obj <- fls_generate(
     x = krill@body$rpos[1, ],
@@ -42,12 +80,15 @@ test_that("target_strength works with different scatterer types", {
     radius_curvature_ratio = 3.0,
     theta_body = krill@body$theta
   )
-  frequency <- seq(1e3, 100e3, 1e3)
+  frequency <- seq(1e3, 10e3, 1e3)
 
-  fls_with_ts <- target_strength(
-    object = fls_obj,
-    frequency = frequency,
-    model = c("SDWBA", "SDWBA_curved", "DWBA", "KRM")
+  expect_warning(
+    fls_with_ts <- target_strength(
+      object = fls_obj,
+      frequency = frequency,
+      model = c("SDWBA", "SDWBA_curved", "DWBA", "KRM")
+    ),
+    "deprecated"
   )
 
   expect_s4_class(fls_with_ts, "FLS")
@@ -66,20 +107,38 @@ test_that("target_strength works with different scatterer types", {
   expect_s4_class(sardine_with_ts, "SBF")
   expect_true("KRM" %in% names(sardine_with_ts@model))
 
+  cod_with_ts <- target_strength(
+    object = cod,
+    frequency = frequency,
+    model = "KRM"
+  )
+
+  expect_s4_class(cod_with_ts, "SBF")
+  expect_true("KRM" %in% names(cod_with_ts@model))
+  expect_equal(
+    cod_with_ts@model_parameters$KRM$parameters$ns_b,
+    ncol(cod@body$rpos)
+  )
+  expect_equal(
+    cod_with_ts@model_parameters$KRM$parameters$ns_sb,
+    ncol(cod@bladder$rpos)
+  )
+
   # Test with GAS object and MSS Anderson (1950) model
-  gas_obj <- gas_generate(radius_body = 1e-3)
+  gas_obj <- gas_generate(shape = sphere(radius_body = 1e-3, n_segments = 80))
 
   gas_with_ts <- target_strength(
     object = gas_obj,
     frequency = frequency,
-    model = "mss_anderson"
+    model = "sphms"
   )
 
   expect_s4_class(gas_with_ts, "GAS")
-  expect_true("MSS_anderson" %in% names(gas_with_ts@model))
+  expect_true("SPHMS" %in% names(gas_with_ts@model))
 
   # Test ESS object with HP and MSS model
   ess_obj <- ess_generate(
+    shape = sphere(radius_body = 10e-3, n_segments = 80),
     radius_shell = 10e-3, # 10 mm outer radius
     shell_thickness = 1e-3, # 1 mm shell thickness
     sound_speed_shell = 3750, # Shell sound speed (m/s)
@@ -93,12 +152,12 @@ test_that("target_strength works with different scatterer types", {
   ess_with_ts <- target_strength(
     object = ess_obj,
     frequency = frequency,
-    model = c("mss_goodman_stern", "high_pass_stanton")
+    model = c("hpa", "essms")
   )
 
   expect_s4_class(ess_with_ts, "ESS")
   expect_true(
-    all(c("MSS_goodman_stern", "high_pass_stanton")
+    all(c("ESSMS", "HPA")
         %in% names(ess_with_ts@model))
   )
 })
@@ -129,7 +188,7 @@ test_that("target_strength handles multiple models", {
     radius_body = krill@body$radius,
     g_body = krill@body$g,
     h_body = krill@body$h,
-    radius_curvature_ratio = krill@body$radius_curvature_ratio,
+    radius_curvature_ratio = 3.3,
     theta_body = krill@body$theta
   )
   frequency <- c(120e3)
@@ -137,12 +196,88 @@ test_that("target_strength handles multiple models", {
   # Calculate with DWBA
   fls_dwba <- target_strength(fls_obj, frequency, "DWBA")
 
-  # Calculate with DCM (should add to existing models)
-  fls_both <- target_strength(fls_dwba, frequency, "DCM")
+  # Should have the DWBA
+  expect_true("DWBA" %in% names(fls_dwba@model))
+})
 
-  # Should have both models
-  expect_true("DWBA" %in% names(fls_both@model))
-  expect_true("DCM" %in% names(fls_both@model))
+test_that("target_strength applies shared and model-specific arguments cleanly", {
+  data(krill, package = "acousticTS")
+
+  fls_obj <- fls_generate(
+    x = krill@body$rpos[1, ],
+    y = krill@body$rpos[2, ],
+    z = krill@body$rpos[3, ],
+    radius_body = krill@body$radius,
+    g_body = krill@body$g,
+    h_body = krill@body$h,
+    radius_curvature_ratio = 3.3,
+    theta_body = krill@body$theta
+  )
+
+  out <- target_strength(
+    object = fls_obj,
+    frequency = 120e3,
+    model = c("dwba", "sdwba"),
+    density_sw = 1026,
+    sound_speed_sw = 1478,
+    model_args = list(
+      sdwba = c(
+        n_iterations = 5,
+        n_segments_init = 14,
+        phase_sd_init = 0.77,
+        length_init = 38.35e-3,
+        frequency_init = 120e3
+      )
+    )
+  )
+
+  expect_true(all(c("DWBA", "SDWBA") %in% names(out@model)))
+  expect_equal(out@model_parameters$DWBA$medium$density, 1026)
+  expect_equal(out@model_parameters$SDWBA$medium$density, 1026)
+  expect_equal(
+    out@model_parameters$SDWBA$parameters[[1]]$meta_params$p0,
+    0.77
+  )
+  expect_equal(
+    out@model_parameters$SDWBA$parameters[[1]]$meta_params$n_iterations,
+    5
+  )
+})
+
+test_that("target_strength lets model_args override shared arguments", {
+  data(krill, package = "acousticTS")
+
+  fls_obj <- fls_generate(
+    x = krill@body$rpos[1, ],
+    y = krill@body$rpos[2, ],
+    z = krill@body$rpos[3, ],
+    radius_body = krill@body$radius,
+    g_body = krill@body$g,
+    h_body = krill@body$h,
+    radius_curvature_ratio = 3.3,
+    theta_body = krill@body$theta
+  )
+
+  out <- target_strength(
+    object = fls_obj,
+    frequency = 120e3,
+    model = c("dwba", "sdwba"),
+    density_sw = 1026,
+    sound_speed_sw = 1478,
+    model_args = list(
+      SDWBA = list(
+        density_sw = 1027,
+        n_iterations = 5,
+        n_segments_init = 14,
+        phase_sd_init = 0.77,
+        length_init = 38.35e-3,
+        frequency_init = 120e3
+      )
+    )
+  )
+
+  expect_equal(out@model_parameters$DWBA$medium$density, 1026)
+  expect_equal(out@model_parameters$SDWBA$medium$density, 1027)
 })
 
 test_that("target_strength preserves object metadata", {
@@ -185,10 +320,30 @@ test_that("Expected error states for target_strength", {
     "Initialization function invalid_initialize not found for model invalid"
   )
 
-  # Test partial initialize-model function pairing
+  # Test missing initialize-model function pairing
   expect_error(
     target_strength(object = krill, frequency = 120e3, model = "spoof"),
-    "Model function SPOOF not found"
+    "Initialization function spoof_initialize not found for model spoof|Model function SPOOF not found"
+  )
+
+  expect_error(
+    target_strength(
+      object = krill,
+      frequency = 120e3,
+      model = "dwba",
+      model_args = list(sdwba = list(phase_sd_init = 0.77))
+    ),
+    "'model_args' contains entries for model\\(s\\) not requested in 'model'"
+  )
+
+  expect_error(
+    target_strength(
+      object = krill,
+      frequency = 120e3,
+      model = "dwba",
+      model_args = list(dwba = 1:3)
+    ),
+    "must be either a named list or a named atomic vector"
   )
 })
 

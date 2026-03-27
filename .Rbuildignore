@@ -1,10 +1,13 @@
 ^.*\.Rproj$
+^.vscode$
 ^CITATION\.cff$
 ^LICENSE.md$
 ^LICENSE\.md$
 ^Meta$
 ^README.Rmd$
 ^README\.Rmd$
+^Rplots\.pdf$
+^\.Renviron$
 ^\.Rproj\.user$
 ^\.github$
 ^\.httr-oauth$
@@ -23,3 +26,8 @@
 ^man-roxygen$
 ^organisation.yml$
 ^pkgdown$
+^scratch$
+^src/.*\.(dll|o|mod)$
+^tests/testthat/Rplots\.pdf$
+^vignettes/.*/figure$
+^vignettes/.*/figure/.*

@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" role="img" aria-labelledby="title desc">
+  <title id="title">SDWBA coherence regimes</title>
+  <desc id="desc">Comparison of deterministic, partially randomized, and strongly randomized segment phases in the stochastic distorted wave Born approximation.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8f3ea; }
+      .panel { fill: #fffdfa; stroke: #2f2822; stroke-width: 2.2; rx: 16; ry: 16; }
+      .head { font: 700 21px Georgia, serif; fill: #1f1a16; }
+      .txt { font: 15px Georgia, serif; fill: #2f2822; }
+      .small { font: 13px Georgia, serif; fill: #564b40; }
+      .seg { stroke: #3d6a8a; stroke-width: 3.2; fill: none; }
+      .ray { stroke: #9d5d2e; stroke-width: 2.4; fill: none; }
+      .dot { fill: #9d5d2e; }
+    </style>
+  </defs>
+  <rect width="960" height="300" class="bg"/>
+  <text x="28" y="40" class="head">How phase disorder changes the segment sum</text>
+
+  <rect x="24" y="64" width="286" height="206" class="panel"/>
+  <text x="46" y="95" class="txt">Deterministic DWBA</text>
+  <path d="M56 170 C96 126, 156 126, 246 170" class="seg"/>
+  <path d="M82 164 L82 116" class="ray"/>
+  <path d="M126 149 L126 101" class="ray"/>
+  <path d="M170 149 L170 101" class="ray"/>
+  <path d="M214 164 L214 116" class="ray"/>
+  <circle cx="82" cy="116" r="3.5" class="dot"/><circle cx="126" cy="101" r="3.5" class="dot"/><circle cx="170" cy="101" r="3.5" class="dot"/><circle cx="214" cy="116" r="3.5" class="dot"/>
+  <text x="46" y="222" class="small">All segment phases are retained exactly.</text>
+  <text x="46" y="243" class="small">Cross terms add fully coherently.</text>
+
+  <rect x="336" y="64" width="286" height="206" class="panel"/>
+  <text x="358" y="95" class="txt">Moderate phase variance</text>
+  <path d="M368 170 C408 126, 468 126, 558 170" class="seg"/>
+  <path d="M394 164 L385 118" class="ray"/>
+  <path d="M438 149 L451 103" class="ray"/>
+  <path d="M482 149 L470 103" class="ray"/>
+  <path d="M526 164 L537 119" class="ray"/>
+  <circle cx="385" cy="118" r="3.5" class="dot"/><circle cx="451" cy="103" r="3.5" class="dot"/><circle cx="470" cy="103" r="3.5" class="dot"/><circle cx="537" cy="119" r="3.5" class="dot"/>
+  <text x="358" y="222" class="small">Segment amplitudes stay the same.</text>
+  <text x="358" y="243" class="small">Cross terms are damped by exp(-σφ²).</text>
+
+  <rect x="648" y="64" width="286" height="206" class="panel"/>
+  <text x="670" y="95" class="txt">Strong phase randomization</text>
+  <path d="M680 170 C720 126, 780 126, 870 170" class="seg"/>
+  <path d="M706 164 L691 129" class="ray"/>
+  <path d="M750 149 L776 114" class="ray"/>
+  <path d="M794 149 L766 124" class="ray"/>
+  <path d="M838 164 L857 130" class="ray"/>
+  <circle cx="691" cy="129" r="3.5" class="dot"/><circle cx="776" cy="114" r="3.5" class="dot"/><circle cx="766" cy="124" r="3.5" class="dot"/><circle cx="857" cy="130" r="3.5" class="dot"/>
+  <text x="670" y="222" class="small">The coherent pattern is largely washed out.</text>
+  <text x="670" y="243" class="small">The sum approaches an incoherent intensity sum.</text>
+</svg>

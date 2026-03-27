@@ -3,23 +3,32 @@
 \name{linear}
 \alias{linear}
 \alias{db}
-\title{Convert backscatter values from log- to linear-domain.}
+\title{Convert between logarithmic (dB) and linear domains for backscatter values.}
 \usage{
 linear(value, coefficient = 10)
 
 db(value, coefficient = 10)
 }
 \arguments{
-\item{value}{Logarithmic (e.g. TS) or linear (\eqn{\sigma_bs}) value}
+\item{value}{Numeric value to convert. For \code{linear}, this is a logarithmic
+value (e.g., dB TS); for \code{db}, this is a linear value (e.g.,
+\eqn{\sigma_{bs}}).}
 
-\item{coefficient}{Optional. Numeric coefficient preceding the logarithm.
+\item{coefficient}{Optional. Numeric coefficient (base) for the logarithm.
 Default is 10.}
 }
 \value{
-Transforms the backscattering response into either the log (\code{db}) or
-linear (\code{linear}) domains.
+For \code{linear}, returns the value converted to the linear domain. For \code{db},
+returns the value converted to the logarithmic (dB) domain.
 }
 \description{
-The \code{linear(...)} function converts a given value into the linear domain,
-while the \code{db(...)} function converts inputs into the log domain.
+The \code{linear} function converts a value from the logarithmic (dB) domain to
+the linear domain, while the \code{db} function converts a value from the linear
+domain to the logarithmic (dB) domain. These are commonly used for target
+strength (TS) and backscattering coefficient (\eqn{\sigma_{bs}}) conversions.
+
+The conversions are defined as:
+\deqn{\text{linear}(x) = c^{x / c}}
+\deqn{\text{db}(x) = c \log_c(x)}
+where \eqn{c} is the coefficient (default 10).
 }

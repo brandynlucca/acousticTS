@@ -33,9 +33,11 @@ material options.}
 
 \item{ID}{Optional metadata ID input.}
 
-\item{diameter_units}{Units for diameter. Defaults to "m".}
+\item{diameter_units}{Compatibility argument. \code{cal_generate()} now assumes
+meters and ignores non-SI alternatives.}
 
-\item{theta_units}{Units for direction. Defaults to "radians".}
+\item{theta_units}{Compatibility argument. \code{cal_generate()} now assumes
+radians and ignores non-SI alternatives.}
 
 \item{n_segments}{Number of segments to discretize object shape.}
 }
@@ -56,6 +58,10 @@ There are several options for the \strong{material} argument:
 \emph{Copper} \tab "Cu" \tab 4760 \tab 2288.5 \tab 8947\cr
 \emph{Aluminum} \tab "Al" \tab 6260 \tab 3080 \tab 2700\cr
 }
+}
+\examples{
+cal_generate(material = "WC", diameter = 38.1e-3, n_segments = 120)
+
 }
 \seealso{
 \code{\link{CAL}}

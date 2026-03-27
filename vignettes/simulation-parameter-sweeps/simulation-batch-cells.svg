@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 869.18921 297.2973"
+   role="img"
+   aria-labelledby="title desc"
+   version="1.1"
+   id="svg27"
+   sodipodi:docname="simulation-batch-cells.svg"
+   width="869.18921"
+   height="297.2973"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview27"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.925"
+     inkscape:cx="371.89189"
+     inkscape:cy="37.297297"
+     inkscape:window-width="1920"
+     inkscape:window-height="1057"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg27" />
+  <title
+     id="title">Simulation batch cells</title>
+  <desc
+     id="desc">Schematic showing how batch_by creates Cartesian parameter cells and n_realizations repeats simulations within each cell.</desc>
+  <defs
+     id="defs1">
+    <style
+       id="style1">
+      .bg { fill: #fbf8f1; }
+      .panel { fill: #fffdf8; stroke: #28322a; stroke-width: 2; rx: 16; }
+      .heading { font: 700 22px Georgia, &quot;Times New Roman&quot;, serif; fill: #1f2520; }
+      .label { font: 17px Georgia, &quot;Times New Roman&quot;, serif; fill: #1f2520; }
+      .math { font: italic 19px Georgia, &quot;Times New Roman&quot;, serif; fill: #0d4c52; }
+      .cell { fill: #e7f3ef; stroke: #4d8a78; stroke-width: 2; }
+      .rep { fill: #f7eadc; stroke: #8a5c34; stroke-width: 2; }
+      .arrow { stroke: #28322a; stroke-width: 2.5; marker-end: url(#arr); fill: none; }
+    </style>
+    <marker
+       id="arr"
+       markerWidth="10"
+       markerHeight="10"
+       refX="8"
+       refY="5"
+       orient="auto">
+      <path
+         d="M 0,0 10,5 0,10 Z"
+         fill="#28322a"
+         id="path1" />
+    </marker>
+  </defs>
+  <rect
+     class="bg"
+     width="869.18921"
+     height="297.2973"
+     id="rect1"
+     x="0"
+     y="0"
+     style="stroke-width:0.999994" />
+  <text
+     class="heading"
+     x="167.2973"
+     y="26.648649"
+     text-anchor="middle"
+     id="text2"
+     style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:22px;line-height:normal;font-family:Georgia, 'Times New Roman', serif;text-anchor:middle;fill:#1f2520"><tspan
+       sodipodi:role="line"
+       id="tspan27"
+       x="167.2973"
+       y="26.648649">Outer design from <tspan
+   style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:22px;font-family:'Courier New';-inkscape-font-specification:'Courier New, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   id="tspan29">batch_by</tspan></tspan><tspan
+       sodipodi:role="line"
+       id="tspan28"
+       x="167.2973"
+       y="54.706047" /></text>
+  <text
+     class="heading"
+     x="642.43243"
+     y="26.648649"
+     text-anchor="middle"
+     id="text3"
+     style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:22px;line-height:normal;font-family:Georgia, 'Times New Roman', serif;text-anchor:middle;fill:#1f2520">Inner repetition from <tspan
+   style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:22px;font-family:'Courier New';-inkscape-font-specification:'Courier New, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   id="tspan30">n_realizations</tspan></text>
+  <g
+     id="g36"
+     transform="translate(-23.659356,-31.351351)">
+    <text
+       class="label"
+       x="92.062286"
+       y="108.45758"
+       id="text4"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;line-height:normal;font-family:Georgia, 'Times New Roman', serif">Example:</text>
+    <g
+       id="g35"
+       transform="translate(0,-12.99408)">
+      <text
+         class="math"
+         x="170"
+         y="108"
+         id="text5"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:19px;line-height:normal;font-family:Georgia, 'Times New Roman', serif">θ ∈ {θ<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan31">1</tspan>, θ<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan32">2</tspan>, θ<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan33">3</tspan>}</text>
+      <text
+         class="math"
+         x="170"
+         y="136"
+         id="text6"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:19px;line-height:normal;font-family:Georgia, 'Times New Roman', serif">ρ ∈ {ρ<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan34">1</tspan>, ρ<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan35">2</tspan>}</text>
+    </g>
+  </g>
+  <g
+     id="g47"
+     transform="translate(-47.520084,-31.351351)">
+    <rect
+       class="cell"
+       x="76"
+       y="144"
+       width="86"
+       height="56"
+       id="rect6" />
+    <rect
+       class="cell"
+       x="172"
+       y="144"
+       width="86"
+       height="56"
+       id="rect7" />
+    <rect
+       class="cell"
+       x="268"
+       y="144"
+       width="86"
+       height="56"
+       id="rect8" />
+    <rect
+       class="cell"
+       x="76"
+       y="210"
+       width="86"
+       height="56"
+       id="rect9" />
+    <rect
+       class="cell"
+       x="172"
+       y="210"
+       width="86"
+       height="56"
+       id="rect10" />
+    <rect
+       class="cell"
+       x="268"
+       y="210"
+       width="86"
+       height="56"
+       id="rect11" />
+    <text
+       class="label"
+       x="119"
+       y="178"
+       text-anchor="middle"
+       id="text11"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;line-height:normal;font-family:Georgia, 'Times New Roman', serif">(θ<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan36">1</tspan>, ρ<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan37">1</tspan>)</text>
+    <text
+       class="label"
+       x="215"
+       y="178"
+       text-anchor="middle"
+       id="text12"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;line-height:normal;font-family:Georgia, 'Times New Roman', serif">(θ<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan38">2</tspan>, ρ<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan39">1</tspan>)</text>
+    <text
+       class="label"
+       x="311"
+       y="178"
+       text-anchor="middle"
+       id="text13"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;line-height:normal;font-family:Georgia, 'Times New Roman', serif">(θ<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan40">3</tspan>, ρ<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan41">1</tspan>)</text>
+    <text
+       class="label"
+       x="119"
+       y="244"
+       text-anchor="middle"
+       id="text14"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;line-height:normal;font-family:Georgia, 'Times New Roman', serif">(θ<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan42">1</tspan>, ρ<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan43">2</tspan>)</text>
+    <text
+       class="label"
+       x="215"
+       y="244"
+       text-anchor="middle"
+       id="text15"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;line-height:normal;font-family:Georgia, 'Times New Roman', serif">(θ<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan44">2</tspan>, ρ<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan45">2</tspan>)</text>
+    <text
+       class="label"
+       x="311"
+       y="244"
+       text-anchor="middle"
+       id="text16"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;line-height:normal;font-family:Georgia, 'Times New Roman', serif">(θ<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan46">3</tspan>, ρ<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan47">2</tspan>)</text>
+  </g>
+  <path
+     class="arrow"
+     d="m 329.2973,173.64865 c 50,0 78,0 126,0"
+     id="path16" />
+  <g
+     id="g50"
+     transform="translate(-82.008,-39.351351)">
+    <rect
+       class="rep"
+       x="566"
+       y="132"
+       width="106"
+       height="46"
+       rx="8"
+       id="rect16"
+       ry="8" />
+    <rect
+       class="rep"
+       x="566"
+       y="190"
+       width="106"
+       height="46"
+       rx="8"
+       id="rect17"
+       ry="8" />
+    <rect
+       class="rep"
+       x="566"
+       y="248"
+       width="106"
+       height="46"
+       rx="8"
+       id="rect18"
+       ry="8" />
+    <text
+       class="label"
+       x="619"
+       y="161"
+       text-anchor="middle"
+       id="text18"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;line-height:normal;font-family:Georgia, 'Times New Roman', serif;text-anchor:middle;fill:#1f2520">Cell <tspan
+   style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Georgia, 'Times New Roman', serif;-inkscape-font-specification:'Georgia, Times New Roman, serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   id="tspan48">k</tspan>, run 1</text>
+    <text
+       class="label"
+       x="619"
+       y="219"
+       text-anchor="middle"
+       id="text19"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;line-height:normal;font-family:Georgia, 'Times New Roman', serif;text-anchor:middle;fill:#1f2520">Cell <tspan
+   style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Sans;-inkscape-font-specification:'Sans, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   id="tspan49">k</tspan>, run 2</text>
+    <text
+       class="label"
+       x="619"
+       y="277"
+       text-anchor="middle"
+       id="text20"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;line-height:normal;font-family:Georgia, 'Times New Roman', serif;text-anchor:middle;fill:#1f2520">Cell <tspan
+   style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;font-family:Sans;-inkscape-font-specification:'Sans, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   id="tspan50">k</tspan>, run 3</text>
+    <path
+       class="arrow"
+       d="m 676,155 c 32,0 44,0 72,0"
+       id="path20" />
+    <path
+       class="arrow"
+       d="m 676,213 c 32,0 44,0 72,0"
+       id="path21" />
+    <path
+       class="arrow"
+       d="m 676,271 c 32,0 44,0 72,0"
+       id="path22" />
+    <rect
+       class="rep"
+       x="754"
+       y="132"
+       width="128"
+       height="46"
+       rx="8"
+       id="rect22"
+       ry="8" />
+    <rect
+       class="rep"
+       x="754"
+       y="190"
+       width="128"
+       height="46"
+       rx="8"
+       id="rect23"
+       ry="8" />
+    <rect
+       class="rep"
+       x="754"
+       y="248"
+       width="128"
+       height="46"
+       rx="8"
+       id="rect24"
+       ry="8" />
+    <text
+       class="label"
+       x="818"
+       y="161"
+       text-anchor="middle"
+       id="text24"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;line-height:normal;font-family:Georgia, 'Times New Roman', serif">Stored output 1</text>
+    <text
+       class="label"
+       x="818"
+       y="219"
+       text-anchor="middle"
+       id="text25"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;line-height:normal;font-family:Georgia, 'Times New Roman', serif">Stored output 2</text>
+    <text
+       class="label"
+       x="818"
+       y="277"
+       text-anchor="middle"
+       id="text26"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;line-height:normal;font-family:Georgia, 'Times New Roman', serif">Stored output 3</text>
+  </g>
+  <text
+     class="label"
+     x="417.50897"
+     y="282.40543"
+     text-anchor="middle"
+     id="text27"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:17px;line-height:normal;font-family:Georgia, 'Times New Roman', serif">Each Cartesian design cell is repeated for the requested number of realizations.</text>
+</svg>

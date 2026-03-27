@@ -1,0 +1,63 @@
+---
+title: "PSMS"
+output:
+  rmarkdown::html_vignette:
+    toc: false
+    number_sections: false
+    fig_caption: yes
+vignette: >
+  %\VignetteIndexEntry{PSMS}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+# Overview
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  family = "psms",
+  pages = c(
+    Overview = "index.html",
+    Implementation = "psms-implementation.html",
+    Theory = "psms-theory.html"
+  )
+)
+```
+
+```{r psms_overview, echo=FALSE, results='asis'}
+acousticTS:::.model_family_overview(
+  family = "psms",
+  summary = paste(
+    "The prolate spheroidal modal series solution (`PSMS`) is the exact",
+    "single-target modal family for homogeneous prolate spheroids. It is the",
+    "spheroidal analogue of spherical partial-wave theory and the natural",
+    "exact reference for elongated canonical bodies whose surface follows a",
+    "prolate spheroid."
+  ),
+  core_idea = paste(
+    "Separate the Helmholtz equation in prolate spheroidal coordinates,",
+    "expand the incident, scattered, and interior fields in spheroidal wave",
+    "functions, and solve the retained boundary systems order by order."
+  ),
+  best_for = c(
+    "Rigid, pressure-release, liquid-filled, and gas-filled prolate spheroids",
+    "Canonical elongated-body benchmarks",
+    "Validating prolate branches of more general methods such as `TMM`"
+  ),
+  supports = c(
+    "`ProlateSpheroid` shapes on `FLS` or `GAS` objects",
+    "Exact monostatic target strength for homogeneous single-region spheroids",
+    "Spheroidal modal solutions in which medium `1` is seawater and medium `2` is the spheroid interior"
+  ),
+  assumptions = c(
+    "Perfect prolate spheroidal geometry",
+    "Homogeneous interior region",
+    "Linear, time-harmonic acoustics",
+    "No shell or internal secondary component"
+  ),
+  reading = c(
+    "[Implementation](psms-implementation.html): workflows, comparisons, and timing tables",
+    "[Theory](psms-theory.html): full spheroidal-coordinate derivation and retained modal systems"
+  )
+)
+```
+

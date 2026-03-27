@@ -2,19 +2,21 @@
 % Please edit documentation in R/acoustics.R
 \name{rho}
 \alias{rho}
-\title{Calculate the mass density material properties of a scatterer's tissue or
-shell (kappa)}
+\title{Calculate the density contrast (\eqn{\rho}) of a scattering boundary}
 \usage{
-rho(interface1, interface2)
+rho(medium, target)
 }
 \arguments{
-\item{interface1}{Dataframe object containing density (kg/m^3) and sound
-speed (m/s) values for a boundary/interface (1)}
+\item{medium}{Dataframe object containing density (\eqn{kgm^{-3}}) and
+sound speed (\eqn{ms^{-1}}) values for the external medium.}
 
-\item{interface2}{Dataframe object containing density (kg/m^3) and sound
-speed (m/s) values for a boundary/interface (2)}
+\item{target}{Dataframe object containing density (\eqn{kgm^{-3}}) and
+sound speed (\eqn{ms^{-1}}) values for the target boundary.}
+}
+\value{
+Density contrast, defined as
+\eqn{(\rho_{target} - \rho_{medium})/\rho_{target}}.
 }
 \description{
-Calculate the mass density material properties of a scatterer's tissue or
-shell (kappa)
+Calculate the density contrast (\eqn{\rho}) of a scattering boundary
 }

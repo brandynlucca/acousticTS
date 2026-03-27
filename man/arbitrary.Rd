@@ -4,21 +4,37 @@
 \alias{arbitrary}
 \title{Creates arbitrary body shape from user inputs}
 \usage{
-arbitrary(x_body, y_body, z_body, radius_body, length_units = "m")
+arbitrary(..., length_units = "m")
 }
 \arguments{
-\item{x_body}{x-axis (m)}
-
-\item{y_body}{y-axis (m)}
-
-\item{z_body}{z-axis (m)}
-
-\item{radius_body}{Radius (m)}
+\item{...}{Any coordinate or parameter vectors (e.g., x_body, y_body,
+z_body, radius_body, w_body, zU_body, zL_body, custom_*). Inputs are
+stored and padded to a common length; validation happens downstream in
+model-specific code.}
 
 \item{length_units}{Units for body length. Defaults to meters: "m"}
 }
+\value{
+An \code{\link{Arbitrary}} shape object containing the padded
+position matrix and stored shape metadata.
+}
 \description{
 Creates arbitrary body shape from user inputs
+}
+\examples{
+# Symmetric arbitrary shape using x/y/z + radius
+arbitrary(
+  x_body = c(0, 0.01), y_body = c(0, 0), z_body = c(0, 0),
+  radius_body = c(0, 0.002)
+)
+
+# Dorsal/ventral style inputs
+arbitrary(
+  x_body = c(0, 0.015),
+  w_body = c(0.005, 0.0075),
+  zU_body = c(0.001, 0.002),
+  zL_body = c(-0.001, -0.002)
+)
 }
 \seealso{
 \code{\link{Arbitrary}}

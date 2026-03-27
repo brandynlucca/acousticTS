@@ -17,12 +17,19 @@ lame(K = NULL, E = NULL, G = NULL, nu = NULL)
 \item{nu}{Poisson's ratio (Dimensionless).}
 }
 \value{
-Returns Lamé's first parameter (\eqn{\lambda}).
+Lamé's first parameter (\eqn{\lambda}, Pa).
 }
 \description{
-Calculate Lamé's first parameter (\eqn{\lambda}) from two of the
-four other elastic moduli. When more than two values are input, the function
-will default to using the bulk (K) and Young's (E) moduli. This assumes that
-the input values represent 3D material properties.
+Calculates Lamé's first parameter (\eqn{\lambda}) from two of the
+four other elastic moduli: bulk modulus (K), Young's modulus (E), shear
+modulus (G), or Poisson's ratio (\eqn{\nu}). Assumes 3D material properties.
+
+The relationships used are:
+\deqn{\lambda = K - \frac{2G}{3}}
+\deqn{\lambda = \frac{E\nu}{(1 + \nu)(1 - 2\nu)}}
+\deqn{\lambda = \frac{2G\nu}{1 - 2\nu}}
+\deqn{\lambda = \frac{3K\nu}{1 + \nu}}
+\deqn{\lambda = \frac{3K(3K - E)}{9K - E}}
+\deqn{\lambda = \frac{G(E - 2G)}{3G - E}}
 }
 \keyword{elastic}

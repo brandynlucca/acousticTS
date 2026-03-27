@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 973.99994 189"
+   role="img"
+   aria-labelledby="title desc"
+   version="1.1"
+   id="svg17"
+   sodipodi:docname="material-property-pipeline.svg"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   width="973.99994"
+   height="189"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview17"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1"
+     inkscape:cx="581"
+     inkscape:cy="-8.5"
+     inkscape:window-width="1920"
+     inkscape:window-height="1057"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg17" />
+  <title
+     id="title">Material property pipeline</title>
+  <desc
+     id="desc">Diagram showing how literature properties and medium properties lead to contrasts, elastic constants, and model inputs.</desc>
+  <style
+     id="style1">
+    .title { font: 700 28px Georgia, serif; fill: #18324a; }
+    .body { font: 400 18px Georgia, serif; fill: #18324a; }
+    .small { font: 400 15px Georgia, serif; fill: #34566f; }
+    .blue { fill: #f5fbff; stroke: #5d91b6; stroke-width: 2.5; rx: 18; ry: 18; }
+    .sand { fill: #fff7ea; stroke: #c38a43; stroke-width: 2.5; rx: 18; ry: 18; }
+    .line { stroke: #5d91b6; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+  </style>
+  <defs
+     id="defs1">
+    <marker
+       style="overflow:visible"
+       id="RoundedArrow"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Rounded arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.7)"
+         d="m -0.21114562,-4.1055728 6.42229122,3.21114561 a 1,1 90 0 1 0,1.78885438 L -0.21114562,4.1055728 A 1.236068,1.236068 31.717474 0 1 -2,3 v -6 a 1.236068,1.236068 148.28253 0 1 1.78885438,-1.1055728 z"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         id="path8" />
+    </marker>
+    <marker
+       id="arrow"
+       markerWidth="10"
+       markerHeight="10"
+       refX="8"
+       refY="5"
+       orient="auto">
+      <path
+         d="M 0,0 10,5 0,10 Z"
+         fill="#5d91b6"
+         id="path1" />
+    </marker>
+  </defs>
+  <rect
+     class="bg"
+     width="973.99994"
+     height="189"
+     id="rect2"
+     style="fill:#f7f2ea;stroke-width:1"
+     x="0"
+     y="0" />
+  <text
+     x="30.835909"
+     y="38.32085"
+     class="title"
+     id="text1"
+     style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:28px;line-height:normal;font-family:Georgia, serif">Property bookkeeping is a pipeline, not a single number lookup</text>
+  <g
+     id="g33"
+     transform="translate(-7.9662475,-33.305184)">
+    <g
+       id="g32">
+      <rect
+         x="40"
+         y="90"
+         width="219.93199"
+         height="116.61037"
+         class="blue"
+         id="rect1" />
+      <text
+         x="72.600273"
+         y="113.45367"
+         class="body"
+         id="text2"
+         style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:18px;line-height:normal;font-family:Georgia, serif">Source information</text>
+      <text
+         x="149.85614"
+         y="138.79321"
+         class="small"
+         id="text3"
+         style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:15px;line-height:0.9;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#34566f"><tspan
+           sodipodi:role="line"
+           id="tspan17"
+           x="149.85614"
+           y="138.79321"
+           style="line-height:0.9">Density, sound speed,</tspan><tspan
+           sodipodi:role="line"
+           id="tspan18"
+           x="149.85614"
+           y="152.29321"
+           style="line-height:0.9">elastic moduli from literature</tspan></text>
+      <g
+         id="g20"
+         transform="translate(4.9659958,-30.546326)">
+        <text
+           x="83.355713"
+           y="208.13513"
+           class="small"
+           id="text5"
+           style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:15px;line-height:normal;font-family:Georgia, serif">Keep units explicit</text>
+        <text
+           x="92.48114"
+           y="224.06532"
+           class="small"
+           id="text6"
+           style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:15px;line-height:normal;font-family:Georgia, serif">Pa, kg m<tspan
+   style="font-size:65%;baseline-shift:super"
+   id="tspan19">-3</tspan>, m s<tspan
+   style="font-size:65%;baseline-shift:super"
+   id="tspan20">-1</tspan></text>
+      </g>
+    </g>
+    <g
+       id="g31">
+      <rect
+         x="385"
+         y="90"
+         width="219.93199"
+         height="116.61"
+         class="sand"
+         id="rect6" />
+      <text
+         x="421.5246"
+         y="113.44489"
+         class="body"
+         id="text7"
+         style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:18px;line-height:normal;font-family:Georgia, serif">Derived quantities</text>
+      <text
+         x="495.09052"
+         y="138.79321"
+         class="small"
+         id="text8"
+         style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:15px;line-height:1;font-family:Sans;-inkscape-font-specification:'Sans, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#34566f"><tspan
+           sodipodi:role="line"
+           id="tspan21"
+           x="495.09052"
+           y="138.79321"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;line-height:1;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">Contrasts, compressibility,</tspan><tspan
+           sodipodi:role="line"
+           id="tspan22"
+           x="495.09052"
+           y="153.90804"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;line-height:1;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal">impedance, Lamé's parameters</tspan></text>
+      <text
+         x="405.31024"
+         y="185.55389"
+         class="small"
+         id="text11"
+         style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:15px;line-height:normal;font-family:Georgia, serif">Check physical consistency</text>
+    </g>
+    <g
+       id="g30">
+      <rect
+         x="730"
+         y="90"
+         width="219.93243"
+         height="116.61"
+         class="blue"
+         id="rect11" />
+      <text
+         x="756.86084"
+         y="113.44489"
+         class="body"
+         id="text12"
+         style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:18px;line-height:normal;font-family:Georgia, serif">Model-ready inputs</text>
+      <text
+         x="834.77295"
+         y="136.89624"
+         class="small"
+         id="text13"
+         style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:15px;line-height:0.9;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#34566f"><tspan
+           sodipodi:role="line"
+           id="tspan27"
+           x="834.77295"
+           y="136.89624"><tspan
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;font-family:'Courier New';-inkscape-font-specification:'Courier New, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   id="tspan30">Scatterer</tspan> constructors,</tspan><tspan
+           sodipodi:role="line"
+           id="tspan28"
+           x="834.77295"
+           y="150.58289">boundary interpretation,</tspan><tspan
+           sodipodi:role="line"
+           id="tspan29"
+           x="834.77295"
+           y="164.08289">frequency-dependent modeling</tspan></text>
+      <text
+         x="740.8988"
+         y="185.55756"
+         class="small"
+         id="text16"
+         style="font-style:normal;font-variant:normal;font-weight:400;font-stretch:normal;font-size:15px;line-height:normal;font-family:Georgia, serif">Debug with utility checks first</text>
+    </g>
+    <path
+       d="m 259.19215,148.30518 c 44.95887,0 65.39472,0 110.35359,0"
+       class="line"
+       id="path16"
+       style="fill:#aa00ff;fill-opacity:1;marker-end:url(#RoundedArrow)" />
+    <path
+       d="m 604.19215,148.305 c 44.95887,0 65.39472,0 110.35359,0"
+       class="line"
+       id="path30"
+       style="fill:#aa00ff;fill-opacity:1;stroke:#c38a43;stroke-opacity:1;marker-end:url(#RoundedArrow)" />
+  </g>
+</svg>

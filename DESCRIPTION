@@ -2,9 +2,8 @@ Package: acousticTS
 Title: Estimating Acoustic Target Strength via Physics-Based Scattering
     Models
 Version: 1.0.1
-Date: 2023-02-02
 Authors@R: 
-    person("Brandyn", "Lucca", , "brandyn.lucca@gmail.com", role = c("aut", "cre"),
+    person("Brandyn", "Lucca", , "brandyn.lucca@gmail.com", role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0000-0003-3145-2969"))
 Description: Acoustic target strength (TS) represents the intensity of an
     echo returning from an individual scatterer such as bubbles, fish, or
@@ -19,39 +18,86 @@ Description: Acoustic target strength (TS) represents the intensity of an
     as analytical approaches. The models provided can help provide TS
     estimates over broad statistical distributions of model parameters.
 License: GPL-3 | file LICENSE
-URL: https://brandynlucca.github.io/acousticTS/, https://zenodo.org/records/7600660
+URL: https://brandynlucca.github.io/acousticTS/,
+    https://zenodo.org/records/7600660
 BugReports: https://github.com/brandynlucca/acousticTS/issues
 Depends:
     R (>= 4.0.0)
 Imports: 
+    grDevices,
     graphics,
     methods,
+    parallel,
     pbapply,
-    stats
+    Rcpp,
+    stats,
+    utils
 Suggests: 
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
+LinkingTo:
+    BH,
+    Rcpp,
+    RcppArmadillo
 VignetteBuilder: 
     knitr
 Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en-US
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Collate: 
+    'RcppExports.R'
     'acoustics.R'
-    'bessel.R'
+    'bessel-cylindrical.R'
+    'bessel-spherical.R'
+    'constants.R'
+    'utilities-scatterer.R'
     'create_scatterer.R'
     'create_shape.R'
     'data.R'
+    'harmonics.R'
     'math.R'
-    'model_initialization.R'
     'models.R'
+    'model-bcms.R'
+    'model-bbfm.R'
+    'model-dwba.R'
+    'model-pcdwba.R'
+    'model-ecms.R'
+    'model-essms.R'
+    'model-vesms.R'
+    'model-fcms.R'
+    'model-hpa.R'
+    'model-krm.R'
+    'model-psms.R'
+    'model-tmm-helpers.R'
+    'model-tmm-spherical.R'
+    'model-tmm-spheroidal.R'
+    'model-tmm.R'
+    'tmm-scattering.R'
+    'tmm-orientation.R'
+    'tmm-diagnostics.R'
+    'tmm-bistatic.R'
+    'tmm-plotting.R'
+    'model-sdwba.R'
+    'model-soems.R'
+    'model-sphms.R'
+    'model-trcm.R'
+    'pkg-docs.R'
+    'validation-registry.R'
+    'pkgdown-helpers.R'
     'scatterer.R'
     'scatterer_plot.R'
     'scatterer_reforge.R'
     'shapes.R'
     'show.R'
     'simulation.R'
+    'spheroidal.R'
     'utilities.R'
+    'utilities-init.R'
+    'utilities-modal.R'
+    'utilities-plotting.R'
+    'utilities-geometry.R'
+    'canonicalize_shape.R'
+    'validation.R'

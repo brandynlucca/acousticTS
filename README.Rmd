@@ -14,38 +14,160 @@ knitr::opts_chunk$set(
 )
 ```
 
-# acousticTS
-[![DOI](https://zenodo.org/badge/161965429.svg)](https://zenodo.org/badge/latestdoi/161965429) [![Documentation](https://img.shields.io/badge/Latest_Documentation-blue)](https://brandynlucca.github.io/acousticTS/)
-[![Build status](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml) [![Coverage](https://github.com/brandynlucca/acousticTS/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/test-coverage.yaml) [![Docs](https://github.com/brandynlucca/acousticTS/actions/workflows/document.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/document.yaml) [![pkgdown](https://github.com/brandynlucca/acousticTS/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/pkgdown.yaml) [![pages-build-deployment](https://github.com/brandynlucca/acousticTS/actions/workflows/pages/pages-build-deployment/badge.svg?branch=gh-pages)](https://github.com/brandynlucca/acousticTS/actions/workflows/pages/pages-build-deployment)
-Acoustic backscatter from a single target or organism is expressed as
-the intensity of an echo typically denoted as the *backscattering
-cross-section* (σ~bs~, m^2^). Target strength (TS, dB re. 1 m^2^) is the
-logarithmic representation of σ~bs~ where: TS = 10 log~10~ (σ~bs~). TS
-can be used to convert integrated (e.g. nautical area scattering
-coefficient, S~A~, dB re. 1(m^2^ nmi^-2^) or volumetric backscatter
-(e.g. S~v~, dB re. 1 m^-1^) collected from fisheries acoustic surveys
-into units of number density, such as the volumetric density of a fish
-school (i.e. animals m^-3^). This parameter can also aid in classifying
-backscatter based on the multifrequency response of targets, such as
-separating likely echoes of large predatory fish from smaller prey.
-While there are several approaches for estimating TS, one common method
-is to apply physics-based models to predict theoretical TS that comprise
-exact and approximate solutions. The models provided in the `acousticTS`
-package can help provide TS estimates parameterized using broad
-statitsical distributions of inputs. This package is in a constant state
-of development with updates to the available model library,
-computational efficiency, and quality-of-life improvements.
+# acousticTS <img src="man/figures/logo.png" align="right" height="158" alt="acousticTS hex logo" />
 
-## [Installation]{.underline}
+[![DOI](https://doi.org/10.5281/zenodo.7855558.svg)](https://doi.org/10.5281/zenodo.7855558) [![Documentation](https://img.shields.io/badge/Latest_Documentation-blue)](https://brandynlucca.github.io/acousticTS/) [![Build status](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml) [![Coverage](https://github.com/brandynlucca/acousticTS/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/test-coverage.yaml)
 
-You can install the current released version of acousticTS via:
+## Overview
 
-``` r
+acousticTS is an R package for estimating the acoustic target strength (TS) of aquatic organisms and objects using physics-based scattering models. It supports a range of scatterer types: fluid-like bodies (e.g., fish, zooplankton), gas-filled bodies (e.g. swimbladders), elastic shells (e.g. pteropods, euphausiids), and calibration spheres. It further provides a unified interface for parameterizing, running, and comparing models across frequencies, orientations, and morphologies. Acoustic backscatter from a single target is expressed as the *backscattering cross-section* ($\sigma_\text{bs}$, m²). Target strength ($TS$, dB re. 1 m²) is its logarithmic form:
+
+$$
+  TS = 10 \log_{10}(\sigma_\text{bs})
+$$
+
+$TS$ is used to:
+
+- Convert integrated backscatter (e.g. $S_\mathrm{A}$, NASC) or volumetric backscatter ($S_\text{V}$) into number density or biomass
+- Classify backscatter by species or taxon based on multi-frequency response
+- Parameterize and evaluate physics-based scattering models over statistical distributions of organism size and orientation
+
+## Installation
+
+Install the latest release from GitHub:
+
+```r
+# install.packages("devtools")
 devtools::install_github("brandynlucca/acousticTS")
 ```
 
-Or you can install the development version of acousticTS like so:
+## Scatterer classes
 
-``` r
-devtools::install_github("brandynlucca/acousticTS@test-branch")
+acousticTS organizes targets into five `S4` classes:
+
+| Class | Description | Example taxa |
+|-------|-------------|--------------|
+| `FLS` | Fluid-like scatterer | Euphausiids, myctophids, decapod shrimp |
+| `SBF` | Swimbladder-bearing fish | Herring, cod, sardine |
+| `GAS` | Gas-filled body | Siphonophore pneumatophores |
+| `ESS` | Elastic-shelled scatterer | Pteropods, juvenile bivalves |
+| `CAL` | Calibration sphere | Tungsten carbide, copper spheres |
+
+Each class stores a shape (position matrix + morphometrics), body material properties (density and sound speed contrasts), and model
+results in a structured `S4` object.
+
+## Models
+
+| Model | Abbreviation | Scatterer type | Boundary |
+|-------|-------------|----------------|----------|
+| Distorted-wave Born approximation | `DWBA` | FLS | Fluid |
+| Stochastic DWBA | `SDWBA` | FLS | Fluid |
+| Kirchhoff-ray mode | `KRM` | FLS, SBF | Fluid + gas |
+| High-pass approximation | `HPA` | FLS, GAS | Fluid / gas |
+| Two-ray cylinder model | `TRCM` | FLS | Fluid |
+| Modal series solution (sphere) | `SPHMS` | CAL, ESS | Multiple |
+| Modal series solution (prolate spheroid) | `PSMS` | FLS | Fluid |
+| Modal series solution (elastic shell) | `ESSMS` | ESS | Elastic |
+| Finite-cylinder modal series | `FCMS` | CAL | Rigid / fluid |
+| Resonance model (gas sphere) | `SOEMS` | GAS, CAL | Gas |
+
+## Quick start
+
+```{r example, eval=FALSE}
+library(acousticTS)
+
+# Build a fluid-like scatterer (e.g. krill) with a cylinder shape
+krill <- cylinder(
+  length = 0.03,          # 30 mm body length
+  radius = 0.003,         # 3 mm max radius
+  g = 1.0357,             # density contrast
+  h = 1.0279,             # sound speed contrast
+  theta = pi / 2          # broadside incidence
+)
+
+# Run the DWBA model from 1 kHz to 300 kHz
+krill <- target_strength(krill, frequency = seq(1e3, 300e3, by = 1e3),
+                          model = "DWBA")
+
+# Plot TS vs frequency
+plot(krill, type="model")
 ```
+
+## Shapes and reforging
+
+Scatterer shapes are created via dedicated constructors:
+
+```{r shapes, eval=FALSE}
+# Cylinder (used by FLS / CAL)
+fish_shape <- cylinder(length = 0.25, radius = 0.02)
+
+# Prolate spheroid (used by FLS / PSMS)
+ps_shape   <- prolate_spheroid(length = 0.02, radius = 0.002)
+
+# Arbitrary shape from digitized position matrix
+arb_shape  <- arbitrary(rpos = my_matrix)
+```
+
+Existing scatterer objects can be resized or re-discretized without reconstructing them from scratch using `reforge()`:
+
+```{r reforge, eval=FALSE}
+# Rescale a krill to 40 mm
+krill_40mm <- reforge(krill, length = 0.04)
+
+# Change segment count
+krill_fine <- reforge(krill, n_segments = 200)
+```
+
+## Configuring simulations
+
+`simulate_ts()` runs repeated model evaluations across distributions of input parameters, supporting both vectorized and batch modes:
+
+```{r simulate, eval=FALSE}
+results <- simulate_ts(
+  krill,
+  model = "DWBA",
+  frequency = 120e3,
+  n = 1000,
+  parameters = list(
+    theta = function() rnorm(1, pi / 2, pi / 18),
+    length = function() rnorm(1, 0.03, 0.003)
+  )
+)
+```
+
+## Built-in datasets
+
+| Dataset | Description |
+|---------|-------------|
+| `krill` | Antarctic krill (*Euphausia superba*) shape and material properties |
+| `cod` | Atlantic cod (*Gadus morhua*) shape and swimbladder |
+| `sardine` | Pacific sardine (*Sardinops sagax*) shape and swimbladder |
+| `benchmark_ts` | Benchmark TS values for model validation |
+
+```{r data, eval=FALSE}
+data(krill)
+data(cod)
+data(sardine)
+data(benchmark_ts)
+```
+
+## Citation
+
+If you use `acousticTS` in published work, please cite:
+
+```{r citation, eval=FALSE}
+citation("acousticTS")
+```
+
+> Lucca, B. (2023). acousticTS: Estimating Acoustic Target Strength via
+> Physics-Based Scattering Models.
+> <https://doi.org/10.5281/zenodo.7600660>
+
+## Contributing and bug reports
+
+Bug reports and feature requests are welcome via the [GitHub Issues page](https://github.com/brandynlucca/acousticTS/issues). Please include a minimal reproducible example when reporting bugs.
+
+## License
+
+GPL-3. See [LICENSE](LICENSE) for details.
+

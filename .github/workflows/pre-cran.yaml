@@ -1,0 +1,76 @@
+name: Pre-CRAN
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+on:
+  workflow_dispatch:
+
+permissions: read-all
+
+jobs:
+  pre-cran-check:
+    runs-on: ubuntu-latest
+    name: ${{ matrix.config.name }}
+    continue-on-error: ${{ matrix.config.experimental }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - {name: 'ubuntu-latest (release)', r: 'release', clang: false, experimental: false}
+          - {name: 'ubuntu-latest (devel)', r: 'devel', clang: false, experimental: true}
+          - {name: 'ubuntu-clang (release)', r: 'release', clang: true, experimental: false}
+          - {name: 'ubuntu-clang (devel)', r: 'devel', clang: true, experimental: true}
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-tinytex@v2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: ${{ matrix.config.r }}
+          http-user-agent: release
+          use-public-rspm: ${{ matrix.config.r != 'devel' }}
+
+      - name: Install Linux build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gfortran qpdf ghostscript
+          if [ "${{ matrix.config.clang }}" = "true" ]; then
+            sudo apt-get install -y clang
+          fi
+
+      - name: Configure clang toolchain
+        if: matrix.config.clang
+        run: |
+          mkdir -p ~/.R
+          cat > ~/.R/Makevars <<'EOF'
+          CC=clang
+          CXX=clang++
+          CXX11=clang++
+          CXX14=clang++
+          CXX17=clang++
+          CXX17STD=-std=gnu++17
+          FC=gfortran
+          F77=gfortran
+          EOF
+        shell: bash
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck
+          needs: check
+
+      - uses: r-lib/actions/check-r-package@v2
+        with:
+          args: 'c("--as-cran")'
+          build_args: 'c("--compact-vignettes=gs+qpdf")'
+          upload-snapshots: true

@@ -1,0 +1,102 @@
+---
+title: "trcm-theory"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{trcm-theory}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+The two-ray model is a high-frequency approximation based on ray acoustics, valid when $ka \gtrsim 0.1$. The model accounts for two primary ray paths: reflection from the front interface and transmission through the body followed by reflection from the back interface and transmission back out. The interference between these two paths, combined with a directivity pattern, yields the backscattering amplitude. The model is most accurate when the scatterer is weakly scattering ($g \approx h \approx 1$).
+
+## Straight cylinder
+
+For a straight cylinder at various angles of incidence, the simplified ray-based scattering amplitude is given by:
+
+$$
+    \mathcal{f}_\text{sc} = 
+        \frac{-i}{2\sqrt{\pi}} 
+        e^{i\pi/4} e^{-i2k_1 a \cos\hat{\theta}}
+        L \sqrt{k_1 a \cos\hat{\theta}} \mathcal{R}_{12} 
+        \frac{\sin\Delta}{\Delta}
+        (1 - \mathcal{T}_{12} \mathcal{T}_{21} e^{i4k_2 a \cos\hat{\theta}}
+        e^{i\mu_{p-2}(k_1 a)}),
+$$
+
+where $k$ is the acoustic wavenumber of the medium ($1$) and cylinder ($2$), $a$ is the cylinder radius, $L$ is the cylinder length, $\hat{\theta}$ is the phase-shifted orientation angle relative to the incident planar wave (i.e., $\hat{\theta} = \theta - \frac{\pi}{2}$), and $i$ is an imaginary number ($\sqrt{-1}$). 
+
+The variable $\mathcal{R}_{12}$ is the reflection coefficient at the medium-cylinder interface: 
+
+$$
+\begin{align*}
+\mathcal{R}_{12} &= 
+    \frac{gh-1}{gh+1}, \\
+g &= \frac{\rho_2}{\rho_1}, \quad
+h = \frac{c_2}{c_1},
+\end{align*}
+$$
+
+where $\rho$ and $c$ denote the density (kg m<sup>-3</sup>) and sound speed (m s<sup>-1</sup>), respectively. The transmission coefficients, $\mathcal{T}_{12}$ and $\mathcal{T_{21}}$ are then defined by:
+
+$$
+\mathcal{T}_{12} = 1 - \mathcal{R}_{12}, \quad 
+    \mathcal{T}_{21} = 1 + \mathcal{R}_{12}.
+$$
+
+The directivity pattern is expressed as the $\text{sinc}$ function:
+
+$$
+\frac{\sin \Delta}{\Delta}, \quad
+    \Delta = k_1 L \sin(\hat{\theta}).
+$$
+
+The final variable, $\mu_{p-2}(k_1a)$, is an empirical phase correction:
+
+$$
+\mu_{p-2}(k_1a) = 
+    \frac{-\frac{\pi}{2} k_1a}{k_1a + 0.4}
+$$
+
+## Uniformly bent cylinder
+
+For an uniformly bent cylinder, the simplified ray-based scattering amplitude is given by:
+
+$$
+\mathcal{f}_\text{bc} = L_\text{ebc} \mathcal{f}_\text{sc}(\hat{\theta})/L,
+$$
+
+where $L_\text{ebc}$ is the equivalent bent cylinder length. The equivalent length is calculated by integrating over the arc length of the bent cylinder:
+
+$$
+L_\text{ebc} = \int\limits_{-\gamma_\text{max}}^{\gamma_\text{max}}
+    e^{ik_1 a_c \gamma^2} d \gamma , \quad \gamma \ll 1,
+$$
+
+where $\gamma$ is the position angle of the bent cylinder and $a_c$ is the radius of curvature (based on an osculating circle). The integral is bounded by $\pm$ $\gamma_\text{max}$:
+
+$$
+\gamma_\text{max} = \frac{L}{2\rho_c}, \quad \rho_c = \frac{a_c}{L}.
+$$
+
+At broadside incidence when deflections of the bent cylinder exceed 1 ($k_1 a_c \gamma_\text{max}^2 \gt 1$), the method of stationary phase can be used to approximate $L_\text{ebc}$ which changes the definition of $\mathcal{f}_\text{bc}$ to:
+
+$$
+\mathcal{f}_\text{bc} = 
+    \sqrt{a_c \frac{\lambda_1}{2}} e^{\frac{i \pi}{4}}
+    \mathcal{f}_\text{sc}(\hat{\theta} = 0 ~ \text{rad}) / L.
+$$
+
+# Implementation
+
+```{r setup}
+library(acousticTS)
+```

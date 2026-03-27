@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="420" viewBox="0 0 720 420" role="img" aria-labelledby="title desc">
+  <title id="title">Prolate coordinate schematic for TMM</title>
+  <desc id="desc">Meridional-plane diagram showing a prolate spheroid boundary, focal points, and prolate spheroidal coordinates.</desc>
+  <defs>
+    <style>
+      .axis { stroke:#444; stroke-width:2; }
+      .shape { fill:#eef6ff; stroke:#1f4e79; stroke-width:3; }
+      .curve { fill:none; stroke:#9a5a00; stroke-width:2.2; stroke-dasharray:8 6; }
+      .label { font-family:'Segoe UI', Arial, sans-serif; font-size:18px; fill:#1d3557; }
+      .small { font-family:'Segoe UI', Arial, sans-serif; font-size:15px; fill:#333; }
+      .focus { fill:#c1121f; }
+      .guide { stroke:#6b8e23; stroke-width:2; fill:none; stroke-dasharray:6 4; }
+    </style>
+  </defs>
+
+  <line class="axis" x1="80" y1="210" x2="640" y2="210"/>
+  <line class="axis" x1="360" y1="70" x2="360" y2="350"/>
+  <text class="label" x="648" y="216">z</text>
+  <text class="label" x="368" y="84">x</text>
+
+  <ellipse class="shape" cx="360" cy="210" rx="220" ry="90"/>
+  <text class="label" x="360" y="112" text-anchor="middle">ξ = ξ₁</text>
+
+  <circle class="focus" cx="250" cy="210" r="5"/>
+  <circle class="focus" cx="470" cy="210" r="5"/>
+  <text class="small" x="233" y="236">−q</text>
+  <text class="small" x="468" y="236">+q</text>
+
+  <path class="curve" d="M130 210 C195 130, 290 105, 360 105 C430 105, 525 130, 590 210"/>
+  <path class="curve" d="M130 210 C195 290, 290 315, 360 315 C430 315, 525 290, 590 210"/>
+  <text class="small" x="548" y="146">η = constant</text>
+
+  <path class="guide" d="M360 210 C405 190, 445 165, 488 125"/>
+  <text class="small" x="494" y="123">observation ray</text>
+
+  <line class="axis" x1="140" y1="320" x2="580" y2="320" stroke-dasharray="4 4"/>
+  <line class="axis" x1="580" y1="320" x2="580" y2="210" stroke-dasharray="4 4"/>
+  <text class="small" x="362" y="340" text-anchor="middle">2a</text>
+  <text class="small" x="596" y="268">b</text>
+
+  <text class="small" x="360" y="374" text-anchor="middle">For the prolate branch, the boundary is a single spheroidal coordinate surface,</text>
+  <text class="small" x="360" y="394" text-anchor="middle">so the modal basis and the geometry are aligned from the start.</text>
+</svg>

@@ -2,15 +2,41 @@
 % Please edit documentation in R/utilities.R
 \name{extract}
 \alias{extract}
-\title{Primary accessor function for dredging specific data from scatterer objects}
+\title{Extract nested components, slots, or matrix/vector fields from objects}
 \usage{
 extract(object, feature)
 }
 \arguments{
 \item{object}{Scatterer-class object.}
 
-\item{feature}{Feature of interest (e.g. body).}
+\item{feature}{Feature(s) of interest (e.g. body). This can either be a
+scalar string, or a vector of names. When a vector is supplied, the function
+recursively accesses the Scatterer object using the 'feature' vector as a
+directory. For example, \code{feature = c("body", "rpos", "x")} would
+extract the 'x' coordinate of the position matrix ('rpos') from the 'body'
+scattering parameters.}
+}
+\value{
+The extracted object, slot, list element, matrix row/column, or
+vector element identified by \code{feature}.
 }
 \description{
-Primary accessor function for dredging specific data from scatterer objects
+Convenience accessor for reaching into \code{Scatterer} and \code{Shape} objects
+without spelling out direct slot access repeatedly. \code{extract()} can also walk
+through nested lists, matrices, and named vectors, which makes it useful for
+pulling model outputs, component properties, or position-matrix fields from a
+common interface.
 }
+\examples{
+obj <- fls_generate(
+  shape = sphere(radius_body = 0.01, n_segments = 40),
+  density_body = 1045,
+  sound_speed_body = 1520
+)
+
+extract(obj, "body")
+extract(obj, c("body", "density"))
+extract(obj, c("shape_parameters", "shape"))
+
+}
+\keyword{utility}

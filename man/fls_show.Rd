@@ -9,6 +9,11 @@ fls_show(object)
 \arguments{
 \item{object}{FLS-class object.}
 }
+\value{
+Called for its side effect of printing a formatted summary;
+invisibly returns \code{NULL}.
+}
 \description{
 show(...) for FLS-class objects.
 }
+\keyword{internal}

@@ -3,7 +3,7 @@
 \docType{data}
 \name{cod}
 \alias{cod}
-\title{Sample code shape with fully inflated swimbladder.}
+\title{Sample cod shape with fully inflated swimbladder}
 \format{
 A pre-generated SBF scatterer containing all information required for
 target strength modeling.
@@ -41,10 +41,23 @@ theta_units (str), length_units (str).
 }
 }
 }
+\source{
+Historical KRM cod shape collection archived in \code{echoSMs}
+(\url{https://github.com/ices-tools-dev/echoSMs}) and associated with the
+Clay and Horne Atlantic cod example.
+}
 \usage{
 data(cod)
 }
 \description{
-Sample code shape with fully inflated swimbladder.
+A pre-generated SBF scatterer containing all information required for target
+strength modeling. The packaged object corresponds to the historical
+Atlantic cod example used in the KRM literature and matches the Cod D case
+archived in the \code{echoSMs} KRM shape collection.
+}
+\references{
+Clay, C.S., and Horne, J.K. (1994). Acoustic models of fish: The Atlantic
+cod (\emph{Gadus morhua}). \emph{The Journal of the Acoustical Society of
+America}, 96, 1661-1668. \doi{10.1121/1.410245}
 }
 \keyword{datasets}

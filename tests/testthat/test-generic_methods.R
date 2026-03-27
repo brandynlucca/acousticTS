@@ -12,11 +12,11 @@ test_that("Generic show method works for all scatterer types", {
   expect_error(suppressAllOutput(show(cal_obj)), NA)
 
   # Test show method for ESS objects
-  ess_obj <- ess_generate(radius_shell = 1)
+  ess_obj <- ess_generate(shape = sphere(radius_body = 1, n_segments = 80))
   expect_error(suppressAllOutput(show(ess_obj)), NA)
 
   # Test show method for GAS objects
-  gas_obj <- gas_generate(radius_body = 1)
+  gas_obj <- gas_generate(shape = sphere(radius_body = 1, n_segments = 80))
   expect_error(suppressAllOutput(show(gas_obj)), NA)
 
   # Test show method for FLS objects
@@ -44,6 +44,22 @@ test_that("Generic show method works for all scatterer types", {
     density_body = 1070, density_bladder = 1.24
   )
   expect_error(suppressAllOutput(show(sbf_obj)), NA)
+
+  # Test show method for BBF objects
+  bbf_obj <- bbf_generate(
+    body_shape = arbitrary(
+      x_body = c(0, 0.04, 0.08),
+      zU_body = c(0.001, 0.003, 0.001),
+      zL_body = c(-0.001, -0.003, -0.001)
+    ),
+    backbone_shape = cylinder(length_body = 0.05, radius_body = 0.0005),
+    density_body = 1070,
+    sound_speed_body = 1570,
+    density_backbone = 1900,
+    sound_speed_longitudinal_backbone = 3500,
+    sound_speed_transversal_backbone = 1700
+  )
+  expect_error(suppressAllOutput(show(bbf_obj)), NA)
 })
 
 test_that("Plot methods work for scatterer objects", {
@@ -68,9 +84,48 @@ test_that("Plot methods work for scatterer objects", {
   )
   expect_error(suppressPlot(plot(fls_obj)), NA)
 
+  # Preserve non-constant radius profiles for canonical axisymmetric shapes ===
+  prolate_obj <- fls_generate(
+    shape = prolate_spheroid(
+      length_body = 0.04,
+      radius_body = 0.004,
+      n_segments = 80
+    ),
+    density_body = 1045,
+    sound_speed_body = 1520
+  )
+  expect_true("radius_shape" %in% names(prolate_obj@shape_parameters))
+  expect_gt(diff(range(prolate_obj@shape_parameters$radius_shape)), 0)
+  expect_error(suppressPlot(plot(prolate_obj)), NA)
+
   # Test plot method for GAS objects
-  gas_obj <- gas_generate(radius_body = 1)
+  gas_obj <- gas_generate(shape = sphere(radius_body = 1, n_segments = 80))
   expect_error(suppressPlot(plot(gas_obj)), NA)
+
+  # Test plot method for ESS objects and preserve curved shell outlines
+  ess_obj <- ess_generate(
+    shape = sphere(radius_body = 1, n_segments = 80),
+    shell_thickness = 0.1,
+    density_shell = 2565,
+    sound_speed_shell = 3750,
+    density_fluid = 1077.3,
+    sound_speed_fluid = 1575,
+    E = 7.0e10,
+    nu = 0.32
+  )
+  shell_outline <- acousticTS:::.axisymmetric_outline_data(
+    position_matrix = ess_obj@shell$rpos,
+    shape_parameters = ess_obj@shape_parameters$shell,
+    center_x = TRUE
+  )
+  fluid_outline <- acousticTS:::.axisymmetric_outline_data(
+    position_matrix = ess_obj@fluid$rpos,
+    shape_parameters = ess_obj@shape_parameters$fluid,
+    center_x = TRUE
+  )
+  expect_gt(diff(range(shell_outline$radius)), 0.5)
+  expect_gt(diff(range(fluid_outline$radius)), 0.5)
+  expect_error(suppressPlot(plot(ess_obj)), NA)
 
   # Test plot method for SBF objects
   x_body <- seq(0, 0.04, length.out = 5)
@@ -90,6 +145,56 @@ test_that("Plot methods work for scatterer objects", {
     density_body = 1070, density_bladder = 1.24
   )
   expect_error(suppressPlot(plot(sbf_obj)), NA)
+
+  # Test plot method for BBF objects
+  bbf_obj <- bbf_generate(
+    body_shape = arbitrary(
+      x_body = c(0, 0.04, 0.08),
+      zU_body = c(0.001, 0.003, 0.001),
+      zL_body = c(-0.001, -0.003, -0.001)
+    ),
+    backbone_shape = cylinder(length_body = 0.05, radius_body = 0.0005),
+    density_body = 1070,
+    sound_speed_body = 1570,
+    density_backbone = 1900,
+    sound_speed_longitudinal_backbone = 3500,
+    sound_speed_transversal_backbone = 1700
+  )
+  expect_error(suppressPlot(plot(bbf_obj)), NA)
+})
+
+test_that("Model plotting works for computed scatterer objects", {
+  suppressPlot <- function(expr) {
+    pdf(NULL)
+    on.exit(dev.off())
+    invisible(force(expr))
+  }
+
+  prolate_obj <- fls_generate(
+    shape = prolate_spheroid(
+      length_body = 0.08,
+      radius_body = 0.01,
+      n_segments = 40
+    ),
+    density_body = 1070,
+    sound_speed_body = 1570
+  )
+
+  prolate_obj <- target_strength(
+    object = prolate_obj,
+    frequency = seq(38000, 78000, by = 8000),
+    model = "PSMS",
+    boundary = "liquid_filled",
+    phi_body = pi,
+    n_integration = 96,
+    simplify_Amn = TRUE
+  )
+
+  expect_true(all(is.finite(prolate_obj@model$PSMS$TS)))
+  expect_error(suppressPlot({
+    plot(prolate_obj, type = "shape")
+    plot(prolate_obj, type = "model")
+  }), NA)
 })
 
 test_that("Extract method works for scatterer objects", {
@@ -115,7 +220,7 @@ test_that("Extract method works for scatterer objects", {
   fls_metadata <- extract(fls_obj, "metadata")
   expect_type(fls_metadata, "list")
 
-  gas_obj <- gas_generate(radius_body = 1)
+  gas_obj <- gas_generate(shape = sphere(radius_body = 1, n_segments = 80))
   gas_body <- extract(gas_obj, "body")
   expect_type(gas_body, "list")
 
@@ -129,7 +234,7 @@ test_that("Extract method works for scatterer objects", {
 test_that("Show method works for scatterer objects", {
   # Create ESS object
   ess_obj <- ess_generate(
-    radius_shell = 1
+    shape = sphere(radius_body = 1, n_segments = 80)
   )
   # ---- Expected console output
   expected <- paste(
@@ -158,7 +263,7 @@ test_that("Show method works for scatterer objects", {
 
   # Create ESS object
   ess_obj <- ess_generate(
-    radius_shell = 1,
+    shape = sphere(radius_body = 1, n_segments = 80),
     shell_thickness = 1e-3,
     sound_speed_shell = 3750,
     sound_speed_fluid = 1575,

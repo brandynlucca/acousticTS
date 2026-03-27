@@ -2,10 +2,10 @@
 % Please edit documentation in R/create_scatterer.R
 \name{fls_generate}
 \alias{fls_generate}
-\title{Manually generate a FLS object.}
+\title{Generate a FLS-class object.}
 \usage{
 fls_generate(
-  shape = "arbitrary",
+  shape = NULL,
   x_body = NULL,
   y_body = NULL,
   z_body = NULL,
@@ -13,8 +13,10 @@ fls_generate(
   radius_body = NULL,
   radius_curvature_ratio = NULL,
   n_segments = 18,
-  g_body,
-  h_body,
+  g_body = NULL,
+  h_body = NULL,
+  density_body = NULL,
+  sound_speed_body = NULL,
   theta_body = pi/2,
   ID = NULL,
   length_units = "m",
@@ -23,8 +25,11 @@ fls_generate(
 )
 }
 \arguments{
-\item{shape}{Optional input argument that dictates shape-type, if desired,
-for generalized shapes.}
+\item{shape}{Pre-built \code{Shape} object describing the target geometry. If
+omitted, explicit profile coordinates such as \code{x_body}, \code{y_body}, and
+\code{z_body} are treated as the manual geometry pathway. Legacy character
+dispatch such as \code{"sphere"} or \code{"arbitrary"} is retained only for backward
+compatibility and is now deprecated.}
 
 \item{x_body}{Vector containing x-axis body (m) shape data.}
 
@@ -46,15 +51,22 @@ homogenous) or a vector of values (i.e. inhomogenous).}
 \item{h_body}{Soundspeed contrast. This can either be a single value (i.e.
 homogenous) or a vector of values (i.e. inhomogenous).}
 
+\item{density_body}{Absolute density (kg/m^3) if contrasts are not supplied.}
+
+\item{sound_speed_body}{Absolute sound speed (m/s) if contrasts are not
+supplied.}
+
 \item{theta_body}{Orientation of the target relative to the transmit source
 (\eqn{\theta}). Broadside incidence is considered 90 degrees, or pi/2.
 Default value is pi/2; input should be in radians.}
 
 \item{ID}{Optional metadata entry.}
 
-\item{length_units}{Units used for position vector. Defaults to "m".}
+\item{length_units}{Compatibility argument. Scatterer constructors now assume
+meters and ignore non-SI alternatives.}
 
-\item{theta_units}{Units used for orientation. Defaults to "radians".}
+\item{theta_units}{Compatibility argument. Scatterer constructors now assume
+radians and ignore non-SI alternatives.}
 
 \item{...}{Additional parameters.}
 }
@@ -62,7 +74,38 @@ Default value is pi/2; input should be in radians.}
 FLS-class object
 }
 \description{
-Manually generate a FLS object.
+Generate a FLS-class object.
+}
+\details{
+The preferred workflow is to build a geometry first with \code{sphere()},
+\code{cylinder()}, \code{prolate_spheroid()}, or \code{arbitrary()}, then pass that \code{Shape}
+object to \code{fls_generate()}. Material properties can be supplied either as
+contrasts (\code{g_body}/\code{h_body}) or as absolute density/sound-speed values
+(\code{density_body}/\code{sound_speed_body}), but not both for the same property
+pair. Downstream models derive contrasts automatically when only absolute
+values are supplied.
+
+The only supported public geometry paths are now:
+\enumerate{
+\item supply a pre-built \code{Shape} object, or
+\item supply explicit profile coordinates directly to the constructor.
+}
+
+Character-based shape dispatch is retained only as a compatibility pathway
+and is now deprecated. Internally, every pathway is resolved to the same
+\code{Shape}-first geometry contract before the \code{FLS} object is built.
+
+Scatterer constructors store geometry in meters and orientations in radians.
+\code{length_units} and \code{theta_units} are retained as compatibility arguments, but
+non-SI values are normalized to the package-standard representation.
+}
+\examples{
+shape <- prolate_spheroid(
+  length_body = 0.04, radius_body = 0.004, n_segments = 50
+)
+fls_generate(
+  shape = shape, density_body = 1045, sound_speed_body = 1520
+)
 }
 \seealso{
 \code{\link{FLS}}

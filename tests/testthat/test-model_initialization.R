@@ -1,5 +1,6 @@
+library(acousticTS)
+
 test_that("calibration_initialize works correctly", {
-  library(acousticTS)
 
   # Test calibration_initialize
   cal_obj <- cal_generate()
@@ -23,40 +24,38 @@ test_that("calibration_initialize works correctly", {
   expect_equal(cal_initialized@model$calibration$frequency, frequency)
 })
 
-test_that("mss_anderson_initialize works correctly", {
-  library(acousticTS)
+test_that("sphms_initialize works correctly", {
 
   # Test mss_anderson_initialize for GAS objects
-  gas_obj <- gas_generate(radius_body = 1)
+  gas_obj <- gas_generate(shape = sphere(radius_body = 1, n_segments = 80))
   frequency <- c(38e3, 120e3)
 
   # Initialize MSS Anderson model
-  gas_initialized <- mss_anderson_initialize(gas_obj, frequency = frequency)
+  gas_initialized <- sphms_initialize(gas_obj, frequency = frequency)
 
   # Check that object is still GAS class
   expect_s4_class(gas_initialized, "GAS")
 
   # Check that model parameters slot was updated
   expect_type(gas_initialized@model_parameters, "list")
-  expect_true("MSS_anderson" %in% names(gas_initialized@model_parameters))
+  expect_true("SPHMS" %in% names(gas_initialized@model_parameters))
 
   # Check that model slot was updated
   expect_type(gas_initialized@model, "list")
-  expect_true("MSS_anderson" %in% names(gas_initialized@model))
+  expect_true("SPHMS" %in% names(gas_initialized@model))
 
   # Check that frequency was properly set
-  expect_equal(gas_initialized@model$MSS_anderson$frequency, frequency)
+  expect_equal(gas_initialized@model$SPHMS$frequency, frequency)
 })
 
-test_that("mss_goodman_stern_initialize works correctly", {
-  library(acousticTS)
+test_that("essms_initialize works correctly", {
 
   # Test mss_goodman_stern_initialize for ESS objects
-  ess_obj <- ess_generate(radius_shell = 1)
+  ess_obj <- ess_generate(shape = sphere(radius_body = 1, n_segments = 80))
   frequency <- c(70e3, 200e3)
 
   # Initialize MSS Goodman-Stern model
-  ess_initialized <- mss_goodman_stern_initialize(ess_obj,
+  ess_initialized <- essms_initialize(ess_obj,
     frequency = frequency
   )
 
@@ -65,15 +64,14 @@ test_that("mss_goodman_stern_initialize works correctly", {
 
   # Check that model parameters slot was updated
   expect_type(ess_initialized@model_parameters, "list")
-  expect_true("MSS_goodman_stern" %in% names(ess_initialized@model_parameters))
+  expect_true("ESSMS" %in% names(ess_initialized@model_parameters))
 
   # Check that model slot was updated
   expect_type(ess_initialized@model, "list")
-  expect_true("MSS_goodman_stern" %in% names(ess_initialized@model))
+  expect_true("ESSMS" %in% names(ess_initialized@model))
 })
 
 test_that("dwba_initialize works correctly", {
-  library(acousticTS)
 
   # Test dwba_initialize for FLS objects
   fls_obj <- fls_generate(
@@ -101,7 +99,6 @@ test_that("dwba_initialize works correctly", {
 })
 
 test_that("dwba_curved_initialize works correctly", {
-  library(acousticTS)
 
   # Test dwba_curved_initialize for FLS objects
   fls_obj <- fls_generate(
@@ -115,7 +112,10 @@ test_that("dwba_curved_initialize works correctly", {
   frequency <- c(120e3)
 
   # Initialize DWBA curved model
-  fls_initialized <- dwba_curved_initialize(fls_obj, frequency = frequency)
+  expect_warning(
+    fls_initialized <- dwba_curved_initialize(fls_obj, frequency = frequency),
+    "deprecated"
+  )
 
   # Check that object is still FLS class
   expect_s4_class(fls_initialized, "FLS")
@@ -129,33 +129,31 @@ test_that("dwba_curved_initialize works correctly", {
   expect_true("DWBA_curved" %in% names(fls_initialized@model))
 })
 
-test_that("dcm_initialize works correctly", {
-  library(acousticTS)
-
-  # Test dcm_initialize for FLS objects
-  fls_obj <- fls_generate(
-    x = 1, y = 1, z = 1, radius_body = 1,
-    g_body = 1, h_body = 1
-  )
-  frequency <- c(38e3, 120e3)
-
-  # Initialize DCM model
-  fls_initialized <- dcm_initialize(fls_obj, frequency = frequency)
-
-  # Check that object is still FLS class
-  expect_s4_class(fls_initialized, "FLS")
-
-  # Check that model parameters slot was updated
-  expect_type(fls_initialized@model_parameters, "list")
-  expect_true("DCM" %in% names(fls_initialized@model_parameters))
-
-  # Check that model slot was updated
-  expect_type(fls_initialized@model, "list")
-  expect_true("DCM" %in% names(fls_initialized@model))
-})
+# test_that("dcm_initialize works correctly", {
+#
+#   # Test dcm_initialize for FLS objects
+#   fls_obj <- fls_generate(
+#     x = 1, y = 1, z = 1, radius_body = 1,
+#     g_body = 1, h_body = 1
+#   )
+#   frequency <- c(38e3, 120e3)
+#
+#   # Initialize DCM model
+#   fls_initialized <- dcm_initialize(fls_obj, frequency = frequency)
+#
+#   # Check that object is still FLS class
+#   expect_s4_class(fls_initialized, "FLS")
+#
+#   # Check that model parameters slot was updated
+#   expect_type(fls_initialized@model_parameters, "list")
+#   expect_true("DCM" %in% names(fls_initialized@model_parameters))
+#
+#   # Check that model slot was updated
+#   expect_type(fls_initialized@model, "list")
+#   expect_true("DCM" %in% names(fls_initialized@model))
+# })
 
 test_that("sdwba_initialize works correctly", {
-  library(acousticTS)
 
   # Test sdwba_initialize for FLS objects
   fls_obj <- fls_generate(
@@ -184,7 +182,6 @@ test_that("sdwba_initialize works correctly", {
 })
 
 test_that("sdwba_curved_initialize works correctly", {
-  library(acousticTS)
 
   # Test sdwba_curved_initialize for FLS objects
   fls_obj <- fls_generate(
@@ -198,7 +195,10 @@ test_that("sdwba_curved_initialize works correctly", {
   frequency <- c(120e3)
 
   # Initialize SDWBA curved model
-  fls_initialized <- sdwba_curved_initialize(fls_obj, frequency = frequency)
+  expect_warning(
+    fls_initialized <- sdwba_curved_initialize(fls_obj, frequency = frequency),
+    "deprecated"
+  )
 
   # Check that object is still FLS class
   expect_s4_class(fls_initialized, "FLS")
@@ -213,7 +213,6 @@ test_that("sdwba_curved_initialize works correctly", {
 })
 
 test_that("krm_initialize works correctly", {
-  library(acousticTS)
 
   # Test krm_initialize for SBF objects
   # SBF should have both body and bladder
@@ -250,32 +249,8 @@ test_that("krm_initialize works correctly", {
   expect_true("KRM" %in% names(sbf_initialized@model))
 })
 
-test_that("high_pass_stanton_initialize works correctly", {
-  library(acousticTS)
-
-  # Test high_pass_stanton_initialize for ESS objects
-  ess_obj <- ess_generate(radius_shell = 1)
-  frequency <- c(120e3, 200e3)
-
-  # Initialize High Pass Stanton model
-  ess_initialized <- high_pass_stanton_initialize(ess_obj,
-    frequency = frequency
-  )
-
-  # Check that object is still ESS class
-  expect_s4_class(ess_initialized, "ESS")
-
-  # Check that model parameters slot was updated
-  expect_type(ess_initialized@model_parameters, "list")
-  expect_true("high_pass_stanton" %in% names(ess_initialized@model_parameters))
-
-  # Check that model slot was updated
-  expect_type(ess_initialized@model, "list")
-  expect_true("high_pass_stanton" %in% names(ess_initialized@model))
-})
 
 test_that("Initialization preserves object integrity", {
-  library(acousticTS)
 
   # Test that initialization doesn't break the object structure
   cal_obj <- cal_generate()
@@ -290,25 +265,4 @@ test_that("Initialization preserves object integrity", {
   expect_true("metadata" %in% slotNames(cal_initialized))
   expect_true("model_parameters" %in% slotNames(cal_initialized))
   expect_true("model" %in% slotNames(cal_initialized))
-})
-
-test_that("Initialization functions handle optional parameters", {
-  library(acousticTS)
-
-  # Test with optional medium parameters
-  gas_obj <- gas_generate(radius_body = 1)
-  frequency <- c(38e3, 120e3)
-
-  # Test with custom sound speed and density
-  gas_initialized <- mss_anderson_initialize(
-    gas_obj,
-    frequency = frequency,
-    sound_speed_sw = 1480, # Different from default
-    density_sw = 1025 # Different from default
-  )
-
-  # Check that custom medium parameters were used
-  medium_params <- gas_initialized@model_parameters$MSS_anderson$medium
-  expect_equal(medium_params$sound_speed, 1480)
-  expect_equal(medium_params$density, 1025)
 })

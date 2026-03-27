@@ -1,0 +1,61 @@
+---
+title: "HPA"
+output:
+  rmarkdown::html_vignette:
+    toc: false
+    number_sections: false
+    fig_caption: yes
+vignette: >
+  %\VignetteIndexEntry{HPA}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+# Overview
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  family = "hpa",
+  pages = c(
+    Overview = "index.html",
+    Implementation = "hpa-implementation.html",
+    Theory = "hpa-theory.html"
+  )
+)
+```
+
+```{r hpa_overview, echo=FALSE, results='asis'}
+acousticTS:::.model_family_overview(
+  family = "hpa",
+  summary = paste(
+    "The high-pass approximation (`HPA`) is a compact asymptotic backscatter",
+    "family that interpolates between a Rayleigh-style low-frequency limit and",
+    "a reflection-controlled high-frequency limit."
+  ),
+  core_idea = paste(
+    "Build a rational approximation whose numerator reproduces the low-`ka`",
+    "scattering strength and whose denominator suppresses unphysical growth as",
+    "frequency increases, then adapt the geometric prefactors to spheres,",
+    "spheroids, and cylinders."
+  ),
+  best_for = c(
+    "Fast approximate spectra for simple canonical bodies",
+    "Broad trend studies when an exact modal solve is unnecessary",
+    "Weakly contrasting or moderately reflecting targets represented by simple shapes"
+  ),
+  supports = c(
+    "Sphere, prolate spheroid, straight cylinder, and bent-cylinder branches",
+    "Contrast bookkeeping relative to seawater as medium `1`",
+    "Very fast monostatic backscatter estimates"
+  ),
+  assumptions = c(
+    "Asymptotic interpolation rather than an exact boundary-value solution",
+    "Shape-specific prefactors carried from the source literature",
+    "Best interpreted as a broadband approximation, not a resonance-resolving solver"
+  ),
+  reading = c(
+    "[Implementation](hpa-implementation.html): quick workflows and validation tables",
+    "[Theory](hpa-theory.html): Rayleigh term, reflection limit, and shape-specific completions"
+  )
+)
+```
+

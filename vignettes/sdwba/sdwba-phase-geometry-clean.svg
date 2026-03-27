@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 420" role="img" aria-labelledby="title desc">
+  <title id="title">SDWBA phase geometry</title>
+  <desc id="desc">Schematic showing deterministic segment contributions along a fluid-like body, unresolved path-length perturbations, and the resulting random phase factors used in the SDWBA.</desc>
+  <defs>
+    <style>
+      .bg { fill: #fbf8f1; }
+      .panel { fill: #fffdf8; stroke: #263129; stroke-width: 2; rx: 16; }
+      .body { fill: none; stroke: #0f5c5c; stroke-width: 8; stroke-linecap: round; }
+      .bodyPert { fill: none; stroke: #7ea79b; stroke-width: 4; stroke-dasharray: 8 6; stroke-linecap: round; }
+      .ray { stroke: #223127; stroke-width: 3; marker-end: url(#arr); }
+      .delta { stroke: #8a5c34; stroke-width: 2.5; stroke-dasharray: 5 5; marker-end: url(#arr2); }
+      .seg { fill: #bb4d00; }
+      .segPert { fill: #c9a27a; }
+      .heading { font: 700 23px Georgia, "Times New Roman", serif; fill: #1f2520; }
+      .label { font: 18px Georgia, "Times New Roman", serif; fill: #1f2520; }
+      .math { font: italic 20px Georgia, "Times New Roman", serif; fill: #0d4c52; }
+      .small { font: 16px Georgia, "Times New Roman", serif; fill: #1f2520; }
+    </style>
+    <marker id="arr" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#223127"/>
+    </marker>
+    <marker id="arr2" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8a5c34"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="980" height="420"/>
+  <rect class="panel" x="26" y="26" width="928" height="368" rx="16"/>
+  <text class="heading" x="490" y="58" text-anchor="middle">SDWBA phase variability as unresolved path-length perturbation</text>
+
+  <line class="ray" x1="64" y1="138" x2="236" y2="138"/>
+  <text class="label" x="66" y="116">incident wave</text>
+
+  <path class="body" d="M246 218 C330 146, 428 146, 512 218 S680 290, 798 220"/>
+  <path class="bodyPert" d="M246 228 C332 160, 432 156, 516 228 S682 302, 798 232"/>
+
+  <circle class="seg" cx="330" cy="180" r="7"/>
+  <circle class="seg" cx="420" cy="166" r="7"/>
+  <circle class="seg" cx="512" cy="218" r="7"/>
+  <circle class="seg" cx="612" cy="260" r="7"/>
+  <circle class="seg" cx="710" cy="260" r="7"/>
+
+  <circle class="segPert" cx="338" cy="192" r="5.5"/>
+  <circle class="segPert" cx="428" cy="176" r="5.5"/>
+  <circle class="segPert" cx="520" cy="230" r="5.5"/>
+  <circle class="segPert" cx="620" cy="272" r="5.5"/>
+  <circle class="segPert" cx="718" cy="272" r="5.5"/>
+
+  <line class="delta" x1="330" y1="180" x2="338" y2="192"/>
+  <line class="delta" x1="420" y1="166" x2="428" y2="176"/>
+  <line class="delta" x1="512" y1="218" x2="520" y2="230"/>
+  <line class="delta" x1="612" y1="260" x2="620" y2="272"/>
+  <line class="delta" x1="710" y1="260" x2="718" y2="272"/>
+
+  <text class="math" x="344" y="166">&#948;&#8467;<tspan baseline-shift="sub" font-size="15">1</tspan></text>
+  <text class="math" x="434" y="152">&#948;&#8467;<tspan baseline-shift="sub" font-size="15">2</tspan></text>
+  <text class="math" x="526" y="206">&#948;&#8467;<tspan baseline-shift="sub" font-size="15">3</tspan></text>
+
+  <text class="math" x="300" y="148">q<tspan baseline-shift="sub" font-size="15">1</tspan></text>
+  <text class="math" x="390" y="136">q<tspan baseline-shift="sub" font-size="15">2</tspan></text>
+  <text class="math" x="486" y="202">q<tspan baseline-shift="sub" font-size="15">3</tspan></text>
+  <text class="math" x="588" y="298">q<tspan baseline-shift="sub" font-size="15">4</tspan></text>
+  <text class="math" x="686" y="298">q<tspan baseline-shift="sub" font-size="15">5</tspan></text>
+
+  <text class="label" x="244" y="330">solid curve: deterministic segmented body</text>
+  <text class="label" x="244" y="356">dashed curve: unresolved effective perturbation of local path length</text>
+
+  <text class="math" x="676" y="96">e<tspan baseline-shift="super" font-size="15">i&#966;<tspan baseline-shift="sub" font-size="12">j</tspan></tspan></text>
+  <text class="math" x="730" y="96">&#966;<tspan baseline-shift="sub" font-size="15">j</tspan> &#8776; 2k<tspan baseline-shift="sub" font-size="15">2</tspan>&#948;&#8467;<tspan baseline-shift="sub" font-size="15">j</tspan></text>
+  <text class="small" x="676" y="124">Each deterministic segment term is multiplied by a realization-specific phase factor.</text>
+
+  <text class="small" x="676" y="176">Ensemble averaging leaves</text>
+  <text class="math" x="858" y="176" text-anchor="end">&#8721;|q<tspan baseline-shift="sub" font-size="15">j</tspan>|<tspan baseline-shift="super" font-size="15">2</tspan></text>
+  <text class="small" x="676" y="202">unchanged and damps cross terms by</text>
+  <text class="math" x="860" y="202" text-anchor="end">e<tspan baseline-shift="super" font-size="15">-&#963;<tspan baseline-shift="sub" font-size="12">&#966;</tspan><tspan baseline-shift="super" font-size="12">2</tspan></tspan></text>
+</svg>

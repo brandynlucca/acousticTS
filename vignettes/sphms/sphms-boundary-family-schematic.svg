@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 320" role="img" aria-labelledby="title desc">
+  <title id="title">SPHMS boundary families</title>
+  <desc id="desc">Comparison of rigid, pressure-release, fluid-filled, and layered-shell sphere boundaries used by the spherical modal series solution.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f7f2ea; }
+      .panel { fill: #fffdfa; stroke: #2f2822; stroke-width: 2.1; rx: 16; ry: 16; }
+      .head { font: 700 21px Georgia, serif; fill: #1f1a16; }
+      .txt { font: 15px Georgia, serif; fill: #2f2822; }
+      .small { font: 13px Georgia, serif; fill: #564b40; }
+      .w { fill: #dcecf5; stroke: #2f2822; stroke-width: 1.8; }
+      .s { fill: #f7d8b0; stroke: #2f2822; stroke-width: 1.8; }
+      .l { fill: #e4dff3; stroke: #2f2822; stroke-width: 1.8; }
+    </style>
+  </defs>
+  <rect width="960" height="320" class="bg"/>
+  <text x="28" y="40" class="head">Boundary families solved within the spherical modal framework</text>
+  <rect x="24" y="68" width="214" height="220" class="panel"/>
+  <text x="44" y="96" class="txt">Rigid</text>
+  <circle cx="132" cy="168" r="58" class="w"/>
+  <text x="54" y="247" class="small">Normal velocity vanishes</text>
+  <text x="54" y="267" class="small">at r = a.</text>
+
+  <rect x="256" y="68" width="214" height="220" class="panel"/>
+  <text x="276" y="96" class="txt">Pressure release</text>
+  <circle cx="364" cy="168" r="58" class="w"/>
+  <text x="286" y="247" class="small">Total pressure vanishes</text>
+  <text x="286" y="267" class="small">at r = a.</text>
+
+  <rect x="488" y="68" width="214" height="220" class="panel"/>
+  <text x="508" y="96" class="txt">Fluid filled</text>
+  <circle cx="596" cy="168" r="58" class="w"/>
+  <circle cx="596" cy="168" r="34" class="s"/>
+  <text x="518" y="247" class="small">Pressure and normal velocity</text>
+  <text x="518" y="267" class="small">are continuous at r = a.</text>
+
+  <rect x="720" y="68" width="214" height="220" class="panel"/>
+  <text x="740" y="96" class="txt">Layered shell</text>
+  <circle cx="828" cy="168" r="58" class="w"/>
+  <circle cx="828" cy="168" r="42" class="l"/>
+  <circle cx="828" cy="168" r="24" class="s"/>
+  <text x="750" y="247" class="small">Acoustic transmission is matched</text>
+  <text x="750" y="267" class="small">at r = a and r = b.</text>
+</svg>

@@ -12,7 +12,7 @@ simulate_ts(
   parameters,
   batch_by = NULL,
   parallel = TRUE,
-  n_cores = parallel::detectCores() - 1,
+  n_cores = .default_simulation_cores(),
   verbose = TRUE
 )
 }
@@ -37,22 +37,48 @@ values. Default is \code{NULL}.}
 \code{TRUE}.}
 
 \item{n_cores}{Optional. Number of CPU cores to use for parallelization.
-Default is \code{parallel::detectCores() - 1}.}
+Default is the smaller of 2 cores and \code{parallel::detectCores() - 1}.}
 
 \item{verbose}{Logical; whether to print progress and status messages to the
 console. Default is \code{TRUE}.}
 }
 \value{
-A data frame (or list of data frames) with simulation results.
+A data frame when a single model is requested, or a named list of data
+frames when multiple models are requested. Each returned data frame contains
+the realized parameter values together with the modeled acoustic output for
+each simulated run.
 }
 \description{
 Simulate target strength (TS) with flexible parameterization and batching
 }
 \details{
-For example, if \code{batch_by = "length"} and \code{parameters["length"]}
-is a vector of values, simulations will be run for each value of length
-\code{n_realizations} times. If multiple parameters are specified in
-\code{batch_by}, batching will occur over all combinations of their values.
+\code{simulate_ts()} is a workflow wrapper around repeated \code{target_strength()}
+calls. It supports three broad parameter modes inside \code{parameters}:
+
+\itemize{
+\item scalars that are recycled across every realization,
+\item explicit vectors that are either aligned with the full simulation
+grid or with one or more batched dimensions, and
+\item generating functions that are re-evaluated for each realization.
+}
+
+If \code{batch_by = "length"} and \code{parameters[["length"]]} is a vector
+of candidate values, then simulations are run for each length value,
+repeated \code{n_realizations} times. When multiple parameters are supplied
+through \code{batch_by}, the function builds the full Cartesian grid of
+those parameter values and runs the requested number of realizations inside
+each batch cell.
+
+Parameter names are interpreted in the same way they would be if supplied
+directly to \code{target_strength()} or to the relevant object constructor /
+\code{reforge()} path. This means \code{simulate_ts()} can be used for:
+
+\itemize{
+\item orientation perturbations,
+\item material-property perturbations,
+\item morphology studies that trigger shape rebuilding or reforging, and
+\item side-by-side comparisons across one or more model families.
+}
 }
 \section{Parallelization}{
 
@@ -70,9 +96,32 @@ within \code{batch_by} may cause significant performance issues or cause
 them into more manageable chunks
 }
 
-\section{DEPRECATION WARNING}{
+\examples{
+shape_obj <- cylinder(
+  length_body = 0.05,
+  radius_body = 0.003,
+  n_segments = 40
+)
 
-The \code{simulate_ts} function will be deprecated in future versions and will be
-replaced by the \code{anneal} function in future versions.
+obj <- fls_generate(
+  shape = shape_obj,
+  density_body = 1045,
+  sound_speed_body = 1520
+)
+
+res <- simulate_ts(
+  object = obj,
+  frequency = seq(38e3, 50e3, by = 6e3),
+  model = "dwba",
+  n_realizations = 2,
+  parameters = list(
+    theta_body = function() runif(1, min = 0.5 * pi, max = pi),
+    density_body = 1045
+  ),
+  parallel = FALSE,
+  verbose = FALSE
+)
+
+head(res)
+
 }
-

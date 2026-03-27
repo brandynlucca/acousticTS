@@ -4,7 +4,7 @@
 \alias{sphere}
 \title{Creates a sphere.}
 \usage{
-sphere(radius_body, n_segments, diameter_units )
+sphere(radius_body, n_segments = 100, diameter_units = "m")
 }
 \arguments{
 \item{radius_body}{Object radius (m).}
@@ -19,6 +19,9 @@ Creates position vector for a spherical object of a defined radius.
 }
 \description{
 Creates a sphere.
+}
+\examples{
+sphere(radius_body = 0.01, n_segments = 50)
 }
 \seealso{
 \code{\link{Sphere}}

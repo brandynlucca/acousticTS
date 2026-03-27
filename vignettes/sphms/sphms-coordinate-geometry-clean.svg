@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 960 420"
+   role="img"
+   aria-labelledby="title desc"
+   version="1.1"
+   id="svg18"
+   sodipodi:docname="sphms-coordinate-geometry-clean.svg"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview18"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="386.43386"
+     inkscape:cy="231.22392"
+     inkscape:window-width="1920"
+     inkscape:window-height="1080"
+     inkscape:window-x="1920"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg18" />
+  <title
+     id="title">Spherical coordinates and modal bookkeeping</title>
+  <desc
+     id="desc">Cleaner SPHMS schematic showing a sphere of radius a, the polar angle theta, incident-wave direction, and the separation between exterior and interior radial basis functions.</desc>
+  <defs
+     id="defs2">
+    <style
+       id="style1">
+      .bg { fill: #fbf8f1; }
+      .panel { fill: #fffdf8; stroke: #28322a; stroke-width: 2; }
+      .sphere { fill: #dbe9ef; stroke: #0f5c5c; stroke-width: 5; }
+      .axis { stroke: #223127; stroke-width: 2.5; }
+      .guide { stroke: #6c756d; stroke-width: 2; stroke-dasharray: 6 6; fill: none; }
+      .ray { stroke: #8a5c34; stroke-width: 3; marker-end: url(#arr1); fill: none; }
+      .out { stroke: #4d8a78; stroke-width: 3; marker-end: url(#arr2); fill: none; }
+      .heading { font: 700 23px Georgia, &quot;Times New Roman&quot;, serif; fill: #1f2520; }
+      .label { font: 18px Georgia, &quot;Times New Roman&quot;, serif; fill: #1f2520; }
+      .math { font: italic 20px Georgia, &quot;Times New Roman&quot;, serif; fill: #0d4c52; }
+      .small { font: 16px Georgia, &quot;Times New Roman&quot;, serif; fill: #1f2520; }
+    </style>
+    <marker
+       id="arr1"
+       markerWidth="10"
+       markerHeight="10"
+       refX="8"
+       refY="5"
+       orient="auto">
+      <path
+         d="M0,0 L10,5 L0,10 z"
+         fill="#8a5c34"
+         id="path1" />
+    </marker>
+    <marker
+       id="arr2"
+       markerWidth="10"
+       markerHeight="10"
+       refX="8"
+       refY="5"
+       orient="auto">
+      <path
+         d="M0,0 L10,5 L0,10 z"
+         fill="#4d8a78"
+         id="path2" />
+    </marker>
+  </defs>
+  <rect
+     class="bg"
+     width="960"
+     height="420"
+     id="rect2" />
+  <rect
+     class="panel"
+     x="24"
+     y="24"
+     width="912"
+     height="372"
+     rx="16"
+     ry="16"
+     id="rect3" />
+  <text
+     class="heading"
+     x="480"
+     y="46"
+     text-anchor="middle"
+     id="text3"
+     style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:23px;line-height:normal;font-family:Georgia, 'Times New Roman', serif">Spherical coordinates and partial-wave bookkeeping</text>
+  <line
+     class="axis"
+     x1="162"
+     y1="210"
+     x2="740"
+     y2="210"
+     id="line3" />
+  <line
+     class="axis"
+     x1="456"
+     y1="348"
+     x2="456"
+     y2="72"
+     id="line4" />
+  <text
+     class="math"
+     x="743.17157"
+     y="215.73633"
+     id="text4"
+     style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:normal;font-family:Georgia, 'Times New Roman', serif;-inkscape-font-specification:'Georgia, Times New Roman, serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#223127;fill-opacity:1"><tspan
+       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24px;font-family:Georgia, 'Times New Roman', serif;-inkscape-font-specification:'Georgia, Times New Roman, serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+       id="tspan26">z</tspan></text>
+  <text
+     class="math"
+     x="449.9707"
+     y="68.686287"
+     id="text5"
+     style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:normal;font-family:Georgia, 'Times New Roman', serif;fill:#223127;fill-opacity:1"><tspan
+       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24px;font-family:Georgia, 'Times New Roman', serif;-inkscape-font-specification:'Georgia, Times New Roman, serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+       id="tspan27">x</tspan></text>
+  <circle
+     class="sphere"
+     cx="456"
+     cy="210"
+     r="114"
+     id="circle5" />
+  <line
+     class="guide"
+     x1="456"
+     y1="210"
+     x2="554"
+     y2="138"
+     id="line5" />
+  <path
+     class="guide"
+     d="M524 210 A68 68 0 0 0 553 156"
+     id="path5" />
+  <text
+     class="math"
+     x="524"
+     y="172"
+     id="text6">θ</text>
+  <text
+     class="small"
+     x="576"
+     y="146"
+     id="text7">polar angle</text>
+  <line
+     class="ray"
+     x1="94"
+     y1="130"
+     x2="264"
+     y2="190"
+     id="line7" />
+  <text
+     class="math"
+     x="99"
+     y="128"
+     id="text9"
+     style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:normal;font-family:Georgia, 'Times New Roman', serif">e <tspan
+   style="font-size:65%;baseline-shift:super"
+   id="tspan24">ik<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan25">1</tspan>z</tspan></text>
+  <line
+     class="ray"
+     x1="456"
+     y1="210"
+     x2="570"
+     y2="210"
+     id="line9" />
+  <text
+     class="math"
+     x="510"
+     y="194"
+     id="text10">a</text>
+  <text
+     class="small"
+     x="580"
+     y="196"
+     id="text11">boundary r = a</text>
+  <path
+     class="out"
+     d="M560 152 C648 122, 730 112, 834 96"
+     id="path11" />
+  <path
+     class="out"
+     d="M570 210 C668 210, 746 226, 840 256"
+     id="path12" />
+  <path
+     class="out"
+     d="M552 268 C636 312, 724 324, 824 336"
+     id="path13" />
+  <text
+     class="small"
+     x="724"
+     y="78"
+     id="text13">exterior scattered basis</text>
+  <text
+     class="math"
+     x="724"
+     y="102"
+     id="text14">A_n h_n^{(1)}(k_1 r) P_n(cosθ)</text>
+  <text
+     class="small"
+     x="370.45081"
+     y="260.76599"
+     id="text15"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;line-height:normal;font-family:Georgia, 'Times New Roman', serif">Interior or regular basis</text>
+  <text
+     class="math"
+     x="246"
+     y="320"
+     id="text16">j_n(k r) P_n(cosθ)</text>
+  <text
+     class="small"
+     x="114"
+     y="360"
+     id="text17">The spherical surface keeps the angular basis matched, so each n-mode remains decoupled.</text>
+  <text
+     class="small"
+     x="114"
+     y="382"
+     id="text18">SPHMS differs by boundary condition, not by a change in the underlying spherical coordinate geometry.</text>
+  <g
+     id="g22"
+     transform="translate(-9.5)">
+    <text
+       class="label"
+       x="45.770267"
+       y="86.202705"
+       id="text8"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;line-height:normal;font-family:Georgia, 'Times New Roman', serif;-inkscape-font-specification:'Georgia, Times New Roman, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#1f2520"><tspan
+         sodipodi:role="line"
+         id="tspan19"
+         x="45.770267"
+         y="86.202705">Incident plane wave</tspan></text>
+    <text
+       class="label"
+       x="109.24686"
+       y="101.38277"
+       id="text20"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;line-height:normal;font-family:Georgia, 'Times New Roman', serif;-inkscape-font-specification:'Georgia, Times New Roman, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#1f2520"><tspan
+         sodipodi:role="line"
+         id="tspan20"
+         x="109.24686"
+         y="101.38277"><tspan
+           style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;font-family:Georgia, 'Times New Roman', serif;-inkscape-font-specification:'Georgia, Times New Roman, serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+           id="tspan22">p</tspan><tspan
+           style="font-size:65%;baseline-shift:sub"
+           id="tspan21">1,inc</tspan></tspan></text>
+  </g>
+  <text
+     xml:space="preserve"
+     style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24px;line-height:0.8;font-family:Georgia, 'Times New Roman', serif;-inkscape-font-specification:'Georgia, Times New Roman, serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;writing-mode:vertical-lr;direction:rtl;fill:#223127;fill-opacity:1;stroke:#000000;stroke-width:0.2"
+     x="250.3158"
+     y="289.91379"
+     id="text28"><tspan
+       sodipodi:role="line"
+       id="tspan28"></tspan></text>
+</svg>

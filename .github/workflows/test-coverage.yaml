@@ -10,6 +10,9 @@ on:
 
 name: Coverage
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 permissions: read-all
 
 jobs:
@@ -25,16 +28,19 @@ jobs:
         with:
           use-public-rspm: true
 
+      - name: Install Fortran toolchain
+        run: sudo apt-get update && sudo apt-get install -y gfortran
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::covr, any::xml2
+          extra-packages: any::covr, any::xml2, local::.
           needs: coverage
 
       - name: Test coverage
         run: |
           cov <- covr::package_coverage(
             quiet = FALSE,
-            clean = FALSE,
+            clean = TRUE,
             install_path = file.path(normalizePath(Sys.getenv("RUNNER_TEMP"), winslash = "/"), "package")
           )
           print(cov)

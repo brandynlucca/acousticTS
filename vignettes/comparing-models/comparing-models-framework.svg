@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="589.50452"
+   height="316.17117"
+   viewBox="0 0 589.50452 316.17117"
+   version="1.1"
+   id="svg9"
+   sodipodi:docname="comparing-models-framework.svg"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs9" />
+  <sodipodi:namedview
+     id="namedview9"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.96521739"
+     inkscape:cx="126.3964"
+     inkscape:cy="252.27477"
+     inkscape:window-width="1920"
+     inkscape:window-height="1057"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg9" />
+  <rect
+     width="589.50452"
+     height="316.17117"
+     fill="#fbfaf5"
+     id="rect1"
+     x="0"
+     y="0"
+     style="stroke-width:1" />
+  <text
+     x="144.92216"
+     y="32.459457"
+     font-family="Georgia, serif"
+     font-size="28px"
+     fill="#203040"
+     id="text1">Fair model comparisons</text>
+  <circle
+     cx="81.27211"
+     cy="116.62247"
+     fill="#d4e7e7"
+     stroke="#0f5c5c"
+     stroke-width="4"
+     id="circle1"
+     r="69.288948" />
+  <g
+     id="g11"
+     transform="translate(-178.3239,0.09771059)">
+    <text
+       x="206.65656"
+       y="111.86603"
+       font-family="Georgia, serif"
+       font-size="24px"
+       fill="#203040"
+       id="text3">Geometry</text>
+    <text
+       x="194.74445"
+       y="134.70694"
+       font-family="Georgia, serif"
+       font-size="18px"
+       fill="#203040"
+       id="text4"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040">Same target shape</text>
+  </g>
+  <circle
+     cx="247.6295"
+     cy="142.52339"
+     fill="#eef0de"
+     stroke="#7a6a2a"
+     stroke-width="4"
+     id="circle2"
+     r="93.11763" />
+  <g
+     id="g9"
+     transform="translate(-199.0446,26.619713)">
+    <text
+       x="407.04715"
+       y="112.44025"
+       font-family="Georgia, serif"
+       font-size="24px"
+       fill="#203040"
+       id="text5">Physics</text>
+    <text
+       x="361.77957"
+       y="134.03899"
+       font-family="Georgia, serif"
+       font-size="18px"
+       fill="#203040"
+       id="text6"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040">Same property meaning</text>
+  </g>
+  <g
+     id="g14"
+     transform="translate(-182.46803,-9.3243246)">
+    <circle
+       cx="646.7774"
+       cy="173.60446"
+       fill="#f3dfcf"
+       stroke="#a35d24"
+       stroke-width="4"
+       id="circle3"
+       r="113.8385" />
+    <g
+       id="g10"
+       transform="translate(0,57.634377)">
+      <text
+         x="565.2442"
+         y="112.44025"
+         font-family="Georgia, serif"
+         font-size="24px"
+         fill="#203040"
+         id="text7">Output domain</text>
+      <text
+         x="578.09381"
+         y="134.1718"
+         font-family="Georgia, serif"
+         font-size="18px"
+         fill="#203040"
+         id="text8"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040">Same frequency/<tspan
+   style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   id="tspan9">ka</tspan></text>
+    </g>
+  </g>
+  <text
+     x="52.310852"
+     y="306.18573"
+     font-family="Georgia, serif"
+     font-size="20px"
+     fill="#203040"
+     id="text9">Account for model assumptions rather than setup drift.</text>
+</svg>

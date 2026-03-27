@@ -1,0 +1,78 @@
+---
+title: "FAQ and Troubleshooting"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: true
+    fig_caption: yes
+    dpi: 200
+    dev.args: list(pointsize=11)
+vignette: >
+  %\VignetteIndexEntry{FAQ and Troubleshooting}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# Introduction
+
+Many problems that look like model failures are really workflow failures: wrong units, wrong boundary assumption, wrong target class, inconsistent material properties, or an interpretation error about what quantity is being combined or plotted. This page collects the issues that are most likely to surface first and arranges them in the order that is usually most efficient for debugging.
+
+The main theme is simple. Before assuming a model is wrong, confirm that the object, the physical interpretation, and the output quantity are all the ones you think they are. In acoustics, small setup mismatches can create large-looking disagreements.
+
+# Common questions
+
+## Why does the model output look unreasonable?
+
+The first things to check are geometry, units, orientation, material properties, and whether the chosen model matches the intended target type. Large discrepancies are often caused by a mismatch between the physical target and the model family rather than by a coding error. A sphere built with the wrong boundary interpretation, a fish-like body represented without its dominant gas-filled component, or a frequency vector supplied in kHz instead of Hz can all produce results that look dramatic while still being explained entirely by setup rather than numerics.
+
+In practice, the fastest way to debug a surprising curve is usually to move backward through the workflow. Plot the shape. Inspect the stored body or component properties. Confirm the frequency grid and orientation angle. Then ask whether the selected model is actually intended for that target. Only after those checks is it worth treating the issue as a possible numerical or implementation problem.
+
+## Why do two models disagree strongly?
+
+Strong disagreement is not necessarily a bug. It often means the models encode different boundary assumptions, high-frequency reductions, coherence assumptions, or geometry simplifications. Before deciding that one of the models is wrong, check whether both models were actually intended to describe the same physics.
+
+Disagreement between `DWBA` and `SDWBA`, for example, may reflect the effect of unresolved phase variability rather than a coding issue. Disagreement between a modal-series model and an asymptotic model may simply mark the point where a compact approximation begins to leave its most reliable regime. In that sense, disagreement is often informative, but only if the comparison itself was fair.
+
+## Can I add component target strengths directly?
+
+Usually no. Target strength is a logarithmic reporting quantity, so adding component `TS` values directly is not generally meaningful. The correct combination rule depends on whether amplitudes or cross-sections are being combined and on whether the components are coherent or incoherent. A deterministic coherent sum requires complex amplitudes and a shared phase reference. An incoherent sum requires an explicit averaging argument.
+
+This is one of the most common places where a workflow can go wrong while still looking algebraically neat. See [combining scattering components](../combining-components/combining-components.html) for the full discussion.
+
+## Why does increasing geometric detail change the answer?
+
+Because different models are sensitive to segmentation, coherence, truncation, and geometric idealization in different ways. More geometric detail does not automatically mean a more appropriate model. In some cases, added detail improves the physical representation. In other cases, it creates a mismatch between the object description and the assumptions of the model being used.
+
+That is why it is often useful to compare a simple canonical geometry against a more detailed segmented geometry before assuming that the more detailed version is automatically better. A model that assumes a canonical sphere, cylinder, or spheroid does not necessarily benefit from extra geometric complexity if that complexity is outside the theory the model was derived for.
+
+## What should I inspect first when debugging a workflow?
+
+Start with shape plots, then stored parameters, then the model choice itself. Only after those are checked is it worth treating the issue as a possible numerical or implementation problem. In practice, the most efficient sequence is usually:
+
+1. plot the shape or scatterer geometry,
+2. inspect the object with `show()` or `extract()`,
+3. confirm the boundary and material assumptions,
+4. verify the frequency grid and orientation convention,
+5. compare the requested model against the model-selection and theory pages.
+
+This sequence works well because it mirrors the structure of the package itself. The object definition comes first, the model assignment comes second, and result interpretation comes third.
+
+## Why does a benchmark or documentation example not reproduce exactly?
+
+The most common reasons are mismatched units, different medium properties, a changed frequency grid, a different orientation convention, or a model-specific numerical option that was not carried over. A benchmark curve is only meaningful when the target definition and calculation settings are genuinely aligned with the reference.
+
+This is especially important for benchmark-style datasets and calibration workflows. In those cases, a result can be physically plausible and still fail to reproduce the intended reference because one small part of the setup was changed.
+
+## Why does a model run but still not answer my scientific question?
+
+Because a successful model execution and a defensible model choice are not the same thing. A model can run cleanly while still being the wrong model for the body type, the boundary interpretation, or the acoustic regime. This is one reason the package documentation separates workflow pages, theory pages, and model-selection pages rather than treating a successful function call as proof that the modeling assumptions are appropriate.
+
+# A practical debugging mindset
+
+The most useful troubleshooting habit is to treat debugging as a sequence of narrowing assumptions rather than as a hunt for broken code. First confirm the object. Then confirm the physics. Then confirm the model family. Then confirm the output quantity being interpreted. Only after those steps should the user move to questions of numerical stability or implementation.
+
+That mindset is especially helpful because many of the hardest-looking failures in scattering workflows are really problems of interpretation. The model may be doing exactly what it was asked to do, but the object or assumptions may not be the ones the user thought they had supplied.
+
+# Recommended reading order
+
+If you are stuck, the most useful sequence is usually [Getting started](../getting-started/getting-started.html), then [Boundary conditions in practice](../boundary-conditions-practice/boundary-conditions-practice.html), then [Choosing a model](../model-selection/model-selection.html), and finally the relevant theory page. That reading order mirrors the workflow itself: first confirm the package logic, then the boundary interpretation, then the model family, and only then the model-specific mathematics.

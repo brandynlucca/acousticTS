@@ -1,0 +1,17 @@
+################################################################################
+# Package-level documentation topics
+################################################################################
+#' Boundary conditions for scatterers
+#'
+#' @description
+#' Details of the boundary-condition aliases supported by the package's target
+#' strength models.
+#'
+#' This topic provides a shared documentation anchor for references such as
+#' `?boundary_conditions` and links emitted from the model help pages. The
+#' longer narrative treatment lives in the package vignette
+#' `vignettes/boundary_conditions.Rmd`.
+#'
+#' @importFrom methods setClass setGeneric signature
+#' @name boundary_conditions
+NULL

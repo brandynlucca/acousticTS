@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="832.2973"
+   height="357.97296"
+   viewBox="0 0 832.2973 357.97296"
+   role="img"
+   aria-labelledby="title desc"
+   version="1.1"
+   id="svg12"
+   sodipodi:docname="tmm-branch-schematic.svg"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview12"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.98666667"
+     inkscape:cx="515.37162"
+     inkscape:cy="285.30405"
+     inkscape:window-width="1920"
+     inkscape:window-height="1057"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg12" />
+  <title
+     id="title">TMM branch schematic</title>
+  <desc
+     id="desc">Diagram showing the single-target TMM workflow splitting into spherical and spheroidal branches.</desc>
+  <defs
+     id="defs1">
+    <marker
+       style="overflow:visible"
+       id="RoundedArrow"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Rounded arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.7)"
+         d="m -0.21114562,-4.1055728 6.42229122,3.21114561 a 1,1 90 0 1 0,1.78885438 L -0.21114562,4.1055728 A 1.236068,1.236068 31.717474 0 1 -2,3 v -6 a 1.236068,1.236068 148.28253 0 1 1.78885438,-1.1055728 z"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         id="path8" />
+    </marker>
+    <style
+       id="style1">
+      .box { fill:#f7fbff; stroke:#1f4e79; stroke-width:2; rx:14; ry:14; }
+      .branch { fill:#fff9ef; stroke:#9a5a00; stroke-width:2; rx:14; ry:14; }
+      .note { fill:#f5f5f5; stroke:#666; stroke-width:1.5; rx:10; ry:10; }
+      .label { font-family: 'Segoe UI', Arial, sans-serif; font-size:18px; fill:#18324a; }
+      .small { font-family: 'Segoe UI', Arial, sans-serif; font-size:15px; fill:#333; }
+      .arrow { stroke:#355c7d; stroke-width:3; fill:none; marker-end:url(#arrowhead); }
+    </style>
+    <marker
+       id="arrowhead"
+       markerWidth="10"
+       markerHeight="7"
+       refX="9"
+       refY="3.5"
+       orient="auto">
+      <polygon
+         points="10,3.5 0,7 0,0 "
+         fill="#355c7d"
+         id="polygon1" />
+    </marker>
+  </defs>
+  <rect
+     class="bg"
+     width="832.2973"
+     height="357.97296"
+     id="rect2-8"
+     style="fill:#f7f2ea;stroke-width:0.999997"
+     x="0"
+     y="0" />
+  <g
+     id="g14"
+     transform="translate(-44.985867,-17.356419)">
+    <rect
+       class="branch"
+       x="80"
+       y="160"
+       width="346.48602"
+       height="120"
+       id="rect2" />
+    <g
+       id="g12"
+       transform="translate(18.243011,4.9372559)">
+      <text
+         class="label"
+         x="235.09668"
+         y="192"
+         text-anchor="middle"
+         id="text3">Sphere branch</text>
+      <text
+         class="small"
+         x="234.87183"
+         y="212"
+         text-anchor="middle"
+         id="text4">Spherical-wave basis</text>
+      <text
+         class="small"
+         x="234.61182"
+         y="230"
+         text-anchor="middle"
+         id="text5">Projected boundary solve</text>
+      <text
+         class="small"
+         x="234.61182"
+         y="248"
+         text-anchor="middle"
+         id="text6">Explicit retained T-matrix blocks available</text>
+    </g>
+  </g>
+  <g
+     id="g15"
+     transform="translate(-44.985867,-17.535584)">
+    <rect
+       class="branch"
+       x="491.75677"
+       y="160"
+       width="346.48648"
+       height="120"
+       id="rect6" />
+    <g
+       id="g13"
+       transform="translate(-0.14282227,4.9372559)">
+      <text
+         class="label"
+         x="665"
+         y="192"
+         text-anchor="middle"
+         id="text7">Prolate spheroid branch</text>
+      <text
+         class="small"
+         x="665"
+         y="212"
+         text-anchor="middle"
+         id="text8">Prolate spheroidal coordinates</text>
+      <text
+         class="small"
+         x="665"
+         y="230"
+         text-anchor="middle"
+         id="text9">Scalar spheroidal modal / T-matrix-equivalent solve</text>
+      <text
+         class="small"
+         x="665"
+         y="248"
+         text-anchor="middle"
+         id="text10">Backscatter benchmarked against PSMS</text>
+    </g>
+  </g>
+  <path
+     class="arrow"
+     d="m 414.13578,82.643581 -204.76871,19.350709 -0.55979,25.45379"
+     id="path10"
+     style="stroke:#1f4e79;stroke-opacity:1;marker-end:url(#RoundedArrow)"
+     sodipodi:nodetypes="ccc" />
+  <g
+     id="g18"
+     transform="translate(-42.31419,-17.356419)">
+    <rect
+       class="note"
+       x="54.256763"
+       y="294"
+       width="807.7027"
+       height="70"
+       id="rect11" />
+    <g
+       id="g17"
+       transform="translate(0,-27.132813)">
+      <text
+         class="small"
+         x="457.81516"
+         y="348"
+         text-anchor="middle"
+         id="text11">Both branches are currently single-target, monostatic formulations.</text>
+      <text
+         class="small"
+         x="457.81516"
+         y="372"
+         text-anchor="middle"
+         id="text12">Multiple-scatterer and orientation-averaged T-matrix workflows are future extensions, not part of the present model.</text>
+    </g>
+  </g>
+  <path
+     class="arrow"
+     d="m 414.13578,82.643581 205.82524,18.196659 0.2321,26.16217"
+     id="path15"
+     style="stroke:#1f4e79;stroke-opacity:1;marker-end:url(#RoundedArrow)"
+     sodipodi:nodetypes="ccc" />
+  <g
+     id="g16"
+     transform="translate(-42.31419,-17.356419)">
+    <rect
+       class="box"
+       x="260.5004"
+       y="30"
+       width="391.89911"
+       height="70"
+       id="rect1" />
+    <text
+       class="label"
+       x="456.74878"
+       y="58"
+       text-anchor="middle"
+       id="text1">Single-target TMM</text>
+    <text
+       class="small"
+       x="456.07642"
+       y="82"
+       text-anchor="middle"
+       id="text2">Incident coefficients → T blocks → scattered coefficients</text>
+  </g>
+</svg>

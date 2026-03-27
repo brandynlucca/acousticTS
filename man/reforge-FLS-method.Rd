@@ -6,10 +6,10 @@
 \usage{
 \S4method{reforge}{FLS}(
   object,
-  length,
-  radius,
+  length = NULL,
+  radius = NULL,
   length_radius_ratio_constant = TRUE,
-  n_segments
+  n_segments = NULL
 )
 }
 \arguments{
@@ -27,3 +27,4 @@ length}
 \description{
 Reforge FLS-class object.
 }
+\keyword{internal}

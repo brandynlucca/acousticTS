@@ -1,5 +1,6 @@
+library(acousticTS)
+
 test_that("Data objects can be loaded and are of expected class types", {
-  library(acousticTS)
 
   # Test that data objects exist and can be loaded
   data(krill, package = "acousticTS")
@@ -25,7 +26,6 @@ test_that("Data objects can be loaded and are of expected class types", {
 })
 
 test_that("Data objects have proper structure", {
-  library(acousticTS)
 
   # Load data objects
   data(krill, package = "acousticTS")
@@ -62,7 +62,6 @@ test_that("Data objects have proper structure", {
 })
 
 test_that("Data objects have valid metadata", {
-  library(acousticTS)
 
   # Load data objects
   data(krill, package = "acousticTS")
@@ -81,7 +80,6 @@ test_that("Data objects have valid metadata", {
 })
 
 test_that("Data objects can be used with generic methods", {
-  library(acousticTS)
 
   # Suppression helper functions
   suppressAllOutput <- function(expr) {

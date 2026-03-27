@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" role="img" aria-labelledby="title desc">
+  <title id="title">PSMS overlap projection</title>
+  <desc id="desc">Schematic showing projection of exterior spheroidal angular modes onto an interior basis with a different reduced frequency in the fluid-filled PSMS system.</desc>
+  <defs>
+    <style>
+      .bg { fill: #faf7f1; }
+      .panel { fill: #fffdf8; stroke: #2e362f; stroke-width: 2; rx: 16; }
+      .curve0 { fill: none; stroke: #155e63; stroke-width: 3.5; }
+      .curve1 { fill: none; stroke: #8b5e34; stroke-width: 3.5; }
+      .guide { stroke: #6f776d; stroke-width: 2; stroke-dasharray: 5 5; }
+      .arrow { stroke: #2e362f; stroke-width: 2.5; fill: none; marker-end: url(#m); }
+      .heading { font: 700 20px Georgia, "Times New Roman", serif; fill: #1c231e; }
+      .label { font: 17px Georgia, "Times New Roman", serif; fill: #1c231e; }
+      .math { font: italic 19px Georgia, "Times New Roman", serif; fill: #0d4850; }
+    </style>
+    <marker id="m" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#2e362f"/>
+    </marker>
+  </defs>
+  <rect class="bg" x="0" y="0" width="960" height="360"/>
+
+  <rect class="panel" x="26" y="30" width="280" height="300" rx="16"/>
+  <text class="heading" x="166" y="60" text-anchor="middle">Exterior basis</text>
+  <line class="guide" x1="72" y1="222" x2="258" y2="222"/>
+  <path class="curve0" d="M72 222 C112 118, 150 118, 190 222 C214 286, 236 286, 258 222"/>
+  <path class="curve0" d="M72 222 C110 180, 144 148, 176 222 C206 294, 232 170, 258 222" opacity="0.45"/>
+  <text class="math" x="166" y="274" text-anchor="middle">S<tspan baseline-shift="sub" font-size="15">mn</tspan><tspan font-style="normal">(</tspan>h<tspan baseline-shift="sub" font-size="15">0</tspan><tspan font-style="normal">, &#951;)</tspan></text>
+  <text class="label" x="166" y="302" text-anchor="middle">Natural for exterior reduced frequency</text>
+
+  <rect class="panel" x="340" y="30" width="280" height="300" rx="16"/>
+  <text class="heading" x="480" y="60" text-anchor="middle">Projection step</text>
+  <line class="guide" x1="388" y1="222" x2="572" y2="222"/>
+  <path class="curve0" d="M388 222 C428 118, 466 118, 506 222 C530 286, 550 286, 572 222"/>
+  <path class="curve1" d="M388 222 C420 168, 460 148, 502 222 C534 278, 552 250, 572 222"/>
+  <text class="math" x="480" y="118" text-anchor="middle">&#945;<tspan baseline-shift="sub" font-size="15">n&#8467;</tspan><tspan baseline-shift="sub" font-size="15">m</tspan></text>
+  <text class="label" x="480" y="274" text-anchor="middle">Mixed overlap on -1 &#8804; &#951; &#8804; 1</text>
+  <text class="label" x="480" y="302" text-anchor="middle">Different bases meet on the same boundary</text>
+
+  <rect class="panel" x="654" y="30" width="280" height="300" rx="16"/>
+  <text class="heading" x="794" y="60" text-anchor="middle">Interior basis</text>
+  <line class="guide" x1="700" y1="222" x2="886" y2="222"/>
+  <path class="curve1" d="M700 222 C732 168, 772 148, 814 222 C846 278, 864 250, 886 222"/>
+  <path class="curve1" d="M700 222 C736 124, 776 202, 818 222 C846 236, 866 182, 886 222" opacity="0.45"/>
+  <text class="math" x="794" y="274" text-anchor="middle">S<tspan baseline-shift="sub" font-size="15">m&#8467;</tspan><tspan font-style="normal">(</tspan>h<tspan baseline-shift="sub" font-size="15">1</tspan><tspan font-style="normal">, &#951;)</tspan></text>
+  <text class="label" x="794" y="302" text-anchor="middle">Natural for interior reduced frequency</text>
+
+  <path class="arrow" d="M306 180 C320 180, 324 180, 338 180"/>
+  <path class="arrow" d="M620 180 C634 180, 638 180, 652 180"/>
+</svg>

@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 923.44452 272.10818"
+   role="img"
+   aria-labelledby="title desc"
+   version="1.1"
+   id="svg11"
+   sodipodi:docname="dwba-volume-to-line-clean.svg"
+   width="923.44452"
+   height="272.10818"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview11"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1.2814507"
+     inkscape:cx="476.02301"
+     inkscape:cy="218.11218"
+     inkscape:window-width="1920"
+     inkscape:window-height="1057"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg11" />
+  <title
+     id="title">DWBA volume to line reduction</title>
+  <desc
+     id="desc">Diagram showing the reduction of the weak-scattering
+    volume integral to a centerline integral with the local cross-sectional
+    response folded into each segment.</desc>
+  <style
+     id="style1">
+    .bg { fill: #fcfbf5; }
+    .head { font: 700 28px Georgia, serif; fill: #1f3345; }
+    .body { font: 18px Georgia, serif; fill: #1f3345; }
+    .small { font: 15px Georgia, serif; fill: #42576a; }
+    .math { font-style: italic; }
+    .sub { font-size: 75%; baseline-shift: sub; }
+    .shape { fill: #dcecea; stroke: #3c7f80; stroke-width: 2.5; }
+    .lineform { stroke: #0f5c5c; stroke-width: 8; fill: none; stroke-linecap: round; }
+    .box { fill: #fffdfa; stroke: #7b8f9c; stroke-width: 2; rx: 16; ry: 16; }
+    .arrow { stroke: #1f3345; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+  </style>
+  <defs
+     id="defs1">
+    <marker
+       id="arrow"
+       markerWidth="10"
+       markerHeight="10"
+       refX="8"
+       refY="5"
+       orient="auto">
+      <path
+         d="M 0,0 10,5 0,10 Z"
+         fill="#1f3345"
+         id="path1" />
+    </marker>
+  </defs>
+  <rect
+     class="bg"
+     width="923.44452"
+     height="272.10818"
+     id="rect1"
+     x="0"
+     y="0"
+     style="stroke-width:1" />
+  <text
+     x="33.867767"
+     y="41.219635"
+     class="head"
+     id="text1"
+     style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:28px;line-height:normal;font-family:Georgia, serif"><tspan
+       sodipodi:role="line"
+       id="tspan29"
+       x="33.867767"
+       y="41.219635">Converting the volume integral into a 1D centerline integral</tspan></text>
+  <g
+     id="g30"
+     transform="translate(51.525736,-0.78036559)">
+    <rect
+       x="59.168041"
+       y="84"
+       width="259.22467"
+       height="170.64062"
+       class="box"
+       id="rect2" />
+    <text
+       x="110.4585"
+       y="102"
+       class="body"
+       id="text2"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;line-height:normal;font-family:Georgia, serif">Volume description</text>
+    <ellipse
+       cx="188"
+       cy="162"
+       rx="117.85272"
+       ry="48"
+       class="shape"
+       id="ellipse2" />
+    <path
+       d="m 74,166.45749 c 42,-38 104,-40 152,0 36,28 64,26 76,0"
+       class="lineform"
+       id="path2" />
+    <g
+       id="g11"
+       transform="translate(-4.3713379)">
+      <text
+         x="78"
+         y="228"
+         class="small"
+         id="text3"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;line-height:normal;font-family:Georgia, serif">Each interior point carries γ(<tspan
+   class="math"
+   id="tspan2">r</tspan>)</text>
+      <text
+         x="78"
+         y="244"
+         class="small"
+         id="text5"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;line-height:normal;font-family:Georgia, serif;fill:#42576a">and the phase factor exp(2ik<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan11">2</tspan>·<tspan
+   style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   id="tspan12">r</tspan>).</text>
+    </g>
+    <line
+       x1="319.39273"
+       y1="169.32033"
+       x2="494.43591"
+       y2="169.32033"
+       class="arrow"
+       id="line5" />
+    <text
+       x="398.80786"
+       y="141.02831"
+       class="body"
+       id="text6"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;line-height:0.9;font-family:Georgia, serif;text-align:center;text-anchor:middle"><tspan
+         sodipodi:role="line"
+         id="tspan13"
+         x="398.80786"
+         y="141.02831"
+         style="line-height:0.9">Integrate over each</tspan><tspan
+         sodipodi:role="line"
+         id="tspan14"
+         x="398.80786"
+         y="157.2283"
+         style="line-height:0.9">circular section</tspan></text>
+    <text
+       x="371.84741"
+       y="187.51352"
+       class="small"
+       id="text7"
+       style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;line-height:normal;font-family:Sans;-inkscape-font-specification:'Sans, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#42576a"><tspan
+         sodipodi:role="line"
+         id="tspan19"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+         x="371.84741"
+         y="187.51352">d<tspan
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   id="tspan20">V to</tspan> d<tspan
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   id="tspan21">s</tspan></tspan></text>
+    <rect
+       x="502"
+       y="76.679497"
+       width="259.22501"
+       height="170.64101"
+       class="box"
+       id="rect7" />
+    <text
+       x="532.45868"
+       y="102"
+       class="body"
+       id="text8"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;line-height:normal;font-family:Georgia, serif">Line-integral description</text>
+    <text
+       x="653.71173"
+       y="148.40991"
+       class="body"
+       id="text9"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;line-height:normal;font-family:Georgia, serif;fill:#bb4d00;fill-opacity:1">Segment <tspan
+   style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   id="tspan15">j</tspan></text>
+    <text
+       x="506.99457"
+       y="201.44144"
+       class="small"
+       id="text10"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;line-height:normal;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#42576a"><tspan
+         sodipodi:role="line"
+         id="tspan25"
+         x="506.99457"
+         y="201.44144">Each segment keeps its local contrast,</tspan><tspan
+         sodipodi:role="line"
+         id="tspan26"
+         x="506.99457"
+         y="220.19144">phase, radius, and Bessel</tspan><tspan
+         sodipodi:role="line"
+         id="tspan27"
+         x="506.99457"
+         y="238.94144">cross-sectional factor.</tspan></text>
+    <path
+       d="m 517.6125,166.45749 c 42,-38 104,-40 152,0 36,28 64,26 76,0"
+       class="lineform"
+       id="path14" />
+    <circle
+       cx="641.72052"
+       cy="148.14977"
+       r="7"
+       fill="#bb4d00"
+       id="circle8" />
+  </g>
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;line-height:0.9;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;writing-mode:vertical-lr;direction:rtl;fill:#bb4d00;fill-opacity:1;stroke:#79838b;stroke-width:4;stroke-linejoin:round;stroke-dasharray:1.8981, 7.5924"
+     x="515.34155"
+     y="270.0065"
+     id="text22"><tspan
+       sodipodi:role="line"
+       id="tspan22"
+       x="515.34155"
+       y="270.0065"> </tspan></text>
+</svg>

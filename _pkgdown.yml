@@ -1,80 +1,348 @@
 url: https://brandynlucca.github.io/acousticTS/
+
 template:
   bootstrap: 5
-  math-rendering: mathjax
+  math-rendering: katex
+  assets:
+    - pkgdown/extra.css
+
+navbar:
+  structure:
+    left: [intro, physics, build, run, library, bibliography, developers, reference, news]
+    right: [github]
+  components:
+    intro:
+      text: Getting Started
+      menu:
+        - text: "Quick Start"
+          href: articles/getting-started/getting-started.html
+        - text: "Package Concepts"
+          href: articles/package-concepts/package-concepts.html
+        - text: "Example Data"
+          href: articles/example-data/example-data.html
+    physics:
+      text: Physics Primer
+      menu:
+        - text: "Acoustic scattering primer"
+          href: articles/acoustic-scattering-primer/acoustic-scattering-primer.html
+        - text: "Notation and symbols"
+          href: articles/notation-and-symbols/notation-and-symbols.html
+        - text: "Boundary conditions"
+          href: articles/boundary_conditions.html
+        - text: "Material properties"
+          href: articles/material-properties/material-properties.html
+        - text: "Numerical methods"
+          href: articles/numerical-foundations/numerical-foundations.html
+    build:
+      text: Build Targets
+      menu:
+        - text: "Building Shapes"
+          href: articles/building-shapes/building-shapes.html
+        - text: "Building Scatterers"
+          href: articles/building-scatterers/building-scatterers.html
+        - text: "Shape Manipulation"
+          href: articles/shape-manipulation-reforging/shape-manipulation-reforging.html
+    run:
+      text: Run Models
+      menu:
+        - text: "Running Models"
+          href: articles/running-models/running-models.html
+        - text: "Choosing a Model"
+          href: articles/model-selection/model-selection.html
+        - text: "Comparing Models"
+          href: articles/comparing-models/comparing-models.html
+        - text: "Visualizing results"
+          href: articles/plotting-inspecting-results/plotting-inspecting-results.html
+        - text: "Simulation sweeps"
+          href: articles/simulation-parameter-sweeps/simulation-parameter-sweeps.html
+        - text: "Calibration workflow"
+          href: articles/calibration-workflow/calibration-workflow.html
+        - text: "Validating models"
+          href: articles/validation-benchmarks/validation-benchmarks.html
+    library:
+      text: Model Library
+      href: articles/model-library/model-library.html
+    bibliography:
+      text: Bibliography
+      href: articles/bibliography/bibliography.html
+    developers:
+      text: Developers
+      menu:
+        - text: "Creating models"
+          href: articles/creating-models-from-scratch/creating-models-from-scratch.html
+        - text: "Combining components"
+          href: articles/combining-components/combining-components.html
+        - text: "Troubleshooting"
+          href: articles/faq-troubleshooting/faq-troubleshooting.html
+
+    reference:
+      text: Reference
+      href: reference/index.html
+    github:
+      icon: fab fa-github
+      aria-label: GitHub repository
+      href: https://github.com/brandynlucca/acousticTS/
+
+articles:
+  - title: Getting Started
+    contents:
+      - getting-started/getting-started
+      - package-concepts/package-concepts
+      - example-data/example-data
+
+  - title: Build Targets
+    contents:
+      - building-shapes/building-shapes
+      - building-scatterers/building-scatterers
+      - shape-manipulation-reforging/shape-manipulation-reforging
+
+  - title: Acoustic Physics Primer
+    contents:
+      - acoustic-scattering-primer/acoustic-scattering-primer
+      - notation-and-symbols/notation-and-symbols
+      - boundary_conditions
+      - material-properties/material-properties
+      - numerical-foundations/numerical-foundations
+
+  - title: Run Models
+    contents:
+      - running-models/running-models
+      - model-selection/model-selection
+      - comparing-models/comparing-models
+      - plotting-inspecting-results/plotting-inspecting-results
+      - simulation-parameter-sweeps/simulation-parameter-sweeps
+      - calibration-workflow/calibration-workflow
+      - validation-benchmarks/validation-benchmarks
+
+  - title: Bibliography
+    contents:
+      - bibliography/bibliography
+
+  - title: Model Library
+    contents:
+      - model-library/model-library
+
+  - title: Exact, Modal-Series, and T-Matrix Families
+    contents:
+      - sphms/index
+      - sphms/sphms-implementation
+      - sphms/sphms-theory
+      - fcms/index
+      - fcms/fcms-implementation
+      - fcms/fcms-theory
+      - psms/index
+      - psms/psms-implementation
+      - psms/psms-theory
+      - tmm/index
+      - tmm/tmm-implementation
+      - tmm/tmm-theory
+      - calibration/index
+      - calibration/calibration-implementation
+      - calibration/calibration-theory
+      - essms/index
+      - essms/essms-implementation
+      - essms/essms-theory
+      - bcms/index
+      - bcms/bcms-implementation
+      - bcms/bcms-theory
+      - ecms/index
+      - ecms/ecms-implementation
+      - ecms/ecms-theory
+
+  - title: Approximation and Composite Families
+    contents:
+      - dwba/index
+      - dwba/dwba-implementation
+      - dwba/dwba-theory
+      - sdwba/index
+      - sdwba/sdwba-implementation
+      - sdwba/sdwba-theory
+      - krm/index
+      - krm/krm-implementation
+      - krm/krm-theory
+      - hpa/index
+      - hpa/hpa-implementation
+      - hpa/hpa-theory
+      - trcm/index
+      - trcm/trcm-implementation
+      - trcm/trcm-theory
+      - pcdwba/index
+      - pcdwba/pcdwba-implementation
+      - pcdwba/pcdwba-theory
+      - vesm/index
+      - vesm/vesm-implementation
+      - vesm/vesm-theory
+      - bbfm/index
+      - bbfm/bbfm-implementation
+      - bbfm/bbfm-theory
+
+  - title: Developer Guides
+    contents:
+      - creating-models-from-scratch/creating-models-from-scratch
+      - combining-components/combining-components
+      - faq-troubleshooting/faq-troubleshooting
 
 reference:
-- title: Scatterer types
+  - title: Core Workflows
 
-- subtitle: Scatterer classes
-  desc: >
-    General scattering classes that dictate expected parameters and compatibility with different classes of 
-    scattering models.
-  contents:
-  - Scatterer
-  - has_keyword("scatterer_type")
+  - subtitle: Running and simulating models
+    desc: >
+      Primary package entry points for deterministic target-strength modeling
+      and repeated simulation workflows.
+    contents:
+      - target_strength
+      - simulate_ts
 
-- subtitle: Scatterer generation
-  desc: >
-    Functions that generate each of the supported scatterering classes.
-  contents:
-  - has_keyword("scatterer_type_generation")
+  - subtitle: Inspection, plotting, and reshaping
+    desc: >
+      Helpers for pulling components out of package objects, visualizing stored
+      results, and modifying geometry after construction.
+    contents:
+      - extract
+      - plot.Scatterer
+      - reforge
+      - brake
 
-- title: Scatterer shapes
+  - subtitle: Bundled benchmark and example data
+    desc: >
+      Built-in objects used throughout the package examples, validation
+      workflows, and benchmark reproductions.
+    contents:
+      - benchmark_ts
+      - cod
+      - krill
+      - sardine
 
-- subtitle: Shape classes
-  desc: >
-    Generic shape classes used by various functions that provide the appropriate information for plotting, 
-    model parameterization, and other features.
-  contents:
-  - Shape
-  - has_keyword("shapes")
+  - title: T-Matrix Post-Processing
 
-- subtitle: Shape generation
-  desc: >
-    Generator functions for producing arbitrary or canonical shapes.
-  contents:
-  - create_shape
-  - has_keyword("shape_generation")
+  - subtitle: Stored-state scattering products
+    desc: >
+      Post-processing helpers that reuse stored T-matrix state for angular
+      scattering, orientation averaging, diagnostics, and higher-level summary
+      products.
+    contents:
+      - tmm_scattering
+      - tmm_scattering_grid
+      - tmm_average_orientation
+      - tmm_orientation_distribution
+      - tmm_bistatic_summary
+      - tmm_diagnostics
+      - tmm_products
 
-- title: Scattering properties
-  desc: >
-    Functions used for computing different scattering properties (e.g. contrasts, impedances, coefficients) used 
-    in various scattering models.
+  - title: Scatterer Types
 
-- subtitle: Elastic moduli for homogoneous isotropic materials
-  contents:
-  - has_keyword("elastic")
+  - subtitle: Scatterer classes
+    desc: >
+      General scattering classes that dictate expected parameters and model
+      compatibility.
+    contents:
+      - Scatterer
+      - CSC
+      - ELA
+      - BBF
+      - CAL
+      - ESS
+      - GAS
+      - FLS
+      - SBF
 
-- title: Mathematical functions
-  desc: >
-    Mathematical functions used throughout the `acousticTS` package.
+  - subtitle: Scatterer generation
+    desc: >
+      Constructors for the supported scatterer classes.
+    contents:
+      - cal_generate
+      - ess_generate
+      - fls_generate
+      - gas_generate
+      - sbf_generate
+      - bbf_generate
 
-- subtitle: Bessel functions
-  contents:
-  - has_keyword("bessel1")
-  - has_keyword("bessel2")
-  - has_keyword("bessel3")
+  - title: Scatterer Geometry
 
-- subtitle: Legendre functions
-  contents:
-  - has_keyword("legendre")
+  - subtitle: Shape classes
+    desc: >
+      Canonical and arbitrary shape classes used throughout the package.
+    contents:
+      - Shape
+      - Arbitrary
+      - Cylinder
+      - PolynomialCylinder
+      - OblateSpheroid
+      - ProlateSpheroid
+      - Sphere
 
-- subtitle: Vector operations
-  contents:
-  - vecnorm
+  - subtitle: Shape generation
+    desc: >
+      Shape constructors, canonicalization helpers, and the convenience wrapper
+      for canonical geometry.
+    contents:
+      - canonicalize_shape
+      - create_shape
+      - arbitrary
+      - cylinder
+      - polynomial_cylinder
+      - oblate_spheroid
+      - prolate_spheroid
+      - sphere
 
-- title: Conversion functions
+  - title: Acoustic and Elastic Utilities
+    desc: >
+      Utility functions for basic acoustic quantities, contrasts, and elastic
+      material-property conversions.
 
-- subtitle: Acoustics
-  contents:
-  - linear
+  - subtitle: Acoustic quantities and coefficients
+    contents:
+      - boundary_conditions
+      - wavenumber
+      - linear
+      - transmission_coefficient
+      - compressibility
+      - rho
 
-- subtitle: Trigonometry
-  contents:
-  - degrees
-  - radians
+  - subtitle: Elastic moduli for homogeneous isotropic materials
+    contents:
+      - pois
+      - bulk
+      - young
+      - shear
+      - lame
 
-- title: internal
-  contents:
-  - lacks_concepts("null_concept")
+  - title: Mathematical Functions
+    desc: >
+      Special functions and numerical helpers used throughout the package.
+
+  - subtitle: Summation, quadrature, and vector helpers
+    contents:
+      - along_sum
+      - gauss_legendre
+      - neumann
+      - vecnorm
+
+  - subtitle: Bessel functions (cylindrical)
+    contents:
+      - jc
+      - yc
+      - hc
+
+  - subtitle: Bessel functions (spherical)
+    contents:
+      - js
+      - ys
+      - hs
+
+  - subtitle: Legendre functions
+    contents:
+      - Pn
+      - Pndk
+      - Qn
+      - Qndk
+
+  - subtitle: Spheroidal wave functions
+    contents:
+      - Smn
+      - Rmn
+
+  - subtitle: Angle conversion
+    contents:
+      - degrees
+      - radians

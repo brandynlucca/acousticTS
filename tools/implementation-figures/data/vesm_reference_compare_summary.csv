@@ -1,0 +1,2 @@
+"comparison","n_frequency","frequency_min_kHz","frequency_max_kHz","max_abs_delta_TS_dB","mean_abs_delta_TS_dB","frequency_at_max_delta_kHz","elapsed_acousticts_s","elapsed_original_s"
+"acousticTS vs original VESM",150,1,150,0.057198142033549,0.0088552580259469,60,0.05,1.096179

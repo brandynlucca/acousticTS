@@ -4,8 +4,13 @@
 \alias{polynomial_cylinder}
 \title{Creates a polynomial deformed cylinder}
 \usage{
-polynomial_cylinder(length_body, radius_body, n_segments, polynomial,
-length_units)
+polynomial_cylinder(
+  length_body,
+  radius_body,
+  n_segments = 100,
+  polynomial,
+  length_units = "m"
+)
 }
 \arguments{
 \item{length_body}{Length (m).}

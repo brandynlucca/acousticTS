@@ -15,15 +15,7 @@ create_shape(shape, ...)
 functions.}
 }
 \value{
-Chu, D., Foote, K.G., and Stanton, T.K. 1993. Further analysis of target
-strength measurements of Antarctic krill at 38 and 120 kHz: Comparison and
-deformed cylinder model and inference of orientation distribution. The
-Journal of the Acoustical Society of America, 93(5): 2985-2988.
-https://doi.org/10.1121/1.405818
-
-Smith, J.N., Ressler, P.H., and Warren, J.D. 2013. A distorted wave Born
-approximation target strength model for Bering Sea euphausiids. ICES Journal
-of Marine Science, 70(1): 204-214. https://doi.org/10.1093/icesjms/fss140
+A \code{\link{Shape}} object.
 }
 \description{
 A wrapper function that automatically creates generalized and/or canonical
@@ -41,6 +33,9 @@ generate the desired shape for TS modeling. Options currently include:
 \tab \emph{Polynomial cylinder} \tab "polynomial_cylinder" \tab
 \tab length, radius, polynomial \tab
 \code{\link[=polynomial_cylinder]{polynomial_cylinder(...)}}\cr
+\tab \emph{Oblate spheroid} \tab "oblate_spheroid" \tab
+\tab length, radius \tab
+\code{\link[=oblate_spheroid]{oblate_spheroid(...)}}\cr
 \tab \emph{Prolate spheroid} \tab "prolate_spheroid" \tab
 \tab length, radius \tab
 \code{\link[=prolate_spheroid]{prolate_spheroid(...)}}\cr
@@ -68,5 +63,18 @@ function, it has a default setting that uses the sixth-degree polynomial
 coefficients reported by Smith \emph{et al.} (2013).
 }
 }
+}
+\examples{
+create_shape("sphere", radius_body = 0.01)
+create_shape(
+  "prolate_spheroid", length_body = 0.04, radius_body = 0.004
+)
+create_shape(
+  "oblate_spheroid", length_body = 0.012, radius_body = 0.01
+)
+create_shape(
+  "cylinder", length_body = 0.05, radius_body = 0.003
+)
+
 }
 \keyword{shape_generation}

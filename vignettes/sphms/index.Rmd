@@ -1,0 +1,64 @@
+---
+title: "SPHMS"
+output:
+  rmarkdown::html_vignette:
+    toc: false
+    number_sections: false
+    fig_caption: yes
+vignette: >
+  %\VignetteIndexEntry{SPHMS}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+# Overview
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  family = "sphms",
+  pages = c(
+    Overview = "index.html",
+    Implementation = "sphms-implementation.html",
+    Theory = "sphms-theory.html"
+  )
+)
+```
+
+```{r sphms_overview, echo=FALSE, results='asis'}
+acousticTS:::.model_family_overview(
+  family = "sphms",
+  summary = paste(
+    "The spherical modal series solution (`SPHMS`) is the package's exact",
+    "canonical solution for unshelled homogeneous spheres in an exterior",
+    "fluid. Because the Helmholtz equation separates exactly in spherical",
+    "coordinates, each angular order remains algebraically local after the",
+    "boundary conditions are imposed."
+  ),
+  core_idea = paste(
+    "Represent the incident, scattered, and interior fields in spherical",
+    "partial waves, enforce the chosen boundary condition at the spherical",
+    "interface, and sum the retained orders into the far-field backscatter.",
+    "`SPHMS` is the natural spherical benchmark for the rest of the package."
+  ),
+  best_for = c(
+    "Rigid, pressure-release, liquid-filled, and gas-filled spheres",
+    "Canonical benchmark comparisons and sanity checks",
+    "Problems where exact spherical geometry is a reasonable physical idealization"
+  ),
+  supports = c(
+    "`Sphere` shapes on `FLS` or `GAS` objects",
+    "Medium-indexed spherical theory with medium `1` as seawater and medium `2` as the sphere interior",
+    "Direct target-strength calculations from exact spherical coefficients"
+  ),
+  assumptions = c(
+    "Perfectly spherical interface",
+    "Homogeneous material properties in each region",
+    "Linear, time-harmonic acoustics",
+    "No elastic shell or viscous intermediate layer"
+  ),
+  reading = c(
+    "[Implementation](sphms-implementation.html): object construction, spectra, and software comparisons",
+    "[Theory](sphms-theory.html): full spherical separation, boundary conditions, and coefficient derivations"
+  )
+)
+```
+

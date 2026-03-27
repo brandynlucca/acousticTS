@@ -1,0 +1,782 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="883.05896"
+   height="517.16046"
+   viewBox="0 0 883.05896 517.16045"
+   version="1.1"
+   id="svg14"
+   sodipodi:docname="building-scatterers-map.svg"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview14"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.80145455"
+     inkscape:cx="288.84982"
+     inkscape:cy="223.96778"
+     inkscape:window-width="1920"
+     inkscape:window-height="1057"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg14" />
+  <rect
+     width="883.05896"
+     height="517.16046"
+     fill="#fbfaf5"
+     id="rect1"
+     x="0"
+     y="0"
+     style="stroke-width:0.999998" />
+  <path
+     d="m 541.484,208.81055 h 122.32745 l -0.56215,56.83638"
+     class="line"
+     id="path4"
+     sodipodi:nodetypes="ccc"
+     style="fill:none;stroke:#203040;stroke-width:4;stroke-dasharray:none;marker-end:url(#arrow-9)" />
+  <defs
+     id="defs1">
+    <marker
+       markerWidth="0.52499998"
+       markerHeight="0.99999994"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       id="CapTriangle"
+       viewBox="0 0 0.525 1"
+       inkscape:stockid="Triangle cap"
+       style="overflow:visible"
+       preserveAspectRatio="xMidYMid"
+       inkscape:isstock="true"
+       inkscape:collect="always">
+      <path
+         style="fill:context-stroke;stroke-linecap:butt"
+         d="M 0,-1 1,0 0,1 -0.05,0 Z"
+         sodipodi:nodetypes="sssssscsss"
+         transform="scale(0.5)"
+         id="path61" />
+    </marker>
+    <linearGradient
+       id="linearGradient59"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#7a6a2a;stop-opacity:1;"
+         offset="0"
+         id="stop60" />
+      <stop
+         style="stop-color:#a35d24;stop-opacity:1;"
+         offset="1"
+         id="stop59" />
+    </linearGradient>
+    <marker
+       style="overflow:visible"
+       id="Triangle"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Triangle arrow"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path135" />
+    </marker>
+    <marker
+       id="arrow"
+       markerWidth="12"
+       markerHeight="12"
+       refX="10"
+       refY="6"
+       orient="auto-start-reverse"
+       viewBox="0 0 12 12"
+       preserveAspectRatio="xMidYMid">
+      <path
+         d="M 0,0 12,6 0,12 Z"
+         fill="#203040"
+         id="path1" />
+    </marker>
+    <marker
+       id="arrow-9"
+       markerWidth="12"
+       markerHeight="12"
+       refX="10"
+       refY="6"
+       orient="auto">
+      <path
+         d="M 0,0 12,6 0,12 Z"
+         fill="#203040"
+         id="path1-4" />
+    </marker>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient59"
+       id="linearGradient60"
+       x1="227.77541"
+       y1="482.22931"
+       x2="689.24524"
+       y2="482.22931"
+       gradientUnits="userSpaceOnUse"
+       spreadMethod="reflect" />
+  </defs>
+  <text
+     x="167.51988"
+     y="29.216518"
+     font-family="Georgia, serif"
+     font-size="28px"
+     fill="#203040"
+     id="text1">From geometry to physical target type</text>
+  <g
+     id="g37"
+     transform="translate(-40.358227,-25.455934)">
+    <rect
+       x="52"
+       y="96"
+       width="199.799"
+       height="55.937553"
+       rx="16"
+       fill="#d4e7e7"
+       stroke="#0f5c5c"
+       stroke-width="4"
+       id="rect2"
+       style="stroke:#0f5c54"
+       ry="16" />
+    <g
+       id="g36"
+       transform="translate(0.10421371,1.8646317)">
+      <text
+         x="87.576538"
+         y="120.68629"
+         font-family="Georgia, serif"
+         font-size="24px"
+         fill="#203040"
+         id="text2">Shape input</text>
+      <text
+         x="59.95837"
+         y="141.37259"
+         font-family="Georgia, serif"
+         font-size="18px"
+         fill="#203040"
+         id="text3">Canonical or measured</text>
+    </g>
+  </g>
+  <line
+     x1="213.44078"
+     y1="98.51284"
+     x2="288.20609"
+     y2="98.51284"
+     stroke="#203040"
+     stroke-width="4"
+     marker-end="url(#arrow)"
+     id="line3" />
+  <rect
+     x="25.13876"
+     y="294.58197"
+     width="412.85699"
+     height="208.95015"
+     fill="#f8f3e7"
+     stroke="#b9ab83"
+     stroke-width="2.99998"
+     id="rect3"
+     ry="20.000002"
+     rx="20.000002" />
+  <a
+     id="a26"
+     href="../../reference/FLS-class.html"
+     target="_top"
+     transform="translate(-292.84463,224.85937)">
+    <g
+       id="g25"
+       transform="translate(-4.963964)">
+      <a
+         id="a14"
+         href="../../reference/FLS-class.html"
+         target="_top"
+         transform="matrix(1.1576798,0,0,0.77059202,-73.349432,-0.606821)"
+         style="stroke-width:1.05875">
+        <rect
+           x="360"
+           y="108"
+           width="146"
+           height="70"
+           rx="12.093154"
+           fill="#eef0de"
+           stroke="#7a6a2a"
+           stroke-width="3.17625"
+           id="rect4"
+           ry="18.16785" />
+      </a>
+      <g
+         id="g24"
+         transform="translate(23.157916)">
+        <text
+           x="385.33539"
+           y="104.91892"
+           font-family="Georgia, serif"
+           font-size="22px"
+           fill="#203040"
+           id="text4"
+           style="font-size:22px;font-family:Georgia, serif;fill:#203040"><tspan
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22px;font-family:'Courier New';-inkscape-font-specification:'Courier New, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+             id="tspan15">FLS</tspan></text>
+        <text
+           x="350.66254"
+           y="123.07658"
+           font-family="Georgia, serif"
+           font-size="16px"
+           fill="#203040"
+           id="text5">Fluid-like body</text>
+      </g>
+    </g>
+  </a>
+  <a
+     id="a27"
+     href="../../GAS-class.html"
+     target="_top"
+     transform="translate(-469.77247,287.76358)">
+    <g
+       id="g23"
+       transform="translate(20.538547)">
+      <rect
+         x="494.77475"
+         y="82.680809"
+         width="169.153"
+         height="53.813999"
+         rx="13.999999"
+         fill="#eef0de"
+         stroke="#7a6a2a"
+         stroke-width="3"
+         id="rect5"
+         ry="13.999999" />
+      <g
+         id="g22"
+         transform="translate(23.157494)">
+        <text
+           x="534.67719"
+           y="104.91892"
+           font-family="Georgia, serif"
+           font-size="22px"
+           fill="#203040"
+           id="text6"
+           style="font-size:22px;font-family:Georgia, serif;fill:#203040"><tspan
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22px;font-family:'Courier New';-inkscape-font-specification:'Courier New, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+             id="tspan17">GAS</tspan></text>
+        <text
+           x="508.42813"
+           y="124.68204"
+           font-family="Georgia, serif"
+           font-size="16px"
+           fill="#203040"
+           id="text7">Gas inclusion</text>
+      </g>
+    </g>
+  </a>
+  <a
+     id="a25"
+     href="../../reference/CAL-class.html"
+     target="_top"
+     transform="translate(-439.58411,295.99822)">
+    <g
+       id="g21"
+       transform="translate(37.036036)">
+      <rect
+         x="654.93243"
+         y="78.680809"
+         width="169.15315"
+         height="53.813999"
+         rx="14.000001"
+         fill="#eef0de"
+         stroke="#7a6a2a"
+         stroke-width="3"
+         id="rect7"
+         ry="14" />
+      <text
+         x="719.19019"
+         y="104.91892"
+         font-family="Georgia, serif"
+         font-size="22px"
+         fill="#203040"
+         id="text8"
+         style="font-size:22px;font-family:Georgia, serif;fill:#203040"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22px;font-family:'Courier New';-inkscape-font-specification:'Courier New, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+           id="tspan18">CAL</tspan></text>
+      <text
+         x="673.54712"
+         y="123.07657"
+         font-family="Georgia, serif"
+         font-size="16"
+         fill="#203040"
+         id="text9"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+           sodipodi:role="line"
+           id="tspan32"
+           x="673.54712"
+           y="123.07657">Calibration sphere</tspan></text>
+    </g>
+  </a>
+  <rect
+     x="451.9082"
+     y="292.30508"
+     width="412.85699"
+     height="208.95015"
+     fill="#f8f3e7"
+     stroke="#b9ab83"
+     stroke-width="2.99998"
+     id="rect47"
+     ry="20.000002"
+     rx="20.000002"
+     style="fill:#f2e7de;fill-opacity:1;stroke:#a35d24;stroke-opacity:1" />
+  <a
+     id="a29"
+     href="../../reference/GAS-class.html"
+     target="_top"
+     transform="translate(232.05891,223.77355)">
+    <g
+       id="g29">
+      <rect
+         x="446"
+         y="210"
+         width="169.698"
+         height="53.389"
+         rx="14"
+         fill="#f3dfcf"
+         stroke="#a35d24"
+         stroke-width="2.99999"
+         id="rect9"
+         ry="14" />
+      <text
+         x="510.15271"
+         y="234.46133"
+         font-family="Georgia, serif"
+         font-size="22px"
+         fill="#203040"
+         id="text10"
+         style="font-size:22px;font-family:Georgia, serif;fill:#203040"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22px;font-family:'Courier New';-inkscape-font-specification:'Courier New, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+           id="tspan20">ESS</tspan></text>
+      <text
+         x="488.48572"
+         y="251.58295"
+         font-family="Georgia, serif"
+         font-size="16px"
+         fill="#203040"
+         id="text11">Elastic shell</text>
+    </g>
+  </a>
+  <a
+     id="a30"
+     href="../../reference/SBF-class.html"
+     target="_top"
+     transform="translate(60.058905,97.752705)">
+    <g
+       id="g28">
+      <rect
+         x="618"
+         y="210"
+         width="169.698"
+         height="53.389011"
+         rx="14"
+         fill="#f3dfcf"
+         stroke="#a35d24"
+         stroke-width="2.99999"
+         id="rect11"
+         ry="13.999999" />
+      <g
+         id="g27"
+         transform="translate(2.8614502,-0.81640434)">
+        <text
+           x="680.13062"
+           y="234.46133"
+           font-family="Georgia, serif"
+           font-size="22px"
+           fill="#203040"
+           id="text12"
+           style="font-size:22px;font-family:Georgia, serif;fill:#203040"><tspan
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22px;font-family:'Courier New';-inkscape-font-specification:'Courier New, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+             id="tspan19">SBF</tspan></text>
+        <text
+           x="630.98462"
+           y="249.95013"
+           font-family="Georgia, serif"
+           font-size="16px"
+           fill="#203040"
+           id="text13"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+             sodipodi:role="line"
+             id="tspan31"
+             x="630.98462"
+             y="249.95013">Body plus inclusion</tspan></text>
+      </g>
+    </g>
+  </a>
+  <text
+     x="26.213726"
+     y="49.612652"
+     font-family="Georgia, serif"
+     font-size="18px"
+     fill="#203040"
+     id="text14"
+     style="font-size:18px;font-family:Georgia, serif;fill:#203040"><tspan
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;font-family:'Courier New';-inkscape-font-specification:'Courier New, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   id="tspan41">Scatterer</tspan> generators add contrasts, orientation, metadata, and model-ready parameter slots</text>
+  <a
+     id="a38"
+     href="../../reference/Scatterer-class.html"
+     target="_top"
+     transform="translate(-115.99799,106.00634)">
+    <g
+       id="g35"
+       transform="translate(-36.449829,-6)">
+      <rect
+         x="513.93182"
+         y="79.774765"
+         width="180"
+         height="58.058876"
+         rx="16"
+         fill="#d4e7e7"
+         stroke="#0f5c5c"
+         stroke-width="4"
+         id="rect33"
+         ry="16"
+         style="fill:#e8c46c;fill-opacity:1;stroke:#876616;stroke-opacity:1" />
+      <g
+         id="g34"
+         transform="translate(-0.28887939)">
+        <text
+           x="539"
+           y="103"
+           font-family="Georgia, serif"
+           font-size="24px"
+           fill="#203040"
+           id="text33"
+           style="font-size:24px;font-family:Georgia, serif;fill:#203040"><tspan
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24px;font-family:'Courier New';-inkscape-font-specification:'Courier New, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+             id="tspan33">Scatterer</tspan></text>
+        <text
+           x="552.11475"
+           y="125"
+           font-family="Georgia, serif"
+           font-size="18px"
+           fill="#203040"
+           id="text34"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+             sodipodi:role="line"
+             id="tspan34"
+             x="552.11475"
+             y="125">Generic class</tspan></text>
+      </g>
+    </g>
+  </a>
+  <g
+     id="g39"
+     transform="translate(-25.281452,5.9575243)">
+    <rect
+       x="603.16406"
+       y="269.3775"
+       width="169.698"
+       height="25.315044"
+       rx="14"
+       fill="#f3dfcf"
+       stroke="#a35d24"
+       stroke-width="2.99999"
+       id="rect38"
+       ry="14" />
+    <text
+       x="612.82556"
+       y="286.34753"
+       font-family="Georgia, serif"
+       font-size="16px"
+       fill="#203040"
+       id="text39"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+         sodipodi:role="line"
+         id="tspan39"
+         x="612.82556"
+         y="286.34753">Multi-layer geometry</tspan></text>
+  </g>
+  <g
+     id="g40"
+     transform="translate(-80.254797,171.28193)">
+    <rect
+       x="226.97305"
+       y="104.0531"
+       width="169.698"
+       height="25.315044"
+       rx="14"
+       fill="#f3dfcf"
+       stroke="#a35d24"
+       stroke-width="2.99999"
+       id="rect39"
+       ry="14"
+       style="fill:#eef0de;fill-opacity:1;stroke:#7a6a2a;stroke-opacity:1" />
+    <text
+       x="235.14236"
+       y="121.02312"
+       font-family="Georgia, serif"
+       font-size="16px"
+       fill="#203040"
+       id="text40"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+         sodipodi:role="line"
+         id="tspan40"
+         x="235.14236"
+         y="121.02312">Single layer geometry</tspan></text>
+  </g>
+  <rect
+     x="297.50027"
+     y="68.338371"
+     width="294.20288"
+     height="55.937553"
+     rx="16"
+     fill="#d4e7e7"
+     stroke="#0f5c5c"
+     stroke-width="4.00001"
+     id="rect6"
+     style="fill:#d5e7d4;fill-opacity:1;stroke:#4d8349;stroke-opacity:1"
+     ry="16" />
+  <g
+     id="g26"
+     transform="translate(-1.9637032,-84.815231)">
+    <text
+       x="363.29785"
+       y="177.89836"
+       font-family="Georgia, serif"
+       font-size="24px"
+       fill="#203040"
+       id="text15"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+         sodipodi:role="line"
+         id="tspan21"
+         x="363.29785"
+         y="177.89836">Generator layer</tspan></text>
+    <text
+       x="309.02979"
+       y="198.58467"
+       font-family="Georgia, serif"
+       font-size="18px"
+       fill="#203040"
+       id="text16"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+         sodipodi:role="line"
+         id="tspan22"
+         x="309.02979"
+         y="198.58467">Generation functions for each type</tspan></text>
+  </g>
+  <line
+     x1="445.48401"
+     y1="126.27593"
+     x2="445.48401"
+     y2="169.35164"
+     stroke="#203040"
+     stroke-width="4"
+     marker-end="url(#arrow)"
+     id="line17" />
+  <path
+     d="M 359.484,208.81055 H 231.09658 v 56.83638"
+     class="line"
+     id="path36"
+     sodipodi:nodetypes="ccc"
+     style="fill:none;stroke:#203040;stroke-width:4;stroke-dasharray:none;marker-end:url(#arrow-9)" />
+  <a
+     id="a41"
+     href="../../reference/ELA-class.html"
+     target="_top"
+     transform="translate(-646.42772,350.88024)">
+    <g
+       id="g41"
+       transform="translate(37.036036)">
+      <rect
+         x="654.93243"
+         y="82.680809"
+         width="169.15315"
+         height="53.813999"
+         rx="14.000001"
+         fill="#eef0de"
+         stroke="#7a6a2a"
+         stroke-width="3"
+         id="rect36"
+         ry="14" />
+      <text
+         x="719.19019"
+         y="104.91892"
+         font-family="Georgia, serif"
+         font-size="22px"
+         fill="#203040"
+         id="text36"
+         style="font-size:22px;font-family:Georgia, serif;fill:#203040"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22px;font-family:'Courier New';-inkscape-font-specification:'Courier New, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+           id="tspan36">ELA</tspan></text>
+      <text
+         x="682.6145"
+         y="123.07657"
+         font-family="Georgia, serif"
+         font-size="16"
+         fill="#203040"
+         id="text37"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+           sodipodi:role="line"
+           id="tspan42"
+           x="682.6145"
+           y="123.07657">Elastic scatterer</tspan></text>
+    </g>
+  </a>
+  <path
+     d="m 226.58132,460.15729 v -55.77772 l 12.52787,-0.14917"
+     class="line"
+     id="path47"
+     sodipodi:nodetypes="ccc"
+     style="fill:none;stroke:#7a6a2a;stroke-width:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Triangle)" />
+  <a
+     id="a50"
+     href="../../reference/CSC-class.html"
+     target="_top"
+     transform="translate(-148.57724,128.88442)">
+    <g
+       id="g50">
+      <rect
+         x="618"
+         y="210"
+         width="169.698"
+         height="53.389011"
+         rx="14"
+         fill="#f3dfcf"
+         stroke="#a35d24"
+         stroke-width="2.99999"
+         id="rect48"
+         ry="13.999999" />
+      <g
+         id="g49"
+         transform="translate(2.8614502,-0.81640434)">
+        <text
+           x="680.13062"
+           y="234.46133"
+           font-family="Georgia, serif"
+           font-size="22px"
+           fill="#203040"
+           id="text48"
+           style="font-size:22px;font-family:Georgia, serif;fill:#203040"><tspan
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22px;font-family:'Courier New';-inkscape-font-specification:'Courier New, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+             id="tspan48">CSC</tspan></text>
+        <text
+           x="628.99341"
+           y="249.95013"
+           font-family="Georgia, serif"
+           font-size="16px"
+           fill="#203040"
+           id="text49"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+             sodipodi:role="line"
+             id="tspan50"
+             x="628.99341"
+             y="249.95013">Composite scatterer</tspan></text>
+      </g>
+    </g>
+  </a>
+  <line
+     x1="639.12073"
+     y1="365.57895"
+     x2="648.05127"
+     y2="365.57895"
+     stroke="#203040"
+     stroke-width="4"
+     marker-end="url(#arrow)"
+     id="line50"
+     style="stroke:#a35d24;stroke-opacity:1;marker-end:url(#CapTriangle)" />
+  <a
+     id="a53"
+     href="../../reference/SBF-class.html"
+     target="_top"
+     transform="translate(60.058905,160.65688)">
+    <g
+       id="g53">
+      <rect
+         x="618"
+         y="210"
+         width="169.698"
+         height="53.389011"
+         rx="14"
+         fill="#f3dfcf"
+         stroke="#a35d24"
+         stroke-width="2.99999"
+         id="rect50"
+         ry="13.999999" />
+      <g
+         id="g52"
+         transform="translate(2.8614502,-0.81640434)">
+        <text
+           x="680.13062"
+           y="234.46133"
+           font-family="Georgia, serif"
+           font-size="22px"
+           fill="#203040"
+           id="text51"
+           style="font-size:22px;font-family:Georgia, serif;fill:#203040"><tspan
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22px;font-family:'Courier New';-inkscape-font-specification:'Courier New, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+             id="tspan51">BBF</tspan></text>
+        <text
+           x="629.0481"
+           y="249.95013"
+           font-family="Georgia, serif"
+           font-size="16px"
+           fill="#203040"
+           id="text52"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
+             sodipodi:role="line"
+             id="tspan53"
+             x="629.0481"
+             y="249.95013">Body plus backbone</tspan></text>
+      </g>
+    </g>
+  </a>
+  <g
+     id="g60"
+     transform="translate(-13.081424,-21.761344)">
+    <path
+       d="M 227.77532,482.22941 H 675.04113"
+       class="line"
+       id="path54"
+       sodipodi:nodetypes="cc"
+       style="fill:none;stroke:url(#linearGradient60);stroke-width:4.00001;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Triangle)" />
+    <line
+       x1="653.30725"
+       y1="482.2294"
+       x2="675.04114"
+       y2="482.2294"
+       stroke="#203040"
+       stroke-width="4"
+       marker-end="url(#arrow)"
+       id="line60"
+       style="stroke:#a35d24;stroke-opacity:1;marker-end:url(#Triangle)" />
+  </g>
+  <g
+     id="g61"
+     transform="translate(-13.081424,-21.761344)">
+    <path
+       d="m 661.13269,391.65794 v 30.91568 h 14.02284"
+       class="line"
+       id="path50"
+       sodipodi:nodetypes="ccc"
+       style="fill:none;stroke:#a35d24;stroke-width:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Triangle)" />
+    <path
+       d="m 661.13269,407.11578 v -55.00884 h 14.02284"
+       class="line"
+       id="path60"
+       sodipodi:nodetypes="ccc"
+       style="fill:none;stroke:#a35d24;stroke-width:4.00001;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Triangle)" />
+  </g>
+</svg>

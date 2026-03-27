@@ -3,53 +3,101 @@
 # GENERIC PLOT FUNCTION FOR BODY SHAPES AND MODELS
 ################################################################################
 ################################################################################
-#' Method for what is printed for objects.
+#' Plot scatterer geometry, stored model results, or stored TMM scattering views
+#'
+#' @description
+#' S3 plotting method for `Scatterer` objects. Depending on `type`, the method
+#' draws the target geometry, one or more stored model curves, or a stored
+#' single-target `TMM` scattering slice / map when the object was computed with
+#' retained T-matrix state.
+#'
 #' @param x Scatterer-class object.
-#' @param y Ignored (required for plot method signature).
-#' @param ... Additional arguments passed to plotting functions
-#' @param type Toggle between body shape ("shape") or modeling results ("model")
-#' @param x_units If "model" is selected, then toggle between frequency
-#'    ("frequency", kHz) or ka ("ka").
-#' @param nudge_y y-axis nudge.
-#' @param nudge_x x-axis nudge.
-#' @param aspect_ratio Aspect ratio setting ( defaults to "manual" for nudge_y
-#' and nudge_x to apply; otherwise, input "auto").
-#' @param y_units y-axis data selection (e.g. TS, sigma_bs -- defaults to TS)
-#' @param ... Additional plot inputs
-#' @rdname plot.scatterer
+#' @param y Ignored (required for the base `plot()` method signature).
+#' @param type Plot mode. Use `"shape"` for the stored geometry, `"model"` for
+#'   the currently stored model output, or `"scattering"` for stored `TMM`
+#'   angular products.
+#' @param nudge_y Multiplicative vertical padding applied to automatically
+#'   derived y-axis limits.
+#' @param nudge_x Multiplicative horizontal padding applied to automatically
+#'   derived x-axis limits.
+#' @param aspect_ratio Aspect-ratio control for supported shape plots. Use
+#'   `"manual"` to honor `nudge_x` / `nudge_y`, or `"auto"` to let the plotting
+#'   helper derive the aspect ratio directly.
+#' @param x_units Horizontal-axis convention for `type = "model"`. Supported
+#'   values depend on the stored model family and typically include
+#'   `"frequency"` and geometry-scaled wavenumber variants such as `"ka"`.
+#' @param y_units Stored response quantity for `type = "model"` or
+#'   `type = "scattering"`. Typical values include `"TS"` and `"sigma_bs"`.
+#' @param ... Additional arguments passed through to the class-specific plotting
+#'   helpers. For stored `TMM` scattering plots, this includes controls such as
+#'   `frequency`, `vary`, `polar`, and `heatmap`.
+#'
+#' @return Called for its side effect of drawing a plot; returns the input
+#'   invisibly.
+#'
+#' @details
+#' This method dispatches to the relevant scatterer-class plotting helper:
+#' `cal_plot()`, `ess_plot()`, `sbf_plot()`, `bbf_plot()`, `fls_plot()`, or
+#' `gas_plot()`. The supported `type` values therefore depend on what has been
+#' stored on the object. For example, `type = "model"` requires the object to
+#' already contain model output, and `type = "scattering"` currently applies
+#' only to stored `TMM` results.
+#'
+#' @seealso [extract()], [target_strength()], [tmm_scattering()],
+#'   [tmm_scattering_grid()]
+#'
+#' @rdname plot.Scatterer
+#' @aliases plot.Scatterer
+#'
+#' @keywords utility plotting
 #' @export
-setGeneric("plot", function(x, y, ...) standardGeneric("plot"))
-#' @rdname plot.scatterer
-#' @export
-setMethod(
-  f = "plot",
-  signature = c(x = "Scatterer", y = "missing"),
-  definition = function(x,
-                        y,
-                        type = "shape",
-                        nudge_y = 1.1,
-                        nudge_x = 1.05,
-                        aspect_ratio = "manual",
-                        x_units = "frequency",
-                        y_units = "TS", ...) {
-    # Detect scatterer type ============================================
-    sc_type <- class(x)
-
-    switch(sc_type,
-      CAL = cal_plot(x, type, nudge_y, nudge_x, x_units, ...),
-      ESS = ess_plot(x, type, nudge_y, nudge_x, x_units, ...),
-      SBF = sbf_plot(x, type, nudge_y, nudge_x, x_units, ...),
-      FLS = fls_plot(x, type, nudge_y, nudge_x, aspect_ratio, x_units, y_units),
-      GAS = gas_plot(x, type, nudge_y, nudge_x, x_units, y_units, ...)
-    )
-  }
-)
+plot.Scatterer <- function(x,
+                           y = NULL,
+                           type = "shape",
+                           nudge_y = 1.1,
+                           nudge_x = 1.05,
+                           aspect_ratio = "manual",
+                           x_units = "frequency",
+                           y_units = "TS", ...) {
+  # Detect scatterer type ======================================================
+  sc_type <- class(x)
+  # Switch to sub-class-specific plotting method ===============================
+  switch(sc_type,
+         CAL = cal_plot(
+           object = x, type = type, nudge_y = nudge_y, nudge_x = nudge_x,
+           x_units = x_units, ...
+         ),
+         ESS = ess_plot(
+           object = x, type = type, nudge_y = nudge_y, nudge_x = nudge_x,
+           x_units = x_units, y_units = y_units, ...
+         ),
+         SBF = sbf_plot(
+           object = x, type = type, nudge_y = nudge_y, nudge_x = nudge_x,
+           aspect_ratio = aspect_ratio, x_units = x_units, y_units = y_units,
+           ...
+         ),
+         BBF = bbf_plot(
+           object = x, type = type, nudge_y = nudge_y, nudge_x = nudge_x,
+           aspect_ratio = aspect_ratio, x_units = x_units, y_units = y_units,
+           ...
+         ),
+         FLS = fls_plot(
+           object = x, type = type, nudge_y = nudge_y, nudge_x = nudge_x,
+           aspect_ratio = aspect_ratio, x_units = x_units, y_units = y_units,
+           ...
+         ),
+         GAS = gas_plot(
+           object = x, type = type, nudge_y = nudge_y, nudge_x = nudge_x,
+           x_units = x_units, y_units = y_units, ...
+         )
+  )
+}
 ################################################################################
 #' Base plotting color palette
 #' @description
 #' Color palette vector referenced for plotting multiple models simultaneously.
 #' @rdname model_palette
-#' @export
+#' @noRd
 model_palette <- c(
   "black", "azure4", "royalblue4", "firebrick3", "steelblue3",
   "orangered3", "darkolivegreen", "sienna3", "cadetblue"
@@ -61,66 +109,33 @@ model_palette <- c(
 ################################################################################
 #' Plotting for CAL-class objects
 #' @param object CAL-class object.
-#' @param type Toggle between body shape ("shape") or modeling results ("model")
+#' @param type Toggle between body shape (`"shape"`), modeling results
+#'   (`"model"`), or stored TMM angular slices (`"scattering"`).
 #' @param x_units If "model" is selected, then toggle between frequency
 #'    ("frequency", kHz) or ka ("ka").
 #' @param nudge_y y-axis nudge.
 #' @param nudge_x x-axis nudge.
 #' @param ... Additional plot inputs
-#' @export
+#' @keywords internal
+#' @noRd
 cal_plot <- function(object,
                      type = "shape",
                      nudge_y = 1.01,
                      nudge_x = 1.01,
                      x_units = "frequency", ...) {
-  # Retrieve default plot window parameters ====================================
-  opar <- graphics::par(no.readonly = TRUE)
-  on.exit(graphics::par(opar))
+  # Respect caller-managed panel layouts by avoiding a full par() reset =======
   if (type == "shape") {
-    # Extract body shape information ===========================================
     body <- acousticTS::extract(
       object,
       "body"
     )
-    # Along-semimajor radii ====================================================
-    along_radius <- sqrt(body$radius^2 - (body$rpos[, 1] - body$radius) *
-                           (body$rpos[, 1] - body$radius))
-    # Define plot margins ======================================================
-    graphics::par(
-      ask = FALSE,
-      oma = base::c(1, 1, 1, 0),
-      mar = base::c(3, 4.5, 1, 2)
-    )
-    # Begin plotting ===========================================================
-    plot(
-      x = body$rpos[, 1],
-      y = -along_radius,
-      type = "l",
+    .plot_axisymmetric_outline(
+      position_matrix = body$rpos,
+      shape_parameters = acousticTS::extract(object, "shape_parameters"),
+      xlab = "Semi-major diameter (m)",
       ylab = "Semi-minor diameter (m)",
-      xlab = "Semi-major dimaeter (m)",
       lwd = 4,
-      cex.lab = 1.2,
-      cex.axis = 1.2,
-      ylim = base::c(
-        min(body$rpos[, 5]) * (1 - (1 - nudge_y)),
-        max(body$rpos[, 4]) * nudge_y
-      )
-    )
-    # Add lower perimeter of shape =============================================
-    graphics::lines(
-      x = body$rpos[, 1],
-      y = along_radius,
-      lty = 1,
-      lwd = 4
-    )
-    # Add body segments ========================================================
-    graphics::segments(
-      x0 = body$rpos[, 1],
-      x1 = body$rpos[, 1],
-      y0 = along_radius,
-      y1 = -along_radius,
-      lty = 3,
-      lwd = 1.25
+      nudge_y = nudge_y
     )
   } else if (type == "model") {
     if (length(extract(object, "model")) == 0) {
@@ -162,7 +177,7 @@ cal_plot <- function(object,
         cex.lab = 1.2,
         cex.axis = 1.2,
         xlim = c(
-          base::abs(min(x_axis) * (1 - (1 + nudge_x))),
+          abs(min(x_axis) * (1 - (1 + nudge_x))),
           max(x_axis) * (nudge_x)
         ),
         ylim = c(
@@ -185,98 +200,37 @@ cal_plot <- function(object,
 #' @param nudge_x x-axis nudge.
 #' @param y_units y-axis data selection (e.g. TS, sigma_bs -- defaults to TS).
 #' @param ... Additional plot inputs
-#' @export
+#' @noRd
 ess_plot <- function(object,
                      type = "shape",
                      nudge_y = 1.02,
                      nudge_x = 1.01,
                      x_units = "frequency",
                      y_units = "TS", ...) {
-  # Retrieve default plot window parameters ====================================
-  opar <- graphics::par(no.readonly = TRUE)
-  on.exit(graphics::par(opar))
+  # Respect caller-managed panel layouts by avoiding a full par() reset =======
   if (type == "shape") {
-    # Extract shell shape information ==========================================
     shell <- extract(object, "shell")
-    # Along-semimajor radii ====================================================
-    along_radius <- sqrt(shell$radius^2 - (shell$rpos[, 1] - shell$radius) *
-                           (shell$rpos[, 1] - shell$radius))
-    # Center axis ==============================================================
-    shell$rpos[, 1] <- shell$rpos[, 1] - stats::median(shell$rpos[, 1])
-    # Define plot margins ======================================================
-    graphics::par(
-      ask = FALSE,
-      oma = c(1, 1, 1, 0),
+    shell_shape <- acousticTS::extract(object, "shape_parameters")$shell
+    .plot_axisymmetric_outline(
+      position_matrix = shell$rpos,
+      shape_parameters = shell_shape,
+      xlab = "Semi-major diameter (m)",
+      ylab = "Semi-minor diameter (m)",
+      nudge_y = nudge_y,
+      center_x = TRUE,
       mar = c(4, 4.5, 1, 2)
     )
-    # Begin plotting ===========================================================
-    plot(
-      x = shell$rpos[, 1],
-      y = along_radius,
-      type = "l",
-      ylab = "Semi-minor diameter (m)",
-      xlab = "Semi-major diameter (m)",
-      lwd = 4,
-      cex.lab = 1.2,
-      cex.axis = 1.2,
-      ylim = base::c(
-        min(-along_radius) * (1 - (1 - nudge_y)),
-        max(along_radius) * nudge_y
-      )
-    )
-    # Add lower perimeter of shape =============================================
-    graphics::lines(
-      x = shell$rpos[, 1],
-      y = -along_radius,
-      lty = 1,
-      lwd = 4
-    )
-    # Add shell segments =======================================================
-    graphics::segments(
-      x0 = shell$rpos[, 1],
-      x1 = shell$rpos[, 1],
-      y0 = -along_radius,
-      y1 = along_radius,
-      lty = 3,
-      lwd = 1.25
-    )
-    # Add internal fluid, if defined ===========================================
     fluid <- extract(object, "fluid")
-    # Only proceed is position matrix is defined +++++++++++++++++++++++++++++++
     if ("rpos" %in% names(fluid)) {
-      # Along-semimajor radii ==================================================
-      along_radius_fl <- sqrt(fluid$radius^2 -
-                                (fluid$rpos[, 1] - fluid$radius) *
-                                (fluid$rpos[, 1] - fluid$radius))
-      # Center +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      fluid$rpos[, 1] <- fluid$rpos[, 1] - stats::median(fluid$rpos[, 1])
-      # Add upper perimeter of shape +++++++++++++++++++++++++++++++++++++++++++
-      graphics::lines(
-        x = fluid$rpos[, 1],
-        y = along_radius_fl,
-        lty = 1,
-        lwd = 4,
-        col = "red"
+      fluid_shape <- acousticTS::extract(object, "shape_parameters")$fluid
+      .plot_axisymmetric_outline(
+        position_matrix = fluid$rpos,
+        shape_parameters = fluid_shape,
+        col = "red",
+        segment_col = "red",
+        center_x = TRUE,
+        init = FALSE
       )
-      # Add lower perimeter of shape +++++++++++++++++++++++++++++++++++++++++++
-      graphics::lines(
-        x = fluid$rpos[, 1],
-        y = -along_radius_fl,
-        lty = 1,
-        lwd = 4,
-        col = "red"
-      )
-      # Add shell segments +++++++++++++++++++++++++++++++++++++++++++++++++++++
-      graphics::segments(
-        x0 = fluid$rpos[, 1],
-        x1 = fluid$rpos[, 1],
-        y0 = -along_radius_fl,
-        y1 = along_radius_fl,
-        lty = 3,
-        lwd = 1.25,
-        col = "red"
-      )
-      # Create legend ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
       graphics::legend(
         x = "bottomright",
         legend = c("Shell", "Fluid-like body"),
@@ -287,91 +241,10 @@ ess_plot <- function(object,
       )
     }
   } else if (type == "model") {
-    # Detect model selection ===================================================
-    models <- extract(object, "model")
-    model_names <- names(models)
-    if (length(model_names) == 0) {
-      stop("ERROR: no model results detected in object.")
-    }
-    # Append model name ========================================================
-    models <- lapply(seq_along(model_names),
-      FUN = function(x) {
-        models[[x]] <- models[[x]][c("frequency", "TS")]
-        transform(models[[x]],
-          model = model_names[x]
-        )
-      }
-    )
-    # Convert into a data.frame ================================================
-    models_df <- do.call("rbind", models)
-    # Define x-axis domain =====================================================
-    x_axis <- models_df[, base::which(base::colnames(models_df) == x_units)]
-    x_mat <- base::split(x_axis, models_df$model)
-    y_axis <- models_df[, base::which(base::colnames(models_df) == y_units)]
-    y_mat <- base::split(y_axis, models_df$model)
-    col_axis <- model_palette[as.numeric(as.factor(models_df$model))]
-    x_lab <- switch(x_units,
-      frequency = "Frequency (Hz)",
-      k_sw = expression(italic(k[sw] * a))
-    )
-    # Define plot margins ======================================================
-    graphics::par(
-      ask = FALSE,
-      mar = base::c(5.0, 5.5, 2.0, 3.5)
-    )
-    # Initiate plotting ========================================================
-    plot(
-      x = seq(
-        from = min(x_axis),
-        to = max(x_axis),
-        length.out = 2
-      ),
-      y = seq(
-        from = min(y_axis),
-        to = max(y_axis),
-        length.out = 2
-      ),
-      xlim = c(
-        min(x_axis) * (1 - nudge_x),
-        max(x_axis) * (nudge_x)
-      ),
-      ylim = c(
-        min(y_axis) * (1 - (1 - nudge_y)),
-        max(y_axis) * (1 + (1 - nudge_y))
-      ),
-      xlab = x_lab,
-      ylab = expression("Target" ~ "strength" ~ ("dB" ~ "re." ~ 1 ~ "m"^2)),
-      yaxs = "i",
-      xaxs = "i",
-      xaxt = "n",
-      type = "n",
-      cex.axis = 1.3,
-      cex.lab = 1.5
-    )
-    atx <- seq(
-      graphics::par("xaxp")[1],
-      graphics::par("xaxp")[2],
-      (graphics::par("xaxp")[2] - graphics::par("xaxp")[1]) /
-        graphics::par("xaxp")[3]
-    )
-    graphics::axis(1,
-      at = atx,
-      labels = format(atx, scientific = FALSE, justify = "left"),
-      cex.axis = 1.3
-    )
-    nm_names <- names(x_mat)
-    invisible(mapply(graphics::lines, x_mat, y_mat,
-      col = model_palette[seq_len(length(model_names))],
-      lwd = 4
-    ))
-    graphics::legend("bottomright",
-      title = expression(bold("TS" ~ "model")),
-      title.adj = 0.05,
-      legend = nm_names,
-      lty = rep(1, length(nm_names)),
-      col = model_palette[seq_len(length(nm_names))],
-      cex = 1.05,
-      lwd = 4
+    .plot_model_results(
+      .collect_model_plot_data(object, x_units = x_units, y_units = y_units),
+      nudge_y = nudge_y,
+      nudge_x = nudge_x
     )
   }
   invisible()
@@ -383,7 +256,8 @@ ess_plot <- function(object,
 ################################################################################
 #' Plotting for FLS-class objects
 #' @param object FLS-class object.
-#' @param type Toggle between body shape ("shape") or modeling results ("model")
+#' @param type Toggle between body shape (`"shape"`), modeling results
+#'   (`"model"`), or stored TMM angular slices (`"scattering"`).
 #' @param x_units If "model" is selected, then toggle between frequency
 #'    ("frequency", kHz) or ka ("ka").
 #' @param nudge_y y-axis nudge.
@@ -392,7 +266,7 @@ ess_plot <- function(object,
 #' and nudge_x to apply; otherwise, input "auto").
 #' @param y_units y-axis data selection (e.g. TS, sigma_bs -- defaults to TS)
 #' @param ... Additional plot inputs
-#' @export
+#' @noRd
 fls_plot <- function(object,
                      type = "shape",
                      nudge_y = 1.05,
@@ -400,236 +274,31 @@ fls_plot <- function(object,
                      aspect_ratio = "manual",
                      x_units = "frequency",
                      y_units = "TS", ...) {
-  # Retrieve default plot window parameters ====================================
-  opar <- graphics::par(no.readonly = TRUE)
-  base::on.exit(graphics::par(opar))
+  # Respect caller-managed panel layouts by avoiding a full par() reset =======
   if (type == "shape") {
-    # Extract body shape information ===========================================
-    body <- acousticTS::extract(
-      object,
-      "body"
-    )
-    # Extract generic shape information ========================================
-    shape_params <- extract(object, "shape_parameters")
-    # Define plot margins ======================================================
-    graphics::par(
-      ask = FALSE,
-      oma = base::c(1, 1, 1, 0),
-      mar = base::c(5.0, 4.5, 1.5, 2)
-    )
-    # Center shape =============================================================
-    body$rpos[3, ] <- body$rpos[3, ] - stats::median(body$rpos[3, ])
-    # Get radius ===============================================================
-    if ("radius_shape" %in% names(shape_params)) {
-      radius <- shape_params$radius_shape
-    } else {
-      radius <- body$radius
-    }
-    # Sort index ===============================================================
-    if (body$rpos[1, 1] > body$rpos[1, ncol(body$rpos)]) {
-      body$rpos <- body$rpos[, rev(seq_len(ncol(body$rpos))),
-        drop = FALSE
-      ]
-      if (!is.null(radius)) radius <- rev(radius)
-      # sort_idx <- order(body$rpos[1, ])
-      # body$rpos <- body$rpos[, sort_idx, drop = FALSE]
-      # if (!is.null(body$radius)) body$radius <- body$radius[sort_idx]
-    }
-    # Adjust axes ==============================================================
-    if (aspect_ratio == "manual") {
-      vert_lims <- base::c(
-        min(body$rpos[3, ] - radius) * (1 - (1 - nudge_y)),
-        max(body$rpos[3, ] + radius) * nudge_y
-      )
-    } else {
-      vert_lims <- base::c(
-        -base::max(body$rpos[1, ]) * 0.10,
-        base::max(body$rpos[1, ]) * 0.10
-      )
-    }
-    # Begin plotting ===========================================================
-    # graphics::plot( x = body$rpos[ 1 , ] ,
-    #                 y = body$rpos[ 3 , ] ,
-    #                 type = 'l' ,
-    #                 lwd = 4 ,
-    #                 cex.lab = 1.2 ,
-    #                 cex.axis = 1.2 ,
-    #                 xlab = "Length (m)" ,
-    #                 ylab = "Thickness (m)" ,
-    #                 ylim = vert_lims )
-    plot(body$rpos[1, ], body$rpos[3, ],
-      type = "n",
-      xlab = "Length (m)", ylab = "Thickness (m)",
-      ylim = c(
-        min(body$rpos[3, ] - radius) * 1.1,
-        max(body$rpos[3, ] + radius) * 1.1
-      )
-    )
-    # Add lower perimeter of shape =============================================
-    # graphics::lines( x = body$rpos[ 1 , ] ,
-    #                  y = body$rpos[ 3 , ] - body$radius ,
-    #                  lty = 1 ,
-    #                  lwd = 4 )
-    # Add upper perimeter of shape =============================================
-    # graphics::lines( x = body$rpos[ 1 , ] ,
-    #                  y = body$rpos[ 3 , ] + body$radius ,
-    #                  lty = 1 ,
-    #                  lwd = 4 )
-    # Add body segments ========================================================
-    # graphics::segments( x0 = body$rpos[ 1 , ] ,
-    #                     x1 = body$rpos[ 1 , ] ,
-    #                     y0 = body$rpos[ 3 , ] - body$radius ,
-    #                     y1 = body$rpos[ 3 , ] + body$radius ,
-    #                     lty = 3 ,
-    #                     lwd = 1.25 )
-    # Draw angled "cylinders" for each segment =================================
-    n_segments <- acousticTS::extract(
-      object,
-      "shape_parameters"
-    )$n_segments
-    # count <- 0
-    # rc <- c()
-    # ---- Iterate =============================================================
-    for (i in 1:(n_segments)) {
-      # ---- Leading coordinates
-      x0 <- body$rpos[1, i]
-      y0 <- body$rpos[3, i]
-      # ---- Trailing coordinates
-      x1 <- body$rpos[1, i + 1]
-      y1 <- body$rpos[3, i + 1]
-      # ---- Thickness
-      r <- radius[i]
-      # rc <- c(rc, r)
-      if (r == 0) next
-      # cat(sprintf("Segment %d [%d, %d]: (%.6f, %.6f) -> (%.6f, %.6f),
-      # r=%.6f\n",
-      #             i, order(body$rpos[1,])[i], order(body$rpos[1,])[i+1],
-      # x0, y0, x1, y1, r))
-      # ---- Direction vector
-      dx <- x1 - x0
-      dy <- y1 - y0
-      len <- sqrt(dx^2 + dy^2)
-      # ---- Perpendicular vector (unit)
-      px <- -dy / len
-      py <- dx / len
-      # ---- Polygon nodes
-      xA <- x0 + r * px
-      yA <- y0 + r * py
-      xB <- x1 + r * px
-      yB <- y1 + r * py
-      xC <- x1 - r * px
-      yC <- y1 - r * py
-      xD <- x0 - r * px
-      yD <- y0 - r * py
-      # ---- Draw polygon
-      graphics::polygon(
-        x = c(xA, xB, xC, xD),
-        y = c(yA, yB, yC, yD),
-        col = grDevices::adjustcolor("gray50", alpha.f = 0.6),
-        border = "black", lwd = 1
-      )
-      # count <- count + 1
-    }
-    # cat("Polygons drawn:", count, "\n")
-    # Draw centerline and points
-    graphics::lines(body$rpos[1, ], body$rpos[3, ], lwd = 3, col = "gray90")
-    graphics::points(body$rpos[1, ], body$rpos[3, ],
-      pch = 1, col = "black",
-      cex = 0.8
+    body <- acousticTS::extract(object, "body")
+    shape_params <- acousticTS::extract(object, "shape_parameters")
+    .plot_row_major_segmented_body(
+      rpos = body$rpos,
+      shape_parameters = shape_params,
+      nudge_y = nudge_y,
+      aspect_ratio = aspect_ratio
     )
   } else if (type == "model") {
-    # Detect model selection ===================================================
-    models <- extract(object, "model")
-    model_names <- names(models)
-    if (base::length(model_names) == 0) {
-      stop("ERROR: no model results detected in object.")
-    }
-    # Extract body shape information ===========================================
-    shape <- extract(object, "body")
-    # Append model name ========================================================
-    models <- lapply(seq_along(model_names),
-      FUN = function(x) {
-        models[[x]] <- models[[x]][c("frequency", "TS")]
-        transform(models[[x]],
-          model = model_names[x]
-        )
-      }
+    .plot_model_results(
+      .collect_model_plot_data(object, x_units = x_units, y_units = y_units),
+      nudge_y = nudge_y,
+      nudge_x = nudge_x
     )
-    # Convert into a data.frame ================================================
-    models_df <- do.call("rbind", models)
-    # Define x-axis domain =====================================================
-    # x_axis <- base::switch( x_units ,
-    #                         frequency = unique( models_df$frequency ) * 1e-3 ,
-    #                         k_sw = unique( models_df$ka ) )
-    x_axis <- models_df[, base::which(base::colnames(models_df) == x_units)]
-    x_mat <- base::split(x_axis, models_df$model)
-    y_axis <- models_df[, base::which(base::colnames(models_df) == y_units)]
-    y_mat <- base::split(y_axis, models_df$model)
-    col_axis <- model_palette[as.numeric(as.factor(models_df$model))]
-    x_lab <- switch(x_units,
-      frequency = "Frequency (Hz)",
-      k_sw = expression(italic(k[sw] * a))
-    )
-    # Define plot margins ======================================================
-    graphics::par(
-      ask = FALSE,
-      mar = base::c(5.0, 5.5, 2.0, 3.5)
-    )
-    # Initiate plotting ========================================================
-    graphics::plot(
-      x = base::seq(
-        from = base::min(x_axis),
-        to = base::max(x_axis),
-        length.out = 2
-      ),
-      y = base::seq(
-        from = base::min(y_axis),
-        to = base::max(y_axis),
-        length.out = 2
-      ),
-      xlim = base::c(
-        base::min(x_axis) * (1 - nudge_x),
-        base::max(x_axis) * (nudge_x)
-      ),
-      ylim = base::c(
-        base::min(y_axis) * (1 - (1 - nudge_y)),
-        base::max(y_axis) * (1 + (1 - nudge_y))
-      ),
-      xlab = x_lab,
-      ylab = expression("Target" ~ "strength" ~ ("dB" ~ "re." ~ 1 ~ "m"^2)),
-      yaxs = "i",
-      xaxs = "i",
-      xaxt = "n",
-      type = "n",
-      cex.axis = 1.3,
-      cex.lab = 1.5
-    )
-    atx <- seq(
-      graphics::par("xaxp")[1], graphics::par("xaxp")[2],
-      (graphics::par("xaxp")[2] - graphics::par("xaxp")[1]) /
-        graphics::par("xaxp")[3]
-    )
-    graphics::axis(1,
-      at = atx,
-      labels = format(atx, scientific = FALSE),
-      cex.axis = 1.3
-    )
-    nm_names <- names(x_mat)
-    invisible(mapply(graphics::lines, x_mat, y_mat,
-      col = model_palette[seq_len(length(model_names))],
-      lwd = 4
-    ))
-    graphics::legend("bottomright",
-      title = expression(bold("TS" ~ "model")),
-      title.adj = 0.05,
-      legend = nm_names,
-      lty = rep(1, length(nm_names)),
-      col = model_palette[seq_len(length(nm_names))],
-      cex = 1.05,
-      lwd = 4
+  } else if (type == "scattering") {
+    .plot_tmm_scattering_slice(
+      object = object,
+      nudge_y = nudge_y,
+      nudge_x = nudge_x,
+      ...
     )
   }
-  base::invisible()
+  invisible()
 }
 ################################################################################
 ################################################################################
@@ -645,145 +314,40 @@ fls_plot <- function(object,
 #' @param nudge_x x-axis nudge.
 #' @param y_units y-axis data selection (e.g. TS, sigma_bs -- defaults to TS).
 #' @param ... Additional plot inputs
-#' @export
+#' @noRd
 gas_plot <- function(object,
                      type = "shape",
                      nudge_y = 1.01,
                      nudge_x = 1.01,
                      x_units = "frequency",
                      y_units = "TS", ...) {
-  # Retrieve default plot window parameters ====================================
-  opar <- graphics::par(no.readonly = TRUE)
-  on.exit(graphics::par(opar))
+  # Respect caller-managed panel layouts by avoiding a full par() reset =======
   if (type == "shape") {
-    # Extract body shape information ===========================================
     body <- extract(object, "body")
-    # Define plot margins ======================================================
-    graphics::par(
-      ask = FALSE,
-      oma = c(1, 1, 1, 0),
-      mar = c(3, 4.5, 1, 2)
-    )
-    # Begin plotting ===========================================================
-    plot(
-      x = body$rpos[, 1],
-      y = body$rpos[, 2],
-      type = "l",
-      ylab = "Semi-minor diameter (m)",
-      xlab = "Semi-major dimaeter (m)",
-      lwd = 4,
-      cex.lab = 1.2,
-      cex.axis = 1.2,
-      ylim = base::c(
-        min(body$rpos[, 3]) * (1 - (1 - nudge_y)),
-        max(-body$rpos[, 3]) * nudge_y
-      )
-    )
-    # Add lower perimeter of shape =============================================
-    graphics::lines(
-      x = body$rpos[, 1],
-      y = body$rpos[, 3],
-      lty = 1,
-      lwd = 4
-    )
-    # Add body segments ========================================================
-    graphics::segments(
-      x0 = body$rpos[, 1],
-      x1 = body$rpos[, 1],
-      y0 = body$rpos[, 2],
-      y1 = body$rpos[, 3],
-      lty = 3,
-      lwd = 1.25
+    shape <- acousticTS::extract(object, "shape_parameters")
+    .plot_axisymmetric_outline(
+      position_matrix = body$rpos,
+      shape_parameters = shape,
+      xlab = "Semi-major axis (m)",
+      ylab = "Semi-minor radius (m)",
+      nudge_y = nudge_y
     )
   } else if (type == "model") {
-    # Detect model selection ===================================================
-    models <- extract(object, "model")
-    model_names <- names(models)
-    if (length(model_names) == 0) {
-      stop("ERROR: no model results detected in object.")
-    }
-    # Extract body shape information ===========================================
-    shape <- extract(object, "body")
-    # Append model name ========================================================
-    models <- lapply(seq_along(model_names),
-      FUN = function(x) {
-        models[[x]] <- models[[x]][c("frequency", "TS")]
-        transform(models[[x]],
-          model = model_names[x]
-        )
-      }
-    )
-    # Convert into a data.frame ================================================
-    models_df <- do.call("rbind", models)
-    # Define x-axis domain =====================================================
-    # x_axis <- base::switch( x_units ,
-    #                         frequency = unique( models_df$frequency ) * 1e-3 ,
-    #                         k_sw = base::unique( models_df$ka ) )
-    x_axis <- models_df[, base::which(base::colnames(models_df) == x_units)]
-    x_mat <- base::split(x_axis, models_df$model)
-    y_axis <- models_df[, base::which(base::colnames(models_df) == y_units)]
-    y_mat <- base::split(y_axis, models_df$model)
-    x_lab <- switch(x_units,
-      frequency = "Frequency (Hz)",
-      k_sw = expression(italic(k[sw] * a))
-    )
-    # Define plot margins ======================================================
-    graphics::par(
-      ask = FALSE,
-      mar = base::c(5.0, 5.5, 2.0, 3.5)
-    )
-    # Initiate plotting ========================================================
-    plot(
-      x = seq(
-        from = min(x_axis),
-        to = max(x_axis),
-        length.out = 2
+    .plot_model_results(
+      .collect_model_plot_data(
+        object,
+        x_units = x_units,
+        y_units = y_units
       ),
-      y = seq(
-        from = min(y_axis),
-        to = max(y_axis),
-        length.out = 2
-      ),
-      xlim = c(
-        min(x_axis) * (1 - nudge_x),
-        max(x_axis) * (nudge_x)
-      ),
-      ylim = c(
-        min(y_axis) * (1 - (1 - nudge_y)),
-        max(y_axis) * (1 + (1 - nudge_y))
-      ),
-      xlab = x_lab,
-      ylab = expression("Target" ~ "strength" ~ ("dB" ~ "re." ~ 1 ~ "m"^2)),
-      yaxs = "i",
-      xaxs = "i",
-      xaxt = "n",
-      type = "n",
-      cex.axis = 1.3,
-      cex.lab = 1.5
+      nudge_y = nudge_y,
+      nudge_x = nudge_x
     )
-    atx <- seq(
-      graphics::par("xaxp")[1], graphics::par("xaxp")[2],
-      (graphics::par("xaxp")[2] - graphics::par("xaxp")[1]) /
-        graphics::par("xaxp")[3]
-    )
-    graphics::axis(1,
-      at = atx,
-      labels = format(atx, scientific = FALSE),
-      cex.axis = 1.3
-    )
-    nm_names <- names(x_mat)
-    invisible(mapply(graphics::lines, x_mat, y_mat,
-      col = model_palette[seq_len(length(model_names))],
-      lwd = 4
-    ))
-    graphics::legend("bottomright",
-      title = expression(bold("TS" ~ "model")),
-      title.adj = 0.05,
-      legend = nm_names,
-      lty = rep(1, length(nm_names)),
-      col = model_palette[seq_len(length(nm_names))],
-      cex = 1.05,
-      lwd = 4
+  } else if (type == "scattering") {
+    .plot_tmm_scattering_slice(
+      object = object,
+      nudge_y = nudge_y,
+      nudge_x = nudge_x,
+      ...
     )
   }
   invisible()
@@ -796,259 +360,85 @@ gas_plot <- function(object,
 #'    ("frequency", kHz) or ka ("ka").
 #' @param nudge_y y-axis nudge.
 #' @param nudge_x x-axis nudge.
-#' @export
+#' @noRd
 sbf_plot <- function(object,
                      type = "shape",
                      nudge_y = 1.05,
                      nudge_x = 1.01,
-                     x_units = "frequency") {
-  # Retrieve default plot window parameters ===================
-  opar <- graphics::par(no.readonly = TRUE)
-  on.exit(graphics::par(opar))
+                     aspect_ratio = "manual",
+                     x_units = "frequency",
+                     y_units = "TS", ...) {
+  # Respect caller-managed panel layouts by avoiding a full par() reset =======
   if (type == "shape") {
-    # Extract body shape information ============================
-    body <- extract(object, "body")$rpos
-    # Extract bladder information ===============================
-    bladder <- extract(object, "bladder")$rpos
-    # Set up plot limits for each shape component ===============
-    ylow_lim <- min(body[4, ]) * (1 - (1 - nudge_y))
-    yhi_lim <- max(body[3, ]) * nudge_y
-    xlow_lim <- min(body[1, ]) * (1 - (1 - nudge_x))
-    xhi_lim <- max(body[1, ]) * nudge_x
-    # Plot dorsoventral view =====================================
-    graphics::par(
-      ask = FALSE,
-      mfrow = c(2, 1),
-      mar = c(2, 4.5, 1, 2),
-      oma = c(1.5, 0.5, 0.5, 0)
-    )
-    # Dorsal =====================================================
-    plot(
-      x = body[1, ],
-      y = body[3, ],
-      type = "l",
-      ylim = c(ylow_lim, yhi_lim),
-      xlim = c(xlow_lim, xhi_lim),
-      xlab = "",
-      ylab = "Height (m)",
-      lwd = 4,
-      xaxt = "n",
-      cex.lab = 1.2,
-      cex.axis = 1.2
-    )
-    # Ventral ====================================================
-    graphics::lines(
-      x = body[1, ],
-      y = body[4, ],
-      lty = 1,
-      lwd = 4
-    )
-    # Connect anterior/posterior gaps =============================
-    graphics::segments(
-      x0 = c(min(body[1, ]), max(body[1, ])),
-      x1 = c(min(body[1, ]), max(body[1, ])),
-      y0 = c(
-        body[4, ][body[1, ] == min(body[1, ])],
-        body[4, ][body[1, ] == max(body[1, ])]
-      ),
-      y1 = c(
-        body[3, ][body[1, ] == min(body[1, ])],
-        body[3, ][body[1, ] == max(body[1, ])]
-      ),
-      lty = 1,
-      lwd = 4,
-      col = "black"
-    )
-    # Plot body segments  =========================================
-    graphics::segments(
-      x0 = body[1, ], x1 = body[1, ], y0 = body[4, ], y1 = body[3, ],
-      lty = 3,
-      lwd = 1,
-      col = "gray30"
-    )
-    # Ventral bladder ==============================================
-    graphics::lines(
-      x = bladder[1, ],
-      y = bladder[4, ],
-      lty = 1,
-      lwd = 3.5,
-      col = "red"
-    )
-    # Dorsal bladder ================================================
-    graphics::lines(
-      x = bladder[1, ],
-      y = bladder[3, ],
-      lty = 1,
-      lwd = 3.5,
-      col = "red"
-    )
-    # Connect anterior/posterior gaps =============================
-    graphics::segments(
-      x0 = c(min(bladder[1, ]), max(bladder[1, ])),
-      x1 = c(min(bladder[1, ]), max(bladder[1, ])),
-      y0 = c(
-        bladder[4, ][bladder[1, ] == min(bladder[1, ])],
-        bladder[4, ][bladder[1, ] == max(bladder[1, ])]
-      ),
-      y1 = c(
-        bladder[3, ][bladder[1, ] == min(bladder[1, ])],
-        bladder[3, ][bladder[1, ] == max(bladder[1, ])]
-      ),
-      lty = 1,
-      lwd = 3.5,
-      col = "red"
-    )
-    # Plot bladder segments ==========================================
-    graphics::segments(
-      x0 = bladder[1, ], x1 = bladder[1, ],
-      y0 = bladder[4, ], y1 = bladder[3, ],
-      lty = 3,
-      lwd = 1,
-      col = "red"
-    )
-    # Create legend ==================================================
-    graphics::legend(
-      x = "bottomright",
-      legend = c("Body", "Resonant feature"),
-      lty = c(1, 1),
-      lwd = c(4, 3.5),
-      col = c("black", "red"),
-      cex = 0.95
-    )
-    # End dorsoventral view =====================================
-    left_limit <- -max(body[2, ] / 2) * (1 - (1 - nudge_y))
-    right_limit <- max(body[2, ] / 2) * (1 - (1 - nudge_y))
-    # Plot ventral view =========================================
-    plot(
-      x = body[1, ],
-      y = body[2, ] / 2,
-      type = "l",
-      ylim = c(left_limit, right_limit),
-      ylab = "Width (m)",
-      lwd = 4,
-      cex.lab = 1.2,
-      cex.axis = 1.2
-    )
-    # Opposite side ====================================================
-    graphics::lines(
-      x = body[1, ],
-      y = -body[2, ] / 2,
-      lty = 1,
-      lwd = 4
-    )
-    # Close ends ====================================================
-    graphics::segments(
-      x0 = c(min(body[1, ]), max(body[1, ])),
-      x1 = c(min(body[1, ]), max(body[1, ])),
-      y0 = c(
-        -body[2, ][body[1, ] == min(body[1, ])] / 2,
-        -body[2, ][body[1, ] == max(body[1, ])] / 2
-      ),
-      y1 = c(
-        body[2, ][body[1, ] == min(body[1, ])] / 2,
-        body[2, ][body[1, ] == max(body[1, ])] / 2
-      ),
-      lty = 1,
-      lwd = 4,
-      col = "black"
-    )
-    # Plot body segments ==========================================
-    graphics::segments(
-      x0 = body[1, ], x1 = body[1, ],
-      y0 = -body[2, ] / 2, y1 = body[2, ] / 2,
-      lty = 3,
-      lwd = 1,
-      col = "gray30"
-    )
-    # Left bladder ==================================================
-    graphics::lines(
-      x = bladder[1, ],
-      y = bladder[2, ] / 2,
-      lty = 1,
-      lwd = 3.5,
-      col = "red"
-    )
-    # Right bladder =================================================
-    graphics::lines(
-      x = bladder[1, ],
-      y = -bladder[2, ] / 2,
-      lty = 1,
-      lwd = 3.5,
-      col = "red"
-    )
-    # Close end of bladders =========================================
-    graphics::segments(
-      x0 = c(min(bladder[1, ]), max(bladder[1, ])),
-      x1 = c(min(bladder[1, ]), max(bladder[1, ])),
-      y0 = c(
-        bladder[2, ][bladder[1, ] == min(bladder[1, ])] / 2,
-        bladder[2, ][bladder[1, ] == max(bladder[1, ])] / 2
-      ),
-      y1 = c(
-        -bladder[2, ][bladder[1, ] == min(bladder[1, ])] / 2,
-        -bladder[2, ][bladder[1, ] == max(bladder[1, ])] / 2
-      ),
-      lty = 1,
-      lwd = 3.5,
-      col = "red"
-    )
-    # Plot bladder segments ==========================================
-    graphics::segments(
-      x0 = bladder[1, ], x1 = bladder[1, ],
-      y0 = -bladder[2, ] / 2, y1 = bladder[2, ] / 2,
-      lty = 3,
-      lwd = 1,
-      col = "red"
-    )
-    # Re-add x-axis text ==========================================
-    graphics::mtext("Along-body axis (m)",
-      side = 1,
-      outer = TRUE,
-      line = 0,
-      cex = 1.2
+    .plot_profile_component_panels(
+      primary_rpos = extract(object, "body")$rpos,
+      secondary_rpos = extract(object, "bladder")$rpos,
+      primary_label = "Body",
+      secondary_label = "Resonant feature",
+      secondary_col = "red",
+      nudge_y = nudge_y,
+      nudge_x = nudge_x
     )
   } else if (type == "model") {
-    if (length(extract(object, "model")) == 0) {
-      stop("ERROR: no model results detected in object.")
-    } else {
-      # Extract body shape information ============================
-      shape <- extract(object, "body")
-      # Extract model results ====================================
-      TS <- extract(object, "model")$KRM$TS
-      x_axis_domain <- extract(object, "model_parameters")$KRM$parameters
-      if (x_units == "frequency") {
-        x_axis <- x_axis_domain$acoustics$frequency * 1e-3
-        x_lab <- "Frequency (kHz)"
-      } else if (x_units == "k_b") {
-        x_axis <- x_axis_domain$acoustics$k_sw * max(shape$rpos[1, ])
-        x_lab <- expression(italic(k[b] * L))
-      }
-      # Plot results ===============================================
-      graphics::par(
-        ask = FALSE,
-        mar = c(4, 4.5, 1, 1)
-      )
-      plot(
-        x = x_axis,
-        y = TS,
-        type = "l",
-        xlab = x_lab,
-        ylab = expression(Target ~ strength ~ (dB ~ re. ~ 1 ~ m^2)),
-        lwd = 2.5,
-        cex.lab = 1.2,
-        cex.axis = 1.2,
-        xlim = c(
-          min(x_axis) * (1 - nudge_x),
-          max(x_axis) * (nudge_x)
-        ),
-        ylim = c(
-          min(TS) * (1 - (1 - nudge_y)),
-          max(TS) * (1 + (1 - nudge_y))
-        ),
-        xaxs = "i",
-        yaxs = "i"
-      )
-    }
+    .plot_model_results(
+      .collect_model_plot_data(
+        object,
+        x_units = x_units,
+        y_units = y_units
+      ),
+      nudge_y = nudge_y,
+      nudge_x = nudge_x
+    )
   }
+  invisible()
+}
+################################################################################
+#' Plotting for BBF-class objects
+#' @param object BBF-class object.
+#' @param type Toggle between body shape (`"shape"`), modeling results
+#'   (`"model"`), or stored TMM angular slices (`"scattering"`).
+#' @param x_units If "model" is selected, then toggle between frequency
+#'    ("frequency", kHz) or ka ("ka").
+#' @param nudge_y y-axis nudge.
+#' @param nudge_x x-axis nudge.
+#' @param aspect_ratio Aspect ratio setting.
+#' @param y_units y-axis data selection (e.g. TS, sigma_bs -- defaults to TS).
+#' @param ... Additional plot inputs
+#' @noRd
+bbf_plot <- function(object,
+                     type = "shape",
+                     nudge_y = 1.05,
+                     nudge_x = 1.01,
+                     aspect_ratio = "manual",
+                     x_units = "frequency",
+                     y_units = "TS", ...) {
+  # Respect caller-managed panel layouts by avoiding a full par() reset =======
+
+  if (type == "shape") {
+    body_component <- extract(object, "body")
+    backbone_component <- extract(object, "backbone")
+    .plot_profile_component_panels(
+      primary_rpos = body_component$rpos,
+      primary_radius = body_component$radius,
+      secondary_rpos = backbone_component$rpos,
+      secondary_radius = backbone_component$radius,
+      primary_label = "Body",
+      secondary_label = "Backbone",
+      secondary_col = "dodgerblue3",
+      nudge_y = nudge_y,
+      nudge_x = nudge_x
+    )
+  } else if (type == "model") {
+    .plot_model_results(
+      .collect_model_plot_data(
+        object,
+        x_units = x_units,
+        y_units = y_units
+      ),
+      nudge_y = nudge_y,
+      nudge_x = nudge_x
+    )
+  }
+
   invisible()
 }

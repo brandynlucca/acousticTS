@@ -1,0 +1,61 @@
+---
+title: "ESSMS"
+output:
+  rmarkdown::html_vignette:
+    toc: false
+    number_sections: false
+    fig_caption: yes
+vignette: >
+  %\VignetteIndexEntry{ESSMS}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+# Overview
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  family = "essms",
+  pages = c(
+    Overview = "index.html",
+    Implementation = "essms-implementation.html",
+    Theory = "essms-theory.html"
+  )
+)
+```
+
+```{r essms_overview, echo=FALSE, results='asis'}
+acousticTS:::.model_family_overview(
+  family = "essms",
+  summary = paste(
+    "The elastic shelled spherical modal series (`ESSMS`) is the package's",
+    "layered spherical family for an elastic shell surrounding either a fluid",
+    "interior or a pressure-release cavity."
+  ),
+  core_idea = paste(
+    "Represent the exterior acoustic field, the shell's longitudinal and",
+    "transverse elastic fields, and the interior acoustic field in spherical",
+    "modes, then match pressure, displacement, and traction conditions at both",
+    "shell interfaces."
+  ),
+  best_for = c(
+    "Spherical elastic shells with fluid or gas interiors",
+    "Layered shell problems where shell resonances matter explicitly",
+    "Theoretical reference work on spherical shell scattering"
+  ),
+  supports = c(
+    "`ESS` spherical geometries",
+    "Exterior seawater (medium `1`), shell (medium `2`), and interior fluid or cavity (medium `3`)",
+    "Pressure-release and fluid-filled shell interiors"
+  ),
+  assumptions = c(
+    "Perfectly spherical shell geometry",
+    "Homogeneous isotropic shell material",
+    "Linear elasticity and linear acoustics",
+    "Modal truncation of an exact spherical layered system"
+  ),
+  reading = c(
+    "[Implementation](essms-implementation.html): current usage and validation status",
+    "[Theory](essms-theory.html): full layered shell derivation, tractions, and mode-wise boundary systems"
+  )
+)
+```
+

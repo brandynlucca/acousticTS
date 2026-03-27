@@ -2,10 +2,10 @@
 % Please edit documentation in R/create_scatterer.R
 \name{ess_generate}
 \alias{ess_generate}
-\title{Generate ESS shape}
+\title{Generate an ESS-class object}
 \usage{
 ess_generate(
-  shape = "sphere",
+  shape = NULL,
   x_body = NULL,
   y_body = NULL,
   z_body = NULL,
@@ -30,8 +30,11 @@ ess_generate(
 )
 }
 \arguments{
-\item{shape}{Optional input argument that dictates shape-type, if desired,
-for generalized shapes.}
+\item{shape}{Pre-built \code{Shape} object describing the outer shell geometry. If
+omitted, explicit shell profile coordinates such as \code{x_body}, \code{y_body},
+and \code{z_body} are treated as the manual geometry pathway. Legacy character
+dispatch such as \code{"sphere"} is retained only for backward compatibility and
+is now deprecated.}
 
 \item{x_body}{Vector containing x-axis body (m) shape data.}
 
@@ -71,15 +74,43 @@ for generalized shapes.}
 
 \item{ID}{Optional metadata entry.}
 
-\item{theta_units}{Units used for orientation. Defaults to "radians".}
+\item{theta_units}{Compatibility argument. Scatterer constructors now assume
+radians and ignore non-SI alternatives.}
 
-\item{length_units}{Units used for position vector. Defaults to "m".}
+\item{length_units}{Compatibility argument. Scatterer constructors now assume
+meters and ignore non-SI alternatives.}
 }
 \value{
 ESS-class object
 }
 \description{
-Generate ESS shape
+Generate an ESS-class object
+}
+\details{
+The preferred workflow is to build the shell geometry first as a \code{Shape}
+object and pass it through \code{shape}, or to supply explicit shell profile
+coordinates directly. Character-based shape dispatch remains available only
+as a compatibility pathway and is now deprecated. Material properties for
+both the shell and the inner fluid may be supplied either as contrasts or as
+absolute values, but each property pair must use only one representation.
+
+Scatterer constructors store geometry in meters and orientations in radians.
+\code{length_units} and \code{theta_units} are retained as compatibility arguments, but
+non-SI values are normalized to the package-standard representation.
+}
+\examples{
+shell <- sphere(radius_body = 0.03, n_segments = 80)
+ess_generate(
+  shape = shell,
+  shell_thickness = 0.001,
+  density_shell = 1050,
+  sound_speed_shell = 2350,
+  density_fluid = 1030,
+  sound_speed_fluid = 1500,
+  E = 3.5e9,
+  nu = 0.34
+)
+
 }
 \seealso{
 \code{\link{ESS}}

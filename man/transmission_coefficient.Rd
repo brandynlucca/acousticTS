@@ -2,9 +2,9 @@
 % Please edit documentation in R/acoustics.R
 \name{transmission_coefficient}
 \alias{transmission_coefficient}
-\title{Transmission coefficient for transmission between two mediums}
+\title{Plane wave/plane interface transmission coefficient}
 \usage{
-transmission_coefficient(interface1, interface2)
+transmission_coefficient(interface1, interface2, mode = "DWBA")
 }
 \arguments{
 \item{interface1}{Dataframe object containing density (kg/m^3) and sound
@@ -12,7 +12,12 @@ speed (m/s) values for a boundary/interface (1)}
 
 \item{interface2}{Dataframe object containing density (kg/m^3) and sound
 speed (m/s) values for a boundary/interface (2)}
+
+\item{mode}{Two options: coefficient calculation for "DWBA" and "KRM"}
+}
+\value{
+Pressure-amplitude transmission coefficient at normal incidence.
 }
 \description{
-Transmission coefficient for transmission between two mediums
+Plane wave/plane interface transmission coefficient
 }

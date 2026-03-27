@@ -1,0 +1,115 @@
+name: implementation-figures
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: Figure rebuild profile
+        type: choice
+        required: true
+        default: light
+        options:
+          - light
+          - all
+      families:
+        description: >
+          Optional comma-separated families to rebuild. Use "all" or leave
+          blank to rebuild the selected profile.
+        required: false
+        type: string
+      fail_on_drift:
+        description: Fail the workflow if rebuild drift is detected
+        type: boolean
+        required: true
+        default: false
+
+permissions: read-all
+
+jobs:
+  implementation-figures:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - name: Install Fortran toolchain
+        run: sudo apt-get update && sudo apt-get install -y gfortran
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::devtools, local::.
+          needs: website
+
+      - name: Fetch PR base branch
+        if: github.event_name == 'pull_request'
+        run: git fetch origin "${{ github.base_ref }}" --depth=1
+
+      - name: Resolve implementation figure scope
+        id: scope
+        env:
+          ACOUSTICTS_IMPL_PROFILE: >-
+            ${{ github.event_name == 'workflow_dispatch'
+              && inputs.profile || 'light' }}
+          ACOUSTICTS_IMPL_REQUESTED_FAMILIES: >-
+            ${{ github.event_name == 'workflow_dispatch'
+              && inputs.families || '' }}
+          GITHUB_BASE_REF: ${{ github.base_ref }}
+        run: source("tools/implementation-figures/resolve_changed_families.R")
+        shell: Rscript {0}
+
+      - name: Rebuild implementation figures
+        if: steps.scope.outputs.scope != 'skip'
+        env:
+          ACOUSTICTS_IMPL_PROFILE: ${{ steps.scope.outputs.profile }}
+          ACOUSTICTS_IMPL_FAMILIES: ${{ steps.scope.outputs.families }}
+        run: source("tools/implementation-figures/run_all.R")
+        shell: Rscript {0}
+
+      - name: Report drift
+        if: steps.scope.outputs.scope != 'skip'
+        run: |
+          git diff --name-only -- \
+            vignettes \
+            tools/implementation-figures \
+            > implementation_drift.txt
+
+          if [ ! -s implementation_drift.txt ]; then
+            exit 0
+          fi
+
+          echo "Detected implementation rebuild drift:"
+          cat implementation_drift.txt
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && \
+             [ "${{ inputs.fail_on_drift }}" = "true" ]; then
+            echo "Implementation figures/data are out of date."
+            exit 1
+          fi
+
+          echo "::warning::Implementation rebuild produced drift, but this PR job is informational only."
+
+      - name: Save drift patch
+        if: steps.scope.outputs.scope != 'skip'
+        run: |
+          git diff --binary -- \
+            vignettes \
+            tools/implementation-figures \
+            > implementation_drift.patch
+
+      - uses: actions/upload-artifact@v4
+        if: steps.scope.outputs.scope != 'skip' && hashFiles('implementation_drift.txt') != ''
+        with:
+          name: implementation-drift
+          path: |
+            implementation_drift.txt
+            implementation_drift.patch
