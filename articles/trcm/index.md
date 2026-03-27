@@ -1,0 +1,54 @@
+# TRCM
+
+## Overview
+
+Benchmarked
+
+*Model-family pages:*
+[Overview](https://brandynlucca.github.io/acousticTS/articles/trcm/index.md)
+[Implementation](https://brandynlucca.github.io/acousticTS/articles/trcm/trcm-implementation.md)
+[Theory](https://brandynlucca.github.io/acousticTS/articles/trcm/trcm-theory.md)
+
+The two-ray cylinder model (`TRCM`) is a high-frequency asymptotic
+family for elongated fluid-like bodies. It retains only two dominant
+coherent paths: a prompt near-side reflection and a through-body path
+that returns after an internal reflection.
+
+### Core idea
+
+Replace the full internal reverberation problem by the first two
+physically important ray paths and compute the target strength from
+their interference, combined with a finite-length directivity factor.
+
+### Best for
+
+- High-frequency elongated fluid-like targets
+- Cylinder-like bodies whose scattering is dominated by specular path
+  interference
+- Fast asymptotic estimates when a full modal or perturbative solve is
+  unnecessary
+
+### Supports
+
+- Straight and bent cylindrical-style branches
+- Contrast notation relative to seawater as medium `1`
+- Monostatic high-frequency backscatter estimates
+
+### Main assumptions
+
+- High-frequency regime
+- Only two dominant coherent internal/external paths are retained
+- No low-order resonances or full internal multiple scattering series
+
+### Validation status
+
+- Benchmarked within the package validation workflow against the
+  straight-cylinder and FCMS-derived bent-cylinder reference
+  constructions.
+
+### Family pages
+
+- [Implementation](https://brandynlucca.github.io/acousticTS/articles/trcm/trcm-implementation.md):
+  usage and comparison workflows
+- [Theory](https://brandynlucca.github.io/acousticTS/articles/trcm/trcm-theory.md):
+  two-ray geometry, interference factor, and finite-length directivity

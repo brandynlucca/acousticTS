@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="935.13513"
+   height="286.44144"
+   viewBox="0 0 935.13513 286.44144"
+   version="1.1"
+   id="svg5"
+   sodipodi:docname="validation-ladder.svg"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs5" />
+  <sodipodi:namedview
+     id="namedview5"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.96521739"
+     inkscape:cx="541.32883"
+     inkscape:cy="260.56306"
+     inkscape:window-width="1920"
+     inkscape:window-height="1057"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg5" />
+  <rect
+     class="bg"
+     width="935.13513"
+     height="286.44144"
+     id="rect2-2"
+     style="fill:#f7f2ea;stroke-width:1"
+     x="0"
+     y="0" />
+  <text
+     x="360.55096"
+     y="33.489365"
+     font-family="Georgia, serif"
+     font-size="28px"
+     fill="#203040"
+     id="text1">Validation ladder</text>
+  <rect
+     x="127.56757"
+     y="192.28043"
+     width="680"
+     height="48"
+     rx="14"
+     fill="#d4e7e7"
+     stroke="#0f5c5c"
+     stroke-width="4"
+     id="rect2"
+     ry="14" />
+  <text
+     x="300.97968"
+     y="224.28043"
+     font-family="Georgia, serif"
+     font-size="24px"
+     fill="#203040"
+     id="text2">1. Object and unit sanity checks</text>
+  <rect
+     x="177.56757"
+     y="122.28043"
+     width="580"
+     height="48"
+     rx="14"
+     fill="#eef0de"
+     stroke="#7a6a2a"
+     stroke-width="4"
+     id="rect3"
+     ry="14" />
+  <text
+     x="249.66913"
+     y="154.28043"
+     font-family="Georgia, serif"
+     font-size="24px"
+     fill="#203040"
+     id="text3">2. Known limits and asymptotic behavior</text>
+  <rect
+     x="227.56757"
+     y="52.280426"
+     width="480"
+     height="48"
+     rx="14"
+     fill="#f3dfcf"
+     stroke="#a35d24"
+     stroke-width="4"
+     id="rect4"
+     ry="14" />
+  <text
+     x="258.67499"
+     y="84.280426"
+     font-family="Georgia, serif"
+     font-size="24px"
+     fill="#203040"
+     id="text4">3. Benchmark or published comparison</text>
+  <text
+     x="14.564636"
+     y="272.28043"
+     font-family="Georgia, serif"
+     font-size="20px"
+     fill="#203040"
+     id="text5">The higher the step, the more confidence that an unusual result is physical rather than a setup mistake.</text>
+</svg>

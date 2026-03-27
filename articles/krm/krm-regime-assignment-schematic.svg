@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 1096.2162 242.16217"
+   role="img"
+   aria-labelledby="title desc"
+   version="1.1"
+   id="svg17"
+   sodipodi:docname="krm-regime-assignment-schematic.svg"
+   width="1096.2162"
+   height="242.16217"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview17"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.925"
+     inkscape:cx="592.97297"
+     inkscape:cy="-101.08108"
+     inkscape:window-width="1920"
+     inkscape:window-height="1057"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg17" />
+  <title
+     id="title">KRM regime assignment</title>
+  <desc
+     id="desc">Schematic showing that the KRM assigns weakly scattering body segments and strongly contrasting swimbladder segments to different acoustic approximations.</desc>
+  <defs
+     id="defs1">
+    <style
+       id="style1">
+      .bg { fill: #f7f2e9; }
+      .panel { fill: #fffdfa; stroke: #2f2822; stroke-width: 2.2; rx: 16; ry: 16; }
+      .body { fill: #d8e8d8; stroke: #2f2822; stroke-width: 2.2; }
+      .bladder { fill: #f7d7ae; stroke: #2f2822; stroke-width: 2.2; }
+      .head { font: 700 21px Georgia, serif; fill: #1f1a16; }
+      .txt { font: 15px Georgia, serif; fill: #2f2822; }
+      .small { font: 13px Georgia, serif; fill: #564b40; }
+      .arrow { stroke: #564b40; stroke-width: 2.4; fill: none; marker-end: url(#m); }
+    </style>
+    <marker
+       id="m"
+       markerWidth="10"
+       markerHeight="10"
+       refX="8"
+       refY="5"
+       orient="auto">
+      <path
+         d="M 0,0 10,5 0,10 Z"
+         fill="#564b40"
+         id="path1" />
+    </marker>
+  </defs>
+  <rect
+     width="1096.2162"
+     height="242.16217"
+     class="bg"
+     id="rect1"
+     x="0"
+     y="0"
+     style="stroke-width:0.999996" />
+  <text
+     x="172.18237"
+     y="28.054054"
+     class="head"
+     id="text1"
+     style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:21px;line-height:normal;font-family:Georgia, serif">Why the KRM uses different approximations for different components</text>
+  <path
+     d="m 347.07095,137.1472 c 11.4746,0 16.39228,0 27.86688,0"
+     class="arrow"
+     id="path16" />
+  <g
+     id="g24"
+     transform="translate(-10,-25.945946)">
+    <rect
+       x="24"
+       y="78.702156"
+       width="334"
+       height="168.782"
+       class="panel"
+       id="rect2" />
+    <path
+       d="m 68,153 c 62,-57 162,-57 244,0 -82,57 -182,57 -244,0 z"
+       class="body"
+       id="path2" />
+    <ellipse
+       cx="197.22353"
+       cy="97.641998"
+       rx="36.701542"
+       ry="6.3307037"
+       class="bladder"
+       id="ellipse2"
+       transform="matrix(0.96281001,0.27017936,-0.25905016,0.96586387,0,0)" />
+    <text
+       x="114.24585"
+       y="100"
+       class="txt"
+       id="text2"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;line-height:normal;font-family:Georgia, serif">Single geometric target</text>
+    <text
+       x="191.34277"
+       y="214.64893"
+       class="small"
+       id="text3"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13px;line-height:0.9;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#564b40"><tspan
+         sodipodi:role="line"
+         id="tspan17"
+         x="191.34277"
+         y="214.64893"
+         style="line-height:0.9">The body and embedded inclusion share one geometry,</tspan><tspan
+         sodipodi:role="line"
+         id="tspan18"
+         x="191.34277"
+         y="226.34892"
+         style="line-height:0.9">but they do not share one acoustic regime.</tspan></text>
+  </g>
+  <path
+     d="m 349.62072,136.24907 c 0.3962,-26.5027 2.29768,-71.834692 18.78551,-83.167552 32.77629,-22.528679 332.53406,-12.203387 351.95487,-5.611808 38.02699,27.916834 -16.36287,53.50413 22.63888,89.67749"
+     class="arrow"
+     id="path17"
+     sodipodi:nodetypes="cssc" />
+  <g
+     id="g25"
+     transform="translate(-11.16217,-25.945946)">
+    <rect
+       x="392"
+       y="78.702156"
+       width="334"
+       height="168.78217"
+       class="panel"
+       id="rect4" />
+    <text
+       x="516.82349"
+       y="100"
+       class="txt"
+       id="text5"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;line-height:normal;font-family:Georgia, serif">Body branch</text>
+    <text
+       x="558.83496"
+       y="214.64893"
+       class="small"
+       id="text6"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13px;line-height:0.9;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#564b40"><tspan
+         sodipodi:role="line"
+         id="tspan19"
+         x="558.83496"
+         y="214.64893">Weak contrast</tspan><tspan
+         sodipodi:role="line"
+         id="tspan20"
+         x="558.83496"
+         y="226.34892">Smooth locally ellipsoidal/cylindrical surface</tspan><tspan
+         sodipodi:role="line"
+         id="tspan21"
+         x="558.83496"
+         y="238.04892">Specular plus first through-body path</tspan></text>
+    <path
+       d="m 436.84904,153 c 62,-56.999997 162,-56.999997 244,0 -82,57 -182,57 -244,0 z"
+       class="body"
+       id="path18" />
+  </g>
+  <g
+     id="g26"
+     transform="translate(0,-25.94603)">
+    <rect
+       x="747.67566"
+       y="78.702156"
+       width="334"
+       height="168.78217"
+       class="panel"
+       id="rect21" />
+    <text
+       x="845.46912"
+       y="101.43188"
+       class="txt"
+       id="text11"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;line-height:normal;font-family:Georgia, serif">Swimbladder branch</text>
+    <text
+       x="914.52014"
+       y="214.0332"
+       class="small"
+       id="text12"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13px;line-height:0.9;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#564b40"><tspan
+         sodipodi:role="line"
+         id="tspan22"
+         x="914.52014"
+         y="214.0332">Strong contrast</tspan><tspan
+         sodipodi:role="line"
+         id="tspan23"
+         x="914.52014"
+         y="225.7332">Small ka: low-order cylindrical mode</tspan><tspan
+         sodipodi:role="line"
+         id="tspan24"
+         x="914.52014"
+         y="237.4332">Large ka: local Kirchoff approximation</tspan></text>
+    <ellipse
+       cx="921.74799"
+       cy="-105.02795"
+       rx="36.701542"
+       ry="6.3307037"
+       class="bladder"
+       id="ellipse21"
+       transform="matrix(0.96281001,0.27017936,-0.25905016,0.96586387,0,0)" />
+  </g>
+</svg>

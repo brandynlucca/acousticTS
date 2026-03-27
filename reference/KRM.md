@@ -1,0 +1,256 @@
+# Kirchhoff Ray Mode (KRM) scattering model
+
+Computes the far-field acoustic scattering amplitude and derived
+quantities for fish and similar elongated scatterers using the
+Kirchhoff–Ray Mode (KRM) approximation described by Clay and Horne
+(1994). The KRM model is widely used in fisheries acoustics for
+estimating target strength, particularly for fish with gas-filled
+swimbladders.
+
+The model represents the fish body and swimbladder as a series of
+contiguous cylindrical elements and computes the coherent sum of their
+scattered fields. Depending on frequency and element size, scattering
+from each segment is evaluated using either a low-frequency modal
+solution or a high-frequency Kirchhoff (ray-based) approximation.
+
+## Usage
+
+This model is accessed via:
+
+    target_strength(
+      ...,
+      model="krm",
+      sound_speed_sw,
+      density_sw,
+      krm_variant = "lowcontrast"
+    )
+
+## Arguments
+
+- `sound_speed_sw`:
+
+  Seawater sound speed (\\m~s^{-1}\\).
+
+- `density_sw`:
+
+  Seawater density (\\kg~m^{-3}\\).
+
+- `krm_variant`:
+
+  Swimbladder-medium convention for combined body-plus-bladder targets.
+  Use `"lowcontrast"` for the low-contrast approximation \\k_B \approx
+  k\\ in both swimbladder regimes, `"body_embedded"` for the literal
+  body-embedded interpretation of Clay and Horne (1994), or `"mixed"`
+  for the intermediate convention in which the high-\\ka\\ swimbladder
+  term uses the body medium but the low-\\ka\\ breathing-mode term uses
+  the low-contrast approximation. This argument is ignored for
+  fluid-only body targets.
+
+## Scatterer representation
+
+The scatterer must provide body and swimbladder geometry discretized
+into axial segments. Each segment is described by its longitudinal
+position and cross-sectional dimensions. Typical geometric quantities
+include \\x(j)\\, \\z_U(j)\\, \\z_L(j)\\, and radius \\a(j)\\ for both
+the body and the swimbladder.
+
+The incident plane wave is defined by angle \\\theta\\, and coordinates
+are transformed into a rotated system according to:
+
+\$\$ u(j) = x(j) \sin \theta - z(j) \cos \theta, \$\$ \$\$ v(j) = x(j)
+\cos \theta + z(j) \sin \theta, \$\$ \$\$ \Delta u_j = \[x(j+1) - x(j)\]
+\sin \theta, \$\$ \$\$ a_j = \[w(j) + w(j+1)\] / 4. \$\$
+
+Segment lengths and effective radii are computed from adjacent points
+and used to evaluate the scattering contribution from each element.
+
+## Theory
+
+The total backscattering amplitude is computed as the coherent sum of
+all scatterer segments:
+
+\$\$ \mathcal{L} = \sum\limits\_{b=1}^{N_b} \mathcal{L}\_{B,b} +
+\sum\limits\_{s=1}^{N_s} \mathcal{L}\_{SB,s}, \$\$
+
+where \\\mathcal{L}\_{B,b}\\ is the contribution from the \\b\\-th body
+segment and \\\mathcal{L}\_{SB,s}\\ is from the \\s\\-th swimbladder
+segment. For body segments:
+
+\$\$ \mathcal{L}\_{B,b} \approx -i \frac{\mathcal{R}\_{wb}}{2\sqrt{\pi}}
+(k a_b)^{1/2} \Delta u_b \left\[ e^{-i2k v\_{U,b}} -
+\mathcal{T}\_{wb}\mathcal{T}\_{bw} e^{-i2k v\_{U,b} + i 2 k_B
+(v\_{U,b} - v\_{L,b}) + i \psi\_{B,b}} \right\], \$\$
+
+where \\\mathcal{R}\_{wb}\\ and \\\mathcal{T}\_{wb}\\ are reflection and
+transmission coefficients at the water-body interface, \\k\\ is the
+wavenumber in water, and \\k_B\\ in the body. The quantities
+\\v\_{U,b}\\ and \\v\_{L,b}\\ are the rotated upper- and lower-surface
+coordinates of the \\b\\-th segment, \\\Delta u_b = \[x(b+1)-x(b)\]
+\sin\theta\\, and \\\psi\_{B,b}\\ is an empirical phase correction.
+
+The scattering from the swimbladder depends on the dimensionless
+frequency parameter \\ka_e\\, \\a_e\\ is the equivalent swimbladder
+radius. For low frequencies (\\ka \< 0.15\\), the swimbladder is treated
+as a finite-length gas-filled cylinder, and the scattering is dominated
+by the first cylindrical mode (breathing mode):
+
+\$\$ L_M(ka)\|\_{m=0} = e^{i(\chi - \pi/4)} \frac{L_e}{\pi} \frac{\sin
+\Delta}{\Delta} b_0, \$\$ \$\$ b_0 = -\frac{1}{1 + i C_0}, \$\$
+
+where \\C_0\\ is a mode coefficient determined by the material
+properties and boundary conditions of the swimbladder. For higher
+frequencies \\ka \ge 0.15\\), the Kirchhoff-ray approximation is used:
+
+\$\$ \mathcal{L}\_{SB,s} \approx -i \frac{\mathcal{R}\_{bc}
+\mathcal{T}\_{wb}\mathcal{T}\_{bw}}{2\sqrt{\pi}} A\_{SB,s} \[(k a_s +
+1)\sin\theta\]^{1/2} \Delta u_s e^{-i (2 k_B v_s + \psi\_{p,s})}. \$\$
+
+Here, \\a_s\\ and \\v_s\\ are the averaged radius and longitudinal
+position for the segment, \\\mathcal{R}\_{bc}\\ is the reflection
+coefficient at the body-cylinder interface, and \\A\_{SB,s}\\ and
+\\\psi\_{p,s}\\ are empirical amplitude and phase adjustments,
+respectively.
+
+For body-plus-swimbladder targets, the default coherent KRM combines the
+two complex scattering lengths as:
+
+\$\$ f\_{bs}^{(\mathrm{coh})} = f\_{body} + f\_{bladder}, \$\$
+
+which gives:
+
+\$\$ \sigma\_{bs}^{(\mathrm{coh})} = \left\|f\_{body} +
+f\_{bladder}\right\|^2. \$\$
+
+## Swimbladder medium conventions
+
+Clay and Horne (1994) derive the swimbladder term for a gas-filled
+inclusion embedded in body tissue, but also note that the low body-water
+contrast can justify the approximation \\k_B \approx k\\. For combined
+body-plus- bladder targets, `acousticTS` exposes that choice through
+`krm_variant`:
+
+- `"body_embedded"`:
+
+  Use the body medium for both the high-\\ka\\ Kirchhoff swimbladder
+  term and the low-\\ka\\ breathing-mode term. This is the most literal
+  interpretation of the body-embedded swimbladder geometry in Clay and
+  Horne (1994).
+
+- `"mixed"`:
+
+  Use the body medium for the high-\\ka\\ swimbladder term but the water
+  approximation for the low-\\ka\\ breathing-mode term. This follows the
+  later mixed convention discussed in the fisheries-acoustics
+  literature.
+
+- `"lowcontrast"`:
+
+  Use the low-contrast approximation \\k_B \approx k\\ for both
+  swimbladder regimes, i.e. evaluate both the high-\\ka\\ and low-\\ka\\
+  swimbladder terms with the external-medium wavenumber rather than the
+  body-medium wavenumber.
+
+These named variants make the swimbladder-medium assumption explicit
+while keeping the public API tied to the scientific interpretation
+rather than to implementation-specific knob names.
+
+**Assumptions and limitations**
+
+The KRM formulation assumes that the scatterer is smooth, elongated, and
+approximately axisymmetric, such that both the Kirchhoff (ray)
+approximation and low-order cylindrical mode solutions are valid
+representations of the local scattering physics. The body andswimbladder
+are discretized into short axial segments, each with its own local
+height and width. While the segments are treated as locally cylindrical
+for the purpose of computing the scattered field, their dimensions may
+vary independently along the body axis. The total scattered field is
+obtained as a coherent sum of the contributions from these segments,
+which implicitly assumes that geometric and material properties vary
+gradually relative to the acoustic wavelength.
+
+The model further assumes that scattering is dominated by first-order
+interactions between the incident field and each local element. Multiple
+internal reflections and higher-order multiple scattering between
+different segments are neglected. For the fish body, the material is
+treated as fluid-like, with no explicit treatment of elastic shear waves
+or bending modes. As a result, elastic shell effects, bone resonance,
+and complex internal structural scattering are not represented
+explicitly, except insofar as they may be approximated through effective
+reflection or transmission coefficients.
+
+The Kirchhoff approximation employed in the high-frequency regime
+assumes that the local radius of curvature of each segment is large
+compared to the acoustic wavelength, and that the incident wave
+interacts primarily with the illuminated surface. Accuracy degrades for
+end-on incidence, sharp geometric discontinuities, or highly concave
+regions, where shadowing and diffraction effects become significant. The
+low-frequency mode solution used for small values of \\ka\\ is limited
+to the lowest-order cylindrical modes and does not capture higher-order
+resonances that may arise for more complex internal geometries.
+
+Orientation dependence is treated deterministically through the incident
+angle \\\theta\\, and the model does not account for stochastic body
+deformations, posture changes, or dynamic swimbladder shape variations.
+Surface roughness may be included through empirical attenuation of the
+reflection coefficient, but this treatment is phenomenological and does
+not represent scattering from discrete roughness elements. Consequently,
+the KRM is best suited for predicting mean or orientation-specific
+target strength for smooth-bodied organisms, and its accuracy decreases
+when applied to organisms with highly irregular shapes, strong elastic
+contrasts, or complex internal skeletal structures.
+
+## Fluid-only and alternative scattering configurations
+
+Although the KRM formulation is most commonly applied to fish with
+gas-filled swimbladders, the model can also be used to compute target
+strength using only the fluid-like scattering contribution of the body.
+
+In this configuration, the swimbladder scattering term is omitted and
+the total scattered field is obtained solely from the fluid contrast
+between the animal body and the surrounding medium. This mode of
+operation is appropriate for organisms that lack swimbladders (e.g. many
+invertebrates, elasmobranchs, or larval fish), or when swimbladder
+geometry is unknown or intentionally excluded.
+
+More generally, the swimbladder component in the KRM framework may be
+replaced or supplemented by alternative internal scattering features,
+provided they can be represented geometrically and assigned appropriate
+acoustic boundary conditions. Examples include rigid or elastic skeletal
+structures (e.g. vertebral columns) or other localized impedance
+contrasts within an otherwise fluid-like body.
+
+In all cases, the total target strength is computed from the coherent
+sum of the selected scattering components. Users are responsible for
+ensuring that the assumed boundary conditions and material contrasts are
+consistent with the biological structure being modeled.
+
+## Implementation
+
+The implementation extracts geometric and acoustic parameters from the
+input object, transforms coordinates to the rotated reference frame,
+evaluates the appropriate modal or ray-based scattering expression for
+each segment, and coherently sums the contributions to obtain the total
+scattering amplitude and target strength.
+
+## References
+
+Clay, C.S. (1991). Low resolution acoustic scattering models:
+Fluid-filled cylinders and fish with swimbladders. The Journal of the
+Acoustical Society of America, 89: 2168-2179.
+
+Clay, C.S. (1992). Composite ray-mode approximations for backscattered
+sound from gas-filled cylinders and swimbladders.The Journal of the
+Acoustical Society of America, 92: 2173-2180.
+
+Clay, C.S., and Horne, J.K. (1994). Acoustic models of fish: The
+Atlantic cod (*Gadus morhua*). The Journal of the Acoustical Society of
+America, 96: 1661-1668.
+
+## See also
+
+See the [boundary conditions
+documentation](https://brandynlucca.github.io/acousticTS/reference/boundary_conditions.md)
+for more details on fluid-like scattering assumptions,
+[`target_strength`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md),
+[`SBF`](https://brandynlucca.github.io/acousticTS/reference/SBF-class.md),
+[`FLS`](https://brandynlucca.github.io/acousticTS/reference/FLS-class.md)

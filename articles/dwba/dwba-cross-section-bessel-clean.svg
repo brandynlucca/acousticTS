@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 836.53156 314.95496"
+   role="img"
+   aria-labelledby="title desc"
+   version="1.1"
+   id="svg32"
+   sodipodi:docname="dwba-cross-section-bessel-clean.svg"
+   width="836.53156"
+   height="314.95496"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview32"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.90612245"
+     inkscape:cx="323.90766"
+     inkscape:cy="88.84009"
+     inkscape:window-width="1920"
+     inkscape:window-height="1057"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg32" />
+  <title
+     id="title">DWBA cross-section to Bessel factor</title>
+  <desc
+     id="desc">Diagram showing how azimuthal and radial integration over
+    a circular section yields the J₁ cross-sectional factor in the
+    DWBA.</desc>
+  <style
+     id="style1">
+    .bg { fill: #fbf8f1; }
+    .head { font: 700 28px Georgia, serif; fill: #1f3345; }
+    .body { font: 18px Georgia, serif; fill: #1f3345; }
+    .small { font: 15px Georgia, serif; fill: #44586a; }
+    .math { font-style: italic; }
+    .sub { font-size: 75%; baseline-shift: sub; }
+    .circle { fill: #dcecea; stroke: #3c7f80; stroke-width: 2.5; }
+    .dash { fill: none; stroke: #9ab7b8; stroke-width: 1.8; stroke-dasharray: 6 5; }
+    .arrow { stroke: #1f3345; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+    .accent { stroke: #bb4d00; stroke-width: 3.5; fill: none; marker-end: url(#arrow2); }
+    .box { fill: #fffdfa; stroke: #718899; stroke-width: 2; rx: 16; ry: 16; }
+  </style>
+  <defs
+     id="defs2">
+    <marker
+       id="arrow"
+       markerWidth="10"
+       markerHeight="10"
+       refX="8"
+       refY="5"
+       orient="auto">
+      <path
+         d="M 0,0 10,5 0,10 Z"
+         fill="#1f3345"
+         id="path1" />
+    </marker>
+    <marker
+       id="arrow2"
+       markerWidth="10"
+       markerHeight="10"
+       refX="8"
+       refY="5"
+       orient="auto">
+      <path
+         d="M 0,0 10,5 0,10 Z"
+         fill="#bb4d00"
+         id="path2" />
+    </marker>
+  </defs>
+  <rect
+     class="bg"
+     width="836.53156"
+     height="314.95496"
+     id="rect2"
+     x="0"
+     y="0"
+     style="stroke-width:1" />
+  <text
+     x="7.837677"
+     y="35.37838"
+     class="head"
+     id="text2"
+     style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:28px;line-height:normal;font-family:Georgia, serif">Why the local circular section produces the Bessel factor</text>
+  <text
+     x="74.761261"
+     y="70.135139"
+     class="body"
+     id="text3"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;line-height:normal;font-family:Georgia, serif">Local circular section at s</text>
+  <circle
+     cx="163.85135"
+     cy="201.37837"
+     r="96"
+     class="circle"
+     id="circle3" />
+  <circle
+     cx="163.85135"
+     cy="201.37837"
+     r="66"
+     class="dash"
+     id="circle4" />
+  <circle
+     cx="163.85135"
+     cy="201.37837"
+     r="38"
+     class="dash"
+     id="circle5" />
+  <line
+     x1="163.85135"
+     y1="201.37837"
+     x2="259.85135"
+     y2="201.37837"
+     class="arrow"
+     id="line5" />
+  <text
+     x="269.85135"
+     y="207.37837"
+     class="body"
+     id="text5"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;line-height:normal;font-family:Georgia, serif"><tspan
+   class="math"
+   id="tspan5">r</tspan>⊥</text>
+  <path
+     d="m 201.85135,187.37838 a 42,42 0 0 1 -20,52"
+     fill="none"
+     stroke="#6a7e8f"
+     stroke-width="2.5"
+     id="path5" />
+  <text
+     x="207.43692"
+     y="187.4482"
+     class="body"
+     id="text6"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;line-height:normal;font-family:Georgia, serif">φ</text>
+  <line
+     x1="163.85135"
+     y1="201.37837"
+     x2="163.85135"
+     y2="99.37838"
+     class="accent"
+     id="line6" />
+  <text
+     x="172.74776"
+     y="101.10136"
+     class="body"
+     id="text7"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;line-height:normal;font-family:Georgia, serif;fill:#bb4d00;fill-opacity:1">Phase gradient across section</text>
+  <text
+     x="291.93692"
+     y="115.72072"
+     class="small"
+     id="text10"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;line-height:normal;font-family:Georgia, serif;fill:#44586a">Set by 2k<tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan33">2</tspan>cos <tspan
+   style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;font-family:Sans;-inkscape-font-specification:'Sans, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   id="tspan37">β</tspan><tspan
+   id="tspan40"
+   style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:9.75px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;baseline-shift:sub">tiltt</tspan></text>
+  <line
+     x1="301.85135"
+     y1="201.37837"
+     x2="494.21805"
+     y2="201.37837"
+     class="arrow"
+     id="line10" />
+  <text
+     x="277.63287"
+     y="180.13737"
+     class="body"
+     id="text11"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;line-height:normal;font-family:Georgia, serif">Integrate over φ, then r⊥</text>
+  <g
+     id="g40"
+     transform="translate(-74.781952,50.074324)">
+    <rect
+       x="576"
+       y="86"
+       width="292.47748"
+       height="130.60811"
+       class="box"
+       id="rect11" />
+    <text
+       x="583.7207"
+       y="103.92793"
+       class="body"
+       id="text12"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;line-height:normal;font-family:Georgia, serif">Azimuthal step</text>
+    <text
+       x="583.21387"
+       y="120.89189"
+       class="small"
+       id="text15"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;line-height:normal;font-family:Georgia, serif;fill:#44586a">∫exp(iz cos φ) dφ = 2π <tspan
+   style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
+   id="tspan36">J</tspan><tspan
+   style="font-size:65%;baseline-shift:sub"
+   id="tspan35">0</tspan>(z)</text>
+    <text
+       x="582.49902"
+       y="149.02702"
+       class="body"
+       id="text16"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;line-height:normal;font-family:Georgia, serif">Radial step</text>
+    <text
+       x="583.21387"
+       y="165.02702"
+       class="small"
+       id="text23"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;line-height:normal;font-family:Georgia, serif">∫ <tspan
+   class="math"
+   id="tspan16">r J</tspan><tspan
+   class="sub"
+   id="tspan17">0</tspan>(<tspan
+   class="math"
+   id="tspan18">br</tspan>) d<tspan
+   class="math"
+   id="tspan19">r</tspan> = <tspan
+   class="math"
+   id="tspan20">a J</tspan><tspan
+   class="sub"
+   id="tspan21">1</tspan>(<tspan
+   class="math"
+   id="tspan22">ba</tspan>) / <tspan
+   class="math"
+   id="tspan23">b</tspan></text>
+    <text
+       x="582.49902"
+       y="190.26352"
+       class="body"
+       id="text24"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:18px;line-height:normal;font-family:Georgia, serif">Result carried into the line integral</text>
+    <text
+       x="583.72656"
+       y="205.22748"
+       class="small"
+       id="text32"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;line-height:normal;font-family:Georgia, serif"><tspan
+   class="math"
+   id="tspan24">J</tspan><tspan
+   class="sub"
+   id="tspan25">1</tspan>(2 <tspan
+   class="math"
+   id="tspan26">k</tspan><tspan
+   class="sub"
+   id="tspan27">2</tspan><tspan
+   class="math"
+   id="tspan28">a</tspan> cos <tspan
+   class="math"
+   id="tspan29">β</tspan><tspan
+   class="sub"
+   id="tspan30">tilt</tspan>) / cos <tspan
+   class="math"
+   id="tspan31">β</tspan><tspan
+   class="sub"
+   id="tspan32">tilt</tspan></text>
+  </g>
+</svg>

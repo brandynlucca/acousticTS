@@ -1,0 +1,210 @@
+# Elastic cylinder modal series solution
+
+## Introduction
+
+Experimental Unvalidated
+
+*Model-family pages:*
+[Overview](https://brandynlucca.github.io/acousticTS/articles/ecms/index.md)
+[Implementation](https://brandynlucca.github.io/acousticTS/articles/ecms/ecms-implementation.md)
+[Theory](https://brandynlucca.github.io/acousticTS/articles/ecms/ecms-theory.md)
+
+The elastic-cylinder modal series solution (`ECMS`) is the
+solid-cylinder counterpart to the fluid `FCMS` family. It combines the
+exact phase-shift treatment of an infinite elastic circular cylinder
+with the same near-broadside finite-length coherence factor used for
+finite cylinders in the classical Stanton
+formulations.[¹](#fn1)[²](#fn2)
+
+The resulting model is exact in the local circular cross-section and
+approximate only in the way finite length is reduced to a coherence
+factor.
+
+This page follows the shared package notation: medium `1` is the
+surrounding seawater and medium `2` is the solid elastic cylinder.
+
+## Exterior fluid and elastic interior
+
+### Exterior acoustic field
+
+In the surrounding seawater, the pressure satisfies:
+
+\nabla^2 p_1 + k_1^2 p_1 = 0, \qquad k_1 = \frac{\omega}{c_1},
+
+where c_1 is the exterior sound speed.
+
+### Elastic interior
+
+Inside the solid cylinder, the displacement field \mathbf{u}\_2
+satisfies the Navier equation:
+
+(\lambda_2 + 2\mu_2)\nabla(\nabla\cdot\mathbf{u}\_2) - \mu_2
+\nabla\times(\nabla\times\mathbf{u}\_2) + \rho_2 \omega^2 \mathbf{u}\_2
+= 0,
+
+where \lambda_2 and \mu_2 are Lam'e parameters and \rho_2 is the solid
+density.
+
+Using the usual Helmholtz decomposition:
+
+\mathbf{u}\_2 = \nabla \Phi_2 + \nabla\times \mathbf{\Psi}\_2,
+
+the solid supports a longitudinal branch and a transverse branch with
+wavenumbers:
+
+k\_{L,2} = \omega\sqrt{\frac{\rho_2}{\lambda_2 + 2\mu_2}}, \qquad
+k\_{T,2} = \omega\sqrt{\frac{\rho_2}{\mu_2}}.
+
+The presence of both branches is the main physical distinction from
+fluid cylinder theory: the interior can support shear as well as
+compression.
+
+## Infinite-cylinder modal representation
+
+### Exterior cylindrical waves
+
+For an incident plane wave near broadside, the exterior field is
+expanded in cylindrical harmonics:
+
+p\_{1,\mathrm{inc}}(r,\phi) = \sum\_{m=0}^{\infty} \epsilon_m i^m
+J_m(k_1 r)\cos(m\phi), \qquad p\_{1,\mathrm{sca}}(r,\phi) =
+\sum\_{m=0}^{\infty} \epsilon_m i^m B_m H_m^{(1)}(k_1 r)\cos(m\phi).
+
+Here J_m is the regular cylindrical Bessel function, H_m^{(1)} is the
+outgoing Hankel function, \epsilon_m is the Neumann factor, and B_m is
+the scattered coefficient of order m.
+
+### Elastic interior potentials
+
+The longitudinal and transverse interior potentials may be written
+schematically as:
+
+\Phi_2(r,\phi) = \sum\_{m=0}^{\infty} \epsilon_m i^m C_m J_m(k\_{L,2}
+r)\cos(m\phi), \qquad \Psi_2(r,\phi) = \sum\_{m=0}^{\infty} \epsilon_m
+i^m D_m J_m(k\_{T,2} r)\sin(m\phi).
+
+with the angular parity chosen so that the resulting displacement
+components match the cylindrical symmetry of order m.
+
+Regularity at the axis excludes singular radial functions from the solid
+interior.
+
+## Boundary conditions at the cylinder wall
+
+At the cylinder surface r = a, the elastic-solid and exterior-fluid
+fields must satisfy three conditions:
+
+1.  continuity of normal velocity,
+2.  balance of normal traction with acoustic pressure,
+3.  vanishing tangential traction because the exterior fluid is
+    inviscid.
+
+Schematically:
+
+-\frac{1}{i\omega\rho_1}\frac{\partial p_1}{\partial r} = -i\omega
+u\_{r,2}
+
+p_1 = -\sigma\_{rr}^{(2)}
+
+\sigma\_{r\phi}^{(2)} = 0.
+
+Substituting the cylindrical-wave expansions into these conditions
+yields the elastic cylinder coefficient problem for each order m. The
+algebra is more involved than for a fluid cylinder because the solid
+interior contributes both longitudinal and transverse potentials, but
+the essential structure remains the same: each azimuthal order produces
+an independent coefficient system.
+
+## Phase-shift representation
+
+Rather than carrying the raw coefficient system directly, elastic
+cylinder theory is often expressed in terms of an order-dependent phase
+shift \eta_m. The corresponding backscattering contribution of order m
+is:
+
+(-1)^m \epsilon_m \sin\eta_m \left(\cos\eta_m - i\sin\eta_m\right).
+
+Equivalently, the modal coefficient may be written as:
+
+B_m = (-1)^m \epsilon_m \sin\eta_m e^{-i\eta_m}.
+
+This representation is useful because it makes the elastic-cylinder
+physics look like the shift of an outgoing cylindrical partial wave
+relative to the free-space solution. Resonant features appear as rapid
+variation in the phase shifts across modal order and frequency.
+
+## Finite-length closure
+
+The modal derivation above is exact for an infinite circular cylinder.
+`ECMS` inherits the same near-broadside finite-length closure used by
+`FCMS`, namely:
+
+\frac{\sin(k_1 L \cos\theta)} {k_1 L \cos\theta},
+
+where L is cylinder length and \theta is the incidence angle relative to
+the cylinder axis.
+
+The finite-cylinder backscattering amplitude is therefore:
+
+f\_{\mathrm{bs}}^{(\mathrm{straight})} = \frac{L}{\pi} \frac{\sin(k_1 L
+\cos\theta)} {k_1 L \cos\theta} \sum\_{m=0}^{\infty} (-1)^m \epsilon_m
+\sin\eta_m e^{-i\eta_m}.
+
+This is the straight solid-cylinder branch of `ECMS`.
+
+## Uniformly bent extension
+
+For a uniformly bent elastic cylinder, the same logic used in bent fluid
+cylinder theory applies at the level of axial coherence. The local
+cross-sectional elastic phase shifts are still governed by the same
+elastic cylinder boundary conditions; curvature mainly changes the phase
+relationship between different axial positions.
+
+That leads to the same coherent-length correction used in bent-cylinder
+modal theory:
+
+f\_{\mathrm{bs}}^{(\mathrm{bent})} = \frac{L\_{\mathrm{ebc}}}{L}
+f\_{\mathrm{bs}}^{(\mathrm{straight})}.
+
+where L\_{\mathrm{ebc}} is the equivalent coherent length of the bent
+axis. The curvature correction therefore multiplies the elastic
+straight-cylinder kernel rather than replacing it.
+
+## Target strength
+
+Once the complex backscattering amplitude is known, the linear
+backscattering cross-section and target strength are:
+
+\sigma\_{\mathrm{bs}} = \left\|f\_{\mathrm{bs}}\right\|^2, \qquad
+\mathrm{TS} = 10\log\_{10}\left(\sigma\_{\mathrm{bs}}\right).
+
+The target-strength definition is unchanged relative to the fluid
+cylinder families; the extra physics is entirely in the elastic phase
+shifts and, where used, the bent-axis coherent-length correction.
+
+## Assumptions and intended regime
+
+The family rests on the following assumptions:
+
+1.  circular homogeneous solid elastic cylinder,
+2.  longitudinal and transverse waves supported in the interior,
+3.  linear acoustics in the exterior fluid and linear elasticity in the
+    solid,
+4.  near-broadside finite-length closure,
+5.  curvature, when present, enters through axial coherence rather than
+    a new local cross-sectional solve.
+
+These assumptions are what make `ECMS` the natural solid-cylinder
+analogue of `FCMS`: exact local circular-cylinder physics, approximate
+finite-length closure, and strongest physical relevance near broadside
+rather than at end-on incidence.
+
+------------------------------------------------------------------------
+
+1.  Faran, J.J. (**1951**). *Sound scattering by solid cylinders and
+    spheres*. *The Journal of the Acoustical Society of America*, 23:
+    405-418.
+
+2.  Stanton, T.K. (**1988**). *Sound scattering by cylinders of finite
+    length. II. Elastic cylinders*. *The Journal of the Acoustical
+    Society of America*, 83: 64-67.

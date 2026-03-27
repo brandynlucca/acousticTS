@@ -1,12 +1,79 @@
 pandoc: 3.1.11
-pkgdown: 2.1.3
+pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
-  calibration_sphere_target_strength_vignette: calibration_sphere_target_strength_vignette.html
-  dcm_deformed_cylinder_model_vignette: dcm_deformed_cylinder_model_vignette.html
-  dwba_fluid_like_scatterers_vignette: dwba_fluid_like_scatterers_vignette.html
-  elastic_shelled_sphere_target_strength_vignette: elastic_shelled_sphere_target_strength_vignette.html
-last_built: 2025-09-30T17:26Z
+  acoustic-scattering-primer/acoustic-scattering-primer: acoustic-scattering-primer/acoustic-scattering-primer.html
+  bbfm/bbfm-implementation: bbfm/bbfm-implementation.html
+  bbfm/bbfm-theory: bbfm/bbfm-theory.html
+  bcms/bcms-implementation: bcms/bcms-implementation.html
+  bcms/bcms-theory: bcms/bcms-theory.html
+  bibliography/bibliography: bibliography/bibliography.html
+  boundary_conditions: boundary_conditions.html
+  building-scatterers/building-scatterers: building-scatterers/building-scatterers.html
+  building-shapes/building-shapes: building-shapes/building-shapes.html
+  calibration/calibration-implementation: calibration/calibration-implementation.html
+  calibration/calibration-theory: calibration/calibration-theory.html
+  calibration-workflow/calibration-workflow: calibration-workflow/calibration-workflow.html
+  combining-components/combining-components: combining-components/combining-components.html
+  comparing-models/comparing-models: comparing-models/comparing-models.html
+  creating-models-from-scratch/creating-models-from-scratch: creating-models-from-scratch/creating-models-from-scratch.html
+  dwba/dwba-implementation: dwba/dwba-implementation.html
+  dwba/dwba-theory: dwba/dwba-theory.html
+  ecms/ecms-implementation: ecms/ecms-implementation.html
+  ecms/ecms-theory: ecms/ecms-theory.html
+  essms/essms-implementation: essms/essms-implementation.html
+  essms/essms-theory: essms/essms-theory.html
+  example-data/example-data: example-data/example-data.html
+  faq-troubleshooting/faq-troubleshooting: faq-troubleshooting/faq-troubleshooting.html
+  fcms/fcms-implementation: fcms/fcms-implementation.html
+  fcms/fcms-theory: fcms/fcms-theory.html
+  getting-started/getting-started: getting-started/getting-started.html
+  hpa/hpa-implementation: hpa/hpa-implementation.html
+  hpa/hpa-theory: hpa/hpa-theory.html
+  bbfm/index: bbfm/index.html
+  bcms/index: bcms/index.html
+  calibration/index: calibration/index.html
+  dwba/index: dwba/index.html
+  ecms/index: ecms/index.html
+  essms/index: essms/index.html
+  fcms/index: fcms/index.html
+  hpa/index: hpa/index.html
+  krm/index: krm/index.html
+  pcdwba/index: pcdwba/index.html
+  psms/index: psms/index.html
+  sdwba/index: sdwba/index.html
+  sphms/index: sphms/index.html
+  tmm/index: tmm/index.html
+  trcm/index: trcm/index.html
+  vesm/index: vesm/index.html
+  krm/krm-implementation: krm/krm-implementation.html
+  krm/krm-theory: krm/krm-theory.html
+  material-properties/material-properties: material-properties/material-properties.html
+  model-library/model-library: model-library/model-library.html
+  model-selection/model-selection: model-selection/model-selection.html
+  notation-and-symbols/notation-and-symbols: notation-and-symbols/notation-and-symbols.html
+  numerical-foundations/numerical-foundations: numerical-foundations/numerical-foundations.html
+  package-concepts/package-concepts: package-concepts/package-concepts.html
+  pcdwba/pcdwba-implementation: pcdwba/pcdwba-implementation.html
+  pcdwba/pcdwba-theory: pcdwba/pcdwba-theory.html
+  plotting-inspecting-results/plotting-inspecting-results: plotting-inspecting-results/plotting-inspecting-results.html
+  psms/psms-implementation: psms/psms-implementation.html
+  psms/psms-theory: psms/psms-theory.html
+  running-models/running-models: running-models/running-models.html
+  sdwba/sdwba-implementation: sdwba/sdwba-implementation.html
+  sdwba/sdwba-theory: sdwba/sdwba-theory.html
+  shape-manipulation-reforging/shape-manipulation-reforging: shape-manipulation-reforging/shape-manipulation-reforging.html
+  simulation-parameter-sweeps/simulation-parameter-sweeps: simulation-parameter-sweeps/simulation-parameter-sweeps.html
+  sphms/sphms-implementation: sphms/sphms-implementation.html
+  sphms/sphms-theory: sphms/sphms-theory.html
+  tmm/tmm-implementation: tmm/tmm-implementation.html
+  tmm/tmm-theory: tmm/tmm-theory.html
+  trcm/trcm-implementation: trcm/trcm-implementation.html
+  trcm/trcm-theory: trcm/trcm-theory.html
+  validation-benchmarks/validation-benchmarks: validation-benchmarks/validation-benchmarks.html
+  vesm/vesm-implementation: vesm/vesm-implementation.html
+  vesm/vesm-theory: vesm/vesm-theory.html
+last_built: 2026-03-27T17:55Z
 urls:
   reference: https://brandynlucca.github.io/acousticTS/reference
   article: https://brandynlucca.github.io/acousticTS/articles

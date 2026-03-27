@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="865.54053"
+   height="254.99998"
+   viewBox="0 0 865.54053 254.99998"
+   version="1.1"
+   id="svg17"
+   sodipodi:docname="package-concepts-architecture.svg"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs17" />
+  <sodipodi:namedview
+     id="namedview17"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.98666667"
+     inkscape:cx="446.95946"
+     inkscape:cy="17.736486"
+     inkscape:window-width="1920"
+     inkscape:window-height="1057"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg17" />
+  <rect
+     width="865.54053"
+     height="254.99998"
+     fill="#fbfaf5"
+     id="rect1"
+     x="0"
+     y="0"
+     style="stroke-width:1" />
+  <text
+     x="237.03003"
+     y="26.716215"
+     font-family="Georgia, serif"
+     font-size="28px"
+     fill="#203040"
+     id="text1">Conceptual layers in acousticTS</text>
+  <g
+     id="g23"
+     transform="translate(-0.20825152,1.9189185)">
+    <text
+       x="205"
+       y="219"
+       font-family="Georgia, serif"
+       font-size="20px"
+       fill="#203040"
+       id="text14">One geometry can support several scatterer-types</text>
+    <text
+       x="205"
+       y="244"
+       font-family="Georgia, serif"
+       font-size="20px"
+       fill="#203040"
+       id="text15">One scatterer can be passed through several models</text>
+  </g>
+  <!-- Transparent clickable overlays to preserve visuals but make shapes clickable -->
+  <g
+     id="g18"
+     transform="translate(-22.729736,-3.5540615)">
+    <rect
+       x="31"
+       y="72"
+       width="326"
+       height="110"
+       rx="30"
+       fill="#d4e7e7"
+       stroke="#0f5c5c"
+       stroke-width="4"
+       id="rect2" />
+    <text
+       x="49"
+       y="97"
+       font-family="Georgia, serif"
+       font-size="25px"
+       fill="#203040"
+       id="text2">Shape</text>
+    <text
+       x="50"
+       y="121"
+       font-family="Georgia, serif"
+       font-size="18px"
+       fill="#203040"
+       id="text3">Only geometry</text>
+    <text
+       x="50"
+       y="143"
+       font-family="Georgia, serif"
+       font-size="18px"
+       fill="#203040"
+       id="text4">Coordinates and base morphometrics</text>
+    <text
+       x="50"
+       y="166"
+       font-family="Georgia, serif"
+       font-size="18px"
+       fill="#203040"
+       id="text5">Canonical or arbitrary form</text>
+  </g>
+  <rect
+     x="400.27026"
+     y="45.891884"
+     width="200"
+     height="151.05405"
+     rx="17"
+     fill="#eef0de"
+     stroke="#7a6a2a"
+     stroke-width="4"
+     id="rect5" />
+  <g
+     id="g19"
+     transform="translate(15.045019,-25.279041)">
+    <text
+       x="398"
+       y="96"
+       font-family="Georgia, serif"
+       font-size="25px"
+       fill="#203040"
+       id="text6">Scatterer</text>
+    <text
+       x="399"
+       y="118"
+       font-family="Georgia, serif"
+       font-size="18px"
+       fill="#203040"
+       id="text7">Physics and metadata</text>
+    <text
+       x="399"
+       y="140"
+       font-family="Georgia, serif"
+       font-size="18px"
+       fill="#203040"
+       id="text8">Target class</text>
+    <text
+       x="399"
+       y="162"
+       font-family="Georgia, serif"
+       font-size="18px"
+       fill="#203040"
+       id="text9">Material properties</text>
+    <text
+       x="399"
+       y="184"
+       font-family="Georgia, serif"
+       font-size="18px"
+       fill="#203040"
+       id="text10">Orientation</text>
+    <text
+       x="399"
+       y="207"
+       font-family="Georgia, serif"
+       font-size="18px"
+       fill="#203040"
+       id="text11">Component structure</text>
+  </g>
+  <rect
+     x="666.27026"
+     y="94.945938"
+     width="191"
+     height="57"
+     rx="18"
+     fill="#f3dfcf"
+     stroke="#a35d24"
+     stroke-width="4"
+     id="rect11" />
+  <text
+     x="679.2027"
+     y="117.27702"
+     font-family="Georgia, serif"
+     font-size="25px"
+     fill="#203040"
+     id="text12">Model</text>
+  <text
+     x="679.2027"
+     y="138.27702"
+     font-family="Georgia, serif"
+     font-size="18px"
+     fill="#203040"
+     id="text13">Maps scatterer to TS</text>
+  <g
+     id="g17"
+     transform="translate(50.270263,-50.554061)">
+    <line
+       x1="286"
+       y1="174"
+       x2="338"
+       y2="174"
+       stroke="#203040"
+       stroke-width="4"
+       id="line13" />
+    <polygon
+       points="338,174 326,168 326,180 "
+       fill="#203040"
+       id="polygon13"
+       inkscape:transform-center-x="8.8682432"
+       transform="translate(10)" />
+  </g>
+  <g
+     id="g21"
+     transform="translate(316.27026,-50.554061)">
+    <line
+       x1="286"
+       y1="174"
+       x2="338"
+       y2="174"
+       stroke="#203040"
+       stroke-width="4"
+       id="line21" />
+    <polygon
+       points="326,168 326,180 338,174 "
+       fill="#203040"
+       id="polygon21"
+       inkscape:transform-center-x="8.8682432"
+       transform="translate(10)" />
+  </g>
+  <a
+     href="../building-shapes/building-shapes.html"
+     target="_top"
+     id="a15"
+     transform="matrix(1.5090602,0,0,0.71413721,-91.999532,-0.99672648)"
+     style="stroke-width:0.963287">
+    <rect
+       x="64"
+       y="96"
+       width="220"
+       height="156"
+       rx="20"
+       fill="transparent"
+       pointer-events="all"
+       id="rect15"
+       style="stroke-width:0.963287" />
+  </a>
+  <a
+     href="../building-scatterers/building-scatterers.html"
+     target="_top"
+     id="a16"
+     transform="matrix(0.88641659,0,0,0.77146264,97.003433,-12.710262)"
+     style="stroke-width:1.20927">
+    <rect
+       x="340"
+       y="72"
+       width="232"
+       height="204"
+       rx="20"
+       fill="transparent"
+       pointer-events="all"
+       id="rect16"
+       style="stroke-width:1.20927" />
+  </a>
+  <a
+     href="../running-models/running-models.html"
+     target="_top"
+     id="a17"
+     transform="matrix(0.91948725,0,0,0.39903846,86.424953,53.439198)"
+     style="stroke-width:1.65089">
+    <rect
+       x="628"
+       y="96"
+       width="214"
+       height="156"
+       rx="20"
+       fill="transparent"
+       pointer-events="all"
+       id="rect17"
+       style="stroke-width:1.65089" />
+  </a>
+</svg>

@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 320" role="img" aria-labelledby="title desc">
+  <title id="title">PSMS mode coupling</title>
+  <desc id="desc">Schematic showing that rigid and pressure-release spheroids remain diagonal by degree, while fluid-filled spheroids couple degrees through overlap integrals between different spheroidal bases.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8f3ea; }
+      .panel { fill: #fffdfa; stroke: #2f2822; stroke-width: 2.2; rx: 16; ry: 16; }
+      .head { font: 700 21px Georgia, serif; fill: #1f1a16; }
+      .txt { font: 15px Georgia, serif; fill: #2f2822; }
+      .small { font: 13px Georgia, serif; fill: #564b40; }
+      .ell { fill: #dde9f5; stroke: #2f2822; stroke-width: 2; }
+      .arrow { stroke: #564b40; stroke-width: 2.3; fill: none; marker-end: url(#m); }
+      .grid { stroke: #8a7b6f; stroke-width: 1.5; }
+    </style>
+    <marker id="m" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#564b40"/></marker>
+  </defs>
+  <rect width="960" height="320" class="bg"/>
+  <text x="28" y="40" class="head">Why the fluid-filled spheroidal problem is harder than the rigid or soft case</text>
+  <rect x="24" y="68" width="282" height="220" class="panel"/>
+  <text x="46" y="96" class="txt">Rigid or pressure-release</text>
+  <ellipse cx="164" cy="167" rx="88" ry="54" class="ell"/>
+  <text x="70" y="245" class="small">One exterior basis, one boundary equation</text>
+  <text x="70" y="265" class="small">for each retained degree n.</text>
+
+  <rect x="338" y="68" width="290" height="220" class="panel"/>
+  <text x="360" y="96" class="txt">Fluid filled</text>
+  <ellipse cx="486" cy="167" rx="88" ry="54" class="ell"/>
+  <ellipse cx="486" cy="167" rx="58" ry="35" fill="#f7d9b4" stroke="#2f2822" stroke-width="2"/>
+  <text x="360" y="245" class="small">Exterior and interior use different reduced</text>
+  <text x="360" y="265" class="small">frequencies, so the angular bases do not match.</text>
+
+  <rect x="660" y="68" width="276" height="220" class="panel"/>
+  <text x="682" y="96" class="txt">Consequence</text>
+  <path d="M710 128 L886 128" class="grid"/>
+  <path d="M710 168 L886 168" class="grid"/>
+  <path d="M710 208 L886 208" class="grid"/>
+  <path d="M710 128 L710 248" class="grid"/>
+  <path d="M768 128 L768 248" class="grid"/>
+  <path d="M826 128 L826 248" class="grid"/>
+  <path d="M886 128 L886 248" class="grid"/>
+  <path d="M714 132 L882 244" class="arrow"/>
+  <path d="M714 244 L882 132" class="arrow"/>
+  <text x="682" y="265" class="small">Overlap integrals α⁽m⁾ₙℓ create mode coupling.</text>
+
+  <path d="M306 167 C320 167, 324 167, 338 167" class="arrow"/>
+  <path d="M628 167 C642 167, 646 167, 660 167" class="arrow"/>
+</svg>
