@@ -128,7 +128,7 @@ yc(2, 3i)
 #> [1] 0.03915877-2.245212i
 
 # Singularity at origin
-yc(0, 0)  # Returns -Inf
+yc(0, 0) # Returns -Inf
 #> [1] -Inf+0i
 
 # First derivative

@@ -118,6 +118,6 @@ hcdk(1, 2, 2)
 #> [1] -0.4003078-0.2016716i
 
 # k-th derivative
-hcdk(1, 2, 3)  # Third derivative
+hcdk(1, 2, 3) # Third derivative
 #> [1] 0.08820851-0.154352i
 ```

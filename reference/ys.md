@@ -107,7 +107,7 @@ ys(0, c(1, 2, 3))
 #> [1] -0.5403023  0.2080734  0.3299975
 
 # Singularity at origin
-ys(0, 0)  # Returns -Inf
+ys(0, 0) # Returns -Inf
 #> [1] -Inf
 
 # First derivative

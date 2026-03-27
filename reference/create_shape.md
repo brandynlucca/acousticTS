@@ -206,7 +206,8 @@ create_shape("sphere", radius_body = 0.01)
 #> 
 #> 
 create_shape(
-  "prolate_spheroid", length_body = 0.04, radius_body = 0.004
+  "prolate_spheroid",
+  length_body = 0.04, radius_body = 0.004
 )
 #> An object of class "ProlateSpheroid"
 #> Slot "position_matrix":
@@ -357,7 +358,8 @@ create_shape(
 #> 
 #> 
 create_shape(
-  "oblate_spheroid", length_body = 0.012, radius_body = 0.01
+  "oblate_spheroid",
+  length_body = 0.012, radius_body = 0.01
 )
 #> An object of class "OblateSpheroid"
 #> Slot "position_matrix":
@@ -504,7 +506,8 @@ create_shape(
 #> 
 #> 
 create_shape(
-  "cylinder", length_body = 0.05, radius_body = 0.003
+  "cylinder",
+  length_body = 0.05, radius_body = 0.003
 )
 #> An object of class "Cylinder"
 #> Slot "position_matrix":
