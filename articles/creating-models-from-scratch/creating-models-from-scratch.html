@@ -128,8 +128,12 @@ that <code><a href="../../reference/target_strength.html">target_strength()</a><
 <p>For a toy target strength-length model called <code>TSL</code>, that
 means defining:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">tsl_initialize</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="op">{</span> <span class="va">...</span> <span class="op">}</span></span>
-<span><span class="va">TSL</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">object</span><span class="op">)</span> <span class="op">{</span> <span class="va">...</span> <span class="op">}</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">tsl_initialize</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">}</span></span>
+<span><span class="va">TSL</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">object</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 <p>This vignette walks through that pattern and builds a simple example
 model from scratch. The example is intentionally simple. It is not meant
 to be a physically complete scattering model. Its purpose is to show how

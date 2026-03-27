@@ -20,8 +20,12 @@ For a toy target strength-length model called `TSL`, that means
 defining:
 
 ``` r
-tsl_initialize <- function(...) { ... }
-TSL <- function(object) { ... }
+tsl_initialize <- function(...) {
+  ...
+}
+TSL <- function(object) {
+  ...
+}
 ```
 
 This vignette walks through that pattern and builds a simple example
