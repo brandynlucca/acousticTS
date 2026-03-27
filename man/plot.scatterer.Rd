@@ -69,4 +69,4 @@ only to stored \code{TMM} results.
 \code{\link[=tmm_scattering_grid]{tmm_scattering_grid()}}
 }
 \keyword{plotting}
-\keyword{utility,}
+\keyword{utility}

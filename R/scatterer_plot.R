@@ -49,7 +49,7 @@
 #' @rdname plot.Scatterer
 #' @aliases plot.Scatterer
 #'
-#' @keywords utility, plotting
+#' @keywords utility plotting
 #' @export
 plot.Scatterer <- function(x,
                            y = NULL,

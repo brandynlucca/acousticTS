@@ -52,15 +52,15 @@ plot_case <- function(compare_df,
 
 compare_0 <- read_compare_csv(file.path(
   "tools/implementation-figures/data/tmm",
-  "bempp_cylinder_pr_70x10_38k_xy_181_0deg_compare.csv"
+  "bempp_cyl_pr_38k_xy_181_0deg.csv"
 ))
 compare_45 <- read_compare_csv(file.path(
   "tools/implementation-figures/data/tmm",
-  "bempp_cylinder_pr_70x10_38k_xy_181_45deg_compare.csv"
+  "bempp_cyl_pr_38k_xy_181_45deg.csv"
 ))
 compare_90 <- read_compare_csv(file.path(
   "tools/implementation-figures/data/tmm",
-  "bempp_cylinder_pr_70x10_38k_xy_181_compare.csv"
+  "bempp_cyl_pr_38k_xy_181.csv"
 ))
 
 png(
@@ -186,21 +186,21 @@ mono_summary <- do.call(
       length_body = 0.07,
       radius_body = 0.01,
       incidence_deg = 0,
-      compare_csv = file.path("scratch", "bempp_cylinder_pr_70x10_38k_xy_181_0deg_compare.csv")
+      compare_csv = file.path("scratch", "bempp_cyl_pr_38k_xy_181_0deg.csv")
     ),
     check_monostatic_case(
       freq = 38000,
       length_body = 0.07,
       radius_body = 0.01,
       incidence_deg = 45,
-      compare_csv = file.path("scratch", "bempp_cylinder_pr_70x10_38k_xy_181_45deg_compare.csv")
+      compare_csv = file.path("scratch", "bempp_cyl_pr_38k_xy_181_45deg.csv")
     ),
     check_monostatic_case(
       freq = 38000,
       length_body = 0.07,
       radius_body = 0.01,
       incidence_deg = 90,
-      compare_csv = file.path("scratch", "bempp_cylinder_pr_70x10_38k_xy_181_compare.csv")
+      compare_csv = file.path("scratch", "bempp_cyl_pr_38k_xy_181.csv")
     ),
     check_monostatic_case(
       freq = 70000,

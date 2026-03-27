@@ -242,7 +242,7 @@ canonicalize_shape <- function(shape,
   # Integrate the equivalent circular area profile =============================
   area <- pi * radius_eq^2
   dx <- diff(x)
-  sum(dx * (head(area, -1L) + tail(area, -1L)) / 2)
+  sum(dx * (utils::head(area, -1L) + utils::tail(area, -1L)) / 2)
 }
 
 #' Collect shape metrics used by the canonicalization helpers
@@ -373,11 +373,11 @@ canonicalize_shape <- function(shape,
   if (identical(to, "Sphere")) {
     lower <- eps
     upper <- max(L0 * 2, a0 * 5, eps * 10)
-    objective <- function(radius) {
+    sphere_objective <- function(radius) {
       model <- .canonical_radius_profile(x, "Sphere", 2 * radius, radius)
       mean((r - model)^2)
     }
-    opt <- stats::optimize(objective, interval = c(lower, upper))
+    opt <- stats::optimize(sphere_objective, interval = c(lower, upper))
     return(list(length = 2 * opt$minimum,
                 radius = opt$minimum,
                 objective = opt$objective))
@@ -395,7 +395,7 @@ canonicalize_shape <- function(shape,
   }
   # Define the penalized least-squares objective ===============================
   penalty_scale <- 1e6 / max(a0^2, eps)
-  objective <- function(par_log) {
+  profile_objective <- function(par_log) {
     length_fit <- exp(par_log[1])
     radius_fit <- exp(par_log[2])
 
@@ -422,7 +422,7 @@ canonicalize_shape <- function(shape,
 
   opt <- stats::optim(
     par = log(c(L0, a0)),
-    fn = objective,
+    fn = profile_objective,
     method = "L-BFGS-B",
     lower = lower,
     upper = upper

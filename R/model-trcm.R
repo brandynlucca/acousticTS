@@ -17,7 +17,7 @@
 #' and bent cylinders, with the bent cylinder formulation incorporating the
 #' radius of curvature to account for body shape effects on the directivity
 #' pattern. For more details, see the [expanded documentation on the two-ray cylinder
-#' model](https://brandynlucca.github.io/acousticTS/trcm-theory.html).
+#' model](https://brandynlucca.github.io/acousticTS/articles/trcm/trcm-theory.html).
 #'
 #' @section Usage:
 #' This model is accessed via:
