@@ -27,7 +27,7 @@ jobs:
         config:
           - {os: macos-latest,   r: 'release'}
           - {os: windows-latest, r: 'release'}
-          - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
+          - {os: ubuntu-latest,    r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest,   r: 'release'}
           - {os: ubuntu-latest,   r: 'oldrel-1'}
 
@@ -82,7 +82,18 @@ jobs:
           } >> ~/.R/Makevars
         shell: bash
 
+      - name: Install R-devel dependencies from source
+        if: matrix.config.r == 'devel'
+        shell: Rscript {0}
+        run: |
+          options(repos = c(CRAN = "https://cloud.r-project.org"))
+          install.packages("remotes")
+          remotes::install_github("r-lib/rlang")
+          remotes::install_cran("rcmdcheck")
+          remotes::install_deps(dependencies = TRUE, upgrade = "never")
+
       - uses: r-lib/actions/setup-r-dependencies@v2
+        if: matrix.config.r != 'devel'
         with:
           extra-packages: any::rcmdcheck
           needs: check
