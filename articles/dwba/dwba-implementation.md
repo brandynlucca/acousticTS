@@ -9,7 +9,13 @@ Benchmarked Validated
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/dwba/dwba-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/dwba/dwba-theory.md)
 
-The `acousticTS` implementation of deterministic DWBA follows the same
+These pages follow the weak-scattering elongated-body formulation and
+later applied fisheries-acoustics usage of the distorted-wave Born
+approximation ([Morse and Ingard 1986](#ref-morse_theoretical_1986);
+[Stanton, Chu, and Wiebe 1998](#ref-stanton_sound_1998-1); [Gastauer,
+Chu, and Cox 2019](#ref-gastauer_zooscatrspan_2019)).
+
+The acousticTS implementation of deterministic DWBA follows the same
 object-based pattern used throughout the package. A fluid-like scatterer
 is constructed first, the model is then run through
 [`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md),
@@ -219,14 +225,31 @@ implementation.
 
 | Comparison                                                                 | Mean abs. delta TS (dB) | Max abs. delta TS (dB) |
 |:---------------------------------------------------------------------------|------------------------:|-----------------------:|
-| `acousticTS` vs published McGehee MATLAB implementation                    |                1.23e-05 |               4.33e-05 |
-| `acousticTS` vs independent DWBA implementation                            |                 0.42284 |                1.01167 |
+| acousticTS vs published McGehee MATLAB implementation                      |                1.23e-05 |               4.33e-05 |
+| acousticTS vs independent DWBA implementation                              |                 0.42284 |                1.01167 |
 | Independent DWBA implementation vs published McGehee MATLAB implementation |                 0.42284 |                1.01167 |
 
-On this bundled krill geometry, `acousticTS` reproduces the published
+On this bundled krill geometry, acousticTS reproduces the published
 McGehee MATLAB implementation essentially exactly, while the independent
 implementation remains within about 1 dB of the same spectrum but does
 not collapse onto the published curve. That makes the canonical
 modal-series table above and the bundled krill comparison complementary:
 one checks exact isolated-shape behavior, and the other checks a
 published segmented-body DWBA target.
+
+## References
+
+Gastauer, Sven, Dezhang Chu, and Martin J. Cox. 2019. “ZooScatR—An
+\<Span Style="font-Variant:small-Caps;"\>r\</Span\> Package for
+Modelling the Scattering Properties of Weak Scattering Targets Using the
+Distorted Wave Born Approximation.” *The Journal of the Acoustical
+Society of America* 145 (1): EL102–8.
+<https://doi.org/10.1121/1.5085655>.
+
+Morse, Philip M., and K. Uno Ingard. 1986. *Theoretical Acoustics*.
+Princeton, N.J: Princeton University Press.
+
+Stanton, Timothy K., Dezhang Chu, and Peter H. Wiebe. 1998. “Sound
+Scattering by Several Zooplankton Groups. II. Scattering Models.” *The
+Journal of the Acoustical Society of America* 103 (1): 236–53.
+<https://doi.org/10.1121/1.421110>.

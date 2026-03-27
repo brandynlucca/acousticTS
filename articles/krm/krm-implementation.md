@@ -9,15 +9,20 @@ Benchmarked Validated
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/krm/krm-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/krm/krm-theory.md)
 
-The `acousticTS` package uses object-based scatterers, so the KRM
-workflow follows the same broad structure used elsewhere in the package:
-define the geometry, attach material meaning to the body and any
-internal inclusion, evaluate the model over the desired frequency range,
-and then inspect the returned response carefully enough to understand
-what part of the target is driving it. For KRM, the main structural
-choice is whether the target is represented as a fluid-like body only or
-as a body plus an internal strongly contrasting inclusion such as a
-swimbladder.
+These pages follow the composite body-plus-swimbladder fish modeling
+literature initiated for cod and later generalized in open software
+implementations ([C. S. Clay 1991](#ref-clay_1991); [Clarence S. Clay
+and Horne 1994](#ref-clay_horne_1994); [Gastauer
+2025](#ref-sven_gastauer_svengastauerkrmr_2025)).
+
+The acousticTS package uses object-based scatterers, so the KRM workflow
+follows the same broad structure used elsewhere in the package: define
+the geometry, attach material meaning to the body and any internal
+inclusion, evaluate the model over the desired frequency range, and then
+inspect the returned response carefully enough to understand what part
+of the target is driving it. For KRM, the main structural choice is
+whether the target is represented as a fluid-like body only or as a body
+plus an internal strongly contrasting inclusion such as a swimbladder.
 
 This matters because KRM is not just a body-shape model. It is a
 composite body-plus-inclusion model. Readers should therefore treat
@@ -119,7 +124,7 @@ body-plus-swimbladder targets, where the model must decide what
 surrounding medium is used in the swimbladder terms (Clay and Horne
 1994; Horne and Jech 1999).
 
-In the high-`ka` swimbladder Kirchhoff term, `acousticTS` uses the
+In the high-`ka` swimbladder Kirchhoff term, acousticTS uses the
 empirical factors:
 
 A\_{SB,s} = \frac{ka_s}{ka_s + 0.083}, \qquad \psi\_{p,s} =
@@ -297,3 +302,17 @@ So the two benchmark roles are now explicit:
     checks, and
 2.  bundled-fish compatibility checks for the body-plus-swimbladder
     convention choice.
+
+## References
+
+Clay, C. S. 1991. “Low-Resolution Acoustic Scattering Models:
+Fluid-Filled Cylinders and Fish with Swim Bladders.” *The Journal of the
+Acoustical Society of America* 89 (5): 2168–79.
+<https://doi.org/10.1121/1.400910>.
+
+Clay, Clarence S., and John K. Horne. 1994. “Acoustic Models of Fish:
+The Atlantic Cod (*Gadus Morhua*).” *The Journal of the Acoustical
+Society of America* 96 (3): 1661–68. <https://doi.org/10.1121/1.410245>.
+
+Gastauer, Sven. 2025. “SvenGastauer/KRMr: V0.4.8.” Zenodo.
+<https://doi.org/10.5281/ZENODO.15838374>.

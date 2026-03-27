@@ -115,14 +115,18 @@
 </h2>
 <p><span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span></p>
 <p><em>Model-family pages:</em> <a href="index.html">Overview</a> <a href="psms-implementation.html">Implementation</a> <a href="psms-theory.html">Theory</a></p>
-<p>The <code>acousticTS</code> package uses object-based scatterers so
-the same implementation pattern carries across models: create a
-scatterer, run <code><a href="../../reference/target_strength.html">target_strength()</a></code>, inspect the stored model
-output, and then compare a small set of physically important inputs. For
-PSMS, the main additional choices are the boundary condition, the
-incident roll angle <code>phi_body</code>, and the numerical settings
-that control how the retained spheroidal system is actually
-evaluated.</p>
+<p>These pages are rooted in exact spheroidal-coordinate separations and
+later fisheries-acoustics use of prolate-spheroid models <span class="citation">(<a href="#ref-spence_scattering_1951">Spence and
+Granger 1951</a>; <a href="#ref-flammer_spheroidal_1957">Flammer
+1957</a>; <a href="#ref-furusawa_prolate_1988">Furusawa
+1988</a>)</span>.</p>
+<p>The acousticTS package uses object-based scatterers so the same
+implementation pattern carries across models: create a scatterer, run
+<code><a href="../../reference/target_strength.html">target_strength()</a></code>, inspect the stored model output, and
+then compare a small set of physically important inputs. For PSMS, the
+main additional choices are the boundary condition, the incident roll
+angle <code>phi_body</code>, and the numerical settings that control how
+the retained spheroidal system is actually evaluated.</p>
 <p>That last point is especially important for PSMS. Unlike some of the
 simpler modal models, the prolate spheroidal calculation can make
 numerical settings part of the practical interpretation of the run. The
@@ -1102,8 +1106,8 @@ whether the same prolate-spheroid definitions produce comparable spectra
 in other locally available implementations. The table below uses the
 shared <code>12, 18, 38, 70, 100 kHz</code> frequency set so that the
 cross-software check reaches more informative reduced frequencies while
-still remaining computationally manageable. The <code>acousticTS</code>
-settings are the same ones used for the main benchmark-quality run here:
+still remaining computationally manageable. The acousticTS settings are
+the same ones used for the main benchmark-quality run here:
 <code>precision = "quad"</code>, <code>adaptive = FALSE</code>,
 <code>simplify_Amn = FALSE</code>, <code>n_integration = 96</code>, and
 <code>phi_body = pi</code>.</p>
@@ -1140,8 +1144,7 @@ original (dB)</th>
 vectorized (dB)</th>
 <th align="right">Mean abs. delta TS vs <code>Prol_Spheroid</code>
 vectorized (dB)</th>
-<th align="right">
-<code>acousticTS</code> elapsed (s)</th>
+<th align="right">acousticTS elapsed (s)</th>
 <th align="right">
 <code>echoSMs</code> elapsed (s)</th>
 <th align="right">
@@ -1298,6 +1301,26 @@ affect the stability and cost of the fluid-filled solve.</li>
 <p>Those are the settings to revisit first when a spectrum appears
 unexpectedly noisy, unexpectedly sensitive, or unexpectedly expensive to
 evaluate.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
+</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="ref-flammer_spheroidal_1957" class="csl-entry">
+Flammer, Carson. 1957. <em>Spheroidal Wave Functions</em>. <a href="https://ui.adsabs.harvard.edu/abs/1957spwf.book.....F" class="external-link">https://ui.adsabs.harvard.edu/abs/1957spwf.book.....F</a>.
+</div>
+<div id="ref-furusawa_prolate_1988" class="csl-entry">
+Furusawa, Masahiko. 1988. <span>“Prolate Spheroidal Models for
+Predicting General Trends of Fish Target Strength.”</span> <em>Journal
+of the Acoustical Society of Japan (E)</em> 9 (1): 13–24. <a href="https://doi.org/10.1250/ast.9.13" class="external-link">https://doi.org/10.1250/ast.9.13</a>.
+</div>
+<div id="ref-spence_scattering_1951" class="csl-entry">
+Spence, R. D., and Sara Granger. 1951. <span>“The
+<span>Scattering</span> of <span>Sound</span> from a
+<span>Prolate</span> <span>Spheroid</span>.”</span> <em>The Journal of
+the Acoustical Society of America</em> 23 (6): 701–6. <a href="https://doi.org/10.1121/1.1906827" class="external-link">https://doi.org/10.1121/1.1906827</a>.
+</div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

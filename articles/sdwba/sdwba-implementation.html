@@ -115,11 +115,13 @@
 </h2>
 <p><span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span></p>
 <p><em>Model-family pages:</em> <a href="index.html">Overview</a> <a href="sdwba-implementation.html">Implementation</a> <a href="sdwba-theory.html">Theory</a></p>
-<p>The <code>acousticTS</code> package uses object-based scatterers so
-the same implementation pattern carries across models: create a
-scatterer, run <code><a href="../../reference/target_strength.html">target_strength()</a></code>, inspect the stored model
-output, and then compare a small set of physically important inputs. For
-SDWBA, the required object class is still <code>FLS</code>, but
+<p>These pages connect krill-body DWBA models to phase variability,
+orientation effects, and practical survey use <span class="citation">(<a href="#ref-demer_reconciling_2003">Demer and Conti 2003a</a>; <a href="#ref-demer_validation_2003">Demer and Conti 2003b</a>, <a href="#ref-demer_new_2005">2005</a>; <a href="#ref-conti_improved_2006">Conti and Demer 2006</a>)</span>.</p>
+<p>The acousticTS package uses object-based scatterers so the same
+implementation pattern carries across models: create a scatterer, run
+<code><a href="../../reference/target_strength.html">target_strength()</a></code>, inspect the stored model output, and
+then compare a small set of physically important inputs. For SDWBA, the
+required object class is still <code>FLS</code>, but
 <code><a href="../../reference/target_strength.html">target_strength()</a></code> also receives stochastic controls for
 phase variability and resampling.</p>
 <p>The important implementation point is that the SDWBA does not replace
@@ -442,21 +444,18 @@ reference values used for the benchmark calculations
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">
-<code>acousticTS</code> vs <code>echoSMs</code>
+<td align="left">acousticTS vs <code>echoSMs</code>
 </td>
 <td align="right">1.70257</td>
 <td align="right">30.63630</td>
 </tr>
 <tr class="even">
-<td align="left">
-<code>acousticTS</code> vs CCAMLR MATLAB</td>
+<td align="left">acousticTS vs CCAMLR MATLAB</td>
 <td align="right">0.06978</td>
 <td align="right">0.18270</td>
 </tr>
 <tr class="odd">
-<td align="left">
-<code>acousticTS</code> vs NOAA HTML</td>
+<td align="left">acousticTS vs NOAA HTML</td>
 <td align="right">0.06158</td>
 <td align="right">0.52846</td>
 </tr>
@@ -484,14 +483,45 @@ benchmark errors. All four calculations use the same bundled krill
 dimensions and the same initial stochastic reference values, but they do
 not use the same stochastic convention. In the current external
 implementations, both the CCAMLR MATLAB code and the NOAA HTML code
-square the phase term in the stochastic multiplier, while
-<code>acousticTS</code> keeps the paper-style linear phase standard
-deviation and <code>echoSMs</code> follows its own direct
-stochastic-phase application. So the bundled krill comparison is
-complementary to the canonical tables above: one set checks the
-stochastic model against published weakly scattering reference cases,
-and the other checks how the same biological krill geometry separates
-across existing SDWBA implementations.</p>
+square the phase term in the stochastic multiplier, while acousticTS
+keeps the paper-style linear phase standard deviation and
+<code>echoSMs</code> follows its own direct stochastic-phase
+application. So the bundled krill comparison is complementary to the
+canonical tables above: one set checks the stochastic model against
+published weakly scattering reference cases, and the other checks how
+the same biological krill geometry separates across existing SDWBA
+implementations.</p>
+</div>
+</div>
+</div>
+<div class="section level2">
+<h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
+</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="ref-conti_improved_2006" class="csl-entry">
+Conti, Stéphane G., and David A. Demer. 2006. <span>“Improved
+Parameterization of the <span>SDWBA</span> for Estimating Krill Target
+Strength.”</span> <em>ICES Journal of Marine Science</em> 63 (5):
+928–35. <a href="https://doi.org/10.1016/j.icesjms.2006.02.007" class="external-link">https://doi.org/10.1016/j.icesjms.2006.02.007</a>.
+</div>
+<div id="ref-demer_reconciling_2003" class="csl-entry">
+Demer, David A., and Stephane G. Conti. 2003a. <span>“Reconciling
+Theoretical Versus Empirical Target Strengths of Krill: Effects of Phase
+Variability on the Distorted-Wave <span>Born</span>
+Approximation.”</span> <em>ICES Journal of Marine Science</em> 60 (2):
+429–34. <a href="https://doi.org/10.1016/S1054-3139(03)00002-X" class="external-link">https://doi.org/10.1016/S1054-3139(03)00002-X</a>.
+</div>
+<div id="ref-demer_validation_2003" class="csl-entry">
+Demer, David A., and Stéphane G. Conti. 2003b. <span>“Validation of the
+Stochastic Distorted-Wave <span>Born</span> Approximation Model with
+Broad Bandwidth Total Target Strength Measurements of
+<span>Antarctic</span> Krill.”</span> <em>ICES Journal of Marine
+Science</em> 60 (3): 625–35. <a href="https://doi.org/10.1016/S1054-3139(03)00063-8" class="external-link">https://doi.org/10.1016/S1054-3139(03)00063-8</a>.
+</div>
+<div id="ref-demer_new_2005" class="csl-entry">
+———. 2005. <span>“New Target-Strength Model Indicates More Krill in the
+<span>Southern</span> <span>Ocean</span>.”</span> <em>ICES Journal of
+Marine Science</em> 62 (1): 25–32. <a href="https://doi.org/10.1016/j.icesjms.2004.07.027" class="external-link">https://doi.org/10.1016/j.icesjms.2004.07.027</a>.
 </div>
 </div>
 </div>

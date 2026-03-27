@@ -9,7 +9,12 @@ Benchmarked Validated
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/sphms/sphms-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/sphms/sphms-theory.md)
 
-The `acousticTS` package uses object-based scatterers so the same
+These pages follow the classical exact sphere literature for fluid,
+elastic, and approximate shell limits ([Anderson
+1950](#ref-anderson_sound_1950); [Faran 1951](#ref-faran_sound_1951);
+[Hickling 1962](#ref-hickling_analysis_1962)).
+
+The acousticTS package uses object-based scatterers so the same
 implementation pattern carries across models: create a scatterer, run
 [`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md),
 inspect the stored model output, and then compare a small set of
@@ -163,7 +168,7 @@ within about 0.005 dB in the worst case.
 
 #### Cross-software implementation checks
 
-For the penetrable spherical cases, the current `acousticTS`
+For the penetrable spherical cases, the current acousticTS
 implementation can also be checked directly against the locally
 available `KRMr` and `echoSMs` sphere solvers. Those checks serve a
 different purpose from the Jech benchmark table above: they verify that
@@ -171,18 +176,18 @@ the software implementations agree when they are solving the same
 penetrable spherical problem, rather than only asking how closely any
 one implementation tracks the benchmark family.
 
-| Boundary        | Comparison                | Mean abs. delta TS (dB) | Max abs. delta TS (dB) |
-|:----------------|:--------------------------|------------------------:|-----------------------:|
-| `gas_filled`    | `acousticTS` vs `KRMr`    |                3.21e-14 |               2.21e-12 |
-| `gas_filled`    | `acousticTS` vs `echoSMs` |                1.71e-13 |               1.52e-11 |
-| `liquid_filled` | `acousticTS` vs `KRMr`    |                5.70e-12 |               1.30e-10 |
-| `liquid_filled` | `acousticTS` vs `echoSMs` |                3.68e-11 |               3.37e-09 |
+| Boundary        | Comparison              | Mean abs. delta TS (dB) | Max abs. delta TS (dB) |
+|:----------------|:------------------------|------------------------:|-----------------------:|
+| `gas_filled`    | acousticTS vs `KRMr`    |                3.21e-14 |               2.21e-12 |
+| `gas_filled`    | acousticTS vs `echoSMs` |                1.71e-13 |               1.52e-11 |
+| `liquid_filled` | acousticTS vs `KRMr`    |                5.70e-12 |               1.30e-10 |
+| `liquid_filled` | acousticTS vs `echoSMs` |                3.68e-11 |               3.37e-09 |
 
 Those values show that the penetrable SPHMS branches are effectively
 identical across the three implementations on the shared spherical
 definitions. In other words, the small residuals reported against the
-benchmark family above are not an `acousticTS`-specific artifact. They
-are shared by the matched software implementations solving the same
+benchmark family above are not an acousticTS-specific artifact. They are
+shared by the matched software implementations solving the same
 gas-filled and liquid-filled sphere problems.
 
 SPHMS does expose one additional numerical control, `m_limit`, so it is
@@ -203,3 +208,17 @@ wall-clock time can drop. The benchmarked spherical branches therefore
 do not need the same kind of configuration matrix as PSMS. Boundary
 choice is the main physical switch, and `m_limit` is best treated as a
 guarded numerical override rather than as a routine tuning knob.
+
+## References
+
+Anderson, Victor C. 1950. “Sound Scattering from a Fluid Sphere.” *The
+Journal of the Acoustical Society of America* 22 (4): 426–31.
+<https://doi.org/10.1121/1.1906621>.
+
+Faran, James J. 1951. “Sound Scattering by Solid Cylinders and Spheres.”
+*The Journal of the Acoustical Society of America* 23 (4): 405–18.
+<https://doi.org/10.1121/1.1906780>.
+
+Hickling, Robert. 1962. “Analysis of Echoes from a Solid Elastic Sphere
+in Water.” *The Journal of the Acoustical Society of America* 34 (10):
+1582–92. <https://doi.org/10.1121/1.1909055>.

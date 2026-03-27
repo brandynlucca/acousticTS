@@ -9,6 +9,11 @@ Validated Experimental
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/pcdwba/pcdwba-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/pcdwba/pcdwba-theory.md)
 
+These pages follow the phase-compensated weak-scattering literature for
+broadside elongated bodies and krill-style applications ([Chu and Ye
+1999](#ref-chu_phase-compensated_1999); [Chu, Foote, and Stanton
+1993](#ref-chu_further_1993); [Stanton 1989](#ref-stanton_sound_1989)).
+
 The phase-compensated distorted wave Born approximation is available
 through `target_strength(..., model = "pcdwba")`. The implementation is
 intended for weakly scattering fluid-like bodies and uses the same
@@ -40,7 +45,7 @@ The comparison uses a single reproducible bent-cylinder case:
 - `12-200 kHz` in `2 kHz` steps
 - `51` integration nodes in all three implementations
 
-In `acousticTS`, that target is built as:
+In acousticTS, that target is built as:
 
 ``` r
 library(acousticTS)
@@ -87,13 +92,13 @@ head(extract(pcdwba_object, "model")$PCDWBA)
 | acousticTS vs ZooScatR-source |               0.000000 |                0.000000 |
 | echopop vs ZooScatR-source    |               0.073947 |                0.001123 |
 
-The `ZooScatR` source-level reconstruction and `acousticTS` are
+The `ZooScatR` source-level reconstruction and acousticTS are
 indistinguishable on this grid. The `echopop` comparison remains close
 as well, but it is not at machine precision because that implementation
 evaluates the cylindrical Bessel term through interpolation rather than
 a direct nodewise call. On this grid, the largest mismatch occurs near
 `112 kHz`; replacing the interpolated `J_1(x)/x` evaluation with a
-direct call collapses that residual onto the `acousticTS` / `ZooScatR`
+direct call collapses that residual onto the acousticTS / `ZooScatR`
 curve. So the remaining drift is numerical, not geometrical.
 
 #### Timings
@@ -116,6 +121,24 @@ This is the kind of implementation check that matters for a
 phase-compensated bent-cylinder solver. The comparison is not just
 against a benchmark curve. It is against two independently written
 source routines that share the same governing model. On this reference
-case, `acousticTS` reproduces the direct ZooScatR-style calculation
+case, acousticTS reproduces the direct ZooScatR-style calculation
 exactly and stays very close to the `echopop` implementation across the
 full frequency band.
+
+## References
+
+Chu, Dezhang, Kenneth G. Foote, and Timothy K. Stanton. 1993. “Further
+Analysis of Target Strength Measurements of Antarctic Krill at 38 and
+120 kHz: Comparison with Deformed Cylinder Model and Inference of
+Orientation Distribution.” *The Journal of the Acoustical Society of
+America* 93 (5): 2985–88. <https://doi.org/10.1121/1.405818>.
+
+Chu, Dezhang, and Zhen Ye. 1999. “A Phase-Compensated Distorted Wave
+Born Approximation Representation of the Bistatic Scattering by Weakly
+Scattering Objects: Application to Zooplankton.” *The Journal of the
+Acoustical Society of America* 106 (4): 1732–43.
+<https://doi.org/10.1121/1.428036>.
+
+Stanton, T. K. 1989. “Sound Scattering by Cylinders of Finite Length.
+III. Deformed Cylinders.” *The Journal of the Acoustical Society of
+America* 86 (2): 691–705. <https://doi.org/10.1121/1.398193>.

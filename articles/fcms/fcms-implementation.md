@@ -9,7 +9,11 @@ Benchmarked Validated
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/fcms/fcms-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/fcms/fcms-theory.md)
 
-The `acousticTS` package uses object-based scatterers, so the FCMS
+These pages follow the finite-cylinder modal-series literature for
+straight circular cylinders near broadside ([Stanton
+1988](#ref-stanton_sound_1988), [1989](#ref-stanton_sound_1989)).
+
+The acousticTS package uses object-based scatterers, so the FCMS
 workflow follows the same broad pattern used elsewhere in the package:
 construct a geometry, attach the material properties needed for a
 cylindrical scatterer, evaluate target strength over the frequencies of
@@ -200,17 +204,16 @@ directly against the locally available `echoSMs` finite-cylinder
 implementation. This check serves a different purpose from the benchmark
 table above. It asks whether the software implementations agree with
 each other on the same finite-cylinder problem, and whether the
-remaining benchmark residual is shared rather than unique to
-`acousticTS`.
+remaining benchmark residual is shared rather than unique to acousticTS.
 
-| Boundary           | Mean abs. delta `acousticTS` vs `echoSMs` (dB) | Max abs. delta `acousticTS` vs `echoSMs` (dB) | Mean abs. delta `echoSMs` vs benchmark (dB) | Max abs. delta `echoSMs` vs benchmark (dB) |
-|:-------------------|-----------------------------------------------:|----------------------------------------------:|--------------------------------------------:|-------------------------------------------:|
-| `fixed_rigid`      |                                       7.14e-09 |                                      1.64e-07 |                                     0.00914 |                                    0.19454 |
-| `pressure_release` |                                       6.97e-09 |                                      1.59e-07 |                                     0.00263 |                                    0.00780 |
-| `gas_filled`       |                                       6.96e-09 |                                      1.59e-07 |                                     0.00245 |                                    0.00499 |
-| `liquid_filled`    |                                       4.36e-09 |                                      2.62e-07 |                                     0.00512 |                                    0.11453 |
+| Boundary           | Mean abs. delta acousticTS vs `echoSMs` (dB) | Max abs. delta acousticTS vs `echoSMs` (dB) | Mean abs. delta `echoSMs` vs benchmark (dB) | Max abs. delta `echoSMs` vs benchmark (dB) |
+|:-------------------|---------------------------------------------:|--------------------------------------------:|--------------------------------------------:|-------------------------------------------:|
+| `fixed_rigid`      |                                     7.14e-09 |                                    1.64e-07 |                                     0.00914 |                                    0.19454 |
+| `pressure_release` |                                     6.97e-09 |                                    1.59e-07 |                                     0.00263 |                                    0.00780 |
+| `gas_filled`       |                                     6.96e-09 |                                    1.59e-07 |                                     0.00245 |                                    0.00499 |
+| `liquid_filled`    |                                     4.36e-09 |                                    2.62e-07 |                                     0.00512 |                                    0.11453 |
 
-The key point is that `acousticTS` and `echoSMs` collapse onto the same
+The key point is that acousticTS and `echoSMs` collapse onto the same
 FCMS spectra to practical machine precision across all four boundary
 types. That means the larger fixed-rigid and liquid-filled benchmark
 residuals reported above are shared against the benchmark curve rather
@@ -233,3 +236,13 @@ branches are the boundary conditions themselves. The extra argument is a
 modal truncation cap, and the benchmark comparison shows that it can be
 pushed somewhat, but not recklessly, before the cylindrical modal sum is
 no longer trustworthy.
+
+## References
+
+Stanton, T. K. 1988. “Sound Scattering by Cylinders of Finite Length. I.
+Fluid Cylinders.” *The Journal of the Acoustical Society of America* 83
+(1): 55–63. <https://doi.org/10.1121/1.396184>.
+
+———. 1989. “Sound Scattering by Cylinders of Finite Length. III.
+Deformed Cylinders.” *The Journal of the Acoustical Society of America*
+86 (2): 691–705. <https://doi.org/10.1121/1.398193>.

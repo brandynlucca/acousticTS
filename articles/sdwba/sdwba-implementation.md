@@ -9,7 +9,13 @@ Benchmarked Validated
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/sdwba/sdwba-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/sdwba/sdwba-theory.md)
 
-The `acousticTS` package uses object-based scatterers so the same
+These pages connect krill-body DWBA models to phase variability,
+orientation effects, and practical survey use ([Demer and Conti
+2003a](#ref-demer_reconciling_2003); [Demer and Conti
+2003b](#ref-demer_validation_2003), [2005](#ref-demer_new_2005); [Conti
+and Demer 2006](#ref-conti_improved_2006)).
+
+The acousticTS package uses object-based scatterers so the same
 implementation pattern carries across models: create a scatterer, run
 [`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md),
 inspect the stored model output, and then compare a small set of
@@ -237,24 +243,47 @@ values used for the benchmark calculations (`N0 = 50`,
 `phase_sd_init = sqrt(2) / 32`, `L0 = 38.35 mm`, `f0 = 120 kHz`,
 `n_iterations = 100`).
 
-| Comparison                    | Mean abs. delta TS (dB) | Max abs. delta TS (dB) |
-|:------------------------------|------------------------:|-----------------------:|
-| `acousticTS` vs `echoSMs`     |                 1.70257 |               30.63630 |
-| `acousticTS` vs CCAMLR MATLAB |                 0.06978 |                0.18270 |
-| `acousticTS` vs NOAA HTML     |                 0.06158 |                0.52846 |
-| `echoSMs` vs CCAMLR MATLAB    |                 1.74808 |               30.72119 |
-| `echoSMs` vs NOAA HTML        |                 1.69189 |               30.27117 |
-| CCAMLR MATLAB vs NOAA HTML    |                 0.13036 |                0.65798 |
+| Comparison                  | Mean abs. delta TS (dB) | Max abs. delta TS (dB) |
+|:----------------------------|------------------------:|-----------------------:|
+| acousticTS vs `echoSMs`     |                 1.70257 |               30.63630 |
+| acousticTS vs CCAMLR MATLAB |                 0.06978 |                0.18270 |
+| acousticTS vs NOAA HTML     |                 0.06158 |                0.52846 |
+| `echoSMs` vs CCAMLR MATLAB  |                 1.74808 |               30.72119 |
+| `echoSMs` vs NOAA HTML      |                 1.69189 |               30.27117 |
+| CCAMLR MATLAB vs NOAA HTML  |                 0.13036 |                0.65798 |
 
 Those values should be read as implementation differences rather than
 benchmark errors. All four calculations use the same bundled krill
 dimensions and the same initial stochastic reference values, but they do
 not use the same stochastic convention. In the current external
 implementations, both the CCAMLR MATLAB code and the NOAA HTML code
-square the phase term in the stochastic multiplier, while `acousticTS`
+square the phase term in the stochastic multiplier, while acousticTS
 keeps the paper-style linear phase standard deviation and `echoSMs`
 follows its own direct stochastic-phase application. So the bundled
 krill comparison is complementary to the canonical tables above: one set
 checks the stochastic model against published weakly scattering
 reference cases, and the other checks how the same biological krill
 geometry separates across existing SDWBA implementations.
+
+## References
+
+Conti, Stéphane G., and David A. Demer. 2006. “Improved Parameterization
+of the SDWBA for Estimating Krill Target Strength.” *ICES Journal of
+Marine Science* 63 (5): 928–35.
+<https://doi.org/10.1016/j.icesjms.2006.02.007>.
+
+Demer, David A., and Stephane G. Conti. 2003a. “Reconciling Theoretical
+Versus Empirical Target Strengths of Krill: Effects of Phase Variability
+on the Distorted-Wave Born Approximation.” *ICES Journal of Marine
+Science* 60 (2): 429–34.
+<https://doi.org/10.1016/S1054-3139(03)00002-X>.
+
+Demer, David A., and Stéphane G. Conti. 2003b. “Validation of the
+Stochastic Distorted-Wave Born Approximation Model with Broad Bandwidth
+Total Target Strength Measurements of Antarctic Krill.” *ICES Journal of
+Marine Science* 60 (3): 625–35.
+<https://doi.org/10.1016/S1054-3139(03)00063-8>.
+
+———. 2005. “New Target-Strength Model Indicates More Krill in the
+Southern Ocean.” *ICES Journal of Marine Science* 62 (1): 25–32.
+<https://doi.org/10.1016/j.icesjms.2004.07.027>.

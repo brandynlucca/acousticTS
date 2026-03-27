@@ -13,8 +13,8 @@ The elastic-cylinder modal series solution (`ECMS`) is the
 solid-cylinder counterpart to the fluid `FCMS` family. It combines the
 exact phase-shift treatment of an infinite elastic circular cylinder
 with the same near-broadside finite-length coherence factor used for
-finite cylinders in the classical Stanton
-formulations.[¹](#fn1)[²](#fn2)
+finite cylinders in the classical Stanton formulations ([Faran
+1951](#ref-faran_sound_1951); [Stanton 1988](#ref-stanton_sound_1988)).
 
 The resulting model is exact in the local circular cross-section and
 approximate only in the way finite length is reduced to a coherence
@@ -199,12 +199,12 @@ analogue of `FCMS`: exact local circular-cylinder physics, approximate
 finite-length closure, and strongest physical relevance near broadside
 rather than at end-on incidence.
 
-------------------------------------------------------------------------
+## References
 
-1.  Faran, J.J. (**1951**). *Sound scattering by solid cylinders and
-    spheres*. *The Journal of the Acoustical Society of America*, 23:
-    405-418.
+Faran, James J. 1951. “Sound Scattering by Solid Cylinders and Spheres.”
+*The Journal of the Acoustical Society of America* 23 (4): 405–18.
+<https://doi.org/10.1121/1.1906780>.
 
-2.  Stanton, T.K. (**1988**). *Sound scattering by cylinders of finite
-    length. II. Elastic cylinders*. *The Journal of the Acoustical
-    Society of America*, 83: 64-67.
+Stanton, T. K. 1988. “Sound Scattering by Cylinders of Finite Length. I.
+Fluid Cylinders.” *The Journal of the Acoustical Society of America* 83
+(1): 55–63. <https://doi.org/10.1121/1.396184>.

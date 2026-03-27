@@ -115,15 +115,21 @@
 </h2>
 <p><span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span></p>
 <p><em>Model-family pages:</em> <a href="index.html">Overview</a> <a href="krm-implementation.html">Implementation</a> <a href="krm-theory.html">Theory</a></p>
-<p>The <code>acousticTS</code> package uses object-based scatterers, so
-the KRM workflow follows the same broad structure used elsewhere in the
-package: define the geometry, attach material meaning to the body and
-any internal inclusion, evaluate the model over the desired frequency
-range, and then inspect the returned response carefully enough to
-understand what part of the target is driving it. For KRM, the main
-structural choice is whether the target is represented as a fluid-like
-body only or as a body plus an internal strongly contrasting inclusion
-such as a swimbladder.</p>
+<p>These pages follow the composite body-plus-swimbladder fish modeling
+literature initiated for cod and later generalized in open software
+implementations <span class="citation">(<a href="#ref-clay_1991">C. S.
+Clay 1991</a>; <a href="#ref-clay_horne_1994">Clarence S. Clay and Horne
+1994</a>; <a href="#ref-sven_gastauer_svengastauerkrmr_2025">Gastauer
+2025</a>)</span>.</p>
+<p>The acousticTS package uses object-based scatterers, so the KRM
+workflow follows the same broad structure used elsewhere in the package:
+define the geometry, attach material meaning to the body and any
+internal inclusion, evaluate the model over the desired frequency range,
+and then inspect the returned response carefully enough to understand
+what part of the target is driving it. For KRM, the main structural
+choice is whether the target is represented as a fluid-like body only or
+as a body plus an internal strongly contrasting inclusion such as a
+swimbladder.</p>
 <p>This matters because KRM is not just a body-shape model. It is a
 composite body-plus-inclusion model. Readers should therefore treat
 object construction as part of the scientific interpretation rather than
@@ -218,8 +224,8 @@ because only the body Kirchhoff term is evaluated. The argument matters
 only for combined body-plus-swimbladder targets, where the model must
 decide what surrounding medium is used in the swimbladder terms (Clay
 and Horne 1994; Horne and Jech 1999).</p>
-<p>In the high-<code>ka</code> swimbladder Kirchhoff term,
-<code>acousticTS</code> uses the empirical factors:</p>
+<p>In the high-<code>ka</code> swimbladder Kirchhoff term, acousticTS
+uses the empirical factors:</p>
 <p><span class="math display">
   A_{SB,s} = \frac{ka_s}{ka_s + 0.083},
   \qquad
@@ -581,6 +587,29 @@ checks, and</li>
 <li>bundled-fish compatibility checks for the body-plus-swimbladder
 convention choice.</li>
 </ol>
+</div>
+</div>
+</div>
+<div class="section level2">
+<h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
+</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="ref-clay_1991" class="csl-entry">
+Clay, C. S. 1991. <span>“Low-Resolution Acoustic Scattering Models:
+<span>Fluid</span>-Filled Cylinders and Fish with Swim Bladders.”</span>
+<em>The Journal of the Acoustical Society of America</em> 89 (5):
+2168–79. <a href="https://doi.org/10.1121/1.400910" class="external-link">https://doi.org/10.1121/1.400910</a>.
+</div>
+<div id="ref-clay_horne_1994" class="csl-entry">
+Clay, Clarence S., and John K. Horne. 1994. <span>“Acoustic Models of
+Fish: <span>The</span> <span>Atlantic</span> Cod (<em><span>Gadus</span>
+Morhua</em>).”</span> <em>The Journal of the Acoustical Society of
+America</em> 96 (3): 1661–68. <a href="https://doi.org/10.1121/1.410245" class="external-link">https://doi.org/10.1121/1.410245</a>.
+</div>
+<div id="ref-sven_gastauer_svengastauerkrmr_2025" class="csl-entry">
+Gastauer, Sven. 2025.
+<span>“<span>SvenGastauer</span>/<span>KRMr</span>: V0.4.8.”</span>
+Zenodo. <a href="https://doi.org/10.5281/ZENODO.15838374" class="external-link">https://doi.org/10.5281/ZENODO.15838374</a>.
 </div>
 </div>
 </div>

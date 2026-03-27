@@ -9,6 +9,11 @@ Experimental Unvalidated
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/ecms/ecms-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/ecms/ecms-theory.md)
 
+These pages sit between the classical elastic-cylinder literature and
+later finite-length cylinder approximations used in fisheries acoustics
+([Faran 1951](#ref-faran_sound_1951); [Stanton
+1988](#ref-stanton_sound_1988)).
+
 The elastic-cylinder modal-series solution is available through
 `target_strength(..., model = "ecms")`. The preferred geometry carrier
 is an elastic-cylinder `ESS` object, while the elastic material
@@ -43,7 +48,7 @@ The reference cylinder uses:
 - broadside incidence
 - `12-200 kHz` in `2 kHz` steps
 
-In `acousticTS`, the call is:
+In acousticTS, the call is:
 
 ``` r
 library(acousticTS)
@@ -109,3 +114,13 @@ modal-series families. `ECMS` is not being claimed here as externally
 validated. What is being documented is that the package reproduces the
 elastic-cylinder algebra it claims to implement, across a full frequency
 band rather than only at a few checkpoint frequencies.
+
+## References
+
+Faran, James J. 1951. “Sound Scattering by Solid Cylinders and Spheres.”
+*The Journal of the Acoustical Society of America* 23 (4): 405–18.
+<https://doi.org/10.1121/1.1906780>.
+
+Stanton, T. K. 1988. “Sound Scattering by Cylinders of Finite Length. I.
+Fluid Cylinders.” *The Journal of the Acoustical Society of America* 83
+(1): 55–63. <https://doi.org/10.1121/1.396184>.

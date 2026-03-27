@@ -2,7 +2,13 @@
 
 ## Introduction
 
-Model execution in `acousticTS` is organized around the target object
+The execution patterns shown here are designed to make it easy to
+reproduce the same kinds of spectra and angle-series comparisons
+reported in benchmark and software papers ([Jech et al.
+2015](#ref-jech_etal_2015); [Gastauer, Chu, and Cox
+2019](#ref-gastauer_zooscatrspan_2019)).
+
+Model execution in acousticTS is organized around the target object
 rather than around detached parameter tables. A model reads the
 scatterer geometry and properties, applies a chosen theoretical or
 approximate formulation, and stores the resulting outputs back onto the
@@ -368,3 +374,18 @@ relevant, and consistency with the intended target description.
   results](https://brandynlucca.github.io/acousticTS/articles/plotting-inspecting-results/plotting-inspecting-results.md)
 - [Simulation and parameter
   sweeps](https://brandynlucca.github.io/acousticTS/articles/simulation-parameter-sweeps/simulation-parameter-sweeps.md)
+
+## References
+
+Gastauer, Sven, Dezhang Chu, and Martin J. Cox. 2019. “ZooScatR—An
+\<Span Style="font-Variant:small-Caps;"\>r\</Span\> Package for
+Modelling the Scattering Properties of Weak Scattering Targets Using the
+Distorted Wave Born Approximation.” *The Journal of the Acoustical
+Society of America* 145 (1): EL102–8.
+<https://doi.org/10.1121/1.5085655>.
+
+Jech, J. Michael, John K. Horne, Dezhang Chu, David A. Demer, David T.
+I. Francis, Natalia Gorska, Benjamin Jones, et al. 2015. “Comparisons
+Among Ten Models of Acoustic Backscattering Used in Aquatic Ecosystem
+Research.” *The Journal of the Acoustical Society of America* 138 (6):
+3742–64. <https://doi.org/10.1121/1.4937607>.

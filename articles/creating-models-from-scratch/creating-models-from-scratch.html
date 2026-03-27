@@ -113,9 +113,12 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>One of the most useful features of <code>acousticTS</code> is that a
-new target-strength model does not need a large registration framework.
-The package’s <code><a href="../../reference/target_strength.html">target_strength()</a></code> wrapper already handles the
+<p>Building a model from scratch is easiest when the geometry, basis,
+and approximation regime stay aligned with the canonical scattering
+literature <span class="citation">(<a href="#ref-morse_theoretical_1986">Morse and Ingard 1986</a>; <a href="#ref-waterman_t_2009">Waterman 2009</a>)</span>.</p>
+<p>One of the most useful features of acousticTS is that a new
+target-strength model does not need a large registration framework. The
+package’s <code><a href="../../reference/target_strength.html">target_strength()</a></code> wrapper already handles the
 dispatch pattern. To add a new model, the minimum requirement is that
 two functions exist and follow the expected naming convention:</p>
 <ol style="list-style-type: decimal">
@@ -411,6 +414,21 @@ or any model-specific diagnostics.</li>
 this pattern. If you provide a correctly named initializer and a
 correctly named model function, <code><a href="../../reference/target_strength.html">target_strength()</a></code> can do
 the rest.</p>
+</div>
+<div class="section level2">
+<h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
+</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="ref-morse_theoretical_1986" class="csl-entry">
+Morse, Philip M., and K. Uno Ingard. 1986. <em>Theoretical
+Acoustics</em>. Princeton, N.J: Princeton University Press.
+</div>
+<div id="ref-waterman_t_2009" class="csl-entry">
+Waterman, P. C. 2009. <span>“T -Matrix Methods in Acoustic
+Scattering.”</span> <em>The Journal of the Acoustical Society of
+America</em> 125 (1): 42–51. <a href="https://doi.org/10.1121/1.3035839" class="external-link">https://doi.org/10.1121/1.3035839</a>.
+</div>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

@@ -9,7 +9,12 @@ Benchmarked Validated Experimental
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/tmm/tmm-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/tmm/tmm-theory.md)
 
-The `acousticTS` package uses object-based scatterers, so the `TMM`
+These pages follow the coefficient-map view of scattering and later
+numerical implementations for axisymmetric bodies ([Waterman
+1969](#ref-waterman_new_1969), [2009](#ref-waterman_t_2009); [Ganesh and
+Hawkins 2022](#ref-ganesh_numerically_2022)).
+
+The acousticTS package uses object-based scatterers, so the `TMM`
 workflow follows the same broad structure used elsewhere in the package:
 define the geometry, attach the material interpretation, evaluate target
 strength over the frequency range of interest, and then inspect the
@@ -392,7 +397,7 @@ All of the
 [`tmm_scattering()`](https://brandynlucca.github.io/acousticTS/reference/tmm_scattering.md)-style
 helpers use the **body-fixed angular coordinates** of the canonical
 axisymmetric target, not arbitrary world-frame directions. For the
-built-in prolate, oblate, and cylinder shapes in `acousticTS`, the
+built-in prolate, oblate, and cylinder shapes in acousticTS, the
 symmetry axis is the body `x`-axis. So when these helpers are compared
 against an external BEM/FEM slice generated in a world `x-y` plane, the
 world directions need to be converted to the body-fixed `(\theta, \phi)`
@@ -967,3 +972,19 @@ implementation agreeing with the exact spherical modal solution. The
 prolate figure is really a geometry-consistency story: the current `TMM`
 family now lands on the exact spheroidal solution rather than drifting
 because of a mismatched basis.
+
+## References
+
+Ganesh, M., and Stuart C. Hawkins. 2022. “A Numerically Stable T-Matrix
+Method for Acoustic Scattering by Nonspherical Particles with Large
+Aspect Ratios and Size Parameters.” *The Journal of the Acoustical
+Society of America* 151 (3): 1978–88.
+<https://doi.org/10.1121/10.0009679>.
+
+Waterman, P. C. 1969. “New Formulation of Acoustic Scattering.” *The
+Journal of the Acoustical Society of America* 45 (6): 1417–29.
+<https://doi.org/10.1121/1.1911619>.
+
+———. 2009. “T -Matrix Methods in Acoustic Scattering.” *The Journal of
+the Acoustical Society of America* 125 (1): 42–51.
+<https://doi.org/10.1121/1.3035839>.

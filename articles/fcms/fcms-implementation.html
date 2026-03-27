@@ -115,11 +115,13 @@
 </h2>
 <p><span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span></p>
 <p><em>Model-family pages:</em> <a href="index.html">Overview</a> <a href="fcms-implementation.html">Implementation</a> <a href="fcms-theory.html">Theory</a></p>
-<p>The <code>acousticTS</code> package uses object-based scatterers, so
-the FCMS workflow follows the same broad pattern used elsewhere in the
-package: construct a geometry, attach the material properties needed for
-a cylindrical scatterer, evaluate target strength over the frequencies
-of interest, and then inspect how the result changes when the physically
+<p>These pages follow the finite-cylinder modal-series literature for
+straight circular cylinders near broadside <span class="citation">(<a href="#ref-stanton_sound_1988">Stanton 1988</a>, <a href="#ref-stanton_sound_1989">1989</a>)</span>.</p>
+<p>The acousticTS package uses object-based scatterers, so the FCMS
+workflow follows the same broad pattern used elsewhere in the package:
+construct a geometry, attach the material properties needed for a
+cylindrical scatterer, evaluate target strength over the frequencies of
+interest, and then inspect how the result changes when the physically
 important assumptions are changed. For FCMS, the most important
 assumptions are usually the cylinder radius, cylinder length,
 orientation, and the boundary condition used to represent the cylinder
@@ -331,7 +333,7 @@ finite-cylinder implementation. This check serves a different purpose
 from the benchmark table above. It asks whether the software
 implementations agree with each other on the same finite-cylinder
 problem, and whether the remaining benchmark residual is shared rather
-than unique to <code>acousticTS</code>.</p>
+than unique to acousticTS.</p>
 <table class="table">
 <colgroup>
 <col width="20%">
@@ -342,10 +344,10 @@ than unique to <code>acousticTS</code>.</p>
 </colgroup>
 <thead><tr class="header">
 <th align="left">Boundary</th>
-<th align="right">Mean abs. delta <code>acousticTS</code> vs
-<code>echoSMs</code> (dB)</th>
-<th align="right">Max abs. delta <code>acousticTS</code> vs
-<code>echoSMs</code> (dB)</th>
+<th align="right">Mean abs. delta acousticTS vs <code>echoSMs</code>
+(dB)</th>
+<th align="right">Max abs. delta acousticTS vs <code>echoSMs</code>
+(dB)</th>
 <th align="right">Mean abs. delta <code>echoSMs</code> vs benchmark
 (dB)</th>
 <th align="right">Max abs. delta <code>echoSMs</code> vs benchmark
@@ -382,12 +384,12 @@ than unique to <code>acousticTS</code>.</p>
 </tr>
 </tbody>
 </table>
-<p>The key point is that <code>acousticTS</code> and
-<code>echoSMs</code> collapse onto the same FCMS spectra to practical
-machine precision across all four boundary types. That means the larger
-fixed-rigid and liquid-filled benchmark residuals reported above are
-shared against the benchmark curve rather than being a disagreement
-between the two software implementations.</p>
+<p>The key point is that acousticTS and <code>echoSMs</code> collapse
+onto the same FCMS spectra to practical machine precision across all
+four boundary types. That means the larger fixed-rigid and liquid-filled
+benchmark residuals reported above are shared against the benchmark
+curve rather than being a disagreement between the two software
+implementations.</p>
 <p>The main additional numerical switch in FCMS is <code>m_limit</code>,
 so the natural follow-up check is the same one used for SPHMS: hold the
 liquid-filled benchmark definition fixed and inspect how strongly the
@@ -437,6 +439,22 @@ branches are the boundary conditions themselves. The extra argument is a
 modal truncation cap, and the benchmark comparison shows that it can be
 pushed somewhat, but not recklessly, before the cylindrical modal sum is
 no longer trustworthy.</p>
+</div>
+</div>
+</div>
+<div class="section level2">
+<h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
+</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="ref-stanton_sound_1988" class="csl-entry">
+Stanton, T. K. 1988. <span>“Sound Scattering by Cylinders of Finite
+Length. <span>I</span>. <span>Fluid</span> Cylinders.”</span> <em>The
+Journal of the Acoustical Society of America</em> 83 (1): 55–63. <a href="https://doi.org/10.1121/1.396184" class="external-link">https://doi.org/10.1121/1.396184</a>.
+</div>
+<div id="ref-stanton_sound_1989" class="csl-entry">
+———. 1989. <span>“Sound Scattering by Cylinders of Finite Length.
+<span>III</span>. <span>Deformed</span> Cylinders.”</span> <em>The
+Journal of the Acoustical Society of America</em> 86 (2): 691–705. <a href="https://doi.org/10.1121/1.398193" class="external-link">https://doi.org/10.1121/1.398193</a>.
 </div>
 </div>
 </div>

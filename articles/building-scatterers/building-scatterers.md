@@ -2,12 +2,19 @@
 
 ## Introduction
 
+The scatterer classes in `acousticTS` are organized around target types
+that recur across fisheries and zooplankton acoustics, from calibration
+spheres to weakly scattering elongated bodies and composite fish targets
+([Foote 1990](#ref-foote_spheres_1990); [Stanton
+1996](#ref-stanton_acoustic_1996); [Clay and Horne
+1994](#ref-clay_horne_1994)).
+
 Once a geometry exists, it still has to be assigned a physical
-interpretation before most models in `acousticTS` can be run. That is
-the role of a scatterer object. A shape answers the geometric question,
-but a scatterer answers the acoustic one: what is the target made of,
-which interfaces matter, how should the surrounding medium be
-interpreted, and which class of model assumptions is meant to apply?
+interpretation before most models in acousticTS can be run. That is the
+role of a scatterer object. A shape answers the geometric question, but
+a scatterer answers the acoustic one: what is the target made of, which
+interfaces matter, how should the surrounding medium be interpreted, and
+which class of model assumptions is meant to apply?
 
 This distinction matters because the same outline can support several
 different physical interpretations. A smooth elongated body might be
@@ -216,3 +223,17 @@ continuation of this article is [running target strength
 models](https://brandynlucca.github.io/acousticTS/articles/running-models/running-models.md),
 while the conceptual continuation is [choosing a
 model](https://brandynlucca.github.io/acousticTS/articles/model-selection/model-selection.md).
+
+## References
+
+Clay, Clarence S., and John K. Horne. 1994. “Acoustic Models of Fish:
+The Atlantic Cod (*Gadus Morhua*).” *The Journal of the Acoustical
+Society of America* 96 (3): 1661–68. <https://doi.org/10.1121/1.410245>.
+
+Foote, K. G. 1990. “Spheres for Calibrating an Eleven-Frequency Acoustic
+Measurement System.” *ICES Journal of Marine Science* 46 (3): 284–86.
+<https://doi.org/10.1093/icesjms/46.3.284>.
+
+Stanton, T. 1996. “Acoustic Scattering Characteristics of Several
+Zooplankton Groups.” *ICES Journal of Marine Science* 53 (2): 289–95.
+<https://doi.org/10.1006/jmsc.1996.0037>.

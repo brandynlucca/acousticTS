@@ -11,11 +11,12 @@ Experimental Unvalidated
 
 The bent-cylinder modal series solution (`BCMS`) is a curvature-aware
 extension of the straight finite-cylinder modal family developed by
-Stanton for finite-length cylinders near broadside.[¹](#fn1)[²](#fn2)
-The physical idea is simple: curvature modifies the way different parts
-of the cylinder remain coherent with one another, but it does not
-replace the local cross-sectional scattering physics with a completely
-different kernel.
+Stanton for finite-length cylinders near broadside ([Stanton
+1988](#ref-stanton_sound_1988), [1989](#ref-stanton_sound_1989)). The
+physical idea is simple: curvature modifies the way different parts of
+the cylinder remain coherent with one another, but it does not replace
+the local cross-sectional scattering physics with a completely different
+kernel.
 
 That separation leads to a two-level theory:
 
@@ -156,12 +157,12 @@ Its strength is that it preserves the modal physics of the straight
 cylinder while still accounting for the first-order way in which a bent
 axis destroys coherence.
 
-------------------------------------------------------------------------
+## References
 
-1.  Stanton, T.K. (**1988**). *Sound scattering by cylinders of finite
-    length. I. Fluid cylinders*. *The Journal of the Acoustical Society
-    of America*, 83: 55-63.
+Stanton, T. K. 1988. “Sound Scattering by Cylinders of Finite Length. I.
+Fluid Cylinders.” *The Journal of the Acoustical Society of America* 83
+(1): 55–63. <https://doi.org/10.1121/1.396184>.
 
-2.  Stanton, T.K. (**1989**). *Sound scattering by cylinders of finite
-    length. III. Deformed cylinders*. *The Journal of the Acoustical
-    Society of America*, 86: 691-705.
+———. 1989. “Sound Scattering by Cylinders of Finite Length. III.
+Deformed Cylinders.” *The Journal of the Acoustical Society of America*
+86 (2): 691–705. <https://doi.org/10.1121/1.398193>.

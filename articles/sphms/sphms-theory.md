@@ -14,7 +14,9 @@ problem can be solved exactly by separation of variables. Because the
 Helmholtz equation separates in spherical coordinates, the incident,
 scattered, and interior fields can be expanded in spherical
 eigenfunctions, and the boundary conditions reduce to independent
-algebraic equations for each angular order.[¹](#fn1)[²](#fn2)[³](#fn3)
+algebraic equations for each angular order ([Anderson
+1950](#ref-anderson_sound_1950); [Faran 1951](#ref-faran_sound_1951);
+[Hickling 1962](#ref-hickling_analysis_1962)).
 
 That structure is what underlies the spherical modal series solution for
 rigid, pressure-release, fluid-filled, and gas-filled spheres. In this
@@ -314,17 +316,16 @@ the fluid-filled case. That is exactly why the spherical problem serves
 as the standard benchmark against which more complicated modal and
 approximate models are often judged.
 
-### References
+## References
 
-------------------------------------------------------------------------
+Anderson, Victor C. 1950. “Sound Scattering from a Fluid Sphere.” *The
+Journal of the Acoustical Society of America* 22 (4): 426–31.
+<https://doi.org/10.1121/1.1906621>.
 
-1.  Anderson, V. C. (1950). Sound scattering from a fluid sphere. *The
-    Journal of the Acoustical Society of America*, 22, 426-431.
+Faran, James J. 1951. “Sound Scattering by Solid Cylinders and Spheres.”
+*The Journal of the Acoustical Society of America* 23 (4): 405–18.
+<https://doi.org/10.1121/1.1906780>.
 
-2.  Faran, J. J. (1951). Sound scattering by solid cylinders and
-    spheres. *The Journal of the Acoustical Society of America*, 23,
-    405-418.
-
-3.  Hickling, R. (1962). Analysis of echoes from a solid elastic sphere
-    in water. *The Journal of the Acoustical Society of America*, 34,
-    1582-1592.
+Hickling, Robert. 1962. “Analysis of Echoes from a Solid Elastic Sphere
+in Water.” *The Journal of the Acoustical Society of America* 34 (10):
+1582–92. <https://doi.org/10.1121/1.1909055>.

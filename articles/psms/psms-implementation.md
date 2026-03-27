@@ -9,7 +9,13 @@ Benchmarked Validated
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/psms/psms-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/psms/psms-theory.md)
 
-The `acousticTS` package uses object-based scatterers so the same
+These pages are rooted in exact spheroidal-coordinate separations and
+later fisheries-acoustics use of prolate-spheroid models ([Spence and
+Granger 1951](#ref-spence_scattering_1951); [Flammer
+1957](#ref-flammer_spheroidal_1957); [Furusawa
+1988](#ref-furusawa_prolate_1988)).
+
+The acousticTS package uses object-based scatterers so the same
 implementation pattern carries across models: create a scatterer, run
 [`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md),
 inspect the stored model output, and then compare a small set of
@@ -496,8 +502,8 @@ whether the same prolate-spheroid definitions produce comparable spectra
 in other locally available implementations. The table below uses the
 shared `12, 18, 38, 70, 100 kHz` frequency set so that the
 cross-software check reaches more informative reduced frequencies while
-still remaining computationally manageable. The `acousticTS` settings
-are the same ones used for the main benchmark-quality run here:
+still remaining computationally manageable. The acousticTS settings are
+the same ones used for the main benchmark-quality run here:
 `precision = "quad"`, `adaptive = FALSE`, `simplify_Amn = FALSE`,
 `n_integration = 96`, and `phi_body = pi`.
 
@@ -506,12 +512,12 @@ are `N/A` for `fixed_rigid` and `pressure_release`. The table separates
 the original and vectorized `Prol_Spheroid` branches because the
 numerical agreement is nearly identical while the runtime is not.
 
-| Case               | Frequency set (kHz)   | Max abs. delta TS vs `echoSMs` (dB) | Mean abs. delta TS vs `echoSMs` (dB) | Max abs. delta TS vs `Prol_Spheroid` original (dB) | Mean abs. delta TS vs `Prol_Spheroid` original (dB) | Max abs. delta TS vs `Prol_Spheroid` vectorized (dB) | Mean abs. delta TS vs `Prol_Spheroid` vectorized (dB) | `acousticTS` elapsed (s) | `echoSMs` elapsed (s) | `Prol_Spheroid` original elapsed (s) | `Prol_Spheroid` vectorized elapsed (s) |
-|:-------------------|:----------------------|------------------------------------:|-------------------------------------:|---------------------------------------------------:|----------------------------------------------------:|-----------------------------------------------------:|------------------------------------------------------:|-------------------------:|----------------------:|-------------------------------------:|---------------------------------------:|
-| `fixed_rigid`      | `12, 18, 38, 70, 100` |                           `0.49692` |                            `0.10091` |                                              `N/A` |                                               `N/A` |                                                `N/A` |                                                 `N/A` |                   `0.86` |                `0.34` |                                `N/A` |                                  `N/A` |
-| `pressure_release` | `12, 18, 38, 70, 100` |                           `0.08619` |                            `0.01757` |                                              `N/A` |                                               `N/A` |                                                `N/A` |                                                 `N/A` |                   `0.93` |                `0.33` |                                `N/A` |                                  `N/A` |
-| `liquid_filled`    | `12, 18, 38, 70, 100` |                           `1.01676` |                            `0.20537` |                                          `0.00128` |                                           `0.00055` |                                            `0.00128` |                                             `0.00055` |                   `2.72` |               `48.02` |                              `48.65` |                                `11.06` |
-| `gas_filled`       | `12, 18, 38, 70, 100` |                           `5.49661` |                            `1.10385` |                                         `42.84714` |                                          `13.22982` |                                           `42.84714` |                                            `13.22982` |                   `2.69` |               `70.97` |                             `698.50` |                                `26.94` |
+| Case               | Frequency set (kHz)   | Max abs. delta TS vs `echoSMs` (dB) | Mean abs. delta TS vs `echoSMs` (dB) | Max abs. delta TS vs `Prol_Spheroid` original (dB) | Mean abs. delta TS vs `Prol_Spheroid` original (dB) | Max abs. delta TS vs `Prol_Spheroid` vectorized (dB) | Mean abs. delta TS vs `Prol_Spheroid` vectorized (dB) | acousticTS elapsed (s) | `echoSMs` elapsed (s) | `Prol_Spheroid` original elapsed (s) | `Prol_Spheroid` vectorized elapsed (s) |
+|:-------------------|:----------------------|------------------------------------:|-------------------------------------:|---------------------------------------------------:|----------------------------------------------------:|-----------------------------------------------------:|------------------------------------------------------:|-----------------------:|----------------------:|-------------------------------------:|---------------------------------------:|
+| `fixed_rigid`      | `12, 18, 38, 70, 100` |                           `0.49692` |                            `0.10091` |                                              `N/A` |                                               `N/A` |                                                `N/A` |                                                 `N/A` |                 `0.86` |                `0.34` |                                `N/A` |                                  `N/A` |
+| `pressure_release` | `12, 18, 38, 70, 100` |                           `0.08619` |                            `0.01757` |                                              `N/A` |                                               `N/A` |                                                `N/A` |                                                 `N/A` |                 `0.93` |                `0.33` |                                `N/A` |                                  `N/A` |
+| `liquid_filled`    | `12, 18, 38, 70, 100` |                           `1.01676` |                            `0.20537` |                                          `0.00128` |                                           `0.00055` |                                            `0.00128` |                                             `0.00055` |                 `2.72` |               `48.02` |                              `48.65` |                                `11.06` |
+| `gas_filled`       | `12, 18, 38, 70, 100` |                           `5.49661` |                            `1.10385` |                                         `42.84714` |                                          `13.22982` |                                           `42.84714` |                                            `13.22982` |                 `2.69` |               `70.97` |                             `698.50` |                                `26.94` |
 
 These checks are informative in a more mixed way once `70` and `100 kHz`
 are included. The penetrable liquid-filled case remains extremely close
@@ -602,3 +608,16 @@ For practical PSMS work, the first controls to revisit are usually:
 Those are the settings to revisit first when a spectrum appears
 unexpectedly noisy, unexpectedly sensitive, or unexpectedly expensive to
 evaluate.
+
+## References
+
+Flammer, Carson. 1957. *Spheroidal Wave Functions*.
+<https://ui.adsabs.harvard.edu/abs/1957spwf.book.....F>.
+
+Furusawa, Masahiko. 1988. “Prolate Spheroidal Models for Predicting
+General Trends of Fish Target Strength.” *Journal of the Acoustical
+Society of Japan (E)* 9 (1): 13–24. <https://doi.org/10.1250/ast.9.13>.
+
+Spence, R. D., and Sara Granger. 1951. “The Scattering of Sound from a
+Prolate Spheroid.” *The Journal of the Acoustical Society of America* 23
+(6): 701–6. <https://doi.org/10.1121/1.1906827>.

@@ -115,12 +115,14 @@
 </h2>
 <p><span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span></p>
 <p><em>Model-family pages:</em> <a href="index.html">Overview</a> <a href="sphms-implementation.html">Implementation</a> <a href="sphms-theory.html">Theory</a></p>
-<p>The <code>acousticTS</code> package uses object-based scatterers so
-the same implementation pattern carries across models: create a
-scatterer, run <code><a href="../../reference/target_strength.html">target_strength()</a></code>, inspect the stored model
-output, and then compare a small set of physically important inputs. For
-SPHMS, the object must be spherical and the main model choice is the
-boundary condition.</p>
+<p>These pages follow the classical exact sphere literature for fluid,
+elastic, and approximate shell limits <span class="citation">(<a href="#ref-anderson_sound_1950">Anderson 1950</a>; <a href="#ref-faran_sound_1951">Faran 1951</a>; <a href="#ref-hickling_analysis_1962">Hickling 1962</a>)</span>.</p>
+<p>The acousticTS package uses object-based scatterers so the same
+implementation pattern carries across models: create a scatterer, run
+<code><a href="../../reference/target_strength.html">target_strength()</a></code>, inspect the stored model output, and
+then compare a small set of physically important inputs. For SPHMS, the
+object must be spherical and the main model choice is the boundary
+condition.</p>
 <p>That apparent simplicity is one of the reasons SPHMS is so useful.
 When the target really is well approximated by a sphere, the geometry
 and the coordinate system match exactly, so the main practical decisions
@@ -290,14 +292,13 @@ within about 0.005 dB in the worst case.</p>
 <div class="section level4">
 <h4 id="cross-software-implementation-checks">Cross-software implementation checks<a class="anchor" aria-label="anchor" href="#cross-software-implementation-checks"></a>
 </h4>
-<p>For the penetrable spherical cases, the current
-<code>acousticTS</code> implementation can also be checked directly
-against the locally available <code>KRMr</code> and <code>echoSMs</code>
-sphere solvers. Those checks serve a different purpose from the Jech
-benchmark table above: they verify that the software implementations
-agree when they are solving the same penetrable spherical problem,
-rather than only asking how closely any one implementation tracks the
-benchmark family.</p>
+<p>For the penetrable spherical cases, the current acousticTS
+implementation can also be checked directly against the locally
+available <code>KRMr</code> and <code>echoSMs</code> sphere solvers.
+Those checks serve a different purpose from the Jech benchmark table
+above: they verify that the software implementations agree when they are
+solving the same penetrable spherical problem, rather than only asking
+how closely any one implementation tracks the benchmark family.</p>
 <table class="table">
 <colgroup>
 <col width="25%">
@@ -314,32 +315,28 @@ benchmark family.</p>
 <tbody>
 <tr class="odd">
 <td align="left"><code>gas_filled</code></td>
-<td align="left">
-<code>acousticTS</code> vs <code>KRMr</code>
+<td align="left">acousticTS vs <code>KRMr</code>
 </td>
 <td align="right">3.21e-14</td>
 <td align="right">2.21e-12</td>
 </tr>
 <tr class="even">
 <td align="left"><code>gas_filled</code></td>
-<td align="left">
-<code>acousticTS</code> vs <code>echoSMs</code>
+<td align="left">acousticTS vs <code>echoSMs</code>
 </td>
 <td align="right">1.71e-13</td>
 <td align="right">1.52e-11</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>liquid_filled</code></td>
-<td align="left">
-<code>acousticTS</code> vs <code>KRMr</code>
+<td align="left">acousticTS vs <code>KRMr</code>
 </td>
 <td align="right">5.70e-12</td>
 <td align="right">1.30e-10</td>
 </tr>
 <tr class="even">
 <td align="left"><code>liquid_filled</code></td>
-<td align="left">
-<code>acousticTS</code> vs <code>echoSMs</code>
+<td align="left">acousticTS vs <code>echoSMs</code>
 </td>
 <td align="right">3.68e-11</td>
 <td align="right">3.37e-09</td>
@@ -349,9 +346,9 @@ benchmark family.</p>
 <p>Those values show that the penetrable SPHMS branches are effectively
 identical across the three implementations on the shared spherical
 definitions. In other words, the small residuals reported against the
-benchmark family above are not an <code>acousticTS</code>-specific
-artifact. They are shared by the matched software implementations
-solving the same gas-filled and liquid-filled sphere problems.</p>
+benchmark family above are not an acousticTS-specific artifact. They are
+shared by the matched software implementations solving the same
+gas-filled and liquid-filled sphere problems.</p>
 <p>SPHMS does expose one additional numerical control,
 <code>m_limit</code>, so it is worth checking how aggressively the modal
 cap can be reduced before the liquid-filled benchmark fit starts to
@@ -403,6 +400,27 @@ do not need the same kind of configuration matrix as PSMS. Boundary
 choice is the main physical switch, and <code>m_limit</code> is best
 treated as a guarded numerical override rather than as a routine tuning
 knob.</p>
+</div>
+</div>
+</div>
+<div class="section level2">
+<h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
+</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="ref-anderson_sound_1950" class="csl-entry">
+Anderson, Victor C. 1950. <span>“Sound Scattering from a Fluid
+Sphere.”</span> <em>The Journal of the Acoustical Society of
+America</em> 22 (4): 426–31. <a href="https://doi.org/10.1121/1.1906621" class="external-link">https://doi.org/10.1121/1.1906621</a>.
+</div>
+<div id="ref-faran_sound_1951" class="csl-entry">
+Faran, James J. 1951. <span>“Sound Scattering by Solid Cylinders and
+Spheres.”</span> <em>The Journal of the Acoustical Society of
+America</em> 23 (4): 405–18. <a href="https://doi.org/10.1121/1.1906780" class="external-link">https://doi.org/10.1121/1.1906780</a>.
+</div>
+<div id="ref-hickling_analysis_1962" class="csl-entry">
+Hickling, Robert. 1962. <span>“Analysis of Echoes from a Solid Elastic
+Sphere in Water.”</span> <em>The Journal of the Acoustical Society of
+America</em> 34 (10): 1582–92. <a href="https://doi.org/10.1121/1.1909055" class="external-link">https://doi.org/10.1121/1.1909055</a>.
 </div>
 </div>
 </div>

@@ -9,6 +9,10 @@ Experimental Unvalidated
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/bcms/bcms-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/bcms/bcms-theory.md)
 
+This family follows the deformed-cylinder and coherence-corrected
+cylinder literature for weakly scattering elongated bodies ([Stanton
+1989](#ref-stanton_sound_1989), [1988](#ref-stanton_sound_1988)).
+
 The bent-cylinder modal-series solution is available through
 `target_strength(..., model = "bcms")`. It is intended for slender,
 weakly scattering cylinders whose cross-section is still well
@@ -47,7 +51,7 @@ Two geometries are compared:
 - a straight finite cylinder
 - a bent cylinder with `rho_c / L = 1.5`
 
-In `acousticTS`, the objects are built as:
+In acousticTS, the objects are built as:
 
 ``` r
 library(acousticTS)
@@ -238,3 +242,13 @@ to `FCMS` in the straight limit, and exact agreement with the
 bent-cylinder coherence construction in the curved case. Those checks do
 not replace an external benchmark ladder, but they do establish that the
 current implementation is respecting the defining algebra of the model.
+
+## References
+
+Stanton, T. K. 1988. “Sound Scattering by Cylinders of Finite Length. I.
+Fluid Cylinders.” *The Journal of the Acoustical Society of America* 83
+(1): 55–63. <https://doi.org/10.1121/1.396184>.
+
+———. 1989. “Sound Scattering by Cylinders of Finite Length. III.
+Deformed Cylinders.” *The Journal of the Acoustical Society of America*
+86 (2): 691–705. <https://doi.org/10.1121/1.398193>.

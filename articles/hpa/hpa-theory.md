@@ -13,10 +13,11 @@ The high-pass approximation (HPA) is not an exact boundary-value
 solution. It is a compact asymptotic model constructed so that the
 low-frequency limit matches the Rayleigh expansion of weakly scattering
 bodies, while the large-ka limit remains bounded and approaches a
-reflection-controlled scale.[¹](#fn1)[²](#fn2)[³](#fn3) The model is
-therefore best understood as an interpolation between two physically
-distinct regimes rather than as a direct solution of the governing
-boundary-value problem at all frequencies.
+reflection-controlled scale ([Johnson 1977](#ref-johnson_sound_1977);
+[Stanton 1989](#ref-stanton_1989)). The model is therefore best
+understood as an interpolation between two physically distinct regimes
+rather than as a direct solution of the governing boundary-value problem
+at all frequencies.
 
 Its usefulness comes from that interpolation. Instead of carrying a full
 modal series or surface integral, the HPA writes the backscattering
@@ -135,8 +136,8 @@ considered.
 
 ### High-pass denominator
 
-Johnson (1977)[⁴](#fn4) introduced the simplest rational completion of
-that numerator by writing:
+Johnson (1977) ([Johnson 1977](#ref-johnson_sound_1977)) introduced the
+simplest rational completion of that numerator by writing:
 
 \sigma\_\text{bs} = \frac{a^2 (ka)^4 \alpha\_{\pi s}^2}{1 +
 \tfrac{3}{2}(ka)^4}.
@@ -171,13 +172,14 @@ diverging.
 
 ## Stanton (1989) generalization
 
-Stanton (1989)[⁵](#fn5) extended the same logic to a broader class of
-shapes by matching a low-frequency scattering term to a reflected-wave
-asymptote and then introducing empirical correction factors where
-needed. In this broader setting, the geometric prefactors and
-directivity terms become just as important as the material contrasts
-because they determine how the same asymptotic logic is adapted to
-spheres, spheroids, straight cylinders, and bent cylinders.
+Stanton (1989) ([Stanton 1989](#ref-stanton_1989)) extended the same
+logic to a broader class of shapes by matching a low-frequency
+scattering term to a reflected-wave asymptote and then introducing
+empirical correction factors where needed. In this broader setting, the
+geometric prefactors and directivity terms become just as important as
+the material contrasts because they determine how the same asymptotic
+logic is adapted to spheres, spheroids, straight cylinders, and bent
+cylinders.
 
 ### Deviation and null functions
 
@@ -196,8 +198,8 @@ physical meaning at the same level as g\_{21}, h\_{21}, or \mathcal{R}.
 
 ### Spherical form
 
-For a sphere, the generalized expression from Stanton (1989)[⁶](#fn6)
-is:
+For a sphere, the generalized expression from Stanton (1989) ([Stanton
+1989](#ref-stanton_1989)) is:
 
 \sigma\_\text{bs} = \frac{a^2 (ka)^4 \alpha\_{\pi s}^2 \mathcal{G}}{ 1 +
 \dfrac{4(ka)^4 \alpha\_{\pi s}^2}{\mathcal{R}^2 \mathcal{F}} }.
@@ -205,10 +207,10 @@ is:
 The low-frequency numerator is still the Rayleigh term. The denominator
 is now written so that the high-frequency scale is set explicitly by the
 reflection coefficient \mathcal{R}. Compared with the simpler form of
-Johnson (1977; 1978)[⁷](#fn7)[⁸](#fn8), the version from Stanton
-(1989)[⁹](#fn9) makes the reflection-controlled nature of the large-ka
-limit more explicit and leaves room for the correction factors
-\mathcal{F} and \mathcal{G}.
+Johnson (1977) ([Johnson 1977](#ref-johnson_sound_1977)), the version
+from Stanton (1989) ([Stanton 1989](#ref-stanton_1989)) makes the
+reflection-controlled nature of the large-ka limit more explicit and
+leaves room for the correction factors \mathcal{F} and \mathcal{G}.
 
 ### Prolate spheroid form
 
@@ -304,40 +306,13 @@ therefore most useful when the scientific question is about broad
 frequency trends, relative shape effects, or fast exploratory
 calculations rather than resonance-resolving inference.
 
-------------------------------------------------------------------------
+## References
 
-1.  Johnson, R. K. (1977). Sound scattering from a fluid sphere
-    revisited. *The Journal of the Acoustical Society of America*, 61,
-    375-377.
+Johnson, Richard K. 1977. “Sound Scattering from a Fluid Sphere
+Revisited.” *The Journal of the Acoustical Society of America* 61 (2):
+375–77. <https://doi.org/10.1121/1.381326>.
 
-2.  Johnson, R. K. (1978). Erratum: Sound scattering from a fluid sphere
-    revisited. *The Journal of the Acoustical Society of America*, 63,
-    626.
-
-3.  Stanton, T. K. (1989). Simple approximate formulas for
-    backscattering of sound by spherical and elongated objects. *The
-    Journal of the Acoustical Society of America*, 86, 1499-1510.
-
-4.  Johnson, R. K. (1977). Sound scattering from a fluid sphere
-    revisited. *The Journal of the Acoustical Society of America*, 61,
-    375-377.
-
-5.  Stanton, T. K. (1989). Simple approximate formulas for
-    backscattering of sound by spherical and elongated objects. *The
-    Journal of the Acoustical Society of America*, 86, 1499-1510.
-
-6.  Stanton, T. K. (1989). Simple approximate formulas for
-    backscattering of sound by spherical and elongated objects. *The
-    Journal of the Acoustical Society of America*, 86, 1499-1510.
-
-7.  Johnson, R. K. (1977). Sound scattering from a fluid sphere
-    revisited. *The Journal of the Acoustical Society of America*, 61,
-    375-377.
-
-8.  Johnson, R. K. (1978). Erratum: Sound scattering from a fluid sphere
-    revisited. *The Journal of the Acoustical Society of America*, 63,
-    626.
-
-9.  Stanton, T. K. (1989). Simple approximate formulas for
-    backscattering of sound by spherical and elongated objects. *The
-    Journal of the Acoustical Society of America*, 86, 1499-1510.
+Stanton, Timothy K. 1989. “Simple Approximate Formulas for
+Backscattering of Sound by Spherical and Elongated Objects.” *The
+Journal of the Acoustical Society of America* 86 (4): 1499–1510.
+<https://doi.org/10.1121/1.398711>.

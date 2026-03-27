@@ -113,13 +113,15 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
+<p>The package concepts reflect the same divide between exact solutions,
+asymptotic approximations, and organism-specific composites seen in the
+scattering literature <span class="citation">(<a href="#ref-jech_etal_2015">Jech et al. 2015</a>; <a href="#ref-stanton_acoustic_1996">Stanton 1996</a>)</span>.</p>
 <p>The package is easiest to use once three ideas are kept separate:
 geometry, physical target type, and scattering model. Those three ideas
 are related, but they are not interchangeable. Many practical mistakes
-in <code>acousticTS</code> come from confusing one of those layers with
-another, such as treating a shape as if it were already a physical
-scatterer, or treating a model name as if it defined the target
-itself.</p>
+in acousticTS come from confusing one of those layers with another, such
+as treating a shape as if it were already a physical scatterer, or
+treating a model name as if it defined the target itself.</p>
 <object type="image/svg+xml" data="package-concepts-architecture.svg" style="width:100%;" aria-label="Conceptual layers">
 </object>
 <p>This page is the conceptual map for the rest of the documentation.
@@ -257,14 +259,14 @@ makes later comparison and validation much easier.</p>
 <div class="section level2">
 <h2 id="models-as-separate-layers">Models as separate layers<a class="anchor" aria-label="anchor" href="#models-as-separate-layers"></a>
 </h2>
-<p>Models in <code>acousticTS</code> are not the same thing as
-scatterers. A model is a mathematical mapping from the scatterer
-description and acoustic conditions to predicted backscatter. This is
-why the package can support multiple models for the same target. A
-fluid-like elongated object might be explored with <code>DWBA</code>,
-<code>SDWBA</code>, <code>TRCM</code>, <code>HPA</code>, or another more
-canonical model depending on the question being asked and the
-approximation regime that is defensible.</p>
+<p>Models in acousticTS are not the same thing as scatterers. A model is
+a mathematical mapping from the scatterer description and acoustic
+conditions to predicted backscatter. This is why the package can support
+multiple models for the same target. A fluid-like elongated object might
+be explored with <code>DWBA</code>, <code>SDWBA</code>,
+<code>TRCM</code>, <code>HPA</code>, or another more canonical model
+depending on the question being asked and the approximation regime that
+is defensible.</p>
 <p>This separation is one of the most useful design choices in the
 package because it means you do not have to rebuild the target every
 time you ask a different modeling question. One object can support
@@ -384,6 +386,24 @@ scatterers</a></li>
 <li><a href="../running-models/running-models.html">Running target
 strength models</a></li>
 </ul>
+</div>
+<div class="section level2">
+<h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
+</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="ref-jech_etal_2015" class="csl-entry">
+Jech, J. Michael, John K. Horne, Dezhang Chu, David A. Demer, David T.
+I. Francis, Natalia Gorska, Benjamin Jones, et al. 2015.
+<span>“Comparisons Among Ten Models of Acoustic Backscattering Used in
+Aquatic Ecosystem Research.”</span> <em>The Journal of the Acoustical
+Society of America</em> 138 (6): 3742–64. <a href="https://doi.org/10.1121/1.4937607" class="external-link">https://doi.org/10.1121/1.4937607</a>.
+</div>
+<div id="ref-stanton_acoustic_1996" class="csl-entry">
+Stanton, T. 1996. <span>“Acoustic Scattering Characteristics of Several
+Zooplankton Groups.”</span> <em>ICES Journal of Marine Science</em> 53
+(2): 289–95. <a href="https://doi.org/10.1006/jmsc.1996.0037" class="external-link">https://doi.org/10.1006/jmsc.1996.0037</a>.
+</div>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

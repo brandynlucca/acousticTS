@@ -115,10 +115,12 @@
 </h2>
 <p><span class="model-tag unvalidated">Unvalidated</span></p>
 <p><em>Model-family pages:</em> <a href="index.html">Overview</a> <a href="essms-implementation.html">Implementation</a> <a href="essms-theory.html">Theory</a></p>
-<p>The <code>acousticTS</code> package uses object-based scatterers so
-the same implementation pattern carries across models: create a
-scatterer, run <code><a href="../../reference/target_strength.html">target_strength()</a></code>, inspect the stored model
-output, and then compare a small set of physically important inputs. For
+<p>These pages are grounded in the classical elastic-shell scattering
+literature for fluid-filled spherical shells <span class="citation">(<a href="#ref-goodman_reflection_1962">Goodman and Stern 1962</a>; <a href="#ref-faran_sound_1951">Faran 1951</a>; <a href="#ref-stanton_sound_1990">Stanton 1990</a>)</span>.</p>
+<p>The acousticTS package uses object-based scatterers so the same
+implementation pattern carries across models: create a scatterer, run
+<code><a href="../../reference/target_strength.html">target_strength()</a></code>, inspect the stored model output, and
+then compare a small set of physically important inputs. For
 <code>ESSMS</code>, the required object class is <code>ESS</code>, which
 combines a spherical shell, an optional internal fluid, and the elastic
 constants required for the shell solution.</p>
@@ -418,6 +420,27 @@ present ESSMS full-grid benchmark failure is not just a consequence of
 picking the wrong modal cap in the implementation examples. Changing
 <code>m_limit</code> over a broad range does not recover a usable Jech
 shell-sphere comparison table yet.</p>
+</div>
+</div>
+</div>
+<div class="section level2">
+<h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
+</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="ref-faran_sound_1951" class="csl-entry">
+Faran, James J. 1951. <span>“Sound Scattering by Solid Cylinders and
+Spheres.”</span> <em>The Journal of the Acoustical Society of
+America</em> 23 (4): 405–18. <a href="https://doi.org/10.1121/1.1906780" class="external-link">https://doi.org/10.1121/1.1906780</a>.
+</div>
+<div id="ref-goodman_reflection_1962" class="csl-entry">
+Goodman, Ralph R., and Raya Stern. 1962. <span>“Reflection and
+Transmission of Sound by Elastic Spherical Shells.”</span> <em>The
+Journal of the Acoustical Society of America</em> 34 (3): 338–44. <a href="https://doi.org/10.1121/1.1928120" class="external-link">https://doi.org/10.1121/1.1928120</a>.
+</div>
+<div id="ref-stanton_sound_1990" class="csl-entry">
+Stanton, T. K. 1990. <span>“Sound Scattering by Spherical and Elongated
+Shelled Bodies.”</span> <em>The Journal of the Acoustical Society of
+America</em> 88 (3): 1619–33. <a href="https://doi.org/10.1121/1.400321" class="external-link">https://doi.org/10.1121/1.400321</a>.
 </div>
 </div>
 </div>

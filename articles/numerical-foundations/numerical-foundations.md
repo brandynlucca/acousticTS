@@ -2,6 +2,12 @@
 
 ## Introduction
 
+The numerical choices documented here are motivated by the
+special-function and basis-expansion structure of the underlying
+scattering literature ([Flammer 1957](#ref-flammer_spheroidal_1957);
+[Waterman 2009](#ref-waterman_t_2009); [Betcke and Scroggs
+2021](#ref-betcke_bempp-cl_2021)).
+
 Several of the package models are mathematically exact only because they
 are written in special-function bases adapted to canonical geometries.
 This article is the high-level guide to those numerical ingredients.
@@ -162,7 +168,7 @@ Those are the actual special-function building blocks that the rest of
 the spheroidal models depend on, so it is useful to separate their
 evaluation from the later model-specific algebra.
 
-In `acousticTS`, those functions are evaluated through the `profcn`
+In acousticTS, those functions are evaluated through the `profcn`
 backend in `src/prolate_swf.f90`, with the corresponding `C++` wrappers
 in `src/psms.cpp` handling the extraction and rescaling needed by the
 exported
@@ -403,3 +409,16 @@ This page answers “what is hard about evaluating it robustly?”
   theory](https://brandynlucca.github.io/acousticTS/articles/fcms/fcms-theory.md)
 - [ESSMS
   theory](https://brandynlucca.github.io/acousticTS/articles/essms/essms-theory.md)
+
+## References
+
+Betcke, Timo, and Matthew Scroggs. 2021. “Bempp-Cl: A Fast Python Based
+Just-in-Time Compiling Boundary Element Library.” *Journal of Open
+Source Software* 6 (59): 2879. <https://doi.org/10.21105/joss.02879>.
+
+Flammer, Carson. 1957. *Spheroidal Wave Functions*.
+<https://ui.adsabs.harvard.edu/abs/1957spwf.book.....F>.
+
+Waterman, P. C. 2009. “T -Matrix Methods in Acoustic Scattering.” *The
+Journal of the Acoustical Society of America* 125 (1): 42–51.
+<https://doi.org/10.1121/1.3035839>.

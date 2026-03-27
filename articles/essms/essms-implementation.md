@@ -9,7 +9,12 @@ Unvalidated
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/essms/essms-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/essms/essms-theory.md)
 
-The `acousticTS` package uses object-based scatterers so the same
+These pages are grounded in the classical elastic-shell scattering
+literature for fluid-filled spherical shells ([Goodman and Stern
+1962](#ref-goodman_reflection_1962); [Faran
+1951](#ref-faran_sound_1951); [Stanton 1990](#ref-stanton_sound_1990)).
+
+The acousticTS package uses object-based scatterers so the same
 implementation pattern carries across models: create a scatterer, run
 [`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md),
 inspect the stored model output, and then compare a small set of
@@ -213,3 +218,17 @@ present ESSMS full-grid benchmark failure is not just a consequence of
 picking the wrong modal cap in the implementation examples. Changing
 `m_limit` over a broad range does not recover a usable Jech shell-sphere
 comparison table yet.
+
+## References
+
+Faran, James J. 1951. “Sound Scattering by Solid Cylinders and Spheres.”
+*The Journal of the Acoustical Society of America* 23 (4): 405–18.
+<https://doi.org/10.1121/1.1906780>.
+
+Goodman, Ralph R., and Raya Stern. 1962. “Reflection and Transmission of
+Sound by Elastic Spherical Shells.” *The Journal of the Acoustical
+Society of America* 34 (3): 338–44. <https://doi.org/10.1121/1.1928120>.
+
+Stanton, T. K. 1990. “Sound Scattering by Spherical and Elongated
+Shelled Bodies.” *The Journal of the Acoustical Society of America* 88
+(3): 1619–33. <https://doi.org/10.1121/1.400321>.

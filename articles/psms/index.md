@@ -9,6 +9,12 @@ Benchmarked Validated
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/psms/psms-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/psms/psms-theory.md)
 
+These pages are rooted in exact spheroidal-coordinate separations and
+later fisheries-acoustics use of prolate-spheroid models ([Spence and
+Granger 1951](#ref-spence_scattering_1951); [Flammer
+1957](#ref-flammer_spheroidal_1957); [Furusawa
+1988](#ref-furusawa_prolate_1988)).
+
 The prolate spheroidal modal series solution (`PSMS`) is the exact
 single-target modal family for homogeneous prolate spheroids. It is the
 spheroidal analogue of spherical partial-wave theory and the natural
@@ -56,3 +62,16 @@ functions, and solve the retained boundary systems order by order.
   workflows, comparisons, and timing tables
 - [Theory](https://brandynlucca.github.io/acousticTS/articles/psms/psms-theory.md):
   full spheroidal-coordinate derivation and retained modal systems
+
+## References
+
+Flammer, Carson. 1957. *Spheroidal Wave Functions*.
+<https://ui.adsabs.harvard.edu/abs/1957spwf.book.....F>.
+
+Furusawa, Masahiko. 1988. “Prolate Spheroidal Models for Predicting
+General Trends of Fish Target Strength.” *Journal of the Acoustical
+Society of Japan (E)* 9 (1): 13–24. <https://doi.org/10.1250/ast.9.13>.
+
+Spence, R. D., and Sara Granger. 1951. “The Scattering of Sound from a
+Prolate Spheroid.” *The Journal of the Acoustical Society of America* 23
+(6): 701–6. <https://doi.org/10.1121/1.1906827>.

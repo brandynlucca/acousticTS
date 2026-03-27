@@ -2,6 +2,13 @@
 
 ## Introduction
 
+The bundled example objects are anchored to published fish, krill, and
+benchmark resources that make it easier to reproduce known workflows
+before introducing custom geometry ([Clay and Horne
+1994](#ref-clay_horne_1994); [McGehee, O’Driscoll, and Traykovski
+1998](#ref-mcgehee_effects_1998); [Jech et al.
+2015](#ref-jech_etal_2015)).
+
 The package includes bundled data objects that are useful for learning
 the workflow, benchmarking model behavior, and reproducing examples
 without first building every target from scratch. Those objects are not
@@ -133,20 +140,17 @@ reaches for the right example at the right stage of the workflow.
 
 ## References
 
-- Clay, C.S., and Horne, J.K. (1994). Acoustic models of fish: The
-  Atlantic cod (*Gadus morhua*). *The Journal of the Acoustical Society
-  of America*, 96, 1661-1668. <https://doi.org/10.1121/1.410245>
-- Conti, S.G., and Demer, D.A. (2003). Wide-bandwidth acoustical
-  characterization of anchovy and sardine from reverberation
-  measurements in an echoic tank. *ICES Journal of Marine Science*, 60,
-  617-624. <https://doi.org/10.1016/S1054-3139(03)00056-0>
-- Jech, J.M., Horne, J.K., Chu, D., Demer, D.A., Francis, D.T.I.,
-  Gorska, N., Jones, B., Lavery, A.C., Stanton, T.K., and Reeder, D.B.
-  (2015). Comparisons among ten models of acoustic backscattering used
-  in aquatic ecosystem research. *The Journal of the Acoustical Society
-  of America*, 138, 3742-3764. <https://doi.org/10.1121/1.4937607>
-- Jech, M., and Macaulay, G. *echoSMs*: Acoustic backscattering models
-  used in aquatic ecosystem research. GitHub repository:
-  <https://github.com/ices-tools-dev/echoSMs>
-- NOAA Fisheries. KRM model reference collection.
-  <https://www.fisheries.noaa.gov/data-tools/krm-model>
+Clay, Clarence S., and John K. Horne. 1994. “Acoustic Models of Fish:
+The Atlantic Cod (*Gadus Morhua*).” *The Journal of the Acoustical
+Society of America* 96 (3): 1661–68. <https://doi.org/10.1121/1.410245>.
+
+Jech, J. Michael, John K. Horne, Dezhang Chu, David A. Demer, David T.
+I. Francis, Natalia Gorska, Benjamin Jones, et al. 2015. “Comparisons
+Among Ten Models of Acoustic Backscattering Used in Aquatic Ecosystem
+Research.” *The Journal of the Acoustical Society of America* 138 (6):
+3742–64. <https://doi.org/10.1121/1.4937607>.
+
+McGehee, D. E., R. L. O’Driscoll, and L. V.Martin Traykovski. 1998.
+“Effects of Orientation on Acoustic Scattering from Antarctic Krill at
+120 kHz.” *Deep Sea Research Part II: Topical Studies in Oceanography*
+45 (7): 1273–94. <https://doi.org/10.1016/S0967-0645(98)00036-8>.

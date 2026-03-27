@@ -115,6 +115,11 @@
 </h2>
 <p><span class="model-tag validated">Validated</span> <span class="model-tag experimental">Experimental</span></p>
 <p><em>Model-family pages:</em> <a href="index.html">Overview</a> <a href="pcdwba-implementation.html">Implementation</a> <a href="pcdwba-theory.html">Theory</a></p>
+<p>These pages follow the phase-compensated weak-scattering literature
+for broadside elongated bodies and krill-style applications <span class="citation">(<a href="#ref-chu_phase-compensated_1999">Chu and Ye
+1999</a>; <a href="#ref-chu_further_1993">Chu, Foote, and Stanton
+1993</a>; <a href="#ref-stanton_sound_1989">Stanton
+1989</a>)</span>.</p>
 <p>The phase-compensated distorted wave Born approximation is available
 through <code>target_strength(..., model = "pcdwba")</code>. The
 implementation is intended for weakly scattering fluid-like bodies and
@@ -158,7 +163,7 @@ that implementation’s interpolated Bessel evaluation.</p>
 <li>
 <code>51</code> integration nodes in all three implementations</li>
 </ul>
-<p>In <code>acousticTS</code>, that target is built as:</p>
+<p>In acousticTS, that target is built as:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://brandynlucca.github.io/acousticTS/">acousticTS</a></span><span class="op">)</span></span>
 <span></span>
@@ -227,16 +232,15 @@ that implementation’s interpolated Bessel evaluation.</p>
 </tr>
 </tbody>
 </table>
-<p>The <code>ZooScatR</code> source-level reconstruction and
-<code>acousticTS</code> are indistinguishable on this grid. The
-<code>echopop</code> comparison remains close as well, but it is not at
-machine precision because that implementation evaluates the cylindrical
-Bessel term through interpolation rather than a direct nodewise call. On
-this grid, the largest mismatch occurs near <code>112 kHz</code>;
-replacing the interpolated <code>J_1(x)/x</code> evaluation with a
-direct call collapses that residual onto the <code>acousticTS</code> /
-<code>ZooScatR</code> curve. So the remaining drift is numerical, not
-geometrical.</p>
+<p>The <code>ZooScatR</code> source-level reconstruction and acousticTS
+are indistinguishable on this grid. The <code>echopop</code> comparison
+remains close as well, but it is not at machine precision because that
+implementation evaluates the cylindrical Bessel term through
+interpolation rather than a direct nodewise call. On this grid, the
+largest mismatch occurs near <code>112 kHz</code>; replacing the
+interpolated <code>J_1(x)/x</code> evaluation with a direct call
+collapses that residual onto the acousticTS / <code>ZooScatR</code>
+curve. So the remaining drift is numerical, not geometrical.</p>
 </div>
 <div class="section level4">
 <h4 id="timings">Timings<a class="anchor" aria-label="anchor" href="#timings"></a>
@@ -299,9 +303,36 @@ geometrical.</p>
 phase-compensated bent-cylinder solver. The comparison is not just
 against a benchmark curve. It is against two independently written
 source routines that share the same governing model. On this reference
-case, <code>acousticTS</code> reproduces the direct ZooScatR-style
-calculation exactly and stays very close to the <code>echopop</code>
-implementation across the full frequency band.</p>
+case, acousticTS reproduces the direct ZooScatR-style calculation
+exactly and stays very close to the <code>echopop</code> implementation
+across the full frequency band.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
+</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="ref-chu_further_1993" class="csl-entry">
+Chu, Dezhang, Kenneth G. Foote, and Timothy K. Stanton. 1993.
+<span>“Further Analysis of Target Strength Measurements of
+<span>Antarctic</span> Krill at 38 and 120 <span class="nocase">kHz</span>: <span>Comparison</span> with Deformed
+Cylinder Model and Inference of Orientation Distribution.”</span>
+<em>The Journal of the Acoustical Society of America</em> 93 (5):
+2985–88. <a href="https://doi.org/10.1121/1.405818" class="external-link">https://doi.org/10.1121/1.405818</a>.
+</div>
+<div id="ref-chu_phase-compensated_1999" class="csl-entry">
+Chu, Dezhang, and Zhen Ye. 1999. <span>“A Phase-Compensated Distorted
+Wave <span>Born</span> Approximation Representation of the Bistatic
+Scattering by Weakly Scattering Objects: <span>Application</span> to
+Zooplankton.”</span> <em>The Journal of the Acoustical Society of
+America</em> 106 (4): 1732–43. <a href="https://doi.org/10.1121/1.428036" class="external-link">https://doi.org/10.1121/1.428036</a>.
+</div>
+<div id="ref-stanton_sound_1989" class="csl-entry">
+Stanton, T. K. 1989. <span>“Sound Scattering by Cylinders of Finite
+Length. <span>III</span>. <span>Deformed</span> Cylinders.”</span>
+<em>The Journal of the Acoustical Society of America</em> 86 (2):
+691–705. <a href="https://doi.org/10.1121/1.398193" class="external-link">https://doi.org/10.1121/1.398193</a>.
+</div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

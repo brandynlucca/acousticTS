@@ -113,15 +113,18 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
+<p>The package workflow is meant to help users move between the same
+geometry, material, and model-choice questions that structure the
+broader fisheries-acoustics literature <span class="citation">(<a href="#ref-jech_etal_2015">Jech et al. 2015</a>; <a href="#ref-stanton_acoustic_1996">Stanton 1996</a>; <a href="#ref-medwin_fundamentals_1998">Medwin and Clay
+1998</a>)</span>.</p>
 <p>This documentation is meant to be the first practical stop for
-readers who are new to <code>acousticTS</code>. The package covers
-several different target-strength models, several target classes, and
-several ways of building geometry, so the documentation can look broad
-at first glance. The easiest way to make that structure manageable is to
-keep one idea in mind from the beginning: the package separates
-geometry, physical interpretation, model choice, and result inspection
-on purpose. Those are related decisions, but they are not the same
-decision.</p>
+readers who are new to acousticTS. The package covers several different
+target-strength models, several target classes, and several ways of
+building geometry, so the documentation can look broad at first glance.
+The easiest way to make that structure manageable is to keep one idea in
+mind from the beginning: the package separates geometry, physical
+interpretation, model choice, and result inspection on purpose. Those
+are related decisions, but they are not the same decision.</p>
 <p>At the broadest level, every workflow moves through four layers. A
 <code>Shape</code> describes geometry only. A <code>Scatterer</code>
 object adds material properties, boundary interpretation, and metadata.
@@ -323,6 +326,28 @@ documentation is meant to support both directions. The important point
 is that the package is easiest to use when geometry, physical
 interpretation, and model assumptions are treated as distinct but
 connected parts of the same workflow.</p>
+</div>
+<div class="section level2">
+<h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
+</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="ref-jech_etal_2015" class="csl-entry">
+Jech, J. Michael, John K. Horne, Dezhang Chu, David A. Demer, David T.
+I. Francis, Natalia Gorska, Benjamin Jones, et al. 2015.
+<span>“Comparisons Among Ten Models of Acoustic Backscattering Used in
+Aquatic Ecosystem Research.”</span> <em>The Journal of the Acoustical
+Society of America</em> 138 (6): 3742–64. <a href="https://doi.org/10.1121/1.4937607" class="external-link">https://doi.org/10.1121/1.4937607</a>.
+</div>
+<div id="ref-medwin_fundamentals_1998" class="csl-entry">
+Medwin, Herman, and Clarence S. Clay. 1998. <em>Fundamentals of
+Acoustical Oceanography</em>. Boston: Academic Press.
+</div>
+<div id="ref-stanton_acoustic_1996" class="csl-entry">
+Stanton, T. 1996. <span>“Acoustic Scattering Characteristics of Several
+Zooplankton Groups.”</span> <em>ICES Journal of Marine Science</em> 53
+(2): 289–95. <a href="https://doi.org/10.1006/jmsc.1996.0037" class="external-link">https://doi.org/10.1006/jmsc.1996.0037</a>.
+</div>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

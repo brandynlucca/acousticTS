@@ -115,16 +115,18 @@
 </h2>
 <p><span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span></p>
 <p><em>Model-family pages:</em> <a href="index.html">Overview</a> <a href="hpa-implementation.html">Implementation</a> <a href="hpa-theory.html">Theory</a></p>
-<p>The <code>acousticTS</code> package uses object-based scatterers, so
-the HPA workflow follows the same broad pattern used throughout the
-package: define the geometry, attach fluid-like material properties,
-evaluate the model over the frequency range of interest, and then
-inspect the returned results carefully enough to confirm that the
-approximation is being used in a sensible way. For HPA, the most
-important additional choice is the approximation method:
-<code>johnson</code> for the compact sphere expression of Johnson (1977;
-1978), or <code>stanton</code> for the broader sphere, prolate-spheroid,
-and cylinder approximations of Stanton (1989).</p>
+<p>These pages follow Johnson’s asymptotic fluid-sphere formulation and
+Stanton’s generalized approximate backscatter formulas <span class="citation">(<a href="#ref-johnson_sound_1977">Johnson 1977</a>; <a href="#ref-stanton_1989">Stanton 1989</a>)</span>.</p>
+<p>The acousticTS package uses object-based scatterers, so the HPA
+workflow follows the same broad pattern used throughout the package:
+define the geometry, attach fluid-like material properties, evaluate the
+model over the frequency range of interest, and then inspect the
+returned results carefully enough to confirm that the approximation is
+being used in a sensible way. For HPA, the most important additional
+choice is the approximation method: <code>johnson</code> for the compact
+sphere expression of Johnson (1977), or <code>stanton</code> for the
+broader sphere, prolate-spheroid, and cylinder approximations of Stanton
+(1989).</p>
 <p>This matters because HPA is an asymptotic model family rather than an
 exact solution family. The implementation should therefore be read as a
 workflow for setting up and checking an approximation, not as a
@@ -133,8 +135,8 @@ package.</p>
 <div class="section level3">
 <h3 id="object-generation">Object generation<a class="anchor" aria-label="anchor" href="#object-generation"></a>
 </h3>
-<p>The Johnson (1977; 1978) and Stanton (1989) sphere formulations can
-be compared using the same spherical <code>FLS</code> object.</p>
+<p>The Johnson (1977) and Stanton (1989) sphere formulations can be
+compared using the same spherical <code>FLS</code> object.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://brandynlucca.github.io/acousticTS/">acousticTS</a></span><span class="op">)</span></span>
 <span></span>
@@ -259,11 +261,10 @@ examine <code>sigma_bs</code> in the linear domain as well.</p>
 <p>This comparison is most useful as a model-behavior check. Because the
 geometry and material properties are the same, any difference between
 the curves reflects the difference between the compact sphere
-interpolation of Johnson (1977; 1978) and the more general asymptotic
-form of Stanton (1989). That makes the comparison a good way to judge
-whether the added flexibility of the Stanton (1989) formulation
-materially changes the interpretation over the frequency band of
-interest.</p>
+interpolation of Johnson (1977) and the more general asymptotic form of
+Stanton (1989). That makes the comparison a good way to judge whether
+the added flexibility of the Stanton (1989) formulation materially
+changes the interpretation over the frequency band of interest.</p>
 </div>
 <div class="section level4">
 <h4 id="elongated-body-stanton-formulation">Elongated-body Stanton formulation<a class="anchor" aria-label="anchor" href="#elongated-body-stanton-formulation"></a>
@@ -349,7 +350,7 @@ current machine.</p>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">Johnson (1977; 1978) sphere</td>
+<td align="left">Johnson (1977) sphere</td>
 <td align="right">42.20232</td>
 <td align="right">6.34274</td>
 <td align="right">0.00</td>
@@ -381,8 +382,8 @@ benchmark null structure or narrow resonant detail of the benchmark
 curves summarized by Jech et al. (2015).</p>
 <p>The other documented HPA arguments, <code>deviation_fun</code> and
 <code>null_fun</code>, are empirical fitting controls rather than
-canonical benchmark switches. Johnson (1977; 1978), Stanton (1989), and
-Jech et al. (2015) do not prescribe a single authoritative benchmark
+canonical benchmark switches. Johnson (1977), Stanton (1989), and Jech
+et al. (2015) do not prescribe a single authoritative benchmark
 parameterization for those functions, so this implementation page keeps
 them at their neutral value of <code>1</code> when reporting benchmark
 deltas. That leaves <code>method</code> and target geometry as the
@@ -401,10 +402,10 @@ with a particular measured dataset.</p>
 <p>The locally available <code>echoSMs::HPModel</code> provides a direct
 software-to-software check for the spherical Stanton (1989) branch. For
 the other HPA paths, the cleaner validation target is the published
-Johnson (1977; 1978) and Stanton (1989) algebra itself. The current
-local <code>HPModel</code> prolate-spheroid and cylinder branches error
-before returning a spectrum, so those cells are reported as
-<code>N/A</code> in the software-comparison columns below.</p>
+Johnson (1977) and Stanton (1989) algebra itself. The current local
+<code>HPModel</code> prolate-spheroid and cylinder branches error before
+returning a spectrum, so those cells are reported as <code>N/A</code> in
+the software-comparison columns below.</p>
 <table class="table">
 <colgroup>
 <col width="20%">
@@ -415,16 +416,16 @@ before returning a spectrum, so those cells are reported as
 </colgroup>
 <thead><tr class="header">
 <th align="left">Case</th>
-<th align="right">Mean abs. delta <code>acousticTS</code> vs
-<code>echoSMs</code> (dB)</th>
-<th align="right">Max abs. delta <code>acousticTS</code> vs
-<code>echoSMs</code> (dB)</th>
+<th align="right">Mean abs. delta acousticTS vs <code>echoSMs</code>
+(dB)</th>
+<th align="right">Max abs. delta acousticTS vs <code>echoSMs</code>
+(dB)</th>
 <th align="right">Mean abs. delta vs published algebra (dB)</th>
 <th align="right">Max abs. delta vs published algebra (dB)</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">Johnson (1977; 1978) sphere</td>
+<td align="left">Johnson (1977) sphere</td>
 <td align="right"><code>N/A</code></td>
 <td align="right"><code>N/A</code></td>
 <td align="right">2.33e-13</td>
@@ -456,24 +457,27 @@ before returning a spectrum, so those cells are reported as
 <p>So the HPA picture is now explicit. The spherical Stanton branch
 agrees with the available external software implementation to practical
 machine precision, and every canonical branch matches the published
-Johnson (1977; 1978) or Stanton (1989) algebra to the same order. That
-does not make HPA an exact replacement for the benchmarked modal-series
+Johnson (1977) or Stanton (1989) algebra to the same order. That does
+not make HPA an exact replacement for the benchmarked modal-series
 models above, but it does confirm that the package is implementing the
-intended asymptotic formulas correctly. ## References</p>
-<p>Johnson, R. K. (1977). Sound scattering from a fluid sphere
-revisited. <em>The Journal of the Acoustical Society of America</em>,
-61, 375-377.</p>
-<p>Johnson, R. K. (1978). Sound scattering from a fluid sphere:
-intermediate frequencies. <em>The Journal of the Acoustical Society of
-America</em>, 64, 1498-1505.</p>
-<p>Jech, J. M., Horne, J. K., Chu, D., Demer, D. A., Francis, D. T. I.,
-Gorska, N., Jones, B., Lavery, A. C., Stanton, T. K., and Reeder, D. B.
-(2015). Comparisons among ten models of acoustic backscattering used in
-aquatic ecosystem research. <em>The Journal of the Acoustical Society of
-America</em>, 138, 3742-3764.</p>
-<p>Stanton, T. K. (1989). Simple approximate formulas for backscattering
-of sound by spherical and elongated objects. <em>The Journal of the
-Acoustical Society of America</em>, 86, 1499-1510.</p>
+intended asymptotic formulas correctly.</p>
+</div>
+</div>
+</div>
+<div class="section level2">
+<h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
+</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="ref-johnson_sound_1977" class="csl-entry">
+Johnson, Richard K. 1977. <span>“Sound Scattering from a Fluid Sphere
+Revisited.”</span> <em>The Journal of the Acoustical Society of
+America</em> 61 (2): 375–77. <a href="https://doi.org/10.1121/1.381326" class="external-link">https://doi.org/10.1121/1.381326</a>.
+</div>
+<div id="ref-stanton_1989" class="csl-entry">
+Stanton, Timothy K. 1989. <span>“Simple Approximate Formulas for
+Backscattering of Sound by Spherical and Elongated Objects.”</span>
+<em>The Journal of the Acoustical Society of America</em> 86 (4):
+1499–1510. <a href="https://doi.org/10.1121/1.398711" class="external-link">https://doi.org/10.1121/1.398711</a>.
 </div>
 </div>
 </div>

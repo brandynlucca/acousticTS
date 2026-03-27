@@ -11,10 +11,12 @@ Validated Experimental
 
 The phase-compensated distorted wave Born approximation (`PCDWBA`)
 extends the ordinary `DWBA` to elongated bodies whose centerlines are
-curved rather than straight.[¹](#fn1)[²](#fn2) It preserves the same
-weak-scattering local kernel used for slender fluid-like bodies, but it
-replaces the straight-body phase bookkeeping by a centerline-dependent
-phase that follows the bent geometry explicitly.
+curved rather than straight ([Chu and Ye
+1999](#ref-chu_phase-compensated_1999); [Stanton
+1989](#ref-stanton_sound_1989)). It preserves the same weak-scattering
+local kernel used for slender fluid-like bodies, but it replaces the
+straight-body phase bookkeeping by a centerline-dependent phase that
+follows the bent geometry explicitly.
 
 The family therefore sits conceptually between two extremes: it is more
 physical than treating a curved body as if it were straight, but it
@@ -179,13 +181,14 @@ That is why `PCDWBA` should be read as a curved-body extension of
 the part of the physics that `DWBA` misses first when the body bends:
 the geometry-dependent coherent phase.
 
-------------------------------------------------------------------------
+## References
 
-1.  Chu, D., and Ye, Z. (**1999**). *A phase-compensated distorted wave
-    Born approximation representation of the bistatic scattering by
-    weakly scattering objects: Application to zooplankton*. *The Journal
-    of the Acoustical Society of America*, 106: 1732-1743.
+Chu, Dezhang, and Zhen Ye. 1999. “A Phase-Compensated Distorted Wave
+Born Approximation Representation of the Bistatic Scattering by Weakly
+Scattering Objects: Application to Zooplankton.” *The Journal of the
+Acoustical Society of America* 106 (4): 1732–43.
+<https://doi.org/10.1121/1.428036>.
 
-2.  Stanton, T.K. (**1989**). *Sound scattering by cylinders of finite
-    length. III. Deformed cylinders*. *The Journal of the Acoustical
-    Society of America*, 86: 691-705.
+Stanton, T. K. 1989. “Sound Scattering by Cylinders of Finite Length.
+III. Deformed Cylinders.” *The Journal of the Acoustical Society of
+America* 86 (2): 691–705. <https://doi.org/10.1121/1.398193>.

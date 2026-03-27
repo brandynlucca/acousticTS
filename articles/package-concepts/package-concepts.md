@@ -2,11 +2,16 @@
 
 ## Introduction
 
+The package concepts reflect the same divide between exact solutions,
+asymptotic approximations, and organism-specific composites seen in the
+scattering literature ([Jech et al. 2015](#ref-jech_etal_2015); [Stanton
+1996](#ref-stanton_acoustic_1996)).
+
 The package is easiest to use once three ideas are kept separate:
 geometry, physical target type, and scattering model. Those three ideas
 are related, but they are not interchangeable. Many practical mistakes
-in `acousticTS` come from confusing one of those layers with another,
-such as treating a shape as if it were already a physical scatterer, or
+in acousticTS come from confusing one of those layers with another, such
+as treating a shape as if it were already a physical scatterer, or
 treating a model name as if it defined the target itself.
 
 This page is the conceptual map for the rest of the documentation. The
@@ -153,8 +158,8 @@ later comparison and validation much easier.
 
 ## Models as separate layers
 
-Models in `acousticTS` are not the same thing as scatterers. A model is
-a mathematical mapping from the scatterer description and acoustic
+Models in acousticTS are not the same thing as scatterers. A model is a
+mathematical mapping from the scatterer description and acoustic
 conditions to predicted backscatter. This is why the package can support
 multiple models for the same target. A fluid-like elongated object might
 be explored with `DWBA`, `SDWBA`, `TRCM`, `HPA`, or another more
@@ -294,3 +299,15 @@ them, those different kinds of documentation still connect cleanly.
   scatterers](https://brandynlucca.github.io/acousticTS/articles/building-scatterers/building-scatterers.md)
 - [Running target strength
   models](https://brandynlucca.github.io/acousticTS/articles/running-models/running-models.md)
+
+## References
+
+Jech, J. Michael, John K. Horne, Dezhang Chu, David A. Demer, David T.
+I. Francis, Natalia Gorska, Benjamin Jones, et al. 2015. “Comparisons
+Among Ten Models of Acoustic Backscattering Used in Aquatic Ecosystem
+Research.” *The Journal of the Acoustical Society of America* 138 (6):
+3742–64. <https://doi.org/10.1121/1.4937607>.
+
+Stanton, T. 1996. “Acoustic Scattering Characteristics of Several
+Zooplankton Groups.” *ICES Journal of Marine Science* 53 (2): 289–95.
+<https://doi.org/10.1006/jmsc.1996.0037>.

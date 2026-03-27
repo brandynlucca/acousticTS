@@ -9,6 +9,10 @@ Benchmarked Validated
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/hpa/hpa-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/hpa/hpa-theory.md)
 
+These pages follow Johnson’s asymptotic fluid-sphere formulation and
+Stanton’s generalized approximate backscatter formulas ([Johnson
+1977](#ref-johnson_sound_1977); [Stanton 1989](#ref-stanton_1989)).
+
 The high-pass approximation (`HPA`) is a compact asymptotic backscatter
 family that interpolates between a Rayleigh-style low-frequency limit
 and a reflection-controlled high-frequency limit.
@@ -54,3 +58,14 @@ spheroids, and cylinders.
   quick workflows and validation tables
 - [Theory](https://brandynlucca.github.io/acousticTS/articles/hpa/hpa-theory.md):
   Rayleigh term, reflection limit, and shape-specific completions
+
+## References
+
+Johnson, Richard K. 1977. “Sound Scattering from a Fluid Sphere
+Revisited.” *The Journal of the Acoustical Society of America* 61 (2):
+375–77. <https://doi.org/10.1121/1.381326>.
+
+Stanton, Timothy K. 1989. “Simple Approximate Formulas for
+Backscattering of Sound by Spherical and Elongated Objects.” *The
+Journal of the Acoustical Society of America* 86 (4): 1499–1510.
+<https://doi.org/10.1121/1.398711>.

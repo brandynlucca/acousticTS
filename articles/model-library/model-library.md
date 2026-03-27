@@ -2,6 +2,12 @@
 
 ## Introduction
 
+The family library is easiest to navigate when read against
+model-comparison reviews, organism-focused scattering surveys, and
+companion open-source modeling ecosystems ([Jech et al.
+2015](#ref-jech_etal_2015); [Stanton 1996](#ref-stanton_acoustic_1996);
+[Lucca and Lee 2026](#ref-brandyn_lucca_osoceanacousticsechopop_2026)).
+
 The package now contains enough model families that the site works
 better when the model pages are treated as a library rather than as a
 flat list in the top navigation. This page is the main entry point for
@@ -122,7 +128,7 @@ targets.
 
 ### [VESM](https://brandynlucca.github.io/acousticTS/articles/vesm/index.md)
 
-Validated Experimental
+Experimental Unvalidated
 
 Viscous-elastic layered-sphere family for gas-core, shell, and
 viscous-layer targets.
@@ -140,3 +146,18 @@ Each family page is intended to be the local navigation hub for that
 model family. Use the family page to move between overview, theory,
 implementation, and related package pages, rather than relying on a long
 global theory or implementation menu.
+
+## References
+
+Jech, J. Michael, John K. Horne, Dezhang Chu, David A. Demer, David T.
+I. Francis, Natalia Gorska, Benjamin Jones, et al. 2015. “Comparisons
+Among Ten Models of Acoustic Backscattering Used in Aquatic Ecosystem
+Research.” *The Journal of the Acoustical Society of America* 138 (6):
+3742–64. <https://doi.org/10.1121/1.4937607>.
+
+Lucca, Brandyn, and Wu-Jung Lee. 2026. “OSOceanAcoustics/Echopop:
+V0.6.0.” Zenodo. <https://doi.org/10.5281/ZENODO.18975959>.
+
+Stanton, T. 1996. “Acoustic Scattering Characteristics of Several
+Zooplankton Groups.” *ICES Journal of Marine Science* 53 (2): 289–95.
+<https://doi.org/10.1006/jmsc.1996.0037>.

@@ -14,9 +14,10 @@ model for weakly scattering fluid-like bodies. It is most useful when
 the material contrasts are small enough that the total acoustic field
 inside the body remains close to the incident field, but the geometry is
 sufficiently extended that phase accumulation along the body cannot be
-ignored[¹](#fn1)[²](#fn2). In that regime, a purely local approximation
-is too crude, while a full boundary-value solution is often unnecessary
-or unavailable.
+ignored ([Morse and Ingard 1986](#ref-morse_theoretical_1986);
+[**stanton_sound_1998i?**](#ref-stanton_sound_1998i)). In that regime, a
+purely local approximation is too crude, while a full boundary-value
+solution is often unnecessary or unavailable.
 
 For elongated zooplankton and similar organisms, the most important
 consequence of the DWBA is that a three-dimensional volume scattering
@@ -408,11 +409,7 @@ DWBA. It is physically grounded for weakly contrasting fluid-like
 bodies, but it is not intended for rigid shells, elastic skeletons, or
 strongly resonant structures.
 
-------------------------------------------------------------------------
+## References
 
-1.  Morse, P. M., and Ingard, K. U. (1968). *Theoretical Acoustics*.
-    Princeton University Press.
-
-2.  Stanton, T. K., Chu, D., and Wiebe, P. H. (1998). Sound scattering
-    by several zooplankton groups. II. Scattering models. *The Journal
-    of the Acoustical Society of America*, 103, 236-253.
+Morse, Philip M., and K. Uno Ingard. 1986. *Theoretical Acoustics*.
+Princeton, N.J: Princeton University Press.

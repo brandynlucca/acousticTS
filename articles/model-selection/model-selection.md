@@ -2,6 +2,12 @@
 
 ## Introduction
 
+Model selection in this package mirrors the broader literature: match
+geometry, material contrast, and anatomical complexity before worrying
+about computational detail ([Jech et al. 2015](#ref-jech_etal_2015);
+[Clay and Horne 1994](#ref-clay_horne_1994); [Stanton
+1996](#ref-stanton_acoustic_1996)).
+
 There is no single deterministic rule that maps every scatterer to
 exactly one model. In practice, model choice depends on at least five
 questions:
@@ -316,3 +322,19 @@ Those are still modeling judgments. The purpose of the decision tree is
 to narrow the candidate set to the models whose assumptions are closest
 to the target and to make clear where a user should compare more than
 one model rather than commit to only one.
+
+## References
+
+Clay, Clarence S., and John K. Horne. 1994. “Acoustic Models of Fish:
+The Atlantic Cod (*Gadus Morhua*).” *The Journal of the Acoustical
+Society of America* 96 (3): 1661–68. <https://doi.org/10.1121/1.410245>.
+
+Jech, J. Michael, John K. Horne, Dezhang Chu, David A. Demer, David T.
+I. Francis, Natalia Gorska, Benjamin Jones, et al. 2015. “Comparisons
+Among Ten Models of Acoustic Backscattering Used in Aquatic Ecosystem
+Research.” *The Journal of the Acoustical Society of America* 138 (6):
+3742–64. <https://doi.org/10.1121/1.4937607>.
+
+Stanton, T. 1996. “Acoustic Scattering Characteristics of Several
+Zooplankton Groups.” *ICES Journal of Marine Science* 53 (2): 289–95.
+<https://doi.org/10.1006/jmsc.1996.0037>.

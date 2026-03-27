@@ -14,11 +14,13 @@ elongated fluid-like bodies. It assumes that the dominant backscatter
 from a locally cylindrical body is produced by two coherent
 contributions: a prompt reflection from the near interface and a second
 contribution that enters the body, traverses the diameter, reflects from
-the far interface, and returns with additional
-phase.[¹](#fn1)[²](#fn2)[³](#fn3) The model is therefore asymptotic from
-the outset. It does not attempt to represent low-order resonances or a
-full internal reverberation series. Instead, it keeps only the first two
-physically important specular paths and asks how they interfere.
+the far interface, and returns with additional phase ([Stanton et al.
+1993](#ref-stanton_etal_1993), [1998](#ref-stanton_sound_1998);
+[**stanton_sound_1998i?**](#ref-stanton_sound_1998i)). The model is
+therefore asymptotic from the outset. It does not attempt to represent
+low-order resonances or a full internal reverberation series. Instead,
+it keeps only the first two physically important specular paths and asks
+how they interfere.
 
 Throughout this page, medium `1` is the surrounding seawater and medium
 `2` is the fluid-like body interior.
@@ -340,21 +342,15 @@ associated with two-ray interference, but it is not intended to
 reproduce a full modal or reverberant description of a finite fluid
 cylinder.
 
-### References
+## References
 
-------------------------------------------------------------------------
+Stanton, Timothy K., Dezhang Chu, Peter H. Wiebe, and Clarence S. Clay.
+1993. “Average Echoes from Randomly Oriented Random‐length Finite
+Cylinders: Zooplankton Models.” *The Journal of the Acoustical Society
+of America* 94 (6): 3463–72. <https://doi.org/10.1121/1.407200>.
 
-1.  Stanton, T. K., Chu, D., Wiebe, P. H., and Clay, C. S. (1993).
-    Average echoes from randomly oriented random-length finite
-    cylinders: zooplankton models. *The Journal of the Acoustical
-    Society of America*, 94, 3463-3472.
-
-2.  Stanton, T. K., Chu, D., Wiebe, P. H., Martin, L. V., and
-    Eastwood, R. L. (1998). Sound scattering by several zooplankton
-    groups. I. Experimental determination of dominant scattering
-    mechanisms. *The Journal of the Acoustical Society of America*, 103,
-    225-235.
-
-3.  Stanton, T. K., Chu, D., and Wiebe, P. H. (1998). Sound scattering
-    by several zooplankton groups. II. Scattering models. *The Journal
-    of the Acoustical Society of America*, 103, 236-253.
+Stanton, Timothy K., Dezhang Chu, Peter H. Wiebe, Linda V. Martin, and
+Robert L. Eastwood. 1998. “Sound Scattering by Several Zooplankton
+Groups. I. Experimental Determination of Dominant Scattering
+Mechanisms.” *The Journal of the Acoustical Society of America* 103 (1):
+225–35. <https://doi.org/10.1121/1.421469>.

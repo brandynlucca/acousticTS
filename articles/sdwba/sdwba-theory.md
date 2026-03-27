@@ -12,8 +12,10 @@ Benchmarked Validated
 The stochastic distorted wave Born approximation (SDWBA) begins with the
 same weak-scattering derivation as the deterministic DWBA, then modifies
 the phase structure of the coherent sum to account for unresolved
-variability in body shape, posture, and internal
-structure.[¹](#fn1)[²](#fn2)[³](#fn3)
+variability in body shape, posture, and internal structure ([Demer and
+Conti 2003](#ref-demer_reconciling_2003); [Conti and Demer
+2006](#ref-conti_improved_2006);
+[**stanton_sound_1998i?**](#ref-stanton_sound_1998i)).
 
 The deterministic part of the derivation still assumes a weakly
 scattering fluid-like body, so the local scattering strength is
@@ -294,19 +296,15 @@ underlying scattering physics. It softens the coherence structure of the
 deterministic model when unresolved morphology or posture would
 otherwise make the predicted interference pattern unrealistically sharp.
 
-### References
+## References
 
-------------------------------------------------------------------------
+Conti, Stéphane G., and David A. Demer. 2006. “Improved Parameterization
+of the SDWBA for Estimating Krill Target Strength.” *ICES Journal of
+Marine Science* 63 (5): 928–35.
+<https://doi.org/10.1016/j.icesjms.2006.02.007>.
 
-1.  Demer, D. A., and Conti, S. G. (2003). Reconciling theoretical
-    versus empirical target strengths of krill: effects of phase
-    variability on the distorted-wave Born approximation. *ICES Journal
-    of Marine Science*, 60, 429-434.
-
-2.  Conti, S. G., and Demer, D. A. (2006). Improved parameterization of
-    the SDWBA for estimating krill target strength. *ICES Journal of
-    Marine Science*, 63, 928-935.
-
-3.  Stanton, T. K., Chu, D., and Wiebe, P. H. (1998). Sound scattering
-    by several zooplankton groups. II. Scattering models. *The Journal
-    of the Acoustical Society of America*, 103, 236-253.
+Demer, David A., and Stephane G. Conti. 2003. “Reconciling Theoretical
+Versus Empirical Target Strengths of Krill: Effects of Phase Variability
+on the Distorted-Wave Born Approximation.” *ICES Journal of Marine
+Science* 60 (2): 429–34.
+<https://doi.org/10.1016/S1054-3139(03)00002-X>.

@@ -9,6 +9,13 @@ Experimental Unvalidated
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/bbfm/bbfm-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/bbfm/bbfm-theory.md)
 
+This family is best read alongside the swimbladder-less fish and
+composite-scatterer literature that motivates explicit flesh-body and
+backbone terms ([Gorska, Ona, and Korneliussen
+2005](#ref-gorska_etal_2005); [Stanton, Chu, and Wiebe
+1998](#ref-stanton_sound_1998-1); [Clay and Horne
+1994](#ref-clay_horne_1994)).
+
 The body-backbone fish model (`BBFM`) is a composite scattering family
 for swimbladder-less targets whose flesh body and backbone should remain
 explicit, separately parameterized contributors. The point of the model
@@ -222,3 +229,20 @@ Folding both of those into one effective region can hide the very
 mechanism one is trying to study. `BBFM` therefore earns its place not
 by being exact, but by keeping the dominant anatomical contributors
 explicit while preserving coherent interference between them.
+
+## References
+
+Clay, Clarence S., and John K. Horne. 1994. “Acoustic Models of Fish:
+The Atlantic Cod (*Gadus Morhua*).” *The Journal of the Acoustical
+Society of America* 96 (3): 1661–68. <https://doi.org/10.1121/1.410245>.
+
+Gorska, Natalia, Egil Ona, and Rolf Korneliussen. 2005. “Acoustic
+Backscattering by Atlantic Mackerel as Being Representative of Fish That
+Lack a Swimbladder. Backscattering by Individual Fish.” *ICES Journal of
+Marine Science* 62 (5): 984–95.
+<https://doi.org/10.1016/j.icesjms.2005.03.010>.
+
+Stanton, Timothy K., Dezhang Chu, and Peter H. Wiebe. 1998. “Sound
+Scattering by Several Zooplankton Groups. II. Scattering Models.” *The
+Journal of the Acoustical Society of America* 103 (1): 236–53.
+<https://doi.org/10.1121/1.421110>.

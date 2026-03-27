@@ -2,6 +2,11 @@
 
 ## Introduction
 
+Plot inspection is most useful when curves are read against known
+benchmark shapes, resonances, and asymptotic regimes from the published
+scattering literature ([Foote 1990](#ref-foote_spheres_1990); [Jech et
+al. 2015](#ref-jech_etal_2015)).
+
 The package stores geometry, parameters, and model outputs in nested
 scatterer objects. That design is useful only if the contents can be
 inspected and visualized efficiently. This article is the companion
@@ -157,3 +162,15 @@ important as looking at the plot.
   target](https://brandynlucca.github.io/acousticTS/articles/comparing-models/comparing-models.md)
 - [Working with real example
   data](https://brandynlucca.github.io/acousticTS/articles/example-data/example-data.md)
+
+## References
+
+Foote, K. G. 1990. “Spheres for Calibrating an Eleven-Frequency Acoustic
+Measurement System.” *ICES Journal of Marine Science* 46 (3): 284–86.
+<https://doi.org/10.1093/icesjms/46.3.284>.
+
+Jech, J. Michael, John K. Horne, Dezhang Chu, David A. Demer, David T.
+I. Francis, Natalia Gorska, Benjamin Jones, et al. 2015. “Comparisons
+Among Ten Models of Acoustic Backscattering Used in Aquatic Ecosystem
+Research.” *The Journal of the Acoustical Society of America* 138 (6):
+3742–64. <https://doi.org/10.1121/1.4937607>.

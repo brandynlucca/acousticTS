@@ -2,12 +2,17 @@
 
 ## Overview
 
-Validated Experimental
+Experimental Unvalidated
 
 *Model-family pages:*
 [Overview](https://brandynlucca.github.io/acousticTS/articles/vesm/index.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/vesm/vesm-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/vesm/vesm-theory.md)
+
+These pages are motivated by layered gas-bearing fish scattering models
+and viscous resonance broadening ([Khodabandeloo et al.
+2021](#ref-khodabandeloo_estimating_2021); [Feuillade and Nero
+1998](#ref-feuillade_nero_1998)).
 
 The viscous-elastic spherical model (`VESM`) is a layered spherical
 resonance family for a gas core surrounded by an elastic shell and an
@@ -55,3 +60,17 @@ shell.
 - [Theory](https://brandynlucca.github.io/acousticTS/articles/vesm/vesm-theory.md):
   full layered spherical field structure, interface conditions, and
   mode-wise systems
+
+## References
+
+Feuillade, C., and R. W. Nero. 1998. “A Viscous-Elastic Swimbladder
+Model for Describing Enhanced-Frequency Resonance Scattering from Fish.”
+*The Journal of the Acoustical Society of America* 103 (6): 3245–55.
+<https://doi.org/10.1121/1.423076>.
+
+Khodabandeloo, Babak, Mette Dalgaard Agersted, Thor Klevjer, Gavin J.
+Macaulay, and Webjørn Melle. 2021. “Estimating Target Strength and
+Physical Characteristics of Gas-Bearing Mesopelagic Fish from Wideband
+*in Situ* Echoes Using a Viscous-Elastic Scattering Model.” *The Journal
+of the Acoustical Society of America* 149 (1): 673–91.
+<https://doi.org/10.1121/10.0003341>.

@@ -13,8 +13,8 @@ The transition matrix method (`TMM`) is a basis-expansion view of
 scattering. Instead of solving directly for the scattered pressure in
 physical space, one expands both the incident and scattered fields in
 complete wave bases and then asks for the linear map between the two
-coefficient vectors. That map is the transition matrix, or
-T-matrix.[¹](#fn1)
+coefficient vectors. That map is the transition matrix, or T-matrix
+([Waterman 1969](#ref-waterman_new_1969)).
 
 For a single target, that point of view is valuable even before one
 thinks about multiple scattering. Once the target response is
@@ -31,8 +31,11 @@ surface r(\theta), but the surface geometry then enters explicitly
 through the boundary operator. Finite cylinders are different again: the
 sidewall-endcap junctions make a purely spherical retained operator much
 less natural than a cylindrical modal basis, especially once one wants
-reliable angular products away from the simplest monostatic
-setting.[²](#fn2)[³](#fn3)[⁴](#fn4)[⁵](#fn5)
+reliable angular products away from the simplest monostatic setting
+([Varadan et al. 1982](#ref-varadan_computation_1982); [Mahadevan Ganesh
+and Hawkins 2008](#ref-ganesh_far_2008); [M. Ganesh and Hawkins
+2022](#ref-ganesh_numerically_2022); [Waterman
+2009](#ref-waterman_t_2009)).
 
 Unless stated otherwise, medium `1` is the surrounding seawater and
 medium `2` is the target interior.
@@ -61,7 +64,9 @@ transition matrix is then the linear map:
 For axisymmetric targets, the azimuthal order decouples. The T-matrix
 can therefore be organized into independent m-blocks, and the monostatic
 backscatter amplitude is reconstructed from those blocks after the
-incident plane-wave coefficients have been determined.[⁶](#fn6)[⁷](#fn7)
+incident plane-wave coefficients have been determined ([Waterman
+1969](#ref-waterman_new_1969); [Varadan et al.
+1982](#ref-varadan_computation_1982)).
 
 ### Boundary conditions
 
@@ -159,8 +164,8 @@ This simply states that a ray from the origin first meets either an
 end-cap plane or the cylindrical side wall. The resulting r(\theta) is
 continuous but not differentiable where the side wall and end-cap meet,
 which is one reason finite cylinders are numerically less forgiving than
-smooth spheres or spheroids in a spherical-basis T-matrix
-treatment.[⁸](#fn8)
+smooth spheres or spheroids in a spherical-basis T-matrix treatment
+([Waterman 2009](#ref-waterman_t_2009)).
 
 ### Monostatic reconstruction
 
@@ -201,8 +206,10 @@ trustworthy finite-cylinder operator.
 A prolate spheroid is not a constant-r surface. So while spherical-wave
 expansions can still be written down, they do not align naturally with
 the geometry. This is exactly the regime where the classic
-spheroidal-coordinate literature becomes
-relevant.[⁹](#fn9)[¹⁰](#fn10)[¹¹](#fn11)
+spheroidal-coordinate literature becomes relevant ([Varadan et al.
+1982](#ref-varadan_computation_1982); [M. Ganesh and Hawkins
+2022](#ref-ganesh_numerically_2022); [Hackman and Todoroff
+1984](#ref-hackman_application_1984)).
 
 For the single-target scalar acoustic problem, it is more natural to use
 prolate spheroidal coordinates and write the target surface as a single
@@ -245,7 +252,10 @@ effectively local in the exact spheroidal basis. For liquid- and
 gas-filled prolates, the interior and exterior reduced frequencies
 differ, so the angular bases no longer match exactly. This introduces
 overlap-driven coupling between retained degrees, exactly as in the
-exact prolate spheroidal modal-series solution.[¹²](#fn12)[¹³](#fn13)
+exact prolate spheroidal modal-series solution ([Hackman and Todoroff
+1984](#ref-hackman_application_1984); [Spence and Granger
+1951](#ref-spence_scattering_1951); [Furusawa
+1988](#ref-furusawa_prolate_1988)).
 
 ### T-matrix interpretation in a geometry-matched basis
 
@@ -261,30 +271,41 @@ T-matrix interpretation is the same: the target response is represented
 as a linear map from incident modal amplitudes to scattered modal
 amplitudes in the basis natural to that geometry.
 
-------------------------------------------------------------------------
+## References
 
-1.  Waterman (1969).
+Furusawa, Masahiko. 1988. “Prolate Spheroidal Models for Predicting
+General Trends of Fish Target Strength.” *Journal of the Acoustical
+Society of Japan (E)* 9 (1): 13–24. <https://doi.org/10.1250/ast.9.13>.
 
-2.  Varadan et al. (1982).
+Ganesh, Mahadevan, and Stuart Collin Hawkins. 2008. “A Far Field Based
+T-Matrix Method for Three Dimensional Acoustic Scattering.” *ANZIAM
+Journal* 49 (October): 121.
+<https://doi.org/10.21914/anziamj.v50i0.1441>.
 
-3.  Ganesh and Hawkins (2008).
+Ganesh, M., and Stuart C. Hawkins. 2022. “A Numerically Stable T-Matrix
+Method for Acoustic Scattering by Nonspherical Particles with Large
+Aspect Ratios and Size Parameters.” *The Journal of the Acoustical
+Society of America* 151 (3): 1978–88.
+<https://doi.org/10.1121/10.0009679>.
 
-4.  Ganesh and Hawkins (2022).
+Hackman, Roger H., and Douglas G. Todoroff. 1984. “An Application of the
+Spheroidal-Coordinate-Based Transition Matrix: Acoustic Scattering from
+High Aspect Ratio Solids.” *The Journal of the Acoustical Society of
+America* 76 (S1): S8–8. <https://doi.org/10.1121/1.2022083>.
 
-5.  Waterman (2009).
+Spence, R. D., and Sara Granger. 1951. “The Scattering of Sound from a
+Prolate Spheroid.” *The Journal of the Acoustical Society of America* 23
+(6): 701–6. <https://doi.org/10.1121/1.1906827>.
 
-6.  Waterman (1969).
+Varadan, V. K., V. V. Varadan, Louis R. Dragonette, and Lawrence Flax.
+1982. “Computation of Rigid Body Scattering by Prolate Spheroids Using
+the *t* -Matrix Approach.” *The Journal of the Acoustical Society of
+America* 71 (1): 22–25. <https://doi.org/10.1121/1.387311>.
 
-7.  Varadan et al. (1982).
+Waterman, P. C. 1969. “New Formulation of Acoustic Scattering.” *The
+Journal of the Acoustical Society of America* 45 (6): 1417–29.
+<https://doi.org/10.1121/1.1911619>.
 
-8.  Waterman (2009).
-
-9.  Varadan et al. (1982).
-
-10. Ganesh and Hawkins (2022).
-
-11. Hackman (1984).
-
-12. Hackman (1984).
-
-13. Spencer and Granger (1951); Furusawa (1988).
+———. 2009. “T -Matrix Methods in Acoustic Scattering.” *The Journal of
+the Acoustical Society of America* 125 (1): 42–51.
+<https://doi.org/10.1121/1.3035839>.

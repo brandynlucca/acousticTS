@@ -15,7 +15,10 @@ bodies whose surface is better approximated by a prolate spheroid than
 by a sphere or cylinder. The essential fact is that the Helmholtz
 equation is separable in prolate spheroidal coordinates, so the
 incident, scattered, and interior fields can all be expanded in
-spheroidal angular and radial wave functions.[¹](#fn1)[²](#fn2)[³](#fn3)
+spheroidal angular and radial wave functions ([Spence and Granger
+1951](#ref-spence_scattering_1951); [Furusawa
+1988](#ref-furusawa_prolate_1988); [Flammer
+1957](#ref-flammer_spheroidal_1957)).
 
 The rigid case enforces zero normal velocity on \xi = \xi_1, the
 pressure-release case enforces zero pressure there, and the fluid-filled
@@ -569,17 +572,15 @@ relationship to a truly prolate geometry than a sphere- or
 cylinder-based substitute, but it pays for that fidelity with more
 complicated basis functions, overlap integrals, and linear algebra.
 
-### References
+## References
 
-------------------------------------------------------------------------
+Flammer, Carson. 1957. *Spheroidal Wave Functions*.
+<https://ui.adsabs.harvard.edu/abs/1957spwf.book.....F>.
 
-1.  Spencer, R. D., and Granger, S. (1951). The scattering of sound from
-    a prolate spheroid. *The Journal of the Acoustical Society of
-    America*, 23, 701-706.
+Furusawa, Masahiko. 1988. “Prolate Spheroidal Models for Predicting
+General Trends of Fish Target Strength.” *Journal of the Acoustical
+Society of Japan (E)* 9 (1): 13–24. <https://doi.org/10.1250/ast.9.13>.
 
-2.  Furusawa, M. (1988). Prolate spheroidal models for predicting
-    general trends of fish target strength. *Journal of the Acoustical
-    Society of Japan*, 9, 13-24.
-
-3.  Flammer, C. (1957). *Spheroidal Wave Functions*. Stanford University
-    Press.
+Spence, R. D., and Sara Granger. 1951. “The Scattering of Sound from a
+Prolate Spheroid.” *The Journal of the Acoustical Society of America* 23
+(6): 701–6. <https://doi.org/10.1121/1.1906827>.

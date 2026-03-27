@@ -9,7 +9,12 @@ Benchmarked
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/trcm/trcm-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/trcm/trcm-theory.md)
 
-The `acousticTS` package uses object-based scatterers so the same
+These pages come from the high-frequency elongated-body literature and
+later fish and zooplankton applications ([Stanton et al.
+1993](#ref-stanton_etal_1993), [1998](#ref-stanton_sound_1998);
+[Stanton, Chu, and Wiebe 1998](#ref-stanton_sound_1998-1)).
+
+The acousticTS package uses object-based scatterers so the same
 implementation pattern carries across models: create a scatterer, run
 [`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md),
 inspect the stored model output, and then compare a small set of
@@ -203,3 +208,21 @@ against a straight-cylinder benchmark that it was never meant to
 represent. Its remaining error should be read as the cost of using an
 asymptotic bent-body replacement for the full curvature integral, not as
 evidence that curvature itself is being mishandled.
+
+## References
+
+Stanton, Timothy K., Dezhang Chu, and Peter H. Wiebe. 1998. “Sound
+Scattering by Several Zooplankton Groups. II. Scattering Models.” *The
+Journal of the Acoustical Society of America* 103 (1): 236–53.
+<https://doi.org/10.1121/1.421110>.
+
+Stanton, Timothy K., Dezhang Chu, Peter H. Wiebe, and Clarence S. Clay.
+1993. “Average Echoes from Randomly Oriented Random‐length Finite
+Cylinders: Zooplankton Models.” *The Journal of the Acoustical Society
+of America* 94 (6): 3463–72. <https://doi.org/10.1121/1.407200>.
+
+Stanton, Timothy K., Dezhang Chu, Peter H. Wiebe, Linda V. Martin, and
+Robert L. Eastwood. 1998. “Sound Scattering by Several Zooplankton
+Groups. I. Experimental Determination of Dominant Scattering
+Mechanisms.” *The Journal of the Acoustical Society of America* 103 (1):
+225–35. <https://doi.org/10.1121/1.421469>.

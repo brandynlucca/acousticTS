@@ -2,9 +2,17 @@
 
 ## Introduction
 
+The validation workflow on this page is grounded in inter-model
+benchmark comparisons and open-software reproductions ([Jech et al.
+2015](#ref-jech_etal_2015); [Demer and Conti
+2003](#ref-demer_validation_2003); [Gastauer, Chu, and Cox
+2019](#ref-gastauer_zooscatrspan_2019); [Gastauer
+2025](#ref-sven_gastauer_svengastauerkrmr_2025); [Betcke and Scroggs
+2021](#ref-betcke_bempp-cl_2021)).
+
 Modeling packages become much more useful when users can distinguish a
 physically surprising result from a setup error. Validation pages help
-provide that context. In `acousticTS`, validation is not a single check
+provide that context. In acousticTS, validation is not a single check
 with a single threshold. It is a layered workflow that begins with
 object and unit sanity, then moves to canonical benchmark reproduction,
 and finally asks whether the numerical behavior is stable enough that
@@ -82,7 +90,7 @@ be drawn from one source rather than maintained separately.
 | TRCM   | Approximation and ray-based families | Benchmarked                          |
 | PCDWBA | Approximation and ray-based families | Validated, Experimental              |
 | BBFM   | Composite and emerging families      | Experimental, Unvalidated            |
-| VESM   | Composite and emerging families      | Validated, Experimental              |
+| VESM   | Composite and emerging families      | Experimental, Unvalidated            |
 | TMM    | Composite and emerging families      | Benchmarked, Validated, Experimental |
 
 ### Benchmark evidence
@@ -102,24 +110,23 @@ be drawn from one source rather than maintained separately.
 
 ### External-comparison evidence
 
-| Family | Evidence type | Source                                         | Scope                                                                       | Summary                                                                                                    |
-|:-------|:--------------|:-----------------------------------------------|:----------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------|
-| SPHMS  | Validated     | KRMr and echoSMs                               | Penetrable sphere spectra on shared software definitions.                   | Validated against `KRMr` and `echoSMs` on shared penetrable-sphere cases.                                  |
-| FCMS   | Validated     | echoSMs                                        | Rigid, soft, liquid-filled, and gas-filled finite-cylinder spectra.         | Validated against the `echoSMs` finite-cylinder implementation.                                            |
-| PSMS   | Validated     | Prol_Spheroid                                  | Liquid-filled and gas-filled prolate-spheroid software comparisons.         | Validated against the external `Prol_Spheroid` implementation on shared prolate cases.                     |
-| SOEMS  | Validated     | echoSMs, sphereTS, NOAA applet                 | Shared calibration-sphere material sets and frequency sweeps.               | Validated against `echoSMs`, `sphereTS`, and the NOAA calibration applet.                                  |
-| DWBA   | Validated     | Published and independent DWBA implementations | Bundled krill geometry and published DWBA reference workflows.              | Validated against the published McGehee MATLAB workflow and an independent DWBA implementation.            |
-| SDWBA  | Validated     | CCAMLR MATLAB and NOAA HTML implementations    | Bundled krill stochastic workflow comparisons.                              | Validated against the CCAMLR MATLAB and NOAA HTML SDWBA implementations.                                   |
-| KRM    | Validated     | KRMr, echoSMs, NOAA applet                     | Bundled sardine and cod software-to-software comparisons.                   | Validated against `KRMr`, `echoSMs`, and the NOAA KRM applet on bundled fish objects and shared workflows. |
-| HPA    | Validated     | echoSMs HPModel and published algebra          | Spherical HPModel branch and published asymptotic formulas.                 | Validated against the spherical `echoSMs::HPModel` branch and the published Johnson/Stanton algebra.       |
-| PCDWBA | Validated     | ZooScatR and echopop source workflows          | Curved weak-scattering reference workflows on shared bent-body cases.       | Validated against source-level `ZooScatR` and `echopop` PCDWBA workflows.                                  |
-| VESM   | Validated     | Reference Python VESM workflow                 | Documented spherical layered case used by the original VESM implementation. | Validated against the reference Python VESM implementation on the documented layered-sphere case.          |
-| TMM    | Validated     | BEMPP far-field checks                         | Pressure-release angular slices for sphere, oblate, and prolate cases.      | Validated against external BEMPP far-field checks for sphere, oblate, and prolate pressure-release cases.  |
-| TMM    | Validated     | Exact general-angle spheroidal solution        | General-angle prolate retained-state validation.                            | Retained prolate angular products are also checked against the exact general-angle spheroidal solution.    |
+| Family | Evidence type | Source                                         | Scope                                                                  | Summary                                                                                                    |
+|:-------|:--------------|:-----------------------------------------------|:-----------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------|
+| SPHMS  | Validated     | KRMr and echoSMs                               | Penetrable sphere spectra on shared software definitions.              | Validated against `KRMr` and `echoSMs` on shared penetrable-sphere cases.                                  |
+| FCMS   | Validated     | echoSMs                                        | Rigid, soft, liquid-filled, and gas-filled finite-cylinder spectra.    | Validated against the `echoSMs` finite-cylinder implementation.                                            |
+| PSMS   | Validated     | Prol_Spheroid                                  | Liquid-filled and gas-filled prolate-spheroid software comparisons.    | Validated against the external `Prol_Spheroid` implementation on shared prolate cases.                     |
+| SOEMS  | Validated     | echoSMs, sphereTS, NOAA applet                 | Shared calibration-sphere material sets and frequency sweeps.          | Validated against `echoSMs`, `sphereTS`, and the NOAA calibration applet.                                  |
+| DWBA   | Validated     | Published and independent DWBA implementations | Bundled krill geometry and published DWBA reference workflows.         | Validated against the published McGehee MATLAB workflow and an independent DWBA implementation.            |
+| SDWBA  | Validated     | CCAMLR MATLAB and NOAA HTML implementations    | Bundled krill stochastic workflow comparisons.                         | Validated against the CCAMLR MATLAB and NOAA HTML SDWBA implementations.                                   |
+| KRM    | Validated     | KRMr, echoSMs, NOAA applet                     | Bundled sardine and cod software-to-software comparisons.              | Validated against `KRMr`, `echoSMs`, and the NOAA KRM applet on bundled fish objects and shared workflows. |
+| HPA    | Validated     | echoSMs HPModel and published algebra          | Spherical HPModel branch and published asymptotic formulas.            | Validated against the spherical `echoSMs::HPModel` branch and the published Johnson/Stanton algebra.       |
+| PCDWBA | Validated     | ZooScatR and echopop source workflows          | Curved weak-scattering reference workflows on shared bent-body cases.  | Validated against source-level `ZooScatR` and `echopop` PCDWBA workflows.                                  |
+| TMM    | Validated     | BEMPP far-field checks                         | Pressure-release angular slices for sphere, oblate, and prolate cases. | Validated against external BEMPP far-field checks for sphere, oblate, and prolate pressure-release cases.  |
+| TMM    | Validated     | Exact general-angle spheroidal solution        | General-angle prolate retained-state validation.                       | Retained prolate angular products are also checked against the exact general-angle spheroidal solution.    |
 
 ## What validation means in this package
 
-Validation in `acousticTS` is best understood as at least four related
+Validation in acousticTS is best understood as at least four related
 layers of evidence.
 
 First, the object and setup have to be internally consistent. The
@@ -302,3 +309,31 @@ mismatches of assumptions.
   functions](https://brandynlucca.github.io/acousticTS/articles/numerical-foundations/numerical-foundations.md)
 - [FAQ and
   troubleshooting](https://brandynlucca.github.io/acousticTS/articles/faq-troubleshooting/faq-troubleshooting.md)
+
+## References
+
+Betcke, Timo, and Matthew Scroggs. 2021. “Bempp-Cl: A Fast Python Based
+Just-in-Time Compiling Boundary Element Library.” *Journal of Open
+Source Software* 6 (59): 2879. <https://doi.org/10.21105/joss.02879>.
+
+Demer, David A., and Stéphane G. Conti. 2003. “Validation of the
+Stochastic Distorted-Wave Born Approximation Model with Broad Bandwidth
+Total Target Strength Measurements of Antarctic Krill.” *ICES Journal of
+Marine Science* 60 (3): 625–35.
+<https://doi.org/10.1016/S1054-3139(03)00063-8>.
+
+Gastauer, Sven. 2025. “SvenGastauer/KRMr: V0.4.8.” Zenodo.
+<https://doi.org/10.5281/ZENODO.15838374>.
+
+Gastauer, Sven, Dezhang Chu, and Martin J. Cox. 2019. “ZooScatR—An
+\<Span Style="font-Variant:small-Caps;"\>r\</Span\> Package for
+Modelling the Scattering Properties of Weak Scattering Targets Using the
+Distorted Wave Born Approximation.” *The Journal of the Acoustical
+Society of America* 145 (1): EL102–8.
+<https://doi.org/10.1121/1.5085655>.
+
+Jech, J. Michael, John K. Horne, Dezhang Chu, David A. Demer, David T.
+I. Francis, Natalia Gorska, Benjamin Jones, et al. 2015. “Comparisons
+Among Ten Models of Acoustic Backscattering Used in Aquatic Ecosystem
+Research.” *The Journal of the Acoustical Society of America* 138 (6):
+3742–64. <https://doi.org/10.1121/1.4937607>.

@@ -9,7 +9,13 @@ Benchmarked Validated
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/calibration/calibration-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/calibration/calibration-theory.md)
 
-The calibration workflow in `acousticTS` is designed to be short and
+These pages are grounded in the standard-target calibration literature
+for elastic reference spheres ([Dragonette, Numrich, and Frank
+1981](#ref-dragonette_calibration_1981); [Foote
+1990](#ref-foote_spheres_1990); [MacLennan
+1981](#ref-maclennan_theory_1981)).
+
+The calibration workflow in acousticTS is designed to be short and
 explicit. A user first creates a calibration sphere object, then
 evaluates the calibration model over a chosen frequency grid, and
 finally inspects or plots the stored results. The object-based design is
@@ -198,7 +204,7 @@ wave speeds have changed.
 Because the calibration-sphere model is itself a modal-series solution,
 the most useful implementation check is agreement with other MacLennan
 (1981) elastic-sphere implementations rather than with a separate
-benchmark family. The `acousticTS` solver now exposes an `adaptive`
+benchmark family. The acousticTS solver now exposes an `adaptive`
 argument. When `adaptive = TRUE` (the default), the solver starts from
 the usual \mathrm{round}(ka)+10 partial waves and then extends the sum
 until the tail term is below 10^{-10}. When `adaptive = FALSE`, it falls
@@ -225,7 +231,7 @@ the NWFSC calibration-sphere applet remains inside its stated ka
 NOAA calibration applet for the 38.1 mm tungsten-carbide
 sphere.](calibration-external-comparison.png)
 
-These comparisons show that the current `acousticTS` elastic-sphere
+These comparisons show that the current acousticTS elastic-sphere
 implementation is numerically aligned with the other MacLennan (1981)
 software implementations over the full comparison band. For the 38.1 mm
 tungsten-carbide case, the largest absolute differences are on the order
@@ -262,3 +268,18 @@ the full object-to-model workflow in action. A well-defined object is
 created, a canonical model is applied, and the outputs can then be
 compared across diameter, material, or frequency range with very little
 ambiguity about what the target actually is.
+
+## References
+
+Dragonette, Louis R., S. K. Numrich, and Laurence J. Frank. 1981.
+“Calibration Technique for Acoustic Scattering Measurements.” *The
+Journal of the Acoustical Society of America* 69 (4): 1186–89.
+<https://doi.org/10.1121/1.385699>.
+
+Foote, K. G. 1990. “Spheres for Calibrating an Eleven-Frequency Acoustic
+Measurement System.” *ICES Journal of Marine Science* 46 (3): 284–86.
+<https://doi.org/10.1093/icesjms/46.3.284>.
+
+MacLennan, D. N. 1981. “The Theory of Solid Spheres as Sonar Calibration
+Targets.” Scottish Fisheries Research Report 22. Department of
+Agriculture; Fisheries for Scotland.

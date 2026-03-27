@@ -2,6 +2,12 @@
 
 ## Introduction
 
+The notation and reporting conventions on this page follow standard
+time-harmonic scattering texts and elastic-wave treatments ([Medwin and
+Clay 1998](#ref-medwin_fundamentals_1998); [Morse and Ingard
+1986](#ref-morse_theoretical_1986); [Achenbach
+1973](#ref-achenbach_wave_1973)).
+
 This article is the shared physics starting point for the model-family
 theory pages. The goal is to make the recurring acoustic field
 definitions, medium-indexing rules, and reporting quantities explicit in
@@ -221,3 +227,15 @@ additional physical assumptions make this model solvable or useful?
   properties](https://brandynlucca.github.io/acousticTS/articles/material-properties/material-properties.md)
 - [Numerical
   foundations](https://brandynlucca.github.io/acousticTS/articles/numerical-foundations/numerical-foundations.md)
+
+## References
+
+Achenbach, J. D. 1973. *Wave Propagation in Elastic Solids*.
+North-Holland Series in Applied Mathematics and Mechanics, v. 16.
+Amsterdam New York: North-Holland Pub. Co. American Elsevier Pub. Co.
+
+Medwin, Herman, and Clarence S. Clay. 1998. *Fundamentals of Acoustical
+Oceanography*. Boston: Academic Press.
+
+Morse, Philip M., and K. Uno Ingard. 1986. *Theoretical Acoustics*.
+Princeton, N.J: Princeton University Press.

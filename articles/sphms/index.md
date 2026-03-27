@@ -9,6 +9,11 @@ Benchmarked Validated
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/sphms/sphms-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/sphms/sphms-theory.md)
 
+These pages follow the classical exact sphere literature for fluid,
+elastic, and approximate shell limits ([Anderson
+1950](#ref-anderson_sound_1950); [Faran 1951](#ref-faran_sound_1951);
+[Hickling 1962](#ref-hickling_analysis_1962)).
+
 The spherical modal series solution (`SPHMS`) is the package’s exact
 canonical solution for unshelled homogeneous spheres in an exterior
 fluid. Because the Helmholtz equation separates exactly in spherical
@@ -57,3 +62,17 @@ interface, and sum the retained orders into the far-field backscatter.
 - [Theory](https://brandynlucca.github.io/acousticTS/articles/sphms/sphms-theory.md):
   full spherical separation, boundary conditions, and coefficient
   derivations
+
+## References
+
+Anderson, Victor C. 1950. “Sound Scattering from a Fluid Sphere.” *The
+Journal of the Acoustical Society of America* 22 (4): 426–31.
+<https://doi.org/10.1121/1.1906621>.
+
+Faran, James J. 1951. “Sound Scattering by Solid Cylinders and Spheres.”
+*The Journal of the Acoustical Society of America* 23 (4): 405–18.
+<https://doi.org/10.1121/1.1906780>.
+
+Hickling, Robert. 1962. “Analysis of Echoes from a Solid Elastic Sphere
+in Water.” *The Journal of the Acoustical Society of America* 34 (10):
+1582–92. <https://doi.org/10.1121/1.1909055>.

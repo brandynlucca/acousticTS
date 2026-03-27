@@ -16,7 +16,9 @@ body is treated with a Kirchhoff-ray approximation appropriate for a
 weakly contrasting, smoothly varying, elongated fluid-like body, while
 the swimbladder is treated either by a low-order modal approximation
 when its acoustic size is small or by a Kirchhoff approximation when it
-is larger.[¹](#fn1)[²](#fn2)[³](#fn3)
+is larger ([C. S. Clay 1991](#ref-clay_1991); [Clarence S. Clay
+1992](#ref-clay_1992); [Clarence S. Clay and Horne
+1994](#ref-clay_horne_1994)).
 
 Its body term therefore uses weak fluid-like tissue contrasts at a fluid
 interface, while its swimbladder term uses a much stronger gas-tissue
@@ -470,18 +472,18 @@ intended to model fine elastic resonances, anatomically complex
 multiple-scattering phenomena, or detailed three-dimensional end effects
 that fall outside the segmented locally cylindrical description.
 
-### References
+## References
 
-------------------------------------------------------------------------
+Clay, C. S. 1991. “Low-Resolution Acoustic Scattering Models:
+Fluid-Filled Cylinders and Fish with Swim Bladders.” *The Journal of the
+Acoustical Society of America* 89 (5): 2168–79.
+<https://doi.org/10.1121/1.400910>.
 
-1.  Clay, C. S. (1991). Low resolution acoustic scattering models:
-    fluid-filled cylinders and fish with swimbladders. *The Journal of
-    the Acoustical Society of America*, 89, 2168-2179.
+Clay, Clarence S. 1992. “Composite Ray‐mode Approximations for
+Backscattered Sound from Gas‐filled Cylinders and Swimbladders.” *The
+Journal of the Acoustical Society of America* 92 (4): 2173–80.
+<https://doi.org/10.1121/1.405211>.
 
-2.  Clay, C. S. (1992). Composite ray-mode approximations for
-    backscattered sound from gas-filled cylinders and swimbladders. *The
-    Journal of the Acoustical Society of America*, 92, 2173-2180.
-
-3.  Clay, C. S., and Horne, J. K. (1994). Acoustic models of fish: the
-    Atlantic cod (*Gadus morhua*). *The Journal of the Acoustical
-    Society of America*, 96, 1661-1668.
+Clay, Clarence S., and John K. Horne. 1994. “Acoustic Models of Fish:
+The Atlantic Cod (*Gadus Morhua*).” *The Journal of the Acoustical
+Society of America* 96 (3): 1661–68. <https://doi.org/10.1121/1.410245>.

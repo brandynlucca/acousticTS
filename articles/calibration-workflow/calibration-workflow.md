@@ -2,6 +2,12 @@
 
 ## Introduction
 
+This workflow is designed around the standard-target calibration
+literature for elastic reference spheres ([Dragonette, Numrich, and
+Frank 1981](#ref-dragonette_calibration_1981); [Foote
+1990](#ref-foote_spheres_1990); [MacLennan
+1981](#ref-maclennan_theory_1981)).
+
 The package already contains substantial theory for calibration spheres.
 This page is the practical counterpart. Its purpose is to show how
 calibration-related objects and model outputs fit into an actual user
@@ -186,3 +192,18 @@ specifications to a defensible modeled reference curve.
   implementation](https://brandynlucca.github.io/acousticTS/articles/calibration/calibration-implementation.md)
 - [Material properties and acoustic
   utilities](https://brandynlucca.github.io/acousticTS/articles/material-properties/material-properties.md)
+
+## References
+
+Dragonette, Louis R., S. K. Numrich, and Laurence J. Frank. 1981.
+“Calibration Technique for Acoustic Scattering Measurements.” *The
+Journal of the Acoustical Society of America* 69 (4): 1186–89.
+<https://doi.org/10.1121/1.385699>.
+
+Foote, K. G. 1990. “Spheres for Calibrating an Eleven-Frequency Acoustic
+Measurement System.” *ICES Journal of Marine Science* 46 (3): 284–86.
+<https://doi.org/10.1093/icesjms/46.3.284>.
+
+MacLennan, D. N. 1981. “The Theory of Solid Spheres as Sonar Calibration
+Targets.” Scottish Fisheries Research Report 22. Department of
+Agriculture; Fisheries for Scotland.

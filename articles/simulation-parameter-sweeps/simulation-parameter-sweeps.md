@@ -2,6 +2,12 @@
 
 ## Introduction
 
+Parameter sweeps are especially useful when a model has to be
+interpreted over the orientation, size, and contrast ranges emphasized
+in benchmark and survey studies ([Jech et al.
+2015](#ref-jech_etal_2015); [Demer and Conti
+2005](#ref-demer_new_2005)).
+
 Single deterministic model runs are useful, but many acoustic questions
 are inherently distributional. The package therefore includes simulation
 tools for repeated realizations, parameter batching, and ensemble
@@ -435,3 +441,15 @@ The current simulation interface is already useful, but the package
 documentation indicates that this part of the workflow may continue to
 evolve. This article should therefore be read as a workflow guide rather
 than as a claim that the current interface is final.
+
+## References
+
+Demer, David A., and Stéphane G. Conti. 2005. “New Target-Strength Model
+Indicates More Krill in the Southern Ocean.” *ICES Journal of Marine
+Science* 62 (1): 25–32. <https://doi.org/10.1016/j.icesjms.2004.07.027>.
+
+Jech, J. Michael, John K. Horne, Dezhang Chu, David A. Demer, David T.
+I. Francis, Natalia Gorska, Benjamin Jones, et al. 2015. “Comparisons
+Among Ten Models of Acoustic Backscattering Used in Aquatic Ecosystem
+Research.” *The Journal of the Acoustical Society of America* 138 (6):
+3742–64. <https://doi.org/10.1121/1.4937607>.

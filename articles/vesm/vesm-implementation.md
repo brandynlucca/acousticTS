@@ -2,12 +2,17 @@
 
 ## acousticTS implementation
 
-Validated Experimental
+Experimental Unvalidated
 
 *Model-family pages:*
 [Overview](https://brandynlucca.github.io/acousticTS/articles/vesm/index.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/vesm/vesm-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/vesm/vesm-theory.md)
+
+These pages are motivated by layered gas-bearing fish scattering models
+and viscous resonance broadening ([Khodabandeloo et al.
+2021](#ref-khodabandeloo_estimating_2021); [Feuillade and Nero
+1998](#ref-feuillade_nero_1998)).
 
 The viscous-elastic spherical model is available through
 `target_strength(..., model = "vesms")`. The implementation is built on
@@ -16,19 +21,18 @@ in the same object framework already used by the elastic-shelled sphere
 model. The additional viscous layer is then supplied through model
 arguments at run time.
 
-This page focuses on a single reproducible reference case that mirrors
-the original Khodabandeloo et al. (2021) Python workflow bundled in the
-local `ViscousElasticModel` directory. The goal is not to restate that
-code line by line. It is to show how the same layered target is built in
-`acousticTS`, how the model is called, and how closely the resulting
-spectrum matches the original implementation over a broader frequency
-range.
+This page focuses on a single reproducible reference case that
+implemented the model presented by Khodabandeloo et al. (2021) in
+Python. The goal is not to restate that code line by line. It is to show
+how the same layered target is built in acousticTS, how the model is
+called, and how closely the resulting spectrum matches the original
+implementation over a broader frequency range.
 
-`VESMS` is benchmarked here against the original reference Python
-implementation over a dense frequency sweep. That is strong
-software-to-software validation for the documented spherical case, but
-it is still narrower than the older modal-series families with
-long-standing benchmark ladders.
+`VESMS` is benchmarked here against a reference Python implementation
+over a dense frequency sweep. That is strong across-language validation
+for the documented spherical case, but it is still narrower than the
+older modal-series families with long-standing benchmark ladders.
+Moreover, both implementations were authored by the same individual.
 
 ### Building the reference object
 
@@ -73,7 +77,7 @@ vesm_object <- ess_generate(
 
 ### Running the model
 
-The original workflow retains the `m = 0, 1, 2` terms. In `acousticTS`,
+The original workflow retains the `m = 0, 1, 2` terms. In acousticTS,
 the corresponding setting is `m_limit = 2`. If no outer viscous radius
 is supplied, `VESMS` estimates it from the neutral-buoyancy relation
 described on the theory page.
@@ -127,24 +131,23 @@ For the implementation check below, the same reference geometry and
 material properties were run through:
 
 - [`acousticTS::VESMS`](https://brandynlucca.github.io/acousticTS/reference/VESMS.md)
-- the original Python VESM implementation from the local
-  `ViscousElasticModel` source
+- bespoke Python implementation
 
 The comparison uses a shared `1-150 kHz` grid with `1 kHz` spacing and
 the same retained modal orders (`m = 0, 1, 2`).
 
-After regenerating the benchmark against the current compiled
-`acousticTS` implementation, the reference case gives:
+After regenerating the benchmark against the current compiled acousticTS
+implementation, the reference case gives:
 
 - max abs. delta TS = `0.05598 dB`
 - mean abs. delta TS = `0.00885 dB`
 - frequency at max abs. delta = `60 kHz`
-- elapsed time = `0.79 s` for `acousticTS` and `0.98 s` for the original
-  Python implementation
+- elapsed time = `0.79 s` for acousticTS and `0.98 s` for the Python
+  implementation
 
-| Comparison                  | N frequency | f min (kHz) | f max (kHz) | Max abs. delta TS (dB) | Mean abs. delta TS (dB) | f at max delta (kHz) | acousticTS elapsed (s) | Original elapsed (s) |
-|:----------------------------|------------:|------------:|------------:|-----------------------:|------------------------:|---------------------:|-----------------------:|---------------------:|
-| acousticTS vs original VESM |         150 |           1 |         150 |                 0.0572 |                  0.0089 |                   60 |                   0.05 |               1.0962 |
+| Comparison                  | N frequency | f min (kHz) | f max (kHz) | Max &#124; \Delta &#124;~\textit{TS} (dB) | Mean &#124; \Delta &#124;~\textit{TS} (dB) | f at max &#124; \Delta &#124;~\textit{TS} (kHz) | acousticTS elapsed (s) | Python elapsed (s) |
+|:----------------------------|------------:|------------:|------------:|------------------------------------------:|-------------------------------------------:|------------------------------------------------:|-----------------------:|-------------------:|
+| acousticTS vs original VESM |         150 |           1 |         150 |                                    0.0572 |                                     0.0089 |                                              60 |                   0.05 |             1.0962 |
 
 The largest mismatch on this grid remains well below `0.1 dB`, and the
 mean absolute difference stays below `0.01 dB`. That is strong agreement
@@ -165,19 +168,19 @@ the scale of the full spectrum.
 
 #### A few explicit checkpoints
 
-|     | Frequency (Hz) | acousticTS TS (dB) | Original TS (dB) | Delta TS (dB) | Abs. delta TS (dB) |
-|:----|---------------:|-------------------:|-----------------:|--------------:|-------------------:|
-| 1   |           1000 |         -116.01044 |       -116.00966 |      -0.00078 |            0.00078 |
-| 38  |          38000 |          -55.81067 |        -55.80907 |      -0.00160 |            0.00160 |
-| 60  |          60000 |          -58.93634 |        -58.99354 |       0.05720 |            0.05720 |
-| 120 |         120000 |          -65.27321 |        -65.25513 |      -0.01807 |            0.01807 |
-| 150 |         150000 |          -63.89102 |        -63.87077 |      -0.02025 |            0.02025 |
+|     | Frequency (Hz) | acousticTS TS (dB) | Python TS (dB) | \Delta~\textit{TS} (dB) | Abs. delta TS (dB) |
+|:----|---------------:|-------------------:|---------------:|------------------------:|-------------------:|
+| 1   |           1000 |         -116.01044 |     -116.00966 |                -0.00078 |            0.00078 |
+| 38  |          38000 |          -55.81067 |      -55.80907 |                -0.00160 |            0.00160 |
+| 60  |          60000 |          -58.93634 |      -58.99354 |                 0.05720 |            0.05720 |
+| 120 |         120000 |          -65.27321 |      -65.25513 |                -0.01807 |            0.01807 |
+| 150 |         150000 |          -63.89102 |      -63.87077 |                -0.02025 |            0.02025 |
 
 ### Practical note on modal truncation
 
 This comparison was run with `m_limit = 2` because that is the modal
 content retained by the original reference implementation used here. For
-exploratory work at larger acoustic size, `acousticTS` can retain more
+exploratory work at larger acoustic size, acousticTS can retain more
 modes by increasing `m_limit` or by leaving it unspecified so the model
 uses its default frequency-dependent cutoff.
 
@@ -185,8 +188,22 @@ uses its default frequency-dependent cutoff.
 
 The implementation check is useful because the viscous-elastic model is
 numerically more delicate than the simpler spherical modal-series models
-in the package. The agreement shown here reflects the current
-`acousticTS` implementation after the compiled VESMS backend and shared
-complex spherical-Bessel updates, and it indicates that the model is
-reproducing the intended layered-reference behavior across a meaningful
-frequency range rather than only at a few isolated checkpoints.
+in the package. The agreement shown here reflects the current acousticTS
+implementation after the compiled VESMS backend and shared complex
+spherical-Bessel updates, and it indicates that the model is reproducing
+the intended layered-reference behavior across a meaningful frequency
+range rather than only at a few isolated checkpoints.
+
+## References
+
+Feuillade, C., and R. W. Nero. 1998. “A Viscous-Elastic Swimbladder
+Model for Describing Enhanced-Frequency Resonance Scattering from Fish.”
+*The Journal of the Acoustical Society of America* 103 (6): 3245–55.
+<https://doi.org/10.1121/1.423076>.
+
+Khodabandeloo, Babak, Mette Dalgaard Agersted, Thor Klevjer, Gavin J.
+Macaulay, and Webjørn Melle. 2021. “Estimating Target Strength and
+Physical Characteristics of Gas-Bearing Mesopelagic Fish from Wideband
+*in Situ* Echoes Using a Viscous-Elastic Scattering Model.” *The Journal
+of the Acoustical Society of America* 149 (1): 673–91.
+<https://doi.org/10.1121/10.0003341>.

@@ -9,6 +9,10 @@ Benchmarked Validated
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/fcms/fcms-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/fcms/fcms-theory.md)
 
+These pages follow the finite-cylinder modal-series literature for
+straight circular cylinders near broadside ([Stanton
+1988](#ref-stanton_sound_1988), [1989](#ref-stanton_sound_1989)).
+
 The finite cylinder modal series solution (`FCMS`) is the package’s
 geometry-matched cylinder family for straight circular cylinders. It
 keeps the exact cylindrical-harmonic treatment of the cross-section and
@@ -56,3 +60,13 @@ the coherent addition along the cylinder axis.
 - [Theory](https://brandynlucca.github.io/acousticTS/articles/fcms/fcms-theory.md):
   cylindrical modal reduction, boundary conditions, and finite-length
   factorization
+
+## References
+
+Stanton, T. K. 1988. “Sound Scattering by Cylinders of Finite Length. I.
+Fluid Cylinders.” *The Journal of the Acoustical Society of America* 83
+(1): 55–63. <https://doi.org/10.1121/1.396184>.
+
+———. 1989. “Sound Scattering by Cylinders of Finite Length. III.
+Deformed Cylinders.” *The Journal of the Acoustical Society of America*
+86 (2): 691–705. <https://doi.org/10.1121/1.398193>.

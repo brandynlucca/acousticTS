@@ -2,6 +2,12 @@
 
 ## Introduction
 
+Component combination becomes most important in fish-like targets where
+anatomically distinct regions scatter in different regimes ([Clay and
+Horne 1994](#ref-clay_horne_1994); [Gorska, Ona, and Korneliussen
+2005](#ref-gorska_etal_2005); [Stanton
+1996](#ref-stanton_acoustic_1996)).
+
 It is often tempting to build a composite target by running two
 canonical models separately and then combining the results. In a few
 restricted cases, that can be a useful first approximation. In many
@@ -300,7 +306,7 @@ approximation, not as the exact response of a composite target.
 
 ## Connection to package workflows
 
-This cautionary logic is exactly why `acousticTS` distinguishes between
+This cautionary logic is exactly why acousticTS distinguishes between
 comparing models and combining components. Comparing models asks how
 different formulations behave on the same target. Combining components
 asks whether separate subtargets can be turned into one composite
@@ -318,3 +324,19 @@ subscatterers whose complex amplitudes may be added with a common phase
 reference as a first-order approximation? Only if the answer to that
 narrower question is yes does coherent component summation become
 plausible.
+
+## References
+
+Clay, Clarence S., and John K. Horne. 1994. “Acoustic Models of Fish:
+The Atlantic Cod (*Gadus Morhua*).” *The Journal of the Acoustical
+Society of America* 96 (3): 1661–68. <https://doi.org/10.1121/1.410245>.
+
+Gorska, Natalia, Egil Ona, and Rolf Korneliussen. 2005. “Acoustic
+Backscattering by Atlantic Mackerel as Being Representative of Fish That
+Lack a Swimbladder. Backscattering by Individual Fish.” *ICES Journal of
+Marine Science* 62 (5): 984–95.
+<https://doi.org/10.1016/j.icesjms.2005.03.010>.
+
+Stanton, T. 1996. “Acoustic Scattering Characteristics of Several
+Zooplankton Groups.” *ICES Journal of Marine Science* 53 (2): 289–95.
+<https://doi.org/10.1006/jmsc.1996.0037>.

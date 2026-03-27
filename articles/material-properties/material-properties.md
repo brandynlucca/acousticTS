@@ -2,6 +2,11 @@
 
 ## Introduction
 
+The property conventions on this page follow standard acoustics and
+elastic-wave references used throughout underwater scattering theory
+([Medwin and Clay 1998](#ref-medwin_fundamentals_1998); [Achenbach
+1973](#ref-achenbach_wave_1973)).
+
 Many modeling errors are not caused by the scattering model itself. They
 are caused by incorrect material properties, inconsistent contrasts, or
 unit conversion mistakes. This article collects the supporting
@@ -47,7 +52,7 @@ answers a different question.
 
 ## Contrasts versus absolute properties
 
-One of the most useful design choices in `acousticTS` is that many
+One of the most useful design choices in acousticTS is that many
 constructors and models accept either contrasts or absolute properties.
 A density contrast such as `g_body` expresses target density relative to
 the surrounding medium, while a sound-speed contrast such as `h_body`
@@ -306,3 +311,12 @@ and the reporting domain were all defined consistently.
   practice](https://brandynlucca.github.io/acousticTS/articles/boundary-conditions-practice/boundary-conditions-practice.md)
 - [FAQ and
   troubleshooting](https://brandynlucca.github.io/acousticTS/articles/faq-troubleshooting/faq-troubleshooting.md)
+
+## References
+
+Achenbach, J. D. 1973. *Wave Propagation in Elastic Solids*.
+North-Holland Series in Applied Mathematics and Mechanics, v. 16.
+Amsterdam New York: North-Holland Pub. Co. American Elsevier Pub. Co.
+
+Medwin, Herman, and Clarence S. Clay. 1998. *Fundamentals of Acoustical
+Oceanography*. Boston: Academic Press.

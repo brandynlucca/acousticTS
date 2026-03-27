@@ -9,6 +9,10 @@ Experimental Unvalidated
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/bcms/bcms-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/bcms/bcms-theory.md)
 
+This family follows the deformed-cylinder and coherence-corrected
+cylinder literature for weakly scattering elongated bodies ([Stanton
+1989](#ref-stanton_sound_1989), [1988](#ref-stanton_sound_1988)).
+
 The bent cylinder modal series solution (`BCMS`) extends the straight
 finite-cylinder modal family to uniformly bent cylinders by keeping the
 straight cross-sectional modal physics and modifying only the along-axis
@@ -54,3 +58,13 @@ coherent length derived for a uniformly bent axis.
 - [Theory](https://brandynlucca.github.io/acousticTS/articles/bcms/bcms-theory.md):
   bent-axis coherence integrals and relation to the straight-cylinder
   modal kernel
+
+## References
+
+Stanton, T. K. 1988. “Sound Scattering by Cylinders of Finite Length. I.
+Fluid Cylinders.” *The Journal of the Acoustical Society of America* 83
+(1): 55–63. <https://doi.org/10.1121/1.396184>.
+
+———. 1989. “Sound Scattering by Cylinders of Finite Length. III.
+Deformed Cylinders.” *The Journal of the Acoustical Society of America*
+86 (2): 691–705. <https://doi.org/10.1121/1.398193>.

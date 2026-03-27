@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Validated Experimental
+Experimental Unvalidated
 
 *Model-family pages:*
 [Overview](https://brandynlucca.github.io/acousticTS/articles/vesm/index.md)
@@ -15,7 +15,9 @@ viscous biological layer before the whole target is embedded in
 seawater. In the mesopelagic-fish setting of Khodabandeloo et
 al. (2021), those layers represent gas, a mechanically stiffer
 shell-like inclusion, and soft tissue whose viscosity damps and broadens
-the gas-driven resonance.[¹](#fn1)[²](#fn2)
+the gas-driven resonance ([Khodabandeloo et al.
+2021](#ref-khodabandeloo_estimating_2021); [Feuillade and Nero
+1998](#ref-feuillade_nero_1998)).
 
 This family is still spherical, so the angular dependence remains
 separable. What makes it more intricate than `SPHMS`, `ESSMS`, or a
@@ -301,15 +303,16 @@ general fish-body solver. Its strength is that it retains the physics of
 gas compression, shell elasticity, and viscous damping within one
 separable spherical framework.
 
-------------------------------------------------------------------------
+## References
 
-1.  Khodabandeloo, B., Agersted, M.D., Klevjer, T., Macaulay, G.J., and
-    Melle, W. (**2021**). *Estimating target strength and physical
-    characteristics of gas-bearing mesopelagic fish from wideband in
-    situ echoes using a viscous-elastic scattering model*. *The Journal
-    of the Acoustical Society of America*, 149: 673-691.
+Feuillade, C., and R. W. Nero. 1998. “A Viscous-Elastic Swimbladder
+Model for Describing Enhanced-Frequency Resonance Scattering from Fish.”
+*The Journal of the Acoustical Society of America* 103 (6): 3245–55.
+<https://doi.org/10.1121/1.423076>.
 
-2.  Feuillade, C., and Nero, R.W. (**1998**). *A viscous-elastic
-    swimbladder model for describing enhanced-frequency resonance
-    scattering from fish*. *The Journal of the Acoustical Society of
-    America*, 103: 3245-3255.
+Khodabandeloo, Babak, Mette Dalgaard Agersted, Thor Klevjer, Gavin J.
+Macaulay, and Webjørn Melle. 2021. “Estimating Target Strength and
+Physical Characteristics of Gas-Bearing Mesopelagic Fish from Wideband
+*in Situ* Echoes Using a Viscous-Elastic Scattering Model.” *The Journal
+of the Acoustical Society of America* 149 (1): 673–91.
+<https://doi.org/10.1121/10.0003341>.

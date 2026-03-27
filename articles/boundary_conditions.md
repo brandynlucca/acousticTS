@@ -2,6 +2,13 @@
 
 ## Introduction
 
+The boundary families summarized here correspond to the classical fluid,
+rigid, elastic, shell, and viscous-interface scattering literature
+([Anderson 1950](#ref-anderson_sound_1950); [Faran
+1951](#ref-faran_sound_1951); [Goodman and Stern
+1962](#ref-goodman_reflection_1962); [Feuillade and Nero
+1998](#ref-feuillade_nero_1998)).
+
 Boundary conditions are the mathematical statements that turn a general
 wave equation into a specific scattering problem. In target-strength
 modeling, they specify what the target surface can and cannot do in
@@ -339,3 +346,22 @@ with a sharply enforcing interface condition. Physically, the target
 behaves approximately like the surrounding fluid, and the backscatter is
 produced by residual density and compressibility contrasts rather than
 by a large impedance jump at the boundary.
+
+## References
+
+Anderson, Victor C. 1950. “Sound Scattering from a Fluid Sphere.” *The
+Journal of the Acoustical Society of America* 22 (4): 426–31.
+<https://doi.org/10.1121/1.1906621>.
+
+Faran, James J. 1951. “Sound Scattering by Solid Cylinders and Spheres.”
+*The Journal of the Acoustical Society of America* 23 (4): 405–18.
+<https://doi.org/10.1121/1.1906780>.
+
+Feuillade, C., and R. W. Nero. 1998. “A Viscous-Elastic Swimbladder
+Model for Describing Enhanced-Frequency Resonance Scattering from Fish.”
+*The Journal of the Acoustical Society of America* 103 (6): 3245–55.
+<https://doi.org/10.1121/1.423076>.
+
+Goodman, Ralph R., and Raya Stern. 1962. “Reflection and Transmission of
+Sound by Elastic Spherical Shells.” *The Journal of the Acoustical
+Society of America* 34 (3): 338–44. <https://doi.org/10.1121/1.1928120>.

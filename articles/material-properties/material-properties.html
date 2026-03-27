@@ -113,6 +113,11 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
+<p>The property conventions on this page follow standard acoustics and
+elastic-wave references used throughout underwater scattering theory
+<span class="citation">(<a href="#ref-medwin_fundamentals_1998">Medwin
+and Clay 1998</a>; <a href="#ref-achenbach_wave_1973">Achenbach
+1973</a>)</span>.</p>
 <p>Many modeling errors are not caused by the scattering model itself.
 They are caused by incorrect material properties, inconsistent
 contrasts, or unit conversion mistakes. This article collects the
@@ -161,12 +166,12 @@ answers a different question.</p>
 <div class="section level2">
 <h2 id="contrasts-versus-absolute-properties">Contrasts versus absolute properties<a class="anchor" aria-label="anchor" href="#contrasts-versus-absolute-properties"></a>
 </h2>
-<p>One of the most useful design choices in <code>acousticTS</code> is
-that many constructors and models accept either contrasts or absolute
-properties. A density contrast such as <code>g_body</code> expresses
-target density relative to the surrounding medium, while a sound-speed
-contrast such as <code>h_body</code> expresses target sound speed
-relative to the surrounding medium. Absolute properties such as
+<p>One of the most useful design choices in acousticTS is that many
+constructors and models accept either contrasts or absolute properties.
+A density contrast such as <code>g_body</code> expresses target density
+relative to the surrounding medium, while a sound-speed contrast such as
+<code>h_body</code> expresses target sound speed relative to the
+surrounding medium. Absolute properties such as
 <code>density_body</code> and <code>sound_speed_body</code> can often be
 supplied instead, with contrasts derived internally.</p>
 <p>This flexibility is convenient, but it also means a user should be
@@ -389,6 +394,22 @@ conditions in practice</a></li>
 <li><a href="../faq-troubleshooting/faq-troubleshooting.html">FAQ and
 troubleshooting</a></li>
 </ul>
+</div>
+<div class="section level2">
+<h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
+</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="ref-achenbach_wave_1973" class="csl-entry">
+Achenbach, J. D. 1973. <em>Wave Propagation in Elastic Solids</em>.
+North-<span>Holland</span> Series in Applied Mathematics and Mechanics,
+v. 16. Amsterdam New York: North-Holland Pub. Co. American Elsevier Pub.
+Co.
+</div>
+<div id="ref-medwin_fundamentals_1998" class="csl-entry">
+Medwin, Herman, and Clarence S. Clay. 1998. <em>Fundamentals of
+Acoustical Oceanography</em>. Boston: Academic Press.
+</div>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

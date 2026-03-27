@@ -11,8 +11,9 @@ Benchmarked Validated
 
 The finite cylinder modal series solution (FCMS) is one of the standard
 ways to represent acoustic backscatter from straight cylinders of finite
-length.[¹](#fn1)[²](#fn2) Its appeal is that it retains the exact
-cylindrical-harmonic treatment of the circular cross-section while
+length ([Stanton 1988](#ref-stanton_sound_1988),
+[1989](#ref-stanton_sound_1989)). Its appeal is that it retains the
+exact cylindrical-harmonic treatment of the circular cross-section while
 replacing the fully three-dimensional endcap problem with a finite-axis
 coherence factor. That combination makes the model substantially more
 informative than a purely asymptotic ray-style approximation, while
@@ -447,12 +448,12 @@ endcaps, or material distributions that vary along the axis are outside
 the ideal assumptions under which the factorized representation is most
 defensible.
 
-------------------------------------------------------------------------
+## References
 
-1.  Stanton, T. K. (1988). Sound scattering by cylinders of finite
-    length. I. Fluid cylinders. *The Journal of the Acoustical Society
-    of America*, 83, 55-63.
+Stanton, T. K. 1988. “Sound Scattering by Cylinders of Finite Length. I.
+Fluid Cylinders.” *The Journal of the Acoustical Society of America* 83
+(1): 55–63. <https://doi.org/10.1121/1.396184>.
 
-2.  Stanton, T. K. (1989). Sound scattering by cylinders of finite
-    length. III. Deformed cylinders. *The Journal of the Acoustical
-    Society of America*, 85, 232-237.
+———. 1989. “Sound Scattering by Cylinders of Finite Length. III.
+Deformed Cylinders.” *The Journal of the Acoustical Society of America*
+86 (2): 691–705. <https://doi.org/10.1121/1.398193>.

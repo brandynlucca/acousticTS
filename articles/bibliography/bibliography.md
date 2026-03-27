@@ -2,202 +2,239 @@
 
 ## Introduction
 
-This page consolidates the explicit literature and resource citations
-used throughout the `acousticTS` vignette tree.
+This page is generated directly from the shared bibliography file used
+across the `acousticTS` vignette tree.
 
-Each work is listed once even if it is cited in multiple theory,
-implementation, workflow, or example-data pages.
+Each cited source is maintained once in
+[vignettes/REFERENCES.bib](https://brandynlucca.github.io/acousticTS/articles/REFERENCES.bib)
+and can then be cited throughout the theory, implementation, workflow,
+and example-data pages using standard Pandoc citation keys such as
+`[@stanton_1989]`.
 
-## Foundational acoustics and elastic-scattering texts
+## Notes
 
-- Achenbach, J. D. (1973). *Wave Propagation in Elastic Solids*.
-  Vol. 16. North-Holland.
+The bibliography below includes every entry currently retained in the
+shared BibTeX file, including literature citations and external software
+or data resources referenced elsewhere in the documentation.
 
-- Flammer, C. (1957). *Spheroidal Wave Functions*. Stanford University
-  Press.
+## Complete Bibliography
 
-- Morse, P. M., and Ingard, K. U. (1968). *Theoretical Acoustics*.
-  Princeton University Press.
+Achenbach, J. D. 1973. *Wave Propagation in Elastic Solids*.
+North-Holland Series in Applied Mathematics and Mechanics, v. 16.
+Amsterdam New York: North-Holland Pub. Co. American Elsevier Pub. Co.
 
-## Canonical exact and modal-series scattering literature
+Anderson, Victor C. 1950. “Sound Scattering from a Fluid Sphere.” *The
+Journal of the Acoustical Society of America* 22 (4): 426–31.
+<https://doi.org/10.1121/1.1906621>.
 
-- Anderson, V. C. (1950). Sound scattering from a fluid sphere. *The
-  Journal of the Acoustical Society of America*, 22, 426-431.
+Betcke, Timo, and Matthew Scroggs. 2021. “Bempp-Cl: A Fast Python Based
+Just-in-Time Compiling Boundary Element Library.” *Journal of Open
+Source Software* 6 (59): 2879. <https://doi.org/10.21105/joss.02879>.
 
-- Faran, J. J. (1951). Sound scattering by solid cylinders and spheres.
-  *The Journal of the Acoustical Society of America*, 23, 405-418.
+Chu, Dezhang, Kenneth G. Foote, and Timothy K. Stanton. 1993. “Further
+Analysis of Target Strength Measurements of Antarctic Krill at 38 and
+120 kHz: Comparison with Deformed Cylinder Model and Inference of
+Orientation Distribution.” *The Journal of the Acoustical Society of
+America* 93 (5): 2985–88. <https://doi.org/10.1121/1.405818>.
 
-- Goodman, R. R., and Stern, R. (1962). Reflection and transmission of
-  sound by elastic spherical shells. *The Journal of the Acoustical
-  Society of America*, 34, 338-344.
+Chu, Dezhang, and Zhen Ye. 1999. “A Phase-Compensated Distorted Wave
+Born Approximation Representation of the Bistatic Scattering by Weakly
+Scattering Objects: Application to Zooplankton.” *The Journal of the
+Acoustical Society of America* 106 (4): 1732–43.
+<https://doi.org/10.1121/1.428036>.
 
-- Hickling, R. (1962). Analysis of echoes from a solid elastic sphere in
-  water. *The Journal of the Acoustical Society of America*, 34,
-  1582-1592.
+Clay, C. S. 1991. “Low-Resolution Acoustic Scattering Models:
+Fluid-Filled Cylinders and Fish with Swim Bladders.” *The Journal of the
+Acoustical Society of America* 89 (5): 2168–79.
+<https://doi.org/10.1121/1.400910>.
 
-- Rudgers, A. J. (1969). Acoustic pulses scattered by a rigid sphere
-  immersed in a fluid. *The Journal of the Acoustical Society of
-  America*, 45, 900-910.
+Clay, Clarence S. 1992. “Composite Ray‐mode Approximations for
+Backscattered Sound from Gas‐filled Cylinders and Swimbladders.” *The
+Journal of the Acoustical Society of America* 92 (4): 2173–80.
+<https://doi.org/10.1121/1.405211>.
 
-- Foote, K. G. (1990). Spheres for calibration an eleven-frequency
-  acoustic measurement system. *Journal du Conseil International pour
-  l’Exploration de la Mer*, 46, 284-286.
+Clay, Clarence S., and John K. Horne. 1994. “Acoustic Models of Fish:
+The Atlantic Cod (*Gadus Morhua*).” *The Journal of the Acoustical
+Society of America* 96 (3): 1661–68. <https://doi.org/10.1121/1.410245>.
 
-- MacLennan, D. N. (1981). *Target Strength Measurements on Metal
-  Spheres*. Scottish Fisheries Research Report 25.
+Conti, Stéphane G., and David A. Demer. 2006. “Improved Parameterization
+of the SDWBA for Estimating Krill Target Strength.” *ICES Journal of
+Marine Science* 63 (5): 928–35.
+<https://doi.org/10.1016/j.icesjms.2006.02.007>.
 
-- Spencer, R. D., and Granger, S. (1951). The scattering of sound from a
-  prolate spheroid. *The Journal of the Acoustical Society of America*,
-  23, 701-706.
+Demer, David A., and Stephane G. Conti. 2003a. “Reconciling Theoretical
+Versus Empirical Target Strengths of Krill: Effects of Phase Variability
+on the Distorted-Wave Born Approximation.” *ICES Journal of Marine
+Science* 60 (2): 429–34.
+<https://doi.org/10.1016/S1054-3139(03)00002-X>.
 
-- Furusawa, M. (1988). Prolate spheroidal models for predicting general
-  trends of fish target strength. *Journal of the Acoustical Society of
-  Japan*, 9, 13-24.
+Demer, David A., and Stéphane G. Conti. 2003b. “Validation of the
+Stochastic Distorted-Wave Born Approximation Model with Broad Bandwidth
+Total Target Strength Measurements of Antarctic Krill.” *ICES Journal of
+Marine Science* 60 (3): 625–35.
+<https://doi.org/10.1016/S1054-3139(03)00063-8>.
 
-- Stanton, T. K. (1988). Sound scattering by cylinders of finite
-  length. I. Fluid cylinders. *The Journal of the Acoustical Society of
-  America*, 83, 55-63.
+———. 2005. “New Target-Strength Model Indicates More Krill in the
+Southern Ocean.” *ICES Journal of Marine Science* 62 (1): 25–32.
+<https://doi.org/10.1016/j.icesjms.2004.07.027>.
 
-- Stanton, T. K. (1988). Sound scattering by cylinders of finite length.
+Dragonette, Louis R., S. K. Numrich, and Laurence J. Frank. 1981.
+“Calibration Technique for Acoustic Scattering Measurements.” *The
+Journal of the Acoustical Society of America* 69 (4): 1186–89.
+<https://doi.org/10.1121/1.385699>.
 
-  2.  Elastic cylinders. *The Journal of the Acoustical Society of
-      America*, 83, 64-67.
+Faran, James J. 1951. “Sound Scattering by Solid Cylinders and Spheres.”
+*The Journal of the Acoustical Society of America* 23 (4): 405–18.
+<https://doi.org/10.1121/1.1906780>.
 
-- Stanton, T. K. (1989). Sound scattering by cylinders of finite length.
+Feuillade, C., and R. W. Nero. 1998. “A Viscous-Elastic Swimbladder
+Model for Describing Enhanced-Frequency Resonance Scattering from Fish.”
+*The Journal of the Acoustical Society of America* 103 (6): 3245–55.
+<https://doi.org/10.1121/1.423076>.
 
-  3.  Deformed cylinders. *The Journal of the Acoustical Society of
-      America*, 86, 691-705.
+Flammer, Carson. 1957. *Spheroidal Wave Functions*.
+<https://ui.adsabs.harvard.edu/abs/1957spwf.book.....F>.
 
-- Stanton, T. K. (1990). Sound scattering by spherical and elongated
-  shelled bodies. *The Journal of the Acoustical Society of America*,
-  88, 1619-1633.
+Foote, K. G. 1990. “Spheres for Calibrating an Eleven-Frequency Acoustic
+Measurement System.” *ICES Journal of Marine Science* 46 (3): 284–86.
+<https://doi.org/10.1093/icesjms/46.3.284>.
 
-## Approximation, fish, and zooplankton applications
+Furusawa, Masahiko. 1988. “Prolate Spheroidal Models for Predicting
+General Trends of Fish Target Strength.” *Journal of the Acoustical
+Society of Japan (E)* 9 (1): 13–24. <https://doi.org/10.1250/ast.9.13>.
 
-- Chu, D., and Ye, Z. (1999). A phase-compensated distorted wave Born
-  approximation representation of the bistatic scattering by weakly
-  scattering objects: Application to zooplankton. *The Journal of the
-  Acoustical Society of America*, 106, 1732-1743.
+Ganesh, Mahadevan, and Stuart Collin Hawkins. 2008. “A Far Field Based
+T-Matrix Method for Three Dimensional Acoustic Scattering.” *ANZIAM
+Journal* 49 (October): 121.
+<https://doi.org/10.21914/anziamj.v50i0.1441>.
 
-- Clay, C. S. (1991). Low resolution acoustic scattering models:
-  fluid-filled cylinders and fish with swimbladders. *The Journal of the
-  Acoustical Society of America*, 89, 2168-2179.
+Ganesh, M., and Stuart C. Hawkins. 2022. “A Numerically Stable T-Matrix
+Method for Acoustic Scattering by Nonspherical Particles with Large
+Aspect Ratios and Size Parameters.” *The Journal of the Acoustical
+Society of America* 151 (3): 1978–88.
+<https://doi.org/10.1121/10.0009679>.
 
-- Clay, C. S. (1992). Composite ray-mode approximations for
-  backscattered sound from gas-filled cylinders and swimbladders. *The
-  Journal of the Acoustical Society of America*, 92, 2173-2180.
+Gastauer, Sven. 2019. “AustralianAntarcticDivision/ZooScatR: First
+Package Release.” Zenodo. <https://doi.org/10.5281/ZENODO.2536635>.
 
-- Clay, C. S., and Horne, J. K. (1994). Acoustic models of fish: The
-  Atlantic cod (*Gadus morhua*). *The Journal of the Acoustical Society
-  of America*, 96, 1661-1668.
+———. 2025. “SvenGastauer/KRMr: V0.4.8.” Zenodo.
+<https://doi.org/10.5281/ZENODO.15838374>.
 
-- Conti, S. G., and Demer, D. A. (2003). Wide-bandwidth acoustical
-  characterization of anchovy and sardine from reverberation
-  measurements in an echoic tank. *ICES Journal of Marine Science*, 60,
-  617-624.
+Gastauer, Sven, Dezhang Chu, and Martin J. Cox. 2019. “ZooScatR—An
+\<Span Style="font-Variant:small-Caps;"\>r\</Span\> Package for
+Modelling the Scattering Properties of Weak Scattering Targets Using the
+Distorted Wave Born Approximation.” *The Journal of the Acoustical
+Society of America* 145 (1): EL102–8.
+<https://doi.org/10.1121/1.5085655>.
 
-- Conti, S. G., and Demer, D. A. (2006). Improved parameterization of
-  the SDWBA for estimating krill target strength. *ICES Journal of
-  Marine Science*, 63, 928-935.
+Goodman, Ralph R., and Raya Stern. 1962. “Reflection and Transmission of
+Sound by Elastic Spherical Shells.” *The Journal of the Acoustical
+Society of America* 34 (3): 338–44. <https://doi.org/10.1121/1.1928120>.
 
-- Demer, D. A., and Conti, S. G. (2003). Reconciling theoretical versus
-  empirical target strengths of krill: effects of phase variability on
-  the distorted-wave Born approximation. *ICES Journal of Marine
-  Science*, 60, 429-434.
+Gorska, Natalia, Egil Ona, and Rolf Korneliussen. 2005. “Acoustic
+Backscattering by Atlantic Mackerel as Being Representative of Fish That
+Lack a Swimbladder. Backscattering by Individual Fish.” *ICES Journal of
+Marine Science* 62 (5): 984–95.
+<https://doi.org/10.1016/j.icesjms.2005.03.010>.
 
-- Feuillade, C., and Nero, R. W. (1998). A viscous-elastic swimbladder
-  model for describing enhanced-frequency resonance scattering from
-  fish. *The Journal of the Acoustical Society of America*, 103,
-  3245-3255.
+Hackman, Roger H., and Douglas G. Todoroff. 1984. “An Application of the
+Spheroidal-Coordinate-Based Transition Matrix: Acoustic Scattering from
+High Aspect Ratio Solids.” *The Journal of the Acoustical Society of
+America* 76 (S1): S8–8. <https://doi.org/10.1121/1.2022083>.
 
-- Gorska, N., Ona, E., and Korneliussen, R. (2005). Acoustic
-  backscattering by Atlantic mackerel as being representative of fish
-  that lack a swimbladder. *ICES Journal of Marine Science*, 62,
-  984-995.
+Hickling, Robert. 1962. “Analysis of Echoes from a Solid Elastic Sphere
+in Water.” *The Journal of the Acoustical Society of America* 34 (10):
+1582–92. <https://doi.org/10.1121/1.1909055>.
 
-- Horne, J. K., and Jech, J. M. (1999). Multi-frequency estimates of
-  fish abundance: constraints of rather high frequencies. *ICES Journal
-  of Marine Science*, 56, 184-199.
+Jech, J. Michael, John K. Horne, Dezhang Chu, David A. Demer, David T.
+I. Francis, Natalia Gorska, Benjamin Jones, et al. 2015. “Comparisons
+Among Ten Models of Acoustic Backscattering Used in Aquatic Ecosystem
+Research.” *The Journal of the Acoustical Society of America* 138 (6):
+3742–64. <https://doi.org/10.1121/1.4937607>.
 
-- Jech, J. M., Horne, J. K., Chu, D., Demer, D. A., Francis, D. T. I.,
-  Gorska, N., Jones, B., Lavery, A. C., Stanton, T. K., and
-  Reeder, D. B. (2015). Comparisons among ten models of acoustic
-  backscattering used in aquatic ecosystem research. *The Journal of the
-  Acoustical Society of America*, 138, 3742-3764.
+Johnson, Richard K. 1977. “Sound Scattering from a Fluid Sphere
+Revisited.” *The Journal of the Acoustical Society of America* 61 (2):
+375–77. <https://doi.org/10.1121/1.381326>.
 
-- Johnson, R. K. (1977). Sound scattering from a fluid sphere revisited.
-  *The Journal of the Acoustical Society of America*, 61, 375-377.
+Khodabandeloo, Babak, Mette Dalgaard Agersted, Thor Klevjer, Gavin J.
+Macaulay, and Webjørn Melle. 2021. “Estimating Target Strength and
+Physical Characteristics of Gas-Bearing Mesopelagic Fish from Wideband
+*in Situ* Echoes Using a Viscous-Elastic Scattering Model.” *The Journal
+of the Acoustical Society of America* 149 (1): 673–91.
+<https://doi.org/10.1121/10.0003341>.
 
-- Johnson, R. K. (1978). Sound scattering from a fluid sphere:
-  intermediate frequencies. *The Journal of the Acoustical Society of
-  America*, 64, 1498-1505.
+Lucca, Brandyn, and Wu-Jung Lee. 2026. “OSOceanAcoustics/Echopop:
+V0.6.0.” Zenodo. <https://doi.org/10.5281/ZENODO.18975959>.
 
-- Johnson, R. K. (1978). Erratum: Sound scattering from a fluid sphere
-  revisited. *The Journal of the Acoustical Society of America*, 63,
-  626.
+MacLennan, D. N. 1981. “The Theory of Solid Spheres as Sonar Calibration
+Targets.” Scottish Fisheries Research Report 22. Department of
+Agriculture; Fisheries for Scotland.
 
-- Khodabandeloo, B., Agersted, M. D., Klevjer, T., Macaulay, G. J., and
-  Melle, W. (2021). Estimating target strength and physical
-  characteristics of gas-bearing mesopelagic fish from wideband in situ
-  echoes using a viscous-elastic scattering model. *The Journal of the
-  Acoustical Society of America*, 149, 673-691.
+McGehee, D. E., R. L. O’Driscoll, and L. V.Martin Traykovski. 1998.
+“Effects of Orientation on Acoustic Scattering from Antarctic Krill at
+120 kHz.” *Deep Sea Research Part II: Topical Studies in Oceanography*
+45 (7): 1273–94. <https://doi.org/10.1016/S0967-0645(98)00036-8>.
 
-- McGehee, D. E., O’Driscoll, R. L., and Martin Traykovski, L. V.
-  (1998). Effects of orientation on acoustic scattering from Antarctic
-  krill at 120 kHz. *Deep-Sea Research Part II: Topical Studies in
-  Oceanography*, 45, 1273-1294.
+Medwin, Herman, and Clarence S. Clay. 1998. *Fundamentals of Acoustical
+Oceanography*. Boston: Academic Press.
 
-- Stanton, T. K. (1989). Simple approximate formulas for backscattering
-  of sound by spherical and elongated objects. *The Journal of the
-  Acoustical Society of America*, 86, 1499-1510.
+Morse, Philip M., and K. Uno Ingard. 1986. *Theoretical Acoustics*.
+Princeton, N.J: Princeton University Press.
 
-- Stanton, T. K., Chu, D., Wiebe, P. H., and Clay, C. S. (1993). Average
-  echoes from randomly oriented random-length finite cylinders:
-  zooplankton models. *The Journal of the Acoustical Society of
-  America*, 94, 3463-3472.
+Rudgers, Anthony J. 1969. “Acoustic Pulses Scattered by a Rigid Sphere
+Immersed in a Fluid.” *The Journal of the Acoustical Society of America*
+45 (4): 900–910. <https://doi.org/10.1121/1.1911567>.
 
-- Stanton, T. K., Chu, D., Wiebe, P. H., Martin, L. V., and
-  Eastwood, R. L. (1998). Sound scattering by several zooplankton
-  groups. I. Experimental determination of dominant scattering
-  mechanisms. *The Journal of the Acoustical Society of America*, 103,
-  225-235.
+Spence, R. D., and Sara Granger. 1951. “The Scattering of Sound from a
+Prolate Spheroid.” *The Journal of the Acoustical Society of America* 23
+(6): 701–6. <https://doi.org/10.1121/1.1906827>.
 
-- Stanton, T. K., Chu, D., and Wiebe, P. H. (1998). Sound scattering by
-  several zooplankton groups. II. Scattering models. *The Journal of the
-  Acoustical Society of America*, 103, 236-253.
+Stanton, T. 1996. “Acoustic Scattering Characteristics of Several
+Zooplankton Groups.” *ICES Journal of Marine Science* 53 (2): 289–95.
+<https://doi.org/10.1006/jmsc.1996.0037>.
 
-## T-matrix and nonspherical scattering
+Stanton, T. K. 1988. “Sound Scattering by Cylinders of Finite Length. I.
+Fluid Cylinders.” *The Journal of the Acoustical Society of America* 83
+(1): 55–63. <https://doi.org/10.1121/1.396184>.
 
-- Ganesh, M., and Hawkins, S. C. (2008). A far-field based T-matrix
-  method for three dimensional acoustic scattering. *Wave Motion*, 45,
-  1441-1460.
+———. 1989. “Sound Scattering by Cylinders of Finite Length. III.
+Deformed Cylinders.” *The Journal of the Acoustical Society of America*
+86 (2): 691–705. <https://doi.org/10.1121/1.398193>.
 
-- Ganesh, M., and Hawkins, S. C. (2022). A numerically stable T-matrix
-  method for acoustic scattering by nonspherical particles with large
-  aspect ratios and size parameters. *The Journal of the Acoustical
-  Society of America*, 151, 1978-1988.
+———. 1990. “Sound Scattering by Spherical and Elongated Shelled Bodies.”
+*The Journal of the Acoustical Society of America* 88 (3): 1619–33.
+<https://doi.org/10.1121/1.400321>.
 
-- Hackman, R. H. (1984). An application of the
-  spheroidal-coordinate-based transition matrix: The acoustic scattering
-  from high aspect ratio solids. *The Journal of the Acoustical Society
-  of America*, 76, 1058-1070.
+Stanton, Timothy K. 1989. “Simple Approximate Formulas for
+Backscattering of Sound by Spherical and Elongated Objects.” *The
+Journal of the Acoustical Society of America* 86 (4): 1499–1510.
+<https://doi.org/10.1121/1.398711>.
 
-- Varadan, V. K., Varadan, V. V., Bringi, V. N., and Waterman, P. C.
-  (1982). Computation of rigid body scattering by prolate spheroids
-  using the T-matrix approach. *The Journal of the Acoustical Society of
-  America*, 71, 22-25.
+Stanton, Timothy K., Dezhang Chu, and Peter H. Wiebe. 1998. “Sound
+Scattering by Several Zooplankton Groups. II. Scattering Models.” *The
+Journal of the Acoustical Society of America* 103 (1): 236–53.
+<https://doi.org/10.1121/1.421110>.
 
-- Waterman, P. C. (1969). New formulation of acoustic scattering. *The
-  Journal of the Acoustical Society of America*, 45, 1417-1429.
+Stanton, Timothy K., Dezhang Chu, Peter H. Wiebe, and Clarence S. Clay.
+1993. “Average Echoes from Randomly Oriented Random‐length Finite
+Cylinders: Zooplankton Models.” *The Journal of the Acoustical Society
+of America* 94 (6): 3463–72. <https://doi.org/10.1121/1.407200>.
 
-- Waterman, P. C. (2009). T-matrix methods in acoustic scattering. *The
-  Journal of the Acoustical Society of America*, 125, 42-51.
+Stanton, Timothy K., Dezhang Chu, Peter H. Wiebe, Linda V. Martin, and
+Robert L. Eastwood. 1998. “Sound Scattering by Several Zooplankton
+Groups. I. Experimental Determination of Dominant Scattering
+Mechanisms.” *The Journal of the Acoustical Society of America* 103 (1):
+225–35. <https://doi.org/10.1121/1.421469>.
 
-## Software and external resources
+Varadan, V. K., V. V. Varadan, Louis R. Dragonette, and Lawrence Flax.
+1982. “Computation of Rigid Body Scattering by Prolate Spheroids Using
+the *t* -Matrix Approach.” *The Journal of the Acoustical Society of
+America* 71 (1): 22–25. <https://doi.org/10.1121/1.387311>.
 
-- Jech, M., and Macaulay, G. *echoSMs*: Acoustic backscattering models
-  used in aquatic ecosystem research. GitHub repository:
-  <https://github.com/ices-tools-dev/echoSMs>
+Waterman, P. C. 1969. “New Formulation of Acoustic Scattering.” *The
+Journal of the Acoustical Society of America* 45 (6): 1417–29.
+<https://doi.org/10.1121/1.1911619>.
 
-- NOAA Fisheries. KRM model reference collection.
-  <https://www.fisheries.noaa.gov/data-tools/krm-model>
+———. 2009. “T -Matrix Methods in Acoustic Scattering.” *The Journal of
+the Acoustical Society of America* 125 (1): 42–51.
+<https://doi.org/10.1121/1.3035839>.

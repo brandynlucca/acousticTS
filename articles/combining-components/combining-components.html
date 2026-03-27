@@ -113,6 +113,11 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
+<p>Component combination becomes most important in fish-like targets
+where anatomically distinct regions scatter in different regimes <span class="citation">(<a href="#ref-clay_horne_1994">Clay and Horne
+1994</a>; <a href="#ref-gorska_etal_2005">Gorska, Ona, and Korneliussen
+2005</a>; <a href="#ref-stanton_acoustic_1996">Stanton
+1996</a>)</span>.</p>
 <p>It is often tempting to build a composite target by running two
 canonical models separately and then combining the results. In a few
 restricted cases, that can be a useful first approximation. In many
@@ -449,14 +454,14 @@ response of a composite target.</p>
 <div class="section level2">
 <h2 id="connection-to-package-workflows">Connection to package workflows<a class="anchor" aria-label="anchor" href="#connection-to-package-workflows"></a>
 </h2>
-<p>This cautionary logic is exactly why <code>acousticTS</code>
-distinguishes between comparing models and combining components.
-Comparing models asks how different formulations behave on the same
-target. Combining components asks whether separate subtargets can be
-turned into one composite prediction. Those are not interchangeable
-tasks. A model-comparison workflow can often be rigorous with matched
-inputs, while a component-combination workflow usually requires much
-stronger physical assumptions.</p>
+<p>This cautionary logic is exactly why acousticTS distinguishes between
+comparing models and combining components. Comparing models asks how
+different formulations behave on the same target. Combining components
+asks whether separate subtargets can be turned into one composite
+prediction. Those are not interchangeable tasks. A model-comparison
+workflow can often be rigorous with matched inputs, while a
+component-combination workflow usually requires much stronger physical
+assumptions.</p>
 </div>
 <div class="section level2">
 <h2 id="final-rule">Final rule<a class="anchor" aria-label="anchor" href="#final-rule"></a>
@@ -468,6 +473,30 @@ subscatterers whose complex amplitudes may be added with a common phase
 reference as a first-order approximation? Only if the answer to that
 narrower question is yes does coherent component summation become
 plausible.</p>
+</div>
+<div class="section level2">
+<h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
+</h2>
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="ref-clay_horne_1994" class="csl-entry">
+Clay, Clarence S., and John K. Horne. 1994. <span>“Acoustic Models of
+Fish: <span>The</span> <span>Atlantic</span> Cod (<em><span>Gadus</span>
+Morhua</em>).”</span> <em>The Journal of the Acoustical Society of
+America</em> 96 (3): 1661–68. <a href="https://doi.org/10.1121/1.410245" class="external-link">https://doi.org/10.1121/1.410245</a>.
+</div>
+<div id="ref-gorska_etal_2005" class="csl-entry">
+Gorska, Natalia, Egil Ona, and Rolf Korneliussen. 2005. <span>“Acoustic
+Backscattering by <span>Atlantic</span> Mackerel as Being Representative
+of Fish That Lack a Swimbladder. <span>Backscattering</span> by
+Individual Fish.”</span> <em>ICES Journal of Marine Science</em> 62 (5):
+984–95. <a href="https://doi.org/10.1016/j.icesjms.2005.03.010" class="external-link">https://doi.org/10.1016/j.icesjms.2005.03.010</a>.
+</div>
+<div id="ref-stanton_acoustic_1996" class="csl-entry">
+Stanton, T. 1996. <span>“Acoustic Scattering Characteristics of Several
+Zooplankton Groups.”</span> <em>ICES Journal of Marine Science</em> 53
+(2): 289–95. <a href="https://doi.org/10.1006/jmsc.1996.0037" class="external-link">https://doi.org/10.1006/jmsc.1996.0037</a>.
+</div>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

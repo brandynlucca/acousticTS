@@ -2,7 +2,12 @@
 
 ## Introduction
 
-One of the most useful features of `acousticTS` is that a new
+Building a model from scratch is easiest when the geometry, basis, and
+approximation regime stay aligned with the canonical scattering
+literature ([Morse and Ingard 1986](#ref-morse_theoretical_1986);
+[Waterman 2009](#ref-waterman_t_2009)).
+
+One of the most useful features of acousticTS is that a new
 target-strength model does not need a large registration framework. The
 package’s
 [`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md)
@@ -305,3 +310,12 @@ this pattern. If you provide a correctly named initializer and a
 correctly named model function,
 [`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md)
 can do the rest.
+
+## References
+
+Morse, Philip M., and K. Uno Ingard. 1986. *Theoretical Acoustics*.
+Princeton, N.J: Princeton University Press.
+
+Waterman, P. C. 2009. “T -Matrix Methods in Acoustic Scattering.” *The
+Journal of the Acoustical Society of America* 125 (1): 42–51.
+<https://doi.org/10.1121/1.3035839>.

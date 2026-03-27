@@ -2,6 +2,13 @@
 
 ## Introduction
 
+The shape pathways on this page are most useful when read against the
+canonical geometries that dominate the scattering literature, especially
+spheres, cylinders, spheroids, and piecewise elongated bodies ([Waterman
+2009](#ref-waterman_t_2009); [Flammer
+1957](#ref-flammer_spheroidal_1957); [Stanton
+1988](#ref-stanton_sound_1988)).
+
 Geometry is the first major decision in the package. Before choosing a
 scatterer class or a target-strength model, it is usually worth deciding
 whether the target is best represented as a canonical shape or as a
@@ -227,3 +234,16 @@ scatterers](https://brandynlucca.github.io/acousticTS/articles/building-scattere
 where material properties, contrasts, and target type are added to the
 geometric object. That is the stage where a shape becomes a model-ready
 acoustic target.
+
+## References
+
+Flammer, Carson. 1957. *Spheroidal Wave Functions*.
+<https://ui.adsabs.harvard.edu/abs/1957spwf.book.....F>.
+
+Stanton, T. K. 1988. “Sound Scattering by Cylinders of Finite Length. I.
+Fluid Cylinders.” *The Journal of the Acoustical Society of America* 83
+(1): 55–63. <https://doi.org/10.1121/1.396184>.
+
+Waterman, P. C. 2009. “T -Matrix Methods in Acoustic Scattering.” *The
+Journal of the Acoustical Society of America* 125 (1): 42–51.
+<https://doi.org/10.1121/1.3035839>.
