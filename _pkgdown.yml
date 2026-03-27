@@ -8,7 +8,7 @@ template:
 
 navbar:
   structure:
-    left: [intro, physics, build, run, library, bibliography, developers, reference, news]
+    left: [intro, physics, build, run, library, developers, bibliography, reference, news]
     right: [github]
   components:
     intro:
@@ -60,7 +60,7 @@ navbar:
         - text: "Validating models"
           href: articles/validation-benchmarks/validation-benchmarks.html
     library:
-      text: Model Library
+      text: Models
       href: articles/model-library/model-library.html
     bibliography:
       text: Bibliography
@@ -114,13 +114,19 @@ articles:
       - calibration-workflow/calibration-workflow
       - validation-benchmarks/validation-benchmarks
 
-  - title: Bibliography
-    contents:
-      - bibliography/bibliography
-
   - title: Model Library
     contents:
       - model-library/model-library
+
+  - title: Developer Guides
+    contents:
+      - creating-models-from-scratch/creating-models-from-scratch
+      - combining-components/combining-components
+      - faq-troubleshooting/faq-troubleshooting
+
+  - title: Bibliography
+    contents:
+      - bibliography/bibliography
 
   - title: Exact, Modal-Series, and T-Matrix Families
     contents:
@@ -175,12 +181,6 @@ articles:
       - bbfm/index
       - bbfm/bbfm-implementation
       - bbfm/bbfm-theory
-
-  - title: Developer Guides
-    contents:
-      - creating-models-from-scratch/creating-models-from-scratch
-      - combining-components/combining-components
-      - faq-troubleshooting/faq-troubleshooting
 
 reference:
   - title: Core Workflows
