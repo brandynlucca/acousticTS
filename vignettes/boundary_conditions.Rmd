@@ -9,7 +9,7 @@ output:
     fig_height: 3.5
     dpi: 200
     dev.args: list(pointsize=11)
-bibliography: ../REFERENCES.bib
+bibliography: REFERENCES.bib
 link-citations: true
 reference-section-title: References
 vignette: >
