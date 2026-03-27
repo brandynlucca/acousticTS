@@ -52,13 +52,11 @@ cal_generate(
 
 - diameter_units:
 
-  Compatibility argument. `cal_generate()` now assumes meters and
-  ignores non-SI alternatives.
+  Units for diameter. Defaults to "m".
 
 - theta_units:
 
-  Compatibility argument. `cal_generate()` now assumes radians and
-  ignores non-SI alternatives.
+  Units for direction. Defaults to "radians".
 
 - n_segments:
 
@@ -83,19 +81,3 @@ There are several options for the **material** argument:
 ## See also
 
 [`CAL`](https://brandynlucca.github.io/acousticTS/reference/CAL-class.md)
-
-## Examples
-
-``` r
-cal_generate(material = "WC", diameter = 38.1e-3, n_segments = 120)
-#> CAL-object
-#>  Calibration sphere
-#>  ID:Calibration sphere
-#> Material:WC
-#>  Sphere longitudinal sound speed:6853m/s
-#>  Sphere transversal sound speed:4171m/s
-#>  Sphere density:14900kg/m^3
-#> Diameter:0.0381 m
-#>  Radius:0.01905 m
-#> Propagation direction of the incident sound wave:3.142 radians
-```

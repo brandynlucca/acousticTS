@@ -5,13 +5,8 @@ Creates a polynomial deformed cylinder
 ## Usage
 
 ``` r
-polynomial_cylinder(
-  length_body,
-  radius_body,
-  n_segments = 100,
-  polynomial,
-  length_units = "m"
-)
+polynomial_cylinder(length_body, radius_body, n_segments, polynomial,
+length_units)
 ```
 
 ## Arguments

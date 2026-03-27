@@ -13,8 +13,3 @@ cal_show(object)
 - object:
 
   CAL-class object.
-
-## Value
-
-Called for its side effect of printing a formatted summary; invisibly
-returns `NULL`.

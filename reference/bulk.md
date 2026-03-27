@@ -1,11 +1,10 @@
 # Calculate the bulk modulus (K).
 
-Calculates the bulk modulus (K) from two of the three other elastic
-moduli: Young's modulus (E), shear modulus (G), or Poisson's ratio
-(\\\nu\\). Assumes 3D material properties.
-
-The relationships used are: \$\$K = \frac{E G}{3(3G - E)}\$\$ \$\$K =
-\frac{2G(1 + \nu)}{3(1 - 2\nu)}\$\$ \$\$K = \frac{E}{3(1 - 2\nu)}\$\$
+Calculate the bulk modulus (K) from two of the three other elastic
+moduli to calculate the Lamé's parameter. When more than two values are
+input, the function will default to using Young's (E) and shear (G)
+moduli. This assumes that the input values represent 3D material
+properties.
 
 ## Usage
 
@@ -29,4 +28,4 @@ bulk(E = NULL, G = NULL, nu = NULL)
 
 ## Value
 
-Bulk modulus (K, Pa).
+Returns an estimate for the bulk modulus (K).

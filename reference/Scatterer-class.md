@@ -1,6 +1,6 @@
 # Scatterer-class object for target strength estimation
 
-The `acousticTS` package uses a variety of defined S4-class objects
+The \\acousticTS\\ package uses a variety of defined S4-class objects
 comprising different types of scatterers, such as fish with gas-filled
 swimbladders
 ([SBF](https://brandynlucca.github.io/acousticTS/reference/SBF-class.md))
@@ -81,15 +81,6 @@ and fluid-like crustaceans
   linear domain (i.e. σ_(bs)).
 
 ## Supported Scatterers
-
-- `Elastic-based scatterers`
-  ([ELA](https://brandynlucca.github.io/acousticTS/reference/ELA-class.md))
-
-- `Composite multi-component scatterers`
-  ([CSC](https://brandynlucca.github.io/acousticTS/reference/CSC-class.md))
-
-- `Backboned fish`
-  ([BBF](https://brandynlucca.github.io/acousticTS/reference/BBF-class.md))
 
 - `Calibration spheres`
   ([CAL](https://brandynlucca.github.io/acousticTS/reference/CAL-class.md))

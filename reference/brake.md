@@ -5,12 +5,12 @@ Support function for bending scatterer body shape and position matrix
 ## Usage
 
 ``` r
-brake(object, radius_curvature, mode = "ratio")
+brake(input, radius_curvature, mode = "ratio")
 ```
 
 ## Arguments
 
-- object:
+- input:
 
   Dataframe or scatterer-class object
 
@@ -22,8 +22,3 @@ brake(object, radius_curvature, mode = "ratio")
 - mode:
 
   Either "ratio" or "measurement"
-
-## Value
-
-A bent version of `object`, returned as the same broad object type with
-updated geometry and curvature metadata.
