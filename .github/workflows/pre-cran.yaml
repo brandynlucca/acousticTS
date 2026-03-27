@@ -70,9 +70,9 @@ jobs:
           F77=gfortran
           EOF
           {
-            echo "PKG_CPPFLAGS=-I$GCC_INCLUDE"
-            echo "PKG_LIBS+=-L$GFORTRAN_LIBDIR -L$QUADMATH_LIBDIR"
-          } >> ~/.R/Makevars
+            echo "CPATH=$GCC_INCLUDE"
+            echo "LIBRARY_PATH=$GFORTRAN_LIBDIR:$QUADMATH_LIBDIR"
+          } >> "$GITHUB_ENV"
         shell: bash
 
       - uses: r-lib/actions/setup-r-dependencies@v2
