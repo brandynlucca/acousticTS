@@ -19,8 +19,8 @@
   # Confirm that retained modal blocks are actually available ==================
   t_store <- model_params$parameters$t_matrix
   if (is.null(t_store) ||
-      !length(t_store) ||
-      all(vapply(t_store, is.null, logical(1)))) {
+    !length(t_store) ||
+    all(vapply(t_store, is.null, logical(1)))) {
     stop(
       "Stored T-matrix blocks are required for this helper. Re-run ",
       "'target_strength(..., model = \"TMM\", store_t_matrix = TRUE)'.",
@@ -187,11 +187,11 @@
 .tmm_validate_scattering_grid_dims <- function(n_theta, n_phi) {
   # Require at least two samples along each angular axis =======================
   if (!is.numeric(n_theta) || length(n_theta) != 1 || !is.finite(n_theta) ||
-      n_theta < 2 || n_theta %% 1 != 0) {
+    n_theta < 2 || n_theta %% 1 != 0) {
     stop("'n_theta' must be a single integer >= 2.", call. = FALSE)
   }
   if (!is.numeric(n_phi) || length(n_phi) != 1 || !is.finite(n_phi) ||
-      n_phi < 2 || n_phi %% 1 != 0) {
+    n_phi < 2 || n_phi %% 1 != 0) {
     stop("'n_phi' must be a single integer >= 2.", call. = FALSE)
   }
 
@@ -372,7 +372,7 @@
   n_eval <- length(theta_body)
 
   if (!all(c(length(phi_body), length(theta_scatter), length(phi_scatter)) ==
-           n_eval)) {
+    n_eval)) {
     stop(
       "Stored TMM point evaluations require equal-length angle vectors.",
       call. = FALSE
@@ -606,8 +606,7 @@ tmm_scattering <- function(object,
   )
 
   # Dispatch the retained evaluation through the active coordinate backend =====
-  f_scat <- switch(
-    parameters$coordinate_system,
+  f_scat <- switch(parameters$coordinate_system,
     spherical = .tmm_scattering_spherical(
       t_store = parameters$t_matrix,
       acoustics = acoustics,
@@ -649,10 +648,10 @@ tmm_scattering <- function(object,
 #' @noRd
 .tmm_validate_orientation_n_theta <- function(n_theta) {
   if (!is.numeric(n_theta) ||
-      length(n_theta) != 1 ||
-      !is.finite(n_theta) ||
-      n_theta < 1 ||
-      n_theta %% 1 != 0) {
+    length(n_theta) != 1 ||
+    !is.finite(n_theta) ||
+    n_theta < 1 ||
+    n_theta %% 1 != 0) {
     stop("'n_theta' must be a single positive integer.", call. = FALSE)
   }
 
@@ -662,14 +661,14 @@ tmm_scattering <- function(object,
 #' @noRd
 .tmm_validate_orientation_interval <- function(lower, upper, distribution) {
   if (!is.numeric(lower) ||
-      !is.numeric(upper) ||
-      length(lower) != 1 ||
-      length(upper) != 1 ||
-      !is.finite(lower) ||
-      !is.finite(upper) ||
-      lower < 0 ||
-      upper > pi ||
-      lower >= upper) {
+    !is.numeric(upper) ||
+    length(lower) != 1 ||
+    length(upper) != 1 ||
+    !is.finite(lower) ||
+    !is.finite(upper) ||
+    lower < 0 ||
+    upper > pi ||
+    lower >= upper) {
     stop(
       "'",
       distribution,
@@ -684,12 +683,12 @@ tmm_scattering <- function(object,
 #' @noRd
 .tmm_validate_orientation_normal <- function(mean_theta, sd_theta) {
   if (!is.numeric(mean_theta) ||
-      length(mean_theta) != 1 ||
-      !is.finite(mean_theta) ||
-      !is.numeric(sd_theta) ||
-      length(sd_theta) != 1 ||
-      !is.finite(sd_theta) ||
-      sd_theta <= 0) {
+    length(mean_theta) != 1 ||
+    !is.finite(mean_theta) ||
+    !is.numeric(sd_theta) ||
+    length(sd_theta) != 1 ||
+    !is.finite(sd_theta) ||
+    sd_theta <= 0) {
     stop(
       "'mean_theta' and 'sd_theta' must be finite numeric scalars ",
       "and 'sd_theta' must be > 0.",
@@ -713,10 +712,10 @@ tmm_scattering <- function(object,
     weights <- rep(1 / length(theta_body), length(theta_body))
   } else {
     if (!is.numeric(weights) ||
-        length(weights) != length(theta_body) ||
-        any(!is.finite(weights)) ||
-        any(weights < 0) ||
-        sum(weights) <= 0) {
+      length(weights) != length(theta_body) ||
+      any(!is.finite(weights)) ||
+      any(weights < 0) ||
+      sum(weights) <= 0) {
       stop(
         "'weights' must be a non-negative numeric vector with the same ",
         "length as 'theta_body'.",
@@ -948,8 +947,8 @@ tmm_scattering_grid <- function(object,
 
   # Validate the requested frequency and find the nearest stored match =========
   if (!is.numeric(frequency) ||
-      length(frequency) != 1 ||
-      !is.finite(frequency)) {
+    length(frequency) != 1 ||
+    !is.finite(frequency)) {
     stop("'frequency' must be a single finite value in Hz.", call. = FALSE)
   }
 

@@ -249,11 +249,11 @@ dwba_curved_initialize <- function(object,
   body <- extract(object, "body")
   # Bend body ==================================================================
   body <- brake(body,
-                radius_curvature = ifelse(!is.null(radius_curvature_ratio),
-                                          radius_curvature_ratio,
-                                          body$radius_curvature_ratio
-                ),
-                mode = "ratio"
+    radius_curvature = ifelse(!is.null(radius_curvature_ratio),
+      radius_curvature_ratio,
+      body$radius_curvature_ratio
+    ),
+    mode = "ratio"
   )
   # Define medium parameters ===================================================
   medium_params <- data.frame(

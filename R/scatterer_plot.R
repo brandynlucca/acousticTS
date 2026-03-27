@@ -63,33 +63,33 @@ plot.Scatterer <- function(x,
   sc_type <- class(x)
   # Switch to sub-class-specific plotting method ===============================
   switch(sc_type,
-         CAL = cal_plot(
-           object = x, type = type, nudge_y = nudge_y, nudge_x = nudge_x,
-           x_units = x_units, ...
-         ),
-         ESS = ess_plot(
-           object = x, type = type, nudge_y = nudge_y, nudge_x = nudge_x,
-           x_units = x_units, y_units = y_units, ...
-         ),
-         SBF = sbf_plot(
-           object = x, type = type, nudge_y = nudge_y, nudge_x = nudge_x,
-           aspect_ratio = aspect_ratio, x_units = x_units, y_units = y_units,
-           ...
-         ),
-         BBF = bbf_plot(
-           object = x, type = type, nudge_y = nudge_y, nudge_x = nudge_x,
-           aspect_ratio = aspect_ratio, x_units = x_units, y_units = y_units,
-           ...
-         ),
-         FLS = fls_plot(
-           object = x, type = type, nudge_y = nudge_y, nudge_x = nudge_x,
-           aspect_ratio = aspect_ratio, x_units = x_units, y_units = y_units,
-           ...
-         ),
-         GAS = gas_plot(
-           object = x, type = type, nudge_y = nudge_y, nudge_x = nudge_x,
-           x_units = x_units, y_units = y_units, ...
-         )
+    CAL = cal_plot(
+      object = x, type = type, nudge_y = nudge_y, nudge_x = nudge_x,
+      x_units = x_units, ...
+    ),
+    ESS = ess_plot(
+      object = x, type = type, nudge_y = nudge_y, nudge_x = nudge_x,
+      x_units = x_units, y_units = y_units, ...
+    ),
+    SBF = sbf_plot(
+      object = x, type = type, nudge_y = nudge_y, nudge_x = nudge_x,
+      aspect_ratio = aspect_ratio, x_units = x_units, y_units = y_units,
+      ...
+    ),
+    BBF = bbf_plot(
+      object = x, type = type, nudge_y = nudge_y, nudge_x = nudge_x,
+      aspect_ratio = aspect_ratio, x_units = x_units, y_units = y_units,
+      ...
+    ),
+    FLS = fls_plot(
+      object = x, type = type, nudge_y = nudge_y, nudge_x = nudge_x,
+      aspect_ratio = aspect_ratio, x_units = x_units, y_units = y_units,
+      ...
+    ),
+    GAS = gas_plot(
+      object = x, type = type, nudge_y = nudge_y, nudge_x = nudge_x,
+      x_units = x_units, y_units = y_units, ...
+    )
   )
 }
 ################################################################################

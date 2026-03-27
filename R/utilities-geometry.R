@@ -618,8 +618,7 @@ segmentize <- function(x1, x0) {
   x_center <- mean(range(body$rpos[1, ]))
 
   # Evaluate the canonical radius profile for the requested shape ==============
-  radius_nodes <- switch(
-    shape_class,
+  radius_nodes <- switch(shape_class,
     Sphere = {
       radius_body <- as.numeric(shape$radius)[1]
       v <- seq(0, pi, length.out = n_nodes)
@@ -632,13 +631,13 @@ segmentize <- function(x1, x0) {
     },
     ProlateSpheroid = {
       semi_major <- if ("semimajor_length" %in% names(shape) &&
-                        !is.null(shape$semimajor_length)) {
+        !is.null(shape$semimajor_length)) {
         as.numeric(shape$semimajor_length)[1]
       } else {
         as.numeric(shape$length)[1] / 2
       }
       semi_minor <- if ("semiminor_length" %in% names(shape) &&
-                        !is.null(shape$semiminor_length)) {
+        !is.null(shape$semiminor_length)) {
         as.numeric(shape$semiminor_length)[1]
       } else {
         as.numeric(shape$radius)[1]
@@ -736,8 +735,7 @@ segmentize <- function(x1, x0) {
   n_nodes <- shape$n_segments + 1
 
   # Evaluate the canonical KRM radius profile for the requested shape ==========
-  prof <- switch(
-    shape_class,
+  prof <- switch(shape_class,
     Sphere = {
       radius_body <- as.numeric(shape$radius)[1]
       v <- seq(-pi / 2, pi / 2, length.out = n_nodes)
@@ -748,13 +746,13 @@ segmentize <- function(x1, x0) {
     },
     ProlateSpheroid = {
       semi_major <- if ("semimajor_length" %in% names(shape) &&
-                        !is.null(shape$semimajor_length)) {
+        !is.null(shape$semimajor_length)) {
         as.numeric(shape$semimajor_length)[1]
       } else {
         as.numeric(shape$length)[1] / 2
       }
       semi_minor <- if ("semiminor_length" %in% names(shape) &&
-                        !is.null(shape$semiminor_length)) {
+        !is.null(shape$semiminor_length)) {
         as.numeric(shape$semiminor_length)[1]
       } else {
         max(as.numeric(shape$radius), na.rm = TRUE)
@@ -876,7 +874,7 @@ sdwba_resample <- function(object, n_segments) {
       indices <- indices[indices <= length(new_radius)]
     } else {
       indices <- which(x_new_seg >= orig_x[i] &
-                         x_new_seg < orig_x[i + 1])
+        x_new_seg < orig_x[i + 1])
     }
     new_radius[indices] <<- body$radius[i + 1]
   })

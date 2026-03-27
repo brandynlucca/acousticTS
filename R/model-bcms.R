@@ -57,8 +57,7 @@ NULL
 .bcms_resolve_boundary <- function(object, boundary) {
   # Derive the default boundary from the scatterer class when omitted ==========
   if (is.null(boundary)) {
-    return(switch(
-      class(object),
+    return(switch(class(object),
       FLS = "liquid_filled",
       GAS = "gas_filled",
       stop("BCMS currently supports 'FLS' and 'GAS' cylinder scatterers only.")
@@ -83,8 +82,8 @@ NULL
 .bcms_warn_approximation_regime <- function(shape, body, stationary_phase) {
   # Warn when the bent-cylinder correction is used away from broadside =========
   if (!is.null(shape$radius_curvature_ratio) &&
-      !is.na(shape$radius_curvature_ratio) &&
-      abs(body$theta - pi / 2) > pi / 18) {
+    !is.na(shape$radius_curvature_ratio) &&
+    abs(body$theta - pi / 2) > pi / 18) {
     warning(
       "BCMS bent-cylinder correction is intended for broadside or near-",
       "broadside incidence."
@@ -155,8 +154,10 @@ bcms_initialize <- function(object,
   # Resolve the supported boundary alias =======================================
   boundary <- .bcms_resolve_boundary(object, boundary)
   # Hydrate the body contrasts and warn on limited regimes =====================
-  body <- .hydrate_contrasts(extract(object, "body"),
-                             sound_speed_sw, density_sw)
+  body <- .hydrate_contrasts(
+    extract(object, "body"),
+    sound_speed_sw, density_sw
+  )
   .bcms_warn_approximation_regime(shape, body, stationary_phase)
   # Resolve the modal truncation limit =========================================
   m_limit <- .bcms_resolve_m_limit(
@@ -181,8 +182,7 @@ bcms_initialize <- function(object,
           lambda = sound_speed_sw / frequency,
           m_limit = m_limit
         ),
-        Bm_method = switch(
-          boundary,
+        Bm_method = switch(boundary,
           liquid_filled = "Bm_fluid",
           gas_filled = "Bm_fluid",
           fixed_rigid = "Bm_rigid",
@@ -207,8 +207,7 @@ bcms_initialize <- function(object,
   k2a <- acoustics$k_sw * sin(body$theta) / body$h * body$radius
   gh <- body$g * body$h
   # Evaluate the boundary-condition coefficients ===============================
-  Bm <- switch(
-    bm_method,
+  Bm <- switch(bm_method,
     Bm_fluid = .fcms_bm_fluid(k1a, k2a, gh, nu, acoustics$m_limit),
     Bm_rigid = .fcms_bm_fixed_rigid(k1a, nu, acoustics$m_limit),
     Bm_pressure_release = .fcms_bm_pressure_release(k1a, nu, acoustics$m_limit)

@@ -77,7 +77,8 @@
     sections <- c(
       sections,
       paste0("## Main assumptions\n\n", paste0("- ", assumptions,
-                                               collapse = "\n"))
+        collapse = "\n"
+      ))
     )
   }
 
@@ -85,7 +86,8 @@
     sections <- c(
       sections,
       paste0("## Validation status\n\n", paste0("- ", validation,
-                                                collapse = "\n"))
+        collapse = "\n"
+      ))
     )
   }
 

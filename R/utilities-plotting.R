@@ -364,7 +364,7 @@
     context = "segmented body plot"
   )
   z_center <- if (!is.null(rownames(rpos)) &&
-      any(c("z", "z_body", "z_bladder") %in% rownames(rpos))) {
+    any(c("z", "z_body", "z_bladder") %in% rownames(rpos))) {
     .extract_shape_component_row(
       rpos,
       c("z", "z_body", "z_bladder"),
@@ -477,7 +477,7 @@
 
   width <- fields$w
   if (all(is.na(width)) || max(abs(width), na.rm = TRUE) <=
-      sqrt(.Machine$double.eps)) {
+    sqrt(.Machine$double.eps)) {
     width <- 2 * radius
   }
 
@@ -503,16 +503,16 @@
 #' @keywords internal
 #' @noRd
 .plot_profile_component_panels <- function(
-    primary_rpos,
-    primary_radius = NULL,
-    secondary_rpos = NULL,
-    secondary_radius = NULL,
-    primary_label = "Body",
-    secondary_label = "Internal component",
-    secondary_col = "red",
-    nudge_y = 1.05,
-    nudge_x = 1.01
-  ) {
+  primary_rpos,
+  primary_radius = NULL,
+  secondary_rpos = NULL,
+  secondary_radius = NULL,
+  primary_label = "Body",
+  secondary_label = "Internal component",
+  secondary_col = "red",
+  nudge_y = 1.05,
+  nudge_x = 1.01
+) {
   # Recover the outline data for the primary and optional secondary component ==
   primary <- .component_profile_outline(primary_rpos, radius = primary_radius)
   secondary <- if (!is.null(secondary_rpos)) {

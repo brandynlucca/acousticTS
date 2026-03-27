@@ -139,8 +139,10 @@ fcms_initialize <- function(object,
     )
   }
   # Parse body =================================================================
-  body <- .hydrate_contrasts(extract(object, "body"),
-                             sound_speed_sw, density_sw)
+  body <- .hydrate_contrasts(
+    extract(object, "body"),
+    sound_speed_sw, density_sw
+  )
   # Define model parameters recipe =============================================
   model_params <- list(
     acoustics = .init_acoustics_df(
@@ -162,8 +164,7 @@ fcms_initialize <- function(object,
     )
   }
   # Assign method ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  model_params$Bm_method <- switch(
-    boundary,
+  model_params$Bm_method <- switch(boundary,
     liquid_filled = "Bm_fluid",
     gas_filled = "Bm_fluid",
     fixed_rigid = "Bm_rigid",
@@ -228,8 +229,7 @@ FCMS <- function(object) {
   # Combine material properties ================================================
   gh <- body$g * body$h
   # Resolve modal series coefficient calculation method ========================
-  Bm <- switch(
-    parameters$Bm_method,
+  Bm <- switch(parameters$Bm_method,
     Bm_fluid = .fcms_bm_fluid(k1a, k2a, gh, nu, acoustics$m_limit),
     Bm_rigid = .fcms_bm_fixed_rigid(k1a, nu, acoustics$m_limit),
     Bm_pressure_release = .fcms_bm_pressure_release(k1a, nu, acoustics$m_limit)

@@ -8,7 +8,9 @@
 #' @noRd
 .show_mean <- function(x) {
   # Return a printable NA token for missing inputs =============================
-  if (is.null(x) || all(is.na(x))) return("NA")
+  if (is.null(x) || all(is.na(x))) {
+    return("NA")
+  }
   # Otherwise return the rounded mean ==========================================
   round(mean(x, na.rm = TRUE), 4)
 }
@@ -90,12 +92,14 @@
   # Append the optional radius summaries =======================================
   lines <- c(paste0(section_name, ":"), length_line)
   if (!is.null(mean_radius)) {
-    lines <- c(lines,
+    lines <- c(
+      lines,
       paste0(" Mean radius:", round(mean_radius, 4), " ", units)
     )
   }
   if (!is.null(max_radius)) {
-    lines <- c(lines,
+    lines <- c(
+      lines,
       paste0(" Max radius:", round(max_radius, 4), " ", units)
     )
   }
@@ -194,7 +198,7 @@
                                          h = NULL) {
   # Prefer absolute density and sound-speed values when present ================
   if ((!is.null(density) && !all(is.na(density))) ||
-      (!is.null(sound_speed) && !all(is.na(sound_speed)))) {
+    (!is.null(sound_speed) && !all(is.na(sound_speed)))) {
     return(.show_section_lines(
       section_name,
       .show_density_speed_line(
@@ -432,12 +436,16 @@ cal_show <- function(object) {
   .show_emit(.show_summary_lines(
     object, "Calibration sphere", meta,
     paste0("Material:", meta$Material),
-    paste0(" Sphere longitudinal sound speed:",
-           body$sound_speed_longitudinal,
-           "m/s"),
-    paste0(" Sphere transversal sound speed:",
-           body$sound_speed_transversal,
-           "m/s"),
+    paste0(
+      " Sphere longitudinal sound speed:",
+      body$sound_speed_longitudinal,
+      "m/s"
+    ),
+    paste0(
+      " Sphere transversal sound speed:",
+      body$sound_speed_transversal,
+      "m/s"
+    ),
     paste0(" Sphere density:", body$density, "kg/m^3"),
     paste0("Diameter:", shape$diameter, " ", shape$diameter_units),
     paste0(" Radius:", shape$radius, " ", shape$diameter_units),

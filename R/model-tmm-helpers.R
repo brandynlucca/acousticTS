@@ -9,8 +9,7 @@
     return(boundary)
   }
 
-  switch(
-    class(object)[1],
+  switch(class(object)[1],
     GAS = "gas_filled",
     FLS = "liquid_filled",
     stop(
@@ -96,7 +95,7 @@
   use_spheroidal_branch <- .tmm_is_spheroidal_branch(shape_parameters)
   use_cylindrical_branch <- .tmm_is_cylindrical_branch(shape_parameters)
   if (use_cylindrical_branch &&
-      isTRUE(getOption("acousticTS.warn_tmm_cylinder", TRUE))) {
+    isTRUE(getOption("acousticTS.warn_tmm_cylinder", TRUE))) {
     warning(
       "Cylinder 'TMM' support remains experimental. The default monostatic ",
       "branch is benchmark-matched to 'FCMS', but external BEM agreement is ",
@@ -140,7 +139,7 @@
 .tmm_validate_store_t_matrix <- function(store_t_matrix) {
   # Require an explicit scalar logical storage flag ============================
   if (!is.logical(store_t_matrix) || length(store_t_matrix) != 1 ||
-      is.na(store_t_matrix)) {
+    is.na(store_t_matrix)) {
     stop("'store_t_matrix' must be either TRUE or FALSE.", call. = FALSE)
   }
 
@@ -167,7 +166,7 @@
 .tmm_validate_penetrable_body <- function(body, boundary) {
   # Require scalar density and sound speed for penetrable targets ==============
   if (boundary %in% c("liquid_filled", "gas_filled") &&
-      (is.null(body$density) || is.null(body$sound_speed))) {
+    (is.null(body$density) || is.null(body$sound_speed))) {
     stop(
       "Penetrable TMM boundaries require scalar body density and sound speed ",
       "(or the corresponding scalar contrasts).",
@@ -362,11 +361,9 @@
 # Return the outer size scale used in the default spherical truncation rule.
 #' @noRd
 .tmm_bounding_radius <- function(shape_parameters) {
-  switch(
-    shape_parameters$shape,
+  switch(shape_parameters$shape,
     Sphere = as.numeric(shape_parameters$radius)[1],
-    ProlateSpheroid = as.numeric(shape_parameters$semimajor_length)[1]
-    ,
+    ProlateSpheroid = as.numeric(shape_parameters$semimajor_length)[1],
     OblateSpheroid = as.numeric(shape_parameters$semimajor_length)[1],
     Cylinder = sqrt(
       (as.numeric(shape_parameters$length)[1] / 2)^2 +
@@ -391,8 +388,7 @@
     return(NA_integer_)
   }
 
-  switch(
-    boundary,
+  switch(boundary,
     fixed_rigid = 30L,
     pressure_release = 24L,
     liquid_filled = 36L,
@@ -410,8 +406,7 @@
     return(NA_integer_)
   }
 
-  switch(
-    boundary,
+  switch(boundary,
     fixed_rigid = 40L,
     pressure_release = 24L,
     liquid_filled = 36L,
@@ -441,15 +436,16 @@
 # Normalize `n_max` into a per-frequency integer vector.
 #' @noRd
 .tmm_prepare_n_max <- function(
-    n_max, frequency, k_sw, shape_parameters, boundary
-  ) {
+  n_max, frequency, k_sw, shape_parameters, boundary
+) {
   if (is.null(n_max)) {
     return(.tmm_default_n_max(k_sw, shape_parameters, boundary))
   }
 
   if (!is.numeric(n_max) || any(!is.finite(n_max)) || any(n_max < 1)) {
     stop("'n_max' must be NULL or a positive finite integer vector.",
-         call. = FALSE)
+      call. = FALSE
+    )
   }
 
   if (length(n_max) == 1) {
@@ -472,12 +468,14 @@
 .tmm_prepare_cylinder_n_max <- function(n_max, frequency, k_sw, shape_parameters) {
   if (is.null(n_max)) {
     return(as.integer(ceiling(k_sw * max(as.numeric(shape_parameters$radius),
-                                         na.rm = TRUE)) + 10L))
+      na.rm = TRUE
+    )) + 10L))
   }
 
   if (!is.numeric(n_max) || any(!is.finite(n_max)) || any(n_max < 1)) {
     stop("'n_max' must be NULL or a positive finite integer vector.",
-         call. = FALSE)
+      call. = FALSE
+    )
   }
 
   if (length(n_max) == 1) {
@@ -498,7 +496,7 @@
 #' @noRd
 .tmm_collocation_nodes <- function(shape_parameters, boundary, n_terms) {
   if (identical(shape_parameters$shape, "Cylinder") &&
-      identical(boundary, "fixed_rigid")) {
+    identical(boundary, "fixed_rigid")) {
     return(max(128L, 10L * n_terms))
   }
 
@@ -509,8 +507,7 @@
 # into the compiled spherical backend.
 #' @noRd
 .tmm_shape_values <- function(shape_parameters) {
-  switch(
-    shape_parameters$shape,
+  switch(shape_parameters$shape,
     Sphere = c(as.numeric(shape_parameters$radius)[1]),
     ProlateSpheroid = c(
       as.numeric(shape_parameters$semimajor_length)[1],
@@ -549,8 +546,7 @@
   }
   gh <- body$g_body * body$h_body
 
-  Bm <- switch(
-    boundary,
+  Bm <- switch(boundary,
     liquid_filled = .fcms_bm_fluid(k1a, k2a, gh, nu, acoustics$n_max),
     gas_filled = .fcms_bm_fluid(k1a, k2a, gh, nu, acoustics$n_max),
     fixed_rigid = .fcms_bm_fixed_rigid(k1a, nu, acoustics$n_max),

@@ -219,7 +219,7 @@ jcdk <- function(l, n, k) {
 #' yc(2, 3i)
 #'
 #' # Singularity at origin
-#' yc(0, 0)  # Returns -Inf
+#' yc(0, 0) # Returns -Inf
 #'
 #' # First derivative
 #' ycdk(1, 2, 1)
@@ -344,7 +344,7 @@ ycdk <- function(l, n, k) {
 #' hcdk(1, 2, 2)
 #'
 #' # k-th derivative
-#' hcdk(1, 2, 3)  # Third derivative
+#' hcdk(1, 2, 3) # Third derivative
 #'
 #' @references
 #' Abramowitz, M. and Stegun, I.A. (Eds.). (1964). \emph{Handbook of

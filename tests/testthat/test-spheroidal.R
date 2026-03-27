@@ -1,5 +1,4 @@
 test_that("Spheroidal wave functions work correctly", {
-  
   # Angular wave function, Smn
   expect_equal(
     Smn(2, 3, 1, 0.5)$value,

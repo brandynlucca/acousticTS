@@ -232,8 +232,8 @@ NULL
   }
   length_body_profile <- sum(sqrt(diff(body$rpos[x_idx, ])^2 + diff(z_pos)^2))
 
-  if (is.null(length_body_profile) || !is.finite(length_body_profile)
-      || length_body_profile <= 0) {
+  if (is.null(length_body_profile) || !is.finite(length_body_profile) ||
+    length_body_profile <= 0) {
     length_body_profile <- diff(range(body$rpos[1, ]))
   }
 
@@ -241,24 +241,24 @@ NULL
     radius_curvature_ratio
   } else if (!is.null(radius_curvature)) {
     radius_curvature / length_body_profile
-  } else if (!is.null(shape$radius_curvature_ratio)
-             && !is.na(shape$radius_curvature_ratio)) {
+  } else if (!is.null(shape$radius_curvature_ratio) &&
+    !is.na(shape$radius_curvature_ratio)) {
     shape$radius_curvature_ratio
-  } else if (!is.null(body$radius_curvature_ratio)
-             && !is.na(body$radius_curvature_ratio)) {
+  } else if (!is.null(body$radius_curvature_ratio) &&
+    !is.na(body$radius_curvature_ratio)) {
     body$radius_curvature_ratio
   } else {
     NA_real_
   }
   # Build the regular or profile-derived geometry terms ========================
   if (!is.na(effective_ratio) &&
-      identical(shape$shape, "Cylinder")) {
+    identical(shape$shape, "Cylinder")) {
     geometry <- .pcdwba_regular_geometry(
       n_nodes = ncol(body$rpos),
       radius_curvature_ratio = effective_ratio,
       taper_order = if ("taper_order" %in% names(shape)) {
         shape$taper_order
-      } else{
+      } else {
         NA_real_
       }
     )

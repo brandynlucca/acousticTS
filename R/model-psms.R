@@ -289,8 +289,7 @@ NULL
 #' @noRd
 .psms_Amn_method <- function(boundary, simplify_Amn) {
   # Map the public PSMS boundary labels onto the internal kernel names ========
-  switch(
-    boundary,
+  switch(boundary,
     liquid_filled = ifelse(simplify_Amn, "Amn_fluid_simplify", "Amn_fluid"),
     gas_filled = ifelse(simplify_Amn, "Amn_fluid_simplify", "Amn_fluid"),
     fixed_rigid = "Amn_fixed_rigid",
@@ -380,10 +379,10 @@ NULL
     return(96L)
   }
   if (!is.numeric(n_integration) ||
-      length(n_integration) != 1 ||
-      is.na(n_integration) ||
-      n_integration < 1 ||
-      n_integration %% 1 != 0) {
+    length(n_integration) != 1 ||
+    is.na(n_integration) ||
+    n_integration < 1 ||
+    n_integration %% 1 != 0) {
     stop("'n_integration' must be a single positive integer.")
   }
 
@@ -489,11 +488,11 @@ psms_initialize <- function(object,
 #' @keywords internal
 #' @noRd
 .psms_adaptive_n_integration <- function(
-    chi_sw,
-    chi_body,
-    m_max,
-    n_max,
-    precision
+  chi_sw,
+  chi_body,
+  m_max,
+  n_max,
+  precision
 ) {
   # Initialize the parameterization required for Gauss-Legendre quadrature =====
   chi_max <- pmax(abs(chi_sw), abs(chi_body))
@@ -521,13 +520,13 @@ psms_initialize <- function(object,
 #' @keywords internal
 #' @noRd
 .prolate_spheroidal_kernels_fixed <- function(
-    acoustics,
-    body,
-    medium,
-    boundary_method,
-    n_integration = 96,
-    precision = "double",
-    adaptive = FALSE
+  acoustics,
+  body,
+  medium,
+  boundary_method,
+  n_integration = 96,
+  precision = "double",
+  adaptive = FALSE
 ) {
   # Generate nodes and weights for quadrature ==================================
   quad_pts <- gauss_legendre(n = n_integration, a = -1, b = 1)
@@ -542,12 +541,12 @@ psms_initialize <- function(object,
 #' @keywords internal
 #' @noRd
 .prolate_spheroidal_kernels_adaptive <- function(
-    acoustics,
-    body,
-    medium,
-    boundary_method,
-    precision = "double",
-    adaptive = TRUE
+  acoustics,
+  body,
+  medium,
+  boundary_method,
+  precision = "double",
+  adaptive = TRUE
 ) {
   # Frequency-specific integration node count ==================================
   n_by_freq <- .psms_adaptive_n_integration(
@@ -592,13 +591,13 @@ psms_initialize <- function(object,
 #' @keywords internal
 #' @noRd
 prolate_spheroidal_kernels <- function(
-    acoustics,
-    body,
-    medium,
-    boundary_method,
-    n_integration = 96,
-    precision = "double",
-    adaptive = FALSE
+  acoustics,
+  body,
+  medium,
+  boundary_method,
+  n_integration = 96,
+  precision = "double",
+  adaptive = FALSE
 ) {
   # Use the adaptive grouped solver for full fluid penetrable cases ============
   if (isTRUE(adaptive) && identical(boundary_method, "Amn_fluid")) {
@@ -615,7 +614,7 @@ prolate_spheroidal_kernels <- function(
   }
   # Normalize missing quadrature input =========================================
   if (is.null(n_integration) || (length(n_integration) == 1 &&
-                                 is.na(n_integration))) {
+    is.na(n_integration))) {
     n_integration <- 96L
   }
   # Fall back to the fixed-order kernel solver =================================

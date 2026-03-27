@@ -232,7 +232,7 @@ essms_initialize <- function(object,
   fluid_params <- .extract_material_props(fluid, sound_speed_sw, density_sw)
   # Add morphometrics ==========================================================
   # Shell ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  shell_params$radius          <- shell$radius
+  shell_params$radius <- shell$radius
   shell_params$shell_thickness <- shell$shell_thickness
   # Fluid ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   fluid_params$radius <- fluid$radius

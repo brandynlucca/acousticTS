@@ -307,4 +307,3 @@ test_that("SDWBA resampling works as intended", {
   expect_equal(length(body$radius), 51)
   expect_equal(shape$n_segments, 50)
 })
-

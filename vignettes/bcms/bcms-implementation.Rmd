@@ -146,7 +146,8 @@ bcms_summary <- utils::read.csv(
   )
 )
 
-straight_check <- subset(bcms_summary, case == "straight")[,
+straight_check <- subset(bcms_summary, case == "straight")[
+  ,
   c(
     "max_abs_delta_TS_dB",
     "mean_abs_delta_TS_dB",
@@ -174,7 +175,8 @@ This is the first defining identity of the model. When curvature is absent, `BCM
 ### Bent-cylinder coherence relation
 
 ```{r echo = FALSE}
-bent_check <- subset(bcms_summary, case == "bent")[,
+bent_check <- subset(bcms_summary, case == "bent")[
+  ,
   c(
     "max_abs_delta_TS_dB",
     "mean_abs_delta_TS_dB",

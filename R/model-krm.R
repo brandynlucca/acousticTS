@@ -287,9 +287,11 @@ krm_initialize <- function(object,
                            frequency,
                            sound_speed_sw = 1500,
                            density_sw = 1026,
-                           krm_variant = c("lowcontrast",
-                                           "mixed",
-                                           "body_embedded")) {
+                           krm_variant = c(
+                             "lowcontrast",
+                             "mixed",
+                             "body_embedded"
+                           )) {
   krm_variant <- .krm_variant_settings(krm_variant)
   # Detect scatterer object class ==============================================
   scatterer_type <- class(object)
@@ -425,15 +427,16 @@ krm_initialize <- function(object,
 }
 
 ################################################################################
-.krm_variant_settings <- function(krm_variant = c("lowcontrast",
-                                                  "mixed",
-                                                  "body_embedded")) {
+.krm_variant_settings <- function(krm_variant = c(
+                                    "lowcontrast",
+                                    "mixed",
+                                    "body_embedded"
+                                  )) {
   # Resolve the requested swimbladder-medium convention ========================
   krm_variant <- match.arg(krm_variant)
 
   # Return the medium-selection recipe used by the swimbladder helpers =========
-  switch(
-    krm_variant,
+  switch(krm_variant,
     lowcontrast = list(
       name = "lowcontrast",
       high_ka_medium = "water",
@@ -580,7 +583,8 @@ krm_initialize <- function(object,
 
   body_dorsal_sum <- matrix(
     data = rep(body_rpos_sum[3, ],
-               each = length(model$parameters$acoustics$k_sw)),
+      each = length(model$parameters$acoustics$k_sw)
+    ),
     ncol = length(body_rpos_sum[3, ]),
     nrow = length(model$parameters$acoustics$k_sw)
   ) / 2
@@ -684,7 +688,8 @@ krm_initialize <- function(object,
   )
   delta_u_bladder <- matrix(
     data = rep(uv_bladder$delta_u,
-               each = length(model$parameters$acoustics$k_sw)),
+      each = length(model$parameters$acoustics$k_sw)
+    ),
     ncol = length(uv_bladder$delta_u),
     nrow = length(model$parameters$acoustics$k_sw)
   )
@@ -726,7 +731,8 @@ krm_initialize <- function(object,
   # Assemble the low-ka phase and sinc factors along the bladder length ========
   dx_matrix <- matrix(
     data = rep(bladder_geom$delta_x,
-               each = length(model$parameters$acoustics$k_sw)),
+      each = length(model$parameters$acoustics$k_sw)
+    ),
     ncol = length(bladder_geom$delta_x),
     nrow = length(model$parameters$acoustics$k_sw)
   )

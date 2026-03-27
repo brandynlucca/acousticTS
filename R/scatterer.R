@@ -264,7 +264,7 @@ BBF <- setClass("BBF",
 #' @seealso \link{Scatterer}
 #'
 #' @keywords scatterer_type
-#' 
+#'
 #' @name ESS
 #' @aliases ESS-class
 #' @rdname ESS-class

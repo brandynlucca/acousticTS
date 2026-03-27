@@ -191,7 +191,7 @@ hpa_initialize <- function(object,
                            sound_speed_sw = 1500,
                            density_sw = 1026) {
   # Validate function arguments ================================================
-  if (! method %in% c("stanton", "johnson")) {
+  if (!method %in% c("stanton", "johnson")) {
     stop("'method' must be one of the following: 'stanton', 'johnson'.")
   }
   if (is.function(deviation_fun)) {
@@ -231,7 +231,7 @@ hpa_initialize <- function(object,
     body <- acousticTS::extract(object, "body")
   }
   if (method == "stanton") {
-    if (! scatterer_shape %in% c("Sphere", "ProlateSpheroid", "Cylinder")) {
+    if (!scatterer_shape %in% c("Sphere", "ProlateSpheroid", "Cylinder")) {
       stop(
         "The high-pass approximation requires scatterer to one of the ",
         "following shape-types when 'method' = 'stanton': 'Cylinder', ",
@@ -247,9 +247,11 @@ hpa_initialize <- function(object,
     )
   }
   medium_params <- .init_medium_params(sound_speed_sw, density_sw)
-  body <- .hydrate_contrasts(body,
-                             medium_params$sound_speed,
-                             medium_params$density)
+  body <- .hydrate_contrasts(
+    body,
+    medium_params$sound_speed,
+    medium_params$density
+  )
   # Define model parameters recipe =============================================
   model_params <- list(
     acoustics = .init_acoustics_df(
@@ -332,7 +334,7 @@ hpa_initialize <- function(object,
 .stanton_prolate_spheroid <- function(ka, l, r, alpha, gnull, fdevs) {
   # Compute sigma_bs ===========================================================
   ((1 / 9) * l^2 * ka^4 * alpha^2 * gnull) / (1 + ((16 / 9) * ka^4 * alpha^2) /
-                                                (r^2 * fdevs))
+    (r^2 * fdevs))
 }
 
 #' Stanton (1989) high-pass model for cylinders.
@@ -342,15 +344,15 @@ hpa_initialize <- function(object,
   ka <- k * a
   # Special case: bent cylinder ================================================
   if (length(rho_c) > 0 && !all(is.na(rho_c))) {
-      # Compute the literal radius of curvature ++++++++++++++++++++++++++++++++
-      r_c <- rho_c * l
-      # Compute effective length of bent cylinder ++++++++++++++++++++++++++++++
-      H <- 0.5 + 0.5 * rho_c * sin(1 / rho_c)
-      # Compute sigma_bs +++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      return(
-        (0.25 * l^2 * ka^4 * alpha^2 * H^2 * gnull) /
-          (1 + (l^2 * ka^4 * alpha^2 * H^2) / (r_c * a * r^2 * fdevs))
-      )
+    # Compute the literal radius of curvature ++++++++++++++++++++++++++++++++
+    r_c <- rho_c * l
+    # Compute effective length of bent cylinder ++++++++++++++++++++++++++++++
+    H <- 0.5 + 0.5 * rho_c * sin(1 / rho_c)
+    # Compute sigma_bs +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    return(
+      (0.25 * l^2 * ka^4 * alpha^2 * H^2 * gnull) /
+        (1 + (l^2 * ka^4 * alpha^2 * H^2) / (r_c * a * r^2 * fdevs))
+    )
   }
   # Compute the effective length based on tilt angle ===========================
   s <- sin(k * l * cos(theta)) / (k * l * cos(theta))
@@ -388,13 +390,12 @@ hpa_initialize <- function(object,
   # Calculate corrected reflection coefficient, R ==============================
   r <- (body$g * body$h - 1) / (body$g * body$h + 1)
   # Compute sigma_bs ===========================================================
-  switch(
-    body$shape,
+  switch(body$shape,
     Sphere = .stanton_sphere(a, ka, r, alpha, gnull, fdevs),
     Cylinder = .stanton_cylinder(
       acoustics$k_sw, body$length, a, body$theta,
       body$radius_curvature_ratio, r, alpha, gnull, fdevs
-      ),
+    ),
     ProlateSpheroid = .stanton_prolate_spheroid(
       ka, body$length, r, alpha, gnull, fdevs
     )
@@ -417,8 +418,7 @@ HPA <- function(object) {
   # Compute the alpha auxiliary variable =======================================
   alpha <- .alpha_pi(body)
   # Calculate the linear backscattering coefficient, sigma_bs ==================
-  obs <- switch(
-    parameters$method,
+  obs <- switch(parameters$method,
     johnson = .johnson_hp(acoustics, body, alpha),
     stanton = .stanton_hp(acoustics, body, parameters, alpha)
   )

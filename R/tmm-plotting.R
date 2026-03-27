@@ -36,13 +36,15 @@
   idx <- .tmm_plot_frequency_index(frequency, acoustics$frequency)
 
   if (!is.numeric(n_points) || length(n_points) != 1 || !is.finite(n_points) ||
-      n_points < 2 || n_points %% 1 != 0) {
+    n_points < 2 || n_points %% 1 != 0) {
     stop("'n_points' must be a single integer >= 2.", call. = FALSE)
   }
 
   # Resolve the varying angle and normalize the plotting quantity ==============
-  vary <- match.arg(vary, c("theta_scatter", "phi_scatter", "theta_body",
-                            "phi_body"))
+  vary <- match.arg(vary, c(
+    "theta_scatter", "phi_scatter", "theta_body",
+    "phi_body"
+  ))
   quantity <- .tmm_plot_quantity(quantity)
 
   theta_body_default <- defaults$theta_body
@@ -55,21 +57,29 @@
   }
 
   # Expand the incident and receive geometry over the slice grid ===============
-  theta_body_vec <- rep(.tmm_scalar_angle(theta_body, theta_body_default,
-                                          "theta_body"), n_points)
-  phi_body_vec <- rep(.tmm_scalar_angle(phi_body, phi_body_default,
-                                        "phi_body"), n_points)
+  theta_body_vec <- rep(.tmm_scalar_angle(
+    theta_body, theta_body_default,
+    "theta_body"
+  ), n_points)
+  phi_body_vec <- rep(.tmm_scalar_angle(
+    phi_body, phi_body_default,
+    "phi_body"
+  ), n_points)
   theta_scatter_vec <- if (is.null(theta_scatter)) {
     pi - theta_body_vec
   } else {
-    rep(.tmm_scalar_angle(theta_scatter, pi - theta_body_vec[1],
-                          "theta_scatter"), n_points)
+    rep(.tmm_scalar_angle(
+      theta_scatter, pi - theta_body_vec[1],
+      "theta_scatter"
+    ), n_points)
   }
   phi_scatter_vec <- if (is.null(phi_scatter)) {
     phi_body_vec + pi
   } else {
-    rep(.tmm_scalar_angle(phi_scatter, phi_body_vec[1] + pi,
-                          "phi_scatter"), n_points)
+    rep(.tmm_scalar_angle(
+      phi_scatter, phi_body_vec[1] + pi,
+      "phi_scatter"
+    ), n_points)
   }
 
   if (vary == "theta_body") {
@@ -99,8 +109,7 @@
     phi_scatter = phi_scatter_vec
   )
 
-  y_vals <- switch(
-    quantity,
+  y_vals <- switch(quantity,
     sigma_scat_dB = db(.sigma_bs(f_vals)),
     sigma_scat = .sigma_bs(f_vals),
     mod_f = Mod(f_vals),
@@ -108,15 +117,13 @@
   )
 
   # Resolve axis labels for the selected angular slice =========================
-  x_lab <- switch(
-    vary,
+  x_lab <- switch(vary,
     theta_body = expression(theta[body] ~ "(rad)"),
     phi_body = expression(phi[body] ~ "(rad)"),
     theta_scatter = expression(theta[scatter] ~ "(rad)"),
     phi_scatter = expression(phi[scatter] ~ "(rad)")
   )
-  y_lab <- switch(
-    quantity,
+  y_lab <- switch(quantity,
     sigma_scat_dB = expression(10 * log[10](sigma[scat] / (1 ~ m^2)) ~ "(dB)"),
     sigma_scat = expression(sigma[scat]),
     mod_f = expression("|" * f[scat] * "|"),
@@ -140,15 +147,13 @@
 .tmm_grid_plot_data <- function(grid, quantity = "sigma_scat_dB") {
   # Normalize the requested plotted quantity ===================================
   quantity <- .tmm_plot_quantity(quantity)
-  z_vals <- switch(
-    quantity,
+  z_vals <- switch(quantity,
     sigma_scat_dB = grid$sigma_scat_dB,
     sigma_scat = grid$sigma_scat,
     mod_f = Mod(grid$f_scat),
     phase = Arg(grid$f_scat)
   )
-  z_lab <- switch(
-    quantity,
+  z_lab <- switch(quantity,
     sigma_scat_dB = expression(10 * log[10](sigma[scat] / (1 ~ m^2)) ~ "(dB)"),
     sigma_scat = expression(sigma[scat]),
     mod_f = expression("|" * f[scat] * "|"),
@@ -210,7 +215,8 @@
   phi_edges <- .tmm_grid_edges(grid$phi_scatter, lower = 0, upper = 2 * pi)
   palette <- grDevices::hcl.colors(128, "Spectral", rev = TRUE)
   z_breaks <- seq(min(z_finite), max(z_finite),
-                  length.out = length(palette) + 1)
+    length.out = length(palette) + 1
+  )
   opar <- graphics::par(no.readonly = TRUE)
   on.exit(graphics::par(opar))
   graphics::par(
@@ -295,31 +301,39 @@
       lty = 3
     )
   }
-  graphics::symbols(0, 0, circles = pi, inches = FALSE, add = TRUE,
-                    fg = "black", bg = NA)
+  graphics::symbols(0, 0,
+    circles = pi, inches = FALSE, add = TRUE,
+    fg = "black", bg = NA
+  )
   graphics::text(0, 0, labels = "0", cex = 0.85, font = 2)
   graphics::text(
     x = c(pi + 0.18, 0, -pi - 0.18, 0),
     y = c(0, pi - 0.12, 0, -pi + 0.12),
-    labels = c(expression(0), expression(pi / 2), expression(pi),
-               expression(3 * pi / 2)),
+    labels = c(
+      expression(0), expression(pi / 2), expression(pi),
+      expression(3 * pi / 2)
+    ),
     xpd = NA,
     cex = 0.9
   )
   graphics::text(
     x = c(pi / 4, pi / 2, 3 * pi / 4, pi),
     y = 0,
-    labels = c(expression(pi / 4), expression(pi / 2),
-               expression(3 * pi / 4), expression(pi)),
+    labels = c(
+      expression(pi / 4), expression(pi / 2),
+      expression(3 * pi / 4), expression(pi)
+    ),
     pos = 3,
     col = "grey35",
     cex = 0.8
   )
 
   # Draw the companion colorbar for the plotted scattering quantity ============
-  graphics::par(fig = c(0.845, 0.965, 0.15, 0.88),
-                mar = c(1.8, 0.2, 2.2, 3.0),
-                new = TRUE)
+  graphics::par(
+    fig = c(0.845, 0.965, 0.15, 0.88),
+    mar = c(1.8, 0.2, 2.2, 3.0),
+    new = TRUE
+  )
   graphics::plot.new()
   graphics::plot.window(xlim = c(0, 1), ylim = range(z_breaks))
   y_edges <- seq(min(z_breaks), max(z_breaks), length.out = length(palette) + 1)
@@ -374,8 +388,10 @@
   }
 
   # Build the one-dimensional slice and its plotting limits ====================
-  slice <- do.call(.tmm_scattering_slice_data, c(list(object = object),
-                                                 extra_args))
+  slice <- do.call(.tmm_scattering_slice_data, c(
+    list(object = object),
+    extra_args
+  ))
   y_finite <- slice$y[is.finite(slice$y)]
 
   if (!length(y_finite)) {
@@ -411,8 +427,10 @@
     xaxs = "i",
     yaxs = "i"
   )
-  graphics::title(main = sprintf("TMM scattering slice at %.1f kHz",
-                                 slice$frequency * 1e-3))
+  graphics::title(main = sprintf(
+    "TMM scattering slice at %.1f kHz",
+    slice$frequency * 1e-3
+  ))
 
   # Return the slice data invisibly for downstream inspection ==================
   invisible(slice)

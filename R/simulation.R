@@ -73,8 +73,9 @@
   list(
     simulation_grid = data.frame(
       realization = rep(seq_len(n_realizations), times = nrow(parameter_grid)),
-      parameter_grid[rep(seq_len(nrow(parameter_grid)), each = n_realizations),
-        , drop = FALSE],
+      parameter_grid[rep(seq_len(nrow(parameter_grid)), each = n_realizations), ,
+        drop = FALSE
+      ],
       row.names = NULL
     ),
     batch_values = batch_values
@@ -197,8 +198,10 @@
   )
   parallel::clusterExport(
     cluster,
-    c(".discover_reforge_params", ".get_TS", "reforge", "target_strength",
-      "extract"),
+    c(
+      ".discover_reforge_params", ".get_TS", "reforge", "target_strength",
+      "extract"
+    ),
     envir = asNamespace("acousticTS")
   )
 

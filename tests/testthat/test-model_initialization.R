@@ -1,7 +1,6 @@
 library(acousticTS)
 
 test_that("calibration_initialize works correctly", {
-
   # Test calibration_initialize
   cal_obj <- cal_generate()
   frequency <- c(38e3, 70e3, 120e3)
@@ -25,7 +24,6 @@ test_that("calibration_initialize works correctly", {
 })
 
 test_that("sphms_initialize works correctly", {
-
   # Test mss_anderson_initialize for GAS objects
   gas_obj <- gas_generate(shape = sphere(radius_body = 1, n_segments = 80))
   frequency <- c(38e3, 120e3)
@@ -49,7 +47,6 @@ test_that("sphms_initialize works correctly", {
 })
 
 test_that("essms_initialize works correctly", {
-
   # Test mss_goodman_stern_initialize for ESS objects
   ess_obj <- ess_generate(shape = sphere(radius_body = 1, n_segments = 80))
   frequency <- c(70e3, 200e3)
@@ -72,7 +69,6 @@ test_that("essms_initialize works correctly", {
 })
 
 test_that("dwba_initialize works correctly", {
-
   # Test dwba_initialize for FLS objects
   fls_obj <- fls_generate(
     x = 1, y = 1, z = 1, radius_body = 1,
@@ -99,7 +95,6 @@ test_that("dwba_initialize works correctly", {
 })
 
 test_that("dwba_curved_initialize works correctly", {
-
   # Test dwba_curved_initialize for FLS objects
   fls_obj <- fls_generate(
     x = seq(0, 1, length.out = 11),
@@ -154,7 +149,6 @@ test_that("dwba_curved_initialize works correctly", {
 # })
 
 test_that("sdwba_initialize works correctly", {
-
   # Test sdwba_initialize for FLS objects
   fls_obj <- fls_generate(
     x = seq(0, 1, length.out = 11),
@@ -182,7 +176,6 @@ test_that("sdwba_initialize works correctly", {
 })
 
 test_that("sdwba_curved_initialize works correctly", {
-
   # Test sdwba_curved_initialize for FLS objects
   fls_obj <- fls_generate(
     x = seq(0, 1, length.out = 11),
@@ -213,7 +206,6 @@ test_that("sdwba_curved_initialize works correctly", {
 })
 
 test_that("krm_initialize works correctly", {
-
   # Test krm_initialize for SBF objects
   # SBF should have both body and bladder
   x_body <- seq(0, 0.05, length.out = 6)
@@ -251,7 +243,6 @@ test_that("krm_initialize works correctly", {
 
 
 test_that("Initialization preserves object integrity", {
-
   # Test that initialization doesn't break the object structure
   cal_obj <- cal_generate()
   original_metadata <- cal_obj@metadata

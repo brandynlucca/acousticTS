@@ -1031,8 +1031,8 @@ test_that("Cylinder TMM stores cylindrical-family retained state when requested"
     model = "tmm",
     boundary = "fixed_rigid",
     density_sw = density_sw,
-      sound_speed_sw = sound_speed_sw,
-      store_t_matrix = TRUE
+    sound_speed_sw = sound_speed_sw,
+    store_t_matrix = TRUE
   )
 
   t_store <- object@model_parameters$TMM$parameters$t_matrix
@@ -1114,8 +1114,8 @@ test_that("Cylinder TMM retained state supports exact monostatic reuse only", {
     model = "tmm",
     boundary = "fixed_rigid",
     density_sw = density_sw,
-      sound_speed_sw = sound_speed_sw,
-      store_t_matrix = TRUE
+    sound_speed_sw = sound_speed_sw,
+    store_t_matrix = TRUE
   )
 
   mono <- tmm_scattering(object)
@@ -1287,8 +1287,8 @@ test_that("tmm_diagnostics provides physics-based checks for stored TMM objects"
     model = "tmm",
     boundary = "fixed_rigid",
     density_sw = density_sw,
-      sound_speed_sw = sound_speed_sw,
-      store_t_matrix = TRUE
+    sound_speed_sw = sound_speed_sw,
+    store_t_matrix = TRUE
   )
 
   sphere_diag <- tmm_diagnostics(sphere_obj, n_theta = 31, n_phi = 61)

@@ -337,8 +337,10 @@ bbf_generate <- function(body_shape,
     x_offset = x_offset_backbone,
     z_offset = z_offset_backbone
   )
-  backbone_shape_params <- acousticTS::extract(backbone_shape,
-                                               "shape_parameters")
+  backbone_shape_params <- acousticTS::extract(
+    backbone_shape,
+    "shape_parameters"
+  )
   backbone <- .build_row_major_elastic_component(
     shape_obj = backbone_shape,
     theta = theta_backbone,
@@ -612,8 +614,8 @@ fls_generate <- function(shape = NULL,
   )
   # Validate shape input pathway ===============================================
   if (!methods::is(shape, "Shape") &&
-      (is.null(shape) || identical(shape, "arbitrary")) &&
-      !.has_explicit_profile_coordinates(arg_pull)) {
+    (is.null(shape) || identical(shape, "arbitrary")) &&
+    !.has_explicit_profile_coordinates(arg_pull)) {
     stop(
       "Supply 'shape' as a pre-built Shape object, or provide explicit ",
       "profile coordinates such as x_body/y_body/z_body.",
@@ -1048,14 +1050,15 @@ ess_generate <- function(shape = NULL,
   # Format inputs to get Shape-class generator =================================
   name <- tolower(shape_name)
   missing_arg <- function(key) {
-    if (!(key %in% names(arguments))) return(TRUE)
+    if (!(key %in% names(arguments))) {
+      return(TRUE)
+    }
     value <- arguments[[key]]
     is.null(value) || (is.atomic(value) && all(is.na(value)))
   }
   stop_missing <- function(msg) stop(msg, call. = FALSE)
   # Toggle through the valid Shape-classes =====================================
-  switch(
-    name,
+  switch(name,
     sphere = {
       if (missing_arg("radius_body")) {
         stop_missing("Sphere requires 'radius_body'.")

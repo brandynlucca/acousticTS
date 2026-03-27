@@ -111,7 +111,7 @@
                             drop_dB = 3) {
   # Validate the requested dB drop threshold ===================================
   if (!is.numeric(drop_dB) || length(drop_dB) != 1 || !is.finite(drop_dB) ||
-      drop_dB <= 0) {
+    drop_dB <= 0) {
     stop("'drop_dB' must be a single positive numeric value.", call. = FALSE)
   }
 
@@ -213,9 +213,9 @@
     stop("'sectors$sector' must contain non-empty names.", call. = FALSE)
   }
   if (!is.numeric(sectors$psi_min) || !is.numeric(sectors$psi_max) ||
-      any(!is.finite(sectors$psi_min)) || any(!is.finite(sectors$psi_max)) ||
-      any(sectors$psi_min < 0) || any(sectors$psi_max > pi) ||
-      any(sectors$psi_min >= sectors$psi_max)) {
+    any(!is.finite(sectors$psi_min)) || any(!is.finite(sectors$psi_max)) ||
+    any(sectors$psi_min < 0) || any(sectors$psi_max > pi) ||
+    any(sectors$psi_min >= sectors$psi_max)) {
     stop(
       "'sectors' must define finite angular bounds in radians with 0 <= ",
       "psi_min < psi_max <= pi.",
@@ -258,7 +258,7 @@
 
   # Validate the local-slice resolution and resolve stored defaults ============
   if (!is.numeric(n_psi) || length(n_psi) != 1 || !is.finite(n_psi) ||
-      n_psi < 3 || n_psi %% 1 != 0) {
+    n_psi < 3 || n_psi %% 1 != 0) {
     stop("'n_psi' must be a single integer >= 3.", call. = FALSE)
   }
 

@@ -351,7 +351,7 @@
 
     # Project the collocation equations back onto the retained modal basis =====
     surface_weight <- surface$radius * sqrt(surface$radius^2 +
-                                              surface$radius_derivative^2)
+      surface$radius_derivative^2)
     weighted_test <- sweep(p_mat, 1, quad$weights * surface_weight, `*`)
     if (boundary %in% c("fixed_rigid", "pressure_release")) {
       lhs_proj <- Conj(t(weighted_test)) %*% system$lhs

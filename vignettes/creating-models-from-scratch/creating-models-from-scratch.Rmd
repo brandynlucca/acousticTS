@@ -23,8 +23,12 @@ One of the most useful features of `acousticTS` is that a new target-strength mo
 For a toy target strength-length model called `TSL`, that means defining:
 
 ```{r eval = FALSE}
-tsl_initialize <- function(...) { ... }
-TSL <- function(object) { ... }
+tsl_initialize <- function(...) {
+  ...
+}
+TSL <- function(object) {
+  ...
+}
 ```
 
 This vignette walks through that pattern and builds a simple example model from scratch. The example is intentionally simple. It is not meant to be a physically complete scattering model. Its purpose is to show how model dispatch, parameter storage, and result storage work inside the package.

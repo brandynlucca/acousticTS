@@ -223,8 +223,8 @@ trcm_initialize <- function(object,
 #' @keywords internal
 #' @noRd
 .trcm_curved <- function(
-    k1, k2a, lambda, l, a, rho_c, r, I, theta_shift, stationary_phase
-  ) {
+  k1, k2a, lambda, l, a, rho_c, r, I, theta_shift, stationary_phase
+) {
   # Stationary phase correction ================================================
   if (stationary_phase) {
     # Simplified equivalent bent cylinder length +++++++++++++++++++++++++++++++

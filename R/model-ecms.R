@@ -147,8 +147,8 @@ NULL
 
   # Bent-cylinder corrections share the same incidence limitation =============
   if (!is.null(shape_core$radius_curvature_ratio) &&
-      !is.na(shape_core$radius_curvature_ratio) &&
-      abs(elastic_comp$theta - pi / 2) > pi / 18) {
+    !is.na(shape_core$radius_curvature_ratio) &&
+    abs(elastic_comp$theta - pi / 2) > pi / 18) {
     warning(
       "ECMS bent-cylinder correction is intended for broadside or near-",
       "broadside incidence."
@@ -230,7 +230,7 @@ NULL
     is_bent = !is.null(geometry$curvature_ratio) &&
       !is.na(geometry$curvature_ratio),
     radius_curvature = if (!is.null(geometry$curvature_ratio) &&
-                           !is.na(geometry$curvature_ratio)) {
+      !is.na(geometry$curvature_ratio)) {
       geometry$curvature_ratio * geometry$length
     } else {
       NA_real_
@@ -357,7 +357,7 @@ ecms_initialize <- function(object,
   tan_alpha1 <- -.ecms_safe_divide(x1 * jcd(m, x1), J1)
   tan_alpha2 <- -.ecms_safe_divide(x2 * jcd(m, x2), J2)
   tan_alpha3 <- -.ecms_safe_divide(x3 * jcd(m, x3), J3)
-  tan_beta3  <- -.ecms_safe_divide(x3 * ycd(m, x3), Y3)
+  tan_beta3 <- -.ecms_safe_divide(x3 * ycd(m, x3), Y3)
   tan_delta3 <- -.ecms_safe_divide(J3, Y3)
 
   X2 <- x2^2 / 2

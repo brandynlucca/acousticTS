@@ -92,28 +92,42 @@
     description = c(
       "Spherical modal-series solution for canonical spherical targets.",
       "Finite-cylinder modal-series solution for straight cylindrical targets.",
-      paste("Prolate-spheroidal modal-series solution for smooth",
-            "elongated canonical bodies."),
+      paste(
+        "Prolate-spheroidal modal-series solution for smooth",
+        "elongated canonical bodies."
+      ),
       "Solid elastic spherical model used mainly for calibration spheres.",
       "Elastic-shelled spherical family for layered shell targets.",
-      paste("Bent-cylinder modal-series family for straight and uniformly bent",
-      "cylinders."),
+      paste(
+        "Bent-cylinder modal-series family for straight and uniformly bent",
+        "cylinders."
+      ),
       "Elastic-cylinder modal-series family for fully elastic solid cylinders.",
       "Weak-scattering elongated-body approximation for fluid-like targets.",
       "Stochastic DWBA family for unresolved phase variability.",
-      paste("Kirchhoff-ray mode model for segmented fish-like ",
-      "body-plus-inclusion targets."),
+      paste(
+        "Kirchhoff-ray mode model for segmented fish-like ",
+        "body-plus-inclusion targets."
+      ),
       "High-pass approximation for compact asymptotic screening.",
-      paste("Two-ray cylindrical family for high-frequency locally",
-            "cylindrical targets."),
+      paste(
+        "Two-ray cylindrical family for high-frequency locally",
+        "cylindrical targets."
+      ),
       "Phase-compensated DWBA for bent weakly scattering targets.",
-      paste("Composite flesh-plus-backbone family for swimbladder-less ",
-      "fish-like targets."),
-      paste("Viscous-elastic layered-sphere family for gas-core, shell,",
-            "and viscous-layer targets."),
-      paste("Single-target transition-matrix family for retained monostatic",
-            "and angle-dependent scattering products across supported",
-            "canonical shapes.")
+      paste(
+        "Composite flesh-plus-backbone family for swimbladder-less ",
+        "fish-like targets."
+      ),
+      paste(
+        "Viscous-elastic layered-sphere family for gas-core, shell,",
+        "and viscous-layer targets."
+      ),
+      paste(
+        "Single-target transition-matrix family for retained monostatic",
+        "and angle-dependent scattering products across supported",
+        "canonical shapes."
+      )
     ),
     experimental = c(
       FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE,
@@ -203,99 +217,164 @@
       "Cylinder branch remains guarded"
     ),
     summary = c(
-      paste("Benchmarked against the canonical spherical spectra stored",
-            "in `benchmark_ts`."),
-      paste("Validated against `KRMr` and `echoSMs` on shared",
-            "penetrable-sphere cases."),
-      paste("Benchmarked against the canonical finite-cylinder spectra",
-            "stored in `benchmark_ts`."),
+      paste(
+        "Benchmarked against the canonical spherical spectra stored",
+        "in `benchmark_ts`."
+      ),
+      paste(
+        "Validated against `KRMr` and `echoSMs` on shared",
+        "penetrable-sphere cases."
+      ),
+      paste(
+        "Benchmarked against the canonical finite-cylinder spectra",
+        "stored in `benchmark_ts`."
+      ),
       "Validated against the `echoSMs` finite-cylinder implementation.",
-      paste("Benchmarked against the canonical prolate-spheroid spectra",
-            "stored in `benchmark_ts`."),
-      paste("Validated against the external `Prol_Spheroid` implementation",
-            "on shared prolate cases."),
-      paste("Benchmarked against published calibration-sphere targets used",
-            "throughout the package documentation."),
-      paste("Validated against `echoSMs`, `sphereTS`, and the NOAA calibration",
-            "applet."),
-      paste("A direct shell-sphere benchmark family exists, but the current",
-            "ESSMS implementation still does not return finite full-grid",
-            "benchmark spectra."),
-      paste("Current BCMS checks are internal coherence reconstructions; the",
-            "family does not yet have an external benchmark or software ladder."
-            ),
-      paste("Current ECMS checks are independent algebra reconstructions",
-            "rather than a documented external benchmark ladder."),
-      paste("Benchmarked against the canonical weakly scattering targets",
-            "summarized by Jech et al. (2015)."),
-      paste("Validated against the published McGehee MATLAB workflow and an",
-            "independent DWBA implementation."),
+      paste(
+        "Benchmarked against the canonical prolate-spheroid spectra",
+        "stored in `benchmark_ts`."
+      ),
+      paste(
+        "Validated against the external `Prol_Spheroid` implementation",
+        "on shared prolate cases."
+      ),
+      paste(
+        "Benchmarked against published calibration-sphere targets used",
+        "throughout the package documentation."
+      ),
+      paste(
+        "Validated against `echoSMs`, `sphereTS`, and the NOAA calibration",
+        "applet."
+      ),
+      paste(
+        "A direct shell-sphere benchmark family exists, but the current",
+        "ESSMS implementation still does not return finite full-grid",
+        "benchmark spectra."
+      ),
+      paste(
+        "Current BCMS checks are internal coherence reconstructions; the",
+        "family does not yet have an external benchmark or software ladder."
+      ),
+      paste(
+        "Current ECMS checks are independent algebra reconstructions",
+        "rather than a documented external benchmark ladder."
+      ),
+      paste(
+        "Benchmarked against the canonical weakly scattering targets",
+        "summarized by Jech et al. (2015)."
+      ),
+      paste(
+        "Validated against the published McGehee MATLAB workflow and an",
+        "independent DWBA implementation."
+      ),
       "Benchmarked against published SDWBA weak-scattering comparison cases.",
       paste(
         "Validated against the CCAMLR MATLAB and NOAA HTML SDWBA ",
         "implementations."
       ),
-      paste("Benchmarked against canonical modal-family targets used for",
-            "isolated gas-filled and weakly scattering cases."),
-      paste("Validated against `KRMr`, `echoSMs`, and the NOAA KRM applet on",
-            "bundled fish objects and shared workflows."),
-      paste("Benchmarked against canonical asymptotic target families rather",
-            "than as an exact modal solver."),
-      paste("Validated against the spherical `echoSMs::HPModel` branch and",
-            "the published Johnson/Stanton algebra."),
-      paste("Benchmarked within the package validation workflow against the",
-            "straight-cylinder and FCMS-derived bent-cylinder reference",
-            "constructions."),
-      paste("Validated against source-level `ZooScatR` and `echopop` PCDWBA ",
-            "workflows."),
-      paste("BBFM currently has documented internal reconstruction checks",
-            "but no external benchmark ladder or independent public",
-            "implementation comparison."),
-      paste("Validated against the reference Python VESM implementation on",
-            "the documented layered-sphere case."),
-      paste("Benchmarked against `SPHMS`, `PSMS`, and `FCMS` on the",
-            "currently supported canonical shape branches."),
-      paste("Validated against external BEMPP far-field checks for sphere,",
-            "oblate, and prolate pressure-release cases."),
-      paste("Retained prolate angular products are also checked against the",
-            "exact general-angle spheroidal solution."),
-      paste("The cylinder branch is benchmark-matched only for the exact",
-            "monostatic workflow; retained general-angle cylinder products",
-            "remain outside the validated public scope.")
+      paste(
+        "Benchmarked against canonical modal-family targets used for",
+        "isolated gas-filled and weakly scattering cases."
+      ),
+      paste(
+        "Validated against `KRMr`, `echoSMs`, and the NOAA KRM applet on",
+        "bundled fish objects and shared workflows."
+      ),
+      paste(
+        "Benchmarked against canonical asymptotic target families rather",
+        "than as an exact modal solver."
+      ),
+      paste(
+        "Validated against the spherical `echoSMs::HPModel` branch and",
+        "the published Johnson/Stanton algebra."
+      ),
+      paste(
+        "Benchmarked within the package validation workflow against the",
+        "straight-cylinder and FCMS-derived bent-cylinder reference",
+        "constructions."
+      ),
+      paste(
+        "Validated against source-level `ZooScatR` and `echopop` PCDWBA ",
+        "workflows."
+      ),
+      paste(
+        "BBFM currently has documented internal reconstruction checks",
+        "but no external benchmark ladder or independent public",
+        "implementation comparison."
+      ),
+      paste(
+        "Validated against the reference Python VESM implementation on",
+        "the documented layered-sphere case."
+      ),
+      paste(
+        "Benchmarked against `SPHMS`, `PSMS`, and `FCMS` on the",
+        "currently supported canonical shape branches."
+      ),
+      paste(
+        "Validated against external BEMPP far-field checks for sphere,",
+        "oblate, and prolate pressure-release cases."
+      ),
+      paste(
+        "Retained prolate angular products are also checked against the",
+        "exact general-angle spheroidal solution."
+      ),
+      paste(
+        "The cylinder branch is benchmark-matched only for the exact",
+        "monostatic workflow; retained general-angle cylinder products",
+        "remain outside the validated public scope."
+      )
     ),
     scope = c(
       "Sphere spectra across rigid, soft, liquid-filled, and gas-filled cases.",
       "Penetrable sphere spectra on shared software definitions.",
-      paste("Finite-cylinder spectra across the canonical cylindrical",
-            "benchmark grid."),
+      paste(
+        "Finite-cylinder spectra across the canonical cylindrical",
+        "benchmark grid."
+      ),
       "Rigid, soft, liquid-filled, and gas-filled finite-cylinder spectra.",
       "Prolate-spheroid spectra across the canonical benchmark grid.",
       "Liquid-filled and gas-filled prolate-spheroid software comparisons.",
       "Tungsten-carbide and copper calibration spheres.",
       "Shared calibration-sphere material sets and frequency sweeps.",
-      paste("Layered shell-sphere benchmark status only; not yet",
-            "benchmark-grade agreement."),
+      paste(
+        "Layered shell-sphere benchmark status only; not yet",
+        "benchmark-grade agreement."
+      ),
       "Uniform-curvature cylinder coherence extension of FCMS.",
-      paste("Elastic-cylinder component family and near-broadside",
-            "canonical cases."),
+      paste(
+        "Elastic-cylinder component family and near-broadside",
+        "canonical cases."
+      ),
       "Weakly scattering sphere, prolate spheroid, and cylinder targets.",
       "Bundled krill geometry and published DWBA reference workflows.",
-      paste("Weakly scattering sphere, prolate spheroid, and cylinder",
-            "stochastic targets."),
+      paste(
+        "Weakly scattering sphere, prolate spheroid, and cylinder",
+        "stochastic targets."
+      ),
       "Bundled krill stochastic workflow comparisons.",
-      paste("Canonical isolated targets used for the package KRM",
-            "benchmark ladder."),
+      paste(
+        "Canonical isolated targets used for the package KRM",
+        "benchmark ladder."
+      ),
       "Bundled sardine and cod software-to-software comparisons.",
-      paste("Sphere, prolate spheroid, and cylinder asymptotic",
-            "benchmark targets."),
+      paste(
+        "Sphere, prolate spheroid, and cylinder asymptotic",
+        "benchmark targets."
+      ),
       "Spherical HPModel branch and published asymptotic formulas.",
-      paste("Straight and bent cylindrical validation cases documented",
-            "in the package."),
-      paste("Curved weak-scattering reference workflows on shared",
-            "bent-body cases."),
+      paste(
+        "Straight and bent cylindrical validation cases documented",
+        "in the package."
+      ),
+      paste(
+        "Curved weak-scattering reference workflows on shared",
+        "bent-body cases."
+      ),
       "Internal composite-component consistency checks only.",
-      paste("Documented spherical layered case used by the original",
-            "VESM implementation."),
+      paste(
+        "Documented spherical layered case used by the original",
+        "VESM implementation."
+      ),
       "Sphere, oblate, prolate, and guarded cylinder monostatic branches.",
       "Pressure-release angular slices for sphere, oblate, and prolate cases.",
       "General-angle prolate retained-state validation.",
@@ -376,8 +455,10 @@
   badge <- function(x) .validation_status_badge(x)
 
   sections <- c(
-    paste("Status tags are derived from the package's internal validation",
-          "registry and used conservatively:"),
+    paste(
+      "Status tags are derived from the package's internal validation",
+      "registry and used conservatively:"
+    ),
     paste0(
       "- ", badge("benchmarked"),
       " means the family has a documented comparison against a canonical ",
@@ -400,12 +481,18 @@
     ),
     "",
     "These statuses are not all mutually exclusive:",
-    paste("- `Benchmarked` and `Validated` are evidence tags and can",
-          "appear together."),
-    paste("- `Experimental` is a lifecycle tag and can coexist with",
-          "either evidence tag."),
-    paste("- `Unvalidated` is reserved for families lacking both evidence",
-          "tags, so it should not be combined with other evidence tags.")
+    paste(
+      "- `Benchmarked` and `Validated` are evidence tags and can",
+      "appear together."
+    ),
+    paste(
+      "- `Experimental` is a lifecycle tag and can coexist with",
+      "either evidence tag."
+    ),
+    paste(
+      "- `Unvalidated` is reserved for families lacking both evidence",
+      "tags, so it should not be combined with other evidence tags."
+    )
   )
 
   out <- paste(sections, collapse = "\n")
@@ -451,12 +538,16 @@
 
   keep_types <- unique(c(type, if (include_notes) "note"))
   evidence <- evidence[evidence$evidence_type %in% keep_types, ,
-                       drop = FALSE]
+    drop = FALSE
+  ]
 
   families <- .validation_family_registry()[, c("family", "display"),
-                                            drop = FALSE]
-  evidence <- merge(evidence, families, by = "family", all.x = TRUE,
-                    sort = FALSE)
+    drop = FALSE
+  ]
+  evidence <- merge(evidence, families,
+    by = "family", all.x = TRUE,
+    sort = FALSE
+  )
 
   evidence_type_order <- c(benchmark = 1L, external = 2L, note = 3L)
   evidence <- evidence[order(
@@ -466,8 +557,10 @@
 
   data.frame(
     Family = evidence$display,
-    `Evidence type` = vapply(evidence$evidence_type,
-                             .validation_family_label, character(1)),
+    `Evidence type` = vapply(
+      evidence$evidence_type,
+      .validation_family_label, character(1)
+    ),
     Source = evidence$source,
     Scope = evidence$scope,
     Summary = evidence$summary,

@@ -16,7 +16,9 @@
 #' @keywords internal
 #' @noRd
 .validate_dimensions_target <- function(target, target_name, valid_dims) {
-  if (is.null(target)) return(NULL)
+  if (is.null(target)) {
+    return(NULL)
+  }
   if (!is.numeric(target)) {
     stop(paste0("'", target_name, "' must be numeric."), call. = FALSE)
   }
@@ -52,7 +54,7 @@
 #' @param dims The dimensions of the parameter defined for rescaling
 #' @param dims_name Name of dimension
 #' @param valid_dims Character vector of valid dimension names
-#' @param isometry Boolean argument defining whether to isometrically rescale 
+#' @param isometry Boolean argument defining whether to isometrically rescale
 #' all dimensions in the shape
 #' @param iso_name Name of dimension used for isometric rescaling when toggled
 #' @return Validated parameter (invisibly)
@@ -64,7 +66,9 @@
                                         isometry,
                                         iso_name) {
   # No dimensions provided
-  if (is.null(dims)) return(NULL)
+  if (is.null(dims)) {
+    return(NULL)
+  }
 
   # Check if dimensions are all numeric
   if (!is.numeric(dims)) {
@@ -73,7 +77,7 @@
 
   # Handle scalar case where `isometry=TRUE`
   if (length(dims) == 1 && isometry &&
-      (is.null(names(dims)) || all(names(dims) %in% valid_dims)) ) {
+    (is.null(names(dims)) || all(names(dims) %in% valid_dims))) {
     return(stats::setNames(rep(dims, length(valid_dims)), valid_dims))
   }
 
@@ -85,9 +89,9 @@
           "'%s' must either be a scalar or a named vector with dimensions: %s."
         ),
         dims_name,
-        paste0("'", valid_dims, "'", collapse=", ")
+        paste0("'", valid_dims, "'", collapse = ", ")
       ),
-      call.=FALSE
+      call. = FALSE
     )
   }
 
@@ -119,8 +123,8 @@
           "Expected dimensions are: %s."
         ),
         dims_name,
-        paste0("'", invalid_dims, "'", collapse=", "),
-        paste0("'", valid_dims, "'", collapse=", ")
+        paste0("'", invalid_dims, "'", collapse = ", "),
+        paste0("'", valid_dims, "'", collapse = ", ")
       ),
       call. = FALSE
     )
@@ -137,7 +141,7 @@
           ),
           iso_name,
           dims_name,
-          paste0("'", valid_dims, "'", collapse=", ")
+          paste0("'", valid_dims, "'", collapse = ", ")
         ),
         call. = FALSE
       )
@@ -169,7 +173,7 @@
   if (sum(provided) < min_required) {
     # Preserve the historical "At least two ..." wording used in public errors
     min_required_label <- if (identical(min_required, 2L) ||
-                              identical(min_required, 2)) {
+      identical(min_required, 2)) {
       "two"
     } else {
       as.character(min_required)
@@ -189,24 +193,27 @@
 
 #' Validate brake/bending parameters
 #' @param body_df Dataframe containing shape information
-#' @param radius_curvature Curvature defined by the radius of an overlapping 
+#' @param radius_curvature Curvature defined by the radius of an overlapping
 #' osculating circle. This can either be an absolute or ratio quantity.
-#' @param mode Domain of radius of curvature quantity that can either be a 
+#' @param mode Domain of radius of curvature quantity that can either be a
 #' ratio or an absolute quantity
 #' @keywords internal
 #' @noRd
 .validate_brake_params <- function(body_df, radius_curvature, mode) {
   if (!is.list(body_df) || is.null(body_df$rpos) || !is.matrix(body_df$rpos)) {
     stop("Body shape information must be a list with a matrix element 'rpos'.",
-         call. = FALSE)
+      call. = FALSE
+    )
   }
   if (!is.numeric(radius_curvature) || radius_curvature <= 0) {
     stop("Radius of curvature must be a positive-only, real number.",
-         call. = FALSE)
+      call. = FALSE
+    )
   }
   if (!mode %in% c("ratio", "measurement")) {
     stop("Radius-of-curvature 'mode' must be either 'ratio' or 'measurement'.",
-         call. = FALSE)
+      call. = FALSE
+    )
   }
   invisible(TRUE)
 }
@@ -225,8 +232,10 @@
 
   if (!model_name %in% names(models)) {
     stop(
-      sprintf("Model '%s' not found. Available: %s",
-              model_name, paste(names(models), collapse = ", ")),
+      sprintf(
+        "Model '%s' not found. Available: %s",
+        model_name, paste(names(models), collapse = ", ")
+      ),
       call. = FALSE
     )
   }

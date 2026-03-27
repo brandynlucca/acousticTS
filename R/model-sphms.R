@@ -126,8 +126,10 @@ NULL
       "'shelled_gas'. Input boundary is '", boundary, "'."
     )
   }
-  if (boundary %in% c("shelled_pressure_release", "shelled_liquid",
-                      "shelled_gas")) {
+  if (boundary %in% c(
+    "shelled_pressure_release", "shelled_liquid",
+    "shelled_gas"
+  )) {
     stop(
       "Only the following values for 'boundary' are available in this ",
       "implementation of the sphere modal series solution for the ",
@@ -149,8 +151,7 @@ NULL
 #' @noRd
 .sphms_Bm_method <- function(boundary) {
   # Map the public boundary labels onto the internal series-kernel names =======
-  switch(
-    boundary,
+  switch(boundary,
     liquid_filled = "Bm_fluid",
     gas_filled = "Bm_fluid",
     fixed_rigid = "Bm_rigid",
@@ -200,15 +201,17 @@ NULL
 
   # ESS objects keep both shell-to-water and core-to-shell interfaces ==========
   fluid <- acousticTS::extract(object, "fluid")
-  g21 <- if (!is.null(exterior$density)) exterior$density / density_sw else
+  g21 <- if (!is.null(exterior$density)) {
+    exterior$density / density_sw
+  } else {
     exterior$g %||% NA_real_
+  }
   h21 <- if (!is.null(exterior$sound_speed)) {
     exterior$sound_speed / sound_speed_sw
   } else {
     exterior$h %||% NA_real_
   }
-  g32 <- if (!is.null(fluid$density)) fluid$density / (g21 * density_sw) else
-    if (!is.null(fluid$g)) fluid$g / g21 else NA_real_
+  g32 <- if (!is.null(fluid$density)) fluid$density / (g21 * density_sw) else if (!is.null(fluid$g)) fluid$g / g21 else NA_real_
   h32 <- if (!is.null(fluid$sound_speed)) {
     fluid$sound_speed / (h21 * sound_speed_sw)
   } else if (!is.null(fluid$h)) {
@@ -216,8 +219,11 @@ NULL
   } else {
     NA_real_
   }
-  g31 <- if (!is.null(fluid$density)) fluid$density / density_sw else
+  g31 <- if (!is.null(fluid$density)) {
+    fluid$density / density_sw
+  } else {
     fluid$g %||% NA_real_
+  }
   h31 <- if (!is.null(fluid$sound_speed)) {
     fluid$sound_speed / sound_speed_sw
   } else {
@@ -345,20 +351,19 @@ SPHMS <- function(object) {
   k3a <- acoustics$k_fluid * body$radius_fluid
   k3b <- acoustics$k_fluid * body$radius_fluid
   # Define the boundary expansion coefficient method ===========================
-  sph_bm <- switch(
-    parameters$Bm_method,
+  sph_bm <- switch(parameters$Bm_method,
     Bm_rigid = .sphms_bm_rigid(k1a, m_limit),
-    Bm_pressure_release = .sphms_bm_prelease(k1a, m_limit) ,
+    Bm_pressure_release = .sphms_bm_prelease(k1a, m_limit),
     Bm_fluid = .sphms_bm_fluid(k1a, k3a, body$g31, body$h31, m_limit),
     Bm_shelled_pressure_release = .sphms_bm_shelled_prelease(
-        k1a, k2a, k2b, body$g21, body$h21, m_limit
-      ),
+      k1a, k2a, k2b, body$g21, body$h21, m_limit
+    ),
     Bm_shelled_fluid = .sphms_bm_shelled_fluid(
-        k1a, k2a, k2b, k3b,
-        body$g21, body$g31, body$g32,
-        body$h21, body$h31, body$h32,
-        m_limit
-      )
+      k1a, k2a, k2b, k3b,
+      body$g21, body$g31, body$g32,
+      body$h21, body$h31, body$h32,
+      m_limit
+    )
   )
   # Compute the linear scattering coefficient, f_bs ============================
   f_bs <- -1i / acoustics$k_sw * sph_bm
@@ -469,7 +474,7 @@ SPHMS <- function(object) {
 #' @keywords internal
 #' @noRd
 .sphms_bm_shelled_fluid <- function(
-    k1a, k2a, k2b, k3b, g21, g31, g32, h21, h31, h32, m_limit
+  k1a, k2a, k2b, k3b, g21, g31, g32, h21, h31, h32, m_limit
 ) {
   # Get maximum m_limit ========================================================
   m_max <- max(m_limit)
@@ -495,14 +500,14 @@ SPHMS <- function(object) {
     b1 <- js(m, k1a)
     b2 <- jsd(m, k1a) * g21 * h21
     # Calculate coefficient ++++++++++++++++++++++++++++++++++++++++++++++++++++
-    Am <- (b1*a22*a33 + a13*b2*a32 - a12*b2*a33 - b1*a23*a32) /
-      (a11*a22*a33 + a13*a21*a32 - a12*a21*a33 - a11*a23*a32)
+    Am <- (b1 * a22 * a33 + a13 * b2 * a32 - a12 * b2 * a33 - b1 * a23 * a32) /
+      (a11 * a22 * a33 + a13 * a21 * a32 - a12 * a21 * a33 - a11 * a23 * a32)
     if (length(Am) < (m_max + 1)) {
-        difference <- (m_max + 1) - length(Am)
-        Am <- c(Am, rep(NA, difference))
-      }
+      difference <- (m_max + 1) - length(Am)
+      Am <- c(Am, rep(NA, difference))
+    }
     Am
-    }, k1a, k2a, k2b, k3b, g21, g31, g32, h21, h31, h32, m_limit)
+  }, k1a, k2a, k2b, k3b, g21, g31, g32, h21, h31, h32, m_limit)
 
   # Return the entire boundary modal term ======================================
   colSums((2 * (0:m_max) + 1) * (-1)^(0:m_max) * Am, na.rm = TRUE)

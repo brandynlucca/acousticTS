@@ -28,22 +28,22 @@
 
   # Validate the numeric angle and weight columns ==============================
   if (!is.numeric(distribution$theta_body) ||
-      any(!is.finite(distribution$theta_body))) {
+    any(!is.finite(distribution$theta_body))) {
     stop(
       "'distribution$theta_body' must be finite numeric angles in radians.",
       call. = FALSE
     )
   }
   if (!is.numeric(distribution$phi_body) ||
-      any(!is.finite(distribution$phi_body))) {
+    any(!is.finite(distribution$phi_body))) {
     stop(
       "'distribution$phi_body' must be finite numeric angles in radians.",
       call. = FALSE
     )
   }
   if (!is.numeric(distribution$weights) ||
-      any(!is.finite(distribution$weights)) ||
-      any(distribution$weights < 0) || sum(distribution$weights) <= 0) {
+    any(!is.finite(distribution$weights)) ||
+    any(distribution$weights < 0) || sum(distribution$weights) <= 0) {
     stop(
       "'distribution$weights' must be finite, non-negative, and sum to a ",
       "positive value.",
@@ -65,9 +65,9 @@
                                       name = "theta_body") {
   # Validate the supplied density values against the theta grid ================
   if (!is.numeric(density_values) ||
-      length(density_values) != length(theta_body) ||
-      any(!is.finite(density_values)) || any(density_values < 0)) {
-        stop(
+    length(density_values) != length(theta_body) ||
+    any(!is.finite(density_values)) || any(density_values < 0)) {
+    stop(
       "'density_values' must be a non-negative numeric vector with the ",
       "same length as '",
       name,
@@ -147,8 +147,7 @@ tmm_orientation_distribution <- function(distribution = c(
   n_theta <- .tmm_validate_orientation_n_theta(n_theta)
 
   # Build the requested theta grid and associated normalized weights ===========
-  orientation <- switch(
-    distribution,
+  orientation <- switch(distribution,
     quadrature = {
       if (is.null(theta_body)) {
         stop(
@@ -232,8 +231,8 @@ tmm_orientation_distribution <- function(distribution = c(
                                                    phi_body) {
   # Require a concrete angle vector when no stored distribution is supplied ====
   if (!is.numeric(theta_body) ||
-      !length(theta_body) ||
-      any(!is.finite(theta_body))) {
+    !length(theta_body) ||
+    any(!is.finite(theta_body))) {
     stop(
       "'theta_body' must be a non-empty numeric vector of angles in radians.",
       call. = FALSE
@@ -266,10 +265,10 @@ tmm_orientation_distribution <- function(distribution = c(
 
   # Validate and normalize explicit weights ====================================
   if (!is.numeric(weights) ||
-      length(weights) != n_angles ||
-      any(!is.finite(weights)) ||
-      any(weights < 0) ||
-      sum(weights) <= 0) {
+    length(weights) != n_angles ||
+    any(!is.finite(weights)) ||
+    any(weights < 0) ||
+    sum(weights) <= 0) {
     stop(
       "'weights' must be a non-negative numeric vector with the same length ",
       "as 'theta_body'.",

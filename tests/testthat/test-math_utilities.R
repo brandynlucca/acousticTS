@@ -1,7 +1,6 @@
 library(acousticTS)
 
 test_that("Mathematical utility functions work correctly", {
-
   # Test along_sum function
   rpos <- matrix(c(1, 2, 3, 4, 5, 6), nrow = 2, ncol = 3)
   iterations <- 3
@@ -48,7 +47,6 @@ test_that("Mathematical utility functions work correctly", {
 })
 
 test_that("Complex integration functions work", {
-
   # Test contour_integrate with a simple function
   # Define a simple complex function for testing
   simple_integral <- function(s, x, y) {
@@ -77,9 +75,8 @@ test_that("Complex integration functions work", {
 })
 
 test_that(
-  "Gauss-Legendre quadrature validates n and supports the one-node rule", 
+  "Gauss-Legendre quadrature validates n and supports the one-node rule",
   {
-
     gl1 <- gauss_legendre(1)
 
     expect_equal(gl1$nodes, 0)

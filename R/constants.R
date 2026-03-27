@@ -2,7 +2,7 @@
 # Constants used throughout the acousticTS package
 ################################################################################
 # Broadside incidence angle (radians)
-.BROADSIDE_ORIENTATION_DEFAULT <- pi/2
+.BROADSIDE_ORIENTATION_DEFAULT <- pi / 2
 
 # Air sound speed (m/s)
 .AIR_SOUND_SPEED_DEFAULT <- 343
@@ -63,5 +63,3 @@
 
 # Calcite Lame parameter (lambda, Pa)
 .CALCITE_LAME_DEFAULT <- 4e10
-
-

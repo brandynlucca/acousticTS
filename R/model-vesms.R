@@ -91,9 +91,9 @@ NULL
 .vesms_validate_outer_radius <- function(radius_viscous, radius_shell) {
   # Validate the viscous-layer outer radius ====================================
   if (!is.numeric(radius_viscous) ||
-      length(radius_viscous) != 1L ||
-      !is.finite(radius_viscous) ||
-      radius_viscous <= radius_shell) {
+    length(radius_viscous) != 1L ||
+    !is.finite(radius_viscous) ||
+    radius_viscous <= radius_shell) {
     stop(
       "VESMS requires the viscous-layer radius to be a finite scalar larger ",
       "than the shell radius."
@@ -170,28 +170,29 @@ NULL
 #' @noRd
 .vesms_validate_shell_fluid <- function(shell, fluid) {
   if (is.null(shell$radius) ||
-      is.null(fluid$radius) ||
-      !is.finite(shell$radius) ||
-      !is.finite(fluid$radius) ||
-      fluid$radius >= shell$radius) {
+    is.null(fluid$radius) ||
+    !is.finite(shell$radius) ||
+    !is.finite(fluid$radius) ||
+    fluid$radius >= shell$radius) {
     stop(
       "VESMS requires a valid shell radius larger than the inner gas radius."
     )
   }
 
   if (is.null(shell$density) ||
-      !is.finite(shell$density) ||
-      is.null(shell$G) ||
-      !is.finite(shell$G)) {
-    stop(
-      "VESMS requires the ESS shell to have finite density and shear modulus."
-    )
-  }
+        !is.finite(shell$density) ||
+        is.null(shell$G) ||
+        !is.finite(shell$G)) {
+          stop(
+            "VESMS requires the ESS shell to have finite density ",
+            "and shear modulus."
+          )
+    }
 
   if (is.null(fluid$density) ||
-      !is.finite(fluid$density) ||
-      is.null(fluid$sound_speed) ||
-      !is.finite(fluid$sound_speed)) {
+    !is.finite(fluid$density) ||
+    is.null(fluid$sound_speed) ||
+    !is.finite(fluid$sound_speed)) {
     stop(
       "VESMS requires the ESS inner fluid slot to represent a gas core with ",
       "finite density and sound speed."
@@ -226,8 +227,8 @@ NULL
                                              density_viscous,
                                              shear_viscosity_viscous) {
   if (missing(sound_speed_viscous) ||
-      missing(density_viscous) ||
-      missing(shear_viscosity_viscous)) {
+    missing(density_viscous) ||
+    missing(shear_viscosity_viscous)) {
     stop(
       "VESMS requires 'sound_speed_viscous', 'density_viscous', and ",
       "'shear_viscosity_viscous'."
@@ -235,11 +236,11 @@ NULL
   }
 
   if (!is.finite(sound_speed_viscous) ||
-      sound_speed_viscous <= 0 ||
-      !is.finite(density_viscous) ||
-      density_viscous <= 0 ||
-      !is.finite(shear_viscosity_viscous) ||
-      shear_viscosity_viscous <= 0) {
+    sound_speed_viscous <= 0 ||
+    !is.finite(density_viscous) ||
+    density_viscous <= 0 ||
+    !is.finite(shear_viscosity_viscous) ||
+    shear_viscosity_viscous <= 0) {
     stop(
       "VESMS requires positive finite viscous-layer sound speed, density, ",
       "and shear viscosity."
@@ -308,8 +309,8 @@ NULL
   }
 
   if (length(m_limit) != length(frequency) ||
-      any(!is.finite(m_limit)) ||
-      any(m_limit < 0)) {
+    any(!is.finite(m_limit)) ||
+    any(m_limit < 0)) {
     stop(
       "VESMS requires 'm_limit' to be a non-negative scalar or a vector ",
       "with one value per frequency."

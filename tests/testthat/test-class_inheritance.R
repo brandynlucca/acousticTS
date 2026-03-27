@@ -1,7 +1,6 @@
 library(acousticTS)
 
 test_that("Scatterer class inheritance works correctly", {
-
   # Test that all scatterer classes inherit from Scatterer
   # Create instances of each scatterer type
 
@@ -99,7 +98,6 @@ test_that("Scatterer class inheritance works correctly", {
 })
 
 test_that("Scatterer objects have required slots", {
-
   # Test that Scatterer base class has required slots
   cal_obj <- cal_generate()
 
@@ -124,7 +122,6 @@ test_that("Scatterer objects have required slots", {
 })
 
 test_that("Scatterer generation functions work", {
-
   # Test cal_generate
   cal_obj <- cal_generate()
   expect_s4_class(cal_obj, "CAL")
@@ -154,7 +151,6 @@ test_that("Scatterer generation functions work", {
 })
 
 test_that("Scatterer objects have proper structure", {
-
   # Test CAL structure
   cal_obj <- cal_generate()
   expect_true("body" %in% slotNames(cal_obj))
@@ -198,7 +194,6 @@ test_that("Scatterer objects have proper structure", {
 })
 
 test_that("CAL-class generation works as expected", {
-
   # Create object
   cal_sphere <- cal_generate(
     sound_speed_longitudinal = 3e3,
@@ -215,7 +210,6 @@ test_that("CAL-class generation works as expected", {
 })
 
 test_that("FLS-class generation works as expected", {
-
   # Test full parmeterization
   fls_test <- fls_generate(
     x_body = seq(0, 1, length.out = 5),
@@ -351,7 +345,6 @@ test_that("FLS-class generation works as expected", {
 })
 
 test_that("ESS error cases are raised when necessary", {
-
   # Test case where conflicting density/g and sound speed/h values are input
   expect_error(
     ess_generate(

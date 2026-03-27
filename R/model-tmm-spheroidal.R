@@ -32,15 +32,20 @@
       boundary = parameters$boundary,
       adaptive = FALSE,
       precision = parameters$precision,
-      n_integration = if (is.na(parameters$n_integration)) NULL else
-        parameters$n_integration,
+      n_integration = if (is.na(parameters$n_integration)) {
+        NULL
+      } else {
+        parameters$n_integration
+      },
       simplify_Amn = FALSE,
       sound_speed_sw = medium$sound_speed,
       density_sw = medium$density
     )
     psms_object <- PSMS(psms_object)
-    psms_parameters <- acousticTS::extract(psms_object,
-                                           "model_parameters")$PSMS$parameters
+    psms_parameters <- acousticTS::extract(
+      psms_object,
+      "model_parameters"
+    )$PSMS$parameters
     f_bs <- .tmm_spheroidal_sum_to_amplitude(
       psms_object@model$PSMS$f_bs,
       acoustics$k_sw
@@ -74,8 +79,7 @@
     medium = medium,
     integration_pts = quad_pts,
     precision = parameters$precision,
-    Amn_method = switch(
-      parameters$boundary,
+    Amn_method = switch(parameters$boundary,
       liquid_filled = "Amn_fluid",
       gas_filled = "Amn_fluid",
       fixed_rigid = "Amn_fixed_rigid",

@@ -103,7 +103,7 @@ canonicalize_shape <- function(shape,
   }
   n_segments <- as.integer(n_segments)
   if (!is.numeric(n_segments) || length(n_segments) != 1L ||
-      is.na(n_segments) || n_segments < 2L) {
+    is.na(n_segments) || n_segments < 2L) {
     stop(
       "'n_segments' must be one integer greater than or equal to 2.",
       call. = FALSE
@@ -126,8 +126,7 @@ canonicalize_shape <- function(shape,
     )
   }
   # Fit the requested canonical surrogate ======================================
-  fit <- switch(
-    resolved_method,
+  fit <- switch(resolved_method,
     volume = .canonicalize_shape_fit_volume(source_metrics, to),
     length_volume = .canonicalize_shape_fit_length_volume(source_metrics, to),
     profile_l2 = .canonicalize_shape_fit_profile_l2(source_metrics, to)
@@ -164,8 +163,7 @@ canonicalize_shape <- function(shape,
     return(method)
   }
   # Assign the default rule for the target family ==============================
-  switch(
-    to,
+  switch(to,
     Sphere = "volume",
     Cylinder = "length_volume",
     ProlateSpheroid = "profile_l2",
@@ -279,8 +277,7 @@ canonicalize_shape <- function(shape,
     return(rep(0, base::length(x)))
   }
   # Evaluate the target canonical profile ======================================
-  switch(
-    to,
+  switch(to,
     Sphere = sqrt(pmax(radius^2 - (x - radius)^2, 0)),
     Cylinder = ifelse(x >= 0 & x <= length, radius, 0),
     ProlateSpheroid = {
@@ -378,9 +375,11 @@ canonicalize_shape <- function(shape,
       mean((r - model)^2)
     }
     opt <- stats::optimize(sphere_objective, interval = c(lower, upper))
-    return(list(length = 2 * opt$minimum,
-                radius = opt$minimum,
-                objective = opt$objective))
+    return(list(
+      length = 2 * opt$minimum,
+      radius = opt$minimum,
+      objective = opt$objective
+    ))
   }
   # Shift the starting guess toward the admissible aspect-ratio side ===========
   if (identical(to, "ProlateSpheroid")) {
@@ -450,8 +449,7 @@ canonicalize_shape <- function(shape,
     source_parameters$length_units %||%
     "m"
   # Build the requested canonical surrogate ====================================
-  switch(
-    to,
+  switch(to,
     Sphere = sphere(
       radius_body = fit$radius,
       n_segments = n_segments,

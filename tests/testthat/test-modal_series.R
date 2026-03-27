@@ -3,7 +3,6 @@
 library(acousticTS)
 
 test_that("Test spherical model", {
-
   # Read in benchmark values
   data(benchmark_ts)
 
@@ -35,16 +34,16 @@ test_that("Test spherical model", {
   }
 
   # ESS - SPHERE - FIXED-RIGID
-  check_sphere_mss(boundary="fixed_rigid")
+  check_sphere_mss(boundary = "fixed_rigid")
 
   # ESS - SPHERE - PRESSURE RELEASE
-  check_sphere_mss(boundary="pressure_release")
+  check_sphere_mss(boundary = "pressure_release")
 
   # ESS - SPHERE - GAS-FILLED
-  check_sphere_mss(boundary="gas_filled")
+  check_sphere_mss(boundary = "gas_filled")
 
   # FLS - SPHERE - LIQUID-FILLED
-  check_sphere_mss(boundary="liquid_filled")
+  check_sphere_mss(boundary = "liquid_filled")
 
   # ESS - SPHERE - SHELLED PRESSURE RELEASE
   check_sphere_mss(boundary = "shelled_pressure_release")
@@ -57,7 +56,6 @@ test_that("Test spherical model", {
 })
 
 test_that("Test cylindrical model", {
-
   # Read in benchmark values
   data(benchmark_ts)
 
@@ -89,21 +87,19 @@ test_that("Test cylindrical model", {
   }
 
   # ESS - CYLINDER - FIXED-RIGID
-  check_cylinder_mss(boundary="fixed_rigid")
+  check_cylinder_mss(boundary = "fixed_rigid")
 
   # ESS - CYLINDER - PRESSURE RELEASE
-  check_cylinder_mss(boundary="pressure_release")
+  check_cylinder_mss(boundary = "pressure_release")
 
   # ESS - CYLINDER - GAS-FILLED
   # check_cylinder_mss(boundary="gas_filled")
 
   # FLS - CYLINDER - LIQUID-FILLED
-  check_cylinder_mss(boundary="liquid_filled")
-
+  check_cylinder_mss(boundary = "liquid_filled")
 })
 
 test_that("Test prolate spheroid model", {
-
   # Read in benchmark values
   data(benchmark_ts)
 
@@ -147,18 +143,16 @@ test_that("Test prolate spheroid model", {
   }
 
   # ESS - PROLATE SPHEROID - FIXED-RIGID
-  check_ps_mss(boundary="fixed_rigid")
+  check_ps_mss(boundary = "fixed_rigid")
 
   # ESS - PROLATE SPHEROID - PRESSURE RELEASE
-  check_ps_mss(boundary="pressure_release")
+  check_ps_mss(boundary = "pressure_release")
 
   # FLS - PROLATE SPHEROID - LIQUID-FILLED
-  check_ps_mss(boundary="liquid_filled")
-
+  check_ps_mss(boundary = "liquid_filled")
 })
 
 test_that("Gas-filled prolate spheroid PSMS returns finite values on the benchmark-supported grid", {
-
   data(benchmark_ts)
 
   density_sw <- 1026.8

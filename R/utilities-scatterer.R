@@ -199,7 +199,7 @@
 
   # Warn when the legacy character-dispatch pathway is used ====================
   if (is.character(shape) &&
-      !(identical(shape, "arbitrary") && has_profile_coordinates)) {
+    !(identical(shape, "arbitrary") && has_profile_coordinates)) {
     .warn_scatterer_constructor_compatibility(
       paste0(
         "Character-based 'shape' dispatch in scatterer constructors is ",
@@ -321,8 +321,11 @@
   }
 
   storage <- if (row_major) "profile_row_major" else "shape_column_major"
-  axis_names <- if (row_major) rownames(position_matrix) else
+  axis_names <- if (row_major) {
+    rownames(position_matrix)
+  } else {
     colnames(position_matrix)
+  }
 
   # Prefer named axes from the internal geometry contract when available =======
   if (!is.null(axis_names)) {
@@ -351,8 +354,11 @@
   }
 
   if (axis == "x") {
-    return(as.numeric(if (row_major) position_matrix[1, ] else
-      position_matrix[, 1]))
+    return(as.numeric(if (row_major) {
+      position_matrix[1, ]
+    } else {
+      position_matrix[, 1]
+    }))
   }
 
   # Return NULL when the requested optional axis is unavailable ================
@@ -471,8 +477,8 @@
 
   # Prefer a scalar radius stored directly on the shape parameters =============
   if (!is.null(shape_parameters$radius) &&
-      length(shape_parameters$radius) == 1 &&
-      !is.na(shape_parameters$radius)) {
+    length(shape_parameters$radius) == 1 &&
+    !is.na(shape_parameters$radius)) {
     return(as.numeric(shape_parameters$radius)[1])
   }
 
@@ -693,12 +699,12 @@
 #' @keywords internal
 #' @noRd
 .extract_shape_component_column <- function(position_matrix,
-                                           candidates,
-                                           default = NULL) {
+                                            candidates,
+                                            default = NULL) {
   # Return the first matching named column from the candidate list =============
   for (nm in candidates) {
     if (!is.null(colnames(position_matrix)) && nm %in%
-        colnames(position_matrix)) {
+      colnames(position_matrix)) {
       return(position_matrix[, nm])
     }
   }
@@ -723,7 +729,7 @@
   # Return the first matching named row from the candidate list ================
   for (nm in candidates) {
     if (!is.null(rownames(position_matrix)) && nm %in%
-        rownames(position_matrix)) {
+      rownames(position_matrix)) {
       return(position_matrix[nm, ])
     }
   }
@@ -744,26 +750,38 @@
 #' @keywords internal
 #' @noRd
 .translate_shape_position_matrix <- function(position_matrix,
-                                            x_offset = 0,
-                                            y_offset = 0,
-                                            z_offset = 0) {
+                                             x_offset = 0,
+                                             y_offset = 0,
+                                             z_offset = 0) {
   # Copy the shape matrix before applying any rigid translation ================
   translated <- position_matrix
 
   # Apply the requested offsets to any recognized coordinate columns ===========
   if (!is.null(colnames(translated))) {
-    if ("x" %in% colnames(translated)) translated[, "x"] <-
+    if ("x" %in% colnames(translated)) {
+      translated[, "x"] <-
         translated[, "x"] + x_offset
-    if ("y" %in% colnames(translated)) translated[, "y"] <-
+    }
+    if ("y" %in% colnames(translated)) {
+      translated[, "y"] <-
         translated[, "y"] + y_offset
-    if ("w" %in% colnames(translated)) translated[, "w"] <-
+    }
+    if ("w" %in% colnames(translated)) {
+      translated[, "w"] <-
         translated[, "w"] + y_offset
-    if ("z" %in% colnames(translated)) translated[, "z"] <-
+    }
+    if ("z" %in% colnames(translated)) {
+      translated[, "z"] <-
         translated[, "z"] + z_offset
-    if ("zU" %in% colnames(translated)) translated[, "zU"] <-
+    }
+    if ("zU" %in% colnames(translated)) {
+      translated[, "zU"] <-
         translated[, "zU"] + z_offset
-    if ("zL" %in% colnames(translated)) translated[, "zL"] <-
+    }
+    if ("zL" %in% colnames(translated)) {
+      translated[, "zL"] <-
         translated[, "zL"] + z_offset
+    }
   }
 
   # Return the translated shape matrix =========================================
@@ -1129,7 +1147,7 @@
 .normalize_shape_diameter <- function(params) {
   # Collapse vector radius metadata while preserving the original profile ======
   if (!is.null(params$radius) && length(params$radius) > 1 &&
-      !all(is.na(params$radius))) {
+    !all(is.na(params$radius))) {
     if (is.null(params$radius_shape)) {
       params$radius_shape <- params$radius
     }
@@ -1138,7 +1156,7 @@
 
   # Collapse vector diameter metadata while preserving the original profile ====
   if (!is.null(params$diameter) && length(params$diameter) > 1 &&
-      !all(is.na(params$diameter))) {
+    !all(is.na(params$diameter))) {
     if (is.null(params$diameter_shape)) {
       params$diameter_shape <- params$diameter
     }
@@ -1173,15 +1191,17 @@
     return(NULL)
   }
   if (!is.numeric(shell_thickness) || length(shell_thickness) != 1 ||
-      !is.finite(shell_thickness) || shell_thickness <= 0) {
+    !is.finite(shell_thickness) || shell_thickness <= 0) {
     stop("'shell_thickness' must be a single positive number.", call. = FALSE)
   }
 
   # Recover the outer shell geometry and validate the thickness ================
   position_matrix <- acousticTS::extract(shape_obj, "position_matrix")
   shape_parameters <- acousticTS::extract(shape_obj, "shape_parameters")
-  max_radius <- .shape_max_radius(shape_input = shape_obj,
-                                  error_context = "ESS shell")
+  max_radius <- .shape_max_radius(
+    shape_input = shape_obj,
+    error_context = "ESS shell"
+  )
   if (!is.finite(max_radius) || shell_thickness >= max_radius) {
     stop(
       "'shell_thickness' must be smaller than the shell radius.",
@@ -1202,7 +1222,9 @@
     return(cylinder(
       length_body = shape_parameters$length,
       radius_body = max_radius - shell_thickness,
-      taper = if (is.na(shape_parameters$taper_order)) NULL else {
+      taper = if (is.na(shape_parameters$taper_order)) {
+        NULL
+      } else {
         shape_parameters$taper_order
       },
       radius_curvature_ratio = if (is.na(
@@ -1266,8 +1288,8 @@
     context = "ESS shell position matrix"
   )
   z_center <- if (!is.null(colnames(position_matrix)) &&
-      any(c("z", "z_body", "z_shell", "z_fluid") %in%
-          colnames(position_matrix))) {
+    any(c("z", "z_body", "z_shell", "z_fluid") %in%
+      colnames(position_matrix))) {
     .extract_shape_component_column(
       position_matrix,
       c("z", "z_body", "z_shell", "z_fluid"),

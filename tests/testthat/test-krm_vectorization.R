@@ -14,8 +14,7 @@ test_that("KRM vectorized FLS matches per-frequency evaluation", {
   freqs <- c(12e3, 166e3, 314e3)
 
   for (shape in c("sphere", "prolate")) {
-    prof <- switch(
-      shape,
+    prof <- switch(shape,
       sphere = .nonuniform_profile(0.02, 0.01),
       prolate = .nonuniform_profile(0.14, 0.01)
     )

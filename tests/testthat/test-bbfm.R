@@ -117,7 +117,7 @@ test_that("BBFM matches the explicit DWBA-plus-ECMS coherent sum", {
   phase_shift <- exp(
     2i * acousticTS::wavenumber(frequency, sound_speed_sw) *
       (x_center * cos(backbone_body$theta) +
-         z_center * sin(backbone_body$theta))
+        z_center * sin(backbone_body$theta))
   )
   expected_fbs <- body_out$f_bs + backbone_out$f_bs * phase_shift
 

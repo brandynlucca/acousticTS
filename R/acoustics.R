@@ -376,8 +376,7 @@ lame <- function(K = NULL, E = NULL, G = NULL, nu = NULL) {
   # Resolve the first supported parameter combination ==========================
   combo <- .lame_input_combo(K = K, E = E, G = G, nu = nu)
 
-  switch(
-    combo,
+  switch(combo,
     K_G = K - 2 * G / 3,
     E_nu = E * nu / ((1 + nu) * (1 - 2 * nu)),
     G_nu = 2 * G * nu / (1 - 2 * nu),
@@ -693,7 +692,8 @@ target_strength <- function(object,
   model_arg_names <- names(model_args)
   if (is.null(model_arg_names) || any(!nzchar(model_arg_names))) {
     stop("'model_args' must be a named list keyed by model name.",
-         call. = FALSE)
+      call. = FALSE
+    )
   }
   # Check for argname conflicts ================================================
   normalized_names <- tolower(model_arg_names)

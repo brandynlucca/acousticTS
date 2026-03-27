@@ -96,12 +96,12 @@ NULL
 #' @param density_sw Seawater density (kg/m³).
 #' @noRd
 calibration_initialize <- function(
-    object,
-    frequency,
-    sound_speed_sw = .SEAWATER_SOUND_SPEED_DEFAULT,
-    density_sw = .SEAWATER_DENSITY_DEFAULT,
-    adaptive = TRUE
-  ) {
+  object,
+  frequency,
+  sound_speed_sw = .SEAWATER_SOUND_SPEED_DEFAULT,
+  density_sw = .SEAWATER_DENSITY_DEFAULT,
+  adaptive = TRUE
+) {
   # Parse shape ================================================================
   shape <- acousticTS::extract(
     object,
@@ -214,12 +214,13 @@ calibration <- function(object) {
     (2 * m + 1) * Pl * (sin_eta * (1i * cos_eta - sin_eta))
   }
   # Compute form function ======================================================
-  f_j <- mapply(FUN = function(ka_sw,
-                               ka_l,
-                               ka_t,
-                               theta,
-                               density_body,
-                               density_sw) {
+  f_j <- mapply(
+    FUN = function(ka_sw,
+                   ka_l,
+                   ka_t,
+                   theta,
+                   density_body,
+                   density_sw) {
       # Start with the common MacLennan / echoSMs truncation guess =============
       ml <- as.integer(round(ka_sw) + 10L)
       m <- 0:ml
@@ -237,7 +238,7 @@ calibration <- function(object) {
       # Extend the modal sum until the tail term is negligible =================
       if (adaptive) {
         while (Mod(utils::tail(terms, 1L)) > modal_tol &&
-               ml < max_modal_order) {
+          ml < max_modal_order) {
           ml <- ml + 1L
           terms <- c(
             terms,
@@ -255,7 +256,8 @@ calibration <- function(object) {
       }
       sum(terms)
     }, ka_sw, ka_l, ka_t, model$body$theta, model$body$density,
-    model$medium$density)
+    model$medium$density
+  )
   # Calculate linear backscatter coefficient ===================================
   f_bs <- abs(-2i * f_j / ka_sw) * model$body$radius / 2
   sigma_bs <- f_bs * f_bs

@@ -52,15 +52,17 @@ arbitrary <- function(...,
       z = .validate_coord_aliases(coord_names, "^z(?![UL])"),
       zU = .validate_coord_aliases(coord_names, "^(zU)"),
       zL = .validate_coord_aliases(coord_names, "^(zL)"),
-      a = .validate_coord_aliases(coord_names,
-                                  "^radius(?!_curvature)\\w*")
+      a = .validate_coord_aliases(
+        coord_names,
+        "^radius(?!_curvature)\\w*"
+      )
     ))
     if (length(all_aliases) < 2) {
       stop(
         "'Arbitrary' shape-class requires at least two numeric vectors with ",
         "valid coordinates (e.g., 'x_body' and 'radius_body'). Current ",
         "detected coordinates from input: '",
-        paste(unlist(all_aliases), collapse="', '"), "'.",
+        paste(unlist(all_aliases), collapse = "', '"), "'.",
         call. = FALSE
       )
     }
@@ -87,17 +89,17 @@ arbitrary <- function(...,
   if (is_a & !is_zU & !is_zL) {
     position_matrix <- cbind(
       position_matrix,
-      cbind(zU=position_matrix[,"a"], zL=-position_matrix[,"a"])
+      cbind(zU = position_matrix[, "a"], zL = -position_matrix[, "a"])
     )
-  } else if(is_a & !is_zU & is_zL) {
+  } else if (is_a & !is_zU & is_zL) {
     position_matrix <- cbind(
       position_matrix,
-      cbind(zU=-position_matrix[,"zL"])
+      cbind(zU = -position_matrix[, "zL"])
     )
-  } else if(is_a & is_zU & !is_zL) {
+  } else if (is_a & is_zU & !is_zL) {
     position_matrix <- cbind(
       position_matrix,
-      cbind(zL=-position_matrix[,"zU"])
+      cbind(zL = -position_matrix[, "zU"])
     )
   }
   shape_parameters <- c(
@@ -128,7 +130,7 @@ arbitrary <- function(...,
       paste(aliases, collapse = "', '"),
       "'."
     )
-  } else if(length(aliases) == 0) {
+  } else if (length(aliases) == 0) {
     return(NULL)
   }
   aliases
@@ -442,8 +444,9 @@ cylinder <- function(length_body,
       taper
     ),
     radius_curvature_ratio = ifelse(is.null(radius_curvature_ratio),
-                                    NA,
-                                    radius_curvature_ratio),
+      NA,
+      radius_curvature_ratio
+    ),
     length_units = length_units
   )
   # Generate new shape object ==================================================
@@ -530,13 +533,16 @@ polynomial_cylinder <- function(length_body,
 #' @examples
 #' create_shape("sphere", radius_body = 0.01)
 #' create_shape(
-#'   "prolate_spheroid", length_body = 0.04, radius_body = 0.004
+#'   "prolate_spheroid",
+#'   length_body = 0.04, radius_body = 0.004
 #' )
 #' create_shape(
-#'   "oblate_spheroid", length_body = 0.012, radius_body = 0.01
+#'   "oblate_spheroid",
+#'   length_body = 0.012, radius_body = 0.01
 #' )
 #' create_shape(
-#'   "cylinder", length_body = 0.05, radius_body = 0.003
+#'   "cylinder",
+#'   length_body = 0.05, radius_body = 0.003
 #' )
 #'
 #' @details

@@ -1,4 +1,3 @@
-
 ################################################################################
 # Transition matrix method (TMM) diagnostics helpers
 ################################################################################
@@ -12,8 +11,8 @@
   }
   # Validate the requested frequencies =========================================
   if (!is.numeric(frequency) ||
-      !length(frequency) ||
-      any(!is.finite(frequency))) {
+    !length(frequency) ||
+    any(!is.finite(frequency))) {
     stop(
       "'frequency' must be NULL or a numeric vector of finite values in Hz.",
       call. = FALSE
@@ -64,7 +63,7 @@
 
   for (nm in required_cols) {
     if (!is.numeric(reciprocity_pairs[[nm]]) ||
-        any(!is.finite(reciprocity_pairs[[nm]]))) {
+      any(!is.finite(reciprocity_pairs[[nm]]))) {
       stop(
         "'",
         nm,
@@ -191,8 +190,8 @@
   }
   # Validate the continuation path length ======================================
   if (!is.numeric(continuation_steps) || length(continuation_steps) != 1 ||
-      !is.finite(continuation_steps) || continuation_steps < 0 ||
-      continuation_steps %% 1 != 0) {
+    !is.finite(continuation_steps) || continuation_steps < 0 ||
+    continuation_steps %% 1 != 0) {
     stop("'continuation_steps' must be a single integer >= 0.", call. = FALSE)
   }
   if (continuation_steps < 2) {
@@ -415,12 +414,12 @@
 .tmm_validate_diagnostic_grid <- function(n_theta, n_phi) {
   # Validate the theta-grid control ===========================================
   if (!is.numeric(n_theta) || length(n_theta) != 1 || !is.finite(n_theta) ||
-      n_theta < 5 || n_theta %% 1 != 0) {
+    n_theta < 5 || n_theta %% 1 != 0) {
     stop("'n_theta' must be a single integer >= 5.", call. = FALSE)
   }
   # Validate the phi-grid control =============================================
   if (!is.numeric(n_phi) || length(n_phi) != 1 || !is.finite(n_phi) ||
-      n_phi < 5 || n_phi %% 1 != 0) {
+    n_phi < 5 || n_phi %% 1 != 0) {
     stop("'n_phi' must be a single integer >= 5.", call. = FALSE)
   }
   # Return the validated grid sizes ===========================================
@@ -519,7 +518,9 @@
 
 .tmm_block_summary <- function(block_df) {
   # Estimate block conditioning from the stored summaries =====================
-  min_rcond <- if (nrow(block_df)) min(block_df$rcond, na.rm = TRUE) else {
+  min_rcond <- if (nrow(block_df)) {
+    min(block_df$rcond, na.rm = TRUE)
+  } else {
     NA_real_
   }
   if (!is.finite(min_rcond)) {
@@ -551,8 +552,7 @@
   }
   # Recover the continuation row for the active frequency =====================
   continuation_row <- continuation_summary[
-    continuation_summary$frequency == frequency_value,
-    ,
+    continuation_summary$frequency == frequency_value, ,
     drop = FALSE
   ]
   if (!nrow(continuation_row)) {

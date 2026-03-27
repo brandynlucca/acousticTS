@@ -187,10 +187,10 @@ sdwba_initialize <- function(object,
   # Define stochastic recipe ===================================================
   # First calculate new resampled body shape resolution ++++++++++++++++++++++++
   N_f <- ceiling(n_segments_init * (frequency / frequency_init) *
-                   (shape$length / length_init))
+    (shape$length / length_init))
   N_f_vec <- ifelse(N_f > n_segments_init,
-                    N_f,
-                    n_segments_init
+    N_f,
+    n_segments_init
   )
   N_f_idx <- unique(
     N_f_vec
@@ -200,30 +200,30 @@ sdwba_initialize <- function(object,
     (shape$length / length_init)
   # Create stochastic recipe +++++++++++++++++++++++++++++++++++++++++++++++++++
   stochastic_params <- lapply(seq_along(N_f_idx),
-                              FUN = function(i) {
-                                idx <- which(N_f_vec == N_f_idx[i])
-                                object_new <- sdwba_resample(
-                                  object_profiled,
-                                  n_segments = N_f_idx[i]
-                                )
-                                body <- acousticTS::extract(object_new, "body")
-                                n_segments <- N_f_idx[i]
-                                phase_sd <- phase_sd[i]
-                                acoustics <- model_params$acoustics[idx, ]
-                                list(
-                                  meta_params = data.frame(
-                                    n_iterations = n_iterations,
-                                    phase_sd = phase_sd,
-                                    N0 = n_segments_init,
-                                    f0 = frequency_init,
-                                    L0 = length_init,
-                                    p0 = phase_sd_init
-                                  ),
-                                  body_params = body,
-                                  n_segments = n_segments,
-                                  acoustics = acoustics
-                                )
-                              }
+    FUN = function(i) {
+      idx <- which(N_f_vec == N_f_idx[i])
+      object_new <- sdwba_resample(
+        object_profiled,
+        n_segments = N_f_idx[i]
+      )
+      body <- acousticTS::extract(object_new, "body")
+      n_segments <- N_f_idx[i]
+      phase_sd <- phase_sd[i]
+      acoustics <- model_params$acoustics[idx, ]
+      list(
+        meta_params = data.frame(
+          n_iterations = n_iterations,
+          phase_sd = phase_sd,
+          N0 = n_segments_init,
+          f0 = frequency_init,
+          L0 = length_init,
+          p0 = phase_sd_init
+        ),
+        body_params = body,
+        n_segments = n_segments,
+        acoustics = acoustics
+      )
+    }
   )
   .init_model_slots(
     object = object,
@@ -331,7 +331,7 @@ SDWBA <- function(object) {
   results <- do.call(
     "rbind",
     lapply(seq_along(model$parameters),
-           FUN = function(i) SDWBA_resampled(i)
+      FUN = function(i) SDWBA_resampled(i)
     )
   )
   # Update scatterer object ====================================================
@@ -378,8 +378,8 @@ sdwba_curved_initialize <- function(object,
   # Bend body ==================================================================
   object_copy <- object
   object_copy <- brake(object_copy,
-                       radius_curvature = body$radius_curvature_ratio,
-                       mode = "ratio"
+    radius_curvature = body$radius_curvature_ratio,
+    mode = "ratio"
   )
   # Define medium parameters ===================================================
   medium_params <- data.frame(
@@ -406,10 +406,10 @@ sdwba_curved_initialize <- function(object,
   # Define stochastic recipe ===================================================
   # First calculate new resampled body shape resolution ++++++++++++++++++++++++
   N_f <- ceiling(n_segments_init * (frequency / frequency_init) *
-                   (shape$length / length_init))
+    (shape$length / length_init))
   N_f_vec <- ifelse(N_f > n_segments_init,
-                    N_f,
-                    n_segments_init
+    N_f,
+    n_segments_init
   )
   N_f_idx <- unique(
     N_f_vec
@@ -419,30 +419,30 @@ sdwba_curved_initialize <- function(object,
     (shape$length / length_init)
   # Create stochastic recipe +++++++++++++++++++++++++++++++++++++++++++++++++++
   stochastic_params <- lapply(seq_along(N_f_idx),
-                              FUN = function(i) {
-                                idx <- which(N_f_vec == N_f_idx[i])
-                                object_new <- sdwba_resample(
-                                  object_copy,
-                                  n_segments = N_f_idx[i]
-                                )
-                                body <- extract(object_new, "body")
-                                n_segments <- N_f_idx[i]
-                                phase_sd <- phase_sd[i]
-                                acoustics <- model_params$acoustics[idx, ]
-                                list(
-                                  meta_params = data.frame(
-                                    n_iterations = n_iterations,
-                                    phase_sd = phase_sd,
-                                    N0 = n_segments_init,
-                                    f0 = frequency_init,
-                                    L0 = length_init,
-                                    p0 = phase_sd_init
-                                  ),
-                                  body_params = body,
-                                  n_segments = n_segments,
-                                  acoustics = acoustics
-                                )
-                              }
+    FUN = function(i) {
+      idx <- which(N_f_vec == N_f_idx[i])
+      object_new <- sdwba_resample(
+        object_copy,
+        n_segments = N_f_idx[i]
+      )
+      body <- extract(object_new, "body")
+      n_segments <- N_f_idx[i]
+      phase_sd <- phase_sd[i]
+      acoustics <- model_params$acoustics[idx, ]
+      list(
+        meta_params = data.frame(
+          n_iterations = n_iterations,
+          phase_sd = phase_sd,
+          N0 = n_segments_init,
+          f0 = frequency_init,
+          L0 = length_init,
+          p0 = phase_sd_init
+        ),
+        body_params = body,
+        n_segments = n_segments,
+        acoustics = acoustics
+      )
+    }
   )
   # Add model parameters slot to scattering object =============================
   methods::slot(
@@ -503,7 +503,7 @@ SDWBA_curved <- function(object) {
   results <- do.call(
     "rbind",
     lapply(seq_along(model$parameters),
-           FUN = function(i) SDWBA_resampled_c(i)
+      FUN = function(i) SDWBA_resampled_c(i)
     )
   )
   # Update scatterer object ====================================================

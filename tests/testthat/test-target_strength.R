@@ -94,7 +94,7 @@ test_that("target_strength works with different scatterer types", {
   expect_s4_class(fls_with_ts, "FLS")
   expect_true(
     all(c("DWBA", "SDWBA", "SDWBA_curved", "KRM")
-        %in% names(fls_with_ts@model))
+    %in% names(fls_with_ts@model))
   )
 
   # Test SBF object with KRM
@@ -158,7 +158,7 @@ test_that("target_strength works with different scatterer types", {
   expect_s4_class(ess_with_ts, "ESS")
   expect_true(
     all(c("ESSMS", "HPA")
-        %in% names(ess_with_ts@model))
+    %in% names(ess_with_ts@model))
   )
 })
 

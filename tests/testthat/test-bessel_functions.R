@@ -1,7 +1,6 @@
 library(acousticTS)
 
 test_that("Bessel functions work correctly", {
-
   # Test jc (cylindrical Bessel function of the first kind)
   expect_equal(Re(jc(0, 1)), besselJ(1, 0))
   expect_equal(Re(jc(1, 2)), besselJ(2, 1))
@@ -61,7 +60,6 @@ test_that("Bessel functions work correctly", {
 })
 
 test_that("Spherical Bessel functions work correctly", {
-
   # Test js (spherical Bessel function of the first kind)
   # js should be related to jc by: js(l, n) = sqrt(pi/(2*n)) * jc(l + 0.5, n)
   l <- 1
@@ -187,7 +185,6 @@ test_that("Spherical Bessel functions support complex arguments", {
 })
 
 test_that("Hankel functions work correctly", {
-
   # Test hc (cylindrical Hankel function)
   # hc should equal jc + 1i * yc
   l <- 1
@@ -222,7 +219,7 @@ test_that("Hankel functions work correctly", {
   )
   # ---- Case: n == 0
   expect_true(
-    is.na(Re(hcdd(1,0))) & is.na(Im(hcdd(1,0)))
+    is.na(Re(hcdd(1, 0))) & is.na(Im(hcdd(1, 0)))
   )
 
 

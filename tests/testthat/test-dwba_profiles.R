@@ -33,8 +33,7 @@ library(acousticTS)
 }
 
 .make_dwba_canonical <- function(shape_name, n_segments) {
-  switch(
-    shape_name,
+  switch(shape_name,
     sphere = fls_generate(
       shape = sphere(
         radius_body = 0.01,

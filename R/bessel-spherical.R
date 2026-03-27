@@ -199,7 +199,7 @@ jsdk <- function(l, n, k) {
 #' ys(0, c(1, 2, 3))
 #'
 #' # Singularity at origin
-#' ys(0, 0)  # Returns -Inf
+#' ys(0, 0) # Returns -Inf
 #'
 #' # First derivative
 #' ysdk(1, 2, 1)

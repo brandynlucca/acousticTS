@@ -139,8 +139,8 @@ bbfm_initialize <- function(object,
     )
   }
   if (is.null(backbone$density) ||
-      is.null(backbone$sound_speed_longitudinal) ||
-      is.null(backbone$sound_speed_transversal)) {
+    is.null(backbone$sound_speed_longitudinal) ||
+    is.null(backbone$sound_speed_transversal)) {
     stop(
       "BBFM requires backbone density plus longitudinal and transversal wave ",
       "speeds.",

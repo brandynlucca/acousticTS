@@ -32,7 +32,6 @@ test_that("Shape creation functions work correctly", {
 })
 
 test_that("Prolate spheroid creation works", {
-
   # Test prolate spheroid
   length_body <- 0.1 # 10 cm
   radius_body <- 0.02 # 2 cm
@@ -96,7 +95,6 @@ test_that("Prolate spheroid creation works", {
 })
 
 test_that("Cylinder creation works", {
-
   # Test cylinder
   length_body <- 0.08
   radius_body <- 0.015
@@ -163,8 +161,7 @@ test_that("Canonical KRM profiles match the common benchmark geometries after re
   krm_common_shape <- function(shape, n_points = 30L) {
     ang <- seq(-pi / 2, pi / 2, length.out = n_points)
 
-    switch(
-      shape,
+    switch(shape,
       sphere = data.frame(
         x = 0.01 * (sin(ang) + 1),
         w = 0.02 * cos(ang),
@@ -187,8 +184,7 @@ test_that("Canonical KRM profiles match the common benchmark geometries after re
   }
 
   for (shape_name in c("sphere", "prolate", "cylinder")) {
-    obj <- switch(
-      shape_name,
+    obj <- switch(shape_name,
       sphere = fls_generate(
         sphere(radius_body = 0.01, n_segments = 29),
         density_body = 1028.9,
@@ -215,10 +211,12 @@ test_that("Canonical KRM profiles match the common benchmark geometries after re
     )
     profiled <- acousticTS:::.as_krm_profile(obj)
     body <- profiled@body$rpos
-    acoustic <- data.frame(x = rev(body["x", ]),
-                           w = rev(body["w", ]),
-                           zU = rev(body["zU", ]),
-                           zL = rev(body["zL", ]))
+    acoustic <- data.frame(
+      x = rev(body["x", ]),
+      w = rev(body["w", ]),
+      zU = rev(body["zU", ]),
+      zL = rev(body["zL", ])
+    )
 
     expect_equal(acoustic, krm_common_shape(shape_name), tolerance = 1e-12)
   }
