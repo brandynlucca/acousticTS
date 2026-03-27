@@ -13,6 +13,9 @@ on:
       
 name: Build status
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 permissions: read-all
 
 jobs:
@@ -44,7 +47,6 @@ jobs:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: ${{ matrix.config.r != 'devel' }}
-          error-on: '"error"'
 
       - name: Install Linux Fortran toolchain
         if: runner.os == 'Linux'
@@ -53,8 +55,9 @@ jobs:
       - name: Install macOS GNU toolchain
         if: runner.os == 'macOS'
         run: |
-          brew update
-          brew install gcc
+          if ! brew list gcc >/dev/null 2>&1; then
+            brew install gcc
+          fi
 
       - name: Configure macOS GNU toolchain
         if: runner.os == 'macOS'

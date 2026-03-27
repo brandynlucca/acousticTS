@@ -116,9 +116,8 @@ $$
   \end{bmatrix}.
 $$
 
-```{r echo = FALSE, out.width = "92%", fig.align = "center", fig.cap = "BCMS keeps the straight finite-cylinder modal sum and modifies only the along-axis coherence for a uniformly bent centerline."}
-knitr::include_graphics("bcms-cylinder-schematic.svg")
-```
+![BCMS keeps the straight finite-cylinder modal sum and modifies only the along-axis coherence for a uniformly bent centerline.](bcms-cylinder-schematic.svg)
+
 
 ## Broadside phase bookkeeping
 

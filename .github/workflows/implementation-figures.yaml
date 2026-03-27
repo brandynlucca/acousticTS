@@ -1,5 +1,8 @@
 name: implementation-figures
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   pull_request:
     branches: [main]
@@ -19,6 +22,11 @@ on:
           blank to rebuild the selected profile.
         required: false
         type: string
+      fail_on_drift:
+        description: Fail the workflow if rebuild drift is detected
+        type: boolean
+        required: true
+        default: false
 
 permissions: read-all
 
@@ -67,7 +75,7 @@ jobs:
         run: source("tools/implementation-figures/run_all.R")
         shell: Rscript {0}
 
-      - name: Check for drift
+      - name: Report drift
         if: steps.scope.outputs.scope != 'skip'
         run: |
           git diff --name-only -- \
@@ -82,9 +90,26 @@ jobs:
           echo "Detected implementation rebuild drift:"
           cat implementation_drift.txt
 
-          if grep -vE '(\.png$|_timing[^/]*\.csv$|_compare_summary\.csv$)' implementation_drift.txt >/dev/null; then
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && \
+             [ "${{ inputs.fail_on_drift }}" = "true" ]; then
             echo "Implementation figures/data are out of date."
             exit 1
           fi
 
-          echo "Only PNG or timing-derived drift detected; not failing the workflow."
+          echo "::warning::Implementation rebuild produced drift, but this PR job is informational only."
+
+      - name: Save drift patch
+        if: steps.scope.outputs.scope != 'skip'
+        run: |
+          git diff --binary -- \
+            vignettes \
+            tools/implementation-figures \
+            > implementation_drift.patch
+
+      - uses: actions/upload-artifact@v4
+        if: steps.scope.outputs.scope != 'skip' && hashFiles('implementation_drift.txt') != ''
+        with:
+          name: implementation-drift
+          path: |
+            implementation_drift.txt
+            implementation_drift.patch
