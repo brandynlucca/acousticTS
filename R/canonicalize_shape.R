@@ -41,8 +41,8 @@
 #' defensible for the intended model comparison.
 #'
 #' @return
-#' If `diagnostics = FALSE`, a canonical `Shape` object. If `diagnostics = TRUE`,
-#' a list with elements:
+#' If `diagnostics = FALSE`, a canonical `Shape` object. If
+#' `diagnostics = TRUE`, a list with elements:
 #' \itemize{
 #'   \item `shape`: the fitted canonical `Shape`
 #'   \item `diagnostics`: a named list of source, target, and fit metrics
@@ -102,8 +102,8 @@ canonicalize_shape <- function(shape,
       .shape_segment_count(position_matrix = position_matrix)
   }
   n_segments <- as.integer(n_segments)
-  if (!is.numeric(n_segments) || length(n_segments) != 1L || is.na(n_segments) ||
-      n_segments < 2L) {
+  if (!is.numeric(n_segments) || length(n_segments) != 1L ||
+      is.na(n_segments) || n_segments < 2L) {
     stop(
       "'n_segments' must be one integer greater than or equal to 2.",
       call. = FALSE

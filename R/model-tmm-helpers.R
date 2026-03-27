@@ -73,6 +73,292 @@
   invisible(TRUE)
 }
 
+# Enforce the current public TMM scope to homogeneous fluid/gas scatterers.
+#' @noRd
+.tmm_validate_object_scope <- function(object) {
+  # Restrict the current TMM initializer to the supported scatterer classes ====
+  if (!methods::is(object, "FLS") && !methods::is(object, "GAS")) {
+    stop(
+      "The current TMM implementation requires the scatterer to be either ",
+      "'FLS' or 'GAS'. Input scatterer is type '", class(object)[1], "'.",
+      call. = FALSE
+    )
+  }
+
+  invisible(TRUE)
+}
+
+# Resolve the active geometric branch for one TMM initialization call.
+#' @noRd
+.tmm_branch_flags <- function(shape_parameters) {
+  # Validate the supported geometry and identify the active backend ============
+  .tmm_validate_shape(shape_parameters)
+  use_spheroidal_branch <- .tmm_is_spheroidal_branch(shape_parameters)
+  use_cylindrical_branch <- .tmm_is_cylindrical_branch(shape_parameters)
+  if (use_cylindrical_branch &&
+      isTRUE(getOption("acousticTS.warn_tmm_cylinder", TRUE))) {
+    warning(
+      "Cylinder 'TMM' support remains experimental. The default monostatic ",
+      "branch is benchmark-matched to 'FCMS', but external BEM agreement is ",
+      "not yet closed away from broadside, and stored cylinder TMM currently ",
+      "supports only exact monostatic reuse plus orientation-averaged ",
+      "monostatic products. Use 'FCMS' for production cylinder target ",
+      "strength calculations when possible.",
+      call. = FALSE
+    )
+  }
+
+  list(
+    use_spheroidal_branch = use_spheroidal_branch,
+    use_cylindrical_branch = use_cylindrical_branch
+  )
+}
+
+# Validate the public TMM boundary labels after applying the class default.
+#' @noRd
+.tmm_resolve_boundary <- function(object, boundary) {
+  # Apply the class-specific default boundary and validate the final label =====
+  boundary <- .tmm_boundary_default(object, boundary)
+  if (!(boundary %in% c(
+    "fixed_rigid",
+    "pressure_release",
+    "liquid_filled",
+    "gas_filled"
+  ))) {
+    stop(
+      "Only the following values for 'boundary' are available in TMM: ",
+      "'fixed_rigid', 'pressure_release', 'liquid_filled', 'gas_filled'.",
+      call. = FALSE
+    )
+  }
+
+  boundary
+}
+
+# Validate the retained-block storage flag for one TMM initialization call.
+#' @noRd
+.tmm_validate_store_t_matrix <- function(store_t_matrix) {
+  # Require an explicit scalar logical storage flag ============================
+  if (!is.logical(store_t_matrix) || length(store_t_matrix) != 1 ||
+      is.na(store_t_matrix)) {
+    stop("'store_t_matrix' must be either TRUE or FALSE.", call. = FALSE)
+  }
+
+  invisible(TRUE)
+}
+
+# Disable unsupported spherical truncation overrides on the spheroidal branch.
+#' @noRd
+.tmm_branch_n_max <- function(n_max, use_spheroidal_branch) {
+  # Ignore `n_max` on the prolate spheroidal branch ============================
+  if (use_spheroidal_branch && !is.null(n_max)) {
+    warning(
+      "'n_max' is ignored for the current prolate-spheroidal TMM branch, ",
+      "which uses a spheroidal-coordinate modal/T-matrix equivalent backend."
+    )
+    return(NULL)
+  }
+
+  n_max
+}
+
+# Validate the interior material properties required for penetrable TMM runs.
+#' @noRd
+.tmm_validate_penetrable_body <- function(body, boundary) {
+  # Require scalar density and sound speed for penetrable targets ==============
+  if (boundary %in% c("liquid_filled", "gas_filled") &&
+      (is.null(body$density) || is.null(body$sound_speed))) {
+    stop(
+      "Penetrable TMM boundaries require scalar body density and sound speed ",
+      "(or the corresponding scalar contrasts).",
+      call. = FALSE
+    )
+  }
+
+  invisible(TRUE)
+}
+
+# Resolve the homogeneous interior properties used by the TMM initializer.
+#' @noRd
+.tmm_prepare_body <- function(object, sound_speed_sw, density_sw, boundary) {
+  # Complete the body properties against the surrounding medium ===============
+  body <- .complete_material_props(
+    acousticTS::extract(object, "body"),
+    medium_sound_speed = sound_speed_sw,
+    medium_density = density_sw
+  )
+  .tmm_require_homogeneous_body(body, boundary)
+  .tmm_validate_penetrable_body(body, boundary)
+
+  body
+}
+
+# Build the prolate-spheroidal geometry scalars used by the TMM backend.
+#' @noRd
+.tmm_spheroidal_geometry <- function(shape_parameters) {
+  # Convert the stored prolate geometry to spheroidal coordinates =============
+  xi <- 1 / sqrt(
+    1 - (shape_parameters$radius / (shape_parameters$length / 2))^2
+  )
+  q <- shape_parameters$length / 2 / xi
+
+  list(xi = xi, q = q)
+}
+
+# Build the common acoustics table shared by all TMM branches.
+#' @noRd
+.tmm_base_acoustics <- function(frequency, sound_speed_sw, body, boundary) {
+  # Initialize the exterior and optional interior wavenumber columns ===========
+  acoustics <- .init_acoustics_df(frequency, k_sw = sound_speed_sw)
+  acoustics$k_body <- if (boundary %in% c("liquid_filled", "gas_filled")) {
+    wavenumber(frequency, body$sound_speed)
+  } else {
+    NA_real_
+  }
+
+  acoustics
+}
+
+# Attach the spheroidal reduced-frequency bookkeeping to the acoustics table.
+#' @noRd
+.tmm_add_spheroidal_acoustics <- function(acoustics, boundary, geometry) {
+  # Add reduced frequencies and spheroidal truncation heuristics ==============
+  acoustics$chi_sw <- acoustics$k_sw * geometry$q
+  acoustics$chi_body <- if (boundary %in% c("liquid_filled", "gas_filled")) {
+    acoustics$k_body * geometry$q
+  } else {
+    acoustics$k_sw * geometry$q
+  }
+  acoustics$m_max <- ceiling(2 * acoustics$k_sw * geometry$radius)
+  acoustics$n_max <- acoustics$m_max + ceiling(0.5 * acoustics$chi_sw)
+
+  acoustics
+}
+
+# Apply the branch-specific truncation rules to the TMM acoustics table.
+#' @noRd
+.tmm_assign_branch_n_max <- function(acoustics,
+                                     n_max,
+                                     frequency,
+                                     shape_parameters,
+                                     boundary,
+                                     use_spheroidal_branch,
+                                     use_cylindrical_branch) {
+  # Preserve the spheroidal truncation already attached to the acoustics table =
+  if (use_spheroidal_branch) {
+    return(acoustics)
+  }
+
+  # Apply the cylinder or spherical truncation rules as appropriate ============
+  acoustics$n_max <- if (use_cylindrical_branch) {
+    .tmm_prepare_cylinder_n_max(
+      n_max = n_max,
+      frequency = frequency,
+      k_sw = acoustics$k_sw,
+      shape_parameters = shape_parameters
+    )
+  } else {
+    .tmm_prepare_n_max(
+      n_max = n_max,
+      frequency = frequency,
+      k_sw = acoustics$k_sw,
+      shape_parameters = shape_parameters,
+      boundary = boundary
+    )
+  }
+
+  acoustics
+}
+
+# Build the branch-specific acoustics table and optional spheroidal geometry.
+#' @noRd
+.tmm_prepare_acoustics <- function(frequency,
+                                   sound_speed_sw,
+                                   body,
+                                   boundary,
+                                   shape_parameters,
+                                   use_spheroidal_branch,
+                                   use_cylindrical_branch,
+                                   n_max) {
+  # Start from the shared wavenumber table ====================================
+  acoustics <- .tmm_base_acoustics(frequency, sound_speed_sw, body, boundary)
+  geometry <- NULL
+  if (use_spheroidal_branch) {
+    geometry <- .tmm_spheroidal_geometry(shape_parameters)
+    geometry$radius <- shape_parameters$radius
+    acoustics <- .tmm_add_spheroidal_acoustics(acoustics, boundary, geometry)
+  }
+  acoustics <- .tmm_assign_branch_n_max(
+    acoustics = acoustics,
+    n_max = n_max,
+    frequency = frequency,
+    shape_parameters = shape_parameters,
+    boundary = boundary,
+    use_spheroidal_branch = use_spheroidal_branch,
+    use_cylindrical_branch = use_cylindrical_branch
+  )
+
+  list(acoustics = acoustics, geometry = geometry)
+}
+
+# Build the stored body metadata used by the TMM runtime helpers.
+#' @noRd
+.tmm_body_parameters <- function(body, geometry) {
+  # Start from the common body-fixed incident and material properties ==========
+  body_params <- list(
+    theta_body = body$theta,
+    theta_scatter = pi - body$theta,
+    phi_body = pi,
+    phi_scatter = 2 * pi,
+    density = body$density,
+    sound_speed = body$sound_speed,
+    g_body = body$g,
+    h_body = body$h
+  )
+  if (!is.null(geometry)) {
+    body_params$xi <- geometry$xi
+    body_params$q <- geometry$q
+  }
+
+  body_params
+}
+
+# Resolve the coordinate-system label stored with the initialized TMM object.
+#' @noRd
+.tmm_coordinate_system <- function(use_spheroidal_branch, use_cylindrical_branch) {
+  # Label the active TMM backend coordinate system ============================
+  if (use_spheroidal_branch) {
+    return("spheroidal")
+  }
+  if (use_cylindrical_branch) {
+    return("cylindrical")
+  }
+
+  "spherical"
+}
+
+# Resolve the stored precision label for one initialized TMM object.
+#' @noRd
+.tmm_precision_label <- function(use_spheroidal_branch, boundary) {
+  # Penetrable spheroidal runs use the quad-precision backend =================
+  if (use_spheroidal_branch && boundary %in% c("liquid_filled", "gas_filled")) {
+    return("quad")
+  }
+
+  "double"
+}
+
+# Resolve the stored quadrature-node count for the spheroidal TMM branch.
+#' @noRd
+.tmm_n_integration_label <- function(use_spheroidal_branch, boundary) {
+  # Only penetrable spheroidal runs currently keep an explicit quadrature count
+  if (use_spheroidal_branch && boundary %in% c("liquid_filled", "gas_filled")) {
+    return(96L)
+  }
+
+  NA_integer_
+}
+
 # Return the outer size scale used in the default spherical truncation rule.
 #' @noRd
 .tmm_bounding_radius <- function(shape_parameters) {
@@ -154,13 +440,16 @@
 
 # Normalize `n_max` into a per-frequency integer vector.
 #' @noRd
-.tmm_prepare_n_max <- function(n_max, frequency, k_sw, shape_parameters, boundary) {
+.tmm_prepare_n_max <- function(
+    n_max, frequency, k_sw, shape_parameters, boundary
+  ) {
   if (is.null(n_max)) {
     return(.tmm_default_n_max(k_sw, shape_parameters, boundary))
   }
 
   if (!is.numeric(n_max) || any(!is.finite(n_max)) || any(n_max < 1)) {
-    stop("'n_max' must be NULL or a positive finite integer vector.", call. = FALSE)
+    stop("'n_max' must be NULL or a positive finite integer vector.",
+         call. = FALSE)
   }
 
   if (length(n_max) == 1) {
@@ -182,11 +471,13 @@
 #' @noRd
 .tmm_prepare_cylinder_n_max <- function(n_max, frequency, k_sw, shape_parameters) {
   if (is.null(n_max)) {
-    return(as.integer(ceiling(k_sw * max(as.numeric(shape_parameters$radius), na.rm = TRUE)) + 10L))
+    return(as.integer(ceiling(k_sw * max(as.numeric(shape_parameters$radius),
+                                         na.rm = TRUE)) + 10L))
   }
 
   if (!is.numeric(n_max) || any(!is.finite(n_max)) || any(n_max < 1)) {
-    stop("'n_max' must be NULL or a positive finite integer vector.", call. = FALSE)
+    stop("'n_max' must be NULL or a positive finite integer vector.",
+         call. = FALSE)
   }
 
   if (length(n_max) == 1) {
@@ -248,9 +539,11 @@
   m_max <- max(acoustics$n_max)
   nu <- neumann(0:m_max)
   k1L <- shape_parameters$length * acoustics$k_sw
-  k1a <- acoustics$k_sw * sin(body$theta_body) * max(as.numeric(shape_parameters$radius), na.rm = TRUE)
+  k1a <- acoustics$k_sw * sin(body$theta_body) *
+    max(as.numeric(shape_parameters$radius), na.rm = TRUE)
   k2a <- if (boundary %in% c("liquid_filled", "gas_filled")) {
-    acoustics$k_sw * sin(body$theta_body) / body$h_body * max(as.numeric(shape_parameters$radius), na.rm = TRUE)
+    acoustics$k_sw * sin(body$theta_body) / body$h_body *
+      max(as.numeric(shape_parameters$radius), na.rm = TRUE)
   } else {
     NA_real_
   }

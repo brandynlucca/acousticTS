@@ -365,32 +365,57 @@ shear <- function(K = NULL, E = NULL, nu = NULL) {
 #' @rdname lame
 #' @export
 lame <- function(K = NULL, E = NULL, G = NULL, nu = NULL) {
-  # Check inputs ===============================================================
-  inputs <- list(K = K, E = E, G = G, nu = nu)
-  provided <- !vapply(inputs, is.null, logical(1))
-  # Checksum ===================================================================
-  if (sum(provided) < 2) {
-    stop(
-      paste0(
-        "At least two elasticity moduli values are required to ",
-        "calculate the Lam\U00E9 parameter."
-      )
-    )
-  }
-  # Use first available combination ============================================
+  # Validate the available elastic moduli before selecting a formula ==========
+  .validate_elastic_inputs(
+    K = K,
+    E = E,
+    G = G,
+    nu = nu,
+    param_name = "the Lam\U00E9 parameter"
+  )
+  # Resolve the first supported parameter combination ==========================
+  combo <- .lame_input_combo(K = K, E = E, G = G, nu = nu)
+
+  switch(
+    combo,
+    K_G = K - 2 * G / 3,
+    E_nu = E * nu / ((1 + nu) * (1 - 2 * nu)),
+    G_nu = 2 * G * nu / (1 - 2 * nu),
+    K_nu = 3 * K * nu / (1 + nu),
+    K_E = 3 * K * (3 * K - E) / (9 * K - E),
+    E_G = G * (E - 2 * G) / (3 * G - E)
+  )
+}
+
+#' Resolve the precedence-ordered parameter pair used by lame()
+#' @keywords internal
+#' @noRd
+.lame_input_combo <- function(K = NULL, E = NULL, G = NULL, nu = NULL) {
+  # Record which elastic moduli are available ==================================
+  provided <- !vapply(
+    list(K = K, E = E, G = G, nu = nu),
+    is.null,
+    logical(1)
+  )
+
+  # Apply the historical precedence order used by the public helper ===========
   if (provided["K"] && provided["G"]) {
-    return(K - 2 * G / 3)
-  } else if (provided["E"] && provided["nu"]) {
-    return(E * nu / ((1 + nu) * (1 - 2 * nu)))
-  } else if (provided["G"] && provided["nu"]) {
-    return(2 * G * nu / (1 - 2 * nu))
-  } else if (provided["K"] && provided["nu"]) {
-    return(3 * K * nu / (1 + nu))
-  } else if (provided["K"] && provided["E"]) {
-    return(3 * K * (3 * K - E) / (9 * K - E))
-  } else if (provided["E"] && provided["G"]) {
-    return(G * (E - 2 * G) / (3 * G - E))
+    return("K_G")
   }
+  if (provided["E"] && provided["nu"]) {
+    return("E_nu")
+  }
+  if (provided["G"] && provided["nu"]) {
+    return("G_nu")
+  }
+  if (provided["K"] && provided["nu"]) {
+    return("K_nu")
+  }
+  if (provided["K"] && provided["E"]) {
+    return("K_E")
+  }
+
+  "E_G"
 }
 ################################################################################
 #' Wrapper function to model acoustic target strength
@@ -509,26 +534,80 @@ target_strength <- function(object,
   target_object <- object
   # Capture all arguments including ... ========================================
   shared_args <- list(object = target_object, frequency = frequency, ...)
-  # Handle model names (convert to uppercase for consistency) ==================
+  # Resolve the requested target-strength model names ==========================
+  model_names <- .resolve_target_strength_model_names(model)
+  model <- model_names$model
+  ts_model <- model_names$ts_model
+  model_args <- .normalize_target_strength_model_args(model_args, model)
+  # Initialize the requested model families ===================================
+  target_object <- .initialize_target_strength_models(
+    target_object = target_object,
+    model = model,
+    ts_model = ts_model,
+    shared_args = shared_args,
+    model_args = model_args,
+    verbose = verbose
+  )
+  # Run the requested model families ===========================================
+  .run_target_strength_models(
+    target_object = target_object,
+    model = model,
+    ts_model = ts_model,
+    verbose = verbose
+  )
+}
+
+#' Normalize model names and exported solver names for target_strength()
+#' @keywords internal
+#' @noRd
+.resolve_target_strength_model_names <- function(model) {
+  # Normalize model labels to the naming used throughout the package ===========
   model <- tolower(model)
   ts_model <- gsub("(_.*)", "\\L\\1", paste0(toupper(model)), perl = TRUE)
-  ts_model <- ifelse(ts_model %in% c(
-    "CALIBRATION",
-    "HIGH_pass_stanton"
-  ),
-  tolower(ts_model),
-  ts_model
+  ts_model <- ifelse(
+    ts_model %in% c("CALIBRATION", "HIGH_pass_stanton"),
+    tolower(ts_model),
+    ts_model
   )
-  model_args <- .normalize_target_strength_model_args(model_args, model)
-  # Initialize objects to input model parameters ==============================
-  idx <- 1
-  repeat {
-    if (idx > length(model)) {
-      break
-    }
-    # Pull correct formal arguments ==========================================
+
+  list(model = model, ts_model = ts_model)
+}
+
+#' Build a compact object label for target_strength() status messages
+#' @keywords internal
+#' @noRd
+.target_strength_object_label <- function(object) {
+  paste0(class(object), "-object: ", extract(object, "metadata")$ID)
+}
+
+#' Copy initialized model slots from a model-specific initialize() call
+#' @keywords internal
+#' @noRd
+.store_target_strength_model_state <- function(target_object,
+                                               object_copy,
+                                               ts_model_name) {
+  # Copy the initialized parameter recipe back onto the output object ==========
+  methods::slot(target_object, "model_parameters")[ts_model_name] <-
+    extract(object_copy, "model_parameters")[ts_model_name]
+  methods::slot(target_object, "model")[ts_model_name] <-
+    extract(object_copy, "model")[ts_model_name]
+
+  target_object
+}
+
+#' Initialize all requested model families for target_strength()
+#' @keywords internal
+#' @noRd
+.initialize_target_strength_models <- function(target_object,
+                                               model,
+                                               ts_model,
+                                               shared_args,
+                                               model_args,
+                                               verbose = FALSE) {
+  # Initialize one model family at a time =====================================
+  for (idx in seq_along(model)) {
     model_name <- paste0(model[idx], "_initialize")
-    # Check if initialization function exists ================================
+
     if (!exists(model_name)) {
       stop(
         "Initialization function ",
@@ -537,72 +616,60 @@ target_strength <- function(object,
         model[idx]
       )
     }
-    # Filter out inappropriate parameters ====================================
-    arg_pull <- .merge_target_strength_args(
-      shared_args,
-      model_args[[model[idx]]]
-    )
+
+    arg_pull <- .merge_target_strength_args(shared_args, model_args[[model[idx]]])
     true_args <- .filter_shape_args(model_name, arg_pull)
-    # Initialize ==============================================================
     object_copy <- do.call(model_name, true_args)
-    # Store model parameters and results =====================================
-    methods::slot(
-      target_object,
-      "model_parameters"
-    )[ts_model[idx]] <- extract(
-      object_copy, "model_parameters"
-    )[ts_model[idx]]
-    methods::slot(
-      target_object,
-      "model"
-    )[ts_model[idx]] <- extract(
-      object_copy, "model"
-    )[ts_model[idx]]
+    target_object <- .store_target_strength_model_state(
+      target_object = target_object,
+      object_copy = object_copy,
+      ts_model_name = ts_model[idx]
+    )
 
     if (verbose) {
       cat(
-        toupper(model[idx]), "model for", paste0(
-          class(target_object), "-object: ",
-          extract(target_object, "metadata")$ID
-        ),
+        toupper(model[idx]), "model for",
+        .target_strength_object_label(target_object),
         "initialized.\n\n"
       )
     }
-
-    idx <- idx + 1
   }
-  # Run the models =============================================================
-  idx <- 1
-  repeat {
-    if (idx > length(model)) {
-      break
-    }
+
+  target_object
+}
+
+#' Run all requested model families for target_strength()
+#' @keywords internal
+#' @noRd
+.run_target_strength_models <- function(target_object,
+                                        model,
+                                        ts_model,
+                                        verbose = FALSE) {
+  # Evaluate the requested target-strength models sequentially ================
+  for (idx in seq_along(model)) {
     if (verbose) {
       cat(
         "Beginning TS modeling via", toupper(model[idx]),
-        "model for", paste0(
-          class(target_object), "-object: ",
-          extract(target_object, "metadata")$ID
-        ), "\n"
+        "model for", .target_strength_object_label(target_object), "\n"
       )
     }
-    # Check if model function exists ===========================================
+
     if (!exists(ts_model[idx])) {
       stop("Model function ", ts_model[idx], " not found")
     }
-    # Calculate modeled TS using do.call instead of eval(parse(...)) ===========
+
     target_object <- do.call(ts_model[idx], list(object = target_object))
 
     if (verbose) {
-      cat(toupper(model[idx]), "TS model predictions for", paste0(
-        class(target_object), "-object: ",
-        extract(target_object, "metadata")$ID
-      ), "complete.\n\n")
+      cat(
+        toupper(model[idx]), "TS model predictions for",
+        .target_strength_object_label(target_object),
+        "complete.\n\n"
+      )
     }
-    idx <- idx + 1
   }
-  # Output object ==============================================================
-  return(target_object)
+
+  target_object
 }
 
 #' Normalize per-model argument bundles supplied to target_strength()

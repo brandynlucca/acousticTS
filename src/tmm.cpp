@@ -10,8 +10,6 @@ using namespace Rcpp;
 
 void gauss_legendre(int n, std::vector<double>& nodes, std::vector<double>& weights);
 
-static const std::complex<double> tmm_i(0.0, 1.0);
-
 // Integer powers of i appear repeatedly in the modal algebra, so evaluate them
 // exactly instead of repeatedly calling std::pow on complex values.
 static inline std::complex<double> tmm_pow_i(int n) {

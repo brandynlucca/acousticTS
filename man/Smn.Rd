@@ -51,8 +51,9 @@ Computes the prolate spheroidal angular function of the first kind,
 and angular coordinate \eqn{\eta}.
 
 This function is an R wrapper for compiled C++ code, which in turn calls the
-underlying Fortran library (\code{prolate_swf}) for high-performance numerical
-computation. All heavy computation is performed in compiled code for speed and
+underlying Fortran library (\code{prolate_swf}) for high-performance
+numerical computation. All heavy computation is performed in compiled code
+for speed and
 accuracy.
 }
 \details{

@@ -74,7 +74,8 @@ setGeneric(
 #' @noRd
 .reforge_component_dimensions <- function(rpos, length = NULL) {
   # Recover the width profile needed for scalar component summaries ============
-  width_profile <- .shape_width_profile(position_matrix = rpos, row_major = TRUE)
+  width_profile <- .shape_width_profile(position_matrix = rpos,
+                                        row_major = TRUE)
   # Return length, width, and height for the current component =================
   c(
     length = if (!is.null(length)) {
@@ -225,9 +226,11 @@ setGeneric(
   parent_x <- .shape_x(parent_rpos, row_major = TRUE)
   component_x <- .shape_x(component_rpos, row_major = TRUE)
   new_start <- min(parent_x, na.rm = TRUE) +
-    relative_start * .shape_length(position_matrix = parent_rpos, row_major = TRUE)
+    relative_start * .shape_length(position_matrix = parent_rpos,
+                                   row_major = TRUE)
   shift_amount <- new_start - component_x[1]
-  x_idx <- match(.geometry_contract_schema()$profile_row_major$x, rownames(component_rpos),
+  x_idx <- match(.geometry_contract_schema()$profile_row_major$x,
+                 rownames(component_rpos),
     nomatch = 0
   )
   x_idx <- x_idx[x_idx > 0][1]
@@ -506,7 +509,8 @@ setMethod(
       )
     }
     if (!is.null(scale) && !is.null(radius_target)) {
-      stop("Specify only one of scale or radius_target, not both.", call. = FALSE)
+      stop("Specify only one of scale or radius_target, not both.",
+           call. = FALSE)
     }
     if (!is.null(scale) &&
         (!is.numeric(scale) || length(scale) != 1 || scale <= 0)) {
@@ -535,7 +539,8 @@ setMethod(
     # Interpolate every non-x column so that arbitrary shapes are handled.
     if (!is.null(n_segments)) {
       rpos <- .resample_rpos(rpos, as.integer(n_segments) + 1L)
-      methods::slot(object, "shape_parameters")$n_segments <- as.integer(n_segments)
+      methods::slot(object, "shape_parameters")$n_segments <-
+        as.integer(n_segments)
     }
     ############################################################################
     # Apply scale ==============================================================
@@ -607,12 +612,14 @@ setMethod(
     # CAL is always a sphere; radius is a scalar stored in shape_parameters
     current_radius <- shape$radius_body %||% shape$radius
     # Derive scale from diameter_target if given ===============================
-    if (!is.null(diameter_target)) scale <- (diameter_target / 2) / current_radius
+    if (!is.null(diameter_target)) scale <- (diameter_target / 2) /
+      current_radius
     ############################################################################
     # Resample segments first ==================================================
     if (!is.null(n_segments)) {
       rpos <- .resample_rpos(rpos, as.integer(n_segments) + 1L)
-      methods::slot(object, "shape_parameters")$n_segments <- as.integer(n_segments)
+      methods::slot(object, "shape_parameters")$n_segments <-
+        as.integer(n_segments)
     }
     ############################################################################
     # Apply scale ==============================================================
@@ -673,7 +680,8 @@ setMethod(
       )
     }
     if (!is.null(scale) && !is.null(radius_target)) {
-      stop("Specify only one of scale or radius_target, not both.", call. = FALSE)
+      stop("Specify only one of scale or radius_target, not both.",
+           call. = FALSE)
     }
     if (!is.null(scale) &&
         (!is.numeric(scale) || length(scale) != 1 || scale <= 0)) {
@@ -690,7 +698,8 @@ setMethod(
       stop("'shell_thickness' must be a single positive number.", call. = FALSE)
     }
     if (!is.null(n_segments) &&
-        (!is.numeric(n_segments) || length(n_segments) != 1 || n_segments < 1)) {
+        (!is.numeric(n_segments) || length(n_segments) != 1 ||
+         n_segments < 1)) {
       stop("'n_segments' must be a single positive integer.", call. = FALSE)
     }
     ############################################################################
@@ -715,7 +724,8 @@ setMethod(
       rpos_shell <- .resample_rpos(rpos_shell, n_new)
       if (!is.null(rpos_fluid))
         rpos_fluid <- .resample_rpos(rpos_fluid, n_new)
-      methods::slot(object, "shape_parameters")$n_segments <- as.integer(n_segments)
+      methods::slot(object, "shape_parameters")$n_segments <-
+        as.integer(n_segments)
     }
     ############################################################################
     # Apply scale to shell =====================================================
@@ -725,7 +735,8 @@ setMethod(
       new_shell_max_r <- curr_shell_max_r * scale
       methods::slot(object, "shell")$radius                    <- new_shell_r
       methods::slot(object, "shape_parameters")$shell$radius   <- new_shell_r
-      methods::slot(object, "shape_parameters")$shell$diameter <- new_shell_r * 2
+      methods::slot(object, "shape_parameters")$shell$diameter <-
+        new_shell_r * 2
       # Scale fluid if present ------------------------------------------------
       if (!is.null(rpos_fluid) && !is.na(curr_fluid_max_r)) {
         if (!is.null(shell_thickness)) {
@@ -744,7 +755,8 @@ setMethod(
         }
         methods::slot(object, "fluid")$radius                    <- new_fluid_r
         methods::slot(object, "shape_parameters")$fluid$radius   <- new_fluid_r
-        methods::slot(object, "shape_parameters")$fluid$diameter <- new_fluid_r * 2
+        methods::slot(object, "shape_parameters")$fluid$diameter <-
+          new_fluid_r * 2
       }
     } else if (!is.null(shell_thickness)) {
       # Thickness-only update: rescale fluid, leave shell unchanged ============
@@ -757,7 +769,8 @@ setMethod(
         new_fluid_r <- curr_fluid_r * fluid_scale
         methods::slot(object, "fluid")$radius                    <- new_fluid_r
         methods::slot(object, "shape_parameters")$fluid$radius   <- new_fluid_r
-        methods::slot(object, "shape_parameters")$fluid$diameter <- new_fluid_r * 2
+        methods::slot(object, "shape_parameters")$fluid$diameter <-
+          new_fluid_r * 2
       }
       methods::slot(object, "shell")$shell_thickness <- shell_thickness
     }
@@ -828,7 +841,8 @@ setMethod(
           # Correct the already-scaled radius rows in rpos so they match.
           correction <- r_scale / new_scale
           if (nrow(rpos) >= 4)
-            rpos[seq(4L, nrow(rpos)), ] <- rpos[seq(4L, nrow(rpos)), ] * correction
+            rpos[seq(4L, nrow(rpos)), ] <- rpos[seq(4L, nrow(rpos)), ] *
+            correction
         }
         methods::slot(object, "shape_parameters")$radius <- max(radii)
       } else {

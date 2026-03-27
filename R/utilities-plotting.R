@@ -476,7 +476,8 @@
   }
 
   width <- fields$w
-  if (all(is.na(width)) || max(abs(width), na.rm = TRUE) <= sqrt(.Machine$double.eps)) {
+  if (all(is.na(width)) || max(abs(width), na.rm = TRUE) <=
+      sqrt(.Machine$double.eps)) {
     width <- 2 * radius
   }
 
@@ -501,15 +502,17 @@
 #' @param nudge_x x-axis nudge factor.
 #' @keywords internal
 #' @noRd
-.plot_profile_component_panels <- function(primary_rpos,
-                                           primary_radius = NULL,
-                                           secondary_rpos = NULL,
-                                           secondary_radius = NULL,
-                                           primary_label = "Body",
-                                           secondary_label = "Internal component",
-                                           secondary_col = "red",
-                                           nudge_y = 1.05,
-                                           nudge_x = 1.01) {
+.plot_profile_component_panels <- function(
+    primary_rpos,
+    primary_radius = NULL,
+    secondary_rpos = NULL,
+    secondary_radius = NULL,
+    primary_label = "Body",
+    secondary_label = "Internal component",
+    secondary_col = "red",
+    nudge_y = 1.05,
+    nudge_x = 1.01
+  ) {
   # Recover the outline data for the primary and optional secondary component ==
   primary <- .component_profile_outline(primary_rpos, radius = primary_radius)
   secondary <- if (!is.null(secondary_rpos)) {

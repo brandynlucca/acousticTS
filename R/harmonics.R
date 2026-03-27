@@ -376,24 +376,84 @@ Qn <- function(n, x) {
 #' @importFrom Rcpp sourceCpp
 #' @keywords legendre derivative
 #' @rdname Qndk
-#' @export
-Qndk <- function(n, x, k = 1L) {
-  # Validation =================================================================
+#' @noRd
+.validate_Qndk_inputs <- function(n, x, k) {
+  # Restrict the derivative inputs to the real-valued implementation ===========
   if (is.complex(n) | is.complex(x)) {
     stop("'n' and 'x' must be real numbers.")
   }
+
+  # Require finite degree and evaluation coordinates ===========================
   if (any(!is.finite(n))) {
     stop("'n' must be finite.")
   }
   if (any(!is.finite(x))) {
     stop("'x' must be a real, finite numeric.")
   }
+
+  # Enforce a non-negative integer derivative order ============================
   if (!is.numeric(k) || length(k) != 1 || k < 0 || k != floor(k)) {
     stop("'k' must be a non-negative integer.")
   }
+
+  # Warn when the derivative is requested too close to the singular endpoints ==
   if (any(abs(abs(x) - 1) < 1e-10)) {
     warning("Derivatives near x = +/-1 may be inaccurate due to singularity.")
   }
+}
+
+#' Derivative of the Legendre function of the second kind
+#'
+#' @param n Numeric vector. Degree (order) of the Legendre function.
+#' @param x Numeric vector. Real argument(s) at which to evaluate the
+#'   derivative. Avoid \eqn{x = \pm 1}.
+#' @param k Integer. Order of the derivative (\eqn{k \geq 0}). Default is 1.
+#'
+#' @return
+#' A complex matrix of dimension \code{length(n)} by \code{length(x)}, where
+#' element \code{[i, j]} contains \eqn{\frac{d^k}{dx^k} Q_{n_i}(x_j)}.
+#'
+#' @examples
+#' # First derivative of Q_1(x) at x = 0.5
+#' Qndk(1, 0.5, 1)
+#'
+#' # Compare with numerical derivative
+#' h <- 1e-6
+#' (Qn(1, 0.5 + h) - Qn(1, 0.5 - h)) / (2 * h)
+#'
+#' # Second derivative
+#' Qndk(2, 0.5, 2)
+#'
+#' # Multiple orders
+#' Qndk(c(1, 2, 3), 0.5, 1)
+#'
+#' # Complex result for |x| > 1
+#' Qndk(1, 2.0, 1)
+#'
+#' @references
+#' Abramowitz, M. and Stegun, I. A. (1972). \emph{Handbook of Mathematical
+#' Functions}. Dover Publications. Chapter 8: Legendre Functions.
+#'
+#' @seealso
+#' \code{\link{Qn}} for Legendre functions of the second kind.
+#'
+#' @note
+#' Derivatives are computed via finite differences with step size
+#' \eqn{h = 10^{-6}}. Accuracy is typically 4-6 significant digits for
+#' first derivatives, less for higher orders.
+#'
+#' This function calls underlying \eqn{C++} code via \code{Rcpp} for
+#' computational efficiency and to support different cases for both order and
+#' argument that are not readily available in \code{R}.
+#'
+#' @useDynLib acousticTS, .registration = TRUE
+#' @importFrom Rcpp sourceCpp
+#' @keywords legendre derivative
+#' @export
+Qndk <- function(n, x, k = 1L) {
+  # Validate the derivative request before dispatching to the C++ backend ======
+  .validate_Qndk_inputs(n = n, x = x, k = k)
+
   # Compute derivative =========================================================
   Qn_deriv_cpp(as.numeric(n), as.numeric(x), as.integer(k))
 }

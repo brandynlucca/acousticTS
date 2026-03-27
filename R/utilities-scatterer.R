@@ -61,8 +61,8 @@
     if (!identical(unit_args[[nm]], si_defaults[[nm]])) {
       .warn_scatterer_constructor_compatibility(
         paste0(
-          "'", nm, "' in ", context, " constructors is deprecated and ignored. ",
-          "Supply scatterer geometry in meters and orientations in radians."
+          "'", nm, "' in ", context, " constructors is deprecated and ignored.",
+          " Supply scatterer geometry in meters and orientations in radians."
         )
       )
     }
@@ -191,8 +191,8 @@
       return(.resolve_shape("arbitrary", arguments))
     }
     stop(
-      "Supply 'shape' as a pre-built Shape object, or provide explicit profile ",
-      "coordinates such as x_body/zU_body/zL_body.",
+      "Supply 'shape' as a pre-built Shape object, or provide explicit ",
+      "profile coordinates such as x_body/zU_body/zL_body.",
       call. = FALSE
     )
   }
@@ -321,7 +321,8 @@
   }
 
   storage <- if (row_major) "profile_row_major" else "shape_column_major"
-  axis_names <- if (row_major) rownames(position_matrix) else colnames(position_matrix)
+  axis_names <- if (row_major) rownames(position_matrix) else
+    colnames(position_matrix)
 
   # Prefer named axes from the internal geometry contract when available =======
   if (!is.null(axis_names)) {
@@ -350,7 +351,8 @@
   }
 
   if (axis == "x") {
-    return(as.numeric(if (row_major) position_matrix[1, ] else position_matrix[, 1]))
+    return(as.numeric(if (row_major) position_matrix[1, ] else
+      position_matrix[, 1]))
   }
 
   # Return NULL when the requested optional axis is unavailable ================
@@ -620,7 +622,10 @@
   if (length(values) != expected_segments) {
     stop(
       sprintf(
-        "Vector input for '%s' with %d elements does not match the expected number of segments (%d).",
+        paste0(
+          "Vector input for '%s' with %d elements does not match the expected ",
+          "number of segments (%d)."
+        ),
         argument_name,
         length(values),
         expected_segments
@@ -692,7 +697,8 @@
                                            default = NULL) {
   # Return the first matching named column from the candidate list =============
   for (nm in candidates) {
-    if (!is.null(colnames(position_matrix)) && nm %in% colnames(position_matrix)) {
+    if (!is.null(colnames(position_matrix)) && nm %in%
+        colnames(position_matrix)) {
       return(position_matrix[, nm])
     }
   }
@@ -716,7 +722,8 @@
                                          default = NULL) {
   # Return the first matching named row from the candidate list ================
   for (nm in candidates) {
-    if (!is.null(rownames(position_matrix)) && nm %in% rownames(position_matrix)) {
+    if (!is.null(rownames(position_matrix)) && nm %in%
+        rownames(position_matrix)) {
       return(position_matrix[nm, ])
     }
   }
@@ -745,12 +752,18 @@
 
   # Apply the requested offsets to any recognized coordinate columns ===========
   if (!is.null(colnames(translated))) {
-    if ("x" %in% colnames(translated)) translated[, "x"] <- translated[, "x"] + x_offset
-    if ("y" %in% colnames(translated)) translated[, "y"] <- translated[, "y"] + y_offset
-    if ("w" %in% colnames(translated)) translated[, "w"] <- translated[, "w"] + y_offset
-    if ("z" %in% colnames(translated)) translated[, "z"] <- translated[, "z"] + z_offset
-    if ("zU" %in% colnames(translated)) translated[, "zU"] <- translated[, "zU"] + z_offset
-    if ("zL" %in% colnames(translated)) translated[, "zL"] <- translated[, "zL"] + z_offset
+    if ("x" %in% colnames(translated)) translated[, "x"] <-
+        translated[, "x"] + x_offset
+    if ("y" %in% colnames(translated)) translated[, "y"] <-
+        translated[, "y"] + y_offset
+    if ("w" %in% colnames(translated)) translated[, "w"] <-
+        translated[, "w"] + y_offset
+    if ("z" %in% colnames(translated)) translated[, "z"] <-
+        translated[, "z"] + z_offset
+    if ("zU" %in% colnames(translated)) translated[, "zU"] <-
+        translated[, "zU"] + z_offset
+    if ("zL" %in% colnames(translated)) translated[, "zL"] <-
+        translated[, "zL"] + z_offset
   }
 
   # Return the translated shape matrix =========================================
@@ -1167,7 +1180,8 @@
   # Recover the outer shell geometry and validate the thickness ================
   position_matrix <- acousticTS::extract(shape_obj, "position_matrix")
   shape_parameters <- acousticTS::extract(shape_obj, "shape_parameters")
-  max_radius <- .shape_max_radius(shape_input = shape_obj, error_context = "ESS shell")
+  max_radius <- .shape_max_radius(shape_input = shape_obj,
+                                  error_context = "ESS shell")
   if (!is.finite(max_radius) || shell_thickness >= max_radius) {
     stop(
       "'shell_thickness' must be smaller than the shell radius.",
@@ -1191,7 +1205,9 @@
       taper = if (is.na(shape_parameters$taper_order)) NULL else {
         shape_parameters$taper_order
       },
-      radius_curvature_ratio = if (is.na(shape_parameters$radius_curvature_ratio)) {
+      radius_curvature_ratio = if (is.na(
+        shape_parameters$radius_curvature_ratio
+      )) {
         NULL
       } else {
         shape_parameters$radius_curvature_ratio
@@ -1250,7 +1266,8 @@
     context = "ESS shell position matrix"
   )
   z_center <- if (!is.null(colnames(position_matrix)) &&
-      any(c("z", "z_body", "z_shell", "z_fluid") %in% colnames(position_matrix))) {
+      any(c("z", "z_body", "z_shell", "z_fluid") %in%
+          colnames(position_matrix))) {
     .extract_shape_component_column(
       position_matrix,
       c("z", "z_body", "z_shell", "z_fluid"),
@@ -1310,7 +1327,8 @@
   } else if (is.null(shape)) {
     stop(
       "Supply 'shape' as a pre-built Shape object for `ess_generate()`, or ",
-      "provide explicit shell profile coordinates such as x_body/y_body/z_body.",
+      "provide explicit shell profile coordinates such as ",
+      "x_body/y_body/z_body.",
       call. = FALSE
     )
   } else {

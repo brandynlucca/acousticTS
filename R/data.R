@@ -65,10 +65,13 @@
 
 #' Sample cod shape with fully inflated swimbladder
 #'
-#' @format A pre-generated SBF scatterer containing all information required for
-#' target strength modeling. The packaged object corresponds to the historical
+#' A pre-generated SBF scatterer containing all information required for target
+#' strength modeling. The packaged object corresponds to the historical
 #' Atlantic cod example used in the KRM literature and matches the Cod D case
 #' archived in the \code{echoSMs} KRM shape collection.
+#'
+#' @format A pre-generated SBF scatterer containing all information required for
+#' target strength modeling.
 #' \describe{
 #'   \item{metadata}{Relevant and identifying metadata (\code{list}).}
 #'   \item{model_parameters}{Container for specified model parameters

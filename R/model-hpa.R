@@ -247,7 +247,9 @@ hpa_initialize <- function(object,
     )
   }
   medium_params <- .init_medium_params(sound_speed_sw, density_sw)
-  body <- .hydrate_contrasts(body, medium_params$sound_speed, medium_params$density)
+  body <- .hydrate_contrasts(body,
+                             medium_params$sound_speed,
+                             medium_params$density)
   # Define model parameters recipe =============================================
   model_params <- list(
     acoustics = .init_acoustics_df(

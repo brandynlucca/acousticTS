@@ -13,8 +13,8 @@ Rmn(m, n, c, xi, kind = 1, precision = "double")
 \item{n}{Non-negative integer. The degree of the spheroidal function (\eqn{n
 \geq m}).}
 
-\item{c}{Numeric. The scalar size parameter (also denoted \eqn{\gamma} in some
-references).}
+\item{c}{Numeric. The scalar size parameter (also denoted \eqn{\gamma} in
+some references).}
 
 \item{xi}{Numeric. The radial coordinate at which to evaluate the function.
 Must satisfy \eqn{\xi \geq 1}.}

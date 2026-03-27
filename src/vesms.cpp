@@ -7,7 +7,6 @@
 using namespace Rcpp;
 
 static const double vesms_pi = M_PI;
-static const double vesms_tol = 1e-12;
 static const std::complex<double> vesms_i(0.0, 1.0);
 
 // Solve one dense modal boundary system. Try the fast direct solver first,

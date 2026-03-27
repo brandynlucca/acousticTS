@@ -76,14 +76,16 @@
   if (length(assumptions) > 0) {
     sections <- c(
       sections,
-      paste0("## Main assumptions\n\n", paste0("- ", assumptions, collapse = "\n"))
+      paste0("## Main assumptions\n\n", paste0("- ", assumptions,
+                                               collapse = "\n"))
     )
   }
 
   if (length(validation) > 0) {
     sections <- c(
       sections,
-      paste0("## Validation status\n\n", paste0("- ", validation, collapse = "\n"))
+      paste0("## Validation status\n\n", paste0("- ", validation,
+                                                collapse = "\n"))
     )
   }
 

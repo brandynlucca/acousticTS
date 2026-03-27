@@ -177,16 +177,62 @@ neumann <- function(x) {
 #' Davis, P. J., & Rabinowitz, P. (2007). Methods of Numerical Integration
 #' (2nd ed.).
 #'
-#' @export
-gauss_legendre <- function(n, a = -1, b = 1) {
-  # Validation =================================================================
+#' @keywords integration quadrature
+#' @rdname gauss_legendre
+#' @noRd
+.validate_gauss_legendre_inputs <- function(n, a, b) {
+  # Require a positive integer node count ======================================
   if (!is.numeric(n) || length(n) != 1 || n < 1 || n %% 1 != 0) {
     stop("n must be a positive integer")
   }
+
+  # Require scalar numeric interval endpoints ==================================
   if (!is.numeric(a) || !is.numeric(b) || length(a) != 1 || length(b) != 1) {
     stop("a and b must be numeric scalars")
   }
-  if (b <= a) stop("b must be greater than a")
+
+  # Enforce a properly ordered interval =======================================
+  if (b <= a) {
+    stop("b must be greater than a")
+  }
+}
+
+#' Gauss-Legendre nodes and weights
+#'
+#' Compute Gauss-Legendre quadrature nodes and weights on an interval
+#' \eqn{[a,~b]}.
+#'
+#' @param n Number of quadrature nodes (n >= 1).
+#' @param a Left endpoint of the integration interval.
+#' @param b Right endpoint of the integration interval (b > a).
+#'
+#' @return A list with components:
+#' \describe{
+#'   \item{nodes}{Quadrature abscissae \eqn{x_i} in \eqn{[a,~b]}.}
+#'   \item{weights}{Quadrature weights \eqn{w_i} such that
+#'     \eqn{\int_a^b f(x)\,dx \approx \sum_{i=1}^n w_i\,f(x_i).}}
+#' }
+#'
+#' @details
+#' Gauss-Legendre quadrature provides exact integration for polynomials of
+#' degree up to \eqn{2n-1} using n nodes and weights chosen as the roots of the
+#' Legendre polynomial \eqn{P_n(x)} on the canonical interval \eqn{[-1,1]}. For
+#' a general interval \eqn{[a,b]} the canonical nodes are shifted and rescaled
+#' onto \eqn{[a,b]}, and the weights are scaled by \eqn{(b-a)/2}.
+#'
+#' This wrapper performs basic argument validation and calls the C++ routine
+#' to obtain nodes and weights with high accuracy for moderate \code{n}.
+#'
+#' @references
+#' Davis, P. J., & Rabinowitz, P. (2007). Methods of Numerical Integration
+#' (2nd ed.).
+#'
+#' @keywords integration quadrature
+#' @export
+gauss_legendre <- function(n, a = -1, b = 1) {
+  # Validate the quadrature request before calling the compiled backend ========
+  .validate_gauss_legendre_inputs(n = n, a = a, b = b)
+
   # Get nodes and their weights ================================================
   gauss_legendre_cpp(n = n, a = a, b = b)
 }

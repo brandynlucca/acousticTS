@@ -42,8 +42,16 @@
 #' @keywords internal
 #' @noRd
 `%||%` <- function(a, b) {
-  # Return the left-hand value unless it is NULL or NA =========================
-  if (!is.null(a) && !is.na(a)) a else b
+  # Prefer the left-hand value unless it is NULL or a scalar NA ===============
+  if (is.null(a)) {
+    return(b)
+  }
+
+  if (is.atomic(a) && length(a) == 1 && is.na(a)) {
+    return(b)
+  }
+
+  a
 }
 
 #' Return real part if imaginary part is (numerically) zero, else return complex
@@ -112,12 +120,116 @@
   )
 }
 
+#' Resolve one slot access while traversing nested scatterer structures
+#' @param layer Current traversal layer.
+#' @param sub_layer Requested child element.
+#' @param class_name Display name used in error messages.
+#' @keywords internal
+#' @noRd
+.extract_slot_layer <- function(layer, sub_layer, class_name) {
+  # Guard against invalid slot requests before attempting slot access ==========
+  if (!methods::.hasSlot(layer, sub_layer)) {
+    stop(sprintf("%s does not have slot '%s'.", class_name, sub_layer))
+  }
+
+  # Return the requested slot ==================================================
+  methods::slot(layer, sub_layer)
+}
+
+#' Resolve one list element while traversing nested scatterer structures
+#' @param layer Current traversal layer.
+#' @param sub_layer Requested child element.
+#' @keywords internal
+#' @noRd
+.extract_list_layer <- function(layer, sub_layer) {
+  # Flag missing list elements without raising immediately =====================
+  if (!sub_layer %in% names(layer)) {
+    return(list(layer = layer, fail_state = TRUE))
+  }
+
+  # Return the requested list element =========================================
+  list(layer = layer[[sub_layer]], fail_state = FALSE)
+}
+
+#' Resolve one matrix row or column while traversing nested structures
+#' @param layer Current traversal layer.
+#' @param sub_layer Requested child element.
+#' @keywords internal
+#' @noRd
+.extract_matrix_layer <- function(layer, sub_layer) {
+  # Prefer row names before column names to match the legacy accessor ==========
+  is_rows <- sub_layer %in% row.names(layer)
+  is_cols <- sub_layer %in% colnames(layer)
+
+  if (is_rows) {
+    return(list(layer = layer[sub_layer, ], fail_state = FALSE))
+  }
+  if (is_cols) {
+    return(list(layer = layer[, sub_layer], fail_state = FALSE))
+  }
+
+  # Flag unresolved matrix lookups for the caller ==============================
+  list(layer = layer, fail_state = TRUE)
+}
+
+#' Resolve one named-vector element while traversing nested structures
+#' @param layer Current traversal layer.
+#' @param sub_layer Requested child element.
+#' @keywords internal
+#' @noRd
+.extract_vector_layer <- function(layer, sub_layer) {
+  # Flag unresolved vector lookups for the caller ==============================
+  if (!sub_layer %in% names(layer)) {
+    return(list(layer = layer, fail_state = TRUE))
+  }
+
+  # Return the requested named-vector value ===================================
+  list(layer = layer[sub_layer], fail_state = FALSE)
+}
+
+#' Advance one step through a nested scatterer/shape structure
+#' @param layer Current traversal layer.
+#' @param sub_layer Requested child element.
+#' @keywords internal
+#' @noRd
+.extract_next_layer <- function(layer, sub_layer) {
+  # Handle S4 scatterer slots ==================================================
+  if (methods::is(layer, "Scatterer")) {
+    return(list(
+      layer = .extract_slot_layer(layer, sub_layer, "Scattering object"),
+      fail_state = FALSE
+    ))
+  }
+
+  # Handle S4 shape slots ======================================================
+  if (methods::is(layer, "Shape")) {
+    return(list(
+      layer = .extract_slot_layer(layer, sub_layer, "Shape object"),
+      fail_state = FALSE
+    ))
+  }
+
+  # Handle recursive containers ================================================
+  if (is.list(layer)) {
+    return(.extract_list_layer(layer, sub_layer))
+  }
+  if (is.matrix(layer)) {
+    return(.extract_matrix_layer(layer, sub_layer))
+  }
+  if (is.vector(layer)) {
+    return(.extract_vector_layer(layer, sub_layer))
+  }
+
+  # Return the current layer unchanged when no traversal rule applies ==========
+  list(layer = layer, fail_state = FALSE)
+}
+
 ################################################################################
 ################################################################################
 # Accessor functions
 ################################################################################
 ################################################################################
-#' Extract nested components, slots, or matrix/vector fields from package objects
+#' Extract nested components, slots, or matrix/vector fields from objects
 #'
 #' @description
 #' Convenience accessor for reaching into `Scatterer` and `Shape` objects
@@ -161,42 +273,14 @@ extract <- function(object, feature) {
   # Traverse one feature token at a time through the supported containers ======
   for (sub_layer in feature) {
     accum_feature <- c(accum_feature, sub_layer)
-    if (methods::is(layer, "Scatterer")) {
-      if (!methods::.hasSlot(layer, sub_layer)) {
-        stop(sprintf("Scattering object does not have slot '%s'.", sub_layer))
-      }
+    next_layer <- .extract_next_layer(layer, sub_layer)
 
-      layer <- methods::slot(layer, sub_layer)
-    } else if (methods::is(layer, "Shape")) {
-      if (!methods::.hasSlot(layer, sub_layer)) {
-        stop(sprintf("Shape object does not have slot '%s'.", sub_layer))
-      }
-
-      layer <- methods::slot(layer, sub_layer)
-    } else if (is.list(layer)) {
-      if (! sub_layer %in% names(layer)) {
-        fail_state <- TRUE
-        break
-      }
-      layer <- layer[[sub_layer]]
-    } else if (is.matrix(layer)) {
-      is_rows <- sub_layer %in% row.names(layer)
-      is_cols <- sub_layer %in% colnames(layer)
-      if (is_rows) {
-        layer <- layer[sub_layer, ]
-      } else if (is_cols) {
-        layer <- layer[, sub_layer]
-      } else {
-        fail_state <- TRUE
-        break
-      }
-    } else if (is.vector(layer)) {
-      if (!sub_layer %in% names(layer)) {
-        fail_state <- TRUE
-        break
-      }
-      layer <- layer[sub_layer]
+    if (isTRUE(next_layer$fail_state)) {
+      fail_state <- TRUE
+      break
     }
+
+    layer <- next_layer$layer
   }
 
   # Report the deepest missing path when traversal fails =======================

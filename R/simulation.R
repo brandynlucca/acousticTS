@@ -1,3 +1,234 @@
+################################################################################
+# SIMULATION HELPERS
+################################################################################
+# Resolve the default core count used by `simulate_ts()`.
+#' @noRd
+.default_simulation_cores <- function() {
+  # Cap the default at two cores to stay within CRAN's shared-check guidance ===
+  detected <- parallel::detectCores()
+  detected <- if (length(detected) && is.finite(detected)) detected else 2L
+
+  min(2L, max(1L, as.integer(detected) - 1L))
+}
+
+# Resolve whether `simulate_ts()` should actually use a PSOCK cluster.
+#' @noRd
+.resolve_simulation_parallel <- function(parallel, n_cores) {
+  # Require a valid multi-core request before enabling PSOCK execution =========
+  isTRUE(parallel) &&
+    is.numeric(n_cores) &&
+    length(n_cores) == 1 &&
+    !is.na(n_cores) &&
+    n_cores > 1
+}
+
+# Validate the requested target-strength models for one simulation run.
+#' @noRd
+.validate_simulation_models <- function(model) {
+  # Normalize model aliases and confirm each one is supported ==================
+  normalized_model <- .normalize_simulation_models(model)
+  unexpected_model <- model[!(normalized_model %in%
+    .normalize_simulation_models(names(.get_models())))]
+  if (length(unexpected_model) > 0) {
+    stop(
+      "The following user-defined models are not supported by `acousticTS`: ",
+      paste(unexpected_model, collapse = ", ")
+    )
+  }
+
+  normalized_model
+}
+
+# Build the simulation grid, including any batched parameter expansion.
+#' @noRd
+.prepare_simulation_grid <- function(n_realizations, parameters, batch_by) {
+  # Fall back to the simple realization index when batching is disabled ========
+  if (is.null(batch_by)) {
+    return(list(
+      simulation_grid = data.frame(
+        realization = seq_len(n_realizations),
+        row.names = NULL
+      ),
+      batch_values = NULL
+    ))
+  }
+
+  # Validate that each batching parameter is present in `parameters` ===========
+  missing_parameters <- setdiff(batch_by, names(parameters))
+  if (length(missing_parameters) > 0) {
+    stop(
+      "The following 'batch_by' are missing from 'parameters': ",
+      paste(missing_parameters, collapse = ", ")
+    )
+  }
+
+  # Resolve the concrete batch-value vectors before expanding the grid =========
+  batch_values <- .prepare_simulation_batch_values(batch_by, parameters)
+  parameter_grid <- expand.grid(
+    lapply(batch_values, function(x) seq_along(x)),
+    stringsAsFactors = FALSE
+  )
+  names(parameter_grid) <- paste0(names(batch_values), "_idx")
+
+  list(
+    simulation_grid = data.frame(
+      realization = rep(seq_len(n_realizations), times = nrow(parameter_grid)),
+      parameter_grid[rep(seq_len(nrow(parameter_grid)), each = n_realizations),
+        , drop = FALSE],
+      row.names = NULL
+    ),
+    batch_values = batch_values
+  )
+}
+
+# Resolve the concrete vectors used for each batched simulation parameter.
+#' @noRd
+.prepare_simulation_batch_values <- function(batch_by, parameters) {
+  # Evaluate generating functions once per batch dimension =====================
+  batch_values <- lapply(batch_by, function(param) {
+    value <- parameters[[param]]
+    if (is.function(value)) {
+      result <- value()
+      if (length(result) == 0) {
+        stop(
+          paste0(
+            "Batch parameter '", param, "' function must return at least 1 ",
+            "valid value."
+          )
+        )
+      }
+      return(result)
+    }
+
+    value
+  })
+  names(batch_values) <- batch_by
+
+  batch_values
+}
+
+# Expand the user-supplied parameter definitions across the simulation grid.
+#' @noRd
+.simulation_parameter_matrix <- function(parameters,
+                                         batch_by,
+                                         batch_values,
+                                         simulation_grid) {
+  # Resolve one parameter vector per simulation input ==========================
+  parameter_names <- names(parameters)
+  as.data.frame(
+    stats::setNames(
+      lapply(parameter_names, function(param) {
+        .resolve_param_value(
+          param_name = param,
+          param_value = parameters[[param]],
+          batch_by = batch_by,
+          batch_values = batch_values,
+          grid_size = nrow(simulation_grid),
+          simulation_grid = simulation_grid
+        )
+      }),
+      parameter_names
+    )
+  )
+}
+
+# Print the high-level simulation summary shown before the TS runs begin.
+#' @noRd
+.print_simulation_header <- function(object,
+                                     model,
+                                     batch_by,
+                                     parameters,
+                                     parallel,
+                                     simulation_grid) {
+  # Print the standardized simulation summary =================================
+  cat("====================================\n")
+  cat("Scatterer-class:", class(object)[[1]], "\n")
+  cat("Model(s):", paste(model, collapse = ", "), "\n")
+  if (!is.null(batch_by)) {
+    cat("Batching parameter(s):", paste(batch_by, collapse = ", "), "\n")
+  } else {
+    cat("")
+  }
+  cat("Simulated parameters:", paste(names(parameters), collapse = ", "), "\n")
+  cat("Total simulation realizations:", nrow(simulation_grid), "\n")
+  cat("Parallelize TS calculations:", parallel, "\n")
+  cat("====================================\n")
+}
+
+# Prepare the optional PSOCK cluster used by `simulate_ts()`.
+#' @noRd
+.prepare_simulation_cluster <- function(parallel,
+                                        n_cores,
+                                        object,
+                                        frequency,
+                                        normalized_model,
+                                        simulation_grid,
+                                        verbose) {
+  # Fall back to sequential execution when no cluster is requested =============
+  if (!parallel) {
+    if (verbose) {
+      cat("====================================\n")
+      cat("Preparing sequential simulations\n")
+    }
+    return(NULL)
+  }
+
+  # Build and prime the PSOCK cluster for worker-side TS evaluation ============
+  if (verbose) {
+    cat("====================================\n")
+    cat("Preparing parallelized simulations\n")
+    cat("Number of cores:", paste0(n_cores), "\n")
+  }
+
+  cluster <- parallel::makeCluster(n_cores)
+  if (verbose) print(cluster)
+  parallel::clusterCall(
+    cluster,
+    function() {
+      loadNamespace("acousticTS")
+      loadNamespace("methods")
+      NULL
+    }
+  )
+  parallel::clusterExport(
+    cluster,
+    c("object", "frequency", "normalized_model", "simulation_grid"),
+    envir = environment()
+  )
+  parallel::clusterExport(
+    cluster,
+    c(".discover_reforge_params", ".get_TS", "reforge", "target_strength",
+      "extract"),
+    envir = asNamespace("acousticTS")
+  )
+
+  cluster
+}
+
+# Bind one list of per-model simulation results into the final return object.
+#' @noRd
+.combine_simulation_results <- function(results_list) {
+  # Return NULL for the degenerate empty-simulation case =======================
+  if (length(results_list) == 0) {
+    return(NULL)
+  }
+
+  # Bind each model-specific result stack into one data frame ==================
+  model_names <- names(results_list[[1]])
+  stats::setNames(
+    lapply(
+      model_names,
+      function(mod_name) {
+        model_data <- lapply(results_list, function(x) x[[mod_name]])
+        df <- do.call(rbind, model_data)
+        rownames(df) <- NULL
+        df
+      }
+    ),
+    model_names
+  )
+}
+
 #' Simulate target strength (TS) with flexible parameterization and batching
 #' @inheritParams target_strength
 #' @param model Model name. If multiple models are specified, the output will
@@ -11,7 +242,7 @@
 #' @param parallel Logical; whether to parallelize the simulations. Default is
 #' \code{TRUE}.
 #' @param n_cores Optional. Number of CPU cores to use for parallelization.
-#' Default is \code{parallel::detectCores() - 1}.
+#' Default is the smaller of 2 cores and \code{parallel::detectCores() - 1}.
 #' @param verbose Logical; whether to print progress and status messages to the
 #' console. Default is \code{TRUE}.
 #'
@@ -99,96 +330,27 @@ simulate_ts <- function(object,
                         parameters,
                         batch_by = NULL,
                         parallel = TRUE,
-                        n_cores = parallel::detectCores() - 1,
+                        n_cores = .default_simulation_cores(),
                         verbose = TRUE) {
   # Validate that object is of the correct class ===============================
   stopifnot(
     "'object' must be a 'scatterer'-based class" = inherits(object, "Scatterer")
   )
-  parallel <- isTRUE(parallel) &&
-    is.numeric(n_cores) &&
-    length(n_cores) == 1 &&
-    !is.na(n_cores) &&
-    n_cores > 1
-  # Validate model =============================================================
-  normalized_model <- .normalize_simulation_models(model)
-  unexpected_model <- model[!(normalized_model %in%
-    .normalize_simulation_models(names(.get_models())))]
-  if (length(unexpected_model) > 0) {
-    stop(
-      "The following user-defined models are not supported by `acousticTS`: ",
-      paste(unexpected_model, collapse = ", ")
-    )
-  }
-  # Handle batching parameter argument =========================================
-  if (!is.null(batch_by)) {
-    # ---- Validate ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    missing_parameters <- setdiff(batch_by, names(parameters))
-    if (length(missing_parameters) > 0) {
-      stop(
-        "The following 'batch_by' are missing from 'parameters': ",
-        paste(missing_parameters, collapse = ", ")
-      )
-    }
-    # ---- Set up batching values ++++++++++++++++++++++++++++++++++++++++++++++
-    batch_values <- lapply(batch_by, function(param) {
-      value <- parameters[[param]]
-      # ---- Case where parameter is a generating function +++++++++++++++++++++
-      if (is.function(value)) {
-        result <- value()
-        if (length(result) == 0) {
-          stop(
-            paste0(
-              "Batch parameter '", param, "' function must return at least 1 ",
-              "valid value."
-            )
-          )
-        }
-        result
-        # ---- Case where parameter is a defined value +++++++++++++++++++++++++
-      } else {
-        value
-      }
-    })
-    # ---- Apply names +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    names(batch_values) <- batch_by
-    # ---- Prepare parameter grid ++++++++++++++++++++++++++++++++++++++++++++++
-    parameter_grid <- expand.grid(
-      lapply(batch_values, function(x) seq_along(x)),
-      stringsAsFactors = FALSE
-    )
-    names(parameter_grid) <- paste0(names(batch_values), "_idx")
-    # ---- Create indexed dataframe ++++++++++++++++++++++++++++++++++++++++++++
-    simulation_grid <- data.frame(
-      realization = rep(seq_len(n_realizations), times = nrow(parameter_grid)),
-      parameter_grid[rep(seq_len(nrow(parameter_grid)),
-                         each = n_realizations
-      ), , drop = FALSE],
-      row.names = NULL
-    )
-  } else {
-    # ---- Non-batched case for dataframe ++++++++++++++++++++++++++++++++++++++
-    simulation_grid <- data.frame(
-      realization = seq_len(n_realizations),
-      row.names = NULL
-    )
-  }
+  parallel <- .resolve_simulation_parallel(parallel, n_cores)
+  normalized_model <- .validate_simulation_models(model)
+  simulation_setup <- .prepare_simulation_grid(
+    n_realizations = n_realizations,
+    parameters = parameters,
+    batch_by = batch_by
+  )
+  simulation_grid <- simulation_setup$simulation_grid
+  batch_values <- simulation_setup$batch_values
   # Simulate/map parameter values ==============================================
-  parameter_names <- names(parameters)
-  parameter_matrix <- as.data.frame(
-    stats::setNames(
-      lapply(parameter_names, function(param) {
-        .resolve_param_value(
-          param_name = param,
-          param_value = parameters[[param]],
-          batch_by = batch_by,
-          batch_values = if (!is.null(batch_by)) batch_values else NULL,
-          grid_size = nrow(simulation_grid),
-          simulation_grid = simulation_grid
-        )
-      }),
-      parameter_names
-    )
+  parameter_matrix <- .simulation_parameter_matrix(
+    parameters = parameters,
+    batch_by = batch_by,
+    batch_values = batch_values,
+    simulation_grid = simulation_grid
   )
   # ---- Bind to simulation grid +++++++++++++++++++++++++++++++++++++++++++++++
   if (length(parameters) > 0) {
@@ -196,74 +358,27 @@ simulate_ts <- function(object,
   }
   # Run simulations ============================================================
   if (verbose) {
-    cat("====================================\n")
-    cat("Scatterer-class:", class(object)[[1]], "\n")
-    cat("Model(s):", paste(model, collapse = ", "), "\n")
-    if (!is.null(batch_by)) {
-      cat(
-        "Batching parameter(s):",
-        paste(batch_by, collapse = ", "), "\n"
-      )
-    } else {
-      cat("")
-    }
-    cat(
-      "Simulated parameters:",
-      paste(names(parameters), collapse = ", "), "\n"
+    .print_simulation_header(
+      object = object,
+      model = model,
+      batch_by = batch_by,
+      parameters = parameters,
+      parallel = parallel,
+      simulation_grid = simulation_grid
     )
-    cat("Total simulation realizations:", nrow(simulation_grid), "\n")
-
-    cat("Parallelize TS calculations:", parallel, "\n")
-    cat("====================================\n")
   }
-  # ---- Parallelized approach +++++++++++++++++++++++++++++++++++++++++++++++++
-  if (parallel) {
-    if (verbose) {
-      cat("====================================\n")
-      cat("Preparing parallelized simulations\n")
-      cat("Number of cores:", paste0(n_cores), "\n")
-    }
-    # ---- Set up cluster ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    cluster <- parallel::makeCluster(n_cores)
+  # Prepare the optional PSOCK cluster =========================================
+  cluster <- .prepare_simulation_cluster(
+    parallel = parallel,
+    n_cores = n_cores,
+    object = object,
+    frequency = frequency,
+    normalized_model = normalized_model,
+    simulation_grid = simulation_grid,
+    verbose = verbose
+  )
+  if (!is.null(cluster)) {
     on.exit(parallel::stopCluster(cluster))
-    if (verbose) print(cluster)
-    # ---- Make sure appropriate libraries are loaded ++++++++++++++++++++++++++
-    parallel::clusterCall(
-      cluster,
-      function() {
-        loadNamespace("acousticTS")
-        loadNamespace("methods")
-        NULL
-      }
-    )
-    # ---- Export the required objects/functions to each core ++++++++++++++++++
-    parallel::clusterExport(
-      cluster,
-      c(
-        # Arguments
-        "object", "frequency", "normalized_model",
-        # Intermediate variables
-        "simulation_grid"
-      ),
-      envir = environment()
-    )
-    parallel::clusterExport(
-      cluster,
-      c(
-        # Functions
-        ".discover_reforge_params", ".get_TS", "reforge", "target_strength",
-        "extract"
-      ),
-      envir = asNamespace("acousticTS")
-    )
-    # ---- Sequential approach +++++++++++++++++++++++++++++++++++++++++++++++++
-  } else {
-    if (verbose) {
-      cat("====================================\n")
-      cat("Preparing sequential simulations\n")
-    }
-    # ---- Set up cluster ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    cluster <- NULL
   }
   # Run TS simulations =========================================================
   pbapply::pboptions(type = if (verbose) "txt" else "none")
@@ -278,31 +393,14 @@ simulate_ts <- function(object,
     cl = cluster
   )
   # Prepare output =============================================================
-  if (length(results_list) == 0) {
-    return(NULL)
-  }
-  # ---- Get model names +++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  model_names <- names(results_list[[1]])
-  # ---- Concatenate into a single dataframe +++++++++++++++++++++++++++++++++++
-  final_result <- stats::setNames(
-    lapply(
-      model_names,
-      function(mod_name) {
-        model_data <- lapply(results_list, function(x) x[[mod_name]])
-        df <- do.call(rbind, model_data)
-        rownames(df) <- NULL
-        df
-      }
-    ),
-    model_names
-  )
+  final_result <- .combine_simulation_results(results_list)
   # Return output dataframe ====================================================
   if (verbose) {
     cat("====================================\n")
     cat("Simulations complete!\n")
     cat("====================================\n")
   }
-  return(final_result)
+  final_result
 }
 
 #' Normalize simulation model names to the strings accepted by target_strength()

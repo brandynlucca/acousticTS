@@ -8,6 +8,10 @@ test_that("Mathematical utility functions work correctly", {
   result <- along_sum(rpos, iterations)
   expected <- rpos[, 1:(iterations - 1)] + rpos[, 2:iterations]
   expect_equal(result, expected)
+  expect_error(
+    along_sum(rpos, 1),
+    "requires at least 2 columns"
+  )
 
   # Test degrees conversion function
   expect_equal(degrees(pi), 180)
@@ -31,6 +35,16 @@ test_that("Mathematical utility functions work correctly", {
   values_multi <- matrix(c(1, 2, 2, 3, 3, 4), nrow = 2, ncol = 3)
   expected_norms <- c(sqrt(1^2 + 2^2 + 3^2), sqrt(2^2 + 3^2 + 4^2))
   expect_equal(vecnorm(values_multi), expected_norms, tolerance = 1e-10)
+
+  expect_equal(neumann(0:3), c(1, 2, 2, 2))
+  expect_error(
+    neumann(-1),
+    "must be a non-negative integer"
+  )
+  expect_error(
+    neumann(c(0, 1.5)),
+    "All values in vector 'x' must be non-negative integers."
+  )
 })
 
 test_that("Complex integration functions work", {
@@ -51,6 +65,15 @@ test_that("Complex integration functions work", {
 
   # Test that the result is complex
   expect_true(is.complex(result))
+
+  phase_locked <- phase_integrate(
+    x = 1,
+    y = 1,
+    n_iterations = 4,
+    integral = simple_integral,
+    phase_sd = 0
+  )
+  expect_equal(phase_locked, rep(result, 4))
 })
 
 test_that(
@@ -65,6 +88,14 @@ test_that(
     expect_error(
       gauss_legendre(1.5),
       "n must be a positive integer"
+    )
+    expect_error(
+      gauss_legendre(2, a = c(0, 1), b = 1),
+      "a and b must be numeric scalars"
+    )
+    expect_error(
+      gauss_legendre(2, a = 1, b = 1),
+      "b must be greater than a"
     )
   }
 )

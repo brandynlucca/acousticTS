@@ -8,8 +8,9 @@
 #' and angular coordinate \eqn{\eta}.
 #'
 #' This function is an R wrapper for compiled C++ code, which in turn calls the
-#' underlying Fortran library (\code{prolate_swf}) for high-performance numerical
-#' computation. All heavy computation is performed in compiled code for speed and
+#' underlying Fortran library (\code{prolate_swf}) for high-performance
+#' numerical computation. All heavy computation is performed in compiled code
+#' for speed and
 #' accuracy.
 #'
 #' @details
@@ -195,8 +196,8 @@ Smn <- function(m, n, c, eta, normalize = FALSE, precision = "double") {
 #' \geq 0}).
 #' @param n Non-negative integer. The degree of the spheroidal function (\eqn{n
 #' \geq m}).
-#' @param c Numeric. The scalar size parameter (also denoted \eqn{\gamma} in some
-#' references).
+#' @param c Numeric. The scalar size parameter (also denoted \eqn{\gamma} in
+#' some references).
 #' @param xi Numeric. The radial coordinate at which to evaluate the function.
 #'   Must satisfy \eqn{\xi \geq 1}.
 #' @param kind Integer. Specifies which kind of radial function to compute:

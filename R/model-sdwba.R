@@ -202,8 +202,9 @@ sdwba_initialize <- function(object,
   stochastic_params <- lapply(seq_along(N_f_idx),
                               FUN = function(i) {
                                 idx <- which(N_f_vec == N_f_idx[i])
-                                object_new <- sdwba_resample(object_profiled,
-                                                             n_segments = N_f_idx[i]
+                                object_new <- sdwba_resample(
+                                  object_profiled,
+                                  n_segments = N_f_idx[i]
                                 )
                                 body <- acousticTS::extract(object_new, "body")
                                 n_segments <- N_f_idx[i]
@@ -245,7 +246,9 @@ sdwba_initialize <- function(object,
 #' @param n_iterations Number of stochastic realizations.
 #' @keywords internal
 #' @noRd
-sdwba_stochastic_summary <- function(segment_integrals, phase_sd, n_iterations) {
+sdwba_stochastic_summary <- function(segment_integrals,
+                                     phase_sd,
+                                     n_iterations) {
   n_k <- nrow(segment_integrals)
   n_segments <- ncol(segment_integrals)
   phase_cyl <- vapply(
@@ -418,8 +421,9 @@ sdwba_curved_initialize <- function(object,
   stochastic_params <- lapply(seq_along(N_f_idx),
                               FUN = function(i) {
                                 idx <- which(N_f_vec == N_f_idx[i])
-                                object_new <- sdwba_resample(object_copy,
-                                                             n_segments = N_f_idx[i]
+                                object_new <- sdwba_resample(
+                                  object_copy,
+                                  n_segments = N_f_idx[i]
                                 )
                                 body <- extract(object_new, "body")
                                 n_segments <- N_f_idx[i]

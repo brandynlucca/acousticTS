@@ -66,26 +66,18 @@
 #' @keywords models acoustics internal
 NULL
 
-#' Initialize scatterer-class object for the elastic cylinder modal series model.
+#' Initialize scatterer-class object for the elastic cylinder modal series
+#' model.
 #' @noRd
-ecms_initialize <- function(object,
-                            frequency,
-                            sound_speed_sw = .SEAWATER_SOUND_SPEED_DEFAULT,
-                            density_sw = .SEAWATER_DENSITY_DEFAULT,
-                            density_body = NULL,
-                            sound_speed_longitudinal_body = NULL,
-                            sound_speed_transversal_body = NULL,
-                            m_limit = NULL) {
-  # Extract the shape metadata and active cylinder geometry ====================
-  shape <- extract(object, "shape_parameters")
-  shape_core <- if (methods::is(object, "ESS")) shape$shell else shape
-  # Validate the supported scatterer and shape types ===========================
+.ecms_validate_scope <- function(object, shape) {
+  # Limit ECMS to cylindrical ESS and legacy cylindrical FLS objects ===========
   if (!(methods::is(object, "ESS") || methods::is(object, "FLS"))) {
     stop(
       "ECMS requires a cylindrical 'ESS' or legacy cylindrical 'FLS' scatterer."
     )
   }
 
+  # Reject non-cylindrical geometries ==========================================
   if (shape$shape != "Cylinder") {
     stop(
       "The elastic cylinder modal series solution requires scatterer to be ",
@@ -93,18 +85,37 @@ ecms_initialize <- function(object,
       shape$shape, "'."
     )
   }
-  # Resolve the elastic-cylinder material properties ===========================
-  elastic_comp <- if (methods::is(object, "ESS")) {
-    extract(object, "shell")
-  } else {
-    extract(object, "body")
+}
+
+#' Resolve the active elastic component for ECMS
+#' @noRd
+.ecms_resolve_component <- function(object) {
+  # ESS objects store the elastic layer in the shell slot ======================
+  if (methods::is(object, "ESS")) {
+    return(extract(object, "shell"))
   }
+
+  # Legacy cylindrical FLS objects store the elastic body directly ============
+  extract(object, "body")
+}
+
+#' Resolve the ECMS body material properties
+#' @noRd
+.ecms_resolve_materials <- function(object,
+                                    sound_speed_sw,
+                                    density_sw,
+                                    density_body = NULL,
+                                    sound_speed_longitudinal_body = NULL,
+                                    sound_speed_transversal_body = NULL) {
+  # Recover the active elastic component and hydrate any stored contrasts ======
+  elastic_comp <- .ecms_resolve_component(object)
   rho_body <- density_body %||% elastic_comp$density
   cL_body <- sound_speed_longitudinal_body %||%
     elastic_comp$sound_speed_longitudinal
   cT_body <- sound_speed_transversal_body %||%
     elastic_comp$sound_speed_transversal
-  # Validate the required elastic inputs =======================================
+
+  # Validate the required elastic material inputs ==============================
   if (is.null(rho_body)) {
     stop(
       "ECMS requires the elastic-cylinder density, either stored on the ",
@@ -117,13 +128,24 @@ ecms_initialize <- function(object,
       "either stored on the scatterer or passed directly to target_strength()."
     )
   }
-  # Warn when the incidence leaves the supported regime ========================
+
+  list(
+    component = elastic_comp,
+    density = rho_body,
+    sound_speed_longitudinal = cL_body,
+    sound_speed_transversal = cT_body
+  )
+}
+
+#' Warn when ECMS inputs leave the intended incidence regime
+#' @noRd
+.ecms_warn_incidence_regime <- function(shape_core, elastic_comp) {
+  # Warn when incidence departs too far from broadside =========================
   if (abs(elastic_comp$theta - pi / 2) > pi / 18) {
-    warning(
-      "ECMS is intended for broadside or near-broadside incidence."
-    )
+    warning("ECMS is intended for broadside or near-broadside incidence.")
   }
 
+  # Bent-cylinder corrections share the same incidence limitation =============
   if (!is.null(shape_core$radius_curvature_ratio) &&
       !is.na(shape_core$radius_curvature_ratio) &&
       abs(elastic_comp$theta - pi / 2) > pi / 18) {
@@ -132,10 +154,12 @@ ecms_initialize <- function(object,
       "broadside incidence."
     )
   }
-  # Build the acoustic size parameters and truncation ==========================
-  k_sw <- wavenumber(frequency, sound_speed_sw)
-  k_l <- wavenumber(frequency, cL_body)
-  k_t <- wavenumber(frequency, cT_body)
+}
+
+#' Resolve the stored ECMS cylinder geometry
+#' @noRd
+.ecms_resolve_geometry <- function(shape_core, elastic_comp) {
+  # Resolve the effective cylinder radius from the shape metadata first ========
   radius_body <- if (!is.null(shape_core$radius)) {
     shape_core$radius
   } else {
@@ -144,19 +168,119 @@ ecms_initialize <- function(object,
   if (length(radius_body) > 1) {
     radius_body <- max(radius_body, na.rm = TRUE)
   }
+
+  # Resolve the body length from shape metadata or the stored profile ==========
   length_body <- shape_core$length
   if (is.null(length_body)) {
     length_body <- diff(range(elastic_comp$rpos["x", ], na.rm = TRUE))
   }
+
+  # Preserve the curvature ratio when the caller supplied a bent cylinder ======
   curvature_ratio <- if (!is.null(shape_core$radius_curvature_ratio)) {
     shape_core$radius_curvature_ratio
   } else {
     NA_real_
   }
-  ka_max <- pmax(k_sw, k_l, k_t) * radius_body * abs(sin(elastic_comp$theta))
-  if (is.null(m_limit)) {
-    m_limit <- ceiling(ka_max) + 10
+
+  list(
+    length = length_body,
+    radius = radius_body,
+    curvature_ratio = curvature_ratio
+  )
+}
+
+#' Resolve the ECMS modal truncation limit
+#' @noRd
+.ecms_resolve_m_limit <- function(m_limit,
+                                  frequency,
+                                  sound_speed_sw,
+                                  cL_body,
+                                  cT_body,
+                                  radius_body,
+                                  theta_body) {
+  # Preserve an explicit truncation choice when the caller supplied one ========
+  if (!is.null(m_limit)) {
+    return(m_limit)
   }
+
+  # Otherwise use the standard size-parameter truncation heuristic ============
+  k_sw <- wavenumber(frequency, sound_speed_sw)
+  k_l <- wavenumber(frequency, cL_body)
+  k_t <- wavenumber(frequency, cT_body)
+  ka_max <- pmax(k_sw, k_l, k_t) * radius_body * abs(sin(theta_body))
+
+  ceiling(ka_max) + 10
+}
+
+#' Build the stored ECMS body metadata
+#' @noRd
+.ecms_body_parameters <- function(geometry,
+                                  elastic_comp,
+                                  rho_body,
+                                  cL_body,
+                                  cT_body) {
+  # Convert curvature ratios into physical radii for the stored metadata ======
+  list(
+    length = geometry$length,
+    radius = geometry$radius,
+    theta = elastic_comp$theta,
+    density = rho_body,
+    sound_speed_longitudinal = cL_body,
+    sound_speed_transversal = cT_body,
+    is_bent = !is.null(geometry$curvature_ratio) &&
+      !is.na(geometry$curvature_ratio),
+    radius_curvature = if (!is.null(geometry$curvature_ratio) &&
+                           !is.na(geometry$curvature_ratio)) {
+      geometry$curvature_ratio * geometry$length
+    } else {
+      NA_real_
+    }
+  )
+}
+
+#' Initialize scatterer-class object for the elastic cylinder modal series
+#' model.
+#' @noRd
+ecms_initialize <- function(object,
+                            frequency,
+                            sound_speed_sw = .SEAWATER_SOUND_SPEED_DEFAULT,
+                            density_sw = .SEAWATER_DENSITY_DEFAULT,
+                            density_body = NULL,
+                            sound_speed_longitudinal_body = NULL,
+                            sound_speed_transversal_body = NULL,
+                            m_limit = NULL) {
+  # Extract the shape metadata and active cylinder geometry ====================
+  shape <- extract(object, "shape_parameters")
+  shape_core <- if (methods::is(object, "ESS")) shape$shell else shape
+  .ecms_validate_scope(object, shape)
+  # Resolve the elastic-cylinder material properties ===========================
+  material <- .ecms_resolve_materials(
+    object = object,
+    sound_speed_sw = sound_speed_sw,
+    density_sw = density_sw,
+    density_body = density_body,
+    sound_speed_longitudinal_body = sound_speed_longitudinal_body,
+    sound_speed_transversal_body = sound_speed_transversal_body
+  )
+  elastic_comp <- material$component
+  rho_body <- material$density
+  cL_body <- material$sound_speed_longitudinal
+  cT_body <- material$sound_speed_transversal
+  .ecms_warn_incidence_regime(shape_core, elastic_comp)
+  # Build the acoustic size parameters and truncation ==========================
+  k_sw <- wavenumber(frequency, sound_speed_sw)
+  k_l <- wavenumber(frequency, cL_body)
+  k_t <- wavenumber(frequency, cT_body)
+  geometry <- .ecms_resolve_geometry(shape_core, elastic_comp)
+  m_limit <- .ecms_resolve_m_limit(
+    m_limit = m_limit,
+    frequency = frequency,
+    sound_speed_sw = sound_speed_sw,
+    cL_body = cL_body,
+    cT_body = cT_body,
+    radius_body = geometry$radius,
+    theta_body = elastic_comp$theta
+  )
   # Store the ECMS initialization recipe =======================================
   methods::slot(object, "model_parameters")$ECMS <- list(
     parameters = list(
@@ -172,20 +296,12 @@ ecms_initialize <- function(object,
       sound_speed = sound_speed_sw,
       density = density_sw
     ),
-    body = list(
-      length = length_body,
-      radius = radius_body,
-      theta = elastic_comp$theta,
-      density = rho_body,
-      sound_speed_longitudinal = cL_body,
-      sound_speed_transversal = cT_body,
-      is_bent = !is.null(curvature_ratio) && !is.na(curvature_ratio),
-      radius_curvature = if (!is.null(curvature_ratio) &&
-                             !is.na(curvature_ratio)) {
-        curvature_ratio * length_body
-      } else {
-        NA_real_
-      }
+    body = .ecms_body_parameters(
+      geometry = geometry,
+      elastic_comp = elastic_comp,
+      rho_body = rho_body,
+      cL_body = cL_body,
+      cT_body = cT_body
     )
   )
 

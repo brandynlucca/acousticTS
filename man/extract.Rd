@@ -2,7 +2,7 @@
 % Please edit documentation in R/utilities.R
 \name{extract}
 \alias{extract}
-\title{Extract nested components, slots, or matrix/vector fields from package objects}
+\title{Extract nested components, slots, or matrix/vector fields from objects}
 \usage{
 extract(object, feature)
 }

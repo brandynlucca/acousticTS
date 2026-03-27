@@ -359,8 +359,10 @@ krm_initialize <- function(object,
   )
 
   # Complete the acoustics bookkeeping for the fluid-only branch ===============
-  model_params$acoustics$k_b <- wavenumber(frequency = model_params$acoustics$frequency,
-                                           sound_speed = sound_speed_sw * body$h)
+  model_params$acoustics$k_b <- wavenumber(
+    frequency = model_params$acoustics$frequency,
+    sound_speed = sound_speed_sw * body$h
+  )
   model_params$ns_b <- ncol(body$rpos)
 
   # Return the initialized KRM parameter bundle ================================
@@ -577,7 +579,8 @@ krm_initialize <- function(object,
   )
 
   body_dorsal_sum <- matrix(
-    data = rep(body_rpos_sum[3, ], each = length(model$parameters$acoustics$k_sw)),
+    data = rep(body_rpos_sum[3, ],
+               each = length(model$parameters$acoustics$k_sw)),
     ncol = length(body_rpos_sum[3, ]),
     nrow = length(model$parameters$acoustics$k_sw)
   ) / 2
@@ -680,7 +683,8 @@ krm_initialize <- function(object,
     length(model$parameters$acoustics$k_sw)
   )
   delta_u_bladder <- matrix(
-    data = rep(uv_bladder$delta_u, each = length(model$parameters$acoustics$k_sw)),
+    data = rep(uv_bladder$delta_u,
+               each = length(model$parameters$acoustics$k_sw)),
     ncol = length(uv_bladder$delta_u),
     nrow = length(model$parameters$acoustics$k_sw)
   )
@@ -721,7 +725,8 @@ krm_initialize <- function(object,
 
   # Assemble the low-ka phase and sinc factors along the bladder length ========
   dx_matrix <- matrix(
-    data = rep(bladder_geom$delta_x, each = length(model$parameters$acoustics$k_sw)),
+    data = rep(bladder_geom$delta_x,
+               each = length(model$parameters$acoustics$k_sw)),
     ncol = length(bladder_geom$delta_x),
     nrow = length(model$parameters$acoustics$k_sw)
   )

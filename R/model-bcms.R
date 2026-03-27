@@ -54,6 +54,87 @@ NULL
 
 #' Initialize scatterer-class object for the bent cylinder modal series model.
 #' @noRd
+.bcms_resolve_boundary <- function(object, boundary) {
+  # Derive the default boundary from the scatterer class when omitted ==========
+  if (is.null(boundary)) {
+    return(switch(
+      class(object),
+      FLS = "liquid_filled",
+      GAS = "gas_filled",
+      stop("BCMS currently supports 'FLS' and 'GAS' cylinder scatterers only.")
+    ))
+  }
+
+  # Reject unsupported boundary aliases ========================================
+  if (!(boundary %in% c(
+    "liquid_filled", "fixed_rigid", "pressure_release", "gas_filled"
+  ))) {
+    stop(
+      "Only 'liquid_filled', 'gas_filled', 'fixed_rigid', and ",
+      "'pressure_release' are available in this implementation of BCMS."
+    )
+  }
+
+  boundary
+}
+
+#' Warn when BCMS inputs leave the intended approximation regime
+#' @noRd
+.bcms_warn_approximation_regime <- function(shape, body, stationary_phase) {
+  # Warn when the bent-cylinder correction is used away from broadside =========
+  if (!is.null(shape$radius_curvature_ratio) &&
+      !is.na(shape$radius_curvature_ratio) &&
+      abs(body$theta - pi / 2) > pi / 18) {
+    warning(
+      "BCMS bent-cylinder correction is intended for broadside or near-",
+      "broadside incidence."
+    )
+  }
+
+  # Remind callers that the stationary-phase flag is inactive ==================
+  if (isTRUE(stationary_phase)) {
+    warning(
+      "'stationary_phase' is ignored for BCMS. BCMS uses the Fresnel-integral ",
+      "bent-cylinder modal-series form only."
+    )
+  }
+}
+
+#' Resolve the BCMS modal truncation limit
+#' @noRd
+.bcms_resolve_m_limit <- function(m_limit, frequency, sound_speed_sw, radius) {
+  # Preserve an explicit truncation choice when the caller supplied one ========
+  if (!is.null(m_limit)) {
+    return(m_limit)
+  }
+
+  # Otherwise use the package default size-based truncation ====================
+  ceiling(wavenumber(frequency, sound_speed_sw) * radius) + 10
+}
+
+#' Build the stored BCMS body metadata
+#' @noRd
+.bcms_body_parameters <- function(shape, body) {
+  # Resolve the stored curvature metadata from the shape description ============
+  curvature_ratio <- shape$radius_curvature_ratio
+
+  list(
+    length = shape$length,
+    radius = shape$radius,
+    theta = body$theta,
+    g = body$g,
+    h = body$h,
+    is_bent = !is.null(curvature_ratio) && !is.na(curvature_ratio),
+    radius_curvature = if (!is.null(curvature_ratio) && !is.na(curvature_ratio)) {
+      curvature_ratio * shape$length
+    } else {
+      NA_real_
+    }
+  )
+}
+
+#' Initialize scatterer-class object for the bent cylinder modal series model.
+#' @noRd
 bcms_initialize <- function(object,
                             frequency,
                             boundary = NULL,
@@ -71,51 +152,19 @@ bcms_initialize <- function(object,
       shape$shape, "'."
     )
   }
-
-  if (is.null(boundary)) {
-    boundary <- switch(
-      class(object),
-      FLS = "liquid_filled",
-      GAS = "gas_filled",
-      stop(
-        "BCMS currently supports 'FLS' and 'GAS' cylinder scatterers only."
-      )
-    )
-  }
-
-  if (!(boundary %in% c(
-    "liquid_filled", "fixed_rigid", "pressure_release", "gas_filled"
-  ))) {
-    stop(
-      "Only 'liquid_filled', 'gas_filled', 'fixed_rigid', and ",
-      "'pressure_release' are available in this implementation of BCMS."
-    )
-  }
+  # Resolve the supported boundary alias =======================================
+  boundary <- .bcms_resolve_boundary(object, boundary)
   # Hydrate the body contrasts and warn on limited regimes =====================
   body <- .hydrate_contrasts(extract(object, "body"),
                              sound_speed_sw, density_sw)
-
-  if (!is.null(shape$radius_curvature_ratio) &&
-      !is.na(shape$radius_curvature_ratio) &&
-      abs(body$theta - pi / 2) > pi / 18) {
-    warning(
-      "BCMS bent-cylinder correction is intended for broadside or near-",
-      "broadside incidence."
-    )
-  }
-
-  if (isTRUE(stationary_phase)) {
-    warning(
-      "'stationary_phase' is ignored for BCMS. BCMS uses the Fresnel-integral ",
-      "bent-cylinder modal-series form only."
-    )
-  }
+  .bcms_warn_approximation_regime(shape, body, stationary_phase)
   # Resolve the modal truncation limit =========================================
-  if (is.null(m_limit)) {
-    m_limit <- ceiling(
-      wavenumber(frequency, sound_speed_sw) * shape$radius
-    ) + 10
-  }
+  m_limit <- .bcms_resolve_m_limit(
+    m_limit = m_limit,
+    frequency = frequency,
+    sound_speed_sw = sound_speed_sw,
+    radius = shape$radius
+  )
   # Store the BCMS initialization recipe =======================================
   .init_model_slots(
     object = object,
@@ -142,21 +191,7 @@ bcms_initialize <- function(object,
         boundary = boundary
       ),
       medium = .init_medium_params(sound_speed_sw, density_sw),
-      body = list(
-        length = shape$length,
-        radius = shape$radius,
-        theta = body$theta,
-        g = body$g,
-        h = body$h,
-        is_bent = !is.null(shape$radius_curvature_ratio) &&
-          !is.na(shape$radius_curvature_ratio),
-        radius_curvature = if (!is.null(shape$radius_curvature_ratio) &&
-                               !is.na(shape$radius_curvature_ratio)) {
-          shape$radius_curvature_ratio * shape$length
-        } else {
-          NA_real_
-        }
-      )
+      body = .bcms_body_parameters(shape, body)
     )
   )
 }

@@ -33,8 +33,8 @@ shape. Defaults to the source shape segment count.}
 diagnostics.}
 }
 \value{
-If \code{diagnostics = FALSE}, a canonical \code{Shape} object. If \code{diagnostics = TRUE},
-a list with elements:
+If \code{diagnostics = FALSE}, a canonical \code{Shape} object. If
+\code{diagnostics = TRUE}, a list with elements:
 \itemize{
 \item \code{shape}: the fitted canonical \code{Shape}
 \item \code{diagnostics}: a named list of source, target, and fit metrics

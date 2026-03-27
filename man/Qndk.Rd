@@ -2,7 +2,7 @@
 % Please edit documentation in R/harmonics.R
 \name{Qndk}
 \alias{Qndk}
-\title{Derivative of the Legendre Function of the Second Kind}
+\title{Derivative of the Legendre function of the second kind}
 \usage{
 Qndk(n, x, k = 1L)
 }
@@ -19,22 +19,7 @@ A complex matrix of dimension \code{length(n)} by \code{length(x)}, where
 element \code{[i, j]} contains \eqn{\frac{d^k}{dx^k} Q_{n_i}(x_j)}.
 }
 \description{
-Computes the \eqn{k}-th derivative of the Legendre function of the second
-kind, \eqn{\frac{d^k}{dx^k} Q_\nu(x)}, with respect to the argument \eqn{x}.
-}
-\details{
-Derivatives are computed using central finite differences:
-\deqn{\frac{dQ_\nu}{dx} \approx \frac{Q_\nu(x+h) - Q_\nu(x-h)}{2h}}
-
-Higher-order derivatives use the generalized finite difference stencil with
-binomial coefficients.
-
-For \eqn{|x| > 1}, the result is complex since \eqn{Q_\nu(x)} is complex
-in that domain.
-
-\strong{Singularities:} The function \eqn{Q_\nu(x)} has logarithmic singularities
-at \eqn{x = \pm 1}. Derivatives near these points will have reduced accuracy
-or may be undefined.
+Derivative of the Legendre function of the second kind
 }
 \note{
 Derivatives are computed via finite differences with step size
@@ -42,7 +27,7 @@ Derivatives are computed via finite differences with step size
 first derivatives, less for higher orders.
 
 This function calls underlying \eqn{C++} code via \code{Rcpp} for
-computational efficiency and  to support different cases for both order and
+computational efficiency and to support different cases for both order and
 argument that are not readily available in \code{R}.
 }
 \examples{

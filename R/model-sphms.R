@@ -61,6 +61,212 @@
 #' @keywords models acoustics internal
 NULL
 
+# Validate that the current SPHMS implementation is only used for spheres.
+#' @noRd
+.sphms_validate_shape <- function(scatterer_shape) {
+  # Restrict the modal-series initializer to spherical shapes ==================
+  if (scatterer_shape$shape != "Sphere") {
+    stop(
+      "The modal series solution for a sphere requires scatterer to be ",
+      "shape-type 'Sphere'. Input scatterer is shape-type ",
+      paste0("'", scatterer_shape$shape, "'.")
+    )
+  }
+
+  invisible(TRUE)
+}
+
+# Resolve the default SPHMS boundary from the scatterer class.
+#' @noRd
+.sphms_default_boundary <- function(object, boundary) {
+  # Keep the explicit boundary when the caller already supplied one ============
+  if (!is.null(boundary)) {
+    return(boundary)
+  }
+
+  # Otherwise infer the appropriate sphere boundary from the scatterer class ===
+  if (methods::is(object, "CAL")) {
+    stop("Use 'model = \"calibration\"' when modeling the TS of a solid sphere.")
+  }
+  if (methods::is(object, "ESS")) {
+    return("shelled_liquid")
+  }
+  if (methods::is(object, "FLS")) {
+    return("liquid_filled")
+  }
+  if (methods::is(object, "GAS") || methods::is(object, "SBF")) {
+    return("gas_filled")
+  }
+
+  stop(
+    "Could not infer a default SPHMS boundary for scatterer class '",
+    class(object)[1], "'.",
+    call. = FALSE
+  )
+}
+
+# Validate that the resolved SPHMS boundary is compatible with the object class.
+#' @noRd
+.sphms_validate_boundary <- function(object, boundary) {
+  # Accept the supported public sphere boundary labels =========================
+  valid_boundaries <- c(
+    "liquid_filled", "fixed_rigid", "pressure_release", "gas_filled",
+    "shelled_pressure_release", "shelled_liquid", "shelled_gas"
+  )
+  if (boundary %in% valid_boundaries) {
+    return(boundary)
+  }
+
+  # Otherwise emit the class-specific compatibility error ======================
+  if (methods::is(object, "ESS")) {
+    stop(
+      "Only the following values for 'boundary' are available in this ",
+      "implementation of the sphere modal series solution for the ",
+      "'ESS'-class: 'shelled_pressure_release', 'shelled_liquid', ",
+      "'shelled_gas'. Input boundary is '", boundary, "'."
+    )
+  }
+  if (boundary %in% c("shelled_pressure_release", "shelled_liquid",
+                      "shelled_gas")) {
+    stop(
+      "Only the following values for 'boundary' are available in this ",
+      "implementation of the sphere modal series solution for the ",
+      "'", class(object)[1], "'-class: 'fixed_rigid', 'pressure_release', ",
+      "'liquid_filled', 'gas_filled'."
+    )
+  }
+
+  stop(
+    "Only the following values for 'boundary' are available in this ",
+    "implementation of the sphere modal series solution: 'liquid_filled', ",
+    "'fixed_rigid', 'pressure_release', 'gas_filled', ",
+    "'shelled_pressure_release', 'shelled_liquid', 'shelled_gas'. Input ",
+    "boundary is '", boundary, "'."
+  )
+}
+
+# Resolve the internal Bm formulation associated with one SPHMS boundary.
+#' @noRd
+.sphms_Bm_method <- function(boundary) {
+  # Map the public boundary labels onto the internal series-kernel names =======
+  switch(
+    boundary,
+    liquid_filled = "Bm_fluid",
+    gas_filled = "Bm_fluid",
+    fixed_rigid = "Bm_rigid",
+    pressure_release = "Bm_pressure_release",
+    shelled_pressure_release = "Bm_shelled_pressure_release",
+    shelled_liquid = "Bm_shelled_fluid",
+    shelled_gas = "Bm_shelled_fluid"
+  )
+}
+
+# Resolve the exterior shell/body layer used to define the SPHMS interfaces.
+#' @noRd
+.sphms_exterior_layer <- function(object) {
+  # ESS objects use the shell as the exterior interface; other classes use body
+  if ("shell" %in% methods::slotNames(object)) {
+    return(acousticTS::extract(object, "shell"))
+  }
+
+  acousticTS::extract(object, "body")
+}
+
+# Build the interface property ratios used by the SPHMS kernels.
+#' @noRd
+.sphms_body_parameters <- function(object, exterior, sound_speed_sw, density_sw) {
+  # Resolve the shell/body to surrounding-medium property ratios ===============
+  g_exterior <- exterior$g %||%
+    if (!is.null(exterior$density)) exterior$density / density_sw else NA_real_
+  h_exterior <- exterior$h %||%
+    if (!is.null(exterior$sound_speed)) {
+      exterior$sound_speed / sound_speed_sw
+    } else {
+      NA_real_
+    }
+
+  if (!methods::is(object, "ESS")) {
+    return(list(
+      g21 = g_exterior,
+      g32 = NA_real_,
+      g31 = g_exterior,
+      h21 = h_exterior,
+      h32 = NA_real_,
+      h31 = h_exterior,
+      radius_shell = NA,
+      radius_fluid = exterior$radius
+    ))
+  }
+
+  # ESS objects keep both shell-to-water and core-to-shell interfaces ==========
+  fluid <- acousticTS::extract(object, "fluid")
+  g21 <- if (!is.null(exterior$density)) exterior$density / density_sw else
+    exterior$g %||% NA_real_
+  h21 <- if (!is.null(exterior$sound_speed)) {
+    exterior$sound_speed / sound_speed_sw
+  } else {
+    exterior$h %||% NA_real_
+  }
+  g32 <- if (!is.null(fluid$density)) fluid$density / (g21 * density_sw) else
+    if (!is.null(fluid$g)) fluid$g / g21 else NA_real_
+  h32 <- if (!is.null(fluid$sound_speed)) {
+    fluid$sound_speed / (h21 * sound_speed_sw)
+  } else if (!is.null(fluid$h)) {
+    fluid$h / h21
+  } else {
+    NA_real_
+  }
+  g31 <- if (!is.null(fluid$density)) fluid$density / density_sw else
+    fluid$g %||% NA_real_
+  h31 <- if (!is.null(fluid$sound_speed)) {
+    fluid$sound_speed / sound_speed_sw
+  } else {
+    fluid$h %||% NA_real_
+  }
+
+  list(
+    g21 = g21,
+    g32 = g32,
+    g31 = g31,
+    h21 = h21,
+    h32 = h32,
+    h31 = h31,
+    radius_shell = exterior$radius,
+    radius_fluid = fluid$radius
+  )
+}
+
+# Build the acoustics table used by the SPHMS initializer.
+#' @noRd
+.sphms_acoustics <- function(frequency, sound_speed_sw, body_params) {
+  # Initialize the exterior, shell, and interior wavenumber columns ============
+  acoustics <- .init_acoustics_df(frequency, k_sw = sound_speed_sw)
+  acoustics$k_shell <- acoustics$k_sw / body_params$h21
+  acoustics$k_fluid <- if (!is.na(body_params$h32)) {
+    acoustics$k_shell / body_params$h32
+  } else {
+    acoustics$k_sw / body_params$h31
+  }
+
+  acoustics
+}
+
+# Resolve the modal truncation limit used by the SPHMS solver.
+#' @noRd
+.sphms_m_limit <- function(m_limit, acoustics, body_params) {
+  # Preserve an explicit modal cutoff when one was supplied ====================
+  if (!is.null(m_limit)) {
+    return(m_limit)
+  }
+
+  # Otherwise use the relevant outer radius for the default truncation rule ===
+  if (!is.na(body_params$radius_shell)) {
+    return(round(acoustics$k_sw * body_params$radius_shell + 20))
+  }
+
+  round(acoustics$k_sw * body_params$radius_fluid + 20)
+}
+
 #' Initialize object for the modal series solution for a sphere
 #'
 #' @param object Scatterer-class object that must be a sphere.
@@ -78,170 +284,30 @@ sphms_initialize <- function(object,
                              sound_speed_sw = .SEAWATER_SOUND_SPEED_DEFAULT,
                              density_sw = .SEAWATER_DENSITY_DEFAULT,
                              m_limit = NULL) {
-
-  # Detect object class ========================================================
-  scatterer_type <- class(object)
-  # Detect object shape ========================================================
   scatterer_shape <- acousticTS::extract(object, "shape_parameters")
-  # Validate shape +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  if (scatterer_shape$shape != "Sphere") {
-    stop(
-      "The modal series solution for a sphere requires scatterer to be ",
-      "shape-type 'Sphere'. Input scatterer is shape-type ",
-      paste0("'", scatterer_shape, "'.")
-    )
-  }
+  .sphms_validate_shape(scatterer_shape)
   medium_params <- .init_medium_params(sound_speed_sw, density_sw)
   # Determine expansion coefficient Bm method ==================================
-  # Validate method ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  if (is.null(boundary)) {
-    # Set default boundary +++++++++++++++++++++++++++++++++++++++++++++++++++
-    boundary <- if (methods::is(object, "CAL")) {
-      stop(
-        "Use 'model='calibration'' when modeling the TS of a solid sphere."
-      )
-    } else if (methods::is(object, "ESS")) {
-      "shelled_liquid"
-    } else if (methods::is(object, "FLS")) {
-      "liquid_filled"
-    } else if (methods::is(object, "GAS") || methods::is(object, "SBF")) {
-      "gas_filled"
-    } else {
-      stop(
-        "Could not infer a default SPHMS boundary for scatterer class '",
-        class(object)[1], "'.",
-        call. = FALSE
-      )
-    }
-  }
-  if (!(boundary %in% c(
-    "liquid_filled", "fixed_rigid", "pressure_release", "gas_filled",
-    "shelled_pressure_release", "shelled_liquid", "shelled_gas"
-  ))) {
-    # Check boundary compatibility with scattering class +++++++++++++++++++++++
-    # ESS ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    if (
-      methods::is(object, "ESS") &
-      !(boundary %in%
-        c("shelled_pressure_release", "shelled_liquid", "shelled_gas")
-      )
-    ) {
-      stop(
-        "Only the following values for 'boundary' are available in this ",
-        "implementation of the sphere modal series solution for the ",
-        "'ESS'-class: ",
-        "'shelled_pressure_release', 'shelled_liquid', 'shelled_gas'. Input ",
-        "boundary is ", paste0("'", boundary, "'.")
-      )
-    } else if (
-      # All others +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-      boundary %in%
-      c(
-        "shelled_pressure_release", "shelled_liquid", "shelled_gas"
-      )
-    ) {
-      stop(
-        "Only the following values for 'boundary' are available in this ",
-        "implementation of the sphere modal series solution for the ",
-        paste0("'", class(object)[1], "'-class:" ),
-        "'fixed_rigid', 'pressure_release', 'liquid_filled', 'gas_filled'."
-      )
-    }
-  }
-  # Assign method ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  model_params <- list()
-  model_params$Bm_method <- switch(
-    boundary,
-    liquid_filled = "Bm_fluid",
-    gas_filled = "Bm_fluid",
-    fixed_rigid = "Bm_rigid",
-    pressure_release = "Bm_pressure_release",
-    shelled_pressure_release = "Bm_shelled_pressure_release",
-    shelled_liquid = "Bm_shelled_fluid",
-    shelled_gas = "Bm_shelled_fluid"
-  )
+  boundary <- .sphms_default_boundary(object, boundary)
+  boundary <- .sphms_validate_boundary(object, boundary)
+  model_params <- list(Bm_method = .sphms_Bm_method(boundary))
   # Compute sphere material properties =========================================
-  exterior <- if ("shell" %in% methods::slotNames(object)) {
-    acousticTS::extract(object, "shell")
-  } else {
-    acousticTS::extract(object, "body")
-  }
-  g_exterior <- exterior$g %||%
-    if (!is.null(exterior$density)) exterior$density / density_sw else NA_real_
-  h_exterior <- exterior$h %||%
-    if (!is.null(exterior$sound_speed)) exterior$sound_speed / sound_speed_sw else NA_real_
-  # Material properties: body/shell-to-seawater interface ++++++++++++++++++++++
-  if (methods::is(object, "ESS")) {
-    g21 <- if (!is.null(exterior$density)) exterior$density / density_sw else
-      exterior$g %||% NA_real_
-    h21 <- if (!is.null(exterior$sound_speed)) exterior$sound_speed / sound_speed_sw else
-      exterior$h %||% NA_real_
-  } else {
-    g21 <- g_exterior
-    h21 <- h_exterior
-  }
-  # Material properties: fluid-to-shell interface ++++++++++++++++++++++++++++++
-  if (methods::is(object, "ESS")) {
-    fluid <- acousticTS::extract(object, "fluid")
-    g32 <- if (!is.null(fluid$density)) fluid$density / (g21 * density_sw) else
-      if (!is.null(fluid$g)) fluid$g / g21 else NA_real_
-    h32 <- if (!is.null(fluid$sound_speed)) fluid$sound_speed / (h21 * sound_speed_sw) else
-      if (!is.null(fluid$h)) fluid$h / h21 else NA_real_
-  } else {
-    g32 <- NA_real_
-    h32 <- NA_real_
-  }
-  # Material properties: fluid-to-seawater interface +++++++++++++++++++++++++++
-  if (methods::is(object, "ESS")) {
-    g31 <- if (!is.null(fluid$density)) fluid$density / density_sw else
-      fluid$g %||% NA_real_
-    h31 <- if (!is.null(fluid$sound_speed)) fluid$sound_speed / sound_speed_sw else
-      fluid$h %||% NA_real_
-  } else {
-    g31 <- g21
-    h31 <- h21
-  }
-  # Outer radius +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  radius_shell <- switch(
-    class(object),
-    ESS = exterior$radius,
-    NA
-  )
-  radius_fluid <- switch(
-    class(object),
-    ESS = fluid$radius,
-    exterior$radius
-  )
-  # Add to list ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  body_params <- list(
-    g21 = g21, g32 = g32, g31 = g31,
-    h21 = h21, h32 = h32, h31 = h31,
-    radius_shell = radius_shell,
-    radius_fluid = radius_fluid
+  exterior <- .sphms_exterior_layer(object)
+  body_params <- .sphms_body_parameters(
+    object = object,
+    exterior = exterior,
+    sound_speed_sw = sound_speed_sw,
+    density_sw = density_sw
   )
   # Define model parameters recipe =============================================
-  acoustics <- .init_acoustics_df(frequency, k_sw = sound_speed_sw)
-  # Wavenumber at shell-to-seawater interface ++++++++++++++++++++++++++++++++++
-  acoustics$k_shell <- acoustics$k_sw / h21
-  # Wavenumber at fluid-to-shell interface +++++++++++++++++++++++++++++++++++++
-  acoustics$k_fluid <- if( !is.na(h32)) {
-    acoustics$k_shell / h32
-  } else {
-    acoustics$k_sw / h31
-  }
+  acoustics <- .sphms_acoustics(frequency, sound_speed_sw, body_params)
   model_params$acoustics <- acoustics
   # Define limits for 'm' modal series iterator ================================
-  if (!is.null(m_limit)) {
-    model_params$acoustics$m_limit <- m_limit
-  } else if(!is.na(radius_shell)){
-    model_params$acoustics$m_limit <- round(
-      model_params$acoustics$k_sw * radius_shell + 20
-    )
-  } else {
-    model_params$acoustics$m_limit <- round(
-      model_params$acoustics$k_sw * radius_fluid + 20
-    )
-  }
+  model_params$acoustics$m_limit <- .sphms_m_limit(
+    m_limit = m_limit,
+    acoustics = acoustics,
+    body_params = body_params
+  )
   .init_model_slots(
     object = object,
     model_name = "SPHMS",

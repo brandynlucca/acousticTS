@@ -161,7 +161,10 @@ NULL
   length_body <- sum(sqrt(dx_phys^2 + dz_phys^2))
 
   if (!is.finite(length_body) || length_body <= 0) {
-    stop("PCDWBA could not resolve a positive body length from the scatterer geometry.")
+    stop(
+      "PCDWBA could not resolve a positive body length from the scatterer ",
+      "geometry."
+    )
   }
 
   longitudinal <- x_long - mean(range(x_long))
@@ -197,8 +200,8 @@ NULL
   # Validate the scatterer and curvature inputs ================================
   if (!methods::is(object, "FLS")) {
     stop(
-      "PCDWBA requires a fluid-like scatterer ('FLS'). Input scatterer is type '",
-      class(object), "'."
+      "PCDWBA requires a fluid-like scatterer ('FLS'). Input scatterer is ",
+      "type '", class(object), "'."
     )
   }
 
@@ -229,7 +232,8 @@ NULL
   }
   length_body_profile <- sum(sqrt(diff(body$rpos[x_idx, ])^2 + diff(z_pos)^2))
 
-  if (is.null(length_body_profile) || !is.finite(length_body_profile) || length_body_profile <= 0) {
+  if (is.null(length_body_profile) || !is.finite(length_body_profile)
+      || length_body_profile <= 0) {
     length_body_profile <- diff(range(body$rpos[1, ]))
   }
 
@@ -237,9 +241,11 @@ NULL
     radius_curvature_ratio
   } else if (!is.null(radius_curvature)) {
     radius_curvature / length_body_profile
-  } else if (!is.null(shape$radius_curvature_ratio) && !is.na(shape$radius_curvature_ratio)) {
+  } else if (!is.null(shape$radius_curvature_ratio)
+             && !is.na(shape$radius_curvature_ratio)) {
     shape$radius_curvature_ratio
-  } else if (!is.null(body$radius_curvature_ratio) && !is.na(body$radius_curvature_ratio)) {
+  } else if (!is.null(body$radius_curvature_ratio)
+             && !is.na(body$radius_curvature_ratio)) {
     body$radius_curvature_ratio
   } else {
     NA_real_
@@ -250,7 +256,11 @@ NULL
     geometry <- .pcdwba_regular_geometry(
       n_nodes = ncol(body$rpos),
       radius_curvature_ratio = effective_ratio,
-      taper_order = if ("taper_order" %in% names(shape)) shape$taper_order else NA_real_
+      taper_order = if ("taper_order" %in% names(shape)) {
+        shape$taper_order
+      } else{
+        NA_real_
+      }
     )
     geometry$length_body <- shape$length
   } else {

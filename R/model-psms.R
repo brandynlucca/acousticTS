@@ -55,11 +55,11 @@
 #'   double- and quadruple-precision usages are implemented.}
 #'   \item{\code{n_integration}}{An integer argument that informs the model how
 #'   many integration points will be used to calculate \eqn{\alpha_{mn}^{m}},
-  #'   which is numerically calculated using Gauss-Legendre quadrature. When left
-  #'   as \code{NULL}, the model uses 96 integration points unless
-  #'   \code{adaptive = TRUE}, in which case a reduced-frequency-based
-  #'   quadrature rule is selected internally for the full fluid- or gas-filled
-  #'   solve. See
+#'   which is numerically calculated using Gauss-Legendre quadrature. When left
+#'   as \code{NULL}, the model uses 96 integration points unless
+#'   \code{adaptive = TRUE}, in which case a reduced-frequency-based
+#'   quadrature rule is selected internally for the full fluid- or gas-filled
+#'   solve. See
 #'   \link{gauss_legendre} for a full description of how \code{n_integration} is
 #'   used. **Note:** this argument **only** applies to when
 #'   \code{boundary = "liquid_filled"} or \code{boundary = "gas_filled"}. It is
@@ -230,16 +230,195 @@
 #' @keywords models acoustics internal
 NULL
 
+# Validate that the current PSMS implementation is only used for prolates.
+#' @noRd
+.psms_validate_shape <- function(scatterer_shape) {
+  # Restrict the modal-series initializer to prolate spheroids =================
+  if (scatterer_shape$shape != "ProlateSpheroid") {
+    stop(
+      "The modal series solution for a prolate spheroid requires scatterer to ",
+      "be shape-type 'ProlateSpheroid'. Input scatterer is shape-type ",
+      paste0("'", scatterer_shape$shape, "'.")
+    )
+  }
+
+  invisible(TRUE)
+}
+
+# Validate the PSMS boundary label used to choose the Amn formulation.
+#' @noRd
+.psms_validate_boundary <- function(boundary) {
+  # Confirm that the requested PSMS boundary is implemented ====================
+  if (!(boundary %in% c(
+    "liquid_filled", "gas_filled", "fixed_rigid", "pressure_release"
+  ))) {
+    stop(
+      "Only the following values for 'method' are available in this ",
+      "implementation of the prolate spheroid modal series solution: ",
+      "'liquid_filled' (default), 'gas_filled', 'fixed_rigid', ",
+      "'pressure_release'."
+    )
+  }
+
+  boundary
+}
+
+# Validate the PSMS precision label.
+#' @noRd
+.psms_validate_precision <- function(precision) {
+  # Restrict the precision choice to the supported backends ====================
+  if (!precision %in% c("double", "quad")) {
+    stop("'precision' must be either 'double' or 'quad'.")
+  }
+
+  precision
+}
+
+# Validate the PSMS adaptive-mode flag.
+#' @noRd
+.psms_validate_adaptive <- function(adaptive) {
+  # Require a scalar logical adaptive flag =====================================
+  if (!is.logical(adaptive) || length(adaptive) != 1 || is.na(adaptive)) {
+    stop("'adaptive' must be either TRUE or FALSE.")
+  }
+
+  adaptive
+}
+
+# Resolve the Amn formulation associated with one PSMS boundary condition.
+#' @noRd
+.psms_Amn_method <- function(boundary, simplify_Amn) {
+  # Map the public PSMS boundary labels onto the internal kernel names ========
+  switch(
+    boundary,
+    liquid_filled = ifelse(simplify_Amn, "Amn_fluid_simplify", "Amn_fluid"),
+    gas_filled = ifelse(simplify_Amn, "Amn_fluid_simplify", "Amn_fluid"),
+    fixed_rigid = "Amn_fixed_rigid",
+    pressure_release = "Amn_pressure_release"
+  )
+}
+
+# Resolve the hydrated PSMS body properties against the surrounding medium.
+#' @noRd
+.psms_body_state <- function(object, sound_speed_sw, density_sw) {
+  # Hydrate contrasts into absolute body properties ============================
+  body <- .hydrate_contrasts(
+    extract(object, "body"),
+    sound_speed_sw,
+    density_sw
+  )
+
+  list(
+    body = body,
+    medium = .init_medium_params(sound_speed_sw, density_sw)
+  )
+}
+
+# Build the PSMS model-parameter list prior to geometry-specific bookkeeping.
+#' @noRd
+.psms_model_parameters <- function(frequency,
+                                   sound_speed_sw,
+                                   body_h,
+                                   precision,
+                                   n_integration,
+                                   adaptive) {
+  # Initialize the common acoustics table and scalar controls ==================
+  list(
+    acoustics = .init_acoustics_df(
+      frequency,
+      k_sw = sound_speed_sw,
+      k_f = body_h * sound_speed_sw
+    ),
+    precision = precision,
+    n_integration = n_integration,
+    adaptive = adaptive
+  )
+}
+
+# Build the stored body metadata for one initialized PSMS object.
+#' @noRd
+.psms_body_parameters <- function(scatterer_shape,
+                                  body,
+                                  phi_body,
+                                  sound_speed_sw,
+                                  density_sw) {
+  # Convert the stored prolate geometry into spheroidal coordinates ============
+  body_params <- list(
+    xi = 1 / sqrt(
+      1 - (scatterer_shape$radius / (scatterer_shape$length / 2))^2
+    ),
+    phi_body = phi_body,
+    phi_scatter = phi_body + pi,
+    theta_body = body$theta,
+    theta_scatter = pi - body$theta,
+    density = body$g * density_sw,
+    sound_speed = body$h * sound_speed_sw
+  )
+  body_params$q <- scatterer_shape$length / 2 / body_params$xi
+
+  body_params
+}
+
+# Resolve the quadrature order used by the PSMS kernels.
+#' @noRd
+.psms_n_integration <- function(n_integration, adaptive, Amn_method) {
+  # Allow the adaptive full-fluid solve to choose quadrature internally ========
+  use_adaptive_quadrature <- isTRUE(adaptive) &&
+    identical(Amn_method, "Amn_fluid")
+  if (use_adaptive_quadrature) {
+    if (!is.null(n_integration)) {
+      warning(
+        "'n_integration' is ignored when 'adaptive = TRUE' for the full ",
+        "fluid- or gas-filled PSMS solve."
+      )
+    }
+    return(NA_integer_)
+  }
+
+  # Otherwise validate or fill in the explicit quadrature order ===============
+  if (is.null(n_integration)) {
+    return(96L)
+  }
+  if (!is.numeric(n_integration) ||
+      length(n_integration) != 1 ||
+      is.na(n_integration) ||
+      n_integration < 1 ||
+      n_integration %% 1 != 0) {
+    stop("'n_integration' must be a single positive integer.")
+  }
+
+  as.integer(n_integration)
+}
+
+# Attach the reduced frequencies and modal truncation limits to the PSMS
+# acoustics table.
+#' @noRd
+.psms_complete_acoustics <- function(model_params, body_params, scatterer_shape) {
+  # Add reduced frequencies for the surrounding medium and interior ============
+  model_params$acoustics$chi_sw <- model_params$acoustics$k_sw * body_params$q
+  model_params$acoustics$chi_body <- model_params$acoustics$k_f * body_params$q
+  # Add the hard modal truncation limits used by the PSMS solver ==============
+  model_params$acoustics$m_max <- ceiling(
+    2 * model_params$acoustics$k_sw * scatterer_shape$radius
+  )
+  model_params$acoustics$n_max <- model_params$acoustics$m_max +
+    ceiling(0.5 * model_params$acoustics$chi_sw)
+
+  model_params
+}
+
 #' Initialize object for the modal series solution for a prolate spheroid
 #' @param object Scatterer-class object.
 #' @param frequency Frequency vector (Hz).
 #' @param phi_body Body rotation angle (radians).
 #' @param boundary Boundary condition.
-#' @param adaptive Apply adaptive modal-tail truncation and quadrature selection.
+#' @param adaptive Apply adaptive modal-tail truncation and quadrature
+#' selection.
 #' @param precision Numerical precision.
-  #' @param n_integration Number of integration points. When left as `NULL`, the
-  #' model uses 96 integration points unless `adaptive = TRUE`, in which case a
-  #' reduced-frequency-based rule is used internally for full fluid- or gas-filled runs.
+#' @param n_integration Number of integration points. When left as `NULL`, the
+#' model uses 96 integration points unless `adaptive = TRUE`, in which case a
+#' reduced-frequency-based rule is used internally for full fluid- or
+#' gas-filled runs.
 #' @param simplify_Amn Calculate the boundary expansion coefficient using a
 #' simplified formulation.
 #' @param sound_speed_sw Seawater sound speed (m/s).
@@ -256,121 +435,43 @@ psms_initialize <- function(object,
                             sound_speed_sw = 1500,
                             density_sw = 1026) {
   # Detect object class ========================================================
-  scatterer_type <- class(object)
-  # Detect object shape ========================================================
   scatterer_shape <- acousticTS::extract(object, "shape_parameters")
-  # Validate shape +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  if (scatterer_shape$shape != "ProlateSpheroid") {
-    stop(
-      "The modal series solution for a prolate spheroid requires scatterer to ",
-      "be shape-type 'ProlateSpheroid'. Input scatterer is shape-type ",
-      paste0("'", scatterer_shape, "'.")
-    )
-  }
-  # Parse body =================================================================
-  body <- .hydrate_contrasts(extract(object, "body"), sound_speed_sw, density_sw)
-  body_h <- body$h
-  body_g <- body$g
-  medium_params <- .init_medium_params(sound_speed_sw, density_sw)
+  .psms_validate_shape(scatterer_shape)
+  body_state <- .psms_body_state(object, sound_speed_sw, density_sw)
+  body <- body_state$body
+  medium_params <- body_state$medium
   # Define model parameters recipe =============================================
-  model_params <- list(
-    acoustics = .init_acoustics_df(
-      frequency,
-      k_sw = sound_speed_sw,
-      k_f = body_h * sound_speed_sw
-    ),
+  boundary <- .psms_validate_boundary(boundary)
+  precision <- .psms_validate_precision(precision)
+  adaptive <- .psms_validate_adaptive(adaptive)
+  model_params <- .psms_model_parameters(
+    frequency = frequency,
+    sound_speed_sw = sound_speed_sw,
+    body_h = body$h,
     precision = precision,
     n_integration = n_integration,
     adaptive = adaptive
   )
   # Determine expansion coefficient Amn method =================================
-  # Validate method ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  if (
-    !(boundary %in% c(
-      "liquid_filled", "gas_filled", "fixed_rigid", "pressure_release"
-    )
-    )) {
-    stop(
-      "Only the following values for 'method' are available in this ",
-      "implementation of the prolate spheroid modal series solution: ",
-      "'liquid_filled' (default), 'gas_filled', 'fixed_rigid',
-      'pressure_release'."
-    )
-  }
-  if (! precision %in% c("double", "quad")) {
-    stop(
-      "'precision' must be either 'double' or 'quad'."
-    )
-  }
-  if (!is.logical(adaptive) || length(adaptive) != 1 || is.na(adaptive)) {
-    stop("'adaptive' must be either TRUE or FALSE.")
-  }
-  # Assign method ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  model_params$Amn_method <- switch(
-    boundary,
-    liquid_filled = ifelse(simplify_Amn, "Amn_fluid_simplify", "Amn_fluid"),
-    gas_filled = ifelse(simplify_Amn, "Amn_fluid_simplify", "Amn_fluid"),
-    fixed_rigid = "Amn_fixed_rigid",
-    pressure_release = "Amn_pressure_release"
-  )
+  model_params$Amn_method <- .psms_Amn_method(boundary, simplify_Amn)
   # Compute body parameters ====================================================
-  body_params <- list(
-    # Prolate spheroidal coordinate 'xi' +++++++++++++++++++++++++++++++++++++++
-    xi = 1 / sqrt(
-      1 - (scatterer_shape$radius / (scatterer_shape$length / 2))^2
-    ),
-    # Roll angle 'phi' (incident direction) ++++++++++++++++++++++++++++++++++++
+  body_params <- .psms_body_parameters(
+    scatterer_shape = scatterer_shape,
+    body = body,
     phi_body = phi_body,
-    # Roll angle 'phi' (scattering direction) ++++++++++++++++++++++++++++++++++
-    phi_scatter = phi_body + pi,
-    # Theta angle 'theta' (incident direction) +++++++++++++++++++++++++++++++++
-    theta_body = body$theta,
-    # Theta angle 'theta' (scattering direction) +++++++++++++++++++++++++++++++
-    theta_scatter = pi - body$theta,
-    # Density ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    density = body_g * density_sw,
-    # Sound speed ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    sound_speed = body_h * sound_speed_sw
+    sound_speed_sw = sound_speed_sw,
+    density_sw = density_sw
   )
-  # Focal length 'q' +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  body_params$q <- scatterer_shape$length / 2 / body_params$xi
-  # Compute the reduced frequency for the surrounding medium ===================
-  model_params$acoustics$chi_sw <- model_params$acoustics$k_sw * body_params$q
-  # Compute the reduced frequency for the scatterer body =======================
-  model_params$acoustics$chi_body <- model_params$acoustics$k_f * body_params$q
-  # Determine quadrature order =================================================
-  use_adaptive_quadrature <- isTRUE(adaptive) && identical(model_params$Amn_method, "Amn_fluid")
-  if (use_adaptive_quadrature) {
-    if (!is.null(n_integration)) {
-      warning(
-        "'n_integration' is ignored when 'adaptive = TRUE' for the full fluid- or gas-filled PSMS solve."
-      )
-    }
-    n_integration <- NULL
-  } else if (is.null(n_integration)) {
-    n_integration <- 96L
-  }
-  if (!is.null(n_integration)) {
-    if (
-      !is.numeric(n_integration) ||
-      length(n_integration) != 1 ||
-      is.na(n_integration) ||
-      n_integration < 1 ||
-      n_integration %% 1 != 0
-    ) {
-      stop("'n_integration' must be a single positive integer.")
-    }
-    n_integration <- as.integer(n_integration)
-  } else {
-    n_integration <- NA_integer_
-  }
-  model_params$n_integration <- n_integration
-  # Define limits for 'm' and 'n' iterators ====================================
-  model_params$acoustics$m_max <- ceiling(
-    2 * model_params$acoustics$k_sw * scatterer_shape$radius
+  model_params <- .psms_complete_acoustics(
+    model_params = model_params,
+    body_params = body_params,
+    scatterer_shape = scatterer_shape
   )
-  model_params$acoustics$n_max <- model_params$acoustics$m_max +
-    ceiling(0.5 * model_params$acoustics$chi_sw)
+  model_params$n_integration <- .psms_n_integration(
+    n_integration = n_integration,
+    adaptive = adaptive,
+    Amn_method = model_params$Amn_method
+  )
   .init_model_slots(
     object = object,
     model_name = "PSMS",
@@ -513,7 +614,8 @@ prolate_spheroidal_kernels <- function(
     )
   }
   # Normalize missing quadrature input =========================================
-  if (is.null(n_integration) || (length(n_integration) == 1 && is.na(n_integration))) {
+  if (is.null(n_integration) || (length(n_integration) == 1 &&
+                                 is.na(n_integration))) {
     n_integration <- 96L
   }
   # Fall back to the fixed-order kernel solver =================================

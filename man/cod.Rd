@@ -6,9 +6,7 @@
 \title{Sample cod shape with fully inflated swimbladder}
 \format{
 A pre-generated SBF scatterer containing all information required for
-target strength modeling. The packaged object corresponds to the historical
-Atlantic cod example used in the KRM literature and matches the Cod D case
-archived in the \code{echoSMs} KRM shape collection.
+target strength modeling.
 \describe{
 \item{metadata}{Relevant and identifying metadata (\code{list}).}
 \item{model_parameters}{Container for specified model parameters
@@ -52,7 +50,10 @@ Clay and Horne Atlantic cod example.
 data(cod)
 }
 \description{
-Sample cod shape with fully inflated swimbladder
+A pre-generated SBF scatterer containing all information required for target
+strength modeling. The packaged object corresponds to the historical
+Atlantic cod example used in the KRM literature and matches the Cod D case
+archived in the \code{echoSMs} KRM shape collection.
 }
 \references{
 Clay, C.S., and Horne, J.K. (1994). Acoustic models of fish: The Atlantic

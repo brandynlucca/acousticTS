@@ -16,8 +16,8 @@
 #' is much smaller than the organism size. The model supports both straight
 #' and bent cylinders, with the bent cylinder formulation incorporating the
 #' radius of curvature to account for body shape effects on the directivity
-#' pattern. For more details, see the [expanded documentation on the two-ray cylinder
-#' model](https://brandynlucca.github.io/acousticTS/articles/trcm/trcm-theory.html).
+#' pattern. For a fuller derivation and implementation discussion, see
+#' `vignette("trcm-theory", package = "acousticTS")`.
 #'
 #' @section Usage:
 #' This model is accessed via:
@@ -124,7 +124,11 @@ trcm_initialize <- function(object,
   }
   # Fill out material properties ===============================================
   body_params$h <- body$h %||%
-    if (!is.null(body$sound_speed)) body$sound_speed / medium_params$sound_speed else NA
+    if (!is.null(body$sound_speed)) {
+      body$sound_speed / medium_params$sound_speed
+    } else {
+      NA
+    }
   body_params$g <- body$g %||%
     if (!is.null(body$density)) body$density / medium_params$density else NA
   # Define model parameters ====================================================

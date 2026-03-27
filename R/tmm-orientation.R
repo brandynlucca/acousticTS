@@ -200,6 +200,108 @@ tmm_orientation_distribution <- function(distribution = c(
   distribution_df
 }
 
+# Resolve either a pre-built orientation distribution or the direct averaging
+# inputs supplied to `tmm_average_orientation()`.
+#' @noRd
+.tmm_average_orientation_inputs <- function(distribution,
+                                            theta_body,
+                                            weights,
+                                            phi_body) {
+  # Reuse the shared distribution validator when a pre-built grid is supplied ==
+  if (!is.null(distribution)) {
+    distribution <- .tmm_validate_orientation_distribution(distribution)
+    return(list(
+      theta_body = distribution$theta_body,
+      phi_body = distribution$phi_body,
+      weights = distribution$weights
+    ))
+  }
+
+  # Otherwise validate the direct theta/phi/weight inputs ======================
+  .tmm_average_orientation_direct_inputs(
+    theta_body = theta_body,
+    weights = weights,
+    phi_body = phi_body
+  )
+}
+
+# Validate direct theta/phi/weight inputs for `tmm_average_orientation()`.
+#' @noRd
+.tmm_average_orientation_direct_inputs <- function(theta_body,
+                                                   weights,
+                                                   phi_body) {
+  # Require a concrete angle vector when no stored distribution is supplied ====
+  if (!is.numeric(theta_body) ||
+      !length(theta_body) ||
+      any(!is.finite(theta_body))) {
+    stop(
+      "'theta_body' must be a non-empty numeric vector of angles in radians.",
+      call. = FALSE
+    )
+  }
+
+  n_angles <- length(theta_body)
+  phi_body <- rep_len(phi_body, n_angles)
+  if (any(!is.finite(phi_body))) {
+    stop("'phi_body' must be finite.", call. = FALSE)
+  }
+
+  # Resolve equal weights or normalize the user-supplied weight vector =========
+  weights <- .tmm_average_orientation_weights(weights, n_angles, theta_body)
+
+  list(
+    theta_body = theta_body,
+    phi_body = phi_body,
+    weights = weights
+  )
+}
+
+# Normalize the averaging weights for `tmm_average_orientation()`.
+#' @noRd
+.tmm_average_orientation_weights <- function(weights, n_angles, theta_body) {
+  # Default to equal weighting across the supplied angle grid ==================
+  if (is.null(weights)) {
+    return(rep(1 / n_angles, n_angles))
+  }
+
+  # Validate and normalize explicit weights ====================================
+  if (!is.numeric(weights) ||
+      length(weights) != n_angles ||
+      any(!is.finite(weights)) ||
+      any(weights < 0) ||
+      sum(weights) <= 0) {
+    stop(
+      "'weights' must be a non-negative numeric vector with the same length ",
+      "as 'theta_body'.",
+      call. = FALSE
+    )
+  }
+
+  weights / sum(weights)
+}
+
+# Resolve the receive-angle vectors for one orientation-averaged TMM solve.
+#' @noRd
+.tmm_average_scatter_angles <- function(theta_body,
+                                        phi_body,
+                                        theta_scatter,
+                                        phi_scatter) {
+  # Default to the exact monostatic receive direction when omitted ============
+  n_angles <- length(theta_body)
+  theta_scatter <- if (is.null(theta_scatter)) {
+    pi - theta_body
+  } else {
+    rep_len(theta_scatter, n_angles)
+  }
+  phi_scatter <- if (is.null(phi_scatter)) {
+    phi_body + pi
+  } else {
+    rep_len(phi_scatter, n_angles)
+  }
+
+  list(theta_scatter = theta_scatter, phi_scatter = phi_scatter)
+}
+
 #' Orientation-average scattering from a stored TMM object
 #'
 #' @description
@@ -239,59 +341,28 @@ tmm_average_orientation <- function(object,
   # Recover the stored TMM state and any pre-built distribution ================
   model_params <- .tmm_require_stored_blocks(object)
   .tmm_warn_exploratory_cylinder_blocks(object, model_params)
-  if (!is.null(distribution)) {
-    distribution <- .tmm_validate_orientation_distribution(distribution)
-    theta_body <- distribution$theta_body
-    phi_body <- distribution$phi_body
-    weights <- distribution$weights
-  } else {
-    if (!is.numeric(theta_body) ||
-        !length(theta_body) ||
-        any(!is.finite(theta_body))) {
-      stop(
-        "'theta_body' must be a non-empty numeric vector of angles in ",
-        "radians.",
-        call. = FALSE
-      )
-    }
-
-    n_angles <- length(theta_body)
-    phi_body <- rep_len(phi_body, n_angles)
-    if (any(!is.finite(phi_body))) {
-      stop("'phi_body' must be finite.", call. = FALSE)
-    }
-
-    if (is.null(weights)) {
-      weights <- rep(1 / n_angles, n_angles)
-    } else {
-      if (!is.numeric(weights) ||
-          length(weights) != n_angles ||
-          any(!is.finite(weights)) ||
-          any(weights < 0) || sum(weights) <= 0) {
-        stop(
-          "'weights' must be a non-negative numeric vector with the same ",
-          "length as 'theta_body'.",
-          call. = FALSE
-        )
-      }
-      weights <- weights / sum(weights)
-    }
-  }
+  orientation <- .tmm_average_orientation_inputs(
+    distribution = distribution,
+    theta_body = theta_body,
+    weights = weights,
+    phi_body = phi_body
+  )
+  theta_body <- orientation$theta_body
+  phi_body <- orientation$phi_body
+  weights <- orientation$weights
 
   # Resolve the receive direction, defaulting to exact monostatic geometry =====
-  n_angles <- length(theta_body)
-  if (is.null(theta_scatter)) {
-    theta_scatter <- pi - theta_body
-  } else {
-    theta_scatter <- rep_len(theta_scatter, n_angles)
-  }
-  if (is.null(phi_scatter)) {
-    phi_scatter <- phi_body + pi
-  } else {
-    phi_scatter <- rep_len(phi_scatter, n_angles)
-  }
+  scatter_angles <- .tmm_average_scatter_angles(
+    theta_body = theta_body,
+    phi_body = phi_body,
+    theta_scatter = theta_scatter,
+    phi_scatter = phi_scatter
+  )
+  theta_scatter <- scatter_angles$theta_scatter
+  phi_scatter <- scatter_angles$phi_scatter
 
   # Evaluate the stored scattering operator at each supplied orientation =======
+  n_angles <- length(theta_body)
   sigma_mat <- vapply(
     seq_len(n_angles),
     function(i) {

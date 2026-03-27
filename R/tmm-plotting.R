@@ -41,7 +41,8 @@
   }
 
   # Resolve the varying angle and normalize the plotting quantity ==============
-  vary <- match.arg(vary, c("theta_scatter", "phi_scatter", "theta_body", "phi_body"))
+  vary <- match.arg(vary, c("theta_scatter", "phi_scatter", "theta_body",
+                            "phi_body"))
   quantity <- .tmm_plot_quantity(quantity)
 
   theta_body_default <- defaults$theta_body
@@ -54,17 +55,21 @@
   }
 
   # Expand the incident and receive geometry over the slice grid ===============
-  theta_body_vec <- rep(.tmm_scalar_angle(theta_body, theta_body_default, "theta_body"), n_points)
-  phi_body_vec <- rep(.tmm_scalar_angle(phi_body, phi_body_default, "phi_body"), n_points)
+  theta_body_vec <- rep(.tmm_scalar_angle(theta_body, theta_body_default,
+                                          "theta_body"), n_points)
+  phi_body_vec <- rep(.tmm_scalar_angle(phi_body, phi_body_default,
+                                        "phi_body"), n_points)
   theta_scatter_vec <- if (is.null(theta_scatter)) {
     pi - theta_body_vec
   } else {
-    rep(.tmm_scalar_angle(theta_scatter, pi - theta_body_vec[1], "theta_scatter"), n_points)
+    rep(.tmm_scalar_angle(theta_scatter, pi - theta_body_vec[1],
+                          "theta_scatter"), n_points)
   }
   phi_scatter_vec <- if (is.null(phi_scatter)) {
     phi_body_vec + pi
   } else {
-    rep(.tmm_scalar_angle(phi_scatter, phi_body_vec[1] + pi, "phi_scatter"), n_points)
+    rep(.tmm_scalar_angle(phi_scatter, phi_body_vec[1] + pi,
+                          "phi_scatter"), n_points)
   }
 
   if (vary == "theta_body") {
@@ -193,14 +198,19 @@
   z_finite <- z_vals[is.finite(z_vals)]
 
   if (!length(z_finite)) {
-    stop("The requested TMM scattering grid does not contain finite plotted values.", call. = FALSE)
+    stop(
+      "The requested TMM scattering grid does not contain finite plotted ",
+      "values.",
+      call. = FALSE
+    )
   }
 
   # Build the polar cell geometry, palette, and legend scale ===================
   theta_edges <- .tmm_grid_edges(grid$theta_scatter, lower = 0, upper = pi)
   phi_edges <- .tmm_grid_edges(grid$phi_scatter, lower = 0, upper = 2 * pi)
   palette <- grDevices::hcl.colors(128, "Spectral", rev = TRUE)
-  z_breaks <- seq(min(z_finite), max(z_finite), length.out = length(palette) + 1)
+  z_breaks <- seq(min(z_finite), max(z_finite),
+                  length.out = length(palette) + 1)
   opar <- graphics::par(no.readonly = TRUE)
   on.exit(graphics::par(opar))
   graphics::par(
@@ -285,26 +295,31 @@
       lty = 3
     )
   }
-  graphics::symbols(0, 0, circles = pi, inches = FALSE, add = TRUE, fg = "black", bg = NA)
+  graphics::symbols(0, 0, circles = pi, inches = FALSE, add = TRUE,
+                    fg = "black", bg = NA)
   graphics::text(0, 0, labels = "0", cex = 0.85, font = 2)
   graphics::text(
     x = c(pi + 0.18, 0, -pi - 0.18, 0),
     y = c(0, pi - 0.12, 0, -pi + 0.12),
-    labels = c(expression(0), expression(pi / 2), expression(pi), expression(3 * pi / 2)),
+    labels = c(expression(0), expression(pi / 2), expression(pi),
+               expression(3 * pi / 2)),
     xpd = NA,
     cex = 0.9
   )
   graphics::text(
     x = c(pi / 4, pi / 2, 3 * pi / 4, pi),
     y = 0,
-    labels = c(expression(pi / 4), expression(pi / 2), expression(3 * pi / 4), expression(pi)),
+    labels = c(expression(pi / 4), expression(pi / 2),
+               expression(3 * pi / 4), expression(pi)),
     pos = 3,
     col = "grey35",
     cex = 0.8
   )
 
   # Draw the companion colorbar for the plotted scattering quantity ============
-  graphics::par(fig = c(0.845, 0.965, 0.15, 0.88), mar = c(1.8, 0.2, 2.2, 3.0), new = TRUE)
+  graphics::par(fig = c(0.845, 0.965, 0.15, 0.88),
+                mar = c(1.8, 0.2, 2.2, 3.0),
+                new = TRUE)
   graphics::plot.new()
   graphics::plot.window(xlim = c(0, 1), ylim = range(z_breaks))
   y_edges <- seq(min(z_breaks), max(z_breaks), length.out = length(palette) + 1)
@@ -337,7 +352,10 @@
   extra_args <- list(...)
 
   if (isTRUE(polar) && isTRUE(heatmap)) {
-    stop("Only one of 'polar' or 'heatmap' can be TRUE for TMM scattering plots.", call. = FALSE)
+    stop(
+      "Only one of 'polar' or 'heatmap' can be TRUE for TMM scattering plots.",
+      call. = FALSE
+    )
   }
 
   # Route map-style requests through the 2D grid plotting helpers ==============
@@ -356,12 +374,14 @@
   }
 
   # Build the one-dimensional slice and its plotting limits ====================
-  slice <- do.call(.tmm_scattering_slice_data, c(list(object = object), extra_args))
+  slice <- do.call(.tmm_scattering_slice_data, c(list(object = object),
+                                                 extra_args))
   y_finite <- slice$y[is.finite(slice$y)]
 
   if (!length(y_finite)) {
     stop(
-      "The requested scattering slice does not contain any finite plotted values.",
+      "The requested scattering slice does not contain any finite plotted ",
+      "values.",
       call. = FALSE
     )
   }
@@ -391,7 +411,8 @@
     xaxs = "i",
     yaxs = "i"
   )
-  graphics::title(main = sprintf("TMM scattering slice at %.1f kHz", slice$frequency * 1e-3))
+  graphics::title(main = sprintf("TMM scattering slice at %.1f kHz",
+                                 slice$frequency * 1e-3))
 
   # Return the slice data invisibly for downstream inspection ==================
   invisible(slice)

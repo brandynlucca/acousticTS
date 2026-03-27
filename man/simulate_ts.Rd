@@ -12,7 +12,7 @@ simulate_ts(
   parameters,
   batch_by = NULL,
   parallel = TRUE,
-  n_cores = parallel::detectCores() - 1,
+  n_cores = .default_simulation_cores(),
   verbose = TRUE
 )
 }
@@ -37,7 +37,7 @@ values. Default is \code{NULL}.}
 \code{TRUE}.}
 
 \item{n_cores}{Optional. Number of CPU cores to use for parallelization.
-Default is \code{parallel::detectCores() - 1}.}
+Default is the smaller of 2 cores and \code{parallel::detectCores() - 1}.}
 
 \item{verbose}{Logical; whether to print progress and status messages to the
 console. Default is \code{TRUE}.}

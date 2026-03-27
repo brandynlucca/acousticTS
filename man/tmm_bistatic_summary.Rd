@@ -30,7 +30,8 @@ incident angle.}
 \item{phi_body}{Incident azimuth angle (radians). Defaults to the stored TMM
 incident angle.}
 
-\item{n_theta}{Number of receive polar-angle samples used by the summary grid.}
+\item{n_theta}{Number of receive polar-angle samples used by the summary
+grid.}
 
 \item{n_phi}{Number of receive azimuth samples used by the summary grid.}
 

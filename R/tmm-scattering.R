@@ -181,6 +181,85 @@
   # Return the midpoint-derived plotting or integration edges ==================
   c(lower, mids, upper)
 }
+
+# Validate the default 2D scattering-grid dimensions requested by the caller.
+#' @noRd
+.tmm_validate_scattering_grid_dims <- function(n_theta, n_phi) {
+  # Require at least two samples along each angular axis =======================
+  if (!is.numeric(n_theta) || length(n_theta) != 1 || !is.finite(n_theta) ||
+      n_theta < 2 || n_theta %% 1 != 0) {
+    stop("'n_theta' must be a single integer >= 2.", call. = FALSE)
+  }
+  if (!is.numeric(n_phi) || length(n_phi) != 1 || !is.finite(n_phi) ||
+      n_phi < 2 || n_phi %% 1 != 0) {
+    stop("'n_phi' must be a single integer >= 2.", call. = FALSE)
+  }
+
+  invisible(NULL)
+}
+
+# Resolve the incident and receive angles used by `tmm_scattering_grid()`.
+#' @noRd
+.tmm_scattering_grid_angles <- function(theta_body,
+                                        phi_body,
+                                        theta_scatter,
+                                        phi_scatter,
+                                        defaults,
+                                        n_theta,
+                                        n_phi) {
+  # Resolve the incident direction from the stored defaults ====================
+  theta_body <- .tmm_scalar_angle(theta_body, defaults$theta_body, "theta_body")
+  phi_body <- .tmm_scalar_angle(phi_body, defaults$phi_body %||% pi, "phi_body")
+  # Resolve the receive-angle grids ============================================
+  theta_scatter <- .tmm_angle_vector(
+    theta_scatter,
+    default = c(0, pi),
+    n_default = n_theta,
+    lower = 0,
+    upper = pi,
+    name = "theta_scatter"
+  )
+  phi_scatter <- .tmm_angle_vector(
+    phi_scatter,
+    default = c(0, 2 * pi),
+    n_default = n_phi,
+    lower = 0,
+    upper = 2 * pi,
+    name = "phi_scatter"
+  )
+
+  list(
+    theta_body = theta_body,
+    phi_body = phi_body,
+    theta_scatter = theta_scatter,
+    phi_scatter = phi_scatter
+  )
+}
+
+# Assemble the standard return payload for `tmm_scattering_grid()`.
+#' @noRd
+.tmm_scattering_grid_output <- function(acoustics,
+                                        idx,
+                                        theta_body,
+                                        phi_body,
+                                        theta_scatter,
+                                        phi_scatter,
+                                        f_scat) {
+  # Convert the complex field onto differential scattering summaries ===========
+  sigma_scat <- .sigma_bs(f_scat)
+  sigma_scat_dB <- db(sigma_scat)
+
+  list(
+    frequency = acoustics$frequency[idx],
+    theta_body = theta_body,
+    phi_body = phi_body,
+    theta_scatter = theta_scatter,
+    phi_scatter = phi_scatter,
+    f_scat = f_scat,
+    sigma_scat = sigma_scat,
+    sigma_scat_dB = sigma_scat_dB
+  )
+}
 # Re-evaluate the exact-family finite-cylinder monostatic response for one
 # incident angle without rebuilding a dense spherical retained solve.
 #' @noRd
@@ -811,43 +890,24 @@ tmm_scattering_grid <- function(object,
   acoustics <- parameters$acoustics
   shape_parameters <- acousticTS::extract(object, "shape_parameters")
   idx <- .tmm_plot_frequency_index(frequency, acoustics$frequency)
-
-  if (!is.numeric(n_theta) || length(n_theta) != 1 || !is.finite(n_theta) ||
-      n_theta < 2 || n_theta %% 1 != 0) {
-    stop("'n_theta' must be a single integer >= 2.", call. = FALSE)
-  }
-  if (!is.numeric(n_phi) || length(n_phi) != 1 || !is.finite(n_phi) ||
-      n_phi < 2 || n_phi %% 1 != 0) {
-    stop("'n_phi' must be a single integer >= 2.", call. = FALSE)
-  }
+  .tmm_validate_scattering_grid_dims(n_theta, n_phi)
 
   # Resolve the incident direction and receive-angle grids =====================
-  theta_body <- .tmm_scalar_angle(theta_body, defaults$theta_body, "theta_body")
-  phi_body <- .tmm_scalar_angle(phi_body, defaults$phi_body %||% pi, "phi_body")
-  theta_scatter <- .tmm_angle_vector(
-    theta_scatter,
-    default = c(0, pi),
-    n_default = n_theta,
-    lower = 0,
-    upper = pi,
-    name = "theta_scatter"
+  angles <- .tmm_scattering_grid_angles(
+    theta_body = theta_body,
+    phi_body = phi_body,
+    theta_scatter = theta_scatter,
+    phi_scatter = phi_scatter,
+    defaults = defaults,
+    n_theta = n_theta,
+    n_phi = n_phi
   )
-  phi_scatter <- .tmm_angle_vector(
-    phi_scatter,
-    default = c(0, 2 * pi),
-    n_default = n_phi,
-    lower = 0,
-    upper = 2 * pi,
-    name = "phi_scatter"
-  )
+  theta_body <- angles$theta_body
+  phi_body <- angles$phi_body
+  theta_scatter <- angles$theta_scatter
+  phi_scatter <- angles$phi_scatter
 
   # Evaluate the retained operator over the requested scattering grid ==========
-  f_scat <- matrix(
-    0 + 0i,
-    nrow = length(theta_scatter),
-    ncol = length(phi_scatter),
-    dimnames = list(NULL, NULL)
-  )
   f_scat <- .tmm_scattering_grid_matrix(
     model_params = model_params,
     frequency_idx = idx,
@@ -859,18 +919,14 @@ tmm_scattering_grid <- function(object,
   )
 
   # Return the grid and its derived scattering summaries =======================
-  sigma_scat <- .sigma_bs(f_scat)
-  sigma_scat_dB <- db(sigma_scat)
-
-  list(
-    frequency = acoustics$frequency[idx],
+  .tmm_scattering_grid_output(
+    acoustics = acoustics,
+    idx = idx,
     theta_body = theta_body,
     phi_body = phi_body,
     theta_scatter = theta_scatter,
     phi_scatter = phi_scatter,
-    f_scat = f_scat,
-    sigma_scat = sigma_scat,
-    sigma_scat_dB = sigma_scat_dB
+    f_scat = f_scat
   )
 }
 
