@@ -329,7 +329,7 @@ still be inspected in the wrong domain for the scientific question.
 Because model outputs are stored back onto the object, it is easy to
 forget that any substantive change to geometry, material properties,
 orientation, frequency grid, or model arguments requires a new run. The
-stored result does not update automatically just because an earlier
+stored result does not update automatically just because an upstream
 object or variable in the workflow has changed.
 
 As a practical rule, a model should be re-run whenever:

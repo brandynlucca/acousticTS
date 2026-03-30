@@ -8,28 +8,32 @@ companion open-source modeling ecosystems ([Jech et al.
 2015](#ref-jech_etal_2015); [Stanton 1996](#ref-stanton_acoustic_1996);
 [Lucca and Lee 2026](#ref-brandyn_lucca_osoceanacousticsechopop_2026)).
 
-The package now contains enough model families that the site works
-better when the model pages are treated as a library rather than as a
-flat list in the top navigation. This page is the main entry point for
-that library.
+The package contains enough model families that the site works better
+when the model pages are treated as a library rather than as a flat list
+in the top navigation. This page is the main entry point for that
+library.
 
 ### Model-status policy
 
-Status tags are derived from the package’s internal validation registry
-and used conservatively: - Benchmarked means the family has a documented
-comparison against a canonical benchmark ladder or stored benchmark
-values. - Validated means the family has a documented comparison against
-at least one external implementation or software package. - Experimental
-means the family is available to use, but its interface or validation
-scope should still be treated as provisional. - Unvalidated means the
-package site does not yet document either benchmark evidence or an
-external implementation comparison for that family.
+- Benchmarked means the family has a documented comparison against a
+  canonical benchmark ladder or stored benchmark values.
+- Validated means the currently supported public scope has a documented
+  external software or independent-comparison check.
+- Partially validated means some supported branches are externally
+  checked, but the full public scope is not yet closed.
+- Unvalidated means the package does not yet claim external validation
+  across the current public scope.
+- Experimental means the family is available to use, but its interface
+  or supported workflow should still be treated as provisional.
 
-These statuses are not all mutually exclusive: - `Benchmarked` and
-`Validated` are evidence tags and can appear together. - `Experimental`
-is a lifecycle tag and can coexist with either evidence tag. -
-`Unvalidated` is reserved for families lacking both evidence tags, so it
-should not be combined with other evidence tags.
+These tags are intended to be read in three pieces:
+
+- `Benchmarked` is independent of the validation badge and can appear
+  alongside `Validated`, `Partially validated`, or `Unvalidated`.
+- The validation badge is always exactly one of `Validated`,
+  `Partially validated`, or `Unvalidated`.
+- `Experimental` is a separate lifecycle tag and can coexist with any
+  benchmark or validation badge.
 
 ## Modal-series families
 
@@ -66,14 +70,14 @@ Elastic-shelled spherical family for layered shell targets.
 
 ### [BCMS](https://brandynlucca.github.io/acousticTS/articles/bcms/index.md)
 
-Experimental Unvalidated
+Unvalidated Experimental
 
 Bent-cylinder modal-series family for straight and uniformly bent
 cylinders.
 
 ### [ECMS](https://brandynlucca.github.io/acousticTS/articles/ecms/index.md)
 
-Experimental Unvalidated
+Unvalidated Experimental
 
 Elastic-cylinder modal-series family for fully elastic solid cylinders.
 
@@ -106,7 +110,7 @@ High-pass approximation for compact asymptotic screening.
 
 ### [TRCM](https://brandynlucca.github.io/acousticTS/articles/trcm/index.md)
 
-Benchmarked
+Benchmarked Unvalidated
 
 Two-ray cylindrical family for high-frequency locally cylindrical
 targets.
@@ -121,21 +125,21 @@ Phase-compensated DWBA for bent weakly scattering targets.
 
 ### [BBFM](https://brandynlucca.github.io/acousticTS/articles/bbfm/index.md)
 
-Experimental Unvalidated
+Unvalidated Experimental
 
 Composite flesh-plus-backbone family for swimbladder-less fish-like
 targets.
 
 ### [VESM](https://brandynlucca.github.io/acousticTS/articles/vesm/index.md)
 
-Experimental Unvalidated
+Validated Experimental
 
 Viscous-elastic layered-sphere family for gas-core, shell, and
 viscous-layer targets.
 
 ### [TMM](https://brandynlucca.github.io/acousticTS/articles/tmm/index.md)
 
-Benchmarked Validated Experimental
+Benchmarked Partially validated Experimental
 
 Single-target transition-matrix family for retained monostatic and
 angle-dependent scattering products across supported canonical shapes.

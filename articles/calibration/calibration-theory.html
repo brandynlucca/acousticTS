@@ -83,11 +83,19 @@
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
-<li class="nav-item"><a class="nav-link" href="../../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../../reference/index.html">Function reference</a></li>
+    <li><a class="dropdown-item" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
+    <li><a class="dropdown-item" href="../../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -113,8 +121,15 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p><span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span></p>
-<p><em>Model-family pages:</em> <a href="index.html">Overview</a> <a href="calibration-implementation.html">Implementation</a> <a href="calibration-theory.html">Theory</a></p>
+<div class="model-status-line">
+<span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span>
+</div>
+<div class="model-nav">
+<div class="model-nav-links">
+<a class="model-nav-badge" href="index.html">Overview</a>
+<a class="model-nav-badge" href="calibration-implementation.html">Implementation</a>
+</div>
+</div>
 <p>Echosounders are commonly calibrated with standard targets whose
 acoustic response is strong, repeatable, and sufficiently well
 understood that the backscattering level can be predicted independently
@@ -223,19 +238,19 @@ angular parts.</p>
 <p>where <span class="math inline">a</span> is the sphere radius. The
 boundary conditions then enforce:</p>
 <p><span class="math display">
-  \begin{align*}
+  \begin{aligned}
   \mathbf{u}_2(r) &amp;= \mathbf{u}_1(r) ~ \text{(continuity of normal
 displacement)} , \\
     \sigma_2(rr) &amp;= -p_1 ~ \text{(continuity of normal stress)} , \\
     \sigma_2(r\theta) &amp;= 0 ~ \text{(zero tangential stress)} ,
-  \end{align*}
+  \end{aligned}
 </span></p>
 <p>where <span class="math inline">\sigma</span> denotes the Cauchy
 stress tensor describing internal forces in the solid, <span class="math inline">\sigma_2(rr)</span> is its component along the
 radial direction in spherical coordinates (i.e., the normal stress on a
 spherical surface), and <span class="math inline">\sigma_2(r
 \theta)</span> is the shear stress along the polar direction <span class="math inline">\theta</span> of the sphere.</p>
-<p>This model incorporates copmressional and shear waves within the
+<p>This model incorporates compressional and shear waves within the
 calibration sphere alongside the boundary conditions at the
 sphere-medium interface to compute the far-field acoustic backscatter.
 Since the full elastodynamic scattering problem is separable for an
@@ -302,12 +317,12 @@ material properties.</p>
 <span class="citation">(<a href="#ref-hickling_analysis_1962">Hickling
 1962</a>)</span>:</p>
 <p><span class="math display">
-  \begin{align*}
+  \begin{aligned}
   p_\text{inc}(r, \theta) &amp;= P_0 \frac{e^{-i k_1
-\mathcal{D}}}{\mathcal{D}} \\
-    &amp;= ik_1 P_0 \sum\limits_{m=0}^\infty (2m + 1) (-1)^n j_m(k_1r)
-h_m(k_1 r_0) P_m(\cos \theta), \quad (0 &lt; r &lt; r_0),
-  \end{align*}
+\mathcal{D}}}{\mathcal{D}} \\ &amp;= ik_1 P_0 \sum\limits_{m=0}^\infty
+(2m + 1) (-1)^n j_m(k_1r) h_m(k_1 r_0) P_m(\cos \theta), \quad (0 &lt; r
+&lt; r_0),
+  \end{aligned}
 </span></p>
 <p>where <span class="math inline">k_1 = \omega / c_1</span> is the
 acoustic wavenumber in the surrounding fluid, <span class="math inline">P_0</span> is the incident pressure amplitude, and
@@ -358,19 +373,18 @@ incident wave. In the far-field, <span class="math inline">r \to
 function and <span class="math inline">\frac{e^{-i k_1
 \mathcal{D}}}{\mathcal{D}}</span> term can be used:</p>
 <p><span class="math display">
-  \begin{align*}
+  \begin{aligned}
   \frac{e^{-i k_1 \mathcal{D}}}{\mathcal{D}} &amp;\sim
   e^{ik_1 r_0} \frac{e^{i k_1 r \cos \theta}}{r_0}, \\
     h_m^{(1)}(k_1r_0) &amp;\sim (-i)^{m+1} \frac{e^{i k_1 r_0}}{k_1r_0}.
-  \end{align*}
+  \end{aligned}
 </span></p>
 <p>These limits consequently simplify <span class="math inline">p_\text{inc}</span> to:</p>
 <p><span class="math display">
-  \begin{align*}
-  p_\text{inc}(r, \theta) &amp;= P_0 e^{ik_1 r \cos \theta} \\
-    &amp;= P_0 \sum\limits_{m=0}^\infty (2m + 1) i^m j_m(k_1 r) P_m(\cos
-\theta).
-  \end{align*}
+  \begin{aligned}
+  p_\text{inc}(r, \theta) &amp;= P_0 e^{ik_1 r \cos \theta} \\ &amp;=
+P_0 \sum\limits_{m=0}^\infty (2m + 1) i^m j_m(k_1 r) P_m(\cos \theta).
+  \end{aligned}
 </span></p>
 </div>
 <div class="section level3">
@@ -383,7 +397,7 @@ representation, the elastic boundary conditions determine how far the
 outgoing partial wave is shifted relative to the free spherical
 solution.</p>
 <div class="float">
-<img src="calibration-phase-shift-schematic.svg" alt="Calibration sphere phase-shift schematic"><div class="figcaption">Calibration sphere phase-shift schematic</div>
+<img src="calibration-phase-shift-schematic.png" alt="Calibration sphere phase-shift schematic"><div class="figcaption">Calibration sphere phase-shift schematic</div>
 </div>
 <p>The scattered acoustic field can be expressed as a sum of partial
 waves: <span class="math display">
@@ -409,7 +423,7 @@ phase-shift angle is expressed using: <span class="math display">
 <p>where <span class="math inline">\alpha_m</span>, <span class="math inline">\beta_m</span>, and <span class="math inline">\delta_m</span> are the scattering phase-angles, and
 <span class="math inline">\Phi_m</span> is the boundary impedance
 phase-angle. These angles are defined as: <span class="math display">
-  \begin{align*}
+  \begin{aligned}
   \delta_m(k_1a) &amp;=
     \tan^{-1} \left[ \frac{-j_m(k_1a)}{y_m(k_1a)} \right] ,\\
     \alpha_m(k_1a) &amp;=
@@ -418,9 +432,9 @@ phase-angle. These angles are defined as: <span class="math display">
     \beta_m(k_1a) &amp;=
     \tan^{-1} \left[ \frac{-k_1 a ~y^\prime_m(k_1a)}{y_m(k_1a)} \right]
 , \\
-    \tan \Phi_m &amp;=
-    -\frac{\rho_1}{\rho_2} \tan \zeta_m(k_\ell a, \sigma),
-  \end{align*}
+    \tan \Phi_m &amp;= -\frac{\rho_1}{\rho_2} \tan \zeta_m(k_\ell a,
+\sigma),
+  \end{aligned}
 </span></p>
 <p>where <span class="math inline">\zeta_m(k_\ell a, \sigma)</span> is
 the boundary-impedance phase angle induced by the elastic interior <span class="citation">(<a href="#ref-faran_sound_1951">Faran
@@ -431,16 +445,15 @@ r_0) \sin \eta_m e^{-i \eta_m}. </span></p>
 (i.e., a hard or rigid boundary), then the form function can be
 derived:</p>
 <p><span class="math display">
-  \mathcal{f}_\infty(k_1 a) =
-    -2 \frac{k_1 r}{k_1 a} e^{i k_1 r} \sum\limits_{m=0}^\infty
-(-i)^{m+1} h_m^{(2)}(k_1 r) (-1)^m (2m + 1) \sin \eta_m e^{i \eta_m}.
+  \mathcal{f}_\infty(k_1 a) = -2 \frac{k_1 r}{k_1 a} e^{i k_1 r}
+\sum\limits_{m=0}^\infty (-i)^{m+1} h_m^{(2)}(k_1 r) (-1)^m (2m + 1)
+\sin \eta_m e^{i \eta_m}.
 </span></p>
 <p>This can be further simplified to derive the far-field expression in
 the backscattering direction in the far-field limit <span class="math inline">r \to \infty</span>:</p>
 <p><span class="math display">
-  \mathcal{f}_\text{bs}(k_1 a) =
-    -\frac{2}{k_1a} \sum\limits_{m=0}^\infty (-1)^m (2m + 1) \sin \eta_m
-e^{i \eta_m}.
+  \mathcal{f}_\text{bs}(k_1 a) = -\frac{2}{k_1a}
+\sum\limits_{m=0}^\infty (-1)^m (2m + 1) \sin \eta_m e^{i \eta_m}.
 </span></p>
 <p>The details vary by notation across the literature, but the
 interpretation is the same: the sphere material and elastic wave speeds
@@ -466,7 +479,7 @@ sometimes in terms of a dimensional backscattering length. Those
 descriptions are compatible, but only if the rescaling is made
 explicit.</p>
 <div class="float">
-<img src="calibration-modal-bookkeeping.svg" alt="Calibration sphere modal bookkeeping from partial waves to reported backscatter quantities."><div class="figcaption">Calibration sphere modal bookkeeping from
+<img src="calibration-modal-bookkeeping.png" alt="Calibration sphere modal bookkeeping from partial waves to reported backscatter quantities."><div class="figcaption">Calibration sphere modal bookkeeping from
 partial waves to reported backscatter quantities.</div>
 </div>
 <p>The modal bookkeeping proceeds in a fixed order. The incident plane

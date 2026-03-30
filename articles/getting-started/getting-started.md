@@ -33,6 +33,9 @@ together. Readers should come away knowing what kinds of objects they
 will create, what choices they will need to make, and which later
 vignette to read when a particular decision becomes more detailed.
 
+![Getting started
+workflow](getting-started-workflow.png)[](https://brandynlucca.github.io/acousticTS/articles/building-shapes/building-shapes.md "Build a shape")[](https://brandynlucca.github.io/acousticTS/articles/building-scatterers/building-scatterers.md "Wrap as scatterer")[](https://brandynlucca.github.io/acousticTS/articles/running-models/running-models.md "Run model(s)")
+
 You can interact with certain figures by clicking diagram elements.
 
 ## Quick example
@@ -111,9 +114,9 @@ and
 answer the physical one. The supported public geometry pathways are
 therefore either a pre-built `Shape` object or explicit coordinate
 vectors supplied directly to the constructor. Older shorthand pathways
-based on character shape labels are now compatibility-only and
-deprecated, so the shape-first workflow is the clearest one to learn and
-the least ambiguous one to debug.
+based on character shape labels are compatibility-only and deprecated,
+so the shape-first workflow is the clearest one to learn and the least
+ambiguous one to debug.
 
 ## Core concepts and objects
 

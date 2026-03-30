@@ -4,10 +4,8 @@
 
 Benchmarked Validated
 
-*Model-family pages:*
-[Overview](https://brandynlucca.github.io/acousticTS/articles/dwba/index.md)
-[Implementation](https://brandynlucca.github.io/acousticTS/articles/dwba/dwba-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/dwba/dwba-theory.md)
+[Implementation](https://brandynlucca.github.io/acousticTS/articles/dwba/dwba-implementation.md)
 
 These pages follow the weak-scattering elongated-body formulation and
 later applied fisheries-acoustics usage of the distorted-wave Born

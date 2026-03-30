@@ -34,19 +34,20 @@ not match the target. Conversely, a simpler model can be the better
 first choice if it captures the dominant physics of the question being
 asked.
 
-The revised chart removes a few false dichotomies that were starting to
-creep into the earlier version. Composite internal structure, canonical
-geometry, and asymptotic screening are now treated as separate decisions
-rather than as a single forced branch. That makes room for families such
-as `BBFM`, `BCMS`, `ECMS`, `PCDWBA`, `VESM`, and the newer
-shape-specific `TMM` branches, and it also makes clearer that `HPA`,
-`SDWBA`, and `TRCM` are often neighboring screening or regime-specific
-alternatives rather than absolute replacements for the more
-geometry-matched families. Experimental families are shown in a separate
-color so they remain visible without being confused with the
-longer-established model paths, while gray boxes identify
-future-development families that have been discussed but are not yet
-public package models.
+![Revised general model-selection
+flowchart](model-selection-flowchart.png)[](https://brandynlucca.github.io/acousticTS/articles/krm/index.md "KRM overview")[](https://brandynlucca.github.io/acousticTS/articles/bbfm/index.md "BBFM overview")[](https://brandynlucca.github.io/acousticTS/articles/hpa/index.md "HPA overview")[](https://brandynlucca.github.io/acousticTS/articles/sphms/index.md "SPHMS overview")[](https://brandynlucca.github.io/acousticTS/articles/calibration/index.md "Calibration overview")[](https://brandynlucca.github.io/acousticTS/articles/fcms/index.md "FCMS overview")[](https://brandynlucca.github.io/acousticTS/articles/essms/index.md "ESSMS overview")[](https://brandynlucca.github.io/acousticTS/articles/trcm/index.md "TRCM overview")[](https://brandynlucca.github.io/acousticTS/articles/bcms/index.md "BCMS overview")[](https://brandynlucca.github.io/acousticTS/articles/ecms/index.md "ECMS overview")[](https://brandynlucca.github.io/acousticTS/articles/vesm/index.md "VESM overview")[](https://brandynlucca.github.io/acousticTS/articles/sdwba/index.md "SDWBA overview")[](https://brandynlucca.github.io/acousticTS/articles/dwba/index.md "DWBA overview")[](https://brandynlucca.github.io/acousticTS/articles/psms/index.md "PSMS overview")[](https://brandynlucca.github.io/acousticTS/articles/pcdwba/index.md "PCDWBA overview")[](https://brandynlucca.github.io/acousticTS/articles/tmm/index.md "TMM overview")[](https://brandynlucca.github.io/acousticTS/articles/tmm/index.md "TMM overview")[](https://brandynlucca.github.io/acousticTS/articles/tmm/index.md "TMM overview")[](https://brandynlucca.github.io/acousticTS/articles/tmm/index.md "TMM overview")
+
+The chart separates composite internal structure, canonical geometry,
+and asymptotic screening into distinct decisions rather than folding
+them into a single forced branch. That leaves room for families such as
+`BBFM`, `BCMS`, `ECMS`, `PCDWBA`, `VESM`, and the shape-specific `TMM`
+branches, and it also makes clearer that `HPA`, `SDWBA`, and `TRCM` are
+often neighboring screening or regime-specific alternatives rather than
+absolute replacements for the more geometry-matched families.
+Experimental families are shown in a separate color so they remain
+visible without being confused with the longer-established model paths,
+while gray boxes identify future-development families that have been
+discussed but are not public package models.
 
 Boundary condition is often as decisive as geometry in this decision
 process. A spherical pressure-release cavity, a fluid-filled sphere, and
@@ -134,20 +135,19 @@ canonical geometry.
 ### Oblate spheroid
 
 If the target is flattened rather than elongated and is better
-represented as an oblate spheroid, the current package path is
+represented as an oblate spheroid, the package path is
 [TMM](https://brandynlucca.github.io/acousticTS/articles/tmm/tmm-theory.md).
 That branch is still experimental, but it is the active shape-matched
 route for single-target oblate scattering in the package. The chart also
 shows `OSMS` in gray because a true oblate modal-series companion model
-remains a future-development target rather than a current public model.
+remains a future-development target rather than a public package model.
 
 This oblate branch matters because it separates two different ideas that
 are easy to conflate. The first is “can the target be represented as an
 oblate spheroid?” The second is “does the package already have a
-dedicated oblate modal-series family?” Right now the answer is yes to
-the first question and no to the second, which is why the flowchart
-routes the current public choice through `TMM` and reserves `OSMS` for
-future development.
+dedicated oblate modal-series family?” The answer is yes to the first
+question and no to the second, which is why the flowchart routes the
+public choice through `TMM` and reserves `OSMS` for future development.
 
 ### Finite cylinder
 
@@ -159,8 +159,8 @@ cross-section is circular, the cylinder is reasonably straight, and the
 separated finite-cylinder reduction is defensible.
 [TMM](https://brandynlucca.github.io/acousticTS/articles/tmm/tmm-theory.md)
 is shown for cylinders as a guarded experimental branch rather than as a
-co-equal default, because its current supported scope is narrower than
-the sphere, oblate, and prolate `TMM` branches.
+co-equal default, because its documented supported scope is narrower
+than the sphere, oblate, and prolate `TMM` branches.
 [HPA](https://brandynlucca.github.io/acousticTS/articles/hpa/hpa-theory.md)
 is useful when only a compact approximate response is needed, while
 [TRCM](https://brandynlucca.github.io/acousticTS/articles/trcm/trcm-theory.md)

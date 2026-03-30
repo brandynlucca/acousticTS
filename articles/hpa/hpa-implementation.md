@@ -4,9 +4,7 @@
 
 Benchmarked Validated
 
-*Model-family pages:*
 [Overview](https://brandynlucca.github.io/acousticTS/articles/hpa/index.md)
-[Implementation](https://brandynlucca.github.io/acousticTS/articles/hpa/hpa-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/hpa/hpa-theory.md)
 
 These pages follow Johnson’s asymptotic fluid-sphere formulation and
@@ -245,12 +243,12 @@ definitions and shows how the current HPA implementations compare with
 those benchmark series. Elapsed times are representative values from the
 current machine.
 
-| Case                            | Max abs. delta TS (dB) | Mean abs. delta TS (dB) | Elapsed (s) |
-|:--------------------------------|-----------------------:|------------------------:|------------:|
-| Johnson (1977) sphere           |               42.20232 |                 6.34274 |        0.00 |
-| Stanton (1989) sphere           |               35.46445 |                 5.48942 |        0.01 |
-| Stanton (1989) prolate spheroid |               46.13636 |                 5.57418 |        0.01 |
-| Stanton (1989) cylinder         |               46.97943 |                 5.65639 |        0.00 |
+| Case                            | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | Elapsed (s) |
+|:--------------------------------|------------------------:|-------------------------:|------------:|
+| Johnson (1977) sphere           |                42.20232 |                  6.34274 |        0.00 |
+| Stanton (1989) sphere           |                35.46445 |                  5.48942 |        0.01 |
+| Stanton (1989) prolate spheroid |                46.13636 |                  5.57418 |        0.01 |
+| Stanton (1989) cylinder         |                46.97943 |                  5.65639 |        0.00 |
 
 Those numbers make the role of HPA very clear. It is extremely fast, but
 it is not a mode-by-mode benchmark reproducer. Its value is in
@@ -263,8 +261,8 @@ empirical fitting controls rather than canonical benchmark switches.
 Johnson (1977), Stanton (1989), and Jech et al. (2015) do not prescribe
 a single authoritative benchmark parameterization for those functions,
 so this implementation page keeps them at their neutral value of `1`
-when reporting benchmark deltas. That leaves `method` and target
-geometry as the defensible comparison dimensions for validation.
+when reporting \Delta TS benchmark summaries. That leaves `method` and
+target geometry as the defensible comparison dimensions for validation.
 
 If those arguments are explored at all, the cleanest workflow is to
 treat that as a separate sensitivity or calibration exercise after the
@@ -284,15 +282,15 @@ Johnson (1977) and Stanton (1989) algebra itself. The current local
 a spectrum, so those cells are reported as `N/A` in the
 software-comparison columns below.
 
-| Case                            | Mean abs. delta acousticTS vs `echoSMs` (dB) | Max abs. delta acousticTS vs `echoSMs` (dB) | Mean abs. delta vs published algebra (dB) | Max abs. delta vs published algebra (dB) |
-|:--------------------------------|---------------------------------------------:|--------------------------------------------:|------------------------------------------:|-----------------------------------------:|
-| Johnson (1977) sphere           |                                        `N/A` |                                       `N/A` |                                  2.33e-13 |                                 2.98e-13 |
-| Stanton (1989) sphere           |                                     3.43e-14 |                                    4.69e-13 |                                  3.43e-14 |                                 4.69e-13 |
-| Stanton (1989) prolate spheroid |                                        `N/A` |                                       `N/A` |                                  2.46e-14 |                                 1.28e-13 |
-| Stanton (1989) cylinder         |                                        `N/A` |                                       `N/A` |                                  2.39e-14 |                                 8.53e-14 |
+| Case                            | Mean abs. \Delta acousticTS vs `echoSMs` (dB) | Max abs. \Delta acousticTS vs `echoSMs` (dB) | Mean abs. \Delta vs published algebra (dB) | Max abs. \Delta vs published algebra (dB) |
+|:--------------------------------|----------------------------------------------:|---------------------------------------------:|-------------------------------------------:|------------------------------------------:|
+| Johnson (1977) sphere           |                                         `N/A` |                                        `N/A` |                                   2.33e-13 |                                  2.98e-13 |
+| Stanton (1989) sphere           |                                      3.43e-14 |                                     4.69e-13 |                                   3.43e-14 |                                  4.69e-13 |
+| Stanton (1989) prolate spheroid |                                         `N/A` |                                        `N/A` |                                   2.46e-14 |                                  1.28e-13 |
+| Stanton (1989) cylinder         |                                         `N/A` |                                        `N/A` |                                   2.39e-14 |                                  8.53e-14 |
 
-So the HPA picture is now explicit. The spherical Stanton branch agrees
-with the available external software implementation to practical machine
+The HPA picture is explicit. The spherical Stanton branch agrees with
+the available external software implementation to practical machine
 precision, and every canonical branch matches the published Johnson
 (1977) or Stanton (1989) algebra to the same order. That does not make
 HPA an exact replacement for the benchmarked modal-series models above,

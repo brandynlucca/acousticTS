@@ -83,11 +83,19 @@
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
-<li class="nav-item"><a class="nav-link" href="../../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../../reference/index.html">Function reference</a></li>
+    <li><a class="dropdown-item" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
+    <li><a class="dropdown-item" href="../../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -113,8 +121,15 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p><span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span></p>
-<p><em>Model-family pages:</em> <a href="index.html">Overview</a> <a href="psms-implementation.html">Implementation</a> <a href="psms-theory.html">Theory</a></p>
+<div class="model-status-line">
+<span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span>
+</div>
+<div class="model-nav">
+<div class="model-nav-links">
+<a class="model-nav-badge" href="index.html">Overview</a>
+<a class="model-nav-badge" href="psms-implementation.html">Implementation</a>
+</div>
+</div>
 <p>The prolate spheroidal modal series solution (PSMS) is the natural
 exact-separation analogue of spherical partial-wave theory for elongated
 bodies whose surface is better approximated by a prolate spheroid than
@@ -225,12 +240,9 @@ curvilinear coordinates.</p>
 <p>Thus <span class="math inline">\xi_1</span> is the natural shape
 parameter of the spheroid, while <span class="math inline">q</span> sets
 the absolute scale.</p>
+<!-- ![PSMS coordinate geometry in the meridional plane, showing focal points, the boundary surface $\xi = \xi_1$, and representative $\xi$- and $\eta$-coordinate curves.](psms-coordinate-geometry-clean.png) -->
 <div class="float">
-<img src="psms-coordinate-geometry-clean.svg" alt="PSMS coordinate geometry in the meridional plane, showing focal points, the boundary surface \xi = \xi_1, and representative \xi- and \eta-coordinate curves."><div class="figcaption">PSMS coordinate geometry in the meridional
-plane, showing focal points, the boundary surface <span class="math inline">\xi = \xi_1</span>, and representative <span class="math inline">\xi</span>- and <span class="math inline">\eta</span>-coordinate curves.</div>
-</div>
-<div class="float">
-<img src="psms-mode-coupling-schematic.svg" alt="Why rigid and pressure-release PSMS remain mode-local while the fluid-filled case introduces overlap-driven coupling between degrees."><div class="figcaption">Why rigid and pressure-release PSMS remain
+<img src="psms-mode-coupling-schematic.png" alt="Why rigid and pressure-release PSMS remain mode-local while the fluid-filled case introduces overlap-driven coupling between degrees."><div class="figcaption">Why rigid and pressure-release PSMS remain
 mode-local while the fluid-filled case introduces overlap-driven
 coupling between degrees.</div>
 </div>
@@ -244,7 +256,7 @@ interior and exterior reduced frequencies differ, so the angular bases
 no longer match exactly and the overlap integrals become the mechanism
 that couples degrees together.</p>
 <!-- ![Projection of exterior angular modes onto the interior spheroidal basis in
-the fluid-filled PSMS system.](psms-overlap-projection-schematic.svg) -->
+the fluid-filled PSMS system.](psms-overlap-projection-schematic.png) -->
 <p>The projection step is the part of the interior-fluid derivation that
 makes the PSMS algebra noticeably harder. The exterior angular basis is
 complete for the exterior reduced frequency <span class="math inline">\mathbb{k}_1</span>, and the interior basis is
@@ -309,8 +321,8 @@ coordinates gives:</p>
   \frac{\partial}{\partial\xi}\left[(\xi^2-1)\frac{\partial
 p}{\partial\xi}\right] +
 \frac{\partial}{\partial\eta}\left[(1-\eta^2)\frac{\partial
-p}{\partial\eta}\right] +
-\frac{\xi^2-\eta^2}{(\xi^2-1)(1-\eta^2)}\frac{\partial^2
+p}{\partial\eta}\right] + \\
+  \frac{\xi^2-\eta^2}{(\xi^2-1)(1-\eta^2)}\frac{\partial^2
 p}{\partial\phi^2} + \mathbb{k}^2(\xi^2-\eta^2)p = 0
 </span></p>
 <p>Substituting <span class="math inline">p = RS\Phi</span> and dividing
@@ -318,8 +330,8 @@ by <span class="math inline">RS\Phi</span> gives:</p>
 <p><span class="math display">
   \frac{1}{R}\frac{d}{d\xi}\left[(\xi^2-1)\frac{dR}{d\xi}\right] +
 \mathbb{k}^2\xi^2 +
-\frac{1}{S}\frac{d}{d\eta}\left[(1-\eta^2)\frac{dS}{d\eta}\right] -
-\mathbb{k}^2\eta^2 +
+\frac{1}{S}\frac{d}{d\eta}\left[(1-\eta^2)\frac{dS}{d\eta}\right] - \\
+  \mathbb{k}^2\eta^2 +
 \frac{1}{\Phi}\frac{\xi^2-\eta^2}{(\xi^2-1)(1-\eta^2)}\frac{d^2\Phi}{d\phi^2}
 = 0
 </span></p>
@@ -374,7 +386,7 @@ spheroid interior. The exterior incident field then has the form:</p>
   p_{1,\text{inc}} = 2\sum_{m=0}^{\infty}\sum_{n=m}^{\infty}
   \frac{\epsilon_m i^n}{N_{mn}(\mathbb{k}_1)}
   S_{mn}^{(1)}(\mathbb{k}_1,\cos\theta')
-  S_{mn}^{(1)}(\mathbb{k}_1,\eta)
+  S_{mn}^{(1)}(\mathbb{k}_1,\eta) \\
   R_{mn}^{(1)}(\mathbb{k}_1,\xi)
   \cos m(\phi-\phi')
 </span></p>
@@ -385,7 +397,7 @@ basis used for the unknown scattered field.</p>
 <p>The scattered and interior fields are expanded in the same angular
 structure but with different radial functions:</p>
 <p><span class="math display">
-  \begin{align*}
+  \begin{aligned}
   p_{1,\text{scat}} &amp;=
     2\sum_{m=0}^{\infty}\sum_{n=m}^{\infty} \frac{\epsilon_m
 i^n}{N_{mn}(\mathbb{k}_1)}
@@ -395,9 +407,10 @@ i^n}{N_{mn}(\mathbb{k}_1)}
     p_{2, \text{interior}} &amp;=
     2\sum_{m=0}^{\infty}\sum_{\ell=m}^{\infty} \frac{\epsilon_m
 i^\ell}{N_{m\ell}(\mathbb{k}_2)}
-  B_{m\ell}S_{m\ell}^{(1)}(\mathbb{k}_2,\eta)R_{m\ell}^{(1)}(\mathbb{k}_2,\xi)
+  B_{m\ell}S_{m\ell}^{(1)}(\mathbb{k}_2,\eta)
+R_{m\ell}^{(1)}(\mathbb{k}_2,\xi)
   \cos m(\phi-\phi').
-  \end{align*}
+  \end{aligned}
 </span></p>
 <p>These are the full modal expansions from which the pressure-release,
 rigid, fluid-filled, and gas-filled boundary systems follow. The
@@ -412,7 +425,7 @@ interior-fluid case.</p>
 </h3>
 <p>The scattered far-field amplitude is expanded as:</p>
 <p><span class="math display">
-  f_\infty(\theta,\phi\mid\theta',\phi') =
+  f_\infty(\theta,\phi\mid\theta',\phi') = \\
     \frac{-2i}{k_2}
   \sum_{m=0}^{\infty}\sum_{n=m}^{\infty}
   \frac{\epsilon_m}{N_{mn}(\mathbb{k}_1)}
@@ -504,26 +517,26 @@ the normal-velocity continuity condition.</p>
 and interior pressure <span class="math inline">p_1</span>, pressure
 continuity at <span class="math inline">\xi = \xi_1</span> gives:</p>
 <p><span class="math display">
-  \begin{align*}
+  \begin{aligned}
   &amp;\sum_{n=m}^{\infty}
 A_{mn}S_{mn}^{(1)}(\mathbb{k}_1,\eta)R_{mn}^{(3)}(\mathbb{k}_1,\xi_1) +
     \sum_{n=m}^{\infty}
 S_{mn}^{(1)}(\mathbb{k}_1,\eta)R_{mn}^{(1)}(\mathbb{k}_1,\xi_1) \\
-    &amp;= \sum_{\ell=m}^{\infty}
+&amp;= \sum_{\ell=m}^{\infty}
 B_{m\ell}S_{m\ell}^{(1)}(\mathbb{k}_1,\eta)R_{m\ell}^{(1)}(\mathbb{k}_1,\xi_1).
-  \end{align*}
+  \end{aligned}
 </span></p>
 <p>Normal-velocity continuity gives the corresponding derivative
 condition:</p>
 <p><span class="math display">
-  \begin{align*}
+  \begin{aligned}
   &amp;\frac{1}{\rho_1}\sum_{n=m}^{\infty}
 A_{mn}S_{mn}^{(1)}(\mathbb{k}_1,\eta)R_{mn}^{(3)\prime}(\mathbb{k}_1,\xi_1)
 + \frac{1}{\rho_1}\sum_{n=m}^{\infty}
 S_{mn}^{(1)}(\mathbb{k}_1,\eta)R_{mn}^{(1)\prime}(\mathbb{k}_1,\xi_1) \\
-    &amp;= \frac{1}{\rho_2}\sum_{\ell=m}^{\infty}
+&amp;= \frac{1}{\rho_2}\sum_{\ell=m}^{\infty}
 B_{m\ell}S_{m\ell}^{(1)}(\mathbb{k}_2,\eta)R_{m\ell}^{(1)\prime}(\mathbb{k}_2,\xi_1).
-  \end{align*}
+  \end{aligned}
 </span></p>
 <p>To solve these equations, one projects onto the interior angular
 basis using orthogonality. This introduces overlap integrals of the

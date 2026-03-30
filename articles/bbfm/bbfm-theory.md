@@ -2,12 +2,10 @@
 
 ## Introduction
 
-Experimental Unvalidated
+Unvalidated Experimental
 
-*Model-family pages:*
 [Overview](https://brandynlucca.github.io/acousticTS/articles/bbfm/index.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/bbfm/bbfm-implementation.md)
-[Theory](https://brandynlucca.github.io/acousticTS/articles/bbfm/bbfm-theory.md)
 
 This family is best read alongside the swimbladder-less fish and
 composite-scatterer literature that motivates explicit flesh-body and
@@ -57,9 +55,9 @@ explicit:
 where c\_{L,3} and c\_{T,3} are the longitudinal and transverse wave
 speeds of the elastic backbone.
 
-The important approximation enters immediately here: the current
-backbone term is not the exact solution for an elastic region `3`
-embedded inside flesh region `2`. Instead, it is a seawater-referenced
+The important approximation enters immediately here: the backbone term
+used here is not the exact solution for an elastic region `3` embedded
+inside flesh region `2`. Instead, it is a seawater-referenced
 elastic-cylinder surrogate that is then positioned inside the same body
 frame as the flesh solve.
 
@@ -132,7 +130,7 @@ wave-conversion physics.
 ## Spatial placement in the body frame
 
 The flesh and backbone amplitudes cannot be added meaningfully unless
-they are referred to the same spatial frame. The current family uses the
+they are referred to the same spatial frame. The family uses the
 body-fixed coordinate system for that purpose.
 
 If the representative backbone position is \mathbf{r}\_c, then the
@@ -144,8 +142,8 @@ two-way phase factor:
 
 where \hat{\mathbf{q}}\_{\mathrm{bs}} is the backscatter direction.
 
-In the axisymmetric body-frame convention used by the current
-implementation, that projection becomes:
+In the axisymmetric body-frame convention used here, that projection
+becomes:
 
 \hat{\mathbf{q}}\_{\mathrm{bs}}\cdot\mathbf{r}\_c = x_c\cos\theta +
 z_c\sin\theta.

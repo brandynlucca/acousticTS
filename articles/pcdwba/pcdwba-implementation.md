@@ -4,9 +4,7 @@
 
 Validated Experimental
 
-*Model-family pages:*
 [Overview](https://brandynlucca.github.io/acousticTS/articles/pcdwba/index.md)
-[Implementation](https://brandynlucca.github.io/acousticTS/articles/pcdwba/pcdwba-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/pcdwba/pcdwba-theory.md)
 
 These pages follow the phase-compensated weak-scattering literature for
@@ -86,11 +84,11 @@ head(extract(pcdwba_object, "model")$PCDWBA)
 
 #### Comparison summary
 
-| Comparison                    | Max abs. delta TS (dB) | Mean abs. delta TS (dB) |
-|:------------------------------|-----------------------:|------------------------:|
-| acousticTS vs echopop         |               0.073947 |                0.001123 |
-| acousticTS vs ZooScatR-source |               0.000000 |                0.000000 |
-| echopop vs ZooScatR-source    |               0.073947 |                0.001123 |
+| Comparison                    | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) |
+|:------------------------------|------------------------:|-------------------------:|
+| acousticTS vs echopop         |                0.073947 |                 0.001123 |
+| acousticTS vs ZooScatR-source |                0.000000 |                 0.000000 |
+| echopop vs ZooScatR-source    |                0.073947 |                 0.001123 |
 
 The `ZooScatR` source-level reconstruction and acousticTS are
 indistinguishable on this grid. The `echopop` comparison remains close

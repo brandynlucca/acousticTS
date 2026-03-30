@@ -83,11 +83,19 @@
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
-<li class="nav-item"><a class="nav-link" href="../../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../../reference/index.html">Function reference</a></li>
+    <li><a class="dropdown-item" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
+    <li><a class="dropdown-item" href="../../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -122,8 +130,9 @@ useful but not quite in the form required for the next model or
 comparison step. The package includes tools for reshaping, bending, or
 otherwise transforming existing objects rather than rebuilding them from
 scratch.</p>
-<object type="image/svg+xml" data="shape-manipulation-schematic.svg" style="width:100%;" aria-label="Shape manipulation">
-</object>
+<div class="clickable-figure">
+<img class="clickable-figure__image" src="shape-manipulation-schematic.png" alt="Shape manipulation"><a class="clickable-figure__link" href="../../reference/brake.html" aria-label="brake()" title="brake()" style="left:22.29%;top:29.03%;width:15.00%;height:21.34%;"></a><a class="clickable-figure__link" href="../../reference/reforge.html" aria-label="reforge()" title="reforge()" style="left:22.29%;top:63.23%;width:15.00%;height:21.34%;"></a>
+</div>
 <p>These tools are not cosmetic. They are part of the modeling layer
 because curvature, segmentation, and relative body-swimbladder scaling
 can all change the resulting backscatter in physically meaningful
@@ -133,7 +142,7 @@ only about producing a different outline. It is about deciding how a
 target should be represented for a specific scientific or modeling
 question. A bent body, an inflated swimbladder, or a resampled
 segmentation may all be legitimate transformations, but each of them
-changes what the object now means physically.</p>
+changes what the object means physically.</p>
 </div>
 <div class="section level2">
 <h2 id="main-ideas">Main ideas<a class="anchor" aria-label="anchor" href="#main-ideas"></a>
@@ -220,9 +229,9 @@ as a cosmetic deformation of a drawing.</p>
 <h2 id="re-parameterizing-with-reforge">Re-parameterizing with <code>reforge()</code><a class="anchor" aria-label="anchor" href="#re-parameterizing-with-reforge"></a>
 </h2>
 <p><code><a href="../../reference/reforge.html">reforge()</a></code> is a generic interface for reshaping or
-resizing an existing object. The most developed method in the current
-package is the <code>SBF</code> method, which handles body and
-swimbladder geometry jointly.</p>
+resizing an existing object. The most developed method in the package is
+the <code>SBF</code> method, which handles body and swimbladder geometry
+jointly.</p>
 <p>Its most important arguments are:</p>
 <ol style="list-style-type: decimal">
 <li>

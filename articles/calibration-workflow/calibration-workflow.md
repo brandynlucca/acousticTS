@@ -22,7 +22,7 @@ frequency grid are all tied closely to the real measurement context.
 That changes how material properties are sourced, how model outputs are
 judged, and how discrepancies should be interpreted.
 
-![Calibration workflow map](calibration-workflow-map.svg)
+![Calibration workflow map](calibration-workflow-map.png)
 
 Calibration workflow map
 

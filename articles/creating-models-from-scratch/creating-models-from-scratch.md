@@ -8,11 +8,12 @@ literature ([Morse and Ingard 1986](#ref-morse_theoretical_1986);
 [Waterman 2009](#ref-waterman_t_2009)).
 
 One of the most useful features of acousticTS is that a new
-target-strength model does not need a large registration framework. The
-package’s
+target-strength model does not need package-file edits just to be tried.
+The package has a runtime model registry, so a user-defined model can be
+registered for the current session and then used through the same
 [`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md)
-wrapper already handles the dispatch pattern. To add a new model, the
-minimum requirement is that two functions exist and follow the expected
+wrapper as the built-in models. To add a new model, the minimum
+requirement is still that two functions exist and follow the expected
 naming convention:
 
 1.  A lower-case initialization function named `*_initialize()`
@@ -36,10 +37,10 @@ TSL <- function(object) {
 This vignette walks through that pattern and builds a simple example
 model from scratch. The example is intentionally simple. It is not meant
 to be a physically complete scattering model. Its purpose is to show how
-model dispatch, parameter storage, and result storage work inside the
-package.
+model dispatch, registration, parameter storage, and result storage work
+inside the package.
 
-![Dispatch path for a new model.](creating-model-dispatch.svg)
+![Dispatch path for a new model.](creating-model-dispatch.png)
 
 Dispatch path for a new model.
 
@@ -47,39 +48,43 @@ Dispatch path for a new model.
 
 The important part of
 [`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md)
-is that it does two passes. First, it initializes the object for the
-requested model. Second, it runs the model itself. Conceptually, the
-workflow is:
+is that it does two passes. First, it resolves the requested model in
+the registry. Second, it initializes the object and runs the solver for
+that registered model. Conceptually, the workflow is:
 
 1.  The user calls
     `target_strength(object, frequency, model = "tsl", ...)`
-2.  [`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md)
-    looks for a function called `tsl_initialize`
-3.  That initializer stores the model parameters and creates an empty
+2.  acousticTS resolves `"tsl"` through the model registry
+3.  The registry entry points to an initializer such as
+    `tsl_initialize()`
+4.  That initializer stores the model parameters and creates an empty
     results slot under `$TSL`
-4.  [`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md)
-    then looks for a function called `TSL`
-5.  `TSL()` computes the model output and fills in the stored results
+5.  The registry entry then points to a solver such as `TSL()`
+6.  `TSL()` computes the model output and fills in the stored results
     table
 
 This is exactly the same pattern used by the existing model files. The
 details differ from model to model, but the basic workflow is the same
 in `R/acoustics.R` and in model files such as `R/model-dwba.R`.
 
-For a simple model name like `"tsl"`,
-[`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md)
-converts the requested model into the upper-case model label `TSL`,
-then:
+For a simple model name like `"tsl"`, a minimal user-defined
+registration looks like this:
 
 ``` r
-model_name <- paste0(model[idx], "_initialize")
-object_copy <- do.call(model_name, true_args)
-target_object <- do.call(ts_model[idx], list(object = target_object))
+register_model(
+  name = "tsl",
+  initialize = tsl_initialize,
+  solver = TSL,
+  slot = "TSL"
+)
 ```
 
 The practical consequence is straightforward. If you create
-`tsl_initialize()` and `TSL()`, and if they store their parameters and
-results under `$TSL`, the wrapper can find and run them.
+`tsl_initialize()` and `TSL()`, register them, and store their
+parameters and results under `$TSL`, the wrapper can find and run them.
+The built-in package models are shipped in the same registry; user
+models are simply added at run time rather than hard-coded into the
+package source.
 
 ## What the initializer is responsible for
 
@@ -196,10 +201,23 @@ TSL <- function(object) {
 }
 ```
 
-This is enough for
-[`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md)
-to run the new model. The function name is literally `TSL`, which is
-what the wrapper will call after initialization.
+This is enough for the solver itself. To make the model callable through
+[`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md),
+register it:
+
+``` r
+register_model(
+  name = "tsl",
+  initialize = tsl_initialize,
+  solver = TSL,
+  slot = "TSL",
+  aliases = "toy_tsl"
+)
+```
+
+At that point `target_strength(..., model = "tsl")` and
+`target_strength(..., model = "toy_tsl")` both resolve to the same
+registered model.
 
 The example above repeats the same `TS` value across all requested
 frequencies because this toy model does not use frequency. That is
@@ -207,10 +225,18 @@ acceptable for a pedagogical example. A frequency-dependent model would
 instead calculate a vector whose length matches the input `frequency`
 vector.
 
-## Putting the pieces into a source file
+## Session registration versus package registration
 
-In practice, the cleanest place to put a new model is a new file such as
-`R/model-tsl.R`. A minimal version would look like this:
+There are two clean ways to use a new model.
+
+1.  Session registration: define the functions in the current session or
+    in another package, then call
+    [`register_model()`](https://brandynlucca.github.io/acousticTS/reference/register_model.md).
+2.  Package registration: if you are extending acousticTS itself, add
+    the model file to the package source and add a built-in registry
+    entry in `R/models.R`.
+
+For a package-style source file, a minimal version would look like this:
 
 ``` r
 #' Target strength-length model (TSL)
@@ -247,12 +273,16 @@ TSL <- function(object) {
 
 That is the same broad organization used by the existing `model-*.R`
 files: roxygen block first, initializer next, solver function after
-that.
+that. If the model lives in another package, the usual pattern is to
+call
+[`register_model()`](https://brandynlucca.github.io/acousticTS/reference/register_model.md)
+from that package’s `.onLoad()` hook so the model becomes available
+automatically when the extension package is attached.
 
 ## Calling the new model
 
-Once the functions are available in the package source, the new model
-can be called through the standard wrapper:
+Once the functions are defined and registered, the new model can be
+called through the standard wrapper:
 
 ``` r
 target <- target_strength(
@@ -271,23 +301,42 @@ The results live in the model slot and can be inspected with:
 extract(target, "model")$TSL
 ```
 
+The currently available built-in and user-registered models can be
+listed with:
+
+``` r
+available_models()
+```
+
+If the model should survive across sessions without editing the
+acousticTS install tree,
+[`register_model()`](https://brandynlucca.github.io/acousticTS/reference/register_model.md)
+also supports `persist = TRUE`. Persistent registrations are written to
+the user’s `R_user_dir()` config path, not into the package library
+itself, so package updates do not require users to modify installed
+package files.
+
 ## Practical rules to keep in mind
 
 When creating a new model, the following rules are the ones most likely
 to prevent headaches later.
 
-1.  The initializer name must be lower-case model name plus
+1.  The initializer name should usually be lower-case model name plus
     `_initialize()`.
-2.  The model function name must match the model label that
-    [`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md)
-    will call.
+2.  The solver function name should usually match the upper-case slot
+    label, such as `TSL()`.
 3.  Both functions must store and retrieve values under the same slot
     name, such as `$TSL`.
-4.  The initializer should prepare parameters and an empty result table,
+4.  The model must be registered before
+    [`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md)
+    or
+    [`simulate_ts()`](https://brandynlucca.github.io/acousticTS/reference/simulate_ts.md)
+    can resolve it.
+5.  The initializer should prepare parameters and an empty result table,
     not perform the actual model calculation.
-5.  The model function should return the updated object after filling in
+6.  The model function should return the updated object after filling in
     the result table.
-6.  Any extra arguments the user supplies either through
+7.  Any extra arguments the user supplies either through
     `target_strength(..., model = "tsl", ...)` or through
     `target_strength(..., model_args = list(tsl = list(...)))` need to
     appear as formal arguments in `tsl_initialize()`.
@@ -306,10 +355,12 @@ Once the minimal pattern is working, the next steps are usually:
     diagnostics.
 
 The key point is that the package architecture is already set up for
-this pattern. If you provide a correctly named initializer and a
-correctly named model function,
+this pattern. If you provide a correctly structured initializer and
+solver, and register the model in the registry,
 [`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md)
-can do the rest.
+and
+[`simulate_ts()`](https://brandynlucca.github.io/acousticTS/reference/simulate_ts.md)
+can use it just like a built-in family.
 
 ## References
 

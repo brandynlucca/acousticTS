@@ -306,7 +306,7 @@ p}{\partial n} = -i \omega u_n, \qquad \sigma\_{nt} = 0,
 
 where \rho_f is the fluid density. The exact sign of the
 pressure-traction relation depends on the outward-normal convention, but
-the physical content is unchanged. The shell now carries both normal and
+the physical content is unchanged. The shell carries both normal and
 tangential motion, and that coupling makes the scattering problem much
 richer than either the rigid or the inelastic-shell cases. The resulting
 modal systems support resonance structure associated with shell

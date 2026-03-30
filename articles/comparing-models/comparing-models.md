@@ -23,7 +23,7 @@ behavior alone. At that point the comparison has become a mixture of
 model differences and setup differences, which is a much harder thing to
 interpret honestly.
 
-![Model-comparison framework](comparing-models-framework.svg)
+![Model-comparison framework](comparing-models-framework.png)
 
 Model-comparison framework
 

@@ -83,11 +83,19 @@
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
-<li class="nav-item"><a class="nav-link" href="../../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../../reference/index.html">Function reference</a></li>
+    <li><a class="dropdown-item" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
+    <li><a class="dropdown-item" href="../../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -113,8 +121,15 @@
 <div class="section level2">
 <h2 id="acousticts-implementation">acousticTS implementation<a class="anchor" aria-label="anchor" href="#acousticts-implementation"></a>
 </h2>
-<p><span class="model-tag unvalidated">Unvalidated</span></p>
-<p><em>Model-family pages:</em> <a href="index.html">Overview</a> <a href="essms-implementation.html">Implementation</a> <a href="essms-theory.html">Theory</a></p>
+<div class="model-status-line">
+<span class="model-tag unvalidated">Unvalidated</span>
+</div>
+<div class="model-nav">
+<div class="model-nav-links">
+<a class="model-nav-badge" href="index.html">Overview</a>
+<a class="model-nav-badge" href="essms-theory.html">Theory</a>
+</div>
+</div>
 <p>These pages are grounded in the classical elastic-shell scattering
 literature for fluid-filled spherical shells <span class="citation">(<a href="#ref-goodman_reflection_1962">Goodman and Stern 1962</a>; <a href="#ref-faran_sound_1951">Faran 1951</a>; <a href="#ref-stanton_sound_1990">Stanton 1990</a>)</span>.</p>
 <p>The acousticTS package uses object-based scatterers so the same
@@ -125,11 +140,11 @@ then compare a small set of physically important inputs. For
 combines a spherical shell, an optional internal fluid, and the elastic
 constants required for the shell solution.</p>
 <div class="caution" data-title="Current ESSMS status">
-<p><code>ESSMS</code> remains unvalidated in the package. The benchmark
-family exists, but the current implementation still does not return
-finite full-grid <code>TS</code> values across those shell-sphere
-comparison sweeps, so this page is documenting behavior and limitations
-rather than benchmark-grade agreement.</p>
+<p><code>ESSMS</code> is unvalidated in the package. The benchmark
+family exists, but the implementation does not return finite full-grid
+<code>TS</code> values across those shell-sphere comparison sweeps, so
+this page documents behavior and limitations rather than benchmark-grade
+agreement.</p>
 </div>
 <div class="section level3">
 <h3 id="elastic-shelled-sphere-object-generation">Elastic-shelled sphere object generation<a class="anchor" aria-label="anchor" href="#elastic-shelled-sphere-object-generation"></a>
@@ -278,10 +293,10 @@ control where the strongest modal features occur.</p>
 <h4 id="benchmark-source-and-current-status">Benchmark source and current status<a class="anchor" aria-label="anchor" href="#benchmark-source-and-current-status"></a>
 </h4>
 <p>ESSMS does have a direct benchmark source in the Jech shell-sphere
-family. At the moment, though, the current full-grid ESSMS sweep is
-still a status check rather than a usable delta table because the
-present implementation does not return finite <code>TS</code> values
-across the benchmark grid.</p>
+family. The full-grid ESSMS sweep is a status check rather than a usable
+<span class="math inline">\Delta</span> table because the implementation
+does not return finite <code>TS</code> values across the benchmark
+grid.</p>
 <table style="width:100%;" class="table">
 <colgroup>
 <col width="16%">
@@ -294,10 +309,12 @@ across the benchmark grid.</p>
 <thead><tr class="header">
 <th align="left">ESSMS case</th>
 <th align="right">Finite benchmark points matched</th>
-<th align="left">Max abs. delta TS (dB)</th>
-<th align="left">Mean abs. delta TS (dB)</th>
+<th align="left">Max abs. <span class="math inline">\Delta</span> TS
+(dB)</th>
+<th align="left">Mean abs. <span class="math inline">\Delta</span> TS
+(dB)</th>
 <th align="right">Elapsed (s)</th>
-<th align="left">Current status</th>
+<th align="left">Status</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
@@ -326,11 +343,10 @@ across the benchmark grid.</p>
 </tr>
 </tbody>
 </table>
-<p>So the benchmarking story for ESSMS is currently very simple. The
-external benchmark family exists and is the right one to use, but the
-current implementation still needs numerical stabilization before this
-page can present the same kind of benchmark-accuracy table shown for
-SPHMS, FCMS, and PSMS.</p>
+<p>The benchmarking story for ESSMS is simple. The external benchmark
+family exists and is the right one to use, but the implementation needs
+numerical stabilization before this page can present the same kind of
+benchmark-accuracy table shown for SPHMS, FCMS, and PSMS.</p>
 <p>ESSMS also exposes <code>m_limit</code>, so the obvious next question
 is whether the absence of finite full-grid values is just an overly
 aggressive truncation choice. The table below checks that directly.</p>
@@ -347,7 +363,7 @@ aggressive truncation choice. The table below checks that directly.</p>
 <th align="left"><code>m_limit</code></th>
 <th align="right">Finite benchmark points matched</th>
 <th align="right">Elapsed (s)</th>
-<th align="left">Current status</th>
+<th align="left">Status</th>
 </tr></thead>
 <tbody>
 <tr class="odd">

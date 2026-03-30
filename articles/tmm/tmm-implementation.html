@@ -83,11 +83,19 @@
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
-<li class="nav-item"><a class="nav-link" href="../../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../../reference/index.html">Function reference</a></li>
+    <li><a class="dropdown-item" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
+    <li><a class="dropdown-item" href="../../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -113,8 +121,15 @@
 <div class="section level2">
 <h2 id="acousticts-implementation">acousticTS implementation<a class="anchor" aria-label="anchor" href="#acousticts-implementation"></a>
 </h2>
-<p><span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span> <span class="model-tag experimental">Experimental</span></p>
-<p><em>Model-family pages:</em> <a href="index.html">Overview</a> <a href="tmm-implementation.html">Implementation</a> <a href="tmm-theory.html">Theory</a></p>
+<div class="model-status-line">
+<span class="model-tag established">Benchmarked</span> <span class="model-tag partially-validated">Partially validated</span> <span class="model-tag experimental">Experimental</span>
+</div>
+<div class="model-nav">
+<div class="model-nav-links">
+<a class="model-nav-badge" href="index.html">Overview</a>
+<a class="model-nav-badge" href="tmm-theory.html">Theory</a>
+</div>
+</div>
 <p>These pages follow the coefficient-map view of scattering and later
 numerical implementations for axisymmetric bodies <span class="citation">(<a href="#ref-waterman_new_1969">Waterman 1969</a>, <a href="#ref-waterman_t_2009">2009</a>; <a href="#ref-ganesh_numerically_2022">Ganesh and Hawkins
 2022</a>)</span>.</p>
@@ -128,37 +143,37 @@ understand what the model is actually buying you.</p>
 <h3 id="why-use-tmm-over-sphms-or-psms">Why use <code>TMM</code> over <code>SPHMS</code> or
 <code>PSMS</code>?<a class="anchor" aria-label="anchor" href="#why-use-tmm-over-sphms-or-psms"></a>
 </h3>
-<p>For the currently supported canonical shapes, <code>TMM</code> is not
-primarily about producing a different target-strength answer from
+<p>For the supported canonical shapes, <code>TMM</code> is not primarily
+about producing a different target-strength answer from
 <code>SPHMS</code>, <code>PSMS</code>, or <code>FCMS</code>. In the
-exact or sanity-checked single-target cases documented here, it should
-reduce to those shape-specific families. The reason to use
-<code>TMM</code> is that it organizes the scattering problem around an
-incident-to-scattered coefficient map rather than only around a
-monostatic backscatter formula. That makes it the natural family to
-extend later toward stored T-matrix blocks, bistatic scattering,
-orientation averaging, and eventually multi-target workflows.</p>
+exact or sanity-checked single-target cases documented here, it reduces
+to those shape-specific families. The reason to use <code>TMM</code> is
+that it organizes the scattering problem around an incident-to-scattered
+coefficient map rather than only around a monostatic backscatter
+formula. That makes it the natural family for stored T-matrix blocks,
+bistatic scattering, orientation averaging, and later multi-target
+workflows.</p>
 <p>In other words:</p>
 <ol style="list-style-type: decimal">
 <li>if the goal is only a sphere target-strength calculation,
-<code>SPHMS</code> remains the more direct exact model,</li>
+<code>SPHMS</code> is the more direct exact model,</li>
 <li>if the goal is only a prolate-spheroid target-strength calculation,
-<code>PSMS</code> remains the more direct exact model,</li>
+<code>PSMS</code> is the more direct exact model,</li>
 <li>if the goal is only a finite-cylinder target-strength calculation,
-<code>FCMS</code> remains the more direct exact model even though the
-default monostatic cylinder branch in <code>TMM</code> is
-benchmark-matched to it, and</li>
+<code>FCMS</code> is the more direct exact model even though the default
+monostatic cylinder branch in <code>TMM</code> is benchmark-matched to
+it, and</li>
 <li>if the goal is to stay inside a transition-matrix framework that can
 grow into broader scattering workflows while using one common
 post-processing layer across spheres, spheroids, and cylinders,
 <code>TMM</code> is the relevant model family.</li>
 </ol>
 <div class="caution" data-title="Cylinder TMM scope">
-<p>The current <code>TMM</code> cylinder branch is intentionally
-narrower than the sphere, oblate, and prolate branches. The default
-monostatic path is benchmark-matched to <code>FCMS</code>, but full
-retained-angle cylinder grids and bistatic summaries are still outside
-the validated public scope.</p>
+<p>The <code>TMM</code> cylinder branch is intentionally narrower than
+the sphere, oblate, and prolate branches. The default monostatic path is
+benchmark-matched to <code>FCMS</code>, but full retained-angle cylinder
+grids and bistatic summaries remain outside the validated public
+scope.</p>
 </div>
 </div>
 <div class="section level3">
@@ -219,7 +234,7 @@ shape, generate a homogeneous scatterer, and then call
 <code><a href="../../reference/target_strength.html">target_strength()</a></code>. The practical difference is that
 <code>TMM</code> keeps the calculation inside a transition-matrix
 viewpoint rather than only inside a direct modal-series viewpoint. The
-currently documented shape set is:</p>
+documented shape set is:</p>
 <ol style="list-style-type: decimal">
 <li><code>Sphere</code></li>
 <li><code>OblateSpheroid</code></li>
@@ -271,11 +286,11 @@ currently documented shape set is:</p>
 <span><span class="co">## 5    100000 -9.784203e-05+1.983609e-06i 9.576997e-09 -80.18771    24</span></span></code></pre>
 <p>This step is intentionally similar to the other exact families. The
 important part is not that the call looks unfamiliar. It is that the
-stored result now comes from a T-matrix-centered model family. For
-spheres, the reported <code>n_max</code> is the retained spherical-wave
-cutoff. For prolates, the reported <code>n_max</code> is inherited from
-the exact spheroidal retained system and should therefore be interpreted
-as the size of the retained spheroidal solve rather than as a
+stored result comes from a T-matrix-centered model family. For spheres,
+the reported <code>n_max</code> is the retained spherical-wave cutoff.
+For prolates, the reported <code>n_max</code> is inherited from the
+exact spheroidal retained system and should therefore be interpreted as
+the size of the retained spheroidal solve rather than as a
 spherical-wave truncation limit.</p>
 </div>
 <div class="section level3">
@@ -343,8 +358,7 @@ stored, but the retained cylinder state is intentionally narrower: it
 reuses the exact geometry-matched cylindrical family only for exact
 monostatic evaluations and orientation-averaged monostatic products.
 Full general-angle cylinder grids and bistatic summaries are not exposed
-yet because a validated retained cylinder angular operator is still
-missing.</p>
+because a validated retained cylinder angular operator is missing.</p>
 </div>
 <div class="section level4">
 <h4 id="orientation-averaging-from-stored-blocks">Orientation averaging from stored blocks<a class="anchor" aria-label="anchor" href="#orientation-averaging-from-stored-blocks"></a>
@@ -496,8 +510,8 @@ is apples-to-apples.</p>
 </h4>
 <p>Once the stored blocks are available, the next natural step is to
 move beyond individual points and slices and ask for higher-level
-bistatic summaries. For the current package build, that applies to the
-spherical and spheroidal stored branches.
+bistatic summaries. Within the documented package scope, that applies to
+the spherical and spheroidal stored branches.
 <code><a href="../../reference/tmm_bistatic_summary.html">tmm_bistatic_summary()</a></code> does that for one stored frequency
 by returning:</p>
 <ol style="list-style-type: decimal">
@@ -583,11 +597,11 @@ implementation page uses pre-rendered figures for those heavier views so
 the article stays lightweight to build.</p>
 <p>The vignette embeds pre-rendered examples here so the implementation
 page does not need to rebuild the heavier two-dimensional scattering
-figures every time it is rendered. The current gallery covers the stored
+figures every time it is rendered. The gallery covers the stored
 branches that actually support angular grids: <code>Sphere</code>,
 <code>OblateSpheroid</code>, and <code>ProlateSpheroid</code>.
 <code>Cylinder</code> is intentionally omitted because the
-retained-cylinder path currently stops at exact monostatic reuse and
+retained-cylinder path stops at exact monostatic reuse and
 orientation-averaged monostatic products.</p>
 </div>
 <div class="section level4">
@@ -648,8 +662,8 @@ nonspherical oblate case</li>
 <li>Prolate spheroid cases are compared against <code>PSMS</code>
 </li>
 <li>Cylinder cases are compared against <code>FCMS</code> for the
-default monostatic branch, now extended through <code>200 kHz</code> on
-the tested grids</li>
+default monostatic branch over the tested <code>12-200 kHz</code>
+grids</li>
 </ul>
 <p>Those broad checks were run over multiple shapes and multiple
 frequency grids rather than just one canonical example, but the
@@ -1083,11 +1097,11 @@ on the tested grid.</li>
 in the sphere limit and also agrees closely with an external
 pressure-release BEMPP slice for a genuinely nonspherical oblate
 case.</li>
-<li>The prolate branch now uses the geometry-matched
-spheroidal-coordinate backend, so the <code>TMM</code> and
-<code>PSMS</code> spectra coincide across the tested geometry and
-frequency sweep for all four supported scalar boundary types.</li>
-<li>The default monostatic finite-cylinder branch now lands directly on
+<li>The prolate branch uses the geometry-matched spheroidal-coordinate
+backend, so the <code>TMM</code> and <code>PSMS</code> spectra coincide
+across the tested geometry and frequency sweep for all four supported
+scalar boundary types.</li>
+<li>The default monostatic finite-cylinder branch lands directly on
 <code>FCMS</code> across the tested geometry and frequency sweep because
 it uses the geometry-matched cylindrical modal backend, and the
 stored-cylinder path reuses that same backend only where the monostatic
@@ -1095,16 +1109,16 @@ mapping is exact.</li>
 </ol>
 <p>That fourth point is an <strong>in-package exact-family consistency
 check</strong>, not a claim that the cylinder branch is already
-externally closed against BEM/FEM over all angles. It means the current
+externally closed against BEM/FEM over all angles. It means the default
 monostatic <code>TMM</code> cylinder branch and <code>FCMS</code> are
-now the same calculation family at the package level. The external
-cylinder discussion below is separate and is the reason the retained
+the same calculation family at the package level. The external cylinder
+discussion below is separate and is the reason the retained
 general-angle cylinder helpers remain disabled.</p>
 <p>That benchmark pattern is exactly what one would want at this stage.
-The current TMM family is useful because it stays within a
-transition-matrix formulation while still landing on the correct
-exact-family answers for the canonical geometries it presently supports
-in the default monostatic workflow.</p>
+The <code>TMM</code> family is useful because it stays within a
+transition-matrix formulation while landing on the correct exact-family
+answers for the canonical geometries it supports in the default
+monostatic workflow.</p>
 </div>
 </div>
 <div class="section level3">
@@ -1122,10 +1136,9 @@ reusing the stored blocks and reporting:</p>
 and</li>
 <li>block-level conditioning summaries.</li>
 </ol>
-<p>For the rigid and pressure-release prolate branches, there is now an
-even tighter internal validator available during development: the
-stored-block <code>TMM</code> angular field can be checked directly
-against the exact general-angle spheroidal modal-series solution used by
+<p>For the rigid and pressure-release prolate branches, the stored-block
+<code>TMM</code> angular field can be checked directly against the exact
+general-angle spheroidal modal-series solution used by
 <code>PSMS</code>. That is the fastest way to constrain off-axis
 disagreements, because it removes external meshing and solver
 conventions from the loop and asks only whether the retained prolate
@@ -1139,11 +1152,11 @@ incident and receive angles.</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">diag_70</span><span class="op">$</span><span class="va">summary</span></span></code></pre></div>
-<p>For this package build, independent BEMPP cross-checks were available
-for the pressure-release sphere, oblate, and prolate branches. The
-cylinder situation is different because the current retained-cylinder
-scope is intentionally monostatic-only. So the current validation ladder
-for the remaining newer branches combines:</p>
+<p>Independent BEMPP cross-checks were available for the
+pressure-release sphere, oblate, and prolate branches. The cylinder
+situation is different because the retained-cylinder scope is
+intentionally monostatic-only. So the validation ladder for these
+branches combines:</p>
 <ol style="list-style-type: decimal">
 <li>exact-family checks where they exist (<code>SPHMS</code>,
 <code>PSMS</code>, <code>FCMS</code>),</li>
@@ -1151,7 +1164,7 @@ for the remaining newer branches combines:</p>
 <li>theorem-based diagnostics from the stored T-matrix blocks.</li>
 </ol>
 <p>The table below shows representative diagnostic summaries for one
-stored object from each currently supported branch where <span class="math inline">e</span> is the residual.</p>
+stored object from each supported branch, where <span class="math inline">e</span> is the residual.</p>
 <table style="width:100%;" class="table">
 <colgroup>
 <col width="14%">
@@ -1224,10 +1237,10 @@ stored object from each currently supported branch where <span class="math inlin
 <li>The sphere and prolate branches are numerically self-consistent to
 essentially machine precision on the tested grids.</li>
 <li>The stored-cylinder branch is deliberately narrower than the sphere
-and prolate branches. It currently carries only the geometry-matched
-monostatic reuse path, so reciprocity and optical-theorem-style angular
-diagnostics are left as <code>NA</code> rather than being computed from
-an unvalidated cylinder grid operator.</li>
+and prolate branches. It carries only the geometry-matched monostatic
+reuse path, so reciprocity and optical-theorem-style angular diagnostics
+are left as <code>NA</code> rather than being computed from an
+unvalidated cylinder grid operator.</li>
 </ol>
 </div>
 <div class="section level3">
@@ -1239,10 +1252,10 @@ smoothly to the requested aspect ratio. The monostatic response should
 move smoothly along that path. Abrupt jumps, non-finite values, or
 strong zig-zag second differences at modest aspect ratio are a sign that
 the truncation or angular reconstruction is not under control.</p>
-<p>This check is now built into <code><a href="../../reference/tmm_diagnostics.html">tmm_diagnostics()</a></code> for
-prolate and oblate targets. The continuation is generated at constant
-volume, beginning from the exact sphere limit and stepping to the
-requested spheroidal aspect ratio.</p>
+<p>This check is built into <code><a href="../../reference/tmm_diagnostics.html">tmm_diagnostics()</a></code> for prolate
+and oblate targets. The continuation is generated at constant volume,
+beginning from the exact sphere limit and stepping to the requested
+spheroidal aspect ratio.</p>
 <p>The figure below shows the built-in continuation path for a
 pressure-release prolate spheroid with target aspect ratio
 <code>3.5</code>.</p>
@@ -1259,23 +1272,21 @@ normalization, or far-field extraction are even involved.</p>
 <div class="section level3">
 <h3 id="exact-prolate-angular-validation">Exact prolate angular validation<a class="anchor" aria-label="anchor" href="#exact-prolate-angular-validation"></a>
 </h3>
-<p>For the retained prolate branch, the most useful current validation
-is not a paper-style sketch and not an external mesh-based comparison.
-It is a direct check against the exact general-angle spheroidal solution
-already available in the package for rigid and pressure-release scalar
-prolates. That is the right apples-to-apples comparison because it
-uses:</p>
+<p>For the retained prolate branch, the most useful validation is not a
+paper-style sketch and not an external mesh-based comparison. It is a
+direct check against the exact general-angle spheroidal solution already
+available in the package for rigid and pressure-release scalar prolates.
+That is the right apples-to-apples comparison because it uses:</p>
 <ol style="list-style-type: decimal">
 <li>the same geometry,</li>
 <li>the same incident and receive-angle definitions,</li>
 <li>the same scalar boundary conditions, and</li>
 <li>the same far-field normalization.</li>
 </ol>
-<p>So, for the current retained prolate <code>TMM</code> operator, the
-key question is simply whether <code><a href="../../reference/tmm_scattering.html">tmm_scattering()</a></code> reproduces
-the exact <code>prolate_spheroid_fbs()</code> field when both are
-evaluated at the same stored frequency and the same incident/receive
-angles.</p>
+<p>So, for the retained prolate <code>TMM</code> operator, the key
+question is simply whether <code><a href="../../reference/tmm_scattering.html">tmm_scattering()</a></code> reproduces the
+exact <code>prolate_spheroid_fbs()</code> field when both are evaluated
+at the same stored frequency and the same incident/receive angles.</p>
 <p>The figure below shows that check for a rigid and a pressure-release
 prolate spheroid with <code>L = 70 mm</code>, <code>a = 10 mm</code>,
 broadside incidence, and a <code>38 kHz</code> equatorial receive-angle
@@ -1286,17 +1297,30 @@ open symbols are the stored-block <code>TMM</code> reconstruction.</p>
 pressure-release prolate spheroids at 38 kHz, shown as equatorial
 receive-angle sweeps under broadside incidence.</div>
 </div>
-<p>This is a much stronger constraint on the current prolate branch than
-the earlier exploratory paper-style plots, because it directly tests the
-retained angular operator that powers <code><a href="../../reference/tmm_scattering.html">tmm_scattering()</a></code>,
-<code><a href="../../reference/tmm_scattering_grid.html">tmm_scattering_grid()</a></code>, and the higher-level post-processing
-helpers.</p>
-<p>That body-fixed angle convention also resolves the earlier mismatch
-with the exploratory BEMPP prolate slice. For the pressure-release
-prolate case with <code>L = 70 mm</code>, <code>a = 10 mm</code>, and
-<code>38 kHz</code>, the retained <code>TMM</code> branch and the
-external BEMPP far-field solution line up closely across the tested
-incidence angles:</p>
+<p>This directly tests the retained angular operator that powers
+<code><a href="../../reference/tmm_scattering.html">tmm_scattering()</a></code>, <code><a href="../../reference/tmm_scattering_grid.html">tmm_scattering_grid()</a></code>, and
+the higher-level post-processing helpers.</p>
+<p>That body-fixed angle convention also resolves the mismatch with the
+exploratory BEMPP prolate slice.</p>
+<div class="section level4">
+<h4 id="external-comparison-tables">External comparison tables<a class="anchor" aria-label="anchor" href="#external-comparison-tables"></a>
+</h4>
+<div class="panel-tabset">
+
+
+
+<ul class="nav nav-tabs" id="NA" role="tablist">
+<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#prolate-2" id="prolate-2-tab" type="button" role="tab" aria-controls="prolate-2" aria-selected="true" class="active nav-link">Prolate</button></li>
+<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#oblate-2" id="oblate-2-tab" type="button" role="tab" aria-controls="oblate-2" aria-selected="false" class="nav-link">Oblate</button></li>
+<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#cylinder-1" id="cylinder-1-tab" type="button" role="tab" aria-controls="cylinder-1" aria-selected="false" class="nav-link">Cylinder</button></li>
+</ul>
+<div class="tab-content">
+<div class="active  tab-pane" id="prolate-2" role="tabpanel" aria-labelledby="prolate-2-tab">
+
+<p>For the pressure-release prolate case with <code>L = 70 mm</code>,
+<code>a = 10 mm</code>, and <code>38 kHz</code>, the retained
+<code>TMM</code> branch and the external BEMPP far-field solution line
+up closely across the tested incidence angles:</p>
 <table class="table">
 <colgroup>
 <col width="25%">
@@ -1306,8 +1330,10 @@ incidence angles:</p>
 </colgroup>
 <thead><tr class="header">
 <th align="right">World-frame incidence (deg)</th>
-<th align="right">Max abs. delta amplitude (dB)</th>
-<th align="right">Mean abs. delta amplitude (dB)</th>
+<th align="right">Max abs. <span class="math inline">\Delta</span>
+amplitude (dB)</th>
+<th align="right">Mean abs. <span class="math inline">\Delta</span>
+amplitude (dB)</th>
 <th align="left">Note</th>
 </tr></thead>
 <tbody>
@@ -1331,9 +1357,12 @@ incidence angles:</p>
 </tr>
 </tbody>
 </table>
+</div>
+<div class="tab-pane" id="oblate-2" role="tabpanel" aria-labelledby="oblate-2-tab">
+
 <p>The same body-fixed/world-frame conversion is also important for the
-nonspherical oblate branch, which still uses the spherical-coordinate
-retained operator. For a pressure-release oblate with polar semiaxis
+nonspherical oblate branch, which uses the spherical-coordinate retained
+operator. For a pressure-release oblate with polar semiaxis
 <code>c = 6 mm</code> and equatorial semiaxis <code>a = 10 mm</code>,
 the corrected BEMPP comparison is likewise tight on the tested
 cases:</p>
@@ -1348,8 +1377,10 @@ cases:</p>
 <thead><tr class="header">
 <th align="right">Frequency (kHz)</th>
 <th align="right">World-frame incidence (deg)</th>
-<th align="right">Max abs. delta amplitude (dB)</th>
-<th align="right">Mean abs. delta amplitude (dB)</th>
+<th align="right">Max abs. <span class="math inline">\Delta</span>
+amplitude (dB)</th>
+<th align="right">Mean abs. <span class="math inline">\Delta</span>
+amplitude (dB)</th>
 <th align="left">Validation note</th>
 </tr></thead>
 <tbody>
@@ -1383,12 +1414,15 @@ cases:</p>
 </tr>
 </tbody>
 </table>
-<p>By contrast, the same corrected BEMPP comparison also clarified why
-the current package does <strong>not</strong> expose a full
-retained-cylinder angular operator. Additional pressure-release cylinder
-checks were run at a second frequency and a second geometry, and the
-exploratory retained-cylinder angular reconstruction remained much less
-reliable than the sphere and prolate branches:</p>
+</div>
+<div class="tab-pane" id="cylinder-1" role="tabpanel" aria-labelledby="cylinder-1-tab">
+
+<p>By contrast, the same corrected BEMPP comparison also clarifies why
+the package does <strong>not</strong> expose a full retained-cylinder
+angular operator. Additional pressure-release cylinder checks were run
+at a second frequency and a second geometry, and the exploratory
+retained-cylinder angular reconstruction remained much less reliable
+than the sphere and prolate branches:</p>
 <table style="width:100%;" class="table">
 <colgroup>
 <col width="14%">
@@ -1408,8 +1442,10 @@ reliable than the sphere and prolate branches:</p>
 <th align="right">World-frame incidence (deg)</th>
 <th align="right">Stored-cylinder <code>n_max</code>
 </th>
-<th align="right">Max abs. delta amplitude (dB)</th>
-<th align="right">Mean abs. delta amplitude (dB)</th>
+<th align="right">Max abs. <span class="math inline">\Delta</span>
+amplitude (dB)</th>
+<th align="right">Mean abs. <span class="math inline">\Delta</span>
+amplitude (dB)</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
@@ -1441,70 +1477,8 @@ reliable than the sphere and prolate branches:</p>
 </tr>
 </tbody>
 </table>
-<p>Those extra checks matter because they show the remaining cylinder
-issue is not just one broken benchmark file. A retained cylinder angular
-operator can sometimes be tuned to look better on a
-low-to-moderate-frequency case, but that improvement does not generalize
-cleanly once the frequency or geometry changes. So the external
-benchmark work now supports a more precise conclusion: the retained
-prolate branch is behaving correctly, while the cylinder family should
-currently stop at exact monostatic reuse and orientation-averaged
-monostatic products until a separate validated retained cylinder angular
-operator is built.</p>
-</div>
-<div class="section level3">
-<h3 id="external-bem-validation-figures">External BEM validation figures<a class="anchor" aria-label="anchor" href="#external-bem-validation-figures"></a>
-</h3>
-<p>The BEMPP pressure-release slices are a useful second validation
-ladder because they are independent of the in-package exact-family
-models. The three figures below show the broadside <code>38 kHz</code>
-comparisons currently used to constrain the stored <code>TMM</code>
-angular operators.</p>
-<p>For the sphere, the comparison is direct because the world-frame
-<code>x-y</code> slice and the body-fixed slice are identical by
-symmetry. For the oblate and prolate spheroids, the BEMPP world-frame
-slice is first converted to the same body-fixed angular convention used
-by <code><a href="../../reference/tmm_scattering.html">tmm_scattering()</a></code>. That frame conversion is what resolves
-the earlier apparent nonspherical mismatch.</p>
-<div class="section level4">
-<h4 id="external-bem-figures">External BEM figures<a class="anchor" aria-label="anchor" href="#external-bem-figures"></a>
-</h4>
-<div class="panel-tabset">
-
-
-
-
-<ul class="nav nav-tabs" id="NA" role="tablist">
-<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#sphere-2" id="sphere-2-tab" type="button" role="tab" aria-controls="sphere-2" aria-selected="true" class="active nav-link">Sphere</button></li>
-<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#oblate-2" id="oblate-2-tab" type="button" role="tab" aria-controls="oblate-2" aria-selected="false" class="nav-link">Oblate</button></li>
-<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#prolate-2" id="prolate-2-tab" type="button" role="tab" aria-controls="prolate-2" aria-selected="false" class="nav-link">Prolate</button></li>
-<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#cylinder-1" id="cylinder-1-tab" type="button" role="tab" aria-controls="cylinder-1" aria-selected="false" class="nav-link">Cylinder</button></li>
-</ul>
-<div class="tab-content">
-<div class="active  tab-pane" id="sphere-2" role="tabpanel" aria-labelledby="sphere-2-tab">
-
-<p><img src="tmm-bempp-sphere-validation.png" class="r-plt" alt="Pre-rendered pressure-release sphere validation against BEMPP. The upper panel overlays the TMM and BEMPP angular scattering curves at 38 kHz for a 10 mm radius sphere, and the lower panel shows the amplitude residual in dB across the same receive-angle sweep." width="85%" style="display: block; margin: auto;"></p>
-</div>
-<div class="tab-pane" id="oblate-2" role="tabpanel" aria-labelledby="oblate-2-tab">
-
-<p><img src="tmm-bempp-oblate-validation.png" class="r-plt" alt="Pre-rendered pressure-release oblate spheroid validation against BEMPP. The upper panel overlays the TMM and BEMPP angular scattering curves at 38 kHz for an oblate spheroid with 6 mm polar semiaxis and 10 mm equatorial semiaxis under broadside incidence, and the lower panel shows the amplitude residual in dB across the same receive-angle sweep after converting the BEMPP world-frame directions into the TMM body-fixed angle convention." width="85%" style="display: block; margin: auto;"></p>
-</div>
-<div class="tab-pane" id="prolate-2" role="tabpanel" aria-labelledby="prolate-2-tab">
-
-<p><img src="tmm-bempp-prolate-validation.png" class="r-plt" alt="Pre-rendered pressure-release prolate spheroid validation against BEMPP. The upper panel overlays the TMM and BEMPP angular scattering curves at 38 kHz for a 70 mm by 10 mm prolate spheroid under broadside incidence, and the lower panel shows the amplitude residual in dB across the same receive-angle sweep after converting the BEMPP world-frame directions into the TMM body-fixed angle convention." width="85%" style="display: block; margin: auto;"></p>
-</div>
-<div class="tab-pane" id="cylinder-1" role="tabpanel" aria-labelledby="cylinder-1-tab">
-
-<p><img src="tmm-bempp-cylinder-validation.png" class="r-plt" alt="Pre-rendered pressure-release cylinder comparison against BEMPP for the exploratory retained-angle cylinder TMM branch. The figure shows 38 kHz world-frame x-y slice comparisons at 0, 45, and 90 degree incidence, with BEMPP and exploratory retained-angle TMM overlays and the corresponding amplitude residual curves." width="92%" style="display: block; margin: auto;"></p>
-<p>For the cylinder, the analogous full-angle figure is shown here only
-as a <strong>constraint on the old exploratory retained-angle cylinder
-operator</strong>. It is not documenting a currently supported public
-cylinder workflow. The point of the figure is to show why the package
-now refuses to provide full retained cylinder grids and bistatic
-summaries instead of pretending they are validated.</p>
-<p>The current exact monostatic cylinder branch can still be compared to
-the same BEMPP slices at the single backscatter point. That sharper
-check makes the scope clearer:</p>
+<p>The exact monostatic cylinder branch can also be compared to the same
+BEMPP slices at the single backscatter point:</p>
 <table style="width:100%;" class="table">
 <colgroup>
 <col width="16%">
@@ -1521,7 +1495,7 @@ check makes the scope clearer:</p>
 <span class="math inline">a</span> (mm)</th>
 <th align="right">Frequency (kHz)</th>
 <th align="right">World-frame incidence (deg)</th>
-<th align="right">Backscatter-point delta amplitude (dB)</th>
+<th align="right">Backscatter-point <span class="math inline">\Delta</span> amplitude (dB)</th>
 <th align="left">Interpretation</th>
 </tr></thead>
 <tbody>
@@ -1531,7 +1505,7 @@ check makes the scope clearer:</p>
 <td align="right"><code>38</code></td>
 <td align="right"><code>90</code></td>
 <td align="right"><code>-0.128</code></td>
-<td align="left">broadside is the best current case here, but still
+<td align="left">broadside is the best tested case here, but it stays
 above a <code>&lt; 0.1 dB</code> target</td>
 </tr>
 <tr class="even">
@@ -1549,7 +1523,7 @@ tested case</td>
 <td align="right"><code>38</code></td>
 <td align="right"><code>90</code></td>
 <td align="right"><code>-0.198</code></td>
-<td align="left">smaller broadside case is still above a
+<td align="left">the smaller broadside case stays above a
 <code>&lt; 0.1 dB</code> target</td>
 </tr>
 <tr class="even">
@@ -1558,7 +1532,7 @@ tested case</td>
 <td align="right"><code>38</code></td>
 <td align="right"><code>45</code></td>
 <td align="right"><code>-5.104</code></td>
-<td align="left">oblique monostatic point is still not externally
+<td align="left">oblique monostatic agreement is not externally
 closed</td>
 </tr>
 <tr class="odd">
@@ -1567,11 +1541,75 @@ closed</td>
 <td align="right"><code>38</code></td>
 <td align="right"><code>0</code></td>
 <td align="right"><code>-272.091</code></td>
-<td align="left">end-on pressure-release cylinder remains strongly
+<td align="left">the end-on pressure-release cylinder remains strongly
 inconsistent with BEMPP</td>
 </tr>
 </tbody>
 </table>
+</div>
+</div>
+</div>
+<p>Those extra checks matter because they show the remaining cylinder
+issue is not just one broken benchmark file. A retained cylinder angular
+operator can sometimes be tuned to look better on a
+low-to-moderate-frequency case, but that improvement does not generalize
+cleanly once the frequency or geometry changes. So the external
+benchmark work supports a more precise conclusion: the retained prolate
+branch behaves correctly, while the cylinder family stops at exact
+monostatic reuse and orientation-averaged monostatic products until a
+separate validated retained cylinder angular operator is built.</p>
+</div>
+</div>
+<div class="section level3">
+<h3 id="external-bem-validation-figures">External BEM validation figures<a class="anchor" aria-label="anchor" href="#external-bem-validation-figures"></a>
+</h3>
+<p>The BEMPP pressure-release slices are a useful second validation
+ladder because they are independent of the in-package exact-family
+models. The three figures below show the broadside <code>38 kHz</code>
+comparisons used to constrain the stored <code>TMM</code> angular
+operators.</p>
+<p>For the sphere, the comparison is direct because the world-frame
+<code>x-y</code> slice and the body-fixed slice are identical by
+symmetry. For the oblate and prolate spheroids, the BEMPP world-frame
+slice is first converted to the same body-fixed angular convention used
+by <code><a href="../../reference/tmm_scattering.html">tmm_scattering()</a></code>. That frame conversion is what resolves
+the apparent nonspherical mismatch.</p>
+<div class="section level4">
+<h4 id="external-bem-figures">External BEM figures<a class="anchor" aria-label="anchor" href="#external-bem-figures"></a>
+</h4>
+<div class="panel-tabset">
+
+
+
+
+<ul class="nav nav-tabs" id="NA" role="tablist">
+<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#sphere-2" id="sphere-2-tab" type="button" role="tab" aria-controls="sphere-2" aria-selected="true" class="active nav-link">Sphere</button></li>
+<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#oblate-3" id="oblate-3-tab" type="button" role="tab" aria-controls="oblate-3" aria-selected="false" class="nav-link">Oblate</button></li>
+<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#prolate-3" id="prolate-3-tab" type="button" role="tab" aria-controls="prolate-3" aria-selected="false" class="nav-link">Prolate</button></li>
+<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#cylinder-2" id="cylinder-2-tab" type="button" role="tab" aria-controls="cylinder-2" aria-selected="false" class="nav-link">Cylinder</button></li>
+</ul>
+<div class="tab-content">
+<div class="active  tab-pane" id="sphere-2" role="tabpanel" aria-labelledby="sphere-2-tab">
+
+<p><img src="tmm-bempp-sphere-validation.png" class="r-plt" alt="Pre-rendered pressure-release sphere validation against BEMPP. The upper panel overlays the TMM and BEMPP angular scattering curves at 38 kHz for a 10 mm radius sphere, and the lower panel shows the amplitude residual in dB across the same receive-angle sweep." width="85%" style="display: block; margin: auto;"></p>
+</div>
+<div class="tab-pane" id="oblate-3" role="tabpanel" aria-labelledby="oblate-3-tab">
+
+<p><img src="tmm-bempp-oblate-validation.png" class="r-plt" alt="Pre-rendered pressure-release oblate spheroid validation against BEMPP. The upper panel overlays the TMM and BEMPP angular scattering curves at 38 kHz for an oblate spheroid with 6 mm polar semiaxis and 10 mm equatorial semiaxis under broadside incidence, and the lower panel shows the amplitude residual in dB across the same receive-angle sweep after converting the BEMPP world-frame directions into the TMM body-fixed angle convention." width="85%" style="display: block; margin: auto;"></p>
+</div>
+<div class="tab-pane" id="prolate-3" role="tabpanel" aria-labelledby="prolate-3-tab">
+
+<p><img src="tmm-bempp-prolate-validation.png" class="r-plt" alt="Pre-rendered pressure-release prolate spheroid validation against BEMPP. The upper panel overlays the TMM and BEMPP angular scattering curves at 38 kHz for a 70 mm by 10 mm prolate spheroid under broadside incidence, and the lower panel shows the amplitude residual in dB across the same receive-angle sweep after converting the BEMPP world-frame directions into the TMM body-fixed angle convention." width="85%" style="display: block; margin: auto;"></p>
+</div>
+<div class="tab-pane" id="cylinder-2" role="tabpanel" aria-labelledby="cylinder-2-tab">
+
+<p><img src="tmm-bempp-cylinder-validation.png" class="r-plt" alt="Pre-rendered pressure-release cylinder comparison against BEMPP for the exploratory retained-angle cylinder TMM branch. The figure shows 38 kHz world-frame x-y slice comparisons at 0, 45, and 90 degree incidence, with BEMPP and exploratory retained-angle TMM overlays and the corresponding amplitude residual curves." width="92%" style="display: block; margin: auto;"></p>
+<p>For the cylinder, the analogous full-angle figure is shown here only
+as a <strong>constraint on the exploratory retained-angle cylinder
+operator</strong>. It is not documenting a supported public cylinder
+workflow. The point of the figure is to show why the package refuses to
+provide full retained cylinder grids and bistatic summaries instead of
+pretending they are validated.</p>
 <p>These figures make the external-validation story much more
 concrete:</p>
 <ol style="list-style-type: decimal">
@@ -1583,11 +1621,11 @@ the frame convention is matched correctly,</li>
 once the frame convention is matched correctly,</li>
 <li>the exploratory retained-angle cylinder branch does
 <strong>not</strong> agree externally and is therefore not part of the
-current public retained-cylinder workflow, and</li>
-<li>even the current exact monostatic pressure-release cylinder branch
-is only externally close near broadside on the tested cases, so cylinder
-remains the least externally constrained <code>TMM</code> shape family
-and now emits a warning by default when used.</li>
+documented public retained-cylinder workflow, and</li>
+<li>even the exact monostatic pressure-release cylinder branch is only
+externally close near broadside on the tested cases, so cylinder remains
+the least externally constrained <code>TMM</code> shape family and emits
+a warning by default when used.</li>
 </ol>
 <p>At this point, no direct paper-figure reproduction is claimed here
 for the prolate angular response. If a future paper-grounded
@@ -1606,8 +1644,8 @@ mimicking the general visual style.</p>
 <p>The sphere figure is the more conventional benchmark story: a
 T-matrix implementation agreeing with the exact spherical modal
 solution. The prolate figure is really a geometry-consistency story: the
-current <code>TMM</code> family now lands on the exact spheroidal
-solution rather than drifting because of a mismatched basis.</p>
+<code>TMM</code> family lands on the exact spheroidal solution rather
+than drifting because of a mismatched basis.</p>
 </div>
 </div>
 <div class="section level2">

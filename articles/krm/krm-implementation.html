@@ -83,11 +83,19 @@
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
-<li class="nav-item"><a class="nav-link" href="../../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../../reference/index.html">Function reference</a></li>
+    <li><a class="dropdown-item" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
+    <li><a class="dropdown-item" href="../../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -113,8 +121,15 @@
 <div class="section level2">
 <h2 id="acousticts-implementation">acousticTS implementation<a class="anchor" aria-label="anchor" href="#acousticts-implementation"></a>
 </h2>
-<p><span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span></p>
-<p><em>Model-family pages:</em> <a href="index.html">Overview</a> <a href="krm-implementation.html">Implementation</a> <a href="krm-theory.html">Theory</a></p>
+<div class="model-status-line">
+<span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span>
+</div>
+<div class="model-nav">
+<div class="model-nav-links">
+<a class="model-nav-badge" href="index.html">Overview</a>
+<a class="model-nav-badge" href="krm-theory.html">Theory</a>
+</div>
+</div>
 <p>These pages follow the composite body-plus-swimbladder fish modeling
 literature initiated for cod and later generalized in open software
 implementations <span class="citation">(<a href="#ref-clay_1991">C. S.
@@ -350,8 +365,10 @@ software-compatibility checks for body-plus-swimbladder targets.</p>
 </colgroup>
 <thead><tr class="header">
 <th align="left">Canonical case</th>
-<th align="right">Max abs. delta TS (dB)</th>
-<th align="right">Mean abs. delta TS (dB)</th>
+<th align="right">Max abs. <span class="math inline">\Delta</span> TS
+(dB)</th>
+<th align="right">Mean abs. <span class="math inline">\Delta</span> TS
+(dB)</th>
 <th align="right">Elapsed (s)</th>
 </tr></thead>
 <tbody>
@@ -397,175 +414,339 @@ software-compatibility checks for body-plus-swimbladder targets.</p>
 the canonical KRM targets.</p>
 </div>
 <div class="section level4">
-<h4 id="bundled-fish-compatibility-checks">Bundled fish compatibility checks<a class="anchor" aria-label="anchor" href="#bundled-fish-compatibility-checks"></a>
+<h4 class="tabset tabset-fade tabset-pills" id="bundled-fish-compatibility-checks">Bundled fish compatibility
+checks<a class="anchor" aria-label="anchor" href="#bundled-fish-compatibility-checks"></a>
 </h4>
 <p>The bundled fish objects serve a different benchmark role from the
 canonical modal-series targets above. There is no exact modal-series
 reference for these segmented body-plus-swimbladder geometries, so they
 are used only to check software-to-software agreement for the
 <code>krm_variant</code> branches on realistic fish shapes.</p>
+<div class="section level5">
+<h5 id="sardine">Sardine<a class="anchor" aria-label="anchor" href="#sardine"></a>
+</h5>
+<div class="panel-tabset">
+
+
+
+<ul class="nav nav-tabs" id="NA" role="tablist">
+<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#krm_variant-lowcontrast" id="krm_variant-lowcontrast-tab" type="button" role="tab" aria-controls="krm_variant-lowcontrast" aria-selected="true" class="active nav-link"><code>krm_variant = lowcontrast</code></button></li>
+<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#krm_variant-body_embedded" id="krm_variant-body_embedded-tab" type="button" role="tab" aria-controls="krm_variant-body_embedded" aria-selected="false" class="nav-link"><code>krm_variant = body_embedded</code></button></li>
+<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#krm_variant-mixed" id="krm_variant-mixed-tab" type="button" role="tab" aria-controls="krm_variant-mixed" aria-selected="false" class="nav-link"><code>krm_variant = mixed</code></button></li>
+</ul>
+<div class="tab-content">
+<div class="active  tab-pane" id="krm_variant-lowcontrast" role="tabpanel" aria-labelledby="krm_variant-lowcontrast-tab">
+
 <table class="table">
-<colgroup>
-<col width="25%">
-<col width="25%">
-<col width="25%">
-<col width="25%">
-</colgroup>
 <thead><tr class="header">
-<th align="left">Object</th>
-<th align="left">Branch or comparison</th>
-<th align="right">Mean abs. delta TS (dB)</th>
-<th align="right">Max abs. delta TS (dB)</th>
+<th align="center">
+<span class="math inline">\vert \overline{\Delta TS}
+\vert</span> (dB)</th>
+<th align="center"></th>
+<th align="center"></th>
+<th align="center"></th>
+<th align="center"></th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left"><code>sardine</code></td>
-<td align="left">
-<code>acousticTS lowcontrast</code> vs
-<code>KRMr</code>
-</td>
-<td align="right">1.58e-14</td>
-<td align="right">1.42e-13</td>
+<td align="center"></td>
+<td align="center">acousticTS</td>
+<td align="center">KRMr</td>
+<td align="center">echoSMs</td>
+<td align="center">NOAA SWFSC applet</td>
 </tr>
 <tr class="even">
-<td align="left"><code>sardine</code></td>
-<td align="left">
-<code>acousticTS lowcontrast</code> vs
-<code>echoSMs</code> low-contrast spectrum</td>
-<td align="right">3.31e-14</td>
-<td align="right">5.54e-13</td>
+<td align="center">acousticTS</td>
+<td align="center">-</td>
+<td align="center">1.6e-14</td>
+<td align="center">3.3e-14</td>
+<td align="center">2.6e-3</td>
 </tr>
 <tr class="odd">
-<td align="left"><code>sardine</code></td>
-<td align="left">
-<code>acousticTS lowcontrast</code> vs NOAA applet
-spectrum</td>
-<td align="right">0.00262</td>
-<td align="right">0.00496</td>
+<td align="center">KRMr</td>
+<td align="center">1.6e-14</td>
+<td align="center">-</td>
+<td align="center">3.9e-14</td>
+<td align="center">2.6e-3</td>
 </tr>
 <tr class="even">
-<td align="left"><code>sardine</code></td>
-<td align="left">
-<code>KRMr</code> vs <code>echoSMs</code> low-contrast
-spectrum</td>
-<td align="right">3.85e-14</td>
-<td align="right">5.54e-13</td>
+<td align="center">echoSMs</td>
+<td align="center">3.3e-14</td>
+<td align="center">3.9e-14</td>
+<td align="center">-</td>
+<td align="center">2.6e-3</td>
 </tr>
 <tr class="odd">
-<td align="left"><code>sardine</code></td>
-<td align="left">
-<code>KRMr</code> vs NOAA applet spectrum</td>
-<td align="right">0.00262</td>
-<td align="right">0.00496</td>
-</tr>
-<tr class="even">
-<td align="left"><code>sardine</code></td>
-<td align="left">
-<code>echoSMs</code> low-contrast spectrum vs NOAA
-applet spectrum</td>
-<td align="right">0.00262</td>
-<td align="right">0.00496</td>
-</tr>
-<tr class="odd">
-<td align="left"><code>sardine</code></td>
-<td align="left">
-<code>acousticTS body_embedded</code> vs
-<code>echoSMs</code> body-embedded spectrum</td>
-<td align="right">3.37e-14</td>
-<td align="right">1.85e-13</td>
-</tr>
-<tr class="even">
-<td align="left"><code>sardine</code></td>
-<td align="left">
-<code>acousticTS mixed</code> vs <code>echoSMs</code>
-body-embedded spectrum</td>
-<td align="right">3.37e-14</td>
-<td align="right">1.85e-13</td>
-</tr>
-<tr class="odd">
-<td align="left"><code>sardine</code></td>
-<td align="left">
-<code>acousticTS mixed</code> vs
-<code>acousticTS body_embedded</code>
-</td>
-<td align="right">0.00000</td>
-<td align="right">0.00000</td>
-</tr>
-<tr class="even">
-<td align="left"><code>cod</code></td>
-<td align="left">
-<code>acousticTS lowcontrast</code> vs
-<code>KRMr</code>
-</td>
-<td align="right">1.33e-14</td>
-<td align="right">7.82e-14</td>
-</tr>
-<tr class="odd">
-<td align="left"><code>cod</code></td>
-<td align="left">
-<code>acousticTS lowcontrast</code> vs
-<code>echoSMs</code> low-contrast spectrum</td>
-<td align="right">5.36e-15</td>
-<td align="right">3.55e-14</td>
-</tr>
-<tr class="even">
-<td align="left"><code>cod</code></td>
-<td align="left">
-<code>acousticTS lowcontrast</code> vs NOAA applet
-spectrum</td>
-<td align="right">0.00262</td>
-<td align="right">0.00498</td>
-</tr>
-<tr class="odd">
-<td align="left"><code>cod</code></td>
-<td align="left">
-<code>KRMr</code> vs <code>echoSMs</code> low-contrast
-spectrum</td>
-<td align="right">1.46e-14</td>
-<td align="right">8.53e-14</td>
-</tr>
-<tr class="even">
-<td align="left"><code>cod</code></td>
-<td align="left">
-<code>KRMr</code> vs NOAA applet spectrum</td>
-<td align="right">0.00262</td>
-<td align="right">0.00498</td>
-</tr>
-<tr class="odd">
-<td align="left"><code>cod</code></td>
-<td align="left">
-<code>echoSMs</code> low-contrast spectrum vs NOAA
-applet spectrum</td>
-<td align="right">0.00262</td>
-<td align="right">0.00498</td>
-</tr>
-<tr class="even">
-<td align="left"><code>cod</code></td>
-<td align="left">
-<code>acousticTS body_embedded</code> vs
-<code>echoSMs</code> body-embedded spectrum</td>
-<td align="right">6.16e-15</td>
-<td align="right">5.68e-14</td>
-</tr>
-<tr class="odd">
-<td align="left"><code>cod</code></td>
-<td align="left">
-<code>acousticTS mixed</code> vs <code>echoSMs</code>
-body-embedded spectrum</td>
-<td align="right">6.16e-15</td>
-<td align="right">5.68e-14</td>
-</tr>
-<tr class="even">
-<td align="left"><code>cod</code></td>
-<td align="left">
-<code>acousticTS mixed</code> vs
-<code>acousticTS body_embedded</code>
-</td>
-<td align="right">0.00000</td>
-<td align="right">0.00000</td>
+<td align="center">NOAA SWFSC applet</td>
+<td align="center">2.6e-3</td>
+<td align="center">2.6e-3</td>
+<td align="center">2.6e-3</td>
+<td align="center">-</td>
 </tr>
 </tbody>
 </table>
+<table class="table">
+<thead><tr class="header">
+<th align="center">
+<span class="math inline">\max \vert {\Delta TS}
+\vert</span> (dB)</th>
+<th align="center"></th>
+<th align="center"></th>
+<th align="center"></th>
+<th align="center"></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="center"></td>
+<td align="center">acousticTS</td>
+<td align="center">KRMr</td>
+<td align="center">echoSMs</td>
+<td align="center">NOAA SWFSC applet</td>
+</tr>
+<tr class="even">
+<td align="center">acousticTS</td>
+<td align="center">-</td>
+<td align="center">1.4e-13</td>
+<td align="center">5.5e-13</td>
+<td align="center">5.0e-3</td>
+</tr>
+<tr class="odd">
+<td align="center">KRMr</td>
+<td align="center">1.4e-13</td>
+<td align="center">-</td>
+<td align="center">5.5e-13</td>
+<td align="center">5.0e-3</td>
+</tr>
+<tr class="even">
+<td align="center">echoSMs</td>
+<td align="center">5.5e-13</td>
+<td align="center">5.5e-13</td>
+<td align="center">-</td>
+<td align="center">5.0e-3</td>
+</tr>
+<tr class="odd">
+<td align="center">NOAA SWFSC applet</td>
+<td align="center">5.0e-3</td>
+<td align="center">5.0e-3</td>
+<td align="center">5.0e-3</td>
+<td align="center">-</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="tab-pane" id="krm_variant-body_embedded" role="tabpanel" aria-labelledby="krm_variant-body_embedded-tab">
+
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th align="center">Compared to…</th>
+<th align="center">
+<span class="math inline">\vert \overline{\Delta TS}
+\vert</span> (dB)</th>
+<th align="center">
+<span class="math inline">\max \vert \Delta TS
+\vert</span> (dB)</th>
+</tr></thead>
+<tbody><tr class="odd">
+<td align="center">echoSMs</td>
+<td align="center">3.4e-14</td>
+<td align="center">1.9e-13</td>
+</tr></tbody>
+</table>
+</div>
+<div class="tab-pane" id="krm_variant-mixed" role="tabpanel" aria-labelledby="krm_variant-mixed-tab">
+
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th align="center">Compared to…</th>
+<th align="center">
+<span class="math inline">\vert \overline{\Delta TS}
+\vert</span> (dB)</th>
+<th align="center">
+<span class="math inline">\max \vert \Delta TS
+\vert</span> (dB)</th>
+</tr></thead>
+<tbody><tr class="odd">
+<td align="center">echoSMs</td>
+<td align="center">3.4e-14</td>
+<td align="center">1.9e-13</td>
+</tr></tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="section level5">
+<h5 id="cod">Cod<a class="anchor" aria-label="anchor" href="#cod"></a>
+</h5>
+<div class="panel-tabset">
+
+
+
+<ul class="nav nav-tabs" id="NA" role="tablist">
+<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#krm_variant-lowcontrast-1" id="krm_variant-lowcontrast-1-tab" type="button" role="tab" aria-controls="krm_variant-lowcontrast-1" aria-selected="true" class="active nav-link"><code>krm_variant = lowcontrast</code></button></li>
+<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#krm_variant-body_embedded-1" id="krm_variant-body_embedded-1-tab" type="button" role="tab" aria-controls="krm_variant-body_embedded-1" aria-selected="false" class="nav-link"><code>krm_variant = body_embedded</code></button></li>
+<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#krm_variant-mixed-1" id="krm_variant-mixed-1-tab" type="button" role="tab" aria-controls="krm_variant-mixed-1" aria-selected="false" class="nav-link"><code>krm_variant = mixed</code></button></li>
+</ul>
+<div class="tab-content">
+<div class="active  tab-pane" id="krm_variant-lowcontrast-1" role="tabpanel" aria-labelledby="krm_variant-lowcontrast-1-tab">
+
+<table class="table">
+<thead><tr class="header">
+<th align="center">
+<span class="math inline">\vert \overline{\Delta TS}
+\vert</span> (dB)</th>
+<th align="center"></th>
+<th align="center"></th>
+<th align="center"></th>
+<th align="center"></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="center"></td>
+<td align="center">acousticTS</td>
+<td align="center">KRMr</td>
+<td align="center">echoSMs</td>
+<td align="center">NOAA SWFSC applet</td>
+</tr>
+<tr class="even">
+<td align="center">acousticTS</td>
+<td align="center">-</td>
+<td align="center">1.3e-14</td>
+<td align="center">5.4e-15</td>
+<td align="center">2.6e-3</td>
+</tr>
+<tr class="odd">
+<td align="center">KRMr</td>
+<td align="center">1.3e-14</td>
+<td align="center">-</td>
+<td align="center">3.9e-14</td>
+<td align="center">-</td>
+</tr>
+<tr class="even">
+<td align="center">echoSMs</td>
+<td align="center">5.4e-14</td>
+<td align="center">3.9e-14</td>
+<td align="center">-</td>
+<td align="center">-</td>
+</tr>
+<tr class="odd">
+<td align="center">NOAA SWFSC applet</td>
+<td align="center">2.6e-3</td>
+<td align="center">-</td>
+<td align="center">-</td>
+<td align="center">-</td>
+</tr>
+</tbody>
+</table>
+<table class="table">
+<thead><tr class="header">
+<th align="center">
+<span class="math inline">\max \vert {\Delta TS}
+\vert</span> (dB)</th>
+<th align="center"></th>
+<th align="center"></th>
+<th align="center"></th>
+<th align="center"></th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="center"></td>
+<td align="center">acousticTS</td>
+<td align="center">KRMr</td>
+<td align="center">echoSMs</td>
+<td align="center">NOAA SWFSC applet</td>
+</tr>
+<tr class="even">
+<td align="center">acousticTS</td>
+<td align="center">-</td>
+<td align="center">7.8e-14</td>
+<td align="center">3.6e-14</td>
+<td align="center">5.0e-3</td>
+</tr>
+<tr class="odd">
+<td align="center">KRMr</td>
+<td align="center">7.8e-14</td>
+<td align="center">-</td>
+<td align="center">8.5e-13</td>
+<td align="center">-</td>
+</tr>
+<tr class="even">
+<td align="center">echoSMs</td>
+<td align="center">3.6e-14</td>
+<td align="center">8.5e-13</td>
+<td align="center">-</td>
+<td align="center">-</td>
+</tr>
+<tr class="odd">
+<td align="center">NOAA SWFSC applet</td>
+<td align="center">5.0e-3</td>
+<td align="center">-</td>
+<td align="center">-</td>
+<td align="center">-</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="tab-pane" id="krm_variant-body_embedded-1" role="tabpanel" aria-labelledby="krm_variant-body_embedded-1-tab">
+
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th align="center">Compared to…</th>
+<th align="center">
+<span class="math inline">\vert \overline{\Delta TS}
+\vert</span> (dB)</th>
+<th align="center">
+<span class="math inline">\max \vert \Delta TS
+\vert</span> (dB)</th>
+</tr></thead>
+<tbody><tr class="odd">
+<td align="center">echoSMs</td>
+<td align="center">6.2e-15</td>
+<td align="center">5.7e-14</td>
+</tr></tbody>
+</table>
+</div>
+<div class="tab-pane" id="krm_variant-mixed-1" role="tabpanel" aria-labelledby="krm_variant-mixed-1-tab">
+
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th align="center">Compared to…</th>
+<th align="center">
+<span class="math inline">\vert \overline{\Delta TS}
+\vert</span> (dB)</th>
+<th align="center">
+<span class="math inline">\max \vert \Delta TS
+\vert</span> (dB)</th>
+</tr></thead>
+<tbody><tr class="odd">
+<td align="center">echoSMs</td>
+<td align="center">6.2e-15</td>
+<td align="center">5.7e-14</td>
+</tr></tbody>
+</table>
+</div>
+</div>
+</div>
 <p>Those values make the branch behavior explicit:</p>
 <ol style="list-style-type: decimal">
 <li>
@@ -580,13 +761,14 @@ spectrum.</li>
 literature convention, even though on both bundled fish frequency grids
 it collapses numerically onto <code>body_embedded</code>.</li>
 </ol>
-<p>So the two benchmark roles are now explicit:</p>
+<p>The two benchmark roles are explicit:</p>
 <ol style="list-style-type: decimal">
 <li>canonical modal-series tables for isolated-shape KRM implementation
 checks, and</li>
 <li>bundled-fish compatibility checks for the body-plus-swimbladder
 convention choice.</li>
 </ol>
+</div>
 </div>
 </div>
 </div>

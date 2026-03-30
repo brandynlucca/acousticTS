@@ -2,12 +2,10 @@
 
 ## Introduction
 
-Experimental Unvalidated
+Unvalidated Experimental
 
-*Model-family pages:*
 [Overview](https://brandynlucca.github.io/acousticTS/articles/bcms/index.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/bcms/bcms-implementation.md)
-[Theory](https://brandynlucca.github.io/acousticTS/articles/bcms/bcms-theory.md)
 
 The bent-cylinder modal series solution (`BCMS`) is a curvature-aware
 extension of the straight finite-cylinder modal family developed by

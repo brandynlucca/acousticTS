@@ -4,9 +4,7 @@
 
 Benchmarked Validated
 
-*Model-family pages:*
 [Overview](https://brandynlucca.github.io/acousticTS/articles/dwba/index.md)
-[Implementation](https://brandynlucca.github.io/acousticTS/articles/dwba/dwba-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/dwba/dwba-theory.md)
 
 These pages follow the weak-scattering elongated-body formulation and
@@ -73,7 +71,7 @@ cylinder_scatterer
     ##  h: 1.03
     ## Body orientation (relative to transducer face/axis):1.571 radians
 
-This object now contains the geometry, the fluid-like material
+This object contains the geometry, the fluid-like material
 interpretation, and the orientation needed by the model. That makes it a
 good starting point for checking whether later differences in output
 come from frequency, orientation, or material contrast rather than from
@@ -195,16 +193,16 @@ cylinder files. The comparison below uses those canonical targets
 directly. Elapsed times are representative values from the current
 machine.
 
-| Geometry                           | Max abs. delta vs benchmark (dB) | Mean abs. delta vs benchmark (dB) | Elapsed (s) |
-|:-----------------------------------|---------------------------------:|----------------------------------:|------------:|
-| Weakly scattering sphere           |                         16.17744 |                           0.29031 |        0.74 |
-| Weakly scattering prolate spheroid |                          0.04993 |                           0.01735 |        5.11 |
-| Weakly scattering cylinder         |                          2.28194 |                           0.06664 |        2.53 |
+| Geometry                           | Max abs. \Delta vs benchmark (dB) | Mean abs. \Delta vs benchmark (dB) | Elapsed (s) |
+|:-----------------------------------|----------------------------------:|-----------------------------------:|------------:|
+| Weakly scattering sphere           |                          16.17744 |                            0.29031 |        0.74 |
+| Weakly scattering prolate spheroid |                           0.04993 |                            0.01735 |        5.11 |
+| Weakly scattering cylinder         |                           2.28194 |                            0.06664 |        2.53 |
 
 Those values still need to be read carefully. The largest absolute
-deltas are concentrated near deep nulls, so the sphere and cylinder
-maxima are driven by a small number of frequencies rather than by a
-uniform offset across the full sweep.
+\Delta TS values are concentrated near deep nulls, so the sphere and
+cylinder maxima are driven by a small number of frequencies rather than
+by a uniform offset across the full sweep.
 
 There is no comparable benchmarked configuration sweep for DWBA beyond
 the target definition itself. The implementation does not expose a
@@ -223,11 +221,11 @@ reproduces the published deterministic DWBA implementation and to show
 how that same geometry compares with an independent software
 implementation.
 
-| Comparison                                                                 | Mean abs. delta TS (dB) | Max abs. delta TS (dB) |
-|:---------------------------------------------------------------------------|------------------------:|-----------------------:|
-| acousticTS vs published McGehee MATLAB implementation                      |                1.23e-05 |               4.33e-05 |
-| acousticTS vs independent DWBA implementation                              |                 0.42284 |                1.01167 |
-| Independent DWBA implementation vs published McGehee MATLAB implementation |                 0.42284 |                1.01167 |
+| Comparison                                                                 | Mean abs. \Delta TS (dB) | Max abs. \Delta TS (dB) |
+|:---------------------------------------------------------------------------|-------------------------:|------------------------:|
+| acousticTS vs published McGehee MATLAB implementation                      |                 1.23e-05 |                4.33e-05 |
+| acousticTS vs independent DWBA implementation                              |                  0.42284 |                 1.01167 |
+| Independent DWBA implementation vs published McGehee MATLAB implementation |                  0.42284 |                 1.01167 |
 
 On this bundled krill geometry, acousticTS reproduces the published
 McGehee MATLAB implementation essentially exactly, while the independent

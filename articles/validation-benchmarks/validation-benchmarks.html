@@ -83,11 +83,19 @@
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
-<li class="nav-item"><a class="nav-link" href="../../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../../reference/index.html">Function reference</a></li>
+    <li><a class="dropdown-item" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
+    <li><a class="dropdown-item" href="../../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -125,7 +133,7 @@ object and unit sanity, then moves to canonical benchmark reproduction,
 and finally asks whether the numerical behavior is stable enough that
 any remaining discrepancy deserves physical interpretation.</p>
 <div class="float">
-<img src="validation-ladder.svg" alt="Validation ladder"><div class="figcaption">Validation ladder</div>
+<img src="validation-ladder.png" alt="Validation ladder"><div class="figcaption">Validation ladder</div>
 </div>
 <p>That layered view matters because benchmark comparisons are only
 informative when the target definition, acoustic assumptions, numerical
@@ -155,7 +163,7 @@ package’s broader numerical validation strategy.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">benchmark_ts</span><span class="op">$</span><span class="va">frequency_spectra</span><span class="op">$</span><span class="va">index</span><span class="op">$</span><span class="va">frequency</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 12000 14000 16000 18000 20000 22000</span></span></code></pre>
-<p>The benchmark cases currently emphasize canonical exact or near-exact
+<p>The benchmark cases emphasize canonical exact or near-exact
 comparison problems: <code>SPHMS</code> sphere cases with several
 boundary conditions, <code>FCMS</code> finite-cylinder cases, and
 <code>PSMS</code> prolate-spheroid cases. That combination is useful
@@ -168,17 +176,17 @@ behaves consistently when anchored to a trusted canonical case.</p>
 <div class="section level2">
 <h2 id="validation-registry-snapshot">Validation registry snapshot<a class="anchor" aria-label="anchor" href="#validation-registry-snapshot"></a>
 </h2>
-<p>The package now also keeps a small internal validation registry so
-the family-page badges, model-library summaries, and validation evidence
-can be drawn from one source rather than maintained separately.</p>
+<p>The package also keeps a small internal validation registry so the
+family-page badges, model-library summaries, and validation evidence can
+be drawn from one source rather than maintained separately.</p>
 <div class="section level3">
 <h3 id="family-statuses">Family statuses<a class="anchor" aria-label="anchor" href="#family-statuses"></a>
 </h3>
 <table class="table">
 <colgroup>
-<col width="8%">
-<col width="45%">
-<col width="45%">
+<col width="7%">
+<col width="40%">
+<col width="51%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">Family</th>
@@ -214,12 +222,12 @@ can be drawn from one source rather than maintained separately.</p>
 <tr class="even">
 <td align="left">BCMS</td>
 <td align="left">Modal-series families</td>
-<td align="left">Experimental, Unvalidated</td>
+<td align="left">Unvalidated, Experimental</td>
 </tr>
 <tr class="odd">
 <td align="left">ECMS</td>
 <td align="left">Modal-series families</td>
-<td align="left">Experimental, Unvalidated</td>
+<td align="left">Unvalidated, Experimental</td>
 </tr>
 <tr class="even">
 <td align="left">DWBA</td>
@@ -244,7 +252,7 @@ can be drawn from one source rather than maintained separately.</p>
 <tr class="even">
 <td align="left">TRCM</td>
 <td align="left">Approximation and ray-based families</td>
-<td align="left">Benchmarked</td>
+<td align="left">Benchmarked, Unvalidated</td>
 </tr>
 <tr class="odd">
 <td align="left">PCDWBA</td>
@@ -254,17 +262,17 @@ can be drawn from one source rather than maintained separately.</p>
 <tr class="even">
 <td align="left">BBFM</td>
 <td align="left">Composite and emerging families</td>
-<td align="left">Experimental, Unvalidated</td>
+<td align="left">Unvalidated, Experimental</td>
 </tr>
 <tr class="odd">
 <td align="left">VESM</td>
 <td align="left">Composite and emerging families</td>
-<td align="left">Experimental, Unvalidated</td>
+<td align="left">Validated, Experimental</td>
 </tr>
 <tr class="even">
 <td align="left">TMM</td>
 <td align="left">Composite and emerging families</td>
-<td align="left">Benchmarked, Validated, Experimental</td>
+<td align="left">Benchmarked, Partially validated, Experimental</td>
 </tr>
 </tbody>
 </table>
@@ -383,15 +391,15 @@ canonical shape branches.</td>
 </table>
 </div>
 <div class="section level3">
-<h3 id="external-comparison-evidence">External-comparison evidence<a class="anchor" aria-label="anchor" href="#external-comparison-evidence"></a>
+<h3 id="validated-comparison-evidence">Validated-comparison evidence<a class="anchor" aria-label="anchor" href="#validated-comparison-evidence"></a>
 </h3>
 <table class="table">
 <colgroup>
 <col width="2%">
 <col width="5%">
-<col width="19%">
-<col width="28%">
-<col width="43%">
+<col width="18%">
+<col width="30%">
+<col width="42%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">Family</th>
@@ -484,6 +492,15 @@ bent-body cases.</td>
 and <code>echopop</code> PCDWBA workflows.</td>
 </tr>
 <tr class="even">
+<td align="left">VESM</td>
+<td align="left">Validated</td>
+<td align="left">Reference Python VESM workflow</td>
+<td align="left">Documented spherical layered case used by the original
+VESM implementation.</td>
+<td align="left">Validated against the reference Python VESM
+implementation on the documented layered-sphere case.</td>
+</tr>
+<tr class="odd">
 <td align="left">TMM</td>
 <td align="left">Validated</td>
 <td align="left">BEMPP far-field checks</td>
@@ -492,13 +509,125 @@ prolate cases.</td>
 <td align="left">Validated against external BEMPP far-field checks for
 sphere, oblate, and prolate pressure-release cases.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">TMM</td>
 <td align="left">Validated</td>
 <td align="left">Exact general-angle spheroidal solution</td>
 <td align="left">General-angle prolate retained-state validation.</td>
 <td align="left">Retained prolate angular products are also checked
 against the exact general-angle spheroidal solution.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level3">
+<h3 id="partially-validated-scope-evidence">Partially-validated scope evidence<a class="anchor" aria-label="anchor" href="#partially-validated-scope-evidence"></a>
+</h3>
+<table class="table">
+<colgroup>
+<col width="2%">
+<col width="6%">
+<col width="10%">
+<col width="19%">
+<col width="62%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Family</th>
+<th align="left">Evidence type</th>
+<th align="left">Source</th>
+<th align="left">Scope</th>
+<th align="left">Summary</th>
+</tr></thead>
+<tbody><tr class="odd">
+<td align="left">TMM</td>
+<td align="left">Partially validated</td>
+<td align="left">Cylinder retained-angle scope</td>
+<td align="left">Cylinder retained-angle scope limitation and
+guardrails.</td>
+<td align="left">TMM is partially validated because the sphere, oblate,
+and prolate branches have external checks, but retained general-angle
+cylinder products remain outside the validated public scope.</td>
+</tr></tbody>
+</table>
+</div>
+<div class="section level3">
+<h3 id="experimental-scope-evidence">Experimental-scope evidence<a class="anchor" aria-label="anchor" href="#experimental-scope-evidence"></a>
+</h3>
+<table class="table">
+<colgroup>
+<col width="2%">
+<col width="4%">
+<col width="14%">
+<col width="22%">
+<col width="56%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Family</th>
+<th align="left">Evidence type</th>
+<th align="left">Source</th>
+<th align="left">Scope</th>
+<th align="left">Summary</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">BCMS</td>
+<td align="left">Experimental</td>
+<td align="left">Internal FCMS-based reference reconstruction</td>
+<td align="left">Uniform-curvature cylinder coherence extension of
+FCMS.</td>
+<td align="left">BCMS is currently marked experimental because the
+documented checks are internal coherence reconstructions rather than an
+external benchmark or software-comparison ladder.</td>
+</tr>
+<tr class="even">
+<td align="left">ECMS</td>
+<td align="left">Experimental</td>
+<td align="left">Independent algebra transcription</td>
+<td align="left">Elastic-cylinder component family and near-broadside
+canonical cases.</td>
+<td align="left">ECMS is currently marked experimental because the
+documented checks are independent algebra reconstructions rather than an
+external benchmark or software-comparison ladder.</td>
+</tr>
+<tr class="odd">
+<td align="left">PCDWBA</td>
+<td align="left">Experimental</td>
+<td align="left">Current package workflow surface</td>
+<td align="left">Current package-facing PCDWBA workflow and argument
+surface.</td>
+<td align="left">PCDWBA is currently marked experimental because the
+public package workflow is still being tightened even though the current
+source- level comparison cases are documented.</td>
+</tr>
+<tr class="even">
+<td align="left">BBFM</td>
+<td align="left">Experimental</td>
+<td align="left">Internal DWBA + ECMS reconstruction</td>
+<td align="left">Internal composite-component consistency checks
+only.</td>
+<td align="left">BBFM is currently marked experimental because it has
+documented internal reconstruction checks but no external benchmark
+ladder or independent public implementation comparison.</td>
+</tr>
+<tr class="odd">
+<td align="left">VESM</td>
+<td align="left">Experimental</td>
+<td align="left">Current layered-sphere workflow surface</td>
+<td align="left">Current documented layered-sphere workflow
+surface.</td>
+<td align="left">VESM is currently marked experimental because the
+documented public workflow is still limited to the current
+layered-sphere scope.</td>
+</tr>
+<tr class="even">
+<td align="left">TMM</td>
+<td align="left">Experimental</td>
+<td align="left">Current retained-state branch matrix</td>
+<td align="left">Current retained-state branch matrix across supported
+shapes.</td>
+<td align="left">TMM is currently marked experimental because the
+retained-state workflow and branch matrix are still guarded while
+shape-specific support continues to be tightened.</td>
 </tr>
 </tbody>
 </table>

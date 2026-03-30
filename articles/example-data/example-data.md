@@ -15,6 +15,8 @@ without first building every target from scratch. Those objects are not
 meant to replace careful object construction, but they do reduce the
 distance between installation and a meaningful first calculation.
 
+![Example data workflow map](example-data-map.png)
+
 ## Bundled objects
 
 The most obvious data entry points are `sardine`, `cod`, `krill`, and

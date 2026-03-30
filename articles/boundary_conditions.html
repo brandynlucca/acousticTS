@@ -83,11 +83,19 @@
     <li><a class="dropdown-item" href="../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../articles/bibliography/bibliography.html">Bibliography</a></li>
-<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../reference/index.html">Function reference</a></li>
+    <li><a class="dropdown-item" href="../articles/bibliography/bibliography.html">Bibliography</a></li>
+    <li><a class="dropdown-item" href="../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -135,8 +143,6 @@ guide</a>. In the package theory pages, medium <code>1</code> is always
 the surrounding seawater, medium <code>2</code> is the first target
 region encountered from the outside, and deeper internal regions are
 numbered inward.</p>
-<object type="image/svg+xml" data="boundary-conditions-overview.svg" style="width:100%;" aria-label="Boundary-condition overview">
-</object>
 <p>The main boundary families separate most naturally according to the
 field quantity constrained most directly at the interface: pressure,
 normal velocity, layered acoustic transmission, or elastic traction.</p>
@@ -178,8 +184,7 @@ fluid, the acoustic pressure field <span class="math inline">p(\mathbf{x}, t)</s
 field <span class="math inline">\mathbf{v}(\mathbf{x}, t)</span> satisfy
 the linearized momentum equation:</p>
 <p><span class="math display">
-  \rho \frac{\partial \mathbf{v}}{\partial t} =
-    -\nabla p,
+  \rho \frac{\partial \mathbf{v}}{\partial t} = -\nabla p,
 </span></p>
 <p>where <span class="math inline">\rho</span> is the surrounding-fluid
 density, <span class="math inline">\mathbf{x}</span> is the position
@@ -279,8 +284,7 @@ normal traction gives continuity of acoustic pressure:</p>
 in the two media. Using the linearized momentum relation in each
 fluid:</p>
 <p><span class="math display">
-  \mathbf{v}_j =
-    -\frac{1}{i \omega \rho_j}\nabla p_j,
+  \mathbf{v}_j = -\frac{1}{i \omega \rho_j}\nabla p_j,
 </span></p>
 <p>the normal-velocity condition can also be written as:</p>
 <p><span class="math display">
@@ -456,17 +460,16 @@ tangential traction, then the interface conditions may be written
 schematically as:</p>
 <p><span class="math display">
   p = -\sigma_{nn},
-  \qquad
-  -\frac{1}{i \omega \rho_f}\frac{\partial p}{\partial n} =
-    -i \omega u_n,
+  \qquad -\frac{1}{i \omega \rho_f}\frac{\partial p}{\partial n} = -i
+\omega u_n,
   \qquad
   \sigma_{nt} = 0,
 </span></p>
 <p>where <span class="math inline">\rho_f</span> is the fluid density.
 The exact sign of the pressure-traction relation depends on the
 outward-normal convention, but the physical content is unchanged. The
-shell now carries both normal and tangential motion, and that coupling
-makes the scattering problem much richer than either the rigid or the
+shell carries both normal and tangential motion, and that coupling makes
+the scattering problem much richer than either the rigid or the
 inelastic-shell cases. The resulting modal systems support resonance
 structure associated with shell thickness, elastic moduli, and both the
 exterior and interior fluid properties.</p>

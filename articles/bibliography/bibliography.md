@@ -3,19 +3,7 @@
 ## Introduction
 
 This page is generated directly from the shared bibliography file used
-across the `acousticTS` vignette tree.
-
-Each cited source is maintained once in
-[vignettes/REFERENCES.bib](https://brandynlucca.github.io/acousticTS/articles/REFERENCES.bib)
-and can then be cited throughout the theory, implementation, workflow,
-and example-data pages using standard Pandoc citation keys such as
-`[@stanton_1989]`.
-
-## Notes
-
-The bibliography below includes every entry currently retained in the
-shared BibTeX file, including literature citations and external software
-or data resources referenced elsewhere in the documentation.
+across acousticTS documentation.
 
 ## Complete Bibliography
 

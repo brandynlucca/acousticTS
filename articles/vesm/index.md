@@ -2,12 +2,10 @@
 
 ## Overview
 
-Experimental Unvalidated
+Validated Experimental
 
-*Model-family pages:*
-[Overview](https://brandynlucca.github.io/acousticTS/articles/vesm/index.md)
-[Implementation](https://brandynlucca.github.io/acousticTS/articles/vesm/vesm-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/vesm/vesm-theory.md)
+[Implementation](https://brandynlucca.github.io/acousticTS/articles/vesm/vesm-implementation.md)
 
 These pages are motivated by layered gas-bearing fish scattering models
 and viscous resonance broadening ([Khodabandeloo et al.
@@ -52,6 +50,8 @@ shell.
 
 - Validated against the reference Python VESM implementation on the
   documented layered-sphere case.
+- VESM is currently marked experimental because the documented public
+  workflow is still limited to the current layered-sphere scope.
 
 ### Family pages
 

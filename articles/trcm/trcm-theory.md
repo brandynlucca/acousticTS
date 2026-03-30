@@ -2,12 +2,10 @@
 
 ## Introduction
 
-Benchmarked
+Benchmarked Unvalidated
 
-*Model-family pages:*
 [Overview](https://brandynlucca.github.io/acousticTS/articles/trcm/index.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/trcm/trcm-implementation.md)
-[Theory](https://brandynlucca.github.io/acousticTS/articles/trcm/trcm-theory.md)
 
 The two-ray cylinder model (TRCM) is a high-frequency approximation for
 elongated fluid-like bodies. It assumes that the dominant backscatter

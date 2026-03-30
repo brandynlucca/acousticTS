@@ -83,11 +83,19 @@
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
-<li class="nav-item"><a class="nav-link" href="../../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../../reference/index.html">Function reference</a></li>
+    <li><a class="dropdown-item" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
+    <li><a class="dropdown-item" href="../../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -113,8 +121,15 @@
 <div class="section level2">
 <h2 id="acousticts-implementation">acousticTS implementation<a class="anchor" aria-label="anchor" href="#acousticts-implementation"></a>
 </h2>
-<p><span class="model-tag experimental">Experimental</span> <span class="model-tag unvalidated">Unvalidated</span></p>
-<p><em>Model-family pages:</em> <a href="index.html">Overview</a> <a href="bbfm-implementation.html">Implementation</a> <a href="bbfm-theory.html">Theory</a></p>
+<div class="model-status-line">
+<span class="model-tag unvalidated">Unvalidated</span> <span class="model-tag experimental">Experimental</span>
+</div>
+<div class="model-nav">
+<div class="model-nav-links">
+<a class="model-nav-badge" href="index.html">Overview</a>
+<a class="model-nav-badge" href="bbfm-theory.html">Theory</a>
+</div>
+</div>
 <p>This family is best read alongside the swimbladder-less fish and
 composite-scatterer literature that motivates explicit flesh-body and
 backbone terms <span class="citation">(<a href="#ref-gorska_etal_2005">Gorska, Ona, and Korneliussen 2005</a>; <a href="#ref-stanton_sound_1998-1">Stanton, Chu, and Wiebe 1998</a>; <a href="#ref-clay_horne_1994">Clay and Horne 1994</a>)</span>.</p>
@@ -123,7 +138,7 @@ backbone terms <span class="citation">(<a href="#ref-gorska_etal_2005">Gorska, O
 swimbladder-less targets whose flesh body and backbone should remain
 acoustically explicit components rather than being collapsed into a
 single effective medium.</p>
-<p>In practice, <code>BBFM</code> is the package’s current composite
+<p>In practice, <code>BBFM</code> is the package’s composite
 body-plus-backbone family:</p>
 <ol style="list-style-type: decimal">
 <li>the flesh body is evaluated with <code>DWBA</code>,</li>
@@ -134,11 +149,10 @@ phase factor, and</li>
 <code>sigma_bs</code> and <code>TS</code> are reported.</li>
 </ol>
 <div class="experiment" data-title="Validation scope">
-<p><code>BBFM</code> is still an experimental family. The package
-currently documents the composite bookkeeping and verifies that the
-stored result reproduces the stated component sum, but it does not yet
-provide an external benchmark ladder or a separate public software
-comparison.</p>
+<p><code>BBFM</code> is an experimental family. The package documents
+the composite bookkeeping and verifies that the stored result reproduces
+the stated component sum, but it does not yet provide an external
+benchmark ladder or a separate public software comparison.</p>
 </div>
 <div class="caution" data-title="Approximation structure">
 <p><code>BBFM</code> is not a fully coupled three-medium boundary-value
@@ -430,7 +444,7 @@ implied by the model design:</p>
 <span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>    quantity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Max |delta f_bs|"</span>, <span class="st">"Max |delta TS| (dB)"</span><span class="op">)</span>,</span>
+<span>    quantity <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Max $|\\Delta f_{bs}|$"</span>, <span class="st">"Max $|\\Delta TS|$ (dB)"</span><span class="op">)</span>,</span>
 <span>    value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>      <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">bbfm_check</span><span class="op">$</span><span class="va">delta_f_bs</span><span class="op">)</span>,</span>
 <span>      <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">bbfm_check</span><span class="op">$</span><span class="va">delta_TS_dB</span><span class="op">)</span><span class="op">)</span></span>
@@ -445,16 +459,19 @@ implied by the model design:</p>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">Max |delta f_bs|</td>
+<td align="left">Max <span class="math inline">&amp;#124;\Delta
+f_{bs}&amp;#124;</span>
+</td>
 <td align="right">0</td>
 </tr>
 <tr class="even">
-<td align="left">Max |delta TS| (dB)</td>
+<td align="left">Max <span class="math inline">&amp;#124;\Delta
+TS&amp;#124;</span> (dB)</td>
 <td align="right">0</td>
 </tr>
 </tbody>
 </table>
-<p>For the current implementation, those deltas should collapse to
+<p>For this reconstruction check, those <span class="math inline">\Delta</span> values should collapse to
 floating-point noise. That does not replace an external benchmark, but
 it does verify that the family is carrying out the coherent composite
 sum it claims to perform.</p>
@@ -488,9 +505,9 @@ anatomy-specific components while still letting them interfere
 coherently in one stored body frame.</p>
 </div>
 <div class="section level2">
-<h2 id="current-scope">Current scope<a class="anchor" aria-label="anchor" href="#current-scope"></a>
+<h2 id="scope">Scope<a class="anchor" aria-label="anchor" href="#scope"></a>
 </h2>
-<p>At the moment, <code>BBFM</code> should be interpreted as:</p>
+<p><code>BBFM</code> should be interpreted as:</p>
 <ul>
 <li>a reproducible composite model for a body plus an explicit
 backbone,</li>
@@ -499,10 +516,10 @@ should remain acoustically explicit,</li>
 <li>a first-order coherent combination model rather than a fully coupled
 multi-region boundary-value solve.</li>
 </ul>
-<p>So the current implementation answers the bookkeeping question
-clearly: acousticTS can construct, evaluate, and inspect this composite
-family in a transparent way. The remaining open work is external
-benchmarking and, later, more tightly coupled composite physics.</p>
+<p>So the implementation answers the bookkeeping question clearly:
+acousticTS can construct, evaluate, and inspect this composite family in
+a transparent way. The remaining open work is external benchmarking and,
+later, more tightly coupled composite physics.</p>
 </div>
 <div class="section level2">
 <h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>

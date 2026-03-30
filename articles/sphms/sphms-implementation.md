@@ -4,9 +4,7 @@
 
 Benchmarked Validated
 
-*Model-family pages:*
 [Overview](https://brandynlucca.github.io/acousticTS/articles/sphms/index.md)
-[Implementation](https://brandynlucca.github.io/acousticTS/articles/sphms/sphms-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/sphms/sphms-theory.md)
 
 These pages follow the classical exact sphere literature for fluid,
@@ -155,16 +153,16 @@ stored in `benchmark_ts`. The summary below uses the full spherical
 benchmark grid. Elapsed times are representative values from the current
 machine rather than universal expectations.
 
-| Boundary           | Max abs. delta TS (dB) | Mean abs. delta TS (dB) | Elapsed (s) |
-|:-------------------|-----------------------:|------------------------:|------------:|
-| `fixed_rigid`      |                0.00497 |                 0.00246 |        0.03 |
-| `pressure_release` |                0.00500 |                 0.00243 |        0.09 |
-| `gas_filled`       |                0.00499 |                 0.00263 |        0.06 |
-| `liquid_filled`    |                0.00492 |                 0.00241 |        0.11 |
+| Boundary           | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | Elapsed (s) |
+|:-------------------|------------------------:|-------------------------:|------------:|
+| `fixed_rigid`      |                 0.00497 |                  0.00246 |        0.03 |
+| `pressure_release` |                 0.00500 |                  0.00243 |        0.09 |
+| `gas_filled`       |                 0.00499 |                  0.00263 |        0.06 |
+| `liquid_filled`    |                 0.00492 |                  0.00241 |        0.11 |
 
 All four spherical boundary types remain very close to the benchmark
-family over the full grid, with the current implementation staying
-within about 0.005 dB in the worst case.
+family over the full grid, with the implementation staying within about
+0.005 dB in the worst case.
 
 #### Cross-software implementation checks
 
@@ -176,12 +174,12 @@ the software implementations agree when they are solving the same
 penetrable spherical problem, rather than only asking how closely any
 one implementation tracks the benchmark family.
 
-| Boundary        | Comparison              | Mean abs. delta TS (dB) | Max abs. delta TS (dB) |
-|:----------------|:------------------------|------------------------:|-----------------------:|
-| `gas_filled`    | acousticTS vs `KRMr`    |                3.21e-14 |               2.21e-12 |
-| `gas_filled`    | acousticTS vs `echoSMs` |                1.71e-13 |               1.52e-11 |
-| `liquid_filled` | acousticTS vs `KRMr`    |                5.70e-12 |               1.30e-10 |
-| `liquid_filled` | acousticTS vs `echoSMs` |                3.68e-11 |               3.37e-09 |
+| Boundary        | Comparison              | Mean abs. \Delta TS (dB) | Max abs. \Delta TS (dB) |
+|:----------------|:------------------------|-------------------------:|------------------------:|
+| `gas_filled`    | acousticTS vs `KRMr`    |                 3.21e-14 |                2.21e-12 |
+| `gas_filled`    | acousticTS vs `echoSMs` |                 1.71e-13 |                1.52e-11 |
+| `liquid_filled` | acousticTS vs `KRMr`    |                 5.70e-12 |                1.30e-10 |
+| `liquid_filled` | acousticTS vs `echoSMs` |                 3.68e-11 |                3.37e-09 |
 
 Those values show that the penetrable SPHMS branches are effectively
 identical across the three implementations on the shared spherical
@@ -196,11 +194,11 @@ liquid-filled benchmark fit starts to move. The table below keeps the
 same weakly scattering liquid-filled benchmark and only changes that
 truncation cap.
 
-| Boundary        | `m_limit`    | Max abs. delta TS (dB) | Mean abs. delta TS (dB) | Elapsed (s) |
-|:----------------|:-------------|-----------------------:|------------------------:|------------:|
-| `liquid_filled` | default rule |                0.00492 |                 0.00241 |        0.07 |
-| `liquid_filled` | `20`         |                0.52550 |                 0.00640 |        0.14 |
-| `liquid_filled` | `10`         |               58.24225 |                 8.07819 |        0.02 |
+| Boundary        | `m_limit`    | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | Elapsed (s) |
+|:----------------|:-------------|------------------------:|-------------------------:|------------:|
+| `liquid_filled` | default rule |                 0.00492 |                  0.00241 |        0.07 |
+| `liquid_filled` | `20`         |                 0.52550 |                  0.00640 |        0.14 |
+| `liquid_filled` | `10`         |                58.24225 |                  8.07819 |        0.02 |
 
 That pattern is useful because it shows that SPHMS is not especially
 tolerant of aggressive modal under-truncation, even though the

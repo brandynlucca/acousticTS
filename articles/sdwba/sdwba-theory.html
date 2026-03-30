@@ -83,11 +83,19 @@
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
-<li class="nav-item"><a class="nav-link" href="../../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../../reference/index.html">Function reference</a></li>
+    <li><a class="dropdown-item" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
+    <li><a class="dropdown-item" href="../../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -113,15 +121,23 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p><span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span></p>
-<p><em>Model-family pages:</em> <a href="index.html">Overview</a> <a href="sdwba-implementation.html">Implementation</a> <a href="sdwba-theory.html">Theory</a></p>
+<div class="model-status-line">
+<span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span>
+</div>
+<div class="model-nav">
+<div class="model-nav-links">
+<a class="model-nav-badge" href="index.html">Overview</a>
+<a class="model-nav-badge" href="sdwba-implementation.html">Implementation</a>
+</div>
+</div>
 <p>The stochastic distorted wave Born approximation (SDWBA) begins with
 the same weak-scattering derivation as the deterministic DWBA, then
 modifies the phase structure of the coherent sum to account for
 unresolved variability in body shape, posture, and internal structure
 <span class="citation">(<a href="#ref-demer_reconciling_2003">Demer and
 Conti 2003</a>; <a href="#ref-conti_improved_2006">Conti and Demer
-2006</a>; <a href="#ref-stanton_sound_1998i"><strong>stanton_sound_1998i?</strong></a>)</span>.</p>
+2006</a>; <a href="#ref-stanton_sound_1998">Stanton et al.
+1998</a>)</span>.</p>
 <p>The deterministic part of the derivation still assumes a weakly
 scattering fluid-like body, so the local scattering strength is
 controlled by small density and compressibility contrasts in the same
@@ -452,6 +468,13 @@ Theoretical Versus Empirical Target Strengths of Krill: Effects of Phase
 Variability on the Distorted-Wave <span>Born</span>
 Approximation.”</span> <em>ICES Journal of Marine Science</em> 60 (2):
 429–34. <a href="https://doi.org/10.1016/S1054-3139(03)00002-X" class="external-link">https://doi.org/10.1016/S1054-3139(03)00002-X</a>.
+</div>
+<div id="ref-stanton_sound_1998" class="csl-entry">
+Stanton, Timothy K., Dezhang Chu, Peter H. Wiebe, Linda V. Martin, and
+Robert L. Eastwood. 1998. <span>“Sound Scattering by Several Zooplankton
+Groups. <span>I</span>. <span>Experimental</span> Determination of
+Dominant Scattering Mechanisms.”</span> <em>The Journal of the
+Acoustical Society of America</em> 103 (1): 225–35. <a href="https://doi.org/10.1121/1.421469" class="external-link">https://doi.org/10.1121/1.421469</a>.
 </div>
 </div>
 </div>

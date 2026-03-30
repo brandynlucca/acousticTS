@@ -133,7 +133,7 @@ This is often the most honest description for biological targets,
 because posture variability, roughness, and unresolved internal
 structure may suppress interference without eliminating it completely.
 
-![Coherence regimes schematic](combining-coherence-schematic.svg)
+![Coherence regimes schematic](combining-coherence-schematic.png)
 
 Coherence regimes schematic
 

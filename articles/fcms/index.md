@@ -4,10 +4,8 @@
 
 Benchmarked Validated
 
-*Model-family pages:*
-[Overview](https://brandynlucca.github.io/acousticTS/articles/fcms/index.md)
-[Implementation](https://brandynlucca.github.io/acousticTS/articles/fcms/fcms-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/fcms/fcms-theory.md)
+[Implementation](https://brandynlucca.github.io/acousticTS/articles/fcms/fcms-implementation.md)
 
 These pages follow the finite-cylinder modal-series literature for
 straight circular cylinders near broadside ([Stanton

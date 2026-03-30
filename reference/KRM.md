@@ -126,7 +126,7 @@ f\_{bladder}\right\|^2. \$\$
 Clay and Horne (1994) derive the swimbladder term for a gas-filled
 inclusion embedded in body tissue, but also note that the low body-water
 contrast can justify the approximation \\k_B \approx k\\. For combined
-body-plus- bladder targets, `acousticTS` exposes that choice through
+body-plus- bladder targets, acousticTS exposes that choice through
 `krm_variant`:
 
 - `"body_embedded"`:

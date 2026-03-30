@@ -2,12 +2,10 @@
 
 ## Introduction
 
-Experimental Unvalidated
+Unvalidated Experimental
 
-*Model-family pages:*
 [Overview](https://brandynlucca.github.io/acousticTS/articles/ecms/index.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/ecms/ecms-implementation.md)
-[Theory](https://brandynlucca.github.io/acousticTS/articles/ecms/ecms-theory.md)
 
 The elastic-cylinder modal series solution (`ECMS`) is the
 solid-cylinder counterpart to the fluid `FCMS` family. It combines the
@@ -66,9 +64,10 @@ compression.
 For an incident plane wave near broadside, the exterior field is
 expanded in cylindrical harmonics:
 
-p\_{1,\mathrm{inc}}(r,\phi) = \sum\_{m=0}^{\infty} \epsilon_m i^m
-J_m(k_1 r)\cos(m\phi), \qquad p\_{1,\mathrm{sca}}(r,\phi) =
+\begin{align\*} p\_{1,\mathrm{inc}}(r,\phi) &= \sum\_{m=0}^{\infty}
+\epsilon_m i^m J_m(k_1 r)\cos(m\phi), \\ p\_{1,\mathrm{sca}}(r,\phi) &=
 \sum\_{m=0}^{\infty} \epsilon_m i^m B_m H_m^{(1)}(k_1 r)\cos(m\phi).
+\end{align\*}
 
 Here J_m is the regular cylindrical Bessel function, H_m^{(1)} is the
 outgoing Hankel function, \epsilon_m is the Neumann factor, and B_m is
@@ -79,9 +78,10 @@ the scattered coefficient of order m.
 The longitudinal and transverse interior potentials may be written
 schematically as:
 
-\Phi_2(r,\phi) = \sum\_{m=0}^{\infty} \epsilon_m i^m C_m J_m(k\_{L,2}
-r)\cos(m\phi), \qquad \Psi_2(r,\phi) = \sum\_{m=0}^{\infty} \epsilon_m
-i^m D_m J_m(k\_{T,2} r)\sin(m\phi).
+\begin{align\*} \Phi_2(r,\phi) &= \sum\_{m=0}^{\infty} \epsilon_m i^m
+C_m J_m(k\_{L,2} r)\cos(m\phi), \\ \Psi_2(r,\phi) &=
+\sum\_{m=0}^{\infty} \epsilon_m i^m D_m J_m(k\_{T,2} r)\sin(m\phi).
+\end{align\*}
 
 with the angular parity chosen so that the resulting displacement
 components match the cylindrical symmetry of order m.
@@ -101,7 +101,7 @@ fields must satisfy three conditions:
 
 Schematically:
 
--\frac{1}{i\omega\rho_1}\frac{\partial p_1}{\partial r} = -i\omega
+\frac{1}{i\omega\rho_1}\frac{\partial p_1}{\partial r} = i\omega
 u\_{r,2}
 
 p_1 = -\sigma\_{rr}^{(2)}

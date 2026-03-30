@@ -83,11 +83,19 @@
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
-<li class="nav-item"><a class="nav-link" href="../../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../../reference/index.html">Function reference</a></li>
+    <li><a class="dropdown-item" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
+    <li><a class="dropdown-item" href="../../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -122,8 +130,9 @@ are related, but they are not interchangeable. Many practical mistakes
 in acousticTS come from confusing one of those layers with another, such
 as treating a shape as if it were already a physical scatterer, or
 treating a model name as if it defined the target itself.</p>
-<object type="image/svg+xml" data="package-concepts-architecture.svg" style="width:100%;" aria-label="Conceptual layers">
-</object>
+<div class="clickable-figure">
+<img class="clickable-figure__image" src="package-concepts-architecture.png" alt="Conceptual layers"><a class="clickable-figure__link" href="../building-shapes/building-shapes.html" aria-label="Shape concepts" title="Shape concepts" style="left:0.53%;top:26.49%;width:38.36%;height:43.69%;"></a><a class="clickable-figure__link" href="../building-scatterers/building-scatterers.html" aria-label="Scatterer concepts" title="Scatterer concepts" style="left:46.03%;top:16.80%;width:23.76%;height:61.72%;"></a><a class="clickable-figure__link" href="../running-models/running-models.html" aria-label="Model execution" title="Model execution" style="left:76.70%;top:35.98%;width:22.73%;height:24.41%;"></a>
+</div>
 <p>This page is the conceptual map for the rest of the documentation.
 The goal is not to derive any model. The goal is to stabilize the
 package vocabulary before moving into theory pages and workflow pages.

@@ -83,11 +83,19 @@
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
-<li class="nav-item"><a class="nav-link" href="../../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../../reference/index.html">Function reference</a></li>
+    <li><a class="dropdown-item" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
+    <li><a class="dropdown-item" href="../../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -113,8 +121,15 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p><span class="model-tag unvalidated">Unvalidated</span></p>
-<p><em>Model-family pages:</em> <a href="index.html">Overview</a> <a href="essms-implementation.html">Implementation</a> <a href="essms-theory.html">Theory</a></p>
+<div class="model-status-line">
+<span class="model-tag unvalidated">Unvalidated</span>
+</div>
+<div class="model-nav">
+<div class="model-nav-links">
+<a class="model-nav-badge" href="index.html">Overview</a>
+<a class="model-nav-badge" href="essms-implementation.html">Implementation</a>
+</div>
+</div>
 <p>These pages are grounded in the classical elastic-shell scattering
 literature for fluid-filled spherical shells <span class="citation">(<a href="#ref-goodman_reflection_1962">Goodman and Stern 1962</a>; <a href="#ref-faran_sound_1951">Faran 1951</a>; <a href="#ref-stanton_sound_1990">Stanton 1990</a>)</span>.</p>
 <p>An elastic shell is a solid scattering structure that supports both
@@ -158,7 +173,7 @@ represented by:</p>
 <p>where <span class="math inline">i</span> and <span class="math inline">j</span> represent two separate media. Consequently,
 there are two primary interfaces: exterior-shell (<span class="math inline">g_{21}</span>, <span class="math inline">h_{21}</span>) and shell-interior (<span class="math inline">g_{32}</span>, <span class="math inline">h_{32}</span>).</p>
 <div class="float">
-<img src="essms-boundary-bookkeeping.svg" alt="ESSMS mode-wise boundary bookkeeping from the two shell radii to the exterior scattering coefficient."><div class="figcaption">ESSMS mode-wise boundary bookkeeping from the
+<img src="essms-boundary-bookkeeping.png" alt="ESSMS mode-wise boundary bookkeeping from the two shell radii to the exterior scattering coefficient."><div class="figcaption">ESSMS mode-wise boundary bookkeeping from the
 two shell radii to the exterior scattering coefficient.</div>
 </div>
 <p>The six scalar conditions arise because pressure and radial velocity
@@ -203,7 +218,7 @@ introducing longitudinal and transverse wave potentials:</p>
 \mu\,\nabla\times(\nabla\times\mathbf{u}) + \rho_s \omega^2 \mathbf{u} =
 0,
 </span></p>
-<p>where <span class="math inline">\lambda</span> and <span class="math inline">\mu</span> are the Lamé elastic constants and <span class="math inline">\rho_2</span> is the mass density of the shell.
+<p>where <span class="math inline">\lambda</span> and <span class="math inline">\mu</span> are the Lam'e elastic constants and <span class="math inline">\rho_2</span> is the mass density of the shell.
 Applying the Helmholtz decomposition, <span class="math inline">\mathbf{u}</span> is written as:</p>
 <p><span class="math display">
   \mathbf{u} = \nabla\phi + \nabla\times\mathbf{\Psi},
@@ -304,16 +319,15 @@ equation:</p>
 <p>Separate velocity potentials are introduced for the incident plane
 wave and fluid regions:</p>
 <p><span class="math display">
-  \begin{align*}
+  \begin{aligned}
   \phi_\text{inc}(r, \theta) &amp;=
-    e^{ik_1 r\cos\theta} \\
-    &amp;= \sum\limits_{m=0}^\infty i^m(2m+1)\,j_m(k_1
-r)\,P_m(\cos\theta), \\
+    e^{ik_1 r\cos\theta} \\ &amp;= \sum\limits_{m=0}^\infty
+i^m(2m+1)\,j_m(k_1 r)\,P_m(\cos\theta), \\
     \phi_1(\theta,r) &amp;= \sum\limits_{m=0}^\infty i^m(2m+1)
 A_m^{(1)}\,h_m^{(1)}(k_1 r)\,P_m(\cos\theta), \\
     \phi_3(\theta,r) &amp;= \sum\limits_{m=0}^\infty i^m(2m+1)
 A_m^{(3)}\,j_m(k_3 r)\,P_m(\cos\theta),
-  \end{align*}
+  \end{aligned}
 </span></p>
 <p>where the coefficients <span class="math inline">A_m^{(1)}</span> and
 <span class="math inline">A_m^{(3)}</span> are unknown modal amplitudes
@@ -377,7 +391,7 @@ components that separate by angular order.</p>
 <p>For each angular mode <span class="math inline">m</span>, the radial
 and tangential displacement components in the shell are:</p>
 <p><span class="math display">
-  \begin{align*}
+  \begin{aligned}
   u_r &amp;=
     \sum_{m=0}^{\infty}
   \left[
@@ -392,7 +406,7 @@ and tangential displacement components in the shell are:</p>
     \frac{d}{dr}(r\psi_m)
   \right]
   \frac{dP_m(\cos\theta)}{d\theta},
-  \end{align*}
+  \end{aligned}
 </span></p>
 <p>where <span class="math inline">\phi_m(r)</span> and <span class="math inline">\psi_m(r)</span> denote the radial parts of <span class="math inline">\phi_2</span> and <span class="math inline">\Psi</span> for mode <span class="math inline">m</span>, respectively. These expressions allow the
 stress and velocity boundary conditions at <span class="math inline">r=a</span> and <span class="math inline">r=b</span>
@@ -441,7 +455,7 @@ u_\theta)</span> are nonzero. Consequently, only two traction components
 enter the boundary conditions: the normal stress <span class="math inline">\sigma_{rr}</span> and the shear stress <span class="math inline">\sigma_{r\theta}</span> acting on spherical
 surfaces. In spherical coordinates, these stress components are:</p>
 <p><span class="math display">
-  \begin{align*}
+  \begin{aligned}
   \sigma_{rr} &amp;=
     (\lambda + 2\mu)\frac{\partial u_r}{\partial r} +
     \lambda
@@ -457,7 +471,7 @@ surfaces. In spherical coordinates, these stress components are:</p>
     \frac{\partial u_\theta}{\partial r} -
     \frac{u_\theta}{r}
   \right).
-  \end{align*}
+  \end{aligned}
 </span></p>
 <p>The normal stress <span class="math inline">\sigma_{rr}</span>
 represents the radial traction exerted by the shell on the surrounding
@@ -470,13 +484,13 @@ these relations causes all angular dependence to factor into <span class="math i
 orthogonality of the Legendre polynomials, each angular order remains
 uncoupled, and the stresses may be written in modal form as:</p>
 <p><span class="math display">
-  \begin{align*}
+  \begin{aligned}
   \sigma_{rr}^{(m)}(r,\theta) &amp;=
     \Sigma_{rr}^{(m)}(r)\,P_m(\cos\theta), \\
     \sigma_{r\theta}^{(m)}(r,\theta) &amp;=
     \Sigma_{r\theta}^{(m)}(r)\,
   \frac{dP_m(\cos\theta)}{d\theta},
-  \end{align*}
+  \end{aligned}
 </span></p>
 <p>where <span class="math inline">\Sigma_{rr}^{(m)}(r)</span> and <span class="math inline">\Sigma_{r\theta}^{(m)}(r)</span> are radial
 functions that depend linearly on the modal coefficients <span class="math inline">(A_m, B_m, C_m, D_m)</span> and their radial
@@ -552,9 +566,8 @@ p_1</span> and <span class="math inline">v_{n,1} =
 \mathbf{v}_1\cdot\mathbf{n}</span> with <span class="math inline">\mathbf{n}</span> radial gives:</p>
 <p><span class="math display">
   p_1 = \sigma_{rr},
-  \quad
-  -\frac{1}{i\omega\rho_1}\frac{\partial p_1}{\partial r} = -i\omega
-u_r,
+  \quad -\frac{1}{i\omega\rho_1}\frac{\partial p_1}{\partial r} =
+-i\omega u_r,
   \quad
   \sigma_{r\theta} = 0
 </span></p>
@@ -569,9 +582,8 @@ velocity is enforced, together with vanishing shear traction. Using
 p_3</span> gives:</p>
 <p><span class="math display">
   p_3 = \sigma_{rr},
-  \quad
-  -\frac{1}{i\omega\rho_3}\frac{\partial p_3}{\partial r} = -i\omega
-u_r,
+  \quad -\frac{1}{i\omega\rho_3}\frac{\partial p_3}{\partial r} =
+-i\omega u_r,
   \quad
   \sigma_{r\theta} = 0
 </span></p>
@@ -665,8 +677,7 @@ interface conditions yield the linear system <span class="math inline">\mathbf{M
 where the first unknown corresponds to the exterior scattering
 coefficient, <span class="math inline">A_m^{(1)}</span>. For each <span class="math inline">m&gt;0</span>, <span class="math inline">A_m^{(1)}</span> is obtained by Cramer’s rule:</p>
 <p><span class="math display">
-  A_m^{(1)} =
-    -i^m (2m + 1)
+  A_m^{(1)} = -i^m (2m + 1)
   \frac{
   \det(\mathbf{M}_m^{(1)})
   }{
@@ -814,15 +825,14 @@ P_m(\cos\theta).
 </span></p>
 <p>Using the phase identity for the outgoing-wave prefactor gives:</p>
 <p><span class="math display">
-  \begin{align*}
+  \begin{aligned}
   \mathcal{f}(\theta) &amp;=
     \frac{-i}{k_1}
   \sum\limits_{m=0}^\infty (2m + 1)(-i)^{(m)} A_m^{(1)} P_m(\cos\theta),
-\\
-    &amp;=
+\\ &amp;=
     \frac{-i}{k}
   \sum\limits_{m=0}^\infty (2m + 1)A_m^{(1)} P_m(\cos\theta),
-  \end{align*}
+  \end{aligned}
 </span></p>
 <p>where the <span class="math inline">(-i)^m</span> term disappears
 since <span class="math inline">A_m^{(1)}</span> is defined to

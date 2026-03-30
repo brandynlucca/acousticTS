@@ -83,11 +83,19 @@
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
-<li class="nav-item"><a class="nav-link" href="../../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../../reference/index.html">Function reference</a></li>
+    <li><a class="dropdown-item" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
+    <li><a class="dropdown-item" href="../../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -113,8 +121,15 @@
 <div class="section level2">
 <h2 id="acousticts-implementation">acousticTS implementation<a class="anchor" aria-label="anchor" href="#acousticts-implementation"></a>
 </h2>
-<p><span class="model-tag experimental">Experimental</span> <span class="model-tag unvalidated">Unvalidated</span></p>
-<p><em>Model-family pages:</em> <a href="index.html">Overview</a> <a href="vesm-implementation.html">Implementation</a> <a href="vesm-theory.html">Theory</a></p>
+<div class="model-status-line">
+<span class="model-tag validated">Validated</span> <span class="model-tag experimental">Experimental</span>
+</div>
+<div class="model-nav">
+<div class="model-nav-links">
+<a class="model-nav-badge" href="index.html">Overview</a>
+<a class="model-nav-badge" href="vesm-theory.html">Theory</a>
+</div>
+</div>
 <p>These pages are motivated by layered gas-bearing fish scattering
 models and viscous resonance broadening <span class="citation">(<a href="#ref-khodabandeloo_estimating_2021">Khodabandeloo et al. 2021</a>;
 <a href="#ref-feuillade_nero_1998">Feuillade and Nero
@@ -262,41 +277,41 @@ material properties were run through:</p>
 <p>After regenerating the benchmark against the current compiled
 acousticTS implementation, the reference case gives:</p>
 <ul>
-<li>max abs. delta TS = <code>0.05598 dB</code>
+<li>max abs. <span class="math inline">\Delta</span> TS =
+<code>0.05598 dB</code>
 </li>
-<li>mean abs. delta TS = <code>0.00885 dB</code>
+<li>mean abs. <span class="math inline">\Delta</span> TS =
+<code>0.00885 dB</code>
 </li>
-<li>frequency at max abs. delta = <code>60 kHz</code>
+<li>frequency at max abs. <span class="math inline">\Delta</span> =
+<code>60 kHz</code>
 </li>
 <li>elapsed time = <code>0.79 s</code> for acousticTS and
 <code>0.98 s</code> for the Python implementation</li>
 </ul>
 <table class="table">
 <colgroup>
-<col width="11%">
+<col width="10%">
 <col width="4%">
-<col width="5%">
-<col width="5%">
-<col width="17%">
-<col width="17%">
-<col width="20%">
-<col width="9%">
+<col width="10%">
+<col width="10%">
+<col width="14%">
+<col width="14%">
+<col width="19%">
+<col width="8%">
 <col width="7%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">Comparison</th>
 <th align="right">N frequency</th>
 <th align="right">
-<span class="math inline">f</span> min (kHz)</th>
+<i>f</i><sub>min</sub> (kHz)</th>
 <th align="right">
-<span class="math inline">f</span> max (kHz)</th>
-<th align="right">Max <span class="math inline">&amp;#124; \Delta
-&amp;#124;~\textit{TS}</span> (dB)</th>
-<th align="right">Mean <span class="math inline">&amp;#124; \Delta
-&amp;#124;~\textit{TS}</span> (dB)</th>
+<i>f</i><sub>max</sub> (kHz)</th>
+<th align="right">Max |Δ| <i>TS</i> (dB)</th>
+<th align="right">Mean |Δ| <i>TS</i> (dB)</th>
 <th align="right">
-<span class="math inline">f</span> at max <span class="math inline">&amp;#124; \Delta &amp;#124;~\textit{TS}</span>
-(kHz)</th>
+<i>f</i> at max |Δ| <i>TS</i> (kHz)</th>
 <th align="right">acousticTS elapsed (s)</th>
 <th align="right">Python elapsed (s)</th>
 </tr></thead>
@@ -333,22 +348,20 @@ remains small relative to the scale of the full spectrum.</p>
 </h4>
 <table class="table">
 <colgroup>
-<col width="4%">
-<col width="15%">
-<col width="19%">
-<col width="15%">
+<col width="3%">
+<col width="14%">
+<col width="18%">
+<col width="14%">
+<col width="22%">
 <col width="26%">
-<col width="19%">
 </colgroup>
 <thead><tr class="header">
 <th align="left"></th>
 <th align="right">Frequency (Hz)</th>
 <th align="right">acousticTS TS (dB)</th>
 <th align="right">Python TS (dB)</th>
-<th align="right">
-<span class="math inline">\Delta~\textit{TS}</span>
-(dB)</th>
-<th align="right">Abs. delta TS (dB)</th>
+<th align="right">Δ <i>TS</i> (dB)</th>
+<th align="right">Abs. Δ <i>TS</i> (dB)</th>
 </tr></thead>
 <tbody>
 <tr class="odd">

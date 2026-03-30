@@ -4,10 +4,8 @@
 
 Benchmarked Validated
 
-*Model-family pages:*
-[Overview](https://brandynlucca.github.io/acousticTS/articles/sphms/index.md)
-[Implementation](https://brandynlucca.github.io/acousticTS/articles/sphms/sphms-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/sphms/sphms-theory.md)
+[Implementation](https://brandynlucca.github.io/acousticTS/articles/sphms/sphms-implementation.md)
 
 These pages follow the classical exact sphere literature for fluid,
 elastic, and approximate shell limits ([Anderson

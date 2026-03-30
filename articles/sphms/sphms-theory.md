@@ -4,10 +4,8 @@
 
 Benchmarked Validated
 
-*Model-family pages:*
 [Overview](https://brandynlucca.github.io/acousticTS/articles/sphms/index.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/sphms/sphms-implementation.md)
-[Theory](https://brandynlucca.github.io/acousticTS/articles/sphms/sphms-theory.md)
 
 The sphere is the classical geometry for which the acoustic scattering
 problem can be solved exactly by separation of variables. Because the
@@ -98,7 +96,7 @@ The radial equation takes the form:
 \frac{d}{dr}\left(r^2\frac{dR}{dr}\right) + \left(k^2r^2 -
 n(n+1)\right)R = 0,
 
-whose independent solutions are the spherical Bessel, Neumann, and
+whose independent solutions are the spherical Bessel, oeumann, and
 Hankel functions. The essential point is that spherical geometry keeps
 the angular order n separated exactly. That is why each partial wave can
 be solved independently once the boundary condition is imposed.
@@ -172,11 +170,11 @@ r}(p\_{1,\text{inc}}+p\_{1,\text{scat}})\right\|\_{r=a} = 0.
 Substituting the modal expansions and using orthogonality gives, for
 each order n:
 
-\text{j}\_n'(k_1a) + A_n h_n^{(1)\\'}(k_1a) = 0.
+\text{j}\_n^\prime(k_1a) + A_n h_n^{(1)\\\prime}(k_1a) = 0.
 
 This boundary condition gives the scattered partial-wave coefficient:
 
-A_n = -\frac{\text{j}\_n'(k_1a)}{h_n^{(1)\\'}(k_1a)}.
+A_n = -\frac{\text{j}\_n^\prime(k_1a)}{h_n^{(1)\\\prime}(k_1a)}.
 
 ### Pressure-release sphere
 
@@ -217,9 +215,11 @@ Since the exterior total pressure is p_1 = p\_{1,\text{inc}} +
 p\_{1,\text{scat}}, substituting the modal expansions gives, for each
 order n:
 
-\text{j}\_n(k_1a) + A_n h_n^{(1)}(k_1a) = B_n \text{j}\_n(k_2a), \qquad
-\frac{k_1}{\rho_1}\left\[\text{j}\_n'(k_1a) + A_n
-h_n^{(1)\\'}(k_1a)\right\] = \frac{k_2}{\rho_2}B_n \text{j}\_n'(k_2a).
+\begin{align\*} \text{j}\_n(k_1a) + A_n h_n^{(1)}(k_1a) &= B_n
+\text{j}\_n(k_2a), \\
+\frac{k_1}{\rho_1}\left\[\text{j}\_n^\prime(k_1a) + A_n
+h_n^{(1)\\\prime}(k_1a)\right\] &= \frac{k_2}{\rho_2}B_n
+\text{j}\_n^\prime(k_2a). \end{align\*}
 
 Solving the pressure-continuity equation for the interior coefficient
 gives:
@@ -229,8 +229,8 @@ a)}.
 
 Substituting that result into the velocity condition yields:
 
-\text{j}\_n'(k_1 a) + A_n h_n^{(1)\\'}(k_1 a) = \frac{\rho_1 k_2}{\rho_2
-k_1} \frac{\text{j}\_n'(k_2 a)}{\text{j}\_n(k_2 a)}
+\text{j}\_n^\prime(k_1 a) + A_n h_n^{(1)\\\prime}(k_1 a) = \frac{\rho_1
+k_2}{\rho_2 k_1} \frac{\text{j}\_n^\prime(k_2 a)}{\text{j}\_n(k_2 a)}
 \left\[\text{j}\_n(k_1 a) + A_n h_n^{(1)}(k_1 a)\right\]
 
 Now define the density and sound-speed contrasts by:
@@ -241,17 +241,18 @@ Because k_2/k_1 = 1/h\_{21}, the prefactor \rho_1 k_2 / (\rho_2 k_1)
 becomes 1/(g\_{21}h\_{21}). Rearranging the continuity equations
 therefore gives:
 
-A_n \left\[ h_n^{(1)\\'}(k_1 a) -\frac{1}{g\_{21}h\_{21}}
+A_n \left\[ h_n^{(1)\\\prime}(k_1 a) -\frac{1}{g\_{21}h\_{21}}
 \frac{\text{j}\_n'(k_2 a)}{\text{j}\_n(k_2 a)} h_n^{(1)}(k_1 a) \right\]
-= \frac{1}{g\_{21}h\_{21}} \frac{\text{j}\_n'(k_2 a)}{\text{j}\_n(k_2
+= \\ \frac{1}{g\_{21}h\_{21}} \frac{\text{j}\_n'(k_2 a)}{\text{j}\_n(k_2
 a)} \text{j}\_n(k_1 a) -\text{j}\_n'(k_1 a)
 
 The scattered partial-wave coefficient can therefore be written
 explicitly as:
 
-A_n = \frac{ \dfrac{1}{g\_{21}h\_{21}}\dfrac{\text{j}\_n'(k_2
-a)}{\text{j}\_n(k_2 a)}\text{j}\_n(k_1 a) - \text{j}\_n'(k_1 a) }{
-h_n^{(1)\\'}(k_1 a) - \dfrac{1}{g\_{21}h\_{21}}\dfrac{\text{j}\_n'(k_2
+A_n = \frac{ \dfrac{1}{g\_{21}h\_{21}}\dfrac{\text{j}\_n^\prime(k_2
+a)}{\text{j}\_n(k_2 a)}\text{j}\_n(k_1 a) - \text{j}\_n^\prime(k_1 a) }{
+h_n^{(1)\\\prime}(k_1 a) -
+\dfrac{1}{g\_{21}h\_{21}}\dfrac{\text{j}\_n^\prime(k_2
 a)}{\text{j}\_n(k_2 a)}h_n^{(1)}(k_1 a) }
 
 This is the direct spherical analogue of the fluid-filled cylindrical

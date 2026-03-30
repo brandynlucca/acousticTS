@@ -4,10 +4,8 @@
 
 Benchmarked Validated
 
-*Model-family pages:*
 [Overview](https://brandynlucca.github.io/acousticTS/articles/hpa/index.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/hpa/hpa-implementation.md)
-[Theory](https://brandynlucca.github.io/acousticTS/articles/hpa/hpa-theory.md)
 
 The high-pass approximation (HPA) is not an exact boundary-value
 solution. It is a compact asymptotic model constructed so that the
@@ -205,7 +203,7 @@ For a sphere, the generalized expression from Stanton (1989) ([Stanton
 \dfrac{4(ka)^4 \alpha\_{\pi s}^2}{\mathcal{R}^2 \mathcal{F}} }.
 
 The low-frequency numerator is still the Rayleigh term. The denominator
-is now written so that the high-frequency scale is set explicitly by the
+is written so that the high-frequency scale is set explicitly by the
 reflection coefficient \mathcal{R}. Compared with the simpler form of
 Johnson (1977) ([Johnson 1977](#ref-johnson_sound_1977)), the version
 from Stanton (1989) ([Stanton 1989](#ref-stanton_1989)) makes the

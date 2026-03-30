@@ -4,10 +4,8 @@
 
 Benchmarked Validated
 
-*Model-family pages:*
-[Overview](https://brandynlucca.github.io/acousticTS/articles/sdwba/index.md)
-[Implementation](https://brandynlucca.github.io/acousticTS/articles/sdwba/sdwba-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/sdwba/sdwba-theory.md)
+[Implementation](https://brandynlucca.github.io/acousticTS/articles/sdwba/sdwba-implementation.md)
 
 These pages connect krill-body DWBA models to phase variability,
 orientation effects, and practical survey use ([Demer and Conti

@@ -4,10 +4,8 @@
 
 Benchmarked Validated
 
-*Model-family pages:*
-[Overview](https://brandynlucca.github.io/acousticTS/articles/krm/index.md)
-[Implementation](https://brandynlucca.github.io/acousticTS/articles/krm/krm-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/krm/krm-theory.md)
+[Implementation](https://brandynlucca.github.io/acousticTS/articles/krm/krm-implementation.md)
 
 These pages follow the composite body-plus-swimbladder fish modeling
 literature initiated for cod and later generalized in open software

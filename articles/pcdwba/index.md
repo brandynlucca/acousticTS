@@ -4,10 +4,8 @@
 
 Validated Experimental
 
-*Model-family pages:*
-[Overview](https://brandynlucca.github.io/acousticTS/articles/pcdwba/index.md)
-[Implementation](https://brandynlucca.github.io/acousticTS/articles/pcdwba/pcdwba-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/pcdwba/pcdwba-theory.md)
+[Implementation](https://brandynlucca.github.io/acousticTS/articles/pcdwba/pcdwba-implementation.md)
 
 These pages follow the phase-compensated weak-scattering literature for
 broadside elongated bodies and krill-style applications ([Chu and Ye
@@ -49,6 +47,9 @@ that would be lost by treating the target as straight.
 
 - Validated against source-level `ZooScatR` and `echopop` PCDWBA
   workflows.
+- PCDWBA is currently marked experimental because the public package
+  workflow is still being tightened even though the current source-
+  level comparison cases are documented.
 
 ### Family pages
 

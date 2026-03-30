@@ -2,12 +2,10 @@
 
 ## Introduction
 
-Experimental Unvalidated
+Validated Experimental
 
-*Model-family pages:*
 [Overview](https://brandynlucca.github.io/acousticTS/articles/vesm/index.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/vesm/vesm-implementation.md)
-[Theory](https://brandynlucca.github.io/acousticTS/articles/vesm/vesm-theory.md)
 
 The viscous-elastic spherical model describes a layered resonant target
 whose gas core is surrounded first by an elastic shell and then by a

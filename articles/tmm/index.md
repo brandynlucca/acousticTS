@@ -2,12 +2,10 @@
 
 ## Overview
 
-Benchmarked Validated Experimental
+Benchmarked Partially validated Experimental
 
-*Model-family pages:*
-[Overview](https://brandynlucca.github.io/acousticTS/articles/tmm/index.md)
-[Implementation](https://brandynlucca.github.io/acousticTS/articles/tmm/tmm-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/tmm/tmm-theory.md)
+[Implementation](https://brandynlucca.github.io/acousticTS/articles/tmm/tmm-implementation.md)
 
 These pages follow the coefficient-map view of scattering and later
 numerical implementations for axisymmetric bodies ([Waterman
@@ -22,7 +20,7 @@ angle-dependent scattering products.
 
 Represent the incident and scattered fields in complete modal bases and
 solve for the linear map between those coefficient vectors. In the
-current package scope, that gives a reusable single-target retained
+supported package scope, that gives a reusable single-target retained
 state for monostatic target strength and, where externally constrained,
 for general-angle or orientation-averaged post-processing.
 
@@ -49,8 +47,8 @@ for general-angle or orientation-averaged post-processing.
 - Single-target scope only
 - Geometry-specific basis choice rather than one universal retained
   operator for every shape
-- Cylinder branch currently has narrower validated scope than sphere,
-  oblate, and prolate branches
+- Cylinder branch has narrower validated scope than sphere, oblate, and
+  prolate branches
 
 ### Validation status
 
@@ -60,14 +58,17 @@ for general-angle or orientation-averaged post-processing.
   and prolate pressure-release cases.
 - Retained prolate angular products are also checked against the exact
   general-angle spheroidal solution.
-- The cylinder branch is benchmark-matched only for the exact monostatic
-  workflow; retained general-angle cylinder products remain outside the
-  validated public scope.
+- TMM is partially validated because the sphere, oblate, and prolate
+  branches have external checks, but retained general-angle cylinder
+  products remain outside the validated public scope.
+- TMM is currently marked experimental because the retained-state
+  workflow and branch matrix are still guarded while shape-specific
+  support continues to be tightened.
 
 ### Family pages
 
 - [Implementation](https://brandynlucca.github.io/acousticTS/articles/tmm/tmm-implementation.md):
-  stored-state workflows, plots, benchmarks, and current scope
+  stored-state workflows, plots, benchmarks, and supported scope
 - [Theory](https://brandynlucca.github.io/acousticTS/articles/tmm/tmm-theory.md):
   T-matrix interpretation, boundary operators, and geometry-matched
   bases
@@ -75,7 +76,7 @@ for general-angle or orientation-averaged post-processing.
 ![Single-target TMM workflow, showing the spherical-coordinate branch
 used for spheres and oblates, the spheroidal branch used for prolates,
 and the cylindrical monostatic branch used for finite
-cylinders.](tmm-branch-schematic.svg)
+cylinders.](tmm-branch-schematic.png)
 
 Single-target TMM workflow, showing the spherical-coordinate branch used
 for spheres and oblates, the spheroidal branch used for prolates, and

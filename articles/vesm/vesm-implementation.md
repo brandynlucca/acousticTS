@@ -2,11 +2,9 @@
 
 ## acousticTS implementation
 
-Experimental Unvalidated
+Validated Experimental
 
-*Model-family pages:*
 [Overview](https://brandynlucca.github.io/acousticTS/articles/vesm/index.md)
-[Implementation](https://brandynlucca.github.io/acousticTS/articles/vesm/vesm-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/vesm/vesm-theory.md)
 
 These pages are motivated by layered gas-bearing fish scattering models
@@ -139,15 +137,15 @@ the same retained modal orders (`m = 0, 1, 2`).
 After regenerating the benchmark against the current compiled acousticTS
 implementation, the reference case gives:
 
-- max abs. delta TS = `0.05598 dB`
-- mean abs. delta TS = `0.00885 dB`
-- frequency at max abs. delta = `60 kHz`
+- max abs. \Delta TS = `0.05598 dB`
+- mean abs. \Delta TS = `0.00885 dB`
+- frequency at max abs. \Delta = `60 kHz`
 - elapsed time = `0.79 s` for acousticTS and `0.98 s` for the Python
   implementation
 
-| Comparison                  | N frequency | f min (kHz) | f max (kHz) | Max &#124; \Delta &#124;~\textit{TS} (dB) | Mean &#124; \Delta &#124;~\textit{TS} (dB) | f at max &#124; \Delta &#124;~\textit{TS} (kHz) | acousticTS elapsed (s) | Python elapsed (s) |
-|:----------------------------|------------:|------------:|------------:|------------------------------------------:|-------------------------------------------:|------------------------------------------------:|-----------------------:|-------------------:|
-| acousticTS vs original VESM |         150 |           1 |         150 |                                    0.0572 |                                     0.0089 |                                              60 |                   0.05 |             1.0962 |
+| Comparison                  | N frequency | *f*_(min) (kHz) | *f*_(max) (kHz) | Max \|Δ\| *TS* (dB) | Mean \|Δ\| *TS* (dB) | *f* at max \|Δ\| *TS* (kHz) | acousticTS elapsed (s) | Python elapsed (s) |
+|:----------------------------|------------:|----------------:|----------------:|--------------------:|---------------------:|----------------------------:|-----------------------:|-------------------:|
+| acousticTS vs original VESM |         150 |               1 |             150 |              0.0572 |               0.0089 |                          60 |                   0.05 |             1.0962 |
 
 The largest mismatch on this grid remains well below `0.1 dB`, and the
 mean absolute difference stays below `0.01 dB`. That is strong agreement
@@ -168,13 +166,13 @@ the scale of the full spectrum.
 
 #### A few explicit checkpoints
 
-|     | Frequency (Hz) | acousticTS TS (dB) | Python TS (dB) | \Delta~\textit{TS} (dB) | Abs. delta TS (dB) |
-|:----|---------------:|-------------------:|---------------:|------------------------:|-------------------:|
-| 1   |           1000 |         -116.01044 |     -116.00966 |                -0.00078 |            0.00078 |
-| 38  |          38000 |          -55.81067 |      -55.80907 |                -0.00160 |            0.00160 |
-| 60  |          60000 |          -58.93634 |      -58.99354 |                 0.05720 |            0.05720 |
-| 120 |         120000 |          -65.27321 |      -65.25513 |                -0.01807 |            0.01807 |
-| 150 |         150000 |          -63.89102 |      -63.87077 |                -0.02025 |            0.02025 |
+|     | Frequency (Hz) | acousticTS TS (dB) | Python TS (dB) | Δ *TS* (dB) | Abs. Δ *TS* (dB) |
+|:----|---------------:|-------------------:|---------------:|------------:|-----------------:|
+| 1   |           1000 |         -116.01044 |     -116.00966 |    -0.00078 |          0.00078 |
+| 38  |          38000 |          -55.81067 |      -55.80907 |    -0.00160 |          0.00160 |
+| 60  |          60000 |          -58.93634 |      -58.99354 |     0.05720 |          0.05720 |
+| 120 |         120000 |          -65.27321 |      -65.25513 |    -0.01807 |          0.01807 |
+| 150 |         150000 |          -63.89102 |      -63.87077 |    -0.02025 |          0.02025 |
 
 ### Practical note on modal truncation
 

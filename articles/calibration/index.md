@@ -4,10 +4,8 @@
 
 Benchmarked Validated
 
-*Model-family pages:*
-[Overview](https://brandynlucca.github.io/acousticTS/articles/calibration/index.md)
-[Implementation](https://brandynlucca.github.io/acousticTS/articles/calibration/calibration-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/calibration/calibration-theory.md)
+[Implementation](https://brandynlucca.github.io/acousticTS/articles/calibration/calibration-implementation.md)
 
 These pages are grounded in the standard-target calibration literature
 for elastic reference spheres ([Dragonette, Numrich, and Frank

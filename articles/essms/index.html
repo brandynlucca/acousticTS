@@ -83,11 +83,19 @@
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
-<li class="nav-item"><a class="nav-link" href="../../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../../reference/index.html">Function reference</a></li>
+    <li><a class="dropdown-item" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
+    <li><a class="dropdown-item" href="../../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -113,8 +121,15 @@
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p><span class="model-tag unvalidated">Unvalidated</span></p>
-<p><em>Model-family pages:</em> <a href="index.html">Overview</a> <a href="essms-implementation.html">Implementation</a> <a href="essms-theory.html">Theory</a></p>
+<div class="model-status-line">
+<span class="model-tag unvalidated">Unvalidated</span>
+</div>
+<div class="model-nav">
+<div class="model-nav-links">
+<a class="model-nav-badge" href="essms-theory.html">Theory</a>
+<a class="model-nav-badge" href="essms-implementation.html">Implementation</a>
+</div>
+</div>
 <p>These pages are grounded in the classical elastic-shell scattering
 literature for fluid-filled spherical shells <span class="citation">(<a href="#ref-goodman_reflection_1962">Goodman and Stern 1962</a>; <a href="#ref-faran_sound_1951">Faran 1951</a>; <a href="#ref-stanton_sound_1990">Stanton 1990</a>)</span>.</p>
 <p>The elastic shelled spherical modal series (<code>ESSMS</code>) is
@@ -163,9 +178,8 @@ both shell interfaces.</p>
 <h3 id="validation-status">Validation status<a class="anchor" aria-label="anchor" href="#validation-status"></a>
 </h3>
 <ul>
-<li>A direct shell-sphere benchmark family exists, but the current ESSMS
-implementation still does not return finite full-grid benchmark
-spectra.</li>
+<li>The package does not yet claim external validation across the
+current public scope.</li>
 </ul>
 </div>
 <div class="section level3">

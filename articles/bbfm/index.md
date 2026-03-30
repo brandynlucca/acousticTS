@@ -2,12 +2,10 @@
 
 ## Overview
 
-Experimental Unvalidated
+Unvalidated Experimental
 
-*Model-family pages:*
-[Overview](https://brandynlucca.github.io/acousticTS/articles/bbfm/index.md)
-[Implementation](https://brandynlucca.github.io/acousticTS/articles/bbfm/bbfm-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/bbfm/bbfm-theory.md)
+[Implementation](https://brandynlucca.github.io/acousticTS/articles/bbfm/bbfm-implementation.md)
 
 This family is best read alongside the swimbladder-less fish and
 composite-scatterer literature that motivates explicit flesh-body and
@@ -54,9 +52,9 @@ amplitudes coherently.
 
 ### Validation status
 
-- BBFM currently has documented internal reconstruction checks but no
-  external benchmark ladder or independent public implementation
-  comparison.
+- BBFM is currently marked experimental because it has documented
+  internal reconstruction checks but no external benchmark ladder or
+  independent public implementation comparison.
 
 ### Family pages
 

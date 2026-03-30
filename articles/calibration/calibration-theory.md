@@ -4,10 +4,8 @@
 
 Benchmarked Validated
 
-*Model-family pages:*
 [Overview](https://brandynlucca.github.io/acousticTS/articles/calibration/index.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/calibration/calibration-implementation.md)
-[Theory](https://brandynlucca.github.io/acousticTS/articles/calibration/calibration-theory.md)
 
 Echosounders are commonly calibrated with standard targets whose
 acoustic response is strong, repeatable, and sufficiently well
@@ -112,10 +110,10 @@ boundary conditions at surface r = a decouple by angular order:
 
 where a is the sphere radius. The boundary conditions then enforce:
 
-\begin{align\*} \mathbf{u}\_2(r) &= \mathbf{u}\_1(r) ~ \text{(continuity
+\begin{aligned} \mathbf{u}\_2(r) &= \mathbf{u}\_1(r) ~ \text{(continuity
 of normal displacement)} , \\ \sigma_2(rr) &= -p_1 ~ \text{(continuity
 of normal stress)} , \\ \sigma_2(r\theta) &= 0 ~ \text{(zero tangential
-stress)} , \end{align\*}
+stress)} , \end{aligned}
 
 where \sigma denotes the Cauchy stress tensor describing internal forces
 in the solid, \sigma_2(rr) is its component along the radial direction
@@ -123,7 +121,7 @@ in spherical coordinates (i.e., the normal stress on a spherical
 surface), and \sigma_2(r \theta) is the shear stress along the polar
 direction \theta of the sphere.
 
-This model incorporates copmressional and shear waves within the
+This model incorporates compressional and shear waves within the
 calibration sphere alongside the boundary conditions at the
 sphere-medium interface to compute the far-field acoustic backscatter.
 Since the full elastodynamic scattering problem is separable for an
@@ -176,10 +174,10 @@ field and material properties.
 For a plane wave incident along polar coordinate z, the acoustic
 pressure is expressed as ([Hickling 1962](#ref-hickling_analysis_1962)):
 
-\begin{align\*} p\_\text{inc}(r, \theta) &= P_0 \frac{e^{-i k_1
+\begin{aligned} p\_\text{inc}(r, \theta) &= P_0 \frac{e^{-i k_1
 \mathcal{D}}}{\mathcal{D}} \\ &= ik_1 P_0 \sum\limits\_{m=0}^\infty
 (2m + 1) (-1)^n j_m(k_1r) h_m(k_1 r_0) P_m(\cos \theta), \quad (0 \< r
-\< r_0), \end{align\*}
+\< r_0), \end{aligned}
 
 where k_1 = \omega / c_1 is the acoustic wavenumber in the surrounding
 fluid, P_0 is the incident pressure amplitude, and the function
@@ -226,15 +224,15 @@ amplitude of pressure in the incident wave. In the far-field, r \to
 \infty which means that the asymptotic forms of the Hankel function and
 \frac{e^{-i k_1 \mathcal{D}}}{\mathcal{D}} term can be used:
 
-\begin{align\*} \frac{e^{-i k_1 \mathcal{D}}}{\mathcal{D}} &\sim e^{ik_1
+\begin{aligned} \frac{e^{-i k_1 \mathcal{D}}}{\mathcal{D}} &\sim e^{ik_1
 r_0} \frac{e^{i k_1 r \cos \theta}}{r_0}, \\ h_m^{(1)}(k_1r_0) &\sim
-(-i)^{m+1} \frac{e^{i k_1 r_0}}{k_1r_0}. \end{align\*}
+(-i)^{m+1} \frac{e^{i k_1 r_0}}{k_1r_0}. \end{aligned}
 
 These limits consequently simplify p\_\text{inc} to:
 
-\begin{align\*} p\_\text{inc}(r, \theta) &= P_0 e^{ik_1 r \cos \theta}
+\begin{aligned} p\_\text{inc}(r, \theta) &= P_0 e^{ik_1 r \cos \theta}
 \\ &= P_0 \sum\limits\_{m=0}^\infty (2m + 1) i^m j_m(k_1 r) P_m(\cos
-\theta). \end{align\*}
+\theta). \end{aligned}
 
 ### Phase-shift form of the solution
 
@@ -246,7 +244,7 @@ boundary conditions determine how far the outgoing partial wave is
 shifted relative to the free spherical solution.
 
 ![Calibration sphere phase-shift
-schematic](calibration-phase-shift-schematic.svg)
+schematic](calibration-phase-shift-schematic.png)
 
 Calibration sphere phase-shift schematic
 
@@ -273,12 +271,12 @@ expressed using: \tan \eta_m = \tan \delta_m(k_1a) \left\[ \frac{ \tan
 
 where \alpha_m, \beta_m, and \delta_m are the scattering phase-angles,
 and \Phi_m is the boundary impedance phase-angle. These angles are
-defined as: \begin{align\*} \delta_m(k_1a) &= \tan^{-1} \left\[
+defined as: \begin{aligned} \delta_m(k_1a) &= \tan^{-1} \left\[
 \frac{-j_m(k_1a)}{y_m(k_1a)} \right\] ,\\ \alpha_m(k_1a) &= \tan^{-1}
 \left\[ \frac{-k_1 a ~j^\prime_m(k_1a)}{y_m(k_1a)} \right\] ,\\
 \beta_m(k_1a) &= \tan^{-1} \left\[ \frac{-k_1 a
 ~y^\prime_m(k_1a)}{y_m(k_1a)} \right\] , \\ \tan \Phi_m &=
--\frac{\rho_1}{\rho_2} \tan \zeta_m(k\_\ell a, \sigma), \end{align\*}
+-\frac{\rho_1}{\rho_2} \tan \zeta_m(k\_\ell a, \sigma), \end{aligned}
 
 where \zeta_m(k\_\ell a, \sigma) is the boundary-impedance phase angle
 induced by the elastic interior ([Faran 1951](#ref-faran_sound_1951)).
@@ -320,7 +318,7 @@ sometimes in terms of a dimensional backscattering length. Those
 descriptions are compatible, but only if the rescaling is made explicit.
 
 ![Calibration sphere modal bookkeeping from partial waves to reported
-backscatter quantities.](calibration-modal-bookkeeping.svg)
+backscatter quantities.](calibration-modal-bookkeeping.png)
 
 Calibration sphere modal bookkeeping from partial waves to reported
 backscatter quantities.

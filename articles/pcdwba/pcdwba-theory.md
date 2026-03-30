@@ -4,10 +4,8 @@
 
 Validated Experimental
 
-*Model-family pages:*
 [Overview](https://brandynlucca.github.io/acousticTS/articles/pcdwba/index.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/pcdwba/pcdwba-implementation.md)
-[Theory](https://brandynlucca.github.io/acousticTS/articles/pcdwba/pcdwba-theory.md)
 
 The phase-compensated distorted wave Born approximation (`PCDWBA`)
 extends the ordinary `DWBA` to elongated bodies whose centerlines are

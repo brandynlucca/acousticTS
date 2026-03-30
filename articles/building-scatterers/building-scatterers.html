@@ -83,11 +83,19 @@
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
-<li class="nav-item"><a class="nav-link" href="../../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../../reference/index.html">Function reference</a></li>
+    <li><a class="dropdown-item" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
+    <li><a class="dropdown-item" href="../../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -130,8 +138,9 @@ inclusion, or as part of a composite fish-like target with an internal
 swimbladder. The geometry by itself does not decide among those cases.
 Scatterer construction is the step where the reader turns a geometric
 description into a model-ready acoustic object.</p>
-<object type="image/svg+xml" data="building-scatterers-map.svg" style="width:100%;" aria-label="Updated scatterer-generation and class-hierarchy map">
-</object>
+<div class="clickable-figure">
+<img class="clickable-figure__image" src="building-scatterers-map.png" alt="Updated scatterer-generation and class-hierarchy map"><a class="clickable-figure__link" href="../../reference/Scatterer-class.html" aria-label="Scatterer class" title="Scatterer class" style="left:40.94%;top:34.76%;width:20.38%;height:11.23%;"></a><a class="clickable-figure__link" href="../../reference/FLS-class.html" aria-label="FLS class" title="FLS class" style="left:5.16%;top:59.45%;width:19.14%;height:10.43%;"></a><a class="clickable-figure__link" href="../../reference/GAS-class.html" aria-label="GAS class" title="GAS class" style="left:5.16%;top:71.63%;width:19.16%;height:10.41%;"></a><a class="clickable-figure__link" href="../../reference/CAL-class.html" aria-label="CAL class" title="CAL class" style="left:28.58%;top:72.45%;width:19.16%;height:10.41%;"></a><a class="clickable-figure__link" href="../../reference/ELA-class.html" aria-label="ELA class" title="ELA class" style="left:5.16%;top:83.83%;width:19.16%;height:10.41%;"></a><a class="clickable-figure__link" href="../../reference/CSC-class.html" aria-label="CSC class" title="CSC class" style="left:53.16%;top:65.53%;width:19.22%;height:10.32%;"></a><a class="clickable-figure__link" href="../../reference/SBF-class.html" aria-label="SBF class" title="SBF class" style="left:76.79%;top:59.51%;width:19.22%;height:10.32%;"></a><a class="clickable-figure__link" href="../../reference/BBF-class.html" aria-label="BBF class" title="BBF class" style="left:76.79%;top:71.67%;width:19.22%;height:10.32%;"></a><a class="clickable-figure__link" href="../../reference/ESS-class.html" aria-label="ESS class" title="ESS class" style="left:76.79%;top:83.88%;width:19.22%;height:10.32%;"></a>
+</div>
 </div>
 <div class="section level2">
 <h2 id="why-scatterer-construction-is-separate-from-shape-construction">Why scatterer construction is separate from shape construction<a class="anchor" aria-label="anchor" href="#why-scatterer-construction-is-separate-from-shape-construction"></a>
@@ -181,19 +190,19 @@ well-defined solid sphere used for reference and validation work.</p>
 <p>The practical consequence is that constructor choice should be driven
 by the interface physics that matter most, not only by the overall
 silhouette of the target.</p>
-<p>The updated map above now makes the class hierarchy explicit as well.
+<p>The map above makes the class hierarchy explicit as well.
 <code>Scatterer</code> remains the common parent, but composite targets
-now branch through <code>CSC</code>, elastic-target families branch
-through <code>ELA</code>, and the swimbladder-bearing and
-backbone-bearing composite targets are separated into <code>SBF</code>
-and <code>BBF</code> rather than being implied by one generic fish-only
+branch through <code>CSC</code>, elastic-target families branch through
+<code>ELA</code>, and the swimbladder-bearing and backbone-bearing
+composite targets are separated into <code>SBF</code> and
+<code>BBF</code> rather than being implied by one generic fish-only
 path. That makes the difference between generator choice and class
 inheritance much more transparent.</p>
 </div>
 <div class="section level2">
 <h2 id="recommended-constructor-convention">Recommended constructor convention<a class="anchor" aria-label="anchor" href="#recommended-constructor-convention"></a>
 </h2>
-<p>The clearest workflow is now:</p>
+<p>The clearest workflow is:</p>
 <ol style="list-style-type: decimal">
 <li>Build geometry with a <code>Shape</code> constructor.</li>
 <li>Pass that geometry into the relevant scatterer constructor.</li>
@@ -215,22 +224,21 @@ like <code>fls_generate(shape = my_shape, ...)</code>, not by asking
 Likewise, <code><a href="../../reference/sbf_generate.html">sbf_generate()</a></code> is clearest when the body and
 swimbladder are built separately and passed in explicitly as
 <code>body_shape</code> and <code>bladder_shape</code>.</p>
-<p>Older entry points are still available for compatibility, but they
-should now be treated as compatibility-only rather than preferred public
+<p>Older entry points remain available for compatibility, but they
+should be treated as compatibility-only rather than preferred public
 interfaces. Raw coordinate vectors remain a supported manual geometry
 pathway. Character shape labels such as <code>"sphere"</code> or
 <code>"arbitrary"</code> are still accepted so that older scripts
-continue to run, but that string-dispatch pattern is now deprecated.
+continue to run, but that string-dispatch pattern is deprecated.
 Internally, every accepted pathway is normalized to the same
 <code>Shape</code>-first geometry contract as the explicit workflow.</p>
 <p>The same simplification applies to units. Scatterer constructors are
 standardized to meters for geometry and radians for orientation.
 Compatibility arguments like <code>length_units</code>,
 <code>radius_units</code>, <code>diameter_units</code>, and
-<code>theta_units</code> are still accepted so that older calls do not
-fail abruptly, but non-SI values are now treated as deprecated
-compatibility inputs rather than as an encouraged part of the public
-workflow.</p>
+<code>theta_units</code> are accepted so that older calls do not fail
+abruptly, but non-SI values are deprecated compatibility inputs rather
+than an encouraged part of the public workflow.</p>
 <p>Material inputs remain flexible by design. For each component,
 density and sound speed may be supplied either as contrasts
 (<code>g_*</code>, <code>h_*</code>) or as absolute properties

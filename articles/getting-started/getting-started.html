@@ -83,11 +83,19 @@
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
-<li class="nav-item"><a class="nav-link" href="../../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../../reference/index.html">Function reference</a></li>
+    <li><a class="dropdown-item" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
+    <li><a class="dropdown-item" href="../../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -139,8 +147,9 @@ it shows the workflow logic that links the rest of the documentation
 together. Readers should come away knowing what kinds of objects they
 will create, what choices they will need to make, and which later
 vignette to read when a particular decision becomes more detailed.</p>
-<object type="image/svg+xml" data="getting-started-workflow.svg" style="width:100%;" aria-label="Getting started workflow">
-</object>
+<div class="clickable-figure">
+<img class="clickable-figure__image" src="getting-started-workflow.png" alt="Getting started workflow"><a class="clickable-figure__link" href="../building-shapes/building-shapes.html" aria-label="Build a shape" title="Build a shape" style="left:1.81%;top:26.82%;width:21.12%;height:32.11%;"></a><a class="clickable-figure__link" href="../building-scatterers/building-scatterers.html" aria-label="Wrap as scatterer" title="Wrap as scatterer" style="left:34.68%;top:27.24%;width:24.97%;height:32.11%;"></a><a class="clickable-figure__link" href="../running-models/running-models.html" aria-label="Run model(s)" title="Run model(s)" style="left:71.42%;top:27.43%;width:26.77%;height:32.11%;"></a>
+</div>
 <div class="tip" data-title="Clickable figures">
 <p>You can interact with certain figures by clicking diagram
 elements.</p>
@@ -209,9 +218,9 @@ geometric question, while <code><a href="../../reference/fls_generate.html">fls_
 physical one. The supported public geometry pathways are therefore
 either a pre-built <code>Shape</code> object or explicit coordinate
 vectors supplied directly to the constructor. Older shorthand pathways
-based on character shape labels are now compatibility-only and
-deprecated, so the shape-first workflow is the clearest one to learn and
-the least ambiguous one to debug.</p>
+based on character shape labels are compatibility-only and deprecated,
+so the shape-first workflow is the clearest one to learn and the least
+ambiguous one to debug.</p>
 </div>
 <div class="section level2">
 <h2 id="core-concepts-and-objects">Core concepts and objects<a class="anchor" aria-label="anchor" href="#core-concepts-and-objects"></a>

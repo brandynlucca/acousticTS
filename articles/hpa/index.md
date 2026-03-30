@@ -4,10 +4,8 @@
 
 Benchmarked Validated
 
-*Model-family pages:*
-[Overview](https://brandynlucca.github.io/acousticTS/articles/hpa/index.md)
-[Implementation](https://brandynlucca.github.io/acousticTS/articles/hpa/hpa-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/hpa/hpa-theory.md)
+[Implementation](https://brandynlucca.github.io/acousticTS/articles/hpa/hpa-implementation.md)
 
 These pages follow Johnson’s asymptotic fluid-sphere formulation and
 Stanton’s generalized approximate backscatter formulas ([Johnson

@@ -83,11 +83,19 @@
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
-<li class="nav-item"><a class="nav-link" href="../../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../../reference/index.html">Function reference</a></li>
+    <li><a class="dropdown-item" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
+    <li><a class="dropdown-item" href="../../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -123,15 +131,14 @@ as a segmented arbitrary body. That decision is not just cosmetic. It
 determines how faithfully the object matches a theory family, how much
 geometric detail is preserved, and how easy it will be to interpret the
 response later.</p>
-<p>The important point is that shape construction is not yet the stage
-where material contrasts or boundary conditions are fixed. At this
-stage, only the geometric description of the target is being chosen.
-That separation is intentional. It keeps the geometric question distinct
-from the physical one and makes it easier to evaluate later whether a
-modeled response is being driven by morphology, by material properties,
-or by model assumptions.</p>
-<object type="image/svg+xml" data="building-shapes-spectrum.svg" style="width:100%;" aria-label="Shape-selection spectrum">
-</object>
+<p>The important point is that shape construction is not the stage where
+material contrasts or boundary conditions are fixed. At this stage, only
+the geometric description of the target is being chosen. That separation
+is intentional. It keeps the geometric question distinct from the
+physical one and makes it easier to evaluate later whether a modeled
+response is being driven by morphology, by material properties, or by
+model assumptions.</p>
+<p><img class="vignette-figure" src="building-shapes-spectrum.png" alt="Shape-selection spectrum"></p>
 </div>
 <div class="section level2">
 <h2 id="why-geometry-choice-matters">Why geometry choice matters<a class="anchor" aria-label="anchor" href="#why-geometry-choice-matters"></a>
@@ -175,9 +182,8 @@ conditions, a simple sphere, cylinder, or spheroid often provides a
 cleaner starting point than a highly detailed arbitrary outline.</p>
 <p>The direct generators are usually the clearest interface because they
 make the resulting shape class explicit at the call site.
-<code><a href="../../reference/create_shape.html">create_shape()</a></code> is still useful, but it is best treated as a
-thin convenience dispatcher rather than as the main pedagogical
-path.</p>
+<code><a href="../../reference/create_shape.html">create_shape()</a></code> is a thin convenience dispatcher rather than
+the main pedagogical path.</p>
 </div>
 <div class="section level2">
 <h2 id="coordinate-conventions-by-shape">Coordinate conventions by shape<a class="anchor" aria-label="anchor" href="#coordinate-conventions-by-shape"></a>
@@ -187,8 +193,7 @@ models, but it is easier to read those objects once the coordinate
 conventions are made explicit. The schematic below shows the profile
 view used by the canonical shapes and the side-profile plus
 cross-section interpretation used by arbitrary shapes.</p>
-<object type="image/svg+xml" data="building-shapes-coordinates.svg" style="width:100%;" aria-label="Coordinate conventions for canonical and arbitrary shapes">
-</object>
+<p><img class="vignette-figure" src="building-shapes-coordinates.png" alt="Coordinate conventions for canonical and arbitrary shapes"></p>
 <p>For <code><a href="../../reference/sphere.html">sphere()</a></code>, the geometry is most naturally interpreted
 as a profile in the <code>x-z</code> plane with a single radius
 <code>a</code>. At any axial coordinate <code>x_i</code>, the upper and

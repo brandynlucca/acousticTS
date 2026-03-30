@@ -83,11 +83,19 @@
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
-<li class="nav-item"><a class="nav-link" href="../../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../../reference/index.html">Function reference</a></li>
+    <li><a class="dropdown-item" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
+    <li><a class="dropdown-item" href="../../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -134,8 +142,7 @@ evaluated with finite precision, finite truncation, and finite numerical
 resolution. Readers should therefore treat numerical settings as part of
 the reliability of the answer, not as an afterthought that becomes
 relevant only when something fails dramatically.</p>
-<object type="image/svg+xml" data="numerical-foundations-map.svg" style="width:100%;" aria-label="Numerical foundations map">
-</object>
+<p><img class="vignette-figure" src="numerical-foundations-map.png" alt="Numerical foundations map"></p>
 </div>
 <div class="section level2">
 <h2 id="package-numerical-policy">Package numerical policy<a class="anchor" aria-label="anchor" href="#package-numerical-policy"></a>
@@ -320,10 +327,10 @@ quadruple-precision values.</p>
 <p>The important practical point is that <code><a href="../../reference/Smn.html">Smn()</a></code> and
 <code><a href="../../reference/Rmn.html">Rmn()</a></code> are not numerically difficult because the formulas
 are conceptually obscure. They are difficult because spheroidal special
-functions are expensive and delicate at high order. The current
-implementation in <code>prolate_swf.f90</code> and the related
-<code>psms.cpp</code> wrappers is designed to keep those evaluations
-stable before any model-specific scattering algebra is applied.</p>
+functions are expensive and delicate at high order. The implementation
+in <code>prolate_swf.f90</code> and the related <code>psms.cpp</code>
+wrappers is designed to keep those evaluations stable before any
+model-specific scattering algebra is applied.</p>
 </div>
 </div>
 <div class="section level2">
@@ -349,7 +356,7 @@ in: convergence should be checked by increasing the truncation and
 asking whether the result changes materially. A truncation rule of thumb
 is a starting point, not a proof of adequacy. If a spectrum, resonance
 feature, or angular response moves noticeably when the truncation is
-increased moderately, the earlier result should not yet be treated as
+increased moderately, that result should not yet be treated as
 numerically settled.</p>
 </div>
 <div class="section level2">

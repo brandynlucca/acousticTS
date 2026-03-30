@@ -2,12 +2,10 @@
 
 ## Overview
 
-Experimental Unvalidated
+Unvalidated Experimental
 
-*Model-family pages:*
-[Overview](https://brandynlucca.github.io/acousticTS/articles/ecms/index.md)
-[Implementation](https://brandynlucca.github.io/acousticTS/articles/ecms/ecms-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/ecms/ecms-theory.md)
+[Implementation](https://brandynlucca.github.io/acousticTS/articles/ecms/ecms-implementation.md)
 
 These pages sit between the classical elastic-cylinder literature and
 later finite-length cylinder approximations used in fisheries acoustics
@@ -48,8 +46,9 @@ to recover monostatic backscatter.
 
 ### Validation status
 
-- Current ECMS checks are independent algebra reconstructions rather
-  than a documented external benchmark ladder.
+- ECMS is currently marked experimental because the documented checks
+  are independent algebra reconstructions rather than an external
+  benchmark or software-comparison ladder.
 
 ### Family pages
 

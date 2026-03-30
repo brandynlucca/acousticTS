@@ -83,11 +83,19 @@
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
-<li class="nav-item"><a class="nav-link" href="../../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../../reference/index.html">Function reference</a></li>
+    <li><a class="dropdown-item" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
+    <li><a class="dropdown-item" href="../../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -113,8 +121,15 @@
 <div class="section level2">
 <h2 id="acousticts-implementation">acousticTS implementation<a class="anchor" aria-label="anchor" href="#acousticts-implementation"></a>
 </h2>
-<p><span class="model-tag experimental">Experimental</span> <span class="model-tag unvalidated">Unvalidated</span></p>
-<p><em>Model-family pages:</em> <a href="index.html">Overview</a> <a href="ecms-implementation.html">Implementation</a> <a href="ecms-theory.html">Theory</a></p>
+<div class="model-status-line">
+<span class="model-tag unvalidated">Unvalidated</span> <span class="model-tag experimental">Experimental</span>
+</div>
+<div class="model-nav">
+<div class="model-nav-links">
+<a class="model-nav-badge" href="index.html">Overview</a>
+<a class="model-nav-badge" href="ecms-theory.html">Theory</a>
+</div>
+</div>
 <p>These pages sit between the classical elastic-cylinder literature and
 later finite-length cylinder approximations used in fisheries acoustics
 <span class="citation">(<a href="#ref-faran_sound_1951">Faran 1951</a>;
@@ -128,16 +143,16 @@ the elastic material parameters are supplied through:</p>
 <li><code>sound_speed_longitudinal_body</code></li>
 <li><code>sound_speed_transversal_body</code></li>
 </ul>
-<p>The current implementation check uses an independent direct
-transcription of the Faran-Stanton algebra rather than a
-package-to-package comparison. That is useful for confirming that the
-package code path reproduces the intended elastic-cylinder algebra on a
-shared grid, but it is not a substitute for an external benchmark ladder
-or a separate public software implementation.</p>
+<p>The implementation check uses an independent direct transcription of
+the Faran-Stanton algebra rather than a package-to-package comparison.
+That is useful for confirming that the package code path reproduces the
+intended elastic-cylinder algebra on a shared grid, but it is not a
+substitute for an external benchmark ladder or a separate public
+software implementation.</p>
 <div class="experiment" data-title="Current validation">
-<p><code>ECMS</code> is still marked unvalidated because the current
-check is an independent algebra transcription rather than an external
-benchmark ladder or separate public software implementation.</p>
+<p><code>ECMS</code> is marked unvalidated because the check is an
+independent algebra transcription rather than an external benchmark
+ladder or separate public software implementation.</p>
 </div>
 <div class="section level3">
 <h3 id="reference-case">Reference case<a class="anchor" aria-label="anchor" href="#reference-case"></a>
@@ -206,15 +221,17 @@ benchmark ladder or separate public software implementation.</p>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">Max abs. delta TS (dB)</td>
+<td align="left">Max abs. <span class="math inline">\Delta</span> TS
+(dB)</td>
 <td align="right">0.00</td>
 </tr>
 <tr class="even">
-<td align="left">Mean abs. delta TS (dB)</td>
+<td align="left">Mean abs. <span class="math inline">\Delta</span> TS
+(dB)</td>
 <td align="right">0.00</td>
 </tr>
 <tr class="odd">
-<td align="left">Frequency at max delta (kHz)</td>
+<td align="left">Frequency at max <span class="math inline">\Delta</span> (kHz)</td>
 <td align="right">12.00</td>
 </tr>
 <tr class="even">
@@ -229,9 +246,9 @@ benchmark ladder or separate public software implementation.</p>
 </table>
 <p>This is not presented as a benchmark. It is an implementation
 identity check: the package output and the independent algebra
-transcription coincide on the shared grid, so the current
-<code>ECMS</code> code path is reproducing the stated elastic-cylinder
-series rather than drifting numerically from it.</p>
+transcription coincide on the shared grid, so the <code>ECMS</code> code
+path is reproducing the stated elastic-cylinder series rather than
+drifting numerically from it.</p>
 <div class="section level4">
 <h4 id="spectrum-overlay">Spectrum overlay<a class="anchor" aria-label="anchor" href="#spectrum-overlay"></a>
 </h4>

@@ -4,10 +4,8 @@
 
 Benchmarked Validated
 
-*Model-family pages:*
 [Overview](https://brandynlucca.github.io/acousticTS/articles/fcms/index.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/fcms/fcms-implementation.md)
-[Theory](https://brandynlucca.github.io/acousticTS/articles/fcms/fcms-theory.md)
 
 The finite cylinder modal series solution (FCMS) is one of the standard
 ways to represent acoustic backscatter from straight cylinders of finite
@@ -332,7 +330,7 @@ C_m^{(int)} = \frac{J_m(Ka)+B_mH_m^{(1)}(Ka)}{J_m(K'a)}.
 
 Substituting this into the velocity condition gives:
 
-J_m'(Ka)+B_mH_m^{(1)\prime}(Ka) =
+J_m'(Ka)+B_mH_m^{(1)\prime}(Ka) = \\
 g\_{21}h\_{21}\\\frac{J_m'(K'a)}{J_m(K'a)}
 \left\[J_m(Ka)+B_mH_m^{(1)}(Ka)\right\],
 
@@ -340,7 +338,7 @@ where g\_{21}=\rho_2/\rho_1 and h\_{21}=c_2/c_1. Rearranging yields:
 
 B_m
 \left\[H_m^{(1)\prime}(Ka)-g\_{21}h\_{21}\frac{J_m'(K'a)}{J_m(K'a)}H_m^{(1)}(Ka)\right\]
-= g\_{21}h\_{21}\frac{J_m'(K'a)}{J_m(K'a)}J_m(Ka)-J_m'(Ka).
+= \\ g\_{21}h\_{21}\frac{J_m'(K'a)}{J_m(K'a)}J_m(Ka)-J_m'(Ka).
 
 Solving for the exterior scattering coefficient gives:
 

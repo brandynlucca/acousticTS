@@ -83,11 +83,19 @@
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
-<li class="nav-item"><a class="nav-link" href="../../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../../reference/index.html">Function reference</a></li>
+    <li><a class="dropdown-item" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
+    <li><a class="dropdown-item" href="../../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -141,22 +149,22 @@ starting point if its geometry, boundary assumptions, or approximation
 regime do not match the target. Conversely, a simpler model can be the
 better first choice if it captures the dominant physics of the question
 being asked.</p>
-<object type="image/svg+xml" data="model-selection-flowchart.svg" style="width:100%;" aria-label="Revised general model-selection flowchart">
-</object>
-<p>The revised chart removes a few false dichotomies that were starting
-to creep into the earlier version. Composite internal structure,
-canonical geometry, and asymptotic screening are now treated as separate
-decisions rather than as a single forced branch. That makes room for
-families such as <code>BBFM</code>, <code>BCMS</code>,
-<code>ECMS</code>, <code>PCDWBA</code>, <code>VESM</code>, and the newer
-shape-specific <code>TMM</code> branches, and it also makes clearer that
+<div class="clickable-figure">
+<img class="clickable-figure__image" src="model-selection-flowchart.png" alt="Revised general model-selection flowchart"><a class="clickable-figure__link" href="../krm/index.html" aria-label="KRM overview" title="KRM overview" style="left:75.75%;top:24.09%;width:5.47%;height:2.86%;"></a><a class="clickable-figure__link" href="../bbfm/index.html" aria-label="BBFM overview" title="BBFM overview" style="left:55.68%;top:36.55%;width:6.08%;height:2.86%;"></a><a class="clickable-figure__link" href="../hpa/index.html" aria-label="HPA overview" title="HPA overview" style="left:53.59%;top:56.20%;width:5.34%;height:2.86%;"></a><a class="clickable-figure__link" href="../sphms/index.html" aria-label="SPHMS overview" title="SPHMS overview" style="left:77.31%;top:63.58%;width:6.58%;height:2.59%;"></a><a class="clickable-figure__link" href="../calibration/index.html" aria-label="Calibration overview" title="Calibration overview" style="left:77.68%;top:66.65%;width:5.85%;height:2.59%;"></a><a class="clickable-figure__link" href="../fcms/index.html" aria-label="FCMS overview" title="FCMS overview" style="left:90.04%;top:66.00%;width:5.64%;height:2.59%;"></a><a class="clickable-figure__link" href="../essms/index.html" aria-label="ESSMS overview" title="ESSMS overview" style="left:77.86%;top:69.72%;width:5.49%;height:2.59%;"></a><a class="clickable-figure__link" href="../trcm/index.html" aria-label="TRCM overview" title="TRCM overview" style="left:89.70%;top:69.09%;width:6.32%;height:2.56%;"></a><a class="clickable-figure__link" href="../bcms/index.html" aria-label="BCMS overview" title="BCMS overview" style="left:89.70%;top:72.15%;width:6.32%;height:2.56%;"></a><a class="clickable-figure__link" href="../ecms/index.html" aria-label="ECMS overview" title="ECMS overview" style="left:89.70%;top:75.21%;width:6.32%;height:2.56%;"></a><a class="clickable-figure__link" href="../vesm/index.html" aria-label="VESM overview" title="VESM overview" style="left:77.54%;top:72.79%;width:6.12%;height:2.59%;"></a><a class="clickable-figure__link" href="../sdwba/index.html" aria-label="SDWBA overview" title="SDWBA overview" style="left:47.03%;top:73.83%;width:7.38%;height:2.83%;"></a><a class="clickable-figure__link" href="../dwba/index.html" aria-label="DWBA overview" title="DWBA overview" style="left:7.12%;top:75.46%;width:6.79%;height:2.84%;"></a><a class="clickable-figure__link" href="../psms/index.html" aria-label="PSMS overview" title="PSMS overview" style="left:69.80%;top:78.14%;width:5.64%;height:2.59%;"></a><a class="clickable-figure__link" href="../pcdwba/index.html" aria-label="PCDWBA overview" title="PCDWBA overview" style="left:47.03%;top:77.08%;width:7.38%;height:2.83%;"></a><a class="clickable-figure__link" href="../tmm/index.html" aria-label="TMM overview" title="TMM overview" style="left:90.19%;top:78.17%;width:5.34%;height:2.59%;"></a><a class="clickable-figure__link" href="../tmm/index.html" aria-label="TMM overview" title="TMM overview" style="left:59.98%;top:78.13%;width:5.34%;height:2.59%;"></a><a class="clickable-figure__link" href="../tmm/index.html" aria-label="TMM overview" title="TMM overview" style="left:77.93%;top:75.86%;width:5.34%;height:2.59%;"></a><a class="clickable-figure__link" href="../tmm/index.html" aria-label="TMM overview" title="TMM overview" style="left:69.98%;top:81.22%;width:5.34%;height:2.59%;"></a>
+</div>
+<p>The chart separates composite internal structure, canonical geometry,
+and asymptotic screening into distinct decisions rather than folding
+them into a single forced branch. That leaves room for families such as
+<code>BBFM</code>, <code>BCMS</code>, <code>ECMS</code>,
+<code>PCDWBA</code>, <code>VESM</code>, and the shape-specific
+<code>TMM</code> branches, and it also makes clearer that
 <code>HPA</code>, <code>SDWBA</code>, and <code>TRCM</code> are often
 neighboring screening or regime-specific alternatives rather than
 absolute replacements for the more geometry-matched families.
 Experimental families are shown in a separate color so they remain
 visible without being confused with the longer-established model paths,
 while gray boxes identify future-development families that have been
-discussed but are not yet public package models.</p>
+discussed but are not public package models.</p>
 <p>Boundary condition is often as decisive as geometry in this decision
 process. A spherical pressure-release cavity, a fluid-filled sphere, and
 an elastic shell may look similar at gross scale while belonging to
@@ -239,18 +247,18 @@ matched canonical geometry.</p>
 <h3 id="oblate-spheroid">Oblate spheroid<a class="anchor" aria-label="anchor" href="#oblate-spheroid"></a>
 </h3>
 <p>If the target is flattened rather than elongated and is better
-represented as an oblate spheroid, the current package path is <a href="../tmm/tmm-theory.html">TMM</a>. That branch is still
+represented as an oblate spheroid, the package path is <a href="../tmm/tmm-theory.html">TMM</a>. That branch is still
 experimental, but it is the active shape-matched route for single-target
 oblate scattering in the package. The chart also shows <code>OSMS</code>
 in gray because a true oblate modal-series companion model remains a
-future-development target rather than a current public model.</p>
+future-development target rather than a public package model.</p>
 <p>This oblate branch matters because it separates two different ideas
 that are easy to conflate. The first is “can the target be represented
 as an oblate spheroid?” The second is “does the package already have a
-dedicated oblate modal-series family?” Right now the answer is yes to
-the first question and no to the second, which is why the flowchart
-routes the current public choice through <code>TMM</code> and reserves
-<code>OSMS</code> for future development.</p>
+dedicated oblate modal-series family?” The answer is yes to the first
+question and no to the second, which is why the flowchart routes the
+public choice through <code>TMM</code> and reserves <code>OSMS</code>
+for future development.</p>
 </div>
 <div class="section level3">
 <h3 id="finite-cylinder">Finite cylinder<a class="anchor" aria-label="anchor" href="#finite-cylinder"></a>
@@ -261,8 +269,8 @@ choice. It is most appropriate when the cross-section is circular, the
 cylinder is reasonably straight, and the separated finite-cylinder
 reduction is defensible. <a href="../tmm/tmm-theory.html">TMM</a> is
 shown for cylinders as a guarded experimental branch rather than as a
-co-equal default, because its current supported scope is narrower than
-the sphere, oblate, and prolate <code>TMM</code> branches. <a href="../hpa/hpa-theory.html">HPA</a> is useful when only a compact
+co-equal default, because its documented supported scope is narrower
+than the sphere, oblate, and prolate <code>TMM</code> branches. <a href="../hpa/hpa-theory.html">HPA</a> is useful when only a compact
 approximate response is needed, while <a href="../trcm/trcm-theory.html">TRCM</a> is more appropriate when the
 dominant physics is high-frequency specular and through-body ray
 interference rather than modal structure.</p>

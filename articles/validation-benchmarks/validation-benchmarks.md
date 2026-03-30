@@ -18,7 +18,7 @@ object and unit sanity, then moves to canonical benchmark reproduction,
 and finally asks whether the numerical behavior is stable enough that
 any remaining discrepancy deserves physical interpretation.
 
-![Validation ladder](validation-ladder.svg)
+![Validation ladder](validation-ladder.png)
 
 Validation ladder
 
@@ -56,42 +56,42 @@ head(benchmark_ts$frequency_spectra$index$frequency)
 
     ## [1] 12000 14000 16000 18000 20000 22000
 
-The benchmark cases currently emphasize canonical exact or near-exact
-comparison problems: `SPHMS` sphere cases with several boundary
-conditions, `FCMS` finite-cylinder cases, and `PSMS` prolate-spheroid
-cases. That combination is useful because it spans several canonical
-geometries and several different numerical mechanisms. In practice,
-these resources let a user ask two related but different questions. The
-first is whether a known reference problem can be reproduced. The second
-is whether a new workflow still behaves consistently when anchored to a
-trusted canonical case.
+The benchmark cases emphasize canonical exact or near-exact comparison
+problems: `SPHMS` sphere cases with several boundary conditions, `FCMS`
+finite-cylinder cases, and `PSMS` prolate-spheroid cases. That
+combination is useful because it spans several canonical geometries and
+several different numerical mechanisms. In practice, these resources let
+a user ask two related but different questions. The first is whether a
+known reference problem can be reproduced. The second is whether a new
+workflow still behaves consistently when anchored to a trusted canonical
+case.
 
 ## Validation registry snapshot
 
-The package now also keeps a small internal validation registry so the
+The package also keeps a small internal validation registry so the
 family-page badges, model-library summaries, and validation evidence can
 be drawn from one source rather than maintained separately.
 
 ### Family statuses
 
-| Family | Section                              | Status                               |
-|:-------|:-------------------------------------|:-------------------------------------|
-| SPHMS  | Modal-series families                | Benchmarked, Validated               |
-| FCMS   | Modal-series families                | Benchmarked, Validated               |
-| PSMS   | Modal-series families                | Benchmarked, Validated               |
-| SOEMS  | Modal-series families                | Benchmarked, Validated               |
-| ESSMS  | Modal-series families                | Unvalidated                          |
-| BCMS   | Modal-series families                | Experimental, Unvalidated            |
-| ECMS   | Modal-series families                | Experimental, Unvalidated            |
-| DWBA   | Approximation and ray-based families | Benchmarked, Validated               |
-| SDWBA  | Approximation and ray-based families | Benchmarked, Validated               |
-| KRM    | Approximation and ray-based families | Benchmarked, Validated               |
-| HPA    | Approximation and ray-based families | Benchmarked, Validated               |
-| TRCM   | Approximation and ray-based families | Benchmarked                          |
-| PCDWBA | Approximation and ray-based families | Validated, Experimental              |
-| BBFM   | Composite and emerging families      | Experimental, Unvalidated            |
-| VESM   | Composite and emerging families      | Experimental, Unvalidated            |
-| TMM    | Composite and emerging families      | Benchmarked, Validated, Experimental |
+| Family | Section                              | Status                                         |
+|:-------|:-------------------------------------|:-----------------------------------------------|
+| SPHMS  | Modal-series families                | Benchmarked, Validated                         |
+| FCMS   | Modal-series families                | Benchmarked, Validated                         |
+| PSMS   | Modal-series families                | Benchmarked, Validated                         |
+| SOEMS  | Modal-series families                | Benchmarked, Validated                         |
+| ESSMS  | Modal-series families                | Unvalidated                                    |
+| BCMS   | Modal-series families                | Unvalidated, Experimental                      |
+| ECMS   | Modal-series families                | Unvalidated, Experimental                      |
+| DWBA   | Approximation and ray-based families | Benchmarked, Validated                         |
+| SDWBA  | Approximation and ray-based families | Benchmarked, Validated                         |
+| KRM    | Approximation and ray-based families | Benchmarked, Validated                         |
+| HPA    | Approximation and ray-based families | Benchmarked, Validated                         |
+| TRCM   | Approximation and ray-based families | Benchmarked, Unvalidated                       |
+| PCDWBA | Approximation and ray-based families | Validated, Experimental                        |
+| BBFM   | Composite and emerging families      | Unvalidated, Experimental                      |
+| VESM   | Composite and emerging families      | Validated, Experimental                        |
+| TMM    | Composite and emerging families      | Benchmarked, Partially validated, Experimental |
 
 ### Benchmark evidence
 
@@ -108,21 +108,39 @@ be drawn from one source rather than maintained separately.
 | TRCM   | Benchmarked   | Package validation workflow             | Straight and bent cylindrical validation cases documented in the package.    | Benchmarked within the package validation workflow against the straight-cylinder and FCMS-derived bent-cylinder reference constructions. |
 | TMM    | Benchmarked   | SPHMS / PSMS / FCMS benchmark ladder    | Sphere, oblate, prolate, and guarded cylinder monostatic branches.           | Benchmarked against `SPHMS`, `PSMS`, and `FCMS` on the currently supported canonical shape branches.                                     |
 
-### External-comparison evidence
+### Validated-comparison evidence
 
-| Family | Evidence type | Source                                         | Scope                                                                  | Summary                                                                                                    |
-|:-------|:--------------|:-----------------------------------------------|:-----------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------|
-| SPHMS  | Validated     | KRMr and echoSMs                               | Penetrable sphere spectra on shared software definitions.              | Validated against `KRMr` and `echoSMs` on shared penetrable-sphere cases.                                  |
-| FCMS   | Validated     | echoSMs                                        | Rigid, soft, liquid-filled, and gas-filled finite-cylinder spectra.    | Validated against the `echoSMs` finite-cylinder implementation.                                            |
-| PSMS   | Validated     | Prol_Spheroid                                  | Liquid-filled and gas-filled prolate-spheroid software comparisons.    | Validated against the external `Prol_Spheroid` implementation on shared prolate cases.                     |
-| SOEMS  | Validated     | echoSMs, sphereTS, NOAA applet                 | Shared calibration-sphere material sets and frequency sweeps.          | Validated against `echoSMs`, `sphereTS`, and the NOAA calibration applet.                                  |
-| DWBA   | Validated     | Published and independent DWBA implementations | Bundled krill geometry and published DWBA reference workflows.         | Validated against the published McGehee MATLAB workflow and an independent DWBA implementation.            |
-| SDWBA  | Validated     | CCAMLR MATLAB and NOAA HTML implementations    | Bundled krill stochastic workflow comparisons.                         | Validated against the CCAMLR MATLAB and NOAA HTML SDWBA implementations.                                   |
-| KRM    | Validated     | KRMr, echoSMs, NOAA applet                     | Bundled sardine and cod software-to-software comparisons.              | Validated against `KRMr`, `echoSMs`, and the NOAA KRM applet on bundled fish objects and shared workflows. |
-| HPA    | Validated     | echoSMs HPModel and published algebra          | Spherical HPModel branch and published asymptotic formulas.            | Validated against the spherical `echoSMs::HPModel` branch and the published Johnson/Stanton algebra.       |
-| PCDWBA | Validated     | ZooScatR and echopop source workflows          | Curved weak-scattering reference workflows on shared bent-body cases.  | Validated against source-level `ZooScatR` and `echopop` PCDWBA workflows.                                  |
-| TMM    | Validated     | BEMPP far-field checks                         | Pressure-release angular slices for sphere, oblate, and prolate cases. | Validated against external BEMPP far-field checks for sphere, oblate, and prolate pressure-release cases.  |
-| TMM    | Validated     | Exact general-angle spheroidal solution        | General-angle prolate retained-state validation.                       | Retained prolate angular products are also checked against the exact general-angle spheroidal solution.    |
+| Family | Evidence type | Source                                         | Scope                                                                       | Summary                                                                                                    |
+|:-------|:--------------|:-----------------------------------------------|:----------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------|
+| SPHMS  | Validated     | KRMr and echoSMs                               | Penetrable sphere spectra on shared software definitions.                   | Validated against `KRMr` and `echoSMs` on shared penetrable-sphere cases.                                  |
+| FCMS   | Validated     | echoSMs                                        | Rigid, soft, liquid-filled, and gas-filled finite-cylinder spectra.         | Validated against the `echoSMs` finite-cylinder implementation.                                            |
+| PSMS   | Validated     | Prol_Spheroid                                  | Liquid-filled and gas-filled prolate-spheroid software comparisons.         | Validated against the external `Prol_Spheroid` implementation on shared prolate cases.                     |
+| SOEMS  | Validated     | echoSMs, sphereTS, NOAA applet                 | Shared calibration-sphere material sets and frequency sweeps.               | Validated against `echoSMs`, `sphereTS`, and the NOAA calibration applet.                                  |
+| DWBA   | Validated     | Published and independent DWBA implementations | Bundled krill geometry and published DWBA reference workflows.              | Validated against the published McGehee MATLAB workflow and an independent DWBA implementation.            |
+| SDWBA  | Validated     | CCAMLR MATLAB and NOAA HTML implementations    | Bundled krill stochastic workflow comparisons.                              | Validated against the CCAMLR MATLAB and NOAA HTML SDWBA implementations.                                   |
+| KRM    | Validated     | KRMr, echoSMs, NOAA applet                     | Bundled sardine and cod software-to-software comparisons.                   | Validated against `KRMr`, `echoSMs`, and the NOAA KRM applet on bundled fish objects and shared workflows. |
+| HPA    | Validated     | echoSMs HPModel and published algebra          | Spherical HPModel branch and published asymptotic formulas.                 | Validated against the spherical `echoSMs::HPModel` branch and the published Johnson/Stanton algebra.       |
+| PCDWBA | Validated     | ZooScatR and echopop source workflows          | Curved weak-scattering reference workflows on shared bent-body cases.       | Validated against source-level `ZooScatR` and `echopop` PCDWBA workflows.                                  |
+| VESM   | Validated     | Reference Python VESM workflow                 | Documented spherical layered case used by the original VESM implementation. | Validated against the reference Python VESM implementation on the documented layered-sphere case.          |
+| TMM    | Validated     | BEMPP far-field checks                         | Pressure-release angular slices for sphere, oblate, and prolate cases.      | Validated against external BEMPP far-field checks for sphere, oblate, and prolate pressure-release cases.  |
+| TMM    | Validated     | Exact general-angle spheroidal solution        | General-angle prolate retained-state validation.                            | Retained prolate angular products are also checked against the exact general-angle spheroidal solution.    |
+
+### Partially-validated scope evidence
+
+| Family | Evidence type       | Source                        | Scope                                                    | Summary                                                                                                                                                                                   |
+|:-------|:--------------------|:------------------------------|:---------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| TMM    | Partially validated | Cylinder retained-angle scope | Cylinder retained-angle scope limitation and guardrails. | TMM is partially validated because the sphere, oblate, and prolate branches have external checks, but retained general-angle cylinder products remain outside the validated public scope. |
+
+### Experimental-scope evidence
+
+| Family | Evidence type | Source                                       | Scope                                                                 | Summary                                                                                                                                                                          |
+|:-------|:--------------|:---------------------------------------------|:----------------------------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| BCMS   | Experimental  | Internal FCMS-based reference reconstruction | Uniform-curvature cylinder coherence extension of FCMS.               | BCMS is currently marked experimental because the documented checks are internal coherence reconstructions rather than an external benchmark or software-comparison ladder.      |
+| ECMS   | Experimental  | Independent algebra transcription            | Elastic-cylinder component family and near-broadside canonical cases. | ECMS is currently marked experimental because the documented checks are independent algebra reconstructions rather than an external benchmark or software-comparison ladder.     |
+| PCDWBA | Experimental  | Current package workflow surface             | Current package-facing PCDWBA workflow and argument surface.          | PCDWBA is currently marked experimental because the public package workflow is still being tightened even though the current source- level comparison cases are documented.      |
+| BBFM   | Experimental  | Internal DWBA + ECMS reconstruction          | Internal composite-component consistency checks only.                 | BBFM is currently marked experimental because it has documented internal reconstruction checks but no external benchmark ladder or independent public implementation comparison. |
+| VESM   | Experimental  | Current layered-sphere workflow surface      | Current documented layered-sphere workflow surface.                   | VESM is currently marked experimental because the documented public workflow is still limited to the current layered-sphere scope.                                               |
+| TMM    | Experimental  | Current retained-state branch matrix         | Current retained-state branch matrix across supported shapes.         | TMM is currently marked experimental because the retained-state workflow and branch matrix are still guarded while shape-specific support continues to be tightened.             |
 
 ## What validation means in this package
 

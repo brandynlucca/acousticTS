@@ -4,9 +4,7 @@
 
 Unvalidated
 
-*Model-family pages:*
 [Overview](https://brandynlucca.github.io/acousticTS/articles/essms/index.md)
-[Implementation](https://brandynlucca.github.io/acousticTS/articles/essms/essms-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/essms/essms-theory.md)
 
 These pages are grounded in the classical elastic-shell scattering
@@ -22,11 +20,10 @@ physically important inputs. For `ESSMS`, the required object class is
 `ESS`, which combines a spherical shell, an optional internal fluid, and
 the elastic constants required for the shell solution.
 
-`ESSMS` remains unvalidated in the package. The benchmark family exists,
-but the current implementation still does not return finite full-grid
-`TS` values across those shell-sphere comparison sweeps, so this page is
-documenting behavior and limitations rather than benchmark-grade
-agreement.
+`ESSMS` is unvalidated in the package. The benchmark family exists, but
+the implementation does not return finite full-grid `TS` values across
+those shell-sphere comparison sweeps, so this page documents behavior
+and limitations rather than benchmark-grade agreement.
 
 ### Elastic-shelled sphere object generation
 
@@ -180,28 +177,26 @@ the strongest modal features occur.
 #### Benchmark source and current status
 
 ESSMS does have a direct benchmark source in the Jech shell-sphere
-family. At the moment, though, the current full-grid ESSMS sweep is
-still a status check rather than a usable delta table because the
-present implementation does not return finite `TS` values across the
-benchmark grid.
+family. The full-grid ESSMS sweep is a status check rather than a usable
+\Delta table because the implementation does not return finite `TS`
+values across the benchmark grid.
 
-| ESSMS case                             | Finite benchmark points matched | Max abs. delta TS (dB) | Mean abs. delta TS (dB) | Elapsed (s) | Current status         |
-|:---------------------------------------|--------------------------------:|:-----------------------|:------------------------|------------:|:-----------------------|
-| Pressure-release interior shell        |                               0 | `NA`                   | `NA`                    |        0.05 | no finite full-grid TS |
-| Gas-interior shell                     |                               0 | `NA`                   | `NA`                    |        0.07 | no finite full-grid TS |
-| Weakly scattering fluid-interior shell |                               0 | `NA`                   | `NA`                    |        0.05 | no finite full-grid TS |
+| ESSMS case                             | Finite benchmark points matched | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | Elapsed (s) | Status                 |
+|:---------------------------------------|--------------------------------:|:------------------------|:-------------------------|------------:|:-----------------------|
+| Pressure-release interior shell        |                               0 | `NA`                    | `NA`                     |        0.05 | no finite full-grid TS |
+| Gas-interior shell                     |                               0 | `NA`                    | `NA`                     |        0.07 | no finite full-grid TS |
+| Weakly scattering fluid-interior shell |                               0 | `NA`                    | `NA`                     |        0.05 | no finite full-grid TS |
 
-So the benchmarking story for ESSMS is currently very simple. The
-external benchmark family exists and is the right one to use, but the
-current implementation still needs numerical stabilization before this
-page can present the same kind of benchmark-accuracy table shown for
-SPHMS, FCMS, and PSMS.
+The benchmarking story for ESSMS is simple. The external benchmark
+family exists and is the right one to use, but the implementation needs
+numerical stabilization before this page can present the same kind of
+benchmark-accuracy table shown for SPHMS, FCMS, and PSMS.
 
 ESSMS also exposes `m_limit`, so the obvious next question is whether
 the absence of finite full-grid values is just an overly aggressive
 truncation choice. The table below checks that directly.
 
-| ESSMS case                             | `m_limit`    | Finite benchmark points matched | Elapsed (s) | Current status         |
+| ESSMS case                             | `m_limit`    | Finite benchmark points matched | Elapsed (s) | Status                 |
 |:---------------------------------------|:-------------|--------------------------------:|------------:|:-----------------------|
 | Pressure-release interior shell        | default rule |                               0 |        0.04 | no finite full-grid TS |
 | Pressure-release interior shell        | `40`         |                               0 |        0.12 | no finite full-grid TS |

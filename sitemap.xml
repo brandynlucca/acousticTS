@@ -116,6 +116,7 @@
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/VESMS.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/along_sum.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/arbitrary.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/available_models.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/bbf_generate.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/bbf_show.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/benchmark_ts.html</loc></url>
@@ -158,6 +159,8 @@
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/reforge-GAS-method.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/reforge-SBF-method.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/reforge.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/register_model.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/reset_model_registry.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/rho.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/sardine.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/sbf_generate.html</loc></url>
@@ -175,6 +178,7 @@
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/tmm_scattering.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/tmm_scattering_grid.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/transmission_coefficient.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/unregister_model.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/vecnorm.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/wavenumber.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/yc.html</loc></url>

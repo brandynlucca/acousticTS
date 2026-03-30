@@ -4,9 +4,7 @@
 
 Benchmarked Validated
 
-*Model-family pages:*
 [Overview](https://brandynlucca.github.io/acousticTS/articles/psms/index.md)
-[Implementation](https://brandynlucca.github.io/acousticTS/articles/psms/psms-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/psms/psms-theory.md)
 
 These pages are rooted in exact spheroidal-coordinate separations and
@@ -136,7 +134,7 @@ double-precision path is usually the more practical choice.
 
 ### Adaptive mode
 
-The `adaptive` argument is now the main switch that separates a fully
+The `adaptive` argument is the main switch that separates a fully
 literal retained-mode evaluation from a more pragmatic backscatter
 evaluation. The important point is that `adaptive = TRUE` does not
 redefine the PSMS mathematics. It changes how aggressively the
@@ -262,47 +260,59 @@ Three coverage details matter when reading the numbers:
     The gas-filled prolate-spheroid frequency comparison is marked `NB`,
     and the corresponding discussion states that no benchmark `TS`
     values were calculated for that target. The gas-filled rows below
-    therefore report `NB` in the delta columns rather than treating that
-    curve as a benchmark target.
+    therefore report `NB` in the \Delta TS columns rather than treating
+    that curve as a benchmark target.
 3.  The liquid-filled benchmark has values at
     `12, 18, 38, 70, 120, 200, 250, 300, 400 kHz`, but not at `333 kHz`.
 
-The reported deltas are therefore computed only where validated
+The reported \Delta values are therefore computed only where validated
 benchmark values exist.
 
-| Boundary           | Precision | `simplify_Amn` | `adaptive` | `n_integration` | Max abs. delta TS (dB) | Mean abs. delta TS (dB) |
-|:-------------------|:----------|:---------------|:-----------|:----------------|-----------------------:|------------------------:|
-| `fixed_rigid`      | `double`  |                | `FALSE`    | `96`            |                0.00674 |                 0.00230 |
-| `fixed_rigid`      | `double`  |                | `TRUE`     |                 |                0.00674 |                 0.00230 |
-| `fixed_rigid`      | `quad`    |                | `FALSE`    | `96`            |                0.00096 |                 0.00083 |
-| `fixed_rigid`      | `quad`    |                | `TRUE`     |                 |                0.00096 |                 0.00083 |
-| `pressure_release` | `double`  |                | `FALSE`    | `96`            |                0.00412 |                 0.00251 |
-| `pressure_release` | `double`  |                | `TRUE`     |                 |                0.00412 |                 0.00251 |
-| `pressure_release` | `quad`    |                | `FALSE`    | `96`            |                0.00433 |                 0.00293 |
-| `pressure_release` | `quad`    |                | `TRUE`     |                 |                0.00433 |                 0.00293 |
-| `gas_filled`       | `double`  | `FALSE`        | `FALSE`    | `96`            |                   `NB` |                    `NB` |
-| `gas_filled`       | `double`  | `FALSE`        | `TRUE`     |                 |                   `NB` |                    `NB` |
-| `gas_filled`       | `double`  | `TRUE`         | `FALSE`    | `96`            |                   `NB` |                    `NB` |
-| `gas_filled`       | `double`  | `TRUE`         | `TRUE`     |                 |                   `NB` |                    `NB` |
-| `gas_filled`       | `quad`    | `FALSE`        | `FALSE`    | `96`            |                   `NB` |                    `NB` |
-| `gas_filled`       | `quad`    | `FALSE`        | `TRUE`     |                 |                   `NB` |                    `NB` |
-| `gas_filled`       | `quad`    | `TRUE`         | `FALSE`    | `96`            |                   `NB` |                    `NB` |
-| `gas_filled`       | `quad`    | `TRUE`         | `TRUE`     |                 |                   `NB` |                    `NB` |
-| `liquid_filled`    | `double`  | `FALSE`        | `FALSE`    | `96`            |                8.67114 |                 1.53575 |
-| `liquid_filled`    | `double`  | `FALSE`        | `TRUE`     |                 |               17.34265 |                 4.59850 |
-| `liquid_filled`    | `double`  | `TRUE`         | `FALSE`    | `96`            |                7.18195 |                 2.22574 |
-| `liquid_filled`    | `double`  | `TRUE`         | `TRUE`     |                 |                7.18195 |                 2.22574 |
-| `liquid_filled`    | `quad`    | `FALSE`        | `FALSE`    | `96`            |                0.08263 |                 0.02805 |
-| `liquid_filled`    | `quad`    | `FALSE`        | `TRUE`     |                 |                0.08348 |                 0.02806 |
-| `liquid_filled`    | `quad`    | `TRUE`         | `FALSE`    | `96`            |                3.65223 |                 1.46801 |
-| `liquid_filled`    | `quad`    | `TRUE`         | `TRUE`     |                 |                3.65223 |                 1.46801 |
+#### Benchmark summary
+
+- Rigid and pressure release
+- Gas filled
+- Liquid filled
+
+| Boundary           | Precision | `adaptive` | `n_integration` | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) |
+|:-------------------|:----------|:-----------|:----------------|------------------------:|-------------------------:|
+| `fixed_rigid`      | `double`  | `FALSE`    | `96`            |                 0.00674 |                  0.00230 |
+| `fixed_rigid`      | `double`  | `TRUE`     |                 |                 0.00674 |                  0.00230 |
+| `fixed_rigid`      | `quad`    | `FALSE`    | `96`            |                 0.00096 |                  0.00083 |
+| `fixed_rigid`      | `quad`    | `TRUE`     |                 |                 0.00096 |                  0.00083 |
+| `pressure_release` | `double`  | `FALSE`    | `96`            |                 0.00412 |                  0.00251 |
+| `pressure_release` | `double`  | `TRUE`     |                 |                 0.00412 |                  0.00251 |
+| `pressure_release` | `quad`    | `FALSE`    | `96`            |                 0.00433 |                  0.00293 |
+| `pressure_release` | `quad`    | `TRUE`     |                 |                 0.00433 |                  0.00293 |
+
+| Precision | `simplify_Amn` | `adaptive` | `n_integration` | Benchmark status | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) |
+|:----------|:---------------|:-----------|:----------------|:-----------------|:------------------------|:-------------------------|
+| `double`  | `FALSE`        | `FALSE`    | `96`            | `NB`             | `NB`                    | `NB`                     |
+| `double`  | `FALSE`        | `TRUE`     |                 | `NB`             | `NB`                    | `NB`                     |
+| `double`  | `TRUE`         | `FALSE`    | `96`            | `NB`             | `NB`                    | `NB`                     |
+| `double`  | `TRUE`         | `TRUE`     |                 | `NB`             | `NB`                    | `NB`                     |
+| `quad`    | `FALSE`        | `FALSE`    | `96`            | `NB`             | `NB`                    | `NB`                     |
+| `quad`    | `FALSE`        | `TRUE`     |                 | `NB`             | `NB`                    | `NB`                     |
+| `quad`    | `TRUE`         | `FALSE`    | `96`            | `NB`             | `NB`                    | `NB`                     |
+| `quad`    | `TRUE`         | `TRUE`     |                 | `NB`             | `NB`                    | `NB`                     |
+
+| Precision | `simplify_Amn` | `adaptive` | `n_integration` | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) |
+|:----------|:---------------|:-----------|:----------------|------------------------:|-------------------------:|
+| `double`  | `FALSE`        | `FALSE`    | `96`            |                 8.67114 |                  1.53575 |
+| `double`  | `FALSE`        | `TRUE`     |                 |                17.34265 |                  4.59850 |
+| `double`  | `TRUE`         | `FALSE`    | `96`            |                 7.18195 |                  2.22574 |
+| `double`  | `TRUE`         | `TRUE`     |                 |                 7.18195 |                  2.22574 |
+| `quad`    | `FALSE`        | `FALSE`    | `96`            |                 0.08263 |                  0.02805 |
+| `quad`    | `FALSE`        | `TRUE`     |                 |                 0.08348 |                  0.02806 |
+| `quad`    | `TRUE`         | `FALSE`    | `96`            |                 3.65223 |                  1.46801 |
+| `quad`    | `TRUE`         | `TRUE`     |                 |                 3.65223 |                  1.46801 |
 
 Several practical points follow from this comparison.
 
 1.  For `fixed_rigid` and `pressure_release`, both precisions remain
     benchmark-close over the frequencies for which benchmark values are
     available, and the adaptive early-stop logic does not materially
-    change those benchmark deltas on this short grid.
+    change those benchmark \Delta values on this short grid.
 2.  When `adaptive = FALSE`, the model keeps the literal fixed
     `n_integration = 96` default. When `adaptive = TRUE`, the table
     leaves that cell blank because the adaptive path no longer treats
@@ -313,16 +323,16 @@ Several practical points follow from this comparison.
     `simplify_Amn = FALSE` and `precision = "quad"` remains the only
     configuration in this table that stays benchmark-close through the
     higher-frequency benchmark range.
-5.  The gas-filled prolate rows are retained here because they are still
+5.  The gas-filled prolate rows are retained here because they remain
     part of the implementation space, but they are not interpreted as
-    benchmark deltas because the published comparison explicitly labels
-    that case `NB` for no benchmark.
-6.  The current adaptive liquid-filled path is useful in quad precision,
-    but it is not universally beneficial. In particular, the
+    benchmark \Delta values because the published comparison explicitly
+    labels that case `NB` for no benchmark.
+6.  The adaptive liquid-filled path is useful in quad precision, but it
+    is not universally beneficial. In particular, the
     `precision = "double"`, `simplify_Amn = FALSE`, `adaptive = TRUE`
     combination drifts much farther from benchmark on this grid than the
     literal double-precision run.
-7.  The largest liquid-filled deviations still occur in deep null
+7.  The largest liquid-filled deviations occur in deep null
     neighborhoods, where small phase or truncation differences can
     produce visibly larger `TS` differences in dB than they would on a
     linear scattering-amplitude scale.
@@ -331,18 +341,18 @@ The summary statistics are helpful, but they still compress where the
 differences actually occur. For the main liquid-filled benchmark
 configuration, the frequency-specific comparison is:
 
-| Frequency (kHz) | Benchmark TS (dB) | Literal TS (dB) | Adaptive TS (dB) | Adaptive `n_integration` | Literal delta TS (dB) | Adaptive delta TS (dB) |
-|----------------:|------------------:|----------------:|-----------------:|-------------------------:|----------------------:|-----------------------:|
-|              12 |            -87.05 |       -87.05331 |        -87.05331 |                       32 |              -0.00331 |               -0.00331 |
-|              18 |            -81.19 |       -81.19965 |        -81.19965 |                       32 |              -0.00965 |               -0.00965 |
-|              38 |            -77.17 |       -77.20046 |        -77.20046 |                       32 |              -0.03046 |               -0.03046 |
-|              70 |            -76.92 |       -76.95042 |        -76.95042 |                       32 |              -0.03042 |               -0.03042 |
-|             120 |            -80.58 |       -80.55970 |        -80.55951 |                       32 |               0.02030 |                0.02049 |
-|             200 |            -89.31 |       -89.39263 |        -89.39348 |                       48 |              -0.08263 |               -0.08348 |
-|             250 |            -79.39 |       -79.42879 |        -79.42819 |                       56 |              -0.03879 |               -0.03819 |
-|             300 |            -77.52 |       -77.51659 |        -77.51653 |                       64 |               0.00341 |                0.00347 |
-|             333 |              `NA` |       -76.90684 |        -76.90677 |                       72 |                  `NA` |                   `NA` |
-|             400 |            -78.41 |       -78.44349 |        -78.44309 |                       88 |              -0.03349 |               -0.03309 |
+| Frequency (kHz) | Benchmark TS (dB) | Literal TS (dB) | Adaptive TS (dB) | Adaptive `n_integration` | Literal \Delta TS (dB) | Adaptive \Delta TS (dB) |
+|----------------:|------------------:|----------------:|-----------------:|-------------------------:|-----------------------:|------------------------:|
+|              12 |            -87.05 |       -87.05331 |        -87.05331 |                       32 |               -0.00331 |                -0.00331 |
+|              18 |            -81.19 |       -81.19965 |        -81.19965 |                       32 |               -0.00965 |                -0.00965 |
+|              38 |            -77.17 |       -77.20046 |        -77.20046 |                       32 |               -0.03046 |                -0.03046 |
+|              70 |            -76.92 |       -76.95042 |        -76.95042 |                       32 |               -0.03042 |                -0.03042 |
+|             120 |            -80.58 |       -80.55970 |        -80.55951 |                       32 |                0.02030 |                 0.02049 |
+|             200 |            -89.31 |       -89.39263 |        -89.39348 |                       48 |               -0.08263 |                -0.08348 |
+|             250 |            -79.39 |       -79.42879 |        -79.42819 |                       56 |               -0.03879 |                -0.03819 |
+|             300 |            -77.52 |       -77.51659 |        -77.51653 |                       64 |                0.00341 |                 0.00347 |
+|             333 |              `NA` |       -76.90684 |        -76.90677 |                       72 |                   `NA` |                    `NA` |
+|             400 |            -78.41 |       -78.44349 |        -78.44309 |                       88 |               -0.03349 |                -0.03309 |
 
 That table compares the literal run `adaptive = FALSE`,
 `n_integration = 96` against the adaptive run `adaptive = TRUE`, which
@@ -416,8 +426,8 @@ double-minus-quadruple residual.](psms-precision-drift.png)
 For this full liquid-filled run, the double- and quadruple-precision
 curves are effectively indistinguishable through `k_0 b < 1`, differ by
 only about `1.4e-07 dB` at `38 kHz`, then separate to about `0.01 dB` by
-`70 kHz` (`k_0 b â‰ˆ 2.98`) and to about `1.02 dB` by `100 kHz`
-(`k_0 b â‰ˆ 4.25`). That is the practical reason the benchmark table
+`70 kHz` (`k_0 b \approx 2.98`) and to about `1.02 dB` by `100 kHz`
+(`k_0 b \approx 4.25`). That is the practical reason the benchmark table
 above starts to favor quadruple precision once the retained PSMS system
 moves into the higher-frequency penetrable regime.
 
@@ -440,32 +450,44 @@ The timed frequency grid was the same one used in the benchmark table:
 12,\\ 18,\\ 38,\\ 70,\\ 120,\\ 200,\\ 250,\\ 300,\\ 333,\\ 400\\
 \text{kHz}.
 
-| Boundary           | Precision | `simplify_Amn` | `adaptive` | `n_integration` | Elapsed time (s) |
-|:-------------------|:----------|:---------------|:-----------|:----------------|-----------------:|
-| `fixed_rigid`      | `double`  |                | `FALSE`    | `96`            |             0.20 |
-| `fixed_rigid`      | `double`  |                | `TRUE`     |                 |             0.14 |
-| `fixed_rigid`      | `quad`    |                | `FALSE`    | `96`            |            13.61 |
-| `fixed_rigid`      | `quad`    |                | `TRUE`     |                 |            13.53 |
-| `pressure_release` | `double`  |                | `FALSE`    | `96`            |             0.14 |
-| `pressure_release` | `double`  |                | `TRUE`     |                 |             0.14 |
-| `pressure_release` | `quad`    |                | `FALSE`    | `96`            |            13.38 |
-| `pressure_release` | `quad`    |                | `TRUE`     |                 |            13.36 |
-| `gas_filled`       | `double`  | `FALSE`        | `FALSE`    | `96`            |             0.06 |
-| `gas_filled`       | `double`  | `FALSE`        | `TRUE`     |                 |             0.03 |
-| `gas_filled`       | `double`  | `TRUE`         | `FALSE`    | `96`            |             0.00 |
-| `gas_filled`       | `double`  | `TRUE`         | `TRUE`     |                 |             0.02 |
-| `gas_filled`       | `quad`    | `FALSE`        | `FALSE`    | `96`            |             2.81 |
-| `gas_filled`       | `quad`    | `FALSE`        | `TRUE`     |                 |             1.11 |
-| `gas_filled`       | `quad`    | `TRUE`         | `FALSE`    | `96`            |             0.31 |
-| `gas_filled`       | `quad`    | `TRUE`         | `TRUE`     |                 |             0.21 |
-| `liquid_filled`    | `double`  | `FALSE`        | `FALSE`    | `96`            |             1.81 |
-| `liquid_filled`    | `double`  | `FALSE`        | `TRUE`     |                 |             1.31 |
-| `liquid_filled`    | `double`  | `TRUE`         | `FALSE`    | `96`            |             0.18 |
-| `liquid_filled`    | `double`  | `TRUE`         | `TRUE`     |                 |             0.15 |
-| `liquid_filled`    | `quad`    | `FALSE`        | `FALSE`    | `96`            |            59.66 |
-| `liquid_filled`    | `quad`    | `FALSE`        | `TRUE`     |                 |            48.33 |
-| `liquid_filled`    | `quad`    | `TRUE`         | `FALSE`    | `96`            |            14.75 |
-| `liquid_filled`    | `quad`    | `TRUE`         | `TRUE`     |                 |            14.56 |
+#### Runtime summary
+
+- Rigid and pressure release
+- Gas filled
+- Liquid filled
+
+| Boundary           | Precision | `adaptive` | `n_integration` | Elapsed time (s) |
+|:-------------------|:----------|:-----------|:----------------|-----------------:|
+| `fixed_rigid`      | `double`  | `FALSE`    | `96`            |             0.20 |
+| `fixed_rigid`      | `double`  | `TRUE`     |                 |             0.14 |
+| `fixed_rigid`      | `quad`    | `FALSE`    | `96`            |            13.61 |
+| `fixed_rigid`      | `quad`    | `TRUE`     |                 |            13.53 |
+| `pressure_release` | `double`  | `FALSE`    | `96`            |             0.14 |
+| `pressure_release` | `double`  | `TRUE`     |                 |             0.14 |
+| `pressure_release` | `quad`    | `FALSE`    | `96`            |            13.38 |
+| `pressure_release` | `quad`    | `TRUE`     |                 |            13.36 |
+
+| Precision | `simplify_Amn` | `adaptive` | `n_integration` | Elapsed time (s) |
+|:----------|:---------------|:-----------|:----------------|-----------------:|
+| `double`  | `FALSE`        | `FALSE`    | `96`            |             0.06 |
+| `double`  | `FALSE`        | `TRUE`     |                 |             0.03 |
+| `double`  | `TRUE`         | `FALSE`    | `96`            |             0.00 |
+| `double`  | `TRUE`         | `TRUE`     |                 |             0.02 |
+| `quad`    | `FALSE`        | `FALSE`    | `96`            |             2.81 |
+| `quad`    | `FALSE`        | `TRUE`     |                 |             1.11 |
+| `quad`    | `TRUE`         | `FALSE`    | `96`            |             0.31 |
+| `quad`    | `TRUE`         | `TRUE`     |                 |             0.21 |
+
+| Precision | `simplify_Amn` | `adaptive` | `n_integration` | Elapsed time (s) |
+|:----------|:---------------|:-----------|:----------------|-----------------:|
+| `double`  | `FALSE`        | `FALSE`    | `96`            |             1.81 |
+| `double`  | `FALSE`        | `TRUE`     |                 |             1.31 |
+| `double`  | `TRUE`         | `FALSE`    | `96`            |             0.18 |
+| `double`  | `TRUE`         | `TRUE`     |                 |             0.15 |
+| `quad`    | `FALSE`        | `FALSE`    | `96`            |            59.66 |
+| `quad`    | `FALSE`        | `TRUE`     |                 |            48.33 |
+| `quad`    | `TRUE`         | `FALSE`    | `96`            |            14.75 |
+| `quad`    | `TRUE`         | `TRUE`     |                 |            14.56 |
 
 The practical interpretation is straightforward:
 
@@ -474,13 +496,12 @@ The practical interpretation is straightforward:
     overlap-driven fluid solve.
 2.  The full liquid-filled solve with `simplify_Amn = FALSE` is still by
     far the most expensive configuration in this benchmark set.
-3.  The gas-filled rows are much cheaper here because the currently
-    benchmarked gas-filled frequency range is short (`12-40 kHz`) and
-    does not drive the same modal growth as the liquid-filled
-    `12-400 kHz` sweep.
-4.  The current adaptive liquid-filled path is faster because it
-    combines a smaller modal-content-based quadrature rule at lower
-    reduced frequency with earlier n- and m-tail termination inside the
+3.  The gas-filled rows are much cheaper here because the benchmarked
+    gas-filled frequency range is short (`12-40 kHz`) and does not drive
+    the same modal growth as the liquid-filled `12-400 kHz` sweep.
+4.  The adaptive liquid-filled path is faster because it combines a
+    smaller modal-content-based quadrature rule at lower reduced
+    frequency with more aggressive n- and m-tail termination inside the
     backscatter assembly.
 5.  On this machine and grid, that reduces the full liquid-filled quad
     run from about `59.7 s` to about `48.3 s` without materially
@@ -508,16 +529,36 @@ the same ones used for the main benchmark-quality run here:
 `n_integration = 96`, and `phi_body = pi`.
 
 `Prol_Spheroid` only treats penetrable prolate spheroids, so its cells
-are `N/A` for `fixed_rigid` and `pressure_release`. The table separates
-the original and vectorized `Prol_Spheroid` branches because the
-numerical agreement is nearly identical while the runtime is not.
+are `N/A` for `fixed_rigid` and `pressure_release`. The original and
+vectorized `Prol_Spheroid` branches are split below because their
+numerical agreement is nearly identical while their runtimes are not.
 
-| Case               | Frequency set (kHz)   | Max abs. delta TS vs `echoSMs` (dB) | Mean abs. delta TS vs `echoSMs` (dB) | Max abs. delta TS vs `Prol_Spheroid` original (dB) | Mean abs. delta TS vs `Prol_Spheroid` original (dB) | Max abs. delta TS vs `Prol_Spheroid` vectorized (dB) | Mean abs. delta TS vs `Prol_Spheroid` vectorized (dB) | acousticTS elapsed (s) | `echoSMs` elapsed (s) | `Prol_Spheroid` original elapsed (s) | `Prol_Spheroid` vectorized elapsed (s) |
-|:-------------------|:----------------------|------------------------------------:|-------------------------------------:|---------------------------------------------------:|----------------------------------------------------:|-----------------------------------------------------:|------------------------------------------------------:|-----------------------:|----------------------:|-------------------------------------:|---------------------------------------:|
-| `fixed_rigid`      | `12, 18, 38, 70, 100` |                           `0.49692` |                            `0.10091` |                                              `N/A` |                                               `N/A` |                                                `N/A` |                                                 `N/A` |                 `0.86` |                `0.34` |                                `N/A` |                                  `N/A` |
-| `pressure_release` | `12, 18, 38, 70, 100` |                           `0.08619` |                            `0.01757` |                                              `N/A` |                                               `N/A` |                                                `N/A` |                                                 `N/A` |                 `0.93` |                `0.33` |                                `N/A` |                                  `N/A` |
-| `liquid_filled`    | `12, 18, 38, 70, 100` |                           `1.01676` |                            `0.20537` |                                          `0.00128` |                                           `0.00055` |                                            `0.00128` |                                             `0.00055` |                 `2.72` |               `48.02` |                              `48.65` |                                `11.06` |
-| `gas_filled`       | `12, 18, 38, 70, 100` |                           `5.49661` |                            `1.10385` |                                         `42.84714` |                                          `13.22982` |                                           `42.84714` |                                            `13.22982` |                 `2.69` |               `70.97` |                             `698.50` |                                `26.94` |
+#### Cross-software summary
+
+- `echoSMs`
+- `Prol_Spheroid`
+- Runtime
+
+| Case               | Frequency set (kHz)   | Max abs. \Delta TS vs `echoSMs` (dB) | Mean abs. \Delta TS vs `echoSMs` (dB) |
+|:-------------------|:----------------------|-------------------------------------:|--------------------------------------:|
+| `fixed_rigid`      | `12, 18, 38, 70, 100` |                            `0.49692` |                             `0.10091` |
+| `pressure_release` | `12, 18, 38, 70, 100` |                            `0.08619` |                             `0.01757` |
+| `liquid_filled`    | `12, 18, 38, 70, 100` |                            `1.01676` |                             `0.20537` |
+| `gas_filled`       | `12, 18, 38, 70, 100` |                            `5.49661` |                             `1.10385` |
+
+| Case               | Frequency set (kHz)   | Max abs. \Delta TS vs `Prol_Spheroid` original (dB) | Mean abs. \Delta TS vs `Prol_Spheroid` original (dB) | Max abs. \Delta TS vs `Prol_Spheroid` vectorized (dB) | Mean abs. \Delta TS vs `Prol_Spheroid` vectorized (dB) |
+|:-------------------|:----------------------|----------------------------------------------------:|-----------------------------------------------------:|------------------------------------------------------:|-------------------------------------------------------:|
+| `fixed_rigid`      | `12, 18, 38, 70, 100` |                                               `N/A` |                                                `N/A` |                                                 `N/A` |                                                  `N/A` |
+| `pressure_release` | `12, 18, 38, 70, 100` |                                               `N/A` |                                                `N/A` |                                                 `N/A` |                                                  `N/A` |
+| `liquid_filled`    | `12, 18, 38, 70, 100` |                                           `0.00128` |                                            `0.00055` |                                             `0.00128` |                                              `0.00055` |
+| `gas_filled`       | `12, 18, 38, 70, 100` |                                          `42.84714` |                                           `13.22982` |                                            `42.84714` |                                             `13.22982` |
+
+| Case               | Frequency set (kHz)   | acousticTS elapsed (s) | `echoSMs` elapsed (s) | `Prol_Spheroid` original elapsed (s) | `Prol_Spheroid` vectorized elapsed (s) |
+|:-------------------|:----------------------|-----------------------:|----------------------:|-------------------------------------:|---------------------------------------:|
+| `fixed_rigid`      | `12, 18, 38, 70, 100` |                 `0.86` |                `0.34` |                                `N/A` |                                  `N/A` |
+| `pressure_release` | `12, 18, 38, 70, 100` |                 `0.93` |                `0.33` |                                `N/A` |                                  `N/A` |
+| `liquid_filled`    | `12, 18, 38, 70, 100` |                 `2.72` |               `48.02` |                              `48.65` |                                `11.06` |
+| `gas_filled`       | `12, 18, 38, 70, 100` |                 `2.69` |               `70.97` |                             `698.50` |                                `26.94` |
 
 These checks are informative in a more mixed way once `70` and `100 kHz`
 are included. The penetrable liquid-filled case remains extremely close

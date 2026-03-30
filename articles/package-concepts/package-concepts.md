@@ -14,6 +14,9 @@ in acousticTS come from confusing one of those layers with another, such
 as treating a shape as if it were already a physical scatterer, or
 treating a model name as if it defined the target itself.
 
+![Conceptual
+layers](package-concepts-architecture.png)[](https://brandynlucca.github.io/acousticTS/articles/building-shapes/building-shapes.md "Shape concepts")[](https://brandynlucca.github.io/acousticTS/articles/building-scatterers/building-scatterers.md "Scatterer concepts")[](https://brandynlucca.github.io/acousticTS/articles/running-models/running-models.md "Model execution")
+
 This page is the conceptual map for the rest of the documentation. The
 goal is not to derive any model. The goal is to stabilize the package
 vocabulary before moving into theory pages and workflow pages. If

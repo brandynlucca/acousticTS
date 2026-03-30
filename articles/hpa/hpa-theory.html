@@ -83,11 +83,19 @@
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
-<li class="nav-item"><a class="nav-link" href="../../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../../reference/index.html">Function reference</a></li>
+    <li><a class="dropdown-item" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
+    <li><a class="dropdown-item" href="../../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -113,8 +121,15 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p><span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span></p>
-<p><em>Model-family pages:</em> <a href="index.html">Overview</a> <a href="hpa-implementation.html">Implementation</a> <a href="hpa-theory.html">Theory</a></p>
+<div class="model-status-line">
+<span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span>
+</div>
+<div class="model-nav">
+<div class="model-nav-links">
+<a class="model-nav-badge" href="index.html">Overview</a>
+<a class="model-nav-badge" href="hpa-implementation.html">Implementation</a>
+</div>
+</div>
 <p>The high-pass approximation (HPA) is not an exact boundary-value
 solution. It is a compact asymptotic model constructed so that the
 low-frequency limit matches the Rayleigh expansion of weakly scattering
@@ -313,7 +328,7 @@ is:</p>
   }.
 </span></p>
 <p>The low-frequency numerator is still the Rayleigh term. The
-denominator is now written so that the high-frequency scale is set
+denominator is written so that the high-frequency scale is set
 explicitly by the reflection coefficient <span class="math inline">\mathcal{R}</span>. Compared with the simpler form
 of Johnson (1977) <span class="citation">(<a href="#ref-johnson_sound_1977">Johnson 1977</a>)</span>, the version
 from Stanton (1989) <span class="citation">(<a href="#ref-stanton_1989">Stanton 1989</a>)</span> makes the

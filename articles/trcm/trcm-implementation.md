@@ -2,11 +2,9 @@
 
 ## acousticTS implementation
 
-Benchmarked
+Benchmarked Unvalidated
 
-*Model-family pages:*
 [Overview](https://brandynlucca.github.io/acousticTS/articles/trcm/index.md)
-[Implementation](https://brandynlucca.github.io/acousticTS/articles/trcm/trcm-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/trcm/trcm-theory.md)
 
 These pages come from the high-frequency elongated-body literature and
@@ -189,25 +187,25 @@ discussed by Stanton (1989) and Stanton et al. (1993): `L/a = 10.5`,
 `rho_c/L = 1.5`, `g = 1.0357`, `h = 1.0279`, and `ka` spanning `0.1` to
 `10`.
 
-| Geometry          | Implementation branch                                | Reference family                                                    | Max abs. delta TS (dB) | Mean abs. delta TS (dB) | Elapsed (s) |
-|:------------------|:-----------------------------------------------------|:--------------------------------------------------------------------|-----------------------:|------------------------:|------------:|
-| Straight cylinder | Standard TRCM                                        | Weakly scattering straight-cylinder benchmark                       |               23.76946 |                 0.59807 |        0.00 |
-| Bent cylinder     | Fresnel-integral branch (`stationary_phase = FALSE`) | FCMS-derived bent-cylinder reference from Stanton (1989, Eq. 25-26) |               10.39341 |                 0.73244 |        0.05 |
-| Bent cylinder     | Stationary-phase branch (`stationary_phase = TRUE`)  | FCMS-derived bent-cylinder reference from Stanton (1989, Eq. 25-26) |               12.10080 |                 1.41033 |        0.00 |
+| Geometry          | Implementation branch                                | Reference family                                                    | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | Elapsed (s) |
+|:------------------|:-----------------------------------------------------|:--------------------------------------------------------------------|------------------------:|-------------------------:|------------:|
+| Straight cylinder | Standard TRCM                                        | Weakly scattering straight-cylinder benchmark                       |              `23.76946` |                `0.59807` |      `0.00` |
+| Bent cylinder     | Fresnel-integral branch (`stationary_phase = FALSE`) | FCMS-derived bent-cylinder reference from Stanton (1989, Eq. 25-26) |              `10.39341` |                `0.73244` |      `0.05` |
+| Bent cylinder     | Stationary-phase branch (`stationary_phase = TRUE`)  | FCMS-derived bent-cylinder reference from Stanton (1989, Eq. 25-26) |              `12.10080` |                `1.41033` |      `0.00` |
 
-This split is much more faithful to the underlying approximation
-structure. The straight-cylinder row checks the ordinary two-ray
-reduction against the canonical constant-radius cylinder case. The two
-bent-cylinder rows then test the curvature bookkeeping separately: the
-full Fresnel-integral branch and the asymptotic stationary-phase
-shortcut are each evaluated against the same FCMS-derived bent-cylinder
-reference problem from Stanton’s Eq. 25-26 construction.
+This split separates the approximation structure cleanly. The
+straight-cylinder row checks the ordinary two-ray reduction against the
+canonical constant-radius cylinder case. The two bent-cylinder rows then
+test the curvature bookkeeping separately: the full Fresnel-integral
+branch and the asymptotic stationary-phase shortcut are each evaluated
+against the same FCMS-derived bent-cylinder reference problem from
+Stanton’s Eq. 25-26 construction.
 
-The stationary-phase shortcut is therefore no longer being judged
-against a straight-cylinder benchmark that it was never meant to
-represent. Its remaining error should be read as the cost of using an
-asymptotic bent-body replacement for the full curvature integral, not as
-evidence that curvature itself is being mishandled.
+The stationary-phase shortcut is therefore judged against the
+bent-cylinder reference it is meant to approximate. Its remaining error
+should be read as the cost of using an asymptotic bent-body replacement
+for the full curvature integral, not as evidence that curvature itself
+is being mishandled.
 
 ## References
 

@@ -2,12 +2,10 @@
 
 ## Introduction
 
-Benchmarked Validated Experimental
+Benchmarked Partially validated Experimental
 
-*Model-family pages:*
 [Overview](https://brandynlucca.github.io/acousticTS/articles/tmm/index.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/tmm/tmm-implementation.md)
-[Theory](https://brandynlucca.github.io/acousticTS/articles/tmm/tmm-theory.md)
 
 The transition matrix method (`TMM`) is a basis-expansion view of
 scattering. Instead of solving directly for the scattered pressure in
@@ -101,10 +99,10 @@ r = r(\theta).
 The exterior regular and outgoing basis states are then built from
 spherical partial waves:
 
-\psi^{(1)}\_{mn}(r,\theta,\phi) =
-j_n(kr)\\P_n^m(\cos\theta)\\e^{im\phi}, \qquad
-\psi^{(3)}\_{mn}(r,\theta,\phi) =
-h_n^{(1)}(kr)\\P_n^m(\cos\theta)\\e^{im\phi}.
+\begin{align\*} \psi^{(1)}\_{mn}(r,\theta,\phi) &=
+j_n(kr)\\P_n^m(\cos\theta)\\e^{im\phi}, \\
+\psi^{(3)}\_{mn}(r,\theta,\phi) &=
+h_n^{(1)}(kr)\\P_n^m(\cos\theta)\\e^{im\phi}. \end{align\*}
 
 Along the curved meridional profile r(\theta), the outward normal
 derivative is:
@@ -221,8 +219,9 @@ for a geometry-matched T-matrix formulation.
 Let q be the semifocal length and let (\xi,\eta,\phi) be prolate
 spheroidal coordinates. In Cartesian coordinates:
 
-x = q\sqrt{(\xi^2 - 1)(1 - \eta^2)}\cos\phi, \qquad y = q\sqrt{(\xi^2 -
-1)(1 - \eta^2)}\sin\phi, \qquad z = q \xi \eta.
+\begin{align\*} x &= q\sqrt{(\xi^2 - 1)(1 - \eta^2)}\cos\phi, \\ y &=
+q\sqrt{(\xi^2 - 1)(1 - \eta^2)}\sin\phi, \\ z &= q \xi \eta.
+\end{align\*}
 
 The coordinate ranges are:
 
@@ -244,8 +243,7 @@ product of a radial spheroidal function in \xi, an angular spheroidal
 function in \eta, and an azimuthal factor in \phi.
 
 The resulting field expansion has the same logical structure as the
-generic T-matrix expression above, but the basis is now
-geometry-matched.
+generic T-matrix expression above, but the basis is geometry-matched.
 
 For rigid and pressure-release prolates, the retained degrees remain
 effectively local in the exact spheroidal basis. For liquid- and

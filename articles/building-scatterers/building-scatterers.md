@@ -24,6 +24,9 @@ swimbladder. The geometry by itself does not decide among those cases.
 Scatterer construction is the step where the reader turns a geometric
 description into a model-ready acoustic object.
 
+![Updated scatterer-generation and class-hierarchy
+map](building-scatterers-map.png)[](https://brandynlucca.github.io/acousticTS/reference/Scatterer-class.md "Scatterer class")[](https://brandynlucca.github.io/acousticTS/reference/FLS-class.md "FLS class")[](https://brandynlucca.github.io/acousticTS/reference/GAS-class.md "GAS class")[](https://brandynlucca.github.io/acousticTS/reference/CAL-class.md "CAL class")[](https://brandynlucca.github.io/acousticTS/reference/ELA-class.md "ELA class")[](https://brandynlucca.github.io/acousticTS/reference/CSC-class.md "CSC class")[](https://brandynlucca.github.io/acousticTS/reference/SBF-class.md "SBF class")[](https://brandynlucca.github.io/acousticTS/reference/BBF-class.md "BBF class")[](https://brandynlucca.github.io/acousticTS/reference/ESS-class.md "ESS class")
+
 ## Why scatterer construction is separate from shape construction
 
 The package separates shape generation from scatterer generation so that
@@ -82,9 +85,9 @@ The practical consequence is that constructor choice should be driven by
 the interface physics that matter most, not only by the overall
 silhouette of the target.
 
-The updated map above now makes the class hierarchy explicit as well.
-`Scatterer` remains the common parent, but composite targets now branch
-through `CSC`, elastic-target families branch through `ELA`, and the
+The map above makes the class hierarchy explicit as well. `Scatterer`
+remains the common parent, but composite targets branch through `CSC`,
+elastic-target families branch through `ELA`, and the
 swimbladder-bearing and backbone-bearing composite targets are separated
 into `SBF` and `BBF` rather than being implied by one generic fish-only
 path. That makes the difference between generator choice and class
@@ -92,7 +95,7 @@ inheritance much more transparent.
 
 ## Recommended constructor convention
 
-The clearest workflow is now:
+The clearest workflow is:
 
 1.  Build geometry with a `Shape` constructor.
 2.  Pass that geometry into the relevant scatterer constructor.
@@ -113,22 +116,21 @@ to also invent the geometry internally. Likewise,
 is clearest when the body and swimbladder are built separately and
 passed in explicitly as `body_shape` and `bladder_shape`.
 
-Older entry points are still available for compatibility, but they
-should now be treated as compatibility-only rather than preferred public
+Older entry points remain available for compatibility, but they should
+be treated as compatibility-only rather than preferred public
 interfaces. Raw coordinate vectors remain a supported manual geometry
 pathway. Character shape labels such as `"sphere"` or `"arbitrary"` are
 still accepted so that older scripts continue to run, but that
-string-dispatch pattern is now deprecated. Internally, every accepted
+string-dispatch pattern is deprecated. Internally, every accepted
 pathway is normalized to the same `Shape`-first geometry contract as the
 explicit workflow.
 
 The same simplification applies to units. Scatterer constructors are
 standardized to meters for geometry and radians for orientation.
 Compatibility arguments like `length_units`, `radius_units`,
-`diameter_units`, and `theta_units` are still accepted so that older
-calls do not fail abruptly, but non-SI values are now treated as
-deprecated compatibility inputs rather than as an encouraged part of the
-public workflow.
+`diameter_units`, and `theta_units` are accepted so that older calls do
+not fail abruptly, but non-SI values are deprecated compatibility inputs
+rather than an encouraged part of the public workflow.
 
 Material inputs remain flexible by design. For each component, density
 and sound speed may be supplied either as contrasts (`g_*`, `h_*`) or as

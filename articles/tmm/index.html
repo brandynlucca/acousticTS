@@ -83,11 +83,19 @@
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
-<li class="nav-item"><a class="nav-link" href="../../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../../reference/index.html">Function reference</a></li>
+    <li><a class="dropdown-item" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
+    <li><a class="dropdown-item" href="../../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -113,8 +121,15 @@
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p><span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span> <span class="model-tag experimental">Experimental</span></p>
-<p><em>Model-family pages:</em> <a href="index.html">Overview</a> <a href="tmm-implementation.html">Implementation</a> <a href="tmm-theory.html">Theory</a></p>
+<div class="model-status-line">
+<span class="model-tag established">Benchmarked</span> <span class="model-tag partially-validated">Partially validated</span> <span class="model-tag experimental">Experimental</span>
+</div>
+<div class="model-nav">
+<div class="model-nav-links">
+<a class="model-nav-badge" href="tmm-theory.html">Theory</a>
+<a class="model-nav-badge" href="tmm-implementation.html">Implementation</a>
+</div>
+</div>
 <p>These pages follow the coefficient-map view of scattering and later
 numerical implementations for axisymmetric bodies <span class="citation">(<a href="#ref-waterman_new_1969">Waterman 1969</a>, <a href="#ref-waterman_t_2009">2009</a>; <a href="#ref-ganesh_numerically_2022">Ganesh and Hawkins
 2022</a>)</span>.</p>
@@ -126,7 +141,7 @@ broader angle-dependent scattering products.</p>
 </h3>
 <p>Represent the incident and scattered fields in complete modal bases
 and solve for the linear map between those coefficient vectors. In the
-current package scope, that gives a reusable single-target retained
+supported package scope, that gives a reusable single-target retained
 state for monostatic target strength and, where externally constrained,
 for general-angle or orientation-averaged post-processing.</p>
 </div>
@@ -163,8 +178,8 @@ orientation averages where validated</li>
 <li>Single-target scope only</li>
 <li>Geometry-specific basis choice rather than one universal retained
 operator for every shape</li>
-<li>Cylinder branch currently has narrower validated scope than sphere,
-oblate, and prolate branches</li>
+<li>Cylinder branch has narrower validated scope than sphere, oblate,
+and prolate branches</li>
 </ul>
 </div>
 <div class="section level3">
@@ -178,9 +193,12 @@ branches.</li>
 oblate, and prolate pressure-release cases.</li>
 <li>Retained prolate angular products are also checked against the exact
 general-angle spheroidal solution.</li>
-<li>The cylinder branch is benchmark-matched only for the exact
-monostatic workflow; retained general-angle cylinder products remain
-outside the validated public scope.</li>
+<li>TMM is partially validated because the sphere, oblate, and prolate
+branches have external checks, but retained general-angle cylinder
+products remain outside the validated public scope.</li>
+<li>TMM is currently marked experimental because the retained-state
+workflow and branch matrix are still guarded while shape-specific
+support continues to be tightened.</li>
 </ul>
 </div>
 <div class="section level3">
@@ -189,13 +207,13 @@ outside the validated public scope.</li>
 <ul>
 <li>
 <a href="tmm-implementation.html">Implementation</a>: stored-state
-workflows, plots, benchmarks, and current scope</li>
+workflows, plots, benchmarks, and supported scope</li>
 <li>
 <a href="tmm-theory.html">Theory</a>: T-matrix interpretation,
 boundary operators, and geometry-matched bases</li>
 </ul>
 <div class="float">
-<img src="tmm-branch-schematic.svg" alt="Single-target TMM workflow, showing the spherical-coordinate branch used for spheres and oblates, the spheroidal branch used for prolates, and the cylindrical monostatic branch used for finite cylinders."><div class="figcaption">Single-target TMM workflow, showing the
+<img src="tmm-branch-schematic.png" alt="Single-target TMM workflow, showing the spherical-coordinate branch used for spheres and oblates, the spheroidal branch used for prolates, and the cylindrical monostatic branch used for finite cylinders."><div class="figcaption">Single-target TMM workflow, showing the
 spherical-coordinate branch used for spheres and oblates, the spheroidal
 branch used for prolates, and the cylindrical monostatic branch used for
 finite cylinders.</div>

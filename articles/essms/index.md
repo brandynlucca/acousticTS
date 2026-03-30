@@ -4,10 +4,8 @@
 
 Unvalidated
 
-*Model-family pages:*
-[Overview](https://brandynlucca.github.io/acousticTS/articles/essms/index.md)
-[Implementation](https://brandynlucca.github.io/acousticTS/articles/essms/essms-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/essms/essms-theory.md)
+[Implementation](https://brandynlucca.github.io/acousticTS/articles/essms/essms-implementation.md)
 
 These pages are grounded in the classical elastic-shell scattering
 literature for fluid-filled spherical shells ([Goodman and Stern
@@ -47,9 +45,8 @@ both shell interfaces.
 
 ### Validation status
 
-- A direct shell-sphere benchmark family exists, but the current ESSMS
-  implementation still does not return finite full-grid benchmark
-  spectra.
+- The package does not yet claim external validation across the current
+  public scope.
 
 ### Family pages
 

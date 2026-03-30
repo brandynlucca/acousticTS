@@ -4,20 +4,18 @@
 
 Benchmarked Validated
 
-*Model-family pages:*
 [Overview](https://brandynlucca.github.io/acousticTS/articles/dwba/index.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/dwba/dwba-implementation.md)
-[Theory](https://brandynlucca.github.io/acousticTS/articles/dwba/dwba-theory.md)
 
 The distorted wave Born approximation (DWBA) is a first-order scattering
 model for weakly scattering fluid-like bodies. It is most useful when
 the material contrasts are small enough that the total acoustic field
 inside the body remains close to the incident field, but the geometry is
 sufficiently extended that phase accumulation along the body cannot be
-ignored ([Morse and Ingard 1986](#ref-morse_theoretical_1986);
-[**stanton_sound_1998i?**](#ref-stanton_sound_1998i)). In that regime, a
-purely local approximation is too crude, while a full boundary-value
-solution is often unnecessary or unavailable.
+ignored ([Morse and Ingard 1986](#ref-morse_theoretical_1986); [Stanton
+et al. 1998](#ref-stanton_sound_1998)). In that regime, a purely local
+approximation is too crude, while a full boundary-value solution is
+often unnecessary or unavailable.
 
 For elongated zooplankton and similar organisms, the most important
 consequence of the DWBA is that a three-dimensional volume scattering
@@ -42,10 +40,10 @@ e^{-i \omega t}. Let the surrounding seawater be medium `1`, with
 density \rho_1, sound speed c_1, compressibility \kappa_1 = (\rho_1
 c_1^2)^{-1}, and wavenumber:
 
-\begin{align\*} \rho(\mathbf{x})\frac{\partial \mathbf{v}}{\partial t}
+\begin{aligned} \rho(\mathbf{x})\frac{\partial \mathbf{v}}{\partial t}
 &= -\nabla p, \\ \frac{\partial \rho'}{\partial t} + \rho(\mathbf{x}) \\
 \nabla \cdot \mathbf{v} &= 0 \\ p &= c^2(\mathbf{x}) \\ \rho'.
-\end{align\*}
+\end{aligned}
 
 Eliminating particle velocity \mathbf{v} and density perturbation \rho'
 gives an acoustic equation in a heterogeneous medium. When the medium is
@@ -258,9 +256,9 @@ f\_{\mathrm{bs}} = \frac{k_1}{4 \pi} \int e^{2 i \mathbf{k}\_2 \cdot
 d\varphi \right\] ds.
 
 The body is therefore reduced to a coherent sum of local cross-sectional
-responses distributed along the centerline. Moreover, if the material
-properties contrast does nto vary across the local section, it can be
-taken outside the inner integral.
+responses distributed along the centerline. Moreover, if the
+material-property contrast does not vary across the local section, it
+can be taken outside the inner integral.
 
 ### Azimuthal and radial integration
 
@@ -325,14 +323,14 @@ f\_{\mathrm{bs}} = \frac{k_1}{4} \int \left( \gamma\_\kappa -
 \beta\_{\mathrm{tilt}}(s) \right) }{ \cos \beta\_{\mathrm{tilt}}(s) } \\
 ds.
 
-Each factor now has a direct interpretation:
+Each factor has a direct interpretation:
 
-\begin{align\*} \gamma\_\kappa - \gamma\_\rho &\Rightarrow
+\begin{aligned} \gamma\_\kappa - \gamma\_\rho &\Rightarrow
 \text{material property contrast} \\ e^{2 i \mathbf{k}\_2 \cdot
 \mathbf{r}\_{pos}(s)} &\Rightarrow \text{two-way propagation phase} \\
 \frac{J_1\\\left(2 k_2 a(s)
 \cos\beta\_{tilt}(s)\right)}{\cos\beta\_{tilt}(s)} &\Rightarrow
-\text{exact cross-sectional diffraction}. \end{align\*}
+\text{exact cross-sectional diffraction}. \end{aligned}
 
 ![Conceptual reduction from a 3D volume integral to a 1D centerline
 integral for an elongated fluid body.](dwba-volume-to-line-clean.svg)
@@ -413,3 +411,9 @@ strongly resonant structures.
 
 Morse, Philip M., and K. Uno Ingard. 1986. *Theoretical Acoustics*.
 Princeton, N.J: Princeton University Press.
+
+Stanton, Timothy K., Dezhang Chu, Peter H. Wiebe, Linda V. Martin, and
+Robert L. Eastwood. 1998. “Sound Scattering by Several Zooplankton
+Groups. I. Experimental Determination of Dominant Scattering
+Mechanisms.” *The Journal of the Acoustical Society of America* 103 (1):
+225–35. <https://doi.org/10.1121/1.421469>.

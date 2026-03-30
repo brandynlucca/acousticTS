@@ -83,11 +83,19 @@
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
-<li class="nav-item"><a class="nav-link" href="../../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../../reference/index.html">Function reference</a></li>
+    <li><a class="dropdown-item" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
+    <li><a class="dropdown-item" href="../../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -113,8 +121,15 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p><span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span></p>
-<p><em>Model-family pages:</em> <a href="index.html">Overview</a> <a href="krm-implementation.html">Implementation</a> <a href="krm-theory.html">Theory</a></p>
+<div class="model-status-line">
+<span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span>
+</div>
+<div class="model-nav">
+<div class="model-nav-links">
+<a class="model-nav-badge" href="index.html">Overview</a>
+<a class="model-nav-badge" href="krm-implementation.html">Implementation</a>
+</div>
+</div>
 <p>The Kirchhoff-Ray Mode (KRM) model is a composite scattering theory
 for elongated fish-like bodies. Its defining assumption is that
 different anatomical components can occupy different acoustic regimes.
@@ -402,8 +417,7 @@ the square root of local acoustic size:</p>
 <p>Multiplying by the projected segment length <span class="math inline">\Delta u_j</span> gives the segment scattering
 length:</p>
 <p><span class="math display">
-  \mathcal{L}_{B,j} \approx
-  -i\frac{\mathcal{R}_{wb}}{2\sqrt{\pi}}
+  \mathcal{L}_{B,j} \approx -i\frac{\mathcal{R}_{wb}}{2\sqrt{\pi}}
   (k a_j)^{1/2}
   \Delta u_j
   \left[
@@ -478,23 +492,25 @@ let the surrounding body medium be region 2 and the internal gas be
 region 3. The modal derivation then begins with the cylindrical
 expansions:</p>
 <p><span class="math display">
-  p_{2,inc}(r,\phi) =
-    \sum_{m=0}^{\infty} \epsilon_m i^m J_m(k_2 r)\cos(m\phi),
-  \qquad
-  p_{2,scat}(r,\phi) =
-    \sum_{m=0}^{\infty} \epsilon_m i^m b_m H_m^{(1)}(k_2 r)\cos(m\phi),
-  \qquad
-  p_{3}(r,\phi) = \sum_{m=0}^{\infty} \epsilon_m i^m c_m J_m(k_3
+  \begin{align*}
+    p_{2,inc}(r,\phi) &amp;=
+      \sum_{m=0}^{\infty} \epsilon_m i^m J_m(k_2 r)\cos(m\phi), \\
+    p_{2,scat}(r,\phi) &amp;=
+      \sum_{m=0}^{\infty} \epsilon_m i^m b_m H_m^{(1)}(k_2
+r)\cos(m\phi), \\
+    p_{3}(r,\phi) &amp;= \sum_{m=0}^{\infty} \epsilon_m i^m c_m J_m(k_3
 r)\cos(m\phi).
+  \end{align*}
 </span></p>
 <p>Pressure continuity and normal-velocity continuity at the gas
 boundary <span class="math inline">r=a</span> give, for each mode <span class="math inline">m</span>:</p>
 <p><span class="math display">
-  J_m(k_2 a) + b_m H_m^{(1)}(k_2 a) = c_m J_m(k_3 a),
-  \qquad
-  \frac{1}{\rho_2}\left[J_m'(k_2 a)+b_mH_m^{(1)\prime}(k_2 a)\right]
-=
-    \frac{1}{\rho_3}\frac{k_3}{k_2}c_mJ_m'(k_3 a).
+  \begin{align*}
+    J_m(k_2 a) + b_m H_m^{(1)}(k_2 a) &amp;= c_m J_m(k_3 a), \\
+    \frac{1}{\rho_2}\left[J_m'(k_2 a)+b_mH_m^{(1)\prime}(k_2
+a)\right] &amp;=
+      \frac{1}{\rho_3}\frac{k_3}{k_2}c_mJ_m'(k_3 a).
+  \end{align*}
 </span></p>
 <p>Eliminating <span class="math inline">c_m</span> gives the usual
 fluid-cylinder coefficient. In the long-wavelength limit, the <span class="math inline">m=0</span> term dominates, so one retains only:</p>
@@ -530,7 +546,7 @@ local-Kirchhoff logic used for the body is applied to the swimbladder.
 The segment contribution becomes:</p>
 <p><span class="math display">
   \mathcal{L}_{SB,j} \approx
-  -i\frac{\mathcal{R}_{bc}\mathcal{T}_{wb}\mathcal{T}_{bw}}{2\sqrt{\pi}}
+-i\frac{\mathcal{R}_{bc}\mathcal{T}_{wb}\mathcal{T}_{bw}}{2\sqrt{\pi}}
   A_{SB,j}[(k a_j+1)\sin\theta]^{1/2}
   \Delta u_j
   e^{-i(2k_Bv_j+\psi_{p,j})}

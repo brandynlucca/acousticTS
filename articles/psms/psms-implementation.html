@@ -83,11 +83,19 @@
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
-<li class="nav-item"><a class="nav-link" href="../../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../../reference/index.html">Function reference</a></li>
+    <li><a class="dropdown-item" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
+    <li><a class="dropdown-item" href="../../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -113,8 +121,15 @@
 <div class="section level2">
 <h2 id="acousticts-implementation">acousticTS implementation<a class="anchor" aria-label="anchor" href="#acousticts-implementation"></a>
 </h2>
-<p><span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span></p>
-<p><em>Model-family pages:</em> <a href="index.html">Overview</a> <a href="psms-implementation.html">Implementation</a> <a href="psms-theory.html">Theory</a></p>
+<div class="model-status-line">
+<span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span>
+</div>
+<div class="model-nav">
+<div class="model-nav-links">
+<a class="model-nav-badge" href="index.html">Overview</a>
+<a class="model-nav-badge" href="psms-theory.html">Theory</a>
+</div>
+</div>
 <p>These pages are rooted in exact spheroidal-coordinate separations and
 later fisheries-acoustics use of prolate-spheroid models <span class="citation">(<a href="#ref-spence_scattering_1951">Spence and
 Granger 1951</a>; <a href="#ref-flammer_spheroidal_1957">Flammer
@@ -236,8 +251,8 @@ double-precision path is usually the more practical choice.</p>
 <div class="section level3">
 <h3 id="adaptive-mode">Adaptive mode<a class="anchor" aria-label="anchor" href="#adaptive-mode"></a>
 </h3>
-<p>The <code>adaptive</code> argument is now the main switch that
-separates a fully literal retained-mode evaluation from a more pragmatic
+<p>The <code>adaptive</code> argument is the main switch that separates
+a fully literal retained-mode evaluation from a more pragmatic
 backscatter evaluation. The important point is that
 <code>adaptive = TRUE</code> does not redefine the PSMS mathematics. It
 changes how aggressively the implementation is allowed to stop once the
@@ -361,14 +376,118 @@ values are only available at <code>12, 18, 38, 70 kHz</code>.</li>
 benchmark.” The gas-filled prolate-spheroid frequency comparison is
 marked <code>NB</code>, and the corresponding discussion states that no
 benchmark <code>TS</code> values were calculated for that target. The
-gas-filled rows below therefore report <code>NB</code> in the delta
-columns rather than treating that curve as a benchmark target.</li>
+gas-filled rows below therefore report <code>NB</code> in the <span class="math inline">\Delta TS</span> columns rather than treating that
+curve as a benchmark target.</li>
 <li>The liquid-filled benchmark has values at
 <code>12, 18, 38, 70, 120, 200, 250, 300, 400 kHz</code>, but not at
 <code>333 kHz</code>.</li>
 </ol>
-<p>The reported deltas are therefore computed only where validated
-benchmark values exist.</p>
+<p>The reported <span class="math inline">\Delta</span> values are
+therefore computed only where validated benchmark values exist.</p>
+<div class="section level4">
+<h4 id="benchmark-summary">Benchmark summary<a class="anchor" aria-label="anchor" href="#benchmark-summary"></a>
+</h4>
+<div class="panel-tabset">
+
+
+
+<ul class="nav nav-tabs" id="NA" role="tablist">
+<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#rigid-and-pressure-release" id="rigid-and-pressure-release-tab" type="button" role="tab" aria-controls="rigid-and-pressure-release" aria-selected="true" class="active nav-link">Rigid and pressure release</button></li>
+<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#gas-filled" id="gas-filled-tab" type="button" role="tab" aria-controls="gas-filled" aria-selected="false" class="nav-link">Gas filled</button></li>
+<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#liquid-filled" id="liquid-filled-tab" type="button" role="tab" aria-controls="liquid-filled" aria-selected="false" class="nav-link">Liquid filled</button></li>
+</ul>
+<div class="tab-content">
+<div class="active  tab-pane" id="rigid-and-pressure-release" role="tabpanel" aria-labelledby="rigid-and-pressure-release-tab">
+
+<table style="width:100%;" class="table">
+<colgroup>
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Boundary</th>
+<th align="left">Precision</th>
+<th align="left"><code>adaptive</code></th>
+<th align="left"><code>n_integration</code></th>
+<th align="right">Max abs. <span class="math inline">\Delta</span> TS
+(dB)</th>
+<th align="right">Mean abs. <span class="math inline">\Delta</span> TS
+(dB)</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>fixed_rigid</code></td>
+<td align="left"><code>double</code></td>
+<td align="left"><code>FALSE</code></td>
+<td align="left"><code>96</code></td>
+<td align="right">0.00674</td>
+<td align="right">0.00230</td>
+</tr>
+<tr class="even">
+<td align="left"><code>fixed_rigid</code></td>
+<td align="left"><code>double</code></td>
+<td align="left"><code>TRUE</code></td>
+<td align="left"></td>
+<td align="right">0.00674</td>
+<td align="right">0.00230</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>fixed_rigid</code></td>
+<td align="left"><code>quad</code></td>
+<td align="left"><code>FALSE</code></td>
+<td align="left"><code>96</code></td>
+<td align="right">0.00096</td>
+<td align="right">0.00083</td>
+</tr>
+<tr class="even">
+<td align="left"><code>fixed_rigid</code></td>
+<td align="left"><code>quad</code></td>
+<td align="left"><code>TRUE</code></td>
+<td align="left"></td>
+<td align="right">0.00096</td>
+<td align="right">0.00083</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>pressure_release</code></td>
+<td align="left"><code>double</code></td>
+<td align="left"><code>FALSE</code></td>
+<td align="left"><code>96</code></td>
+<td align="right">0.00412</td>
+<td align="right">0.00251</td>
+</tr>
+<tr class="even">
+<td align="left"><code>pressure_release</code></td>
+<td align="left"><code>double</code></td>
+<td align="left"><code>TRUE</code></td>
+<td align="left"></td>
+<td align="right">0.00412</td>
+<td align="right">0.00251</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>pressure_release</code></td>
+<td align="left"><code>quad</code></td>
+<td align="left"><code>FALSE</code></td>
+<td align="left"><code>96</code></td>
+<td align="right">0.00433</td>
+<td align="right">0.00293</td>
+</tr>
+<tr class="even">
+<td align="left"><code>pressure_release</code></td>
+<td align="left"><code>quad</code></td>
+<td align="left"><code>TRUE</code></td>
+<td align="left"></td>
+<td align="right">0.00433</td>
+<td align="right">0.00293</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="tab-pane" id="gas-filled" role="tabpanel" aria-labelledby="gas-filled-tab">
+
 <table style="width:100%;" class="table">
 <colgroup>
 <col width="14%">
@@ -380,161 +499,115 @@ benchmark values exist.</p>
 <col width="14%">
 </colgroup>
 <thead><tr class="header">
-<th align="left">Boundary</th>
 <th align="left">Precision</th>
 <th align="left"><code>simplify_Amn</code></th>
 <th align="left"><code>adaptive</code></th>
 <th align="left"><code>n_integration</code></th>
-<th align="right">Max abs. delta TS (dB)</th>
-<th align="right">Mean abs. delta TS (dB)</th>
+<th align="left">Benchmark status</th>
+<th align="left">Max abs. <span class="math inline">\Delta</span> TS
+(dB)</th>
+<th align="left">Mean abs. <span class="math inline">\Delta</span> TS
+(dB)</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left"><code>fixed_rigid</code></td>
-<td align="left"><code>double</code></td>
-<td align="left"></td>
-<td align="left"><code>FALSE</code></td>
-<td align="left"><code>96</code></td>
-<td align="right">0.00674</td>
-<td align="right">0.00230</td>
-</tr>
-<tr class="even">
-<td align="left"><code>fixed_rigid</code></td>
-<td align="left"><code>double</code></td>
-<td align="left"></td>
-<td align="left"><code>TRUE</code></td>
-<td align="left"></td>
-<td align="right">0.00674</td>
-<td align="right">0.00230</td>
-</tr>
-<tr class="odd">
-<td align="left"><code>fixed_rigid</code></td>
-<td align="left"><code>quad</code></td>
-<td align="left"></td>
-<td align="left"><code>FALSE</code></td>
-<td align="left"><code>96</code></td>
-<td align="right">0.00096</td>
-<td align="right">0.00083</td>
-</tr>
-<tr class="even">
-<td align="left"><code>fixed_rigid</code></td>
-<td align="left"><code>quad</code></td>
-<td align="left"></td>
-<td align="left"><code>TRUE</code></td>
-<td align="left"></td>
-<td align="right">0.00096</td>
-<td align="right">0.00083</td>
-</tr>
-<tr class="odd">
-<td align="left"><code>pressure_release</code></td>
-<td align="left"><code>double</code></td>
-<td align="left"></td>
-<td align="left"><code>FALSE</code></td>
-<td align="left"><code>96</code></td>
-<td align="right">0.00412</td>
-<td align="right">0.00251</td>
-</tr>
-<tr class="even">
-<td align="left"><code>pressure_release</code></td>
-<td align="left"><code>double</code></td>
-<td align="left"></td>
-<td align="left"><code>TRUE</code></td>
-<td align="left"></td>
-<td align="right">0.00412</td>
-<td align="right">0.00251</td>
-</tr>
-<tr class="odd">
-<td align="left"><code>pressure_release</code></td>
-<td align="left"><code>quad</code></td>
-<td align="left"></td>
-<td align="left"><code>FALSE</code></td>
-<td align="left"><code>96</code></td>
-<td align="right">0.00433</td>
-<td align="right">0.00293</td>
-</tr>
-<tr class="even">
-<td align="left"><code>pressure_release</code></td>
-<td align="left"><code>quad</code></td>
-<td align="left"></td>
-<td align="left"><code>TRUE</code></td>
-<td align="left"></td>
-<td align="right">0.00433</td>
-<td align="right">0.00293</td>
-</tr>
-<tr class="odd">
-<td align="left"><code>gas_filled</code></td>
 <td align="left"><code>double</code></td>
 <td align="left"><code>FALSE</code></td>
 <td align="left"><code>FALSE</code></td>
 <td align="left"><code>96</code></td>
-<td align="right"><code>NB</code></td>
-<td align="right"><code>NB</code></td>
+<td align="left"><code>NB</code></td>
+<td align="left"><code>NB</code></td>
+<td align="left"><code>NB</code></td>
 </tr>
 <tr class="even">
-<td align="left"><code>gas_filled</code></td>
 <td align="left"><code>double</code></td>
 <td align="left"><code>FALSE</code></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"></td>
-<td align="right"><code>NB</code></td>
-<td align="right"><code>NB</code></td>
+<td align="left"><code>NB</code></td>
+<td align="left"><code>NB</code></td>
+<td align="left"><code>NB</code></td>
 </tr>
 <tr class="odd">
-<td align="left"><code>gas_filled</code></td>
 <td align="left"><code>double</code></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"><code>FALSE</code></td>
 <td align="left"><code>96</code></td>
-<td align="right"><code>NB</code></td>
-<td align="right"><code>NB</code></td>
+<td align="left"><code>NB</code></td>
+<td align="left"><code>NB</code></td>
+<td align="left"><code>NB</code></td>
 </tr>
 <tr class="even">
-<td align="left"><code>gas_filled</code></td>
 <td align="left"><code>double</code></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"></td>
-<td align="right"><code>NB</code></td>
-<td align="right"><code>NB</code></td>
+<td align="left"><code>NB</code></td>
+<td align="left"><code>NB</code></td>
+<td align="left"><code>NB</code></td>
 </tr>
 <tr class="odd">
-<td align="left"><code>gas_filled</code></td>
 <td align="left"><code>quad</code></td>
 <td align="left"><code>FALSE</code></td>
 <td align="left"><code>FALSE</code></td>
 <td align="left"><code>96</code></td>
-<td align="right"><code>NB</code></td>
-<td align="right"><code>NB</code></td>
+<td align="left"><code>NB</code></td>
+<td align="left"><code>NB</code></td>
+<td align="left"><code>NB</code></td>
 </tr>
 <tr class="even">
-<td align="left"><code>gas_filled</code></td>
 <td align="left"><code>quad</code></td>
 <td align="left"><code>FALSE</code></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"></td>
-<td align="right"><code>NB</code></td>
-<td align="right"><code>NB</code></td>
+<td align="left"><code>NB</code></td>
+<td align="left"><code>NB</code></td>
+<td align="left"><code>NB</code></td>
 </tr>
 <tr class="odd">
-<td align="left"><code>gas_filled</code></td>
 <td align="left"><code>quad</code></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"><code>FALSE</code></td>
 <td align="left"><code>96</code></td>
-<td align="right"><code>NB</code></td>
-<td align="right"><code>NB</code></td>
+<td align="left"><code>NB</code></td>
+<td align="left"><code>NB</code></td>
+<td align="left"><code>NB</code></td>
 </tr>
 <tr class="even">
-<td align="left"><code>gas_filled</code></td>
 <td align="left"><code>quad</code></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"></td>
-<td align="right"><code>NB</code></td>
-<td align="right"><code>NB</code></td>
+<td align="left"><code>NB</code></td>
+<td align="left"><code>NB</code></td>
+<td align="left"><code>NB</code></td>
 </tr>
+</tbody>
+</table>
+</div>
+<div class="tab-pane" id="liquid-filled" role="tabpanel" aria-labelledby="liquid-filled-tab">
+
+<table style="width:100%;" class="table">
+<colgroup>
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Precision</th>
+<th align="left"><code>simplify_Amn</code></th>
+<th align="left"><code>adaptive</code></th>
+<th align="left"><code>n_integration</code></th>
+<th align="right">Max abs. <span class="math inline">\Delta</span> TS
+(dB)</th>
+<th align="right">Mean abs. <span class="math inline">\Delta</span> TS
+(dB)</th>
+</tr></thead>
+<tbody>
 <tr class="odd">
-<td align="left"><code>liquid_filled</code></td>
 <td align="left"><code>double</code></td>
 <td align="left"><code>FALSE</code></td>
 <td align="left"><code>FALSE</code></td>
@@ -543,7 +616,6 @@ benchmark values exist.</p>
 <td align="right">1.53575</td>
 </tr>
 <tr class="even">
-<td align="left"><code>liquid_filled</code></td>
 <td align="left"><code>double</code></td>
 <td align="left"><code>FALSE</code></td>
 <td align="left"><code>TRUE</code></td>
@@ -552,7 +624,6 @@ benchmark values exist.</p>
 <td align="right">4.59850</td>
 </tr>
 <tr class="odd">
-<td align="left"><code>liquid_filled</code></td>
 <td align="left"><code>double</code></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"><code>FALSE</code></td>
@@ -561,7 +632,6 @@ benchmark values exist.</p>
 <td align="right">2.22574</td>
 </tr>
 <tr class="even">
-<td align="left"><code>liquid_filled</code></td>
 <td align="left"><code>double</code></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"><code>TRUE</code></td>
@@ -570,7 +640,6 @@ benchmark values exist.</p>
 <td align="right">2.22574</td>
 </tr>
 <tr class="odd">
-<td align="left"><code>liquid_filled</code></td>
 <td align="left"><code>quad</code></td>
 <td align="left"><code>FALSE</code></td>
 <td align="left"><code>FALSE</code></td>
@@ -579,7 +648,6 @@ benchmark values exist.</p>
 <td align="right">0.02805</td>
 </tr>
 <tr class="even">
-<td align="left"><code>liquid_filled</code></td>
 <td align="left"><code>quad</code></td>
 <td align="left"><code>FALSE</code></td>
 <td align="left"><code>TRUE</code></td>
@@ -588,7 +656,6 @@ benchmark values exist.</p>
 <td align="right">0.02806</td>
 </tr>
 <tr class="odd">
-<td align="left"><code>liquid_filled</code></td>
 <td align="left"><code>quad</code></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"><code>FALSE</code></td>
@@ -597,7 +664,6 @@ benchmark values exist.</p>
 <td align="right">1.46801</td>
 </tr>
 <tr class="even">
-<td align="left"><code>liquid_filled</code></td>
 <td align="left"><code>quad</code></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"><code>TRUE</code></td>
@@ -607,12 +673,15 @@ benchmark values exist.</p>
 </tr>
 </tbody>
 </table>
+</div>
+</div>
+</div>
 <p>Several practical points follow from this comparison.</p>
 <ol style="list-style-type: decimal">
 <li>For <code>fixed_rigid</code> and <code>pressure_release</code>, both
 precisions remain benchmark-close over the frequencies for which
 benchmark values are available, and the adaptive early-stop logic does
-not materially change those benchmark deltas on this short grid.</li>
+not materially change those benchmark <span class="math inline">\Delta</span> values on this short grid.</li>
 <li>When <code>adaptive = FALSE</code>, the model keeps the literal
 fixed <code>n_integration = 96</code> default. When
 <code>adaptive = TRUE</code>, the table leaves that cell blank because
@@ -626,16 +695,17 @@ so that column is blank for <code>fixed_rigid</code> and
 <code>simplify_Amn = FALSE</code> and <code>precision = "quad"</code>
 remains the only configuration in this table that stays benchmark-close
 through the higher-frequency benchmark range.</li>
-<li>The gas-filled prolate rows are retained here because they are still
+<li>The gas-filled prolate rows are retained here because they remain
 part of the implementation space, but they are not interpreted as
-benchmark deltas because the published comparison explicitly labels that
-case <code>NB</code> for no benchmark.</li>
-<li>The current adaptive liquid-filled path is useful in quad precision,
-but it is not universally beneficial. In particular, the
+benchmark <span class="math inline">\Delta</span> values because the
+published comparison explicitly labels that case <code>NB</code> for no
+benchmark.</li>
+<li>The adaptive liquid-filled path is useful in quad precision, but it
+is not universally beneficial. In particular, the
 <code>precision = "double"</code>, <code>simplify_Amn = FALSE</code>,
 <code>adaptive = TRUE</code> combination drifts much farther from
 benchmark on this grid than the literal double-precision run.</li>
-<li>The largest liquid-filled deviations still occur in deep null
+<li>The largest liquid-filled deviations occur in deep null
 neighborhoods, where small phase or truncation differences can produce
 visibly larger <code>TS</code> differences in dB than they would on a
 linear scattering-amplitude scale.</li>
@@ -660,8 +730,10 @@ configuration, the frequency-specific comparison is:</p>
 <th align="right">Adaptive TS (dB)</th>
 <th align="right">Adaptive <code>n_integration</code>
 </th>
-<th align="right">Literal delta TS (dB)</th>
-<th align="right">Adaptive delta TS (dB)</th>
+<th align="right">Literal <span class="math inline">\Delta</span> TS
+(dB)</th>
+<th align="right">Adaptive <span class="math inline">\Delta</span> TS
+(dB)</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
@@ -763,6 +835,7 @@ internally. The largest differences occur near deeper nulls, which is
 why the absolute <code>TS</code> deltas can look more dramatic than the
 underlying linear-amplitude mismatch would suggest.</p>
 </div>
+</div>
 <div class="section level3">
 <h3 id="double--versus-quadruple-precision-drift">Double- versus quadruple-precision drift<a class="anchor" aria-label="anchor" href="#double--versus-quadruple-precision-drift"></a>
 </h3>
@@ -826,9 +899,9 @@ radius.</p>
 curves are effectively indistinguishable through
 <code>k_0 b &lt; 1</code>, differ by only about <code>1.4e-07 dB</code>
 at <code>38 kHz</code>, then separate to about <code>0.01 dB</code> by
-<code>70 kHz</code> (<code>k_0 b â‰ˆ 2.98</code>) and to about
+<code>70 kHz</code> (<code>k_0 b \approx 2.98</code>) and to about
 <code>1.02 dB</code> by <code>100 kHz</code>
-(<code>k_0 b â‰ˆ 4.25</code>). That is the practical reason the
+(<code>k_0 b \approx 4.25</code>). That is the practical reason the
 benchmark table above starts to favor quadruple precision once the
 retained PSMS system moves into the higher-frequency penetrable
 regime.</p>
@@ -856,19 +929,32 @@ table:</p>
   12,\; 18,\; 38,\; 70,\; 120,\; 200,\; 250,\; 300,\; 333,\; 400\
 \text{kHz}.
 </span></p>
-<table style="width:100%;" class="table">
+<div class="section level4">
+<h4 id="runtime-summary">Runtime summary<a class="anchor" aria-label="anchor" href="#runtime-summary"></a>
+</h4>
+<div class="panel-tabset">
+
+
+
+<ul class="nav nav-tabs" id="NA" role="tablist">
+<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#rigid-and-pressure-release-1" id="rigid-and-pressure-release-1-tab" type="button" role="tab" aria-controls="rigid-and-pressure-release-1" aria-selected="true" class="active nav-link">Rigid and pressure release</button></li>
+<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#gas-filled-1" id="gas-filled-1-tab" type="button" role="tab" aria-controls="gas-filled-1" aria-selected="false" class="nav-link">Gas filled</button></li>
+<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#liquid-filled-1" id="liquid-filled-1-tab" type="button" role="tab" aria-controls="liquid-filled-1" aria-selected="false" class="nav-link">Liquid filled</button></li>
+</ul>
+<div class="tab-content">
+<div class="active  tab-pane" id="rigid-and-pressure-release-1" role="tabpanel" aria-labelledby="rigid-and-pressure-release-1-tab">
+
+<table class="table">
 <colgroup>
-<col width="16%">
-<col width="16%">
-<col width="16%">
-<col width="16%">
-<col width="16%">
-<col width="16%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">Boundary</th>
 <th align="left">Precision</th>
-<th align="left"><code>simplify_Amn</code></th>
 <th align="left"><code>adaptive</code></th>
 <th align="left"><code>n_integration</code></th>
 <th align="right">Elapsed time (s)</th>
@@ -877,7 +963,6 @@ table:</p>
 <tr class="odd">
 <td align="left"><code>fixed_rigid</code></td>
 <td align="left"><code>double</code></td>
-<td align="left"></td>
 <td align="left"><code>FALSE</code></td>
 <td align="left"><code>96</code></td>
 <td align="right">0.20</td>
@@ -885,7 +970,6 @@ table:</p>
 <tr class="even">
 <td align="left"><code>fixed_rigid</code></td>
 <td align="left"><code>double</code></td>
-<td align="left"></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"></td>
 <td align="right">0.14</td>
@@ -893,7 +977,6 @@ table:</p>
 <tr class="odd">
 <td align="left"><code>fixed_rigid</code></td>
 <td align="left"><code>quad</code></td>
-<td align="left"></td>
 <td align="left"><code>FALSE</code></td>
 <td align="left"><code>96</code></td>
 <td align="right">13.61</td>
@@ -901,7 +984,6 @@ table:</p>
 <tr class="even">
 <td align="left"><code>fixed_rigid</code></td>
 <td align="left"><code>quad</code></td>
-<td align="left"></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"></td>
 <td align="right">13.53</td>
@@ -909,7 +991,6 @@ table:</p>
 <tr class="odd">
 <td align="left"><code>pressure_release</code></td>
 <td align="left"><code>double</code></td>
-<td align="left"></td>
 <td align="left"><code>FALSE</code></td>
 <td align="left"><code>96</code></td>
 <td align="right">0.14</td>
@@ -917,7 +998,6 @@ table:</p>
 <tr class="even">
 <td align="left"><code>pressure_release</code></td>
 <td align="left"><code>double</code></td>
-<td align="left"></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"></td>
 <td align="right">0.14</td>
@@ -925,7 +1005,6 @@ table:</p>
 <tr class="odd">
 <td align="left"><code>pressure_release</code></td>
 <td align="left"><code>quad</code></td>
-<td align="left"></td>
 <td align="left"><code>FALSE</code></td>
 <td align="left"><code>96</code></td>
 <td align="right">13.38</td>
@@ -933,13 +1012,32 @@ table:</p>
 <tr class="even">
 <td align="left"><code>pressure_release</code></td>
 <td align="left"><code>quad</code></td>
-<td align="left"></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"></td>
 <td align="right">13.36</td>
 </tr>
+</tbody>
+</table>
+</div>
+<div class="tab-pane" id="gas-filled-1" role="tabpanel" aria-labelledby="gas-filled-1-tab">
+
+<table class="table">
+<colgroup>
+<col width="20%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Precision</th>
+<th align="left"><code>simplify_Amn</code></th>
+<th align="left"><code>adaptive</code></th>
+<th align="left"><code>n_integration</code></th>
+<th align="right">Elapsed time (s)</th>
+</tr></thead>
+<tbody>
 <tr class="odd">
-<td align="left"><code>gas_filled</code></td>
 <td align="left"><code>double</code></td>
 <td align="left"><code>FALSE</code></td>
 <td align="left"><code>FALSE</code></td>
@@ -947,7 +1045,6 @@ table:</p>
 <td align="right">0.06</td>
 </tr>
 <tr class="even">
-<td align="left"><code>gas_filled</code></td>
 <td align="left"><code>double</code></td>
 <td align="left"><code>FALSE</code></td>
 <td align="left"><code>TRUE</code></td>
@@ -955,7 +1052,6 @@ table:</p>
 <td align="right">0.03</td>
 </tr>
 <tr class="odd">
-<td align="left"><code>gas_filled</code></td>
 <td align="left"><code>double</code></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"><code>FALSE</code></td>
@@ -963,7 +1059,6 @@ table:</p>
 <td align="right">0.00</td>
 </tr>
 <tr class="even">
-<td align="left"><code>gas_filled</code></td>
 <td align="left"><code>double</code></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"><code>TRUE</code></td>
@@ -971,7 +1066,6 @@ table:</p>
 <td align="right">0.02</td>
 </tr>
 <tr class="odd">
-<td align="left"><code>gas_filled</code></td>
 <td align="left"><code>quad</code></td>
 <td align="left"><code>FALSE</code></td>
 <td align="left"><code>FALSE</code></td>
@@ -979,7 +1073,6 @@ table:</p>
 <td align="right">2.81</td>
 </tr>
 <tr class="even">
-<td align="left"><code>gas_filled</code></td>
 <td align="left"><code>quad</code></td>
 <td align="left"><code>FALSE</code></td>
 <td align="left"><code>TRUE</code></td>
@@ -987,7 +1080,6 @@ table:</p>
 <td align="right">1.11</td>
 </tr>
 <tr class="odd">
-<td align="left"><code>gas_filled</code></td>
 <td align="left"><code>quad</code></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"><code>FALSE</code></td>
@@ -995,15 +1087,34 @@ table:</p>
 <td align="right">0.31</td>
 </tr>
 <tr class="even">
-<td align="left"><code>gas_filled</code></td>
 <td align="left"><code>quad</code></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"></td>
 <td align="right">0.21</td>
 </tr>
+</tbody>
+</table>
+</div>
+<div class="tab-pane" id="liquid-filled-1" role="tabpanel" aria-labelledby="liquid-filled-1-tab">
+
+<table class="table">
+<colgroup>
+<col width="20%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Precision</th>
+<th align="left"><code>simplify_Amn</code></th>
+<th align="left"><code>adaptive</code></th>
+<th align="left"><code>n_integration</code></th>
+<th align="right">Elapsed time (s)</th>
+</tr></thead>
+<tbody>
 <tr class="odd">
-<td align="left"><code>liquid_filled</code></td>
 <td align="left"><code>double</code></td>
 <td align="left"><code>FALSE</code></td>
 <td align="left"><code>FALSE</code></td>
@@ -1011,7 +1122,6 @@ table:</p>
 <td align="right">1.81</td>
 </tr>
 <tr class="even">
-<td align="left"><code>liquid_filled</code></td>
 <td align="left"><code>double</code></td>
 <td align="left"><code>FALSE</code></td>
 <td align="left"><code>TRUE</code></td>
@@ -1019,7 +1129,6 @@ table:</p>
 <td align="right">1.31</td>
 </tr>
 <tr class="odd">
-<td align="left"><code>liquid_filled</code></td>
 <td align="left"><code>double</code></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"><code>FALSE</code></td>
@@ -1027,7 +1136,6 @@ table:</p>
 <td align="right">0.18</td>
 </tr>
 <tr class="even">
-<td align="left"><code>liquid_filled</code></td>
 <td align="left"><code>double</code></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"><code>TRUE</code></td>
@@ -1035,7 +1143,6 @@ table:</p>
 <td align="right">0.15</td>
 </tr>
 <tr class="odd">
-<td align="left"><code>liquid_filled</code></td>
 <td align="left"><code>quad</code></td>
 <td align="left"><code>FALSE</code></td>
 <td align="left"><code>FALSE</code></td>
@@ -1043,7 +1150,6 @@ table:</p>
 <td align="right">59.66</td>
 </tr>
 <tr class="even">
-<td align="left"><code>liquid_filled</code></td>
 <td align="left"><code>quad</code></td>
 <td align="left"><code>FALSE</code></td>
 <td align="left"><code>TRUE</code></td>
@@ -1051,7 +1157,6 @@ table:</p>
 <td align="right">48.33</td>
 </tr>
 <tr class="odd">
-<td align="left"><code>liquid_filled</code></td>
 <td align="left"><code>quad</code></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"><code>FALSE</code></td>
@@ -1059,7 +1164,6 @@ table:</p>
 <td align="right">14.75</td>
 </tr>
 <tr class="even">
-<td align="left"><code>liquid_filled</code></td>
 <td align="left"><code>quad</code></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"><code>TRUE</code></td>
@@ -1068,6 +1172,9 @@ table:</p>
 </tr>
 </tbody>
 </table>
+</div>
+</div>
+</div>
 <p>The practical interpretation is straightforward:</p>
 <ol style="list-style-type: decimal">
 <li>The rigid and pressure-release PSMS paths are comparatively cheap,
@@ -1076,13 +1183,13 @@ fluid solve.</li>
 <li>The full liquid-filled solve with <code>simplify_Amn = FALSE</code>
 is still by far the most expensive configuration in this benchmark
 set.</li>
-<li>The gas-filled rows are much cheaper here because the currently
-benchmarked gas-filled frequency range is short (<code>12-40 kHz</code>)
-and does not drive the same modal growth as the liquid-filled
+<li>The gas-filled rows are much cheaper here because the benchmarked
+gas-filled frequency range is short (<code>12-40 kHz</code>) and does
+not drive the same modal growth as the liquid-filled
 <code>12-400 kHz</code> sweep.</li>
-<li>The current adaptive liquid-filled path is faster because it
-combines a smaller modal-content-based quadrature rule at lower reduced
-frequency with earlier <span class="math inline">n</span>- and <span class="math inline">m</span>-tail termination inside the backscatter
+<li>The adaptive liquid-filled path is faster because it combines a
+smaller modal-content-based quadrature rule at lower reduced frequency
+with more aggressive <span class="math inline">n</span>- and <span class="math inline">m</span>-tail termination inside the backscatter
 assembly.</li>
 <li>On this machine and grid, that reduces the full liquid-filled quad
 run from about <code>59.7 s</code> to about <code>48.3 s</code> without
@@ -1097,6 +1204,7 @@ selected quadrature orders were
 shown in the frequency-by-frequency table above because it is an
 internal implementation detail, not a user-specified input.</li>
 </ol>
+</div>
 </div>
 <div class="section level3">
 <h3 id="cross-software-implementation-checks">Cross-software implementation checks<a class="anchor" aria-label="anchor" href="#cross-software-implementation-checks"></a>
@@ -1113,37 +1221,141 @@ the same ones used for the main benchmark-quality run here:
 <code>phi_body = pi</code>.</p>
 <p><code>Prol_Spheroid</code> only treats penetrable prolate spheroids,
 so its cells are <code>N/A</code> for <code>fixed_rigid</code> and
-<code>pressure_release</code>. The table separates the original and
-vectorized <code>Prol_Spheroid</code> branches because the numerical
-agreement is nearly identical while the runtime is not.</p>
+<code>pressure_release</code>. The original and vectorized
+<code>Prol_Spheroid</code> branches are split below because their
+numerical agreement is nearly identical while their runtimes are
+not.</p>
+<div class="section level4">
+<h4 id="cross-software-summary">Cross-software summary<a class="anchor" aria-label="anchor" href="#cross-software-summary"></a>
+</h4>
+<div class="panel-tabset">
+
+
+
+<ul class="nav nav-tabs" id="NA" role="tablist">
+<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#echosms" id="echosms-tab" type="button" role="tab" aria-controls="echosms" aria-selected="true" class="active nav-link"><code>echoSMs</code></button></li>
+<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#prol_spheroid" id="prol_spheroid-tab" type="button" role="tab" aria-controls="prol_spheroid" aria-selected="false" class="nav-link"><code>Prol_Spheroid</code></button></li>
+<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#runtime" id="runtime-tab" type="button" role="tab" aria-controls="runtime" aria-selected="false" class="nav-link">Runtime</button></li>
+</ul>
+<div class="tab-content">
+<div class="active  tab-pane" id="echosms" role="tabpanel" aria-labelledby="echosms-tab">
+
 <table class="table">
 <colgroup>
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
+<col width="25%">
+<col width="25%">
+<col width="25%">
+<col width="25%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">Case</th>
 <th align="left">Frequency set (kHz)</th>
-<th align="right">Max abs. delta TS vs <code>echoSMs</code> (dB)</th>
-<th align="right">Mean abs. delta TS vs <code>echoSMs</code> (dB)</th>
-<th align="right">Max abs. delta TS vs <code>Prol_Spheroid</code>
-original (dB)</th>
-<th align="right">Mean abs. delta TS vs <code>Prol_Spheroid</code>
-original (dB)</th>
-<th align="right">Max abs. delta TS vs <code>Prol_Spheroid</code>
-vectorized (dB)</th>
-<th align="right">Mean abs. delta TS vs <code>Prol_Spheroid</code>
-vectorized (dB)</th>
+<th align="right">Max abs. <span class="math inline">\Delta</span> TS vs
+<code>echoSMs</code> (dB)</th>
+<th align="right">Mean abs. <span class="math inline">\Delta</span> TS
+vs <code>echoSMs</code> (dB)</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>fixed_rigid</code></td>
+<td align="left"><code>12, 18, 38, 70, 100</code></td>
+<td align="right"><code>0.49692</code></td>
+<td align="right"><code>0.10091</code></td>
+</tr>
+<tr class="even">
+<td align="left"><code>pressure_release</code></td>
+<td align="left"><code>12, 18, 38, 70, 100</code></td>
+<td align="right"><code>0.08619</code></td>
+<td align="right"><code>0.01757</code></td>
+</tr>
+<tr class="odd">
+<td align="left"><code>liquid_filled</code></td>
+<td align="left"><code>12, 18, 38, 70, 100</code></td>
+<td align="right"><code>1.01676</code></td>
+<td align="right"><code>0.20537</code></td>
+</tr>
+<tr class="even">
+<td align="left"><code>gas_filled</code></td>
+<td align="left"><code>12, 18, 38, 70, 100</code></td>
+<td align="right"><code>5.49661</code></td>
+<td align="right"><code>1.10385</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="tab-pane" id="prol_spheroid" role="tabpanel" aria-labelledby="prol_spheroid-tab">
+
+<table style="width:100%;" class="table">
+<colgroup>
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Case</th>
+<th align="left">Frequency set (kHz)</th>
+<th align="right">Max abs. <span class="math inline">\Delta</span> TS vs
+<code>Prol_Spheroid</code> original (dB)</th>
+<th align="right">Mean abs. <span class="math inline">\Delta</span> TS
+vs <code>Prol_Spheroid</code> original (dB)</th>
+<th align="right">Max abs. <span class="math inline">\Delta</span> TS vs
+<code>Prol_Spheroid</code> vectorized (dB)</th>
+<th align="right">Mean abs. <span class="math inline">\Delta</span> TS
+vs <code>Prol_Spheroid</code> vectorized (dB)</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>fixed_rigid</code></td>
+<td align="left"><code>12, 18, 38, 70, 100</code></td>
+<td align="right"><code>N/A</code></td>
+<td align="right"><code>N/A</code></td>
+<td align="right"><code>N/A</code></td>
+<td align="right"><code>N/A</code></td>
+</tr>
+<tr class="even">
+<td align="left"><code>pressure_release</code></td>
+<td align="left"><code>12, 18, 38, 70, 100</code></td>
+<td align="right"><code>N/A</code></td>
+<td align="right"><code>N/A</code></td>
+<td align="right"><code>N/A</code></td>
+<td align="right"><code>N/A</code></td>
+</tr>
+<tr class="odd">
+<td align="left"><code>liquid_filled</code></td>
+<td align="left"><code>12, 18, 38, 70, 100</code></td>
+<td align="right"><code>0.00128</code></td>
+<td align="right"><code>0.00055</code></td>
+<td align="right"><code>0.00128</code></td>
+<td align="right"><code>0.00055</code></td>
+</tr>
+<tr class="even">
+<td align="left"><code>gas_filled</code></td>
+<td align="left"><code>12, 18, 38, 70, 100</code></td>
+<td align="right"><code>42.84714</code></td>
+<td align="right"><code>13.22982</code></td>
+<td align="right"><code>42.84714</code></td>
+<td align="right"><code>13.22982</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="tab-pane" id="runtime" role="tabpanel" aria-labelledby="runtime-tab">
+
+<table style="width:100%;" class="table">
+<colgroup>
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Case</th>
+<th align="left">Frequency set (kHz)</th>
 <th align="right">acousticTS elapsed (s)</th>
 <th align="right">
 <code>echoSMs</code> elapsed (s)</th>
@@ -1156,12 +1368,6 @@ vectorized (dB)</th>
 <tr class="odd">
 <td align="left"><code>fixed_rigid</code></td>
 <td align="left"><code>12, 18, 38, 70, 100</code></td>
-<td align="right"><code>0.49692</code></td>
-<td align="right"><code>0.10091</code></td>
-<td align="right"><code>N/A</code></td>
-<td align="right"><code>N/A</code></td>
-<td align="right"><code>N/A</code></td>
-<td align="right"><code>N/A</code></td>
 <td align="right"><code>0.86</code></td>
 <td align="right"><code>0.34</code></td>
 <td align="right"><code>N/A</code></td>
@@ -1170,12 +1376,6 @@ vectorized (dB)</th>
 <tr class="even">
 <td align="left"><code>pressure_release</code></td>
 <td align="left"><code>12, 18, 38, 70, 100</code></td>
-<td align="right"><code>0.08619</code></td>
-<td align="right"><code>0.01757</code></td>
-<td align="right"><code>N/A</code></td>
-<td align="right"><code>N/A</code></td>
-<td align="right"><code>N/A</code></td>
-<td align="right"><code>N/A</code></td>
 <td align="right"><code>0.93</code></td>
 <td align="right"><code>0.33</code></td>
 <td align="right"><code>N/A</code></td>
@@ -1184,12 +1384,6 @@ vectorized (dB)</th>
 <tr class="odd">
 <td align="left"><code>liquid_filled</code></td>
 <td align="left"><code>12, 18, 38, 70, 100</code></td>
-<td align="right"><code>1.01676</code></td>
-<td align="right"><code>0.20537</code></td>
-<td align="right"><code>0.00128</code></td>
-<td align="right"><code>0.00055</code></td>
-<td align="right"><code>0.00128</code></td>
-<td align="right"><code>0.00055</code></td>
 <td align="right"><code>2.72</code></td>
 <td align="right"><code>48.02</code></td>
 <td align="right"><code>48.65</code></td>
@@ -1198,12 +1392,6 @@ vectorized (dB)</th>
 <tr class="even">
 <td align="left"><code>gas_filled</code></td>
 <td align="left"><code>12, 18, 38, 70, 100</code></td>
-<td align="right"><code>5.49661</code></td>
-<td align="right"><code>1.10385</code></td>
-<td align="right"><code>42.84714</code></td>
-<td align="right"><code>13.22982</code></td>
-<td align="right"><code>42.84714</code></td>
-<td align="right"><code>13.22982</code></td>
 <td align="right"><code>2.69</code></td>
 <td align="right"><code>70.97</code></td>
 <td align="right"><code>698.50</code></td>
@@ -1211,6 +1399,9 @@ vectorized (dB)</th>
 </tr>
 </tbody>
 </table>
+</div>
+</div>
+</div>
 <p>These checks are informative in a more mixed way once <code>70</code>
 and <code>100 kHz</code> are included. The penetrable liquid-filled case
 remains extremely close to the independent <code>Prol_Spheroid</code>
@@ -1234,6 +1425,7 @@ do here: it shows that the low-frequency agreement is reassuring, but it
 also flags the higher-frequency penetrable PSMS pathways as the part of
 the implementation space that still deserves the most careful future
 scrutiny.</p>
+</div>
 </div>
 <div class="section level3">
 <h3 id="extracting-model-results">Extracting model results<a class="anchor" aria-label="anchor" href="#extracting-model-results"></a>

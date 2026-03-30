@@ -4,10 +4,8 @@
 
 Benchmarked Validated
 
-*Model-family pages:*
-[Overview](https://brandynlucca.github.io/acousticTS/articles/psms/index.md)
-[Implementation](https://brandynlucca.github.io/acousticTS/articles/psms/psms-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/psms/psms-theory.md)
+[Implementation](https://brandynlucca.github.io/acousticTS/articles/psms/psms-implementation.md)
 
 These pages are rooted in exact spheroidal-coordinate separations and
 later fisheries-acoustics use of prolate-spheroid models ([Spence and

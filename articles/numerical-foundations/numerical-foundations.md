@@ -27,6 +27,8 @@ resolution. Readers should therefore treat numerical settings as part of
 the reliability of the answer, not as an afterthought that becomes
 relevant only when something fails dramatically.
 
+![Numerical foundations map](numerical-foundations-map.png)
+
 ## Package numerical policy
 
 The package follows a simple numerical policy so that model arguments
@@ -226,7 +228,7 @@ and
 [`Rmn()`](https://brandynlucca.github.io/acousticTS/reference/Rmn.md)
 are not numerically difficult because the formulas are conceptually
 obscure. They are difficult because spheroidal special functions are
-expensive and delicate at high order. The current implementation in
+expensive and delicate at high order. The implementation in
 `prolate_swf.f90` and the related `psms.cpp` wrappers is designed to
 keep those evaluations stable before any model-specific scattering
 algebra is applied.
@@ -257,7 +259,7 @@ convergence should be checked by increasing the truncation and asking
 whether the result changes materially. A truncation rule of thumb is a
 starting point, not a proof of adequacy. If a spectrum, resonance
 feature, or angular response moves noticeably when the truncation is
-increased moderately, the earlier result should not yet be treated as
+increased moderately, that result should not yet be treated as
 numerically settled.
 
 ## Quadrature and overlap integrals

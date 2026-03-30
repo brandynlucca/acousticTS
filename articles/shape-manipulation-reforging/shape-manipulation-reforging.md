@@ -14,6 +14,9 @@ comparison step. The package includes tools for reshaping, bending, or
 otherwise transforming existing objects rather than rebuilding them from
 scratch.
 
+![Shape
+manipulation](shape-manipulation-schematic.png)[](https://brandynlucca.github.io/acousticTS/reference/brake.md "brake()")[](https://brandynlucca.github.io/acousticTS/reference/reforge.md "reforge()")
+
 These tools are not cosmetic. They are part of the modeling layer
 because curvature, segmentation, and relative body-swimbladder scaling
 can all change the resulting backscatter in physically meaningful ways.
@@ -23,7 +26,7 @@ only about producing a different outline. It is about deciding how a
 target should be represented for a specific scientific or modeling
 question. A bent body, an inflated swimbladder, or a resampled
 segmentation may all be legitimate transformations, but each of them
-changes what the object now means physically.
+changes what the object means physically.
 
 ## Main ideas
 
@@ -118,8 +121,8 @@ as a cosmetic deformation of a drawing.
 
 [`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md)
 is a generic interface for reshaping or resizing an existing object. The
-most developed method in the current package is the `SBF` method, which
-handles body and swimbladder geometry jointly.
+most developed method in the package is the `SBF` method, which handles
+body and swimbladder geometry jointly.
 
 Its most important arguments are:
 

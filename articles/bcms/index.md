@@ -2,12 +2,10 @@
 
 ## Overview
 
-Experimental Unvalidated
+Unvalidated Experimental
 
-*Model-family pages:*
-[Overview](https://brandynlucca.github.io/acousticTS/articles/bcms/index.md)
-[Implementation](https://brandynlucca.github.io/acousticTS/articles/bcms/bcms-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/bcms/bcms-theory.md)
+[Implementation](https://brandynlucca.github.io/acousticTS/articles/bcms/bcms-implementation.md)
 
 This family follows the deformed-cylinder and coherence-corrected
 cylinder literature for weakly scattering elongated bodies ([Stanton
@@ -48,8 +46,9 @@ coherent length derived for a uniformly bent axis.
 
 ### Validation status
 
-- Current BCMS checks are internal coherence reconstructions; the family
-  does not yet have an external benchmark or software ladder.
+- BCMS is currently marked experimental because the documented checks
+  are internal coherence reconstructions rather than an external
+  benchmark or software-comparison ladder.
 
 ### Family pages
 

@@ -13,6 +13,20 @@ and repeated simulation workflows.
   : Simulate target strength (TS) with flexible parameterization and
   batching
 
+### Model registry and extensions
+
+Helpers for listing built-in models and registering custom model
+implementations for the current session or across sessions.
+
+- [`available_models()`](https://brandynlucca.github.io/acousticTS/reference/available_models.md)
+  : List available target-strength models
+- [`register_model()`](https://brandynlucca.github.io/acousticTS/reference/register_model.md)
+  : Register a user-defined target-strength model
+- [`unregister_model()`](https://brandynlucca.github.io/acousticTS/reference/unregister_model.md)
+  : Remove a user-defined target-strength model registration
+- [`reset_model_registry()`](https://brandynlucca.github.io/acousticTS/reference/reset_model_registry.md)
+  : Clear user-defined model registrations
+
 ### Inspection, plotting, and reshaping
 
 Helpers for pulling components out of package objects, visualizing

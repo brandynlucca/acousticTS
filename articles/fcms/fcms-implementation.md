@@ -4,9 +4,7 @@
 
 Benchmarked Validated
 
-*Model-family pages:*
 [Overview](https://brandynlucca.github.io/acousticTS/articles/fcms/index.md)
-[Implementation](https://brandynlucca.github.io/acousticTS/articles/fcms/fcms-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/fcms/fcms-theory.md)
 
 These pages follow the finite-cylinder modal-series literature for
@@ -184,12 +182,12 @@ benchmark family stored in `benchmark_ts`. The table below uses the full
 cylindrical benchmark grid. Elapsed times are representative values from
 the current machine.
 
-| Boundary           | Max abs. delta TS (dB) | Mean abs. delta TS (dB) | Elapsed (s) |
-|:-------------------|-----------------------:|------------------------:|------------:|
-| `fixed_rigid`      |                0.19454 |                 0.00914 |        0.01 |
-| `pressure_release` |                0.00780 |                 0.00263 |        0.03 |
-| `gas_filled`       |                0.00499 |                 0.00245 |        0.05 |
-| `liquid_filled`    |                0.11453 |                 0.00512 |        0.05 |
+| Boundary           | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | Elapsed (s) |
+|:-------------------|------------------------:|-------------------------:|------------:|
+| `fixed_rigid`      |                 0.19454 |                  0.00914 |        0.01 |
+| `pressure_release` |                 0.00780 |                  0.00263 |        0.03 |
+| `gas_filled`       |                 0.00499 |                  0.00245 |        0.05 |
+| `liquid_filled`    |                 0.11453 |                  0.00512 |        0.05 |
 
 The pressure-release and gas-filled cases remain very close to the
 benchmark family across the full frequency grid. The larger residuals
@@ -206,12 +204,12 @@ table above. It asks whether the software implementations agree with
 each other on the same finite-cylinder problem, and whether the
 remaining benchmark residual is shared rather than unique to acousticTS.
 
-| Boundary           | Mean abs. delta acousticTS vs `echoSMs` (dB) | Max abs. delta acousticTS vs `echoSMs` (dB) | Mean abs. delta `echoSMs` vs benchmark (dB) | Max abs. delta `echoSMs` vs benchmark (dB) |
-|:-------------------|---------------------------------------------:|--------------------------------------------:|--------------------------------------------:|-------------------------------------------:|
-| `fixed_rigid`      |                                     7.14e-09 |                                    1.64e-07 |                                     0.00914 |                                    0.19454 |
-| `pressure_release` |                                     6.97e-09 |                                    1.59e-07 |                                     0.00263 |                                    0.00780 |
-| `gas_filled`       |                                     6.96e-09 |                                    1.59e-07 |                                     0.00245 |                                    0.00499 |
-| `liquid_filled`    |                                     4.36e-09 |                                    2.62e-07 |                                     0.00512 |                                    0.11453 |
+| Boundary           | Mean abs. \Delta acousticTS vs `echoSMs` (dB) | Max abs. \Delta acousticTS vs `echoSMs` (dB) | Mean abs. \Delta `echoSMs` vs benchmark (dB) | Max abs. \Delta `echoSMs` vs benchmark (dB) |
+|:-------------------|----------------------------------------------:|---------------------------------------------:|---------------------------------------------:|--------------------------------------------:|
+| `fixed_rigid`      |                                      7.14e-09 |                                     1.64e-07 |                                      0.00914 |                                     0.19454 |
+| `pressure_release` |                                      6.97e-09 |                                     1.59e-07 |                                      0.00263 |                                     0.00780 |
+| `gas_filled`       |                                      6.96e-09 |                                     1.59e-07 |                                      0.00245 |                                     0.00499 |
+| `liquid_filled`    |                                      4.36e-09 |                                     2.62e-07 |                                      0.00512 |                                     0.11453 |
 
 The key point is that acousticTS and `echoSMs` collapse onto the same
 FCMS spectra to practical machine precision across all four boundary
@@ -224,11 +222,11 @@ natural follow-up check is the same one used for SPHMS: hold the
 liquid-filled benchmark definition fixed and inspect how strongly the
 benchmark fit depends on a reduced modal cap.
 
-| Boundary        | `m_limit`    | Max abs. delta TS (dB) | Mean abs. delta TS (dB) | Elapsed (s) |
-|:----------------|:-------------|-----------------------:|------------------------:|------------:|
-| `liquid_filled` | default rule |                0.11453 |                 0.00512 |        0.05 |
-| `liquid_filled` | `20`         |                0.12618 |                 0.00547 |        0.09 |
-| `liquid_filled` | `10`         |               43.09805 |                 4.29035 |        0.01 |
+| Boundary        | `m_limit`    | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | Elapsed (s) |
+|:----------------|:-------------|------------------------:|-------------------------:|------------:|
+| `liquid_filled` | default rule |                 0.11453 |                  0.00512 |        0.05 |
+| `liquid_filled` | `20`         |                 0.12618 |                  0.00547 |        0.09 |
+| `liquid_filled` | `10`         |                43.09805 |                  4.29035 |        0.01 |
 
 That sensitivity check shows why the FCMS page does not need a large
 PSMS-style configuration matrix. The physically meaningful benchmark

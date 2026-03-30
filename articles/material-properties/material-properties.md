@@ -23,6 +23,8 @@ theoretically appropriate model will still give an inappropriate answer
 if the target and medium properties do not describe the same physical
 situation the reader believes they are describing.
 
+![Material property pipeline](material-property-pipeline.png)
+
 ## Main utility groups
 
 The package includes utilities for density- and sound-speed-derived

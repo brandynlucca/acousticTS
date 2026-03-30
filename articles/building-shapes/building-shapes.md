@@ -17,13 +17,15 @@ determines how faithfully the object matches a theory family, how much
 geometric detail is preserved, and how easy it will be to interpret the
 response later.
 
-The important point is that shape construction is not yet the stage
-where material contrasts or boundary conditions are fixed. At this
-stage, only the geometric description of the target is being chosen.
-That separation is intentional. It keeps the geometric question distinct
-from the physical one and makes it easier to evaluate later whether a
-modeled response is being driven by morphology, by material properties,
-or by model assumptions.
+The important point is that shape construction is not the stage where
+material contrasts or boundary conditions are fixed. At this stage, only
+the geometric description of the target is being chosen. That separation
+is intentional. It keeps the geometric question distinct from the
+physical one and makes it easier to evaluate later whether a modeled
+response is being driven by morphology, by material properties, or by
+model assumptions.
+
+![Shape-selection spectrum](building-shapes-spectrum.png)
 
 ## Why geometry choice matters
 
@@ -73,8 +75,7 @@ point than a highly detailed arbitrary outline.
 The direct generators are usually the clearest interface because they
 make the resulting shape class explicit at the call site.
 [`create_shape()`](https://brandynlucca.github.io/acousticTS/reference/create_shape.md)
-is still useful, but it is best treated as a thin convenience dispatcher
-rather than as the main pedagogical path.
+is a thin convenience dispatcher rather than the main pedagogical path.
 
 ## Coordinate conventions by shape
 
@@ -83,6 +84,9 @@ models, but it is easier to read those objects once the coordinate
 conventions are made explicit. The schematic below shows the profile
 view used by the canonical shapes and the side-profile plus
 cross-section interpretation used by arbitrary shapes.
+
+![Coordinate conventions for canonical and arbitrary
+shapes](building-shapes-coordinates.png)
 
 For
 [`sphere()`](https://brandynlucca.github.io/acousticTS/reference/sphere.md),

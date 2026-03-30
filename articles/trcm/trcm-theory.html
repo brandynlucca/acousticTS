@@ -83,11 +83,19 @@
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
-<li class="nav-item"><a class="nav-link" href="../../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../../reference/index.html">Function reference</a></li>
+    <li><a class="dropdown-item" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
+    <li><a class="dropdown-item" href="../../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -113,8 +121,15 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p><span class="model-tag established">Benchmarked</span></p>
-<p><em>Model-family pages:</em> <a href="index.html">Overview</a> <a href="trcm-implementation.html">Implementation</a> <a href="trcm-theory.html">Theory</a></p>
+<div class="model-status-line">
+<span class="model-tag established">Benchmarked</span> <span class="model-tag unvalidated">Unvalidated</span>
+</div>
+<div class="model-nav">
+<div class="model-nav-links">
+<a class="model-nav-badge" href="index.html">Overview</a>
+<a class="model-nav-badge" href="trcm-implementation.html">Implementation</a>
+</div>
+</div>
 <p>The two-ray cylinder model (TRCM) is a high-frequency approximation
 for elongated fluid-like bodies. It assumes that the dominant
 backscatter from a locally cylindrical body is produced by two coherent
@@ -136,9 +151,9 @@ the incident field is reflected or transmitted. The TRCM does not solve
 that boundary-value problem exactly. It inserts those local interface
 coefficients into a high-frequency two-path reduction for an elongated
 body. <!-- 
-![Straight-cylinder cross-section and the two retained TRCM paths.](trcm-two-ray-geometry-clean.svg)
+![Straight-cylinder cross-section and the two retained TRCM paths.](trcm-two-ray-geometry-clean.png)
 
-![Curvature changes axial coherence length, not the local two-ray cross-sectional physics.](trcm-curvature-coherence-clean.svg) --></p>
+![Curvature changes axial coherence length, not the local two-ray cross-sectional physics.](trcm-curvature-coherence-clean.png) --></p>
 <p>The model can be read as the product of four ingredients. The fluid
 interface supplies a reflection coefficient. The cross-section supplies
 a normalized two-ray interference factor. The finite body axis supplies
@@ -289,8 +304,7 @@ first transmitted return. The model also introduces an empirical phase
 correction to shift that return away from the strict geometric-optics
 value at finite acoustic size:</p>
 <p><span class="math display">
-  \mu =
-    -\frac{(\pi / 2) k_1 a}{k_1 a + 0.4}.
+  \mu = -\frac{(\pi / 2) k_1 a}{k_1 a + 0.4}.
 </span></p>
 <p>The through-body contribution is therefore multiplied by:</p>
 <p><span class="math display">
@@ -358,8 +372,7 @@ contributes:</p>
 <p>Putting all of these ingredients together gives the straight-cylinder
 scattering amplitude:</p>
 <p><span class="math display">
-  \mathcal{f}_\text{bs}^{(straight)} =
-    -\frac{i}{2 \sqrt{\pi}}
+  \mathcal{f}_\text{bs}^{(straight)} = -\frac{i}{2 \sqrt{\pi}}
   e^{i \pi / 4}
   e^{-2 i k_1 a \cos \hat{\theta}}
   L \sqrt{k_1 a \cos \hat{\theta}}

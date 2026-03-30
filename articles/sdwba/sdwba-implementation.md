@@ -4,9 +4,7 @@
 
 Benchmarked Validated
 
-*Model-family pages:*
 [Overview](https://brandynlucca.github.io/acousticTS/articles/sdwba/index.md)
-[Implementation](https://brandynlucca.github.io/acousticTS/articles/sdwba/sdwba-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/sdwba/sdwba-theory.md)
 
 These pages connect krill-body DWBA models to phase variability,
@@ -197,11 +195,11 @@ in the Jech weakly scattering sphere, prolate-spheroid, and cylinder
 files. The table below reports that direct comparison together with the
 representative runtime on the current machine.
 
-| Geometry                           | Max abs. delta vs benchmark (dB) | Mean abs. delta vs benchmark (dB) | Elapsed (s) |
-|:-----------------------------------|---------------------------------:|----------------------------------:|------------:|
-| Weakly scattering sphere           |                         10.08475 |                           0.35609 |        0.72 |
-| Weakly scattering prolate spheroid |                          2.05918 |                           0.07638 |        3.58 |
-| Weakly scattering cylinder         |                          2.07406 |                           0.15895 |        1.91 |
+| Geometry                           | Max abs. \Delta vs benchmark (dB) | Mean abs. \Delta vs benchmark (dB) | Elapsed (s) |
+|:-----------------------------------|----------------------------------:|-----------------------------------:|------------:|
+| Weakly scattering sphere           |                          10.08475 |                            0.35609 |        0.72 |
+| Weakly scattering prolate spheroid |                           2.05918 |                            0.07638 |        3.58 |
+| Weakly scattering cylinder         |                           2.07406 |                            0.15895 |        1.91 |
 
 These runs use the same stochastic reference values throughout the
 benchmark set: `N0 = 50`, `phase_sd_init = sqrt(2) / 32`,
@@ -212,17 +210,17 @@ For SDWBA, the most important additional implementation control is
 average is actually resolved numerically. The table below keeps the same
 Jech targets and changes only `n_iterations`.
 
-| Geometry                           | `n_iterations` | Max abs. delta vs benchmark (dB) | Mean abs. delta vs benchmark (dB) | Elapsed (s) |
-|:-----------------------------------|---------------:|---------------------------------:|----------------------------------:|------------:|
-| Weakly scattering sphere           |             25 |                          9.30458 |                           0.34871 |        0.58 |
-| Weakly scattering sphere           |            100 |                         10.08475 |                           0.35609 |        0.63 |
-| Weakly scattering sphere           |            500 |                          9.97080 |                           0.35343 |        1.11 |
-| Weakly scattering prolate spheroid |             25 |                          1.26004 |                           0.06948 |        3.08 |
-| Weakly scattering prolate spheroid |            100 |                          2.05918 |                           0.07638 |        3.63 |
-| Weakly scattering prolate spheroid |            500 |                          1.28403 |                           0.07107 |        6.50 |
-| Weakly scattering cylinder         |             25 |                          2.07406 |                           0.15899 |        1.75 |
-| Weakly scattering cylinder         |            100 |                          2.07406 |                           0.15895 |        2.03 |
-| Weakly scattering cylinder         |            500 |                          2.07403 |                           0.15895 |        3.39 |
+| Geometry                           | `n_iterations` | Max abs. \Delta vs benchmark (dB) | Mean abs. \Delta vs benchmark (dB) | Elapsed (s) |
+|:-----------------------------------|---------------:|----------------------------------:|-----------------------------------:|------------:|
+| Weakly scattering sphere           |             25 |                           9.30458 |                            0.34871 |        0.58 |
+| Weakly scattering sphere           |            100 |                          10.08475 |                            0.35609 |        0.63 |
+| Weakly scattering sphere           |            500 |                           9.97080 |                            0.35343 |        1.11 |
+| Weakly scattering prolate spheroid |             25 |                           1.26004 |                            0.06948 |        3.08 |
+| Weakly scattering prolate spheroid |            100 |                           2.05918 |                            0.07638 |        3.63 |
+| Weakly scattering prolate spheroid |            500 |                           1.28403 |                            0.07107 |        6.50 |
+| Weakly scattering cylinder         |             25 |                           2.07406 |                            0.15899 |        1.75 |
+| Weakly scattering cylinder         |            100 |                           2.07406 |                            0.15895 |        2.03 |
+| Weakly scattering cylinder         |            500 |                           2.07403 |                            0.15895 |        3.39 |
 
 That sensitivity table is useful because it shows two things at once.
 First, the runtime cost does scale with the number of stochastic
@@ -243,14 +241,14 @@ values used for the benchmark calculations (`N0 = 50`,
 `phase_sd_init = sqrt(2) / 32`, `L0 = 38.35 mm`, `f0 = 120 kHz`,
 `n_iterations = 100`).
 
-| Comparison                  | Mean abs. delta TS (dB) | Max abs. delta TS (dB) |
-|:----------------------------|------------------------:|-----------------------:|
-| acousticTS vs `echoSMs`     |                 1.70257 |               30.63630 |
-| acousticTS vs CCAMLR MATLAB |                 0.06978 |                0.18270 |
-| acousticTS vs NOAA HTML     |                 0.06158 |                0.52846 |
-| `echoSMs` vs CCAMLR MATLAB  |                 1.74808 |               30.72119 |
-| `echoSMs` vs NOAA HTML      |                 1.69189 |               30.27117 |
-| CCAMLR MATLAB vs NOAA HTML  |                 0.13036 |                0.65798 |
+| Comparison                  | Mean abs. \Delta TS (dB) | Max abs. \Delta TS (dB) |
+|:----------------------------|-------------------------:|------------------------:|
+| acousticTS vs `echoSMs`     |                  1.70257 |                30.63630 |
+| acousticTS vs CCAMLR MATLAB |                  0.06978 |                 0.18270 |
+| acousticTS vs NOAA HTML     |                  0.06158 |                 0.52846 |
+| `echoSMs` vs CCAMLR MATLAB  |                  1.74808 |                30.72119 |
+| `echoSMs` vs NOAA HTML      |                  1.69189 |                30.27117 |
+| CCAMLR MATLAB vs NOAA HTML  |                  0.13036 |                 0.65798 |
 
 Those values should be read as implementation differences rather than
 benchmark errors. All four calculations use the same bundled krill

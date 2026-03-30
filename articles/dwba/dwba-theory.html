@@ -83,11 +83,19 @@
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
-<li class="nav-item"><a class="nav-link" href="../../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../../reference/index.html">Function reference</a></li>
+    <li><a class="dropdown-item" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
+    <li><a class="dropdown-item" href="../../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -113,15 +121,22 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p><span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span></p>
-<p><em>Model-family pages:</em> <a href="index.html">Overview</a> <a href="dwba-implementation.html">Implementation</a> <a href="dwba-theory.html">Theory</a></p>
+<div class="model-status-line">
+<span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span>
+</div>
+<div class="model-nav">
+<div class="model-nav-links">
+<a class="model-nav-badge" href="index.html">Overview</a>
+<a class="model-nav-badge" href="dwba-implementation.html">Implementation</a>
+</div>
+</div>
 <p>The distorted wave Born approximation (DWBA) is a first-order
 scattering model for weakly scattering fluid-like bodies. It is most
 useful when the material contrasts are small enough that the total
 acoustic field inside the body remains close to the incident field, but
 the geometry is sufficiently extended that phase accumulation along the
-body cannot be ignored <span class="citation">(<a href="#ref-morse_theoretical_1986">Morse and Ingard 1986</a>; <a href="#ref-stanton_sound_1998i"><strong>stanton_sound_1998i?</strong></a>)</span>.
-In that regime, a purely local approximation is too crude, while a full
+body cannot be ignored <span class="citation">(<a href="#ref-morse_theoretical_1986">Morse and Ingard 1986</a>; <a href="#ref-stanton_sound_1998">Stanton et al. 1998</a>)</span>. In that
+regime, a purely local approximation is too crude, while a full
 boundary-value solution is often unnecessary or unavailable.</p>
 <p>For elongated zooplankton and similar organisms, the most important
 consequence of the DWBA is that a three-dimensional volume scattering
@@ -146,13 +161,13 @@ to <span class="math inline">e^{-i \omega t}</span>. Let the surrounding
 seawater be medium <code>1</code>, with density <span class="math inline">\rho_1</span>, sound speed <span class="math inline">c_1</span>, compressibility <span class="math inline">\kappa_1 = (\rho_1 c_1^2)^{-1}</span>, and
 wavenumber:</p>
 <p><span class="math display">
-  \begin{align*}
+  \begin{aligned}
   \rho(\mathbf{x})\frac{\partial \mathbf{v}}{\partial t} &amp;= -\nabla
 p, \\
     \frac{\partial \rho'}{\partial t} + \rho(\mathbf{x}) \, \nabla
 \cdot \mathbf{v} &amp;= 0 \\
     p &amp;= c^2(\mathbf{x}) \, \rho'.
-  \end{align*}
+  \end{aligned}
 </span></p>
 <p>Eliminating particle velocity <span class="math inline">\mathbf{v}</span> and density perturbation <span class="math inline">\rho'</span> gives an acoustic equation in a
 heterogeneous medium. When the medium is decomposed into a homogeneous
@@ -395,7 +410,7 @@ cross-sectional diffraction integral:</p>
 </span></p>
 <p>The body is therefore reduced to a coherent sum of local
 cross-sectional responses distributed along the centerline. Moreover, if
-the material properties contrast does nto vary across the local section,
+the material-property contrast does not vary across the local section,
 it can be taken outside the inner integral.</p>
 </div>
 <div class="section level3">
@@ -500,9 +515,9 @@ expression becomes:</p>
   }
   \, ds.
 </span></p>
-<p>Each factor now has a direct interpretation:</p>
+<p>Each factor has a direct interpretation:</p>
 <p><span class="math display">
-  \begin{align*}
+  \begin{aligned}
   \gamma_\kappa - \gamma_\rho &amp;\Rightarrow \text{material property
 contrast} \\
     e^{2 i \mathbf{k}_2 \cdot \mathbf{r}_{pos}(s)} &amp;\Rightarrow
@@ -510,7 +525,7 @@ contrast} \\
     \frac{J_1\!\left(2 k_2 a(s)
 \cos\beta_{tilt}(s)\right)}{\cos\beta_{tilt}(s)} &amp;\Rightarrow
 \text{exact cross-sectional diffraction}.
-  \end{align*}
+  \end{aligned}
 </span></p>
 <div class="float">
 <img src="dwba-volume-to-line-clean.svg" alt="Conceptual reduction from a 3D volume integral to a 1D centerline integral for an elongated fluid body."><div class="figcaption">Conceptual reduction from a 3D volume integral
@@ -621,6 +636,13 @@ strongly resonant structures.</p>
 <div id="ref-morse_theoretical_1986" class="csl-entry">
 Morse, Philip M., and K. Uno Ingard. 1986. <em>Theoretical
 Acoustics</em>. Princeton, N.J: Princeton University Press.
+</div>
+<div id="ref-stanton_sound_1998" class="csl-entry">
+Stanton, Timothy K., Dezhang Chu, Peter H. Wiebe, Linda V. Martin, and
+Robert L. Eastwood. 1998. <span>“Sound Scattering by Several Zooplankton
+Groups. <span>I</span>. <span>Experimental</span> Determination of
+Dominant Scattering Mechanisms.”</span> <em>The Journal of the
+Acoustical Society of America</em> 103 (1): 225–35. <a href="https://doi.org/10.1121/1.421469" class="external-link">https://doi.org/10.1121/1.421469</a>.
 </div>
 </div>
 </div>

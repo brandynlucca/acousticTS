@@ -4,10 +4,8 @@
 
 Unvalidated
 
-*Model-family pages:*
 [Overview](https://brandynlucca.github.io/acousticTS/articles/essms/index.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/essms/essms-implementation.md)
-[Theory](https://brandynlucca.github.io/acousticTS/articles/essms/essms-theory.md)
 
 These pages are grounded in the classical elastic-shell scattering
 literature for fluid-filled spherical shells ([Goodman and Stern
@@ -57,7 +55,7 @@ primary interfaces: exterior-shell (g\_{21}, h\_{21}) and shell-interior
 (g\_{32}, h\_{32}).
 
 ![ESSMS mode-wise boundary bookkeeping from the two shell radii to the
-exterior scattering coefficient.](essms-boundary-bookkeeping.svg)
+exterior scattering coefficient.](essms-boundary-bookkeeping.png)
 
 ESSMS mode-wise boundary bookkeeping from the two shell radii to the
 exterior scattering coefficient.
@@ -101,7 +99,7 @@ potentials:
 \mu\\\nabla\times(\nabla\times\mathbf{u}) + \rho_s \omega^2 \mathbf{u} =
 0,
 
-where \lambda and \mu are the Lamé elastic constants and \rho_2 is the
+where \lambda and \mu are the Lam'e elastic constants and \rho_2 is the
 mass density of the shell. Applying the Helmholtz decomposition,
 \mathbf{u} is written as:
 
@@ -199,12 +197,12 @@ equation:
 Separate velocity potentials are introduced for the incident plane wave
 and fluid regions:
 
-\begin{align\*} \phi\_\text{inc}(r, \theta) &= e^{ik_1 r\cos\theta} \\
+\begin{aligned} \phi\_\text{inc}(r, \theta) &= e^{ik_1 r\cos\theta} \\
 &= \sum\limits\_{m=0}^\infty i^m(2m+1)\\j_m(k_1 r)\\P_m(\cos\theta), \\
 \phi_1(\theta,r) &= \sum\limits\_{m=0}^\infty i^m(2m+1)
 A_m^{(1)}\\h_m^{(1)}(k_1 r)\\P_m(\cos\theta), \\ \phi_3(\theta,r) &=
 \sum\limits\_{m=0}^\infty i^m(2m+1) A_m^{(3)}\\j_m(k_3
-r)\\P_m(\cos\theta), \end{align\*}
+r)\\P_m(\cos\theta), \end{aligned}
 
 where the coefficients A_m^{(1)} and A_m^{(3)} are unknown modal
 amplitudes determined by the boundary conditions at the shell
@@ -267,10 +265,10 @@ for the displacement components that separate by angular order.
 For each angular mode m, the radial and tangential displacement
 components in the shell are:
 
-\begin{align\*} u_r &= \sum\_{m=0}^{\infty} \left\[ \frac{d\phi_m}{dr} +
+\begin{aligned} u_r &= \sum\_{m=0}^{\infty} \left\[ \frac{d\phi_m}{dr} +
 \frac{m(m+1)}{r} \psi_m \right\] P_m(\cos\theta), \\ u\_\theta &=
 \sum\_{m=0}^{\infty} \left\[ \frac{\phi_m}{r} + \frac{d}{dr}(r\psi_m)
-\right\] \frac{dP_m(\cos\theta)}{d\theta}, \end{align\*}
+\right\] \frac{dP_m(\cos\theta)}{d\theta}, \end{aligned}
 
 where \phi_m(r) and \psi_m(r) denote the radial parts of \phi_2 and \Psi
 for mode m, respectively. These expressions allow the stress and
@@ -314,12 +312,12 @@ conditions: the normal stress \sigma\_{rr} and the shear stress
 \sigma\_{r\theta} acting on spherical surfaces. In spherical
 coordinates, these stress components are:
 
-\begin{align\*} \sigma\_{rr} &= (\lambda + 2\mu)\frac{\partial
+\begin{aligned} \sigma\_{rr} &= (\lambda + 2\mu)\frac{\partial
 u_r}{\partial r} + \lambda \left( \frac{2u_r}{r} +
 \frac{1}{r}\frac{\partial u\_\theta}{\partial\theta} +
 \frac{u\_\theta\cot\theta}{r} \right), \\ \sigma\_{r\theta} &= \mu
 \left( \frac{1}{r}\frac{\partial u_r}{\partial\theta} + \frac{\partial
-u\_\theta}{\partial r} - \frac{u\_\theta}{r} \right). \end{align\*}
+u\_\theta}{\partial r} - \frac{u\_\theta}{r} \right). \end{aligned}
 
 The normal stress \sigma\_{rr} represents the radial traction exerted by
 the shell on the surrounding fluid or interior medium, while
@@ -333,10 +331,10 @@ or its derivative. By orthogonality of the Legendre polynomials, each
 angular order remains uncoupled, and the stresses may be written in
 modal form as:
 
-\begin{align\*} \sigma\_{rr}^{(m)}(r,\theta) &=
+\begin{aligned} \sigma\_{rr}^{(m)}(r,\theta) &=
 \Sigma\_{rr}^{(m)}(r)\\P_m(\cos\theta), \\
 \sigma\_{r\theta}^{(m)}(r,\theta) &= \Sigma\_{r\theta}^{(m)}(r)\\
-\frac{dP_m(\cos\theta)}{d\theta}, \end{align\*}
+\frac{dP_m(\cos\theta)}{d\theta}, \end{aligned}
 
 where \Sigma\_{rr}^{(m)}(r) and \Sigma\_{r\theta}^{(m)}(r) are radial
 functions that depend linearly on the modal coefficients (A_m, B_m, C_m,
@@ -561,10 +559,10 @@ Consequently, the form function, \mathcal{f}(\theta), is written as:
 
 Using the phase identity for the outgoing-wave prefactor gives:
 
-\begin{align\*} \mathcal{f}(\theta) &= \frac{-i}{k_1}
+\begin{aligned} \mathcal{f}(\theta) &= \frac{-i}{k_1}
 \sum\limits\_{m=0}^\infty (2m + 1)(-i)^{(m)} A_m^{(1)} P_m(\cos\theta),
 \\ &= \frac{-i}{k} \sum\limits\_{m=0}^\infty (2m + 1)A_m^{(1)}
-P_m(\cos\theta), \end{align\*}
+P_m(\cos\theta), \end{aligned}
 
 where the (-i)^m term disappears since A_m^{(1)} is defined to
 explicitly include it.

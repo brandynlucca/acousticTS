@@ -83,11 +83,19 @@
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
-<li class="nav-item"><a class="nav-link" href="../../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../../reference/index.html">Function reference</a></li>
+    <li><a class="dropdown-item" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
+    <li><a class="dropdown-item" href="../../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -113,8 +121,15 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p><span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span></p>
-<p><em>Model-family pages:</em> <a href="index.html">Overview</a> <a href="fcms-implementation.html">Implementation</a> <a href="fcms-theory.html">Theory</a></p>
+<div class="model-status-line">
+<span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span>
+</div>
+<div class="model-nav">
+<div class="model-nav-links">
+<a class="model-nav-badge" href="index.html">Overview</a>
+<a class="model-nav-badge" href="fcms-implementation.html">Implementation</a>
+</div>
+</div>
 <p>The finite cylinder modal series solution (FCMS) is one of the
 standard ways to represent acoustic backscatter from straight cylinders
 of finite length <span class="citation">(<a href="#ref-stanton_sound_1988">Stanton 1988</a>, <a href="#ref-stanton_sound_1989">1989</a>)</span>. Its appeal is that it
@@ -447,7 +462,7 @@ gives:</p>
 </span></p>
 <p>Substituting this into the velocity condition gives:</p>
 <p><span class="math display">
-  J_m'(Ka)+B_mH_m^{(1)\prime}(Ka) =
+  J_m'(Ka)+B_mH_m^{(1)\prime}(Ka) = \\
     g_{21}h_{21}\,\frac{J_m'(K'a)}{J_m(K'a)}
   \left[J_m(Ka)+B_mH_m^{(1)}(Ka)\right],
 </span></p>
@@ -455,7 +470,7 @@ gives:</p>
 <p><span class="math display">
   B_m
   \left[H_m^{(1)\prime}(Ka)-g_{21}h_{21}\frac{J_m'(K'a)}{J_m(K'a)}H_m^{(1)}(Ka)\right]
-=
+= \\
     g_{21}h_{21}\frac{J_m'(K'a)}{J_m(K'a)}J_m(Ka)-J_m'(Ka).
 </span></p>
 <p>Solving for the exterior scattering coefficient gives:</p>

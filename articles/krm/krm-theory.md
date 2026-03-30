@@ -4,10 +4,8 @@
 
 Benchmarked Validated
 
-*Model-family pages:*
 [Overview](https://brandynlucca.github.io/acousticTS/articles/krm/index.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/krm/krm-implementation.md)
-[Theory](https://brandynlucca.github.io/acousticTS/articles/krm/krm-theory.md)
 
 The Kirchhoff-Ray Mode (KRM) model is a composite scattering theory for
 elongated fish-like bodies. Its defining assumption is that different
@@ -348,17 +346,18 @@ let the surrounding body medium be region 2 and the internal gas be
 region 3. The modal derivation then begins with the cylindrical
 expansions:
 
-p\_{2,inc}(r,\phi) = \sum\_{m=0}^{\infty} \epsilon_m i^m J_m(k_2
-r)\cos(m\phi), \qquad p\_{2,scat}(r,\phi) = \sum\_{m=0}^{\infty}
-\epsilon_m i^m b_m H_m^{(1)}(k_2 r)\cos(m\phi), \qquad p\_{3}(r,\phi) =
-\sum\_{m=0}^{\infty} \epsilon_m i^m c_m J_m(k_3 r)\cos(m\phi).
+\begin{align\*} p\_{2,inc}(r,\phi) &= \sum\_{m=0}^{\infty} \epsilon_m
+i^m J_m(k_2 r)\cos(m\phi), \\ p\_{2,scat}(r,\phi) &=
+\sum\_{m=0}^{\infty} \epsilon_m i^m b_m H_m^{(1)}(k_2 r)\cos(m\phi), \\
+p\_{3}(r,\phi) &= \sum\_{m=0}^{\infty} \epsilon_m i^m c_m J_m(k_3
+r)\cos(m\phi). \end{align\*}
 
 Pressure continuity and normal-velocity continuity at the gas boundary
 r=a give, for each mode m:
 
-J_m(k_2 a) + b_m H_m^{(1)}(k_2 a) = c_m J_m(k_3 a), \qquad
-\frac{1}{\rho_2}\left\[J_m'(k_2 a)+b_mH_m^{(1)\prime}(k_2 a)\right\] =
-\frac{1}{\rho_3}\frac{k_3}{k_2}c_mJ_m'(k_3 a).
+\begin{align\*} J_m(k_2 a) + b_m H_m^{(1)}(k_2 a) &= c_m J_m(k_3 a), \\
+\frac{1}{\rho_2}\left\[J_m'(k_2 a)+b_mH_m^{(1)\prime}(k_2 a)\right\] &=
+\frac{1}{\rho_3}\frac{k_3}{k_2}c_mJ_m'(k_3 a). \end{align\*}
 
 Eliminating c_m gives the usual fluid-cylinder coefficient. In the
 long-wavelength limit, the m=0 term dominates, so one retains only:

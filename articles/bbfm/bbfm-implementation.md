@@ -2,11 +2,9 @@
 
 ## acousticTS implementation
 
-Experimental Unvalidated
+Unvalidated Experimental
 
-*Model-family pages:*
 [Overview](https://brandynlucca.github.io/acousticTS/articles/bbfm/index.md)
-[Implementation](https://brandynlucca.github.io/acousticTS/articles/bbfm/bbfm-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/bbfm/bbfm-theory.md)
 
 This family is best read alongside the swimbladder-less fish and
@@ -22,8 +20,8 @@ swimbladder-less targets whose flesh body and backbone should remain
 acoustically explicit components rather than being collapsed into a
 single effective medium.
 
-In practice, `BBFM` is the package’s current composite
-body-plus-backbone family:
+In practice, `BBFM` is the package’s composite body-plus-backbone
+family:
 
 1.  the flesh body is evaluated with `DWBA`,
 2.  the backbone is evaluated with `ECMS`,
@@ -32,10 +30,10 @@ body-plus-backbone family:
 4.  the two complex amplitudes are summed coherently before `sigma_bs`
     and `TS` are reported.
 
-`BBFM` is still an experimental family. The package currently documents
-the composite bookkeeping and verifies that the stored result reproduces
-the stated component sum, but it does not yet provide an external
-benchmark ladder or a separate public software comparison.
+`BBFM` is an experimental family. The package documents the composite
+bookkeeping and verifies that the stored result reproduces the stated
+component sum, but it does not yet provide an external benchmark ladder
+or a separate public software comparison.
 
 `BBFM` is not a fully coupled three-medium boundary-value solve. The
 flesh body and the backbone are each solved as their own
@@ -274,7 +272,7 @@ bbfm_check <- data.frame(
 
 knitr::kable(
   data.frame(
-    quantity = c("Max |delta f_bs|", "Max |delta TS| (dB)"),
+    quantity = c("Max $|\\Delta f_{bs}|$", "Max $|\\Delta TS|$ (dB)"),
     value = c(
       max(bbfm_check$delta_f_bs),
       max(abs(bbfm_check$delta_TS_dB))
@@ -284,12 +282,12 @@ knitr::kable(
 )
 ```
 
-| quantity              | value |
-|:----------------------|------:|
-| Max \|delta f_bs\|    |     0 |
-| Max \|delta TS\| (dB) |     0 |
+| quantity                       | value |
+|:-------------------------------|------:|
+| Max &#124;\Delta f\_{bs}&#124; |     0 |
+| Max &#124;\Delta TS&#124; (dB) |     0 |
 
-For the current implementation, those deltas should collapse to
+For this reconstruction check, those \Delta values should collapse to
 floating-point noise. That does not replace an external benchmark, but
 it does verify that the family is carrying out the coherent composite
 sum it claims to perform.
@@ -316,9 +314,9 @@ This is exactly why `BBFM` is useful. It preserves the anatomy-specific
 components while still letting them interfere coherently in one stored
 body frame.
 
-## Current scope
+## Scope
 
-At the moment, `BBFM` should be interpreted as:
+`BBFM` should be interpreted as:
 
 - a reproducible composite model for a body plus an explicit backbone,
 - a convenient scaffold for swimbladder-less fish whose backbone should
@@ -326,7 +324,7 @@ At the moment, `BBFM` should be interpreted as:
 - a first-order coherent combination model rather than a fully coupled
   multi-region boundary-value solve.
 
-So the current implementation answers the bookkeeping question clearly:
+So the implementation answers the bookkeeping question clearly:
 acousticTS can construct, evaluate, and inspect this composite family in
 a transparent way. The remaining open work is external benchmarking and,
 later, more tightly coupled composite physics.

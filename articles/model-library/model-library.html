@@ -83,11 +83,19 @@
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
-<li class="nav-item"><a class="nav-link" href="../../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../../reference/index.html">Function reference</a></li>
+    <li><a class="dropdown-item" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
+    <li><a class="dropdown-item" href="../../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -117,29 +125,59 @@
 model-comparison reviews, organism-focused scattering surveys, and
 companion open-source modeling ecosystems <span class="citation">(<a href="#ref-jech_etal_2015">Jech et al. 2015</a>; <a href="#ref-stanton_acoustic_1996">Stanton 1996</a>; <a href="#ref-brandyn_lucca_osoceanacousticsechopop_2026">Lucca and Lee
 2026</a>)</span>.</p>
-<p>The package now contains enough model families that the site works
-better when the model pages are treated as a library rather than as a
-flat list in the top navigation. This page is the main entry point for
-that library.</p>
+<p>The package contains enough model families that the site works better
+when the model pages are treated as a library rather than as a flat list
+in the top navigation. This page is the main entry point for that
+library.</p>
 <div class="section level3">
 <h3 id="model-status-policy">Model-status policy<a class="anchor" aria-label="anchor" href="#model-status-policy"></a>
 </h3>
-<p>Status tags are derived from the package’s internal validation
-registry and used conservatively: - <span class="model-tag established">Benchmarked</span> means the family has a
-documented comparison against a canonical benchmark ladder or stored
-benchmark values. - <span class="model-tag validated">Validated</span>
-means the family has a documented comparison against at least one
-external implementation or software package. - <span class="model-tag experimental">Experimental</span> means the family is
-available to use, but its interface or validation scope should still be
-treated as provisional. - <span class="model-tag unvalidated">Unvalidated</span> means the package site
-does not yet document either benchmark evidence or an external
-implementation comparison for that family.</p>
-<p>These statuses are not all mutually exclusive: -
-<code>Benchmarked</code> and <code>Validated</code> are evidence tags
-and can appear together. - <code>Experimental</code> is a lifecycle tag
-and can coexist with either evidence tag. - <code>Unvalidated</code> is
-reserved for families lacking both evidence tags, so it should not be
-combined with other evidence tags.</p>
+<div class="validation-status-policy">
+<ul>
+<li>
+<span class="model-tag established">Benchmarked</span> means the family
+has a documented comparison against a canonical benchmark ladder or
+stored benchmark values.
+</li>
+<li>
+<span class="model-tag validated">Validated</span> means the currently
+supported public scope has a documented external software or
+independent-comparison check.
+</li>
+<li>
+<span class="model-tag partially-validated">Partially validated</span>
+means some supported branches are externally checked, but the full
+public scope is not yet closed.
+</li>
+<li>
+<span class="model-tag unvalidated">Unvalidated</span> means the package
+does not yet claim external validation across the current public scope.
+</li>
+<li>
+<span class="model-tag experimental">Experimental</span> means the
+family is available to use, but its interface or supported workflow
+should still be treated as provisional.
+</li>
+</ul>
+<p>
+These tags are intended to be read in three pieces:
+</p>
+<ul>
+<li>
+<code>Benchmarked</code> is independent of the validation badge and can
+appear alongside <code>Validated</code>, <code>Partially
+validated</code>, or <code>Unvalidated</code>.
+</li>
+<li>
+The validation badge is always exactly one of <code>Validated</code>,
+<code>Partially validated</code>, or <code>Unvalidated</code>.
+</li>
+<li>
+<code>Experimental</code> is a separate lifecycle tag and can coexist
+with any benchmark or validation badge.
+</li>
+</ul>
+</div>
 </div>
 </div>
 <div class="section level2">
@@ -149,14 +187,14 @@ combined with other evidence tags.</p>
 <h3 id="sphms">
 <a href="../sphms/index.html">SPHMS</a><a class="anchor" aria-label="anchor" href="#sphms"></a>
 </h3>
-<p><span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span></p>
+<p><span class="model-tag established" title="Benchmarked against the canonical spherical spectra stored in `benchmark_ts`." data-tooltip="Benchmarked against the canonical spherical spectra stored in `benchmark_ts`." tabindex="0">Benchmarked</span> <span class="model-tag validated" title="Validated against `KRMr` and `echoSMs` on shared penetrable-sphere cases." data-tooltip="Validated against `KRMr` and `echoSMs` on shared penetrable-sphere cases." tabindex="0">Validated</span></p>
 <p>Spherical modal-series solution for canonical spherical targets.</p>
 </div>
 <div class="section level3">
 <h3 id="fcms">
 <a href="../fcms/index.html">FCMS</a><a class="anchor" aria-label="anchor" href="#fcms"></a>
 </h3>
-<p><span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span></p>
+<p><span class="model-tag established" title="Benchmarked against the canonical finite-cylinder spectra stored in `benchmark_ts`." data-tooltip="Benchmarked against the canonical finite-cylinder spectra stored in `benchmark_ts`." tabindex="0">Benchmarked</span> <span class="model-tag validated" title="Validated against the `echoSMs` finite-cylinder implementation." data-tooltip="Validated against the `echoSMs` finite-cylinder implementation." tabindex="0">Validated</span></p>
 <p>Finite-cylinder modal-series solution for straight cylindrical
 targets.</p>
 </div>
@@ -164,7 +202,7 @@ targets.</p>
 <h3 id="psms">
 <a href="../psms/index.html">PSMS</a><a class="anchor" aria-label="anchor" href="#psms"></a>
 </h3>
-<p><span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span></p>
+<p><span class="model-tag established" title="Benchmarked against the canonical prolate-spheroid spectra stored in `benchmark_ts`." data-tooltip="Benchmarked against the canonical prolate-spheroid spectra stored in `benchmark_ts`." tabindex="0">Benchmarked</span> <span class="model-tag validated" title="Validated against the external `Prol_Spheroid` implementation on shared prolate cases." data-tooltip="Validated against the external `Prol_Spheroid` implementation on shared prolate cases." tabindex="0">Validated</span></p>
 <p>Prolate-spheroidal modal-series solution for smooth elongated
 canonical bodies.</p>
 </div>
@@ -172,7 +210,7 @@ canonical bodies.</p>
 <h3 id="soems">
 <a href="../calibration/index.html">SOEMS</a><a class="anchor" aria-label="anchor" href="#soems"></a>
 </h3>
-<p><span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span></p>
+<p><span class="model-tag established" title="Benchmarked against published calibration-sphere targets used throughout the package documentation." data-tooltip="Benchmarked against published calibration-sphere targets used throughout the package documentation." tabindex="0">Benchmarked</span> <span class="model-tag validated" title="Validated against `echoSMs`, `sphereTS`, and the NOAA calibration applet." data-tooltip="Validated against `echoSMs`, `sphereTS`, and the NOAA calibration applet." tabindex="0">Validated</span></p>
 <p>Solid elastic spherical model used mainly for calibration
 spheres.</p>
 </div>
@@ -180,14 +218,14 @@ spheres.</p>
 <h3 id="essms">
 <a href="../essms/index.html">ESSMS</a><a class="anchor" aria-label="anchor" href="#essms"></a>
 </h3>
-<p><span class="model-tag unvalidated">Unvalidated</span></p>
+<p><span class="model-tag unvalidated" title="The package does not yet claim external validation across the current public scope." data-tooltip="The package does not yet claim external validation across the current public scope." tabindex="0">Unvalidated</span></p>
 <p>Elastic-shelled spherical family for layered shell targets.</p>
 </div>
 <div class="section level3">
 <h3 id="bcms">
 <a href="../bcms/index.html">BCMS</a><a class="anchor" aria-label="anchor" href="#bcms"></a>
 </h3>
-<p><span class="model-tag experimental">Experimental</span> <span class="model-tag unvalidated">Unvalidated</span></p>
+<p><span class="model-tag unvalidated" title="The package does not yet claim external validation across the current public scope." data-tooltip="The package does not yet claim external validation across the current public scope." tabindex="0">Unvalidated</span> <span class="model-tag experimental" title="BCMS is currently marked experimental because the documented checks are internal coherence reconstructions rather than an external benchmark or software-comparison ladder." data-tooltip="BCMS is currently marked experimental because the documented checks are internal coherence reconstructions rather than an external benchmark or software-comparison ladder." tabindex="0">Experimental</span></p>
 <p>Bent-cylinder modal-series family for straight and uniformly bent
 cylinders.</p>
 </div>
@@ -195,7 +233,7 @@ cylinders.</p>
 <h3 id="ecms">
 <a href="../ecms/index.html">ECMS</a><a class="anchor" aria-label="anchor" href="#ecms"></a>
 </h3>
-<p><span class="model-tag experimental">Experimental</span> <span class="model-tag unvalidated">Unvalidated</span></p>
+<p><span class="model-tag unvalidated" title="The package does not yet claim external validation across the current public scope." data-tooltip="The package does not yet claim external validation across the current public scope." tabindex="0">Unvalidated</span> <span class="model-tag experimental" title="ECMS is currently marked experimental because the documented checks are independent algebra reconstructions rather than an external benchmark or software-comparison ladder." data-tooltip="ECMS is currently marked experimental because the documented checks are independent algebra reconstructions rather than an external benchmark or software-comparison ladder." tabindex="0">Experimental</span></p>
 <p>Elastic-cylinder modal-series family for fully elastic solid
 cylinders.</p>
 </div>
@@ -207,7 +245,7 @@ cylinders.</p>
 <h3 id="dwba">
 <a href="../dwba/index.html">DWBA</a><a class="anchor" aria-label="anchor" href="#dwba"></a>
 </h3>
-<p><span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span></p>
+<p><span class="model-tag established" title="Benchmarked against the canonical weakly scattering targets summarized by Jech et al. (2015)." data-tooltip="Benchmarked against the canonical weakly scattering targets summarized by Jech et al. (2015)." tabindex="0">Benchmarked</span> <span class="model-tag validated" title="Validated against the published McGehee MATLAB workflow and an independent DWBA implementation." data-tooltip="Validated against the published McGehee MATLAB workflow and an independent DWBA implementation." tabindex="0">Validated</span></p>
 <p>Weak-scattering elongated-body approximation for fluid-like
 targets.</p>
 </div>
@@ -215,14 +253,14 @@ targets.</p>
 <h3 id="sdwba">
 <a href="../sdwba/index.html">SDWBA</a><a class="anchor" aria-label="anchor" href="#sdwba"></a>
 </h3>
-<p><span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span></p>
+<p><span class="model-tag established" title="Benchmarked against published SDWBA weak-scattering comparison cases." data-tooltip="Benchmarked against published SDWBA weak-scattering comparison cases." tabindex="0">Benchmarked</span> <span class="model-tag validated" title="Validated against the CCAMLR MATLAB and NOAA HTML SDWBA  implementations." data-tooltip="Validated against the CCAMLR MATLAB and NOAA HTML SDWBA  implementations." tabindex="0">Validated</span></p>
 <p>Stochastic DWBA family for unresolved phase variability.</p>
 </div>
 <div class="section level3">
 <h3 id="krm">
 <a href="../krm/index.html">KRM</a><a class="anchor" aria-label="anchor" href="#krm"></a>
 </h3>
-<p><span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span></p>
+<p><span class="model-tag established" title="Benchmarked against canonical modal-family targets used for isolated gas-filled and weakly scattering cases." data-tooltip="Benchmarked against canonical modal-family targets used for isolated gas-filled and weakly scattering cases." tabindex="0">Benchmarked</span> <span class="model-tag validated" title="Validated against `KRMr`, `echoSMs`, and the NOAA KRM applet on bundled fish objects and shared workflows." data-tooltip="Validated against `KRMr`, `echoSMs`, and the NOAA KRM applet on bundled fish objects and shared workflows." tabindex="0">Validated</span></p>
 <p>Kirchhoff-ray mode model for segmented fish-like body-plus-inclusion
 targets.</p>
 </div>
@@ -230,14 +268,14 @@ targets.</p>
 <h3 id="hpa">
 <a href="../hpa/index.html">HPA</a><a class="anchor" aria-label="anchor" href="#hpa"></a>
 </h3>
-<p><span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span></p>
+<p><span class="model-tag established" title="Benchmarked against canonical asymptotic target families rather than as an exact modal solver." data-tooltip="Benchmarked against canonical asymptotic target families rather than as an exact modal solver." tabindex="0">Benchmarked</span> <span class="model-tag validated" title="Validated against the spherical `echoSMs::HPModel` branch and the published Johnson/Stanton algebra." data-tooltip="Validated against the spherical `echoSMs::HPModel` branch and the published Johnson/Stanton algebra." tabindex="0">Validated</span></p>
 <p>High-pass approximation for compact asymptotic screening.</p>
 </div>
 <div class="section level3">
 <h3 id="trcm">
 <a href="../trcm/index.html">TRCM</a><a class="anchor" aria-label="anchor" href="#trcm"></a>
 </h3>
-<p><span class="model-tag established">Benchmarked</span></p>
+<p><span class="model-tag established" title="Benchmarked within the package validation workflow against the straight-cylinder and FCMS-derived bent-cylinder reference constructions." data-tooltip="Benchmarked within the package validation workflow against the straight-cylinder and FCMS-derived bent-cylinder reference constructions." tabindex="0">Benchmarked</span> <span class="model-tag unvalidated" title="The package does not yet claim external validation across the current public scope." data-tooltip="The package does not yet claim external validation across the current public scope." tabindex="0">Unvalidated</span></p>
 <p>Two-ray cylindrical family for high-frequency locally cylindrical
 targets.</p>
 </div>
@@ -245,7 +283,7 @@ targets.</p>
 <h3 id="pcdwba">
 <a href="../pcdwba/index.html">PCDWBA</a><a class="anchor" aria-label="anchor" href="#pcdwba"></a>
 </h3>
-<p><span class="model-tag validated">Validated</span> <span class="model-tag experimental">Experimental</span></p>
+<p><span class="model-tag validated" title="Validated against source-level `ZooScatR` and `echopop` PCDWBA  workflows." data-tooltip="Validated against source-level `ZooScatR` and `echopop` PCDWBA  workflows." tabindex="0">Validated</span> <span class="model-tag experimental" title="PCDWBA is currently marked experimental because the public package workflow is still being tightened even though the current source- level comparison cases are documented." data-tooltip="PCDWBA is currently marked experimental because the public package workflow is still being tightened even though the current source- level comparison cases are documented." tabindex="0">Experimental</span></p>
 <p>Phase-compensated DWBA for bent weakly scattering targets.</p>
 </div>
 </div>
@@ -256,7 +294,7 @@ targets.</p>
 <h3 id="bbfm">
 <a href="../bbfm/index.html">BBFM</a><a class="anchor" aria-label="anchor" href="#bbfm"></a>
 </h3>
-<p><span class="model-tag experimental">Experimental</span> <span class="model-tag unvalidated">Unvalidated</span></p>
+<p><span class="model-tag unvalidated" title="The package does not yet claim external validation across the current public scope." data-tooltip="The package does not yet claim external validation across the current public scope." tabindex="0">Unvalidated</span> <span class="model-tag experimental" title="BBFM is currently marked experimental because it has documented internal reconstruction checks but no external benchmark ladder or independent public implementation comparison." data-tooltip="BBFM is currently marked experimental because it has documented internal reconstruction checks but no external benchmark ladder or independent public implementation comparison." tabindex="0">Experimental</span></p>
 <p>Composite flesh-plus-backbone family for swimbladder-less fish-like
 targets.</p>
 </div>
@@ -264,7 +302,7 @@ targets.</p>
 <h3 id="vesm">
 <a href="../vesm/index.html">VESM</a><a class="anchor" aria-label="anchor" href="#vesm"></a>
 </h3>
-<p><span class="model-tag experimental">Experimental</span> <span class="model-tag unvalidated">Unvalidated</span></p>
+<p><span class="model-tag validated" title="Validated against the reference Python VESM implementation on the documented layered-sphere case." data-tooltip="Validated against the reference Python VESM implementation on the documented layered-sphere case." tabindex="0">Validated</span> <span class="model-tag experimental" title="VESM is currently marked experimental because the documented public workflow is still limited to the current layered-sphere scope." data-tooltip="VESM is currently marked experimental because the documented public workflow is still limited to the current layered-sphere scope." tabindex="0">Experimental</span></p>
 <p>Viscous-elastic layered-sphere family for gas-core, shell, and
 viscous-layer targets.</p>
 </div>
@@ -272,7 +310,7 @@ viscous-layer targets.</p>
 <h3 id="tmm">
 <a href="../tmm/index.html">TMM</a><a class="anchor" aria-label="anchor" href="#tmm"></a>
 </h3>
-<p><span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span> <span class="model-tag experimental">Experimental</span></p>
+<p><span class="model-tag established" title="Benchmarked against `SPHMS`, `PSMS`, and `FCMS` on the currently supported canonical shape branches." data-tooltip="Benchmarked against `SPHMS`, `PSMS`, and `FCMS` on the currently supported canonical shape branches." tabindex="0">Benchmarked</span> <span class="model-tag partially-validated" title="TMM is partially validated because the sphere, oblate, and prolate branches have external checks, but retained general-angle cylinder products remain outside the validated public scope." data-tooltip="TMM is partially validated because the sphere, oblate, and prolate branches have external checks, but retained general-angle cylinder products remain outside the validated public scope." tabindex="0">Partially validated</span> <span class="model-tag experimental" title="TMM is currently marked experimental because the retained-state workflow and branch matrix are still guarded while shape-specific support continues to be tightened." data-tooltip="TMM is currently marked experimental because the retained-state workflow and branch matrix are still guarded while shape-specific support continues to be tightened." tabindex="0">Experimental</span></p>
 <p>Single-target transition-matrix family for retained monostatic and
 angle-dependent scattering products across supported canonical
 shapes.</p>

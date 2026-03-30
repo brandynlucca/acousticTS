@@ -4,10 +4,8 @@
 
 Benchmarked Validated
 
-*Model-family pages:*
 [Overview](https://brandynlucca.github.io/acousticTS/articles/psms/index.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/psms/psms-implementation.md)
-[Theory](https://brandynlucca.github.io/acousticTS/articles/psms/psms-theory.md)
 
 The prolate spheroidal modal series solution (PSMS) is the natural
 exact-separation analogue of spherical partial-wave theory for elongated
@@ -108,17 +106,9 @@ Eliminating q gives:
 Thus \xi_1 is the natural shape parameter of the spheroid, while q sets
 the absolute scale.
 
-![PSMS coordinate geometry in the meridional plane, showing focal
-points, the boundary surface \xi = \xi_1, and representative \xi- and
-\eta-coordinate curves.](psms-coordinate-geometry-clean.svg)
-
-PSMS coordinate geometry in the meridional plane, showing focal points,
-the boundary surface \xi = \xi_1, and representative \xi- and
-\eta-coordinate curves.
-
 ![Why rigid and pressure-release PSMS remain mode-local while the
 fluid-filled case introduces overlap-driven coupling between
-degrees.](psms-mode-coupling-schematic.svg)
+degrees.](psms-mode-coupling-schematic.png)
 
 Why rigid and pressure-release PSMS remain mode-local while the
 fluid-filled case introduces overlap-driven coupling between degrees.
@@ -192,7 +182,7 @@ coordinates gives:
 \frac{\partial}{\partial\xi}\left\[(\xi^2-1)\frac{\partial
 p}{\partial\xi}\right\] +
 \frac{\partial}{\partial\eta}\left\[(1-\eta^2)\frac{\partial
-p}{\partial\eta}\right\] +
+p}{\partial\eta}\right\] + \\
 \frac{\xi^2-\eta^2}{(\xi^2-1)(1-\eta^2)}\frac{\partial^2
 p}{\partial\phi^2} + \mathbb{k}^2(\xi^2-\eta^2)p = 0
 
@@ -200,7 +190,7 @@ Substituting p = RS\Phi and dividing by RS\Phi gives:
 
 \frac{1}{R}\frac{d}{d\xi}\left\[(\xi^2-1)\frac{dR}{d\xi}\right\] +
 \mathbb{k}^2\xi^2 +
-\frac{1}{S}\frac{d}{d\eta}\left\[(1-\eta^2)\frac{dS}{d\eta}\right\] -
+\frac{1}{S}\frac{d}{d\eta}\left\[(1-\eta^2)\frac{dS}{d\eta}\right\] - \\
 \mathbb{k}^2\eta^2 +
 \frac{1}{\Phi}\frac{\xi^2-\eta^2}{(\xi^2-1)(1-\eta^2)}\frac{d^2\Phi}{d\phi^2}
 = 0
@@ -249,8 +239,8 @@ form:
 p\_{1,\text{inc}} = 2\sum\_{m=0}^{\infty}\sum\_{n=m}^{\infty}
 \frac{\epsilon_m i^n}{N\_{mn}(\mathbb{k}\_1)}
 S\_{mn}^{(1)}(\mathbb{k}\_1,\cos\theta')
-S\_{mn}^{(1)}(\mathbb{k}\_1,\eta) R\_{mn}^{(1)}(\mathbb{k}\_1,\xi) \cos
-m(\phi-\phi')
+S\_{mn}^{(1)}(\mathbb{k}\_1,\eta) \\ R\_{mn}^{(1)}(\mathbb{k}\_1,\xi)
+\cos m(\phi-\phi')
 
 This is the spheroidal analogue of the spherical plane-wave expansion.
 It is the starting point for every boundary-condition derivation because
@@ -260,15 +250,15 @@ unknown scattered field.
 The scattered and interior fields are expanded in the same angular
 structure but with different radial functions:
 
-\begin{align\*} p\_{1,\text{scat}} &=
+\begin{aligned} p\_{1,\text{scat}} &=
 2\sum\_{m=0}^{\infty}\sum\_{n=m}^{\infty} \frac{\epsilon_m
 i^n}{N\_{mn}(\mathbb{k}\_1)} S\_{mn}^{(1)}(\mathbb{k}\_1,\cos\theta')
 A\_{mn}S\_{mn}^{(1)}(\mathbb{k}\_1,\eta)R\_{mn}^{(3)}(\mathbb{k}\_1,\xi),
 \\ p\_{2, \text{interior}} &=
 2\sum\_{m=0}^{\infty}\sum\_{\ell=m}^{\infty} \frac{\epsilon_m
 i^\ell}{N\_{m\ell}(\mathbb{k}\_2)}
-B\_{m\ell}S\_{m\ell}^{(1)}(\mathbb{k}\_2,\eta)R\_{m\ell}^{(1)}(\mathbb{k}\_2,\xi)
-\cos m(\phi-\phi'). \end{align\*}
+B\_{m\ell}S\_{m\ell}^{(1)}(\mathbb{k}\_2,\eta)
+R\_{m\ell}^{(1)}(\mathbb{k}\_2,\xi) \cos m(\phi-\phi'). \end{aligned}
 
 These are the full modal expansions from which the pressure-release,
 rigid, fluid-filled, and gas-filled boundary systems follow. The
@@ -281,7 +271,7 @@ later forces the projection step in the interior-fluid case.
 
 The scattered far-field amplitude is expanded as:
 
-f\_\infty(\theta,\phi\mid\theta',\phi') = \frac{-2i}{k_2}
+f\_\infty(\theta,\phi\mid\theta',\phi') = \\ \frac{-2i}{k_2}
 \sum\_{m=0}^{\infty}\sum\_{n=m}^{\infty}
 \frac{\epsilon_m}{N\_{mn}(\mathbb{k}\_1)}
 S\_{mn}^{(1)}(\mathbb{k}\_1,\cos\theta') A\_{mn}
@@ -362,23 +352,23 @@ coefficients be B\_{m\ell}. With exterior total pressure p_1 =
 p\_{1,\text{inc}} + p\_{1,\text{scat}} and interior pressure p_1,
 pressure continuity at \xi = \xi_1 gives:
 
-\begin{align\*} &\sum\_{n=m}^{\infty}
+\begin{aligned} &\sum\_{n=m}^{\infty}
 A\_{mn}S\_{mn}^{(1)}(\mathbb{k}\_1,\eta)R\_{mn}^{(3)}(\mathbb{k}\_1,\xi_1) +
 \sum\_{n=m}^{\infty}
 S\_{mn}^{(1)}(\mathbb{k}\_1,\eta)R\_{mn}^{(1)}(\mathbb{k}\_1,\xi_1) \\
 &= \sum\_{\ell=m}^{\infty}
 B\_{m\ell}S\_{m\ell}^{(1)}(\mathbb{k}\_1,\eta)R\_{m\ell}^{(1)}(\mathbb{k}\_1,\xi_1).
-\end{align\*}
+\end{aligned}
 
 Normal-velocity continuity gives the corresponding derivative condition:
 
-\begin{align\*} &\frac{1}{\rho_1}\sum\_{n=m}^{\infty}
+\begin{aligned} &\frac{1}{\rho_1}\sum\_{n=m}^{\infty}
 A\_{mn}S\_{mn}^{(1)}(\mathbb{k}\_1,\eta)R\_{mn}^{(3)\prime}(\mathbb{k}\_1,\xi_1) +
 \frac{1}{\rho_1}\sum\_{n=m}^{\infty}
 S\_{mn}^{(1)}(\mathbb{k}\_1,\eta)R\_{mn}^{(1)\prime}(\mathbb{k}\_1,\xi_1)
 \\ &= \frac{1}{\rho_2}\sum\_{\ell=m}^{\infty}
 B\_{m\ell}S\_{m\ell}^{(1)}(\mathbb{k}\_2,\eta)R\_{m\ell}^{(1)\prime}(\mathbb{k}\_2,\xi_1).
-\end{align\*}
+\end{aligned}
 
 To solve these equations, one projects onto the interior angular basis
 using orthogonality. This introduces overlap integrals of the form:

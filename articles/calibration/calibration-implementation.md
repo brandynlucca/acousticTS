@@ -4,9 +4,7 @@
 
 Benchmarked Validated
 
-*Model-family pages:*
 [Overview](https://brandynlucca.github.io/acousticTS/articles/calibration/index.md)
-[Implementation](https://brandynlucca.github.io/acousticTS/articles/calibration/calibration-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/calibration/calibration-theory.md)
 
 These pages are grounded in the standard-target calibration literature
@@ -204,12 +202,12 @@ wave speeds have changed.
 Because the calibration-sphere model is itself a modal-series solution,
 the most useful implementation check is agreement with other MacLennan
 (1981) elastic-sphere implementations rather than with a separate
-benchmark family. The acousticTS solver now exposes an `adaptive`
-argument. When `adaptive = TRUE` (the default), the solver starts from
-the usual \mathrm{round}(ka)+10 partial waves and then extends the sum
-until the tail term is below 10^{-10}. When `adaptive = FALSE`, it falls
-back to the original fixed cutoff only. The adaptive mode removes the
-small truncation bias that otherwise remains at the upper end of the
+benchmark family. The acousticTS solver includes an `adaptive` argument.
+When `adaptive = TRUE` (the default), the solver starts from the usual
+\mathrm{round}(ka)+10 partial waves and then extends the sum until the
+tail term is below 10^{-10}. When `adaptive = FALSE`, it falls back to
+the original fixed cutoff only. The adaptive mode removes the small
+truncation bias that otherwise remains at the upper end of the
 comparison band. For the default 38.1 mm tungsten-carbide sphere, the
 comparison below uses the shared material properties c\_\ell = 6853 m
 s^{-1}, c\_\tau = 4171 m s^{-1}, and \rho = 14900 kg m^{-3} together
@@ -218,14 +216,14 @@ with the standard surrounding-water values c = 1477.3 m s^{-1} and \rho
 the NWFSC calibration-sphere applet remains inside its stated ka
 \lesssim 30 reliability range.
 
-| Comparison                | N frequency | Max abs. delta TS (dB) | Mean abs. delta TS (dB) |
-|:--------------------------|------------:|-----------------------:|------------------------:|
-| acousticTS vs echoSMs     |         360 |                      0 |                       0 |
-| acousticTS vs sphereTS    |         360 |                      0 |                       0 |
-| acousticTS vs NOAA applet |         360 |                      0 |                       0 |
-| echoSMs vs sphereTS       |         360 |                      0 |                       0 |
-| echoSMs vs NOAA applet    |         360 |                      0 |                       0 |
-| sphereTS vs NOAA applet   |         360 |                      0 |                       0 |
+| Comparison                | N frequency | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) |
+|:--------------------------|------------:|------------------------:|-------------------------:|
+| acousticTS vs echoSMs     |         360 |                       0 |                        0 |
+| acousticTS vs sphereTS    |         360 |                       0 |                        0 |
+| acousticTS vs NOAA applet |         360 |                       0 |                        0 |
+| echoSMs vs sphereTS       |         360 |                       0 |                        0 |
+| echoSMs vs NOAA applet    |         360 |                       0 |                        0 |
+| sphereTS vs NOAA applet   |         360 |                       0 |                        0 |
 
 ![Pre-rendered calibration comparison against echoSMs, sphereTS, and the
 NOAA calibration applet for the 38.1 mm tungsten-carbide
@@ -249,11 +247,11 @@ the same comparison was repeated for one smaller tungsten-carbide sphere
 and one copper sphere from the calibration-target definitions shipped
 with `echoSMs`.
 
-| Target                    | Diameter (mm) | N frequency | Max frequency (kHz) | Max abs. delta adapt = TRUE vs echoSMs (dB) | Max abs. delta adapt = FALSE vs echoSMs (dB) | Max abs. delta adapt = TRUE vs sphereTS (dB) | Max abs. delta adapt = FALSE vs sphereTS (dB) | Max abs. delta adapt = TRUE vs NOAA applet (dB) | Max abs. delta adapt = FALSE vs NOAA applet (dB) | Elapsed acousticTS adapt = TRUE (s) | Elapsed acousticTS adapt = FALSE (s) | Elapsed echoSMs (s) | Elapsed sphereTS (s) | Elapsed NOAA applet (s) |
-|:--------------------------|--------------:|------------:|--------------------:|--------------------------------------------:|---------------------------------------------:|---------------------------------------------:|----------------------------------------------:|------------------------------------------------:|-------------------------------------------------:|------------------------------------:|-------------------------------------:|--------------------:|---------------------:|------------------------:|
-| WC20 calibration sphere   |          20.0 |         360 |                 360 |                                           0 |                                      1.0e-06 |                                            0 |                                       1.0e-06 |                                               0 |                                          1.0e-06 |                                0.30 |                                 0.27 |            5.299925 |             0.133197 |                9.941499 |
-| WC38.1 calibration sphere |          38.1 |         360 |                 360 |                                           0 |                                      7.2e-05 |                                            0 |                                       7.2e-05 |                                               0 |                                          7.2e-05 |                                0.37 |                                 0.31 |            7.249260 |             0.203651 |               14.536226 |
-| Cu32.1 calibration sphere |          32.1 |         360 |                 360 |                                           0 |                                      4.5e-05 |                                            0 |                                       4.5e-05 |                                               0 |                                          4.5e-05 |                                0.33 |                                 0.28 |            6.737922 |             0.233885 |               13.309330 |
+| Target                    | Diameter (mm) | N frequency | Max frequency (kHz) | Max abs. \Delta adapt = TRUE vs echoSMs (dB) | Max abs. \Delta adapt = FALSE vs echoSMs (dB) | Max abs. \Delta adapt = TRUE vs sphereTS (dB) | Max abs. \Delta adapt = FALSE vs sphereTS (dB) | Max abs. \Delta adapt = TRUE vs NOAA applet (dB) | Max abs. \Delta adapt = FALSE vs NOAA applet (dB) | Elapsed acousticTS adapt = TRUE (s) | Elapsed acousticTS adapt = FALSE (s) | Elapsed echoSMs (s) | Elapsed sphereTS (s) | Elapsed NOAA applet (s) |
+|:--------------------------|--------------:|------------:|--------------------:|---------------------------------------------:|----------------------------------------------:|----------------------------------------------:|-----------------------------------------------:|-------------------------------------------------:|--------------------------------------------------:|------------------------------------:|-------------------------------------:|--------------------:|---------------------:|------------------------:|
+| WC20 calibration sphere   |          20.0 |         360 |                 360 |                                            0 |                                       1.0e-06 |                                             0 |                                        1.0e-06 |                                                0 |                                           1.0e-06 |                                0.30 |                                 0.27 |            5.299925 |             0.133197 |                9.941499 |
+| WC38.1 calibration sphere |          38.1 |         360 |                 360 |                                            0 |                                       7.2e-05 |                                             0 |                                        7.2e-05 |                                                0 |                                           7.2e-05 |                                0.37 |                                 0.31 |            7.249260 |             0.203651 |               14.536226 |
+| Cu32.1 calibration sphere |          32.1 |         360 |                 360 |                                            0 |                                       4.5e-05 |                                             0 |                                        4.5e-05 |                                                0 |                                           4.5e-05 |                                0.33 |                                 0.28 |            6.737922 |             0.233885 |               13.309330 |
 
 Across those additional targets, the adaptive solver keeps the maximum
 absolute differences near 10^{-10} dB, while the original fixed cutoff

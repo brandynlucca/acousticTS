@@ -2,11 +2,9 @@
 
 ## acousticTS implementation
 
-Experimental Unvalidated
+Unvalidated Experimental
 
-*Model-family pages:*
 [Overview](https://brandynlucca.github.io/acousticTS/articles/ecms/index.md)
-[Implementation](https://brandynlucca.github.io/acousticTS/articles/ecms/ecms-implementation.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/ecms/ecms-theory.md)
 
 These pages sit between the classical elastic-cylinder literature and
@@ -23,16 +21,16 @@ parameters are supplied through:
 - `sound_speed_longitudinal_body`
 - `sound_speed_transversal_body`
 
-The current implementation check uses an independent direct
-transcription of the Faran-Stanton algebra rather than a
-package-to-package comparison. That is useful for confirming that the
-package code path reproduces the intended elastic-cylinder algebra on a
-shared grid, but it is not a substitute for an external benchmark ladder
-or a separate public software implementation.
+The implementation check uses an independent direct transcription of the
+Faran-Stanton algebra rather than a package-to-package comparison. That
+is useful for confirming that the package code path reproduces the
+intended elastic-cylinder algebra on a shared grid, but it is not a
+substitute for an external benchmark ladder or a separate public
+software implementation.
 
-`ECMS` is still marked unvalidated because the current check is an
-independent algebra transcription rather than an external benchmark
-ladder or separate public software implementation.
+`ECMS` is marked unvalidated because the check is an independent algebra
+transcription rather than an external benchmark ladder or separate
+public software implementation.
 
 ### Reference case
 
@@ -89,17 +87,16 @@ head(extract(elastic_cylinder, "model")$ECMS)
 
 | Diagnostic                       | Value |
 |:---------------------------------|------:|
-| Max abs. delta TS (dB)           |  0.00 |
-| Mean abs. delta TS (dB)          |  0.00 |
-| Frequency at max delta (kHz)     | 12.00 |
+| Max abs. \Delta TS (dB)          |  0.00 |
+| Mean abs. \Delta TS (dB)         |  0.00 |
+| Frequency at max \Delta (kHz)    | 12.00 |
 | acousticTS elapsed (s)           |  0.08 |
 | Direct transcription elapsed (s) |  0.03 |
 
 This is not presented as a benchmark. It is an implementation identity
 check: the package output and the independent algebra transcription
-coincide on the shared grid, so the current `ECMS` code path is
-reproducing the stated elastic-cylinder series rather than drifting
-numerically from it.
+coincide on the shared grid, so the `ECMS` code path is reproducing the
+stated elastic-cylinder series rather than drifting numerically from it.
 
 #### Spectrum overlay
 

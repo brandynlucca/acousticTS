@@ -83,11 +83,19 @@
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
-<li class="nav-item"><a class="nav-link" href="../../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../../reference/index.html">Function reference</a></li>
+    <li><a class="dropdown-item" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
+    <li><a class="dropdown-item" href="../../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -113,8 +121,15 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p><span class="model-tag experimental">Experimental</span> <span class="model-tag unvalidated">Unvalidated</span></p>
-<p><em>Model-family pages:</em> <a href="index.html">Overview</a> <a href="bbfm-implementation.html">Implementation</a> <a href="bbfm-theory.html">Theory</a></p>
+<div class="model-status-line">
+<span class="model-tag unvalidated">Unvalidated</span> <span class="model-tag experimental">Experimental</span>
+</div>
+<div class="model-nav">
+<div class="model-nav-links">
+<a class="model-nav-badge" href="index.html">Overview</a>
+<a class="model-nav-badge" href="bbfm-implementation.html">Implementation</a>
+</div>
+</div>
 <p>This family is best read alongside the swimbladder-less fish and
 composite-scatterer literature that motivates explicit flesh-body and
 backbone terms <span class="citation">(<a href="#ref-gorska_etal_2005">Gorska, Ona, and Korneliussen 2005</a>; <a href="#ref-stanton_sound_1998-1">Stanton, Chu, and Wiebe 1998</a>; <a href="#ref-clay_horne_1994">Clay and Horne 1994</a>)</span>.</p>
@@ -167,8 +182,8 @@ explicit:</p>
 </span></p>
 <p>where <span class="math inline">c_{L,3}</span> and <span class="math inline">c_{T,3}</span> are the longitudinal and transverse
 wave speeds of the elastic backbone.</p>
-<p>The important approximation enters immediately here: the current
-backbone term is not the exact solution for an elastic region
+<p>The important approximation enters immediately here: the backbone
+term used here is not the exact solution for an elastic region
 <code>3</code> embedded inside flesh region <code>2</code>. Instead, it
 is a seawater-referenced elastic-cylinder surrogate that is then
 positioned inside the same body frame as the flesh solve.</p>
@@ -264,7 +279,7 @@ internal wave-conversion physics.</p>
 <h2 id="spatial-placement-in-the-body-frame">Spatial placement in the body frame<a class="anchor" aria-label="anchor" href="#spatial-placement-in-the-body-frame"></a>
 </h2>
 <p>The flesh and backbone amplitudes cannot be added meaningfully unless
-they are referred to the same spatial frame. The current family uses the
+they are referred to the same spatial frame. The family uses the
 body-fixed coordinate system for that purpose.</p>
 <p>If the representative backbone position is <span class="math inline">\mathbf{r}_c</span>, then the backbone amplitude is
 translated into the body frame by the monostatic two-way phase
@@ -275,8 +290,8 @@ factor:</p>
 </span></p>
 <p>where <span class="math inline">\hat{\mathbf{q}}_{\mathrm{bs}}</span>
 is the backscatter direction.</p>
-<p>In the axisymmetric body-frame convention used by the current
-implementation, that projection becomes:</p>
+<p>In the axisymmetric body-frame convention used here, that projection
+becomes:</p>
 <p><span class="math display">
   \hat{\mathbf{q}}_{\mathrm{bs}}\cdot\mathbf{r}_c =
     x_c\cos\theta + z_c\sin\theta.
@@ -327,8 +342,7 @@ explicit:</p>
     2\,\Re\!\left\{
   f_{\mathrm{bs}}^{(2)}
   \overline{f_{\mathrm{bs}}^{(3)}}
-  \exp\!\left(
-  -2 i k_1 \hat{\mathbf{q}}_{\mathrm{bs}}\cdot\mathbf{r}_c
+  \exp\!\left( -2 i k_1 \hat{\mathbf{q}}_{\mathrm{bs}}\cdot\mathbf{r}_c
   \right)
   \right\}.
 </span></p>

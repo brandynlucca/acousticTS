@@ -52,10 +52,15 @@
     <li><a class="dropdown-item" href="../articles/combining-components/combining-components.html">Combining components</a></li>
     <li><a class="dropdown-item" href="../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul></li>
-<li class="nav-item"><a class="nav-link" href="../articles/bibliography/bibliography.html">Bibliography</a></li>
-<li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
-      </ul><ul class="navbar-nav"><li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
+<li class="active nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference"><li><a class="dropdown-item" href="../reference/index.html">Function reference</a></li>
+    <li><a class="dropdown-item" href="../articles/bibliography/bibliography.html">Bibliography</a></li>
+    <li><a class="dropdown-item" href="../news/index.html">Changelog</a></li>
+  </ul></li>
+      </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul></div>
 
 
@@ -94,6 +99,43 @@
 
         </dt>
         <dd>Simulate target strength (TS) with flexible parameterization and batching</dd>
+      </dl></div><div class="section level2">
+
+      <h3 id="model-registry-and-extensions">Model registry and extensions<a class="anchor" aria-label="anchor" href="#model-registry-and-extensions"></a></h3>
+      <div class="section-desc"><p>Helpers for listing built-in models and registering custom model implementations for the current session or across sessions.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="available_models.html">available_models()</a></code>
+
+        </dt>
+        <dd>List available target-strength models</dd>
+
+        <dt>
+
+          <code><a href="register_model.html">register_model()</a></code>
+
+        </dt>
+        <dd>Register a user-defined target-strength model</dd>
+
+        <dt>
+
+          <code><a href="unregister_model.html">unregister_model()</a></code>
+
+        </dt>
+        <dd>Remove a user-defined target-strength model registration</dd>
+
+        <dt>
+
+          <code><a href="reset_model_registry.html">reset_model_registry()</a></code>
+
+        </dt>
+        <dd>Clear user-defined model registrations</dd>
       </dl></div><div class="section level2">
 
       <h3 id="inspection-plotting-and-reshaping">Inspection, plotting, and reshaping<a class="anchor" aria-label="anchor" href="#inspection-plotting-and-reshaping"></a></h3>

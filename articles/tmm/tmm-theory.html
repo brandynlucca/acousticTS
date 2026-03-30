@@ -83,11 +83,19 @@
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
-<li class="nav-item"><a class="nav-link" href="../../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../../news/index.html">Changelog</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../../reference/index.html">Function reference</a></li>
+    <li><a class="dropdown-item" href="../../articles/bibliography/bibliography.html">Bibliography</a></li>
+    <li><a class="dropdown-item" href="../../news/index.html">Changelog</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../../search.json">
+</form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/brandynlucca/acousticTS/" aria-label="GitHub repository"><span class="fa fab fa-github"></span></a></li>
       </ul>
 </div>
@@ -113,8 +121,15 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p><span class="model-tag established">Benchmarked</span> <span class="model-tag validated">Validated</span> <span class="model-tag experimental">Experimental</span></p>
-<p><em>Model-family pages:</em> <a href="index.html">Overview</a> <a href="tmm-implementation.html">Implementation</a> <a href="tmm-theory.html">Theory</a></p>
+<div class="model-status-line">
+<span class="model-tag established">Benchmarked</span> <span class="model-tag partially-validated">Partially validated</span> <span class="model-tag experimental">Experimental</span>
+</div>
+<div class="model-nav">
+<div class="model-nav-links">
+<a class="model-nav-badge" href="index.html">Overview</a>
+<a class="model-nav-badge" href="tmm-implementation.html">Implementation</a>
+</div>
+</div>
 <p>The transition matrix method (<code>TMM</code>) is a basis-expansion
 view of scattering. Instead of solving directly for the scattered
 pressure in physical space, one expands both the incident and scattered
@@ -210,11 +225,12 @@ spherical coordinates as:</p>
 <p>The exterior regular and outgoing basis states are then built from
 spherical partial waves:</p>
 <p><span class="math display">
-  \psi^{(1)}_{mn}(r,\theta,\phi) =
-    j_n(kr)\,P_n^m(\cos\theta)\,e^{im\phi},
-  \qquad
-  \psi^{(3)}_{mn}(r,\theta,\phi) =
-    h_n^{(1)}(kr)\,P_n^m(\cos\theta)\,e^{im\phi}.
+  \begin{align*}
+    \psi^{(1)}_{mn}(r,\theta,\phi) &amp;=
+      j_n(kr)\,P_n^m(\cos\theta)\,e^{im\phi}, \\
+    \psi^{(3)}_{mn}(r,\theta,\phi) &amp;=
+      h_n^{(1)}(kr)\,P_n^m(\cos\theta)\,e^{im\phi}.
+  \end{align*}
 </span></p>
 <p>Along the curved meridional profile <span class="math inline">r(\theta)</span>, the outward normal derivative
 is:</p>
@@ -262,8 +278,7 @@ a</span>:</p>
 </span></p>
 <p>Differentiating gives:</p>
 <p><span class="math display">
-  r_\theta =
-    -\sin\theta\cos\theta
+  r_\theta = -\sin\theta\cos\theta
   \left(
   \frac{1}{a^2} - \frac{1}{c^2}
   \right)
@@ -356,17 +371,16 @@ formulation.</p>
 let <span class="math inline">(\xi,\eta,\phi)</span> be prolate
 spheroidal coordinates. In Cartesian coordinates:</p>
 <p><span class="math display">
-  x = q\sqrt{(\xi^2 - 1)(1 - \eta^2)}\cos\phi,
-  \qquad
-  y = q\sqrt{(\xi^2 - 1)(1 - \eta^2)}\sin\phi,
-  \qquad
-  z = q \xi \eta.
+  \begin{align*}
+    x &amp;= q\sqrt{(\xi^2 - 1)(1 - \eta^2)}\cos\phi, \\
+    y &amp;= q\sqrt{(\xi^2 - 1)(1 - \eta^2)}\sin\phi, \\
+    z &amp;= q \xi \eta.
+  \end{align*}
 </span></p>
 <p>The coordinate ranges are:</p>
 <p><span class="math display">
   \xi \ge 1,
-  \qquad
-  -1 \le \eta \le 1,
+  \qquad -1 \le \eta \le 1,
   \qquad
   0 \le \phi &lt; 2\pi.
 </span></p>
@@ -382,7 +396,7 @@ semi-axis <span class="math inline">b</span> satisfy:</p>
 <p><span class="math display">
   \xi_1 = \left[1 - \left(\frac{b}{a}\right)^2\right]^{-1/2}.
 </span></p>
-<!-- ![Meridional-plane geometry for the prolate spheroidal TMM branch.](tmm-prolate-coordinate-schematic.svg) -->
+<!-- ![Meridional-plane geometry for the prolate spheroidal TMM branch.](tmm-prolate-coordinate-schematic.png) -->
 </div>
 <div class="section level3">
 <h3 id="spheroidal-modal-representation">Spheroidal modal representation<a class="anchor" aria-label="anchor" href="#spheroidal-modal-representation"></a>
@@ -390,7 +404,7 @@ semi-axis <span class="math inline">b</span> satisfy:</p>
 <p>In a homogeneous region, the separated pressure field is written as
 the product of a radial spheroidal function in <span class="math inline">\xi</span>, an angular spheroidal function in <span class="math inline">\eta</span>, and an azimuthal factor in <span class="math inline">\phi</span>.</p>
 <p>The resulting field expansion has the same logical structure as the
-generic T-matrix expression above, but the basis is now
+generic T-matrix expression above, but the basis is
 geometry-matched.</p>
 <p>For rigid and pressure-release prolates, the retained degrees remain
 effectively local in the exact spheroidal basis. For liquid- and
