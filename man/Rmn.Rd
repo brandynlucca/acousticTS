@@ -127,7 +127,7 @@ Rmn(m = 2, n = 3, c = 1, xi = 1.5, precision = "quad")
 \references{
 Van Buren, A. L. and Boisvert, J. E. "Prolate Spheroidal Wave Functions."
 GitHub repository:
-\url{https://github.com/MathieuandSpheroidalWaveFunctions/Prolate_swf}
+\url{https://github.com/MathieuandSpheroidalWaveFunctions/prolate_swf}
 
 Morse, P. M. and Feshbach, H. (1953). \emph{Methods of Theoretical Physics}.
 McGraw-Hill, New York. Chapter 21.

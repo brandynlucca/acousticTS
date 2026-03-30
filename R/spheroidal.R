@@ -94,7 +94,7 @@
 #' @references
 #' Van Buren, A. L. and Boisvert, J. E. "Prolate Spheroidal Wave Functions."
 #' GitHub repository:
-#' \url{https://github.com/MathieuandSpheroidalWaveFunctions/Prolate_swf}
+#' \url{https://github.com/MathieuandSpheroidalWaveFunctions/prolate_swf}
 #'
 #' Meixner, J. and Schäfke, F. W. (1954). \emph{Mathieusche Funktionen und
 #' Sphäroidfunktionen}. Springer-Verlag, Berlin.
@@ -246,7 +246,7 @@ Smn <- function(m, n, c, eta, normalize = FALSE, precision = "double") {
 #' @references
 #' Van Buren, A. L. and Boisvert, J. E. "Prolate Spheroidal Wave Functions."
 #' GitHub repository:
-#' \url{https://github.com/MathieuandSpheroidalWaveFunctions/Prolate_swf}
+#' \url{https://github.com/MathieuandSpheroidalWaveFunctions/prolate_swf}
 #'
 #' Morse, P. M. and Feshbach, H. (1953). \emph{Methods of Theoretical Physics}.
 #' McGraw-Hill, New York. Chapter 21.

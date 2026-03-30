@@ -108,7 +108,7 @@ Smn(m = 2, n = 3, c = 1, eta = 0.5, precision = "quad")
 \references{
 Van Buren, A. L. and Boisvert, J. E. "Prolate Spheroidal Wave Functions."
 GitHub repository:
-\url{https://github.com/MathieuandSpheroidalWaveFunctions/Prolate_swf}
+\url{https://github.com/MathieuandSpheroidalWaveFunctions/prolate_swf}
 
 Meixner, J. and Schäfke, F. W. (1954). \emph{Mathieusche Funktionen und
 Sphäroidfunktionen}. Springer-Verlag, Berlin.
