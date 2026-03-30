@@ -338,7 +338,9 @@ and shear wave speeds have changed.</p>
 <p>Because the calibration-sphere model is itself a modal-series
 solution, the most useful implementation check is agreement with other
 MacLennan (1981) elastic-sphere implementations rather than with a
-separate benchmark family. The acousticTS solver includes an
+separate benchmark family. In the comparisons below, that includes
+<code>SphereTS</code> <span class="citation">(<a href="#ref-macaulay_spherets_2025">Macaulay 2025</a>)</span> alongside
+the other reference implementations. The acousticTS solver includes an
 <code>adaptive</code> argument. When <code>adaptive = TRUE</code> (the
 default), the solver starts from the usual <span class="math inline">\mathrm{round}(ka)+10</span> partial waves and then
 extends the sum until the tail term is below <span class="math inline">10^{-10}</span>. When <code>adaptive = FALSE</code>,
@@ -423,7 +425,9 @@ tungsten-carbide spectrum from about 0.31 s to about 0.37 s.</p>
 <p>To show that this is not unique to the 38.1 mm tungsten-carbide
 sphere, the same comparison was repeated for one smaller
 tungsten-carbide sphere and one copper sphere from the
-calibration-target definitions shipped with <code>echoSMs</code>.</p>
+calibration-target definitions shipped with <code>echoSMs</code>, again
+including the <code>SphereTS</code> implementation <span class="citation">(<a href="#ref-macaulay_spherets_2025">Macaulay
+2025</a>)</span>.</p>
 <table class="table">
 <colgroup>
 <col width="5%">
@@ -548,6 +552,10 @@ America</em> 69 (4): 1186–89. <a href="https://doi.org/10.1121/1.385699" class
 Foote, K. G. 1990. <span>“Spheres for Calibrating an Eleven-Frequency
 Acoustic Measurement System.”</span> <em>ICES Journal of Marine
 Science</em> 46 (3): 284–86. <a href="https://doi.org/10.1093/icesjms/46.3.284" class="external-link">https://doi.org/10.1093/icesjms/46.3.284</a>.
+</div>
+<div id="ref-macaulay_spherets_2025" class="csl-entry">
+Macaulay, Gavin J. 2025. <span>“<span class="nocase">gavinmacaulay</span>/<span>SphereTS</span>:
+V1.0.8.”</span> <a href="https://github.com/gavinmacaulay/SphereTS" class="external-link">https://github.com/gavinmacaulay/SphereTS</a>.
 </div>
 <div id="ref-maclennan_theory_1981" class="csl-entry">
 MacLennan, D. N. 1981. <span>“The Theory of Solid Spheres as Sonar

@@ -109,7 +109,7 @@ for robust and efficient computation.
 
 Van Buren, A. L. and Boisvert, J. E. "Prolate Spheroidal Wave
 Functions." GitHub repository:
-<https://github.com/MathieuandSpheroidalWaveFunctions/Prolate_swf>
+<https://github.com/MathieuandSpheroidalWaveFunctions/prolate_swf>
 
 Meixner, J. and Schäfke, F. W. (1954). *Mathieusche Funktionen und
 Sphäroidfunktionen*. Springer-Verlag, Berlin.

@@ -19,6 +19,10 @@ Betcke, Timo, and Matthew Scroggs. 2021. “Bempp-Cl: A Fast Python Based
 Just-in-Time Compiling Boundary Element Library.” *Journal of Open
 Source Software* 6 (59): 2879. <https://doi.org/10.21105/joss.02879>.
 
+Buren, Arnie Lee Van, and Jeffrey E. Boisvert. 2026.
+“MathieuandSpheroidalWaveFunctions/prolate_swf.”
+<https://github.com/MathieuandSpheroidalWaveFunctions/prolate_swf>.
+
 Chu, Dezhang, Kenneth G. Foote, and Timothy K. Stanton. 1993. “Further
 Analysis of Target Strength Measurements of Antarctic Krill at 38 and
 120 kHz: Comparison with Deformed Cylinder Model and Inference of
@@ -153,6 +157,9 @@ of the Acoustical Society of America* 149 (1): 673–91.
 
 Lucca, Brandyn, and Wu-Jung Lee. 2026. “OSOceanAcoustics/Echopop:
 V0.6.0.” Zenodo. <https://doi.org/10.5281/ZENODO.18975959>.
+
+Macaulay, Gavin J. 2025. “gavinmacaulay/SphereTS: V1.0.8.”
+<https://github.com/gavinmacaulay/SphereTS>.
 
 MacLennan, D. N. 1981. “The Theory of Solid Spheres as Sonar Calibration
 Targets.” Scottish Fisheries Research Report 22. Department of

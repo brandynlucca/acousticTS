@@ -284,14 +284,14 @@ building blocks that the rest of the spheroidal models depend on, so it
 is useful to separate their evaluation from the later model-specific
 algebra.</p>
 <p>In acousticTS, those functions are evaluated through the
-<code>profcn</code> backend in <code>src/prolate_swf.f90</code>, with
-the corresponding <code>C++</code> wrappers in <code>src/psms.cpp</code>
-handling the extraction and rescaling needed by the exported
-<code><a href="../../reference/Smn.html">Smn()</a></code> and <code><a href="../../reference/Rmn.html">Rmn()</a></code> interfaces. That split of
-responsibility matters because the Fortran routine computes a large
-family of spheroidal quantities at once, while the package-level
-functions usually want one specific angular or radial quantity and,
-often, its derivative.</p>
+<code>profcn</code> backend in <code>src/prolate_swf.f90</code> <span class="citation">(<a href="#ref-van_buren_boisvert_prolate_swf_2026">Buren and Boisvert
+2026</a>)</span>, with the corresponding <code>C++</code> wrappers in
+<code>src/psms.cpp</code> handling the extraction and rescaling needed
+by the exported <code><a href="../../reference/Smn.html">Smn()</a></code> and <code><a href="../../reference/Rmn.html">Rmn()</a></code> interfaces.
+That split of responsibility matters because the Fortran routine
+computes a large family of spheroidal quantities at once, while the
+package-level functions usually want one specific angular or radial
+quantity and, often, its derivative.</p>
 <p>One detail that is easy to miss from the outside is that the Fortran
 backend stores many spheroidal quantities in
 mantissa-and-base-10-exponent form rather than as a single
@@ -504,6 +504,10 @@ Betcke, Timo, and Matthew Scroggs. 2021. <span>“Bempp-Cl: <span>A</span>
 Fast <span>Python</span> Based Just-in-Time Compiling Boundary Element
 Library.”</span> <em>Journal of Open Source Software</em> 6 (59): 2879.
 <a href="https://doi.org/10.21105/joss.02879" class="external-link">https://doi.org/10.21105/joss.02879</a>.
+</div>
+<div id="ref-van_buren_boisvert_prolate_swf_2026" class="csl-entry">
+Buren, Arnie Lee Van, and Jeffrey E. Boisvert. 2026.
+<span>“<span>MathieuandSpheroidalWaveFunctions</span>/<span class="nocase">prolate_swf</span>.”</span> <a href="https://github.com/MathieuandSpheroidalWaveFunctions/prolate_swf" class="external-link">https://github.com/MathieuandSpheroidalWaveFunctions/prolate_swf</a>.
 </div>
 <div id="ref-flammer_spheroidal_1957" class="csl-entry">
 Flammer, Carson. 1957. <em>Spheroidal Wave Functions</em>. <a href="https://ui.adsabs.harvard.edu/abs/1957spwf.book.....F" class="external-link">https://ui.adsabs.harvard.edu/abs/1957spwf.book.....F</a>.

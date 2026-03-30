@@ -129,7 +129,7 @@ for robust and efficient computation.
 
 Van Buren, A. L. and Boisvert, J. E. "Prolate Spheroidal Wave
 Functions." GitHub repository:
-<https://github.com/MathieuandSpheroidalWaveFunctions/Prolate_swf>
+<https://github.com/MathieuandSpheroidalWaveFunctions/prolate_swf>
 
 Morse, P. M. and Feshbach, H. (1953). *Methods of Theoretical Physics*.
 McGraw-Hill, New York. Chapter 21.

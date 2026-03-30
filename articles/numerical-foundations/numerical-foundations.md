@@ -171,9 +171,10 @@ the spheroidal models depend on, so it is useful to separate their
 evaluation from the later model-specific algebra.
 
 In acousticTS, those functions are evaluated through the `profcn`
-backend in `src/prolate_swf.f90`, with the corresponding `C++` wrappers
-in `src/psms.cpp` handling the extraction and rescaling needed by the
-exported
+backend in `src/prolate_swf.f90` ([Buren and Boisvert
+2026](#ref-van_buren_boisvert_prolate_swf_2026)), with the corresponding
+`C++` wrappers in `src/psms.cpp` handling the extraction and rescaling
+needed by the exported
 [`Smn()`](https://brandynlucca.github.io/acousticTS/reference/Smn.md)
 and
 [`Rmn()`](https://brandynlucca.github.io/acousticTS/reference/Rmn.md)
@@ -417,6 +418,10 @@ This page answers “what is hard about evaluating it robustly?”
 Betcke, Timo, and Matthew Scroggs. 2021. “Bempp-Cl: A Fast Python Based
 Just-in-Time Compiling Boundary Element Library.” *Journal of Open
 Source Software* 6 (59): 2879. <https://doi.org/10.21105/joss.02879>.
+
+Buren, Arnie Lee Van, and Jeffrey E. Boisvert. 2026.
+“MathieuandSpheroidalWaveFunctions/prolate_swf.”
+<https://github.com/MathieuandSpheroidalWaveFunctions/prolate_swf>.
 
 Flammer, Carson. 1957. *Spheroidal Wave Functions*.
 <https://ui.adsabs.harvard.edu/abs/1957spwf.book.....F>.
