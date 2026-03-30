@@ -158,7 +158,7 @@ $$
   }.
 $$
 
-The low-frequency numerator is still the Rayleigh term. The denominator is now written so that the high-frequency scale is set explicitly by the reflection coefficient $\mathcal{R}$. Compared with the simpler form of Johnson (1977) [@johnson_sound_1977], the version from Stanton (1989) [@stanton_1989] makes the reflection-controlled nature of the large-$ka$ limit more explicit and leaves room for the correction factors $\mathcal{F}$ and $\mathcal{G}$.
+The low-frequency numerator is still the Rayleigh term. The denominator is written so that the high-frequency scale is set explicitly by the reflection coefficient $\mathcal{R}$. Compared with the simpler form of Johnson (1977) [@johnson_sound_1977], the version from Stanton (1989) [@stanton_1989] makes the reflection-controlled nature of the large-$ka$ limit more explicit and leaves room for the correction factors $\mathcal{F}$ and $\mathcal{G}$.
 
 ## Prolate spheroid form
 

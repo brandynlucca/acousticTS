@@ -20,7 +20,7 @@ The family library is easiest to navigate when read against model-comparison rev
 
 
 
-The package now contains enough model families that the site works better when the model pages are treated as a library rather than as a flat list in the top navigation. This page is the main entry point for that library.
+The package contains enough model families that the site works better when the model pages are treated as a library rather than as a flat list in the top navigation. This page is the main entry point for that library.
 
 ## Model-status policy
 

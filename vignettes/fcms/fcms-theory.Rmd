@@ -287,7 +287,7 @@ $$
 Substituting this into the velocity condition gives:
 
 $$
-  J_m'(Ka)+B_mH_m^{(1)\prime}(Ka) =
+  J_m'(Ka)+B_mH_m^{(1)\prime}(Ka) = \\
     g_{21}h_{21}\,\frac{J_m'(K'a)}{J_m(K'a)}
   \left[J_m(Ka)+B_mH_m^{(1)}(Ka)\right],
 $$
@@ -296,7 +296,7 @@ where $g_{21}=\rho_2/\rho_1$ and $h_{21}=c_2/c_1$. Rearranging yields:
 
 $$
   B_m
-  \left[H_m^{(1)\prime}(Ka)-g_{21}h_{21}\frac{J_m'(K'a)}{J_m(K'a)}H_m^{(1)}(Ka)\right] =
+  \left[H_m^{(1)\prime}(Ka)-g_{21}h_{21}\frac{J_m'(K'a)}{J_m(K'a)}H_m^{(1)}(Ka)\right] = \\
     g_{21}h_{21}\frac{J_m'(K'a)}{J_m(K'a)}J_m(Ka)-J_m'(Ka).
 $$
 

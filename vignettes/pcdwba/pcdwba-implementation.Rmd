@@ -108,8 +108,8 @@ knitr::kable(
   digits = 6,
   col.names = c(
     "Comparison",
-    "Max abs. delta TS (dB)",
-    "Mean abs. delta TS (dB)"
+    "Max abs. $\\Delta$ TS (dB)",
+    "Mean abs. $\\Delta$ TS (dB)"
   )
 )
 ```

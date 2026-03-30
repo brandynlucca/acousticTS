@@ -40,10 +40,10 @@ The elastic-cylinder modal-series solution is available through `target_strength
 - `sound_speed_longitudinal_body`
 - `sound_speed_transversal_body`
 
-The current implementation check uses an independent direct transcription of the Faran-Stanton algebra rather than a package-to-package comparison. That is useful for confirming that the package code path reproduces the intended elastic-cylinder algebra on a shared grid, but it is not a substitute for an external benchmark ladder or a separate public software implementation.
+The implementation check uses an independent direct transcription of the Faran-Stanton algebra rather than a package-to-package comparison. That is useful for confirming that the package code path reproduces the intended elastic-cylinder algebra on a shared grid, but it is not a substitute for an external benchmark ladder or a separate public software implementation.
 
 ::: {.experiment data-title="Current validation"}
-`ECMS` is still marked unvalidated because the current check is an independent algebra transcription rather than an external benchmark ladder or separate public software implementation.
+`ECMS` is marked unvalidated because the check is an independent algebra transcription rather than an external benchmark ladder or separate public software implementation.
 :::
 
 ## Reference case
@@ -106,9 +106,9 @@ ecms_summary <- utils::read.csv(
 knitr::kable(
   data.frame(
     Metric = c(
-      "Max abs. delta TS (dB)",
-      "Mean abs. delta TS (dB)",
-      "Frequency at max delta (kHz)",
+      "Max abs. $\\Delta$ TS (dB)",
+      "Mean abs. $\\Delta$ TS (dB)",
+      "Frequency at max $\\Delta$ (kHz)",
       "acousticTS elapsed (s)",
       "Direct transcription elapsed (s)"
     ),
@@ -125,7 +125,7 @@ knitr::kable(
 )
 ```
 
-This is not presented as a benchmark. It is an implementation identity check: the package output and the independent algebra transcription coincide on the shared grid, so the current `ECMS` code path is reproducing the stated elastic-cylinder series rather than drifting numerically from it.
+This is not presented as a benchmark. It is an implementation identity check: the package output and the independent algebra transcription coincide on the shared grid, so the `ECMS` code path is reproducing the stated elastic-cylinder series rather than drifting numerically from it.
 
 ### Spectrum overlay
 

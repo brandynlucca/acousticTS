@@ -7,6 +7,9 @@
    id="svg10"
    sodipodi:docname="building-shapes-spectrum.svg"
    inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   inkscape:export-filename="building-shapes-spectrum.png"
+   inkscape:export-xdpi="200"
+   inkscape:export-ydpi="200"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -23,8 +26,8 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:zoom="1.3650235"
-     inkscape:cx="460.79792"
-     inkscape:cy="111.71969"
+     inkscape:cx="460.06534"
+     inkscape:cy="170.32674"
      inkscape:window-width="1920"
      inkscape:window-height="1057"
      inkscape:window-x="1912"
@@ -89,7 +92,7 @@
        sodipodi:role="line"
        id="tspan19"
        x="781.89862"
-       y="223.34567"></tspan></text>
+       y="223.34567" /></text>
   <circle
      cx="48.998085"
      cy="111.90429"

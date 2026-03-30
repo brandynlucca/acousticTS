@@ -112,16 +112,16 @@ $$
 where $a$ is the sphere radius. The boundary conditions then enforce:
 
 $$
-  \begin{align*}
+  \begin{aligned}
   \mathbf{u}_2(r) &= \mathbf{u}_1(r) ~ \text{(continuity of normal displacement)} , \\
     \sigma_2(rr) &= -p_1 ~ \text{(continuity of normal stress)} , \\
     \sigma_2(r\theta) &= 0 ~ \text{(zero tangential stress)} ,
-  \end{align*}
+  \end{aligned}
 $$
 
 where $\sigma$ denotes the Cauchy stress tensor describing internal forces in the solid, $\sigma_2(rr)$ is its component along the radial direction in spherical coordinates (i.e., the normal stress on a spherical surface), and $\sigma_2(r \theta)$ is the shear stress along the polar direction $\theta$ of the sphere.
 
-This model incorporates copmressional and shear waves within the calibration sphere alongside the boundary conditions at the sphere-medium interface to compute the far-field acoustic backscatter. Since the full elastodynamic scattering problem is separable for an elastic sphere immersed in a fluid, the natural eigenfunctions are spherical harmonics. These boundary conditions can then be projected onto the basis of Legendre polynomials due to the assumed orthogonality whereby each angular mode $n$ interacts only with itself. Thus:
+This model incorporates compressional and shear waves within the calibration sphere alongside the boundary conditions at the sphere-medium interface to compute the far-field acoustic backscatter. Since the full elastodynamic scattering problem is separable for an elastic sphere immersed in a fluid, the natural eigenfunctions are spherical harmonics. These boundary conditions can then be projected onto the basis of Legendre polynomials due to the assumed orthogonality whereby each angular mode $n$ interacts only with itself. Thus:
 
 $$
   \int\limits_{-1}^1 P_m(\cos \theta)\underbrace{(\text{boundary condition})}_{\text{function of }\theta}  d(\cos \theta),
@@ -171,10 +171,9 @@ where $\mathbf{M}_m$ is a mode-dependent coefficient matrix and $\mathbf{F}_m$ i
 For a plane wave incident along polar coordinate $z$, the acoustic pressure is expressed as [@hickling_analysis_1962]:
 
 $$
-  \begin{align*}
-  p_\text{inc}(r, \theta) &= P_0 \frac{e^{-i k_1 \mathcal{D}}}{\mathcal{D}} \\
-    &= ik_1 P_0 \sum\limits_{m=0}^\infty (2m + 1) (-1)^n j_m(k_1r) h_m(k_1 r_0) P_m(\cos \theta), \quad (0 < r < r_0),
-  \end{align*}
+  \begin{aligned}
+  p_\text{inc}(r, \theta) &= P_0 \frac{e^{-i k_1 \mathcal{D}}}{\mathcal{D}} \\ &= ik_1 P_0 \sum\limits_{m=0}^\infty (2m + 1) (-1)^n j_m(k_1r) h_m(k_1 r_0) P_m(\cos \theta), \quad (0 < r < r_0),
+  \end{aligned}
 $$
 
 where $k_1 = \omega / c_1$ is the acoustic wavenumber in the surrounding fluid, $P_0$ is the incident pressure amplitude, and the function $\mathcal{D}$ is defined explicitly as: 
@@ -215,27 +214,26 @@ $$
 where $\mathcal{D}$ represents the additive effect of $r$ and stress components, $i$ is an imaginary number ($i=\sqrt{-1}$), and $P_0$ is the amplitude of pressure in the incident wave. In the far-field, $r \to \infty$ which means that the asymptotic forms of the Hankel function and $\frac{e^{-i k_1 \mathcal{D}}}{\mathcal{D}}$ term can be used:
 
 $$
-  \begin{align*}
+  \begin{aligned}
   \frac{e^{-i k_1 \mathcal{D}}}{\mathcal{D}} &\sim
   e^{ik_1 r_0} \frac{e^{i k_1 r \cos \theta}}{r_0}, \\
     h_m^{(1)}(k_1r_0) &\sim (-i)^{m+1} \frac{e^{i k_1 r_0}}{k_1r_0}.
-  \end{align*}
+  \end{aligned}
 $$
 
 These limits consequently simplify $p_\text{inc}$ to:
 
 $$
-  \begin{align*}
-  p_\text{inc}(r, \theta) &= P_0 e^{ik_1 r \cos \theta} \\
-    &= P_0 \sum\limits_{m=0}^\infty (2m + 1) i^m j_m(k_1 r) P_m(\cos \theta).
-  \end{align*}
+  \begin{aligned}
+  p_\text{inc}(r, \theta) &= P_0 e^{ik_1 r \cos \theta} \\ &= P_0 \sum\limits_{m=0}^\infty (2m + 1) i^m j_m(k_1 r) P_m(\cos \theta).
+  \end{aligned}
 $$
 
 ## Phase-shift form of the solution
 
 It is often more informative to parameterize each partial wave by a real phase shift $\eta_m$ than by the raw complex coefficient $B_m$ [@faran_sound_1951; @rudgers_acoustic_1969]. In that representation, the elastic boundary conditions determine how far the outgoing partial wave is shifted relative to the free spherical solution.
 
-![Calibration sphere phase-shift schematic](calibration-phase-shift-schematic.svg)
+![Calibration sphere phase-shift schematic](calibration-phase-shift-schematic.png)
 
 The scattered acoustic field can be expressed as a sum of partial waves: 
 $$ 
@@ -257,16 +255,15 @@ $$
 
 where $\alpha_m$, $\beta_m$, and $\delta_m$ are the scattering phase-angles, and $\Phi_m$ is the boundary impedance phase-angle. These angles are defined as: 
 $$ 
-  \begin{align*}
+  \begin{aligned}
   \delta_m(k_1a) &=
     \tan^{-1} \left[ \frac{-j_m(k_1a)}{y_m(k_1a)} \right] ,\\
     \alpha_m(k_1a) &=
     \tan^{-1} \left[ \frac{-k_1 a ~j^\prime_m(k_1a)}{y_m(k_1a)} \right] ,\\
     \beta_m(k_1a) &=
     \tan^{-1} \left[ \frac{-k_1 a ~y^\prime_m(k_1a)}{y_m(k_1a)} \right] , \\
-    \tan \Phi_m &=
-    -\frac{\rho_1}{\rho_2} \tan \zeta_m(k_\ell a, \sigma),
-  \end{align*}
+    \tan \Phi_m &= -\frac{\rho_1}{\rho_2} \tan \zeta_m(k_\ell a, \sigma),
+  \end{aligned}
 $$ 
 
 where $\zeta_m(k_\ell a, \sigma)$ is the boundary-impedance phase angle induced by the elastic interior [@faran_sound_1951]. Once obtained, $B_m$ is: $$ B_m = k_1 (-1)^m (2m + 1) h_m^{(1)}(k_1 r_0) \sin \eta_m e^{-i \eta_m}. $$
@@ -274,15 +271,13 @@ where $\zeta_m(k_\ell a, \sigma)$ is the boundary-impedance phase angle induced 
 By imposing Neumann boundary conditions at the sphere's surface (i.e., a hard or rigid boundary), then the form function can be derived: 
 
 $$ 
-  \mathcal{f}_\infty(k_1 a) =
-    -2 \frac{k_1 r}{k_1 a} e^{i k_1 r} \sum\limits_{m=0}^\infty (-i)^{m+1} h_m^{(2)}(k_1 r) (-1)^m (2m + 1) \sin \eta_m e^{i \eta_m}.
+  \mathcal{f}_\infty(k_1 a) = -2 \frac{k_1 r}{k_1 a} e^{i k_1 r} \sum\limits_{m=0}^\infty (-i)^{m+1} h_m^{(2)}(k_1 r) (-1)^m (2m + 1) \sin \eta_m e^{i \eta_m}.
 $$
 
 This can be further simplified to derive the far-field expression in the backscattering direction in the far-field limit $r \to \infty$: 
 
 $$ 
-  \mathcal{f}_\text{bs}(k_1 a) =
-    -\frac{2}{k_1a} \sum\limits_{m=0}^\infty (-1)^m (2m + 1) \sin \eta_m e^{i \eta_m}.
+  \mathcal{f}_\text{bs}(k_1 a) = -\frac{2}{k_1a} \sum\limits_{m=0}^\infty (-1)^m (2m + 1) \sin \eta_m e^{i \eta_m}.
 $$
 
 The details vary by notation across the literature, but the interpretation is the same: the sphere material and elastic wave speeds determine a modal phase lag, and the total backscatter is a coherent sum over those lagged partial waves.
@@ -304,7 +299,7 @@ $$
 
 This normalization is important because calibration references are sometimes written in terms of a dimensionless form function and sometimes in terms of a dimensional backscattering length. Those descriptions are compatible, but only if the rescaling is made explicit.
 
-![Calibration sphere modal bookkeeping from partial waves to reported backscatter quantities.](calibration-modal-bookkeeping.svg)
+![Calibration sphere modal bookkeeping from partial waves to reported backscatter quantities.](calibration-modal-bookkeeping.png)
 
 The modal bookkeeping proceeds in a fixed order. The incident plane wave is decomposed into modal terms, each mode acquires an elastic phase shift at the sphere surface, the far-field series is summed, and the final result is reported as a linear backscattering length, a backscattering cross-section, and target strength.
 

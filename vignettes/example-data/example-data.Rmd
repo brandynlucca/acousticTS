@@ -24,7 +24,12 @@ The bundled example objects are anchored to published fish, krill, and benchmark
 
 The package includes bundled data objects that are useful for learning the workflow, benchmarking model behavior, and reproducing examples without first building every target from scratch. Those objects are not meant to replace careful object construction, but they do reduce the distance between installation and a meaningful first calculation.
 
-<object type="image/svg+xml" data="example-data-map.svg" style="width:100%;" aria-label="Example data workflow map"></object>
+```{r echo=FALSE, results='asis'}
+acousticTS:::.vignette_static_figure(
+  src = "example-data-map.png",
+  alt = "Example data workflow map"
+)
+```
 
 # Bundled objects
 

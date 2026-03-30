@@ -85,8 +85,8 @@ $$
 where $c_{L,3}$ and $c_{T,3}$ are the longitudinal and transverse wave speeds
 of the elastic backbone.
 
-The important approximation enters immediately here: the current backbone term
-is not the exact solution for an elastic region `3` embedded inside flesh
+The important approximation enters immediately here: the backbone term used
+here is not the exact solution for an elastic region `3` embedded inside flesh
 region `2`. Instead, it is a seawater-referenced elastic-cylinder surrogate
 that is then positioned inside the same body frame as the flesh solve.
 
@@ -178,7 +178,7 @@ explicit elastic structure with its own internal wave-conversion physics.
 # Spatial placement in the body frame
 
 The flesh and backbone amplitudes cannot be added meaningfully unless they are
-referred to the same spatial frame. The current family uses the body-fixed
+referred to the same spatial frame. The family uses the body-fixed
 coordinate system for that purpose.
 
 If the representative backbone position is $\mathbf{r}_c$, then the backbone
@@ -192,7 +192,7 @@ $$
 
 where $\hat{\mathbf{q}}_{\mathrm{bs}}$ is the backscatter direction.
 
-In the axisymmetric body-frame convention used by the current implementation,
+In the axisymmetric body-frame convention used here,
 that projection becomes:
 
 $$
@@ -250,8 +250,7 @@ $$
     2\,\Re\!\left\{
   f_{\mathrm{bs}}^{(2)}
   \overline{f_{\mathrm{bs}}^{(3)}}
-  \exp\!\left(
-  -2 i k_1 \hat{\mathbf{q}}_{\mathrm{bs}}\cdot\mathbf{r}_c
+  \exp\!\left( -2 i k_1 \hat{\mathbf{q}}_{\mathrm{bs}}\cdot\mathbf{r}_c
   \right)
   \right\}.
 $$

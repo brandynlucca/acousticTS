@@ -174,7 +174,7 @@ For more realistic biological examples, the bundled `cod` and `sardine` datasets
 
 The primary KRM implementation benchmark for the canonical gas-filled and weakly scattering shapes is the published modal-series reference solution for each isolated canonical case. The summary table below keeps that benchmark visible without mixing it with the separate software-compatibility checks for body-plus-swimbladder targets.
 
-| Canonical case | Max abs. delta TS (dB) | Mean abs. delta TS (dB) | Elapsed (s) |
+| Canonical case | Max abs. $\Delta$ TS (dB) | Mean abs. $\Delta$ TS (dB) | Elapsed (s) |
 |:--|--:|--:|--:|
 | Gas sphere | 7.91469 | 6.04116 | 0.01 |
 | Weakly scattering sphere | 11.21090 | 0.47451 | 0.15 |
@@ -185,30 +185,81 @@ The primary KRM implementation benchmark for the canonical gas-filled and weakly
 
 The modal-series table above remains the implementation benchmark for the canonical KRM targets.
 
-### Bundled fish compatibility checks
+### Bundled fish compatibility checks {.tabset .tabset-fade .tabset-pills}
 
 The bundled fish objects serve a different benchmark role from the canonical modal-series targets above. There is no exact modal-series reference for these segmented body-plus-swimbladder geometries, so they are used only to check software-to-software agreement for the `krm_variant` branches on realistic fish shapes.
 
-| Object | Branch or comparison | Mean abs. delta TS (dB) | Max abs. delta TS (dB) |
-|:--|:--|--:|--:|
-| `sardine` | `acousticTS lowcontrast` vs `KRMr` | 1.58e-14 | 1.42e-13 |
-| `sardine` | `acousticTS lowcontrast` vs `echoSMs` low-contrast spectrum | 3.31e-14 | 5.54e-13 |
-| `sardine` | `acousticTS lowcontrast` vs NOAA applet spectrum | 0.00262 | 0.00496 |
-| `sardine` | `KRMr` vs `echoSMs` low-contrast spectrum | 3.85e-14 | 5.54e-13 |
-| `sardine` | `KRMr` vs NOAA applet spectrum | 0.00262 | 0.00496 |
-| `sardine` | `echoSMs` low-contrast spectrum vs NOAA applet spectrum | 0.00262 | 0.00496 |
-| `sardine` | `acousticTS body_embedded` vs `echoSMs` body-embedded spectrum | 3.37e-14 | 1.85e-13 |
-| `sardine` | `acousticTS mixed` vs `echoSMs` body-embedded spectrum | 3.37e-14 | 1.85e-13 |
-| `sardine` | `acousticTS mixed` vs `acousticTS body_embedded` | 0.00000 | 0.00000 |
-| `cod` | `acousticTS lowcontrast` vs `KRMr` | 1.33e-14 | 7.82e-14 |
-| `cod` | `acousticTS lowcontrast` vs `echoSMs` low-contrast spectrum | 5.36e-15 | 3.55e-14 |
-| `cod` | `acousticTS lowcontrast` vs NOAA applet spectrum | 0.00262 | 0.00498 |
-| `cod` | `KRMr` vs `echoSMs` low-contrast spectrum | 1.46e-14 | 8.53e-14 |
-| `cod` | `KRMr` vs NOAA applet spectrum | 0.00262 | 0.00498 |
-| `cod` | `echoSMs` low-contrast spectrum vs NOAA applet spectrum | 0.00262 | 0.00498 |
-| `cod` | `acousticTS body_embedded` vs `echoSMs` body-embedded spectrum | 6.16e-15 | 5.68e-14 |
-| `cod` | `acousticTS mixed` vs `echoSMs` body-embedded spectrum | 6.16e-15 | 5.68e-14 |
-| `cod` | `acousticTS mixed` vs `acousticTS body_embedded` | 0.00000 | 0.00000 |
+#### Sardine
+
+::: {.panel-tabset}
+
+##### `krm_variant = lowcontrast`
+
+| $\vert \overline{\Delta TS} \vert$ (dB)  | | | | |
+| :---: | :---:  | :---:  | :---:  | :---:  |
+| | acousticTS | KRMr | echoSMs | NOAA SWFSC applet |
+| acousticTS | - | 1.6e-14 | 3.3e-14 | 2.6e-3 |
+| KRMr | 1.6e-14 | - | 3.9e-14 | 2.6e-3 |
+| echoSMs | 3.3e-14 | 3.9e-14 | - | 2.6e-3 |
+| NOAA SWFSC applet | 2.6e-3 | 2.6e-3 | 2.6e-3 | - | 
+
+| $\max \vert {\Delta TS} \vert$ (dB)  | | | | |
+| :---: | :---:  | :---:  | :---:  | :---:  |
+| | acousticTS | KRMr | echoSMs | NOAA SWFSC applet |
+| acousticTS | - | 1.4e-13 | 5.5e-13 | 5.0e-3 |
+| KRMr | 1.4e-13 | - | 5.5e-13 | 5.0e-3 |
+| echoSMs | 5.5e-13 | 5.5e-13 | - | 5.0e-3 |
+| NOAA SWFSC applet | 5.0e-3 | 5.0e-3 | 5.0e-3 | - | 
+
+##### `krm_variant = body_embedded`
+
+| Compared to... | $\vert \overline{\Delta TS} \vert$ (dB) | $\max \vert \Delta TS \vert$ (dB) |
+| :---: | :---:  | :---:  |
+| echoSMs | 3.4e-14 | 1.9e-13 |
+
+##### `krm_variant = mixed`
+
+| Compared to... | $\vert \overline{\Delta TS} \vert$ (dB) | $\max \vert \Delta TS \vert$ (dB) |
+| :---: | :---:  | :---:  |
+| echoSMs | 3.4e-14 | 1.9e-13 |
+
+:::
+
+#### Cod
+
+::: {.panel-tabset}
+
+##### `krm_variant = lowcontrast`
+
+| $\vert \overline{\Delta TS} \vert$ (dB)  | | | | |
+| :---: | :---:  | :---:  | :---:  | :---:  |
+| | acousticTS | KRMr | echoSMs | NOAA SWFSC applet |
+| acousticTS | - | 1.3e-14 | 5.4e-15 | 2.6e-3 |
+| KRMr | 1.3e-14 | - | 3.9e-14 | - |
+| echoSMs | 5.4e-14 | 3.9e-14 | - | - |
+| NOAA SWFSC applet | 2.6e-3 | - | - | - | 
+
+| $\max \vert {\Delta TS} \vert$ (dB)  | | | | |
+| :---: | :---:  | :---:  | :---:  | :---:  |
+| | acousticTS | KRMr | echoSMs | NOAA SWFSC applet |
+| acousticTS | - | 7.8e-14 | 3.6e-14 | 5.0e-3 |
+| KRMr | 7.8e-14 | - | 8.5e-13 | - |
+| echoSMs | 3.6e-14 | 8.5e-13 | - | - |
+| NOAA SWFSC applet | 5.0e-3 | - | - | - | 
+
+##### `krm_variant = body_embedded`
+
+| Compared to... | $\vert \overline{\Delta TS} \vert$ (dB) | $\max \vert \Delta TS \vert$ (dB) |
+| :---: | :---:  | :---:  |
+| echoSMs | 6.2e-15 | 5.7e-14 |
+
+##### `krm_variant = mixed`
+
+| Compared to... | $\vert \overline{\Delta TS} \vert$ (dB) | $\max \vert \Delta TS \vert$ (dB) |
+| :---: | :---:  | :---:  |
+| echoSMs | 6.2e-15 | 5.7e-14 |
+
+:::
 
 Those values make the branch behavior explicit:
 
@@ -216,7 +267,7 @@ Those values make the branch behavior explicit:
 2. `body_embedded` remains the literal body-medium alternative and lines up with the corresponding body-embedded spectrum.
 3. `mixed` is still exposed because it is a distinct literature convention, even though on both bundled fish frequency grids it collapses numerically onto `body_embedded`.
 
-So the two benchmark roles are now explicit:
+The two benchmark roles are explicit:
 
 1. canonical modal-series tables for isolated-shape KRM implementation checks, and
 2. bundled-fish compatibility checks for the body-plus-swimbladder convention choice.

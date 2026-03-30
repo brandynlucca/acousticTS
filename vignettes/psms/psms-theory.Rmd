@@ -103,14 +103,14 @@ $$
 
 Thus $\xi_1$ is the natural shape parameter of the spheroid, while $q$ sets the absolute scale.
 
-![PSMS coordinate geometry in the meridional plane, showing focal points, the boundary surface $\xi = \xi_1$, and representative $\xi$- and $\eta$-coordinate curves.](psms-coordinate-geometry-clean.svg)
+<!-- ![PSMS coordinate geometry in the meridional plane, showing focal points, the boundary surface $\xi = \xi_1$, and representative $\xi$- and $\eta$-coordinate curves.](psms-coordinate-geometry-clean.png) -->
 
-![Why rigid and pressure-release PSMS remain mode-local while the fluid-filled case introduces overlap-driven coupling between degrees.](psms-mode-coupling-schematic.svg)
+![Why rigid and pressure-release PSMS remain mode-local while the fluid-filled case introduces overlap-driven coupling between degrees.](psms-mode-coupling-schematic.png)
 
 The boundary is imposed on $\xi = \xi_1$, with the focal points at $\pm q$ fixing the prolate geometry and the semi-axes $a$ and $b$ setting the physical scale. In the rigid and pressure-release cases, one exterior spheroidal basis is sufficient, so each retained degree stays effectively local. In the fluid-filled and gas-filled cases, the interior and exterior reduced frequencies differ, so the angular bases no longer match exactly and the overlap integrals become the mechanism that couples degrees together.
 
 <!-- ![Projection of exterior angular modes onto the interior spheroidal basis in
-the fluid-filled PSMS system.](psms-overlap-projection-schematic.svg) -->
+the fluid-filled PSMS system.](psms-overlap-projection-schematic.png) -->
 
 The projection step is the part of the interior-fluid derivation that makes the PSMS algebra noticeably harder. The exterior angular basis is complete for the exterior reduced frequency $\mathbb{k}_1$, and the interior basis is complete for the interior reduced frequency $\mathbb{k}_2$, but those two families are not identical when $\mathbb{k}_1 \ne \mathbb{k}_2$. The overlap matrix is therefore the bridge between two valid but nonidentical angular descriptions of the same boundary data.
 
@@ -153,13 +153,15 @@ The separation succeeds because the metric factors of prolate spheroidal coordin
 Written explicitly, the Helmholtz operator in prolate spheroidal coordinates gives:
 
 $$
-  \frac{\partial}{\partial\xi}\left[(\xi^2-1)\frac{\partial p}{\partial\xi}\right] + \frac{\partial}{\partial\eta}\left[(1-\eta^2)\frac{\partial p}{\partial\eta}\right] + \frac{\xi^2-\eta^2}{(\xi^2-1)(1-\eta^2)}\frac{\partial^2 p}{\partial\phi^2} + \mathbb{k}^2(\xi^2-\eta^2)p = 0
+  \frac{\partial}{\partial\xi}\left[(\xi^2-1)\frac{\partial p}{\partial\xi}\right] + \frac{\partial}{\partial\eta}\left[(1-\eta^2)\frac{\partial p}{\partial\eta}\right] + \\ 
+  \frac{\xi^2-\eta^2}{(\xi^2-1)(1-\eta^2)}\frac{\partial^2 p}{\partial\phi^2} + \mathbb{k}^2(\xi^2-\eta^2)p = 0
 $$
 
 Substituting $p = RS\Phi$ and dividing by $RS\Phi$ gives:
 
 $$
-  \frac{1}{R}\frac{d}{d\xi}\left[(\xi^2-1)\frac{dR}{d\xi}\right] + \mathbb{k}^2\xi^2 + \frac{1}{S}\frac{d}{d\eta}\left[(1-\eta^2)\frac{dS}{d\eta}\right] - \mathbb{k}^2\eta^2 + \frac{1}{\Phi}\frac{\xi^2-\eta^2}{(\xi^2-1)(1-\eta^2)}\frac{d^2\Phi}{d\phi^2} = 0
+  \frac{1}{R}\frac{d}{d\xi}\left[(\xi^2-1)\frac{dR}{d\xi}\right] + \mathbb{k}^2\xi^2 + \frac{1}{S}\frac{d}{d\eta}\left[(1-\eta^2)\frac{dS}{d\eta}\right] - \\ 
+  \mathbb{k}^2\eta^2 + \frac{1}{\Phi}\frac{\xi^2-\eta^2}{(\xi^2-1)(1-\eta^2)}\frac{d^2\Phi}{d\phi^2} = 0
 $$
 
 The azimuthal dependence is separated by imposing:
@@ -200,7 +202,7 @@ $$
   p_{1,\text{inc}} = 2\sum_{m=0}^{\infty}\sum_{n=m}^{\infty}
   \frac{\epsilon_m i^n}{N_{mn}(\mathbb{k}_1)}
   S_{mn}^{(1)}(\mathbb{k}_1,\cos\theta')
-  S_{mn}^{(1)}(\mathbb{k}_1,\eta)
+  S_{mn}^{(1)}(\mathbb{k}_1,\eta) \\
   R_{mn}^{(1)}(\mathbb{k}_1,\xi)
   \cos m(\phi-\phi')
 $$
@@ -210,16 +212,16 @@ This is the spheroidal analogue of the spherical plane-wave expansion. It is the
 The scattered and interior fields are expanded in the same angular structure but with different radial functions:
 
 $$
-  \begin{align*}
+  \begin{aligned}
   p_{1,\text{scat}} &=
     2\sum_{m=0}^{\infty}\sum_{n=m}^{\infty} \frac{\epsilon_m i^n}{N_{mn}(\mathbb{k}_1)}
   S_{mn}^{(1)}(\mathbb{k}_1,\cos\theta')
   A_{mn}S_{mn}^{(1)}(\mathbb{k}_1,\eta)R_{mn}^{(3)}(\mathbb{k}_1,\xi), \\
     p_{2, \text{interior}} &=
     2\sum_{m=0}^{\infty}\sum_{\ell=m}^{\infty} \frac{\epsilon_m i^\ell}{N_{m\ell}(\mathbb{k}_2)}
-  B_{m\ell}S_{m\ell}^{(1)}(\mathbb{k}_2,\eta)R_{m\ell}^{(1)}(\mathbb{k}_2,\xi)
+  B_{m\ell}S_{m\ell}^{(1)}(\mathbb{k}_2,\eta) R_{m\ell}^{(1)}(\mathbb{k}_2,\xi)
   \cos m(\phi-\phi').
-  \end{align*}
+  \end{aligned}
 $$
 
 These are the full modal expansions from which the pressure-release, rigid, fluid-filled, and gas-filled boundary systems follow. The important bookkeeping point is that the exterior incident and scattered fields share the same reduced frequency $\mathbb{k}_1$, whereas the interior field carries $\mathbb{k}_1$. That single difference is what later forces the projection step in the interior-fluid case.
@@ -229,10 +231,10 @@ These are the full modal expansions from which the pressure-release, rigid, flui
 The scattered far-field amplitude is expanded as:
 
 $$
-  f_\infty(\theta,\phi\mid\theta',\phi') =
+  f_\infty(\theta,\phi\mid\theta',\phi') = \\
     \frac{-2i}{k_2}
   \sum_{m=0}^{\infty}\sum_{n=m}^{\infty}
-  \frac{\epsilon_m}{N_{mn}(\mathbb{k}_1)}
+  \frac{\epsilon_m}{N_{mn}(\mathbb{k}_1)} 
   S_{mn}^{(1)}(\mathbb{k}_1,\cos\theta')
   A_{mn}
   S_{mn}^{(1)}(\mathbb{k}_1,\cos\theta)
@@ -300,20 +302,18 @@ Here $\mathbb{k}_1 = k_1 q$ and $\mathbb{k}_1 = k_2 q$ are the exterior and inte
 Let the exterior scattered coefficients be $A_{mn}$ and the interior coefficients be $B_{m\ell}$. With exterior total pressure $p_1 = p_{1,\text{inc}} + p_{1,\text{scat}}$ and interior pressure $p_1$, pressure continuity at $\xi = \xi_1$ gives:
 
 $$
-  \begin{align*}
+  \begin{aligned}
   &\sum_{n=m}^{\infty} A_{mn}S_{mn}^{(1)}(\mathbb{k}_1,\eta)R_{mn}^{(3)}(\mathbb{k}_1,\xi_1) +
-    \sum_{n=m}^{\infty} S_{mn}^{(1)}(\mathbb{k}_1,\eta)R_{mn}^{(1)}(\mathbb{k}_1,\xi_1) \\
-    &= \sum_{\ell=m}^{\infty} B_{m\ell}S_{m\ell}^{(1)}(\mathbb{k}_1,\eta)R_{m\ell}^{(1)}(\mathbb{k}_1,\xi_1).
-  \end{align*}
+    \sum_{n=m}^{\infty} S_{mn}^{(1)}(\mathbb{k}_1,\eta)R_{mn}^{(1)}(\mathbb{k}_1,\xi_1) \\ &= \sum_{\ell=m}^{\infty} B_{m\ell}S_{m\ell}^{(1)}(\mathbb{k}_1,\eta)R_{m\ell}^{(1)}(\mathbb{k}_1,\xi_1).
+  \end{aligned}
 $$
 
 Normal-velocity continuity gives the corresponding derivative condition:
 
 $$
-  \begin{align*}
-  &\frac{1}{\rho_1}\sum_{n=m}^{\infty} A_{mn}S_{mn}^{(1)}(\mathbb{k}_1,\eta)R_{mn}^{(3)\prime}(\mathbb{k}_1,\xi_1) + \frac{1}{\rho_1}\sum_{n=m}^{\infty} S_{mn}^{(1)}(\mathbb{k}_1,\eta)R_{mn}^{(1)\prime}(\mathbb{k}_1,\xi_1) \\
-    &= \frac{1}{\rho_2}\sum_{\ell=m}^{\infty} B_{m\ell}S_{m\ell}^{(1)}(\mathbb{k}_2,\eta)R_{m\ell}^{(1)\prime}(\mathbb{k}_2,\xi_1).
-  \end{align*}
+  \begin{aligned}
+  &\frac{1}{\rho_1}\sum_{n=m}^{\infty} A_{mn}S_{mn}^{(1)}(\mathbb{k}_1,\eta)R_{mn}^{(3)\prime}(\mathbb{k}_1,\xi_1) + \frac{1}{\rho_1}\sum_{n=m}^{\infty} S_{mn}^{(1)}(\mathbb{k}_1,\eta)R_{mn}^{(1)\prime}(\mathbb{k}_1,\xi_1) \\ &= \frac{1}{\rho_2}\sum_{\ell=m}^{\infty} B_{m\ell}S_{m\ell}^{(1)}(\mathbb{k}_2,\eta)R_{m\ell}^{(1)\prime}(\mathbb{k}_2,\xi_1).
+  \end{aligned}
 $$
 
 To solve these equations, one projects onto the interior angular basis using orthogonality. This introduces overlap integrals of the form:

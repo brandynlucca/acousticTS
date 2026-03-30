@@ -28,7 +28,12 @@ The theory pages explain where the formulas come from. This page explains why th
 
 This distinction matters because "exact" in a modeling article and "numerically effortless" are not the same thing. A geometry-matched modal formulation may be exact in the mathematical sense that it solves the stated boundary-value problem, but that solution still has to be evaluated with finite precision, finite truncation, and finite numerical resolution. Readers should therefore treat numerical settings as part of the reliability of the answer, not as an afterthought that becomes relevant only when something fails dramatically.
 
-<object type="image/svg+xml" data="numerical-foundations-map.svg" style="width:100%;" aria-label="Numerical foundations map"></object>
+```{r echo=FALSE, results='asis'}
+acousticTS:::.vignette_static_figure(
+  src = "numerical-foundations-map.png",
+  alt = "Numerical foundations map"
+)
+```
 
 # Package numerical policy
 
@@ -94,9 +99,9 @@ For `Smn()`, the main numerical tasks are:
 2. extracting the derivative when it is needed, and
 3. carrying the backend normalization and rescaling cleanly into the returned value.
 
-For `Rmn()`, the numerical tasks are similar but slightly broader because the radial routines must distinguish among radial kinds and their derivatives. The package wrappers therefore handle both the extraction of the correct radial branch and the conversion from the backend’s scaled representation into ordinary double- or quadruple-precision values.
+For `Rmn()`, the numerical tasks are similar but slightly broader because the radial routines must distinguish among radial kinds and their derivatives. The package wrappers therefore handle both the extraction of the correct radial branch and the conversion from the backend's scaled representation into ordinary double- or quadruple-precision values.
 
-The important practical point is that `Smn()` and `Rmn()` are not numerically difficult because the formulas are conceptually obscure. They are difficult because spheroidal special functions are expensive and delicate at high order. The current implementation in `prolate_swf.f90` and the related `psms.cpp` wrappers is designed to keep those evaluations stable before any model-specific scattering algebra is applied.
+The important practical point is that `Smn()` and `Rmn()` are not numerically difficult because the formulas are conceptually obscure. They are difficult because spheroidal special functions are expensive and delicate at high order. The implementation in `prolate_swf.f90` and the related `psms.cpp` wrappers is designed to keep those evaluations stable before any model-specific scattering algebra is applied.
 
 # Acoustic size and truncation
 
@@ -108,7 +113,7 @@ For example, spherical and cylindrical modal sums often use a rule of thumb such
 
 The practical implication is simple: a target that is easy to solve at low frequency may require significantly more work at high frequency even if the geometry does not change.
 
-This is also where one of the most important numerical habits comes in: convergence should be checked by increasing the truncation and asking whether the result changes materially. A truncation rule of thumb is a starting point, not a proof of adequacy. If a spectrum, resonance feature, or angular response moves noticeably when the truncation is increased moderately, the earlier result should not yet be treated as numerically settled.
+This is also where one of the most important numerical habits comes in: convergence should be checked by increasing the truncation and asking whether the result changes materially. A truncation rule of thumb is a starting point, not a proof of adequacy. If a spectrum, resonance feature, or angular response moves noticeably when the truncation is increased moderately, that result should not yet be treated as numerically settled.
 
 # Quadrature and overlap integrals
 

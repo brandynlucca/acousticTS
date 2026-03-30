@@ -8,8 +8,8 @@ template:
 
 navbar:
   structure:
-    left: [intro, physics, build, run, library, developers, bibliography, reference, news]
-    right: [github]
+    left: [intro, physics, build, run, library, developers, reference]
+    right: [search, github]
   components:
     intro:
       text: Getting Started
@@ -62,9 +62,6 @@ navbar:
     library:
       text: Models
       href: articles/model-library/model-library.html
-    bibliography:
-      text: Bibliography
-      href: articles/bibliography/bibliography.html
     developers:
       text: Developers
       menu:
@@ -77,7 +74,13 @@ navbar:
 
     reference:
       text: Reference
-      href: reference/index.html
+      menu:
+        - text: "Function reference"
+          href: reference/index.html
+        - text: "Bibliography"
+          href: articles/bibliography/bibliography.html
+        - text: "Changelog"
+          href: news/index.html
     github:
       icon: fab fa-github
       aria-label: GitHub repository
@@ -192,6 +195,16 @@ reference:
     contents:
       - target_strength
       - simulate_ts
+
+  - subtitle: Model registry and extensions
+    desc: >
+      Helpers for listing built-in models and registering custom model
+      implementations for the current session or across sessions.
+    contents:
+      - available_models
+      - register_model
+      - unregister_model
+      - reset_model_registry
 
   - subtitle: Inspection, plotting, and reshaping
     desc: >

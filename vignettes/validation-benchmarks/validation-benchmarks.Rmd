@@ -24,7 +24,7 @@ The validation workflow on this page is grounded in inter-model benchmark compar
 
 Modeling packages become much more useful when users can distinguish a physically surprising result from a setup error. Validation pages help provide that context. In acousticTS, validation is not a single check with a single threshold. It is a layered workflow that begins with object and unit sanity, then moves to canonical benchmark reproduction, and finally asks whether the numerical behavior is stable enough that any remaining discrepancy deserves physical interpretation.
 
-![Validation ladder](validation-ladder.svg)
+![Validation ladder](validation-ladder.png)
 
 That layered view matters because benchmark comparisons are only informative when the target definition, acoustic assumptions, numerical settings, and reporting scale are already aligned. A mismatch against a stored benchmark curve does not automatically diagnose a broken model. It may instead reflect a different boundary condition, a different frequency grid, a different medium, a different orientation convention, or a comparison being carried out in a quantity that is not the one the benchmark was intended to validate.
 
@@ -41,11 +41,11 @@ names(benchmark_ts$frequency_spectra)
 head(benchmark_ts$frequency_spectra$index$frequency)
 ```
 
-The benchmark cases currently emphasize canonical exact or near-exact comparison problems: `SPHMS` sphere cases with several boundary conditions, `FCMS` finite-cylinder cases, and `PSMS` prolate-spheroid cases. That combination is useful because it spans several canonical geometries and several different numerical mechanisms. In practice, these resources let a user ask two related but different questions. The first is whether a known reference problem can be reproduced. The second is whether a new workflow still behaves consistently when anchored to a trusted canonical case.
+The benchmark cases emphasize canonical exact or near-exact comparison problems: `SPHMS` sphere cases with several boundary conditions, `FCMS` finite-cylinder cases, and `PSMS` prolate-spheroid cases. That combination is useful because it spans several canonical geometries and several different numerical mechanisms. In practice, these resources let a user ask two related but different questions. The first is whether a known reference problem can be reproduced. The second is whether a new workflow still behaves consistently when anchored to a trusted canonical case.
 
 # Validation registry snapshot
 
-The package now also keeps a small internal validation registry so the family-page badges, model-library summaries, and validation evidence can be drawn from one source rather than maintained separately.
+The package also keeps a small internal validation registry so the family-page badges, model-library summaries, and validation evidence can be drawn from one source rather than maintained separately.
 
 ## Family statuses
 
@@ -65,11 +65,29 @@ knitr::kable(
 )
 ```
 
-## External-comparison evidence
+## Validated-comparison evidence
 
-```{r external_evidence_table, echo=FALSE}
+```{r validated_evidence_table, echo=FALSE}
 knitr::kable(
-  acousticTS:::.validation_evidence_table(type = "external"),
+  acousticTS:::.validation_evidence_table(type = "validated"),
+  align = c("l", "l", "l", "l", "l")
+)
+```
+
+## Partially-validated scope evidence
+
+```{r partially_validated_evidence_table, echo=FALSE}
+knitr::kable(
+  acousticTS:::.validation_evidence_table(type = "partially_validated"),
+  align = c("l", "l", "l", "l", "l")
+)
+```
+
+## Experimental-scope evidence
+
+```{r experimental_evidence_table, echo=FALSE}
+knitr::kable(
+  acousticTS:::.validation_evidence_table(type = "experimental"),
   align = c("l", "l", "l", "l", "l")
 )
 ```

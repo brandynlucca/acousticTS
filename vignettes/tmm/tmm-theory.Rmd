@@ -96,11 +96,12 @@ $$
 The exterior regular and outgoing basis states are then built from spherical partial waves:
 
 $$
-  \psi^{(1)}_{mn}(r,\theta,\phi) =
-    j_n(kr)\,P_n^m(\cos\theta)\,e^{im\phi},
-  \qquad
-  \psi^{(3)}_{mn}(r,\theta,\phi) =
-    h_n^{(1)}(kr)\,P_n^m(\cos\theta)\,e^{im\phi}.
+  \begin{align*}
+    \psi^{(1)}_{mn}(r,\theta,\phi) &=
+      j_n(kr)\,P_n^m(\cos\theta)\,e^{im\phi}, \\
+    \psi^{(3)}_{mn}(r,\theta,\phi) &=
+      h_n^{(1)}(kr)\,P_n^m(\cos\theta)\,e^{im\phi}.
+  \end{align*}
 $$
 
 Along the curved meridional profile $r(\theta)$, the outward normal derivative
@@ -146,8 +147,7 @@ $$
 Differentiating gives:
 
 $$
-  r_\theta =
-    -\sin\theta\cos\theta
+  r_\theta = -\sin\theta\cos\theta
   \left(
   \frac{1}{a^2} - \frac{1}{c^2}
   \right)
@@ -206,19 +206,18 @@ For the single-target scalar acoustic problem, it is more natural to use prolate
 Let $q$ be the semifocal length and let $(\xi,\eta,\phi)$ be prolate spheroidal coordinates. In Cartesian coordinates:
 
 $$
-  x = q\sqrt{(\xi^2 - 1)(1 - \eta^2)}\cos\phi,
-  \qquad
-  y = q\sqrt{(\xi^2 - 1)(1 - \eta^2)}\sin\phi,
-  \qquad
-  z = q \xi \eta.
+  \begin{align*}
+    x &= q\sqrt{(\xi^2 - 1)(1 - \eta^2)}\cos\phi, \\
+    y &= q\sqrt{(\xi^2 - 1)(1 - \eta^2)}\sin\phi, \\
+    z &= q \xi \eta.
+  \end{align*}
 $$
 
 The coordinate ranges are:
 
 $$
   \xi \ge 1,
-  \qquad
-  -1 \le \eta \le 1,
+  \qquad -1 \le \eta \le 1,
   \qquad
   0 \le \phi < 2\pi.
 $$
@@ -238,13 +237,13 @@ $$
   \xi_1 = \left[1 - \left(\frac{b}{a}\right)^2\right]^{-1/2}.
 $$
 
-<!-- ![Meridional-plane geometry for the prolate spheroidal TMM branch.](tmm-prolate-coordinate-schematic.svg) -->
+<!-- ![Meridional-plane geometry for the prolate spheroidal TMM branch.](tmm-prolate-coordinate-schematic.png) -->
 
 ## Spheroidal modal representation
 
 In a homogeneous region, the separated pressure field is written as the product of a radial spheroidal function in $\xi$, an angular spheroidal function in $\eta$, and an azimuthal factor in $\phi$.
 
-The resulting field expansion has the same logical structure as the generic T-matrix expression above, but the basis is now geometry-matched.
+The resulting field expansion has the same logical structure as the generic T-matrix expression above, but the basis is geometry-matched.
 
 For rigid and pressure-release prolates, the retained degrees remain effectively local in the exact spheroidal basis. For liquid- and gas-filled prolates, the interior and exterior reduced frequencies differ, so the angular bases no longer match exactly. This introduces overlap-driven coupling between retained degrees, exactly as in the exact prolate spheroidal modal-series solution [@hackman_application_1984; @spence_scattering_1951; @furusawa_prolate_1988].
 

@@ -26,7 +26,7 @@ One of the strongest uses of acousticTS is not simply running a single model, bu
 
 At the same time, model comparison is easy to do badly. If two models are run on different geometries, different frequency grids, different material assumptions, or different reporting quantities, the resulting curves may still be interesting, but they no longer isolate model behavior alone. At that point the comparison has become a mixture of model differences and setup differences, which is a much harder thing to interpret honestly.
 
-![Model-comparison framework](comparing-models-framework.svg)
+![Model-comparison framework](comparing-models-framework.png)
 
 # Why compare models at all
 

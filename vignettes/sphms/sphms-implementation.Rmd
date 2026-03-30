@@ -113,20 +113,20 @@ For fluid-filled spheres, the same implementation pattern applies; the main chan
 
 SPHMS can be compared directly against the Jech benchmark definitions stored in `benchmark_ts`. The summary below uses the full spherical benchmark grid. Elapsed times are representative values from the current machine rather than universal expectations.
 
-| Boundary | Max abs. delta TS (dB) | Mean abs. delta TS (dB) | Elapsed (s) |
+| Boundary | Max abs. $\Delta$ TS (dB) | Mean abs. $\Delta$ TS (dB) | Elapsed (s) |
 |:--|--:|--:|--:|
 | `fixed_rigid` | 0.00497 | 0.00246 | 0.03 |
 | `pressure_release` | 0.00500 | 0.00243 | 0.09 |
 | `gas_filled` | 0.00499 | 0.00263 | 0.06 |
 | `liquid_filled` | 0.00492 | 0.00241 | 0.11 |
 
-All four spherical boundary types remain very close to the benchmark family over the full grid, with the current implementation staying within about 0.005 dB in the worst case.
+All four spherical boundary types remain very close to the benchmark family over the full grid, with the implementation staying within about 0.005 dB in the worst case.
 
 ### Cross-software implementation checks
 
 For the penetrable spherical cases, the current acousticTS implementation can also be checked directly against the locally available `KRMr` and `echoSMs` sphere solvers. Those checks serve a different purpose from the Jech benchmark table above: they verify that the software implementations agree when they are solving the same penetrable spherical problem, rather than only asking how closely any one implementation tracks the benchmark family.
 
-| Boundary | Comparison | Mean abs. delta TS (dB) | Max abs. delta TS (dB) |
+| Boundary | Comparison | Mean abs. $\Delta$ TS (dB) | Max abs. $\Delta$ TS (dB) |
 |:--|:--|--:|--:|
 | `gas_filled` | acousticTS vs `KRMr` | 3.21e-14 | 2.21e-12 |
 | `gas_filled` | acousticTS vs `echoSMs` | 1.71e-13 | 1.52e-11 |
@@ -137,7 +137,7 @@ Those values show that the penetrable SPHMS branches are effectively identical a
 
 SPHMS does expose one additional numerical control, `m_limit`, so it is worth checking how aggressively the modal cap can be reduced before the liquid-filled benchmark fit starts to move. The table below keeps the same weakly scattering liquid-filled benchmark and only changes that truncation cap.
 
-| Boundary | `m_limit` | Max abs. delta TS (dB) | Mean abs. delta TS (dB) | Elapsed (s) |
+| Boundary | `m_limit` | Max abs. $\Delta$ TS (dB) | Mean abs. $\Delta$ TS (dB) | Elapsed (s) |
 |:--|:--|--:|--:|--:|
 | `liquid_filled` | default rule | 0.00492 | 0.00241 | 0.07 |
 | `liquid_filled` | `20` | 0.52550 | 0.00640 | 0.14 |

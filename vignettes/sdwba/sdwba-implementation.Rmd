@@ -131,7 +131,7 @@ For practical SDWBA work, the first controls to revisit are usually:
 
 SDWBA should be judged against the exact modal-series `Benchmark` column in the Jech weakly scattering sphere, prolate-spheroid, and cylinder files. The table below reports that direct comparison together with the representative runtime on the current machine.
 
-| Geometry | Max abs. delta vs benchmark (dB) | Mean abs. delta vs benchmark (dB) | Elapsed (s) |
+| Geometry | Max abs. $\Delta$ vs benchmark (dB) | Mean abs. $\Delta$ vs benchmark (dB) | Elapsed (s) |
 |:--|--:|--:|--:|
 | Weakly scattering sphere | 10.08475 | 0.35609 | 0.72 |
 | Weakly scattering prolate spheroid | 2.05918 | 0.07638 | 3.58 |
@@ -141,7 +141,7 @@ These runs use the same stochastic reference values throughout the benchmark set
 
 For SDWBA, the most important additional implementation control is `n_iterations`, because it determines how well the stochastic ensemble average is actually resolved numerically. The table below keeps the same Jech targets and changes only `n_iterations`.
 
-| Geometry | `n_iterations` | Max abs. delta vs benchmark (dB) | Mean abs. delta vs benchmark (dB) | Elapsed (s) |
+| Geometry | `n_iterations` | Max abs. $\Delta$ vs benchmark (dB) | Mean abs. $\Delta$ vs benchmark (dB) | Elapsed (s) |
 |:--|--:|--:|--:|--:|
 | Weakly scattering sphere | 25 | 9.30458 | 0.34871 | 0.58 |
 | Weakly scattering sphere | 100 | 10.08475 | 0.35609 | 0.63 |
@@ -159,7 +159,7 @@ That sensitivity table is useful because it shows two things at once. First, the
 
 The bundled `krill` object serves a different role from the canonical weakly scattering targets above. Here the goal is not to compare against an exact modal-series solution, but to compare the same stored krill geometry across four SDWBA implementations using a common frequency grid, a common broadside incidence, and the same stochastic reference values used for the benchmark calculations (`N0 = 50`, `phase_sd_init = sqrt(2) / 32`, `L0 = 38.35 mm`, `f0 = 120 kHz`, `n_iterations = 100`).
 
-| Comparison | Mean abs. delta TS (dB) | Max abs. delta TS (dB) |
+| Comparison | Mean abs. $\Delta$ TS (dB) | Max abs. $\Delta$ TS (dB) |
 |:--|--:|--:|
 | acousticTS vs `echoSMs` | 1.70257 | 30.63630 |
 | acousticTS vs CCAMLR MATLAB | 0.06978 | 0.18270 |

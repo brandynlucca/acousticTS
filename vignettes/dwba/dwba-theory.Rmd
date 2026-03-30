@@ -31,7 +31,7 @@ acousticTS:::.model_family_header(
 )
 ```
 
-The distorted wave Born approximation (DWBA) is a first-order scattering model for weakly scattering fluid-like bodies. It is most useful when the material contrasts are small enough that the total acoustic field inside the body remains close to the incident field, but the geometry is sufficiently extended that phase accumulation along the body cannot be ignored [@morse_theoretical_1986; @stanton_sound_1998i]. In that regime, a purely local approximation is too crude, while a full boundary-value solution is often unnecessary or unavailable.
+The distorted wave Born approximation (DWBA) is a first-order scattering model for weakly scattering fluid-like bodies. It is most useful when the material contrasts are small enough that the total acoustic field inside the body remains close to the incident field, but the geometry is sufficiently extended that phase accumulation along the body cannot be ignored [@morse_theoretical_1986; @stanton_sound_1998]. In that regime, a purely local approximation is too crude, while a full boundary-value solution is often unnecessary or unavailable.
 
 For elongated zooplankton and similar organisms, the most important consequence of the DWBA is that a three-dimensional volume scattering problem can be reduced to a one-dimensional integral along the body axis. That simplification is not an ad hoc shortcut. It follows from the weak-scattering approximation together with an elongated axisymmetric body representation.
 
@@ -50,11 +50,11 @@ $\rho_1$, sound speed $c_1$, compressibility
 $\kappa_1 = (\rho_1 c_1^2)^{-1}$, and wavenumber:
 
 $$
-  \begin{align*}
+  \begin{aligned}
   \rho(\mathbf{x})\frac{\partial \mathbf{v}}{\partial t} &= -\nabla p, \\
     \frac{\partial \rho'}{\partial t} + \rho(\mathbf{x}) \, \nabla \cdot \mathbf{v} &= 0 \\
     p &= c^2(\mathbf{x}) \, \rho'.
-  \end{align*}
+  \end{aligned}
 $$
 
 Eliminating particle velocity $\mathbf{v}$ and density perturbation $\rho'$ gives an acoustic equation in a heterogeneous medium. When the medium is decomposed into a homogeneous background plus a localized perturbation, the pressure field satisfies an inhomogeneous Helmholtz equation whose source term is produced by departures of density and compressibility from the background fluid:
@@ -150,7 +150,7 @@ $$
 
 The ordinary Born approximation linearizes the problem by replacing the unknown total field inside the target with the incident field in the surrounding medium. The DWBA keeps the same first-order amplitude logic, but improves the phase description by evaluating the interior reference field with the interior wavenumber $k_2$ rather than with $k_1$. 
 
-The distorted wave Born approximation refines this linearization by separating amplitude and phase accuracy. While the scattering amplitude remains first order in the material contrasts, the phase of the internal field is evaluated using the interior wavenumber. This accounts for the fact that even weak contrasts can accumulate significant phase differences over distances comparable to the body length. The internal reference field is therefore taken as a transmitted or “distorted” plane wave:
+The distorted wave Born approximation refines this linearization by separating amplitude and phase accuracy. While the scattering amplitude remains first order in the material contrasts, the phase of the internal field is evaluated using the interior wavenumber. This accounts for the fact that even weak contrasts can accumulate significant phase differences over distances comparable to the body length. The internal reference field is therefore taken as a transmitted or "distorted" plane wave:
 
 $$
   p(\mathbf{r}') \approx e^{i\mathbf{k}_2\cdot\mathbf{r}'},
@@ -263,7 +263,7 @@ $$
   ds.
 $$
 
-The body is therefore reduced to a coherent sum of local cross-sectional responses distributed along the centerline. Moreover, if the material properties contrast does nto vary across the local section, it can be taken outside the inner integral.
+The body is therefore reduced to a coherent sum of local cross-sectional responses distributed along the centerline. Moreover, if the material-property contrast does not vary across the local section, it can be taken outside the inner integral.
 
 ## Azimuthal and radial integration
 
@@ -370,14 +370,14 @@ $$
   \, ds.
 $$
 
-Each factor now has a direct interpretation:
+Each factor has a direct interpretation:
 
 $$
-  \begin{align*}
+  \begin{aligned}
   \gamma_\kappa - \gamma_\rho &\Rightarrow \text{material property contrast} \\
     e^{2 i \mathbf{k}_2 \cdot \mathbf{r}_{pos}(s)} &\Rightarrow \text{two-way propagation phase} \\
     \frac{J_1\!\left(2 k_2 a(s) \cos\beta_{tilt}(s)\right)}{\cos\beta_{tilt}(s)} &\Rightarrow \text{exact cross-sectional diffraction}.
-  \end{align*}
+  \end{aligned}
 $$
 
 

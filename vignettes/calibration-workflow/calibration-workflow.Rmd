@@ -26,7 +26,7 @@ The package already contains substantial theory for calibration spheres. This pa
 
 That distinction matters because a calibration sphere is meant to serve as a reference standard. The goal is not merely to produce a plausible target-strength curve. The goal is to produce a defensible reference response whose geometry, material properties, medium properties, and frequency grid are all tied closely to the real measurement context. That changes how material properties are sourced, how model outputs are judged, and how discrepancies should be interpreted.
 
-![Calibration workflow map](calibration-workflow-map.svg)
+![Calibration workflow map](calibration-workflow-map.png)
 
 # Why calibration workflows are different
 

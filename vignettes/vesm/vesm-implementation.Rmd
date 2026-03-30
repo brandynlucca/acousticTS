@@ -125,9 +125,9 @@ The comparison uses a shared `1-150 kHz` grid with `1 kHz` spacing and the same 
 
 After regenerating the benchmark against the current compiled acousticTS implementation, the reference case gives:
 
-- max abs. delta TS = `0.05598 dB`
-- mean abs. delta TS = `0.00885 dB`
-- frequency at max abs. delta = `60 kHz`
+- max abs. $\Delta$ TS = `0.05598 dB`
+- mean abs. $\Delta$ TS = `0.00885 dB`
+- frequency at max abs. $\Delta$ = `60 kHz`
 - elapsed time = `0.79 s` for acousticTS and `0.98 s` for the Python implementation
 
 ```{r echo = FALSE}
@@ -145,14 +145,15 @@ vesm_summary <- utils::read.csv(
 knitr::kable(
   vesm_summary,
   digits = 4,
+  escape = FALSE,
   col.names = c(
     "Comparison",
     "N frequency",
-    "$f$ min (kHz)",
-    "$f$ max (kHz)",
-    "Max $| \\Delta |~\\textit{TS}$ (dB)",
-    "Mean $| \\Delta |~\\textit{TS}$ (dB)",
-    "$f$ at max $| \\Delta |~\\textit{TS}$ (kHz)",
+    "<i>f</i><sub>min</sub> (kHz)",
+    "<i>f</i><sub>max</sub> (kHz)",
+    "Max |&Delta;| <i>TS</i> (dB)",
+    "Mean |&Delta;| <i>TS</i> (dB)",
+    "<i>f</i> at max |&Delta;| <i>TS</i> (kHz)",
     "acousticTS elapsed (s)",
     "Python elapsed (s)"
   )
@@ -191,12 +192,13 @@ checkpoint_df <- subset(
 knitr::kable(
   checkpoint_df,
   digits = 5,
+  escape = FALSE,
   col.names = c(
     "Frequency (Hz)",
     "acousticTS TS (dB)",
     "Python TS (dB)",
-    "$\\Delta~\\textit{TS}$ (dB)",
-    "Abs. delta TS (dB)"
+    "&Delta; <i>TS</i> (dB)",
+    "Abs. &Delta; <i>TS</i> (dB)"
   )
 )
 ```

@@ -26,7 +26,12 @@ Many modeling errors are not caused by the scattering model itself. They are cau
 
 In practice, this page is the bookkeeping companion to the theory pages. If a model result looks suspicious, one of the first things to check is whether the object was parameterized with sensible densities, sound speeds, contrasts, elastic constants, and medium properties. That may sound secondary compared with model choice, but it often is not. A theoretically appropriate model will still give an inappropriate answer if the target and medium properties do not describe the same physical situation the reader believes they are describing.
 
-<object type="image/svg+xml" data="material-property-pipeline.svg" style="width:100%;" aria-label="Material property pipeline"></object>
+```{r echo=FALSE, results='asis'}
+acousticTS:::.vignette_static_figure(
+  src = "material-property-pipeline.png",
+  alt = "Material property pipeline"
+)
+```
 
 # Main utility groups
 

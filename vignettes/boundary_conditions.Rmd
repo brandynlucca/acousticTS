@@ -35,8 +35,6 @@ package theory pages, medium `1` is always the surrounding seawater, medium `2`
 is the first target region encountered from the outside, and deeper internal
 regions are numbered inward.
 
-<object type="image/svg+xml" data="boundary-conditions-overview.svg" style="width:100%;" aria-label="Boundary-condition overview"></object>
-
 The main boundary families separate most naturally according to the field quantity constrained most directly at the interface: pressure, normal velocity, layered acoustic transmission, or elastic traction.
 
 # Shared interface notation
@@ -71,8 +69,7 @@ $g_{32}$ and $h_{32}$.
 A fixed rigid boundary is the limiting case of a scatterer whose surface cannot move in the normal direction. In an inviscid surrounding fluid, the acoustic pressure field $p(\mathbf{x}, t)$ and the particle velocity field $\mathbf{v}(\mathbf{x}, t)$ satisfy the linearized momentum equation:
 
 $$
-  \rho \frac{\partial \mathbf{v}}{\partial t} =
-    -\nabla p,
+  \rho \frac{\partial \mathbf{v}}{\partial t} = -\nabla p,
 $$
 
 where $\rho$ is the surrounding-fluid density, $\mathbf{x}$ is the position vector, and $\nabla p$ is the pressure gradient. If $\mathbf{n}$ denotes the outward unit normal vector to the target surface, then the normal component of particle velocity is:
@@ -159,8 +156,7 @@ $$
 where $\mathbf{v}_1$ and $\mathbf{v}_2$ are the particle-velocity fields in the two media. Using the linearized momentum relation in each fluid:
 
 $$
-  \mathbf{v}_j =
-    -\frac{1}{i \omega \rho_j}\nabla p_j,
+  \mathbf{v}_j = -\frac{1}{i \omega \rho_j}\nabla p_j,
 $$
 
 the normal-velocity condition can also be written as:
@@ -303,14 +299,12 @@ At a fluid-solid interface, the fluid pressure must balance the normal traction 
 
 $$
   p = -\sigma_{nn},
-  \qquad
-  -\frac{1}{i \omega \rho_f}\frac{\partial p}{\partial n} =
-    -i \omega u_n,
+  \qquad -\frac{1}{i \omega \rho_f}\frac{\partial p}{\partial n} = -i \omega u_n,
   \qquad
   \sigma_{nt} = 0,
 $$
 
-where $\rho_f$ is the fluid density. The exact sign of the pressure-traction relation depends on the outward-normal convention, but the physical content is unchanged. The shell now carries both normal and tangential motion, and that coupling makes the scattering problem much richer than either the rigid or the inelastic-shell cases. The resulting modal systems support resonance structure associated with shell thickness, elastic moduli, and both the exterior and interior fluid properties.
+where $\rho_f$ is the fluid density. The exact sign of the pressure-traction relation depends on the outward-normal convention, but the physical content is unchanged. The shell carries both normal and tangential motion, and that coupling makes the scattering problem much richer than either the rigid or the inelastic-shell cases. The resulting modal systems support resonance structure associated with shell thickness, elastic moduli, and both the exterior and interior fluid properties.
 
 # Weak, fluid-like
 

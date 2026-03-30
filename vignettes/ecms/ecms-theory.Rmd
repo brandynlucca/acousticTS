@@ -100,13 +100,14 @@ For an incident plane wave near broadside, the exterior field is expanded in
 cylindrical harmonics:
 
 $$
-  p_{1,\mathrm{inc}}(r,\phi) =
-    \sum_{m=0}^{\infty}
-  \epsilon_m i^m J_m(k_1 r)\cos(m\phi),
-  \qquad
-  p_{1,\mathrm{sca}}(r,\phi) =
-    \sum_{m=0}^{\infty}
-  \epsilon_m i^m B_m H_m^{(1)}(k_1 r)\cos(m\phi).
+  \begin{align*}
+    p_{1,\mathrm{inc}}(r,\phi) &=
+      \sum_{m=0}^{\infty}
+    \epsilon_m i^m J_m(k_1 r)\cos(m\phi), \\
+    p_{1,\mathrm{sca}}(r,\phi) &=
+      \sum_{m=0}^{\infty}
+    \epsilon_m i^m B_m H_m^{(1)}(k_1 r)\cos(m\phi).
+  \end{align*}
 $$
 
 Here $J_m$ is the regular cylindrical Bessel function, $H_m^{(1)}$ is the
@@ -119,13 +120,14 @@ The longitudinal and transverse interior potentials may be written
 schematically as:
 
 $$
-  \Phi_2(r,\phi) =
-    \sum_{m=0}^{\infty}
-  \epsilon_m i^m C_m J_m(k_{L,2} r)\cos(m\phi),
-  \qquad
-  \Psi_2(r,\phi) =
-    \sum_{m=0}^{\infty}
-  \epsilon_m i^m D_m J_m(k_{T,2} r)\sin(m\phi).
+  \begin{align*}
+    \Phi_2(r,\phi) &=
+      \sum_{m=0}^{\infty}
+    \epsilon_m i^m C_m J_m(k_{L,2} r)\cos(m\phi), \\
+    \Psi_2(r,\phi) &=
+      \sum_{m=0}^{\infty}
+    \epsilon_m i^m D_m J_m(k_{T,2} r)\sin(m\phi).
+  \end{align*}
 $$
 
 with the angular parity chosen so that the resulting displacement components
@@ -146,8 +148,7 @@ must satisfy three conditions:
 Schematically:
 
 $$
-  -\frac{1}{i\omega\rho_1}\frac{\partial p_1}{\partial r} =
-    -i\omega u_{r,2}
+  \frac{1}{i\omega\rho_1}\frac{\partial p_1}{\partial r} = i\omega u_{r,2}
 $$
 
 $$

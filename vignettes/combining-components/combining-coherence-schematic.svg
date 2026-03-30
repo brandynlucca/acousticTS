@@ -1,34 +1,246 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="760" height="300" viewBox="0 0 760 300">
-  <rect width="760" height="300" fill="#faf7ef"/>
-  <text x="380" y="32" text-anchor="middle" font-family="Georgia, serif" font-size="22" fill="#213547">Coherence Regimes for Component Summation</text>
-
-  <rect x="30" y="60" width="220" height="190" rx="16" fill="#f3e7c8" stroke="#9a7b28" stroke-width="2"/>
-  <rect x="270" y="60" width="220" height="190" rx="16" fill="#d9ece5" stroke="#427a6b" stroke-width="2"/>
-  <rect x="510" y="60" width="220" height="190" rx="16" fill="#e7edf6" stroke="#47678f" stroke-width="2"/>
-
-  <text x="140" y="90" text-anchor="middle" font-family="Georgia, serif" font-size="18" fill="#5d4815">Coherent</text>
-  <text x="380" y="90" text-anchor="middle" font-family="Georgia, serif" font-size="18" fill="#1f574a">Partial Coherence</text>
-  <text x="620" y="90" text-anchor="middle" font-family="Georgia, serif" font-size="18" fill="#2c4768">Incoherent</text>
-
-  <line x1="70" y1="145" x2="205" y2="145" stroke="#8b1e3f" stroke-width="5"/>
-  <line x1="70" y1="175" x2="205" y2="175" stroke="#8b1e3f" stroke-width="5"/>
-  <circle cx="95" cy="145" r="7" fill="#8b1e3f"/>
-  <circle cx="180" cy="175" r="7" fill="#8b1e3f"/>
-  <text x="140" y="220" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#42361b">Fixed relative phase</text>
-  <text x="140" y="240" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#42361b">Cross terms fully retained</text>
-
-  <line x1="310" y1="145" x2="445" y2="145" stroke="#8b1e3f" stroke-width="5" stroke-dasharray="8 6"/>
-  <line x1="310" y1="175" x2="445" y2="175" stroke="#8b1e3f" stroke-width="5" stroke-dasharray="8 6"/>
-  <circle cx="335" cy="145" r="7" fill="#8b1e3f"/>
-  <circle cx="420" cy="175" r="7" fill="#8b1e3f"/>
-  <path d="M 320 120 Q 380 95 440 120" fill="none" stroke="#427a6b" stroke-width="3"/>
-  <text x="380" y="220" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#25453b">Phase memory reduced</text>
-  <text x="380" y="240" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#25453b">Cross terms damped by |Γ|</text>
-
-  <line x1="550" y1="145" x2="685" y2="145" stroke="#8b1e3f" stroke-width="5" stroke-dasharray="3 10"/>
-  <line x1="550" y1="175" x2="685" y2="175" stroke="#8b1e3f" stroke-width="5" stroke-dasharray="3 10"/>
-  <circle cx="575" cy="145" r="7" fill="#8b1e3f"/>
-  <circle cx="660" cy="175" r="7" fill="#8b1e3f"/>
-  <text x="620" y="220" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#243a56">Random relative phase</text>
-  <text x="620" y="240" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#243a56">Mean cross terms vanish</text>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="760"
+   height="300"
+   viewBox="0 0 760 300"
+   version="1.1"
+   id="svg15"
+   sodipodi:docname="combining-coherence-schematic.svg"
+   inkscape:export-filename="combining-coherence-schematic.png"
+   inkscape:export-xdpi="200"
+   inkscape:export-ydpi="200"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs15" />
+  <sodipodi:namedview
+     id="namedview15"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="2.3368421"
+     inkscape:cx="380"
+     inkscape:cy="149.98874"
+     inkscape:window-width="1920"
+     inkscape:window-height="1057"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg15" />
+  <rect
+     width="760"
+     height="300"
+     fill="#faf7ef"
+     id="rect1" />
+  <text
+     x="380"
+     y="32"
+     text-anchor="middle"
+     font-family="Georgia, serif"
+     font-size="22"
+     fill="#213547"
+     id="text1">Coherence Regimes for Component Summation</text>
+  <rect
+     x="30"
+     y="60"
+     width="220"
+     height="190"
+     rx="16"
+     fill="#f3e7c8"
+     stroke="#9a7b28"
+     stroke-width="2"
+     id="rect2" />
+  <rect
+     x="270"
+     y="60"
+     width="220"
+     height="190"
+     rx="16"
+     fill="#d9ece5"
+     stroke="#427a6b"
+     stroke-width="2"
+     id="rect3" />
+  <rect
+     x="510"
+     y="60"
+     width="220"
+     height="190"
+     rx="16"
+     fill="#e7edf6"
+     stroke="#47678f"
+     stroke-width="2"
+     id="rect4" />
+  <text
+     x="140"
+     y="90"
+     text-anchor="middle"
+     font-family="Georgia, serif"
+     font-size="18"
+     fill="#5d4815"
+     id="text4">Coherent</text>
+  <text
+     x="380"
+     y="90"
+     text-anchor="middle"
+     font-family="Georgia, serif"
+     font-size="18"
+     fill="#1f574a"
+     id="text5">Partial Coherence</text>
+  <text
+     x="620"
+     y="90"
+     text-anchor="middle"
+     font-family="Georgia, serif"
+     font-size="18"
+     fill="#2c4768"
+     id="text6">Incoherent</text>
+  <line
+     x1="70"
+     y1="145"
+     x2="205"
+     y2="145"
+     stroke="#8b1e3f"
+     stroke-width="5"
+     id="line6" />
+  <line
+     x1="70"
+     y1="175"
+     x2="205"
+     y2="175"
+     stroke="#8b1e3f"
+     stroke-width="5"
+     id="line7" />
+  <circle
+     cx="95"
+     cy="145"
+     r="7"
+     fill="#8b1e3f"
+     id="circle7" />
+  <circle
+     cx="180"
+     cy="175"
+     r="7"
+     fill="#8b1e3f"
+     id="circle8" />
+  <text
+     x="140"
+     y="220"
+     text-anchor="middle"
+     font-family="Arial, sans-serif"
+     font-size="14"
+     fill="#42361b"
+     id="text8">Fixed relative phase</text>
+  <text
+     x="140"
+     y="240"
+     text-anchor="middle"
+     font-family="Arial, sans-serif"
+     font-size="14"
+     fill="#42361b"
+     id="text9">Cross terms fully retained</text>
+  <line
+     x1="310"
+     y1="145"
+     x2="445"
+     y2="145"
+     stroke="#8b1e3f"
+     stroke-width="5"
+     stroke-dasharray="8 6"
+     id="line9" />
+  <line
+     x1="310"
+     y1="175"
+     x2="445"
+     y2="175"
+     stroke="#8b1e3f"
+     stroke-width="5"
+     stroke-dasharray="8 6"
+     id="line10" />
+  <circle
+     cx="335"
+     cy="145"
+     r="7"
+     fill="#8b1e3f"
+     id="circle10" />
+  <circle
+     cx="420"
+     cy="175"
+     r="7"
+     fill="#8b1e3f"
+     id="circle11" />
+  <path
+     d="M 320 120 Q 380 95 440 120"
+     fill="none"
+     stroke="#427a6b"
+     stroke-width="3"
+     id="path11" />
+  <text
+     x="380"
+     y="220"
+     text-anchor="middle"
+     font-family="Arial, sans-serif"
+     font-size="14"
+     fill="#25453b"
+     id="text11">Phase memory reduced</text>
+  <text
+     x="380"
+     y="240"
+     text-anchor="middle"
+     font-family="Arial, sans-serif"
+     font-size="14"
+     fill="#25453b"
+     id="text12">Cross terms damped by |Γ|</text>
+  <line
+     x1="550"
+     y1="145"
+     x2="685"
+     y2="145"
+     stroke="#8b1e3f"
+     stroke-width="5"
+     stroke-dasharray="3 10"
+     id="line12" />
+  <line
+     x1="550"
+     y1="175"
+     x2="685"
+     y2="175"
+     stroke="#8b1e3f"
+     stroke-width="5"
+     stroke-dasharray="3 10"
+     id="line13" />
+  <circle
+     cx="575"
+     cy="145"
+     r="7"
+     fill="#8b1e3f"
+     id="circle13" />
+  <circle
+     cx="660"
+     cy="175"
+     r="7"
+     fill="#8b1e3f"
+     id="circle14" />
+  <text
+     x="620"
+     y="220"
+     text-anchor="middle"
+     font-family="Arial, sans-serif"
+     font-size="14"
+     fill="#243a56"
+     id="text14">Random relative phase</text>
+  <text
+     x="620"
+     y="240"
+     text-anchor="middle"
+     font-family="Arial, sans-serif"
+     font-size="14"
+     fill="#243a56"
+     id="text15">Mean cross terms vanish</text>
 </svg>

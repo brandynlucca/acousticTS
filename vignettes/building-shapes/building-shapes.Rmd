@@ -24,9 +24,14 @@ The shape pathways on this page are most useful when read against the canonical 
 
 Geometry is the first major decision in the package. Before choosing a scatterer class or a target-strength model, it is usually worth deciding whether the target is best represented as a canonical shape or as a segmented arbitrary body. That decision is not just cosmetic. It determines how faithfully the object matches a theory family, how much geometric detail is preserved, and how easy it will be to interpret the response later.
 
-The important point is that shape construction is not yet the stage where material contrasts or boundary conditions are fixed. At this stage, only the geometric description of the target is being chosen. That separation is intentional. It keeps the geometric question distinct from the physical one and makes it easier to evaluate later whether a modeled response is being driven by morphology, by material properties, or by model assumptions.
+The important point is that shape construction is not the stage where material contrasts or boundary conditions are fixed. At this stage, only the geometric description of the target is being chosen. That separation is intentional. It keeps the geometric question distinct from the physical one and makes it easier to evaluate later whether a modeled response is being driven by morphology, by material properties, or by model assumptions.
 
-<object type="image/svg+xml" data="building-shapes-spectrum.svg" style="width:100%;" aria-label="Shape-selection spectrum"></object>
+```{r echo=FALSE, results='asis'}
+acousticTS:::.vignette_static_figure(
+  src = "building-shapes-spectrum.png",
+  alt = "Shape-selection spectrum"
+)
+```
 
 # Why geometry choice matters
 
@@ -42,13 +47,18 @@ Canonical shapes are especially useful when the geometry itself is part of the m
 
 Canonical geometry is also useful for comparison studies. If the goal is to understand how two model families differ under controlled conditions, a simple sphere, cylinder, or spheroid often provides a cleaner starting point than a highly detailed arbitrary outline.
 
-The direct generators are usually the clearest interface because they make the resulting shape class explicit at the call site. `create_shape()` is still useful, but it is best treated as a thin convenience dispatcher rather than as the main pedagogical path.
+The direct generators are usually the clearest interface because they make the resulting shape class explicit at the call site. `create_shape()` is a thin convenience dispatcher rather than the main pedagogical path.
 
 # Coordinate conventions by shape
 
 The package stores shape geometry in a way that is consistent across models, but it is easier to read those objects once the coordinate conventions are made explicit. The schematic below shows the profile view used by the canonical shapes and the side-profile plus cross-section interpretation used by arbitrary shapes.
 
-<object type="image/svg+xml" data="building-shapes-coordinates.svg" style="width:100%;" aria-label="Coordinate conventions for canonical and arbitrary shapes"></object>
+```{r echo=FALSE, results='asis'}
+acousticTS:::.vignette_static_figure(
+  src = "building-shapes-coordinates.png",
+  alt = "Coordinate conventions for canonical and arbitrary shapes"
+)
+```
 
 For `sphere()`, the geometry is most naturally interpreted as a profile in the `x-z` plane with a single radius `a`. At any axial coordinate `x_i`, the upper and lower boundaries are `zU(x_i)` and `zL(x_i)`. For a perfect sphere, those are the positive and negative branches of the same circular boundary.
 

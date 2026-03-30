@@ -24,7 +24,9 @@ The package concepts reflect the same divide between exact solutions, asymptotic
 
 The package is easiest to use once three ideas are kept separate: geometry, physical target type, and scattering model. Those three ideas are related, but they are not interchangeable. Many practical mistakes in acousticTS come from confusing one of those layers with another, such as treating a shape as if it were already a physical scatterer, or treating a model name as if it defined the target itself.
 
-<object type="image/svg+xml" data="package-concepts-architecture.svg" style="width:100%;" aria-label="Conceptual layers"></object>
+```{r echo=FALSE, results='asis'}
+acousticTS:::.vignette_clickable_figure("package_concepts_architecture")
+```
 
 This page is the conceptual map for the rest of the documentation. The goal is not to derive any model. The goal is to stabilize the package vocabulary before moving into theory pages and workflow pages. If readers understand why the package separates geometry from scatterer meaning and scatterer meaning from model choice, most of the later documentation becomes much easier to navigate.
 

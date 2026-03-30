@@ -39,7 +39,7 @@ The bent-cylinder modal-series solution is available through `target_strength(..
 That is the practical reason to use `BCMS` instead of `FCMS`. `FCMS` is the appropriate model when the target can be treated as a straight finite cylinder. `BCMS` is the natural extension when the same cylinder idealization is still acceptable locally, but the body curvature is strong enough that the straight-cylinder coherence assumption is no longer appropriate.
 
 ::: {.experiment data-title="Current validation scope"}
-`BCMS` is still marked unvalidated because there is not yet an external public software benchmark ladder wired into the package. The implementation checks documented here are the two defining identities of the model: the straight branch must reduce to `FCMS`, and the bent branch must match the Stanton (1989) coherence-corrected construction built from that same straight-cylinder solution.
+`BCMS` is marked unvalidated because there is not an external public software benchmark ladder wired into the package. The implementation checks documented here are the two defining identities of the model: the straight branch must reduce to `FCMS`, and the bent branch must match the Stanton (1989) coherence-corrected construction built from that same straight-cylinder solution.
 :::
 
 ## Building straight and bent reference objects
@@ -165,9 +165,9 @@ straight_check <- subset(bcms_summary, case == "straight")[
 
 straight_check <- data.frame(
   `Reference relation` = "BCMS straight branch vs FCMS",
-  `Max abs. delta TS (dB)` = straight_check$max_abs_delta_TS_dB,
-  `Mean abs. delta TS (dB)` = straight_check$mean_abs_delta_TS_dB,
-  `f at max delta (kHz)` = straight_check$frequency_at_max_delta_kHz,
+  `Max abs. $\\Delta$ TS (dB)` = straight_check$max_abs_delta_TS_dB,
+  `Mean abs. $\\Delta$ TS (dB)` = straight_check$mean_abs_delta_TS_dB,
+  `$f$ at max $\\Delta$ (kHz)` = straight_check$frequency_at_max_delta_kHz,
   `acousticTS elapsed (s)` = straight_check$elapsed_s_acousticts,
   `Reference elapsed (s)` = straight_check$elapsed_s_reference,
   check.names = FALSE
@@ -194,9 +194,9 @@ bent_check <- subset(bcms_summary, case == "bent")[
 
 bent_check <- data.frame(
   `Reference relation` = "BCMS bent branch vs Stanton (1989) coherence construction",
-  `Max abs. delta TS (dB)` = bent_check$max_abs_delta_TS_dB,
-  `Mean abs. delta TS (dB)` = bent_check$mean_abs_delta_TS_dB,
-  `f at max delta (kHz)` = bent_check$frequency_at_max_delta_kHz,
+  `Max abs. $\\Delta$ TS (dB)` = bent_check$max_abs_delta_TS_dB,
+  `Mean abs. $\\Delta$ TS (dB)` = bent_check$mean_abs_delta_TS_dB,
+  `$f$ at max $\\Delta$ (kHz)` = bent_check$frequency_at_max_delta_kHz,
   `acousticTS elapsed (s)` = bent_check$elapsed_s_acousticts,
   `Reference elapsed (s)` = bent_check$elapsed_s_reference,
   check.names = FALSE
@@ -217,4 +217,4 @@ The overlay makes the two implementation identities easier to interpret. The str
 
 ## Closing note
 
-`BCMS` is best viewed as a controlled extension of `FCMS`, not as a completely separate scattering family. The page is therefore organized around the two checks that matter most for that relationship: reduction to `FCMS` in the straight limit, and exact agreement with the bent-cylinder coherence construction in the curved case. Those checks do not replace an external benchmark ladder, but they do establish that the current implementation is respecting the defining algebra of the model.
+`BCMS` is best viewed as a controlled extension of `FCMS`, not as a completely separate scattering family. The page is therefore organized around the two checks that matter most for that relationship: reduction to `FCMS` in the straight limit, and exact agreement with the bent-cylinder coherence construction in the curved case. Those checks do not replace an external benchmark ladder, but they do establish that the implementation respects the defining algebra of the model.

@@ -65,7 +65,7 @@ $$
 Here $R_2$ is the outer radius of the viscous layer, $R_3$ is the outer radius
 of the elastic shell, and $R_4$ is the radius of the gas core.
 
-<!-- ![Layered spherical bookkeeping for the viscous-elastic model.](vesm-layered-sphere-schematic.svg) -->
+<!-- ![Layered spherical bookkeeping for the viscous-elastic model.](vesm-layered-sphere-schematic.png) -->
 
 The model therefore contains three interfaces:
 
@@ -349,8 +349,7 @@ far-field amplitude depends only on the exterior coefficients
 $A_m^{(\mathrm{sca})}$. Using the standard large-$r$ asymptotics:
 
 $$
-  f_{\mathrm{bs}} =
-    -\frac{i}{k_1}
+  f_{\mathrm{bs}} = -\frac{i}{k_1}
   \sum_{m=0}^{M}
   (2m+1)(-1)^m A_m^{(\mathrm{sca})},
 $$

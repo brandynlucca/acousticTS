@@ -24,11 +24,13 @@ Shape manipulation matters because many published target representations are bui
 
 Real workflows often begin with a target description that is close to useful but not quite in the form required for the next model or comparison step. The package includes tools for reshaping, bending, or otherwise transforming existing objects rather than rebuilding them from scratch.
 
-<object type="image/svg+xml" data="shape-manipulation-schematic.svg" style="width:100%;" aria-label="Shape manipulation"></object>
+```{r echo=FALSE, results='asis'}
+acousticTS:::.vignette_clickable_figure("shape_manipulation_schematic")
+```
 
 These tools are not cosmetic. They are part of the modeling layer because curvature, segmentation, and relative body-swimbladder scaling can all change the resulting backscatter in physically meaningful ways.
 
-That is the key idea behind this vignette. Shape manipulation is not only about producing a different outline. It is about deciding how a target should be represented for a specific scientific or modeling question. A bent body, an inflated swimbladder, or a resampled segmentation may all be legitimate transformations, but each of them changes what the object now means physically.
+That is the key idea behind this vignette. Shape manipulation is not only about producing a different outline. It is about deciding how a target should be represented for a specific scientific or modeling question. A bent body, an inflated swimbladder, or a resampled segmentation may all be legitimate transformations, but each of them changes what the object means physically.
 
 # Main ideas
 
@@ -89,7 +91,7 @@ It is also worth checking because curvature can alter more than the silhouette. 
 
 # Re-parameterizing with `reforge()`
 
-`reforge()` is a generic interface for reshaping or resizing an existing object. The most developed method in the current package is the `SBF` method, which handles body and swimbladder geometry jointly.
+`reforge()` is a generic interface for reshaping or resizing an existing object. The most developed method in the package is the `SBF` method, which handles body and swimbladder geometry jointly.
 
 Its most important arguments are:
 
