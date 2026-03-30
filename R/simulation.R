@@ -27,14 +27,6 @@
 .validate_simulation_models <- function(model) {
   # Normalize model aliases and confirm each one is supported ==================
   normalized_model <- .normalize_simulation_models(model)
-  unexpected_model <- model[!(normalized_model %in%
-    .normalize_simulation_models(names(.get_models())))]
-  if (length(unexpected_model) > 0) {
-    stop(
-      "The following user-defined models are not supported by acousticTS: ",
-      paste(unexpected_model, collapse = ", ")
-    )
-  }
 
   normalized_model
 }
@@ -411,9 +403,11 @@ simulate_ts <- function(object,
 #' @keywords internal
 #' @noRd
 .normalize_simulation_models <- function(model) {
-  normalized_model <- tolower(model)
-  normalized_model[normalized_model == "soems"] <- "calibration"
-  normalized_model
+  vapply(
+    .resolve_model_registry_entries(model),
+    function(spec) spec$canonical,
+    character(1)
+  )
 }
 
 #' Run a single simulation for a given parameter grid index

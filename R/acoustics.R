@@ -533,16 +533,14 @@ target_strength <- function(object,
   target_object <- object
   # Capture all arguments including ... ========================================
   shared_args <- list(object = target_object, frequency = frequency, ...)
-  # Resolve the requested target-strength model names ==========================
-  model_names <- .resolve_target_strength_model_names(model)
-  model <- model_names$model
-  ts_model <- model_names$ts_model
+  # Resolve the requested target-strength model registry entries ===============
+  model_specs <- .resolve_target_strength_model_specs(model)
+  model <- vapply(model_specs, function(spec) spec$canonical, character(1))
   model_args <- .normalize_target_strength_model_args(model_args, model)
   # Initialize the requested model families ===================================
   target_object <- .initialize_target_strength_models(
     target_object = target_object,
-    model = model,
-    ts_model = ts_model,
+    model_specs = model_specs,
     shared_args = shared_args,
     model_args = model_args,
     verbose = verbose
@@ -550,26 +548,16 @@ target_strength <- function(object,
   # Run the requested model families ===========================================
   .run_target_strength_models(
     target_object = target_object,
-    model = model,
-    ts_model = ts_model,
+    model_specs = model_specs,
     verbose = verbose
   )
 }
 
-#' Normalize model names and exported solver names for target_strength()
+#' Resolve registered target-strength model entries for target_strength()
 #' @keywords internal
 #' @noRd
-.resolve_target_strength_model_names <- function(model) {
-  # Normalize model labels to the naming used throughout the package ===========
-  model <- tolower(model)
-  ts_model <- gsub("(_.*)", "\\L\\1", paste0(toupper(model)), perl = TRUE)
-  ts_model <- ifelse(
-    ts_model %in% c("CALIBRATION", "HIGH_pass_stanton"),
-    tolower(ts_model),
-    ts_model
-  )
-
-  list(model = model, ts_model = ts_model)
+.resolve_target_strength_model_specs <- function(model) {
+  .resolve_model_registry_entries(model)
 }
 
 #' Build a compact object label for target_strength() status messages
@@ -598,36 +586,29 @@ target_strength <- function(object,
 #' @keywords internal
 #' @noRd
 .initialize_target_strength_models <- function(target_object,
-                                               model,
-                                               ts_model,
+                                               model_specs,
                                                shared_args,
                                                model_args,
                                                verbose = FALSE) {
   # Initialize one model family at a time =====================================
-  for (idx in seq_along(model)) {
-    model_name <- paste0(model[idx], "_initialize")
-
-    if (!exists(model_name)) {
-      stop(
-        "Initialization function ",
-        model_name,
-        " not found for model ",
-        model[idx]
-      )
-    }
-
-    arg_pull <- .merge_target_strength_args(shared_args, model_args[[model[idx]]])
-    true_args <- .filter_shape_args(model_name, arg_pull)
-    object_copy <- do.call(model_name, true_args)
+  for (idx in seq_along(model_specs)) {
+    spec <- model_specs[[idx]]
+    initialize_fun <- .model_registry_initializer(spec)
+    arg_pull <- .merge_target_strength_args(
+      shared_args,
+      model_args[[spec$canonical]]
+    )
+    true_args <- .filter_shape_args(initialize_fun, arg_pull)
+    object_copy <- do.call(initialize_fun, true_args)
     target_object <- .store_target_strength_model_state(
       target_object = target_object,
       object_copy = object_copy,
-      ts_model_name = ts_model[idx]
+      ts_model_name = spec$slot
     )
 
     if (verbose) {
       cat(
-        toupper(model[idx]), "model for",
+        spec$slot, "model for",
         .target_strength_object_label(target_object),
         "initialized.\n\n"
       )
@@ -641,27 +622,24 @@ target_strength <- function(object,
 #' @keywords internal
 #' @noRd
 .run_target_strength_models <- function(target_object,
-                                        model,
-                                        ts_model,
+                                        model_specs,
                                         verbose = FALSE) {
   # Evaluate the requested target-strength models sequentially ================
-  for (idx in seq_along(model)) {
+  for (idx in seq_along(model_specs)) {
+    spec <- model_specs[[idx]]
     if (verbose) {
       cat(
-        "Beginning TS modeling via", toupper(model[idx]),
+        "Beginning TS modeling via", spec$slot,
         "model for", .target_strength_object_label(target_object), "\n"
       )
     }
 
-    if (!exists(ts_model[idx])) {
-      stop("Model function ", ts_model[idx], " not found")
-    }
-
-    target_object <- do.call(ts_model[idx], list(object = target_object))
+    solver_fun <- .model_registry_solver(spec)
+    target_object <- do.call(solver_fun, list(object = target_object))
 
     if (verbose) {
       cat(
-        toupper(model[idx]), "TS model predictions for",
+        spec$slot, "TS model predictions for",
         .target_strength_object_label(target_object),
         "complete.\n\n"
       )
@@ -677,7 +655,11 @@ target_strength <- function(object,
 .normalize_target_strength_model_args <- function(model_args,
                                                   requested_models) {
   # Gather models to validate kwargs ===========================================
-  requested_models <- unique(tolower(requested_models))
+  requested_models <- unique(vapply(
+    .resolve_model_registry_entries(requested_models),
+    function(spec) spec$canonical,
+    character(1)
+  ))
   # Revert to default values ===================================================
   if (is.null(model_args)) {
     out <- vector("list", length(requested_models))
@@ -696,10 +678,14 @@ target_strength <- function(object,
     )
   }
   # Check for argname conflicts ================================================
-  normalized_names <- tolower(model_arg_names)
+  normalized_names <- vapply(
+    model_arg_names,
+    function(name) .resolve_model_registry_entry(name)$canonical,
+    character(1)
+  )
   if (anyDuplicated(normalized_names)) {
     stop(
-      "'model_args' contains duplicate model entries after case normalization.",
+      "'model_args' contains duplicate model entries after model normalization.",
       call. = FALSE
     )
   }

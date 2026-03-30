@@ -3,10 +3,16 @@
 ################################################################################
 
 #' @noRd
-.validation_status_badge <- function(status) {
+.validation_status_badge <- function(status,
+                                     family = NULL,
+                                     tooltip = FALSE) {
   status_map <- list(
     benchmarked = list(css = "established", label = "Benchmarked"),
     validated = list(css = "validated", label = "Validated"),
+    partially_validated = list(
+      css = "partially-validated",
+      label = "Partially validated"
+    ),
     experimental = list(css = "experimental", label = "Experimental"),
     unvalidated = list(css = "unvalidated", label = "Unvalidated")
   )
@@ -16,11 +22,32 @@
     stop("Unknown model status: ", status, call. = FALSE)
   }
 
+  tooltip_attr <- ""
+  if (isTRUE(tooltip) && !is.null(family)) {
+    tooltip_text <- .validation_status_tooltip(family, status)
+    if (length(tooltip_text) == 1L && !is.na(tooltip_text) && nzchar(tooltip_text)) {
+      escaped_tooltip <- .validation_html_escape(tooltip_text)
+      tooltip_attr <- paste0(
+        ' title="', escaped_tooltip,
+        '" data-tooltip="', escaped_tooltip,
+        '" tabindex="0"'
+      )
+    }
+  }
+
   paste0(
-    '<span class="model-tag ', spec$css, '">',
+    '<span class="model-tag ', spec$css, '"', tooltip_attr, '>',
     spec$label,
     "</span>"
   )
+}
+
+#' @noRd
+.validation_html_escape <- function(x) {
+  x <- gsub("&", "&amp;", x, fixed = TRUE)
+  x <- gsub("\"", "&quot;", x, fixed = TRUE)
+  x <- gsub("<", "&lt;", x, fixed = TRUE)
+  gsub(">", "&gt;", x, fixed = TRUE)
 }
 
 #' @noRd
@@ -45,6 +72,16 @@
   }
 
   family
+}
+
+#' @noRd
+.validation_evidence_types <- function() {
+  c("benchmark", "validated", "partially_validated", "experimental")
+}
+
+#' @noRd
+.validation_validation_status_types <- function() {
+  c("validated", "partially_validated", "unvalidated")
 }
 
 #' @noRd
@@ -129,6 +166,24 @@
         "canonical shapes."
       )
     ),
+    # Registry maintenance notes:
+    # - `benchmarked` controls the public `Benchmarked` badge.
+    # - `validation_status` must be exactly one of `validated`,
+    #   `partially_validated`, or `unvalidated`.
+    # - `experimental` controls the separate public `Experimental` badge.
+    # - Update these public badge fields first, then keep the supporting rows
+    #   in `.validation_evidence_registry()` aligned with them.
+    benchmarked = c(
+      TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE,
+      TRUE, TRUE, TRUE, TRUE, TRUE, FALSE,
+      FALSE, FALSE, TRUE
+    ),
+    validation_status = c(
+      "validated", "validated", "validated", "validated",
+      "unvalidated", "unvalidated", "unvalidated",
+      "validated", "validated", "validated", "validated", "unvalidated",
+      "validated", "unvalidated", "validated", "partially_validated"
+    ),
     experimental = c(
       FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE,
       FALSE, FALSE, FALSE, FALSE, FALSE, TRUE,
@@ -140,13 +195,24 @@
 
 #' @noRd
 .validation_evidence_registry <- function() {
+  # Registry maintenance rules:
+  # - `evidence_type` must be exactly one of `benchmark`, `validated`,
+  #   `partially_validated`, or `experimental`.
+  # - `benchmark` means a documented canonical benchmark ladder or stored
+  #   benchmark values.
+  # - `validated` means the current public scope has an external software or
+  #   independent-comparison check.
+  # - `partially_validated` means only part of the public scope has those
+  #   external checks.
+  # - `experimental` means the workflow is public but still provisional.
+  # - `unvalidated` is tracked only in `.validation_family_registry()`.
+  # - Do not add legacy umbrella tags such as `note` or `external`.
   data.frame(
     family = c(
       "sphms", "sphms",
       "fcms", "fcms",
       "psms", "psms",
       "calibration", "calibration",
-      "essms",
       "bcms",
       "ecms",
       "dwba", "dwba",
@@ -154,67 +220,54 @@
       "krm", "krm",
       "hpa", "hpa",
       "trcm",
-      "pcdwba",
+      "pcdwba", "pcdwba",
       "bbfm",
-      "vesm",
-      "tmm", "tmm", "tmm", "tmm"
+      "vesm", "vesm",
+      "tmm", "tmm", "tmm", "tmm", "tmm"
     ),
     evidence_type = c(
-      "benchmark", "external",
-      "benchmark", "external",
-      "benchmark", "external",
-      "benchmark", "external",
-      "note",
-      "note",
-      "note",
-      "benchmark", "external",
-      "benchmark", "external",
-      "benchmark", "external",
-      "benchmark", "external",
+      "benchmark", "validated",
+      "benchmark", "validated",
+      "benchmark", "validated",
+      "benchmark", "validated",
+      "experimental",
+      "experimental",
+      "benchmark", "validated",
+      "benchmark", "validated",
+      "benchmark", "validated",
+      "benchmark", "validated",
       "benchmark",
-      "external",
-      "note",
-      "note",
-      "benchmark", "external", "external", "note"
+      "validated", "experimental",
+      "experimental",
+      "validated", "experimental",
+      "benchmark", "validated", "validated",
+      "partially_validated", "experimental"
     ),
     source = c(
-      # SPHMS
       "benchmark_ts / Jech et al. (2015)", "KRMr and echoSMs",
-      # FCMS
       "benchmark_ts / Jech et al. (2015)", "echoSMs",
-      # PSMS
       "benchmark_ts / Jech et al. (2015)", "Prol_Spheroid",
-      # CAL
       "Published calibration spheres", "echoSMs, sphereTS, NOAA applet",
-      # ESSMS
-      "Jech shell-sphere benchmark family",
-      # BCMS
       "Internal FCMS-based reference reconstruction",
-      # ECMS
       "Independent algebra transcription",
-      # DWBA
       "Jech weakly scattering benchmark ladder",
       "Published and independent DWBA implementations",
-      # SDWBA
       "Published SDWBA weak-scattering ladder",
       "CCAMLR MATLAB and NOAA HTML implementations",
-      # KRM
       "Canonical modal families", "KRMr, echoSMs, NOAA applet",
-      # HPA
       "Jech canonical asymptotic targets",
       "echoSMs HPModel and published algebra",
-      # TRCM
       "Package validation workflow",
-      # PCDWBA
       "ZooScatR and echopop source workflows",
-      # BBFM
+      "Current package workflow surface",
       "Internal DWBA + ECMS reconstruction",
-      # VESM
       "Reference Python VESM workflow",
-      # TTM
-      "SPHMS / PSMS / FCMS benchmark ladder", "BEMPP far-field checks",
+      "Current layered-sphere workflow surface",
+      "SPHMS / PSMS / FCMS benchmark ladder",
+      "BEMPP far-field checks",
       "Exact general-angle spheroidal solution",
-      "Cylinder branch remains guarded"
+      "Cylinder retained-angle scope",
+      "Current retained-state branch matrix"
     ),
     summary = c(
       paste(
@@ -247,17 +300,14 @@
         "applet."
       ),
       paste(
-        "A direct shell-sphere benchmark family exists, but the current",
-        "ESSMS implementation still does not return finite full-grid",
-        "benchmark spectra."
+        "BCMS is currently marked experimental because the documented checks",
+        "are internal coherence reconstructions rather than an external",
+        "benchmark or software-comparison ladder."
       ),
       paste(
-        "Current BCMS checks are internal coherence reconstructions; the",
-        "family does not yet have an external benchmark or software ladder."
-      ),
-      paste(
-        "Current ECMS checks are independent algebra reconstructions",
-        "rather than a documented external benchmark ladder."
+        "ECMS is currently marked experimental because the documented checks",
+        "are independent algebra reconstructions rather than an external",
+        "benchmark or software-comparison ladder."
       ),
       paste(
         "Benchmarked against the canonical weakly scattering targets",
@@ -298,13 +348,22 @@
         "workflows."
       ),
       paste(
-        "BBFM currently has documented internal reconstruction checks",
-        "but no external benchmark ladder or independent public",
-        "implementation comparison."
+        "PCDWBA is currently marked experimental because the public package",
+        "workflow is still being tightened even though the current source-",
+        "level comparison cases are documented."
+      ),
+      paste(
+        "BBFM is currently marked experimental because it has documented",
+        "internal reconstruction checks but no external benchmark ladder or",
+        "independent public implementation comparison."
       ),
       paste(
         "Validated against the reference Python VESM implementation on",
         "the documented layered-sphere case."
+      ),
+      paste(
+        "VESM is currently marked experimental because the documented public",
+        "workflow is still limited to the current layered-sphere scope."
       ),
       paste(
         "Benchmarked against `SPHMS`, `PSMS`, and `FCMS` on the",
@@ -319,9 +378,14 @@
         "exact general-angle spheroidal solution."
       ),
       paste(
-        "The cylinder branch is benchmark-matched only for the exact",
-        "monostatic workflow; retained general-angle cylinder products",
-        "remain outside the validated public scope."
+        "TMM is partially validated because the sphere, oblate, and prolate",
+        "branches have external checks, but retained general-angle cylinder",
+        "products remain outside the validated public scope."
+      ),
+      paste(
+        "TMM is currently marked experimental because the retained-state",
+        "workflow and branch matrix are still guarded while shape-specific",
+        "support continues to be tightened."
       )
     ),
     scope = c(
@@ -336,10 +400,6 @@
       "Liquid-filled and gas-filled prolate-spheroid software comparisons.",
       "Tungsten-carbide and copper calibration spheres.",
       "Shared calibration-sphere material sets and frequency sweeps.",
-      paste(
-        "Layered shell-sphere benchmark status only; not yet",
-        "benchmark-grade agreement."
-      ),
       "Uniform-curvature cylinder coherence extension of FCMS.",
       paste(
         "Elastic-cylinder component family and near-broadside",
@@ -370,15 +430,18 @@
         "Curved weak-scattering reference workflows on shared",
         "bent-body cases."
       ),
+      "Current package-facing PCDWBA workflow and argument surface.",
       "Internal composite-component consistency checks only.",
       paste(
         "Documented spherical layered case used by the original",
         "VESM implementation."
       ),
+      "Current documented layered-sphere workflow surface.",
       "Sphere, oblate, prolate, and guarded cylinder monostatic branches.",
       "Pressure-release angular slices for sphere, oblate, and prolate cases.",
       "General-angle prolate retained-state validation.",
-      "Cylinder retained-angle scope limitation and guardrails."
+      "Cylinder retained-angle scope limitation and guardrails.",
+      "Current retained-state branch matrix across supported shapes."
     ),
     stringsAsFactors = FALSE
   )
@@ -416,34 +479,47 @@
 .validation_family_status <- function(family) {
   family <- .validation_normalize_family(family)
   meta <- .validation_family_meta(family)
-  evidence <- .validation_family_evidence(family)
+  validation_status <- meta$validation_status[[1]]
+  valid_validation_status <- .validation_validation_status_types()
+
+  if (!validation_status %in% valid_validation_status) {
+    stop(
+      "Unknown validation status for family '", family, "': ",
+      validation_status,
+      call. = FALSE
+    )
+  }
 
   status <- character()
 
-  if (any(evidence$evidence_type == "benchmark")) {
+  if (isTRUE(meta$benchmarked[[1]])) {
     status <- c(status, "benchmarked")
   }
-  if (any(evidence$evidence_type == "external")) {
-    status <- c(status, "validated")
-  }
-  if (isTRUE(meta$experimental)) {
+
+  status <- c(status, validation_status)
+
+  if (isTRUE(meta$experimental[[1]])) {
     status <- c(status, "experimental")
   }
-  if (!any(evidence$evidence_type %in% c("benchmark", "external"))) {
-    status <- c(status, "unvalidated")
-  }
 
-  status
+  unique(status)
 }
 
 #' @noRd
 .validation_family_validation <- function(family) {
+  meta <- .validation_family_meta(family)
   evidence <- .validation_family_evidence(
     family,
-    type = c("benchmark", "external", "note")
+    type = .validation_evidence_types()
   )
 
   if (nrow(evidence) == 0) {
+    if (identical(meta$validation_status[[1]], "unvalidated")) {
+      return(
+        "The package does not yet claim external validation across the current public scope."
+      )
+    }
+
     character()
   } else {
     evidence$summary
@@ -451,51 +527,90 @@
 }
 
 #' @noRd
+.validation_status_tooltip <- function(family, status) {
+  family <- .validation_normalize_family(family)
+
+  status_type <- c(
+    benchmarked = "benchmark",
+    validated = "validated",
+    partially_validated = "partially_validated",
+    experimental = "experimental",
+    unvalidated = "unvalidated"
+  )[[status]]
+
+  if (is.null(status_type)) {
+    stop("Unknown model status: ", status, call. = FALSE)
+  }
+
+  if (identical(status_type, "unvalidated")) {
+    return(
+      "The package does not yet claim external validation across the current public scope."
+    )
+  }
+
+  evidence <- .validation_family_evidence(family, type = status_type)
+  if (nrow(evidence) == 0) {
+    return("")
+  }
+
+  paste(unique(evidence$summary), collapse = " ")
+}
+
+#' @noRd
 .validation_status_policy <- function() {
   badge <- function(x) .validation_status_badge(x)
 
-  sections <- c(
-    paste(
-      "Status tags are derived from the package's internal validation",
-      "registry and used conservatively:"
+  out <- paste(
+    c(
+      '<div class="validation-status-policy">',
+      "<ul>",
+      paste0(
+        "<li>", badge("benchmarked"),
+        " means the family has a documented comparison against a canonical",
+        " benchmark ladder or stored benchmark values.</li>"
+      ),
+      paste0(
+        "<li>", badge("validated"),
+        " means the currently supported public scope has a documented",
+        " external software or independent-comparison check.</li>"
+      ),
+      paste0(
+        "<li>", badge("partially_validated"),
+        " means some supported branches are externally checked, but the",
+        " full public scope is not yet closed.</li>"
+      ),
+      paste0(
+        "<li>", badge("unvalidated"),
+        " means the package does not yet claim external validation across",
+        " the current public scope.</li>"
+      ),
+      paste0(
+        "<li>", badge("experimental"),
+        " means the family is available to use, but its interface or",
+        " supported workflow should still be treated as provisional.</li>"
+      ),
+      "</ul>",
+      "<p>These tags are intended to be read in three pieces:</p>",
+      "<ul>",
+      paste(
+        "<li><code>Benchmarked</code> is independent of the validation badge",
+        "and can appear alongside <code>Validated</code>,",
+        "<code>Partially validated</code>, or <code>Unvalidated</code>.</li>"
+      ),
+      paste(
+        "<li>The validation badge is always exactly one of",
+        "<code>Validated</code>, <code>Partially validated</code>, or",
+        "<code>Unvalidated</code>.</li>"
+      ),
+      paste(
+        "<li><code>Experimental</code> is a separate lifecycle tag and can",
+        "coexist with any benchmark or validation badge.</li>"
+      ),
+      "</ul>",
+      "</div>"
     ),
-    paste0(
-      "- ", badge("benchmarked"),
-      " means the family has a documented comparison against a canonical ",
-      "benchmark ladder or stored benchmark values."
-    ),
-    paste0(
-      "- ", badge("validated"),
-      " means the family has a documented comparison against at least one ",
-      "external implementation or software package."
-    ),
-    paste0(
-      "- ", badge("experimental"),
-      " means the family is available to use, but its interface or ",
-      "validation scope should still be treated as provisional."
-    ),
-    paste0(
-      "- ", badge("unvalidated"),
-      " means the package site does not yet document either benchmark ",
-      "evidence or an external implementation comparison for that family."
-    ),
-    "",
-    "These statuses are not all mutually exclusive:",
-    paste(
-      "- `Benchmarked` and `Validated` are evidence tags and can",
-      "appear together."
-    ),
-    paste(
-      "- `Experimental` is a lifecycle tag and can coexist with",
-      "either evidence tag."
-    ),
-    paste(
-      "- `Unvalidated` is reserved for families lacking both evidence",
-      "tags, so it should not be combined with other evidence tags."
-    )
+    collapse = "\n"
   )
-
-  out <- paste(sections, collapse = "\n")
 
   if (requireNamespace("knitr", quietly = TRUE)) {
     knitr::asis_output(paste0(out, "\n"))
@@ -531,15 +646,12 @@
 }
 
 #' @noRd
-.validation_evidence_table <- function(type = c("benchmark", "external"),
-                                       include_notes = FALSE) {
+.validation_evidence_table <- function(
+  type = c("benchmark", "validated", "partially_validated", "experimental")
+) {
   evidence <- .validation_evidence_registry()
   type <- match.arg(type, several.ok = TRUE)
-
-  keep_types <- unique(c(type, if (include_notes) "note"))
-  evidence <- evidence[evidence$evidence_type %in% keep_types, ,
-    drop = FALSE
-  ]
+  evidence <- evidence[evidence$evidence_type %in% type, , drop = FALSE]
 
   families <- .validation_family_registry()[, c("family", "display"),
     drop = FALSE
@@ -549,7 +661,12 @@
     sort = FALSE
   )
 
-  evidence_type_order <- c(benchmark = 1L, external = 2L, note = 3L)
+  evidence_type_order <- c(
+    benchmark = 1L,
+    validated = 2L,
+    partially_validated = 3L,
+    experimental = 4L
+  )
   evidence <- evidence[order(
     match(evidence$family, .validation_family_registry()$family),
     evidence_type_order[evidence$evidence_type]
@@ -593,7 +710,9 @@
       display <- rows$display[[i]]
       status <- .validation_family_status(family)
       status_markup <- paste(
-        vapply(status, .validation_status_badge, character(1)),
+        vapply(status, function(x) {
+          .validation_status_badge(x, family = family, tooltip = TRUE)
+        }, character(1)),
         collapse = " "
       )
 
@@ -625,10 +744,9 @@
   labels <- c(
     benchmark = "Benchmarked",
     benchmarked = "Benchmarked",
-    external = "Validated",
     validated = "Validated",
+    partially_validated = "Partially validated",
     experimental = "Experimental",
-    note = "Note",
     unvalidated = "Unvalidated"
   )
 

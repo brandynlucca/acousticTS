@@ -112,16 +112,16 @@
 #' @export
 Smn <- function(m, n, c, eta, normalize = FALSE, precision = "double") {
   # Validation =================================================================
-  if (!is.numeric(n) || !all(n %% 1 == 0)) {
+  if (!is.numeric(n) || !all(is.finite(n)) || !all(n %% 1 == 0)) {
     stop("'n' must be a real integer, or a vector of real integers.")
   }
-  if (!is.numeric(m) || !all(m %% 1 == 0)) {
+  if (!is.numeric(m) || !all(is.finite(m)) || !all(m %% 1 == 0)) {
     stop("'m' must be a real integer, or a vector of real integers.")
   }
-  if (!is.numeric(eta)) {
+  if (!is.numeric(eta) || !all(is.finite(eta))) {
     stop("'eta' must be a real number, or a vector of real numbers.")
   }
-  if (!is.numeric(c) || length(c) > 1) {
+  if (!is.numeric(c) || length(c) > 1 || !is.finite(c)) {
     stop("'c' must be a single, real number.")
   }
   if (!precision %in% c("double", "quad")) {
@@ -264,16 +264,16 @@ Smn <- function(m, n, c, eta, normalize = FALSE, precision = "double") {
 #' @export
 Rmn <- function(m, n, c, xi, kind = 1, precision = "double") {
   # Validation =================================================================
-  if (!is.numeric(n) || !all(n %% 1 == 0)) {
+  if (!is.numeric(n) || !all(is.finite(n)) || !all(n %% 1 == 0)) {
     stop("'n' must be a real integer, or a vector of real integers.")
   }
-  if (!is.numeric(m) || !all(m %% 1 == 0)) {
+  if (!is.numeric(m) || !all(is.finite(m)) || !all(m %% 1 == 0)) {
     stop("'m' must be a real integer, or a vector of real integers.")
   }
-  if (!is.numeric(c) || length(c) > 1) {
+  if (!is.numeric(c) || length(c) > 1 || !is.finite(c)) {
     stop("'c' must be a single, real number.")
   }
-  if (!is.numeric(xi) || length(xi) > 1) {
+  if (!is.numeric(xi) || length(xi) > 1 || !is.finite(xi)) {
     stop("'xi' must be a single, real number.")
   }
   if (!precision %in% c("double", "quad")) {

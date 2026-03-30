@@ -1086,8 +1086,10 @@ ess_generate <- function(shape = NULL,
       }
       if (radius_missing && missing_arg("length_radius_ratio")) {
         stop_missing(
-          "Prolate spheroid requires 'radius_body', 'semiminor_length', or ",
-          "'length_radius_ratio'."
+          paste0(
+            "Prolate spheroid requires 'radius_body', 'semiminor_length', or ",
+            "'length_radius_ratio'."
+          )
         )
       }
     },
@@ -1103,8 +1105,10 @@ ess_generate <- function(shape = NULL,
       }
       if (radius_missing && missing_arg("length_radius_ratio")) {
         stop_missing(
-          "Oblate spheroid requires 'radius_body', 'semimajor_length', or ",
-          "'length_radius_ratio'."
+          paste0(
+            "Oblate spheroid requires 'radius_body', 'semimajor_length', or ",
+            "'length_radius_ratio'."
+          )
         )
       }
     },
