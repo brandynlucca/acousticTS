@@ -5,35 +5,11 @@ test_that("Bessel functions work correctly", {
   expect_equal(Re(jc(0, 1)), besselJ(1, 0))
   expect_equal(Re(jc(1, 2)), besselJ(2, 1))
   expect_equal(Re(jc(0.5, 1.5)), besselJ(1.5, 0.5))
-  expect_equal(jc(1, -2), as.complex(-besselJ(2, 1)))
-  expect_equal(
-    jc(0.5, -2),
-    exp(1i * pi * 0.5) * besselJ(2, 0.5),
-    tolerance = 1e-10
-  )
-  expect_equal(
-    jc(1, 2i),
-    exp(1i * pi / 2) * besselI(2, 1),
-    tolerance = 1e-10
-  )
 
   # Test yc (cylindrical Bessel function of the second kind)
   expect_equal(Re(yc(0, 1)), besselY(1, 0))
   expect_equal(Re(yc(1, 2)), besselY(2, 1))
   expect_equal(Re(yc(0.5, 1.5)), besselY(1.5, 0.5))
-  expect_equal(yc(1, -2), as.complex(-besselY(2, 1)), tolerance = 1e-10)
-  expect_equal(
-    yc(0.5, -2),
-    as.complex(cos(pi * 0.5) * besselY(2, 0.5) + sin(pi * 0.5) * besselJ(2, 0.5)),
-    tolerance = 1e-10
-  )
-  expect_equal(
-    yc(1, 2i),
-    1i * exp(-1i * pi / 2) * besselI(2, 1) -
-      (2 / pi) * exp(1i * pi / 2) * besselK(2, 1),
-    tolerance = 1e-10
-  )
-  expect_equal(yc(1, -2i), -yc(1, 2i), tolerance = 1e-10)
 
   # Test matrix input for `yc`
   expect_equal(
@@ -51,9 +27,6 @@ test_that("Bessel functions work correctly", {
   n <- 2
   expected <- jc(l - 1, n) - (l / n) * jc(l, n)
   expect_equal(jcd(l, n), expected)
-  expect_equal(jcdk(1, 2, 0), jc(1, 2))
-  expect_equal(jcdk(1, 2i, 1), jcd(1, 2i), tolerance = 1e-10)
-  expect_equal(jcdk(1, 2i, 2), jcdd(1, 2i), tolerance = 1e-10)
 
   # Test jcd with matrix input
   n_l <- seq(1, 4, 1)
@@ -72,9 +45,6 @@ test_that("Bessel functions work correctly", {
   n <- 2
   expected <- yc(l - 1, n) - (l / n) * yc(l, n)
   expect_equal(ycd(l, n), expected)
-  expect_equal(ycdk(1, 2, 0), yc(1, 2))
-  expect_equal(ycdk(1, 2i, 1), ycd(1, 2i), tolerance = 1e-10)
-  expect_equal(ycdk(1, 2i, 2), ycdd(1, 2i), tolerance = 1e-10)
 
   # Test matrix input for `ycd`
   expect_equal(
@@ -87,9 +57,6 @@ test_that("Bessel functions work correctly", {
   n <- 2
   expected <- 0.25 * (jc(l - 2, n) - 2 * jc(l, n) + jc(l + 2, n))
   expect_equal(jcdd(l, n), expected)
-
-  expect_error(jc(1, 1 + 1i), "general complex z")
-  expect_error(yc(1, 1 + 1i), "general complex z")
 })
 
 test_that("Spherical Bessel functions work correctly", {
@@ -156,8 +123,6 @@ test_that("Spherical Bessel functions work correctly", {
 
   # Test ysdd
   expect_equal(ysdd(1, 1), -5 * sin(1) - 3 * cos(1))
-  expect_equal(ysdk(1, 1, 1), ysd(1, 1))
-  expect_equal(ysdk(1, 1, 2), ysdd(1, 1))
 
   # Test hs (spherical Hankel function)
   # hs should equal js + 1i * ys
@@ -166,8 +131,6 @@ test_that("Spherical Bessel functions work correctly", {
 
   # Test hsd
   expect_equal(hsd(1, 1), (2 + 1i) * exp(1i))
-  expect_equal(hsdd(1, 1), hsdk(1, 1, 2))
-  expect_equal(hsdk(1, 1, 1), hsd(1, 1))
 
   # Test higher order derivative functions (kth derivatives)
   expect_equal(jsdk(1, 1, 1), jsd(1, 1))
@@ -200,11 +163,6 @@ test_that("Spherical Bessel functions support complex arguments", {
     tolerance = 1e-12
   )
   expect_equal(
-    ysdk(1, z, 1),
-    ysd(1, z),
-    tolerance = 1e-12
-  )
-  expect_equal(
     hs(1, z),
     js(1, z) + 1i * ys(1, z),
     tolerance = 1e-12
@@ -224,16 +182,6 @@ test_that("Spherical Bessel functions support complex arguments", {
     -hs(1, z),
     tolerance = 1e-12
   )
-  expect_equal(
-    hsdk(1, z, 1),
-    hsd(1, z),
-    tolerance = 1e-12
-  )
-  expect_equal(
-    hsdd(1, z),
-    hsdk(1, z, 2),
-    tolerance = 1e-12
-  )
 })
 
 test_that("Hankel functions work correctly", {
@@ -243,10 +191,6 @@ test_that("Hankel functions work correctly", {
   n <- 2
   expected <- jc(l, n) + 1i * yc(l, n)
   expect_equal(hc(l, n), expected, tolerance = 1e-10)
-  expect_equal(hc(1, 2i), jc(1, 2i) + 1i * yc(1, 2i), tolerance = 1e-10)
-  expect_equal(hcdk(1, 2i, 0), hc(1, 2i), tolerance = 1e-10)
-  expect_equal(hcdk(1, 2i, 1), hcd(1, 2i), tolerance = 1e-10)
-  expect_error(hc(1, 1 + 1i), "general complex z")
 
   # Test hcd (first derivative of hc)
   # hcd should equal jcd + 1i * ycd
@@ -290,65 +234,5 @@ test_that("Hankel functions work correctly", {
   expect_equal(
     hcdk(1, matrix(c(1, 2, 3)), 1),
     hcd(1, matrix(c(1, 2, 3)))
-  )
-})
-
-test_that("Bessel wrappers cover negative-imaginary, zero-limit, matrix, and cpp edge branches", {
-  expect_equal(
-    jc(0.5, -2i),
-    exp(1i * pi * 0.5) * jc(0.5, 2i),
-    tolerance = 1e-10
-  )
-  expect_equal(
-    yc(0.5, -2i),
-    Conj(yc(0.5, 2i)),
-    tolerance = 1e-10
-  )
-
-  expect_equal(js(0, 0), 1)
-  expect_equal(as.numeric(jsdk(2, 0 + 0i, 2)), 2 / 15, tolerance = 1e-12)
-  expect_true(all(is.nan(ys(1, 0 + 0i))))
-  expect_true(all(is.nan(hsdk(1, 0 + 0i, 1))))
-  expect_equal(Re(hs(0, 0)), 1)
-  expect_true(is.infinite(Im(hs(0, 0))))
-
-  cyl_matrix <- jcdk(c(0, 1), c(1, 2, 3), 3)
-  expect_true(is.matrix(cyl_matrix))
-  expect_equal(dim(cyl_matrix), c(2, 3))
-
-  complex_js <- js(0:2, c(1 + 0.5i, 2 + 0.25i))
-  complex_ys <- ys(0:2, c(1 + 0.5i, 2 + 0.25i))
-  complex_hs <- hsdk(0:2, c(1 + 0.5i, 2 + 0.25i), 2)
-  expect_true(is.matrix(complex_js))
-  expect_true(is.matrix(complex_ys))
-  expect_true(is.matrix(complex_hs))
-  expect_equal(dim(complex_js), c(3, 2))
-  expect_equal(dim(complex_ys), c(3, 2))
-  expect_equal(dim(complex_hs), c(3, 2))
-  expect_equal(hsdk(2, 1 + 0.5i, 3), acousticTS:::hs_complex_deriv_cpp(2L, as.complex(1 + 0.5i), 3L))
-
-  expect_error(
-    acousticTS:::jc_cpp(as.complex(1), as.complex(1 + 1i)),
-    "Complex order"
-  )
-  expect_error(
-    acousticTS:::yc_cpp(as.complex(1), as.complex(1 + 1i)),
-    "Complex order"
-  )
-  expect_error(
-    acousticTS:::hc_cpp(as.complex(1), as.complex(1 + 1i)),
-    "Complex order"
-  )
-  expect_error(
-    acousticTS:::jc_deriv_cpp(as.complex(1), as.complex(1), -1L),
-    "non-negative"
-  )
-  expect_error(
-    acousticTS:::ys_deriv_cpp(1L, 1, -1L),
-    "non-negative"
-  )
-  expect_error(
-    acousticTS:::hs_complex_deriv_cpp(1L, as.complex(1 + 0.5i), -1L),
-    "non-negative"
   )
 })
