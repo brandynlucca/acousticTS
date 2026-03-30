@@ -22,6 +22,17 @@ test_that("Simple acoustic utility functions work as intended", {
     tolerance = 1e-10
   )
 
+  # Test compressibility
+  medium <- data.frame(sound_speed = 1500, density = 1026)
+  target <- data.frame(sound_speed = 1400, density = 1010)
+  K1 <- 1 / (medium$density * medium$sound_speed^2)
+  K2 <- 1 / (target$density * target$sound_speed^2)
+  expect_equal(
+    compressibility(medium, target),
+    (K2 - K1) / K1,
+    tolerance = 1e-10
+  )
+
   # Test pois
   # ---- Case: K & E
   expect_equal(pois(K = 1, E = 1), 1 / 3)

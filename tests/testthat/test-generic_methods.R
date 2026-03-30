@@ -197,6 +197,50 @@ test_that("Model plotting works for computed scatterer objects", {
   }), NA)
 })
 
+test_that("Specialized model plotting helpers cover calibration, gas, SBF, and BBF branches", {
+  suppressPlot <- function(expr) {
+    pdf(NULL)
+    on.exit(dev.off())
+    invisible(force(expr))
+  }
+
+  expect_error(
+    {
+      pdf(NULL)
+      on.exit(dev.off(), add = TRUE)
+      plot(cal_generate(), type = "model")
+    },
+    "no model results detected in object"
+  )
+
+  cal_obj <- target_strength(
+    cal_generate(),
+    frequency = c(38000, 70000),
+    model = "calibration"
+  )
+  expect_error(suppressPlot({
+    plot(cal_obj, type = "model", x_units = "frequency")
+    plot(cal_obj, type = "model", x_units = "k_sw")
+    plot(cal_obj, type = "model", x_units = "k_l")
+    plot(cal_obj, type = "model", x_units = "k_t")
+  }), NA)
+
+  gas_obj <- target_strength(
+    gas_generate(shape = sphere(radius_body = 1e-3, n_segments = 80)),
+    frequency = c(38000, 70000),
+    model = "sphms"
+  )
+  expect_error(suppressPlot(plot(gas_obj, type = "model")), NA)
+
+  data(sardine, package = "acousticTS")
+  sardine_obj <- target_strength(sardine, frequency = 38000, model = "krm")
+  expect_error(suppressPlot(plot(sardine_obj, type = "model")), NA)
+
+  data(cod, package = "acousticTS")
+  cod_obj <- target_strength(cod, frequency = 38000, model = "krm")
+  expect_error(suppressPlot(plot(cod_obj, type = "model")), NA)
+})
+
 test_that("Extract method works for scatterer objects", {
   # Test extract method for metadata
   cal_obj <- cal_generate()

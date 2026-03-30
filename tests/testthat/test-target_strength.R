@@ -317,13 +317,13 @@ test_that("Expected error states for target_strength", {
   # Test invalid 'model'
   expect_error(
     target_strength(object = krill, frequency = 120e3, model = "invalid"),
-    "Initialization function invalid_initialize not found for model invalid"
+    "Unknown target strength model 'invalid'"
   )
 
   # Test missing initialize-model function pairing
   expect_error(
     target_strength(object = krill, frequency = 120e3, model = "spoof"),
-    "Initialization function spoof_initialize not found for model spoof|Model function SPOOF not found"
+    "Unknown target strength model 'spoof'"
   )
 
   expect_error(

@@ -882,3 +882,86 @@ test_that("`reforge('SBF')` correctly updates body shape", {
     )
   )
 })
+
+test_that("`reforge()` covers GAS, CAL, and ESS resize methods", {
+  gas_obj <- gas_generate(
+    shape = sphere(radius_body = 0.01, n_segments = 40),
+    density_fluid = 1.24,
+    sound_speed_fluid = 345
+  )
+  gas_reforged <- reforge(gas_obj, radius_target = 0.02, n_segments = 20)
+  expect_equal(max(extract(gas_reforged, "shape_parameters")$radius), 0.02, tolerance = 1e-12)
+  expect_equal(max(extract(gas_reforged, "body")$radius), 0.02, tolerance = 1e-12)
+  expect_equal(extract(gas_reforged, "shape_parameters")$n_segments, 20)
+  expect_equal(nrow(extract(gas_reforged, "body")$rpos), 21)
+  expect_error(reforge(gas_obj), "Must specify at least one")
+  expect_error(reforge(gas_obj, scale = 2, radius_target = 0.02), "Specify only one")
+  expect_error(reforge(gas_obj, scale = -1), "'scale' must be a single positive number")
+  expect_error(
+    reforge(gas_obj, radius_target = -0.02),
+    "'radius_target' must be a single positive number"
+  )
+  expect_error(
+    reforge(gas_obj, n_segments = 0),
+    "'n_segments' must be a single positive integer"
+  )
+
+  cal_obj <- cal_generate(diameter = 38.1e-3, n_segments = 60)
+  cal_reforged <- reforge(cal_obj, diameter_target = 0.05, n_segments = 30)
+  expect_equal(extract(cal_reforged, "shape_parameters")$diameter, 0.05, tolerance = 1e-12)
+  expect_equal(extract(cal_reforged, "body")$diameter, 0.05, tolerance = 1e-12)
+  expect_equal(extract(cal_reforged, "shape_parameters")$n_segments, 30)
+  expect_equal(nrow(extract(cal_reforged, "body")$rpos), 31)
+  expect_error(reforge(cal_obj), "Must specify at least one")
+  expect_error(reforge(cal_obj, scale = 2, diameter_target = 0.05), "Specify only one")
+  expect_error(reforge(cal_obj, scale = -1), "'scale' must be a single positive number")
+  expect_error(
+    reforge(cal_obj, diameter_target = -0.05),
+    "'diameter_target' must be a single positive number"
+  )
+  expect_error(
+    reforge(cal_obj, n_segments = 0),
+    "'n_segments' must be a single positive integer"
+  )
+
+  ess_obj <- fixture_sphere("shelled_liquid")
+  ess_reforged <- reforge(
+    ess_obj,
+    radius_target = 0.015,
+    shell_thickness = 0.002,
+    n_segments = 20
+  )
+  ess_shape <- extract(ess_reforged, "shape_parameters")
+  expect_equal(max(ess_shape$shell$radius), 0.015, tolerance = 1e-12)
+  expect_equal(max(ess_shape$fluid$radius), 0.013, tolerance = 1e-12)
+  expect_equal(extract(ess_reforged, "shell")$shell_thickness, 0.002, tolerance = 1e-12)
+  expect_equal(ess_shape$n_segments, 20)
+  expect_equal(nrow(extract(ess_reforged, "shell")$rpos), 21)
+  expect_equal(nrow(extract(ess_reforged, "fluid")$rpos), 21)
+  expect_error(reforge(ess_obj), "Must specify at least one")
+  expect_error(reforge(ess_obj, scale = 2, radius_target = 0.015), "Specify only one")
+  expect_error(reforge(ess_obj, scale = -1), "'scale' must be a single positive number")
+  expect_error(
+    reforge(ess_obj, radius_target = -0.015),
+    "'radius_target' must be a single positive number"
+  )
+  expect_error(
+    reforge(ess_obj, shell_thickness = -0.002),
+    "'shell_thickness' must be a single positive number"
+  )
+  expect_error(
+    reforge(ess_obj, n_segments = 0),
+    "'n_segments' must be a single positive integer"
+  )
+  expect_error(
+    reforge(ess_obj, shell_thickness = 1),
+    "shell_thickness exceeds shell radius"
+  )
+
+  ess_thickness_only <- reforge(ess_obj, shell_thickness = 0.0015)
+  expect_equal(
+    max(extract(ess_thickness_only, "shape_parameters")$fluid$radius),
+    max(extract(ess_thickness_only, "shape_parameters")$shell$radius) - 0.0015,
+    tolerance = 1e-12
+  )
+})

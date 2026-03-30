@@ -319,7 +319,7 @@ test_that("simulate_ts validates inputs correctly", {
   # Test invalid model
   expect_error(
     simulate_ts(krill, frequency, "invalid_model", 5, parameters),
-    "not supported"
+    "Unknown target strength model 'invalid_model'"
   )
 
   # Test missing batch_by parameter
@@ -525,4 +525,129 @@ test_that("Simulation errors are raised as expected", {
     ),
     "Batch parameter 'length' function must return at least 1 valid value."
   )
+})
+
+test_that("simulation helper utilities print headers and prepare optional clusters", {
+  skip_on_cran()
+
+  cal_obj <- cal_generate()
+  simulation_grid <- data.frame(realization = 1:2)
+
+  header <- capture.output(
+    acousticTS:::.print_simulation_header(
+      object = cal_obj,
+      model = "calibration",
+      batch_by = NULL,
+      parameters = list(length = 0.02),
+      parallel = FALSE,
+      simulation_grid = simulation_grid
+    )
+  )
+  expect_true(any(grepl("Scatterer-class: CAL", header, fixed = TRUE)))
+  expect_true(any(grepl("Total simulation realizations: 2", header, fixed = TRUE)))
+
+  sequential <- capture.output(
+    cluster <- acousticTS:::.prepare_simulation_cluster(
+      parallel = FALSE,
+      n_cores = 2,
+      object = cal_obj,
+      frequency = 38000,
+      normalized_model = "calibration",
+      simulation_grid = simulation_grid,
+      verbose = TRUE
+    )
+  )
+  expect_null(cluster)
+  expect_true(any(grepl("Preparing sequential simulations", sequential, fixed = TRUE)))
+
+  parallel_out <- capture.output(
+    cluster <- acousticTS:::.prepare_simulation_cluster(
+      parallel = TRUE,
+      n_cores = 2,
+      object = cal_obj,
+      frequency = 38000,
+      normalized_model = "calibration",
+      simulation_grid = simulation_grid,
+      verbose = TRUE
+    )
+  )
+  on.exit(parallel::stopCluster(cluster), add = TRUE)
+
+  expect_s3_class(cluster, "cluster")
+  expect_true(any(grepl("Preparing parallelized simulations", parallel_out, fixed = TRUE)))
+})
+
+test_that("simulation helper utilities are exercised under coverage runs", {
+  cal_obj <- cal_generate()
+  simulation_grid <- data.frame(realization = 1:2)
+
+  header <- capture.output(
+    acousticTS:::.print_simulation_header(
+      object = cal_obj,
+      model = "calibration",
+      batch_by = "length",
+      parameters = list(length = 0.02),
+      parallel = FALSE,
+      simulation_grid = simulation_grid
+    )
+  )
+  expect_true(any(grepl("Batching parameter(s): length", header, fixed = TRUE)))
+
+  sequential <- capture.output(
+    cluster <- acousticTS:::.prepare_simulation_cluster(
+      parallel = FALSE,
+      n_cores = 2,
+      object = cal_obj,
+      frequency = 38000,
+      normalized_model = "calibration",
+      simulation_grid = simulation_grid,
+      verbose = TRUE
+    )
+  )
+  expect_null(cluster)
+  expect_true(any(grepl("Preparing sequential simulations", sequential, fixed = TRUE)))
+
+  parallel_out <- capture.output(
+    cluster <- acousticTS:::.prepare_simulation_cluster(
+      parallel = TRUE,
+      n_cores = 2,
+      object = cal_obj,
+      frequency = 38000,
+      normalized_model = "calibration",
+      simulation_grid = simulation_grid,
+      verbose = TRUE
+    )
+  )
+  on.exit(parallel::stopCluster(cluster), add = TRUE)
+
+  expect_s3_class(cluster, "cluster")
+  expect_true(any(grepl("Preparing parallelized simulations", parallel_out, fixed = TRUE)))
+})
+
+test_that("simulation helpers cover scalar batch values, empty combines, and verbose sequential execution", {
+  expect_equal(
+    acousticTS:::.prepare_simulation_batch_values(
+      batch_by = c("length", "density_body"),
+      parameters = list(length = c(0.02, 0.03), density_body = 1028.9)
+    ),
+    list(length = c(0.02, 0.03), density_body = 1028.9)
+  )
+  expect_null(acousticTS:::.combine_simulation_results(list()))
+
+  cal_obj <- cal_generate()
+  verbose_run <- capture.output(
+    result <- simulate_ts(
+      object = cal_obj,
+      frequency = 38e3,
+      model = "calibration",
+      n_realizations = 1,
+      parameters = list(),
+      parallel = FALSE,
+      verbose = TRUE
+    )
+  )
+  expect_true(is.list(result))
+  expect_s3_class(result$calibration, "data.frame")
+  expect_true(any(grepl("Scatterer-class: CAL", verbose_run, fixed = TRUE)))
+  expect_true(any(grepl("Simulations complete!", verbose_run, fixed = TRUE)))
 })
