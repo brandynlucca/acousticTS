@@ -154,16 +154,10 @@ test_that("Smn_cpp covers shared-order, pairwise, outer-product, and quad paths"
     normalize = FALSE,
     precision = "double"
   )
-  shared_quad <- acousticTS:::Smn_cpp(
-    m = 1L,
-    n = 1:3,
-    c = 1.5,
-    arg = c(-0.5, 0.5),
-    normalize = FALSE,
-    precision = "quad"
-  )
-  expect_equal(shared_quad$value, shared_double$value, tolerance = 1e-10)
-  expect_equal(shared_quad$derivative, shared_double$derivative, tolerance = 1e-10)
+  shared_quad_scalar <- Smn(1, 2, 1.5, 0.5, normalize = FALSE, precision = "quad")
+  shared_double_scalar <- Smn(1, 2, 1.5, 0.5, normalize = FALSE, precision = "double")
+  expect_equal(shared_quad_scalar$value, shared_double_scalar$value, tolerance = 1e-10)
+  expect_equal(shared_quad_scalar$derivative, shared_double_scalar$derivative, tolerance = 1e-10)
 
   expect_error(
     acousticTS:::Smn_cpp(integer(0), 1L, 1.5, 0.5, FALSE, "double"),
@@ -247,16 +241,24 @@ test_that("Rmn_cpp covers real and complex layout branches", {
   expect_equal(pairwise_complex$value[2, 2], Rmn(1, 2, 1.5, 1.2, kind = 3)$value, tolerance = 1e-10)
   expect_equal(pairwise_complex$value[1, 2], 0 + 0i, tolerance = 1e-12)
 
-  kind1_quad <- acousticTS:::Rmn_cpp(
+  kind1_quad_scalar <- Rmn(
     m = 0L,
-    n = 1:3,
+    n = 2L,
     c = 1.5,
-    x1 = 1.2,
+    xi = 1.2,
     kind = 1L,
     precision = "quad"
   )
-  expect_equal(kind1_quad$value, kind1$value, tolerance = 1e-10)
-  expect_equal(kind1_quad$derivative, kind1$derivative, tolerance = 1e-10)
+  kind1_double_scalar <- Rmn(
+    m = 0L,
+    n = 2L,
+    c = 1.5,
+    xi = 1.2,
+    kind = 1L,
+    precision = "double"
+  )
+  expect_equal(kind1_quad_scalar$value, kind1_double_scalar$value, tolerance = 1e-10)
+  expect_equal(kind1_quad_scalar$derivative, kind1_double_scalar$derivative, tolerance = 1e-10)
 
   invalid_outer <- acousticTS:::Rmn_cpp(
     m = c(1L, 2L),
