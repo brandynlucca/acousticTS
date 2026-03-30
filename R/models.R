@@ -222,7 +222,7 @@
     {
       if (grepl(":::", ref, fixed = TRUE)) {
         parts <- strsplit(ref, ":::", fixed = TRUE)[[1]]
-        return(getFromNamespace(parts[[2]], parts[[1]]))
+        return(utils::getFromNamespace(parts[[2]], parts[[1]]))
       }
 
       if (grepl("::", ref, fixed = TRUE)) {
