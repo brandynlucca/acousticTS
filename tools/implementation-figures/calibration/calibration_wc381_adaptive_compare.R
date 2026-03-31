@@ -1,8 +1,8 @@
 source("tools/implementation-figures/helpers/common.R")
 impl_load_all()
 data_dir <- impl_data_path("")
-ref <- read.csv(file.path(data_dir, 'calibration_wc381_package_compare.csv'))
-obj <- cal_generate(material = 'WC', diameter = 38.1e-3)
+ref <- read.csv(file.path(data_dir, "calibration_wc381_package_compare.csv"))
+obj <- cal_generate(material = "WC", diameter = 38.1e-3)
 model <- calibration_initialize(obj, frequency = ref$frequency, sound_speed_sw = 1477.3, density_sw = 1026.8)@model_parameters$calibration
 
 calc_adaptive <- function(model, tol = 1e-10) {
@@ -15,7 +15,7 @@ calc_adaptive <- function(model, tol = 1e-10) {
     ml <- as.integer(round(ka_sw) + 10L)
     repeat {
       m <- 0:ml
-      Pl <- Pn(m, cos(theta))[,1]
+      Pl <- Pn(m, cos(theta))[, 1]
       js_mat <- js(m, ka_sw)
       js_mat_l <- js(m, ka_l)
       js_mat_t <- js(m, ka_t)
@@ -55,7 +55,7 @@ calc_adaptive <- function(model, tol = 1e-10) {
 ts <- calc_adaptive(model)
 d1 <- abs(ts - ref$echoSMs)
 d2 <- abs(ts - ref$sphereTS)
-cat('adaptive vs echoSMs mean/max\n')
-print(c(mean=mean(d1), max=max(d1)))
-cat('adaptive vs sphereTS mean/max\n')
-print(c(mean=mean(d2), max=max(d2)))
+cat("adaptive vs echoSMs mean/max\n")
+print(c(mean = mean(d1), max = max(d1)))
+cat("adaptive vs sphereTS mean/max\n")
+print(c(mean = mean(d2), max = max(d2)))

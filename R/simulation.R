@@ -155,7 +155,7 @@
     mustWork = FALSE
   )
   if (dir.exists(package_dir) &&
-      file.exists(file.path(package_dir, "DESCRIPTION"))) {
+    file.exists(file.path(package_dir, "DESCRIPTION"))) {
     # Reuse the active library path when the current namespace is installed ====
     if (dir.exists(file.path(package_dir, "Meta"))) {
       return(dirname(package_dir))
@@ -183,8 +183,8 @@
   cache_src <- if (is.list(cache)) cache$source else NULL
   cache_pkg <- if (!is.null(cache_lib)) file.path(cache_lib, package) else NULL
   if (!is.null(cache_lib) &&
-      identical(cache_src, package_dir) &&
-      dir.exists(cache_pkg)) {
+    identical(cache_src, package_dir) &&
+    dir.exists(cache_pkg)) {
     return(cache_lib)
   }
 

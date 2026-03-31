@@ -155,8 +155,8 @@
 #' @keywords internal
 #' @noRd
 .update_manipulated_shape_params <- function(params,
-                                            summary,
-                                            force_arbitrary = FALSE) {
+                                             summary,
+                                             force_arbitrary = FALSE) {
   out <- params
 
   # Preserve the updated length and segmentation metadata =====================
@@ -338,12 +338,12 @@
 #' @keywords internal
 #' @noRd
 .shape_manipulation_check_containment <- function(object,
-                                                 component,
-                                                 action = c(
-                                                   "warn",
-                                                   "error",
-                                                   "ignore"
-                                                 )) {
+                                                  component,
+                                                  action = c(
+                                                    "warn",
+                                                    "error",
+                                                    "ignore"
+                                                  )) {
   # Resolve the requested containment action ==================================
   action <- match.arg(action)
   if (identical(action, "ignore") || !methods::is(object, "Scatterer")) {
@@ -381,8 +381,8 @@
 #' @keywords internal
 #' @noRd
 .translate_profile_position_matrix <- function(position_matrix,
-                                              x_offset = 0,
-                                              z_offset = 0) {
+                                               x_offset = 0,
+                                               z_offset = 0) {
   translated <- position_matrix
 
   # Resolve the supported row-major geometry fields ===========================
@@ -429,9 +429,9 @@
 #' @keywords internal
 #' @noRd
 .translate_column_position_matrix <- function(position_matrix,
-                                             x_offset = 0,
-                                             y_offset = 0,
-                                             z_offset = 0) {
+                                              x_offset = 0,
+                                              y_offset = 0,
+                                              z_offset = 0) {
   translated <- position_matrix
 
   # Resolve the supported column-major geometry fields ========================

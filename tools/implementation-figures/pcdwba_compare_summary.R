@@ -14,18 +14,24 @@ merged <- Reduce(
   list(
     setNames(
       pcdwba_acoustic,
-      c("frequency_hz", "frequency_khz", "ka", "f_bs_real_acousticts",
-        "f_bs_imag_acousticts", "sigma_bs_acousticts", "TS_acousticts")
+      c(
+        "frequency_hz", "frequency_khz", "ka", "f_bs_real_acousticts",
+        "f_bs_imag_acousticts", "sigma_bs_acousticts", "TS_acousticts"
+      )
     ),
     setNames(
       pcdwba_echo,
-      c("frequency_hz", "frequency_khz", "ka", "f_bs_real_echopop",
-        "f_bs_imag_echopop", "sigma_bs_echopop", "TS_echopop")
+      c(
+        "frequency_hz", "frequency_khz", "ka", "f_bs_real_echopop",
+        "f_bs_imag_echopop", "sigma_bs_echopop", "TS_echopop"
+      )
     ),
     setNames(
       pcdwba_zoo,
-      c("frequency_hz", "frequency_khz", "ka", "f_bs_real_zooscatr",
-        "f_bs_imag_zooscatr", "sigma_bs_zooscatr", "TS_zooscatr")
+      c(
+        "frequency_hz", "frequency_khz", "ka", "f_bs_real_zooscatr",
+        "f_bs_imag_zooscatr", "sigma_bs_zooscatr", "TS_zooscatr"
+      )
     )
   )
 )

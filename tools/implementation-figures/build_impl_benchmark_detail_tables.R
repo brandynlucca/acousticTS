@@ -101,8 +101,7 @@ make_weak_scattering <- function(shape, theta_body = pi / 2, n_segments = 201L) 
 }
 
 make_dwba_reference_shape <- function(shape, theta_body = pi / 2, spacing = 1e-4) {
-  n_segments <- max(2L, round(switch(
-    shape,
+  n_segments <- max(2L, round(switch(shape,
     sphere = (2 * 0.01) / spacing,
     prolate_spheroid = (2 * 0.07) / spacing,
     cylinder = 0.07 / spacing,
@@ -137,8 +136,7 @@ make_dwba_reference_shape <- function(shape, theta_body = pi / 2, spacing = 1e-4
 
 make_krm_reference_shape <- function(shape, kind, theta_body = pi / 2,
                                      n_segments = 200L) {
-  shape_obj <- switch(
-    shape,
+  shape_obj <- switch(shape,
     sphere = sphere(radius_body = 0.01, n_segments = n_segments),
     prolate_spheroid = prolate_spheroid(
       length_body = 0.14,

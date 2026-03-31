@@ -74,10 +74,13 @@ png(
   res = 200
 )
 op <- par(no.readonly = TRUE)
-on.exit({
-  par(op)
-  dev.off()
-}, add = TRUE)
+on.exit(
+  {
+    par(op)
+    dev.off()
+  },
+  add = TRUE
+)
 par(mfrow = c(3, 2), mar = c(4.1, 4.4, 2.6, 1.2), oma = c(0, 0, 1.4, 0))
 
 plot_case(
