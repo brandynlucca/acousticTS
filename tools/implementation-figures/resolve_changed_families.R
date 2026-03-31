@@ -71,98 +71,34 @@ manual_families <- tolower(
 output_path <- Sys.getenv("GITHUB_OUTPUT", unset = "")
 
 shared_patterns <- c(
-  "^src/",
-  "^R/(acoustics|create_scatterer|create_shape|scatterer.*|utilities.*)\\.R$",
   "^tools/implementation-figures/(helpers/|manifest\\.csv$|run_all\\.R$)",
-  "^tools/implementation-figures/build_impl_benchmark"
+  "^tools/implementation-figures/build_impl_benchmark",
+  "^\\.github/workflows/implementation-figures\\.ya?ml$"
 )
 
-family_patterns <- list(
-  bbfm = c(
-    "^R/model-bbfm\\.R$",
-    "^vignettes/bbfm/",
-    "^tools/implementation-figures/bbfm/"
-  ),
-  bcms = c(
-    "^R/model-bcms\\.R$",
-    "^vignettes/bcms/",
-    "^tools/implementation-figures/bcms/",
-    "^tools/implementation-figures/bcms_compare_reference\\.R$"
-  ),
-  calibration = c(
-    "^R/model-soems\\.R$",
-    "^vignettes/calibration/",
-    "^tools/implementation-figures/calibration/"
-  ),
-  dwba = c(
-    "^R/model-dwba\\.R$",
-    "^vignettes/dwba/",
-    "^tools/implementation-figures/dwba/"
-  ),
-  ecms = c(
-    "^R/model-ecms\\.R$",
-    "^vignettes/ecms/",
-    "^tools/implementation-figures/ecms/",
-    "^tools/implementation-figures/ecms_compare_reference\\.R$"
-  ),
-  essms = c(
-    "^R/model-essms\\.R$",
-    "^vignettes/essms/",
-    "^tools/implementation-figures/essms/"
-  ),
-  fcms = c(
-    "^R/model-fcms\\.R$",
-    "^vignettes/fcms/",
-    "^tools/implementation-figures/fcms/"
-  ),
-  hpa = c(
-    "^R/model-hpa\\.R$",
-    "^vignettes/hpa/",
-    "^tools/implementation-figures/hpa/"
-  ),
-  krm = c(
-    "^R/model-krm\\.R$",
-    "^vignettes/krm/",
-    "^tools/implementation-figures/krm/"
-  ),
-  pcdwba = c(
-    "^R/model-pcdwba\\.R$",
-    "^vignettes/pcdwba/",
-    "^tools/implementation-figures/pcdwba/",
-    "^tools/implementation-figures/pcdwba_compare_summary\\.R$"
-  ),
-  psms = c(
-    "^R/model-psms\\.R$",
-    "^vignettes/psms/",
-    "^tools/implementation-figures/psms/"
-  ),
-  sdwba = c(
-    "^R/model-sdwba\\.R$",
-    "^vignettes/sdwba/",
-    "^tools/implementation-figures/sdwba/"
-  ),
-  sphms = c(
-    "^R/model-sphms\\.R$",
-    "^vignettes/sphms/",
-    "^tools/implementation-figures/sphms/"
-  ),
-  tmm = c(
-    "^R/model-tmm",
-    "^R/tmm-",
-    "^vignettes/tmm/",
-    "^tools/implementation-figures/tmm/"
-  ),
-  trcm = c(
-    "^R/model-trcm\\.R$",
-    "^vignettes/trcm/",
-    "^tools/implementation-figures/trcm/"
-  ),
-  vesm = c(
-    "^R/model-vesms\\.R$",
-    "^vignettes/vesm/",
-    "^tools/implementation-figures/vesm/",
-    "^tools/implementation-figures/vesm_compare_summary\\.R$"
-  )
+escape_regex <- function(x) {
+  gsub("([][{}()+*^$|\\\\?.])", "\\\\\\1", x)
+}
+
+family_patterns <- lapply(
+  split(manifest, tolower(manifest$family)),
+  function(rows) {
+    vignette_paths <- unique(file.path(
+      "vignettes",
+      tolower(rows$family),
+      rows$vignette
+    ))
+    script_paths <- unique(file.path(
+      "tools",
+      "implementation-figures",
+      rows$script
+    ))
+
+    c(
+      paste0("^", escape_regex(vignette_paths), "$"),
+      paste0("^", escape_regex(script_paths), "$")
+    )
+  }
 )
 
 write_output <- function(name, value, path) {

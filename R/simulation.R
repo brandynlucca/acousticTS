@@ -393,9 +393,11 @@
 #'
 #' @section Parallelization:
 #' This function uses \code{pbapply::pblapply()} for parallelized simulation
-#' with progress bars. On Windows, parallelization uses PSOCK clusters, which
-#' require all necessary objects and packages to be exported to worker
-#' processes. On Unix-like systems, forking is used, which is generally simpler.
+#' with progress bars. The current implementation uses PSOCK clusters for
+#' worker execution across platforms, including Windows, macOS, and Linux.
+#' That means worker processes need access to the package namespace and any
+#' required exported objects, and it also means startup overhead is more
+#' noticeable for very small simulation jobs than for larger batched runs.
 #'
 #' @section Performance Issues:
 #' Including too many parameters from \code{parameters}
