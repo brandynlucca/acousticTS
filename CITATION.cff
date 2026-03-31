@@ -4,10 +4,10 @@ type: software
 license: GPL-3.0-only
 title: 'acousticTS: Estimating Acoustic Target Strength via Physics-Based Scattering
   Models'
-version: 1.0.1
+version: 2026.3.0
 identifiers:
 - type: doi
-  value: 10.5281/zenodo.7600660
+  value: 10.5281/zenodo.7600659
 - type: url
   value: https://brandynlucca.github.io/acousticTS/
 abstract: Acoustic target strength (TS) represents the intensity of an echo returning
@@ -34,6 +34,6 @@ contact:
   given-names: Brandyn
   email: brandyn.lucca@gmail.com
   orcid: https://orcid.org/0000-0003-3145-2969
-doi: 10.5281/zenodo.7600660
+doi: 10.5281/zenodo.7600659
 repository-code: https://github.com/brandynlucca/acousticTS
 url: https://brandynlucca.github.io/acousticTS/

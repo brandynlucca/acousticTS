@@ -19,7 +19,7 @@ Description: Acoustic target strength (TS) represents the intensity of an
     estimates over broad statistical distributions of model parameters.
 License: GPL-3 | file LICENSE
 URL: https://brandynlucca.github.io/acousticTS/,
-    https://zenodo.org/records/7600660
+    https://doi.org/10.5281/zenodo.7600659
 BugReports: https://github.com/brandynlucca/acousticTS/issues
 Depends:
     R (>= 4.0.0)
