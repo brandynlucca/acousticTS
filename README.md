@@ -28,7 +28,7 @@ $$
 
 $TS$ is used to:
 
-- Convert integrated backscatter (e.g. $S_\text{A}$, NASC) or
+- Convert integrated backscatter (e.g. $S_\text{A}$), NASC) or
   volumetric backscatter ($S_\text{V}$) into number density or biomass
 - Classify backscatter by species or taxon based on multi-frequency
   response
