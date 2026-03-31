@@ -53,6 +53,30 @@ test_that("simulation parameter resolver handles batch, function, scalar, and ve
     rep(7, 4)
   )
 
+  structured_scalar <- acousticTS:::.resolve_param_value(
+    param_name = "beta_target",
+    param_value = c(length = 0.02),
+    batch_by = NULL,
+    batch_values = list(),
+    grid_size = 3,
+    simulation_grid = data.frame()
+  )
+  expect_true(is.list(structured_scalar))
+  expect_equal(structured_scalar[[1]], c(length = 0.02))
+  expect_equal(structured_scalar[[3]], c(length = 0.02))
+
+  structured_draws <- acousticTS:::.resolve_param_value(
+    param_name = "gamma_target",
+    param_value = function() c(length = 0.03),
+    batch_by = NULL,
+    batch_values = list(),
+    grid_size = 2,
+    simulation_grid = data.frame()
+  )
+  expect_true(is.list(structured_draws))
+  expect_equal(structured_draws[[1]], c(length = 0.03))
+  expect_equal(structured_draws[[2]], c(length = 0.03))
+
   expect_equal(
     acousticTS:::.resolve_param_value(
       param_name = "gamma",
@@ -87,6 +111,24 @@ test_that("simulation parameter resolver handles batch, function, scalar, and ve
       simulation_grid = data.frame()
     ),
     "Length of parameter 'epsilon' \\[2\\] does not match number of realizations \\[3\\]."
+  )
+})
+
+test_that("simulation batch-value normalizer preserves structured candidates", {
+  expect_equal(
+    acousticTS:::.normalize_simulation_batch_values(
+      param_name = "body_target",
+      param_value = c(length = 0.02)
+    ),
+    list(c(length = 0.02))
+  )
+
+  expect_equal(
+    acousticTS:::.normalize_simulation_batch_values(
+      param_name = "body_target",
+      param_value = list(c(length = 0.02), c(length = 0.03))
+    ),
+    list(c(length = 0.02), c(length = 0.03))
   )
 })
 

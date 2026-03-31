@@ -331,24 +331,60 @@
 }
 
 ################################################################################
-#' Support function for bending scatterer body shape and position matrix
+#' Bend a scatterer body or body component
+#'
+#' @description
+#' Apply a smooth curvature transformation to an existing scatterer body or to a
+#' list-like body component containing an \code{rpos} matrix. This is useful
+#' when a target should keep the same broad identity while adopting a curved
+#' centerline for model comparisons or sensitivity studies.
+#'
 #' @param object Dataframe or scatterer-class object
 #' @param radius_curvature Radius of curvature that can be parameterized either
 #' as a ratio relative to body length or actual measurement
 #' @param mode Either "ratio" or "measurement"
 #' @return A bent version of \code{object}, returned as the same broad object
 #'   type with updated geometry and curvature metadata.
+#'
+#' @examples
+#' shape_obj <- cylinder(
+#'   length_body = 0.05,
+#'   radius_body = 0.003,
+#'   n_segments = 80
+#' )
+#' obj <- fls_generate(
+#'   shape = shape_obj,
+#'   density_body = 1045,
+#'   sound_speed_body = 1520
+#' )
+#'
+#' bent_obj <- brake(obj, radius_curvature = 5)
+#' head(extract(bent_obj, c("body", "rpos", "z")))
+#' extract(bent_obj, c("shape_parameters", "radius_curvature_ratio"))
+#'
+#' bent_body <- brake(extract(obj, "body"), radius_curvature = 0.35, mode = "measurement")
+#' head(bent_body$rpos["z", ])
+#'
+#' @seealso [extract()], [reforge()], [translate_shape()], [reanchor_shape()],
+#'   [inflate_shape()], [smooth_shape()], [resample_shape()], [flip_shape()],
+#'   [offset_component()]
 #' @keywords shape manipulator
 #' @rdname brake
 #' @export
 brake <- function(object, radius_curvature, mode = "ratio") {
   # Dispatch the bend helper according to the input object type ================
-  class_type <- typeof(object)
-  output <- switch(class_type,
-    list = brake_df(object, radius_curvature, mode),
-    S4 = brake_scatterer(object, radius_curvature, mode)
+  if (methods::is(object, "Scatterer")) {
+    return(brake_scatterer(object, radius_curvature, mode))
+  }
+  if (is.list(object)) {
+    return(brake_df(object, radius_curvature, mode))
+  }
+
+  # Reject unsupported inputs explicitly rather than returning NULL ============
+  stop(
+    "`brake()` expects either a scatterer object or a list-like body component.",
+    call. = FALSE
   )
-  return(output)
 }
 
 ################################################################################
@@ -363,17 +399,7 @@ brake <- function(object, radius_curvature, mode = "ratio") {
 #' @noRd
 brake_df <- function(body_df, radius_curvature, mode = "ratio") {
   # Validate the body data frame and requested curvature inputs ================
-  if (
-    !is.list(body_df) || is.null(body_df$rpos) || !is.matrix(body_df$rpos)
-  ) {
-    stop("Body shape information must be a list with a matrix element 'rpos'.")
-  }
-  if (!is.numeric(radius_curvature) || radius_curvature <= 0) {
-    stop("Radius of curvature must be a positive-only, real number.")
-  }
-  if (!mode %in% c("ratio", "measurement")) {
-    stop("Radius-of-curvature 'mode' must be either 'ratio' or 'measurement'.")
-  }
+  .validate_brake_params(body_df, radius_curvature, mode)
 
   # Recover the working geometry and normalize the curvature mode ==============
   rpos <- body_df$rpos

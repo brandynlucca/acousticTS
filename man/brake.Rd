@@ -2,7 +2,7 @@
 % Please edit documentation in R/utilities-geometry.R
 \name{brake}
 \alias{brake}
-\title{Support function for bending scatterer body shape and position matrix}
+\title{Bend a scatterer body or body component}
 \usage{
 brake(object, radius_curvature, mode = "ratio")
 }
@@ -19,7 +19,35 @@ A bent version of \code{object}, returned as the same broad object
 type with updated geometry and curvature metadata.
 }
 \description{
-Support function for bending scatterer body shape and position matrix
+Apply a smooth curvature transformation to an existing scatterer body or to a
+list-like body component containing an \code{rpos} matrix. This is useful
+when a target should keep the same broad identity while adopting a curved
+centerline for model comparisons or sensitivity studies.
+}
+\examples{
+shape_obj <- cylinder(
+  length_body = 0.05,
+  radius_body = 0.003,
+  n_segments = 80
+)
+obj <- fls_generate(
+  shape = shape_obj,
+  density_body = 1045,
+  sound_speed_body = 1520
+)
+
+bent_obj <- brake(obj, radius_curvature = 5)
+head(extract(bent_obj, c("body", "rpos", "z")))
+extract(bent_obj, c("shape_parameters", "radius_curvature_ratio"))
+
+bent_body <- brake(extract(obj, "body"), radius_curvature = 0.35, mode = "measurement")
+head(bent_body$rpos["z", ])
+
+}
+\seealso{
+\code{\link[=extract]{extract()}}, \code{\link[=reforge]{reforge()}}, \code{\link[=translate_shape]{translate_shape()}}, \code{\link[=reanchor_shape]{reanchor_shape()}},
+\code{\link[=inflate_shape]{inflate_shape()}}, \code{\link[=smooth_shape]{smooth_shape()}}, \code{\link[=resample_shape]{resample_shape()}}, \code{\link[=flip_shape]{flip_shape()}},
+\code{\link[=offset_component]{offset_component()}}
 }
 \keyword{manipulator}
 \keyword{shape}

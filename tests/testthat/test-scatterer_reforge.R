@@ -4,24 +4,181 @@ test_that("`.discover_reforge_params` returns expected keys.", {
   # Test FLS parameters
   expect_equal(
     .discover_reforge_params("FLS"),
-    c("length", "radius", "length_radius_ratio_constant", "n_segments")
+    c(
+      "body_scale", "body_target", "isometric_body", "n_segments_body",
+      "length", "radius", "length_radius_ratio_constant", "n_segments"
+    )
+  )
+
+  # Test BBF parameters
+  expect_equal(
+    .discover_reforge_params("BBF"),
+    c(
+      "body_scale", "body_target", "backbone_scale",
+      "backbone_target", "isometric_body", "isometric_backbone",
+      "maintain_ratio", "n_segments_body", "n_segments_backbone",
+      "containment"
+    )
   )
 
   # Test SBF parameters
   expect_equal(
     .discover_reforge_params("SBF"),
     c(
-      "body_scale", "swimbladder_scale", "body_target",
-      "swimbladder_target", "swimbladder_inflation_factor",
-      "isometric_body", "isometric_swimbladder", "maintain_ratio",
-      "n_segments_body", "n_segments_swimbladder"
+      "body_scale", "body_target", "swimbladder_scale",
+      "swimbladder_target", "isometric_body", "isometric_swimbladder",
+      "maintain_ratio", "swimbladder_inflation_factor", "n_segments_body",
+      "n_segments_swimbladder", "containment"
     )
+  )
+
+  # Test class vectors and fallback discovery
+  expect_equal(
+    .discover_reforge_params(c("OTHER", "FLS")),
+    .discover_reforge_params("FLS")
   )
 
   # Test erroneous input
   expect_equal(
     .discover_reforge_params("OTHER"),
     character(0)
+  )
+})
+
+test_that("`reforge('BBF')` correctly updates composite body/backbone geometry", {
+  fish <- bbf_generate(
+    body_shape = arbitrary(
+      x_body = c(0, 0.04, 0.08),
+      zU_body = c(0.001, 0.004, 0.001),
+      zL_body = c(-0.001, -0.004, -0.001)
+    ),
+    backbone_shape = cylinder(
+      length_body = 0.05,
+      radius_body = 0.0008,
+      n_segments = 40
+    ),
+    density_body = 1070,
+    sound_speed_body = 1570,
+    density_backbone = 1900,
+    sound_speed_longitudinal_backbone = 3500,
+    sound_speed_transversal_backbone = 1700,
+    x_offset_backbone = 0.015,
+    z_offset_backbone = 0.0002
+  )
+
+  orig_shape <- extract(fish, "shape_parameters")
+  orig_body <- extract(fish, "body")
+  orig_backbone <- extract(fish, "backbone")
+
+  # Explicit body/backbone resampling follows the multi-component reforge path.
+  fish_hires <- reforge(
+    fish,
+    n_segments_body = 80,
+    n_segments_backbone = 30
+  )
+  hires_shape <- extract(fish_hires, "shape_parameters")
+  hires_body <- extract(fish_hires, "body")
+  hires_backbone <- extract(fish_hires, "backbone")
+  expect_equal(hires_shape$body$n_segments, 80)
+  expect_equal(hires_shape$backbone$n_segments, 30)
+  expect_equal(ncol(hires_body$rpos), 80)
+  expect_equal(ncol(hires_backbone$rpos), 30)
+
+  # Default maintain_ratio should resize the backbone with the body.
+  scale_factor <- 1.5
+  fish_scaled <- reforge(fish, body_scale = scale_factor)
+  scaled_shape <- extract(fish_scaled, "shape_parameters")
+  scaled_body <- extract(fish_scaled, "body")
+  scaled_backbone <- extract(fish_scaled, "backbone")
+
+  expect_equal(
+    scaled_shape$body$length,
+    orig_shape$body$length * scale_factor
+  )
+  expect_equal(
+    scaled_shape$backbone$length,
+    orig_shape$backbone$length * scale_factor
+  )
+  expect_equal(
+    max(scaled_body$radius, na.rm = TRUE),
+    max(orig_body$radius, na.rm = TRUE) * scale_factor
+  )
+  expect_equal(
+    max(scaled_backbone$radius, na.rm = TRUE),
+    max(orig_backbone$radius, na.rm = TRUE) * scale_factor
+  )
+
+  # The backbone's relative axial start should stay tied to the body.
+  orig_start_ratio <- (
+    min(orig_backbone$rpos["x", ], na.rm = TRUE) -
+      min(orig_body$rpos["x", ], na.rm = TRUE)
+  ) / orig_shape$body$length
+  new_start_ratio <- (
+    min(scaled_backbone$rpos["x", ], na.rm = TRUE) -
+      min(scaled_body$rpos["x", ], na.rm = TRUE)
+  ) / scaled_shape$body$length
+  expect_equal(new_start_ratio, orig_start_ratio, tolerance = 1e-10)
+  expect_equal(
+    .reforge_relative_vertical_offset(orig_backbone$rpos, orig_body$rpos),
+    .reforge_relative_vertical_offset(scaled_backbone$rpos, scaled_body$rpos),
+    tolerance = 1e-10
+  )
+
+  # Body-only scaling should leave the backbone unchanged when ratio lock is off.
+  fish_body_only <- reforge(
+    fish,
+    body_scale = c(length = 2, width = 1.25, height = 1.5),
+    isometric_body = FALSE,
+    maintain_ratio = FALSE
+  )
+  expect_equal(
+    extract(fish_body_only, c("shape_parameters", "body", "length")),
+    orig_shape$body$length * 2
+  )
+  expect_equal(
+    extract(fish_body_only, c("shape_parameters", "backbone", "length")),
+    orig_shape$backbone$length
+  )
+  expect_equal(
+    max(extract(fish_body_only, "backbone")$radius, na.rm = TRUE),
+    max(orig_backbone$radius, na.rm = TRUE)
+  )
+
+  # Guardrails and containment warnings should mirror the other composite paths.
+  expect_error(reforge(fish), "Must specify at least one")
+  expect_error(
+    reforge(fish, body_scale = 2, body_target = c(length = 0.12)),
+    "Specify only one of body_scale or body_target, not both."
+  )
+  expect_error(
+    reforge(
+      fish,
+      backbone_scale = c(width = 1.5, height = 2),
+      isometric_backbone = FALSE,
+      maintain_ratio = FALSE
+    ),
+    "Backbone reforge must preserve a circular cross-section"
+  )
+  expect_warning(
+    reforge(fish, backbone_scale = 20, maintain_ratio = FALSE),
+    "Backbone exceeds body bounds at some positions."
+  )
+  expect_error(
+    reforge(
+      fish,
+      backbone_scale = 20,
+      maintain_ratio = FALSE,
+      containment = "error"
+    ),
+    "Backbone exceeds body bounds at some positions."
+  )
+  expect_silent(
+    reforge(
+      fish,
+      backbone_scale = 20,
+      maintain_ratio = FALSE,
+      containment = "ignore"
+    )
   )
 })
 
@@ -37,6 +194,47 @@ test_that("`reforge('FLS')` correctly updates body shape", {
   krill_hires <- reforge(krill, n_segments = 100)
   expect_equal(extract(krill_hires, "shape_parameters")$n_segments, 100)
   expect_equal(length(extract(krill_hires, "body")$rpos[1, ]), 101)
+  krill_hires_new <- reforge(krill, n_segments_body = 120)
+  expect_equal(extract(krill_hires_new, "shape_parameters")$n_segments, 120)
+  expect_equal(length(extract(krill_hires_new, "body")$rpos[1, ]), 121)
+
+  # Test the new shared body-scale pathway
+  krill_scaled <- reforge(krill, body_scale = 2)
+  expect_equal(
+    extract(krill_scaled, "shape_parameters")$length,
+    orig_shape$length * 2
+  )
+  expect_equal(
+    extract(krill_scaled, "shape_parameters")$radius,
+    orig_shape$radius * 2
+  )
+  expect_equal(
+    max(extract(krill_scaled, "body")$radius),
+    max(orig_body$radius) * 2
+  )
+
+  target_radius <- 30e-3
+  krill_targeted <- reforge(
+    krill,
+    body_target = c(radius = target_radius),
+    isometric_body = FALSE
+  )
+  expect_equal(
+    extract(krill_targeted, "shape_parameters")$length,
+    orig_shape$length
+  )
+  expect_equal(
+    extract(krill_targeted, "shape_parameters")$radius,
+    target_radius
+  )
+  expect_equal(
+    max(extract(krill_targeted, "body")$radius),
+    target_radius
+  )
+  expect_error(
+    reforge(krill, length = 0.04, body_scale = 2),
+    "Use either the legacy length/radius arguments or the new body_scale/body_target arguments"
+  )
 
   # Test 'length' scaling
   # ---- Case: Constant L/a
@@ -142,6 +340,14 @@ test_that("`reforge('SBF')` correctly updates body shape", {
   expect_equal(
     extract(body_expand, "shape_parameters")$bladder$length,
     new_sblength
+  )
+  expect_equal(
+    .reforge_relative_vertical_offset(orig_bladder$rpos, orig_body$rpos),
+    .reforge_relative_vertical_offset(
+      extract(body_expand, "bladder")$rpos,
+      extract(body_expand, "body")$rpos
+    ),
+    tolerance = 1e-10
   )
   # ---- Case: Defining just length -> applies uniformly across dimensions
   body_expand <- reforge(sardine, body_scale = c(length = scale_factor))
@@ -386,6 +592,25 @@ test_that("`reforge('SBF')` correctly updates body shape", {
       maintain_ratio = FALSE
     ),
     "Swimbladder exceeds body bounds at some positions."
+  )
+  expect_error(
+    reforge(
+      sardine,
+      swimbladder_scale = c(length = 4, width = 1.5, height = 2.0),
+      isometric_swimbladder = FALSE,
+      maintain_ratio = FALSE,
+      containment = "error"
+    ),
+    "Swimbladder exceeds body bounds at some positions."
+  )
+  expect_silent(
+    reforge(
+      sardine,
+      swimbladder_scale = c(length = 4, width = 1.5, height = 2.0),
+      isometric_swimbladder = FALSE,
+      maintain_ratio = FALSE,
+      containment = "ignore"
+    )
   )
 
   new_length <- extract(bladder_expand, "shape_parameters")$body$length

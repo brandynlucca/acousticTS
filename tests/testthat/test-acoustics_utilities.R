@@ -238,6 +238,13 @@ test_that("Curvature edge-case", {
   expect_match(w, ".*One or more body segments", all = FALSE)
 })
 
+test_that("`brake()` rejects unsupported inputs explicitly", {
+  expect_error(
+    brake(1, radius_curvature = 5),
+    "`brake\\(\\)` expects either a scatterer object or a list-like body component."
+  )
+})
+
 test_that("Rotation functions for the KRM work correctly", {
   data(sardine, package = "acousticTS")
 

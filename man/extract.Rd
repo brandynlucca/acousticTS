@@ -25,7 +25,9 @@ Convenience accessor for reaching into \code{Scatterer} and \code{Shape} objects
 without spelling out direct slot access repeatedly. \code{extract()} can also walk
 through nested lists, matrices, and named vectors, which makes it useful for
 pulling model outputs, component properties, or position-matrix fields from a
-common interface.
+common interface. This is especially helpful after geometry manipulations
+such as \code{brake()} and \code{reforge()}, where inspecting the stored body profile
+is often the fastest way to confirm what changed.
 }
 \examples{
 obj <- fls_generate(
@@ -38,5 +40,14 @@ extract(obj, "body")
 extract(obj, c("body", "density"))
 extract(obj, c("shape_parameters", "shape"))
 
+bent_obj <- brake(obj, radius_curvature = 5)
+head(extract(bent_obj, c("body", "rpos", "z")))
+extract(bent_obj, c("shape_parameters", "radius_curvature_ratio"))
+
+}
+\seealso{
+\code{\link[=brake]{brake()}}, \code{\link[=reforge]{reforge()}}, \code{\link[=translate_shape]{translate_shape()}}, \code{\link[=reanchor_shape]{reanchor_shape()}},
+\code{\link[=inflate_shape]{inflate_shape()}}, \code{\link[=smooth_shape]{smooth_shape()}}, \code{\link[=resample_shape]{resample_shape()}}, \code{\link[=flip_shape]{flip_shape()}},
+\code{\link[=offset_component]{offset_component()}}
 }
 \keyword{utility}

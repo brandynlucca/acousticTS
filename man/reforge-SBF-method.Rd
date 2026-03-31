@@ -15,7 +15,8 @@
   maintain_ratio = TRUE,
   swimbladder_inflation_factor = 1,
   n_segments_body = NULL,
-  n_segments_swimbladder = NULL
+  n_segments_swimbladder = NULL,
+  containment = c("warn", "error", "ignore")
 )
 }
 \arguments{
@@ -50,6 +51,10 @@ the swimbladder x-axis origin and terminus are both held constant.}
 \item{n_segments_body}{Number of segments along the body.}
 
 \item{n_segments_swimbladder}{Number of segments along the bladder.}
+
+\item{containment}{Containment policy for internal geometry checks. Use
+\code{"warn"} to keep the current warning behavior, \code{"error"} to fail fast for
+invalid internal geometries, or \code{"ignore"} to skip containment checks.}
 }
 \description{
 Resizing function for swimbladdered targets

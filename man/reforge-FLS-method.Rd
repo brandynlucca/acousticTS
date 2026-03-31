@@ -6,6 +6,10 @@
 \usage{
 \S4method{reforge}{FLS}(
   object,
+  body_scale = NULL,
+  body_target = NULL,
+  isometric_body = TRUE,
+  n_segments_body = NULL,
   length = NULL,
   radius = NULL,
   length_radius_ratio_constant = TRUE,
@@ -15,14 +19,25 @@
 \arguments{
 \item{object}{FLS-class object.}
 
-\item{length}{New body length resize.}
+\item{body_scale}{Proportional scaling to the body length and radius. When a
+single value is supplied, both dimensions are scaled together. Otherwise,
+this input must be a named numeric vector using \code{length} and/or \code{radius}.}
 
-\item{radius}{New radius size}
+\item{body_target}{Target dimensions (m) for the body length and/or radius.
+This input must be a named numeric vector.}
 
-\item{length_radius_ratio_constant}{Keep length-to-radius ratio based on new
-length}
+\item{isometric_body}{Logical; maintain isometric scaling for body.}
 
-\item{n_segments}{New number of segments}
+\item{n_segments_body}{New number of segments along the body profile.}
+
+\item{length}{Legacy alias for a new body length resize.}
+
+\item{radius}{Legacy alias for a new maximum body radius.}
+
+\item{length_radius_ratio_constant}{Legacy toggle controlling whether a
+length-only resize also rescales radius.}
+
+\item{n_segments}{Legacy alias for \code{n_segments_body}.}
 }
 \description{
 Reforge FLS-class object.
