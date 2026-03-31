@@ -231,6 +231,24 @@ test_that("`reforge('FLS')` correctly updates body shape", {
     max(extract(krill_targeted, "body")$radius),
     target_radius
   )
+  # Bent-body resizing should honor the true centerline arc length.
+  bent_krill <- brake(krill, radius_curvature = 5)
+  orig_arc <- .shape_arc_length(body = extract(bent_krill, "body"))
+  target_arc <- orig_arc * 1.5
+  bent_rescaled <- reforge(bent_krill, body_target = c(length = target_arc))
+  bent_body <- extract(bent_rescaled, "body")
+  projected_length <- .shape_length(
+    position_matrix = bent_body$rpos,
+    row_major = TRUE
+  )
+  expect_equal(
+    extract(bent_rescaled, "shape_parameters")$length,
+    target_arc,
+    tolerance = 1e-3
+  )
+  expect_equal(bent_body$arc_length, target_arc, tolerance = 1e-3)
+  expect_equal(.shape_arc_length(body = bent_body), target_arc, tolerance = 1e-3)
+  expect_true(projected_length < target_arc)
   expect_error(
     reforge(krill, length = 0.04, body_scale = 2),
     "Use either the legacy length/radius arguments or the new body_scale/body_target arguments"

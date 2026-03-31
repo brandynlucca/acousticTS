@@ -82,6 +82,89 @@
   abs(diff(range(x_vals, na.rm = TRUE)))
 }
 
+#' Resolve centerline z coordinates from a position matrix or body list
+#' @param position_matrix Numeric position matrix.
+#' @param body Body list containing an \code{rpos} matrix.
+#' @param row_major Logical; whether the x-axis is stored in the first row.
+#' @keywords internal
+#' @noRd
+.shape_centerline_z <- function(position_matrix = NULL,
+                                body = NULL,
+                                row_major = FALSE) {
+  # Fall back to the body profile when a body list is supplied =================
+  if (!is.null(body)) {
+    position_matrix <- body$rpos
+    row_major <- TRUE
+  }
+
+  # Resolve the node count used by the fallback centerline ====================
+  n_nodes <- if (row_major) ncol(position_matrix) else nrow(position_matrix)
+
+  # Return the stored centerline z axis when it exists ========================
+  if (row_major && !is.null(rownames(position_matrix))) {
+    z_idx <- match(
+      c("z", "z_body", "z_bladder", "z_shell", "z_fluid", "z_backbone"),
+      rownames(position_matrix),
+      nomatch = 0
+    )
+    z_idx <- z_idx[z_idx > 0]
+    if (length(z_idx) > 0) {
+      return(as.numeric(position_matrix[z_idx[1], ]))
+    }
+  } else if (!row_major && ncol(position_matrix) >= 3) {
+    return(as.numeric(position_matrix[, 3]))
+  }
+
+  # Fall back to the midpoint of the vertical envelopes when available ========
+  zU <- .geometry_axis_values(
+    position_matrix,
+    axis = "zU",
+    row_major = row_major,
+    default = NULL,
+    context = "Centerline z derivation"
+  )
+  zL <- .geometry_axis_values(
+    position_matrix,
+    axis = "zL",
+    row_major = row_major,
+    default = NULL,
+    context = "Centerline z derivation"
+  )
+  if (!is.null(zU) && !is.null(zL)) {
+    return((zU + zL) / 2)
+  }
+
+  # Fall back to a flat centerline when no vertical offset is stored ==========
+  rep(0, n_nodes)
+}
+
+#' Resolve centerline arc length from a position matrix or body list
+#' @param position_matrix Numeric position matrix.
+#' @param body Body list containing an \code{rpos} matrix.
+#' @param row_major Logical; whether the x-axis is stored in the first row.
+#' @keywords internal
+#' @noRd
+.shape_arc_length <- function(position_matrix = NULL,
+                              body = NULL,
+                              row_major = FALSE) {
+  # Fall back to the body profile when a body list is supplied =================
+  if (!is.null(body)) {
+    position_matrix <- body$rpos
+    row_major <- TRUE
+  }
+
+  # Resolve the centerline coordinates used by the path-length calculation ====
+  x_vals <- .shape_x(position_matrix, row_major = row_major)
+  z_vals <- .shape_centerline_z(position_matrix, row_major = row_major)
+
+  # Return the accumulated centerline distance ================================
+  if (length(x_vals) < 2L) {
+    return(0)
+  }
+
+  sum(sqrt(diff(x_vals)^2 + diff(z_vals)^2))
+}
+
 #' Resolve nodewise radius information from a shape/body representation
 #' @param position_matrix Numeric position matrix.
 #' @param shape_parameters Shape-parameter list.
@@ -496,8 +579,14 @@ brake_scatterer <- function(object, radius_curvature, mode = "ratio") {
   # Mirror the curvature metadata onto the stored shape parameters ============
   if ("shape_parameters" %in% methods::slotNames(object)) {
     shape_parameters <- methods::slot(object, "shape_parameters")
+    curved_length <- .shape_arc_length(body = body_curved)
     shape_parameters$radius_curvature_ratio <-
       body_curved$radius_curvature_ratio
+    if ("body" %in% names(shape_parameters) && is.list(shape_parameters$body)) {
+      shape_parameters$body$length <- curved_length
+    } else if ("length" %in% names(shape_parameters)) {
+      shape_parameters$length <- curved_length
+    }
     methods::slot(object, "shape_parameters") <- shape_parameters
   }
   return(object)

@@ -89,6 +89,8 @@ Ratio mode is often the more robust choice for comparative studies because it ke
 
 This distinction matters because the same nominal curvature can mean very different things for differently sized targets. Ratio mode preserves geometric interpretation across a size series. Measurement mode preserves literal physical curvature. Neither is universally better, but they answer different questions and should not be treated as interchangeable.
 
+For curved `FLS` objects, the stored body length is treated as the bent centerline arc length rather than as the flattened `x`-axis span. That matters for later workflows because `reforge()` now uses that same curved centerline directly when a bent `FLS` is resized. In other words, there is no hidden straight surrogate being rebuilt behind the scenes. The existing bent `rpos` is what gets rescaled.
+
 ```{r}
 shape_obj <- cylinder(
   length_body = 0.05,
@@ -156,6 +158,36 @@ That check is worth doing because a mathematically valid transformation can stil
 
 It is also worth checking because curvature can alter more than the silhouette. Depending on the downstream model, bending can change projected length, local orientation, and the phase relationships among different parts of the body. A curvature transformation is therefore best interpreted as a new geometric state of the same target, not just as a cosmetic deformation of a drawing.
 
+That distinction becomes especially important when a bent object is later resized. The example below shows that the requested `body_target["length"]` is matched to the true bent centerline length, while the projected `x` span stays slightly shorter.
+
+```{r}
+centerline_arc_length <- function(x) {
+  body <- extract(x, "body")
+  rpos <- body$rpos
+  sum(sqrt(diff(rpos["x", ])^2 + diff(rpos["z", ])^2))
+}
+
+bent_rescaled <- reforge(bent_ratio, body_target = c(length = 0.08))
+body_bent_rescaled <- extract(bent_rescaled, "body")$rpos
+
+data.frame(
+  metric = c(
+    "target_length_m",
+    "stored_shape_length_m",
+    "centerline_arc_length_m",
+    "projected_x_length_m"
+  ),
+  value = c(
+    0.08,
+    extract(bent_rescaled, c("shape_parameters", "length")),
+    centerline_arc_length(bent_rescaled),
+    diff(range(body_bent_rescaled["x", ]))
+  )
+)
+```
+
+This is the behavior to expect for an already bent `FLS`: resizing is arc-length aware. If the scientific question is instead "what happens if a straight target of length `L` is bent afterward?", the safer workflow is still to `reforge()` the straight object first and then apply `brake()`.
+
 # Positioning and local profile edits
 
 Not every geometry edit is about bending or global resizing. It is also useful to have small helpers for positioning, resampling, smoothing, or locally widening and pinching an existing profile.
@@ -222,7 +254,7 @@ These operations are helpful when the main question is geometric preprocessing r
 
 # Re-parameterizing with `reforge()`
 
-`reforge()` is a generic interface for reshaping or resizing an existing object. The most developed method in the package is the `SBF` method, which handles body and swimbladder geometry jointly.
+`reforge()` is a generic interface for reshaping or resizing an existing object. The package currently supports both one-body `FLS` workflows and more explicitly multi-component classes such as `SBF` and `BBF`.
 
 Its most important arguments are:
 
@@ -324,6 +356,8 @@ Named vectors matter here. For anisotropic changes, dimensions should be supplie
 
 The deeper point is that `reforge()` often changes representation more directly than `brake()`. Bending usually preserves the same broad anatomical proportions while changing pose. Reforging may change size, aspect ratio, internal proportions, and numerical resolution all at once. That makes it especially powerful for simulation and sensitivity studies, but it also means the transformed object should be treated as a deliberate new parameterization rather than as a trivial variant of the original.
 
+For bent `FLS` objects, there is one more important interpretation detail: `body_target = c(length = ...)` refers to the new bent centerline arc length, not to the projected `x` extent. For straight `FLS` objects those two quantities are effectively the same, but once curvature has been introduced they should not be treated as interchangeable.
+
 # Why this matters
 
 These tools are especially useful when:
@@ -368,6 +402,8 @@ Use `reforge()` when:
 2. body and swimbladder proportions must be altered separately,
 3. segment counts must be regularized for downstream modeling,
 4. simulation workflows need dimension changes as explicit parameters.
+
+If a simulation needs both curvature and resizing, it helps to decide which quantity is supposed to stay physically meaningful. When the object is already bent, `reforge()` preserves the bent state and rescales that geometry directly. When the intended interpretation is "start straight, resize, then bend," that sequence should be built explicitly in the workflow.
 
 # Recommended use
 

@@ -144,7 +144,7 @@ setGeneric(
 #' @param scales Named vector with length/width/height multipliers.
 #' @keywords internal
 #' @noRd
-.reforge_apply_axis_scaling <- function(rpos, scales) {
+.reforge_apply_axis_scaling <- function(rpos, scales, scale_centerline = FALSE) {
   # Leave the component untouched when no scaling was requested ================
   if (is.null(scales)) {
     return(rpos)
@@ -157,6 +157,20 @@ setGeneric(
     context = "Reforge component matrix"
   )
 
+  # Resolve the centerline and envelope rows used by the scaling update =======
+  z_idx <- .reforge_profile_row_idx(
+    rpos,
+    c("z", "z_body", "z_bladder", "z_shell", "z_fluid", "z_backbone")
+  )
+  zU_idx <- .reforge_profile_row_idx(
+    rpos,
+    .geometry_contract_schema()$profile_row_major$zU
+  )
+  zL_idx <- .reforge_profile_row_idx(
+    rpos,
+    .geometry_contract_schema()$profile_row_major$zL
+  )
+
   # Rescale the axial coordinate relative to its leading anchor point ==========
   if (scales["length"] != 1) {
     x_idx <- .reforge_profile_row_idx(
@@ -165,6 +179,22 @@ setGeneric(
     )
     anchor <- rpos[x_idx, 1]
     rpos[x_idx, ] <- anchor + (rpos[x_idx, ] - anchor) * scales["length"]
+
+    # Rescale the stored centerline path when curved profiles request it =======
+    if (isTRUE(scale_centerline) && length(z_idx) > 0) {
+      z_anchor <- rpos[z_idx, 1]
+      z_old <- rpos[z_idx, ]
+      z_new <- z_anchor + (z_old - z_anchor) * scales["length"]
+      z_delta <- z_new - z_old
+      rpos[z_idx, ] <- z_new
+
+      if (length(zU_idx) > 0) {
+        rpos[zU_idx, ] <- rpos[zU_idx, ] + z_delta
+      }
+      if (length(zL_idx) > 0) {
+        rpos[zL_idx, ] <- rpos[zL_idx, ] + z_delta
+      }
+    }
   }
 
   # Rescale the lateral width profile when present =============================
@@ -180,16 +210,6 @@ setGeneric(
 
   # Rescale the vertical profile while preserving its local centerline =========
   if (scales["height"] != 1) {
-    z_idx <- .reforge_profile_row_idx(rpos, c("z", "z_body", "z_bladder"))
-    zU_idx <- .reforge_profile_row_idx(
-      rpos,
-      .geometry_contract_schema()$profile_row_major$zU
-    )
-    zL_idx <- .reforge_profile_row_idx(
-      rpos,
-      .geometry_contract_schema()$profile_row_major$zL
-    )
-
     if (length(zU_idx) > 0 && length(zL_idx) > 0) {
       z_center <- if (length(z_idx) > 0) {
         rpos[z_idx, ]
@@ -620,8 +640,8 @@ setMethod(
     rpos_sb <- .reforge_resample_rows(rpos_sb, n_segments_swimbladder)
     ############################################################################
     # Apply scaling ============================================================
-    rpos_b <- .reforge_apply_axis_scaling(rpos_b, body_scales)
-    rpos_sb <- .reforge_apply_axis_scaling(rpos_sb, bladder_scales)
+      rpos_b <- .reforge_apply_axis_scaling(rpos_b, body_scales)
+      rpos_sb <- .reforge_apply_axis_scaling(rpos_sb, bladder_scales)
     ############################################################################
     # Adjust swimbladder position within scaled body if needed =================
     if (!is.null(body_scales) && body_scales["length"] != 1) {
@@ -1335,9 +1355,16 @@ setMethod(
     }
     ############################################################################
     # Normalize body scaling through the shared validation helpers =============
+    use_arc_length <- !is.null(body$arc_length) ||
+      (!is.null(body$radius_curvature_ratio) &&
+        is.finite(body$radius_curvature_ratio))
     body_dims <- c(
-      length = shape$length %||%
-        .shape_length(position_matrix = rpos, row_major = TRUE),
+      length = if (use_arc_length) {
+        .shape_arc_length(position_matrix = rpos, row_major = TRUE)
+      } else {
+        shape$length %||%
+          .shape_length(position_matrix = rpos, row_major = TRUE)
+      },
       radius = shape$radius %||%
         max(.shape_radius_profile(rpos, row_major = TRUE), na.rm = TRUE)
     )
@@ -1369,7 +1396,11 @@ setMethod(
         width = unname(body_scales["radius"]),
         height = unname(body_scales["radius"])
       )
-      rpos <- .reforge_apply_axis_scaling(rpos, axis_scales)
+      rpos <- .reforge_apply_axis_scaling(
+        rpos,
+        axis_scales,
+        scale_centerline = use_arc_length
+      )
     }
     ############################################################################
     # Flush working copies to slots ============================================
@@ -1380,10 +1411,21 @@ setMethod(
     )
     methods::slot(object, "body")$rpos <- rpos
     methods::slot(object, "body")$radius <- radii
-    methods::slot(object, "shape_parameters")$length <- .shape_length(
-      position_matrix = rpos,
-      row_major = TRUE
-    )
+    if (use_arc_length) {
+      methods::slot(object, "body")$arc_length <- .shape_arc_length(
+        position_matrix = rpos,
+        row_major = TRUE
+      )
+      methods::slot(object, "shape_parameters")$length <- .shape_arc_length(
+        position_matrix = rpos,
+        row_major = TRUE
+      )
+    } else {
+      methods::slot(object, "shape_parameters")$length <- .shape_length(
+        position_matrix = rpos,
+        row_major = TRUE
+      )
+    }
     methods::slot(object, "shape_parameters")$radius <- max(radii, na.rm = TRUE)
     return(object)
     ############################################################################
