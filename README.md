@@ -1,4 +1,3 @@
-
 # acousticTS <img src="man/figures/logo.png" align="right" height="158" alt="acousticTS hex logo" />
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7600659.svg)](https://doi.org/10.5281/zenodo.7600659)
@@ -28,7 +27,7 @@ $$
 
 $TS$ is used to:
 
-- Convert integrated backscatter (e.g. $S_\mathrm{A}$, NASC) or
+- Convert integrated backscatter (e.g. $S_\text{A}$), NASC) or
   volumetric backscatter ($S_\text{V}$) into number density or biomass
 - Classify backscatter by species or taxon based on multi-frequency
   response
