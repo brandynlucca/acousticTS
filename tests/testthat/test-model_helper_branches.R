@@ -3,10 +3,13 @@ library(acousticTS)
 .with_temp_pdf_device <- function(expr) {
   path <- tempfile(fileext = ".pdf")
   grDevices::pdf(path)
-  on.exit({
-    grDevices::dev.off()
-    unlink(path)
-  }, add = TRUE)
+  on.exit(
+    {
+      grDevices::dev.off()
+      unlink(path)
+    },
+    add = TRUE
+  )
   force(expr)
 }
 

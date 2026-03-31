@@ -640,8 +640,8 @@ setMethod(
     rpos_sb <- .reforge_resample_rows(rpos_sb, n_segments_swimbladder)
     ############################################################################
     # Apply scaling ============================================================
-      rpos_b <- .reforge_apply_axis_scaling(rpos_b, body_scales)
-      rpos_sb <- .reforge_apply_axis_scaling(rpos_sb, bladder_scales)
+    rpos_b <- .reforge_apply_axis_scaling(rpos_b, body_scales)
+    rpos_sb <- .reforge_apply_axis_scaling(rpos_sb, bladder_scales)
     ############################################################################
     # Adjust swimbladder position within scaled body if needed =================
     if (!is.null(body_scales) && body_scales["length"] != 1) {

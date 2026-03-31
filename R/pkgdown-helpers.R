@@ -107,8 +107,8 @@
   page_labels[blank_labels] <- unname(pages)[blank_labels]
 
   if (!is.null(current_page) && length(current_page) == 1L &&
-      !is.na(current_page) &&
-      nzchar(current_page)) {
+    !is.na(current_page) &&
+    nzchar(current_page)) {
     keep <- page_labels != current_page
     pages <- pages[keep]
     page_labels <- page_labels[keep]

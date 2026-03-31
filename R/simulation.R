@@ -155,7 +155,7 @@
     mustWork = FALSE
   )
   if (dir.exists(package_dir) &&
-      file.exists(file.path(package_dir, "DESCRIPTION"))) {
+    file.exists(file.path(package_dir, "DESCRIPTION"))) {
     # Reuse the active library path when the current namespace is installed ====
     if (dir.exists(file.path(package_dir, "Meta"))) {
       return(dirname(package_dir))
@@ -183,8 +183,8 @@
   cache_src <- if (is.list(cache)) cache$source else NULL
   cache_pkg <- if (!is.null(cache_lib)) file.path(cache_lib, package) else NULL
   if (!is.null(cache_lib) &&
-      identical(cache_src, package_dir) &&
-      dir.exists(cache_pkg)) {
+    identical(cache_src, package_dir) &&
+    dir.exists(cache_pkg)) {
     return(cache_lib)
   }
 
@@ -393,9 +393,11 @@
 #'
 #' @section Parallelization:
 #' This function uses \code{pbapply::pblapply()} for parallelized simulation
-#' with progress bars. On Windows, parallelization uses PSOCK clusters, which
-#' require all necessary objects and packages to be exported to worker
-#' processes. On Unix-like systems, forking is used, which is generally simpler.
+#' with progress bars. The current implementation uses PSOCK clusters for
+#' worker execution across platforms, including Windows, macOS, and Linux.
+#' That means worker processes need access to the package namespace and any
+#' required exported objects, and it also means startup overhead is more
+#' noticeable for very small simulation jobs than for larger batched runs.
 #'
 #' @section Performance Issues:
 #' Including too many parameters from \code{parameters}

@@ -10,8 +10,7 @@ cal_sphere <- target_strength(
 )
 
 for (x_units in c("frequency", "k_sw", "k_l", "k_t")) {
-  file_name <- switch(
-    x_units,
+  file_name <- switch(x_units,
     frequency = "calibration-spectrum-frequency.png",
     k_sw = "calibration-spectrum-k-sw.png",
     k_l = "calibration-spectrum-k-l.png",

@@ -3,7 +3,7 @@ impl_load_all()
 data_dir <- impl_data_path("")
 
 calc_variant <- function(freq, m_extra = 10L, adaptive = FALSE, tol = 1e-10) {
-  obj <- cal_generate(material = 'WC', diameter = 38.1e-3)
+  obj <- cal_generate(material = "WC", diameter = 38.1e-3)
   model <- calibration_initialize(obj, frequency = freq, sound_speed_sw = 1477.3, density_sw = 1026.8)@model_parameters$calibration
   ka_sw <- model$parameters$acoustics$k_sw * model$body$radius
   ka_l <- model$parameters$acoustics$k_l * model$body$radius
@@ -13,7 +13,7 @@ calc_variant <- function(freq, m_extra = 10L, adaptive = FALSE, tol = 1e-10) {
   one_freq <- function(ka_sw, ka_l, ka_t) {
     sum_to_ml <- function(ml) {
       m <- 0:ml
-      Pl <- Pn(m, cos(theta))[,1]
+      Pl <- Pn(m, cos(theta))[, 1]
       js_mat <- js(m, ka_sw)
       js_mat_l <- js(m, ka_l)
       js_mat_t <- js(m, ka_t)
@@ -66,26 +66,26 @@ adpt <- calc_variant(freqs, m_extra = 10, adaptive = TRUE, tol = 1e-10)
 
 cmp <- data.frame(
   frequency = freqs,
-  base = base[, 'TS'],
-  more = more[, 'TS'],
-  adpt = adpt[, 'TS'],
-  ml_base = base[, 'ml'],
-  ml_more = more[, 'ml'],
-  ml_adpt = adpt[, 'ml'],
-  last_base = base[, 'last_mod'],
-  last_adpt = adpt[, 'last_mod']
+  base = base[, "TS"],
+  more = more[, "TS"],
+  adpt = adpt[, "TS"],
+  ml_base = base[, "ml"],
+  ml_more = more[, "ml"],
+  ml_adpt = adpt[, "ml"],
+  last_base = base[, "last_mod"],
+  last_adpt = adpt[, "last_mod"]
 )
 
 cmp$delta_more <- cmp$more - cmp$base
 cmp$delta_adpt <- cmp$adpt - cmp$base
 write.csv(
   cmp,
-  file.path(data_dir, 'calibration_wc381_truncation_diagnostic.csv'),
+  file.path(data_dir, "calibration_wc381_truncation_diagnostic.csv"),
   row.names = FALSE
 )
-cat('ABS delta more vs base\n')
+cat("ABS delta more vs base\n")
 print(summary(abs(cmp$delta_more)))
-cat('ABS delta adaptive vs base\n')
+cat("ABS delta adaptive vs base\n")
 print(summary(abs(cmp$delta_adpt)))
-cat('Worst adaptive row\n')
+cat("Worst adaptive row\n")
 print(cmp[which.max(abs(cmp$delta_adpt)), ])

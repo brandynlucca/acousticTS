@@ -180,14 +180,14 @@ NULL
   }
 
   if (is.null(shell$density) ||
-        !is.finite(shell$density) ||
-        is.null(shell$G) ||
-        !is.finite(shell$G)) {
-          stop(
-            "VESMS requires the ESS shell to have finite density ",
-            "and shear modulus."
-          )
-    }
+    !is.finite(shell$density) ||
+    is.null(shell$G) ||
+    !is.finite(shell$G)) {
+    stop(
+      "VESMS requires the ESS shell to have finite density ",
+      "and shear modulus."
+    )
+  }
 
   if (is.null(fluid$density) ||
     !is.finite(fluid$density) ||

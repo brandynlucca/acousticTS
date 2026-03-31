@@ -185,8 +185,7 @@ merged <- merge(
 # Reorder rows explicitly because base::merge() does not preserve the intended
 # frequency sweep ordering for the ECMS comparison table.
 merged <- merged[
-  order(merged$frequency_hz),
-  ,
+  order(merged$frequency_hz), ,
   drop = FALSE
 ]
 

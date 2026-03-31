@@ -1,4 +1,4 @@
-devtools::load_all('.')
+devtools::load_all(".")
 
 body_shape <- cylinder(
   length_body = 0.08,
@@ -23,6 +23,6 @@ bbf_object <- bbf_generate(
   x_offset_backbone = 0.015
 )
 
-png('vignettes/bbfm/bbfm-shape-plot.png', width = 1200, height = 1200, res = 200)
-plot(bbf_object, type = 'shape')
+png("vignettes/bbfm/bbfm-shape-plot.png", width = 1200, height = 1200, res = 200)
+plot(bbf_object, type = "shape")
 dev.off()

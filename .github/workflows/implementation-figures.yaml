@@ -42,14 +42,6 @@ jobs:
         with:
           use-public-rspm: true
 
-      - name: Install Fortran toolchain
-        run: sudo apt-get update && sudo apt-get install -y gfortran
-
-      - uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          extra-packages: any::devtools, local::.
-          needs: website
-
       - name: Fetch PR base branch
         if: github.event_name == 'pull_request'
         run: git fetch origin "${{ github.base_ref }}" --depth=1
@@ -66,6 +58,16 @@ jobs:
           GITHUB_BASE_REF: ${{ github.base_ref }}
         run: source("tools/implementation-figures/resolve_changed_families.R")
         shell: Rscript {0}
+
+      - name: Install Fortran toolchain
+        if: steps.scope.outputs.scope != 'skip'
+        run: sudo apt-get update && sudo apt-get install -y gfortran
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        if: steps.scope.outputs.scope != 'skip'
+        with:
+          extra-packages: any::devtools, local::.
+          needs: website
 
       - name: Rebuild implementation figures
         if: steps.scope.outputs.scope != 'skip'

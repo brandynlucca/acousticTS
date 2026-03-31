@@ -4,7 +4,7 @@ data_dir <- impl_data_path("")
 output_path <- file.path(data_dir, "calibration_wc381_timing_compare.csv")
 
 calc_old_ts <- function(freq) {
-  obj <- cal_generate(material = 'WC', diameter = 38.1e-3)
+  obj <- cal_generate(material = "WC", diameter = 38.1e-3)
   model <- calibration_initialize(obj, frequency = freq, sound_speed_sw = 1477.3, density_sw = 1026.8)@model_parameters$calibration
   ka_sw <- model$parameters$acoustics$k_sw * model$body$radius
   ka_l <- model$parameters$acoustics$k_l * model$body$radius
@@ -12,7 +12,7 @@ calc_old_ts <- function(freq) {
   m_limit <- round(ka_sw) + 10
   f_j <- mapply(FUN = function(ka_sw, ka_l, ka_t, theta, density_body, density_sw, ml) {
     m <- 0:ml
-    Pl <- Pn(m, cos(theta))[,1]
+    Pl <- Pn(m, cos(theta))[, 1]
     js_mat <- js(m, ka_sw)
     js_mat_l <- js(m, ka_l)
     js_mat_t <- js(m, ka_t)
@@ -46,8 +46,8 @@ calc_old_ts <- function(freq) {
 }
 
 calc_new_ts <- function(freq) {
-  obj <- cal_generate(material = 'WC', diameter = 38.1e-3)
-  obj <- target_strength(obj, frequency = freq, model = 'calibration', sound_speed_sw = 1477.3, density_sw = 1026.8)
+  obj <- cal_generate(material = "WC", diameter = 38.1e-3)
+  obj <- target_strength(obj, frequency = freq, model = "calibration", sound_speed_sw = 1477.3, density_sw = 1026.8)
   obj@model$calibration$TS
 }
 
@@ -57,11 +57,11 @@ if (impl_should_refresh_timings() || !file.exists(output_path)) {
   old_times <- numeric(5)
   new_times <- numeric(5)
   for (i in seq_len(5)) {
-    old_times[i] <- system.time(calc_old_ts(freq))[['elapsed']]
-    new_times[i] <- system.time(calc_new_ts(freq))[['elapsed']]
+    old_times[i] <- system.time(calc_old_ts(freq))[["elapsed"]]
+    new_times[i] <- system.time(calc_new_ts(freq))[["elapsed"]]
   }
   res <- data.frame(
-    version = c('old_fixed_cutoff', 'new_adaptive_cutoff'),
+    version = c("old_fixed_cutoff", "new_adaptive_cutoff"),
     mean_elapsed_s = c(mean(old_times), mean(new_times)),
     median_elapsed_s = c(median(old_times), median(new_times)),
     min_elapsed_s = c(min(old_times), min(new_times)),

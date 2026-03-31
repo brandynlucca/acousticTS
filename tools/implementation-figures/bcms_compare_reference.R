@@ -150,8 +150,7 @@ merged <- merge(
 # frequency sweep ordering for the bent/straight comparison table.
 case_levels <- c("straight", "bent")
 merged <- merged[
-  order(match(merged$case, case_levels), merged$frequency_hz),
-  ,
+  order(match(merged$case, case_levels), merged$frequency_hz), ,
   drop = FALSE
 ]
 
