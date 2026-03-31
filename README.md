@@ -1,7 +1,7 @@
 
 # acousticTS <img src="man/figures/logo.png" align="right" height="158" alt="acousticTS hex logo" />
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7600660.svg)](https://doi.org/10.5281/zenodo.7600660) [![Documentation](https://img.shields.io/badge/Latest_Documentation-blue)](https://brandynlucca.github.io/acousticTS/) [![Build
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7600659.svg)](https://doi.org/10.5281/zenodo.7600659) [![Documentation](https://img.shields.io/badge/Latest_Documentation-blue)](https://brandynlucca.github.io/acousticTS/) [![Build
 status](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml) [![Coverage](https://codecov.io/gh/brandynlucca/acousticTS/graph/badge.svg?branch=main)](https://app.codecov.io/gh/brandynlucca/acousticTS?branch=main) [![License:
 GPL-3](https://img.shields.io/badge/License-GPL--3-blue.svg)](LICENSE)
 
