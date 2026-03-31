@@ -87,11 +87,13 @@ krill <- cylinder(
 )
 
 # Run the DWBA model from 1 kHz to 300 kHz
-krill <- target_strength(krill, frequency = seq(1e3, 300e3, by = 1e3),
-                          model = "DWBA")
+krill <- target_strength(krill,
+  frequency = seq(1e3, 300e3, by = 1e3),
+  model = "DWBA"
+)
 
 # Plot TS vs frequency
-plot(krill, type="model")
+plot(krill, type = "model")
 ```
 
 ## Shapes and reforging
@@ -103,10 +105,10 @@ Scatterer shapes are created via dedicated constructors:
 fish_shape <- cylinder(length = 0.25, radius = 0.02)
 
 # Prolate spheroid (used by FLS / PSMS)
-ps_shape   <- prolate_spheroid(length = 0.02, radius = 0.002)
+ps_shape <- prolate_spheroid(length = 0.02, radius = 0.002)
 
 # Arbitrary shape from digitized position matrix
-arb_shape  <- arbitrary(rpos = my_matrix)
+arb_shape <- arbitrary(rpos = my_matrix)
 ```
 
 Existing scatterer objects can be resized or re-discretized without
@@ -164,9 +166,10 @@ If you use acousticTS in published work, please cite:
 citation("acousticTS")
 ```
 
-> Lucca, B.M. (2023). acousticTS: Estimating Acoustic Target Strength
-> via Physics-Based Scattering Models.
-> <https://doi.org/10.5281/zenodo.7600660>
+The Zenodo concept DOI for acousticTS, which resolves to the latest
+archived release record, is:
+
+<https://doi.org/10.5281/zenodo.7600659>
 
 ## Contributing and bug reports
 

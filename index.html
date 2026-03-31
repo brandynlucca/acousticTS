@@ -270,11 +270,13 @@
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Run the DWBA model from 1 kHz to 300 kHz</span></span>
-<span><span class="va">krill</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/target_strength.html">target_strength</a></span><span class="op">(</span><span class="va">krill</span>, frequency <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1e3</span>, <span class="fl">300e3</span>, by <span class="op">=</span> <span class="fl">1e3</span><span class="op">)</span>,</span>
-<span>                          model <span class="op">=</span> <span class="st">"DWBA"</span><span class="op">)</span></span>
+<span><span class="va">krill</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/target_strength.html">target_strength</a></span><span class="op">(</span><span class="va">krill</span>,</span>
+<span>  frequency <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1e3</span>, <span class="fl">300e3</span>, by <span class="op">=</span> <span class="fl">1e3</span><span class="op">)</span>,</span>
+<span>  model <span class="op">=</span> <span class="st">"DWBA"</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Plot TS vs frequency</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">krill</span>, type<span class="op">=</span><span class="st">"model"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">krill</span>, type <span class="op">=</span> <span class="st">"model"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="shapes-and-reforging">Shapes and reforging<a class="anchor" aria-label="anchor" href="#shapes-and-reforging"></a>
@@ -285,10 +287,10 @@
 <span><span class="va">fish_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/cylinder.html">cylinder</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fl">0.25</span>, radius <span class="op">=</span> <span class="fl">0.02</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Prolate spheroid (used by FLS / PSMS)</span></span>
-<span><span class="va">ps_shape</span>   <span class="op">&lt;-</span> <span class="fu"><a href="reference/prolate_spheroid.html">prolate_spheroid</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fl">0.02</span>, radius <span class="op">=</span> <span class="fl">0.002</span><span class="op">)</span></span>
+<span><span class="va">ps_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/prolate_spheroid.html">prolate_spheroid</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fl">0.02</span>, radius <span class="op">=</span> <span class="fl">0.002</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Arbitrary shape from digitized position matrix</span></span>
-<span><span class="va">arb_shape</span>  <span class="op">&lt;-</span> <span class="fu"><a href="reference/arbitrary.html">arbitrary</a></span><span class="op">(</span>rpos <span class="op">=</span> <span class="va">my_matrix</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">arb_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/arbitrary.html">arbitrary</a></span><span class="op">(</span>rpos <span class="op">=</span> <span class="va">my_matrix</span><span class="op">)</span></span></code></pre></div>
 <p>Existing scatterer objects can be resized or re-discretized without reconstructing them from scratch using <code><a href="reference/reforge.html">reforge()</a></code>:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Rescale a krill to 40 mm</span></span>
@@ -356,9 +358,8 @@
 <p>If you use acousticTS in published work, please cite:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/citation.html" class="external-link">citation</a></span><span class="op">(</span><span class="st">"acousticTS"</span><span class="op">)</span></span></code></pre></div>
-<blockquote>
-<p>Lucca, B.M. (2023). acousticTS: Estimating Acoustic Target Strength via Physics-Based Scattering Models. <a href="https://doi.org/10.5281/zenodo.7600660" class="external-link uri">https://doi.org/10.5281/zenodo.7600660</a></p>
-</blockquote>
+<p>The Zenodo concept DOI for acousticTS, which resolves to the latest archived release record, is:</p>
+<p><a href="https://doi.org/10.5281/zenodo.7600659" class="external-link uri">https://doi.org/10.5281/zenodo.7600659</a></p>
 </div>
 <div class="section level2">
 <h2 id="contributing-and-bug-reports">Contributing and bug reports<a class="anchor" aria-label="anchor" href="#contributing-and-bug-reports"></a>
