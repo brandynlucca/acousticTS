@@ -213,6 +213,13 @@ reference:
     contents:
       - extract
       - plot.Scatterer
+      - translate_shape
+      - reanchor_shape
+      - offset_component
+      - inflate_shape
+      - smooth_shape
+      - resample_shape
+      - flip_shape
       - reforge
       - brake
 
