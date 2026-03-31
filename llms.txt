@@ -1,4 +1,4 @@
-\` \# acousticTS ![acousticTS hex logo](reference/figures/logo.png)
+# acousticTS
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7600659.svg)](https://doi.org/10.5281/zenodo.7600659)
 [![Documentation](https://img.shields.io/badge/Latest_Documentation-blue)](https://brandynlucca.github.io/acousticTS/)
