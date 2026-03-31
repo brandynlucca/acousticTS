@@ -77,9 +77,13 @@ results in a structured `S4` object.
 library(acousticTS)
 
 # Build a fluid-like scatterer (e.g. krill) with a cylinder shape
-krill <- cylinder(
-  length = 0.03,          # 30 mm body length
-  radius = 0.003,         # 3 mm max radius
+krill_shape <- cylinder(
+  length_body = 0.03,          # 30 mm body length
+  radius_body = 0.003          # 3 mm max radius
+)
+# ---- Create the actual Scatterer-class object (FLS)
+krill <- fls_generate(
+  shape = krill_shape,
   g = 1.0357,             # density contrast
   h = 1.0279,             # sound speed contrast
   theta = pi / 2          # broadside incidence
@@ -101,13 +105,21 @@ Scatterer shapes are created via dedicated constructors:
 
 ```{r shapes, eval=FALSE}
 # Cylinder (used by FLS / CAL)
-fish_shape <- cylinder(length = 0.25, radius = 0.02)
+fish_shape <- cylinder(length_body = 0.25, radius_body = 0.02)
 
 # Prolate spheroid (used by FLS / PSMS)
-ps_shape <- prolate_spheroid(length = 0.02, radius = 0.002)
+ps_shape <- prolate_spheroid(length_body = 0.02, radius_body = 0.002)
 
 # Arbitrary shape from digitized position matrix
 arb_shape <- arbitrary(rpos = my_matrix)
+
+# Dorsal/ventral style inputs
+arbitrary(
+  x_body = c(0, 0.015),
+  w_body = c(0.005, 0.0075),
+  zU_body = c(0.001, 0.002),
+  zL_body = c(-0.001, -0.002)
+)
 ```
 
 Existing scatterer objects can be resized or re-discretized without reconstructing them from scratch using `reforge()`:
@@ -129,10 +141,10 @@ results <- simulate_ts(
   krill,
   model = "DWBA",
   frequency = 120e3,
-  n = 1000,
+  n_realizations = 1000,
   parameters = list(
-    theta = function() rnorm(1, pi / 2, pi / 18),
-    length = function() rnorm(1, 0.03, 0.003)
+    theta_body = function() rnorm(1, pi / 2, pi / 18),
+    length_body = function() rnorm(1, 0.03, 0.003)
   )
 )
 ```
