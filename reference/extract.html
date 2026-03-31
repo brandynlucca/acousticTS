@@ -3,11 +3,15 @@
 without spelling out direct slot access repeatedly. extract() can also walk
 through nested lists, matrices, and named vectors, which makes it useful for
 pulling model outputs, component properties, or position-matrix fields from a
-common interface."><meta property="og:description" content="Convenience accessor for reaching into Scatterer and Shape objects
+common interface. This is especially helpful after geometry manipulations
+such as brake() and reforge(), where inspecting the stored body profile
+is often the fastest way to confirm what changed."><meta property="og:description" content="Convenience accessor for reaching into Scatterer and Shape objects
 without spelling out direct slot access repeatedly. extract() can also walk
 through nested lists, matrices, and named vectors, which makes it useful for
 pulling model outputs, component properties, or position-matrix fields from a
-common interface."><meta property="og:image" content="https://brandynlucca.github.io/acousticTS/logo.png"></head><body>
+common interface. This is especially helpful after geometry manipulations
+such as brake() and reforge(), where inspecting the stored body profile
+is often the fastest way to confirm what changed."><meta property="og:image" content="https://brandynlucca.github.io/acousticTS/logo.png"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -86,7 +90,9 @@ common interface."><meta property="og:image" content="https://brandynlucca.githu
 without spelling out direct slot access repeatedly. <code>extract()</code> can also walk
 through nested lists, matrices, and named vectors, which makes it useful for
 pulling model outputs, component properties, or position-matrix fields from a
-common interface.</p>
+common interface. This is especially helpful after geometry manipulations
+such as <code><a href="brake.html">brake()</a></code> and <code><a href="reforge.html">reforge()</a></code>, where inspecting the stored body profile
+is often the fastest way to confirm what changed.</p>
     </div>
 
     <div class="section level2">
@@ -115,6 +121,12 @@ scattering parameters.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>The extracted object, slot, list element, matrix row/column, or
 vector element identified by <code>feature</code>.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><code><a href="brake.html">brake()</a></code>, <code><a href="reforge.html">reforge()</a></code>, <code><a href="translate_shape.html">translate_shape()</a></code>, <code><a href="reanchor_shape.html">reanchor_shape()</a></code>,
+<code><a href="inflate_shape.html">inflate_shape()</a></code>, <code><a href="smooth_shape.html">smooth_shape()</a></code>, <code><a href="resample_shape.html">resample_shape()</a></code>, <code><a href="flip_shape.html">flip_shape()</a></code>,
+<code><a href="offset_component.html">offset_component()</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -195,6 +207,13 @@ vector element identified by <code>feature</code>.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1045</span>
 <span class="r-in"><span><span class="fu">extract</span><span class="op">(</span><span class="va">obj</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"shape"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Sphere"</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">bent_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="brake.html">brake</a></span><span class="op">(</span><span class="va">obj</span>, radius_curvature <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu">extract</span><span class="op">(</span><span class="va">bent_obj</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"body"</span>, <span class="st">"rpos"</span>, <span class="st">"z"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -0.0004995835 -0.0004509107 -0.0004047267 -0.0003610325 -0.0003198294</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [6] -0.0002811182</span>
+<span class="r-in"><span><span class="fu">extract</span><span class="op">(</span><span class="va">bent_obj</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"radius_curvature_ratio"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 5</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

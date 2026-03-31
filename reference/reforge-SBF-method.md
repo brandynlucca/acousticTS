@@ -17,7 +17,8 @@ reforge(
   maintain_ratio = TRUE,
   swimbladder_inflation_factor = 1,
   n_segments_body = NULL,
-  n_segments_swimbladder = NULL
+  n_segments_swimbladder = NULL,
+  containment = c("warn", "error", "ignore")
 )
 ```
 
@@ -75,3 +76,9 @@ reforge(
 - n_segments_swimbladder:
 
   Number of segments along the bladder.
+
+- containment:
+
+  Containment policy for internal geometry checks. Use `"warn"` to keep
+  the current warning behavior, `"error"` to fail fast for invalid
+  internal geometries, or `"ignore"` to skip containment checks.

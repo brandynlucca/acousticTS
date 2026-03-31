@@ -306,10 +306,10 @@
 <p>Existing scatterer objects can be resized or re-discretized without reconstructing them from scratch using <code><a href="reference/reforge.html">reforge()</a></code>:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Rescale a krill to 40 mm</span></span>
-<span><span class="va">krill_40mm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/reforge.html">reforge</a></span><span class="op">(</span><span class="va">krill</span>, length <span class="op">=</span> <span class="fl">0.04</span><span class="op">)</span></span>
+<span><span class="va">krill_40mm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/reforge.html">reforge</a></span><span class="op">(</span><span class="va">krill</span>, body_target <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fl">0.04</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Change segment count</span></span>
-<span><span class="va">krill_fine</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/reforge.html">reforge</a></span><span class="op">(</span><span class="va">krill</span>, n_segments <span class="op">=</span> <span class="fl">200</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">krill_fine</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/reforge.html">reforge</a></span><span class="op">(</span><span class="va">krill</span>, n_segments_body <span class="op">=</span> <span class="fl">200</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="configuring-simulations">Configuring simulations<a class="anchor" aria-label="anchor" href="#configuring-simulations"></a>

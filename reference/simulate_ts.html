@@ -153,13 +153,24 @@ calls. It supports three broad parameter modes inside <code>parameters</code>:</
 <ul><li><p>scalars that are recycled across every realization,</p></li>
 <li><p>explicit vectors that are either aligned with the full simulation
 grid or with one or more batched dimensions, and</p></li>
-<li><p>generating functions that are re-evaluated for each realization.</p></li>
+<li><p>generating functions that are re-evaluated for each realization, and</p></li>
+<li><p>structured values such as named target-dimension vectors used by
+<code><a href="reforge.html">reforge()</a></code> (for example <code>body_target = c(length = 0.03)</code>).</p></li>
 </ul><p>If <code>batch_by = "length"</code> and <code>parameters[["length"]]</code> is a vector
 of candidate values, then simulations are run for each length value,
 repeated <code>n_realizations</code> times. When multiple parameters are supplied
 through <code>batch_by</code>, the function builds the full Cartesian grid of
 those parameter values and runs the requested number of realizations inside
 each batch cell.</p>
+<p>Structured batch values should be wrapped in a list so that each candidate is
+preserved as one unit. For example, use
+<code>parameters = list(body_target = list(c(length = 0.02), c(length = 0.03))))</code>
+when batching across multiple explicit <code><a href="reforge.html">reforge()</a></code> targets.</p>
+<p>Convenience dimension aliases are also supported for compatible
+<code><a href="reforge.html">reforge()</a></code> methods. For example, <code>length_body = 0.03</code> is treated
+the same as <code>body_target = c(length = 0.03)</code> for fluid-like scatterers,
+while retaining the original <code>length_body</code> column in the returned
+simulation output.</p>
 <p>Parameter names are interpreted in the same way they would be if supplied
 directly to <code><a href="target_strength.html">target_strength()</a></code> or to the relevant object constructor /
 <code><a href="reforge.html">reforge()</a></code> path. This means <code>simulate_ts()</code> can be used for:</p>

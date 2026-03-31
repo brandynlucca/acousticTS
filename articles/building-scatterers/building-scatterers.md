@@ -27,6 +27,69 @@ description into a model-ready acoustic object.
 ![Updated scatterer-generation and class-hierarchy
 map](building-scatterers-map.png)[](https://brandynlucca.github.io/acousticTS/reference/Scatterer-class.md "Scatterer class")[](https://brandynlucca.github.io/acousticTS/reference/FLS-class.md "FLS class")[](https://brandynlucca.github.io/acousticTS/reference/GAS-class.md "GAS class")[](https://brandynlucca.github.io/acousticTS/reference/CAL-class.md "CAL class")[](https://brandynlucca.github.io/acousticTS/reference/ELA-class.md "ELA class")[](https://brandynlucca.github.io/acousticTS/reference/CSC-class.md "CSC class")[](https://brandynlucca.github.io/acousticTS/reference/SBF-class.md "SBF class")[](https://brandynlucca.github.io/acousticTS/reference/BBF-class.md "BBF class")[](https://brandynlucca.github.io/acousticTS/reference/ESS-class.md "ESS class")
 
+## Quick constructor examples
+
+The fastest way to see the package logic is to build a few small objects
+directly.
+
+``` r
+library(acousticTS)
+
+shape_obj <- prolate_spheroid(
+  length_body = 0.04,
+  radius_body = 0.004,
+  n_segments = 60
+)
+
+fls_obj <- fls_generate(
+  shape = shape_obj,
+  density_body = 1045,
+  sound_speed_body = 1520
+)
+
+gas_obj <- gas_generate(
+  shape = sphere(radius_body = 0.01, n_segments = 60),
+  g_fluid = 0.0012,
+  h_fluid = 0.22
+)
+
+data.frame(
+  object_class = c(class(fls_obj)[1], class(gas_obj)[1]),
+  shape = c(
+    extract(fls_obj, c("shape_parameters", "shape")),
+    extract(gas_obj, c("shape_parameters", "shape"))
+  ),
+  length_m = c(
+    extract(fls_obj, c("shape_parameters", "length")),
+    extract(gas_obj, c("shape_parameters", "length"))
+  )
+)
+```
+
+    ##   object_class           shape length_m
+    ## 1          FLS ProlateSpheroid     0.04
+    ## 2          GAS          Sphere     0.02
+
+That is the core pattern used throughout the package: build a `Shape`,
+then assign it a physical interpretation with the relevant scatterer
+constructor.
+
+It is also worth checking the geometry visually at this stage because
+the scatterer plot reflects the stored object that will be passed into
+[`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md),
+not just the constructor inputs.
+
+``` r
+old_par <- par(no.readonly = TRUE)
+on.exit(par(old_par), add = TRUE)
+
+par(mfrow = c(1, 2), mar = c(3, 3, 2.2, 0.8))
+plot(fls_obj, type = "shape", main = "FLS object")
+plot(gas_obj, type = "shape", main = "GAS object")
+```
+
+![](building-scatterers_files/figure-html/unnamed-chunk-3-1.png)
+
 ## Why scatterer construction is separate from shape construction
 
 The package separates shape generation from scatterer generation so that
@@ -138,6 +201,67 @@ absolute properties (`density_*`, `sound_speed_*`). That flexibility is
 useful and does not add the same kind of cognitive overhead as
 overloading the geometry interface.
 
+``` r
+body_shape <- arbitrary(
+  x_body = c(0, 0.08, 0.12),
+  zU_body = c(0.001, 0.004, 0.001),
+  zL_body = c(-0.001, -0.004, -0.001)
+)
+
+bladder_shape <- arbitrary(
+  x_bladder = c(0.03, 0.08, 0.1),
+  zU_bladder = c(0.0008, 0.0016, 0.0008),
+  zL_bladder = c(-0.0008, -0.0016, -0.0008)
+)
+
+sbf_obj <- sbf_generate(
+  body_shape = body_shape,
+  bladder_shape = bladder_shape,
+  density_body = 1040,
+  sound_speed_body = 1500,
+  density_bladder = 1.2,
+  sound_speed_bladder = 340
+)
+
+data.frame(
+  body_length_m = extract(sbf_obj, c("shape_parameters", "body", "length")),
+  bladder_length_m = extract(sbf_obj, c("shape_parameters", "bladder", "length")),
+  body_theta_rad = extract(sbf_obj, c("body", "theta"))
+)
+```
+
+    ##   body_length_m bladder_length_m body_theta_rad
+    ## 1          0.12             0.07       1.570796
+
+That is the composite pattern: build the components separately, then
+hand them to the scatterer generator explicitly as `body_shape`,
+`bladder_shape`, or `backbone_shape`.
+
+At that point it is often useful to inspect the object internals
+directly so the separation between components is explicit in code as
+well as in the plot.
+
+``` r
+list(
+  body_length_m = extract(sbf_obj, c("shape_parameters", "body", "length")),
+  bladder_length_m = extract(sbf_obj, c("shape_parameters", "bladder", "length")),
+  body_theta_rad = extract(sbf_obj, c("body", "theta")),
+  bladder_x_head = head(extract(sbf_obj, "bladder")$rpos[1, ])
+)
+```
+
+    ## $body_length_m
+    ## [1] 0.12
+    ## 
+    ## $bladder_length_m
+    ## [1] 0.07
+    ## 
+    ## $body_theta_rad
+    ## [1] 1.570796
+    ## 
+    ## $bladder_x_head
+    ## [1] 0.03 0.08 0.10
+
 ## Matching class to target type
 
 The scatterer class should match the intended physical interpretation,
@@ -202,6 +326,84 @@ selection much easier, because compatible model families become apparent
 as soon as the scatterer class is chosen. In that sense, good scatterer
 construction is already the beginning of good model selection.
 
+The same shape-first pattern extends to the other target families as
+well:
+
+``` r
+# Explicit body-plus-backbone target for BBFM workflows
+bbf_obj <- bbf_generate(
+  body_shape = arbitrary(
+    x_body = c(0, 0.04, 0.08),
+    zU_body = c(0.001, 0.004, 0.001),
+    zL_body = c(-0.001, -0.004, -0.001)
+  ),
+  backbone_shape = cylinder(
+    length_body = 0.05,
+    radius_body = 0.0008,
+    n_segments = 40
+  ),
+  density_body = 1070,
+  sound_speed_body = 1570,
+  density_backbone = 1900,
+  sound_speed_longitudinal_backbone = 3500,
+  sound_speed_transversal_backbone = 1700
+)
+
+# Standard calibration sphere
+cal_obj <- cal_generate(
+  material = "WC",
+  diameter = 38.1e-3,
+  n_segments = 120
+)
+
+# Elastic-shelled sphere
+ess_obj <- ess_generate(
+  shape = sphere(radius_body = 0.03, n_segments = 80),
+  shell_thickness = 0.001,
+  density_shell = 1050,
+  sound_speed_shell = 2350,
+  density_fluid = 1030,
+  sound_speed_fluid = 1500,
+  E = 3.5e9,
+  nu = 0.34
+)
+```
+
+``` r
+cal_obj <- cal_generate(
+  material = "WC",
+  diameter = 38.1e-3,
+  n_segments = 120
+)
+
+ess_obj <- ess_generate(
+  shape = sphere(radius_body = 0.03, n_segments = 80),
+  shell_thickness = 0.001,
+  density_shell = 1050,
+  sound_speed_shell = 2350,
+  density_fluid = 1030,
+  sound_speed_fluid = 1500,
+  E = 3.5e9,
+  nu = 0.34
+)
+
+data.frame(
+  object_class = c(class(cal_obj)[1], class(ess_obj)[1]),
+  diameter_m = c(
+    extract(cal_obj, c("shape_parameters", "diameter")),
+    NA_real_
+  ),
+  shell_thickness_m = c(
+    NA_real_,
+    extract(ess_obj, c("shell", "shell_thickness"))
+  )
+)
+```
+
+    ##   object_class diameter_m shell_thickness_m
+    ## 1          CAL     0.0381                NA
+    ## 2          ESS         NA             0.001
+
 ## What to check before moving on
 
 Before running a model, it is worth checking a few simple things. The
@@ -215,6 +417,23 @@ separately rather than accidentally collapsed into one homogeneous body.
 Those checks are simple, but they have a large payoff. Many apparent
 modeling problems are actually scatterer-construction problems
 discovered too late.
+
+``` r
+extract(fls_obj, c("body", "density"))
+```
+
+    ## [1] 1045
+
+``` r
+extract(fls_obj, c("shape_parameters", "shape"))
+```
+
+    ## [1] "ProlateSpheroid"
+
+That kind of quick inspection is usually enough to confirm that the
+object you built matches the target type you intended before moving on
+to
+[`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md).
 
 ## Recommended next step
 

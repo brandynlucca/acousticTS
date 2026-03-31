@@ -4,7 +4,13 @@ Convenience accessor for reaching into `Scatterer` and `Shape` objects
 without spelling out direct slot access repeatedly. `extract()` can also
 walk through nested lists, matrices, and named vectors, which makes it
 useful for pulling model outputs, component properties, or
-position-matrix fields from a common interface.
+position-matrix fields from a common interface. This is especially
+helpful after geometry manipulations such as
+[`brake()`](https://brandynlucca.github.io/acousticTS/reference/brake.md)
+and
+[`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md),
+where inspecting the stored body profile is often the fastest way to
+confirm what changed.
 
 ## Usage
 
@@ -31,6 +37,18 @@ extract(object, feature)
 
 The extracted object, slot, list element, matrix row/column, or vector
 element identified by `feature`.
+
+## See also
+
+[`brake()`](https://brandynlucca.github.io/acousticTS/reference/brake.md),
+[`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md),
+[`translate_shape()`](https://brandynlucca.github.io/acousticTS/reference/translate_shape.md),
+[`reanchor_shape()`](https://brandynlucca.github.io/acousticTS/reference/reanchor_shape.md),
+[`inflate_shape()`](https://brandynlucca.github.io/acousticTS/reference/inflate_shape.md),
+[`smooth_shape()`](https://brandynlucca.github.io/acousticTS/reference/smooth_shape.md),
+[`resample_shape()`](https://brandynlucca.github.io/acousticTS/reference/resample_shape.md),
+[`flip_shape()`](https://brandynlucca.github.io/acousticTS/reference/flip_shape.md),
+[`offset_component()`](https://brandynlucca.github.io/acousticTS/reference/offset_component.md)
 
 ## Examples
 
@@ -111,4 +129,11 @@ extract(obj, c("body", "density"))
 #> [1] 1045
 extract(obj, c("shape_parameters", "shape"))
 #> [1] "Sphere"
+
+bent_obj <- brake(obj, radius_curvature = 5)
+head(extract(bent_obj, c("body", "rpos", "z")))
+#> [1] -0.0004995835 -0.0004509107 -0.0004047267 -0.0003610325 -0.0003198294
+#> [6] -0.0002811182
+extract(bent_obj, c("shape_parameters", "radius_curvature_ratio"))
+#> [1] 5
 ```

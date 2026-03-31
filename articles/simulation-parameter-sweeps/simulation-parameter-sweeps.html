@@ -192,24 +192,28 @@ and collecting the outputs into a set of tidy result tables.</p>
 <h2 id="parameter-specification">Parameter specification<a class="anchor" aria-label="anchor" href="#parameter-specification"></a>
 </h2>
 <p>The scratch simulation notes are worth keeping in mind here because
-they clarify the three main parameter modes supported by
+they clarify the four main parameter modes supported by
 <code><a href="../../reference/simulate_ts.html">simulate_ts()</a></code>:</p>
 <ol style="list-style-type: decimal">
 <li>single fixed values,</li>
 <li>explicit vectors,</li>
-<li>generating functions that return one draw at a time.</li>
+<li>generating functions that return one draw at a time,</li>
+<li>structured <code><a href="../../reference/reforge.html">reforge()</a></code> inputs such as named
+target-dimension vectors.</li>
 </ol>
 <p>When <code>batch_by</code> is supplied, the selected parameters
 define a Cartesian grid and each grid cell is then repeated for
 <code>n_realizations</code>. That distinction between batch cells and
 within-cell draws is the core conceptual point of the interface.</p>
-<p>Those three modes answer different questions:</p>
+<p>Those four modes answer different questions:</p>
 <ol style="list-style-type: decimal">
 <li>fixed values are for constants that should be repeated in every
 realization,</li>
 <li>explicit vectors are for a known set of realization-level
 values,</li>
-<li>functions are for stochastic draws generated on demand.</li>
+<li>functions are for stochastic draws generated on demand,</li>
+<li>structured values are for explicit geometry targets that should be
+preserved as one unit.</li>
 </ol>
 <p>The distinction matters because it separates deterministic sweeps
 from uncertainty propagation.</p>
@@ -221,17 +225,58 @@ per-realization generating functions.</div>
 <p>Fixed values are copied into every run unchanged. Explicit vectors
 supply a known sequence of values. Generating functions do not provide a
 pre-listed table at all. They create a new draw whenever a realization
-is built. That difference is what separates a design grid from
-on-the-fly uncertainty propagation.</p>
+is built. Structured values are preserved as list-columns so named
+geometry targets remain intact. That difference is what separates a
+design grid from on-the-fly uncertainty propagation and from explicit
+morphology rebuilding.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  theta_body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.5</span> <span class="op">*</span> <span class="va">pi</span>, <span class="va">pi</span>, length.out <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>,</span>
 <span>  density_body <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, mean <span class="op">=</span> <span class="fl">1045</span>, sd <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>,</span>
-<span>  sound_speed_body <span class="op">=</span> <span class="fl">1520</span></span>
+<span>  sound_speed_body <span class="op">=</span> <span class="fl">1520</span>,</span>
+<span>  body_target <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fl">0.045</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>In this example, <code>theta_body</code> is an explicit set of
-values, <code>density_body</code> is random, and
-<code>sound_speed_body</code> is held fixed.</p>
+values, <code>density_body</code> is random,
+<code>sound_speed_body</code> is held fixed, and
+<code>body_target</code> is a structured <code><a href="../../reference/reforge.html">reforge()</a></code>
+input.</p>
+<p>For fluid-like scatterers, convenience aliases such as
+<code>length_body</code> are also supported. These are normalized
+internally onto the same <code><a href="../../reference/reforge.html">reforge()</a></code> pathway as
+<code>body_target</code>, while preserving the original simulation
+column in the returned output.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">res_length_alias</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/simulate_ts.html">simulate_ts</a></span><span class="op">(</span></span>
+<span>  object <span class="op">=</span> <span class="va">obj</span>,</span>
+<span>  frequency <span class="op">=</span> <span class="fl">120e3</span>,</span>
+<span>  model <span class="op">=</span> <span class="st">"DWBA"</span>,</span>
+<span>  n_realizations <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>  parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    length_body <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>, min <span class="op">=</span> <span class="fl">0.04</span>, max <span class="op">=</span> <span class="fl">0.06</span><span class="op">)</span>,</span>
+<span>    theta_body <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>, min <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="va">pi</span>, max <span class="op">=</span> <span class="va">pi</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  parallel <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## ====================================</span></span>
+<span><span class="co">## Scatterer-class: FLS </span></span>
+<span><span class="co">## Model(s): DWBA </span></span>
+<span><span class="co">## Simulated parameters: length_body, theta_body </span></span>
+<span><span class="co">## Total simulation realizations: 4 </span></span>
+<span><span class="co">## Parallelize TS calculations: FALSE </span></span>
+<span><span class="co">## ====================================</span></span>
+<span><span class="co">## ====================================</span></span>
+<span><span class="co">## Preparing sequential simulations</span></span>
+<span><span class="co">## ====================================</span></span>
+<span><span class="co">## Simulations complete!</span></span>
+<span><span class="co">## ====================================</span></span></code></pre>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">res_length_alias</span><span class="op">$</span><span class="va">DWBA</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"length_body"</span>, <span class="st">"theta_body"</span>, <span class="st">"TS"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##   length_body theta_body        TS</span></span>
+<span><span class="co">## 1  0.04932787   2.784270 -67.69139</span></span>
+<span><span class="co">## 2  0.04995555   2.944616 -67.80459</span></span>
+<span><span class="co">## 3  0.04579534   1.845592 -67.42663</span></span>
+<span><span class="co">## 4  0.05465764   1.624582 -69.50127</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 id="batching-versus-realizations">Batching versus realizations<a class="anchor" aria-label="anchor" href="#batching-versus-realizations"></a>
@@ -251,7 +296,7 @@ performed within each grid cell.</li>
 both placed in <code>batch_by</code>. Then the simulation does not treat
 them as uncertain draws around one target. It treats them as a design
 grid whose combinations are all run separately.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res_grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/simulate_ts.html">simulate_ts</a></span><span class="op">(</span></span>
 <span>  object <span class="op">=</span> <span class="va">obj</span>,</span>
 <span>  frequency <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">38e3</span>, <span class="fl">120e3</span>, by <span class="op">=</span> <span class="fl">6e3</span><span class="op">)</span>,</span>
@@ -307,7 +352,7 @@ working object before the model call.</li>
 <p>This means <code><a href="../../reference/simulate_ts.html">simulate_ts()</a></code> can be used not just for
 orientation or density perturbations, but also for controlled morphology
 studies.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">body_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/arbitrary.html">arbitrary</a></span><span class="op">(</span></span>
 <span>  x_body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.00</span>, <span class="fl">0.02</span>, <span class="fl">0.05</span>, <span class="fl">0.08</span><span class="op">)</span>,</span>
 <span>  zU_body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.001</span>, <span class="fl">0.004</span>, <span class="fl">0.004</span>, <span class="fl">0.001</span><span class="op">)</span>,</span>
@@ -356,6 +401,48 @@ studies.</p>
 <span><span class="co">## ====================================</span></span></code></pre>
 <p>This is one of the cleanest ways to keep a morphology-sensitivity
 analysis tied to the same baseline target.</p>
+<p>For <code>FLS</code> objects, the same idea can be expressed more
+explicitly through <code>body_target</code> or through the convenience
+alias <code>length_body</code>.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">res_fls_reforge</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/simulate_ts.html">simulate_ts</a></span><span class="op">(</span></span>
+<span>  object <span class="op">=</span> <span class="va">obj</span>,</span>
+<span>  frequency <span class="op">=</span> <span class="fl">120e3</span>,</span>
+<span>  model <span class="op">=</span> <span class="st">"DWBA"</span>,</span>
+<span>  n_realizations <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    body_target <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fl">0.04</span>, radius <span class="op">=</span> <span class="fl">0.0025</span><span class="op">)</span>,</span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fl">0.06</span>, radius <span class="op">=</span> <span class="fl">0.0035</span><span class="op">)</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    isometric_body <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>    theta_body <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>, min <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="va">pi</span>, max <span class="op">=</span> <span class="va">pi</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  batch_by <span class="op">=</span> <span class="st">"body_target"</span>,</span>
+<span>  parallel <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## ====================================</span></span>
+<span><span class="co">## Scatterer-class: FLS </span></span>
+<span><span class="co">## Model(s): DWBA </span></span>
+<span><span class="co">## Batching parameter(s): body_target </span></span>
+<span><span class="co">## Simulated parameters: body_target, isometric_body, theta_body </span></span>
+<span><span class="co">## Total simulation realizations: 4 </span></span>
+<span><span class="co">## Parallelize TS calculations: FALSE </span></span>
+<span><span class="co">## ====================================</span></span>
+<span><span class="co">## ====================================</span></span>
+<span><span class="co">## Preparing sequential simulations</span></span>
+<span><span class="co">## ====================================</span></span>
+<span><span class="co">## Simulations complete!</span></span>
+<span><span class="co">## ====================================</span></span></code></pre>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">res_fls_reforge</span><span class="op">$</span><span class="va">DWBA</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"body_target"</span>, <span class="st">"theta_body"</span>, <span class="st">"TS"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##    body_target theta_body        TS</span></span>
+<span><span class="co">## 1 0.04, 0.0025   2.490944 -68.15085</span></span>
+<span><span class="co">## 2 0.04, 0.0025   2.235577 -68.15085</span></span>
+<span><span class="co">## 3 0.06, 0.0035   2.730156 -72.25574</span></span>
+<span><span class="co">## 4 0.06, 0.0035   1.845710 -72.25574</span></span></code></pre>
+<p>When batching across structured geometry targets, wrap the candidates
+in a list so each target vector is treated as one batch value.</p>
 <div class="float">
 <img src="simulation-object-reforge.svg" alt="Object-modifying simulation workflow, where baseline geometry is reforged into a family of derived target states before model execution."><div class="figcaption">Object-modifying simulation workflow, where
 baseline geometry is reforged into a family of derived target states
@@ -366,6 +453,67 @@ metadata. They change the working target itself before the model is run.
 The resulting simulations should therefore be interpreted as distinct
 geometric states derived from one baseline object, not as repeated
 evaluations of a single unchanged shape.</p>
+<p>There is one especially important point for curvature-aware
+workflows: <code><a href="../../reference/simulate_ts.html">simulate_ts()</a></code> does not automatically call
+<code><a href="../../reference/brake.html">brake()</a></code> for the modern <code>DWBA</code> or
+<code>SDWBA</code> paths. If the baseline object is straight, then
+<code>length_body</code> or <code>body_target</code> simply resize that
+straight object. If the baseline object is already a bent
+<code>FLS</code>, then those same parameters resize the existing bent
+geometry directly.</p>
+<p>For bent <code>FLS</code> objects, <code>length_body</code> and
+<code>body_target["length"]</code> are interpreted as the target bent
+centerline arc length, not as the flattened projected <code>x</code>
+span. That makes the resize semantics consistent with the object that is
+actually being modeled.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">obj_bent</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/brake.html">brake</a></span><span class="op">(</span><span class="va">obj</span>, radius_curvature <span class="op">=</span> <span class="fl">5</span>, mode <span class="op">=</span> <span class="st">"ratio"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">res_bent</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/simulate_ts.html">simulate_ts</a></span><span class="op">(</span></span>
+<span>  object <span class="op">=</span> <span class="va">obj_bent</span>,</span>
+<span>  frequency <span class="op">=</span> <span class="fl">120e3</span>,</span>
+<span>  model <span class="op">=</span> <span class="st">"DWBA"</span>,</span>
+<span>  n_realizations <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    length_body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.04</span>, <span class="fl">0.05</span><span class="op">)</span>,</span>
+<span>    theta_body <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="va">pi</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  batch_by <span class="op">=</span> <span class="st">"length_body"</span>,</span>
+<span>  parallel <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## ====================================</span></span>
+<span><span class="co">## Scatterer-class: FLS </span></span>
+<span><span class="co">## Model(s): DWBA </span></span>
+<span><span class="co">## Batching parameter(s): length_body </span></span>
+<span><span class="co">## Simulated parameters: length_body, theta_body </span></span>
+<span><span class="co">## Total simulation realizations: 4 </span></span>
+<span><span class="co">## Parallelize TS calculations: FALSE </span></span>
+<span><span class="co">## ====================================</span></span>
+<span><span class="co">## ====================================</span></span>
+<span><span class="co">## Preparing sequential simulations</span></span>
+<span><span class="co">## ====================================</span></span>
+<span><span class="co">## Simulations complete!</span></span>
+<span><span class="co">## ====================================</span></span></code></pre>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">res_bent</span><span class="op">$</span><span class="va">DWBA</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"length_body"</span>, <span class="st">"theta_body"</span>, <span class="st">"TS"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##   length_body theta_body        TS</span></span>
+<span><span class="co">## 1        0.04   1.570796 -68.48278</span></span>
+<span><span class="co">## 2        0.04   1.570796 -68.48278</span></span>
+<span><span class="co">## 3        0.05   1.570796 -68.35455</span></span>
+<span><span class="co">## 4        0.05   1.570796 -68.35455</span></span></code></pre>
+<p>That example is useful because it separates two different ideas
+cleanly:</p>
+<ol style="list-style-type: decimal">
+<li>the bent state comes from the baseline object passed into
+<code><a href="../../reference/simulate_ts.html">simulate_ts()</a></code>,</li>
+<li>the resizing comes from <code>length_body</code> or
+<code>body_target</code>.</li>
+</ol>
+<p>If the scientific workflow instead needs “resize a straight object
+and then bend it differently for each realization,” that should
+currently be constructed outside <code><a href="../../reference/simulate_ts.html">simulate_ts()</a></code> or through
+the deprecated <code>*_curved</code> model interfaces that still wire
+curvature in internally.</p>
 </div>
 <div class="section level2">
 <h2 id="when-simulation-is-useful">When simulation is useful<a class="anchor" aria-label="anchor" href="#when-simulation-is-useful"></a>
@@ -391,10 +539,10 @@ variability, or design decisions.</p>
 that carries the realization index, any batched parameters, and the
 model outputs. That organization is deliberate: it makes downstream
 plotting or aggregation straightforward.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">res_grid</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "DWBA"  "SDWBA"</span></span></code></pre>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">res_grid</span><span class="op">$</span><span class="va">DWBA</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##   model realization theta_body_idx density_body_idx theta_body density_body</span></span>
 <span><span class="co">## 1  DWBA           1              1                1   1.570796         1035</span></span>
@@ -410,7 +558,7 @@ plotting or aggregation straightforward.</p>
 <span><span class="co">## 4     56000 0.7037168 -0.0002946149-2.087997e-19i 8.679795e-08 -70.61491</span></span>
 <span><span class="co">## 5     62000 0.7791150 -0.0003400723-2.668395e-19i 1.156492e-07 -69.36857</span></span>
 <span><span class="co">## 6     68000 0.8545132 -0.0003822717-3.289791e-19i 1.461317e-07 -68.35256</span></span></code></pre>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">res_grid</span><span class="op">$</span><span class="va">SDWBA</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##   model realization theta_body_idx density_body_idx theta_body density_body</span></span>
 <span><span class="co">## 1 SDWBA           1              1                1   1.570796         1035</span></span>
@@ -420,12 +568,12 @@ plotting or aggregation straightforward.</p>
 <span><span class="co">## 5 SDWBA           1              1                1   1.570796         1035</span></span>
 <span><span class="co">## 6 SDWBA           1              1                1   1.570796         1035</span></span>
 <span><span class="co">##   frequency                        f_bs     sigma_bs        TS     TS_sd</span></span>
-<span><span class="co">## 1     38000 -9.446326e-05-7.048767e-07i 9.929385e-09 -80.03078 -85.53002</span></span>
-<span><span class="co">## 2     44000 -1.211794e-04-3.532537e-06i 1.586274e-08 -77.99622 -83.23411</span></span>
-<span><span class="co">## 3     50000 -1.522836e-04-6.196302e-06i 2.509300e-08 -76.00447 -81.99254</span></span>
-<span><span class="co">## 4     56000 -1.769631e-04+2.008750e-06i 3.424638e-08 -74.65385 -80.05401</span></span>
-<span><span class="co">## 5     62000 -2.043078e-04-3.919300e-06i 4.592003e-08 -73.37998 -78.60042</span></span>
-<span><span class="co">## 6     68000 -2.288323e-04+6.778744e-06i 5.734514e-08 -72.41503 -77.57528</span></span></code></pre>
+<span><span class="co">## 1     38000 -9.447098e-05-7.072660e-07i 9.925839e-09 -80.03233 -85.54242</span></span>
+<span><span class="co">## 2     44000 -1.214249e-04-3.378969e-06i 1.590348e-08 -77.98508 -83.24166</span></span>
+<span><span class="co">## 3     50000 -1.522909e-04-6.089763e-06i 2.509366e-08 -76.00436 -81.99001</span></span>
+<span><span class="co">## 4     56000 -1.771822e-04+1.795488e-06i 3.431663e-08 -74.64495 -80.07396</span></span>
+<span><span class="co">## 5     62000 -2.039148e-04-3.418298e-06i 4.576683e-08 -73.39449 -78.60106</span></span>
+<span><span class="co">## 6     68000 -2.284664e-04+7.397460e-06i 5.717119e-08 -72.42823 -77.59347</span></span></code></pre>
 <p>Common downstream summaries include:</p>
 <ol style="list-style-type: decimal">
 <li>mean and quantiles of <code>TS</code> by frequency,</li>
@@ -448,7 +596,7 @@ tiny exploratory runs.</li>
 <p>For this reason, <code>parallel = FALSE</code> is often the right
 default while debugging a workflow, even if <code>parallel = TRUE</code>
 is the right choice for production runs.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">res_parallel</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/simulate_ts.html">simulate_ts</a></span><span class="op">(</span></span>
 <span>  object <span class="op">=</span> <span class="va">obj</span>,</span>
 <span>  frequency <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">38e3</span>, <span class="fl">120e3</span>, by <span class="op">=</span> <span class="fl">2e3</span><span class="op">)</span>,</span>

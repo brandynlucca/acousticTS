@@ -133,6 +133,7 @@
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/ess_generate.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/ess_show.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/extract.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/flip_shape.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/fls_generate.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/fls_show.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/gas_generate.html</loc></url>
@@ -141,6 +142,7 @@
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/hc.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/hs.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/index.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/inflate_shape.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/jc.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/js.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/krill.html</loc></url>
@@ -148,11 +150,14 @@
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/linear.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/neumann.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/oblate_spheroid.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/offset_component.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/plot.Scatterer.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/pois.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/polynomial_cylinder.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/prolate_spheroid.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/radians.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/reanchor_shape.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/reforge-BBF-method.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/reforge-CAL-method.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/reforge-ESS-method.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/reforge-FLS-method.html</loc></url>
@@ -160,6 +165,7 @@
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/reforge-SBF-method.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/reforge.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/register_model.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/resample_shape.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/reset_model_registry.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/rho.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/sardine.html</loc></url>
@@ -168,6 +174,7 @@
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/shear.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/show-Scatterer-method.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/simulate_ts.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/smooth_shape.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/sphere.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/target_strength.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/tmm_average_orientation.html</loc></url>
@@ -177,6 +184,7 @@
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/tmm_products.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/tmm_scattering.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/tmm_scattering_grid.html</loc></url>
+<url><loc>https://brandynlucca.github.io/acousticTS/reference/translate_shape.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/transmission_coefficient.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/unregister_model.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/vecnorm.html</loc></url>

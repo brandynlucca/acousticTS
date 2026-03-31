@@ -27,6 +27,90 @@ model assumptions.
 
 ![Shape-selection spectrum](building-shapes-spectrum.png)
 
+## Quick construction examples
+
+Before getting into the interpretation tradeoffs, it helps to see the
+main shape builders in direct use.
+
+``` r
+library(acousticTS)
+
+sphere_shape <- sphere(radius_body = 0.01, n_segments = 40)
+cylinder_shape <- cylinder(length_body = 0.05, radius_body = 0.003, n_segments = 80)
+ps_shape <- prolate_spheroid(length_body = 0.04, radius_body = 0.004, n_segments = 60)
+oblate_shape <- oblate_spheroid(length_body = 0.012, radius_body = 0.01, n_segments = 60)
+
+shape_summary <- function(shape_obj) {
+  params <- extract(shape_obj, "shape_parameters")
+  pos <- extract(shape_obj, "position_matrix")
+  radius_value <- params$radius
+  if (length(radius_value) > 1) {
+    radius_value <- max(radius_value, na.rm = TRUE)
+  }
+
+  data.frame(
+    shape = class(shape_obj)[1],
+    length_m = max(pos[, 1], na.rm = TRUE) - min(pos[, 1], na.rm = TRUE),
+    max_radius_m = radius_value,
+    n_segments = params$n_segments
+  )
+}
+
+do.call(
+  rbind,
+  lapply(
+    list(sphere_shape, cylinder_shape, ps_shape, oblate_shape),
+    shape_summary
+  )
+)
+```
+
+    ##             shape length_m max_radius_m n_segments
+    ## 1          Sphere    0.020        0.010         40
+    ## 2        Cylinder    0.050        0.003         80
+    ## 3 ProlateSpheroid    0.040        0.004         60
+    ## 4  OblateSpheroid    0.012        0.010         60
+
+Those four examples cover the main canonical branches. The important
+practical point is that each constructor returns a `Shape` object that
+can later be passed into a scatterer constructor without re-entering the
+geometry.
+
+It is usually worth plotting those objects immediately so that the
+stored geometry is being checked, not just assumed from the constructor
+call.
+
+``` r
+plot_shape_profile <- function(shape_obj, main) {
+  pos <- extract(shape_obj, "position_matrix")
+  x <- pos[, "x"]
+  zU <- pos[, "zU"]
+  zL <- pos[, "zL"]
+  ylim <- range(c(zU, zL), finite = TRUE)
+
+  plot(x, zU,
+    type = "l",
+    ylim = ylim,
+    xlab = "x",
+    ylab = "z",
+    main = main
+  )
+  lines(x, zL)
+  lines(x, rep(0, length(x)), lty = 3, col = "grey70")
+}
+
+old_par <- par(no.readonly = TRUE)
+on.exit(par(old_par), add = TRUE)
+
+par(mfrow = c(2, 2), mar = c(3, 3, 2.2, 0.8))
+plot_shape_profile(sphere_shape, main = "Sphere")
+plot_shape_profile(cylinder_shape, main = "Cylinder")
+plot_shape_profile(ps_shape, main = "Prolate spheroid")
+plot_shape_profile(oblate_shape, main = "Oblate spheroid")
+```
+
+![](building-shapes_files/figure-html/unnamed-chunk-3-1.png)
+
 ## Why geometry choice matters
 
 The geometry chosen at this stage strongly influences which later models
@@ -76,6 +160,33 @@ The direct generators are usually the clearest interface because they
 make the resulting shape class explicit at the call site.
 [`create_shape()`](https://brandynlucca.github.io/acousticTS/reference/create_shape.md)
 is a thin convenience dispatcher rather than the main pedagogical path.
+
+``` r
+wrapped_shape <- create_shape(
+  "cylinder",
+  length_body = 0.03,
+  radius_body = 0.002,
+  n_segments = 50
+)
+
+extract(wrapped_shape, "shape_parameters")[c("shape", "length", "radius", "n_segments")]
+```
+
+    ## $<NA>
+    ## NULL
+    ## 
+    ## $length
+    ## [1] 0.03
+    ## 
+    ## $radius
+    ##  [1] 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002
+    ## [13] 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002
+    ## [25] 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002
+    ## [37] 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002
+    ## [49] 0.002 0.002 0.002
+    ## 
+    ## $n_segments
+    ## [1] 50
 
 ## Coordinate conventions by shape
 
@@ -143,6 +254,31 @@ The further a body departs from a separable canonical surface, the
 stronger the case becomes for preserving the measured morphology rather
 than forcing the target into an overly simple idealized form.
 
+``` r
+measured_like <- arbitrary(
+  x_body = c(0, 0.01, 0.02, 0.03, 0.04),
+  radius_body = c(0, 0.004, 0.006, 0.004, 0)
+)
+
+head(extract(measured_like, "position_matrix"))
+```
+
+    ##         x     a    zU     zL
+    ## [1,] 0.00 0.000 0.000  0.000
+    ## [2,] 0.01 0.004 0.004 -0.004
+    ## [3,] 0.02 0.006 0.006 -0.006
+    ## [4,] 0.03 0.004 0.004 -0.004
+    ## [5,] 0.04 0.000 0.000  0.000
+
+``` r
+plot_shape_profile(measured_like, main = "Arbitrary measured-like body")
+```
+
+![](building-shapes_files/figure-html/unnamed-chunk-7-1.png)
+
+That is the most direct pathway when the user already has an axial
+coordinate series or wants to sketch a bespoke elongated target by hand.
+
 ## Canonical surrogates from measured shapes
 
 Sometimes the right workflow is not to choose between a measured shape
@@ -181,6 +317,39 @@ That pattern keeps the model assumptions honest. The later `PSMS` or
 canonical surrogate, not as though the original irregular target had
 somehow become exactly separable in spheroidal or cylindrical
 coordinates.
+
+``` r
+cyl_fit <- canonicalize_shape(
+  measured_like,
+  to = "Cylinder",
+  diagnostics = TRUE
+)
+
+data.frame(
+  fitted_shape = class(cyl_fit$shape)[1],
+  source_length_m = cyl_fit$diagnostics$source$length,
+  fitted_length_m = cyl_fit$diagnostics$target$length,
+  radius_rmse = cyl_fit$diagnostics$fit$radius_rmse,
+  radius_nrmse = cyl_fit$diagnostics$fit$radius_nrmse
+)
+```
+
+    ##   fitted_shape source_length_m fitted_length_m radius_rmse radius_nrmse
+    ## 1     Cylinder            0.04            0.04 0.002740549    0.4567582
+
+``` r
+old_par <- par(no.readonly = TRUE)
+on.exit(par(old_par), add = TRUE)
+
+par(mfrow = c(1, 2), mar = c(3, 3, 2.2, 0.8))
+plot_shape_profile(measured_like, main = "Original arbitrary shape")
+plot_shape_profile(cyl_fit$shape, main = "Canonicalized cylinder surrogate")
+```
+
+![](building-shapes_files/figure-html/unnamed-chunk-9-1.png)
+
+If the diagnostics are acceptable for the intended use, the fitted shape
+can be passed on like any other canonical `Shape` object.
 
 ## Choosing the right level of geometric detail
 

@@ -50,7 +50,7 @@ obj <- fls_generate(
   sound_speed_body = 1520
 )
 
-bigger_obj <- reforge(obj, length = 0.03)
+bigger_obj <- reforge(obj, body_target = c(length = 0.03))
 extract(bigger_obj, c("shape_parameters", "length"))
 #> [1] 0.03
 ```

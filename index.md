@@ -129,10 +129,10 @@ reconstructing them from scratch using
 
 ``` r
 # Rescale a krill to 40 mm
-krill_40mm <- reforge(krill, length = 0.04)
+krill_40mm <- reforge(krill, body_target = c(length = 0.04))
 
 # Change segment count
-krill_fine <- reforge(krill, n_segments = 200)
+krill_fine <- reforge(krill, n_segments_body = 200)
 ```
 
 ## Configuring simulations

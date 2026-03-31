@@ -85,24 +85,29 @@ The return value is a named list with one data frame per model.
 ## Parameter specification
 
 The scratch simulation notes are worth keeping in mind here because they
-clarify the three main parameter modes supported by
+clarify the four main parameter modes supported by
 [`simulate_ts()`](https://brandynlucca.github.io/acousticTS/reference/simulate_ts.md):
 
 1.  single fixed values,
 2.  explicit vectors,
-3.  generating functions that return one draw at a time.
+3.  generating functions that return one draw at a time,
+4.  structured
+    [`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md)
+    inputs such as named target-dimension vectors.
 
 When `batch_by` is supplied, the selected parameters define a Cartesian
 grid and each grid cell is then repeated for `n_realizations`. That
 distinction between batch cells and within-cell draws is the core
 conceptual point of the interface.
 
-Those three modes answer different questions:
+Those four modes answer different questions:
 
 1.  fixed values are for constants that should be repeated in every
     realization,
 2.  explicit vectors are for a known set of realization-level values,
-3.  functions are for stochastic draws generated on demand.
+3.  functions are for stochastic draws generated on demand,
+4.  structured values are for explicit geometry targets that should be
+    preserved as one unit.
 
 The distinction matters because it separates deterministic sweeps from
 uncertainty propagation.
@@ -119,19 +124,68 @@ functions.
 Fixed values are copied into every run unchanged. Explicit vectors
 supply a known sequence of values. Generating functions do not provide a
 pre-listed table at all. They create a new draw whenever a realization
-is built. That difference is what separates a design grid from
-on-the-fly uncertainty propagation.
+is built. Structured values are preserved as list-columns so named
+geometry targets remain intact. That difference is what separates a
+design grid from on-the-fly uncertainty propagation and from explicit
+morphology rebuilding.
 
 ``` r
 parameters <- list(
   theta_body = seq(0.5 * pi, pi, length.out = 5),
   density_body = function() rnorm(1, mean = 1045, sd = 5),
-  sound_speed_body = 1520
+  sound_speed_body = 1520,
+  body_target = c(length = 0.045)
 )
 ```
 
 In this example, `theta_body` is an explicit set of values,
-`density_body` is random, and `sound_speed_body` is held fixed.
+`density_body` is random, `sound_speed_body` is held fixed, and
+`body_target` is a structured
+[`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md)
+input.
+
+For fluid-like scatterers, convenience aliases such as `length_body` are
+also supported. These are normalized internally onto the same
+[`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md)
+pathway as `body_target`, while preserving the original simulation
+column in the returned output.
+
+``` r
+res_length_alias <- simulate_ts(
+  object = obj,
+  frequency = 120e3,
+  model = "DWBA",
+  n_realizations = 4,
+  parameters = list(
+    length_body = function() runif(1, min = 0.04, max = 0.06),
+    theta_body = function() runif(1, min = 0.5 * pi, max = pi)
+  ),
+  parallel = FALSE
+)
+```
+
+    ## ====================================
+    ## Scatterer-class: FLS 
+    ## Model(s): DWBA 
+    ## Simulated parameters: length_body, theta_body 
+    ## Total simulation realizations: 4 
+    ## Parallelize TS calculations: FALSE 
+    ## ====================================
+    ## ====================================
+    ## Preparing sequential simulations
+    ## ====================================
+    ## Simulations complete!
+    ## ====================================
+
+``` r
+head(res_length_alias$DWBA[, c("length_body", "theta_body", "TS")])
+```
+
+    ##   length_body theta_body        TS
+    ## 1  0.04932787   2.784270 -67.69139
+    ## 2  0.04995555   2.944616 -67.80459
+    ## 3  0.04579534   1.845592 -67.42663
+    ## 4  0.05465764   1.624582 -69.50127
 
 ## Batching versus realizations
 
@@ -267,6 +321,55 @@ res_shape <- simulate_ts(
 This is one of the cleanest ways to keep a morphology-sensitivity
 analysis tied to the same baseline target.
 
+For `FLS` objects, the same idea can be expressed more explicitly
+through `body_target` or through the convenience alias `length_body`.
+
+``` r
+res_fls_reforge <- simulate_ts(
+  object = obj,
+  frequency = 120e3,
+  model = "DWBA",
+  n_realizations = 2,
+  parameters = list(
+    body_target = list(
+      c(length = 0.04, radius = 0.0025),
+      c(length = 0.06, radius = 0.0035)
+    ),
+    isometric_body = FALSE,
+    theta_body = function() runif(1, min = 0.5 * pi, max = pi)
+  ),
+  batch_by = "body_target",
+  parallel = FALSE
+)
+```
+
+    ## ====================================
+    ## Scatterer-class: FLS 
+    ## Model(s): DWBA 
+    ## Batching parameter(s): body_target 
+    ## Simulated parameters: body_target, isometric_body, theta_body 
+    ## Total simulation realizations: 4 
+    ## Parallelize TS calculations: FALSE 
+    ## ====================================
+    ## ====================================
+    ## Preparing sequential simulations
+    ## ====================================
+    ## Simulations complete!
+    ## ====================================
+
+``` r
+head(res_fls_reforge$DWBA[, c("body_target", "theta_body", "TS")])
+```
+
+    ##    body_target theta_body        TS
+    ## 1 0.04, 0.0025   2.490944 -68.15085
+    ## 2 0.04, 0.0025   2.235577 -68.15085
+    ## 3 0.06, 0.0035   2.730156 -72.25574
+    ## 4 0.06, 0.0035   1.845710 -72.25574
+
+When batching across structured geometry targets, wrap the candidates in
+a list so each target vector is treated as one batch value.
+
 ![Object-modifying simulation workflow, where baseline geometry is
 reforged into a family of derived target states before model
 execution.](simulation-object-reforge.svg)
@@ -279,6 +382,74 @@ metadata. They change the working target itself before the model is run.
 The resulting simulations should therefore be interpreted as distinct
 geometric states derived from one baseline object, not as repeated
 evaluations of a single unchanged shape.
+
+There is one especially important point for curvature-aware workflows:
+[`simulate_ts()`](https://brandynlucca.github.io/acousticTS/reference/simulate_ts.md)
+does not automatically call
+[`brake()`](https://brandynlucca.github.io/acousticTS/reference/brake.md)
+for the modern `DWBA` or `SDWBA` paths. If the baseline object is
+straight, then `length_body` or `body_target` simply resize that
+straight object. If the baseline object is already a bent `FLS`, then
+those same parameters resize the existing bent geometry directly.
+
+For bent `FLS` objects, `length_body` and `body_target["length"]` are
+interpreted as the target bent centerline arc length, not as the
+flattened projected `x` span. That makes the resize semantics consistent
+with the object that is actually being modeled.
+
+``` r
+obj_bent <- brake(obj, radius_curvature = 5, mode = "ratio")
+
+res_bent <- simulate_ts(
+  object = obj_bent,
+  frequency = 120e3,
+  model = "DWBA",
+  n_realizations = 2,
+  parameters = list(
+    length_body = c(0.04, 0.05),
+    theta_body = 0.5 * pi
+  ),
+  batch_by = "length_body",
+  parallel = FALSE
+)
+```
+
+    ## ====================================
+    ## Scatterer-class: FLS 
+    ## Model(s): DWBA 
+    ## Batching parameter(s): length_body 
+    ## Simulated parameters: length_body, theta_body 
+    ## Total simulation realizations: 4 
+    ## Parallelize TS calculations: FALSE 
+    ## ====================================
+    ## ====================================
+    ## Preparing sequential simulations
+    ## ====================================
+    ## Simulations complete!
+    ## ====================================
+
+``` r
+head(res_bent$DWBA[, c("length_body", "theta_body", "TS")])
+```
+
+    ##   length_body theta_body        TS
+    ## 1        0.04   1.570796 -68.48278
+    ## 2        0.04   1.570796 -68.48278
+    ## 3        0.05   1.570796 -68.35455
+    ## 4        0.05   1.570796 -68.35455
+
+That example is useful because it separates two different ideas cleanly:
+
+1.  the bent state comes from the baseline object passed into
+    [`simulate_ts()`](https://brandynlucca.github.io/acousticTS/reference/simulate_ts.md),
+2.  the resizing comes from `length_body` or `body_target`.
+
+If the scientific workflow instead needs “resize a straight object and
+then bend it differently for each realization,” that should currently be
+constructed outside
+[`simulate_ts()`](https://brandynlucca.github.io/acousticTS/reference/simulate_ts.md)
+or through the deprecated `*_curved` model interfaces that still wire
+curvature in internally.
 
 ## When simulation is useful
 
@@ -340,12 +511,12 @@ head(res_grid$SDWBA)
     ## 5 SDWBA           1              1                1   1.570796         1035
     ## 6 SDWBA           1              1                1   1.570796         1035
     ##   frequency                        f_bs     sigma_bs        TS     TS_sd
-    ## 1     38000 -9.446326e-05-7.048767e-07i 9.929385e-09 -80.03078 -85.53002
-    ## 2     44000 -1.211794e-04-3.532537e-06i 1.586274e-08 -77.99622 -83.23411
-    ## 3     50000 -1.522836e-04-6.196302e-06i 2.509300e-08 -76.00447 -81.99254
-    ## 4     56000 -1.769631e-04+2.008750e-06i 3.424638e-08 -74.65385 -80.05401
-    ## 5     62000 -2.043078e-04-3.919300e-06i 4.592003e-08 -73.37998 -78.60042
-    ## 6     68000 -2.288323e-04+6.778744e-06i 5.734514e-08 -72.41503 -77.57528
+    ## 1     38000 -9.447098e-05-7.072660e-07i 9.925839e-09 -80.03233 -85.54242
+    ## 2     44000 -1.214249e-04-3.378969e-06i 1.590348e-08 -77.98508 -83.24166
+    ## 3     50000 -1.522909e-04-6.089763e-06i 2.509366e-08 -76.00436 -81.99001
+    ## 4     56000 -1.771822e-04+1.795488e-06i 3.431663e-08 -74.64495 -80.07396
+    ## 5     62000 -2.039148e-04-3.418298e-06i 4.576683e-08 -73.39449 -78.60106
+    ## 6     68000 -2.284664e-04+7.397460e-06i 5.717119e-08 -72.42823 -77.59347
 
 Common downstream summaries include:
 

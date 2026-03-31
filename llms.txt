@@ -129,10 +129,10 @@ reconstructing them from scratch using
 
 ``` r
 # Rescale a krill to 40 mm
-krill_40mm <- reforge(krill, length = 0.04)
+krill_40mm <- reforge(krill, body_target = c(length = 0.04))
 
 # Change segment count
-krill_fine <- reforge(krill, n_segments = 200)
+krill_fine <- reforge(krill, n_segments_body = 200)
 ```
 
 ## Configuring simulations
@@ -234,11 +234,24 @@ stored results, and modifying geometry after construction.
 - [`plot(`*`<Scatterer>`*`)`](https://brandynlucca.github.io/acousticTS/reference/plot.Scatterer.md)
   : Plot scatterer geometry, stored model results, or stored TMM
   scattering views
+- [`translate_shape()`](https://brandynlucca.github.io/acousticTS/reference/translate_shape.md)
+  : Translate a stored shape or scatterer component
+- [`reanchor_shape()`](https://brandynlucca.github.io/acousticTS/reference/reanchor_shape.md)
+  : Re-anchor a stored shape or scatterer component along the x axis
+- [`offset_component()`](https://brandynlucca.github.io/acousticTS/reference/offset_component.md)
+  : Offset an internal scatterer component without rebuilding the object
+- [`inflate_shape()`](https://brandynlucca.github.io/acousticTS/reference/inflate_shape.md)
+  : Locally widen, pinch, or taper a stored shape profile
+- [`smooth_shape()`](https://brandynlucca.github.io/acousticTS/reference/smooth_shape.md)
+  : Smooth a stored shape or scatterer profile
+- [`resample_shape()`](https://brandynlucca.github.io/acousticTS/reference/resample_shape.md)
+  : Resample a stored shape or scatterer profile to a new segment count
+- [`flip_shape()`](https://brandynlucca.github.io/acousticTS/reference/flip_shape.md)
+  : Flip a stored shape or scatterer profile across the x or z axis
 - [`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md)
   : Resize or reparameterize a scatterer object
 - [`brake()`](https://brandynlucca.github.io/acousticTS/reference/brake.md)
-  : Support function for bending scatterer body shape and position
-  matrix
+  : Bend a scatterer body or body component
 
 ### Bundled benchmark and example data
 

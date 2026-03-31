@@ -222,7 +222,7 @@ liquid-filled cylinder with:</p>
 <span><span class="co">##  Fluid-like scatterer </span></span>
 <span><span class="co">##  ID:UID</span></span>
 <span><span class="co">## Body dimensions:</span></span>
-<span><span class="co">##  Length:0.011 m(n = 401 cylinders)</span></span>
+<span><span class="co">##  Length:0.01 m(n = 401 cylinders)</span></span>
 <span><span class="co">##  Mean radius:0.001 m</span></span>
 <span><span class="co">##  Max radius:0.001 m</span></span>
 <span><span class="co">## Shape parameters:</span></span>
@@ -291,12 +291,12 @@ built into the model.</p>
 <code class="sourceCode R"><span><span class="va">bcms_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">bent_object</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">$</span><span class="va">BCMS</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">bcms_results</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##   frequency         ka                        f_bs     sigma_bs        TS</span></span>
-<span><span class="co">## 1     12000 0.05103786 -8.271249e-07-2.430844e-08i 6.847265e-13 -121.6448</span></span>
-<span><span class="co">## 2     14000 0.05954416 -1.124880e-06-3.854702e-08i 1.266842e-12 -118.9728</span></span>
-<span><span class="co">## 3     16000 0.06805047 -1.467840e-06-5.745291e-08i 2.157856e-12 -116.6598</span></span>
-<span><span class="co">## 4     18000 0.07655678 -1.855750e-06-8.167089e-08i 3.450480e-12 -114.6212</span></span>
-<span><span class="co">## 5     20000 0.08506309 -2.288325e-06-1.118381e-07i 5.248937e-12 -112.7993</span></span>
-<span><span class="co">## 6     22000 0.09356940 -2.765245e-06-1.485835e-07i 7.668659e-12 -111.1528</span></span></code></pre>
+<span><span class="co">## 1     12000 0.05103786 -8.271248e-07-2.430843e-08i 6.847263e-13 -121.6448</span></span>
+<span><span class="co">## 2     14000 0.05954416 -1.124880e-06-3.854701e-08i 1.266842e-12 -118.9728</span></span>
+<span><span class="co">## 3     16000 0.06805047 -1.467840e-06-5.745290e-08i 2.157856e-12 -116.6598</span></span>
+<span><span class="co">## 4     18000 0.07655678 -1.855750e-06-8.167087e-08i 3.450479e-12 -114.6212</span></span>
+<span><span class="co">## 5     20000 0.08506309 -2.288324e-06-1.118381e-07i 5.248936e-12 -112.7993</span></span>
+<span><span class="co">## 6     22000 0.09356940 -2.765245e-06-1.485835e-07i 7.668657e-12 -111.1528</span></span></code></pre>
 <p>The stored <code>data.frame</code> contains the modeled frequency,
 the complex backscattering amplitude <code>f_bs</code>, the linear
 backscattering cross-section <code>sigma_bs</code>, and <code>TS</code>.

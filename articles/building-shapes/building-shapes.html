@@ -141,6 +141,83 @@ model assumptions.</p>
 <p><img class="vignette-figure" src="building-shapes-spectrum.png" alt="Shape-selection spectrum"></p>
 </div>
 <div class="section level2">
+<h2 id="quick-construction-examples">Quick construction examples<a class="anchor" aria-label="anchor" href="#quick-construction-examples"></a>
+</h2>
+<p>Before getting into the interpretation tradeoffs, it helps to see the
+main shape builders in direct use.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://brandynlucca.github.io/acousticTS/">acousticTS</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">sphere_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/sphere.html">sphere</a></span><span class="op">(</span>radius_body <span class="op">=</span> <span class="fl">0.01</span>, n_segments <span class="op">=</span> <span class="fl">40</span><span class="op">)</span></span>
+<span><span class="va">cylinder_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/cylinder.html">cylinder</a></span><span class="op">(</span>length_body <span class="op">=</span> <span class="fl">0.05</span>, radius_body <span class="op">=</span> <span class="fl">0.003</span>, n_segments <span class="op">=</span> <span class="fl">80</span><span class="op">)</span></span>
+<span><span class="va">ps_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/prolate_spheroid.html">prolate_spheroid</a></span><span class="op">(</span>length_body <span class="op">=</span> <span class="fl">0.04</span>, radius_body <span class="op">=</span> <span class="fl">0.004</span>, n_segments <span class="op">=</span> <span class="fl">60</span><span class="op">)</span></span>
+<span><span class="va">oblate_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/oblate_spheroid.html">oblate_spheroid</a></span><span class="op">(</span>length_body <span class="op">=</span> <span class="fl">0.012</span>, radius_body <span class="op">=</span> <span class="fl">0.01</span>, n_segments <span class="op">=</span> <span class="fl">60</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">shape_summary</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">shape_obj</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">shape_obj</span>, <span class="st">"shape_parameters"</span><span class="op">)</span></span>
+<span>  <span class="va">pos</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">shape_obj</span>, <span class="st">"position_matrix"</span><span class="op">)</span></span>
+<span>  <span class="va">radius_value</span> <span class="op">&lt;-</span> <span class="va">params</span><span class="op">$</span><span class="va">radius</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">radius_value</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">radius_value</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">radius_value</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>    shape <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">shape_obj</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>    length_m <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">pos</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">pos</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>    max_radius_m <span class="op">=</span> <span class="va">radius_value</span>,</span>
+<span>    n_segments <span class="op">=</span> <span class="va">params</span><span class="op">$</span><span class="va">n_segments</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span></span>
+<span>  <span class="va">rbind</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">sphere_shape</span>, <span class="va">cylinder_shape</span>, <span class="va">ps_shape</span>, <span class="va">oblate_shape</span><span class="op">)</span>,</span>
+<span>    <span class="va">shape_summary</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##             shape length_m max_radius_m n_segments</span></span>
+<span><span class="co">## 1          Sphere    0.020        0.010         40</span></span>
+<span><span class="co">## 2        Cylinder    0.050        0.003         80</span></span>
+<span><span class="co">## 3 ProlateSpheroid    0.040        0.004         60</span></span>
+<span><span class="co">## 4  OblateSpheroid    0.012        0.010         60</span></span></code></pre>
+<p>Those four examples cover the main canonical branches. The important
+practical point is that each constructor returns a <code>Shape</code>
+object that can later be passed into a scatterer constructor without
+re-entering the geometry.</p>
+<p>It is usually worth plotting those objects immediately so that the
+stored geometry is being checked, not just assumed from the constructor
+call.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">plot_shape_profile</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">shape_obj</span>, <span class="va">main</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">pos</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">shape_obj</span>, <span class="st">"position_matrix"</span><span class="op">)</span></span>
+<span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">pos</span><span class="op">[</span>, <span class="st">"x"</span><span class="op">]</span></span>
+<span>  <span class="va">zU</span> <span class="op">&lt;-</span> <span class="va">pos</span><span class="op">[</span>, <span class="st">"zU"</span><span class="op">]</span></span>
+<span>  <span class="va">zL</span> <span class="op">&lt;-</span> <span class="va">pos</span><span class="op">[</span>, <span class="st">"zL"</span><span class="op">]</span></span>
+<span>  <span class="va">ylim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">zU</span>, <span class="va">zL</span><span class="op">)</span>, finite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">zU</span>,</span>
+<span>    type <span class="op">=</span> <span class="st">"l"</span>,</span>
+<span>    ylim <span class="op">=</span> <span class="va">ylim</span>,</span>
+<span>    xlab <span class="op">=</span> <span class="st">"x"</span>,</span>
+<span>    ylab <span class="op">=</span> <span class="st">"z"</span>,</span>
+<span>    main <span class="op">=</span> <span class="va">main</span></span>
+<span>  <span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">zL</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">x</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>, lty <span class="op">=</span> <span class="fl">3</span>, col <span class="op">=</span> <span class="st">"grey70"</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">old_par</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>no.readonly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/on.exit.html" class="external-link">on.exit</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="va">old_par</span><span class="op">)</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">3</span>, <span class="fl">2.2</span>, <span class="fl">0.8</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">plot_shape_profile</span><span class="op">(</span><span class="va">sphere_shape</span>, main <span class="op">=</span> <span class="st">"Sphere"</span><span class="op">)</span></span>
+<span><span class="fu">plot_shape_profile</span><span class="op">(</span><span class="va">cylinder_shape</span>, main <span class="op">=</span> <span class="st">"Cylinder"</span><span class="op">)</span></span>
+<span><span class="fu">plot_shape_profile</span><span class="op">(</span><span class="va">ps_shape</span>, main <span class="op">=</span> <span class="st">"Prolate spheroid"</span><span class="op">)</span></span>
+<span><span class="fu">plot_shape_profile</span><span class="op">(</span><span class="va">oblate_shape</span>, main <span class="op">=</span> <span class="st">"Oblate spheroid"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="building-shapes_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" alt="" width="768"></p>
+</div>
+<div class="section level2">
 <h2 id="why-geometry-choice-matters">Why geometry choice matters<a class="anchor" aria-label="anchor" href="#why-geometry-choice-matters"></a>
 </h2>
 <p>The geometry chosen at this stage strongly influences which later
@@ -184,6 +261,30 @@ cleaner starting point than a highly detailed arbitrary outline.</p>
 make the resulting shape class explicit at the call site.
 <code><a href="../../reference/create_shape.html">create_shape()</a></code> is a thin convenience dispatcher rather than
 the main pedagogical path.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">wrapped_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/create_shape.html">create_shape</a></span><span class="op">(</span></span>
+<span>  <span class="st">"cylinder"</span>,</span>
+<span>  length_body <span class="op">=</span> <span class="fl">0.03</span>,</span>
+<span>  radius_body <span class="op">=</span> <span class="fl">0.002</span>,</span>
+<span>  n_segments <span class="op">=</span> <span class="fl">50</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">wrapped_shape</span>, <span class="st">"shape_parameters"</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape"</span>, <span class="st">"length"</span>, <span class="st">"radius"</span>, <span class="st">"n_segments"</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
+<pre><code><span><span class="co">## $&lt;NA&gt;</span></span>
+<span><span class="co">## NULL</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $length</span></span>
+<span><span class="co">## [1] 0.03</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $radius</span></span>
+<span><span class="co">##  [1] 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002</span></span>
+<span><span class="co">## [13] 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002</span></span>
+<span><span class="co">## [25] 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002</span></span>
+<span><span class="co">## [37] 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002</span></span>
+<span><span class="co">## [49] 0.002 0.002 0.002</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $n_segments</span></span>
+<span><span class="co">## [1] 50</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 id="coordinate-conventions-by-shape">Coordinate conventions by shape<a class="anchor" aria-label="anchor" href="#coordinate-conventions-by-shape"></a>
@@ -241,6 +342,25 @@ interpretation.</p>
 <p>The further a body departs from a separable canonical surface, the
 stronger the case becomes for preserving the measured morphology rather
 than forcing the target into an overly simple idealized form.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">measured_like</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/arbitrary.html">arbitrary</a></span><span class="op">(</span></span>
+<span>  x_body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.01</span>, <span class="fl">0.02</span>, <span class="fl">0.03</span>, <span class="fl">0.04</span><span class="op">)</span>,</span>
+<span>  radius_body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.004</span>, <span class="fl">0.006</span>, <span class="fl">0.004</span>, <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">measured_like</span>, <span class="st">"position_matrix"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##         x     a    zU     zL</span></span>
+<span><span class="co">## [1,] 0.00 0.000 0.000  0.000</span></span>
+<span><span class="co">## [2,] 0.01 0.004 0.004 -0.004</span></span>
+<span><span class="co">## [3,] 0.02 0.006 0.006 -0.006</span></span>
+<span><span class="co">## [4,] 0.03 0.004 0.004 -0.004</span></span>
+<span><span class="co">## [5,] 0.04 0.000 0.000  0.000</span></span></code></pre>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">plot_shape_profile</span><span class="op">(</span><span class="va">measured_like</span>, main <span class="op">=</span> <span class="st">"Arbitrary measured-like body"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="building-shapes_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="672"></p>
+<p>That is the most direct pathway when the user already has an axial
+coordinate series or wants to sketch a bespoke elongated target by
+hand.</p>
 </div>
 <div class="section level2">
 <h2 id="canonical-surrogates-from-measured-shapes">Canonical surrogates from measured shapes<a class="anchor" aria-label="anchor" href="#canonical-surrogates-from-measured-shapes"></a>
@@ -278,6 +398,33 @@ inside the later model call.</p>
 the response of the fitted canonical surrogate, not as though the
 original irregular target had somehow become exactly separable in
 spheroidal or cylindrical coordinates.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cyl_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/canonicalize_shape.html">canonicalize_shape</a></span><span class="op">(</span></span>
+<span>  <span class="va">measured_like</span>,</span>
+<span>  to <span class="op">=</span> <span class="st">"Cylinder"</span>,</span>
+<span>  diagnostics <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  fitted_shape <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">cyl_fit</span><span class="op">$</span><span class="va">shape</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>  source_length_m <span class="op">=</span> <span class="va">cyl_fit</span><span class="op">$</span><span class="va">diagnostics</span><span class="op">$</span><span class="va">source</span><span class="op">$</span><span class="va">length</span>,</span>
+<span>  fitted_length_m <span class="op">=</span> <span class="va">cyl_fit</span><span class="op">$</span><span class="va">diagnostics</span><span class="op">$</span><span class="va">target</span><span class="op">$</span><span class="va">length</span>,</span>
+<span>  radius_rmse <span class="op">=</span> <span class="va">cyl_fit</span><span class="op">$</span><span class="va">diagnostics</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">radius_rmse</span>,</span>
+<span>  radius_nrmse <span class="op">=</span> <span class="va">cyl_fit</span><span class="op">$</span><span class="va">diagnostics</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">radius_nrmse</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##   fitted_shape source_length_m fitted_length_m radius_rmse radius_nrmse</span></span>
+<span><span class="co">## 1     Cylinder            0.04            0.04 0.002740549    0.4567582</span></span></code></pre>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">old_par</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>no.readonly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/on.exit.html" class="external-link">on.exit</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="va">old_par</span><span class="op">)</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">3</span>, <span class="fl">2.2</span>, <span class="fl">0.8</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">plot_shape_profile</span><span class="op">(</span><span class="va">measured_like</span>, main <span class="op">=</span> <span class="st">"Original arbitrary shape"</span><span class="op">)</span></span>
+<span><span class="fu">plot_shape_profile</span><span class="op">(</span><span class="va">cyl_fit</span><span class="op">$</span><span class="va">shape</span>, main <span class="op">=</span> <span class="st">"Canonicalized cylinder surrogate"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="building-shapes_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="672"></p>
+<p>If the diagnostics are acceptable for the intended use, the fitted
+shape can be passed on like any other canonical <code>Shape</code>
+object.</p>
 </div>
 <div class="section level2">
 <h2 id="choosing-the-right-level-of-geometric-detail">Choosing the right level of geometric detail<a class="anchor" aria-label="anchor" href="#choosing-the-right-level-of-geometric-detail"></a>

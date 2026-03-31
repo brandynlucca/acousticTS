@@ -143,6 +143,61 @@ description into a model-ready acoustic object.</p>
 </div>
 </div>
 <div class="section level2">
+<h2 id="quick-constructor-examples">Quick constructor examples<a class="anchor" aria-label="anchor" href="#quick-constructor-examples"></a>
+</h2>
+<p>The fastest way to see the package logic is to build a few small
+objects directly.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://brandynlucca.github.io/acousticTS/">acousticTS</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">shape_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/prolate_spheroid.html">prolate_spheroid</a></span><span class="op">(</span></span>
+<span>  length_body <span class="op">=</span> <span class="fl">0.04</span>,</span>
+<span>  radius_body <span class="op">=</span> <span class="fl">0.004</span>,</span>
+<span>  n_segments <span class="op">=</span> <span class="fl">60</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">fls_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/fls_generate.html">fls_generate</a></span><span class="op">(</span></span>
+<span>  shape <span class="op">=</span> <span class="va">shape_obj</span>,</span>
+<span>  density_body <span class="op">=</span> <span class="fl">1045</span>,</span>
+<span>  sound_speed_body <span class="op">=</span> <span class="fl">1520</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">gas_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/gas_generate.html">gas_generate</a></span><span class="op">(</span></span>
+<span>  shape <span class="op">=</span> <span class="fu"><a href="../../reference/sphere.html">sphere</a></span><span class="op">(</span>radius_body <span class="op">=</span> <span class="fl">0.01</span>, n_segments <span class="op">=</span> <span class="fl">60</span><span class="op">)</span>,</span>
+<span>  g_fluid <span class="op">=</span> <span class="fl">0.0012</span>,</span>
+<span>  h_fluid <span class="op">=</span> <span class="fl">0.22</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  object_class <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">fls_obj</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">gas_obj</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>  shape <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">fls_obj</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"shape"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">gas_obj</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"shape"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  length_m <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">fls_obj</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"length"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">gas_obj</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"length"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##   object_class           shape length_m</span></span>
+<span><span class="co">## 1          FLS ProlateSpheroid     0.04</span></span>
+<span><span class="co">## 2          GAS          Sphere     0.02</span></span></code></pre>
+<p>That is the core pattern used throughout the package: build a
+<code>Shape</code>, then assign it a physical interpretation with the
+relevant scatterer constructor.</p>
+<p>It is also worth checking the geometry visually at this stage because
+the scatterer plot reflects the stored object that will be passed into
+<code><a href="../../reference/target_strength.html">target_strength()</a></code>, not just the constructor inputs.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">old_par</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>no.readonly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/on.exit.html" class="external-link">on.exit</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="va">old_par</span><span class="op">)</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">3</span>, <span class="fl">2.2</span>, <span class="fl">0.8</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fls_obj</span>, type <span class="op">=</span> <span class="st">"shape"</span>, main <span class="op">=</span> <span class="st">"FLS object"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">gas_obj</span>, type <span class="op">=</span> <span class="st">"shape"</span>, main <span class="op">=</span> <span class="st">"GAS object"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="building-scatterers_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" alt="" width="768"></p>
+</div>
+<div class="section level2">
 <h2 id="why-scatterer-construction-is-separate-from-shape-construction">Why scatterer construction is separate from shape construction<a class="anchor" aria-label="anchor" href="#why-scatterer-construction-is-separate-from-shape-construction"></a>
 </h2>
 <p>The package separates shape generation from scatterer generation so
@@ -245,6 +300,60 @@ density and sound speed may be supplied either as contrasts
 (<code>density_*</code>, <code>sound_speed_*</code>). That flexibility
 is useful and does not add the same kind of cognitive overhead as
 overloading the geometry interface.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">body_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/arbitrary.html">arbitrary</a></span><span class="op">(</span></span>
+<span>  x_body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.08</span>, <span class="fl">0.12</span><span class="op">)</span>,</span>
+<span>  zU_body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.001</span>, <span class="fl">0.004</span>, <span class="fl">0.001</span><span class="op">)</span>,</span>
+<span>  zL_body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.001</span>, <span class="op">-</span><span class="fl">0.004</span>, <span class="op">-</span><span class="fl">0.001</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">bladder_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/arbitrary.html">arbitrary</a></span><span class="op">(</span></span>
+<span>  x_bladder <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.03</span>, <span class="fl">0.08</span>, <span class="fl">0.1</span><span class="op">)</span>,</span>
+<span>  zU_bladder <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.0008</span>, <span class="fl">0.0016</span>, <span class="fl">0.0008</span><span class="op">)</span>,</span>
+<span>  zL_bladder <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.0008</span>, <span class="op">-</span><span class="fl">0.0016</span>, <span class="op">-</span><span class="fl">0.0008</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">sbf_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/sbf_generate.html">sbf_generate</a></span><span class="op">(</span></span>
+<span>  body_shape <span class="op">=</span> <span class="va">body_shape</span>,</span>
+<span>  bladder_shape <span class="op">=</span> <span class="va">bladder_shape</span>,</span>
+<span>  density_body <span class="op">=</span> <span class="fl">1040</span>,</span>
+<span>  sound_speed_body <span class="op">=</span> <span class="fl">1500</span>,</span>
+<span>  density_bladder <span class="op">=</span> <span class="fl">1.2</span>,</span>
+<span>  sound_speed_bladder <span class="op">=</span> <span class="fl">340</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  body_length_m <span class="op">=</span> <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">sbf_obj</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"body"</span>, <span class="st">"length"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  bladder_length_m <span class="op">=</span> <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">sbf_obj</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"bladder"</span>, <span class="st">"length"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  body_theta_rad <span class="op">=</span> <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">sbf_obj</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"body"</span>, <span class="st">"theta"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##   body_length_m bladder_length_m body_theta_rad</span></span>
+<span><span class="co">## 1          0.12             0.07       1.570796</span></span></code></pre>
+<p>That is the composite pattern: build the components separately, then
+hand them to the scatterer generator explicitly as
+<code>body_shape</code>, <code>bladder_shape</code>, or
+<code>backbone_shape</code>.</p>
+<p>At that point it is often useful to inspect the object internals
+directly so the separation between components is explicit in code as
+well as in the plot.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  body_length_m <span class="op">=</span> <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">sbf_obj</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"body"</span>, <span class="st">"length"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  bladder_length_m <span class="op">=</span> <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">sbf_obj</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"bladder"</span>, <span class="st">"length"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  body_theta_rad <span class="op">=</span> <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">sbf_obj</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"body"</span>, <span class="st">"theta"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  bladder_x_head <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">sbf_obj</span>, <span class="st">"bladder"</span><span class="op">)</span><span class="op">$</span><span class="va">rpos</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## $body_length_m</span></span>
+<span><span class="co">## [1] 0.12</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $bladder_length_m</span></span>
+<span><span class="co">## [1] 0.07</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $body_theta_rad</span></span>
+<span><span class="co">## [1] 1.570796</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $bladder_x_head</span></span>
+<span><span class="co">## [1] 0.03 0.08 0.10</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 id="matching-class-to-target-type">Matching class to target type<a class="anchor" aria-label="anchor" href="#matching-class-to-target-type"></a>
@@ -308,6 +417,78 @@ than forcing the object into a more generic class.</p>
 selection much easier, because compatible model families become apparent
 as soon as the scatterer class is chosen. In that sense, good scatterer
 construction is already the beginning of good model selection.</p>
+<p>The same shape-first pattern extends to the other target families as
+well:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Explicit body-plus-backbone target for BBFM workflows</span></span>
+<span><span class="va">bbf_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/bbf_generate.html">bbf_generate</a></span><span class="op">(</span></span>
+<span>  body_shape <span class="op">=</span> <span class="fu"><a href="../../reference/arbitrary.html">arbitrary</a></span><span class="op">(</span></span>
+<span>    x_body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.04</span>, <span class="fl">0.08</span><span class="op">)</span>,</span>
+<span>    zU_body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.001</span>, <span class="fl">0.004</span>, <span class="fl">0.001</span><span class="op">)</span>,</span>
+<span>    zL_body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.001</span>, <span class="op">-</span><span class="fl">0.004</span>, <span class="op">-</span><span class="fl">0.001</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  backbone_shape <span class="op">=</span> <span class="fu"><a href="../../reference/cylinder.html">cylinder</a></span><span class="op">(</span></span>
+<span>    length_body <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>    radius_body <span class="op">=</span> <span class="fl">0.0008</span>,</span>
+<span>    n_segments <span class="op">=</span> <span class="fl">40</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  density_body <span class="op">=</span> <span class="fl">1070</span>,</span>
+<span>  sound_speed_body <span class="op">=</span> <span class="fl">1570</span>,</span>
+<span>  density_backbone <span class="op">=</span> <span class="fl">1900</span>,</span>
+<span>  sound_speed_longitudinal_backbone <span class="op">=</span> <span class="fl">3500</span>,</span>
+<span>  sound_speed_transversal_backbone <span class="op">=</span> <span class="fl">1700</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Standard calibration sphere</span></span>
+<span><span class="va">cal_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/cal_generate.html">cal_generate</a></span><span class="op">(</span></span>
+<span>  material <span class="op">=</span> <span class="st">"WC"</span>,</span>
+<span>  diameter <span class="op">=</span> <span class="fl">38.1e-3</span>,</span>
+<span>  n_segments <span class="op">=</span> <span class="fl">120</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Elastic-shelled sphere</span></span>
+<span><span class="va">ess_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/ess_generate.html">ess_generate</a></span><span class="op">(</span></span>
+<span>  shape <span class="op">=</span> <span class="fu"><a href="../../reference/sphere.html">sphere</a></span><span class="op">(</span>radius_body <span class="op">=</span> <span class="fl">0.03</span>, n_segments <span class="op">=</span> <span class="fl">80</span><span class="op">)</span>,</span>
+<span>  shell_thickness <span class="op">=</span> <span class="fl">0.001</span>,</span>
+<span>  density_shell <span class="op">=</span> <span class="fl">1050</span>,</span>
+<span>  sound_speed_shell <span class="op">=</span> <span class="fl">2350</span>,</span>
+<span>  density_fluid <span class="op">=</span> <span class="fl">1030</span>,</span>
+<span>  sound_speed_fluid <span class="op">=</span> <span class="fl">1500</span>,</span>
+<span>  E <span class="op">=</span> <span class="fl">3.5e9</span>,</span>
+<span>  nu <span class="op">=</span> <span class="fl">0.34</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cal_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/cal_generate.html">cal_generate</a></span><span class="op">(</span></span>
+<span>  material <span class="op">=</span> <span class="st">"WC"</span>,</span>
+<span>  diameter <span class="op">=</span> <span class="fl">38.1e-3</span>,</span>
+<span>  n_segments <span class="op">=</span> <span class="fl">120</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">ess_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/ess_generate.html">ess_generate</a></span><span class="op">(</span></span>
+<span>  shape <span class="op">=</span> <span class="fu"><a href="../../reference/sphere.html">sphere</a></span><span class="op">(</span>radius_body <span class="op">=</span> <span class="fl">0.03</span>, n_segments <span class="op">=</span> <span class="fl">80</span><span class="op">)</span>,</span>
+<span>  shell_thickness <span class="op">=</span> <span class="fl">0.001</span>,</span>
+<span>  density_shell <span class="op">=</span> <span class="fl">1050</span>,</span>
+<span>  sound_speed_shell <span class="op">=</span> <span class="fl">2350</span>,</span>
+<span>  density_fluid <span class="op">=</span> <span class="fl">1030</span>,</span>
+<span>  sound_speed_fluid <span class="op">=</span> <span class="fl">1500</span>,</span>
+<span>  E <span class="op">=</span> <span class="fl">3.5e9</span>,</span>
+<span>  nu <span class="op">=</span> <span class="fl">0.34</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  object_class <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">cal_obj</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">ess_obj</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>  diameter_m <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">cal_obj</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"diameter"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="cn">NA_real_</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  shell_thickness_m <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="cn">NA_real_</span>,</span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">ess_obj</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shell"</span>, <span class="st">"shell_thickness"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##   object_class diameter_m shell_thickness_m</span></span>
+<span><span class="co">## 1          CAL     0.0381                NA</span></span>
+<span><span class="co">## 2          ESS         NA             0.001</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 id="what-to-check-before-moving-on">What to check before moving on<a class="anchor" aria-label="anchor" href="#what-to-check-before-moving-on"></a>
@@ -323,6 +504,15 @@ body.</p>
 <p>Those checks are simple, but they have a large payoff. Many apparent
 modeling problems are actually scatterer-construction problems
 discovered too late.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">fls_obj</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"body"</span>, <span class="st">"density"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] 1045</span></span></code></pre>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">fls_obj</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"shape"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] "ProlateSpheroid"</span></span></code></pre>
+<p>That kind of quick inspection is usually enough to confirm that the
+object you built matches the target type you intended before moving on
+to <code><a href="../../reference/target_strength.html">target_strength()</a></code>.</p>
 </div>
 <div class="section level2">
 <h2 id="recommended-next-step">Recommended next step<a class="anchor" aria-label="anchor" href="#recommended-next-step"></a>

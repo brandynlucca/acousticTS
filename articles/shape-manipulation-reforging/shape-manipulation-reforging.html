@@ -169,6 +169,41 @@ proportions, or axial resolution.</li>
 </ol>
 </div>
 <div class="section level2">
+<h2 id="quick-reshaping-examples">Quick reshaping examples<a class="anchor" aria-label="anchor" href="#quick-reshaping-examples"></a>
+</h2>
+<p>It helps to see the two workflows immediately in code before
+discussing the details.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://brandynlucca.github.io/acousticTS/">acousticTS</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">krill</span>, package <span class="op">=</span> <span class="st">"acousticTS"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">krill_40mm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/reforge.html">reforge</a></span><span class="op">(</span><span class="va">krill</span>, body_target <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fl">0.04</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">krill_fine</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/reforge.html">reforge</a></span><span class="op">(</span><span class="va">krill</span>, n_segments_body <span class="op">=</span> <span class="fl">200</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  object <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"original"</span>, <span class="st">"krill_40mm"</span>, <span class="st">"krill_fine"</span><span class="op">)</span>,</span>
+<span>  length_m <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">krill</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"length"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">krill_40mm</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"length"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">krill_fine</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"length"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  n_segments <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">krill</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"n_segments"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">krill_40mm</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"n_segments"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">krill_fine</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"n_segments"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##       object  length_m n_segments</span></span>
+<span><span class="co">## 1   original 0.0410898         14</span></span>
+<span><span class="co">## 2 krill_40mm 0.0400000         14</span></span>
+<span><span class="co">## 3 krill_fine 0.0410898        200</span></span></code></pre>
+<p>That is the simplest <code><a href="../../reference/reforge.html">reforge()</a></code> pattern for a one-body
+<code>FLS</code> object: reuse the same target and change the body
+target dimensions or axial resolution explicitly without rebuilding it
+from scratch.</p>
+</div>
+<div class="section level2">
 <h2 id="bending-with-brake">Bending with <code>brake()</code><a class="anchor" aria-label="anchor" href="#bending-with-brake"></a>
 </h2>
 <p><code><a href="../../reference/brake.html">brake()</a></code> applies a smooth curvature transformation to an
@@ -194,10 +229,15 @@ preserves geometric interpretation across a size series. Measurement
 mode preserves literal physical curvature. Neither is universally
 better, but they answer different questions and should not be treated as
 interchangeable.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://brandynlucca.github.io/acousticTS/">acousticTS</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">shape_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/cylinder.html">cylinder</a></span><span class="op">(</span></span>
+<p>For curved <code>FLS</code> objects, the stored body length is
+treated as the bent centerline arc length rather than as the flattened
+<code>x</code>-axis span. That matters for later workflows because
+<code><a href="../../reference/reforge.html">reforge()</a></code> now uses that same curved centerline directly
+when a bent <code>FLS</code> is resized. In other words, there is no
+hidden straight surrogate being rebuilt behind the scenes. The existing
+bent <code>rpos</code> is what gets rescaled.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">shape_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/cylinder.html">cylinder</a></span><span class="op">(</span></span>
 <span>  length_body <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>  radius_body <span class="op">=</span> <span class="fl">0.003</span>,</span>
 <span>  n_segments <span class="op">=</span> <span class="fl">120</span></span>
@@ -210,11 +250,62 @@ interchangeable.</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">bent_ratio</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/brake.html">brake</a></span><span class="op">(</span><span class="va">obj</span>, radius_curvature <span class="op">=</span> <span class="fl">5</span>, mode <span class="op">=</span> <span class="st">"ratio"</span><span class="op">)</span></span>
-<span><span class="va">bent_measured</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/brake.html">brake</a></span><span class="op">(</span><span class="va">obj</span>, radius_curvature <span class="op">=</span> <span class="fl">0.35</span>, mode <span class="op">=</span> <span class="st">"measurement"</span><span class="op">)</span></span></code></pre></div>
-<p>After bending, it is good practice to re-plot the geometry before
-running a model.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">bent_ratio</span>, type <span class="op">=</span> <span class="st">"shape"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">bent_measured</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/brake.html">brake</a></span><span class="op">(</span><span class="va">obj</span>, radius_curvature <span class="op">=</span> <span class="fl">0.35</span>, mode <span class="op">=</span> <span class="st">"measurement"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">curvature_ratio</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">value</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">x</span>, <span class="st">"shape_parameters"</span><span class="op">)</span><span class="op">$</span><span class="va">radius_curvature_ratio</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="cn">NA_real_</span> <span class="kw">else</span> <span class="va">value</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  object <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"original"</span>, <span class="st">"bent_ratio"</span>, <span class="st">"bent_measured"</span><span class="op">)</span>,</span>
+<span>  length_m <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">obj</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"length"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">bent_ratio</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"length"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">bent_measured</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"length"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  curvature_ratio <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="fu">curvature_ratio</span><span class="op">(</span><span class="va">obj</span><span class="op">)</span>,</span>
+<span>    <span class="fu">curvature_ratio</span><span class="op">(</span><span class="va">bent_ratio</span><span class="op">)</span>,</span>
+<span>    <span class="fu">curvature_ratio</span><span class="op">(</span><span class="va">bent_measured</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##          object   length_m curvature_ratio</span></span>
+<span><span class="co">## 1      original 0.05000000              NA</span></span>
+<span><span class="co">## 2    bent_ratio 0.04999999               5</span></span>
+<span><span class="co">## 3 bent_measured 0.05000000               7</span></span></code></pre>
+<p>Plotting the object before and after bending makes the transformation
+much easier to interpret.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">old_par</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>no.readonly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/on.exit.html" class="external-link">on.exit</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="va">old_par</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3.2</span>, <span class="fl">3.2</span>, <span class="fl">2.6</span>, <span class="fl">0.8</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">obj</span>, type <span class="op">=</span> <span class="st">"shape"</span>, main <span class="op">=</span> <span class="st">"Original FLS cylinder"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">bent_ratio</span>, type <span class="op">=</span> <span class="st">"shape"</span>, main <span class="op">=</span> <span class="st">"After brake(mode = \"ratio\")"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="shape-manipulation-reforging_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" alt="" width="768"></p>
+<p>It is also helpful to inspect the stored position matrix directly.
+For a straight cylinder the body centerline stays at <code>z = 0</code>,
+while <code><a href="../../reference/brake.html">brake()</a></code> shifts the centerline into a curved arc and
+slightly adjusts the <code>x</code> positions accordingly.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">body_before</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">obj</span>, <span class="st">"body"</span><span class="op">)</span><span class="op">$</span><span class="va">rpos</span></span>
+<span><span class="va">body_after</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">bent_ratio</span>, <span class="st">"body"</span><span class="op">)</span><span class="op">$</span><span class="va">rpos</span></span>
+<span><span class="va">stations</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">body_before</span><span class="op">)</span>, length.out <span class="op">=</span> <span class="fl">5</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  station <span class="op">=</span> <span class="va">stations</span>,</span>
+<span>  x_before <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">body_before</span><span class="op">[</span><span class="st">"x"</span>, <span class="va">stations</span><span class="op">]</span>, <span class="fl">5</span><span class="op">)</span>,</span>
+<span>  z_before <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">body_before</span><span class="op">[</span><span class="st">"z"</span>, <span class="va">stations</span><span class="op">]</span>, <span class="fl">5</span><span class="op">)</span>,</span>
+<span>  x_after <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">body_after</span><span class="op">[</span><span class="st">"x"</span>, <span class="va">stations</span><span class="op">]</span>, <span class="fl">5</span><span class="op">)</span>,</span>
+<span>  z_after <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">body_after</span><span class="op">[</span><span class="st">"z"</span>, <span class="va">stations</span><span class="op">]</span>, <span class="fl">5</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##   station x_before z_before x_after  z_after</span></span>
+<span><span class="co">## 1       1   0.0500        0 0.04996 -0.00125</span></span>
+<span><span class="co">## 2      31   0.0375        0 0.03749 -0.00031</span></span>
+<span><span class="co">## 3      61   0.0250        0 0.02500  0.00000</span></span>
+<span><span class="co">## 4      91   0.0125        0 0.01251 -0.00031</span></span>
+<span><span class="co">## 5     121   0.0000        0 0.00004 -0.00125</span></span></code></pre>
 <p>That check is worth doing because a mathematically valid
 transformation can still create a geometry that is too coarse for the
 intended model if the segmentation is sparse.</p>
@@ -224,14 +315,134 @@ projected length, local orientation, and the phase relationships among
 different parts of the body. A curvature transformation is therefore
 best interpreted as a new geometric state of the same target, not just
 as a cosmetic deformation of a drawing.</p>
+<p>That distinction becomes especially important when a bent object is
+later resized. The example below shows that the requested
+<code>body_target["length"]</code> is matched to the true bent
+centerline length, while the projected <code>x</code> span stays
+slightly shorter.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">centerline_arc_length</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">body</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">x</span>, <span class="st">"body"</span><span class="op">)</span></span>
+<span>  <span class="va">rpos</span> <span class="op">&lt;-</span> <span class="va">body</span><span class="op">$</span><span class="va">rpos</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="va">rpos</span><span class="op">[</span><span class="st">"x"</span>, <span class="op">]</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/base/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="va">rpos</span><span class="op">[</span><span class="st">"z"</span>, <span class="op">]</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">bent_rescaled</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/reforge.html">reforge</a></span><span class="op">(</span><span class="va">bent_ratio</span>, body_target <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fl">0.08</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">body_bent_rescaled</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">bent_rescaled</span>, <span class="st">"body"</span><span class="op">)</span><span class="op">$</span><span class="va">rpos</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  metric <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="st">"target_length_m"</span>,</span>
+<span>    <span class="st">"stored_shape_length_m"</span>,</span>
+<span>    <span class="st">"centerline_arc_length_m"</span>,</span>
+<span>    <span class="st">"projected_x_length_m"</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="fl">0.08</span>,</span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">bent_rescaled</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"length"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu">centerline_arc_length</span><span class="op">(</span><span class="va">bent_rescaled</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/diff.html" class="external-link">diff</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="va">body_bent_rescaled</span><span class="op">[</span><span class="st">"x"</span>, <span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##                    metric      value</span></span>
+<span><span class="co">## 1         target_length_m 0.08000000</span></span>
+<span><span class="co">## 2   stored_shape_length_m 0.08000000</span></span>
+<span><span class="co">## 3 centerline_arc_length_m 0.08000000</span></span>
+<span><span class="co">## 4    projected_x_length_m 0.07986674</span></span></code></pre>
+<p>This is the behavior to expect for an already bent <code>FLS</code>:
+resizing is arc-length aware. If the scientific question is instead
+“what happens if a straight target of length <code>L</code> is bent
+afterward?”, the safer workflow is still to <code><a href="../../reference/reforge.html">reforge()</a></code> the
+straight object first and then apply <code><a href="../../reference/brake.html">brake()</a></code>.</p>
+</div>
+<div class="section level2">
+<h2 id="positioning-and-local-profile-edits">Positioning and local profile edits<a class="anchor" aria-label="anchor" href="#positioning-and-local-profile-edits"></a>
+</h2>
+<p>Not every geometry edit is about bending or global resizing. It is
+also useful to have small helpers for positioning, resampling,
+smoothing, or locally widening and pinching an existing profile.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">translated_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/translate_shape.html">translate_shape</a></span><span class="op">(</span><span class="va">obj</span>, x_offset <span class="op">=</span> <span class="op">-</span><span class="fl">0.025</span><span class="op">)</span></span>
+<span><span class="va">centered_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/reanchor_shape.html">reanchor_shape</a></span><span class="op">(</span><span class="va">obj</span>, anchor <span class="op">=</span> <span class="st">"center"</span>, at <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  object <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"original"</span>, <span class="st">"translated"</span>, <span class="st">"centered"</span><span class="op">)</span>,</span>
+<span>  x_min <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">obj</span>, <span class="st">"body"</span><span class="op">)</span><span class="op">$</span><span class="va">rpos</span><span class="op">[</span><span class="st">"x"</span>, <span class="op">]</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">translated_obj</span>, <span class="st">"body"</span><span class="op">)</span><span class="op">$</span><span class="va">rpos</span><span class="op">[</span><span class="st">"x"</span>, <span class="op">]</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">centered_obj</span>, <span class="st">"body"</span><span class="op">)</span><span class="op">$</span><span class="va">rpos</span><span class="op">[</span><span class="st">"x"</span>, <span class="op">]</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  x_max <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">obj</span>, <span class="st">"body"</span><span class="op">)</span><span class="op">$</span><span class="va">rpos</span><span class="op">[</span><span class="st">"x"</span>, <span class="op">]</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">translated_obj</span>, <span class="st">"body"</span><span class="op">)</span><span class="op">$</span><span class="va">rpos</span><span class="op">[</span><span class="st">"x"</span>, <span class="op">]</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">centered_obj</span>, <span class="st">"body"</span><span class="op">)</span><span class="op">$</span><span class="va">rpos</span><span class="op">[</span><span class="st">"x"</span>, <span class="op">]</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##       object  x_min x_max</span></span>
+<span><span class="co">## 1   original  0.000 0.050</span></span>
+<span><span class="co">## 2 translated -0.025 0.025</span></span>
+<span><span class="co">## 3   centered -0.025 0.025</span></span></code></pre>
+<p>Those helpers are intentionally simple:</p>
+<ol style="list-style-type: decimal">
+<li>
+<code><a href="../../reference/translate_shape.html">translate_shape()</a></code> applies a direct offset,</li>
+<li>
+<code><a href="../../reference/reanchor_shape.html">reanchor_shape()</a></code> computes the required offset from a
+nose, center, or tail anchor.</li>
+</ol>
+<p>There are also helpers for local edits to the stored profile:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">obj_inflated</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/inflate_shape.html">inflate_shape</a></span><span class="op">(</span></span>
+<span>  <span class="va">obj</span>,</span>
+<span>  x_range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.015</span>, <span class="fl">0.035</span><span class="op">)</span>,</span>
+<span>  scale <span class="op">=</span> <span class="fl">1.35</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">obj_smoothed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/smooth_shape.html">smooth_shape</a></span><span class="op">(</span><span class="va">obj_inflated</span>, span <span class="op">=</span> <span class="fl">7</span><span class="op">)</span></span>
+<span><span class="va">obj_dense</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/resample_shape.html">resample_shape</a></span><span class="op">(</span><span class="va">obj_smoothed</span>, n_segments <span class="op">=</span> <span class="fl">120</span><span class="op">)</span></span>
+<span><span class="va">obj_flipped</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/flip_shape.html">flip_shape</a></span><span class="op">(</span><span class="va">obj_inflated</span>, axis <span class="op">=</span> <span class="st">"x"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  object <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"original"</span>, <span class="st">"inflated"</span>, <span class="st">"dense"</span><span class="op">)</span>,</span>
+<span>  shape_label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">obj</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"shape"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">obj_inflated</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"shape"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">obj_dense</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"shape"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  n_segments <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">obj</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"n_segments"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">obj_inflated</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"n_segments"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">obj_dense</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"n_segments"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##     object shape_label n_segments</span></span>
+<span><span class="co">## 1 original    Cylinder        120</span></span>
+<span><span class="co">## 2 inflated   Arbitrary        120</span></span>
+<span><span class="co">## 3    dense   Arbitrary        120</span></span></code></pre>
+<p>In that sequence:</p>
+<ol style="list-style-type: decimal">
+<li>
+<code><a href="../../reference/inflate_shape.html">inflate_shape()</a></code> widens a selected axial region,</li>
+<li>
+<code><a href="../../reference/smooth_shape.html">smooth_shape()</a></code> regularizes the resulting outline,</li>
+<li>
+<code><a href="../../reference/resample_shape.html">resample_shape()</a></code> changes the discretization density
+without rebuilding the object,</li>
+<li>
+<code><a href="../../reference/flip_shape.html">flip_shape()</a></code> reverses the stored axial profile while
+keeping the x grid intact.</li>
+</ol>
+<p>These operations are helpful when the main question is geometric
+preprocessing rather than formal rescaling. They are especially useful
+for measured outlines that need light cleanup before canonicalization or
+model runs.</p>
 </div>
 <div class="section level2">
 <h2 id="re-parameterizing-with-reforge">Re-parameterizing with <code>reforge()</code><a class="anchor" aria-label="anchor" href="#re-parameterizing-with-reforge"></a>
 </h2>
 <p><code><a href="../../reference/reforge.html">reforge()</a></code> is a generic interface for reshaping or
-resizing an existing object. The most developed method in the package is
-the <code>SBF</code> method, which handles body and swimbladder geometry
-jointly.</p>
+resizing an existing object. The package currently supports both
+one-body <code>FLS</code> workflows and more explicitly multi-component
+classes such as <code>SBF</code> and <code>BBF</code>.</p>
 <p>Its most important arguments are:</p>
 <ol style="list-style-type: decimal">
 <li>
@@ -255,7 +466,80 @@ and target-dimension arguments. Scale arguments ask, “How much larger or
 smaller should this component become relative to its current state?”
 Target-dimension arguments ask, “What final dimensions should this
 component have?”</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">sardine</span>, package <span class="op">=</span> <span class="st">"acousticTS"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">obj_scaled</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/reforge.html">reforge</a></span><span class="op">(</span></span>
+<span>  <span class="va">sardine</span>,</span>
+<span>  body_scale <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span>,</span>
+<span>  swimbladder_scale <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>height <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span>,</span>
+<span>  isometric_body <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  isometric_swimbladder <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  maintain_ratio <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  n_segments_body <span class="op">=</span> <span class="fl">60</span>,</span>
+<span>  n_segments_swimbladder <span class="op">=</span> <span class="fl">40</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">obj_target</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/reforge.html">reforge</a></span><span class="op">(</span></span>
+<span>  <span class="va">sardine</span>,</span>
+<span>  body_target <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fl">0.12</span><span class="op">)</span>,</span>
+<span>  swimbladder_target <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fl">0.07</span>, height <span class="op">=</span> <span class="fl">0.0025</span><span class="op">)</span>,</span>
+<span>  isometric_swimbladder <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  maintain_ratio <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning: Swimbladder exceeds body bounds at some positions.</span></span></code></pre>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  object <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"original"</span>, <span class="st">"obj_scaled"</span>, <span class="st">"obj_target"</span><span class="op">)</span>,</span>
+<span>  body_length_m <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">sardine</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"body"</span>, <span class="st">"length"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">obj_scaled</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"body"</span>, <span class="st">"length"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">obj_target</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"body"</span>, <span class="st">"length"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  bladder_length_m <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">sardine</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"bladder"</span>, <span class="st">"length"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">obj_scaled</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"bladder"</span>, <span class="st">"length"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">obj_target</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"bladder"</span>, <span class="st">"length"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##       object body_length_m bladder_length_m</span></span>
+<span><span class="co">## 1   original         0.210            0.085</span></span>
+<span><span class="co">## 2 obj_scaled         0.252            0.085</span></span>
+<span><span class="co">## 3 obj_target         0.120            0.070</span></span></code></pre>
+<p>The same idea applies when the body stays fixed but an internal
+component needs to move. For example, a swimbladder can be shifted
+fore-aft or dorsoventrally without rebuilding the entire object:</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">bladder_forward</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/offset_component.html">offset_component</a></span><span class="op">(</span></span>
+<span>  <span class="va">sardine</span>,</span>
+<span>  component <span class="op">=</span> <span class="st">"bladder"</span>,</span>
+<span>  x_offset <span class="op">=</span> <span class="fl">0.002</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  object <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"original"</span>, <span class="st">"bladder_forward"</span><span class="op">)</span>,</span>
+<span>  bladder_x_min <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">sardine</span>, <span class="st">"bladder"</span><span class="op">)</span><span class="op">$</span><span class="va">rpos</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">bladder_forward</span>, <span class="st">"bladder"</span><span class="op">)</span><span class="op">$</span><span class="va">rpos</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##            object bladder_x_min</span></span>
+<span><span class="co">## 1        original         0.065</span></span>
+<span><span class="co">## 2 bladder_forward         0.067</span></span></code></pre>
+<p>The same interface also extends to newer multi-component classes such
+as <code>BBF</code>, where the body and backbone can be reforged
+separately:</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">bbf_rescaled</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/reforge.html">reforge</a></span><span class="op">(</span></span>
+<span>  <span class="va">bbf_obj</span>,</span>
+<span>  body_scale <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fl">1.1</span><span class="op">)</span>,</span>
+<span>  backbone_scale <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fl">1.1</span><span class="op">)</span>,</span>
+<span>  n_segments_body <span class="op">=</span> <span class="fl">120</span>,</span>
+<span>  n_segments_backbone <span class="op">=</span> <span class="fl">60</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>For reference, the scale-target patterns above can also be written
+more compactly as:</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">obj_scaled</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/reforge.html">reforge</a></span><span class="op">(</span></span>
 <span>  <span class="va">obj_sbf</span>,</span>
 <span>  body_scale <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span>,</span>
@@ -282,6 +566,12 @@ numerical resolution all at once. That makes it especially powerful for
 simulation and sensitivity studies, but it also means the transformed
 object should be treated as a deliberate new parameterization rather
 than as a trivial variant of the original.</p>
+<p>For bent <code>FLS</code> objects, there is one more important
+interpretation detail: <code>body_target = c(length = ...)</code> refers
+to the new bent centerline arc length, not to the projected
+<code>x</code> extent. For straight <code>FLS</code> objects those two
+quantities are effectively the same, but once curvature has been
+introduced they should not be treated as interchangeable.</p>
 </div>
 <div class="section level2">
 <h2 id="why-this-matters">Why this matters<a class="anchor" aria-label="anchor" href="#why-this-matters"></a>
@@ -348,6 +638,12 @@ questions.</p>
 <li>simulation workflows need dimension changes as explicit
 parameters.</li>
 </ol>
+<p>If a simulation needs both curvature and resizing, it helps to decide
+which quantity is supposed to stay physically meaningful. When the
+object is already bent, <code><a href="../../reference/reforge.html">reforge()</a></code> preserves the bent state
+and rescales that geometry directly. When the intended interpretation is
+“start straight, resize, then bend,” that sequence should be built
+explicitly in the workflow.</p>
 </div>
 <div class="section level2">
 <h2 id="recommended-use">Recommended use<a class="anchor" aria-label="anchor" href="#recommended-use"></a>

@@ -72,7 +72,156 @@
       <small>Source: <a href="https://github.com/brandynlucca/acousticTS/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
-  </main></div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="2026.3.0" id="acousticts-202630">acousticTS 2026.3.0<a class="anchor" aria-label="anchor" href="#acousticts-202630"></a></h2>
+<div class="section level3">
+<h3 id="whats-changed-2026-3-0">What’s Changed<a class="anchor" aria-label="anchor" href="#whats-changed-2026-3-0"></a></h3>
+<div class="section level4">
+<h4 id="id_️-breaking-changes-2026-3-0">⚠️ Breaking Changes<a class="anchor" aria-label="anchor" href="#id_%EF%B8%8F-breaking-changes-2026-3-0"></a></h4>
+<ul><li>The <code>DCM</code> model has been fully deprecated due to its 1) misleading name and 2) limited scope. It has been superseded by <code>TRCM</code>, which uses an adjusted implementation that allows for both straight and bent cylinder geometries.</li>
+<li>The <code>DWBA_curved</code> and <code>SDWBA_curved</code> models have been deprecated. It is now expected that users explicitly apply <code>brake</code> to their shapes (i.e., adds curvature) prior to using the standard <code>DWBA</code> and <code>SDWBA</code> models.</li>
+<li>The <code>MSS_anderson</code> model has been deprecated and replaced with <code>SPHMS</code>.</li>
+<li>The <code>high_pass_stanton</code> model has been deprecated and replaced with <code>HPA</code>.</li>
+<li>The <code>MSS_goodman_stern</code> model has been deprecated and replaced with <code>ESSMS</code>.</li>
+<li>Additional geometry and class guardrails have been added across the package. Some legacy workflows may now error if the supplied shape, scatterer class, or boundary assumptions are incompatible with the selected model.</li>
+</ul></div>
+<div class="section level4">
+<h4 id="new-features-and-enhancements-sparkles-2026-3-0">New features and enhancements <span class="emoji" data-emoji="sparkles">✨</span>
+<a class="anchor" aria-label="anchor" href="#new-features-and-enhancements-sparkles-2026-3-0"></a></h4>
+<div class="section level5">
+<h5 id="software-desktop_computer-2026-3-0">Software <span class="emoji" data-emoji="desktop_computer">🖥️</span>
+<a class="anchor" aria-label="anchor" href="#software-desktop_computer-2026-3-0"></a></h5>
+<div class="section level6">
+<h6 id="new--updated-models-pencil-2026-3-0">New &amp; updated models <span class="emoji" data-emoji="pencil">📝</span>
+<a class="anchor" aria-label="anchor" href="#new--updated-models-pencil-2026-3-0"></a></h6>
+<ul><li>
+<code>SPHMS</code>: Modal-series solution for canonical spherical targets across multiple supported boundary conditions.</li>
+<li>
+<code>FCMS</code>: Modal-series solution for finite cylinders across multiple supported boundary conditions.</li>
+<li>
+<code>PSMS</code>: Modal-series solution for prolate spheroids across multiple supported boundary conditions.</li>
+<li>
+<code>SOEMS</code> / <code>calibration</code>: The solid elastic sphere workflow has been broadened and documented as a general solid-elastic-sphere family rather than only a calibration-sphere workflow. <code>calibration</code> remains available as a compatibility alias.</li>
+<li>
+<code>ESSMS</code>: Modal-series solution for elastic-shelled spheres.</li>
+<li>
+<code>BCMS</code>: Modal-series solution for finite, bent cylinders.</li>
+<li>
+<code>ECMS</code>: Modal-series solution for solid elastic finite cylinders.</li>
+<li>
+<code>KRM</code>: Now incorporates the breathing-mode modal-series calculation for <code>ka &lt; 0.15</code> and has been updated to better align with alternative body sound-speed assumptions.</li>
+<li>
+<code>HPA</code>: Expanded usable geometries and now includes the Johnson (1977) formulation.</li>
+<li>
+<code>TRCM</code>: The two-ray cylinder model now supports both straight and bent cylinders.</li>
+<li>
+<code>PCDWBA</code>: Phase-compensated distorted-wave Born approximation for bent weakly scattering targets.</li>
+<li>
+<code>BBFM</code>: Composite flesh-plus-backbone model for swimbladder-less fish-like targets, treating the backbone as a solid elastic scatterer.</li>
+<li>
+<code>VESMS</code> (<code>VESM</code> family): Viscous-elastic layered-sphere model for gas-core, shell, and viscous-layer targets.</li>
+<li>
+<code>TMM</code>: Transition-matrix framework for monostatic and angle-dependent scattering of spheres, prolate spheroids, oblate spheroids, and guarded finite-cylinder branches.</li>
+</ul></div>
+<div class="section level6">
+<h6 id="numerical-methods-calling-2026-3-0">Numerical methods <span class="emoji" data-emoji="calling">📲</span>
+<a class="anchor" aria-label="anchor" href="#numerical-methods-calling-2026-3-0"></a></h6>
+<ul><li>Cylindrical and spherical Bessel functions of the first, second, and third kinds were overhauled and expanded, including broader support for orders, purely imaginary arguments, and public <span class="math inline">k^{\text{th}}</span> derivative helpers such as <code><a href="../reference/jc.html">jcdk()</a></code>, <code><a href="../reference/hc.html">hcdk()</a></code>, <code><a href="../reference/js.html">jsdk()</a></code>, and <code><a href="../reference/ys.html">ysdk()</a></code>.</li>
+<li>Full public support for prolate spheroidal angular and radial wave functions via <code><a href="../reference/Smn.html">Smn()</a></code> and <code><a href="../reference/Rmn.html">Rmn()</a></code>, including derivatives.</li>
+<li>Public Legendre support now includes both the first and second kinds, including <code><a href="../reference/Pn.html">Pn()</a></code>, <code><a href="../reference/Pndk.html">Pndk()</a></code>, <code><a href="../reference/Qn.html">Qn()</a></code>, and <code><a href="../reference/Qndk.html">Qndk()</a></code>.</li>
+<li>New numerical helpers such as <code><a href="../reference/gauss_legendre.html">gauss_legendre()</a></code> and related modal/scattering utilities were added to support higher-level model implementations.</li>
+</ul></div>
+<div class="section level6">
+<h6 id="workflow-geometry-and-extensibility-gear-2026-3-0">Workflow, geometry, and extensibility <span class="emoji" data-emoji="gear">⚙️</span>
+<a class="anchor" aria-label="anchor" href="#workflow-geometry-and-extensibility-gear-2026-3-0"></a></h6>
+<ul><li>Shape- and scatterer-generation workflows were substantially streamlined and reorganized.</li>
+<li>
+<code><a href="../reference/simulate_ts.html">simulate_ts()</a></code> provides parameter-sweep and repeated-realization workflows for TS simulation.</li>
+<li>
+<code><a href="../reference/canonicalize_shape.html">canonicalize_shape()</a></code> converts arbitrary shapes into canonical surrogates such as spheres, prolate spheroids, oblate spheroids, and cylinders.</li>
+<li>
+<code><a href="../reference/reforge.html">reforge()</a></code> supports resizing and reparameterizing supported scatterer objects.</li>
+<li>
+<code><a href="../reference/extract.html">extract()</a></code> provides a consistent way to pull nested components and parameters from supported objects.</li>
+<li>New model-registry helpers make it possible to register user-defined models for direct use with the broader <code>acousticTS</code> workflow:
+<ul><li><code><a href="../reference/available_models.html">available_models()</a></code></li>
+<li><code><a href="../reference/register_model.html">register_model()</a></code></li>
+<li><code><a href="../reference/unregister_model.html">unregister_model()</a></code></li>
+<li><code><a href="../reference/reset_model_registry.html">reset_model_registry()</a></code></li>
+</ul></li>
+<li>The <code>TMM</code> workflow now includes additional post-processing and diagnostics helpers, including:
+<ul><li><code><a href="../reference/tmm_scattering.html">tmm_scattering()</a></code></li>
+<li><code><a href="../reference/tmm_scattering_grid.html">tmm_scattering_grid()</a></code></li>
+<li><code><a href="../reference/tmm_products.html">tmm_products()</a></code></li>
+<li><code><a href="../reference/tmm_bistatic_summary.html">tmm_bistatic_summary()</a></code></li>
+<li><code><a href="../reference/tmm_average_orientation.html">tmm_average_orientation()</a></code></li>
+<li><code><a href="../reference/tmm_orientation_distribution.html">tmm_orientation_distribution()</a></code></li>
+<li><code><a href="../reference/tmm_diagnostics.html">tmm_diagnostics()</a></code></li>
+</ul></li>
+</ul></div>
+<div class="section level6">
+<h6 id="other-enhancements-pig2-lipstick-2026-3-0">Other enhancements <span class="emoji" data-emoji="pig2">🐖</span> <span class="emoji" data-emoji="lipstick">💄</span>
+<a class="anchor" aria-label="anchor" href="#other-enhancements-pig2-lipstick-2026-3-0"></a></h6>
+<ul><li>New elastic-property helpers were added, including <code><a href="../reference/lame.html">lame()</a></code>, <code><a href="../reference/pois.html">pois()</a></code>, <code><a href="../reference/bulk.html">bulk()</a></code>, <code><a href="../reference/young.html">young()</a></code>, and <code><a href="../reference/shear.html">shear()</a></code>.</li>
+<li>Core acoustic utilities such as <code><a href="../reference/wavenumber.html">wavenumber()</a></code>, <code><a href="../reference/compressibility.html">compressibility()</a></code>, <code><a href="../reference/transmission_coefficient.html">transmission_coefficient()</a></code>, <code><a href="../reference/degrees.html">degrees()</a></code>, and <code><a href="../reference/radians.html">radians()</a></code> were expanded and cleaned up.</li>
+<li>Example-data support was improved, including bundled fish and benchmark objects used throughout the documentation and validation workflows.</li>
+</ul></div>
+</div>
+<div class="section level5">
+<h5 id="validation-and-benchmarking-white_check_mark-2026-3-0">Validation and benchmarking <span class="emoji" data-emoji="white_check_mark">✅</span>
+<a class="anchor" aria-label="anchor" href="#validation-and-benchmarking-white_check_mark-2026-3-0"></a></h5>
+<ul><li>A formal validation and benchmarking registry was added to track benchmarked, validated, partially validated, unvalidated, and experimental model families.</li>
+<li>A new <code>benchmark_ts</code> dataset was added to support canonical comparison ladders across modal-series families.</li>
+<li>Reproducible implementation-figure and comparison pipelines were added for documented model families.</li>
+<li>Cross-software and cross-reference validation coverage was expanded across models such as <code>SPHMS</code>, <code>FCMS</code>, <code>PSMS</code>, <code>SOEMS</code>, <code>KRM</code>, <code>HPA</code>, <code>PCDWBA</code>, <code>VESMS</code>, and <code>TMM</code>.</li>
+<li>The pkgdown model library now exposes family-level validation badges and supporting summaries directly in the site.</li>
+</ul></div>
+<div class="section level5">
+<h5 id="performance-rocket-2026-3-0">Performance <span class="emoji" data-emoji="rocket">🚀</span>
+<a class="anchor" aria-label="anchor" href="#performance-rocket-2026-3-0"></a></h5>
+<ul><li>Major compiled backends were added in <code>C++</code> and <code>Fortran</code>, substantially improving performance across special functions and core models. This affects the Bessel functions, Legendre functions, spheroidal wave functions, <code>DWBA</code> / <code>SDWBA</code>, <code>PSMS</code>, <code>ESSMS</code>, <code>TMM</code>, and <code>VESMS</code>.</li>
+<li>Adaptive methods were added for <code>SOEMS</code> / <code>calibration</code>, giving users more control over the balance between speed and precision.</li>
+<li>Optional modal-truncation controls such as <code>m_limit</code> were added or expanded across modal-series solutions, allowing users to trade precision for speed more explicitly at higher <code>ka</code>.</li>
+</ul></div>
+<div class="section level5">
+<h5 id="documentation-open_book-2026-3-0">Documentation <span class="emoji" data-emoji="open_book">📖</span>
+<a class="anchor" aria-label="anchor" href="#documentation-open_book-2026-3-0"></a></h5>
+<ul><li>The package documentation was fully reorganized into a pkgdown site with model-family overview, theory, and implementation pages.</li>
+<li>A large new vignette set was added, including package primers, model selection, numerical foundations, notation, material properties, boundary conditions, example data, shape/scatterer construction, running models, comparing models, plotting results, simulation sweeps, validation benchmarks, and model creation workflows.</li>
+<li>Model-family landing pages and the model library were added to make the package structure and validation status easier to navigate.</li>
+<li>Figure-generation and vignette-rendering workflows were standardized and expanded to support the implementation and validation documentation.</li>
+</ul></div>
+<div class="section level5">
+<h5 id="bug-fixes-bug-2026-3-0">Bug-fixes <span class="emoji" data-emoji="bug">🐛</span>
+<a class="anchor" aria-label="anchor" href="#bug-fixes-bug-2026-3-0"></a></h5>
+<ul><li>
+<code>DWBA</code> / <code>SDWBA</code>: End-on incidence for some shapes, especially cylinders, could previously return <code>Inf</code> values for $_`. This behavior was fixed.</li>
+<li>Numerous fixes were applied across shape generation, scatterer handling, plotting, model dispatch, documentation rendering, and pkgdown build behavior.</li>
+<li>Several numerical edge cases and validation pathways were tightened across the special-function and modal-series infrastructure.</li>
+</ul></div>
+<div class="section level5">
+<h5 id="testing-and-qa-test_tube-2026-3-0">Testing and QA <span class="emoji" data-emoji="test_tube">🧪</span>
+<a class="anchor" aria-label="anchor" href="#testing-and-qa-test_tube-2026-3-0"></a></h5>
+<ul><li>The automated test suite was expanded substantially across models, special functions, geometry helpers, simulation workflows, validation utilities, and pkgdown helpers.</li>
+<li>Additional validation-specific and implementation-specific regression tests were added to support the new model families and compiled backends.</li>
+</ul></div>
+<div class="section level5">
+<h5 id="infrastructure-building_construction-2026-3-0">Infrastructure <span class="emoji" data-emoji="building_construction">🏗️</span>
+<a class="anchor" aria-label="anchor" href="#infrastructure-building_construction-2026-3-0"></a></h5>
+<ul><li>GitHub Actions workflows were expanded to cover <code>R CMD check</code>, pkgdown builds, documentation generation, implementation figures, pre-CRAN checks, <code>rhub</code>, and test coverage.</li>
+<li>Package metadata and release-support files were improved, including <code>NEWS.md</code> and <code>CITATION.cff</code>.</li>
+<li>Internal package organization was significantly restructured, including model dispatch, utilities, plotting helpers, validation helpers, and compiled source layout.</li>
+</ul><p><strong>Full Changelog</strong>: <a href="https://github.com/brandynlucca/acousticTS/compare/v.1.0" class="external-link uri">https://github.com/brandynlucca/acousticTS/compare/v.1.0</a>…v.2026.03.0</p>
+</div>
+</div>
+</div>
+</div>
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.0.1" id="acousticts-101">acousticTS 1.0.1<a class="anchor" aria-label="anchor" href="#acousticts-101"></a></h2>
+<ul><li>Added a <code>NEWS.md</code> file to track changes to the package.</li>
+</ul></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">

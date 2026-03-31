@@ -81,7 +81,11 @@ calls. It supports three broad parameter modes inside `parameters`:
 - explicit vectors that are either aligned with the full simulation grid
   or with one or more batched dimensions, and
 
-- generating functions that are re-evaluated for each realization.
+- generating functions that are re-evaluated for each realization, and
+
+- structured values such as named target-dimension vectors used by
+  [`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md)
+  (for example `body_target = c(length = 0.03)`).
 
 If `batch_by = "length"` and `parameters[["length"]]` is a vector of
 candidate values, then simulations are run for each length value,
@@ -89,6 +93,20 @@ repeated `n_realizations` times. When multiple parameters are supplied
 through `batch_by`, the function builds the full Cartesian grid of those
 parameter values and runs the requested number of realizations inside
 each batch cell.
+
+Structured batch values should be wrapped in a list so that each
+candidate is preserved as one unit. For example, use
+`parameters = list(body_target = list(c(length = 0.02), c(length = 0.03))))`
+when batching across multiple explicit
+[`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md)
+targets.
+
+Convenience dimension aliases are also supported for compatible
+[`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md)
+methods. For example, `length_body = 0.03` is treated the same as
+`body_target = c(length = 0.03)` for fluid-like scatterers, while
+retaining the original `length_body` column in the returned simulation
+output.
 
 Parameter names are interpreted in the same way they would be if
 supplied directly to

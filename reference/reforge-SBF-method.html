@@ -91,7 +91,8 @@
 <span>  maintain_ratio <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  swimbladder_inflation_factor <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  n_segments_body <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  n_segments_swimbladder <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  n_segments_swimbladder <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  containment <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"warn"</span>, <span class="st">"error"</span>, <span class="st">"ignore"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -151,6 +152,12 @@ the swimbladder x-axis origin and terminus are both held constant.</p></dd>
 
 <dt id="arg-n-segments-swimbladder">n_segments_swimbladder<a class="anchor" aria-label="anchor" href="#arg-n-segments-swimbladder"></a></dt>
 <dd><p>Number of segments along the bladder.</p></dd>
+
+
+<dt id="arg-containment">containment<a class="anchor" aria-label="anchor" href="#arg-containment"></a></dt>
+<dd><p>Containment policy for internal geometry checks. Use
+<code>"warn"</code> to keep the current warning behavior, <code>"error"</code> to fail fast for
+invalid internal geometries, or <code>"ignore"</code> to skip containment checks.</p></dd>
 
 </dl></div>
 
