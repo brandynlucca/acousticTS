@@ -66,35 +66,56 @@ The return value is a named list with one data frame per model.
 
 # Parameter specification
 
-The scratch simulation notes are worth keeping in mind here because they clarify the three main parameter modes supported by `simulate_ts()`:
+The scratch simulation notes are worth keeping in mind here because they clarify the four main parameter modes supported by `simulate_ts()`:
 
 1. single fixed values,
 2. explicit vectors,
-3. generating functions that return one draw at a time.
+3. generating functions that return one draw at a time,
+4. structured `reforge()` inputs such as named target-dimension vectors.
 
 When `batch_by` is supplied, the selected parameters define a Cartesian grid and each grid cell is then repeated for `n_realizations`. That distinction between batch cells and within-cell draws is the core conceptual point of the interface.
 
-Those three modes answer different questions:
+Those four modes answer different questions:
 
 1. fixed values are for constants that should be repeated in every realization,
 2. explicit vectors are for a known set of realization-level values,
-3. functions are for stochastic draws generated on demand.
+3. functions are for stochastic draws generated on demand,
+4. structured values are for explicit geometry targets that should be preserved as one unit.
 
 The distinction matters because it separates deterministic sweeps from uncertainty propagation.
 
 ![Three parameter-specification modes in `simulate_ts()`: fixed constants, explicit vectors, and per-realization generating functions.](simulation-parameter-modes.svg)
 
-Fixed values are copied into every run unchanged. Explicit vectors supply a known sequence of values. Generating functions do not provide a pre-listed table at all. They create a new draw whenever a realization is built. That difference is what separates a design grid from on-the-fly uncertainty propagation.
+Fixed values are copied into every run unchanged. Explicit vectors supply a known sequence of values. Generating functions do not provide a pre-listed table at all. They create a new draw whenever a realization is built. Structured values are preserved as list-columns so named geometry targets remain intact. That difference is what separates a design grid from on-the-fly uncertainty propagation and from explicit morphology rebuilding.
 
 ```{r eval = TRUE}
 parameters <- list(
   theta_body = seq(0.5 * pi, pi, length.out = 5),
   density_body = function() rnorm(1, mean = 1045, sd = 5),
-  sound_speed_body = 1520
+  sound_speed_body = 1520,
+  body_target = c(length = 0.045)
 )
 ```
 
-In this example, `theta_body` is an explicit set of values, `density_body` is random, and `sound_speed_body` is held fixed.
+In this example, `theta_body` is an explicit set of values, `density_body` is random, `sound_speed_body` is held fixed, and `body_target` is a structured `reforge()` input.
+
+For fluid-like scatterers, convenience aliases such as `length_body` are also supported. These are normalized internally onto the same `reforge()` pathway as `body_target`, while preserving the original simulation column in the returned output.
+
+```{r eval = TRUE}
+res_length_alias <- simulate_ts(
+  object = obj,
+  frequency = 120e3,
+  model = "DWBA",
+  n_realizations = 4,
+  parameters = list(
+    length_body = function() runif(1, min = 0.04, max = 0.06),
+    theta_body = function() runif(1, min = 0.5 * pi, max = pi)
+  ),
+  parallel = FALSE
+)
+
+head(res_length_alias$DWBA[, c("length_body", "theta_body", "TS")])
+```
 
 # Batching versus realizations
 
@@ -175,9 +196,64 @@ res_shape <- simulate_ts(
 
 This is one of the cleanest ways to keep a morphology-sensitivity analysis tied to the same baseline target.
 
+For `FLS` objects, the same idea can be expressed more explicitly through `body_target` or through the convenience alias `length_body`.
+
+```{r eval = TRUE}
+res_fls_reforge <- simulate_ts(
+  object = obj,
+  frequency = 120e3,
+  model = "DWBA",
+  n_realizations = 2,
+  parameters = list(
+    body_target = list(
+      c(length = 0.04, radius = 0.0025),
+      c(length = 0.06, radius = 0.0035)
+    ),
+    isometric_body = FALSE,
+    theta_body = function() runif(1, min = 0.5 * pi, max = pi)
+  ),
+  batch_by = "body_target",
+  parallel = FALSE
+)
+
+head(res_fls_reforge$DWBA[, c("body_target", "theta_body", "TS")])
+```
+
+When batching across structured geometry targets, wrap the candidates in a list so each target vector is treated as one batch value.
+
 ![Object-modifying simulation workflow, where baseline geometry is reforged into a family of derived target states before model execution.](simulation-object-reforge.svg)
 
 Morphology-affecting parameters do not behave like ordinary scalar metadata. They change the working target itself before the model is run. The resulting simulations should therefore be interpreted as distinct geometric states derived from one baseline object, not as repeated evaluations of a single unchanged shape.
+
+There is one especially important point for curvature-aware workflows: `simulate_ts()` does not automatically call `brake()` for the modern `DWBA` or `SDWBA` paths. If the baseline object is straight, then `length_body` or `body_target` simply resize that straight object. If the baseline object is already a bent `FLS`, then those same parameters resize the existing bent geometry directly.
+
+For bent `FLS` objects, `length_body` and `body_target["length"]` are interpreted as the target bent centerline arc length, not as the flattened projected `x` span. That makes the resize semantics consistent with the object that is actually being modeled.
+
+```{r eval = TRUE}
+obj_bent <- brake(obj, radius_curvature = 5, mode = "ratio")
+
+res_bent <- simulate_ts(
+  object = obj_bent,
+  frequency = 120e3,
+  model = "DWBA",
+  n_realizations = 2,
+  parameters = list(
+    length_body = c(0.04, 0.05),
+    theta_body = 0.5 * pi
+  ),
+  batch_by = "length_body",
+  parallel = FALSE
+)
+
+head(res_bent$DWBA[, c("length_body", "theta_body", "TS")])
+```
+
+That example is useful because it separates two different ideas cleanly:
+
+1. the bent state comes from the baseline object passed into `simulate_ts()`,
+2. the resizing comes from `length_body` or `body_target`.
+
+If the scientific workflow instead needs "resize a straight object and then bend it differently for each realization," that should currently be constructed outside `simulate_ts()` or through the deprecated `*_curved` model interfaces that still wire curvature in internally.
 
 # When simulation is useful
 

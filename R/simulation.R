@@ -77,26 +77,16 @@
 # Resolve the concrete vectors used for each batched simulation parameter.
 #' @noRd
 .prepare_simulation_batch_values <- function(batch_by, parameters) {
-  # Evaluate generating functions once per batch dimension =====================
+  # Resolve one normalized candidate set per batched parameter ================
   batch_values <- lapply(batch_by, function(param) {
-    value <- parameters[[param]]
-    if (is.function(value)) {
-      result <- value()
-      if (length(result) == 0) {
-        stop(
-          paste0(
-            "Batch parameter '", param, "' function must return at least 1 ",
-            "valid value."
-          )
-        )
-      }
-      return(result)
-    }
-
-    value
+    .normalize_simulation_batch_values(
+      param_name = param,
+      param_value = parameters[[param]]
+    )
   })
   names(batch_values) <- batch_by
 
+  # Return the normalized batch-value definitions ==============================
   batch_values
 }
 
@@ -108,21 +98,28 @@
                                          simulation_grid) {
   # Resolve one parameter vector per simulation input ==========================
   parameter_names <- names(parameters)
-  as.data.frame(
-    stats::setNames(
-      lapply(parameter_names, function(param) {
-        .resolve_param_value(
-          param_name = param,
-          param_value = parameters[[param]],
-          batch_by = batch_by,
-          batch_values = batch_values,
-          grid_size = nrow(simulation_grid),
-          simulation_grid = simulation_grid
-        )
-      }),
-      parameter_names
-    )
+  resolved_values <- stats::setNames(
+    lapply(parameter_names, function(param) {
+      .resolve_param_value(
+        param_name = param,
+        param_value = parameters[[param]],
+        batch_by = batch_by,
+        batch_values = batch_values,
+        grid_size = nrow(simulation_grid),
+        simulation_grid = simulation_grid
+      )
+    }),
+    parameter_names
   )
+
+  # Preserve structured parameters as list-columns in the simulation grid =====
+  out <- data.frame(row.names = seq_len(nrow(simulation_grid)))
+  for (param in parameter_names) {
+    out[[param]] <- resolved_values[[param]]
+  }
+
+  # Return the resolved simulation parameter matrix ===========================
+  out
 }
 
 # Print the high-level simulation summary shown before the TS runs begin.
@@ -173,15 +170,36 @@
     cat("Number of cores:", paste0(n_cores), "\n")
   }
 
+  # Resolve the local package path when running from a development checkout ===
+  package_dir <- if (
+    requireNamespace("pkgload", quietly = TRUE) &&
+      pkgload::is_dev_package("acousticTS")
+  ) {
+    pkgload::pkg_path()
+  } else {
+    NULL
+  }
+
   cluster <- parallel::makeCluster(n_cores)
   if (verbose) print(cluster)
   parallel::clusterCall(
     cluster,
-    function() {
-      loadNamespace("acousticTS")
+    function(package_dir) {
+      if (!is.null(package_dir) && requireNamespace("pkgload", quietly = TRUE)) {
+        pkgload::load_all(
+          package_dir,
+          quiet = TRUE,
+          export_all = FALSE,
+          helpers = FALSE,
+          attach_testthat = FALSE
+        )
+      } else {
+        loadNamespace("acousticTS")
+      }
       loadNamespace("methods")
       NULL
-    }
+    },
+    package_dir = package_dir
   )
   parallel::clusterExport(
     cluster,
@@ -255,7 +273,9 @@
 #'   \item scalars that are recycled across every realization,
 #'   \item explicit vectors that are either aligned with the full simulation
 #'   grid or with one or more batched dimensions, and
-#'   \item generating functions that are re-evaluated for each realization.
+#'   \item generating functions that are re-evaluated for each realization, and
+#'   \item structured values such as named target-dimension vectors used by
+#'   \code{reforge()} (for example \code{body_target = c(length = 0.03)}).
 #' }
 #'
 #' If \code{batch_by = "length"} and \code{parameters[["length"]]} is a vector
@@ -264,6 +284,17 @@
 #' through \code{batch_by}, the function builds the full Cartesian grid of
 #' those parameter values and runs the requested number of realizations inside
 #' each batch cell.
+#'
+#' Structured batch values should be wrapped in a list so that each candidate is
+#' preserved as one unit. For example, use
+#' \code{parameters = list(body_target = list(c(length = 0.02), c(length = 0.03))))}
+#' when batching across multiple explicit `reforge()` targets.
+#'
+#' Convenience dimension aliases are also supported for compatible
+#' \code{reforge()} methods. For example, \code{length_body = 0.03} is treated
+#' the same as \code{body_target = c(length = 0.03)} for fluid-like scatterers,
+#' while retaining the original \code{length_body} column in the returned
+#' simulation output.
 #'
 #' Parameter names are interpreted in the same way they would be if supplied
 #' directly to \code{target_strength()} or to the relevant object constructor /
@@ -410,6 +441,270 @@ simulate_ts <- function(object,
   )
 }
 
+# Extract one simulation-grid row while preserving structured list-columns.
+#' @noRd
+.simulation_grid_row_values <- function(simulation_grid, grid_index) {
+  # Resolve one value per simulation-grid column ==============================
+  values <- lapply(names(simulation_grid), function(param) {
+    column <- simulation_grid[[param]]
+    if (is.list(column)) {
+      return(column[[grid_index]])
+    }
+
+    column[[grid_index]]
+  })
+  names(values) <- names(simulation_grid)
+
+  # Return the resolved parameter bundle ======================================
+  values
+}
+
+# Build a one-row data frame from one simulation parameter bundle.
+#' @noRd
+.simulation_parameter_row_df <- function(parameter_values) {
+  # Preserve structured values as list-columns in the returned results ========
+  out <- data.frame(row.names = 1L)
+  for (param in names(parameter_values)) {
+    value <- parameter_values[[param]]
+    if (is.atomic(value) &&
+      length(value) == 1L &&
+      (is.null(names(value)) || !any(nzchar(names(value))))) {
+      out[[param]] <- value
+    } else {
+      out[[param]] <- I(list(value))
+    }
+  }
+
+  # Return the one-row parameter data frame ===================================
+  out
+}
+
+# Resolve geometry-bearing component slots available for simulation overrides.
+#' @noRd
+.simulation_component_slots <- function(object) {
+  # Return the supported component slots present on this scatterer ============
+  intersect(
+    methods::slotNames(object),
+    c("body", "bladder", "backbone", "shell", "fluid")
+  )
+}
+
+# Resolve convenience aliases that map onto structured reforge targets.
+#' @noRd
+.simulation_reforge_alias_groups <- function(object) {
+  # Resolve the current reforge method signature for this scatterer ===========
+  valid_reforge_params <- .discover_reforge_params(class(object))
+  out <- list()
+
+  # Map body-dimension aliases onto body_target when available ================
+  if ("body_target" %in% valid_reforge_params) {
+    out$body_target <- list(
+      aliases = c(
+        length_body = "length",
+        width_body = "width",
+        height_body = "height",
+        radius_body = "radius"
+      ),
+      isometric = if ("isometric_body" %in% valid_reforge_params) {
+        "isometric_body"
+      } else {
+        NULL
+      },
+      legacy_conflicts = intersect(c("length", "radius"), valid_reforge_params)
+    )
+  }
+
+  # Map swimbladder aliases onto swimbladder_target when available ============
+  if ("swimbladder_target" %in% valid_reforge_params) {
+    out$swimbladder_target <- list(
+      aliases = c(
+        length_swimbladder = "length",
+        width_swimbladder = "width",
+        height_swimbladder = "height",
+        length_bladder = "length",
+        width_bladder = "width",
+        height_bladder = "height"
+      ),
+      isometric = if ("isometric_swimbladder" %in% valid_reforge_params) {
+        "isometric_swimbladder"
+      } else {
+        NULL
+      },
+      legacy_conflicts = character(0)
+    )
+  }
+
+  # Map backbone aliases onto backbone_target when available ==================
+  if ("backbone_target" %in% valid_reforge_params) {
+    out$backbone_target <- list(
+      aliases = c(
+        length_backbone = "length",
+        width_backbone = "width",
+        height_backbone = "height",
+        radius_backbone = "radius"
+      ),
+      isometric = if ("isometric_backbone" %in% valid_reforge_params) {
+        "isometric_backbone"
+      } else {
+        NULL
+      },
+      legacy_conflicts = character(0)
+    )
+  }
+
+  # Return the supported alias groups for this scatterer ======================
+  out
+}
+
+# Resolve one scalar numeric value used by a simulation convenience alias.
+#' @noRd
+.simulation_alias_scalar <- function(value, alias_name) {
+  # Validate that the alias resolved to one numeric draw ======================
+  if (!is.numeric(value) || length(value) != 1L || is.na(value)) {
+    stop(
+      "Simulation alias '", alias_name,
+      "' must resolve to one non-missing numeric value per realization.",
+      call. = FALSE
+    )
+  }
+
+  # Return the scalar alias value =============================================
+  as.numeric(value)
+}
+
+# Normalize convenience aliases onto the active reforge() argument set.
+#' @noRd
+.normalize_simulation_reforge_parameters <- function(object, parameter_values) {
+  # Start from the explicitly supported reforge parameters ====================
+  valid_reforge_params <- .discover_reforge_params(class(object))
+  reforge_parameters <- parameter_values[
+    names(parameter_values) %in% valid_reforge_params
+  ]
+  alias_groups <- .simulation_reforge_alias_groups(object)
+
+  # Merge component-dimension aliases into structured target vectors ==========
+  for (target_name in names(alias_groups)) {
+    spec <- alias_groups[[target_name]]
+    alias_names <- intersect(names(parameter_values), names(spec$aliases))
+    legacy_names <- intersect(names(reforge_parameters), spec$legacy_conflicts)
+    if (length(alias_names) == 0 && length(legacy_names) == 0) {
+      next
+    }
+
+    # Reject ambiguous mixtures of explicit targets and convenience aliases ===
+    if (target_name %in% names(reforge_parameters)) {
+      stop(
+        "Specify either '", target_name, "' or its convenience aliases (",
+        paste(sprintf("'%s'", alias_names), collapse = ", "),
+        "), not both.",
+        call. = FALSE
+      )
+    }
+
+    # Reject duplicate dimension definitions across alias and legacy inputs ===
+    target_sources <- c(
+      stats::setNames(alias_names, unname(spec$aliases[alias_names])),
+      stats::setNames(legacy_names, legacy_names)
+    )
+    target_dims <- names(target_sources)
+    if (anyDuplicated(target_dims)) {
+      duplicated_dims <- unique(target_dims[duplicated(target_dims)])
+      duplicated_sources <- unique(
+        unname(target_sources[target_dims %in% duplicated_dims])
+      )
+      stop(
+        "Simulation inputs for '", target_name,
+        "' duplicate one or more dimensions: ",
+        paste(sprintf("'%s'", duplicated_dims), collapse = ", "),
+        ". Conflicting parameters: ",
+        paste(sprintf("'%s'", duplicated_sources), collapse = ", "),
+        ".",
+        call. = FALSE
+      )
+    }
+
+    # Resolve the structured target vector from alias and legacy values =======
+    alias_value <- if (length(alias_names) > 0) {
+      stats::setNames(
+        vapply(
+          alias_names,
+          function(alias_name) {
+            .simulation_alias_scalar(parameter_values[[alias_name]], alias_name)
+          },
+          numeric(1)
+        ),
+        unname(spec$aliases[alias_names])
+      )
+    } else {
+      numeric(0)
+    }
+    legacy_value <- if (length(legacy_names) > 0) {
+      stats::setNames(
+        vapply(
+          legacy_names,
+          function(legacy_name) {
+            .simulation_alias_scalar(reforge_parameters[[legacy_name]], legacy_name)
+          },
+          numeric(1)
+        ),
+        legacy_names
+      )
+    } else {
+      numeric(0)
+    }
+    target_value <- c(alias_value, legacy_value)
+    reforge_parameters[[target_name]] <- target_value
+
+    # Drop merged legacy arguments after promoting them to the target vector ==
+    if (length(legacy_names) > 0) {
+      reforge_parameters <- reforge_parameters[
+        !names(reforge_parameters) %in% legacy_names
+      ]
+    }
+
+    # Default multi-axis convenience aliases to anisotropic scaling ===========
+    if (length(target_value) > 1 &&
+      !is.null(spec$isometric) &&
+      !spec$isometric %in% names(reforge_parameters)) {
+      reforge_parameters[[spec$isometric]] <- FALSE
+    }
+  }
+
+  # Return the normalized reforge argument bundle =============================
+  reforge_parameters
+}
+
+# Apply direct simulation-parameter overrides to matching scatterer components.
+#' @noRd
+.apply_simulation_parameter_overrides <- function(object, parameter_values) {
+  # Resolve the component slots that can accept direct parameter overrides =====
+  component_slots <- .simulation_component_slots(object)
+
+  # Apply matching parameters to each geometry-bearing component ==============
+  for (param in names(parameter_values)) {
+    for (slot_name in component_slots) {
+      component_value <- methods::slot(object, slot_name)
+      if (!is.list(component_value) || !param %in% names(component_value)) {
+        next
+      }
+
+      component_value[[param]] <- parameter_values[[param]]
+      methods::slot(object, slot_name) <- component_value
+
+      if ("components" %in% methods::slotNames(object)) {
+        component_registry <- methods::slot(object, "components")
+        if (slot_name %in% names(component_registry)) {
+          component_registry[[slot_name]] <- component_value
+          methods::slot(object, "components") <- component_registry
+        }
+      }
+    }
+  }
+
+  # Return the updated scatterer ==============================================
+  object
+}
+
 #' Run a single simulation for a given parameter grid index
 #'
 #' This helper function extracts parameter values for a given simulation grid
@@ -441,53 +736,25 @@ simulate_ts <- function(object,
                     frequency,
                     model) {
   # Extract parameter values for this grid index ===============================
-  parameter_values <- as.list(simulation_grid[grid_index, , drop = FALSE])
+  parameter_values <- .simulation_grid_row_values(simulation_grid, grid_index)
   # Create working copy of scattering object ===================================
   working_object <- object
   # Reforge object, if parameters require ======================================
-  tryCatch(
-    {
-      # ---- Get valid reforge parameters for this object type +++++++++++++++++
-      valid_reforge_params <- .discover_reforge_params(
-        class(working_object)
-      )
-      # ---- Filter parameters for reforge (only allowed parameters pass)
-      reforge_parameters <- parameter_values[
-        names(parameter_values) %in% valid_reforge_params
-      ]
-      # ---- Set up arguments ++++++++++++++++++++++++++++++++++++++++++++++++++
-      reforge_args <- c(list(object = working_object), reforge_parameters)
-      # ---- Reforge working object ++++++++++++++++++++++++++++++++++++++++++++
-      working_object <- do.call(reforge, reforge_args)
-    },
-    error = function(e) NULL
+  # ---- Normalize explicit and convenience reforge parameters ++++++++++++++++
+  reforge_parameters <- .normalize_simulation_reforge_parameters(
+    working_object,
+    parameter_values
   )
-  # Override parameter definitions where appropriate ===========================
-  for (param in names(parameter_values)) {
-    tryCatch(
-      {
-        if (param %in% names(working_object@body)) {
-          methods::slot(
-            working_object,
-            "body"
-          )[[param]] <- parameter_values[[param]]
-        }
-      },
-      error = function(e) {
-        tryCatch(
-          {
-            if (param %in% names(working_object@bladder)) {
-              methods::slot(
-                working_object,
-                "bladder"
-              )[[param]] <- parameter_values[[param]]
-            }
-          },
-          error = function(e) NULL
-        )
-      }
-    )
+  # ---- Reforge the working object when geometry parameters were supplied ++++
+  if (length(reforge_parameters) > 0) {
+    reforge_args <- c(list(object = working_object), reforge_parameters)
+    working_object <- do.call(reforge, reforge_args)
   }
+  # Override parameter definitions where appropriate ===========================
+  working_object <- .apply_simulation_parameter_overrides(
+    working_object,
+    parameter_values
+  )
   # Calculate acousticTS =======================================================
   # [pun intended :)]
   # ---- Set up TS function arguments ++++++++++++++++++++++++++++++++++++++++++
@@ -515,10 +782,14 @@ simulate_ts <- function(object,
         data.frame(value = model_results[[mod_name]])
       }
       # ---- Add model name, parameter values, and realization number ++++++++++
-      cbind(
-        model = mod_name,
-        as.data.frame(parameter_values, optional = TRUE),
-        df
+      parameter_df <- .simulation_parameter_row_df(parameter_values)
+      parameter_df <- parameter_df[rep(1L, nrow(df)), , drop = FALSE]
+      data.frame(
+        model = rep(mod_name, nrow(df)),
+        parameter_df,
+        df,
+        row.names = NULL,
+        check.names = FALSE
       )
     }
   )

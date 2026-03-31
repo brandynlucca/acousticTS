@@ -183,15 +183,190 @@ test_that("simulate_ts works with batch_by parameter", {
   # Should have more rows due to batching
   expect_true(nrow(result_df) == 6)
 
-  # Check values
-  expect_true(length(unique(result_df$TS)) == 6)
-  expect_equal(result_df$TS[result_df$frequency == 38e3],
-    c(-120.848794, -102.844556, -92.375204),
-    tolerance = 1e-6
+  # Check values against direct reforge() + target_strength() references
+  reference_df <- do.call(
+    rbind,
+    lapply(parameters$length, function(length_value) {
+      obj <- reforge(krill, length = length_value)
+      obj <- target_strength(
+        object = obj,
+        frequency = frequency,
+        model = "DWBA"
+      )
+      df <- extract(obj, "model")$DWBA
+      data.frame(
+        length = length_value,
+        frequency = df$frequency,
+        TS = df$TS
+      )
+    })
   )
-  expect_equal(result_df$TS[result_df$frequency == 120e3],
-    c(-101.045293, -83.563902, -73.985651),
-    tolerance = 1e-6
+
+  result_df <- result_df[order(result_df$length, result_df$frequency), ]
+  reference_df <- reference_df[order(reference_df$length, reference_df$frequency), ]
+  rownames(result_df) <- NULL
+  rownames(reference_df) <- NULL
+
+  expect_true(length(unique(result_df$TS)) == 6)
+  expect_equal(result_df$length, reference_df$length)
+  expect_equal(result_df$frequency, reference_df$frequency)
+  expect_equal(result_df$TS, reference_df$TS, tolerance = 1e-6)
+})
+
+test_that("simulate_ts supports structured reforge parameters", {
+  data(krill)
+
+  result <- simulate_ts(
+    object = krill,
+    frequency = 38e3,
+    model = "DWBA",
+    n_realizations = 1,
+    parameters = list(
+      body_target = c(length = 0.02),
+      n_segments_body = 120
+    ),
+    parallel = FALSE,
+    verbose = FALSE
+  )
+
+  expect_type(result, "list")
+  expect_s3_class(result$DWBA, "data.frame")
+  expect_true(is.list(result$DWBA$body_target))
+  expect_equal(result$DWBA$body_target[[1]], c(length = 0.02))
+  expect_equal(result$DWBA$n_segments_body, 120)
+  expect_true(all(is.finite(result$DWBA$TS)))
+})
+
+test_that("simulate_ts supports convenience FLS reforge aliases", {
+  data(krill)
+
+  result <- simulate_ts(
+    object = krill,
+    frequency = 38e3,
+    model = "DWBA",
+    n_realizations = 1,
+    parameters = list(
+      length_body = 0.02,
+      n_segments_body = 120
+    ),
+    parallel = FALSE,
+    verbose = FALSE
+  )
+
+  expect_type(result, "list")
+  expect_s3_class(result$DWBA, "data.frame")
+  expect_equal(result$DWBA$length_body, 0.02)
+  expect_equal(result$DWBA$n_segments_body, 120)
+  expect_true(all(is.finite(result$DWBA$TS)))
+})
+
+test_that("simulate_ts supports batched structured reforge parameters", {
+  data(krill)
+
+  result <- simulate_ts(
+    object = krill,
+    frequency = 38e3,
+    model = "DWBA",
+    n_realizations = 1,
+    parameters = list(
+      body_target = list(
+        c(length = 0.02),
+        c(length = 0.03)
+      )
+    ),
+    batch_by = "body_target",
+    parallel = FALSE,
+    verbose = FALSE
+  )
+
+  expect_type(result, "list")
+  expect_s3_class(result$DWBA, "data.frame")
+  expect_equal(nrow(result$DWBA), 2)
+  expect_true(is.list(result$DWBA$body_target))
+  expect_equal(result$DWBA$body_target[[1]], c(length = 0.02))
+  expect_equal(result$DWBA$body_target[[2]], c(length = 0.03))
+  expect_true(length(unique(result$DWBA$TS)) == 2)
+})
+
+test_that("simulate_ts supports batched convenience FLS reforge aliases", {
+  data(krill)
+  frequency <- c(38e3, 120e3)
+
+  result <- simulate_ts(
+    object = krill,
+    frequency = frequency,
+    model = "DWBA",
+    n_realizations = 1,
+    parameters = list(
+      length_body = c(0.02, 0.03)
+    ),
+    batch_by = "length_body",
+    parallel = FALSE,
+    verbose = FALSE
+  )
+
+  reference_df <- do.call(
+    rbind,
+    lapply(c(0.02, 0.03), function(length_value) {
+      obj <- reforge(krill, body_target = c(length = length_value))
+      obj <- target_strength(
+        object = obj,
+        frequency = frequency,
+        model = "DWBA"
+      )
+      df <- extract(obj, "model")$DWBA
+      data.frame(
+        length_body = length_value,
+        frequency = df$frequency,
+        TS = df$TS
+      )
+    })
+  )
+
+  result_df <- result$DWBA[order(result$DWBA$length_body, result$DWBA$frequency), ]
+  reference_df <- reference_df[order(reference_df$length_body, reference_df$frequency), ]
+  rownames(result_df) <- NULL
+  rownames(reference_df) <- NULL
+
+  expect_equal(result_df$length_body, reference_df$length_body)
+  expect_equal(result_df$frequency, reference_df$frequency)
+  expect_equal(result_df$TS, reference_df$TS, tolerance = 1e-6)
+})
+
+test_that("simulate_ts propagates invalid structured reforge inputs", {
+  data(krill)
+
+  expect_error(
+    simulate_ts(
+      object = krill,
+      frequency = 38e3,
+      model = "DWBA",
+      n_realizations = 1,
+      parameters = list(body_target = c(depth = 0.02)),
+      parallel = FALSE,
+      verbose = FALSE
+    ),
+    "invalid dimensions"
+  )
+})
+
+test_that("simulate_ts rejects conflicting convenience and explicit targets", {
+  data(krill)
+
+  expect_error(
+    simulate_ts(
+      object = krill,
+      frequency = 38e3,
+      model = "DWBA",
+      n_realizations = 1,
+      parameters = list(
+        body_target = c(length = 0.02),
+        length_body = 0.03
+      ),
+      parallel = FALSE,
+      verbose = FALSE
+    ),
+    "Specify either 'body_target' or its convenience aliases"
   )
 })
 
@@ -233,6 +408,93 @@ test_that("simulate_ts works with generating functions", {
 
   # Ensure that values are not duplicated
   expect_true(length(unique(result_df$TS)) == length(frequency) * 10)
+})
+
+test_that("simulate_ts supports convenience reforge aliases from generators", {
+  data(krill)
+
+  result <- simulate_ts(
+    object = krill,
+    frequency = 38e3,
+    model = "DWBA",
+    n_realizations = 10,
+    parameters = list(
+      length_body = function() stats::rnorm(1, mean = 40e-3, sd = 5e-3)
+    ),
+    parallel = FALSE,
+    verbose = FALSE
+  )
+
+  expect_type(result, "list")
+  expect_s3_class(result$DWBA, "data.frame")
+  expect_equal(nrow(result$DWBA), 10)
+  expect_true("length_body" %in% colnames(result$DWBA))
+  expect_true(length(unique(result$DWBA$length_body)) > 1)
+  expect_true(length(unique(result$DWBA$TS)) > 1)
+})
+
+test_that("simulate_ts preserves legacy curved krill workflows via length_body", {
+  data(krill)
+
+  frequency <- 120e3
+  lengths <- c(0.015, 0.02)
+  params_legacy <- list(
+    length = lengths,
+    sound_speed_sw = 1500,
+    density_sw = 1026,
+    g = 1.02,
+    h = 1.03,
+    theta = function() pi / 2,
+    radius_curvature_ratio = function() 5,
+    n_iterations = 5,
+    n_segments_init = 15,
+    length_init = 17.9e-3,
+    frequency_init = 120e3,
+    phase_sd_init = 0.31
+  )
+  params_alias <- params_legacy
+  params_alias$length <- NULL
+  params_alias$length_body <- lengths
+
+  set.seed(20260331)
+  legacy <- suppressWarnings(
+    simulate_ts(
+      object = krill,
+      batch_by = "length",
+      n_realizations = 2,
+      frequency = frequency,
+      model = "SDWBA_curved",
+      parameters = params_legacy,
+      parallel = FALSE,
+      verbose = FALSE
+    )
+  )
+
+  set.seed(20260331)
+  alias <- suppressWarnings(
+    simulate_ts(
+      object = krill,
+      batch_by = "length_body",
+      n_realizations = 2,
+      frequency = frequency,
+      model = "SDWBA_curved",
+      parameters = params_alias,
+      parallel = FALSE,
+      verbose = FALSE
+    )
+  )
+
+  legacy_df <- legacy$SDWBA_curved[
+    order(legacy$SDWBA_curved$length, legacy$SDWBA_curved$realization),
+    c("length", "TS")
+  ]
+  alias_df <- alias$SDWBA_curved[
+    order(alias$SDWBA_curved$length_body, alias$SDWBA_curved$realization),
+    c("length_body", "TS")
+  ]
+
+  expect_equal(legacy_df$length, alias_df$length_body)
+  expect_equal(legacy_df$TS, alias_df$TS)
 })
 
 test_that("simulate_ts works with multiple generating functions", {
