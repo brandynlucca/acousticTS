@@ -145,6 +145,105 @@
   cat("====================================\n")
 }
 
+# Resolve the package-library path used by PSOCK workers.
+#' @noRd
+.resolve_simulation_worker_library <- function(package = "acousticTS") {
+  # Resolve the active namespace path used by the current R session ============
+  package_dir <- normalizePath(
+    getNamespaceInfo(asNamespace(package), "path"),
+    winslash = "/",
+    mustWork = FALSE
+  )
+  if (dir.exists(package_dir) &&
+      file.exists(file.path(package_dir, "DESCRIPTION"))) {
+    # Reuse the active library path when the current namespace is installed ====
+    if (dir.exists(file.path(package_dir, "Meta"))) {
+      return(dirname(package_dir))
+    }
+  } else {
+    package_dir <- NULL
+  }
+
+  # Reuse another installed package when no source checkout is active =========
+  if (is.null(package_dir)) {
+    installed_paths <- file.path(.libPaths(), package)
+    installed_paths <- installed_paths[
+      file.exists(file.path(installed_paths, "DESCRIPTION"))
+    ]
+    if (length(installed_paths) > 0) {
+      return(dirname(normalizePath(installed_paths[[1]], winslash = "/")))
+    }
+    return(NULL)
+  }
+
+  # Reuse a session-cached worker library when it matches this source tree ====
+  cache_key <- paste0(package, ".simulation_worker_library")
+  cache <- getOption(cache_key, NULL)
+  cache_lib <- if (is.list(cache)) cache$library else NULL
+  cache_src <- if (is.list(cache)) cache$source else NULL
+  cache_pkg <- if (!is.null(cache_lib)) file.path(cache_lib, package) else NULL
+  if (!is.null(cache_lib) &&
+      identical(cache_src, package_dir) &&
+      dir.exists(cache_pkg)) {
+    return(cache_lib)
+  }
+
+  # Install the current source checkout into a temporary worker library =======
+  worker_lib <- file.path(tempdir(), paste0(package, "-simulation-lib"))
+  if (dir.exists(file.path(worker_lib, package))) {
+    unlink(file.path(worker_lib, package), recursive = TRUE, force = TRUE)
+  }
+  dir.create(worker_lib, recursive = TRUE, showWarnings = FALSE)
+
+  r_executable <- file.path(
+    R.home("bin"),
+    if (.Platform$OS.type == "windows") "Rcmd.exe" else "R"
+  )
+  install_args <- if (.Platform$OS.type == "windows") {
+    c(
+      "INSTALL",
+      "-l", worker_lib,
+      "--no-help",
+      "--no-html",
+      "--no-demo",
+      package_dir
+    )
+  } else {
+    c(
+      "CMD", "INSTALL",
+      "-l", worker_lib,
+      "--no-help",
+      "--no-html",
+      "--no-demo",
+      package_dir
+    )
+  }
+  install_output <- system2(
+    r_executable,
+    args = install_args,
+    stdout = TRUE,
+    stderr = TRUE
+  )
+  install_status <- attr(install_output, "status") %||% 0L
+  if (!identical(as.integer(install_status), 0L)) {
+    stop(
+      "Unable to prepare the temporary worker installation for parallel ",
+      "simulate_ts() runs.\n",
+      paste(install_output, collapse = "\n"),
+      call. = FALSE
+    )
+  }
+
+  # Cache and return the worker library used for PSOCK execution ==============
+  options(
+    setNames(
+      list(list(library = worker_lib, source = package_dir)),
+      cache_key
+    )
+  )
+  worker_lib
+}
+
 # Prepare the optional PSOCK cluster used by `simulate_ts()`.
 #' @noRd
 .prepare_simulation_cluster <- function(parallel,
@@ -170,36 +269,21 @@
     cat("Number of cores:", paste0(n_cores), "\n")
   }
 
-  # Resolve the local package path when running from a development checkout ===
-  package_dir <- if (
-    requireNamespace("pkgload", quietly = TRUE) &&
-      pkgload::is_dev_package("acousticTS")
-  ) {
-    pkgload::pkg_path()
-  } else {
-    NULL
-  }
-
+  # Resolve the library location that workers should load acousticTS from =====
+  worker_lib <- .resolve_simulation_worker_library("acousticTS")
   cluster <- parallel::makeCluster(n_cores)
   if (verbose) print(cluster)
   parallel::clusterCall(
     cluster,
-    function(package_dir) {
-      if (!is.null(package_dir) && requireNamespace("pkgload", quietly = TRUE)) {
-        pkgload::load_all(
-          package_dir,
-          quiet = TRUE,
-          export_all = FALSE,
-          helpers = FALSE,
-          attach_testthat = FALSE
-        )
-      } else {
-        loadNamespace("acousticTS")
+    function(worker_lib) {
+      if (!is.null(worker_lib)) {
+        .libPaths(c(worker_lib, .libPaths()))
       }
+      loadNamespace("acousticTS")
       loadNamespace("methods")
       NULL
     },
-    package_dir = package_dir
+    worker_lib = worker_lib
   )
   parallel::clusterExport(
     cluster,

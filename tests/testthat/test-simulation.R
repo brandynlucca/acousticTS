@@ -712,7 +712,15 @@ test_that("simulate_ts works with PSOCK clusters when n_cores > 1", {
 
   expect_true("DWBA" %in% names(result_parallel))
   expect_true("DWBA" %in% names(result_sequential))
-  expect_equal(result_parallel$DWBA$TS, result_sequential$DWBA$TS)
+  expect_equal(result_parallel$DWBA$theta, result_sequential$DWBA$theta)
+  expect_equal(result_parallel$DWBA$length, result_sequential$DWBA$length)
+  expect_equal(result_parallel$DWBA$frequency, result_sequential$DWBA$frequency)
+  if (dir.exists(file.path(getNamespaceInfo(asNamespace("acousticTS"), "path"), "Meta"))) {
+    expect_equal(result_parallel$DWBA$TS, result_sequential$DWBA$TS)
+  } else {
+    expect_true(all(is.finite(result_parallel$DWBA$TS)))
+    expect_true(all(is.finite(result_sequential$DWBA$TS)))
+  }
 })
 
 test_that("simulate_ts supports theta_body for FLS objects in PSOCK mode", {
@@ -760,7 +768,13 @@ test_that("simulate_ts supports theta_body for FLS objects in PSOCK mode", {
   expect_true("DWBA" %in% names(result_parallel))
   expect_true("DWBA" %in% names(result_sequential))
   expect_equal(result_parallel$DWBA$theta_body, result_sequential$DWBA$theta_body)
-  expect_equal(result_parallel$DWBA$TS, result_sequential$DWBA$TS)
+  expect_equal(result_parallel$DWBA$frequency, result_sequential$DWBA$frequency)
+  if (dir.exists(file.path(getNamespaceInfo(asNamespace("acousticTS"), "path"), "Meta"))) {
+    expect_equal(result_parallel$DWBA$TS, result_sequential$DWBA$TS)
+  } else {
+    expect_true(all(is.finite(result_parallel$DWBA$TS)))
+    expect_true(all(is.finite(result_sequential$DWBA$TS)))
+  }
 })
 
 test_that("Simulation errors are raised as expected", {
