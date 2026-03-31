@@ -1,4 +1,4 @@
-# acousticTS
+\` \# acousticTS ![acousticTS hex logo](reference/figures/logo.png)
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7600659.svg)](https://doi.org/10.5281/zenodo.7600659)
 [![Documentation](https://img.shields.io/badge/Latest_Documentation-blue)](https://brandynlucca.github.io/acousticTS/)
@@ -25,8 +25,8 @@ TS = 10 \log\_{10}(\sigma\_\text{bs})
 
 TS is used to:
 
-- Convert integrated backscatter (e.g. S\_\mathrm{A}, NASC) or
-  volumetric backscatter (S\_\text{V}) into number density or biomass
+- Convert integrated backscatter (e.g. S\_\text{A}), NASC) or volumetric
+  backscatter (S\_\text{V}) into number density or biomass
 - Classify backscatter by species or taxon based on multi-frequency
   response
 - Parameterize and evaluate physics-based scattering models over
