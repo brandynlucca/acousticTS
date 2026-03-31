@@ -1,4 +1,3 @@
-`
 # acousticTS <img src="man/figures/logo.png" align="right" height="158" alt="acousticTS hex logo" />
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7600659.svg)](https://doi.org/10.5281/zenodo.7600659)
