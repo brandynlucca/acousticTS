@@ -8,7 +8,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/brandynlucca/acousticTS/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/brandynlucca/acousticTS/blob/v.2026.03.0/DESCRIPTION)
 
 Lucca B (2026). *acousticTS: Estimating Acoustic Target Strength via
 Physics-Based Scattering Models*. R package version 2026.3.0,
