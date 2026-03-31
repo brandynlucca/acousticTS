@@ -33,6 +33,76 @@ acousticTS:::.vignette_static_figure(
 )
 ```
 
+# Quick construction examples
+
+Before getting into the interpretation tradeoffs, it helps to see the main shape builders in direct use.
+
+```{r}
+library(acousticTS)
+
+sphere_shape <- sphere(radius_body = 0.01, n_segments = 40)
+cylinder_shape <- cylinder(length_body = 0.05, radius_body = 0.003, n_segments = 80)
+ps_shape <- prolate_spheroid(length_body = 0.04, radius_body = 0.004, n_segments = 60)
+oblate_shape <- oblate_spheroid(length_body = 0.012, radius_body = 0.01, n_segments = 60)
+
+shape_summary <- function(shape_obj) {
+  params <- extract(shape_obj, "shape_parameters")
+  pos <- extract(shape_obj, "position_matrix")
+  radius_value <- params$radius
+  if (length(radius_value) > 1) {
+    radius_value <- max(radius_value, na.rm = TRUE)
+  }
+
+  data.frame(
+    shape = class(shape_obj)[1],
+    length_m = max(pos[, 1], na.rm = TRUE) - min(pos[, 1], na.rm = TRUE),
+    max_radius_m = radius_value,
+    n_segments = params$n_segments
+  )
+}
+
+do.call(
+  rbind,
+  lapply(
+    list(sphere_shape, cylinder_shape, ps_shape, oblate_shape),
+    shape_summary
+  )
+)
+```
+
+Those four examples cover the main canonical branches. The important practical point is that each constructor returns a `Shape` object that can later be passed into a scatterer constructor without re-entering the geometry.
+
+It is usually worth plotting those objects immediately so that the stored geometry is being checked, not just assumed from the constructor call.
+
+```{r fig.width=8, fig.height=6}
+plot_shape_profile <- function(shape_obj, main) {
+  pos <- extract(shape_obj, "position_matrix")
+  x <- pos[, "x"]
+  zU <- pos[, "zU"]
+  zL <- pos[, "zL"]
+  ylim <- range(c(zU, zL), finite = TRUE)
+
+  plot(x, zU,
+    type = "l",
+    ylim = ylim,
+    xlab = "x",
+    ylab = "z",
+    main = main
+  )
+  lines(x, zL)
+  lines(x, rep(0, length(x)), lty = 3, col = "grey70")
+}
+
+old_par <- par(no.readonly = TRUE)
+on.exit(par(old_par), add = TRUE)
+
+par(mfrow = c(2, 2), mar = c(3, 3, 2.2, 0.8))
+plot_shape_profile(sphere_shape, main = "Sphere")
+plot_shape_profile(cylinder_shape, main = "Cylinder")
+plot_shape_profile(ps_shape, main = "Prolate spheroid")
+plot_shape_profile(oblate_shape, main = "Oblate spheroid")
+```
+
 # Why geometry choice matters
 
 The geometry chosen at this stage strongly influences which later models are natural and which approximations are defensible. A canonical geometry can align very well with an exact or modal-series model, while a segmented arbitrary geometry can align better with a morphology-preserving approximation. Neither option is automatically more correct. The right choice depends on whether the main goal is to preserve measured shape, to stay close to a canonical theory family, or to build a deliberately simplified object for comparison and intuition.
@@ -48,6 +118,17 @@ Canonical shapes are especially useful when the geometry itself is part of the m
 Canonical geometry is also useful for comparison studies. If the goal is to understand how two model families differ under controlled conditions, a simple sphere, cylinder, or spheroid often provides a cleaner starting point than a highly detailed arbitrary outline.
 
 The direct generators are usually the clearest interface because they make the resulting shape class explicit at the call site. `create_shape()` is a thin convenience dispatcher rather than the main pedagogical path.
+
+```{r}
+wrapped_shape <- create_shape(
+  "cylinder",
+  length_body = 0.03,
+  radius_body = 0.002,
+  n_segments = 50
+)
+
+extract(wrapped_shape, "shape_parameters")[c("shape", "length", "radius", "n_segments")]
+```
 
 # Coordinate conventions by shape
 
@@ -76,6 +157,21 @@ This is one of the main geometric tradeoffs in the package. A canonical shape ma
 
 The further a body departs from a separable canonical surface, the stronger the case becomes for preserving the measured morphology rather than forcing the target into an overly simple idealized form.
 
+```{r}
+measured_like <- arbitrary(
+  x_body = c(0, 0.01, 0.02, 0.03, 0.04),
+  radius_body = c(0, 0.004, 0.006, 0.004, 0)
+)
+
+head(extract(measured_like, "position_matrix"))
+```
+
+```{r fig.width=7, fig.height=3.6}
+plot_shape_profile(measured_like, main = "Arbitrary measured-like body")
+```
+
+That is the most direct pathway when the user already has an axial coordinate series or wants to sketch a bespoke elongated target by hand.
+
 # Canonical surrogates from measured shapes
 
 Sometimes the right workflow is not to choose between a measured shape and a canonical one at the beginning, but to use both on purpose. A measured or segmented outline can be preserved first as an `Arbitrary` shape and then reduced explicitly to a canonical surrogate when the goal is to run a shape-specific model such as `SPHMS`, `PSMS`, or `FCMS`.
@@ -96,6 +192,33 @@ In practice, this means a workflow such as:
 3. then run the shape-specific model on the canonical surrogate.
 
 That pattern keeps the model assumptions honest. The later `PSMS` or `FCMS` result can then be interpreted as the response of the fitted canonical surrogate, not as though the original irregular target had somehow become exactly separable in spheroidal or cylindrical coordinates.
+
+```{r}
+cyl_fit <- canonicalize_shape(
+  measured_like,
+  to = "Cylinder",
+  diagnostics = TRUE
+)
+
+data.frame(
+  fitted_shape = class(cyl_fit$shape)[1],
+  source_length_m = cyl_fit$diagnostics$source$length,
+  fitted_length_m = cyl_fit$diagnostics$target$length,
+  radius_rmse = cyl_fit$diagnostics$fit$radius_rmse,
+  radius_nrmse = cyl_fit$diagnostics$fit$radius_nrmse
+)
+```
+
+```{r fig.width=7, fig.height=3.6}
+old_par <- par(no.readonly = TRUE)
+on.exit(par(old_par), add = TRUE)
+
+par(mfrow = c(1, 2), mar = c(3, 3, 2.2, 0.8))
+plot_shape_profile(measured_like, main = "Original arbitrary shape")
+plot_shape_profile(cyl_fit$shape, main = "Canonicalized cylinder surrogate")
+```
+
+If the diagnostics are acceptable for the intended use, the fitted shape can be passed on like any other canonical `Shape` object.
 
 # Choosing the right level of geometric detail
 

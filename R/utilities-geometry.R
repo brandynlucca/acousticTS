@@ -82,6 +82,89 @@
   abs(diff(range(x_vals, na.rm = TRUE)))
 }
 
+#' Resolve centerline z coordinates from a position matrix or body list
+#' @param position_matrix Numeric position matrix.
+#' @param body Body list containing an \code{rpos} matrix.
+#' @param row_major Logical; whether the x-axis is stored in the first row.
+#' @keywords internal
+#' @noRd
+.shape_centerline_z <- function(position_matrix = NULL,
+                                body = NULL,
+                                row_major = FALSE) {
+  # Fall back to the body profile when a body list is supplied =================
+  if (!is.null(body)) {
+    position_matrix <- body$rpos
+    row_major <- TRUE
+  }
+
+  # Resolve the node count used by the fallback centerline ====================
+  n_nodes <- if (row_major) ncol(position_matrix) else nrow(position_matrix)
+
+  # Return the stored centerline z axis when it exists ========================
+  if (row_major && !is.null(rownames(position_matrix))) {
+    z_idx <- match(
+      c("z", "z_body", "z_bladder", "z_shell", "z_fluid", "z_backbone"),
+      rownames(position_matrix),
+      nomatch = 0
+    )
+    z_idx <- z_idx[z_idx > 0]
+    if (length(z_idx) > 0) {
+      return(as.numeric(position_matrix[z_idx[1], ]))
+    }
+  } else if (!row_major && ncol(position_matrix) >= 3) {
+    return(as.numeric(position_matrix[, 3]))
+  }
+
+  # Fall back to the midpoint of the vertical envelopes when available ========
+  zU <- .geometry_axis_values(
+    position_matrix,
+    axis = "zU",
+    row_major = row_major,
+    default = NULL,
+    context = "Centerline z derivation"
+  )
+  zL <- .geometry_axis_values(
+    position_matrix,
+    axis = "zL",
+    row_major = row_major,
+    default = NULL,
+    context = "Centerline z derivation"
+  )
+  if (!is.null(zU) && !is.null(zL)) {
+    return((zU + zL) / 2)
+  }
+
+  # Fall back to a flat centerline when no vertical offset is stored ==========
+  rep(0, n_nodes)
+}
+
+#' Resolve centerline arc length from a position matrix or body list
+#' @param position_matrix Numeric position matrix.
+#' @param body Body list containing an \code{rpos} matrix.
+#' @param row_major Logical; whether the x-axis is stored in the first row.
+#' @keywords internal
+#' @noRd
+.shape_arc_length <- function(position_matrix = NULL,
+                              body = NULL,
+                              row_major = FALSE) {
+  # Fall back to the body profile when a body list is supplied =================
+  if (!is.null(body)) {
+    position_matrix <- body$rpos
+    row_major <- TRUE
+  }
+
+  # Resolve the centerline coordinates used by the path-length calculation ====
+  x_vals <- .shape_x(position_matrix, row_major = row_major)
+  z_vals <- .shape_centerline_z(position_matrix, row_major = row_major)
+
+  # Return the accumulated centerline distance ================================
+  if (length(x_vals) < 2L) {
+    return(0)
+  }
+
+  sum(sqrt(diff(x_vals)^2 + diff(z_vals)^2))
+}
+
 #' Resolve nodewise radius information from a shape/body representation
 #' @param position_matrix Numeric position matrix.
 #' @param shape_parameters Shape-parameter list.
@@ -331,24 +414,60 @@
 }
 
 ################################################################################
-#' Support function for bending scatterer body shape and position matrix
+#' Bend a scatterer body or body component
+#'
+#' @description
+#' Apply a smooth curvature transformation to an existing scatterer body or to a
+#' list-like body component containing an \code{rpos} matrix. This is useful
+#' when a target should keep the same broad identity while adopting a curved
+#' centerline for model comparisons or sensitivity studies.
+#'
 #' @param object Dataframe or scatterer-class object
 #' @param radius_curvature Radius of curvature that can be parameterized either
 #' as a ratio relative to body length or actual measurement
 #' @param mode Either "ratio" or "measurement"
 #' @return A bent version of \code{object}, returned as the same broad object
 #'   type with updated geometry and curvature metadata.
+#'
+#' @examples
+#' shape_obj <- cylinder(
+#'   length_body = 0.05,
+#'   radius_body = 0.003,
+#'   n_segments = 80
+#' )
+#' obj <- fls_generate(
+#'   shape = shape_obj,
+#'   density_body = 1045,
+#'   sound_speed_body = 1520
+#' )
+#'
+#' bent_obj <- brake(obj, radius_curvature = 5)
+#' head(extract(bent_obj, c("body", "rpos", "z")))
+#' extract(bent_obj, c("shape_parameters", "radius_curvature_ratio"))
+#'
+#' bent_body <- brake(extract(obj, "body"), radius_curvature = 0.35, mode = "measurement")
+#' head(bent_body$rpos["z", ])
+#'
+#' @seealso [extract()], [reforge()], [translate_shape()], [reanchor_shape()],
+#'   [inflate_shape()], [smooth_shape()], [resample_shape()], [flip_shape()],
+#'   [offset_component()]
 #' @keywords shape manipulator
 #' @rdname brake
 #' @export
 brake <- function(object, radius_curvature, mode = "ratio") {
   # Dispatch the bend helper according to the input object type ================
-  class_type <- typeof(object)
-  output <- switch(class_type,
-    list = brake_df(object, radius_curvature, mode),
-    S4 = brake_scatterer(object, radius_curvature, mode)
+  if (methods::is(object, "Scatterer")) {
+    return(brake_scatterer(object, radius_curvature, mode))
+  }
+  if (is.list(object)) {
+    return(brake_df(object, radius_curvature, mode))
+  }
+
+  # Reject unsupported inputs explicitly rather than returning NULL ============
+  stop(
+    "`brake()` expects either a scatterer object or a list-like body component.",
+    call. = FALSE
   )
-  return(output)
 }
 
 ################################################################################
@@ -363,17 +482,7 @@ brake <- function(object, radius_curvature, mode = "ratio") {
 #' @noRd
 brake_df <- function(body_df, radius_curvature, mode = "ratio") {
   # Validate the body data frame and requested curvature inputs ================
-  if (
-    !is.list(body_df) || is.null(body_df$rpos) || !is.matrix(body_df$rpos)
-  ) {
-    stop("Body shape information must be a list with a matrix element 'rpos'.")
-  }
-  if (!is.numeric(radius_curvature) || radius_curvature <= 0) {
-    stop("Radius of curvature must be a positive-only, real number.")
-  }
-  if (!mode %in% c("ratio", "measurement")) {
-    stop("Radius-of-curvature 'mode' must be either 'ratio' or 'measurement'.")
-  }
+  .validate_brake_params(body_df, radius_curvature, mode)
 
   # Recover the working geometry and normalize the curvature mode ==============
   rpos <- body_df$rpos
@@ -470,8 +579,14 @@ brake_scatterer <- function(object, radius_curvature, mode = "ratio") {
   # Mirror the curvature metadata onto the stored shape parameters ============
   if ("shape_parameters" %in% methods::slotNames(object)) {
     shape_parameters <- methods::slot(object, "shape_parameters")
+    curved_length <- .shape_arc_length(body = body_curved)
     shape_parameters$radius_curvature_ratio <-
       body_curved$radius_curvature_ratio
+    if ("body" %in% names(shape_parameters) && is.list(shape_parameters$body)) {
+      shape_parameters$body$length <- curved_length
+    } else if ("length" %in% names(shape_parameters)) {
+      shape_parameters$length <- curved_length
+    }
     methods::slot(object, "shape_parameters") <- shape_parameters
   }
   return(object)

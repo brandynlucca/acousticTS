@@ -98,5 +98,6 @@ Collate:
     'utilities-modal.R'
     'utilities-plotting.R'
     'utilities-geometry.R'
+    'shape_manipulation.R'
     'canonicalize_shape.R'
     'validation.R'

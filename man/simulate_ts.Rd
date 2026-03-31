@@ -59,7 +59,9 @@ calls. It supports three broad parameter modes inside \code{parameters}:
 \item scalars that are recycled across every realization,
 \item explicit vectors that are either aligned with the full simulation
 grid or with one or more batched dimensions, and
-\item generating functions that are re-evaluated for each realization.
+\item generating functions that are re-evaluated for each realization, and
+\item structured values such as named target-dimension vectors used by
+\code{reforge()} (for example \code{body_target = c(length = 0.03)}).
 }
 
 If \code{batch_by = "length"} and \code{parameters[["length"]]} is a vector
@@ -68,6 +70,17 @@ repeated \code{n_realizations} times. When multiple parameters are supplied
 through \code{batch_by}, the function builds the full Cartesian grid of
 those parameter values and runs the requested number of realizations inside
 each batch cell.
+
+Structured batch values should be wrapped in a list so that each candidate is
+preserved as one unit. For example, use
+\code{parameters = list(body_target = list(c(length = 0.02), c(length = 0.03))))}
+when batching across multiple explicit \code{reforge()} targets.
+
+Convenience dimension aliases are also supported for compatible
+\code{reforge()} methods. For example, \code{length_body = 0.03} is treated
+the same as \code{body_target = c(length = 0.03)} for fluid-like scatterers,
+while retaining the original \code{length_body} column in the returned
+simulation output.
 
 Parameter names are interpreted in the same way they would be if supplied
 directly to \code{target_strength()} or to the relevant object constructor /

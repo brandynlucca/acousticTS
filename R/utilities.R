@@ -86,6 +86,143 @@
 #' @return Resolved parameter vector
 #' @keywords internal
 #' @noRd
+.simplify_simulation_draws <- function(values) {
+  # Return atomic scalars as a simple vector when possible ====================
+  scalar_atomic <- vapply(
+    values,
+    function(x) {
+      is.atomic(x) &&
+        length(x) == 1L &&
+        (is.null(names(x)) || !any(nzchar(names(x))))
+    },
+    logical(1)
+  )
+  if (all(scalar_atomic)) {
+    return(unlist(values, use.names = FALSE))
+  }
+
+  # Preserve structured draws as a list =======================================
+  values
+}
+
+#' Resolve whether one simulation parameter should be preserved as structured
+#' @param x One simulation parameter value.
+#' @return Logical.
+#' @keywords internal
+#' @noRd
+.is_structured_simulation_value <- function(x) {
+  # Preserve named atomic values so reforge targets retain their dimensions ====
+  if (is.atomic(x) && !is.null(names(x)) && any(nzchar(names(x)))) {
+    return(TRUE)
+  }
+
+  # Preserve list-like and tabular objects as structured values ===============
+  is.list(x) || is.matrix(x) || is.data.frame(x)
+}
+
+#' Normalize one batched simulation parameter into candidate values
+#' @param param_name Parameter name.
+#' @param param_value Parameter definition supplied to `simulate_ts()`.
+#' @return Candidate values used to expand the batch grid.
+#' @keywords internal
+#' @noRd
+.normalize_simulation_batch_values <- function(param_name, param_value) {
+  # Evaluate generating functions once per batched parameter ===================
+  value <- if (is.function(param_value)) {
+    result <- param_value()
+    if (length(result) == 0) {
+      stop(
+        paste0(
+          "Batch parameter '", param_name, "' function must return at least 1 ",
+          "valid value."
+        )
+      )
+    }
+    result
+  } else {
+    param_value
+  }
+
+  # Reject empty candidate sets before grid construction ======================
+  if (length(value) == 0) {
+    stop(
+      "Batch parameter '", param_name, "' must supply at least 1 valid value.",
+      call. = FALSE
+    )
+  }
+
+  # Wrap structured single values so they survive batching intact =============
+  if (.is_structured_simulation_value(value) && !is.list(value)) {
+    return(list(value))
+  }
+
+  # Return the normalized batch candidates ====================================
+  value
+}
+
+#' Resolve one non-batched simulation parameter across the full grid
+#' @param param_name Parameter name.
+#' @param param_value Parameter definition supplied to `simulate_ts()`.
+#' @param grid_size Simulation grid size.
+#' @return Resolved parameter values.
+#' @keywords internal
+#' @noRd
+.resolve_simulation_parameter_values <- function(param_name,
+                                                param_value,
+                                                grid_size) {
+  # Draw one fresh value per realization for stochastic generators =============
+  if (is.function(param_value)) {
+    draws <- lapply(seq_len(grid_size), function(i) param_value())
+    return(.simplify_simulation_draws(draws))
+  }
+
+  # Preserve structured scalar values across the full simulation grid ==========
+  if (.is_structured_simulation_value(param_value)) {
+    if (!is.list(param_value) && !is.data.frame(param_value) && !is.matrix(param_value)) {
+      return(rep(list(param_value), grid_size))
+    }
+    if (length(param_value) == 1L) {
+      return(rep(param_value, grid_size))
+    }
+    if (length(param_value) == grid_size) {
+      return(param_value)
+    }
+  }
+
+  # Recycle scalar atomic inputs across the whole simulation grid =============
+  if (length(param_value) == 1) {
+    return(rep(param_value, grid_size))
+  }
+
+  # Accept vectors that already match the full simulation size ================
+  if (length(param_value) == grid_size) {
+    return(param_value)
+  }
+
+  # Reject ambiguous parameter lengths before model construction ==============
+  stop(
+    sprintf(
+      "Length of parameter '%s' [%d] does not match number of realizations [%d].",
+      param_name, length(param_value), grid_size
+    ),
+    call. = FALSE
+  )
+}
+
+#' Resolve parameter value for simulation grid
+#'
+#' Internal helper to resolve parameter values in simulate_ts based on type
+#' (batch, function, scalar, vector).
+#'
+#' @param param_name Parameter name
+#' @param param_value Parameter value (scalar, vector, or function)
+#' @param batch_by Batch parameter names
+#' @param batch_values Batch parameter values
+#' @param grid_size Simulation grid size
+#' @param simulation_grid Simulation grid data frame
+#' @return Resolved parameter vector
+#' @keywords internal
+#' @noRd
 .resolve_param_value <- function(param_name, param_value, batch_by,
                                  batch_values, grid_size, simulation_grid) {
   # Resolve values from the active batch grid when batching is enabled =========
@@ -94,29 +231,11 @@
     return(batch_values[[param_name]][idx])
   }
 
-  # Draw one fresh value per realization for stochastic generators =============
-  if (is.function(param_value)) {
-    return(replicate(grid_size, param_value()))
-  }
-
-  # Recycle scalar inputs across the whole simulation grid =====================
-  if (length(param_value) == 1) {
-    return(rep(param_value, grid_size))
-  }
-
-  # Accept vectors that already match the full simulation size =================
-  if (length(param_value) == grid_size) {
-    return(param_value)
-  }
-
-  # Reject ambiguous vector lengths before model construction ==================
-  sim_type <- if (is.null(batch_by)) "realizations" else "batched realizations"
-  stop(
-    sprintf(
-      "Length of parameter '%s' [%d] does not match number of %s [%d].",
-      param_name, length(param_value), sim_type, grid_size
-    ),
-    call. = FALSE
+  # Resolve non-batched values across the full simulation grid ================
+  .resolve_simulation_parameter_values(
+    param_name = param_name,
+    param_value = param_value,
+    grid_size = grid_size
   )
 }
 
@@ -236,7 +355,9 @@
 #' without spelling out direct slot access repeatedly. `extract()` can also walk
 #' through nested lists, matrices, and named vectors, which makes it useful for
 #' pulling model outputs, component properties, or position-matrix fields from a
-#' common interface.
+#' common interface. This is especially helpful after geometry manipulations
+#' such as `brake()` and `reforge()`, where inspecting the stored body profile
+#' is often the fastest way to confirm what changed.
 #'
 #' @param object Scatterer-class object.
 #' @param feature Feature(s) of interest (e.g. body). This can either be a
@@ -260,7 +381,14 @@
 #' extract(obj, c("body", "density"))
 #' extract(obj, c("shape_parameters", "shape"))
 #'
+#' bent_obj <- brake(obj, radius_curvature = 5)
+#' head(extract(bent_obj, c("body", "rpos", "z")))
+#' extract(bent_obj, c("shape_parameters", "radius_curvature_ratio"))
+#'
 #' @keywords utility
+#' @seealso [brake()], [reforge()], [translate_shape()], [reanchor_shape()],
+#'   [inflate_shape()], [smooth_shape()], [resample_shape()], [flip_shape()],
+#'   [offset_component()]
 #' @rdname extract
 #'
 #' @export
