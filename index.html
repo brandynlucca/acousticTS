@@ -261,9 +261,13 @@
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://brandynlucca.github.io/acousticTS/">acousticTS</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Build a fluid-like scatterer (e.g. krill) with a cylinder shape</span></span>
-<span><span class="va">krill</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/cylinder.html">cylinder</a></span><span class="op">(</span></span>
-<span>  length <span class="op">=</span> <span class="fl">0.03</span>,          <span class="co"># 30 mm body length</span></span>
-<span>  radius <span class="op">=</span> <span class="fl">0.003</span>,         <span class="co"># 3 mm max radius</span></span>
+<span><span class="va">krill_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/cylinder.html">cylinder</a></span><span class="op">(</span></span>
+<span>  length_body <span class="op">=</span> <span class="fl">0.03</span>,          <span class="co"># 30 mm body length</span></span>
+<span>  radius_body <span class="op">=</span> <span class="fl">0.003</span>          <span class="co"># 3 mm max radius</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co"># ---- Create the actual Scatterer-class object (FLS)</span></span>
+<span><span class="va">krill</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fls_generate.html">fls_generate</a></span><span class="op">(</span></span>
+<span>  shape <span class="op">=</span> <span class="va">krill_shape</span>,</span>
 <span>  g <span class="op">=</span> <span class="fl">1.0357</span>,             <span class="co"># density contrast</span></span>
 <span>  h <span class="op">=</span> <span class="fl">1.0279</span>,             <span class="co"># sound speed contrast</span></span>
 <span>  theta <span class="op">=</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">2</span>          <span class="co"># broadside incidence</span></span>
@@ -284,13 +288,21 @@
 <p>Scatterer shapes are created via dedicated constructors:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Cylinder (used by FLS / CAL)</span></span>
-<span><span class="va">fish_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/cylinder.html">cylinder</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fl">0.25</span>, radius <span class="op">=</span> <span class="fl">0.02</span><span class="op">)</span></span>
+<span><span class="va">fish_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/cylinder.html">cylinder</a></span><span class="op">(</span>length_body <span class="op">=</span> <span class="fl">0.25</span>, radius_body <span class="op">=</span> <span class="fl">0.02</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Prolate spheroid (used by FLS / PSMS)</span></span>
-<span><span class="va">ps_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/prolate_spheroid.html">prolate_spheroid</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fl">0.02</span>, radius <span class="op">=</span> <span class="fl">0.002</span><span class="op">)</span></span>
+<span><span class="va">ps_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/prolate_spheroid.html">prolate_spheroid</a></span><span class="op">(</span>length_body <span class="op">=</span> <span class="fl">0.02</span>, radius_body <span class="op">=</span> <span class="fl">0.002</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Arbitrary shape from digitized position matrix</span></span>
-<span><span class="va">arb_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/arbitrary.html">arbitrary</a></span><span class="op">(</span>rpos <span class="op">=</span> <span class="va">my_matrix</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">arb_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/arbitrary.html">arbitrary</a></span><span class="op">(</span>rpos <span class="op">=</span> <span class="va">my_matrix</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Dorsal/ventral style inputs</span></span>
+<span><span class="fu"><a href="reference/arbitrary.html">arbitrary</a></span><span class="op">(</span></span>
+<span>  x_body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.015</span><span class="op">)</span>,</span>
+<span>  w_body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.005</span>, <span class="fl">0.0075</span><span class="op">)</span>,</span>
+<span>  zU_body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.001</span>, <span class="fl">0.002</span><span class="op">)</span>,</span>
+<span>  zL_body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.001</span>, <span class="op">-</span><span class="fl">0.002</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>Existing scatterer objects can be resized or re-discretized without reconstructing them from scratch using <code><a href="reference/reforge.html">reforge()</a></code>:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Rescale a krill to 40 mm</span></span>
@@ -308,10 +320,10 @@
 <span>  <span class="va">krill</span>,</span>
 <span>  model <span class="op">=</span> <span class="st">"DWBA"</span>,</span>
 <span>  frequency <span class="op">=</span> <span class="fl">120e3</span>,</span>
-<span>  n <span class="op">=</span> <span class="fl">1000</span>,</span>
+<span>  n_realizations <span class="op">=</span> <span class="fl">1000</span>,</span>
 <span>  parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    theta <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">pi</span> <span class="op">/</span> <span class="fl">2</span>, <span class="va">pi</span> <span class="op">/</span> <span class="fl">18</span><span class="op">)</span>,</span>
-<span>    length <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.03</span>, <span class="fl">0.003</span><span class="op">)</span></span>
+<span>    theta_body <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">pi</span> <span class="op">/</span> <span class="fl">2</span>, <span class="va">pi</span> <span class="op">/</span> <span class="fl">18</span><span class="op">)</span>,</span>
+<span>    length_body <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.03</span>, <span class="fl">0.003</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
