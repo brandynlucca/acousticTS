@@ -1,4 +1,4 @@
-# v.2026.03.0
+# acousticTS 2026.3.0
 
 ## What's Changed
 
@@ -95,6 +95,6 @@
 
 **Full Changelog**: https://github.com/brandynlucca/acousticTS/compare/v.1.0...v.2026.03.0
 
-# v1.0.1
+# acousticTS 1.0.1
 
 * Added a `NEWS.md` file to track changes to the package.
