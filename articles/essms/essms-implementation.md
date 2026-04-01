@@ -174,46 +174,6 @@ shell, the next quantities to revisit are the shell elastic constants
 and the shell-to-fluid property contrast, because those control where
 the strongest modal features occur.
 
-#### Benchmark source and current status
-
-ESSMS does have a direct benchmark source in the Jech shell-sphere
-family. The full-grid ESSMS sweep is a status check rather than a usable
-\Delta table because the implementation does not return finite `TS`
-values across the benchmark grid.
-
-| ESSMS case                             | Finite benchmark points matched | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | Elapsed (s) | Status                 |
-|:---------------------------------------|--------------------------------:|:------------------------|:-------------------------|------------:|:-----------------------|
-| Pressure-release interior shell        |                               0 | `NA`                    | `NA`                     |        0.05 | no finite full-grid TS |
-| Gas-interior shell                     |                               0 | `NA`                    | `NA`                     |        0.07 | no finite full-grid TS |
-| Weakly scattering fluid-interior shell |                               0 | `NA`                    | `NA`                     |        0.05 | no finite full-grid TS |
-
-The benchmarking story for ESSMS is simple. The external benchmark
-family exists and is the right one to use, but the implementation needs
-numerical stabilization before this page can present the same kind of
-benchmark-accuracy table shown for SPHMS, FCMS, and PSMS.
-
-ESSMS also exposes `m_limit`, so the obvious next question is whether
-the absence of finite full-grid values is just an overly aggressive
-truncation choice. The table below checks that directly.
-
-| ESSMS case                             | `m_limit`    | Finite benchmark points matched | Elapsed (s) | Status                 |
-|:---------------------------------------|:-------------|--------------------------------:|------------:|:-----------------------|
-| Pressure-release interior shell        | default rule |                               0 |        0.04 | no finite full-grid TS |
-| Pressure-release interior shell        | `40`         |                               0 |        0.12 | no finite full-grid TS |
-| Pressure-release interior shell        | `20`         |                               0 |        0.05 | no finite full-grid TS |
-| Gas-interior shell                     | default rule |                               0 |        0.05 | no finite full-grid TS |
-| Gas-interior shell                     | `40`         |                               0 |        0.13 | no finite full-grid TS |
-| Gas-interior shell                     | `20`         |                               0 |        0.07 | no finite full-grid TS |
-| Weakly scattering fluid-interior shell | default rule |                               0 |        0.06 | no finite full-grid TS |
-| Weakly scattering fluid-interior shell | `40`         |                               0 |        0.14 | no finite full-grid TS |
-| Weakly scattering fluid-interior shell | `20`         |                               0 |        0.06 | no finite full-grid TS |
-
-That check matters because it rules out the easiest explanation. The
-present ESSMS full-grid benchmark failure is not just a consequence of
-picking the wrong modal cap in the implementation examples. Changing
-`m_limit` over a broad range does not recover a usable Jech shell-sphere
-comparison table yet.
-
 ## References
 
 Faran, James J. 1951. “Sound Scattering by Solid Cylinders and Spheres.”
