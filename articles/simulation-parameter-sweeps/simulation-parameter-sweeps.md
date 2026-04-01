@@ -526,10 +526,11 @@ Common downstream summaries include:
 4.  screening plots to identify nonlinear regions before deeper
     analysis.
 
-## Parallel execution on Windows
+## Parallel execution
 
-On Windows, parallel execution uses PSOCK workers rather than forked
-processes. That has two practical consequences:
+[`simulate_ts()`](https://brandynlucca.github.io/acousticTS/reference/simulate_ts.md)
+currently uses PSOCK workers for parallel execution across Windows,
+macOS, and Linux. That has two practical consequences:
 
 1.  startup overhead is more noticeable for small jobs,
 2.  larger simulations benefit more clearly from parallelization than
@@ -586,9 +587,9 @@ Two additional cautions are worth keeping in mind:
 For that reason, this page should be read together with [FAQ and
 troubleshooting](https://brandynlucca.github.io/acousticTS/articles/faq-troubleshooting/faq-troubleshooting.md).
 
-On Windows, parallel execution uses PSOCK workers rather than forked
-processes, so larger simulations benefit from being planned deliberately
-instead of relying on a maximal batch grid by default.
+Because the current parallel path is PSOCK-based, larger simulations
+benefit from being planned deliberately instead of relying on a maximal
+batch grid by default.
 
 ## Relationship to `anneal()`
 

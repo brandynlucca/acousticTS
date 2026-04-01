@@ -584,10 +584,11 @@ analysis.</li>
 </ol>
 </div>
 <div class="section level2">
-<h2 id="parallel-execution-on-windows">Parallel execution on Windows<a class="anchor" aria-label="anchor" href="#parallel-execution-on-windows"></a>
+<h2 id="parallel-execution">Parallel execution<a class="anchor" aria-label="anchor" href="#parallel-execution"></a>
 </h2>
-<p>On Windows, parallel execution uses PSOCK workers rather than forked
-processes. That has two practical consequences:</p>
+<p><code><a href="../../reference/simulate_ts.html">simulate_ts()</a></code> currently uses PSOCK workers for parallel
+execution across Windows, macOS, and Linux. That has two practical
+consequences:</p>
 <ol style="list-style-type: decimal">
 <li>startup overhead is more noticeable for small jobs,</li>
 <li>larger simulations benefit more clearly from parallelization than
@@ -640,9 +641,9 @@ one fixed shape.</li>
 </ol>
 <p>For that reason, this page should be read together with <a href="../faq-troubleshooting/faq-troubleshooting.html">FAQ and
 troubleshooting</a>.</p>
-<p>On Windows, parallel execution uses PSOCK workers rather than forked
-processes, so larger simulations benefit from being planned deliberately
-instead of relying on a maximal batch grid by default.</p>
+<p>Because the current parallel path is PSOCK-based, larger simulations
+benefit from being planned deliberately instead of relying on a maximal
+batch grid by default.</p>
 </div>
 <div class="section level2">
 <h2 id="relationship-to-anneal">Relationship to <code>anneal()</code><a class="anchor" aria-label="anchor" href="#relationship-to-anneal"></a>

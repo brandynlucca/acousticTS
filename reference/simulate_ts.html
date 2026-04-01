@@ -184,9 +184,11 @@ directly to <code><a href="target_strength.html">target_strength()</a></code> or
 
 
 <p>This function uses <code><a href="https://peter.solymos.org/pbapply/reference/pbapply.html" class="external-link">pbapply::pblapply()</a></code> for parallelized simulation
-with progress bars. On Windows, parallelization uses PSOCK clusters, which
-require all necessary objects and packages to be exported to worker
-processes. On Unix-like systems, forking is used, which is generally simpler.</p>
+with progress bars. The current implementation uses PSOCK clusters for
+worker execution across platforms, including Windows, macOS, and Linux.
+That means worker processes need access to the package namespace and any
+required exported objects, and it also means startup overhead is more
+noticeable for very small simulation jobs than for larger batched runs.</p>
     </div>
     <div class="section level2">
     <h2 id="performance-issues">Performance Issues<a class="anchor" aria-label="anchor" href="#performance-issues"></a></h2>
