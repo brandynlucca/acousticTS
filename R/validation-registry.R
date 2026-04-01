@@ -36,7 +36,7 @@
   }
 
   paste0(
-    '<span class="model-tag ', spec$css, '"', tooltip_attr, '>',
+    '<span class="model-tag ', spec$css, '"', tooltip_attr, ">",
     spec$label,
     "</span>"
   )

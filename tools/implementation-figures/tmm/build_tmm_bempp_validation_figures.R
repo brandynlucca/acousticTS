@@ -59,8 +59,9 @@ plot_validation_figure <- function(detail,
   )
   lines(detail$angle_deg, tmm_db, col = "#c75d2c", lwd = 2, lty = 2)
   points(detail$angle_deg[seq(1, nrow(detail), by = 6)],
-         tmm_db[seq(1, nrow(detail), by = 6)],
-         pch = 21, bg = "white", col = "#c75d2c", cex = 0.8)
+    tmm_db[seq(1, nrow(detail), by = 6)],
+    pch = 21, bg = "white", col = "#c75d2c", cex = 0.8
+  )
   legend(
     "topright",
     legend = c("BEMPP", "TMM"),

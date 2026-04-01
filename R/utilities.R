@@ -168,8 +168,8 @@
 #' @keywords internal
 #' @noRd
 .resolve_simulation_parameter_values <- function(param_name,
-                                                param_value,
-                                                grid_size) {
+                                                 param_value,
+                                                 grid_size) {
   # Draw one fresh value per realization for stochastic generators =============
   if (is.function(param_value)) {
     draws <- lapply(seq_len(grid_size), function(i) param_value())

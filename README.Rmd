@@ -28,7 +28,7 @@ $$
 
 $TS$ is used to:
 
-- Convert integrated backscatter (e.g. $S_\mathrm{A}$, NASC) or volumetric backscatter ($S_\text{V}$) into number density or biomass
+- Convert integrated backscatter (e.g., $S_\text{A}$, NASC) or volumetric backscatter ($S_\text{V}$) into number density or biomass
 - Classify backscatter by species or taxon based on multi-frequency response
 - Parameterize and evaluate physics-based scattering models over statistical distributions of organism size and orientation
 
@@ -78,15 +78,15 @@ library(acousticTS)
 
 # Build a fluid-like scatterer (e.g. krill) with a cylinder shape
 krill_shape <- cylinder(
-  length_body = 0.03,          # 30 mm body length
-  radius_body = 0.003          # 3 mm max radius
+  length_body = 0.03, # 30 mm body length
+  radius_body = 0.003 # 3 mm max radius
 )
 # ---- Create the actual Scatterer-class object (FLS)
 krill <- fls_generate(
   shape = krill_shape,
-  g = 1.0357,             # density contrast
-  h = 1.0279,             # sound speed contrast
-  theta = pi / 2          # broadside incidence
+  g = 1.0357, # density contrast
+  h = 1.0279, # sound speed contrast
+  theta = pi / 2 # broadside incidence
 )
 
 # Run the DWBA model from 1 kHz to 300 kHz

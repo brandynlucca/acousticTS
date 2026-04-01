@@ -199,7 +199,7 @@ normalize_file <- function(path) {
       lines[i] <- "$$"
       end <- i + 1L
       while (end <= length(lines) &&
-             !(trimws(lines[end]) %in% c("$$", "$$:"))) {
+        !(trimws(lines[end]) %in% c("$$", "$$:"))) {
         end <- end + 1L
       }
 
@@ -270,7 +270,9 @@ should_dedent_prose <- function(lines, index) {
   TRUE
 }
 
-paths <- list.files("vignettes", recursive = TRUE, pattern = "\\.Rmd$",
-                    full.names = TRUE)
+paths <- list.files("vignettes",
+  recursive = TRUE, pattern = "\\.Rmd$",
+  full.names = TRUE
+)
 changes <- vapply(paths, normalize_file, logical(1))
 cat(sum(changes), "vignette files updated\n")

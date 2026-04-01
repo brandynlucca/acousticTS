@@ -69,8 +69,7 @@ manifest <- utils::read.csv(
   stringsAsFactors = FALSE
 )
 
-allowed_profiles <- switch(
-  profile,
+allowed_profiles <- switch(profile,
   light = "light",
   all = c("light", "heavy"),
   stop("Unknown implementation figure profile: ", profile, call. = FALSE)
@@ -93,8 +92,7 @@ if (nzchar(families_csv)) {
   }
 
   manifest <- manifest[
-    tolower(manifest$family) %in% requested_families,
-    ,
+    tolower(manifest$family) %in% requested_families, ,
     drop = FALSE
   ]
 }

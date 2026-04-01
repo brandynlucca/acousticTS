@@ -46,4 +46,3 @@ impl_with_png(
     graphics::abline(h = 0, lty = 3, col = "grey50")
   }
 )
-
