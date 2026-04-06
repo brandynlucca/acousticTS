@@ -262,9 +262,9 @@ canonical modal-series targets above. There is no exact modal-series
 reference for these segmented body-plus-swimbladder geometries, so they
 are used only to check software-to-software agreement for the
 `krm_variant` branches on realistic fish shapes. This inclues KRMr
-([Gastauer 2025](#ref-KRMr_software)), echoSMs ([Elavia
-2021](#ref-echoSMs_software)), and the SWFSC applet ([Southwest
-Fisheries Science Center 2022](#ref-NOAA_KRM_software)).
+([Gastauer 2025](#ref-KRMr_software)), echoSMs ([Macaulay and
+contributors 2024](#ref-echoSMs_software)), and the SWFSC applet
+([Southwest Fisheries Science Center 2022](#ref-NOAA_KRM_software)).
 
 ##### Sardine
 
@@ -354,9 +354,6 @@ Clay, Clarence S., and John K. Horne. 1994. “Acoustic Models of Fish:
 The Atlantic Cod (*Gadus Morhua*).” *The Journal of the Acoustical
 Society of America* 96 (3): 1661–68. <https://doi.org/10.1121/1.410245>.
 
-Elavia, A. 2021. “Liquid_spheroid: Acoustic Scattering by a Liquid
-Prolate Spheroid.” <https://github.com/elavia/liquid_spheroid>.
-
 Gastauer, Sven. 2025. “SvenGastauer/KRMr: V0.4.8.” Zenodo.
 <https://doi.org/10.5281/ZENODO.15838374>.
 
@@ -364,6 +361,11 @@ Horne, J. K., and J. M. Jech. 1999. “Multi-Frequency Estimates of Fish
 Abundance: Constraints of Rather High Frequencies.” *ICES Journal of
 Marine Science* 56 (2): 184–99.
 <https://doi.org/10.1006/jmsc.1998.0432>.
+
+Macaulay, Gavin, and contributors. 2024. “echoSMs: Making Acoustic
+Scattering Models Available to Fisheries and Plankton Scientists.”
+*GitHub Repository*. <https://github.com/ices-tools-dev/echoSMs>;
+GitHub.
 
 Southwest Fisheries Science Center. 2022. *KRM Model*. National Marine
 Fisheries Service, National Oceanic; Atmospheric Administration.

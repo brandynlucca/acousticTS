@@ -242,7 +242,8 @@ values used for the benchmark calculations (`N0 = 50`,
 CCAMLR ([Commission for the Conservation of Antarctic Marine Living
 Resources 2019](#ref-CCAMLR_SDWBA_software)), NOAA applet
 ([**NOAA-SDWBA_software?**](#ref-NOAA-SDWBA_software)), and the `Python`
-package echoSMs ([Elavia 2021](#ref-echoSMs_software)).
+package echoSMs ([Macaulay and contributors
+2024](#ref-echoSMs_software)).
 
 | Comparison                  | Mean abs. \Delta TS (dB) | Max abs. \Delta TS (dB) |
 |:----------------------------|-------------------------:|------------------------:|
@@ -294,5 +295,7 @@ Marine Science* 60 (3): 625–35.
 Southern Ocean.” *ICES Journal of Marine Science* 62 (1): 25–32.
 <https://doi.org/10.1016/j.icesjms.2004.07.027>.
 
-Elavia, A. 2021. “Liquid_spheroid: Acoustic Scattering by a Liquid
-Prolate Spheroid.” <https://github.com/elavia/liquid_spheroid>.
+Macaulay, Gavin, and contributors. 2024. “echoSMs: Making Acoustic
+Scattering Models Available to Fisheries and Plankton Scientists.”
+*GitHub Repository*. <https://github.com/ices-tools-dev/echoSMs>;
+GitHub.

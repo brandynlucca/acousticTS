@@ -207,8 +207,8 @@ The bundled `krill` object serves a different role from the canonical
 modal-series targets above. Rather than testing an exact canonical-shape
 solution, it is used to verify that the stored segmented-body geometry
 reproduces the `MATLAB` code provded by McGehee, O’Driscoll, and
-Traykovski ([1998](#ref-mcgehee_software)) and echoSMs ([Elavia
-2021](#ref-echoSMs_software)).
+Traykovski ([1998](#ref-mcgehee_software)) and echoSMs ([Macaulay and
+contributors 2024](#ref-echoSMs_software)).
 
 | Comparison                          | Mean abs. \Delta TS (dB) | Max abs. \Delta TS (dB) |
 |:------------------------------------|-------------------------:|------------------------:|
@@ -232,14 +232,16 @@ Analysis of Target Strength Measurements of Antarctic Krill at 38 and
 Orientation Distribution.” *The Journal of the Acoustical Society of
 America* 93 (5): 2985–88. <https://doi.org/10.1121/1.405818>.
 
-Elavia, A. 2021. “Liquid_spheroid: Acoustic Scattering by a Liquid
-Prolate Spheroid.” <https://github.com/elavia/liquid_spheroid>.
-
 Jech, J. Michael, John K. Horne, Dezhang Chu, David A. Demer, David T.
 I. Francis, Natalia Gorska, Benjamin Jones, et al. 2015. “Comparisons
 Among Ten Models of Acoustic Backscattering Used in Aquatic Ecosystem
 Research.” *The Journal of the Acoustical Society of America* 138 (6):
 3742–64. <https://doi.org/10.1121/1.4937607>.
+
+Macaulay, Gavin, and contributors. 2024. “echoSMs: Making Acoustic
+Scattering Models Available to Fisheries and Plankton Scientists.”
+*GitHub Repository*. <https://github.com/ices-tools-dev/echoSMs>;
+GitHub.
 
 McGehee, D. E., R. L. O’Driscoll, and L. V.Martin Traykovski. 1998.
 “Effects of Orientation on Acoustic Scattering from Antarctic Krill at

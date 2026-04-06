@@ -255,11 +255,11 @@ The PSMS implementation is easiest to interpret when the main numerical
 switches are compared directly against the published benchmark geometry.
 For `fixed_rigid`, `pressure_release`, and `liquid_filled`, the summary
 below uses the bundled `benchmark_ts` data ([Jech et al.
-2015](#ref-Jech_2015); [Elavia 2021](#ref-echoSMs_software)). For
-`gas_filled`, the same `140 x 10 mm` broadside prolate geometry is run
-directly, but the external reference are predictions from a boundary
-element method (BEM) model ([Betcke and Scroggs
-2021](#ref-Bempp-cl_software)).
+2015](#ref-Jech_2015); [Macaulay and contributors
+2024](#ref-echoSMs_software)). For `gas_filled`, the same `140 x 10 mm`
+broadside prolate geometry is run directly, but the external reference
+are predictions from a boundary element method (BEM) model ([Betcke and
+Scroggs 2021](#ref-Bempp-cl_software)).
 
 Three coverage details matter when reading the numbers:
 
@@ -542,7 +542,7 @@ remaining computationally manageable. The gas-filled comparison is
 summarized separately because the most informative current check is the
 published benchmark geometry run directly against live outputs from
 Prol_Spheroid ([Khodabandeloo et al. 2025](#ref-Prol_Spheroid_software))
-and echoSMs ([Elavia 2021](#ref-echoSMs_software)).
+and echoSMs ([Macaulay and contributors 2024](#ref-echoSMs_software)).
 
 `Prol_Spheroid` only treats penetrable prolate spheroids, so its cells
 are `N/A` for `fixed_rigid` and `pressure_release`. The original and
@@ -674,9 +674,6 @@ Betcke, Timo, and Matthew Scroggs. 2021. “Bempp-Cl: A Fast Python Based
 Just-in-Time Compiling Boundary Element Library.” *Journal of Open
 Source Software* 6 (59): 2879. <https://doi.org/10.21105/joss.02879>.
 
-Elavia, A. 2021. “Liquid_spheroid: Acoustic Scattering by a Liquid
-Prolate Spheroid.” <https://github.com/elavia/liquid_spheroid>.
-
 Furusawa, Masahiko. 1988. “Prolate Spheroidal Models for Predicting
 General Trends of Fish Target Strength.” *Journal of the Acoustical
 Society of Japan (E)* 9 (1): 13–24. <https://doi.org/10.1250/ast.9.13>.
@@ -693,6 +690,11 @@ Software for Acoustic Backscattering by Liquid- and Gas-Filled Prolate
 Spheroids Across a Wide Frequency Range and Incident Angles:
 Implications for Fisheries Acoustics.” *Journal of Sound and Vibration*,
 119227. https://doi.org/<https://doi.org/10.1016/j.jsv.2025.119227>.
+
+Macaulay, Gavin, and contributors. 2024. “echoSMs: Making Acoustic
+Scattering Models Available to Fisheries and Plankton Scientists.”
+*GitHub Repository*. <https://github.com/ices-tools-dev/echoSMs>;
+GitHub.
 
 Spence, R. D., and Sara Granger. 1951. “The Scattering of Sound from a
 Prolate Spheroid.” *The Journal of the Acoustical Society of America* 23

@@ -125,11 +125,8 @@ Sanderson. 2026. “RcppArmadillo: ’Rcpp’ Integration for the ’Armadillo�
 Templated Linear Algebra Library.”
 <https://doi.org/10.32614/CRAN.package.RcppArmadillo>.
 
-Elavia, A. 2021a. “Liquid_spheroid: Acoustic Scattering by a Liquid
+Elavia, A. 2021. “Liquid_spheroid: Acoustic Scattering by a Liquid
 Prolate Spheroid.” <https://github.com/elavia/liquid_spheroid>.
-
-———. 2021b. “Liquid_spheroid: Acoustic Scattering by a Liquid Prolate
-Spheroid.” <https://github.com/elavia/liquid_spheroid>.
 
 Faran, James J. 1951. “Sound Scattering by Solid Cylinders and Spheres.”
 *The Journal of the Acoustical Society of America* 23 (4): 405–18.
@@ -272,6 +269,11 @@ V0.6.0.” Zenodo. <https://doi.org/10.5281/ZENODO.18975959>.
 
 Macaulay, Gavin J. 2025. “gavinmacaulay/SphereTS: V1.0.8.”
 <https://github.com/gavinmacaulay/SphereTS>.
+
+Macaulay, Gavin, and contributors. 2024. “echoSMs: Making Acoustic
+Scattering Models Available to Fisheries and Plankton Scientists.”
+*GitHub Repository*. <https://github.com/ices-tools-dev/echoSMs>;
+GitHub.
 
 MacLennan, D. N. 1981. “The Theory of Solid Spheres as Sonar Calibration
 Targets.” Scottish Fisheries Research Report 22. Department of

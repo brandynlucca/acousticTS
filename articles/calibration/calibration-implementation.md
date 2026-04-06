@@ -202,11 +202,11 @@ Because the calibration-sphere model is itself a modal-series solution,
 the most useful implementation check is agreement with other MacLennan
 ([1981](#ref-Maclennan_1981)) elastic-sphere implementations rather than
 with a separate benchmark family. In the comparisons below, that
-includes SphereTS ([Macaulay 2025](#ref-SphereTS_software)) alongside
-the other reference implementations. The acousticTS solver includes an
-`adaptive` argument. When `adaptive = TRUE` (the default), the solver
-starts from the usual \mathrm{round}(ka)+10 partial waves and then
-extends the sum until the tail term is below 10^{-10}. When
+includes SphereTS ([G. J. Macaulay 2025](#ref-SphereTS_software))
+alongside the other reference implementations. The acousticTS solver
+includes an `adaptive` argument. When `adaptive = TRUE` (the default),
+the solver starts from the usual \mathrm{round}(ka)+10 partial waves and
+then extends the sum until the tail term is below 10^{-10}. When
 `adaptive = FALSE`, it falls back to the original fixed cutoff only. The
 adaptive mode removes the small truncation bias that otherwise remains
 at the upper end of the comparison band. For the default 38.1 mm
@@ -247,8 +247,9 @@ s to about 0.37 s.
 To show that this is not unique to the 38.1 mm tungsten-carbide sphere,
 the same comparison was repeated for one smaller tungsten-carbide sphere
 and one copper sphere from the calibration-target definitions shipped
-with echoSMs ([Elavia 2021](#ref-echoSMs_software)), again including the
-`SphereTS` implementation ([Macaulay 2025](#ref-SphereTS_software)).
+with echoSMs ([G. Macaulay and contributors
+2024](#ref-echoSMs_software)), again including the `SphereTS`
+implementation ([G. J. Macaulay 2025](#ref-SphereTS_software)).
 
 | Target                    | Diameter (mm) | N frequency | Max frequency (kHz) | Max abs. \Delta adapt = TRUE vs echoSMs (dB) | Max abs. \Delta adapt = FALSE vs echoSMs (dB) | Max abs. \Delta adapt = TRUE vs sphereTS (dB) | Max abs. \Delta adapt = FALSE vs sphereTS (dB) | Max abs. \Delta adapt = TRUE vs NOAA applet (dB) | Max abs. \Delta adapt = FALSE vs NOAA applet (dB) | Elapsed acousticTS adapt = TRUE (s) | Elapsed acousticTS adapt = FALSE (s) | Elapsed echoSMs (s) | Elapsed sphereTS (s) | Elapsed NOAA applet (s) |
 |:--------------------------|--------------:|------------:|--------------------:|---------------------------------------------:|----------------------------------------------:|----------------------------------------------:|-----------------------------------------------:|-------------------------------------------------:|--------------------------------------------------:|------------------------------------:|-------------------------------------:|--------------------:|---------------------:|------------------------:|
@@ -279,15 +280,17 @@ Dragonette, Louis R., S. K. Numrich, and Laurence J. Frank. 1981.
 Journal of the Acoustical Society of America* 69 (4): 1186–89.
 <https://doi.org/10.1121/1.385699>.
 
-Elavia, A. 2021. “Liquid_spheroid: Acoustic Scattering by a Liquid
-Prolate Spheroid.” <https://github.com/elavia/liquid_spheroid>.
-
 Foote, K. G. 1990. “Spheres for Calibrating an Eleven-Frequency Acoustic
 Measurement System.” *ICES Journal of Marine Science* 46 (3): 284–86.
 <https://doi.org/10.1093/icesjms/46.3.284>.
 
 Macaulay, Gavin J. 2025. “gavinmacaulay/SphereTS: V1.0.8.”
 <https://github.com/gavinmacaulay/SphereTS>.
+
+Macaulay, Gavin, and contributors. 2024. “echoSMs: Making Acoustic
+Scattering Models Available to Fisheries and Plankton Scientists.”
+*GitHub Repository*. <https://github.com/ices-tools-dev/echoSMs>;
+GitHub.
 
 MacLennan, D. N. 1981. “The Theory of Solid Spheres as Sonar Calibration
 Targets.” Scottish Fisheries Research Report 22. Department of
