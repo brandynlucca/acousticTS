@@ -473,11 +473,33 @@ std::vector<std::vector<std::complex<T>>> solve_fluid_Amn_native(
 }
 
 template<typename T>
-std::vector<std::vector<std::complex<T>>> solve_fluid_Amn(
+std::vector<std::vector<std::complex<T>>> solve_fluid_Amn_default(
     const std::vector<std::vector<std::complex<T>>>& rhs,
     const std::vector<std::vector<std::complex<T>>>& K3_kernel
 ) {
     return solve_fluid_Amn_divide_and_conquer<T>(rhs, K3_kernel);
+}
+
+template<typename T>
+std::vector<std::vector<std::complex<T>>> solve_fluid_Amn_gas(
+    const std::vector<std::vector<std::complex<T>>>& rhs,
+    const std::vector<std::vector<std::complex<T>>>& K3_kernel
+) {
+    // Keep the gas-filled branch fully separate from the liquid-filled path so
+    // future stabilisation work cannot spill back into liquid_filled PSMS.
+    return solve_fluid_Amn_divide_and_conquer<T>(rhs, K3_kernel);
+}
+
+template<typename T>
+std::vector<std::vector<std::complex<T>>> solve_fluid_Amn(
+    const std::vector<std::vector<std::complex<T>>>& rhs,
+    const std::vector<std::vector<std::complex<T>>>& K3_kernel,
+    bool gas_like = false
+) {
+    if (gas_like) {
+        return solve_fluid_Amn_gas<T>(rhs, K3_kernel);
+    }
+    return solve_fluid_Amn_default<T>(rhs, K3_kernel);
 }
 
 template<typename T>
@@ -582,7 +604,7 @@ std::vector<std::vector<std::complex<T>>> solve_fluid_t_blocks(
 
 template<>
 std::vector<std::vector<std::complex<acousticts_quad_t>>>
-solve_fluid_Amn<acousticts_quad_t>(
+solve_fluid_Amn_default<acousticts_quad_t>(
     const std::vector<std::vector<std::complex<acousticts_quad_t>>>& rhs,
     const std::vector<std::vector<std::complex<acousticts_quad_t>>>& K3_kernel
 ) {
@@ -593,6 +615,21 @@ solve_fluid_Amn<acousticts_quad_t>(
         rhs, K3_kernel
     );
 #endif
+}
+
+template<>
+std::vector<std::vector<std::complex<acousticts_quad_t>>>
+solve_fluid_Amn_gas<acousticts_quad_t>(
+    const std::vector<std::vector<std::complex<acousticts_quad_t>>>& rhs,
+    const std::vector<std::vector<std::complex<acousticts_quad_t>>>& K3_kernel
+) {
+    // The gas-filled branch is intentionally solved with the pseudoinverse
+    // backend even in quad mode. That keeps the extreme fluid-fluid contrast
+    // from tripping the complete-pivoting solve while leaving liquid-filled
+    // PSMS on the faster native quad path.
+    return solve_fluid_Amn_divide_and_conquer<acousticts_quad_t>(
+        rhs, K3_kernel
+    );
 }
 
 // Two-sided Jacobi SVD

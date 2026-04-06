@@ -58,7 +58,7 @@
 #'   which is numerically calculated using Gauss-Legendre quadrature. When left
 #'   as \code{NULL}, the model uses 96 integration points unless
 #'   \code{adaptive = TRUE}, in which case a reduced-frequency-based
-#'   quadrature rule is selected internally for the full fluid- or gas-filled
+#'   quadrature rule is selected internally for the full liquid-filled
 #'   solve. See
 #'   \link{gauss_legendre} for a full description of how \code{n_integration} is
 #'   used. **Note:** this argument **only** applies to when
@@ -291,10 +291,16 @@ NULL
   # Map the public PSMS boundary labels onto the internal kernel names ========
   switch(boundary,
     liquid_filled = ifelse(simplify_Amn, "Amn_fluid_simplify", "Amn_fluid"),
-    gas_filled = ifelse(simplify_Amn, "Amn_fluid_simplify", "Amn_fluid"),
+    gas_filled = ifelse(simplify_Amn, "Amn_fluid_simplify", "Amn_fluid_gas"),
     fixed_rigid = "Amn_fixed_rigid",
     pressure_release = "Amn_pressure_release"
   )
+}
+
+# Identify the full penetrable PSMS solves that own their quadrature order.
+#' @noRd
+.psms_is_full_fluid_method <- function(Amn_method) {
+  identical(Amn_method, "Amn_fluid") || identical(Amn_method, "Amn_fluid_gas")
 }
 
 # Resolve the hydrated PSMS body properties against the surrounding medium.
@@ -360,15 +366,26 @@ NULL
 
 # Resolve the quadrature order used by the PSMS kernels.
 #' @noRd
+.psms_n_integration_label <- function(Amn_method) {
+  switch(Amn_method,
+    Amn_fluid = "full liquid-filled PSMS solve",
+    Amn_fluid_gas = "full gas-filled PSMS solve",
+    "full penetrable PSMS solve"
+  )
+}
+
+# Resolve the quadrature order used by the PSMS kernels.
+#' @noRd
 .psms_n_integration <- function(n_integration, adaptive, Amn_method) {
   # Allow the adaptive full-fluid solve to choose quadrature internally ========
   use_adaptive_quadrature <- isTRUE(adaptive) &&
-    identical(Amn_method, "Amn_fluid")
+    .psms_is_full_fluid_method(Amn_method)
   if (use_adaptive_quadrature) {
     if (!is.null(n_integration)) {
       warning(
-        "'n_integration' is ignored when 'adaptive = TRUE' for the full ",
-        "fluid- or gas-filled PSMS solve."
+        "'n_integration' is ignored when 'adaptive = TRUE' for the ",
+        .psms_n_integration_label(Amn_method),
+        "."
       )
     }
     return(NA_integer_)
@@ -406,6 +423,46 @@ NULL
   model_params
 }
 
+# Promote the retained modal ceilings for the full gas-filled PSMS solve only.
+#' @noRd
+.psms_promote_gas_modal_limits <- function(model_params, body_params, boundary) {
+  if (!identical(boundary, "gas_filled") ||
+    !isTRUE(model_params$adaptive) ||
+    !identical(model_params$Amn_method, "Amn_fluid_gas")) {
+    return(model_params)
+  }
+
+  broadside_weight <- abs(sin(body_params$theta_body))
+  chi_body_abs <- pmax(abs(model_params$acoustics$chi_body), 1)
+  sound_speed_ratio <- ifelse(
+    chi_body_abs > .Machine$double.eps,
+    abs(model_params$acoustics$chi_sw / model_params$acoustics$chi_body),
+    1
+  )
+  m_seed <- if (isTRUE(body_params$sound_speed < 500)) {
+    0.5 * sound_speed_ratio * broadside_weight^3 * chi_body_abs + 8
+  } else {
+    0.3 * sound_speed_ratio * broadside_weight^3 * chi_body_abs + 6
+  }
+  n_offset <- if (identical(model_params$precision, "quad")) 12 else 8
+  angle_discount <- if (identical(model_params$precision, "quad")) 7 else 5
+  n_seed <- 0.75 * chi_body_abs + n_offset - angle_discount * broadside_weight
+  adaptive_m_max <- ceiling(m_seed)
+  adaptive_n_max <- ceiling(n_seed)
+
+  model_params$acoustics$m_max <- pmax(
+    model_params$acoustics$m_max,
+    adaptive_m_max
+  )
+  model_params$acoustics$n_max <- pmax(
+    model_params$acoustics$n_max,
+    adaptive_n_max,
+    model_params$acoustics$m_max
+  )
+
+  model_params
+}
+
 #' Initialize object for the modal series solution for a prolate spheroid
 #' @param object Scatterer-class object.
 #' @param frequency Frequency vector (Hz).
@@ -416,8 +473,8 @@ NULL
 #' @param precision Numerical precision.
 #' @param n_integration Number of integration points. When left as `NULL`, the
 #' model uses 96 integration points unless `adaptive = TRUE`, in which case a
-#' reduced-frequency-based rule is used internally for full fluid- or
-#' gas-filled runs.
+#' reduced-frequency-based rule is used internally for the full liquid-filled
+#' run.
 #' @param simplify_Amn Calculate the boundary expansion coefficient using a
 #' simplified formulation.
 #' @param sound_speed_sw Seawater sound speed (m/s).
@@ -453,6 +510,16 @@ psms_initialize <- function(object,
   )
   # Determine expansion coefficient Amn method =================================
   model_params$Amn_method <- .psms_Amn_method(boundary, simplify_Amn)
+  if (identical(boundary, "gas_filled") &&
+    identical(model_params$Amn_method, "Amn_fluid_gas")) {
+    warning(
+      "The full gas-filled PSMS kernel solve is numerically unstable in the ",
+      "current implementation; using the simplified gas-filled formulation ",
+      "instead.",
+      call. = FALSE
+    )
+    model_params$Amn_method <- "Amn_fluid_simplify"
+  }
   # Compute body parameters ====================================================
   body_params <- .psms_body_parameters(
     scatterer_shape = scatterer_shape,
@@ -465,6 +532,11 @@ psms_initialize <- function(object,
     model_params = model_params,
     body_params = body_params,
     scatterer_shape = scatterer_shape
+  )
+  model_params <- .psms_promote_gas_modal_limits(
+    model_params = model_params,
+    body_params = body_params,
+    boundary = boundary
   )
   model_params$n_integration <- .psms_n_integration(
     n_integration = n_integration,
@@ -600,7 +672,7 @@ prolate_spheroidal_kernels <- function(
   adaptive = FALSE
 ) {
   # Use the adaptive grouped solver for full fluid penetrable cases ============
-  if (isTRUE(adaptive) && identical(boundary_method, "Amn_fluid")) {
+  if (isTRUE(adaptive) && .psms_is_full_fluid_method(boundary_method)) {
     return(
       .prolate_spheroidal_kernels_adaptive(
         acoustics = acoustics,

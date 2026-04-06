@@ -991,7 +991,8 @@ FluidAmnResult<T> fluid_Amn_triangular_from_boundary(
     T density_body,
     T density_sw,
     const std::vector<T>& nodes,
-    const std::vector<T>& weights
+    const std::vector<T>& weights,
+    bool gas_like = false
 ) {
     // Build the full fluid/gas boundary machinery from explicit boundary
     // matrices, then solve the dense modal systems.
@@ -1005,7 +1006,7 @@ FluidAmnResult<T> fluid_Amn_triangular_from_boundary(
 
     FluidAmnResult<T> out;
     out.smn_body = std::move(external_boundary.smn);
-    out.Amn_tri = solve_fluid_Amn<T>(kernels.rhs, kernels.K3_kernel);
+    out.Amn_tri = solve_fluid_Amn<T>(kernels.rhs, kernels.K3_kernel, gas_like);
     return out;
 }
 
@@ -1019,7 +1020,8 @@ FluidAmnResult<double> fluid_Amn_triangular_vectorized_double(
     double density_body,
     double density_sw,
     const std::vector<double>& nodes,
-    const std::vector<double>& weights
+    const std::vector<double>& weights,
+    bool gas_like = false
 ) {
     auto external_boundary = external_boundary_matrices<double>(
         m_max, n_max, chi_sw, xi, eta_body, true
@@ -1031,7 +1033,7 @@ FluidAmnResult<double> fluid_Amn_triangular_vectorized_double(
 
     FluidAmnResult<double> out;
     out.smn_body = std::move(external_boundary.smn);
-    out.Amn_tri = solve_fluid_Amn<double>(kernels.rhs, kernels.K3_kernel);
+    out.Amn_tri = solve_fluid_Amn<double>(kernels.rhs, kernels.K3_kernel, gas_like);
     return out;
 }
 
@@ -1046,7 +1048,8 @@ FluidAmnResult<T> fluid_Amn_triangular_batched(
     T density_body,
     T density_sw,
     const std::vector<T>& nodes,
-    const std::vector<T>& weights
+    const std::vector<T>& weights,
+    bool gas_like = false
 ) {
     // The batched pathway precomputes the external, internal, and overlap data
     // together so the expensive spheroidal setup is shared across nearby m.
@@ -1072,9 +1075,7 @@ FluidAmnResult<T> fluid_Amn_triangular_batched(
     auto K3_kernel = kernel_scattering_matrix<T>(
         m_max, n_max, prep.smn_body, prep.expansion_matrix, E3_coupling
     );
-    auto Amn = solve_fluid_Amn<T>(
-        rhs, K3_kernel
-    );
+    auto Amn = solve_fluid_Amn<T>(rhs, K3_kernel, gas_like);
 
     FluidAmnResult<T> out;
     out.smn_body = std::move(prep.smn_body);
@@ -1094,27 +1095,28 @@ FluidAmnResult<T> fluid_Amn_triangular(
     T density_sw,
     const std::vector<T>& nodes,
     const std::vector<T>& weights,
-    bool vectorized = false
+    bool vectorized = false,
+    bool gas_like = false
 ) {
     if constexpr (is_quad_precision_v<T>) {
         // Quad precision benefits the most from the batched pathway because the
         // spheroidal backend is the dominant cost.
         return fluid_Amn_triangular_batched<T>(
             m_max, n_max, chi_sw, chi_body, xi, eta_body, density_body, density_sw,
-            nodes, weights
+            nodes, weights, gas_like
         );
     }
     if constexpr (std::is_same_v<T, double>) {
         if (vectorized) {
             return fluid_Amn_triangular_vectorized_double(
                 m_max, n_max, chi_sw, chi_body, xi, eta_body, density_body,
-                density_sw, nodes, weights
+                density_sw, nodes, weights, gas_like
             );
         }
     }
     return fluid_Amn_triangular_from_boundary<T>(
         m_max, n_max, chi_sw, chi_body, xi, eta_body, density_body, density_sw,
-        nodes, weights
+        nodes, weights, gas_like
     );
 }
 
@@ -1922,7 +1924,7 @@ std::vector<std::complex<T>> solve_fluid_mode_system_svd(
 }
 
 template<typename T>
-std::vector<std::complex<T>> solve_fluid_mode_system(
+std::vector<std::complex<T>> solve_fluid_mode_system_default(
     const std::vector<std::complex<T>>& K3_kernel,
     const std::vector<std::complex<T>>& rhs,
     int size
@@ -1931,7 +1933,7 @@ std::vector<std::complex<T>> solve_fluid_mode_system(
 }
 
 template<>
-std::vector<std::complex<acousticts_quad_t>> solve_fluid_mode_system<acousticts_quad_t>(
+std::vector<std::complex<acousticts_quad_t>> solve_fluid_mode_system_default<acousticts_quad_t>(
     const std::vector<std::complex<acousticts_quad_t>>& K3_kernel,
     const std::vector<std::complex<acousticts_quad_t>>& rhs,
     int size
@@ -1941,6 +1943,60 @@ std::vector<std::complex<acousticts_quad_t>> solve_fluid_mode_system<acousticts_
 #else
     return solve_fluid_mode_system_svd<acousticts_quad_t>(K3_kernel, rhs, size);
 #endif
+}
+
+template<typename T>
+std::vector<std::complex<T>> solve_fluid_mode_system_gas(
+    const std::vector<std::complex<T>>& K3_kernel,
+    const std::vector<std::complex<T>>& rhs,
+    int size
+) {
+    // Gas-filled kernel blocks become much more ill-conditioned than the
+    // liquid-filled case because the interior sound-speed contrast is extreme.
+    // Use the pseudoinverse solve here so the gas branch can remain stable
+    // without perturbing the default liquid-filled pathway.
+    return solve_fluid_mode_system_svd<T>(K3_kernel, rhs, size);
+}
+
+template<>
+std::vector<std::complex<acousticts_quad_t>> solve_fluid_mode_system_gas<acousticts_quad_t>(
+    const std::vector<std::complex<acousticts_quad_t>>& K3_kernel,
+    const std::vector<std::complex<acousticts_quad_t>>& rhs,
+    int size
+) {
+    return solve_fluid_mode_system_svd<acousticts_quad_t>(K3_kernel, rhs, size);
+}
+
+template<typename T>
+std::vector<std::complex<T>> solve_fluid_mode_system(
+    const std::vector<std::complex<T>>& K3_kernel,
+    const std::vector<std::complex<T>>& rhs,
+    int size,
+    bool gas_like = false
+) {
+    if (gas_like) {
+        return solve_fluid_mode_system_gas<T>(K3_kernel, rhs, size);
+    }
+    return solve_fluid_mode_system_default<T>(K3_kernel, rhs, size);
+}
+
+template<typename T>
+int psms_gas_degree_limit_for_m(
+    int m,
+    int n_max_fortran,
+    T chi_body
+) {
+    T n_limit = static_cast<T>(n_max_fortran);
+    if (chi_body > T(60)) {
+        n_limit = n_limit -
+            T(0.031) * static_cast<T>(m * m) -
+            (T(80) / std::max(T(1), static_cast<T>(n_max_fortran))) * static_cast<T>(m);
+    } else {
+        n_limit = n_limit - static_cast<T>(m);
+    }
+
+    int n_end = static_cast<int>(std::ceil(static_cast<double>(n_limit)));
+    return std::max(m, n_end);
 }
 
 template<typename T>
@@ -1956,7 +2012,8 @@ std::complex<T> psms_backscatter_fluid_adaptive(
     const std::vector<T>& nodes,
     const std::vector<T>& weights,
     bool normalize = true,
-    bool adaptive = false
+    bool adaptive = false,
+    bool gas_like = false
 ) {
     std::complex<T> fbs_sum(0, 0), c(0, 0);
     T max_band = T(0);
@@ -1985,7 +2042,10 @@ std::complex<T> psms_backscatter_fluid_adaptive(
 
         for (int local_m = 0; local_m < m_count; ++local_m) {
             int m = m_start + local_m;
-            int size = n_max - m + 1;
+            int n_end = gas_like
+                ? psms_gas_degree_limit_for_m<T>(m, n_max, chi_body)
+                : n_max;
+            int size = n_end - m + 1;
             if (size <= 0) {
                 continue;
             }
@@ -2117,7 +2177,7 @@ std::complex<T> psms_backscatter_fluid_adaptive(
                 rhs[li] = -row_sum;
             }
 
-            auto Amn = solve_fluid_mode_system<T>(K3, rhs, size);
+            auto Amn = solve_fluid_mode_system<T>(K3, rhs, size, gas_like);
             T nu_m = (m == 0) ? T(1) : T(2);
             std::complex<T> band_sum(0, 0), band_c(0, 0);
             T max_term = T(0);
@@ -2202,7 +2262,7 @@ std::complex<T> psms_fbs(
 ) {
     T eta_body = preccos(theta_body);
     T eta_scatter = preccos(theta_scatter);
-    T pi_val = preccos(T(-1));
+    T pi_val = precpi<T>();
     bool is_backscatter =
         precabs(theta_scatter - (pi_val - theta_body)) <= T(64) * preceps<T>() &&
         precabs(preccos(phi_body - phi_scatter) + T(1)) <= T(64) * preceps<T>();
@@ -2221,10 +2281,12 @@ std::complex<T> psms_fbs(
 
 #if ACOUSTICTS_HAVE_QUADMATH
     if constexpr (is_quad_precision_v<T>) {
-        if (is_backscatter && Amn_method == "Amn_fluid") {
+        if (is_backscatter &&
+            (Amn_method == "Amn_fluid" || Amn_method == "Amn_fluid_gas")) {
             return psms_backscatter_fluid_adaptive<T>(
                 m_max, n_max, chi_sw, chi_body, xi, eta_body,
-                density_body, density_sw, nodes, weights, true, adaptive
+                density_body, density_sw, nodes, weights, true, adaptive,
+                Amn_method == "Amn_fluid_gas"
             );
         }
     }
@@ -2235,10 +2297,11 @@ std::complex<T> psms_fbs(
     std::vector<std::vector<T>> smn_body_matrix;
 
     // Fluid-filled
-    if (Amn_method == "Amn_fluid") {
+    if (Amn_method == "Amn_fluid" || Amn_method == "Amn_fluid_gas") {
         auto fluid_result = fluid_Amn_triangular<T>(
             m_max, n_max, chi_sw, chi_body, xi,
-            eta_body, density_body, density_sw, nodes, weights, vectorized
+            eta_body, density_body, density_sw, nodes, weights, vectorized,
+            Amn_method == "Amn_fluid_gas"
         );
         smn_body_matrix = std::move(fluid_result.smn_body);
         if (is_backscatter) {

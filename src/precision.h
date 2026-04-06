@@ -91,6 +91,21 @@ inline acousticts_quad_t preccos(acousticts_quad_t x) {
 }
 
 template<typename T>
+inline T precpi() {
+    return std::acos(T(-1));
+}
+
+template<>
+inline acousticts_quad_t precpi<acousticts_quad_t>() {
+#if ACOUSTICTS_HAVE_QUADMATH
+    return acosq(acousticts_quad_t(-1));
+#else
+    using boost::multiprecision::acos;
+    return acos(acousticts_quad_t(-1));
+#endif
+}
+
+template<typename T>
 inline T precsqrt(T x) { return std::sqrt(x); }
 
 template<>

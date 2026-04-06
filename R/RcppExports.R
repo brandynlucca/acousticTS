@@ -2,141 +2,142 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 jc_cpp <- function(z, nu) {
-  .Call(`_acousticTS_jc_cpp`, z, nu)
+    .Call(`_acousticTS_jc_cpp`, z, nu)
 }
 
 yc_cpp <- function(z, nu) {
-  .Call(`_acousticTS_yc_cpp`, z, nu)
+    .Call(`_acousticTS_yc_cpp`, z, nu)
 }
 
 hc_cpp <- function(z, nu) {
-  .Call(`_acousticTS_hc_cpp`, z, nu)
+    .Call(`_acousticTS_hc_cpp`, z, nu)
 }
 
 jc_deriv_cpp <- function(z, nu, k) {
-  .Call(`_acousticTS_jc_deriv_cpp`, z, nu, k)
+    .Call(`_acousticTS_jc_deriv_cpp`, z, nu, k)
 }
 
 yc_deriv_cpp <- function(z, nu, k) {
-  .Call(`_acousticTS_yc_deriv_cpp`, z, nu, k)
+    .Call(`_acousticTS_yc_deriv_cpp`, z, nu, k)
 }
 
 hc_deriv_cpp <- function(z, nu, k) {
-  .Call(`_acousticTS_hc_deriv_cpp`, z, nu, k)
+    .Call(`_acousticTS_hc_deriv_cpp`, z, nu, k)
 }
 
 js_cpp <- function(l, z) {
-  .Call(`_acousticTS_js_cpp`, l, z)
+    .Call(`_acousticTS_js_cpp`, l, z)
 }
 
 ys_cpp <- function(l, z) {
-  .Call(`_acousticTS_ys_cpp`, l, z)
+    .Call(`_acousticTS_ys_cpp`, l, z)
 }
 
 hs_cpp <- function(l, z) {
-  .Call(`_acousticTS_hs_cpp`, l, z)
+    .Call(`_acousticTS_hs_cpp`, l, z)
 }
 
 js_deriv_cpp <- function(l, z, k) {
-  .Call(`_acousticTS_js_deriv_cpp`, l, z, k)
+    .Call(`_acousticTS_js_deriv_cpp`, l, z, k)
 }
 
 ys_deriv_cpp <- function(l, z, k) {
-  .Call(`_acousticTS_ys_deriv_cpp`, l, z, k)
+    .Call(`_acousticTS_ys_deriv_cpp`, l, z, k)
 }
 
 hs_deriv_cpp <- function(l, z, k) {
-  .Call(`_acousticTS_hs_deriv_cpp`, l, z, k)
+    .Call(`_acousticTS_hs_deriv_cpp`, l, z, k)
 }
 
 js_complex_cpp <- function(l, z) {
-  .Call(`_acousticTS_js_complex_cpp`, l, z)
+    .Call(`_acousticTS_js_complex_cpp`, l, z)
 }
 
 ys_complex_cpp <- function(l, z) {
-  .Call(`_acousticTS_ys_complex_cpp`, l, z)
+    .Call(`_acousticTS_ys_complex_cpp`, l, z)
 }
 
 hs_complex_cpp <- function(l, z) {
-  .Call(`_acousticTS_hs_complex_cpp`, l, z)
+    .Call(`_acousticTS_hs_complex_cpp`, l, z)
 }
 
 js_complex_deriv_cpp <- function(l, z, k) {
-  .Call(`_acousticTS_js_complex_deriv_cpp`, l, z, k)
+    .Call(`_acousticTS_js_complex_deriv_cpp`, l, z, k)
 }
 
 ys_complex_deriv_cpp <- function(l, z, k) {
-  .Call(`_acousticTS_ys_complex_deriv_cpp`, l, z, k)
+    .Call(`_acousticTS_ys_complex_deriv_cpp`, l, z, k)
 }
 
 hs_complex_deriv_cpp <- function(l, z, k) {
-  .Call(`_acousticTS_hs_complex_deriv_cpp`, l, z, k)
+    .Call(`_acousticTS_hs_complex_deriv_cpp`, l, z, k)
 }
 
 dwba_fbs_cpp <- function(rpos, k_sw, theta, h, R, subdivisions = 100L, rel_tol = 0.0001220703125, abs_tol = 0.0001220703125) {
-  .Call(`_acousticTS_dwba_fbs_cpp`, rpos, k_sw, theta, h, R, subdivisions, rel_tol, abs_tol)
+    .Call(`_acousticTS_dwba_fbs_cpp`, rpos, k_sw, theta, h, R, subdivisions, rel_tol, abs_tol)
 }
 
 dwba_segment_integrals_cpp <- function(rpos, k_sw, theta, h, R, subdivisions = 100L, rel_tol = 0.0001220703125, abs_tol = 0.0001220703125) {
-  .Call(`_acousticTS_dwba_segment_integrals_cpp`, rpos, k_sw, theta, h, R, subdivisions, rel_tol, abs_tol)
+    .Call(`_acousticTS_dwba_segment_integrals_cpp`, rpos, k_sw, theta, h, R, subdivisions, rel_tol, abs_tol)
 }
 
 gauss_legendre_cpp <- function(n, a = -1.0, b = 1.0) {
-  .Call(`_acousticTS_gauss_legendre_cpp`, n, a, b)
+    .Call(`_acousticTS_gauss_legendre_cpp`, n, a, b)
 }
 
 elastic_shell_boundary_conditions_old <- function(k1a, kLa_shell, kTa_shell, kLa_fluid, kTa_fluid, k3a_fluid, m_vec, lambda, mu, rho_ratio_sw, rho_ratio_fl) {
-  .Call(`_acousticTS_elastic_shell_boundary_conditions_old`, k1a, kLa_shell, kTa_shell, kLa_fluid, kTa_fluid, k3a_fluid, m_vec, lambda, mu, rho_ratio_sw, rho_ratio_fl)
+    .Call(`_acousticTS_elastic_shell_boundary_conditions_old`, k1a, kLa_shell, kTa_shell, kLa_fluid, kTa_fluid, k3a_fluid, m_vec, lambda, mu, rho_ratio_sw, rho_ratio_fl)
 }
 
 elastic_shell_boundary_conditions <- function(ka_matrix, m_limit, lambda, mu, rho_ratio_sw, rho_ratio_fl) {
-  .Call(`_acousticTS_elastic_shell_boundary_conditions`, ka_matrix, m_limit, lambda, mu, rho_ratio_sw, rho_ratio_fl)
+    .Call(`_acousticTS_elastic_shell_boundary_conditions`, ka_matrix, m_limit, lambda, mu, rho_ratio_sw, rho_ratio_fl)
 }
 
 Pn_cpp <- function(n, x) {
-  .Call(`_acousticTS_Pn_cpp`, n, x)
+    .Call(`_acousticTS_Pn_cpp`, n, x)
 }
 
 Pn_deriv_cpp <- function(n, x, k) {
-  .Call(`_acousticTS_Pn_deriv_cpp`, n, x, k)
+    .Call(`_acousticTS_Pn_deriv_cpp`, n, x, k)
 }
 
 Qn_cpp <- function(nu, x) {
-  .Call(`_acousticTS_Qn_cpp`, nu, x)
+    .Call(`_acousticTS_Qn_cpp`, nu, x)
 }
 
 Qn_deriv_cpp <- function(n, x, k) {
-  .Call(`_acousticTS_Qn_deriv_cpp`, n, x, k)
+    .Call(`_acousticTS_Qn_deriv_cpp`, n, x, k)
 }
 
 Smn_cpp <- function(m, n, c, arg, normalize = FALSE, precision = "double") {
-  .Call(`_acousticTS_Smn_cpp`, m, n, c, arg, normalize, precision)
+    .Call(`_acousticTS_Smn_cpp`, m, n, c, arg, normalize, precision)
 }
 
 Rmn_cpp <- function(m, n, c, x1, kind = 1L, precision = "double") {
-  .Call(`_acousticTS_Rmn_cpp`, m, n, c, x1, kind, precision)
+    .Call(`_acousticTS_Rmn_cpp`, m, n, c, x1, kind, precision)
 }
 
 prolate_spheroid_fbs <- function(acoustics, body, medium, integration_pts, precision = "double", Amn_method = "Amn_fluid", adaptive = FALSE, vectorized = FALSE) {
-  .Call(`_acousticTS_prolate_spheroid_fbs`, acoustics, body, medium, integration_pts, precision, Amn_method, adaptive, vectorized)
+    .Call(`_acousticTS_prolate_spheroid_fbs`, acoustics, body, medium, integration_pts, precision, Amn_method, adaptive, vectorized)
 }
 
 prolate_spheroid_tmatrix_cpp <- function(acoustics, body, medium, integration_pts, precision = "double", Amn_method = "Amn_fluid") {
-  .Call(`_acousticTS_prolate_spheroid_tmatrix_cpp`, acoustics, body, medium, integration_pts, precision, Amn_method)
+    .Call(`_acousticTS_prolate_spheroid_tmatrix_cpp`, acoustics, body, medium, integration_pts, precision, Amn_method)
 }
 
 prolate_spheroid_scattering_from_tmatrix_cpp <- function(acoustics, t_matrix, theta_body, phi_body, theta_scatter, phi_scatter, precision = "double") {
-  .Call(`_acousticTS_prolate_spheroid_scattering_from_tmatrix_cpp`, acoustics, t_matrix, theta_body, phi_body, theta_scatter, phi_scatter, precision)
+    .Call(`_acousticTS_prolate_spheroid_scattering_from_tmatrix_cpp`, acoustics, t_matrix, theta_body, phi_body, theta_scatter, phi_scatter, precision)
 }
 
 prolate_spheroid_scattering_grid_from_tmatrix_cpp <- function(acoustics, t_matrix, theta_body, phi_body, theta_scatter, phi_scatter, precision = "double") {
-  .Call(`_acousticTS_prolate_spheroid_scattering_grid_from_tmatrix_cpp`, acoustics, t_matrix, theta_body, phi_body, theta_scatter, phi_scatter, precision)
+    .Call(`_acousticTS_prolate_spheroid_scattering_grid_from_tmatrix_cpp`, acoustics, t_matrix, theta_body, phi_body, theta_scatter, phi_scatter, precision)
 }
 
 tmm_backscatter_cpp <- function(frequency, theta_body, shape, shape_values, boundary, sound_speed_sw, density_sw, density_body, sound_speed_body, n_max) {
-  .Call(`_acousticTS_tmm_backscatter_cpp`, frequency, theta_body, shape, shape_values, boundary, sound_speed_sw, density_sw, density_body, sound_speed_body, n_max)
+    .Call(`_acousticTS_tmm_backscatter_cpp`, frequency, theta_body, shape, shape_values, boundary, sound_speed_sw, density_sw, density_body, sound_speed_body, n_max)
 }
 
 vesms_backscatter_cpp <- function(frequency, m_limit, density_sw, density_viscous, density_shell, density_gas, sound_speed_sw, sound_speed_viscous, sound_speed_gas, radius_viscous, radius_shell, radius_gas, shear_viscosity_viscous, bulk_viscosity_viscous, shear_modulus_shell, lambda_shell) {
-  .Call(`_acousticTS_vesms_backscatter_cpp`, frequency, m_limit, density_sw, density_viscous, density_shell, density_gas, sound_speed_sw, sound_speed_viscous, sound_speed_gas, radius_viscous, radius_shell, radius_gas, shear_viscosity_viscous, bulk_viscosity_viscous, shear_modulus_shell, lambda_shell)
+    .Call(`_acousticTS_vesms_backscatter_cpp`, frequency, m_limit, density_sw, density_viscous, density_shell, density_gas, sound_speed_sw, sound_speed_viscous, sound_speed_gas, radius_viscous, radius_shell, radius_gas, shear_viscosity_viscous, bulk_viscosity_viscous, shear_modulus_shell, lambda_shell)
 }
+

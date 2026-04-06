@@ -236,6 +236,8 @@ Rcpp::List Rmn_cpp(
 
 // ============================================================================
 #include "psms_backscatter.h"
+// Keep this translation unit dependent on the header-only PSMS solver changes
+// so Windows rebuilds the compiled wrapper when those headers change.
 
 // C++-R INTERFACE FUNCTION FOR PROLATE SPHEROID MODAL SERIES SOLUTION
 // ----------------------------------------------------------------------------
