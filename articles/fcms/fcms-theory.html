@@ -132,7 +132,7 @@
 </div>
 <p>The finite cylinder modal series solution (FCMS) is one of the
 standard ways to represent acoustic backscatter from straight cylinders
-of finite length <span class="citation">(<a href="#ref-stanton_sound_1988">Stanton 1988</a>, <a href="#ref-stanton_sound_1989">1989</a>)</span>. Its appeal is that it
+of finite length <span class="citation">(<a href="#ref-Stanton_1988">Stanton 1988</a>, <a href="#ref-Stanton_1989_2">1989</a>)</span>. Its appeal is that it
 retains the exact cylindrical-harmonic treatment of the circular
 cross-section while replacing the fully three-dimensional endcap problem
 with a finite-axis coherence factor. That combination makes the model
@@ -322,9 +322,12 @@ equation:</p>
 <p><span class="math display">
   r^2R'' + rR' + (K^2r^2-m^2)R = 0.
 </span></p>
-<p>This is Bessel’s equation, whose solutions are <span class="math inline">J_m(Kr)</span>, <span class="math inline">Y_m(Kr)</span>, and the outgoing combination <span class="math inline">H_m^{(1)}(Kr)</span>. Regularity at the axis <span class="math inline">r=0</span> excludes the singular solution <span class="math inline">Y_m</span> from the incident and interior regular
-fields, while the outgoing radiation condition selects the Hankel
-function of the first kind for the scattered field.</p>
+<p>This is Bessel’s equation, whose solutions are <span class="math inline">J_m(Kr)</span>, <span class="math inline">Y_m(Kr)</span>, and the outgoing combination <span class="math inline">H_m^{(1)}(Kr)</span> <span class="citation">(<a href="#ref-DLMF:ch10">Folver and Maximon 2026</a>)</span>. Regularity at
+the axis <span class="math inline">r=0</span> excludes the singular
+solution <span class="math inline">Y_m</span> from the incident and
+interior regular fields, while the outgoing radiation condition selects
+the Hankel function of the first kind for the scattered field <span class="citation">(<a href="#ref-Sommerfeld_1949">Sommerfeld
+1949</a>)</span>.</p>
 </div>
 <div class="section level3">
 <h3 id="incident-field-in-cylindrical-coordinates">Incident field in cylindrical coordinates<a class="anchor" aria-label="anchor" href="#incident-field-in-cylindrical-coordinates"></a>
@@ -557,7 +560,7 @@ cross-sectional field, especially at larger acoustic size.</p>
 <p><span class="math display">
   \sigma_\text{bs} = |\mathcal{f}_\text{bs}|^2,
 </span></p>
-<p>The corresponding target strength is:</p>
+<p>The corresponding target strength is <span class="citation">(<a href="#ref-MacLennan_2002">MacLennan, Fernandes, and Dalen 2002</a>; <a href="#ref-Urick_1983">Urick 1983</a>; <a href="#ref-Simmonds_2005">Simmonds and MacLennan 2005</a>)</span>:</p>
 <p><span class="math display">
   TS = 10\log_{10}(\sigma_\text{bs}).
 </span></p>
@@ -593,15 +596,42 @@ defensible.</p>
 <h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
 </h2>
 <div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
-<div id="ref-stanton_sound_1988" class="csl-entry">
+<div id="ref-DLMF:ch10" class="csl-entry">
+Folver, F. W. J., and L. C. Maximon. 2026. <span>“<span>Bessel
+Functions</span>.”</span> In <em><span class="nocase">NIST Digital
+Library of Mathematical Functions</span></em>, edited by F. W. J. Olver,
+A. B. Olde Daalhuis, D. W. Lozier, B. I. Schneider, B. A. Boisvert, C.
+W. Clark, B. R. Miller, B. V. Saunders, H. S. Cohl, and M. A. McClain.
+<a href="https://dlmf.nist.gov/10" class="external-link">https://dlmf.nist.gov/10</a>.
+</div>
+<div id="ref-MacLennan_2002" class="csl-entry">
+MacLennan, David N., Percy G. Fernandes, and John Dalen. 2002. <span>“A
+Consistent Approach to Definitions and Symbols in Fisheries
+Acoustics.”</span> <em>ICES Journal of Marine Science</em> 59 (2):
+365–69. <a href="https://doi.org/10.1006/jmsc.2001.1158" class="external-link">https://doi.org/10.1006/jmsc.2001.1158</a>.
+</div>
+<div id="ref-Simmonds_2005" class="csl-entry">
+Simmonds, John, and David N. MacLennan. 2005. <em>Fisheries Acoustics:
+Theory and Practice</em>. 2nd ed. Oxford, UK: Blackwell Science. <a href="https://doi.org/10.1002/9780470995303" class="external-link">https://doi.org/10.1002/9780470995303</a>.
+</div>
+<div id="ref-Sommerfeld_1949" class="csl-entry">
+Sommerfeld, Arnold. 1949. <em>Partial Differential Equations in
+Physics</em>. Vol. 6. Lectures on Theoretical Physics. New York:
+Academic Press.
+</div>
+<div id="ref-Stanton_1988" class="csl-entry">
 Stanton, T. K. 1988. <span>“Sound Scattering by Cylinders of Finite
 Length. <span>I</span>. <span>Fluid</span> Cylinders.”</span> <em>The
 Journal of the Acoustical Society of America</em> 83 (1): 55–63. <a href="https://doi.org/10.1121/1.396184" class="external-link">https://doi.org/10.1121/1.396184</a>.
 </div>
-<div id="ref-stanton_sound_1989" class="csl-entry">
+<div id="ref-Stanton_1989_2" class="csl-entry">
 ———. 1989. <span>“Sound Scattering by Cylinders of Finite Length.
 <span>III</span>. <span>Deformed</span> Cylinders.”</span> <em>The
 Journal of the Acoustical Society of America</em> 86 (2): 691–705. <a href="https://doi.org/10.1121/1.398193" class="external-link">https://doi.org/10.1121/1.398193</a>.
+</div>
+<div id="ref-Urick_1983" class="csl-entry">
+Urick, Robert J. 1983. <em>Principles of Underwater Sound</em>. 3rd ed.
+New York, NY: McGraw-Hill.
 </div>
 </div>
 </div>

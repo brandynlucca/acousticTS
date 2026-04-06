@@ -123,7 +123,8 @@
 </h2>
 <p>The boundary families summarized here correspond to the classical
 fluid, rigid, elastic, shell, and viscous-interface scattering
-literature <span class="citation">(<a href="#ref-anderson_sound_1950">Anderson 1950</a>; <a href="#ref-faran_sound_1951">Faran 1951</a>; <a href="#ref-goodman_reflection_1962">Goodman and Stern 1962</a>; <a href="#ref-feuillade_nero_1998">Feuillade and Nero 1998</a>)</span>.</p>
+literature <span class="citation">(<a href="#ref-Anderson_1950">Anderson
+1950</a>; <a href="#ref-Faran_1951">Faran 1951</a>; <a href="#ref-Goodman_1962">Goodman and Stern 1962</a>; <a href="#ref-Feuillade_1998">Feuillade and Nero 1998</a>)</span>.</p>
 <p>Boundary conditions are the mathematical statements that turn a
 general wave equation into a specific scattering problem. In
 target-strength modeling, they specify what the target surface can and
@@ -292,10 +293,10 @@ fluid:</p>
     \frac{1}{\rho_2}\frac{\partial p_2}{\partial n}.
 </span></p>
 <p>These are the standard transmission conditions for an acoustic
-fluid-fluid boundary. Neither pressure nor normal motion is forced to
-vanish. Instead, both media participate in the interface dynamics, and
-the scattering is controlled by density and compressibility contrast
-across the boundary.</p>
+fluid-fluid boundary <span class="citation">(<a href="#ref-Morse_1968">Morse and Ingard 1968</a>; <a href="#ref-Medwin_1998">Medwin and Clay 1998</a>)</span>. Neither
+pressure nor normal motion is forced to vanish. Instead, both media
+participate in the interface dynamics, and the scattering is controlled
+by density and compressibility contrast across the boundary.</p>
 </div>
 </div>
 <div class="section level2">
@@ -405,7 +406,8 @@ itself support elastic motion.</p>
 <h3 id="elastic-shell-boundary">Elastic shell boundary<a class="anchor" aria-label="anchor" href="#elastic-shell-boundary"></a>
 </h3>
 <p>An elastic shell supports both longitudinal and transverse elastic
-motion. The displacement field <span class="math inline">\mathbf{u}(\mathbf{x}, t)</span> within the shell
+motion <span class="citation">(<a href="#ref-Achenbach_1973">Achenbach
+1973</a>)</span>. The displacement field <span class="math inline">\mathbf{u}(\mathbf{x}, t)</span> within the shell
 satisfies the Navier equation:</p>
 <p><span class="math display">
   (\lambda + 2 \mu)\nabla(\nabla \cdot \mathbf{u}) -
@@ -413,7 +415,7 @@ satisfies the Navier equation:</p>
     \rho_s \frac{\partial^2 \mathbf{u}}{\partial t^2} =
     0,
 </span></p>
-<p>where <span class="math inline">\lambda</span> and <span class="math inline">\mu</span> are the Lam'e parameters and <span class="math inline">\rho_s</span> is the shell density. Using the
+<p>where <span class="math inline">\lambda</span> and <span class="math inline">\mu</span> are the Lamé parameters and <span class="math inline">\rho_s</span> is the shell density. Using the
 Helmholtz decomposition:</p>
 <p><span class="math display">
   \mathbf{u} = \nabla \phi + \nabla \times \mathbf{\Psi},
@@ -502,10 +504,11 @@ as:</p>
   \gamma_\kappa = \frac{\kappa_2 - \kappa_1}{\kappa_1},
 </span></p>
 <p>where <span class="math inline">\kappa_j = (\rho_j c_j^2)^{-1}</span>
-is compressibility in medium <span class="math inline">j</span>. The
-scattered field is then treated as a first-order perturbation produced
-by these small departures from the surrounding fluid rather than by a
-strongly reflecting or traction-supporting surface.</p>
+is compressibility in medium <span class="math inline">j</span> <span class="citation">(<a href="#ref-Medwin_1998">Medwin and Clay
+1998</a>)</span>. The scattered field is then treated as a first-order
+perturbation produced by these small departures from the surrounding
+fluid rather than by a strongly reflecting or traction-supporting
+surface.</p>
 <p>This is why weak-scattering treatments are usually expressed as
 perturbative approximations instead of exact boundary-value problems
 with a sharply enforcing interface condition. Physically, the target
@@ -517,26 +520,41 @@ by a large impedance jump at the boundary.</p>
 <h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
 </h2>
 <div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
-<div id="ref-anderson_sound_1950" class="csl-entry">
+<div id="ref-Achenbach_1973" class="csl-entry">
+Achenbach, J. D. 1973. <em>Wave Propagation in Elastic Solids</em>.
+North-<span>Holland</span> Series in Applied Mathematics and Mechanics,
+v. 16. Amsterdam New York: North-Holland Pub. Co. American Elsevier Pub.
+Co.
+</div>
+<div id="ref-Anderson_1950" class="csl-entry">
 Anderson, Victor C. 1950. <span>“Sound Scattering from a Fluid
 Sphere.”</span> <em>The Journal of the Acoustical Society of
 America</em> 22 (4): 426–31. <a href="https://doi.org/10.1121/1.1906621" class="external-link">https://doi.org/10.1121/1.1906621</a>.
 </div>
-<div id="ref-faran_sound_1951" class="csl-entry">
+<div id="ref-Faran_1951" class="csl-entry">
 Faran, James J. 1951. <span>“Sound Scattering by Solid Cylinders and
 Spheres.”</span> <em>The Journal of the Acoustical Society of
 America</em> 23 (4): 405–18. <a href="https://doi.org/10.1121/1.1906780" class="external-link">https://doi.org/10.1121/1.1906780</a>.
 </div>
-<div id="ref-feuillade_nero_1998" class="csl-entry">
+<div id="ref-Feuillade_1998" class="csl-entry">
 Feuillade, C., and R. W. Nero. 1998. <span>“A Viscous-Elastic
 Swimbladder Model for Describing Enhanced-Frequency Resonance Scattering
 from Fish.”</span> <em>The Journal of the Acoustical Society of
 America</em> 103 (6): 3245–55. <a href="https://doi.org/10.1121/1.423076" class="external-link">https://doi.org/10.1121/1.423076</a>.
 </div>
-<div id="ref-goodman_reflection_1962" class="csl-entry">
+<div id="ref-Goodman_1962" class="csl-entry">
 Goodman, Ralph R., and Raya Stern. 1962. <span>“Reflection and
 Transmission of Sound by Elastic Spherical Shells.”</span> <em>The
 Journal of the Acoustical Society of America</em> 34 (3): 338–44. <a href="https://doi.org/10.1121/1.1928120" class="external-link">https://doi.org/10.1121/1.1928120</a>.
+</div>
+<div id="ref-Medwin_1998" class="csl-entry">
+Medwin, Herman, and Clarence S. Clay. 1998. <em>Fundamentals of
+Acoustical Oceanography</em>. Applications of Modern Acoustics. San
+Diego, CA: Academic Press.
+</div>
+<div id="ref-Morse_1968" class="csl-entry">
+Morse, Philip M., and K. Uno Ingard. 1968. <em>Theoretical
+Acoustics</em>. New York, NY: McGraw-Hill.
 </div>
 </div>
 </div>

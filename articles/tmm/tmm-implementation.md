@@ -9,8 +9,8 @@ Benchmarked Partially validated Experimental
 
 These pages follow the coefficient-map view of scattering and later
 numerical implementations for axisymmetric bodies ([Waterman
-1969](#ref-waterman_new_1969), [2009](#ref-waterman_t_2009); [Ganesh and
-Hawkins 2022](#ref-ganesh_numerically_2022)).
+1969](#ref-Waterman_1969), [2009](#ref-Waterman_2009); [Ganesh and
+Hawkins 2022](#ref-Ganesh_2022)).
 
 The acousticTS package uses object-based scatterers, so the `TMM`
 workflow follows the same broad structure used elsewhere in the package:

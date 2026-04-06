@@ -9,7 +9,7 @@ Benchmarked Validated
 
 These pages follow Johnson’s asymptotic fluid-sphere formulation and
 Stanton’s generalized approximate backscatter formulas ([Johnson
-1977](#ref-johnson_sound_1977); [Stanton 1989](#ref-stanton_1989)).
+1977](#ref-Johnson_1977); [Stanton 1989](#ref-Stanton_1989_1)).
 
 The high-pass approximation (`HPA`) is a compact asymptotic backscatter
 family that interpolates between a Rayleigh-style low-frequency limit

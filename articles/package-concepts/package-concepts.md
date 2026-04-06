@@ -4,8 +4,8 @@
 
 The package concepts reflect the same divide between exact solutions,
 asymptotic approximations, and organism-specific composites seen in the
-scattering literature ([Jech et al. 2015](#ref-jech_etal_2015); [Stanton
-1996](#ref-stanton_acoustic_1996)).
+scattering literature ([**jech_etal_2015?**](#ref-jech_etal_2015);
+[**stanton_acoustic_1996?**](#ref-stanton_acoustic_1996)).
 
 The package is easiest to use once three ideas are kept separate:
 geometry, physical target type, and scattering model. Those three ideas
@@ -302,15 +302,3 @@ them, those different kinds of documentation still connect cleanly.
   scatterers](https://brandynlucca.github.io/acousticTS/articles/building-scatterers/building-scatterers.md)
 - [Running target strength
   models](https://brandynlucca.github.io/acousticTS/articles/running-models/running-models.md)
-
-## References
-
-Jech, J. Michael, John K. Horne, Dezhang Chu, David A. Demer, David T.
-I. Francis, Natalia Gorska, Benjamin Jones, et al. 2015. “Comparisons
-Among Ten Models of Acoustic Backscattering Used in Aquatic Ecosystem
-Research.” *The Journal of the Acoustical Society of America* 138 (6):
-3742–64. <https://doi.org/10.1121/1.4937607>.
-
-Stanton, T. 1996. “Acoustic Scattering Characteristics of Several
-Zooplankton Groups.” *ICES Journal of Marine Science* 53 (2): 289–95.
-<https://doi.org/10.1006/jmsc.1996.0037>.

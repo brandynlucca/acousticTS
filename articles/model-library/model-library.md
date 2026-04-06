@@ -5,8 +5,7 @@
 The family library is easiest to navigate when read against
 model-comparison reviews, organism-focused scattering surveys, and
 companion open-source modeling ecosystems ([Jech et al.
-2015](#ref-jech_etal_2015); [Stanton 1996](#ref-stanton_acoustic_1996);
-[Lucca and Lee 2026](#ref-brandyn_lucca_osoceanacousticsechopop_2026)).
+2015](#ref-Jech_2015)).
 
 The package contains enough model families that the site works better
 when the model pages are treated as a library rather than as a flat list
@@ -158,10 +157,3 @@ I. Francis, Natalia Gorska, Benjamin Jones, et al. 2015. “Comparisons
 Among Ten Models of Acoustic Backscattering Used in Aquatic Ecosystem
 Research.” *The Journal of the Acoustical Society of America* 138 (6):
 3742–64. <https://doi.org/10.1121/1.4937607>.
-
-Lucca, Brandyn, and Wu-Jung Lee. 2026. “OSOceanAcoustics/Echopop:
-V0.6.0.” Zenodo. <https://doi.org/10.5281/ZENODO.18975959>.
-
-Stanton, T. 1996. “Acoustic Scattering Characteristics of Several
-Zooplankton Groups.” *ICES Journal of Marine Science* 53 (2): 289–95.
-<https://doi.org/10.1006/jmsc.1996.0037>.

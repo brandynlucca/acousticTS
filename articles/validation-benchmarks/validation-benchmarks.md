@@ -3,12 +3,12 @@
 ## Introduction
 
 The validation workflow on this page is grounded in inter-model
-benchmark comparisons and open-software reproductions ([Jech et al.
-2015](#ref-jech_etal_2015); [Demer and Conti
-2003](#ref-demer_validation_2003); [Gastauer, Chu, and Cox
-2019](#ref-gastauer_zooscatrspan_2019); [Gastauer
-2025](#ref-sven_gastauer_svengastauerkrmr_2025); [Betcke and Scroggs
-2021](#ref-betcke_bempp-cl_2021)).
+benchmark comparisons and open-software reproductions
+([**jech_etal_2015?**](#ref-jech_etal_2015);
+[**demer_validation_2003?**](#ref-demer_validation_2003);
+[**gastauer_zooscatrspan_2019?**](#ref-gastauer_zooscatrspan_2019);
+[**sven_gastauer_svengastauerkrmr_2025?**](#ref-sven_gastauer_svengastauerkrmr_2025);
+[**betcke_bempp-cl_2021?**](#ref-betcke_bempp-cl_2021)).
 
 Modeling packages become much more useful when users can distinguish a
 physically surprising result from a setup error. Validation pages help
@@ -327,31 +327,3 @@ mismatches of assumptions.
   functions](https://brandynlucca.github.io/acousticTS/articles/numerical-foundations/numerical-foundations.md)
 - [FAQ and
   troubleshooting](https://brandynlucca.github.io/acousticTS/articles/faq-troubleshooting/faq-troubleshooting.md)
-
-## References
-
-Betcke, Timo, and Matthew Scroggs. 2021. “Bempp-Cl: A Fast Python Based
-Just-in-Time Compiling Boundary Element Library.” *Journal of Open
-Source Software* 6 (59): 2879. <https://doi.org/10.21105/joss.02879>.
-
-Demer, David A., and Stéphane G. Conti. 2003. “Validation of the
-Stochastic Distorted-Wave Born Approximation Model with Broad Bandwidth
-Total Target Strength Measurements of Antarctic Krill.” *ICES Journal of
-Marine Science* 60 (3): 625–35.
-<https://doi.org/10.1016/S1054-3139(03)00063-8>.
-
-Gastauer, Sven. 2025. “SvenGastauer/KRMr: V0.4.8.” Zenodo.
-<https://doi.org/10.5281/ZENODO.15838374>.
-
-Gastauer, Sven, Dezhang Chu, and Martin J. Cox. 2019. “ZooScatR—An
-\<Span Style="font-Variant:small-Caps;"\>r\</Span\> Package for
-Modelling the Scattering Properties of Weak Scattering Targets Using the
-Distorted Wave Born Approximation.” *The Journal of the Acoustical
-Society of America* 145 (1): EL102–8.
-<https://doi.org/10.1121/1.5085655>.
-
-Jech, J. Michael, John K. Horne, Dezhang Chu, David A. Demer, David T.
-I. Francis, Natalia Gorska, Benjamin Jones, et al. 2015. “Comparisons
-Among Ten Models of Acoustic Backscattering Used in Aquatic Ecosystem
-Research.” *The Journal of the Acoustical Society of America* 138 (6):
-3742–64. <https://doi.org/10.1121/1.4937607>.

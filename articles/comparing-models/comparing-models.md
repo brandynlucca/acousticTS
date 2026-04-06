@@ -4,8 +4,8 @@
 
 Cross-model comparison is most informative when the candidate families
 are read against broader reviews and inter-model benchmark studies
-([Jech et al. 2015](#ref-jech_etal_2015); [Stanton
-1996](#ref-stanton_acoustic_1996)).
+([**jech_etal_2015?**](#ref-jech_etal_2015);
+[**stanton_acoustic_1996?**](#ref-stanton_acoustic_1996)).
 
 One of the strongest uses of acousticTS is not simply running a single
 model, but asking how several models behave on the same target
@@ -289,15 +289,3 @@ may still be useful, but it is no longer isolating model behavior alone.
 The safest workflow is therefore simple: hold the target definition
 steady, compare one quantity at a time, and interpret disagreement in
 terms of the physical assumptions each model was designed to represent.
-
-## References
-
-Jech, J. Michael, John K. Horne, Dezhang Chu, David A. Demer, David T.
-I. Francis, Natalia Gorska, Benjamin Jones, et al. 2015. “Comparisons
-Among Ten Models of Acoustic Backscattering Used in Aquatic Ecosystem
-Research.” *The Journal of the Acoustical Society of America* 138 (6):
-3742–64. <https://doi.org/10.1121/1.4937607>.
-
-Stanton, T. 1996. “Acoustic Scattering Characteristics of Several
-Zooplankton Groups.” *ICES Journal of Marine Science* 53 (2): 289–95.
-<https://doi.org/10.1006/jmsc.1996.0037>.

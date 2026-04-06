@@ -9,8 +9,8 @@ Unvalidated
 
 These pages are grounded in the classical elastic-shell scattering
 literature for fluid-filled spherical shells ([Goodman and Stern
-1962](#ref-goodman_reflection_1962); [Faran
-1951](#ref-faran_sound_1951); [Stanton 1990](#ref-stanton_sound_1990)).
+1962](#ref-Goodman_1962); [Faran 1951](#ref-Faran_1951); [Stanton
+1990](#ref-Stanton_1990)).
 
 The acousticTS package uses object-based scatterers so the same
 implementation pattern carries across models: create a scatterer, run

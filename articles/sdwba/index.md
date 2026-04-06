@@ -9,9 +9,8 @@ Benchmarked Validated
 
 These pages connect krill-body DWBA models to phase variability,
 orientation effects, and practical survey use ([Demer and Conti
-2003a](#ref-demer_reconciling_2003); [Demer and Conti
-2003b](#ref-demer_validation_2003), [2005](#ref-demer_new_2005); [Conti
-and Demer 2006](#ref-conti_improved_2006)).
+2003a](#ref-Demer_2003_1); [Demer and Conti 2003b](#ref-Demer_2003_2),
+[2005](#ref-Demer_2005); [Conti and Demer 2006](#ref-Conti_2006)).
 
 The stochastic distorted wave Born approximation (`SDWBA`) extends the
 deterministic `DWBA` by treating unresolved posture and shape

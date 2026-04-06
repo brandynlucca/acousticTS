@@ -4,9 +4,8 @@
 
 The notation on this page follows standard scattering texts for
 Helmholtz, elastic-wave, and basis-expansion formulations ([Morse and
-Ingard 1986](#ref-morse_theoretical_1986); [Flammer
-1957](#ref-flammer_spheroidal_1957); [Waterman
-2009](#ref-waterman_t_2009)).
+Ingard 1968](#ref-Morse_1968); [Flammer 1957](#ref-Flammer_1957);
+[Waterman 2009](#ref-Waterman_2009)).
 
 This page is the compact notation guide for the package theory articles.
 The model-family pages still define symbols locally when needed, but the
@@ -57,14 +56,14 @@ layered sphere can use media `1`, `2`, `3`, and `4`.
 
 ## Material properties and contrasts
 
-| Symbol    | Meaning                                     | Typical units |
-|-----------|---------------------------------------------|---------------|
-| \rho_j    | density in medium j                         | kg m^{-3}     |
-| \kappa_j  | compressibility in medium j                 | Pa^{-1}       |
-| \lambda_j | Lam'e’s first parameter in elastic medium j | Pa            |
-| \mu_j     | shear modulus in elastic medium j           | Pa            |
-| g\_{ij}   | density contrast, \rho_i / \rho_j           | dimensionless |
-| h\_{ij}   | sound-speed contrast, c_i / c_j             | dimensionless |
+| Symbol    | Meaning                                    | Typical units |
+|-----------|--------------------------------------------|---------------|
+| \rho_j    | density in medium j                        | kg m^{-3}     |
+| \kappa_j  | compressibility in medium j                | Pa^{-1}       |
+| \lambda_j | Lamé’s first parameter in elastic medium j | Pa            |
+| \mu_j     | shear modulus in elastic medium j          | Pa            |
+| g\_{ij}   | density contrast, \rho_i / \rho_j          | dimensionless |
+| h\_{ij}   | sound-speed contrast, c_i / c_j            | dimensionless |
 
 Important examples: body relative to seawater is expressed with g\_{21}
 and h\_{21}, a shell relative to seawater is likewise expressed with
@@ -122,8 +121,8 @@ h\_{21}, h\_{32}, and so on.
 Flammer, Carson. 1957. *Spheroidal Wave Functions*.
 <https://ui.adsabs.harvard.edu/abs/1957spwf.book.....F>.
 
-Morse, Philip M., and K. Uno Ingard. 1986. *Theoretical Acoustics*.
-Princeton, N.J: Princeton University Press.
+Morse, Philip M., and K. Uno Ingard. 1968. *Theoretical Acoustics*. New
+York, NY: McGraw-Hill.
 
 Waterman, P. C. 2009. “T -Matrix Methods in Acoustic Scattering.” *The
 Journal of the Acoustical Society of America* 125 (1): 42–51.

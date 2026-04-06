@@ -9,7 +9,7 @@ Unvalidated Experimental
 
 This family follows the deformed-cylinder and coherence-corrected
 cylinder literature for weakly scattering elongated bodies ([Stanton
-1989](#ref-stanton_sound_1989), [1988](#ref-stanton_sound_1988)).
+1989](#ref-Stanton_1989_2), [1988](#ref-Stanton_1988)).
 
 The bent cylinder modal series solution (`BCMS`) extends the straight
 finite-cylinder modal family to uniformly bent cylinders by keeping the

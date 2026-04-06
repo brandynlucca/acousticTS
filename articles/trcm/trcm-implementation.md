@@ -8,9 +8,9 @@ Benchmarked Unvalidated
 [Theory](https://brandynlucca.github.io/acousticTS/articles/trcm/trcm-theory.md)
 
 These pages come from the high-frequency elongated-body literature and
-later fish and zooplankton applications ([Stanton et al.
-1993](#ref-stanton_etal_1993), [1998](#ref-stanton_sound_1998);
-[Stanton, Chu, and Wiebe 1998](#ref-stanton_sound_1998-1)).
+later fish and zooplankton applications ([Timothy K. Stanton et al.
+1993](#ref-Stanton_1993), [1998](#ref-Stanton_1998_1); [Timothy K.
+Stanton, Chu, and Wiebe 1998](#ref-Stanton_1998_2)).
 
 The acousticTS package uses object-based scatterers so the same
 implementation pattern carries across models: create a scatterer, run
@@ -179,13 +179,14 @@ TRCM spans two geometry regimes, so the implementation checks should do
 the same. The straight-cylinder branch can still be compared against the
 canonical weakly scattering cylinder reference curve. The bent-cylinder
 branch is compared against the broadside bent-cylinder construction
-implied by Stanton (1989, Eq. 25-26): the straight finite-cylinder modal
-coefficient sum is retained, and curvature enters through the exact
-Fresnel-type coherence integral along the bent axis. In the table below,
-that bent reference uses the uniformly bent weak-fluid cylinder setup
-discussed by Stanton (1989) and Stanton et al. (1993): `L/a = 10.5`,
-`rho_c/L = 1.5`, `g = 1.0357`, `h = 1.0279`, and `ka` spanning `0.1` to
-`10`.
+implied by Eq. 25-26 in T. K. Stanton ([1989](#ref-Stanton_1989_2)): the
+straight finite-cylinder modal coefficient sum is retained, and
+curvature enters through the exact Fresnel-type coherence integral along
+the bent axis. In the table below, that bent reference uses the
+uniformly bent weak-fluid cylinder setup discussed by T. K. Stanton
+([1989](#ref-Stanton_1989_2)) and Timothy K. Stanton et al.
+([1993](#ref-Stanton_1993)): `L/a = 10.5`, `rho_c/L = 1.5`,
+`g = 1.0357`, `h = 1.0279`, and `ka` spanning `0.1` to `10`.
 
 | Geometry          | Implementation branch                                | Reference family                                                    | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | Elapsed (s) |
 |:------------------|:-----------------------------------------------------|:--------------------------------------------------------------------|------------------------:|-------------------------:|------------:|
@@ -209,13 +210,17 @@ is being mishandled.
 
 ## References
 
+Stanton, T. K. 1989. “Sound Scattering by Cylinders of Finite Length.
+III. Deformed Cylinders.” *The Journal of the Acoustical Society of
+America* 86 (2): 691–705. <https://doi.org/10.1121/1.398193>.
+
 Stanton, Timothy K., Dezhang Chu, and Peter H. Wiebe. 1998. “Sound
 Scattering by Several Zooplankton Groups. II. Scattering Models.” *The
 Journal of the Acoustical Society of America* 103 (1): 236–53.
 <https://doi.org/10.1121/1.421110>.
 
 Stanton, Timothy K., Dezhang Chu, Peter H. Wiebe, and Clarence S. Clay.
-1993. “Average Echoes from Randomly Oriented Random‐length Finite
+1993. “Average Echoes from Randomly Oriented Random-Length Finite
 Cylinders: Zooplankton Models.” *The Journal of the Acoustical Society
 of America* 94 (6): 3463–72. <https://doi.org/10.1121/1.407200>.
 

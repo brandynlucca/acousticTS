@@ -9,8 +9,7 @@ Validated Experimental
 
 These pages follow the phase-compensated weak-scattering literature for
 broadside elongated bodies and krill-style applications ([Chu and Ye
-1999](#ref-chu_phase-compensated_1999); [Chu, Foote, and Stanton
-1993](#ref-chu_further_1993); [Stanton 1989](#ref-stanton_sound_1989)).
+1999](#ref-Chu_1999); [Chu, Foote, and Stanton 1993](#ref-Chu_1993)).
 
 The phase-compensated distorted wave Born approximation (`PCDWBA`) is
 the curved-body extension of the weak-scattering `DWBA`. It keeps the
@@ -72,7 +71,3 @@ Born Approximation Representation of the Bistatic Scattering by Weakly
 Scattering Objects: Application to Zooplankton.” *The Journal of the
 Acoustical Society of America* 106 (4): 1732–43.
 <https://doi.org/10.1121/1.428036>.
-
-Stanton, T. K. 1989. “Sound Scattering by Cylinders of Finite Length.
-III. Deformed Cylinders.” *The Journal of the Acoustical Society of
-America* 86 (2): 691–705. <https://doi.org/10.1121/1.398193>.

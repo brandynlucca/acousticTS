@@ -9,7 +9,7 @@ Benchmarked Validated
 
 These pages follow the finite-cylinder modal-series literature for
 straight circular cylinders near broadside ([Stanton
-1988](#ref-stanton_sound_1988), [1989](#ref-stanton_sound_1989)).
+1988](#ref-Stanton_1988), [1989](#ref-Stanton_1989_2)).
 
 The finite cylinder modal series solution (`FCMS`) is the package’s
 geometry-matched cylinder family for straight circular cylinders. It

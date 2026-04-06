@@ -4,10 +4,8 @@
 
 The scatterer classes in `acousticTS` are organized around target types
 that recur across fisheries and zooplankton acoustics, from calibration
-spheres to weakly scattering elongated bodies and composite fish targets
-([Foote 1990](#ref-foote_spheres_1990); [Stanton
-1996](#ref-stanton_acoustic_1996); [Clay and Horne
-1994](#ref-clay_horne_1994)).
+spheres to weakly scattering elongated bodies and composite fish
+targets.
 
 Once a geometry exists, it still has to be assigned a physical
 interpretation before most models in acousticTS can be run. That is the
@@ -444,17 +442,3 @@ continuation of this article is [running target strength
 models](https://brandynlucca.github.io/acousticTS/articles/running-models/running-models.md),
 while the conceptual continuation is [choosing a
 model](https://brandynlucca.github.io/acousticTS/articles/model-selection/model-selection.md).
-
-## References
-
-Clay, Clarence S., and John K. Horne. 1994. “Acoustic Models of Fish:
-The Atlantic Cod (*Gadus Morhua*).” *The Journal of the Acoustical
-Society of America* 96 (3): 1661–68. <https://doi.org/10.1121/1.410245>.
-
-Foote, K. G. 1990. “Spheres for Calibrating an Eleven-Frequency Acoustic
-Measurement System.” *ICES Journal of Marine Science* 46 (3): 284–86.
-<https://doi.org/10.1093/icesjms/46.3.284>.
-
-Stanton, T. 1996. “Acoustic Scattering Characteristics of Several
-Zooplankton Groups.” *ICES Journal of Marine Science* 53 (2): 289–95.
-<https://doi.org/10.1006/jmsc.1996.0037>.

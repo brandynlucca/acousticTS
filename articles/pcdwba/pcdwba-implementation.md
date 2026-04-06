@@ -9,8 +9,7 @@ Validated Experimental
 
 These pages follow the phase-compensated weak-scattering literature for
 broadside elongated bodies and krill-style applications ([Chu and Ye
-1999](#ref-chu_phase-compensated_1999); [Chu, Foote, and Stanton
-1993](#ref-chu_further_1993); [Stanton 1989](#ref-stanton_sound_1989)).
+1999](#ref-Chu_1999); [Chu, Foote, and Stanton 1993](#ref-Chu_1993)).
 
 The phase-compensated distorted wave Born approximation is available
 through `target_strength(..., model = "pcdwba")`. The implementation is
@@ -20,13 +19,15 @@ bent cylinder or an arbitrary fluid-like profile.
 
 This page checks the implementation against two source-level references:
 
-- the `pcdwba_fbs` routine in the local `echopop` source tree,
-- the bent-cylinder DWBA routines in the local `ZooScatR` source tree.
+- the `pcdwba_fbs` routine in the `Python` package Echopop (Lucca and
+  Lee ([2026](#ref-Echopop_software))),
+- the bent-cylinder DWBA routines in the `R`-package ZooScatR (Gastauer,
+  Chu, and Cox ([2019](#ref-ZooScatR_software))) .
 
 `PCDWBA` is validated here against source-level reference
 implementations rather than against a separate published benchmark
-table. The `ZooScatR` source agrees exactly on the shared case, while
-the remaining `echopop` drift is attributable to that implementation’s
+table. The ZooScatR source agrees exactly on the shared case, while the
+remaining Echopop drift is attributable to that implementation’s
 interpolated Bessel evaluation.
 
 ### Reference case
@@ -90,14 +91,14 @@ head(extract(pcdwba_object, "model")$PCDWBA)
 | acousticTS vs ZooScatR-source |                0.000000 |                 0.000000 |
 | echopop vs ZooScatR-source    |                0.073947 |                 0.001123 |
 
-The `ZooScatR` source-level reconstruction and acousticTS are
-indistinguishable on this grid. The `echopop` comparison remains close
-as well, but it is not at machine precision because that implementation
-evaluates the cylindrical Bessel term through interpolation rather than
-a direct nodewise call. On this grid, the largest mismatch occurs near
-`112 kHz`; replacing the interpolated `J_1(x)/x` evaluation with a
-direct call collapses that residual onto the acousticTS / `ZooScatR`
-curve. So the remaining drift is numerical, not geometrical.
+The ZooScatR and acousticTS outputs are indistinguishable on this grid.
+The Echopop comparison remains close as well, but it is not at machine
+precision because that implementation evaluates the cylindrical Bessel
+term through interpolation rather than a direct nodewise call. On this
+grid, the largest mismatch occurs near `112 kHz`; replacing the
+interpolated `J_1(x)/x` evaluation with a direct call collapses that
+residual onto the acousticTS / ZooScatR curve. So the remaining drift is
+numerical, not geometrical.
 
 #### Timings
 
@@ -120,7 +121,7 @@ phase-compensated bent-cylinder solver. The comparison is not just
 against a benchmark curve. It is against two independently written
 source routines that share the same governing model. On this reference
 case, acousticTS reproduces the direct ZooScatR-style calculation
-exactly and stays very close to the `echopop` implementation across the
+exactly and stays very close to the Echopop implementation across the
 full frequency band.
 
 ## References
@@ -137,6 +138,12 @@ Scattering Objects: Application to Zooplankton.” *The Journal of the
 Acoustical Society of America* 106 (4): 1732–43.
 <https://doi.org/10.1121/1.428036>.
 
-Stanton, T. K. 1989. “Sound Scattering by Cylinders of Finite Length.
-III. Deformed Cylinders.” *The Journal of the Acoustical Society of
-America* 86 (2): 691–705. <https://doi.org/10.1121/1.398193>.
+Gastauer, Sven, Dezhang Chu, and Martin J. Cox. 2019. “ZooScatR—An
+\<Span Style="font-Variant:small-Caps;"\>r\</Span\> Package for
+Modelling the Scattering Properties of Weak Scattering Targets Using the
+Distorted Wave Born Approximation.” *The Journal of the Acoustical
+Society of America* 145 (1): EL102–8.
+<https://doi.org/10.1121/1.5085655>.
+
+Lucca, Brandyn, and Wu-Jung Lee. 2026. “OSOceanAcoustics/Echopop:
+V0.6.0.” Zenodo. <https://doi.org/10.5281/ZENODO.18975959>.

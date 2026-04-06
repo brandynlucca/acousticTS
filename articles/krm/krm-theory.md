@@ -14,9 +14,9 @@ body is treated with a Kirchhoff-ray approximation appropriate for a
 weakly contrasting, smoothly varying, elongated fluid-like body, while
 the swimbladder is treated either by a low-order modal approximation
 when its acoustic size is small or by a Kirchhoff approximation when it
-is larger ([C. S. Clay 1991](#ref-clay_1991); [Clarence S. Clay
-1992](#ref-clay_1992); [Clarence S. Clay and Horne
-1994](#ref-clay_horne_1994)).
+is larger ([C. S. Clay 1991](#ref-Clay_1991); [Clarence S. Clay
+1992](#ref-Clay_1992); [Clarence S. Clay and Horne
+1994](#ref-Clay_1994)).
 
 Its body term therefore uses weak fluid-like tissue contrasts at a fluid
 interface, while its swimbladder term uses a much stronger gas-tissue
@@ -442,7 +442,9 @@ The backscattering cross-section is therefore:
 
 \sigma\_\text{bs} = \|\mathcal{f}\_\text{bs}\|^2
 
-and the target strength is:
+and the target strength is ([MacLennan, Fernandes, and Dalen
+2002](#ref-MacLennan_2002); [Urick 1983](#ref-Urick_1983); [Simmonds and
+MacLennan 2005](#ref-Simmonds_2005)):
 
 TS = 20\log\_{10}\|\mathcal{f}\_\text{bs}\|.
 
@@ -478,11 +480,23 @@ Fluid-Filled Cylinders and Fish with Swim Bladders.” *The Journal of the
 Acoustical Society of America* 89 (5): 2168–79.
 <https://doi.org/10.1121/1.400910>.
 
-Clay, Clarence S. 1992. “Composite Ray‐mode Approximations for
-Backscattered Sound from Gas‐filled Cylinders and Swimbladders.” *The
+Clay, Clarence S. 1992. “Composite Ray-Mode Approximations for
+Backscattered Sound from Gas-Filled Cylinders and Swimbladders.” *The
 Journal of the Acoustical Society of America* 92 (4): 2173–80.
 <https://doi.org/10.1121/1.405211>.
 
 Clay, Clarence S., and John K. Horne. 1994. “Acoustic Models of Fish:
 The Atlantic Cod (*Gadus Morhua*).” *The Journal of the Acoustical
 Society of America* 96 (3): 1661–68. <https://doi.org/10.1121/1.410245>.
+
+MacLennan, David N., Percy G. Fernandes, and John Dalen. 2002. “A
+Consistent Approach to Definitions and Symbols in Fisheries Acoustics.”
+*ICES Journal of Marine Science* 59 (2): 365–69.
+<https://doi.org/10.1006/jmsc.2001.1158>.
+
+Simmonds, John, and David N. MacLennan. 2005. *Fisheries Acoustics:
+Theory and Practice*. 2nd ed. Oxford, UK: Blackwell Science.
+<https://doi.org/10.1002/9780470995303>.
+
+Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed. New
+York, NY: McGraw-Hill.

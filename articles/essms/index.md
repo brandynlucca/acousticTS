@@ -9,8 +9,8 @@ Unvalidated
 
 These pages are grounded in the classical elastic-shell scattering
 literature for fluid-filled spherical shells ([Goodman and Stern
-1962](#ref-goodman_reflection_1962); [Faran
-1951](#ref-faran_sound_1951); [Stanton 1990](#ref-stanton_sound_1990)).
+1962](#ref-Goodman_1962); [Faran 1951](#ref-Faran_1951); [Stanton
+1990](#ref-Stanton_1990)).
 
 The elastic shelled spherical modal series (`ESSMS`) is the package’s
 layered spherical family for an elastic shell surrounding either a fluid

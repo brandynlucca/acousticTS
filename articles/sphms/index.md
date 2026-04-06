@@ -9,8 +9,8 @@ Benchmarked Validated
 
 These pages follow the classical exact sphere literature for fluid,
 elastic, and approximate shell limits ([Anderson
-1950](#ref-anderson_sound_1950); [Faran 1951](#ref-faran_sound_1951);
-[Hickling 1962](#ref-hickling_analysis_1962)).
+1950](#ref-Anderson_1950); [Faran 1951](#ref-Faran_1951); [Hickling
+1962](#ref-Hickling_1962)).
 
 The spherical modal series solution (`SPHMS`) is the package’s exact
 canonical solution for unshelled homogeneous spheres in an exterior

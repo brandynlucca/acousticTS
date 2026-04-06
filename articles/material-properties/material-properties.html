@@ -123,9 +123,8 @@
 </h2>
 <p>The property conventions on this page follow standard acoustics and
 elastic-wave references used throughout underwater scattering theory
-<span class="citation">(<a href="#ref-medwin_fundamentals_1998">Medwin
-and Clay 1998</a>; <a href="#ref-achenbach_wave_1973">Achenbach
-1973</a>)</span>.</p>
+<span class="citation">(<a href="#ref-Medwin_1998">Medwin and Clay
+1998</a>; <a href="#ref-Achenbach_1973">Achenbach 1973</a>)</span>.</p>
 <p>Many modeling errors are not caused by the scattering model itself.
 They are caused by incorrect material properties, inconsistent
 contrasts, or unit conversion mistakes. This article collects the
@@ -147,7 +146,7 @@ situation the reader believes they are describing.</p>
 </h2>
 <p>The package includes utilities for density- and sound-speed-derived
 quantities, compressibility- and impedance-related calculations, elastic
-moduli such as Lam'e parameters, shear modulus, Poisson ratio, and
+moduli such as Lamé parameters, shear modulus, Poisson ratio, and
 Young’s modulus, wavenumber and acoustic-size conversions, and
 logarithmic and linear-scale conversions. The functions are small, but
 they are central. Nearly every model in the package uses some subset of
@@ -270,7 +269,8 @@ for a given target. Density contrast alone is rarely the whole story.
 Compressibility, impedance mismatch, and the joint behavior of density
 and sound speed are often the quantities that determine whether a target
 behaves as weakly scattering, strongly reflecting, or something in
-between.</p>
+between <span class="citation">(<a href="#ref-Medwin_1998">Medwin and
+Clay 1998</a>)</span>.</p>
 <p>This is one of the most common places where intuition can go wrong. A
 target may have density close to water but still differ noticeably in
 sound speed, or vice versa. Looking only at one property can therefore
@@ -283,13 +283,13 @@ consequential.</p>
 </h2>
 <p>Shell and solid-sphere models need elastic constants that are often
 reported inconsistently across sources. One paper may give <span class="math inline">E</span> and <span class="math inline">\nu</span>,
-another may give <span class="math inline">K</span> and <span class="math inline">G</span>, and a third may effectively imply Lam'e
+another may give <span class="math inline">K</span> and <span class="math inline">G</span>, and a third may effectively imply Lamé
 parameters. The package utilities make it easier to move among those
 descriptions.</p>
 <p>Representative functions include <code><a href="../../reference/pois.html">pois()</a></code> for Poisson
 ratio, <code><a href="../../reference/bulk.html">bulk()</a></code> for bulk modulus, <code><a href="../../reference/young.html">young()</a></code> for
 Young’s modulus, <code><a href="../../reference/shear.html">shear()</a></code> for shear modulus, and
-<code><a href="../../reference/lame.html">lame()</a></code> for the Lam'e parameter.</p>
+<code><a href="../../reference/lame.html">lame()</a></code> for the Lamé parameter <span class="citation">(<a href="#ref-Achenbach_1973">Achenbach 1973</a>)</span>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">E</span> <span class="op">&lt;-</span> <span class="fl">7e10</span></span>
 <span><span class="va">nu</span> <span class="op">&lt;-</span> <span class="fl">0.32</span></span>
@@ -312,8 +312,8 @@ match the package argument names.</p>
 <p>These conversions are not merely notational. Different elastic
 quantities emphasize different physical aspects of a material. Young’s
 modulus and Poisson ratio are often how a material is reported
-mechanically, while shear modulus, bulk modulus, and Lam'e parameters
-are often closer to the quantities that enter wave propagation and
+mechanically, while shear modulus, bulk modulus, and Lamé parameters are
+often closer to the quantities that enter wave propagation and
 boundary-condition formulas. A careful workflow therefore converts once,
 checks consistency, and then carries the internally consistent elastic
 set through the model setup.</p>
@@ -406,15 +406,16 @@ troubleshooting</a></li>
 <h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
 </h2>
 <div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
-<div id="ref-achenbach_wave_1973" class="csl-entry">
+<div id="ref-Achenbach_1973" class="csl-entry">
 Achenbach, J. D. 1973. <em>Wave Propagation in Elastic Solids</em>.
 North-<span>Holland</span> Series in Applied Mathematics and Mechanics,
 v. 16. Amsterdam New York: North-Holland Pub. Co. American Elsevier Pub.
 Co.
 </div>
-<div id="ref-medwin_fundamentals_1998" class="csl-entry">
+<div id="ref-Medwin_1998" class="csl-entry">
 Medwin, Herman, and Clarence S. Clay. 1998. <em>Fundamentals of
-Acoustical Oceanography</em>. Boston: Academic Press.
+Acoustical Oceanography</em>. Applications of Modern Acoustics. San
+Diego, CA: Academic Press.
 </div>
 </div>
 </div>

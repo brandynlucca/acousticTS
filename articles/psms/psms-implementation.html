@@ -131,10 +131,8 @@
 </div>
 </div>
 <p>These pages are rooted in exact spheroidal-coordinate separations and
-later fisheries-acoustics use of prolate-spheroid models <span class="citation">(<a href="#ref-spence_scattering_1951">Spence and
-Granger 1951</a>; <a href="#ref-flammer_spheroidal_1957">Flammer
-1957</a>; <a href="#ref-furusawa_prolate_1988">Furusawa
-1988</a>)</span>.</p>
+later fisheries-acoustics use of prolate-spheroid models <span class="citation">(<a href="#ref-Spence_1951">Spence and Granger
+1951</a>; <a href="#ref-Furusawa_1988">Furusawa 1988</a>)</span>.</p>
 <p>The acousticTS package uses object-based scatterers so the same
 implementation pattern carries across models: create a scatterer, run
 <code><a href="../../reference/target_strength.html">target_strength()</a></code>, inspect the stored model output, and
@@ -212,14 +210,17 @@ controls the roll orientation used in the spheroidal geometry, and
 affects how the coupled fluid-filled system is evaluated
 numerically.</p>
 <p>For PSMS, <code>boundary = "liquid_filled"</code> and
-<code>boundary = "gas_filled"</code> use the same coupled
-fluid-interface formulation. The difference is not a separate boundary
-equation. It is the material contrast carried by the scatterer object
-itself: an <code>FLS</code> object supplies liquid-like body properties,
-while a <code>GAS</code> object supplies gas-like body properties. In
-that sense, the two options are best read as liquid-filled and
-gas-filled instantiations of the same underlying fluid-filled PSMS
-solve.</p>
+<code>boundary = "gas_filled"</code> use the same penetrable-interface
+formulation. The difference is not a separate boundary equation. It is
+the material contrast carried by the scatterer object itself: an
+<code>FLS</code> object supplies liquid-like body properties, while a
+<code>GAS</code> object supplies gas-like body properties. In that
+sense, the two options are best read as liquid-filled and gas-filled
+instantiations of the same underlying penetrable PSMS problem. In the
+current implementation, however, the public gas-filled path is routed
+onto the simplified penetrable formulation because that is the branch
+that stays externally consistent on the published benchmark
+geometry.</p>
 <p>For rigid and pressure-release boundaries, the PSMS bookkeeping is
 simpler because the modal coefficients remain effectively diagonal by
 retained degree. For fluid-filled runs, the numerical settings deserve
@@ -227,12 +228,12 @@ more attention because the overlap integrals and dense solves are part
 of the practical calculation.</p>
 <div class="caution" data-title="Quad precision and fluid-filled PSMS">
 <p>If <code>precision = "quad"</code> is requested, the main practical
-warning is cost. Quad precision remains substantially slower than double
-precision because the spheroidal functions, overlap integrals, and
-kernel matrices all grow quickly with acoustic size. That is true for
-every PSMS boundary, and it is especially important for full
-fluid-filled or gas-filled runs with
-<code>simplify_Amn = FALSE</code>.</p>
+warning is cost. <a href="https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format" class="external-link">Quad
+precision</a> remains substantially slower than double precision because
+the spheroidal functions, overlap integrals, and kernel matrices all
+grow quickly with acoustic size. That is true for every PSMS boundary,
+and it is especially important for the full liquid-filled solve and for
+the externally benchmarked gas-filled simplified branch.</p>
 <p>The implementation reduces some of that burden by batching
 spheroidal-function calls over blocks of <span class="math inline">m</span>, reusing the incident angular matrix to
 construct the backscatter angular matrix through parity, and avoiding
@@ -256,7 +257,8 @@ a fully literal retained-mode evaluation from a more pragmatic
 backscatter evaluation. The important point is that
 <code>adaptive = TRUE</code> does not redefine the PSMS mathematics. It
 changes how aggressively the implementation is allowed to stop once the
-retained modal tail has already become numerically inactive.</p>
+retained modal tail has already become numerically inactive [<span class="citation">(<a href="#ref-Press_2007"><strong>Press_2007?</strong></a>)</span>;
+DLMF:ch1; DLMF:ch3].</p>
 <p>The hard modal limits remain the same in both modes. The
 initialization step still defines:</p>
 <p><span class="math display">
@@ -272,16 +274,16 @@ small and flattening out, rather than continuing all the way to those
 caps by default.</p>
 <p>That adaptive logic operates in three layers.</p>
 <ol style="list-style-type: decimal">
-<li><p>For the full fluid-filled and gas-filled backscatter solve,
+<li><p>For the full liquid-filled backscatter solve,
 <code>adaptive = TRUE</code> owns the overlap quadrature order
 internally. In that path, a user-supplied <code>n_integration</code> is
 ignored on purpose. The implementation uses the retained modal ceilings
 themselves as the main difficulty scale, with a smaller bonus from the
-larger of <code>|chi_sw|</code> and <code>|chi_body|</code>. Lower modal
-difficulty therefore gets fewer quadrature nodes, while harder runs
-climb toward the same hard cap used by the literal path. This makes the
-quadrature rule general to the retained PSMS problem rather than tied to
-one particular example geometry.</p></li>
+larger of <span class="math inline">|\chi_1|</span> and <span class="math inline">|\chi_2|</span>. Lower modal difficulty therefore
+gets fewer quadrature nodes, while harder runs climb toward the same
+hard cap used by the literal path. This makes the quadrature rule
+general to the retained PSMS problem rather than tied to one particular
+example geometry.</p></li>
 <li><p>Inside each retained azimuthal order <span class="math inline">m</span>, the backscatter evaluators monitor the
 sizes of successive modal terms in <span class="math inline">n</span>.
 The code only stops the inner tail if the current term remains below a
@@ -296,13 +298,12 @@ what allows <code>adaptive = TRUE</code> to matter not only for
 <code>liquid_filled</code> and <code>gas_filled</code>, but also for
 <code>fixed_rigid</code> and <code>pressure_release</code>.</p></li>
 </ol>
-<p>For the full fluid-filled and gas-filled backscatter paths, there is
-one additional adaptive step before the dense system is even built for a
-given <span class="math inline">m</span>. The code forms a cheap proxy
-from the angular and radial factors and uses that proxy to decide
-whether the far tail in <span class="math inline">n</span> is already
-inactive. If it is, the expensive overlap and kernel system is only
-built for the shorter active part of the retained degree range.</p>
+<p>For the full liquid-filled backscatter path, there is one additional
+adaptive step before the dense system is even built for a given <span class="math inline">m</span>. The code forms a cheap proxy from the
+angular and radial factors and uses that proxy to decide whether the far
+tail in <span class="math inline">n</span> is already inactive. If it
+is, the expensive overlap and kernel system is only built for the
+shorter active part of the retained degree range.</p>
 <p>The cutoffs themselves are precision-aware. The relative tolerance
 used in the modal-tail checks remains tighter in quadruple precision
 than in double precision, and an absolute floor is also enforced so that
@@ -352,32 +353,33 @@ closely.</li>
 <span>  precision <span class="op">=</span> <span class="st">"quad"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p>In the second call, <code>n_integration</code> is omitted on purpose.
-For the full fluid-filled or gas-filled PSMS solve,
-<code>adaptive = TRUE</code> chooses the quadrature order internally
-from the retained modal difficulty and ignores a user-supplied
-<code>n_integration</code>.</p>
+For the full liquid-filled PSMS solve, <code>adaptive = TRUE</code>
+chooses the quadrature order internally from the retained modal
+difficulty and ignores a user-supplied <code>n_integration</code>. The
+public gas-filled path currently uses the simplified penetrable
+formulation instead, so it does not take that adaptive quadrature
+branch.</p>
 </div>
 <div class="section level3">
 <h3 id="benchmark-comparisons">Benchmark comparisons<a class="anchor" aria-label="anchor" href="#benchmark-comparisons"></a>
 </h3>
 <p>The PSMS implementation is easiest to interpret when the main
-numerical switches are compared directly against the stored benchmark
-spectra. The table below restores the broader comparison across
-<code>precision</code>, <code>simplify_Amn</code>, and
-<code>adaptive</code>. The runs use
-<code>12, 18, 38, 70, 120, 200, 250, 300, 333, 400 kHz</code> against
-the bundled <code>benchmark_ts</code> data.</p>
+numerical switches are compared directly against the published benchmark
+geometry. For <code>fixed_rigid</code>, <code>pressure_release</code>,
+and <code>liquid_filled</code>, the summary below uses the bundled
+<code>benchmark_ts</code> data <span class="citation">(<a href="#ref-Jech_2015">Jech et al. 2015</a>; <a href="#ref-echoSMs_software">Elavia 2021</a>)</span>. For
+<code>gas_filled</code>, the same <code>140 x 10 mm</code> broadside
+prolate geometry is run directly, but the external reference are
+predictions from a boundary element method (BEM) model <span class="citation">(<a href="#ref-Bempp-cl_software">Betcke and Scroggs
+2021</a>)</span>.</p>
 <p>Three coverage details matter when reading the numbers:</p>
 <ol style="list-style-type: decimal">
 <li>
 <code>fixed_rigid</code> and <code>pressure_release</code> benchmark
 values are only available at <code>12, 18, 38, 70 kHz</code>.</li>
-<li>In Jech et al. (2015, Table III), <code>NB</code> is defined as “no
-benchmark.” The gas-filled prolate-spheroid frequency comparison is
-marked <code>NB</code>, and the corresponding discussion states that no
-benchmark <code>TS</code> values were calculated for that target. The
-gas-filled rows below therefore report <code>NB</code> in the <span class="math inline">\Delta TS</span> columns rather than treating that
-curve as a benchmark target.</li>
+<li>In Table III from <span class="citation">Jech et al. (<a href="#ref-Jech_2015">2015</a>)</span>, <code>NB</code> is defined as
+“no benchmark.” Instead, the gas-filled prolate spheroid was benchmarked
+against a BEM model at <code>12, 38, 70, 120 kHz</code>.</li>
 <li>The liquid-filled benchmark has values at
 <code>12, 18, 38, 70, 120, 200, 250, 300, 400 kHz</code>, but not at
 <code>333 kHz</code>.</li>
@@ -390,10 +392,8 @@ therefore computed only where validated benchmark values exist.</p>
 <div class="panel-tabset">
 
 
-
 <ul class="nav nav-tabs" id="NA" role="tablist">
 <li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#rigid-and-pressure-release" id="rigid-and-pressure-release-tab" type="button" role="tab" aria-controls="rigid-and-pressure-release" aria-selected="true" class="active nav-link">Rigid and pressure release</button></li>
-<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#gas-filled" id="gas-filled-tab" type="button" role="tab" aria-controls="gas-filled" aria-selected="false" class="nav-link">Gas filled</button></li>
 <li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#liquid-filled" id="liquid-filled-tab" type="button" role="tab" aria-controls="liquid-filled" aria-selected="false" class="nav-link">Liquid filled</button></li>
 </ul>
 <div class="tab-content">
@@ -485,105 +485,18 @@ therefore computed only where validated benchmark values exist.</p>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="tab-pane" id="gas-filled" role="tabpanel" aria-labelledby="gas-filled-tab">
+<!-- #### Gas filled
 
-<table style="width:100%;" class="table">
-<colgroup>
-<col width="14%">
-<col width="14%">
-<col width="14%">
-<col width="14%">
-<col width="14%">
-<col width="14%">
-<col width="14%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Precision</th>
-<th align="left"><code>simplify_Amn</code></th>
-<th align="left"><code>adaptive</code></th>
-<th align="left"><code>n_integration</code></th>
-<th align="left">Benchmark status</th>
-<th align="left">Max abs. <span class="math inline">\Delta</span> TS
-(dB)</th>
-<th align="left">Mean abs. <span class="math inline">\Delta</span> TS
-(dB)</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left"><code>double</code></td>
-<td align="left"><code>FALSE</code></td>
-<td align="left"><code>FALSE</code></td>
-<td align="left"><code>96</code></td>
-<td align="left"><code>NB</code></td>
-<td align="left"><code>NB</code></td>
-<td align="left"><code>NB</code></td>
-</tr>
-<tr class="even">
-<td align="left"><code>double</code></td>
-<td align="left"><code>FALSE</code></td>
-<td align="left"><code>TRUE</code></td>
-<td align="left"></td>
-<td align="left"><code>NB</code></td>
-<td align="left"><code>NB</code></td>
-<td align="left"><code>NB</code></td>
-</tr>
-<tr class="odd">
-<td align="left"><code>double</code></td>
-<td align="left"><code>TRUE</code></td>
-<td align="left"><code>FALSE</code></td>
-<td align="left"><code>96</code></td>
-<td align="left"><code>NB</code></td>
-<td align="left"><code>NB</code></td>
-<td align="left"><code>NB</code></td>
-</tr>
-<tr class="even">
-<td align="left"><code>double</code></td>
-<td align="left"><code>TRUE</code></td>
-<td align="left"><code>TRUE</code></td>
-<td align="left"></td>
-<td align="left"><code>NB</code></td>
-<td align="left"><code>NB</code></td>
-<td align="left"><code>NB</code></td>
-</tr>
-<tr class="odd">
-<td align="left"><code>quad</code></td>
-<td align="left"><code>FALSE</code></td>
-<td align="left"><code>FALSE</code></td>
-<td align="left"><code>96</code></td>
-<td align="left"><code>NB</code></td>
-<td align="left"><code>NB</code></td>
-<td align="left"><code>NB</code></td>
-</tr>
-<tr class="even">
-<td align="left"><code>quad</code></td>
-<td align="left"><code>FALSE</code></td>
-<td align="left"><code>TRUE</code></td>
-<td align="left"></td>
-<td align="left"><code>NB</code></td>
-<td align="left"><code>NB</code></td>
-<td align="left"><code>NB</code></td>
-</tr>
-<tr class="odd">
-<td align="left"><code>quad</code></td>
-<td align="left"><code>TRUE</code></td>
-<td align="left"><code>FALSE</code></td>
-<td align="left"><code>96</code></td>
-<td align="left"><code>NB</code></td>
-<td align="left"><code>NB</code></td>
-<td align="left"><code>NB</code></td>
-</tr>
-<tr class="even">
-<td align="left"><code>quad</code></td>
-<td align="left"><code>TRUE</code></td>
-<td align="left"><code>TRUE</code></td>
-<td align="left"></td>
-<td align="left"><code>NB</code></td>
-<td align="left"><code>NB</code></td>
-<td align="left"><code>NB</code></td>
-</tr>
-</tbody>
-</table>
+| Precision | `simplify_Amn` | `adaptive` | `n_integration` | Benchmark status | Max abs. $\Delta$ TS (dB) | Mean abs. $\Delta$ TS (dB) |
+|:--|:--|:--|:--|:--|:--|:--|
+| `double` | `FALSE` | `FALSE` | `96` | `Figure BEM` | `2.07744` | `0.57676` |
+| `double` | `FALSE` | `TRUE` |  | `Figure BEM` | `2.07744` | `0.57676` |
+| `double` | `TRUE` | `FALSE` | `96` | `Figure BEM` | `2.07744` | `0.57676` |
+| `double` | `TRUE` | `TRUE` |  | `Figure BEM` | `2.07744` | `0.57676` |
+| `quad` | `FALSE` | `FALSE` | `96` | `Figure BEM` | `0.06256` | `0.02246` |
+| `quad` | `FALSE` | `TRUE` |  | `Figure BEM` | `0.06256` | `0.02246` |
+| `quad` | `TRUE` | `FALSE` | `96` | `Figure BEM` | `0.06256` | `0.02246` |
+| `quad` | `TRUE` | `TRUE` |  | `Figure BEM` | `0.06256` | `0.02246` | -->
 </div>
 <div class="tab-pane" id="liquid-filled" role="tabpanel" aria-labelledby="liquid-filled-tab">
 
@@ -695,11 +608,18 @@ so that column is blank for <code>fixed_rigid</code> and
 <code>simplify_Amn = FALSE</code> and <code>precision = "quad"</code>
 remains the only configuration in this table that stays benchmark-close
 through the higher-frequency benchmark range.</li>
-<li>The gas-filled prolate rows are retained here because they remain
-part of the implementation space, but they are not interpreted as
-benchmark <span class="math inline">\Delta</span> values because the
-published comparison explicitly labels that case <code>NB</code> for no
-benchmark.</li>
+<li>The simplified gas-filled prolate spheroid model tracks closely with
+the BEM predictions. That behavior is exactly why
+<code>simplify_Amn</code> is currently better suited for gas-filled
+PSMS. The gas interior creates an extreme-contrast fluid problem, and
+the present dense overlap-coupled full gas solve becomes numerically
+unstable there. The simplified branch removes the unstable off-diagonal
+coupling and, for this benchmark geometry, is the one that agrees with
+<code>BEM</code> <em>and</em> <code>FEM</code> predictions, as well as
+external software references <span class="citation">(<a href="#ref-Prol_Spheroid_software">Khodabandeloo et al.
+2025</a>)</span>. In the current public implementation, requests for the
+full gas-filled branch are therefore routed onto this simplified
+formulation.</li>
 <li>The adaptive liquid-filled path is useful in quad precision, but it
 is not universally beneficial. In particular, the
 <code>precision = "double"</code>, <code>simplify_Amn = FALSE</code>,
@@ -896,14 +816,12 @@ radius.</p>
 <span><span class="va">precision_df</span><span class="op">$</span><span class="va">delta_ts</span> <span class="op">&lt;-</span> <span class="va">precision_df</span><span class="op">$</span><span class="va">double_ts</span> <span class="op">-</span> <span class="va">precision_df</span><span class="op">$</span><span class="va">quad_ts</span></span></code></pre></div>
 <p><img src="psms-precision-drift.png" class="r-plt" alt="Pre-rendered PSMS precision comparison showing double- and quadruple-precision spectra versus reduced size together with the double-minus-quadruple residual." width="85%" style="display: block; margin: auto;"></p>
 <p>For this full liquid-filled run, the double- and quadruple-precision
-curves are effectively indistinguishable through
-<code>k_0 b &lt; 1</code>, differ by only about <code>1.4e-07 dB</code>
-at <code>38 kHz</code>, then separate to about <code>0.01 dB</code> by
-<code>70 kHz</code> (<code>k_0 b \approx 2.98</code>) and to about
-<code>1.02 dB</code> by <code>100 kHz</code>
-(<code>k_0 b \approx 4.25</code>). That is the practical reason the
-benchmark table above starts to favor quadruple precision once the
-retained PSMS system moves into the higher-frequency penetrable
+curves are effectively indistinguishable through <span class="math inline">k_1 b &lt; 1</span>, differ by only about
+<code>1.4e-07 dB</code> at <code>38 kHz</code>, then separate to about
+<code>0.01 dB</code> by <code>70 kHz</code> (<span class="math inline">k_1 b \approx 2.98</span>) and to about
+<code>1.02 dB</code> by <code>100 kHz</code> (<span class="math inline">k_1 b \approx 4.25</span>). That is the practical
+reason the benchmark table above starts to favor quadruple precision
+once the retained PSMS system moves into the higher-frequency penetrable
 regime.</p>
 </div>
 <div class="section level3">
@@ -923,12 +841,16 @@ expectations. These runs were recorded on:</p>
 <code>ucrt</code>)</li>
 <li><code>g++</code></li>
 </ol>
-<p>The timed frequency grid was the same one used in the benchmark
-table:</p>
+<p>For <code>fixed_rigid</code>, <code>pressure_release</code>,
+<code>gas_filled</code>, and <code>liquid_filled</code>, the timed
+frequency grid was the same one used in the benchmark table:</p>
 <p><span class="math display">
   12,\; 18,\; 38,\; 70,\; 120,\; 200,\; 250,\; 300,\; 333,\; 400\
 \text{kHz}.
 </span></p>
+<p>For <code>gas_filled</code>, these timings use the same published
+<code>140 x 10 mm</code> broadside benchmark geometry discussed above
+rather than the shorter bundled fixture run.</p>
 <div class="section level4">
 <h4 id="runtime-summary">Runtime summary<a class="anchor" aria-label="anchor" href="#runtime-summary"></a>
 </h4>
@@ -938,7 +860,7 @@ table:</p>
 
 <ul class="nav nav-tabs" id="NA" role="tablist">
 <li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#rigid-and-pressure-release-1" id="rigid-and-pressure-release-1-tab" type="button" role="tab" aria-controls="rigid-and-pressure-release-1" aria-selected="true" class="active nav-link">Rigid and pressure release</button></li>
-<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#gas-filled-1" id="gas-filled-1-tab" type="button" role="tab" aria-controls="gas-filled-1" aria-selected="false" class="nav-link">Gas filled</button></li>
+<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#gas-filled" id="gas-filled-tab" type="button" role="tab" aria-controls="gas-filled" aria-selected="false" class="nav-link">Gas filled</button></li>
 <li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#liquid-filled-1" id="liquid-filled-1-tab" type="button" role="tab" aria-controls="liquid-filled-1" aria-selected="false" class="nav-link">Liquid filled</button></li>
 </ul>
 <div class="tab-content">
@@ -1019,7 +941,7 @@ table:</p>
 </tbody>
 </table>
 </div>
-<div class="tab-pane" id="gas-filled-1" role="tabpanel" aria-labelledby="gas-filled-1-tab">
+<div class="tab-pane" id="gas-filled" role="tabpanel" aria-labelledby="gas-filled-tab">
 
 <table class="table">
 <colgroup>
@@ -1042,56 +964,56 @@ table:</p>
 <td align="left"><code>FALSE</code></td>
 <td align="left"><code>FALSE</code></td>
 <td align="left"><code>96</code></td>
-<td align="right">0.06</td>
+<td align="right"><code>0.47</code></td>
 </tr>
 <tr class="even">
 <td align="left"><code>double</code></td>
 <td align="left"><code>FALSE</code></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"></td>
-<td align="right">0.03</td>
+<td align="right"><code>0.41</code></td>
 </tr>
 <tr class="odd">
 <td align="left"><code>double</code></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"><code>FALSE</code></td>
 <td align="left"><code>96</code></td>
-<td align="right">0.00</td>
+<td align="right"><code>0.40</code></td>
 </tr>
 <tr class="even">
 <td align="left"><code>double</code></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"></td>
-<td align="right">0.02</td>
+<td align="right"><code>0.38</code></td>
 </tr>
 <tr class="odd">
 <td align="left"><code>quad</code></td>
 <td align="left"><code>FALSE</code></td>
 <td align="left"><code>FALSE</code></td>
 <td align="left"><code>96</code></td>
-<td align="right">2.81</td>
+<td align="right"><code>16.92</code></td>
 </tr>
 <tr class="even">
 <td align="left"><code>quad</code></td>
 <td align="left"><code>FALSE</code></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"></td>
-<td align="right">1.11</td>
+<td align="right"><code>16.67</code></td>
 </tr>
 <tr class="odd">
 <td align="left"><code>quad</code></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"><code>FALSE</code></td>
 <td align="left"><code>96</code></td>
-<td align="right">0.31</td>
+<td align="right"><code>16.83</code></td>
 </tr>
 <tr class="even">
 <td align="left"><code>quad</code></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"><code>TRUE</code></td>
 <td align="left"></td>
-<td align="right">0.21</td>
+<td align="right"><code>16.90</code></td>
 </tr>
 </tbody>
 </table>
@@ -1183,10 +1105,16 @@ fluid solve.</li>
 <li>The full liquid-filled solve with <code>simplify_Amn = FALSE</code>
 is still by far the most expensive configuration in this benchmark
 set.</li>
-<li>The gas-filled rows are much cheaper here because the benchmarked
-gas-filled frequency range is short (<code>12-40 kHz</code>) and does
-not drive the same modal growth as the liquid-filled
-<code>12-400 kHz</code> sweep.</li>
+<li>The gas-filled benchmark shape is no longer cheap once the published
+geometry is used, especially in quadruple precision.</li>
+<li>The gas-filled runtime split is therefore diagnostic:
+<code>simplify_Amn = TRUE</code> is not just faster, it is the gas
+branch that is both stable and externally consistent on the benchmark
+geometry. In the current public implementation, rows with
+<code>simplify_Amn = FALSE</code> are routed onto that same simplified
+formulation, so their benchmark deltas now match and their runtime
+differences reduce to small wrapper overhead rather than different core
+solves.</li>
 <li>The adaptive liquid-filled path is faster because it combines a
 smaller modal-content-based quadrature rule at lower reduced frequency
 with more aggressive <span class="math inline">n</span>- and <span class="math inline">m</span>-tail termination inside the backscatter
@@ -1210,15 +1138,16 @@ internal implementation detail, not a user-specified input.</li>
 <h3 id="cross-software-implementation-checks">Cross-software implementation checks<a class="anchor" aria-label="anchor" href="#cross-software-implementation-checks"></a>
 </h3>
 <p>Beyond the published benchmark curves, it is also useful to check
-whether the same prolate-spheroid definitions produce comparable spectra
-in other locally available implementations. The table below uses the
-shared <code>12, 18, 38, 70, 100 kHz</code> frequency set so that the
-cross-software check reaches more informative reduced frequencies while
-still remaining computationally manageable. The acousticTS settings are
-the same ones used for the main benchmark-quality run here:
-<code>precision = "quad"</code>, <code>adaptive = FALSE</code>,
-<code>simplify_Amn = FALSE</code>, <code>n_integration = 96</code>, and
-<code>phi_body = pi</code>.</p>
+whether the same prolate spheroid definitions produce comparable spectra
+in other locally available implementations. The liquid-filled and
+rigid/pressure-release checks below use the shared
+<code>12, 18, 38, 70, 100 kHz</code> frequency set so that the
+cross-software comparison reaches more informative reduced frequencies
+while still remaining computationally manageable. The gas-filled
+comparison is summarized separately because the most informative current
+check is the published benchmark geometry run directly against live
+outputs from Prol_Spheroid <span class="citation">(<a href="#ref-Prol_Spheroid_software">Khodabandeloo et al. 2025</a>)</span>
+and echoSMs <span class="citation">(<a href="#ref-echoSMs_software">Elavia 2021</a>)</span>.</p>
 <p><code>Prol_Spheroid</code> only treats penetrable prolate spheroids,
 so its cells are <code>N/A</code> for <code>fixed_rigid</code> and
 <code>pressure_release</code>. The original and vectorized
@@ -1233,8 +1162,8 @@ not.</p>
 
 
 <ul class="nav nav-tabs" id="NA" role="tablist">
-<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#echosms" id="echosms-tab" type="button" role="tab" aria-controls="echosms" aria-selected="true" class="active nav-link"><code>echoSMs</code></button></li>
-<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#prol_spheroid" id="prol_spheroid-tab" type="button" role="tab" aria-controls="prol_spheroid" aria-selected="false" class="nav-link"><code>Prol_Spheroid</code></button></li>
+<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#echosms" id="echosms-tab" type="button" role="tab" aria-controls="echosms" aria-selected="true" class="active nav-link">echoSMs</button></li>
+<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#prol_spheroid" id="prol_spheroid-tab" type="button" role="tab" aria-controls="prol_spheroid" aria-selected="false" class="nav-link">Prol_Spheroid</button></li>
 <li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#runtime" id="runtime-tab" type="button" role="tab" aria-controls="runtime" aria-selected="false" class="nav-link">Runtime</button></li>
 </ul>
 <div class="tab-content">
@@ -1250,10 +1179,10 @@ not.</p>
 <thead><tr class="header">
 <th align="left">Case</th>
 <th align="left">Frequency set (kHz)</th>
-<th align="right">Max abs. <span class="math inline">\Delta</span> TS vs
-<code>echoSMs</code> (dB)</th>
+<th align="right">Max abs. <span class="math inline">\Delta</span>
+TS</th>
 <th align="right">Mean abs. <span class="math inline">\Delta</span> TS
-vs <code>echoSMs</code> (dB)</th>
+(dB)</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
@@ -1274,12 +1203,6 @@ vs <code>echoSMs</code> (dB)</th>
 <td align="right"><code>1.01676</code></td>
 <td align="right"><code>0.20537</code></td>
 </tr>
-<tr class="even">
-<td align="left"><code>gas_filled</code></td>
-<td align="left"><code>12, 18, 38, 70, 100</code></td>
-<td align="right"><code>5.49661</code></td>
-<td align="right"><code>1.10385</code></td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -1297,14 +1220,14 @@ vs <code>echoSMs</code> (dB)</th>
 <thead><tr class="header">
 <th align="left">Case</th>
 <th align="left">Frequency set (kHz)</th>
-<th align="right">Max abs. <span class="math inline">\Delta</span> TS vs
-<code>Prol_Spheroid</code> original (dB)</th>
+<th align="right">Max abs. <span class="math inline">\Delta</span> TS
+(dB)</th>
 <th align="right">Mean abs. <span class="math inline">\Delta</span> TS
-vs <code>Prol_Spheroid</code> original (dB)</th>
+(dB)</th>
 <th align="right">Max abs. <span class="math inline">\Delta</span> TS vs
-<code>Prol_Spheroid</code> vectorized (dB)</th>
+vectorized (dB)</th>
 <th align="right">Mean abs. <span class="math inline">\Delta</span> TS
-vs <code>Prol_Spheroid</code> vectorized (dB)</th>
+vs vectorized (dB)</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
@@ -1331,14 +1254,6 @@ vs <code>Prol_Spheroid</code> vectorized (dB)</th>
 <td align="right"><code>0.00128</code></td>
 <td align="right"><code>0.00055</code></td>
 </tr>
-<tr class="even">
-<td align="left"><code>gas_filled</code></td>
-<td align="left"><code>12, 18, 38, 70, 100</code></td>
-<td align="right"><code>42.84714</code></td>
-<td align="right"><code>13.22982</code></td>
-<td align="right"><code>42.84714</code></td>
-<td align="right"><code>13.22982</code></td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -1356,13 +1271,16 @@ vs <code>Prol_Spheroid</code> vectorized (dB)</th>
 <thead><tr class="header">
 <th align="left">Case</th>
 <th align="left">Frequency set (kHz)</th>
-<th align="right">acousticTS elapsed (s)</th>
 <th align="right">
-<code>echoSMs</code> elapsed (s)</th>
+<span class="math inline">t_\text{acousticTS}</span>
+(s)</th>
 <th align="right">
-<code>Prol_Spheroid</code> original elapsed (s)</th>
+<span class="math inline">t_\text{echoSMs}</span>
+(s)</th>
 <th align="right">
-<code>Prol_Spheroid</code> vectorized elapsed (s)</th>
+<span class="math inline">t_\text{Prol\_Spheroid}</span> (s)</th>
+<th align="right">
+<span class="math inline">t_\text{Prol\_Spheroid-vectorized}</span> (s)</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
@@ -1389,14 +1307,6 @@ vs <code>Prol_Spheroid</code> vectorized (dB)</th>
 <td align="right"><code>48.65</code></td>
 <td align="right"><code>11.06</code></td>
 </tr>
-<tr class="even">
-<td align="left"><code>gas_filled</code></td>
-<td align="left"><code>12, 18, 38, 70, 100</code></td>
-<td align="right"><code>2.69</code></td>
-<td align="right"><code>70.97</code></td>
-<td align="right"><code>698.50</code></td>
-<td align="right"><code>26.94</code></td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -1404,34 +1314,96 @@ vs <code>Prol_Spheroid</code> vectorized (dB)</th>
 </div>
 <p>These checks are informative in a more mixed way once <code>70</code>
 and <code>100 kHz</code> are included. The penetrable liquid-filled case
-remains extremely close to the independent <code>Prol_Spheroid</code>
-implementation in both branches, with a maximum absolute difference of
-only <code>0.00128 dB</code> over the full five-frequency set. The more
+remains extremely close to the independent Prol_Spheroid implementation
+in both branches, with a maximum absolute difference of only
+<code>0.00128 dB</code> over the full five-frequency set. The more
 interesting difference there is computational rather than acoustic: the
 vectorized branch reduces the liquid-filled runtime from about
 <code>48.65 s</code> to <code>11.06 s</code> on this machine while
 returning the same agreement to the displayed precision.</p>
-<p>By contrast, the shared <code>echoSMs::PSMSModel</code> comparison
-begins to separate at the higher two frequencies, especially for the
-penetrable cases: the liquid-filled difference reaches about
-<code>1.02 dB</code> at <code>100 kHz</code>, while the gas-filled
-comparisons diverge much more strongly above <code>38 kHz</code>. The
-gas-filled <code>Prol_Spheroid</code> timings also show how expensive
-the original branch can become at this five-frequency set, taking about
-<code>698.5 s</code> versus <code>26.9 s</code> for the vectorized
-branch with no meaningful change in the returned <code>TS</code>. In
-other words, the extended frequency set is doing exactly what it should
-do here: it shows that the low-frequency agreement is reassuring, but it
-also flags the higher-frequency penetrable PSMS pathways as the part of
-the implementation space that still deserves the most careful future
-scrutiny.</p>
+<p>By contrast, the shared <a href="https://ices-tools-dev.github.io/echoSMs/api_reference/#echosms.PSMSModel" class="external-link">echoSMs::PSMSModel</a>
+comparison begins to separate at the higher two frequencies, especially
+for the penetrable cases: the liquid-filled difference reaches about
+<code>1.02 dB</code> at <code>100 kHz</code>. The gas-filled comparison
+is summarized separately below because the current implementation story
+there is not “another representative case ladder.” It is the benchmark
+geometry itself and the fact that the simplified gas branch is the only
+one that presently stays stable and externally consistent.</p>
 </div>
+<div class="section level4">
+<h4 id="gas-filled-cross-software-comparison">Gas-filled cross-software comparison<a class="anchor" aria-label="anchor" href="#gas-filled-cross-software-comparison"></a>
+</h4>
+<p>The gas-filled PSMS path is summarized here on the published
+benchmark geometry itself: <code>L = 140 mm</code>,
+<code>a = 10 mm</code>, <code>theta_body = 90 deg</code>,
+<code>phi_body = pi</code>, <code>density_body = 1.24 kg m^-3</code>,
+and <code>sound_speed_body = 345 m s^-1</code>. The frequency set is the
+external-reference overlap <code>12, 18, 38, 70, 120, 200 kHz</code>.
+The table below compares the stable benchmark-shape gas runs against
+live vectorized <code>Prol_Spheroid</code> outputs. The
+<code>acousticTS elapsed</code> values were recomputed on exactly this
+six-frequency grid. In the current public implementation, requests for
+the full gas-filled branch are routed onto the same simplified
+penetrable formulation used by the explicit
+<code>simplify_Amn = TRUE</code> rows.</p>
+<table style="width:100%;" class="table">
+<colgroup>
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Case</th>
+<th align="left">Frequency set (kHz)</th>
+<th align="right">Max abs. <span class="math inline">\Delta</span> TS
+(dB)</th>
+<th align="right">Mean abs. <span class="math inline">\Delta</span> TS
+(dB)</th>
+<th align="right">
+<span class="math inline">t_\text{acousticTS}</span>
+(s)</th>
+<th align="right">
+<span class="math inline">t_\text{Prol\_Spheroid}</span> (s)</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>benchmark broadside, double, simplified, literal</code></td>
+<td align="left"><code>12, 18, 38, 70, 120, 200</code></td>
+<td align="right"><code>2.19518</code></td>
+<td align="right"><code>0.59593</code></td>
+<td align="right"><code>0.13</code></td>
+<td align="right"><code>89.93</code></td>
+</tr>
+<tr class="even">
+<td align="left"><code>benchmark broadside, double, simplified, adaptive</code></td>
+<td align="left"><code>12, 18, 38, 70, 120, 200</code></td>
+<td align="right"><code>2.19518</code></td>
+<td align="right"><code>0.59593</code></td>
+<td align="right"><code>0.14</code></td>
+<td align="right"><code>89.93</code></td>
+</tr>
+<tr class="odd">
+<td align="left"><code>benchmark broadside, quad, simplified, literal</code></td>
+<td align="left"><code>12, 18, 38, 70, 120, 200</code></td>
+<td align="right"><code>0.13946</code></td>
+<td align="right"><code>0.04163</code></td>
+<td align="right"><code>3.04</code></td>
+<td align="right"><code>89.93</code></td>
+</tr>
+<tr class="even">
+<td align="left"><code>benchmark broadside, quad, simplified, adaptive</code></td>
+<td align="left"><code>12, 18, 38, 70, 120, 200</code></td>
+<td align="right"><code>0.13946</code></td>
+<td align="right"><code>0.04163</code></td>
+<td align="right"><code>3.21</code></td>
+<td align="right"><code>89.93</code></td>
+</tr>
+</tbody>
+</table>
 </div>
-<div class="section level3">
-<h3 id="extracting-model-results">Extracting model results<a class="anchor" aria-label="anchor" href="#extracting-model-results"></a>
-</h3>
-<p>Model results can be extracted either visually or directly through
-<code><a href="../../reference/extract.html">extract()</a></code>.</p>
 <div class="section level4">
 <h4 id="plotting-results">Plotting results<a class="anchor" aria-label="anchor" href="#plotting-results"></a>
 </h4>
@@ -1450,12 +1422,6 @@ scrutiny.</p>
 <span><span class="co">## 4     62000 -8.006501e-04-0.04005366i 0.0003085167 -70.21443</span></span>
 <span><span class="co">## 5     70000 -1.298529e-03-0.05066399i 0.0003456888 -69.22629</span></span>
 <span><span class="co">## 6     78000 -1.928321e-03-0.06024267i 0.0003689549 -68.66053</span></span></code></pre>
-<p>At this point, readers should confirm more than the existence of a
-plotted response. It is worth checking that the requested boundary was
-actually the one used, that the returned frequencies match the intended
-grid, and that the resulting spectrum behaves plausibly for a prolate
-fluid-filled target rather than showing obvious signs of under-resolved
-numerical structure.</p>
 </div>
 </div>
 <div class="section level3">
@@ -1499,15 +1465,37 @@ evaluate.</p>
 <h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
 </h2>
 <div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
-<div id="ref-flammer_spheroidal_1957" class="csl-entry">
-Flammer, Carson. 1957. <em>Spheroidal Wave Functions</em>. <a href="https://ui.adsabs.harvard.edu/abs/1957spwf.book.....F" class="external-link">https://ui.adsabs.harvard.edu/abs/1957spwf.book.....F</a>.
+<div id="ref-Bempp-cl_software" class="csl-entry">
+Betcke, Timo, and Matthew Scroggs. 2021. <span>“Bempp-Cl: <span>A</span>
+Fast <span>Python</span> Based Just-in-Time Compiling Boundary Element
+Library.”</span> <em>Journal of Open Source Software</em> 6 (59): 2879.
+<a href="https://doi.org/10.21105/joss.02879" class="external-link">https://doi.org/10.21105/joss.02879</a>.
 </div>
-<div id="ref-furusawa_prolate_1988" class="csl-entry">
+<div id="ref-echoSMs_software" class="csl-entry">
+Elavia, A. 2021. <span>“Liquid_spheroid: Acoustic Scattering by a Liquid
+Prolate Spheroid.”</span> <a href="https://github.com/elavia/liquid_spheroid" class="external-link">https://github.com/elavia/liquid_spheroid</a>.
+</div>
+<div id="ref-Furusawa_1988" class="csl-entry">
 Furusawa, Masahiko. 1988. <span>“Prolate Spheroidal Models for
 Predicting General Trends of Fish Target Strength.”</span> <em>Journal
 of the Acoustical Society of Japan (E)</em> 9 (1): 13–24. <a href="https://doi.org/10.1250/ast.9.13" class="external-link">https://doi.org/10.1250/ast.9.13</a>.
 </div>
-<div id="ref-spence_scattering_1951" class="csl-entry">
+<div id="ref-Jech_2015" class="csl-entry">
+Jech, J. Michael, John K. Horne, Dezhang Chu, David A. Demer, David T.
+I. Francis, Natalia Gorska, Benjamin Jones, et al. 2015.
+<span>“Comparisons Among Ten Models of Acoustic Backscattering Used in
+Aquatic Ecosystem Research.”</span> <em>The Journal of the Acoustical
+Society of America</em> 138 (6): 3742–64. <a href="https://doi.org/10.1121/1.4937607" class="external-link">https://doi.org/10.1121/1.4937607</a>.
+</div>
+<div id="ref-Prol_Spheroid_software" class="csl-entry">
+Khodabandeloo, Babak, Yngve Heggelund, Bjørnar Ystad, Sander Andre Berg
+Marx, and Geir Pedersen. 2025. <span>“High-Precision Model and
+Open-Source Software for Acoustic Backscattering by Liquid- and
+Gas-Filled Prolate Spheroids Across a Wide Frequency Range and Incident
+Angles: Implications for Fisheries Acoustics.”</span> <em>Journal of
+Sound and Vibration</em>, 119227. https://doi.org/<a href="https://doi.org/10.1016/j.jsv.2025.119227" class="external-link">https://doi.org/10.1016/j.jsv.2025.119227</a>.
+</div>
+<div id="ref-Spence_1951" class="csl-entry">
 Spence, R. D., and Sara Granger. 1951. <span>“The
 <span>Scattering</span> of <span>Sound</span> from a
 <span>Prolate</span> <span>Spheroid</span>.”</span> <em>The Journal of

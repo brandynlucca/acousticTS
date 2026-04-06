@@ -9,7 +9,7 @@ Benchmarked Validated
 
 These pages follow Johnson’s asymptotic fluid-sphere formulation and
 Stanton’s generalized approximate backscatter formulas ([Johnson
-1977](#ref-johnson_sound_1977); [Stanton 1989](#ref-stanton_1989)).
+1977](#ref-Johnson_1977); [Stanton 1989](#ref-Stanton_1989_1)).
 
 The acousticTS package uses object-based scatterers, so the HPA workflow
 follows the same broad pattern used throughout the package: define the

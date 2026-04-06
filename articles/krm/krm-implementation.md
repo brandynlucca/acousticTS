@@ -9,9 +9,8 @@ Benchmarked Validated
 
 These pages follow the composite body-plus-swimbladder fish modeling
 literature initiated for cod and later generalized in open software
-implementations ([C. S. Clay 1991](#ref-clay_1991); [Clarence S. Clay
-and Horne 1994](#ref-clay_horne_1994); [Gastauer
-2025](#ref-sven_gastauer_svengastauerkrmr_2025)).
+implementations ([C. S. Clay 1991](#ref-Clay_1991); [Clarence S. Clay
+and Horne 1994](#ref-Clay_1994)).
 
 The acousticTS package uses object-based scatterers, so the KRM workflow
 follows the same broad structure used elsewhere in the package: define
@@ -119,8 +118,9 @@ interest.
 For fluid-only body targets, `krm_variant` is ignored because only the
 body Kirchhoff term is evaluated. The argument matters only for combined
 body-plus-swimbladder targets, where the model must decide what
-surrounding medium is used in the swimbladder terms (Clay and Horne
-1994; Horne and Jech 1999).
+surrounding medium is used in the swimbladder terms ([Clarence S. Clay
+and Horne 1994](#ref-Clay_1994); [Horne and Jech
+1999](#ref-Horne_1999)).
 
 In the high-`ka` swimbladder Kirchhoff term, acousticTS uses the
 empirical factors:
@@ -151,7 +151,7 @@ directly:
     breathing mode, so k_H = k_B and k_L = k.
 3.  `body_embedded`: use the body-medium wavenumber in both swimbladder
     regimes, so k_H = k_L = k_B. This is the most literal body-embedded
-    reading of Clay and Horne (1994).
+    reading of Clarence S. Clay and Horne ([1994](#ref-Clay_1994)).
 
 ![Pre-rendered KRM comparison for the sardine example under the
 lowcontrast, body-embedded, and mixed swimbladder-medium
@@ -261,7 +261,10 @@ The bundled fish objects serve a different benchmark role from the
 canonical modal-series targets above. There is no exact modal-series
 reference for these segmented body-plus-swimbladder geometries, so they
 are used only to check software-to-software agreement for the
-`krm_variant` branches on realistic fish shapes.
+`krm_variant` branches on realistic fish shapes. This inclues KRMr
+([Gastauer 2025](#ref-KRMr_software)), echoSMs ([Elavia
+2021](#ref-echoSMs_software)), and the SWFSC applet ([Southwest
+Fisheries Science Center 2022](#ref-NOAA_KRM_software)).
 
 ##### Sardine
 
@@ -351,5 +354,17 @@ Clay, Clarence S., and John K. Horne. 1994. “Acoustic Models of Fish:
 The Atlantic Cod (*Gadus Morhua*).” *The Journal of the Acoustical
 Society of America* 96 (3): 1661–68. <https://doi.org/10.1121/1.410245>.
 
+Elavia, A. 2021. “Liquid_spheroid: Acoustic Scattering by a Liquid
+Prolate Spheroid.” <https://github.com/elavia/liquid_spheroid>.
+
 Gastauer, Sven. 2025. “SvenGastauer/KRMr: V0.4.8.” Zenodo.
 <https://doi.org/10.5281/ZENODO.15838374>.
+
+Horne, J. K., and J. M. Jech. 1999. “Multi-Frequency Estimates of Fish
+Abundance: Constraints of Rather High Frequencies.” *ICES Journal of
+Marine Science* 56 (2): 184–99.
+<https://doi.org/10.1006/jmsc.1998.0432>.
+
+Southwest Fisheries Science Center. 2022. *KRM Model*. National Marine
+Fisheries Service, National Oceanic; Atmospheric Administration.
+<https://www.fisheries.noaa.gov/data-tools/krm-model>.

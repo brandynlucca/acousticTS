@@ -12,7 +12,7 @@ scattering. Instead of solving directly for the scattered pressure in
 physical space, one expands both the incident and scattered fields in
 complete wave bases and then asks for the linear map between the two
 coefficient vectors. That map is the transition matrix, or T-matrix
-([Waterman 1969](#ref-waterman_new_1969)).
+([Waterman 1969](#ref-Waterman_1969)).
 
 For a single target, that point of view is valuable even before one
 thinks about multiple scattering. Once the target response is
@@ -30,10 +30,9 @@ through the boundary operator. Finite cylinders are different again: the
 sidewall-endcap junctions make a purely spherical retained operator much
 less natural than a cylindrical modal basis, especially once one wants
 reliable angular products away from the simplest monostatic setting
-([Varadan et al. 1982](#ref-varadan_computation_1982); [Mahadevan Ganesh
-and Hawkins 2008](#ref-ganesh_far_2008); [M. Ganesh and Hawkins
-2022](#ref-ganesh_numerically_2022); [Waterman
-2009](#ref-waterman_t_2009)).
+([Varadan et al. 1982](#ref-Varadan_1982); [Mahadevan Ganesh and Hawkins
+2008](#ref-Ganesh_2008); [M. Ganesh and Hawkins 2022](#ref-Ganesh_2022);
+[Waterman 2009](#ref-Waterman_2009)).
 
 Unless stated otherwise, medium `1` is the surrounding seawater and
 medium `2` is the target interior.
@@ -43,7 +42,8 @@ medium `2` is the target interior.
 ### Incident and scattered modal expansions
 
 For time-harmonic pressure with implicit factor e^{-i\omega t}, the
-pressure in a homogeneous region satisfies the Helmholtz equation:
+pressure in a homogeneous region satisfies the Helmholtz equation
+([Morse and Ingard 1968](#ref-Morse_1968)):
 
 \nabla^2 p + k^2 p = 0.
 
@@ -63,8 +63,7 @@ For axisymmetric targets, the azimuthal order decouples. The T-matrix
 can therefore be organized into independent m-blocks, and the monostatic
 backscatter amplitude is reconstructed from those blocks after the
 incident plane-wave coefficients have been determined ([Waterman
-1969](#ref-waterman_new_1969); [Varadan et al.
-1982](#ref-varadan_computation_1982)).
+1969](#ref-Waterman_1969); [Varadan et al. 1982](#ref-Varadan_1982)).
 
 ### Boundary conditions
 
@@ -163,7 +162,7 @@ end-cap plane or the cylindrical side wall. The resulting r(\theta) is
 continuous but not differentiable where the side wall and end-cap meet,
 which is one reason finite cylinders are numerically less forgiving than
 smooth spheres or spheroids in a spherical-basis T-matrix treatment
-([Waterman 2009](#ref-waterman_t_2009)).
+([Waterman 2009](#ref-Waterman_2009)).
 
 ### Monostatic reconstruction
 
@@ -174,7 +173,9 @@ backscattering cross section then follows from:
 
 \sigma\_{bs} = \|f\_{bs}\|^2
 
-and finally:
+and finally ([MacLennan, Fernandes, and Dalen
+2002](#ref-MacLennan_2002); [Urick 1983](#ref-Urick_1983); [Simmonds and
+MacLennan 2005](#ref-Simmonds_2005)):
 
 TS = 10 \log\_{10} \left(\sigma\_{bs}\right)
 
@@ -205,9 +206,9 @@ A prolate spheroid is not a constant-r surface. So while spherical-wave
 expansions can still be written down, they do not align naturally with
 the geometry. This is exactly the regime where the classic
 spheroidal-coordinate literature becomes relevant ([Varadan et al.
-1982](#ref-varadan_computation_1982); [M. Ganesh and Hawkins
-2022](#ref-ganesh_numerically_2022); [Hackman and Todoroff
-1984](#ref-hackman_application_1984)).
+1982](#ref-Varadan_1982); [M. Ganesh and Hawkins
+2022](#ref-Ganesh_2022); [Hackman and Todoroff
+1984](#ref-Hackman_1984)).
 
 For the single-target scalar acoustic problem, it is more natural to use
 prolate spheroidal coordinates and write the target surface as a single
@@ -251,9 +252,8 @@ gas-filled prolates, the interior and exterior reduced frequencies
 differ, so the angular bases no longer match exactly. This introduces
 overlap-driven coupling between retained degrees, exactly as in the
 exact prolate spheroidal modal-series solution ([Hackman and Todoroff
-1984](#ref-hackman_application_1984); [Spence and Granger
-1951](#ref-spence_scattering_1951); [Furusawa
-1988](#ref-furusawa_prolate_1988)).
+1984](#ref-Hackman_1984); [Spence and Granger 1951](#ref-Spence_1951);
+[Furusawa 1988](#ref-Furusawa_1988)).
 
 ### T-matrix interpretation in a geometry-matched basis
 
@@ -291,9 +291,24 @@ Spheroidal-Coordinate-Based Transition Matrix: Acoustic Scattering from
 High Aspect Ratio Solids.” *The Journal of the Acoustical Society of
 America* 76 (S1): S8–8. <https://doi.org/10.1121/1.2022083>.
 
+MacLennan, David N., Percy G. Fernandes, and John Dalen. 2002. “A
+Consistent Approach to Definitions and Symbols in Fisheries Acoustics.”
+*ICES Journal of Marine Science* 59 (2): 365–69.
+<https://doi.org/10.1006/jmsc.2001.1158>.
+
+Morse, Philip M., and K. Uno Ingard. 1968. *Theoretical Acoustics*. New
+York, NY: McGraw-Hill.
+
+Simmonds, John, and David N. MacLennan. 2005. *Fisheries Acoustics:
+Theory and Practice*. 2nd ed. Oxford, UK: Blackwell Science.
+<https://doi.org/10.1002/9780470995303>.
+
 Spence, R. D., and Sara Granger. 1951. “The Scattering of Sound from a
 Prolate Spheroid.” *The Journal of the Acoustical Society of America* 23
 (6): 701–6. <https://doi.org/10.1121/1.1906827>.
+
+Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed. New
+York, NY: McGraw-Hill.
 
 Varadan, V. K., V. V. Varadan, Louis R. Dragonette, and Lawrence Flax.
 1982. “Computation of Rigid Body Scattering by Prolate Spheroids Using

@@ -4,8 +4,8 @@
 
 The property conventions on this page follow standard acoustics and
 elastic-wave references used throughout underwater scattering theory
-([Medwin and Clay 1998](#ref-medwin_fundamentals_1998); [Achenbach
-1973](#ref-achenbach_wave_1973)).
+([Medwin and Clay 1998](#ref-Medwin_1998); [Achenbach
+1973](#ref-Achenbach_1973)).
 
 Many modeling errors are not caused by the scattering model itself. They
 are caused by incorrect material properties, inconsistent contrasts, or
@@ -29,7 +29,7 @@ situation the reader believes they are describing.
 
 The package includes utilities for density- and sound-speed-derived
 quantities, compressibility- and impedance-related calculations, elastic
-moduli such as Lam'e parameters, shear modulus, Poisson ratio, and
+moduli such as Lamé parameters, shear modulus, Poisson ratio, and
 Young’s modulus, wavenumber and acoustic-size conversions, and
 logarithmic and linear-scale conversions. The functions are small, but
 they are central. Nearly every model in the package uses some subset of
@@ -164,7 +164,7 @@ target. Density contrast alone is rarely the whole story.
 Compressibility, impedance mismatch, and the joint behavior of density
 and sound speed are often the quantities that determine whether a target
 behaves as weakly scattering, strongly reflecting, or something in
-between.
+between ([Medwin and Clay 1998](#ref-Medwin_1998)).
 
 This is one of the most common places where intuition can go wrong. A
 target may have density close to water but still differ noticeably in
@@ -176,7 +176,7 @@ consequential.
 
 Shell and solid-sphere models need elastic constants that are often
 reported inconsistently across sources. One paper may give E and \nu,
-another may give K and G, and a third may effectively imply Lam'e
+another may give K and G, and a third may effectively imply Lamé
 parameters. The package utilities make it easier to move among those
 descriptions.
 
@@ -190,7 +190,7 @@ for Young’s modulus,
 [`shear()`](https://brandynlucca.github.io/acousticTS/reference/shear.md)
 for shear modulus, and
 [`lame()`](https://brandynlucca.github.io/acousticTS/reference/lame.md)
-for the Lam'e parameter.
+for the Lamé parameter ([Achenbach 1973](#ref-Achenbach_1973)).
 
 ``` r
 E <- 7e10
@@ -224,8 +224,8 @@ match the package argument names.
 These conversions are not merely notational. Different elastic
 quantities emphasize different physical aspects of a material. Young’s
 modulus and Poisson ratio are often how a material is reported
-mechanically, while shear modulus, bulk modulus, and Lam'e parameters
-are often closer to the quantities that enter wave propagation and
+mechanically, while shear modulus, bulk modulus, and Lamé parameters are
+often closer to the quantities that enter wave propagation and
 boundary-condition formulas. A careful workflow therefore converts once,
 checks consistency, and then carries the internally consistent elastic
 set through the model setup.
@@ -321,4 +321,5 @@ North-Holland Series in Applied Mathematics and Mechanics, v. 16.
 Amsterdam New York: North-Holland Pub. Co. American Elsevier Pub. Co.
 
 Medwin, Herman, and Clarence S. Clay. 1998. *Fundamentals of Acoustical
-Oceanography*. Boston: Academic Press.
+Oceanography*. Applications of Modern Acoustics. San Diego, CA: Academic
+Press.

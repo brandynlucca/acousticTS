@@ -4,9 +4,10 @@
 
 The package workflow is meant to help users move between the same
 geometry, material, and model-choice questions that structure the
-broader fisheries-acoustics literature ([Jech et al.
-2015](#ref-jech_etal_2015); [Stanton 1996](#ref-stanton_acoustic_1996);
-[Medwin and Clay 1998](#ref-medwin_fundamentals_1998)).
+broader fisheries-acoustics literature
+([**jech_etal_2015?**](#ref-jech_etal_2015);
+[**stanton_acoustic_1996?**](#ref-stanton_acoustic_1996);
+[**medwin_fundamentals_1998?**](#ref-medwin_fundamentals_1998)).
 
 This documentation is meant to be the first practical stop for readers
 who are new to acousticTS. The package covers several different
@@ -241,18 +242,3 @@ is meant to support both directions. The important point is that the
 package is easiest to use when geometry, physical interpretation, and
 model assumptions are treated as distinct but connected parts of the
 same workflow.
-
-## References
-
-Jech, J. Michael, John K. Horne, Dezhang Chu, David A. Demer, David T.
-I. Francis, Natalia Gorska, Benjamin Jones, et al. 2015. “Comparisons
-Among Ten Models of Acoustic Backscattering Used in Aquatic Ecosystem
-Research.” *The Journal of the Acoustical Society of America* 138 (6):
-3742–64. <https://doi.org/10.1121/1.4937607>.
-
-Medwin, Herman, and Clarence S. Clay. 1998. *Fundamentals of Acoustical
-Oceanography*. Boston: Academic Press.
-
-Stanton, T. 1996. “Acoustic Scattering Characteristics of Several
-Zooplankton Groups.” *ICES Journal of Marine Science* 53 (2): 289–95.
-<https://doi.org/10.1006/jmsc.1996.0037>.

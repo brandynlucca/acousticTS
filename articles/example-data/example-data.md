@@ -4,10 +4,10 @@
 
 The bundled example objects are anchored to published fish, krill, and
 benchmark resources that make it easier to reproduce known workflows
-before introducing custom geometry ([Clay and Horne
-1994](#ref-clay_horne_1994); [McGehee, O’Driscoll, and Traykovski
-1998](#ref-mcgehee_effects_1998); [Jech et al.
-2015](#ref-jech_etal_2015)).
+before introducing custom geometry
+([**clay_horne_1994?**](#ref-clay_horne_1994);
+[**mcgehee_effects_1998?**](#ref-mcgehee_effects_1998);
+[**jech_etal_2015?**](#ref-jech_etal_2015)).
 
 The package includes bundled data objects that are useful for learning
 the workflow, benchmarking model behavior, and reproducing examples
@@ -139,20 +139,3 @@ reaches for the right example at the right stage of the workflow.
   started](https://brandynlucca.github.io/acousticTS/articles/getting-started/getting-started.md)
 - [Validation and benchmark
   reproduction](https://brandynlucca.github.io/acousticTS/articles/validation-benchmarks/validation-benchmarks.md)
-
-## References
-
-Clay, Clarence S., and John K. Horne. 1994. “Acoustic Models of Fish:
-The Atlantic Cod (*Gadus Morhua*).” *The Journal of the Acoustical
-Society of America* 96 (3): 1661–68. <https://doi.org/10.1121/1.410245>.
-
-Jech, J. Michael, John K. Horne, Dezhang Chu, David A. Demer, David T.
-I. Francis, Natalia Gorska, Benjamin Jones, et al. 2015. “Comparisons
-Among Ten Models of Acoustic Backscattering Used in Aquatic Ecosystem
-Research.” *The Journal of the Acoustical Society of America* 138 (6):
-3742–64. <https://doi.org/10.1121/1.4937607>.
-
-McGehee, D. E., R. L. O’Driscoll, and L. V.Martin Traykovski. 1998.
-“Effects of Orientation on Acoustic Scattering from Antarctic Krill at
-120 kHz.” *Deep Sea Research Part II: Topical Studies in Oceanography*
-45 (7): 1273–94. <https://doi.org/10.1016/S0967-0645(98)00036-8>.

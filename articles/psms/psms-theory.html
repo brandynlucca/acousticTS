@@ -133,10 +133,12 @@
 <p>The prolate spheroidal modal series solution (PSMS) is the natural
 exact-separation analogue of spherical partial-wave theory for elongated
 bodies whose surface is better approximated by a prolate spheroid than
-by a sphere or cylinder. The essential fact is that the Helmholtz
-equation is separable in prolate spheroidal coordinates, so the
-incident, scattered, and interior fields can all be expanded in
-spheroidal angular and radial wave functions <span class="citation">(<a href="#ref-spence_scattering_1951">Spence and Granger 1951</a>; <a href="#ref-furusawa_prolate_1988">Furusawa 1988</a>; <a href="#ref-flammer_spheroidal_1957">Flammer 1957</a>)</span>.</p>
+by a sphere or cylinder <span class="citation">(<a href="#ref-Spence_1951">Spence and Granger 1951</a>; <a href="#ref-Silbiger_1963">Silbiger 1963</a>)</span>. The essential fact
+is that the Helmholtz equation is separable in prolate spheroidal
+coordinates, so the incident, scattered, and interior fields can all be
+expanded in spheroidal angular and radial wave functions <span class="citation">(<a href="#ref-Spence_1951">Spence and Granger
+1951</a>; <a href="#ref-Silbiger_1963">Silbiger 1963</a>; <a href="#ref-Furusawa_1988">Furusawa 1988</a>; <a href="#ref-Yeh_1967">Yeh
+1967</a>; <a href="#ref-Flammer_1957">Flammer 1957</a>; <a href="#ref-Ye_1997_2">Ye, n.d.</a>)</span>.</p>
 <p>The rigid case enforces zero normal velocity on <span class="math inline">\xi = \xi_1</span>, the pressure-release case
 enforces zero pressure there, and the fluid-filled or gas-filled cases
 enforce continuity of pressure and normal velocity between the exterior
@@ -149,9 +151,10 @@ makes the coupled interior problem harder.</p>
 <p>The mathematical structure is the same as in spherical scattering,
 but the basis is more intricate. Instead of Legendre polynomials and
 spherical Bessel functions, one obtains angular spheroidal functions and
-radial spheroidal functions. That similarity is what makes the PSMS
-interpretable as a true modal scattering theory. The difference is what
-makes it algebraically and numerically more demanding.</p>
+radial spheroidal functions <span class="citation">(<a href="#ref-Flammer_1957">Flammer 1957</a>; <a href="#ref-DLMF:ch30">Volkmer 2026</a>)</span>. That similarity is what
+makes the PSMS interpretable as a true modal scattering theory. The
+difference is what makes it algebraically and numerically more
+demanding.</p>
 </div>
 <div class="section level2">
 <h2 id="physical-basis-of-the-psms">Physical basis of the PSMS<a class="anchor" aria-label="anchor" href="#physical-basis-of-the-psms"></a>
@@ -172,13 +175,13 @@ outset.</p>
 <h3 id="linear-time-harmonic-scattering-problem">Linear time-harmonic scattering problem<a class="anchor" aria-label="anchor" href="#linear-time-harmonic-scattering-problem"></a>
 </h3>
 <p>Assume linear acoustics with harmonic time dependence <span class="math inline">e^{-i\omega t}</span>. In each homogeneous region,
-the pressure satisfies the Helmholtz equation. The scattering problem
-then proceeds in three steps. First, the incident field is expanded in
-regular spheroidal eigenfunctions. Second, the scattered field is
-expanded in outgoing spheroidal eigenfunctions. Third, if the spheroid
-contains an interior fluid or gas, the interior field is expanded in
-regular interior spheroidal eigenfunctions. The boundary conditions then
-determine the modal coefficients.</p>
+the pressure satisfies the Helmholtz equation <span class="citation">(<a href="#ref-Morse_1968">Morse and Ingard 1968</a>)</span>. The scattering
+problem then proceeds in three steps. First, the incident field is
+expanded in regular spheroidal eigenfunctions. Second, the scattered
+field is expanded in outgoing spheroidal eigenfunctions. Third, if the
+spheroid contains an interior fluid or gas, the interior field is
+expanded in regular interior spheroidal eigenfunctions. The boundary
+conditions then determine the modal coefficients.</p>
 <p>This summary is simple, but it already contains the main distinction
 between the rigid or pressure-release cases and the interior-fluid
 cases. When only the exterior basis matters, the coefficient bookkeeping
@@ -220,7 +223,7 @@ spheroids. The metric coefficients are:</p>
 </span></p>
 <p>These scale factors are the quantities that make separation of
 variables possible after the Helmholtz operator is written in
-curvilinear coordinates.</p>
+curvilinear coordinates <span class="citation">(<a href="#ref-Flammer_1957">Flammer 1957</a>; <a href="#ref-DLMF:ch30">Volkmer 2026</a>)</span>.</p>
 </div>
 <div class="section level3">
 <h3 id="geometric-parameters-of-the-spheroid">Geometric parameters of the spheroid<a class="anchor" aria-label="anchor" href="#geometric-parameters-of-the-spheroid"></a>
@@ -355,7 +358,8 @@ angular equations stated below.</p>
 <p>where <span class="math inline">\lambda_{mn}(h)</span> is the
 separation constant. When <span class="math inline">h \to 0</span>, this
 reduces to the associated Legendre equation, so the spheroidal angular
-functions reduce smoothly to Legendre functions.</p>
+functions reduce smoothly to Legendre functions <span class="citation">(<a href="#ref-Flammer_1957">Flammer 1957</a>; <a href="#ref-DLMF:ch30">Volkmer 2026</a>; <a href="#ref-DLMF:ch14">Dunster
+2026</a>)</span>.</p>
 </div>
 <div class="section level3">
 <h3 id="radial-equation">Radial equation<a class="anchor" aria-label="anchor" href="#radial-equation"></a>
@@ -367,9 +371,9 @@ functions reduce smoothly to Legendre functions.</p>
 \frac{m^2}{\xi^2-1}\right)R = 0
 </span></p>
 <p>Its independent solutions are the radial spheroidal functions of the
-first, second, third, and fourth kinds. For scattering, the first and
-third kinds play the same roles as regular Bessel and outgoing Hankel
-functions in spherical theory.</p>
+first, second, third, and fourth kinds <span class="citation">(<a href="#ref-Flammer_1957">Flammer 1957</a>; <a href="#ref-DLMF:ch30">Volkmer 2026</a>)</span>. For scattering, the
+first and third kinds play the same roles as regular Bessel and outgoing
+Hankel functions in spherical theory.</p>
 </div>
 </div>
 <div class="section level2">
@@ -390,10 +394,12 @@ spheroid interior. The exterior incident field then has the form:</p>
   R_{mn}^{(1)}(\mathbb{k}_1,\xi)
   \cos m(\phi-\phi')
 </span></p>
-<p>This is the spheroidal analogue of the spherical plane-wave
-expansion. It is the starting point for every boundary-condition
-derivation because it expresses the known incident field in the same
-basis used for the unknown scattered field.</p>
+<p>This is the spheroidal analogue of the spherical plane-wave expansion
+<span class="citation">(<a href="#ref-Spence_1951">Spence and Granger
+1951</a>; <a href="#ref-Furusawa_1988">Furusawa 1988</a>)</span>. It is
+the starting point for every boundary-condition derivation because it
+expresses the known incident field in the same basis used for the
+unknown scattered field.</p>
 <p>The scattered and interior fields are expanded in the same angular
 structure but with different radial functions:</p>
 <p><span class="math display">
@@ -501,12 +507,12 @@ release and <span class="math inline">\Delta =
 </h3>
 <p>The fluid-filled case is more involved because the interior field
 uses a different reduced frequency, <span class="math inline">\mathbb{k}_1 = k_2 q</span>, and therefore a
-different spheroidal basis. The exterior and interior angular functions
-are not identical when <span class="math inline">\mathbb{k}_1 \ne
-\mathbb{k}_1</span>, so the boundary conditions do not remain diagonal
-in <span class="math inline">n</span>. The gas-filled case uses exactly
-the same algebraic structure as the fluid-filled case; only the interior
-density and sound speed differ.</p>
+different spheroidal basis <span class="citation">(<a href="#ref-Yeh_1967">Yeh 1967</a>; <a href="#ref-Furusawa_1988">Furusawa
+1988</a>; <a href="#ref-Ye_1997_2">Ye, n.d.</a>)</span>. The exterior
+and interior angular functions are not identical when <span class="math inline">\mathbb{k}_1 \ne \mathbb{k}_1</span>, so the
+boundary conditions do not remain diagonal in <span class="math inline">n</span>. The gas-filled case uses exactly the same
+algebraic structure as the fluid-filled case; only the interior density
+and sound speed differ.</p>
 <p>Here <span class="math inline">\mathbb{k}_1 = k_1 q</span> and <span class="math inline">\mathbb{k}_1 = k_2 q</span> are the exterior and
 interior reduced frequencies, while <span class="math inline">\rho_1</span> and <span class="math inline">\rho_2</span> are the corresponding densities.
 Because the boundary is the coordinate surface <span class="math inline">\xi = \xi_1</span>, the normal derivative is
@@ -616,7 +622,8 @@ of fluid-filled or gas-filled spheroidal scattering.</p>
 <h2 id="truncation-of-the-infinite-series">Truncation of the infinite series<a class="anchor" aria-label="anchor" href="#truncation-of-the-infinite-series"></a>
 </h2>
 <p>The exact solution is a double infinite series in <span class="math inline">m</span> and <span class="math inline">n</span>. In
-practice, it is truncated at finite limits. A common estimate is:</p>
+practice, it is truncated at finite limits. A common estimate is <span class="citation">(<a href="#ref-Furusawa_1988">Furusawa
+1988</a>)</span>:</p>
 <p><span class="math display">
   m_{max} = \lceil 2k_1b \rceil,
   \qquad
@@ -668,7 +675,7 @@ into an ordinary finite-dimensional linear algebra problem.</p>
   S_{mn}^{(1)}(\mathbb{k}_1,\eta)S_{m\ell}^{(1)}(\mathbb{k}_2,\eta)\,d\eta
 </span></p>
 <p>For the truncated system these integrals are evaluated numerically,
-typically by Gauss-Legendre quadrature. That is, one replaces the
+typically by Gauss-Legendre quadrature <span class="citation">(<a href="#ref-Abramowitz_1964">Abramowitz and Stegun 1964</a>; <a href="#ref-Press2007">Press et al. 2007</a>; <a href="#ref-DLMF:ch3">Temme 2026</a>)</span>. That is, one replaces the
 integral by a weighted sum over quadrature nodes <span class="math inline">\eta_j</span>:</p>
 <p><span class="math display">
   \alpha_{n\ell}^m \approx \frac{1}{N_{m\ell}(\mathbb{k}_2)}
@@ -687,8 +694,9 @@ specification.</p>
 <p>Once <span class="math inline">\mathbf{M}^{(m)}</span> and <span class="math inline">\mathbf{b}^{(m)}</span> are assembled, the truncated
 coefficients are obtained by solving the dense system for each <span class="math inline">m</span>. Near resonances, or when the interior and
 exterior bases become nearly linearly dependent after truncation, <span class="math inline">\mathbf{M}^{(m)}</span> can be poorly conditioned. A
-stable approach is therefore to compute a singular-value
-decomposition:</p>
+stable approach is therefore to compute a singular-value decomposition
+<span class="citation">(<a href="#ref-Press2007">Press et al.
+2007</a>)</span>:</p>
 <p><span class="math display">
   \mathbf{M}^{(m)} = \mathbf{U}\mathbf{\Sigma}\mathbf{V}^*
 </span></p>
@@ -716,7 +724,7 @@ evaluated. The backscattering cross-section then becomes:</p>
 <p><span class="math display">
   \sigma_\text{bs} = |f_\infty|^2
 </span></p>
-<p>with target strength:</p>
+<p>with target strength <span class="citation">(<a href="#ref-MacLennan_2002">MacLennan, Fernandes, and Dalen 2002</a>; <a href="#ref-Urick_1983">Urick 1983</a>; <a href="#ref-Simmonds_2005">Simmonds and MacLennan 2005</a>)</span>:</p>
 <p><span class="math display">
   TS = 10\log_{10}(\sigma_\text{bs}).
 </span></p>
@@ -750,19 +758,84 @@ complicated basis functions, overlap integrals, and linear algebra.</p>
 <h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
 </h2>
 <div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
-<div id="ref-flammer_spheroidal_1957" class="csl-entry">
+<div id="ref-Abramowitz_1964" class="csl-entry">
+Abramowitz, Milton, and Irene A. Stegun. 1964. <em>Handbook of
+Mathematical Functions with Formulas, Graphs, and Mathematical
+Tables</em>. Ninth Dover printing, tenth GPO printing. New York: Dover
+Publications.
+</div>
+<div id="ref-DLMF:ch14" class="csl-entry">
+Dunster, T. M. 2026. <span>“<span class="nocase">Legendre and Related
+Functions</span>.”</span> In <em><span class="nocase">NIST Digital
+Library of Mathematical Functions</span></em>, edited by F. W. J. Olver,
+A. B. Olde Daalhuis, D. W. Lozier, B. I. Schneider, B. A. Boisvert, C.
+W. Clark, B. R. Miller, B. V. Saunders, H. S. Cohl, and M. A. McClain.
+<a href="https://dlmf.nist.gov/14" class="external-link">https://dlmf.nist.gov/14</a>.
+</div>
+<div id="ref-Flammer_1957" class="csl-entry">
 Flammer, Carson. 1957. <em>Spheroidal Wave Functions</em>. <a href="https://ui.adsabs.harvard.edu/abs/1957spwf.book.....F" class="external-link">https://ui.adsabs.harvard.edu/abs/1957spwf.book.....F</a>.
 </div>
-<div id="ref-furusawa_prolate_1988" class="csl-entry">
+<div id="ref-Furusawa_1988" class="csl-entry">
 Furusawa, Masahiko. 1988. <span>“Prolate Spheroidal Models for
 Predicting General Trends of Fish Target Strength.”</span> <em>Journal
 of the Acoustical Society of Japan (E)</em> 9 (1): 13–24. <a href="https://doi.org/10.1250/ast.9.13" class="external-link">https://doi.org/10.1250/ast.9.13</a>.
 </div>
-<div id="ref-spence_scattering_1951" class="csl-entry">
+<div id="ref-MacLennan_2002" class="csl-entry">
+MacLennan, David N., Percy G. Fernandes, and John Dalen. 2002. <span>“A
+Consistent Approach to Definitions and Symbols in Fisheries
+Acoustics.”</span> <em>ICES Journal of Marine Science</em> 59 (2):
+365–69. <a href="https://doi.org/10.1006/jmsc.2001.1158" class="external-link">https://doi.org/10.1006/jmsc.2001.1158</a>.
+</div>
+<div id="ref-Morse_1968" class="csl-entry">
+Morse, Philip M., and K. Uno Ingard. 1968. <em>Theoretical
+Acoustics</em>. New York, NY: McGraw-Hill.
+</div>
+<div id="ref-Press2007" class="csl-entry">
+Press, William H., Saul A. Teukolsky, William T. Vetterling, and Brian
+P. Flannery. 2007. <em>Numerical Recipes: The Art of Scientific
+Computing</em>. 3rd ed. New York, NY: Cambridge University Press.
+</div>
+<div id="ref-Silbiger_1963" class="csl-entry">
+Silbiger, Alexander. 1963. <span>“Scattering of Sound by an Elastic
+Prolate Spheroid.”</span> <em>The Journal of the Acoustical Society of
+America</em> 35 (4): 564–70. <a href="https://doi.org/10.1121/1.1918531" class="external-link">https://doi.org/10.1121/1.1918531</a>.
+</div>
+<div id="ref-Simmonds_2005" class="csl-entry">
+Simmonds, John, and David N. MacLennan. 2005. <em>Fisheries Acoustics:
+Theory and Practice</em>. 2nd ed. Oxford, UK: Blackwell Science. <a href="https://doi.org/10.1002/9780470995303" class="external-link">https://doi.org/10.1002/9780470995303</a>.
+</div>
+<div id="ref-Spence_1951" class="csl-entry">
 Spence, R. D., and Sara Granger. 1951. <span>“The
 <span>Scattering</span> of <span>Sound</span> from a
 <span>Prolate</span> <span>Spheroid</span>.”</span> <em>The Journal of
 the Acoustical Society of America</em> 23 (6): 701–6. <a href="https://doi.org/10.1121/1.1906827" class="external-link">https://doi.org/10.1121/1.1906827</a>.
+</div>
+<div id="ref-DLMF:ch3" class="csl-entry">
+Temme, N. M. 2026. <span>“Numerical Methods.”</span> In <em><span class="nocase">NIST Digital Library of Mathematical
+Functions</span></em>, edited by F. W. J. Olver, A. B. Olde Daalhuis, D.
+W. Lozier, B. I. Schneider, B. A. Boisvert, C. W. Clark, B. R. Miller,
+B. V. Saunders, H. S. Cohl, and M. A. McClain. <a href="https://dlmf.nist.gov/3" class="external-link">https://dlmf.nist.gov/3</a>.
+</div>
+<div id="ref-Urick_1983" class="csl-entry">
+Urick, Robert J. 1983. <em>Principles of Underwater Sound</em>. 3rd ed.
+New York, NY: McGraw-Hill.
+</div>
+<div id="ref-DLMF:ch30" class="csl-entry">
+Volkmer, H. 2026. <span>“<span>Spheroidal Wave Functions</span>.”</span>
+In <em><span class="nocase">NIST Digital Library of Mathematical
+Functions</span></em>, edited by F. W. J. Olver, A. B. Olde Daalhuis, D.
+W. Lozier, B. I. Schneider, B. A. Boisvert, C. W. Clark, B. R. Miller,
+B. V. Saunders, H. S. Cohl, and M. A. McClain. <a href="https://dlmf.nist.gov/30" class="external-link">https://dlmf.nist.gov/30</a>.
+</div>
+<div id="ref-Ye_1997_2" class="csl-entry">
+Ye, Z. n.d. <span>“Low-Frequency Acoustic Scattering by Gas-Filled
+Prolate Spheroids in Liquids.”</span> <em>The Journal of the Acoustical
+Society of America</em> 101 (4): 1945–52. <a href="https://doi.org/10.1121/1.418225" class="external-link">https://doi.org/10.1121/1.418225</a>.
+</div>
+<div id="ref-Yeh_1967" class="csl-entry">
+Yeh, C. 1967. <span>“Scattering of Acoustic Waves by a Penetrable
+Prolate Spheroid. I. Liquid Prolate Spheroid.”</span> <em>The Journal of
+the Acoustical Society of America</em> 42 (2): 518–21. <a href="https://doi.org/10.1121/1.1910614" class="external-link">https://doi.org/10.1121/1.1910614</a>.
 </div>
 </div>
 </div>

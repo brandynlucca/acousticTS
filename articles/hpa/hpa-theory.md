@@ -11,11 +11,11 @@ The high-pass approximation (HPA) is not an exact boundary-value
 solution. It is a compact asymptotic model constructed so that the
 low-frequency limit matches the Rayleigh expansion of weakly scattering
 bodies, while the large-ka limit remains bounded and approaches a
-reflection-controlled scale ([Johnson 1977](#ref-johnson_sound_1977);
-[Stanton 1989](#ref-stanton_1989)). The model is therefore best
-understood as an interpolation between two physically distinct regimes
-rather than as a direct solution of the governing boundary-value problem
-at all frequencies.
+reflection-controlled scale ([Johnson 1977](#ref-Johnson_1977); [Stanton
+1989](#ref-Stanton_1989_1)). The model is therefore best understood as
+an interpolation between two physically distinct regimes rather than as
+a direct solution of the governing boundary-value problem at all
+frequencies.
 
 Its usefulness comes from that interpolation. Instead of carrying a full
 modal series or surface integral, the HPA writes the backscattering
@@ -134,7 +134,7 @@ considered.
 
 ### High-pass denominator
 
-Johnson (1977) ([Johnson 1977](#ref-johnson_sound_1977)) introduced the
+Johnson (1977) ([Johnson 1977](#ref-Johnson_1977)) introduced the
 simplest rational completion of that numerator by writing:
 
 \sigma\_\text{bs} = \frac{a^2 (ka)^4 \alpha\_{\pi s}^2}{1 +
@@ -170,14 +170,13 @@ diverging.
 
 ## Stanton (1989) generalization
 
-Stanton (1989) ([Stanton 1989](#ref-stanton_1989)) extended the same
-logic to a broader class of shapes by matching a low-frequency
-scattering term to a reflected-wave asymptote and then introducing
-empirical correction factors where needed. In this broader setting, the
-geometric prefactors and directivity terms become just as important as
-the material contrasts because they determine how the same asymptotic
-logic is adapted to spheres, spheroids, straight cylinders, and bent
-cylinders.
+Stanton ([1989](#ref-Stanton_1989_1)) extended the same logic to a
+broader class of shapes by matching a low-frequency scattering term to a
+reflected-wave asymptote and then introducing empirical correction
+factors where needed. In this broader setting, the geometric prefactors
+and directivity terms become just as important as the material contrasts
+because they determine how the same asymptotic logic is adapted to
+spheres, spheroids, straight cylinders, and bent cylinders.
 
 ### Deviation and null functions
 
@@ -196,8 +195,8 @@ physical meaning at the same level as g\_{21}, h\_{21}, or \mathcal{R}.
 
 ### Spherical form
 
-For a sphere, the generalized expression from Stanton (1989) ([Stanton
-1989](#ref-stanton_1989)) is:
+For a sphere, the generalized expression from Stanton
+([1989](#ref-Stanton_1989_1)) is:
 
 \sigma\_\text{bs} = \frac{a^2 (ka)^4 \alpha\_{\pi s}^2 \mathcal{G}}{ 1 +
 \dfrac{4(ka)^4 \alpha\_{\pi s}^2}{\mathcal{R}^2 \mathcal{F}} }.
@@ -205,10 +204,10 @@ For a sphere, the generalized expression from Stanton (1989) ([Stanton
 The low-frequency numerator is still the Rayleigh term. The denominator
 is written so that the high-frequency scale is set explicitly by the
 reflection coefficient \mathcal{R}. Compared with the simpler form of
-Johnson (1977) ([Johnson 1977](#ref-johnson_sound_1977)), the version
-from Stanton (1989) ([Stanton 1989](#ref-stanton_1989)) makes the
-reflection-controlled nature of the large-ka limit more explicit and
-leaves room for the correction factors \mathcal{F} and \mathcal{G}.
+Johnson ([1977](#ref-Johnson_1977)), the version from Stanton
+([1989](#ref-Stanton_1989_1)) makes the reflection-controlled nature of
+the large-ka limit more explicit and leaves room for the correction
+factors \mathcal{F} and \mathcal{G}.
 
 ### Prolate spheroid form
 

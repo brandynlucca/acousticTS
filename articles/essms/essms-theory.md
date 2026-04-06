@@ -9,8 +9,8 @@ Unvalidated
 
 These pages are grounded in the classical elastic-shell scattering
 literature for fluid-filled spherical shells ([Goodman and Stern
-1962](#ref-goodman_reflection_1962); [Faran
-1951](#ref-faran_sound_1951); [Stanton 1990](#ref-stanton_sound_1990)).
+1962](#ref-Goodman_1962); [Faran 1951](#ref-Faran_1951); [Stanton
+1990](#ref-Stanton_1990)).
 
 An elastic shell is a solid scattering structure that supports both
 longitudinal (\ell) and transverse (\tau) wave within the shell material
@@ -99,7 +99,7 @@ potentials:
 \mu\\\nabla\times(\nabla\times\mathbf{u}) + \rho_s \omega^2 \mathbf{u} =
 0,
 
-where \lambda and \mu are the Lam'e elastic constants and \rho_2 is the
+where \lambda and \mu are the Lamé elastic constants and \rho_2 is the
 mass density of the shell. Applying the Helmholtz decomposition,
 \mathbf{u} is written as:
 
@@ -180,7 +180,7 @@ linearized momentum equation:
 p = -\rho\\\frac{\partial \phi}{\partial t}.
 
 For time-harmonic fields with e^{-i\omega t} dependence, the pressure
-can be further expressed as:
+can be further expressed as ([Morse and Ingard 1968](#ref-Morse_1968)):
 
 p = i\omega\rho\\\phi.
 
@@ -449,15 +449,17 @@ k_3 b\\ j_m'(k_3 b).
 The remaining \alpha\_{ij} terms are obtained by substituting the modal
 expressions for u_r and u\_\theta into \sigma\_{rr} and
 \sigma\_{r\theta}, then evaluating at r=a and r=b. Explicit expressions
-for all \alpha\_{ij} are given in Goodman and Stern (1962) with some
-modifications described in Stanton (1990).
+for all \alpha\_{ij} are given in Goodman and Stern
+([1962](#ref-Goodman_1962)) with some modifications described in Stanton
+([1990](#ref-Stanton_1990)).
 
 #### Solving for A_m^{(1)}
 
 For each angular order m, the interface conditions yield the linear
 system \mathbf{M}\_m \mathbf{x}\_m = \mathbf{F}\_m, where the first
 unknown corresponds to the exterior scattering coefficient, A_m^{(1)}.
-For each m\>0, A_m^{(1)} is obtained by Cramer’s rule:
+For each m\>0, A_m^{(1)} is obtained by [Cramer’s
+rule](https://en.wikipedia.org/wiki/Cramer%27s_rule):
 
 A_m^{(1)} = -i^m (2m + 1) \frac{ \det(\mathbf{M}\_m^{(1)}) }{
 \det(\mathbf{M}\_m) }, ~ \text{for } m \> 0
@@ -521,7 +523,7 @@ because the incident wave must be finite at the origin.
 
 The scattered field is written as the sum of partial waves using
 outgoing spherical Hankel functions to enforce the Sommerfeld radiation
-condition:
+condition ([Sommerfeld 1949](#ref-Sommerfeld_1949)):
 
 p\_{\mathrm{scat}}(r,\theta) = P_0 \sum\_{m=0}^{\infty} (2m+1) A_m^{(1)}
 h_m^{(1)}(k_1 r) P_m(\cos\theta).
@@ -578,7 +580,9 @@ This gives the final linear scattering coefficient:
 \sum\_{m=0}^{\infty} (2m+1) A_m^{(1)} (-1)^m.
 
 This coefficient therefore defines the backscattering cross-section and
-target strength through:
+target strength through ([MacLennan, Fernandes, and Dalen
+2002](#ref-MacLennan_2002); [Urick 1983](#ref-Urick_1983); [Simmonds and
+MacLennan 2005](#ref-Simmonds_2005)):
 
 \sigma\_\text{bs} = \|\mathcal{f}\_\text{bs}(\theta = \pi)\|^2, \quad TS
 = 10\log\_{10}\left(\sigma\_\text{bs}\right).
@@ -639,6 +643,24 @@ Goodman, Ralph R., and Raya Stern. 1962. “Reflection and Transmission of
 Sound by Elastic Spherical Shells.” *The Journal of the Acoustical
 Society of America* 34 (3): 338–44. <https://doi.org/10.1121/1.1928120>.
 
+MacLennan, David N., Percy G. Fernandes, and John Dalen. 2002. “A
+Consistent Approach to Definitions and Symbols in Fisheries Acoustics.”
+*ICES Journal of Marine Science* 59 (2): 365–69.
+<https://doi.org/10.1006/jmsc.2001.1158>.
+
+Morse, Philip M., and K. Uno Ingard. 1968. *Theoretical Acoustics*. New
+York, NY: McGraw-Hill.
+
+Simmonds, John, and David N. MacLennan. 2005. *Fisheries Acoustics:
+Theory and Practice*. 2nd ed. Oxford, UK: Blackwell Science.
+<https://doi.org/10.1002/9780470995303>.
+
+Sommerfeld, Arnold. 1949. *Partial Differential Equations in Physics*.
+Vol. 6. Lectures on Theoretical Physics. New York: Academic Press.
+
 Stanton, T. K. 1990. “Sound Scattering by Spherical and Elongated
 Shelled Bodies.” *The Journal of the Acoustical Society of America* 88
 (3): 1619–33. <https://doi.org/10.1121/1.400321>.
+
+Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed. New
+York, NY: McGraw-Hill.

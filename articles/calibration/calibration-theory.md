@@ -10,15 +10,16 @@ Benchmarked Validated
 Echosounders are commonly calibrated with standard targets whose
 acoustic response is strong, repeatable, and sufficiently well
 understood that the backscattering level can be predicted independently
-of the instrument being calibrated ([Foote
-1990](#ref-foote_spheres_1990)). In fisheries and ocean-acoustics work,
-that standard target is often a tungsten carbide sphere, although
+of the instrument being calibrated ([K. G. Foote 1990](#ref-Foote_1990);
+[Demer et al. 2015](#ref-Demer_2015)). In fisheries and ocean-acoustics
+work, that standard target is often a tungsten carbide sphere, although
 aluminum, steel, brass, and copper spheres are also used in some
-settings ([Hickling 1962](#ref-hickling_analysis_1962); [MacLennan
-1981](#ref-maclennan_theory_1981)). The reason a solid sphere is so
-useful is not only that it is mechanically robust. It is also one of the
-few practically important targets for which the full elastic scattering
-problem remains separable in spherical coordinates.
+settings ([Kenneth G. Foote 1982](#ref-Foote_1982); [Hickling
+1962](#ref-Hickling_1962); [MacLennan 1981](#ref-Maclennan_1981)). The
+reason a solid sphere is so useful is not only that it is mechanically
+robust. It is also one of the few practically important targets for
+which the full elastic scattering problem remains separable in spherical
+coordinates.
 
 For a calibration sphere, the surrounding medium supports an acoustic
 pressure field, while the sphere interior supports both compressional
@@ -71,9 +72,9 @@ boundary conditions at the fluid-solid interface.
 
 Because the geometry is spherical, the exterior and interior Helmholtz
 equations are separable in spherical coordinates ([Achenbach
-1973](#ref-achenbach_wave_1973)). For a sphere centered at the origin,
-the Hemholtz equation provides solutions that can be written as products
-of single-variable functions:
+1973](#ref-Achenbach_1973)). For a sphere centered at the origin, the
+Hemholtz equation provides solutions that can be written as products of
+single-variable functions:
 
 \psi(r, \theta, \varphi) = R(r) \Theta(\theta) \mathbf{\Phi}(\varphi).
 
@@ -172,7 +173,7 @@ field and material properties.
 ### Far-field scattering
 
 For a plane wave incident along polar coordinate z, the acoustic
-pressure is expressed as ([Hickling 1962](#ref-hickling_analysis_1962)):
+pressure is expressed as ([Hickling 1962](#ref-Hickling_1962)):
 
 \begin{aligned} p\_\text{inc}(r, \theta) &= P_0 \frac{e^{-i k_1
 \mathcal{D}}}{\mathcal{D}} \\ &= ik_1 P_0 \sum\limits\_{m=0}^\infty
@@ -238,10 +239,10 @@ These limits consequently simplify p\_\text{inc} to:
 
 It is often more informative to parameterize each partial wave by a real
 phase shift \eta_m than by the raw complex coefficient B_m ([Faran
-1951](#ref-faran_sound_1951); [Rudgers
-1969](#ref-rudgers_acoustic_1969)). In that representation, the elastic
-boundary conditions determine how far the outgoing partial wave is
-shifted relative to the free spherical solution.
+1951](#ref-Faran_1951); [Rudgers 1969](#ref-Rudgers_1969)). In that
+representation, the elastic boundary conditions determine how far the
+outgoing partial wave is shifted relative to the free spherical
+solution.
 
 ![Calibration sphere phase-shift
 schematic](calibration-phase-shift-schematic.png)
@@ -258,16 +259,15 @@ polynomials simplify to:
 P_m(\cos \pi) = P_m(-1) = (-1)^m.
 
 It is convenient to define a phase-shift angle, \eta_m, of the mth
-scattered wave to compute B_m ([Rudgers
-1969](#ref-rudgers_acoustic_1969)). For each angular order, the exterior
-field can be recast as a regular spherical solution plus an outgoing
-partial wave. Matching that combination to the elastic boundary
-conditions determines the relative phase of the outgoing term, so the
-scattering problem may be parameterized by a real phase shift rather
-than by an unconstrained complex coefficient. This phase-shift angle is
-expressed using: \tan \eta_m = \tan \delta_m(k_1a) \left\[ \frac{ \tan
-\Phi_m + \tan \alpha_m(k_1 a) }{ \tan \Phi_m + \tan \beta_m(k_1 a) }
-\right\],
+scattered wave to compute B_m ([Rudgers 1969](#ref-Rudgers_1969)). For
+each angular order, the exterior field can be recast as a regular
+spherical solution plus an outgoing partial wave. Matching that
+combination to the elastic boundary conditions determines the relative
+phase of the outgoing term, so the scattering problem may be
+parameterized by a real phase shift rather than by an unconstrained
+complex coefficient. This phase-shift angle is expressed using: \tan
+\eta_m = \tan \delta_m(k_1a) \left\[ \frac{ \tan \Phi_m + \tan
+\alpha_m(k_1 a) }{ \tan \Phi_m + \tan \beta_m(k_1 a) } \right\],
 
 where \alpha_m, \beta_m, and \delta_m are the scattering phase-angles,
 and \Phi_m is the boundary impedance phase-angle. These angles are
@@ -279,8 +279,8 @@ defined as: \begin{aligned} \delta_m(k_1a) &= \tan^{-1} \left\[
 -\frac{\rho_1}{\rho_2} \tan \zeta_m(k\_\ell a, \sigma), \end{aligned}
 
 where \zeta_m(k\_\ell a, \sigma) is the boundary-impedance phase angle
-induced by the elastic interior ([Faran 1951](#ref-faran_sound_1951)).
-Once obtained, B_m is: B_m = k_1 (-1)^m (2m + 1) h_m^{(1)}(k_1 r_0) \sin
+induced by the elastic interior ([Faran 1951](#ref-Faran_1951)). Once
+obtained, B_m is: B_m = k_1 (-1)^m (2m + 1) h_m^{(1)}(k_1 r_0) \sin
 \eta_m e^{-i \eta_m}.
 
 By imposing Neumann boundary conditions at the sphere’s surface (i.e., a
@@ -308,7 +308,7 @@ The associated backscattering cross-section is:
 \sigma\_{\mathrm{bs}} = \pi a^2 \|f\_{\mathrm{bs}}\|^2.
 
 Target strength is then reported as ([MacLennan
-1981](#ref-maclennan_theory_1981)):
+1981](#ref-Maclennan_1981)):
 
 \mathit{TS} = 10 \log\_{10} \frac{\sigma\_{\mathrm{bs}}}{4 \pi}.
 
@@ -335,6 +335,11 @@ Achenbach, J. D. 1973. *Wave Propagation in Elastic Solids*.
 North-Holland Series in Applied Mathematics and Mechanics, v. 16.
 Amsterdam New York: North-Holland Pub. Co. American Elsevier Pub. Co.
 
+Demer, David A., Laurent Berger, Matteo Bernasconi, Egil Bethke, Kevin
+Boswell, Dezhang Chu, Reka Domokos, et al. 2015. “Calibration of
+Acoustic Instruments.” ICES Cooperative Research Report, no. 326: 133.
+<https://doi.org/10.17895/ices.pub.5494>.
+
 Faran, James J. 1951. “Sound Scattering by Solid Cylinders and Spheres.”
 *The Journal of the Acoustical Society of America* 23 (4): 405–18.
 <https://doi.org/10.1121/1.1906780>.
@@ -342,6 +347,10 @@ Faran, James J. 1951. “Sound Scattering by Solid Cylinders and Spheres.”
 Foote, K. G. 1990. “Spheres for Calibrating an Eleven-Frequency Acoustic
 Measurement System.” *ICES Journal of Marine Science* 46 (3): 284–86.
 <https://doi.org/10.1093/icesjms/46.3.284>.
+
+Foote, Kenneth G. 1982. “Optimizing Copper Spheres for Precision
+Calibration of Hydroacoustic Equipment.” *The Journal of the Acoustical
+Society of America* 71 (3): 742–47. <https://doi.org/10.1121/1.387497>.
 
 Hickling, Robert. 1962. “Analysis of Echoes from a Solid Elastic Sphere
 in Water.” *The Journal of the Acoustical Society of America* 34 (10):

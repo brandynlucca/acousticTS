@@ -14,8 +14,8 @@ seawater. In the mesopelagic-fish setting of Khodabandeloo et
 al. (2021), those layers represent gas, a mechanically stiffer
 shell-like inclusion, and soft tissue whose viscosity damps and broadens
 the gas-driven resonance ([Khodabandeloo et al.
-2021](#ref-khodabandeloo_estimating_2021); [Feuillade and Nero
-1998](#ref-feuillade_nero_1998)).
+2021](#ref-Khodabandeloo_2021); [Feuillade and Nero
+1998](#ref-Feuillade_1998)).
 
 This family is still spherical, so the angular dependence remains
 separable. What makes it more intricate than `SPHMS`, `ESSMS`, or a
@@ -108,7 +108,7 @@ displacement field \mathbf{u}\_3 satisfies the Navier equation:
 \nabla\times(\nabla\times\mathbf{u}\_3) + \rho_3 \omega^2 \mathbf{u}\_3
 = 0,
 
-where \lambda_3 and \mu_3 are Lam'e parameters and \rho_3 is shell
+where \lambda_3 and \mu_3 are Lamé parameters and \rho_3 is shell
 density.
 
 The shell therefore supports longitudinal and transverse elastic waves
@@ -255,7 +255,10 @@ A_m^{(\mathrm{sca})},
 where the (-1)^m factor comes from evaluating the Legendre polynomials
 in the backscattering direction.
 
-The backscattering cross-section and target strength are then:
+The backscattering cross-section and target strength are then
+([MacLennan, Fernandes, and Dalen 2002](#ref-MacLennan_2002); [Urick
+1983](#ref-Urick_1983); [Simmonds and MacLennan
+2005](#ref-Simmonds_2005)):
 
 \sigma\_{\mathrm{bs}} = \left\|f\_{\mathrm{bs}}\right\|^2, \qquad
 \mathrm{TS} = 10\log\_{10}\left(\sigma\_{\mathrm{bs}}\right).
@@ -314,3 +317,15 @@ Physical Characteristics of Gas-Bearing Mesopelagic Fish from Wideband
 *in Situ* Echoes Using a Viscous-Elastic Scattering Model.” *The Journal
 of the Acoustical Society of America* 149 (1): 673–91.
 <https://doi.org/10.1121/10.0003341>.
+
+MacLennan, David N., Percy G. Fernandes, and John Dalen. 2002. “A
+Consistent Approach to Definitions and Symbols in Fisheries Acoustics.”
+*ICES Journal of Marine Science* 59 (2): 365–69.
+<https://doi.org/10.1006/jmsc.2001.1158>.
+
+Simmonds, John, and David N. MacLennan. 2005. *Fisheries Acoustics:
+Theory and Practice*. 2nd ed. Oxford, UK: Blackwell Science.
+<https://doi.org/10.1002/9780470995303>.
+
+Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed. New
+York, NY: McGraw-Hill.

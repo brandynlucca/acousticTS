@@ -4,8 +4,7 @@
 
 Building a model from scratch is easiest when the geometry, basis, and
 approximation regime stay aligned with the canonical scattering
-literature ([Morse and Ingard 1986](#ref-morse_theoretical_1986);
-[Waterman 2009](#ref-waterman_t_2009)).
+literature.
 
 One of the most useful features of acousticTS is that a new
 target-strength model does not need package-file edits just to be tried.
@@ -361,12 +360,3 @@ solver, and register the model in the registry,
 and
 [`simulate_ts()`](https://brandynlucca.github.io/acousticTS/reference/simulate_ts.md)
 can use it just like a built-in family.
-
-## References
-
-Morse, Philip M., and K. Uno Ingard. 1986. *Theoretical Acoustics*.
-Princeton, N.J: Princeton University Press.
-
-Waterman, P. C. 2009. “T -Matrix Methods in Acoustic Scattering.” *The
-Journal of the Acoustical Society of America* 125 (1): 42–51.
-<https://doi.org/10.1121/1.3035839>.

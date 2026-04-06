@@ -12,8 +12,8 @@ model for weakly scattering fluid-like bodies. It is most useful when
 the material contrasts are small enough that the total acoustic field
 inside the body remains close to the incident field, but the geometry is
 sufficiently extended that phase accumulation along the body cannot be
-ignored ([Morse and Ingard 1986](#ref-morse_theoretical_1986); [Stanton
-et al. 1998](#ref-stanton_sound_1998)). In that regime, a purely local
+ignored ([Morse and Ingard 1968](#ref-Morse_1968); [Stanton, Chu, and
+Wiebe 1998](#ref-Stanton_1998_2)). In that regime, a purely local
 approximation is too crude, while a full boundary-value solution is
 often unnecessary or unavailable.
 
@@ -380,7 +380,9 @@ is:
 
 \sigma\_{\text{bs}} = \|\mathcal{f}\_{\text{bs}}\|^2,
 
-and target strength is:
+and target strength is ([MacLennan, Fernandes, and Dalen
+2002](#ref-MacLennan_2002); [Urick 1983](#ref-Urick_1983); [Simmonds and
+MacLennan 2005](#ref-Simmonds_2005)):
 
 \mathit{TS} = 10 \log\_{10}\left( \sigma\_{\text{bs}} \right).
 
@@ -409,11 +411,22 @@ strongly resonant structures.
 
 ## References
 
-Morse, Philip M., and K. Uno Ingard. 1986. *Theoretical Acoustics*.
-Princeton, N.J: Princeton University Press.
+MacLennan, David N., Percy G. Fernandes, and John Dalen. 2002. “A
+Consistent Approach to Definitions and Symbols in Fisheries Acoustics.”
+*ICES Journal of Marine Science* 59 (2): 365–69.
+<https://doi.org/10.1006/jmsc.2001.1158>.
 
-Stanton, Timothy K., Dezhang Chu, Peter H. Wiebe, Linda V. Martin, and
-Robert L. Eastwood. 1998. “Sound Scattering by Several Zooplankton
-Groups. I. Experimental Determination of Dominant Scattering
-Mechanisms.” *The Journal of the Acoustical Society of America* 103 (1):
-225–35. <https://doi.org/10.1121/1.421469>.
+Morse, Philip M., and K. Uno Ingard. 1968. *Theoretical Acoustics*. New
+York, NY: McGraw-Hill.
+
+Simmonds, John, and David N. MacLennan. 2005. *Fisheries Acoustics:
+Theory and Practice*. 2nd ed. Oxford, UK: Blackwell Science.
+<https://doi.org/10.1002/9780470995303>.
+
+Stanton, Timothy K., Dezhang Chu, and Peter H. Wiebe. 1998. “Sound
+Scattering by Several Zooplankton Groups. II. Scattering Models.” *The
+Journal of the Acoustical Society of America* 103 (1): 236–53.
+<https://doi.org/10.1121/1.421110>.
+
+Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed. New
+York, NY: McGraw-Hill.

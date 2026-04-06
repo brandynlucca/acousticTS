@@ -132,8 +132,9 @@
 </div>
 <p>These pages follow the weak-scattering elongated-body formulation and
 later applied fisheries-acoustics usage of the distorted-wave Born
-approximation <span class="citation">(<a href="#ref-morse_theoretical_1986">Morse and Ingard 1986</a>; <a href="#ref-stanton_sound_1998-1">Stanton, Chu, and Wiebe 1998</a>; <a href="#ref-gastauer_zooscatrspan_2019">Gastauer, Chu, and Cox
-2019</a>)</span>.</p>
+approximation <span class="citation">(<a href="#ref-Morse_1968">Morse
+and Ingard 1968</a>; <a href="#ref-Chu_1993">Chu, Foote, and Stanton
+1993</a>)</span>.</p>
 <p>The acousticTS implementation of deterministic DWBA follows the same
 object-based pattern used throughout the package. A fluid-like scatterer
 is constructed first, the model is then run through
@@ -298,11 +299,9 @@ naturally into the same DWBA workflow.</p>
 <div class="section level4">
 <h4 id="published-reference-comparisons">Published reference comparisons<a class="anchor" aria-label="anchor" href="#published-reference-comparisons"></a>
 </h4>
-<p>For DWBA, the primary reference is the exact modal-series
-<code>Benchmark</code> column in the Jech weakly scattering sphere,
-prolate-spheroid, and cylinder files. The comparison below uses those
-canonical targets directly. Elapsed times are representative values from
-the current machine.</p>
+<p>The comparison below uses those canonical targets directly as
+reported in <span class="citation">Jech et al. (<a href="#ref-Jech_2015">2015</a>)</span>. Elapsed times are representative
+values from the current machine.</p>
 <table class="table">
 <colgroup>
 <col width="25%">
@@ -344,13 +343,6 @@ benchmark (dB)</th>
 deep nulls, so the sphere and cylinder maxima are driven by a small
 number of frequencies rather than by a uniform offset across the full
 sweep.</p>
-<p>There is no comparable benchmarked configuration sweep for DWBA
-beyond the target definition itself. The implementation does not expose
-a PSMS-style family of numerical switches such as precision levels,
-adaptive modal truncation, or simplified coefficient branches. For this
-model, geometry, orientation, and material contrast are the meaningful
-benchmark parameterizations, so the table above already captures the
-relevant implementation comparison space.</p>
 </div>
 <div class="section level4">
 <h4 id="bundled-krill-compatibility-check">Bundled krill compatibility check<a class="anchor" aria-label="anchor" href="#bundled-krill-compatibility-check"></a>
@@ -358,15 +350,10 @@ relevant implementation comparison space.</p>
 <p>The bundled <code>krill</code> object serves a different role from
 the canonical modal-series targets above. Rather than testing an exact
 canonical-shape solution, it is used to verify that the stored
-segmented-body geometry reproduces the published deterministic DWBA
-implementation and to show how that same geometry compares with an
-independent software implementation.</p>
+segmented-body geometry reproduces the <code>MATLAB</code> code provded
+by <span class="citation">McGehee, O’Driscoll, and Traykovski (<a href="#ref-mcgehee_software">1998</a>)</span> and echoSMs <span class="citation">(<a href="#ref-echoSMs_software">Elavia
+2021</a>)</span>.</p>
 <table class="table">
-<colgroup>
-<col width="33%">
-<col width="33%">
-<col width="33%">
-</colgroup>
 <thead><tr class="header">
 <th align="left">Comparison</th>
 <th align="right">Mean abs. <span class="math inline">\Delta</span> TS
@@ -376,31 +363,28 @@ independent software implementation.</p>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">acousticTS vs published McGehee MATLAB
-implementation</td>
+<td align="left">acousticTS vs McGehee et al. (1998)</td>
 <td align="right">1.23e-05</td>
 <td align="right">4.33e-05</td>
 </tr>
 <tr class="even">
-<td align="left">acousticTS vs independent DWBA implementation</td>
+<td align="left">acousticTS vs echoSMs</td>
 <td align="right">0.42284</td>
 <td align="right">1.01167</td>
 </tr>
 <tr class="odd">
-<td align="left">Independent DWBA implementation vs published McGehee
-MATLAB implementation</td>
+<td align="left">McGehee et al. (1998) vs echoSMs</td>
 <td align="right">0.42284</td>
 <td align="right">1.01167</td>
 </tr>
 </tbody>
 </table>
-<p>On this bundled krill geometry, acousticTS reproduces the published
-McGehee MATLAB implementation essentially exactly, while the independent
-implementation remains within about 1 dB of the same spectrum but does
-not collapse onto the published curve. That makes the canonical
-modal-series table above and the bundled krill comparison complementary:
-one checks exact isolated-shape behavior, and the other checks a
-published segmented-body DWBA target.</p>
+<p>On this bundled krill geometry, acousticTS reproduces <span class="citation">McGehee, O’Driscoll, and Traykovski (<a href="#ref-mcgehee_software">1998</a>)</span> essentially exactly, while
+the echoSMs remains within about 1 dB of the same spectrum but does not
+collapse onto the published curve. That makes the canonical modal-series
+table above and the bundled krill comparison complementary: one checks
+exact isolated-shape behavior, and the other checks a published
+segmented-body DWBA target.</p>
 </div>
 </div>
 </div>
@@ -408,24 +392,34 @@ published segmented-body DWBA target.</p>
 <h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
 </h2>
 <div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
-<div id="ref-gastauer_zooscatrspan_2019" class="csl-entry">
-Gastauer, Sven, Dezhang Chu, and Martin J. Cox. 2019.
-<span>“<span>ZooScatR</span>—<span>An</span> <span>&lt;</span>Span
-Style="font-Variant:small-Caps;"<span>&gt;</span>r<span>&lt;</span>/Span<span>&gt;</span>
-Package for Modelling the Scattering Properties of Weak Scattering
-Targets Using the Distorted Wave <span>Born</span>
-Approximation.”</span> <em>The Journal of the Acoustical Society of
-America</em> 145 (1): EL102–8. <a href="https://doi.org/10.1121/1.5085655" class="external-link">https://doi.org/10.1121/1.5085655</a>.
+<div id="ref-Chu_1993" class="csl-entry">
+Chu, Dezhang, Kenneth G. Foote, and Timothy K. Stanton. 1993.
+<span>“Further Analysis of Target Strength Measurements of
+<span>Antarctic</span> Krill at 38 and 120 <span class="nocase">kHz</span>: <span>Comparison</span> with Deformed
+Cylinder Model and Inference of Orientation Distribution.”</span>
+<em>The Journal of the Acoustical Society of America</em> 93 (5):
+2985–88. <a href="https://doi.org/10.1121/1.405818" class="external-link">https://doi.org/10.1121/1.405818</a>.
 </div>
-<div id="ref-morse_theoretical_1986" class="csl-entry">
-Morse, Philip M., and K. Uno Ingard. 1986. <em>Theoretical
-Acoustics</em>. Princeton, N.J: Princeton University Press.
+<div id="ref-echoSMs_software" class="csl-entry">
+Elavia, A. 2021. <span>“Liquid_spheroid: Acoustic Scattering by a Liquid
+Prolate Spheroid.”</span> <a href="https://github.com/elavia/liquid_spheroid" class="external-link">https://github.com/elavia/liquid_spheroid</a>.
 </div>
-<div id="ref-stanton_sound_1998-1" class="csl-entry">
-Stanton, Timothy K., Dezhang Chu, and Peter H. Wiebe. 1998. <span>“Sound
-Scattering by Several Zooplankton Groups. <span>II</span>.
-<span>Scattering</span> Models.”</span> <em>The Journal of the
-Acoustical Society of America</em> 103 (1): 236–53. <a href="https://doi.org/10.1121/1.421110" class="external-link">https://doi.org/10.1121/1.421110</a>.
+<div id="ref-Jech_2015" class="csl-entry">
+Jech, J. Michael, John K. Horne, Dezhang Chu, David A. Demer, David T.
+I. Francis, Natalia Gorska, Benjamin Jones, et al. 2015.
+<span>“Comparisons Among Ten Models of Acoustic Backscattering Used in
+Aquatic Ecosystem Research.”</span> <em>The Journal of the Acoustical
+Society of America</em> 138 (6): 3742–64. <a href="https://doi.org/10.1121/1.4937607" class="external-link">https://doi.org/10.1121/1.4937607</a>.
+</div>
+<div id="ref-mcgehee_software" class="csl-entry">
+McGehee, D. E., R. L. O’Driscoll, and L. V.Martin Traykovski. 1998.
+<span>“Effects of Orientation on Acoustic Scattering from
+<span>Antarctic</span> Krill at 120 <span class="nocase">kHz</span>.”</span> <em>Deep Sea Research Part II:
+Topical Studies in Oceanography</em> 45 (7): 1273–94. <a href="https://doi.org/10.1016/S0967-0645(98)00036-8" class="external-link">https://doi.org/10.1016/S0967-0645(98)00036-8</a>.
+</div>
+<div id="ref-Morse_1968" class="csl-entry">
+Morse, Philip M., and K. Uno Ingard. 1968. <em>Theoretical
+Acoustics</em>. New York, NY: McGraw-Hill.
 </div>
 </div>
 </div>

@@ -131,7 +131,8 @@
 </div>
 </div>
 <p>These pages connect krill-body DWBA models to phase variability,
-orientation effects, and practical survey use <span class="citation">(<a href="#ref-demer_reconciling_2003">Demer and Conti 2003a</a>; <a href="#ref-demer_validation_2003">Demer and Conti 2003b</a>, <a href="#ref-demer_new_2005">2005</a>; <a href="#ref-conti_improved_2006">Conti and Demer 2006</a>)</span>.</p>
+orientation effects, and practical survey use <span class="citation">(<a href="#ref-Demer_2003_1">Demer and Conti 2003a</a>; <a href="#ref-Demer_2003_2">Demer and Conti 2003b</a>, <a href="#ref-Demer_2005">2005</a>; <a href="#ref-Conti_2006">Conti and
+Demer 2006</a>)</span>.</p>
 <p>The acousticTS package uses object-based scatterers so the same
 implementation pattern carries across models: create a scatterer, run
 <code><a href="../../reference/target_strength.html">target_strength()</a></code>, inspect the stored model output, and
@@ -454,7 +455,10 @@ frequency grid, a common broadside incidence, and the same stochastic
 reference values used for the benchmark calculations
 (<code>N0 = 50</code>, <code>phase_sd_init = sqrt(2) / 32</code>,
 <code>L0 = 38.35 mm</code>, <code>f0 = 120 kHz</code>,
-<code>n_iterations = 100</code>).</p>
+<code>n_iterations = 100</code>). These include a <code>MATLAB</code>
+implementation from CCAMLR <span class="citation">(<a href="#ref-CCAMLR_SDWBA_software">Commission for the Conservation of
+Antarctic Marine Living Resources 2019</a>)</span>, NOAA applet <span class="citation">(<a href="#ref-NOAA-SDWBA_software"><strong>NOAA-SDWBA_software?</strong></a>)</span>,
+and the <code>Python</code> package echoSMs <span class="citation">(<a href="#ref-echoSMs_software">Elavia 2021</a>)</span>.</p>
 <table class="table">
 <thead><tr class="header">
 <th align="left">Comparison</th>
@@ -465,8 +469,7 @@ reference values used for the benchmark calculations
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">acousticTS vs <code>echoSMs</code>
-</td>
+<td align="left">acousticTS vs echoSMs</td>
 <td align="right">1.70257</td>
 <td align="right">30.63630</td>
 </tr>
@@ -476,24 +479,22 @@ reference values used for the benchmark calculations
 <td align="right">0.18270</td>
 </tr>
 <tr class="odd">
-<td align="left">acousticTS vs NOAA HTML</td>
+<td align="left">acousticTS vs NOAA</td>
 <td align="right">0.06158</td>
 <td align="right">0.52846</td>
 </tr>
 <tr class="even">
-<td align="left">
-<code>echoSMs</code> vs CCAMLR MATLAB</td>
+<td align="left">echoSMs vs CCAMLR MATLAB</td>
 <td align="right">1.74808</td>
 <td align="right">30.72119</td>
 </tr>
 <tr class="odd">
-<td align="left">
-<code>echoSMs</code> vs NOAA HTML</td>
+<td align="left">echoSMs vs NOAA</td>
 <td align="right">1.69189</td>
 <td align="right">30.27117</td>
 </tr>
 <tr class="even">
-<td align="left">CCAMLR MATLAB vs NOAA HTML</td>
+<td align="left">CCAMLR MATLAB vs NOAA</td>
 <td align="right">0.13036</td>
 <td align="right">0.65798</td>
 </tr>
@@ -505,13 +506,12 @@ dimensions and the same initial stochastic reference values, but they do
 not use the same stochastic convention. In the current external
 implementations, both the CCAMLR MATLAB code and the NOAA HTML code
 square the phase term in the stochastic multiplier, while acousticTS
-keeps the paper-style linear phase standard deviation and
-<code>echoSMs</code> follows its own direct stochastic-phase
-application. So the bundled krill comparison is complementary to the
-canonical tables above: one set checks the stochastic model against
-published weakly scattering reference cases, and the other checks how
-the same biological krill geometry separates across existing SDWBA
-implementations.</p>
+keeps the paper-style linear phase standard deviation and echoSMs
+follows its own direct stochastic-phase application. So the bundled
+krill comparison is complementary to the canonical tables above: one set
+checks the stochastic model against published weakly scattering
+reference cases, and the other checks how the same biological krill
+geometry separates across existing SDWBA implementations.</p>
 </div>
 </div>
 </div>
@@ -519,30 +519,40 @@ implementations.</p>
 <h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
 </h2>
 <div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
-<div id="ref-conti_improved_2006" class="csl-entry">
+<div id="ref-CCAMLR_SDWBA_software" class="csl-entry">
+Commission for the Conservation of Antarctic Marine Living Resources.
+2019. <span>“<span>SDWBA_TS</span>: Stochastic Distorted-Wave Born
+Approximation (<span>SDWBA</span>) Target Strength (<span>TS</span>)
+Model.”</span> <a href="https://github.com/ccamlr/SDWBA_TS" class="external-link uri">https://github.com/ccamlr/SDWBA_TS</a>; GitHub.
+</div>
+<div id="ref-Conti_2006" class="csl-entry">
 Conti, Stéphane G., and David A. Demer. 2006. <span>“Improved
 Parameterization of the <span>SDWBA</span> for Estimating Krill Target
 Strength.”</span> <em>ICES Journal of Marine Science</em> 63 (5):
 928–35. <a href="https://doi.org/10.1016/j.icesjms.2006.02.007" class="external-link">https://doi.org/10.1016/j.icesjms.2006.02.007</a>.
 </div>
-<div id="ref-demer_reconciling_2003" class="csl-entry">
+<div id="ref-Demer_2003_1" class="csl-entry">
 Demer, David A., and Stephane G. Conti. 2003a. <span>“Reconciling
 Theoretical Versus Empirical Target Strengths of Krill: Effects of Phase
 Variability on the Distorted-Wave <span>Born</span>
 Approximation.”</span> <em>ICES Journal of Marine Science</em> 60 (2):
 429–34. <a href="https://doi.org/10.1016/S1054-3139(03)00002-X" class="external-link">https://doi.org/10.1016/S1054-3139(03)00002-X</a>.
 </div>
-<div id="ref-demer_validation_2003" class="csl-entry">
+<div id="ref-Demer_2003_2" class="csl-entry">
 Demer, David A., and Stéphane G. Conti. 2003b. <span>“Validation of the
 Stochastic Distorted-Wave <span>Born</span> Approximation Model with
 Broad Bandwidth Total Target Strength Measurements of
 <span>Antarctic</span> Krill.”</span> <em>ICES Journal of Marine
 Science</em> 60 (3): 625–35. <a href="https://doi.org/10.1016/S1054-3139(03)00063-8" class="external-link">https://doi.org/10.1016/S1054-3139(03)00063-8</a>.
 </div>
-<div id="ref-demer_new_2005" class="csl-entry">
+<div id="ref-Demer_2005" class="csl-entry">
 ———. 2005. <span>“New Target-Strength Model Indicates More Krill in the
 <span>Southern</span> <span>Ocean</span>.”</span> <em>ICES Journal of
 Marine Science</em> 62 (1): 25–32. <a href="https://doi.org/10.1016/j.icesjms.2004.07.027" class="external-link">https://doi.org/10.1016/j.icesjms.2004.07.027</a>.
+</div>
+<div id="ref-echoSMs_software" class="csl-entry">
+Elavia, A. 2021. <span>“Liquid_spheroid: Acoustic Scattering by a Liquid
+Prolate Spheroid.”</span> <a href="https://github.com/elavia/liquid_spheroid" class="external-link">https://github.com/elavia/liquid_spheroid</a>.
 </div>
 </div>
 </div>

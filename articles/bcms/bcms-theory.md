@@ -10,10 +10,10 @@ Unvalidated Experimental
 The bent-cylinder modal series solution (`BCMS`) is a curvature-aware
 extension of the straight finite-cylinder modal family developed by
 Stanton for finite-length cylinders near broadside ([Stanton
-1988](#ref-stanton_sound_1988), [1989](#ref-stanton_sound_1989)). The
-physical idea is simple: curvature modifies the way different parts of
-the cylinder remain coherent with one another, but it does not replace
-the local cross-sectional scattering physics with a completely different
+1988](#ref-Stanton_1988), [1989](#ref-Stanton_1989_2)). The physical
+idea is simple: curvature modifies the way different parts of the
+cylinder remain coherent with one another, but it does not replace the
+local cross-sectional scattering physics with a completely different
 kernel.
 
 That separation leads to a two-level theory:
@@ -128,7 +128,9 @@ coherent length decreases.
 
 Once the straight modal kernel and bent coherent-length factor are
 known, the backscattering cross-section and target strength follow the
-standard monostatic definitions:
+standard monostatic definitions ([MacLennan, Fernandes, and Dalen
+2002](#ref-MacLennan_2002); [Urick 1983](#ref-Urick_1983); [Simmonds and
+MacLennan 2005](#ref-Simmonds_2005)):
 
 \sigma\_{\mathrm{bs}} =
 \left\|f\_{\mathrm{bs}}^{(\mathrm{bent})}\right\|^2, \qquad \mathrm{TS}
@@ -157,6 +159,15 @@ axis destroys coherence.
 
 ## References
 
+MacLennan, David N., Percy G. Fernandes, and John Dalen. 2002. “A
+Consistent Approach to Definitions and Symbols in Fisheries Acoustics.”
+*ICES Journal of Marine Science* 59 (2): 365–69.
+<https://doi.org/10.1006/jmsc.2001.1158>.
+
+Simmonds, John, and David N. MacLennan. 2005. *Fisheries Acoustics:
+Theory and Practice*. 2nd ed. Oxford, UK: Blackwell Science.
+<https://doi.org/10.1002/9780470995303>.
+
 Stanton, T. K. 1988. “Sound Scattering by Cylinders of Finite Length. I.
 Fluid Cylinders.” *The Journal of the Acoustical Society of America* 83
 (1): 55–63. <https://doi.org/10.1121/1.396184>.
@@ -164,3 +175,6 @@ Fluid Cylinders.” *The Journal of the Acoustical Society of America* 83
 ———. 1989. “Sound Scattering by Cylinders of Finite Length. III.
 Deformed Cylinders.” *The Journal of the Acoustical Society of America*
 86 (2): 691–705. <https://doi.org/10.1121/1.398193>.
+
+Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed. New
+York, NY: McGraw-Hill.

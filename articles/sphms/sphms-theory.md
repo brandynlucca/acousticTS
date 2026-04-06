@@ -13,8 +13,8 @@ Helmholtz equation separates in spherical coordinates, the incident,
 scattered, and interior fields can be expanded in spherical
 eigenfunctions, and the boundary conditions reduce to independent
 algebraic equations for each angular order ([Anderson
-1950](#ref-anderson_sound_1950); [Faran 1951](#ref-faran_sound_1951);
-[Hickling 1962](#ref-hickling_analysis_1962)).
+1950](#ref-Anderson_1950); [Faran 1951](#ref-Faran_1951); [Hickling
+1962](#ref-Hickling_1962)).
 
 That structure is what underlies the spherical modal series solution for
 rigid, pressure-release, fluid-filled, and gas-filled spheres. In this
@@ -130,8 +130,8 @@ separated radial equation.
 ### Exterior scattered field
 
 The exterior scattered field must satisfy the Sommerfeld radiation
-condition and is therefore expanded in outgoing spherical Hankel
-functions:
+condition ([Sommerfeld 1949](#ref-Sommerfeld_1949)) and is therefore
+expanded in outgoing spherical Hankel functions:
 
 p\_{1,\text{scat}}(r,\theta) = P_0\sum\_{n=0}^{\infty}(2n+1)i^n A_n
 h_n^{(1)}(k_1r)P_n(\cos\theta).
@@ -288,7 +288,9 @@ cross-section is:
 
 \sigma\_\text{bs} = \|\mathcal{f}\_\text{bs}\|^2
 
-and the target strength is:
+and the target strength is ([MacLennan, Fernandes, and Dalen
+2002](#ref-MacLennan_2002); [Urick 1983](#ref-Urick_1983); [Simmonds and
+MacLennan 2005](#ref-Simmonds_2005)):
 
 TS = 10\log\_{10}(\sigma\_\text{bs}).
 
@@ -330,3 +332,18 @@ Faran, James J. 1951. “Sound Scattering by Solid Cylinders and Spheres.”
 Hickling, Robert. 1962. “Analysis of Echoes from a Solid Elastic Sphere
 in Water.” *The Journal of the Acoustical Society of America* 34 (10):
 1582–92. <https://doi.org/10.1121/1.1909055>.
+
+MacLennan, David N., Percy G. Fernandes, and John Dalen. 2002. “A
+Consistent Approach to Definitions and Symbols in Fisheries Acoustics.”
+*ICES Journal of Marine Science* 59 (2): 365–69.
+<https://doi.org/10.1006/jmsc.2001.1158>.
+
+Simmonds, John, and David N. MacLennan. 2005. *Fisheries Acoustics:
+Theory and Practice*. 2nd ed. Oxford, UK: Blackwell Science.
+<https://doi.org/10.1002/9780470995303>.
+
+Sommerfeld, Arnold. 1949. *Partial Differential Equations in Physics*.
+Vol. 6. Lectures on Theoretical Physics. New York: Academic Press.
+
+Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed. New
+York, NY: McGraw-Hill.

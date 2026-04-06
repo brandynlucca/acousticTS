@@ -9,8 +9,8 @@ Benchmarked Unvalidated
 
 These pages come from the high-frequency elongated-body literature and
 later fish and zooplankton applications ([Stanton et al.
-1993](#ref-stanton_etal_1993), [1998](#ref-stanton_sound_1998);
-[Stanton, Chu, and Wiebe 1998](#ref-stanton_sound_1998-1)).
+1993](#ref-Stanton_1993), [1998](#ref-Stanton_1998_1); [Stanton, Chu,
+and Wiebe 1998](#ref-Stanton_1998_2)).
 
 The two-ray cylinder model (`TRCM`) is a high-frequency asymptotic
 family for elongated fluid-like bodies. It retains only two dominant
@@ -64,7 +64,7 @@ Journal of the Acoustical Society of America* 103 (1): 236–53.
 <https://doi.org/10.1121/1.421110>.
 
 Stanton, Timothy K., Dezhang Chu, Peter H. Wiebe, and Clarence S. Clay.
-1993. “Average Echoes from Randomly Oriented Random‐length Finite
+1993. “Average Echoes from Randomly Oriented Random-Length Finite
 Cylinders: Zooplankton Models.” *The Journal of the Acoustical Society
 of America* 94 (6): 3463–72. <https://doi.org/10.1121/1.407200>.
 

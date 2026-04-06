@@ -9,9 +9,8 @@ Benchmarked Validated
 
 These pages are grounded in the standard-target calibration literature
 for elastic reference spheres ([Dragonette, Numrich, and Frank
-1981](#ref-dragonette_calibration_1981); [Foote
-1990](#ref-foote_spheres_1990); [MacLennan
-1981](#ref-maclennan_theory_1981)).
+1981](#ref-Dragonette_1981); [Foote 1990](#ref-Foote_1990); [MacLennan
+1981](#ref-Maclennan_1981)).
 
 The calibration workflow in acousticTS is designed to be short and
 explicit. A user first creates a calibration sphere object, then
@@ -201,22 +200,22 @@ wave speeds have changed.
 
 Because the calibration-sphere model is itself a modal-series solution,
 the most useful implementation check is agreement with other MacLennan
-(1981) elastic-sphere implementations rather than with a separate
-benchmark family. In the comparisons below, that includes `SphereTS`
-([Macaulay 2025](#ref-macaulay_spherets_2025)) alongside the other
-reference implementations. The acousticTS solver includes an `adaptive`
-argument. When `adaptive = TRUE` (the default), the solver starts from
-the usual \mathrm{round}(ka)+10 partial waves and then extends the sum
-until the tail term is below 10^{-10}. When `adaptive = FALSE`, it falls
-back to the original fixed cutoff only. The adaptive mode removes the
-small truncation bias that otherwise remains at the upper end of the
-comparison band. For the default 38.1 mm tungsten-carbide sphere, the
-comparison below uses the shared material properties c\_\ell = 6853 m
-s^{-1}, c\_\tau = 4171 m s^{-1}, and \rho = 14900 kg m^{-3} together
-with the standard surrounding-water values c = 1477.3 m s^{-1} and \rho
-= 1026.8 kg m^{-3}. The frequency grid is limited to 1–360 kHz so that
-the NWFSC calibration-sphere applet remains inside its stated ka
-\lesssim 30 reliability range.
+([1981](#ref-Maclennan_1981)) elastic-sphere implementations rather than
+with a separate benchmark family. In the comparisons below, that
+includes SphereTS ([Macaulay 2025](#ref-SphereTS_software)) alongside
+the other reference implementations. The acousticTS solver includes an
+`adaptive` argument. When `adaptive = TRUE` (the default), the solver
+starts from the usual \mathrm{round}(ka)+10 partial waves and then
+extends the sum until the tail term is below 10^{-10}. When
+`adaptive = FALSE`, it falls back to the original fixed cutoff only. The
+adaptive mode removes the small truncation bias that otherwise remains
+at the upper end of the comparison band. For the default 38.1 mm
+tungsten-carbide sphere, the comparison below uses the shared material
+properties c\_\ell = 6853 m s^{-1}, c\_\tau = 4171 m s^{-1}, and \rho =
+14900 kg m^{-3} together with the standard surrounding-water values c =
+1477.3 m s^{-1} and \rho = 1026.8 kg m^{-3}. The frequency grid is
+limited to 1–360 kHz so that the NWFSC calibration-sphere applet remains
+inside its stated ka \lesssim 30 reliability range.
 
 | Comparison                | N frequency | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) |
 |:--------------------------|------------:|------------------------:|-------------------------:|
@@ -232,23 +231,24 @@ NOAA calibration applet for the 38.1 mm tungsten-carbide
 sphere.](calibration-external-comparison.png)
 
 These comparisons show that the current acousticTS elastic-sphere
-implementation is numerically aligned with the other MacLennan (1981)
-software implementations over the full comparison band. For the 38.1 mm
-tungsten-carbide case, the largest absolute differences are on the order
-of 10^{-10} dB when `adaptive = TRUE`, which means the remaining
-disagreement is just numerical noise from the special-function libraries
-and stopping criteria rather than a substantive model discrepancy. With
-the original fixed cutoff (`adaptive = FALSE`), the same case stays very
-close but relaxes to a maximum package-to-package difference of about
-7.2 \times 10^{-5} dB. On this machine, the adaptive cutoff increases
-the elapsed time for the 360-point 38.1 mm tungsten-carbide spectrum
-from about 0.31 s to about 0.37 s.
+implementation is numerically aligned with the other MacLennan
+([1981](#ref-Maclennan_1981)) software implementations over the full
+comparison band. For the 38.1 mm tungsten-carbide case, the largest
+absolute differences are on the order of 10^{-10} dB when
+`adaptive = TRUE`, which means the remaining disagreement is just
+numerical noise from the special-function libraries and stopping
+criteria rather than a substantive model discrepancy. With the original
+fixed cutoff (`adaptive = FALSE`), the same case stays very close but
+relaxes to a maximum package-to-package difference of about 7.2 \times
+10^{-5} dB. On this machine, the adaptive cutoff increases the elapsed
+time for the 360-point 38.1 mm tungsten-carbide spectrum from about 0.31
+s to about 0.37 s.
 
 To show that this is not unique to the 38.1 mm tungsten-carbide sphere,
 the same comparison was repeated for one smaller tungsten-carbide sphere
 and one copper sphere from the calibration-target definitions shipped
-with `echoSMs`, again including the `SphereTS` implementation ([Macaulay
-2025](#ref-macaulay_spherets_2025)).
+with echoSMs ([Elavia 2021](#ref-echoSMs_software)), again including the
+`SphereTS` implementation ([Macaulay 2025](#ref-SphereTS_software)).
 
 | Target                    | Diameter (mm) | N frequency | Max frequency (kHz) | Max abs. \Delta adapt = TRUE vs echoSMs (dB) | Max abs. \Delta adapt = FALSE vs echoSMs (dB) | Max abs. \Delta adapt = TRUE vs sphereTS (dB) | Max abs. \Delta adapt = FALSE vs sphereTS (dB) | Max abs. \Delta adapt = TRUE vs NOAA applet (dB) | Max abs. \Delta adapt = FALSE vs NOAA applet (dB) | Elapsed acousticTS adapt = TRUE (s) | Elapsed acousticTS adapt = FALSE (s) | Elapsed echoSMs (s) | Elapsed sphereTS (s) | Elapsed NOAA applet (s) |
 |:--------------------------|--------------:|------------:|--------------------:|---------------------------------------------:|----------------------------------------------:|----------------------------------------------:|-----------------------------------------------:|-------------------------------------------------:|--------------------------------------------------:|------------------------------------:|-------------------------------------:|--------------------:|---------------------:|------------------------:|
@@ -262,7 +262,9 @@ remains within about 10^{-5} to 10^{-4} dB of the other implementations
 over the same grids. The timing columns are machine-specific, but they
 are still useful for showing the qualitative cost of the adaptive cutoff
 relative to the old fixed modal limit and the other available
-implementations. \## Closing note
+implementations.
+
+### Closing note
 
 Calibration spheres are one of the cleanest places in the package to see
 the full object-to-model workflow in action. A well-defined object is
@@ -276,6 +278,9 @@ Dragonette, Louis R., S. K. Numrich, and Laurence J. Frank. 1981.
 “Calibration Technique for Acoustic Scattering Measurements.” *The
 Journal of the Acoustical Society of America* 69 (4): 1186–89.
 <https://doi.org/10.1121/1.385699>.
+
+Elavia, A. 2021. “Liquid_spheroid: Acoustic Scattering by a Liquid
+Prolate Spheroid.” <https://github.com/elavia/liquid_spheroid>.
 
 Foote, K. G. 1990. “Spheres for Calibrating an Eleven-Frequency Acoustic
 Measurement System.” *ICES Journal of Marine Science* 46 (3): 284–86.

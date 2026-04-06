@@ -131,7 +131,7 @@
 </div>
 </div>
 <p>These pages are grounded in the classical elastic-shell scattering
-literature for fluid-filled spherical shells <span class="citation">(<a href="#ref-goodman_reflection_1962">Goodman and Stern 1962</a>; <a href="#ref-faran_sound_1951">Faran 1951</a>; <a href="#ref-stanton_sound_1990">Stanton 1990</a>)</span>.</p>
+literature for fluid-filled spherical shells <span class="citation">(<a href="#ref-Goodman_1962">Goodman and Stern 1962</a>; <a href="#ref-Faran_1951">Faran 1951</a>; <a href="#ref-Stanton_1990">Stanton 1990</a>)</span>.</p>
 <p>An elastic shell is a solid scattering structure that supports both
 longitudinal (<span class="math inline">\ell</span>) and transverse
 (<span class="math inline">\tau</span>) wave within the shell material
@@ -218,7 +218,7 @@ introducing longitudinal and transverse wave potentials:</p>
 \mu\,\nabla\times(\nabla\times\mathbf{u}) + \rho_s \omega^2 \mathbf{u} =
 0,
 </span></p>
-<p>where <span class="math inline">\lambda</span> and <span class="math inline">\mu</span> are the Lam'e elastic constants and <span class="math inline">\rho_2</span> is the mass density of the shell.
+<p>where <span class="math inline">\lambda</span> and <span class="math inline">\mu</span> are the Lamé elastic constants and <span class="math inline">\rho_2</span> is the mass density of the shell.
 Applying the Helmholtz decomposition, <span class="math inline">\mathbf{u}</span> is written as:</p>
 <p><span class="math display">
   \mathbf{u} = \nabla\phi + \nabla\times\mathbf{\Psi},
@@ -303,7 +303,8 @@ linearized momentum equation:</p>
   p = -\rho\,\frac{\partial \phi}{\partial t}.
 </span></p>
 <p>For time-harmonic fields with <span class="math inline">e^{-i\omega
-t}</span> dependence, the pressure can be further expressed as:</p>
+t}</span> dependence, the pressure can be further expressed as <span class="citation">(<a href="#ref-Morse_1968">Morse and Ingard
+1968</a>)</span>:</p>
 <p><span class="math display">
   p = i\omega\rho\,\phi.
 </span></p>
@@ -666,8 +667,8 @@ contribute entries such as:</p>
 </span></p>
 <p>The remaining <span class="math inline">\alpha_{ij}</span> terms are
 obtained by substituting the modal expressions for <span class="math inline">u_r</span> and <span class="math inline">u_\theta</span> into <span class="math inline">\sigma_{rr}</span> and <span class="math inline">\sigma_{r\theta}</span>, then evaluating at <span class="math inline">r=a</span> and <span class="math inline">r=b</span>.
-Explicit expressions for all <span class="math inline">\alpha_{ij}</span> are given in Goodman and Stern
-(1962) with some modifications described in Stanton (1990).</p>
+Explicit expressions for all <span class="math inline">\alpha_{ij}</span> are given in <span class="citation">Goodman and Stern (<a href="#ref-Goodman_1962">1962</a>)</span> with some modifications
+described in <span class="citation">Stanton (<a href="#ref-Stanton_1990">1990</a>)</span>.</p>
 </div>
 <div class="section level4">
 <h4 id="solving-for-a_m1">Solving for <span class="math inline">A_m^{(1)}</span><a class="anchor" aria-label="anchor" href="#solving-for-a_m1"></a>
@@ -675,7 +676,8 @@ Explicit expressions for all <span class="math inline">\alpha_{ij}</span> are gi
 <p>For each angular order <span class="math inline">m</span>, the
 interface conditions yield the linear system <span class="math inline">\mathbf{M}_m \mathbf{x}_m = \mathbf{F}_m</span>,
 where the first unknown corresponds to the exterior scattering
-coefficient, <span class="math inline">A_m^{(1)}</span>. For each <span class="math inline">m&gt;0</span>, <span class="math inline">A_m^{(1)}</span> is obtained by Cramer’s rule:</p>
+coefficient, <span class="math inline">A_m^{(1)}</span>. For each <span class="math inline">m&gt;0</span>, <span class="math inline">A_m^{(1)}</span> is obtained by <a href="https://en.wikipedia.org/wiki/Cramer%27s_rule" class="external-link">Cramer’s
+rule</a>:</p>
 <p><span class="math display">
   A_m^{(1)} = -i^m (2m + 1)
   \frac{
@@ -777,7 +779,7 @@ Legendre polynomials:</p>
 wave must be finite at the origin.</p>
 <p>The scattered field is written as the sum of partial waves using
 outgoing spherical Hankel functions to enforce the Sommerfeld radiation
-condition:</p>
+condition <span class="citation">(<a href="#ref-Sommerfeld_1949">Sommerfeld 1949</a>)</span>:</p>
 <p><span class="math display">
   p_{\mathrm{scat}}(r,\theta) =
     P_0 \sum_{m=0}^{\infty} (2m+1) A_m^{(1)}
@@ -848,7 +850,7 @@ simplify to:</p>
 \sum_{m=0}^{\infty} (2m+1) A_m^{(1)} (-1)^m.
 </span></p>
 <p>This coefficient therefore defines the backscattering cross-section
-and target strength through:</p>
+and target strength through <span class="citation">(<a href="#ref-MacLennan_2002">MacLennan, Fernandes, and Dalen 2002</a>; <a href="#ref-Urick_1983">Urick 1983</a>; <a href="#ref-Simmonds_2005">Simmonds and MacLennan 2005</a>)</span>:</p>
 <p><span class="math display">
   \sigma_\text{bs} = |\mathcal{f}_\text{bs}(\theta = \pi)|^2,
   \quad
@@ -904,20 +906,43 @@ terms.</p>
 <h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
 </h2>
 <div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
-<div id="ref-faran_sound_1951" class="csl-entry">
+<div id="ref-Faran_1951" class="csl-entry">
 Faran, James J. 1951. <span>“Sound Scattering by Solid Cylinders and
 Spheres.”</span> <em>The Journal of the Acoustical Society of
 America</em> 23 (4): 405–18. <a href="https://doi.org/10.1121/1.1906780" class="external-link">https://doi.org/10.1121/1.1906780</a>.
 </div>
-<div id="ref-goodman_reflection_1962" class="csl-entry">
+<div id="ref-Goodman_1962" class="csl-entry">
 Goodman, Ralph R., and Raya Stern. 1962. <span>“Reflection and
 Transmission of Sound by Elastic Spherical Shells.”</span> <em>The
 Journal of the Acoustical Society of America</em> 34 (3): 338–44. <a href="https://doi.org/10.1121/1.1928120" class="external-link">https://doi.org/10.1121/1.1928120</a>.
 </div>
-<div id="ref-stanton_sound_1990" class="csl-entry">
+<div id="ref-MacLennan_2002" class="csl-entry">
+MacLennan, David N., Percy G. Fernandes, and John Dalen. 2002. <span>“A
+Consistent Approach to Definitions and Symbols in Fisheries
+Acoustics.”</span> <em>ICES Journal of Marine Science</em> 59 (2):
+365–69. <a href="https://doi.org/10.1006/jmsc.2001.1158" class="external-link">https://doi.org/10.1006/jmsc.2001.1158</a>.
+</div>
+<div id="ref-Morse_1968" class="csl-entry">
+Morse, Philip M., and K. Uno Ingard. 1968. <em>Theoretical
+Acoustics</em>. New York, NY: McGraw-Hill.
+</div>
+<div id="ref-Simmonds_2005" class="csl-entry">
+Simmonds, John, and David N. MacLennan. 2005. <em>Fisheries Acoustics:
+Theory and Practice</em>. 2nd ed. Oxford, UK: Blackwell Science. <a href="https://doi.org/10.1002/9780470995303" class="external-link">https://doi.org/10.1002/9780470995303</a>.
+</div>
+<div id="ref-Sommerfeld_1949" class="csl-entry">
+Sommerfeld, Arnold. 1949. <em>Partial Differential Equations in
+Physics</em>. Vol. 6. Lectures on Theoretical Physics. New York:
+Academic Press.
+</div>
+<div id="ref-Stanton_1990" class="csl-entry">
 Stanton, T. K. 1990. <span>“Sound Scattering by Spherical and Elongated
 Shelled Bodies.”</span> <em>The Journal of the Acoustical Society of
 America</em> 88 (3): 1619–33. <a href="https://doi.org/10.1121/1.400321" class="external-link">https://doi.org/10.1121/1.400321</a>.
+</div>
+<div id="ref-Urick_1983" class="csl-entry">
+Urick, Robert J. 1983. <em>Principles of Underwater Sound</em>. 3rd ed.
+New York, NY: McGraw-Hill.
 </div>
 </div>
 </div>

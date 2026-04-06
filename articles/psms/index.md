@@ -9,9 +9,7 @@ Benchmarked Validated
 
 These pages are rooted in exact spheroidal-coordinate separations and
 later fisheries-acoustics use of prolate-spheroid models ([Spence and
-Granger 1951](#ref-spence_scattering_1951); [Flammer
-1957](#ref-flammer_spheroidal_1957); [Furusawa
-1988](#ref-furusawa_prolate_1988)).
+Granger 1951](#ref-Spence_1951); [Furusawa 1988](#ref-Furusawa_1988)).
 
 The prolate spheroidal modal series solution (`PSMS`) is the exact
 single-target modal family for homogeneous prolate spheroids. It is the
@@ -62,9 +60,6 @@ functions, and solve the retained boundary systems order by order.
   full spheroidal-coordinate derivation and retained modal systems
 
 ## References
-
-Flammer, Carson. 1957. *Spheroidal Wave Functions*.
-<https://ui.adsabs.harvard.edu/abs/1957spwf.book.....F>.
 
 Furusawa, Masahiko. 1988. “Prolate Spheroidal Models for Predicting
 General Trends of Fish Target Strength.” *Journal of the Acoustical

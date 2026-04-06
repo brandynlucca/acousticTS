@@ -9,9 +9,8 @@ Benchmarked Validated
 
 These pages are grounded in the standard-target calibration literature
 for elastic reference spheres ([Dragonette, Numrich, and Frank
-1981](#ref-dragonette_calibration_1981); [Foote
-1990](#ref-foote_spheres_1990); [MacLennan
-1981](#ref-maclennan_theory_1981)).
+1981](#ref-Dragonette_1981); [Foote 1990](#ref-Foote_1990); [MacLennan
+1981](#ref-Maclennan_1981)).
 
 `SOEMS` is the package’s elastic solid-sphere family for standard-target
 calibration work. It follows the classic solid elastic sphere literature

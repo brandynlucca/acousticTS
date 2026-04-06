@@ -4,9 +4,9 @@
 
 The numerical choices documented here are motivated by the
 special-function and basis-expansion structure of the underlying
-scattering literature ([Flammer 1957](#ref-flammer_spheroidal_1957);
-[Waterman 2009](#ref-waterman_t_2009); [Betcke and Scroggs
-2021](#ref-betcke_bempp-cl_2021)).
+scattering literature ([Flammer 1957](#ref-Flammer_1957); [Waterman
+2009](#ref-Waterman_2009); [Betcke and Scroggs
+2021](#ref-Bempp-cl_software)).
 
 Several of the package models are mathematically exact only because they
 are written in special-function bases adapted to canonical geometries.
@@ -118,9 +118,11 @@ canonical basis.
 ### Cylindrical and spherical Bessel/Hankel functions
 
 These functions are the basic radial building blocks for `FCMS`,
-`SPHMS`, `ESSMS`, and parts of other workflows. Computationally, they
-are important because boundary conditions frequently depend on both the
-functions themselves and their derivatives.
+`SPHMS`, `ESSMS`, and parts of other workflows ([Abramowitz and Stegun
+1964](#ref-Abramowitz_1964); [Folver and Maximon 2026](#ref-DLMF:ch10)).
+Computationally, they are important because boundary conditions
+frequently depend on both the functions themselves and their
+derivatives.
 
 At a practical level, increasing acoustic size usually means more
 oscillatory special functions, more modes required for convergence, and
@@ -136,9 +138,10 @@ quantities.
 ### Legendre and angular functions
 
 For spherical problems, Legendre structure is what separates angular
-dependence from radial dependence. That separation is why the spherical
-models can be solved one order at a time rather than as a fully coupled
-field everywhere in space.
+dependence from radial dependence ([Abramowitz and Stegun
+1964](#ref-Abramowitz_1964); [Dunster 2026](#ref-DLMF:ch14)). That
+separation is why the spherical models can be solved one order at a time
+rather than as a fully coupled field everywhere in space.
 
 The practical importance of that separation is that numerical growth
 happens in an organized way. As acoustic size increases, more angular
@@ -148,9 +151,10 @@ that is easier to diagnose than a generic global discretization.
 ### Spheroidal wave functions
 
 The prolate spheroidal model is numerically more demanding because the
-basis itself is more specialized. The advantage is geometric fidelity
-for prolate bodies. The cost is that evaluating and coupling spheroidal
-wave functions is more delicate than working in ordinary spherical or
+basis itself is more specialized ([Flammer 1957](#ref-Flammer_1957);
+[Volkmer 2026](#ref-DLMF:ch30)). The advantage is geometric fidelity for
+prolate bodies. The cost is that evaluating and coupling spheroidal wave
+functions is more delicate than working in ordinary spherical or
 cylindrical bases.
 
 This is why `PSMS` often deserves more numerical scrutiny than the
@@ -171,10 +175,11 @@ the spheroidal models depend on, so it is useful to separate their
 evaluation from the later model-specific algebra.
 
 In acousticTS, those functions are evaluated through the `profcn`
-backend in `src/prolate_swf.f90` ([Buren and Boisvert
-2026](#ref-van_buren_boisvert_prolate_swf_2026)), with the corresponding
-`C++` wrappers in `src/psms.cpp` handling the extraction and rescaling
-needed by the exported
+backend in `src/prolate_swf.f90` ([Van Buren and Boisvert
+2002](#ref-prolate_swf_software_2002),
+[2004](#ref-prolate_swf_software_2004)), with the corresponding `C++`
+wrappers in `src/psms.cpp` handling the extraction and rescaling needed
+by the exported
 [`Smn()`](https://brandynlucca.github.io/acousticTS/reference/Smn.md)
 and
 [`Rmn()`](https://brandynlucca.github.io/acousticTS/reference/Rmn.md)
@@ -272,9 +277,10 @@ of the model setup.
 
 Gauss-Legendre quadrature is especially useful here because many of the
 relevant overlap integrals live on finite intervals and involve smooth
-but nontrivial products of special functions. The package therefore
-exposes numerical controls such as the number of integration points
-where the model requires them.
+but nontrivial products of special functions ([Abramowitz and Stegun
+1964](#ref-Abramowitz_1964); [Press et al. 2007](#ref-Press2007)). The
+package therefore exposes numerical controls such as the number of
+integration points where the model requires them.
 
 The practical interpretation is that some model arguments are numerical
 arguments rather than physical arguments. Changing `n_integration`,
@@ -302,8 +308,8 @@ nearly dependent at the working precision or if large cancellations
 occur in the coefficient matrices.
 
 That is why several theory pages mention stabilization strategies such
-as singular value decomposition, cautious truncation, or warnings about
-effective precision limits.
+as singular value decomposition ([Press et al. 2007](#ref-Press2007)),
+cautious truncation, or warnings about effective precision limits.
 
 Readers should not interpret such stabilization language as a sign that
 the underlying physics is dubious. It usually means the numerical
@@ -415,16 +421,47 @@ This page answers “what is hard about evaluating it robustly?”
 
 ## References
 
+Abramowitz, Milton, and Irene A. Stegun. 1964. *Handbook of Mathematical
+Functions with Formulas, Graphs, and Mathematical Tables*. Ninth Dover
+printing, tenth GPO printing. New York: Dover Publications.
+
 Betcke, Timo, and Matthew Scroggs. 2021. “Bempp-Cl: A Fast Python Based
 Just-in-Time Compiling Boundary Element Library.” *Journal of Open
 Source Software* 6 (59): 2879. <https://doi.org/10.21105/joss.02879>.
 
-Buren, Arnie Lee Van, and Jeffrey E. Boisvert. 2026.
-“MathieuandSpheroidalWaveFunctions/prolate_swf.”
-<https://github.com/MathieuandSpheroidalWaveFunctions/prolate_swf>.
+Dunster, T. M. 2026. “Legendre and Related Functions.” In *NIST Digital
+Library of Mathematical Functions*, edited by F. W. J. Olver, A. B. Olde
+Daalhuis, D. W. Lozier, B. I. Schneider, B. A. Boisvert, C. W. Clark, B.
+R. Miller, B. V. Saunders, H. S. Cohl, and M. A. McClain.
+<https://dlmf.nist.gov/14>.
 
 Flammer, Carson. 1957. *Spheroidal Wave Functions*.
 <https://ui.adsabs.harvard.edu/abs/1957spwf.book.....F>.
+
+Folver, F. W. J., and L. C. Maximon. 2026. “Bessel Functions.” In *NIST
+Digital Library of Mathematical Functions*, edited by F. W. J. Olver, A.
+B. Olde Daalhuis, D. W. Lozier, B. I. Schneider, B. A. Boisvert, C. W.
+Clark, B. R. Miller, B. V. Saunders, H. S. Cohl, and M. A. McClain.
+<https://dlmf.nist.gov/10>.
+
+Press, William H., Saul A. Teukolsky, William T. Vetterling, and Brian
+P. Flannery. 2007. *Numerical Recipes: The Art of Scientific Computing*.
+3rd ed. New York, NY: Cambridge University Press.
+
+Van Buren, A. L., and J. E. Boisvert. 2002. “Accurate Calculation of
+Prolate Spheroidal Radial Functions of the First Kind and Their First
+Derivatives.” *Quarterly of Applied Mathematics* 60 (3): 589–99.
+<https://doi.org/10.1090/qam/1915351>.
+
+———. 2004. “Improved Calculation of Prolate Spheroidal Radial Functions
+of the Second Kind and Their First Derivatives.” *Quarterly of Applied
+Mathematics* 62 (3): 493–507. <https://doi.org/10.1090/qam/2085732>.
+
+Volkmer, H. 2026. “Spheroidal Wave Functions.” In *NIST Digital Library
+of Mathematical Functions*, edited by F. W. J. Olver, A. B. Olde
+Daalhuis, D. W. Lozier, B. I. Schneider, B. A. Boisvert, C. W. Clark, B.
+R. Miller, B. V. Saunders, H. S. Cohl, and M. A. McClain.
+<https://dlmf.nist.gov/30>.
 
 Waterman, P. C. 2009. “T -Matrix Methods in Acoustic Scattering.” *The
 Journal of the Acoustical Society of America* 125 (1): 42–51.

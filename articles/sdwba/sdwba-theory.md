@@ -11,9 +11,8 @@ The stochastic distorted wave Born approximation (SDWBA) begins with the
 same weak-scattering derivation as the deterministic DWBA, then modifies
 the phase structure of the coherent sum to account for unresolved
 variability in body shape, posture, and internal structure ([Demer and
-Conti 2003](#ref-demer_reconciling_2003); [Conti and Demer
-2006](#ref-conti_improved_2006); [Stanton et al.
-1998](#ref-stanton_sound_1998)).
+Conti 2003](#ref-Demer_2003_1); [Conti and Demer 2006](#ref-Conti_2006);
+[Stanton, Chu, and Wiebe 1998](#ref-Stanton_1998_2)).
 
 The deterministic part of the derivation still assumes a weakly
 scattering fluid-like body, so the local scattering strength is
@@ -226,7 +225,9 @@ realizations:
 \sum\_{m=1}^{M} \left\|\mathcal{f}\_\text{bs}^{(m)}(\theta)\right\|^2,
 
 where M is the number of realizations. The target strength is then
-defined from the averaged linear cross-section:
+defined from the averaged linear cross-section ([MacLennan, Fernandes,
+and Dalen 2002](#ref-MacLennan_2002); [Urick 1983](#ref-Urick_1983);
+[Simmonds and MacLennan 2005](#ref-Simmonds_2005)):
 
 TS = 10\log\_{10}\\\left(\langle \sigma\_\text{bs}(\theta)
 \rangle\right).
@@ -307,8 +308,19 @@ on the Distorted-Wave Born Approximation.” *ICES Journal of Marine
 Science* 60 (2): 429–34.
 <https://doi.org/10.1016/S1054-3139(03)00002-X>.
 
-Stanton, Timothy K., Dezhang Chu, Peter H. Wiebe, Linda V. Martin, and
-Robert L. Eastwood. 1998. “Sound Scattering by Several Zooplankton
-Groups. I. Experimental Determination of Dominant Scattering
-Mechanisms.” *The Journal of the Acoustical Society of America* 103 (1):
-225–35. <https://doi.org/10.1121/1.421469>.
+MacLennan, David N., Percy G. Fernandes, and John Dalen. 2002. “A
+Consistent Approach to Definitions and Symbols in Fisheries Acoustics.”
+*ICES Journal of Marine Science* 59 (2): 365–69.
+<https://doi.org/10.1006/jmsc.2001.1158>.
+
+Simmonds, John, and David N. MacLennan. 2005. *Fisheries Acoustics:
+Theory and Practice*. 2nd ed. Oxford, UK: Blackwell Science.
+<https://doi.org/10.1002/9780470995303>.
+
+Stanton, Timothy K., Dezhang Chu, and Peter H. Wiebe. 1998. “Sound
+Scattering by Several Zooplankton Groups. II. Scattering Models.” *The
+Journal of the Acoustical Society of America* 103 (1): 236–53.
+<https://doi.org/10.1121/1.421110>.
+
+Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed. New
+York, NY: McGraw-Hill.

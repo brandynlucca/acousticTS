@@ -9,14 +9,14 @@ Benchmarked Validated
 
 The finite cylinder modal series solution (FCMS) is one of the standard
 ways to represent acoustic backscatter from straight cylinders of finite
-length ([Stanton 1988](#ref-stanton_sound_1988),
-[1989](#ref-stanton_sound_1989)). Its appeal is that it retains the
-exact cylindrical-harmonic treatment of the circular cross-section while
-replacing the fully three-dimensional endcap problem with a finite-axis
-coherence factor. That combination makes the model substantially more
-informative than a purely asymptotic ray-style approximation, while
-still remaining much simpler than a complete three-dimensional elastic
-boundary-value treatment.
+length ([Stanton 1988](#ref-Stanton_1988), [1989](#ref-Stanton_1989_2)).
+Its appeal is that it retains the exact cylindrical-harmonic treatment
+of the circular cross-section while replacing the fully
+three-dimensional endcap problem with a finite-axis coherence factor.
+That combination makes the model substantially more informative than a
+purely asymptotic ray-style approximation, while still remaining much
+simpler than a complete three-dimensional elastic boundary-value
+treatment.
 
 This structure is also the main conceptual point a reader should carry
 away from the model. The FCMS is not derived by separating variables for
@@ -200,10 +200,11 @@ equation:
 r^2R'' + rR' + (K^2r^2-m^2)R = 0.
 
 This is Bessel’s equation, whose solutions are J_m(Kr), Y_m(Kr), and the
-outgoing combination H_m^{(1)}(Kr). Regularity at the axis r=0 excludes
-the singular solution Y_m from the incident and interior regular fields,
-while the outgoing radiation condition selects the Hankel function of
-the first kind for the scattered field.
+outgoing combination H_m^{(1)}(Kr) ([Folver and Maximon
+2026](#ref-DLMF:ch10)). Regularity at the axis r=0 excludes the singular
+solution Y_m from the incident and interior regular fields, while the
+outgoing radiation condition selects the Hankel function of the first
+kind for the scattered field ([Sommerfeld 1949](#ref-Sommerfeld_1949)).
 
 ### Incident field in cylindrical coordinates
 
@@ -416,7 +417,9 @@ Once the modal sum is evaluated:
 
 \sigma\_\text{bs} = \|\mathcal{f}\_\text{bs}\|^2,
 
-The corresponding target strength is:
+The corresponding target strength is ([MacLennan, Fernandes, and Dalen
+2002](#ref-MacLennan_2002); [Urick 1983](#ref-Urick_1983); [Simmonds and
+MacLennan 2005](#ref-Simmonds_2005)):
 
 TS = 10\log\_{10}(\sigma\_\text{bs}).
 
@@ -448,6 +451,24 @@ defensible.
 
 ## References
 
+Folver, F. W. J., and L. C. Maximon. 2026. “Bessel Functions.” In *NIST
+Digital Library of Mathematical Functions*, edited by F. W. J. Olver, A.
+B. Olde Daalhuis, D. W. Lozier, B. I. Schneider, B. A. Boisvert, C. W.
+Clark, B. R. Miller, B. V. Saunders, H. S. Cohl, and M. A. McClain.
+<https://dlmf.nist.gov/10>.
+
+MacLennan, David N., Percy G. Fernandes, and John Dalen. 2002. “A
+Consistent Approach to Definitions and Symbols in Fisheries Acoustics.”
+*ICES Journal of Marine Science* 59 (2): 365–69.
+<https://doi.org/10.1006/jmsc.2001.1158>.
+
+Simmonds, John, and David N. MacLennan. 2005. *Fisheries Acoustics:
+Theory and Practice*. 2nd ed. Oxford, UK: Blackwell Science.
+<https://doi.org/10.1002/9780470995303>.
+
+Sommerfeld, Arnold. 1949. *Partial Differential Equations in Physics*.
+Vol. 6. Lectures on Theoretical Physics. New York: Academic Press.
+
 Stanton, T. K. 1988. “Sound Scattering by Cylinders of Finite Length. I.
 Fluid Cylinders.” *The Journal of the Acoustical Society of America* 83
 (1): 55–63. <https://doi.org/10.1121/1.396184>.
@@ -455,3 +476,6 @@ Fluid Cylinders.” *The Journal of the Acoustical Society of America* 83
 ———. 1989. “Sound Scattering by Cylinders of Finite Length. III.
 Deformed Cylinders.” *The Journal of the Acoustical Society of America*
 86 (2): 691–705. <https://doi.org/10.1121/1.398193>.
+
+Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed. New
+York, NY: McGraw-Hill.

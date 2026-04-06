@@ -123,8 +123,7 @@
 </h2>
 <p>The numerical choices documented here are motivated by the
 special-function and basis-expansion structure of the underlying
-scattering literature <span class="citation">(<a href="#ref-flammer_spheroidal_1957">Flammer 1957</a>; <a href="#ref-waterman_t_2009">Waterman 2009</a>; <a href="#ref-betcke_bempp-cl_2021">Betcke and Scroggs
-2021</a>)</span>.</p>
+scattering literature <span class="citation">(<a href="#ref-Flammer_1957">Flammer 1957</a>; <a href="#ref-Waterman_2009">Waterman 2009</a>; <a href="#ref-Bempp-cl_software">Betcke and Scroggs 2021</a>)</span>.</p>
 <p>Several of the package models are mathematically exact only because
 they are written in special-function bases adapted to canonical
 geometries. This article is the high-level guide to those numerical
@@ -235,8 +234,9 @@ by forcing them into a poorly matched canonical basis.</p>
 </h3>
 <p>These functions are the basic radial building blocks for
 <code>FCMS</code>, <code>SPHMS</code>, <code>ESSMS</code>, and parts of
-other workflows. Computationally, they are important because boundary
-conditions frequently depend on both the functions themselves and their
+other workflows <span class="citation">(<a href="#ref-Abramowitz_1964">Abramowitz and Stegun 1964</a>; <a href="#ref-DLMF:ch10">Folver and Maximon 2026</a>)</span>.
+Computationally, they are important because boundary conditions
+frequently depend on both the functions themselves and their
 derivatives.</p>
 <p>At a practical level, increasing acoustic size usually means more
 oscillatory special functions, more modes required for convergence, and
@@ -252,9 +252,9 @@ quantities.</p>
 <h3 id="legendre-and-angular-functions">Legendre and angular functions<a class="anchor" aria-label="anchor" href="#legendre-and-angular-functions"></a>
 </h3>
 <p>For spherical problems, Legendre structure is what separates angular
-dependence from radial dependence. That separation is why the spherical
-models can be solved one order at a time rather than as a fully coupled
-field everywhere in space.</p>
+dependence from radial dependence <span class="citation">(<a href="#ref-Abramowitz_1964">Abramowitz and Stegun 1964</a>; <a href="#ref-DLMF:ch14">Dunster 2026</a>)</span>. That separation is why
+the spherical models can be solved one order at a time rather than as a
+fully coupled field everywhere in space.</p>
 <p>The practical importance of that separation is that numerical growth
 happens in an organized way. As acoustic size increases, more angular
 orders contribute, but the model still retains a mode-by-mode structure
@@ -264,10 +264,10 @@ that is easier to diagnose than a generic global discretization.</p>
 <h3 id="spheroidal-wave-functions">Spheroidal wave functions<a class="anchor" aria-label="anchor" href="#spheroidal-wave-functions"></a>
 </h3>
 <p>The prolate spheroidal model is numerically more demanding because
-the basis itself is more specialized. The advantage is geometric
-fidelity for prolate bodies. The cost is that evaluating and coupling
-spheroidal wave functions is more delicate than working in ordinary
-spherical or cylindrical bases.</p>
+the basis itself is more specialized <span class="citation">(<a href="#ref-Flammer_1957">Flammer 1957</a>; <a href="#ref-DLMF:ch30">Volkmer 2026</a>)</span>. The advantage is
+geometric fidelity for prolate bodies. The cost is that evaluating and
+coupling spheroidal wave functions is more delicate than working in
+ordinary spherical or cylindrical bases.</p>
 <p>This is why <code>PSMS</code> often deserves more numerical scrutiny
 than the simpler canonical modal models. The question is not whether the
 mathematics is legitimate. The question is whether the chosen truncation
@@ -284,14 +284,15 @@ building blocks that the rest of the spheroidal models depend on, so it
 is useful to separate their evaluation from the later model-specific
 algebra.</p>
 <p>In acousticTS, those functions are evaluated through the
-<code>profcn</code> backend in <code>src/prolate_swf.f90</code> <span class="citation">(<a href="#ref-van_buren_boisvert_prolate_swf_2026">Buren and Boisvert
-2026</a>)</span>, with the corresponding <code>C++</code> wrappers in
-<code>src/psms.cpp</code> handling the extraction and rescaling needed
-by the exported <code><a href="../../reference/Smn.html">Smn()</a></code> and <code><a href="../../reference/Rmn.html">Rmn()</a></code> interfaces.
-That split of responsibility matters because the Fortran routine
-computes a large family of spheroidal quantities at once, while the
-package-level functions usually want one specific angular or radial
-quantity and, often, its derivative.</p>
+<code>profcn</code> backend in <code>src/prolate_swf.f90</code> <span class="citation">(<a href="#ref-prolate_swf_software_2002">Van Buren and
+Boisvert 2002</a>, <a href="#ref-prolate_swf_software_2004">2004</a>)</span>, with the
+corresponding <code>C++</code> wrappers in <code>src/psms.cpp</code>
+handling the extraction and rescaling needed by the exported
+<code><a href="../../reference/Smn.html">Smn()</a></code> and <code><a href="../../reference/Rmn.html">Rmn()</a></code> interfaces. That split of
+responsibility matters because the Fortran routine computes a large
+family of spheroidal quantities at once, while the package-level
+functions usually want one specific angular or radial quantity and,
+often, its derivative.</p>
 <p>One detail that is easy to miss from the outside is that the Fortran
 backend stores many spheroidal quantities in
 mantissa-and-base-10-exponent form rather than as a single
@@ -368,9 +369,10 @@ terms must be evaluated numerically. In those cases, quadrature accuracy
 becomes part of the model setup.</p>
 <p>Gauss-Legendre quadrature is especially useful here because many of
 the relevant overlap integrals live on finite intervals and involve
-smooth but nontrivial products of special functions. The package
-therefore exposes numerical controls such as the number of integration
-points where the model requires them.</p>
+smooth but nontrivial products of special functions <span class="citation">(<a href="#ref-Abramowitz_1964">Abramowitz and Stegun
+1964</a>; <a href="#ref-Press2007">Press et al. 2007</a>)</span>. The
+package therefore exposes numerical controls such as the number of
+integration points where the model requires them.</p>
 <p>The practical interpretation is that some model arguments are
 numerical arguments rather than physical arguments. Changing
 <code>n_integration</code>, precision, or simplification options does
@@ -395,8 +397,8 @@ truncated system can still be numerically awkward if the basis functions
 become nearly dependent at the working precision or if large
 cancellations occur in the coefficient matrices.</p>
 <p>That is why several theory pages mention stabilization strategies
-such as singular value decomposition, cautious truncation, or warnings
-about effective precision limits.</p>
+such as singular value decomposition <span class="citation">(<a href="#ref-Press2007">Press et al. 2007</a>)</span>, cautious
+truncation, or warnings about effective precision limits.</p>
 <p>Readers should not interpret such stabilization language as a sign
 that the underlying physics is dubious. It usually means the numerical
 representation has become delicate enough that ordinary direct
@@ -499,20 +501,61 @@ robustly?”</p>
 <h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
 </h2>
 <div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
-<div id="ref-betcke_bempp-cl_2021" class="csl-entry">
+<div id="ref-Abramowitz_1964" class="csl-entry">
+Abramowitz, Milton, and Irene A. Stegun. 1964. <em>Handbook of
+Mathematical Functions with Formulas, Graphs, and Mathematical
+Tables</em>. Ninth Dover printing, tenth GPO printing. New York: Dover
+Publications.
+</div>
+<div id="ref-Bempp-cl_software" class="csl-entry">
 Betcke, Timo, and Matthew Scroggs. 2021. <span>“Bempp-Cl: <span>A</span>
 Fast <span>Python</span> Based Just-in-Time Compiling Boundary Element
 Library.”</span> <em>Journal of Open Source Software</em> 6 (59): 2879.
 <a href="https://doi.org/10.21105/joss.02879" class="external-link">https://doi.org/10.21105/joss.02879</a>.
 </div>
-<div id="ref-van_buren_boisvert_prolate_swf_2026" class="csl-entry">
-Buren, Arnie Lee Van, and Jeffrey E. Boisvert. 2026.
-<span>“<span>MathieuandSpheroidalWaveFunctions</span>/<span class="nocase">prolate_swf</span>.”</span> <a href="https://github.com/MathieuandSpheroidalWaveFunctions/prolate_swf" class="external-link">https://github.com/MathieuandSpheroidalWaveFunctions/prolate_swf</a>.
+<div id="ref-DLMF:ch14" class="csl-entry">
+Dunster, T. M. 2026. <span>“<span class="nocase">Legendre and Related
+Functions</span>.”</span> In <em><span class="nocase">NIST Digital
+Library of Mathematical Functions</span></em>, edited by F. W. J. Olver,
+A. B. Olde Daalhuis, D. W. Lozier, B. I. Schneider, B. A. Boisvert, C.
+W. Clark, B. R. Miller, B. V. Saunders, H. S. Cohl, and M. A. McClain.
+<a href="https://dlmf.nist.gov/14" class="external-link">https://dlmf.nist.gov/14</a>.
 </div>
-<div id="ref-flammer_spheroidal_1957" class="csl-entry">
+<div id="ref-Flammer_1957" class="csl-entry">
 Flammer, Carson. 1957. <em>Spheroidal Wave Functions</em>. <a href="https://ui.adsabs.harvard.edu/abs/1957spwf.book.....F" class="external-link">https://ui.adsabs.harvard.edu/abs/1957spwf.book.....F</a>.
 </div>
-<div id="ref-waterman_t_2009" class="csl-entry">
+<div id="ref-DLMF:ch10" class="csl-entry">
+Folver, F. W. J., and L. C. Maximon. 2026. <span>“<span>Bessel
+Functions</span>.”</span> In <em><span class="nocase">NIST Digital
+Library of Mathematical Functions</span></em>, edited by F. W. J. Olver,
+A. B. Olde Daalhuis, D. W. Lozier, B. I. Schneider, B. A. Boisvert, C.
+W. Clark, B. R. Miller, B. V. Saunders, H. S. Cohl, and M. A. McClain.
+<a href="https://dlmf.nist.gov/10" class="external-link">https://dlmf.nist.gov/10</a>.
+</div>
+<div id="ref-Press2007" class="csl-entry">
+Press, William H., Saul A. Teukolsky, William T. Vetterling, and Brian
+P. Flannery. 2007. <em>Numerical Recipes: The Art of Scientific
+Computing</em>. 3rd ed. New York, NY: Cambridge University Press.
+</div>
+<div id="ref-prolate_swf_software_2002" class="csl-entry">
+Van Buren, A. L., and J. E. Boisvert. 2002. <span>“Accurate Calculation
+of Prolate Spheroidal Radial Functions of the First Kind and Their First
+Derivatives.”</span> <em>Quarterly of Applied Mathematics</em> 60 (3):
+589–99. <a href="https://doi.org/10.1090/qam/1915351" class="external-link">https://doi.org/10.1090/qam/1915351</a>.
+</div>
+<div id="ref-prolate_swf_software_2004" class="csl-entry">
+———. 2004. <span>“Improved Calculation of Prolate Spheroidal Radial
+Functions of the Second Kind and Their First Derivatives.”</span>
+<em>Quarterly of Applied Mathematics</em> 62 (3): 493–507. <a href="https://doi.org/10.1090/qam/2085732" class="external-link">https://doi.org/10.1090/qam/2085732</a>.
+</div>
+<div id="ref-DLMF:ch30" class="csl-entry">
+Volkmer, H. 2026. <span>“<span>Spheroidal Wave Functions</span>.”</span>
+In <em><span class="nocase">NIST Digital Library of Mathematical
+Functions</span></em>, edited by F. W. J. Olver, A. B. Olde Daalhuis, D.
+W. Lozier, B. I. Schneider, B. A. Boisvert, C. W. Clark, B. R. Miller,
+B. V. Saunders, H. S. Cohl, and M. A. McClain. <a href="https://dlmf.nist.gov/30" class="external-link">https://dlmf.nist.gov/30</a>.
+</div>
+<div id="ref-Waterman_2009" class="csl-entry">
 Waterman, P. C. 2009. <span>“T -Matrix Methods in Acoustic
 Scattering.”</span> <em>The Journal of the Acoustical Society of
 America</em> 125 (1): 42–51. <a href="https://doi.org/10.1121/1.3035839" class="external-link">https://doi.org/10.1121/1.3035839</a>.

@@ -9,9 +9,8 @@ Benchmarked Validated
 
 These pages follow the weak-scattering elongated-body formulation and
 later applied fisheries-acoustics usage of the distorted-wave Born
-approximation ([Morse and Ingard 1986](#ref-morse_theoretical_1986);
-[Stanton, Chu, and Wiebe 1998](#ref-stanton_sound_1998-1); [Gastauer,
-Chu, and Cox 2019](#ref-gastauer_zooscatrspan_2019)).
+approximation ([Morse and Ingard 1968](#ref-Morse_1968); [Chu, Foote,
+and Stanton 1993](#ref-Chu_1993)).
 
 The acousticTS implementation of deterministic DWBA follows the same
 object-based pattern used throughout the package. A fluid-like scatterer
@@ -187,11 +186,9 @@ the same DWBA workflow.
 
 #### Published reference comparisons
 
-For DWBA, the primary reference is the exact modal-series `Benchmark`
-column in the Jech weakly scattering sphere, prolate-spheroid, and
-cylinder files. The comparison below uses those canonical targets
-directly. Elapsed times are representative values from the current
-machine.
+The comparison below uses those canonical targets directly as reported
+in Jech et al. ([2015](#ref-Jech_2015)). Elapsed times are
+representative values from the current machine.
 
 | Geometry                           | Max abs. \Delta vs benchmark (dB) | Mean abs. \Delta vs benchmark (dB) | Elapsed (s) |
 |:-----------------------------------|----------------------------------:|-----------------------------------:|------------:|
@@ -204,50 +201,50 @@ Those values still need to be read carefully. The largest absolute
 cylinder maxima are driven by a small number of frequencies rather than
 by a uniform offset across the full sweep.
 
-There is no comparable benchmarked configuration sweep for DWBA beyond
-the target definition itself. The implementation does not expose a
-PSMS-style family of numerical switches such as precision levels,
-adaptive modal truncation, or simplified coefficient branches. For this
-model, geometry, orientation, and material contrast are the meaningful
-benchmark parameterizations, so the table above already captures the
-relevant implementation comparison space.
-
 #### Bundled krill compatibility check
 
 The bundled `krill` object serves a different role from the canonical
 modal-series targets above. Rather than testing an exact canonical-shape
 solution, it is used to verify that the stored segmented-body geometry
-reproduces the published deterministic DWBA implementation and to show
-how that same geometry compares with an independent software
-implementation.
+reproduces the `MATLAB` code provded by McGehee, O’Driscoll, and
+Traykovski ([1998](#ref-mcgehee_software)) and echoSMs ([Elavia
+2021](#ref-echoSMs_software)).
 
-| Comparison                                                                 | Mean abs. \Delta TS (dB) | Max abs. \Delta TS (dB) |
-|:---------------------------------------------------------------------------|-------------------------:|------------------------:|
-| acousticTS vs published McGehee MATLAB implementation                      |                 1.23e-05 |                4.33e-05 |
-| acousticTS vs independent DWBA implementation                              |                  0.42284 |                 1.01167 |
-| Independent DWBA implementation vs published McGehee MATLAB implementation |                  0.42284 |                 1.01167 |
+| Comparison                          | Mean abs. \Delta TS (dB) | Max abs. \Delta TS (dB) |
+|:------------------------------------|-------------------------:|------------------------:|
+| acousticTS vs McGehee et al. (1998) |                 1.23e-05 |                4.33e-05 |
+| acousticTS vs echoSMs               |                  0.42284 |                 1.01167 |
+| McGehee et al. (1998) vs echoSMs    |                  0.42284 |                 1.01167 |
 
-On this bundled krill geometry, acousticTS reproduces the published
-McGehee MATLAB implementation essentially exactly, while the independent
-implementation remains within about 1 dB of the same spectrum but does
-not collapse onto the published curve. That makes the canonical
-modal-series table above and the bundled krill comparison complementary:
-one checks exact isolated-shape behavior, and the other checks a
-published segmented-body DWBA target.
+On this bundled krill geometry, acousticTS reproduces McGehee,
+O’Driscoll, and Traykovski ([1998](#ref-mcgehee_software)) essentially
+exactly, while the echoSMs remains within about 1 dB of the same
+spectrum but does not collapse onto the published curve. That makes the
+canonical modal-series table above and the bundled krill comparison
+complementary: one checks exact isolated-shape behavior, and the other
+checks a published segmented-body DWBA target.
 
 ## References
 
-Gastauer, Sven, Dezhang Chu, and Martin J. Cox. 2019. “ZooScatR—An
-\<Span Style="font-Variant:small-Caps;"\>r\</Span\> Package for
-Modelling the Scattering Properties of Weak Scattering Targets Using the
-Distorted Wave Born Approximation.” *The Journal of the Acoustical
-Society of America* 145 (1): EL102–8.
-<https://doi.org/10.1121/1.5085655>.
+Chu, Dezhang, Kenneth G. Foote, and Timothy K. Stanton. 1993. “Further
+Analysis of Target Strength Measurements of Antarctic Krill at 38 and
+120 kHz: Comparison with Deformed Cylinder Model and Inference of
+Orientation Distribution.” *The Journal of the Acoustical Society of
+America* 93 (5): 2985–88. <https://doi.org/10.1121/1.405818>.
 
-Morse, Philip M., and K. Uno Ingard. 1986. *Theoretical Acoustics*.
-Princeton, N.J: Princeton University Press.
+Elavia, A. 2021. “Liquid_spheroid: Acoustic Scattering by a Liquid
+Prolate Spheroid.” <https://github.com/elavia/liquid_spheroid>.
 
-Stanton, Timothy K., Dezhang Chu, and Peter H. Wiebe. 1998. “Sound
-Scattering by Several Zooplankton Groups. II. Scattering Models.” *The
-Journal of the Acoustical Society of America* 103 (1): 236–53.
-<https://doi.org/10.1121/1.421110>.
+Jech, J. Michael, John K. Horne, Dezhang Chu, David A. Demer, David T.
+I. Francis, Natalia Gorska, Benjamin Jones, et al. 2015. “Comparisons
+Among Ten Models of Acoustic Backscattering Used in Aquatic Ecosystem
+Research.” *The Journal of the Acoustical Society of America* 138 (6):
+3742–64. <https://doi.org/10.1121/1.4937607>.
+
+McGehee, D. E., R. L. O’Driscoll, and L. V.Martin Traykovski. 1998.
+“Effects of Orientation on Acoustic Scattering from Antarctic Krill at
+120 kHz.” *Deep Sea Research Part II: Topical Studies in Oceanography*
+45 (7): 1273–94. <https://doi.org/10.1016/S0967-0645(98)00036-8>.
+
+Morse, Philip M., and K. Uno Ingard. 1968. *Theoretical Acoustics*. New
+York, NY: McGraw-Hill.

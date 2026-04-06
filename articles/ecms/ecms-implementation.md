@@ -9,8 +9,7 @@ Unvalidated Experimental
 
 These pages sit between the classical elastic-cylinder literature and
 later finite-length cylinder approximations used in fisheries acoustics
-([Faran 1951](#ref-faran_sound_1951); [Stanton
-1988](#ref-stanton_sound_1988)).
+([Faran 1951](#ref-Faran_1951); [Stanton 1988](#ref-Stanton_1988)).
 
 The elastic-cylinder modal-series solution is available through
 `target_strength(..., model = "ecms")`. The preferred geometry carrier

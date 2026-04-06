@@ -9,7 +9,7 @@ Benchmarked Validated
 
 These pages follow the finite-cylinder modal-series literature for
 straight circular cylinders near broadside ([Stanton
-1988](#ref-stanton_sound_1988), [1989](#ref-stanton_sound_1989)).
+1988](#ref-Stanton_1988), [1989](#ref-Stanton_1989_2)).
 
 The acousticTS package uses object-based scatterers, so the FCMS
 workflow follows the same broad pattern used elsewhere in the package:

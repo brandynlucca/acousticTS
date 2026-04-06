@@ -131,10 +131,7 @@
 </div>
 </div>
 <p>These pages follow the phase-compensated weak-scattering literature
-for broadside elongated bodies and krill-style applications <span class="citation">(<a href="#ref-chu_phase-compensated_1999">Chu and Ye
-1999</a>; <a href="#ref-chu_further_1993">Chu, Foote, and Stanton
-1993</a>; <a href="#ref-stanton_sound_1989">Stanton
-1989</a>)</span>.</p>
+for broadside elongated bodies and krill-style applications <span class="citation">(<a href="#ref-Chu_1999">Chu and Ye 1999</a>; <a href="#ref-Chu_1993">Chu, Foote, and Stanton 1993</a>)</span>.</p>
 <p>The phase-compensated distorted wave Born approximation is available
 through <code>target_strength(..., model = "pcdwba")</code>. The
 implementation is intended for weakly scattering fluid-like bodies and
@@ -143,17 +140,17 @@ canonical bent cylinder or an arbitrary fluid-like profile.</p>
 <p>This page checks the implementation against two source-level
 references:</p>
 <ul>
-<li>the <code>pcdwba_fbs</code> routine in the local
-<code>echopop</code> source tree,</li>
-<li>the bent-cylinder DWBA routines in the local <code>ZooScatR</code>
-source tree.</li>
+<li>the <code>pcdwba_fbs</code> routine in the <code>Python</code>
+package Echopop (<span class="citation">Lucca and Lee (<a href="#ref-Echopop_software">2026</a>)</span>),</li>
+<li>the bent-cylinder DWBA routines in the <code>R</code>-package
+ZooScatR (<span class="citation">Gastauer, Chu, and Cox (<a href="#ref-ZooScatR_software">2019</a>)</span>) .</li>
 </ul>
 <div class="experiment" data-title="Validation scope">
 <p><code>PCDWBA</code> is validated here against source-level reference
 implementations rather than against a separate published benchmark
-table. The <code>ZooScatR</code> source agrees exactly on the shared
-case, while the remaining <code>echopop</code> drift is attributable to
-that implementation’s interpolated Bessel evaluation.</p>
+table. The ZooScatR source agrees exactly on the shared case, while the
+remaining Echopop drift is attributable to that implementation’s
+interpolated Bessel evaluation.</p>
 </div>
 <div class="section level3">
 <h3 id="reference-case">Reference case<a class="anchor" aria-label="anchor" href="#reference-case"></a>
@@ -249,14 +246,13 @@ that implementation’s interpolated Bessel evaluation.</p>
 </tr>
 </tbody>
 </table>
-<p>The <code>ZooScatR</code> source-level reconstruction and acousticTS
-are indistinguishable on this grid. The <code>echopop</code> comparison
-remains close as well, but it is not at machine precision because that
-implementation evaluates the cylindrical Bessel term through
-interpolation rather than a direct nodewise call. On this grid, the
-largest mismatch occurs near <code>112 kHz</code>; replacing the
-interpolated <code>J_1(x)/x</code> evaluation with a direct call
-collapses that residual onto the acousticTS / <code>ZooScatR</code>
+<p>The ZooScatR and acousticTS outputs are indistinguishable on this
+grid. The Echopop comparison remains close as well, but it is not at
+machine precision because that implementation evaluates the cylindrical
+Bessel term through interpolation rather than a direct nodewise call. On
+this grid, the largest mismatch occurs near <code>112 kHz</code>;
+replacing the interpolated <code>J_1(x)/x</code> evaluation with a
+direct call collapses that residual onto the acousticTS / ZooScatR
 curve. So the remaining drift is numerical, not geometrical.</p>
 </div>
 <div class="section level4">
@@ -321,15 +317,15 @@ phase-compensated bent-cylinder solver. The comparison is not just
 against a benchmark curve. It is against two independently written
 source routines that share the same governing model. On this reference
 case, acousticTS reproduces the direct ZooScatR-style calculation
-exactly and stays very close to the <code>echopop</code> implementation
-across the full frequency band.</p>
+exactly and stays very close to the Echopop implementation across the
+full frequency band.</p>
 </div>
 </div>
 <div class="section level2">
 <h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
 </h2>
 <div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
-<div id="ref-chu_further_1993" class="csl-entry">
+<div id="ref-Chu_1993" class="csl-entry">
 Chu, Dezhang, Kenneth G. Foote, and Timothy K. Stanton. 1993.
 <span>“Further Analysis of Target Strength Measurements of
 <span>Antarctic</span> Krill at 38 and 120 <span class="nocase">kHz</span>: <span>Comparison</span> with Deformed
@@ -337,18 +333,25 @@ Cylinder Model and Inference of Orientation Distribution.”</span>
 <em>The Journal of the Acoustical Society of America</em> 93 (5):
 2985–88. <a href="https://doi.org/10.1121/1.405818" class="external-link">https://doi.org/10.1121/1.405818</a>.
 </div>
-<div id="ref-chu_phase-compensated_1999" class="csl-entry">
+<div id="ref-Chu_1999" class="csl-entry">
 Chu, Dezhang, and Zhen Ye. 1999. <span>“A Phase-Compensated Distorted
 Wave <span>Born</span> Approximation Representation of the Bistatic
 Scattering by Weakly Scattering Objects: <span>Application</span> to
 Zooplankton.”</span> <em>The Journal of the Acoustical Society of
 America</em> 106 (4): 1732–43. <a href="https://doi.org/10.1121/1.428036" class="external-link">https://doi.org/10.1121/1.428036</a>.
 </div>
-<div id="ref-stanton_sound_1989" class="csl-entry">
-Stanton, T. K. 1989. <span>“Sound Scattering by Cylinders of Finite
-Length. <span>III</span>. <span>Deformed</span> Cylinders.”</span>
-<em>The Journal of the Acoustical Society of America</em> 86 (2):
-691–705. <a href="https://doi.org/10.1121/1.398193" class="external-link">https://doi.org/10.1121/1.398193</a>.
+<div id="ref-ZooScatR_software" class="csl-entry">
+Gastauer, Sven, Dezhang Chu, and Martin J. Cox. 2019.
+<span>“<span>ZooScatR</span>—<span>An</span> <span>&lt;</span>Span
+Style="font-Variant:small-Caps;"<span>&gt;</span>r<span>&lt;</span>/Span<span>&gt;</span>
+Package for Modelling the Scattering Properties of Weak Scattering
+Targets Using the Distorted Wave <span>Born</span>
+Approximation.”</span> <em>The Journal of the Acoustical Society of
+America</em> 145 (1): EL102–8. <a href="https://doi.org/10.1121/1.5085655" class="external-link">https://doi.org/10.1121/1.5085655</a>.
+</div>
+<div id="ref-Echopop_software" class="csl-entry">
+Lucca, Brandyn, and Wu-Jung Lee. 2026.
+<span>“<span>OSOceanAcoustics</span>/Echopop: V0.6.0.”</span> Zenodo. <a href="https://doi.org/10.5281/ZENODO.18975959" class="external-link">https://doi.org/10.5281/ZENODO.18975959</a>.
 </div>
 </div>
 </div>

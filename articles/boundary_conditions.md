@@ -4,10 +4,9 @@
 
 The boundary families summarized here correspond to the classical fluid,
 rigid, elastic, shell, and viscous-interface scattering literature
-([Anderson 1950](#ref-anderson_sound_1950); [Faran
-1951](#ref-faran_sound_1951); [Goodman and Stern
-1962](#ref-goodman_reflection_1962); [Feuillade and Nero
-1998](#ref-feuillade_nero_1998)).
+([Anderson 1950](#ref-Anderson_1950); [Faran 1951](#ref-Faran_1951);
+[Goodman and Stern 1962](#ref-Goodman_1962); [Feuillade and Nero
+1998](#ref-Feuillade_1998)).
 
 Boundary conditions are the mathematical statements that turn a general
 wave equation into a specific scattering problem. In target-strength
@@ -154,10 +153,11 @@ the normal-velocity condition can also be written as:
 \frac{1}{\rho_2}\frac{\partial p_2}{\partial n}.
 
 These are the standard transmission conditions for an acoustic
-fluid-fluid boundary. Neither pressure nor normal motion is forced to
-vanish. Instead, both media participate in the interface dynamics, and
-the scattering is controlled by density and compressibility contrast
-across the boundary.
+fluid-fluid boundary ([Morse and Ingard 1968](#ref-Morse_1968); [Medwin
+and Clay 1998](#ref-Medwin_1998)). Neither pressure nor normal motion is
+forced to vanish. Instead, both media participate in the interface
+dynamics, and the scattering is controlled by density and
+compressibility contrast across the boundary.
 
 ## Inelastic shelled boundaries
 
@@ -259,14 +259,15 @@ even though it does not itself support elastic motion.
 ### Elastic shell boundary
 
 An elastic shell supports both longitudinal and transverse elastic
-motion. The displacement field \mathbf{u}(\mathbf{x}, t) within the
-shell satisfies the Navier equation:
+motion ([Achenbach 1973](#ref-Achenbach_1973)). The displacement field
+\mathbf{u}(\mathbf{x}, t) within the shell satisfies the Navier
+equation:
 
 (\lambda + 2 \mu)\nabla(\nabla \cdot \mathbf{u}) - \mu \nabla \times
 (\nabla \times \mathbf{u}) + \rho_s \frac{\partial^2
 \mathbf{u}}{\partial t^2} = 0,
 
-where \lambda and \mu are the Lam'e parameters and \rho_s is the shell
+where \lambda and \mu are the Lamé parameters and \rho_s is the shell
 density. Using the Helmholtz decomposition:
 
 \mathbf{u} = \nabla \phi + \nabla \times \mathbf{\Psi},
@@ -335,10 +336,11 @@ Equivalent density and compressibility contrasts may be written as:
 \gamma\_\rho = \frac{\rho_2 - \rho_1}{\rho_2}, \qquad \gamma\_\kappa =
 \frac{\kappa_2 - \kappa_1}{\kappa_1},
 
-where \kappa_j = (\rho_j c_j^2)^{-1} is compressibility in medium j. The
-scattered field is then treated as a first-order perturbation produced
-by these small departures from the surrounding fluid rather than by a
-strongly reflecting or traction-supporting surface.
+where \kappa_j = (\rho_j c_j^2)^{-1} is compressibility in medium j
+([Medwin and Clay 1998](#ref-Medwin_1998)). The scattered field is then
+treated as a first-order perturbation produced by these small departures
+from the surrounding fluid rather than by a strongly reflecting or
+traction-supporting surface.
 
 This is why weak-scattering treatments are usually expressed as
 perturbative approximations instead of exact boundary-value problems
@@ -348,6 +350,10 @@ produced by residual density and compressibility contrasts rather than
 by a large impedance jump at the boundary.
 
 ## References
+
+Achenbach, J. D. 1973. *Wave Propagation in Elastic Solids*.
+North-Holland Series in Applied Mathematics and Mechanics, v. 16.
+Amsterdam New York: North-Holland Pub. Co. American Elsevier Pub. Co.
 
 Anderson, Victor C. 1950. “Sound Scattering from a Fluid Sphere.” *The
 Journal of the Acoustical Society of America* 22 (4): 426–31.
@@ -365,3 +371,10 @@ Model for Describing Enhanced-Frequency Resonance Scattering from Fish.”
 Goodman, Ralph R., and Raya Stern. 1962. “Reflection and Transmission of
 Sound by Elastic Spherical Shells.” *The Journal of the Acoustical
 Society of America* 34 (3): 338–44. <https://doi.org/10.1121/1.1928120>.
+
+Medwin, Herman, and Clarence S. Clay. 1998. *Fundamentals of Acoustical
+Oceanography*. Applications of Modern Acoustics. San Diego, CA: Academic
+Press.
+
+Morse, Philip M., and K. Uno Ingard. 1968. *Theoretical Acoustics*. New
+York, NY: McGraw-Hill.

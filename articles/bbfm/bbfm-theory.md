@@ -9,10 +9,9 @@ Unvalidated Experimental
 
 This family is best read alongside the swimbladder-less fish and
 composite-scatterer literature that motivates explicit flesh-body and
-backbone terms ([Gorska, Ona, and Korneliussen
-2005](#ref-gorska_etal_2005); [Stanton, Chu, and Wiebe
-1998](#ref-stanton_sound_1998-1); [Clay and Horne
-1994](#ref-clay_horne_1994)).
+backbone terms ([Gorska, Ona, and Korneliussen 2005](#ref-Gorska_2005);
+[Stanton et al. 1998](#ref-Stanton_1998_1); [Clay and Horne
+1994](#ref-Clay_1994)).
 
 The body-backbone fish model (`BBFM`) is a composite scattering family
 for swimbladder-less targets whose flesh body and backbone should remain
@@ -176,7 +175,9 @@ The linear backscattering cross-section is:
 \sigma\_{\mathrm{bs}} =
 \left\|f\_{\mathrm{bs}}^{(\mathrm{BBFM})}\right\|^2,
 
-and the target strength is:
+and the target strength is ([MacLennan, Fernandes, and Dalen
+2002](#ref-MacLennan_2002); [Urick 1983](#ref-Urick_1983); [Simmonds and
+MacLennan 2005](#ref-Simmonds_2005)):
 
 \mathrm{TS} = 10 \log\_{10}\left(\sigma\_{\mathrm{bs}}\right).
 
@@ -240,7 +241,20 @@ Lack a Swimbladder. Backscattering by Individual Fish.” *ICES Journal of
 Marine Science* 62 (5): 984–95.
 <https://doi.org/10.1016/j.icesjms.2005.03.010>.
 
-Stanton, Timothy K., Dezhang Chu, and Peter H. Wiebe. 1998. “Sound
-Scattering by Several Zooplankton Groups. II. Scattering Models.” *The
-Journal of the Acoustical Society of America* 103 (1): 236–53.
-<https://doi.org/10.1121/1.421110>.
+MacLennan, David N., Percy G. Fernandes, and John Dalen. 2002. “A
+Consistent Approach to Definitions and Symbols in Fisheries Acoustics.”
+*ICES Journal of Marine Science* 59 (2): 365–69.
+<https://doi.org/10.1006/jmsc.2001.1158>.
+
+Simmonds, John, and David N. MacLennan. 2005. *Fisheries Acoustics:
+Theory and Practice*. 2nd ed. Oxford, UK: Blackwell Science.
+<https://doi.org/10.1002/9780470995303>.
+
+Stanton, Timothy K., Dezhang Chu, Peter H. Wiebe, Linda V. Martin, and
+Robert L. Eastwood. 1998. “Sound Scattering by Several Zooplankton
+Groups. I. Experimental Determination of Dominant Scattering
+Mechanisms.” *The Journal of the Acoustical Society of America* 103 (1):
+225–35. <https://doi.org/10.1121/1.421469>.
+
+Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed. New
+York, NY: McGraw-Hill.

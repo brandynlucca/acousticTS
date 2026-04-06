@@ -9,8 +9,8 @@ Validated Experimental
 
 These pages are motivated by layered gas-bearing fish scattering models
 and viscous resonance broadening ([Khodabandeloo et al.
-2021](#ref-khodabandeloo_estimating_2021); [Feuillade and Nero
-1998](#ref-feuillade_nero_1998)).
+2021](#ref-Khodabandeloo_2021); [Feuillade and Nero
+1998](#ref-Feuillade_1998)).
 
 The viscous-elastic spherical model (`VESM`) is a layered spherical
 resonance family for a gas core surrounded by an elastic shell and an
