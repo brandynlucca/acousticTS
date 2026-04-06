@@ -1,4 +1,4 @@
----
+﻿---
 title: "Target strength for a calibration sphere"
 output:
   rmarkdown::html_vignette:
@@ -34,7 +34,7 @@ acousticTS:::.model_family_header(
 )
 ```
 
-Echosounders are commonly calibrated with standard targets whose acoustic response is strong, repeatable, and sufficiently well understood that the backscattering level can be predicted independently of the instrument being calibrated [@foote_spheres_1990]. In fisheries and ocean-acoustics work, that standard target is often a tungsten carbide sphere, although aluminum, steel, brass, and copper spheres are also used in some settings [@hickling_analysis_1962; @maclennan_theory_1981]. The reason a solid sphere is so useful is not only that it is mechanically robust. It is also one of the few practically important targets for which the full elastic scattering problem remains separable in spherical coordinates.
+Echosounders are commonly calibrated with standard targets whose acoustic response is strong, repeatable, and sufficiently well understood that the backscattering level can be predicted independently of the instrument being calibrated [@Foote_1990; @Demer_2015]. In fisheries and ocean-acoustics work, that standard target is often a tungsten carbide sphere, although aluminum, steel, brass, and copper spheres are also used in some settings [@Foote_1982; @Hickling_1962; @Maclennan_1981]. The reason a solid sphere is so useful is not only that it is mechanically robust. It is also one of the few practically important targets for which the full elastic scattering problem remains separable in spherical coordinates.
 
 For a calibration sphere, the surrounding medium supports an acoustic pressure field, while the sphere interior supports both compressional and shear motion. The scattering problem therefore differs fundamentally from a fluid-filled or rigid sphere problem. The exterior field must be matched to an elastic interior rather than to a single scalar potential. That coupling is what gives the calibration target its characteristic resonance structure and why the material properties of the sphere matter so strongly.
 
@@ -79,7 +79,7 @@ where $k_\ell$ and $k_\tau$ are the longitudinal and transverse wavenumbers, res
 
 ## Separability of the Hemholtz equation in spherical coordinates
 
-Because the geometry is spherical, the exterior and interior Helmholtz equations are separable in spherical coordinates [@achenbach_wave_1973]. For a sphere centered at the origin, the Hemholtz equation provides solutions that can be written as products of single-variable functions:
+Because the geometry is spherical, the exterior and interior Helmholtz equations are separable in spherical coordinates [@Achenbach_1973]. For a sphere centered at the origin, the Hemholtz equation provides solutions that can be written as products of single-variable functions:
 
 $$
   \psi(r, \theta, \varphi) = R(r) \Theta(\theta) \mathbf{\Phi}(\varphi).
@@ -168,7 +168,7 @@ where $\mathbf{M}_m$ is a mode-dependent coefficient matrix and $\mathbf{F}_m$ i
 
 ## Far-field scattering
 
-For a plane wave incident along polar coordinate $z$, the acoustic pressure is expressed as [@hickling_analysis_1962]:
+For a plane wave incident along polar coordinate $z$, the acoustic pressure is expressed as [@Hickling_1962]:
 
 $$
   \begin{aligned}
@@ -231,7 +231,7 @@ $$
 
 ## Phase-shift form of the solution
 
-It is often more informative to parameterize each partial wave by a real phase shift $\eta_m$ than by the raw complex coefficient $B_m$ [@faran_sound_1951; @rudgers_acoustic_1969]. In that representation, the elastic boundary conditions determine how far the outgoing partial wave is shifted relative to the free spherical solution.
+It is often more informative to parameterize each partial wave by a real phase shift $\eta_m$ than by the raw complex coefficient $B_m$ [@Faran_1951; @Rudgers_1969]. In that representation, the elastic boundary conditions determine how far the outgoing partial wave is shifted relative to the free spherical solution.
 
 ![Calibration sphere phase-shift schematic](calibration-phase-shift-schematic.png)
 
@@ -247,7 +247,7 @@ $$
   P_m(\cos \pi) = P_m(-1) = (-1)^m.
 $$ 
 
-It is convenient to define a phase-shift angle, $\eta_m$, of the $m$th scattered wave to compute $B_m$ [@rudgers_acoustic_1969]. For each angular order, the exterior field can be recast as a regular spherical solution plus an outgoing partial wave. Matching that combination to the elastic boundary conditions determines the relative phase of the outgoing term, so the scattering problem may be parameterized by a real phase shift rather than by an unconstrained complex coefficient. This phase-shift angle is expressed using: 
+It is convenient to define a phase-shift angle, $\eta_m$, of the $m$th scattered wave to compute $B_m$ [@Rudgers_1969]. For each angular order, the exterior field can be recast as a regular spherical solution plus an outgoing partial wave. Matching that combination to the elastic boundary conditions determines the relative phase of the outgoing term, so the scattering problem may be parameterized by a real phase shift rather than by an unconstrained complex coefficient. This phase-shift angle is expressed using: 
 $$ 
   \tan \eta_m =
     \tan \delta_m(k_1a) \left[ \frac{ \tan \Phi_m + \tan \alpha_m(k_1 a) }{ \tan \Phi_m + \tan \beta_m(k_1 a) } \right],
@@ -266,7 +266,7 @@ $$
   \end{aligned}
 $$ 
 
-where $\zeta_m(k_\ell a, \sigma)$ is the boundary-impedance phase angle induced by the elastic interior [@faran_sound_1951]. Once obtained, $B_m$ is: $$ B_m = k_1 (-1)^m (2m + 1) h_m^{(1)}(k_1 r_0) \sin \eta_m e^{-i \eta_m}. $$
+where $\zeta_m(k_\ell a, \sigma)$ is the boundary-impedance phase angle induced by the elastic interior [@Faran_1951]. Once obtained, $B_m$ is: $$ B_m = k_1 (-1)^m (2m + 1) h_m^{(1)}(k_1 r_0) \sin \eta_m e^{-i \eta_m}. $$
 
 By imposing Neumann boundary conditions at the sphere's surface (i.e., a hard or rigid boundary), then the form function can be derived: 
 
@@ -290,7 +290,7 @@ $$
   \sigma_{\mathrm{bs}} = \pi a^2 |f_{\mathrm{bs}}|^2.
 $$
 
-Target strength is then reported as [@maclennan_theory_1981]:
+Target strength is then reported as [@Maclennan_1981]:
 
 $$
   \mathit{TS} =
@@ -302,4 +302,5 @@ This normalization is important because calibration references are sometimes wri
 ![Calibration sphere modal bookkeeping from partial waves to reported backscatter quantities.](calibration-modal-bookkeeping.png)
 
 The modal bookkeeping proceeds in a fixed order. The incident plane wave is decomposed into modal terms, each mode acquires an elastic phase shift at the sphere surface, the far-field series is summed, and the final result is reported as a linear backscattering length, a backscattering cross-section, and target strength.
+
 

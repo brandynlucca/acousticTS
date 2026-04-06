@@ -32,7 +32,7 @@ acousticTS:::.model_family_header(
 ```
 
 
-These pages are grounded in the classical elastic-shell scattering literature for fluid-filled spherical shells [@goodman_reflection_1962; @faran_sound_1951; @stanton_sound_1990].
+These pages are grounded in the classical elastic-shell scattering literature for fluid-filled spherical shells [@Goodman_1962; @Faran_1951; @Stanton_1990].
 
 An elastic shell is a solid scattering structure that supports both longitudinal ($\ell$) and transverse ($\tau$) wave within the shell material and encloses a fluid interior. The presence of multiple wave types and two fluid-solid interfaces leads to several distinct scattering mechanisms. 
 
@@ -93,7 +93,7 @@ $$
   (\lambda + 2\mu)\,\nabla(\nabla\cdot\mathbf{u}) - \mu\,\nabla\times(\nabla\times\mathbf{u}) + \rho_s \omega^2 \mathbf{u} = 0,
 $$
 
-where $\lambda$ and $\mu$ are the Lam\'e elastic constants and $\rho_2$ is the mass density of the shell. Applying the Helmholtz decomposition, $\mathbf{u}$ is written as:
+where $\lambda$ and $\mu$ are the Lamé elastic constants and $\rho_2$ is the mass density of the shell. Applying the Helmholtz decomposition, $\mathbf{u}$ is written as:
 
 $$
   \mathbf{u} = \nabla\phi + \nabla\times\mathbf{\Psi},
@@ -157,7 +157,7 @@ $$
   p = -\rho\,\frac{\partial \phi}{\partial t}.
 $$
 
-For time-harmonic fields with $e^{-i\omega t}$ dependence, the pressure can be further expressed as:
+For time-harmonic fields with $e^{-i\omega t}$ dependence, the pressure can be further expressed as [@Morse_1968]:
 
 $$
   p = i\omega\rho\,\phi.
@@ -447,11 +447,11 @@ $$
   \alpha_{56} = k_3 b\, j_m'(k_3 b).
 $$
 
-The remaining $\alpha_{ij}$ terms are obtained by substituting the modal expressions for $u_r$ and $u_\theta$ into $\sigma_{rr}$ and $\sigma_{r\theta}$, then evaluating at $r=a$ and $r=b$. Explicit expressions for all $\alpha_{ij}$ are given in Goodman and Stern (1962) with some modifications described in Stanton (1990).
+The remaining $\alpha_{ij}$ terms are obtained by substituting the modal expressions for $u_r$ and $u_\theta$ into $\sigma_{rr}$ and $\sigma_{r\theta}$, then evaluating at $r=a$ and $r=b$. Explicit expressions for all $\alpha_{ij}$ are given in @Goodman_1962 with some modifications described in @Stanton_1990.
 
 ### Solving for $A_m^{(1)}$
 
-For each angular order $m$, the interface conditions yield the linear system $\mathbf{M}_m \mathbf{x}_m = \mathbf{F}_m$, where the first unknown corresponds to the exterior scattering coefficient, $A_m^{(1)}$. For each $m>0$, $A_m^{(1)}$ is obtained by Cramer's rule:
+For each angular order $m$, the interface conditions yield the linear system $\mathbf{M}_m \mathbf{x}_m = \mathbf{F}_m$, where the first unknown corresponds to the exterior scattering coefficient, $A_m^{(1)}$. For each $m>0$, $A_m^{(1)}$ is obtained by [Cramer's rule](https://en.wikipedia.org/wiki/Cramer%27s_rule):
 
 $$
   A_m^{(1)} = -i^m (2m + 1)
@@ -542,7 +542,7 @@ $$
 
 The spherical Bessel function of the first kind, $j_m$, is incorporated because the incident wave must be finite at the origin.
 
-The scattered field is written as the sum of partial waves using outgoing spherical Hankel functions to enforce the Sommerfeld radiation condition:
+The scattered field is written as the sum of partial waves using outgoing spherical Hankel functions to enforce the Sommerfeld radiation condition [@Sommerfeld_1949]:
 
 $$
   p_{\mathrm{scat}}(r,\theta) =
@@ -617,7 +617,7 @@ $$
   \mathcal{f}_\text{bs}(\theta = \pi) = -\frac{i}{k_1} \sum_{m=0}^{\infty} (2m+1) A_m^{(1)} (-1)^m.
 $$
 
-This coefficient therefore defines the backscattering cross-section and target strength through:
+This coefficient therefore defines the backscattering cross-section and target strength through [@MacLennan_2002; @Urick_1983; @Simmonds_2005]:
 
 $$
   \sigma_\text{bs} = |\mathcal{f}_\text{bs}(\theta = \pi)|^2,

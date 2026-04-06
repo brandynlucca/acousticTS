@@ -20,7 +20,7 @@ vignette: >
 
 # Introduction
 
-The boundary families summarized here correspond to the classical fluid, rigid, elastic, shell, and viscous-interface scattering literature [@anderson_sound_1950; @faran_sound_1951; @goodman_reflection_1962; @feuillade_nero_1998].
+The boundary families summarized here correspond to the classical fluid, rigid, elastic, shell, and viscous-interface scattering literature [@Anderson_1950; @Faran_1951; @Goodman_1962; @Feuillade_1998].
 
 
 
@@ -166,7 +166,7 @@ $$
     \frac{1}{\rho_2}\frac{\partial p_2}{\partial n}.
 $$
 
-These are the standard transmission conditions for an acoustic fluid-fluid boundary. Neither pressure nor normal motion is forced to vanish. Instead, both media participate in the interface dynamics, and the scattering is controlled by density and compressibility contrast across the boundary.
+These are the standard transmission conditions for an acoustic fluid-fluid boundary [@Morse_1968; @Medwin_1998]. Neither pressure nor normal motion is forced to vanish. Instead, both media participate in the interface dynamics, and the scattering is controlled by density and compressibility contrast across the boundary.
 
 # Inelastic shelled boundaries
 
@@ -245,7 +245,7 @@ where $c_{\text{interior}}$ is the sound speed of the interior fluid. The shell 
 
 ## Elastic shell boundary
 
-An elastic shell supports both longitudinal and transverse elastic motion. The displacement field $\mathbf{u}(\mathbf{x}, t)$ within the shell satisfies the Navier equation:
+An elastic shell supports both longitudinal and transverse elastic motion [@Achenbach_1973]. The displacement field $\mathbf{u}(\mathbf{x}, t)$ within the shell satisfies the Navier equation:
 
 $$
   (\lambda + 2 \mu)\nabla(\nabla \cdot \mathbf{u}) -
@@ -254,7 +254,7 @@ $$
     0,
 $$
 
-where $\lambda$ and $\mu$ are the Lam\'e parameters and $\rho_s$ is the shell density. Using the Helmholtz decomposition:
+where $\lambda$ and $\mu$ are the Lamé parameters and $\rho_s$ is the shell density. Using the Helmholtz decomposition:
 
 $$
   \mathbf{u} = \nabla \phi + \nabla \times \mathbf{\Psi},
@@ -330,6 +330,6 @@ $$
   \gamma_\kappa = \frac{\kappa_2 - \kappa_1}{\kappa_1},
 $$
 
-where $\kappa_j = (\rho_j c_j^2)^{-1}$ is compressibility in medium $j$. The scattered field is then treated as a first-order perturbation produced by these small departures from the surrounding fluid rather than by a strongly reflecting or traction-supporting surface.
+where $\kappa_j = (\rho_j c_j^2)^{-1}$ is compressibility in medium $j$ [@Medwin_1998]. The scattered field is then treated as a first-order perturbation produced by these small departures from the surrounding fluid rather than by a strongly reflecting or traction-supporting surface.
 
 This is why weak-scattering treatments are usually expressed as perturbative approximations instead of exact boundary-value problems with a sharply enforcing interface condition. Physically, the target behaves approximately like the surrounding fluid, and the backscatter is produced by residual density and compressibility contrasts rather than by a large impedance jump at the boundary.

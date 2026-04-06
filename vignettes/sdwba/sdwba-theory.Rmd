@@ -1,4 +1,4 @@
----
+﻿---
 title: "Stochastic distorted wave Born approximation (SDWBA) theory"
 output:
   rmarkdown::html_vignette:
@@ -31,7 +31,7 @@ acousticTS:::.model_family_header(
 )
 ```
 
-The stochastic distorted wave Born approximation (SDWBA) begins with the same weak-scattering derivation as the deterministic DWBA, then modifies the phase structure of the coherent sum to account for unresolved variability in body shape, posture, and internal structure [@demer_reconciling_2003; @conti_improved_2006; @stanton_sound_1998].
+The stochastic distorted wave Born approximation (SDWBA) begins with the same weak-scattering derivation as the deterministic DWBA, then modifies the phase structure of the coherent sum to account for unresolved variability in body shape, posture, and internal structure [@Demer_2003_1; @Conti_2006; @Stanton_1998_2].
 
 The deterministic part of the derivation still assumes a weakly scattering fluid-like body, so the local scattering strength is controlled by small density and compressibility contrasts in the same way as in the DWBA. The stochastic extension is introduced only after that weak-contrast amplitude model has been established.
 
@@ -223,7 +223,7 @@ $$
   \left|\mathcal{f}_\text{bs}^{(m)}(\theta)\right|^2,
 $$
 
-where $M$ is the number of realizations. The target strength is then defined from the averaged linear cross-section:
+where $M$ is the number of realizations. The target strength is then defined from the averaged linear cross-section [@MacLennan_2002; @Urick_1983; @Simmonds_2005]:
 
 $$
   TS = 10\log_{10}\!\left(\langle \sigma_\text{bs}(\theta) \rangle\right).
@@ -278,5 +278,6 @@ The SDWBA inherits all assumptions of the deterministic DWBA and adds a small se
 5. The perturbations are represented adequately by a zero-mean Gaussian law.
 
 These assumptions explain the role of the SDWBA. It does not replace the underlying scattering physics. It softens the coherence structure of the deterministic model when unresolved morphology or posture would otherwise make the predicted interference pattern unrealistically sharp.
+
 
 

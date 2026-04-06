@@ -16,7 +16,7 @@ vignette: >
 
 # Introduction
 
-The family library is easiest to navigate when read against model-comparison reviews, organism-focused scattering surveys, and companion open-source modeling ecosystems [@jech_etal_2015; @stanton_acoustic_1996; @brandyn_lucca_osoceanacousticsechopop_2026].
+The family library is easiest to navigate when read against model-comparison reviews, organism-focused scattering surveys, and companion open-source modeling ecosystems [@Jech_2015].
 
 
 

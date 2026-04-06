@@ -31,11 +31,11 @@ acousticTS:::.model_family_header(
 )
 ```
 
-The prolate spheroidal modal series solution (PSMS) is the natural exact-separation analogue of spherical partial-wave theory for elongated bodies whose surface is better approximated by a prolate spheroid than by a sphere or cylinder. The essential fact is that the Helmholtz equation is separable in prolate spheroidal coordinates, so the incident, scattered, and interior fields can all be expanded in spheroidal angular and radial wave functions [@spence_scattering_1951; @furusawa_prolate_1988; @flammer_spheroidal_1957].
+The prolate spheroidal modal series solution (PSMS) is the natural exact-separation analogue of spherical partial-wave theory for elongated bodies whose surface is better approximated by a prolate spheroid than by a sphere or cylinder [@Spence_1951; @Silbiger_1963]. The essential fact is that the Helmholtz equation is separable in prolate spheroidal coordinates, so the incident, scattered, and interior fields can all be expanded in spheroidal angular and radial wave functions [@Spence_1951; @Silbiger_1963; @Furusawa_1988; @Yeh_1967; @Flammer_1957; @Ye_1997_2].
 
 The rigid case enforces zero normal velocity on $\xi = \xi_1$, the pressure-release case enforces zero pressure there, and the fluid-filled or gas-filled cases enforce continuity of pressure and normal velocity between the exterior and interior media. In the PSMS itself, the rigid and pressure-release cases remain comparatively simple because only the exterior basis is involved. The fluid-filled and gas-filled cases use the same interior-fluid algebra, but with different interior material properties and therefore different reduced frequencies. That basis mismatch is what makes the coupled interior problem harder.
 
-The mathematical structure is the same as in spherical scattering, but the basis is more intricate. Instead of Legendre polynomials and spherical Bessel functions, one obtains angular spheroidal functions and radial spheroidal functions. That similarity is what makes the PSMS interpretable as a true modal scattering theory. The difference is what makes it algebraically and numerically more demanding.
+The mathematical structure is the same as in spherical scattering, but the basis is more intricate. Instead of Legendre polynomials and spherical Bessel functions, one obtains angular spheroidal functions and radial spheroidal functions [@Flammer_1957; @DLMF:ch30]. That similarity is what makes the PSMS interpretable as a true modal scattering theory. The difference is what makes it algebraically and numerically more demanding.
 
 # Physical basis of the PSMS
 
@@ -45,7 +45,7 @@ The PSMS begins from a geometric observation. A prolate spheroid is a coordinate
 
 ## Linear time-harmonic scattering problem
 
-Assume linear acoustics with harmonic time dependence $e^{-i\omega t}$. In each homogeneous region, the pressure satisfies the Helmholtz equation. The scattering problem then proceeds in three steps. First, the incident field is expanded in regular spheroidal eigenfunctions. Second, the scattered field is expanded in outgoing spheroidal eigenfunctions. Third, if the spheroid contains an interior fluid or gas, the interior field is expanded in regular interior spheroidal eigenfunctions. The boundary conditions then determine the modal coefficients.
+Assume linear acoustics with harmonic time dependence $e^{-i\omega t}$. In each homogeneous region, the pressure satisfies the Helmholtz equation [@Morse_1968]. The scattering problem then proceeds in three steps. First, the incident field is expanded in regular spheroidal eigenfunctions. Second, the scattered field is expanded in outgoing spheroidal eigenfunctions. Third, if the spheroid contains an interior fluid or gas, the interior field is expanded in regular interior spheroidal eigenfunctions. The boundary conditions then determine the modal coefficients.
 
 This summary is simple, but it already contains the main distinction between the rigid or pressure-release cases and the interior-fluid cases. When only the exterior basis matters, the coefficient bookkeeping remains effectively local. Once an interior medium with a different reduced frequency is introduced, the basis mismatch becomes part of the physics and part of the algebra.
 
@@ -81,7 +81,7 @@ $$
   h_\phi = q\sqrt{(\xi^2-1)(1-\eta^2)}.
 $$
 
-These scale factors are the quantities that make separation of variables possible after the Helmholtz operator is written in curvilinear coordinates.
+These scale factors are the quantities that make separation of variables possible after the Helmholtz operator is written in curvilinear coordinates [@Flammer_1957; @DLMF:ch30].
 
 ## Geometric parameters of the spheroid
 
@@ -180,7 +180,7 @@ $$
   \frac{d}{d\eta}\left[(1-\eta^2)\frac{dS}{d\eta}\right] + \left(\lambda_{mn}(\mathbb{k}) - \mathbb{k}^2\eta^2 - \frac{m^2}{1-\eta^2}\right)S = 0
 $$
 
-where $\lambda_{mn}(h)$ is the separation constant. When $h \to 0$, this reduces to the associated Legendre equation, so the spheroidal angular functions reduce smoothly to Legendre functions.
+where $\lambda_{mn}(h)$ is the separation constant. When $h \to 0$, this reduces to the associated Legendre equation, so the spheroidal angular functions reduce smoothly to Legendre functions [@Flammer_1957; @DLMF:ch30; @DLMF:ch14].
 
 ## Radial equation
 
@@ -190,7 +190,7 @@ $$
   \frac{d}{d\xi}\left[(\xi^2-1)\frac{dR}{d\xi}\right] - \left(\lambda_{mn}(\mathbb{k}) - \mathbb{k}^2\xi^2 + \frac{m^2}{\xi^2-1}\right)R = 0
 $$
 
-Its independent solutions are the radial spheroidal functions of the first, second, third, and fourth kinds. For scattering, the first and third kinds play the same roles as regular Bessel and outgoing Hankel functions in spherical theory.
+Its independent solutions are the radial spheroidal functions of the first, second, third, and fourth kinds [@Flammer_1957; @DLMF:ch30]. For scattering, the first and third kinds play the same roles as regular Bessel and outgoing Hankel functions in spherical theory.
 
 # Field expansions
 
@@ -207,7 +207,7 @@ $$
   \cos m(\phi-\phi')
 $$
 
-This is the spheroidal analogue of the spherical plane-wave expansion. It is the starting point for every boundary-condition derivation because it expresses the known incident field in the same basis used for the unknown scattered field.
+This is the spheroidal analogue of the spherical plane-wave expansion [@Spence_1951; @Furusawa_1988]. It is the starting point for every boundary-condition derivation because it expresses the known incident field in the same basis used for the unknown scattered field.
 
 The scattered and interior fields are expanded in the same angular structure but with different radial functions:
 
@@ -295,7 +295,7 @@ where $\Delta = 1$ for pressure release and $\Delta = \partial/\partial\xi$ for 
 
 ## Fluid-filled and gas-filled spheroid
 
-The fluid-filled case is more involved because the interior field uses a different reduced frequency, $\mathbb{k}_1 = k_2 q$, and therefore a different spheroidal basis. The exterior and interior angular functions are not identical when $\mathbb{k}_1 \ne \mathbb{k}_1$, so the boundary conditions do not remain diagonal in $n$. The gas-filled case uses exactly the same algebraic structure as the fluid-filled case; only the interior density and sound speed differ.
+The fluid-filled case is more involved because the interior field uses a different reduced frequency, $\mathbb{k}_1 = k_2 q$, and therefore a different spheroidal basis [@Yeh_1967; @Furusawa_1988; @Ye_1997_2]. The exterior and interior angular functions are not identical when $\mathbb{k}_1 \ne \mathbb{k}_1$, so the boundary conditions do not remain diagonal in $n$. The gas-filled case uses exactly the same algebraic structure as the fluid-filled case; only the interior density and sound speed differ.
 
 Here $\mathbb{k}_1 = k_1 q$ and $\mathbb{k}_1 = k_2 q$ are the exterior and interior reduced frequencies, while $\rho_1$ and $\rho_2$ are the corresponding densities. Because the boundary is the coordinate surface $\xi = \xi_1$, the normal derivative is proportional to $\partial / \partial \xi$ on both sides of the interface, so the common metric factor cancels from the normal-velocity continuity condition.
 
@@ -379,7 +379,7 @@ This approximation is the statement that each exterior mode couples mainly to th
 
 # Truncation of the infinite series
 
-The exact solution is a double infinite series in $m$ and $n$. In practice, it is truncated at finite limits. A common estimate is:
+The exact solution is a double infinite series in $m$ and $n$. In practice, it is truncated at finite limits. A common estimate is [@Furusawa_1988]:
 
 $$
   m_{max} = \lceil 2k_1b \rceil,
@@ -428,7 +428,7 @@ $$
   S_{mn}^{(1)}(\mathbb{k}_1,\eta)S_{m\ell}^{(1)}(\mathbb{k}_2,\eta)\,d\eta
 $$
 
-For the truncated system these integrals are evaluated numerically, typically by Gauss-Legendre quadrature. That is, one replaces the integral by a weighted sum over quadrature nodes $\eta_j$:
+For the truncated system these integrals are evaluated numerically, typically by Gauss-Legendre quadrature [@Abramowitz_1964; @Press2007; @DLMF:ch3]. That is, one replaces the integral by a weighted sum over quadrature nodes $\eta_j$:
 
 $$
   \alpha_{n\ell}^m \approx \frac{1}{N_{m\ell}(\mathbb{k}_2)}
@@ -440,7 +440,7 @@ This step is mathematically natural because the overlap integrals are smooth on 
 
 ## Stable solution of each modal system
 
-Once $\mathbf{M}^{(m)}$ and $\mathbf{b}^{(m)}$ are assembled, the truncated coefficients are obtained by solving the dense system for each $m$. Near resonances, or when the interior and exterior bases become nearly linearly dependent after truncation, $\mathbf{M}^{(m)}$ can be poorly conditioned. A stable approach is therefore to compute a singular-value decomposition:
+Once $\mathbf{M}^{(m)}$ and $\mathbf{b}^{(m)}$ are assembled, the truncated coefficients are obtained by solving the dense system for each $m$. Near resonances, or when the interior and exterior bases become nearly linearly dependent after truncation, $\mathbf{M}^{(m)}$ can be poorly conditioned. A stable approach is therefore to compute a singular-value decomposition [@Press2007]:
 
 $$
   \mathbf{M}^{(m)} = \mathbf{U}\mathbf{\Sigma}\mathbf{V}^*
@@ -462,7 +462,7 @@ $$
   \sigma_\text{bs} = |f_\infty|^2
 $$
 
-with target strength:
+with target strength [@MacLennan_2002; @Urick_1983; @Simmonds_2005]:
 
 $$
   TS = 10\log_{10}(\sigma_\text{bs}).

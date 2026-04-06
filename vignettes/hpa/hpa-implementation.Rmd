@@ -1,4 +1,4 @@
----
+﻿---
 title: "HPA implementation"
 output:
   rmarkdown::html_vignette:
@@ -32,7 +32,7 @@ acousticTS:::.model_family_header(
 ```
 
 
-These pages follow Johnson's asymptotic fluid-sphere formulation and Stanton's generalized approximate backscatter formulas [@johnson_sound_1977; @stanton_1989].
+These pages follow Johnson's asymptotic fluid-sphere formulation and Stanton's generalized approximate backscatter formulas [@Johnson_1977; @Stanton_1989_1].
 
 The acousticTS package uses object-based scatterers, so the HPA workflow follows the same broad pattern used throughout the package: define the geometry, attach fluid-like material properties, evaluate the model over the frequency range of interest, and then inspect the returned results carefully enough to confirm that the approximation is being used in a sensible way. For HPA, the most important additional choice is the approximation method: `johnson` for the compact sphere expression of Johnson (1977), or `stanton` for the broader sphere, prolate-spheroid, and cylinder approximations of Stanton (1989).
 
@@ -188,3 +188,4 @@ The locally available `echoSMs::HPModel` provides a direct software-to-software 
 | Stanton (1989) cylinder | `N/A` | `N/A` | 2.39e-14 | 8.53e-14 |
 
 The HPA picture is explicit. The spherical Stanton branch agrees with the available external software implementation to practical machine precision, and every canonical branch matches the published Johnson (1977) or Stanton (1989) algebra to the same order. That does not make HPA an exact replacement for the benchmarked modal-series models above, but it does confirm that the package is implementing the intended asymptotic formulas correctly.
+

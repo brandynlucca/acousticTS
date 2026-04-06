@@ -1,5 +1,617 @@
+%%% ------------------%%%
+%%% NUMERICAL METHODS %%%
+%%% ------------------%%%
 
-@article{feuillade_nero_1998,
+@book{Abramowitz_1964,
+	author = {Abramowitz, Milton and Stegun, Irene A.},
+	title = {Handbook of Mathematical Functions with Formulas, Graphs, and Mathematical Tables},
+	publisher = {Dover Publications},
+	year = {1964},
+	address = {New York},
+	edition = {ninth Dover printing, tenth GPO printing},
+	note = {Applied Mathematics Series 55}
+}
+
+@incollection{DLMF:ch1,
+	author = {Roy, R., Olver, F.W.J., Askey, R.A., Wong, R., and Reinhardt, W.P},
+	title = {Algebraic and analytical methods},
+	howpublished = {\url{https://dlmf.nist.gov/1.5#ii}, Release 1.2.6 of 2026-03-15},
+	booktitle = {{NIST Digital Library of Mathematical Functions}},
+	url = {https://dlmf.nist.gov/1.5#ii},
+	editor = {F. W. J. Olver and A. B. {Olde Daalhuis} and D. W. Lozier and B. I. Schneider and B. A. Boisvert and C. W. Clark and B. R. Miller and B. V. Saunders and H. S. Cohl and M. A. McClain},
+	year = {2026},
+	note = {Release 1.2.6},
+	chapter = {1},
+	month = {3},
+	day = {15},
+}
+
+@incollection{DLMF:ch3,
+	author = {Temme, N. M.},
+	title = {Numerical Methods},
+	editor = {F. W. J. Olver and A. B. {Olde Daalhuis} and D. W. Lozier and B. I. Schneider and B. A. Boisvert and C. W. Clark and B. R. Miller and B. V. Saunders and H. S. Cohl and M. A. McClain},
+	booktitle = {{NIST Digital Library of Mathematical Functions}},
+	year = {2026},
+	month = {3},
+	day = {15},
+	note = {Release 1.2.6},
+	url = {https://dlmf.nist.gov/3},
+	chapter = {3}
+}
+
+@incollection{DLMF:ch10,
+	author = {Folver, F.W.J., and Maximon, L.C.},
+	title = {{Bessel Functions}},
+	editor = {F. W. J. Olver and A. B. {Olde Daalhuis} and D. W. Lozier and B. I. Schneider and B. A. Boisvert and C. W. Clark and B. R. Miller and B. V. Saunders and H. S. Cohl and M. A. McClain},
+	booktitle = {{NIST Digital Library of Mathematical Functions}},
+	year = {2026},
+	month = {3},
+	day = {15},
+	note = {Release 1.2.6},
+	url = {https://dlmf.nist.gov/10},
+	chapter = {10}
+}
+
+@incollection{DLMF:ch14,
+	author = {Dunster, T.M.},
+	title = {{Legendre and Related Functions}},
+	editor = {F. W. J. Olver and A. B. {Olde Daalhuis} and D. W. Lozier and B. I. Schneider and B. A. Boisvert and C. W. Clark and B. R. Miller and B. V. Saunders and H. S. Cohl and M. A. McClain},
+	booktitle = {{NIST Digital Library of Mathematical Functions}},
+	year = {2026},
+	month = {3},
+	day = {15},
+	note = {Release 1.2.6},
+	url = {https://dlmf.nist.gov/14},
+	chapter = {14}
+}
+
+@incollection{DLMF:ch30,
+	author = {Volkmer, H.},
+	title = {{Spheroidal Wave Functions}},
+	editor = {F. W. J. Olver and A. B. {Olde Daalhuis} and D. W. Lozier and B. I. Schneider and B. A. Boisvert and C. W. Clark and B. R. Miller and B. V. Saunders and H. S. Cohl and M. A. McClain},
+	booktitle = {{NIST Digital Library of Mathematical Functions}},
+	year = {2026},
+	month = {3},
+	day = {15},
+	note = {Release 1.2.6},
+	url = {https://dlmf.nist.gov/30},
+	chapter = {30}
+}
+
+@book{Flammer_1957,
+	title = {Spheroidal wave functions},
+	url = {https://ui.adsabs.harvard.edu/abs/1957spwf.book.....F},
+	urldate = {2026-03-27},
+	author = {Flammer, Carson},
+	month = dec,
+	year = {1957},
+	keywords = {MATHEMATICAL PHYSICS, SPECIAL FUNCTIONS, SPHEROIDAL WAVE FUNCTIONS},
+}
+
+@article{Goodwin_1949,
+	author = {Goodwin, E. T.},
+	title = {The evaluation of integrals of the form $\int_{-\infty}^{\infty} f(x) e^{-x^2} dx$},
+	journal = {Proceedings of the Cambridge Philosophical Society},
+	year = {1949},
+	volume = {45},
+	number = {2},
+	pages = {241--245},
+	doi = {10.1017/S0305004100024786}
+}
+
+@book{Press2007,
+	author= {Press, William H. and Teukolsky, Saul A. and Vetterling, William T. and Flannery, Brian P.},
+	title= {Numerical Recipes: The Art of Scientific Computing},
+	edition= {3rd},
+	year= {2007},
+	publisher= {Cambridge University Press},
+	address= {New York, NY},
+	isbn= {978-0-521-88068-8}
+}
+
+%%% ---------%%%
+%%% SOFTWARE %%%
+%%% ---------%%%
+@article{Armadillo_software,
+	title = {RcppArmadillo: 'Rcpp' Integration for the 'Armadillo' Templated Linear Algebra Library},
+	author = {Dirk Eddelbuettel and Romain Francois and Doug Bates and Binxiang Ni and Conrad Sanderson},
+	year = {2026},
+	note = {R package version 15.2.4-1},
+	url = {https://CRAN.R-project.org/package=RcppArmadillo},
+	doi = {10.32614/CRAN.package.RcppArmadillo},
+}
+
+@article{Bempp-cl_software,
+	title = {Bempp-cl: {A} fast {Python} based just-in-time compiling boundary element library.},
+	volume = {6},
+	copyright = {http://creativecommons.org/licenses/by/4.0/},
+	issn = {2475-9066},
+	shorttitle = {Bempp-cl},
+	url = {https://joss.theoj.org/papers/10.21105/joss.02879},
+	doi = {10.21105/joss.02879},
+	number = {59},
+	urldate = {2026-03-27},
+	journal = {Journal of Open Source Software},
+	author = {Betcke, Timo and Scroggs, Matthew},
+	month = mar,
+	year = {2021},
+	pages = {2879}
+}
+
+@manual{Boost_software,
+	title = {BH: Boost C++ Header Files},
+	author = {Dirk Eddelbuettel and John W. Emerson and Michael J. Kane},
+	year = {2025},
+	note = {R package version 1.90.0-1},
+	url = {https://CRAN.R-project.org/package=BH},
+	doi = {10.32614/CRAN.package.BH},
+}
+
+@software{CCAMLR_SDWBA_software,
+	author = {{Commission for the Conservation of Antarctic Marine Living Resources}},
+	title  = {{SDWBA\_TS}: Stochastic Distorted-Wave Born Approximation ({SDWBA}) Target Strength ({TS}) Model},
+	year = {2019},
+	version  = {1.3},
+	publisher  = {GitHub},
+	howpublished = {\url{https://github.com/ccamlr/SDWBA_TS}},
+	note = {Official CCAMLR implementation for krill TS-L modeling}
+}
+
+@techreport{cpp_lang,
+	type  = {Standard},
+	key = {ISO/IEC 14882:2020},
+	month = dec,
+	year  = {2020},
+	title = {{ISO/IEC 14882:2020}: Programming languages --- {C++}},
+	volume  = {2020},
+	address = {Geneva, CH},
+	institution = {International Organization for Standardization}
+}
+
+@misc{Echopop_software,
+	title = {{OSOceanAcoustics}/echopop: v0.6.0},
+	copyright = {Apache License 2.0},
+	shorttitle = {{OSOceanAcoustics}/echopop},
+	url = {https://zenodo.org/doi/10.5281/zenodo.18975959},
+	urldate = {2026-03-27},
+	publisher = {Zenodo},
+	author = {Brandyn Lucca and Wu-Jung Lee},
+	month = mar,
+	year = {2026},
+	doi = {10.5281/ZENODO.18975959},
+}
+
+@software{echoSMs_software,
+	author = {Elavia, A.},
+	title  = {liquid\_spheroid: Acoustic scattering by a liquid prolate spheroid},
+	year = {2021},
+	url  = {https://github.com/elavia/liquid_spheroid},
+	note = {GitHub repository}
+}
+
+@manual{InkscapeProject2026,
+	author= {{Inkscape Project}},
+	title= {Inkscape},
+	year= {2026},
+	version= {1.3},
+	url= {https://inkscape.org/},
+	note= {Professional Vector Graphics Editor}
+}
+
+@article{julialang,
+	author  = {Bezanson, Jeff and Edelman, Alan and Karpinski, Stefan and Shah, Viral B.},
+	title = {Julia: A Fresh Approach to Numerical Computing},
+	journal = {SIAM Review},
+	year  = {2017},
+	volume  = {59},
+	number  = {1},
+	pages = {65--98},
+	doi = {10.1137/141000671},
+	url = {https://doi.org/10.1137/141000671}
+}
+
+@misc{KRMr_software,
+	title = {{SvenGastauer}/{KRMr}: v0.4.8},
+	copyright = {MIT License},
+	shorttitle = {{SvenGastauer}/{KRMr}},
+	url = {https://zenodo.org/doi/10.5281/zenodo.15838374},
+	urldate = {2026-03-27},
+	publisher = {Zenodo},
+	author = {Sven Gastauer},
+	month = jul,
+	year = {2025},
+	doi = {10.5281/ZENODO.15838374},
+}
+
+@software{liquid_spheroid_software,
+	author = {Elavia, A.},
+	title  = {liquid\_spheroid: Acoustic scattering by a liquid prolate spheroid},
+	year = {2021},
+	url = {https://github.com/elavia/liquid_spheroid},
+	note = {GitHub repository}
+}
+
+@manual{matlab_lang,
+	author = {{The MathWorks, Inc.}},
+	title  = {{MATLAB}},
+	year = {2026},
+	version = {R2026a},
+	address = {Natick, Massachusetts, United States},
+	url = {https://www.mathworks.com/products/matlab.html},
+	note = {Version 24.1}
+}
+
+@article{mcgehee_software,
+	title = {Effects of orientation on acoustic scattering from {Antarctic} krill at 120 {kHz}},
+	volume = {45},
+	issn = {09670645},
+	url = {https://linkinghub.elsevier.com/retrieve/pii/S0967064598000368},
+	doi = {10.1016/S0967-0645(98)00036-8},
+	language = {en},
+	number = {7},
+	urldate = {2022-07-22},
+	journal = {Deep Sea Research Part II: Topical Studies in Oceanography},
+	author = {McGehee, D.E. and O’Driscoll, R.L. and Traykovski, L.V.Martin},
+	month = jul,
+	year = {1998},
+	pages = {1273--1294},
+}
+
+@manual{NOAA_KRM_software,
+	author = {{Southwest Fisheries Science Center}},
+	title = {KRM Model},
+	year = {2022},
+	organization = {National Marine Fisheries Service, National Oceanic and Atmospheric Administration},
+	url = {https://www.fisheries.noaa.gov/data-tools/krm-model}
+}
+
+@manual{NOAA_SDWBA_software,
+	author = {{Southwest Fisheries Science Center}},
+	title = {SDWBA Model},
+	year = {2022},
+	organization = {National Marine Fisheries Service, National Oceanic and Atmospheric Administration},
+	url = {https://www.fisheries.noaa.gov/data-tools/sdwba-model}
+}
+
+@manual{NOAA_sphere_software,
+	author = {Renfree, J. S. and Demer, D. A.},
+	title = {Standard Sphere Target Strength Calculator},
+	organization = {Advanced Survey Technologies, Fisheries Resource Division, Southwest Fisheries Science Center, National Marine Fisheries Service, National Oceanic and Atmospheric Administration},
+	year = {2014},
+	url = {https://www.fisheries.noaa.gov/data-tools/standard-sphere-target-strength-calculator}
+}
+
+@article{NumPy_software,
+	author= {Harris, Charles R. and Millman, K. Jarrod and {van der Walt}, St{\'e}fan J. and Gommers, Ralf and Virtanen, Pauli and Cournapeau, David and Wieser, Eric and Taylor, Julian and Berg, Sebastian and Smith, Nathaniel J. and Kern, Robert and Picus, Matti and Hoyer, Stephan and {van Kerkwijk}, Marten H. and Brett, Matthew and Haldane, Allan and {del R{\'i}o}, Jaime Fern{\'a}ndez and Wiebe, Mark and Peterson, Pearu and G{\'e}rard-Marchant, Pierre and Sheppard, Kevin and Reddy, Tyler and Weckesser, Warren and Abbasi, Hameer and Gohlke, Christoph and Oliphant, Travis E.},
+	title= {Array programming with {NumPy}},
+	journal= {Nature},
+	year= {2020},
+	volume= {585},
+	number= {7825},
+	pages= {357--362},
+	doi= {10.1038/s41586-020-2649-2},
+	publisher= {Nature Publishing Group}
+}
+
+@Manual{pbapply_software,
+	title = {pbapply: Adding Progress Bar to '*apply' Functions},
+	author = {Peter Solymos and Zygmunt Zawadzki},
+	year = {2025},
+	note = {R package version 1.7-4},
+	url = {https://CRAN.R-project.org/package=pbapply},
+	doi = {10.32614/CRAN.package.pbapply},
+}
+
+@article{Prol_Spheroid_software,
+	title = {High-precision model and open-source software for acoustic backscattering by liquid- and gas-filled prolate spheroids across a wide frequency range and incident angles: Implications for fisheries acoustics},
+	journal = {Journal of Sound and Vibration},
+	pages = {119227},
+	year = {2025},
+	issn = {0022-460X},
+	doi = {https://doi.org/10.1016/j.jsv.2025.119227},
+	url = {https://www.sciencedirect.com/science/article/pii/S0022460X25003013},
+	author = {Babak Khodabandeloo and Yngve Heggelund and Bjørnar Ystad and Sander Andre Berg Marx and Geir Pedersen}
+}
+
+@article{prolate_swf_software_2002,
+	author = {Van Buren, A. L. and Boisvert, J. E.},
+	title = {Accurate calculation of prolate spheroidal radial functions of the first kind and their first derivatives},
+	journal = {Quarterly of Applied Mathematics},
+	year = {2002},
+	volume = {60},
+	number = {3},
+	pages = {589--599},
+	doi = {10.1090/qam/1915351}
+}
+
+@article{prolate_swf_software_2004,
+	author = {Van Buren, A. L. and Boisvert, J. E.},
+	title = {Improved calculation of prolate spheroidal radial functions of the second kind and their first derivatives},
+	journal = {Quarterly of Applied Mathematics},
+	year = {2004},
+	volume = {62},
+	number = {3},
+	pages = {493--507},
+	doi = {10.1090/qam/2085732}
+}
+
+@manual{pylang,
+	author = {{Python Software Foundation}},
+	title = {Python Language Reference, version 3.12},
+	year = {2026},
+	urldate = {https://www.python.org/},
+	note = {Available at python.org}
+}
+
+@article{Rcpp_software,
+	title = {{Extending {R} with {C++}: A Brief Introduction to {Rcpp}}},
+	author = {Dirk Eddelbuettel and James Joseph Balamuta},
+	journal = {The American Statistician},
+	year = {2018},
+	volume = {72},
+	number = {1},
+	pages = {28-36},
+	doi = {10.1080/00031305.2017.1375990},
+}
+
+@manual{rlang,
+	title = {R: A Language and Environment for Statistical Computing},
+	author = {{R Core Team}},
+	organization = {R Foundation for Statistical Computing},
+	address = {Vienna, Austria},
+	year = {2026},
+	url = {https://www.R-project.org/}
+}
+
+@article{SciPy_software,
+	author = {Virtanen, Pauli and Gommers, Ralf and Oliphant, Travis E. and Haberland, Matt and Reddy, Tyler and Cournapeau, David and Burovski, Evgeni and Peterson, Pearu and Weckesser, Warren and Bright, Jonathan and {van der Walt}, St{\'e}fan J. and Brett, Matthew and Wilson, Joshua and Millman, K. Jarrod and Mayorov, Nikolay and Nelson, Andrew R. J. and Jones, Eric and Kern, Robert and Larson, Eric and Carey, C J and Polat, {\.I}lhan and Feng, Yu and Moore, Eric W. and {VanderPlas}, Jake and Laxalde, Denis and Perktold, Josef and Cimrman, Robert and Henriksen, Ian and Quintero, E. A. and Harris, Charles R. and Archibald, Anne M. and Ribeiro, Ant{\^o}nio H. and Pedregosa, Fabian and {van Mulbregt}, Paul and {SciPy 1.0 Contributors}},
+	title = {{{SciPy} 1.0: Fundamental Algorithms for Scientific Computing in Python}},
+	journal = {Nature Methods},
+	year = {2020},
+	volume  = {17},
+	pages = {261--272},
+	adsurl = {https://rdcu.be/b08ss},
+	doi = {10.1038/s41592-019-0686-2}
+}
+
+@misc{SphereTS_software,
+	title = {{gavinmacaulay}/{SphereTS}: v1.0.8},
+	url = {https://github.com/gavinmacaulay/SphereTS},
+	urldate = {2026-03-30},
+	author = {Gavin J. Macaulay},
+	month = dec,
+	year = {2025},
+	note = {GitHub repository},
+}
+
+@article{ZooScatR_software,
+	title = {{ZooScatR}—{An} {\textless}span style="font-variant:small-caps;"{\textgreater}r{\textless}/span{\textgreater} package for modelling the scattering properties of weak scattering targets using the distorted wave {Born} approximation},
+	volume = {145},
+	issn = {0001-4966, 1520-8524},
+	shorttitle = {{ZooScatR}—{An} {\textless}span style="font-variant},
+	url = {https://pubs.aip.org/jasa/article/145/1/EL102/638683/ZooScatR-An-r-package-for-modelling-the-scattering},
+	doi = {10.1121/1.5085655},
+	language = {en},
+	number = {1},
+	urldate = {2026-03-27},
+	journal = {The Journal of the Acoustical Society of America},
+	author = {Gastauer, Sven and Chu, Dezhang and Cox, Martin J.},
+	month = jan,
+	year = {2019},
+	pages = {EL102--EL108}
+}
+
+%%% ----------------- %%%
+%%% GENERAL ACOUSTICS %%%
+%%% ----------------- %%%
+
+@article{MacLennan_2002,
+	title = {A consistent approach to definitions and symbols in fisheries acoustics},
+	volume = {59},
+	issn = {1054-3139, 1095-9289},
+	url = {https://academic.oup.com/icesjms/article/59/2/365/620221},
+	doi = {10.1006/jmsc.2001.1158},
+	language = {en},
+	number = {2},
+	journal = {ICES Journal of Marine Science},
+	author = {MacLennan, David N. and Fernandes, Percy G. and Dalen, John},
+	year = {2002},
+	pages = {365--369},
+}
+
+@book{Medwin_1998,
+	author= {Medwin, Herman and Clay, Clarence S.},
+	title= {Fundamentals of Acoustical Oceanography},
+	year= {1998},
+	publisher= {Academic Press},
+	address= {San Diego, CA},
+	series= {Applications of Modern Acoustics},
+	isbn= {978-0-12-487570-8}
+}
+
+@book{Morse_1968,
+	author= {Morse, Philip M. and Ingard, K. Uno},
+	title= {Theoretical Acoustics},
+	year= {1968},
+	publisher= {McGraw-Hill},
+	address= {New York, NY},
+	isbn= {978-0-07-043330-4},
+	note= {Reprinted by Princeton University Press in 1986}
+}
+
+@book{Morse_1953,
+	author = {Morse, Philip M. and Feshbach, Herman},
+	title = {Methods of Theoretical Physics},
+	year = {1953},
+	publisher = {McGraw-Hill},
+	address = {New York},
+	note = {2 volumes}
+}
+
+@book{Pierce_1989,
+	author = {Pierce, Allan D.},
+	title = {Acoustics: An Introduction to Its Physical Principles and Applications},
+	year = {1989},
+	publisher = {Acoustical Society of America},
+	address = {Woodbury, NY}
+}
+
+@book{Simmonds_2005,
+	author= {Simmonds, John and MacLennan, David N.},
+	title= {Fisheries Acoustics: Theory and Practice},
+	edition= {2nd},
+	year= {2005},
+	publisher= {Blackwell Science},
+	address= {Oxford, UK},
+	isbn= {978-0-632-05994-2},
+	doi= {10.1002/9780470995303}
+}
+
+@book{Skudrzyk_1971,
+	author= {Skudrzyk, Eugen},
+	title= {The Foundations of Acoustics: Basic Mathematics and Basic Acoustics},
+	year= {1971},
+	publisher= {Springer-Verlag},
+	address= {New York, NY},
+	isbn= {978-3-7091-8255-0}
+}
+
+@book{Sommerfeld_1949,
+	author    = {Sommerfeld, Arnold},
+	title     = {Partial Differential Equations in Physics},
+	series    = {Lectures on Theoretical Physics},
+	volume    = {6},
+	publisher = {Academic Press},
+	address   = {New York},
+	year      = {1949},
+	note      = {Translated by Ernst G. Straus}
+}
+
+@book{Urick_1983,
+	author= {Urick, Robert J.},
+	title= {Principles of Underwater Sound},
+	edition= {3rd},
+	year= {1983},
+	publisher= {McGraw-Hill},
+	address= {New York, NY},
+	isbn= {978-0-07-066086-1}
+}
+
+%%% --------------------------- %%%
+%%% GENERAL SCATTERING MODELING %%%
+%%% --------------------------- %%%
+
+@book{Bowman_1987,
+	title = {Electromagnetic and Acoustic Scattering by Simple Shapes},
+	author = {Bowman, J. J. and Senior, T. B. A. and Uslenghi, P. L. E.},
+	publisher = {Hemisphere Publishing Corp.},
+	address = {New York},
+	year = {1987}
+}
+
+@article{Jech_2015,
+	title = {Comparisons among ten models of acoustic backscattering used in aquatic ecosystem research},
+	volume = {138},
+	issn = {0001-4966},
+	url = {http://asa.scitation.org/doi/10.1121/1.4937607},
+	doi = {10.1121/1.4937607},
+	language = {en},
+	number = {6},
+	urldate = {2022-07-12},
+	journal = {The Journal of the Acoustical Society of America},
+	author = {Jech, J. Michael and Horne, John K. and Chu, Dezhang and Demer, David A. and Francis, David T. I. and Gorska, Natalia and Jones, Benjamin and Lavery, Andone C. and Stanton, Timothy K. and Macaulay, Gavin J. and Reeder, D. Benjamin and Sawada, Kouichi},
+	month = dec,
+	year = {2015},
+	pages = {3742--3764},
+}
+
+%%% ------------------------- %%%
+%%% ELASTIC SCATTERING THEORY %%%
+%%% ------------------------- %%%
+
+@book{Achenbach_1973,
+	address = {Amsterdam New York},
+	series = {North-{Holland} series in applied mathematics and mechanics},
+	title = {Wave propagation in elastic solids},
+	isbn = {978-0-7204-0325-1 978-0-7204-2367-9},
+	language = {eng},
+	number = {v. 16},
+	publisher = {North-Holland Pub. Co. American Elsevier Pub. Co},
+	author = {Achenbach, J. D.},
+	year = {1973},
+}
+
+@article{Demer_2015,
+	author = {Demer, David A. and Berger, Laurent and Bernasconi, Matteo and Bethke, Egil and Boswell, Kevin and Chu, Dezhang and Domokos, Reka and Dunford, Amy and F\"{a}ssler, Sascha and Gauthier, Stephane and Hufnagle, Lawrence T. and Jech, J. Michael and Bouffant, Noel and Lebour, Alexis and Logerwell, Elizabeth and MacLennan, David N. and Michaels, William and Perrot, Yannick and Power, David and Ressler, Patrick H. and Stanton, Timothy and Thomas, Jeffrey and Thompson, Cameron and Tsitsika, Eirini and Varghese, Rois\'{i}n and Vernaleo, Jean-Claude and Walline, Paul and Weill, Alain and Williams, Kyle L.},
+	title = {Calibration of acoustic instruments},
+	institution = {International Council for the Exploration of the Sea},
+	type = {ICES Cooperative Research Report},
+	number = {326},
+	year = {2015},
+	pages = {133},
+	doi = {10.17895/ices.pub.5494},
+	url = {https://doi.org/10.17895/ices.pub.5494},
+}
+
+@article{DiMaggio_1966,
+	author= {DiMaggio, Frank L. and Rand, Richard},
+	title= {Axisymmetric vibrations of prolate spheroidal shells},
+	journal= {Journal of Applied Mechanics},
+	year= {1966},
+	volume= {33},
+	number= {1},
+	pages= {31--36},
+	doi= {10.1115/1.3625016}
+}
+
+@article{Doolittle1966,
+	title = {Sound Scattering by Elastic Cylindrical Shells},
+	volume = {39},
+	ISSN = {1520-8524},
+	url = {http://dx.doi.org/10.1121/1.1909886},
+	DOI = {10.1121/1.1909886},
+	number = {2},
+	journal = {The Journal of the Acoustical Society of America},
+	publisher = {Acoustical Society of America (ASA)},
+	author = {Doolittle,  R. D. and \"{U}berall,  H.},
+	year = {1966},
+	month = feb,
+	pages = {272–275}
+}
+
+@article{Dragonette_1981,
+	title = {Calibration technique for acoustic scattering measurements},
+	volume = {69},
+	issn = {0001-4966, 1520-8524},
+	url = {https://pubs.aip.org/jasa/article/69/4/1186/651111/Calibration-technique-for-acoustic-scattering},
+	doi = {10.1121/1.385699},
+	language = {en},
+	number = {4},
+	urldate = {2023-11-12},
+	journal = {The Journal of the Acoustical Society of America},
+	author = {Dragonette, Louis R. and Numrich, S. K. and Frank, Laurence J.},
+	month = apr,
+	year = {1981},
+	pages = {1186--1189},
+}
+
+@article{Faran_1951,
+	title = {Sound scattering by solid cylinders and spheres},
+	volume = {23},
+	issn = {0001-4966},
+	url = {http://asa.scitation.org/doi/10.1121/1.1906780},
+	doi = {10.1121/1.1906780},
+	language = {en},
+	number = {4},
+	urldate = {2022-07-12},
+	journal = {The Journal of the Acoustical Society of America},
+	author = {Faran, James J.},
+	month = jul,
+	year = {1951},
+	pages = {405--418},
+}
+
+@article{Feuillade_1998,
 	title = {A viscous-elastic swimbladder model for describing enhanced-frequency resonance scattering from fish},
 	volume = {103},
 	issn = {0001-4966},
@@ -15,23 +627,270 @@
 	pages = {3245--3255},
 }
 
-@article{stanton_1989,
-	title = {Simple approximate formulas for backscattering of sound by spherical and elongated objects},
-	volume = {86},
-	issn = {0001-4966},
-	url = {http://asa.scitation.org/doi/10.1121/1.398711},
-	doi = {10.1121/1.398711},
+@article{Foote_1982,
+	title = {Optimizing copper spheres for precision calibration of hydroacoustic equipment},
+	volume = {71},
+	issn = {0001-4966, 1520-8524},
+	url = {https://pubs.aip.org/asa/jasa/article-abstract/71/3/742/648327/Optimizing-copper-spheres-for-precision},
+	doi = {10.1121/1.387497},
 	language = {en},
-	number = {4},
-	urldate = {2022-09-12},
+	number = {3},
+	urldate = {2026-04-06},
 	journal = {The Journal of the Acoustical Society of America},
-	author = {Stanton, Timothy K.},
-	month = oct,
-	year = {1989},
-	pages = {1499--1510},
+	author = {Foote, Kenneth G.},
+	month = mar,
+	year = {1982},
+	pages = {742--747},
 }
 
-@article{clay_1991,
+@article{Foote_1990,
+	title = {Spheres for calibrating an eleven-frequency acoustic measurement system},
+	volume = {46},
+	issn = {1054-3139, 1095-9289},
+	url = {https://academic.oup.com/icesjms/article-lookup/doi/10.1093/icesjms/46.3.284},
+	doi = {10.1093/icesjms/46.3.284},
+	language = {en},
+	number = {3},
+	urldate = {2026-03-27},
+	journal = {ICES Journal of Marine Science},
+	author = {Foote, K. G.},
+	month = jan,
+	year = {1990},
+	pages = {284--286},
+}
+
+@article{Gaunaurd_1977,
+	author= {Gaunaurd, G. C.},
+	title= {High-frequency acoustic scattering from submerged cylindrical shells coated with viscoelastic absorbing layers},
+	journal= {The Journal of the Acoustical Society of America},
+	year= {1977},
+	volume= {62},
+	number= {3},
+	pages= {503--512},
+	doi= {10.1121/1.381561}
+}
+
+@article{Goodman_1962,
+	title = {Reflection and transmission of sound by elastic spherical shells},
+	volume = {34},
+	issn = {0001-4966},
+	url = {http://asa.scitation.org/doi/10.1121/1.1928120},
+	doi = {10.1121/1.1928120},
+	language = {en},
+	number = {3},
+	urldate = {2022-07-12},
+	journal = {The Journal of the Acoustical Society of America},
+	author = {Goodman, Ralph R. and Stern, Raya},
+	month = mar,
+	year = {1962},
+	pages = {338--344},
+}
+
+@incollection{Hackman_1993,
+	author= {Hackman, Roger H.},
+	title= {Acoustic Scattering from Elastic Solids},
+	booktitle= {Physical Acoustics},
+	editor= {Mason, Warren P. and Thurston, R. N. and Pierce, Allan D.},
+	year= {1993},
+	volume= {22},
+	pages= {1--194},
+	publisher= {Academic Press},
+	address= {San Diego, CA},
+}
+
+@article{Hickling_1962,
+	title = {Analysis of echoes from a solid elastic sphere in water},
+	volume = {34},
+	issn = {0001-4966, 1520-8524},
+	url = {https://pubs.aip.org/jasa/article/34/10/1582/722440/Analysis-of-Echoes-from-a-Solid-Elastic-Sphere-in},
+	doi = {10.1121/1.1909055},
+	language = {en},
+	number = {10},
+	urldate = {2023-09-20},
+	journal = {The Journal of the Acoustical Society of America},
+	author = {Hickling, Robert},
+	month = oct,
+	year = {1962},
+	pages = {1582--1592},
+}
+
+@article{Junger_1952,
+	author = {Junger, Miguel C.},
+	title = {Sound scattering by thin elastic shells},
+	journal = {The Journal of the Acoustical Society of America},
+	year = {1952},
+	volume = {24},
+	number = {4},
+	pages = {366--373},
+	doi = {10.1121/1.1906900}
+}
+
+@article{Kargl_1989,
+	author = {Kargle, S.G., and Marston, P.L},
+	title = {Observations and modeling of the backscattering of short tone bursts from a spherical shell: Lamb wave echoes, glory, and axial reverberations},
+	journal = {The Journal of the Acoustical Society of America},
+	volume = {85},
+	number = {3},
+	pages = {1014--1028},
+	issn = {0001-4966},
+	url = {http://asa.scitation.org/doi/10.1121/1.397485},
+	doi = {10.1121/1.397485},
+	language = {en},
+}
+
+@article{Khodabandeloo_2021,
+	title = {Estimating target strength and physical characteristics of gas-bearing mesopelagic fish from wideband \textit{in situ} echoes using a viscous-elastic scattering model},
+	volume = {149},
+	issn = {0001-4966},
+	url = {https://asa.scitation.org/doi/10.1121/10.0003341},
+	doi = {10.1121/10.0003341},
+	language = {en},
+	number = {1},
+	urldate = {2022-07-12},
+	journal = {The Journal of the Acoustical Society of America},
+	author = {Khodabandeloo, Babak and Agersted, Mette Dalgaard and Klevjer, Thor and Macaulay, Gavin J. and Melle, Webjørn},
+	month = jan,
+	year = {2021},
+	pages = {673--691},
+}
+
+@article{Marston1988,
+	title = {GTD for backscattering from elastic spheres and cylinders in water and the coupling of surface elastic waves with the acoustic field},
+	volume = {83},
+	ISSN = {1520-8524},
+	url = {http://dx.doi.org/10.1121/1.396428},
+	DOI = {10.1121/1.396428},
+	number = {1},
+	journal = {The Journal of the Acoustical Society of America},
+	publisher = {Acoustical Society of America (ASA)},
+	author = {Marston,  Philip L.},
+	year = {1988},
+	month = jan,
+	pages = {25–37}
+}
+
+@techreport{Maclennan_1981,
+	title = {The theory of solid spheres as sonar calibration targets},
+	number = {Scottish Fisheries Research Report 22},
+	institution = {Department of Agriculture and Fisheries for Scotland},
+	author = {MacLennan, D. N.},
+	year = {1981},
+	pages = {17},
+}
+
+@article{Rand_1967,
+	author= {Rand, Richard and DiMaggio, Frank L.},
+	title= {Vibrations of fluid-filled spherical and spheroidal shells},
+	journal= {The Journal of the Acoustical Society of America},
+	year= {1967},
+	volume= {42},
+	number= {6},
+	pages= {1273--1286},
+	doi= {10.1121/1.1910714}
+}
+
+@article{Rand_1968,
+	author= {Rand, Richard},
+	title= {Torsional vibrations of elastic prolate spheroids},
+	journal= {The Journal of the Acoustical Society of America},
+	year= {1968},
+	volume= {44},
+	number= {3},
+	pages= {749--751},
+	doi= {10.1121/1.1911171}
+}
+
+@techreport{Silbiger_1961,
+	author= {Silbiger, Alexander and DiMaggio, Frank L.},
+	title= {Extensional axi-symmetric second class vibrations of a prolate spheroidal shell},
+	institution= {Columbia University, Department of Civil Engineering and Engineering Mechanics},
+	year= {1961},
+	number= {Technical Report No. 7, Project NR 064-417},
+	address= {New York, NY}
+}
+
+@article{Silbiger_1963,
+	author= {Silbiger, Alexander},
+	title= {Scattering of Sound by an Elastic Prolate Spheroid},
+	journal= {The Journal of the Acoustical Society of America},
+	year= {1963},
+	volume= {35},
+	number= {4},
+	pages= {564--570},
+	doi= {10.1121/1.1918531}
+}
+
+@article{Stanton_1990,
+	title = {Sound scattering by spherical and elongated shelled bodies},
+	volume = {88},
+	issn = {0001-4966},
+	url = {http://asa.scitation.org/doi/10.1121/1.400321},
+	doi = {10.1121/1.400321},
+	language = {en},
+	number = {3},
+	urldate = {2022-11-27},
+	journal = {The Journal of the Acoustical Society of America},
+	author = {Stanton, T. K.},
+	month = sep,
+	year = {1990},
+	pages = {1619--1633},
+}
+
+@article{Stanton_1992,
+	title = {Sound scattering by rough elongated elastic objects. II: Fluctuations of scattered field},
+	volume = {92},
+	number = {3},
+	pages = {1665--1678},
+	issn = {0001-4966},
+	language = {en},
+	year = {1992},
+	journal = {The Journal of the Acoustical Society of America},
+	author = {Stanton, T.K., and Chu, D.},
+	url = {http://asa.scitation.org/doi/10.1121/1.403906},
+	doi = {10.1121/1.403906},
+}
+
+@incollection{Uberall_1973,
+	author = {{\"U}berall, Herbert},
+	title = {Surface Waves in Acoustics},
+	booktitle = {Physical Acoustics},
+	editor = {Mason, Warren P. and Thurston, R. N.},
+	year = {1973},
+	volume = {10},
+	pages = {1--60},
+	publisher = {Academic Press},
+	address = {New York, NY}
+}
+
+%%% ----------------- %%%
+%%% NUMERICAL SOLVERS %%%
+%%% ----------------- %%%
+
+@article{Burton1971,
+	author= {Burton, A. J. and Miller, G. F.},
+	title= {The application of integral equation methods to the numerical solution of some exterior boundary-value problems},
+	journal= {Proceedings of the Royal Society of London. A. Mathematical and Physical Sciences},
+	year= {1971},
+	volume= {323},
+	number= {1553},
+	pages= {201--210},
+	doi= {10.1098/rspa.1971.0097},
+}
+
+@book{Ihlenburg1998,
+	author= {Ihlenburg, Frank},
+	title= {Finite Element Analysis of Acoustic Scattering},
+	year= {1998},
+	publisher= {Springer-Verlag},
+	address= {New York, NY},
+	isbn= {978-0-387-98319-6},
+}
+
+%%% --- %%%
+%%% KRM %%%
+%%% --- %%%
+
+@article{Clay_1991,
 	title = {Low-resolution acoustic scattering models: {Fluid}-filled cylinders and fish with swim bladders},
 	volume = {89},
 	issn = {0001-4966},
@@ -48,8 +907,8 @@
 	pages = {2168--2179},
 }
 
-@article{clay_1992,
-	title = {Composite ray‐mode approximations for backscattered sound from gas‐filled cylinders and swimbladders},
+@article{Clay_1992,
+	title = {Composite ray-mode approximations for backscattered sound from gas-filled cylinders and swimbladders},
 	volume = {92},
 	issn = {0001-4966},
 	url = {http://asa.scitation.org/doi/10.1121/1.405211},
@@ -64,24 +923,7 @@
 	pages = {2173--2180},
 }
 
-@article{stanton_etal_1993,
-	title = {Average echoes from randomly oriented random‐length finite cylinders: {Zooplankton} models},
-	volume = {94},
-	issn = {0001-4966},
-	shorttitle = {Average echoes from randomly oriented random‐length finite cylinders},
-	url = {http://asa.scitation.org/doi/10.1121/1.407200},
-	doi = {10.1121/1.407200},
-	language = {en},
-	number = {6},
-	urldate = {2022-07-22},
-	journal = {The Journal of the Acoustical Society of America},
-	author = {Stanton, Timothy K. and Chu, Dezhang and Wiebe, Peter H. and Clay, Clarence S.},
-	month = dec,
-	year = {1993},
-	pages = {3463--3472},
-}
-
-@article{clay_horne_1994,
+@article{Clay_1994,
 	title = {Acoustic models of fish: {The} {Atlantic} cod (\textit{{Gadus} morhua})},
 	volume = {96},
 	issn = {0001-4966},
@@ -98,41 +940,27 @@
 	pages = {1661--1668},
 }
 
-@article{gorska_etal_2005,
-	title = {Acoustic backscattering by {Atlantic} mackerel as being representative of fish that lack a swimbladder. {Backscattering} by individual fish},
-	volume = {62},
-	issn = {1095-9289, 1054-3139},
-	url = {https://academic.oup.com/icesjms/article/62/5/984/858560},
-	doi = {10.1016/j.icesjms.2005.03.010},
-	abstract = {Abstract
-            Developing acoustic methods for the identification of fish remains a long-term objective of fisheries acoustics. The accuracy of abundance estimation may be increased when the acoustic-scattering characteristics of the fish are known, including their expected variability and uncertainty. The modelling approach is valuable during the process of interpreting multi-frequency echograms. This paper attempts to improve the understanding of sound backscattering of fish without a swimbladder, here represented by Atlantic mackerel (Scomber scombrus). Our approach includes results from modelling as well as comparisons with field data. There will be two papers. The first is a study of the non-averaged backscattering characteristics. This initial analysis is important for the understanding of the averaged backscattering cross-section, which will be considered in the second paper. In that paper the relative importance of bones in acoustic backscattering at higher frequencies will be verified.},
-	language = {en},
-	number = {5},
-	urldate = {2023-01-24},
-	journal = {ICES Journal of Marine Science},
-	author = {Gorska, Natalia and Ona, Egil and Korneliussen, Rolf},
-	month = jan,
-	year = {2005},
-	pages = {984--995},
+@article{Horne_1999,
+    author = {Horne, J. K. and Jech, J. M.},
+    title = {Multi-frequency estimates of fish abundance: constraints of rather high frequencies},
+    journal = {ICES Journal of Marine Science},
+    volume = {56},
+    number = {2},
+    pages = {184-199},
+    year = {1999},
+    month = {04},
+    issn = {1054-3139},
+    doi = {10.1006/jmsc.1998.0432},
+    url = {https://doi.org/10.1006/jmsc.1998.0432},
+    eprint = {https://academic.oup.com/icesjms/article-pdf/56/2/184/1723651/56-2-184.pdf},
 }
 
-@article{jech_etal_2015,
-	title = {Comparisons among ten models of acoustic backscattering used in aquatic ecosystem research},
-	volume = {138},
-	issn = {0001-4966},
-	url = {http://asa.scitation.org/doi/10.1121/1.4937607},
-	doi = {10.1121/1.4937607},
-	language = {en},
-	number = {6},
-	urldate = {2022-07-12},
-	journal = {The Journal of the Acoustical Society of America},
-	author = {Jech, J. Michael and Horne, John K. and Chu, Dezhang and Demer, David A. and Francis, David T. I. and Gorska, Natalia and Jones, Benjamin and Lavery, Andone C. and Stanton, Timothy K. and Macaulay, Gavin J. and Reeder, D. Benjamin and Sawada, Kouichi},
-	month = dec,
-	year = {2015},
-	pages = {3742--3764},
-}
 
-@article{johnson_sound_1977,
+%%% --- %%%
+%%% HPA %%%
+%%% --- %%%
+
+@article{Johnson_1977,
 	title = {Sound scattering from a fluid sphere revisited},
 	volume = {61},
 	issn = {0001-4966},
@@ -148,23 +976,44 @@
 	pages = {375--377},
 }
 
-@article{anderson_sound_1950,
-	title = {Sound scattering from a fluid sphere},
-	volume = {22},
+@article{Stanton_1989_1,
+	title = {Simple approximate formulas for backscattering of sound by spherical and elongated objects},
+	volume = {86},
 	issn = {0001-4966},
-	url = {http://asa.scitation.org/doi/10.1121/1.1906621},
-	doi = {10.1121/1.1906621},
+	url = {http://asa.scitation.org/doi/10.1121/1.398711},
+	doi = {10.1121/1.398711},
 	language = {en},
 	number = {4},
-	urldate = {2022-07-12},
+	urldate = {2022-09-12},
 	journal = {The Journal of the Acoustical Society of America},
-	author = {Anderson, Victor C.},
-	month = jul,
-	year = {1950},
-	pages = {426--431},
+	author = {Stanton, Timothy K.},
+	month = oct,
+	year = {1989},
+	pages = {1499--1510},
 }
 
-@article{stanton_acoustic_1996,
+%%% ---- %%%
+%%% TRCM %%%
+%%% ---- %%%
+
+@article{Stanton_1993,
+	title = {Average echoes from randomly oriented random-length finite cylinders: {Zooplankton} models},
+	volume = {94},
+	issn = {0001-4966},
+	shorttitle = {Average echoes from randomly oriented random-length finite cylinders},
+	url = {http://asa.scitation.org/doi/10.1121/1.407200},
+	doi = {10.1121/1.407200},
+	language = {en},
+	number = {6},
+	urldate = {2022-07-22},
+	journal = {The Journal of the Acoustical Society of America},
+	author = {Stanton, Timothy K. and Chu, Dezhang and Wiebe, Peter H. and Clay, Clarence S.},
+	month = dec,
+	year = {1993},
+	pages = {3463--3472},
+}
+
+@article{Stanton_1996,
 	title = {Acoustic scattering characteristics of several zooplankton groups},
 	volume = {53},
 	issn = {10543139},
@@ -180,77 +1029,16 @@
 	pages = {289--295},
 }
 
-@article{khodabandeloo_estimating_2021,
-	title = {Estimating target strength and physical characteristics of gas-bearing mesopelagic fish from wideband \textit{in situ} echoes using a viscous-elastic scattering model},
-	volume = {149},
-	issn = {0001-4966},
-	url = {https://asa.scitation.org/doi/10.1121/10.0003341},
-	doi = {10.1121/10.0003341},
-	language = {en},
-	number = {1},
-	urldate = {2022-07-12},
-	journal = {The Journal of the Acoustical Society of America},
-	author = {Khodabandeloo, Babak and Agersted, Mette Dalgaard and Klevjer, Thor and Macaulay, Gavin J. and Melle, Webjørn},
-	month = jan,
-	year = {2021},
-	pages = {673--691},
-}
+%%% ---- %%%
+%%% DWBA %%%
+%%% ---- %%%
 
-@article{furusawa_prolate_1988,
-	title = {Prolate spheroidal models for predicting general trends of fish target strength.},
-	volume = {9},
-	issn = {0388-2861, 2185-3509},
-	url = {http://www.jstage.jst.go.jp/article/ast1980/9/1/9_1_13/_article},
-	doi = {10.1250/ast.9.13},
-	language = {en},
-	number = {1},
-	urldate = {2022-07-12},
-	journal = {Journal of the Acoustical Society of Japan (E)},
-	author = {Furusawa, Masahiko},
-	year = {1988},
-	pages = {13--24},
-}
-
-@article{stanton_sound_1998,
-	title = {Sound scattering by several zooplankton groups. {I}. {Experimental} determination of dominant scattering mechanisms},
-	volume = {103},
-	issn = {0001-4966},
-	url = {http://asa.scitation.org/doi/10.1121/1.421469},
-	doi = {10.1121/1.421469},
-	language = {en},
-	number = {1},
-	urldate = {2022-07-12},
-	journal = {The Journal of the Acoustical Society of America},
-	author = {Stanton, Timothy K. and Chu, Dezhang and Wiebe, Peter H. and Martin, Linda V. and Eastwood, Robert L.},
-	month = dec,
-	year = {1998},
-	pages = {225--235},
-}
-
-@article{stanton_sound_1998-1,
-	title = {Sound scattering by several zooplankton groups. {II}. {Scattering} models},
-	volume = {103},
-	issn = {0001-4966},
-	url = {http://asa.scitation.org/doi/10.1121/1.421110},
-	doi = {10.1121/1.421110},
-	language = {en},
-	number = {1},
-	urldate = {2022-07-12},
-	journal = {The Journal of the Acoustical Society of America},
-	author = {Stanton, Timothy K. and Chu, Dezhang and Wiebe, Peter H.},
-	month = dec,
-	year = {1998},
-	pages = {236--253},
-}
-
-@article{conti_improved_2006,
+@article{Conti_2006,
 	title = {Improved parameterization of the {SDWBA} for estimating krill target strength},
 	volume = {63},
 	issn = {1095-9289, 1054-3139},
 	url = {https://academic.oup.com/icesjms/article/63/5/928/664115},
 	doi = {10.1016/j.icesjms.2006.02.007},
-	abstract = {Abstract
-            Recently, a Stochastic Distorted Wave Born Approximation (SDWBA) model was proposed to improve target strength (TS) estimates for Antarctic krill, Euphausia superba. The krill shape is modelled by a collection of cylinders, and total sound scatter is estimated by semi-coherent summation of scatter from each element. The SDWBA model was evaluated with a generic krill shape comprising 14 cylinders and a phase variability of , and predictions were validated with empirical TS and total TS data at 120 kHz, and over a broad bandwidth, respectively. For general application, parameterization of the SDWBA model is improved to account explicitly for dependence among four of the model parameters: standard length of krill, number of cylinders used to describe its shape, amplitude of inter-element phase variability, and acoustic frequency. The model improvements are demonstrated, and the uncertainty in orientation distribution of krill beneath survey vessels and its ramifications on krill biomass estimates are highlighted.},
 	language = {en},
 	number = {5},
 	urldate = {2022-07-22},
@@ -261,227 +1049,7 @@
 	pages = {928--935},
 }
 
-@article{demer_validation_2003,
-	title = {Validation of the stochastic distorted-wave {Born} approximation model with broad bandwidth total target strength measurements of {Antarctic} krill},
-	volume = {60},
-	issn = {1095-9289, 1054-3139},
-	url = {https://academic.oup.com/icesjms/article/60/3/625/660278},
-	doi = {10.1016/S1054-3139(03)00063-8},
-	abstract = {Abstract
-            Total-scattering cross-sections (σt) of Antarctic krill (Euphausia superba) were measured over a broad bandwidth (36–202 kHz) using a new technique based on acoustical reverberation in a cavity. From 18 February to 9 March 2002, mean total target strengths (TTS = 10 log(σt/4π)), were measured from groups of 57–1169 krill (average standard length=31.6 mm; standard deviation=6.6 mm) at the Cape Shirreff field station, Livingston Island, Antarctica, and aboard RV “Yuzhmorgeologiya”. Chirp pulses were transmitted sequentially by an omni-directional emitter into one of three glass carboys containing groups of krill swimming in 9.3, 19.3, or 45.9 liters of seawater (0.6°C≤temperature≤4.0°C). Between each pulse the krill moved within the fixed-boundary tank and the modulated reverberations were sensed bi-statically with three omni-directional receivers. At each center frequency (fc), the coherent energy in 200-pulse ensembles identified sound scattered by the tank. The incoherent energy described total sound scattering from the krill. Thus, the TTS at each fc was extracted from a correlation analysis of energy reverberated in the tank. Measurement bias was determined to be ±0.4 dB from an experiment using metal sphere reference targets, and the precision was estimated as ±0.8 dB from the variability in the krill TTS (fc) measurements. The empirical estimates of mean σt corroborated a krill-scattering model based on the distorted-wave Born approximation (DWBA), enhanced by the authors to account for the stochastic nature of sound scattering (SDWBA), integrated over all scattering angles and averaged over all incident angles (SDWBATTS). The SDWBA, solved for target strength of Antarctic krill, may be the best predictor of backscatter for this important species and may also provide backscattering spectra for improving their acoustic identification. These advances may help to reduce uncertainty in krill-biomass estimation using multi-frequency echosounder data and echo-integration methods.},
-	language = {en},
-	number = {3},
-	urldate = {2022-07-22},
-	journal = {ICES Journal of Marine Science},
-	author = {Demer, David A. and Conti, Stéphane G.},
-	month = jan,
-	year = {2003},
-	pages = {625--635},
-}
-
-@article{demer_reconciling_2003,
-	title = {Reconciling theoretical versus empirical target strengths of krill: effects of phase variability on the distorted-wave {Born} approximation},
-	volume = {60},
-	issn = {1095-9289, 1054-3139},
-	shorttitle = {Reconciling theoretical versus empirical target strengths of krill},
-	url = {https://academic.oup.com/icesjms/article/60/2/429/627957},
-	doi = {10.1016/S1054-3139(03)00002-X},
-	abstract = {Abstract
-            A model was recently proposed to predict the target strengths (TS) of Antarctic krill, Euphausia superba, versus incidence angle (θ) (Deep Sea Res. II 45(7) (1998) 1273). Based on the distorted-wave Born approximation (DWBA), the model depends on the coherent summation of scattering from elements of a discretized-bent cylinder. It was empirically validated at 120 kHz near-broadside incidence (θ≈90°), but large discrepancies were observed at other angles away from the main lobe. As the side-lobe measurements were both higher than the model predictions and above the noise floor, the authors noted that the differences were not entirely due to noise. In this study, the accuracy of the DWBA model is further explored. Results indicate that phase variability in the scatter from elements of a discretized-bent cylinder (krill model) causes a dramatic flattening in the side-lobe regions of TS(θ), while negligibly affecting the main scattering lobe. These results are consistent with the krill TS measurements reported by McGehee et al. Thus, by accounting for phase variability in the solution of the DWBA model, a more accurate and thus practical tool is developed for predicting krill TS.},
-	language = {en},
-	number = {2},
-	urldate = {2022-07-22},
-	journal = {ICES Journal of Marine Science},
-	author = {Demer, David A. and Conti, Stephane G.},
-	month = jan,
-	year = {2003},
-	pages = {429--434},
-}
-
-@article{demer_new_2005,
-	title = {New target-strength model indicates more krill in the {Southern} {Ocean}},
-	volume = {62},
-	issn = {1095-9289, 1054-3139},
-	url = {https://academic.oup.com/icesjms/article/62/1/25/667333},
-	doi = {10.1016/j.icesjms.2004.07.027},
-	abstract = {Abstract
-            Antarctic krill, Euphausia superba, comprises the foundation of the foodweb in the Southern Ocean and is the target of a large fishery. Recently, the total abundance of krill in the Scotia Sea was estimated from an international echosounder and net survey (CCAMLR 2000) to be 44.3 million metric tonnes (Mt; CV 11.4\%) (Hewitt et al., 2002). The new biomass estimate prompted the Antarctic Treaty's Commission for the Conservation of Antarctic Marine Living Resources (CCAMLR) to revise the precautionary catch level for krill in the area from 1.5 to 4 Mt (SC-CAMLR, 2000). These survey results are based on the total echo energy attributed to krill, scaled by the Greene et al. (1991) model of krill acoustical reflectivity or target strength (TS). Presented here is a re-analysis of the CCAMLR 2000 data incorporating recent improvements in the characterization of krill TS. The results indicate that the estimated krill biomass in the Scotia Sea may be as high as 192.4 Mt (CV = 11.7\%), or as low as 109.4 Mt (CV = 10.4\%), depending solely on the expected distribution of krill orientations. The new Stochastic, Distorted-Wave, Born-Approximation (SDWBA) TS model solved with an empirically estimated distribution of in situ orientations leads to a krill-biomass estimate that is nearly 2.5 times the previous estimate. In consequence, revisions may be warranted of the standard krill TS model, the CCAMLR 2000 biomass estimate, and the associated precautionary catch level for krill in the Scotia Sea.},
-	language = {en},
-	number = {1},
-	urldate = {2022-07-22},
-	journal = {ICES Journal of Marine Science},
-	author = {Demer, David A. and Conti, Stéphane G.},
-	month = jan,
-	year = {2005},
-	pages = {25--32},
-}
-
-@article{mcgehee_effects_1998,
-	title = {Effects of orientation on acoustic scattering from {Antarctic} krill at 120 {kHz}},
-	volume = {45},
-	issn = {09670645},
-	url = {https://linkinghub.elsevier.com/retrieve/pii/S0967064598000368},
-	doi = {10.1016/S0967-0645(98)00036-8},
-	language = {en},
-	number = {7},
-	urldate = {2022-07-22},
-	journal = {Deep Sea Research Part II: Topical Studies in Oceanography},
-	author = {McGehee, D.E. and O’Driscoll, R.L. and Traykovski, L.V.Martin},
-	month = jul,
-	year = {1998},
-	pages = {1273--1294},
-}
-
-@book{morse_theoretical_1986,
-	address = {Princeton, N.J},
-	title = {Theoretical acoustics},
-	isbn = {978-0-691-08425-1 978-0-691-02401-1},
-	publisher = {Princeton University Press},
-	author = {Morse, Philip M. and Ingard, K. Uno},
-	year = {1986},
-	keywords = {Sound},
-	annote = {Originally published: New York : McGraw-Hill, 1968},
-}
-
-@article{faran_sound_1951,
-	title = {Sound scattering by solid cylinders and spheres},
-	volume = {23},
-	issn = {0001-4966},
-	url = {http://asa.scitation.org/doi/10.1121/1.1906780},
-	doi = {10.1121/1.1906780},
-	language = {en},
-	number = {4},
-	urldate = {2022-07-12},
-	journal = {The Journal of the Acoustical Society of America},
-	author = {Faran, James J.},
-	month = jul,
-	year = {1951},
-	pages = {405--418},
-}
-
-@article{hickling_analysis_1962,
-	title = {Analysis of echoes from a solid elastic sphere in water},
-	volume = {34},
-	issn = {0001-4966, 1520-8524},
-	url = {https://pubs.aip.org/jasa/article/34/10/1582/722440/Analysis-of-Echoes-from-a-Solid-Elastic-Sphere-in},
-	doi = {10.1121/1.1909055},
-	abstract = {It is well known in sonar work that the pulse form of a direct echo from a target bears little relation to the form of the original signal. This is true even for regularly shaped bodies, such as a sphere. In this paper, the case of a homogeneous elastic sphere in water is examined theoretically and it is shown in comparison with experimental results, that the observed effects originate from vibrations induced in the sphere by the incident sound. Calculated results are presented for a variety of solid materials and it seems that echo forms could possibly provide information about the size and constitution of a sonar target.},
-	language = {en},
-	number = {10},
-	urldate = {2023-09-20},
-	journal = {The Journal of the Acoustical Society of America},
-	author = {Hickling, Robert},
-	month = oct,
-	year = {1962},
-	pages = {1582--1592},
-}
-
-@book{medwin_fundamentals_1998,
-	address = {Boston},
-	title = {Fundamentals of acoustical oceanography},
-	isbn = {978-0-12-487570-8},
-	abstract = {The developments in the field of ocean acoustics over recent years make this book an important reference for specialists in acoustics, oceanography, marine biology, and related fields. Fundamentals of Acoustical Oceanography also encourages a new generation of scientists, engineers, and entrepreneurs to apply the modern methods of acoustical physics to probe the unknown sea. The book is an authoritative, modern text with examples and exercises. It contains techniques to solve the direct problems, solutions of inverse problems, and an extensive bibliography from the earliest use of sound in the sea to present references. Written by internationally recognized scientists, the book provides background to measure ocean parameters and processes, find life and objects in the sea, communicate underwater, and survey the boundaries of the sea. Fundamentals of Acoustical Oceanography explains principles of underwater sound propagation, and describes how both actively probing sonars and passively listening hydrophones can reveal what the eye cannot see over vast ranges of the turbid ocean. This book demonstrates how to use acoustical remote sensing, variations in sound transmission, in situ{\textless}\${\textgreater} acoustical measurements, and computer and laboratory models to identify the physical and biological parameters and processes in the sea. * Offers an integrated, modern approach to passive and active underwater acoustics * Contains many examples of laboratory scale models of ocean-acoustic environments, as well as descriptions of experiments at sea * Covers remote sensing of marine life and the seafloor * Includes signal processing of ocean sounds, physical and biological noises at sea, and inversions * resents sound sources, receivers, and calibration * Explains high intensities; explosive waves, parametric sources, cavitation, shock waves, and streaming * Covers microbubbles from breaking waves, rainfall, dispersion, and attenuation * Describes sound propagation along ray paths and caustics * Presents sound transmissions and normal mode methods in ocean waveguides},
-	language = {eng},
-	publisher = {Academic Press},
-	author = {Medwin, Herman and Clay, Clarence S.},
-	year = {1998},
-	note = {OCLC: 162128827},
-}
-
-@article{chu_phase-compensated_1999,
-	title = {A phase-compensated distorted wave {Born} approximation representation of the bistatic scattering by weakly scattering objects: {Application} to zooplankton},
-	volume = {106},
-	issn = {0001-4966, 1520-8524},
-	shorttitle = {A phase-compensated distorted wave {Born} approximation representation of the bistatic scattering by weakly scattering objects},
-	url = {https://pubs.aip.org/jasa/article/106/4/1732/557428/A-phase-compensated-distorted-wave-Born},
-	doi = {10.1121/1.428036},
-	abstract = {The distorted wave Born approximation (DWBA) method has been successfully used in modeling the acoustic backscattering by weakly scattering zooplankton [Stanton et al., J. Acoust. Soc. Am. 94, 3463–3472 (1993), Wiebe et al., IEEE J. Ocean. Eng. 22(3), 445–464 (1997)]. However, the previously developed DWBA model ignores the imaginary part of the scattering amplitude and thus results in a zero-extinction cross section. As a consequence, the model fails to predict the scattering-induced attenuation which could be important under certain circumstances. In this paper, a phase-compensated DWBA-based approximation is presented. The improved method allows us to compute not only the scattering strength but also the acoustic attenuation. The new scattering model is validated by comparing with the existing exact solution for certain representative finite objects. The results from this study can be applied to bioacoustic applications where the attenuation due to scattering and/or multiple scattering by zooplankton is relevant, and where this information might be used to infer the acoustic properties of live animals.},
-	language = {en},
-	number = {4},
-	urldate = {2023-09-15},
-	journal = {The Journal of the Acoustical Society of America},
-	author = {Chu, Dezhang and Ye, Zhen},
-	month = oct,
-	year = {1999},
-	pages = {1732--1743},
-}
-
-@article{stanton_sound_1988,
-	title = {Sound scattering by cylinders of finite length. {I}. {Fluid} cylinders},
-	volume = {83},
-	issn = {0001-4966, 1520-8524},
-	url = {https://pubs.aip.org/jasa/article/83/1/55/796327/Sound-scattering-by-cylinders-of-finite-length-I},
-	doi = {10.1121/1.396184},
-	abstract = {There are many different finite length scatterers in the ocean such as marine biota in the water column and protuberances (or ‘‘bosses’’) on the seafloor, sea surface, and underside of sea ice. Since it is impossible to describe scattering from the exact shape of most objects, one must use simple geometrical objects such as spheres, spheroids, or finite cylinders as the approximate shape. In this article, the scattering of an incident plane wave by a fluid finite circular cylinder is described for all frequencies. By neglecting end effects, the volume flow per unit length of the scattered field of the finite cylinder is approximated by that of the infinite cylinder. The solution is obtained by integrating this volume flow along the length of the cylinder. This approximation restricts the solution to geometries where the incident waves are normal or near normal to the axis of the cylinder. The solution is adapted to describe the scattering of sound by shrimp, which are elongated fluid-saturated marine organisms. There was excellent agreement between the adapted solution and shrimp backscatter data.},
-	language = {en},
-	number = {1},
-	urldate = {2023-09-15},
-	journal = {The Journal of the Acoustical Society of America},
-	author = {Stanton, T. K.},
-	month = jan,
-	year = {1988},
-	pages = {55--63},
-}
-
-@techreport{maclennan_theory_1981,
-	title = {The theory of solid spheres as sonar calibration targets},
-	number = {Scottish Fisheries Research Report 22},
-	institution = {Department of Agriculture and Fisheries for Scotland},
-	author = {MacLennan, D. N.},
-	year = {1981},
-	pages = {17},
-}
-
-@article{dragonette_calibration_1981,
-	title = {Calibration technique for acoustic scattering measurements},
-	volume = {69},
-	issn = {0001-4966, 1520-8524},
-	url = {https://pubs.aip.org/jasa/article/69/4/1186/651111/Calibration-technique-for-acoustic-scattering},
-	doi = {10.1121/1.385699},
-	abstract = {Tungsten carbide spheres are used as calibration targets in laboratory acoustic scattering measurements. Though the steady-state response of any metal sphere in water greatly differs from a rigid body return, over almost the entire frequency spectrum, the rigid body and elastic returns can be separated in a short pulse, broadband experiment. This rigid body echo can then be used as a reference to normalize the scattering returns from targets of interest.},
-	language = {en},
-	number = {4},
-	urldate = {2023-11-12},
-	journal = {The Journal of the Acoustical Society of America},
-	author = {Dragonette, Louis R. and Numrich, S. K. and Frank, Laurence J.},
-	month = apr,
-	year = {1981},
-	pages = {1186--1189},
-}
-
-@article{stanton_sound_1990,
-	title = {Sound scattering by spherical and elongated shelled bodies},
-	volume = {88},
-	issn = {0001-4966},
-	url = {http://asa.scitation.org/doi/10.1121/1.400321},
-	doi = {10.1121/1.400321},
-	language = {en},
-	number = {3},
-	urldate = {2022-11-27},
-	journal = {The Journal of the Acoustical Society of America},
-	author = {Stanton, T. K.},
-	month = sep,
-	year = {1990},
-	pages = {1619--1633},
-}
-
-@article{goodman_reflection_1962,
-	title = {Reflection and transmission of sound by elastic spherical shells},
-	volume = {34},
-	issn = {0001-4966},
-	url = {http://asa.scitation.org/doi/10.1121/1.1928120},
-	doi = {10.1121/1.1928120},
-	language = {en},
-	number = {3},
-	urldate = {2022-07-12},
-	journal = {The Journal of the Acoustical Society of America},
-	author = {Goodman, Ralph R. and Stern, Raya},
-	month = mar,
-	year = {1962},
-	pages = {338--344},
-}
-
-@article{chu_further_1993,
+@article{Chu_1993,
 	title = {Further analysis of target strength measurements of {Antarctic} krill at 38 and 120 {kHz}: {Comparison} with deformed cylinder model and inference of orientation distribution},
 	volume = {93},
 	issn = {0001-4966},
@@ -498,103 +1066,292 @@
 	pages = {2985--2988},
 }
 
-@misc{gastauer_australianantarcticdivisionzooscatr_2019,
-	title = {{AustralianAntarcticDivision}/{ZooScatR}: {First} package release.},
-	copyright = {GNU General Public License v3.0 or later, Open Access},
-	shorttitle = {{AustralianAntarcticDivision}/{ZooScatR}},
-	url = {https://zenodo.org/record/2536635},
-	abstract = {{\textless}em{\textgreater}ZooScatR{\textless}/em{\textgreater} is an implementation of the {\textless}em{\textgreater}Distorted Wave Born Approximation (DWBA){\textless}/em{\textgreater} model for the simulation of acoustic scattering by weak scattering targets inside a fluid. It includes a shiny web application called {\textless}em{\textgreater}DWBAapp{\textless}/em{\textgreater} for easy model parametrisation and result visualisation as well as the option to run the {\textless}em{\textgreater}DWBA{\textless}/em{\textgreater} model from the command line. Additional functions to compute soundspeed in water, water density and Spherical Bessel functions with their derivatives (as needed in the analytical solution of a weakly scattering sphere, e.g. Neumann and Hankel functions).},
-	urldate = {2026-03-27},
-	publisher = {Zenodo},
-	author = {Gastauer, Sven},
-	collaborator = {Cox, Martin J. and Chu, Dezhang},
-	month = jan,
-	year = {2019},
-	doi = {10.5281/ZENODO.2536635},
-	keywords = {Fisheries Acoustics, Scattering, DWBA, krill, zooplankton, Distorted Wave Born, target strength},
-}
-
-@misc{sven_gastauer_svengastauerkrmr_2025,
-	title = {{SvenGastauer}/{KRMr}: v0.4.8},
-	copyright = {MIT License},
-	shorttitle = {{SvenGastauer}/{KRMr}},
-	url = {https://zenodo.org/doi/10.5281/zenodo.15838374},
-	abstract = {Fix crossing points in ImageJ2shp
-add concaveman dependency},
-	urldate = {2026-03-27},
-	publisher = {Zenodo},
-	author = {Sven Gastauer},
-	month = jul,
-	year = {2025},
-	doi = {10.5281/ZENODO.15838374},
-}
-
-@article{gastauer_zooscatrspan_2019,
-	title = {{ZooScatR}—{An} {\textless}span style="font-variant:small-caps;"{\textgreater}r{\textless}/span{\textgreater} package for modelling the scattering properties of weak scattering targets using the distorted wave {Born} approximation},
-	volume = {145},
+@article{Chu_1999,
+	title = {A phase-compensated distorted wave {Born} approximation representation of the bistatic scattering by weakly scattering objects: {Application} to zooplankton},
+	volume = {106},
 	issn = {0001-4966, 1520-8524},
-	shorttitle = {{ZooScatR}—{An} {\textless}span style="font-variant},
-	url = {https://pubs.aip.org/jasa/article/145/1/EL102/638683/ZooScatR-An-r-package-for-modelling-the-scattering},
-	doi = {10.1121/1.5085655},
-	abstract = {A thorough understanding of the scattering characteristics of marine organisms is a prerequisite for robust quantitative fisheries acoustic data processing or interpretation. Target strength models, such as the distorted wave Born approximation (DWBA) can be used to improve the understanding of field recordings of weakly scattering targets. With acoustic methods now being used by a wide audience, allowing access to such models becomes a necessity. To ease access to the DWBA model, an r package (zooscatr) which includes a web application and the ability to parameterise the model either through the web application, text files, or pure scripting has been developed and is now freely available on Github.},
+	shorttitle = {A phase-compensated distorted wave {Born} approximation representation of the bistatic scattering by weakly scattering objects},
+	url = {https://pubs.aip.org/jasa/article/106/4/1732/557428/A-phase-compensated-distorted-wave-Born},
+	doi = {10.1121/1.428036},
+	language = {en},
+	number = {4},
+	urldate = {2023-09-15},
+	journal = {The Journal of the Acoustical Society of America},
+	author = {Chu, Dezhang and Ye, Zhen},
+	month = oct,
+	year = {1999},
+	pages = {1732--1743},
+}
+
+@article{Demer_2003_1,
+	title = {Reconciling theoretical versus empirical target strengths of krill: effects of phase variability on the distorted-wave {Born} approximation},
+	volume = {60},
+	issn = {1095-9289, 1054-3139},
+	shorttitle = {Reconciling theoretical versus empirical target strengths of krill},
+	url = {https://academic.oup.com/icesjms/article/60/2/429/627957},
+	doi = {10.1016/S1054-3139(03)00002-X},
+	language = {en},
+	number = {2},
+	urldate = {2022-07-22},
+	journal = {ICES Journal of Marine Science},
+	author = {Demer, David A. and Conti, Stephane G.},
+	month = jan,
+	year = {2003},
+	pages = {429--434},
+}
+
+@article{Demer_2003_2,
+	title = {Validation of the stochastic distorted-wave {Born} approximation model with broad bandwidth total target strength measurements of {Antarctic} krill},
+	volume = {60},
+	issn = {1095-9289, 1054-3139},
+	url = {https://academic.oup.com/icesjms/article/60/3/625/660278},
+	doi = {10.1016/S1054-3139(03)00063-8},
+	language = {en},
+	number = {3},
+	urldate = {2022-07-22},
+	journal = {ICES Journal of Marine Science},
+	author = {Demer, David A. and Conti, Stéphane G.},
+	month = jan,
+	year = {2003},
+	pages = {625--635},
+}
+
+@article{Demer_2005,
+	title = {New target-strength model indicates more krill in the {Southern} {Ocean}},
+	volume = {62},
+	issn = {1095-9289, 1054-3139},
+	url = {https://academic.oup.com/icesjms/article/62/1/25/667333},
+	doi = {10.1016/j.icesjms.2004.07.027},
 	language = {en},
 	number = {1},
-	urldate = {2026-03-27},
-	journal = {The Journal of the Acoustical Society of America},
-	author = {Gastauer, Sven and Chu, Dezhang and Cox, Martin J.},
-	month = jan,
-	year = {2019},
-	pages = {EL102--EL108},
-	file = {Full Text PDF:C\:\\Users\\Brandyn\\Zotero\\storage\\SLTMVZ6B\\Gastauer et al. - 2019 - ZooScatR—An r package for modelling the scattering pro.pdf:application/pdf},
-}
-
-@book{flammer_spheroidal_1957,
-	title = {Spheroidal wave functions},
-	url = {https://ui.adsabs.harvard.edu/abs/1957spwf.book.....F},
-	urldate = {2026-03-27},
-	author = {Flammer, Carson},
-	month = dec,
-	year = {1957},
-	note = {Publication Title: A Stanford Research Institute monograph. The basis for this monograph was work done at Stanford Research Institute for the United States Air Force Cambridge Research Center under Contract AF 19 (604)-1296.LCCN 57005621; LC classification (partial) QA405
-ADS Bibcode: 1957spwf.book.....F},
-	keywords = {MATHEMATICAL PHYSICS, SPECIAL FUNCTIONS, SPHEROIDAL WAVE FUNCTIONS},
-}
-
-@article{foote_spheres_1990,
-	title = {Spheres for calibrating an eleven-frequency acoustic measurement system},
-	volume = {46},
-	issn = {1054-3139, 1095-9289},
-	url = {https://academic.oup.com/icesjms/article-lookup/doi/10.1093/icesjms/46.3.284},
-	doi = {10.1093/icesjms/46.3.284},
-	language = {en},
-	number = {3},
-	urldate = {2026-03-27},
+	urldate = {2022-07-22},
 	journal = {ICES Journal of Marine Science},
-	author = {Foote, K. G.},
+	author = {Demer, David A. and Conti, Stéphane G.},
 	month = jan,
-	year = {1990},
-	pages = {284--286},
-	file = {Full Text:C\:\\Users\\Brandyn\\Zotero\\storage\\G9HDXL8C\\Foote - 1990 - Spheres for calibrating an eleven-frequency acoustic measurement system.pdf:application/pdf},
+	year = {2005},
+	pages = {25--32},
 }
 
-@article{ganesh_numerically_2022,
-	title = {A numerically stable {T}-matrix method for acoustic scattering by nonspherical particles with large aspect ratios and size parameters},
-	volume = {151},
-	issn = {0001-4966, 1520-8524},
-	url = {https://pubs.aip.org/jasa/article/151/3/1978/2838375/A-numerically-stable-T-matrix-method-for-acoustic},
-	doi = {10.1121/10.0009679},
-	abstract = {We consider a two-part method for computing the acoustic scattering T-matrix of a three dimensional particle. The first part involves accurately computing the far fields by solving a number of particular scattering problems. The second part calculates the T-matrix from these far fields using the Fourier transform over the sphere. The two-part method was first introduced in Ganesh and Hawkins [J. Comput. Appl. Math. 234, 1702–1709]. The focus of this work is to demonstrate the numerical stability and physical correctness of the two-part method for scattering by nonspherical particles with large aspect ratios and size parameters that are at the upper limit of numerical stability for the current state-of-the-art algorithm. The numerical stability of the method is attributed to elimination of the Hankel functions by working with the far field. The numerical experiments use our recently developed open-source software package (TMATROM3) that implements the two-part method.},
+@article{Stanton_1998_1,
+	title = {Sound scattering by several zooplankton groups. {I}. {Experimental} determination of dominant scattering mechanisms},
+	volume = {103},
+	issn = {0001-4966},
+	url = {http://asa.scitation.org/doi/10.1121/1.421469},
+	doi = {10.1121/1.421469},
 	language = {en},
-	number = {3},
+	number = {1},
+	urldate = {2022-07-12},
+	journal = {The Journal of the Acoustical Society of America},
+	author = {Stanton, Timothy K. and Chu, Dezhang and Wiebe, Peter H. and Martin, Linda V. and Eastwood, Robert L.},
+	month = dec,
+	year = {1998},
+	pages = {225--235},
+}
+
+@article{Stanton_1998_2,
+	title = {Sound scattering by several zooplankton groups. {II}. {Scattering} models},
+	volume = {103},
+	issn = {0001-4966},
+	url = {http://asa.scitation.org/doi/10.1121/1.421110},
+	doi = {10.1121/1.421110},
+	language = {en},
+	number = {1},
+	urldate = {2022-07-12},
+	journal = {The Journal of the Acoustical Society of America},
+	author = {Stanton, Timothy K. and Chu, Dezhang and Wiebe, Peter H.},
+	month = dec,
+	year = {1998},
+	pages = {236--253},
+}
+
+%%% ---- %%%
+%%% BBFM %%%
+%%% ---- %%%
+
+@article{Gorska_2005,
+	title = {Acoustic backscattering by {Atlantic} mackerel as being representative of fish that lack a swimbladder. {Backscattering} by individual fish},
+	volume = {62},
+	issn = {1095-9289, 1054-3139},
+	url = {https://academic.oup.com/icesjms/article/62/5/984/858560},
+	doi = {10.1016/j.icesjms.2005.03.010},
+	language = {en},
+	number = {5},
+	urldate = {2023-01-24},
+	journal = {ICES Journal of Marine Science},
+	author = {Gorska, Natalia and Ona, Egil and Korneliussen, Rolf},
+	month = jan,
+	year = {2005},
+	pages = {984--995},
+}
+
+%%% --------- %%%
+%%% BCMS/FCMS %%%
+%%% --------- %%%
+
+@article{Stanton_1988,
+	title = {Sound scattering by cylinders of finite length. {I}. {Fluid} cylinders},
+	volume = {83},
+	issn = {0001-4966, 1520-8524},
+	url = {https://pubs.aip.org/jasa/article/83/1/55/796327/Sound-scattering-by-cylinders-of-finite-length-I},
+	doi = {10.1121/1.396184},
+	language = {en},
+	number = {1},
+	urldate = {2023-09-15},
+	journal = {The Journal of the Acoustical Society of America},
+	author = {Stanton, T. K.},
+	month = jan,
+	year = {1988},
+	pages = {55--63},
+}
+
+@article{Stanton_1988_2,
+	title = {Sound scattering by cylinders of finite length. {II}. {Elastic} cylinders},
+	volume = {83},
+	issn = {0001-4966, 1520-8524},
+	url = {https://pubs.aip.org/asa/jasa/article-abstract/83/1/64/796325/Sound-scattering-by-cylinders-of-finite-length-II},
+	doi = {10.1121/1.396185},
+	language = {en},
+	number = {1},
+	urldate = {2026-04-06},
+	journal = {The Journal of the Acoustical Society of America},
+	author = {Stanton, T. K.},
+	month = jan,
+	year = {1988},
+	pages = {64--67},
+}
+
+@article{Stanton_1989_2,
+	title = {Sound scattering by cylinders of finite length. {III}. {Deformed} cylinders},
+	volume = {86},
+	issn = {0001-4966, 1520-8524},
+	url = {https://pubs.aip.org/jasa/article/86/2/691/795795/Sound-scattering-by-cylinders-of-finite-length-III},
+	doi = {10.1121/1.398193},
+	language = {en},
+	number = {2},
 	urldate = {2026-03-27},
 	journal = {The Journal of the Acoustical Society of America},
-	author = {Ganesh, M. and Hawkins, Stuart C.},
-	month = mar,
-	year = {2022},
-	pages = {1978--1988},
+	author = {Stanton, T. K.},
+	month = aug,
+	year = {1989},
+	pages = {691--705},
 }
 
-@article{ganesh_far_2008,
+@article{Ye_1997_1,
+	title = {A novel approach to sound scattering by cylinders of finite length},
+	volume = {102},
+	issn = {0001-4966},
+	url = {http://asa.scitation.org/doi/10.1121/1.419910},
+	doi = {10.1121/1.419910},
+	year = {1997},
+	language = {en},
+	number = {2},
+	journal = {The Journal of the Acoustical Society of America},
+	author = {Ye, Z.},
+	pages = {877--884},
+}
+
+%%% ---- %%%
+%%% PSMS %%%
+%%% ---- %%%
+
+@article{Spence_1951,
+	title = {The {Scattering} of {Sound} from a {Prolate} {Spheroid}},
+	volume = {23},
+	issn = {0001-4966, 1520-8524},
+	url = {https://pubs.aip.org/jasa/article/23/6/701/719175/The-Scattering-of-Sound-from-a-Prolate-Spheroid},
+	doi = {10.1121/1.1906827},
+	language = {en},
+	number = {6},
+	urldate = {2026-03-27},
+	journal = {The Journal of the Acoustical Society of America},
+	author = {Spence, R. D. and Granger, Sara},
+	month = nov,
+	year = {1951},
+	pages = {701--706},
+}
+
+@article{Furusawa_1988,
+	title = {Prolate spheroidal models for predicting general trends of fish target strength},
+	volume = {9},
+	issn = {0388-2861, 2185-3509},
+	url = {http://www.jstage.jst.go.jp/article/ast1980/9/1/9_1_13/_article},
+	doi = {10.1250/ast.9.13},
+	language = {en},
+	number = {1},
+	urldate = {2022-07-12},
+	journal = {Journal of the Acoustical Society of Japan (E)},
+	author = {Furusawa, Masahiko},
+	year = {1988},
+	pages = {13--24},
+}
+
+@article{Ye_1997_2,
+	title = {Low-frequency acoustic scattering by gas-filled prolate spheroids in liquids},
+	volume = {101},
+	number = {4},
+	issn = {0001-4966},
+	pages = {1945--1952},
+	url = {http://asa.scitation.org/doi/10.1121/1.418225},
+	doi = {10.1121/1.418225},
+	journal = {The Journal of the Acoustical Society of America},
+	language = {en},
+	author = {Ye, Z.},
+}
+
+@article{Yeh_1967,
+	title = {Scattering of Acoustic Waves by a Penetrable Prolate Spheroid. I. Liquid Prolate Spheroid},
+	author = {Yeh, C.},
+	journal = {The Journal of the Acoustical Society of America},
+	volume = {42},
+	number = {2},
+	pages = {518--521},
+	year = {1967},
+	publisher = {Acoustical Society of America},
+	doi = {10.1121/1.1910614},
+	url = {https://doi.org/10.1121/1.1910614}
+}
+
+%%% ----- %%%
+%%% SPHMS %%%
+%%% ----- %%%
+
+@article{Anderson_1950,
+	title = {Sound scattering from a fluid sphere},
+	volume = {22},
+	issn = {0001-4966},
+	url = {http://asa.scitation.org/doi/10.1121/1.1906621},
+	doi = {10.1121/1.1906621},
+	language = {en},
+	number = {4},
+	urldate = {2022-07-12},
+	journal = {The Journal of the Acoustical Society of America},
+	author = {Anderson, Victor C.},
+	month = jul,
+	year = {1950},
+	pages = {426--431},
+}
+
+@article{Rudgers_1969,
+	title = {Acoustic {Pulses} {Scattered} by a {Rigid} {Sphere} {Immersed} in a {Fluid}},
+	volume = {45},
+	issn = {0001-4966, 1520-8524},
+	url = {https://pubs.aip.org/jasa/article/45/4/900/756071/Acoustic-Pulses-Scattered-by-a-Rigid-Sphere},
+	doi = {10.1121/1.1911567},
+	language = {en},
+	number = {4},
+	urldate = {2026-03-27},
+	journal = {The Journal of the Acoustical Society of America},
+	author = {Rudgers, Anthony J.},
+	month = apr,
+	year = {1969},
+	pages = {900--910},
+}
+
+%%% ---------------- %%% 
+%%% T-MATRIX METHODS %%%
+%%% ---------------- %%% 
+
+@article{Ganesh_2008,
 	title = {A far field based {T}-matrix method for three dimensional acoustic scattering},
 	volume = {49},
 	issn = {1445-8810},
@@ -606,17 +1363,31 @@ ADS Bibcode: 1957spwf.book.....F},
 	month = oct,
 	year = {2008},
 	pages = {121},
-	file = {Full Text:C\:\\Users\\Brandyn\\Zotero\\storage\\99PBQ2FF\\Ganesh and Hawkins - 2008 - A far field based T-matrix method for three dimensional acoustic scattering.pdf:application/pdf},
 }
 
-@article{hackman_application_1984,
+@article{Ganesh_2022,
+	title = {A numerically stable {T}-matrix method for acoustic scattering by nonspherical particles with large aspect ratios and size parameters},
+	volume = {151},
+	issn = {0001-4966, 1520-8524},
+	url = {https://pubs.aip.org/jasa/article/151/3/1978/2838375/A-numerically-stable-T-matrix-method-for-acoustic},
+	doi = {10.1121/10.0009679},
+	language = {en},
+	number = {3},
+	urldate = {2026-03-27},
+	journal = {The Journal of the Acoustical Society of America},
+	author = {Ganesh, M. and Hawkins, Stuart C.},
+	month = mar,
+	year = {2022},
+	pages = {1978--1988},
+}
+
+@article{Hackman_1984,
 	title = {An application of the spheroidal-coordinate-based transition matrix: {Acoustic} scattering from high aspect ratio solids},
 	volume = {76},
 	issn = {0001-4966, 1520-8524},
 	shorttitle = {An application of the spheroidal-coordinate-based transition matrix},
 	url = {https://pubs.aip.org/jasa/article/76/S1/S8/652984/An-application-of-the-spheroidal-coordinate-based},
 	doi = {10.1121/1.2022083},
-	abstract = {In a previous paper [R. H. Hackman, J. Acoust. Soc. Am. 75, 35–45 (1984)] a spheroidal-coordinate-based transition matrix formalism was established for acoustic and elastic wave scattering. In this paper, we consider the acoustic scattering by a solid elastic cylinder with hemispherical endcaps and a length-to-diameter ratio of 10. Numerical results are presented for the backscattered form function as a function of frequency for various angles of incidence. These results are compared with experimental measurements taken at the Naval Coastal Systems Center and given a physical interpretation.},
 	language = {en},
 	number = {S1},
 	urldate = {2026-03-27},
@@ -625,67 +1396,14 @@ ADS Bibcode: 1957spwf.book.....F},
 	month = oct,
 	year = {1984},
 	pages = {S8--S8},
-	file = {Full Text PDF:C\:\\Users\\Brandyn\\Zotero\\storage\\EMXKQW89\\Hackman and Todoroff - 1984 - An application of the spheroidal-coordinate-based transition matrix Acoustic scattering from high a.pdf:application/pdf},
 }
 
-@article{rudgers_acoustic_1969,
-	title = {Acoustic {Pulses} {Scattered} by a {Rigid} {Sphere} {Immersed} in a {Fluid}},
-	volume = {45},
-	issn = {0001-4966, 1520-8524},
-	url = {https://pubs.aip.org/jasa/article/45/4/900/756071/Acoustic-Pulses-Scattered-by-a-Rigid-Sphere},
-	doi = {10.1121/1.1911567},
-	abstract = {The scattered field, produced when a plane-wave pressure pulse is incident upon an ideally rigid sphere, is expressed in the terms of classical scattering theory. Using an incident pulse of known spectral content, the resultant scattered pulse is determined, at a number of field points, with a computer. The time-varying forms of the scattered pulses, thus obtained using the completely rigorous classical theory, display characteristics that may be interpreted in terms of circumferential or creeping waves propagating along the periphery of the sphere. The scattered pulse may be conceived as the superposition of a specularly reflected pulse, with a form similar to the incident pulse, and attenuating pulses that travel along the periphery of the sphere from the boundary of the geometrical shadow to the observation point.},
-	language = {en},
-	number = {4},
-	urldate = {2026-03-27},
-	journal = {The Journal of the Acoustical Society of America},
-	author = {Rudgers, Anthony J.},
-	month = apr,
-	year = {1969},
-	pages = {900--910},
-}
-
-@article{spence_scattering_1951,
-	title = {The {Scattering} of {Sound} from a {Prolate} {Spheroid}},
-	volume = {23},
-	issn = {0001-4966, 1520-8524},
-	url = {https://pubs.aip.org/jasa/article/23/6/701/719175/The-Scattering-of-Sound-from-a-Prolate-Spheroid},
-	doi = {10.1121/1.1906827},
-	abstract = {This paper presents the results of calculations of the scattering of a plane sound wave from a prolate spheroid. Scattering patterns are given for the major axis equal to λ/π, 2λ/π, 3λ/π, for the ratio of axes equal to 0.10, 0.20, 0.29, 0.37, and for the angle of incidence measured from the major axis equal to 0°, 30°, 60°, 90°.},
-	language = {en},
-	number = {6},
-	urldate = {2026-03-27},
-	journal = {The Journal of the Acoustical Society of America},
-	author = {Spence, R. D. and Granger, Sara},
-	month = nov,
-	year = {1951},
-	pages = {701--706},
-}
-
-@article{stanton_sound_1989,
-	title = {Sound scattering by cylinders of finite length. {III}. {Deformed} cylinders},
-	volume = {86},
-	issn = {0001-4966, 1520-8524},
-	url = {https://pubs.aip.org/jasa/article/86/2/691/795795/Sound-scattering-by-cylinders-of-finite-length-III},
-	doi = {10.1121/1.398193},
-	abstract = {A general solution is derived for the scattering of sound by cylinders of finite length with a deformed axis and composition profile and (cross-sectional) radius that vary along the axis. The orientation of the axis, plane-wave source direction, and point receiver position can also vary as long as the directions of incident and scattered fields are nearly perpendicular to the tangent of the axis (this restriction can be relaxed under some conditions). This approximate solution is a generalization of previous work [T. K. Stanton, J. Acoust. Soc. Am. 83, 55–63 (1988); and 83, 64–67 (1988)] where the scattering by straight finite cylinders of uniform fluid and elastic material, respectively, was described. In those articles, the volume flow per unit length of the scattered field of the cylinders was held constant along the length of the axis that restricted the axis to be straight and composition profile and (cross-sectional) radius to remain constant along the length of the axis. In this article, the volume flow per unit length is allowed to vary, thus allowing the above-mentioned quantities also to vary. As a result, an integral equation is derived that, in general, needs to be evaluated numerically. Examples are given in this article of the scattering of sound at all frequencies from a prolate spheroid with a high aspect ratio (i.e., high ratio of major axis to minor axis) and a uniformly bent finite cylinder of constant cross-sectional radius. There is excellent agreement between the (deformed cylinder) calculations involving the prolate spheroid and the exact spheroidal wave-function solution. Furthermore, numerical integration of the deformed cylinder formula required far less computer time than calculating the exact solution. Calculations involving the bent cylinder are compared to backscatter data from preserved euphausiids and suggest that the radius of curvature of the animals plays a major role in the acoustic scatter characteristics of the marine organisms. For example, at 200 kHz, the backscattering cross section of a 23-mm-long euphausiid will decrease by 6 dB if the animal bends by as little as 1.4 mm at the ends.},
-	language = {en},
-	number = {2},
-	urldate = {2026-03-27},
-	journal = {The Journal of the Acoustical Society of America},
-	author = {Stanton, T. K.},
-	month = aug,
-	year = {1989},
-	pages = {691--705},
-}
-
-@article{varadan_computation_1982,
+@article{Varadan_1982,
 	title = {Computation of rigid body scattering by prolate spheroids using the \textit{{T}} -matrix approach},
 	volume = {71},
 	issn = {0001-4966, 1520-8524},
 	url = {https://pubs.aip.org/jasa/article/71/1/22/763223/Computation-of-rigid-body-scattering-by-prolate},
 	doi = {10.1121/1.387311},
-	abstract = {The T-matrix formulation is utilized to obtain calculations of the response of a rigid prolate spheroid to a plane incident acoustic wave, at an arbitrary angle of incidence. Computations are made as a function of frequency in both monostatic and bistatic geometrics. The major features of the monostatic and bistatic response curves obtained agree with predictions based on the interference of specular and diffracted contributions, thus demonstrating the legitimacy of the method.},
 	language = {en},
 	number = {1},
 	urldate = {2026-03-27},
@@ -696,13 +1414,12 @@ ADS Bibcode: 1957spwf.book.....F},
 	pages = {22--25},
 }
 
-@article{waterman_new_1969,
+@article{Waterman_1969,
 	title = {New {Formulation} of {Acoustic} {Scattering}},
 	volume = {45},
 	issn = {0001-4966, 1520-8524},
 	url = {https://pubs.aip.org/jasa/article/45/6/1417/655192/New-Formulation-of-Acoustic-Scattering},
 	doi = {10.1121/1.1911619},
-	abstract = {Upon introducing the outgoing spherical (or circular cylinder) partial waves \{ψn\} as a basis, the equation QT = − Re (Q) is obtained for the transition matrix T describing scattering for general incidence on a smooth object of arbitrary shape. Elements of Q involve integrals over the object surface, e.g. Qmn = ±(i2)δmn+(k8π)∫dσ⋅∇[Re(ψm)ψn]. where the −, + apply for Dirichlet and Neumann conditions, respectively. For quadric (separable) surfaces, Q is symmetric. Symmetry and unitarity lead to a secular equation defining eigenfunctions for general bodies. Some apparently new closed-form results are obtained in the low frequency limit, and the transition matrix is computed numerically for the infinite strip.},
 	language = {en},
 	number = {6},
 	urldate = {2026-03-27},
@@ -713,13 +1430,12 @@ ADS Bibcode: 1957spwf.book.....F},
 	pages = {1417--1429},
 }
 
-@article{waterman_t_2009,
+@article{Waterman_2009,
 	title = {T -matrix methods in acoustic scattering},
 	volume = {125},
 	issn = {0001-4966, 1520-8524},
 	url = {https://pubs.aip.org/jasa/article/125/1/42/1058828/T-matrix-methods-in-acoustic-scattering},
 	doi = {10.1121/1.3035839},
-	abstract = {Some further refinements are described for the T-matrix approach to acoustic scattering. From the structure of the matrices involved, one can infer the Rayleigh limit explicitly for objects having no density contrast. One finds TRay=iR−R2, where the R-matrix involves integrals of the regular spherical wave functions over the object’s surface. The index of refraction and loss factor can be chosen as desired, and energy balance and reciprocity requirements are found to be met. The derivation can be extended to obtain the Rayleigh expansion, effectively describing T as a series in ascending powers of the ratio of object size to wavelength. In trial cases, the series converges throughout the Rayleigh region and somewhat beyond. Bodies of high aspect ratio are also considered, where difficulties arise due to precision loss during numerical integration. Loss ranges from 4 or 5 significant figures (2:1 spheroid) to 22 figures (40:1 spheroid) or more. A class of surfaces has been found for which this problem can be avoided, however, enabling one to treat a variety of body shapes up to aspect ratios of 100:1 with no difficulty.},
 	language = {en},
 	number = {1},
 	urldate = {2026-03-27},
@@ -727,67 +1443,5 @@ ADS Bibcode: 1957spwf.book.....F},
 	author = {Waterman, P. C.},
 	month = jan,
 	year = {2009},
-	pages = {42--51},
-}
-
-@article{betcke_bempp-cl_2021,
-	title = {Bempp-cl: {A} fast {Python} based just-in-time compiling boundary element library.},
-	volume = {6},
-	copyright = {http://creativecommons.org/licenses/by/4.0/},
-	issn = {2475-9066},
-	shorttitle = {Bempp-cl},
-	url = {https://joss.theoj.org/papers/10.21105/joss.02879},
-	doi = {10.21105/joss.02879},
-	number = {59},
-	urldate = {2026-03-27},
-	journal = {Journal of Open Source Software},
-	author = {Betcke, Timo and Scroggs, Matthew},
-	month = mar,
-	year = {2021},
-	pages = {2879},
-	file = {Full Text:C\:\\Users\\Brandyn\\Zotero\\storage\\6537ALQA\\Betcke and Scroggs - 2021 - Bempp-cl A fast Python based just-in-time compiling boundary element library..pdf:application/pdf},
-}
-
-@book{achenbach_wave_1973,
-	address = {Amsterdam New York},
-	series = {North-{Holland} series in applied mathematics and mechanics},
-	title = {Wave propagation in elastic solids},
-	isbn = {978-0-7204-0325-1 978-0-7204-2367-9},
-	language = {eng},
-	number = {v. 16},
-	publisher = {North-Holland Pub. Co. American Elsevier Pub. Co},
-	author = {Achenbach, J. D.},
-	year = {1973},
-}
-
-@misc{brandyn_lucca_osoceanacousticsechopop_2026,
-	title = {{OSOceanAcoustics}/echopop: v0.6.0},
-	copyright = {Apache License 2.0},
-	shorttitle = {{OSOceanAcoustics}/echopop},
-	url = {https://zenodo.org/doi/10.5281/zenodo.18975959},
-	urldate = {2026-03-27},
-	publisher = {Zenodo},
-	author = {Brandyn Lucca and Wu-Jung Lee},
-	month = mar,
-	year = {2026},
-	doi = {10.5281/ZENODO.18975959},
-}
-
-@misc{macaulay_spherets_2025,
-	title = {{gavinmacaulay}/{SphereTS}: v1.0.8},
-	url = {https://github.com/gavinmacaulay/SphereTS},
-	urldate = {2026-03-30},
-	author = {Gavin J. Macaulay},
-	month = dec,
-	year = {2025},
-	note = {GitHub repository},
-}
-
-@misc{van_buren_boisvert_prolate_swf_2026,
-	title = {{MathieuandSpheroidalWaveFunctions}/{prolate_swf}},
-	url = {https://github.com/MathieuandSpheroidalWaveFunctions/prolate_swf},
-	urldate = {2026-03-30},
-	author = {Arnie Lee Van Buren and Jeffrey E. Boisvert},
-	year = {2026},
-	note = {GitHub repository},
+	pages = {42--51}
 }

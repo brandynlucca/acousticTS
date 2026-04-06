@@ -1,4 +1,4 @@
----
+﻿---
 title: "FCMS"
 output:
   rmarkdown::html_vignette:
@@ -27,7 +27,7 @@ acousticTS:::.model_family_header(
 ```
 
 
-These pages follow the finite-cylinder modal-series literature for straight circular cylinders near broadside [@stanton_sound_1988; @stanton_sound_1989].
+These pages follow the finite-cylinder modal-series literature for straight circular cylinders near broadside [@Stanton_1988; @Stanton_1989_2].
 
 ```{r fcms_overview, echo=FALSE, results='asis'}
 acousticTS:::.model_family_overview(
@@ -66,4 +66,5 @@ acousticTS:::.model_family_overview(
   )
 )
 ```
+
 

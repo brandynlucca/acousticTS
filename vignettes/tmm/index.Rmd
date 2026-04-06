@@ -28,7 +28,7 @@ acousticTS:::.model_family_header(
 ```
 
 
-These pages follow the coefficient-map view of scattering and later numerical implementations for axisymmetric bodies [@waterman_new_1969; @waterman_t_2009; @ganesh_numerically_2022].
+These pages follow the coefficient-map view of scattering and later numerical implementations for axisymmetric bodies [@Waterman_1969; @Waterman_2009; @Ganesh_2022].
 
 ```{r tmm_overview, echo=FALSE, results='asis'}
 acousticTS:::.model_family_overview(

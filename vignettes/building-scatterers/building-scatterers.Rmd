@@ -18,7 +18,7 @@ vignette: >
 
 # Introduction
 
-The scatterer classes in `acousticTS` are organized around target types that recur across fisheries and zooplankton acoustics, from calibration spheres to weakly scattering elongated bodies and composite fish targets [@foote_spheres_1990; @stanton_acoustic_1996; @clay_horne_1994].
+The scatterer classes in `acousticTS` are organized around target types that recur across fisheries and zooplankton acoustics, from calibration spheres to weakly scattering elongated bodies and composite fish targets.
 
 
 

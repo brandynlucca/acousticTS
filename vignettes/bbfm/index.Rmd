@@ -1,4 +1,4 @@
----
+﻿---
 title: "BBFM"
 output:
   rmarkdown::html_vignette:
@@ -28,7 +28,7 @@ acousticTS:::.model_family_header(
 ```
 
 
-This family is best read alongside the swimbladder-less fish and composite-scatterer literature that motivates explicit flesh-body and backbone terms [@gorska_etal_2005; @stanton_sound_1998-1; @clay_horne_1994].
+This family is best read alongside the swimbladder-less fish and composite-scatterer literature that motivates explicit flesh-body and backbone terms [@Gorska_2005; @Stanton_1998_1; @Clay_1994].
 
 ```{r bbfm_overview, echo=FALSE, results='asis'}
 acousticTS:::.model_family_overview(
@@ -86,3 +86,4 @@ That is why the family belongs in acousticTS even before a more complete
 composite solver exists: it gives a physically interpretable way to keep the
 two dominant anatomical components explicit in one coherent target-strength
 calculation.
+

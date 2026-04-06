@@ -1,4 +1,4 @@
----
+﻿---
 title: "FCMS implementation"
 output:
   rmarkdown::html_vignette:
@@ -32,7 +32,7 @@ acousticTS:::.model_family_header(
 ```
 
 
-These pages follow the finite-cylinder modal-series literature for straight circular cylinders near broadside [@stanton_sound_1988; @stanton_sound_1989].
+These pages follow the finite-cylinder modal-series literature for straight circular cylinders near broadside [@Stanton_1988; @Stanton_1989_2].
 
 The acousticTS package uses object-based scatterers, so the FCMS workflow follows the same broad pattern used elsewhere in the package: construct a geometry, attach the material properties needed for a cylindrical scatterer, evaluate target strength over the frequencies of interest, and then inspect how the result changes when the physically important assumptions are changed. For FCMS, the most important assumptions are usually the cylinder radius, cylinder length, orientation, and the boundary condition used to represent the cylinder interior.
 
@@ -152,3 +152,4 @@ The main additional numerical switch in FCMS is `m_limit`, so the natural follow
 | `liquid_filled` | `10` | 43.09805 | 4.29035 | 0.01 |
 
 That sensitivity check shows why the FCMS page does not need a large PSMS-style configuration matrix. The physically meaningful benchmark branches are the boundary conditions themselves. The extra argument is a modal truncation cap, and the benchmark comparison shows that it can be pushed somewhat, but not recklessly, before the cylindrical modal sum is no longer trustworthy.
+

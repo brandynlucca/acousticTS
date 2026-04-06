@@ -26,7 +26,7 @@ acousticTS:::.model_family_header(
 ```
 
 
-These pages are motivated by layered gas-bearing fish scattering models and viscous resonance broadening [@khodabandeloo_estimating_2021; @feuillade_nero_1998].
+These pages are motivated by layered gas-bearing fish scattering models and viscous resonance broadening [@Khodabandeloo_2021; @Feuillade_1998].
 
 ```{r vesm_overview, echo=FALSE, results='asis'}
 acousticTS:::.model_family_overview(

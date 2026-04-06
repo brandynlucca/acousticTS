@@ -1,4 +1,4 @@
----
+﻿---
 title: "TRCM implementation"
 output:
   rmarkdown::html_vignette:
@@ -32,7 +32,7 @@ acousticTS:::.model_family_header(
 ```
 
 
-These pages come from the high-frequency elongated-body literature and later fish and zooplankton applications [@stanton_etal_1993; @stanton_sound_1998; @stanton_sound_1998-1].
+These pages come from the high-frequency elongated-body literature and later fish and zooplankton applications [@Stanton_1993; @Stanton_1998_2; @Stanton_1998_1].
 
 The acousticTS package uses object-based scatterers so the same implementation pattern carries across models: create a scatterer, run `target_strength()`, inspect the stored model output, and then compare a small set of physically important inputs. For TRCM, the required object class is `FLS` with a cylindrical shape and fluid-like material properties.
 
@@ -116,7 +116,7 @@ For ray-based use cases, the next parameters to revisit are curvature and body o
 
 ### Reference comparisons
 
-TRCM spans two geometry regimes, so the implementation checks should do the same. The straight-cylinder branch can still be compared against the canonical weakly scattering cylinder reference curve. The bent-cylinder branch is compared against the broadside bent-cylinder construction implied by Stanton (1989, Eq. 25-26): the straight finite-cylinder modal coefficient sum is retained, and curvature enters through the exact Fresnel-type coherence integral along the bent axis. In the table below, that bent reference uses the uniformly bent weak-fluid cylinder setup discussed by Stanton (1989) and Stanton et al. (1993): `L/a = 10.5`, `rho_c/L = 1.5`, `g = 1.0357`, `h = 1.0279`, and `ka` spanning `0.1` to `10`.
+TRCM spans two geometry regimes, so the implementation checks should do the same. The straight-cylinder branch can still be compared against the canonical weakly scattering cylinder reference curve. The bent-cylinder branch is compared against the broadside bent-cylinder construction implied by Eq. 25-26 in @Stanton_1989_2: the straight finite-cylinder modal coefficient sum is retained, and curvature enters through the exact Fresnel-type coherence integral along the bent axis. In the table below, that bent reference uses the uniformly bent weak-fluid cylinder setup discussed by @Stanton_1989_2 and @Stanton_1993: `L/a = 10.5`, `rho_c/L = 1.5`, `g = 1.0357`, `h = 1.0279`, and `ka` spanning `0.1` to `10`.
 
 | Geometry | Implementation branch | Reference family | Max abs. $\Delta TS$ (dB) | Mean abs. $\Delta TS$ (dB) | Elapsed (s) |
 |:--|:--|:--|--:|--:|--:|
@@ -127,3 +127,4 @@ TRCM spans two geometry regimes, so the implementation checks should do the same
 This split separates the approximation structure cleanly. The straight-cylinder row checks the ordinary two-ray reduction against the canonical constant-radius cylinder case. The two bent-cylinder rows then test the curvature bookkeeping separately: the full Fresnel-integral branch and the asymptotic stationary-phase shortcut are each evaluated against the same FCMS-derived bent-cylinder reference problem from Stanton's Eq. 25-26 construction.
 
 The stationary-phase shortcut is therefore judged against the bent-cylinder reference it is meant to approximate. Its remaining error should be read as the cost of using an asymptotic bent-body replacement for the full curvature integral, not as evidence that curvature itself is being mishandled.
+

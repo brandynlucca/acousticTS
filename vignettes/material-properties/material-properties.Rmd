@@ -18,7 +18,7 @@ vignette: >
 
 # Introduction
 
-The property conventions on this page follow standard acoustics and elastic-wave references used throughout underwater scattering theory [@medwin_fundamentals_1998; @achenbach_wave_1973].
+The property conventions on this page follow standard acoustics and elastic-wave references used throughout underwater scattering theory [@Medwin_1998; @Achenbach_1973].
 
 
 
@@ -35,7 +35,7 @@ acousticTS:::.vignette_static_figure(
 
 # Main utility groups
 
-The package includes utilities for density- and sound-speed-derived quantities, compressibility- and impedance-related calculations, elastic moduli such as Lam\'e parameters, shear modulus, Poisson ratio, and Young's modulus, wavenumber and acoustic-size conversions, and logarithmic and linear-scale conversions. The functions are small, but they are central. Nearly every model in the package uses some subset of them, either explicitly or as part of the physical quantities from which the model inputs are built.
+The package includes utilities for density- and sound-speed-derived quantities, compressibility- and impedance-related calculations, elastic moduli such as Lamé parameters, shear modulus, Poisson ratio, and Young's modulus, wavenumber and acoustic-size conversions, and logarithmic and linear-scale conversions. The functions are small, but they are central. Nearly every model in the package uses some subset of them, either explicitly or as part of the physical quantities from which the model inputs are built.
 
 It is useful to think of these utilities as belonging to three different tasks:
 
@@ -98,15 +98,15 @@ target <- data.frame(density = 1045, sound_speed = 1520)
 compressibility(medium, target)
 ```
 
-Those utilities are especially helpful when a user wants to understand why a weak-scattering approximation is or is not plausible for a given target. Density contrast alone is rarely the whole story. Compressibility, impedance mismatch, and the joint behavior of density and sound speed are often the quantities that determine whether a target behaves as weakly scattering, strongly reflecting, or something in between.
+Those utilities are especially helpful when a user wants to understand why a weak-scattering approximation is or is not plausible for a given target. Density contrast alone is rarely the whole story. Compressibility, impedance mismatch, and the joint behavior of density and sound speed are often the quantities that determine whether a target behaves as weakly scattering, strongly reflecting, or something in between [@Medwin_1998].
 
 This is one of the most common places where intuition can go wrong. A target may have density close to water but still differ noticeably in sound speed, or vice versa. Looking only at one property can therefore suggest a weak contrast when the combined interface behavior is more consequential.
 
 # Elastic utilities
 
-Shell and solid-sphere models need elastic constants that are often reported inconsistently across sources. One paper may give $E$ and $\nu$, another may give $K$ and $G$, and a third may effectively imply Lam\'e parameters. The package utilities make it easier to move among those descriptions.
+Shell and solid-sphere models need elastic constants that are often reported inconsistently across sources. One paper may give $E$ and $\nu$, another may give $K$ and $G$, and a third may effectively imply Lamé parameters. The package utilities make it easier to move among those descriptions.
 
-Representative functions include `pois()` for Poisson ratio, `bulk()` for bulk modulus, `young()` for Young's modulus, `shear()` for shear modulus, and `lame()` for the Lam\'e parameter.
+Representative functions include `pois()` for Poisson ratio, `bulk()` for bulk modulus, `young()` for Young's modulus, `shear()` for shear modulus, and `lame()` for the Lamé parameter [@Achenbach_1973].
 
 ```{r}
 E <- 7e10
@@ -123,7 +123,7 @@ lambda
 
 That kind of conversion is useful when building `ESS` or calibration-style objects from literature values that do not already match the package argument names.
 
-These conversions are not merely notational. Different elastic quantities emphasize different physical aspects of a material. Young's modulus and Poisson ratio are often how a material is reported mechanically, while shear modulus, bulk modulus, and Lam\'e parameters are often closer to the quantities that enter wave propagation and boundary-condition formulas. A careful workflow therefore converts once, checks consistency, and then carries the internally consistent elastic set through the model setup.
+These conversions are not merely notational. Different elastic quantities emphasize different physical aspects of a material. Young's modulus and Poisson ratio are often how a material is reported mechanically, while shear modulus, bulk modulus, and Lamé parameters are often closer to the quantities that enter wave propagation and boundary-condition formulas. A careful workflow therefore converts once, checks consistency, and then carries the internally consistent elastic set through the model setup.
 
 Readers should also be cautious about units and admissibility. Elastic moduli are in pascals, not megapascals unless explicitly converted, and not every arbitrary pair of elastic constants is physically admissible. If a conversion produces an obviously implausible modulus or a Poisson ratio outside its admissible range, the source values should be checked before the scatterer is built.
 

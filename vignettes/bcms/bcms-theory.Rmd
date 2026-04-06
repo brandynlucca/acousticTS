@@ -1,4 +1,4 @@
----
+﻿---
 title: "Bent cylinder modal series solution"
 output:
   rmarkdown::html_vignette:
@@ -33,7 +33,7 @@ acousticTS:::.model_family_header(
 
 The bent-cylinder modal series solution (`BCMS`) is a curvature-aware extension
 of the straight finite-cylinder modal family developed by Stanton for
-finite-length cylinders near broadside [@stanton_sound_1988; @stanton_sound_1989]. The physical idea is simple:
+finite-length cylinders near broadside [@Stanton_1988; @Stanton_1989_2]. The physical idea is simple:
 curvature modifies the way different parts of the cylinder remain coherent with
 one another, but it does not replace the local cross-sectional scattering
 physics with a completely different kernel.
@@ -167,7 +167,7 @@ dephase and the coherent length decreases.
 
 Once the straight modal kernel and bent coherent-length factor are known, the
 backscattering cross-section and target strength follow the standard monostatic
-definitions:
+definitions [@MacLennan_2002; @Urick_1983; @Simmonds_2005]:
 
 $$
   \sigma_{\mathrm{bs}} =
@@ -194,3 +194,4 @@ These assumptions are why `BCMS` is best understood as a curvature extension of
 `FCMS`, not as a completely separate exact modal family. Its strength is that
 it preserves the modal physics of the straight cylinder while still accounting
 for the first-order way in which a bent axis destroys coherence.
+

@@ -18,7 +18,7 @@ vignette: >
 
 # Introduction
 
-This workflow is designed around the standard-target calibration literature for elastic reference spheres [@dragonette_calibration_1981; @foote_spheres_1990; @maclennan_theory_1981].
+This workflow is designed around the standard-target calibration literature for elastic reference spheres [@Dragonette_1981; @Foote_1990; @Maclennan_1981].
 
 
 

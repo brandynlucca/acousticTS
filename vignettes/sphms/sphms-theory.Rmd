@@ -1,4 +1,4 @@
----
+﻿---
 title: "Spherical modal series solution (SPHMS) theory"
 output:
   rmarkdown::html_vignette:
@@ -31,7 +31,7 @@ acousticTS:::.model_family_header(
 )
 ```
 
-The sphere is the classical geometry for which the acoustic scattering problem can be solved exactly by separation of variables. Because the Helmholtz equation separates in spherical coordinates, the incident, scattered, and interior fields can be expanded in spherical eigenfunctions, and the boundary conditions reduce to independent algebraic equations for each angular order [@anderson_sound_1950; @faran_sound_1951; @hickling_analysis_1962].
+The sphere is the classical geometry for which the acoustic scattering problem can be solved exactly by separation of variables. Because the Helmholtz equation separates in spherical coordinates, the incident, scattered, and interior fields can be expanded in spherical eigenfunctions, and the boundary conditions reduce to independent algebraic equations for each angular order [@Anderson_1950; @Faran_1951; @Hickling_1962].
 
 That structure is what underlies the spherical modal series solution for rigid, pressure-release, fluid-filled, and gas-filled spheres. In this article, medium `1` denotes the surrounding seawater and medium `2` denotes the sphere interior, consistent with the shared package notation summarized in the [acoustic scattering primer](../acoustic-scattering-primer/acoustic-scattering-primer.html) and [notation guide](../notation-and-symbols/notation-and-symbols.html). Shell-based spherical problems are treated separately in the `ESSMS` and calibration articles because once an intermediate shell is introduced, the interface physics changes qualitatively.
 
@@ -131,7 +131,7 @@ The use of $\text{j}_n$ is the spherical analogue of using a regular interior ra
 
 ## Exterior scattered field
 
-The exterior scattered field must satisfy the Sommerfeld radiation condition and is therefore expanded in outgoing spherical Hankel functions:
+The exterior scattered field must satisfy the Sommerfeld radiation condition [@Sommerfeld_1949] and is therefore expanded in outgoing spherical Hankel functions:
 
 $$
   p_{1,\text{scat}}(r,\theta) =
@@ -308,7 +308,7 @@ $$
   \sigma_\text{bs} = |\mathcal{f}_\text{bs}|^2
 $$
 
-and the target strength is:
+and the target strength is [@MacLennan_2002; @Urick_1983; @Simmonds_2005]:
 
 $$
   TS = 10\log_{10}(\sigma_\text{bs}).
@@ -327,5 +327,6 @@ The spherical modal series rests on the following assumptions:
 5. Radiation condition in the exterior field.
 
 Those assumptions are what make the sphere the natural reference problem for validating more complicated scattering models. The geometry is perfectly matched to the coordinate system, the angular basis remains orthogonal, and every retained order remains algebraically local even in the fluid-filled case. That is exactly why the spherical problem serves as the standard benchmark against which more complicated modal and approximate models are often judged.
+
 
 

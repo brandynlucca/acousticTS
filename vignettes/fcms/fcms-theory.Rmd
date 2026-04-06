@@ -1,4 +1,4 @@
----
+﻿---
 title: "Finite cylinder modal series solution (FCMS) theory"
 output:
   rmarkdown::html_vignette:
@@ -31,7 +31,7 @@ acousticTS:::.model_family_header(
 )
 ```
 
-The finite cylinder modal series solution (FCMS) is one of the standard ways to represent acoustic backscatter from straight cylinders of finite length [@stanton_sound_1988; @stanton_sound_1989]. Its appeal is that it retains the exact cylindrical-harmonic treatment of the circular cross-section while replacing the fully three-dimensional endcap problem with a finite-axis coherence factor. That combination makes the model substantially more informative than a purely asymptotic ray-style approximation, while still remaining much simpler than a complete three-dimensional elastic boundary-value treatment.
+The finite cylinder modal series solution (FCMS) is one of the standard ways to represent acoustic backscatter from straight cylinders of finite length [@Stanton_1988; @Stanton_1989_2]. Its appeal is that it retains the exact cylindrical-harmonic treatment of the circular cross-section while replacing the fully three-dimensional endcap problem with a finite-axis coherence factor. That combination makes the model substantially more informative than a purely asymptotic ray-style approximation, while still remaining much simpler than a complete three-dimensional elastic boundary-value treatment.
 
 This structure is also the main conceptual point a reader should carry away from the model. The FCMS is not derived by separating variables for the entire finite cylinder, because a finite cylinder with endcaps is not globally separable in cylindrical coordinates. Instead, it is assembled from two pieces:
 
@@ -148,7 +148,7 @@ $$
   r^2R'' + rR' + (K^2r^2-m^2)R = 0.
 $$
 
-This is Bessel's equation, whose solutions are $J_m(Kr)$, $Y_m(Kr)$, and the outgoing combination $H_m^{(1)}(Kr)$. Regularity at the axis $r=0$ excludes the singular solution $Y_m$ from the incident and interior regular fields, while the outgoing radiation condition selects the Hankel function of the first kind for the scattered field.
+This is Bessel's equation, whose solutions are $J_m(Kr)$, $Y_m(Kr)$, and the outgoing combination $H_m^{(1)}(Kr)$ [@DLMF:ch10]. Regularity at the axis $r=0$ excludes the singular solution $Y_m$ from the incident and interior regular fields, while the outgoing radiation condition selects the Hankel function of the first kind for the scattered field [@Sommerfeld_1949].
 
 ## Incident field in cylindrical coordinates
 
@@ -363,7 +363,7 @@ $$
   \sigma_\text{bs} = |\mathcal{f}_\text{bs}|^2,
 $$
 
-The corresponding target strength is:
+The corresponding target strength is [@MacLennan_2002; @Urick_1983; @Simmonds_2005]:
 
 $$
   TS = 10\log_{10}(\sigma_\text{bs}).
@@ -382,4 +382,5 @@ The FCMS rests on several assumptions:
 These assumptions explain both the strength and the limitation of the FCMS. It captures boundary-condition physics around the cylinder surface exactly within the cross-sectional modal description, but it treats the finite length through a separated directivity factor rather than through a fully three-dimensional separable solution.
 
 For readers using the model in practice, the most important consequence is that FCMS is best interpreted as a cylinder model with exact circular-boundary physics and approximate finite-length physics. That is a meaningful and often very useful balance, but it also tells us when caution is needed: strongly nonuniform radii, strongly influential endcaps, or material distributions that vary along the axis are outside the ideal assumptions under which the factorized representation is most defensible.
+
 

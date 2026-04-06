@@ -1,4 +1,4 @@
----
+﻿---
 title: "KRM"
 output:
   rmarkdown::html_vignette:
@@ -27,7 +27,7 @@ acousticTS:::.model_family_header(
 ```
 
 
-These pages follow the composite body-plus-swimbladder fish modeling literature initiated for cod and later generalized in open software implementations [@clay_1991; @clay_horne_1994; @sven_gastauer_svengastauerkrmr_2025].
+These pages follow the composite body-plus-swimbladder fish modeling literature initiated for cod and later generalized in open software implementations [@Clay_1991; @Clay_1994].
 
 ```{r krm_overview, echo=FALSE, results='asis'}
 acousticTS:::.model_family_overview(
@@ -66,4 +66,5 @@ acousticTS:::.model_family_overview(
   )
 )
 ```
+
 

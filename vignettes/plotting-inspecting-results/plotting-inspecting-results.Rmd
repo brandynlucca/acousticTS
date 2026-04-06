@@ -18,7 +18,7 @@ vignette: >
 
 # Introduction
 
-Plot inspection is most useful when curves are read against known benchmark shapes, resonances, and asymptotic regimes from the published scattering literature [@foote_spheres_1990; @jech_etal_2015].
+Plot inspection is most useful when curves are read against known benchmark shapes, resonances, and asymptotic regimes from the published scattering literature.
 
 
 

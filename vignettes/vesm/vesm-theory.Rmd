@@ -39,7 +39,7 @@ gas core is surrounded first by an elastic shell and then by a viscous
 biological layer before the whole target is embedded in seawater. In the
 mesopelagic-fish setting of Khodabandeloo et al. (2021), those layers represent
 gas, a mechanically stiffer shell-like inclusion, and soft tissue whose
-viscosity damps and broadens the gas-driven resonance [@khodabandeloo_estimating_2021; @feuillade_nero_1998].
+viscosity damps and broadens the gas-driven resonance [@Khodabandeloo_2021; @Feuillade_1998].
 
 This family is still spherical, so the angular dependence remains separable.
 What makes it more intricate than `SPHMS`, `ESSMS`, or a simple bubble model is
@@ -155,7 +155,7 @@ $$
     0,
 $$
 
-where $\lambda_3$ and $\mu_3$ are Lam\'e parameters and $\rho_3$ is shell
+where $\lambda_3$ and $\mu_3$ are Lamé parameters and $\rho_3$ is shell
 density.
 
 The shell therefore supports longitudinal and transverse elastic waves with
@@ -357,7 +357,7 @@ $$
 where the $(-1)^m$ factor comes from evaluating the Legendre polynomials in the
 backscattering direction.
 
-The backscattering cross-section and target strength are then:
+The backscattering cross-section and target strength are then [@MacLennan_2002; @Urick_1983; @Simmonds_2005]:
 
 $$
   \sigma_{\mathrm{bs}} = \left|f_{\mathrm{bs}}\right|^2,

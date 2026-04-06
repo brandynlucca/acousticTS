@@ -1,4 +1,4 @@
----
+﻿---
 title: "High-pass approximation (HPA) theory"
 output:
   rmarkdown::html_vignette:
@@ -31,7 +31,7 @@ acousticTS:::.model_family_header(
 )
 ```
 
-The high-pass approximation (HPA) is not an exact boundary-value solution. It is a compact asymptotic model constructed so that the low-frequency limit matches the Rayleigh expansion of weakly scattering bodies, while the large-$ka$ limit remains bounded and approaches a reflection-controlled scale [@johnson_sound_1977; @stanton_1989]. The model is therefore best understood as an interpolation between two physically distinct regimes rather than as a direct solution of the governing boundary-value problem at all frequencies.
+The high-pass approximation (HPA) is not an exact boundary-value solution. It is a compact asymptotic model constructed so that the low-frequency limit matches the Rayleigh expansion of weakly scattering bodies, while the large-$ka$ limit remains bounded and approaches a reflection-controlled scale [@Johnson_1977; @Stanton_1989_1]. The model is therefore best understood as an interpolation between two physically distinct regimes rather than as a direct solution of the governing boundary-value problem at all frequencies.
 
 Its usefulness comes from that interpolation. Instead of carrying a full modal series or surface integral, the HPA writes the backscattering cross-section as a rational function of frequency whose numerator reproduces the small-target limit and whose denominator suppresses the unbounded growth that a naive low-frequency continuation would otherwise produce.
 
@@ -102,7 +102,7 @@ This fixes the numerator of any interpolation formula that is to reproduce the c
 
 ## High-pass denominator
 
-Johnson (1977) [@johnson_sound_1977] introduced the simplest rational completion of that numerator by writing:
+Johnson (1977) [@Johnson_1977] introduced the simplest rational completion of that numerator by writing:
 
 $$
   \sigma_\text{bs} =
@@ -139,7 +139,7 @@ so the response approaches a bounded geometric scale instead of diverging.
 
 # Stanton (1989) generalization
 
-Stanton (1989) [@stanton_1989] extended the same logic to a broader class of shapes by matching a low-frequency scattering term to a reflected-wave asymptote and then introducing empirical correction factors where needed. In this broader setting, the geometric prefactors and directivity terms become just as important as the material contrasts because they determine how the same asymptotic logic is adapted to spheres, spheroids, straight cylinders, and bent cylinders.
+@Stanton_1989_1 extended the same logic to a broader class of shapes by matching a low-frequency scattering term to a reflected-wave asymptote and then introducing empirical correction factors where needed. In this broader setting, the geometric prefactors and directivity terms become just as important as the material contrasts because they determine how the same asymptotic logic is adapted to spheres, spheroids, straight cylinders, and bent cylinders.
 
 ## Deviation and null functions
 
@@ -149,7 +149,7 @@ These terms are phenomenological. They do not arise from the first few algebraic
 
 ## Spherical form
 
-For a sphere, the generalized expression from Stanton (1989) [@stanton_1989] is:
+For a sphere, the generalized expression from @Stanton_1989_1 is:
 
 $$
   \sigma_\text{bs} =
@@ -158,7 +158,7 @@ $$
   }.
 $$
 
-The low-frequency numerator is still the Rayleigh term. The denominator is written so that the high-frequency scale is set explicitly by the reflection coefficient $\mathcal{R}$. Compared with the simpler form of Johnson (1977) [@johnson_sound_1977], the version from Stanton (1989) [@stanton_1989] makes the reflection-controlled nature of the large-$ka$ limit more explicit and leaves room for the correction factors $\mathcal{F}$ and $\mathcal{G}$.
+The low-frequency numerator is still the Rayleigh term. The denominator is written so that the high-frequency scale is set explicitly by the reflection coefficient $\mathcal{R}$. Compared with the simpler form of @Johnson_1977, the version from @Stanton_1989_1 makes the reflection-controlled nature of the large-$ka$ limit more explicit and leaves room for the correction factors $\mathcal{F}$ and $\mathcal{G}$.
 
 ## Prolate spheroid form
 
@@ -235,4 +235,5 @@ The HPA rests on the following assumptions:
 5. Shape effects enter primarily through explicit geometric factors such as $L$, $s$, and $\mathcal{H}$.
 
 The strength of the HPA is that it compresses those asymptotic ideas into simple closed forms. The limitation is that it does not reproduce fine modal resonances, exact boundary-condition structure, or detailed internal wave effects that would appear in a fuller solution. It is therefore most useful when the scientific question is about broad frequency trends, relative shape effects, or fast exploratory calculations rather than resonance-resolving inference.
+
 

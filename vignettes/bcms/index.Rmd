@@ -1,4 +1,4 @@
----
+﻿---
 title: "BCMS"
 output:
   rmarkdown::html_vignette:
@@ -26,7 +26,7 @@ acousticTS:::.model_family_header(
 ```
 
 
-This family follows the deformed-cylinder and coherence-corrected cylinder literature for weakly scattering elongated bodies [@stanton_sound_1989; @stanton_sound_1988].
+This family follows the deformed-cylinder and coherence-corrected cylinder literature for weakly scattering elongated bodies [@Stanton_1989_2; @Stanton_1988].
 
 ```{r bcms_overview, echo=FALSE, results='asis'}
 acousticTS:::.model_family_overview(
@@ -63,4 +63,5 @@ acousticTS:::.model_family_overview(
   )
 )
 ```
+
 

@@ -1,4 +1,4 @@
----
+﻿---
 title: "Elastic cylinder modal series solution"
 output:
   rmarkdown::html_vignette:
@@ -35,7 +35,7 @@ The elastic-cylinder modal series solution (`ECMS`) is the solid-cylinder
 counterpart to the fluid `FCMS` family. It combines the exact phase-shift
 treatment of an infinite elastic circular cylinder with the same near-broadside
 finite-length coherence factor used for finite cylinders in the classical
-Stanton formulations [@faran_sound_1951; @stanton_sound_1988].
+Stanton formulations [@Faran_1951; @Stanton_1988; @Stanton_1988_2].
 
 The resulting model is exact in the local circular cross-section and
 approximate only in the way finite length is reduced to a coherence factor.
@@ -69,7 +69,7 @@ $$
     0,
 $$
 
-where $\lambda_2$ and $\mu_2$ are Lam\'e parameters and $\rho_2$ is the solid
+where $\lambda_2$ and $\mu_2$ are Lamé parameters and $\rho_2$ is the solid
 density.
 
 Using the usual Helmholtz decomposition:
@@ -238,7 +238,7 @@ kernel rather than replacing it.
 # Target strength
 
 Once the complex backscattering amplitude is known, the linear backscattering
-cross-section and target strength are:
+cross-section and target strength are [@MacLennan_2002; @Urick_1983; @Simmonds_2005]:
 
 $$
   \sigma_{\mathrm{bs}} =
@@ -267,3 +267,4 @@ These assumptions are what make `ECMS` the natural solid-cylinder analogue of
 `FCMS`: exact local circular-cylinder physics, approximate finite-length
 closure, and strongest physical relevance near broadside rather than at end-on
 incidence.
+

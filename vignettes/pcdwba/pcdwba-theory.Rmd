@@ -1,4 +1,4 @@
----
+﻿---
 title: "Phase-compensated distorted wave Born approximation"
 output:
   rmarkdown::html_vignette:
@@ -33,7 +33,7 @@ acousticTS:::.model_family_header(
 
 The phase-compensated distorted wave Born approximation (`PCDWBA`) extends the
 ordinary `DWBA` to elongated bodies whose centerlines are curved rather than
-straight [@chu_phase-compensated_1999; @stanton_sound_1989]. It preserves the same weak-scattering local kernel used for
+straight [@Chu_1999; @Stanton_1989_2]. It preserves the same weak-scattering local kernel used for
 slender fluid-like bodies, but it replaces the straight-body phase bookkeeping
 by a centerline-dependent phase that follows the bent geometry explicitly.
 
@@ -214,7 +214,7 @@ cross-sectional contrast physics.
 # Backscatter and target strength
 
 Once the complex backscattering amplitude has been assembled from the curved
-centerline sum, the standard monostatic outputs are:
+centerline sum, the standard monostatic outputs are [@MacLennan_2002; @Urick_1983; @Simmonds_2005]:
 
 $$
   \sigma_{\mathrm{bs}} = \left|f_{\mathrm{bs}}\right|^2,
@@ -241,3 +241,4 @@ That is why `PCDWBA` should be read as a curved-body extension of `DWBA`, not
 as a new exact geometry family. Its main purpose is to keep the part of the
 physics that `DWBA` misses first when the body bends: the geometry-dependent
 coherent phase.
+

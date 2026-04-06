@@ -1,4 +1,4 @@
----
+﻿---
 title: "Two-ray cylinder model (TRCM) theory"
 output:
   rmarkdown::html_vignette:
@@ -31,7 +31,7 @@ acousticTS:::.model_family_header(
 )
 ```
 
-The two-ray cylinder model (TRCM) is a high-frequency approximation for elongated fluid-like bodies. It assumes that the dominant backscatter from a locally cylindrical body is produced by two coherent contributions: a prompt reflection from the near interface and a second contribution that enters the body, traverses the diameter, reflects from the far interface, and returns with additional phase [@stanton_etal_1993; @stanton_sound_1998; @stanton_sound_1998i]. The model is therefore asymptotic from the outset. It does not attempt to represent low-order resonances or a full internal reverberation series. Instead, it keeps only the first two physically important specular paths and asks how they interfere.
+The two-ray cylinder model (TRCM) is a high-frequency approximation for elongated fluid-like bodies. It assumes that the dominant backscatter from a locally cylindrical body is produced by two coherent contributions: a prompt reflection from the near interface and a second contribution that enters the body, traverses the diameter, reflects from the far interface, and returns with additional phase [@Stanton_1993; @Stanton_1998_2; @Stanton_1998_1]. The model is therefore asymptotic from the outset. It does not attempt to represent low-order resonances or a full internal reverberation series. Instead, it keeps only the first two physically important specular paths and asks how they interfere.
 
 Throughout this page, medium `1` is the surrounding seawater and medium `2` is
 the fluid-like body interior.
@@ -234,7 +234,7 @@ $$
     \left| \mathcal{f}_\text{bs} \right|^2,
 $$
 
-and the corresponding target strength is:
+and the corresponding target strength is [@MacLennan_2002; @Urick_1983; @Simmonds_2005]:
 
 $$
   TS = 10 \log_{10} \sigma_\text{bs}.
@@ -341,5 +341,6 @@ The TRCM depends on the following assumptions:
 5. Curvature varies slowly enough that the bent-body phase correction can be represented by a quadratic coherence integral or its stationary-phase reduction.
 
 Under these assumptions the TRCM captures the main oscillatory structure associated with two-ray interference, but it is not intended to reproduce a full modal or reverberant description of a finite fluid cylinder.
+
 
 

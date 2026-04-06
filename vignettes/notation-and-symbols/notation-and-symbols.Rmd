@@ -1,4 +1,4 @@
----
+﻿---
 title: "Notation and symbols"
 output:
   rmarkdown::html_vignette:
@@ -18,7 +18,7 @@ vignette: >
 
 # Introduction
 
-The notation on this page follows standard scattering texts for Helmholtz, elastic-wave, and basis-expansion formulations [@morse_theoretical_1986; @flammer_spheroidal_1957; @waterman_t_2009].
+The notation on this page follows standard scattering texts for Helmholtz, elastic-wave, and basis-expansion formulations [@Morse_1968; @Flammer_1957; @Waterman_2009].
 
 
 
@@ -75,7 +75,7 @@ sphere can use media `1`, `2`, `3`, and `4`.
 |---|---|---|
 | $\rho_j$ | density in medium $j$ | kg m$^{-3}$ |
 | $\kappa_j$ | compressibility in medium $j$ | Pa$^{-1}$ |
-| $\lambda_j$ | Lam\'e's first parameter in elastic medium $j$ | Pa |
+| $\lambda_j$ | Lamé's first parameter in elastic medium $j$ | Pa |
 | $\mu_j$ | shear modulus in elastic medium $j$ | Pa |
 | $g_{ij}$ | density contrast, $\rho_i / \rho_j$ | dimensionless |
 | $h_{ij}$ | sound-speed contrast, $c_i / c_j$ | dimensionless |
@@ -126,3 +126,4 @@ and so on.
 - [Acoustic scattering primer](../acoustic-scattering-primer/acoustic-scattering-primer.html)
 - [Scattering boundary conditions](../boundary_conditions.html)
 - [Material properties](../material-properties/material-properties.html)
+

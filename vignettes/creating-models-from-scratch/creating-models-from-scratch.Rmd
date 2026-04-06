@@ -18,7 +18,7 @@ vignette: >
 
 # Introduction
 
-Building a model from scratch is easiest when the geometry, basis, and approximation regime stay aligned with the canonical scattering literature [@morse_theoretical_1986; @waterman_t_2009].
+Building a model from scratch is easiest when the geometry, basis, and approximation regime stay aligned with the canonical scattering literature.
 
 
 

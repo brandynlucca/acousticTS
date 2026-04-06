@@ -1,4 +1,4 @@
----
+﻿---
 title: "KRM implementation"
 output:
   rmarkdown::html_vignette:
@@ -32,7 +32,7 @@ acousticTS:::.model_family_header(
 ```
 
 
-These pages follow the composite body-plus-swimbladder fish modeling literature initiated for cod and later generalized in open software implementations [@clay_1991; @clay_horne_1994; @sven_gastauer_svengastauerkrmr_2025].
+These pages follow the composite body-plus-swimbladder fish modeling literature initiated for cod and later generalized in open software implementations [@Clay_1991; @Clay_1994].
 
 The acousticTS package uses object-based scatterers, so the KRM workflow follows the same broad structure used elsewhere in the package: define the geometry, attach material meaning to the body and any internal inclusion, evaluate the model over the desired frequency range, and then inspect the returned response carefully enough to understand what part of the target is driving it. For KRM, the main structural choice is whether the target is represented as a fluid-like body only or as a body plus an internal strongly contrasting inclusion such as a swimbladder.
 
@@ -93,7 +93,7 @@ This call evaluates the composite KRM response over the requested frequency grid
 
 ### Swimbladder variants
 
-For fluid-only body targets, `krm_variant` is ignored because only the body Kirchhoff term is evaluated. The argument matters only for combined body-plus-swimbladder targets, where the model must decide what surrounding medium is used in the swimbladder terms (Clay and Horne 1994; Horne and Jech 1999).
+For fluid-only body targets, `krm_variant` is ignored because only the body Kirchhoff term is evaluated. The argument matters only for combined body-plus-swimbladder targets, where the model must decide what surrounding medium is used in the swimbladder terms [@Clay_1994; @Horne_1999].
 
 In the high-`ka` swimbladder Kirchhoff term, acousticTS uses the empirical factors:
 
@@ -124,7 +124,7 @@ The three named variants therefore encode the modelling assumption directly:
 
 1. `lowcontrast`: apply the low-contrast approximation $k_B \approx k$ in both swimbladder regimes, so $k_H = k_L = k$.
 2. `mixed`: use the body-medium wavenumber for the high-`ka` swimbladder term but the low-contrast approximation for the low-`ka` breathing mode, so $k_H = k_B$ and $k_L = k$.
-3. `body_embedded`: use the body-medium wavenumber in both swimbladder regimes, so $k_H = k_L = k_B$. This is the most literal body-embedded reading of Clay and Horne (1994).
+3. `body_embedded`: use the body-medium wavenumber in both swimbladder regimes, so $k_H = k_L = k_B$. This is the most literal body-embedded reading of @Clay_1994.
 
 ```{r echo=FALSE, out.width='85%', fig.align='center', fig.alt='Pre-rendered KRM comparison for the sardine example under the lowcontrast, body-embedded, and mixed swimbladder-medium conventions.'}
 knitr::include_graphics("krm-variant-comparison.png")
@@ -187,7 +187,7 @@ The modal-series table above remains the implementation benchmark for the canoni
 
 ### Bundled fish compatibility checks {.tabset .tabset-fade .tabset-pills}
 
-The bundled fish objects serve a different benchmark role from the canonical modal-series targets above. There is no exact modal-series reference for these segmented body-plus-swimbladder geometries, so they are used only to check software-to-software agreement for the `krm_variant` branches on realistic fish shapes.
+The bundled fish objects serve a different benchmark role from the canonical modal-series targets above. There is no exact modal-series reference for these segmented body-plus-swimbladder geometries, so they are used only to check software-to-software agreement for the `krm_variant` branches on realistic fish shapes. This inclues KRMr [@KRMr_software], echoSMs [@echoSMs_software], and the SWFSC applet [@NOAA_KRM_software].
 
 #### Sardine
 
@@ -271,3 +271,4 @@ The two benchmark roles are explicit:
 
 1. canonical modal-series tables for isolated-shape KRM implementation checks, and
 2. bundled-fish compatibility checks for the body-plus-swimbladder convention choice.
+

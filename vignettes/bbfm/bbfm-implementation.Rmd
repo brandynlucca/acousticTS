@@ -1,4 +1,4 @@
----
+﻿---
 title: "Body-backbone fish model"
 output:
   rmarkdown::html_vignette:
@@ -32,7 +32,7 @@ acousticTS:::.model_family_header(
 ```
 
 
-This family is best read alongside the swimbladder-less fish and composite-scatterer literature that motivates explicit flesh-body and backbone terms [@gorska_etal_2005; @stanton_sound_1998-1; @clay_horne_1994].
+This family is best read alongside the swimbladder-less fish and composite-scatterer literature that motivates explicit flesh-body and backbone terms [@Gorska_2005; @Stanton_1998_1; @Clay_1994].
 
 The body-backbone fish model is available through
 `target_strength(..., model = "bbfm")`. It is intended for swimbladder-less
@@ -304,3 +304,4 @@ So the implementation answers the bookkeeping question clearly:
 acousticTS can construct, evaluate, and inspect this composite family in a
 transparent way. The remaining open work is external benchmarking and, later,
 more tightly coupled composite physics.
+

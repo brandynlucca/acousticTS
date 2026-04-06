@@ -18,7 +18,7 @@ vignette: >
 
 # Introduction
 
-The shape pathways on this page are most useful when read against the canonical geometries that dominate the scattering literature, especially spheres, cylinders, spheroids, and piecewise elongated bodies [@waterman_t_2009; @flammer_spheroidal_1957; @stanton_sound_1988].
+The shape pathways on this page are most useful when read against the canonical geometries that dominate the scattering literature, especially spheres, cylinders, spheroids, and piecewise elongated bodies.
 
 
 

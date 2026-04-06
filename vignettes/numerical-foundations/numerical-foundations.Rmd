@@ -18,7 +18,7 @@ vignette: >
 
 # Introduction
 
-The numerical choices documented here are motivated by the special-function and basis-expansion structure of the underlying scattering literature [@flammer_spheroidal_1957; @waterman_t_2009; @betcke_bempp-cl_2021].
+The numerical choices documented here are motivated by the special-function and basis-expansion structure of the underlying scattering literature [@Flammer_1957; @Waterman_2009; @Bempp-cl_software].
 
 
 
@@ -65,7 +65,7 @@ The same point also explains why geometry mismatch can be numerically expensive.
 
 ## Cylindrical and spherical Bessel/Hankel functions
 
-These functions are the basic radial building blocks for `FCMS`, `SPHMS`, `ESSMS`, and parts of other workflows. Computationally, they are important because boundary conditions frequently depend on both the functions themselves and their derivatives.
+These functions are the basic radial building blocks for `FCMS`, `SPHMS`, `ESSMS`, and parts of other workflows [@Abramowitz_1964; @DLMF:ch10]. Computationally, they are important because boundary conditions frequently depend on both the functions themselves and their derivatives.
 
 At a practical level, increasing acoustic size usually means more oscillatory special functions, more modes required for convergence, and a greater risk of cancellation or conditioning issues in coefficient formulas.
 
@@ -73,13 +73,13 @@ Readers do not need to inspect these functions directly to feel their numerical 
 
 ## Legendre and angular functions
 
-For spherical problems, Legendre structure is what separates angular dependence from radial dependence. That separation is why the spherical models can be solved one order at a time rather than as a fully coupled field everywhere in space.
+For spherical problems, Legendre structure is what separates angular dependence from radial dependence [@Abramowitz_1964; @DLMF:ch14]. That separation is why the spherical models can be solved one order at a time rather than as a fully coupled field everywhere in space.
 
 The practical importance of that separation is that numerical growth happens in an organized way. As acoustic size increases, more angular orders contribute, but the model still retains a mode-by-mode structure that is easier to diagnose than a generic global discretization.
 
 ## Spheroidal wave functions
 
-The prolate spheroidal model is numerically more demanding because the basis itself is more specialized. The advantage is geometric fidelity for prolate bodies. The cost is that evaluating and coupling spheroidal wave functions is more delicate than working in ordinary spherical or cylindrical bases.
+The prolate spheroidal model is numerically more demanding because the basis itself is more specialized [@Flammer_1957; @DLMF:ch30]. The advantage is geometric fidelity for prolate bodies. The cost is that evaluating and coupling spheroidal wave functions is more delicate than working in ordinary spherical or cylindrical bases.
 
 This is why `PSMS` often deserves more numerical scrutiny than the simpler canonical modal models. The question is not whether the mathematics is legitimate. The question is whether the chosen truncation and quadrature settings are resolving that more delicate basis accurately enough for the intended calculation.
 
@@ -87,7 +87,7 @@ This is why `PSMS` often deserves more numerical scrutiny than the simpler canon
 
 For the prolate spheroidal basis, the most important numerical objects are the angular wave functions `Smn()` and the radial wave functions `Rmn()`. Those are the actual special-function building blocks that the rest of the spheroidal models depend on, so it is useful to separate their evaluation from the later model-specific algebra.
 
-In acousticTS, those functions are evaluated through the `profcn` backend in `src/prolate_swf.f90` [@van_buren_boisvert_prolate_swf_2026], with the corresponding `C++` wrappers in `src/psms.cpp` handling the extraction and rescaling needed by the exported `Smn()` and `Rmn()` interfaces. That split of responsibility matters because the Fortran routine computes a large family of spheroidal quantities at once, while the package-level functions usually want one specific angular or radial quantity and, often, its derivative.
+In acousticTS, those functions are evaluated through the `profcn` backend in `src/prolate_swf.f90` [@prolate_swf_software_2002; @prolate_swf_software_2004], with the corresponding `C++` wrappers in `src/psms.cpp` handling the extraction and rescaling needed by the exported `Smn()` and `Rmn()` interfaces. That split of responsibility matters because the Fortran routine computes a large family of spheroidal quantities at once, while the package-level functions usually want one specific angular or radial quantity and, often, its derivative.
 
 One detail that is easy to miss from the outside is that the Fortran backend stores many spheroidal quantities in mantissa-and-base-10-exponent form rather than as a single floating-point number. This is a stability device. High-order prolate spheroidal functions can become so large or so small that a naive single-number representation would overflow or underflow before the scaled value of interest is assembled. The `C++` layer therefore reconstructs the ordinary numeric value only after the backend evaluation is complete.
 
@@ -119,7 +119,7 @@ This is also where one of the most important numerical habits comes in: converge
 
 Some models do not reduce to purely closed-form modal coefficients. `PSMS` is the clearest example, because kernel and overlap terms must be evaluated numerically. In those cases, quadrature accuracy becomes part of the model setup.
 
-Gauss-Legendre quadrature is especially useful here because many of the relevant overlap integrals live on finite intervals and involve smooth but nontrivial products of special functions. The package therefore exposes numerical controls such as the number of integration points where the model requires them.
+Gauss-Legendre quadrature is especially useful here because many of the relevant overlap integrals live on finite intervals and involve smooth but nontrivial products of special functions [@Abramowitz_1964; @Press2007]. The package therefore exposes numerical controls such as the number of integration points where the model requires them.
 
 The practical interpretation is that some model arguments are numerical arguments rather than physical arguments. Changing `n_integration`, precision, or simplification options does not change the target. It changes how faithfully the truncated mathematical problem is being solved.
 
@@ -131,7 +131,7 @@ Not all modal problems are equally easy after truncation. Some models decouple i
 
 This is where conditioning matters. A mathematically correct truncated system can still be numerically awkward if the basis functions become nearly dependent at the working precision or if large cancellations occur in the coefficient matrices.
 
-That is why several theory pages mention stabilization strategies such as singular value decomposition, cautious truncation, or warnings about effective precision limits.
+That is why several theory pages mention stabilization strategies such as singular value decomposition [@Press2007], cautious truncation, or warnings about effective precision limits.
 
 Readers should not interpret such stabilization language as a sign that the underlying physics is dubious. It usually means the numerical representation has become delicate enough that ordinary direct evaluation may not be robust across the whole working range. In other words, stabilization is often a mark of numerical honesty rather than a warning that the model should be discarded.
 
