@@ -32,10 +32,9 @@
   model_params
 }
 
-# The cylindrical retained path is now geometry-matched and intentionally
-# limited to exact monostatic reuse. The helper is kept as a no-op so the
-# public post-processing calls can keep one shared structure without warning on
-# the supported cylinder workflow.
+# Stored sharp-cylinder workflows now use retained axisymmetric blocks, so
+# this hook simply stays silent while the public post-processing helpers reuse
+# the standard spherical/spheroidal plotting and summary machinery.
 #' @noRd
 .tmm_warn_exploratory_cylinder_blocks <- function(object, model_params) {
   # Keep the shared post-processing hook while suppressing cylinder warnings ===
@@ -308,9 +307,9 @@
   }
 }
 
-# Evaluate the retained cylindrical branch. The current geometry-matched
-# cylinder family only supports exact monostatic reuse; general-angle cylinder
-# post-processing still needs a separate validated cylindrical operator.
+# Evaluate the legacy cylindrical branch. This keeps the exact finite-cylinder
+# family available for sharp-cylinder monostatic reuse without invoking the
+# retained axisymmetric post-processing operator.
 #' @noRd
 .tmm_scattering_cylindrical <- function(model_params,
                                         shape_parameters,
@@ -356,6 +355,441 @@
   )
 }
 
+# Interpolate one stored hybrid-grid field value at the requested receive
+# angles. This is used by the current axial elastic-shell prolate TMM rebuild
+# branch, which stores a validated external hybrid grid rather than analytic
+# retained modal coefficients.
+#' @noRd
+.tmm_scattering_hybrid_grid_point <- function(store_i,
+                                              theta_scatter,
+                                              phi_scatter) {
+  theta_vals <- as.numeric(store_i$theta_scatter)
+  phi_vals <- as.numeric(store_i$phi_scatter)
+  field <- store_i$f_scat
+
+  phi_target <- .tmm_wrap_angle_2pi(phi_scatter)
+  if (abs(phi_target - 2 * pi) <= 1e-10) {
+    phi_target <- 2 * pi
+  }
+  if (phi_target < min(phi_vals) - 1e-12 || phi_target > max(phi_vals) + 1e-12) {
+    phi_target <- min(max(phi_target, min(phi_vals)), max(phi_vals))
+  }
+  theta_target <- min(max(theta_scatter, min(theta_vals)), max(theta_vals))
+
+  theta_idx_hi <- which(theta_vals >= theta_target)[1]
+  if (is.na(theta_idx_hi)) {
+    theta_idx_hi <- length(theta_vals)
+  }
+  theta_idx_lo <- max(1L, theta_idx_hi - 1L)
+  theta_idx_hi <- if (theta_vals[theta_idx_lo] == theta_target) theta_idx_lo else theta_idx_hi
+
+  phi_idx_hi <- which(phi_vals >= phi_target)[1]
+  if (is.na(phi_idx_hi)) {
+    phi_idx_hi <- length(phi_vals)
+  }
+  phi_idx_lo <- max(1L, phi_idx_hi - 1L)
+  phi_idx_hi <- if (phi_vals[phi_idx_lo] == phi_target) phi_idx_lo else phi_idx_hi
+
+  if (theta_idx_lo == theta_idx_hi && phi_idx_lo == phi_idx_hi) {
+    return(field[theta_idx_lo, phi_idx_lo])
+  }
+
+  theta_lo <- theta_vals[theta_idx_lo]
+  theta_hi <- theta_vals[theta_idx_hi]
+  phi_lo <- phi_vals[phi_idx_lo]
+  phi_hi <- phi_vals[phi_idx_hi]
+
+  theta_w <- if (theta_hi > theta_lo) {
+    (theta_target - theta_lo) / (theta_hi - theta_lo)
+  } else {
+    0
+  }
+  phi_w <- if (phi_hi > phi_lo) {
+    (phi_target - phi_lo) / (phi_hi - phi_lo)
+  } else {
+    0
+  }
+
+  f00 <- field[theta_idx_lo, phi_idx_lo]
+  f01 <- field[theta_idx_lo, phi_idx_hi]
+  f10 <- field[theta_idx_hi, phi_idx_lo]
+  f11 <- field[theta_idx_hi, phi_idx_hi]
+
+  (1 - theta_w) * (1 - phi_w) * f00 +
+    (1 - theta_w) * phi_w * f01 +
+    theta_w * (1 - phi_w) * f10 +
+    theta_w * phi_w * f11
+}
+
+# Evaluate one stored hybrid-grid branch at arbitrary receive angles.
+#' @noRd
+.tmm_scattering_hybrid_grid <- function(t_store,
+                                        acoustics,
+                                        theta_body,
+                                        phi_body,
+                                        theta_scatter,
+                                        phi_scatter) {
+  vapply(
+    seq_along(t_store),
+    function(i) {
+      store_i <- t_store[[i]]
+      if (!isTRUE(all.equal(theta_body, store_i$theta_body, tolerance = 1e-8)) ||
+        !isTRUE(all.equal(.tmm_wrap_angle_2pi(phi_body),
+          .tmm_wrap_angle_2pi(store_i$phi_body),
+          tolerance = 1e-8
+        ))) {
+        stop(
+          "Stored ESPSMS hybrid-grid TMM currently supports only the stored axial incident geometry.",
+          call. = FALSE
+        )
+      }
+      .tmm_scattering_hybrid_grid_point(
+        store_i = store_i,
+        theta_scatter = theta_scatter,
+        phi_scatter = phi_scatter
+      )
+    },
+    complex(1)
+  )
+}
+
+# Evaluate one stored hybrid-grid frequency over a requested theta-phi receive
+# grid by interpolation from the retained external hybrid reference.
+#' @noRd
+.tmm_scattering_hybrid_grid_matrix <- function(model_params,
+                                               frequency_idx,
+                                               theta_body,
+                                               phi_body,
+                                               theta_scatter,
+                                               phi_scatter) {
+  store_i <- model_params$parameters$t_matrix[[frequency_idx]]
+  if (!isTRUE(all.equal(theta_body, store_i$theta_body, tolerance = 1e-8)) ||
+    !isTRUE(all.equal(.tmm_wrap_angle_2pi(phi_body),
+      .tmm_wrap_angle_2pi(store_i$phi_body),
+      tolerance = 1e-8
+    ))) {
+    stop(
+      "Stored ESPSMS hybrid-grid TMM currently supports only the stored axial incident geometry.",
+      call. = FALSE
+    )
+  }
+
+  if (length(theta_scatter) == length(store_i$theta_scatter) &&
+    length(phi_scatter) == length(store_i$phi_scatter) &&
+    all(abs(theta_scatter - store_i$theta_scatter) <= 1e-12) &&
+    all(abs(phi_scatter - store_i$phi_scatter) <= 1e-12)) {
+    return(store_i$f_scat)
+  }
+
+  out <- matrix(0 + 0i, nrow = length(theta_scatter), ncol = length(phi_scatter))
+  for (i in seq_along(theta_scatter)) {
+    for (j in seq_along(phi_scatter)) {
+      out[i, j] <- .tmm_scattering_hybrid_grid_point(
+        store_i = store_i,
+        theta_scatter = theta_scatter[i],
+        phi_scatter = phi_scatter[j]
+      )
+    }
+  }
+
+  out
+}
+
+# Reject public cylinder TMM helpers that imply general-angle bistatic support.
+#' @noRd
+.tmm_stop_cylinder_bistatic_public <- function(helper) {
+  stop(
+    "Cylinder 'TMM' bistatic evaluation is outside the current public scope. ",
+    "Cylinder TMM currently supports only exact monostatic backscatter and ",
+    "orientation-averaged monostatic products. Helper: '", helper, "'.",
+    call. = FALSE
+  )
+}
+
+# Guard the public stored-cylinder helper scope to exact monostatic reuse only.
+#' @noRd
+.tmm_validate_cylinder_public_scattering <- function(shape_parameters,
+                                                     theta_body,
+                                                     phi_body,
+                                                     theta_scatter,
+                                                     phi_scatter,
+                                                     helper = "tmm_scattering()") {
+  if (!identical(.tmm_shape_name(shape_parameters), "Cylinder")) {
+    return(invisible(NULL))
+  }
+
+  if (!.tmm_is_monostatic_direction(
+    theta_body = theta_body,
+    phi_body = phi_body,
+    theta_scatter = theta_scatter,
+    phi_scatter = phi_scatter
+  )) {
+    .tmm_stop_cylinder_bistatic_public(helper)
+  }
+
+  invisible(NULL)
+}
+
+# Evaluate the retained axisymmetric cylinder branch. Exact monostatic requests
+# stay on the finite-cylinder family, while general-angle calls use the
+# dedicated cylinder-native profile integral rather than the shared spherical
+# retained operator.
+#' @noRd
+.tmm_cylinder_profile_quadrature <- function(shape_parameters,
+                                             cylinder_endcap_fraction = NULL) {
+  length_body <- as.numeric(shape_parameters$length)[1]
+  half_length <- length_body / 2
+  radius_profile <- as.numeric(shape_parameters$radius)
+  if (!length(radius_profile)) {
+    radius_profile <- rep(0, 2)
+  }
+
+  z_nodes <- seq(-half_length, half_length, length.out = length(radius_profile))
+  taper_order <- if ("taper_order" %in% names(shape_parameters)) {
+    as.numeric(shape_parameters$taper_order)[1]
+  } else {
+    NA_real_
+  }
+
+  if (!is.null(cylinder_endcap_fraction) &&
+    cylinder_endcap_fraction > 0 &&
+    !is.finite(taper_order)) {
+    max_radius <- max(radius_profile, na.rm = TRUE)
+    cap_length <- min(half_length * cylinder_endcap_fraction, half_length - 1e-9)
+    z_cap_center <- half_length - cap_length
+    radius_profile <- vapply(
+      z_nodes,
+      function(z_i) {
+        abs_z <- abs(z_i)
+        if (abs_z <= z_cap_center) {
+          return(max_radius)
+        }
+        max_radius * sqrt(pmax(
+          1 - ((abs_z - z_cap_center) / cap_length)^2,
+          0
+        ))
+      },
+      numeric(1)
+    )
+  }
+
+  if (length(z_nodes) == 1) {
+    return(list(
+      z = z_nodes,
+      radius = radius_profile,
+      weight = length_body
+    ))
+  }
+
+  dz <- diff(z_nodes)
+  weights <- c(dz[1], dz[-length(dz)] + dz[-1], dz[length(dz)]) / 2
+
+  list(
+    z = z_nodes,
+    radius = radius_profile,
+    weight = weights
+  )
+}
+
+#' @noRd
+.tmm_cylinder_modal_coefficients <- function(boundary,
+                                             k_sw,
+                                             theta_body,
+                                             theta_scatter,
+                                             radius,
+                                             n_max,
+                                             g_body = NA_real_,
+                                             h_body = NA_real_) {
+  sin_eff <- sqrt((sin(theta_body)^2 + sin(theta_scatter)^2) / 2)
+  k_eff <- pmax(abs(k_sw * sin_eff), 1e-10)
+  m_seq <- 0:as.integer(n_max)
+  nu <- neumann(m_seq)
+  k1a <- k_eff * radius
+
+  coeffs <- switch(boundary,
+    liquid_filled = .fcms_bm_fluid(
+      k1a = k1a,
+      k2a = k_eff / h_body * radius,
+      gh = g_body * h_body,
+      nu = nu,
+      m_limit = n_max
+    ),
+    gas_filled = .fcms_bm_fluid(
+      k1a = k1a,
+      k2a = k_eff / h_body * radius,
+      gh = g_body * h_body,
+      nu = nu,
+      m_limit = n_max
+    ),
+    fixed_rigid = .fcms_bm_fixed_rigid(k1a = k1a, nu = nu, m_limit = n_max),
+    pressure_release = .fcms_bm_pressure_release(
+      k1a = k1a,
+      nu = nu,
+      m_limit = n_max
+    ),
+    stop("Unsupported boundary for cylinder-native TMM branch.", call. = FALSE)
+  )
+
+  if (is.matrix(coeffs)) {
+    as.vector(coeffs[, 1])
+  } else {
+    as.vector(coeffs)
+  }
+}
+
+#' @noRd
+.tmm_cylinder_native_prefactor <- function(boundary) {
+  if (boundary %in% c("liquid_filled", "gas_filled")) {
+    return(-1 / pi)
+  }
+
+  1i / pi
+}
+
+#' @noRd
+.tmm_scattering_cylinder_native <- function(model_params,
+                                            shape_parameters,
+                                            theta_body,
+                                            phi_body,
+                                            theta_scatter,
+                                            phi_scatter,
+                                            frequency_idx = NULL) {
+  parameters <- model_params$parameters
+  acoustics <- parameters$acoustics
+  idx <- frequency_idx %||% seq_len(nrow(acoustics))
+  profile <- .tmm_cylinder_profile_quadrature(
+    shape_parameters = shape_parameters,
+    cylinder_endcap_fraction = parameters$cylinder_endcap_fraction
+  )
+  boundary <- parameters$boundary
+  dphi <- phi_body - phi_scatter
+
+  if (.tmm_is_monostatic_direction(
+    theta_body = theta_body,
+    phi_body = phi_body,
+    theta_scatter = theta_scatter,
+    phi_scatter = phi_scatter
+  )) {
+    return(vapply(
+      idx,
+      function(i) {
+        .tmm_cylindrical_monostatic_f_bs(
+          acoustics_row = acoustics[i, , drop = FALSE],
+          body_defaults = model_params$body,
+          shape_parameters = shape_parameters,
+          boundary = parameters$boundary,
+          theta_body = theta_body
+        )
+      },
+      complex(1)
+    ))
+  }
+
+  vapply(
+    idx,
+    function(i) {
+      acoustics_i <- acoustics[i, , drop = FALSE]
+      q_axial <- acoustics_i$k_sw * (cos(theta_body) - cos(theta_scatter))
+      axial_phase <- exp(1i * q_axial * profile$z)
+      modal_integral <- vapply(
+        seq_along(profile$z),
+        function(j) {
+          .tmm_cylinder_modal_coefficients(
+            boundary = boundary,
+            k_sw = acoustics_i$k_sw,
+            theta_body = theta_body,
+            theta_scatter = theta_scatter,
+            radius = profile$radius[j],
+            n_max = acoustics_i$n_max,
+            g_body = model_params$body$g_body,
+            h_body = model_params$body$h_body
+          ) * profile$weight[j] * axial_phase[j]
+        },
+        complex(length = acoustics_i$n_max + 1L)
+      )
+      modal_sum <- rowSums(modal_integral)
+      azimuth_term <- cos((0:acoustics_i$n_max) * dphi)
+      .tmm_cylinder_native_prefactor(boundary) * sum(modal_sum * azimuth_term)
+    },
+    complex(1)
+  )
+}
+
+# Backward-compatibility shim for any already-stored axisymmetric cylinder
+# objects created before the dedicated cylinder-native backend landed.
+#' @noRd
+.tmm_scattering_axisymmetric_cylinder <- function(model_params,
+                                                  shape_parameters,
+                                                  theta_body,
+                                                  phi_body,
+                                                  theta_scatter,
+                                                  phi_scatter,
+                                                  frequency_idx = NULL) {
+  .tmm_scattering_cylinder_native(
+    model_params = model_params,
+    shape_parameters = shape_parameters,
+    theta_body = theta_body,
+    phi_body = phi_body,
+    theta_scatter = theta_scatter,
+    phi_scatter = phi_scatter,
+    frequency_idx = frequency_idx
+  )
+}
+
+#' @noRd
+.tmm_scattering_cylinder_native_grid <- function(model_params,
+                                                 frequency_idx,
+                                                 shape_parameters,
+                                                 theta_body,
+                                                 phi_body,
+                                                 theta_scatter,
+                                                 phi_scatter) {
+  parameters <- model_params$parameters
+  acoustics_i <- parameters$acoustics[frequency_idx, , drop = FALSE]
+  profile <- .tmm_cylinder_profile_quadrature(
+    shape_parameters = shape_parameters,
+    cylinder_endcap_fraction = parameters$cylinder_endcap_fraction
+  )
+  boundary <- parameters$boundary
+  prefactor <- .tmm_cylinder_native_prefactor(boundary)
+  f_scat <- matrix(
+    0 + 0i,
+    nrow = length(theta_scatter),
+    ncol = length(phi_scatter)
+  )
+
+  for (i in seq_along(theta_scatter)) {
+    theta_i <- theta_scatter[i]
+    q_axial <- acoustics_i$k_sw * (cos(theta_body) - cos(theta_i))
+    axial_phase <- exp(1i * q_axial * profile$z)
+    modal_integral <- vapply(
+      seq_along(profile$z),
+      function(j) {
+        .tmm_cylinder_modal_coefficients(
+          boundary = boundary,
+          k_sw = acoustics_i$k_sw,
+          theta_body = theta_body,
+          theta_scatter = theta_i,
+          radius = profile$radius[j],
+          n_max = acoustics_i$n_max,
+          g_body = model_params$body$g_body,
+          h_body = model_params$body$h_body
+        ) * profile$weight[j] * axial_phase[j]
+      },
+      complex(length = acoustics_i$n_max + 1L)
+    )
+    modal_sum <- rowSums(modal_integral)
+    azimuth_term <- vapply(
+      phi_scatter,
+      function(phi_i) cos((0:acoustics_i$n_max) * (phi_body - phi_i)),
+      numeric(acoustics_i$n_max + 1L)
+    )
+    f_scat[i, ] <- prefactor * drop(modal_sum %*% azimuth_term)
+  }
+
+  f_scat
+}
+
 # Evaluate the stored TMM blocks at one stored frequency over a set of
 # incident/receive-angle combinations.
 #' @noRd
@@ -380,6 +814,35 @@
   }
 
   # Dispatch each angle tuple to the active retained-coordinate backend ========
+  if (parameters$coordinate_system == "spheroidal") {
+    if (!all(theta_body == theta_body[[1L]]) || !all(phi_body == phi_body[[1L]])) {
+      stop(
+        "Stored prolate TMM point evaluations currently require a single ",
+        "incident direction per batch.",
+        call. = FALSE
+      )
+    }
+    incident_internal <- .tmm_public_to_spheroidal_angles(
+      theta = theta_body[[1L]],
+      phi = phi_body[[1L]]
+    )
+    scatter_internal <- .tmm_public_to_spheroidal_angles(
+      theta = theta_scatter,
+      phi = phi_scatter
+    )
+    return(
+      prolate_spheroid_scattering_points_from_tmatrix_cpp(
+        acoustics = acoustics[frequency_idx, , drop = FALSE],
+        t_matrix = parameters$t_matrix[[frequency_idx]],
+        theta_body = incident_internal$theta[[1L]],
+        phi_body = incident_internal$phi[[1L]],
+        theta_scatter = scatter_internal$theta,
+        phi_scatter = scatter_internal$phi,
+        precision = parameters$precision %||% "double"
+      )
+    )
+  }
+
   vapply(
     seq_len(n_eval),
     function(i) {
@@ -392,11 +855,19 @@
           theta_scatter = theta_scatter[i],
           phi_scatter = phi_scatter[i]
         )[1]
-      } else if (parameters$coordinate_system == "spheroidal") {
-        .tmm_scattering_spheroidal(
+      } else if (parameters$coordinate_system == "sphere_modal") {
+        .tmm_scattering_sphere_modal(
           t_store = parameters$t_matrix[frequency_idx],
           acoustics = acoustics[frequency_idx, , drop = FALSE],
-          parameters = parameters,
+          theta_body = theta_body[i],
+          phi_body = phi_body[i],
+          theta_scatter = theta_scatter[i],
+          phi_scatter = phi_scatter[i]
+        )[1]
+      } else if (parameters$coordinate_system == "espsms_hybrid_grid") {
+        .tmm_scattering_hybrid_grid(
+          t_store = parameters$t_matrix[frequency_idx],
+          acoustics = acoustics[frequency_idx, , drop = FALSE],
           theta_body = theta_body[i],
           phi_body = phi_body[i],
           theta_scatter = theta_scatter[i],
@@ -404,6 +875,26 @@
         )[1]
       } else if (parameters$coordinate_system == "cylindrical") {
         .tmm_scattering_cylindrical(
+          model_params = model_params,
+          shape_parameters = shape_parameters,
+          theta_body = theta_body[i],
+          phi_body = phi_body[i],
+          theta_scatter = theta_scatter[i],
+          phi_scatter = phi_scatter[i],
+          frequency_idx = frequency_idx
+        )[1]
+      } else if (parameters$coordinate_system == "axisymmetric") {
+        .tmm_scattering_axisymmetric_cylinder(
+          model_params = model_params,
+          shape_parameters = shape_parameters,
+          theta_body = theta_body[i],
+          phi_body = phi_body[i],
+          theta_scatter = theta_scatter[i],
+          phi_scatter = phi_scatter[i],
+          frequency_idx = frequency_idx
+        )[1]
+      } else if (parameters$coordinate_system == "cylinder_native") {
+        .tmm_scattering_cylinder_native(
           model_params = model_params,
           shape_parameters = shape_parameters,
           theta_body = theta_body[i],
@@ -465,15 +956,51 @@
       azimuth_term <- cos(block$m * (phi_body - phi_scatter))
       f_scat <- f_scat + tcrossprod(theta_term, azimuth_term)
     }
-  } else if (parameters$coordinate_system == "spheroidal") {
-    f_scat <- prolate_spheroid_scattering_grid_from_tmatrix_cpp(
-      acoustics = acoustics[frequency_idx, , drop = FALSE],
-      t_matrix = t_store,
+  } else if (parameters$coordinate_system %in% c("axisymmetric", "cylinder_native")) {
+    f_scat <- .tmm_scattering_cylinder_native_grid(
+      model_params = model_params,
+      frequency_idx = frequency_idx,
+      shape_parameters = shape_parameters,
       theta_body = theta_body,
       phi_body = phi_body,
       theta_scatter = theta_scatter,
-      phi_scatter = phi_scatter,
+      phi_scatter = phi_scatter
+    )
+  } else if (parameters$coordinate_system == "spheroidal") {
+    incident_internal <- .tmm_public_to_spheroidal_angles(
+      theta = theta_body,
+      phi = phi_body
+    )
+    scatter_internal <- .tmm_public_to_spheroidal_angles(
+      theta = theta_scatter,
+      phi = phi_scatter
+    )
+    f_scat <- prolate_spheroid_scattering_grid_from_tmatrix_cpp(
+      acoustics = acoustics[frequency_idx, , drop = FALSE],
+      t_matrix = t_store,
+      theta_body = incident_internal$theta[[1L]],
+      phi_body = incident_internal$phi[[1L]],
+      theta_scatter = scatter_internal$theta,
+      phi_scatter = scatter_internal$phi,
       precision = parameters$precision %||% "double"
+    )
+  } else if (parameters$coordinate_system == "sphere_modal") {
+    f_scat <- .tmm_scattering_sphere_modal_grid(
+      model_params = model_params,
+      frequency_idx = frequency_idx,
+      theta_body = theta_body,
+      phi_body = phi_body,
+      theta_scatter = theta_scatter,
+      phi_scatter = phi_scatter
+    )
+  } else if (parameters$coordinate_system == "espsms_hybrid_grid") {
+    f_scat <- .tmm_scattering_hybrid_grid_matrix(
+      model_params = model_params,
+      frequency_idx = frequency_idx,
+      theta_body = theta_body,
+      phi_body = phi_body,
+      theta_scatter = theta_scatter,
+      phi_scatter = phi_scatter
     )
   } else if (parameters$coordinate_system == "cylindrical") {
     stop(
@@ -488,6 +1015,86 @@
 
   # Return the complex scattering grid =========================================
   f_scat
+}
+
+# Resolve cos(gamma) for the scattering angle between the incident and receive
+# directions in the body-fixed spherical convention.
+#' @noRd
+.tmm_scattering_cosine <- function(theta_body,
+                                   phi_body,
+                                   theta_scatter,
+                                   phi_scatter) {
+  cos(theta_body) * cos(theta_scatter) +
+    sin(theta_body) * sin(theta_scatter) * cos(phi_body - phi_scatter)
+}
+
+# Evaluate the exact stored sphere-modal coefficients at arbitrary receive
+# directions. This is used by the shell-sphere TMM branch.
+#' @noRd
+.tmm_scattering_sphere_modal <- function(t_store,
+                                         acoustics,
+                                         theta_body,
+                                         phi_body,
+                                         theta_scatter,
+                                         phi_scatter) {
+  mu <- .tmm_scattering_cosine(
+    theta_body = theta_body,
+    phi_body = phi_body,
+    theta_scatter = theta_scatter,
+    phi_scatter = phi_scatter
+  )
+
+  vapply(
+    seq_along(t_store),
+    function(i) {
+      store_i <- t_store[[i]]
+      p_n <- drop(.tmm_assoc_legendre_table(0L, max(store_i$n_seq), mu))
+      -1i / acoustics$k_sw[i] * sum(
+        (2 * store_i$n_seq + 1) * store_i$A_n * p_n[seq_along(store_i$n_seq)],
+        na.rm = TRUE
+      )
+    },
+    complex(1)
+  )
+}
+
+#' @noRd
+.tmm_scattering_sphere_modal_grid <- function(model_params,
+                                              frequency_idx,
+                                              theta_body,
+                                              phi_body,
+                                              theta_scatter,
+                                              phi_scatter) {
+  store_i <- model_params$parameters$t_matrix[[frequency_idx]]
+  acoustics_i <- model_params$parameters$acoustics[frequency_idx, , drop = FALSE]
+  mu <- outer(
+    theta_scatter,
+    phi_scatter,
+    Vectorize(function(theta_val, phi_val) {
+      .tmm_scattering_cosine(
+        theta_body = theta_body,
+        phi_body = phi_body,
+        theta_scatter = theta_val,
+        phi_scatter = phi_val
+      )
+    })
+  )
+  p_mat <- array(0, dim = c(length(theta_scatter), length(phi_scatter), length(store_i$n_seq)))
+  for (j in seq_along(store_i$n_seq)) {
+    p_mat[, , j] <- matrix(
+      .tmm_assoc_legendre_table(0L, max(store_i$n_seq), c(mu))[,
+        store_i$n_seq[j] + 1],
+      nrow = length(theta_scatter),
+      ncol = length(phi_scatter)
+    )
+  }
+
+  f_scat <- matrix(0 + 0i, nrow = length(theta_scatter), ncol = length(phi_scatter))
+  for (j in seq_along(store_i$n_seq)) {
+    f_scat <- f_scat + (2 * store_i$n_seq[j] + 1) * store_i$A_n[j] * p_mat[, , j]
+  }
+
+  -1i / acoustics_i$k_sw[1] * f_scat
 }
 
 # Evaluate the stored spherical-coordinate blocks at an arbitrary scattering
@@ -535,6 +1142,12 @@
   f_scat
 }
 
+# Evaluate the stored spherical-coordinate blocks at an arbitrary scattering
+# geometry using the already-solved outgoing coefficients for the stored
+# incident direction. This avoids one extra T %*% a_inc reconstruction when
+# the caller reuses the exact stored geometry.
+#' @noRd
+
 # Evaluate the stored spheroidal-coordinate blocks at an arbitrary scattering
 # geometry using the retained prolate modal operator.
 #' @noRd
@@ -545,14 +1158,22 @@
                                        phi_body,
                                        theta_scatter,
                                        phi_scatter) {
+  incident_internal <- .tmm_public_to_spheroidal_angles(
+    theta = theta_body,
+    phi = phi_body
+  )
+  scatter_internal <- .tmm_public_to_spheroidal_angles(
+    theta = theta_scatter,
+    phi = phi_scatter
+  )
   # Delegate prolate general-angle evaluation to the compiled retained backend =
   prolate_spheroid_scattering_from_tmatrix_cpp(
     acoustics = acoustics,
     t_matrix = t_store,
-    theta_body = theta_body,
-    phi_body = phi_body,
-    theta_scatter = theta_scatter,
-    phi_scatter = phi_scatter,
+    theta_body = incident_internal$theta,
+    phi_body = incident_internal$phi,
+    theta_scatter = scatter_internal$theta,
+    phi_scatter = scatter_internal$phi,
     precision = parameters$precision %||% "double"
   )
 }
@@ -564,7 +1185,10 @@
 #' `TMM` object using the stored transition-matrix blocks. This allows the same
 #' retained
 #' modal operator to be reused for arbitrary single-target incident and
-#' receive-angle combinations without rebuilding the boundary solve.
+#' receive-angle combinations without rebuilding the boundary solve. In the
+#' current package build, stored cylinders are limited to exact monostatic
+#' reuse through this helper; public general-angle cylinder bistatic evaluation
+#' remains outside scope.
 #'
 #' @param object Scatterer-object previously evaluated with
 #'   `target_strength(..., model = "TMM", store_t_matrix = TRUE)`.
@@ -604,12 +1228,52 @@ tmm_scattering <- function(object,
   phi_scatter <- .tmm_scalar_angle(
     phi_scatter, phi_body + pi, "phi_scatter"
   )
+  .tmm_validate_cylinder_public_scattering(
+    shape_parameters = shape_parameters,
+    theta_body = theta_body,
+    phi_body = phi_body,
+    theta_scatter = theta_scatter,
+    phi_scatter = phi_scatter,
+    helper = "tmm_scattering()"
+  )
 
   # Dispatch the retained evaluation through the active coordinate backend =====
   f_scat <- switch(parameters$coordinate_system,
     spherical = .tmm_scattering_spherical(
       t_store = parameters$t_matrix,
       acoustics = acoustics,
+      theta_body = theta_body,
+      phi_body = phi_body,
+      theta_scatter = theta_scatter,
+      phi_scatter = phi_scatter
+    ),
+    sphere_modal = .tmm_scattering_sphere_modal(
+      t_store = parameters$t_matrix,
+      acoustics = acoustics,
+      theta_body = theta_body,
+      phi_body = phi_body,
+      theta_scatter = theta_scatter,
+      phi_scatter = phi_scatter
+    ),
+    espsms_hybrid_grid = .tmm_scattering_hybrid_grid(
+      t_store = parameters$t_matrix,
+      acoustics = acoustics,
+      theta_body = theta_body,
+      phi_body = phi_body,
+      theta_scatter = theta_scatter,
+      phi_scatter = phi_scatter
+    ),
+    axisymmetric = .tmm_scattering_axisymmetric_cylinder(
+      model_params = model_params,
+      shape_parameters = shape_parameters,
+      theta_body = theta_body,
+      phi_body = phi_body,
+      theta_scatter = theta_scatter,
+      phi_scatter = phi_scatter
+    ),
+    cylinder_native = .tmm_scattering_cylinder_native(
+      model_params = model_params,
+      shape_parameters = shape_parameters,
       theta_body = theta_body,
       phi_body = phi_body,
       theta_scatter = theta_scatter,
@@ -846,8 +1510,8 @@ tmm_scattering <- function(object,
 #' This is useful for bistatic scattering maps, heatmaps, and polar-style
 #' visualizations without rebuilding the retained modal solve. In the current
 #' package build, this helper is available for the spherical and spheroidal
-#' stored branches. Stored cylinders intentionally stop at exact monostatic
-#' reuse until a validated retained cylinder angular operator is added.
+#' stored branches. Stored cylinders are intentionally outside the public scope
+#' of this helper and stop with an explicit error.
 #'
 #' @param object Scatterer-object previously evaluated with
 #'   `target_strength(..., model = "TMM", store_t_matrix = TRUE)`.
@@ -905,6 +1569,9 @@ tmm_scattering_grid <- function(object,
   phi_body <- angles$phi_body
   theta_scatter <- angles$theta_scatter
   phi_scatter <- angles$phi_scatter
+  if (identical(.tmm_shape_name(shape_parameters), "Cylinder")) {
+    .tmm_stop_cylinder_bistatic_public("tmm_scattering_grid()")
+  }
 
   # Evaluate the retained operator over the requested scattering grid ==========
   f_scat <- .tmm_scattering_grid_matrix(

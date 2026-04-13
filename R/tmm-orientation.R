@@ -376,7 +376,11 @@ tmm_average_orientation <- function(object,
     numeric(length(model_params$parameters$acoustics$frequency))
   )
   if (is.null(dim(sigma_mat))) {
-    sigma_mat <- matrix(sigma_mat, ncol = 1)
+    sigma_mat <- matrix(
+      sigma_mat,
+      nrow = length(model_params$parameters$acoustics$frequency),
+      ncol = n_angles
+    )
   }
   sigma_avg <- as.vector(sigma_mat %*% weights)
 

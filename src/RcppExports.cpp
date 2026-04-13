@@ -472,6 +472,23 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// prolate_spheroid_scattering_points_from_tmatrix_cpp
+Rcpp::ComplexVector prolate_spheroid_scattering_points_from_tmatrix_cpp(Rcpp::DataFrame acoustics, Rcpp::List t_matrix, double theta_body, double phi_body, Rcpp::NumericVector theta_scatter, Rcpp::NumericVector phi_scatter, std::string precision);
+RcppExport SEXP _acousticTS_prolate_spheroid_scattering_points_from_tmatrix_cpp(SEXP acousticsSEXP, SEXP t_matrixSEXP, SEXP theta_bodySEXP, SEXP phi_bodySEXP, SEXP theta_scatterSEXP, SEXP phi_scatterSEXP, SEXP precisionSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::DataFrame >::type acoustics(acousticsSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type t_matrix(t_matrixSEXP);
+    Rcpp::traits::input_parameter< double >::type theta_body(theta_bodySEXP);
+    Rcpp::traits::input_parameter< double >::type phi_body(phi_bodySEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type theta_scatter(theta_scatterSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type phi_scatter(phi_scatterSEXP);
+    Rcpp::traits::input_parameter< std::string >::type precision(precisionSEXP);
+    rcpp_result_gen = Rcpp::wrap(prolate_spheroid_scattering_points_from_tmatrix_cpp(acoustics, t_matrix, theta_body, phi_body, theta_scatter, phi_scatter, precision));
+    return rcpp_result_gen;
+END_RCPP
+}
 // tmm_backscatter_cpp
 Rcpp::ComplexVector tmm_backscatter_cpp(Rcpp::NumericVector frequency, double theta_body, std::string shape, Rcpp::NumericVector shape_values, std::string boundary, double sound_speed_sw, double density_sw, double density_body, double sound_speed_body, Rcpp::IntegerVector n_max);
 RcppExport SEXP _acousticTS_tmm_backscatter_cpp(SEXP frequencySEXP, SEXP theta_bodySEXP, SEXP shapeSEXP, SEXP shape_valuesSEXP, SEXP boundarySEXP, SEXP sound_speed_swSEXP, SEXP density_swSEXP, SEXP density_bodySEXP, SEXP sound_speed_bodySEXP, SEXP n_maxSEXP) {
@@ -553,6 +570,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_acousticTS_prolate_spheroid_tmatrix_cpp", (DL_FUNC) &_acousticTS_prolate_spheroid_tmatrix_cpp, 6},
     {"_acousticTS_prolate_spheroid_scattering_from_tmatrix_cpp", (DL_FUNC) &_acousticTS_prolate_spheroid_scattering_from_tmatrix_cpp, 7},
     {"_acousticTS_prolate_spheroid_scattering_grid_from_tmatrix_cpp", (DL_FUNC) &_acousticTS_prolate_spheroid_scattering_grid_from_tmatrix_cpp, 7},
+    {"_acousticTS_prolate_spheroid_scattering_points_from_tmatrix_cpp", (DL_FUNC) &_acousticTS_prolate_spheroid_scattering_points_from_tmatrix_cpp, 7},
     {"_acousticTS_tmm_backscatter_cpp", (DL_FUNC) &_acousticTS_tmm_backscatter_cpp, 10},
     {"_acousticTS_vesms_backscatter_cpp", (DL_FUNC) &_acousticTS_vesms_backscatter_cpp, 16},
     {NULL, NULL, 0}

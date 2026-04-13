@@ -247,13 +247,9 @@
                                          n_psi,
                                          sectors) {
   # Reject unsupported retained cylindrical bistatic workflows ================
-  if (identical(model_params$parameters$coordinate_system, "cylindrical")) {
-    stop(
-      "Stored cylindrical TMM bistatic summaries are not available yet. ",
-      "The current cylindrical retained operator supports exact monostatic ",
-      "reuse and orientation-averaged monostatic products only.",
-      call. = FALSE
-    )
+  if (model_params$parameters$coordinate_system %in%
+    c("cylindrical", "axisymmetric", "cylinder_native")) {
+    .tmm_stop_cylinder_bistatic_public("tmm_bistatic_summary()")
   }
 
   # Validate the local-slice resolution and resolve stored defaults ============
@@ -419,8 +415,8 @@
 #' peak-scattering direction, backscatter-lobe width, and integrated scattering
 #' over coarse angular sectors. In the current package build, this helper is
 #' available for the spherical and spheroidal stored branches. Stored cylinders
-#' intentionally stop at exact monostatic reuse until a validated retained
-#' cylinder angular operator is added.
+#' are intentionally outside the public scope of this helper and stop with an
+#' explicit error.
 #'
 #' @param object Scatterer-object previously evaluated with
 #'   `target_strength(..., model = "TMM", store_t_matrix = TRUE)`.
@@ -565,8 +561,8 @@ tmm_bistatic_summary <- function(object,
 #' orientation average, and a higher-level bistatic summary without rebuilding
 #' the underlying T-matrix solve. For stored cylinders, the currently supported
 #' products are the exact monostatic scattering spectrum and the corresponding
-#' orientation-averaged monostatic outputs; cylinder bistatic summaries remain
-#' unavailable until a validated retained cylinder angular operator is added.
+#' orientation-averaged monostatic outputs; cylinder bistatic summaries are
+#' intentionally outside the public scope.
 #'
 #' @param object Scatterer-object previously evaluated with
 #'   `target_strength(..., model = "TMM", store_t_matrix = TRUE)`.
