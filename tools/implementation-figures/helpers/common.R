@@ -92,14 +92,102 @@ impl_delta_label <- function() {
   expression(Delta ~ TS ~ (dB))
 }
 
+impl_heatmap_palette <- function(n = 101) {
+  grDevices::colorRampPalette(c("#2166ac", "#f7f7f7", "#b2182b"))(n)
+}
+
+impl_draw_colorbar <- function(zlim,
+                               palette_vals = impl_heatmap_palette(),
+                               label = impl_delta_label(),
+                               n_ticks = 5) {
+  zlim <- range(zlim, finite = TRUE)
+  if (length(zlim) != 2L || any(!is.finite(zlim))) {
+    zlim <- c(-1, 1)
+  }
+  if (diff(zlim) <= 0) {
+    zlim <- c(-1, 1)
+  }
+
+  usr <- graphics::par("usr")
+  x_range <- usr[2] - usr[1]
+  y_range <- usr[4] - usr[3]
+  if (!is.finite(x_range) || x_range == 0) {
+    x_range <- 1
+  }
+  if (!is.finite(y_range) || y_range == 0) {
+    y_range <- 1
+  }
+
+  x_left <- usr[2] + 0.05 * x_range
+  x_right <- usr[2] + 0.11 * x_range
+  y_bottom <- usr[3] + 0.08 * y_range
+  y_top <- usr[4] - 0.08 * y_range
+
+  old_xpd <- graphics::par("xpd")[[1]]
+  graphics::par(xpd = NA)
+  on.exit(graphics::par(xpd = old_xpd), add = TRUE)
+
+  y_edges <- seq(y_bottom, y_top, length.out = length(palette_vals) + 1L)
+  for (i in seq_along(palette_vals)) {
+    graphics::rect(
+      xleft = x_left,
+      ybottom = y_edges[[i]],
+      xright = x_right,
+      ytop = y_edges[[i + 1L]],
+      col = palette_vals[[i]],
+      border = NA
+    )
+  }
+  graphics::rect(
+    xleft = x_left,
+    ybottom = y_bottom,
+    xright = x_right,
+    ytop = y_top,
+    border = "gray30",
+    lwd = 0.8
+  )
+
+  ticks <- pretty(zlim, n = n_ticks)
+  ticks <- ticks[ticks >= zlim[[1]] & ticks <= zlim[[2]]]
+  if (!length(ticks)) {
+    ticks <- zlim
+  }
+  y_ticks <- y_bottom + (ticks - zlim[[1]]) / diff(zlim) * (y_top - y_bottom)
+  tick_extent <- 0.015 * x_range
+  graphics::segments(
+    x0 = x_right,
+    y0 = y_ticks,
+    x1 = x_right + tick_extent,
+    y1 = y_ticks
+  )
+  graphics::text(
+    x = x_right + 0.025 * x_range,
+    y = y_ticks,
+    labels = format(signif(ticks, 3), trim = TRUE),
+    adj = c(0, 0.5),
+    cex = 0.68
+  )
+  graphics::text(
+    x = (x_left + x_right) / 2,
+    y = y_top + 0.06 * y_range,
+    labels = label,
+    cex = 0.72
+  )
+}
+
 impl_sort_compare_df <- function(df) {
   sort_cols <- intersect(
     c(
+      "stage",
+      "validation_case",
+      "boundary_condition",
       "case",
+      "size_scale",
       "frequency_hz",
       "frequency",
       "frequency_khz",
       "angle_deg",
+      "theta_body_deg",
       "theta_deg",
       "phi_deg",
       "ka"
