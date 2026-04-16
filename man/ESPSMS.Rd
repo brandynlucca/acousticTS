@@ -9,9 +9,10 @@
 \title{Elastic-shell prolate spheroidal model (ESPSMS)}
 \description{
 The original experimental \code{ESPSMS} branch used a projected thin-shell
-impedance approximation on the prolate surface. That route did not validate as
-a genuine elastic-shelled prolate spheroid model and is disabled by default
-while a shell-only modal/numerical rebuild is developed.
+impedance approximation on the prolate surface. That route did not validate
+against the shell-only literature or against independent shell validation and
+is now disabled while a paper-backed elastic-shelled prolate formulation is
+rebuilt.
 }
 \section{Usage}{
 
@@ -38,11 +39,12 @@ target_strength(
 (\eqn{m~s^{-1}}).}
 \item{\code{density_sw}}{Surrounding-medium density (\eqn{kg~m^{-3}}).}
 \item{\code{n_max}}{Reserved for the future native shell-only rebuild.}
-\item{\code{solver_backend}}{Use \code{"disabled"} to keep the rebuild branch
-off, or \code{"hybrid_reference"} to run the external coupled shell-fluid
-reference backend.}
+\item{\code{solver_backend}}{Use \code{"disabled"} to keep the rebuild
+branch off, or \code{"hybrid_reference"} to use the external coupled
+shell-fluid reference backend.}
 \item{\code{theta_body_deg}}{Optional orientation override for the current
-experimental backend. Only \code{0} and \code{180} are supported at present.}
+experimental backend. Only \code{0} and \code{180} are supported at
+present.}
 \item{\code{validation_repo}}{Optional path to the sibling
 \code{acousticTSValidation} repository when using the hybrid-reference
 backend.}
@@ -50,17 +52,16 @@ backend.}
 }
 
 \section{Implementation route}{
-The retired approximation has been removed from default public use. The
-intended replacement route is a shell-only elastic-shelled prolate formulation
-built from the dedicated prolate shell vibration and scattering literature,
-validated first against an independent hybrid elastic-shell \code{FEM/BEM}
-reference and only then wrapped into \code{TMM} for bistatic use.
 
-Until the native direct solver is rebuilt, the package exposes an explicit
-experimental \code{"hybrid_reference"} backend for monostatic axial-incidence
-runs. That backend delegates to the external coupled shell-fluid solver in the
-validation repository and is intended only for rebuild-stage comparison and
-development.
+The next supported implementation follows the elastic-shelled prolate
+literature directly, using shell-only modal/numerical equations from the
+prolate shell vibration/scattering literature together with an independent
+hybrid shell validator before any \code{TMM} wrapping is restored.
+
+The current rebuild keeps the old proxy branch disabled by default. An
+explicit experimental backend, \code{solver_backend = "hybrid_reference"}, is
+available for monostatic axial-incidence runs when the sibling
+\code{acousticTSValidation} repository and the Python hybrid helper are available.
 }
 
 \references{

@@ -31,7 +31,7 @@ target_strength(
 \code{"psms"} (\code{\link{PSMS}}),
 \code{"sphms"} (\code{\link{SPHMS}}),
 \code{"essms"} (\code{\link{ESSMS}}),
-\code{"espsms"} / \code{"epsms"} (\code{\link{ESPSMS}}, disabled by default while being rebuilt, with an explicit experimental hybrid-reference backend for monostatic axial-incidence rebuild checks),
+\code{"espsms"} / \code{"epsms"} (\code{\link{ESPSMS}}),
 \code{"vesms"} (\code{\link{VESMS}}),
 \code{"trcm"} (\code{\link{TRCM}}), and
 \code{"calibration"} / \code{"soems"} (\code{\link{SOEMS}}).}

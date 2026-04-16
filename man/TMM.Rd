@@ -11,9 +11,9 @@ transition-matrix formulation. The current implementation targets smooth
 bodies of revolution and finite cylinders already represented in the
 package as a \code{Sphere}, \code{OblateSpheroid}, \code{ProlateSpheroid}, or \code{Cylinder}.
 It also supports spherical fluid shells and spherical elastic
-shells carried by \code{ESS} objects. An internal experimental
-hybrid-reference path is also retained for elastic-shelled prolate
-spheroids under axial incidence rebuild work. The current public boundaries therefore cover rigid,
+shells carried by \code{ESS} objects. An internal experimental hybrid-reference
+path is also retained for elastic-shelled prolate spheroids under axial
+incidence rebuild work. The current public boundaries therefore cover rigid,
 pressure-release, and homogeneous penetrable fluid/gas interiors for
 homogeneous bodies, plus \code{shelled_pressure_release}, \code{shelled_liquid}, and
 \code{shelled_gas} for shell spheres, and \code{elastic_shelled} for spherical elastic
