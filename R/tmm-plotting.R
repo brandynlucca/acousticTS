@@ -164,16 +164,125 @@
   list(z = z_vals, label = z_lab, quantity = quantity)
 }
 
+# Build one incident-local theta/phi evaluation grid for native polar plotting.
+#' @noRd
+.tmm_incident_local_polar_grid <- function(object,
+                                           frequency = NULL,
+                                           theta_body = NULL,
+                                           phi_body = NULL,
+                                           psi_scatter = NULL,
+                                           alpha_scatter = NULL,
+                                           n_theta = 91,
+                                           n_phi = 181) {
+  model_params <- .tmm_require_stored_blocks(object)
+  .tmm_warn_exploratory_cylinder_blocks(object, model_params)
+  parameters <- model_params$parameters
+  defaults <- model_params$body
+  acoustics <- parameters$acoustics
+  shape_parameters <- acousticTS::extract(object, "shape_parameters")
+  idx <- .tmm_plot_frequency_index(frequency, acoustics$frequency)
+  .tmm_validate_scattering_grid_dims(n_theta, n_phi)
+
+  theta_body <- .tmm_scalar_angle(theta_body, defaults$theta_body, "theta_body")
+  phi_body <- .tmm_scalar_angle(phi_body, defaults$phi_body %||% pi, "phi_body")
+  psi_scatter <- .tmm_angle_vector(
+    psi_scatter,
+    default = c(0, pi),
+    n_default = n_theta,
+    lower = 0,
+    upper = pi,
+    name = "psi_scatter"
+  )
+  if (is.null(alpha_scatter)) {
+    alpha_scatter <- seq(0, 2 * pi, length.out = n_phi + 1L)
+    alpha_scatter <- alpha_scatter[seq_len(n_phi)]
+  } else {
+    alpha_scatter <- .tmm_angle_vector(
+      alpha_scatter,
+      lower = 0,
+      upper = 2 * pi,
+      name = "alpha_scatter"
+    )
+    alpha_scatter <- sort(unique(.tmm_wrap_angle_2pi(alpha_scatter)))
+  }
+
+  local_dirs <- .tmm_local_grid_directions(
+    theta_body = theta_body,
+    phi_body = phi_body,
+    psi_scatter = psi_scatter,
+    alpha_scatter = alpha_scatter
+  )
+  f_scat <- .tmm_scattering_points(
+    model_params = model_params,
+    frequency_idx = idx,
+    shape_parameters = shape_parameters,
+    theta_body = rep(theta_body, nrow(local_dirs)),
+    phi_body = rep(phi_body, nrow(local_dirs)),
+    theta_scatter = local_dirs$theta_scatter,
+    phi_scatter = local_dirs$phi_scatter
+  )
+  f_scat <- matrix(
+    f_scat,
+    nrow = length(psi_scatter),
+    ncol = length(alpha_scatter)
+  )
+
+  list(
+    frequency = acoustics$frequency[idx],
+    theta_body = theta_body,
+    phi_body = phi_body,
+    theta_scatter = psi_scatter,
+    phi_scatter = alpha_scatter,
+    psi_scatter = psi_scatter,
+    alpha_scatter = alpha_scatter,
+    theta_scatter_world = matrix(
+      local_dirs$theta_scatter,
+      nrow = length(psi_scatter),
+      ncol = length(alpha_scatter)
+    ),
+    phi_scatter_world = matrix(
+      local_dirs$phi_scatter,
+      nrow = length(psi_scatter),
+      ncol = length(alpha_scatter)
+    ),
+    coordinate_frame = "incident_local",
+    f_scat = f_scat,
+    sigma_scat = .sigma_bs(f_scat),
+    sigma_scat_dB = db(.sigma_bs(f_scat))
+  )
+}
+
 # Build a symmetric grid-edge vector for cell-based plotting.
 #' @noRd
 .plot_tmm_scattering_heatmap <- function(grid, quantity = "sigma_scat_dB") {
   # Resolve the plotted grid values and legend label ===========================
   plot_data <- .tmm_grid_plot_data(grid, quantity = quantity)
+  coordinate_frame <- grid$coordinate_frame %||% "world"
+  x_vals <- if (identical(coordinate_frame, "incident_local")) {
+    grid$alpha_scatter %||% grid$phi_scatter
+  } else {
+    grid$phi_scatter
+  }
+  y_vals <- if (identical(coordinate_frame, "incident_local")) {
+    grid$psi_scatter %||% grid$theta_scatter
+  } else {
+    grid$theta_scatter
+  }
+  x_lab <- if (identical(coordinate_frame, "incident_local")) {
+    expression(alpha[scatter] ~ "(rad)")
+  } else {
+    expression(phi[scatter] ~ "(rad)")
+  }
+  y_lab <- if (identical(coordinate_frame, "incident_local")) {
+    expression(psi[scatter] ~ "(rad)")
+  } else {
+    expression(theta[scatter] ~ "(rad)")
+  }
 
   # Draw the filled contour heatmap with TMM-specific axis labels ==============
   graphics::filled.contour(
-    x = grid$phi_scatter,
-    y = grid$theta_scatter,
+    x = x_vals,
+    y = y_vals,
     z = t(plot_data$z),
     xlab = "",
     ylab = "",
@@ -183,9 +292,17 @@
       graphics::axis(2)
     },
     plot.title = graphics::title(
-      main = sprintf("TMM scattering grid at %.1f kHz", grid$frequency * 1e-3),
-      xlab = expression(phi[scatter] ~ "(rad)"),
-      ylab = expression(theta[scatter] ~ "(rad)")
+      main = sprintf(
+        "TMM %s scattering grid at %.1f kHz",
+        if (identical(coordinate_frame, "incident_local")) {
+          "incident-local"
+        } else {
+          "world"
+        },
+        grid$frequency * 1e-3
+      ),
+      xlab = x_lab,
+      ylab = y_lab
     ),
     color.palette = function(n) grDevices::hcl.colors(n, "Spectral", rev = TRUE)
   )
@@ -199,6 +316,17 @@
 .plot_tmm_scattering_polar <- function(grid, quantity = "sigma_scat_dB") {
   # Resolve the plotted quantity and finite dynamic range ======================
   plot_data <- .tmm_grid_plot_data(grid, quantity = quantity)
+  coordinate_frame <- grid$coordinate_frame %||% "world"
+  theta_vals <- if (identical(coordinate_frame, "incident_local")) {
+    grid$psi_scatter %||% grid$theta_scatter
+  } else {
+    grid$theta_scatter
+  }
+  phi_vals <- if (identical(coordinate_frame, "incident_local")) {
+    grid$alpha_scatter %||% grid$phi_scatter
+  } else {
+    grid$phi_scatter
+  }
   z_vals <- plot_data$z
   z_finite <- z_vals[is.finite(z_vals)]
 
@@ -211,8 +339,8 @@
   }
 
   # Build the polar cell geometry, palette, and legend scale ===================
-  theta_edges <- .tmm_grid_edges(grid$theta_scatter, lower = 0, upper = pi)
-  phi_edges <- .tmm_grid_edges(grid$phi_scatter, lower = 0, upper = 2 * pi)
+  theta_edges <- .tmm_grid_edges(theta_vals, lower = 0, upper = pi)
+  phi_edges <- .tmm_grid_edges(phi_vals, lower = 0, upper = 2 * pi)
   palette <- grDevices::hcl.colors(128, "Spectral", rev = TRUE)
   z_breaks <- seq(min(z_finite), max(z_finite),
     length.out = length(palette) + 1
@@ -237,15 +365,23 @@
     yaxs = "i"
   )
   graphics::mtext(
-    sprintf("TMM polar scattering map at %.1f kHz", grid$frequency * 1e-3),
+    sprintf(
+      "TMM %s polar scattering map at %.1f kHz",
+      if (identical(coordinate_frame, "incident_local")) {
+        "incident-local"
+      } else {
+        "world"
+      },
+      grid$frequency * 1e-3
+    ),
     side = 3,
     line = 0.35,
     font = 2
   )
 
   # Fill each polar cell with the corresponding scattering value ===============
-  for (j in seq_len(length(grid$phi_scatter))) {
-    for (i in seq_len(length(grid$theta_scatter))) {
+  for (j in seq_len(length(phi_vals))) {
+    for (i in seq_len(length(theta_vals))) {
       z_ij <- z_vals[i, j]
       if (!is.finite(z_ij)) {
         next
@@ -374,17 +510,30 @@
 
   # Route map-style requests through the 2D grid plotting helpers ==============
   if (isTRUE(polar) || isTRUE(heatmap)) {
-    grid <- do.call(tmm_scattering_grid, c(list(object = object), extra_args))
+    grid_args <- extra_args
+    quantity <- grid_args$quantity %||% "sigma_scat_dB"
+    grid_args$quantity <- NULL
     if (isTRUE(polar)) {
+      polar_frame <- grid_args$frame %||% "incident_local"
+      grid_args$frame <- NULL
+      grid <- if (identical(polar_frame, "incident_local")) {
+        do.call(.tmm_incident_local_polar_grid, c(list(object = object), grid_args))
+      } else {
+        do.call(tmm_scattering_grid, c(list(object = object), grid_args))
+      }
       return(invisible(.plot_tmm_scattering_polar(
         grid,
-        quantity = extra_args$quantity %||% "sigma_scat_dB"
+        quantity = quantity
       )))
     }
-    return(invisible(.plot_tmm_scattering_heatmap(
-      grid,
-      quantity = extra_args$quantity %||% "sigma_scat_dB"
-    )))
+    heatmap_frame <- grid_args$frame %||% "world"
+    grid_args$frame <- NULL
+    grid <- if (identical(heatmap_frame, "incident_local")) {
+      do.call(.tmm_incident_local_polar_grid, c(list(object = object), grid_args))
+    } else {
+      do.call(tmm_scattering_grid, c(list(object = object), grid_args))
+    }
+    return(invisible(.plot_tmm_scattering_heatmap(grid, quantity = quantity)))
   }
 
   # Build the one-dimensional slice and its plotting limits ====================

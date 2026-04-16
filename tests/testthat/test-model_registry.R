@@ -60,6 +60,8 @@ test_that("available_models lists built-ins and target_strength resolves aliases
 
   expect_true("calibration" %in% models$model)
   expect_true(any(models$model == "calibration" & grepl("soems", models$aliases)))
+  expect_true("espsms" %in% models$model)
+  expect_true(any(models$model == "espsms" & grepl("epsms", models$aliases)))
 
   cal_obj <- target_strength(cal_generate(), frequency = 38e3, model = "soems")
 

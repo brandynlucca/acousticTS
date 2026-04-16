@@ -37,7 +37,10 @@ Evaluates the far-field scattering amplitude from a previously computed
 \code{TMM} object using the stored transition-matrix blocks. This allows the same
 retained
 modal operator to be reused for arbitrary single-target incident and
-receive-angle combinations without rebuilding the boundary solve.
+receive-angle combinations without rebuilding the boundary solve. In the
+current package build, stored cylinders are limited to exact monostatic
+reuse through this helper; public general-angle cylinder bistatic evaluation
+remains outside scope.
 }
 \seealso{
 \code{\link[=target_strength]{target_strength()}}, \code{\link{tmm_average_orientation}}

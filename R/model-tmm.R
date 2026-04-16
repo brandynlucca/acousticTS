@@ -9,9 +9,9 @@
 #' bodies of revolution and finite cylinders already represented in the
 #' package as a `Sphere`, `OblateSpheroid`, `ProlateSpheroid`, or `Cylinder`.
 #' It also supports spherical fluid shells and spherical elastic
-#' shells carried by `ESS` objects. An explicit experimental hybrid-reference
-#' path is also available for elastic-shelled prolate spheroids under axial
-#' incidence. The current public boundaries therefore cover rigid,
+#' shells carried by `ESS` objects. An internal experimental hybrid-reference
+#' path is also retained for elastic-shelled prolate spheroids under axial
+#' incidence rebuild work. The current public boundaries therefore cover rigid,
 #' pressure-release, and homogeneous penetrable fluid/gas interiors for
 #' homogeneous bodies, plus `shelled_pressure_release`, `shelled_liquid`, and
 #' `shelled_gas` for shell spheres, and `elastic_shelled` for spherical elastic
@@ -42,12 +42,10 @@
 #' intentionally outside the current scope. Cylinder calls therefore still emit
 #' a warning by default while this narrower validation scope is being
 #' maintained; see \code{options(acousticTS.warn_tmm_cylinder = FALSE)} to
-#' silence it in controlled test or benchmarking workflows. Elastic-shelled
-#' prolate spheroids currently expose an experimental retained-grid route backed
-#' by the coupled shell-fluid hybrid solver in the sibling
-#' `acousticTSValidation` repository. That branch currently supports axial
-#' incidence only (`theta_body_deg = 0` or `180`) and is enabled explicitly
-#' with `elastic_shell_backend = "hybrid_reference"`.
+#' silence it in controlled test or benchmarking workflows. An internal
+#' elastic-shelled prolate retained-grid route is still available for rebuild
+#' comparisons through package options, but it is not part of the normal public
+#' `target_strength()` interface.
 #'
 #' The present solver is therefore a practical single-target acoustic
 #' T-matrix method motivated by the classic transition-matrix literature, but
@@ -64,13 +62,7 @@
 #'   boundary,
 #'   sound_speed_sw,
 #'   density_sw,
-#'   n_max,
-#'   cylinder_backend,
-#'   store_t_matrix,
-#'   cylinder_endcap_fraction,
-#'   elastic_shell_backend,
-#'   theta_body_deg,
-#'   validation_repo
+#'   store_t_matrix
 #' )
 #' }
 #'
@@ -82,32 +74,11 @@
 #'   \code{"shelled_pressure_release"}, \code{"shelled_liquid"}, or
 #'   \code{"shelled_gas"}, or \code{"elastic_shelled"}. The fluid-shell
 #'   boundaries are currently restricted to spherical `ESS` objects. The
-#'   `elastic_shelled` boundary supports spherical `ESS` objects directly and
-#'   also exposes an experimental axial-incidence prolate-shell route when
-#'   `elastic_shell_backend = "hybrid_reference"` is supplied.}
+#'   \code{"elastic_shelled"} branch remains public for spherical elastic
+#'   shells.}
 #'   \item{\code{sound_speed_sw}}{Surrounding-medium sound speed
 #'   (\eqn{m~s^{-1}}).}
 #'   \item{\code{density_sw}}{Surrounding-medium density (\eqn{kg~m^{-3}}).}
-#'   \item{\code{n_max}}{Optional truncation limit. For spheres and oblate
-#'   spheroids, this is the maximum spherical-wave degree used in the truncated
-#'   T-matrix solve. For the default monostatic cylinder branch, it is the
-#'   cylindrical modal cutoff used in the geometry-matched backend. When left
-#'   as \code{NULL}, a geometry-aware rule is used frequency-by-frequency. This
-#'   argument is currently ignored for prolate spheroids, which use the
-#'   spheroidal-coordinate branch.}
-#'   \item{\code{cylinder_backend}}{Cylinder-specific backend selection. One of
-#'   \code{"auto"}, \code{"legacy"}, or \code{"retained"}. The default
-#'   \code{"auto"} keeps plain sharp-cylinder monostatic runs on the
-#'   geometry-matched cylindrical branch, but can switch stored-cylinder
-#'   workflows and tapered or explicitly endcap-smoothed cylinders onto the
-#'   retained internal branch used for exact monostatic reuse. This argument is
-#'   ignored for non-cylinder shapes.}
-#'   \item{\code{cylinder_endcap_fraction}}{Optional non-negative smoothing
-#'   fraction used only by the retained axisymmetric cylinder backend. When
-#'   positive, this rounds each sharp cylinder endcap over that fraction of the
-#'   half-length using a short spheroidal cap profile. The default \code{NULL}
-#'   keeps sharp cylinders sharp. This argument is ignored for non-cylinder
-#'   shapes and for the default legacy cylinder backend.}
 #'   \item{\code{store_t_matrix}}{Logical flag controlling whether the
 #'   frequency-specific retained state is stored under
 #'   \code{object@model_parameters$TMM$parameters$t_matrix}. The default is
@@ -116,19 +87,10 @@
 #'   stored runs keep the geometry-matched monostatic family on the model table
 #'   while retaining only the exact monostatic reuse path; public cylinder
 #'   bistatic and grid helpers remain outside scope. For the experimental
-#'   elastic-shelled prolate branch, the retained state is the externally
-#'   generated hybrid scattering grid.}
-#'   \item{\code{elastic_shell_backend}}{Elastic-shelled prolate backend
-#'   selection. The default \code{"default"} keeps that branch disabled.
-#'   Supply \code{"hybrid_reference"} to use the coupled shell-fluid hybrid
-#'   solver from the sibling \code{acousticTSValidation} repository. Ignored
-#'   for all non-prolate or non-elastic-shell calls.}
-#'   \item{\code{theta_body_deg}}{Optional body-axis incidence angle in
-#'   degrees for the experimental elastic-shelled prolate branch. Only
-#'   \code{0} and \code{180} are supported at present. Ignored otherwise.}
-#'   \item{\code{validation_repo}}{Optional path to the sibling
-#'   \code{acousticTSValidation} repository used by the experimental
-#'   elastic-shelled prolate hybrid backend.}
+#'   elastic-shelled prolate rebuild route, the retained state is the
+#'   externally generated hybrid scattering grid. The advanced solver and
+#'   backend overrides used for internal rebuild work are not part of the
+#'   normal public `target_strength()` interface.}
 #' }
 #'
 #' @section Theory:
@@ -190,6 +152,39 @@
 #' @keywords models acoustics internal
 NULL
 
+#' Resolve internal TMM runtime controls kept outside the normal public API.
+#' @noRd
+.tmm_internal_controls <- function() {
+  opt_scalar <- function(name, default = NULL) {
+    value <- getOption(name, default)
+    if (is.null(value)) {
+      return(NULL)
+    }
+    value[[1L]]
+  }
+
+  list(
+    n_max = opt_scalar("acousticTS.tmm_n_max", NULL),
+    cylinder_backend = NULL,
+    cylinder_endcap_fraction = opt_scalar("acousticTS.tmm_cylinder_endcap_fraction", NULL),
+    elastic_shell_backend = match.arg(
+      as.character(opt_scalar("acousticTS.tmm_elastic_shell_backend", "default")),
+      c("default", "hybrid_reference")
+    ),
+    validation_repo = opt_scalar("acousticTS.tmm_validation_repo", NULL),
+    python = as.character(opt_scalar(
+      "acousticTS.tmm_python",
+      Sys.getenv("ACOUSTICTS_PYTHON", unset = "python")
+    )),
+    theta_body_deg = opt_scalar("acousticTS.tmm_theta_body_deg", NULL),
+    n_eta = as.integer(opt_scalar("acousticTS.tmm_hybrid_n_eta", 129L)),
+    mesh_n_u = as.integer(opt_scalar("acousticTS.tmm_hybrid_mesh_n_u", 12L)),
+    mesh_n_v = as.integer(opt_scalar("acousticTS.tmm_hybrid_mesh_n_v", 16L)),
+    n_theta = as.integer(opt_scalar("acousticTS.tmm_hybrid_n_theta", 91L)),
+    n_phi = as.integer(opt_scalar("acousticTS.tmm_hybrid_n_phi", 181L))
+  )
+}
+
 #' Initialize object for the transition matrix method
 #'
 #' @param object Scatterer-class object.
@@ -197,10 +192,6 @@ NULL
 #' @param boundary Boundary condition at the target surface.
 #' @param sound_speed_sw Surrounding-medium sound speed (m/s).
 #' @param density_sw Surrounding-medium density (kg/m^3).
-#' @param n_max Optional truncation degree for the spherical-wave basis.
-#' @param cylinder_backend Optional cylinder backend selector.
-#' @param cylinder_endcap_fraction Optional smoothing fraction for the retained
-#'   axisymmetric cylinder branch.
 #' @param store_t_matrix Logical; retain the frequency-specific T-matrix blocks.
 #' @keywords internal
 #' @noRd
@@ -209,23 +200,23 @@ tmm_initialize <- function(object,
                            boundary = NULL,
                            sound_speed_sw = .SEAWATER_SOUND_SPEED_DEFAULT,
                            density_sw = .SEAWATER_DENSITY_DEFAULT,
-                           n_max = NULL,
-                           cylinder_backend = "auto",
-                           cylinder_endcap_fraction = NULL,
-                           store_t_matrix = FALSE,
-                           elastic_shell_backend = c("default", "hybrid_reference"),
-                           validation_repo = NULL,
-                           python = Sys.getenv("ACOUSTICTS_PYTHON", unset = "python"),
-                           theta_body_deg = NULL,
-                           n_eta = 129L,
-                           mesh_n_u = 12L,
-                           mesh_n_v = 16L,
-                           n_theta = 91L,
-                           n_phi = 181L) {
+                           store_t_matrix = FALSE) {
   # Enforce the current homogeneous-fluid scatterer scope ======================
   .tmm_validate_object_scope(object)
   .tmm_validate_store_t_matrix(store_t_matrix)
-  elastic_shell_backend <- match.arg(elastic_shell_backend)
+  internal <- .tmm_internal_controls()
+  n_max <- internal$n_max
+  cylinder_backend <- internal$cylinder_backend
+  cylinder_endcap_fraction <- internal$cylinder_endcap_fraction
+  elastic_shell_backend <- internal$elastic_shell_backend
+  validation_repo <- internal$validation_repo
+  python <- internal$python
+  theta_body_deg <- internal$theta_body_deg
+  n_eta <- internal$n_eta
+  mesh_n_u <- internal$mesh_n_u
+  mesh_n_v <- internal$mesh_n_v
+  n_theta <- internal$n_theta
+  n_phi <- internal$n_phi
   cylinder_endcap_fraction <- .tmm_resolve_cylinder_endcap_fraction(
     cylinder_endcap_fraction
   )
@@ -275,8 +266,8 @@ tmm_initialize <- function(object,
     if (!identical(elastic_shell_backend, "hybrid_reference")) {
       stop(
         paste(
-          "Elastic-shelled prolate TMM currently requires",
-          "'elastic_shell_backend = \"hybrid_reference\"'."
+          "Elastic-shelled prolate TMM currently requires the internal",
+          "hybrid-reference backend option."
         ),
         call. = FALSE
       )
@@ -284,8 +275,8 @@ tmm_initialize <- function(object,
     if (is.null(theta_body_deg)) {
       stop(
         paste(
-          "Elastic-shelled prolate TMM currently needs an explicit axial",
-          "'theta_body_deg' override of 0 or 180."
+          "Elastic-shelled prolate TMM currently needs the internal axial",
+          "incidence override (0 or 180 degrees)."
         ),
         call. = FALSE
       )
@@ -294,7 +285,10 @@ tmm_initialize <- function(object,
     if (!is.finite(theta_body_deg) ||
       !(isTRUE(all.equal(theta_body_deg %% 180, 0, tolerance = 1e-8)))) {
       stop(
-        "Elastic-shelled prolate TMM currently supports axial 'theta_body_deg' only (0 or 180).",
+        paste(
+          "Elastic-shelled prolate TMM currently supports only axial internal",
+          "incidence overrides (0 or 180 degrees)."
+        ),
         call. = FALSE
       )
     }

@@ -9,9 +9,15 @@
 Computes monostatic backscatter from a single axisymmetric target using a
 transition-matrix formulation. The current implementation targets smooth
 bodies of revolution and finite cylinders already represented in the
-package as a \code{Sphere}, \code{OblateSpheroid}, \code{ProlateSpheroid}, or \code{Cylinder},
-and supports rigid, pressure-release, and homogeneous penetrable fluid/gas
-interiors.
+package as a \code{Sphere}, \code{OblateSpheroid}, \code{ProlateSpheroid}, or \code{Cylinder}.
+It also supports spherical fluid shells and spherical elastic
+shells carried by \code{ESS} objects. An internal experimental
+hybrid-reference path is also retained for elastic-shelled prolate
+spheroids under axial incidence rebuild work. The current public boundaries therefore cover rigid,
+pressure-release, and homogeneous penetrable fluid/gas interiors for
+homogeneous bodies, plus \code{shelled_pressure_release}, \code{shelled_liquid}, and
+\code{shelled_gas} for shell spheres, and \code{elastic_shelled} for spherical elastic
+shells plus the experimental axial prolate-shell branch.
 }
 \details{
 This implementation is intentionally scoped to \strong{single targets} and the
@@ -19,20 +25,29 @@ monostatic backscatter quantity used by \code{target_strength()}.
 
 For spheres and oblate spheroids, the current implementation uses a
 spherical-wave basis with an explicit projected boundary solve over the
-target surface. For prolate spheroids, it instead uses a
+target surface. Spherical fluid shells instead stay on the exact layered
+sphere modal path already represented by \code{SPHMS}, but are retained and
+post-processed through the same stored \code{TMM} workflow. Spherical elastic
+shells analogously stay on the exact \code{ESSMS} modal path while exposing the
+same retained \code{TMM} angular post-processing interface. For prolate
+spheroids, it instead uses a
 spheroidal-coordinate transition-matrix-equivalent backend, which is the
 more natural coordinate system for that geometry and is consistent with the
 scalar spheroidal T-matrix literature for single-target scattering. For
 finite cylinders, the default monostatic branch uses a
 cylindrical-coordinate modal/T-matrix-equivalent backend so that the
 backscatter benchmark remains aligned with the exact finite-cylinder family.
-When \code{store_t_matrix = TRUE}, cylinders retain lightweight
-cylindrical-family state that supports exact monostatic reuse and
-orientation-averaged monostatic products, while general-angle cylinder
-bistatic post-processing remains outside the current validated scope. Because
-of that narrower validation status, cylinder calls emit a warning by default;
-see \code{options(acousticTS.warn_tmm_cylinder = FALSE)} to silence it in
-controlled test or benchmarking workflows.
+When \code{store_t_matrix = TRUE}, sharp cylinders keep that exact
+finite-cylinder monostatic family on the stored model table and retain only
+the exact monostatic reuse path needed by the standard monostatic
+post-processing helpers. Public general-angle cylinder bistatic helpers are
+intentionally outside the current scope. Cylinder calls therefore still emit
+a warning by default while this narrower validation scope is being
+maintained; see \code{options(acousticTS.warn_tmm_cylinder = FALSE)} to
+silence it in controlled test or benchmarking workflows. An internal
+elastic-shelled prolate retained-grid route is still available for rebuild
+comparisons through package options, but it is not part of the normal public
+\code{target_strength()} interface.
 
 The present solver is therefore a practical single-target acoustic
 T-matrix method motivated by the classic transition-matrix literature, but
@@ -50,7 +65,6 @@ target_strength(
   boundary,
   sound_speed_sw,
   density_sw,
-  n_max,
   store_t_matrix
 )
 }
@@ -61,26 +75,27 @@ target_strength(
 \describe{
 \item{\code{boundary}}{Boundary condition at the target surface. One of
 \code{"fixed_rigid"}, \code{"pressure_release"},
-\code{"liquid_filled"}, or \code{"gas_filled"}.}
+\code{"liquid_filled"}, \code{"gas_filled"},
+\code{"shelled_pressure_release"}, \code{"shelled_liquid"}, or
+\code{"shelled_gas"}, or \code{"elastic_shelled"}. The fluid-shell
+boundaries are currently restricted to spherical \code{ESS} objects. The
+\code{"elastic_shelled"} branch remains public for spherical elastic
+shells.}
 \item{\code{sound_speed_sw}}{Surrounding-medium sound speed
 (\eqn{m~s^{-1}}).}
 \item{\code{density_sw}}{Surrounding-medium density (\eqn{kg~m^{-3}}).}
-\item{\code{n_max}}{Optional truncation limit. For spheres and oblate
-spheroids, this is the maximum spherical-wave degree used in the truncated
-T-matrix solve. For the default monostatic cylinder branch, it is the
-cylindrical modal cutoff used in the geometry-matched backend. When left
-as \code{NULL}, a geometry-aware rule is used frequency-by-frequency. This
-argument is currently ignored for prolate spheroids, which use the
-spheroidal-coordinate branch.}
 \item{\code{store_t_matrix}}{Logical flag controlling whether the
 frequency-specific retained state is stored under
 \code{object@model_parameters$TMM$parameters$t_matrix}. The default is
 \code{FALSE} to avoid large object sizes. Explicit block retention is
-available for the spherical and spheroidal branches. For cylinders, the
-stored state keeps the geometry-matched cylindrical monostatic family
-available for exact monostatic reuse and orientation-averaged monostatic
-products; full general-angle cylinder bistatic post-processing is not yet
-provided.}
+available for the spherical and spheroidal branches. For cylinders, sharp
+stored runs keep the geometry-matched monostatic family on the model table
+while retaining only the exact monostatic reuse path; public cylinder
+bistatic and grid helpers remain outside scope. For the experimental
+elastic-shelled prolate rebuild route, the retained state is the
+externally generated hybrid scattering grid. The advanced solver and
+backend overrides used for internal rebuild work are not part of the
+normal public \code{target_strength()} interface.}
 }
 }
 
@@ -132,7 +147,7 @@ and size parameters. \emph{The Journal of the Acoustical Society of America},
 }
 \seealso{
 \code{\link{target_strength}}, \code{\link{FLS}}, \code{\link{GAS}},
-\code{\link{Sphere}}, \code{\link{OblateSpheroid}},
+\code{\link{ESS}}, \code{\link{Sphere}}, \code{\link{OblateSpheroid}},
 \code{\link{ProlateSpheroid}}, \code{\link{Cylinder}},
 \code{\link{sphere}}, \code{\link{oblate_spheroid}},
 \code{\link{prolate_spheroid}}, \code{\link{cylinder}}

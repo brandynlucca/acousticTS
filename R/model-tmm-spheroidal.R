@@ -21,6 +21,25 @@
   list(theta = theta_internal, phi = phi_internal)
 }
 
+# Convert the internal prolate spheroidal convention whose polar axis is aligned
+# with the body-fixed x-axis back into the shared public/world spherical-angle
+# convention used by the rest of the TMM interface.
+#' @noRd
+.tmm_spheroidal_to_public_angles <- function(theta, phi) {
+  x <- cos(theta)
+  y <- sin(theta) * cos(phi)
+  z <- sin(theta) * sin(phi)
+
+  theta_public <- acos(pmax(-1, pmin(1, z)))
+  phi_public <- atan2(y, x)
+  phi_public <- .tmm_wrap_angle_2pi(phi_public)
+
+  on_axis <- abs(sin(theta_public)) < 1e-10
+  phi_public[on_axis] <- 0
+
+  list(theta = theta_public, phi = phi_public)
+}
+
 # Convert the Furusawa-style retained modal sum into the far-field scattering
 # amplitude used elsewhere in TMM. The spheroidal backend returns the series
 # before the -2i / k prefactor from the published far-field expression.

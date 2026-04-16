@@ -547,7 +547,12 @@
   )
   q <- a / xi
 
-  list(xi = xi, q = q)
+  list(
+    xi = xi,
+    q = q,
+    semimajor_length = a,
+    semiminor_length = b
+  )
 }
 
 # Build the common acoustics table shared by all TMM branches.
@@ -576,6 +581,15 @@
   }
   acoustics$m_max <- ceiling(2 * acoustics$k_sw * geometry$radius)
   acoustics$n_max <- acoustics$m_max + ceiling(0.5 * acoustics$chi_sw)
+  # Slender rigid prolates need a slightly higher retained ceiling than the
+  # classic hard rule to stabilize broadside monostatic nulls in the stored
+  # spheroidal TMM path.
+  if (identical(boundary, "fixed_rigid")) {
+    n_floor <- ceiling(abs(acoustics$k_sw) * geometry$semimajor_length + 4)
+    m_floor <- ceiling(n_floor / 2)
+    acoustics$m_max <- pmax(acoustics$m_max, m_floor)
+    acoustics$n_max <- pmax(acoustics$n_max, n_floor)
+  }
 
   acoustics
 }

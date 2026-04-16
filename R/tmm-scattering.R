@@ -971,11 +971,16 @@
       theta = theta_body,
       phi = phi_body
     )
+    # The public-to-spheroidal transform depends on paired (theta, phi)
+    # directions, so evaluate the full receive mesh point-by-point before
+    # reshaping it back to the standard theta x phi grid.
+    theta_mesh <- rep(theta_scatter, times = length(phi_scatter))
+    phi_mesh <- rep(phi_scatter, each = length(theta_scatter))
     scatter_internal <- .tmm_public_to_spheroidal_angles(
-      theta = theta_scatter,
-      phi = phi_scatter
+      theta = theta_mesh,
+      phi = phi_mesh
     )
-    f_scat <- prolate_spheroid_scattering_grid_from_tmatrix_cpp(
+    f_scat <- prolate_spheroid_scattering_points_from_tmatrix_cpp(
       acoustics = acoustics[frequency_idx, , drop = FALSE],
       t_matrix = t_store,
       theta_body = incident_internal$theta[[1L]],
@@ -983,6 +988,11 @@
       theta_scatter = scatter_internal$theta,
       phi_scatter = scatter_internal$phi,
       precision = parameters$precision %||% "double"
+    )
+    f_scat <- matrix(
+      f_scat,
+      nrow = length(theta_scatter),
+      ncol = length(phi_scatter)
     )
   } else if (parameters$coordinate_system == "sphere_modal") {
     f_scat <- .tmm_scattering_sphere_modal_grid(

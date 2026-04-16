@@ -36,9 +36,30 @@ test_that("internal TMM setup helpers cover boundary, truncation, and geometry b
     sound_speed_fluid = 343,
     theta_body = pi / 4
   )
+  shell_obj <- ess_generate(
+    shape = sphere_shape,
+    radius_shell = 0.01,
+    shell_thickness = 0.001,
+    density_shell = 1028.9,
+    sound_speed_shell = 1480.3,
+    density_fluid = 1031,
+    sound_speed_fluid = 1483.3,
+    theta_shell = pi / 2
+  )
+  elastic_shell_obj <- fixture_sphere("elastic_shelled")
+  elastic_prolate_obj <- fixture_ps("elastic_shelled")
 
   expect_equal(acousticTS:::.tmm_boundary_default(fls_obj, NULL), "liquid_filled")
   expect_equal(acousticTS:::.tmm_boundary_default(gas_obj, NULL), "gas_filled")
+  expect_equal(acousticTS:::.tmm_boundary_default(shell_obj, NULL), "shelled_liquid")
+  expect_equal(
+    acousticTS:::.tmm_boundary_default(elastic_shell_obj, NULL),
+    "elastic_shelled"
+  )
+  expect_error(
+    acousticTS:::.tmm_boundary_default(elastic_prolate_obj, NULL),
+    "Specify 'boundary' explicitly"
+  )
   expect_equal(
     acousticTS:::.tmm_boundary_default(fls_obj, "fixed_rigid"),
     "fixed_rigid"
@@ -49,9 +70,10 @@ test_that("internal TMM setup helpers cover boundary, truncation, and geometry b
   )
 
   expect_invisible(acousticTS:::.tmm_validate_object_scope(fls_obj))
+  expect_invisible(acousticTS:::.tmm_validate_object_scope(shell_obj))
   expect_error(
     acousticTS:::.tmm_validate_object_scope(cal_generate()),
-    "requires the scatterer to be either 'FLS' or 'GAS'"
+    "requires the scatterer to be either 'FLS', 'GAS', or a supported 'ESS'"
   )
 
   expect_invisible(
@@ -70,6 +92,18 @@ test_that("internal TMM setup helpers cover boundary, truncation, and geometry b
   expect_error(
     acousticTS:::.tmm_resolve_boundary(fls_obj, "elastic"),
     "Only the following values for 'boundary' are available"
+  )
+  expect_equal(
+    acousticTS:::.tmm_resolve_boundary(shell_obj, "shelled_gas"),
+    "shelled_gas"
+  )
+  expect_equal(
+    acousticTS:::.tmm_resolve_boundary(elastic_shell_obj, "elastic_shelled"),
+    "elastic_shelled"
+  )
+  expect_equal(
+    acousticTS:::.tmm_resolve_boundary(elastic_prolate_obj, "elastic_shelled"),
+    "elastic_shelled"
   )
   expect_error(
     acousticTS:::.tmm_validate_store_t_matrix(c(TRUE, FALSE)),
@@ -103,10 +137,14 @@ test_that("internal TMM setup helpers cover boundary, truncation, and geometry b
   expect_equal(acousticTS:::.tmm_prolate_nmax_override(prolate_params, "gas_filled"), 36L)
 
   expect_true(is.na(acousticTS:::.tmm_cylinder_nmax_floor(sphere_params, "fixed_rigid")))
-  expect_equal(acousticTS:::.tmm_cylinder_nmax_floor(cylinder_params, "fixed_rigid"), 40L)
-  expect_equal(acousticTS:::.tmm_cylinder_nmax_floor(cylinder_params, "pressure_release"), 24L)
-  expect_equal(acousticTS:::.tmm_cylinder_nmax_floor(cylinder_params, "liquid_filled"), 36L)
-  expect_equal(acousticTS:::.tmm_cylinder_nmax_floor(cylinder_params, "gas_filled"), 24L)
+  expect_equal(acousticTS:::.tmm_cylinder_nmax_floor(cylinder_params, "fixed_rigid"), 56L)
+  expect_equal(acousticTS:::.tmm_cylinder_nmax_floor(cylinder_params, "pressure_release"), 52L)
+  expect_equal(acousticTS:::.tmm_cylinder_nmax_floor(cylinder_params, "liquid_filled"), 64L)
+  expect_equal(acousticTS:::.tmm_cylinder_nmax_floor(cylinder_params, "gas_filled"), 56L)
+  expect_true(is.na(acousticTS:::.tmm_oblate_nmax_floor(sphere_params, "fixed_rigid")))
+  expect_equal(acousticTS:::.tmm_oblate_nmax_floor(oblate_params, "fixed_rigid"), 24L)
+  expect_equal(acousticTS:::.tmm_oblate_nmax_floor(oblate_params, "liquid_filled"), 24L)
+  expect_true(is.na(acousticTS:::.tmm_oblate_nmax_floor(oblate_params, "pressure_release")))
 
   expect_equal(
     acousticTS:::.tmm_prepare_n_max(
@@ -125,8 +163,28 @@ test_that("internal TMM setup helpers cover boundary, truncation, and geometry b
       k_sw = c(0.5, 1),
       shape_parameters = cylinder_params,
       boundary = "fixed_rigid"
-    ) >= 40L
+    ) >= 56L
   ))
+  expect_equal(
+    acousticTS:::.tmm_prepare_n_max(
+      NULL,
+      frequency = c(1, 2),
+      k_sw = c(0.5, 1),
+      shape_parameters = oblate_params,
+      boundary = "fixed_rigid"
+    ),
+    c(24L, 24L)
+  )
+  expect_equal(
+    acousticTS:::.tmm_prepare_n_max(
+      NULL,
+      frequency = c(1, 2),
+      k_sw = c(0.5, 1),
+      shape_parameters = oblate_params,
+      boundary = "liquid_filled"
+    ),
+    c(24L, 24L)
+  )
   expect_equal(
     acousticTS:::.tmm_prepare_n_max(
       7,
@@ -214,6 +272,50 @@ test_that("internal TMM setup helpers cover boundary, truncation, and geometry b
     "must be length 1 or match the length of 'frequency'"
   )
 
+  old_opt <- options(acousticTS.tmm_cylinder_backend = "spherical")
+  on.exit(options(old_opt), add = TRUE)
+  expect_false(acousticTS:::.tmm_is_cylindrical_branch(cylinder_params))
+  expect_equal(
+    acousticTS:::.tmm_prepare_cylinder_spherical_n_max(
+      NULL,
+      frequency = c(1, 2),
+      k_sw = c(100, 200),
+      shape_parameters = cylinder_params,
+      boundary = "fixed_rigid"
+    ),
+    c(47L, 48L)
+  )
+  expect_equal(
+    acousticTS:::.tmm_prepare_cylinder_spherical_n_max(
+      NULL,
+      frequency = c(1, 2),
+      k_sw = c(100, 200),
+      shape_parameters = cylinder_params,
+      boundary = "pressure_release"
+    ),
+    c(37L, 38L)
+  )
+  expect_equal(
+    acousticTS:::.tmm_prepare_cylinder_spherical_n_max(
+      NULL,
+      frequency = c(1, 2),
+      k_sw = c(100, 200),
+      shape_parameters = cylinder_params,
+      boundary = "gas_filled"
+    ),
+    c(16L, 17L)
+  )
+  expect_equal(
+    acousticTS:::.tmm_prepare_cylinder_spherical_n_max(
+      NULL,
+      frequency = c(1, 2),
+      k_sw = c(100, 200),
+      shape_parameters = cylinder_params,
+      boundary = "liquid_filled"
+    ),
+    c(5L, 6L)
+  )
+
   expect_equal(acousticTS:::.tmm_collocation_nodes(cylinder_params, "fixed_rigid", 3), 128L)
   expect_equal(acousticTS:::.tmm_collocation_nodes(sphere_params, "fixed_rigid", 3), 64L)
 
@@ -271,6 +373,11 @@ test_that("internal TMM spherical helpers cover surface and solver branches", {
     g_body = 1,
     h_body = 1
   )@shape_parameters
+  tapered_cylinder_params <- fls_generate(
+    shape = cylinder(length_body = 0.2, radius_body = 0.01, taper = 8, n_segments = 20),
+    g_body = 1,
+    h_body = 1
+  )@shape_parameters
   theta <- c(0, pi / 4, pi / 2)
 
   expect_equal(acousticTS:::.tmm_double_factorial_odd(0), 1)
@@ -280,13 +387,37 @@ test_that("internal TMM spherical helpers cover surface and solver branches", {
   prolate_radius <- acousticTS:::.tmm_surface_radius(prolate_params, theta)
   oblate_radius <- acousticTS:::.tmm_surface_radius(oblate_params, theta)
   cylinder_radius <- acousticTS:::.tmm_surface_radius(cylinder_params, theta)
+  tapered_radius <- acousticTS:::.tmm_surface_radius(tapered_cylinder_params, theta)
 
   expect_equal(sphere_radius$radius, rep(0.01, length(theta)))
   expect_equal(sphere_radius$radius_derivative, rep(0, length(theta)))
   expect_true(all(prolate_radius$radius > 0))
   expect_true(all(oblate_radius$radius > 0))
   expect_true(all(cylinder_radius$radius > 0))
+  expect_true(all(tapered_radius$radius > 0))
   expect_equal(length(cylinder_radius$radius_derivative), length(theta))
+  expect_equal(acousticTS:::.tmm_cylinder_endcap_fraction(tapered_cylinder_params), 0)
+  expect_equal(acousticTS:::.tmm_cylinder_endcap_fraction(cylinder_params), 0)
+  expect_equal(
+    acousticTS:::.tmm_cylinder_endcap_fraction(
+      cylinder_params,
+      cylinder_endcap_fraction = 0.05
+    ),
+    0.05
+  )
+  expect_equal(acousticTS:::.tmm_resolve_cylinder_endcap_fraction(0.6), 0.45)
+  expect_error(
+    acousticTS:::.tmm_resolve_cylinder_endcap_fraction(-0.01),
+    "'cylinder_endcap_fraction' must be non-negative"
+  )
+  piecewise_surface <- acousticTS:::.tmm_cylinder_piecewise_surface(
+    cylinder_params,
+    n_terms = 6
+  )
+  expect_true(all(piecewise_surface$radius > 0))
+  expect_true(all(piecewise_surface$area_weight > 0))
+  expect_equal(length(piecewise_surface$mu), length(piecewise_surface$normal_r))
+  expect_equal(length(piecewise_surface$mu), length(piecewise_surface$normal_theta))
   expect_error(
     acousticTS:::.tmm_surface_radius(list(shape = "Weird"), theta),
     "Unsupported TMM shape geometry"
@@ -304,6 +435,41 @@ test_that("internal TMM spherical helpers cover surface and solver branches", {
   expect_equal(
     acousticTS:::.tmm_solve_linear_system(rectangular, rhs_rect),
     qr.solve(rectangular, rhs_rect)
+  )
+
+  mu <- cos(c(pi / 6, pi / 3))
+  p_mat <- acousticTS:::.tmm_assoc_legendre_table(0, 1, mu)
+  dp_dtheta <- acousticTS:::.tmm_assoc_legendre_theta_derivative(0, 0:1, mu, p_mat)
+  radial <- matrix(c(1 + 0i, 2 + 0i, 3 + 0i, 4 + 0i), nrow = 2, byrow = TRUE)
+  radial_deriv <- matrix(c(0.5 + 0i, 0.25 + 0i, 0.75 + 0i, 0.1 + 0i), nrow = 2, byrow = TRUE)
+  radius <- c(1.2, 0.9)
+  radius_derivative <- c(0.3, -0.25)
+
+  normal_scale <- sqrt(1 + (radius_derivative / radius)^2)
+  normal_r <- 1 / normal_scale
+  normal_theta <- (radius_derivative / radius) / normal_scale
+
+  expect_equal(
+    acousticTS:::.tmm_normal_derivative_matrix(
+      radial = radial,
+      radial_deriv = radial_deriv,
+      angular = p_mat,
+      angular_theta_deriv = dp_dtheta,
+      k = 2.3,
+      radius = radius,
+      radius_derivative = radius_derivative
+    ),
+    acousticTS:::.tmm_normal_derivative_explicit(
+      radial = radial,
+      radial_deriv = radial_deriv,
+      angular = p_mat,
+      angular_theta_deriv = dp_dtheta,
+      k = 2.3,
+      radius = radius,
+      normal_r = normal_r,
+      normal_theta = normal_theta
+    ),
+    tolerance = 1e-12
   )
 })
 

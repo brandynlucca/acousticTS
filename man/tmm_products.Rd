@@ -62,8 +62,8 @@ workflow. One call can return the monostatic scattering spectrum, an
 orientation average, and a higher-level bistatic summary without rebuilding
 the underlying T-matrix solve. For stored cylinders, the currently supported
 products are the exact monostatic scattering spectrum and the corresponding
-orientation-averaged monostatic outputs; cylinder bistatic summaries remain
-unavailable until a validated retained cylinder angular operator is added.
+orientation-averaged monostatic outputs; cylinder bistatic summaries are
+intentionally outside the public scope.
 }
 \seealso{
 \code{\link{tmm_scattering}},
