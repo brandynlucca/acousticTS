@@ -8,31 +8,20 @@
 \alias{EPSMS}
 \title{Elastic-shell prolate spheroidal model (ESPSMS)}
 \description{
-\code{ESPSMS} is currently disabled in \pkg{acousticTS}. The package-side
-experimental elastic-shelled prolate rebuild and every external validation or
-hybrid workflow now live in the standalone \code{acousticValidator}
-repository until a validated direct implementation is restored in the package.
+\code{ESPSMS} is currently disabled in \code{acousticTS} while the elastic-shelled
+prolate implementation is rebuilt and validated in the standalone
+\code{acousticValidator} repository.
 }
 \section{Usage}{
 
-By default this model identifier fails fast:
-\preformatted{
-target_strength(
-  ...,
-  model = "espsms",
-  sound_speed_sw,
-  density_sw
-)
-}
+Calls routed through \code{model = "espsms"} currently fail fast.
 }
 
-\section{Status}{
+\section{Implementation route}{
 
-The retained shell-theory helpers are still kept internally for rebuild work,
-but the public \code{ESPSMS} model itself is intentionally unavailable inside
-\pkg{acousticTS}. Any validator-side meshing, solver backends, Python bridges,
-or angular/grid validation workflows belong in the standalone
-\code{acousticValidator} repository instead of the package proper.
+The package retains only the shell-theory helper routines needed for the
+ongoing rebuild. Validation solvers, external bridges, and experimental
+hybrid workflows live outside \code{acousticTS}.
 }
 
 \references{

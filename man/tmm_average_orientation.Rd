@@ -8,7 +8,7 @@ tmm_average_orientation(
   object,
   theta_body = NULL,
   weights = NULL,
-  phi_body = pi,
+  phi_body = NULL,
   theta_scatter = NULL,
   phi_scatter = NULL,
   distribution = NULL
