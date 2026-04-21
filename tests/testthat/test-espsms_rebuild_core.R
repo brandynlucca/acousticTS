@@ -23,7 +23,7 @@ test_that("ESPSMS rebuild geometry matches the canonical validation case", {
     sound_speed_sw = 1477.3,
     density_sw = 1026.8
   )
-  eta <- acousticTS:::.espsms_uniform_eta_grid(n_eta = 129L)
+  eta <- acousticTS:::.espsms_uniform_eta_grid(eta_grid_size = 129L)
   geom <- acousticTS:::.espsms_shell_geometry_state(body, eta)
 
   expect_equal(geom$semimajor_length, 0.035, tolerance = 1e-14)
@@ -75,7 +75,7 @@ test_that("ESPSMS rebuild shell operator matches the external rebuild report", {
     sys <- acousticTS:::.espsms_axisymmetric_shell_system(
       body,
       frequency_hz = freq,
-      n_eta = 129L
+      eta_grid_size = 129L
     )
     dynamic <- sys$dynamic_matrix
     rel_skew <- norm(dynamic - t(dynamic), type = "F") / norm(dynamic, type = "F")
@@ -114,7 +114,7 @@ test_that("ESPSMS rebuild keeps the K_uw block aligned with the shell report", {
   sys <- acousticTS:::.espsms_axisymmetric_shell_system(
     body,
     frequency_hz = 12000,
-    n_eta = 129L
+    eta_grid_size = 129L
   )
   kuw <- sys$structural_blocks$K_uw
 
@@ -124,37 +124,4 @@ test_that("ESPSMS rebuild keeps the K_uw block aligned with the shell report", {
     155.40040305023714,
     tolerance = 1e-11
   )
-})
-
-test_that("ESPSMS hybrid backend can reproduce the canonical coupled reference", {
-  skip_if_not(
-    identical(
-      tolower(Sys.getenv("ACOUSTICTS_RUN_EXTERNAL_VALIDATION", unset = "false")),
-      "true"
-    )
-  )
-
-  validation_repo <- Sys.getenv(
-    "ACOUSTICTS_VALIDATION_REPO",
-    unset = "C:/Users/Brandyn/Desktop/acousticTSValidation"
-  )
-  skip_if_not(dir.exists(validation_repo))
-
-  out <- target_strength(
-    object = .espsms_rebuild_fixture(),
-    frequency = 12000,
-    model = "epsms",
-    sound_speed_sw = 1477.3,
-    density_sw = 1026.8,
-    solver_backend = "hybrid_reference",
-    theta_body_deg = 0,
-    validation_repo = validation_repo
-  )
-  ref <- out@model$ESPSMS
-
-  expect_equal(nrow(ref), 1L)
-  expect_equal(ref$TS[[1]], -49.618749648212976, tolerance = 1e-9)
-  expect_equal(ref$n_surface_dof[[1]], 178)
-  expect_equal(ref$n_shell_dof[[1]], 387)
-  expect_identical(ref$solver_backend[[1]], "hybrid_reference")
 })

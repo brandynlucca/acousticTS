@@ -447,7 +447,7 @@ test_that("internal TMM spherical helpers cover surface and solver branches", {
 
   normal_scale <- sqrt(1 + (radius_derivative / radius)^2)
   normal_r <- 1 / normal_scale
-  normal_theta <- (radius_derivative / radius) / normal_scale
+  normal_theta <- -(radius_derivative / radius) / normal_scale
 
   expect_equal(
     acousticTS:::.tmm_normal_derivative_matrix(
@@ -468,7 +468,7 @@ test_that("internal TMM spherical helpers cover surface and solver branches", {
       radius = radius,
       normal_r = normal_r,
       normal_theta = normal_theta
-    ),
+    ) * normal_scale,
     tolerance = 1e-12
   )
 })

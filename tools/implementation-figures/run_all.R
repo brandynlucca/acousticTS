@@ -69,11 +69,16 @@ manifest <- utils::read.csv(
   stringsAsFactors = FALSE
 )
 
-allowed_profiles <- switch(profile,
-  light = "light",
-  all = c("light", "heavy"),
-  stop("Unknown implementation figure profile: ", profile, call. = FALSE)
-)
+if (!identical(profile, "light")) {
+  stop(
+    "The package-side implementation runner now supports only ",
+    "'ACOUSTICTS_IMPL_PROFILE=light'. Heavy validation workflows were ",
+    "externalized to 'C:/Users/Brandyn/Desktop/acousticTSValidation'.",
+    call. = FALSE
+  )
+}
+
+allowed_profiles <- "light"
 
 if (nzchar(families_csv)) {
   requested_families <- unique(
