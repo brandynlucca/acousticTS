@@ -92,13 +92,10 @@
     identical(boundary, "elastic_shelled")
 }
 
-# Identify the experimental prolate elastic-shell branch backed by the external
-# coupled shell-fluid hybrid solver.
+# Identify the disabled prolate elastic-shell branch.
 #' @noRd
 .tmm_is_elastic_shell_prolate_branch <- function(object, shape_parameters, boundary) {
-  methods::is(object, "ESS") &&
-    identical(as.character(shape_parameters[["shape"]])[1], "ProlateSpheroid") &&
-    identical(boundary, "elastic_shelled")
+  FALSE
 }
 
 # Detect whether an ESS shell carries elastic properties.
@@ -511,18 +508,6 @@
     ))
   }
 
-  if (.tmm_is_elastic_shell_prolate_branch(
-    object = object,
-    shape_parameters = shape_parameters,
-    boundary = boundary
-  )) {
-    return(.elastic_shell_prolate_body(
-      object = object,
-      sound_speed_sw = sound_speed_sw,
-      density_sw = density_sw
-    ))
-  }
-
   # Complete the body properties against the surrounding medium ===============
   body <- .complete_material_props(
     acousticTS::extract(object, "body"),
@@ -790,15 +775,11 @@
 .tmm_coordinate_system <- function(use_spheroidal_branch,
                                    use_cylindrical_branch,
                                    use_shell_sphere_branch = FALSE,
-                                   use_elastic_shell_prolate_branch = FALSE,
                                    shape_parameters = NULL,
                                    cylinder_backend = NULL) {
   # Label the active TMM backend coordinate system ============================
   if (use_shell_sphere_branch) {
     return("sphere_modal")
-  }
-  if (use_elastic_shell_prolate_branch) {
-    return("espsms_hybrid_grid")
   }
   if (use_spheroidal_branch) {
     return("spheroidal")

@@ -1,58 +1,17 @@
-################################################################################
-# Elastic-shell prolate spheroidal modal series (ESPSMS)
-################################################################################
 #' Elastic-shell prolate spheroidal model (ESPSMS)
 #'
 #' @description
-#' The original experimental `ESPSMS` branch used a projected thin-shell
-#' impedance approximation on the prolate surface. That route did not validate
-#' against the shell-only literature or against independent shell validation and
-#' is now disabled while a paper-backed elastic-shelled prolate formulation is
-#' rebuilt.
+#' `ESPSMS` is currently disabled in `acousticTS` while the elastic-shelled
+#' prolate implementation is rebuilt and validated in the standalone
+#' `acousticValidator` repository.
 #'
 #' @section Usage:
-#' By default this model identifier fails fast. During the rebuild, an explicit
-#' experimental backend may be requested:
-#' \preformatted{
-#' target_strength(
-#'   ...,
-#'   model = "espsms",
-#'   sound_speed_sw,
-#'   density_sw,
-#'   n_max,
-#'   solver_backend = "hybrid_reference",
-#'   theta_body_deg = 0,
-#'   validation_repo = "path/to/acousticTSValidation"
-#' )
-#' }
-#'
-#' @section Arguments:
-#' \describe{
-#'   \item{\code{sound_speed_sw}}{Surrounding-medium sound speed
-#'   (\eqn{m~s^{-1}}).}
-#'   \item{\code{density_sw}}{Surrounding-medium density (\eqn{kg~m^{-3}}).}
-#'   \item{\code{n_max}}{Reserved for the future native shell-only rebuild.}
-#'   \item{\code{solver_backend}}{Use \code{"disabled"} to keep the rebuild
-#'   branch off, or \code{"hybrid_reference"} to use the external coupled
-#'   shell-fluid reference backend.}
-#'   \item{\code{theta_body_deg}}{Optional orientation override for the current
-#'   experimental backend. Only \code{0} and \code{180} are supported at
-#'   present.}
-#'   \item{\code{validation_repo}}{Optional path to the sibling
-#'   \code{acousticTSValidation} repository when using the hybrid-reference
-#'   backend.}
-#' }
+#' Calls routed through `model = "espsms"` currently fail fast.
 #'
 #' @section Implementation route:
-#' The next supported implementation follows the elastic-shelled prolate
-#' literature directly, using shell-only modal/numerical equations from the
-#' prolate shell vibration/scattering literature together with an independent
-#' hybrid shell validator before any `TMM` wrapping is restored.
-#'
-#' The current rebuild keeps the old proxy branch disabled by default. An
-#' explicit experimental backend, `solver_backend = "hybrid_reference"`, is
-#' available for monostatic axial-incidence runs when the sibling
-#' `acousticTSValidation` repository and the Python hybrid helper are available.
+#' The package retains only the shell-theory helper routines needed for the
+#' ongoing rebuild. Validation solvers, external bridges, and experimental
+#' hybrid workflows live outside `acousticTS`.
 #'
 #' @seealso
 #' \code{\link{target_strength}}, \code{\link{ESS}},
@@ -163,11 +122,11 @@ NULL
 
 #' Build the open meridional eta-grid used by the prolate shell rebuild.
 #' @noRd
-.espsms_uniform_eta_grid <- function(n_eta = 129L,
+.espsms_uniform_eta_grid <- function(eta_grid_size = 129L,
                                      pole_offset = 1e-4) {
-  if (!is.numeric(n_eta) || length(n_eta) != 1L || !is.finite(n_eta) ||
-    n_eta < 5) {
-    stop("'n_eta' must be one integer >= 5.", call. = FALSE)
+  if (!is.numeric(eta_grid_size) || length(eta_grid_size) != 1L ||
+    !is.finite(eta_grid_size) || eta_grid_size < 5) {
+    stop("'eta_grid_size' must be one integer >= 5.", call. = FALSE)
   }
   if (!is.numeric(pole_offset) || length(pole_offset) != 1L ||
     !is.finite(pole_offset) || pole_offset <= 0 || pole_offset >= 0.5) {
@@ -177,7 +136,7 @@ NULL
   seq(
     from = -1 + pole_offset,
     to = 1 - pole_offset,
-    length.out = as.integer(n_eta)
+    length.out = as.integer(eta_grid_size)
   )
 }
 
@@ -264,9 +223,12 @@ NULL
 #' @noRd
 .espsms_axisymmetric_shell_system <- function(body,
                                               frequency_hz,
-                                              n_eta = 129L,
+                                              eta_grid_size = 129L,
                                               pole_offset = 1e-4) {
-  eta <- .espsms_uniform_eta_grid(n_eta = n_eta, pole_offset = pole_offset)
+  eta <- .espsms_uniform_eta_grid(
+    eta_grid_size = eta_grid_size,
+    pole_offset = pole_offset
+  )
   fd <- .espsms_fd_matrices(eta)
   geom <- .espsms_shell_geometry_state(body, eta)
 
@@ -450,459 +412,24 @@ NULL
   )
 }
 
-#' Resolve the sibling validation repository used for the ESPSMS rebuild.
-#' @noRd
-.espsms_validation_repo_root <- function(validation_repo = NULL) {
-  if (!is.null(validation_repo)) {
-    root <- normalizePath(validation_repo, winslash = "/", mustWork = FALSE)
-    if (!dir.exists(root)) {
-      stop(
-        "The requested ESPSMS validation repository does not exist: ",
-        validation_repo,
-        call. = FALSE
-      )
-    }
-    return(root)
-  }
-
-  env_root <- Sys.getenv("ACOUSTICTS_VALIDATION_REPO", unset = NA_character_)
-  if (is.character(env_root) && length(env_root) == 1L &&
-    !is.na(env_root) && nzchar(env_root) && dir.exists(env_root)) {
-    return(normalizePath(env_root, winslash = "/", mustWork = TRUE))
-  }
-
-  sibling_root <- normalizePath(
-    file.path(dirname(normalizePath(getwd(), winslash = "/", mustWork = TRUE)), "acousticTSValidation"),
-    winslash = "/",
-    mustWork = FALSE
-  )
-  if (dir.exists(sibling_root)) {
-    return(sibling_root)
-  }
-
-  stop(
-    paste(
-      "Could not locate the 'acousticTSValidation' repository needed for the",
-      "ESPSMS hybrid reference bridge. Set 'validation_repo' explicitly or",
-      "define ACOUSTICTS_VALIDATION_REPO."
-    ),
-    call. = FALSE
-  )
-}
-
-#' Convert an ESPSMS body description into the canonical hybrid-spec schema.
-#' @noRd
-.espsms_validation_spec <- function(body, frequency_hz, case_id = "espsms_package_bridge") {
-  list(
-    case_id = case_id,
-    family = "ESPSMS",
-    workflow = "package_bridge_hybrid_reference",
-    recommended_backend = "hybrid_shell_fem_bem",
-    geometry = list(
-      type = "prolate_spheroid",
-      semimajor_length_m = as.numeric(body$semimajor_length)[1],
-      semiminor_length_m = as.numeric(body$semiminor_length)[1],
-      total_length_m = 2 * as.numeric(body$semimajor_length)[1],
-      aspect_ratio = as.numeric(body$semimajor_length)[1] /
-        as.numeric(body$semiminor_length)[1],
-      shell_thickness_m = as.numeric(body$shell_thickness)[1]
-    ),
-    media = list(
-      surrounding = list(
-        density_kg_m3 = as.numeric(body$medium_density)[1],
-        sound_speed_m_s = as.numeric(body$medium_sound_speed)[1]
-      ),
-      shell = list(
-        density_kg_m3 = as.numeric(body$shell_density)[1],
-        sound_speed_m_s = as.numeric(body$shell_sound_speed %||% sqrt(
-          as.numeric(body$shell_E)[1] /
-            (as.numeric(body$shell_density)[1] * (1 - as.numeric(body$shell_nu)[1]^2))
-        ))[1],
-        youngs_modulus_Pa = as.numeric(body$shell_E)[1],
-        poissons_ratio = as.numeric(body$shell_nu)[1]
-      ),
-      interior = list(
-        density_kg_m3 = as.numeric(body$fluid_density)[1],
-        sound_speed_m_s = as.numeric(body$fluid_sound_speed)[1]
-      )
-    ),
-    frequency_hz = as.list(as.numeric(frequency_hz)),
-    notes = list(
-      "Temporary internal package bridge to the external ESPSMS hybrid reference.",
-      "This is for rebuild comparison only and is not the public ESPSMS direct solver."
-    )
-  )
-}
-
-#' Run the external hybrid ESPSMS reference for a monostatic ladder.
-#' @noRd
-.espsms_hybrid_reference_monostatic_from_body <- function(body,
-                                                          frequency,
-                                                          theta_body_deg = 0,
-                                                          n_eta = 129L,
-                                                          mesh_n_u = 12L,
-                                                          mesh_n_v = 16L,
-                                                          validation_repo = NULL,
-                                                          python = Sys.getenv("ACOUSTICTS_PYTHON", unset = "python")) {
-  repo_root <- .espsms_validation_repo_root(validation_repo)
-  helper_py <- file.path(
-    repo_root,
-    "tools",
-    "implementation-figures",
-    "helpers",
-    "prolate_elastic_shell_hybrid_solver.py"
-  )
-  if (!file.exists(helper_py)) {
-    stop("Missing ESPSMS hybrid helper: ", helper_py, call. = FALSE)
-  }
-
-  tmp_dir <- tempfile("espsms-hybrid-bridge-")
-  dir.create(tmp_dir, recursive = TRUE, showWarnings = FALSE)
-  on.exit(unlink(tmp_dir, recursive = TRUE, force = TRUE), add = TRUE)
-
-  spec_path <- file.path(tmp_dir, "spec.json")
-  out_path <- file.path(tmp_dir, "monostatic.csv")
-  jsonlite::write_json(
-    .espsms_validation_spec(body, frequency_hz = frequency),
-    path = spec_path,
-    auto_unbox = TRUE,
-    pretty = TRUE
-  )
-
-  out <- system2(
-    python,
-    args = c(
-      helper_py,
-      "--spec", spec_path,
-      "--case-id", "espsms_package_bridge",
-      "--theta-body-deg", as.character(theta_body_deg),
-      "--n-eta", as.character(as.integer(n_eta)),
-      "--mesh-n-u", as.character(as.integer(mesh_n_u)),
-      "--mesh-n-v", as.character(as.integer(mesh_n_v)),
-      "--mode", "monostatic",
-      "--monostatic-out", out_path
-    ),
-    stdout = TRUE,
-    stderr = TRUE
-  )
-  status <- attr(out, "status")
-  if (!is.null(status) && status != 0) {
-    stop(
-      paste(c("ESPSMS hybrid reference bridge failed:", out), collapse = "\n"),
-      call. = FALSE
-    )
-  }
-  if (!file.exists(out_path)) {
-    stop(
-      "ESPSMS hybrid reference bridge did not produce the monostatic output file.",
-      call. = FALSE
-    )
-  }
-
-  utils::read.csv(out_path, stringsAsFactors = FALSE)
-}
-
-#' Run the external hybrid ESPSMS reference for a monostatic ladder.
-#' @noRd
-.espsms_hybrid_reference_monostatic <- function(object,
-                                                frequency,
-                                                sound_speed_sw = .SEAWATER_SOUND_SPEED_DEFAULT,
-                                                density_sw = .SEAWATER_DENSITY_DEFAULT,
-                                                theta_body_deg = 0,
-                                                n_eta = 129L,
-                                                mesh_n_u = 12L,
-                                                mesh_n_v = 16L,
-                                                validation_repo = NULL,
-                                                python = Sys.getenv("ACOUSTICTS_PYTHON", unset = "python")) {
-  body <- .elastic_shell_prolate_body(
-    object = object,
-    sound_speed_sw = sound_speed_sw,
-    density_sw = density_sw
-  )
-
-  .espsms_hybrid_reference_monostatic_from_body(
-    body = body,
-    frequency = frequency,
-    theta_body_deg = theta_body_deg,
-    n_eta = n_eta,
-    mesh_n_u = mesh_n_u,
-    mesh_n_v = mesh_n_v,
-    validation_repo = validation_repo,
-    python = python
-  )
-}
-
-#' Run the external hybrid ESPSMS reference grid for one stored frequency.
-#' @noRd
-.espsms_hybrid_reference_grid_from_body <- function(body,
-                                                    frequency,
-                                                    theta_body_deg = 0,
-                                                    n_eta = 129L,
-                                                    mesh_n_u = 12L,
-                                                    mesh_n_v = 16L,
-                                                    n_theta = 91L,
-                                                    n_phi = 181L,
-                                                    validation_repo = NULL,
-                                                    python = Sys.getenv("ACOUSTICTS_PYTHON", unset = "python")) {
-  repo_root <- .espsms_validation_repo_root(validation_repo)
-  helper_py <- file.path(
-    repo_root,
-    "tools",
-    "implementation-figures",
-    "helpers",
-    "prolate_elastic_shell_hybrid_solver.py"
-  )
-  if (!file.exists(helper_py)) {
-    stop("Missing ESPSMS hybrid helper: ", helper_py, call. = FALSE)
-  }
-
-  tmp_dir <- tempfile("espsms-hybrid-grid-")
-  dir.create(tmp_dir, recursive = TRUE, showWarnings = FALSE)
-  on.exit(unlink(tmp_dir, recursive = TRUE, force = TRUE), add = TRUE)
-
-  spec_path <- file.path(tmp_dir, "spec.json")
-  out_path <- file.path(tmp_dir, "grid.csv")
-  jsonlite::write_json(
-    .espsms_validation_spec(body, frequency_hz = frequency, case_id = "espsms_package_grid_bridge"),
-    path = spec_path,
-    auto_unbox = TRUE,
-    pretty = TRUE
-  )
-
-  out <- system2(
-    python,
-    args = c(
-      helper_py,
-      "--spec", spec_path,
-      "--case-id", "espsms_package_grid_bridge",
-      "--theta-body-deg", as.character(theta_body_deg),
-      "--n-eta", as.character(as.integer(n_eta)),
-      "--mesh-n-u", as.character(as.integer(mesh_n_u)),
-      "--mesh-n-v", as.character(as.integer(mesh_n_v)),
-      "--mode", "bistatic_grid",
-      "--grid-frequency-hz", as.character(as.numeric(frequency)[1]),
-      "--n-theta", as.character(as.integer(n_theta)),
-      "--n-phi", as.character(as.integer(n_phi)),
-      "--bistatic-out", out_path
-    ),
-    stdout = TRUE,
-    stderr = TRUE
-  )
-  status <- attr(out, "status")
-  if (!is.null(status) && status != 0) {
-    stop(
-      paste(c("ESPSMS hybrid grid bridge failed:", out), collapse = "\n"),
-      call. = FALSE
-    )
-  }
-  if (!file.exists(out_path)) {
-    stop(
-      "ESPSMS hybrid grid bridge did not produce the bistatic output file.",
-      call. = FALSE
-    )
-  }
-
-  grid_df <- utils::read.csv(out_path, stringsAsFactors = FALSE)
-  theta_vals <- sort(unique(as.numeric(grid_df$theta_scatter_rad)))
-  phi_vals <- sort(unique(as.numeric(grid_df$phi_scatter_rad)))
-  f_vals <- complex(
-    real = as.numeric(grid_df$f_scat_real),
-    imaginary = as.numeric(grid_df$f_scat_imag)
-  )
-  sigma_vals <- as.numeric(grid_df$sigma_scat)
-
-  list(
-    family = "espsms_hybrid_grid",
-    theta_body = pi / 2,
-    phi_body = if ((theta_body_deg %% 360) < 90 || (theta_body_deg %% 360) > 270) 0 else pi,
-    frequency = as.numeric(frequency)[1],
-    theta_scatter = theta_vals,
-    phi_scatter = phi_vals,
-    f_scat = matrix(
-      f_vals,
-      nrow = length(theta_vals),
-      ncol = length(phi_vals),
-      byrow = TRUE
-    ),
-    sigma_scat = matrix(
-      sigma_vals,
-      nrow = length(theta_vals),
-      ncol = length(phi_vals),
-      byrow = TRUE
-    )
-  )
-}
-
-#' Resolve the direct-solver profile for the current ESPSMS branch.
-#' @noRd
-.espsms_resolve_solver_profile <- function(frequency,
-                                           sound_speed_sw,
-                                           shape_parameters,
-                                           theta_body,
-                                           n_max = NULL) {
-  if (!is.null(n_max)) {
-    if (!is.numeric(n_max) || any(!is.finite(n_max)) || any(n_max < 0)) {
-      stop(
-        "'n_max' must be a non-negative numeric scalar or vector.",
-        call. = FALSE
-      )
-    }
-    if (length(n_max) == 1L) {
-      resolved_n_max <- rep(as.integer(round(n_max)), length(frequency))
-    } else if (length(n_max) != length(frequency)) {
-      stop(
-        "'n_max' must have length 1 or the same length as 'frequency'.",
-        call. = FALSE
-      )
-    } else {
-      resolved_n_max <- as.integer(round(n_max))
-    }
-  } else {
-    shape_source <- shape_parameters$shell %||% shape_parameters
-    major_radius <- as.numeric(
-      shape_source$semimajor_length %||% (shape_source$length / 2)
-    )[1]
-    if (!is.finite(major_radius) || major_radius <= 0) {
-      stop(
-        "ESPSMS requires a finite positive prolate semimajor length.",
-        call. = FALSE
-      )
-    }
-
-    ka_major <- wavenumber(frequency, sound_speed_sw) * major_radius
-    cos_theta <- abs(cos(theta_body))
-    sin_theta <- abs(sin(theta_body))
-
-    resolved_n_max <- ifelse(
-      ka_major <= 5,
-      ifelse(
-        cos_theta >= 0.75,
-        48L,
-        ifelse(cos_theta >= 0.25, 32L, 12L)
-      ),
-      ifelse(sin_theta >= 0.95, 48L, 32L)
-    )
-  }
-
-  resolved_n_max <- as.integer(pmin(64L, pmax(12L, resolved_n_max)))
-  shape_source <- shape_parameters$shell %||% shape_parameters
-  major_radius <- as.numeric(
-    shape_source$semimajor_length %||% (shape_source$length / 2)
-  )[1]
-  ka_major <- wavenumber(frequency, sound_speed_sw) * major_radius
-  cos_theta <- abs(cos(theta_body))
-  sin_theta <- abs(sin(theta_body))
-  high_ka <- ka_major > 5
-
-  collocation_multiplier <- rep(as.integer(8L), length(frequency))
-  svd_rel_tol <- rep(1e-10, length(frequency))
-  enhanced_projection <- high_ka & sin_theta >= 0.45
-  collocation_multiplier[enhanced_projection] <- 12L
-  svd_rel_tol[enhanced_projection] <- 1e-5
-
-  list(
-    n_max = resolved_n_max,
-    collocation_multiplier = collocation_multiplier,
-    svd_rel_tol = svd_rel_tol
-  )
-}
-
 #' Initialize a prolate elastic-shell object for the ESPSMS branch.
 #' @param object ESS-class object.
 #' @param frequency Frequency vector (Hz).
 #' @param sound_speed_sw Surrounding-medium sound speed (m/s).
 #' @param density_sw Surrounding-medium density (kg/m^3).
-#' @param n_max Optional retained modal cutoff.
-#' @param solver_backend ESPSMS backend selector. Use `"disabled"` to keep the
-#'   branch off, or `"hybrid_reference"` to use the external coupled shell-fluid
-#'   hybrid solver during the rebuild.
-#' @param validation_repo Optional path to the `acousticTSValidation`
-#'   repository when using `solver_backend = "hybrid_reference"`.
-#' @param python Python executable to use for the hybrid reference backend.
-#' @param theta_body_deg Optional incidence angle override for the current
-#'   experimental hybrid backend. At present only `0` or `180` are supported.
-#' @param n_eta Shell meridional grid size for the hybrid reference backend.
-#' @param mesh_n_u Structured surface-mesh meridional count for the hybrid
-#'   reference backend.
-#' @param mesh_n_v Structured surface-mesh azimuthal count for the hybrid
-#'   reference backend.
 #' @noRd
 espsms_initialize <- function(object,
                               frequency,
                               sound_speed_sw = .SEAWATER_SOUND_SPEED_DEFAULT,
-                              density_sw = .SEAWATER_DENSITY_DEFAULT,
-                              n_max = NULL,
-                              solver_backend = c("disabled", "hybrid_reference"),
-                              validation_repo = NULL,
-                              python = Sys.getenv("ACOUSTICTS_PYTHON", unset = "python"),
-                              theta_body_deg = NULL,
-                              n_eta = 129L,
-                              mesh_n_u = 12L,
-                              mesh_n_v = 16L) {
-  solver_backend <- match.arg(solver_backend)
-  if (identical(solver_backend, "disabled")) {
-    stop(
-      paste(
-        "ESPSMS is temporarily disabled.",
-        "The previous projected thin-shell approximation did not validate as a",
-        "genuine elastic-shelled prolate spheroid model and has been retired",
-        "pending a shell-only modal/numerical rebuild."
-      ),
-      call. = FALSE
-    )
-  }
-
-  body <- .elastic_shell_prolate_body(
-    object = object,
-    sound_speed_sw = sound_speed_sw,
-    density_sw = density_sw
-  )
-  shape_parameters <- acousticTS::extract(object, "shape_parameters")
-  acoustics <- .init_acoustics_df(
-    frequency,
-    k_sw = sound_speed_sw,
-    k_body = body$fluid_sound_speed
-  )
-  solver_profile <- .espsms_resolve_solver_profile(
-    frequency = frequency,
-    sound_speed_sw = sound_speed_sw,
-    shape_parameters = shape_parameters,
-    theta_body = body$theta,
-    n_max = n_max
-  )
-  acoustics$n_max <- solver_profile$n_max
-
-  .init_model_slots(
-    object = object,
-    model_name = "ESPSMS",
-    frequency = frequency,
-    model_parameters = list(
-      parameters = list(
-        acoustics = acoustics,
-        shell_theory = "thin_isotropic_love_kirchhoff",
-        solver_profile = solver_profile,
-        solver_backend = solver_backend,
-        validation_repo = validation_repo,
-        python = python,
-        theta_body_deg = theta_body_deg,
-        n_eta = as.integer(n_eta),
-        mesh_n_u = as.integer(mesh_n_u),
-        mesh_n_v = as.integer(mesh_n_v)
-      ),
-      medium = .init_medium_params(sound_speed_sw, density_sw),
-      body = body
+                              density_sw = .SEAWATER_DENSITY_DEFAULT) {
+  stop(
+    paste(
+      "ESPSMS is temporarily disabled.",
+      "The elastic-shelled prolate rebuild and all validator workflows now live",
+      "in the standalone acousticValidator repository until the package-side",
+      "model is restored as a validated direct implementation."
     ),
-    result_cols = c(
-      "f_bs",
-      "sigma_bs",
-      "TS",
-      "n_max",
-      "solver_backend",
-      "n_surface_dof",
-      "n_shell_dof",
-      "shell_w_abs_max",
-      "pressure_jump_abs_max"
-    )
+    call. = FALSE
   )
 }
 
@@ -910,84 +437,15 @@ espsms_initialize <- function(object,
 #' @param object ESS-class object initialized for ESPSMS.
 #' @noRd
 ESPSMS <- function(object) {
-  model <- acousticTS::extract(object, "model_parameters")$ESPSMS
-  acoustics <- model$parameters$acoustics
-  solver_profile <- model$parameters$solver_profile
-  body <- model$body
-  solver_backend <- model$parameters$solver_backend %||% "disabled"
-
-  if (identical(solver_backend, "disabled")) {
-    stop(
-      paste(
-        "ESPSMS is temporarily disabled.",
-        "The previous projected thin-shell approximation did not validate as a",
-        "genuine elastic-shelled prolate spheroid model and has been retired",
-        "pending a shell-only modal/numerical rebuild."
-      ),
-      call. = FALSE
-    )
-  }
-
-  if (!identical(solver_backend, "hybrid_reference")) {
-    stop(
-      "Unsupported ESPSMS solver backend: ", solver_backend,
-      call. = FALSE
-    )
-  }
-
-  theta_body_deg <- model$parameters$theta_body_deg %||% NA_real_
-  if (is.na(theta_body_deg)) {
-    theta_body_deg <- if (isTRUE(all.equal(abs(cos(body$theta)), 1, tolerance = 1e-8))) {
-      if (cos(body$theta) >= 0) 0 else 180
-    } else {
-      stop(
-        paste(
-          "The current ESPSMS hybrid-reference backend only supports axial",
-          "incidence (theta_body = 0 or pi). Supply 'theta_body_deg = 0' or",
-          "'theta_body_deg = 180' explicitly when initializing the model."
-        ),
-        call. = FALSE
-      )
-    }
-  }
-  if (!isTRUE(all.equal(theta_body_deg %% 180, 0, tolerance = 1e-8))) {
-    stop(
-      paste(
-        "The current ESPSMS hybrid-reference backend only supports axial",
-        "incidence (theta_body = 0 or pi)."
-      ),
-      call. = FALSE
-    )
-  }
-  theta_body_deg <- ifelse((theta_body_deg %% 360) >= 180, 180, 0)
-
-  hybrid <- .espsms_hybrid_reference_monostatic(
-    object = object,
-    frequency = acoustics$frequency,
-    sound_speed_sw = model$medium$sound_speed,
-    density_sw = model$medium$density,
-    theta_body_deg = theta_body_deg,
-    n_eta = model$parameters$n_eta %||% 129L,
-    mesh_n_u = model$parameters$mesh_n_u %||% 12L,
-    mesh_n_v = model$parameters$mesh_n_v %||% 16L,
-    validation_repo = model$parameters$validation_repo,
-    python = model$parameters$python %||% Sys.getenv("ACOUSTICTS_PYTHON", unset = "python")
+  stop(
+    paste(
+      "ESPSMS is temporarily disabled.",
+      "The elastic-shelled prolate rebuild and all validator workflows now live",
+      "in the standalone acousticValidator repository until the package-side",
+      "model is restored as a validated direct implementation."
+    ),
+    call. = FALSE
   )
-
-  methods::slot(object, "model")$ESPSMS <- data.frame(
-    frequency = acoustics$frequency,
-    f_bs = complex(real = hybrid$f_bs_real, imaginary = hybrid$f_bs_imag),
-    sigma_bs = hybrid$sigma_bs,
-    TS = hybrid$TS,
-    n_max = acoustics$n_max,
-    solver_backend = solver_backend,
-    n_surface_dof = hybrid$n_surface_dof,
-    n_shell_dof = hybrid$n_shell_dof,
-    shell_w_abs_max = hybrid$shell_w_abs_max,
-    pressure_jump_abs_max = hybrid$pressure_jump_abs_max
-  )
-
-  object
 }
 
 #' Backward-compatible initializer alias for older experimental naming.

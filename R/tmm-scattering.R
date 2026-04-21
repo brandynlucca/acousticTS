@@ -67,6 +67,50 @@
   abs(theta_scatter - expected_theta) <= tol && delta_phi <= tol
 }
 
+# Check whether one requested incident direction matches the stored TMM
+# incidence to within the standard angular tolerance.
+#' @noRd
+.tmm_matches_stored_incidence <- function(model_params,
+                                          theta_body,
+                                          phi_body,
+                                          tol = 1e-8) {
+  defaults <- model_params$body
+  delta_phi <- abs(.tmm_wrap_angle_2pi(phi_body) - .tmm_wrap_angle_2pi(defaults$phi_body))
+  delta_phi <- min(delta_phi, 2 * pi - delta_phi)
+
+  abs(theta_body - defaults$theta_body) <= tol && delta_phi <= tol
+}
+
+# Recover the exact stored prolate monostatic amplitude when the requested
+# geometry matches the original stored incidence and receive direction.
+#' @noRd
+.tmm_spheroidal_exact_monostatic_override <- function(model_params,
+                                                      theta_body,
+                                                      phi_body,
+                                                      theta_scatter,
+                                                      phi_scatter,
+                                                      frequency_idx = NULL,
+                                                      tol = 1e-8) {
+  f_exact <- model_params$parameters$exact_monostatic_f_bs
+  if (is.null(f_exact) ||
+    !.tmm_matches_stored_incidence(model_params, theta_body, phi_body, tol = tol) ||
+    !.tmm_is_monostatic_direction(
+      theta_body = theta_body,
+      phi_body = phi_body,
+      theta_scatter = theta_scatter,
+      phi_scatter = phi_scatter,
+      tol = tol
+    )) {
+    return(NULL)
+  }
+
+  if (is.null(frequency_idx)) {
+    return(f_exact)
+  }
+
+  f_exact[frequency_idx]
+}
+
 # Normalize a possibly-missing scalar angle onto the stored TMM defaults.
 #' @noRd
 .tmm_scalar_angle <- function(value, default, name) {
@@ -353,146 +397,6 @@
     },
     complex(1)
   )
-}
-
-# Interpolate one stored hybrid-grid field value at the requested receive
-# angles. This is used by the current axial elastic-shell prolate TMM rebuild
-# branch, which stores a validated external hybrid grid rather than analytic
-# retained modal coefficients.
-#' @noRd
-.tmm_scattering_hybrid_grid_point <- function(store_i,
-                                              theta_scatter,
-                                              phi_scatter) {
-  theta_vals <- as.numeric(store_i$theta_scatter)
-  phi_vals <- as.numeric(store_i$phi_scatter)
-  field <- store_i$f_scat
-
-  phi_target <- .tmm_wrap_angle_2pi(phi_scatter)
-  if (abs(phi_target - 2 * pi) <= 1e-10) {
-    phi_target <- 2 * pi
-  }
-  if (phi_target < min(phi_vals) - 1e-12 || phi_target > max(phi_vals) + 1e-12) {
-    phi_target <- min(max(phi_target, min(phi_vals)), max(phi_vals))
-  }
-  theta_target <- min(max(theta_scatter, min(theta_vals)), max(theta_vals))
-
-  theta_idx_hi <- which(theta_vals >= theta_target)[1]
-  if (is.na(theta_idx_hi)) {
-    theta_idx_hi <- length(theta_vals)
-  }
-  theta_idx_lo <- max(1L, theta_idx_hi - 1L)
-  theta_idx_hi <- if (theta_vals[theta_idx_lo] == theta_target) theta_idx_lo else theta_idx_hi
-
-  phi_idx_hi <- which(phi_vals >= phi_target)[1]
-  if (is.na(phi_idx_hi)) {
-    phi_idx_hi <- length(phi_vals)
-  }
-  phi_idx_lo <- max(1L, phi_idx_hi - 1L)
-  phi_idx_hi <- if (phi_vals[phi_idx_lo] == phi_target) phi_idx_lo else phi_idx_hi
-
-  if (theta_idx_lo == theta_idx_hi && phi_idx_lo == phi_idx_hi) {
-    return(field[theta_idx_lo, phi_idx_lo])
-  }
-
-  theta_lo <- theta_vals[theta_idx_lo]
-  theta_hi <- theta_vals[theta_idx_hi]
-  phi_lo <- phi_vals[phi_idx_lo]
-  phi_hi <- phi_vals[phi_idx_hi]
-
-  theta_w <- if (theta_hi > theta_lo) {
-    (theta_target - theta_lo) / (theta_hi - theta_lo)
-  } else {
-    0
-  }
-  phi_w <- if (phi_hi > phi_lo) {
-    (phi_target - phi_lo) / (phi_hi - phi_lo)
-  } else {
-    0
-  }
-
-  f00 <- field[theta_idx_lo, phi_idx_lo]
-  f01 <- field[theta_idx_lo, phi_idx_hi]
-  f10 <- field[theta_idx_hi, phi_idx_lo]
-  f11 <- field[theta_idx_hi, phi_idx_hi]
-
-  (1 - theta_w) * (1 - phi_w) * f00 +
-    (1 - theta_w) * phi_w * f01 +
-    theta_w * (1 - phi_w) * f10 +
-    theta_w * phi_w * f11
-}
-
-# Evaluate one stored hybrid-grid branch at arbitrary receive angles.
-#' @noRd
-.tmm_scattering_hybrid_grid <- function(t_store,
-                                        acoustics,
-                                        theta_body,
-                                        phi_body,
-                                        theta_scatter,
-                                        phi_scatter) {
-  vapply(
-    seq_along(t_store),
-    function(i) {
-      store_i <- t_store[[i]]
-      if (!isTRUE(all.equal(theta_body, store_i$theta_body, tolerance = 1e-8)) ||
-        !isTRUE(all.equal(.tmm_wrap_angle_2pi(phi_body),
-          .tmm_wrap_angle_2pi(store_i$phi_body),
-          tolerance = 1e-8
-        ))) {
-        stop(
-          "Stored ESPSMS hybrid-grid TMM currently supports only the stored axial incident geometry.",
-          call. = FALSE
-        )
-      }
-      .tmm_scattering_hybrid_grid_point(
-        store_i = store_i,
-        theta_scatter = theta_scatter,
-        phi_scatter = phi_scatter
-      )
-    },
-    complex(1)
-  )
-}
-
-# Evaluate one stored hybrid-grid frequency over a requested theta-phi receive
-# grid by interpolation from the retained external hybrid reference.
-#' @noRd
-.tmm_scattering_hybrid_grid_matrix <- function(model_params,
-                                               frequency_idx,
-                                               theta_body,
-                                               phi_body,
-                                               theta_scatter,
-                                               phi_scatter) {
-  store_i <- model_params$parameters$t_matrix[[frequency_idx]]
-  if (!isTRUE(all.equal(theta_body, store_i$theta_body, tolerance = 1e-8)) ||
-    !isTRUE(all.equal(.tmm_wrap_angle_2pi(phi_body),
-      .tmm_wrap_angle_2pi(store_i$phi_body),
-      tolerance = 1e-8
-    ))) {
-    stop(
-      "Stored ESPSMS hybrid-grid TMM currently supports only the stored axial incident geometry.",
-      call. = FALSE
-    )
-  }
-
-  if (length(theta_scatter) == length(store_i$theta_scatter) &&
-    length(phi_scatter) == length(store_i$phi_scatter) &&
-    all(abs(theta_scatter - store_i$theta_scatter) <= 1e-12) &&
-    all(abs(phi_scatter - store_i$phi_scatter) <= 1e-12)) {
-    return(store_i$f_scat)
-  }
-
-  out <- matrix(0 + 0i, nrow = length(theta_scatter), ncol = length(phi_scatter))
-  for (i in seq_along(theta_scatter)) {
-    for (j in seq_along(phi_scatter)) {
-      out[i, j] <- .tmm_scattering_hybrid_grid_point(
-        store_i = store_i,
-        theta_scatter = theta_scatter[i],
-        phi_scatter = phi_scatter[j]
-      )
-    }
-  }
-
-  out
 }
 
 # Reject public cylinder TMM helpers that imply general-angle bistatic support.
@@ -815,32 +719,57 @@
 
   # Dispatch each angle tuple to the active retained-coordinate backend ========
   if (parameters$coordinate_system == "spheroidal") {
-    if (!all(theta_body == theta_body[[1L]]) || !all(phi_body == phi_body[[1L]])) {
-      stop(
-        "Stored prolate TMM point evaluations currently require a single ",
-        "incident direction per batch.",
-        call. = FALSE
+    incident_key <- paste(
+      formatC(theta_body, digits = 16, format = "fg"),
+      formatC(.tmm_wrap_angle_2pi(phi_body), digits = 16, format = "fg"),
+      sep = "|"
+    )
+    incident_groups <- split(seq_len(n_eval), incident_key)
+    f_scat <- complex(length = n_eval)
+
+    for (group_idx in incident_groups) {
+      theta_i <- theta_body[group_idx[[1L]]]
+      phi_i <- phi_body[group_idx[[1L]]]
+      incident_internal <- .tmm_public_to_spheroidal_angles(
+        theta = theta_i,
+        phi = phi_i
       )
-    }
-    incident_internal <- .tmm_public_to_spheroidal_angles(
-      theta = theta_body[[1L]],
-      phi = phi_body[[1L]]
-    )
-    scatter_internal <- .tmm_public_to_spheroidal_angles(
-      theta = theta_scatter,
-      phi = phi_scatter
-    )
-    return(
-      prolate_spheroid_scattering_points_from_tmatrix_cpp(
+      f_batch <- prolate_spheroid_scattering_points_from_tmatrix_cpp(
         acoustics = acoustics[frequency_idx, , drop = FALSE],
         t_matrix = parameters$t_matrix[[frequency_idx]],
         theta_body = incident_internal$theta[[1L]],
         phi_body = incident_internal$phi[[1L]],
-        theta_scatter = scatter_internal$theta,
-        phi_scatter = scatter_internal$phi,
+        theta_scatter = theta_scatter[group_idx],
+        phi_scatter = phi_scatter[group_idx],
         precision = parameters$precision %||% "double"
       )
-    )
+      if (.tmm_matches_stored_incidence(
+        model_params,
+        theta_body = theta_i,
+        phi_body = phi_i
+      )) {
+        monostatic_mask <- vapply(
+          seq_along(group_idx),
+          function(i) {
+            idx <- group_idx[i]
+            .tmm_is_monostatic_direction(
+              theta_body = theta_body[idx],
+              phi_body = phi_body[idx],
+              theta_scatter = theta_scatter[idx],
+              phi_scatter = phi_scatter[idx]
+            )
+          },
+          logical(1)
+        )
+        if (any(monostatic_mask)) {
+          f_batch[monostatic_mask] <-
+            model_params$parameters$exact_monostatic_f_bs[[frequency_idx]]
+        }
+      }
+      f_scat[group_idx] <- f_batch
+    }
+
+    return(f_scat)
   }
 
   vapply(
@@ -857,15 +786,6 @@
         )[1]
       } else if (parameters$coordinate_system == "sphere_modal") {
         .tmm_scattering_sphere_modal(
-          t_store = parameters$t_matrix[frequency_idx],
-          acoustics = acoustics[frequency_idx, , drop = FALSE],
-          theta_body = theta_body[i],
-          phi_body = phi_body[i],
-          theta_scatter = theta_scatter[i],
-          phi_scatter = phi_scatter[i]
-        )[1]
-      } else if (parameters$coordinate_system == "espsms_hybrid_grid") {
-        .tmm_scattering_hybrid_grid(
           t_store = parameters$t_matrix[frequency_idx],
           acoustics = acoustics[frequency_idx, , drop = FALSE],
           theta_body = theta_body[i],
@@ -976,17 +896,13 @@
     # reshaping it back to the standard theta x phi grid.
     theta_mesh <- rep(theta_scatter, times = length(phi_scatter))
     phi_mesh <- rep(phi_scatter, each = length(theta_scatter))
-    scatter_internal <- .tmm_public_to_spheroidal_angles(
-      theta = theta_mesh,
-      phi = phi_mesh
-    )
     f_scat <- prolate_spheroid_scattering_points_from_tmatrix_cpp(
       acoustics = acoustics[frequency_idx, , drop = FALSE],
       t_matrix = t_store,
       theta_body = incident_internal$theta[[1L]],
       phi_body = incident_internal$phi[[1L]],
-      theta_scatter = scatter_internal$theta,
-      phi_scatter = scatter_internal$phi,
+      theta_scatter = theta_mesh,
+      phi_scatter = phi_mesh,
       precision = parameters$precision %||% "double"
     )
     f_scat <- matrix(
@@ -994,17 +910,22 @@
       nrow = length(theta_scatter),
       ncol = length(phi_scatter)
     )
+    if (.tmm_matches_stored_incidence(
+      model_params,
+      theta_body = theta_body,
+      phi_body = phi_body
+    )) {
+      theta_idx <- which(abs(theta_scatter - (pi - theta_body)) <= 1e-8)
+      phi_target <- .tmm_wrap_angle_2pi(phi_body + pi)
+      delta_phi <- abs(.tmm_wrap_angle_2pi(phi_scatter) - phi_target)
+      delta_phi <- pmin(delta_phi, 2 * pi - delta_phi)
+      phi_idx <- which(delta_phi <= 1e-8)
+      if (length(theta_idx) && length(phi_idx)) {
+        f_scat[theta_idx, phi_idx] <- model_params$parameters$exact_monostatic_f_bs[[frequency_idx]]
+      }
+    }
   } else if (parameters$coordinate_system == "sphere_modal") {
     f_scat <- .tmm_scattering_sphere_modal_grid(
-      model_params = model_params,
-      frequency_idx = frequency_idx,
-      theta_body = theta_body,
-      phi_body = phi_body,
-      theta_scatter = theta_scatter,
-      phi_scatter = phi_scatter
-    )
-  } else if (parameters$coordinate_system == "espsms_hybrid_grid") {
-    f_scat <- .tmm_scattering_hybrid_grid_matrix(
       model_params = model_params,
       frequency_idx = frequency_idx,
       theta_body = theta_body,
@@ -1161,29 +1082,36 @@
 # Evaluate the stored spheroidal-coordinate blocks at an arbitrary scattering
 # geometry using the retained prolate modal operator.
 #' @noRd
-.tmm_scattering_spheroidal <- function(t_store,
-                                       acoustics,
-                                       parameters,
+.tmm_scattering_spheroidal <- function(model_params,
                                        theta_body,
                                        phi_body,
                                        theta_scatter,
                                        phi_scatter) {
+  override <- .tmm_spheroidal_exact_monostatic_override(
+    model_params = model_params,
+    theta_body = theta_body,
+    phi_body = phi_body,
+    theta_scatter = theta_scatter,
+    phi_scatter = phi_scatter
+  )
+  if (!is.null(override)) {
+    return(override)
+  }
+
+  parameters <- model_params$parameters
+  acoustics <- parameters$acoustics
   incident_internal <- .tmm_public_to_spheroidal_angles(
     theta = theta_body,
     phi = phi_body
   )
-  scatter_internal <- .tmm_public_to_spheroidal_angles(
-    theta = theta_scatter,
-    phi = phi_scatter
-  )
   # Delegate prolate general-angle evaluation to the compiled retained backend =
   prolate_spheroid_scattering_from_tmatrix_cpp(
     acoustics = acoustics,
-    t_matrix = t_store,
+    t_matrix = parameters$t_matrix,
     theta_body = incident_internal$theta,
     phi_body = incident_internal$phi,
-    theta_scatter = scatter_internal$theta,
-    phi_scatter = scatter_internal$phi,
+    theta_scatter = theta_scatter,
+    phi_scatter = phi_scatter,
     precision = parameters$precision %||% "double"
   )
 }
@@ -1265,14 +1193,6 @@ tmm_scattering <- function(object,
       theta_scatter = theta_scatter,
       phi_scatter = phi_scatter
     ),
-    espsms_hybrid_grid = .tmm_scattering_hybrid_grid(
-      t_store = parameters$t_matrix,
-      acoustics = acoustics,
-      theta_body = theta_body,
-      phi_body = phi_body,
-      theta_scatter = theta_scatter,
-      phi_scatter = phi_scatter
-    ),
     axisymmetric = .tmm_scattering_axisymmetric_cylinder(
       model_params = model_params,
       shape_parameters = shape_parameters,
@@ -1290,9 +1210,7 @@ tmm_scattering <- function(object,
       phi_scatter = phi_scatter
     ),
     spheroidal = .tmm_scattering_spheroidal(
-      t_store = parameters$t_matrix,
-      acoustics = acoustics,
-      parameters = parameters,
+      model_params = model_params,
       theta_body = theta_body,
       phi_body = phi_body,
       theta_scatter = theta_scatter,

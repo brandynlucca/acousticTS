@@ -49,6 +49,54 @@
   (-2i / k_sw) * f_sum
 }
 
+# Evaluate the exact prolate monostatic spectrum through the PSMS family used
+# by the direct spheroidal TMM path.
+#' @noRd
+.tmm_spheroidal_exact_monostatic <- function(object,
+                                             acoustics,
+                                             body_internal,
+                                             medium,
+                                             parameters) {
+  use_simplified_gas <- identical(parameters$boundary, "gas_filled")
+  psms_object <- psms_initialize(
+    object = object,
+    frequency = acoustics$frequency,
+    phi_body = body_internal$phi_body,
+    boundary = parameters$boundary,
+    adaptive = FALSE,
+    precision = parameters$precision,
+    n_integration = if (is.na(parameters$n_integration)) {
+      NULL
+    } else {
+      parameters$n_integration
+    },
+    simplify_Amn = use_simplified_gas,
+    sound_speed_sw = medium$sound_speed,
+    density_sw = medium$density
+  )
+  psms_object <- PSMS(psms_object)
+  psms_parameters <- acousticTS::extract(
+    psms_object,
+    "model_parameters"
+  )$PSMS$parameters
+  f_bs <- .tmm_spheroidal_sum_to_amplitude(
+    psms_object@model$PSMS$f_bs,
+    acoustics$k_sw
+  )
+  sigma_bs <- .sigma_bs(f_bs)
+
+  list(
+    model = data.frame(
+      frequency = acoustics$frequency,
+      f_bs = f_bs,
+      sigma_bs = sigma_bs,
+      TS = db(sigma_bs),
+      n_max = psms_parameters$acoustics$n_max
+    ),
+    n_max = psms_parameters$acoustics$n_max
+  )
+}
+
 # Route the prolate branch through the exact scalar spheroidal modal-series
 # backend. For the current single-target scope, this is the geometry-matched
 # T-matrix-equivalent path.
@@ -66,52 +114,21 @@
   )
   body_internal$theta_body <- incident_internal$theta[[1L]]
   body_internal$phi_body <- incident_internal$phi[[1L]]
-  use_simplified_gas <- identical(parameters$boundary, "gas_filled")
   # Penetrable prolate cases are numerically stiffer, so they inherit the same
   # conservative PSMS settings used in the benchmarked modal-series workflow.
   if (!isTRUE(parameters$store_t_matrix)) {
-    # Reuse the exact PSMS backend when no retained blocks are needed ==========
-    psms_object <- psms_initialize(
+    exact_result <- .tmm_spheroidal_exact_monostatic(
       object = object,
-      frequency = acoustics$frequency,
-      phi_body = body_internal$phi_body,
-      boundary = parameters$boundary,
-      adaptive = FALSE,
-      precision = parameters$precision,
-      n_integration = if (is.na(parameters$n_integration)) {
-        NULL
-      } else {
-        parameters$n_integration
-      },
-      # The full gas-filled spheroidal kernel remains numerically unstable in
-      # the benchmark regime, so the prolate TMM gas branch must stay aligned
-      # with the stabilized public PSMS pathway.
-      simplify_Amn = use_simplified_gas,
-      sound_speed_sw = medium$sound_speed,
-      density_sw = medium$density
+      acoustics = acoustics,
+      body_internal = body_internal,
+      medium = medium,
+      parameters = parameters
     )
-    psms_object <- PSMS(psms_object)
-    psms_parameters <- acousticTS::extract(
-      psms_object,
-      "model_parameters"
-    )$PSMS$parameters
-    f_bs <- .tmm_spheroidal_sum_to_amplitude(
-      psms_object@model$PSMS$f_bs,
-      acoustics$k_sw
-    )
-    sigma_bs <- .sigma_bs(f_bs)
 
     return(
-      list(
-        model = data.frame(
-          frequency = acoustics$frequency,
-          f_bs = f_bs,
-          sigma_bs = sigma_bs,
-          TS = db(sigma_bs),
-          n_max = psms_parameters$acoustics$n_max
-        ),
-        n_max = psms_parameters$acoustics$n_max,
-        t_matrix = NULL
+      c(
+        exact_result,
+        list(t_matrix = NULL)
       )
     )
   }
@@ -135,22 +152,20 @@
       pressure_release = "Amn_pressure_release"
     )
   )
-  # Convert the retained modal sums into the public TMM outputs ================
-  f_bs <- .tmm_spheroidal_sum_to_amplitude(
-    tmm_detail$f_scat,
-    acoustics$k_sw
+  # Keep the stored monostatic spectrum tied to the exact PSMS family while
+  # still retaining the spheroidal transition blocks for general-angle
+  # post-processing.
+  exact_result <- .tmm_spheroidal_exact_monostatic(
+    object = object,
+    acoustics = acoustics,
+    body_internal = body_internal,
+    medium = medium,
+    parameters = parameters
   )
-  sigma_bs <- .sigma_bs(f_bs)
   # Return the monostatic spectrum and stored spheroidal blocks ================
   list(
-    model = data.frame(
-      frequency = acoustics$frequency,
-      f_bs = f_bs,
-      sigma_bs = sigma_bs,
-      TS = db(sigma_bs),
-      n_max = acoustics$n_max
-    ),
-    n_max = acoustics$n_max,
+    model = exact_result$model,
+    n_max = exact_result$n_max,
     t_matrix = tmm_detail$t_matrix
   )
 }

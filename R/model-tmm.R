@@ -9,13 +9,11 @@
 #' bodies of revolution and finite cylinders already represented in the
 #' package as a `Sphere`, `OblateSpheroid`, `ProlateSpheroid`, or `Cylinder`.
 #' It also supports spherical fluid shells and spherical elastic
-#' shells carried by `ESS` objects. An internal experimental hybrid-reference
-#' path is also retained for elastic-shelled prolate spheroids under axial
-#' incidence rebuild work. The current public boundaries therefore cover rigid,
-#' pressure-release, and homogeneous penetrable fluid/gas interiors for
-#' homogeneous bodies, plus `shelled_pressure_release`, `shelled_liquid`, and
-#' `shelled_gas` for shell spheres, and `elastic_shelled` for spherical elastic
-#' shells plus the experimental axial prolate-shell branch.
+#' shells carried by `ESS` objects. The current public boundaries therefore
+#' cover rigid, pressure-release, and homogeneous penetrable fluid/gas
+#' interiors for homogeneous bodies, plus `shelled_pressure_release`,
+#' `shelled_liquid`, and `shelled_gas` for shell spheres, and
+#' `elastic_shelled` for spherical elastic shells.
 #'
 #' @details
 #' This implementation is intentionally scoped to **single targets** and the
@@ -42,10 +40,7 @@
 #' intentionally outside the current scope. Cylinder calls therefore still emit
 #' a warning by default while this narrower validation scope is being
 #' maintained; see \code{options(acousticTS.warn_tmm_cylinder = FALSE)} to
-#' silence it in controlled test or benchmarking workflows. An internal
-#' elastic-shelled prolate retained-grid route is still available for rebuild
-#' comparisons through package options, but it is not part of the normal public
-#' `target_strength()` interface.
+#' silence it in controlled test or benchmarking workflows.
 #'
 #' The present solver is therefore a practical single-target acoustic
 #' T-matrix method motivated by the classic transition-matrix literature, but
@@ -86,11 +81,7 @@
 #'   available for the spherical and spheroidal branches. For cylinders, sharp
 #'   stored runs keep the geometry-matched monostatic family on the model table
 #'   while retaining only the exact monostatic reuse path; public cylinder
-#'   bistatic and grid helpers remain outside scope. For the experimental
-#'   elastic-shelled prolate rebuild route, the retained state is the
-#'   externally generated hybrid scattering grid. The advanced solver and
-#'   backend overrides used for internal rebuild work are not part of the
-#'   normal public `target_strength()` interface.}
+#'   bistatic and grid helpers remain outside scope.}
 #' }
 #'
 #' @section Theory:
@@ -152,39 +143,6 @@
 #' @keywords models acoustics internal
 NULL
 
-#' Resolve internal TMM runtime controls kept outside the normal public API.
-#' @noRd
-.tmm_internal_controls <- function() {
-  opt_scalar <- function(name, default = NULL) {
-    value <- getOption(name, default)
-    if (is.null(value)) {
-      return(NULL)
-    }
-    value[[1L]]
-  }
-
-  list(
-    n_max = opt_scalar("acousticTS.tmm_n_max", NULL),
-    cylinder_backend = NULL,
-    cylinder_endcap_fraction = opt_scalar("acousticTS.tmm_cylinder_endcap_fraction", NULL),
-    elastic_shell_backend = match.arg(
-      as.character(opt_scalar("acousticTS.tmm_elastic_shell_backend", "default")),
-      c("default", "hybrid_reference")
-    ),
-    validation_repo = opt_scalar("acousticTS.tmm_validation_repo", NULL),
-    python = as.character(opt_scalar(
-      "acousticTS.tmm_python",
-      Sys.getenv("ACOUSTICTS_PYTHON", unset = "python")
-    )),
-    theta_body_deg = opt_scalar("acousticTS.tmm_theta_body_deg", NULL),
-    n_eta = as.integer(opt_scalar("acousticTS.tmm_hybrid_n_eta", 129L)),
-    mesh_n_u = as.integer(opt_scalar("acousticTS.tmm_hybrid_mesh_n_u", 12L)),
-    mesh_n_v = as.integer(opt_scalar("acousticTS.tmm_hybrid_mesh_n_v", 16L)),
-    n_theta = as.integer(opt_scalar("acousticTS.tmm_hybrid_n_theta", 91L)),
-    n_phi = as.integer(opt_scalar("acousticTS.tmm_hybrid_n_phi", 181L))
-  )
-}
-
 #' Initialize object for the transition matrix method
 #'
 #' @param object Scatterer-class object.
@@ -204,40 +162,19 @@ tmm_initialize <- function(object,
   # Enforce the current homogeneous-fluid scatterer scope ======================
   .tmm_validate_object_scope(object)
   .tmm_validate_store_t_matrix(store_t_matrix)
-  internal <- .tmm_internal_controls()
-  n_max <- internal$n_max
-  cylinder_backend <- internal$cylinder_backend
-  cylinder_endcap_fraction <- internal$cylinder_endcap_fraction
-  elastic_shell_backend <- internal$elastic_shell_backend
-  validation_repo <- internal$validation_repo
-  python <- internal$python
-  theta_body_deg <- internal$theta_body_deg
-  n_eta <- internal$n_eta
-  mesh_n_u <- internal$mesh_n_u
-  mesh_n_v <- internal$mesh_n_v
-  n_theta <- internal$n_theta
-  n_phi <- internal$n_phi
-  cylinder_endcap_fraction <- .tmm_resolve_cylinder_endcap_fraction(
-    cylinder_endcap_fraction
-  )
+  cylinder_backend <- NULL
+  cylinder_endcap_fraction <- NULL
   boundary <- .tmm_resolve_boundary(object, boundary)
   shape_parameters <- acousticTS::extract(object, "shape_parameters")
-  use_elastic_shell_prolate_branch <- .tmm_is_elastic_shell_prolate_branch(
-    object = object,
-    shape_parameters = shape_parameters,
-    boundary = boundary
-  )
   if (methods::is(object, "ESS") &&
     !.tmm_is_sphere_modal_branch(
       object = object,
       shape_parameters = shape_parameters,
       boundary = boundary
-    ) &&
-    !use_elastic_shell_prolate_branch) {
+    )) {
     stop(
       "The current TMM shell branch supports spherical fluid shells plus ",
-      "spherical elastic shells, along with the experimental axial-incidence ",
-      "elastic-shelled prolate branch. Supported ESS boundaries are ",
+      "spherical elastic shells only. Supported ESS boundaries are ",
       "'shelled_pressure_release', 'shelled_liquid', 'shelled_gas', and ",
       "'elastic_shelled'.",
       call. = FALSE
@@ -260,41 +197,8 @@ tmm_initialize <- function(object,
   resolved_cylinder_backend <- branch_flags$cylinder_backend
 
   # Resolve the boundary condition and validate the storage controls ===========
-  n_max <- .tmm_branch_n_max(n_max, use_spheroidal_branch)
+  n_max <- .tmm_branch_n_max(NULL, use_spheroidal_branch)
   body <- .tmm_prepare_body(object, sound_speed_sw, density_sw, boundary)
-  if (use_elastic_shell_prolate_branch) {
-    if (!identical(elastic_shell_backend, "hybrid_reference")) {
-      stop(
-        paste(
-          "Elastic-shelled prolate TMM currently requires the internal",
-          "hybrid-reference backend option."
-        ),
-        call. = FALSE
-      )
-    }
-    if (is.null(theta_body_deg)) {
-      stop(
-        paste(
-          "Elastic-shelled prolate TMM currently needs the internal axial",
-          "incidence override (0 or 180 degrees)."
-        ),
-        call. = FALSE
-      )
-    }
-    theta_body_deg <- as.numeric(theta_body_deg)[1]
-    if (!is.finite(theta_body_deg) ||
-      !(isTRUE(all.equal(theta_body_deg %% 180, 0, tolerance = 1e-8)))) {
-      stop(
-        paste(
-          "Elastic-shelled prolate TMM currently supports only axial internal",
-          "incidence overrides (0 or 180 degrees)."
-        ),
-        call. = FALSE
-      )
-    }
-    body$theta <- pi / 2
-    body$phi_body <- if ((theta_body_deg %% 360) < 90 || (theta_body_deg %% 360) > 270) 0 else pi
-  }
 
   # Build the shared acoustics table for the requested frequencies =============
   acoustics_info <- .tmm_prepare_acoustics(
@@ -330,7 +234,6 @@ tmm_initialize <- function(object,
           use_spheroidal_branch,
           use_cylindrical_branch,
           use_shell_sphere_branch = use_shell_sphere_branch,
-          use_elastic_shell_prolate_branch = use_elastic_shell_prolate_branch,
           shape_parameters = shape_parameters,
           cylinder_backend = resolved_cylinder_backend
         ),
@@ -339,15 +242,6 @@ tmm_initialize <- function(object,
           use_spheroidal_branch,
           boundary
         ),
-        elastic_shell_backend = elastic_shell_backend,
-        validation_repo = validation_repo,
-        python = python,
-        theta_body_deg = theta_body_deg,
-        n_eta = as.integer(n_eta),
-        mesh_n_u = as.integer(mesh_n_u),
-        mesh_n_v = as.integer(mesh_n_v),
-        n_theta = as.integer(n_theta),
-        n_phi = as.integer(n_phi),
         cylinder_endcap_fraction = cylinder_endcap_fraction,
         store_t_matrix = store_t_matrix,
         t_matrix = if (isTRUE(store_t_matrix)) {
@@ -360,78 +254,6 @@ tmm_initialize <- function(object,
       body = body_params
     ),
     result_cols = c("f_bs", "sigma_bs", "TS", "n_max")
-  )
-}
-
-# Build the stored hybrid-grid branch used for the current elastic-shelled
-# prolate TMM rebuild route.
-#' @noRd
-.tmm_run_elastic_shell_prolate_hybrid_branch <- function(acoustics,
-                                                         body,
-                                                         parameters) {
-  theta_body_deg <- parameters$theta_body_deg %||% 0
-  t_store <- if (isTRUE(parameters$store_t_matrix)) {
-    lapply(
-      acoustics$frequency,
-      function(freq_i) {
-        .espsms_hybrid_reference_grid_from_body(
-          body = body,
-          frequency = freq_i,
-          theta_body_deg = theta_body_deg,
-          n_eta = parameters$n_eta %||% 129L,
-          mesh_n_u = parameters$mesh_n_u %||% 12L,
-          mesh_n_v = parameters$mesh_n_v %||% 16L,
-          n_theta = parameters$n_theta %||% 91L,
-          n_phi = parameters$n_phi %||% 181L,
-          validation_repo = parameters$validation_repo,
-          python = parameters$python %||% Sys.getenv("ACOUSTICTS_PYTHON", unset = "python")
-        )
-      }
-    )
-  } else {
-    NULL
-  }
-
-  if (isTRUE(parameters$store_t_matrix)) {
-    monostatic_index <- function(store_i) {
-      theta_target <- pi - store_i$theta_body
-      phi_target <- .tmm_wrap_angle_2pi(store_i$phi_body + pi)
-      theta_idx <- which.min(abs(store_i$theta_scatter - theta_target))
-      phi_idx <- which.min(abs(store_i$phi_scatter - phi_target))
-      c(theta_idx = theta_idx, phi_idx = phi_idx)
-    }
-    f_bs <- vapply(
-      t_store,
-      function(store_i) {
-        idx <- monostatic_index(store_i)
-        store_i$f_scat[idx[[1]], idx[[2]]]
-      },
-      complex(1)
-    )
-  } else {
-    mono <- .espsms_hybrid_reference_monostatic_from_body(
-      body = body,
-      frequency = acoustics$frequency,
-      theta_body_deg = theta_body_deg,
-      n_eta = parameters$n_eta %||% 129L,
-      mesh_n_u = parameters$mesh_n_u %||% 12L,
-      mesh_n_v = parameters$mesh_n_v %||% 16L,
-      validation_repo = parameters$validation_repo,
-      python = parameters$python %||% Sys.getenv("ACOUSTICTS_PYTHON", unset = "python")
-    )
-    f_bs <- complex(real = mono$f_bs_real, imaginary = mono$f_bs_imag)
-  }
-
-  sigma_bs <- .sigma_bs(f_bs)
-  list(
-    model = data.frame(
-      frequency = acoustics$frequency,
-      f_bs = f_bs,
-      sigma_bs = sigma_bs,
-      TS = db(sigma_bs),
-      n_max = acoustics$n_max
-    ),
-    t_matrix = t_store
   )
 }
 
@@ -577,19 +399,6 @@ TMM <- function(object) {
     return(object)
   }
 
-  if (identical(parameters$coordinate_system, "espsms_hybrid_grid")) {
-    hybrid_result <- .tmm_run_elastic_shell_prolate_hybrid_branch(
-      acoustics = acoustics,
-      body = body,
-      parameters = parameters
-    )
-    methods::slot(object, "model")$TMM <- hybrid_result$model
-    if (isTRUE(parameters$store_t_matrix)) {
-      methods::slot(object, "model_parameters")$TMM$parameters$t_matrix <- hybrid_result$t_matrix
-    }
-    return(object)
-  }
-
   # Route prolate targets through the geometry-matched spheroidal backend ======
   if (.tmm_is_spheroidal_branch(shape_parameters, parameters$boundary)) {
     spheroidal_result <- .tmm_run_spheroidal_branch(
@@ -605,6 +414,8 @@ TMM <- function(object) {
     if (isTRUE(parameters$store_t_matrix)) {
       methods::slot(object, "model_parameters")$TMM$parameters$t_matrix <-
         spheroidal_result$t_matrix
+      methods::slot(object, "model_parameters")$TMM$parameters$exact_monostatic_f_bs <-
+        spheroidal_result$model$f_bs
     }
 
     return(object)
