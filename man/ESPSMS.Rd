@@ -8,60 +8,20 @@
 \alias{EPSMS}
 \title{Elastic-shell prolate spheroidal model (ESPSMS)}
 \description{
-The original experimental \code{ESPSMS} branch used a projected thin-shell
-impedance approximation on the prolate surface. That route did not validate
-against the shell-only literature or against independent shell validation and
-is now disabled while a paper-backed elastic-shelled prolate formulation is
-rebuilt.
+\code{ESPSMS} is currently disabled in \code{acousticTS} while the elastic-shelled
+prolate implementation is rebuilt and validated in the standalone
+\code{acousticValidator} repository.
 }
 \section{Usage}{
 
-By default this model identifier fails fast. During the rebuild, an explicit
-experimental backend may be requested:
-\preformatted{
-target_strength(
-  ...,
-  model = "espsms",
-  sound_speed_sw,
-  density_sw,
-  n_max,
-  solver_backend = "hybrid_reference",
-  theta_body_deg = 0,
-  validation_repo = "path/to/acousticTSValidation"
-)
-}
-}
-
-\section{Arguments}{
-
-\describe{
-\item{\code{sound_speed_sw}}{Surrounding-medium sound speed
-(\eqn{m~s^{-1}}).}
-\item{\code{density_sw}}{Surrounding-medium density (\eqn{kg~m^{-3}}).}
-\item{\code{n_max}}{Reserved for the future native shell-only rebuild.}
-\item{\code{solver_backend}}{Use \code{"disabled"} to keep the rebuild
-branch off, or \code{"hybrid_reference"} to use the external coupled
-shell-fluid reference backend.}
-\item{\code{theta_body_deg}}{Optional orientation override for the current
-experimental backend. Only \code{0} and \code{180} are supported at
-present.}
-\item{\code{validation_repo}}{Optional path to the sibling
-\code{acousticTSValidation} repository when using the hybrid-reference
-backend.}
-}
+Calls routed through \code{model = "espsms"} currently fail fast.
 }
 
 \section{Implementation route}{
 
-The next supported implementation follows the elastic-shelled prolate
-literature directly, using shell-only modal/numerical equations from the
-prolate shell vibration/scattering literature together with an independent
-hybrid shell validator before any \code{TMM} wrapping is restored.
-
-The current rebuild keeps the old proxy branch disabled by default. An
-explicit experimental backend, \code{solver_backend = "hybrid_reference"}, is
-available for monostatic axial-incidence runs when the sibling
-\code{acousticTSValidation} repository and the Python hybrid helper are available.
+The package retains only the shell-theory helper routines needed for the
+ongoing rebuild. Validation solvers, external bridges, and experimental
+hybrid workflows live outside \code{acousticTS}.
 }
 
 \references{

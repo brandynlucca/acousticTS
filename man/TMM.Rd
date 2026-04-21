@@ -11,13 +11,11 @@ transition-matrix formulation. The current implementation targets smooth
 bodies of revolution and finite cylinders already represented in the
 package as a \code{Sphere}, \code{OblateSpheroid}, \code{ProlateSpheroid}, or \code{Cylinder}.
 It also supports spherical fluid shells and spherical elastic
-shells carried by \code{ESS} objects. An internal experimental hybrid-reference
-path is also retained for elastic-shelled prolate spheroids under axial
-incidence rebuild work. The current public boundaries therefore cover rigid,
-pressure-release, and homogeneous penetrable fluid/gas interiors for
-homogeneous bodies, plus \code{shelled_pressure_release}, \code{shelled_liquid}, and
-\code{shelled_gas} for shell spheres, and \code{elastic_shelled} for spherical elastic
-shells plus the experimental axial prolate-shell branch.
+shells carried by \code{ESS} objects. The current public boundaries therefore
+cover rigid, pressure-release, and homogeneous penetrable fluid/gas
+interiors for homogeneous bodies, plus \code{shelled_pressure_release},
+\code{shelled_liquid}, and \code{shelled_gas} for shell spheres, and
+\code{elastic_shelled} for spherical elastic shells.
 }
 \details{
 This implementation is intentionally scoped to \strong{single targets} and the
@@ -44,10 +42,7 @@ post-processing helpers. Public general-angle cylinder bistatic helpers are
 intentionally outside the current scope. Cylinder calls therefore still emit
 a warning by default while this narrower validation scope is being
 maintained; see \code{options(acousticTS.warn_tmm_cylinder = FALSE)} to
-silence it in controlled test or benchmarking workflows. An internal
-elastic-shelled prolate retained-grid route is still available for rebuild
-comparisons through package options, but it is not part of the normal public
-\code{target_strength()} interface.
+silence it in controlled test or benchmarking workflows.
 
 The present solver is therefore a practical single-target acoustic
 T-matrix method motivated by the classic transition-matrix literature, but
@@ -91,11 +86,7 @@ frequency-specific retained state is stored under
 available for the spherical and spheroidal branches. For cylinders, sharp
 stored runs keep the geometry-matched monostatic family on the model table
 while retaining only the exact monostatic reuse path; public cylinder
-bistatic and grid helpers remain outside scope. For the experimental
-elastic-shelled prolate rebuild route, the retained state is the
-externally generated hybrid scattering grid. The advanced solver and
-backend overrides used for internal rebuild work are not part of the
-normal public \code{target_strength()} interface.}
+bistatic and grid helpers remain outside scope.}
 }
 }
 
