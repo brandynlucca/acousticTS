@@ -433,6 +433,7 @@ lame <- function(K = NULL, E = NULL, G = NULL, nu = NULL) {
 #'   \code{"psms"} (\code{\link{PSMS}}),
 #'   \code{"sphms"} (\code{\link{SPHMS}}),
 #'   \code{"essms"} (\code{\link{ESSMS}}),
+#'   \code{"espsms"} / \code{"epsms"} (\code{\link{ESPSMS}}),
 #'   \code{"vesms"} (\code{\link{VESMS}}),
 #'   \code{"trcm"} (\code{\link{TRCM}}), and
 #'   \code{"calibration"} / \code{"soems"} (\code{\link{SOEMS}}).
@@ -475,6 +476,10 @@ lame <- function(K = NULL, E = NULL, G = NULL, nu = NULL) {
 #'   \item \code{\link{SPHMS}} for the spherical modal series solution.
 #'   \item \code{\link{ESSMS}} for the elastic-shelled spherical modal series
 #'   solution.
+#'   \item \code{\link{ESPSMS}} for the rebuilding elastic-shelled prolate
+#'   spheroidal branch. By default it remains disabled, but an explicit
+#'   experimental hybrid-reference backend is available for monostatic
+#'   axial-incidence rebuild checks.
 #'   \item \code{\link{VESMS}} for the viscous-elastic spherical scattering
 #'   model applied to gas-filled elastic shells with an external viscous layer.
 #'   \item \code{\link{TMM}} for the single-target transition-matrix family.

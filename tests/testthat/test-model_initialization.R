@@ -68,6 +68,19 @@ test_that("essms_initialize works correctly", {
   expect_true("ESSMS" %in% names(ess_initialized@model))
 })
 
+test_that("espsms_initialize is disabled pending the shell-only rebuild", {
+  eps_obj <- fixture_ps("elastic_shelled")
+  frequency <- c(12e3, 38e3, 70e3, 120e3)
+
+  expect_error(
+    espsms_initialize(
+      eps_obj,
+      frequency = frequency
+    ),
+    "temporarily disabled"
+  )
+})
+
 test_that("dwba_initialize works correctly", {
   # Test dwba_initialize for FLS objects
   fls_obj <- fls_generate(

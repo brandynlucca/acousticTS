@@ -280,5 +280,5 @@ Rmn <- function(m, n, c, xi, kind = 1, precision = "double") {
     stop("'precision' must either be 'double' (default) or 'quad'.")
   }
   # Run compiled function ======================================================
-  Rmn_cpp(m, n, c, xi, kind)
+  Rmn_cpp(m, n, c, xi, kind, precision)
 }

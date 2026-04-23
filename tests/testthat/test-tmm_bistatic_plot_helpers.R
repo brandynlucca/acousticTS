@@ -46,6 +46,18 @@ test_that("TMM geometry helpers cover coordinate conversions and lobe widths", {
   expect_equal(slice_dirs$theta_scatter[2], pi / 2, tolerance = 1e-12)
   expect_equal(slice_dirs$phi_scatter[2], pi, tolerance = 1e-12)
 
+  grid_dirs <- acousticTS:::.tmm_local_grid_directions(
+    theta_body = pi / 2,
+    phi_body = 0,
+    psi_scatter = c(0, pi),
+    alpha_scatter = c(0, pi / 2)
+  )
+  expect_equal(nrow(grid_dirs), 4)
+  expect_equal(grid_dirs$theta_scatter[1], pi / 2, tolerance = 1e-12)
+  expect_equal(grid_dirs$phi_scatter[1], 0, tolerance = 1e-12)
+  expect_equal(grid_dirs$theta_scatter[2], pi / 2, tolerance = 1e-12)
+  expect_equal(grid_dirs$phi_scatter[2], pi, tolerance = 1e-12)
+
   psi_grid <- acousticTS:::.tmm_forward_separation_matrix(
     theta_body = pi / 2,
     phi_body = 0,
@@ -152,7 +164,7 @@ test_that("TMM sector and summary-input helpers validate their contracts", {
       n_psi = 7,
       sectors = NULL
     ),
-    "Stored cylindrical TMM bistatic summaries are not available yet"
+    "Cylinder 'TMM' bistatic evaluation is outside the current public scope"
   )
   expect_error(
     acousticTS:::.tmm_bistatic_summary_inputs(
@@ -454,6 +466,20 @@ test_that("TMM plotting renderers and dispatcher cover polar, heatmap, and slice
       grid
     )
     expect_identical(
+      acousticTS:::.plot_tmm_scattering_heatmap(
+        modifyList(grid, list(
+          coordinate_frame = "incident_local",
+          psi_scatter = grid$theta_scatter,
+          alpha_scatter = grid$phi_scatter
+        ))
+      ),
+      modifyList(grid, list(
+        coordinate_frame = "incident_local",
+        psi_scatter = grid$theta_scatter,
+        alpha_scatter = grid$phi_scatter
+      ))
+    )
+    expect_identical(
       acousticTS:::.plot_tmm_scattering_polar(grid, quantity = "phase"),
       grid
     )
@@ -470,6 +496,9 @@ test_that("TMM plotting renderers and dispatcher cover polar, heatmap, and slice
 
   local({
     testthat::local_mocked_bindings(
+      .tmm_incident_local_polar_grid = function(...) {
+        modifyList(grid, list(coordinate_frame = "incident_local"))
+      },
       tmm_scattering_grid = function(...) grid,
       .plot_tmm_scattering_polar = function(grid, quantity) {
         attr(grid, "quantity") <- quantity
@@ -491,8 +520,14 @@ test_that("TMM plotting renderers and dispatcher cover polar, heatmap, and slice
       object = structure(list(), class = "Scatterer"),
       heatmap = TRUE
     )
+    local_heatmap_grid <- acousticTS:::.plot_tmm_scattering_slice(
+      object = structure(list(), class = "Scatterer"),
+      heatmap = TRUE,
+      frame = "incident_local"
+    )
     expect_equal(attr(polar_grid, "quantity"), "phase")
     expect_equal(attr(heatmap_grid, "quantity"), "sigma_scat_dB")
+    expect_equal(local_heatmap_grid$coordinate_frame, "incident_local")
   })
 
   local({

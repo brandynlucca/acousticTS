@@ -649,3 +649,94 @@ Rcpp::ComplexMatrix prolate_spheroid_scattering_grid_from_tmatrix_cpp(
         Rcpp::as<std::vector<double>>(phi_scatter)
     );
 }
+
+// Evaluate one retained prolate T-matrix block set over paired
+// theta-scatter/phi-scatter points in compiled code.
+// [[Rcpp::export]]
+Rcpp::ComplexVector prolate_spheroid_scattering_points_from_tmatrix_cpp(
+    Rcpp::DataFrame acoustics,
+    Rcpp::List t_matrix,
+    double theta_body,
+    double phi_body,
+    Rcpp::NumericVector theta_scatter,
+    Rcpp::NumericVector phi_scatter,
+    std::string precision = "double"
+) {
+    if (theta_scatter.size() != phi_scatter.size()) {
+        Rcpp::stop(
+            "Prolate retained point evaluation requires equal-length "
+            "theta_scatter and phi_scatter vectors."
+        );
+    }
+
+    double chi_sw = Rcpp::as<std::vector<double>>(acoustics["chi_sw"])[0];
+    double k_sw = Rcpp::as<std::vector<double>>(acoustics["k_sw"])[0];
+
+    auto eval_points = [&](auto dummy_type) {
+        using T = decltype(dummy_type);
+
+        int n_point = theta_scatter.size();
+        auto t_blocks = prolate_tmatrix_blocks_from_rcpp<T>(t_matrix);
+        int m_max = t_matrix.size() - 1;
+        Rcpp::List last_block = t_matrix[m_max];
+        Rcpp::IntegerVector n_seq_last = last_block["n_seq"];
+        int n_max = n_seq_last[n_seq_last.size() - 1];
+
+        T chi_val = static_cast<T>(chi_sw);
+        T k_val = static_cast<T>(k_sw);
+        auto smn_inc = compute_smn_matrix<T>(
+            m_max, n_max, chi_val, preccos(static_cast<T>(theta_body)), true
+        );
+
+        std::vector<T> theta_unique;
+        std::vector<std::vector<std::vector<T>>> smn_cache;
+        std::vector<int> theta_index(n_point);
+        theta_unique.reserve(n_point);
+        smn_cache.reserve(n_point);
+
+        for (int i = 0; i < n_point; ++i) {
+            T theta_i = static_cast<T>(theta_scatter[i]);
+            int match = -1;
+            for (size_t j = 0; j < theta_unique.size(); ++j) {
+                if (theta_unique[j] == theta_i) {
+                    match = static_cast<int>(j);
+                    break;
+                }
+            }
+            if (match < 0) {
+                theta_unique.push_back(theta_i);
+                smn_cache.push_back(
+                    compute_smn_matrix<T>(m_max, n_max, chi_val, preccos(theta_i), true)
+                );
+                match = static_cast<int>(theta_unique.size()) - 1;
+            }
+            theta_index[i] = match;
+        }
+
+        Rcpp::ComplexVector out(n_point);
+        for (int i = 0; i < n_point; ++i) {
+            auto azimuth = compute_azimuth<T>(
+                m_max,
+                static_cast<T>(phi_body),
+                static_cast<T>(phi_scatter[i])
+            );
+            auto raw_sum = compute_fbs_from_tmatrix_blocks<T>(
+                m_max,
+                n_max,
+                azimuth,
+                smn_inc,
+                smn_cache[theta_index[i]],
+                t_blocks
+            );
+            out[i] = to_Rcomplex(std::complex<T>(0, -T(2) / k_val) * raw_sum);
+        }
+
+        return out;
+    };
+
+    if (precision == "quad") {
+        return eval_points(acousticts_quad_t(0));
+    }
+
+    return eval_points(double(0));
+}

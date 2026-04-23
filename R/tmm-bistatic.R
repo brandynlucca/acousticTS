@@ -45,14 +45,47 @@
 .tmm_forward_basis <- function(theta_body, phi_body) {
   # Build the forward-scattering direction =====================================
   forward <- .tmm_spherical_to_cartesian(theta_body, phi_body)
-  ref <- if (abs(forward[3]) < 0.95) c(0, 0, 1) else c(1, 0, 0)
-  # Construct an orthonormal transverse basis ==================================
-  e1 <- .tmm_cross_product(ref, forward)
+  body_axis <- c(1, 0, 0)
+  e1 <- body_axis - sum(body_axis * forward) * forward
+  if (sqrt(sum(e1^2)) < 1e-12) {
+    ref <- if (abs(forward[3]) < 0.95) c(0, 0, 1) else c(0, 1, 0)
+    e1 <- ref - sum(ref * forward) * forward
+  }
   e1 <- e1 / sqrt(sum(e1^2))
   e2 <- .tmm_cross_product(forward, e1)
   e2 <- e2 / sqrt(sum(e2^2))
 
   list(forward = forward, e1 = e1, e2 = e2)
+}
+
+# Build one full incident-centered local scattering grid using the shared
+# forward/body-axis basis.
+#' @noRd
+.tmm_local_grid_directions <- function(theta_body,
+                                       phi_body,
+                                       psi_scatter,
+                                       alpha_scatter) {
+  basis <- .tmm_forward_basis(theta_body, phi_body)
+  psi_mesh <- rep(psi_scatter, times = length(alpha_scatter))
+  alpha_mesh <- rep(alpha_scatter, each = length(psi_scatter))
+
+  dirs <- vapply(
+    seq_along(psi_mesh),
+    function(i) {
+      basis$forward * cos(psi_mesh[i]) +
+        (basis$e1 * cos(alpha_mesh[i]) + basis$e2 * sin(alpha_mesh[i])) *
+          sin(psi_mesh[i])
+    },
+    numeric(3)
+  )
+  angles <- apply(dirs, 2, .tmm_cartesian_to_spherical)
+
+  data.frame(
+    psi_scatter = psi_mesh,
+    alpha_scatter = alpha_mesh,
+    theta_scatter = as.numeric(angles["theta", ]),
+    phi_scatter = as.numeric(angles["phi", ])
+  )
 }
 
 # Build one great-circle scattering slice in local coordinates centered on the
@@ -62,24 +95,17 @@
                                         phi_body,
                                         psi_scatter,
                                         alpha = 0) {
-  # Build the local forward-centered basis =====================================
-  basis <- .tmm_forward_basis(theta_body, phi_body)
-  # Rotate the local great-circle directions into Cartesian space ==============
-  dirs <- vapply(
-    psi_scatter,
-    function(psi) {
-      basis$forward * cos(psi) +
-        (basis$e1 * cos(alpha) + basis$e2 * sin(alpha)) * sin(psi)
-    },
-    numeric(3)
-  )
-  # Convert the local slice back to spherical receive angles ===================
-  angles <- apply(dirs, 2, .tmm_cartesian_to_spherical)
-  # Return the forward-centered slice coordinates ==============================
-  data.frame(
+  slice <- .tmm_local_grid_directions(
+    theta_body = theta_body,
+    phi_body = phi_body,
     psi_scatter = psi_scatter,
-    theta_scatter = as.numeric(angles["theta", ]),
-    phi_scatter = as.numeric(angles["phi", ])
+    alpha_scatter = alpha
+  )
+
+  data.frame(
+    psi_scatter = slice$psi_scatter,
+    theta_scatter = slice$theta_scatter,
+    phi_scatter = slice$phi_scatter
   )
 }
 
@@ -247,13 +273,9 @@
                                          n_psi,
                                          sectors) {
   # Reject unsupported retained cylindrical bistatic workflows ================
-  if (identical(model_params$parameters$coordinate_system, "cylindrical")) {
-    stop(
-      "Stored cylindrical TMM bistatic summaries are not available yet. ",
-      "The current cylindrical retained operator supports exact monostatic ",
-      "reuse and orientation-averaged monostatic products only.",
-      call. = FALSE
-    )
+  if (model_params$parameters$coordinate_system %in%
+    c("cylindrical", "axisymmetric", "cylinder_native")) {
+    .tmm_stop_cylinder_bistatic_public("tmm_bistatic_summary()")
   }
 
   # Validate the local-slice resolution and resolve stored defaults ============
@@ -419,8 +441,8 @@
 #' peak-scattering direction, backscatter-lobe width, and integrated scattering
 #' over coarse angular sectors. In the current package build, this helper is
 #' available for the spherical and spheroidal stored branches. Stored cylinders
-#' intentionally stop at exact monostatic reuse until a validated retained
-#' cylinder angular operator is added.
+#' are intentionally outside the public scope of this helper and stop with an
+#' explicit error.
 #'
 #' @param object Scatterer-object previously evaluated with
 #'   `target_strength(..., model = "TMM", store_t_matrix = TRUE)`.
@@ -565,8 +587,8 @@ tmm_bistatic_summary <- function(object,
 #' orientation average, and a higher-level bistatic summary without rebuilding
 #' the underlying T-matrix solve. For stored cylinders, the currently supported
 #' products are the exact monostatic scattering spectrum and the corresponding
-#' orientation-averaged monostatic outputs; cylinder bistatic summaries remain
-#' unavailable until a validated retained cylinder angular operator is added.
+#' orientation-averaged monostatic outputs; cylinder bistatic summaries are
+#' intentionally outside the public scope.
 #'
 #' @param object Scatterer-object previously evaluated with
 #'   `target_strength(..., model = "TMM", store_t_matrix = TRUE)`.

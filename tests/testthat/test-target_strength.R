@@ -162,6 +162,19 @@ test_that("target_strength works with different scatterer types", {
   )
 })
 
+test_that("target_strength blocks ESPSMS pending the shell-only rebuild", {
+  eps_obj <- fixture_ps("elastic_shelled")
+
+  expect_error(
+    target_strength(
+      object = eps_obj,
+      frequency = c(12e3, 38e3, 70e3, 120e3),
+      model = "epsms"
+    ),
+    "temporarily disabled"
+  )
+})
+
 test_that("target_strength can update existing models", {
   # Test that target_strength can be called multiple times
   cal_obj <- cal_generate()

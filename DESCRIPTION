@@ -66,6 +66,7 @@ Collate:
     'model-pcdwba.R'
     'model-ecms.R'
     'model-essms.R'
+    'model-espsms.R'
     'model-vesms.R'
     'model-fcms.R'
     'model-hpa.R'

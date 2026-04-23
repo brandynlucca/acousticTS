@@ -133,6 +133,10 @@ prolate_spheroid_scattering_grid_from_tmatrix_cpp <- function(acoustics, t_matri
     .Call(`_acousticTS_prolate_spheroid_scattering_grid_from_tmatrix_cpp`, acoustics, t_matrix, theta_body, phi_body, theta_scatter, phi_scatter, precision)
 }
 
+prolate_spheroid_scattering_points_from_tmatrix_cpp <- function(acoustics, t_matrix, theta_body, phi_body, theta_scatter, phi_scatter, precision = "double") {
+    .Call(`_acousticTS_prolate_spheroid_scattering_points_from_tmatrix_cpp`, acoustics, t_matrix, theta_body, phi_body, theta_scatter, phi_scatter, precision)
+}
+
 tmm_backscatter_cpp <- function(frequency, theta_body, shape, shape_values, boundary, sound_speed_sw, density_sw, density_body, sound_speed_body, n_max) {
     .Call(`_acousticTS_tmm_backscatter_cpp`, frequency, theta_body, shape, shape_values, boundary, sound_speed_sw, density_sw, density_body, sound_speed_body, n_max)
 }

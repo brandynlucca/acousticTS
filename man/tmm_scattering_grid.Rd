@@ -52,8 +52,8 @@ response over a two-dimensional receive-angle grid at one stored frequency.
 This is useful for bistatic scattering maps, heatmaps, and polar-style
 visualizations without rebuilding the retained modal solve. In the current
 package build, this helper is available for the spherical and spheroidal
-stored branches. Stored cylinders intentionally stop at exact monostatic
-reuse until a validated retained cylinder angular operator is added.
+stored branches. Stored cylinders are intentionally outside the public scope
+of this helper and stop with an explicit error.
 }
 \seealso{
 \code{\link{tmm_scattering}}, \code{\link{tmm_average_orientation}}

@@ -344,6 +344,16 @@
     return(empty)
   }
 
+  if (!is.null(t_blocks$family) &&
+    identical(t_blocks$family, "cylinder_native")) {
+    return(data.frame(
+      m = NA_real_,
+      n_terms = as.numeric(t_blocks$n_max %||% NA_integer_) + 1,
+      rcond = 1,
+      transpose_residual = 0
+    ))
+  }
+
   valid_blocks <- Filter(
     function(block) is.list(block) && !is.null(block[["T"]]),
     t_blocks

@@ -66,7 +66,7 @@ many integration points will be used to calculate \eqn{\alpha_{mn}^{m}},
 which is numerically calculated using Gauss-Legendre quadrature. When left
 as \code{NULL}, the model uses 96 integration points unless
 \code{adaptive = TRUE}, in which case a reduced-frequency-based
-quadrature rule is selected internally for the full fluid- or gas-filled
+quadrature rule is selected internally for the full liquid-filled
 solve. See
 \link{gauss_legendre} for a full description of how \code{n_integration} is
 used. \strong{Note:} this argument \strong{only} applies to when

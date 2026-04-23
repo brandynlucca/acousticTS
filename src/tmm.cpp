@@ -81,7 +81,7 @@ static arma::mat tmm_assoc_legendre_theta_derivative(int m,
             if (sin_theta[i] <= 0.0) {
                 deriv(i, j) = 0.0;
             } else {
-                deriv(i, j) = (n * mu[i] * p_nm[i] - (n + m) * p_nm1[i]) / sin_theta[i];
+                deriv(i, j) = -((n * mu[i] * p_nm[i] - (n + m) * p_nm1[i]) / sin_theta[i]);
             }
         }
     }
@@ -132,23 +132,29 @@ static void tmm_surface_radius(const std::string& shape,
     if (shape == "Cylinder") {
         double half_length = shape_values[0];
         double cyl_radius = shape_values[1];
-        arma::vec cos_theta = arma::cos(theta);
-        arma::vec sin_theta = arma::sin(theta);
-        arma::vec eps_vec(theta.n_elem);
-        eps_vec.fill(std::numeric_limits<double>::epsilon());
-        arma::vec r_end = half_length / arma::max(arma::abs(cos_theta), eps_vec);
-        arma::vec r_side = cyl_radius / arma::max(arma::abs(sin_theta), eps_vec);
-        radius = arma::min(r_end, r_side);
         radius_derivative = arma::vec(theta.n_elem, arma::fill::zeros);
-        if (theta.n_elem > 1) {
-            radius_derivative[0] = (radius[1] - radius[0]) / (theta[1] - theta[0]);
-            radius_derivative[theta.n_elem - 1] =
-                (radius[theta.n_elem - 1] - radius[theta.n_elem - 2]) /
-                (theta[theta.n_elem - 1] - theta[theta.n_elem - 2]);
-            for (arma::uword i = 1; i + 1 < theta.n_elem; ++i) {
-                radius_derivative[i] =
-                    (radius[i + 1] - radius[i - 1]) /
-                    (theta[i + 1] - theta[i - 1]);
+        radius = arma::vec(theta.n_elem, arma::fill::zeros);
+        double theta_switch = std::atan2(cyl_radius, half_length);
+        double eps = std::numeric_limits<double>::epsilon();
+        for (arma::uword i = 0; i < theta.n_elem; ++i) {
+            double th = theta[i];
+            double cos_th = std::cos(th);
+            double sin_th = std::sin(th);
+            if (th <= theta_switch + 1e-12) {
+                double denom = std::max(cos_th, eps);
+                radius[i] = half_length / denom;
+                radius_derivative[i] = half_length * sin_th /
+                    std::max(cos_th * cos_th, eps);
+            } else if (th >= (arma::datum::pi - theta_switch - 1e-12)) {
+                double denom = std::min(cos_th, -eps);
+                radius[i] = -half_length / denom;
+                radius_derivative[i] = -half_length * sin_th /
+                    std::max(cos_th * cos_th, eps);
+            } else {
+                double denom = std::max(sin_th, eps);
+                radius[i] = cyl_radius / denom;
+                radius_derivative[i] = -cyl_radius * cos_th /
+                    std::max(sin_th * sin_th, eps);
             }
         }
         return;
@@ -161,7 +167,7 @@ static void tmm_surface_radius(const std::string& shape,
 static int tmm_collocation_nodes(const std::string& shape,
                                  const std::string& boundary,
                                  int n_terms) {
-    if (shape == "Cylinder" && boundary == "fixed_rigid") {
+    if (shape == "Cylinder") {
         return std::max(128, 10 * n_terms);
     }
     return std::max(64, 4 * n_terms);
@@ -207,9 +213,14 @@ static arma::cx_mat tmm_normal_derivative_matrix(const arma::cx_mat& radial,
 
     for (arma::uword i = 0; i < radial.n_rows; ++i) {
         double scale = radius_derivative[i] / (radius[i] * radius[i]);
+        double normal_scale = std::sqrt(
+            1.0 + std::pow(radius_derivative[i] / radius[i], 2.0)
+        );
         for (arma::uword j = 0; j < radial.n_cols; ++j) {
-            out(i, j) = k * radial_deriv(i, j) * angular(i, j) -
-                radial(i, j) * angular_theta_deriv(i, j) * scale;
+            out(i, j) = (
+                k * radial_deriv(i, j) * angular(i, j) +
+                    radial(i, j) * angular_theta_deriv(i, j) * scale
+            ) / normal_scale;
         }
     }
 

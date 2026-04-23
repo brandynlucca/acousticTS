@@ -58,8 +58,8 @@ higher-level bistatic summary, including forward- and cross-plane slices,
 peak-scattering direction, backscatter-lobe width, and integrated scattering
 over coarse angular sectors. In the current package build, this helper is
 available for the spherical and spheroidal stored branches. Stored cylinders
-intentionally stop at exact monostatic reuse until a validated retained
-cylinder angular operator is added.
+are intentionally outside the public scope of this helper and stop with an
+explicit error.
 }
 \seealso{
 \code{\link{tmm_scattering_grid}},

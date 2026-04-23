@@ -131,6 +131,13 @@
       solver = "ESSMS",
       slot = "ESSMS"
     ),
+    espsms = .new_model_registry_entry(
+      name = "espsms",
+      initialize = "espsms_initialize",
+      solver = "ESPSMS",
+      slot = "ESPSMS",
+      aliases = c("espsms", "epsms")
+    ),
     vesms = .new_model_registry_entry(
       name = "vesms",
       initialize = "vesms_initialize",

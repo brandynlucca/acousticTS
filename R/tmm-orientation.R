@@ -205,7 +205,8 @@ tmm_orientation_distribution <- function(distribution = c(
 .tmm_average_orientation_inputs <- function(distribution,
                                             theta_body,
                                             weights,
-                                            phi_body) {
+                                            phi_body,
+                                            default_phi_body = pi) {
   # Reuse the shared distribution validator when a pre-built grid is supplied ==
   if (!is.null(distribution)) {
     distribution <- .tmm_validate_orientation_distribution(distribution)
@@ -220,7 +221,8 @@ tmm_orientation_distribution <- function(distribution = c(
   .tmm_average_orientation_direct_inputs(
     theta_body = theta_body,
     weights = weights,
-    phi_body = phi_body
+    phi_body = phi_body,
+    default_phi_body = default_phi_body
   )
 }
 
@@ -228,7 +230,8 @@ tmm_orientation_distribution <- function(distribution = c(
 #' @noRd
 .tmm_average_orientation_direct_inputs <- function(theta_body,
                                                    weights,
-                                                   phi_body) {
+                                                   phi_body,
+                                                   default_phi_body = pi) {
   # Require a concrete angle vector when no stored distribution is supplied ====
   if (!is.numeric(theta_body) ||
     !length(theta_body) ||
@@ -240,6 +243,9 @@ tmm_orientation_distribution <- function(distribution = c(
   }
 
   n_angles <- length(theta_body)
+  if (is.null(phi_body)) {
+    phi_body <- default_phi_body
+  }
   phi_body <- rep_len(phi_body, n_angles)
   if (any(!is.finite(phi_body))) {
     stop("'phi_body' must be finite.", call. = FALSE)
@@ -333,7 +339,7 @@ tmm_orientation_distribution <- function(distribution = c(
 tmm_average_orientation <- function(object,
                                     theta_body = NULL,
                                     weights = NULL,
-                                    phi_body = pi,
+                                    phi_body = NULL,
                                     theta_scatter = NULL,
                                     phi_scatter = NULL,
                                     distribution = NULL) {
@@ -344,7 +350,8 @@ tmm_average_orientation <- function(object,
     distribution = distribution,
     theta_body = theta_body,
     weights = weights,
-    phi_body = phi_body
+    phi_body = phi_body,
+    default_phi_body = model_params$body$phi_body %||% pi
   )
   theta_body <- orientation$theta_body
   phi_body <- orientation$phi_body
@@ -376,7 +383,11 @@ tmm_average_orientation <- function(object,
     numeric(length(model_params$parameters$acoustics$frequency))
   )
   if (is.null(dim(sigma_mat))) {
-    sigma_mat <- matrix(sigma_mat, ncol = 1)
+    sigma_mat <- matrix(
+      sigma_mat,
+      nrow = length(model_params$parameters$acoustics$frequency),
+      ncol = n_angles
+    )
   }
   sigma_avg <- as.vector(sigma_mat %*% weights)
 

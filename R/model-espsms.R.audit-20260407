@@ -1,0 +1,332 @@
+################################################################################
+# Elastic-shell prolate spheroidal modal series (ESPSMS)
+################################################################################
+#' Elastic-shell prolate spheroidal modal series (ESPSMS) solution
+#'
+#' @description
+#' Calculates monostatic backscatter from a thin isotropic elastic-shelled
+#' prolate spheroid with a fluid-filled interior. The current implementation is
+#' a thin-shell Love/Kirchhoff-type surface-impedance model with membrane and
+#' bending terms, evaluated by a projected retained modal solve over the prolate
+#' surface. It is therefore a direct prolate elastic-shell model, but it is
+#' **not** a literal closed-form implementation of the solid-elastic Silbiger
+#' (1963) spheroidal-wave formulation.
+#'
+#' @section Usage:
+#' This model is accessed via:
+#' \preformatted{
+#' target_strength(
+#'   ...,
+#'   model = "espsms",
+#'   sound_speed_sw,
+#'   density_sw,
+#'   n_max
+#' )
+#' }
+#'
+#' @section Arguments:
+#' \describe{
+#'   \item{\code{sound_speed_sw}}{Surrounding-medium sound speed
+#'   (\eqn{m~s^{-1}}).}
+#'   \item{\code{density_sw}}{Surrounding-medium density (\eqn{kg~m^{-3}}).}
+#'   \item{\code{n_max}}{Optional truncation limit for the retained projected
+#'   modal solve. When omitted, the implementation uses a conservative
+#'   minor-axis-based rule intended to keep the first version numerically
+#'   stable on the benchmark ladder.}
+#' }
+#'
+#' @section Implementation route:
+#' This model treats the prolate shell as a thin isotropic elastic surface with
+#' both membrane and bending stiffness. The shell response is represented
+#' through a frequency-dependent surface-density jump coefficient constructed
+#' from the local principal curvatures of the prolate spheroid together with the
+#' shell thickness, density, Young's modulus, and Poisson ratio. The exterior
+#' and interior acoustic fields are then matched through a projected retained
+#' modal solve on the actual prolate surface.
+#'
+#' This makes `ESPSMS` closer in spirit to a retained modal/T-matrix-equivalent
+#' thin-shell model than to the exact scalar `PSMS` fluid branch. It is the
+#' package's direct monostatic prolate elastic-shell model and the intended
+#' precursor to later retained `TMM` support.
+#'
+#' @seealso
+#' \code{\link{target_strength}}, \code{\link{ESS}},
+#' \code{\link{ProlateSpheroid}}, \code{\link{prolate_spheroid}}
+#'
+#' @references
+#'
+#' Goodman, R. R., and Stern, R. (1962). Reflection and transmission of sound
+#' by elastic spherical shells. *The Journal of the Acoustical Society of
+#' America*, **34**, 338-344.
+#'
+#' Norris, A. N., and Rebinsky, D. A. (1993). Membrane and flexural waves on
+#' thin shells in a fluid. *Journal of Sound and Vibration*, **168**, 385-406.
+#'
+#' Stanton, T. K. (1990). Sound scattering by spherical and elongated shelled
+#' bodies. *The Journal of the Acoustical Society of America*, **88**, 1619-1633.
+#'
+#' @name ESPSMS
+#' @aliases espsms ESPSMS epsms EPSMS
+#' @docType data
+#' @keywords models acoustics internal
+NULL
+
+#' Validate the current ESPSMS shape and shell scope.
+#' @noRd
+.espsms_validate_object <- function(object) {
+  if (!methods::is(object, "ESS")) {
+    stop(
+      "ESPSMS requires an 'ESS' scatterer object.",
+      call. = FALSE
+    )
+  }
+
+  shape_parameters <- acousticTS::extract(object, "shape_parameters")
+  shape_name <- as.character(shape_parameters$shape)[1]
+  if (!identical(shape_name, "ProlateSpheroid")) {
+    stop(
+      "ESPSMS currently supports prolate-spheroidal ESS objects only.",
+      call. = FALSE
+    )
+  }
+
+  shell <- acousticTS::extract(object, "shell")
+  if (!acousticTS:::.tmm_has_elastic_shell(shell)) {
+    stop(
+      "ESPSMS requires elastic shell properties on the ESS shell component.",
+      call. = FALSE
+    )
+  }
+
+  fluid <- acousticTS::extract(object, "fluid")
+  if (is.null(fluid$density) || is.null(fluid$sound_speed)) {
+    stop(
+      "ESPSMS requires an explicit interior fluid density and sound speed.",
+      call. = FALSE
+    )
+  }
+
+  invisible(TRUE)
+}
+
+#' Build the shared thin-shell prolate body state used by ESPSMS.
+#' @noRd
+.elastic_shell_prolate_body <- function(object,
+                                        sound_speed_sw,
+                                        density_sw) {
+  .espsms_validate_object(object)
+
+  shape_parameters <- acousticTS::extract(object, "shape_parameters")
+  shell_raw <- acousticTS::extract(object, "shell")
+  fluid_raw <- acousticTS::extract(object, "fluid")
+  shell <- .extract_material_props(shell_raw, sound_speed_sw, density_sw)
+  fluid <- .extract_material_props(fluid_raw, sound_speed_sw, density_sw)
+  shell[names(.complete_elastic_moduli(
+    E = shell$E,
+    G = shell$G,
+    K = shell$K,
+    nu = shell$nu
+  ))] <- .complete_elastic_moduli(
+    E = shell$E,
+    G = shell$G,
+    K = shell$K,
+    nu = shell$nu
+  )
+
+  list(
+    theta = shell_raw$theta,
+    phi_body = pi,
+    density = fluid$density,
+    sound_speed = fluid$sound_speed,
+    fluid_density = fluid$density,
+    fluid_sound_speed = fluid$sound_speed,
+    shell_density = shell$density,
+    shell_E = shell$E,
+    shell_G = shell$G,
+    shell_K = shell$K,
+    shell_nu = shell$nu,
+    shell_lambda = shell$lambda,
+    shell_thickness = shell_raw$shell_thickness,
+    medium_density = density_sw,
+    medium_sound_speed = sound_speed_sw,
+    semimajor_length = as.numeric(shape_parameters$shell$semimajor_length)[1],
+    semiminor_length = as.numeric(shape_parameters$shell$semiminor_length)[1]
+  )
+}
+
+#' Resolve the direct-solver profile for the current ESPSMS branch.
+#' @noRd
+.espsms_resolve_solver_profile <- function(frequency,
+                                           sound_speed_sw,
+                                           shape_parameters,
+                                           theta_body,
+                                           n_max = NULL) {
+  if (!is.null(n_max)) {
+    if (!is.numeric(n_max) || any(!is.finite(n_max)) || any(n_max < 0)) {
+      stop(
+        "'n_max' must be a non-negative numeric scalar or vector.",
+        call. = FALSE
+      )
+    }
+    if (length(n_max) == 1L) {
+      resolved_n_max <- rep(as.integer(round(n_max)), length(frequency))
+    } else if (length(n_max) != length(frequency)) {
+      stop(
+        "'n_max' must have length 1 or the same length as 'frequency'.",
+        call. = FALSE
+      )
+    } else {
+      resolved_n_max <- as.integer(round(n_max))
+    }
+  } else {
+    shape_source <- shape_parameters$shell %||% shape_parameters
+    major_radius <- as.numeric(
+      shape_source$semimajor_length %||% (shape_source$length / 2)
+    )[1]
+    if (!is.finite(major_radius) || major_radius <= 0) {
+      stop(
+        "ESPSMS requires a finite positive prolate semimajor length.",
+        call. = FALSE
+      )
+    }
+
+    ka_major <- wavenumber(frequency, sound_speed_sw) * major_radius
+    cos_theta <- abs(cos(theta_body))
+    sin_theta <- abs(sin(theta_body))
+
+    resolved_n_max <- ifelse(
+      ka_major <= 5,
+      ifelse(
+        cos_theta >= 0.75,
+        48L,
+        ifelse(cos_theta >= 0.25, 32L, 12L)
+      ),
+      ifelse(sin_theta >= 0.95, 48L, 32L)
+    )
+  }
+
+  resolved_n_max <- as.integer(pmin(64L, pmax(12L, resolved_n_max)))
+  shape_source <- shape_parameters$shell %||% shape_parameters
+  major_radius <- as.numeric(
+    shape_source$semimajor_length %||% (shape_source$length / 2)
+  )[1]
+  ka_major <- wavenumber(frequency, sound_speed_sw) * major_radius
+  cos_theta <- abs(cos(theta_body))
+  sin_theta <- abs(sin(theta_body))
+  high_ka <- ka_major > 5
+
+  collocation_multiplier <- rep(as.integer(8L), length(frequency))
+  svd_rel_tol <- rep(1e-10, length(frequency))
+  enhanced_projection <- high_ka & sin_theta >= 0.45
+  collocation_multiplier[enhanced_projection] <- 12L
+  svd_rel_tol[enhanced_projection] <- 1e-5
+
+  list(
+    n_max = resolved_n_max,
+    collocation_multiplier = collocation_multiplier,
+    svd_rel_tol = svd_rel_tol
+  )
+}
+
+#' Initialize a prolate elastic-shell object for the ESPSMS branch.
+#' @param object ESS-class object.
+#' @param frequency Frequency vector (Hz).
+#' @param sound_speed_sw Surrounding-medium sound speed (m/s).
+#' @param density_sw Surrounding-medium density (kg/m^3).
+#' @param n_max Optional retained modal cutoff.
+#' @noRd
+espsms_initialize <- function(object,
+                              frequency,
+                              sound_speed_sw = .SEAWATER_SOUND_SPEED_DEFAULT,
+                              density_sw = .SEAWATER_DENSITY_DEFAULT,
+                              n_max = NULL) {
+  body <- .elastic_shell_prolate_body(
+    object = object,
+    sound_speed_sw = sound_speed_sw,
+    density_sw = density_sw
+  )
+  shape_parameters <- acousticTS::extract(object, "shape_parameters")
+  acoustics <- .init_acoustics_df(
+    frequency,
+    k_sw = sound_speed_sw,
+    k_body = body$fluid_sound_speed
+  )
+  solver_profile <- .espsms_resolve_solver_profile(
+    frequency = frequency,
+    sound_speed_sw = sound_speed_sw,
+    shape_parameters = shape_parameters,
+    theta_body = body$theta,
+    n_max = n_max
+  )
+  acoustics$n_max <- solver_profile$n_max
+
+  .init_model_slots(
+    object = object,
+    model_name = "ESPSMS",
+    frequency = frequency,
+    model_parameters = list(
+      parameters = list(
+        acoustics = acoustics,
+        shell_theory = "thin_isotropic_love_kirchhoff",
+        solver_profile = solver_profile
+      ),
+      medium = .init_medium_params(sound_speed_sw, density_sw),
+      body = body
+    ),
+    result_cols = c("f_bs", "sigma_bs", "TS", "n_max")
+  )
+}
+
+#' Evaluate the thin-shell prolate ESPSMS branch.
+#' @param object ESS-class object initialized for ESPSMS.
+#' @noRd
+ESPSMS <- function(object) {
+  model <- acousticTS::extract(object, "model_parameters")$ESPSMS
+  acoustics <- model$parameters$acoustics
+  solver_profile <- model$parameters$solver_profile
+  body <- model$body
+  shape_parameters <- acousticTS::extract(object, "shape_parameters")
+
+  f_bs <- complex(length.out = nrow(acoustics))
+  for (i in seq_len(nrow(acoustics))) {
+    solve_i <- .tmm_single_frequency_spherical(
+      k_sw = acoustics$k_sw[i],
+      k_body = acoustics$k_body[i],
+      theta_body = body$theta,
+      boundary = "elastic_shelled",
+      shape_parameters = shape_parameters,
+      rho_sw = model$medium$density,
+      rho_body = body$fluid_density,
+      n_max = acoustics$n_max[i],
+      shell_body = body,
+      frequency_hz = acoustics$frequency[i],
+      store_t_matrix = FALSE,
+      collocation_multiplier = solver_profile$collocation_multiplier[i],
+      svd_rel_tol = solver_profile$svd_rel_tol[i]
+    )
+    f_bs[i] <- solve_i$f_bs
+  }
+
+  sigma_bs <- .sigma_bs(f_bs)
+  methods::slot(object, "model")$ESPSMS <- data.frame(
+    frequency = acoustics$frequency,
+    f_bs = f_bs,
+    sigma_bs = sigma_bs,
+    TS = db(sigma_bs),
+    n_max = acoustics$n_max
+  )
+
+  object
+}
+
+#' Backward-compatible initializer alias for older experimental naming.
+#' @noRd
+epsms_initialize <- function(...) {
+  espsms_initialize(...)
+}
+
+#' Backward-compatible solver alias for older experimental naming.
+#' @noRd
+EPSMS <- function(...) {
+  ESPSMS(...)
+}
