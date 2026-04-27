@@ -29,9 +29,9 @@ target surface. Spherical fluid shells instead stay on the exact layered
 sphere modal path already represented by \code{SPHMS}, but are retained and
 post-processed through the same stored \code{TMM} workflow. Spherical elastic
 shells analogously stay on the exact \code{ESSMS} modal path while exposing the
-same retained \code{TMM} angular post-processing interface. Solid elastic
-spheres similarly stay on the exact \code{SOEMS} calibration-sphere path for
-monostatic runs while sharing the public \code{TMM} interface. For prolate
+same retained \code{TMM} angular post-processing interface. Solid elastic spheres
+similarly stay on the exact \code{SOEMS} calibration-sphere path for monostatic
+runs while sharing the public \code{TMM} interface. For prolate
 spheroids, it instead uses a
 spheroidal-coordinate transition-matrix-equivalent backend, which is the
 more natural coordinate system for that geometry and is consistent with the
@@ -79,10 +79,10 @@ target_strength(
 \code{"shelled_gas"}, or \code{"elastic_shelled"}, or \code{"elastic"}.
 The fluid-shell
 boundaries are currently restricted to spherical \code{ESS} objects. The
-\code{"elastic_shelled"} branch remains public for spherical elastic
-shells. The \code{"elastic"} branch is currently public for solid elastic
-spherical \code{ELA}/\code{CAL} targets plus prolate \code{ELA} targets
-through the retained T-matrix backend.}
+\code{"elastic_shelled"} branch is public for spherical elastic
+shells. The \code{"elastic"} branch is currently public for
+solid elastic spherical \code{ELA}/\code{CAL} targets plus prolate \code{ELA}
+targets through the retained T-matrix backend.}
 \item{\code{sound_speed_sw}}{Surrounding-medium sound speed
 (\eqn{m~s^{-1}}).}
 \item{\code{density_sw}}{Surrounding-medium density (\eqn{kg~m^{-3}}).}
@@ -145,8 +145,7 @@ and size parameters. \emph{The Journal of the Acoustical Society of America},
 }
 \seealso{
 \code{\link{target_strength}}, \code{\link{FLS}}, \code{\link{GAS}},
-\code{\link{CAL}},
-\code{\link{ESS}}, \code{\link{Sphere}}, \code{\link{OblateSpheroid}},
+\code{\link{ESS}}, \code{\link{CAL}}, \code{\link{Sphere}}, \code{\link{OblateSpheroid}},
 \code{\link{ProlateSpheroid}}, \code{\link{Cylinder}},
 \code{\link{sphere}}, \code{\link{oblate_spheroid}},
 \code{\link{prolate_spheroid}}, \code{\link{cylinder}}
