@@ -102,14 +102,8 @@ RmnResult<T> Rmn_higher_order(int m, int n, int lnum, T c, T x1) {
 }
 
 template<typename T>
-void Rmn_scalar(
-    int m,
-    int n,
-    T c,
-    T x1,
-    std::complex<T>& value,
-    std::complex<T>& derivative,
-    int kind = 1
+std::pair<std::complex<T>, std::complex<T>> Rmn_scalar(
+    int m, int n, T c, T x1, int kind = 1
 ) {
     int lnum = n - m + 1;
     int lnum_safe = std::max(lnum, 2);
@@ -169,9 +163,7 @@ void Rmn_scalar(
                 Rd = std::numeric_limits<T>::quiet_NaN();
             }
         }
-        value = std::complex<T>(R, 0);
-        derivative = std::complex<T>(Rd, 0);
-        return;
+        return {std::complex<T>(R, 0), std::complex<T>(Rd, 0)};
     }
 
     // Higher-order conventions use outgoing/incoming combinations built from
@@ -185,8 +177,7 @@ void Rmn_scalar(
         val = std::complex<T>(result.val1, -result.val2);
         der = std::complex<T>(result.der1, -result.der2);
     }
-    value = val;
-    derivative = der;
+    return {val, der};
 }
 
 // ============================================================================
@@ -420,11 +411,9 @@ RmnMatrixResult<T> Rmn_matrix(
     if (m_len == 1 && n_len == 1) {
         if (n[0] < m[0])
             throw std::invalid_argument("'n' must be >= 'm'.");
-        std::complex<T> value;
-        std::complex<T> derivative;
-        Rmn_scalar<T>(m[0], n[0], c, x1, value, derivative, kind);
-        out.value[0][0] = value;
-        out.derivative[0][0] = derivative;
+        auto res = Rmn_scalar<T>(m[0], n[0], c, x1, kind);
+        out.value[0][0] = res.first;
+        out.derivative[0][0] = res.second;
         return out;
     }
 
