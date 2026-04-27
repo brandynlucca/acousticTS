@@ -11,6 +11,18 @@ test_that("Scatterer class inheritance works correctly", {
   expect_s4_class(cal_obj, "Scatterer") # ELA inherits from Scatterer
   expect_false(methods::is(cal_obj, "ESS")) # CAL is no longer treated as ESS
 
+  # Test plain ELA solid target
+  ela_obj <- ela_generate(
+    shape = prolate_spheroid(length_body = 0.04, radius_body = 0.004, n_segments = 40),
+    density_body = 14900,
+    sound_speed_longitudinal_body = 6853,
+    sound_speed_transversal_body = 4171
+  )
+  expect_s4_class(ela_obj, "ELA")
+  expect_s4_class(ela_obj, "Scatterer")
+  expect_false(methods::is(ela_obj, "CAL"))
+  expect_false(methods::is(ela_obj, "ESS"))
+
   # Test ESS (elastic shelled sphere)
   ess_obj <- ess_generate(shape = sphere(radius_body = 1, n_segments = 80))
   expect_s4_class(ess_obj, "ESS")

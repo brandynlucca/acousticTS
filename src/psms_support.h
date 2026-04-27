@@ -85,7 +85,7 @@ struct ProfcnResultDouble {
     std::vector<int> is1e, is1de, naccs;
 };
 
-ProfcnResultDouble cprofcn_double(
+inline ProfcnResultDouble cprofcn_double(
     double c,
     int m,
     int lnum,
@@ -145,7 +145,7 @@ struct ProfcnResultQuad {
     std::vector<int> is1e, is1de, naccs;
 };
 
-ProfcnResultQuad cprofcn_quad(
+inline ProfcnResultQuad cprofcn_quad(
     acousticts_quad_t c,
     int m,
     int lnum,

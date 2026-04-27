@@ -60,11 +60,17 @@ test_that("available_models lists built-ins and target_strength resolves aliases
 
   expect_true("calibration" %in% models$model)
   expect_true(any(models$model == "calibration" & grepl("soems", models$aliases)))
+  expect_false("espsms" %in% models$model)
+  expect_false("epsms" %in% models$model)
 
   cal_obj <- target_strength(cal_generate(), frequency = 38e3, model = "soems")
 
   expect_true("calibration" %in% names(cal_obj@model))
   expect_true(all(is.finite(cal_obj@model$calibration$TS)))
+  expect_error(
+    target_strength(cal_generate(), frequency = 38e3, model = "epsms"),
+    "Unknown target strength model 'epsms'"
+  )
 })
 
 test_that("user-registered models work in target_strength and simulate_ts", {

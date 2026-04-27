@@ -1,3 +1,3 @@
 "case","max_abs_delta_TS_dB","mean_abs_delta_TS_dB","frequency_at_max_delta_kHz","implementation_acousticts","elapsed_s_acousticts","frequency_min_khz_acousticts","frequency_max_khz_acousticts","frequency_step_khz_acousticts","implementation_reference","elapsed_s_reference","frequency_min_khz_reference","frequency_max_khz_reference","frequency_step_khz_reference"
-"bent",0,0,12,"acousticTS",0.13,12,400,2,"Stanton-1989-reference",0.02,12,400,2
-"straight",0,0,12,"acousticTS",0.04,12,400,2,"FCMS-reference",0.03,12,400,2
+"bent",0,0,12,"acousticTS",0.13,12,400,2,"Stanton-1989-reference",0,12,400,2
+"straight",0,0,12,"acousticTS",0.04,12,400,2,"FCMS-reference",0.04,12,400,2

@@ -244,25 +244,38 @@
       "partially_validated", "experimental"
     ),
     source = c(
+      # SPHMS
       "benchmark_ts / Jech et al. (2015)", "KRMr and echoSMs",
+      # FCMS
       "benchmark_ts / Jech et al. (2015)", "echoSMs",
-      "benchmark_ts / Jech et al. (2015)", "Prol_Spheroid",
-      "Published calibration spheres", "echoSMs, sphereTS, NOAA applet",
+      # PSMS
+      "benchmark_ts / Jech et al. (2015)", "Prol_Spheroid and echoSMs",
+      # SOEMS
+      "Published calibration spheres", "echoSMs, SphereTS, NOAA applet",
+      # BCMS
       "Internal FCMS-based reference reconstruction",
+      # ECMS
       "Independent algebra transcription",
-      "Jech weakly scattering benchmark ladder",
-      "Published and independent DWBA implementations",
-      "Published SDWBA weak-scattering ladder",
-      "CCAMLR MATLAB and NOAA HTML implementations",
-      "Canonical modal families", "KRMr, echoSMs, NOAA applet",
-      "Jech canonical asymptotic targets",
-      "echoSMs HPModel and published algebra",
-      "Package validation workflow",
-      "ZooScatR and echopop source workflows",
-      "Current package workflow surface",
+      # DWBA
+      "benchmark_ts / Jech et al. (2015)",
+      "McGehee et al. (1998) and echoSMs",
+      # SDWBA
+      "benchmark_ts / Jech et al. (2015)",
+      "CCAMLR MATLAB, NOAA applet, echoSMs",
+      # KRM
+      "benchmark_ts / Jech et al. (2015)", "KRMr, echoSMs, NOAA applet",
+      # HPA
+      "benchmark_ts / Jech et al. (2015)", "echoSMs",
+      # TRCM
+      "benchmark_ts / Jech et al. (2015)",
+      # PCDWBA
+      "benchmark_ts / Jech et al. (2015)", "ZooScatR",
+      # BBFM
       "Internal DWBA + ECMS reconstruction",
+      # VESM
       "Reference Python VESM workflow",
       "Current layered-sphere workflow surface",
+      # TMM
       "SPHMS / PSMS / FCMS benchmark ladder",
       "BEMPP far-field checks",
       "Exact general-angle spheroidal solution",
@@ -270,81 +283,96 @@
       "Current retained-state branch matrix"
     ),
     summary = c(
+      # SPHMS
       paste(
         "Benchmarked against the canonical spherical spectra stored",
-        "in `benchmark_ts`."
+        "in benchmark_ts."
       ),
       paste(
         "Validated against `KRMr` and `echoSMs` on shared",
         "penetrable-sphere cases."
       ),
+      # FCMS
       paste(
         "Benchmarked against the canonical finite-cylinder spectra",
-        "stored in `benchmark_ts`."
+        "stored in benchmark_ts."
       ),
-      "Validated against the `echoSMs` finite-cylinder implementation.",
+      "Validated against the echoSMs finite-cylinder implementation.",
+      # PSMS
       paste(
         "Benchmarked against the canonical prolate-spheroid spectra",
-        "stored in `benchmark_ts`."
+        "stored in benchmark_ts."
       ),
       paste(
-        "Validated against the external `Prol_Spheroid` implementation",
-        "on shared prolate cases."
+        "Validated against the external Prol_Spheroid and echoSMs ",
+        "implementations on shared prolate cases."
       ),
+      # SOEMS / CALIBRATION
       paste(
         "Benchmarked against published calibration-sphere targets used",
         "throughout the package documentation."
       ),
       paste(
-        "Validated against `echoSMs`, `sphereTS`, and the NOAA calibration",
+        "Validated against echoSMs, SphereTS, and the NOAA calibration",
         "applet."
       ),
+      # BCMS
       paste(
         "BCMS is currently marked experimental because the documented checks",
         "are internal coherence reconstructions rather than an external",
         "benchmark or software-comparison ladder."
       ),
+      # ECMS
       paste(
         "ECMS is currently marked experimental because the documented checks",
         "are independent algebra reconstructions rather than an external",
         "benchmark or software-comparison ladder."
       ),
+      # DWBA
       paste(
-        "Benchmarked against the canonical weakly scattering targets",
-        "summarized by Jech et al. (2015)."
+        "Benchmarked against the canonical spectra stored",
+        "in benchmark_ts."
       ),
       paste(
-        "Validated against the published McGehee MATLAB workflow and an",
-        "independent DWBA implementation."
+        "Validated against the published McGehee et al (1998) and echoSMs ",
+        "workflows."
       ),
-      "Benchmarked against published SDWBA weak-scattering comparison cases.",
+      #SDWBA
       paste(
-        "Validated against the CCAMLR MATLAB and NOAA HTML SDWBA ",
+        "Benchmarked against the canonical spectra stored",
+        "in benchmark_ts."
+      ),
+      paste(
+        "Validated against the CCAMLR, NOAA applet, and echoSMs ",
         "implementations."
       ),
+      # KRM
       paste(
-        "Benchmarked against canonical modal-family targets used for",
-        "isolated gas-filled and weakly scattering cases."
+        "Benchmarked against the canonical spectra stored",
+        "in benchmark_ts."
       ),
       paste(
-        "Validated against `KRMr`, `echoSMs`, and the NOAA KRM applet on",
+        "Validated against`KRMr, echoSMs, and the NOAA KRM applet on",
         "bundled fish objects and shared workflows."
       ),
+      # HPA
       paste(
-        "Benchmarked against canonical asymptotic target families rather",
-        "than as an exact modal solver."
+        "Benchmarked against the canonical spherical spectra stored",
+        "in benchmark_ts."
       ),
       paste(
-        "Validated against the spherical `echoSMs::HPModel` branch and",
-        "the published Johnson/Stanton algebra."
+        "Validated against the spherical echoSMs implementation."
       ),
+      # TRCM
       paste(
-        "Benchmarked within the package validation workflow against the",
-        "straight-cylinder and FCMS-derived bent-cylinder reference",
-        "constructions."
+        "Benchmarked within the package validation workflow against ",
+        "the canonical spectra stored in benchmark_ts. Further ",
+        "compared to the straight-cylinder and FCMS-derived ",
+        "bent-cylinder reference constructions."
       ),
+      # PCDWBA
       paste(
-        "Validated against source-level `ZooScatR` and `echopop` PCDWBA ",
+        "Validated against source-level ZooScatR and Echopop PCDWBA ",
         "workflows."
       ),
       paste(
@@ -352,11 +380,13 @@
         "workflow is still being tightened even though the current source-",
         "level comparison cases are documented."
       ),
+      # BBFM
       paste(
         "BBFM is currently marked experimental because it has documented",
         "internal reconstruction checks but no external benchmark ladder or",
         "independent public implementation comparison."
       ),
+      # VESM
       paste(
         "Validated against the reference Python VESM implementation on",
         "the documented layered-sphere case."
@@ -365,6 +395,7 @@
         "VESM is currently marked experimental because the documented public",
         "workflow is still limited to the current layered-sphere scope."
       ),
+      # TMM
       paste(
         "Benchmarked against `SPHMS`, `PSMS`, and `FCMS` on the",
         "currently supported canonical shape branches."

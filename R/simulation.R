@@ -236,7 +236,7 @@
 
   # Cache and return the worker library used for PSOCK execution ==============
   options(
-    setNames(
+    stats::setNames(
       list(list(library = worker_lib, source = package_dir)),
       cache_key
     )

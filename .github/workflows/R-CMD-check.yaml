@@ -36,6 +36,7 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
+      _R_CHECK_TESTS_NLINE_: 0
 
     steps:
       - uses: actions/checkout@v4
@@ -90,6 +91,8 @@ jobs:
           needs: check
 
       - uses: r-lib/actions/check-r-package@v2
+        env:
+          _R_CHECK_TESTS_NLINES_: 0
         with:
           upload-snapshots: true
           build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'

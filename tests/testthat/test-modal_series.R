@@ -167,7 +167,7 @@ test_that("Gas-filled prolate spheroid PSMS returns finite values on the benchma
     frequency = frequency,
     model = "psms",
     boundary = "gas_filled",
-    simplify_Amn = FALSE,
+    simplify_Amn = TRUE,
     density_sw = density_sw,
     sound_speed_sw = sound_speed_sw,
     precision = "quad"

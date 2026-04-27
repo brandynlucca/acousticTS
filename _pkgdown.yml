@@ -270,6 +270,7 @@ reference:
     desc: >
       Constructors for the supported scatterer classes.
     contents:
+      - ela_generate
       - cal_generate
       - ess_generate
       - fls_generate

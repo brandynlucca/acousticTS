@@ -517,7 +517,8 @@ lame <- function(K = NULL, E = NULL, G = NULL, nu = NULL) {
 #' \code{\link{SDWBA}}, \code{\link{FCMS}}, \code{\link{BCMS}},
 #' \code{\link{ECMS}}, \code{\link{HPA}}, \code{\link{KRM}}, \code{\link{PSMS}},
 #' \code{\link{SPHMS}}, \code{\link{ESSMS}}, \code{\link{VESMS}},
-#' \code{\link{TMM}}, \code{\link{TRCM}}, \code{\link{SOEMS}}
+#' \code{\link{TMM}}, \code{\link{TRCM}},
+#' \code{\link{SOEMS}}
 #' @export
 target_strength <- function(object,
                             frequency,

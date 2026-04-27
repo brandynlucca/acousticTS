@@ -125,5 +125,6 @@ such as \code{"DWBA"} and \code{"dwba"} resolve to the same family.
 \code{\link{SDWBA}}, \code{\link{FCMS}}, \code{\link{BCMS}},
 \code{\link{ECMS}}, \code{\link{HPA}}, \code{\link{KRM}}, \code{\link{PSMS}},
 \code{\link{SPHMS}}, \code{\link{ESSMS}}, \code{\link{VESMS}},
-\code{\link{TMM}}, \code{\link{TRCM}}, \code{\link{SOEMS}}
+\code{\link{TMM}}, \code{\link{TRCM}},
+\code{\link{SOEMS}}
 }

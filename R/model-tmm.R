@@ -158,12 +158,31 @@ tmm_initialize <- function(object,
   # Enforce the current homogeneous-fluid scatterer scope ======================
   .tmm_validate_object_scope(object)
   shape_parameters <- acousticTS::extract(object, "shape_parameters")
-  branch_flags <- .tmm_branch_flags(shape_parameters)
+  boundary <- .tmm_resolve_boundary(object, boundary)
+  if (methods::is(object, "ESS") &&
+    !.tmm_is_sphere_modal_branch(
+      object = object,
+      shape_parameters = shape_parameters,
+      boundary = boundary
+    )) {
+    stop(
+      "The current TMM shell branch supports spherical fluid shells plus ",
+      "spherical elastic shells only. Supported ESS boundaries are ",
+      "'shelled_pressure_release', 'shelled_liquid', 'shelled_gas', and ",
+      "'elastic_shelled'.",
+      call. = FALSE
+    )
+  }
+  branch_flags <- .tmm_branch_flags(shape_parameters, boundary = boundary)
   use_spheroidal_branch <- branch_flags$use_spheroidal_branch
   use_cylindrical_branch <- branch_flags$use_cylindrical_branch
+  use_shell_sphere_branch <- .tmm_is_sphere_modal_branch(
+    object = object,
+    shape_parameters = shape_parameters,
+    boundary = boundary
+  )
 
   # Resolve the boundary condition and validate the storage controls ===========
-  boundary <- .tmm_resolve_boundary(object, boundary)
   .tmm_validate_store_t_matrix(store_t_matrix)
   n_max <- .tmm_branch_n_max(n_max, use_spheroidal_branch)
   body <- .tmm_prepare_body(object, sound_speed_sw, density_sw, boundary)
@@ -196,7 +215,8 @@ tmm_initialize <- function(object,
         boundary = boundary,
         coordinate_system = .tmm_coordinate_system(
           use_spheroidal_branch,
-          use_cylindrical_branch
+          use_cylindrical_branch,
+          use_shell_sphere_branch = use_shell_sphere_branch
         ),
         precision = .tmm_precision_label(use_spheroidal_branch, boundary),
         n_integration = .tmm_n_integration_label(
@@ -217,6 +237,119 @@ tmm_initialize <- function(object,
   )
 }
 
+# Build the exact spherical shell modal coefficients retained by the TMM shell
+# branch so bistatic scattering can be reconstructed directly from the
+# layered-fluid modal series.
+#' @noRd
+.tmm_store_sphere_modal_branch <- function(acoustics, body, boundary) {
+  Am <- .sphms_modal_coefficients(
+    k1a = acoustics$k_sw * body$radius_shell,
+    k2a = acoustics$k_shell * body$radius_shell,
+    k2b = acoustics$k_shell * body$radius_fluid,
+    k3a = acoustics$k_fluid * body$radius_fluid,
+    k3b = acoustics$k_fluid * body$radius_fluid,
+    g21 = body$g21,
+    g31 = body$g31,
+    g32 = body$g32,
+    h21 = body$h21,
+    h31 = body$h31,
+    h32 = body$h32,
+    m_limit = acoustics$n_max,
+    Bm_method = .sphms_Bm_method(boundary)
+  )
+
+  lapply(
+    seq_len(nrow(acoustics)),
+    function(i) {
+      n_seq <- 0:as.integer(acoustics$n_max[i])
+      list(
+        family = "sphere_modal",
+        n_seq = n_seq,
+        A_n = as.vector(Am[seq_along(n_seq), i])
+      )
+    }
+  )
+}
+
+# Store the exact elastic-shell sphere modal coefficients in the same retained
+# spherical-modal structure used by the shell-sphere fluid branch.
+#' @noRd
+.tmm_store_elastic_shell_modal_branch <- function(acoustics, body) {
+  sound_speed_longitudinal <- sqrt(
+    (body$shell_lambda + 2 * body$shell_G) / body$shell_density
+  )
+  sound_speed_transversal <- sqrt(body$shell_G / body$shell_density)
+  ka_matrix <- .calculate_ka_matrix(
+    frequency = acoustics$frequency,
+    sound_speed_sw = body$medium_sound_speed,
+    sound_speed_fluid = body$fluid_sound_speed,
+    sound_speed_longitudinal = sound_speed_longitudinal,
+    sound_speed_transversal = sound_speed_transversal,
+    radius_shell = body$radius_shell,
+    radius_fluid = body$radius_fluid
+  )
+  Am <- elastic_shell_boundary_conditions(
+    ka_matrix = ka_matrix,
+    m_limit = acoustics$m_limit,
+    lambda = body$shell_lambda,
+    mu = body$shell_G,
+    rho_ratio_sw = body$medium_density / body$shell_density,
+    rho_ratio_fl = body$fluid_density / body$shell_density
+  )
+
+  lapply(
+    seq_len(nrow(acoustics)),
+    function(i) {
+      n_seq <- 0:as.integer(acoustics$m_limit[i])
+      list(
+        family = "sphere_modal",
+        n_seq = n_seq,
+        A_n = as.vector(Am[i, seq_along(n_seq)])
+      )
+    }
+  )
+}
+
+# Evaluate the exact stored spherical-modal TMM branches used by shell spheres.
+#' @noRd
+.tmm_run_shell_sphere_branch <- function(acoustics, body, boundary) {
+  t_store <- if (identical(boundary, "elastic_shelled")) {
+    .tmm_store_elastic_shell_modal_branch(
+      acoustics = acoustics,
+      body = body
+    )
+  } else {
+    .tmm_store_sphere_modal_branch(
+      acoustics = acoustics,
+      body = body,
+      boundary = boundary
+    )
+  }
+  sph_bm <- vapply(
+    seq_along(t_store),
+    function(i) {
+      sum(
+        .sphms_modal_weights(acoustics$n_max[i]) * t_store[[i]]$A_n,
+        na.rm = TRUE
+      )
+    },
+    complex(1)
+  )
+  f_bs <- -1i / acoustics$k_sw * sph_bm
+  sigma_bs <- .sigma_bs(f_bs)
+
+  list(
+    model = data.frame(
+      frequency = acoustics$frequency,
+      f_bs = f_bs,
+      sigma_bs = sigma_bs,
+      TS = db(sigma_bs),
+      n_max = acoustics$n_max
+    ),
+    t_matrix = t_store
+  )
+}
+
 
 #' Single-target transition matrix method (TMM)
 #'
@@ -231,8 +364,23 @@ TMM <- function(object) {
   body <- model_params$body
   shape_parameters <- acousticTS::extract(object, "shape_parameters")
 
+  if (identical(parameters$coordinate_system, "sphere_modal")) {
+    shell_result <- .tmm_run_shell_sphere_branch(
+      acoustics = acoustics,
+      body = body,
+      boundary = parameters$boundary
+    )
+    methods::slot(object, "model")$TMM <- shell_result$model
+    if (isTRUE(parameters$store_t_matrix)) {
+      methods::slot(object, "model_parameters")$TMM$parameters$t_matrix <-
+        shell_result$t_matrix
+    }
+
+    return(object)
+  }
+
   # Route prolate targets through the geometry-matched spheroidal backend ======
-  if (.tmm_is_spheroidal_branch(shape_parameters)) {
+  if (.tmm_is_spheroidal_branch(shape_parameters, parameters$boundary)) {
     spheroidal_result <- .tmm_run_spheroidal_branch(
       object = object,
       acoustics = acoustics,

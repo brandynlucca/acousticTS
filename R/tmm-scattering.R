@@ -68,6 +68,50 @@
   abs(theta_scatter - expected_theta) <= tol && delta_phi <= tol
 }
 
+# Check whether one requested incident direction matches the stored TMM
+# incidence to within the standard angular tolerance.
+#' @noRd
+.tmm_matches_stored_incidence <- function(model_params,
+                                          theta_body,
+                                          phi_body,
+                                          tol = 1e-8) {
+  defaults <- model_params$body
+  delta_phi <- abs(.tmm_wrap_angle_2pi(phi_body) - .tmm_wrap_angle_2pi(defaults$phi_body))
+  delta_phi <- min(delta_phi, 2 * pi - delta_phi)
+
+  abs(theta_body - defaults$theta_body) <= tol && delta_phi <= tol
+}
+
+# Recover the exact stored prolate monostatic amplitude when the requested
+# geometry matches the original stored incidence and receive direction.
+#' @noRd
+.tmm_spheroidal_exact_monostatic_override <- function(model_params,
+                                                      theta_body,
+                                                      phi_body,
+                                                      theta_scatter,
+                                                      phi_scatter,
+                                                      frequency_idx = NULL,
+                                                      tol = 1e-8) {
+  f_exact <- model_params$parameters$exact_monostatic_f_bs
+  if (is.null(f_exact) ||
+    !.tmm_matches_stored_incidence(model_params, theta_body, phi_body, tol = tol) ||
+    !.tmm_is_monostatic_direction(
+      theta_body = theta_body,
+      phi_body = phi_body,
+      theta_scatter = theta_scatter,
+      phi_scatter = phi_scatter,
+      tol = tol
+    )) {
+    return(NULL)
+  }
+
+  if (is.null(frequency_idx)) {
+    return(f_exact)
+  }
+
+  f_exact[frequency_idx]
+}
+
 # Normalize a possibly-missing scalar angle onto the stored TMM defaults.
 #' @noRd
 .tmm_scalar_angle <- function(value, default, name) {
@@ -392,6 +436,15 @@
           theta_scatter = theta_scatter[i],
           phi_scatter = phi_scatter[i]
         )[1]
+      } else if (parameters$coordinate_system == "sphere_modal") {
+        .tmm_scattering_sphere_modal(
+          t_store = parameters$t_matrix[frequency_idx],
+          acoustics = acoustics[frequency_idx, , drop = FALSE],
+          theta_body = theta_body[i],
+          phi_body = phi_body[i],
+          theta_scatter = theta_scatter[i],
+          phi_scatter = phi_scatter[i]
+        )[1]
       } else if (parameters$coordinate_system == "spheroidal") {
         .tmm_scattering_spheroidal(
           t_store = parameters$t_matrix[frequency_idx],
@@ -475,6 +528,15 @@
       phi_scatter = phi_scatter,
       precision = parameters$precision %||% "double"
     )
+  } else if (parameters$coordinate_system == "sphere_modal") {
+    f_scat <- .tmm_scattering_sphere_modal_grid(
+      model_params = model_params,
+      frequency_idx = frequency_idx,
+      theta_body = theta_body,
+      phi_body = phi_body,
+      theta_scatter = theta_scatter,
+      phi_scatter = phi_scatter
+    )
   } else if (parameters$coordinate_system == "cylindrical") {
     stop(
       "Stored cylindrical TMM grid evaluations are not available yet. ",
@@ -488,6 +550,86 @@
 
   # Return the complex scattering grid =========================================
   f_scat
+}
+
+# Resolve cos(gamma) for the scattering angle between the incident and receive
+# directions in the body-fixed spherical convention.
+#' @noRd
+.tmm_scattering_cosine <- function(theta_body,
+                                   phi_body,
+                                   theta_scatter,
+                                   phi_scatter) {
+  cos(theta_body) * cos(theta_scatter) +
+    sin(theta_body) * sin(theta_scatter) * cos(phi_body - phi_scatter)
+}
+
+# Evaluate the exact stored sphere-modal coefficients at arbitrary receive
+# directions. This is used by the shell-sphere TMM branch.
+#' @noRd
+.tmm_scattering_sphere_modal <- function(t_store,
+                                         acoustics,
+                                         theta_body,
+                                         phi_body,
+                                         theta_scatter,
+                                         phi_scatter) {
+  mu <- .tmm_scattering_cosine(
+    theta_body = theta_body,
+    phi_body = phi_body,
+    theta_scatter = theta_scatter,
+    phi_scatter = phi_scatter
+  )
+
+  vapply(
+    seq_along(t_store),
+    function(i) {
+      store_i <- t_store[[i]]
+      p_n <- drop(.tmm_assoc_legendre_table(0L, max(store_i$n_seq), mu))
+      -1i / acoustics$k_sw[i] * sum(
+        (2 * store_i$n_seq + 1) * store_i$A_n * p_n[seq_along(store_i$n_seq)],
+        na.rm = TRUE
+      )
+    },
+    complex(1)
+  )
+}
+
+#' @noRd
+.tmm_scattering_sphere_modal_grid <- function(model_params,
+                                              frequency_idx,
+                                              theta_body,
+                                              phi_body,
+                                              theta_scatter,
+                                              phi_scatter) {
+  store_i <- model_params$parameters$t_matrix[[frequency_idx]]
+  acoustics_i <- model_params$parameters$acoustics[frequency_idx, , drop = FALSE]
+  mu <- outer(
+    theta_scatter,
+    phi_scatter,
+    Vectorize(function(theta_val, phi_val) {
+      .tmm_scattering_cosine(
+        theta_body = theta_body,
+        phi_body = phi_body,
+        theta_scatter = theta_val,
+        phi_scatter = phi_val
+      )
+    })
+  )
+  p_mat <- array(0, dim = c(length(theta_scatter), length(phi_scatter), length(store_i$n_seq)))
+  for (j in seq_along(store_i$n_seq)) {
+    p_mat[, , j] <- matrix(
+      .tmm_assoc_legendre_table(0L, max(store_i$n_seq), c(mu))[,
+        store_i$n_seq[j] + 1],
+      nrow = length(theta_scatter),
+      ncol = length(phi_scatter)
+    )
+  }
+
+  f_scat <- matrix(0 + 0i, nrow = length(theta_scatter), ncol = length(phi_scatter))
+  for (j in seq_along(store_i$n_seq)) {
+    f_scat <- f_scat + (2 * store_i$n_seq[j] + 1) * store_i$A_n[j] * p_mat[, , j]
+  }
+
+  -1i / acoustics_i$k_sw[1] * f_scat
 }
 
 # Evaluate the stored spherical-coordinate blocks at an arbitrary scattering
@@ -608,6 +750,14 @@ tmm_scattering <- function(object,
   # Dispatch the retained evaluation through the active coordinate backend =====
   f_scat <- switch(parameters$coordinate_system,
     spherical = .tmm_scattering_spherical(
+      t_store = parameters$t_matrix,
+      acoustics = acoustics,
+      theta_body = theta_body,
+      phi_body = phi_body,
+      theta_scatter = theta_scatter,
+      phi_scatter = phi_scatter
+    ),
+    sphere_modal = .tmm_scattering_sphere_modal(
       t_store = parameters$t_matrix,
       acoustics = acoustics,
       theta_body = theta_body,

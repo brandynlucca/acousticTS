@@ -10,11 +10,30 @@
   }
 
   switch(class(object)[1],
+    ESS = {
+      shape_parameters <- acousticTS::extract(object, "shape_parameters")
+      shell <- acousticTS::extract(object, "shell")
+      shape_name <- as.character(shape_parameters[["shape"]])[1]
+      if (identical(shape_name, "Sphere")) {
+        if (.tmm_has_elastic_shell(shell)) {
+          "elastic_shelled"
+        } else {
+          "shelled_liquid"
+        }
+      } else {
+        stop(
+          "Specify 'boundary' explicitly for TMM when the scatterer is not a ",
+          "supported homogeneous fluid/gas sphere, spheroid, or supported ",
+          "spherical shell ESS object.",
+          call. = FALSE
+        )
+      }
+    },
     GAS = "gas_filled",
     FLS = "liquid_filled",
     stop(
       "Specify 'boundary' explicitly for TMM when the scatterer is not a ",
-      "'FLS' or 'GAS' object.",
+      "'FLS', 'GAS', or supported shell-sphere 'ESS' object.",
       call. = FALSE
     )
   )
@@ -23,13 +42,21 @@
 # Guard the current public scope of TMM to the exact sphere and prolate
 # spheroid geometries already supported by the package.
 #' @noRd
+.tmm_shape_name <- function(shape_parameters) {
+  as.character(shape_parameters$shape)[1]
+}
+
+# Guard the current public scope of TMM to the exact sphere and prolate
+# spheroid geometries already supported by the package.
+#' @noRd
 .tmm_validate_shape <- function(shape_parameters) {
   supported <- c("Sphere", "ProlateSpheroid", "OblateSpheroid", "Cylinder")
-  if (!(shape_parameters$shape %in% supported)) {
+  shape_name <- .tmm_shape_name(shape_parameters)
+  if (!(shape_name %in% supported)) {
     stop(
       "The current TMM implementation supports the following shape-types: ",
       paste0("'", supported, "'", collapse = ", "),
-      ". Input scatterer is shape-type '", shape_parameters$shape, "'.",
+      ". Input scatterer is shape-type '", shape_name, "'.",
       call. = FALSE
     )
   }
@@ -38,15 +65,59 @@
 # Decide whether the object should be routed through the spheroidal-coordinate
 # backend rather than the spherical-coordinate backend.
 #' @noRd
-.tmm_is_spheroidal_branch <- function(shape_parameters) {
-  identical(shape_parameters$shape, "ProlateSpheroid")
+.tmm_is_spheroidal_branch <- function(shape_parameters, boundary = NULL) {
+  identical(.tmm_shape_name(shape_parameters), "ProlateSpheroid") &&
+    !identical(boundary, "elastic_shelled")
 }
 
 # Cylinders now have a dedicated geometry-matched cylindrical backend rather
 # than the exploratory spherical stored-block branch.
 #' @noRd
 .tmm_is_cylindrical_branch <- function(shape_parameters) {
-  identical(shape_parameters$shape, "Cylinder")
+  identical(.tmm_shape_name(shape_parameters), "Cylinder")
+}
+
+# Detect whether an ESS shell carries elastic properties.
+#' @noRd
+.tmm_has_elastic_shell <- function(shell) {
+  any(vapply(
+    c("E", "G", "K", "nu", "lambda"),
+    function(nm) {
+      value <- shell[[nm]]
+      !is.null(value) && length(value) == 1L && is.finite(value)
+    },
+    logical(1)
+  ))
+}
+
+# Identify spherical fluid-shell runs that should stay on the exact sphere
+# modal path rather than the projected spherical T-matrix solve.
+#' @noRd
+.tmm_is_shell_sphere_branch <- function(object, shape_parameters, boundary) {
+  methods::is(object, "ESS") &&
+    identical(as.character(shape_parameters[["shape"]])[1], "Sphere") &&
+    boundary %in% c(
+      "shelled_pressure_release",
+      "shelled_liquid",
+      "shelled_gas"
+    )
+}
+
+# Identify spherical elastic-shell runs that should stay on the exact elastic
+# spherical modal path rather than the projected spherical T-matrix solve.
+#' @noRd
+.tmm_is_elastic_shell_sphere_branch <- function(object, shape_parameters, boundary) {
+  methods::is(object, "ESS") &&
+    identical(as.character(shape_parameters[["shape"]])[1], "Sphere") &&
+    identical(boundary, "elastic_shelled")
+}
+
+# Identify all sphere-modal TMM branches that retain explicit spherical modal
+# coefficients for downstream bistatic reconstruction.
+#' @noRd
+.tmm_is_sphere_modal_branch <- function(object, shape_parameters, boundary) {
+  .tmm_is_shell_sphere_branch(object, shape_parameters, boundary) ||
+    .tmm_is_elastic_shell_sphere_branch(object, shape_parameters, boundary)
 }
 
 # The present penetrable implementation assumes a single homogeneous interior,
@@ -76,10 +147,13 @@
 #' @noRd
 .tmm_validate_object_scope <- function(object) {
   # Restrict the current TMM initializer to the supported scatterer classes ====
-  if (!methods::is(object, "FLS") && !methods::is(object, "GAS")) {
+  if (!methods::is(object, "FLS") &&
+    !methods::is(object, "GAS") &&
+    !methods::is(object, "ESS")) {
     stop(
       "The current TMM implementation requires the scatterer to be either ",
-      "'FLS' or 'GAS'. Input scatterer is type '", class(object)[1], "'.",
+      "'FLS' or 'GAS', or a supported 'ESS'. Input scatterer is type '",
+      class(object)[1], "'.",
       call. = FALSE
     )
   }
@@ -89,10 +163,10 @@
 
 # Resolve the active geometric branch for one TMM initialization call.
 #' @noRd
-.tmm_branch_flags <- function(shape_parameters) {
+.tmm_branch_flags <- function(shape_parameters, boundary = NULL) {
   # Validate the supported geometry and identify the active backend ============
   .tmm_validate_shape(shape_parameters)
-  use_spheroidal_branch <- .tmm_is_spheroidal_branch(shape_parameters)
+  use_spheroidal_branch <- .tmm_is_spheroidal_branch(shape_parameters, boundary)
   use_cylindrical_branch <- .tmm_is_cylindrical_branch(shape_parameters)
   if (use_cylindrical_branch &&
     isTRUE(getOption("acousticTS.warn_tmm_cylinder", TRUE))) {
@@ -118,6 +192,18 @@
 .tmm_resolve_boundary <- function(object, boundary) {
   # Apply the class-specific default boundary and validate the final label =====
   boundary <- .tmm_boundary_default(object, boundary)
+  if (methods::is(object, "ESS")) {
+    shape_name <- as.character(acousticTS::extract(object, "shape_parameters")[["shape"]])[1]
+    if (identical(shape_name, "Sphere") &&
+      boundary %in% c(
+        "shelled_pressure_release",
+        "shelled_liquid",
+        "shelled_gas",
+        "elastic_shelled"
+      )) {
+      return(boundary)
+    }
+  }
   if (!(boundary %in% c(
     "fixed_rigid",
     "pressure_release",
@@ -126,7 +212,9 @@
   ))) {
     stop(
       "Only the following values for 'boundary' are available in TMM: ",
-      "'fixed_rigid', 'pressure_release', 'liquid_filled', 'gas_filled'.",
+      "'fixed_rigid', 'pressure_release', 'liquid_filled', 'gas_filled', ",
+      "'shelled_pressure_release', 'shelled_liquid', 'shelled_gas', ",
+      "'elastic_shelled'.",
       call. = FALSE
     )
   }
@@ -180,6 +268,100 @@
 # Resolve the homogeneous interior properties used by the TMM initializer.
 #' @noRd
 .tmm_prepare_body <- function(object, sound_speed_sw, density_sw, boundary) {
+  shape_parameters <- acousticTS::extract(object, "shape_parameters")
+
+  if (.tmm_is_shell_sphere_branch(
+    object = object,
+    shape_parameters = shape_parameters,
+    boundary = boundary
+  )) {
+    shell <- .complete_material_props(
+      acousticTS::extract(object, "shell"),
+      medium_sound_speed = sound_speed_sw,
+      medium_density = density_sw
+    )
+    fluid <- acousticTS::extract(object, "fluid")
+    fluid <- .complete_material_props(
+      fluid,
+      medium_sound_speed = shell$sound_speed %||% (shell$h * sound_speed_sw),
+      medium_density = shell$density %||% (shell$g * density_sw)
+    )
+    sph_body <- .sphms_body_parameters(
+      object = object,
+      exterior = shell,
+      sound_speed_sw = sound_speed_sw,
+      density_sw = density_sw
+    )
+
+    return(c(
+      list(
+        theta = shell$theta,
+        density = shell$density,
+        sound_speed = shell$sound_speed,
+        g = shell$g,
+        h = shell$h,
+        shell_density = shell$density,
+        shell_sound_speed = shell$sound_speed,
+        shell_g = shell$g,
+        shell_h = shell$h,
+        fluid_density = fluid$density %||% NA_real_,
+        fluid_sound_speed = fluid$sound_speed %||% NA_real_,
+        fluid_g = fluid$g %||% NA_real_,
+        fluid_h = fluid$h %||% NA_real_
+      ),
+      sph_body
+    ))
+  }
+
+  if (.tmm_is_elastic_shell_sphere_branch(
+    object = object,
+    shape_parameters = shape_parameters,
+    boundary = boundary
+  )) {
+    shell <- .extract_material_props(
+      acousticTS::extract(object, "shell"),
+      sound_speed_sw,
+      density_sw
+    )
+    shell[names(.complete_elastic_moduli(
+      E = shell$E,
+      G = shell$G,
+      K = shell$K,
+      nu = shell$nu
+    ))] <- .complete_elastic_moduli(
+      E = shell$E,
+      G = shell$G,
+      K = shell$K,
+      nu = shell$nu
+    )
+    fluid <- .extract_material_props(
+      acousticTS::extract(object, "fluid"),
+      sound_speed_sw,
+      density_sw
+    )
+    shell_raw <- acousticTS::extract(object, "shell")
+    fluid_raw <- acousticTS::extract(object, "fluid")
+
+    return(list(
+      theta = shell_raw$theta,
+      density = shell$density,
+      sound_speed = shell$sound_speed,
+      radius_shell = shell_raw$radius,
+      shell_thickness = shell_raw$shell_thickness,
+      fluid_density = fluid$density,
+      fluid_sound_speed = fluid$sound_speed,
+      radius_fluid = fluid_raw$radius,
+      shell_density = shell$density,
+      shell_E = shell$E,
+      shell_G = shell$G,
+      shell_K = shell$K,
+      shell_nu = shell$nu,
+      shell_lambda = shell$lambda,
+      medium_density = density_sw,
+      medium_sound_speed = sound_speed_sw
+    ))
+  }
+
   # Complete the body properties against the surrounding medium ===============
   body <- .complete_material_props(
     acousticTS::extract(object, "body"),
@@ -279,6 +461,43 @@
                                    use_spheroidal_branch,
                                    use_cylindrical_branch,
                                    n_max) {
+  if (boundary %in% c(
+    "shelled_pressure_release",
+    "shelled_liquid",
+    "shelled_gas"
+  )) {
+    acoustics <- .init_acoustics_df(
+      frequency,
+      k_sw = sound_speed_sw,
+      k_shell = body$shell_sound_speed,
+      k_fluid = if (is.finite(body$fluid_sound_speed)) body$fluid_sound_speed else NA_real_
+    )
+    acoustics$m_limit <- .sphms_m_limit(
+      m_limit = n_max,
+      acoustics = acoustics,
+      body_params = body
+    )
+    acoustics$n_max <- acoustics$m_limit
+
+    return(list(acoustics = acoustics, geometry = NULL))
+  }
+
+  if (identical(boundary, "elastic_shelled")) {
+    acoustics <- .init_acoustics_df(
+      frequency,
+      k_sw = sound_speed_sw,
+      k_fluid = body$fluid_sound_speed
+    )
+    acoustics$m_limit <- if (is.null(n_max)) {
+      round(acoustics$k_sw * body$radius_shell) + 10L
+    } else {
+      as.integer(n_max)
+    }
+    acoustics$n_max <- acoustics$m_limit
+
+    return(list(acoustics = acoustics, geometry = NULL))
+  }
+
   # Start from the shared wavenumber table ====================================
   acoustics <- .tmm_base_acoustics(frequency, sound_speed_sw, body, boundary)
   geometry <- NULL
@@ -307,8 +526,8 @@
   body_params <- list(
     theta_body = body$theta,
     theta_scatter = pi - body$theta,
-    phi_body = pi,
-    phi_scatter = 2 * pi,
+    phi_body = body$phi_body %||% pi,
+    phi_scatter = (body$phi_body %||% pi) + pi,
     density = body$density,
     sound_speed = body$sound_speed,
     g_body = body$g,
@@ -319,13 +538,34 @@
     body_params$q <- geometry$q
   }
 
+  for (nm in c(
+    "radius_shell", "radius_fluid",
+    "diameter",
+    "semimajor_length", "semiminor_length", "shape_n_segments",
+    "shell_density", "shell_sound_speed", "shell_g", "shell_h",
+    "fluid_density", "fluid_sound_speed", "fluid_g", "fluid_h",
+    "g21", "g31", "g32", "h21", "h31", "h32",
+    "shell_thickness",
+    "shell_E", "shell_G", "shell_K", "shell_nu", "shell_lambda",
+    "medium_density", "medium_sound_speed"
+  )) {
+    if (!is.null(body[[nm]])) {
+      body_params[[nm]] <- body[[nm]]
+    }
+  }
+
   body_params
 }
 
 # Resolve the coordinate-system label stored with the initialized TMM object.
 #' @noRd
-.tmm_coordinate_system <- function(use_spheroidal_branch, use_cylindrical_branch) {
+.tmm_coordinate_system <- function(use_spheroidal_branch,
+                                   use_cylindrical_branch,
+                                   use_shell_sphere_branch = FALSE) {
   # Label the active TMM backend coordinate system ============================
+  if (use_shell_sphere_branch) {
+    return("sphere_modal")
+  }
   if (use_spheroidal_branch) {
     return("spheroidal")
   }

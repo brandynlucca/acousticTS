@@ -64,6 +64,16 @@ fixture_sphere <- function(boundary_type) {
       sound_speed_shell = 1480.3,
       density_fluid = 1031.0,
       sound_speed_fluid = 1483.3
+    ),
+    elastic_shelled = ess_generate(
+      shape = sphere_shape,
+      radius_shell = shell_radius,
+      shell_thickness = shell_thickness,
+      density_shell = 2565,
+      density_fluid = 1077.3,
+      sound_speed_fluid = 1575,
+      E = 7.0e10,
+      nu = 0.32
     )
   )
 }
@@ -144,6 +154,15 @@ fixture_ps <- function(boundary_type) {
       shape = prolate_shape,
       g_body = 1028.9 / density_sw,
       h_body = 1480.3 / sound_speed_sw
+    ),
+    elastic_shelled = ess_generate(
+      shape = prolate_shape,
+      shell_thickness = 0.001,
+      density_shell = 2565,
+      density_fluid = 1077.3,
+      sound_speed_fluid = 1575,
+      E = 7.0e10,
+      nu = 0.32
     )
   )
 }

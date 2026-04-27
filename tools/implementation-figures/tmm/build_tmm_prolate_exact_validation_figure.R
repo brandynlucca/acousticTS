@@ -2,7 +2,7 @@ source("tools/implementation-figures/helpers/common.R")
 impl_load_all()
 
 density_sw <- 1026.8
-sound_speed_sw <- 1480
+sound_speed_sw <- 1477.3
 theta_body <- pi / 2
 phi_body <- pi / 2
 theta_scatter <- rep(pi / 2, 181)
@@ -12,7 +12,7 @@ quad <- gauss_legendre(n = 96, a = -1, b = 1)
 build_case <- function(boundary, Amn_method) {
   object <- target_strength(
     object = fls_generate(
-      shape = prolate_spheroid(length_body = 0.07, radius_body = 0.01, n_segments = 80),
+      shape = prolate_spheroid(length_body = 0.14, radius_body = 0.01, n_segments = 80),
       g_body = 1,
       h_body = 1,
       theta_body = theta_body
@@ -38,10 +38,11 @@ build_case <- function(boundary, Amn_method) {
     body$phi_body <- phi_body
     body$theta_scatter <- theta_scatter[i]
     body$phi_scatter <- phi_scatter[i]
+    body_exact <- acousticTS:::.tmm_spheroidal_cpp_body(body)
 
     exact_raw <- prolate_spheroid_fbs(
       acoustics = acoustics,
-      body = body,
+      body = body_exact,
       medium = medium,
       integration_pts = quad,
       precision = "double",

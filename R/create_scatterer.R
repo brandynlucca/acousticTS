@@ -386,7 +386,80 @@ bbf_generate <- function(body_shape,
     backbone = backbone,
     shape_parameters = shape_parameters,
     components = list(backbone = backbone)
-  ))
+))
+}
+################################################################################
+# Create ELA-class object
+################################################################################
+#' Generate a ELA-class object.
+#'
+#' @param shape Pre-built `Shape` object describing the elastic target geometry.
+#' @param density_body Optional body density (kg/m^3).
+#' @param sound_speed_longitudinal_body Optional longitudinal wave speed (m/s).
+#' @param sound_speed_transversal_body Optional transversal wave speed (m/s).
+#' @param theta_body Body orientation relative to the incident wave (radians).
+#' @param ID Optional metadata identifier.
+#' @param length_units Compatibility argument. Scatterer constructors now assume
+#'   meters and ignore non-SI alternatives.
+#' @param theta_units Compatibility argument. Scatterer constructors now assume
+#'   radians and ignore non-SI alternatives.
+#'
+#' @details
+#' `ela_generate()` builds a generic solid-elastic scatterer under the shared
+#' `ELA` class. Unlike `CAL`, it is not restricted to spheres, so it can carry
+#' prolate, oblate, cylindrical, or arbitrary elastic shapes together with the
+#' body density and longitudinal/transversal wave speeds used by solid-elastic
+#' models such as `TMM`.
+#'
+#' @return
+#' ELA-class object.
+#'
+#' @seealso \code{\link{ELA}}, \code{\link{CAL}}, \code{\link{ESS}}
+#'
+#' @importFrom methods new
+#' @keywords scatterer_type_generation
+#' @export
+ela_generate <- function(shape,
+                         density_body = NULL,
+                         sound_speed_longitudinal_body = NULL,
+                         sound_speed_transversal_body = NULL,
+                         theta_body = pi / 2,
+                         ID = NULL,
+                         length_units = "m",
+                         theta_units = "radians") {
+  units <- .normalize_scatterer_units(
+    theta_units = theta_units,
+    length_units = length_units,
+    context = "ELA"
+  )
+  if (!methods::is(shape, "Shape")) {
+    stop("'shape' must be a pre-built Shape object.", call. = FALSE)
+  }
+
+  shape_parameters <- .shape_common_parameters(
+    shape_input = shape,
+    error_context = "ELA body",
+    extra_units = list(
+      length_units = units$length_units,
+      theta_units = units$theta_units
+    )
+  )
+  body <- .build_row_major_elastic_component(
+    shape_obj = shape,
+    theta = theta_body,
+    density = density_body,
+    sound_speed_longitudinal = sound_speed_longitudinal_body,
+    sound_speed_transversal = sound_speed_transversal_body
+  )
+  metadata <- .scatterer_metadata(ID = ID)
+
+  methods::new("ELA",
+    metadata = metadata,
+    model_parameters = list(),
+    model = list(),
+    body = body,
+    shape_parameters = shape_parameters
+  )
 }
 ################################################################################
 # Create CAL-class object
@@ -506,7 +579,9 @@ cal_generate <- function(material = "WC",
   )
   # Define shape parameters ====================================================
   shape_parameters <- list(
+    shape = "Sphere",
     diameter = diameter,
+    radius = diameter / 2,
     radius_body = diameter / 2,
     n_segments = n_segments,
     diameter_units = units$diameter_units,
