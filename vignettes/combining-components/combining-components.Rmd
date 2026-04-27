@@ -20,7 +20,7 @@ vignette: >
 
 # Introduction
 
-Component combination becomes most important in fish-like targets where anatomically distinct regions scatter in different regimes [@clay_horne_1994; @gorska_etal_2005; @stanton_acoustic_1996].
+Component combination becomes most important in fish-like targets where anatomically distinct regions scatter in different regimes [@Clay_1994; @Gorska_2005; @Stanton_1996].
 
 
 

@@ -18,7 +18,7 @@ vignette: >
  
 # Introduction
 
-The package workflow is meant to help users move between the same geometry, material, and model-choice questions that structure the broader fisheries-acoustics literature [@jech_etal_2015; @stanton_acoustic_1996; @medwin_fundamentals_1998].
+The package workflow is meant to help users move between the same geometry, material, and model-choice questions that structure the broader fisheries-acoustics literature [@Jech_2015; @Stanton_1996; @Medwin_1998].
 
 
 

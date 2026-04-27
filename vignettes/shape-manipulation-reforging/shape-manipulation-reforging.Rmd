@@ -18,7 +18,7 @@ vignette: >
 
 # Introduction
 
-Shape manipulation matters because many published target representations are built from segmented or reformatted coordinate sets rather than from canonical closed forms [@clay_horne_1994; @gastauer_australianantarcticdivisionzooscatr_2019].
+Shape manipulation matters because many published target representations are built from segmented or reformatted coordinate sets rather than from canonical closed forms [@Clay_1994; @ZooScatR_software].
 
 
 

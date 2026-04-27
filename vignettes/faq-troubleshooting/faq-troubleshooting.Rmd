@@ -18,7 +18,7 @@ vignette: >
 
 # Introduction
 
-Many common modeling pathologies are simply violations of the asymptotic, boundary, or material assumptions documented in the core scattering texts [@medwin_fundamentals_1998; @morse_theoretical_1986].
+Many common modeling pathologies are simply violations of the asymptotic, boundary, or material assumptions documented in the core scattering texts [@Medwin_1998; @Morse_1968].
 
 
 

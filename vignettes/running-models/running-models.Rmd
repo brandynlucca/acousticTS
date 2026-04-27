@@ -18,7 +18,7 @@ vignette: >
 
 # Introduction
 
-The execution patterns shown here are designed to make it easy to reproduce the same kinds of spectra and angle-series comparisons reported in benchmark and software papers [@jech_etal_2015; @gastauer_zooscatrspan_2019].
+The execution patterns shown here are designed to make it easy to reproduce the same kinds of spectra and angle-series comparisons reported in benchmark and software papers [@Jech_2015; @ZooScatR_software].
 
 
 

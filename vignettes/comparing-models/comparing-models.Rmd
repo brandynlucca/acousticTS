@@ -18,7 +18,7 @@ vignette: >
 
 # Introduction
 
-Cross-model comparison is most informative when the candidate families are read against broader reviews and inter-model benchmark studies [@jech_etal_2015; @stanton_acoustic_1996].
+Cross-model comparison is most informative when the candidate families are read against broader reviews and inter-model benchmark studies [@Jech_2015; @Stanton_1996].
 
 
 

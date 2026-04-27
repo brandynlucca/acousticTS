@@ -25,6 +25,7 @@ dev/
 inst/doc
 libs
 output
+Rplots.pdf
 renv/library
 scratch/
 src/*.dll

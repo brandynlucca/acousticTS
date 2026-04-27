@@ -20,7 +20,7 @@ vignette: >
 
 # Introduction
 
-Model selection in this package mirrors the broader literature: match geometry, material contrast, and anatomical complexity before worrying about computational detail [@jech_etal_2015; @clay_horne_1994; @stanton_acoustic_1996].
+Model selection in this package mirrors the broader literature: match geometry, material contrast, and anatomical complexity before worrying about computational detail [@Jech_2015; @Clay_1994; @Stanton_1996].
 
 
 

@@ -18,7 +18,7 @@ vignette: >
 
 # Introduction
 
-The validation workflow on this page is grounded in inter-model benchmark comparisons and open-software reproductions [@jech_etal_2015; @demer_validation_2003; @gastauer_zooscatrspan_2019; @sven_gastauer_svengastauerkrmr_2025; @betcke_bempp-cl_2021].
+The validation workflow on this page is grounded in inter-model benchmark comparisons and open-software reproductions [@Jech_2015; @echoSMs_software; @ZooScatR_software; @KRMr_software; @Bempp-cl_software; @liquid_spheroid_software; @mcgehee_software; @Echopop_software; @CCAMLR_SDWBA_software; @NOAA_KRM_software; @NOAA_SDWBA_software; @NOAA_sphere_software; @Prol_Spheroid_software; @SphereTS_software].
 
 
 

@@ -18,7 +18,7 @@ vignette: >
 
 # Introduction
 
-The bundled example objects are anchored to published fish, krill, and benchmark resources that make it easier to reproduce known workflows before introducing custom geometry [@clay_horne_1994; @mcgehee_effects_1998; @jech_etal_2015].
+The bundled example objects are anchored to published fish, krill, and benchmark resources that make it easier to reproduce known workflows before introducing custom geometry [@Clay_1994; @mcgehee_software; @Jech_2015].
 
 
 

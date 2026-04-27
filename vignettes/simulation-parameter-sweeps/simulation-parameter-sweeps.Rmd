@@ -18,7 +18,7 @@ vignette: >
 
 # Introduction
 
-Parameter sweeps are especially useful when a model has to be interpreted over the orientation, size, and contrast ranges emphasized in benchmark and survey studies [@jech_etal_2015; @demer_new_2005].
+Parameter sweeps are especially useful when a model has to be interpreted over the orientation, size, and contrast ranges emphasized in benchmark and survey studies [@Jech_2015; @Demer_2005.
 
 
 
