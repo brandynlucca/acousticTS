@@ -49,6 +49,18 @@
   (-2i / k_sw) * f_sum
 }
 
+# Resolve the exact PSMS kernel family used by the spheroidal TMM branch.
+#' @noRd
+.tmm_spheroidal_Amn_method <- function(boundary) {
+  switch(boundary,
+    liquid_filled = "Amn_fluid",
+    gas_filled = "Amn_fluid_simplify",
+    fixed_rigid = "Amn_fixed_rigid",
+    pressure_release = "Amn_pressure_release",
+    stop("Unsupported spheroidal TMM boundary.", call. = FALSE)
+  )
+}
+
 # Reduce the stored TMM prolate body metadata to the scalar fields required by
 # the compiled spheroidal kernels. The stored body bundle can also carry shape
 # profiles such as the meridional radius vector, which should not be passed
@@ -63,6 +75,80 @@
     phi_scatter = as.numeric(body$phi_scatter)[1],
     density = as.numeric(body$density)[1]
   )
+}
+
+# Build the scalar-body payload used by the exact prolate kernels for one
+# incident/receive-angle tuple.
+#' @noRd
+.tmm_spheroidal_exact_body <- function(model_params,
+                                       theta_body,
+                                       phi_body,
+                                       theta_scatter,
+                                       phi_scatter) {
+  body <- model_params$body
+  incident_internal <- .tmm_public_to_spheroidal_angles(
+    theta = theta_body,
+    phi = phi_body
+  )
+  body$theta_body <- incident_internal$theta[[1L]]
+  body$phi_body <- incident_internal$phi[[1L]]
+  body$theta_scatter <- theta_scatter
+  body$phi_scatter <- phi_scatter
+  .tmm_spheroidal_cpp_body(body)
+}
+
+# Evaluate the exact prolate spheroidal scattering amplitude for one
+# incident/receive-angle tuple using the PSMS kernel family that already backed
+# the direct spheroidal TMM branch on main.
+#' @noRd
+.tmm_spheroidal_exact_scattering <- function(model_params,
+                                             theta_body,
+                                             phi_body,
+                                             theta_scatter,
+                                             phi_scatter,
+                                             frequency_idx = NULL) {
+  override <- .tmm_spheroidal_exact_monostatic_override(
+    model_params = model_params,
+    theta_body = theta_body,
+    phi_body = phi_body,
+    theta_scatter = theta_scatter,
+    phi_scatter = phi_scatter,
+    frequency_idx = frequency_idx
+  )
+  if (!is.null(override)) {
+    return(override)
+  }
+
+  parameters <- model_params$parameters
+  acoustics <- parameters$acoustics
+  if (!is.null(frequency_idx)) {
+    acoustics <- acoustics[frequency_idx, , drop = FALSE]
+  }
+
+  quad_pts <- gauss_legendre(
+    n = parameters$n_integration %||% 96L,
+    a = -1,
+    b = 1
+  )
+  body_exact <- .tmm_spheroidal_exact_body(
+    model_params = model_params,
+    theta_body = theta_body,
+    phi_body = phi_body,
+    theta_scatter = theta_scatter,
+    phi_scatter = phi_scatter
+  )
+  raw_sum <- prolate_spheroid_fbs(
+    acoustics = acoustics,
+    body = body_exact,
+    medium = model_params$medium,
+    integration_pts = quad_pts,
+    precision = parameters$precision %||% "double",
+    Amn_method = .tmm_spheroidal_Amn_method(parameters$boundary),
+    adaptive = FALSE,
+    vectorized = FALSE
+  )
+
+  .tmm_spheroidal_sum_to_amplitude(raw_sum, acoustics$k_sw)
 }
 
 # Evaluate the exact prolate monostatic spectrum through the PSMS family used
@@ -161,12 +247,7 @@
     medium = medium,
     integration_pts = quad_pts,
     precision = parameters$precision,
-    Amn_method = switch(parameters$boundary,
-      liquid_filled = "Amn_fluid",
-      gas_filled = "Amn_fluid_simplify",
-      fixed_rigid = "Amn_fixed_rigid",
-      pressure_release = "Amn_pressure_release"
-    )
+    Amn_method = .tmm_spheroidal_Amn_method(parameters$boundary)
   )
   # Keep the stored monostatic spectrum tied to the exact PSMS family while
   # still retaining the spheroidal transition blocks for general-angle

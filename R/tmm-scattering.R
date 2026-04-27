@@ -719,57 +719,20 @@
 
   # Dispatch each angle tuple to the active retained-coordinate backend ========
   if (parameters$coordinate_system == "spheroidal") {
-    incident_key <- paste(
-      formatC(theta_body, digits = 16, format = "fg"),
-      formatC(.tmm_wrap_angle_2pi(phi_body), digits = 16, format = "fg"),
-      sep = "|"
-    )
-    incident_groups <- split(seq_len(n_eval), incident_key)
-    f_scat <- complex(length.out = n_eval)
-
-    for (group_idx in incident_groups) {
-      theta_i <- theta_body[group_idx[[1L]]]
-      phi_i <- phi_body[group_idx[[1L]]]
-      incident_internal <- .tmm_public_to_spheroidal_angles(
-        theta = theta_i,
-        phi = phi_i
-      )
-      f_batch <- prolate_spheroid_scattering_points_from_tmatrix_cpp(
-        acoustics = acoustics[frequency_idx, , drop = FALSE],
-        t_matrix = parameters$t_matrix[[frequency_idx]],
-        theta_body = incident_internal$theta[[1L]],
-        phi_body = incident_internal$phi[[1L]],
-        theta_scatter = theta_scatter[group_idx],
-        phi_scatter = phi_scatter[group_idx],
-        precision = parameters$precision %||% "double"
-      )
-      if (.tmm_matches_stored_incidence(
-        model_params,
-        theta_body = theta_i,
-        phi_body = phi_i
-      )) {
-        monostatic_mask <- vapply(
-          seq_along(group_idx),
-          function(i) {
-            idx <- group_idx[i]
-            .tmm_is_monostatic_direction(
-              theta_body = theta_body[idx],
-              phi_body = phi_body[idx],
-              theta_scatter = theta_scatter[idx],
-              phi_scatter = phi_scatter[idx]
-            )
-          },
-          logical(1)
-        )
-        if (any(monostatic_mask)) {
-          f_batch[monostatic_mask] <-
-            model_params$parameters$exact_monostatic_f_bs[[frequency_idx]]
-        }
-      }
-      f_scat[group_idx] <- f_batch
-    }
-
-    return(f_scat)
+    return(vapply(
+      seq_len(n_eval),
+      function(i) {
+        .tmm_spheroidal_exact_scattering(
+          model_params = model_params,
+          theta_body = theta_body[i],
+          phi_body = phi_body[i],
+          theta_scatter = theta_scatter[i],
+          phi_scatter = phi_scatter[i],
+          frequency_idx = frequency_idx
+        )[1]
+      },
+      complex(1)
+    ))
   }
 
   vapply(
@@ -887,23 +850,16 @@
       phi_scatter = phi_scatter
     )
   } else if (parameters$coordinate_system == "spheroidal") {
-    incident_internal <- .tmm_public_to_spheroidal_angles(
-      theta = theta_body,
-      phi = phi_body
-    )
-    # The public-to-spheroidal transform depends on paired (theta, phi)
-    # directions, so evaluate the full receive mesh point-by-point before
-    # reshaping it back to the standard theta x phi grid.
     theta_mesh <- rep(theta_scatter, times = length(phi_scatter))
     phi_mesh <- rep(phi_scatter, each = length(theta_scatter))
-    f_scat <- prolate_spheroid_scattering_points_from_tmatrix_cpp(
-      acoustics = acoustics[frequency_idx, , drop = FALSE],
-      t_matrix = t_store,
-      theta_body = incident_internal$theta[[1L]],
-      phi_body = incident_internal$phi[[1L]],
+    f_scat <- .tmm_scattering_points(
+      model_params = model_params,
+      frequency_idx = frequency_idx,
+      shape_parameters = shape_parameters,
+      theta_body = rep(theta_body, length(theta_mesh)),
+      phi_body = rep(phi_body, length(theta_mesh)),
       theta_scatter = theta_mesh,
-      phi_scatter = phi_mesh,
-      precision = parameters$precision %||% "double"
+      phi_scatter = phi_mesh
     )
     f_scat <- matrix(
       f_scat,
@@ -1087,32 +1043,12 @@
                                        phi_body,
                                        theta_scatter,
                                        phi_scatter) {
-  override <- .tmm_spheroidal_exact_monostatic_override(
+  .tmm_spheroidal_exact_scattering(
     model_params = model_params,
     theta_body = theta_body,
     phi_body = phi_body,
     theta_scatter = theta_scatter,
     phi_scatter = phi_scatter
-  )
-  if (!is.null(override)) {
-    return(override)
-  }
-
-  parameters <- model_params$parameters
-  acoustics <- parameters$acoustics
-  incident_internal <- .tmm_public_to_spheroidal_angles(
-    theta = theta_body,
-    phi = phi_body
-  )
-  # Delegate prolate general-angle evaluation to the compiled retained backend =
-  prolate_spheroid_scattering_from_tmatrix_cpp(
-    acoustics = acoustics,
-    t_matrix = parameters$t_matrix,
-    theta_body = incident_internal$theta,
-    phi_body = incident_internal$phi,
-    theta_scatter = theta_scatter,
-    phi_scatter = phi_scatter,
-    precision = parameters$precision %||% "double"
   )
 }
 
