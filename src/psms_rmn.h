@@ -26,6 +26,14 @@ struct RadialValue {
     T der_imag;
 };
 
+template<typename T>
+struct RmnScalarResult {
+    // Dedicated scalar return type avoids the compiler ABI warning triggered
+    // by returning std::pair<std::complex<T>, std::complex<T>> on GCC/macOS.
+    std::complex<T> value;
+    std::complex<T> derivative;
+};
+
 // -----------------------------------------------------------
 // HIGHER ORDER [3, 4] HELPER FUNCTION
 // -----------------------------------------------------------
@@ -102,7 +110,7 @@ RmnResult<T> Rmn_higher_order(int m, int n, int lnum, T c, T x1) {
 }
 
 template<typename T>
-std::pair<std::complex<T>, std::complex<T>> Rmn_scalar(
+RmnScalarResult<T> Rmn_scalar(
     int m, int n, T c, T x1, int kind = 1
 ) {
     int lnum = n - m + 1;
@@ -163,7 +171,10 @@ std::pair<std::complex<T>, std::complex<T>> Rmn_scalar(
                 Rd = std::numeric_limits<T>::quiet_NaN();
             }
         }
-        return {std::complex<T>(R, 0), std::complex<T>(Rd, 0)};
+        return {
+            std::complex<T>(R, 0),
+            std::complex<T>(Rd, 0)
+        };
     }
 
     // Higher-order conventions use outgoing/incoming combinations built from
@@ -412,8 +423,8 @@ RmnMatrixResult<T> Rmn_matrix(
         if (n[0] < m[0])
             throw std::invalid_argument("'n' must be >= 'm'.");
         auto res = Rmn_scalar<T>(m[0], n[0], c, x1, kind);
-        out.value[0][0] = res.first;
-        out.derivative[0][0] = res.second;
+        out.value[0][0] = res.value;
+        out.derivative[0][0] = res.derivative;
         return out;
     }
 
