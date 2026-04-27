@@ -10,6 +10,8 @@
   }
 
   switch(class(object)[1],
+    ELA = "elastic",
+    CAL = "elastic",
     GAS = "gas_filled",
     FLS = "liquid_filled",
     ESS = {
@@ -33,7 +35,7 @@
     },
     stop(
       "Specify 'boundary' explicitly for TMM when the scatterer is not a ",
-      "'FLS', 'GAS', or supported shell-sphere 'ESS' object.",
+      "'FLS', 'GAS', 'ELA', or supported shell-sphere 'ESS' object.",
       call. = FALSE
     )
   )
@@ -67,7 +69,8 @@
 #' @noRd
 .tmm_is_spheroidal_branch <- function(shape_parameters, boundary = NULL) {
   identical(.tmm_shape_name(shape_parameters), "ProlateSpheroid") &&
-    !identical(boundary, "elastic_shelled")
+    !identical(boundary, "elastic_shelled") &&
+    !identical(boundary, "elastic")
 }
 
 # Identify spherical fluid-shell runs that should stay on the exact sphere
@@ -92,10 +95,27 @@
     identical(boundary, "elastic_shelled")
 }
 
-# Identify the disabled prolate elastic-shell branch.
+# Identify elastic-solid TMM runs carried by plain ELA or CAL objects.
 #' @noRd
-.tmm_is_elastic_shell_prolate_branch <- function(object, shape_parameters, boundary) {
-  FALSE
+.tmm_is_elastic_solid_branch <- function(object, boundary) {
+  identical(boundary, "elastic") &&
+    methods::is(object, "ELA") &&
+    !methods::is(object, "ESS")
+}
+
+# Identify solid-elastic sphere runs that should stay on the exact calibration
+# sphere modal path while still using the public TMM interface.
+#' @noRd
+.tmm_is_elastic_solid_sphere_branch <- function(object, shape_parameters, boundary) {
+  .tmm_is_elastic_solid_branch(object, boundary) &&
+    identical(as.character(shape_parameters[["shape"]])[1], "Sphere")
+}
+
+# Identify solid-elastic prolate runs carried by the public TMM interface.
+#' @noRd
+.tmm_is_elastic_solid_prolate_branch <- function(object, shape_parameters, boundary) {
+  .tmm_is_elastic_solid_branch(object, boundary) &&
+    identical(as.character(shape_parameters[["shape"]])[1], "ProlateSpheroid")
 }
 
 # Detect whether an ESS shell carries elastic properties.
@@ -232,10 +252,10 @@
   # Restrict the current TMM initializer to the supported scatterer classes ====
   if (!methods::is(object, "FLS") &&
     !methods::is(object, "GAS") &&
-    !methods::is(object, "ESS")) {
+    !methods::is(object, "ELA")) {
     stop(
       "The current TMM implementation requires the scatterer to be either ",
-      "'FLS', 'GAS', or a supported 'ESS'. Input scatterer is ",
+      "'FLS', 'GAS', 'ELA', or a supported 'ESS'. Input scatterer is ",
       "type '", class(object)[1], "'.",
       call. = FALSE
     )
@@ -302,6 +322,11 @@
 .tmm_resolve_boundary <- function(object, boundary) {
   # Apply the class-specific default boundary and validate the final label =====
   boundary <- .tmm_boundary_default(object, boundary)
+  if (methods::is(object, "ELA") &&
+    !methods::is(object, "ESS") &&
+    identical(boundary, "elastic")) {
+    return(boundary)
+  }
   if (methods::is(object, "ESS")) {
     shape_name <- as.character(acousticTS::extract(object, "shape_parameters")[["shape"]])[1]
     if ((identical(shape_name, "Sphere") &&
@@ -319,6 +344,14 @@
     }
   }
 
+  if (identical(boundary, "elastic")) {
+    stop(
+      "TMM boundary 'elastic' is currently available only for solid elastic ",
+      "ELA/CAL targets.",
+      call. = FALSE
+    )
+  }
+
   if (!(boundary %in% c(
     "fixed_rigid",
     "pressure_release",
@@ -328,7 +361,7 @@
     stop(
       "Only the following values for 'boundary' are available in TMM: ",
       "'fixed_rigid', 'pressure_release', 'liquid_filled', 'gas_filled', ",
-      "'shelled_pressure_release', 'shelled_liquid', 'shelled_gas', ",
+      "'elastic', 'shelled_pressure_release', 'shelled_liquid', 'shelled_gas', ",
       "'elastic_shelled'.",
       call. = FALSE
     )
@@ -413,8 +446,56 @@
 
 # Resolve the homogeneous interior properties used by the TMM initializer.
 #' @noRd
-.tmm_prepare_body <- function(object, sound_speed_sw, density_sw, boundary) {
+.tmm_prepare_body <- function(object,
+                              sound_speed_sw,
+                              density_sw,
+                              boundary,
+                              density_body = NULL,
+                              sound_speed_longitudinal_body = NULL,
+                              sound_speed_transversal_body = NULL) {
   shape_parameters <- acousticTS::extract(object, "shape_parameters")
+
+  if (.tmm_is_elastic_solid_branch(object, boundary)) {
+    body <- acousticTS::extract(object, "body")
+    rho_body <- density_body %||% body$density
+    cL_body <- sound_speed_longitudinal_body %||% body$sound_speed_longitudinal
+    cT_body <- sound_speed_transversal_body %||% body$sound_speed_transversal
+    if (is.null(rho_body) || is.null(cL_body) || is.null(cT_body)) {
+      stop(
+        "Elastic-solid TMM requires body density plus longitudinal and ",
+        "transversal wave speeds, either stored on the scatterer or passed ",
+        "directly to target_strength().",
+        call. = FALSE
+      )
+    }
+
+    shear_modulus <- rho_body * cT_body^2
+    lame_lambda <- rho_body * cL_body^2 -
+      2 * shear_modulus
+
+    return(list(
+      theta = body$theta,
+      density = rho_body,
+      radius = body$radius %||% shape_parameters$radius %||%
+        shape_parameters$radius_body %||% NA_real_,
+      diameter = body$diameter %||% shape_parameters$diameter %||%
+        (2 * (shape_parameters$radius %||% shape_parameters$radius_body %||% NA_real_)),
+      sound_speed_longitudinal = cL_body,
+      sound_speed_transversal = cT_body,
+      lambda = lame_lambda,
+      mu = shear_modulus,
+      medium_density = density_sw,
+      medium_sound_speed = sound_speed_sw,
+      semimajor_length = as.numeric(
+        shape_parameters$semimajor_length %||%
+          shape_parameters$length / 2
+      )[1],
+      semiminor_length = as.numeric(
+        shape_parameters$semiminor_length %||%
+          shape_parameters$radius
+      )[1]
+    ))
+  }
 
   if (.tmm_is_shell_sphere_branch(
     object = object,
@@ -629,6 +710,31 @@
                                    cylinder_backend = NULL,
                                    cylinder_endcap_fraction = NULL,
                                    store_t_matrix = FALSE) {
+  if (identical(boundary, "elastic")) {
+    acoustics <- .init_acoustics_df(
+      frequency,
+      k_sw = sound_speed_sw,
+      k_l = body$sound_speed_longitudinal,
+      k_t = body$sound_speed_transversal
+    )
+    if (identical(.tmm_shape_name(shape_parameters), "Sphere")) {
+      acoustics$n_max <- NA_integer_
+      return(list(acoustics = acoustics, geometry = NULL))
+    }
+
+    k_eff <- pmax(acoustics$k_sw, acoustics$k_l, acoustics$k_t)
+    acoustics$n_max <- .tmm_prepare_n_max(
+      n_max = n_max,
+      frequency = frequency,
+      k_sw = k_eff,
+      shape_parameters = shape_parameters,
+      boundary = boundary,
+      cylinder_backend = cylinder_backend
+    )
+
+    return(list(acoustics = acoustics, geometry = NULL))
+  }
+
   if (boundary %in% c(
     "shelled_pressure_release",
     "shelled_liquid",
@@ -754,12 +860,15 @@
   }
   for (nm in c(
     "radius_shell", "radius_fluid",
+    "radius", "diameter",
     "semimajor_length", "semiminor_length", "shape_n_segments",
     "shell_density", "shell_sound_speed", "shell_g", "shell_h",
     "fluid_density", "fluid_sound_speed", "fluid_g", "fluid_h",
     "g21", "g31", "g32", "h21", "h31", "h32",
     "shell_thickness",
     "shell_E", "shell_G", "shell_K", "shell_nu", "shell_lambda",
+    "sound_speed_longitudinal", "sound_speed_transversal",
+    "lambda", "mu",
     "medium_density", "medium_sound_speed"
   )) {
     if (!is.null(body[[nm]])) {
@@ -775,9 +884,13 @@
 .tmm_coordinate_system <- function(use_spheroidal_branch,
                                    use_cylindrical_branch,
                                    use_shell_sphere_branch = FALSE,
+                                   use_elastic_solid_sphere_branch = FALSE,
                                    shape_parameters = NULL,
                                    cylinder_backend = NULL) {
   # Label the active TMM backend coordinate system ============================
+  if (use_elastic_solid_sphere_branch) {
+    return("sphere_elastic_exact")
+  }
   if (use_shell_sphere_branch) {
     return("sphere_modal")
   }
@@ -998,6 +1111,192 @@
   as.integer(n_max)
 }
 
+# Build the candidate retained-degree set scanned by the elastic prolate TMM
+# selector. The current elastic solid branch becomes unstable when the raw
+# bounding-sphere rule drives `n_max` too aggressively, so the package scans a
+# local neighborhood around that seed and selects a smooth modal path from the
+# actual retained solves rather than trusting one closed-form cutoff.
+#' @noRd
+.tmm_elastic_prolate_candidate_n_max <- function(n_seed) {
+  # Center the scan around the default retained-degree seed ====================
+  n_seed <- as.integer(round(n_seed))[1]
+  lower <- max(5L, n_seed - 12L)
+  upper <- max(lower, n_seed + 6L)
+
+  # Scan both parities because the elastic prolate branch can stabilize on
+  # either side of the raw retained-degree seed.
+  seq.int(lower, upper, by = 1L)
+}
+
+# Summarize the retained elastic-solid blocks with the diagnostics needed by
+# the automatic `n_max` selector.
+#' @noRd
+.tmm_elastic_prolate_block_diagnostics <- function(blocks) {
+  # Flatten the solved block bookkeeping across all retained azimuthal orders ===
+  if (!length(blocks)) {
+    return(list(
+      max_coeff = Inf,
+      low_max = Inf,
+      tail_ratio = Inf
+    ))
+  }
+
+  coeff_values <- unlist(
+    lapply(blocks, function(block) Mod(block$coefficients)),
+    use.names = FALSE
+  )
+  n_values <- unlist(
+    lapply(blocks, function(block) block$n_seq),
+    use.names = FALSE
+  )
+  m_values <- unlist(
+    lapply(blocks, function(block) {
+      rep.int(block$m, length(block$n_seq))
+    }),
+    use.names = FALSE
+  )
+  max_n <- max(n_values, na.rm = TRUE)
+  low_mask <- m_values <= 2L & n_values <= (m_values + 2L)
+  tail_mask <- n_values >= (max_n - 2L)
+
+  max_coeff <- max(coeff_values, na.rm = TRUE)
+  low_max <- if (any(low_mask)) {
+    max(coeff_values[low_mask], na.rm = TRUE)
+  } else {
+    max_coeff
+  }
+  tail_max <- if (any(tail_mask)) {
+    max(coeff_values[tail_mask], na.rm = TRUE)
+  } else {
+    max_coeff
+  }
+
+  list(
+    max_coeff = max_coeff,
+    low_max = low_max,
+    tail_ratio = tail_max / max(max_coeff, sqrt(.Machine$double.eps))
+  )
+}
+
+# Scan a local retained-degree neighborhood for the solid-elastic prolate TMM
+# branch and record the modal diagnostics used by the automatic selector.
+#' @noRd
+.tmm_elastic_prolate_scan_n_path <- function(acoustics,
+                                             body,
+                                             medium,
+                                             shape_parameters,
+                                             boundary,
+                                             svd_rel_tol = 1e-10) {
+  # Keep the selector scoped to the current public elastic-prolate branch ======
+  if (!identical(boundary, "elastic") ||
+    !identical(.tmm_shape_name(shape_parameters), "ProlateSpheroid")) {
+    return(NULL)
+  }
+
+  rows <- vector("list", 0L)
+  theta_incident <- body$theta_body %||% body$theta
+  for (i in seq_len(nrow(acoustics))) {
+    candidates <- .tmm_elastic_prolate_candidate_n_max(acoustics$n_max[i])
+    for (n_i in candidates) {
+      fit_i <- .tmm_single_frequency_spherical(
+        k_sw = acoustics$k_sw[i],
+        k_body = acoustics$k_body[i],
+        k_l = acoustics$k_l[i],
+        k_t = acoustics$k_t[i],
+        theta_body = theta_incident,
+        boundary = boundary,
+        shape_parameters = shape_parameters,
+        rho_sw = medium$density[1],
+        rho_body = body$density,
+        lambda = body$lambda,
+        mu = body$mu,
+        n_max = n_i,
+        store_t_matrix = FALSE,
+        frequency_hz = acoustics$frequency[i],
+        svd_rel_tol = svd_rel_tol
+      )
+      diag_i <- .tmm_elastic_prolate_block_diagnostics(fit_i$blocks)
+      rows[[length(rows) + 1L]] <- data.frame(
+        freq_index = i,
+        frequency = acoustics$frequency[i],
+        n_max = n_i,
+        TS = db(.sigma_bs(fit_i$f_bs)),
+        max_coeff = diag_i$max_coeff,
+        low_max = diag_i$low_max,
+        tail_ratio = diag_i$tail_ratio
+      )
+    }
+  }
+
+  do.call(rbind, rows)
+}
+
+# Select a smooth retained-degree path for the elastic prolate TMM branch from
+# the scanned modal diagnostics.
+#' @noRd
+.tmm_elastic_prolate_select_n_path <- function(scan_df) {
+  # Return the empty integer template when no scan was supplied ================
+  if (is.null(scan_df) || !nrow(scan_df)) {
+    return(integer(0))
+  }
+
+  scan_df <- scan_df[order(scan_df$freq_index, scan_df$n_max), , drop = FALSE]
+  local_min_coeff <- tapply(scan_df$max_coeff, scan_df$freq_index, min)
+  local_cost <- with(
+    scan_df,
+    log1p(low_max) +
+      0.25 * log1p(max_coeff) +
+      10 * sqrt(pmax(tail_ratio, 0))
+  )
+  unstable_mask <- scan_df$max_coeff >
+    4 * local_min_coeff[as.character(scan_df$freq_index)]
+  local_cost <- local_cost + ifelse(unstable_mask, 5, 0)
+  scan_df$local_cost <- local_cost
+
+  split_scan <- split(scan_df, scan_df$freq_index)
+  dp_cost <- vector("list", length(split_scan))
+  dp_prev <- vector("list", length(split_scan))
+  dp_cost[[1L]] <- split_scan[[1L]]$local_cost
+  dp_prev[[1L]] <- rep(NA_integer_, nrow(split_scan[[1L]]))
+
+  if (length(split_scan) > 1L) {
+    for (i in 2:length(split_scan)) {
+      prev_df <- split_scan[[i - 1L]]
+      curr_df <- split_scan[[i]]
+      cost_i <- rep(Inf, nrow(curr_df))
+      prev_i <- rep(NA_integer_, nrow(curr_df))
+
+      for (j in seq_len(nrow(curr_df))) {
+        transition_cost <- 0.35 * abs(curr_df$TS[j] - prev_df$TS) +
+          0.05 * abs(curr_df$n_max[j] - prev_df$n_max)
+        candidate_cost <- dp_cost[[i - 1L]] +
+          transition_cost +
+          curr_df$local_cost[j]
+        best_idx <- which.min(candidate_cost)
+        cost_i[j] <- candidate_cost[best_idx]
+        prev_i[j] <- best_idx
+      }
+
+      dp_cost[[i]] <- cost_i
+      dp_prev[[i]] <- prev_i
+    }
+  }
+
+  path_idx <- integer(length(split_scan))
+  path_idx[length(split_scan)] <- which.min(dp_cost[[length(split_scan)]])
+  if (length(split_scan) > 1L) {
+    for (i in seq(length(split_scan), 2L)) {
+      path_idx[i - 1L] <- dp_prev[[i]][path_idx[i]]
+    }
+  }
+
+  as.integer(vapply(
+    seq_along(split_scan),
+    function(i) as.integer(split_scan[[i]]$n_max[path_idx[i]]),
+    integer(1)
+  ))
+}
+
 # Cylinder monostatic TMM uses the same modal truncation rule as FCMS so that
 # the cylindrical-coordinate backend remains benchmark-compatible by default.
 #' @noRd
@@ -1035,7 +1334,7 @@
     return(max(128L, 10L * n_terms))
   }
 
-  if (identical(boundary, "elastic_shelled")) {
+  if (boundary %in% c("elastic_shelled", "elastic")) {
     return(max(128L, 8L * n_terms))
   }
 

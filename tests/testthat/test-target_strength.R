@@ -162,17 +162,95 @@ test_that("target_strength works with different scatterer types", {
   )
 })
 
-test_that("target_strength blocks ESPSMS pending the shell-only rebuild", {
-  eps_obj <- fixture_ps("elastic_shelled")
-
+test_that("target_strength no longer exposes the removed EPSMS model", {
   expect_error(
     target_strength(
-      object = eps_obj,
-      frequency = c(12e3, 38e3, 70e3, 120e3),
-      model = "epsms"
+      object = cal_generate(),
+      frequency = 12e3,
+      model = "epsms",
+      density_sw = 1026.8,
+      sound_speed_sw = 1477.3
     ),
-    "temporarily disabled"
+    "Unknown target strength model 'epsms'"
   )
+})
+
+test_that("TMM reuses the exact solid-elastic sphere branch for CAL objects", {
+  cal_obj <- cal_generate(material = "WC", diameter = 38.1e-3)
+  frequency <- c(38e3, 120e3)
+
+  tmm_obj <- target_strength(
+    object = cal_obj,
+    frequency = frequency,
+    model = "tmm",
+    sound_speed_sw = 1477.3,
+    density_sw = 1026.8
+  )
+  cal_ref <- target_strength(
+    object = cal_obj,
+    frequency = frequency,
+    model = "calibration",
+    sound_speed_sw = 1477.3,
+    density_sw = 1026.8
+  )
+
+  expect_true("TMM" %in% names(tmm_obj@model))
+  expect_equal(tmm_obj@model$TMM$frequency, frequency)
+  expect_equal(tmm_obj@model$TMM$TS, cal_ref@model$calibration$TS)
+  expect_true(all(is.na(tmm_obj@model$TMM$n_max)))
+})
+
+test_that("TMM reuses the exact solid-elastic sphere branch for ELA sphere carriers", {
+  ela_obj <- ela_generate(
+    shape = sphere(radius_body = 38.1e-3 / 2, n_segments = 80),
+    density_body = 14900,
+    sound_speed_longitudinal_body = 6853,
+    sound_speed_transversal_body = 4171,
+    theta_body = pi
+  )
+  cal_ref_obj <- cal_generate(material = "WC", diameter = 38.1e-3)
+  frequency <- c(38e3, 120e3)
+
+  tmm_obj <- target_strength(
+    object = ela_obj,
+    frequency = frequency,
+    model = "tmm",
+    sound_speed_sw = 1477.3,
+    density_sw = 1026.8
+  )
+  cal_ref <- target_strength(
+    object = cal_ref_obj,
+    frequency = frequency,
+    model = "calibration",
+    sound_speed_sw = 1477.3,
+    density_sw = 1026.8
+  )
+
+  expect_equal(tmm_obj@model$TMM$frequency, frequency)
+  expect_equal(tmm_obj@model$TMM$TS, cal_ref@model$calibration$TS)
+  expect_true(all(is.na(tmm_obj@model$TMM$n_max)))
+})
+
+test_that("TMM returns finite outputs for prolate ELA elastic targets", {
+  ela_obj <- ela_generate(
+    shape = prolate_spheroid(length_body = 0.04, radius_body = 0.004, n_segments = 60),
+    density_body = 14900,
+    sound_speed_longitudinal_body = 6853,
+    sound_speed_transversal_body = 4171,
+    theta_body = pi / 2
+  )
+
+  tmm_obj <- target_strength(
+    object = ela_obj,
+    frequency = c(38e3, 70e3),
+    model = "tmm",
+    sound_speed_sw = 1477.3,
+    density_sw = 1026.8
+  )
+
+  expect_equal(tmm_obj@model$TMM$frequency, c(38e3, 70e3))
+  expect_true(all(is.finite(tmm_obj@model$TMM$TS)))
+  expect_true(all(is.finite(tmm_obj@model$TMM$n_max)))
 })
 
 test_that("target_strength can update existing models", {

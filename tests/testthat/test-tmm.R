@@ -237,18 +237,34 @@ test_that("Stored elastic-shell sphere TMM supports the standard scattering help
   expect_true(is.finite(summary$metrics$peak_sigma_scat))
 })
 
-test_that("Elastic-shell prolate TMM is unsupported in package proper", {
+test_that("Elastic-shell prolate TMM runs in package proper", {
+  tmm_obj <- target_strength(
+    object = fixture_ps("elastic_shelled"),
+    frequency = 12e3,
+    model = "tmm",
+    boundary = "elastic_shelled",
+    density_sw = 1026.8,
+    sound_speed_sw = 1477.3,
+    store_t_matrix = TRUE
+  )
+
+  expect_s4_class(tmm_obj, "ESS")
+  expect_true("TMM" %in% names(tmm_obj@model))
+  expect_true(all(is.finite(tmm_obj@model$TMM$TS)))
+  expect_true(all(is.finite(Mod(tmm_obj@model$TMM$f_bs))))
+  expect_true(length(tmm_obj@model_parameters$TMM$parameters$t_matrix) == 1L)
+})
+
+test_that("The removed EPSMS model is not aliased to the TMM branch", {
   expect_error(
     target_strength(
-      object = fixture_ps("elastic_shelled"),
-      frequency = c(38e3, 70e3),
-      model = "tmm",
-      boundary = "elastic_shelled",
+      object = fixture_ps("fixed_rigid"),
+      frequency = 12e3,
+      model = "epsms",
       density_sw = 1026.8,
-      sound_speed_sw = 1477.3,
-      store_t_matrix = TRUE
+      sound_speed_sw = 1477.3
     ),
-    "spherical fluid shells plus spherical elastic shells only"
+    "Unknown target strength model 'epsms'"
   )
 })
 

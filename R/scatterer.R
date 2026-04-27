@@ -120,7 +120,13 @@ setClass("Scatterer",
 ELA <- setClass("ELA",
   slots = c(
     model = "list",
+    body = "list",
     shape_parameters = "list"
+  ),
+  prototype = list(
+    model = list(),
+    body = list(),
+    shape_parameters = list()
   ),
   contains = "Scatterer"
 )
@@ -298,9 +304,6 @@ ESS <- setClass("ESS",
 #' @rdname CAL-class
 #' @exportClass CAL
 CAL <- setClass("CAL",
-  slots = c(
-    body = "list"
-  ),
   contains = "ELA"
 )
 ################################################################################

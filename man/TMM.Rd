@@ -11,11 +11,13 @@ transition-matrix formulation. The current implementation targets smooth
 bodies of revolution and finite cylinders already represented in the
 package as a \code{Sphere}, \code{OblateSpheroid}, \code{ProlateSpheroid}, or \code{Cylinder}.
 It also supports spherical fluid shells and spherical elastic
-shells carried by \code{ESS} objects. The current public boundaries therefore
+shells carried by \code{ESS} objects, plus solid elastic spheres carried by
+\code{CAL} or plain \code{ELA} objects. The current public boundaries therefore
 cover rigid, pressure-release, and homogeneous penetrable fluid/gas
 interiors for homogeneous bodies, plus \code{shelled_pressure_release},
 \code{shelled_liquid}, and \code{shelled_gas} for shell spheres, and
-\code{elastic_shelled} for spherical elastic shells.
+\code{elastic_shelled} for spherical elastic shells, and \code{elastic}
+for solid elastic spheres.
 }
 \details{
 This implementation is intentionally scoped to \strong{single targets} and the
@@ -27,7 +29,9 @@ target surface. Spherical fluid shells instead stay on the exact layered
 sphere modal path already represented by \code{SPHMS}, but are retained and
 post-processed through the same stored \code{TMM} workflow. Spherical elastic
 shells analogously stay on the exact \code{ESSMS} modal path while exposing the
-same retained \code{TMM} angular post-processing interface. For prolate
+same retained \code{TMM} angular post-processing interface. Solid elastic
+spheres similarly stay on the exact \code{SOEMS} calibration-sphere path for
+monostatic runs while sharing the public \code{TMM} interface. For prolate
 spheroids, it instead uses a
 spheroidal-coordinate transition-matrix-equivalent backend, which is the
 more natural coordinate system for that geometry and is consistent with the
@@ -72,10 +76,13 @@ target_strength(
 \code{"fixed_rigid"}, \code{"pressure_release"},
 \code{"liquid_filled"}, \code{"gas_filled"},
 \code{"shelled_pressure_release"}, \code{"shelled_liquid"}, or
-\code{"shelled_gas"}, or \code{"elastic_shelled"}. The fluid-shell
+\code{"shelled_gas"}, or \code{"elastic_shelled"}, or \code{"elastic"}.
+The fluid-shell
 boundaries are currently restricted to spherical \code{ESS} objects. The
 \code{"elastic_shelled"} branch remains public for spherical elastic
-shells.}
+shells. The \code{"elastic"} branch is currently public for solid elastic
+spherical \code{ELA}/\code{CAL} targets plus prolate \code{ELA} targets
+through the retained T-matrix backend.}
 \item{\code{sound_speed_sw}}{Surrounding-medium sound speed
 (\eqn{m~s^{-1}}).}
 \item{\code{density_sw}}{Surrounding-medium density (\eqn{kg~m^{-3}}).}
@@ -138,6 +145,7 @@ and size parameters. \emph{The Journal of the Acoustical Society of America},
 }
 \seealso{
 \code{\link{target_strength}}, \code{\link{FLS}}, \code{\link{GAS}},
+\code{\link{CAL}},
 \code{\link{ESS}}, \code{\link{Sphere}}, \code{\link{OblateSpheroid}},
 \code{\link{ProlateSpheroid}}, \code{\link{Cylinder}},
 \code{\link{sphere}}, \code{\link{oblate_spheroid}},

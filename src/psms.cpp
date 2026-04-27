@@ -65,7 +65,6 @@ struct ProfcnBatchResult;
 // Internal PSMS support layer: special-function wrappers, profcn batching,
 // exponent rescaling helpers, and precision-agnostic scaffolding.
 #include "psms_support.h"
-
 #include "psms_smn.h"
 
 // C++-R INTERFACE FUNCTION [Smn]

@@ -632,6 +632,158 @@
     shell_density * shell_thickness
 }
 
+# Differentiate the associated Legendre table a second time with respect to
+# theta. The spherical elastic-solid basis needs this to evaluate the
+# tangential strains and tractions on the physical prolate surface.
+#' @noRd
+.tmm_assoc_legendre_theta_second_derivative <- function(m,
+                                                        n_seq,
+                                                        theta,
+                                                        p_mat,
+                                                        dp_dtheta) {
+  sin_theta <- pmax(sin(theta), sqrt(.Machine$double.eps))
+  cot_theta <- cos(theta) / sin_theta
+  d2p <- -sweep(dp_dtheta, 1, cot_theta, `*`)
+  d2p <- d2p - sweep(
+    p_mat,
+    2,
+    as.numeric(n_seq) * (as.numeric(n_seq) + 1),
+    `*`
+  )
+  d2p + sweep(p_mat, 1, (m^2) / (sin_theta^2), `*`)
+}
+
+# Build the unit surface normal and meridional tangent for one smooth
+# axisymmetric generator r(theta).
+#' @noRd
+.tmm_surface_frame <- function(radius, radius_derivative) {
+  scale <- sqrt(radius^2 + radius_derivative^2)
+  normal_r <- radius / scale
+  normal_theta <- -radius_derivative / scale
+
+  list(
+    normal_r = normal_r,
+    normal_theta = normal_theta,
+    tangent_r = -normal_theta,
+    tangent_theta = normal_r
+  )
+}
+
+# Evaluate one solid-elastic vector-wave family on the physical surface. The
+# interior displacement is expanded in the usual longitudinal, poloidal, and
+# toroidal vector spherical waves, then converted into normal displacement and
+# traction channels for the retained T-matrix solve.
+#' @noRd
+.tmm_elastic_solid_family <- function(family,
+                                      m,
+                                      n_seq,
+                                      k,
+                                      radius,
+                                      theta,
+                                      p_mat,
+                                      dp_dtheta,
+                                      d2p_dtheta2,
+                                      lambda,
+                                      mu,
+                                      frame) {
+  r_mat <- matrix(radius, nrow = length(radius), ncol = length(n_seq))
+  sin_theta <- pmax(sin(theta), sqrt(.Machine$double.eps))
+  cos_theta <- cos(theta)
+  sin_mat <- matrix(sin_theta, nrow = length(theta), ncol = length(n_seq))
+  cot_mat <- matrix(cos_theta / sin_theta, nrow = length(theta), ncol = length(n_seq))
+  x_mat <- k * r_mat
+  inv_x <- 1 / pmax(x_mat, sqrt(.Machine$double.eps))
+  inv_r <- 1 / r_mat
+  inv_r2 <- inv_r^2
+  n_mat <- matrix(
+    as.numeric(n_seq) * (as.numeric(n_seq) + 1),
+    nrow = length(radius),
+    ncol = length(n_seq),
+    byrow = TRUE
+  )
+
+  radial <- .tmm_radial_matrix(js, n_seq, k * radius)
+  radial_deriv <- .tmm_radial_matrix(jsd, n_seq, k * radius)
+  radial_second <- (n_mat * inv_x^2 - 1) * radial - 2 * radial_deriv * inv_x
+  i_m <- 1i * as.numeric(m)
+
+  if (identical(family, "longitudinal")) {
+    u_r <- k * radial_deriv * p_mat
+    u_theta <- radial * dp_dtheta * inv_r
+    u_phi <- i_m * radial * p_mat / (r_mat * sin_mat)
+
+    u_r_r <- (k^2) * radial_second * p_mat
+    u_r_theta <- k * radial_deriv * dp_dtheta
+    u_theta_r <- (k * radial_deriv * inv_r - radial * inv_r2) * dp_dtheta
+    u_theta_theta <- radial * d2p_dtheta2 * inv_r
+    u_phi_r <- i_m * (k * radial_deriv * inv_r - radial * inv_r2) *
+      p_mat / sin_mat
+    u_phi_theta <- i_m * radial * (
+      dp_dtheta / (r_mat * sin_mat) -
+        p_mat * cot_mat / r_mat
+    )
+  } else if (identical(family, "poloidal")) {
+    a_mat <- n_mat * radial * inv_x
+    b_mat <- radial_deriv + radial * inv_x
+    a_r <- k * n_mat * (radial_deriv * inv_x - radial * inv_x^2)
+    b_r <- k * (radial_second + radial_deriv * inv_x - radial * inv_x^2)
+
+    u_r <- a_mat * p_mat
+    u_theta <- b_mat * dp_dtheta
+    u_phi <- i_m * b_mat * p_mat / sin_mat
+
+    u_r_r <- a_r * p_mat
+    u_r_theta <- a_mat * dp_dtheta
+    u_theta_r <- b_r * dp_dtheta
+    u_theta_theta <- b_mat * d2p_dtheta2
+    u_phi_r <- i_m * b_r * p_mat / sin_mat
+    u_phi_theta <- i_m * b_mat * (dp_dtheta / sin_mat - p_mat * cot_mat)
+  } else if (identical(family, "toroidal")) {
+    u_r <- matrix(0 + 0i, nrow = nrow(p_mat), ncol = ncol(p_mat))
+    u_theta <- i_m * radial * p_mat / sin_mat
+    u_phi <- -radial * dp_dtheta
+
+    u_r_r <- u_r
+    u_r_theta <- u_r
+    u_theta_r <- i_m * k * radial_deriv * p_mat / sin_mat
+    u_theta_theta <- i_m * radial * (dp_dtheta / sin_mat - p_mat * cot_mat)
+    u_phi_r <- -k * radial_deriv * dp_dtheta
+    u_phi_theta <- -radial * d2p_dtheta2
+  } else {
+    stop("Unsupported elastic-solid TMM basis family.", call. = FALSE)
+  }
+
+  div_u <- u_r_r + 2 * u_r * inv_r +
+    u_theta_theta * inv_r +
+    u_theta * cot_mat * inv_r +
+    i_m * u_phi / (r_mat * sin_mat)
+
+  sigma_rr <- lambda * div_u + 2 * mu * u_r_r
+  sigma_rtheta <- mu * (u_r_theta * inv_r + u_theta_r - u_theta * inv_r)
+  sigma_rphi <- mu * (i_m * u_r / (r_mat * sin_mat) + u_phi_r - u_phi * inv_r)
+  sigma_thetatheta <- lambda * div_u + 2 * mu * (u_r * inv_r + u_theta_theta * inv_r)
+  sigma_thetaphi <- mu * (
+    u_phi_theta * inv_r - u_phi * cot_mat * inv_r +
+      i_m * u_theta / (r_mat * sin_mat)
+  )
+
+  normal_r_mat <- matrix(frame$normal_r, nrow = length(radius), ncol = length(n_seq))
+  normal_theta_mat <- matrix(frame$normal_theta, nrow = length(radius), ncol = length(n_seq))
+  tangent_r_mat <- matrix(frame$tangent_r, nrow = length(radius), ncol = length(n_seq))
+  tangent_theta_mat <- matrix(frame$tangent_theta, nrow = length(radius), ncol = length(n_seq))
+
+  traction_r <- sigma_rr * normal_r_mat + sigma_rtheta * normal_theta_mat
+  traction_theta <- sigma_rtheta * normal_r_mat + sigma_thetatheta * normal_theta_mat
+  traction_phi <- sigma_rphi * normal_r_mat + sigma_thetaphi * normal_theta_mat
+
+  list(
+    u_normal = u_r * normal_r_mat + u_theta * normal_theta_mat,
+    traction_normal = traction_r * normal_r_mat + traction_theta * normal_theta_mat,
+    traction_meridional = traction_r * tangent_r_mat + traction_theta * tangent_theta_mat,
+    traction_phi = traction_phi
+  )
+}
+
 # Assemble the collocation system for one azimuthal block under the requested
 # boundary condition.
 #' @noRd
@@ -639,12 +791,18 @@
                                 n_seq,
                                 p_mat,
                                 dp_dtheta,
+                                theta,
                                 radius,
                                 radius_derivative,
                                 k_sw,
                                 k_body = NULL,
+                                k_l = NULL,
+                                k_t = NULL,
                                 rho_sw,
                                 rho_body = NULL,
+                                lambda = NULL,
+                                mu = NULL,
+                                frequency_hz = NULL,
                                 shell_alpha = NULL) {
   # Evaluate the exterior radial-function families on the target surface =======
   kr_sw <- k_sw * radius
@@ -681,6 +839,113 @@
   if (boundary == "fixed_rigid") {
     # Rigid targets enforce zero normal velocity at the surface.
     return(list(lhs = out_normal, rhs = -reg_normal))
+  }
+
+  if (identical(boundary, "elastic")) {
+    if (!all(is.finite(c(k_l, k_t, lambda, mu)))) {
+      stop(
+        "Elastic-solid TMM requires finite longitudinal/transversal wave numbers ",
+        "plus Lamé parameters at every solved frequency.",
+        call. = FALSE
+      )
+    }
+
+    if (!is.finite(frequency_hz) || frequency_hz <= 0) {
+      stop(
+        "Elastic-solid TMM requires one positive finite frequency for each ",
+        "retained block solve.",
+        call. = FALSE
+      )
+    }
+
+    d2p_dtheta2 <- .tmm_assoc_legendre_theta_second_derivative(
+      m = min(n_seq),
+      n_seq = n_seq,
+      theta = theta,
+      p_mat = p_mat,
+      dp_dtheta = dp_dtheta
+    )
+    frame <- .tmm_surface_frame(radius, radius_derivative)
+    omega <- 2 * pi * frequency_hz
+    zero_block <- matrix(0 + 0i, nrow = nrow(p_mat), ncol = length(n_seq))
+
+    longitudinal <- .tmm_elastic_solid_family(
+      family = "longitudinal",
+      m = min(n_seq),
+      n_seq = n_seq,
+      k = k_l,
+      radius = radius,
+      theta = theta,
+      p_mat = p_mat,
+      dp_dtheta = dp_dtheta,
+      d2p_dtheta2 = d2p_dtheta2,
+      lambda = lambda,
+      mu = mu,
+      frame = frame
+    )
+    poloidal <- .tmm_elastic_solid_family(
+      family = "poloidal",
+      m = min(n_seq),
+      n_seq = n_seq,
+      k = k_t,
+      radius = radius,
+      theta = theta,
+      p_mat = p_mat,
+      dp_dtheta = dp_dtheta,
+      d2p_dtheta2 = d2p_dtheta2,
+      lambda = lambda,
+      mu = mu,
+      frame = frame
+    )
+    toroidal <- .tmm_elastic_solid_family(
+      family = "toroidal",
+      m = min(n_seq),
+      n_seq = n_seq,
+      k = k_t,
+      radius = radius,
+      theta = theta,
+      p_mat = p_mat,
+      dp_dtheta = dp_dtheta,
+      d2p_dtheta2 = d2p_dtheta2,
+      lambda = lambda,
+      mu = mu,
+      frame = frame
+    )
+
+    lhs <- rbind(
+      cbind(
+        h_sw * p_mat,
+        longitudinal$traction_normal,
+        poloidal$traction_normal,
+        toroidal$traction_normal
+      ),
+      cbind(
+        zero_block,
+        longitudinal$traction_meridional,
+        poloidal$traction_meridional,
+        toroidal$traction_meridional
+      ),
+      cbind(
+        zero_block,
+        longitudinal$traction_phi,
+        poloidal$traction_phi,
+        toroidal$traction_phi
+      ),
+      cbind(
+        out_normal / (rho_sw * omega^2),
+        -longitudinal$u_normal,
+        -poloidal$u_normal,
+        -toroidal$u_normal
+      )
+    )
+    rhs <- -rbind(
+      j_sw * p_mat,
+      zero_block,
+      zero_block,
+      reg_normal / (rho_sw * omega^2)
+    )
+
+    return(list(lhs = lhs, rhs = rhs))
   }
 
   # Add the interior field block for penetrable targets ========================
@@ -807,11 +1072,15 @@
 #' @noRd
 .tmm_single_frequency_spherical <- function(k_sw,
                                             k_body,
+                                            k_l = NULL,
+                                            k_t = NULL,
                                             theta_body,
                                             boundary,
                                             shape_parameters,
                                             rho_sw,
                                             rho_body = NULL,
+                                            lambda = NULL,
+                                            mu = NULL,
                                             n_max,
                                             cylinder_endcap_fraction = NULL,
                                             store_t_matrix = FALSE,
@@ -876,12 +1145,18 @@
         n_seq = n_seq,
         p_mat = p_mat,
         dp_dtheta = dp_dtheta,
+        theta = theta,
         radius = surface$radius,
         radius_derivative = surface$radius_derivative,
         k_sw = k_sw,
         k_body = k_body,
+        k_l = k_l,
+        k_t = k_t,
         rho_sw = rho_sw,
         rho_body = rho_body,
+        lambda = lambda,
+        mu = mu,
+        frequency_hz = frequency_hz,
         shell_alpha = if (identical(boundary, "elastic_shelled")) {
           .tmm_elastic_shell_alpha(
             shape_parameters = shape_parameters,
@@ -905,10 +1180,18 @@
       rhs_proj <- Conj(t(weighted_test)) %*% system$rhs
     } else {
       n_rows <- nrow(p_mat)
-      projector <- rbind(
-        cbind(Conj(t(weighted_test)), matrix(0, n_terms, n_rows)),
-        cbind(matrix(0, n_terms, n_rows), Conj(t(weighted_test)))
+      n_channels <- if (identical(boundary, "elastic")) 4L else 2L
+      projector <- matrix(
+        0 + 0i,
+        nrow = n_channels * n_terms,
+        ncol = n_channels * n_rows
       )
+      base_projector <- Conj(t(weighted_test))
+      for (channel in seq_len(n_channels)) {
+        row_idx <- ((channel - 1L) * n_terms + 1L):(channel * n_terms)
+        col_idx <- ((channel - 1L) * n_rows + 1L):(channel * n_rows)
+        projector[row_idx, col_idx] <- base_projector
+      }
       lhs_proj <- projector %*% system$lhs
       rhs_proj <- projector %*% system$rhs
     }
@@ -923,7 +1206,8 @@
 
     # Solve the projected system and recover the outgoing block ================
     use_stabilized_solver <- use_piecewise_cylinder ||
-      identical(boundary, "elastic_shelled")
+      identical(boundary, "elastic_shelled") ||
+      identical(boundary, "elastic")
     if (isTRUE(store_t_matrix)) {
       solution <- if (use_stabilized_solver) {
         .tmm_solve_linear_system_stabilized(

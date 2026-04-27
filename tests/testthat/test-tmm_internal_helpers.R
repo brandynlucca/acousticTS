@@ -36,6 +36,20 @@ test_that("internal TMM setup helpers cover boundary, truncation, and geometry b
     sound_speed_fluid = 343,
     theta_body = pi / 4
   )
+  ela_obj <- ela_generate(
+    shape = sphere_shape,
+    density_body = 14900,
+    sound_speed_longitudinal_body = 6853,
+    sound_speed_transversal_body = 4171,
+    theta_body = pi / 3
+  )
+  ela_prolate_obj <- ela_generate(
+    shape = prolate_spheroid(length_body = 0.2, radius_body = 0.01, n_segments = 20),
+    density_body = 14900,
+    sound_speed_longitudinal_body = 6853,
+    sound_speed_transversal_body = 4171,
+    theta_body = pi / 2
+  )
   shell_obj <- ess_generate(
     shape = sphere_shape,
     radius_shell = 0.01,
@@ -51,6 +65,7 @@ test_that("internal TMM setup helpers cover boundary, truncation, and geometry b
 
   expect_equal(acousticTS:::.tmm_boundary_default(fls_obj, NULL), "liquid_filled")
   expect_equal(acousticTS:::.tmm_boundary_default(gas_obj, NULL), "gas_filled")
+  expect_equal(acousticTS:::.tmm_boundary_default(ela_obj, NULL), "elastic")
   expect_equal(acousticTS:::.tmm_boundary_default(shell_obj, NULL), "shelled_liquid")
   expect_equal(
     acousticTS:::.tmm_boundary_default(elastic_shell_obj, NULL),
@@ -64,16 +79,21 @@ test_that("internal TMM setup helpers cover boundary, truncation, and geometry b
     acousticTS:::.tmm_boundary_default(fls_obj, "fixed_rigid"),
     "fixed_rigid"
   )
-  expect_error(
-    acousticTS:::.tmm_boundary_default(cal_generate(), NULL),
-    "Specify 'boundary' explicitly"
-  )
+  expect_equal(acousticTS:::.tmm_boundary_default(cal_generate(), NULL), "elastic")
 
   expect_invisible(acousticTS:::.tmm_validate_object_scope(fls_obj))
   expect_invisible(acousticTS:::.tmm_validate_object_scope(shell_obj))
+  expect_invisible(acousticTS:::.tmm_validate_object_scope(cal_generate()))
+  expect_invisible(acousticTS:::.tmm_validate_object_scope(ela_obj))
   expect_error(
-    acousticTS:::.tmm_validate_object_scope(cal_generate()),
-    "requires the scatterer to be either 'FLS', 'GAS', or a supported 'ESS'"
+    acousticTS:::.tmm_validate_object_scope(
+      methods::new(
+        "Scatterer",
+        metadata = list(),
+        model_parameters = list()
+      )
+    ),
+    "requires the scatterer to be either 'FLS', 'GAS', 'ELA', or a supported 'ESS'"
   )
 
   expect_invisible(
@@ -91,8 +111,10 @@ test_that("internal TMM setup helpers cover boundary, truncation, and geometry b
   )
   expect_error(
     acousticTS:::.tmm_resolve_boundary(fls_obj, "elastic"),
-    "Only the following values for 'boundary' are available"
+    "currently available only for solid elastic ELA/CAL targets"
   )
+  expect_equal(acousticTS:::.tmm_resolve_boundary(ela_obj, NULL), "elastic")
+  expect_equal(acousticTS:::.tmm_resolve_boundary(ela_prolate_obj, "elastic"), "elastic")
   expect_equal(
     acousticTS:::.tmm_resolve_boundary(shell_obj, "shelled_gas"),
     "shelled_gas"
@@ -104,6 +126,14 @@ test_that("internal TMM setup helpers cover boundary, truncation, and geometry b
   expect_equal(
     acousticTS:::.tmm_resolve_boundary(elastic_prolate_obj, "elastic_shelled"),
     "elastic_shelled"
+  )
+  expect_equal(
+    acousticTS:::.tmm_resolve_boundary(cal_generate(), NULL),
+    "elastic"
+  )
+  expect_equal(
+    acousticTS:::.tmm_resolve_boundary(cal_generate(), "elastic"),
+    "elastic"
   )
   expect_error(
     acousticTS:::.tmm_validate_store_t_matrix(c(TRUE, FALSE)),
@@ -472,6 +502,7 @@ test_that("internal TMM spherical helpers cover surface and solver branches", {
     tolerance = 1e-12
   )
 })
+
 
 test_that("internal TMM diagnostics helpers cover validation and continuation branches", {
   density_sw <- 1026.8

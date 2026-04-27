@@ -9,11 +9,13 @@
 #' bodies of revolution and finite cylinders already represented in the
 #' package as a `Sphere`, `OblateSpheroid`, `ProlateSpheroid`, or `Cylinder`.
 #' It also supports spherical fluid shells and spherical elastic
-#' shells carried by `ESS` objects. The current public boundaries therefore
+#' shells carried by `ESS` objects, plus solid elastic spheres carried by
+#' `CAL` or plain `ELA` objects. The current public boundaries therefore
 #' cover rigid, pressure-release, and homogeneous penetrable fluid/gas
 #' interiors for homogeneous bodies, plus `shelled_pressure_release`,
 #' `shelled_liquid`, and `shelled_gas` for shell spheres, and
-#' `elastic_shelled` for spherical elastic shells.
+#' `elastic_shelled` for spherical elastic shells, and `elastic`
+#' for solid elastic spheres.
 #'
 #' @details
 #' This implementation is intentionally scoped to **single targets** and the
@@ -25,7 +27,9 @@
 #' sphere modal path already represented by `SPHMS`, but are retained and
 #' post-processed through the same stored `TMM` workflow. Spherical elastic
 #' shells analogously stay on the exact `ESSMS` modal path while exposing the
-#' same retained `TMM` angular post-processing interface. For prolate
+#' same retained `TMM` angular post-processing interface. Solid elastic spheres
+#' similarly stay on the exact `SOEMS` calibration-sphere path for monostatic
+#' runs while sharing the public `TMM` interface. For prolate
 #' spheroids, it instead uses a
 #' spheroidal-coordinate transition-matrix-equivalent backend, which is the
 #' more natural coordinate system for that geometry and is consistent with the
@@ -67,10 +71,13 @@
 #'   \code{"fixed_rigid"}, \code{"pressure_release"},
 #'   \code{"liquid_filled"}, \code{"gas_filled"},
 #'   \code{"shelled_pressure_release"}, \code{"shelled_liquid"}, or
-#'   \code{"shelled_gas"}, or \code{"elastic_shelled"}. The fluid-shell
+#'   \code{"shelled_gas"}, or \code{"elastic_shelled"}, or \code{"elastic"}.
+#'   The fluid-shell
 #'   boundaries are currently restricted to spherical `ESS` objects. The
-#'   \code{"elastic_shelled"} branch remains public for spherical elastic
-#'   shells.}
+#'   \code{"elastic_shelled"} branch is public for spherical elastic
+#'   shells. The \code{"elastic"} branch is currently public for
+#'   solid elastic spherical `ELA`/`CAL` targets plus prolate `ELA`
+#'   targets through the retained T-matrix backend.}
 #'   \item{\code{sound_speed_sw}}{Surrounding-medium sound speed
 #'   (\eqn{m~s^{-1}}).}
 #'   \item{\code{density_sw}}{Surrounding-medium density (\eqn{kg~m^{-3}}).}
@@ -108,7 +115,7 @@
 #'
 #' @seealso
 #' \code{\link{target_strength}}, \code{\link{FLS}}, \code{\link{GAS}},
-#' \code{\link{ESS}}, \code{\link{Sphere}}, \code{\link{OblateSpheroid}},
+#' \code{\link{ESS}}, \code{\link{CAL}}, \code{\link{Sphere}}, \code{\link{OblateSpheroid}},
 #' \code{\link{ProlateSpheroid}}, \code{\link{Cylinder}},
 #' \code{\link{sphere}}, \code{\link{oblate_spheroid}},
 #' \code{\link{prolate_spheroid}}, \code{\link{cylinder}}
@@ -158,6 +165,9 @@ tmm_initialize <- function(object,
                            boundary = NULL,
                            sound_speed_sw = .SEAWATER_SOUND_SPEED_DEFAULT,
                            density_sw = .SEAWATER_DENSITY_DEFAULT,
+                           density_body = NULL,
+                           sound_speed_longitudinal_body = NULL,
+                           sound_speed_transversal_body = NULL,
                            store_t_matrix = FALSE) {
   # Enforce the current homogeneous-fluid scatterer scope ======================
   .tmm_validate_object_scope(object)
@@ -166,6 +176,33 @@ tmm_initialize <- function(object,
   cylinder_endcap_fraction <- NULL
   boundary <- .tmm_resolve_boundary(object, boundary)
   shape_parameters <- acousticTS::extract(object, "shape_parameters")
+  use_elastic_solid_sphere_branch <- .tmm_is_elastic_solid_sphere_branch(
+    object = object,
+    shape_parameters = shape_parameters,
+    boundary = boundary
+  )
+  use_elastic_solid_prolate_branch <- .tmm_is_elastic_solid_prolate_branch(
+    object = object,
+    shape_parameters = shape_parameters,
+    boundary = boundary
+  )
+  if (.tmm_is_elastic_solid_branch(object, boundary) &&
+    !use_elastic_solid_sphere_branch &&
+    !use_elastic_solid_prolate_branch) {
+    stop(
+      "The current TMM elastic-solid branch is public for spherical ELA/CAL ",
+      "targets plus prolate ELA targets. Solid elastic oblate/cylindrical TMM ",
+      "backends still need to be implemented.",
+      call. = FALSE
+    )
+  }
+  if (use_elastic_solid_sphere_branch && isTRUE(store_t_matrix)) {
+    stop(
+      "Stored TMM blocks are not yet available for the exact solid-elastic ",
+      "sphere branch.",
+      call. = FALSE
+    )
+  }
   if (methods::is(object, "ESS") &&
     !.tmm_is_sphere_modal_branch(
       object = object,
@@ -198,7 +235,15 @@ tmm_initialize <- function(object,
 
   # Resolve the boundary condition and validate the storage controls ===========
   n_max <- .tmm_branch_n_max(NULL, use_spheroidal_branch)
-  body <- .tmm_prepare_body(object, sound_speed_sw, density_sw, boundary)
+  body <- .tmm_prepare_body(
+    object = object,
+    sound_speed_sw = sound_speed_sw,
+    density_sw = density_sw,
+    boundary = boundary,
+    density_body = density_body,
+    sound_speed_longitudinal_body = sound_speed_longitudinal_body,
+    sound_speed_transversal_body = sound_speed_transversal_body
+  )
 
   # Build the shared acoustics table for the requested frequencies =============
   acoustics_info <- .tmm_prepare_acoustics(
@@ -217,6 +262,21 @@ tmm_initialize <- function(object,
   acoustics <- acoustics_info$acoustics
   geometry <- acoustics_info$geometry
 
+  # Solid elastic prolates stay on the retained spherical-coordinate branch,
+  # but their default bounding-sphere truncation can jump onto unstable modal
+  # branches. Replace that raw seed with a diagnostics-driven retained-degree
+  # path selected from the actual elastic block solves.
+  if (use_elastic_solid_prolate_branch) {
+    elastic_scan <- .tmm_elastic_prolate_scan_n_path(
+      acoustics = acoustics,
+      body = body,
+      medium = .init_medium_params(sound_speed_sw, density_sw),
+      shape_parameters = shape_parameters,
+      boundary = boundary
+    )
+    acoustics$n_max <- .tmm_elastic_prolate_select_n_path(elastic_scan)
+  }
+
   # Assemble the stored body/geometry metadata for downstream reuse ============
   body_params <- .tmm_body_parameters(body, geometry)
 
@@ -234,6 +294,7 @@ tmm_initialize <- function(object,
           use_spheroidal_branch,
           use_cylindrical_branch,
           use_shell_sphere_branch = use_shell_sphere_branch,
+          use_elastic_solid_sphere_branch = use_elastic_solid_sphere_branch,
           shape_parameters = shape_parameters,
           cylinder_backend = resolved_cylinder_backend
         ),
@@ -370,6 +431,59 @@ tmm_initialize <- function(object,
   )
 }
 
+# Evaluate the exact solid-elastic sphere branch while keeping the public TMM
+# interface aligned with the existing calibration-sphere modal solution.
+#' @noRd
+.tmm_calibration_proxy_object <- function(object, body) {
+  if (methods::is(object, "CAL")) {
+    return(object)
+  }
+
+  shape_parameters <- acousticTS::extract(object, "shape_parameters")
+  if (!identical(as.character(shape_parameters$shape)[1], "Sphere")) {
+    stop(
+      "The exact solid-elastic sphere proxy requires a spherical ELA/CAL target.",
+      call. = FALSE
+    )
+  }
+
+  cal_generate(
+    material = "WC",
+    diameter = body$diameter,
+    sound_speed_longitudinal = body$sound_speed_longitudinal,
+    sound_speed_transversal = body$sound_speed_transversal,
+    density_sphere = body$density,
+    theta_sphere = body$theta_body
+  )
+}
+
+# Evaluate the exact solid-elastic sphere branch while keeping the public TMM
+# interface aligned with the existing calibration-sphere modal solution.
+#' @noRd
+.tmm_run_elastic_solid_sphere_branch <- function(object, acoustics, medium, body) {
+  cal_proxy <- .tmm_calibration_proxy_object(object, body)
+  cal_object <- calibration_initialize(
+    object = cal_proxy,
+    frequency = acoustics$frequency,
+    sound_speed_sw = medium$sound_speed,
+    density_sw = medium$density,
+    adaptive = TRUE
+  )
+  cal_object <- calibration(cal_object)
+  cal_model <- cal_object@model$calibration
+
+  list(
+    model = data.frame(
+      frequency = cal_model$frequency,
+      f_bs = as.complex(cal_model$f_bs),
+      sigma_bs = cal_model$sigma_bs,
+      TS = cal_model$TS,
+      n_max = NA_integer_
+    ),
+    t_matrix = NULL
+  )
+}
+
 
 #' Single-target transition matrix method (TMM)
 #'
@@ -396,6 +510,17 @@ TMM <- function(object) {
         shell_result$t_matrix
     }
 
+    return(object)
+  }
+
+  if (identical(parameters$coordinate_system, "sphere_elastic_exact")) {
+    solid_result <- .tmm_run_elastic_solid_sphere_branch(
+      object = object,
+      acoustics = acoustics,
+      medium = medium,
+      body = body
+    )
+    methods::slot(object, "model")$TMM <- solid_result$model
     return(object)
   }
 
@@ -498,7 +623,9 @@ TMM <- function(object) {
   use_compiled_spherical <- !(
     identical(.tmm_shape_name(shape_parameters), "Cylinder") &&
       identical(parameters$cylinder_backend, "retained")
-  ) && !identical(parameters$boundary, "elastic_shelled")
+  ) &&
+    !identical(parameters$boundary, "elastic_shelled") &&
+    !identical(parameters$boundary, "elastic")
 
   if (!isTRUE(parameters$store_t_matrix) && use_compiled_spherical) {
     f_bs <- tmm_backscatter_cpp(
@@ -522,11 +649,15 @@ TMM <- function(object) {
       tmm_i <- .tmm_single_frequency_spherical(
         k_sw = acoustics$k_sw[i],
         k_body = acoustics$k_body[i],
+        k_l = acoustics$k_l[i] %||% NA_real_,
+        k_t = acoustics$k_t[i] %||% NA_real_,
         theta_body = body$theta_body,
         boundary = parameters$boundary,
         shape_parameters = shape_parameters,
         rho_sw = medium$density,
         rho_body = body$density,
+        lambda = body$lambda %||% NA_real_,
+        mu = body$mu %||% NA_real_,
         n_max = acoustics$n_max[i],
         cylinder_endcap_fraction = parameters$cylinder_endcap_fraction,
         store_t_matrix = parameters$store_t_matrix,
