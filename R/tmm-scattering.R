@@ -609,7 +609,7 @@
             h_body = model_params$body$h_body
           ) * profile$weight[j] * axial_phase[j]
         },
-        complex(length = acoustics_i$n_max + 1L)
+        complex(length.out = acoustics_i$n_max + 1L)
       )
       modal_sum <- rowSums(modal_integral)
       azimuth_term <- cos((0:acoustics_i$n_max) * dphi)
@@ -680,7 +680,7 @@
           h_body = model_params$body$h_body
         ) * profile$weight[j] * axial_phase[j]
       },
-      complex(length = acoustics_i$n_max + 1L)
+      complex(length.out = acoustics_i$n_max + 1L)
     )
     modal_sum <- rowSums(modal_integral)
     azimuth_term <- vapply(
@@ -725,7 +725,7 @@
       sep = "|"
     )
     incident_groups <- split(seq_len(n_eval), incident_key)
-    f_scat <- complex(length = n_eval)
+    f_scat <- complex(length.out = n_eval)
 
     for (group_idx in incident_groups) {
       theta_i <- theta_body[group_idx[[1L]]]

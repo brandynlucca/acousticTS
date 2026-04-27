@@ -297,7 +297,7 @@
             x * tan(th) - cyl_radius * sqrt(profile_ratio)
           }
 
-          uniroot(
+          stats::uniroot(
             root_fun,
             lower = 0,
             upper = half_length,
@@ -845,7 +845,7 @@
     if (!all(is.finite(c(k_l, k_t, lambda, mu)))) {
       stop(
         "Elastic-solid TMM requires finite longitudinal/transversal wave numbers ",
-        "plus Lamé parameters at every solved frequency.",
+        "plus Lame parameters at every solved frequency.",
         call. = FALSE
       )
     }
