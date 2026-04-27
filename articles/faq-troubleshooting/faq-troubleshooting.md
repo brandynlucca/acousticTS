@@ -4,9 +4,8 @@
 
 Many common modeling pathologies are simply violations of the
 asymptotic, boundary, or material assumptions documented in the core
-scattering texts
-([**medwin_fundamentals_1998?**](#ref-medwin_fundamentals_1998);
-[**morse_theoretical_1986?**](#ref-morse_theoretical_1986)).
+scattering texts ([Medwin and Clay 1998](#ref-Medwin_1998); [Morse and
+Ingard 1968](#ref-Morse_1968)).
 
 Many problems that look like model failures are really workflow
 failures: wrong units, wrong boundary assumption, wrong target class,
@@ -155,3 +154,12 @@ and finally the relevant theory page. That reading order mirrors the
 workflow itself: first confirm the package logic, then the boundary
 interpretation, then the model family, and only then the model-specific
 mathematics.
+
+## References
+
+Medwin, Herman, and Clarence S. Clay. 1998. *Fundamentals of Acoustical
+Oceanography*. Applications of Modern Acoustics. San Diego, CA: Academic
+Press.
+
+Morse, Philip M., and K. Uno Ingard. 1968. *Theoretical Acoustics*. New
+York, NY: McGraw-Hill.

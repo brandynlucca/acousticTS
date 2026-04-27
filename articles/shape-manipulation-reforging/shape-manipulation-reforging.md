@@ -4,8 +4,8 @@
 
 Shape manipulation matters because many published target representations
 are built from segmented or reformatted coordinate sets rather than from
-canonical closed forms ([**clay_horne_1994?**](#ref-clay_horne_1994);
-[**gastauer_australianantarcticdivisionzooscatr_2019?**](#ref-gastauer_australianantarcticdivisionzooscatr_2019)).
+canonical closed forms ([Clay and Horne 1994](#ref-Clay_1994);
+[Gastauer, Chu, and Cox 2019](#ref-ZooScatR_software)).
 
 Real workflows often begin with a target description that is close to
 useful but not quite in the form required for the next model or
@@ -608,3 +608,16 @@ untracked series of geometric edits.
   scatterers](https://brandynlucca.github.io/acousticTS/articles/building-scatterers/building-scatterers.md)
 - [Comparing models on the same
   target](https://brandynlucca.github.io/acousticTS/articles/comparing-models/comparing-models.md)
+
+## References
+
+Clay, Clarence S., and John K. Horne. 1994. “Acoustic Models of Fish:
+The Atlantic Cod (*Gadus Morhua*).” *The Journal of the Acoustical
+Society of America* 96 (3): 1661–68. <https://doi.org/10.1121/1.410245>.
+
+Gastauer, Sven, Dezhang Chu, and Martin J. Cox. 2019. “ZooScatR—An
+\<Span Style="font-Variant:small-Caps;"\>r\</Span\> Package for
+Modelling the Scattering Properties of Weak Scattering Targets Using the
+Distorted Wave Born Approximation.” *The Journal of the Acoustical
+Society of America* 145 (1): EL102–8.
+<https://doi.org/10.1121/1.5085655>.

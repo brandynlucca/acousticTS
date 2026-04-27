@@ -3,12 +3,20 @@
 ## Introduction
 
 The validation workflow on this page is grounded in inter-model
-benchmark comparisons and open-software reproductions
-([**jech_etal_2015?**](#ref-jech_etal_2015);
-[**demer_validation_2003?**](#ref-demer_validation_2003);
-[**gastauer_zooscatrspan_2019?**](#ref-gastauer_zooscatrspan_2019);
-[**sven_gastauer_svengastauerkrmr_2025?**](#ref-sven_gastauer_svengastauerkrmr_2025);
-[**betcke_bempp-cl_2021?**](#ref-betcke_bempp-cl_2021)).
+benchmark comparisons and open-software reproductions ([Jech et al.
+2015](#ref-Jech_2015); [G. Macaulay and contributors
+2024](#ref-echoSMs_software); [Gastauer, Chu, and Cox
+2019](#ref-ZooScatR_software); [Gastauer 2025](#ref-KRMr_software);
+[Betcke and Scroggs 2021](#ref-Bempp-cl_software); [Elavia
+2021](#ref-liquid_spheroid_software); [McGehee, O’Driscoll, and
+Traykovski 1998](#ref-mcgehee_software); [Lucca and Lee
+2026](#ref-Echopop_software); [Commission for the Conservation of
+Antarctic Marine Living Resources 2019](#ref-CCAMLR_SDWBA_software);
+[Southwest Fisheries Science Center 2022a](#ref-NOAA_KRM_software),
+[2022b](#ref-NOAA_SDWBA_software); [Renfree and Demer
+2014](#ref-NOAA_sphere_software); [Khodabandeloo et al.
+2025](#ref-Prol_Spheroid_software); [G. J. Macaulay
+2025](#ref-SphereTS_software)).
 
 Modeling packages become much more useful when users can distinguish a
 physically surprising result from a setup error. Validation pages help
@@ -327,3 +335,70 @@ mismatches of assumptions.
   functions](https://brandynlucca.github.io/acousticTS/articles/numerical-foundations/numerical-foundations.md)
 - [FAQ and
   troubleshooting](https://brandynlucca.github.io/acousticTS/articles/faq-troubleshooting/faq-troubleshooting.md)
+
+## References
+
+Betcke, Timo, and Matthew Scroggs. 2021. “Bempp-Cl: A Fast Python Based
+Just-in-Time Compiling Boundary Element Library.” *Journal of Open
+Source Software* 6 (59): 2879. <https://doi.org/10.21105/joss.02879>.
+
+Commission for the Conservation of Antarctic Marine Living Resources.
+2019. “SDWBA_TS: Stochastic Distorted-Wave Born Approximation (SDWBA)
+Target Strength (TS) Model.” <https://github.com/ccamlr/SDWBA_TS>;
+GitHub.
+
+Elavia, A. 2021. “Liquid_spheroid: Acoustic Scattering by a Liquid
+Prolate Spheroid.” <https://github.com/elavia/liquid_spheroid>.
+
+Gastauer, Sven. 2025. “SvenGastauer/KRMr: V0.4.8.” Zenodo.
+<https://doi.org/10.5281/ZENODO.15838374>.
+
+Gastauer, Sven, Dezhang Chu, and Martin J. Cox. 2019. “ZooScatR—An
+\<Span Style="font-Variant:small-Caps;"\>r\</Span\> Package for
+Modelling the Scattering Properties of Weak Scattering Targets Using the
+Distorted Wave Born Approximation.” *The Journal of the Acoustical
+Society of America* 145 (1): EL102–8.
+<https://doi.org/10.1121/1.5085655>.
+
+Jech, J. Michael, John K. Horne, Dezhang Chu, David A. Demer, David T.
+I. Francis, Natalia Gorska, Benjamin Jones, et al. 2015. “Comparisons
+Among Ten Models of Acoustic Backscattering Used in Aquatic Ecosystem
+Research.” *The Journal of the Acoustical Society of America* 138 (6):
+3742–64. <https://doi.org/10.1121/1.4937607>.
+
+Khodabandeloo, Babak, Yngve Heggelund, Bjørnar Ystad, Sander Andre Berg
+Marx, and Geir Pedersen. 2025. “High-Precision Model and Open-Source
+Software for Acoustic Backscattering by Liquid- and Gas-Filled Prolate
+Spheroids Across a Wide Frequency Range and Incident Angles:
+Implications for Fisheries Acoustics.” *Journal of Sound and Vibration*,
+119227. https://doi.org/<https://doi.org/10.1016/j.jsv.2025.119227>.
+
+Lucca, Brandyn, and Wu-Jung Lee. 2026. “OSOceanAcoustics/Echopop:
+V0.6.0.” Zenodo. <https://doi.org/10.5281/ZENODO.18975959>.
+
+Macaulay, Gavin J. 2025. “gavinmacaulay/SphereTS: V1.0.8.”
+<https://github.com/gavinmacaulay/SphereTS>.
+
+Macaulay, Gavin, and contributors. 2024. “echoSMs: Making Acoustic
+Scattering Models Available to Fisheries and Plankton Scientists.”
+*GitHub Repository*. <https://github.com/ices-tools-dev/echoSMs>;
+GitHub.
+
+McGehee, D. E., R. L. O’Driscoll, and L. V.Martin Traykovski. 1998.
+“Effects of Orientation on Acoustic Scattering from Antarctic Krill at
+120 kHz.” *Deep Sea Research Part II: Topical Studies in Oceanography*
+45 (7): 1273–94. <https://doi.org/10.1016/S0967-0645(98)00036-8>.
+
+Renfree, J. S., and D. A. Demer. 2014. *Standard Sphere Target Strength
+Calculator*. Advanced Survey Technologies, Fisheries Resource Division,
+Southwest Fisheries Science Center, National Marine Fisheries Service,
+National Oceanic; Atmospheric Administration.
+<https://www.fisheries.noaa.gov/data-tools/standard-sphere-target-strength-calculator>.
+
+Southwest Fisheries Science Center. 2022a. *KRM Model*. National Marine
+Fisheries Service, National Oceanic; Atmospheric Administration.
+<https://www.fisheries.noaa.gov/data-tools/krm-model>.
+
+———. 2022b. *SDWBA Model*. National Marine Fisheries Service, National
+Oceanic; Atmospheric Administration.
+<https://www.fisheries.noaa.gov/data-tools/sdwba-model>.
