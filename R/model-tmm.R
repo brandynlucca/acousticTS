@@ -619,13 +619,10 @@ TMM <- function(object) {
     return(object)
   }
 
-  # Use the fast compiled spherical branch when block storage is disabled ======
-  use_compiled_spherical <- !(
-    identical(.tmm_shape_name(shape_parameters), "Cylinder") &&
-      identical(parameters$cylinder_backend, "retained")
-  ) &&
-    !identical(parameters$boundary, "elastic_shelled") &&
-    !identical(parameters$boundary, "elastic")
+  # Keep the public spherical-coordinate branch on the established retained R
+  # solve for now. The newer compiled backend is currently excluded because it
+  # is the most likely source of the macOS-only teardown abort seen in CI.
+  use_compiled_spherical <- FALSE
 
   if (!isTRUE(parameters$store_t_matrix) && use_compiled_spherical) {
     f_bs <- tmm_backscatter_cpp(
