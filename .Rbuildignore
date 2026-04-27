@@ -37,6 +37,8 @@
 ^pkgdown$
 ^results$
 ^results/.*$
+^R/.*\.audit-.*$
+^R/.*\.bak-.*$
 ^scratch$
 ^src/.*\.(dll|o|mod)$
 ^tests/testthat/Rplots\.pdf$
