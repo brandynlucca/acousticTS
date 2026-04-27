@@ -38,10 +38,11 @@ build_case <- function(boundary, Amn_method) {
     body$phi_body <- phi_body
     body$theta_scatter <- theta_scatter[i]
     body$phi_scatter <- phi_scatter[i]
+    body_exact <- acousticTS:::.tmm_spheroidal_cpp_body(body)
 
     exact_raw <- prolate_spheroid_fbs(
       acoustics = acoustics,
-      body = body,
+      body = body_exact,
       medium = medium,
       integration_pts = quad,
       precision = "double",

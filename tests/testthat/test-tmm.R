@@ -237,22 +237,19 @@ test_that("Stored elastic-shell sphere TMM supports the standard scattering help
   expect_true(is.finite(summary$metrics$peak_sigma_scat))
 })
 
-test_that("Elastic-shell prolate TMM runs in package proper", {
-  tmm_obj <- target_strength(
-    object = fixture_ps("elastic_shelled"),
-    frequency = 12e3,
-    model = "tmm",
-    boundary = "elastic_shelled",
-    density_sw = 1026.8,
-    sound_speed_sw = 1477.3,
-    store_t_matrix = TRUE
+test_that("Elastic-shell prolate TMM is rejected under the current public scope", {
+  expect_error(
+    target_strength(
+      object = fixture_ps("elastic_shelled"),
+      frequency = 12e3,
+      model = "tmm",
+      boundary = "elastic_shelled",
+      density_sw = 1026.8,
+      sound_speed_sw = 1477.3,
+      store_t_matrix = TRUE
+    ),
+    "supports spherical fluid shells plus spherical elastic shells only"
   )
-
-  expect_s4_class(tmm_obj, "ESS")
-  expect_true("TMM" %in% names(tmm_obj@model))
-  expect_true(all(is.finite(tmm_obj@model$TMM$TS)))
-  expect_true(all(is.finite(Mod(tmm_obj@model$TMM$f_bs))))
-  expect_true(length(tmm_obj@model_parameters$TMM$parameters$t_matrix) == 1L)
 })
 
 test_that("The removed EPSMS model is not aliased to the TMM branch", {
@@ -789,8 +786,9 @@ test_that("Stored prolate TMM matches the exact general-angle pressure-release f
     body_exact <- body
     body_exact$theta_body <- incident_internal$theta[[1L]]
     body_exact$phi_body <- incident_internal$phi[[1L]]
+    body_exact <- acousticTS:::.tmm_spheroidal_cpp_body(body_exact)
 
-    exact_raw <- prolate_spheroid_fbs(
+    exact_raw <- acousticTS:::prolate_spheroid_fbs(
       acoustics = acoustics,
       body = body_exact,
       medium = medium,
@@ -853,8 +851,9 @@ test_that("Stored prolate TMM matches the exact general-angle rigid field", {
     body_exact <- body
     body_exact$theta_body <- incident_internal$theta[[1L]]
     body_exact$phi_body <- incident_internal$phi[[1L]]
+    body_exact <- acousticTS:::.tmm_spheroidal_cpp_body(body_exact)
 
-    exact_raw <- prolate_spheroid_fbs(
+    exact_raw <- acousticTS:::prolate_spheroid_fbs(
       acoustics = acoustics,
       body = body_exact,
       medium = medium,
@@ -918,9 +917,10 @@ test_that("Stored prolate TMM matches the exact general-angle penetrable field",
       body_exact <- body
       body_exact$theta_body <- incident_internal$theta[[1L]]
       body_exact$phi_body <- incident_internal$phi[[1L]]
+      body_exact <- acousticTS:::.tmm_spheroidal_cpp_body(body_exact)
 
       exact_raw <- tryCatch(
-        prolate_spheroid_fbs(
+        acousticTS:::prolate_spheroid_fbs(
           acoustics = acoustics[1, , drop = FALSE],
           body = body_exact,
           medium = medium,

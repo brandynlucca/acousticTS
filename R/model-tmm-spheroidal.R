@@ -49,6 +49,22 @@
   (-2i / k_sw) * f_sum
 }
 
+# Reduce the stored TMM prolate body metadata to the scalar fields required by
+# the compiled spheroidal kernels. The stored body bundle can also carry shape
+# profiles such as the meridional radius vector, which should not be passed
+# through the one-row compiled data-frame interface.
+#' @noRd
+.tmm_spheroidal_cpp_body <- function(body) {
+  data.frame(
+    xi = as.numeric(body$xi)[1],
+    theta_body = as.numeric(body$theta_body)[1],
+    theta_scatter = as.numeric(body$theta_scatter)[1],
+    phi_body = as.numeric(body$phi_body)[1],
+    phi_scatter = as.numeric(body$phi_scatter)[1],
+    density = as.numeric(body$density)[1]
+  )
+}
+
 # Evaluate the exact prolate monostatic spectrum through the PSMS family used
 # by the direct spheroidal TMM path.
 #' @noRd
@@ -141,7 +157,7 @@
   # Evaluate the retained spheroidal T-matrix blocks ===========================
   tmm_detail <- prolate_spheroid_tmatrix_cpp(
     acoustics = acoustics,
-    body = body_internal,
+    body = .tmm_spheroidal_cpp_body(body_internal),
     medium = medium,
     integration_pts = quad_pts,
     precision = parameters$precision,
