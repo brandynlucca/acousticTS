@@ -26,14 +26,6 @@ struct RadialValue {
     T der_imag;
 };
 
-template<typename T>
-struct RmnScalarResult {
-    // Dedicated scalar return type avoids the compiler ABI warning triggered
-    // by returning std::pair<std::complex<T>, std::complex<T>> on GCC/macOS.
-    std::complex<T> value;
-    std::complex<T> derivative;
-};
-
 // -----------------------------------------------------------
 // HIGHER ORDER [3, 4] HELPER FUNCTION
 // -----------------------------------------------------------
@@ -110,8 +102,14 @@ RmnResult<T> Rmn_higher_order(int m, int n, int lnum, T c, T x1) {
 }
 
 template<typename T>
-RmnScalarResult<T> Rmn_scalar(
-    int m, int n, T c, T x1, int kind = 1
+void Rmn_scalar(
+    int m,
+    int n,
+    T c,
+    T x1,
+    std::complex<T>& value,
+    std::complex<T>& derivative,
+    int kind = 1
 ) {
     int lnum = n - m + 1;
     int lnum_safe = std::max(lnum, 2);
@@ -171,10 +169,9 @@ RmnScalarResult<T> Rmn_scalar(
                 Rd = std::numeric_limits<T>::quiet_NaN();
             }
         }
-        return {
-            std::complex<T>(R, 0),
-            std::complex<T>(Rd, 0)
-        };
+        value = std::complex<T>(R, 0);
+        derivative = std::complex<T>(Rd, 0);
+        return;
     }
 
     // Higher-order conventions use outgoing/incoming combinations built from
@@ -188,7 +185,8 @@ RmnScalarResult<T> Rmn_scalar(
         val = std::complex<T>(result.val1, -result.val2);
         der = std::complex<T>(result.der1, -result.der2);
     }
-    return {val, der};
+    value = val;
+    derivative = der;
 }
 
 // ============================================================================
@@ -422,9 +420,11 @@ RmnMatrixResult<T> Rmn_matrix(
     if (m_len == 1 && n_len == 1) {
         if (n[0] < m[0])
             throw std::invalid_argument("'n' must be >= 'm'.");
-        auto res = Rmn_scalar<T>(m[0], n[0], c, x1, kind);
-        out.value[0][0] = res.value;
-        out.derivative[0][0] = res.derivative;
+        std::complex<T> value;
+        std::complex<T> derivative;
+        Rmn_scalar<T>(m[0], n[0], c, x1, value, derivative, kind);
+        out.value[0][0] = value;
+        out.derivative[0][0] = derivative;
         return out;
     }
 
