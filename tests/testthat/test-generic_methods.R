@@ -65,8 +65,15 @@ test_that("Generic show method works for all scatterer types", {
 test_that("Plot methods work for scatterer objects", {
   # Helper suppression function
   suppressPlot <- function(expr) {
-    pdf(NULL) # Open null graphics device
-    on.exit(dev.off()) # Ensure it's closed after evaluation
+    path <- tempfile(fileext = ".pdf")
+    grDevices::pdf(path)
+    on.exit(
+      {
+        grDevices::dev.off()
+        unlink(path)
+      },
+      add = TRUE
+    )
     invisible(force(expr))
   }
 
@@ -165,8 +172,15 @@ test_that("Plot methods work for scatterer objects", {
 
 test_that("Model plotting works for computed scatterer objects", {
   suppressPlot <- function(expr) {
-    pdf(NULL)
-    on.exit(dev.off())
+    path <- tempfile(fileext = ".pdf")
+    grDevices::pdf(path)
+    on.exit(
+      {
+        grDevices::dev.off()
+        unlink(path)
+      },
+      add = TRUE
+    )
     invisible(force(expr))
   }
 
@@ -199,15 +213,29 @@ test_that("Model plotting works for computed scatterer objects", {
 
 test_that("Specialized model plotting helpers cover calibration, gas, SBF, and BBF branches", {
   suppressPlot <- function(expr) {
-    pdf(NULL)
-    on.exit(dev.off())
+    path <- tempfile(fileext = ".pdf")
+    grDevices::pdf(path)
+    on.exit(
+      {
+        grDevices::dev.off()
+        unlink(path)
+      },
+      add = TRUE
+    )
     invisible(force(expr))
   }
 
   expect_error(
     {
-      pdf(NULL)
-      on.exit(dev.off(), add = TRUE)
+      path <- tempfile(fileext = ".pdf")
+      grDevices::pdf(path)
+      on.exit(
+        {
+          grDevices::dev.off()
+          unlink(path)
+        },
+        add = TRUE
+      )
       plot(cal_generate(), type = "model")
     },
     "no model results detected in object"

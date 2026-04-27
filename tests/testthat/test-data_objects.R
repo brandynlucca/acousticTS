@@ -83,8 +83,15 @@ test_that("Data objects can be used with generic methods", {
   }
 
   suppressPlot <- function(expr) {
-    pdf(NULL) # Open null graphics device
-    on.exit(dev.off()) # Ensure it's closed after evaluation
+    path <- tempfile(fileext = ".pdf")
+    grDevices::pdf(path)
+    on.exit(
+      {
+        grDevices::dev.off()
+        unlink(path)
+      },
+      add = TRUE
+    )
     invisible(force(expr))
   }
 
