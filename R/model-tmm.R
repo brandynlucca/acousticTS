@@ -670,7 +670,11 @@ TMM <- function(object) {
       t_store[[i]] <- tmm_i$blocks
     }
 
-    methods::slot(object, "model_parameters")$TMM$parameters$t_matrix <- t_store
+    if (isTRUE(parameters$store_t_matrix)) {
+      methods::slot(object, "model_parameters")$TMM$parameters$t_matrix <- t_store
+    } else {
+      methods::slot(object, "model_parameters")$TMM$parameters$t_matrix <- NULL
+    }
   }
 
   # Store the monostatic backscatter outputs on the scatterer object ===========
