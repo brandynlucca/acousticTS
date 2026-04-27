@@ -45,10 +45,9 @@ spheroids, and cylinders.
 
 ### Validation status
 
-- Benchmarked against canonical asymptotic target families rather than
-  as an exact modal solver.
-- Validated against the spherical `echoSMs::HPModel` branch and the
-  published Johnson/Stanton algebra.
+- Benchmarked against the canonical spherical spectra stored in
+  benchmark_ts.
+- Validated against the spherical echoSMs implementation.
 
 ### Family pages
 

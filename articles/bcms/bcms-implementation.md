@@ -197,7 +197,7 @@ relative to the straight-cylinder baseline.
 
 | Reference relation           | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | f at max \Delta (kHz) | acousticTS elapsed (s) | Reference elapsed (s) |
 |:-----------------------------|------------------------:|-------------------------:|----------------------:|-----------------------:|----------------------:|
-| BCMS straight branch vs FCMS |                       0 |                        0 |                    12 |                   0.04 |                  0.03 |
+| BCMS straight branch vs FCMS |                       0 |                        0 |                    12 |                   0.04 |                  0.04 |
 
 This is the first defining identity of the model. When curvature is
 absent, `BCMS` should not behave like a different cylinder model. It
@@ -209,7 +209,7 @@ curvature correction truly drops out when it should.
 
 | Reference relation                                        | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | f at max \Delta (kHz) | acousticTS elapsed (s) | Reference elapsed (s) |
 |:----------------------------------------------------------|------------------------:|-------------------------:|----------------------:|-----------------------:|----------------------:|
-| BCMS bent branch vs Stanton (1989) coherence construction |                       0 |                        0 |                    12 |                   0.13 |                  0.02 |
+| BCMS bent branch vs Stanton (1989) coherence construction |                       0 |                        0 |                    12 |                   0.13 |                     0 |
 
 This is the second defining identity. The bent-cylinder branch is
 expected to match the straight-cylinder modal-series result multiplied

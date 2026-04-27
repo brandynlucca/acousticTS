@@ -46,6 +46,7 @@ their interference, combined with a finite-length directivity factor.
 ### Validation status
 
 - Benchmarked within the package validation workflow against the
+  canonical spectra stored in benchmark_ts. Further compared to the
   straight-cylinder and FCMS-derived bent-cylinder reference
   constructions.
 

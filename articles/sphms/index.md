@@ -49,7 +49,7 @@ interface, and sum the retained orders into the far-field backscatter.
 ### Validation status
 
 - Benchmarked against the canonical spherical spectra stored in
-  `benchmark_ts`.
+  benchmark_ts.
 - Validated against `KRMr` and `echoSMs` on shared penetrable-sphere
   cases.
 

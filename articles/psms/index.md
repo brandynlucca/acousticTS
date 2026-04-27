@@ -48,9 +48,9 @@ functions, and solve the retained boundary systems order by order.
 ### Validation status
 
 - Benchmarked against the canonical prolate-spheroid spectra stored in
-  `benchmark_ts`.
-- Validated against the external `Prol_Spheroid` implementation on
-  shared prolate cases.
+  benchmark_ts.
+- Validated against the external Prol_Spheroid and echoSMs
+  implementations on shared prolate cases.
 
 ### Family pages
 

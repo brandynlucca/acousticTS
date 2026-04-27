@@ -50,10 +50,9 @@ complex component amplitudes coherently.
 
 ### Validation status
 
-- Benchmarked against canonical modal-family targets used for isolated
-  gas-filled and weakly scattering cases.
-- Validated against `KRMr`, `echoSMs`, and the NOAA KRM applet on
-  bundled fish objects and shared workflows.
+- Benchmarked against the canonical spectra stored in benchmark_ts.
+- Validated against\`KRMr, echoSMs, and the NOAA KRM applet on bundled
+  fish objects and shared workflows.
 
 ### Family pages
 

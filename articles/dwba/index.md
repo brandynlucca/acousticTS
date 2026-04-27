@@ -47,10 +47,9 @@ cross-sectional response over a segmented centerline.
 
 ### Validation status
 
-- Benchmarked against the canonical weakly scattering targets summarized
-  by Jech et al. (2015).
-- Validated against the published McGehee MATLAB workflow and an
-  independent DWBA implementation.
+- Benchmarked against the canonical spectra stored in benchmark_ts.
+- Validated against the published McGehee et al (1998) and echoSMs
+  workflows.
 
 ### Family pages
 

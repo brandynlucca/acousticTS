@@ -44,8 +44,7 @@ that would be lost by treating the target as straight.
 
 ### Validation status
 
-- Validated against source-level `ZooScatR` and `echopop` PCDWBA
-  workflows.
+- Validated against source-level ZooScatR and Echopop PCDWBA workflows.
 - PCDWBA is currently marked experimental because the public package
   workflow is still being tightened even though the current source-
   level comparison cases are documented.

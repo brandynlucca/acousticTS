@@ -48,8 +48,8 @@ the coherent addition along the cylinder axis.
 ### Validation status
 
 - Benchmarked against the canonical finite-cylinder spectra stored in
-  `benchmark_ts`.
-- Validated against the `echoSMs` finite-cylinder implementation.
+  benchmark_ts.
+- Validated against the echoSMs finite-cylinder implementation.
 
 ### Family pages
 

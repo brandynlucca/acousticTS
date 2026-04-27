@@ -284,10 +284,10 @@ be drawn from one source rather than maintained separately.</p>
 <table class="table">
 <colgroup>
 <col width="2%">
-<col width="5%">
-<col width="14%">
-<col width="28%">
-<col width="49%">
+<col width="4%">
+<col width="10%">
+<col width="22%">
+<col width="60%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">Family</th>
@@ -304,7 +304,7 @@ be drawn from one source rather than maintained separately.</p>
 <td align="left">Sphere spectra across rigid, soft, liquid-filled, and
 gas-filled cases.</td>
 <td align="left">Benchmarked against the canonical spherical spectra
-stored in <code>benchmark_ts</code>.</td>
+stored in benchmark_ts.</td>
 </tr>
 <tr class="even">
 <td align="left">FCMS</td>
@@ -313,7 +313,7 @@ stored in <code>benchmark_ts</code>.</td>
 <td align="left">Finite-cylinder spectra across the canonical
 cylindrical benchmark grid.</td>
 <td align="left">Benchmarked against the canonical finite-cylinder
-spectra stored in <code>benchmark_ts</code>.</td>
+spectra stored in benchmark_ts.</td>
 </tr>
 <tr class="odd">
 <td align="left">PSMS</td>
@@ -322,7 +322,7 @@ spectra stored in <code>benchmark_ts</code>.</td>
 <td align="left">Prolate-spheroid spectra across the canonical benchmark
 grid.</td>
 <td align="left">Benchmarked against the canonical prolate-spheroid
-spectra stored in <code>benchmark_ts</code>.</td>
+spectra stored in benchmark_ts.</td>
 </tr>
 <tr class="even">
 <td align="left">SOEMS</td>
@@ -335,47 +335,48 @@ targets used throughout the package documentation.</td>
 <tr class="odd">
 <td align="left">DWBA</td>
 <td align="left">Benchmarked</td>
-<td align="left">Jech weakly scattering benchmark ladder</td>
+<td align="left">benchmark_ts / Jech et al. (2015)</td>
 <td align="left">Weakly scattering sphere, prolate spheroid, and
 cylinder targets.</td>
-<td align="left">Benchmarked against the canonical weakly scattering
-targets summarized by Jech et al. (2015).</td>
+<td align="left">Benchmarked against the canonical spectra stored in
+benchmark_ts.</td>
 </tr>
 <tr class="even">
 <td align="left">SDWBA</td>
 <td align="left">Benchmarked</td>
-<td align="left">Published SDWBA weak-scattering ladder</td>
+<td align="left">benchmark_ts / Jech et al. (2015)</td>
 <td align="left">Weakly scattering sphere, prolate spheroid, and
 cylinder stochastic targets.</td>
-<td align="left">Benchmarked against published SDWBA weak-scattering
-comparison cases.</td>
+<td align="left">Benchmarked against the canonical spectra stored in
+benchmark_ts.</td>
 </tr>
 <tr class="odd">
 <td align="left">KRM</td>
 <td align="left">Benchmarked</td>
-<td align="left">Canonical modal families</td>
+<td align="left">benchmark_ts / Jech et al. (2015)</td>
 <td align="left">Canonical isolated targets used for the package KRM
 benchmark ladder.</td>
-<td align="left">Benchmarked against canonical modal-family targets used
-for isolated gas-filled and weakly scattering cases.</td>
+<td align="left">Benchmarked against the canonical spectra stored in
+benchmark_ts.</td>
 </tr>
 <tr class="even">
 <td align="left">HPA</td>
 <td align="left">Benchmarked</td>
-<td align="left">Jech canonical asymptotic targets</td>
+<td align="left">benchmark_ts / Jech et al. (2015)</td>
 <td align="left">Sphere, prolate spheroid, and cylinder asymptotic
 benchmark targets.</td>
-<td align="left">Benchmarked against canonical asymptotic target
-families rather than as an exact modal solver.</td>
+<td align="left">Benchmarked against the canonical spherical spectra
+stored in benchmark_ts.</td>
 </tr>
 <tr class="odd">
 <td align="left">TRCM</td>
 <td align="left">Benchmarked</td>
-<td align="left">Package validation workflow</td>
+<td align="left">benchmark_ts / Jech et al. (2015)</td>
 <td align="left">Straight and bent cylindrical validation cases
 documented in the package.</td>
 <td align="left">Benchmarked within the package validation workflow
-against the straight-cylinder and FCMS-derived bent-cylinder reference
+against the canonical spectra stored in benchmark_ts. Further compared
+to the straight-cylinder and FCMS-derived bent-cylinder reference
 constructions.</td>
 </tr>
 <tr class="even">
@@ -398,9 +399,9 @@ canonical shape branches.</td>
 <colgroup>
 <col width="2%">
 <col width="5%">
-<col width="18%">
-<col width="30%">
-<col width="42%">
+<col width="16%">
+<col width="31%">
+<col width="43%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">Family</th>
@@ -425,42 +426,42 @@ definitions.</td>
 <td align="left">echoSMs</td>
 <td align="left">Rigid, soft, liquid-filled, and gas-filled
 finite-cylinder spectra.</td>
-<td align="left">Validated against the <code>echoSMs</code>
-finite-cylinder implementation.</td>
+<td align="left">Validated against the echoSMs finite-cylinder
+implementation.</td>
 </tr>
 <tr class="odd">
 <td align="left">PSMS</td>
 <td align="left">Validated</td>
-<td align="left">Prol_Spheroid</td>
+<td align="left">Prol_Spheroid and echoSMs</td>
 <td align="left">Liquid-filled and gas-filled prolate-spheroid software
 comparisons.</td>
-<td align="left">Validated against the external
-<code>Prol_Spheroid</code> implementation on shared prolate cases.</td>
+<td align="left">Validated against the external Prol_Spheroid and
+echoSMs implementations on shared prolate cases.</td>
 </tr>
 <tr class="even">
 <td align="left">SOEMS</td>
 <td align="left">Validated</td>
-<td align="left">echoSMs, sphereTS, NOAA applet</td>
+<td align="left">echoSMs, SphereTS, NOAA applet</td>
 <td align="left">Shared calibration-sphere material sets and frequency
 sweeps.</td>
-<td align="left">Validated against <code>echoSMs</code>,
-<code>sphereTS</code>, and the NOAA calibration applet.</td>
+<td align="left">Validated against echoSMs, SphereTS, and the NOAA
+calibration applet.</td>
 </tr>
 <tr class="odd">
 <td align="left">DWBA</td>
 <td align="left">Validated</td>
-<td align="left">Published and independent DWBA implementations</td>
+<td align="left">McGehee et al. (1998) and echoSMs</td>
 <td align="left">Bundled krill geometry and published DWBA reference
 workflows.</td>
-<td align="left">Validated against the published McGehee MATLAB workflow
-and an independent DWBA implementation.</td>
+<td align="left">Validated against the published McGehee et al (1998)
+and echoSMs workflows.</td>
 </tr>
 <tr class="even">
 <td align="left">SDWBA</td>
 <td align="left">Validated</td>
-<td align="left">CCAMLR MATLAB and NOAA HTML implementations</td>
+<td align="left">CCAMLR MATLAB, NOAA applet, echoSMs</td>
 <td align="left">Bundled krill stochastic workflow comparisons.</td>
-<td align="left">Validated against the CCAMLR MATLAB and NOAA HTML SDWBA
+<td align="left">Validated against the CCAMLR, NOAA applet, and echoSMs
 implementations.</td>
 </tr>
 <tr class="odd">
@@ -469,28 +470,26 @@ implementations.</td>
 <td align="left">KRMr, echoSMs, NOAA applet</td>
 <td align="left">Bundled sardine and cod software-to-software
 comparisons.</td>
-<td align="left">Validated against <code>KRMr</code>,
-<code>echoSMs</code>, and the NOAA KRM applet on bundled fish objects
-and shared workflows.</td>
+<td align="left">Validated against`KRMr, echoSMs, and the NOAA KRM
+applet on bundled fish objects and shared workflows.</td>
 </tr>
 <tr class="even">
 <td align="left">HPA</td>
 <td align="left">Validated</td>
-<td align="left">echoSMs HPModel and published algebra</td>
+<td align="left">echoSMs</td>
 <td align="left">Spherical HPModel branch and published asymptotic
 formulas.</td>
-<td align="left">Validated against the spherical
-<code>echoSMs::HPModel</code> branch and the published Johnson/Stanton
-algebra.</td>
+<td align="left">Validated against the spherical echoSMs
+implementation.</td>
 </tr>
 <tr class="odd">
 <td align="left">PCDWBA</td>
 <td align="left">Validated</td>
-<td align="left">ZooScatR and echopop source workflows</td>
+<td align="left">benchmark_ts / Jech et al. (2015)</td>
 <td align="left">Curved weak-scattering reference workflows on shared
 bent-body cases.</td>
-<td align="left">Validated against source-level <code>ZooScatR</code>
-and <code>echopop</code> PCDWBA workflows.</td>
+<td align="left">Validated against source-level ZooScatR and Echopop
+PCDWBA workflows.</td>
 </tr>
 <tr class="even">
 <td align="left">VESM</td>
@@ -593,7 +592,7 @@ external benchmark or software-comparison ladder.</td>
 <tr class="odd">
 <td align="left">PCDWBA</td>
 <td align="left">Experimental</td>
-<td align="left">Current package workflow surface</td>
+<td align="left">ZooScatR</td>
 <td align="left">Current package-facing PCDWBA workflow and argument
 surface.</td>
 <td align="left">PCDWBA is currently marked experimental because the

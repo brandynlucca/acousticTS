@@ -15,6 +15,14 @@ Achenbach, J. D. 1973. *Wave Propagation in Elastic Solids*.
 North-Holland Series in Applied Mathematics and Mechanics, v. 16.
 Amsterdam New York: North-Holland Pub. Co. American Elsevier Pub. Co.
 
+Amini, S., and P. J. Harris. 1990. “A Comparison Between Various
+Boundary Integral Formulations of the Exterior Acoustic Problem.”
+*Computer Methods in Applied Mechanics and Engineering* 84 (1): 59–75.
+<https://doi.org/10.1016/0045-7825(90)90089-5>.
+
+Anderson, Edward et al. 1999. *LAPACK Users’ Guide*. 3rd ed. SIAM.
+<https://doi.org/10.1137/1.9780898719604>.
+
 Anderson, Victor C. 1950. “Sound Scattering from a Fluid Sphere.” *The
 Journal of the Acoustical Society of America* 22 (4): 426–31.
 <https://doi.org/10.1121/1.1906621>.
@@ -22,6 +30,11 @@ Journal of the Acoustical Society of America* 22 (4): 426–31.
 Betcke, Timo, and Matthew Scroggs. 2021. “Bempp-Cl: A Fast Python Based
 Just-in-Time Compiling Boundary Element Library.” *Journal of Open
 Source Software* 6 (59): 2879. <https://doi.org/10.21105/joss.02879>.
+
+Betcke, Timo, Matthew W. Scroggs, and Wojciech migaj. 2021. “Product
+Algebras for Galerkin Discretisations of Boundary Integral Operators and
+Their Applications.” *ACM Transactions on Mathematical Software (TOMS)*
+47 (1): 1–27. <https://doi.org/10.1145/3412850>.
 
 Bezanson, Jeff, Alan Edelman, Stefan Karpinski, and Viral B. Shah. 2017.
 “Julia: A Fresh Approach to Numerical Computing.” *SIAM Review* 59 (1):
@@ -63,6 +76,10 @@ Clay, Clarence S., and John K. Horne. 1994. “Acoustic Models of Fish:
 The Atlantic Cod (*Gadus Morhua*).” *The Journal of the Acoustical
 Society of America* 96 (3): 1661–68. <https://doi.org/10.1121/1.410245>.
 
+Colton, David, and Rainer Kress. 2013. *Inverse Acoustic and
+Electromagnetic Scattering Theory*. 3rd ed. Vol. 93. New York: Springer.
+<https://doi.org/10.1007/978-1-4614-4942-3>.
+
 Commission for the Conservation of Antarctic Marine Living Resources.
 2019. “SDWBA_TS: Stochastic Distorted-Wave Born Approximation (SDWBA)
 Target Strength (TS) Model.” <https://github.com/ccamlr/SDWBA_TS>;
@@ -72,6 +89,11 @@ Conti, Stéphane G., and David A. Demer. 2006. “Improved Parameterization
 of the SDWBA for Estimating Krill Target Strength.” *ICES Journal of
 Marine Science* 63 (5): 928–35.
 <https://doi.org/10.1016/j.icesjms.2006.02.007>.
+
+Costabel, Martin, and Ernst P. Stephan. 1985. “A Direct Boundary
+Integral Equation Method for Transmission Problems.” *Journal of
+Mathematical Analysis and Applications* 106 (2): 367–413.
+<https://doi.org/10.1016/0022-247X(85)90118-0>.
 
 Demer, David A., Laurent Berger, Matteo Bernasconi, Egil Bethke, Kevin
 Boswell, Dezhang Chu, Reka Domokos, et al. 2015. “Calibration of
@@ -217,10 +239,19 @@ Hickling, Robert. 1962. “Analysis of Echoes from a Solid Elastic Sphere
 in Water.” *The Journal of the Acoustical Society of America* 34 (10):
 1582–92. <https://doi.org/10.1121/1.1909055>.
 
+Hiptmair, Ralf, and Carlos Jerez-Hanckes. 2012. “Multiple Traces
+Boundary Integral Formulation for Helmholtz Transmission Problems.”
+*Advances in Computational Mathematics* 37 (1): 39–91.
+<https://doi.org/10.1007/s10444-011-9194-3>.
+
 Horne, J. K., and J. M. Jech. 1999. “Multi-Frequency Estimates of Fish
 Abundance: Constraints of Rather High Frequencies.” *ICES Journal of
 Marine Science* 56 (2): 184–99.
 <https://doi.org/10.1006/jmsc.1998.0432>.
+
+Hsiao, George C., and Wolfgang L. Wendland. 2008. *Boundary Integral
+Equations*. Vol. 164. Berlin: Springer.
+<https://doi.org/10.1007/978-3-540-68545-6>.
 
 Ihlenburg, Frank. 1998. *Finite Element Analysis of Acoustic
 Scattering*. New York, NY: Springer-Verlag.
@@ -279,6 +310,10 @@ MacLennan, D. N. 1981. “The Theory of Solid Spheres as Sonar Calibration
 Targets.” Scottish Fisheries Research Report 22. Department of
 Agriculture; Fisheries for Scotland.
 
+MacLennan, David N. 1990. “Acoustical Measurement of Fish Abundance.”
+*The Journal of the Acoustical Society of America* 87 (1): 1–15.
+<https://doi.org/10.1121/1.399285>.
+
 MacLennan, David N., Percy G. Fernandes, and John Dalen. 2002. “A
 Consistent Approach to Definitions and Symbols in Fisheries Acoustics.”
 *ICES Journal of Marine Science* 59 (2): 365–69.
@@ -298,11 +333,21 @@ Medwin, Herman, and Clarence S. Clay. 1998. *Fundamentals of Acoustical
 Oceanography*. Applications of Modern Acoustics. San Diego, CA: Academic
 Press.
 
+Mishchenko, Michael I., Larry D. Travis, and Andrew A. Lacis. 2002.
+*Scattering, Absorption, and Emission of Light by Small Particles*.
+Cambridge University Press.
+
 Morse, Philip M., and Herman Feshbach. 1953. *Methods of Theoretical
 Physics*. New York: McGraw-Hill.
 
 Morse, Philip M., and K. Uno Ingard. 1968. *Theoretical Acoustics*. New
 York, NY: McGraw-Hill.
+
+Nieminen, Timo A., Halina Rubinsztein-Dunlop, and Norman R. Heckenberg.
+2003. “Calculation of the T-Matrix: General Considerations and
+Application of the Point-Matching Method.” *Journal of Quantitative
+Spectroscopy and Radiative Transfer* 79: 1019–29.
+<https://doi.org/10.1016/S0022-4073(02)00336-9>.
 
 Pierce, Allan D. 1989. *Acoustics: An Introduction to Its Physical
 Principles and Applications*. Woodbury, NY: Acoustical Society of
@@ -344,9 +389,21 @@ Rudgers, Anthony J. 1969. “Acoustic Pulses Scattered by a Rigid Sphere
 Immersed in a Fluid.” *The Journal of the Acoustical Society of America*
 45 (4): 900–910. <https://doi.org/10.1121/1.1911567>.
 
+Saad, Youcef, and Martin H. Schultz. 1986. “GMRES: A Generalized Minimal
+Residual Algorithm for Solving Nonsymmetric Linear Systems.” *SIAM
+Journal on Scientific and Statistical Computing* 7 (3): 856–69.
+<https://doi.org/10.1137/0907058>.
+
+Sauter, Stefan A., and Christoph Schwab. 2011. *Boundary Element
+Methods*. Berlin: Springer. <https://doi.org/10.1007/978-3-540-68093-2>.
+
+Schenck, Harry A. 1968. “Improved Integral Formulation for Acoustic
+Radiation Problems.” *The Journal of the Acoustical Society of America*
+44 (1): 41–58. <https://doi.org/10.1121/1.1911085>.
+
 Silbiger, Alexander. 1963. “Scattering of Sound by an Elastic Prolate
 Spheroid.” *The Journal of the Acoustical Society of America* 35 (4):
-564–70. <https://doi.org/10.1121/1.1918531>.
+564–70. <https://doi.org/10.1121/1.1918533>.
 
 Silbiger, Alexander, and Frank L. DiMaggio. 1961. “Extensional
 Axi-Symmetric Second Class Vibrations of a Prolate Spheroidal Shell.”
@@ -425,6 +482,10 @@ Groups. I. Experimental Determination of Dominant Scattering
 Mechanisms.” *The Journal of the Acoustical Society of America* 103 (1):
 225–35. <https://doi.org/10.1121/1.421469>.
 
+Steinbach, Olaf. 2008. *Numerical Approximation Methods for Elliptic
+Boundary Value Problems: Finite and Boundary Elements*. New York:
+Springer. <https://doi.org/10.1007/978-0-387-68805-3>.
+
 Temme, N. M. 2026. “Numerical Methods.” In *NIST Digital Library of
 Mathematical Functions*, edited by F. W. J. Olver, A. B. Olde Daalhuis,
 D. W. Lozier, B. I. Schneider, B. A. Boisvert, C. W. Clark, B. R.
@@ -474,6 +535,10 @@ Journal of the Acoustical Society of America* 45 (6): 1417–29.
 ———. 2009. “T -Matrix Methods in Acoustic Scattering.” *The Journal of
 the Acoustical Society of America* 125 (1): 42–51.
 <https://doi.org/10.1121/1.3035839>.
+
+Waterman, Peter C. 1971. “Symmetry, Unitarity, and Geometry in
+Electromagnetic Scattering.” *Physical Review D* 3 (4): 825–39.
+<https://doi.org/10.1103/PhysRevD.3.825>.
 
 Ye, Z. 1997. “A Novel Approach to Sound Scattering by Cylinders of
 Finite Length.” *The Journal of the Acoustical Society of America* 102

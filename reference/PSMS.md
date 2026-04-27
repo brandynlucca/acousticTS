@@ -75,7 +75,7 @@ This model is accessed via:
   calculated using Gauss-Legendre quadrature. When left as `NULL`, the
   model uses 96 integration points unless `adaptive = TRUE`, in which
   case a reduced-frequency-based quadrature rule is selected internally
-  for the full fluid- or gas-filled solve. See
+  for the full liquid-filled solve. See
   [gauss_legendre](https://brandynlucca.github.io/acousticTS/reference/gauss_legendre.md)
   for a full description of how `n_integration` is used. **Note:** this
   argument **only** applies to when `boundary = "liquid_filled"` or

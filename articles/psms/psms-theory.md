@@ -609,7 +609,7 @@ P. Flannery. 2007. *Numerical Recipes: The Art of Scientific Computing*.
 
 Silbiger, Alexander. 1963. “Scattering of Sound by an Elastic Prolate
 Spheroid.” *The Journal of the Acoustical Society of America* 35 (4):
-564–70. <https://doi.org/10.1121/1.1918531>.
+564–70. <https://doi.org/10.1121/1.1918533>.
 
 Simmonds, John, and David N. MacLennan. 2005. *Fisheries Acoustics:
 Theory and Practice*. 2nd ed. Oxford, UK: Blackwell Science.

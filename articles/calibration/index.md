@@ -49,8 +49,7 @@ backscatter from the resulting phase-shifted partial waves.
 
 - Benchmarked against published calibration-sphere targets used
   throughout the package documentation.
-- Validated against `echoSMs`, `sphereTS`, and the NOAA calibration
-  applet.
+- Validated against echoSMs, SphereTS, and the NOAA calibration applet.
 
 ### Family pages
 

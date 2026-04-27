@@ -49,8 +49,8 @@ variability.
 
 ### Validation status
 
-- Benchmarked against published SDWBA weak-scattering comparison cases.
-- Validated against the CCAMLR MATLAB and NOAA HTML SDWBA
+- Benchmarked against the canonical spectra stored in benchmark_ts.
+- Validated against the CCAMLR, NOAA applet, and echoSMs
   implementations.
 
 ### Family pages

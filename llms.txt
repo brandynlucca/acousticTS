@@ -330,6 +330,8 @@ compatibility.
 
 Constructors for the supported scatterer classes.
 
+- [`ela_generate()`](https://brandynlucca.github.io/acousticTS/reference/ela_generate.md)
+  : Generate a ELA-class object.
 - [`cal_generate()`](https://brandynlucca.github.io/acousticTS/reference/cal_generate.md)
   : Generate a CAL-class object.
 - [`ess_generate()`](https://brandynlucca.github.io/acousticTS/reference/ess_generate.md)
