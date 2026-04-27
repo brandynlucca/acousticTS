@@ -734,20 +734,14 @@
         theta = theta_i,
         phi = phi_i
       )
-      f_batch <- vapply(
-        group_idx,
-        function(idx) {
-          prolate_spheroid_scattering_from_tmatrix_cpp(
-            acoustics = acoustics[frequency_idx, , drop = FALSE],
-            t_matrix = parameters$t_matrix[[frequency_idx]],
-            theta_body = incident_internal$theta[[1L]],
-            phi_body = incident_internal$phi[[1L]],
-            theta_scatter = theta_scatter[idx],
-            phi_scatter = phi_scatter[idx],
-            precision = parameters$precision %||% "double"
-          )[1]
-        },
-        complex(1)
+      f_batch <- prolate_spheroid_scattering_points_from_tmatrix_cpp(
+        acoustics = acoustics[frequency_idx, , drop = FALSE],
+        t_matrix = parameters$t_matrix[[frequency_idx]],
+        theta_body = incident_internal$theta[[1L]],
+        phi_body = incident_internal$phi[[1L]],
+        theta_scatter = theta_scatter[group_idx],
+        phi_scatter = phi_scatter[group_idx],
+        precision = parameters$precision %||% "double"
       )
       if (.tmm_matches_stored_incidence(
         model_params,
@@ -897,13 +891,24 @@
       theta = theta_body,
       phi = phi_body
     )
-    f_scat <- prolate_spheroid_scattering_grid_from_tmatrix_cpp(
+    # The public-to-spheroidal transform depends on paired (theta, phi)
+    # directions, so evaluate the full receive mesh point-by-point before
+    # reshaping it back to the standard theta x phi grid.
+    theta_mesh <- rep(theta_scatter, times = length(phi_scatter))
+    phi_mesh <- rep(phi_scatter, each = length(theta_scatter))
+    f_scat <- prolate_spheroid_scattering_points_from_tmatrix_cpp(
       acoustics = acoustics[frequency_idx, , drop = FALSE],
       t_matrix = t_store,
       theta_body = incident_internal$theta[[1L]],
       phi_body = incident_internal$phi[[1L]],
-      theta_scatter = theta_scatter,
-      phi_scatter = phi_scatter
+      theta_scatter = theta_mesh,
+      phi_scatter = phi_mesh,
+      precision = parameters$precision %||% "double"
+    )
+    f_scat <- matrix(
+      f_scat,
+      nrow = length(theta_scatter),
+      ncol = length(phi_scatter)
     )
     if (.tmm_matches_stored_incidence(
       model_params,
@@ -1099,6 +1104,7 @@
     theta = theta_body,
     phi = phi_body
   )
+  # Delegate prolate general-angle evaluation to the compiled retained backend =
   prolate_spheroid_scattering_from_tmatrix_cpp(
     acoustics = acoustics,
     t_matrix = parameters$t_matrix,

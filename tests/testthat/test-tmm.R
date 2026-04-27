@@ -1,15 +1,8 @@
 library(acousticTS)
 
 .with_null_pdf_device <- function(expr) {
-  path <- tempfile(fileext = ".pdf")
-  grDevices::pdf(path)
-  on.exit(
-    {
-      grDevices::dev.off()
-      unlink(path)
-    },
-    add = TRUE
-  )
+  grDevices::pdf(NULL)
+  on.exit(grDevices::dev.off(), add = TRUE)
   invisible(force(expr))
 }
 
