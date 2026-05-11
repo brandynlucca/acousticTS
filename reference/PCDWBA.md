@@ -11,6 +11,7 @@ stored in `FLS` objects.
 
 This model is accessed via:
 
+
     target_strength(
       ...,
       model = "PCDWBA",

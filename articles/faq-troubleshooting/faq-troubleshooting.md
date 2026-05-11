@@ -158,8 +158,7 @@ mathematics.
 ## References
 
 Medwin, Herman, and Clarence S. Clay. 1998. *Fundamentals of Acoustical
-Oceanography*. Applications of Modern Acoustics. San Diego, CA: Academic
-Press.
+Oceanography*. Applications of Modern Acoustics. Academic Press.
 
-Morse, Philip M., and K. Uno Ingard. 1968. *Theoretical Acoustics*. New
-York, NY: McGraw-Hill.
+Morse, Philip M., and K. Uno Ingard. 1968. *Theoretical Acoustics*.
+McGraw-Hill.

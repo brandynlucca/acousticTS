@@ -4,18 +4,18 @@
 
 The validation workflow on this page is grounded in inter-model
 benchmark comparisons and open-software reproductions ([Jech et al.
-2015](#ref-Jech_2015); [G. Macaulay and contributors
-2024](#ref-echoSMs_software); [Gastauer, Chu, and Cox
+2015](#ref-Jech_2015); [Macaulay and contributors
+2024](#ref-echoSMs_software); [Gastauer et al.
 2019](#ref-ZooScatR_software); [Gastauer 2025](#ref-KRMr_software);
 [Betcke and Scroggs 2021](#ref-Bempp-cl_software); [Elavia
-2021](#ref-liquid_spheroid_software); [McGehee, O’Driscoll, and
-Traykovski 1998](#ref-mcgehee_software); [Lucca and Lee
+2021](#ref-liquid_spheroid_software); [McGehee et al.
+1998](#ref-mcgehee_software); [Lucca and Lee
 2026](#ref-Echopop_software); [Commission for the Conservation of
 Antarctic Marine Living Resources 2019](#ref-CCAMLR_SDWBA_software);
 [Southwest Fisheries Science Center 2022a](#ref-NOAA_KRM_software),
 [2022b](#ref-NOAA_SDWBA_software); [Renfree and Demer
 2014](#ref-NOAA_sphere_software); [Khodabandeloo et al.
-2025](#ref-Prol_Spheroid_software); [G. J. Macaulay
+2025](#ref-Prol_Spheroid_software); [Macaulay
 2025](#ref-SphereTS_software)).
 
 Modeling packages become much more useful when users can distinguish a
@@ -49,6 +49,7 @@ dataset more than a teaching convenience. It is also part of the
 package’s broader numerical validation strategy.
 
 ``` r
+
 library(acousticTS)
 
 data(benchmark_ts)
@@ -59,6 +60,7 @@ names(benchmark_ts$frequency_spectra)
     ## [1] "index"            "sphere"           "prolate_spheroid" "cylinder"
 
 ``` r
+
 head(benchmark_ts$frequency_spectra$index$frequency)
 ```
 
@@ -82,73 +84,73 @@ be drawn from one source rather than maintained separately.
 
 ### Family statuses
 
-| Family | Section                              | Status                                         |
-|:-------|:-------------------------------------|:-----------------------------------------------|
-| SPHMS  | Modal-series families                | Benchmarked, Validated                         |
-| FCMS   | Modal-series families                | Benchmarked, Validated                         |
-| PSMS   | Modal-series families                | Benchmarked, Validated                         |
-| SOEMS  | Modal-series families                | Benchmarked, Validated                         |
-| ESSMS  | Modal-series families                | Unvalidated                                    |
-| BCMS   | Modal-series families                | Unvalidated, Experimental                      |
-| ECMS   | Modal-series families                | Unvalidated, Experimental                      |
-| DWBA   | Approximation and ray-based families | Benchmarked, Validated                         |
-| SDWBA  | Approximation and ray-based families | Benchmarked, Validated                         |
-| KRM    | Approximation and ray-based families | Benchmarked, Validated                         |
-| HPA    | Approximation and ray-based families | Benchmarked, Validated                         |
-| TRCM   | Approximation and ray-based families | Benchmarked, Unvalidated                       |
-| PCDWBA | Approximation and ray-based families | Validated, Experimental                        |
-| BBFM   | Composite and emerging families      | Unvalidated, Experimental                      |
-| VESM   | Composite and emerging families      | Validated, Experimental                        |
-| TMM    | Composite and emerging families      | Benchmarked, Partially validated, Experimental |
+| Family | Section | Status |
+|:---|:---|:---|
+| SPHMS | Modal-series families | Benchmarked, Validated |
+| FCMS | Modal-series families | Benchmarked, Validated |
+| PSMS | Modal-series families | Benchmarked, Validated |
+| SOEMS | Modal-series families | Benchmarked, Validated |
+| ESSMS | Modal-series families | Unvalidated |
+| BCMS | Modal-series families | Unvalidated, Experimental |
+| ECMS | Modal-series families | Unvalidated, Experimental |
+| DWBA | Approximation and ray-based families | Benchmarked, Validated |
+| SDWBA | Approximation and ray-based families | Benchmarked, Validated |
+| KRM | Approximation and ray-based families | Benchmarked, Validated |
+| HPA | Approximation and ray-based families | Benchmarked, Validated |
+| TRCM | Approximation and ray-based families | Benchmarked, Unvalidated |
+| PCDWBA | Approximation and ray-based families | Validated, Experimental |
+| BBFM | Composite and emerging families | Unvalidated, Experimental |
+| VESM | Composite and emerging families | Validated, Experimental |
+| TMM | Composite and emerging families | Benchmarked, Partially validated, Experimental |
 
 ### Benchmark evidence
 
-| Family | Evidence type | Source                               | Scope                                                                        | Summary                                                                                                                                                                                                    |
-|:-------|:--------------|:-------------------------------------|:-----------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| SPHMS  | Benchmarked   | benchmark_ts / Jech et al. (2015)    | Sphere spectra across rigid, soft, liquid-filled, and gas-filled cases.      | Benchmarked against the canonical spherical spectra stored in benchmark_ts.                                                                                                                                |
-| FCMS   | Benchmarked   | benchmark_ts / Jech et al. (2015)    | Finite-cylinder spectra across the canonical cylindrical benchmark grid.     | Benchmarked against the canonical finite-cylinder spectra stored in benchmark_ts.                                                                                                                          |
-| PSMS   | Benchmarked   | benchmark_ts / Jech et al. (2015)    | Prolate-spheroid spectra across the canonical benchmark grid.                | Benchmarked against the canonical prolate-spheroid spectra stored in benchmark_ts.                                                                                                                         |
-| SOEMS  | Benchmarked   | Published calibration spheres        | Tungsten-carbide and copper calibration spheres.                             | Benchmarked against published calibration-sphere targets used throughout the package documentation.                                                                                                        |
-| DWBA   | Benchmarked   | benchmark_ts / Jech et al. (2015)    | Weakly scattering sphere, prolate spheroid, and cylinder targets.            | Benchmarked against the canonical spectra stored in benchmark_ts.                                                                                                                                          |
-| SDWBA  | Benchmarked   | benchmark_ts / Jech et al. (2015)    | Weakly scattering sphere, prolate spheroid, and cylinder stochastic targets. | Benchmarked against the canonical spectra stored in benchmark_ts.                                                                                                                                          |
-| KRM    | Benchmarked   | benchmark_ts / Jech et al. (2015)    | Canonical isolated targets used for the package KRM benchmark ladder.        | Benchmarked against the canonical spectra stored in benchmark_ts.                                                                                                                                          |
-| HPA    | Benchmarked   | benchmark_ts / Jech et al. (2015)    | Sphere, prolate spheroid, and cylinder asymptotic benchmark targets.         | Benchmarked against the canonical spherical spectra stored in benchmark_ts.                                                                                                                                |
-| TRCM   | Benchmarked   | benchmark_ts / Jech et al. (2015)    | Straight and bent cylindrical validation cases documented in the package.    | Benchmarked within the package validation workflow against the canonical spectra stored in benchmark_ts. Further compared to the straight-cylinder and FCMS-derived bent-cylinder reference constructions. |
-| TMM    | Benchmarked   | SPHMS / PSMS / FCMS benchmark ladder | Sphere, oblate, prolate, and guarded cylinder monostatic branches.           | Benchmarked against `SPHMS`, `PSMS`, and `FCMS` on the currently supported canonical shape branches.                                                                                                       |
+| Family | Evidence type | Source | Scope | Summary |
+|:---|:---|:---|:---|:---|
+| SPHMS | Benchmarked | benchmark_ts / Jech et al. (2015) | Sphere spectra across rigid, soft, liquid-filled, and gas-filled cases. | Benchmarked against the canonical spherical spectra stored in benchmark_ts. |
+| FCMS | Benchmarked | benchmark_ts / Jech et al. (2015) | Finite-cylinder spectra across the canonical cylindrical benchmark grid. | Benchmarked against the canonical finite-cylinder spectra stored in benchmark_ts. |
+| PSMS | Benchmarked | benchmark_ts / Jech et al. (2015) | Prolate-spheroid spectra across the canonical benchmark grid. | Benchmarked against the canonical prolate-spheroid spectra stored in benchmark_ts. |
+| SOEMS | Benchmarked | Published calibration spheres | Tungsten-carbide and copper calibration spheres. | Benchmarked against published calibration-sphere targets used throughout the package documentation. |
+| DWBA | Benchmarked | benchmark_ts / Jech et al. (2015) | Weakly scattering sphere, prolate spheroid, and cylinder targets. | Benchmarked against the canonical spectra stored in benchmark_ts. |
+| SDWBA | Benchmarked | benchmark_ts / Jech et al. (2015) | Weakly scattering sphere, prolate spheroid, and cylinder stochastic targets. | Benchmarked against the canonical spectra stored in benchmark_ts. |
+| KRM | Benchmarked | benchmark_ts / Jech et al. (2015) | Canonical isolated targets used for the package KRM benchmark ladder. | Benchmarked against the canonical spectra stored in benchmark_ts. |
+| HPA | Benchmarked | benchmark_ts / Jech et al. (2015) | Sphere, prolate spheroid, and cylinder asymptotic benchmark targets. | Benchmarked against the canonical spherical spectra stored in benchmark_ts. |
+| TRCM | Benchmarked | benchmark_ts / Jech et al. (2015) | Straight and bent cylindrical validation cases documented in the package. | Benchmarked within the package validation workflow against the canonical spectra stored in benchmark_ts. Further compared to the straight-cylinder and FCMS-derived bent-cylinder reference constructions. |
+| TMM | Benchmarked | SPHMS / PSMS / FCMS benchmark ladder | Sphere, oblate, prolate, and guarded cylinder monostatic branches. | Benchmarked against `SPHMS`, `PSMS`, and `FCMS` on the currently supported canonical shape branches. |
 
 ### Validated-comparison evidence
 
-| Family | Evidence type | Source                                  | Scope                                                                       | Summary                                                                                                   |
-|:-------|:--------------|:----------------------------------------|:----------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------|
-| SPHMS  | Validated     | KRMr and echoSMs                        | Penetrable sphere spectra on shared software definitions.                   | Validated against `KRMr` and `echoSMs` on shared penetrable-sphere cases.                                 |
-| FCMS   | Validated     | echoSMs                                 | Rigid, soft, liquid-filled, and gas-filled finite-cylinder spectra.         | Validated against the echoSMs finite-cylinder implementation.                                             |
-| PSMS   | Validated     | Prol_Spheroid and echoSMs               | Liquid-filled and gas-filled prolate-spheroid software comparisons.         | Validated against the external Prol_Spheroid and echoSMs implementations on shared prolate cases.         |
-| SOEMS  | Validated     | echoSMs, SphereTS, NOAA applet          | Shared calibration-sphere material sets and frequency sweeps.               | Validated against echoSMs, SphereTS, and the NOAA calibration applet.                                     |
-| DWBA   | Validated     | McGehee et al. (1998) and echoSMs       | Bundled krill geometry and published DWBA reference workflows.              | Validated against the published McGehee et al (1998) and echoSMs workflows.                               |
-| SDWBA  | Validated     | CCAMLR MATLAB, NOAA applet, echoSMs     | Bundled krill stochastic workflow comparisons.                              | Validated against the CCAMLR, NOAA applet, and echoSMs implementations.                                   |
-| KRM    | Validated     | KRMr, echoSMs, NOAA applet              | Bundled sardine and cod software-to-software comparisons.                   | Validated against\`KRMr, echoSMs, and the NOAA KRM applet on bundled fish objects and shared workflows.   |
-| HPA    | Validated     | echoSMs                                 | Spherical HPModel branch and published asymptotic formulas.                 | Validated against the spherical echoSMs implementation.                                                   |
-| PCDWBA | Validated     | benchmark_ts / Jech et al. (2015)       | Curved weak-scattering reference workflows on shared bent-body cases.       | Validated against source-level ZooScatR and Echopop PCDWBA workflows.                                     |
-| VESM   | Validated     | Reference Python VESM workflow          | Documented spherical layered case used by the original VESM implementation. | Validated against the reference Python VESM implementation on the documented layered-sphere case.         |
-| TMM    | Validated     | BEMPP far-field checks                  | Pressure-release angular slices for sphere, oblate, and prolate cases.      | Validated against external BEMPP far-field checks for sphere, oblate, and prolate pressure-release cases. |
-| TMM    | Validated     | Exact general-angle spheroidal solution | General-angle prolate retained-state validation.                            | Retained prolate angular products are also checked against the exact general-angle spheroidal solution.   |
+| Family | Evidence type | Source | Scope | Summary |
+|:---|:---|:---|:---|:---|
+| SPHMS | Validated | KRMr and echoSMs | Penetrable sphere spectra on shared software definitions. | Validated against `KRMr` and `echoSMs` on shared penetrable-sphere cases. |
+| FCMS | Validated | echoSMs | Rigid, soft, liquid-filled, and gas-filled finite-cylinder spectra. | Validated against the echoSMs finite-cylinder implementation. |
+| PSMS | Validated | Prol_Spheroid and echoSMs | Liquid-filled and gas-filled prolate-spheroid software comparisons. | Validated against the external Prol_Spheroid and echoSMs implementations on shared prolate cases. |
+| SOEMS | Validated | echoSMs, SphereTS, NOAA applet | Shared calibration-sphere material sets and frequency sweeps. | Validated against echoSMs, SphereTS, and the NOAA calibration applet. |
+| DWBA | Validated | McGehee et al. (1998) and echoSMs | Bundled krill geometry and published DWBA reference workflows. | Validated against the published McGehee et al (1998) and echoSMs workflows. |
+| SDWBA | Validated | CCAMLR MATLAB, NOAA applet, echoSMs | Bundled krill stochastic workflow comparisons. | Validated against the CCAMLR, NOAA applet, and echoSMs implementations. |
+| KRM | Validated | KRMr, echoSMs, NOAA applet | Bundled sardine and cod software-to-software comparisons. | Validated against\`KRMr, echoSMs, and the NOAA KRM applet on bundled fish objects and shared workflows. |
+| HPA | Validated | echoSMs | Spherical HPModel branch and published asymptotic formulas. | Validated against the spherical echoSMs implementation. |
+| PCDWBA | Validated | benchmark_ts / Jech et al. (2015) | Curved weak-scattering reference workflows on shared bent-body cases. | Validated against source-level ZooScatR and Echopop PCDWBA workflows. |
+| VESM | Validated | Reference Python VESM workflow | Documented spherical layered case used by the original VESM implementation. | Validated against the reference Python VESM implementation on the documented layered-sphere case. |
+| TMM | Validated | BEMPP far-field checks | Pressure-release angular slices for sphere, oblate, and prolate cases. | Validated against external BEMPP far-field checks for sphere, oblate, and prolate pressure-release cases. |
+| TMM | Validated | Exact general-angle spheroidal solution | General-angle prolate retained-state validation. | Retained prolate angular products are also checked against the exact general-angle spheroidal solution. |
 
 ### Partially-validated scope evidence
 
-| Family | Evidence type       | Source                        | Scope                                                    | Summary                                                                                                                                                                                   |
-|:-------|:--------------------|:------------------------------|:---------------------------------------------------------|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| TMM    | Partially validated | Cylinder retained-angle scope | Cylinder retained-angle scope limitation and guardrails. | TMM is partially validated because the sphere, oblate, and prolate branches have external checks, but retained general-angle cylinder products remain outside the validated public scope. |
+| Family | Evidence type | Source | Scope | Summary |
+|:---|:---|:---|:---|:---|
+| TMM | Partially validated | Cylinder retained-angle scope | Cylinder retained-angle scope limitation and guardrails. | TMM is partially validated because the sphere, oblate, and prolate branches have external checks, but retained general-angle cylinder products remain outside the validated public scope. |
 
 ### Experimental-scope evidence
 
-| Family | Evidence type | Source                                       | Scope                                                                 | Summary                                                                                                                                                                          |
-|:-------|:--------------|:---------------------------------------------|:----------------------------------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| BCMS   | Experimental  | Internal FCMS-based reference reconstruction | Uniform-curvature cylinder coherence extension of FCMS.               | BCMS is currently marked experimental because the documented checks are internal coherence reconstructions rather than an external benchmark or software-comparison ladder.      |
-| ECMS   | Experimental  | Independent algebra transcription            | Elastic-cylinder component family and near-broadside canonical cases. | ECMS is currently marked experimental because the documented checks are independent algebra reconstructions rather than an external benchmark or software-comparison ladder.     |
-| PCDWBA | Experimental  | ZooScatR                                     | Current package-facing PCDWBA workflow and argument surface.          | PCDWBA is currently marked experimental because the public package workflow is still being tightened even though the current source- level comparison cases are documented.      |
-| BBFM   | Experimental  | Internal DWBA + ECMS reconstruction          | Internal composite-component consistency checks only.                 | BBFM is currently marked experimental because it has documented internal reconstruction checks but no external benchmark ladder or independent public implementation comparison. |
-| VESM   | Experimental  | Current layered-sphere workflow surface      | Current documented layered-sphere workflow surface.                   | VESM is currently marked experimental because the documented public workflow is still limited to the current layered-sphere scope.                                               |
-| TMM    | Experimental  | Current retained-state branch matrix         | Current retained-state branch matrix across supported shapes.         | TMM is currently marked experimental because the retained-state workflow and branch matrix are still guarded while shape-specific support continues to be tightened.             |
+| Family | Evidence type | Source | Scope | Summary |
+|:---|:---|:---|:---|:---|
+| BCMS | Experimental | Internal FCMS-based reference reconstruction | Uniform-curvature cylinder coherence extension of FCMS. | BCMS is currently marked experimental because the documented checks are internal coherence reconstructions rather than an external benchmark or software-comparison ladder. |
+| ECMS | Experimental | Independent algebra transcription | Elastic-cylinder component family and near-broadside canonical cases. | ECMS is currently marked experimental because the documented checks are independent algebra reconstructions rather than an external benchmark or software-comparison ladder. |
+| PCDWBA | Experimental | ZooScatR | Current package-facing PCDWBA workflow and argument surface. | PCDWBA is currently marked experimental because the public package workflow is still being tightened even though the current source- level comparison cases are documented. |
+| BBFM | Experimental | Internal DWBA + ECMS reconstruction | Internal composite-component consistency checks only. | BBFM is currently marked experimental because it has documented internal reconstruction checks but no external benchmark ladder or independent public implementation comparison. |
+| VESM | Experimental | Current layered-sphere workflow surface | Current documented layered-sphere workflow surface. | VESM is currently marked experimental because the documented public workflow is still limited to the current layered-sphere scope. |
+| TMM | Experimental | Current retained-state branch matrix | Current retained-state branch matrix across supported shapes. | TMM is currently marked experimental because the retained-state workflow and branch matrix are still guarded while shape-specific support continues to be tightened. |
 
 ## What validation means in this package
 
@@ -206,6 +208,7 @@ canonical sphere case, run `SPHMS`, and compare the resulting `TS`
 vector against the stored benchmark curve.
 
 ``` r
+
 data(benchmark_ts)
 
 frequency <- benchmark_ts$frequency_spectra$index$frequency
@@ -343,14 +346,16 @@ Just-in-Time Compiling Boundary Element Library.” *Journal of Open
 Source Software* 6 (59): 2879. <https://doi.org/10.21105/joss.02879>.
 
 Commission for the Conservation of Antarctic Marine Living Resources.
-2019. “SDWBA_TS: Stochastic Distorted-Wave Born Approximation (SDWBA)
-Target Strength (TS) Model.” <https://github.com/ccamlr/SDWBA_TS>;
-GitHub.
+2019. *SDWBA_TS: Stochastic Distorted-Wave Born Approximation (SDWBA)
+Target Strength (TS) Model*. V. 1.3.
+[Https://github.com/ccamlr/SDWBA_TS](https://github.com/ccamlr/SDWBA_TS);
+GitHub, released.
 
-Elavia, A. 2021. “Liquid_spheroid: Acoustic Scattering by a Liquid
-Prolate Spheroid.” <https://github.com/elavia/liquid_spheroid>.
+Elavia, A. 2021. *Liquid_spheroid: Acoustic Scattering by a Liquid
+Prolate Spheroid*. Released.
+<https://github.com/elavia/liquid_spheroid>.
 
-Gastauer, Sven. 2025. “SvenGastauer/KRMr: V0.4.8.” Zenodo.
+Gastauer, Sven. 2025. *SvenGastauer/KRMr: V0.4.8*. Zenodo.
 <https://doi.org/10.5281/ZENODO.15838374>.
 
 Gastauer, Sven, Dezhang Chu, and Martin J. Cox. 2019. “ZooScatR—An
@@ -360,8 +365,7 @@ Distorted Wave Born Approximation.” *The Journal of the Acoustical
 Society of America* 145 (1): EL102–8.
 <https://doi.org/10.1121/1.5085655>.
 
-Jech, J. Michael, John K. Horne, Dezhang Chu, David A. Demer, David T.
-I. Francis, Natalia Gorska, Benjamin Jones, et al. 2015. “Comparisons
+Jech, J. Michael, John K. Horne, Dezhang Chu, et al. 2015. “Comparisons
 Among Ten Models of Acoustic Backscattering Used in Aquatic Ecosystem
 Research.” *The Journal of the Acoustical Society of America* 138 (6):
 3742–64. <https://doi.org/10.1121/1.4937607>.
@@ -373,15 +377,16 @@ Spheroids Across a Wide Frequency Range and Incident Angles:
 Implications for Fisheries Acoustics.” *Journal of Sound and Vibration*,
 119227. https://doi.org/<https://doi.org/10.1016/j.jsv.2025.119227>.
 
-Lucca, Brandyn, and Wu-Jung Lee. 2026. “OSOceanAcoustics/Echopop:
-V0.6.0.” Zenodo. <https://doi.org/10.5281/ZENODO.18975959>.
+Lucca, Brandyn, and Wu-Jung Lee. 2026. *OSOceanAcoustics/Echopop:
+V0.6.0*. Zenodo. <https://doi.org/10.5281/ZENODO.18975959>.
 
-Macaulay, Gavin J. 2025. “gavinmacaulay/SphereTS: V1.0.8.”
+Macaulay, Gavin J. 2025. *gavinmacaulay/SphereTS: V1.0.8*.
 <https://github.com/gavinmacaulay/SphereTS>.
 
 Macaulay, Gavin, and contributors. 2024. “echoSMs: Making Acoustic
-Scattering Models Available to Fisheries and Plankton Scientists.”
-*GitHub Repository*. <https://github.com/ices-tools-dev/echoSMs>;
+Scattering Models Available to Fisheries and Plankton Scientists.” In
+*GitHub Repository*.
+[Https://github.com/ices-tools-dev/echoSMs](https://github.com/ices-tools-dev/echoSMs);
 GitHub.
 
 McGehee, D. E., R. L. O’Driscoll, and L. V.Martin Traykovski. 1998.
@@ -399,6 +404,6 @@ Southwest Fisheries Science Center. 2022a. *KRM Model*. National Marine
 Fisheries Service, National Oceanic; Atmospheric Administration.
 <https://www.fisheries.noaa.gov/data-tools/krm-model>.
 
-———. 2022b. *SDWBA Model*. National Marine Fisheries Service, National
-Oceanic; Atmospheric Administration.
+Southwest Fisheries Science Center. 2022b. *SDWBA Model*. National
+Marine Fisheries Service, National Oceanic; Atmospheric Administration.
 <https://www.fisheries.noaa.gov/data-tools/sdwba-model>.

@@ -288,7 +288,7 @@ cross-section is:
 
 \sigma\_\text{bs} = \|\mathcal{f}\_\text{bs}\|^2
 
-and the target strength is ([MacLennan, Fernandes, and Dalen
+and the target strength is ([MacLennan et al.
 2002](#ref-MacLennan_2002); [Urick 1983](#ref-Urick_1983); [Simmonds and
 MacLennan 2005](#ref-Simmonds_2005)):
 
@@ -339,11 +339,11 @@ Consistent Approach to Definitions and Symbols in Fisheries Acoustics.”
 <https://doi.org/10.1006/jmsc.2001.1158>.
 
 Simmonds, John, and David N. MacLennan. 2005. *Fisheries Acoustics:
-Theory and Practice*. 2nd ed. Oxford, UK: Blackwell Science.
+Theory and Practice*. 2nd ed. Blackwell Science.
 <https://doi.org/10.1002/9780470995303>.
 
 Sommerfeld, Arnold. 1949. *Partial Differential Equations in Physics*.
-Vol. 6. Lectures on Theoretical Physics. New York: Academic Press.
+Vol. 6. Lectures on Theoretical Physics. Academic Press.
 
-Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed. New
-York, NY: McGraw-Hill.
+Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed.
+McGraw-Hill.

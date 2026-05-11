@@ -546,9 +546,9 @@ evaluated. The backscattering cross-section then becomes:
 
 \sigma\_\text{bs} = \|f\_\infty\|^2
 
-with target strength ([MacLennan, Fernandes, and Dalen
-2002](#ref-MacLennan_2002); [Urick 1983](#ref-Urick_1983); [Simmonds and
-MacLennan 2005](#ref-Simmonds_2005)):
+with target strength ([MacLennan et al. 2002](#ref-MacLennan_2002);
+[Urick 1983](#ref-Urick_1983); [Simmonds and MacLennan
+2005](#ref-Simmonds_2005)):
 
 TS = 10\log\_{10}(\sigma\_\text{bs}).
 
@@ -580,13 +580,11 @@ complicated basis functions, overlap integrals, and linear algebra.
 
 Abramowitz, Milton, and Irene A. Stegun. 1964. *Handbook of Mathematical
 Functions with Formulas, Graphs, and Mathematical Tables*. Ninth Dover
-printing, tenth GPO printing. New York: Dover Publications.
+printing, tenth GPO printing. Dover Publications.
 
-Dunster, T. M. 2026. “Legendre and Related Functions.” In *NIST Digital
-Library of Mathematical Functions*, edited by F. W. J. Olver, A. B. Olde
-Daalhuis, D. W. Lozier, B. I. Schneider, B. A. Boisvert, C. W. Clark, B.
-R. Miller, B. V. Saunders, H. S. Cohl, and M. A. McClain.
-<https://dlmf.nist.gov/14>.
+Dunster, T. M. 2026. “Legendre and Related Functions.” Chap. 14 in *NIST
+Digital Library of Mathematical Functions*, edited by F. W. J. Olver, A.
+B. Olde Daalhuis, D. W. Lozier, et al. <https://dlmf.nist.gov/14>.
 
 Flammer, Carson. 1957. *Spheroidal Wave Functions*.
 <https://ui.adsabs.harvard.edu/abs/1957spwf.book.....F>.
@@ -600,39 +598,35 @@ Consistent Approach to Definitions and Symbols in Fisheries Acoustics.”
 *ICES Journal of Marine Science* 59 (2): 365–69.
 <https://doi.org/10.1006/jmsc.2001.1158>.
 
-Morse, Philip M., and K. Uno Ingard. 1968. *Theoretical Acoustics*. New
-York, NY: McGraw-Hill.
+Morse, Philip M., and K. Uno Ingard. 1968. *Theoretical Acoustics*.
+McGraw-Hill.
 
 Press, William H., Saul A. Teukolsky, William T. Vetterling, and Brian
 P. Flannery. 2007. *Numerical Recipes: The Art of Scientific Computing*.
-3rd ed. New York, NY: Cambridge University Press.
+3rd ed. Cambridge University Press.
 
 Silbiger, Alexander. 1963. “Scattering of Sound by an Elastic Prolate
 Spheroid.” *The Journal of the Acoustical Society of America* 35 (4):
 564–70. <https://doi.org/10.1121/1.1918533>.
 
 Simmonds, John, and David N. MacLennan. 2005. *Fisheries Acoustics:
-Theory and Practice*. 2nd ed. Oxford, UK: Blackwell Science.
+Theory and Practice*. 2nd ed. Blackwell Science.
 <https://doi.org/10.1002/9780470995303>.
 
 Spence, R. D., and Sara Granger. 1951. “The Scattering of Sound from a
 Prolate Spheroid.” *The Journal of the Acoustical Society of America* 23
 (6): 701–6. <https://doi.org/10.1121/1.1906827>.
 
-Temme, N. M. 2026. “Numerical Methods.” In *NIST Digital Library of
-Mathematical Functions*, edited by F. W. J. Olver, A. B. Olde Daalhuis,
-D. W. Lozier, B. I. Schneider, B. A. Boisvert, C. W. Clark, B. R.
-Miller, B. V. Saunders, H. S. Cohl, and M. A. McClain.
-<https://dlmf.nist.gov/3>.
-
-Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed. New
-York, NY: McGraw-Hill.
-
-Volkmer, H. 2026. “Spheroidal Wave Functions.” In *NIST Digital Library
+Temme, N. M. 2026. “Numerical Methods.” Chap. 3 in *NIST Digital Library
 of Mathematical Functions*, edited by F. W. J. Olver, A. B. Olde
-Daalhuis, D. W. Lozier, B. I. Schneider, B. A. Boisvert, C. W. Clark, B.
-R. Miller, B. V. Saunders, H. S. Cohl, and M. A. McClain.
-<https://dlmf.nist.gov/30>.
+Daalhuis, D. W. Lozier, et al. <https://dlmf.nist.gov/3>.
+
+Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed.
+McGraw-Hill.
+
+Volkmer, H. 2026. “Spheroidal Wave Functions.” Chap. 30 in *NIST Digital
+Library of Mathematical Functions*, edited by F. W. J. Olver, A. B. Olde
+Daalhuis, D. W. Lozier, et al. <https://dlmf.nist.gov/30>.
 
 Ye, Z. n.d. “Low-Frequency Acoustic Scattering by Gas-Filled Prolate
 Spheroids in Liquids.” *The Journal of the Acoustical Society of

@@ -9,8 +9,8 @@ Benchmarked Validated
 
 These pages follow the weak-scattering elongated-body formulation and
 later applied fisheries-acoustics usage of the distorted-wave Born
-approximation ([Morse and Ingard 1968](#ref-Morse_1968); [Chu, Foote,
-and Stanton 1993](#ref-Chu_1993)).
+approximation ([Morse and Ingard 1968](#ref-Morse_1968); [Chu et al.
+1993](#ref-Chu_1993)).
 
 The acousticTS implementation of deterministic DWBA follows the same
 object-based pattern used throughout the package. A fluid-like scatterer
@@ -36,6 +36,7 @@ how object construction and model execution fit together before moving
 on to more realistic weakly scattering bodies.
 
 ``` r
+
 library(acousticTS)
 
 cylinder_shape <- cylinder(
@@ -85,6 +86,7 @@ short frequency sweep that allows the user to inspect the overall
 response before moving on to larger parameter studies.
 
 ``` r
+
 frequency <- seq(50e3, 200e3, by = 10e3)
 
 cylinder_scatterer <- target_strength(
@@ -126,6 +128,7 @@ intended.
 ### Accessing results
 
 ``` r
+
 dwba_results <- extract(cylinder_scatterer, "model")$DWBA
 head(dwba_results)
 ```
@@ -190,11 +193,11 @@ The comparison below uses those canonical targets directly as reported
 in Jech et al. ([2015](#ref-Jech_2015)). Elapsed times are
 representative values from the current machine.
 
-| Geometry                           | Max abs. \Delta vs benchmark (dB) | Mean abs. \Delta vs benchmark (dB) | Elapsed (s) |
-|:-----------------------------------|----------------------------------:|-----------------------------------:|------------:|
-| Weakly scattering sphere           |                          16.17744 |                            0.29031 |        0.74 |
-| Weakly scattering prolate spheroid |                           0.04993 |                            0.01735 |        5.11 |
-| Weakly scattering cylinder         |                           2.28194 |                            0.06664 |        2.53 |
+| Geometry | Max abs. \Delta vs benchmark (dB) | Mean abs. \Delta vs benchmark (dB) | Elapsed (s) |
+|:---|---:|---:|---:|
+| Weakly scattering sphere | 16.17744 | 0.29031 | 0.74 |
+| Weakly scattering prolate spheroid | 0.04993 | 0.01735 | 5.11 |
+| Weakly scattering cylinder | 2.28194 | 0.06664 | 2.53 |
 
 Those values still need to be read carefully. The largest absolute
 \Delta TS values are concentrated near deep nulls, so the sphere and
@@ -206,23 +209,23 @@ by a uniform offset across the full sweep.
 The bundled `krill` object serves a different role from the canonical
 modal-series targets above. Rather than testing an exact canonical-shape
 solution, it is used to verify that the stored segmented-body geometry
-reproduces the `MATLAB` code provded by McGehee, O’Driscoll, and
-Traykovski ([1998](#ref-mcgehee_software)) and echoSMs ([Macaulay and
-contributors 2024](#ref-echoSMs_software)).
+reproduces the `MATLAB` code provded by McGehee et al.
+([1998](#ref-mcgehee_software)) and echoSMs ([Macaulay and contributors
+2024](#ref-echoSMs_software)).
 
-| Comparison                          | Mean abs. \Delta TS (dB) | Max abs. \Delta TS (dB) |
-|:------------------------------------|-------------------------:|------------------------:|
-| acousticTS vs McGehee et al. (1998) |                 1.23e-05 |                4.33e-05 |
-| acousticTS vs echoSMs               |                  0.42284 |                 1.01167 |
-| McGehee et al. (1998) vs echoSMs    |                  0.42284 |                 1.01167 |
+| Comparison | Mean abs. \Delta TS (dB) | Max abs. \Delta TS (dB) |
+|:---|---:|---:|
+| acousticTS vs McGehee et al. (1998) | 1.23e-05 | 4.33e-05 |
+| acousticTS vs echoSMs | 0.42284 | 1.01167 |
+| McGehee et al. (1998) vs echoSMs | 0.42284 | 1.01167 |
 
-On this bundled krill geometry, acousticTS reproduces McGehee,
-O’Driscoll, and Traykovski ([1998](#ref-mcgehee_software)) essentially
-exactly, while the echoSMs remains within about 1 dB of the same
-spectrum but does not collapse onto the published curve. That makes the
-canonical modal-series table above and the bundled krill comparison
-complementary: one checks exact isolated-shape behavior, and the other
-checks a published segmented-body DWBA target.
+On this bundled krill geometry, acousticTS reproduces McGehee et al.
+([1998](#ref-mcgehee_software)) essentially exactly, while the echoSMs
+remains within about 1 dB of the same spectrum but does not collapse
+onto the published curve. That makes the canonical modal-series table
+above and the bundled krill comparison complementary: one checks exact
+isolated-shape behavior, and the other checks a published segmented-body
+DWBA target.
 
 ## References
 
@@ -232,15 +235,15 @@ Analysis of Target Strength Measurements of Antarctic Krill at 38 and
 Orientation Distribution.” *The Journal of the Acoustical Society of
 America* 93 (5): 2985–88. <https://doi.org/10.1121/1.405818>.
 
-Jech, J. Michael, John K. Horne, Dezhang Chu, David A. Demer, David T.
-I. Francis, Natalia Gorska, Benjamin Jones, et al. 2015. “Comparisons
+Jech, J. Michael, John K. Horne, Dezhang Chu, et al. 2015. “Comparisons
 Among Ten Models of Acoustic Backscattering Used in Aquatic Ecosystem
 Research.” *The Journal of the Acoustical Society of America* 138 (6):
 3742–64. <https://doi.org/10.1121/1.4937607>.
 
 Macaulay, Gavin, and contributors. 2024. “echoSMs: Making Acoustic
-Scattering Models Available to Fisheries and Plankton Scientists.”
-*GitHub Repository*. <https://github.com/ices-tools-dev/echoSMs>;
+Scattering Models Available to Fisheries and Plankton Scientists.” In
+*GitHub Repository*.
+[Https://github.com/ices-tools-dev/echoSMs](https://github.com/ices-tools-dev/echoSMs);
 GitHub.
 
 McGehee, D. E., R. L. O’Driscoll, and L. V.Martin Traykovski. 1998.
@@ -248,5 +251,5 @@ McGehee, D. E., R. L. O’Driscoll, and L. V.Martin Traykovski. 1998.
 120 kHz.” *Deep Sea Research Part II: Topical Studies in Oceanography*
 45 (7): 1273–94. <https://doi.org/10.1016/S0967-0645(98)00036-8>.
 
-Morse, Philip M., and K. Uno Ingard. 1968. *Theoretical Acoustics*. New
-York, NY: McGraw-Hill.
+Morse, Philip M., and K. Uno Ingard. 1968. *Theoretical Acoustics*.
+McGraw-Hill.

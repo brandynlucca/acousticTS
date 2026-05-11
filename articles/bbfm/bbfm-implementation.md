@@ -9,9 +9,8 @@ Unvalidated Experimental
 
 This family is best read alongside the swimbladder-less fish and
 composite-scatterer literature that motivates explicit flesh-body and
-backbone terms ([Gorska, Ona, and Korneliussen 2005](#ref-Gorska_2005);
-[Stanton et al. 1998](#ref-Stanton_1998_1); [Clay and Horne
-1994](#ref-Clay_1994)).
+backbone terms ([Gorska et al. 2005](#ref-Gorska_2005); [Stanton et al.
+1998](#ref-Stanton_1998_1); [Clay and Horne 1994](#ref-Clay_1994)).
 
 The body-backbone fish model is available through
 `target_strength(..., model = "bbfm")`. It is intended for
@@ -78,6 +77,7 @@ straight fluid-like body with an internal elastic cylindrical backbone
 offset along the body axis.
 
 ``` r
+
 library(acousticTS)
 
 body_shape <- cylinder(
@@ -174,21 +174,21 @@ check.](bbfm-example-spectrum.png)
 The `BBFM` output table keeps the component bookkeeping explicit instead
 of returning only a final `TS` column.
 
-| Column               | Meaning                                                                       |
-|:---------------------|:------------------------------------------------------------------------------|
-| `frequency`          | Acoustic frequency in Hz                                                      |
-| `ka_body`            | Body acoustic size returned by the `DWBA` body solve                          |
-| `ka_backbone`        | Backbone acoustic size returned by the `ECMS` backbone solve                  |
-| `f_body`             | Flesh-body complex backscattering amplitude from `DWBA`                       |
-| `f_backbone`         | Backbone complex backscattering amplitude before placement                    |
+| Column | Meaning |
+|:---|:---|
+| `frequency` | Acoustic frequency in Hz |
+| `ka_body` | Body acoustic size returned by the `DWBA` body solve |
+| `ka_backbone` | Backbone acoustic size returned by the `ECMS` backbone solve |
+| `f_body` | Flesh-body complex backscattering amplitude from `DWBA` |
+| `f_backbone` | Backbone complex backscattering amplitude before placement |
 | `f_backbone_aligned` | Backbone amplitude after centroid-based phase translation into the body frame |
-| `f_bs`               | Total coherent backscattering amplitude                                       |
-| `sigma_body`         | Flesh-body backscattering cross-section                                       |
-| `sigma_backbone`     | Aligned-backbone backscattering cross-section                                 |
-| `sigma_bs`           | Total backscattering cross-section                                            |
-| `TS_body`            | Flesh-body target strength                                                    |
-| `TS_backbone`        | Backbone target strength                                                      |
-| `TS`                 | Total composite target strength                                               |
+| `f_bs` | Total coherent backscattering amplitude |
+| `sigma_body` | Flesh-body backscattering cross-section |
+| `sigma_backbone` | Aligned-backbone backscattering cross-section |
+| `sigma_bs` | Total backscattering cross-section |
+| `TS_body` | Flesh-body target strength |
+| `TS_backbone` | Backbone target strength |
+| `TS` | Total composite target strength |
 
 Those columns make it possible to inspect not just the final spectrum,
 but also which part of the result comes from the body, which part comes
@@ -208,6 +208,7 @@ model design:
     output.
 
 ``` r
+
 bbfm_out <- extract(bbf_object, "model")$BBFM
 
 body_object <- methods::new("FLS",

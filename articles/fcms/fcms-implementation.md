@@ -30,6 +30,7 @@ actually passed into the FCMS calculation.
 ### Cylinder object generation
 
 ``` r
+
 library(acousticTS)
 
 cylinder_shape <- cylinder(
@@ -82,6 +83,7 @@ the transverse size parameter and the longitudinal coherence factor.
 ### Calculating a TS-frequency spectrum
 
 ``` r
+
 frequency <- seq(38e3, 150e3, by = 8e3)
 
 cylinder_object <- target_strength(
@@ -124,6 +126,7 @@ spectrum.](fcms-model-plot.png)
 #### Accessing results
 
 ``` r
+
 fcms_results <- extract(cylinder_object, "model")$FCMS
 head(fcms_results)
 ```
@@ -182,12 +185,12 @@ benchmark family stored in `benchmark_ts`. The table below uses the full
 cylindrical benchmark grid. Elapsed times are representative values from
 the current machine.
 
-| Boundary           | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | Elapsed (s) |
-|:-------------------|------------------------:|-------------------------:|------------:|
-| `fixed_rigid`      |                 0.19454 |                  0.00914 |        0.01 |
-| `pressure_release` |                 0.00780 |                  0.00263 |        0.03 |
-| `gas_filled`       |                 0.00499 |                  0.00245 |        0.05 |
-| `liquid_filled`    |                 0.11453 |                  0.00512 |        0.05 |
+| Boundary | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | Elapsed (s) |
+|:---|---:|---:|---:|
+| `fixed_rigid` | 0.19454 | 0.00914 | 0.01 |
+| `pressure_release` | 0.00780 | 0.00263 | 0.03 |
+| `gas_filled` | 0.00499 | 0.00245 | 0.05 |
+| `liquid_filled` | 0.11453 | 0.00512 | 0.05 |
 
 The pressure-release and gas-filled cases remain very close to the
 benchmark family across the full frequency grid. The larger residuals
@@ -204,12 +207,12 @@ table above. It asks whether the software implementations agree with
 each other on the same finite-cylinder problem, and whether the
 remaining benchmark residual is shared rather than unique to acousticTS.
 
-| Boundary           | Mean abs. \Delta acousticTS vs `echoSMs` (dB) | Max abs. \Delta acousticTS vs `echoSMs` (dB) | Mean abs. \Delta `echoSMs` vs benchmark (dB) | Max abs. \Delta `echoSMs` vs benchmark (dB) |
-|:-------------------|----------------------------------------------:|---------------------------------------------:|---------------------------------------------:|--------------------------------------------:|
-| `fixed_rigid`      |                                      7.14e-09 |                                     1.64e-07 |                                      0.00914 |                                     0.19454 |
-| `pressure_release` |                                      6.97e-09 |                                     1.59e-07 |                                      0.00263 |                                     0.00780 |
-| `gas_filled`       |                                      6.96e-09 |                                     1.59e-07 |                                      0.00245 |                                     0.00499 |
-| `liquid_filled`    |                                      4.36e-09 |                                     2.62e-07 |                                      0.00512 |                                     0.11453 |
+| Boundary | Mean abs. \Delta acousticTS vs `echoSMs` (dB) | Max abs. \Delta acousticTS vs `echoSMs` (dB) | Mean abs. \Delta `echoSMs` vs benchmark (dB) | Max abs. \Delta `echoSMs` vs benchmark (dB) |
+|:---|---:|---:|---:|---:|
+| `fixed_rigid` | 7.14e-09 | 1.64e-07 | 0.00914 | 0.19454 |
+| `pressure_release` | 6.97e-09 | 1.59e-07 | 0.00263 | 0.00780 |
+| `gas_filled` | 6.96e-09 | 1.59e-07 | 0.00245 | 0.00499 |
+| `liquid_filled` | 4.36e-09 | 2.62e-07 | 0.00512 | 0.11453 |
 
 The key point is that acousticTS and `echoSMs` collapse onto the same
 FCMS spectra to practical machine precision across all four boundary
@@ -222,11 +225,11 @@ natural follow-up check is the same one used for SPHMS: hold the
 liquid-filled benchmark definition fixed and inspect how strongly the
 benchmark fit depends on a reduced modal cap.
 
-| Boundary        | `m_limit`    | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | Elapsed (s) |
-|:----------------|:-------------|------------------------:|-------------------------:|------------:|
-| `liquid_filled` | default rule |                 0.11453 |                  0.00512 |        0.05 |
-| `liquid_filled` | `20`         |                 0.12618 |                  0.00547 |        0.09 |
-| `liquid_filled` | `10`         |                43.09805 |                  4.29035 |        0.01 |
+| Boundary | `m_limit` | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | Elapsed (s) |
+|:---|:---|---:|---:|---:|
+| `liquid_filled` | default rule | 0.11453 | 0.00512 | 0.05 |
+| `liquid_filled` | `20` | 0.12618 | 0.00547 | 0.09 |
+| `liquid_filled` | `10` | 43.09805 | 4.29035 | 0.01 |
 
 That sensitivity check shows why the FCMS page does not need a large
 PSMS-style configuration matrix. The physically meaningful benchmark
@@ -241,6 +244,6 @@ Stanton, T. K. 1988. “Sound Scattering by Cylinders of Finite Length. I.
 Fluid Cylinders.” *The Journal of the Acoustical Society of America* 83
 (1): 55–63. <https://doi.org/10.1121/1.396184>.
 
-———. 1989. “Sound Scattering by Cylinders of Finite Length. III.
-Deformed Cylinders.” *The Journal of the Acoustical Society of America*
-86 (2): 691–705. <https://doi.org/10.1121/1.398193>.
+Stanton, T. K. 1989. “Sound Scattering by Cylinders of Finite Length.
+III. Deformed Cylinders.” *The Journal of the Acoustical Society of
+America* 86 (2): 691–705. <https://doi.org/10.1121/1.398193>.

@@ -9,8 +9,9 @@ Benchmarked Unvalidated
 
 These pages come from the high-frequency elongated-body literature and
 later fish and zooplankton applications ([Stanton et al.
-1993](#ref-Stanton_1993), [1998](#ref-Stanton_1998_1); [Stanton, Chu,
-and Wiebe 1998](#ref-Stanton_1998_2)).
+1993](#ref-Stanton_1993); [Stanton, Chu, and Wiebe
+1998](#ref-Stanton_1998_2); [Stanton, Chu, Wiebe, Martin, et al.
+1998](#ref-Stanton_1998_1)).
 
 The two-ray cylinder model (`TRCM`) is a high-frequency asymptotic
 family for elongated fluid-like bodies. It retains only two dominant

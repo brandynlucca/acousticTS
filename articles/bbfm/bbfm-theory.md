@@ -9,9 +9,8 @@ Unvalidated Experimental
 
 This family is best read alongside the swimbladder-less fish and
 composite-scatterer literature that motivates explicit flesh-body and
-backbone terms ([Gorska, Ona, and Korneliussen 2005](#ref-Gorska_2005);
-[Stanton et al. 1998](#ref-Stanton_1998_1); [Clay and Horne
-1994](#ref-Clay_1994)).
+backbone terms ([Gorska et al. 2005](#ref-Gorska_2005); [Stanton et al.
+1998](#ref-Stanton_1998_1); [Clay and Horne 1994](#ref-Clay_1994)).
 
 The body-backbone fish model (`BBFM`) is a composite scattering family
 for swimbladder-less targets whose flesh body and backbone should remain
@@ -175,7 +174,7 @@ The linear backscattering cross-section is:
 \sigma\_{\mathrm{bs}} =
 \left\|f\_{\mathrm{bs}}^{(\mathrm{BBFM})}\right\|^2,
 
-and the target strength is ([MacLennan, Fernandes, and Dalen
+and the target strength is ([MacLennan et al.
 2002](#ref-MacLennan_2002); [Urick 1983](#ref-Urick_1983); [Simmonds and
 MacLennan 2005](#ref-Simmonds_2005)):
 
@@ -247,7 +246,7 @@ Consistent Approach to Definitions and Symbols in Fisheries Acoustics.”
 <https://doi.org/10.1006/jmsc.2001.1158>.
 
 Simmonds, John, and David N. MacLennan. 2005. *Fisheries Acoustics:
-Theory and Practice*. 2nd ed. Oxford, UK: Blackwell Science.
+Theory and Practice*. 2nd ed. Blackwell Science.
 <https://doi.org/10.1002/9780470995303>.
 
 Stanton, Timothy K., Dezhang Chu, Peter H. Wiebe, Linda V. Martin, and
@@ -256,5 +255,5 @@ Groups. I. Experimental Determination of Dominant Scattering
 Mechanisms.” *The Journal of the Acoustical Society of America* 103 (1):
 225–35. <https://doi.org/10.1121/1.421469>.
 
-Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed. New
-York, NY: McGraw-Hill.
+Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed.
+McGraw-Hill.

@@ -174,10 +174,9 @@ straight-cylinder kernel rather than replacing it.
 ## Target strength
 
 Once the complex backscattering amplitude is known, the linear
-backscattering cross-section and target strength are ([MacLennan,
-Fernandes, and Dalen 2002](#ref-MacLennan_2002); [Urick
-1983](#ref-Urick_1983); [Simmonds and MacLennan
-2005](#ref-Simmonds_2005)):
+backscattering cross-section and target strength are ([MacLennan et al.
+2002](#ref-MacLennan_2002); [Urick 1983](#ref-Urick_1983); [Simmonds and
+MacLennan 2005](#ref-Simmonds_2005)):
 
 \sigma\_{\mathrm{bs}} = \left\|f\_{\mathrm{bs}}\right\|^2, \qquad
 \mathrm{TS} = 10\log\_{10}\left(\sigma\_{\mathrm{bs}}\right).
@@ -215,16 +214,16 @@ Consistent Approach to Definitions and Symbols in Fisheries Acoustics.”
 <https://doi.org/10.1006/jmsc.2001.1158>.
 
 Simmonds, John, and David N. MacLennan. 2005. *Fisheries Acoustics:
-Theory and Practice*. 2nd ed. Oxford, UK: Blackwell Science.
+Theory and Practice*. 2nd ed. Blackwell Science.
 <https://doi.org/10.1002/9780470995303>.
 
 Stanton, T. K. 1988a. “Sound Scattering by Cylinders of Finite Length.
 I. Fluid Cylinders.” *The Journal of the Acoustical Society of America*
 83 (1): 55–63. <https://doi.org/10.1121/1.396184>.
 
-———. 1988b. “Sound Scattering by Cylinders of Finite Length. II. Elastic
-Cylinders.” *The Journal of the Acoustical Society of America* 83 (1):
-64–67. <https://doi.org/10.1121/1.396185>.
+Stanton, T. K. 1988b. “Sound Scattering by Cylinders of Finite Length.
+II. Elastic Cylinders.” *The Journal of the Acoustical Society of
+America* 83 (1): 64–67. <https://doi.org/10.1121/1.396185>.
 
-Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed. New
-York, NY: McGraw-Hill.
+Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed.
+McGraw-Hill.

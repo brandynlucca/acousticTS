@@ -580,9 +580,9 @@ This gives the final linear scattering coefficient:
 \sum\_{m=0}^{\infty} (2m+1) A_m^{(1)} (-1)^m.
 
 This coefficient therefore defines the backscattering cross-section and
-target strength through ([MacLennan, Fernandes, and Dalen
-2002](#ref-MacLennan_2002); [Urick 1983](#ref-Urick_1983); [Simmonds and
-MacLennan 2005](#ref-Simmonds_2005)):
+target strength through ([MacLennan et al. 2002](#ref-MacLennan_2002);
+[Urick 1983](#ref-Urick_1983); [Simmonds and MacLennan
+2005](#ref-Simmonds_2005)):
 
 \sigma\_\text{bs} = \|\mathcal{f}\_\text{bs}(\theta = \pi)\|^2, \quad TS
 = 10\log\_{10}\left(\sigma\_\text{bs}\right).
@@ -648,19 +648,19 @@ Consistent Approach to Definitions and Symbols in Fisheries Acoustics.”
 *ICES Journal of Marine Science* 59 (2): 365–69.
 <https://doi.org/10.1006/jmsc.2001.1158>.
 
-Morse, Philip M., and K. Uno Ingard. 1968. *Theoretical Acoustics*. New
-York, NY: McGraw-Hill.
+Morse, Philip M., and K. Uno Ingard. 1968. *Theoretical Acoustics*.
+McGraw-Hill.
 
 Simmonds, John, and David N. MacLennan. 2005. *Fisheries Acoustics:
-Theory and Practice*. 2nd ed. Oxford, UK: Blackwell Science.
+Theory and Practice*. 2nd ed. Blackwell Science.
 <https://doi.org/10.1002/9780470995303>.
 
 Sommerfeld, Arnold. 1949. *Partial Differential Equations in Physics*.
-Vol. 6. Lectures on Theoretical Physics. New York: Academic Press.
+Vol. 6. Lectures on Theoretical Physics. Academic Press.
 
 Stanton, T. K. 1990. “Sound Scattering by Spherical and Elongated
 Shelled Bodies.” *The Journal of the Acoustical Society of America* 88
 (3): 1619–33. <https://doi.org/10.1121/1.400321>.
 
-Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed. New
-York, NY: McGraw-Hill.
+Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed.
+McGraw-Hill.

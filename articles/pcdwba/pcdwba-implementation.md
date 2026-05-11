@@ -9,7 +9,7 @@ Validated Experimental
 
 These pages follow the phase-compensated weak-scattering literature for
 broadside elongated bodies and krill-style applications ([Chu and Ye
-1999](#ref-Chu_1999); [Chu, Foote, and Stanton 1993](#ref-Chu_1993)).
+1999](#ref-Chu_1999); [Chu et al. 1993](#ref-Chu_1993)).
 
 The phase-compensated distorted wave Born approximation is available
 through `target_strength(..., model = "pcdwba")`. The implementation is
@@ -21,8 +21,8 @@ This page checks the implementation against two source-level references:
 
 - the `pcdwba_fbs` routine in the `Python` package Echopop (Lucca and
   Lee ([2026](#ref-Echopop_software))),
-- the bent-cylinder DWBA routines in the `R`-package ZooScatR (Gastauer,
-  Chu, and Cox ([2019](#ref-ZooScatR_software))) .
+- the bent-cylinder DWBA routines in the `R`-package ZooScatR (Gastauer
+  et al. ([2019](#ref-ZooScatR_software))) .
 
 `PCDWBA` is validated here against source-level reference
 implementations rather than against a separate published benchmark
@@ -47,6 +47,7 @@ The comparison uses a single reproducible bent-cylinder case:
 In acousticTS, that target is built as:
 
 ``` r
+
 library(acousticTS)
 
 pcdwba_object <- fls_generate(
@@ -85,11 +86,11 @@ head(extract(pcdwba_object, "model")$PCDWBA)
 
 #### Comparison summary
 
-| Comparison                    | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) |
-|:------------------------------|------------------------:|-------------------------:|
-| acousticTS vs echopop         |                0.073947 |                 0.001123 |
-| acousticTS vs ZooScatR-source |                0.000000 |                 0.000000 |
-| echopop vs ZooScatR-source    |                0.073947 |                 0.001123 |
+| Comparison | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) |
+|:---|---:|---:|
+| acousticTS vs echopop | 0.073947 | 0.001123 |
+| acousticTS vs ZooScatR-source | 0.000000 | 0.000000 |
+| echopop vs ZooScatR-source | 0.073947 | 0.001123 |
 
 The ZooScatR and acousticTS outputs are indistinguishable on this grid.
 The Echopop comparison remains close as well, but it is not at machine
@@ -145,5 +146,5 @@ Distorted Wave Born Approximation.” *The Journal of the Acoustical
 Society of America* 145 (1): EL102–8.
 <https://doi.org/10.1121/1.5085655>.
 
-Lucca, Brandyn, and Wu-Jung Lee. 2026. “OSOceanAcoustics/Echopop:
-V0.6.0.” Zenodo. <https://doi.org/10.5281/ZENODO.18975959>.
+Lucca, Brandyn, and Wu-Jung Lee. 2026. *OSOceanAcoustics/Echopop:
+V0.6.0*. Zenodo. <https://doi.org/10.5281/ZENODO.18975959>.

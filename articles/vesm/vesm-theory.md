@@ -256,7 +256,7 @@ where the (-1)^m factor comes from evaluating the Legendre polynomials
 in the backscattering direction.
 
 The backscattering cross-section and target strength are then
-([MacLennan, Fernandes, and Dalen 2002](#ref-MacLennan_2002); [Urick
+([MacLennan et al. 2002](#ref-MacLennan_2002); [Urick
 1983](#ref-Urick_1983); [Simmonds and MacLennan
 2005](#ref-Simmonds_2005)):
 
@@ -324,8 +324,8 @@ Consistent Approach to Definitions and Symbols in Fisheries Acoustics.”
 <https://doi.org/10.1006/jmsc.2001.1158>.
 
 Simmonds, John, and David N. MacLennan. 2005. *Fisheries Acoustics:
-Theory and Practice*. 2nd ed. Oxford, UK: Blackwell Science.
+Theory and Practice*. 2nd ed. Blackwell Science.
 <https://doi.org/10.1002/9780470995303>.
 
-Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed. New
-York, NY: McGraw-Hill.
+Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed.
+McGraw-Hill.

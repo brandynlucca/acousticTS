@@ -156,6 +156,7 @@ through `...` and per-model overrides may be supplied through
 seawater properties but only one of them needs an extra stochastic or
 numerical control:
 
+
     target_strength(
       object,
       frequency,

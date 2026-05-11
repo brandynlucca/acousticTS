@@ -17,6 +17,7 @@ solution or a high-frequency Kirchhoff (ray-based) approximation.
 
 This model is accessed via:
 
+
     target_strength(
       ...,
       model="krm",

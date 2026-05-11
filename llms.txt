@@ -4,7 +4,8 @@
 [![Documentation](https://img.shields.io/badge/Latest_Documentation-blue)](https://brandynlucca.github.io/acousticTS/)
 [![Build
 status](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml)
-[![Coverage](https://codecov.io/gh/brandynlucca/acousticTS/graph/badge.svg?branch=main)](https://app.codecov.io/gh/brandynlucca/acousticTS?branch=main)
+[![Code
+Coverage](https://img.shields.io/codecov/c/github/brandynlucca/acousticTS?label=Code+Coverage)](https://app.codecov.io/gh/brandynlucca/acousticTS)
 [![License:
 GPL-3](https://img.shields.io/badge/License-GPL--3-blue.svg)](https://brandynlucca.github.io/acousticTS/LICENSE)
 
@@ -37,6 +38,7 @@ TS is used to:
 Install the latest release from GitHub:
 
 ``` r
+
 # install.packages("devtools")
 devtools::install_github("brandynlucca/acousticTS")
 ```
@@ -59,22 +61,23 @@ results in a structured `S4` object.
 
 ## Models
 
-| Model                                    | Abbreviation | Scatterer type | Boundary      |
-|------------------------------------------|--------------|----------------|---------------|
-| Distorted-wave Born approximation        | `DWBA`       | FLS            | Fluid         |
-| Stochastic DWBA                          | `SDWBA`      | FLS            | Fluid         |
-| Kirchhoff-ray mode                       | `KRM`        | FLS, SBF       | Fluid + gas   |
-| High-pass approximation                  | `HPA`        | FLS, GAS       | Fluid / gas   |
-| Two-ray cylinder model                   | `TRCM`       | FLS            | Fluid         |
-| Modal series solution (sphere)           | `SPHMS`      | CAL, ESS       | Multiple      |
-| Modal series solution (prolate spheroid) | `PSMS`       | FLS            | Fluid         |
-| Modal series solution (elastic shell)    | `ESSMS`      | ESS            | Elastic       |
-| Finite-cylinder modal series             | `FCMS`       | CAL            | Rigid / fluid |
-| Resonance model (gas sphere)             | `SOEMS`      | GAS, CAL       | Gas           |
+| Model | Abbreviation | Scatterer type | Boundary |
+|----|----|----|----|
+| Distorted-wave Born approximation | `DWBA` | FLS | Fluid |
+| Stochastic DWBA | `SDWBA` | FLS | Fluid |
+| Kirchhoff-ray mode | `KRM` | FLS, SBF | Fluid + gas |
+| High-pass approximation | `HPA` | FLS, GAS | Fluid / gas |
+| Two-ray cylinder model | `TRCM` | FLS | Fluid |
+| Modal series solution (sphere) | `SPHMS` | CAL, ESS | Multiple |
+| Modal series solution (prolate spheroid) | `PSMS` | FLS | Fluid |
+| Modal series solution (elastic shell) | `ESSMS` | ESS | Elastic |
+| Finite-cylinder modal series | `FCMS` | CAL | Rigid / fluid |
+| Resonance model (gas sphere) | `SOEMS` | GAS, CAL | Gas |
 
 ## Quick start
 
 ``` r
+
 library(acousticTS)
 
 # Build a fluid-like scatterer (e.g. krill) with a cylinder shape
@@ -105,6 +108,7 @@ plot(krill, type = "model")
 Scatterer shapes are created via dedicated constructors:
 
 ``` r
+
 # Cylinder (used by FLS / CAL)
 fish_shape <- cylinder(length_body = 0.25, radius_body = 0.02)
 
@@ -128,6 +132,7 @@ reconstructing them from scratch using
 [`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md):
 
 ``` r
+
 # Rescale a krill to 40 mm
 krill_40mm <- reforge(krill, body_target = c(length = 0.04))
 
@@ -142,6 +147,7 @@ runs repeated model evaluations across distributions of input
 parameters, supporting both vectorized and batch modes:
 
 ``` r
+
 results <- simulate_ts(
   krill,
   model = "DWBA",
@@ -156,14 +162,15 @@ results <- simulate_ts(
 
 ## Built-in datasets
 
-| Dataset        | Description                                                         |
-|----------------|---------------------------------------------------------------------|
-| `krill`        | Antarctic krill (*Euphausia superba*) shape and material properties |
-| `cod`          | Atlantic cod (*Gadus morhua*) shape and swimbladder                 |
-| `sardine`      | Pacific sardine (*Sardinops sagax*) shape and swimbladder           |
-| `benchmark_ts` | Benchmark TS values for model validation                            |
+| Dataset | Description |
+|----|----|
+| `krill` | Antarctic krill (*Euphausia superba*) shape and material properties |
+| `cod` | Atlantic cod (*Gadus morhua*) shape and swimbladder |
+| `sardine` | Pacific sardine (*Sardinops sagax*) shape and swimbladder |
+| `benchmark_ts` | Benchmark TS values for model validation |
 
 ``` r
+
 data(krill)
 data(cod)
 data(sardine)
@@ -175,6 +182,7 @@ data(benchmark_ts)
 If you use acousticTS in published work, please cite:
 
 ``` r
+
 citation("acousticTS")
 ```
 

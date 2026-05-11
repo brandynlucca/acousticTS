@@ -4,8 +4,8 @@
 
 Shape manipulation matters because many published target representations
 are built from segmented or reformatted coordinate sets rather than from
-canonical closed forms ([Clay and Horne 1994](#ref-Clay_1994);
-[Gastauer, Chu, and Cox 2019](#ref-ZooScatR_software)).
+canonical closed forms ([Clay and Horne 1994](#ref-Clay_1994); [Gastauer
+et al. 2019](#ref-ZooScatR_software)).
 
 Real workflows often begin with a target description that is close to
 useful but not quite in the form required for the next model or
@@ -59,6 +59,7 @@ It helps to see the two workflows immediately in code before discussing
 the details.
 
 ``` r
+
 library(acousticTS)
 
 data(krill, package = "acousticTS")
@@ -128,6 +129,7 @@ rebuilt behind the scenes. The existing bent `rpos` is what gets
 rescaled.
 
 ``` r
+
 shape_obj <- cylinder(
   length_body = 0.05,
   radius_body = 0.003,
@@ -172,6 +174,7 @@ Plotting the object before and after bending makes the transformation
 much easier to interpret.
 
 ``` r
+
 old_par <- par(no.readonly = TRUE)
 on.exit(par(old_par))
 
@@ -189,6 +192,7 @@ shifts the centerline into a curved arc and slightly adjusts the `x`
 positions accordingly.
 
 ``` r
+
 body_before <- extract(obj, "body")$rpos
 body_after <- extract(bent_ratio, "body")$rpos
 stations <- unique(round(seq(1, ncol(body_before), length.out = 5)))
@@ -226,6 +230,7 @@ later resized. The example below shows that the requested
 while the projected `x` span stays slightly shorter.
 
 ``` r
+
 centerline_arc_length <- function(x) {
   body <- extract(x, "body")
   rpos <- body$rpos
@@ -272,6 +277,7 @@ useful to have small helpers for positioning, resampling, smoothing, or
 locally widening and pinching an existing profile.
 
 ``` r
+
 translated_obj <- translate_shape(obj, x_offset = -0.025)
 centered_obj <- reanchor_shape(obj, anchor = "center", at = 0)
 
@@ -305,6 +311,7 @@ Those helpers are intentionally simple:
 There are also helpers for local edits to the stored profile:
 
 ``` r
+
 obj_inflated <- inflate_shape(
   obj,
   x_range = c(0.015, 0.035),
@@ -373,6 +380,7 @@ Target-dimension arguments ask, “What final dimensions should this
 component have?”
 
 ``` r
+
 data(sardine, package = "acousticTS")
 
 obj_scaled <- reforge(
@@ -398,6 +406,7 @@ obj_target <- reforge(
     ## Warning: Swimbladder exceeds body bounds at some positions.
 
 ``` r
+
 data.frame(
   object = c("original", "obj_scaled", "obj_target"),
   body_length_m = c(
@@ -423,6 +432,7 @@ component needs to move. For example, a swimbladder can be shifted
 fore-aft or dorsoventrally without rebuilding the entire object:
 
 ``` r
+
 bladder_forward <- offset_component(
   sardine,
   component = "bladder",
@@ -446,6 +456,7 @@ The same interface also extends to newer multi-component classes such as
 `BBF`, where the body and backbone can be reforged separately:
 
 ``` r
+
 bbf_rescaled <- reforge(
   bbf_obj,
   body_scale = c(length = 1.1),
@@ -459,6 +470,7 @@ For reference, the scale-target patterns above can also be written more
 compactly as:
 
 ``` r
+
 obj_scaled <- reforge(
   obj_sbf,
   body_scale = c(length = 1.2),

@@ -9,9 +9,8 @@ Benchmarked Validated
 
 These pages follow the weak-scattering elongated-body formulation and
 later applied fisheries-acoustics usage of the distorted-wave Born
-approximation ([Morse and Ingard 1968](#ref-Morse_1968); [Chu, Foote,
-and Stanton 1993](#ref-Chu_1993); [Stanton, Chu, and Wiebe
-1998](#ref-Stanton_1998_2)).
+approximation ([Morse and Ingard 1968](#ref-Morse_1968); [Chu et al.
+1993](#ref-Chu_1993); [Stanton et al. 1998](#ref-Stanton_1998_2)).
 
 The distorted wave Born approximation (`DWBA`) is the package’s main
 weak-scattering fluid-body model for elongated targets that are no
@@ -66,8 +65,8 @@ Analysis of Target Strength Measurements of Antarctic Krill at 38 and
 Orientation Distribution.” *The Journal of the Acoustical Society of
 America* 93 (5): 2985–88. <https://doi.org/10.1121/1.405818>.
 
-Morse, Philip M., and K. Uno Ingard. 1968. *Theoretical Acoustics*. New
-York, NY: McGraw-Hill.
+Morse, Philip M., and K. Uno Ingard. 1968. *Theoretical Acoustics*.
+McGraw-Hill.
 
 Stanton, Timothy K., Dezhang Chu, and Peter H. Wiebe. 1998. “Sound
 Scattering by Several Zooplankton Groups. II. Scattering Models.” *The

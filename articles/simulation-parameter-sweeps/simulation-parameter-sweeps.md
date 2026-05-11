@@ -39,6 +39,7 @@ object, running the model, and collecting the outputs into a set of tidy
 result tables.
 
 ``` r
+
 library(acousticTS)
 
 shape_obj <- cylinder(
@@ -129,6 +130,7 @@ design grid from on-the-fly uncertainty propagation and from explicit
 morphology rebuilding.
 
 ``` r
+
 parameters <- list(
   theta_body = seq(0.5 * pi, pi, length.out = 5),
   density_body = function() rnorm(1, mean = 1045, sd = 5),
@@ -150,6 +152,7 @@ pathway as `body_target`, while preserving the original simulation
 column in the returned output.
 
 ``` r
+
 res_length_alias <- simulate_ts(
   object = obj,
   frequency = 120e3,
@@ -177,6 +180,7 @@ res_length_alias <- simulate_ts(
     ## ====================================
 
 ``` r
+
 head(res_length_alias$DWBA[, c("length_body", "theta_body", "TS")])
 ```
 
@@ -203,6 +207,7 @@ target. It treats them as a design grid whose combinations are all run
 separately.
 
 ``` r
+
 res_grid <- simulate_ts(
   object = obj,
   frequency = seq(38e3, 120e3, by = 6e3),
@@ -268,6 +273,7 @@ can be used not just for orientation or density perturbations, but also
 for controlled morphology studies.
 
 ``` r
+
 body_shape <- arbitrary(
   x_body = c(0.00, 0.02, 0.05, 0.08),
   zU_body = c(0.001, 0.004, 0.004, 0.001),
@@ -324,6 +330,7 @@ For `FLS` objects, the same idea can be expressed more explicitly
 through `body_target` or through the convenience alias `length_body`.
 
 ``` r
+
 res_fls_reforge <- simulate_ts(
   object = obj,
   frequency = 120e3,
@@ -357,6 +364,7 @@ res_fls_reforge <- simulate_ts(
     ## ====================================
 
 ``` r
+
 head(res_fls_reforge$DWBA[, c("body_target", "theta_body", "TS")])
 ```
 
@@ -397,6 +405,7 @@ flattened projected `x` span. That makes the resize semantics consistent
 with the object that is actually being modeled.
 
 ``` r
+
 obj_bent <- brake(obj, radius_curvature = 5, mode = "ratio")
 
 res_bent <- simulate_ts(
@@ -428,6 +437,7 @@ res_bent <- simulate_ts(
     ## ====================================
 
 ``` r
+
 head(res_bent$DWBA[, c("length_body", "theta_body", "TS")])
 ```
 
@@ -474,12 +484,14 @@ outputs. That organization is deliberate: it makes downstream plotting
 or aggregation straightforward.
 
 ``` r
+
 names(res_grid)
 ```
 
     ## [1] "DWBA"  "SDWBA"
 
 ``` r
+
 head(res_grid$DWBA)
 ```
 
@@ -499,6 +511,7 @@ head(res_grid$DWBA)
     ## 6     68000 0.8545132 -0.0003822717-3.289791e-19i 1.461317e-07 -68.35256
 
 ``` r
+
 head(res_grid$SDWBA)
 ```
 
@@ -540,6 +553,7 @@ debugging a workflow, even if `parallel = TRUE` is the right choice for
 production runs.
 
 ``` r
+
 res_parallel <- simulate_ts(
   object = obj,
   frequency = seq(38e3, 120e3, by = 2e3),
@@ -619,8 +633,7 @@ Demer, David A., and Stéphane G. Conti. 2005. “New Target-Strength Model
 Indicates More Krill in the Southern Ocean.” *ICES Journal of Marine
 Science* 62 (1): 25–32. <https://doi.org/10.1016/j.icesjms.2004.07.027>.
 
-Jech, J. Michael, John K. Horne, Dezhang Chu, David A. Demer, David T.
-I. Francis, Natalia Gorska, Benjamin Jones, et al. 2015. “Comparisons
+Jech, J. Michael, John K. Horne, Dezhang Chu, et al. 2015. “Comparisons
 Among Ten Models of Acoustic Backscattering Used in Aquatic Ecosystem
 Research.” *The Journal of the Acoustical Society of America* 138 (6):
 3742–64. <https://doi.org/10.1121/1.4937607>.

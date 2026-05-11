@@ -65,6 +65,6 @@ Stanton, T. K. 1988. “Sound Scattering by Cylinders of Finite Length. I.
 Fluid Cylinders.” *The Journal of the Acoustical Society of America* 83
 (1): 55–63. <https://doi.org/10.1121/1.396184>.
 
-———. 1989. “Sound Scattering by Cylinders of Finite Length. III.
-Deformed Cylinders.” *The Journal of the Acoustical Society of America*
-86 (2): 691–705. <https://doi.org/10.1121/1.398193>.
+Stanton, T. K. 1989. “Sound Scattering by Cylinders of Finite Length.
+III. Deformed Cylinders.” *The Journal of the Acoustical Society of
+America* 86 (2): 691–705. <https://doi.org/10.1121/1.398193>.

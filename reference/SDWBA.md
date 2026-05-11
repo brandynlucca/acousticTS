@@ -11,6 +11,7 @@ variability in biological scatterers.
 
 This model is accessed via:
 
+
     target_strength(
       ...,
       model = "sdwba",

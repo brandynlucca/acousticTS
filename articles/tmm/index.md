@@ -94,6 +94,6 @@ Waterman, P. C. 1969. “New Formulation of Acoustic Scattering.” *The
 Journal of the Acoustical Society of America* 45 (6): 1417–29.
 <https://doi.org/10.1121/1.1911619>.
 
-———. 2009. “T -Matrix Methods in Acoustic Scattering.” *The Journal of
-the Acoustical Society of America* 125 (1): 42–51.
+Waterman, P. C. 2009. “T -Matrix Methods in Acoustic Scattering.” *The
+Journal of the Acoustical Society of America* 125 (1): 42–51.
 <https://doi.org/10.1121/1.3035839>.

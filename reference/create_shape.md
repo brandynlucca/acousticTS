@@ -31,14 +31,14 @@ object.
 The **shape** argument specifies what shape for the function to generate
 the desired shape for TS modeling. Options currently include:
 
-|     |                             |                       |     |                            |                                                                                                          |
-|-----|-----------------------------|-----------------------|-----|----------------------------|----------------------------------------------------------------------------------------------------------|
-|     | **Object shape**            | **shape = ...**       |     | **Parameters**             | **Root function**                                                                                        |
-|     | *Discrete/tapered cylinder* | "cylinder"            |     | length, radius             | [`cylinder(...)`](https://brandynlucca.github.io/acousticTS/reference/cylinder.md)                       |
-|     | *Polynomial cylinder*       | "polynomial_cylinder" |     | length, radius, polynomial | [`polynomial_cylinder(...)`](https://brandynlucca.github.io/acousticTS/reference/polynomial_cylinder.md) |
-|     | *Oblate spheroid*           | "oblate_spheroid"     |     | length, radius             | [`oblate_spheroid(...)`](https://brandynlucca.github.io/acousticTS/reference/oblate_spheroid.md)         |
-|     | *Prolate spheroid*          | "prolate_spheroid"    |     | length, radius             | [`prolate_spheroid(...)`](https://brandynlucca.github.io/acousticTS/reference/prolate_spheroid.md)       |
-|     | *Sphere*                    | "sphere"              |     | radius                     | [`sphere(...)`](https://brandynlucca.github.io/acousticTS/reference/sphere.md)                           |
+|  |  |  |  |  |  |
+|----|----|----|----|----|----|
+|  | **Object shape** | **shape = ...** |  | **Parameters** | **Root function** |
+|  | *Discrete/tapered cylinder* | "cylinder" |  | length, radius | [`cylinder(...)`](https://brandynlucca.github.io/acousticTS/reference/cylinder.md) |
+|  | *Polynomial cylinder* | "polynomial_cylinder" |  | length, radius, polynomial | [`polynomial_cylinder(...)`](https://brandynlucca.github.io/acousticTS/reference/polynomial_cylinder.md) |
+|  | *Oblate spheroid* | "oblate_spheroid" |  | length, radius | [`oblate_spheroid(...)`](https://brandynlucca.github.io/acousticTS/reference/oblate_spheroid.md) |
+|  | *Prolate spheroid* | "prolate_spheroid" |  | length, radius | [`prolate_spheroid(...)`](https://brandynlucca.github.io/acousticTS/reference/prolate_spheroid.md) |
+|  | *Sphere* | "sphere" |  | radius | [`sphere(...)`](https://brandynlucca.github.io/acousticTS/reference/sphere.md) |
 
 ### Model Parameter Definitions
 

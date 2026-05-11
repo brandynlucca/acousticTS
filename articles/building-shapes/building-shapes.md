@@ -30,6 +30,7 @@ Before getting into the interpretation tradeoffs, it helps to see the
 main shape builders in direct use.
 
 ``` r
+
 library(acousticTS)
 
 sphere_shape <- sphere(radius_body = 0.01, n_segments = 40)
@@ -78,6 +79,7 @@ stored geometry is being checked, not just assumed from the constructor
 call.
 
 ``` r
+
 plot_shape_profile <- function(shape_obj, main) {
   pos <- extract(shape_obj, "position_matrix")
   x <- pos[, "x"]
@@ -159,6 +161,7 @@ make the resulting shape class explicit at the call site.
 is a thin convenience dispatcher rather than the main pedagogical path.
 
 ``` r
+
 wrapped_shape <- create_shape(
   "cylinder",
   length_body = 0.03,
@@ -252,6 +255,7 @@ stronger the case becomes for preserving the measured morphology rather
 than forcing the target into an overly simple idealized form.
 
 ``` r
+
 measured_like <- arbitrary(
   x_body = c(0, 0.01, 0.02, 0.03, 0.04),
   radius_body = c(0, 0.004, 0.006, 0.004, 0)
@@ -268,6 +272,7 @@ head(extract(measured_like, "position_matrix"))
     ## [5,] 0.04 0.000 0.000  0.000
 
 ``` r
+
 plot_shape_profile(measured_like, main = "Arbitrary measured-like body")
 ```
 
@@ -316,6 +321,7 @@ somehow become exactly separable in spheroidal or cylindrical
 coordinates.
 
 ``` r
+
 cyl_fit <- canonicalize_shape(
   measured_like,
   to = "Cylinder",
@@ -335,6 +341,7 @@ data.frame(
     ## 1     Cylinder            0.04            0.04 0.002740549    0.4567582
 
 ``` r
+
 old_par <- par(no.readonly = TRUE)
 on.exit(par(old_par), add = TRUE)
 

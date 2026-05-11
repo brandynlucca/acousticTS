@@ -19,6 +19,7 @@ spheres, prolate spheroids, and cylinders.
 
 This model is accessed via:
 
+
     target_strength(
       ...,
       model = "HPA",

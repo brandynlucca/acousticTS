@@ -53,6 +53,7 @@ on that same object, and extracting the results only after the model
 runs are complete.
 
 ``` r
+
 library(acousticTS)
 
 shape_obj <- cylinder(
@@ -217,6 +218,7 @@ contain a systematic offset, a frequency-localized resonance mismatch,
 or a regime boundary where one approximation begins to fail.
 
 ``` r
+
 comparison <- data.frame(
   frequency = dwba_out$frequency,
   TS_DWBA = dwba_out$TS,
@@ -291,8 +293,7 @@ terms of the physical assumptions each model was designed to represent.
 
 ## References
 
-Jech, J. Michael, John K. Horne, Dezhang Chu, David A. Demer, David T.
-I. Francis, Natalia Gorska, Benjamin Jones, et al. 2015. “Comparisons
+Jech, J. Michael, John K. Horne, Dezhang Chu, et al. 2015. “Comparisons
 Among Ten Models of Acoustic Backscattering Used in Aquatic Ecosystem
 Research.” *The Journal of the Acoustical Society of America* 138 (6):
 3742–64. <https://doi.org/10.1121/1.4937607>.

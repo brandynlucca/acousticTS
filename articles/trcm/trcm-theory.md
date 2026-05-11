@@ -13,12 +13,12 @@ from a locally cylindrical body is produced by two coherent
 contributions: a prompt reflection from the near interface and a second
 contribution that enters the body, traverses the diameter, reflects from
 the far interface, and returns with additional phase ([Stanton et al.
-1993](#ref-Stanton_1993), [1998](#ref-Stanton_1998_1); [Stanton, Chu,
-and Wiebe 1998](#ref-Stanton_1998_2)). The model is therefore asymptotic
-from the outset. It does not attempt to represent low-order resonances
-or a full internal reverberation series. Instead, it keeps only the
-first two physically important specular paths and asks how they
-interfere.
+1993](#ref-Stanton_1993); [Stanton, Chu, and Wiebe
+1998](#ref-Stanton_1998_2); [Stanton, Chu, Wiebe, Martin, et al.
+1998](#ref-Stanton_1998_1)). The model is therefore asymptotic from the
+outset. It does not attempt to represent low-order resonances or a full
+internal reverberation series. Instead, it keeps only the first two
+physically important specular paths and asks how they interfere.
 
 Throughout this page, medium `1` is the surrounding seawater and medium
 `2` is the fluid-like body interior.
@@ -238,9 +238,9 @@ backscattering cross-section is:
 
 \sigma\_\text{bs} = \left\| \mathcal{f}\_\text{bs} \right\|^2,
 
-and the corresponding target strength is ([MacLennan, Fernandes, and
-Dalen 2002](#ref-MacLennan_2002); [Urick 1983](#ref-Urick_1983);
-[Simmonds and MacLennan 2005](#ref-Simmonds_2005)):
+and the corresponding target strength is ([MacLennan et al.
+2002](#ref-MacLennan_2002); [Urick 1983](#ref-Urick_1983); [Simmonds and
+MacLennan 2005](#ref-Simmonds_2005)):
 
 TS = 10 \log\_{10} \sigma\_\text{bs}.
 
@@ -350,7 +350,7 @@ Consistent Approach to Definitions and Symbols in Fisheries Acoustics.”
 <https://doi.org/10.1006/jmsc.2001.1158>.
 
 Simmonds, John, and David N. MacLennan. 2005. *Fisheries Acoustics:
-Theory and Practice*. 2nd ed. Oxford, UK: Blackwell Science.
+Theory and Practice*. 2nd ed. Blackwell Science.
 <https://doi.org/10.1002/9780470995303>.
 
 Stanton, Timothy K., Dezhang Chu, and Peter H. Wiebe. 1998. “Sound
@@ -369,5 +369,5 @@ Groups. I. Experimental Determination of Dominant Scattering
 Mechanisms.” *The Journal of the Acoustical Society of America* 103 (1):
 225–35. <https://doi.org/10.1121/1.421469>.
 
-Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed. New
-York, NY: McGraw-Hill.
+Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed.
+McGraw-Hill.

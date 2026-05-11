@@ -52,6 +52,7 @@ Two geometries are compared:
 In acousticTS, the objects are built as:
 
 ``` r
+
 library(acousticTS)
 
 density_sw <- 1026.8
@@ -94,6 +95,7 @@ straight_object
     ## Body orientation (relative to transducer face/axis):1.571 radians
 
 ``` r
+
 bent_object
 ```
 
@@ -125,6 +127,7 @@ along-body coherence is modified by curvature.
 The same `BCMS` call can be applied to either geometry:
 
 ``` r
+
 frequency <- seq(12e3, 400e3, by = 2e3)
 
 straight_object <- target_strength(
@@ -172,6 +175,7 @@ model.
 #### Accessing results
 
 ``` r
+
 bcms_results <- extract(bent_object, "model")$BCMS
 head(bcms_results)
 ```
@@ -195,9 +199,9 @@ relative to the straight-cylinder baseline.
 
 #### Straight-cylinder reduction
 
-| Reference relation           | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | f at max \Delta (kHz) | acousticTS elapsed (s) | Reference elapsed (s) |
-|:-----------------------------|------------------------:|-------------------------:|----------------------:|-----------------------:|----------------------:|
-| BCMS straight branch vs FCMS |                       0 |                        0 |                    12 |                   0.04 |                  0.04 |
+| Reference relation | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | f at max \Delta (kHz) | acousticTS elapsed (s) | Reference elapsed (s) |
+|:---|---:|---:|---:|---:|---:|
+| BCMS straight branch vs FCMS | 0 | 0 | 12 | 0.04 | 0.04 |
 
 This is the first defining identity of the model. When curvature is
 absent, `BCMS` should not behave like a different cylinder model. It
@@ -207,9 +211,9 @@ curvature correction truly drops out when it should.
 
 #### Bent-cylinder coherence relation
 
-| Reference relation                                        | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | f at max \Delta (kHz) | acousticTS elapsed (s) | Reference elapsed (s) |
-|:----------------------------------------------------------|------------------------:|-------------------------:|----------------------:|-----------------------:|----------------------:|
-| BCMS bent branch vs Stanton (1989) coherence construction |                       0 |                        0 |                    12 |                   0.13 |                     0 |
+| Reference relation | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | f at max \Delta (kHz) | acousticTS elapsed (s) | Reference elapsed (s) |
+|:---|---:|---:|---:|---:|---:|
+| BCMS bent branch vs Stanton (1989) coherence construction | 0 | 0 | 12 | 0.13 | 0 |
 
 This is the second defining identity. The bent-cylinder branch is
 expected to match the straight-cylinder modal-series result multiplied
@@ -247,6 +251,6 @@ Stanton, T. K. 1988. “Sound Scattering by Cylinders of Finite Length. I.
 Fluid Cylinders.” *The Journal of the Acoustical Society of America* 83
 (1): 55–63. <https://doi.org/10.1121/1.396184>.
 
-———. 1989. “Sound Scattering by Cylinders of Finite Length. III.
-Deformed Cylinders.” *The Journal of the Acoustical Society of America*
-86 (2): 691–705. <https://doi.org/10.1121/1.398193>.
+Stanton, T. K. 1989. “Sound Scattering by Cylinders of Finite Length.
+III. Deformed Cylinders.” *The Journal of the Acoustical Society of
+America* 86 (2): 691–705. <https://doi.org/10.1121/1.398193>.

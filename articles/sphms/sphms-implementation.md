@@ -32,6 +32,7 @@ reused for gas-filled and idealized rigid or pressure-release
 comparisons.
 
 ``` r
+
 library(acousticTS)
 
 sphere_shape <- sphere(
@@ -67,6 +68,7 @@ sound-speed contrast relative to the surrounding fluid.
 ### Calculating a TS-frequency spectrum
 
 ``` r
+
 frequency <- seq(1e3, 100e3, by = 1e3)
 
 gas_sphere <- target_strength(
@@ -101,6 +103,7 @@ spectrum.](sphms-model-plot.png)
 #### Accessing results
 
 ``` r
+
 sphms_results <- extract(gas_sphere, "model")$SPHMS
 head(sphms_results)
 ```
@@ -153,12 +156,12 @@ stored in `benchmark_ts`. The summary below uses the full spherical
 benchmark grid. Elapsed times are representative values from the current
 machine rather than universal expectations.
 
-| Boundary           | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | Elapsed (s) |
-|:-------------------|------------------------:|-------------------------:|------------:|
-| `fixed_rigid`      |                 0.00497 |                  0.00246 |        0.03 |
-| `pressure_release` |                 0.00500 |                  0.00243 |        0.09 |
-| `gas_filled`       |                 0.00499 |                  0.00263 |        0.06 |
-| `liquid_filled`    |                 0.00492 |                  0.00241 |        0.11 |
+| Boundary | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | Elapsed (s) |
+|:---|---:|---:|---:|
+| `fixed_rigid` | 0.00497 | 0.00246 | 0.03 |
+| `pressure_release` | 0.00500 | 0.00243 | 0.09 |
+| `gas_filled` | 0.00499 | 0.00263 | 0.06 |
+| `liquid_filled` | 0.00492 | 0.00241 | 0.11 |
 
 All four spherical boundary types remain very close to the benchmark
 family over the full grid, with the implementation staying within about
@@ -175,9 +178,9 @@ verify that the software implementations agree when they are solving the
 same penetrable spherical problem, rather than only asking how closely
 any one implementation tracks the benchmark family.
 
-| Boundary     | Comparison                                                                                                                                                                             | Mean abs. \Delta TS (dB) | Max abs. \Delta TS (dB) |
-|:-------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------:|------------------------:|
-| `gas_filled` | acousticTS vs`KRMr | 3.21e-14 | 2.21e-12 | |`gas_filled`| acousticTS vs echoSMs | 1.71e-13 | 1.52e-11 | |`liquid_filled`| acousticTS vs KRMr | 5.70e-12 | 1.30e-10 | |`liquid_filled\` |    acousticTS vs echoSMs |                3.68e-11 |
+| Boundary | Comparison | Mean abs. \Delta TS (dB) | Max abs. \Delta TS (dB) |
+|:---|:---|---:|---:|
+| `gas_filled` | acousticTS vs`KRMr | 3.21e-14 | 2.21e-12 | |`gas_filled`| acousticTS vs echoSMs | 1.71e-13 | 1.52e-11 | |`liquid_filled`| acousticTS vs KRMr | 5.70e-12 | 1.30e-10 | |`liquid_filled\` | acousticTS vs echoSMs | 3.68e-11 |
 
 Those values show that the penetrable SPHMS branches are effectively
 identical across the three implementations on the shared spherical
@@ -192,11 +195,11 @@ liquid-filled benchmark fit starts to move. The table below keeps the
 same weakly scattering liquid-filled benchmark and only changes that
 truncation cap.
 
-| Boundary        | `m_limit`    | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | Elapsed (s) |
-|:----------------|:-------------|------------------------:|-------------------------:|------------:|
-| `liquid_filled` | default rule |                 0.00492 |                  0.00241 |        0.07 |
-| `liquid_filled` | `20`         |                 0.52550 |                  0.00640 |        0.14 |
-| `liquid_filled` | `10`         |                58.24225 |                  8.07819 |        0.02 |
+| Boundary | `m_limit` | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | Elapsed (s) |
+|:---|:---|---:|---:|---:|
+| `liquid_filled` | default rule | 0.00492 | 0.00241 | 0.07 |
+| `liquid_filled` | `20` | 0.52550 | 0.00640 | 0.14 |
+| `liquid_filled` | `10` | 58.24225 | 8.07819 | 0.02 |
 
 That pattern is useful because it shows that SPHMS is not especially
 tolerant of aggressive modal under-truncation, even though the
@@ -215,7 +218,7 @@ Faran, James J. 1951. “Sound Scattering by Solid Cylinders and Spheres.”
 *The Journal of the Acoustical Society of America* 23 (4): 405–18.
 <https://doi.org/10.1121/1.1906780>.
 
-Gastauer, Sven. 2025. “SvenGastauer/KRMr: V0.4.8.” Zenodo.
+Gastauer, Sven. 2025. *SvenGastauer/KRMr: V0.4.8*. Zenodo.
 <https://doi.org/10.5281/ZENODO.15838374>.
 
 Hickling, Robert. 1962. “Analysis of Echoes from a Solid Elastic Sphere
@@ -223,6 +226,7 @@ in Water.” *The Journal of the Acoustical Society of America* 34 (10):
 1582–92. <https://doi.org/10.1121/1.1909055>.
 
 Macaulay, Gavin, and contributors. 2024. “echoSMs: Making Acoustic
-Scattering Models Available to Fisheries and Plankton Scientists.”
-*GitHub Repository*. <https://github.com/ices-tools-dev/echoSMs>;
+Scattering Models Available to Fisheries and Plankton Scientists.” In
+*GitHub Repository*.
+[Https://github.com/ices-tools-dev/echoSMs](https://github.com/ices-tools-dev/echoSMs);
 GitHub.

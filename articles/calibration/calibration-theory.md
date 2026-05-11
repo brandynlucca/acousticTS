@@ -10,11 +10,11 @@ Benchmarked Validated
 Echosounders are commonly calibrated with standard targets whose
 acoustic response is strong, repeatable, and sufficiently well
 understood that the backscattering level can be predicted independently
-of the instrument being calibrated ([K. G. Foote 1990](#ref-Foote_1990);
+of the instrument being calibrated ([Foote 1990](#ref-Foote_1990);
 [Demer et al. 2015](#ref-Demer_2015)). In fisheries and ocean-acoustics
 work, that standard target is often a tungsten carbide sphere, although
 aluminum, steel, brass, and copper spheres are also used in some
-settings ([Kenneth G. Foote 1982](#ref-Foote_1982); [Hickling
+settings ([Foote 1982](#ref-Foote_1982); [Hickling
 1962](#ref-Hickling_1962); [MacLennan 1981](#ref-Maclennan_1981)). The
 reason a solid sphere is so useful is not only that it is mechanically
 robust. It is also one of the few practically important targets for
@@ -333,12 +333,11 @@ backscattering cross-section, and target strength.
 
 Achenbach, J. D. 1973. *Wave Propagation in Elastic Solids*.
 North-Holland Series in Applied Mathematics and Mechanics, v. 16.
-Amsterdam New York: North-Holland Pub. Co. American Elsevier Pub. Co.
+North-Holland Pub. Co. American Elsevier Pub. Co.
 
-Demer, David A., Laurent Berger, Matteo Bernasconi, Egil Bethke, Kevin
-Boswell, Dezhang Chu, Reka Domokos, et al. 2015. “Calibration of
-Acoustic Instruments.” ICES Cooperative Research Report, no. 326: 133.
-<https://doi.org/10.17895/ices.pub.5494>.
+Demer, David A., Laurent Berger, Matteo Bernasconi, et al. 2015.
+*Calibration of Acoustic Instruments*. ICES Cooperative Research Report.
+no. 326: 133. <https://doi.org/10.17895/ices.pub.5494>.
 
 Faran, James J. 1951. “Sound Scattering by Solid Cylinders and Spheres.”
 *The Journal of the Acoustical Society of America* 23 (4): 405–18.
@@ -356,8 +355,8 @@ Hickling, Robert. 1962. “Analysis of Echoes from a Solid Elastic Sphere
 in Water.” *The Journal of the Acoustical Society of America* 34 (10):
 1582–92. <https://doi.org/10.1121/1.1909055>.
 
-MacLennan, D. N. 1981. “The Theory of Solid Spheres as Sonar Calibration
-Targets.” Scottish Fisheries Research Report 22. Department of
+MacLennan, D. N. 1981. *The Theory of Solid Spheres as Sonar Calibration
+Targets*. Scottish Fisheries Research Report 22. Department of
 Agriculture; Fisheries for Scotland.
 
 Rudgers, Anthony J. 1969. “Acoustic Pulses Scattered by a Rigid Sphere

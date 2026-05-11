@@ -9,6 +9,7 @@ contrasts or absolute values (contrasts derived relative to seawater).
 
 This model is accessed via:
 
+
     target_strength(
       ...,
       model="dwba",

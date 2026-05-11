@@ -353,7 +353,7 @@ by a large impedance jump at the boundary.
 
 Achenbach, J. D. 1973. *Wave Propagation in Elastic Solids*.
 North-Holland Series in Applied Mathematics and Mechanics, v. 16.
-Amsterdam New York: North-Holland Pub. Co. American Elsevier Pub. Co.
+North-Holland Pub. Co. American Elsevier Pub. Co.
 
 Anderson, Victor C. 1950. “Sound Scattering from a Fluid Sphere.” *The
 Journal of the Acoustical Society of America* 22 (4): 426–31.
@@ -373,8 +373,7 @@ Sound by Elastic Spherical Shells.” *The Journal of the Acoustical
 Society of America* 34 (3): 338–44. <https://doi.org/10.1121/1.1928120>.
 
 Medwin, Herman, and Clarence S. Clay. 1998. *Fundamentals of Acoustical
-Oceanography*. Applications of Modern Acoustics. San Diego, CA: Academic
-Press.
+Oceanography*. Applications of Modern Acoustics. Academic Press.
 
-Morse, Philip M., and K. Uno Ingard. 1968. *Theoretical Acoustics*. New
-York, NY: McGraw-Hill.
+Morse, Philip M., and K. Uno Ingard. 1968. *Theoretical Acoustics*.
+McGraw-Hill.

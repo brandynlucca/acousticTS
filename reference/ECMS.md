@@ -14,6 +14,7 @@ also accepted as geometry carriers for backward compatibility.
 
 This model is accessed via:
 
+
     target_strength(
       ...,
       model = "ECMS",

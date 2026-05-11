@@ -13,6 +13,7 @@ centroid before the two complex amplitudes are summed.
 
 This model is accessed via:
 
+
     target_strength(
       ...,
       model = "BBFM",

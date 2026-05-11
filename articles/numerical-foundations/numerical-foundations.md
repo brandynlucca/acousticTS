@@ -324,6 +324,7 @@ Even outside the exact modal models, a few small acoustic utilities
 appear constantly in the package.
 
 ``` r
+
 library(acousticTS)
 
 frequency <- c(38e3, 70e3, 120e3)
@@ -335,12 +336,14 @@ wavenumber(frequency, sound_speed)
     ## [1] 159.1740 293.2153 502.6548
 
 ``` r
+
 linear(-60)
 ```
 
     ## [1] 1e-06
 
 ``` r
+
 db(1e-6)
 ```
 
@@ -423,45 +426,41 @@ This page answers “what is hard about evaluating it robustly?”
 
 Abramowitz, Milton, and Irene A. Stegun. 1964. *Handbook of Mathematical
 Functions with Formulas, Graphs, and Mathematical Tables*. Ninth Dover
-printing, tenth GPO printing. New York: Dover Publications.
+printing, tenth GPO printing. Dover Publications.
 
 Betcke, Timo, and Matthew Scroggs. 2021. “Bempp-Cl: A Fast Python Based
 Just-in-Time Compiling Boundary Element Library.” *Journal of Open
 Source Software* 6 (59): 2879. <https://doi.org/10.21105/joss.02879>.
 
-Dunster, T. M. 2026. “Legendre and Related Functions.” In *NIST Digital
-Library of Mathematical Functions*, edited by F. W. J. Olver, A. B. Olde
-Daalhuis, D. W. Lozier, B. I. Schneider, B. A. Boisvert, C. W. Clark, B.
-R. Miller, B. V. Saunders, H. S. Cohl, and M. A. McClain.
-<https://dlmf.nist.gov/14>.
+Dunster, T. M. 2026. “Legendre and Related Functions.” Chap. 14 in *NIST
+Digital Library of Mathematical Functions*, edited by F. W. J. Olver, A.
+B. Olde Daalhuis, D. W. Lozier, et al. <https://dlmf.nist.gov/14>.
 
 Flammer, Carson. 1957. *Spheroidal Wave Functions*.
 <https://ui.adsabs.harvard.edu/abs/1957spwf.book.....F>.
 
-Folver, F. W. J., and L. C. Maximon. 2026. “Bessel Functions.” In *NIST
-Digital Library of Mathematical Functions*, edited by F. W. J. Olver, A.
-B. Olde Daalhuis, D. W. Lozier, B. I. Schneider, B. A. Boisvert, C. W.
-Clark, B. R. Miller, B. V. Saunders, H. S. Cohl, and M. A. McClain.
+Folver, F. W. J., and L. C. Maximon. 2026. “Bessel Functions.” Chap. 10
+in *NIST Digital Library of Mathematical Functions*, edited by F. W. J.
+Olver, A. B. Olde Daalhuis, D. W. Lozier, et al.
 <https://dlmf.nist.gov/10>.
 
 Press, William H., Saul A. Teukolsky, William T. Vetterling, and Brian
 P. Flannery. 2007. *Numerical Recipes: The Art of Scientific Computing*.
-3rd ed. New York, NY: Cambridge University Press.
+3rd ed. Cambridge University Press.
 
 Van Buren, A. L., and J. E. Boisvert. 2002. “Accurate Calculation of
 Prolate Spheroidal Radial Functions of the First Kind and Their First
 Derivatives.” *Quarterly of Applied Mathematics* 60 (3): 589–99.
 <https://doi.org/10.1090/qam/1915351>.
 
-———. 2004. “Improved Calculation of Prolate Spheroidal Radial Functions
-of the Second Kind and Their First Derivatives.” *Quarterly of Applied
-Mathematics* 62 (3): 493–507. <https://doi.org/10.1090/qam/2085732>.
+Van Buren, A. L., and J. E. Boisvert. 2004. “Improved Calculation of
+Prolate Spheroidal Radial Functions of the Second Kind and Their First
+Derivatives.” *Quarterly of Applied Mathematics* 62 (3): 493–507.
+<https://doi.org/10.1090/qam/2085732>.
 
-Volkmer, H. 2026. “Spheroidal Wave Functions.” In *NIST Digital Library
-of Mathematical Functions*, edited by F. W. J. Olver, A. B. Olde
-Daalhuis, D. W. Lozier, B. I. Schneider, B. A. Boisvert, C. W. Clark, B.
-R. Miller, B. V. Saunders, H. S. Cohl, and M. A. McClain.
-<https://dlmf.nist.gov/30>.
+Volkmer, H. 2026. “Spheroidal Wave Functions.” Chap. 30 in *NIST Digital
+Library of Mathematical Functions*, edited by F. W. J. Olver, A. B. Olde
+Daalhuis, D. W. Lozier, et al. <https://dlmf.nist.gov/30>.
 
 Waterman, P. C. 2009. “T -Matrix Methods in Acoustic Scattering.” *The
 Journal of the Acoustical Society of America* 125 (1): 42–51.

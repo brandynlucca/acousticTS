@@ -112,7 +112,7 @@
 <img src="logo.png" class="logo" alt=""><h1 id="acousticts-">acousticTS <a class="anchor" aria-label="anchor" href="#acousticts-"></a>
 </h1>
 </div>
-<p><a href="https://doi.org/10.5281/zenodo.7600659" class="external-link"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.7600659.svg" alt="DOI"></a> <a href="https://brandynlucca.github.io/acousticTS/"><img src="https://img.shields.io/badge/Latest_Documentation-blue" alt="Documentation"></a> <a href="https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml/badge.svg" alt="Build status"></a> <a href="https://app.codecov.io/gh/brandynlucca/acousticTS?branch=main" class="external-link"><img src="https://codecov.io/gh/brandynlucca/acousticTS/graph/badge.svg?branch=main" alt="Coverage"></a> <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3-blue.svg" alt="License: GPL-3"></a></p>
+<p><a href="https://doi.org/10.5281/zenodo.7600659" class="external-link"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.7600659.svg" alt="DOI"></a> <a href="https://brandynlucca.github.io/acousticTS/"><img src="https://img.shields.io/badge/Latest_Documentation-blue" alt="Documentation"></a> <a href="https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml/badge.svg" alt="Build status"></a> <a href="https://app.codecov.io/gh/brandynlucca/acousticTS" class="external-link"><img src="https://img.shields.io/codecov/c/github/brandynlucca/acousticTS?label=Code+Coverage" alt="Code Coverage"></a> <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3-blue.svg" alt="License: GPL-3"></a></p>
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
@@ -145,33 +145,33 @@
 <col width="36%">
 <col width="54%">
 </colgroup>
-<thead><tr class="header">
+<thead><tr>
 <th>Class</th>
 <th>Description</th>
 <th>Example taxa</th>
 </tr></thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td><code>FLS</code></td>
 <td>Fluid-like scatterer</td>
 <td>Euphausiids, myctophids, decapod shrimp</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>SBF</code></td>
 <td>Swimbladder-bearing fish</td>
 <td>Herring, cod, sardine</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>GAS</code></td>
 <td>Gas-filled body</td>
 <td>Siphonophore pneumatophores</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>ESS</code></td>
 <td>Elastic-shelled scatterer</td>
 <td>Pteropods, juvenile bivalves</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>CAL</code></td>
 <td>Calibration sphere</td>
 <td>Tungsten carbide, copper spheres</td>
@@ -184,68 +184,68 @@
 <h2 id="models">Models<a class="anchor" aria-label="anchor" href="#models"></a>
 </h2>
 <table class="table">
-<thead><tr class="header">
+<thead><tr>
 <th>Model</th>
 <th>Abbreviation</th>
 <th>Scatterer type</th>
 <th>Boundary</th>
 </tr></thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td>Distorted-wave Born approximation</td>
 <td><code>DWBA</code></td>
 <td>FLS</td>
 <td>Fluid</td>
 </tr>
-<tr class="even">
+<tr>
 <td>Stochastic DWBA</td>
 <td><code>SDWBA</code></td>
 <td>FLS</td>
 <td>Fluid</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>Kirchhoff-ray mode</td>
 <td><code>KRM</code></td>
 <td>FLS, SBF</td>
 <td>Fluid + gas</td>
 </tr>
-<tr class="even">
+<tr>
 <td>High-pass approximation</td>
 <td><code>HPA</code></td>
 <td>FLS, GAS</td>
 <td>Fluid / gas</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>Two-ray cylinder model</td>
 <td><code>TRCM</code></td>
 <td>FLS</td>
 <td>Fluid</td>
 </tr>
-<tr class="even">
+<tr>
 <td>Modal series solution (sphere)</td>
 <td><code>SPHMS</code></td>
 <td>CAL, ESS</td>
 <td>Multiple</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>Modal series solution (prolate spheroid)</td>
 <td><code>PSMS</code></td>
 <td>FLS</td>
 <td>Fluid</td>
 </tr>
-<tr class="even">
+<tr>
 <td>Modal series solution (elastic shell)</td>
 <td><code>ESSMS</code></td>
 <td>ESS</td>
 <td>Elastic</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>Finite-cylinder modal series</td>
 <td><code>FCMS</code></td>
 <td>CAL</td>
 <td>Rigid / fluid</td>
 </tr>
-<tr class="even">
+<tr>
 <td>Resonance model (gas sphere)</td>
 <td><code>SOEMS</code></td>
 <td>GAS, CAL</td>
@@ -335,24 +335,24 @@
 <col width="50%">
 <col width="50%">
 </colgroup>
-<thead><tr class="header">
+<thead><tr>
 <th>Dataset</th>
 <th>Description</th>
 </tr></thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td><code>krill</code></td>
 <td>Antarctic krill (<em>Euphausia superba</em>) shape and material properties</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>cod</code></td>
 <td>Atlantic cod (<em>Gadus morhua</em>) shape and swimbladder</td>
 </tr>
-<tr class="odd">
+<tr>
 <td><code>sardine</code></td>
 <td>Pacific sardine (<em>Sardinops sagax</em>) shape and swimbladder</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>benchmark_ts</code></td>
 <td>Benchmark TS values for model validation</td>
 </tr>

@@ -40,6 +40,7 @@ external far-field solver as the first stage.
 
 This model is accessed via:
 
+
     target_strength(
       ...,
       model = "TMM",

@@ -30,6 +30,7 @@ spheroidal system has been solved.
 ### Prolate spheroid object generation
 
 ``` r
+
 library(acousticTS)
 
 prolate_shape <- prolate_spheroid(
@@ -73,6 +74,7 @@ somewhat longer than it is wide.
 ### Calculating a TS-frequency spectrum
 
 ``` r
+
 frequency <- seq(38e3, 120e3, by = 8e3)
 
 prolate_object <- target_strength(
@@ -216,6 +218,7 @@ The safest way to use the switch is:
 The code below shows the two usage patterns explicitly.
 
 ``` r
+
 # Literal hard-cap evaluation
 obj_literal <- target_strength(
   object = prolate_object,
@@ -279,27 +282,27 @@ benchmark values exist.
 - Rigid and pressure release
 - Liquid filled
 
-| Boundary           | Precision | `adaptive` | `n_integration` | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) |
-|:-------------------|:----------|:-----------|:----------------|------------------------:|-------------------------:|
-| `fixed_rigid`      | `double`  | `FALSE`    | `96`            |                 0.00674 |                  0.00230 |
-| `fixed_rigid`      | `double`  | `TRUE`     |                 |                 0.00674 |                  0.00230 |
-| `fixed_rigid`      | `quad`    | `FALSE`    | `96`            |                 0.00096 |                  0.00083 |
-| `fixed_rigid`      | `quad`    | `TRUE`     |                 |                 0.00096 |                  0.00083 |
-| `pressure_release` | `double`  | `FALSE`    | `96`            |                 0.00412 |                  0.00251 |
-| `pressure_release` | `double`  | `TRUE`     |                 |                 0.00412 |                  0.00251 |
-| `pressure_release` | `quad`    | `FALSE`    | `96`            |                 0.00433 |                  0.00293 |
-| `pressure_release` | `quad`    | `TRUE`     |                 |                 0.00433 |                  0.00293 |
+| Boundary | Precision | `adaptive` | `n_integration` | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) |
+|:---|:---|:---|:---|---:|---:|
+| `fixed_rigid` | `double` | `FALSE` | `96` | 0.00674 | 0.00230 |
+| `fixed_rigid` | `double` | `TRUE` |  | 0.00674 | 0.00230 |
+| `fixed_rigid` | `quad` | `FALSE` | `96` | 0.00096 | 0.00083 |
+| `fixed_rigid` | `quad` | `TRUE` |  | 0.00096 | 0.00083 |
+| `pressure_release` | `double` | `FALSE` | `96` | 0.00412 | 0.00251 |
+| `pressure_release` | `double` | `TRUE` |  | 0.00412 | 0.00251 |
+| `pressure_release` | `quad` | `FALSE` | `96` | 0.00433 | 0.00293 |
+| `pressure_release` | `quad` | `TRUE` |  | 0.00433 | 0.00293 |
 
 | Precision | `simplify_Amn` | `adaptive` | `n_integration` | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) |
-|:----------|:---------------|:-----------|:----------------|------------------------:|-------------------------:|
-| `double`  | `FALSE`        | `FALSE`    | `96`            |                 8.67114 |                  1.53575 |
-| `double`  | `FALSE`        | `TRUE`     |                 |                17.34265 |                  4.59850 |
-| `double`  | `TRUE`         | `FALSE`    | `96`            |                 7.18195 |                  2.22574 |
-| `double`  | `TRUE`         | `TRUE`     |                 |                 7.18195 |                  2.22574 |
-| `quad`    | `FALSE`        | `FALSE`    | `96`            |                 0.08263 |                  0.02805 |
-| `quad`    | `FALSE`        | `TRUE`     |                 |                 0.08348 |                  0.02806 |
-| `quad`    | `TRUE`         | `FALSE`    | `96`            |                 3.65223 |                  1.46801 |
-| `quad`    | `TRUE`         | `TRUE`     |                 |                 3.65223 |                  1.46801 |
+|:---|:---|:---|:---|---:|---:|
+| `double` | `FALSE` | `FALSE` | `96` | 8.67114 | 1.53575 |
+| `double` | `FALSE` | `TRUE` |  | 17.34265 | 4.59850 |
+| `double` | `TRUE` | `FALSE` | `96` | 7.18195 | 2.22574 |
+| `double` | `TRUE` | `TRUE` |  | 7.18195 | 2.22574 |
+| `quad` | `FALSE` | `FALSE` | `96` | 0.08263 | 0.02805 |
+| `quad` | `FALSE` | `TRUE` |  | 0.08348 | 0.02806 |
+| `quad` | `TRUE` | `FALSE` | `96` | 3.65223 | 1.46801 |
+| `quad` | `TRUE` | `TRUE` |  | 3.65223 | 1.46801 |
 
 Several practical points follow from this comparison.
 
@@ -343,17 +346,17 @@ differences actually occur. For the main liquid-filled benchmark
 configuration, the frequency-specific comparison is:
 
 | Frequency (kHz) | Benchmark TS (dB) | Literal TS (dB) | Adaptive TS (dB) | Adaptive `n_integration` | Literal \Delta TS (dB) | Adaptive \Delta TS (dB) |
-|----------------:|------------------:|----------------:|-----------------:|-------------------------:|-----------------------:|------------------------:|
-|              12 |            -87.05 |       -87.05331 |        -87.05331 |                       32 |               -0.00331 |                -0.00331 |
-|              18 |            -81.19 |       -81.19965 |        -81.19965 |                       32 |               -0.00965 |                -0.00965 |
-|              38 |            -77.17 |       -77.20046 |        -77.20046 |                       32 |               -0.03046 |                -0.03046 |
-|              70 |            -76.92 |       -76.95042 |        -76.95042 |                       32 |               -0.03042 |                -0.03042 |
-|             120 |            -80.58 |       -80.55970 |        -80.55951 |                       32 |                0.02030 |                 0.02049 |
-|             200 |            -89.31 |       -89.39263 |        -89.39348 |                       48 |               -0.08263 |                -0.08348 |
-|             250 |            -79.39 |       -79.42879 |        -79.42819 |                       56 |               -0.03879 |                -0.03819 |
-|             300 |            -77.52 |       -77.51659 |        -77.51653 |                       64 |                0.00341 |                 0.00347 |
-|             333 |              `NA` |       -76.90684 |        -76.90677 |                       72 |                   `NA` |                    `NA` |
-|             400 |            -78.41 |       -78.44349 |        -78.44309 |                       88 |               -0.03349 |                -0.03309 |
+|---:|---:|---:|---:|---:|---:|---:|
+| 12 | -87.05 | -87.05331 | -87.05331 | 32 | -0.00331 | -0.00331 |
+| 18 | -81.19 | -81.19965 | -81.19965 | 32 | -0.00965 | -0.00965 |
+| 38 | -77.17 | -77.20046 | -77.20046 | 32 | -0.03046 | -0.03046 |
+| 70 | -76.92 | -76.95042 | -76.95042 | 32 | -0.03042 | -0.03042 |
+| 120 | -80.58 | -80.55970 | -80.55951 | 32 | 0.02030 | 0.02049 |
+| 200 | -89.31 | -89.39263 | -89.39348 | 48 | -0.08263 | -0.08348 |
+| 250 | -79.39 | -79.42879 | -79.42819 | 56 | -0.03879 | -0.03819 |
+| 300 | -77.52 | -77.51659 | -77.51653 | 64 | 0.00341 | 0.00347 |
+| 333 | `NA` | -76.90684 | -76.90677 | 72 | `NA` | `NA` |
+| 400 | -78.41 | -78.44349 | -78.44309 | 88 | -0.03349 | -0.03309 |
 
 That table compares the literal run `adaptive = FALSE`,
 `n_integration = 96` against the adaptive run `adaptive = TRUE`, which
@@ -371,6 +374,7 @@ that is to hold every other setting fixed and then plot the
 where `b` is the spheroid minor radius.
 
 ``` r
+
 precision_freq <- c(12e3, 18e3, 38e3, 70e3, 100e3)
 precision_obj <- fls_generate(
   shape = prolate_spheroid(
@@ -555,23 +559,23 @@ numerical agreement is nearly identical while their runtimes are not.
 - Prol_Spheroid
 - Runtime
 
-| Case               | Frequency set (kHz)   | Max abs. \Delta TS | Mean abs. \Delta TS (dB) |
-|:-------------------|:----------------------|-------------------:|-------------------------:|
-| `fixed_rigid`      | `12, 18, 38, 70, 100` |          `0.49692` |                `0.10091` |
-| `pressure_release` | `12, 18, 38, 70, 100` |          `0.08619` |                `0.01757` |
-| `liquid_filled`    | `12, 18, 38, 70, 100` |          `1.01676` |                `0.20537` |
+| Case | Frequency set (kHz) | Max abs. \Delta TS | Mean abs. \Delta TS (dB) |
+|:---|:---|---:|---:|
+| `fixed_rigid` | `12, 18, 38, 70, 100` | `0.49692` | `0.10091` |
+| `pressure_release` | `12, 18, 38, 70, 100` | `0.08619` | `0.01757` |
+| `liquid_filled` | `12, 18, 38, 70, 100` | `1.01676` | `0.20537` |
 
-| Case               | Frequency set (kHz)   | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | Max abs. \Delta TS vs vectorized (dB) | Mean abs. \Delta TS vs vectorized (dB) |
-|:-------------------|:----------------------|------------------------:|-------------------------:|--------------------------------------:|---------------------------------------:|
-| `fixed_rigid`      | `12, 18, 38, 70, 100` |                   `N/A` |                    `N/A` |                                 `N/A` |                                  `N/A` |
-| `pressure_release` | `12, 18, 38, 70, 100` |                   `N/A` |                    `N/A` |                                 `N/A` |                                  `N/A` |
-| `liquid_filled`    | `12, 18, 38, 70, 100` |               `0.00128` |                `0.00055` |                             `0.00128` |                              `0.00055` |
+| Case | Frequency set (kHz) | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | Max abs. \Delta TS vs vectorized (dB) | Mean abs. \Delta TS vs vectorized (dB) |
+|:---|:---|---:|---:|---:|---:|
+| `fixed_rigid` | `12, 18, 38, 70, 100` | `N/A` | `N/A` | `N/A` | `N/A` |
+| `pressure_release` | `12, 18, 38, 70, 100` | `N/A` | `N/A` | `N/A` | `N/A` |
+| `liquid_filled` | `12, 18, 38, 70, 100` | `0.00128` | `0.00055` | `0.00128` | `0.00055` |
 
-| Case               | Frequency set (kHz)   | t\_\text{acousticTS} (s) | t\_\text{echoSMs} (s) | t\_\text{Prol\\Spheroid} (s) | t\_\text{Prol\\Spheroid-vectorized} (s) |
-|:-------------------|:----------------------|-------------------------:|----------------------:|-----------------------------:|----------------------------------------:|
-| `fixed_rigid`      | `12, 18, 38, 70, 100` |                   `0.86` |                `0.34` |                        `N/A` |                                   `N/A` |
-| `pressure_release` | `12, 18, 38, 70, 100` |                   `0.93` |                `0.33` |                        `N/A` |                                   `N/A` |
-| `liquid_filled`    | `12, 18, 38, 70, 100` |                   `2.72` |               `48.02` |                      `48.65` |                                 `11.06` |
+| Case | Frequency set (kHz) | t\_\text{acousticTS} (s) | t\_\text{echoSMs} (s) | t\_\text{Prol\\Spheroid} (s) | t\_\text{Prol\\Spheroid-vectorized} (s) |
+|:---|:---|---:|---:|---:|---:|
+| `fixed_rigid` | `12, 18, 38, 70, 100` | `0.86` | `0.34` | `N/A` | `N/A` |
+| `pressure_release` | `12, 18, 38, 70, 100` | `0.93` | `0.33` | `N/A` | `N/A` |
+| `liquid_filled` | `12, 18, 38, 70, 100` | `2.72` | `48.02` | `48.65` | `11.06` |
 
 These checks are informative in a more mixed way once `70` and `100 kHz`
 are included. The penetrable liquid-filled case remains extremely close
@@ -606,12 +610,12 @@ implementation, requests for the full gas-filled branch are routed onto
 the same simplified penetrable formulation used by the explicit
 `simplify_Amn = TRUE` rows.
 
-| Case                                                | Frequency set (kHz)        | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | t\_\text{acousticTS} (s) | t\_\text{Prol\\Spheroid} (s) |
-|:----------------------------------------------------|:---------------------------|------------------------:|-------------------------:|-------------------------:|-----------------------------:|
-| `benchmark broadside, double, simplified, literal`  | `12, 18, 38, 70, 120, 200` |               `2.19518` |                `0.59593` |                   `0.13` |                      `89.93` |
-| `benchmark broadside, double, simplified, adaptive` | `12, 18, 38, 70, 120, 200` |               `2.19518` |                `0.59593` |                   `0.14` |                      `89.93` |
-| `benchmark broadside, quad, simplified, literal`    | `12, 18, 38, 70, 120, 200` |               `0.13946` |                `0.04163` |                   `3.04` |                      `89.93` |
-| `benchmark broadside, quad, simplified, adaptive`   | `12, 18, 38, 70, 120, 200` |               `0.13946` |                `0.04163` |                   `3.21` |                      `89.93` |
+| Case | Frequency set (kHz) | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | t\_\text{acousticTS} (s) | t\_\text{Prol\\Spheroid} (s) |
+|:---|:---|---:|---:|---:|---:|
+| `benchmark broadside, double, simplified, literal` | `12, 18, 38, 70, 120, 200` | `2.19518` | `0.59593` | `0.13` | `89.93` |
+| `benchmark broadside, double, simplified, adaptive` | `12, 18, 38, 70, 120, 200` | `2.19518` | `0.59593` | `0.14` | `89.93` |
+| `benchmark broadside, quad, simplified, literal` | `12, 18, 38, 70, 120, 200` | `0.13946` | `0.04163` | `3.04` | `89.93` |
+| `benchmark broadside, quad, simplified, adaptive` | `12, 18, 38, 70, 120, 200` | `0.13946` | `0.04163` | `3.21` | `89.93` |
 
 #### Plotting results
 
@@ -621,6 +625,7 @@ geometry.](psms-shape-plot.png)
 #### Accessing results
 
 ``` r
+
 psms_results <- extract(prolate_object, "model")$PSMS
 head(psms_results)
 ```
@@ -678,8 +683,7 @@ Furusawa, Masahiko. 1988. “Prolate Spheroidal Models for Predicting
 General Trends of Fish Target Strength.” *Journal of the Acoustical
 Society of Japan (E)* 9 (1): 13–24. <https://doi.org/10.1250/ast.9.13>.
 
-Jech, J. Michael, John K. Horne, Dezhang Chu, David A. Demer, David T.
-I. Francis, Natalia Gorska, Benjamin Jones, et al. 2015. “Comparisons
+Jech, J. Michael, John K. Horne, Dezhang Chu, et al. 2015. “Comparisons
 Among Ten Models of Acoustic Backscattering Used in Aquatic Ecosystem
 Research.” *The Journal of the Acoustical Society of America* 138 (6):
 3742–64. <https://doi.org/10.1121/1.4937607>.
@@ -692,8 +696,9 @@ Implications for Fisheries Acoustics.” *Journal of Sound and Vibration*,
 119227. https://doi.org/<https://doi.org/10.1016/j.jsv.2025.119227>.
 
 Macaulay, Gavin, and contributors. 2024. “echoSMs: Making Acoustic
-Scattering Models Available to Fisheries and Plankton Scientists.”
-*GitHub Repository*. <https://github.com/ices-tools-dev/echoSMs>;
+Scattering Models Available to Fisheries and Plankton Scientists.” In
+*GitHub Repository*.
+[Https://github.com/ices-tools-dev/echoSMs](https://github.com/ices-tools-dev/echoSMs);
 GitHub.
 
 Spence, R. D., and Sara Granger. 1951. “The Scattering of Sound from a

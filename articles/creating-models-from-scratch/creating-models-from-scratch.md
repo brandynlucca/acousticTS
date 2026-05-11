@@ -25,6 +25,7 @@ For a toy target strength-length model called `TSL`, that means
 defining:
 
 ``` r
+
 tsl_initialize <- function(...) {
   ...
 }
@@ -70,6 +71,7 @@ For a simple model name like `"tsl"`, a minimal user-defined
 registration looks like this:
 
 ``` r
+
 register_model(
   name = "tsl",
   initialize = tsl_initialize,
@@ -123,6 +125,7 @@ empirical coefficients in the `$TSL` model-parameter slot, then creates
 an empty result table in the `$TSL` model slot.
 
 ``` r
+
 tsl_initialize <- function(object,
                            frequency,
                            intercept = -70,
@@ -179,6 +182,7 @@ parameters out of `$TSL`, computes `TS`, converts to `sigma_bs`, and
 stores the finished results back into the model slot.
 
 ``` r
+
 TSL <- function(object) {
   model <- acousticTS::extract(object, "model_parameters")$TSL
 
@@ -205,6 +209,7 @@ This is enough for the solver itself. To make the model callable through
 register it:
 
 ``` r
+
 register_model(
   name = "tsl",
   initialize = tsl_initialize,
@@ -238,6 +243,7 @@ There are two clean ways to use a new model.
 For a package-style source file, a minimal version would look like this:
 
 ``` r
+
 #' Target strength-length model (TSL)
 #'
 #' @description
@@ -284,6 +290,7 @@ Once the functions are defined and registered, the new model can be
 called through the standard wrapper:
 
 ``` r
+
 target <- target_strength(
   object = target,
   frequency = seq(38000, 120000, by = 1000),
@@ -297,6 +304,7 @@ From the user’s perspective, `TSL` then behaves like any other model.
 The results live in the model slot and can be inspected with:
 
 ``` r
+
 extract(target, "model")$TSL
 ```
 
@@ -304,6 +312,7 @@ The currently available built-in and user-registered models can be
 listed with:
 
 ``` r
+
 available_models()
 ```
 

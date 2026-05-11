@@ -9,6 +9,7 @@ near normal incidence.
 
 This model is accessed via:
 
+
     target_strength(
       ...,
       model = "BCMS",

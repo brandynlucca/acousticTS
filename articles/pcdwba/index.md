@@ -9,7 +9,7 @@ Validated Experimental
 
 These pages follow the phase-compensated weak-scattering literature for
 broadside elongated bodies and krill-style applications ([Chu and Ye
-1999](#ref-Chu_1999); [Chu, Foote, and Stanton 1993](#ref-Chu_1993)).
+1999](#ref-Chu_1999); [Chu et al. 1993](#ref-Chu_1993)).
 
 The phase-compensated distorted wave Born approximation (`PCDWBA`) is
 the curved-body extension of the weak-scattering `DWBA`. It keeps the

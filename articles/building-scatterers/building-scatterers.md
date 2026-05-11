@@ -31,6 +31,7 @@ The fastest way to see the package logic is to build a few small objects
 directly.
 
 ``` r
+
 library(acousticTS)
 
 shape_obj <- prolate_spheroid(
@@ -78,6 +79,7 @@ the scatterer plot reflects the stored object that will be passed into
 not just the constructor inputs.
 
 ``` r
+
 old_par <- par(no.readonly = TRUE)
 on.exit(par(old_par), add = TRUE)
 
@@ -200,6 +202,7 @@ useful and does not add the same kind of cognitive overhead as
 overloading the geometry interface.
 
 ``` r
+
 body_shape <- arbitrary(
   x_body = c(0, 0.08, 0.12),
   zU_body = c(0.001, 0.004, 0.001),
@@ -240,6 +243,7 @@ directly so the separation between components is explicit in code as
 well as in the plot.
 
 ``` r
+
 list(
   body_length_m = extract(sbf_obj, c("shape_parameters", "body", "length")),
   bladder_length_m = extract(sbf_obj, c("shape_parameters", "bladder", "length")),
@@ -328,6 +332,7 @@ The same shape-first pattern extends to the other target families as
 well:
 
 ``` r
+
 # Explicit body-plus-backbone target for BBFM workflows
 bbf_obj <- bbf_generate(
   body_shape = arbitrary(
@@ -368,6 +373,7 @@ ess_obj <- ess_generate(
 ```
 
 ``` r
+
 cal_obj <- cal_generate(
   material = "WC",
   diameter = 38.1e-3,
@@ -417,12 +423,14 @@ modeling problems are actually scatterer-construction problems
 discovered too late.
 
 ``` r
+
 extract(fls_obj, c("body", "density"))
 ```
 
     ## [1] 1045
 
 ``` r
+
 extract(fls_obj, c("shape_parameters", "shape"))
 ```
 

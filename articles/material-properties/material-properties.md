@@ -94,6 +94,7 @@ The acoustic wavenumber appears everywhere because it connects frequency
 and sound speed to acoustic size.
 
 ``` r
+
 library(acousticTS)
 
 frequency <- c(38e3, 70e3, 120e3)
@@ -121,12 +122,14 @@ Model outputs are often easier to compare in different domains depending
 on the question.
 
 ``` r
+
 linear(-60)
 ```
 
     ## [1] 1e-06
 
 ``` r
+
 db(1e-6)
 ```
 
@@ -150,6 +153,7 @@ The package also exposes simple interface-level calculations that are
 useful for sanity checks.
 
 ``` r
+
 medium <- data.frame(density = 1026, sound_speed = 1500)
 target <- data.frame(density = 1045, sound_speed = 1520)
 
@@ -193,6 +197,7 @@ for shear modulus, and
 for the Lamé parameter ([Achenbach 1973](#ref-Achenbach_1973)).
 
 ``` r
+
 E <- 7e10
 nu <- 0.32
 
@@ -206,12 +211,14 @@ G
     ## [1] 26515151515
 
 ``` r
+
 K
 ```
 
     ## [1] 64814814815
 
 ``` r
+
 lambda
 ```
 
@@ -318,8 +325,7 @@ and the reporting domain were all defined consistently.
 
 Achenbach, J. D. 1973. *Wave Propagation in Elastic Solids*.
 North-Holland Series in Applied Mathematics and Mechanics, v. 16.
-Amsterdam New York: North-Holland Pub. Co. American Elsevier Pub. Co.
+North-Holland Pub. Co. American Elsevier Pub. Co.
 
 Medwin, Herman, and Clarence S. Clay. 1998. *Fundamentals of Acoustical
-Oceanography*. Applications of Modern Acoustics. San Diego, CA: Academic
-Press.
+Oceanography*. Applications of Modern Acoustics. Academic Press.

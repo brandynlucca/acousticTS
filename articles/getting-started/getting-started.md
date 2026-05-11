@@ -49,6 +49,7 @@ is usually not the overall workflow, but the physical meaning of the
 geometry and the assumptions built into the selected model.
 
 ``` r
+
 library(acousticTS)
 
 # 1. Create a geometry
@@ -244,15 +245,13 @@ same workflow.
 
 ## References
 
-Jech, J. Michael, John K. Horne, Dezhang Chu, David A. Demer, David T.
-I. Francis, Natalia Gorska, Benjamin Jones, et al. 2015. “Comparisons
+Jech, J. Michael, John K. Horne, Dezhang Chu, et al. 2015. “Comparisons
 Among Ten Models of Acoustic Backscattering Used in Aquatic Ecosystem
 Research.” *The Journal of the Acoustical Society of America* 138 (6):
 3742–64. <https://doi.org/10.1121/1.4937607>.
 
 Medwin, Herman, and Clarence S. Clay. 1998. *Fundamentals of Acoustical
-Oceanography*. Applications of Modern Acoustics. San Diego, CA: Academic
-Press.
+Oceanography*. Applications of Modern Acoustics. Academic Press.
 
 Stanton, T. 1996. “Acoustic Scattering Characteristics of Several
 Zooplankton Groups.” *ICES Journal of Marine Science* 53 (2): 289–95.

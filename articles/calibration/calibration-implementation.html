@@ -131,7 +131,7 @@
 </div>
 </div>
 <p>These pages are grounded in the standard-target calibration
-literature for elastic reference spheres <span class="citation">(<a href="#ref-Dragonette_1981">Dragonette, Numrich, and Frank 1981</a>; <a href="#ref-Foote_1990">Foote 1990</a>; <a href="#ref-Maclennan_1981">MacLennan 1981</a>)</span>.</p>
+literature for elastic reference spheres <span class="citation">(<a href="#ref-Dragonette_1981">Dragonette et al. 1981</a>; <a href="#ref-Foote_1990">Foote 1990</a>; <a href="#ref-Maclennan_1981">MacLennan 1981</a>)</span>.</p>
 <p>The calibration workflow in acousticTS is designed to be short and
 explicit. A user first creates a calibration sphere object, then
 evaluates the calibration model over a chosen frequency grid, and
@@ -338,8 +338,8 @@ and shear wave speeds have changed.</p>
 solution, the most useful implementation check is agreement with other
 <span class="citation">MacLennan (<a href="#ref-Maclennan_1981">1981</a>)</span> elastic-sphere
 implementations rather than with a separate benchmark family. In the
-comparisons below, that includes SphereTS <span class="citation">(<a href="#ref-SphereTS_software">G. J. Macaulay 2025</a>)</span> alongside
-the other reference implementations. The acousticTS solver includes an
+comparisons below, that includes SphereTS <span class="citation">(<a href="#ref-SphereTS_software">Macaulay 2025</a>)</span> alongside the
+other reference implementations. The acousticTS solver includes an
 <code>adaptive</code> argument. When <code>adaptive = TRUE</code> (the
 default), the solver starts from the usual <span class="math inline">\mathrm{round}(ka)+10</span> partial waves and then
 extends the sum until the tail term is below <span class="math inline">10^{-10}</span>. When <code>adaptive = FALSE</code>,
@@ -423,9 +423,9 @@ tungsten-carbide spectrum from about 0.31 s to about 0.37 s.</p>
 <p>To show that this is not unique to the 38.1 mm tungsten-carbide
 sphere, the same comparison was repeated for one smaller
 tungsten-carbide sphere and one copper sphere from the
-calibration-target definitions shipped with echoSMs <span class="citation">(<a href="#ref-echoSMs_software">G. Macaulay and
-contributors 2024</a>)</span>, again including the <code>SphereTS</code>
-implementation <span class="citation">(<a href="#ref-SphereTS_software">G. J. Macaulay 2025</a>)</span>.</p>
+calibration-target definitions shipped with echoSMs <span class="citation">(<a href="#ref-echoSMs_software"><span class="nocase">Macaulay and contributors</span> 2024</a>)</span>, again
+including the <code>SphereTS</code> implementation <span class="citation">(<a href="#ref-SphereTS_software">Macaulay
+2025</a>)</span>.</p>
 <table class="table">
 <colgroup>
 <col width="5%">
@@ -543,7 +543,7 @@ ambiguity about what the target actually is.</p>
 <div class="section level2">
 <h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-Dragonette_1981" class="csl-entry">
 Dragonette, Louis R., S. K. Numrich, and Laurence J. Frank. 1981.
 <span>“Calibration Technique for Acoustic Scattering
@@ -556,17 +556,18 @@ Acoustic Measurement System.”</span> <em>ICES Journal of Marine
 Science</em> 46 (3): 284–86. <a href="https://doi.org/10.1093/icesjms/46.3.284" class="external-link">https://doi.org/10.1093/icesjms/46.3.284</a>.
 </div>
 <div id="ref-SphereTS_software" class="csl-entry">
-Macaulay, Gavin J. 2025. <span>“<span class="nocase">gavinmacaulay</span>/<span>SphereTS</span>:
-V1.0.8.”</span> <a href="https://github.com/gavinmacaulay/SphereTS" class="external-link">https://github.com/gavinmacaulay/SphereTS</a>.
+Macaulay, Gavin J. 2025. <em><span class="nocase">gavinmacaulay</span>/<span>SphereTS</span>: V1.0.8</em>.
+<a href="https://github.com/gavinmacaulay/SphereTS" class="external-link">https://github.com/gavinmacaulay/SphereTS</a>.
 </div>
 <div id="ref-echoSMs_software" class="csl-entry">
-Macaulay, Gavin, and contributors. 2024. <span>“<span class="nocase">echoSMs</span>: Making Acoustic Scattering Models
-Available to Fisheries and Plankton Scientists.”</span> <em>GitHub
-Repository</em>. <a href="https://github.com/ices-tools-dev/echoSMs" class="external-link uri">https://github.com/ices-tools-dev/echoSMs</a>; GitHub.
+<span class="nocase">Macaulay, Gavin, and contributors</span>. 2024.
+<span>“<span class="nocase">echoSMs</span>: Making Acoustic Scattering
+Models Available to Fisheries and Plankton Scientists.”</span> In
+<em>GitHub Repository</em>. <a href="https://github.com/ices-tools-dev/echoSMs" class="external-link uri">Https://github.com/ices-tools-dev/echoSMs</a>; GitHub.
 </div>
 <div id="ref-Maclennan_1981" class="csl-entry">
-MacLennan, D. N. 1981. <span>“The Theory of Solid Spheres as Sonar
-Calibration Targets.”</span> Scottish Fisheries Research Report 22.
+MacLennan, D. N. 1981. <em>The Theory of Solid Spheres as Sonar
+Calibration Targets</em>. Scottish Fisheries Research Report 22.
 Department of Agriculture; Fisheries for Scotland.
 </div>
 </div>

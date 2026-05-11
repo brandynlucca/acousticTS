@@ -8,6 +8,7 @@ Goodman and Stern (1962).
 
 This model is accessed via:
 
+
     target_strength(
       ...,
       model="essms",

@@ -11,6 +11,7 @@ in the SPHMS vignette.
 
 This model is accessed via:
 
+
     target_strength(
       ...,
       model="sphms",

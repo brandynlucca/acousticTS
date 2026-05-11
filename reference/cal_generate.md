@@ -72,13 +72,13 @@ Generates a CAL-class object.
 
 There are several options for the **material** argument:
 
-|              |              |          |         |                   |                    |
-|--------------|--------------|----------|---------|-------------------|--------------------|
-| **Material** | **Argument** | **c1**   | **c2**  | **\\\rho1\\**     | *Tungsten carbide* |
-| "WC"         | 6853         | 4171     | 14900   | *Stainless steel* | "steel"            |
-| 5980         | 3297         | 7970     | *Brass* | "brass"           | 4372               |
-| 2100         | 8360         | *Copper* | "Cu"    | 4760              | 2288.5             |
-| 8947         | *Aluminum*   | "Al"     | 6260    | 3080              | 2700               |
+|  |  |  |  |  |  |
+|----|----|----|----|----|----|
+| **Material** | **Argument** | **c1** | **c2** | **\\\rho1\\** | *Tungsten carbide* |
+| "WC" | 6853 | 4171 | 14900 | *Stainless steel* | "steel" |
+| 5980 | 3297 | 7970 | *Brass* | "brass" | 4372 |
+| 2100 | 8360 | *Copper* | "Cu" | 4760 | 2288.5 |
+| 8947 | *Aluminum* | "Al" | 6260 | 3080 | 2700 |
 
 ## See also
 

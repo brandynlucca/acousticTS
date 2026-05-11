@@ -35,6 +35,7 @@ speed, and elastic constants. The inner fluid can be provided using
 either contrasts or absolute material properties.
 
 ``` r
+
 library(acousticTS)
 
 sphere_shape <- sphere(radius_body = 10e-3, n_segments = 80)
@@ -87,6 +88,7 @@ stores the results back inside the same object. As with the rest of the
 package, frequency is supplied in Hz.
 
 ``` r
+
 frequency <- seq(38e3, 120e3, by = 4e3)
 
 shelled_sphere <- target_strength(
@@ -109,6 +111,7 @@ used in the implementation example.](essms-shape-plot.png)
 #### Accessing results
 
 ``` r
+
 essms_results <- extract(shelled_sphere, "model")$ESSMS
 head(essms_results)
 ```

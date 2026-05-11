@@ -33,6 +33,7 @@ The Johnson (1977) and Stanton (1989) sphere formulations can be
 compared using the same spherical `FLS` object.
 
 ``` r
+
 library(acousticTS)
 
 sphere_shape <- sphere(
@@ -75,6 +76,7 @@ shared across anisotropic shapes where orientation does matter.
 ### Calculating a TS-frequency spectrum
 
 ``` r
+
 frequency <- seq(18e3, 200e3, by = 7e3)
 
 hpa_johnson <- target_strength(
@@ -121,6 +123,7 @@ example.](hpa-model-plot.png)
 #### Accessing results
 
 ``` r
+
 johnson_results <- extract(hpa_johnson, "model")$HPA
 stanton_results <- extract(hpa_stanton, "model")$HPA
 
@@ -136,6 +139,7 @@ head(johnson_results)
     ## 6     53000 2.208800e-09  -86.55844
 
 ``` r
+
 head(stanton_results)
 ```
 
@@ -176,6 +180,7 @@ changes the interpretation over the frequency band of interest.
 The `stanton` method is the one to use when the shape is not spherical.
 
 ``` r
+
 cylinder_shape <- cylinder(
   length_body = 25e-3,
   radius_body = 2e-3,
@@ -243,12 +248,12 @@ definitions and shows how the current HPA implementations compare with
 those benchmark series. Elapsed times are representative values from the
 current machine.
 
-| Case                            | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | Elapsed (s) |
-|:--------------------------------|------------------------:|-------------------------:|------------:|
-| Johnson (1977) sphere           |                42.20232 |                  6.34274 |        0.00 |
-| Stanton (1989) sphere           |                35.46445 |                  5.48942 |        0.01 |
-| Stanton (1989) prolate spheroid |                46.13636 |                  5.57418 |        0.01 |
-| Stanton (1989) cylinder         |                46.97943 |                  5.65639 |        0.00 |
+| Case | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | Elapsed (s) |
+|:---|---:|---:|---:|
+| Johnson (1977) sphere | 42.20232 | 6.34274 | 0.00 |
+| Stanton (1989) sphere | 35.46445 | 5.48942 | 0.01 |
+| Stanton (1989) prolate spheroid | 46.13636 | 5.57418 | 0.01 |
+| Stanton (1989) cylinder | 46.97943 | 5.65639 | 0.00 |
 
 Those numbers make the role of HPA very clear. It is extremely fast, but
 it is not a mode-by-mode benchmark reproducer. Its value is in
@@ -282,12 +287,12 @@ Johnson (1977) and Stanton (1989) algebra itself. The current local
 a spectrum, so those cells are reported as `N/A` in the
 software-comparison columns below.
 
-| Case                            | Mean abs. \Delta acousticTS vs `echoSMs` (dB) | Max abs. \Delta acousticTS vs `echoSMs` (dB) | Mean abs. \Delta vs published algebra (dB) | Max abs. \Delta vs published algebra (dB) |
-|:--------------------------------|----------------------------------------------:|---------------------------------------------:|-------------------------------------------:|------------------------------------------:|
-| Johnson (1977) sphere           |                                         `N/A` |                                        `N/A` |                                   2.33e-13 |                                  2.98e-13 |
-| Stanton (1989) sphere           |                                      3.43e-14 |                                     4.69e-13 |                                   3.43e-14 |                                  4.69e-13 |
-| Stanton (1989) prolate spheroid |                                         `N/A` |                                        `N/A` |                                   2.46e-14 |                                  1.28e-13 |
-| Stanton (1989) cylinder         |                                         `N/A` |                                        `N/A` |                                   2.39e-14 |                                  8.53e-14 |
+| Case | Mean abs. \Delta acousticTS vs `echoSMs` (dB) | Max abs. \Delta acousticTS vs `echoSMs` (dB) | Mean abs. \Delta vs published algebra (dB) | Max abs. \Delta vs published algebra (dB) |
+|:---|---:|---:|---:|---:|
+| Johnson (1977) sphere | `N/A` | `N/A` | 2.33e-13 | 2.98e-13 |
+| Stanton (1989) sphere | 3.43e-14 | 4.69e-13 | 3.43e-14 | 4.69e-13 |
+| Stanton (1989) prolate spheroid | `N/A` | `N/A` | 2.46e-14 | 1.28e-13 |
+| Stanton (1989) cylinder | `N/A` | `N/A` | 2.39e-14 | 8.53e-14 |
 
 The HPA picture is explicit. The spherical Stanton branch agrees with
 the available external software implementation to practical machine
@@ -305,5 +310,5 @@ Revisited.” *The Journal of the Acoustical Society of America* 61 (2):
 
 Stanton, Timothy K. 1989. “Simple Approximate Formulas for
 Backscattering of Sound by Spherical and Elongated Objects.” *The
-Journal of the Acoustical Society of America* 86 (4): 1499–1510.
+Journal of the Acoustical Society of America* 86 (4): 1499–510.
 <https://doi.org/10.1121/1.398711>.

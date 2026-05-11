@@ -9,8 +9,8 @@ Benchmarked Validated
 
 These pages follow the composite body-plus-swimbladder fish modeling
 literature initiated for cod and later generalized in open software
-implementations ([C. S. Clay 1991](#ref-Clay_1991); [Clarence S. Clay
-and Horne 1994](#ref-Clay_1994)).
+implementations ([Clay 1991](#ref-Clay_1991); [Clay and Horne
+1994](#ref-Clay_1994)).
 
 The acousticTS package uses object-based scatterers, so the KRM workflow
 follows the same broad structure used elsewhere in the package: define
@@ -35,6 +35,7 @@ and passes both to
 [`sbf_generate()`](https://brandynlucca.github.io/acousticTS/reference/sbf_generate.md).
 
 ``` r
+
 library(acousticTS)
 
 body_shape <- arbitrary(
@@ -94,6 +95,7 @@ result will no longer match the intended biological target.
 ### Calculating a TS-frequency spectrum
 
 ``` r
+
 frequency <- seq(18e3, 120e3, by = 6e3)
 
 fish_object <- target_strength(
@@ -118,9 +120,8 @@ interest.
 For fluid-only body targets, `krm_variant` is ignored because only the
 body Kirchhoff term is evaluated. The argument matters only for combined
 body-plus-swimbladder targets, where the model must decide what
-surrounding medium is used in the swimbladder terms ([Clarence S. Clay
-and Horne 1994](#ref-Clay_1994); [Horne and Jech
-1999](#ref-Horne_1999)).
+surrounding medium is used in the swimbladder terms ([Clay and Horne
+1994](#ref-Clay_1994); [Horne and Jech 1999](#ref-Horne_1999)).
 
 In the high-`ka` swimbladder Kirchhoff term, acousticTS uses the
 empirical factors:
@@ -151,7 +152,7 @@ directly:
     breathing mode, so k_H = k_B and k_L = k.
 3.  `body_embedded`: use the body-medium wavenumber in both swimbladder
     regimes, so k_H = k_L = k_B. This is the most literal body-embedded
-    reading of Clarence S. Clay and Horne ([1994](#ref-Clay_1994)).
+    reading of Clay and Horne ([1994](#ref-Clay_1994)).
 
 ![Pre-rendered KRM comparison for the sardine example under the
 lowcontrast, body-embedded, and mixed swimbladder-medium
@@ -178,6 +179,7 @@ spectrum.](krm-model-plot.png)
 #### Accessing results
 
 ``` r
+
 krm_results <- extract(fish_object, "model")$KRM
 head(krm_results)
 ```
@@ -243,14 +245,14 @@ solution for each isolated canonical case. The summary table below keeps
 that benchmark visible without mixing it with the separate
 software-compatibility checks for body-plus-swimbladder targets.
 
-| Canonical case                     | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | Elapsed (s) |
-|:-----------------------------------|------------------------:|-------------------------:|------------:|
-| Gas sphere                         |                 7.91469 |                  6.04116 |        0.01 |
-| Weakly scattering sphere           |                11.21090 |                  0.47451 |        0.15 |
-| Gas prolate spheroid               |                 7.36054 |                  4.62751 |        0.00 |
-| Weakly scattering prolate spheroid |                14.27193 |                  0.46239 |        0.00 |
-| Gas cylinder                       |                 7.35632 |                  6.19094 |        0.02 |
-| Weakly scattering cylinder         |                23.22115 |                  0.59807 |        0.02 |
+| Canonical case | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | Elapsed (s) |
+|:---|---:|---:|---:|
+| Gas sphere | 7.91469 | 6.04116 | 0.01 |
+| Weakly scattering sphere | 11.21090 | 0.47451 | 0.15 |
+| Gas prolate spheroid | 7.36054 | 4.62751 | 0.00 |
+| Weakly scattering prolate spheroid | 14.27193 | 0.46239 | 0.00 |
+| Gas cylinder | 7.35632 | 6.19094 | 0.02 |
+| Weakly scattering cylinder | 23.22115 | 0.59807 | 0.02 |
 
 The modal-series table above remains the implementation benchmark for
 the canonical KRM targets.
@@ -272,29 +274,29 @@ contributors 2024](#ref-echoSMs_software)), and the SWFSC applet
 - `krm_variant = body_embedded`
 - `krm_variant = mixed`
 
-| \vert \overline{\Delta TS} \vert (dB) |            |         |         |                   |
-|:-------------------------------------:|:----------:|:-------:|:-------:|:-----------------:|
-|                                       | acousticTS |  KRMr   | echoSMs | NOAA SWFSC applet |
-|              acousticTS               |     \-     | 1.6e-14 | 3.3e-14 |      2.6e-3       |
-|                 KRMr                  |  1.6e-14   |   \-    | 3.9e-14 |      2.6e-3       |
-|                echoSMs                |  3.3e-14   | 3.9e-14 |   \-    |      2.6e-3       |
-|           NOAA SWFSC applet           |   2.6e-3   | 2.6e-3  | 2.6e-3  |        \-         |
+| \vert \overline{\Delta TS} \vert (dB) |  |  |  |  |
+|:--:|:--:|:--:|:--:|:--:|
+|  | acousticTS | KRMr | echoSMs | NOAA SWFSC applet |
+| acousticTS | \- | 1.6e-14 | 3.3e-14 | 2.6e-3 |
+| KRMr | 1.6e-14 | \- | 3.9e-14 | 2.6e-3 |
+| echoSMs | 3.3e-14 | 3.9e-14 | \- | 2.6e-3 |
+| NOAA SWFSC applet | 2.6e-3 | 2.6e-3 | 2.6e-3 | \- |
 
-| \max \vert {\Delta TS} \vert (dB) |            |         |         |                   |
-|:---------------------------------:|:----------:|:-------:|:-------:|:-----------------:|
-|                                   | acousticTS |  KRMr   | echoSMs | NOAA SWFSC applet |
-|            acousticTS             |     \-     | 1.4e-13 | 5.5e-13 |      5.0e-3       |
-|               KRMr                |  1.4e-13   |   \-    | 5.5e-13 |      5.0e-3       |
-|              echoSMs              |  5.5e-13   | 5.5e-13 |   \-    |      5.0e-3       |
-|         NOAA SWFSC applet         |   5.0e-3   | 5.0e-3  | 5.0e-3  |        \-         |
-
-| Compared to… | \vert \overline{\Delta TS} \vert (dB) | \max \vert \Delta TS \vert (dB) |
-|:------------:|:-------------------------------------:|:-------------------------------:|
-|   echoSMs    |                3.4e-14                |             1.9e-13             |
+| \max \vert {\Delta TS} \vert (dB) |  |  |  |  |
+|:--:|:--:|:--:|:--:|:--:|
+|  | acousticTS | KRMr | echoSMs | NOAA SWFSC applet |
+| acousticTS | \- | 1.4e-13 | 5.5e-13 | 5.0e-3 |
+| KRMr | 1.4e-13 | \- | 5.5e-13 | 5.0e-3 |
+| echoSMs | 5.5e-13 | 5.5e-13 | \- | 5.0e-3 |
+| NOAA SWFSC applet | 5.0e-3 | 5.0e-3 | 5.0e-3 | \- |
 
 | Compared to… | \vert \overline{\Delta TS} \vert (dB) | \max \vert \Delta TS \vert (dB) |
-|:------------:|:-------------------------------------:|:-------------------------------:|
-|   echoSMs    |                3.4e-14                |             1.9e-13             |
+|:--:|:--:|:--:|
+| echoSMs | 3.4e-14 | 1.9e-13 |
+
+| Compared to… | \vert \overline{\Delta TS} \vert (dB) | \max \vert \Delta TS \vert (dB) |
+|:--:|:--:|:--:|
+| echoSMs | 3.4e-14 | 1.9e-13 |
 
 ##### Cod
 
@@ -302,29 +304,29 @@ contributors 2024](#ref-echoSMs_software)), and the SWFSC applet
 - `krm_variant = body_embedded`
 - `krm_variant = mixed`
 
-| \vert \overline{\Delta TS} \vert (dB) |            |         |         |                   |
-|:-------------------------------------:|:----------:|:-------:|:-------:|:-----------------:|
-|                                       | acousticTS |  KRMr   | echoSMs | NOAA SWFSC applet |
-|              acousticTS               |     \-     | 1.3e-14 | 5.4e-15 |      2.6e-3       |
-|                 KRMr                  |  1.3e-14   |   \-    | 3.9e-14 |        \-         |
-|                echoSMs                |  5.4e-14   | 3.9e-14 |   \-    |        \-         |
-|           NOAA SWFSC applet           |   2.6e-3   |   \-    |   \-    |        \-         |
+| \vert \overline{\Delta TS} \vert (dB) |  |  |  |  |
+|:--:|:--:|:--:|:--:|:--:|
+|  | acousticTS | KRMr | echoSMs | NOAA SWFSC applet |
+| acousticTS | \- | 1.3e-14 | 5.4e-15 | 2.6e-3 |
+| KRMr | 1.3e-14 | \- | 3.9e-14 | \- |
+| echoSMs | 5.4e-14 | 3.9e-14 | \- | \- |
+| NOAA SWFSC applet | 2.6e-3 | \- | \- | \- |
 
-| \max \vert {\Delta TS} \vert (dB) |            |         |         |                   |
-|:---------------------------------:|:----------:|:-------:|:-------:|:-----------------:|
-|                                   | acousticTS |  KRMr   | echoSMs | NOAA SWFSC applet |
-|            acousticTS             |     \-     | 7.8e-14 | 3.6e-14 |      5.0e-3       |
-|               KRMr                |  7.8e-14   |   \-    | 8.5e-13 |        \-         |
-|              echoSMs              |  3.6e-14   | 8.5e-13 |   \-    |        \-         |
-|         NOAA SWFSC applet         |   5.0e-3   |   \-    |   \-    |        \-         |
-
-| Compared to… | \vert \overline{\Delta TS} \vert (dB) | \max \vert \Delta TS \vert (dB) |
-|:------------:|:-------------------------------------:|:-------------------------------:|
-|   echoSMs    |                6.2e-15                |             5.7e-14             |
+| \max \vert {\Delta TS} \vert (dB) |  |  |  |  |
+|:--:|:--:|:--:|:--:|:--:|
+|  | acousticTS | KRMr | echoSMs | NOAA SWFSC applet |
+| acousticTS | \- | 7.8e-14 | 3.6e-14 | 5.0e-3 |
+| KRMr | 7.8e-14 | \- | 8.5e-13 | \- |
+| echoSMs | 3.6e-14 | 8.5e-13 | \- | \- |
+| NOAA SWFSC applet | 5.0e-3 | \- | \- | \- |
 
 | Compared to… | \vert \overline{\Delta TS} \vert (dB) | \max \vert \Delta TS \vert (dB) |
-|:------------:|:-------------------------------------:|:-------------------------------:|
-|   echoSMs    |                6.2e-15                |             5.7e-14             |
+|:--:|:--:|:--:|
+| echoSMs | 6.2e-15 | 5.7e-14 |
+
+| Compared to… | \vert \overline{\Delta TS} \vert (dB) | \max \vert \Delta TS \vert (dB) |
+|:--:|:--:|:--:|
+| echoSMs | 6.2e-15 | 5.7e-14 |
 
 Those values make the branch behavior explicit:
 
@@ -354,7 +356,7 @@ Clay, Clarence S., and John K. Horne. 1994. “Acoustic Models of Fish:
 The Atlantic Cod (*Gadus Morhua*).” *The Journal of the Acoustical
 Society of America* 96 (3): 1661–68. <https://doi.org/10.1121/1.410245>.
 
-Gastauer, Sven. 2025. “SvenGastauer/KRMr: V0.4.8.” Zenodo.
+Gastauer, Sven. 2025. *SvenGastauer/KRMr: V0.4.8*. Zenodo.
 <https://doi.org/10.5281/ZENODO.15838374>.
 
 Horne, J. K., and J. M. Jech. 1999. “Multi-Frequency Estimates of Fish
@@ -363,8 +365,9 @@ Marine Science* 56 (2): 184–99.
 <https://doi.org/10.1006/jmsc.1998.0432>.
 
 Macaulay, Gavin, and contributors. 2024. “echoSMs: Making Acoustic
-Scattering Models Available to Fisheries and Plankton Scientists.”
-*GitHub Repository*. <https://github.com/ices-tools-dev/echoSMs>;
+Scattering Models Available to Fisheries and Plankton Scientists.” In
+*GitHub Repository*.
+[Https://github.com/ices-tools-dev/echoSMs](https://github.com/ices-tools-dev/echoSMs);
 GitHub.
 
 Southwest Fisheries Science Center. 2022. *KRM Model*. National Marine

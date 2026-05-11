@@ -7,6 +7,7 @@ a solid elastic (calibration) sphere using a modal series solution.
 
 This model is accessed via:
 
+
     target_strength(
       ...,
       model="calibration",

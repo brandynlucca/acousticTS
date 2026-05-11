@@ -8,7 +8,7 @@ Benchmarked Validated
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/calibration/calibration-implementation.md)
 
 These pages are grounded in the standard-target calibration literature
-for elastic reference spheres ([Dragonette, Numrich, and Frank
+for elastic reference spheres ([Dragonette et al.
 1981](#ref-Dragonette_1981); [Foote 1990](#ref-Foote_1990); [MacLennan
 1981](#ref-Maclennan_1981)).
 
@@ -69,6 +69,6 @@ Foote, K. G. 1990. “Spheres for Calibrating an Eleven-Frequency Acoustic
 Measurement System.” *ICES Journal of Marine Science* 46 (3): 284–86.
 <https://doi.org/10.1093/icesjms/46.3.284>.
 
-MacLennan, D. N. 1981. “The Theory of Solid Spheres as Sonar Calibration
-Targets.” Scottish Fisheries Research Report 22. Department of
+MacLennan, D. N. 1981. *The Theory of Solid Spheres as Sonar Calibration
+Targets*. Scottish Fisheries Research Report 22. Department of
 Agriculture; Fisheries for Scotland.

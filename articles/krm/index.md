@@ -9,8 +9,8 @@ Benchmarked Validated
 
 These pages follow the composite body-plus-swimbladder fish modeling
 literature initiated for cod and later generalized in open software
-implementations ([C. S. Clay 1991](#ref-Clay_1991); [Clarence S. Clay
-and Horne 1994](#ref-Clay_1994)).
+implementations ([Clay 1991](#ref-Clay_1991); [Clay and Horne
+1994](#ref-Clay_1994)).
 
 The Kirchhoff-ray mode model (`KRM`) is the package’s composite fish
 family for targets whose body and swimbladder occupy different acoustic

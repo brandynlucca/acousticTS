@@ -123,7 +123,7 @@ the far-field scattering amplitude.
 
 The exact basis used to compute f depends on the model. In spherical,
 cylindrical, spheroidal, and T-matrix formulations, that amplitude is
-reconstructed from modal coefficients ([Bowman, Senior, and Uslenghi
+reconstructed from modal coefficients ([Bowman et al.
 1987](#ref-Bowman_1987)). In approximate models such as `DWBA`, `TRCM`,
 or `KRM`, it is assembled from asymptotic or perturbative expressions.
 
@@ -140,7 +140,7 @@ The linear backscattering cross-section is:
 \sigma\_{\mathrm{bs}} = \left\|f\_{\mathrm{bs}}\right\|^2,
 
 and the target strength is ([Urick 1983](#ref-Urick_1983); [Simmonds and
-MacLennan 2005](#ref-Simmonds_2005); [MacLennan, Fernandes, and Dalen
+MacLennan 2005](#ref-Simmonds_2005); [MacLennan et al.
 2002](#ref-MacLennan_2002)):
 
 \mathrm{TS} = 10 \log\_{10}\left(\sigma\_{\mathrm{bs}}\right).
@@ -206,7 +206,7 @@ small number of principled ways:
 
 1.  **Basis choice.** Spheres use spherical functions, cylinders use
     cylindrical functions, and spheroids use spheroidal functions or
-    geometry-aware T-matrix operators ([Bowman, Senior, and Uslenghi
+    geometry-aware T-matrix operators ([Bowman et al.
     1987](#ref-Bowman_1987)).
 2.  **Boundary conditions.** Rigid, pressure-release, fluid-filled,
     gas-filled, viscous, and elastic interfaces each enforce different
@@ -241,8 +241,8 @@ Journal of the Acoustical Society of America* 22 (4): 426–31.
 <https://doi.org/10.1121/1.1906621>.
 
 Bowman, J. J., T. B. A. Senior, and P. L. E. Uslenghi. 1987.
-*Electromagnetic and Acoustic Scattering by Simple Shapes*. New York:
-Hemisphere Publishing Corp.
+*Electromagnetic and Acoustic Scattering by Simple Shapes*. Hemisphere
+Publishing Corp.
 
 Faran, James J. 1951. “Sound Scattering by Solid Cylinders and Spheres.”
 *The Journal of the Acoustical Society of America* 23 (4): 405–18.
@@ -254,21 +254,20 @@ Consistent Approach to Definitions and Symbols in Fisheries Acoustics.”
 <https://doi.org/10.1006/jmsc.2001.1158>.
 
 Morse, Philip M., and Herman Feshbach. 1953. *Methods of Theoretical
-Physics*. New York: McGraw-Hill.
+Physics*. McGraw-Hill.
 
-Morse, Philip M., and K. Uno Ingard. 1968. *Theoretical Acoustics*. New
-York, NY: McGraw-Hill.
+Morse, Philip M., and K. Uno Ingard. 1968. *Theoretical Acoustics*.
+McGraw-Hill.
 
 Pierce, Allan D. 1989. *Acoustics: An Introduction to Its Physical
-Principles and Applications*. Woodbury, NY: Acoustical Society of
-America.
+Principles and Applications*. Acoustical Society of America.
 
 Simmonds, John, and David N. MacLennan. 2005. *Fisheries Acoustics:
-Theory and Practice*. 2nd ed. Oxford, UK: Blackwell Science.
+Theory and Practice*. 2nd ed. Blackwell Science.
 <https://doi.org/10.1002/9780470995303>.
 
 Sommerfeld, Arnold. 1949. *Partial Differential Equations in Physics*.
-Vol. 6. Lectures on Theoretical Physics. New York: Academic Press.
+Vol. 6. Lectures on Theoretical Physics. Academic Press.
 
-Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed. New
-York, NY: McGraw-Hill.
+Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed.
+McGraw-Hill.

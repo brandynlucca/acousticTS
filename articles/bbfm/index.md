@@ -9,9 +9,8 @@ Unvalidated Experimental
 
 This family is best read alongside the swimbladder-less fish and
 composite-scatterer literature that motivates explicit flesh-body and
-backbone terms ([Gorska, Ona, and Korneliussen 2005](#ref-Gorska_2005);
-[Stanton et al. 1998](#ref-Stanton_1998_1); [Clay and Horne
-1994](#ref-Clay_1994)).
+backbone terms ([Gorska et al. 2005](#ref-Gorska_2005); [Stanton et al.
+1998](#ref-Stanton_1998_1); [Clay and Horne 1994](#ref-Clay_1994)).
 
 The body-backbone fish model (`BBFM`) is the package’s composite
 swimbladder-less family for targets whose flesh body and backbone should

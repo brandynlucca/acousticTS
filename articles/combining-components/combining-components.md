@@ -4,8 +4,8 @@
 
 Component combination becomes most important in fish-like targets where
 anatomically distinct regions scatter in different regimes ([Clay and
-Horne 1994](#ref-Clay_1994); [Gorska, Ona, and Korneliussen
-2005](#ref-Gorska_2005); [Stanton 1996](#ref-Stanton_1996)).
+Horne 1994](#ref-Clay_1994); [Gorska et al. 2005](#ref-Gorska_2005);
+[Stanton 1996](#ref-Stanton_1996)).
 
 It is often tempting to build a composite target by running two
 canonical models separately and then combining the results. In a few

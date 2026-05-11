@@ -8,9 +8,10 @@ Benchmarked Unvalidated
 [Theory](https://brandynlucca.github.io/acousticTS/articles/trcm/trcm-theory.md)
 
 These pages come from the high-frequency elongated-body literature and
-later fish and zooplankton applications ([Timothy K. Stanton et al.
-1993](#ref-Stanton_1993), [1998](#ref-Stanton_1998_1); [Timothy K.
-Stanton, Chu, and Wiebe 1998](#ref-Stanton_1998_2)).
+later fish and zooplankton applications ([Stanton et al.
+1993](#ref-Stanton_1993); [Stanton, Chu, and Wiebe
+1998](#ref-Stanton_1998_2); [Stanton, Chu, Wiebe, Martin, et al.
+1998](#ref-Stanton_1998_1)).
 
 The acousticTS package uses object-based scatterers so the same
 implementation pattern carries across models: create a scatterer, run
@@ -38,6 +39,7 @@ structure rather than exact modal behavior.
 ### Cylinder object generation
 
 ``` r
+
 library(acousticTS)
 
 straight_cylinder_shape <- cylinder(
@@ -82,6 +84,7 @@ force TRCM to explain spectral structure it was not built to represent.
 ### Calculating a TS-frequency spectrum
 
 ``` r
+
 frequency <- seq(10e3, 300e3, by = 10e3)
 
 straight_cylinder <- target_strength(
@@ -120,6 +123,7 @@ radius, contrasts, and frequency range.
 #### Accessing results
 
 ``` r
+
 trcm_results <- extract(straight_cylinder, "model")$TRCM
 head(trcm_results)
 ```
@@ -179,20 +183,20 @@ TRCM spans two geometry regimes, so the implementation checks should do
 the same. The straight-cylinder branch can still be compared against the
 canonical weakly scattering cylinder reference curve. The bent-cylinder
 branch is compared against the broadside bent-cylinder construction
-implied by Eq. 25-26 in T. K. Stanton ([1989](#ref-Stanton_1989_2)): the
+implied by Eq. 25-26 in Stanton ([1989](#ref-Stanton_1989_2)): the
 straight finite-cylinder modal coefficient sum is retained, and
 curvature enters through the exact Fresnel-type coherence integral along
 the bent axis. In the table below, that bent reference uses the
-uniformly bent weak-fluid cylinder setup discussed by T. K. Stanton
-([1989](#ref-Stanton_1989_2)) and Timothy K. Stanton et al.
+uniformly bent weak-fluid cylinder setup discussed by Stanton
+([1989](#ref-Stanton_1989_2)) and Stanton et al.
 ([1993](#ref-Stanton_1993)): `L/a = 10.5`, `rho_c/L = 1.5`,
 `g = 1.0357`, `h = 1.0279`, and `ka` spanning `0.1` to `10`.
 
-| Geometry          | Implementation branch                                | Reference family                                                    | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | Elapsed (s) |
-|:------------------|:-----------------------------------------------------|:--------------------------------------------------------------------|------------------------:|-------------------------:|------------:|
-| Straight cylinder | Standard TRCM                                        | Weakly scattering straight-cylinder benchmark                       |              `23.76946` |                `0.59807` |      `0.00` |
-| Bent cylinder     | Fresnel-integral branch (`stationary_phase = FALSE`) | FCMS-derived bent-cylinder reference from Stanton (1989, Eq. 25-26) |              `10.39341` |                `0.73244` |      `0.05` |
-| Bent cylinder     | Stationary-phase branch (`stationary_phase = TRUE`)  | FCMS-derived bent-cylinder reference from Stanton (1989, Eq. 25-26) |              `12.10080` |                `1.41033` |      `0.00` |
+| Geometry | Implementation branch | Reference family | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | Elapsed (s) |
+|:---|:---|:---|---:|---:|---:|
+| Straight cylinder | Standard TRCM | Weakly scattering straight-cylinder benchmark | `23.76946` | `0.59807` | `0.00` |
+| Bent cylinder | Fresnel-integral branch (`stationary_phase = FALSE`) | FCMS-derived bent-cylinder reference from Stanton (1989, Eq. 25-26) | `10.39341` | `0.73244` | `0.05` |
+| Bent cylinder | Stationary-phase branch (`stationary_phase = TRUE`) | FCMS-derived bent-cylinder reference from Stanton (1989, Eq. 25-26) | `12.10080` | `1.41033` | `0.00` |
 
 This split separates the approximation structure cleanly. The
 straight-cylinder row checks the ordinary two-ray reduction against the

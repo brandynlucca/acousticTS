@@ -417,7 +417,7 @@ Once the modal sum is evaluated:
 
 \sigma\_\text{bs} = \|\mathcal{f}\_\text{bs}\|^2,
 
-The corresponding target strength is ([MacLennan, Fernandes, and Dalen
+The corresponding target strength is ([MacLennan et al.
 2002](#ref-MacLennan_2002); [Urick 1983](#ref-Urick_1983); [Simmonds and
 MacLennan 2005](#ref-Simmonds_2005)):
 
@@ -451,10 +451,9 @@ defensible.
 
 ## References
 
-Folver, F. W. J., and L. C. Maximon. 2026. “Bessel Functions.” In *NIST
-Digital Library of Mathematical Functions*, edited by F. W. J. Olver, A.
-B. Olde Daalhuis, D. W. Lozier, B. I. Schneider, B. A. Boisvert, C. W.
-Clark, B. R. Miller, B. V. Saunders, H. S. Cohl, and M. A. McClain.
+Folver, F. W. J., and L. C. Maximon. 2026. “Bessel Functions.” Chap. 10
+in *NIST Digital Library of Mathematical Functions*, edited by F. W. J.
+Olver, A. B. Olde Daalhuis, D. W. Lozier, et al.
 <https://dlmf.nist.gov/10>.
 
 MacLennan, David N., Percy G. Fernandes, and John Dalen. 2002. “A
@@ -463,19 +462,19 @@ Consistent Approach to Definitions and Symbols in Fisheries Acoustics.”
 <https://doi.org/10.1006/jmsc.2001.1158>.
 
 Simmonds, John, and David N. MacLennan. 2005. *Fisheries Acoustics:
-Theory and Practice*. 2nd ed. Oxford, UK: Blackwell Science.
+Theory and Practice*. 2nd ed. Blackwell Science.
 <https://doi.org/10.1002/9780470995303>.
 
 Sommerfeld, Arnold. 1949. *Partial Differential Equations in Physics*.
-Vol. 6. Lectures on Theoretical Physics. New York: Academic Press.
+Vol. 6. Lectures on Theoretical Physics. Academic Press.
 
 Stanton, T. K. 1988. “Sound Scattering by Cylinders of Finite Length. I.
 Fluid Cylinders.” *The Journal of the Acoustical Society of America* 83
 (1): 55–63. <https://doi.org/10.1121/1.396184>.
 
-———. 1989. “Sound Scattering by Cylinders of Finite Length. III.
-Deformed Cylinders.” *The Journal of the Acoustical Society of America*
-86 (2): 691–705. <https://doi.org/10.1121/1.398193>.
+Stanton, T. K. 1989. “Sound Scattering by Cylinders of Finite Length.
+III. Deformed Cylinders.” *The Journal of the Acoustical Society of
+America* 86 (2): 691–705. <https://doi.org/10.1121/1.398193>.
 
-Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed. New
-York, NY: McGraw-Hill.
+Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed.
+McGraw-Hill.

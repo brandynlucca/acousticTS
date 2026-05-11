@@ -30,8 +30,8 @@ through the boundary operator. Finite cylinders are different again: the
 sidewall-endcap junctions make a purely spherical retained operator much
 less natural than a cylindrical modal basis, especially once one wants
 reliable angular products away from the simplest monostatic setting
-([Varadan et al. 1982](#ref-Varadan_1982); [Mahadevan Ganesh and Hawkins
-2008](#ref-Ganesh_2008); [M. Ganesh and Hawkins 2022](#ref-Ganesh_2022);
+([Varadan et al. 1982](#ref-Varadan_1982); [Ganesh and Hawkins
+2008](#ref-Ganesh_2008); [Ganesh and Hawkins 2022](#ref-Ganesh_2022);
 [Waterman 2009](#ref-Waterman_2009)).
 
 Unless stated otherwise, medium `1` is the surrounding seawater and
@@ -173,9 +173,9 @@ backscattering cross section then follows from:
 
 \sigma\_{bs} = \|f\_{bs}\|^2
 
-and finally ([MacLennan, Fernandes, and Dalen
-2002](#ref-MacLennan_2002); [Urick 1983](#ref-Urick_1983); [Simmonds and
-MacLennan 2005](#ref-Simmonds_2005)):
+and finally ([MacLennan et al. 2002](#ref-MacLennan_2002); [Urick
+1983](#ref-Urick_1983); [Simmonds and MacLennan
+2005](#ref-Simmonds_2005)):
 
 TS = 10 \log\_{10} \left(\sigma\_{bs}\right)
 
@@ -206,9 +206,8 @@ A prolate spheroid is not a constant-r surface. So while spherical-wave
 expansions can still be written down, they do not align naturally with
 the geometry. This is exactly the regime where the classic
 spheroidal-coordinate literature becomes relevant ([Varadan et al.
-1982](#ref-Varadan_1982); [M. Ganesh and Hawkins
-2022](#ref-Ganesh_2022); [Hackman and Todoroff
-1984](#ref-Hackman_1984)).
+1982](#ref-Varadan_1982); [Ganesh and Hawkins 2022](#ref-Ganesh_2022);
+[Hackman and Todoroff 1984](#ref-Hackman_1984)).
 
 For the single-target scalar acoustic problem, it is more natural to use
 prolate spheroidal coordinates and write the target surface as a single
@@ -296,19 +295,19 @@ Consistent Approach to Definitions and Symbols in Fisheries Acoustics.”
 *ICES Journal of Marine Science* 59 (2): 365–69.
 <https://doi.org/10.1006/jmsc.2001.1158>.
 
-Morse, Philip M., and K. Uno Ingard. 1968. *Theoretical Acoustics*. New
-York, NY: McGraw-Hill.
+Morse, Philip M., and K. Uno Ingard. 1968. *Theoretical Acoustics*.
+McGraw-Hill.
 
 Simmonds, John, and David N. MacLennan. 2005. *Fisheries Acoustics:
-Theory and Practice*. 2nd ed. Oxford, UK: Blackwell Science.
+Theory and Practice*. 2nd ed. Blackwell Science.
 <https://doi.org/10.1002/9780470995303>.
 
 Spence, R. D., and Sara Granger. 1951. “The Scattering of Sound from a
 Prolate Spheroid.” *The Journal of the Acoustical Society of America* 23
 (6): 701–6. <https://doi.org/10.1121/1.1906827>.
 
-Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed. New
-York, NY: McGraw-Hill.
+Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed.
+McGraw-Hill.
 
 Varadan, V. K., V. V. Varadan, Louis R. Dragonette, and Lawrence Flax.
 1982. “Computation of Rigid Body Scattering by Prolate Spheroids Using
@@ -319,6 +318,6 @@ Waterman, P. C. 1969. “New Formulation of Acoustic Scattering.” *The
 Journal of the Acoustical Society of America* 45 (6): 1417–29.
 <https://doi.org/10.1121/1.1911619>.
 
-———. 2009. “T -Matrix Methods in Acoustic Scattering.” *The Journal of
-the Acoustical Society of America* 125 (1): 42–51.
+Waterman, P. C. 2009. “T -Matrix Methods in Acoustic Scattering.” *The
+Journal of the Acoustical Society of America* 125 (1): 42–51.
 <https://doi.org/10.1121/1.3035839>.

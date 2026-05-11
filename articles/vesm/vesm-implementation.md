@@ -52,6 +52,7 @@ The reference case uses:
 The shell and gas core are stored in an `ESS` object:
 
 ``` r
+
 library(acousticTS)
 
 radius_gas <- 1e-3
@@ -81,6 +82,7 @@ is supplied, `VESMS` estimates it from the neutral-buoyancy relation
 described on the theory page.
 
 ``` r
+
 frequency <- seq(1e3, 150e3, by = 1e3)
 
 vesm_object <- target_strength(
@@ -143,9 +145,9 @@ implementation, the reference case gives:
 - elapsed time = `0.79 s` for acousticTS and `0.98 s` for the Python
   implementation
 
-| Comparison                  | N frequency | *f*_(min) (kHz) | *f*_(max) (kHz) | Max \|Δ\| *TS* (dB) | Mean \|Δ\| *TS* (dB) | *f* at max \|Δ\| *TS* (kHz) | acousticTS elapsed (s) | Python elapsed (s) |
-|:----------------------------|------------:|----------------:|----------------:|--------------------:|---------------------:|----------------------------:|-----------------------:|-------------------:|
-| acousticTS vs original VESM |         150 |               1 |             150 |              0.0572 |               0.0089 |                          60 |                   0.05 |             1.0962 |
+| Comparison | N frequency | *f*_(min) (kHz) | *f*_(max) (kHz) | Max \|Δ\| *TS* (dB) | Mean \|Δ\| *TS* (dB) | *f* at max \|Δ\| *TS* (kHz) | acousticTS elapsed (s) | Python elapsed (s) |
+|:---|---:|---:|---:|---:|---:|---:|---:|---:|
+| acousticTS vs original VESM | 150 | 1 | 150 | 0.0572 | 0.0089 | 60 | 0.05 | 1.0962 |
 
 The largest mismatch on this grid remains well below `0.1 dB`, and the
 mean absolute difference stays below `0.01 dB`. That is strong agreement
@@ -166,13 +168,13 @@ the scale of the full spectrum.
 
 #### A few explicit checkpoints
 
-|     | Frequency (Hz) | acousticTS TS (dB) | Python TS (dB) | Δ *TS* (dB) | Abs. Δ *TS* (dB) |
-|:----|---------------:|-------------------:|---------------:|------------:|-----------------:|
-| 1   |           1000 |         -116.01044 |     -116.00966 |    -0.00078 |          0.00078 |
-| 38  |          38000 |          -55.81067 |      -55.80907 |    -0.00160 |          0.00160 |
-| 60  |          60000 |          -58.93634 |      -58.99354 |     0.05720 |          0.05720 |
-| 120 |         120000 |          -65.27321 |      -65.25513 |    -0.01807 |          0.01807 |
-| 150 |         150000 |          -63.89102 |      -63.87077 |    -0.02025 |          0.02025 |
+|  | Frequency (Hz) | acousticTS TS (dB) | Python TS (dB) | Δ *TS* (dB) | Abs. Δ *TS* (dB) |
+|:---|---:|---:|---:|---:|---:|
+| 1 | 1000 | -116.01044 | -116.00966 | -0.00078 | 0.00078 |
+| 38 | 38000 | -55.81067 | -55.80907 | -0.00160 | 0.00160 |
+| 60 | 60000 | -58.93634 | -58.99354 | 0.05720 | 0.05720 |
+| 120 | 120000 | -65.27321 | -65.25513 | -0.01807 | 0.01807 |
+| 150 | 150000 | -63.89102 | -63.87077 | -0.02025 | 0.02025 |
 
 ### Practical note on modal truncation
 

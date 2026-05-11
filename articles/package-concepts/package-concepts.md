@@ -107,6 +107,7 @@ differ by class, but the logic is stable across the package.
 That arrangement is easiest to see with a small example.
 
 ``` r
+
 library(acousticTS)
 
 shape_obj <- cylinder(
@@ -129,6 +130,7 @@ names(scatterer_obj@metadata)
     ## [1] "ID"
 
 ``` r
+
 names(scatterer_obj@body)
 ```
 
@@ -137,6 +139,7 @@ names(scatterer_obj@body)
     ## [7] "sound_speed"            "radius_curvature_ratio"
 
 ``` r
+
 names(scatterer_obj@shape_parameters)
 ```
 
@@ -176,6 +179,7 @@ runs, provided the geometry and physical interpretation are compatible
 with those models.
 
 ``` r
+
 frequency <- seq(38e3, 120e3, by = 6e3)
 
 scatterer_obj <- target_strength(
@@ -218,6 +222,7 @@ can keep one object in memory, run several models, and then pull the
 corresponding sub-results by name.
 
 ``` r
+
 head(extract(scatterer_obj, "model")$DWBA)
 ```
 
@@ -230,6 +235,7 @@ head(extract(scatterer_obj, "model")$DWBA)
     ## 6     68000 0.7120943 -1.798640e-04-9.287346e-20i 3.235107e-08 -74.90111
 
 ``` r
+
 head(extract(scatterer_obj, "model")$HPA)
 ```
 
@@ -305,8 +311,7 @@ them, those different kinds of documentation still connect cleanly.
 
 ## References
 
-Jech, J. Michael, John K. Horne, Dezhang Chu, David A. Demer, David T.
-I. Francis, Natalia Gorska, Benjamin Jones, et al. 2015. “Comparisons
+Jech, J. Michael, John K. Horne, Dezhang Chu, et al. 2015. “Comparisons
 Among Ten Models of Acoustic Backscattering Used in Aquatic Ecosystem
 Research.” *The Journal of the Acoustical Society of America* 138 (6):
 3742–64. <https://doi.org/10.1121/1.4937607>.

@@ -20,6 +20,7 @@ implementation discussion, see
 
 This model is accessed via:
 
+
     target_strength(
       ...,
       model = "TRCM",

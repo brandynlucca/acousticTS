@@ -53,6 +53,7 @@ bistatic summaries remain outside the validated public scope.
 ### Object generation
 
 ``` r
+
 library(acousticTS)
 
 density_sw <- 1026.8
@@ -119,6 +120,7 @@ modal-series viewpoint. The documented shape set is:
 ### Calculating a TS-frequency spectrum
 
 ``` r
+
 sphere_object <- target_strength(
   object = sphere_object,
   frequency = seq(12e3, 120e3, by = 12e3),
@@ -153,6 +155,7 @@ sphere_object@model$TMM
     ## 10    120000 -1.347015e-05+3.698175e-07i 1.815818e-10  -97.40928    14
 
 ``` r
+
 prolate_object@model$TMM
 ```
 
@@ -187,6 +190,7 @@ spectrum.](tmm-model-plot.png)
 #### Accessing results
 
 ``` r
+
 tmm_results <- extract(sphere_object, "model")$TMM
 head(tmm_results)
 ```
@@ -213,6 +217,7 @@ Explicit per-frequency T-matrix block storage is available for both
 supported geometry branches.
 
 ``` r
+
 sphere_store <- target_strength(
   object = fls_generate(
     shape = sphere(radius_body = 0.01, n_segments = 80),
@@ -256,6 +261,7 @@ summaries without rerunning the boundary solve. The simplest example is
 an orientation-averaged monostatic cross section.
 
 ``` r
+
 prolate_store <- target_strength(
   object = fls_generate(
     shape = prolate_spheroid(
@@ -419,6 +425,7 @@ does that for one stored frequency by returning:
     to the forward direction.
 
 ``` r
+
 summary_70 <- tmm_bistatic_summary(
   object = prolate_store,
   frequency = 70e3,
@@ -438,6 +445,7 @@ summary_70$metrics
     ## 1          -61.54602               1.021018
 
 ``` r
+
 summary_70$sector_integrals
 ```
 
@@ -461,6 +469,7 @@ for several things.” The higher-level
 wrapper is meant for exactly that pattern.
 
 ``` r
+
 products_70 <- tmm_products(
   object = prolate_store,
   frequency = 70e3,
@@ -477,6 +486,7 @@ names(products_70)
     ## [1] "monostatic"          "orientation_average" "bistatic_summary"
 
 ``` r
+
 products_70$bistatic_summary$metrics
 ```
 
@@ -589,59 +599,59 @@ lightweight to build.
 Spherical models were benchmarked against `SPHMS` over `12:120 by 4` kHz
 for `a = 5`, `10`, and `18 mm`.
 
-| a (mm) | Boundary           | \max \vert \Delta TS \vert ~ (\text{dB}) | \vert \overline{\Delta TS} \vert ~ (\text{dB}) | t\_\text{TMM} (\text{s}) | t\_\text{SPHMS} (\text{s}) |
-|:-------|:-------------------|-----------------------------------------:|-----------------------------------------------:|-------------------------:|---------------------------:|
-| `5`    | `fixed_rigid`      |                               `1.66e-11` |                                     `1.95e-12` |                   `0.27` |                     `0.03` |
-| `5`    | `pressure_release` |                               `1.76e-11` |                                     `1.77e-12` |                   `0.31` |                     `0.07` |
-| `5`    | `liquid_filled`    |                               `2.26e-11` |                                     `4.04e-12` |                   `0.39` |                     `0.01` |
-| `5`    | `gas_filled`       |                               `1.75e-11` |                                     `1.75e-12` |                   `0.47` |                     `0.03` |
-| `10`   | `fixed_rigid`      |                               `2.37e-10` |                                     `2.75e-11` |                   `0.50` |                     `0.00` |
-| `10`   | `pressure_release` |                               `2.44e-10` |                                     `2.91e-11` |                   `0.56` |                     `0.02` |
-| `10`   | `liquid_filled`    |                               `1.14e-10` |                                     `1.67e-11` |                   `0.75` |                     `0.02` |
-| `10`   | `gas_filled`       |                               `2.45e-10` |                                     `2.86e-11` |                   `0.78` |                     `0.01` |
-| `18`   | `fixed_rigid`      |                               `7.62e-10` |                                     `8.32e-11` |                   `1.03` |                     `0.01` |
-| `18`   | `pressure_release` |                               `7.91e-10` |                                     `8.49e-11` |                   `1.06` |                     `0.00` |
-| `18`   | `liquid_filled`    |                               `4.59e-09` |                                     `2.36e-10` |                   `1.47` |                     `0.02` |
-| `18`   | `gas_filled`       |                               `8.46e-10` |                                     `8.71e-11` |                   `1.53` |                     `0.00` |
+| a (mm) | Boundary | \max \vert \Delta TS \vert ~ (\text{dB}) | \vert \overline{\Delta TS} \vert ~ (\text{dB}) | t\_\text{TMM} (\text{s}) | t\_\text{SPHMS} (\text{s}) |
+|:---|:---|---:|---:|---:|---:|
+| `5` | `fixed_rigid` | `1.66e-11` | `1.95e-12` | `0.27` | `0.03` |
+| `5` | `pressure_release` | `1.76e-11` | `1.77e-12` | `0.31` | `0.07` |
+| `5` | `liquid_filled` | `2.26e-11` | `4.04e-12` | `0.39` | `0.01` |
+| `5` | `gas_filled` | `1.75e-11` | `1.75e-12` | `0.47` | `0.03` |
+| `10` | `fixed_rigid` | `2.37e-10` | `2.75e-11` | `0.50` | `0.00` |
+| `10` | `pressure_release` | `2.44e-10` | `2.91e-11` | `0.56` | `0.02` |
+| `10` | `liquid_filled` | `1.14e-10` | `1.67e-11` | `0.75` | `0.02` |
+| `10` | `gas_filled` | `2.45e-10` | `2.86e-11` | `0.78` | `0.01` |
+| `18` | `fixed_rigid` | `7.62e-10` | `8.32e-11` | `1.03` | `0.01` |
+| `18` | `pressure_release` | `7.91e-10` | `8.49e-11` | `1.06` | `0.00` |
+| `18` | `liquid_filled` | `4.59e-09` | `2.36e-10` | `1.47` | `0.02` |
+| `18` | `gas_filled` | `8.46e-10` | `8.71e-11` | `1.53` | `0.00` |
 
 Oblate sphere-limit checks used three equal-volume radii and compared
 against the `SPHMS` sphere limit at `12`, `38`, `70`, and `120 kHz`.
 
-| Boundary           | \max \vert \Delta TS \vert ~ (\text{dB}) | \vert \overline{\Delta TS} \vert ~ (\text{dB}) | t\_\text{TMM} (\text{s}) | t\_\text{SPHMS} (\text{s}) |
-|:-------------------|-----------------------------------------:|-----------------------------------------------:|-------------------------:|---------------------------:|
-| `fixed_rigid`      |                               `3.60e-10` |                                     `4.97e-11` |                   `0.11` |                     `0.05` |
-| `pressure_release` |                               `3.12e-10` |                                     `5.06e-11` |                   `0.12` |                     `0.00` |
-| `liquid_filled`    |                               `1.04e-10` |                                     `2.02e-11` |                   `0.15` |                     `0.02` |
-| `gas_filled`       |                               `3.12e-10` |                                     `5.07e-11` |                   `0.23` |                     `0.00` |
+| Boundary | \max \vert \Delta TS \vert ~ (\text{dB}) | \vert \overline{\Delta TS} \vert ~ (\text{dB}) | t\_\text{TMM} (\text{s}) | t\_\text{SPHMS} (\text{s}) |
+|:---|---:|---:|---:|---:|
+| `fixed_rigid` | `3.60e-10` | `4.97e-11` | `0.11` | `0.05` |
+| `pressure_release` | `3.12e-10` | `5.06e-11` | `0.12` | `0.00` |
+| `liquid_filled` | `1.04e-10` | `2.02e-11` | `0.15` | `0.02` |
+| `gas_filled` | `3.12e-10` | `5.07e-11` | `0.23` | `0.00` |
 
 Prolate models were benchmarked against `PSMS`. The `60 x 8 mm` case
 used `12`, `18`, `38`, `70`, `100`, and `150 kHz`, while the
 `140 x 10 mm` case used `12`, `18`, `38`, `70`, and `100 kHz`.
 
-| L (mm) | a (mm) | Boundary           | \max \vert \Delta TS \vert ~ (\text{dB}) | \vert \overline{\Delta TS} \vert ~ (\text{dB}) | t\_\text{TMM} (\text{s}) | t\_\text{PSMS} (\text{s}) |
-|:-------|:-------|:-------------------|-----------------------------------------:|-----------------------------------------------:|-------------------------:|--------------------------:|
-| `60`   | `8`    | `fixed_rigid`      |                                `0.00000` |                                      `0.00000` |                   `0.03` |                    `0.08` |
-| `60`   | `8`    | `pressure_release` |                                `0.00000` |                                      `0.00000` |                   `0.03` |                    `0.02` |
-| `60`   | `8`    | `liquid_filled`    |                                `0.00000` |                                      `0.00000` |                   `2.50` |                    `1.83` |
-| `60`   | `8`    | `gas_filled`       |                                `0.00000` |                                      `0.00000` |                   `2.39` |                    `2.53` |
-| `140`  | `10`   | `fixed_rigid`      |                                `0.00000` |                                      `0.00000` |                   `0.03` |                    `0.02` |
-| `140`  | `10`   | `pressure_release` |                                `0.00000` |                                      `0.00000` |                   `0.02` |                    `0.02` |
-| `140`  | `10`   | `liquid_filled`    |                                `0.00000` |                                      `0.00000` |                   `2.81` |                    `2.23` |
-| `140`  | `10`   | `gas_filled`       |                                `0.00000` |                                      `0.00000` |                   `2.70` |                    `2.81` |
+| L (mm) | a (mm) | Boundary | \max \vert \Delta TS \vert ~ (\text{dB}) | \vert \overline{\Delta TS} \vert ~ (\text{dB}) | t\_\text{TMM} (\text{s}) | t\_\text{PSMS} (\text{s}) |
+|:---|:---|:---|---:|---:|---:|---:|
+| `60` | `8` | `fixed_rigid` | `0.00000` | `0.00000` | `0.03` | `0.08` |
+| `60` | `8` | `pressure_release` | `0.00000` | `0.00000` | `0.03` | `0.02` |
+| `60` | `8` | `liquid_filled` | `0.00000` | `0.00000` | `2.50` | `1.83` |
+| `60` | `8` | `gas_filled` | `0.00000` | `0.00000` | `2.39` | `2.53` |
+| `140` | `10` | `fixed_rigid` | `0.00000` | `0.00000` | `0.03` | `0.02` |
+| `140` | `10` | `pressure_release` | `0.00000` | `0.00000` | `0.02` | `0.02` |
+| `140` | `10` | `liquid_filled` | `0.00000` | `0.00000` | `2.81` | `2.23` |
+| `140` | `10` | `gas_filled` | `0.00000` | `0.00000` | `2.70` | `2.81` |
 
 Cylinders were benchmarked against `FCMS` over `12`, `18`, `38`, `70`,
 `100`, `150`, and `200 kHz`.
 
-| L (mm) | a (mm) | Boundary           | \max \vert \Delta TS \vert ~ (\text{dB}) | \vert \overline{\Delta TS} \vert ~ (\text{dB}) | t\_\text{TMM} (\text{s}) | t\_\text{FCMS} (\text{s}) |
-|:-------|:-------|:-------------------|-----------------------------------------:|-----------------------------------------------:|-------------------------:|--------------------------:|
-| `70`   | `10`   | `fixed_rigid`      |                               `0.00e+00` |                                     `0.00e+00` |                  `0.011` |                   `0.004` |
-| `70`   | `10`   | `pressure_release` |                               `0.00e+00` |                                     `0.00e+00` |                  `0.001` |                   `0.000` |
-| `70`   | `10`   | `liquid_filled`    |                               `0.00e+00` |                                     `0.00e+00` |                  `0.009` |                   `0.001` |
-| `70`   | `10`   | `gas_filled`       |                               `0.00e+00` |                                     `0.00e+00` |                  `0.002` |                   `0.004` |
-| `50`   | `8`    | `fixed_rigid`      |                               `3.55e-15` |                                     `5.08e-16` |                  `0.000` |                   `0.000` |
-| `50`   | `8`    | `pressure_release` |                               `0.00e+00` |                                     `0.00e+00` |                  `0.001` |                   `0.000` |
-| `50`   | `8`    | `liquid_filled`    |                               `0.00e+00` |                                     `0.00e+00` |                  `0.004` |                   `0.001` |
-| `50`   | `8`    | `gas_filled`       |                               `0.00e+00` |                                     `0.00e+00` |                  `0.002` |                   `0.004` |
+| L (mm) | a (mm) | Boundary | \max \vert \Delta TS \vert ~ (\text{dB}) | \vert \overline{\Delta TS} \vert ~ (\text{dB}) | t\_\text{TMM} (\text{s}) | t\_\text{FCMS} (\text{s}) |
+|:---|:---|:---|---:|---:|---:|---:|
+| `70` | `10` | `fixed_rigid` | `0.00e+00` | `0.00e+00` | `0.011` | `0.004` |
+| `70` | `10` | `pressure_release` | `0.00e+00` | `0.00e+00` | `0.001` | `0.000` |
+| `70` | `10` | `liquid_filled` | `0.00e+00` | `0.00e+00` | `0.009` | `0.001` |
+| `70` | `10` | `gas_filled` | `0.00e+00` | `0.00e+00` | `0.002` | `0.004` |
+| `50` | `8` | `fixed_rigid` | `3.55e-15` | `5.08e-16` | `0.000` | `0.000` |
+| `50` | `8` | `pressure_release` | `0.00e+00` | `0.00e+00` | `0.001` | `0.000` |
+| `50` | `8` | `liquid_filled` | `0.00e+00` | `0.00e+00` | `0.004` | `0.001` |
+| `50` | `8` | `gas_filled` | `0.00e+00` | `0.00e+00` | `0.002` | `0.004` |
 
 These are intentionally not one-off canonical checks. The tables above
 sweep multiple shapes and frequency sets so the agreement is not just
@@ -701,6 +711,7 @@ whether the retained prolate operator reproduces the exact scalar
 spheroidal field at the same incident and receive angles.
 
 ``` r
+
 diag_70 <- tmm_diagnostics(
   prolate_store,
   n_theta = 31,
@@ -722,12 +733,12 @@ monostatic-only. So the validation ladder for these branches combines:
 The table below shows representative diagnostic summaries for one stored
 object from each supported branch, where e is the residual.
 
-| Case                              | \mathscr{f}~(\text{kHz}) | Max monostatic e | Max reciprocity e | Max optical-theorem e | Min block `rcond` | Max block transpose e |
-|:----------------------------------|:-------------------------|-----------------:|------------------:|----------------------:|------------------:|----------------------:|
-| sphere, `fixed_rigid`             | `38, 70`                 |       `2.55e-16` |        `2.12e-16` |            `1.24e-03` |        `3.11e-09` |            `1.93e-16` |
-| oblate spheroid, `liquid_filled`  | `38, 70`                 |       `2.80e-16` |        `1.14e-04` |            `1.34e-03` |        `2.24e-16` |            `3.48e-01` |
-| prolate spheroid, `liquid_filled` | `38, 70`                 |       `3.28e-16` |        `2.64e-12` |                  `NA` |        `3.35e-47` |            `1.15e-13` |
-| finite cylinder, `fixed_rigid`    | `38, 70`                 |       `0.00e+00` |              `NA` |                  `NA` |              `NA` |                  `NA` |
+| Case | \mathscr{f}~(\text{kHz}) | Max monostatic e | Max reciprocity e | Max optical-theorem e | Min block `rcond` | Max block transpose e |
+|:---|:---|---:|---:|---:|---:|---:|
+| sphere, `fixed_rigid` | `38, 70` | `2.55e-16` | `2.12e-16` | `1.24e-03` | `3.11e-09` | `1.93e-16` |
+| oblate spheroid, `liquid_filled` | `38, 70` | `2.80e-16` | `1.14e-04` | `1.34e-03` | `2.24e-16` | `3.48e-01` |
+| prolate spheroid, `liquid_filled` | `38, 70` | `3.28e-16` | `2.64e-12` | `NA` | `3.35e-47` | `1.15e-13` |
+| finite cylinder, `fixed_rigid` | `38, 70` | `0.00e+00` | `NA` | `NA` | `NA` | `NA` |
 
 Two points are worth emphasizing.
 
@@ -823,11 +834,11 @@ For the pressure-release prolate case with `L = 70 mm`, `a = 10 mm`, and
 `38 kHz`, the retained `TMM` branch and the external BEMPP far-field
 solution line up closely across the tested incidence angles:
 
-| World-frame incidence (deg) | Max abs. \Delta amplitude (dB) | Mean abs. \Delta amplitude (dB) | Note                              |
-|----------------------------:|-------------------------------:|--------------------------------:|:----------------------------------|
-|                         `0` |                       `0.0069` |                        `0.0033` | pressure-release, BEMPP far-field |
-|                        `45` |                       `0.0076` |                        `0.0031` | pressure-release, BEMPP far-field |
-|                        `90` |                       `0.0078` |                        `0.0030` | pressure-release, BEMPP far-field |
+| World-frame incidence (deg) | Max abs. \Delta amplitude (dB) | Mean abs. \Delta amplitude (dB) | Note |
+|---:|---:|---:|:---|
+| `0` | `0.0069` | `0.0033` | pressure-release, BEMPP far-field |
+| `45` | `0.0076` | `0.0031` | pressure-release, BEMPP far-field |
+| `90` | `0.0078` | `0.0030` | pressure-release, BEMPP far-field |
 
 The same body-fixed/world-frame conversion is also important for the
 nonspherical oblate branch, which uses the spherical-coordinate retained
@@ -835,12 +846,12 @@ operator. For a pressure-release oblate with polar semiaxis `c = 6 mm`
 and equatorial semiaxis `a = 10 mm`, the corrected BEMPP comparison is
 likewise tight on the tested cases:
 
-| Frequency (kHz) | World-frame incidence (deg) | Max abs. \Delta amplitude (dB) | Mean abs. \Delta amplitude (dB) | Validation note                   |
-|----------------:|----------------------------:|-------------------------------:|--------------------------------:|:----------------------------------|
-|            `38` |                         `0` |                       `0.0091` |                        `0.0054` | pressure-release, BEMPP far-field |
-|            `38` |                        `45` |                       `0.0083` |                        `0.0053` | pressure-release, BEMPP far-field |
-|            `38` |                        `90` |                       `0.0079` |                        `0.0051` | pressure-release, BEMPP far-field |
-|            `70` |                        `90` |                       `0.0091` |                        `0.0047` | pressure-release, BEMPP far-field |
+| Frequency (kHz) | World-frame incidence (deg) | Max abs. \Delta amplitude (dB) | Mean abs. \Delta amplitude (dB) | Validation note |
+|---:|---:|---:|---:|:---|
+| `38` | `0` | `0.0091` | `0.0054` | pressure-release, BEMPP far-field |
+| `38` | `45` | `0.0083` | `0.0053` | pressure-release, BEMPP far-field |
+| `38` | `90` | `0.0079` | `0.0051` | pressure-release, BEMPP far-field |
+| `70` | `90` | `0.0091` | `0.0047` | pressure-release, BEMPP far-field |
 
 By contrast, the same corrected BEMPP comparison also clarifies why the
 package does **not** expose a full retained-cylinder angular operator.
@@ -850,21 +861,21 @@ angular reconstruction remained much less reliable than the sphere and
 prolate branches:
 
 | L (mm) | a (mm) | Frequency (kHz) | World-frame incidence (deg) | Stored-cylinder `n_max` | Max abs. \Delta amplitude (dB) | Mean abs. \Delta amplitude (dB) |
-|:-------|:-------|----------------:|----------------------------:|------------------------:|-------------------------------:|--------------------------------:|
-| `70`   | `10`   |            `38` |                        `90` |                    `24` |                         `1.58` |                          `0.74` |
-| `70`   | `10`   |            `70` |                        `90` |                    `24` |                         `8.12` |                          `3.73` |
-| `50`   | `8`    |            `38` |                        `90` |                    `24` |                         `0.71` |                          `0.29` |
+|:---|:---|---:|---:|---:|---:|---:|
+| `70` | `10` | `38` | `90` | `24` | `1.58` | `0.74` |
+| `70` | `10` | `70` | `90` | `24` | `8.12` | `3.73` |
+| `50` | `8` | `38` | `90` | `24` | `0.71` | `0.29` |
 
 The exact monostatic cylinder branch can also be compared to the same
 BEMPP slices at the single backscatter point:
 
-| L (mm) | a (mm) | Frequency (kHz) | World-frame incidence (deg) | Backscatter-point \Delta amplitude (dB) | Interpretation                                                                 |
-|:-------|:-------|----------------:|----------------------------:|----------------------------------------:|:-------------------------------------------------------------------------------|
-| `70`   | `10`   |            `38` |                        `90` |                                `-0.128` | broadside is the best tested case here, but it stays above a `< 0.1 dB` target |
-| `70`   | `10`   |            `70` |                        `90` |                                `-0.063` | broadside falls below `0.1 dB` on this tested case                             |
-| `50`   | `8`    |            `38` |                        `90` |                                `-0.198` | the smaller broadside case stays above a `< 0.1 dB` target                     |
-| `70`   | `10`   |            `38` |                        `45` |                                `-5.104` | oblique monostatic agreement is not externally closed                          |
-| `70`   | `10`   |            `38` |                         `0` |                              `-272.091` | the end-on pressure-release cylinder remains strongly inconsistent with BEMPP  |
+| L (mm) | a (mm) | Frequency (kHz) | World-frame incidence (deg) | Backscatter-point \Delta amplitude (dB) | Interpretation |
+|:---|:---|---:|---:|---:|:---|
+| `70` | `10` | `38` | `90` | `-0.128` | broadside is the best tested case here, but it stays above a `< 0.1 dB` target |
+| `70` | `10` | `70` | `90` | `-0.063` | broadside falls below `0.1 dB` on this tested case |
+| `50` | `8` | `38` | `90` | `-0.198` | the smaller broadside case stays above a `< 0.1 dB` target |
+| `70` | `10` | `38` | `45` | `-5.104` | oblique monostatic agreement is not externally closed |
+| `70` | `10` | `38` | `0` | `-272.091` | the end-on pressure-release cylinder remains strongly inconsistent with BEMPP |
 
 Those extra checks matter because they show the remaining cylinder issue
 is not just one broken benchmark file. A retained cylinder angular
@@ -982,6 +993,6 @@ Waterman, P. C. 1969. “New Formulation of Acoustic Scattering.” *The
 Journal of the Acoustical Society of America* 45 (6): 1417–29.
 <https://doi.org/10.1121/1.1911619>.
 
-———. 2009. “T -Matrix Methods in Acoustic Scattering.” *The Journal of
-the Acoustical Society of America* 125 (1): 42–51.
+Waterman, P. C. 2009. “T -Matrix Methods in Acoustic Scattering.” *The
+Journal of the Acoustical Society of America* 125 (1): 42–51.
 <https://doi.org/10.1121/1.3035839>.

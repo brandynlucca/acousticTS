@@ -8,9 +8,10 @@ Benchmarked Validated
 [Theory](https://brandynlucca.github.io/acousticTS/articles/sdwba/sdwba-theory.md)
 
 These pages connect krill-body DWBA models to phase variability,
-orientation effects, and practical survey use ([Demer and Conti
-2003a](#ref-Demer_2003_1); [Demer and Conti 2003b](#ref-Demer_2003_2),
-[2005](#ref-Demer_2005); [Conti and Demer 2006](#ref-Conti_2006)).
+orientation effects, and practical survey use ([Demer and Stephane G.
+Conti 2003](#ref-Demer_2003_1); [Demer and Stéphane G. Conti
+2003](#ref-Demer_2003_2), [2005](#ref-Demer_2005); [Conti and Demer
+2006](#ref-Conti_2006)).
 
 The acousticTS package uses object-based scatterers so the same
 implementation pattern carries across models: create a scatterer, run
@@ -31,6 +32,7 @@ introduced.
 ### Fluid-like scatterer object generation
 
 ``` r
+
 library(acousticTS)
 
 cylinder_shape <- cylinder(
@@ -72,6 +74,7 @@ averaging can be compared directly with the baseline deterministic
 response.
 
 ``` r
+
 frequency <- seq(50e3, 200e3, by = 10e3)
 
 stochastic_scatterer <- target_strength(
@@ -114,6 +117,7 @@ target-strength spectrum.](sdwba-model-plot.png)
 #### Accessing results
 
 ``` r
+
 dwba_results <- extract(stochastic_scatterer, "model")$DWBA
 sdwba_results <- extract(stochastic_scatterer, "model")$SDWBA
 
@@ -129,6 +133,7 @@ head(dwba_results)
     ## 6     1e+05 0.8377580 -0.0003756433-1.366000e-19i 1.411079e-07 -68.50449
 
 ``` r
+
 head(sdwba_results)
 ```
 
@@ -194,11 +199,11 @@ in the Jech weakly scattering sphere, prolate-spheroid, and cylinder
 files. The table below reports that direct comparison together with the
 representative runtime on the current machine.
 
-| Geometry                           | Max abs. \Delta vs benchmark (dB) | Mean abs. \Delta vs benchmark (dB) | Elapsed (s) |
-|:-----------------------------------|----------------------------------:|-----------------------------------:|------------:|
-| Weakly scattering sphere           |                          10.08475 |                            0.35609 |        0.72 |
-| Weakly scattering prolate spheroid |                           2.05918 |                            0.07638 |        3.58 |
-| Weakly scattering cylinder         |                           2.07406 |                            0.15895 |        1.91 |
+| Geometry | Max abs. \Delta vs benchmark (dB) | Mean abs. \Delta vs benchmark (dB) | Elapsed (s) |
+|:---|---:|---:|---:|
+| Weakly scattering sphere | 10.08475 | 0.35609 | 0.72 |
+| Weakly scattering prolate spheroid | 2.05918 | 0.07638 | 3.58 |
+| Weakly scattering cylinder | 2.07406 | 0.15895 | 1.91 |
 
 These runs use the same stochastic reference values throughout the
 benchmark set: `N0 = 50`, `phase_sd_init = sqrt(2) / 32`,
@@ -209,17 +214,17 @@ For SDWBA, the most important additional implementation control is
 average is actually resolved numerically. The table below keeps the same
 Jech targets and changes only `n_iterations`.
 
-| Geometry                           | `n_iterations` | Max abs. \Delta vs benchmark (dB) | Mean abs. \Delta vs benchmark (dB) | Elapsed (s) |
-|:-----------------------------------|---------------:|----------------------------------:|-----------------------------------:|------------:|
-| Weakly scattering sphere           |             25 |                           9.30458 |                            0.34871 |        0.58 |
-| Weakly scattering sphere           |            100 |                          10.08475 |                            0.35609 |        0.63 |
-| Weakly scattering sphere           |            500 |                           9.97080 |                            0.35343 |        1.11 |
-| Weakly scattering prolate spheroid |             25 |                           1.26004 |                            0.06948 |        3.08 |
-| Weakly scattering prolate spheroid |            100 |                           2.05918 |                            0.07638 |        3.63 |
-| Weakly scattering prolate spheroid |            500 |                           1.28403 |                            0.07107 |        6.50 |
-| Weakly scattering cylinder         |             25 |                           2.07406 |                            0.15899 |        1.75 |
-| Weakly scattering cylinder         |            100 |                           2.07406 |                            0.15895 |        2.03 |
-| Weakly scattering cylinder         |            500 |                           2.07403 |                            0.15895 |        3.39 |
+| Geometry | `n_iterations` | Max abs. \Delta vs benchmark (dB) | Mean abs. \Delta vs benchmark (dB) | Elapsed (s) |
+|:---|---:|---:|---:|---:|
+| Weakly scattering sphere | 25 | 9.30458 | 0.34871 | 0.58 |
+| Weakly scattering sphere | 100 | 10.08475 | 0.35609 | 0.63 |
+| Weakly scattering sphere | 500 | 9.97080 | 0.35343 | 1.11 |
+| Weakly scattering prolate spheroid | 25 | 1.26004 | 0.06948 | 3.08 |
+| Weakly scattering prolate spheroid | 100 | 2.05918 | 0.07638 | 3.63 |
+| Weakly scattering prolate spheroid | 500 | 1.28403 | 0.07107 | 6.50 |
+| Weakly scattering cylinder | 25 | 2.07406 | 0.15899 | 1.75 |
+| Weakly scattering cylinder | 100 | 2.07406 | 0.15895 | 2.03 |
+| Weakly scattering cylinder | 500 | 2.07403 | 0.15895 | 3.39 |
 
 That sensitivity table is useful because it shows two things at once.
 First, the runtime cost does scale with the number of stochastic
@@ -245,14 +250,14 @@ Resources 2019](#ref-CCAMLR_SDWBA_software)), NOAA applet
 package echoSMs ([Macaulay and contributors
 2024](#ref-echoSMs_software)).
 
-| Comparison                  | Mean abs. \Delta TS (dB) | Max abs. \Delta TS (dB) |
-|:----------------------------|-------------------------:|------------------------:|
-| acousticTS vs echoSMs       |                  1.70257 |                30.63630 |
-| acousticTS vs CCAMLR MATLAB |                  0.06978 |                 0.18270 |
-| acousticTS vs NOAA          |                  0.06158 |                 0.52846 |
-| echoSMs vs CCAMLR MATLAB    |                  1.74808 |                30.72119 |
-| echoSMs vs NOAA             |                  1.69189 |                30.27117 |
-| CCAMLR MATLAB vs NOAA       |                  0.13036 |                 0.65798 |
+| Comparison | Mean abs. \Delta TS (dB) | Max abs. \Delta TS (dB) |
+|:---|---:|---:|
+| acousticTS vs echoSMs | 1.70257 | 30.63630 |
+| acousticTS vs CCAMLR MATLAB | 0.06978 | 0.18270 |
+| acousticTS vs NOAA | 0.06158 | 0.52846 |
+| echoSMs vs CCAMLR MATLAB | 1.74808 | 30.72119 |
+| echoSMs vs NOAA | 1.69189 | 30.27117 |
+| CCAMLR MATLAB vs NOAA | 0.13036 | 0.65798 |
 
 Those values should be read as implementation differences rather than
 benchmark errors. All four calculations use the same bundled krill
@@ -270,32 +275,34 @@ geometry separates across existing SDWBA implementations.
 ## References
 
 Commission for the Conservation of Antarctic Marine Living Resources.
-2019. “SDWBA_TS: Stochastic Distorted-Wave Born Approximation (SDWBA)
-Target Strength (TS) Model.” <https://github.com/ccamlr/SDWBA_TS>;
-GitHub.
+2019. *SDWBA_TS: Stochastic Distorted-Wave Born Approximation (SDWBA)
+Target Strength (TS) Model*. V. 1.3.
+[Https://github.com/ccamlr/SDWBA_TS](https://github.com/ccamlr/SDWBA_TS);
+GitHub, released.
 
 Conti, Stéphane G., and David A. Demer. 2006. “Improved Parameterization
 of the SDWBA for Estimating Krill Target Strength.” *ICES Journal of
 Marine Science* 63 (5): 928–35.
 <https://doi.org/10.1016/j.icesjms.2006.02.007>.
 
-Demer, David A., and Stephane G. Conti. 2003a. “Reconciling Theoretical
+Demer, David A., and Stephane G. Conti. 2003. “Reconciling Theoretical
 Versus Empirical Target Strengths of Krill: Effects of Phase Variability
 on the Distorted-Wave Born Approximation.” *ICES Journal of Marine
 Science* 60 (2): 429–34.
 <https://doi.org/10.1016/S1054-3139(03)00002-X>.
 
-Demer, David A., and Stéphane G. Conti. 2003b. “Validation of the
+Demer, David A., and Stéphane G. Conti. 2003. “Validation of the
 Stochastic Distorted-Wave Born Approximation Model with Broad Bandwidth
 Total Target Strength Measurements of Antarctic Krill.” *ICES Journal of
 Marine Science* 60 (3): 625–35.
 <https://doi.org/10.1016/S1054-3139(03)00063-8>.
 
-———. 2005. “New Target-Strength Model Indicates More Krill in the
-Southern Ocean.” *ICES Journal of Marine Science* 62 (1): 25–32.
-<https://doi.org/10.1016/j.icesjms.2004.07.027>.
+Demer, David A., and Stéphane G. Conti. 2005. “New Target-Strength Model
+Indicates More Krill in the Southern Ocean.” *ICES Journal of Marine
+Science* 62 (1): 25–32. <https://doi.org/10.1016/j.icesjms.2004.07.027>.
 
 Macaulay, Gavin, and contributors. 2024. “echoSMs: Making Acoustic
-Scattering Models Available to Fisheries and Plankton Scientists.”
-*GitHub Repository*. <https://github.com/ices-tools-dev/echoSMs>;
+Scattering Models Available to Fisheries and Plankton Scientists.” In
+*GitHub Repository*.
+[Https://github.com/ices-tools-dev/echoSMs](https://github.com/ices-tools-dev/echoSMs);
 GitHub.

@@ -311,5 +311,5 @@ Revisited.” *The Journal of the Acoustical Society of America* 61 (2):
 
 Stanton, Timothy K. 1989. “Simple Approximate Formulas for
 Backscattering of Sound by Spherical and Elongated Objects.” *The
-Journal of the Acoustical Society of America* 86 (4): 1499–1510.
+Journal of the Acoustical Society of America* 86 (4): 1499–510.
 <https://doi.org/10.1121/1.398711>.

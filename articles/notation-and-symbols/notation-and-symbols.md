@@ -29,16 +29,16 @@ layered sphere can use media `1`, `2`, `3`, and `4`.
 
 ## Shared field variables
 
-| Symbol             | Meaning                                                          | Typical units |
-|--------------------|------------------------------------------------------------------|---------------|
-| p_1^{\mathrm{inc}} | incident pressure in seawater                                    | Pa            |
-| p_1^{\mathrm{sca}} | scattered pressure in seawater                                   | Pa            |
-| p_1^{\mathrm{tot}} | total exterior pressure, p_1^{\mathrm{inc}} + p_1^{\mathrm{sca}} | Pa            |
-| p_j                | pressure in medium j                                             | Pa            |
-| \mathbf{u}         | elastic displacement vector                                      | m             |
-| \mathbf{v}         | fluid particle velocity                                          | m s^{-1}      |
-| \mathbf{n}         | outward unit normal                                              | dimensionless |
-| \sigma\_{ij}       | stress-tensor components                                         | Pa            |
+| Symbol | Meaning | Typical units |
+|----|----|----|
+| p_1^{\mathrm{inc}} | incident pressure in seawater | Pa |
+| p_1^{\mathrm{sca}} | scattered pressure in seawater | Pa |
+| p_1^{\mathrm{tot}} | total exterior pressure, p_1^{\mathrm{inc}} + p_1^{\mathrm{sca}} | Pa |
+| p_j | pressure in medium j | Pa |
+| \mathbf{u} | elastic displacement vector | m |
+| \mathbf{v} | fluid particle velocity | m s^{-1} |
+| \mathbf{n} | outward unit normal | dimensionless |
+| \sigma\_{ij} | stress-tensor components | Pa |
 
 ## Frequencies, speeds, and wavenumbers
 
@@ -74,33 +74,33 @@ expressed with g\_{31} and h\_{31}.
 
 ## Scattering quantities
 
-| Symbol                                  | Meaning                                               | Typical units |
-|-----------------------------------------|-------------------------------------------------------|---------------|
-| f(\theta_s,\phi_s \mid \theta_i,\phi_i) | far-field scattering amplitude                        | m             |
-| f\_{\mathrm{bs}}                        | backscattering amplitude                              | m             |
-| \sigma\_{\mathrm{bs}}                   | backscattering cross-section, \|f\_{\mathrm{bs}}\|^2  | m^2           |
-| \mathrm{TS}                             | target strength, 10 \log\_{10}(\sigma\_{\mathrm{bs}}) | dB            |
+| Symbol | Meaning | Typical units |
+|----|----|----|
+| f(\theta_s,\phi_s \mid \theta_i,\phi_i) | far-field scattering amplitude | m |
+| f\_{\mathrm{bs}} | backscattering amplitude | m |
+| \sigma\_{\mathrm{bs}} | backscattering cross-section, \|f\_{\mathrm{bs}}\|^2 | m^2 |
+| \mathrm{TS} | target strength, 10 \log\_{10}(\sigma\_{\mathrm{bs}}) | dB |
 
 ## Angles and directions
 
-| Symbol           | Meaning                                                                       | Typical units |
-|------------------|-------------------------------------------------------------------------------|---------------|
-| \theta_i, \phi_i | incident polar and azimuthal angles                                           | rad           |
-| \theta_s, \phi_s | scattered or receive polar and azimuthal angles                               | rad           |
-| \theta           | body or target orientation angle when a page uses a 2D axisymmetric reduction | rad           |
-| \beta            | local body-tilt angle along a segmented or curved centerline                  | rad           |
+| Symbol | Meaning | Typical units |
+|----|----|----|
+| \theta_i, \phi_i | incident polar and azimuthal angles | rad |
+| \theta_s, \phi_s | scattered or receive polar and azimuthal angles | rad |
+| \theta | body or target orientation angle when a page uses a 2D axisymmetric reduction | rad |
+| \beta | local body-tilt angle along a segmented or curved centerline | rad |
 
 ## Coordinate-specific notation
 
 Some theory pages use geometry-matched coordinates that introduce
 additional symbols:
 
-| Geometry         | Symbols                      | Meaning                                                     |
-|------------------|------------------------------|-------------------------------------------------------------|
-| sphere           | (r,\theta,\phi)              | ordinary spherical coordinates                              |
-| cylinder         | (r,\phi,z)                   | ordinary cylindrical coordinates                            |
-| prolate spheroid | (\xi,\eta,\phi)              | prolate spheroidal coordinates                              |
-| oblate spheroid  | (\xi,\eta,\phi) or r(\theta) | oblate geometry in a spheroidal or spherical representation |
+| Geometry | Symbols | Meaning |
+|----|----|----|
+| sphere | (r,\theta,\phi) | ordinary spherical coordinates |
+| cylinder | (r,\phi,z) | ordinary cylindrical coordinates |
+| prolate spheroid | (\xi,\eta,\phi) | prolate spheroidal coordinates |
+| oblate spheroid | (\xi,\eta,\phi) or r(\theta) | oblate geometry in a spheroidal or spherical representation |
 
 When a page uses scale factors such as h\_\xi, h\_\eta, or h\_\phi,
 those are coordinate metric coefficients, not sound-speed contrasts. The
@@ -121,8 +121,8 @@ h\_{21}, h\_{32}, and so on.
 Flammer, Carson. 1957. *Spheroidal Wave Functions*.
 <https://ui.adsabs.harvard.edu/abs/1957spwf.book.....F>.
 
-Morse, Philip M., and K. Uno Ingard. 1968. *Theoretical Acoustics*. New
-York, NY: McGraw-Hill.
+Morse, Philip M., and K. Uno Ingard. 1968. *Theoretical Acoustics*.
+McGraw-Hill.
 
 Waterman, P. C. 2009. “T -Matrix Methods in Acoustic Scattering.” *The
 Journal of the Acoustical Society of America* 125 (1): 42–51.

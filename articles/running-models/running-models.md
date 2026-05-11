@@ -5,8 +5,7 @@
 The execution patterns shown here are designed to make it easy to
 reproduce the same kinds of spectra and angle-series comparisons
 reported in benchmark and software papers ([Jech et al.
-2015](#ref-Jech_2015); [Gastauer, Chu, and Cox
-2019](#ref-ZooScatR_software)).
+2015](#ref-Jech_2015); [Gastauer et al. 2019](#ref-ZooScatR_software)).
 
 Model execution in acousticTS is organized around the target object
 rather than around detached parameter tables. A model reads the
@@ -33,6 +32,7 @@ Most workflows eventually pass through
 [`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md):
 
 ``` r
+
 library(acousticTS)
 
 shape_obj <- cylinder(
@@ -89,6 +89,7 @@ therefore supports both:
 - model-specific argument bundles through `model_args`
 
 ``` r
+
 comparison_obj <- target_strength(
   object = scatterer_obj,
   frequency = frequency,
@@ -141,6 +142,7 @@ way it did. For careful comparison or later reuse, it is usually worth
 knowing exactly which variables a given model stores.
 
 ``` r
+
 model_output <- extract(scatterer_obj, "model")$DWBA
 names(model_output)
 ```
@@ -148,6 +150,7 @@ names(model_output)
     ## [1] "frequency" "ka"        "f_bs"      "sigma_bs"  "TS"
 
 ``` r
+
 head(model_output)
 ```
 
@@ -167,6 +170,7 @@ question is about sensitivity to model assumptions rather than about
 obtaining only a single curve.
 
 ``` r
+
 comparison_obj <- fls_generate(
   shape = shape_obj,
   density_body = 1045,
@@ -247,6 +251,7 @@ Some model calls require only the object, frequency, and model name.
 Others require additional inputs. A few representative patterns are:
 
 ``` r
+
 # Sphere modal series with an explicit boundary condition
 target_strength(gas_sphere, frequency, model = "sphms", boundary = "gas_filled")
 
@@ -286,6 +291,7 @@ object-construction problems, model-compatibility problems, and
 post-processing problems.
 
 ``` r
+
 target_strength(
   object = scatterer_obj,
   frequency = frequency,
@@ -302,12 +308,14 @@ or plotted with `plot(..., type = "model")`. That makes it easy to
 compare multiple models or to keep geometry and modeled output together.
 
 ``` r
+
 plot(scatterer_obj, type = "shape")
 ```
 
 ![](running-models_files/figure-html/unnamed-chunk-7-1.png)
 
 ``` r
+
 plot(scatterer_obj, type = "model")
 ```
 
@@ -384,8 +392,7 @@ Distorted Wave Born Approximation.” *The Journal of the Acoustical
 Society of America* 145 (1): EL102–8.
 <https://doi.org/10.1121/1.5085655>.
 
-Jech, J. Michael, John K. Horne, Dezhang Chu, David A. Demer, David T.
-I. Francis, Natalia Gorska, Benjamin Jones, et al. 2015. “Comparisons
+Jech, J. Michael, John K. Horne, Dezhang Chu, et al. 2015. “Comparisons
 Among Ten Models of Acoustic Backscattering Used in Aquatic Ecosystem
 Research.” *The Journal of the Acoustical Society of America* 138 (6):
 3742–64. <https://doi.org/10.1121/1.4937607>.

@@ -17,6 +17,7 @@ relation used by Khodabandeloo et al. (2021, Eq. 18).
 
 This model is accessed via:
 
+
     target_strength(
       ...,
       model = "VESMS",
