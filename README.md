@@ -4,7 +4,7 @@
 [![Documentation](https://img.shields.io/badge/Latest_Documentation-blue)](https://brandynlucca.github.io/acousticTS/)
 [![Build
 status](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml)
-[![Coverage](https://codecov.io/gh/brandynlucca/acousticTS/graph/badge.svg?branch=main)](https://app.codecov.io/gh/brandynlucca/acousticTS?branch=main)
+[![Code Coverage](https://img.shields.io/codecov/c/github/brandynlucca/acousticTS?label=Code+Coverage)](https://app.codecov.io/gh/brandynlucca/acousticTS)
 [![License:
 GPL-3](https://img.shields.io/badge/License-GPL--3-blue.svg)](LICENSE)
 
