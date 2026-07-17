@@ -552,6 +552,45 @@ Rcpp::ComplexMatrix prolate_scattering_grid_from_retained_blocks_single(
     return f_grid;
 }
 
+template<typename T>
+Rcpp::ComplexVector prolate_scattering_points_from_retained_blocks_single(
+    const Rcpp::List& blocks,
+    T chi_sw,
+    T k_sw,
+    T theta_body,
+    T phi_body,
+    const std::vector<T>& theta_scatter,
+    const std::vector<T>& phi_scatter
+) {
+    // Evaluate paired receive directions while reusing the incident angular
+    // basis and retained T-matrix blocks for the whole point batch.
+    if (theta_scatter.size() != phi_scatter.size()) {
+        Rcpp::stop("'theta_scatter' and 'phi_scatter' must have equal length.");
+    }
+
+    int m_max = blocks.size() - 1;
+    Rcpp::List last_block = blocks[m_max];
+    Rcpp::IntegerVector n_seq_last = last_block["n_seq"];
+    int n_max = n_seq_last[n_seq_last.size() - 1];
+
+    auto t_blocks = prolate_tmatrix_blocks_from_rcpp<T>(blocks);
+    auto smn_inc = compute_smn_matrix<T>(m_max, n_max, chi_sw, preccos(theta_body), true);
+
+    Rcpp::ComplexVector f_points(theta_scatter.size());
+    for (size_t i = 0; i < theta_scatter.size(); ++i) {
+        auto smn_scat = compute_smn_matrix<T>(
+            m_max, n_max, chi_sw, preccos(theta_scatter[i]), true
+        );
+        auto azimuth = compute_azimuth<T>(m_max, phi_body, phi_scatter[i]);
+        auto raw_sum = compute_fbs_from_tmatrix_blocks<T>(
+            m_max, n_max, azimuth, smn_inc, smn_scat, t_blocks
+        );
+        f_points[i] = to_Rcomplex(std::complex<T>(0, -T(2) / k_sw) * raw_sum);
+    }
+
+    return f_points;
+}
+
 } // namespace
 
 // Evaluate the stored prolate retained blocks in compiled code so the
@@ -605,6 +644,47 @@ Rcpp::ComplexVector prolate_spheroid_scattering_from_tmatrix_cpp(
     }
 
     return f_scat;
+}
+
+// Evaluate one retained prolate T-matrix block set over paired receive points
+// that share one incident direction.
+// [[Rcpp::export]]
+Rcpp::ComplexVector prolate_spheroid_scattering_points_from_tmatrix_cpp(
+    Rcpp::DataFrame acoustics,
+    Rcpp::List t_matrix,
+    double theta_body,
+    double phi_body,
+    Rcpp::NumericVector theta_scatter,
+    Rcpp::NumericVector phi_scatter,
+    std::string precision = "double"
+) {
+    double chi_sw = Rcpp::as<std::vector<double>>(acoustics["chi_sw"])[0];
+    double k_sw = Rcpp::as<std::vector<double>>(acoustics["k_sw"])[0];
+
+    if (precision == "quad") {
+        std::vector<acousticts_quad_t> theta_q(theta_scatter.size()), phi_q(phi_scatter.size());
+        for (int i = 0; i < theta_scatter.size(); ++i) theta_q[i] = static_cast<acousticts_quad_t>(theta_scatter[i]);
+        for (int i = 0; i < phi_scatter.size(); ++i) phi_q[i] = static_cast<acousticts_quad_t>(phi_scatter[i]);
+        return prolate_scattering_points_from_retained_blocks_single<acousticts_quad_t>(
+            t_matrix,
+            static_cast<acousticts_quad_t>(chi_sw),
+            static_cast<acousticts_quad_t>(k_sw),
+            static_cast<acousticts_quad_t>(theta_body),
+            static_cast<acousticts_quad_t>(phi_body),
+            theta_q,
+            phi_q
+        );
+    }
+
+    return prolate_scattering_points_from_retained_blocks_single<double>(
+        t_matrix,
+        chi_sw,
+        k_sw,
+        theta_body,
+        phi_body,
+        Rcpp::as<std::vector<double>>(theta_scatter),
+        Rcpp::as<std::vector<double>>(phi_scatter)
+    );
 }
 
 // Evaluate one retained prolate T-matrix block set over a full

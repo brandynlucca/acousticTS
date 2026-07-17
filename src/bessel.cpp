@@ -207,6 +207,169 @@ std::complex<double> hs_single_impl(int li, double zi) {
 }
 
 // --------------------------------------------------------------------------
+// Helper: Compute spherical j_l(z), l = 0..l_max, by Miller downward
+// recurrence with renormalization against the analytic j_0/j_1 values.
+// --------------------------------------------------------------------------
+std::vector<double> js_sequence_miller_impl(int l_max, double zi) {
+    if (l_max < 0) {
+        return std::vector<double>();
+    }
+
+    std::vector<double> out(l_max + 1, 0.0);
+    if (std::abs(zi) < tol) {
+        out[0] = 1.0;
+        return out;
+    }
+
+    double z = zi;
+    int extra = std::max(
+        50,
+        static_cast<int>(std::ceil(10.0 * std::sqrt(std::abs(z) + l_max + 1.0)))
+    );
+    int n_seed = std::max(
+        l_max + extra,
+        static_cast<int>(std::ceil(std::abs(z))) + extra
+    );
+
+    std::vector<double> work(n_seed + 2, 0.0);
+    work[n_seed + 1] = 0.0;
+    work[n_seed] = 1.0;
+
+    for (int n = n_seed; n >= 1; --n) {
+        work[n - 1] = ((2.0 * n + 1.0) / z) * work[n] - work[n + 1];
+        double max_abs = std::max(
+            std::abs(work[n - 1]),
+            std::max(std::abs(work[n]), std::abs(work[n + 1]))
+        );
+        if (max_abs > 1e150) {
+            for (int k = n - 1; k <= n_seed + 1; ++k) {
+                work[k] *= 1e-150;
+            }
+        }
+    }
+
+    double j0 = std::sin(z) / z;
+    double j1 = std::sin(z) / (z * z) - std::cos(z) / z;
+    double scale = R_NaN;
+    if (std::isfinite(work[0]) && std::abs(work[0]) > 1e-280 &&
+        std::abs(j0) > 1e-280) {
+        scale = j0 / work[0];
+    } else if (std::isfinite(work[1]) && std::abs(work[1]) > 1e-280) {
+        scale = j1 / work[1];
+    }
+
+    if (!std::isfinite(scale)) {
+        for (int n = 0; n <= l_max; ++n) {
+            out[n] = js_single_impl(n, z);
+        }
+        return out;
+    }
+
+    for (int n = 0; n <= l_max; ++n) {
+        out[n] = scale * work[n];
+        if (!std::isfinite(out[n])) {
+            out[n] = js_single_impl(n, z);
+        }
+    }
+
+    return out;
+}
+
+// --------------------------------------------------------------------------
+// Helper: Compute spherical y_l(z), l = 0..l_max, by upward recurrence.
+// --------------------------------------------------------------------------
+std::vector<double> ys_sequence_upward_impl(int l_max, double zi) {
+    if (l_max < 0) {
+        return std::vector<double>();
+    }
+
+    std::vector<double> out(l_max + 1, 0.0);
+    if (std::abs(zi) < tol) {
+        std::fill(out.begin(), out.end(), R_NegInf);
+        return out;
+    }
+
+    double z = zi;
+    out[0] = -std::cos(z) / z;
+    if (l_max == 0) {
+        return out;
+    }
+
+    out[1] = -std::cos(z) / (z * z) - std::sin(z) / z;
+    for (int n = 1; n < l_max; ++n) {
+        out[n + 1] = ((2.0 * n + 1.0) / z) * out[n] - out[n - 1];
+    }
+
+    return out;
+}
+
+// --------------------------------------------------------------------------
+// Helper: Compute spherical h_l^(1)(z), l = 0..l_max, from stable j/y
+// sequences.
+// --------------------------------------------------------------------------
+std::vector<std::complex<double>> hs_sequence_impl(int l_max, double zi) {
+    std::vector<double> j_seq = js_sequence_miller_impl(l_max, zi);
+    std::vector<double> y_seq = ys_sequence_upward_impl(l_max, zi);
+    std::vector<std::complex<double>> out(l_max + 1);
+
+    for (int n = 0; n <= l_max; ++n) {
+        out[n] = std::complex<double>(j_seq[n], y_seq[n]);
+    }
+
+    return out;
+}
+
+// --------------------------------------------------------------------------
+// Helper: Compute first derivatives j'_l(z), l = 0..l_max, from one Miller
+// sequence extended through l_max + 1.
+// --------------------------------------------------------------------------
+std::vector<double> js_deriv_sequence_impl(int l_max, double zi) {
+    if (l_max < 0) {
+        return std::vector<double>();
+    }
+
+    std::vector<double> out(l_max + 1, 0.0);
+    if (std::abs(zi) < tol) {
+        for (int n = 0; n <= l_max; ++n) {
+            out[n] = js_deriv_single_impl(n, zi, 1);
+        }
+        return out;
+    }
+
+    std::vector<double> j_seq = js_sequence_miller_impl(l_max + 1, zi);
+    for (int n = 0; n <= l_max; ++n) {
+        out[n] = (static_cast<double>(n) / zi) * j_seq[n] - j_seq[n + 1];
+    }
+
+    return out;
+}
+
+// --------------------------------------------------------------------------
+// Helper: Compute first derivatives h'_l(z), l = 0..l_max, from h_l and
+// h_{l+1} sequences.
+// --------------------------------------------------------------------------
+std::vector<std::complex<double>> hs_deriv_sequence_impl(int l_max, double zi) {
+    if (l_max < 0) {
+        return std::vector<std::complex<double>>();
+    }
+
+    std::vector<std::complex<double>> out(l_max + 1);
+    if (std::abs(zi) < tol) {
+        for (int n = 0; n <= l_max; ++n) {
+            out[n] = hs_deriv_single_impl(n, zi, 1);
+        }
+        return out;
+    }
+
+    std::vector<std::complex<double>> h_seq = hs_sequence_impl(l_max + 1, zi);
+    for (int n = 0; n <= l_max; ++n) {
+        out[n] = (static_cast<double>(n) / zi) * h_seq[n] - h_seq[n + 1];
+    }
+
+    return out;
+}
+
+// --------------------------------------------------------------------------
 // Helper: Compute single complex spherical j_l(z) value
 // --------------------------------------------------------------------------
 std::complex<double> js_single_complex_impl(int li, std::complex<double> zi) {
@@ -1117,6 +1280,58 @@ SEXP hc_deriv_cpp(ComplexVector z, ComplexVector nu, int k) {
 // ==========================================================================
 // SPHERICAL BESSEL FUNCTIONS
 // ==========================================================================
+
+// --------------------------------------------------------------------------
+// Internal sequence matrix for TMM radial blocks. Rows correspond to z values
+// and columns correspond to requested spherical orders.
+// --------------------------------------------------------------------------
+// [[Rcpp::export]]
+SEXP spherical_bessel_sequence_matrix_cpp(IntegerVector l,
+                                          NumericVector z,
+                                          std::string fun) {
+    int l_size = l.size();
+    int z_size = z.size();
+    if (l_size == 0 || z_size == 0) {
+        Rcpp::stop("'l' and 'z' must be non-empty.");
+    }
+
+    int l_max = 0;
+    for (int j = 0; j < l_size; ++j) {
+        if (l[j] < 0) {
+            Rcpp::stop("Spherical Bessel orders must be non-negative.");
+        }
+        l_max = std::max(l_max, l[j]);
+    }
+
+    if (fun == "js" || fun == "jsd") {
+        NumericMatrix result(z_size, l_size);
+        for (int i = 0; i < z_size; ++i) {
+            std::vector<double> seq = (fun == "js") ?
+                js_sequence_miller_impl(l_max, z[i]) :
+                js_deriv_sequence_impl(l_max, z[i]);
+            for (int j = 0; j < l_size; ++j) {
+                result(i, j) = seq[l[j]];
+            }
+        }
+        return result;
+    }
+
+    if (fun == "hs" || fun == "hsd") {
+        ComplexMatrix result(z_size, l_size);
+        for (int i = 0; i < z_size; ++i) {
+            std::vector<std::complex<double>> seq = (fun == "hs") ?
+                hs_sequence_impl(l_max, z[i]) :
+                hs_deriv_sequence_impl(l_max, z[i]);
+            for (int j = 0; j < l_size; ++j) {
+                result(i, j) = to_Rcomplex(seq[l[j]]);
+            }
+        }
+        return result;
+    }
+
+    Rcpp::stop("Unsupported spherical Bessel sequence request.");
+    return R_NilValue;
+}
 
 // --------------------------------------------------------------------------
 // 7. Spherical Bessel j_l(z)
