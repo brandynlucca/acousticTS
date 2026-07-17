@@ -386,7 +386,7 @@ bbf_generate <- function(body_shape,
     backbone = backbone,
     shape_parameters = shape_parameters,
     components = list(backbone = backbone)
-))
+  ))
 }
 ################################################################################
 # Create ELA-class object

@@ -1209,7 +1209,8 @@ test_that("`reforge('GAS')` reshapes canonical bodies and stays a GAS", {
   expect_equal(extract(iso_sphere, "shape_parameters")$shape, "Sphere")
   expect_equal(gas_radius(iso_sphere), 0.02, tolerance = 1e-6)
   promoted <- reforge(
-    sphere_gas, body_target = c(length = 0.05), isometric_body = FALSE
+    sphere_gas,
+    body_target = c(length = 0.05), isometric_body = FALSE
   )
   expect_equal(extract(promoted, "shape_parameters")$shape, "ProlateSpheroid")
 

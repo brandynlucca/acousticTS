@@ -25,6 +25,10 @@ hc_deriv_cpp <- function(z, nu, k) {
     .Call(`_acousticTS_hc_deriv_cpp`, z, nu, k)
 }
 
+spherical_bessel_sequence_matrix_cpp <- function(l, z, fun) {
+    .Call(`_acousticTS_spherical_bessel_sequence_matrix_cpp`, l, z, fun)
+}
+
 js_cpp <- function(l, z) {
     .Call(`_acousticTS_js_cpp`, l, z)
 }
@@ -127,6 +131,10 @@ prolate_spheroid_tmatrix_cpp <- function(acoustics, body, medium, integration_pt
 
 prolate_spheroid_scattering_from_tmatrix_cpp <- function(acoustics, t_matrix, theta_body, phi_body, theta_scatter, phi_scatter, precision = "double") {
     .Call(`_acousticTS_prolate_spheroid_scattering_from_tmatrix_cpp`, acoustics, t_matrix, theta_body, phi_body, theta_scatter, phi_scatter, precision)
+}
+
+prolate_spheroid_scattering_points_from_tmatrix_cpp <- function(acoustics, t_matrix, theta_body, phi_body, theta_scatter, phi_scatter, precision = "double") {
+    .Call(`_acousticTS_prolate_spheroid_scattering_points_from_tmatrix_cpp`, acoustics, t_matrix, theta_body, phi_body, theta_scatter, phi_scatter, precision)
 }
 
 prolate_spheroid_scattering_grid_from_tmatrix_cpp <- function(acoustics, t_matrix, theta_body, phi_body, theta_scatter, phi_scatter, precision = "double") {

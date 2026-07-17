@@ -144,6 +144,30 @@
 # Evaluate one spherical radial-function family across all retained degrees.
 #' @noRd
 .tmm_radial_matrix <- function(fun, n_seq, argument) {
+  fun_name <- NULL
+  if (identical(fun, js)) {
+    fun_name <- "js"
+  } else if (identical(fun, jsd)) {
+    fun_name <- "jsd"
+  } else if (identical(fun, hs)) {
+    fun_name <- "hs"
+  } else if (identical(fun, hsd)) {
+    fun_name <- "hsd"
+  }
+
+  if (!is.null(fun_name)) {
+    values <- spherical_bessel_sequence_matrix_cpp(
+      as.integer(n_seq),
+      as.numeric(argument),
+      fun_name
+    )
+    return(matrix(
+      as.complex(values),
+      nrow = length(argument),
+      ncol = length(n_seq)
+    ))
+  }
+
   # Evaluate the requested radial family degree by degree ======================
   values <- lapply(n_seq, function(n) as.complex(fun(n, argument)))
   # Bind the retained modal vectors into one matrix ============================
@@ -307,6 +331,164 @@
   list(lhs = lhs, rhs = rhs)
 }
 
+# Precompute the frequency-independent collocation and projection data for one
+# retained azimuthal block.
+#' @noRd
+.tmm_spherical_block_setup <- function(m,
+                                       n_max,
+                                       boundary,
+                                       shape_parameters) {
+  n_seq <- m:n_max
+  n_terms <- length(n_seq)
+  n_nodes <- .tmm_collocation_nodes(shape_parameters, boundary, n_terms)
+  quad <- gauss_legendre(n_nodes, a = -1, b = 1)
+  mu <- quad$nodes
+  theta <- acos(mu)
+  surface <- .tmm_surface_radius(shape_parameters, theta)
+  p_mat <- .tmm_assoc_legendre_table(m, n_max, mu)
+  dp_dtheta <- .tmm_assoc_legendre_theta_derivative(m, n_seq, mu, p_mat)
+  surface_weight <- surface$radius * sqrt(surface$radius^2 +
+    surface$radius_derivative^2)
+  weighted_test <- sweep(p_mat, 1, quad$weights * surface_weight, `*`)
+
+  projector <- Conj(t(weighted_test))
+  if (!boundary %in% c("fixed_rigid", "pressure_release")) {
+    n_rows <- nrow(p_mat)
+    projector <- rbind(
+      cbind(projector, matrix(0, n_terms, n_rows)),
+      cbind(matrix(0, n_terms, n_rows), projector)
+    )
+  }
+
+  list(
+    m = m,
+    n_max = n_max,
+    n_seq = n_seq,
+    n_terms = n_terms,
+    p_mat = p_mat,
+    dp_dtheta = dp_dtheta,
+    radius = surface$radius,
+    radius_derivative = surface$radius_derivative,
+    projector = projector
+  )
+}
+
+# Solve one frequency-dependent radial block using a cached spherical setup.
+#' @noRd
+.tmm_solve_spherical_block <- function(setup,
+                                       boundary,
+                                       k_sw,
+                                       k_body,
+                                       rho_sw,
+                                       rho_body = NULL) {
+  system <- .tmm_boundary_block(
+    boundary = boundary,
+    n_seq = setup$n_seq,
+    p_mat = setup$p_mat,
+    dp_dtheta = setup$dp_dtheta,
+    radius = setup$radius,
+    radius_derivative = setup$radius_derivative,
+    k_sw = k_sw,
+    k_body = k_body,
+    rho_sw = rho_sw,
+    rho_body = rho_body
+  )
+
+  lhs_proj <- setup$projector %*% system$lhs
+  rhs_proj <- setup$projector %*% system$rhs
+  rcond_lhs <- tryCatch(
+    rcond(lhs_proj),
+    error = function(...) NA_real_
+  )
+
+  solution <- .tmm_solve_linear_system(lhs_proj, rhs_proj)
+  t_block <- if (boundary %in% c("fixed_rigid", "pressure_release")) {
+    solution
+  } else {
+    solution[seq_len(setup$n_terms), , drop = FALSE]
+  }
+
+  list(T = t_block, rcond_lhs = rcond_lhs)
+}
+
+# Build the incident-side coefficient state for one cached spherical block.
+#' @noRd
+.tmm_spherical_incident_block <- function(setup, mu0) {
+  p_inc <- as.numeric(.tmm_assoc_legendre_table(setup$m, setup$n_max, mu0))
+  a_inc <- .tmm_incident_plane_wave_coefficients(
+    setup$m,
+    setup$n_seq,
+    mu0,
+    p_inc
+  )
+
+  list(p_inc = p_inc, a_inc = a_inc)
+}
+
+# Solve the retained spherical branch by reusing each frequency-independent
+# azimuthal block setup across all frequencies in the same n_max bucket.
+#' @noRd
+.tmm_spherical_stored_frequency_sweep <- function(acoustics,
+                                                  theta_body,
+                                                  boundary,
+                                                  shape_parameters,
+                                                  rho_sw,
+                                                  rho_body = NULL,
+                                                  store_t_matrix = TRUE) {
+  mu0 <- cos(theta_body)
+  f_bs <- complex(length.out = nrow(acoustics))
+  t_store <- vector("list", nrow(acoustics))
+  frequency_buckets <- split(seq_len(nrow(acoustics)), acoustics$n_max)
+
+  for (bucket_indices in frequency_buckets) {
+    n_max <- as.integer(acoustics$n_max[bucket_indices[1]])
+    for (frequency_idx in bucket_indices) {
+      t_store[[frequency_idx]] <- vector("list", length = n_max + 1L)
+    }
+
+    for (m in 0:n_max) {
+      setup <- .tmm_spherical_block_setup(
+        m = m,
+        n_max = n_max,
+        boundary = boundary,
+        shape_parameters = shape_parameters
+      )
+      incident <- .tmm_spherical_incident_block(setup, mu0)
+
+      for (frequency_idx in bucket_indices) {
+        solved <- .tmm_solve_spherical_block(
+          setup = setup,
+          boundary = boundary,
+          k_sw = acoustics$k_sw[frequency_idx],
+          k_body = acoustics$k_body[frequency_idx],
+          rho_sw = rho_sw,
+          rho_body = rho_body
+        )
+        coeffs <- as.vector(solved$T %*% incident$a_inc)
+
+        t_store[[frequency_idx]][[m + 1L]] <- list(
+          m = m,
+          n_seq = setup$n_seq,
+          p_inc = incident$p_inc,
+          coefficients = coeffs,
+          rcond_lhs = solved$rcond_lhs,
+          T = if (isTRUE(store_t_matrix)) solved$T else NULL
+        )
+      }
+    }
+
+    for (frequency_idx in bucket_indices) {
+      f_bs[frequency_idx] <- .tmm_backscatter_from_blocks(
+        t_store[[frequency_idx]],
+        k_sw = acoustics$k_sw[frequency_idx],
+        mu0 = mu0
+      )
+    }
+  }
+
+  list(f_bs = f_bs, t_matrix = t_store)
+}
+
 # Solve one frequency of the spherical-coordinate TMM branch and optionally
 # retain the per-order projected blocks.
 #' @noRd
@@ -324,75 +506,33 @@
   blocks <- vector("list", length = n_max + 1L)
 
   for (m in 0:n_max) {
-    # Build the retained degree sequence and collocation grid ==================
-    n_seq <- m:n_max
-    n_terms <- length(n_seq)
-    n_nodes <- .tmm_collocation_nodes(shape_parameters, boundary, n_terms)
-    quad <- gauss_legendre(n_nodes, a = -1, b = 1)
-    mu <- quad$nodes
-    theta <- acos(mu)
-    surface <- .tmm_surface_radius(shape_parameters, theta)
-    p_mat <- .tmm_assoc_legendre_table(m, n_max, mu)
-    dp_dtheta <- .tmm_assoc_legendre_theta_derivative(m, n_seq, mu, p_mat)
-
-    # Assemble the collocation system for this azimuthal order =================
-    system <- .tmm_boundary_block(
+    setup <- .tmm_spherical_block_setup(
+      m = m,
+      n_max = n_max,
       boundary = boundary,
-      n_seq = n_seq,
-      p_mat = p_mat,
-      dp_dtheta = dp_dtheta,
-      radius = surface$radius,
-      radius_derivative = surface$radius_derivative,
+      shape_parameters = shape_parameters
+    )
+    solved <- .tmm_solve_spherical_block(
+      setup = setup,
+      boundary = boundary,
       k_sw = k_sw,
       k_body = k_body,
       rho_sw = rho_sw,
       rho_body = rho_body
     )
 
-    # Project the collocation equations back onto the retained modal basis =====
-    surface_weight <- surface$radius * sqrt(surface$radius^2 +
-      surface$radius_derivative^2)
-    weighted_test <- sweep(p_mat, 1, quad$weights * surface_weight, `*`)
-    if (boundary %in% c("fixed_rigid", "pressure_release")) {
-      lhs_proj <- Conj(t(weighted_test)) %*% system$lhs
-      rhs_proj <- Conj(t(weighted_test)) %*% system$rhs
-    } else {
-      n_rows <- nrow(p_mat)
-      projector <- rbind(
-        cbind(Conj(t(weighted_test)), matrix(0, n_terms, n_rows)),
-        cbind(matrix(0, n_terms, n_rows), Conj(t(weighted_test)))
-      )
-      lhs_proj <- projector %*% system$lhs
-      rhs_proj <- projector %*% system$rhs
-    }
-
-    # Keep a lightweight conditioning indicator for diagnostics ================
-    rcond_lhs <- tryCatch(
-      rcond(lhs_proj),
-      error = function(...) NA_real_
-    )
-
-    # Solve the projected system and recover the outgoing block ================
-    solution <- .tmm_solve_linear_system(lhs_proj, rhs_proj)
-    t_block <- if (boundary %in% c("fixed_rigid", "pressure_release")) {
-      solution
-    } else {
-      solution[seq_len(n_terms), , drop = FALSE]
-    }
-
     # Apply the block T-matrix to the incident coefficients ====================
-    p_inc <- as.numeric(.tmm_assoc_legendre_table(m, n_max, mu0))
-    a_inc <- .tmm_incident_plane_wave_coefficients(m, n_seq, mu0, p_inc)
-    coeffs <- as.vector(t_block %*% a_inc)
+    incident <- .tmm_spherical_incident_block(setup, mu0)
+    coeffs <- as.vector(solved$T %*% incident$a_inc)
 
     # Store the solved block and its diagnostic bookkeeping ====================
     blocks[[m + 1L]] <- list(
       m = m,
-      n_seq = n_seq,
-      p_inc = p_inc,
+      n_seq = setup$n_seq,
+      p_inc = incident$p_inc,
       coefficients = coeffs,
-      rcond_lhs = rcond_lhs,
-      T = if (isTRUE(store_t_matrix)) t_block else NULL
+      rcond_lhs = solved$rcond_lhs,
+      T = if (isTRUE(store_t_matrix)) solved$T else NULL
     )
   }
 

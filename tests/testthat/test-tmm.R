@@ -385,6 +385,60 @@ test_that("Stored prolate TMM keeps the spheroidal modal cutoff", {
   expect_equal(acoustics$n_max, expected_n_max)
 })
 
+test_that("Stored prolate TMM paired-point evaluation matches scalar spheroidal calls", {
+  density_sw <- 1026.8
+  sound_speed_sw <- 1480
+  theta_body <- pi / 2
+  phi_body <- pi / 3
+  object <- target_strength(
+    object = fls_generate(
+      shape = prolate_spheroid(length_body = 0.07, radius_body = 0.01, n_segments = 80),
+      g_body = 1,
+      h_body = 1,
+      theta_body = theta_body
+    ),
+    frequency = 38e3,
+    model = "tmm",
+    boundary = "pressure_release",
+    density_sw = density_sw,
+    sound_speed_sw = sound_speed_sw,
+    store_t_matrix = TRUE
+  )
+
+  model_params <- object@model_parameters$TMM
+  acoustics <- model_params$parameters$acoustics[1, , drop = FALSE]
+  t_store <- model_params$parameters$t_matrix[[1]]
+  theta_scatter <- c(pi / 3, pi / 2, 2 * pi / 3)
+  phi_scatter <- c(0, pi / 2, 5 * pi / 4)
+
+  paired <- acousticTS:::.tmm_scattering_points(
+    model_params = model_params,
+    frequency_idx = 1L,
+    shape_parameters = acousticTS::extract(object, "shape_parameters"),
+    theta_body = rep(theta_body, length(theta_scatter)),
+    phi_body = rep(phi_body, length(theta_scatter)),
+    theta_scatter = theta_scatter,
+    phi_scatter = phi_scatter
+  )
+  scalar <- vapply(
+    seq_along(theta_scatter),
+    function(i) {
+      acousticTS:::.tmm_scattering_spheroidal(
+        t_store = list(t_store),
+        acoustics = acoustics,
+        parameters = model_params$parameters,
+        theta_body = theta_body,
+        phi_body = phi_body,
+        theta_scatter = theta_scatter[i],
+        phi_scatter = phi_scatter[i]
+      )[1]
+    },
+    complex(1)
+  )
+
+  expect_equal(paired, scalar, tolerance = 1e-10)
+})
+
 test_that("tmm_scattering reproduces stored monostatic results", {
   density_sw <- 1026.8
   sound_speed_sw <- 1477.3

@@ -3,6 +3,7 @@
 
 #include <Rcpp.h>
 #include <complex>
+#include <vector>
 
 // Convert the internal std::complex representation used by the compiled
 // solvers into the Rcomplex layout expected by Rcpp return values.
@@ -23,6 +24,15 @@ std::complex<double> yc_single_impl(std::complex<double> zi, double nui);
 double js_single_impl(int li, double zi);
 double ys_single_impl(int li, double zi);
 std::complex<double> hs_single_impl(int li, double zi);
+
+// Real-argument spherical Bessel/Hankel order sequences. The regular
+// spherical Bessel sequence uses Miller downward recurrence with normalization;
+// the irregular sequence is evaluated upward in order.
+std::vector<double> js_sequence_miller_impl(int l_max, double zi);
+std::vector<double> ys_sequence_upward_impl(int l_max, double zi);
+std::vector<std::complex<double>> hs_sequence_impl(int l_max, double zi);
+std::vector<double> js_deriv_sequence_impl(int l_max, double zi);
+std::vector<std::complex<double>> hs_deriv_sequence_impl(int l_max, double zi);
 
 // Complex-argument spherical Bessel helpers used when attenuation or complex
 // wavenumbers move the argument off the real axis.

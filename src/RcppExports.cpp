@@ -86,6 +86,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// spherical_bessel_sequence_matrix_cpp
+SEXP spherical_bessel_sequence_matrix_cpp(IntegerVector l, NumericVector z, std::string fun);
+RcppExport SEXP _acousticTS_spherical_bessel_sequence_matrix_cpp(SEXP lSEXP, SEXP zSEXP, SEXP funSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerVector >::type l(lSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type z(zSEXP);
+    Rcpp::traits::input_parameter< std::string >::type fun(funSEXP);
+    rcpp_result_gen = Rcpp::wrap(spherical_bessel_sequence_matrix_cpp(l, z, fun));
+    return rcpp_result_gen;
+END_RCPP
+}
 // js_cpp
 SEXP js_cpp(IntegerVector l, NumericVector z);
 RcppExport SEXP _acousticTS_js_cpp(SEXP lSEXP, SEXP zSEXP) {
@@ -455,6 +468,23 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// prolate_spheroid_scattering_points_from_tmatrix_cpp
+Rcpp::ComplexVector prolate_spheroid_scattering_points_from_tmatrix_cpp(Rcpp::DataFrame acoustics, Rcpp::List t_matrix, double theta_body, double phi_body, Rcpp::NumericVector theta_scatter, Rcpp::NumericVector phi_scatter, std::string precision);
+RcppExport SEXP _acousticTS_prolate_spheroid_scattering_points_from_tmatrix_cpp(SEXP acousticsSEXP, SEXP t_matrixSEXP, SEXP theta_bodySEXP, SEXP phi_bodySEXP, SEXP theta_scatterSEXP, SEXP phi_scatterSEXP, SEXP precisionSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::DataFrame >::type acoustics(acousticsSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type t_matrix(t_matrixSEXP);
+    Rcpp::traits::input_parameter< double >::type theta_body(theta_bodySEXP);
+    Rcpp::traits::input_parameter< double >::type phi_body(phi_bodySEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type theta_scatter(theta_scatterSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type phi_scatter(phi_scatterSEXP);
+    Rcpp::traits::input_parameter< std::string >::type precision(precisionSEXP);
+    rcpp_result_gen = Rcpp::wrap(prolate_spheroid_scattering_points_from_tmatrix_cpp(acoustics, t_matrix, theta_body, phi_body, theta_scatter, phi_scatter, precision));
+    return rcpp_result_gen;
+END_RCPP
+}
 // prolate_spheroid_scattering_grid_from_tmatrix_cpp
 Rcpp::ComplexMatrix prolate_spheroid_scattering_grid_from_tmatrix_cpp(Rcpp::DataFrame acoustics, Rcpp::List t_matrix, double theta_body, double phi_body, Rcpp::NumericVector theta_scatter, Rcpp::NumericVector phi_scatter, std::string precision);
 RcppExport SEXP _acousticTS_prolate_spheroid_scattering_grid_from_tmatrix_cpp(SEXP acousticsSEXP, SEXP t_matrixSEXP, SEXP theta_bodySEXP, SEXP phi_bodySEXP, SEXP theta_scatterSEXP, SEXP phi_scatterSEXP, SEXP precisionSEXP) {
@@ -526,6 +556,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_acousticTS_jc_deriv_cpp", (DL_FUNC) &_acousticTS_jc_deriv_cpp, 3},
     {"_acousticTS_yc_deriv_cpp", (DL_FUNC) &_acousticTS_yc_deriv_cpp, 3},
     {"_acousticTS_hc_deriv_cpp", (DL_FUNC) &_acousticTS_hc_deriv_cpp, 3},
+    {"_acousticTS_spherical_bessel_sequence_matrix_cpp", (DL_FUNC) &_acousticTS_spherical_bessel_sequence_matrix_cpp, 3},
     {"_acousticTS_js_cpp", (DL_FUNC) &_acousticTS_js_cpp, 2},
     {"_acousticTS_ys_cpp", (DL_FUNC) &_acousticTS_ys_cpp, 2},
     {"_acousticTS_hs_cpp", (DL_FUNC) &_acousticTS_hs_cpp, 2},
@@ -552,6 +583,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_acousticTS_prolate_spheroid_fbs", (DL_FUNC) &_acousticTS_prolate_spheroid_fbs, 8},
     {"_acousticTS_prolate_spheroid_tmatrix_cpp", (DL_FUNC) &_acousticTS_prolate_spheroid_tmatrix_cpp, 6},
     {"_acousticTS_prolate_spheroid_scattering_from_tmatrix_cpp", (DL_FUNC) &_acousticTS_prolate_spheroid_scattering_from_tmatrix_cpp, 7},
+    {"_acousticTS_prolate_spheroid_scattering_points_from_tmatrix_cpp", (DL_FUNC) &_acousticTS_prolate_spheroid_scattering_points_from_tmatrix_cpp, 7},
     {"_acousticTS_prolate_spheroid_scattering_grid_from_tmatrix_cpp", (DL_FUNC) &_acousticTS_prolate_spheroid_scattering_grid_from_tmatrix_cpp, 7},
     {"_acousticTS_tmm_backscatter_cpp", (DL_FUNC) &_acousticTS_tmm_backscatter_cpp, 10},
     {"_acousticTS_vesms_backscatter_cpp", (DL_FUNC) &_acousticTS_vesms_backscatter_cpp, 16},

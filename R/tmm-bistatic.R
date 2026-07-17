@@ -93,15 +93,19 @@
   # Build the forward direction for the incident geometry ======================
   forward <- .tmm_spherical_to_cartesian(theta_body, phi_body)
   # Compute the forward-centered angular separation grid =======================
-  psi <- outer(
-    theta_scatter,
-    phi_scatter,
-    Vectorize(function(theta_val, phi_val) {
-      scat <- .tmm_spherical_to_cartesian(theta_val, phi_val)
-      acos(max(-1, min(1, sum(forward * scat))))
-    })
+  dot <- tcrossprod(
+    sin(theta_scatter),
+    forward[1] * cos(phi_scatter) + forward[2] * sin(phi_scatter)
+  ) + tcrossprod(
+    cos(theta_scatter),
+    rep(forward[3], length(phi_scatter))
   )
-  psi
+  dot <- matrix(
+    pmax(-1, pmin(1, dot)),
+    nrow = length(theta_scatter),
+    ncol = length(phi_scatter)
+  )
+  acos(dot)
 }
 
 # Measure the -drop_dB width of the local backscatter lobe on one great-circle

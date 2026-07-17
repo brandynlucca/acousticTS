@@ -360,29 +360,32 @@ tmm_average_orientation <- function(object,
   theta_scatter <- scatter_angles$theta_scatter
   phi_scatter <- scatter_angles$phi_scatter
 
-  # Evaluate the stored scattering operator at each supplied orientation =======
+  # Evaluate each stored frequency once over the full orientation batch =======
   n_angles <- length(theta_body)
-  sigma_mat <- vapply(
-    seq_len(n_angles),
-    function(i) {
-      suppressWarnings(tmm_scattering(
-        object = object,
-        theta_body = theta_body[i],
-        phi_body = phi_body[i],
-        theta_scatter = theta_scatter[i],
-        phi_scatter = phi_scatter[i]
-      ))$sigma_scat
-    },
-    numeric(length(model_params$parameters$acoustics$frequency))
+  acoustics <- model_params$parameters$acoustics
+  shape_parameters <- acousticTS::extract(object, "shape_parameters")
+  sigma_mat <- matrix(
+    NA_real_,
+    nrow = length(acoustics$frequency),
+    ncol = n_angles
   )
-  if (is.null(dim(sigma_mat))) {
-    sigma_mat <- matrix(sigma_mat, ncol = 1)
+  for (frequency_idx in seq_along(acoustics$frequency)) {
+    f_scat <- .tmm_scattering_points(
+      model_params = model_params,
+      frequency_idx = frequency_idx,
+      shape_parameters = shape_parameters,
+      theta_body = theta_body,
+      phi_body = phi_body,
+      theta_scatter = theta_scatter,
+      phi_scatter = phi_scatter
+    )
+    sigma_mat[frequency_idx, ] <- .sigma_bs(f_scat)
   }
   sigma_avg <- as.vector(sigma_mat %*% weights)
 
   # Return the orientation-averaged backscatter summaries ======================
   data.frame(
-    frequency = model_params$parameters$acoustics$frequency,
+    frequency = acoustics$frequency,
     sigma_bs = sigma_avg,
     TS = db(sigma_avg)
   )

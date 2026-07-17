@@ -307,6 +307,103 @@ test_that("internal TMM spherical helpers cover surface and solver branches", {
   )
 })
 
+test_that("stored spherical TMM frequency sweep matches single-frequency solves", {
+  sphere_params <- fls_generate(
+    shape = sphere(radius_body = 0.01, n_segments = 20),
+    g_body = 1,
+    h_body = 1
+  )@shape_parameters
+  frequency <- c(18e3, 38e3, 70e3)
+  acoustics <- data.frame(
+    frequency = frequency,
+    k_sw = wavenumber(frequency, 1500),
+    k_body = NA_real_,
+    n_max = c(3L, 3L, 4L)
+  )
+
+  sweep <- acousticTS:::.tmm_spherical_stored_frequency_sweep(
+    acoustics = acoustics,
+    theta_body = pi / 3,
+    boundary = "pressure_release",
+    shape_parameters = sphere_params,
+    rho_sw = 1026.8,
+    store_t_matrix = TRUE
+  )
+  reference <- lapply(
+    seq_len(nrow(acoustics)),
+    function(i) {
+      acousticTS:::.tmm_single_frequency_spherical(
+        k_sw = acoustics$k_sw[i],
+        k_body = acoustics$k_body[i],
+        theta_body = pi / 3,
+        boundary = "pressure_release",
+        shape_parameters = sphere_params,
+        rho_sw = 1026.8,
+        n_max = acoustics$n_max[i],
+        store_t_matrix = TRUE
+      )
+    }
+  )
+
+  expect_equal(
+    sweep$f_bs,
+    vapply(reference, `[[`, complex(1), "f_bs"),
+    tolerance = 1e-12
+  )
+  for (i in seq_along(reference)) {
+    expect_length(sweep$t_matrix[[i]], acoustics$n_max[i] + 1L)
+    for (j in seq_along(reference[[i]]$blocks)) {
+      expect_equal(
+        sweep$t_matrix[[i]][[j]]$coefficients,
+        reference[[i]]$blocks[[j]]$coefficients,
+        tolerance = 1e-12
+      )
+      expect_equal(
+        sweep$t_matrix[[i]][[j]]$T,
+        reference[[i]]$blocks[[j]]$T,
+        tolerance = 1e-12
+      )
+    }
+  }
+})
+
+test_that("compiled spherical TMM wrapper preserves mixed n_max bucket order", {
+  frequency <- c(18e3, 38e3, 70e3, 120e3)
+  n_max <- c(3L, 4L, 3L, 4L)
+  vectorized <- tmm_backscatter_cpp(
+    frequency = frequency,
+    theta_body = pi / 3,
+    shape = "Sphere",
+    shape_values = 0.01,
+    boundary = "pressure_release",
+    sound_speed_sw = 1500,
+    density_sw = 1026.8,
+    density_body = NA_real_,
+    sound_speed_body = NA_real_,
+    n_max = n_max
+  )
+  scalar <- vapply(
+    seq_along(frequency),
+    function(i) {
+      tmm_backscatter_cpp(
+        frequency = frequency[i],
+        theta_body = pi / 3,
+        shape = "Sphere",
+        shape_values = 0.01,
+        boundary = "pressure_release",
+        sound_speed_sw = 1500,
+        density_sw = 1026.8,
+        density_body = NA_real_,
+        sound_speed_body = NA_real_,
+        n_max = n_max[i]
+      )[1]
+    },
+    complex(1)
+  )
+
+  expect_equal(vectorized, scalar, tolerance = 1e-12)
+})
+
 test_that("internal TMM diagnostics helpers cover validation and continuation branches", {
   density_sw <- 1026.8
   sound_speed_sw <- 1477.3
@@ -759,4 +856,84 @@ test_that("internal TMM scattering and orientation helpers cover remaining valid
   )
   mono <- tmm_scattering(stored_obj, theta_body = pi / 2, phi_body = pi)
   expect_equal(avg$sigma_bs, mono$sigma_scat, tolerance = 1e-10)
+})
+
+test_that("TMM shared-incidence point and sphere-modal grid paths match scalar evaluators", {
+  t_store <- list(
+    list(
+      m = 0L,
+      n_seq = 0:1,
+      T = matrix(c(1 + 0i, 0.2 - 0.1i, -0.3 + 0.4i, 0.7 + 0i), nrow = 2)
+    ),
+    list(
+      m = 1L,
+      n_seq = 1:2,
+      T = matrix(c(0.5 + 0.2i, -0.1 + 0i, 0.3 - 0.2i, 0.4 + 0.1i), nrow = 2)
+    )
+  )
+  acoustics <- data.frame(frequency = 38000, k_sw = 2)
+  theta_body <- rep(pi / 3, 3)
+  phi_body <- rep(pi / 4, 3)
+  theta_scatter <- c(pi / 5, pi / 2, 4 * pi / 5)
+  phi_scatter <- c(0, pi / 3, 5 * pi / 4)
+
+  fast <- acousticTS:::.tmm_scattering_points(
+    model_params = list(parameters = list(
+      coordinate_system = "spherical",
+      acoustics = acoustics,
+      t_matrix = list(t_store)
+    )),
+    frequency_idx = 1L,
+    shape_parameters = list(),
+    theta_body = theta_body,
+    phi_body = phi_body,
+    theta_scatter = theta_scatter,
+    phi_scatter = phi_scatter
+  )
+  scalar <- vapply(
+    seq_along(theta_scatter),
+    function(i) {
+      acousticTS:::.tmm_scattering_spherical(
+        t_store = list(t_store),
+        acoustics = acoustics,
+        theta_body = theta_body[i],
+        phi_body = phi_body[i],
+        theta_scatter = theta_scatter[i],
+        phi_scatter = phi_scatter[i]
+      )[1]
+    },
+    complex(1)
+  )
+  expect_equal(fast, scalar, tolerance = 1e-12)
+
+  sphere_store <- list(n_seq = 0:2, A_n = c(1 + 0i, 0.2 - 0.1i, -0.3 + 0.4i))
+  theta_grid <- c(pi / 6, pi / 2)
+  phi_grid <- c(0, pi / 2, pi)
+  grid <- acousticTS:::.tmm_scattering_sphere_modal_grid(
+    model_params = list(parameters = list(
+      coordinate_system = "sphere_modal",
+      acoustics = acoustics,
+      t_matrix = list(sphere_store)
+    )),
+    frequency_idx = 1L,
+    theta_body = pi / 3,
+    phi_body = pi / 4,
+    theta_scatter = theta_grid,
+    phi_scatter = phi_grid
+  )
+  point_grid <- outer(
+    seq_along(theta_grid),
+    seq_along(phi_grid),
+    Vectorize(function(i, j) {
+      acousticTS:::.tmm_scattering_sphere_modal(
+        t_store = list(sphere_store),
+        acoustics = acoustics,
+        theta_body = pi / 3,
+        phi_body = pi / 4,
+        theta_scatter = theta_grid[i],
+        phi_scatter = phi_grid[j]
+      )[1]
+    })
+  )
+  expect_equal(grid, point_grid, tolerance = 1e-12)
 })
