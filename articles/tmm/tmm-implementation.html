@@ -664,15 +664,15 @@ nonspherical oblate case</li>
 <li>Cylinder cases are compared against <code>FCMS</code> for the
 default monostatic branch over the tested <code>12-200 kHz</code>
 grids</li>
+<li>Shell-sphere cases (<code>ESS</code> objects) are compared against
+the same published benchmark reference used for <code>ESSMS</code>
+</li>
 </ul>
-<p>Those broad checks were run over multiple shapes and multiple
-frequency grids rather than just one canonical example, but the
-resulting summary tables are kept static here so the implementation page
-remains lightweight to build.</p>
 <div class="section level4">
 <h4 id="benchmark-tables">Benchmark tables<a class="anchor" aria-label="anchor" href="#benchmark-tables"></a>
 </h4>
 <div class="panel-tabset">
+
 
 
 
@@ -682,34 +682,44 @@ remains lightweight to build.</p>
 <li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#oblate-1" id="oblate-1-tab" type="button" role="tab" aria-controls="oblate-1" aria-selected="false" class="nav-link">Oblate</button></li>
 <li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#prolate-1" id="prolate-1-tab" type="button" role="tab" aria-controls="prolate-1" aria-selected="false" class="nav-link">Prolate</button></li>
 <li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#cylinder" id="cylinder-tab" type="button" role="tab" aria-controls="cylinder" aria-selected="false" class="nav-link">Cylinder</button></li>
+<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#shell-sphere" id="shell-sphere-tab" type="button" role="tab" aria-controls="shell-sphere" aria-selected="false" class="nav-link">Shell sphere</button></li>
 </ul>
 <div class="tab-content">
 <div class="active  tab-pane" id="sphere-1" role="tabpanel" aria-labelledby="sphere-1-tab">
 
-<p>Spherical models were benchmarked against <code>SPHMS</code> over
-<code>12:120 by 4</code> kHz for <code>a = 5</code>, <code>10</code>,
-and <code>18 mm</code>.</p>
-<table style="width:100%;" class="table">
+<table class="table">
 <colgroup>
-<col width="16%">
-<col width="16%">
-<col width="16%">
-<col width="16%">
-<col width="16%">
-<col width="16%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">
 <span class="math inline">a</span> (mm)</th>
 <th align="left">Boundary</th>
-<th align="right"><span class="math inline">\max \vert \Delta TS \vert ~
-(\text{dB})</span></th>
-<th align="right"><span class="math inline">\vert \overline{\Delta TS}
-\vert ~ (\text{dB})</span></th>
-<th align="right"><span class="math inline">t_\text{TMM}
-(\text{s})</span></th>
-<th align="right"><span class="math inline">t_\text{SPHMS}
-(\text{s})</span></th>
+<th align="right">
+<span class="math inline">\max \vert \Delta TS \vert ~
+(\text{dB})</span> SPHMS</th>
+<th align="right">
+<span class="math inline">\vert \overline{\Delta TS}
+\vert ~ (\text{dB})</span> SPHMS</th>
+<th align="right">
+<span class="math inline">\max \vert \Delta TS \vert ~
+(\text{dB})</span> BEM</th>
+<th align="right">
+<span class="math inline">\vert \overline{\Delta TS}
+\vert ~ (\text{dB})</span> BEM</th>
+<th align="right">
+<span class="math inline">\max \vert \Delta TS \vert ~
+(\text{dB})</span> FEM</th>
+<th align="right">
+<span class="math inline">\vert \overline{\Delta TS}
+\vert ~ (\text{dB})</span> FEM</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
@@ -717,105 +727,126 @@ and <code>18 mm</code>.</p>
 <td align="left"><code>fixed_rigid</code></td>
 <td align="right"><code>1.66e-11</code></td>
 <td align="right"><code>1.95e-12</code></td>
-<td align="right"><code>0.17</code></td>
-<td align="right"><code>0.01</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
 </tr>
 <tr class="even">
 <td align="left"><code>5</code></td>
 <td align="left"><code>pressure_release</code></td>
 <td align="right"><code>1.76e-11</code></td>
 <td align="right"><code>1.76e-12</code></td>
-<td align="right"><code>0.17</code></td>
-<td align="right"><code>0.00</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
 </tr>
 <tr class="odd">
 <td align="left"><code>5</code></td>
 <td align="left"><code>liquid_filled</code></td>
 <td align="right"><code>4.19e-11</code></td>
 <td align="right"><code>6.17e-12</code></td>
-<td align="right"><code>0.28</code></td>
-<td align="right"><code>0.03</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
 </tr>
 <tr class="even">
 <td align="left"><code>5</code></td>
 <td align="left"><code>gas_filled</code></td>
 <td align="right"><code>1.75e-11</code></td>
 <td align="right"><code>1.75e-12</code></td>
-<td align="right"><code>0.28</code></td>
-<td align="right"><code>0.02</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
 </tr>
 <tr class="odd">
 <td align="left"><code>10</code></td>
 <td align="left"><code>fixed_rigid</code></td>
 <td align="right"><code>2.37e-10</code></td>
 <td align="right"><code>2.75e-11</code></td>
-<td align="right"><code>0.25</code></td>
-<td align="right"><code>0.01</code></td>
+<td align="right"><code>0.048</code></td>
+<td align="right"><code>0.010</code></td>
+<td align="right"><code>0.528</code></td>
+<td align="right"><code>0.087</code></td>
 </tr>
 <tr class="even">
 <td align="left"><code>10</code></td>
 <td align="left"><code>pressure_release</code></td>
 <td align="right"><code>2.44e-10</code></td>
 <td align="right"><code>2.91e-11</code></td>
-<td align="right"><code>0.24</code></td>
-<td align="right"><code>0.02</code></td>
+<td align="right"><code>0.072</code></td>
+<td align="right"><code>0.014</code></td>
+<td align="right"><code>0.164</code></td>
+<td align="right"><code>0.031</code></td>
 </tr>
 <tr class="odd">
 <td align="left"><code>10</code></td>
 <td align="left"><code>liquid_filled</code></td>
 <td align="right"><code>1.15e-10</code></td>
 <td align="right"><code>1.74e-11</code></td>
-<td align="right"><code>0.34</code></td>
-<td align="right"><code>0.01</code></td>
+<td align="right"><code>3.873</code></td>
+<td align="right"><code>0.046</code></td>
+<td align="right"><code>3.599</code></td>
+<td align="right"><code>0.025</code></td>
 </tr>
 <tr class="even">
 <td align="left"><code>10</code></td>
 <td align="left"><code>gas_filled</code></td>
 <td align="right"><code>2.45e-10</code></td>
 <td align="right"><code>2.86e-11</code></td>
-<td align="right"><code>0.41</code></td>
-<td align="right"><code>0.03</code></td>
+<td align="right"><code>0.030</code></td>
+<td align="right"><code>0.004</code></td>
+<td align="right"><code>0.007</code></td>
+<td align="right"><code>0.0004</code></td>
 </tr>
 <tr class="odd">
 <td align="left"><code>18</code></td>
 <td align="left"><code>fixed_rigid</code></td>
 <td align="right"><code>7.62e-10</code></td>
 <td align="right"><code>8.32e-11</code></td>
-<td align="right"><code>0.34</code></td>
-<td align="right"><code>0.00</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
 </tr>
 <tr class="even">
 <td align="left"><code>18</code></td>
 <td align="left"><code>pressure_release</code></td>
 <td align="right"><code>7.91e-10</code></td>
 <td align="right"><code>8.49e-11</code></td>
-<td align="right"><code>0.35</code></td>
-<td align="right"><code>0.01</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
 </tr>
 <tr class="odd">
 <td align="left"><code>18</code></td>
 <td align="left"><code>liquid_filled</code></td>
 <td align="right"><code>4.96e-09</code></td>
 <td align="right"><code>2.48e-10</code></td>
-<td align="right"><code>0.55</code></td>
-<td align="right"><code>0.02</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
 </tr>
 <tr class="even">
 <td align="left"><code>18</code></td>
 <td align="left"><code>gas_filled</code></td>
 <td align="right"><code>8.46e-10</code></td>
 <td align="right"><code>8.71e-11</code></td>
-<td align="right"><code>0.62</code></td>
-<td align="right"><code>0.01</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="tab-pane" id="oblate-1" role="tabpanel" aria-labelledby="oblate-1-tab">
 
-<p>Oblate sphere-limit checks used three equal-volume radii and compared
-against the <code>SPHMS</code> sphere limit at <code>12</code>,
-<code>38</code>, <code>70</code>, and <code>120 kHz</code>.</p>
 <table class="table">
 <colgroup>
 <col width="20%">
@@ -826,55 +857,53 @@ against the <code>SPHMS</code> sphere limit at <code>12</code>,
 </colgroup>
 <thead><tr class="header">
 <th align="left">Boundary</th>
-<th align="right"><span class="math inline">\max \vert \Delta TS \vert ~
-(\text{dB})</span></th>
-<th align="right"><span class="math inline">\vert \overline{\Delta TS}
-\vert ~ (\text{dB})</span></th>
-<th align="right"><span class="math inline">t_\text{TMM}
-(\text{s})</span></th>
-<th align="right"><span class="math inline">t_\text{SPHMS}
-(\text{s})</span></th>
+<th align="right">
+<span class="math inline">\max \vert \Delta TS \vert ~
+(\text{dB})</span> SPHMS</th>
+<th align="right">
+<span class="math inline">\vert \overline{\Delta TS}
+\vert ~ (\text{dB})</span> SPHMS</th>
+<th align="right">
+<span class="math inline">\max \vert \Delta TS \vert ~
+(\text{dB})</span> BEM</th>
+<th align="right">
+<span class="math inline">\vert \overline{\Delta TS}
+\vert ~ (\text{dB})</span> BEM</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td align="left"><code>fixed_rigid</code></td>
 <td align="right"><code>3.60e-10</code></td>
 <td align="right"><code>4.97e-11</code></td>
-<td align="right"><code>0.05</code></td>
-<td align="right"><code>0.01</code></td>
+<td align="right"><code>0.034</code></td>
+<td align="right"><code>0.008</code></td>
 </tr>
 <tr class="even">
 <td align="left"><code>pressure_release</code></td>
 <td align="right"><code>3.12e-10</code></td>
 <td align="right"><code>5.06e-11</code></td>
-<td align="right"><code>0.08</code></td>
-<td align="right"><code>0.00</code></td>
+<td align="right"><code>0.009</code></td>
+<td align="right"><code>0.002</code></td>
 </tr>
 <tr class="odd">
 <td align="left"><code>liquid_filled</code></td>
 <td align="right"><code>1.09e-10</code></td>
 <td align="right"><code>1.92e-11</code></td>
-<td align="right"><code>0.08</code></td>
-<td align="right"><code>0.01</code></td>
+<td align="right"><code>31.14</code></td>
+<td align="right"><code>0.497</code></td>
 </tr>
 <tr class="even">
 <td align="left"><code>gas_filled</code></td>
 <td align="right"><code>3.12e-10</code></td>
 <td align="right"><code>5.07e-11</code></td>
-<td align="right"><code>0.10</code></td>
-<td align="right"><code>0.01</code></td>
+<td align="right"><code>0.023</code></td>
+<td align="right"><code>0.009</code></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="tab-pane" id="prolate-1" role="tabpanel" aria-labelledby="prolate-1-tab">
 
-<p>Prolate models were benchmarked against <code>PSMS</code>. The
-<code>60 x 8 mm</code> case used <code>12</code>, <code>18</code>,
-<code>38</code>, <code>70</code>, <code>100</code>, and
-<code>150 kHz</code>, while the <code>140 x 10 mm</code> case used
-<code>12</code>, <code>18</code>, <code>38</code>, <code>70</code>, and
-<code>100 kHz</code>.</p>
 <table style="width:100%;" class="table">
 <colgroup>
 <col width="14%">
@@ -891,14 +920,18 @@ against the <code>SPHMS</code> sphere limit at <code>12</code>,
 <th align="left">
 <span class="math inline">a</span> (mm)</th>
 <th align="left">Boundary</th>
-<th align="right"><span class="math inline">\max \vert \Delta TS \vert ~
-(\text{dB})</span></th>
-<th align="right"><span class="math inline">\vert \overline{\Delta TS}
-\vert ~ (\text{dB})</span></th>
-<th align="right"><span class="math inline">t_\text{TMM}
-(\text{s})</span></th>
-<th align="right"><span class="math inline">t_\text{PSMS}
-(\text{s})</span></th>
+<th align="right">
+<span class="math inline">\max \vert \Delta TS \vert ~
+(\text{dB})</span> PSMS</th>
+<th align="right">
+<span class="math inline">\vert \overline{\Delta TS}
+\vert ~ (\text{dB})</span> PSMS</th>
+<th align="right">
+<span class="math inline">\max \vert \Delta TS \vert ~
+(\text{dB})</span> BEM</th>
+<th align="right">
+<span class="math inline">\vert \overline{\Delta TS}
+\vert ~ (\text{dB})</span> BEM</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
@@ -907,8 +940,8 @@ against the <code>SPHMS</code> sphere limit at <code>12</code>,
 <td align="left"><code>fixed_rigid</code></td>
 <td align="right"><code>0.00000</code></td>
 <td align="right"><code>0.00000</code></td>
-<td align="right"><code>0.03</code></td>
-<td align="right"><code>0.03</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
 </tr>
 <tr class="even">
 <td align="left"><code>60</code></td>
@@ -916,8 +949,8 @@ against the <code>SPHMS</code> sphere limit at <code>12</code>,
 <td align="left"><code>pressure_release</code></td>
 <td align="right"><code>0.00000</code></td>
 <td align="right"><code>0.00000</code></td>
-<td align="right"><code>0.01</code></td>
-<td align="right"><code>0.03</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
 </tr>
 <tr class="odd">
 <td align="left"><code>60</code></td>
@@ -925,8 +958,8 @@ against the <code>SPHMS</code> sphere limit at <code>12</code>,
 <td align="left"><code>liquid_filled</code></td>
 <td align="right"><code>0.00000</code></td>
 <td align="right"><code>0.00000</code></td>
-<td align="right"><code>2.54</code></td>
-<td align="right"><code>2.49</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
 </tr>
 <tr class="even">
 <td align="left"><code>60</code></td>
@@ -934,8 +967,8 @@ against the <code>SPHMS</code> sphere limit at <code>12</code>,
 <td align="left"><code>gas_filled</code></td>
 <td align="right"><code>0.00000</code></td>
 <td align="right"><code>0.00000</code></td>
-<td align="right"><code>0.81</code></td>
-<td align="right"><code>0.78</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
 </tr>
 <tr class="odd">
 <td align="left"><code>140</code></td>
@@ -943,8 +976,8 @@ against the <code>SPHMS</code> sphere limit at <code>12</code>,
 <td align="left"><code>fixed_rigid</code></td>
 <td align="right"><code>0.00000</code></td>
 <td align="right"><code>0.00000</code></td>
-<td align="right"><code>0.04</code></td>
-<td align="right"><code>0.01</code></td>
+<td align="right"><code>16.66</code></td>
+<td align="right"><code>0.068</code></td>
 </tr>
 <tr class="even">
 <td align="left"><code>140</code></td>
@@ -952,8 +985,8 @@ against the <code>SPHMS</code> sphere limit at <code>12</code>,
 <td align="left"><code>pressure_release</code></td>
 <td align="right"><code>0.00000</code></td>
 <td align="right"><code>0.00000</code></td>
-<td align="right"><code>0.05</code></td>
-<td align="right"><code>0.03</code></td>
+<td align="right"><code>0.105</code></td>
+<td align="right"><code>0.010</code></td>
 </tr>
 <tr class="odd">
 <td align="left"><code>140</code></td>
@@ -961,8 +994,8 @@ against the <code>SPHMS</code> sphere limit at <code>12</code>,
 <td align="left"><code>liquid_filled</code></td>
 <td align="right"><code>0.00000</code></td>
 <td align="right"><code>0.00000</code></td>
-<td align="right"><code>2.22</code></td>
-<td align="right"><code>2.31</code></td>
+<td align="right"><code>58.26</code></td>
+<td align="right"><code>1.378</code></td>
 </tr>
 <tr class="even">
 <td align="left"><code>140</code></td>
@@ -970,17 +1003,14 @@ against the <code>SPHMS</code> sphere limit at <code>12</code>,
 <td align="left"><code>gas_filled</code></td>
 <td align="right"><code>0.00000</code></td>
 <td align="right"><code>0.00000</code></td>
-<td align="right"><code>1.11</code></td>
-<td align="right"><code>1.06</code></td>
+<td align="right"><code>0.295</code></td>
+<td align="right"><code>0.028</code></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="tab-pane" id="cylinder" role="tabpanel" aria-labelledby="cylinder-tab">
 
-<p>Cylinders were benchmarked against <code>FCMS</code> over
-<code>12</code>, <code>18</code>, <code>38</code>, <code>70</code>,
-<code>100</code>, <code>150</code>, and <code>200 kHz</code>.</p>
 <table style="width:100%;" class="table">
 <colgroup>
 <col width="14%">
@@ -997,14 +1027,18 @@ against the <code>SPHMS</code> sphere limit at <code>12</code>,
 <th align="left">
 <span class="math inline">a</span> (mm)</th>
 <th align="left">Boundary</th>
-<th align="right"><span class="math inline">\max \vert \Delta TS \vert ~
-(\text{dB})</span></th>
-<th align="right"><span class="math inline">\vert \overline{\Delta TS}
-\vert ~ (\text{dB})</span></th>
-<th align="right"><span class="math inline">t_\text{TMM}
-(\text{s})</span></th>
-<th align="right"><span class="math inline">t_\text{FCMS}
-(\text{s})</span></th>
+<th align="right">
+<span class="math inline">\max \vert \Delta TS \vert ~
+(\text{dB})</span> FCMS</th>
+<th align="right">
+<span class="math inline">\vert \overline{\Delta TS}
+\vert ~ (\text{dB})</span> FCMS</th>
+<th align="right">
+<span class="math inline">\max \vert \Delta TS \vert ~
+(\text{dB})</span> BEM</th>
+<th align="right">
+<span class="math inline">\vert \overline{\Delta TS}
+\vert ~ (\text{dB})</span> BEM</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
@@ -1013,8 +1047,8 @@ against the <code>SPHMS</code> sphere limit at <code>12</code>,
 <td align="left"><code>fixed_rigid</code></td>
 <td align="right"><code>0.00e+00</code></td>
 <td align="right"><code>0.00e+00</code></td>
-<td align="right"><code>0.020</code></td>
-<td align="right"><code>0.000</code></td>
+<td align="right"><code>63.4</code></td>
+<td align="right"><code>15.2</code></td>
 </tr>
 <tr class="even">
 <td align="left"><code>70</code></td>
@@ -1022,8 +1056,8 @@ against the <code>SPHMS</code> sphere limit at <code>12</code>,
 <td align="left"><code>pressure_release</code></td>
 <td align="right"><code>0.00e+00</code></td>
 <td align="right"><code>0.00e+00</code></td>
-<td align="right"><code>0.000</code></td>
-<td align="right"><code>0.000</code></td>
+<td align="right"><code>38.9</code></td>
+<td align="right"><code>12.4</code></td>
 </tr>
 <tr class="odd">
 <td align="left"><code>70</code></td>
@@ -1031,8 +1065,8 @@ against the <code>SPHMS</code> sphere limit at <code>12</code>,
 <td align="left"><code>liquid_filled</code></td>
 <td align="right"><code>0.00e+00</code></td>
 <td align="right"><code>0.00e+00</code></td>
-<td align="right"><code>0.010</code></td>
-<td align="right"><code>0.010</code></td>
+<td align="right"><code>74.9</code></td>
+<td align="right"><code>14.3</code></td>
 </tr>
 <tr class="even">
 <td align="left"><code>70</code></td>
@@ -1040,8 +1074,8 @@ against the <code>SPHMS</code> sphere limit at <code>12</code>,
 <td align="left"><code>gas_filled</code></td>
 <td align="right"><code>0.00e+00</code></td>
 <td align="right"><code>0.00e+00</code></td>
-<td align="right"><code>0.000</code></td>
-<td align="right"><code>0.010</code></td>
+<td align="right"><code>39.7</code></td>
+<td align="right"><code>12.3</code></td>
 </tr>
 <tr class="odd">
 <td align="left"><code>50</code></td>
@@ -1049,8 +1083,8 @@ against the <code>SPHMS</code> sphere limit at <code>12</code>,
 <td align="left"><code>fixed_rigid</code></td>
 <td align="right"><code>3.55e-15</code></td>
 <td align="right"><code>5.08e-16</code></td>
-<td align="right"><code>0.010</code></td>
-<td align="right"><code>0.010</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
 </tr>
 <tr class="even">
 <td align="left"><code>50</code></td>
@@ -1058,8 +1092,8 @@ against the <code>SPHMS</code> sphere limit at <code>12</code>,
 <td align="left"><code>pressure_release</code></td>
 <td align="right"><code>0.00e+00</code></td>
 <td align="right"><code>0.00e+00</code></td>
-<td align="right"><code>0.010</code></td>
-<td align="right"><code>0.010</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
 </tr>
 <tr class="odd">
 <td align="left"><code>50</code></td>
@@ -1067,8 +1101,8 @@ against the <code>SPHMS</code> sphere limit at <code>12</code>,
 <td align="left"><code>liquid_filled</code></td>
 <td align="right"><code>0.00e+00</code></td>
 <td align="right"><code>0.00e+00</code></td>
-<td align="right"><code>0.000</code></td>
-<td align="right"><code>0.010</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
 </tr>
 <tr class="even">
 <td align="left"><code>50</code></td>
@@ -1076,49 +1110,71 @@ against the <code>SPHMS</code> sphere limit at <code>12</code>,
 <td align="left"><code>gas_filled</code></td>
 <td align="right"><code>0.00e+00</code></td>
 <td align="right"><code>0.00e+00</code></td>
-<td align="right"><code>0.000</code></td>
-<td align="right"><code>0.000</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="tab-pane" id="shell-sphere" role="tabpanel" aria-labelledby="shell-sphere-tab">
+
+<table class="table">
+<colgroup>
+<col width="20%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Boundary</th>
+<th align="right">
+<span class="math inline">\max \vert \Delta TS \vert ~
+(\text{dB})</span> bistatic grid</th>
+<th align="right">
+<span class="math inline">\vert \overline{\Delta TS}
+\vert ~ (\text{dB})</span> bistatic grid</th>
+<th align="right">
+<span class="math inline">\max \vert \Delta TS \vert ~
+(\text{dB})</span> published monostatic</th>
+<th align="right">
+<span class="math inline">\vert \overline{\Delta TS}
+\vert ~ (\text{dB})</span> published monostatic</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>shelled_pressure_release</code></td>
+<td align="right"><code>2.1e-14</code></td>
+<td align="right"><code>1.9e-15</code></td>
+<td align="right"><code>4.97e-03</code></td>
+<td align="right"><code>2.43e-03</code></td>
+</tr>
+<tr class="even">
+<td align="left"><code>shelled_gas</code></td>
+<td align="right"><code>2.1e-14</code></td>
+<td align="right"><code>2.4e-15</code></td>
+<td align="right"><code>5.00e-03</code></td>
+<td align="right"><code>2.58e-03</code></td>
+</tr>
+<tr class="odd">
+<td align="left"><code>shelled_liquid</code></td>
+<td align="right"><code>8.9e-11</code></td>
+<td align="right"><code>3.0e-12</code></td>
+<td align="right"><code>4.94e-03</code></td>
+<td align="right"><code>2.50e-03</code></td>
+</tr>
+<tr class="even">
+<td align="left"><code>elastic_shelled</code></td>
+<td align="right"><code>0.012</code></td>
+<td align="right"><code>0.001</code></td>
+<td align="right"><code>—</code></td>
+<td align="right"><code>—</code></td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
 </div>
-<p>These are intentionally not one-off canonical checks. The tables
-above sweep multiple shapes and frequency sets so the agreement is not
-just tied to one hand-picked sphere or one hand-picked prolate
-spheroid.</p>
-<p>Two points matter most here.</p>
-<ol style="list-style-type: decimal">
-<li>The sphere branch behaves like a true spherical-coordinate T-matrix
-implementation and agrees with <code>SPHMS</code> to numerical precision
-on the tested grid.</li>
-<li>The oblate branch collapses correctly onto the exact sphere solution
-in the sphere limit and also agrees closely with an external
-pressure-release BEMPP slice for a genuinely nonspherical oblate
-case.</li>
-<li>The prolate branch uses the geometry-matched spheroidal-coordinate
-backend, so the <code>TMM</code> and <code>PSMS</code> spectra coincide
-across the tested geometry and frequency sweep for all four supported
-scalar boundary types.</li>
-<li>The default monostatic finite-cylinder branch lands directly on
-<code>FCMS</code> across the tested geometry and frequency sweep because
-it uses the geometry-matched cylindrical modal backend, and the
-stored-cylinder path reuses that same backend only where the monostatic
-mapping is exact.</li>
-</ol>
-<p>That fourth point is an <strong>in-package exact-family consistency
-check</strong>, not a claim that the cylinder branch is already
-externally closed against BEM/FEM over all angles. It means the default
-monostatic <code>TMM</code> cylinder branch and <code>FCMS</code> are
-the same calculation family at the package level. The external cylinder
-discussion below is separate and is the reason the retained
-general-angle cylinder helpers remain disabled.</p>
-<p>That benchmark pattern is exactly what one would want at this stage.
-The <code>TMM</code> family is useful because it stays within a
-transition-matrix formulation while landing on the correct exact-family
-answers for the canonical geometries it supports in the default
-monostatic workflow.</p>
 </div>
 </div>
 <div class="section level3">
@@ -1563,17 +1619,11 @@ separate validated retained cylinder angular operator is built.</p>
 <div class="section level3">
 <h3 id="external-bem-validation-figures">External BEM validation figures<a class="anchor" aria-label="anchor" href="#external-bem-validation-figures"></a>
 </h3>
-<p>The BEMPP pressure-release slices are a useful second validation
-ladder because they are independent of the in-package exact-family
-models. The three figures below show the broadside <code>38 kHz</code>
-comparisons used to constrain the stored <code>TMM</code> angular
-operators.</p>
-<p>For the sphere, the comparison is direct because the world-frame
-<code>x-y</code> slice and the body-fixed slice are identical by
-symmetry. For the oblate and prolate spheroids, the BEMPP world-frame
-slice is first converted to the same body-fixed angular convention used
-by <code><a href="../../reference/tmm_scattering.html">tmm_scattering()</a></code>. That frame conversion is what resolves
-the apparent nonspherical mismatch.</p>
+<p>Each figure shows <code>TMM</code> minus the external reference
+(<code>ΔTS</code>, dB) across the bistatic grid at <code>12</code>,
+<code>38</code>, <code>70</code>, <code>120 kHz</code>. The small
+circle-and-arrow marker is a legend marking the incident direction, not
+data.</p>
 <div class="section level4">
 <h4 id="external-bem-figures">External BEM figures<a class="anchor" aria-label="anchor" href="#external-bem-figures"></a>
 </h4>
@@ -1582,24 +1632,32 @@ the apparent nonspherical mismatch.</p>
 
 
 
+
 <ul class="nav nav-tabs" id="NA" role="tablist">
 <li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#sphere-2" id="sphere-2-tab" type="button" role="tab" aria-controls="sphere-2" aria-selected="true" class="active nav-link">Sphere</button></li>
 <li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#oblate-3" id="oblate-3-tab" type="button" role="tab" aria-controls="oblate-3" aria-selected="false" class="nav-link">Oblate</button></li>
 <li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#prolate-3" id="prolate-3-tab" type="button" role="tab" aria-controls="prolate-3" aria-selected="false" class="nav-link">Prolate</button></li>
+<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#shell-sphere-1" id="shell-sphere-1-tab" type="button" role="tab" aria-controls="shell-sphere-1" aria-selected="false" class="nav-link">Shell sphere</button></li>
 <li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#cylinder-2" id="cylinder-2-tab" type="button" role="tab" aria-controls="cylinder-2" aria-selected="false" class="nav-link">Cylinder</button></li>
 </ul>
 <div class="tab-content">
 <div class="active  tab-pane" id="sphere-2" role="tabpanel" aria-labelledby="sphere-2-tab">
 
-<p><img src="tmm-bempp-sphere-validation.png" class="r-plt" alt="Pre-rendered pressure-release sphere validation against BEMPP. The upper panel overlays the TMM and BEMPP angular scattering curves at 38 kHz for a 10 mm radius sphere, and the lower panel shows the amplitude residual in dB across the same receive-angle sweep." width="85%" style="display: block; margin: auto;"></p>
+<p><img src="tmm-bempp-sphere-fixed-rigid-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the fixed-rigid sphere across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="49%" style="display: block; margin: auto;"><img src="tmm-bempp-sphere-pressure-release-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the pressure-release sphere across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="49%" style="display: block; margin: auto;"></p>
+<p><img src="tmm-bempp-sphere-liquid-filled-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the liquid-filled sphere across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="49%" style="display: block; margin: auto;"><img src="tmm-bempp-sphere-gas-filled-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the gas-filled sphere across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="49%" style="display: block; margin: auto;"></p>
 </div>
 <div class="tab-pane" id="oblate-3" role="tabpanel" aria-labelledby="oblate-3-tab">
 
-<p><img src="tmm-bempp-oblate-validation.png" class="r-plt" alt="Pre-rendered pressure-release oblate spheroid validation against BEMPP. The upper panel overlays the TMM and BEMPP angular scattering curves at 38 kHz for an oblate spheroid with 6 mm polar semiaxis and 10 mm equatorial semiaxis under broadside incidence, and the lower panel shows the amplitude residual in dB across the same receive-angle sweep after converting the BEMPP world-frame directions into the TMM body-fixed angle convention." width="85%" style="display: block; margin: auto;"></p>
+<p><img src="tmm-bempp-oblate-fixed-rigid-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the fixed-rigid oblate spheroid across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="32%" style="display: block; margin: auto;"><img src="tmm-bempp-oblate-pressure-release-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the pressure-release oblate spheroid across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="32%" style="display: block; margin: auto;"><img src="tmm-bempp-oblate-gas-filled-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the gas-filled oblate spheroid across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="32%" style="display: block; margin: auto;"></p>
 </div>
 <div class="tab-pane" id="prolate-3" role="tabpanel" aria-labelledby="prolate-3-tab">
 
-<p><img src="tmm-bempp-prolate-validation.png" class="r-plt" alt="Pre-rendered pressure-release prolate spheroid validation against BEMPP. The upper panel overlays the TMM and BEMPP angular scattering curves at 38 kHz for a 70 mm by 10 mm prolate spheroid under broadside incidence, and the lower panel shows the amplitude residual in dB across the same receive-angle sweep after converting the BEMPP world-frame directions into the TMM body-fixed angle convention." width="85%" style="display: block; margin: auto;"></p>
+<p><img src="tmm-bempp-prolate-fixed-rigid-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the fixed-rigid prolate spheroid across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="32%" style="display: block; margin: auto;"><img src="tmm-bempp-prolate-pressure-release-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the pressure-release prolate spheroid across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="32%" style="display: block; margin: auto;"><img src="tmm-bempp-prolate-liquid-filled-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the liquid-filled prolate spheroid across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="32%" style="display: block; margin: auto;"></p>
+</div>
+<div class="tab-pane" id="shell-sphere-1" role="tabpanel" aria-labelledby="shell-sphere-1-tab">
+
+<p><img src="tmm-bempp-sphere-shelled-pressure-release-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the shelled pressure-release sphere across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="49%" style="display: block; margin: auto;"><img src="tmm-bempp-sphere-shelled-gas-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the shelled gas sphere across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="49%" style="display: block; margin: auto;"></p>
+<p><img src="tmm-bempp-sphere-shelled-liquid-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the shelled liquid sphere across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="49%" style="display: block; margin: auto;"><img src="tmm-bempp-sphere-elastic-shelled-delta.png" class="r-plt" alt="Pre-rendered TMM minus independent radial finite-element residual for the elastic-shelled sphere across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="49%" style="display: block; margin: auto;"></p>
 </div>
 <div class="tab-pane" id="cylinder-2" role="tabpanel" aria-labelledby="cylinder-2-tab">
 
@@ -1613,12 +1671,12 @@ pretending they are validated.</p>
 <p>These figures make the external-validation story much more
 concrete:</p>
 <ol style="list-style-type: decimal">
-<li>the pressure-release sphere is externally calibrated to the BEMPP
-far-field solver,</li>
-<li>the retained pressure-release oblate branch also agrees closely once
-the frame convention is matched correctly,</li>
-<li>the retained pressure-release prolate branch also agrees closely
-once the frame convention is matched correctly,</li>
+<li>the sphere is externally calibrated to BEM/FEM across all four
+boundaries,</li>
+<li>the retained oblate branch also agrees closely once the frame
+convention is matched correctly,</li>
+<li>the retained prolate branch also agrees closely once the frame
+convention is matched correctly,</li>
 <li>the exploratory retained-angle cylinder branch does
 <strong>not</strong> agree externally and is therefore not part of the
 documented public retained-cylinder workflow, and</li>

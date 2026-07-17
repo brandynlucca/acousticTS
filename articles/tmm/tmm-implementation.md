@@ -583,11 +583,8 @@ exact-family references already used elsewhere in the package.
 - Prolate spheroid cases are compared against `PSMS`
 - Cylinder cases are compared against `FCMS` for the default monostatic
   branch over the tested `12-200 kHz` grids
-
-Those broad checks were run over multiple shapes and multiple frequency
-grids rather than just one canonical example, but the resulting summary
-tables are kept static here so the implementation page remains
-lightweight to build.
+- Shell-sphere cases (`ESS` objects) are compared against the same
+  published benchmark reference used for `ESSMS`
 
 #### Benchmark tables
 
@@ -595,98 +592,58 @@ lightweight to build.
 - Oblate
 - Prolate
 - Cylinder
+- Shell sphere
 
-Spherical models were benchmarked against `SPHMS` over `12:120 by 4` kHz
-for `a = 5`, `10`, and `18 mm`.
+| a (mm) | Boundary | \max \vert \Delta TS \vert ~ (\text{dB}) SPHMS | \vert \overline{\Delta TS} \vert ~ (\text{dB}) SPHMS | \max \vert \Delta TS \vert ~ (\text{dB}) BEM | \vert \overline{\Delta TS} \vert ~ (\text{dB}) BEM | \max \vert \Delta TS \vert ~ (\text{dB}) FEM | \vert \overline{\Delta TS} \vert ~ (\text{dB}) FEM |
+|:---|:---|---:|---:|---:|---:|---:|---:|
+| `5` | `fixed_rigid` | `1.66e-11` | `1.95e-12` | `—` | `—` | `—` | `—` |
+| `5` | `pressure_release` | `1.76e-11` | `1.76e-12` | `—` | `—` | `—` | `—` |
+| `5` | `liquid_filled` | `4.19e-11` | `6.17e-12` | `—` | `—` | `—` | `—` |
+| `5` | `gas_filled` | `1.75e-11` | `1.75e-12` | `—` | `—` | `—` | `—` |
+| `10` | `fixed_rigid` | `2.37e-10` | `2.75e-11` | `0.048` | `0.010` | `0.528` | `0.087` |
+| `10` | `pressure_release` | `2.44e-10` | `2.91e-11` | `0.072` | `0.014` | `0.164` | `0.031` |
+| `10` | `liquid_filled` | `1.15e-10` | `1.74e-11` | `3.873` | `0.046` | `3.599` | `0.025` |
+| `10` | `gas_filled` | `2.45e-10` | `2.86e-11` | `0.030` | `0.004` | `0.007` | `0.0004` |
+| `18` | `fixed_rigid` | `7.62e-10` | `8.32e-11` | `—` | `—` | `—` | `—` |
+| `18` | `pressure_release` | `7.91e-10` | `8.49e-11` | `—` | `—` | `—` | `—` |
+| `18` | `liquid_filled` | `4.96e-09` | `2.48e-10` | `—` | `—` | `—` | `—` |
+| `18` | `gas_filled` | `8.46e-10` | `8.71e-11` | `—` | `—` | `—` | `—` |
 
-| a (mm) | Boundary | \max \vert \Delta TS \vert ~ (\text{dB}) | \vert \overline{\Delta TS} \vert ~ (\text{dB}) | t\_\text{TMM} (\text{s}) | t\_\text{SPHMS} (\text{s}) |
-|:---|:---|---:|---:|---:|---:|
-| `5` | `fixed_rigid` | `1.66e-11` | `1.95e-12` | `0.17` | `0.01` |
-| `5` | `pressure_release` | `1.76e-11` | `1.76e-12` | `0.17` | `0.00` |
-| `5` | `liquid_filled` | `4.19e-11` | `6.17e-12` | `0.28` | `0.03` |
-| `5` | `gas_filled` | `1.75e-11` | `1.75e-12` | `0.28` | `0.02` |
-| `10` | `fixed_rigid` | `2.37e-10` | `2.75e-11` | `0.25` | `0.01` |
-| `10` | `pressure_release` | `2.44e-10` | `2.91e-11` | `0.24` | `0.02` |
-| `10` | `liquid_filled` | `1.15e-10` | `1.74e-11` | `0.34` | `0.01` |
-| `10` | `gas_filled` | `2.45e-10` | `2.86e-11` | `0.41` | `0.03` |
-| `18` | `fixed_rigid` | `7.62e-10` | `8.32e-11` | `0.34` | `0.00` |
-| `18` | `pressure_release` | `7.91e-10` | `8.49e-11` | `0.35` | `0.01` |
-| `18` | `liquid_filled` | `4.96e-09` | `2.48e-10` | `0.55` | `0.02` |
-| `18` | `gas_filled` | `8.46e-10` | `8.71e-11` | `0.62` | `0.01` |
-
-Oblate sphere-limit checks used three equal-volume radii and compared
-against the `SPHMS` sphere limit at `12`, `38`, `70`, and `120 kHz`.
-
-| Boundary | \max \vert \Delta TS \vert ~ (\text{dB}) | \vert \overline{\Delta TS} \vert ~ (\text{dB}) | t\_\text{TMM} (\text{s}) | t\_\text{SPHMS} (\text{s}) |
+| Boundary | \max \vert \Delta TS \vert ~ (\text{dB}) SPHMS | \vert \overline{\Delta TS} \vert ~ (\text{dB}) SPHMS | \max \vert \Delta TS \vert ~ (\text{dB}) BEM | \vert \overline{\Delta TS} \vert ~ (\text{dB}) BEM |
 |:---|---:|---:|---:|---:|
-| `fixed_rigid` | `3.60e-10` | `4.97e-11` | `0.05` | `0.01` |
-| `pressure_release` | `3.12e-10` | `5.06e-11` | `0.08` | `0.00` |
-| `liquid_filled` | `1.09e-10` | `1.92e-11` | `0.08` | `0.01` |
-| `gas_filled` | `3.12e-10` | `5.07e-11` | `0.10` | `0.01` |
+| `fixed_rigid` | `3.60e-10` | `4.97e-11` | `0.034` | `0.008` |
+| `pressure_release` | `3.12e-10` | `5.06e-11` | `0.009` | `0.002` |
+| `liquid_filled` | `1.09e-10` | `1.92e-11` | `31.14` | `0.497` |
+| `gas_filled` | `3.12e-10` | `5.07e-11` | `0.023` | `0.009` |
 
-Prolate models were benchmarked against `PSMS`. The `60 x 8 mm` case
-used `12`, `18`, `38`, `70`, `100`, and `150 kHz`, while the
-`140 x 10 mm` case used `12`, `18`, `38`, `70`, and `100 kHz`.
-
-| L (mm) | a (mm) | Boundary | \max \vert \Delta TS \vert ~ (\text{dB}) | \vert \overline{\Delta TS} \vert ~ (\text{dB}) | t\_\text{TMM} (\text{s}) | t\_\text{PSMS} (\text{s}) |
+| L (mm) | a (mm) | Boundary | \max \vert \Delta TS \vert ~ (\text{dB}) PSMS | \vert \overline{\Delta TS} \vert ~ (\text{dB}) PSMS | \max \vert \Delta TS \vert ~ (\text{dB}) BEM | \vert \overline{\Delta TS} \vert ~ (\text{dB}) BEM |
 |:---|:---|:---|---:|---:|---:|---:|
-| `60` | `8` | `fixed_rigid` | `0.00000` | `0.00000` | `0.03` | `0.03` |
-| `60` | `8` | `pressure_release` | `0.00000` | `0.00000` | `0.01` | `0.03` |
-| `60` | `8` | `liquid_filled` | `0.00000` | `0.00000` | `2.54` | `2.49` |
-| `60` | `8` | `gas_filled` | `0.00000` | `0.00000` | `0.81` | `0.78` |
-| `140` | `10` | `fixed_rigid` | `0.00000` | `0.00000` | `0.04` | `0.01` |
-| `140` | `10` | `pressure_release` | `0.00000` | `0.00000` | `0.05` | `0.03` |
-| `140` | `10` | `liquid_filled` | `0.00000` | `0.00000` | `2.22` | `2.31` |
-| `140` | `10` | `gas_filled` | `0.00000` | `0.00000` | `1.11` | `1.06` |
+| `60` | `8` | `fixed_rigid` | `0.00000` | `0.00000` | `—` | `—` |
+| `60` | `8` | `pressure_release` | `0.00000` | `0.00000` | `—` | `—` |
+| `60` | `8` | `liquid_filled` | `0.00000` | `0.00000` | `—` | `—` |
+| `60` | `8` | `gas_filled` | `0.00000` | `0.00000` | `—` | `—` |
+| `140` | `10` | `fixed_rigid` | `0.00000` | `0.00000` | `16.66` | `0.068` |
+| `140` | `10` | `pressure_release` | `0.00000` | `0.00000` | `0.105` | `0.010` |
+| `140` | `10` | `liquid_filled` | `0.00000` | `0.00000` | `58.26` | `1.378` |
+| `140` | `10` | `gas_filled` | `0.00000` | `0.00000` | `0.295` | `0.028` |
 
-Cylinders were benchmarked against `FCMS` over `12`, `18`, `38`, `70`,
-`100`, `150`, and `200 kHz`.
-
-| L (mm) | a (mm) | Boundary | \max \vert \Delta TS \vert ~ (\text{dB}) | \vert \overline{\Delta TS} \vert ~ (\text{dB}) | t\_\text{TMM} (\text{s}) | t\_\text{FCMS} (\text{s}) |
+| L (mm) | a (mm) | Boundary | \max \vert \Delta TS \vert ~ (\text{dB}) FCMS | \vert \overline{\Delta TS} \vert ~ (\text{dB}) FCMS | \max \vert \Delta TS \vert ~ (\text{dB}) BEM | \vert \overline{\Delta TS} \vert ~ (\text{dB}) BEM |
 |:---|:---|:---|---:|---:|---:|---:|
-| `70` | `10` | `fixed_rigid` | `0.00e+00` | `0.00e+00` | `0.020` | `0.000` |
-| `70` | `10` | `pressure_release` | `0.00e+00` | `0.00e+00` | `0.000` | `0.000` |
-| `70` | `10` | `liquid_filled` | `0.00e+00` | `0.00e+00` | `0.010` | `0.010` |
-| `70` | `10` | `gas_filled` | `0.00e+00` | `0.00e+00` | `0.000` | `0.010` |
-| `50` | `8` | `fixed_rigid` | `3.55e-15` | `5.08e-16` | `0.010` | `0.010` |
-| `50` | `8` | `pressure_release` | `0.00e+00` | `0.00e+00` | `0.010` | `0.010` |
-| `50` | `8` | `liquid_filled` | `0.00e+00` | `0.00e+00` | `0.000` | `0.010` |
-| `50` | `8` | `gas_filled` | `0.00e+00` | `0.00e+00` | `0.000` | `0.000` |
+| `70` | `10` | `fixed_rigid` | `0.00e+00` | `0.00e+00` | `63.4` | `15.2` |
+| `70` | `10` | `pressure_release` | `0.00e+00` | `0.00e+00` | `38.9` | `12.4` |
+| `70` | `10` | `liquid_filled` | `0.00e+00` | `0.00e+00` | `74.9` | `14.3` |
+| `70` | `10` | `gas_filled` | `0.00e+00` | `0.00e+00` | `39.7` | `12.3` |
+| `50` | `8` | `fixed_rigid` | `3.55e-15` | `5.08e-16` | `—` | `—` |
+| `50` | `8` | `pressure_release` | `0.00e+00` | `0.00e+00` | `—` | `—` |
+| `50` | `8` | `liquid_filled` | `0.00e+00` | `0.00e+00` | `—` | `—` |
+| `50` | `8` | `gas_filled` | `0.00e+00` | `0.00e+00` | `—` | `—` |
 
-These are intentionally not one-off canonical checks. The tables above
-sweep multiple shapes and frequency sets so the agreement is not just
-tied to one hand-picked sphere or one hand-picked prolate spheroid.
-
-Two points matter most here.
-
-1.  The sphere branch behaves like a true spherical-coordinate T-matrix
-    implementation and agrees with `SPHMS` to numerical precision on the
-    tested grid.
-2.  The oblate branch collapses correctly onto the exact sphere solution
-    in the sphere limit and also agrees closely with an external
-    pressure-release BEMPP slice for a genuinely nonspherical oblate
-    case.
-3.  The prolate branch uses the geometry-matched spheroidal-coordinate
-    backend, so the `TMM` and `PSMS` spectra coincide across the tested
-    geometry and frequency sweep for all four supported scalar boundary
-    types.
-4.  The default monostatic finite-cylinder branch lands directly on
-    `FCMS` across the tested geometry and frequency sweep because it
-    uses the geometry-matched cylindrical modal backend, and the
-    stored-cylinder path reuses that same backend only where the
-    monostatic mapping is exact.
-
-That fourth point is an **in-package exact-family consistency check**,
-not a claim that the cylinder branch is already externally closed
-against BEM/FEM over all angles. It means the default monostatic `TMM`
-cylinder branch and `FCMS` are the same calculation family at the
-package level. The external cylinder discussion below is separate and is
-the reason the retained general-angle cylinder helpers remain disabled.
-
-That benchmark pattern is exactly what one would want at this stage. The
-`TMM` family is useful because it stays within a transition-matrix
-formulation while landing on the correct exact-family answers for the
-canonical geometries it supports in the default monostatic workflow.
+| Boundary | \max \vert \Delta TS \vert ~ (\text{dB}) bistatic grid | \vert \overline{\Delta TS} \vert ~ (\text{dB}) bistatic grid | \max \vert \Delta TS \vert ~ (\text{dB}) published monostatic | \vert \overline{\Delta TS} \vert ~ (\text{dB}) published monostatic |
+|:---|---:|---:|---:|---:|
+| `shelled_pressure_release` | `2.1e-14` | `1.9e-15` | `4.97e-03` | `2.43e-03` |
+| `shelled_gas` | `2.1e-14` | `2.4e-15` | `5.00e-03` | `2.58e-03` |
+| `shelled_liquid` | `8.9e-11` | `3.0e-12` | `4.94e-03` | `2.50e-03` |
+| `elastic_shelled` | `0.012` | `0.001` | `—` | `—` |
 
 ### Diagnostics and internal validation
 
@@ -889,47 +846,66 @@ separate validated retained cylinder angular operator is built.
 
 ### External BEM validation figures
 
-The BEMPP pressure-release slices are a useful second validation ladder
-because they are independent of the in-package exact-family models. The
-three figures below show the broadside `38 kHz` comparisons used to
-constrain the stored `TMM` angular operators.
-
-For the sphere, the comparison is direct because the world-frame `x-y`
-slice and the body-fixed slice are identical by symmetry. For the oblate
-and prolate spheroids, the BEMPP world-frame slice is first converted to
-the same body-fixed angular convention used by
-[`tmm_scattering()`](https://brandynlucca.github.io/acousticTS/reference/tmm_scattering.md).
-That frame conversion is what resolves the apparent nonspherical
-mismatch.
+Each figure shows `TMM` minus the external reference (`ΔTS`, dB) across
+the bistatic grid at `12`, `38`, `70`, `120 kHz`. The small
+circle-and-arrow marker is a legend marking the incident direction, not
+data.
 
 #### External BEM figures
 
 - Sphere
 - Oblate
 - Prolate
+- Shell sphere
 - Cylinder
 
-![Pre-rendered pressure-release sphere validation against BEMPP. The
-upper panel overlays the TMM and BEMPP angular scattering curves at 38
-kHz for a 10 mm radius sphere, and the lower panel shows the amplitude
-residual in dB across the same receive-angle
-sweep.](tmm-bempp-sphere-validation.png)
+![Pre-rendered TMM minus BEM residual for the fixed-rigid sphere across
+the full bistatic scattering grid at 12, 38, 70, and 120
+kHz.](tmm-bempp-sphere-fixed-rigid-delta.png)![Pre-rendered TMM minus
+BEM residual for the pressure-release sphere across the full bistatic
+scattering grid at 12, 38, 70, and 120
+kHz.](tmm-bempp-sphere-pressure-release-delta.png)
 
-![Pre-rendered pressure-release oblate spheroid validation against
-BEMPP. The upper panel overlays the TMM and BEMPP angular scattering
-curves at 38 kHz for an oblate spheroid with 6 mm polar semiaxis and 10
-mm equatorial semiaxis under broadside incidence, and the lower panel
-shows the amplitude residual in dB across the same receive-angle sweep
-after converting the BEMPP world-frame directions into the TMM
-body-fixed angle convention.](tmm-bempp-oblate-validation.png)
+![Pre-rendered TMM minus BEM residual for the liquid-filled sphere
+across the full bistatic scattering grid at 12, 38, 70, and 120
+kHz.](tmm-bempp-sphere-liquid-filled-delta.png)![Pre-rendered TMM minus
+BEM residual for the gas-filled sphere across the full bistatic
+scattering grid at 12, 38, 70, and 120
+kHz.](tmm-bempp-sphere-gas-filled-delta.png)
 
-![Pre-rendered pressure-release prolate spheroid validation against
-BEMPP. The upper panel overlays the TMM and BEMPP angular scattering
-curves at 38 kHz for a 70 mm by 10 mm prolate spheroid under broadside
-incidence, and the lower panel shows the amplitude residual in dB across
-the same receive-angle sweep after converting the BEMPP world-frame
-directions into the TMM body-fixed angle
-convention.](tmm-bempp-prolate-validation.png)
+![Pre-rendered TMM minus BEM residual for the fixed-rigid oblate
+spheroid across the full bistatic scattering grid at 12, 38, 70, and 120
+kHz.](tmm-bempp-oblate-fixed-rigid-delta.png)![Pre-rendered TMM minus
+BEM residual for the pressure-release oblate spheroid across the full
+bistatic scattering grid at 12, 38, 70, and 120
+kHz.](tmm-bempp-oblate-pressure-release-delta.png)![Pre-rendered TMM
+minus BEM residual for the gas-filled oblate spheroid across the full
+bistatic scattering grid at 12, 38, 70, and 120
+kHz.](tmm-bempp-oblate-gas-filled-delta.png)
+
+![Pre-rendered TMM minus BEM residual for the fixed-rigid prolate
+spheroid across the full bistatic scattering grid at 12, 38, 70, and 120
+kHz.](tmm-bempp-prolate-fixed-rigid-delta.png)![Pre-rendered TMM minus
+BEM residual for the pressure-release prolate spheroid across the full
+bistatic scattering grid at 12, 38, 70, and 120
+kHz.](tmm-bempp-prolate-pressure-release-delta.png)![Pre-rendered TMM
+minus BEM residual for the liquid-filled prolate spheroid across the
+full bistatic scattering grid at 12, 38, 70, and 120
+kHz.](tmm-bempp-prolate-liquid-filled-delta.png)
+
+![Pre-rendered TMM minus BEM residual for the shelled pressure-release
+sphere across the full bistatic scattering grid at 12, 38, 70, and 120
+kHz.](tmm-bempp-sphere-shelled-pressure-release-delta.png)![Pre-rendered
+TMM minus BEM residual for the shelled gas sphere across the full
+bistatic scattering grid at 12, 38, 70, and 120
+kHz.](tmm-bempp-sphere-shelled-gas-delta.png)
+
+![Pre-rendered TMM minus BEM residual for the shelled liquid sphere
+across the full bistatic scattering grid at 12, 38, 70, and 120
+kHz.](tmm-bempp-sphere-shelled-liquid-delta.png)![Pre-rendered TMM minus
+independent radial finite-element residual for the elastic-shelled
+sphere across the full bistatic scattering grid at 12, 38, 70, and 120
+kHz.](tmm-bempp-sphere-elastic-shelled-delta.png)
 
 ![Pre-rendered pressure-release cylinder comparison against BEMPP for
 the exploratory retained-angle cylinder TMM branch. The figure shows 38
@@ -947,12 +923,12 @@ validated.
 
 These figures make the external-validation story much more concrete:
 
-1.  the pressure-release sphere is externally calibrated to the BEMPP
-    far-field solver,
-2.  the retained pressure-release oblate branch also agrees closely once
-    the frame convention is matched correctly,
-3.  the retained pressure-release prolate branch also agrees closely
-    once the frame convention is matched correctly,
+1.  the sphere is externally calibrated to BEM/FEM across all four
+    boundaries,
+2.  the retained oblate branch also agrees closely once the frame
+    convention is matched correctly,
+3.  the retained prolate branch also agrees closely once the frame
+    convention is matched correctly,
 4.  the exploratory retained-angle cylinder branch does **not** agree
     externally and is therefore not part of the documented public
     retained-cylinder workflow, and
