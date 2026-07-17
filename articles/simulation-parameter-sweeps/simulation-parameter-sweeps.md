@@ -38,9 +38,61 @@ process of rebuilding a set of parameters, optionally reworking the
 object, running the model, and collecting the outputs into a set of tidy
 result tables.
 
+Both `n_realizations` and `parameters` are optional. Calling
+[`simulate_ts()`](https://brandynlucca.github.io/acousticTS/reference/simulate_ts.md)
+with neither runs a single realization of the object unchanged.
+
 ``` r
 
 library(acousticTS)
+
+shape_obj_default <- cylinder(
+  length_body = 0.05,
+  radius_body = 0.003,
+  n_segments = 80
+)
+
+obj_default <- fls_generate(
+  shape = shape_obj_default,
+  density_body = 1045,
+  sound_speed_body = 1520
+)
+
+res_default <- simulate_ts(
+  object = obj_default,
+  frequency = 70e3,
+  model = "DWBA",
+  parallel = FALSE
+)
+```
+
+    ## ====================================
+    ## Scatterer-class: FLS 
+    ## Model(s): DWBA 
+    ## Simulated parameters:  
+    ## Total simulation realizations: 1 
+    ## Parallelize TS calculations: FALSE 
+    ## ====================================
+    ## ====================================
+    ## Preparing sequential simulations
+    ## ====================================
+    ## Simulations complete!
+    ## ====================================
+
+``` r
+
+res_default$DWBA
+```
+
+    ##   model realization frequency        ka                        f_bs
+    ## 1  DWBA           1     70000 0.8796459 -0.0003953234-3.502174e-19i
+    ##       sigma_bs        TS
+    ## 1 1.562806e-07 -68.06095
+
+Once actual parameters are involved, the more typical call supplies
+both.
+
+``` r
 
 shape_obj <- cylinder(
   length_body = 0.05,
@@ -95,10 +147,18 @@ clarify the four main parameter modes supported by
     [`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md)
     inputs such as named target-dimension vectors.
 
-When `batch_by` is supplied, the selected parameters define a Cartesian
-grid and each grid cell is then repeated for `n_realizations`. That
-distinction between batch cells and within-cell draws is the core
-conceptual point of the interface.
+Every parameter supplied as more than one deterministic value - an
+explicit vector, or a list of more than one structured target -
+automatically defines a grid axis, whether or not it is also named in
+`batch_by`. Each cell of the resulting grid is then repeated for
+`n_realizations`. `batch_by` no longer controls *whether* a parameter is
+swept; naming an axis there only documents intent. What a bare
+multi-value parameter never means on its own is “align one value per
+realization” - that alignment is what `n_realizations` together with
+per-realization generating functions is for, or what `permute = FALSE`
+is for when two swept parameters should instead move together (see
+[Crossing versus pairing varied
+parameters](#crossing-versus-pairing-varied-parameters)).
 
 Those four modes answer different questions:
 
@@ -196,15 +256,17 @@ The most important conceptual distinction in the interface is the
 difference between a batched parameter and a realization-level
 parameter.
 
-1.  `batch_by` creates a grid of settings that should each be kept
-    distinct in the output.
+1.  any parameter supplied as more than one deterministic value defines
+    a grid axis, and every such axis is crossed into a design grid whose
+    cells are kept distinct in the output,
 2.  `n_realizations` controls how many repeated runs are performed
-    within each grid cell.
+    within each resulting grid cell, redrawing any generating functions
+    each time.
 
-Suppose `theta_body` and `density_body` are both placed in `batch_by`.
-Then the simulation does not treat them as uncertain draws around one
-target. It treats them as a design grid whose combinations are all run
-separately.
+Suppose `theta_body` and `density_body` are both supplied as explicit
+multi-value vectors. The simulation does not treat them as uncertain
+draws around one target. It treats them as a design grid whose
+combinations are all run separately.
 
 ``` r
 
@@ -251,6 +313,77 @@ parameters define the outer design. Realizations live inside that
 design. If a user loses track of that nesting, it becomes very easy to
 misread deterministic design cells as random draws or random draws as
 deterministic sweep levels.
+
+The `batch_by = c("theta_body", "density_body")` argument above is not
+what makes these two parameters a grid. Both are already multi-value
+vectors, so they would form the same design grid without it. Supplying
+`batch_by` here documents intent - it is useful for that reason, and for
+cases where a parameter list mixes several multi-value parameters and
+only some of them are meant to read as the “design” - but it no longer
+changes what gets swept.
+
+### Crossing versus pairing varied parameters
+
+By default, every varied parameter is crossed into the full Cartesian
+grid (`permute = TRUE`). Setting `permute = FALSE` instead pairs (zips)
+the varied parameters element-wise, so they advance together rather than
+combinatorially. Every varied parameter must then supply the same number
+of values; a length-one parameter is held constant across the paired
+runs.
+
+``` r
+
+res_paired <- simulate_ts(
+  object = obj,
+  frequency = 70e3,
+  model = "DWBA",
+  parameters = list(
+    theta_body = seq(0.5 * pi, pi, length.out = 4),
+    density_body = c(1035, 1045, 1050, 1055)
+  ),
+  permute = FALSE,
+  parallel = FALSE
+)
+```
+
+    ## ====================================
+    ## Scatterer-class: FLS 
+    ## Model(s): DWBA 
+    ## Batching parameter(s): theta_body, density_body 
+    ## Simulated parameters: theta_body, density_body 
+    ## Total simulation realizations: 4 
+    ## Parallelize TS calculations: FALSE 
+    ## ====================================
+    ## ====================================
+    ## Preparing sequential simulations
+    ## ====================================
+    ## Simulations complete!
+    ## ====================================
+
+``` r
+
+nrow(res_paired$DWBA)
+```
+
+    ## [1] 4
+
+``` r
+
+res_paired$DWBA[, c("theta_body", "density_body", "TS")]
+```
+
+    ##   theta_body density_body        TS
+    ## 1   1.570796         1035 -68.06095
+    ## 2   2.094395         1045 -68.06095
+    ## 3   2.617994         1050 -68.06095
+    ## 4   3.141593         1055 -68.06095
+
+Four `theta_body` values paired with four `density_body` values yields
+four paired runs rather than the sixteen that `permute = TRUE` would
+produce for the same inputs. Pairing is the right tool when two
+parameters are meant to move together - for example, a size series where
+length and density both vary along one intended trajectory - rather than
+being screened independently against each other.
 
 ## Parameters that modify the object
 
@@ -590,9 +723,11 @@ are:
 
 Two additional cautions are worth keeping in mind:
 
-1.  if a parameter sequence is meant to represent uncertainty, placing
-    it in `batch_by` changes the interpretation from random variation to
-    deterministic design cells,
+1.  if a parameter sequence is meant to represent uncertainty, supplying
+    it as an explicit multi-value vector changes the interpretation from
+    random variation to a deterministic design grid regardless of
+    whether it is also named in `batch_by`. Instead, use a generating
+    function when the intent is a random draw,
 2.  if geometry-affecting parameters are varied, the results should be
     interpreted as new target states rather than as mere perturbations
     of one fixed shape.
@@ -611,21 +746,6 @@ The current documentation and source code indicate that
 is expected to give way to `anneal()` in future releases. The important
 point for current users is that the workflow logic on this page remains
 useful even if the interface evolves.
-
-The stable ideas are:
-
-1.  keep one object as the baseline target description,
-2.  separate batch design from within-cell variation,
-3.  make model comparison operate on matched simulation cells,
-4.  summarize in linear or logarithmic units according to the scientific
-    question.
-
-## Relationship to future interfaces
-
-The current simulation interface is already useful, but the package
-documentation indicates that this part of the workflow may continue to
-evolve. This article should therefore be read as a workflow guide rather
-than as a claim that the current interface is final.
 
 ## References
 

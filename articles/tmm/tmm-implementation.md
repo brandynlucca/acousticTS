@@ -601,28 +601,28 @@ for `a = 5`, `10`, and `18 mm`.
 
 | a (mm) | Boundary | \max \vert \Delta TS \vert ~ (\text{dB}) | \vert \overline{\Delta TS} \vert ~ (\text{dB}) | t\_\text{TMM} (\text{s}) | t\_\text{SPHMS} (\text{s}) |
 |:---|:---|---:|---:|---:|---:|
-| `5` | `fixed_rigid` | `1.66e-11` | `1.95e-12` | `0.27` | `0.03` |
-| `5` | `pressure_release` | `1.76e-11` | `1.77e-12` | `0.31` | `0.07` |
-| `5` | `liquid_filled` | `2.26e-11` | `4.04e-12` | `0.39` | `0.01` |
-| `5` | `gas_filled` | `1.75e-11` | `1.75e-12` | `0.47` | `0.03` |
-| `10` | `fixed_rigid` | `2.37e-10` | `2.75e-11` | `0.50` | `0.00` |
-| `10` | `pressure_release` | `2.44e-10` | `2.91e-11` | `0.56` | `0.02` |
-| `10` | `liquid_filled` | `1.14e-10` | `1.67e-11` | `0.75` | `0.02` |
-| `10` | `gas_filled` | `2.45e-10` | `2.86e-11` | `0.78` | `0.01` |
-| `18` | `fixed_rigid` | `7.62e-10` | `8.32e-11` | `1.03` | `0.01` |
-| `18` | `pressure_release` | `7.91e-10` | `8.49e-11` | `1.06` | `0.00` |
-| `18` | `liquid_filled` | `4.59e-09` | `2.36e-10` | `1.47` | `0.02` |
-| `18` | `gas_filled` | `8.46e-10` | `8.71e-11` | `1.53` | `0.00` |
+| `5` | `fixed_rigid` | `1.66e-11` | `1.95e-12` | `0.17` | `0.01` |
+| `5` | `pressure_release` | `1.76e-11` | `1.76e-12` | `0.17` | `0.00` |
+| `5` | `liquid_filled` | `4.19e-11` | `6.17e-12` | `0.28` | `0.03` |
+| `5` | `gas_filled` | `1.75e-11` | `1.75e-12` | `0.28` | `0.02` |
+| `10` | `fixed_rigid` | `2.37e-10` | `2.75e-11` | `0.25` | `0.01` |
+| `10` | `pressure_release` | `2.44e-10` | `2.91e-11` | `0.24` | `0.02` |
+| `10` | `liquid_filled` | `1.15e-10` | `1.74e-11` | `0.34` | `0.01` |
+| `10` | `gas_filled` | `2.45e-10` | `2.86e-11` | `0.41` | `0.03` |
+| `18` | `fixed_rigid` | `7.62e-10` | `8.32e-11` | `0.34` | `0.00` |
+| `18` | `pressure_release` | `7.91e-10` | `8.49e-11` | `0.35` | `0.01` |
+| `18` | `liquid_filled` | `4.96e-09` | `2.48e-10` | `0.55` | `0.02` |
+| `18` | `gas_filled` | `8.46e-10` | `8.71e-11` | `0.62` | `0.01` |
 
 Oblate sphere-limit checks used three equal-volume radii and compared
 against the `SPHMS` sphere limit at `12`, `38`, `70`, and `120 kHz`.
 
 | Boundary | \max \vert \Delta TS \vert ~ (\text{dB}) | \vert \overline{\Delta TS} \vert ~ (\text{dB}) | t\_\text{TMM} (\text{s}) | t\_\text{SPHMS} (\text{s}) |
 |:---|---:|---:|---:|---:|
-| `fixed_rigid` | `3.60e-10` | `4.97e-11` | `0.11` | `0.05` |
-| `pressure_release` | `3.12e-10` | `5.06e-11` | `0.12` | `0.00` |
-| `liquid_filled` | `1.04e-10` | `2.02e-11` | `0.15` | `0.02` |
-| `gas_filled` | `3.12e-10` | `5.07e-11` | `0.23` | `0.00` |
+| `fixed_rigid` | `3.60e-10` | `4.97e-11` | `0.05` | `0.01` |
+| `pressure_release` | `3.12e-10` | `5.06e-11` | `0.08` | `0.00` |
+| `liquid_filled` | `1.09e-10` | `1.92e-11` | `0.08` | `0.01` |
+| `gas_filled` | `3.12e-10` | `5.07e-11` | `0.10` | `0.01` |
 
 Prolate models were benchmarked against `PSMS`. The `60 x 8 mm` case
 used `12`, `18`, `38`, `70`, `100`, and `150 kHz`, while the
@@ -630,28 +630,28 @@ used `12`, `18`, `38`, `70`, `100`, and `150 kHz`, while the
 
 | L (mm) | a (mm) | Boundary | \max \vert \Delta TS \vert ~ (\text{dB}) | \vert \overline{\Delta TS} \vert ~ (\text{dB}) | t\_\text{TMM} (\text{s}) | t\_\text{PSMS} (\text{s}) |
 |:---|:---|:---|---:|---:|---:|---:|
-| `60` | `8` | `fixed_rigid` | `0.00000` | `0.00000` | `0.03` | `0.08` |
-| `60` | `8` | `pressure_release` | `0.00000` | `0.00000` | `0.03` | `0.02` |
-| `60` | `8` | `liquid_filled` | `0.00000` | `0.00000` | `2.50` | `1.83` |
-| `60` | `8` | `gas_filled` | `0.00000` | `0.00000` | `2.39` | `2.53` |
-| `140` | `10` | `fixed_rigid` | `0.00000` | `0.00000` | `0.03` | `0.02` |
-| `140` | `10` | `pressure_release` | `0.00000` | `0.00000` | `0.02` | `0.02` |
-| `140` | `10` | `liquid_filled` | `0.00000` | `0.00000` | `2.81` | `2.23` |
-| `140` | `10` | `gas_filled` | `0.00000` | `0.00000` | `2.70` | `2.81` |
+| `60` | `8` | `fixed_rigid` | `0.00000` | `0.00000` | `0.03` | `0.03` |
+| `60` | `8` | `pressure_release` | `0.00000` | `0.00000` | `0.01` | `0.03` |
+| `60` | `8` | `liquid_filled` | `0.00000` | `0.00000` | `2.54` | `2.49` |
+| `60` | `8` | `gas_filled` | `0.00000` | `0.00000` | `0.81` | `0.78` |
+| `140` | `10` | `fixed_rigid` | `0.00000` | `0.00000` | `0.04` | `0.01` |
+| `140` | `10` | `pressure_release` | `0.00000` | `0.00000` | `0.05` | `0.03` |
+| `140` | `10` | `liquid_filled` | `0.00000` | `0.00000` | `2.22` | `2.31` |
+| `140` | `10` | `gas_filled` | `0.00000` | `0.00000` | `1.11` | `1.06` |
 
 Cylinders were benchmarked against `FCMS` over `12`, `18`, `38`, `70`,
 `100`, `150`, and `200 kHz`.
 
 | L (mm) | a (mm) | Boundary | \max \vert \Delta TS \vert ~ (\text{dB}) | \vert \overline{\Delta TS} \vert ~ (\text{dB}) | t\_\text{TMM} (\text{s}) | t\_\text{FCMS} (\text{s}) |
 |:---|:---|:---|---:|---:|---:|---:|
-| `70` | `10` | `fixed_rigid` | `0.00e+00` | `0.00e+00` | `0.011` | `0.004` |
-| `70` | `10` | `pressure_release` | `0.00e+00` | `0.00e+00` | `0.001` | `0.000` |
-| `70` | `10` | `liquid_filled` | `0.00e+00` | `0.00e+00` | `0.009` | `0.001` |
-| `70` | `10` | `gas_filled` | `0.00e+00` | `0.00e+00` | `0.002` | `0.004` |
-| `50` | `8` | `fixed_rigid` | `3.55e-15` | `5.08e-16` | `0.000` | `0.000` |
-| `50` | `8` | `pressure_release` | `0.00e+00` | `0.00e+00` | `0.001` | `0.000` |
-| `50` | `8` | `liquid_filled` | `0.00e+00` | `0.00e+00` | `0.004` | `0.001` |
-| `50` | `8` | `gas_filled` | `0.00e+00` | `0.00e+00` | `0.002` | `0.004` |
+| `70` | `10` | `fixed_rigid` | `0.00e+00` | `0.00e+00` | `0.020` | `0.000` |
+| `70` | `10` | `pressure_release` | `0.00e+00` | `0.00e+00` | `0.000` | `0.000` |
+| `70` | `10` | `liquid_filled` | `0.00e+00` | `0.00e+00` | `0.010` | `0.010` |
+| `70` | `10` | `gas_filled` | `0.00e+00` | `0.00e+00` | `0.000` | `0.010` |
+| `50` | `8` | `fixed_rigid` | `3.55e-15` | `5.08e-16` | `0.010` | `0.010` |
+| `50` | `8` | `pressure_release` | `0.00e+00` | `0.00e+00` | `0.010` | `0.010` |
+| `50` | `8` | `liquid_filled` | `0.00e+00` | `0.00e+00` | `0.000` | `0.010` |
+| `50` | `8` | `gas_filled` | `0.00e+00` | `0.00e+00` | `0.000` | `0.000` |
 
 These are intentionally not one-off canonical checks. The tables above
 sweep multiple shapes and frequency sets so the agreement is not just

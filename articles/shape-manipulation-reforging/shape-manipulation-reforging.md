@@ -427,6 +427,17 @@ data.frame(
     ## 2 obj_scaled         0.252            0.085
     ## 3 obj_target         0.120            0.070
 
+Height scaling is applied about each component’s own vertical center
+rather than around a shared coordinate origin. For components built from
+upper/lower envelopes with no explicit centerline row - the common case
+for `SBF`/`BBF` body profiles - that center is the midline implied by
+those envelopes, so a curved or undulating midline keeps its proportions
+instead of warping when the body is enlarged or shrunk. Components that
+do carry an explicit centerline row, such as an `FLS` or `BBF` backbone,
+are treated differently: the centerline is held fixed and only the
+surrounding tube thickness responds to the height factor, since that row
+is a genuine path rather than an emergent midline.
+
 The same idea applies when the body stays fixed but an internal
 component needs to move. For example, a swimbladder can be shifted
 fore-aft or dorsoventrally without rebuilding the entire object:
@@ -508,6 +519,116 @@ centerline arc length, not to the projected `x` extent. For straight
 `FLS` objects those two quantities are effectively the same, but once
 curvature has been introduced they should not be treated as
 interchangeable.
+
+## Reshaping gas-filled bodies with `reforge()`
+
+`GAS` objects follow the same `body_scale`/`body_target` interface used
+for `FLS`, but because a `GAS` body can be a canonical sphere, prolate
+spheroid, or cylinder,
+[`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md)
+treats `length` and `radius` as independently addressable dimensions
+rather than forcing isometric scaling.
+
+``` r
+
+gas_prolate <- gas_generate(
+  shape = prolate_spheroid(
+    length_body = 0.05,
+    radius_body = 0.01,
+    n_segments = 40
+  ),
+  g_fluid = 0.0012,
+  h_fluid = 0.22
+)
+
+gas_length_only <- reforge(
+  gas_prolate,
+  body_target = c(length = 0.09),
+  isometric_body = FALSE
+)
+
+gas_radius_only <- reforge(
+  gas_prolate,
+  body_target = c(radius = 0.02),
+  isometric_body = FALSE
+)
+
+data.frame(
+  object = c("original", "length_only", "radius_only"),
+  length_m = c(
+    extract(gas_prolate, c("shape_parameters", "length")),
+    extract(gas_length_only, c("shape_parameters", "length")),
+    extract(gas_radius_only, c("shape_parameters", "length"))
+  ),
+  radius_m = c(
+    max(extract(gas_prolate, "body")$rpos[, "zU"]),
+    max(extract(gas_length_only, "body")$rpos[, "zU"]),
+    max(extract(gas_radius_only, "body")$rpos[, "zU"])
+  )
+)
+```
+
+    ##        object length_m radius_m
+    ## 1    original     0.05     0.01
+    ## 2 length_only     0.09     0.01
+    ## 3 radius_only     0.05     0.02
+
+When the stored body is one of the package’s canonical families
+(`Sphere`, `ProlateSpheroid`, `Cylinder`),
+[`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md)
+does not scale the position matrix directly. It instead regenerates the
+geometry from the requested `length` and `radius` through the matching
+shape constructor, so the discretization stays clean and the stored
+shape descriptor - and therefore any model that inspects it - remains
+accurate.
+
+That regeneration has one notable consequence for spheres: a sphere is
+only a sphere while `length == 2 * radius`. Scaling both dimensions
+together, the default isometric behavior, keeps it a sphere. But an
+independent length change under `isometric_body = FALSE` breaks that
+identity and promotes the body to a prolate spheroid.
+
+``` r
+
+gas_sphere <- gas_generate(
+  shape = sphere(radius_body = 0.01, n_segments = 40),
+  g_fluid = 0.0012,
+  h_fluid = 0.22
+)
+
+gas_sphere_isometric <- reforge(gas_sphere, radius_target = 0.015)
+gas_sphere_promoted <- reforge(
+  gas_sphere,
+  body_target = c(length = 0.05),
+  isometric_body = FALSE
+)
+
+data.frame(
+  object = c("original", "isometric_resize", "independent_length"),
+  shape = c(
+    extract(gas_sphere, c("shape_parameters", "shape")),
+    extract(gas_sphere_isometric, c("shape_parameters", "shape")),
+    extract(gas_sphere_promoted, c("shape_parameters", "shape"))
+  )
+)
+```
+
+    ##               object           shape
+    ## 1           original          Sphere
+    ## 2   isometric_resize          Sphere
+    ## 3 independent_length ProlateSpheroid
+
+Arbitrary, non-canonical `GAS` bodies do not have a matching shape
+constructor to regenerate from, so they fall back to direct per-axis
+scaling of the position matrix - the same approach `FLS` and `SBF`
+bodies already use.
+
+The legacy `scale`, `radius_target`, and `n_segments` arguments are
+still available on `GAS` objects and remain isometric, so existing code
+that only needs uniform scaling does not need to change.
+`body_scale`/`body_target` (with `isometric_body = FALSE`) are the
+interface to reach for once length and radius need to move
+independently.
 
 ## Why this matters
 

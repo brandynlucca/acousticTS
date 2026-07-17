@@ -505,6 +505,17 @@ component have?”</p>
 <span><span class="co">## 1   original         0.210            0.085</span></span>
 <span><span class="co">## 2 obj_scaled         0.252            0.085</span></span>
 <span><span class="co">## 3 obj_target         0.120            0.070</span></span></code></pre>
+<p>Height scaling is applied about each component’s own vertical center
+rather than around a shared coordinate origin. For components built from
+upper/lower envelopes with no explicit centerline row - the common case
+for <code>SBF</code>/<code>BBF</code> body profiles - that center is the
+midline implied by those envelopes, so a curved or undulating midline
+keeps its proportions instead of warping when the body is enlarged or
+shrunk. Components that do carry an explicit centerline row, such as an
+<code>FLS</code> or <code>BBF</code> backbone, are treated differently:
+the centerline is held fixed and only the surrounding tube thickness
+responds to the height factor, since that row is a genuine path rather
+than an emergent midline.</p>
 <p>The same idea applies when the body stays fixed but an internal
 component needs to move. For example, a swimbladder can be shifted
 fore-aft or dorsoventrally without rebuilding the entire object:</p>
@@ -571,6 +582,107 @@ to the new bent centerline arc length, not to the projected
 <code>x</code> extent. For straight <code>FLS</code> objects those two
 quantities are effectively the same, but once curvature has been
 introduced they should not be treated as interchangeable.</p>
+</div>
+<div class="section level2">
+<h2 id="reshaping-gas-filled-bodies-with-reforge">Reshaping gas-filled bodies with <code>reforge()</code><a class="anchor" aria-label="anchor" href="#reshaping-gas-filled-bodies-with-reforge"></a>
+</h2>
+<p><code>GAS</code> objects follow the same
+<code>body_scale</code>/<code>body_target</code> interface used for
+<code>FLS</code>, but because a <code>GAS</code> body can be a canonical
+sphere, prolate spheroid, or cylinder, <code><a href="../../reference/reforge.html">reforge()</a></code> treats
+<code>length</code> and <code>radius</code> as independently addressable
+dimensions rather than forcing isometric scaling.</p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">gas_prolate</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/gas_generate.html">gas_generate</a></span><span class="op">(</span></span>
+<span>  shape <span class="op">=</span> <span class="fu"><a href="../../reference/prolate_spheroid.html">prolate_spheroid</a></span><span class="op">(</span></span>
+<span>    length_body <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>    radius_body <span class="op">=</span> <span class="fl">0.01</span>,</span>
+<span>    n_segments <span class="op">=</span> <span class="fl">40</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  g_fluid <span class="op">=</span> <span class="fl">0.0012</span>,</span>
+<span>  h_fluid <span class="op">=</span> <span class="fl">0.22</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">gas_length_only</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/reforge.html">reforge</a></span><span class="op">(</span></span>
+<span>  <span class="va">gas_prolate</span>,</span>
+<span>  body_target <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fl">0.09</span><span class="op">)</span>,</span>
+<span>  isometric_body <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">gas_radius_only</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/reforge.html">reforge</a></span><span class="op">(</span></span>
+<span>  <span class="va">gas_prolate</span>,</span>
+<span>  body_target <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>radius <span class="op">=</span> <span class="fl">0.02</span><span class="op">)</span>,</span>
+<span>  isometric_body <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  object <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"original"</span>, <span class="st">"length_only"</span>, <span class="st">"radius_only"</span><span class="op">)</span>,</span>
+<span>  length_m <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">gas_prolate</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"length"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">gas_length_only</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"length"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">gas_radius_only</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"length"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  radius_m <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">gas_prolate</span>, <span class="st">"body"</span><span class="op">)</span><span class="op">$</span><span class="va">rpos</span><span class="op">[</span>, <span class="st">"zU"</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">gas_length_only</span>, <span class="st">"body"</span><span class="op">)</span><span class="op">$</span><span class="va">rpos</span><span class="op">[</span>, <span class="st">"zU"</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">gas_radius_only</span>, <span class="st">"body"</span><span class="op">)</span><span class="op">$</span><span class="va">rpos</span><span class="op">[</span>, <span class="st">"zU"</span><span class="op">]</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##        object length_m radius_m</span></span>
+<span><span class="co">## 1    original     0.05     0.01</span></span>
+<span><span class="co">## 2 length_only     0.09     0.01</span></span>
+<span><span class="co">## 3 radius_only     0.05     0.02</span></span></code></pre>
+<p>When the stored body is one of the package’s canonical families
+(<code>Sphere</code>, <code>ProlateSpheroid</code>,
+<code>Cylinder</code>), <code><a href="../../reference/reforge.html">reforge()</a></code> does not scale the
+position matrix directly. It instead regenerates the geometry from the
+requested <code>length</code> and <code>radius</code> through the
+matching shape constructor, so the discretization stays clean and the
+stored shape descriptor - and therefore any model that inspects it -
+remains accurate.</p>
+<p>That regeneration has one notable consequence for spheres: a sphere
+is only a sphere while <code>length == 2 * radius</code>. Scaling both
+dimensions together, the default isometric behavior, keeps it a sphere.
+But an independent length change under
+<code>isometric_body = FALSE</code> breaks that identity and promotes
+the body to a prolate spheroid.</p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">gas_sphere</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/gas_generate.html">gas_generate</a></span><span class="op">(</span></span>
+<span>  shape <span class="op">=</span> <span class="fu"><a href="../../reference/sphere.html">sphere</a></span><span class="op">(</span>radius_body <span class="op">=</span> <span class="fl">0.01</span>, n_segments <span class="op">=</span> <span class="fl">40</span><span class="op">)</span>,</span>
+<span>  g_fluid <span class="op">=</span> <span class="fl">0.0012</span>,</span>
+<span>  h_fluid <span class="op">=</span> <span class="fl">0.22</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">gas_sphere_isometric</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/reforge.html">reforge</a></span><span class="op">(</span><span class="va">gas_sphere</span>, radius_target <span class="op">=</span> <span class="fl">0.015</span><span class="op">)</span></span>
+<span><span class="va">gas_sphere_promoted</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/reforge.html">reforge</a></span><span class="op">(</span></span>
+<span>  <span class="va">gas_sphere</span>,</span>
+<span>  body_target <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span>,</span>
+<span>  isometric_body <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  object <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"original"</span>, <span class="st">"isometric_resize"</span>, <span class="st">"independent_length"</span><span class="op">)</span>,</span>
+<span>  shape <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">gas_sphere</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"shape"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">gas_sphere_isometric</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"shape"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">gas_sphere_promoted</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape_parameters"</span>, <span class="st">"shape"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##               object           shape</span></span>
+<span><span class="co">## 1           original          Sphere</span></span>
+<span><span class="co">## 2   isometric_resize          Sphere</span></span>
+<span><span class="co">## 3 independent_length ProlateSpheroid</span></span></code></pre>
+<p>Arbitrary, non-canonical <code>GAS</code> bodies do not have a
+matching shape constructor to regenerate from, so they fall back to
+direct per-axis scaling of the position matrix - the same approach
+<code>FLS</code> and <code>SBF</code> bodies already use.</p>
+<p>The legacy <code>scale</code>, <code>radius_target</code>, and
+<code>n_segments</code> arguments are still available on
+<code>GAS</code> objects and remain isometric, so existing code that
+only needs uniform scaling does not need to change.
+<code>body_scale</code>/<code>body_target</code> (with
+<code>isometric_body = FALSE</code>) are the interface to reach for once
+length and radius need to move independently.</p>
 </div>
 <div class="section level2">
 <h2 id="why-this-matters">Why this matters<a class="anchor" aria-label="anchor" href="#why-this-matters"></a>
