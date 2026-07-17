@@ -1,6 +1,10 @@
-# Resizing function for swimbladdered targets
+# Reforge SBF-class object
 
-Resizing function for swimbladdered targets
+Resize a swimbladdered fish scatterer by rescaling the flesh body and
+the gas-filled swimbladder together or independently. Body and
+swimbladder geometry each support `length`, `width`, and `height`
+scaling supplied as a direct `*_scale` factor or a `*_target` dimension
+(m).
 
 ## Usage
 
@@ -82,3 +86,16 @@ reforge(
   Containment policy for internal geometry checks. Use `"warn"` to keep
   the current warning behavior, `"error"` to fail fast for invalid
   internal geometries, or `"ignore"` to skip containment checks.
+
+## Details
+
+Vertical scaling is applied about each component's own centerline so
+that curved bodies keep their proportions when resized rather than
+warping - a resized body remains geometrically similar whether it is
+enlarged or shrunk. After scaling, the swimbladder is re-nested inside
+the body: its relative along-body start and its relative vertical offset
+within the body envelope are restored, so the bladder tracks the body
+instead of drifting out of it. The `swimbladder_inflation_factor` scales
+only the bladder width and height (its length endpoints are held fixed)
+about the bladder's own center. The `containment` policy governs what
+happens when the swimbladder exceeds the body envelope.

@@ -1,6 +1,9 @@
-# Reforge FLS-class object.
+# Reforge FLS-class object
 
-Reforge FLS-class object.
+Resize a fluid-like scatterer's single body by scaling its `length`
+and/or `radius`, supplied either as a direct `body_scale` factor or a
+`body_target` dimension (m). The cross-section is circular, so `radius`
+drives both lateral and vertical extent together.
 
 ## Usage
 
@@ -61,3 +64,13 @@ reforge(
 - n_segments:
 
   Legacy alias for `n_segments_body`.
+
+## Details
+
+For bent bodies (see
+[`brake()`](https://brandynlucca.github.io/acousticTS/reference/brake.md))
+a `length` resize follows the true centerline arc length and rescales
+the curved path, while a `radius` resize changes only the tube thickness
+and leaves the centerline in place. The legacy `length`, `radius`,
+`length_radius_ratio_constant`, and `n_segments` arguments are retained
+as thin wrappers over the `body_scale`/`body_target` pathway.

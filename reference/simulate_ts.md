@@ -10,9 +10,10 @@ simulate_ts(
   object,
   frequency,
   model,
-  n_realizations,
-  parameters,
+  n_realizations = NULL,
+  parameters = list(),
   batch_by = NULL,
+  permute = TRUE,
   parallel = TRUE,
   n_cores = .default_simulation_cores(),
   verbose = TRUE
@@ -36,18 +37,37 @@ simulate_ts(
 
 - n_realizations:
 
-  Number of realizations and output TS values.
+  Optional number of repeated evaluations of each deterministic grid
+  cell (default `1`). It is a pure repeat/redraw multiplier: every
+  deterministic multi-value parameter is always treated as a grid axis,
+  and `n_realizations` controls how many times each resulting cell is
+  evaluated, redrawing any generating functions each time. The total
+  number of realizations is therefore the size of the Cartesian grid
+  multiplied by `n_realizations` (for example, one length and two radii
+  yield two cells; with `n_realizations = 5` that is ten realizations).
+  Use it to draw repeated samples from generating functions
+  (distributions).
 
 - parameters:
 
   List containing the values, distributions, or generating functions of
-  parameter values that inform the TS model.
+  parameter values that inform the TS model. Defaults to an empty list,
+  which runs a single realization of the unmodified object.
 
 - batch_by:
 
   Optional. Specifies which parameters in `parameters` to batch over.
   Simulations will be run for all combinations of these parameter
   values. Default is `NULL`.
+
+- permute:
+
+  Logical; controls how varied parameters combine. When `TRUE` (default)
+  every deterministic multi-value parameter is crossed into the full
+  Cartesian grid. When `FALSE` the varied parameters are instead paired
+  (zipped) element-wise, so they advance together rather than
+  combinatorially; in that case every varied parameter must supply the
+  same number of values (length-one parameters are held constant).
 
 - parallel:
 
@@ -93,6 +113,24 @@ repeated `n_realizations` times. When multiple parameters are supplied
 through `batch_by`, the function builds the full Cartesian grid of those
 parameter values and runs the requested number of realizations inside
 each batch cell.
+
+Batching is automatic and follows one consistent rule: every
+deterministic multi-value parameter is a grid axis, whether or not
+`n_realizations` or `batch_by` are supplied. A bare vector therefore
+always means "sweep these values" rather than "align one value per
+realization". `batch_by` remains available to document intent, but
+naming an axis is no longer required for it to be swept.
+
+To vary parameters *together* (paired rather than crossed) set
+`permute = FALSE`. The varied parameters are then zipped element-wise
+and must share the same number of values. For example,
+`parameters = list(theta_body = c(1, 2), density_body = c(1040, 1050))`
+yields four runs by default but two paired runs - `(1, 1040)` and
+`(2, 1050)` - under `permute = FALSE`. Alternatively, values that belong
+to one
+[`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md)
+target can be paired within a single structured parameter, for example
+`parameters = list(body_target = list(c(length = 0.02, radius = 0.002), c(length = 0.03, radius = 0.003)))`.
 
 Structured batch values should be wrapped in a list so that each
 candidate is preserved as one unit. For example, use
