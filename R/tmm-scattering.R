@@ -424,6 +424,32 @@
   }
 
   # Dispatch each angle tuple to the active retained-coordinate backend ========
+  if (parameters$coordinate_system == "spherical" &&
+    .tmm_angles_all_equal(theta_body) &&
+    .tmm_angles_all_equal(phi_body)) {
+    return(.tmm_scattering_spherical_points_shared_incidence(
+      t_store = parameters$t_matrix[[frequency_idx]],
+      acoustics = acoustics[frequency_idx, , drop = FALSE],
+      theta_body = theta_body[1],
+      phi_body = phi_body[1],
+      theta_scatter = theta_scatter,
+      phi_scatter = phi_scatter
+    ))
+  }
+  if (parameters$coordinate_system == "spheroidal" &&
+    .tmm_angles_all_equal(theta_body) &&
+    .tmm_angles_all_equal(phi_body)) {
+    return(.tmm_scattering_spheroidal_points_shared_incidence(
+      t_store = parameters$t_matrix[[frequency_idx]],
+      acoustics = acoustics[frequency_idx, , drop = FALSE],
+      parameters = parameters,
+      theta_body = theta_body[1],
+      phi_body = phi_body[1],
+      theta_scatter = theta_scatter,
+      phi_scatter = phi_scatter
+    ))
+  }
+
   vapply(
     seq_len(n_eval),
     function(i) {
@@ -471,6 +497,12 @@
     },
     complex(1)
   )
+}
+
+# Check whether one angle vector is effectively constant.
+#' @noRd
+.tmm_angles_all_equal <- function(angle, tol = 1e-12) {
+  all(abs(angle - angle[1]) <= tol)
 }
 
 # Evaluate one stored TMM frequency over a full theta-phi receive grid while
@@ -602,34 +634,66 @@
                                               phi_scatter) {
   store_i <- model_params$parameters$t_matrix[[frequency_idx]]
   acoustics_i <- model_params$parameters$acoustics[frequency_idx, , drop = FALSE]
-  mu <- outer(
-    theta_scatter,
-    phi_scatter,
-    Vectorize(function(theta_val, phi_val) {
-      .tmm_scattering_cosine(
-        theta_body = theta_body,
-        phi_body = phi_body,
-        theta_scatter = theta_val,
-        phi_scatter = phi_val
-      )
-    })
-  )
-  p_mat <- array(0, dim = c(length(theta_scatter), length(phi_scatter), length(store_i$n_seq)))
-  for (j in seq_along(store_i$n_seq)) {
-    p_mat[, , j] <- matrix(
-      .tmm_assoc_legendre_table(0L, max(store_i$n_seq), c(mu))[,
-        store_i$n_seq[j] + 1],
-      nrow = length(theta_scatter),
-      ncol = length(phi_scatter)
-    )
-  }
 
-  f_scat <- matrix(0 + 0i, nrow = length(theta_scatter), ncol = length(phi_scatter))
-  for (j in seq_along(store_i$n_seq)) {
-    f_scat <- f_scat + (2 * store_i$n_seq[j] + 1) * store_i$A_n[j] * p_mat[, , j]
-  }
+  mu <- tcrossprod(
+    cos(theta_scatter),
+    rep(cos(theta_body), length(phi_scatter))
+  ) + tcrossprod(
+    sin(theta_scatter),
+    sin(theta_body) * cos(phi_body - phi_scatter)
+  )
+  mu <- matrix(
+    pmax(-1, pmin(1, mu)),
+    nrow = length(theta_scatter),
+    ncol = length(phi_scatter)
+  )
+
+  p_all <- .tmm_assoc_legendre_table(0L, max(store_i$n_seq), c(mu))
+  modal_weight <- (2 * store_i$n_seq + 1) * store_i$A_n
+  f_scat <- matrix(
+    as.vector(p_all[, store_i$n_seq + 1L, drop = FALSE] %*% modal_weight),
+    nrow = length(theta_scatter),
+    ncol = length(phi_scatter)
+  )
 
   -1i / acoustics_i$k_sw[1] * f_scat
+}
+
+# Evaluate one stored spherical-coordinate TMM frequency at many receive
+# points that share a single incident direction.
+#' @noRd
+.tmm_scattering_spherical_points_shared_incidence <- function(t_store,
+                                                              acoustics,
+                                                              theta_body,
+                                                              phi_body,
+                                                              theta_scatter,
+                                                              phi_scatter) {
+  mu_inc <- cos(theta_body)
+  mu_scat <- cos(theta_scatter)
+  k_sw <- acoustics$k_sw[1]
+  f_scat <- complex(length.out = length(theta_scatter))
+
+  for (block in t_store) {
+    n_seq <- as.integer(block$n_seq)
+    p_inc <- drop(.tmm_assoc_legendre_table(block$m, max(n_seq), mu_inc))
+    a_inc <- .tmm_incident_plane_wave_coefficients(
+      block$m,
+      n_seq,
+      mu_inc,
+      p_inc
+    )
+    coeffs <- as.vector(block[["T"]] %*% a_inc)
+    p_scat <- .tmm_assoc_legendre_table(block$m, max(n_seq), mu_scat)
+    theta_term <- as.vector(
+      p_scat[, seq_along(n_seq), drop = FALSE] %*%
+        (((-1i)^(n_seq + 1)) * coeffs / k_sw)
+    )
+    azimuth <- cos(block$m * (phi_body - phi_scatter))
+
+    f_scat <- f_scat + theta_term * azimuth
+  }
+
+  f_scat
 }
 
 # Evaluate the stored spherical-coordinate blocks at an arbitrary scattering
@@ -689,6 +753,27 @@
                                        phi_scatter) {
   # Delegate prolate general-angle evaluation to the compiled retained backend =
   prolate_spheroid_scattering_from_tmatrix_cpp(
+    acoustics = acoustics,
+    t_matrix = t_store,
+    theta_body = theta_body,
+    phi_body = phi_body,
+    theta_scatter = theta_scatter,
+    phi_scatter = phi_scatter,
+    precision = parameters$precision %||% "double"
+  )
+}
+
+# Evaluate one stored spheroidal-coordinate TMM frequency at paired receive
+# points that share a single incident direction.
+#' @noRd
+.tmm_scattering_spheroidal_points_shared_incidence <- function(t_store,
+                                                               acoustics,
+                                                               parameters,
+                                                               theta_body,
+                                                               phi_body,
+                                                               theta_scatter,
+                                                               phi_scatter) {
+  prolate_spheroid_scattering_points_from_tmatrix_cpp(
     acoustics = acoustics,
     t_matrix = t_store,
     theta_body = theta_body,

@@ -430,26 +430,18 @@ TMM <- function(object) {
       n_max = acoustics$n_max
     )
   } else {
-    # Retain the per-frequency spherical blocks for post-processing ============
-    f_bs <- complex(length.out = nrow(acoustics))
-    t_store <- vector("list", nrow(acoustics))
-
-    for (i in seq_len(nrow(acoustics))) {
-      tmm_i <- .tmm_single_frequency_spherical(
-        k_sw = acoustics$k_sw[i],
-        k_body = acoustics$k_body[i],
-        theta_body = body$theta_body,
-        boundary = parameters$boundary,
-        shape_parameters = shape_parameters,
-        rho_sw = medium$density,
-        rho_body = body$density,
-        n_max = acoustics$n_max[i],
-        store_t_matrix = parameters$store_t_matrix
-      )
-
-      f_bs[i] <- tmm_i$f_bs
-      t_store[[i]] <- tmm_i$blocks
-    }
+    # Retain spherical blocks while sharing setup work within n_max buckets ===
+    stored_spherical <- .tmm_spherical_stored_frequency_sweep(
+      acoustics = acoustics,
+      theta_body = body$theta_body,
+      boundary = parameters$boundary,
+      shape_parameters = shape_parameters,
+      rho_sw = medium$density,
+      rho_body = body$density,
+      store_t_matrix = parameters$store_t_matrix
+    )
+    f_bs <- stored_spherical$f_bs
+    t_store <- stored_spherical$t_matrix
 
     methods::slot(object, "model_parameters")$TMM$parameters$t_matrix <- t_store
   }
