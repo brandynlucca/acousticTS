@@ -337,7 +337,7 @@
         "Validated against the published McGehee et al (1998) and echoSMs ",
         "workflows."
       ),
-      #SDWBA
+      # SDWBA
       paste(
         "Benchmarked against the canonical spectra stored",
         "in benchmark_ts."
