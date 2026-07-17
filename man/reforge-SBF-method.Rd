@@ -2,7 +2,7 @@
 % Please edit documentation in R/scatterer_reforge.R
 \name{reforge,SBF-method}
 \alias{reforge,SBF-method}
-\title{Resizing function for swimbladdered targets}
+\title{Reforge SBF-class object}
 \usage{
 \S4method{reforge}{SBF}(
   object,
@@ -57,6 +57,21 @@ the swimbladder x-axis origin and terminus are both held constant.}
 invalid internal geometries, or \code{"ignore"} to skip containment checks.}
 }
 \description{
-Resizing function for swimbladdered targets
+Resize a swimbladdered fish scatterer by rescaling the flesh body and the
+gas-filled swimbladder together or independently. Body and swimbladder
+geometry each support \code{length}, \code{width}, and \code{height} scaling supplied as a
+direct \verb{*_scale} factor or a \verb{*_target} dimension (m).
+}
+\details{
+Vertical scaling is applied about each component's own centerline so that
+curved bodies keep their proportions when resized rather than warping - a
+resized body remains geometrically similar whether it is enlarged or shrunk.
+After scaling, the swimbladder is re-nested inside the body: its relative
+along-body start and its relative vertical offset within the body envelope
+are restored, so the bladder tracks the body instead of drifting out of it.
+The \code{swimbladder_inflation_factor} scales only the bladder width and height
+(its length endpoints are held fixed) about the bladder's own center. The
+\code{containment} policy governs what happens when the swimbladder exceeds the
+body envelope.
 }
 \keyword{internal}

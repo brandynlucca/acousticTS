@@ -1126,6 +1126,129 @@ test_that("`reforge('SBF')` correctly updates body shape", {
   )
 })
 
+test_that("`reforge('SBF')` scales the body centerline without warping", {
+  # Regression guard: an emergent midline (SBF body has no explicit z-row) must
+  # scale with the height factor. Previously only the half-height scaled while
+  # the centerline undulation stayed at full size, warping resized bodies -
+  # most severely when shrinking (e.g. body_target = c(length = 30e-3)).
+  data(sardine, package = "acousticTS")
+
+  orig_body <- extract(sardine, "body")$rpos
+  orig_center <- (orig_body[3, ] + orig_body[4, ]) / 2
+  orig_half <- (orig_body[3, ] - orig_body[4, ]) / 2
+  orig_ratio <- diff(range(orig_center)) / max(orig_half)
+
+  # The centerline-span to thickness ratio is scale-invariant under resizing.
+  for (factor in c(0.1, 0.5, 3)) {
+    body <- extract(reforge(sardine, body_scale = factor), "body")$rpos
+    center <- (body[3, ] + body[4, ]) / 2
+    half <- (body[3, ] - body[4, ]) / 2
+    expect_equal(diff(range(center)) / max(half), orig_ratio, tolerance = 1e-8)
+    expect_equal(
+      diff(range(center)), diff(range(orig_center)) * factor,
+      tolerance = 1e-10
+    )
+  }
+
+  # The same holds when resizing through a target length.
+  resized <- reforge(sardine, body_target = c(length = 30e-3))
+  body <- extract(resized, "body")$rpos
+  center <- (body[3, ] + body[4, ]) / 2
+  half <- (body[3, ] - body[4, ]) / 2
+  expect_equal(diff(range(center)) / max(half), orig_ratio, tolerance = 1e-8)
+})
+
+test_that("`reforge('GAS')` reshapes canonical bodies and stays a GAS", {
+  prolate <- gas_generate(
+    shape = prolate_spheroid(
+      length_body = 0.05, radius_body = 0.01, n_segments = 40
+    ),
+    g_fluid = 0.0012, h_fluid = 0.22
+  )
+  gas_length <- function(o) extract(o, "shape_parameters")$length
+  gas_radius <- function(o) max(extract(o, "body")$rpos[, "zU"])
+
+  # The returned object must remain a GAS across every resize pathway.
+  expect_true(is(reforge(prolate, n_segments = 25), "GAS"))
+  expect_true(is(reforge(prolate, n_segments_body = 25), "GAS"))
+  expect_true(is(reforge(prolate, scale = 2), "GAS"))
+  expect_true(is(reforge(prolate, body_target = c(length = 0.1)), "GAS"))
+
+  # Length and radius can be reshaped independently for elongated bodies.
+  len_only <- reforge(prolate, body_target = c(length = 0.1), isometric_body = FALSE)
+  expect_equal(gas_length(len_only), 0.1, tolerance = 1e-9)
+  expect_equal(gas_radius(len_only), 0.01, tolerance = 1e-6)
+
+  rad_only <- reforge(prolate, body_target = c(radius = 0.02), isometric_body = FALSE)
+  expect_equal(gas_length(rad_only), 0.05, tolerance = 1e-9)
+  expect_equal(gas_radius(rad_only), 0.02, tolerance = 1e-6)
+
+  both <- reforge(
+    prolate,
+    body_target = c(length = 0.08, radius = 0.03), isometric_body = FALSE
+  )
+  expect_equal(gas_length(both), 0.08, tolerance = 1e-9)
+  expect_equal(gas_radius(both), 0.03, tolerance = 1e-6)
+
+  # A single isometric target scales both dimensions (FLS/SBF convention).
+  iso <- reforge(prolate, body_target = c(length = 0.1))
+  expect_equal(gas_length(iso), 0.1, tolerance = 1e-9)
+  expect_equal(gas_radius(iso), 0.02, tolerance = 1e-6)
+
+  # Internal-gas material contrasts survive the geometry rebuild.
+  expect_equal(extract(len_only, "body")$g, extract(prolate, "body")$g)
+  expect_equal(extract(len_only, "body")$h, extract(prolate, "body")$h)
+
+  # Spheres stay spheres under isometric resizing, but an independent length
+  # change promotes the body to a prolate spheroid.
+  sphere_gas <- gas_generate(
+    shape = sphere(radius_body = 0.01, n_segments = 40),
+    g_fluid = 0.0012, h_fluid = 0.22
+  )
+  iso_sphere <- reforge(sphere_gas, radius_target = 0.02)
+  expect_equal(extract(iso_sphere, "shape_parameters")$shape, "Sphere")
+  expect_equal(gas_radius(iso_sphere), 0.02, tolerance = 1e-6)
+  promoted <- reforge(
+    sphere_gas, body_target = c(length = 0.05), isometric_body = FALSE
+  )
+  expect_equal(extract(promoted, "shape_parameters")$shape, "ProlateSpheroid")
+
+  # Cylinders reshape and remain cylinders.
+  cyl <- gas_generate(
+    shape = cylinder(length_body = 0.05, radius_body = 0.01, n_segments = 40),
+    g_fluid = 0.0012, h_fluid = 0.22
+  )
+  cyl_reforged <- reforge(cyl, body_target = c(length = 0.08), isometric_body = FALSE)
+  expect_true(is(cyl_reforged, "GAS"))
+  expect_equal(extract(cyl_reforged, "shape_parameters")$shape, "Cylinder")
+  expect_equal(gas_length(cyl_reforged), 0.08, tolerance = 1e-9)
+
+  # `simulate_ts()` convenience aliases resolve onto the GAS body target.
+  expect_true("body_target" %in% .discover_reforge_params("GAS"))
+  normalized <- .normalize_simulation_reforge_parameters(
+    prolate, list(length_body = 0.08, radius_body = 0.02)
+  )
+  expect_equal(
+    normalized$body_target,
+    c(length = 0.08, radius = 0.02)
+  )
+
+  # Guardrails.
+  expect_error(reforge(prolate), "Must specify at least one")
+  expect_error(
+    reforge(prolate, scale = 2, body_target = c(length = 0.1)),
+    "Use either the legacy scale/radius_target arguments"
+  )
+  expect_error(
+    reforge(prolate, body_scale = 2, body_target = c(length = 0.1)),
+    "Specify only one of body_scale or body_target"
+  )
+  expect_error(
+    reforge(prolate, n_segments = 10, n_segments_body = 10),
+    "Specify only one of n_segments or n_segments_body"
+  )
+})
+
 test_that("`reforge()` covers GAS, CAL, and ESS resize methods", {
   gas_obj <- gas_generate(
     shape = sphere(radius_body = 0.01, n_segments = 40),

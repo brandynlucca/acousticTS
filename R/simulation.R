@@ -31,9 +31,53 @@
   normalized_model
 }
 
+# Identify a deterministic multi-level parameter that defines a grid axis.
+#' @noRd
+.is_auto_batch_parameter <- function(value) {
+  # Generating functions are stochastic draws, not deterministic grid axes =====
+  if (is.function(value)) {
+    return(FALSE)
+  }
+  # Structured values are a single unit unless supplied as a list of levels ====
+  if (.is_structured_simulation_value(value)) {
+    return(is.list(value) && length(value) > 1)
+  }
+  # Plain atomic inputs define a grid axis only with more than one level =======
+  length(value) > 1
+}
+
+# Resolve the deterministic grid axes and the per-cell repeat count.
+#' @noRd
+.resolve_simulation_realizations <- function(parameters, batch_by, n_realizations) {
+  # Resolve the per-cell repeat count (defaults to a single evaluation) =========
+  # `n_realizations` is purely a repeat/redraw multiplier: each deterministic
+  # grid cell is evaluated this many times, redrawing any generating functions.
+  if (is.null(n_realizations)) {
+    n_realizations <- 1L
+  } else if (!is.numeric(n_realizations) || length(n_realizations) != 1 ||
+    is.na(n_realizations) || n_realizations < 1) {
+    stop("'n_realizations' must be a single positive integer.", call. = FALSE)
+  } else {
+    n_realizations <- as.integer(n_realizations)
+  }
+
+  # Every deterministic multi-level parameter defines a grid axis ==============
+  # This holds regardless of `n_realizations`, so a bare multi-value vector
+  # always means "sweep these values" rather than "align one per realization".
+  auto_batch <- names(parameters)[
+    vapply(parameters, .is_auto_batch_parameter, logical(1))
+  ]
+  batch_by <- union(batch_by %||% character(0), auto_batch)
+  if (length(batch_by) == 0) {
+    batch_by <- NULL
+  }
+  list(n_realizations = n_realizations, batch_by = batch_by)
+}
+
 # Build the simulation grid, including any batched parameter expansion.
 #' @noRd
-.prepare_simulation_grid <- function(n_realizations, parameters, batch_by) {
+.prepare_simulation_grid <- function(n_realizations, parameters, batch_by,
+                                     permute = TRUE) {
   # Fall back to the simple realization index when batching is disabled ========
   if (is.null(batch_by)) {
     return(list(
@@ -56,10 +100,7 @@
 
   # Resolve the concrete batch-value vectors before expanding the grid =========
   batch_values <- .prepare_simulation_batch_values(batch_by, parameters)
-  parameter_grid <- expand.grid(
-    lapply(batch_values, function(x) seq_along(x)),
-    stringsAsFactors = FALSE
-  )
+  parameter_grid <- .simulation_index_grid(batch_values, permute)
   names(parameter_grid) <- paste0(names(batch_values), "_idx")
 
   list(
@@ -71,6 +112,47 @@
       row.names = NULL
     ),
     batch_values = batch_values
+  )
+}
+
+# Build the per-axis index grid, crossing or pairing the varied parameters.
+#' @noRd
+.simulation_index_grid <- function(batch_values, permute) {
+  # Cross every axis into the full Cartesian grid ==============================
+  if (isTRUE(permute)) {
+    return(expand.grid(
+      lapply(batch_values, function(x) seq_along(x)),
+      stringsAsFactors = FALSE
+    ))
+  }
+
+  # Otherwise zip the axes element-wise into aligned combinations =============
+  axis_lengths <- vapply(batch_values, length, integer(1))
+  n_paired <- max(axis_lengths)
+  mismatched <- axis_lengths != n_paired & axis_lengths != 1L
+  if (any(mismatched)) {
+    stop(
+      "Paired simulation ('permute = FALSE') requires every varied parameter ",
+      "to share the same number of values. Mismatched: ",
+      paste(
+        sprintf(
+          "'%s' [%d]",
+          names(batch_values)[mismatched],
+          axis_lengths[mismatched]
+        ),
+        collapse = ", "
+      ),
+      ".",
+      call. = FALSE
+    )
+  }
+
+  # Length-one axes stay constant; the rest advance together through the pairs =
+  as.data.frame(
+    lapply(axis_lengths, function(n) {
+      if (n == 1L) rep(1L, n_paired) else seq_len(n_paired)
+    }),
+    stringsAsFactors = FALSE
   )
 }
 
@@ -330,12 +412,27 @@
 #' @inheritParams target_strength
 #' @param model Model name. If multiple models are specified, the output will
 #' be a list of data frames, one for each model.
-#' @param n_realizations Number of realizations and output TS values.
+#' @param n_realizations Optional number of repeated evaluations of each
+#' deterministic grid cell (default \code{1}). It is a pure repeat/redraw
+#' multiplier: every deterministic multi-value parameter is always treated as a
+#' grid axis, and \code{n_realizations} controls how many times each resulting
+#' cell is evaluated, redrawing any generating functions each time. The total
+#' number of realizations is therefore the size of the Cartesian grid multiplied
+#' by \code{n_realizations} (for example, one length and two radii yield two
+#' cells; with \code{n_realizations = 5} that is ten realizations). Use it to
+#' draw repeated samples from generating functions (distributions).
 #' @param parameters List containing the values, distributions, or generating
-#' functions of parameter values that inform the TS model.
+#' functions of parameter values that inform the TS model. Defaults to an empty
+#' list, which runs a single realization of the unmodified object.
 #' @param batch_by Optional. Specifies which parameters in \code{parameters} to
 #' batch over. Simulations will be run for all combinations of these parameter
 #' values. Default is \code{NULL}.
+#' @param permute Logical; controls how varied parameters combine. When
+#' \code{TRUE} (default) every deterministic multi-value parameter is crossed
+#' into the full Cartesian grid. When \code{FALSE} the varied parameters are
+#' instead paired (zipped) element-wise, so they advance together rather than
+#' combinatorially; in that case every varied parameter must supply the same
+#' number of values (length-one parameters are held constant).
 #' @param parallel Logical; whether to parallelize the simulations. Default is
 #' \code{TRUE}.
 #' @param n_cores Optional. Number of CPU cores to use for parallelization.
@@ -368,6 +465,24 @@
 #' through \code{batch_by}, the function builds the full Cartesian grid of
 #' those parameter values and runs the requested number of realizations inside
 #' each batch cell.
+#'
+#' Batching is automatic and follows one consistent rule: every deterministic
+#' multi-value parameter is a grid axis, whether or not \code{n_realizations} or
+#' \code{batch_by} are supplied. A bare vector therefore always means "sweep
+#' these values" rather than "align one value per realization". \code{batch_by}
+#' remains available to document intent, but naming an axis is no longer
+#' required for it to be swept.
+#'
+#' To vary parameters \emph{together} (paired rather than crossed) set
+#' \code{permute = FALSE}. The varied parameters are then zipped element-wise
+#' and must share the same number of values. For example,
+#' \code{parameters = list(theta_body = c(1, 2), density_body = c(1040, 1050))}
+#' yields four runs by default but two paired runs -
+#' \code{(1, 1040)} and \code{(2, 1050)} - under \code{permute = FALSE}.
+#' Alternatively, values that belong to one \code{reforge()} target can be
+#' paired within a single structured parameter, for example
+#' \code{parameters = list(body_target = list(c(length = 0.02, radius = 0.002),
+#' c(length = 0.03, radius = 0.003)))}.
 #'
 #' Structured batch values should be wrapped in a list so that each candidate is
 #' preserved as one unit. For example, use
@@ -438,9 +553,10 @@
 simulate_ts <- function(object,
                         frequency,
                         model,
-                        n_realizations,
-                        parameters,
+                        n_realizations = NULL,
+                        parameters = list(),
                         batch_by = NULL,
+                        permute = TRUE,
                         parallel = TRUE,
                         n_cores = .default_simulation_cores(),
                         verbose = TRUE) {
@@ -450,10 +566,19 @@ simulate_ts <- function(object,
   )
   parallel <- .resolve_simulation_parallel(parallel, n_cores)
   normalized_model <- .validate_simulation_models(model)
+  # Infer the realization count and grid axes when they are not supplied =======
+  realization_setup <- .resolve_simulation_realizations(
+    parameters = parameters,
+    batch_by = batch_by,
+    n_realizations = n_realizations
+  )
+  n_realizations <- realization_setup$n_realizations
+  batch_by <- realization_setup$batch_by
   simulation_setup <- .prepare_simulation_grid(
     n_realizations = n_realizations,
     parameters = parameters,
-    batch_by = batch_by
+    batch_by = batch_by,
+    permute = permute
   )
   simulation_grid <- simulation_setup$simulation_grid
   batch_values <- simulation_setup$batch_values

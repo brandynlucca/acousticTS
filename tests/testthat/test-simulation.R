@@ -153,6 +153,185 @@ test_that("simulate_ts accepts model names case-insensitively", {
   expect_equal(result_upper$DWBA$TS, result_lower$DWBA$TS)
 })
 
+test_that("simulate_ts infers realizations from deterministic parameters", {
+  data(krill)
+
+  # A single deterministic grid axis needs no explicit n_realizations.
+  one_by_two <- simulate_ts(
+    object = krill,
+    frequency = 38e3,
+    model = "DWBA",
+    parameters = list(length_body = 0.02, radius_body = c(2e-3, 3e-3)),
+    parallel = FALSE,
+    verbose = FALSE
+  )
+  expect_equal(nrow(one_by_two$DWBA), 2)
+
+  # Multiple deterministic axes expand to their Cartesian product.
+  two_by_three <- simulate_ts(
+    object = krill,
+    frequency = 38e3,
+    model = "DWBA",
+    parameters = list(
+      length_body = c(0.02, 0.03),
+      radius_body = c(2e-3, 3e-3, 4e-3)
+    ),
+    parallel = FALSE,
+    verbose = FALSE
+  )
+  expect_equal(nrow(two_by_three$DWBA), 6)
+  expect_equal(
+    nrow(unique(two_by_three$DWBA[, c("length_body", "radius_body")])),
+    6
+  )
+
+  # With no varying parameters a single realization runs.
+  none <- simulate_ts(
+    object = krill,
+    frequency = 38e3,
+    model = "DWBA",
+    parallel = FALSE,
+    verbose = FALSE
+  )
+  expect_equal(nrow(none$DWBA), 1)
+
+  # A structured multi-dimension target is one unit, not a grid axis.
+  structured <- simulate_ts(
+    object = krill,
+    frequency = 38e3,
+    model = "DWBA",
+    parameters = list(
+      body_target = c(length = 0.02, radius = 3e-3),
+      isometric_body = FALSE
+    ),
+    parallel = FALSE,
+    verbose = FALSE
+  )
+  expect_equal(nrow(structured$DWBA), 1)
+
+  # A list of structured targets is a grid axis.
+  target_list <- simulate_ts(
+    object = krill,
+    frequency = 38e3,
+    model = "DWBA",
+    parameters = list(
+      body_target = list(c(length = 0.02), c(length = 0.03))
+    ),
+    parallel = FALSE,
+    verbose = FALSE
+  )
+  expect_equal(nrow(target_list$DWBA), 2)
+
+  # Generating functions draw once per grid cell when n_realizations is absent.
+  inferred_gen <- simulate_ts(
+    object = krill,
+    frequency = 38e3,
+    model = "DWBA",
+    parameters = list(
+      length_body = c(0.02, 0.03),
+      theta = function() stats::runif(1, 0, pi)
+    ),
+    parallel = FALSE,
+    verbose = FALSE
+  )
+  expect_equal(nrow(inferred_gen$DWBA), 2)
+
+  # An explicit n_realizations still repeats every deterministic cell.
+  repeated <- simulate_ts(
+    object = krill,
+    frequency = 38e3,
+    model = "DWBA",
+    n_realizations = 3,
+    parameters = list(length_body = c(0.02, 0.03)),
+    batch_by = "length_body",
+    parallel = FALSE,
+    verbose = FALSE
+  )
+  expect_equal(nrow(repeated$DWBA), 6)
+
+  expect_error(
+    simulate_ts(
+      object = krill,
+      frequency = 38e3,
+      model = "DWBA",
+      n_realizations = 0,
+      parameters = list(),
+      parallel = FALSE,
+      verbose = FALSE
+    ),
+    "'n_realizations' must be a single positive integer"
+  )
+})
+
+test_that("simulate_ts pairs parameters when permute = FALSE", {
+  data(krill)
+
+  # Default crosses the two axes into the full grid.
+  crossed <- simulate_ts(
+    object = krill,
+    frequency = 38e3,
+    model = "DWBA",
+    parameters = list(theta_body = c(1, 2), density_body = c(1040, 1050)),
+    parallel = FALSE,
+    verbose = FALSE
+  )
+  expect_equal(nrow(crossed$DWBA), 4)
+
+  # permute = FALSE zips the axes element-wise into aligned pairs.
+  paired <- simulate_ts(
+    object = krill,
+    frequency = 38e3,
+    model = "DWBA",
+    parameters = list(theta_body = c(1, 2), density_body = c(1040, 1050)),
+    permute = FALSE,
+    parallel = FALSE,
+    verbose = FALSE
+  )
+  expect_equal(nrow(paired$DWBA), 2)
+  expect_equal(paired$DWBA$theta_body, c(1, 2))
+  expect_equal(paired$DWBA$density_body, c(1040, 1050))
+
+  # Length-one parameters stay constant across the pairs.
+  const <- simulate_ts(
+    object = krill,
+    frequency = 38e3,
+    model = "DWBA",
+    parameters = list(theta_body = c(1, 2, 3), density_body = 1040),
+    permute = FALSE,
+    parallel = FALSE,
+    verbose = FALSE
+  )
+  expect_equal(nrow(const$DWBA), 3)
+  expect_true(all(const$DWBA$density_body == 1040))
+
+  # n_realizations still repeats each paired cell.
+  repeated <- simulate_ts(
+    object = krill,
+    frequency = 38e3,
+    model = "DWBA",
+    n_realizations = 3,
+    parameters = list(theta_body = c(1, 2), density_body = c(1040, 1050)),
+    permute = FALSE,
+    parallel = FALSE,
+    verbose = FALSE
+  )
+  expect_equal(nrow(repeated$DWBA), 6)
+
+  # Mismatched axis lengths cannot be zipped.
+  expect_error(
+    simulate_ts(
+      object = krill,
+      frequency = 38e3,
+      model = "DWBA",
+      parameters = list(theta_body = c(1, 2), density_body = c(1, 2, 3)),
+      permute = FALSE,
+      parallel = FALSE,
+      verbose = FALSE
+    ),
+    "share the same number of values"
+  )
+})
+
 test_that("simulate_ts works with batch_by parameter", {
   # Test batching with different parameter values
   data(krill)
@@ -537,18 +716,17 @@ test_that("simulate_ts handles mixed parameter types", {
   frequency <- c(38e3, 70e3)
 
   parameters <- list(
-    length = 20e-3, # Single value
-    radius_body = seq(1e-3, 3e-3, length.out = 10),
-    theta = function() runif(1, min = 0, max = pi)
+    length = 20e-3, # Single value (held constant)
+    radius_body = seq(1e-3, 3e-3, length.out = 10), # Deterministic grid axis
+    theta = function() runif(1, min = 0, max = pi) # Redrawn per grid cell
   )
 
-  # Run simulation with batching on vector_values
+  # The 10-level radius axis defines the realizations; no n_realizations needed.
   result <- simulate_ts(
     object = krill,
     frequency = frequency,
     model = "DWBA",
     parameters = parameters,
-    n_realizations = 10,
     parallel = FALSE,
     verbose = FALSE
   )

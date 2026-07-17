@@ -4,29 +4,67 @@
 \alias{reforge,GAS-method}
 \title{Reforge GAS-class object}
 \usage{
-\S4method{reforge}{GAS}(object, scale = NULL, radius_target = NULL, n_segments = NULL)
+\S4method{reforge}{GAS}(
+  object,
+  body_scale = NULL,
+  body_target = NULL,
+  isometric_body = TRUE,
+  n_segments_body = NULL,
+  scale = NULL,
+  radius_target = NULL,
+  n_segments = NULL
+)
 }
 \arguments{
 \item{object}{GAS-class object.}
 
-\item{scale}{Single positive scalar applied isometrically to every axis of
-the position matrix.  Mutually exclusive with \code{radius_target}.}
+\item{body_scale}{Proportional scaling for the body length and/or radius.
+A single value scales both dimensions isometrically; otherwise supply a
+named numeric vector using \code{length} and/or \code{radius}.}
 
-\item{radius_target}{Target \emph{maximum} body radius (m).  The scale
-factor is derived as \code{radius_target / max(current_radius)}.  Mutually
-exclusive with \code{scale}.}
+\item{body_target}{Target dimensions (m) for the body length and/or radius,
+supplied as a named numeric vector using \code{length} and/or \code{radius}.}
 
-\item{n_segments}{New number of discrete segments.  All position-matrix
-columns are re-interpolated along the x-axis.}
+\item{isometric_body}{Logical; maintain isometric scaling for the body.}
+
+\item{n_segments_body}{New number of segments along the body profile.}
+
+\item{scale}{Legacy isometric scale factor applied to every axis. Mutually
+exclusive with \code{radius_target}.}
+
+\item{radius_target}{Legacy target \emph{maximum} body radius (m); the
+isometric scale factor is derived as \code{radius_target / max(current_radius)}.
+Mutually exclusive with \code{scale}.}
+
+\item{n_segments}{Legacy alias for \code{n_segments_body}.}
 }
 \value{
 Modified GAS-class object.
 }
 \description{
-Resize a gas-filled scatterer by applying an isometric scale factor or
-specifying a target maximum radius.  Optionally re-discretize the body
-representation to a new segment count.  The underlying shape (sphere,
-prolate spheroid, cylinder, arbitrary, etc.) is preserved; scaling is
-applied uniformly to all axes of the position matrix.
+Resize a gas-filled fluid scatterer. \code{GAS} bodies are single-component
+fluid-like targets, so the interface mirrors \code{\link[=reforge]{reforge()}} for \code{FLS}: supply
+either a direct \code{body_scale} or a \code{body_target} describing the desired
+\code{length} and/or \code{radius}. Because both dimensions are addressable, elongated
+canonical bodies (prolate spheroids, cylinders) can be reshaped
+\emph{non-isometrically} - for example lengthening the body while holding its
+radius fixed.
+}
+\details{
+When the body is a recognized canonical family (sphere, prolate spheroid, or
+cylinder) the geometry is regenerated from the requested dimensions through
+the corresponding shape constructor, which keeps the discretization clean and
+the stored shape descriptor accurate. Arbitrary shapes fall back to direct
+per-axis scaling of the position matrix. In every case the returned object is
+a \code{GAS}, with the internal-gas material contrasts, orientation, and metadata
+preserved.
+
+The legacy \code{scale}, \code{radius_target}, and \code{n_segments} arguments remain
+available and are isometric: they scale every axis together, so a sphere
+stays a sphere. Use \code{body_scale}/\code{body_target} for independent length and
+radius control.
+}
+\seealso{
+\code{\link[=reforge]{reforge()}}
 }
 \keyword{internal}

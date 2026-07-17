@@ -2,7 +2,7 @@
 % Please edit documentation in R/scatterer_reforge.R
 \name{reforge,FLS-method}
 \alias{reforge,FLS-method}
-\title{Reforge FLS-class object.}
+\title{Reforge FLS-class object}
 \usage{
 \S4method{reforge}{FLS}(
   object,
@@ -40,6 +40,16 @@ length-only resize also rescales radius.}
 \item{n_segments}{Legacy alias for \code{n_segments_body}.}
 }
 \description{
-Reforge FLS-class object.
+Resize a fluid-like scatterer's single body by scaling its \code{length} and/or
+\code{radius}, supplied either as a direct \code{body_scale} factor or a \code{body_target}
+dimension (m). The cross-section is circular, so \code{radius} drives both lateral
+and vertical extent together.
+}
+\details{
+For bent bodies (see \code{\link[=brake]{brake()}}) a \code{length} resize follows the true centerline
+arc length and rescales the curved path, while a \code{radius} resize changes only
+the tube thickness and leaves the centerline in place. The legacy \code{length},
+\code{radius}, \code{length_radius_ratio_constant}, and \code{n_segments} arguments are
+retained as thin wrappers over the \code{body_scale}/\code{body_target} pathway.
 }
 \keyword{internal}

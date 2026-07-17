@@ -208,23 +208,41 @@ setGeneric(
     }
   }
 
-  # Rescale the vertical profile while preserving its local centerline =========
+  # Rescale the vertical profile about the component's own vertical center =====
+  # The local half-height (tube thickness) always follows the height factor.
+  # The centerline is treated differently depending on how it is stored:
+  #   * Emergent midlines (no explicit z-row, e.g. SBF/BBF bodies) are the
+  #     average of the upper/lower envelopes and belong to the body shape, so
+  #     they must scale with the height factor about the component's vertical
+  #     center. Scaling only the half-height leaves the midline undulation at
+  #     full size and warps curved-centerline bodies when they are resized -
+  #     most visibly when shrinking.
+  #   * Explicit backbones (a dedicated z-row, e.g. FLS/BBF backbones) define a
+  #     genuine centerline path that must not move when the surrounding tube
+  #     thickness changes, so the centerline is held fixed.
   if (scales["height"] != 1) {
     if (length(zU_idx) > 0 && length(zL_idx) > 0) {
-      z_center <- if (length(z_idx) > 0) {
+      has_explicit_center <- length(z_idx) > 0
+      z_center <- if (has_explicit_center) {
         rpos[z_idx, ]
       } else {
         (rpos[zU_idx, ] + rpos[zL_idx, ]) / 2
       }
       half_height <- (rpos[zU_idx, ] - rpos[zL_idx, ]) / 2
       half_height <- half_height * scales["height"]
+      # ---- Scale emergent midlines about their own vertical center ++++++++++++
+      if (!has_explicit_center) {
+        z_ref <- mean(z_center, na.rm = TRUE)
+        z_center <- z_ref + (z_center - z_ref) * scales["height"]
+      }
       rpos[zU_idx, ] <- z_center + half_height
       rpos[zL_idx, ] <- z_center - half_height
-      if (length(z_idx) > 0) {
+      if (has_explicit_center) {
         rpos[z_idx, ] <- z_center
       }
     } else if (length(z_idx) > 0) {
-      rpos[z_idx, ] <- rpos[z_idx, ] * scales["height"]
+      z_ref <- mean(rpos[z_idx, ], na.rm = TRUE)
+      rpos[z_idx, ] <- z_ref + (rpos[z_idx, ] - z_ref) * scales["height"]
     }
   }
 
@@ -491,7 +509,26 @@ setGeneric(
   invisible(all(contained))
 }
 
-#' Resizing function for swimbladdered targets
+#' Reforge SBF-class object
+#'
+#' @description
+#' Resize a swimbladdered fish scatterer by rescaling the flesh body and the
+#' gas-filled swimbladder together or independently. Body and swimbladder
+#' geometry each support `length`, `width`, and `height` scaling supplied as a
+#' direct `*_scale` factor or a `*_target` dimension (m).
+#'
+#' @details
+#' Vertical scaling is applied about each component's own centerline so that
+#' curved bodies keep their proportions when resized rather than warping - a
+#' resized body remains geometrically similar whether it is enlarged or shrunk.
+#' After scaling, the swimbladder is re-nested inside the body: its relative
+#' along-body start and its relative vertical offset within the body envelope
+#' are restored, so the bladder tracks the body instead of drifting out of it.
+#' The `swimbladder_inflation_factor` scales only the bladder width and height
+#' (its length endpoints are held fixed) about the bladder's own center. The
+#' `containment` policy governs what happens when the swimbladder exceeds the
+#' body envelope.
+#'
 #' @param object SBF-class object.
 #' @param body_scale Proportional scaling to the body length, width, and height
 #' dimensions. When a single value is supplied, all dimensions are scaled using
@@ -948,40 +985,107 @@ setMethod(
   }
 )
 ################################################################################
+#' Rebuild a canonical gas-body shape from requested length/radius dimensions
+#' @param shape_type Stored shape descriptor (e.g. "Sphere", "ProlateSpheroid").
+#' @param length Requested body length (m).
+#' @param radius Requested maximum body radius (m).
+#' @param n_segments Requested number of body segments.
+#' @return A canonical `Shape` object, or `NULL` when the shape is not one of
+#'   the supported canonical families (the caller then falls back to geometric
+#'   axis scaling).
+#' @keywords internal
+#' @noRd
+.reforge_gas_canonical_shape <- function(shape_type, length, radius, n_segments) {
+  # Resolve the canonical family from the stored shape descriptor ==============
+  family <- tolower(shape_type %||% "")
+  # Rebuild the requested canonical geometry ===================================
+  if (family == "sphere") {
+    # A sphere only remains a sphere while length tracks the diameter; an
+    # independent length change promotes it to a prolate spheroid.
+    if (isTRUE(all.equal(length, 2 * radius))) {
+      sphere(radius_body = radius, n_segments = n_segments)
+    } else {
+      prolate_spheroid(
+        length_body = length,
+        radius_body = radius,
+        n_segments = n_segments
+      )
+    }
+  } else if (family == "prolatespheroid") {
+    prolate_spheroid(
+      length_body = length,
+      radius_body = radius,
+      n_segments = n_segments
+    )
+  } else if (family == "cylinder") {
+    cylinder(
+      length_body = length,
+      radius_body = radius,
+      n_segments = n_segments
+    )
+  } else {
+    # Non-canonical shapes are handled by the geometric fallback ===============
+    NULL
+  }
+}
+################################################################################
 #' Reforge GAS-class object
 #'
-#' Resize a gas-filled scatterer by applying an isometric scale factor or
-#' specifying a target maximum radius.  Optionally re-discretize the body
-#' representation to a new segment count.  The underlying shape (sphere,
-#' prolate spheroid, cylinder, arbitrary, etc.) is preserved; scaling is
-#' applied uniformly to all axes of the position matrix.
+#' @description
+#' Resize a gas-filled fluid scatterer. `GAS` bodies are single-component
+#' fluid-like targets, so the interface mirrors [reforge()] for `FLS`: supply
+#' either a direct `body_scale` or a `body_target` describing the desired
+#' `length` and/or `radius`. Because both dimensions are addressable, elongated
+#' canonical bodies (prolate spheroids, cylinders) can be reshaped
+#' \emph{non-isometrically} - for example lengthening the body while holding its
+#' radius fixed.
+#'
+#' @details
+#' When the body is a recognized canonical family (sphere, prolate spheroid, or
+#' cylinder) the geometry is regenerated from the requested dimensions through
+#' the corresponding shape constructor, which keeps the discretization clean and
+#' the stored shape descriptor accurate. Arbitrary shapes fall back to direct
+#' per-axis scaling of the position matrix. In every case the returned object is
+#' a `GAS`, with the internal-gas material contrasts, orientation, and metadata
+#' preserved.
+#'
+#' The legacy `scale`, `radius_target`, and `n_segments` arguments remain
+#' available and are isometric: they scale every axis together, so a sphere
+#' stays a sphere. Use `body_scale`/`body_target` for independent length and
+#' radius control.
 #'
 #' @param object GAS-class object.
-#' @param scale Single positive scalar applied isometrically to every axis of
-#'   the position matrix.  Mutually exclusive with \code{radius_target}.
-#' @param radius_target Target \emph{maximum} body radius (m).  The scale
-#'   factor is derived as \code{radius_target / max(current_radius)}.  Mutually
-#'   exclusive with \code{scale}.
-#' @param n_segments New number of discrete segments.  All position-matrix
-#'   columns are re-interpolated along the x-axis.
+#' @param body_scale Proportional scaling for the body length and/or radius.
+#'   A single value scales both dimensions isometrically; otherwise supply a
+#'   named numeric vector using `length` and/or `radius`.
+#' @param body_target Target dimensions (m) for the body length and/or radius,
+#'   supplied as a named numeric vector using `length` and/or `radius`.
+#' @param isometric_body Logical; maintain isometric scaling for the body.
+#' @param n_segments_body New number of segments along the body profile.
+#' @param scale Legacy isometric scale factor applied to every axis. Mutually
+#'   exclusive with `radius_target`.
+#' @param radius_target Legacy target \emph{maximum} body radius (m); the
+#'   isometric scale factor is derived as `radius_target / max(current_radius)`.
+#'   Mutually exclusive with `scale`.
+#' @param n_segments Legacy alias for `n_segments_body`.
 #' @return Modified GAS-class object.
+#' @seealso [reforge()]
 #' @keywords internal
 #' @export
 setMethod(
   "reforge",
   signature(object = "GAS"),
   function(object,
+           body_scale = NULL,
+           body_target = NULL,
+           isometric_body = TRUE,
+           n_segments_body = NULL,
            scale = NULL,
            radius_target = NULL,
            n_segments = NULL) {
     ############################################################################
     # Validation ===============================================================
-    if (is.null(scale) && is.null(radius_target) && is.null(n_segments)) {
-      stop(
-        "Must specify at least one of: scale, radius_target, or n_segments.",
-        call. = FALSE
-      )
-    }
+    # ---- Legacy scalar guards (preserve historical messages) +++++++++++++++++
     if (!is.null(scale) && !is.null(radius_target)) {
       stop("Specify only one of scale or radius_target, not both.",
         call. = FALSE
@@ -996,38 +1100,134 @@ setMethod(
         radius_target <= 0)) {
       stop("'radius_target' must be a single positive number.", call. = FALSE)
     }
-    if (!is.null(n_segments) &&
-      (!is.numeric(n_segments) || length(n_segments) != 1 || n_segments < 1)) {
+    # ---- Reconcile the body-segment count arguments ++++++++++++++++++++++++++
+    if (!is.null(n_segments) && !is.null(n_segments_body)) {
+      stop("Specify only one of n_segments or n_segments_body, not both.",
+        call. = FALSE
+      )
+    }
+    n_seg <- n_segments_body %||% n_segments
+    if (!is.null(n_seg) &&
+      (!is.numeric(n_seg) || length(n_seg) != 1 || n_seg < 1)) {
       stop("'n_segments' must be a single positive integer.", call. = FALSE)
     }
+    # ---- Fold the legacy isometric aliases onto the shared body pathway ++++++
+    if (!is.null(scale) || !is.null(radius_target)) {
+      if (!is.null(body_scale) || !is.null(body_target)) {
+        stop(
+          paste0(
+            "Use either the legacy scale/radius_target arguments or the new ",
+            "body_scale/body_target arguments, not both."
+          ),
+          call. = FALSE
+        )
+      }
+    }
+    if (!is.null(body_scale) && !is.null(body_target)) {
+      stop("Specify only one of body_scale or body_target, not both.",
+        call. = FALSE
+      )
+    }
+    if (is.null(body_scale) && is.null(body_target) &&
+      is.null(scale) && is.null(radius_target) && is.null(n_seg)) {
+      stop(
+        paste0(
+          "Must specify at least one of: body_scale, body_target, scale, ",
+          "radius_target, n_segments, or n_segments_body."
+        ),
+        call. = FALSE
+      )
+    }
     ############################################################################
+    # Extract components and current dimensions ================================
     body <- acousticTS::extract(object, "body")
     shape <- acousticTS::extract(object, "shape_parameters")
     rpos <- body$rpos
-    # radius may be a scalar (sphere) or a per-point vector (cylinder, etc.)
-    current_radius <- shape$radius
-    current_max_r <- max(current_radius, na.rm = TRUE)
-    # Derive scale from radius_target if given =================================
-    if (!is.null(radius_target)) scale <- radius_target / current_max_r
+    shape_type <- shape$shape
+    current_length <- shape$length %||% (max(rpos[, 1]) - min(rpos[, 1]))
+    current_max_r <- max(shape$radius, na.rm = TRUE)
+    current_n_seg <- shape$n_segments %||% (nrow(rpos) - 1L)
     ############################################################################
-    # Resample segments first ==================================================
-    # Interpolate every non-x column so that arbitrary shapes are handled.
-    if (!is.null(n_segments)) {
-      rpos <- .resample_rpos(rpos, as.integer(n_segments) + 1L)
-      methods::slot(object, "shape_parameters")$n_segments <-
-        as.integer(n_segments)
+    # Resolve legacy isometric aliases into the shared body scale pathway ======
+    if (!is.null(radius_target)) {
+      body_scale <- radius_target / current_max_r
+    } else if (!is.null(scale)) {
+      body_scale <- scale
     }
     ############################################################################
-    # Apply scale ==============================================================
-    if (!is.null(scale)) {
-      rpos <- rpos * scale
-      new_radius <- current_radius * scale
-      methods::slot(object, "body")$radius <- new_radius
-      methods::slot(object, "shape_parameters")$radius <- new_radius
-      methods::slot(object, "shape_parameters")$length <-
-        max(rpos[, 1]) - min(rpos[, 1])
+    # Normalize body scaling through the shared validation helpers =============
+    body_dims <- c(length = current_length, radius = current_max_r)
+    body_target <- .validate_dimensions_target(
+      body_target,
+      "body_target",
+      c("length", "radius")
+    )
+    body_scale_lst <- .reforge_scale_vector(body_scale, body_target, body_dims)
+    body_scales <- .validate_dimension_scaling(
+      dims = body_scale_lst$scale,
+      dims_name = paste0("body", body_scale_lst$suffix),
+      valid_dims = c("length", "radius"),
+      isometry = isometric_body,
+      iso_name = "isometric_body"
+    )
+    ############################################################################
+    # Resolve the requested target geometry ====================================
+    new_length <- if (is.null(body_scales)) {
+      current_length
+    } else {
+      current_length * unname(body_scales["length"])
     }
-    methods::slot(object, "body")$rpos <- rpos
+    new_radius <- if (is.null(body_scales)) {
+      current_max_r
+    } else {
+      current_max_r * unname(body_scales["radius"])
+    }
+    new_n_seg <- if (!is.null(n_seg)) as.integer(n_seg) else as.integer(current_n_seg)
+    ############################################################################
+    # Regenerate canonical geometry, otherwise scale the profile directly ======
+    new_shape <- .reforge_gas_canonical_shape(
+      shape_type,
+      new_length,
+      new_radius,
+      new_n_seg
+    )
+    if (!is.null(new_shape)) {
+      # ---- Rebuild the canonical body and transplant its geometry ++++++++++++
+      # Material contrasts, orientation, model state, and metadata all live on
+      # the original object, so only the geometry-bearing slots are replaced.
+      rebuilt <- gas_generate(
+        shape = new_shape,
+        g_fluid = body$g,
+        h_fluid = body$h,
+        theta_body = body$theta
+      )
+      methods::slot(object, "body")$rpos <-
+        acousticTS::extract(rebuilt, "body")$rpos
+      methods::slot(object, "body")$radius <-
+        acousticTS::extract(rebuilt, "body")$radius
+      methods::slot(object, "shape_parameters") <-
+        acousticTS::extract(rebuilt, "shape_parameters")
+    } else {
+      # ---- Fallback: scale an arbitrary profile axis by axis +++++++++++++++++
+      if (!is.null(n_seg)) {
+        rpos <- .resample_rpos(rpos, new_n_seg + 1L)
+      }
+      length_ratio <- new_length / current_length
+      radius_ratio <- new_radius / current_max_r
+      x_anchor <- min(rpos[, 1], na.rm = TRUE)
+      rpos[, 1] <- x_anchor + (rpos[, 1] - x_anchor) * length_ratio
+      # Radius is carried in the lateral/vertical envelope columns.
+      radius_cols <- intersect(colnames(rpos), c("y", "zU", "zL"))
+      for (col in radius_cols) {
+        rpos[, col] <- rpos[, col] * radius_ratio
+      }
+      methods::slot(object, "body")$rpos <- rpos
+      methods::slot(object, "body")$radius <- shape$radius * radius_ratio
+      methods::slot(object, "shape_parameters")$radius <-
+        shape$radius * radius_ratio
+      methods::slot(object, "shape_parameters")$length <- new_length
+      methods::slot(object, "shape_parameters")$n_segments <- new_n_seg
+    }
     return(object)
   }
 )
@@ -1269,7 +1469,21 @@ setMethod(
   }
 )
 ################################################################################
-#' Reforge FLS-class object.
+#' Reforge FLS-class object
+#'
+#' @description
+#' Resize a fluid-like scatterer's single body by scaling its `length` and/or
+#' `radius`, supplied either as a direct `body_scale` factor or a `body_target`
+#' dimension (m). The cross-section is circular, so `radius` drives both lateral
+#' and vertical extent together.
+#'
+#' @details
+#' For bent bodies (see [brake()]) a `length` resize follows the true centerline
+#' arc length and rescales the curved path, while a `radius` resize changes only
+#' the tube thickness and leaves the centerline in place. The legacy `length`,
+#' `radius`, `length_radius_ratio_constant`, and `n_segments` arguments are
+#' retained as thin wrappers over the `body_scale`/`body_target` pathway.
+#'
 #' @param object FLS-class object.
 #' @param body_scale Proportional scaling to the body length and radius. When a
 #'   single value is supplied, both dimensions are scaled together. Otherwise,
