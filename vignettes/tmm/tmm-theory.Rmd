@@ -35,7 +35,7 @@ The transition matrix method (`TMM`) is a basis-expansion view of scattering. In
 
 For a single target, that point of view is valuable even before one thinks about multiple scattering. Once the target response is represented in a basis-to-basis form, the same mathematical object can in principle support monostatic scattering, bistatic scattering, rotations, and later orientation averaging.
 
-For smooth axisymmetric targets, the most natural basis depends on the geometry. A sphere is naturally represented in spherical coordinates, while a prolate spheroid is naturally represented in prolate spheroidal coordinates. Oblate spheroids can still be handled in a spherical-wave T-matrix framework by enforcing the boundary conditions on the actual surface $r(\theta)$, but the surface geometry then enters explicitly through the boundary operator. Finite cylinders are different again: the sidewall-endcap junctions make a purely spherical retained operator much less natural than a cylindrical modal basis, especially once one wants reliable angular products away from the simplest monostatic setting [@Varadan_1982; @Ganesh_2008; @Ganesh_2022; @Waterman_2009].
+For smooth axisymmetric targets, the most natural basis depends on the geometry. A sphere is naturally represented in spherical coordinates, while a prolate spheroid is naturally represented in prolate spheroidal coordinates. Oblate spheroids can still be handled in a spherical-wave T-matrix framework by enforcing the boundary conditions on the actual surface $r(\theta)$, but the surface geometry then enters explicitly through the boundary operator. Finite cylinders are different again: the sidewall-endcap junctions make a purely spherical retained operator much less natural than a cylindrical modal basis, especially once one wants reliable angular products away from the simplest monostatic setting [@Varadan_1982; @Waterman_2009].
 
 Unless stated otherwise, medium `1` is the surrounding seawater and medium `2` is the target interior.
 
@@ -197,7 +197,7 @@ The main obstacle for cylinders is geometric non-smoothness. A sphere or smooth 
 
 ## Why spherical coordinates are not the best exact basis
 
-A prolate spheroid is not a constant-$r$ surface. So while spherical-wave expansions can still be written down, they do not align naturally with the geometry. This is exactly the regime where the classic spheroidal-coordinate literature becomes relevant [@Varadan_1982; @Ganesh_2022; @Hackman_1984].
+A prolate spheroid is not a constant-$r$ surface. So while spherical-wave expansions can still be written down, they do not align naturally with the geometry. This is exactly the regime where the classic spheroidal-coordinate transition-matrix literature becomes relevant [@Varadan_1982; @Hackman_1984].
 
 For the single-target scalar acoustic problem, it is more natural to use prolate spheroidal coordinates and write the target surface as a single coordinate surface $\xi = \xi_1$. That is also the natural starting point for a geometry-matched T-matrix formulation.
 
