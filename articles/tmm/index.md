@@ -7,10 +7,10 @@ Benchmarked Partially validated Experimental
 [Theory](https://brandynlucca.github.io/acousticTS/articles/tmm/tmm-theory.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/tmm/tmm-implementation.md)
 
-These pages follow the coefficient-map view of scattering and later
-numerical implementations for axisymmetric bodies ([Waterman
-1969](#ref-Waterman_1969), [2009](#ref-Waterman_2009); [Ganesh and
-Hawkins 2022](#ref-Ganesh_2022)).
+These pages follow the coefficient-map view of acoustic scattering: the
+target response is represented as a map from incident modal amplitudes
+to scattered modal amplitudes ([Waterman 1969](#ref-Waterman_1969),
+[2009](#ref-Waterman_2009)).
 
 The transition matrix method (`TMM`) is the package’s current
 single-target bridge between exact modal-series solvers and broader
@@ -83,12 +83,6 @@ for spheres and oblates, the spheroidal branch used for prolates, and
 the cylindrical monostatic branch used for finite cylinders.
 
 ## References
-
-Ganesh, M., and Stuart C. Hawkins. 2022. “A Numerically Stable T-Matrix
-Method for Acoustic Scattering by Nonspherical Particles with Large
-Aspect Ratios and Size Parameters.” *The Journal of the Acoustical
-Society of America* 151 (3): 1978–88.
-<https://doi.org/10.1121/10.0009679>.
 
 Waterman, P. C. 1969. “New Formulation of Acoustic Scattering.” *The
 Journal of the Acoustical Society of America* 45 (6): 1417–29.

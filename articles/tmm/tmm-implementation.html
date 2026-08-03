@@ -130,9 +130,9 @@
 <a class="model-nav-badge" href="tmm-theory.html">Theory</a>
 </div>
 </div>
-<p>These pages follow the coefficient-map view of scattering and later
-numerical implementations for axisymmetric bodies <span class="citation">(<a href="#ref-Waterman_1969">Waterman 1969</a>, <a href="#ref-Waterman_2009">2009</a>; <a href="#ref-Ganesh_2022">Ganesh
-and Hawkins 2022</a>)</span>.</p>
+<p>These pages follow the coefficient-map view of acoustic scattering:
+the target response is represented as a map from incident modal
+amplitudes to scattered modal amplitudes <span class="citation">(<a href="#ref-Waterman_1969">Waterman 1969</a>, <a href="#ref-Waterman_2009">2009</a>)</span>.</p>
 <p>The acousticTS package uses object-based scatterers, so the
 <code>TMM</code> workflow follows the same broad structure used
 elsewhere in the package: define the geometry, attach the material
@@ -146,13 +146,13 @@ understand what the model is actually buying you.</p>
 <p>For the supported canonical shapes, <code>TMM</code> is not primarily
 about producing a different target-strength answer from
 <code>SPHMS</code>, <code>PSMS</code>, or <code>FCMS</code>. In the
-exact or sanity-checked single-target cases documented here, it reduces
-to those shape-specific families. The reason to use <code>TMM</code> is
-that it organizes the scattering problem around an incident-to-scattered
-coefficient map rather than only around a monostatic backscatter
-formula. That makes it the natural family for stored T-matrix blocks,
-bistatic scattering, orientation averaging, and later multi-target
-workflows.</p>
+exact or sanity-checked single-target cases documented here, it agrees
+with those shape-specific families where they describe the same physics.
+The reason to use <code>TMM</code> is that it organizes the scattering
+problem around an incident-to-scattered coefficient map rather than only
+around a monostatic backscatter formula. That makes it the natural
+family for stored T-matrix blocks, bistatic scattering, orientation
+averaging, and later multi-target workflows.</p>
 <p>In other words:</p>
 <ol style="list-style-type: decimal">
 <li>if the goal is only a sphere target-strength calculation,
@@ -1643,21 +1643,47 @@ data.</p>
 <div class="tab-content">
 <div class="active  tab-pane" id="sphere-2" role="tabpanel" aria-labelledby="sphere-2-tab">
 
-<p><img src="tmm-bempp-sphere-fixed-rigid-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the fixed-rigid sphere across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="49%" style="display: block; margin: auto;"><img src="tmm-bempp-sphere-pressure-release-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the pressure-release sphere across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="49%" style="display: block; margin: auto;"></p>
-<p><img src="tmm-bempp-sphere-liquid-filled-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the liquid-filled sphere across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="49%" style="display: block; margin: auto;"><img src="tmm-bempp-sphere-gas-filled-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the gas-filled sphere across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="49%" style="display: block; margin: auto;"></p>
+<details open><summary>
+Fixed rigid
+</summary><img src="tmm-bempp-sphere-fixed-rigid-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the fixed-rigid sphere across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="85%" style="display: block; margin: auto;"></details><details><summary>
+Pressure release
+</summary><img src="tmm-bempp-sphere-pressure-release-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the pressure-release sphere across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="85%" style="display: block; margin: auto;"></details><details><summary>
+Liquid filled
+</summary><img src="tmm-bempp-sphere-liquid-filled-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the liquid-filled sphere across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="85%" style="display: block; margin: auto;"></details><details><summary>
+Gas filled
+</summary><img src="tmm-bempp-sphere-gas-filled-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the gas-filled sphere across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="85%" style="display: block; margin: auto;"></details>
 </div>
 <div class="tab-pane" id="oblate-3" role="tabpanel" aria-labelledby="oblate-3-tab">
 
-<p><img src="tmm-bempp-oblate-fixed-rigid-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the fixed-rigid oblate spheroid across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="32%" style="display: block; margin: auto;"><img src="tmm-bempp-oblate-pressure-release-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the pressure-release oblate spheroid across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="32%" style="display: block; margin: auto;"><img src="tmm-bempp-oblate-gas-filled-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the gas-filled oblate spheroid across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="32%" style="display: block; margin: auto;"></p>
+<details open><summary>
+Fixed rigid
+</summary><img src="tmm-bempp-oblate-fixed-rigid-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the fixed-rigid oblate spheroid across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="85%" style="display: block; margin: auto;"></details><details><summary>
+Pressure release
+</summary><img src="tmm-bempp-oblate-pressure-release-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the pressure-release oblate spheroid across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="85%" style="display: block; margin: auto;"></details><details><summary>
+Gas filled
+</summary><img src="tmm-bempp-oblate-gas-filled-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the gas-filled oblate spheroid across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="85%" style="display: block; margin: auto;"></details>
 </div>
 <div class="tab-pane" id="prolate-3" role="tabpanel" aria-labelledby="prolate-3-tab">
 
-<p><img src="tmm-bempp-prolate-fixed-rigid-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the fixed-rigid prolate spheroid across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="32%" style="display: block; margin: auto;"><img src="tmm-bempp-prolate-pressure-release-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the pressure-release prolate spheroid across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="32%" style="display: block; margin: auto;"><img src="tmm-bempp-prolate-liquid-filled-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the liquid-filled prolate spheroid across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="32%" style="display: block; margin: auto;"></p>
+<details open><summary>
+Fixed rigid
+</summary><img src="tmm-bempp-prolate-fixed-rigid-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the fixed-rigid prolate spheroid across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="85%" style="display: block; margin: auto;"></details><details><summary>
+Pressure release
+</summary><img src="tmm-bempp-prolate-pressure-release-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the pressure-release prolate spheroid across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="85%" style="display: block; margin: auto;"></details><details><summary>
+Liquid filled
+</summary><img src="tmm-bempp-prolate-liquid-filled-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the liquid-filled prolate spheroid across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="85%" style="display: block; margin: auto;"></details>
 </div>
 <div class="tab-pane" id="shell-sphere-1" role="tabpanel" aria-labelledby="shell-sphere-1-tab">
 
-<p><img src="tmm-bempp-sphere-shelled-pressure-release-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the shelled pressure-release sphere across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="49%" style="display: block; margin: auto;"><img src="tmm-bempp-sphere-shelled-gas-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the shelled gas sphere across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="49%" style="display: block; margin: auto;"></p>
-<p><img src="tmm-bempp-sphere-shelled-liquid-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the shelled liquid sphere across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="49%" style="display: block; margin: auto;"><img src="tmm-bempp-sphere-elastic-shelled-delta.png" class="r-plt" alt="Pre-rendered TMM minus independent radial finite-element residual for the elastic-shelled sphere across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="49%" style="display: block; margin: auto;"></p>
+<details open><summary>
+Shelled pressure release
+</summary><img src="tmm-bempp-sphere-shelled-pressure-release-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the shelled pressure-release sphere across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="85%" style="display: block; margin: auto;"></details><details><summary>
+Shelled gas
+</summary><img src="tmm-bempp-sphere-shelled-gas-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the shelled gas sphere across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="85%" style="display: block; margin: auto;"></details><details><summary>
+Shelled liquid
+</summary><img src="tmm-bempp-sphere-shelled-liquid-delta.png" class="r-plt" alt="Pre-rendered TMM minus BEM residual for the shelled liquid sphere across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="85%" style="display: block; margin: auto;"></details><details><summary>
+Elastic shelled
+</summary><img src="tmm-bempp-sphere-elastic-shelled-delta.png" class="r-plt" alt="Pre-rendered TMM minus independent radial finite-element residual for the elastic-shelled sphere across the full bistatic scattering grid at 12, 38, 70, and 120 kHz." width="85%" style="display: block; margin: auto;"></details>
 </div>
 <div class="tab-pane" id="cylinder-2" role="tabpanel" aria-labelledby="cylinder-2-tab">
 
@@ -1710,12 +1736,6 @@ than drifting because of a mismatched basis.</p>
 <h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
 </h2>
 <div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-Ganesh_2022" class="csl-entry">
-Ganesh, M., and Stuart C. Hawkins. 2022. <span>“A Numerically Stable
-<span>T</span>-Matrix Method for Acoustic Scattering by Nonspherical
-Particles with Large Aspect Ratios and Size Parameters.”</span> <em>The
-Journal of the Acoustical Society of America</em> 151 (3): 1978–88. <a href="https://doi.org/10.1121/10.0009679" class="external-link">https://doi.org/10.1121/10.0009679</a>.
-</div>
 <div id="ref-Waterman_1969" class="csl-entry">
 Waterman, P. C. 1969. <span>“New <span>Formulation</span> of
 <span>Acoustic</span> <span>Scattering</span>.”</span> <em>The Journal

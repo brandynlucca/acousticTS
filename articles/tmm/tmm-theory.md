@@ -30,9 +30,8 @@ through the boundary operator. Finite cylinders are different again: the
 sidewall-endcap junctions make a purely spherical retained operator much
 less natural than a cylindrical modal basis, especially once one wants
 reliable angular products away from the simplest monostatic setting
-([Varadan et al. 1982](#ref-Varadan_1982); [Ganesh and Hawkins
-2008](#ref-Ganesh_2008); [Ganesh and Hawkins 2022](#ref-Ganesh_2022);
-[Waterman 2009](#ref-Waterman_2009)).
+([Varadan et al. 1982](#ref-Varadan_1982); [Waterman
+2009](#ref-Waterman_2009)).
 
 Unless stated otherwise, medium `1` is the surrounding seawater and
 medium `2` is the target interior.
@@ -205,9 +204,9 @@ trustworthy finite-cylinder operator.
 A prolate spheroid is not a constant-r surface. So while spherical-wave
 expansions can still be written down, they do not align naturally with
 the geometry. This is exactly the regime where the classic
-spheroidal-coordinate literature becomes relevant ([Varadan et al.
-1982](#ref-Varadan_1982); [Ganesh and Hawkins 2022](#ref-Ganesh_2022);
-[Hackman and Todoroff 1984](#ref-Hackman_1984)).
+spheroidal-coordinate transition-matrix literature becomes relevant
+([Varadan et al. 1982](#ref-Varadan_1982); [Hackman and Todoroff
+1984](#ref-Hackman_1984)).
 
 For the single-target scalar acoustic problem, it is more natural to use
 prolate spheroidal coordinates and write the target surface as a single
@@ -273,17 +272,6 @@ amplitudes in the basis natural to that geometry.
 Furusawa, Masahiko. 1988. “Prolate Spheroidal Models for Predicting
 General Trends of Fish Target Strength.” *Journal of the Acoustical
 Society of Japan (E)* 9 (1): 13–24. <https://doi.org/10.1250/ast.9.13>.
-
-Ganesh, Mahadevan, and Stuart Collin Hawkins. 2008. “A Far Field Based
-T-Matrix Method for Three Dimensional Acoustic Scattering.” *ANZIAM
-Journal* 49 (October): 121.
-<https://doi.org/10.21914/anziamj.v50i0.1441>.
-
-Ganesh, M., and Stuart C. Hawkins. 2022. “A Numerically Stable T-Matrix
-Method for Acoustic Scattering by Nonspherical Particles with Large
-Aspect Ratios and Size Parameters.” *The Journal of the Acoustical
-Society of America* 151 (3): 1978–88.
-<https://doi.org/10.1121/10.0009679>.
 
 Hackman, Roger H., and Douglas G. Todoroff. 1984. “An Application of the
 Spheroidal-Coordinate-Based Transition Matrix: Acoustic Scattering from
