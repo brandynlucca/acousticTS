@@ -32,13 +32,13 @@ acousticTS:::.model_family_header(
 ```
 
 
-These pages follow the coefficient-map view of scattering and later numerical implementations for axisymmetric bodies [@Waterman_1969; @Waterman_2009; @Ganesh_2022].
+These pages follow the coefficient-map view of acoustic scattering: the target response is represented as a map from incident modal amplitudes to scattered modal amplitudes [@Waterman_1969; @Waterman_2009].
 
 The acousticTS package uses object-based scatterers, so the `TMM` workflow follows the same broad structure used elsewhere in the package: define the geometry, attach the material interpretation, evaluate target strength over the frequency range of interest, and then inspect the returned response carefully enough to understand what the model is actually buying you.
 
 ## Why use `TMM` over `SPHMS` or `PSMS`?
 
-For the supported canonical shapes, `TMM` is not primarily about producing a different target-strength answer from `SPHMS`, `PSMS`, or `FCMS`. In the exact or sanity-checked single-target cases documented here, it reduces to those shape-specific families. The reason to use `TMM` is that it organizes the scattering problem around an incident-to-scattered coefficient map rather than only around a monostatic backscatter formula. That makes it the natural family for stored T-matrix blocks, bistatic scattering, orientation averaging, and later multi-target workflows.
+For the supported canonical shapes, `TMM` is not primarily about producing a different target-strength answer from `SPHMS`, `PSMS`, or `FCMS`. In the exact or sanity-checked single-target cases documented here, it agrees with those shape-specific families where they describe the same physics. The reason to use `TMM` is that it organizes the scattering problem around an incident-to-scattered coefficient map rather than only around a monostatic backscatter formula. That makes it the natural family for stored T-matrix blocks, bistatic scattering, orientation averaging, and later multi-target workflows.
 
 In other words:
 

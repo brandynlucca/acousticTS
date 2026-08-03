@@ -12,18 +12,21 @@
 #' interiors.
 #'
 #' @details
-#' This implementation is intentionally scoped to **single targets** and the
-#' monostatic backscatter quantity used by `target_strength()`.
+#' This implementation is intentionally scoped to **single targets**. The
+#' default `target_strength()` result is monostatic backscatter, and retained
+#' T-matrix state can also be reused for angular post-processing where the
+#' active branch supports it.
 #'
 #' For spheres and oblate spheroids, the current implementation uses a
-#' spherical-wave basis with an explicit projected boundary solve over the
-#' target surface. For prolate spheroids, it instead uses a
-#' spheroidal-coordinate transition-matrix-equivalent backend, which is the
-#' more natural coordinate system for that geometry and is consistent with the
-#' scalar spheroidal T-matrix literature for single-target scattering. For
-#' finite cylinders, the default monostatic branch uses a
-#' cylindrical-coordinate modal/T-matrix-equivalent backend so that the
-#' backscatter benchmark remains aligned with the exact finite-cylinder family.
+#' spherical-wave T-matrix: each retained azimuthal order is solved as an
+#' incident-to-outgoing modal coefficient map after projecting the boundary
+#' conditions on the target surface. For prolate spheroids, the implementation
+#' uses a geometry-matched spheroidal-basis T-matrix formulation, which is the
+#' natural coordinate system for that geometry and is consistent with the
+#' scalar spheroidal transition-matrix literature for single-target scattering.
+#' For finite cylinders, the default monostatic branch uses a
+#' cylindrical-coordinate modal T-matrix-style backend so that the backscatter
+#' benchmark remains aligned with the exact finite-cylinder family.
 #' When \code{store_t_matrix = TRUE}, cylinders retain lightweight
 #' cylindrical-family state that supports exact monostatic reuse and
 #' orientation-averaged monostatic products, while general-angle cylinder
@@ -32,11 +35,13 @@
 #' see \code{options(acousticTS.warn_tmm_cylinder = FALSE)} to silence it in
 #' controlled test or benchmarking workflows.
 #'
-#' The present solver is therefore a practical single-target acoustic
-#' T-matrix method motivated by the classic transition-matrix literature, but
-#' it is **not yet** a full implementation of the far-field two-part
-#' T-matrix workflow of Ganesh and Hawkins (2008, 2022), which assumes an
-#' external far-field solver as the first stage.
+#' The sphere, oblate, prolate, and shell-sphere branches are therefore
+#' single-target acoustic T-matrix methods in the modal coefficient-map sense:
+#' they represent the target response as a map from incident modal amplitudes to
+#' scattered modal amplitudes and reuse that retained state for supported
+#' post-processing. The cylinder branch is more limited and should be treated as
+#' a guarded monostatic modal T-matrix-style branch until a validated
+#' general-angle cylindrical operator is available.
 #'
 #' @section Usage:
 #' This model is accessed via:
@@ -95,10 +100,13 @@
 #' }
 #'
 #' For the axisymmetric single-target case used here, the azimuthal orders
-#' decouple and each block is recovered by enforcing the boundary conditions on
-#' the target surface for the retained modal basis functions. The
-#' backscatter amplitude is then obtained by evaluating the outgoing expansion
-#' in the monostatic receive direction opposite to the incident plane wave.
+#' decouple. Each retained block is recovered in the basis used by the active
+#' geometry branch: spherical for spheres and oblates, spheroidal for prolates,
+#' and exact spherical modal coefficients for supported shell spheres. The
+#' backscatter amplitude is obtained by evaluating the outgoing expansion in the
+#' monostatic receive direction opposite to the incident plane wave. When the
+#' retained state is stored, the same coefficient map can be reused for
+#' supported angular, bistatic, diagnostic, and orientation-averaged products.
 #'
 #' @seealso
 #' \code{\link{target_strength}}, \code{\link{FLS}}, \code{\link{GAS}},
@@ -122,14 +130,6 @@
 
 #' Waterman, P. C. (2009). T-matrix methods in acoustic scattering. *The
 #' Journal of the Acoustical Society of America*, **125**, 42-51.
-#'
-#' Ganesh, M., and Hawkins, S. C. (2008). A far-field based T-matrix method for
-#' three dimensional acoustic scattering. *Wave Motion*, **45**, 1441-1460.
-#'
-#' Ganesh, M., and Hawkins, S. C. (2022). A numerically stable T-matrix method
-#' for acoustic scattering by nonspherical particles with large aspect ratios
-#' and size parameters. *The Journal of the Acoustical Society of America*,
-#' **151**, 1978-1988.
 #'
 #' @name TMM
 #' @aliases tmm TMM
