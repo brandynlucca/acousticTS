@@ -1158,6 +1158,37 @@ test_that("`reforge('SBF')` scales the body centerline without warping", {
   expect_equal(diff(range(center)) / max(half), orig_ratio, tolerance = 1e-8)
 })
 
+test_that("`reforge('SBF')` preserves swimbladder profile shape on body resize", {
+  data(sardine, package = "acousticTS")
+
+  orig_body <- extract(sardine, "body")$rpos
+  orig_bladder <- extract(sardine, "bladder")$rpos
+  scale_factor <- 0.5
+
+  resized <- reforge(sardine, body_scale = scale_factor)
+  new_bladder <- extract(resized, "bladder")$rpos
+
+  orig_center <- (orig_bladder[3, ] + orig_bladder[4, ]) / 2
+  new_center <- (new_bladder[3, ] + new_bladder[4, ]) / 2
+  orig_height <- orig_bladder[3, ] - orig_bladder[4, ]
+  new_height <- new_bladder[3, ] - new_bladder[4, ]
+
+  expect_equal(
+    new_center - mean(new_center),
+    (orig_center - mean(orig_center)) * scale_factor,
+    tolerance = 1e-10
+  )
+  expect_equal(new_height, orig_height * scale_factor, tolerance = 1e-10)
+  expect_equal(
+    .reforge_relative_vertical_offset(orig_bladder, orig_body),
+    .reforge_relative_vertical_offset(
+      new_bladder,
+      extract(resized, "body")$rpos
+    ),
+    tolerance = 1e-8
+  )
+})
+
 test_that("`reforge('GAS')` reshapes canonical bodies and stays a GAS", {
   prolate <- gas_generate(
     shape = prolate_spheroid(

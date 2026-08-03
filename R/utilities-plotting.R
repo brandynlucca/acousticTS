@@ -595,6 +595,11 @@
     cex.axis = 1.2
   )
   graphics::lines(primary$x, -primary$half_width, lty = 1, lwd = 4)
+  graphics::segments(
+    x0 = primary$x, x1 = primary$x,
+    y0 = -primary$half_width, y1 = primary$half_width,
+    lty = 3, lwd = 1, col = "gray30"
+  )
 
   if (!is.null(secondary)) {
     graphics::lines(
@@ -604,6 +609,11 @@
     graphics::lines(
       secondary$x, -secondary$half_width,
       lty = 1, lwd = 3.5, col = secondary_col
+    )
+    graphics::segments(
+      x0 = secondary$x, x1 = secondary$x,
+      y0 = -secondary$half_width, y1 = secondary$half_width,
+      lty = 3, lwd = 1, col = secondary_col
     )
   }
 
