@@ -327,7 +327,7 @@ setGeneric(
   component_rpos
 }
 
-#' Express an internal component centerline offset relative to parent thickness
+#' Express an internal component z-origin offset relative to parent thickness
 #' @param component_rpos Row-major internal-component position matrix.
 #' @param parent_rpos Row-major parent-component position matrix.
 #' @keywords internal
@@ -362,21 +362,19 @@ setGeneric(
   )
   component_center <- .reforge_profile_centerline(component_fields)
 
-  # Store a robust median offset ratio so it can be reconstructed later =======
-  valid <- is.finite(parent_half_height) &
-    (abs(parent_half_height) > sqrt(.Machine$double.eps))
-  if (!any(valid)) {
+  # Store the internal component z-origin relative to the parent profile ======
+  valid <- is.finite(parent_center[1]) &
+    is.finite(parent_half_height[1]) &
+    is.finite(component_center[1]) &
+    (abs(parent_half_height[1]) > sqrt(.Machine$double.eps))
+  if (!isTRUE(valid)) {
     return(0)
   }
 
-  stats::median(
-    (component_center[valid] - parent_center[valid]) /
-      parent_half_height[valid],
-    na.rm = TRUE
-  )
+  (component_center[1] - parent_center[1]) / parent_half_height[1]
 }
 
-#' Reposition an internal component to preserve relative vertical placement
+#' Reposition an internal component to preserve relative z-origin placement
 #' @param component_rpos Row-major internal-component position matrix.
 #' @param relative_offset Relative centerline offset scaled by parent half-height.
 #' @param parent_rpos Row-major parent-component position matrix.
@@ -418,10 +416,16 @@ setGeneric(
     .reforge_profile_half_height(parent_fields)
   )
   current_center <- .reforge_profile_centerline(component_fields)
-  target_center <- parent_center + relative_offset * parent_half_height
-  delta <- target_center - current_center
+  target_origin <- parent_center[1] + relative_offset * parent_half_height[1]
+  current_origin <- current_center[1]
+  if (!is.finite(target_origin) || !is.finite(current_origin)) {
+    return(component_rpos)
+  }
+  delta <- target_origin - current_origin
 
-  # Shift every vertical coordinate row by the reconstructed centerline delta ==
+  # Shift every vertical coordinate row by one component-level displacement.
+  # A nodewise displacement forces the internal component to inherit the body
+  # centerline profile and changes the component shape during reforge.
   z_idx <- .reforge_profile_row_idx(component_rpos, c("z", "z_body", "z_bladder"))
   zU_idx <- .reforge_profile_row_idx(
     component_rpos,
