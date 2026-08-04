@@ -1,4 +1,4 @@
-﻿---
+---
 title: "HPA"
 output:
   rmarkdown::html_vignette:
@@ -20,8 +20,10 @@ acousticTS:::.model_family_header(
   family = "hpa",
   pages = c(
     Overview = "index.html",
+    Theory = "hpa-theory.html",
     Implementation = "hpa-implementation.html",
-    Theory = "hpa-theory.html"
+    Benchmarks = "hpa-benchmarks.html",
+    Validation = "hpa-validation.html"
   )
 )
 ```
@@ -59,7 +61,9 @@ acousticTS:::.model_family_overview(
     "Best interpreted as a broadband approximation, not a resonance-resolving solver"
   ),
   reading = c(
-    "[Implementation](hpa-implementation.html): quick workflows and validation tables",
+    "[Implementation](hpa-implementation.html): quick workflows and model outputs",
+    "[Benchmarks](hpa-benchmarks.html): canonical targets and formula reproduction tables",
+    "[Validation](hpa-validation.html): BEM check for the liquid-filled Stanton sphere branch",
     "[Theory](hpa-theory.html): Rayleigh term, reflection limit, and shape-specific completions"
   )
 )

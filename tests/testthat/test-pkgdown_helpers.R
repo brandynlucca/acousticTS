@@ -20,15 +20,63 @@ test_that("pkgdown helper markup reflects validation metadata", {
       current_page = "Theory"
     )
   )
-  expect_match(header, "Validated")
+  expect_true(grepl("Partially validated", header, fixed = TRUE))
   expect_true(grepl("href=\"index.html\"", header, fixed = TRUE))
+  expect_true(grepl("href=\"theory.html\"", header, fixed = TRUE))
   expect_true(grepl("href=\"implementation.html\"", header, fixed = TRUE))
-  expect_false(grepl("href=\"theory.html\"", header, fixed = TRUE))
   expect_false(grepl("Empty", header, fixed = TRUE))
+  expect_match(header, "hpa-benchmarks.html", fixed = TRUE)
+  expect_match(header, "hpa-validation.html", fixed = TRUE)
+  expect_match(header, ">Overview<", fixed = TRUE)
+  expect_match(header, ">Theory<", fixed = TRUE)
+  expect_match(header, ">Implementation<", fixed = TRUE)
+  expect_match(header, ">Benchmarks<", fixed = TRUE)
+  expect_match(header, ">Validation<", fixed = TRUE)
   expect_lt(
     regexpr("href=\"index.html\"", header, fixed = TRUE)[[1]],
+    regexpr("href=\"theory.html\"", header, fixed = TRUE)[[1]]
+  )
+  expect_lt(
+    regexpr("href=\"theory.html\"", header, fixed = TRUE)[[1]],
     regexpr("href=\"implementation.html\"", header, fixed = TRUE)[[1]]
   )
+  expect_lt(
+    regexpr("href=\"implementation.html\"", header, fixed = TRUE)[[1]],
+    regexpr("hpa-benchmarks.html", header, fixed = TRUE)[[1]]
+  )
+  expect_lt(
+    regexpr("hpa-benchmarks.html", header, fixed = TRUE)[[1]],
+    regexpr("hpa-validation.html", header, fixed = TRUE)[[1]]
+  )
+  expect_true(regexpr("hpa-benchmarks.html", header, fixed = TRUE)[[1]] > 0)
+
+  dwba_header <- as.character(
+    acousticTS:::.model_family_header(
+      family = "dwba",
+      pages = c(
+        Overview = "index.html",
+        Implementation = "implementation.html",
+        Theory = "theory.html"
+      ),
+      current_page = "Theory"
+    )
+  )
+  expect_match(dwba_header, "dwba-benchmarks.html", fixed = TRUE)
+  expect_match(dwba_header, "dwba-validation.html", fixed = TRUE)
+
+  bcms_header <- as.character(
+    acousticTS:::.model_family_header(
+      family = "bcms",
+      pages = c(
+        Overview = "index.html",
+        Implementation = "implementation.html",
+        Theory = "theory.html"
+      ),
+      current_page = "Theory"
+    )
+  )
+  expect_false(grepl("bcms-benchmarks.html", bcms_header, fixed = TRUE))
+  expect_match(bcms_header, "bcms-validation.html", fixed = TRUE)
 
   overview <- as.character(
     acousticTS:::.model_family_overview(
@@ -147,6 +195,16 @@ test_that("pkgdown helpers cover fallback output and ordering branches", {
 
   static_figure <- acousticTS:::.vignette_static_figure("example.png", "Example")
   expect_match(static_figure, 'src="example.png"', fixed = TRUE)
+
+  detail_figure <- acousticTS:::.vignette_detail_figure(
+    "Open figure",
+    "example.png",
+    "Example",
+    open = TRUE
+  )
+  expect_match(detail_figure, 'class="figure-drop"', fixed = TRUE)
+  expect_match(detail_figure, "<summary>Open figure</summary>", fixed = TRUE)
+  expect_match(detail_figure, " open", fixed = TRUE)
 
   expect_error(
     acousticTS:::.vignette_clickable_figure("unknown_id"),

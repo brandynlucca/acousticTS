@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Phase-compensated distorted wave Born approximation"
 output:
   rmarkdown::html_vignette:
@@ -25,8 +25,10 @@ acousticTS:::.model_family_header(
   family = "pcdwba",
   pages = c(
     Overview = "index.html",
+    Theory = "pcdwba-theory.html",
     Implementation = "pcdwba-implementation.html",
-    Theory = "pcdwba-theory.html"
+    Benchmarks = "pcdwba-benchmarks.html",
+    Validation = "pcdwba-validation.html"
   )
 )
 ```

@@ -1,0 +1,60 @@
+---
+title: "PSMS benchmarks"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: false
+    fig_caption: yes
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
+vignette: >
+  %\VignetteIndexEntry{PSMS benchmarks}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# Benchmarks
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  family = "psms",
+  pages = c(
+    Overview = "index.html",
+    Theory = "psms-theory.html",
+    Implementation = "psms-implementation.html",
+    Benchmarks = "psms-benchmarks.html",
+    Validation = "psms-validation.html"
+  )
+)
+```
+
+PSMS is benchmarked against the Jech et al. prolate-spheroid cases where tabulated benchmark values exist [@Jech_2015]. The gas-filled benchmark uses the published `140 x 10 mm` broadside geometry and external BEM reference values.
+
+::: {.caution data-title="Precision matters"}
+The full liquid-filled branch is the demanding case. Quad precision with the full formulation is the benchmark-close configuration at higher reduced frequency.
+:::
+
+## Rigid and pressure release
+
+| Boundary | Precision | `adaptive` | `n_integration` | Max abs. $\Delta$ TS (dB) | Mean abs. $\Delta$ TS (dB) |
+|:--|:--|:--|:--|--:|--:|
+| `fixed_rigid` | `double` | `FALSE` | `96` | 0.00674 | 0.00230 |
+| `fixed_rigid` | `quad` | `FALSE` | `96` | 0.00096 | 0.00083 |
+| `pressure_release` | `double` | `FALSE` | `96` | 0.00412 | 0.00251 |
+| `pressure_release` | `quad` | `FALSE` | `96` | 0.00433 | 0.00293 |
+
+## Liquid filled
+
+| Precision | `simplify_Amn` | `adaptive` | `n_integration` | Max abs. $\Delta$ TS (dB) | Mean abs. $\Delta$ TS (dB) |
+|:--|:--|:--|:--|--:|--:|
+| `double` | `FALSE` | `FALSE` | `96` | 8.67114 | 1.53575 |
+| `double` | `FALSE` | `TRUE` |  | 17.34265 | 4.59850 |
+| `quad` | `FALSE` | `FALSE` | `96` | 0.08263 | 0.02805 |
+| `quad` | `FALSE` | `TRUE` |  | 0.08348 | 0.02806 |
+| `quad` | `TRUE` | `FALSE` | `96` | 3.65223 | 1.46801 |
+
+## Runtime notes
+
+Full liquid-filled quad runs are the slow path because they retain dense overlap-coupled systems. Adaptive mode reduces that cost in quad precision without materially changing the benchmark result on the reported grid.
+

@@ -20,8 +20,10 @@ acousticTS:::.model_family_header(
   family = "calibration",
   pages = c(
     Overview = "index.html",
+    Theory = "calibration-theory.html",
     Implementation = "calibration-implementation.html",
-    Theory = "calibration-theory.html"
+    Benchmarks = "calibration-benchmarks.html",
+    Validation = "calibration-validation.html"
   )
 )
 ```

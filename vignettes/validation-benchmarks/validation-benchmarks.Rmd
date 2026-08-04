@@ -18,11 +18,11 @@ vignette: >
 
 # Introduction
 
-The validation workflow on this page is grounded in inter-model benchmark comparisons and open-software reproductions [@Jech_2015; @echoSMs_software; @ZooScatR_software; @KRMr_software; @Bempp-cl_software; @liquid_spheroid_software; @mcgehee_software; @Echopop_software; @CCAMLR_SDWBA_software; @NOAA_KRM_software; @NOAA_SDWBA_software; @NOAA_sphere_software; @Prol_Spheroid_software; @SphereTS_software].
+This page separates benchmark evidence from validation evidence. Benchmarks include `benchmark_ts`, canonical published tables, software-distribution comparisons, timing and parameter-sensitivity sweeps, and formula reproduction checks [@Jech_2015; @echoSMs_software; @ZooScatR_software; @KRMr_software; @Bempp-cl_software; @liquid_spheroid_software; @mcgehee_software; @Echopop_software; @CCAMLR_SDWBA_software; @NOAA_KRM_software; @NOAA_SDWBA_software; @NOAA_sphere_software; @Prol_Spheroid_software; @SphereTS_software]. Validation is reserved for independently solved same-problem evidence: exact/modal reference solutions, BEM, FEM, hybrid FEM/BEM, or equivalent full-wave checks.
 
 
 
-Modeling packages become much more useful when users can distinguish a physically surprising result from a setup error. Validation pages help provide that context. In acousticTS, validation is not a single check with a single threshold. It is a layered workflow that begins with object and unit sanity, then moves to canonical benchmark reproduction, and finally asks whether the numerical behavior is stable enough that any remaining discrepancy deserves physical interpretation.
+Modeling packages become much more useful when users can distinguish a physically surprising result from a setup error. In acousticTS, evidence is not a single check with a single threshold. It starts with object and unit sanity, then moves to benchmark reproduction, and finally uses independent validation methods where those methods exist for the documented model scope.
 
 ![Validation ladder](validation-ladder.png)
 
@@ -65,7 +65,7 @@ knitr::kable(
 )
 ```
 
-## Validated-comparison evidence
+## Validation evidence
 
 ```{r validated_evidence_table, echo=FALSE}
 knitr::kable(

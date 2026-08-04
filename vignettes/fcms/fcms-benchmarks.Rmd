@@ -1,0 +1,52 @@
+---
+title: "FCMS benchmarks"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: false
+    fig_caption: yes
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
+vignette: >
+  %\VignetteIndexEntry{FCMS benchmarks}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# Benchmarks
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  family = "fcms",
+  pages = c(
+    Overview = "index.html",
+    Theory = "fcms-theory.html",
+    Implementation = "fcms-implementation.html",
+    Benchmarks = "fcms-benchmarks.html",
+    Validation = "fcms-validation.html"
+  )
+)
+```
+
+FCMS is benchmarked against the finite-cylinder Jech et al. reference family stored in `benchmark_ts` [@Jech_2015]. The full cylindrical grid is used for each boundary condition.
+
+| Boundary | Max abs. $\Delta$ TS (dB) | Mean abs. $\Delta$ TS (dB) | Elapsed (s) |
+|:--|--:|--:|--:|
+| `fixed_rigid` | 0.19454 | 0.00914 | 0.01 |
+| `pressure_release` | 0.00780 | 0.00263 | 0.03 |
+| `gas_filled` | 0.00499 | 0.00245 | 0.05 |
+| `liquid_filled` | 0.11453 | 0.00512 | 0.05 |
+
+The largest residuals occur in fixed-rigid and liquid-filled null neighborhoods. Pressure-release and gas-filled runs remain benchmark-close across the full grid.
+
+## Modal-limit sensitivity
+
+| Boundary | `m_limit` | Max abs. $\Delta$ TS (dB) | Mean abs. $\Delta$ TS (dB) | Elapsed (s) |
+|:--|:--|--:|--:|--:|
+| `liquid_filled` | default rule | 0.11453 | 0.00512 | 0.05 |
+| `liquid_filled` | `20` | 0.12618 | 0.00547 | 0.09 |
+| `liquid_filled` | `10` | 43.09805 | 4.29035 | 0.01 |
+
+The reduced cap check is a convergence guard. It is not a recommended speed knob for production comparisons.
+

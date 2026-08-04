@@ -19,8 +19,10 @@ acousticTS:::.model_family_header(
   family = "vesm",
   pages = c(
     Overview = "index.html",
+    Theory = "vesm-theory.html",
     Implementation = "vesm-implementation.html",
-    Theory = "vesm-theory.html"
+    Benchmarks = "vesm-benchmarks.html",
+    Validation = "vesm-validation.html"
   )
 )
 ```
@@ -58,7 +60,9 @@ acousticTS:::.model_family_overview(
     "Layered spherical interfaces with no nonspherical posture or geometry effects"
   ),
   reading = c(
-    "[Implementation](vesm-implementation.html): layered-object workflow and benchmark comparisons",
+    "[Implementation](vesm-implementation.html): layered-object workflow and model outputs",
+    "[Benchmarks](vesm-benchmarks.html): layered-sphere comparison table",
+    "[Validation](vesm-validation.html): radial FEM check for the documented layered sphere",
     "[Theory](vesm-theory.html): full layered spherical field structure, interface conditions, and mode-wise systems"
   )
 )

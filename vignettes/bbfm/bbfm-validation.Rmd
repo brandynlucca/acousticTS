@@ -1,0 +1,93 @@
+---
+title: "BBFM validation"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: false
+    fig_caption: yes
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
+vignette: >
+  %\VignetteIndexEntry{BBFM validation}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# Validation
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  family = "bbfm",
+  pages = c(
+    Overview = "index.html",
+    Theory = "bbfm-theory.html",
+    Implementation = "bbfm-implementation.html",
+    Validation = "bbfm-validation.html"
+  )
+)
+```
+
+BBFM is checked by separating the weak-body, elastic-backbone, and coherent-composite pieces, then reporting each component surface.
+
+::: {.tip data-title="Residuals near nulls"}
+Mean absolute differences describe the typical agreement; maximum differences are retained because deep nulls can expose localized convention or resolution errors.
+:::
+
+## TS-Frequency
+
+Frequency rows retain the matched target and orientation while sweeping frequency.
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|:--|--:|--:|
+| BEM |  | finite-cylinder modal weak-body reference | 12.0-120.0 |  | Length (mm) 70.000 | 0.146 | 1.072 |
+
+<details>
+<summary>BEM / finite-cylinder modal weak-body reference / 12.0-120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| BEM |  | finite-cylinder modal weak-body reference | 12.0 |  | 70.000 | -89.789 | -89.799 | -0.010 |
+| BEM |  | finite-cylinder modal weak-body reference | 18.0 |  | 70.000 | -84.273 | -84.275 | -0.003 |
+| BEM |  | finite-cylinder modal weak-body reference | 25.0 |  | 70.000 | -81.363 | -81.358 | 0.006 |
+| BEM |  | finite-cylinder modal weak-body reference | 38.0 |  | 70.000 | -84.801 | -84.784 | 0.016 |
+| BEM |  | finite-cylinder modal weak-body reference | 50.0 |  | 70.000 | -86.684 | -86.656 | 0.028 |
+| BEM |  | finite-cylinder modal weak-body reference | 70.0 |  | 70.000 | -78.293 | -78.292 | 0.000 |
+| BEM |  | finite-cylinder modal weak-body reference | 90.0 |  | 70.000 | -80.795 | -80.763 | 0.032 |
+| BEM |  | finite-cylinder modal weak-body reference | 120.0 |  | 70.000 | -113.364 | -112.292 | 1.072 |
+
+</details>
+
+
+## Boundary Cases
+
+Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled, and shell cases when those branches apply.
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|:--|--:|--:|
+| Component synthesis |  | Matched validation target | 12.0-120.0 |  |  | 0.000 | 0.000 |
+
+<details>
+<summary>Component synthesis / Matched validation target / 12.0-120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| Component synthesis |  | Matched validation target | 12.0 |  |  | -86.094 | -86.094 | 0.000 |
+| Component synthesis |  | Matched validation target | 18.0 |  |  | -80.017 | -80.017 | 0.000 |
+| Component synthesis |  | Matched validation target | 25.0 |  |  | -75.920 | -75.920 | 0.000 |
+| Component synthesis |  | Matched validation target | 38.0 |  |  | -72.820 | -72.820 | 0.000 |
+| Component synthesis |  | Matched validation target | 50.0 |  |  | -72.137 | -72.137 | 0.000 |
+| Component synthesis |  | Matched validation target | 70.0 |  |  | -67.036 | -67.036 | 0.000 |
+| Component synthesis |  | Matched validation target | 90.0 |  |  | -59.921 | -59.921 | 0.000 |
+| Component synthesis |  | Matched validation target | 120.0 |  |  | -56.100 | -56.100 | 0.000 |
+
+</details>
+
+
+## Residual Summary
+
+| Axis | Method | Boundary | Frequency (kHz) | Angle (deg) | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|--:|--:|
+| Boundary Cases | Component synthesis |  | 12.0-120.0 |  | 0.000 | 0.000 |
+| TS-Frequency | BEM |  | 12.0-120.0 |  | 0.146 | 1.072 |
+

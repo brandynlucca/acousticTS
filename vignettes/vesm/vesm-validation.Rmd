@@ -1,0 +1,332 @@
+---
+title: "VESM validation"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: false
+    fig_caption: yes
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
+vignette: >
+  %\VignetteIndexEntry{VESM validation}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# Validation
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  family = "vesm",
+  pages = c(
+    Overview = "index.html",
+    Theory = "vesm-theory.html",
+    Implementation = "vesm-implementation.html",
+    Benchmarks = "vesm-benchmarks.html",
+    Validation = "vesm-validation.html"
+  )
+)
+```
+
+VESM is checked on layered gas-core elastic-shell spheres with radial FEM/modal references over frequency, radius, layer, shell, and viscous-parameter coverage.
+
+::: {.tip data-title="Residuals near nulls"}
+Mean absolute differences describe the typical agreement; maximum differences are retained because deep nulls can expose localized convention or resolution errors.
+:::
+
+## TS-Frequency
+
+Frequency rows retain the matched target and orientation while sweeping frequency.
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|:--|--:|--:|
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 1.0-150.0 |  |  | 0.003 | 0.067 |
+
+<details>
+<summary>FEM / elastic shell / layered gas-core elastic-shell sphere / 1.0-150.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 1.0 |  |  | -116.008 | -116.010 | -0.003 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 2.0 |  |  | -103.918 | -103.921 | -0.003 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 3.0 |  |  | -96.797 | -96.800 | -0.003 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 4.0 |  |  | -91.694 | -91.697 | -0.003 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 5.0 |  |  | -87.683 | -87.685 | -0.003 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 6.0 |  |  | -84.349 | -84.352 | -0.003 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 7.0 |  |  | -81.473 | -81.476 | -0.003 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 8.0 |  |  | -78.919 | -78.922 | -0.003 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 9.0 |  |  | -76.602 | -76.605 | -0.003 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 10.0 |  |  | -74.458 | -74.461 | -0.003 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 11.0 |  |  | -72.444 | -72.447 | -0.003 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 12.0 |  |  | -70.523 | -70.526 | -0.003 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 13.0 |  |  | -68.666 | -68.670 | -0.003 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 14.0 |  |  | -66.847 | -66.851 | -0.004 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 15.0 |  |  | -65.042 | -65.046 | -0.004 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 16.0 |  |  | -63.225 | -63.229 | -0.004 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 17.0 |  |  | -61.372 | -61.376 | -0.004 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 18.0 |  |  | -59.451 | -59.456 | -0.005 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 19.0 |  |  | -57.428 | -57.434 | -0.005 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 20.0 |  |  | -55.262 | -55.268 | -0.006 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 21.0 |  |  | -52.909 | -52.915 | -0.007 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 22.0 |  |  | -50.346 | -50.353 | -0.008 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 23.0 |  |  | -47.686 | -47.694 | -0.008 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 24.0 |  |  | -45.494 | -45.500 | -0.006 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 25.0 |  |  | -44.867 | -44.867 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 26.0 |  |  | -45.890 | -45.887 | 0.003 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 27.0 |  |  | -47.475 | -47.471 | 0.004 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 28.0 |  |  | -48.980 | -48.976 | 0.004 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 29.0 |  |  | -50.263 | -50.260 | 0.003 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 30.0 |  |  | -51.333 | -51.330 | 0.003 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 31.0 |  |  | -52.228 | -52.226 | 0.002 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 32.0 |  |  | -52.984 | -52.982 | 0.002 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 33.0 |  |  | -53.630 | -53.628 | 0.002 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 34.0 |  |  | -54.187 | -54.186 | 0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 35.0 |  |  | -54.672 | -54.671 | 0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 36.0 |  |  | -55.098 | -55.097 | 0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 37.0 |  |  | -55.475 | -55.475 | 0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 38.0 |  |  | -55.811 | -55.811 | 0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 39.0 |  |  | -56.113 | -56.112 | 0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 40.0 |  |  | -56.384 | -56.384 | 0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 41.0 |  |  | -56.630 | -56.630 | 0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 42.0 |  |  | -56.854 | -56.854 | 0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 43.0 |  |  | -57.059 | -57.058 | 0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 44.0 |  |  | -57.246 | -57.246 | 0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 45.0 |  |  | -57.419 | -57.419 | 0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 46.0 |  |  | -57.579 | -57.579 | 0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 47.0 |  |  | -57.727 | -57.727 | 0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 48.0 |  |  | -57.865 | -57.865 | 0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 49.0 |  |  | -57.993 | -57.994 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 50.0 |  |  | -58.113 | -58.113 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 51.0 |  |  | -58.226 | -58.226 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 52.0 |  |  | -58.332 | -58.333 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 53.0 |  |  | -58.431 | -58.432 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 54.0 |  |  | -58.526 | -58.526 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 55.0 |  |  | -58.615 | -58.615 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 56.0 |  |  | -58.699 | -58.699 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 57.0 |  |  | -58.779 | -58.779 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 58.0 |  |  | -58.855 | -58.856 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 59.0 |  |  | -58.928 | -58.928 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 60.0 |  |  | -58.998 | -58.936 | 0.061 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 61.0 |  |  | -59.064 | -59.064 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 62.0 |  |  | -59.128 | -59.128 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 63.0 |  |  | -59.189 | -59.189 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 64.0 |  |  | -59.248 | -59.248 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 65.0 |  |  | -59.304 | -59.305 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 66.0 |  |  | -59.359 | -59.359 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 67.0 |  |  | -59.412 | -59.412 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 68.0 |  |  | -59.462 | -59.463 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 69.0 |  |  | -59.512 | -59.512 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 70.0 |  |  | -59.559 | -59.559 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 71.0 |  |  | -59.605 | -59.605 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 72.0 |  |  | -59.650 | -59.650 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 73.0 |  |  | -59.693 | -59.693 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 74.0 |  |  | -59.735 | -59.735 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 75.0 |  |  | -59.775 | -59.776 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 76.0 |  |  | -59.815 | -59.815 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 77.0 |  |  | -59.853 | -59.853 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 78.0 |  |  | -59.890 | -59.890 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 79.0 |  |  | -59.926 | -59.926 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 80.0 |  |  | -59.960 | -59.960 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 81.0 |  |  | -59.994 | -59.994 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 82.0 |  |  | -60.026 | -60.026 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 83.0 |  |  | -60.056 | -60.057 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 84.0 |  |  | -60.086 | -60.086 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 85.0 |  |  | -60.114 | -60.114 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 86.0 |  |  | -60.141 | -60.141 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 87.0 |  |  | -60.166 | -60.166 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 88.0 |  |  | -60.189 | -60.189 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 89.0 |  |  | -60.210 | -60.211 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 90.0 |  |  | -60.230 | -60.230 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 91.0 |  |  | -60.247 | -60.248 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 92.0 |  |  | -60.262 | -60.262 | -0.000 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 93.0 |  |  | -60.273 | -60.274 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 94.0 |  |  | -60.282 | -60.283 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 95.0 |  |  | -60.287 | -60.287 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 96.0 |  |  | -60.287 | -60.288 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 97.0 |  |  | -60.283 | -60.284 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 98.0 |  |  | -60.273 | -60.273 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 99.0 |  |  | -60.256 | -60.256 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 100.0 |  |  | -60.230 | -60.231 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 101.0 |  |  | -60.194 | -60.195 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 102.0 |  |  | -60.146 | -60.147 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 103.0 |  |  | -60.082 | -60.083 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 104.0 |  |  | -59.998 | -59.999 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 105.0 |  |  | -59.888 | -59.889 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 106.0 |  |  | -59.742 | -59.744 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 107.0 |  |  | -59.548 | -59.549 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 108.0 |  |  | -59.283 | -59.284 | -0.002 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 109.0 |  |  | -58.910 | -58.912 | -0.002 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 110.0 |  |  | -58.363 | -58.366 | -0.003 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 111.0 |  |  | -57.507 | -57.511 | -0.004 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 112.0 |  |  | -56.029 | -56.037 | -0.008 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 113.0 |  |  | -53.258 | -53.271 | -0.014 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 114.0 |  |  | -54.170 | -54.129 | 0.041 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 115.0 |  |  | -67.558 | -67.491 | 0.067 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 116.0 |  |  | -74.134 | -74.164 | -0.030 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 117.0 |  |  | -69.198 | -69.214 | -0.016 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 118.0 |  |  | -67.062 | -67.071 | -0.009 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 119.0 |  |  | -65.945 | -65.951 | -0.006 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 120.0 |  |  | -65.269 | -65.273 | -0.004 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 121.0 |  |  | -64.823 | -64.826 | -0.003 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 122.0 |  |  | -64.512 | -64.514 | -0.003 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 123.0 |  |  | -64.286 | -64.288 | -0.002 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 124.0 |  |  | -64.119 | -64.121 | -0.002 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 125.0 |  |  | -63.992 | -63.994 | -0.002 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 126.0 |  |  | -63.895 | -63.897 | -0.002 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 127.0 |  |  | -63.821 | -63.823 | -0.002 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 128.0 |  |  | -63.765 | -63.766 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 129.0 |  |  | -63.722 | -63.723 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 130.0 |  |  | -63.690 | -63.691 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 131.0 |  |  | -63.667 | -63.668 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 132.0 |  |  | -63.652 | -63.653 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 133.0 |  |  | -63.642 | -63.643 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 134.0 |  |  | -63.638 | -63.639 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 135.0 |  |  | -63.638 | -63.639 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 136.0 |  |  | -63.641 | -63.642 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 137.0 |  |  | -63.648 | -63.649 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 138.0 |  |  | -63.658 | -63.658 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 139.0 |  |  | -63.669 | -63.670 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 140.0 |  |  | -63.683 | -63.684 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 141.0 |  |  | -63.699 | -63.700 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 142.0 |  |  | -63.716 | -63.717 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 143.0 |  |  | -63.734 | -63.735 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 144.0 |  |  | -63.754 | -63.755 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 145.0 |  |  | -63.775 | -63.776 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 146.0 |  |  | -63.796 | -63.797 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 147.0 |  |  | -63.819 | -63.820 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 148.0 |  |  | -63.842 | -63.843 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 149.0 |  |  | -63.866 | -63.867 | -0.001 |
+| FEM | elastic shell | layered gas-core elastic-shell sphere | 150.0 |  |  | -63.890 | -63.891 | -0.001 |
+
+</details>
+
+
+## TS-Size
+
+Size rows retain the matched material constants while sweeping length, radius, diameter, or scale.
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|:--|--:|--:|
+| FEM | elastic shell | layered sphere radius sweep | 12.0 |  | Radius scale 0.700-1.300 | 0.074 | 0.101 |
+| FEM | elastic shell | layered sphere radius sweep | 120.0 |  | Radius scale 0.700-1.300 | 0.121 | 0.203 |
+| FEM | elastic shell | layered sphere radius sweep | 150.0 |  | Radius scale 0.700-1.300 | 0.184 | 0.232 |
+| FEM | elastic shell | layered sphere radius sweep | 38.0 |  | Radius scale 0.700-1.300 | 0.890 | 3.421 |
+| FEM | elastic shell | layered sphere radius sweep | 70.0 |  | Radius scale 0.700-1.300 | 0.054 | 0.172 |
+
+<details>
+<summary>FEM / elastic shell / layered sphere radius sweep / 12.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| FEM | elastic shell | layered sphere radius sweep | 12.0 |  | 0.700 | -80.977 | -81.078 | -0.101 |
+| FEM | elastic shell | layered sphere radius sweep | 12.0 |  | 0.900 | -73.678 | -73.760 | -0.081 |
+| FEM | elastic shell | layered sphere radius sweep | 12.0 |  | 1.000 | -70.454 | -70.526 | -0.073 |
+| FEM | elastic shell | layered sphere radius sweep | 12.0 |  | 1.100 | -67.407 | -67.472 | -0.065 |
+| FEM | elastic shell | layered sphere radius sweep | 12.0 |  | 1.300 | -61.613 | -61.664 | -0.050 |
+
+</details>
+
+<details>
+<summary>FEM / elastic shell / layered sphere radius sweep / 120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| FEM | elastic shell | layered sphere radius sweep | 120.0 |  | 0.700 | -63.209 | -63.218 | -0.009 |
+| FEM | elastic shell | layered sphere radius sweep | 120.0 |  | 0.900 | -60.079 | -60.209 | -0.129 |
+| FEM | elastic shell | layered sphere radius sweep | 120.0 |  | 1.000 | -65.152 | -65.273 | -0.121 |
+| FEM | elastic shell | layered sphere radius sweep | 120.0 |  | 1.100 | -62.669 | -62.809 | -0.141 |
+| FEM | elastic shell | layered sphere radius sweep | 120.0 |  | 1.300 | -61.525 | -61.728 | -0.203 |
+
+</details>
+
+<details>
+<summary>FEM / elastic shell / layered sphere radius sweep / 150.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| FEM | elastic shell | layered sphere radius sweep | 150.0 |  | 0.700 | -62.915 | -63.019 | -0.104 |
+| FEM | elastic shell | layered sphere radius sweep | 150.0 |  | 0.900 | -64.381 | -64.572 | -0.191 |
+| FEM | elastic shell | layered sphere radius sweep | 150.0 |  | 1.000 | -63.659 | -63.891 | -0.232 |
+| FEM | elastic shell | layered sphere radius sweep | 150.0 |  | 1.100 | -63.236 | -63.463 | -0.227 |
+| FEM | elastic shell | layered sphere radius sweep | 150.0 |  | 1.300 | -62.246 | -62.414 | -0.168 |
+
+</details>
+
+<details>
+<summary>FEM / elastic shell / layered sphere radius sweep / 38.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| FEM | elastic shell | layered sphere radius sweep | 38.0 |  | 0.700 | -47.383 | -50.804 | -3.421 |
+| FEM | elastic shell | layered sphere radius sweep | 38.0 |  | 0.900 | -54.777 | -55.240 | -0.462 |
+| FEM | elastic shell | layered sphere radius sweep | 38.0 |  | 1.000 | -55.523 | -55.811 | -0.288 |
+| FEM | elastic shell | layered sphere radius sweep | 38.0 |  | 1.100 | -55.773 | -55.967 | -0.194 |
+| FEM | elastic shell | layered sphere radius sweep | 38.0 |  | 1.300 | -55.649 | -55.736 | -0.087 |
+
+</details>
+
+<details>
+<summary>FEM / elastic shell / layered sphere radius sweep / 70.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| FEM | elastic shell | layered sphere radius sweep | 70.0 |  | 0.700 | -60.973 | -61.145 | -0.172 |
+| FEM | elastic shell | layered sphere radius sweep | 70.0 |  | 0.900 | -60.086 | -60.115 | -0.029 |
+| FEM | elastic shell | layered sphere radius sweep | 70.0 |  | 1.000 | -59.569 | -59.559 | 0.009 |
+| FEM | elastic shell | layered sphere radius sweep | 70.0 |  | 1.100 | -59.049 | -59.018 | 0.031 |
+| FEM | elastic shell | layered sphere radius sweep | 70.0 |  | 1.300 | -57.980 | -57.951 | 0.029 |
+
+</details>
+
+
+## Boundary Cases
+
+Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled, and shell cases when those branches apply.
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|:--|--:|--:|
+| FEM | elastic shell | layered sphere radius sweep | 12.0-150.0 |  | Radius scale 0.700-1.300 | 0.265 | 3.421 |
+
+<details>
+<summary>FEM / elastic shell / layered sphere radius sweep / 12.0-150.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| FEM | elastic shell | layered sphere radius sweep | 12.0 |  | 0.700 | -80.977 | -81.078 | -0.101 |
+| FEM | elastic shell | layered sphere radius sweep | 12.0 |  | 0.900 | -73.678 | -73.760 | -0.081 |
+| FEM | elastic shell | layered sphere radius sweep | 12.0 |  | 1.000 | -70.454 | -70.526 | -0.073 |
+| FEM | elastic shell | layered sphere radius sweep | 12.0 |  | 1.100 | -67.407 | -67.472 | -0.065 |
+| FEM | elastic shell | layered sphere radius sweep | 12.0 |  | 1.300 | -61.613 | -61.664 | -0.050 |
+| FEM | elastic shell | layered sphere radius sweep | 38.0 |  | 0.700 | -47.383 | -50.804 | -3.421 |
+| FEM | elastic shell | layered sphere radius sweep | 38.0 |  | 0.900 | -54.777 | -55.240 | -0.462 |
+| FEM | elastic shell | layered sphere radius sweep | 38.0 |  | 1.000 | -55.523 | -55.811 | -0.288 |
+| FEM | elastic shell | layered sphere radius sweep | 38.0 |  | 1.100 | -55.773 | -55.967 | -0.194 |
+| FEM | elastic shell | layered sphere radius sweep | 38.0 |  | 1.300 | -55.649 | -55.736 | -0.087 |
+| FEM | elastic shell | layered sphere radius sweep | 70.0 |  | 0.700 | -60.973 | -61.145 | -0.172 |
+| FEM | elastic shell | layered sphere radius sweep | 70.0 |  | 0.900 | -60.086 | -60.115 | -0.029 |
+| FEM | elastic shell | layered sphere radius sweep | 70.0 |  | 1.000 | -59.569 | -59.559 | 0.009 |
+| FEM | elastic shell | layered sphere radius sweep | 70.0 |  | 1.100 | -59.049 | -59.018 | 0.031 |
+| FEM | elastic shell | layered sphere radius sweep | 70.0 |  | 1.300 | -57.980 | -57.951 | 0.029 |
+| FEM | elastic shell | layered sphere radius sweep | 120.0 |  | 0.700 | -63.209 | -63.218 | -0.009 |
+| FEM | elastic shell | layered sphere radius sweep | 120.0 |  | 0.900 | -60.079 | -60.209 | -0.129 |
+| FEM | elastic shell | layered sphere radius sweep | 120.0 |  | 1.000 | -65.152 | -65.273 | -0.121 |
+| FEM | elastic shell | layered sphere radius sweep | 120.0 |  | 1.100 | -62.669 | -62.809 | -0.141 |
+| FEM | elastic shell | layered sphere radius sweep | 120.0 |  | 1.300 | -61.525 | -61.728 | -0.203 |
+| FEM | elastic shell | layered sphere radius sweep | 150.0 |  | 0.700 | -62.915 | -63.019 | -0.104 |
+| FEM | elastic shell | layered sphere radius sweep | 150.0 |  | 0.900 | -64.381 | -64.572 | -0.191 |
+| FEM | elastic shell | layered sphere radius sweep | 150.0 |  | 1.000 | -63.659 | -63.891 | -0.232 |
+| FEM | elastic shell | layered sphere radius sweep | 150.0 |  | 1.100 | -63.236 | -63.463 | -0.227 |
+| FEM | elastic shell | layered sphere radius sweep | 150.0 |  | 1.300 | -62.246 | -62.414 | -0.168 |
+
+</details>
+
+
+## Residual Summary
+
+| Axis | Method | Boundary | Frequency (kHz) | Angle (deg) | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|--:|--:|
+| Boundary Cases | FEM | elastic shell | 12.0-150.0 |  | 0.265 | 3.421 |
+| TS-Frequency | FEM | elastic shell | 1.0-150.0 |  | 0.003 | 0.067 |
+| TS-Size | FEM | elastic shell | 12.0-150.0 |  | 0.265 | 3.421 |
+

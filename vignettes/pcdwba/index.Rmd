@@ -1,4 +1,4 @@
-﻿---
+---
 title: "PCDWBA"
 output:
   rmarkdown::html_vignette:
@@ -19,8 +19,10 @@ acousticTS:::.model_family_header(
   family = "pcdwba",
   pages = c(
     Overview = "index.html",
+    Theory = "pcdwba-theory.html",
     Implementation = "pcdwba-implementation.html",
-    Theory = "pcdwba-theory.html"
+    Benchmarks = "pcdwba-benchmarks.html",
+    Validation = "pcdwba-validation.html"
   )
 )
 ```
@@ -58,7 +60,9 @@ acousticTS:::.model_family_overview(
     "Single scattering from an elongated fluid-like target"
   ),
   reading = c(
-    "[Implementation](pcdwba-implementation.html): object workflow and comparison results",
+    "[Implementation](pcdwba-implementation.html): object setup and model output",
+    "[Benchmarks](pcdwba-benchmarks.html): curved-body implementation comparisons and timing",
+    "[Validation](pcdwba-validation.html): direct phase-compensated quadrature matrix",
     "[Theory](pcdwba-theory.html): bent-centerline parameterization and phase-compensated weak-scattering sum"
   )
 )

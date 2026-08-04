@@ -1,0 +1,124 @@
+---
+title: "KRM benchmarks"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: false
+    fig_caption: yes
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
+vignette: >
+  %\VignetteIndexEntry{KRM benchmarks}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# Benchmarks
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  family = "krm",
+  pages = c(
+    Overview = "index.html",
+    Theory = "krm-theory.html",
+    Implementation = "krm-implementation.html",
+    Benchmarks = "krm-benchmarks.html",
+    Validation = "krm-validation.html"
+  )
+)
+```
+
+KRM benchmark comparisons use canonical isolated targets from the package benchmark ladder and bundled fish compatibility checks.
+
+| Canonical case | Max abs. $\Delta$ TS (dB) | Mean abs. $\Delta$ TS (dB) | Elapsed (s) |
+|:--|--:|--:|--:|
+| Gas sphere | 7.91469 | 6.04116 | 0.01 |
+| Weakly scattering sphere | 11.21090 | 0.47451 | 0.15 |
+| Gas prolate spheroid | 7.36054 | 4.62751 | 0.00 |
+| Weakly scattering prolate spheroid | 14.27193 | 0.46239 | 0.00 |
+| Gas cylinder | 7.35632 | 6.19094 | 0.02 |
+| Weakly scattering cylinder | 23.22115 | 0.59807 | 0.02 |
+
+## Body-plus-swimbladder reference frequencies
+
+The sardine SBF case is benchmarked against the KRMr, echoSMs, and NOAA reference-frequency family using the documented low-contrast convention, seawater density `1030 kg m^-3`, and seawater sound speed `1490 m s^-1`.
+
+| Frequency (kHz) | Reference TS (dB) | acousticTS TS (dB) | $\Delta TS$ (dB) |
+|--:|--:|--:|--:|
+| 12 | -33.981600 | -33.981600 | 0.000000 |
+| 24 | -35.980723 | -35.980723 | 0.000000 |
+| 60 | -40.771343 | -40.771343 | 0.000000 |
+| 100 | -46.021179 | -46.021179 | 0.000000 |
+| 120 | -76.074901 | -76.074901 | 0.000000 |
+| 200 | -39.128308 | -39.128308 | 0.000000 |
+| 300 | -46.273771 | -46.273771 | 0.000000 |
+| 400 | -42.816793 | -42.816793 | 0.000000 |
+
+| Benchmark summary | N frequency | Mean abs. $\Delta TS$ (dB) | Max abs. $\Delta TS$ (dB) |
+|:--|--:|--:|--:|
+| acousticTS vs KRMr reference frequencies | 8 | 0.000000 | 0.000000 |
+| acousticTS vs echoSMs reference frequencies | 8 | 0.000000 | 0.000000 |
+| acousticTS vs NOAA reference frequencies | 8 | 0.002600 | 0.005000 |
+
+## Fish compatibility checks
+
+<details class="figure-drop" open>
+<summary>Sardine software comparisons</summary>
+
+### `krm_variant = lowcontrast`
+
+| Mean abs. $\Delta TS$ (dB) | acousticTS | KRMr | echoSMs | NOAA SWFSC applet |
+|:--|--:|--:|--:|--:|
+| acousticTS | - | 1.6e-14 | 3.3e-14 | 2.6e-3 |
+| KRMr | 1.6e-14 | - | 3.9e-14 | 2.6e-3 |
+| echoSMs | 3.3e-14 | 3.9e-14 | - | 2.6e-3 |
+| NOAA SWFSC applet | 2.6e-3 | 2.6e-3 | 2.6e-3 | - |
+
+| Max abs. $\Delta TS$ (dB) | acousticTS | KRMr | echoSMs | NOAA SWFSC applet |
+|:--|--:|--:|--:|--:|
+| acousticTS | - | 1.4e-13 | 5.5e-13 | 5.0e-3 |
+| KRMr | 1.4e-13 | - | 5.5e-13 | 5.0e-3 |
+| echoSMs | 5.5e-13 | 5.5e-13 | - | 5.0e-3 |
+| NOAA SWFSC applet | 5.0e-3 | 5.0e-3 | 5.0e-3 | - |
+
+### `krm_variant = body_embedded` and `mixed`
+
+| Variant | Compared to | Mean abs. $\Delta TS$ (dB) | Max abs. $\Delta TS$ (dB) |
+|:--|:--|--:|--:|
+| `body_embedded` | echoSMs | 3.4e-14 | 1.9e-13 |
+| `mixed` | echoSMs | 3.4e-14 | 1.9e-13 |
+
+</details>
+
+<details class="figure-drop">
+<summary>Cod software comparisons</summary>
+
+### `krm_variant = lowcontrast`
+
+| Mean abs. $\Delta TS$ (dB) | acousticTS | KRMr | echoSMs | NOAA SWFSC applet |
+|:--|--:|--:|--:|--:|
+| acousticTS | - | 1.3e-14 | 5.4e-14 | 2.6e-3 |
+| KRMr | 1.3e-14 | - | 3.9e-14 | - |
+| echoSMs | 5.4e-14 | 3.9e-14 | - | - |
+| NOAA SWFSC applet | 2.6e-3 | - | - | - |
+
+| Max abs. $\Delta TS$ (dB) | acousticTS | KRMr | echoSMs | NOAA SWFSC applet |
+|:--|--:|--:|--:|--:|
+| acousticTS | - | 7.8e-14 | 3.6e-14 | 5.0e-3 |
+| KRMr | 7.8e-14 | - | 8.5e-13 | - |
+| echoSMs | 3.6e-14 | 8.5e-13 | - | - |
+| NOAA SWFSC applet | 5.0e-3 | - | - | - |
+
+### `krm_variant = body_embedded` and `mixed`
+
+| Variant | Compared to | Mean abs. $\Delta TS$ (dB) | Max abs. $\Delta TS$ (dB) |
+|:--|:--|--:|--:|
+| `body_embedded` | echoSMs | 6.2e-15 | 5.7e-14 |
+| `mixed` | echoSMs | 6.2e-15 | 5.7e-14 |
+
+</details>
+
+::: {.tip data-title="Keep software checks in Benchmarks"}
+These rows check implementation agreement at documented reference frequencies. Full SBF validation still requires component-wise or full-wave checks of the body, inclusion, placement, and coherent total.
+:::

@@ -1,4 +1,4 @@
-﻿---
+---
 title: "SDWBA"
 output:
   rmarkdown::html_vignette:
@@ -20,8 +20,10 @@ acousticTS:::.model_family_header(
   family = "sdwba",
   pages = c(
     Overview = "index.html",
+    Theory = "sdwba-theory.html",
     Implementation = "sdwba-implementation.html",
-    Theory = "sdwba-theory.html"
+    Benchmarks = "sdwba-benchmarks.html",
+    Validation = "sdwba-validation.html"
   )
 )
 ```
@@ -58,7 +60,9 @@ acousticTS:::.model_family_overview(
     "Randomization acts on the coherent sum rather than on the local scattering kernel"
   ),
   reading = c(
-    "[Implementation](sdwba-implementation.html): stochastic settings, spectra, and validation workflows",
+    "[Implementation](sdwba-implementation.html): stochastic settings and spectra",
+    "[Benchmarks](sdwba-benchmarks.html): canonical targets and stochastic software-reference tables",
+    "[Validation](sdwba-validation.html): deterministic weak-cylinder BEM transmission check",
     "[Theory](sdwba-theory.html): randomized coherent sums and scale-invariant phase statistics"
   )
 )

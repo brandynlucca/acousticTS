@@ -1,0 +1,60 @@
+---
+title: "SPHMS benchmarks"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: false
+    fig_caption: yes
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
+vignette: >
+  %\VignetteIndexEntry{SPHMS benchmarks}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# Benchmarks
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  family = "sphms",
+  pages = c(
+    Overview = "index.html",
+    Theory = "sphms-theory.html",
+    Implementation = "sphms-implementation.html",
+    Benchmarks = "sphms-benchmarks.html",
+    Validation = "sphms-validation.html"
+  )
+)
+```
+
+SPHMS is benchmarked against the spherical Jech et al. reference definitions stored in `benchmark_ts` [@Jech_2015]. The comparison is intentionally simple: the same spherical geometry and boundary condition are evaluated in acousticTS, then compared to the stored target-strength curve in dB.
+
+::: {.tip data-title="Read benchmark deltas in context"}
+Small dB residuals are most meaningful when the benchmark and reproduced case share the same radius, medium properties, boundary condition, frequency grid, and reporting quantity.
+:::
+
+## Benchmark summary
+
+| Boundary | Max abs. $\Delta$ TS (dB) | Mean abs. $\Delta$ TS (dB) | Elapsed (s) |
+|:--|--:|--:|--:|
+| `fixed_rigid` | 0.00497 | 0.00246 | 0.03 |
+| `pressure_release` | 0.00500 | 0.00243 | 0.09 |
+| `gas_filled` | 0.00499 | 0.00263 | 0.06 |
+| `liquid_filled` | 0.00492 | 0.00241 | 0.11 |
+
+All four spherical boundary types stay within about `0.005 dB` of the stored benchmark family across the tested grid.
+
+## Modal-limit sensitivity
+
+SPHMS exposes `m_limit`, so the benchmark suite also checks how much the liquid-filled result moves when the modal cap is reduced.
+
+| Boundary | `m_limit` | Max abs. $\Delta$ TS (dB) | Mean abs. $\Delta$ TS (dB) | Elapsed (s) |
+|:--|:--|--:|--:|--:|
+| `liquid_filled` | default rule | 0.00492 | 0.00241 | 0.07 |
+| `liquid_filled` | `20` | 0.52550 | 0.00640 | 0.14 |
+| `liquid_filled` | `10` | 58.24225 | 8.07819 | 0.02 |
+
+Aggressive under-truncation can reduce elapsed time, but it can also destroy the benchmark fit. In normal use, `m_limit` should be treated as a convergence-control override rather than a tuning parameter.
+

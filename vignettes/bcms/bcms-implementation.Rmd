@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Bent cylinder modal series solution"
 output:
   rmarkdown::html_vignette:
@@ -25,8 +25,9 @@ acousticTS:::.model_family_header(
   family = "bcms",
   pages = c(
     Overview = "index.html",
+    Theory = "bcms-theory.html",
     Implementation = "bcms-implementation.html",
-    Theory = "bcms-theory.html"
+    Validation = "bcms-validation.html"
   )
 )
 ```
@@ -38,8 +39,8 @@ The bent-cylinder modal-series solution is available through `target_strength(..
 
 That is the practical reason to use `BCMS` instead of `FCMS`. `FCMS` is the appropriate model when the target can be treated as a straight finite cylinder. `BCMS` is the natural extension when the same cylinder idealization is still acceptable locally, but the body curvature is strong enough that the straight-cylinder coherence assumption is no longer appropriate.
 
-::: {.experiment data-title="Current validation scope"}
-`BCMS` is marked unvalidated because there is not an external public software benchmark ladder wired into the package. The implementation checks documented here are the two defining identities of the model: the straight branch must reduce to `FCMS`, and the bent branch must match the Stanton (1989) coherence-corrected construction built from that same straight-cylinder solution.
+::: {.note data-title="Implementation identities"}
+The implementation checks below verify the defining algebra: the straight branch reduces to `FCMS`, and the bent branch matches the Stanton (1989) coherence-corrected construction built from that same straight-cylinder solution.
 :::
 
 ## Building straight and bent reference objects
@@ -217,5 +218,5 @@ The overlay makes the two implementation identities easier to interpret. The str
 
 ## Closing note
 
-`BCMS` is best viewed as a controlled extension of `FCMS`, not as a completely separate scattering family. The page is therefore organized around the two checks that matter most for that relationship: reduction to `FCMS` in the straight limit, and exact agreement with the bent-cylinder coherence construction in the curved case. Those checks do not replace an external benchmark ladder, but they do establish that the implementation respects the defining algebra of the model.
+`BCMS` is best viewed as a controlled extension of `FCMS`, not as a completely separate scattering family. The page is therefore organized around the two checks that matter most for that relationship: reduction to `FCMS` in the straight limit, and exact agreement with the bent-cylinder coherence construction in the curved case. Those checks establish that the implementation respects the defining algebra of the model.
 

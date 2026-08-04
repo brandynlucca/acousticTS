@@ -1,4 +1,4 @@
-﻿---
+---
 title: "SPHMS"
 output:
   rmarkdown::html_vignette:
@@ -20,8 +20,10 @@ acousticTS:::.model_family_header(
   family = "sphms",
   pages = c(
     Overview = "index.html",
+    Theory = "sphms-theory.html",
     Implementation = "sphms-implementation.html",
-    Theory = "sphms-theory.html"
+    Benchmarks = "sphms-benchmarks.html",
+    Validation = "sphms-validation.html"
   )
 )
 ```

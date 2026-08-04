@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Bent cylinder modal series solution"
 output:
   rmarkdown::html_vignette:
@@ -25,8 +25,9 @@ acousticTS:::.model_family_header(
   family = "bcms",
   pages = c(
     Overview = "index.html",
+    Theory = "bcms-theory.html",
     Implementation = "bcms-implementation.html",
-    Theory = "bcms-theory.html"
+    Validation = "bcms-validation.html"
   )
 )
 ```

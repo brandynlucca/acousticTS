@@ -163,6 +163,28 @@ details.code-drop pre {
   padding: 15px !important;
 }
 
+/* --- COLLAPSIBLE FIGURES --- */
+details.figure-drop {
+  border: 1px solid #d1d5da !important;
+  border-radius: 6px !important;
+  background: #ffffff !important;
+  margin: 1rem 0 !important;
+  overflow: hidden !important;
+}
+
+details.figure-drop summary {
+  padding: 0.65rem 0.85rem !important;
+  background: #f8fafc !important;
+  color: #1f2937 !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+}
+
+details.figure-drop .vignette-figure {
+  margin-top: 0.75rem;
+  margin-bottom: 1rem;
+}
+
 /* --- MODEL LIBRARY TAGS AND LOCAL NAV --- */
 .model-tag {
   display: inline-block;

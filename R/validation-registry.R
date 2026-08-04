@@ -175,14 +175,14 @@
     #   in `.validation_evidence_registry()` aligned with them.
     benchmarked = c(
       TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE,
-      TRUE, TRUE, TRUE, TRUE, TRUE, FALSE,
-      FALSE, FALSE, TRUE
+      TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+      FALSE, TRUE, TRUE
     ),
     validation_status = c(
-      "validated", "validated", "validated", "validated",
-      "unvalidated", "unvalidated", "unvalidated",
-      "validated", "validated", "validated", "validated", "unvalidated",
-      "validated", "unvalidated", "validated", "partially_validated"
+      "validated", "partially_validated", "partially_validated", "validated",
+      "partially_validated", "partially_validated", "partially_validated",
+      "partially_validated", "partially_validated", "partially_validated", "partially_validated", "partially_validated",
+      "partially_validated", "partially_validated", "partially_validated", "partially_validated"
     ),
     experimental = c(
       FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, TRUE,
@@ -200,11 +200,11 @@
   #   `partially_validated`, or `experimental`.
   # - `benchmark` means a documented canonical benchmark ladder or stored
   #   benchmark values.
-  # - `validated` means the current public scope has an external software or
-  #   independent-comparison check.
+  # - `validated` means the current public scope has an independent numerical,
+  #   analytical, FEM, BEM, or hybrid check.
   # - `partially_validated` means only part of the public scope has those
-  #   external checks.
-  # - `experimental` means the workflow is public but still provisional.
+  #   independent checks.
+  # - `experimental` means the model is public but still provisional.
   # - `unvalidated` is tracked only in `.validation_family_registry()`.
   # - Do not add legacy umbrella tags such as `note` or `external`.
   data.frame(
@@ -213,71 +213,86 @@
       "fcms", "fcms",
       "psms", "psms",
       "calibration", "calibration",
-      "bcms",
-      "ecms",
-      "dwba", "dwba",
-      "sdwba", "sdwba",
+      "essms",
+      "bcms", "bcms",
+      "ecms", "ecms",
+      "dwba", "dwba", "dwba",
+      "sdwba", "sdwba", "sdwba",
       "krm", "krm",
-      "hpa", "hpa",
-      "trcm",
-      "pcdwba", "pcdwba",
-      "bbfm",
-      "vesm", "vesm",
+      "hpa", "hpa", "hpa",
+      "trcm", "trcm",
+      "pcdwba", "pcdwba", "pcdwba",
+      "bbfm", "bbfm",
+      "vesm", "vesm", "vesm",
       "tmm", "tmm", "tmm", "tmm", "tmm"
     ),
     evidence_type = c(
       "benchmark", "validated",
+      "benchmark", "partially_validated",
+      "benchmark", "partially_validated",
       "benchmark", "validated",
-      "benchmark", "validated",
-      "benchmark", "validated",
-      "experimental",
-      "experimental",
-      "benchmark", "validated",
-      "benchmark", "validated",
-      "benchmark", "validated",
-      "benchmark", "validated",
-      "benchmark",
-      "validated", "experimental",
-      "experimental",
-      "validated", "experimental",
+      "partially_validated",
+      "partially_validated", "experimental",
+      "partially_validated", "experimental",
+      "benchmark", "benchmark", "partially_validated",
+      "benchmark", "benchmark", "partially_validated",
+      "benchmark", "partially_validated",
+      "benchmark", "benchmark", "partially_validated",
+      "benchmark", "partially_validated",
+      "benchmark", "partially_validated", "experimental",
+      "partially_validated", "experimental",
+      "benchmark", "partially_validated", "experimental",
       "benchmark", "validated", "validated",
       "partially_validated", "experimental"
     ),
     source = c(
       # SPHMS
-      "benchmark_ts / Jech et al. (2015)", "KRMr and echoSMs",
+      "benchmark_ts / Jech et al. (2015)", "Monostatic spherical BEM checks",
       # FCMS
-      "benchmark_ts / Jech et al. (2015)", "echoSMs",
+      "benchmark_ts / Jech et al. (2015)", "Finite-cylinder FEM and BEM rows",
       # PSMS
-      "benchmark_ts / Jech et al. (2015)", "Prol_Spheroid and echoSMs",
+      "benchmark_ts / Jech et al. (2015)", "Prolate-spheroid BEM checks",
       # SOEMS
-      "Published calibration spheres", "echoSMs, SphereTS, NOAA applet",
+      "Published calibration spheres", "Elastic calibration-sphere calculations",
+      # ESSMS
+      "Spherical shell FEM/BEM and hybrid checks",
       # BCMS
-      "Internal FCMS-based reference reconstruction",
+      "Radial FEM bent-cylinder validation",
+      "Internal FCMS-based reconstruction",
       # ECMS
-      "Independent algebra transcription",
+      "Cylindrical radial FEM reference",
+      "Independent algebra reconstruction",
       # DWBA
       "benchmark_ts / Jech et al. (2015)",
-      "McGehee et al. (1998) and echoSMs",
+      "Published segmented-krill benchmark calculation",
+      "Weak-cylinder BEM check",
       # SDWBA
       "benchmark_ts / Jech et al. (2015)",
-      "CCAMLR MATLAB, NOAA applet, echoSMs",
+      "Published stochastic krill software references",
+      "Weak-cylinder BEM check",
       # KRM
-      "benchmark_ts / Jech et al. (2015)", "KRMr, echoSMs, NOAA applet",
+      "benchmark_ts / KRMr / echoSMs / NOAA reference frequencies",
+      "Weak-cylinder BEM check",
       # HPA
-      "benchmark_ts / Jech et al. (2015)", "echoSMs",
+      "benchmark_ts / Jech et al. (2015)", "Johnson/Stanton formula benchmark checks",
+      "BEM liquid-filled sphere check",
       # TRCM
       "benchmark_ts / Jech et al. (2015)",
+      "Fluid-filled cylinder FEM reference",
       # PCDWBA
-      "benchmark_ts / Jech et al. (2015)", "ZooScatR",
+      "ZooScatR and Echopop PCDWBA benchmark",
+      "Direct phase-compensated quadrature validation",
+      "Current PCDWBA argument surface",
       # BBFM
+      "BEM/FEM component checks",
       "Internal DWBA + ECMS reconstruction",
       # VESM
-      "Reference Python VESM workflow",
-      "Current layered-sphere workflow surface",
+      "Layered-sphere benchmark calculation",
+      "Radial FEM layered-sphere validation",
+      "Current layered-sphere benchmark surface",
       # TMM
       "SPHMS / PSMS / FCMS benchmark ladder",
-      "BEMPP far-field checks",
+      "BEM far-field checks",
       "Exact general-angle spheroidal solution",
       "Cylinder retained-angle scope",
       "Current retained-state branch matrix"
@@ -289,23 +304,28 @@
         "in benchmark_ts."
       ),
       paste(
-        "Validated against `KRMr` and `echoSMs` on shared",
-        "penetrable-sphere cases."
+        "Validation uses monostatic spherical BEM far-field checks",
+        "across rigid, pressure-release, liquid-filled, and gas-filled cases."
       ),
       # FCMS
       paste(
         "Benchmarked against the canonical finite-cylinder spectra",
         "stored in benchmark_ts."
       ),
-      "Validated against the echoSMs finite-cylinder implementation.",
+      paste(
+        "Partial validation uses straight-cylinder radial FEM",
+        "frequency, angle, and size matrices across pressure-release,",
+        "fixed-rigid, liquid-filled, and gas-filled branches, plus",
+        "surface BEM spot checks."
+      ),
       # PSMS
       paste(
         "Benchmarked against the canonical prolate-spheroid spectra",
         "stored in benchmark_ts."
       ),
       paste(
-        "Validated against the external Prol_Spheroid and echoSMs ",
-        "implementations on shared prolate cases."
+        "Partial validation uses prolate-spheroid BEM far-field",
+        "checks, including a direct low-frequency gas-filled row."
       ),
       # SOEMS / CALIBRATION
       paste(
@@ -313,20 +333,35 @@
         "throughout the package documentation."
       ),
       paste(
-        "Validated against echoSMs, SphereTS, and the NOAA calibration",
-        "applet."
+        "Validation uses independent elastic calibration-sphere",
+        "calculations on matched material constants and frequency grids."
+      ),
+      # ESSMS
+      paste(
+        "ESSMS has spherical-shell validation coverage, including",
+        "radial FEM, BEM, and hybrid checks, but remains partially",
+        "validated until the full documented shell-sphere scope is closed."
       ),
       # BCMS
       paste(
-        "BCMS is currently marked experimental because the documented checks",
-        "are internal coherence reconstructions rather than an external",
-        "benchmark or software-comparison ladder."
+        "Partial validation compares straight and uniformly bent cylinders",
+        "against radial FEM references across frequency, boundary condition,",
+        "angle, size, and orientation cases."
+      ),
+      paste(
+        "BCMS is currently marked experimental because the full public",
+        "curved-cylinder scope remains provisional."
       ),
       # ECMS
       paste(
+        "Partial validation compares the elastic-cylinder modal series",
+        "against cylindrical radial FEM frequency, angle, size, and",
+        "orientation matrices."
+      ),
+      paste(
         "ECMS is currently marked experimental because the documented checks",
-        "are independent algebra reconstructions rather than an external",
-        "benchmark or software-comparison ladder."
+        "are algebra reconstructions rather than a closed independent",
+        "validation surface."
       ),
       # DWBA
       paste(
@@ -334,8 +369,13 @@
         "in benchmark_ts."
       ),
       paste(
-        "Validated against the published McGehee et al (1998) and echoSMs ",
-        "workflows."
+        "Benchmarked against the published segmented-krill calculation",
+        "with matched geometry, contrasts, orientation, and frequency grid."
+      ),
+      paste(
+        "Partial validation compares a broadside weak liquid-filled",
+        "finite cylinder against a BEM transmission reference at",
+        "12, 38, 70, and 120 kHz."
       ),
       # SDWBA
       paste(
@@ -343,17 +383,22 @@
         "in benchmark_ts."
       ),
       paste(
-        "Validated against the CCAMLR, NOAA applet, and echoSMs ",
-        "implementations."
+        "Benchmarked against published stochastic krill software references",
+        "with matched geometry and ensemble settings."
+      ),
+      paste(
+        "Partial validation compares a broadside weak liquid-filled",
+        "finite cylinder against a BEM transmission reference using",
+        "deterministic phase settings at 12, 38, 70, and 120 kHz."
       ),
       # KRM
       paste(
-        "Benchmarked against the canonical spectra stored",
-        "in benchmark_ts."
+        "Benchmarked against canonical spectra and SBF reference-frequency",
+        "tables from KRMr, echoSMs, and NOAA materials."
       ),
       paste(
-        "Validated against`KRMr, echoSMs, and the NOAA KRM applet on",
-        "bundled fish objects and shared workflows."
+        "Partial validation compares the weak liquid-filled body branch",
+        "against a BEM transmission reference at 12, 38, 70, and 120 kHz."
       ),
       # HPA
       paste(
@@ -361,39 +406,60 @@
         "in benchmark_ts."
       ),
       paste(
-        "Validated against the spherical echoSMs implementation."
+        "Formula benchmark checks reproduce the Johnson and Stanton",
+        "branches used by the supported HPA cases."
+      ),
+      paste(
+        "Partial validation compares the Stanton sphere branch to a",
+        "liquid-filled sphere BEM reference at 12, 38, 70, and 120 kHz."
       ),
       # TRCM
       paste(
-        "Benchmarked within the package validation workflow against ",
-        "the canonical spectra stored in benchmark_ts. Further ",
-        "compared to the straight-cylinder and FCMS-derived ",
-        "bent-cylinder reference constructions."
+        "Benchmarked against the canonical spectra stored in benchmark_ts."
+      ),
+      paste(
+        "Partial validation compares liquid-filled and gas-filled",
+        "straight and bent cylinders against radial FEM frequency, angle,",
+        "and size matrices."
       ),
       # PCDWBA
       paste(
-        "Validated against source-level ZooScatR and Echopop PCDWBA ",
-        "workflows."
+        "Benchmarked on a curved weak-scattering cylinder against",
+        "`ZooScatR` and `Echopop` over 12-200 kHz."
       ),
       paste(
-        "PCDWBA is currently marked experimental because the public package",
-        "workflow is still being tightened even though the current source-",
-        "level comparison cases are documented."
+        "Partial validation compares the package output against a direct",
+        "phase-compensated quadrature over curvature, taper, size, contrast,",
+        "orientation, and node-count cases."
+      ),
+      paste(
+        "PCDWBA is currently marked experimental because the public",
+        "argument surface remains provisional."
       ),
       # BBFM
       paste(
+        "Partial validation compares the flesh-body component against",
+        "a liquid-filled finite-cylinder BEM reference and the backbone",
+        "component against an elastic-cylinder FEM reference."
+      ),
+      paste(
         "BBFM is currently marked experimental because it has documented",
-        "internal reconstruction checks but no external benchmark ladder or",
-        "independent public implementation comparison."
+        "internal reconstruction checks, while the fully coupled embedded",
+        "body-plus-backbone surface remains outside the current claim."
       ),
       # VESM
       paste(
-        "Validated against the reference Python VESM implementation on",
-        "the documented layered-sphere case."
+        "Benchmarked against a layered-sphere calculation with matched",
+        "geometry, material constants, retained orders, and frequency grid."
       ),
       paste(
-        "VESM is currently marked experimental because the documented public",
-        "workflow is still limited to the current layered-sphere scope."
+        "Partial validation compares the documented layered-sphere result",
+        "against a radial FEM reference over 1-150 kHz."
+      ),
+      paste(
+        "VESM is currently marked experimental because the documented",
+        "validated surface is still limited to the current layered-sphere",
+        "scope."
       ),
       # TMM
       paste(
@@ -401,8 +467,8 @@
         "currently supported canonical shape branches."
       ),
       paste(
-        "Validated against external BEMPP far-field checks for sphere,",
-        "oblate, and prolate pressure-release cases."
+        "Validation uses BEM far-field checks for sphere, oblate,",
+        "and prolate pressure-release cases."
       ),
       paste(
         "Retained prolate angular products are also checked against the",
@@ -410,64 +476,125 @@
       ),
       paste(
         "TMM is partially validated because the sphere, oblate, and prolate",
-        "branches have external checks, but retained general-angle cylinder",
+        "branches have independent checks, but retained general-angle cylinder",
         "products remain outside the validated public scope."
       ),
       paste(
         "TMM is currently marked experimental because the retained-state",
-        "workflow and branch matrix are still guarded while shape-specific",
+        "branch matrix is still guarded while shape-specific",
         "support continues to be tightened."
       )
     ),
     scope = c(
       "Sphere spectra across rigid, soft, liquid-filled, and gas-filled cases.",
-      "Penetrable sphere spectra on shared software definitions.",
+      "Monostatic sphere BEM checks across four boundary conditions.",
       paste(
         "Finite-cylinder spectra across the canonical cylindrical",
         "benchmark grid."
       ),
-      "Rigid, soft, liquid-filled, and gas-filled finite-cylinder spectra.",
+      paste(
+        "Straight finite-cylinder FEM rows over 12-400 kHz across",
+        "pressure-release, fixed-rigid, liquid-filled, and gas-filled",
+        "branches, with angle and size ladders at 120 kHz; surface",
+        "BEM spot checks at the canonical cylinder size."
+      ),
       "Prolate-spheroid spectra across the canonical benchmark grid.",
-      "Liquid-filled and gas-filled prolate-spheroid software comparisons.",
+      "Broadside prolate-spheroid BEM checks.",
       "Tungsten-carbide and copper calibration spheres.",
       "Shared calibration-sphere material sets and frequency sweeps.",
-      "Uniform-curvature cylinder coherence extension of FCMS.",
+      paste(
+        "Monostatic elastic-shelled sphere checks with radial FEM/BEM",
+        "comparison and shell boundary-condition variants."
+      ),
+      paste(
+        "Straight and uniformly bent cylinders over 12-400 kHz, with",
+        "pressure-release, fixed-rigid, liquid-filled, and gas-filled",
+        "boundary-condition checks plus angle, size, and orientation ladders."
+      ),
+      "Uniform-curvature cylinder coherence extension.",
       paste(
         "Elastic-cylinder component family and near-broadside",
         "canonical cases."
       ),
+      paste(
+        "Elastic cylinder: length 0.04 m, radius 0.005 m, broadside",
+        "incidence, seawater 1026.8 kg/m^3 and 1477.3 m/s,",
+        "solid density 2800 kg/m^3, longitudinal speed 6398 m/s,",
+        "transverse speed 3122 m/s, 12-200 kHz."
+      ),
       "Weakly scattering sphere, prolate spheroid, and cylinder targets.",
-      "Bundled krill geometry and published DWBA reference workflows.",
+      "Bundled krill geometry and published DWBA benchmark calculation.",
+      paste(
+        "Weak liquid-filled finite cylinder: length 0.07 m, radius 0.01 m,",
+        "broadside incidence, seawater 1026.8 kg/m^3 and 1477.3 m/s,",
+        "interior 1028.9 kg/m^3 and 1480.3 m/s,",
+        "12/38/70/120 kHz."
+      ),
       paste(
         "Weakly scattering sphere, prolate spheroid, and cylinder",
         "stochastic targets."
       ),
-      "Bundled krill stochastic workflow comparisons.",
+      "Bundled krill stochastic software-reference calculations.",
       paste(
-        "Canonical isolated targets used for the package KRM",
-        "benchmark ladder."
+        "Weak liquid-filled finite cylinder: length 0.07 m, radius 0.01 m,",
+        "broadside incidence, seawater 1026.8 kg/m^3 and 1477.3 m/s,",
+        "interior 1028.9 kg/m^3 and 1480.3 m/s,",
+        "12/38/70/120 kHz."
       ),
-      "Bundled sardine and cod software-to-software comparisons.",
+      paste(
+        "Canonical isolated targets and bundled SBF software-comparison",
+        "tables used for the package KRM benchmark ladder."
+      ),
+      paste(
+        "Weak liquid-filled finite cylinder body branch: length 0.07 m,",
+        "radius 0.01 m, broadside incidence, seawater 1026.8 kg/m^3",
+        "and 1477.3 m/s, interior 1028.9 kg/m^3 and 1480.3 m/s,",
+        "12/38/70/120 kHz."
+      ),
       paste(
         "Sphere, prolate spheroid, and cylinder asymptotic",
         "benchmark targets."
       ),
       "Spherical HPModel branch and published asymptotic formulas.",
       paste(
+        "Liquid-filled sphere: radius 0.01 m, seawater 1026.8 kg/m^3",
+        "and 1477.3 m/s, interior 1028.9 kg/m^3 and 1480.3 m/s,",
+        "12/38/70/120 kHz."
+      ),
+      paste(
         "Straight and bent cylindrical validation cases documented",
         "in the package."
       ),
       paste(
-        "Curved weak-scattering reference workflows on shared",
-        "bent-body cases."
+        "Liquid-filled and gas-filled cylinders: straight and bent",
+        "frequency sweeps over 12-400 kHz, plus 120 kHz angle and",
+        "size ladders."
       ),
-      "Current package-facing PCDWBA workflow and argument surface.",
-      "Internal composite-component consistency checks only.",
       paste(
-        "Documented spherical layered case used by the original",
-        "VESM implementation."
+        "Curved weak-scattering benchmark against `ZooScatR` and",
+        "`Echopop`."
       ),
-      "Current documented layered-sphere workflow surface.",
+      paste(
+        "Bent weak-scattering cylinders from 12-200 kHz, including",
+        "curvature ratios 1.5, 3, and 6; taper orders 4 and 10;",
+        "15-20 mm lengths; 1.0-1.2 mm radii; contrast and",
+        "near-broadside angle variants."
+      ),
+      "Current PCDWBA argument surface.",
+      paste(
+        "Body component: liquid-filled finite cylinder, length 0.08 m,",
+        "radius 0.003 m, 38/70/120 kHz. Backbone component:",
+        "elastic-cylinder FEM comparison over 12-200 kHz."
+      ),
+      "Internal composite-component consistency checks.",
+      paste(
+        "Documented spherical layered gas-core case."
+      ),
+      paste(
+        "Documented gas-core, elastic-shell, viscous-layer sphere over",
+        "1-150 kHz."
+      ),
+      "Current documented layered-sphere benchmark surface.",
       "Sphere, oblate, prolate, and guarded cylinder monostatic branches.",
       "Pressure-release angular slices for sphere, oblate, and prolate cases.",
       "General-angle prolate retained-state validation.",
@@ -547,7 +674,7 @@
   if (nrow(evidence) == 0) {
     if (identical(meta$validation_status[[1]], "unvalidated")) {
       return(
-        "The package does not yet claim external validation across the current public scope."
+        "The package does not yet claim independent validation across the current public scope."
       )
     }
 
@@ -575,7 +702,7 @@
 
   if (identical(status_type, "unvalidated")) {
     return(
-      "The package does not yet claim external validation across the current public scope."
+      "The package does not yet claim independent validation across the current public scope."
     )
   }
 
@@ -598,12 +725,14 @@
       paste0(
         "<li>", badge("benchmarked"),
         " means the family has a documented comparison against a canonical",
-        " benchmark ladder or stored benchmark values.</li>"
+        " benchmark ladder, published table, software distribution, timing",
+        " sweep, parameter-sensitivity sweep, or formula reproduction check.</li>"
       ),
       paste0(
         "<li>", badge("validated"),
         " means the currently supported public scope has a documented",
-        " external software or independent-comparison check.</li>"
+        " independent same-problem solution check: exact/modal, BEM, FEM,",
+        " hybrid FEM/BEM, or equivalent full-wave evidence.</li>"
       ),
       paste0(
         "<li>", badge("partially_validated"),
@@ -612,13 +741,13 @@
       ),
       paste0(
         "<li>", badge("unvalidated"),
-        " means the package does not yet claim external validation across",
+        " means the package does not yet claim independent validation across",
         " the current public scope.</li>"
       ),
       paste0(
         "<li>", badge("experimental"),
         " means the family is available to use, but its interface or",
-        " supported workflow should still be treated as provisional.</li>"
+        " supported surface should still be treated as provisional.</li>"
       ),
       "</ul>",
       "<p>These tags are intended to be read in three pieces:</p>",

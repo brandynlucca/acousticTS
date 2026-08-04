@@ -1,4 +1,4 @@
-﻿---
+---
 title: "KRM"
 output:
   rmarkdown::html_vignette:
@@ -20,8 +20,10 @@ acousticTS:::.model_family_header(
   family = "krm",
   pages = c(
     Overview = "index.html",
+    Theory = "krm-theory.html",
     Implementation = "krm-implementation.html",
-    Theory = "krm-theory.html"
+    Benchmarks = "krm-benchmarks.html",
+    Validation = "krm-validation.html"
   )
 )
 ```
@@ -61,7 +63,9 @@ acousticTS:::.model_family_overview(
     "Coherent component combination without a full coupled body-bladder boundary-value solve"
   ),
   reading = c(
-    "[Implementation](krm-implementation.html): scatterer setup, spectra, and validation tables",
+    "[Implementation](krm-implementation.html): scatterer setup and spectra",
+    "[Benchmarks](krm-benchmarks.html): canonical targets and SBF software-comparison tables",
+    "[Validation](krm-validation.html): weak body-branch BEM transmission check",
     "[Theory](krm-theory.html): body Kirchhoff reduction, swimbladder mode/ray branches, and coherent composite sum"
   )
 )

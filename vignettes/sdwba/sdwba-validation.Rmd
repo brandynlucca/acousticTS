@@ -1,0 +1,903 @@
+---
+title: "SDWBA validation"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: false
+    fig_caption: yes
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
+vignette: >
+  %\VignetteIndexEntry{SDWBA validation}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# Validation
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  family = "sdwba",
+  pages = c(
+    Overview = "index.html",
+    Theory = "sdwba-theory.html",
+    Implementation = "sdwba-implementation.html",
+    Benchmarks = "sdwba-benchmarks.html",
+    Validation = "sdwba-validation.html"
+  )
+)
+```
+
+SDWBA is checked on weak finite-cylinder cases with stochastic controls fixed so residuals reflect the deterministic kernel.
+
+::: {.tip data-title="Residuals near nulls"}
+Mean absolute differences describe the typical agreement; maximum differences are retained because deep nulls can expose localized convention or resolution errors.
+:::
+
+## TS-Frequency
+
+Frequency rows retain the matched target and orientation while sweeping frequency.
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|:--|--:|--:|
+| finite-cylinder modal | liquid filled | 12 kHz | 12.0 | 90.0 | Length (mm) 70.000 | 0.081 | 0.081 |
+| finite-cylinder modal | liquid filled | 120 kHz | 120.0 | 90.0 | Length (mm) 70.000 | 0.246 | 0.246 |
+| finite-cylinder modal | liquid filled | 18 kHz | 18.0 | 90.0 | Length (mm) 70.000 | 0.070 | 0.070 |
+| finite-cylinder modal | liquid filled | 25 kHz | 25.0 | 90.0 | Length (mm) 70.000 | 0.055 | 0.055 |
+| finite-cylinder modal | liquid filled | 38 kHz | 38.0 | 90.0 | Length (mm) 70.000 | 0.006 | 0.006 |
+| finite-cylinder modal | liquid filled | 50 kHz | 50.0 | 90.0 | Length (mm) 70.000 | 0.182 | 0.182 |
+| finite-cylinder modal | liquid filled | 70 kHz | 70.0 | 90.0 | Length (mm) 70.000 | 0.108 | 0.108 |
+| finite-cylinder modal | liquid filled | 90 kHz | 90.0 | 90.0 | Length (mm) 70.000 | 0.086 | 0.086 |
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 12 kHz / 12.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 12 kHz | 12.0 | 90.0 | 70.000 | -89.789 | -89.870 | -0.081 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 120 kHz / 120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 120 kHz | 120.0 | 90.0 | 70.000 | -113.364 | -113.610 | -0.246 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 18 kHz / 18.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 18 kHz | 18.0 | 90.0 | 70.000 | -84.273 | -84.343 | -0.070 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 25 kHz / 25.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 25 kHz | 25.0 | 90.0 | 70.000 | -81.363 | -81.419 | -0.055 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 38 kHz / 38.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 38 kHz | 38.0 | 90.0 | 70.000 | -84.801 | -84.794 | 0.006 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 50 kHz / 50.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 50 kHz | 50.0 | 90.0 | 70.000 | -86.684 | -86.865 | -0.182 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 70 kHz / 70.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 70 kHz | 70.0 | 90.0 | 70.000 | -78.293 | -78.400 | -0.108 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 90 kHz / 90.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 90 kHz | 90.0 | 90.0 | 70.000 | -80.795 | -80.881 | -0.086 |
+
+</details>
+
+
+## TS-Orientation
+
+Orientation rows retain the matched target and frequency ladder while sweeping incidence or scatter angle.
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|:--|--:|--:|
+| finite-cylinder modal | liquid filled | 120 deg | 12.0 | 120.0 | Length (mm) 70.000 | 2.537 | 2.537 |
+| finite-cylinder modal | liquid filled | 120 deg | 120.0 | 120.0 | Length (mm) 70.000 | 3.526 | 3.526 |
+| finite-cylinder modal | liquid filled | 120 deg | 25.0 | 120.0 | Length (mm) 70.000 | 2.033 | 2.033 |
+| finite-cylinder modal | liquid filled | 120 deg | 38.0 | 120.0 | Length (mm) 70.000 | 2.983 | 2.983 |
+| finite-cylinder modal | liquid filled | 120 deg | 70.0 | 120.0 | Length (mm) 70.000 | 1.431 | 1.431 |
+| finite-cylinder modal | liquid filled | 150 deg | 12.0 | 150.0 | Length (mm) 70.000 | 16.484 | 16.484 |
+| finite-cylinder modal | liquid filled | 150 deg | 120.0 | 150.0 | Length (mm) 70.000 | 17.610 | 17.610 |
+| finite-cylinder modal | liquid filled | 150 deg | 25.0 | 150.0 | Length (mm) 70.000 | 7.636 | 7.636 |
+| finite-cylinder modal | liquid filled | 150 deg | 38.0 | 150.0 | Length (mm) 70.000 | 9.588 | 9.588 |
+| finite-cylinder modal | liquid filled | 150 deg | 70.0 | 150.0 | Length (mm) 70.000 | 12.891 | 12.891 |
+| finite-cylinder modal | liquid filled | 30 deg | 12.0 | 30.0 | Length (mm) 70.000 | 16.484 | 16.484 |
+| finite-cylinder modal | liquid filled | 30 deg | 120.0 | 30.0 | Length (mm) 70.000 | 17.610 | 17.610 |
+| finite-cylinder modal | liquid filled | 30 deg | 25.0 | 30.0 | Length (mm) 70.000 | 7.636 | 7.636 |
+| finite-cylinder modal | liquid filled | 30 deg | 38.0 | 30.0 | Length (mm) 70.000 | 9.588 | 9.588 |
+| finite-cylinder modal | liquid filled | 30 deg | 70.0 | 30.0 | Length (mm) 70.000 | 12.891 | 12.891 |
+| finite-cylinder modal | liquid filled | 60 deg | 12.0 | 60.0 | Length (mm) 70.000 | 2.537 | 2.537 |
+| finite-cylinder modal | liquid filled | 60 deg | 120.0 | 60.0 | Length (mm) 70.000 | 3.526 | 3.526 |
+| finite-cylinder modal | liquid filled | 60 deg | 25.0 | 60.0 | Length (mm) 70.000 | 2.033 | 2.033 |
+| finite-cylinder modal | liquid filled | 60 deg | 38.0 | 60.0 | Length (mm) 70.000 | 2.983 | 2.983 |
+| finite-cylinder modal | liquid filled | 60 deg | 70.0 | 60.0 | Length (mm) 70.000 | 1.431 | 1.431 |
+| finite-cylinder modal | liquid filled | 90 deg | 12.0 | 90.0 | Length (mm) 70.000 | 0.081 | 0.081 |
+| finite-cylinder modal | liquid filled | 90 deg | 120.0 | 90.0 | Length (mm) 70.000 | 0.246 | 0.246 |
+| finite-cylinder modal | liquid filled | 90 deg | 25.0 | 90.0 | Length (mm) 70.000 | 0.055 | 0.055 |
+| finite-cylinder modal | liquid filled | 90 deg | 38.0 | 90.0 | Length (mm) 70.000 | 0.006 | 0.006 |
+| finite-cylinder modal | liquid filled | 90 deg | 70.0 | 90.0 | Length (mm) 70.000 | 0.108 | 0.108 |
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 120 deg / 12.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 120 deg | 12.0 | 120.0 | 70.000 | -97.235 | -94.698 | 2.537 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 150 deg / 12.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 150 deg | 12.0 | 150.0 | 70.000 | -137.219 | -120.734 | 16.484 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 30 deg / 12.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 30 deg | 12.0 | 30.0 | 70.000 | -137.219 | -120.734 | 16.484 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 60 deg / 12.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 60 deg | 12.0 | 60.0 | 70.000 | -97.235 | -94.698 | 2.537 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 90 deg / 12.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 90 deg | 12.0 | 90.0 | 70.000 | -89.789 | -89.870 | -0.081 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 120 deg / 120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 120 deg | 120.0 | 120.0 | 70.000 | -102.252 | -98.725 | 3.526 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 150 deg / 120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 150 deg | 120.0 | 150.0 | 70.000 | -114.876 | -97.266 | 17.610 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 30 deg / 120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 30 deg | 120.0 | 30.0 | 70.000 | -114.876 | -97.266 | 17.610 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 60 deg / 120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 60 deg | 120.0 | 60.0 | 70.000 | -102.252 | -98.725 | 3.526 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 90 deg / 120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 90 deg | 120.0 | 90.0 | 70.000 | -113.364 | -113.610 | -0.246 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 120 deg / 25.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 120 deg | 25.0 | 120.0 | 70.000 | -99.006 | -96.973 | 2.033 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 150 deg / 25.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 150 deg | 25.0 | 150.0 | 70.000 | -121.179 | -113.544 | 7.636 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 30 deg / 25.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 30 deg | 25.0 | 30.0 | 70.000 | -121.179 | -113.544 | 7.636 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 60 deg / 25.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 60 deg | 25.0 | 60.0 | 70.000 | -99.006 | -96.973 | 2.033 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 90 deg / 25.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 90 deg | 25.0 | 90.0 | 70.000 | -81.363 | -81.419 | -0.055 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 120 deg / 38.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 120 deg | 38.0 | 120.0 | 70.000 | -101.433 | -98.450 | 2.983 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 150 deg / 38.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 150 deg | 38.0 | 150.0 | 70.000 | -112.252 | -102.664 | 9.588 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 30 deg / 38.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 30 deg | 38.0 | 30.0 | 70.000 | -112.252 | -102.664 | 9.588 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 60 deg / 38.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 60 deg | 38.0 | 60.0 | 70.000 | -101.433 | -98.450 | 2.983 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 90 deg / 38.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 90 deg | 38.0 | 90.0 | 70.000 | -84.801 | -84.794 | 0.006 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 120 deg / 70.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 120 deg | 70.0 | 120.0 | 70.000 | -99.980 | -98.549 | 1.431 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 150 deg / 70.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 150 deg | 70.0 | 150.0 | 70.000 | -110.634 | -97.743 | 12.891 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 30 deg / 70.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 30 deg | 70.0 | 30.0 | 70.000 | -110.634 | -97.743 | 12.891 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 60 deg / 70.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 60 deg | 70.0 | 60.0 | 70.000 | -99.980 | -98.549 | 1.431 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 90 deg / 70.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 90 deg | 70.0 | 90.0 | 70.000 | -78.293 | -78.400 | -0.108 |
+
+</details>
+
+
+## TS-Size
+
+Size rows retain the matched material constants while sweeping length, radius, diameter, or scale.
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|:--|--:|--:|
+| finite-cylinder modal | liquid filled | 105 x 15 mm | 12.0 | 90.0 | Length (mm) 105.000 | 0.070 | 0.070 |
+| finite-cylinder modal | liquid filled | 105 x 15 mm | 120.0 | 90.0 | Length (mm) 105.000 | 0.100 | 0.100 |
+| finite-cylinder modal | liquid filled | 105 x 15 mm | 25.0 | 90.0 | Length (mm) 105.000 | 0.001 | 0.001 |
+| finite-cylinder modal | liquid filled | 105 x 15 mm | 38.0 | 90.0 | Length (mm) 105.000 | 0.116 | 0.116 |
+| finite-cylinder modal | liquid filled | 105 x 15 mm | 70.0 | 90.0 | Length (mm) 105.000 | 0.121 | 0.121 |
+| finite-cylinder modal | liquid filled | 35 x 5 mm | 12.0 | 90.0 | Length (mm) 35.000 | 0.089 | 0.089 |
+| finite-cylinder modal | liquid filled | 35 x 5 mm | 120.0 | 90.0 | Length (mm) 35.000 | 0.109 | 0.109 |
+| finite-cylinder modal | liquid filled | 35 x 5 mm | 25.0 | 90.0 | Length (mm) 35.000 | 0.080 | 0.080 |
+| finite-cylinder modal | liquid filled | 35 x 5 mm | 38.0 | 90.0 | Length (mm) 35.000 | 0.068 | 0.068 |
+| finite-cylinder modal | liquid filled | 35 x 5 mm | 70.0 | 90.0 | Length (mm) 35.000 | 0.018 | 0.018 |
+| finite-cylinder modal | liquid filled | 70 x 10 mm | 12.0 | 90.0 | Length (mm) 70.000 | 0.081 | 0.081 |
+| finite-cylinder modal | liquid filled | 70 x 10 mm | 120.0 | 90.0 | Length (mm) 70.000 | 0.246 | 0.246 |
+| finite-cylinder modal | liquid filled | 70 x 10 mm | 25.0 | 90.0 | Length (mm) 70.000 | 0.055 | 0.055 |
+| finite-cylinder modal | liquid filled | 70 x 10 mm | 38.0 | 90.0 | Length (mm) 70.000 | 0.006 | 0.006 |
+| finite-cylinder modal | liquid filled | 70 x 10 mm | 70.0 | 90.0 | Length (mm) 70.000 | 0.108 | 0.108 |
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 105 x 15 mm / 12.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 105 x 15 mm | 12.0 | 90.0 | 105.000 | -80.751 | -80.821 | -0.070 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 35 x 5 mm / 12.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 35 x 5 mm | 12.0 | 90.0 | 35.000 | -106.975 | -107.064 | -0.089 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 70 x 10 mm / 12.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 70 x 10 mm | 12.0 | 90.0 | 70.000 | -89.789 | -89.870 | -0.081 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 105 x 15 mm / 120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 105 x 15 mm | 120.0 | 90.0 | 105.000 | -70.194 | -70.293 | -0.100 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 35 x 5 mm / 120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 35 x 5 mm | 120.0 | 90.0 | 35.000 | -84.305 | -84.414 | -0.109 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 70 x 10 mm / 120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 70 x 10 mm | 120.0 | 90.0 | 70.000 | -113.364 | -113.610 | -0.246 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 105 x 15 mm / 25.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 105 x 15 mm | 25.0 | 90.0 | 105.000 | -80.822 | -80.821 | 0.001 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 35 x 5 mm / 25.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 35 x 5 mm | 25.0 | 90.0 | 35.000 | -95.201 | -95.282 | -0.080 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 70 x 10 mm / 25.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 70 x 10 mm | 25.0 | 90.0 | 70.000 | -81.363 | -81.419 | -0.055 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 105 x 15 mm / 38.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 105 x 15 mm | 38.0 | 90.0 | 105.000 | -76.062 | -76.179 | -0.116 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 35 x 5 mm / 38.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 35 x 5 mm | 38.0 | 90.0 | 35.000 | -89.680 | -89.748 | -0.068 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 70 x 10 mm / 38.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 70 x 10 mm | 38.0 | 90.0 | 70.000 | -84.801 | -84.794 | 0.006 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 105 x 15 mm / 70.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 105 x 15 mm | 70.0 | 90.0 | 105.000 | -72.286 | -72.407 | -0.121 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 35 x 5 mm / 70.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 35 x 5 mm | 70.0 | 90.0 | 35.000 | -88.650 | -88.669 | -0.018 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 70 x 10 mm / 70.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 70 x 10 mm | 70.0 | 90.0 | 70.000 | -78.293 | -78.400 | -0.108 |
+
+</details>
+
+
+## TS-Parameter
+
+Parameter rows retain the matched geometry class while sweeping material, curvature, taper, thickness, or discretization parameters.
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|:--|--:|--:|
+| finite-cylinder modal | liquid filled | denser faster | 12.0-120.0 | 60.0-120.0 | Length (mm) 70.000 | 1.757 | 3.950 |
+| finite-cylinder modal | liquid filled | lighter slower | 12.0-120.0 | 60.0-120.0 | Length (mm) 70.000 | 1.647 | 2.787 |
+| finite-cylinder modal | liquid filled | near matched | 12.0-120.0 | 60.0-120.0 | Length (mm) 70.000 | 1.701 | 3.526 |
+
+<details>
+<summary>finite-cylinder modal / liquid filled / denser faster / 12.0-120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | denser faster | 12.0 | 60.0 | 70.000 | -83.579 | -80.981 | 2.598 |
+| finite-cylinder modal | liquid filled | denser faster | 12.0 | 90.0 | 70.000 | -76.136 | -76.262 | -0.126 |
+| finite-cylinder modal | liquid filled | denser faster | 12.0 | 120.0 | 70.000 | -83.579 | -80.981 | 2.598 |
+| finite-cylinder modal | liquid filled | denser faster | 25.0 | 60.0 | 70.000 | -85.350 | -83.761 | 1.589 |
+| finite-cylinder modal | liquid filled | denser faster | 25.0 | 90.0 | 70.000 | -67.691 | -67.713 | -0.022 |
+| finite-cylinder modal | liquid filled | denser faster | 25.0 | 120.0 | 70.000 | -85.350 | -83.761 | 1.589 |
+| finite-cylinder modal | liquid filled | denser faster | 38.0 | 60.0 | 70.000 | -87.648 | -83.921 | 3.727 |
+| finite-cylinder modal | liquid filled | denser faster | 38.0 | 90.0 | 70.000 | -70.785 | -70.696 | 0.089 |
+| finite-cylinder modal | liquid filled | denser faster | 38.0 | 120.0 | 70.000 | -87.648 | -83.921 | 3.727 |
+| finite-cylinder modal | liquid filled | denser faster | 70.0 | 60.0 | 70.000 | -86.496 | -85.797 | 0.699 |
+| finite-cylinder modal | liquid filled | denser faster | 70.0 | 90.0 | 70.000 | -64.338 | -64.426 | -0.088 |
+| finite-cylinder modal | liquid filled | denser faster | 70.0 | 120.0 | 70.000 | -86.496 | -85.797 | 0.699 |
+| finite-cylinder modal | liquid filled | denser faster | 120.0 | 60.0 | 70.000 | -88.338 | -84.388 | 3.950 |
+| finite-cylinder modal | liquid filled | denser faster | 120.0 | 90.0 | 70.000 | -81.411 | -82.310 | -0.899 |
+| finite-cylinder modal | liquid filled | denser faster | 120.0 | 120.0 | 70.000 | -88.338 | -84.388 | 3.950 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / lighter slower / 12.0-120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | lighter slower | 12.0 | 60.0 | 70.000 | -84.714 | -82.239 | 2.475 |
+| finite-cylinder modal | liquid filled | lighter slower | 12.0 | 90.0 | 70.000 | -77.264 | -77.293 | -0.029 |
+| finite-cylinder modal | liquid filled | lighter slower | 12.0 | 120.0 | 70.000 | -84.714 | -82.239 | 2.475 |
+| finite-cylinder modal | liquid filled | lighter slower | 25.0 | 60.0 | 70.000 | -86.486 | -84.024 | 2.463 |
+| finite-cylinder modal | liquid filled | lighter slower | 25.0 | 90.0 | 70.000 | -68.862 | -68.947 | -0.085 |
+| finite-cylinder modal | liquid filled | lighter slower | 25.0 | 120.0 | 70.000 | -86.486 | -84.024 | 2.463 |
+| finite-cylinder modal | liquid filled | lighter slower | 38.0 | 60.0 | 70.000 | -89.060 | -86.938 | 2.122 |
+| finite-cylinder modal | liquid filled | lighter slower | 38.0 | 90.0 | 70.000 | -72.692 | -72.766 | -0.074 |
+| finite-cylinder modal | liquid filled | lighter slower | 38.0 | 120.0 | 70.000 | -89.060 | -86.938 | 2.122 |
+| finite-cylinder modal | liquid filled | lighter slower | 70.0 | 60.0 | 70.000 | -87.307 | -85.273 | 2.034 |
+| finite-cylinder modal | liquid filled | lighter slower | 70.0 | 90.0 | 70.000 | -66.149 | -66.253 | -0.103 |
+| finite-cylinder modal | liquid filled | lighter slower | 70.0 | 120.0 | 70.000 | -87.307 | -85.273 | 2.034 |
+| finite-cylinder modal | liquid filled | lighter slower | 120.0 | 60.0 | 70.000 | -90.117 | -87.329 | 2.787 |
+| finite-cylinder modal | liquid filled | lighter slower | 120.0 | 90.0 | 70.000 | -80.416 | -81.064 | -0.648 |
+| finite-cylinder modal | liquid filled | lighter slower | 120.0 | 120.0 | 70.000 | -90.117 | -87.329 | 2.787 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / near matched / 12.0-120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | near matched | 12.0 | 60.0 | 70.000 | -97.235 | -94.698 | 2.537 |
+| finite-cylinder modal | liquid filled | near matched | 12.0 | 90.0 | 70.000 | -89.789 | -89.870 | -0.081 |
+| finite-cylinder modal | liquid filled | near matched | 12.0 | 120.0 | 70.000 | -97.235 | -94.698 | 2.537 |
+| finite-cylinder modal | liquid filled | near matched | 25.0 | 60.0 | 70.000 | -99.006 | -96.973 | 2.033 |
+| finite-cylinder modal | liquid filled | near matched | 25.0 | 90.0 | 70.000 | -81.363 | -81.419 | -0.055 |
+| finite-cylinder modal | liquid filled | near matched | 25.0 | 120.0 | 70.000 | -99.006 | -96.973 | 2.033 |
+| finite-cylinder modal | liquid filled | near matched | 38.0 | 60.0 | 70.000 | -101.433 | -98.450 | 2.983 |
+| finite-cylinder modal | liquid filled | near matched | 38.0 | 90.0 | 70.000 | -84.801 | -84.794 | 0.006 |
+| finite-cylinder modal | liquid filled | near matched | 38.0 | 120.0 | 70.000 | -101.433 | -98.450 | 2.983 |
+| finite-cylinder modal | liquid filled | near matched | 70.0 | 60.0 | 70.000 | -99.980 | -98.549 | 1.431 |
+| finite-cylinder modal | liquid filled | near matched | 70.0 | 90.0 | 70.000 | -78.293 | -78.400 | -0.108 |
+| finite-cylinder modal | liquid filled | near matched | 70.0 | 120.0 | 70.000 | -99.980 | -98.549 | 1.431 |
+| finite-cylinder modal | liquid filled | near matched | 120.0 | 60.0 | 70.000 | -102.252 | -98.725 | 3.526 |
+| finite-cylinder modal | liquid filled | near matched | 120.0 | 90.0 | 70.000 | -113.364 | -113.610 | -0.246 |
+| finite-cylinder modal | liquid filled | near matched | 120.0 | 120.0 | 70.000 | -102.252 | -98.725 | 3.526 |
+
+</details>
+
+
+## Boundary Cases
+
+Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled, and shell cases when those branches apply.
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|:--|--:|--:|
+| finite-cylinder modal | liquid filled | 105 x 15 mm | 12.0-120.0 | 90.0 | Length (mm) 105.000 | 0.082 | 0.121 |
+| finite-cylinder modal | liquid filled | 12 kHz | 12.0 | 90.0 | Length (mm) 70.000 | 0.081 | 0.081 |
+| finite-cylinder modal | liquid filled | 120 deg | 12.0-120.0 | 120.0 | Length (mm) 70.000 | 2.502 | 3.526 |
+| finite-cylinder modal | liquid filled | 120 kHz | 120.0 | 90.0 | Length (mm) 70.000 | 0.246 | 0.246 |
+| finite-cylinder modal | liquid filled | 150 deg | 12.0-120.0 | 150.0 | Length (mm) 70.000 | 12.842 | 17.610 |
+| finite-cylinder modal | liquid filled | 18 kHz | 18.0 | 90.0 | Length (mm) 70.000 | 0.070 | 0.070 |
+| finite-cylinder modal | liquid filled | 25 kHz | 25.0 | 90.0 | Length (mm) 70.000 | 0.055 | 0.055 |
+| finite-cylinder modal | liquid filled | 30 deg | 12.0-120.0 | 30.0 | Length (mm) 70.000 | 12.842 | 17.610 |
+| finite-cylinder modal | liquid filled | 35 x 5 mm | 12.0-120.0 | 90.0 | Length (mm) 35.000 | 0.073 | 0.109 |
+| finite-cylinder modal | liquid filled | 38 kHz | 38.0 | 90.0 | Length (mm) 70.000 | 0.006 | 0.006 |
+| finite-cylinder modal | liquid filled | 50 kHz | 50.0 | 90.0 | Length (mm) 70.000 | 0.182 | 0.182 |
+| finite-cylinder modal | liquid filled | 60 deg | 12.0-120.0 | 60.0 | Length (mm) 70.000 | 2.502 | 3.526 |
+| finite-cylinder modal | liquid filled | 70 kHz | 70.0 | 90.0 | Length (mm) 70.000 | 0.108 | 0.108 |
+| finite-cylinder modal | liquid filled | 70 x 10 mm | 12.0-120.0 | 90.0 | Length (mm) 70.000 | 0.099 | 0.246 |
+| finite-cylinder modal | liquid filled | 90 deg | 12.0-120.0 | 90.0 | Length (mm) 70.000 | 0.099 | 0.246 |
+| finite-cylinder modal | liquid filled | 90 kHz | 90.0 | 90.0 | Length (mm) 70.000 | 0.086 | 0.086 |
+| finite-cylinder modal | liquid filled | denser faster | 12.0-120.0 | 60.0-120.0 | Length (mm) 70.000 | 1.757 | 3.950 |
+| finite-cylinder modal | liquid filled | lighter slower | 12.0-120.0 | 60.0-120.0 | Length (mm) 70.000 | 1.647 | 2.787 |
+| finite-cylinder modal | liquid filled | near matched | 12.0-120.0 | 60.0-120.0 | Length (mm) 70.000 | 1.701 | 3.526 |
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 105 x 15 mm / 12.0-120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 105 x 15 mm | 12.0 | 90.0 | 105.000 | -80.751 | -80.821 | -0.070 |
+| finite-cylinder modal | liquid filled | 105 x 15 mm | 25.0 | 90.0 | 105.000 | -80.822 | -80.821 | 0.001 |
+| finite-cylinder modal | liquid filled | 105 x 15 mm | 38.0 | 90.0 | 105.000 | -76.062 | -76.179 | -0.116 |
+| finite-cylinder modal | liquid filled | 105 x 15 mm | 70.0 | 90.0 | 105.000 | -72.286 | -72.407 | -0.121 |
+| finite-cylinder modal | liquid filled | 105 x 15 mm | 120.0 | 90.0 | 105.000 | -70.194 | -70.293 | -0.100 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 12 kHz / 12.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 12 kHz | 12.0 | 90.0 | 70.000 | -89.789 | -89.870 | -0.081 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 120 deg / 12.0-120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 120 deg | 12.0 | 120.0 | 70.000 | -97.235 | -94.698 | 2.537 |
+| finite-cylinder modal | liquid filled | 120 deg | 25.0 | 120.0 | 70.000 | -99.006 | -96.973 | 2.033 |
+| finite-cylinder modal | liquid filled | 120 deg | 38.0 | 120.0 | 70.000 | -101.433 | -98.450 | 2.983 |
+| finite-cylinder modal | liquid filled | 120 deg | 70.0 | 120.0 | 70.000 | -99.980 | -98.549 | 1.431 |
+| finite-cylinder modal | liquid filled | 120 deg | 120.0 | 120.0 | 70.000 | -102.252 | -98.725 | 3.526 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 120 kHz / 120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 120 kHz | 120.0 | 90.0 | 70.000 | -113.364 | -113.610 | -0.246 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 150 deg / 12.0-120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 150 deg | 12.0 | 150.0 | 70.000 | -137.219 | -120.734 | 16.484 |
+| finite-cylinder modal | liquid filled | 150 deg | 25.0 | 150.0 | 70.000 | -121.179 | -113.544 | 7.636 |
+| finite-cylinder modal | liquid filled | 150 deg | 38.0 | 150.0 | 70.000 | -112.252 | -102.664 | 9.588 |
+| finite-cylinder modal | liquid filled | 150 deg | 70.0 | 150.0 | 70.000 | -110.634 | -97.743 | 12.891 |
+| finite-cylinder modal | liquid filled | 150 deg | 120.0 | 150.0 | 70.000 | -114.876 | -97.266 | 17.610 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 18 kHz / 18.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 18 kHz | 18.0 | 90.0 | 70.000 | -84.273 | -84.343 | -0.070 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 25 kHz / 25.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 25 kHz | 25.0 | 90.0 | 70.000 | -81.363 | -81.419 | -0.055 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 30 deg / 12.0-120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 30 deg | 12.0 | 30.0 | 70.000 | -137.219 | -120.734 | 16.484 |
+| finite-cylinder modal | liquid filled | 30 deg | 25.0 | 30.0 | 70.000 | -121.179 | -113.544 | 7.636 |
+| finite-cylinder modal | liquid filled | 30 deg | 38.0 | 30.0 | 70.000 | -112.252 | -102.664 | 9.588 |
+| finite-cylinder modal | liquid filled | 30 deg | 70.0 | 30.0 | 70.000 | -110.634 | -97.743 | 12.891 |
+| finite-cylinder modal | liquid filled | 30 deg | 120.0 | 30.0 | 70.000 | -114.876 | -97.266 | 17.610 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 35 x 5 mm / 12.0-120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 35 x 5 mm | 12.0 | 90.0 | 35.000 | -106.975 | -107.064 | -0.089 |
+| finite-cylinder modal | liquid filled | 35 x 5 mm | 25.0 | 90.0 | 35.000 | -95.201 | -95.282 | -0.080 |
+| finite-cylinder modal | liquid filled | 35 x 5 mm | 38.0 | 90.0 | 35.000 | -89.680 | -89.748 | -0.068 |
+| finite-cylinder modal | liquid filled | 35 x 5 mm | 70.0 | 90.0 | 35.000 | -88.650 | -88.669 | -0.018 |
+| finite-cylinder modal | liquid filled | 35 x 5 mm | 120.0 | 90.0 | 35.000 | -84.305 | -84.414 | -0.109 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 38 kHz / 38.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 38 kHz | 38.0 | 90.0 | 70.000 | -84.801 | -84.794 | 0.006 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 50 kHz / 50.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 50 kHz | 50.0 | 90.0 | 70.000 | -86.684 | -86.865 | -0.182 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 60 deg / 12.0-120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 60 deg | 12.0 | 60.0 | 70.000 | -97.235 | -94.698 | 2.537 |
+| finite-cylinder modal | liquid filled | 60 deg | 25.0 | 60.0 | 70.000 | -99.006 | -96.973 | 2.033 |
+| finite-cylinder modal | liquid filled | 60 deg | 38.0 | 60.0 | 70.000 | -101.433 | -98.450 | 2.983 |
+| finite-cylinder modal | liquid filled | 60 deg | 70.0 | 60.0 | 70.000 | -99.980 | -98.549 | 1.431 |
+| finite-cylinder modal | liquid filled | 60 deg | 120.0 | 60.0 | 70.000 | -102.252 | -98.725 | 3.526 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 70 kHz / 70.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 70 kHz | 70.0 | 90.0 | 70.000 | -78.293 | -78.400 | -0.108 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 70 x 10 mm / 12.0-120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 70 x 10 mm | 12.0 | 90.0 | 70.000 | -89.789 | -89.870 | -0.081 |
+| finite-cylinder modal | liquid filled | 70 x 10 mm | 25.0 | 90.0 | 70.000 | -81.363 | -81.419 | -0.055 |
+| finite-cylinder modal | liquid filled | 70 x 10 mm | 38.0 | 90.0 | 70.000 | -84.801 | -84.794 | 0.006 |
+| finite-cylinder modal | liquid filled | 70 x 10 mm | 70.0 | 90.0 | 70.000 | -78.293 | -78.400 | -0.108 |
+| finite-cylinder modal | liquid filled | 70 x 10 mm | 120.0 | 90.0 | 70.000 | -113.364 | -113.610 | -0.246 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 90 deg / 12.0-120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 90 deg | 12.0 | 90.0 | 70.000 | -89.789 | -89.870 | -0.081 |
+| finite-cylinder modal | liquid filled | 90 deg | 25.0 | 90.0 | 70.000 | -81.363 | -81.419 | -0.055 |
+| finite-cylinder modal | liquid filled | 90 deg | 38.0 | 90.0 | 70.000 | -84.801 | -84.794 | 0.006 |
+| finite-cylinder modal | liquid filled | 90 deg | 70.0 | 90.0 | 70.000 | -78.293 | -78.400 | -0.108 |
+| finite-cylinder modal | liquid filled | 90 deg | 120.0 | 90.0 | 70.000 | -113.364 | -113.610 | -0.246 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / 90 kHz / 90.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | 90 kHz | 90.0 | 90.0 | 70.000 | -80.795 | -80.881 | -0.086 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / denser faster / 12.0-120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | denser faster | 12.0 | 60.0 | 70.000 | -83.579 | -80.981 | 2.598 |
+| finite-cylinder modal | liquid filled | denser faster | 12.0 | 90.0 | 70.000 | -76.136 | -76.262 | -0.126 |
+| finite-cylinder modal | liquid filled | denser faster | 12.0 | 120.0 | 70.000 | -83.579 | -80.981 | 2.598 |
+| finite-cylinder modal | liquid filled | denser faster | 25.0 | 60.0 | 70.000 | -85.350 | -83.761 | 1.589 |
+| finite-cylinder modal | liquid filled | denser faster | 25.0 | 90.0 | 70.000 | -67.691 | -67.713 | -0.022 |
+| finite-cylinder modal | liquid filled | denser faster | 25.0 | 120.0 | 70.000 | -85.350 | -83.761 | 1.589 |
+| finite-cylinder modal | liquid filled | denser faster | 38.0 | 60.0 | 70.000 | -87.648 | -83.921 | 3.727 |
+| finite-cylinder modal | liquid filled | denser faster | 38.0 | 90.0 | 70.000 | -70.785 | -70.696 | 0.089 |
+| finite-cylinder modal | liquid filled | denser faster | 38.0 | 120.0 | 70.000 | -87.648 | -83.921 | 3.727 |
+| finite-cylinder modal | liquid filled | denser faster | 70.0 | 60.0 | 70.000 | -86.496 | -85.797 | 0.699 |
+| finite-cylinder modal | liquid filled | denser faster | 70.0 | 90.0 | 70.000 | -64.338 | -64.426 | -0.088 |
+| finite-cylinder modal | liquid filled | denser faster | 70.0 | 120.0 | 70.000 | -86.496 | -85.797 | 0.699 |
+| finite-cylinder modal | liquid filled | denser faster | 120.0 | 60.0 | 70.000 | -88.338 | -84.388 | 3.950 |
+| finite-cylinder modal | liquid filled | denser faster | 120.0 | 90.0 | 70.000 | -81.411 | -82.310 | -0.899 |
+| finite-cylinder modal | liquid filled | denser faster | 120.0 | 120.0 | 70.000 | -88.338 | -84.388 | 3.950 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / lighter slower / 12.0-120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | lighter slower | 12.0 | 60.0 | 70.000 | -84.714 | -82.239 | 2.475 |
+| finite-cylinder modal | liquid filled | lighter slower | 12.0 | 90.0 | 70.000 | -77.264 | -77.293 | -0.029 |
+| finite-cylinder modal | liquid filled | lighter slower | 12.0 | 120.0 | 70.000 | -84.714 | -82.239 | 2.475 |
+| finite-cylinder modal | liquid filled | lighter slower | 25.0 | 60.0 | 70.000 | -86.486 | -84.024 | 2.463 |
+| finite-cylinder modal | liquid filled | lighter slower | 25.0 | 90.0 | 70.000 | -68.862 | -68.947 | -0.085 |
+| finite-cylinder modal | liquid filled | lighter slower | 25.0 | 120.0 | 70.000 | -86.486 | -84.024 | 2.463 |
+| finite-cylinder modal | liquid filled | lighter slower | 38.0 | 60.0 | 70.000 | -89.060 | -86.938 | 2.122 |
+| finite-cylinder modal | liquid filled | lighter slower | 38.0 | 90.0 | 70.000 | -72.692 | -72.766 | -0.074 |
+| finite-cylinder modal | liquid filled | lighter slower | 38.0 | 120.0 | 70.000 | -89.060 | -86.938 | 2.122 |
+| finite-cylinder modal | liquid filled | lighter slower | 70.0 | 60.0 | 70.000 | -87.307 | -85.273 | 2.034 |
+| finite-cylinder modal | liquid filled | lighter slower | 70.0 | 90.0 | 70.000 | -66.149 | -66.253 | -0.103 |
+| finite-cylinder modal | liquid filled | lighter slower | 70.0 | 120.0 | 70.000 | -87.307 | -85.273 | 2.034 |
+| finite-cylinder modal | liquid filled | lighter slower | 120.0 | 60.0 | 70.000 | -90.117 | -87.329 | 2.787 |
+| finite-cylinder modal | liquid filled | lighter slower | 120.0 | 90.0 | 70.000 | -80.416 | -81.064 | -0.648 |
+| finite-cylinder modal | liquid filled | lighter slower | 120.0 | 120.0 | 70.000 | -90.117 | -87.329 | 2.787 |
+
+</details>
+
+<details>
+<summary>finite-cylinder modal / liquid filled / near matched / 12.0-120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| finite-cylinder modal | liquid filled | near matched | 12.0 | 60.0 | 70.000 | -97.235 | -94.698 | 2.537 |
+| finite-cylinder modal | liquid filled | near matched | 12.0 | 90.0 | 70.000 | -89.789 | -89.870 | -0.081 |
+| finite-cylinder modal | liquid filled | near matched | 12.0 | 120.0 | 70.000 | -97.235 | -94.698 | 2.537 |
+| finite-cylinder modal | liquid filled | near matched | 25.0 | 60.0 | 70.000 | -99.006 | -96.973 | 2.033 |
+| finite-cylinder modal | liquid filled | near matched | 25.0 | 90.0 | 70.000 | -81.363 | -81.419 | -0.055 |
+| finite-cylinder modal | liquid filled | near matched | 25.0 | 120.0 | 70.000 | -99.006 | -96.973 | 2.033 |
+| finite-cylinder modal | liquid filled | near matched | 38.0 | 60.0 | 70.000 | -101.433 | -98.450 | 2.983 |
+| finite-cylinder modal | liquid filled | near matched | 38.0 | 90.0 | 70.000 | -84.801 | -84.794 | 0.006 |
+| finite-cylinder modal | liquid filled | near matched | 38.0 | 120.0 | 70.000 | -101.433 | -98.450 | 2.983 |
+| finite-cylinder modal | liquid filled | near matched | 70.0 | 60.0 | 70.000 | -99.980 | -98.549 | 1.431 |
+| finite-cylinder modal | liquid filled | near matched | 70.0 | 90.0 | 70.000 | -78.293 | -78.400 | -0.108 |
+| finite-cylinder modal | liquid filled | near matched | 70.0 | 120.0 | 70.000 | -99.980 | -98.549 | 1.431 |
+| finite-cylinder modal | liquid filled | near matched | 120.0 | 60.0 | 70.000 | -102.252 | -98.725 | 3.526 |
+| finite-cylinder modal | liquid filled | near matched | 120.0 | 90.0 | 70.000 | -113.364 | -113.610 | -0.246 |
+| finite-cylinder modal | liquid filled | near matched | 120.0 | 120.0 | 70.000 | -102.252 | -98.725 | 3.526 |
+
+</details>
+
+
+## Residual Summary
+
+| Axis | Method | Boundary | Frequency (kHz) | Angle (deg) | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|--:|--:|
+| Boundary Cases | finite-cylinder modal | liquid filled | 12.0-120.0 | 30.0-150.0 | 2.501 | 17.610 |
+| TS-Frequency | finite-cylinder modal | liquid filled | 12.0-120.0 | 90.0 | 0.104 | 0.246 |
+| TS-Orientation | finite-cylinder modal | liquid filled | 12.0-120.0 | 30.0-150.0 | 6.157 | 17.610 |
+| TS-Parameter | finite-cylinder modal | liquid filled | 12.0-120.0 | 60.0-120.0 | 1.701 | 3.950 |
+| TS-Size | finite-cylinder modal | liquid filled | 12.0-120.0 | 90.0 | 0.085 | 0.246 |
+

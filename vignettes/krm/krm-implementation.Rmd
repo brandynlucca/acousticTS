@@ -1,4 +1,4 @@
-﻿---
+---
 title: "KRM implementation"
 output:
   rmarkdown::html_vignette:
@@ -25,8 +25,10 @@ acousticTS:::.model_family_header(
   family = "krm",
   pages = c(
     Overview = "index.html",
+    Theory = "krm-theory.html",
     Implementation = "krm-implementation.html",
-    Theory = "krm-theory.html"
+    Benchmarks = "krm-benchmarks.html",
+    Validation = "krm-validation.html"
   )
 )
 ```
@@ -170,105 +172,9 @@ For practical KRM work, the first inputs to revisit are usually:
 
 For more realistic biological examples, the bundled `cod` and `sardine` datasets are the natural next objects to inspect because they already package body and swimbladder geometry in the format expected by the model.
 
-### Modal-series benchmark comparisons
+### Evidence references
 
-The primary KRM implementation benchmark for the canonical gas-filled and weakly scattering shapes is the published modal-series reference solution for each isolated canonical case. The summary table below keeps that benchmark visible without mixing it with the separate software-compatibility checks for body-plus-swimbladder targets.
+For KRM evidence, use:
 
-| Canonical case | Max abs. $\Delta$ TS (dB) | Mean abs. $\Delta$ TS (dB) | Elapsed (s) |
-|:--|--:|--:|--:|
-| Gas sphere | 7.91469 | 6.04116 | 0.01 |
-| Weakly scattering sphere | 11.21090 | 0.47451 | 0.15 |
-| Gas prolate spheroid | 7.36054 | 4.62751 | 0.00 |
-| Weakly scattering prolate spheroid | 14.27193 | 0.46239 | 0.00 |
-| Gas cylinder | 7.35632 | 6.19094 | 0.02 |
-| Weakly scattering cylinder | 23.22115 | 0.59807 | 0.02 |
-
-The modal-series table above remains the implementation benchmark for the canonical KRM targets.
-
-### Bundled fish compatibility checks {.tabset .tabset-fade .tabset-pills}
-
-The bundled fish objects serve a different benchmark role from the canonical modal-series targets above. There is no exact modal-series reference for these segmented body-plus-swimbladder geometries, so they are used only to check software-to-software agreement for the `krm_variant` branches on realistic fish shapes. This inclues KRMr [@KRMr_software], echoSMs [@echoSMs_software], and the SWFSC applet [@NOAA_KRM_software].
-
-#### Sardine
-
-::: {.panel-tabset}
-
-##### `krm_variant = lowcontrast`
-
-| $\vert \overline{\Delta TS} \vert$ (dB)  | | | | |
-| :---: | :---:  | :---:  | :---:  | :---:  |
-| | acousticTS | KRMr | echoSMs | NOAA SWFSC applet |
-| acousticTS | - | 1.6e-14 | 3.3e-14 | 2.6e-3 |
-| KRMr | 1.6e-14 | - | 3.9e-14 | 2.6e-3 |
-| echoSMs | 3.3e-14 | 3.9e-14 | - | 2.6e-3 |
-| NOAA SWFSC applet | 2.6e-3 | 2.6e-3 | 2.6e-3 | - | 
-
-| $\max \vert {\Delta TS} \vert$ (dB)  | | | | |
-| :---: | :---:  | :---:  | :---:  | :---:  |
-| | acousticTS | KRMr | echoSMs | NOAA SWFSC applet |
-| acousticTS | - | 1.4e-13 | 5.5e-13 | 5.0e-3 |
-| KRMr | 1.4e-13 | - | 5.5e-13 | 5.0e-3 |
-| echoSMs | 5.5e-13 | 5.5e-13 | - | 5.0e-3 |
-| NOAA SWFSC applet | 5.0e-3 | 5.0e-3 | 5.0e-3 | - | 
-
-##### `krm_variant = body_embedded`
-
-| Compared to... | $\vert \overline{\Delta TS} \vert$ (dB) | $\max \vert \Delta TS \vert$ (dB) |
-| :---: | :---:  | :---:  |
-| echoSMs | 3.4e-14 | 1.9e-13 |
-
-##### `krm_variant = mixed`
-
-| Compared to... | $\vert \overline{\Delta TS} \vert$ (dB) | $\max \vert \Delta TS \vert$ (dB) |
-| :---: | :---:  | :---:  |
-| echoSMs | 3.4e-14 | 1.9e-13 |
-
-:::
-
-#### Cod
-
-::: {.panel-tabset}
-
-##### `krm_variant = lowcontrast`
-
-| $\vert \overline{\Delta TS} \vert$ (dB)  | | | | |
-| :---: | :---:  | :---:  | :---:  | :---:  |
-| | acousticTS | KRMr | echoSMs | NOAA SWFSC applet |
-| acousticTS | - | 1.3e-14 | 5.4e-15 | 2.6e-3 |
-| KRMr | 1.3e-14 | - | 3.9e-14 | - |
-| echoSMs | 5.4e-14 | 3.9e-14 | - | - |
-| NOAA SWFSC applet | 2.6e-3 | - | - | - | 
-
-| $\max \vert {\Delta TS} \vert$ (dB)  | | | | |
-| :---: | :---:  | :---:  | :---:  | :---:  |
-| | acousticTS | KRMr | echoSMs | NOAA SWFSC applet |
-| acousticTS | - | 7.8e-14 | 3.6e-14 | 5.0e-3 |
-| KRMr | 7.8e-14 | - | 8.5e-13 | - |
-| echoSMs | 3.6e-14 | 8.5e-13 | - | - |
-| NOAA SWFSC applet | 5.0e-3 | - | - | - | 
-
-##### `krm_variant = body_embedded`
-
-| Compared to... | $\vert \overline{\Delta TS} \vert$ (dB) | $\max \vert \Delta TS \vert$ (dB) |
-| :---: | :---:  | :---:  |
-| echoSMs | 6.2e-15 | 5.7e-14 |
-
-##### `krm_variant = mixed`
-
-| Compared to... | $\vert \overline{\Delta TS} \vert$ (dB) | $\max \vert \Delta TS \vert$ (dB) |
-| :---: | :---:  | :---:  |
-| echoSMs | 6.2e-15 | 5.7e-14 |
-
-:::
-
-Those values make the branch behavior explicit:
-
-1. `lowcontrast` remains the default because it reproduces the low-contrast software family on both bundled fish objects.
-2. `body_embedded` remains the literal body-medium alternative and lines up with the corresponding body-embedded spectrum.
-3. `mixed` is still exposed because it is a distinct literature convention, even though on both bundled fish frequency grids it collapses numerically onto `body_embedded`.
-
-The two benchmark roles are explicit:
-
-1. canonical modal-series tables for isolated-shape KRM implementation checks, and
-2. bundled-fish compatibility checks for the body-plus-swimbladder convention choice.
-
+- [KRM benchmarks](krm-benchmarks.html)
+- [KRM validation](krm-validation.html)

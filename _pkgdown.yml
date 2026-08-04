@@ -65,6 +65,8 @@ navbar:
     developers:
       text: Developers
       menu:
+        - text: "Validation methods"
+          href: articles/validation-methods/validation-methods.html
         - text: "Creating models"
           href: articles/creating-models-from-scratch/creating-models-from-scratch.html
         - text: "Combining components"
@@ -123,6 +125,7 @@ articles:
 
   - title: Developer Guides
     contents:
+      - validation-methods/validation-methods
       - creating-models-from-scratch/creating-models-from-scratch
       - combining-components/combining-components
       - faq-troubleshooting/faq-troubleshooting
@@ -135,54 +138,82 @@ articles:
     contents:
       - sphms/index
       - sphms/sphms-implementation
+      - sphms/sphms-benchmarks
+      - sphms/sphms-validation
       - sphms/sphms-theory
       - fcms/index
       - fcms/fcms-implementation
+      - fcms/fcms-benchmarks
+      - fcms/fcms-validation
       - fcms/fcms-theory
       - psms/index
       - psms/psms-implementation
+      - psms/psms-benchmarks
+      - psms/psms-validation
       - psms/psms-theory
       - tmm/index
       - tmm/tmm-implementation
+      - tmm/tmm-benchmarks
+      - tmm/tmm-validation
       - tmm/tmm-theory
       - calibration/index
       - calibration/calibration-implementation
+      - calibration/calibration-benchmarks
+      - calibration/calibration-validation
       - calibration/calibration-theory
       - essms/index
       - essms/essms-implementation
+      - essms/essms-validation
       - essms/essms-theory
       - bcms/index
       - bcms/bcms-implementation
+      - bcms/bcms-validation
       - bcms/bcms-theory
       - ecms/index
       - ecms/ecms-implementation
+      - ecms/ecms-validation
       - ecms/ecms-theory
 
   - title: Approximation and Composite Families
     contents:
       - dwba/index
       - dwba/dwba-implementation
+      - dwba/dwba-benchmarks
+      - dwba/dwba-validation
       - dwba/dwba-theory
       - sdwba/index
       - sdwba/sdwba-implementation
+      - sdwba/sdwba-benchmarks
+      - sdwba/sdwba-validation
       - sdwba/sdwba-theory
       - krm/index
       - krm/krm-implementation
+      - krm/krm-benchmarks
+      - krm/krm-validation
       - krm/krm-theory
       - hpa/index
       - hpa/hpa-implementation
+      - hpa/hpa-benchmarks
+      - hpa/hpa-validation
       - hpa/hpa-theory
       - trcm/index
       - trcm/trcm-implementation
+      - trcm/trcm-benchmarks
+      - trcm/trcm-validation
       - trcm/trcm-theory
       - pcdwba/index
       - pcdwba/pcdwba-implementation
+      - pcdwba/pcdwba-benchmarks
+      - pcdwba/pcdwba-validation
       - pcdwba/pcdwba-theory
       - vesm/index
       - vesm/vesm-implementation
+      - vesm/vesm-benchmarks
+      - vesm/vesm-validation
       - vesm/vesm-theory
       - bbfm/index
       - bbfm/bbfm-implementation
+      - bbfm/bbfm-validation
       - bbfm/bbfm-theory
 
 reference:

@@ -21,8 +21,10 @@ acousticTS:::.model_family_header(
   family = "tmm",
   pages = c(
     Overview = "index.html",
+    Theory = "tmm-theory.html",
     Implementation = "tmm-implementation.html",
-    Theory = "tmm-theory.html"
+    Benchmarks = "tmm-benchmarks.html",
+    Validation = "tmm-validation.html"
   )
 )
 ```

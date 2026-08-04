@@ -1,0 +1,54 @@
+---
+title: "SDWBA benchmarks"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: false
+    fig_caption: yes
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
+vignette: >
+  %\VignetteIndexEntry{SDWBA benchmarks}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# Benchmarks
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  family = "sdwba",
+  pages = c(
+    Overview = "index.html",
+    Theory = "sdwba-theory.html",
+    Implementation = "sdwba-implementation.html",
+    Benchmarks = "sdwba-benchmarks.html",
+    Validation = "sdwba-validation.html"
+  )
+)
+```
+
+SDWBA is benchmarked against the weakly scattering Jech et al. target set with fixed stochastic reference settings [@Jech_2015].
+
+| Geometry | Max abs. $\Delta$ vs benchmark (dB) | Mean abs. $\Delta$ vs benchmark (dB) | Elapsed (s) |
+|:--|--:|--:|--:|
+| Weakly scattering sphere | 10.08475 | 0.35609 | 0.72 |
+| Weakly scattering prolate spheroid | 2.05918 | 0.07638 | 3.58 |
+| Weakly scattering cylinder | 2.07406 | 0.15895 | 1.91 |
+
+Increasing `n_iterations` stabilizes the stochastic ensemble estimate, but it does not force the stochastic approximation onto the deterministic modal-series benchmark.
+
+## Stochastic krill software-reference comparisons
+
+The stochastic krill benchmark uses matched segment geometry, orientation, ensemble settings, and frequency grid for the published krill reference case [@CCAMLR_SDWBA_software; @NOAA_SDWBA_software]. These are software-reference comparisons, so they are reported as benchmarks.
+
+| Comparison | Mean abs. $\Delta TS$ (dB) | Max abs. $\Delta TS$ (dB) |
+|:--|--:|--:|
+| acousticTS vs stochastic reference A | 0.06978 | 0.18270 |
+| acousticTS vs stochastic reference B | 0.06158 | 0.52846 |
+| Reference A vs reference B | 0.13036 | 0.65798 |
+
+::: {.note data-title="Stochastic convention"}
+Report SDWBA benchmark residuals with the stochastic settings. Different phase conventions can produce visibly different curves while preserving the same broad approximation regime.
+:::

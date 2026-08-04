@@ -1,0 +1,589 @@
+---
+title: "ESSMS validation"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: false
+    fig_caption: yes
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
+vignette: >
+  %\VignetteIndexEntry{ESSMS validation}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# Validation
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  family = "essms",
+  pages = c(
+    Overview = "index.html",
+    Theory = "essms-theory.html",
+    Implementation = "essms-implementation.html",
+    Validation = "essms-validation.html"
+  )
+)
+```
+
+ESSMS is checked with radial and hybrid shell references for elastic-shelled spheres, including shell thickness, shell material, interior material, size, orientation, and frequency coverage.
+
+::: {.tip data-title="Residuals near nulls"}
+Mean absolute differences describe the typical agreement; maximum differences are retained because deep nulls can expose localized convention or resolution errors.
+:::
+
+## TS-Frequency
+
+Frequency rows retain the matched target and orientation while sweeping frequency.
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|:--|--:|--:|
+| FEM | elastic shell | elastic-shelled sphere | 38.0-118.0 |  |  | 0.002 | 0.013 |
+
+<details>
+<summary>FEM / elastic shell / elastic-shelled sphere / 38.0-118.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| FEM | elastic shell | elastic-shelled sphere | 38.0 |  |  | -40.934 | -40.935 | -0.001 |
+| FEM | elastic shell | elastic-shelled sphere | 42.0 |  |  | -57.057 | -57.057 | 0.000 |
+| FEM | elastic shell | elastic-shelled sphere | 46.0 |  |  | -53.046 | -53.046 | 0.000 |
+| FEM | elastic shell | elastic-shelled sphere | 50.0 |  |  | -46.904 | -46.891 | 0.013 |
+| FEM | elastic shell | elastic-shelled sphere | 54.0 |  |  | -50.631 | -50.631 | 0.001 |
+| FEM | elastic shell | elastic-shelled sphere | 58.0 |  |  | -50.219 | -50.223 | -0.004 |
+| FEM | elastic shell | elastic-shelled sphere | 62.0 |  |  | -50.434 | -50.435 | -0.000 |
+| FEM | elastic shell | elastic-shelled sphere | 66.0 |  |  | -48.173 | -48.173 | -0.000 |
+| FEM | elastic shell | elastic-shelled sphere | 70.0 |  |  | -43.673 | -43.672 | 0.001 |
+| FEM | elastic shell | elastic-shelled sphere | 74.0 |  |  | -43.640 | -43.638 | 0.002 |
+| FEM | elastic shell | elastic-shelled sphere | 78.0 |  |  | -45.711 | -45.711 | -0.000 |
+| FEM | elastic shell | elastic-shelled sphere | 82.0 |  |  | -46.595 | -46.595 | -0.000 |
+| FEM | elastic shell | elastic-shelled sphere | 86.0 |  |  | -46.971 | -46.972 | -0.000 |
+| FEM | elastic shell | elastic-shelled sphere | 90.0 |  |  | -47.311 | -47.310 | 0.000 |
+| FEM | elastic shell | elastic-shelled sphere | 94.0 |  |  | -47.292 | -47.292 | -0.000 |
+| FEM | elastic shell | elastic-shelled sphere | 98.0 |  |  | -46.904 | -46.904 | -0.000 |
+| FEM | elastic shell | elastic-shelled sphere | 102.0 |  |  | -45.957 | -45.957 | -0.000 |
+| FEM | elastic shell | elastic-shelled sphere | 106.0 |  |  | -45.220 | -45.219 | 0.001 |
+| FEM | elastic shell | elastic-shelled sphere | 110.0 |  |  | -44.194 | -44.183 | 0.011 |
+| FEM | elastic shell | elastic-shelled sphere | 114.0 |  |  | -45.242 | -45.242 | 0.000 |
+| FEM | elastic shell | elastic-shelled sphere | 118.0 |  |  | -46.550 | -46.550 | 0.000 |
+
+</details>
+
+
+## TS-Orientation
+
+Orientation rows retain the matched target and frequency ladder while sweeping incidence or scatter angle.
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|:--|--:|--:|
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 0.0-180.0 |  | 0.003 | 0.020 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 0.0-180.0 |  | 0.000 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 0.0-180.0 |  | 0.001 | 0.003 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 0.0-180.0 |  | 0.000 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 0.0-180.0 |  | 0.000 | 0.000 |
+
+<details>
+<summary>Hybrid FEM/BEM / elastic shell / Elastic-shelled sphere / 110.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 0.0 |  | -60.866 | -60.847 | -0.020 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 2.0 |  | -60.730 | -60.721 | -0.009 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 4.0 |  | -59.733 | -59.734 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 6.0 |  | -58.244 | -58.248 | 0.004 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 8.0 |  | -56.650 | -56.653 | 0.003 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 10.0 |  | -55.153 | -55.154 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 12.0 |  | -53.823 | -53.821 | -0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 14.0 |  | -52.672 | -52.668 | -0.004 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 16.0 |  | -51.690 | -51.685 | -0.005 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 18.0 |  | -50.860 | -50.854 | -0.006 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 20.0 |  | -50.165 | -50.159 | -0.006 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 22.0 |  | -49.586 | -49.580 | -0.006 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 24.0 |  | -49.106 | -49.101 | -0.005 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 26.0 |  | -48.706 | -48.702 | -0.004 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 28.0 |  | -48.370 | -48.367 | -0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 30.0 |  | -48.080 | -48.079 | -0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 32.0 |  | -47.820 | -47.820 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 34.0 |  | -47.577 | -47.578 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 36.0 |  | -47.338 | -47.340 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 38.0 |  | -47.094 | -47.097 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 40.0 |  | -46.840 | -46.843 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 42.0 |  | -46.573 | -46.575 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 44.0 |  | -46.293 | -46.294 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 46.0 |  | -45.999 | -46.000 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 48.0 |  | -45.694 | -45.695 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 50.0 |  | -45.379 | -45.379 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 52.0 |  | -45.055 | -45.055 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 54.0 |  | -44.720 | -44.720 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 56.0 |  | -44.373 | -44.373 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 58.0 |  | -44.012 | -44.013 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 60.0 |  | -43.634 | -43.636 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 62.0 |  | -43.239 | -43.240 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 64.0 |  | -42.824 | -42.827 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 66.0 |  | -42.394 | -42.397 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 68.0 |  | -41.952 | -41.954 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 70.0 |  | -41.505 | -41.507 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 72.0 |  | -41.062 | -41.062 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 74.0 |  | -40.632 | -40.632 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 76.0 |  | -40.226 | -40.224 | -0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 78.0 |  | -39.853 | -39.850 | -0.003 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 80.0 |  | -39.522 | -39.518 | -0.004 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 82.0 |  | -39.242 | -39.237 | -0.005 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 84.0 |  | -39.017 | -39.011 | -0.006 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 86.0 |  | -38.853 | -38.847 | -0.007 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 88.0 |  | -38.754 | -38.747 | -0.007 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 90.0 |  | -38.720 | -38.713 | -0.007 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 92.0 |  | -38.754 | -38.747 | -0.007 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 94.0 |  | -38.853 | -38.847 | -0.007 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 96.0 |  | -39.017 | -39.011 | -0.006 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 98.0 |  | -39.242 | -39.237 | -0.005 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 100.0 |  | -39.522 | -39.518 | -0.004 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 102.0 |  | -39.853 | -39.850 | -0.003 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 104.0 |  | -40.226 | -40.224 | -0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 106.0 |  | -40.632 | -40.632 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 108.0 |  | -41.062 | -41.062 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 110.0 |  | -41.505 | -41.507 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 112.0 |  | -41.952 | -41.954 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 114.0 |  | -42.394 | -42.397 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 116.0 |  | -42.824 | -42.827 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 118.0 |  | -43.239 | -43.240 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 120.0 |  | -43.634 | -43.636 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 122.0 |  | -44.012 | -44.013 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 124.0 |  | -44.373 | -44.373 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 126.0 |  | -44.720 | -44.720 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 128.0 |  | -45.055 | -45.055 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 130.0 |  | -45.379 | -45.379 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 132.0 |  | -45.694 | -45.695 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 134.0 |  | -45.999 | -46.000 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 136.0 |  | -46.293 | -46.294 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 138.0 |  | -46.573 | -46.575 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 140.0 |  | -46.840 | -46.843 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 142.0 |  | -47.094 | -47.097 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 144.0 |  | -47.338 | -47.340 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 146.0 |  | -47.577 | -47.578 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 148.0 |  | -47.820 | -47.820 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 150.0 |  | -48.080 | -48.079 | -0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 152.0 |  | -48.370 | -48.367 | -0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 154.0 |  | -48.706 | -48.702 | -0.004 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 156.0 |  | -49.106 | -49.101 | -0.005 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 158.0 |  | -49.586 | -49.580 | -0.006 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 160.0 |  | -50.165 | -50.159 | -0.006 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 162.0 |  | -50.860 | -50.854 | -0.006 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 164.0 |  | -51.690 | -51.685 | -0.005 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 166.0 |  | -52.672 | -52.668 | -0.004 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 168.0 |  | -53.823 | -53.821 | -0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 170.0 |  | -55.153 | -55.154 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 172.0 |  | -56.650 | -56.653 | 0.003 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 174.0 |  | -58.244 | -58.248 | 0.004 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 176.0 |  | -59.733 | -59.734 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 178.0 |  | -60.730 | -60.721 | -0.009 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 180.0 |  | -60.866 | -60.847 | -0.020 |
+
+</details>
+
+<details>
+<summary>Hybrid FEM/BEM / elastic shell / Elastic-shelled sphere / 12.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 0.0 |  | -64.453 | -64.453 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 2.0 |  | -64.563 | -64.563 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 4.0 |  | -64.677 | -64.677 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 6.0 |  | -64.795 | -64.795 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 8.0 |  | -64.917 | -64.917 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 10.0 |  | -65.043 | -65.043 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 12.0 |  | -65.174 | -65.174 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 14.0 |  | -65.308 | -65.308 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 16.0 |  | -65.446 | -65.446 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 18.0 |  | -65.589 | -65.589 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 20.0 |  | -65.735 | -65.735 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 22.0 |  | -65.884 | -65.884 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 24.0 |  | -66.038 | -66.038 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 26.0 |  | -66.194 | -66.194 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 28.0 |  | -66.354 | -66.354 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 30.0 |  | -66.516 | -66.516 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 32.0 |  | -66.681 | -66.681 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 34.0 |  | -66.848 | -66.848 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 36.0 |  | -67.017 | -67.017 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 38.0 |  | -67.188 | -67.188 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 40.0 |  | -67.360 | -67.360 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 42.0 |  | -67.533 | -67.533 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 44.0 |  | -67.706 | -67.706 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 46.0 |  | -67.879 | -67.879 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 48.0 |  | -68.051 | -68.051 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 50.0 |  | -68.223 | -68.223 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 52.0 |  | -68.392 | -68.392 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 54.0 |  | -68.558 | -68.558 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 56.0 |  | -68.722 | -68.722 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 58.0 |  | -68.882 | -68.882 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 60.0 |  | -69.037 | -69.037 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 62.0 |  | -69.187 | -69.187 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 64.0 |  | -69.331 | -69.331 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 66.0 |  | -69.468 | -69.468 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 68.0 |  | -69.598 | -69.598 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 70.0 |  | -69.719 | -69.719 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 72.0 |  | -69.831 | -69.831 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 74.0 |  | -69.934 | -69.934 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 76.0 |  | -70.026 | -70.026 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 78.0 |  | -70.108 | -70.108 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 80.0 |  | -70.177 | -70.177 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 82.0 |  | -70.235 | -70.235 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 84.0 |  | -70.281 | -70.281 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 86.0 |  | -70.313 | -70.313 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 88.0 |  | -70.333 | -70.333 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 90.0 |  | -70.340 | -70.340 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 92.0 |  | -70.333 | -70.333 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 94.0 |  | -70.313 | -70.313 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 96.0 |  | -70.281 | -70.281 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 98.0 |  | -70.235 | -70.235 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 100.0 |  | -70.177 | -70.177 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 102.0 |  | -70.108 | -70.108 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 104.0 |  | -70.026 | -70.026 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 106.0 |  | -69.934 | -69.934 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 108.0 |  | -69.831 | -69.831 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 110.0 |  | -69.719 | -69.719 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 112.0 |  | -69.598 | -69.598 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 114.0 |  | -69.468 | -69.468 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 116.0 |  | -69.331 | -69.331 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 118.0 |  | -69.187 | -69.187 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 120.0 |  | -69.037 | -69.037 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 122.0 |  | -68.882 | -68.882 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 124.0 |  | -68.722 | -68.722 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 126.0 |  | -68.558 | -68.558 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 128.0 |  | -68.392 | -68.392 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 130.0 |  | -68.223 | -68.223 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 132.0 |  | -68.051 | -68.051 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 134.0 |  | -67.879 | -67.879 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 136.0 |  | -67.706 | -67.706 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 138.0 |  | -67.533 | -67.533 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 140.0 |  | -67.360 | -67.360 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 142.0 |  | -67.188 | -67.188 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 144.0 |  | -67.017 | -67.017 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 146.0 |  | -66.848 | -66.848 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 148.0 |  | -66.681 | -66.681 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 150.0 |  | -66.516 | -66.516 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 152.0 |  | -66.354 | -66.354 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 154.0 |  | -66.194 | -66.194 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 156.0 |  | -66.038 | -66.038 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 158.0 |  | -65.884 | -65.884 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 160.0 |  | -65.735 | -65.735 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 162.0 |  | -65.589 | -65.589 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 164.0 |  | -65.446 | -65.446 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 166.0 |  | -65.308 | -65.308 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 168.0 |  | -65.174 | -65.174 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 170.0 |  | -65.043 | -65.043 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 172.0 |  | -64.917 | -64.917 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 174.0 |  | -64.795 | -64.795 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 176.0 |  | -64.677 | -64.677 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 178.0 |  | -64.563 | -64.563 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 180.0 |  | -64.453 | -64.453 | 0.000 |
+
+</details>
+
+<details>
+<summary>Hybrid FEM/BEM / elastic shell / Elastic-shelled sphere / 38.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 0.0 |  | -57.704 | -57.704 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 2.0 |  | -57.104 | -57.105 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 4.0 |  | -56.401 | -56.402 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 6.0 |  | -55.636 | -55.637 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 8.0 |  | -54.845 | -54.846 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 10.0 |  | -54.057 | -54.059 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 12.0 |  | -53.293 | -53.295 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 14.0 |  | -52.566 | -52.567 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 16.0 |  | -51.882 | -51.884 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 18.0 |  | -51.246 | -51.248 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 20.0 |  | -50.659 | -50.661 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 22.0 |  | -50.122 | -50.124 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 24.0 |  | -49.633 | -49.634 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 26.0 |  | -49.190 | -49.192 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 28.0 |  | -48.792 | -48.794 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 30.0 |  | -48.438 | -48.439 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 32.0 |  | -48.124 | -48.125 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 34.0 |  | -47.849 | -47.850 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 36.0 |  | -47.612 | -47.613 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 38.0 |  | -47.409 | -47.410 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 40.0 |  | -47.240 | -47.241 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 42.0 |  | -47.102 | -47.103 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 44.0 |  | -46.993 | -46.994 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 46.0 |  | -46.913 | -46.913 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 48.0 |  | -46.857 | -46.857 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 50.0 |  | -46.826 | -46.826 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 52.0 |  | -46.816 | -46.816 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 54.0 |  | -46.826 | -46.826 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 56.0 |  | -46.854 | -46.853 | -0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 58.0 |  | -46.897 | -46.896 | -0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 60.0 |  | -46.953 | -46.952 | -0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 62.0 |  | -47.021 | -47.019 | -0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 64.0 |  | -47.097 | -47.095 | -0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 66.0 |  | -47.179 | -47.178 | -0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 68.0 |  | -47.266 | -47.264 | -0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 70.0 |  | -47.354 | -47.352 | -0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 72.0 |  | -47.441 | -47.439 | -0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 74.0 |  | -47.526 | -47.524 | -0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 76.0 |  | -47.606 | -47.603 | -0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 78.0 |  | -47.679 | -47.677 | -0.003 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 80.0 |  | -47.744 | -47.742 | -0.003 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 82.0 |  | -47.799 | -47.797 | -0.003 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 84.0 |  | -47.844 | -47.841 | -0.003 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 86.0 |  | -47.876 | -47.873 | -0.003 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 88.0 |  | -47.896 | -47.893 | -0.003 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 90.0 |  | -47.902 | -47.899 | -0.003 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 92.0 |  | -47.896 | -47.893 | -0.003 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 94.0 |  | -47.876 | -47.873 | -0.003 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 96.0 |  | -47.844 | -47.841 | -0.003 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 98.0 |  | -47.799 | -47.797 | -0.003 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 100.0 |  | -47.744 | -47.742 | -0.003 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 102.0 |  | -47.679 | -47.677 | -0.003 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 104.0 |  | -47.606 | -47.603 | -0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 106.0 |  | -47.526 | -47.524 | -0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 108.0 |  | -47.441 | -47.439 | -0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 110.0 |  | -47.354 | -47.352 | -0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 112.0 |  | -47.266 | -47.264 | -0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 114.0 |  | -47.179 | -47.178 | -0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 116.0 |  | -47.097 | -47.095 | -0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 118.0 |  | -47.021 | -47.019 | -0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 120.0 |  | -46.953 | -46.952 | -0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 122.0 |  | -46.897 | -46.896 | -0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 124.0 |  | -46.854 | -46.853 | -0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 126.0 |  | -46.826 | -46.826 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 128.0 |  | -46.816 | -46.816 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 130.0 |  | -46.826 | -46.826 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 132.0 |  | -46.857 | -46.857 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 134.0 |  | -46.913 | -46.913 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 136.0 |  | -46.993 | -46.994 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 138.0 |  | -47.102 | -47.103 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 140.0 |  | -47.240 | -47.241 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 142.0 |  | -47.409 | -47.410 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 144.0 |  | -47.612 | -47.613 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 146.0 |  | -47.849 | -47.850 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 148.0 |  | -48.124 | -48.125 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 150.0 |  | -48.438 | -48.439 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 152.0 |  | -48.792 | -48.794 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 154.0 |  | -49.190 | -49.192 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 156.0 |  | -49.633 | -49.634 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 158.0 |  | -50.122 | -50.124 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 160.0 |  | -50.659 | -50.661 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 162.0 |  | -51.246 | -51.248 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 164.0 |  | -51.882 | -51.884 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 166.0 |  | -52.566 | -52.567 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 168.0 |  | -53.293 | -53.295 | 0.002 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 170.0 |  | -54.057 | -54.059 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 172.0 |  | -54.845 | -54.846 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 174.0 |  | -55.636 | -55.637 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 176.0 |  | -56.401 | -56.402 | 0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 178.0 |  | -57.104 | -57.105 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 180.0 |  | -57.704 | -57.704 | 0.000 |
+
+</details>
+
+<details>
+<summary>Hybrid FEM/BEM / elastic shell / Elastic-shelled sphere / 54.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 0.0 |  | -50.241 | -50.241 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 2.0 |  | -50.259 | -50.258 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 4.0 |  | -50.274 | -50.274 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 6.0 |  | -50.287 | -50.287 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 8.0 |  | -50.294 | -50.294 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 10.0 |  | -50.293 | -50.293 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 12.0 |  | -50.282 | -50.282 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 14.0 |  | -50.260 | -50.260 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 16.0 |  | -50.224 | -50.223 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 18.0 |  | -50.171 | -50.171 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 20.0 |  | -50.100 | -50.100 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 22.0 |  | -50.010 | -50.010 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 24.0 |  | -49.896 | -49.896 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 26.0 |  | -49.758 | -49.758 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 28.0 |  | -49.593 | -49.594 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 30.0 |  | -49.400 | -49.401 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 32.0 |  | -49.177 | -49.178 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 34.0 |  | -48.925 | -48.925 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 36.0 |  | -48.642 | -48.642 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 38.0 |  | -48.330 | -48.331 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 40.0 |  | -47.993 | -47.993 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 42.0 |  | -47.631 | -47.632 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 44.0 |  | -47.250 | -47.251 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 46.0 |  | -46.854 | -46.855 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 48.0 |  | -46.447 | -46.448 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 50.0 |  | -46.035 | -46.035 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 52.0 |  | -45.621 | -45.621 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 54.0 |  | -45.210 | -45.210 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 56.0 |  | -44.806 | -44.806 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 58.0 |  | -44.413 | -44.413 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 60.0 |  | -44.033 | -44.033 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 62.0 |  | -43.670 | -43.669 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 64.0 |  | -43.325 | -43.325 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 66.0 |  | -43.001 | -43.000 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 68.0 |  | -42.698 | -42.698 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 70.0 |  | -42.419 | -42.419 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 72.0 |  | -42.164 | -42.164 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 74.0 |  | -41.935 | -41.934 | -0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 76.0 |  | -41.731 | -41.731 | -0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 78.0 |  | -41.554 | -41.553 | -0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 80.0 |  | -41.403 | -41.402 | -0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 82.0 |  | -41.279 | -41.279 | -0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 84.0 |  | -41.183 | -41.182 | -0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 86.0 |  | -41.114 | -41.113 | -0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 88.0 |  | -41.073 | -41.072 | -0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 90.0 |  | -41.059 | -41.058 | -0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 92.0 |  | -41.073 | -41.072 | -0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 94.0 |  | -41.114 | -41.113 | -0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 96.0 |  | -41.183 | -41.182 | -0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 98.0 |  | -41.279 | -41.279 | -0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 100.0 |  | -41.403 | -41.402 | -0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 102.0 |  | -41.554 | -41.553 | -0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 104.0 |  | -41.731 | -41.731 | -0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 106.0 |  | -41.935 | -41.934 | -0.001 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 108.0 |  | -42.164 | -42.164 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 110.0 |  | -42.419 | -42.419 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 112.0 |  | -42.698 | -42.698 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 114.0 |  | -43.001 | -43.000 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 116.0 |  | -43.325 | -43.325 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 118.0 |  | -43.670 | -43.669 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 120.0 |  | -44.033 | -44.033 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 122.0 |  | -44.413 | -44.413 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 124.0 |  | -44.806 | -44.806 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 126.0 |  | -45.210 | -45.210 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 128.0 |  | -45.621 | -45.621 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 130.0 |  | -46.035 | -46.035 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 132.0 |  | -46.447 | -46.448 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 134.0 |  | -46.854 | -46.855 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 136.0 |  | -47.250 | -47.251 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 138.0 |  | -47.631 | -47.632 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 140.0 |  | -47.993 | -47.993 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 142.0 |  | -48.330 | -48.331 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 144.0 |  | -48.642 | -48.642 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 146.0 |  | -48.925 | -48.925 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 148.0 |  | -49.177 | -49.178 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 150.0 |  | -49.400 | -49.401 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 152.0 |  | -49.593 | -49.594 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 154.0 |  | -49.758 | -49.758 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 156.0 |  | -49.896 | -49.896 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 158.0 |  | -50.010 | -50.010 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 160.0 |  | -50.100 | -50.100 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 162.0 |  | -50.171 | -50.171 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 164.0 |  | -50.224 | -50.223 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 166.0 |  | -50.260 | -50.260 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 168.0 |  | -50.282 | -50.282 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 170.0 |  | -50.293 | -50.293 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 172.0 |  | -50.294 | -50.294 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 174.0 |  | -50.287 | -50.287 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 176.0 |  | -50.274 | -50.274 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 178.0 |  | -50.259 | -50.258 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 180.0 |  | -50.241 | -50.241 | -0.000 |
+
+</details>
+
+<details>
+<summary>Hybrid FEM/BEM / elastic shell / Elastic-shelled sphere / 86.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 0.0 |  | -50.854 | -50.854 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 2.0 |  | -50.226 | -50.226 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 4.0 |  | -49.624 | -49.624 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 6.0 |  | -49.048 | -49.048 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 8.0 |  | -48.495 | -48.495 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 10.0 |  | -47.965 | -47.965 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 12.0 |  | -47.457 | -47.457 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 14.0 |  | -46.970 | -46.970 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 16.0 |  | -46.503 | -46.503 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 18.0 |  | -46.055 | -46.055 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 20.0 |  | -45.626 | -45.626 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 22.0 |  | -45.215 | -45.215 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 24.0 |  | -44.820 | -44.820 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 26.0 |  | -44.442 | -44.442 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 28.0 |  | -44.079 | -44.079 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 30.0 |  | -43.730 | -43.730 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 32.0 |  | -43.393 | -43.393 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 34.0 |  | -43.068 | -43.068 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 36.0 |  | -42.754 | -42.754 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 38.0 |  | -42.448 | -42.448 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 40.0 |  | -42.150 | -42.150 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 42.0 |  | -41.858 | -41.858 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 44.0 |  | -41.571 | -41.571 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 46.0 |  | -41.288 | -41.288 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 48.0 |  | -41.009 | -41.009 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 50.0 |  | -40.733 | -40.733 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 52.0 |  | -40.460 | -40.460 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 54.0 |  | -40.191 | -40.191 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 56.0 |  | -39.926 | -39.926 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 58.0 |  | -39.665 | -39.665 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 60.0 |  | -39.411 | -39.411 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 62.0 |  | -39.163 | -39.164 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 64.0 |  | -38.925 | -38.925 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 66.0 |  | -38.697 | -38.697 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 68.0 |  | -38.482 | -38.482 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 70.0 |  | -38.279 | -38.279 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 72.0 |  | -38.092 | -38.092 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 74.0 |  | -37.920 | -37.920 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 76.0 |  | -37.766 | -37.766 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 78.0 |  | -37.631 | -37.631 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 80.0 |  | -37.515 | -37.515 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 82.0 |  | -37.419 | -37.418 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 84.0 |  | -37.343 | -37.343 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 86.0 |  | -37.289 | -37.289 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 88.0 |  | -37.257 | -37.256 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 90.0 |  | -37.246 | -37.246 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 92.0 |  | -37.257 | -37.256 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 94.0 |  | -37.289 | -37.289 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 96.0 |  | -37.343 | -37.343 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 98.0 |  | -37.419 | -37.418 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 100.0 |  | -37.515 | -37.515 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 102.0 |  | -37.631 | -37.631 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 104.0 |  | -37.766 | -37.766 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 106.0 |  | -37.920 | -37.920 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 108.0 |  | -38.092 | -38.092 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 110.0 |  | -38.279 | -38.279 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 112.0 |  | -38.482 | -38.482 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 114.0 |  | -38.697 | -38.697 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 116.0 |  | -38.925 | -38.925 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 118.0 |  | -39.163 | -39.164 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 120.0 |  | -39.411 | -39.411 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 122.0 |  | -39.665 | -39.665 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 124.0 |  | -39.926 | -39.926 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 126.0 |  | -40.191 | -40.191 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 128.0 |  | -40.460 | -40.460 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 130.0 |  | -40.733 | -40.733 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 132.0 |  | -41.009 | -41.009 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 134.0 |  | -41.288 | -41.288 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 136.0 |  | -41.571 | -41.571 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 138.0 |  | -41.858 | -41.858 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 140.0 |  | -42.150 | -42.150 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 142.0 |  | -42.448 | -42.448 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 144.0 |  | -42.754 | -42.754 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 146.0 |  | -43.068 | -43.068 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 148.0 |  | -43.393 | -43.393 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 150.0 |  | -43.730 | -43.730 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 152.0 |  | -44.079 | -44.079 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 154.0 |  | -44.442 | -44.442 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 156.0 |  | -44.820 | -44.820 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 158.0 |  | -45.215 | -45.215 | 0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 160.0 |  | -45.626 | -45.626 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 162.0 |  | -46.055 | -46.055 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 164.0 |  | -46.503 | -46.503 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 166.0 |  | -46.970 | -46.970 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 168.0 |  | -47.457 | -47.457 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 170.0 |  | -47.965 | -47.965 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 172.0 |  | -48.495 | -48.495 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 174.0 |  | -49.048 | -49.048 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 176.0 |  | -49.624 | -49.624 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 178.0 |  | -50.226 | -50.226 | -0.000 |
+| Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 180.0 |  | -50.854 | -50.854 | -0.000 |
+
+</details>
+
+
+## Residual Summary
+
+| Axis | Method | Boundary | Frequency (kHz) | Angle (deg) | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|--:|--:|
+| TS-Frequency | FEM | elastic shell | 38.0-118.0 |  | 0.002 | 0.013 |
+| TS-Orientation | Hybrid FEM/BEM | elastic shell | 12.0-110.0 | 0.0-180.0 | 0.001 | 0.020 |
+

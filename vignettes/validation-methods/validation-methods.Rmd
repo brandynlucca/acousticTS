@@ -1,0 +1,405 @@
+---
+title: "Validation methods"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: false
+    fig_caption: yes
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
+vignette: >
+  %\VignetteIndexEntry{Validation methods}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# Independent validation methods
+
+This page describes the independent checks used by the model-specific validation pages.
+
+::: {.note data-title="What validation means here"}
+Validation means the model is compared against an independently evaluated acoustic problem with matched geometry, material constants, frequency, incidence, output convention, and sampling grid.
+:::
+
+## Method map
+
+| Method | Best suited for | Primary output | Main risk |
+|:--|:--|:--|:--|
+| Exact or modal reference | Spheres, spheroids, cylinders, shell limits | Modal coefficients, $f$, `TS` | Truncation and convention mismatch |
+| BEM far-field reference | Rigid, pressure-release, and penetrable canonical surfaces | Bistatic or monostatic far-field amplitude | Mesh density, quadrature, interior resonances |
+| FEM radial or axisymmetric reference | Shells, elastic structures, layered interiors | Pressure, displacement, modal response, `TS` | PML design, element resolution, coupling setup |
+| Hybrid FEM/BEM reference | Elastic shell or solid body in an unbounded fluid | Coupled structural-acoustic far field | Interface conditions and solver conditioning |
+
+## Boundary element checks
+
+BEM checks solve the exterior Helmholtz scattering problem with a surface-only discretization. The unbounded fluid is represented through Helmholtz layer potentials, so the far-field amplitude can be evaluated directly after the boundary traces are solved.
+
+The exterior pressure satisfies
+
+$$
+(\nabla^2+k_0^2)p_\mathrm{scat}=0,\qquad
+p_\mathrm{tot}=p_\mathrm{inc}+p_\mathrm{scat},
+$$
+
+with the Sommerfeld radiation condition at infinity. The free-space Green function is
+
+$$
+G_k(x,y)=\frac{\exp(ik|x-y|)}{4\pi|x-y|}.
+$$
+
+The surface formulation is assembled from the single-layer, double-layer, adjoint double-layer, and hypersingular operators:
+
+$$
+\begin{aligned}
+(V\phi)(x) &= \int_\Gamma G_k(x,y)\phi(y)\,dS_y,\\
+(K\psi)(x) &= \int_\Gamma \partial_{n_y}G_k(x,y)\psi(y)\,dS_y,\\
+(K'\phi)(x) &= \partial_{n_x}\int_\Gamma G_k(x,y)\phi(y)\,dS_y,\\
+(W\psi)(x) &= -\partial_{n_x}\int_\Gamma \partial_{n_y}G_k(x,y)\psi(y)\,dS_y .
+\end{aligned}
+$$
+
+For the validation pages, BEM is used most often for:
+
+- pressure-release surfaces, where total pressure is zero on the body;
+- fixed-rigid surfaces, where normal velocity is zero on the body;
+- liquid-filled or gas-filled transmission problems, where pressure and normal velocity are continuous across the interface;
+- dense angular grids for retained-angle TMM products.
+
+For TMM-style angular validation, the BEM reference is evaluated on a full spherical scatter grid for each frequency. The retained output is a pointwise table with scatter angle, BEM `TS`, model `TS`, and $\Delta TS$, plus per-frequency summaries of the mean and maximum absolute residuals.
+
+::: {.tip data-title="BEM is a far-field check"}
+BEM comparisons are strongest when the quantity being compared is the far-field amplitude on the same angular grid. If only `TS` is shown, the underlying amplitude residual should still be inspected near deep nulls.
+:::
+
+### Geometry-specific BEM cases
+
+| Geometry | Natural BEM validation target | Typical grid | Notes |
+|:--|:--|:--|:--|
+| Sphere | SPHMS, ESSMS, calibration, and spherical TMM cases | Monostatic or full spherical grid | Useful because exact/modal results can be checked first, then BEM provides an independent discretized reference |
+| Prolate spheroid | PSMS and prolate TMM branches | Full $(\theta, \phi)$ grid or monostatic angle sweep | Strong for retained-angle products because the same shape can be checked against both spheroidal/modal and BEM references |
+| Oblate spheroid | Oblate TMM branch | Full $(\theta, \phi)$ grid | Best treated as a separate geometry, not as a prolate parameter tweak |
+| Finite cylinder | FCMS, TRCM, and cylinder TMM slices | Broadside or end-on slices before full grids | End caps and incidence convention should be documented explicitly |
+| Bent/deformed body | BCMS, KRM, BBFM, SBF | Full 3D BEM when symmetry is lost | Axisymmetric shortcuts are no longer valid once curvature or component placement breaks rotational symmetry |
+
+### BEM boundary systems
+
+| Boundary family | Matched condition | Typical solved quantity |
+|:--|:--|:--|
+| Pressure release | $p_\mathrm{tot}=0$ on $\Gamma$ | surface source density or Dirichlet trace |
+| Fixed rigid | $\partial_n p_\mathrm{tot}=0$ on $\Gamma$ | Neumann trace with Burton-Miller stabilization |
+| Liquid filled | $[p]=0$ and $[\rho^{-1}\partial_n p]=0$ | coupled exterior/interior traces |
+| Gas filled | same transmission equations with gas material constants | coupled traces with stronger contrast |
+
+For pressure-release cases, the scattered field can be represented by a single-layer potential whose boundary value cancels the incident pressure. For fixed-rigid cases, the Neumann equation is stabilized with a Burton-Miller term,
+
+$$
+\left(-\frac{1}{2}I+K'+i\eta V\right)\psi
+=-\partial_n p_\mathrm{inc}-i\eta p_\mathrm{inc},
+\qquad \eta=k_0 .
+$$
+
+::: {.caution data-title="Coordinate conventions"}
+Spheroid validation tables must state whether angles are body-frame or world-frame angles. Oblate cases are especially easy to misread because the symmetry axis is the semiminor axis, not the long transverse radius.
+:::
+
+### BEM comparison protocol
+
+| Step | Requirement |
+|:--|:--|
+| Geometry | Same radius, length, aspect ratio, shell thickness, and orientation convention |
+| Materials | Same exterior and interior density and sound speed |
+| Boundary | Same pressure-release, fixed-rigid, liquid-filled, gas-filled, or shell condition |
+| Sampling | Same incidence direction, scatter direction grid, and frequency set |
+| Metric | Pointwise $\Delta TS = TS_\text{model} - TS_\text{BEM}$ plus mean and max absolute residual |
+| Diagnostics | Residual maps, discretization profile, and null-sensitive linear-domain checks |
+
+### BEM solver controls
+
+| Control | Validation role |
+|:--|:--|
+| Surface resolution | High-frequency and high-curvature cases need tighter surface elements |
+| Regular quadrature order | Controls ordinary surface integrals away from singular panels |
+| Singular quadrature order | Controls self and near-neighbor panel interactions |
+| GMRES tolerance and iteration cap | Determines whether iterative residuals are smaller than the reported model residual |
+| Direct factorization reuse | Useful when the same matrix is solved for many incident or scatter directions |
+| Burton-Miller coupling | Stabilizes rigid Neumann exterior problems near irregular frequencies |
+| CHIEF points | Additional interior constraints for Neumann stabilization when Burton-Miller alone is not used |
+| Transmission formulation | Must match pressure and normal-velocity continuity for liquid- or gas-filled bodies |
+
+Typical dense spheroid validation grids use 2 deg angular spacing, for example a 91 by 181 polar-azimuthal grid. A prolate reference body used in the validation tables has length 0.14 m, semimajor radius 0.07 m, semiminor radius 0.01 m, and aspect ratio 7. The standard frequency ladder is 12, 18, 38, 70, and 120 kHz. Surface Galerkin solves use P1 elements, regular quadrature around order 8, singular or near-panel quadrature around order 10, and GMRES residual tolerances around 1e-6 unless a direct factorization is reused for repeated incidence solves.
+
+::: {.caution data-title="Rigid BEM needs stabilization"}
+Fixed-rigid exterior Helmholtz problems can hit irregular frequencies. Rigid validation tables should say whether a Burton-Miller, hypersingular, or CHIEF-stabilized formulation was used.
+:::
+
+## Finite element checks
+
+FEM checks solve the acoustic or coupled acoustic-structural problem on a volume mesh. They are most useful when the target cannot be reduced to a simple exterior boundary condition, especially for elastic shells, solid elastic bodies, or layered interiors.
+
+The FEM reference uses a weak-form discretization of the Helmholtz or elastodynamic equations. For acoustic pressure $p$, the generic discrete problem is:
+
+$$
+\mathbf{K}\mathbf{p} = \mathbf{f},
+$$
+
+where the stiffness matrix contains the gradient, mass-like, and boundary terms implied by the selected acoustic problem.
+
+For a canonical exterior acoustic problem, the weak Galerkin form is
+
+$$
+\int_\Omega
+\left(\nabla p\cdot\nabla\phi-k^2p\phi\right)\,d\Omega
+-ik\rho_0c_0\int_{\Gamma_\mathrm{imp}}p\phi\,d\Gamma
+=F(\phi).
+$$
+
+The discrete basis is usually P1 or P2 Lagrange, so $p(x)=\sum_j p_jN_j(x)$ and the assembled linear system is $\mathbf{K}\mathbf{p}=\mathbf{f}$. Boundary conditions are matched to the validation problem:
+
+| Boundary | FEM condition |
+|:--|:--|
+| Pressure release | $p_\mathrm{tot}=0$ |
+| Fixed rigid | $\partial_n p_\mathrm{tot}=0$ |
+| Fluid transmission | $[p]=0$ and $[\rho^{-1}\partial_n p]=0$ |
+| Elastic interface | acoustic pressure load balanced with structural normal motion |
+
+For PML calculations, the radial coordinate is stretched as
+
+$$
+\tilde{r}=r+\int\frac{\sigma(s)}{ik_0}\,ds,\qquad
+\sigma(r)=\sigma_\max\left(\frac{r-r_\mathrm{body}}{L_\mathrm{PML}}\right)^2 .
+$$
+
+Common controls are $L_\mathrm{PML}\approx0.2$ to $0.4$ times the outer radius and $\sigma_\max\approx0.1k_0$. Mesh spacing should satisfy at least $h\le\lambda/6$, with $h\approx0.1\lambda$ preferred for residual tables. Linear solves normally use GMRES tolerances in the 1e-6 to 1e-8 range.
+
+### FEM controls that matter
+
+| Control | Why it matters |
+|:--|:--|
+| Element order | Higher-order elements reduce dispersion for wave problems |
+| Element size | Mesh spacing should resolve the shortest wavelength in the problem |
+| PML thickness | Absorbs outgoing waves before they reflect from the artificial boundary |
+| PML damping profile | Controls reflection and stability across the frequency band |
+| Interface matching | Pressure, velocity, displacement, and stress conditions must match the model boundary |
+| Solver tolerance | Poor linear solves can look like model disagreement |
+
+::: {.caution data-title="PML checks are not optional"}
+If the PML is too thin, too weak, or too close to the target, the residual can be dominated by artificial reflections rather than model error.
+:::
+
+### FEM variants used for validation
+
+| FEM variant | Best model targets | What it validates |
+|:--|:--|:--|
+| Radial FEM + spherical DtN | SPHMS, ESSMS, VESM, calibration spheres | Layering, shell thickness, elastic constants, and radial boundary matching without a large exterior mesh |
+| Radial FEM + spheroidal DtN | PSMS and spheroidal TMM cases | Spheroidal layering and modal coupling in a geometry-matched coordinate system |
+| Cylindrical radial FEM + DtN | FCMS, TRCM, ECMS | Interior or shell response of cylindrical bodies with outgoing-wave closure |
+| Axisymmetric FEM + PML | Spheres, spheroids, straight cylinders, axisymmetric shells | Full-wave acoustic response when a volume discretization is preferred |
+| Full 3D FEM + PML | Bent bodies, displaced inclusions, anatomically shaped targets | Cases where symmetry is broken and surface-only methods are not enough |
+| Shell FEM | ESSMS, ECMS, VESM, BBFM | Structural shell or backbone motion before coupling to the exterior acoustic field |
+
+FEM residuals are interpreted together with the dimensionality of the discretization, element order, shortest wavelength, element size relative to wavelength, PML thickness, and outer-domain distance. Those controls distinguish model error from discretization error.
+
+The far-field amplitude is obtained from a Huygens projection over a closed extraction surface:
+
+$$
+f(\hat{x})=\int_{\Gamma_H}
+\left[
+\partial_n p(y)-ik_0(\hat{x}\cdot n)p(y)
+\right]\exp(-ik_0\hat{x}\cdot y)\,dS_y .
+$$
+
+The reported residual is then computed on the same frequency and angular grid as the package model.
+
+## Hybrid FEM/BEM checks
+
+Hybrid checks use FEM where the physics is local and structural, and BEM where the exterior acoustic field is unbounded. This is the relevant pattern for elastic shells and other coupled targets.
+
+The interface conditions are the central part of the check:
+
+$$
+p_\text{FEM} = p_\text{BEM}, \qquad
+\frac{1}{\rho_\text{FEM}}\partial_n p_\text{FEM}
+=
+\frac{1}{\rho_\text{BEM}}\partial_n p_\text{BEM}.
+$$
+
+For elastic shells, the structural displacement also has to be coupled to acoustic pressure and normal velocity. A good validation table should therefore report not only a `TS` residual, but also whether the shell thickness, elastic constants, fluid loading, and resonance locations were matched.
+
+For the elastic-shelled prolate spheroid checks, the canonical geometry is semimajor radius 0.035 m, semiminor radius 0.007 m, total length 0.07 m, aspect ratio 5, and shell thickness 0.0005 m. The exterior seawater constants are 1026.8 kg m^-3^ and 1477.3 m s^-1^. The shell constants are density 2565 kg m^-3^, Young's modulus $7\times10^{10}$ Pa, and Poisson ratio 0.32. The interior liquid constants are 1077.3 kg m^-3^ and 1575 m s^-1^. The standard frequencies are 12, 38, 70, and 120 kHz.
+
+The meridional shell state is
+
+$$
+\mathbf{q}(\eta)=
+\begin{bmatrix}
+u(\eta) & w(\eta) & \beta_\eta(\eta)
+\end{bmatrix}^T,
+$$
+
+and the structural dynamic matrix is written
+
+$$
+\mathbf{D}_\mathrm{shell}=\mathbf{K}+\hat{\omega}^2\mathbf{M}.
+$$
+
+The acoustic unknowns are the exterior scattered traces and interior traces, coupled to the shell state by pressure-load and normal-motion rows. In compact form, the coupled solve has the block structure
+
+$$
+\begin{bmatrix}
+A_\mathrm{ext} & 0 & B_\mathrm{ext}\\
+0 & A_\mathrm{int} & B_\mathrm{int}\\
+C_\mathrm{ext} & C_\mathrm{int} & D_\mathrm{shell}
+\end{bmatrix}
+\begin{bmatrix}
+x_\mathrm{ext}\\
+x_\mathrm{int}\\
+q
+\end{bmatrix}
+=
+\begin{bmatrix}
+b_\mathrm{ext}\\
+b_\mathrm{int}\\
+b_\mathrm{shell}
+\end{bmatrix}.
+$$
+
+Quadratic meridional shell elements use
+
+$$
+N_1=\frac{1}{2}\xi(\xi-1),\qquad
+N_2=1-\xi^2,\qquad
+N_3=\frac{1}{2}\xi(\xi+1),
+$$
+
+with Gauss quadrature along the meridian. The far field is assembled from exterior traces as
+
+$$
+f = D_\mathrm{ff}[\psi_s]-S_\mathrm{ff}[\phi_s],
+\qquad
+TS=10\log_{10}\sigma_{bs}.
+$$
+
+### Hybrid geometry targets
+
+| Target | FEM side | BEM side | Required comparison |
+|:--|:--|:--|:--|
+| Elastic shelled sphere | Radial or shell displacement through the shell | Exterior acoustic radiation | Resonance frequency, peak level, and off-resonance `TS` residual |
+| Elastic shelled spheroid | Axisymmetric shell displacement | Exterior spheroidal far field | Angular pattern and shell-mode placement |
+| Solid elastic calibration sphere | Elastic displacement in the solid | Exterior acoustic radiation | Standard-target frequency response over the documented band |
+| BBF body with backbone | Structural backbone plus surrounding flesh surrogate | Exterior acoustic radiation | Body-only, backbone-only, and coherent total amplitudes |
+| SBF fish with bladder | Fluid body plus gas inclusion geometry | Exterior acoustic radiation | Body term, inclusion term, placement phase, and coherent total |
+
+## Exact and modal checks
+
+Exact or modal references are used where a separable solution is available. They are especially important for spheres, finite cylinders, and spheroids because they let the package result be compared against a high-truncation or independently assembled series.
+
+For a circular cylinder of radius $a$, the modal pressure is
+
+$$
+p_\mathrm{tot}=
+\sum_{m=-\infty}^{\infty}
+\left[i^mJ_m(k_0r)+a_mH_m^{(1)}(k_0r)\right]e^{im\theta}.
+$$
+
+The pressure-release and fixed-rigid coefficients are
+
+$$
+a_m^\mathrm{soft}=-i^m\frac{J_m(k_0a)}{H_m^{(1)}(k_0a)},
+\qquad
+a_m^\mathrm{rigid}=-i^m\frac{J'_m(k_0a)}{H_m^{(1)\prime}(k_0a)}.
+$$
+
+The backscatter amplitude can be evaluated as
+
+$$
+f_{bs}=a_0+2\sum_{m=1}^{m_\max}(-1)^ma_m,
+$$
+
+with a practical truncation $m_\max\approx1.5k_0a+10$ and term convergence below about $10^{-10}|f_{bs}|$.
+
+For elastic spheroidal shells, the shell displacement is expanded as
+
+$$
+\mathbf{U}=U_\xi\mathbf{e}_\xi+U_\eta\mathbf{e}_\eta+U_\phi\mathbf{e}_\phi,
+$$
+
+and the structural eigenproblem is
+
+$$
+\int
+\left(
+\nabla_m\mathbf{U}:\mathbf{C}^{(m)}:\nabla_m\mathbf{V}
+-\omega_{nm}^2\rho_s\mathbf{U}\cdot\mathbf{V}
+\right)\,d\xi d\eta=0.
+$$
+
+Fluid loading shifts shell resonances and adds radiation damping, so validation should compare both target-strength residuals and modal peak locations.
+
+| Family | Typical exact/modal check |
+|:--|:--|
+| SPHMS | Spherical partial-wave expansion and boundary-condition coefficients |
+| FCMS | Cylindrical modal expansion with finite-length coherence term |
+| PSMS | Spheroidal functions and prolate modal summation |
+| ESSMS/VESM | Shell or layered-sphere modal systems with matched material constants |
+| TMM | Stored transition operator reconstructed against exact-family outputs |
+| TRCM | Straight and bent fluid-filled cylindrical reductions against radial FEM references |
+
+## Current same-problem coverage
+
+| Family | Independent method | Validated surface | Result summary |
+|:--|:--|:--|:--|
+| SPHMS | spherical BEM and exact/modal checks | sphere boundary families | monostatic residual tables by boundary condition |
+| FCMS | finite-cylinder BEM | broadside pressure-release and penetrable cylinder rows | pressure-release and filled-body residual tables; fixed-rigid row reported as unresolved |
+| PSMS | prolate-spheroid BEM | broadside prolate branch | angular and low-frequency residual tables |
+| ESSMS | radial FEM, BEM, hybrid shell checks | elastic-shelled sphere | shell boundary-condition variants |
+| TMM | BEM plus exact spheroidal products | sphere, oblate, prolate angular products | pointwise angular maps and summaries |
+| TRCM | radial FEM | straight and uniformly bent liquid-filled and gas-filled cylinders | frequency, angle, and size residual tables |
+| ECMS | cylindrical radial FEM | broadside solid elastic cylinder | 12-200 kHz residual sweep |
+| DWBA | finite-cylinder BEM | broadside weak liquid-filled cylinder | 12/38/70/120 kHz transmission residual table |
+| SDWBA | finite-cylinder BEM | deterministic weak liquid-filled cylinder kernel | 12/38/70/120 kHz transmission residual table |
+| KRM | finite-cylinder BEM | weak liquid-filled body branch | 12/38/70/120 kHz transmission residual table |
+| HPA | liquid-filled sphere BEM | Stanton sphere branch | 12/38/70/120 kHz |
+| PCDWBA | direct phase-compensated quadrature | bent weak liquid-filled tapered cylinders | curvature, taper, size, contrast, orientation, and node-count matrix |
+| BBFM | liquid-filled BEM and elastic-cylinder FEM | component paths and coherent sum | body, backbone, and total tables |
+| VESM | radial FEM | documented layered sphere | 1-150 kHz residual sweep |
+
+::: {.tip data-title="Use exact checks before mesh-heavy checks"}
+When an exact or modal check exists, run it before BEM or FEM. It isolates indexing, truncation, boundary-condition, and unit errors before mesh discretization is introduced.
+:::
+
+## BBF and SBF validation strategy
+
+BBF and SBF targets should be validated in layers because a total `TS` match can hide compensating errors.
+
+| Layer | BBF check | SBF check |
+|:--|:--|:--|
+| Geometry | Body centerline, radius profile, backbone placement, and segment normals | Body centerline, bladder centerline, bladder radius profile, and relative placement |
+| Component physics | DWBA-like flesh term and elastic-cylinder or shell-like backbone term | Weak body term and gas-inclusion modal or Kirchhoff term |
+| Phase bookkeeping | Coherent phase between flesh and backbone amplitudes | Coherent phase from body, inclusion, and placement offsets |
+| Independent full-wave target | Full 3D FEM/BEM or shell FEM plus BEM on simplified backbone geometries | Full 3D BEM or FEM/BEM on simple gas-inclusion bodies before anatomical shapes |
+| Reporting | Component amplitudes, coherent total, `sigma_bs`, and `TS` | Component amplitudes, coherent total, `sigma_bs`, and `TS` |
+
+::: {.caution data-title="Do not validate only the total curve"}
+For composite targets, total `TS` is the last comparison, not the first. Validate the component geometries and amplitudes before interpreting agreement in the coherent total.
+:::
+
+## Residual metrics
+
+The standard pointwise target-strength residual is:
+
+$$
+\Delta TS_i = TS_{\text{model},i} - TS_{\text{reference},i}.
+$$
+
+The standard summary table should include:
+
+| Metric | Meaning |
+|:--|:--|
+| Mean abs. $\Delta TS$ | Typical absolute disagreement across the compared points |
+| Max abs. $\Delta TS$ | Worst point, often dominated by nulls |
+| Frequency at max $\Delta$ | Where the largest residual occurs |
+| N frequency or N grid | Size of the compared sample |
+| Linear-domain residual | Amplitude-scale check used near deep nulls |
+
+For deep nulls, the linear-domain residual should be checked alongside `TS` because logarithmic differences can become visually large when both amplitudes are small.

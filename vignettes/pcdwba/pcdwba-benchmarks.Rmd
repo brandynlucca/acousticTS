@@ -1,0 +1,48 @@
+---
+title: "PCDWBA benchmarks"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: false
+    fig_caption: yes
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
+vignette: >
+  %\VignetteIndexEntry{PCDWBA benchmarks}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# Benchmarks
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  family = "pcdwba",
+  pages = c(
+    Overview = "index.html",
+    Theory = "pcdwba-theory.html",
+    Implementation = "pcdwba-implementation.html",
+    Benchmarks = "pcdwba-benchmarks.html",
+    Validation = "pcdwba-validation.html"
+  )
+)
+```
+
+The current PCDWBA benchmark case is a curved, weakly scattering cylinder evaluated from `12-200 kHz` in `2 kHz` steps with `51` integration nodes. The geometry is length `15 mm`, radius `1 mm`, taper order `10`, curvature ratio `rho_c / L = 3`, density contrast `g = 1.02`, sound-speed contrast `h = 1.02`, and broadside incidence.
+
+| Benchmark comparison | Max abs. $\Delta TS$ (dB) | Mean abs. $\Delta TS$ (dB) |
+|:--|--:|--:|
+| acousticTS vs `ZooScatR` | 9.95e-13 | 1.05e-14 |
+| acousticTS vs `Echopop` | 0.07395 | 0.00112 |
+| `Echopop` vs `ZooScatR` | 0.07395 | 0.00112 |
+
+| Evaluation path | Elapsed (s) | Frequency range (kHz) | Frequency step (kHz) | Node count |
+|:--|--:|:--|--:|--:|
+| acousticTS | 0.01 | `12-200` | 2 | 51 |
+| `ZooScatR` | 0.12 | `12-200` | 2 | 51 |
+| `Echopop` | 3.31 | `12-200` | 2 | 51 |
+
+::: {.note data-title="Why this is the benchmark case"}
+PCDWBA is a curved-body model, so the benchmark should retain curvature. A straight-body reduction is useful as a diagnostic, but it is not the benchmark target for this public model surface.
+:::

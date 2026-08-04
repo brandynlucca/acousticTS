@@ -1,4 +1,4 @@
-﻿---
+---
 title: "ECMS"
 output:
   rmarkdown::html_vignette:
@@ -19,8 +19,9 @@ acousticTS:::.model_family_header(
   family = "ecms",
   pages = c(
     Overview = "index.html",
+    Theory = "ecms-theory.html",
     Implementation = "ecms-implementation.html",
-    Theory = "ecms-theory.html"
+    Validation = "ecms-validation.html"
   )
 )
 ```
@@ -60,6 +61,7 @@ acousticTS:::.model_family_overview(
   ),
   reading = c(
     "[Implementation](ecms-implementation.html): object setup and current comparison workflow",
+    "[Validation](ecms-validation.html): elastic-cylinder FEM comparison",
     "[Theory](ecms-theory.html): elastic cylindrical potentials, phase shifts, and finite-length closure"
   )
 )

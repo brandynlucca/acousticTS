@@ -1,0 +1,52 @@
+---
+title: "HPA benchmarks"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: false
+    fig_caption: yes
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
+vignette: >
+  %\VignetteIndexEntry{HPA benchmarks}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# Benchmarks
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  family = "hpa",
+  pages = c(
+    Overview = "index.html",
+    Theory = "hpa-theory.html",
+    Implementation = "hpa-implementation.html",
+    Benchmarks = "hpa-benchmarks.html",
+    Validation = "hpa-validation.html"
+  )
+)
+```
+
+HPA is benchmarked against weakly scattering reference cases to document approximation behavior, not exact modal reproduction.
+
+| Case | Max abs. $\Delta$ TS (dB) | Mean abs. $\Delta$ TS (dB) | Elapsed (s) |
+|:--|--:|--:|--:|
+| Johnson (1977) sphere | 42.20232 | 6.34274 | 0.00 |
+| Stanton (1989) sphere | 35.46445 | 5.48942 | 0.01 |
+| Stanton (1989) prolate spheroid | 46.13636 | 5.57418 | 0.01 |
+| Stanton (1989) cylinder | 46.97943 | 5.65639 | 0.00 |
+
+These large maxima are expected for a high-pass approximation near exact-model nulls. HPA is useful for fast trend and scale checks, not for reproducing fine modal structure.
+
+## Formula reproduction checks
+
+The evaluated HPA formulas are checked against the Johnson and Stanton algebra for the supported high-pass branches [@Johnson_1977; @Stanton_1989_1]. These are formula reproduction benchmarks, not independent full-wave validation.
+
+| Case | Formula branch | Mean abs. $\Delta TS$ (dB) | Max abs. $\Delta TS$ (dB) |
+|:--|:--|--:|--:|
+| Sphere | Johnson (1977) | 2.33e-13 | 2.98e-13 |
+| Sphere | Stanton (1989) | 3.43e-14 | 4.69e-13 |
+| Prolate spheroid | Stanton (1989) | 2.46e-14 | 1.28e-13 |
+| Cylinder | Stanton (1989) | 2.39e-14 | 8.53e-14 |

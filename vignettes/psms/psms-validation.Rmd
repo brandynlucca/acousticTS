@@ -1,0 +1,1332 @@
+---
+title: "PSMS validation"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: false
+    fig_caption: yes
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
+vignette: >
+  %\VignetteIndexEntry{PSMS validation}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# Validation
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  family = "psms",
+  pages = c(
+    Overview = "index.html",
+    Theory = "psms-theory.html",
+    Implementation = "psms-implementation.html",
+    Benchmarks = "psms-benchmarks.html",
+    Validation = "psms-validation.html"
+  )
+)
+```
+
+PSMS is checked on matched prolate-spheroid modal problems across boundary, frequency, orientation, size, and material-contrast ladders.
+
+::: {.tip data-title="Residuals near nulls"}
+Mean absolute differences describe the typical agreement; maximum differences are retained because deep nulls can expose localized convention or resolution errors.
+:::
+
+## TS-Frequency
+
+Frequency rows retain the matched target and orientation while sweeping frequency.
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|:--|--:|--:|
+| spheroidal modal | fixed rigid | baseline geometry | 12.0-200.0 | 90.0 | Length (mm) 70.000 | 0.000 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 12.0-200.0 | 90.0 | Length (mm) 70.000 | 0.829 | 7.358 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0-200.0 | 90.0 | Length (mm) 70.000 | 3.300 | 15.645 |
+| spheroidal modal | pressure release | baseline geometry | 12.0-200.0 | 90.0 | Length (mm) 70.000 | 0.000 | 0.000 |
+
+<details>
+<summary>spheroidal modal / fixed rigid / baseline geometry / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 90.0 | 70.000 | -42.331 | -42.331 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 18.0 | 90.0 | 70.000 | -37.102 | -37.102 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 25.0 | 90.0 | 70.000 | -35.094 | -35.094 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 90.0 | 70.000 | -36.229 | -36.229 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 50.0 | 90.0 | 70.000 | -34.398 | -34.398 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 90.0 | 70.000 | -35.629 | -35.629 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 90.0 | 90.0 | 70.000 | -35.359 | -35.359 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 90.0 | 70.000 | -35.337 | -35.337 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 160.0 | 90.0 | 70.000 | -35.162 | -35.162 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 90.0 | 70.000 | -35.118 | -35.118 | 0.000 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / gas filled / baseline geometry / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 90.0 | 70.000 | -92.616 | -92.616 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 18.0 | 90.0 | 70.000 | -86.459 | -86.459 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 25.0 | 90.0 | 70.000 | -82.652 | -82.652 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 90.0 | 70.000 | -81.676 | -81.676 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 50.0 | 90.0 | 70.000 | -89.756 | -89.756 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 90.0 | 70.000 | -84.465 | -84.465 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 90.0 | 90.0 | 70.000 | -119.816 | -119.818 | -0.003 |
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 90.0 | 70.000 | -84.944 | -84.946 | -0.002 |
+| spheroidal modal | gas filled | baseline geometry | 160.0 | 90.0 | 70.000 | -91.587 | -90.657 | 0.930 |
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 90.0 | 70.000 | -91.961 | -99.319 | -7.358 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / liquid filled / baseline geometry / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 90.0 | 70.000 | -93.073 | -92.616 | 0.457 |
+| spheroidal modal | liquid filled | baseline geometry | 18.0 | 90.0 | 70.000 | -87.226 | -86.459 | 0.767 |
+| spheroidal modal | liquid filled | baseline geometry | 25.0 | 90.0 | 70.000 | -83.626 | -82.652 | 0.974 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 90.0 | 70.000 | -83.223 | -81.676 | 1.546 |
+| spheroidal modal | liquid filled | baseline geometry | 50.0 | 90.0 | 70.000 | -95.310 | -89.756 | 5.554 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 90.0 | 70.000 | -82.973 | -84.465 | -1.492 |
+| spheroidal modal | liquid filled | baseline geometry | 90.0 | 90.0 | 70.000 | -104.174 | -119.818 | -15.645 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 90.0 | 70.000 | -86.581 | -84.946 | 1.634 |
+| spheroidal modal | liquid filled | baseline geometry | 160.0 | 90.0 | 70.000 | -89.625 | -90.657 | -1.032 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 90.0 | 70.000 | -95.417 | -99.319 | -3.902 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / pressure release / baseline geometry / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 90.0 | 70.000 | -35.910 | -35.910 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 18.0 | 90.0 | 70.000 | -35.706 | -35.706 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 25.0 | 90.0 | 70.000 | -35.321 | -35.321 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 90.0 | 70.000 | -34.879 | -34.879 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 50.0 | 90.0 | 70.000 | -34.807 | -34.807 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 90.0 | 70.000 | -34.909 | -34.909 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 90.0 | 90.0 | 70.000 | -35.034 | -35.034 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 90.0 | 70.000 | -35.083 | -35.083 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 160.0 | 90.0 | 70.000 | -35.135 | -35.135 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 90.0 | 70.000 | -34.978 | -34.978 | 0.000 |
+
+</details>
+
+
+## TS-Orientation
+
+Orientation rows retain the matched target and frequency ladder while sweeping incidence or scatter angle.
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|:--|--:|--:|
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 15.0-165.0 | Length (mm) 70.000 | 0.000 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 15.0-165.0 | Length (mm) 70.000 | 0.000 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 15.0-165.0 | Length (mm) 70.000 | 0.000 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 15.0-165.0 | Length (mm) 70.000 | 0.000 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 15.0-165.0 | Length (mm) 70.000 | 0.000 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 15.0-165.0 | Length (mm) 70.000 | 0.000 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 15.0-165.0 | Length (mm) 70.000 | 0.000 | 0.002 |
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 15.0-165.0 | Length (mm) 70.000 | 1.051 | 7.358 |
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 15.0-165.0 | Length (mm) 70.000 | 0.000 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 15.0-165.0 | Length (mm) 70.000 | 0.000 | 0.000 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 15.0-165.0 | Length (mm) 70.000 | 1.110 | 2.268 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 15.0-165.0 | Length (mm) 70.000 | 5.166 | 7.342 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 15.0-165.0 | Length (mm) 70.000 | 11.798 | 23.625 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 15.0-165.0 | Length (mm) 70.000 | 6.726 | 20.092 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 15.0-165.0 | Length (mm) 70.000 | 6.266 | 8.397 |
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 15.0-165.0 | Length (mm) 70.000 | 0.000 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 15.0-165.0 | Length (mm) 70.000 | 0.000 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 15.0-165.0 | Length (mm) 70.000 | 0.000 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 15.0-165.0 | Length (mm) 70.000 | 0.000 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 15.0-165.0 | Length (mm) 70.000 | 0.000 | 0.000 |
+
+<details>
+<summary>spheroidal modal / fixed rigid / baseline geometry / 12.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 15.0 | 70.000 | -58.663 | -58.663 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 30.0 | 70.000 | -54.444 | -54.444 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 60.0 | 70.000 | -45.805 | -45.805 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 90.0 | 70.000 | -42.331 | -42.331 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 120.0 | 70.000 | -45.805 | -45.805 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 150.0 | 70.000 | -54.444 | -54.444 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 165.0 | 70.000 | -58.663 | -58.663 | 0.000 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / fixed rigid / baseline geometry / 120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 15.0 | 70.000 | -60.810 | -60.810 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 30.0 | 70.000 | -58.328 | -58.328 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 60.0 | 70.000 | -46.936 | -46.936 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 90.0 | 70.000 | -35.337 | -35.337 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 120.0 | 70.000 | -46.936 | -46.936 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 150.0 | 70.000 | -58.328 | -58.328 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 165.0 | 70.000 | -60.810 | -60.810 | 0.000 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / fixed rigid / baseline geometry / 200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 15.0 | 70.000 | -58.332 | -58.332 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 30.0 | 70.000 | -56.734 | -56.734 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 60.0 | 70.000 | -47.237 | -47.237 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 90.0 | 70.000 | -35.118 | -35.118 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 120.0 | 70.000 | -47.237 | -47.237 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 150.0 | 70.000 | -56.734 | -56.734 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 165.0 | 70.000 | -58.332 | -58.332 | 0.000 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / fixed rigid / baseline geometry / 38.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 15.0 | 70.000 | -61.599 | -61.599 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 30.0 | 70.000 | -59.716 | -59.716 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 60.0 | 70.000 | -48.241 | -48.241 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 90.0 | 70.000 | -36.229 | -36.229 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 120.0 | 70.000 | -48.241 | -48.241 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 150.0 | 70.000 | -59.716 | -59.716 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 165.0 | 70.000 | -61.599 | -61.599 | 0.000 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / fixed rigid / baseline geometry / 70.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 15.0 | 70.000 | -58.820 | -58.820 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 30.0 | 70.000 | -55.499 | -55.499 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 60.0 | 70.000 | -47.346 | -47.346 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 90.0 | 70.000 | -35.629 | -35.629 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 120.0 | 70.000 | -47.346 | -47.346 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 150.0 | 70.000 | -55.499 | -55.499 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 165.0 | 70.000 | -58.820 | -58.820 | 0.000 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / gas filled / baseline geometry / 12.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 15.0 | 70.000 | -107.797 | -107.797 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 30.0 | 70.000 | -103.840 | -103.840 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 60.0 | 70.000 | -95.823 | -95.823 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 90.0 | 70.000 | -92.616 | -92.616 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 120.0 | 70.000 | -95.823 | -95.823 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 150.0 | 70.000 | -103.840 | -103.840 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 165.0 | 70.000 | -107.797 | -107.797 | 0.000 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / gas filled / baseline geometry / 120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 15.0 | 70.000 | -99.235 | -99.235 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 30.0 | 70.000 | -95.195 | -95.195 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 60.0 | 70.000 | -97.057 | -97.057 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 90.0 | 70.000 | -84.944 | -84.946 | -0.002 |
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 120.0 | 70.000 | -97.057 | -97.057 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 150.0 | 70.000 | -95.195 | -95.195 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 165.0 | 70.000 | -99.235 | -99.235 | -0.000 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / gas filled / baseline geometry / 200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 15.0 | 70.000 | -105.907 | -105.907 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 30.0 | 70.000 | -99.626 | -99.626 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 60.0 | 70.000 | -130.825 | -130.825 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 90.0 | 70.000 | -91.961 | -99.319 | -7.358 |
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 120.0 | 70.000 | -130.825 | -130.825 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 150.0 | 70.000 | -99.626 | -99.626 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 165.0 | 70.000 | -105.907 | -105.907 | 0.000 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / gas filled / baseline geometry / 38.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 15.0 | 70.000 | -108.987 | -108.987 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 30.0 | 70.000 | -105.686 | -105.686 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 60.0 | 70.000 | -93.506 | -93.506 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 90.0 | 70.000 | -81.676 | -81.676 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 120.0 | 70.000 | -93.506 | -93.506 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 150.0 | 70.000 | -105.686 | -105.686 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 165.0 | 70.000 | -108.987 | -108.987 | 0.000 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / gas filled / baseline geometry / 70.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 15.0 | 70.000 | -110.371 | -110.371 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 30.0 | 70.000 | -97.602 | -97.602 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 60.0 | 70.000 | -91.674 | -91.674 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 90.0 | 70.000 | -84.465 | -84.465 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 120.0 | 70.000 | -91.674 | -91.674 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 150.0 | 70.000 | -97.602 | -97.602 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 165.0 | 70.000 | -110.371 | -110.371 | -0.000 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / liquid filled / baseline geometry / 12.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 15.0 | 70.000 | -105.530 | -107.797 | -2.268 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 30.0 | 70.000 | -102.455 | -103.840 | -1.384 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 60.0 | 70.000 | -95.828 | -95.823 | 0.004 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 90.0 | 70.000 | -93.073 | -92.616 | 0.457 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 120.0 | 70.000 | -95.828 | -95.823 | 0.004 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 150.0 | 70.000 | -102.455 | -103.840 | -1.384 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 165.0 | 70.000 | -105.530 | -107.797 | -2.268 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / liquid filled / baseline geometry / 120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 15.0 | 70.000 | -104.497 | -99.235 | 5.263 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 30.0 | 70.000 | -102.537 | -95.195 | 7.342 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 60.0 | 70.000 | -101.719 | -97.057 | 4.661 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 90.0 | 70.000 | -86.581 | -84.946 | 1.634 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 120.0 | 70.000 | -101.719 | -97.057 | 4.661 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 150.0 | 70.000 | -102.537 | -95.195 | 7.342 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 165.0 | 70.000 | -104.497 | -99.235 | 5.263 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / liquid filled / baseline geometry / 200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 15.0 | 70.000 | -110.566 | -105.907 | 4.659 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 30.0 | 70.000 | -110.685 | -99.626 | 11.059 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 60.0 | 70.000 | -107.200 | -130.825 | -23.625 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 90.0 | 70.000 | -95.417 | -99.319 | -3.902 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 120.0 | 70.000 | -107.200 | -130.825 | -23.625 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 150.0 | 70.000 | -110.685 | -99.626 | 11.059 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 165.0 | 70.000 | -110.566 | -105.907 | 4.659 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / liquid filled / baseline geometry / 38.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 15.0 | 70.000 | -129.079 | -108.987 | 20.092 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 30.0 | 70.000 | -104.152 | -105.686 | -1.534 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 60.0 | 70.000 | -94.647 | -93.506 | 1.141 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 90.0 | 70.000 | -83.223 | -81.676 | 1.546 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 120.0 | 70.000 | -94.647 | -93.506 | 1.141 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 150.0 | 70.000 | -104.152 | -105.686 | -1.534 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 165.0 | 70.000 | -129.079 | -108.987 | 20.092 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / liquid filled / baseline geometry / 70.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 15.0 | 70.000 | -118.769 | -110.371 | 8.397 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 30.0 | 70.000 | -103.738 | -97.602 | 6.136 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 60.0 | 70.000 | -98.325 | -91.674 | 6.651 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 90.0 | 70.000 | -82.973 | -84.465 | -1.492 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 120.0 | 70.000 | -98.325 | -91.674 | 6.651 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 150.0 | 70.000 | -103.738 | -97.602 | 6.136 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 165.0 | 70.000 | -118.769 | -110.371 | 8.397 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / pressure release / baseline geometry / 12.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 15.0 | 70.000 | -46.005 | -46.005 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 30.0 | 70.000 | -45.778 | -45.778 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 60.0 | 70.000 | -40.232 | -40.232 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 90.0 | 70.000 | -35.910 | -35.910 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 120.0 | 70.000 | -40.232 | -40.232 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 150.0 | 70.000 | -45.778 | -45.778 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 165.0 | 70.000 | -46.005 | -46.005 | 0.000 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / pressure release / baseline geometry / 120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 15.0 | 70.000 | -54.519 | -54.519 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 30.0 | 70.000 | -53.169 | -53.169 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 60.0 | 70.000 | -46.397 | -46.397 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 90.0 | 70.000 | -35.083 | -35.083 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 120.0 | 70.000 | -46.397 | -46.397 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 150.0 | 70.000 | -53.169 | -53.169 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 165.0 | 70.000 | -54.519 | -54.519 | 0.000 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / pressure release / baseline geometry / 200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 15.0 | 70.000 | -55.368 | -55.368 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 30.0 | 70.000 | -53.901 | -53.901 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 60.0 | 70.000 | -46.632 | -46.632 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 90.0 | 70.000 | -34.978 | -34.978 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 120.0 | 70.000 | -46.632 | -46.632 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 150.0 | 70.000 | -53.901 | -53.901 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 165.0 | 70.000 | -55.368 | -55.368 | 0.000 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / pressure release / baseline geometry / 38.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 15.0 | 70.000 | -51.275 | -51.275 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 30.0 | 70.000 | -49.996 | -49.996 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 60.0 | 70.000 | -44.574 | -44.574 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 90.0 | 70.000 | -34.879 | -34.879 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 120.0 | 70.000 | -44.574 | -44.574 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 150.0 | 70.000 | -49.996 | -49.996 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 165.0 | 70.000 | -51.275 | -51.275 | 0.000 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / pressure release / baseline geometry / 70.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 15.0 | 70.000 | -53.218 | -53.218 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 30.0 | 70.000 | -51.946 | -51.946 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 60.0 | 70.000 | -45.815 | -45.815 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 90.0 | 70.000 | -34.909 | -34.909 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 120.0 | 70.000 | -45.815 | -45.815 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 150.0 | 70.000 | -51.946 | -51.946 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 165.0 | 70.000 | -53.218 | -53.218 | 0.000 |
+
+</details>
+
+
+## TS-Size
+
+Size rows retain the matched material constants while sweeping length, radius, diameter, or scale.
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|:--|--:|--:|
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 90.0 | Length (mm) 35.000-105.000 | 0.000 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 90.0 | Length (mm) 35.000-105.000 | 0.000 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 90.0 | Length (mm) 35.000-105.000 | 0.000 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 90.0 | Length (mm) 35.000-105.000 | 0.000 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 90.0 | Length (mm) 35.000-105.000 | 0.000 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 90.0 | Length (mm) 35.000-105.000 | 0.000 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 90.0 | Length (mm) 35.000-105.000 | 0.772 | 3.263 |
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 90.0 | Length (mm) 35.000-105.000 | 1.829 | 7.358 |
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 90.0 | Length (mm) 35.000-105.000 | 0.000 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 90.0 | Length (mm) 35.000-105.000 | 0.000 | 0.001 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 90.0 | Length (mm) 35.000-105.000 | 0.428 | 0.767 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 90.0 | Length (mm) 35.000-105.000 | 1.513 | 4.060 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 90.0 | Length (mm) 35.000-105.000 | 2.225 | 4.773 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 90.0 | Length (mm) 35.000-105.000 | 2.844 | 8.392 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 90.0 | Length (mm) 35.000-105.000 | 1.153 | 1.562 |
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 90.0 | Length (mm) 35.000-105.000 | 0.000 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 90.0 | Length (mm) 35.000-105.000 | 0.000 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 90.0 | Length (mm) 35.000-105.000 | 0.000 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 90.0 | Length (mm) 35.000-105.000 | 0.000 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 90.0 | Length (mm) 35.000-105.000 | 0.000 | 0.000 |
+
+<details>
+<summary>spheroidal modal / fixed rigid / baseline geometry / 12.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 90.0 | 35.000 | -59.557 | -59.557 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 90.0 | 35.000 | -48.985 | -48.985 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 90.0 | 35.000 | -43.969 | -43.969 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 90.0 | 70.000 | -53.213 | -53.213 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 90.0 | 70.000 | -42.331 | -42.331 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 90.0 | 70.000 | -37.334 | -37.334 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 90.0 | 105.000 | -49.556 | -49.556 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 90.0 | 105.000 | -38.572 | -38.572 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 90.0 | 105.000 | -33.580 | -33.580 | 0.000 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / fixed rigid / baseline geometry / 120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 90.0 | 35.000 | -40.663 | -40.663 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 90.0 | 35.000 | -41.371 | -41.371 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 90.0 | 35.000 | -41.754 | -41.754 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 90.0 | 70.000 | -34.582 | -34.582 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 90.0 | 70.000 | -35.337 | -35.337 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 90.0 | 70.000 | -35.339 | -35.339 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 90.0 | 105.000 | -30.864 | -30.864 | -0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 90.0 | 105.000 | -32.071 | -32.071 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 90.0 | 105.000 | -31.774 | -31.774 | 0.000 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / fixed rigid / baseline geometry / 200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 90.0 | 35.000 | -41.656 | -41.656 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 90.0 | 35.000 | -41.138 | -41.138 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 90.0 | 35.000 | -41.171 | -41.171 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 90.0 | 70.000 | -35.168 | -35.168 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 90.0 | 70.000 | -35.118 | -35.118 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 90.0 | 70.000 | -35.130 | -35.130 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 90.0 | 105.000 | -30.442 | -30.442 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 90.0 | 105.000 | -31.010 | -31.010 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 90.0 | 105.000 | -32.362 | -32.362 | 0.000 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / fixed rigid / baseline geometry / 38.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 90.0 | 35.000 | -42.616 | -42.616 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 90.0 | 35.000 | -43.122 | -43.122 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 90.0 | 35.000 | -40.613 | -40.613 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 90.0 | 70.000 | -36.509 | -36.509 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 90.0 | 70.000 | -36.229 | -36.229 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 90.0 | 70.000 | -34.442 | -34.442 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 90.0 | 105.000 | -32.968 | -32.968 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 90.0 | 105.000 | -32.597 | -32.597 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 90.0 | 105.000 | -30.778 | -30.778 | 0.000 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / fixed rigid / baseline geometry / 70.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 90.0 | 35.000 | -41.995 | -41.995 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 90.0 | 35.000 | -41.855 | -41.855 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 90.0 | 35.000 | -41.335 | -41.335 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 90.0 | 70.000 | -35.872 | -35.872 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 90.0 | 70.000 | -35.629 | -35.629 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 90.0 | 70.000 | -35.181 | -35.181 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 90.0 | 105.000 | -32.335 | -32.335 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 90.0 | 105.000 | -32.079 | -32.079 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 90.0 | 105.000 | -31.696 | -31.696 | 0.000 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / gas filled / baseline geometry / 12.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 90.0 | 35.000 | -110.292 | -110.292 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 90.0 | 35.000 | -98.990 | -98.990 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 90.0 | 35.000 | -93.202 | -93.202 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 90.0 | 70.000 | -103.954 | -103.954 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 90.0 | 70.000 | -92.616 | -92.616 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 90.0 | 70.000 | -86.776 | -86.776 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 90.0 | 105.000 | -100.174 | -100.174 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 90.0 | 105.000 | -88.822 | -88.822 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 90.0 | 105.000 | -82.938 | -82.938 | 0.000 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / gas filled / baseline geometry / 120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 90.0 | 35.000 | -97.948 | -97.948 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 90.0 | 35.000 | -91.363 | -91.363 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 90.0 | 35.000 | -89.349 | -89.349 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 90.0 | 70.000 | -92.169 | -92.164 | 0.004 |
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 90.0 | 70.000 | -84.944 | -84.946 | -0.002 |
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 90.0 | 70.000 | -82.771 | -82.772 | -0.001 |
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 90.0 | 105.000 | -88.710 | -85.448 | 3.263 |
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 90.0 | 105.000 | -81.334 | -83.601 | -2.267 |
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 90.0 | 105.000 | -79.114 | -80.528 | -1.414 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / gas filled / baseline geometry / 200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 90.0 | 35.000 | -91.017 | -91.017 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 90.0 | 35.000 | -98.832 | -98.832 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 90.0 | 35.000 | -89.730 | -89.730 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 90.0 | 70.000 | -84.875 | -88.965 | -4.090 |
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 90.0 | 70.000 | -91.961 | -99.319 | -7.358 |
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 90.0 | 70.000 | -84.246 | -82.228 | 2.019 |
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 90.0 | 105.000 | -81.323 | -79.852 | 1.471 |
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 90.0 | 105.000 | -88.231 | -87.119 | 1.112 |
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 90.0 | 105.000 | -80.872 | -80.457 | 0.415 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / gas filled / baseline geometry / 38.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 90.0 | 35.000 | -91.754 | -91.754 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 90.0 | 35.000 | -88.005 | -88.005 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 90.0 | 35.000 | -101.387 | -101.387 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 90.0 | 70.000 | -85.612 | -85.612 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 90.0 | 70.000 | -81.676 | -81.676 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 90.0 | 70.000 | -99.976 | -99.976 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 90.0 | 105.000 | -82.062 | -82.062 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 90.0 | 105.000 | -78.093 | -78.093 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 90.0 | 105.000 | -97.462 | -97.462 | 0.000 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / gas filled / baseline geometry / 70.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 90.0 | 35.000 | -87.286 | -87.286 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 90.0 | 35.000 | -90.071 | -90.071 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 90.0 | 35.000 | -89.464 | -89.464 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 90.0 | 70.000 | -81.169 | -81.169 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 90.0 | 70.000 | -84.465 | -84.465 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 90.0 | 70.000 | -82.710 | -82.710 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 90.0 | 105.000 | -77.632 | -77.632 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 90.0 | 105.000 | -81.012 | -81.011 | 0.001 |
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 90.0 | 105.000 | -79.084 | -79.085 | -0.001 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / liquid filled / baseline geometry / 12.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 90.0 | 35.000 | -110.427 | -110.292 | 0.135 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 90.0 | 35.000 | -99.094 | -98.990 | 0.104 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 90.0 | 35.000 | -93.247 | -93.202 | 0.045 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 90.0 | 70.000 | -104.415 | -103.954 | 0.461 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 90.0 | 70.000 | -93.073 | -92.616 | 0.457 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 90.0 | 70.000 | -87.226 | -86.776 | 0.450 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 90.0 | 105.000 | -100.876 | -100.174 | 0.702 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 90.0 | 105.000 | -89.552 | -88.822 | 0.730 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 90.0 | 105.000 | -83.704 | -82.938 | 0.767 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / liquid filled / baseline geometry / 120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 90.0 | 35.000 | -94.127 | -97.948 | -3.821 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 90.0 | 35.000 | -92.599 | -91.363 | 1.236 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 90.0 | 35.000 | -89.527 | -89.349 | 0.178 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 90.0 | 70.000 | -88.104 | -92.164 | -4.060 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 90.0 | 70.000 | -86.581 | -84.946 | 1.634 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 90.0 | 70.000 | -83.504 | -82.772 | 0.732 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 90.0 | 105.000 | -84.581 | -85.448 | -0.866 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 90.0 | 105.000 | -83.058 | -83.601 | -0.543 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 90.0 | 105.000 | -79.980 | -80.528 | -0.548 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / liquid filled / baseline geometry / 200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 90.0 | 35.000 | -92.231 | -91.017 | 1.214 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 90.0 | 35.000 | -101.437 | -98.832 | 2.605 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 90.0 | 35.000 | -89.546 | -89.730 | -0.184 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 90.0 | 70.000 | -86.208 | -88.965 | -2.756 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 90.0 | 70.000 | -95.417 | -99.319 | -3.902 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 90.0 | 70.000 | -83.538 | -82.228 | 1.311 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 90.0 | 105.000 | -82.687 | -79.852 | 2.835 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 90.0 | 105.000 | -91.892 | -87.119 | 4.773 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 90.0 | 105.000 | -80.016 | -80.457 | -0.442 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / liquid filled / baseline geometry / 38.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 90.0 | 35.000 | -92.559 | -91.754 | 0.806 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 90.0 | 35.000 | -89.254 | -88.005 | 1.249 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 90.0 | 35.000 | -98.644 | -101.387 | -2.744 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 90.0 | 70.000 | -86.531 | -85.612 | 0.919 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 90.0 | 70.000 | -83.223 | -81.676 | 1.546 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 90.0 | 70.000 | -92.595 | -99.976 | -7.381 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 90.0 | 105.000 | -83.011 | -82.062 | 0.950 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 90.0 | 105.000 | -79.699 | -78.093 | 1.606 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 90.0 | 105.000 | -89.070 | -97.462 | -8.392 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / liquid filled / baseline geometry / 70.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 90.0 | 35.000 | -88.616 | -87.286 | 1.329 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 90.0 | 35.000 | -88.997 | -90.071 | -1.074 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 90.0 | 35.000 | -89.641 | -89.464 | 0.176 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 90.0 | 70.000 | -82.592 | -81.169 | 1.422 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 90.0 | 70.000 | -82.973 | -84.465 | -1.492 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 90.0 | 70.000 | -83.604 | -82.710 | 0.894 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 90.0 | 105.000 | -79.059 | -77.632 | 1.427 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 90.0 | 105.000 | -79.449 | -81.011 | -1.562 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 90.0 | 105.000 | -80.081 | -79.085 | 0.997 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / pressure release / baseline geometry / 12.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 90.0 | 35.000 | -41.617 | -41.617 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 90.0 | 35.000 | -40.188 | -40.188 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 90.0 | 35.000 | -39.822 | -39.822 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 90.0 | 70.000 | -36.993 | -36.993 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 90.0 | 70.000 | -35.910 | -35.910 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 90.0 | 70.000 | -35.483 | -35.483 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 90.0 | 105.000 | -33.619 | -33.619 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 90.0 | 105.000 | -32.598 | -32.598 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 90.0 | 105.000 | -32.184 | -32.184 | 0.000 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / pressure release / baseline geometry / 120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 90.0 | 35.000 | -40.842 | -40.842 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 90.0 | 35.000 | -41.097 | -41.097 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 90.0 | 35.000 | -41.108 | -41.108 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 90.0 | 70.000 | -34.718 | -34.718 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 90.0 | 70.000 | -35.083 | -35.083 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 90.0 | 70.000 | -35.109 | -35.109 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 90.0 | 105.000 | -30.741 | -30.741 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 90.0 | 105.000 | -31.608 | -31.608 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 90.0 | 105.000 | -31.591 | -31.591 | 0.000 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / pressure release / baseline geometry / 200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 90.0 | 35.000 | -41.091 | -41.091 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 90.0 | 35.000 | -41.134 | -41.134 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 90.0 | 35.000 | -41.139 | -41.139 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 90.0 | 70.000 | -35.021 | -35.021 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 90.0 | 70.000 | -34.978 | -34.978 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 90.0 | 70.000 | -35.147 | -35.147 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 90.0 | 105.000 | -29.982 | -29.982 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 90.0 | 105.000 | -31.020 | -31.020 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 90.0 | 105.000 | -32.338 | -32.338 | 0.000 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / pressure release / baseline geometry / 38.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 90.0 | 35.000 | -41.678 | -41.678 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 90.0 | 35.000 | -40.963 | -40.963 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 90.0 | 35.000 | -40.773 | -40.773 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 90.0 | 70.000 | -35.639 | -35.639 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 90.0 | 70.000 | -34.879 | -34.879 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 90.0 | 70.000 | -34.914 | -34.914 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 90.0 | 105.000 | -32.047 | -32.047 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 90.0 | 105.000 | -31.212 | -31.212 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 90.0 | 105.000 | -31.286 | -31.286 | 0.000 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / pressure release / baseline geometry / 70.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 90.0 | 35.000 | -40.926 | -40.926 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 90.0 | 35.000 | -41.013 | -41.013 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 90.0 | 35.000 | -41.024 | -41.024 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 90.0 | 70.000 | -34.677 | -34.677 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 90.0 | 70.000 | -34.909 | -34.909 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 90.0 | 70.000 | -35.065 | -35.065 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 90.0 | 105.000 | -31.042 | -31.042 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 90.0 | 105.000 | -31.361 | -31.361 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 90.0 | 105.000 | -31.555 | -31.555 | 0.000 |
+
+</details>
+
+
+## TS-Parameter
+
+Parameter rows retain the matched geometry class while sweeping material, curvature, taper, thickness, or discretization parameters.
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|:--|--:|--:|
+| spheroidal modal | gas filled | gas core | 12.0-200.0 | 60.0-120.0 | Length (mm) 70.000 | 0.009 | 0.136 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0-200.0 | 60.0-120.0 | Length (mm) 70.000 | 5.413 | 23.625 |
+| spheroidal modal | liquid filled | denser faster | 12.0-200.0 | 60.0-120.0 | Length (mm) 70.000 | 4.095 | 11.337 |
+
+<details>
+<summary>spheroidal modal / gas filled / gas core / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | gas filled | gas core | 12.0 | 60.0 | 70.000 | -40.245 | -40.245 | 0.000 |
+| spheroidal modal | gas filled | gas core | 12.0 | 90.0 | 70.000 | -35.923 | -35.923 | 0.000 |
+| spheroidal modal | gas filled | gas core | 12.0 | 120.0 | 70.000 | -40.245 | -40.245 | 0.000 |
+| spheroidal modal | gas filled | gas core | 38.0 | 60.0 | 70.000 | -44.557 | -44.557 | -0.000 |
+| spheroidal modal | gas filled | gas core | 38.0 | 90.0 | 70.000 | -34.908 | -34.908 | 0.000 |
+| spheroidal modal | gas filled | gas core | 38.0 | 120.0 | 70.000 | -44.557 | -44.557 | -0.000 |
+| spheroidal modal | gas filled | gas core | 70.0 | 60.0 | 70.000 | -45.966 | -45.966 | 0.000 |
+| spheroidal modal | gas filled | gas core | 70.0 | 90.0 | 70.000 | -34.916 | -34.916 | -0.000 |
+| spheroidal modal | gas filled | gas core | 70.0 | 120.0 | 70.000 | -45.966 | -45.966 | 0.000 |
+| spheroidal modal | gas filled | gas core | 120.0 | 60.0 | 70.000 | -46.362 | -46.362 | 0.000 |
+| spheroidal modal | gas filled | gas core | 120.0 | 90.0 | 70.000 | -35.111 | -35.111 | 0.000 |
+| spheroidal modal | gas filled | gas core | 120.0 | 120.0 | 70.000 | -46.362 | -46.362 | -0.000 |
+| spheroidal modal | gas filled | gas core | 200.0 | 60.0 | 70.000 | -48.771 | -48.771 | 0.000 |
+| spheroidal modal | gas filled | gas core | 200.0 | 90.0 | 70.000 | -35.071 | -34.935 | 0.136 |
+| spheroidal modal | gas filled | gas core | 200.0 | 120.0 | 70.000 | -48.771 | -48.771 | 0.000 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / liquid filled / baseline geometry / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 60.0 | 70.000 | -95.828 | -95.823 | 0.004 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 90.0 | 70.000 | -93.073 | -92.616 | 0.457 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 120.0 | 70.000 | -95.828 | -95.823 | 0.004 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 60.0 | 70.000 | -94.647 | -93.506 | 1.141 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 90.0 | 70.000 | -83.223 | -81.676 | 1.546 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 120.0 | 70.000 | -94.647 | -93.506 | 1.141 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 60.0 | 70.000 | -98.325 | -91.674 | 6.651 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 90.0 | 70.000 | -82.973 | -84.465 | -1.492 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 120.0 | 70.000 | -98.325 | -91.674 | 6.651 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 60.0 | 70.000 | -101.719 | -97.057 | 4.661 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 90.0 | 70.000 | -86.581 | -84.946 | 1.634 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 120.0 | 70.000 | -101.719 | -97.057 | 4.661 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 60.0 | 70.000 | -107.200 | -130.825 | -23.625 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 90.0 | 70.000 | -95.417 | -99.319 | -3.902 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 120.0 | 70.000 | -107.200 | -130.825 | -23.625 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / liquid filled / denser faster / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | liquid filled | denser faster | 12.0 | 60.0 | 70.000 | -82.181 | -82.179 | 0.002 |
+| spheroidal modal | liquid filled | denser faster | 12.0 | 90.0 | 70.000 | -79.423 | -78.882 | 0.541 |
+| spheroidal modal | liquid filled | denser faster | 12.0 | 120.0 | 70.000 | -82.181 | -82.179 | 0.002 |
+| spheroidal modal | liquid filled | denser faster | 38.0 | 60.0 | 70.000 | -81.048 | -79.675 | 1.373 |
+| spheroidal modal | liquid filled | denser faster | 38.0 | 90.0 | 70.000 | -69.431 | -67.646 | 1.785 |
+| spheroidal modal | liquid filled | denser faster | 38.0 | 120.0 | 70.000 | -81.048 | -79.675 | 1.373 |
+| spheroidal modal | liquid filled | denser faster | 70.0 | 60.0 | 70.000 | -85.214 | -77.597 | 7.617 |
+| spheroidal modal | liquid filled | denser faster | 70.0 | 90.0 | 70.000 | -69.393 | -71.364 | -1.972 |
+| spheroidal modal | liquid filled | denser faster | 70.0 | 120.0 | 70.000 | -85.214 | -77.597 | 7.617 |
+| spheroidal modal | liquid filled | denser faster | 120.0 | 60.0 | 70.000 | -86.858 | -80.844 | 6.014 |
+| spheroidal modal | liquid filled | denser faster | 120.0 | 90.0 | 70.000 | -71.792 | -70.092 | 1.700 |
+| spheroidal modal | liquid filled | denser faster | 120.0 | 120.0 | 70.000 | -86.858 | -80.844 | 6.014 |
+| spheroidal modal | liquid filled | denser faster | 200.0 | 60.0 | 70.000 | -99.869 | -88.532 | 11.337 |
+| spheroidal modal | liquid filled | denser faster | 200.0 | 90.0 | 70.000 | -77.438 | -80.178 | -2.740 |
+| spheroidal modal | liquid filled | denser faster | 200.0 | 120.0 | 70.000 | -99.869 | -88.532 | 11.337 |
+
+</details>
+
+
+## Boundary Cases
+
+Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled, and shell cases when those branches apply.
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|:--|--:|--:|
+| spheroidal modal | fixed rigid | baseline geometry | 12.0-200.0 | 15.0-165.0 | Length (mm) 35.000-105.000 | 0.000 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 12.0-200.0 | 15.0-165.0 | Length (mm) 35.000-105.000 | 0.304 | 7.358 |
+| spheroidal modal | gas filled | gas core | 12.0-200.0 | 60.0-120.0 | Length (mm) 70.000 | 0.009 | 0.136 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0-200.0 | 15.0-165.0 | Length (mm) 35.000-105.000 | 3.823 | 23.625 |
+| spheroidal modal | liquid filled | denser faster | 12.0-200.0 | 60.0-120.0 | Length (mm) 70.000 | 4.095 | 11.337 |
+| spheroidal modal | pressure release | baseline geometry | 12.0-200.0 | 15.0-165.0 | Length (mm) 35.000-105.000 | 0.000 | 0.000 |
+
+<details>
+<summary>spheroidal modal / fixed rigid / baseline geometry / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 15.0 | 70.000 | -58.663 | -58.663 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 30.0 | 70.000 | -54.444 | -54.444 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 60.0 | 70.000 | -45.805 | -45.805 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 90.0 | 35.000 | -59.557 | -59.557 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 90.0 | 35.000 | -48.985 | -48.985 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 90.0 | 35.000 | -43.969 | -43.969 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 90.0 | 70.000 | -42.331 | -42.331 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 90.0 | 70.000 | -53.213 | -53.213 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 90.0 | 70.000 | -37.334 | -37.334 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 90.0 | 105.000 | -49.556 | -49.556 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 90.0 | 105.000 | -38.572 | -38.572 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 90.0 | 105.000 | -33.580 | -33.580 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 120.0 | 70.000 | -45.805 | -45.805 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 150.0 | 70.000 | -54.444 | -54.444 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 12.0 | 165.0 | 70.000 | -58.663 | -58.663 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 18.0 | 90.0 | 70.000 | -37.102 | -37.102 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 25.0 | 90.0 | 70.000 | -35.094 | -35.094 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 15.0 | 70.000 | -61.599 | -61.599 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 30.0 | 70.000 | -59.716 | -59.716 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 60.0 | 70.000 | -48.241 | -48.241 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 90.0 | 35.000 | -42.616 | -42.616 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 90.0 | 35.000 | -43.122 | -43.122 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 90.0 | 35.000 | -40.613 | -40.613 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 90.0 | 70.000 | -36.229 | -36.229 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 90.0 | 70.000 | -36.509 | -36.509 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 90.0 | 70.000 | -34.442 | -34.442 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 90.0 | 105.000 | -32.968 | -32.968 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 90.0 | 105.000 | -32.597 | -32.597 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 90.0 | 105.000 | -30.778 | -30.778 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 120.0 | 70.000 | -48.241 | -48.241 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 150.0 | 70.000 | -59.716 | -59.716 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 38.0 | 165.0 | 70.000 | -61.599 | -61.599 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 50.0 | 90.0 | 70.000 | -34.398 | -34.398 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 15.0 | 70.000 | -58.820 | -58.820 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 30.0 | 70.000 | -55.499 | -55.499 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 60.0 | 70.000 | -47.346 | -47.346 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 90.0 | 35.000 | -41.995 | -41.995 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 90.0 | 35.000 | -41.855 | -41.855 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 90.0 | 35.000 | -41.335 | -41.335 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 90.0 | 70.000 | -35.629 | -35.629 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 90.0 | 70.000 | -35.872 | -35.872 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 90.0 | 70.000 | -35.181 | -35.181 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 90.0 | 105.000 | -32.335 | -32.335 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 90.0 | 105.000 | -32.079 | -32.079 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 90.0 | 105.000 | -31.696 | -31.696 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 120.0 | 70.000 | -47.346 | -47.346 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 150.0 | 70.000 | -55.499 | -55.499 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 70.0 | 165.0 | 70.000 | -58.820 | -58.820 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 90.0 | 90.0 | 70.000 | -35.359 | -35.359 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 15.0 | 70.000 | -60.810 | -60.810 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 30.0 | 70.000 | -58.328 | -58.328 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 60.0 | 70.000 | -46.936 | -46.936 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 90.0 | 35.000 | -40.663 | -40.663 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 90.0 | 35.000 | -41.371 | -41.371 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 90.0 | 35.000 | -41.754 | -41.754 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 90.0 | 70.000 | -35.337 | -35.337 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 90.0 | 70.000 | -34.582 | -34.582 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 90.0 | 70.000 | -35.339 | -35.339 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 90.0 | 105.000 | -30.864 | -30.864 | -0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 90.0 | 105.000 | -32.071 | -32.071 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 90.0 | 105.000 | -31.774 | -31.774 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 120.0 | 70.000 | -46.936 | -46.936 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 150.0 | 70.000 | -58.328 | -58.328 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 120.0 | 165.0 | 70.000 | -60.810 | -60.810 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 160.0 | 90.0 | 70.000 | -35.162 | -35.162 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 15.0 | 70.000 | -58.332 | -58.332 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 30.0 | 70.000 | -56.734 | -56.734 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 60.0 | 70.000 | -47.237 | -47.237 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 90.0 | 35.000 | -41.656 | -41.656 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 90.0 | 35.000 | -41.138 | -41.138 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 90.0 | 35.000 | -41.171 | -41.171 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 90.0 | 70.000 | -35.118 | -35.118 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 90.0 | 70.000 | -35.168 | -35.168 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 90.0 | 70.000 | -35.130 | -35.130 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 90.0 | 105.000 | -30.442 | -30.442 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 90.0 | 105.000 | -31.010 | -31.010 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 90.0 | 105.000 | -32.362 | -32.362 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 120.0 | 70.000 | -47.237 | -47.237 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 150.0 | 70.000 | -56.734 | -56.734 | 0.000 |
+| spheroidal modal | fixed rigid | baseline geometry | 200.0 | 165.0 | 70.000 | -58.332 | -58.332 | 0.000 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / gas filled / baseline geometry / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 15.0 | 70.000 | -107.797 | -107.797 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 30.0 | 70.000 | -103.840 | -103.840 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 60.0 | 70.000 | -95.823 | -95.823 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 90.0 | 35.000 | -110.292 | -110.292 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 90.0 | 35.000 | -98.990 | -98.990 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 90.0 | 35.000 | -93.202 | -93.202 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 90.0 | 70.000 | -92.616 | -92.616 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 90.0 | 70.000 | -103.954 | -103.954 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 90.0 | 70.000 | -86.776 | -86.776 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 90.0 | 105.000 | -100.174 | -100.174 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 90.0 | 105.000 | -88.822 | -88.822 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 90.0 | 105.000 | -82.938 | -82.938 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 120.0 | 70.000 | -95.823 | -95.823 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 150.0 | 70.000 | -103.840 | -103.840 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 12.0 | 165.0 | 70.000 | -107.797 | -107.797 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 18.0 | 90.0 | 70.000 | -86.459 | -86.459 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 25.0 | 90.0 | 70.000 | -82.652 | -82.652 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 15.0 | 70.000 | -108.987 | -108.987 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 30.0 | 70.000 | -105.686 | -105.686 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 60.0 | 70.000 | -93.506 | -93.506 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 90.0 | 35.000 | -91.754 | -91.754 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 90.0 | 35.000 | -88.005 | -88.005 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 90.0 | 35.000 | -101.387 | -101.387 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 90.0 | 70.000 | -81.676 | -81.676 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 90.0 | 70.000 | -85.612 | -85.612 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 90.0 | 70.000 | -99.976 | -99.976 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 90.0 | 105.000 | -82.062 | -82.062 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 90.0 | 105.000 | -78.093 | -78.093 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 90.0 | 105.000 | -97.462 | -97.462 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 120.0 | 70.000 | -93.506 | -93.506 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 150.0 | 70.000 | -105.686 | -105.686 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 38.0 | 165.0 | 70.000 | -108.987 | -108.987 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 50.0 | 90.0 | 70.000 | -89.756 | -89.756 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 15.0 | 70.000 | -110.371 | -110.371 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 30.0 | 70.000 | -97.602 | -97.602 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 60.0 | 70.000 | -91.674 | -91.674 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 90.0 | 35.000 | -87.286 | -87.286 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 90.0 | 35.000 | -90.071 | -90.071 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 90.0 | 35.000 | -89.464 | -89.464 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 90.0 | 70.000 | -84.465 | -84.465 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 90.0 | 70.000 | -81.169 | -81.169 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 90.0 | 70.000 | -82.710 | -82.710 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 90.0 | 105.000 | -77.632 | -77.632 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 90.0 | 105.000 | -81.012 | -81.011 | 0.001 |
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 90.0 | 105.000 | -79.084 | -79.085 | -0.001 |
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 120.0 | 70.000 | -91.674 | -91.674 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 150.0 | 70.000 | -97.602 | -97.602 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 70.0 | 165.0 | 70.000 | -110.371 | -110.371 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 90.0 | 90.0 | 70.000 | -119.816 | -119.818 | -0.003 |
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 15.0 | 70.000 | -99.235 | -99.235 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 30.0 | 70.000 | -95.195 | -95.195 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 60.0 | 70.000 | -97.057 | -97.057 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 90.0 | 35.000 | -97.948 | -97.948 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 90.0 | 35.000 | -91.363 | -91.363 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 90.0 | 35.000 | -89.349 | -89.349 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 90.0 | 70.000 | -84.944 | -84.946 | -0.002 |
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 90.0 | 70.000 | -92.169 | -92.164 | 0.004 |
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 90.0 | 70.000 | -82.771 | -82.772 | -0.001 |
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 90.0 | 105.000 | -88.710 | -85.448 | 3.263 |
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 90.0 | 105.000 | -81.334 | -83.601 | -2.267 |
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 90.0 | 105.000 | -79.114 | -80.528 | -1.414 |
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 120.0 | 70.000 | -97.057 | -97.057 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 150.0 | 70.000 | -95.195 | -95.195 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 120.0 | 165.0 | 70.000 | -99.235 | -99.235 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 160.0 | 90.0 | 70.000 | -91.587 | -90.657 | 0.930 |
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 15.0 | 70.000 | -105.907 | -105.907 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 30.0 | 70.000 | -99.626 | -99.626 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 60.0 | 70.000 | -130.825 | -130.825 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 90.0 | 35.000 | -91.017 | -91.017 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 90.0 | 35.000 | -98.832 | -98.832 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 90.0 | 35.000 | -89.730 | -89.730 | 0.000 |
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 90.0 | 70.000 | -91.961 | -99.319 | -7.358 |
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 90.0 | 70.000 | -84.875 | -88.965 | -4.090 |
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 90.0 | 70.000 | -84.246 | -82.228 | 2.019 |
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 90.0 | 105.000 | -81.323 | -79.852 | 1.471 |
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 90.0 | 105.000 | -88.231 | -87.119 | 1.112 |
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 90.0 | 105.000 | -80.872 | -80.457 | 0.415 |
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 120.0 | 70.000 | -130.825 | -130.825 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 150.0 | 70.000 | -99.626 | -99.626 | -0.000 |
+| spheroidal modal | gas filled | baseline geometry | 200.0 | 165.0 | 70.000 | -105.907 | -105.907 | 0.000 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / gas filled / gas core / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | gas filled | gas core | 12.0 | 60.0 | 70.000 | -40.245 | -40.245 | 0.000 |
+| spheroidal modal | gas filled | gas core | 12.0 | 90.0 | 70.000 | -35.923 | -35.923 | 0.000 |
+| spheroidal modal | gas filled | gas core | 12.0 | 120.0 | 70.000 | -40.245 | -40.245 | 0.000 |
+| spheroidal modal | gas filled | gas core | 38.0 | 60.0 | 70.000 | -44.557 | -44.557 | -0.000 |
+| spheroidal modal | gas filled | gas core | 38.0 | 90.0 | 70.000 | -34.908 | -34.908 | 0.000 |
+| spheroidal modal | gas filled | gas core | 38.0 | 120.0 | 70.000 | -44.557 | -44.557 | -0.000 |
+| spheroidal modal | gas filled | gas core | 70.0 | 60.0 | 70.000 | -45.966 | -45.966 | 0.000 |
+| spheroidal modal | gas filled | gas core | 70.0 | 90.0 | 70.000 | -34.916 | -34.916 | -0.000 |
+| spheroidal modal | gas filled | gas core | 70.0 | 120.0 | 70.000 | -45.966 | -45.966 | 0.000 |
+| spheroidal modal | gas filled | gas core | 120.0 | 60.0 | 70.000 | -46.362 | -46.362 | 0.000 |
+| spheroidal modal | gas filled | gas core | 120.0 | 90.0 | 70.000 | -35.111 | -35.111 | 0.000 |
+| spheroidal modal | gas filled | gas core | 120.0 | 120.0 | 70.000 | -46.362 | -46.362 | -0.000 |
+| spheroidal modal | gas filled | gas core | 200.0 | 60.0 | 70.000 | -48.771 | -48.771 | 0.000 |
+| spheroidal modal | gas filled | gas core | 200.0 | 90.0 | 70.000 | -35.071 | -34.935 | 0.136 |
+| spheroidal modal | gas filled | gas core | 200.0 | 120.0 | 70.000 | -48.771 | -48.771 | 0.000 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / liquid filled / baseline geometry / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 15.0 | 70.000 | -105.530 | -107.797 | -2.268 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 30.0 | 70.000 | -102.455 | -103.840 | -1.384 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 60.0 | 70.000 | -95.828 | -95.823 | 0.004 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 90.0 | 35.000 | -110.427 | -110.292 | 0.135 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 90.0 | 35.000 | -99.094 | -98.990 | 0.104 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 90.0 | 35.000 | -93.247 | -93.202 | 0.045 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 90.0 | 70.000 | -93.073 | -92.616 | 0.457 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 90.0 | 70.000 | -104.415 | -103.954 | 0.461 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 90.0 | 70.000 | -87.226 | -86.776 | 0.450 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 90.0 | 105.000 | -100.876 | -100.174 | 0.702 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 90.0 | 105.000 | -89.552 | -88.822 | 0.730 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 90.0 | 105.000 | -83.704 | -82.938 | 0.767 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 120.0 | 70.000 | -95.828 | -95.823 | 0.004 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 150.0 | 70.000 | -102.455 | -103.840 | -1.384 |
+| spheroidal modal | liquid filled | baseline geometry | 12.0 | 165.0 | 70.000 | -105.530 | -107.797 | -2.268 |
+| spheroidal modal | liquid filled | baseline geometry | 18.0 | 90.0 | 70.000 | -87.226 | -86.459 | 0.767 |
+| spheroidal modal | liquid filled | baseline geometry | 25.0 | 90.0 | 70.000 | -83.626 | -82.652 | 0.974 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 15.0 | 70.000 | -129.079 | -108.987 | 20.092 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 30.0 | 70.000 | -104.152 | -105.686 | -1.534 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 60.0 | 70.000 | -94.647 | -93.506 | 1.141 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 90.0 | 35.000 | -92.559 | -91.754 | 0.806 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 90.0 | 35.000 | -89.254 | -88.005 | 1.249 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 90.0 | 35.000 | -98.644 | -101.387 | -2.744 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 90.0 | 70.000 | -83.223 | -81.676 | 1.546 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 90.0 | 70.000 | -86.531 | -85.612 | 0.919 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 90.0 | 70.000 | -92.595 | -99.976 | -7.381 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 90.0 | 105.000 | -83.011 | -82.062 | 0.950 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 90.0 | 105.000 | -79.699 | -78.093 | 1.606 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 90.0 | 105.000 | -89.070 | -97.462 | -8.392 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 120.0 | 70.000 | -94.647 | -93.506 | 1.141 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 150.0 | 70.000 | -104.152 | -105.686 | -1.534 |
+| spheroidal modal | liquid filled | baseline geometry | 38.0 | 165.0 | 70.000 | -129.079 | -108.987 | 20.092 |
+| spheroidal modal | liquid filled | baseline geometry | 50.0 | 90.0 | 70.000 | -95.310 | -89.756 | 5.554 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 15.0 | 70.000 | -118.769 | -110.371 | 8.397 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 30.0 | 70.000 | -103.738 | -97.602 | 6.136 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 60.0 | 70.000 | -98.325 | -91.674 | 6.651 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 90.0 | 35.000 | -88.616 | -87.286 | 1.329 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 90.0 | 35.000 | -88.997 | -90.071 | -1.074 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 90.0 | 35.000 | -89.641 | -89.464 | 0.176 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 90.0 | 70.000 | -82.973 | -84.465 | -1.492 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 90.0 | 70.000 | -82.592 | -81.169 | 1.422 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 90.0 | 70.000 | -83.604 | -82.710 | 0.894 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 90.0 | 105.000 | -79.059 | -77.632 | 1.427 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 90.0 | 105.000 | -79.449 | -81.011 | -1.562 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 90.0 | 105.000 | -80.081 | -79.085 | 0.997 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 120.0 | 70.000 | -98.325 | -91.674 | 6.651 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 150.0 | 70.000 | -103.738 | -97.602 | 6.136 |
+| spheroidal modal | liquid filled | baseline geometry | 70.0 | 165.0 | 70.000 | -118.769 | -110.371 | 8.397 |
+| spheroidal modal | liquid filled | baseline geometry | 90.0 | 90.0 | 70.000 | -104.174 | -119.818 | -15.645 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 15.0 | 70.000 | -104.497 | -99.235 | 5.263 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 30.0 | 70.000 | -102.537 | -95.195 | 7.342 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 60.0 | 70.000 | -101.719 | -97.057 | 4.661 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 90.0 | 35.000 | -94.127 | -97.948 | -3.821 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 90.0 | 35.000 | -92.599 | -91.363 | 1.236 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 90.0 | 35.000 | -89.527 | -89.349 | 0.178 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 90.0 | 70.000 | -86.581 | -84.946 | 1.634 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 90.0 | 70.000 | -88.104 | -92.164 | -4.060 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 90.0 | 70.000 | -83.504 | -82.772 | 0.732 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 90.0 | 105.000 | -84.581 | -85.448 | -0.866 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 90.0 | 105.000 | -83.058 | -83.601 | -0.543 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 90.0 | 105.000 | -79.980 | -80.528 | -0.548 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 120.0 | 70.000 | -101.719 | -97.057 | 4.661 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 150.0 | 70.000 | -102.537 | -95.195 | 7.342 |
+| spheroidal modal | liquid filled | baseline geometry | 120.0 | 165.0 | 70.000 | -104.497 | -99.235 | 5.263 |
+| spheroidal modal | liquid filled | baseline geometry | 160.0 | 90.0 | 70.000 | -89.625 | -90.657 | -1.032 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 15.0 | 70.000 | -110.566 | -105.907 | 4.659 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 30.0 | 70.000 | -110.685 | -99.626 | 11.059 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 60.0 | 70.000 | -107.200 | -130.825 | -23.625 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 90.0 | 35.000 | -92.231 | -91.017 | 1.214 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 90.0 | 35.000 | -101.437 | -98.832 | 2.605 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 90.0 | 35.000 | -89.546 | -89.730 | -0.184 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 90.0 | 70.000 | -95.417 | -99.319 | -3.902 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 90.0 | 70.000 | -86.208 | -88.965 | -2.756 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 90.0 | 70.000 | -83.538 | -82.228 | 1.311 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 90.0 | 105.000 | -82.687 | -79.852 | 2.835 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 90.0 | 105.000 | -91.892 | -87.119 | 4.773 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 90.0 | 105.000 | -80.016 | -80.457 | -0.442 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 120.0 | 70.000 | -107.200 | -130.825 | -23.625 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 150.0 | 70.000 | -110.685 | -99.626 | 11.059 |
+| spheroidal modal | liquid filled | baseline geometry | 200.0 | 165.0 | 70.000 | -110.566 | -105.907 | 4.659 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / liquid filled / denser faster / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | liquid filled | denser faster | 12.0 | 60.0 | 70.000 | -82.181 | -82.179 | 0.002 |
+| spheroidal modal | liquid filled | denser faster | 12.0 | 90.0 | 70.000 | -79.423 | -78.882 | 0.541 |
+| spheroidal modal | liquid filled | denser faster | 12.0 | 120.0 | 70.000 | -82.181 | -82.179 | 0.002 |
+| spheroidal modal | liquid filled | denser faster | 38.0 | 60.0 | 70.000 | -81.048 | -79.675 | 1.373 |
+| spheroidal modal | liquid filled | denser faster | 38.0 | 90.0 | 70.000 | -69.431 | -67.646 | 1.785 |
+| spheroidal modal | liquid filled | denser faster | 38.0 | 120.0 | 70.000 | -81.048 | -79.675 | 1.373 |
+| spheroidal modal | liquid filled | denser faster | 70.0 | 60.0 | 70.000 | -85.214 | -77.597 | 7.617 |
+| spheroidal modal | liquid filled | denser faster | 70.0 | 90.0 | 70.000 | -69.393 | -71.364 | -1.972 |
+| spheroidal modal | liquid filled | denser faster | 70.0 | 120.0 | 70.000 | -85.214 | -77.597 | 7.617 |
+| spheroidal modal | liquid filled | denser faster | 120.0 | 60.0 | 70.000 | -86.858 | -80.844 | 6.014 |
+| spheroidal modal | liquid filled | denser faster | 120.0 | 90.0 | 70.000 | -71.792 | -70.092 | 1.700 |
+| spheroidal modal | liquid filled | denser faster | 120.0 | 120.0 | 70.000 | -86.858 | -80.844 | 6.014 |
+| spheroidal modal | liquid filled | denser faster | 200.0 | 60.0 | 70.000 | -99.869 | -88.532 | 11.337 |
+| spheroidal modal | liquid filled | denser faster | 200.0 | 90.0 | 70.000 | -77.438 | -80.178 | -2.740 |
+| spheroidal modal | liquid filled | denser faster | 200.0 | 120.0 | 70.000 | -99.869 | -88.532 | 11.337 |
+
+</details>
+
+<details>
+<summary>spheroidal modal / pressure release / baseline geometry / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 15.0 | 70.000 | -46.005 | -46.005 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 30.0 | 70.000 | -45.778 | -45.778 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 60.0 | 70.000 | -40.232 | -40.232 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 90.0 | 35.000 | -41.617 | -41.617 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 90.0 | 35.000 | -40.188 | -40.188 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 90.0 | 35.000 | -39.822 | -39.822 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 90.0 | 70.000 | -35.910 | -35.910 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 90.0 | 70.000 | -36.993 | -36.993 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 90.0 | 70.000 | -35.483 | -35.483 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 90.0 | 105.000 | -33.619 | -33.619 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 90.0 | 105.000 | -32.598 | -32.598 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 90.0 | 105.000 | -32.184 | -32.184 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 120.0 | 70.000 | -40.232 | -40.232 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 150.0 | 70.000 | -45.778 | -45.778 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 12.0 | 165.0 | 70.000 | -46.005 | -46.005 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 18.0 | 90.0 | 70.000 | -35.706 | -35.706 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 25.0 | 90.0 | 70.000 | -35.321 | -35.321 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 15.0 | 70.000 | -51.275 | -51.275 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 30.0 | 70.000 | -49.996 | -49.996 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 60.0 | 70.000 | -44.574 | -44.574 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 90.0 | 35.000 | -41.678 | -41.678 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 90.0 | 35.000 | -40.963 | -40.963 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 90.0 | 35.000 | -40.773 | -40.773 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 90.0 | 70.000 | -34.879 | -34.879 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 90.0 | 70.000 | -35.639 | -35.639 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 90.0 | 70.000 | -34.914 | -34.914 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 90.0 | 105.000 | -32.047 | -32.047 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 90.0 | 105.000 | -31.212 | -31.212 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 90.0 | 105.000 | -31.286 | -31.286 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 120.0 | 70.000 | -44.574 | -44.574 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 150.0 | 70.000 | -49.996 | -49.996 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 38.0 | 165.0 | 70.000 | -51.275 | -51.275 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 50.0 | 90.0 | 70.000 | -34.807 | -34.807 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 15.0 | 70.000 | -53.218 | -53.218 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 30.0 | 70.000 | -51.946 | -51.946 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 60.0 | 70.000 | -45.815 | -45.815 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 90.0 | 35.000 | -40.926 | -40.926 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 90.0 | 35.000 | -41.013 | -41.013 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 90.0 | 35.000 | -41.024 | -41.024 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 90.0 | 70.000 | -34.909 | -34.909 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 90.0 | 70.000 | -34.677 | -34.677 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 90.0 | 70.000 | -35.065 | -35.065 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 90.0 | 105.000 | -31.042 | -31.042 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 90.0 | 105.000 | -31.361 | -31.361 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 90.0 | 105.000 | -31.555 | -31.555 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 120.0 | 70.000 | -45.815 | -45.815 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 150.0 | 70.000 | -51.946 | -51.946 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 70.0 | 165.0 | 70.000 | -53.218 | -53.218 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 90.0 | 90.0 | 70.000 | -35.034 | -35.034 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 15.0 | 70.000 | -54.519 | -54.519 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 30.0 | 70.000 | -53.169 | -53.169 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 60.0 | 70.000 | -46.397 | -46.397 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 90.0 | 35.000 | -40.842 | -40.842 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 90.0 | 35.000 | -41.097 | -41.097 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 90.0 | 35.000 | -41.108 | -41.108 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 90.0 | 70.000 | -35.083 | -35.083 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 90.0 | 70.000 | -34.718 | -34.718 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 90.0 | 70.000 | -35.109 | -35.109 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 90.0 | 105.000 | -30.741 | -30.741 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 90.0 | 105.000 | -31.608 | -31.608 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 90.0 | 105.000 | -31.591 | -31.591 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 120.0 | 70.000 | -46.397 | -46.397 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 150.0 | 70.000 | -53.169 | -53.169 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 120.0 | 165.0 | 70.000 | -54.519 | -54.519 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 160.0 | 90.0 | 70.000 | -35.135 | -35.135 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 15.0 | 70.000 | -55.368 | -55.368 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 30.0 | 70.000 | -53.901 | -53.901 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 60.0 | 70.000 | -46.632 | -46.632 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 90.0 | 35.000 | -41.091 | -41.091 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 90.0 | 35.000 | -41.134 | -41.134 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 90.0 | 35.000 | -41.139 | -41.139 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 90.0 | 70.000 | -34.978 | -34.978 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 90.0 | 70.000 | -35.021 | -35.021 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 90.0 | 70.000 | -35.147 | -35.147 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 90.0 | 105.000 | -29.982 | -29.982 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 90.0 | 105.000 | -31.020 | -31.020 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 90.0 | 105.000 | -32.338 | -32.338 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 120.0 | 70.000 | -46.632 | -46.632 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 150.0 | 70.000 | -53.901 | -53.901 | 0.000 |
+| spheroidal modal | pressure release | baseline geometry | 200.0 | 165.0 | 70.000 | -55.368 | -55.368 | 0.000 |
+
+</details>
+
+
+## Residual Summary
+
+| Axis | Method | Boundary | Frequency (kHz) | Angle (deg) | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|--:|--:|
+| Boundary Cases | spheroidal modal | fixed rigid | 12.0-200.0 | 15.0-165.0 | 0.000 | 0.000 |
+| Boundary Cases | spheroidal modal | gas filled | 12.0-200.0 | 15.0-165.0 | 0.258 | 7.358 |
+| Boundary Cases | spheroidal modal | liquid filled | 12.0-200.0 | 15.0-165.0 | 3.866 | 23.625 |
+| Boundary Cases | spheroidal modal | pressure release | 12.0-200.0 | 15.0-165.0 | 0.000 | 0.000 |
+| TS-Frequency | spheroidal modal | fixed rigid | 12.0-200.0 | 90.0 | 0.000 | 0.000 |
+| TS-Frequency | spheroidal modal | gas filled | 12.0-200.0 | 90.0 | 0.829 | 7.358 |
+| TS-Frequency | spheroidal modal | liquid filled | 12.0-200.0 | 90.0 | 3.300 | 15.645 |
+| TS-Frequency | spheroidal modal | pressure release | 12.0-200.0 | 90.0 | 0.000 | 0.000 |
+| TS-Orientation | spheroidal modal | fixed rigid | 12.0-200.0 | 15.0-165.0 | 0.000 | 0.000 |
+| TS-Orientation | spheroidal modal | gas filled | 12.0-200.0 | 15.0-165.0 | 0.210 | 7.358 |
+| TS-Orientation | spheroidal modal | liquid filled | 12.0-200.0 | 15.0-165.0 | 6.213 | 23.625 |
+| TS-Orientation | spheroidal modal | pressure release | 12.0-200.0 | 15.0-165.0 | 0.000 | 0.000 |
+| TS-Parameter | spheroidal modal | gas filled | 12.0-200.0 | 60.0-120.0 | 0.009 | 0.136 |
+| TS-Parameter | spheroidal modal | liquid filled | 12.0-200.0 | 60.0-120.0 | 4.754 | 23.625 |
+| TS-Size | spheroidal modal | fixed rigid | 12.0-200.0 | 90.0 | 0.000 | 0.000 |
+| TS-Size | spheroidal modal | gas filled | 12.0-200.0 | 90.0 | 0.520 | 7.358 |
+| TS-Size | spheroidal modal | liquid filled | 12.0-200.0 | 90.0 | 1.632 | 8.392 |
+| TS-Size | spheroidal modal | pressure release | 12.0-200.0 | 90.0 | 0.000 | 0.000 |
+

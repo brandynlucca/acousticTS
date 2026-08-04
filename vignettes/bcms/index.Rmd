@@ -1,4 +1,4 @@
-﻿---
+---
 title: "BCMS"
 output:
   rmarkdown::html_vignette:
@@ -19,8 +19,9 @@ acousticTS:::.model_family_header(
   family = "bcms",
   pages = c(
     Overview = "index.html",
+    Theory = "bcms-theory.html",
     Implementation = "bcms-implementation.html",
-    Theory = "bcms-theory.html"
+    Validation = "bcms-validation.html"
   )
 )
 ```
@@ -59,7 +60,8 @@ acousticTS:::.model_family_overview(
   ),
   reading = c(
     "[Implementation](bcms-implementation.html): usage and current reference checks",
-    "[Theory](bcms-theory.html): bent-axis coherence integrals and relation to the straight-cylinder modal kernel"
+    "[Theory](bcms-theory.html): bent-axis coherence integrals and relation to the straight-cylinder modal kernel",
+    "[Validation](bcms-validation.html): radial FEM checks across frequency, boundary, angle, size, and orientation cases"
   )
 )
 ```

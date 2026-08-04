@@ -1,0 +1,57 @@
+---
+title: "DWBA benchmarks"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: false
+    fig_caption: yes
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
+vignette: >
+  %\VignetteIndexEntry{DWBA benchmarks}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# Benchmarks
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  family = "dwba",
+  pages = c(
+    Overview = "index.html",
+    Theory = "dwba-theory.html",
+    Implementation = "dwba-implementation.html",
+    Benchmarks = "dwba-benchmarks.html",
+    Validation = "dwba-validation.html"
+  )
+)
+```
+
+DWBA benchmark comparisons use the canonical weakly scattering targets from Jech et al. [@Jech_2015]. These are benchmark anchors for the approximation, not exact guarantees for arbitrary segmented bodies.
+
+| Geometry | Max abs. $\Delta$ vs benchmark (dB) | Mean abs. $\Delta$ vs benchmark (dB) | Elapsed (s) |
+|:--|--:|--:|--:|
+| Weakly scattering sphere | 16.17744 | 0.29031 | 0.74 |
+| Weakly scattering prolate spheroid | 0.04993 | 0.01735 | 5.11 |
+| Weakly scattering cylinder | 2.28194 | 0.06664 | 2.53 |
+
+The largest absolute dB differences are concentrated near deep nulls. For physical-strength comparisons, `sigma_bs` residuals should be checked alongside `TS`.
+
+## Software implementation comparison
+
+The segmented krill benchmark is also compared to the `echoSMs` implementation on the published sweep. This is a software benchmark, not a validation-method result.
+
+| Benchmark comparison | Target | Frequency range | Mean abs. $\Delta TS$ (dB) | Max abs. $\Delta TS$ (dB) |
+|:--|:--|:--|--:|--:|
+| acousticTS vs `echoSMs` | Segmented krill | Published sweep | 0.42284 | 1.01167 |
+| McGehee et al. (1998) vs `echoSMs` | Segmented krill | Published sweep | 0.42284 | 1.01167 |
+
+## Published segmented-body benchmark
+
+The same segmented krill target is also checked against the published McGehee et al. calculation [@mcgehee_software]. The case matches the segment positions, local radii, weak-scattering contrasts, orientation, and frequency grid.
+
+| Benchmark comparison | Target | Frequency range | Mean abs. $\Delta TS$ (dB) | Max abs. $\Delta TS$ (dB) |
+|:--|:--|:--|--:|--:|
+| acousticTS vs McGehee et al. (1998) | Segmented krill | Published sweep | 1.23e-05 | 4.33e-05 |

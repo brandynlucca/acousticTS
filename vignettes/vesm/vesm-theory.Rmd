@@ -28,8 +28,10 @@ acousticTS:::.model_family_header(
   family = "vesm",
   pages = c(
     Overview = "index.html",
+    Theory = "vesm-theory.html",
     Implementation = "vesm-implementation.html",
-    Theory = "vesm-theory.html"
+    Benchmarks = "vesm-benchmarks.html",
+    Validation = "vesm-validation.html"
   )
 )
 ```

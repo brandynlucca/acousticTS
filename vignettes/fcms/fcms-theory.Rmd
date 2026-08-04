@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Finite cylinder modal series solution (FCMS) theory"
 output:
   rmarkdown::html_vignette:
@@ -25,8 +25,10 @@ acousticTS:::.model_family_header(
   family = "fcms",
   pages = c(
     Overview = "index.html",
+    Theory = "fcms-theory.html",
     Implementation = "fcms-implementation.html",
-    Theory = "fcms-theory.html"
+    Benchmarks = "fcms-benchmarks.html",
+    Validation = "fcms-validation.html"
   )
 )
 ```

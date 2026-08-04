@@ -1,4 +1,4 @@
-﻿---
+---
 title: "TRCM"
 output:
   rmarkdown::html_vignette:
@@ -20,8 +20,10 @@ acousticTS:::.model_family_header(
   family = "trcm",
   pages = c(
     Overview = "index.html",
+    Theory = "trcm-theory.html",
     Implementation = "trcm-implementation.html",
-    Theory = "trcm-theory.html"
+    Benchmarks = "trcm-benchmarks.html",
+    Validation = "trcm-validation.html"
   )
 )
 ```

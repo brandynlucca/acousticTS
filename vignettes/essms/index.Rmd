@@ -19,8 +19,9 @@ acousticTS:::.model_family_header(
   family = "essms",
   pages = c(
     Overview = "index.html",
+    Theory = "essms-theory.html",
     Implementation = "essms-implementation.html",
-    Theory = "essms-theory.html"
+    Validation = "essms-validation.html"
   )
 )
 ```

@@ -1,0 +1,357 @@
+---
+title: "SOEMS validation"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: false
+    fig_caption: yes
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
+vignette: >
+  %\VignetteIndexEntry{SOEMS validation}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# Validation
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  family = "calibration",
+  pages = c(
+    Overview = "index.html",
+    Theory = "calibration-theory.html",
+    Implementation = "calibration-implementation.html",
+    Benchmarks = "calibration-benchmarks.html",
+    Validation = "calibration-validation.html"
+  )
+)
+```
+
+SOEMS is checked as a solid elastic calibration sphere over frequency, orientation, diameter, and elastic material parameterizations.
+
+::: {.tip data-title="Residuals near nulls"}
+Mean absolute differences describe the typical agreement; maximum differences are retained because deep nulls can expose localized convention or resolution errors.
+:::
+
+## TS-Frequency
+
+Frequency rows retain the matched target and orientation while sweeping frequency.
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|:--|--:|--:|
+| exact modal |  | WC | 12.0-200.0 | 180.0 | Diameter (mm) 38.100 | 0.000 | 0.000 |
+
+<details>
+<summary>exact modal / WC / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal |  | WC | 12.0 | 180.0 | 38.100 | -41.899 | -41.899 | 0.000 |
+| exact modal |  | WC | 18.0 | 180.0 | 38.100 | -42.817 | -42.817 | -0.000 |
+| exact modal |  | WC | 25.0 | 180.0 | 38.100 | -42.261 | -42.261 | -0.000 |
+| exact modal |  | WC | 38.0 | 180.0 | 38.100 | -42.330 | -42.330 | 0.000 |
+| exact modal |  | WC | 50.0 | 180.0 | 38.100 | -41.185 | -41.185 | 0.000 |
+| exact modal |  | WC | 70.0 | 180.0 | 38.100 | -41.070 | -41.070 | 0.000 |
+| exact modal |  | WC | 90.0 | 180.0 | 38.100 | -45.481 | -45.481 | 0.000 |
+| exact modal |  | WC | 120.0 | 180.0 | 38.100 | -39.503 | -39.503 | 0.000 |
+| exact modal |  | WC | 160.0 | 180.0 | 38.100 | -39.711 | -39.711 | -0.000 |
+| exact modal |  | WC | 200.0 | 180.0 | 38.100 | -39.438 | -39.438 | -0.000 |
+
+</details>
+
+
+## TS-Orientation
+
+Orientation rows retain the matched target and frequency ladder while sweeping incidence or scatter angle.
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|:--|--:|--:|
+| exact modal |  | WC | 12.0 | 0.0-180.0 | Diameter (mm) 38.100 | 0.000 | 0.000 |
+| exact modal |  | WC | 120.0 | 0.0-180.0 | Diameter (mm) 38.100 | 0.000 | 0.000 |
+| exact modal |  | WC | 200.0 | 0.0-180.0 | Diameter (mm) 38.100 | 0.000 | 0.000 |
+| exact modal |  | WC | 38.0 | 0.0-180.0 | Diameter (mm) 38.100 | 0.000 | 0.000 |
+| exact modal |  | WC | 70.0 | 0.0-180.0 | Diameter (mm) 38.100 | 0.000 | 0.000 |
+
+<details>
+<summary>exact modal / WC / 12.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal |  | WC | 12.0 | 0.0 | 38.100 | -51.043 | -51.043 | -0.000 |
+| exact modal |  | WC | 12.0 | 30.0 | 38.100 | -54.795 | -54.795 | -0.000 |
+| exact modal |  | WC | 12.0 | 60.0 | 38.100 | -55.458 | -55.458 | 0.000 |
+| exact modal |  | WC | 12.0 | 90.0 | 38.100 | -47.118 | -47.118 | 0.000 |
+| exact modal |  | WC | 12.0 | 120.0 | 38.100 | -43.664 | -43.664 | 0.000 |
+| exact modal |  | WC | 12.0 | 150.0 | 38.100 | -42.266 | -42.266 | -0.000 |
+| exact modal |  | WC | 12.0 | 180.0 | 38.100 | -41.899 | -41.899 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / WC / 120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal |  | WC | 120.0 | 0.0 | 38.100 | -22.429 | -22.429 | 0.000 |
+| exact modal |  | WC | 120.0 | 30.0 | 38.100 | -44.499 | -44.499 | 0.000 |
+| exact modal |  | WC | 120.0 | 60.0 | 38.100 | -39.527 | -39.527 | 0.000 |
+| exact modal |  | WC | 120.0 | 90.0 | 38.100 | -41.829 | -41.829 | 0.000 |
+| exact modal |  | WC | 120.0 | 120.0 | 38.100 | -40.578 | -40.578 | 0.000 |
+| exact modal |  | WC | 120.0 | 150.0 | 38.100 | -40.236 | -40.236 | -0.000 |
+| exact modal |  | WC | 120.0 | 180.0 | 38.100 | -39.503 | -39.503 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / WC / 200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal |  | WC | 200.0 | 0.0 | 38.100 | -17.512 | -17.512 | 0.000 |
+| exact modal |  | WC | 200.0 | 30.0 | 38.100 | -43.687 | -43.687 | -0.000 |
+| exact modal |  | WC | 200.0 | 60.0 | 38.100 | -41.218 | -41.218 | 0.000 |
+| exact modal |  | WC | 200.0 | 90.0 | 38.100 | -40.587 | -40.587 | 0.000 |
+| exact modal |  | WC | 200.0 | 120.0 | 38.100 | -40.838 | -40.838 | 0.000 |
+| exact modal |  | WC | 200.0 | 150.0 | 38.100 | -41.022 | -41.022 | -0.000 |
+| exact modal |  | WC | 200.0 | 180.0 | 38.100 | -39.438 | -39.438 | -0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / WC / 38.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal |  | WC | 38.0 | 0.0 | 38.100 | -34.211 | -34.211 | 0.000 |
+| exact modal |  | WC | 38.0 | 30.0 | 38.100 | -37.861 | -37.861 | 0.000 |
+| exact modal |  | WC | 38.0 | 60.0 | 38.100 | -38.419 | -38.419 | 0.000 |
+| exact modal |  | WC | 38.0 | 90.0 | 38.100 | -44.799 | -44.799 | 0.000 |
+| exact modal |  | WC | 38.0 | 120.0 | 38.100 | -40.440 | -40.440 | -0.000 |
+| exact modal |  | WC | 38.0 | 150.0 | 38.100 | -41.490 | -41.490 | 0.000 |
+| exact modal |  | WC | 38.0 | 180.0 | 38.100 | -42.330 | -42.330 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / WC / 70.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal |  | WC | 70.0 | 0.0 | 38.100 | -27.853 | -27.853 | -0.000 |
+| exact modal |  | WC | 70.0 | 30.0 | 38.100 | -34.871 | -34.871 | 0.000 |
+| exact modal |  | WC | 70.0 | 60.0 | 38.100 | -39.965 | -39.965 | 0.000 |
+| exact modal |  | WC | 70.0 | 90.0 | 38.100 | -41.769 | -41.769 | -0.000 |
+| exact modal |  | WC | 70.0 | 120.0 | 38.100 | -41.861 | -41.861 | 0.000 |
+| exact modal |  | WC | 70.0 | 150.0 | 38.100 | -40.413 | -40.413 | 0.000 |
+| exact modal |  | WC | 70.0 | 180.0 | 38.100 | -41.070 | -41.070 | 0.000 |
+
+</details>
+
+
+## TS-Size
+
+Size rows retain the matched material constants while sweeping length, radius, diameter, or scale.
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|:--|--:|--:|
+| exact modal |  | WC | 12.0 | 180.0 | Diameter (mm) 19.050-57.150 | 0.000 | 0.000 |
+| exact modal |  | WC | 120.0 | 180.0 | Diameter (mm) 19.050-57.150 | 0.000 | 0.000 |
+| exact modal |  | WC | 200.0 | 180.0 | Diameter (mm) 19.050-57.150 | 0.000 | 0.000 |
+| exact modal |  | WC | 38.0 | 180.0 | Diameter (mm) 19.050-57.150 | 0.000 | 0.000 |
+| exact modal |  | WC | 70.0 | 180.0 | Diameter (mm) 19.050-57.150 | 0.000 | 0.000 |
+
+<details>
+<summary>exact modal / WC / 12.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal |  | WC | 12.0 | 180.0 | 19.050 | -56.210 | -56.210 | 0.000 |
+| exact modal |  | WC | 12.0 | 180.0 | 38.100 | -41.899 | -41.899 | 0.000 |
+| exact modal |  | WC | 12.0 | 180.0 | 57.150 | -39.295 | -39.295 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / WC / 120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal |  | WC | 120.0 | 180.0 | 19.050 | -45.633 | -45.633 | 0.000 |
+| exact modal |  | WC | 120.0 | 180.0 | 38.100 | -39.503 | -39.503 | 0.000 |
+| exact modal |  | WC | 120.0 | 180.0 | 57.150 | -35.718 | -35.718 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / WC / 200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal |  | WC | 200.0 | 180.0 | 19.050 | -45.837 | -45.837 | 0.000 |
+| exact modal |  | WC | 200.0 | 180.0 | 38.100 | -39.438 | -39.438 | -0.000 |
+| exact modal |  | WC | 200.0 | 180.0 | 57.150 | -34.652 | -34.652 | -0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / WC / 38.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal |  | WC | 38.0 | 180.0 | 19.050 | -49.634 | -49.634 | 0.000 |
+| exact modal |  | WC | 38.0 | 180.0 | 38.100 | -42.330 | -42.330 | 0.000 |
+| exact modal |  | WC | 38.0 | 180.0 | 57.150 | -36.684 | -36.684 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / WC / 70.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal |  | WC | 70.0 | 180.0 | 19.050 | -47.700 | -47.700 | 0.000 |
+| exact modal |  | WC | 70.0 | 180.0 | 38.100 | -41.070 | -41.070 | 0.000 |
+| exact modal |  | WC | 70.0 | 180.0 | 57.150 | -35.876 | -35.876 | -0.000 |
+
+</details>
+
+
+## TS-Parameter
+
+Parameter rows retain the matched geometry class while sweeping material, curvature, taper, thickness, or discretization parameters.
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|:--|--:|--:|
+| exact modal |  | Al | 12.0-200.0 | 90.0-180.0 | Diameter (mm) 38.100 | 0.000 | 0.000 |
+| exact modal |  | brass | 12.0-200.0 | 90.0-180.0 | Diameter (mm) 38.100 | 0.000 | 0.000 |
+| exact modal |  | Cu | 12.0-200.0 | 90.0-180.0 | Diameter (mm) 38.100 | 0.000 | 0.000 |
+| exact modal |  | steel | 12.0-200.0 | 90.0-180.0 | Diameter (mm) 38.100 | 0.000 | 0.000 |
+| exact modal |  | WC | 12.0-200.0 | 90.0-180.0 | Diameter (mm) 38.100 | 0.000 | 0.000 |
+
+<details>
+<summary>exact modal / Al / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal |  | Al | 12.0 | 90.0 | 38.100 | -47.245 | -47.245 | 0.000 |
+| exact modal |  | Al | 12.0 | 135.0 | 38.100 | -45.445 | -45.445 | -0.000 |
+| exact modal |  | Al | 12.0 | 180.0 | 38.100 | -45.438 | -45.438 | 0.000 |
+| exact modal |  | Al | 38.0 | 90.0 | 38.100 | -45.767 | -45.767 | 0.000 |
+| exact modal |  | Al | 38.0 | 135.0 | 38.100 | -39.679 | -39.679 | 0.000 |
+| exact modal |  | Al | 38.0 | 180.0 | 38.100 | -39.858 | -39.858 | 0.000 |
+| exact modal |  | Al | 70.0 | 90.0 | 38.100 | -43.668 | -43.668 | 0.000 |
+| exact modal |  | Al | 70.0 | 135.0 | 38.100 | -44.839 | -44.839 | -0.000 |
+| exact modal |  | Al | 70.0 | 180.0 | 38.100 | -38.887 | -38.887 | 0.000 |
+| exact modal |  | Al | 120.0 | 90.0 | 38.100 | -45.878 | -45.878 | -0.000 |
+| exact modal |  | Al | 120.0 | 135.0 | 38.100 | -44.791 | -44.791 | -0.000 |
+| exact modal |  | Al | 120.0 | 180.0 | 38.100 | -37.286 | -37.286 | 0.000 |
+| exact modal |  | Al | 200.0 | 90.0 | 38.100 | -44.501 | -44.501 | 0.000 |
+| exact modal |  | Al | 200.0 | 135.0 | 38.100 | -41.909 | -41.909 | 0.000 |
+| exact modal |  | Al | 200.0 | 180.0 | 38.100 | -39.064 | -39.064 | -0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / brass / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal |  | brass | 12.0 | 90.0 | 38.100 | -47.186 | -47.186 | 0.000 |
+| exact modal |  | brass | 12.0 | 135.0 | 38.100 | -43.279 | -43.279 | -0.000 |
+| exact modal |  | brass | 12.0 | 180.0 | 38.100 | -42.517 | -42.517 | -0.000 |
+| exact modal |  | brass | 38.0 | 90.0 | 38.100 | -46.258 | -46.258 | 0.000 |
+| exact modal |  | brass | 38.0 | 135.0 | 38.100 | -39.385 | -39.385 | 0.000 |
+| exact modal |  | brass | 38.0 | 180.0 | 38.100 | -39.174 | -39.174 | 0.000 |
+| exact modal |  | brass | 70.0 | 90.0 | 38.100 | -42.109 | -42.109 | -0.000 |
+| exact modal |  | brass | 70.0 | 135.0 | 38.100 | -38.635 | -38.635 | 0.000 |
+| exact modal |  | brass | 70.0 | 180.0 | 38.100 | -40.515 | -40.515 | -0.000 |
+| exact modal |  | brass | 120.0 | 90.0 | 38.100 | -48.553 | -48.553 | 0.000 |
+| exact modal |  | brass | 120.0 | 135.0 | 38.100 | -38.974 | -38.974 | 0.000 |
+| exact modal |  | brass | 120.0 | 180.0 | 38.100 | -35.984 | -35.984 | -0.000 |
+| exact modal |  | brass | 200.0 | 90.0 | 38.100 | -43.661 | -43.661 | 0.000 |
+| exact modal |  | brass | 200.0 | 135.0 | 38.100 | -44.320 | -44.320 | 0.000 |
+| exact modal |  | brass | 200.0 | 180.0 | 38.100 | -41.157 | -41.157 | -0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / Cu / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal |  | Cu | 12.0 | 90.0 | 38.100 | -47.164 | -47.164 | 0.000 |
+| exact modal |  | Cu | 12.0 | 135.0 | 38.100 | -43.201 | -43.201 | 0.000 |
+| exact modal |  | Cu | 12.0 | 180.0 | 38.100 | -42.419 | -42.419 | 0.000 |
+| exact modal |  | Cu | 38.0 | 90.0 | 38.100 | -45.633 | -45.633 | 0.000 |
+| exact modal |  | Cu | 38.0 | 135.0 | 38.100 | -39.876 | -39.876 | 0.000 |
+| exact modal |  | Cu | 38.0 | 180.0 | 38.100 | -40.460 | -40.460 | 0.000 |
+| exact modal |  | Cu | 70.0 | 90.0 | 38.100 | -41.704 | -41.704 | 0.000 |
+| exact modal |  | Cu | 70.0 | 135.0 | 38.100 | -41.418 | -41.418 | 0.000 |
+| exact modal |  | Cu | 70.0 | 180.0 | 38.100 | -36.543 | -36.543 | 0.000 |
+| exact modal |  | Cu | 120.0 | 90.0 | 38.100 | -42.642 | -42.642 | 0.000 |
+| exact modal |  | Cu | 120.0 | 135.0 | 38.100 | -41.702 | -41.702 | 0.000 |
+| exact modal |  | Cu | 120.0 | 180.0 | 38.100 | -45.254 | -45.254 | -0.000 |
+| exact modal |  | Cu | 200.0 | 90.0 | 38.100 | -43.278 | -43.278 | -0.000 |
+| exact modal |  | Cu | 200.0 | 135.0 | 38.100 | -40.124 | -40.124 | -0.000 |
+| exact modal |  | Cu | 200.0 | 180.0 | 38.100 | -36.369 | -36.369 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / steel / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal |  | steel | 12.0 | 90.0 | 38.100 | -47.167 | -47.167 | 0.000 |
+| exact modal |  | steel | 12.0 | 135.0 | 38.100 | -43.340 | -43.340 | -0.000 |
+| exact modal |  | steel | 12.0 | 180.0 | 38.100 | -42.596 | -42.596 | -0.000 |
+| exact modal |  | steel | 38.0 | 90.0 | 38.100 | -45.068 | -45.068 | -0.000 |
+| exact modal |  | steel | 38.0 | 135.0 | 38.100 | -40.330 | -40.330 | 0.000 |
+| exact modal |  | steel | 38.0 | 180.0 | 38.100 | -41.608 | -41.608 | 0.000 |
+| exact modal |  | steel | 70.0 | 90.0 | 38.100 | -41.981 | -41.981 | 0.000 |
+| exact modal |  | steel | 70.0 | 135.0 | 38.100 | -44.002 | -44.002 | 0.000 |
+| exact modal |  | steel | 70.0 | 180.0 | 38.100 | -38.222 | -38.222 | 0.000 |
+| exact modal |  | steel | 120.0 | 90.0 | 38.100 | -42.866 | -42.866 | 0.000 |
+| exact modal |  | steel | 120.0 | 135.0 | 38.100 | -42.900 | -42.900 | -0.000 |
+| exact modal |  | steel | 120.0 | 180.0 | 38.100 | -38.184 | -38.184 | 0.000 |
+| exact modal |  | steel | 200.0 | 90.0 | 38.100 | -42.171 | -42.171 | 0.000 |
+| exact modal |  | steel | 200.0 | 135.0 | 38.100 | -40.960 | -40.960 | 0.000 |
+| exact modal |  | steel | 200.0 | 180.0 | 38.100 | -38.457 | -38.457 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / WC / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal |  | WC | 12.0 | 90.0 | 38.100 | -47.118 | -47.118 | 0.000 |
+| exact modal |  | WC | 12.0 | 135.0 | 38.100 | -42.794 | -42.794 | 0.000 |
+| exact modal |  | WC | 12.0 | 180.0 | 38.100 | -41.899 | -41.899 | 0.000 |
+| exact modal |  | WC | 38.0 | 90.0 | 38.100 | -44.799 | -44.799 | 0.000 |
+| exact modal |  | WC | 38.0 | 135.0 | 38.100 | -40.585 | -40.585 | 0.000 |
+| exact modal |  | WC | 38.0 | 180.0 | 38.100 | -42.330 | -42.330 | 0.000 |
+| exact modal |  | WC | 70.0 | 90.0 | 38.100 | -41.769 | -41.769 | -0.000 |
+| exact modal |  | WC | 70.0 | 135.0 | 38.100 | -40.375 | -40.375 | 0.000 |
+| exact modal |  | WC | 70.0 | 180.0 | 38.100 | -41.070 | -41.070 | 0.000 |
+| exact modal |  | WC | 120.0 | 90.0 | 38.100 | -41.829 | -41.829 | 0.000 |
+| exact modal |  | WC | 120.0 | 135.0 | 38.100 | -41.156 | -41.156 | 0.000 |
+| exact modal |  | WC | 120.0 | 180.0 | 38.100 | -39.503 | -39.503 | 0.000 |
+| exact modal |  | WC | 200.0 | 90.0 | 38.100 | -40.587 | -40.587 | 0.000 |
+| exact modal |  | WC | 200.0 | 135.0 | 38.100 | -40.513 | -40.513 | -0.000 |
+| exact modal |  | WC | 200.0 | 180.0 | 38.100 | -39.438 | -39.438 | -0.000 |
+
+</details>
+
+
+## Residual Summary
+
+| Axis | Method | Boundary | Frequency (kHz) | Angle (deg) | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|--:|--:|
+| TS-Frequency | exact modal |  | 12.0-200.0 | 180.0 | 0.000 | 0.000 |
+| TS-Orientation | exact modal |  | 12.0-200.0 | 0.0-180.0 | 0.000 | 0.000 |
+| TS-Parameter | exact modal |  | 12.0-200.0 | 90.0-180.0 | 0.000 | 0.000 |
+| TS-Size | exact modal |  | 12.0-200.0 | 180.0 | 0.000 | 0.000 |
+

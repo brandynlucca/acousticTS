@@ -10,7 +10,7 @@
 # Model subdirectory linking for pkgdown site
 #' @noRd
 .model_family_page_order <- function() {
-  c("Overview", "Theory", "Implementation")
+  c("Overview", "Theory", "Implementation", "Benchmarks", "Validation")
 }
 
 # Detect current page to hide from list to avoid a duplicated listing
@@ -36,8 +36,54 @@
   if (grepl("-implementation\\.[rq]md$", input)) {
     return("Implementation")
   }
+  if (grepl("-benchmarks\\.[rq]md$", input)) {
+    return("Benchmarks")
+  }
+  if (grepl("-validation\\.[rq]md$", input)) {
+    return("Validation")
+  }
 
   NULL
+}
+
+# Add model-family pages implied by the public status policy.
+#' @noRd
+.model_family_status_pages <- function(family) {
+  if (is.null(family)) {
+    return(character())
+  }
+
+  family <- .validation_normalize_family(family)
+  meta <- .validation_family_meta(family)
+  display <- meta$display[[1]]
+  stem <- tolower(display)
+  stem <- if (identical(family, "calibration")) "calibration" else stem
+
+  pages <- character()
+
+  if (isTRUE(meta$benchmarked[[1]])) {
+    pages <- c(pages, Benchmarks = paste0(stem, "-benchmarks.html"))
+  }
+
+  if (meta$validation_status[[1]] %in% c("validated", "partially_validated")) {
+    pages <- c(pages, Validation = paste0(stem, "-validation.html"))
+  }
+
+  pages
+}
+
+#' @noRd
+.model_family_pages <- function(family = NULL, pages = c()) {
+  pages <- pages[!is.na(pages) & nzchar(pages)]
+  status_pages <- .model_family_status_pages(family)
+
+  for (label in names(status_pages)) {
+    if (!label %in% names(pages)) {
+      pages <- c(pages, status_pages[label])
+    }
+  }
+
+  .model_family_pages_ordered(pages)
 }
 
 # Order the landing pages
@@ -95,7 +141,7 @@
     ""
   }
 
-  pages <- .model_family_pages_ordered(pages)
+  pages <- .model_family_pages(family = family, pages = pages)
   if (is.null(current_page)) {
     current_page <- .model_family_current_page()
   }
@@ -105,14 +151,6 @@
   }
   blank_labels <- is.na(page_labels) | !nzchar(page_labels)
   page_labels[blank_labels] <- unname(pages)[blank_labels]
-
-  if (!is.null(current_page) && length(current_page) == 1L &&
-    !is.na(current_page) &&
-    nzchar(current_page)) {
-    keep <- page_labels != current_page
-    pages <- pages[keep]
-    page_labels <- page_labels[keep]
-  }
 
   nav_markup <- if (length(pages) > 0) {
     paste0(
@@ -221,6 +259,30 @@
   out <- paste0(
     '<img class="vignette-figure" src="', src,
     '" alt="', .html_escape(alt), '" />'
+  )
+
+  if (requireNamespace("knitr", quietly = TRUE)) {
+    knitr::asis_output(paste0(out, "\n"))
+  } else {
+    out
+  }
+}
+
+# Static figure inside a native HTML disclosure block.
+#' @noRd
+.vignette_detail_figure <- function(summary,
+                                    src,
+                                    alt,
+                                    open = FALSE,
+                                    width = "85%") {
+  open_attr <- if (isTRUE(open)) " open" else ""
+  out <- paste0(
+    '<details class="figure-drop"', open_attr, ">",
+    "<summary>", .html_escape(summary), "</summary>",
+    '<img class="vignette-figure" style="width:', .html_escape(width),
+    ';" src="', src,
+    '" alt="', .html_escape(alt), '" />',
+    "</details>"
   )
 
   if (requireNamespace("knitr", quietly = TRUE)) {

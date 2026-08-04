@@ -1,4 +1,4 @@
-﻿---
+---
 title: "DWBA"
 output:
   rmarkdown::html_vignette:
@@ -20,8 +20,10 @@ acousticTS:::.model_family_header(
   family = "dwba",
   pages = c(
     Overview = "index.html",
+    Theory = "dwba-theory.html",
     Implementation = "dwba-implementation.html",
-    Theory = "dwba-theory.html"
+    Benchmarks = "dwba-benchmarks.html",
+    Validation = "dwba-validation.html"
   )
 )
 ```
@@ -60,7 +62,9 @@ acousticTS:::.model_family_overview(
     "Fluid-like, non-elastic interior response"
   ),
   reading = c(
-    "[Implementation](dwba-implementation.html): object workflows, spectra, and validation tables",
+    "[Implementation](dwba-implementation.html): object workflows and spectra",
+    "[Benchmarks](dwba-benchmarks.html): canonical targets, software comparisons, and published segmented-body tables",
+    "[Validation](dwba-validation.html): weak-cylinder BEM transmission check",
     "[Theory](dwba-theory.html): Born linearization, contrast term, and centerline integral"
   )
 )

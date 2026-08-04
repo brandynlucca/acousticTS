@@ -1,0 +1,1212 @@
+---
+title: "SPHMS validation"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    number_sections: false
+    fig_caption: yes
+bibliography: ../REFERENCES.bib
+link-citations: true
+reference-section-title: References
+vignette: >
+  %\VignetteIndexEntry{SPHMS validation}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# Validation
+
+```{r model_family_header, echo=FALSE, results='asis'}
+acousticTS:::.model_family_header(
+  family = "sphms",
+  pages = c(
+    Overview = "index.html",
+    Theory = "sphms-theory.html",
+    Implementation = "sphms-implementation.html",
+    Benchmarks = "sphms-benchmarks.html",
+    Validation = "sphms-validation.html"
+  )
+)
+```
+
+SPHMS is checked on spherical boundary-value problems across boundary condition, frequency, radius, orientation, and material-contrast ladders.
+
+::: {.tip data-title="Residuals near nulls"}
+Mean absolute differences describe the typical agreement; maximum differences are retained because deep nulls can expose localized convention or resolution errors.
+:::
+
+## TS-Frequency
+
+Frequency rows retain the matched target and orientation while sweeping frequency.
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|:--|--:|--:|
+| exact modal | fixed rigid | baseline geometry | 12.0-200.0 | 90.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+| exact modal | gas filled | baseline geometry | 12.0-200.0 | 90.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 12.0-200.0 | 90.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+| exact modal | pressure release | baseline geometry | 12.0-200.0 | 90.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+
+<details>
+<summary>exact modal / fixed rigid / baseline geometry / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | fixed rigid | baseline geometry | 12.0 | 90.0 | 10.000 | -54.436 | -54.436 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 18.0 | 90.0 | 10.000 | -48.964 | -48.964 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 25.0 | 90.0 | 10.000 | -46.281 | -46.281 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 38.0 | 90.0 | 10.000 | -49.089 | -49.089 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 50.0 | 90.0 | 10.000 | -47.039 | -47.039 | -0.000 |
+| exact modal | fixed rigid | baseline geometry | 70.0 | 90.0 | 10.000 | -48.382 | -48.382 | -0.000 |
+| exact modal | fixed rigid | baseline geometry | 90.0 | 90.0 | 10.000 | -45.860 | -45.860 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 120.0 | 90.0 | 10.000 | -46.091 | -46.091 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 160.0 | 90.0 | 10.000 | -46.790 | -46.790 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 200.0 | 90.0 | 10.000 | -45.583 | -45.583 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / gas filled / baseline geometry / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | gas filled | baseline geometry | 12.0 | 90.0 | 10.000 | -42.344 | -42.344 | 0.000 |
+| exact modal | gas filled | baseline geometry | 18.0 | 90.0 | 10.000 | -44.035 | -44.035 | 0.000 |
+| exact modal | gas filled | baseline geometry | 25.0 | 90.0 | 10.000 | -44.708 | -44.708 | 0.000 |
+| exact modal | gas filled | baseline geometry | 38.0 | 90.0 | 10.000 | -44.989 | -44.989 | 0.000 |
+| exact modal | gas filled | baseline geometry | 50.0 | 90.0 | 10.000 | -45.475 | -45.475 | 0.000 |
+| exact modal | gas filled | baseline geometry | 70.0 | 90.0 | 10.000 | -45.636 | -45.636 | 0.000 |
+| exact modal | gas filled | baseline geometry | 90.0 | 90.0 | 10.000 | -45.747 | -45.747 | 0.000 |
+| exact modal | gas filled | baseline geometry | 120.0 | 90.0 | 10.000 | -45.923 | -45.923 | 0.000 |
+| exact modal | gas filled | baseline geometry | 160.0 | 90.0 | 10.000 | -45.829 | -45.829 | 0.000 |
+| exact modal | gas filled | baseline geometry | 200.0 | 90.0 | 10.000 | -46.452 | -46.452 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / liquid filled / baseline geometry / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | liquid filled | baseline geometry | 12.0 | 90.0 | 10.000 | -103.954 | -103.954 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 18.0 | 90.0 | 10.000 | -98.105 | -98.105 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 25.0 | 90.0 | 10.000 | -94.515 | -94.515 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 38.0 | 90.0 | 10.000 | -94.134 | -94.134 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 50.0 | 90.0 | 10.000 | -106.291 | -106.291 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 70.0 | 90.0 | 10.000 | -93.905 | -93.905 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 90.0 | 90.0 | 10.000 | -114.758 | -114.758 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 120.0 | 90.0 | 10.000 | -97.409 | -97.409 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 160.0 | 90.0 | 10.000 | -100.456 | -100.456 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 200.0 | 90.0 | 10.000 | -106.585 | -106.585 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / pressure release / baseline geometry / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | pressure release | baseline geometry | 12.0 | 90.0 | 10.000 | -42.288 | -42.288 | 0.000 |
+| exact modal | pressure release | baseline geometry | 18.0 | 90.0 | 10.000 | -44.020 | -44.020 | 0.000 |
+| exact modal | pressure release | baseline geometry | 25.0 | 90.0 | 10.000 | -44.775 | -44.775 | 0.000 |
+| exact modal | pressure release | baseline geometry | 38.0 | 90.0 | 10.000 | -44.998 | -44.998 | 0.000 |
+| exact modal | pressure release | baseline geometry | 50.0 | 90.0 | 10.000 | -45.453 | -45.453 | 0.000 |
+| exact modal | pressure release | baseline geometry | 70.0 | 90.0 | 10.000 | -45.640 | -45.640 | 0.000 |
+| exact modal | pressure release | baseline geometry | 90.0 | 90.0 | 10.000 | -45.734 | -45.734 | 0.000 |
+| exact modal | pressure release | baseline geometry | 120.0 | 90.0 | 10.000 | -45.849 | -45.849 | 0.000 |
+| exact modal | pressure release | baseline geometry | 160.0 | 90.0 | 10.000 | -45.922 | -45.922 | 0.000 |
+| exact modal | pressure release | baseline geometry | 200.0 | 90.0 | 10.000 | -45.951 | -45.951 | 0.000 |
+
+</details>
+
+
+## TS-Orientation
+
+Orientation rows retain the matched target and frequency ladder while sweeping incidence or scatter angle.
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|:--|--:|--:|
+| exact modal | fixed rigid | baseline geometry | 12.0 | 0.0-180.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 120.0 | 0.0-180.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 200.0 | 0.0-180.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 38.0 | 0.0-180.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 70.0 | 0.0-180.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+| exact modal | gas filled | baseline geometry | 12.0 | 0.0-180.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+| exact modal | gas filled | baseline geometry | 120.0 | 0.0-180.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+| exact modal | gas filled | baseline geometry | 200.0 | 0.0-180.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+| exact modal | gas filled | baseline geometry | 38.0 | 0.0-180.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+| exact modal | gas filled | baseline geometry | 70.0 | 0.0-180.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 12.0 | 0.0-180.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 120.0 | 0.0-180.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 200.0 | 0.0-180.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 38.0 | 0.0-180.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 70.0 | 0.0-180.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+| exact modal | pressure release | baseline geometry | 12.0 | 0.0-180.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+| exact modal | pressure release | baseline geometry | 120.0 | 0.0-180.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+| exact modal | pressure release | baseline geometry | 200.0 | 0.0-180.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+| exact modal | pressure release | baseline geometry | 38.0 | 0.0-180.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+| exact modal | pressure release | baseline geometry | 70.0 | 0.0-180.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+
+<details>
+<summary>exact modal / fixed rigid / baseline geometry / 12.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | fixed rigid | baseline geometry | 12.0 | 0.0 | 10.000 | -54.436 | -54.436 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 12.0 | 30.0 | 10.000 | -54.436 | -54.436 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 12.0 | 60.0 | 10.000 | -54.436 | -54.436 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 12.0 | 90.0 | 10.000 | -54.436 | -54.436 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 12.0 | 120.0 | 10.000 | -54.436 | -54.436 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 12.0 | 150.0 | 10.000 | -54.436 | -54.436 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 12.0 | 180.0 | 10.000 | -54.436 | -54.436 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / fixed rigid / baseline geometry / 120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | fixed rigid | baseline geometry | 120.0 | 0.0 | 10.000 | -46.091 | -46.091 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 120.0 | 30.0 | 10.000 | -46.091 | -46.091 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 120.0 | 60.0 | 10.000 | -46.091 | -46.091 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 120.0 | 90.0 | 10.000 | -46.091 | -46.091 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 120.0 | 120.0 | 10.000 | -46.091 | -46.091 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 120.0 | 150.0 | 10.000 | -46.091 | -46.091 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 120.0 | 180.0 | 10.000 | -46.091 | -46.091 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / fixed rigid / baseline geometry / 200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | fixed rigid | baseline geometry | 200.0 | 0.0 | 10.000 | -45.583 | -45.583 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 200.0 | 30.0 | 10.000 | -45.583 | -45.583 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 200.0 | 60.0 | 10.000 | -45.583 | -45.583 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 200.0 | 90.0 | 10.000 | -45.583 | -45.583 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 200.0 | 120.0 | 10.000 | -45.583 | -45.583 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 200.0 | 150.0 | 10.000 | -45.583 | -45.583 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 200.0 | 180.0 | 10.000 | -45.583 | -45.583 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / fixed rigid / baseline geometry / 38.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | fixed rigid | baseline geometry | 38.0 | 0.0 | 10.000 | -49.089 | -49.089 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 38.0 | 30.0 | 10.000 | -49.089 | -49.089 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 38.0 | 60.0 | 10.000 | -49.089 | -49.089 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 38.0 | 90.0 | 10.000 | -49.089 | -49.089 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 38.0 | 120.0 | 10.000 | -49.089 | -49.089 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 38.0 | 150.0 | 10.000 | -49.089 | -49.089 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 38.0 | 180.0 | 10.000 | -49.089 | -49.089 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / fixed rigid / baseline geometry / 70.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | fixed rigid | baseline geometry | 70.0 | 0.0 | 10.000 | -48.382 | -48.382 | -0.000 |
+| exact modal | fixed rigid | baseline geometry | 70.0 | 30.0 | 10.000 | -48.382 | -48.382 | -0.000 |
+| exact modal | fixed rigid | baseline geometry | 70.0 | 60.0 | 10.000 | -48.382 | -48.382 | -0.000 |
+| exact modal | fixed rigid | baseline geometry | 70.0 | 90.0 | 10.000 | -48.382 | -48.382 | -0.000 |
+| exact modal | fixed rigid | baseline geometry | 70.0 | 120.0 | 10.000 | -48.382 | -48.382 | -0.000 |
+| exact modal | fixed rigid | baseline geometry | 70.0 | 150.0 | 10.000 | -48.382 | -48.382 | -0.000 |
+| exact modal | fixed rigid | baseline geometry | 70.0 | 180.0 | 10.000 | -48.382 | -48.382 | -0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / gas filled / baseline geometry / 12.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | gas filled | baseline geometry | 12.0 | 0.0 | 10.000 | -42.344 | -42.344 | 0.000 |
+| exact modal | gas filled | baseline geometry | 12.0 | 30.0 | 10.000 | -42.344 | -42.344 | 0.000 |
+| exact modal | gas filled | baseline geometry | 12.0 | 60.0 | 10.000 | -42.344 | -42.344 | 0.000 |
+| exact modal | gas filled | baseline geometry | 12.0 | 90.0 | 10.000 | -42.344 | -42.344 | 0.000 |
+| exact modal | gas filled | baseline geometry | 12.0 | 120.0 | 10.000 | -42.344 | -42.344 | 0.000 |
+| exact modal | gas filled | baseline geometry | 12.0 | 150.0 | 10.000 | -42.344 | -42.344 | 0.000 |
+| exact modal | gas filled | baseline geometry | 12.0 | 180.0 | 10.000 | -42.344 | -42.344 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / gas filled / baseline geometry / 120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | gas filled | baseline geometry | 120.0 | 0.0 | 10.000 | -45.923 | -45.923 | 0.000 |
+| exact modal | gas filled | baseline geometry | 120.0 | 30.0 | 10.000 | -45.923 | -45.923 | 0.000 |
+| exact modal | gas filled | baseline geometry | 120.0 | 60.0 | 10.000 | -45.923 | -45.923 | 0.000 |
+| exact modal | gas filled | baseline geometry | 120.0 | 90.0 | 10.000 | -45.923 | -45.923 | 0.000 |
+| exact modal | gas filled | baseline geometry | 120.0 | 120.0 | 10.000 | -45.923 | -45.923 | 0.000 |
+| exact modal | gas filled | baseline geometry | 120.0 | 150.0 | 10.000 | -45.923 | -45.923 | 0.000 |
+| exact modal | gas filled | baseline geometry | 120.0 | 180.0 | 10.000 | -45.923 | -45.923 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / gas filled / baseline geometry / 200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | gas filled | baseline geometry | 200.0 | 0.0 | 10.000 | -46.452 | -46.452 | 0.000 |
+| exact modal | gas filled | baseline geometry | 200.0 | 30.0 | 10.000 | -46.452 | -46.452 | 0.000 |
+| exact modal | gas filled | baseline geometry | 200.0 | 60.0 | 10.000 | -46.452 | -46.452 | 0.000 |
+| exact modal | gas filled | baseline geometry | 200.0 | 90.0 | 10.000 | -46.452 | -46.452 | 0.000 |
+| exact modal | gas filled | baseline geometry | 200.0 | 120.0 | 10.000 | -46.452 | -46.452 | 0.000 |
+| exact modal | gas filled | baseline geometry | 200.0 | 150.0 | 10.000 | -46.452 | -46.452 | 0.000 |
+| exact modal | gas filled | baseline geometry | 200.0 | 180.0 | 10.000 | -46.452 | -46.452 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / gas filled / baseline geometry / 38.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | gas filled | baseline geometry | 38.0 | 0.0 | 10.000 | -44.989 | -44.989 | 0.000 |
+| exact modal | gas filled | baseline geometry | 38.0 | 30.0 | 10.000 | -44.989 | -44.989 | 0.000 |
+| exact modal | gas filled | baseline geometry | 38.0 | 60.0 | 10.000 | -44.989 | -44.989 | 0.000 |
+| exact modal | gas filled | baseline geometry | 38.0 | 90.0 | 10.000 | -44.989 | -44.989 | 0.000 |
+| exact modal | gas filled | baseline geometry | 38.0 | 120.0 | 10.000 | -44.989 | -44.989 | 0.000 |
+| exact modal | gas filled | baseline geometry | 38.0 | 150.0 | 10.000 | -44.989 | -44.989 | 0.000 |
+| exact modal | gas filled | baseline geometry | 38.0 | 180.0 | 10.000 | -44.989 | -44.989 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / gas filled / baseline geometry / 70.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | gas filled | baseline geometry | 70.0 | 0.0 | 10.000 | -45.636 | -45.636 | 0.000 |
+| exact modal | gas filled | baseline geometry | 70.0 | 30.0 | 10.000 | -45.636 | -45.636 | 0.000 |
+| exact modal | gas filled | baseline geometry | 70.0 | 60.0 | 10.000 | -45.636 | -45.636 | 0.000 |
+| exact modal | gas filled | baseline geometry | 70.0 | 90.0 | 10.000 | -45.636 | -45.636 | 0.000 |
+| exact modal | gas filled | baseline geometry | 70.0 | 120.0 | 10.000 | -45.636 | -45.636 | 0.000 |
+| exact modal | gas filled | baseline geometry | 70.0 | 150.0 | 10.000 | -45.636 | -45.636 | 0.000 |
+| exact modal | gas filled | baseline geometry | 70.0 | 180.0 | 10.000 | -45.636 | -45.636 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / liquid filled / baseline geometry / 12.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | liquid filled | baseline geometry | 12.0 | 0.0 | 10.000 | -103.954 | -103.954 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 12.0 | 30.0 | 10.000 | -103.954 | -103.954 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 12.0 | 60.0 | 10.000 | -103.954 | -103.954 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 12.0 | 90.0 | 10.000 | -103.954 | -103.954 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 12.0 | 120.0 | 10.000 | -103.954 | -103.954 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 12.0 | 150.0 | 10.000 | -103.954 | -103.954 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 12.0 | 180.0 | 10.000 | -103.954 | -103.954 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / liquid filled / baseline geometry / 120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | liquid filled | baseline geometry | 120.0 | 0.0 | 10.000 | -97.409 | -97.409 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 120.0 | 30.0 | 10.000 | -97.409 | -97.409 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 120.0 | 60.0 | 10.000 | -97.409 | -97.409 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 120.0 | 90.0 | 10.000 | -97.409 | -97.409 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 120.0 | 120.0 | 10.000 | -97.409 | -97.409 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 120.0 | 150.0 | 10.000 | -97.409 | -97.409 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 120.0 | 180.0 | 10.000 | -97.409 | -97.409 | -0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / liquid filled / baseline geometry / 200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | liquid filled | baseline geometry | 200.0 | 0.0 | 10.000 | -106.585 | -106.585 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 200.0 | 30.0 | 10.000 | -106.585 | -106.585 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 200.0 | 60.0 | 10.000 | -106.585 | -106.585 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 200.0 | 90.0 | 10.000 | -106.585 | -106.585 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 200.0 | 120.0 | 10.000 | -106.585 | -106.585 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 200.0 | 150.0 | 10.000 | -106.585 | -106.585 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 200.0 | 180.0 | 10.000 | -106.585 | -106.585 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / liquid filled / baseline geometry / 38.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | liquid filled | baseline geometry | 38.0 | 0.0 | 10.000 | -94.134 | -94.134 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 38.0 | 30.0 | 10.000 | -94.134 | -94.134 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 38.0 | 60.0 | 10.000 | -94.134 | -94.134 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 38.0 | 90.0 | 10.000 | -94.134 | -94.134 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 38.0 | 120.0 | 10.000 | -94.134 | -94.134 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 38.0 | 150.0 | 10.000 | -94.134 | -94.134 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 38.0 | 180.0 | 10.000 | -94.134 | -94.134 | -0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / liquid filled / baseline geometry / 70.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | liquid filled | baseline geometry | 70.0 | 0.0 | 10.000 | -93.905 | -93.905 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 70.0 | 30.0 | 10.000 | -93.905 | -93.905 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 70.0 | 60.0 | 10.000 | -93.905 | -93.905 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 70.0 | 90.0 | 10.000 | -93.905 | -93.905 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 70.0 | 120.0 | 10.000 | -93.905 | -93.905 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 70.0 | 150.0 | 10.000 | -93.905 | -93.905 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 70.0 | 180.0 | 10.000 | -93.905 | -93.905 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / pressure release / baseline geometry / 12.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | pressure release | baseline geometry | 12.0 | 0.0 | 10.000 | -42.288 | -42.288 | 0.000 |
+| exact modal | pressure release | baseline geometry | 12.0 | 30.0 | 10.000 | -42.288 | -42.288 | 0.000 |
+| exact modal | pressure release | baseline geometry | 12.0 | 60.0 | 10.000 | -42.288 | -42.288 | 0.000 |
+| exact modal | pressure release | baseline geometry | 12.0 | 90.0 | 10.000 | -42.288 | -42.288 | 0.000 |
+| exact modal | pressure release | baseline geometry | 12.0 | 120.0 | 10.000 | -42.288 | -42.288 | 0.000 |
+| exact modal | pressure release | baseline geometry | 12.0 | 150.0 | 10.000 | -42.288 | -42.288 | 0.000 |
+| exact modal | pressure release | baseline geometry | 12.0 | 180.0 | 10.000 | -42.288 | -42.288 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / pressure release / baseline geometry / 120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | pressure release | baseline geometry | 120.0 | 0.0 | 10.000 | -45.849 | -45.849 | 0.000 |
+| exact modal | pressure release | baseline geometry | 120.0 | 30.0 | 10.000 | -45.849 | -45.849 | 0.000 |
+| exact modal | pressure release | baseline geometry | 120.0 | 60.0 | 10.000 | -45.849 | -45.849 | 0.000 |
+| exact modal | pressure release | baseline geometry | 120.0 | 90.0 | 10.000 | -45.849 | -45.849 | 0.000 |
+| exact modal | pressure release | baseline geometry | 120.0 | 120.0 | 10.000 | -45.849 | -45.849 | 0.000 |
+| exact modal | pressure release | baseline geometry | 120.0 | 150.0 | 10.000 | -45.849 | -45.849 | 0.000 |
+| exact modal | pressure release | baseline geometry | 120.0 | 180.0 | 10.000 | -45.849 | -45.849 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / pressure release / baseline geometry / 200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | pressure release | baseline geometry | 200.0 | 0.0 | 10.000 | -45.951 | -45.951 | 0.000 |
+| exact modal | pressure release | baseline geometry | 200.0 | 30.0 | 10.000 | -45.951 | -45.951 | 0.000 |
+| exact modal | pressure release | baseline geometry | 200.0 | 60.0 | 10.000 | -45.951 | -45.951 | 0.000 |
+| exact modal | pressure release | baseline geometry | 200.0 | 90.0 | 10.000 | -45.951 | -45.951 | 0.000 |
+| exact modal | pressure release | baseline geometry | 200.0 | 120.0 | 10.000 | -45.951 | -45.951 | 0.000 |
+| exact modal | pressure release | baseline geometry | 200.0 | 150.0 | 10.000 | -45.951 | -45.951 | 0.000 |
+| exact modal | pressure release | baseline geometry | 200.0 | 180.0 | 10.000 | -45.951 | -45.951 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / pressure release / baseline geometry / 38.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | pressure release | baseline geometry | 38.0 | 0.0 | 10.000 | -44.998 | -44.998 | 0.000 |
+| exact modal | pressure release | baseline geometry | 38.0 | 30.0 | 10.000 | -44.998 | -44.998 | 0.000 |
+| exact modal | pressure release | baseline geometry | 38.0 | 60.0 | 10.000 | -44.998 | -44.998 | 0.000 |
+| exact modal | pressure release | baseline geometry | 38.0 | 90.0 | 10.000 | -44.998 | -44.998 | 0.000 |
+| exact modal | pressure release | baseline geometry | 38.0 | 120.0 | 10.000 | -44.998 | -44.998 | 0.000 |
+| exact modal | pressure release | baseline geometry | 38.0 | 150.0 | 10.000 | -44.998 | -44.998 | 0.000 |
+| exact modal | pressure release | baseline geometry | 38.0 | 180.0 | 10.000 | -44.998 | -44.998 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / pressure release / baseline geometry / 70.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | pressure release | baseline geometry | 70.0 | 0.0 | 10.000 | -45.640 | -45.640 | 0.000 |
+| exact modal | pressure release | baseline geometry | 70.0 | 30.0 | 10.000 | -45.640 | -45.640 | 0.000 |
+| exact modal | pressure release | baseline geometry | 70.0 | 60.0 | 10.000 | -45.640 | -45.640 | 0.000 |
+| exact modal | pressure release | baseline geometry | 70.0 | 90.0 | 10.000 | -45.640 | -45.640 | 0.000 |
+| exact modal | pressure release | baseline geometry | 70.0 | 120.0 | 10.000 | -45.640 | -45.640 | 0.000 |
+| exact modal | pressure release | baseline geometry | 70.0 | 150.0 | 10.000 | -45.640 | -45.640 | 0.000 |
+| exact modal | pressure release | baseline geometry | 70.0 | 180.0 | 10.000 | -45.640 | -45.640 | 0.000 |
+
+</details>
+
+
+## TS-Size
+
+Size rows retain the matched material constants while sweeping length, radius, diameter, or scale.
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|:--|--:|--:|
+| exact modal | fixed rigid | baseline geometry | 12.0 | 90.0 | Radius (mm) 5.000-20.000 | 0.000 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 120.0 | 90.0 | Radius (mm) 5.000-20.000 | 0.000 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 200.0 | 90.0 | Radius (mm) 5.000-20.000 | 0.000 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 38.0 | 90.0 | Radius (mm) 5.000-20.000 | 0.000 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 70.0 | 90.0 | Radius (mm) 5.000-20.000 | 0.000 | 0.000 |
+| exact modal | gas filled | baseline geometry | 12.0 | 90.0 | Radius (mm) 5.000-20.000 | 0.000 | 0.000 |
+| exact modal | gas filled | baseline geometry | 120.0 | 90.0 | Radius (mm) 5.000-20.000 | 0.000 | 0.000 |
+| exact modal | gas filled | baseline geometry | 200.0 | 90.0 | Radius (mm) 5.000-20.000 | 0.000 | 0.000 |
+| exact modal | gas filled | baseline geometry | 38.0 | 90.0 | Radius (mm) 5.000-20.000 | 0.000 | 0.000 |
+| exact modal | gas filled | baseline geometry | 70.0 | 90.0 | Radius (mm) 5.000-20.000 | 0.000 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 12.0 | 90.0 | Radius (mm) 5.000-20.000 | 0.000 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 120.0 | 90.0 | Radius (mm) 5.000-20.000 | 0.000 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 200.0 | 90.0 | Radius (mm) 5.000-20.000 | 0.000 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 38.0 | 90.0 | Radius (mm) 5.000-20.000 | 0.000 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 70.0 | 90.0 | Radius (mm) 5.000-20.000 | 0.000 | 0.000 |
+| exact modal | pressure release | baseline geometry | 12.0 | 90.0 | Radius (mm) 5.000-20.000 | 0.000 | 0.000 |
+| exact modal | pressure release | baseline geometry | 120.0 | 90.0 | Radius (mm) 5.000-20.000 | 0.000 | 0.000 |
+| exact modal | pressure release | baseline geometry | 200.0 | 90.0 | Radius (mm) 5.000-20.000 | 0.000 | 0.000 |
+| exact modal | pressure release | baseline geometry | 38.0 | 90.0 | Radius (mm) 5.000-20.000 | 0.000 | 0.000 |
+| exact modal | pressure release | baseline geometry | 70.0 | 90.0 | Radius (mm) 5.000-20.000 | 0.000 | 0.000 |
+
+<details>
+<summary>exact modal / fixed rigid / baseline geometry / 12.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | fixed rigid | baseline geometry | 12.0 | 90.0 | 5.000 | -71.618 | -71.618 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 12.0 | 90.0 | 10.000 | -54.436 | -54.436 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 12.0 | 90.0 | 20.000 | -40.443 | -40.443 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / fixed rigid / baseline geometry / 120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | fixed rigid | baseline geometry | 120.0 | 90.0 | 5.000 | -51.816 | -51.816 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 120.0 | 90.0 | 10.000 | -46.091 | -46.091 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 120.0 | 90.0 | 20.000 | -40.606 | -40.606 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / fixed rigid / baseline geometry / 200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | fixed rigid | baseline geometry | 200.0 | 90.0 | 5.000 | -53.754 | -53.754 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 200.0 | 90.0 | 10.000 | -45.583 | -45.583 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 200.0 | 90.0 | 20.000 | -39.817 | -39.817 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / fixed rigid / baseline geometry / 38.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | fixed rigid | baseline geometry | 38.0 | 90.0 | 5.000 | -54.390 | -54.390 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 38.0 | 90.0 | 10.000 | -49.089 | -49.089 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 38.0 | 90.0 | 20.000 | -41.420 | -41.420 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / fixed rigid / baseline geometry / 70.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | fixed rigid | baseline geometry | 70.0 | 90.0 | 5.000 | -53.803 | -53.803 | -0.000 |
+| exact modal | fixed rigid | baseline geometry | 70.0 | 90.0 | 10.000 | -48.382 | -48.382 | -0.000 |
+| exact modal | fixed rigid | baseline geometry | 70.0 | 90.0 | 20.000 | -39.546 | -39.546 | -0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / gas filled / baseline geometry / 12.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | gas filled | baseline geometry | 12.0 | 90.0 | 5.000 | -46.632 | -46.632 | 0.000 |
+| exact modal | gas filled | baseline geometry | 12.0 | 90.0 | 10.000 | -42.344 | -42.344 | 0.000 |
+| exact modal | gas filled | baseline geometry | 12.0 | 90.0 | 20.000 | -38.762 | -38.762 | -0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / gas filled / baseline geometry / 120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | gas filled | baseline geometry | 120.0 | 90.0 | 5.000 | -51.434 | -51.434 | 0.000 |
+| exact modal | gas filled | baseline geometry | 120.0 | 90.0 | 10.000 | -45.923 | -45.923 | 0.000 |
+| exact modal | gas filled | baseline geometry | 120.0 | 90.0 | 20.000 | -40.021 | -40.021 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / gas filled / baseline geometry / 200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | gas filled | baseline geometry | 200.0 | 90.0 | 5.000 | -51.809 | -51.809 | 0.000 |
+| exact modal | gas filled | baseline geometry | 200.0 | 90.0 | 10.000 | -46.452 | -46.452 | 0.000 |
+| exact modal | gas filled | baseline geometry | 200.0 | 90.0 | 20.000 | -40.025 | -40.025 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / gas filled / baseline geometry / 38.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | gas filled | baseline geometry | 38.0 | 90.0 | 5.000 | -50.245 | -50.245 | 0.000 |
+| exact modal | gas filled | baseline geometry | 38.0 | 90.0 | 10.000 | -44.989 | -44.989 | 0.000 |
+| exact modal | gas filled | baseline geometry | 38.0 | 90.0 | 20.000 | -39.256 | -39.256 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / gas filled / baseline geometry / 70.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | gas filled | baseline geometry | 70.0 | 90.0 | 5.000 | -50.879 | -50.879 | 0.000 |
+| exact modal | gas filled | baseline geometry | 70.0 | 90.0 | 10.000 | -45.636 | -45.636 | 0.000 |
+| exact modal | gas filled | baseline geometry | 70.0 | 90.0 | 20.000 | -39.860 | -39.860 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / liquid filled / baseline geometry / 12.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | liquid filled | baseline geometry | 12.0 | 90.0 | 5.000 | -121.321 | -121.321 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 12.0 | 90.0 | 10.000 | -103.954 | -103.954 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 12.0 | 90.0 | 20.000 | -88.848 | -88.848 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / liquid filled / baseline geometry / 120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | liquid filled | baseline geometry | 120.0 | 90.0 | 5.000 | -105.038 | -105.038 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 120.0 | 90.0 | 10.000 | -97.409 | -97.409 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 120.0 | 90.0 | 20.000 | -125.442 | -125.442 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / liquid filled / baseline geometry / 200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | liquid filled | baseline geometry | 200.0 | 90.0 | 5.000 | -103.196 | -103.196 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 200.0 | 90.0 | 10.000 | -106.585 | -106.585 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 200.0 | 90.0 | 20.000 | -89.347 | -89.347 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / liquid filled / baseline geometry / 38.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | liquid filled | baseline geometry | 38.0 | 90.0 | 5.000 | -103.438 | -103.438 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 38.0 | 90.0 | 10.000 | -94.134 | -94.134 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 38.0 | 90.0 | 20.000 | -88.216 | -88.216 | -0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / liquid filled / baseline geometry / 70.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | liquid filled | baseline geometry | 70.0 | 90.0 | 5.000 | -99.523 | -99.523 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 70.0 | 90.0 | 10.000 | -93.905 | -93.905 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 70.0 | 90.0 | 20.000 | -89.408 | -89.408 | -0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / pressure release / baseline geometry / 12.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | pressure release | baseline geometry | 12.0 | 90.0 | 5.000 | -46.660 | -46.660 | 0.000 |
+| exact modal | pressure release | baseline geometry | 12.0 | 90.0 | 10.000 | -42.288 | -42.288 | 0.000 |
+| exact modal | pressure release | baseline geometry | 12.0 | 90.0 | 20.000 | -38.729 | -38.729 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / pressure release / baseline geometry / 120.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | pressure release | baseline geometry | 120.0 | 90.0 | 5.000 | -51.498 | -51.498 | 0.000 |
+| exact modal | pressure release | baseline geometry | 120.0 | 90.0 | 10.000 | -45.849 | -45.849 | 0.000 |
+| exact modal | pressure release | baseline geometry | 120.0 | 90.0 | 20.000 | -39.953 | -39.953 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / pressure release / baseline geometry / 200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | pressure release | baseline geometry | 200.0 | 90.0 | 5.000 | -51.829 | -51.829 | 0.000 |
+| exact modal | pressure release | baseline geometry | 200.0 | 90.0 | 10.000 | -45.951 | -45.951 | 0.000 |
+| exact modal | pressure release | baseline geometry | 200.0 | 90.0 | 20.000 | -39.982 | -39.982 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / pressure release / baseline geometry / 38.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | pressure release | baseline geometry | 38.0 | 90.0 | 5.000 | -50.245 | -50.245 | 0.000 |
+| exact modal | pressure release | baseline geometry | 38.0 | 90.0 | 10.000 | -44.998 | -44.998 | 0.000 |
+| exact modal | pressure release | baseline geometry | 38.0 | 90.0 | 20.000 | -39.680 | -39.680 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / pressure release / baseline geometry / 70.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | pressure release | baseline geometry | 70.0 | 90.0 | 5.000 | -50.884 | -50.884 | 0.000 |
+| exact modal | pressure release | baseline geometry | 70.0 | 90.0 | 10.000 | -45.640 | -45.640 | 0.000 |
+| exact modal | pressure release | baseline geometry | 70.0 | 90.0 | 20.000 | -39.866 | -39.866 | 0.000 |
+
+</details>
+
+
+## TS-Parameter
+
+Parameter rows retain the matched geometry class while sweeping material, curvature, taper, thickness, or discretization parameters.
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|:--|--:|--:|
+| exact modal | gas filled | baseline geometry | 12.0-200.0 | 60.0-120.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+| exact modal | gas filled | dense fast | 12.0-200.0 | 60.0-120.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+| exact modal | gas filled | light slow | 12.0-200.0 | 60.0-120.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 12.0-200.0 | 60.0-120.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+| exact modal | liquid filled | dense fast | 12.0-200.0 | 60.0-120.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+| exact modal | liquid filled | light slow | 12.0-200.0 | 60.0-120.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+
+<details>
+<summary>exact modal / gas filled / baseline geometry / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | gas filled | baseline geometry | 12.0 | 60.0 | 10.000 | -42.344 | -42.344 | 0.000 |
+| exact modal | gas filled | baseline geometry | 12.0 | 90.0 | 10.000 | -42.344 | -42.344 | 0.000 |
+| exact modal | gas filled | baseline geometry | 12.0 | 120.0 | 10.000 | -42.344 | -42.344 | 0.000 |
+| exact modal | gas filled | baseline geometry | 38.0 | 60.0 | 10.000 | -44.989 | -44.989 | 0.000 |
+| exact modal | gas filled | baseline geometry | 38.0 | 90.0 | 10.000 | -44.989 | -44.989 | 0.000 |
+| exact modal | gas filled | baseline geometry | 38.0 | 120.0 | 10.000 | -44.989 | -44.989 | 0.000 |
+| exact modal | gas filled | baseline geometry | 70.0 | 60.0 | 10.000 | -45.636 | -45.636 | 0.000 |
+| exact modal | gas filled | baseline geometry | 70.0 | 90.0 | 10.000 | -45.636 | -45.636 | 0.000 |
+| exact modal | gas filled | baseline geometry | 70.0 | 120.0 | 10.000 | -45.636 | -45.636 | 0.000 |
+| exact modal | gas filled | baseline geometry | 120.0 | 60.0 | 10.000 | -45.923 | -45.923 | 0.000 |
+| exact modal | gas filled | baseline geometry | 120.0 | 90.0 | 10.000 | -45.923 | -45.923 | 0.000 |
+| exact modal | gas filled | baseline geometry | 120.0 | 120.0 | 10.000 | -45.923 | -45.923 | 0.000 |
+| exact modal | gas filled | baseline geometry | 200.0 | 60.0 | 10.000 | -46.452 | -46.452 | 0.000 |
+| exact modal | gas filled | baseline geometry | 200.0 | 90.0 | 10.000 | -46.452 | -46.452 | 0.000 |
+| exact modal | gas filled | baseline geometry | 200.0 | 120.0 | 10.000 | -46.452 | -46.452 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / gas filled / dense fast / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | gas filled | dense fast | 12.0 | 60.0 | 10.000 | -42.235 | -42.235 | 0.000 |
+| exact modal | gas filled | dense fast | 12.0 | 90.0 | 10.000 | -42.235 | -42.235 | 0.000 |
+| exact modal | gas filled | dense fast | 12.0 | 120.0 | 10.000 | -42.235 | -42.235 | 0.000 |
+| exact modal | gas filled | dense fast | 38.0 | 60.0 | 10.000 | -45.014 | -45.014 | 0.000 |
+| exact modal | gas filled | dense fast | 38.0 | 90.0 | 10.000 | -45.014 | -45.014 | 0.000 |
+| exact modal | gas filled | dense fast | 38.0 | 120.0 | 10.000 | -45.014 | -45.014 | 0.000 |
+| exact modal | gas filled | dense fast | 70.0 | 60.0 | 10.000 | -45.596 | -45.596 | 0.000 |
+| exact modal | gas filled | dense fast | 70.0 | 90.0 | 10.000 | -45.596 | -45.596 | 0.000 |
+| exact modal | gas filled | dense fast | 70.0 | 120.0 | 10.000 | -45.596 | -45.596 | 0.000 |
+| exact modal | gas filled | dense fast | 120.0 | 60.0 | 10.000 | -44.158 | -44.158 | 0.000 |
+| exact modal | gas filled | dense fast | 120.0 | 90.0 | 10.000 | -44.158 | -44.158 | 0.000 |
+| exact modal | gas filled | dense fast | 120.0 | 120.0 | 10.000 | -44.158 | -44.158 | 0.000 |
+| exact modal | gas filled | dense fast | 200.0 | 60.0 | 10.000 | -45.877 | -45.877 | 0.000 |
+| exact modal | gas filled | dense fast | 200.0 | 90.0 | 10.000 | -45.877 | -45.877 | 0.000 |
+| exact modal | gas filled | dense fast | 200.0 | 120.0 | 10.000 | -45.877 | -45.877 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / gas filled / light slow / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | gas filled | light slow | 12.0 | 60.0 | 10.000 | -42.296 | -42.296 | 0.000 |
+| exact modal | gas filled | light slow | 12.0 | 90.0 | 10.000 | -42.296 | -42.296 | 0.000 |
+| exact modal | gas filled | light slow | 12.0 | 120.0 | 10.000 | -42.296 | -42.296 | 0.000 |
+| exact modal | gas filled | light slow | 38.0 | 60.0 | 10.000 | -44.995 | -44.995 | 0.000 |
+| exact modal | gas filled | light slow | 38.0 | 90.0 | 10.000 | -44.995 | -44.995 | 0.000 |
+| exact modal | gas filled | light slow | 38.0 | 120.0 | 10.000 | -44.995 | -44.995 | 0.000 |
+| exact modal | gas filled | light slow | 70.0 | 60.0 | 10.000 | -45.643 | -45.643 | 0.000 |
+| exact modal | gas filled | light slow | 70.0 | 90.0 | 10.000 | -45.643 | -45.643 | 0.000 |
+| exact modal | gas filled | light slow | 70.0 | 120.0 | 10.000 | -45.643 | -45.643 | 0.000 |
+| exact modal | gas filled | light slow | 120.0 | 60.0 | 10.000 | -45.832 | -45.832 | -0.000 |
+| exact modal | gas filled | light slow | 120.0 | 90.0 | 10.000 | -45.832 | -45.832 | -0.000 |
+| exact modal | gas filled | light slow | 120.0 | 120.0 | 10.000 | -45.832 | -45.832 | -0.000 |
+| exact modal | gas filled | light slow | 200.0 | 60.0 | 10.000 | -45.391 | -45.391 | 0.000 |
+| exact modal | gas filled | light slow | 200.0 | 90.0 | 10.000 | -45.391 | -45.391 | 0.000 |
+| exact modal | gas filled | light slow | 200.0 | 120.0 | 10.000 | -45.391 | -45.391 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / liquid filled / baseline geometry / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | liquid filled | baseline geometry | 12.0 | 60.0 | 10.000 | -103.954 | -103.954 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 12.0 | 90.0 | 10.000 | -103.954 | -103.954 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 12.0 | 120.0 | 10.000 | -103.954 | -103.954 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 38.0 | 60.0 | 10.000 | -94.134 | -94.134 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 38.0 | 90.0 | 10.000 | -94.134 | -94.134 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 38.0 | 120.0 | 10.000 | -94.134 | -94.134 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 70.0 | 60.0 | 10.000 | -93.905 | -93.905 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 70.0 | 90.0 | 10.000 | -93.905 | -93.905 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 70.0 | 120.0 | 10.000 | -93.905 | -93.905 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 120.0 | 60.0 | 10.000 | -97.409 | -97.409 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 120.0 | 90.0 | 10.000 | -97.409 | -97.409 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 120.0 | 120.0 | 10.000 | -97.409 | -97.409 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 200.0 | 60.0 | 10.000 | -106.585 | -106.585 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 200.0 | 90.0 | 10.000 | -106.585 | -106.585 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 200.0 | 120.0 | 10.000 | -106.585 | -106.585 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / liquid filled / dense fast / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | liquid filled | dense fast | 12.0 | 60.0 | 10.000 | -90.297 | -90.297 | 0.000 |
+| exact modal | liquid filled | dense fast | 12.0 | 90.0 | 10.000 | -90.297 | -90.297 | 0.000 |
+| exact modal | liquid filled | dense fast | 12.0 | 120.0 | 10.000 | -90.297 | -90.297 | 0.000 |
+| exact modal | liquid filled | dense fast | 38.0 | 60.0 | 10.000 | -80.481 | -80.481 | -0.000 |
+| exact modal | liquid filled | dense fast | 38.0 | 90.0 | 10.000 | -80.481 | -80.481 | -0.000 |
+| exact modal | liquid filled | dense fast | 38.0 | 120.0 | 10.000 | -80.481 | -80.481 | -0.000 |
+| exact modal | liquid filled | dense fast | 70.0 | 60.0 | 10.000 | -80.559 | -80.559 | 0.000 |
+| exact modal | liquid filled | dense fast | 70.0 | 90.0 | 10.000 | -80.559 | -80.559 | 0.000 |
+| exact modal | liquid filled | dense fast | 70.0 | 120.0 | 10.000 | -80.559 | -80.559 | 0.000 |
+| exact modal | liquid filled | dense fast | 120.0 | 60.0 | 10.000 | -82.471 | -82.471 | 0.000 |
+| exact modal | liquid filled | dense fast | 120.0 | 90.0 | 10.000 | -82.471 | -82.471 | 0.000 |
+| exact modal | liquid filled | dense fast | 120.0 | 120.0 | 10.000 | -82.471 | -82.471 | 0.000 |
+| exact modal | liquid filled | dense fast | 200.0 | 60.0 | 10.000 | -89.199 | -89.199 | 0.000 |
+| exact modal | liquid filled | dense fast | 200.0 | 90.0 | 10.000 | -89.199 | -89.199 | 0.000 |
+| exact modal | liquid filled | dense fast | 200.0 | 120.0 | 10.000 | -89.199 | -89.199 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / liquid filled / light slow / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | liquid filled | light slow | 12.0 | 60.0 | 10.000 | -91.431 | -91.431 | -0.000 |
+| exact modal | liquid filled | light slow | 12.0 | 90.0 | 10.000 | -91.431 | -91.431 | -0.000 |
+| exact modal | liquid filled | light slow | 12.0 | 120.0 | 10.000 | -91.431 | -91.431 | -0.000 |
+| exact modal | liquid filled | light slow | 38.0 | 60.0 | 10.000 | -81.608 | -81.608 | 0.000 |
+| exact modal | liquid filled | light slow | 38.0 | 90.0 | 10.000 | -81.608 | -81.608 | 0.000 |
+| exact modal | liquid filled | light slow | 38.0 | 120.0 | 10.000 | -81.608 | -81.608 | 0.000 |
+| exact modal | liquid filled | light slow | 70.0 | 60.0 | 10.000 | -81.081 | -81.081 | 0.000 |
+| exact modal | liquid filled | light slow | 70.0 | 90.0 | 10.000 | -81.081 | -81.081 | 0.000 |
+| exact modal | liquid filled | light slow | 70.0 | 120.0 | 10.000 | -81.081 | -81.081 | 0.000 |
+| exact modal | liquid filled | light slow | 120.0 | 60.0 | 10.000 | -86.741 | -86.741 | -0.000 |
+| exact modal | liquid filled | light slow | 120.0 | 90.0 | 10.000 | -86.741 | -86.741 | -0.000 |
+| exact modal | liquid filled | light slow | 120.0 | 120.0 | 10.000 | -86.741 | -86.741 | -0.000 |
+| exact modal | liquid filled | light slow | 200.0 | 60.0 | 10.000 | -100.686 | -100.686 | -0.000 |
+| exact modal | liquid filled | light slow | 200.0 | 90.0 | 10.000 | -100.686 | -100.686 | -0.000 |
+| exact modal | liquid filled | light slow | 200.0 | 120.0 | 10.000 | -100.686 | -100.686 | -0.000 |
+
+</details>
+
+
+## Boundary Cases
+
+Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled, and shell cases when those branches apply.
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|:--|--:|--:|
+| exact modal | fixed rigid | baseline geometry | 12.0-200.0 | 0.0-180.0 | Radius (mm) 5.000-20.000 | 0.000 | 0.000 |
+| exact modal | gas filled | baseline geometry | 12.0-200.0 | 0.0-180.0 | Radius (mm) 5.000-20.000 | 0.000 | 0.000 |
+| exact modal | gas filled | dense fast | 12.0-200.0 | 60.0-120.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+| exact modal | gas filled | light slow | 12.0-200.0 | 60.0-120.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 12.0-200.0 | 0.0-180.0 | Radius (mm) 5.000-20.000 | 0.000 | 0.000 |
+| exact modal | liquid filled | dense fast | 12.0-200.0 | 60.0-120.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+| exact modal | liquid filled | light slow | 12.0-200.0 | 60.0-120.0 | Radius (mm) 10.000 | 0.000 | 0.000 |
+| exact modal | pressure release | baseline geometry | 12.0-200.0 | 0.0-180.0 | Radius (mm) 5.000-20.000 | 0.000 | 0.000 |
+
+<details>
+<summary>exact modal / fixed rigid / baseline geometry / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | fixed rigid | baseline geometry | 12.0 | 0.0 | 10.000 | -54.436 | -54.436 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 12.0 | 30.0 | 10.000 | -54.436 | -54.436 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 12.0 | 60.0 | 10.000 | -54.436 | -54.436 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 12.0 | 90.0 | 5.000 | -71.618 | -71.618 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 12.0 | 90.0 | 10.000 | -54.436 | -54.436 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 12.0 | 90.0 | 20.000 | -40.443 | -40.443 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 12.0 | 120.0 | 10.000 | -54.436 | -54.436 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 12.0 | 150.0 | 10.000 | -54.436 | -54.436 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 12.0 | 180.0 | 10.000 | -54.436 | -54.436 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 18.0 | 90.0 | 10.000 | -48.964 | -48.964 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 25.0 | 90.0 | 10.000 | -46.281 | -46.281 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 38.0 | 0.0 | 10.000 | -49.089 | -49.089 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 38.0 | 30.0 | 10.000 | -49.089 | -49.089 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 38.0 | 60.0 | 10.000 | -49.089 | -49.089 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 38.0 | 90.0 | 5.000 | -54.390 | -54.390 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 38.0 | 90.0 | 10.000 | -49.089 | -49.089 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 38.0 | 90.0 | 20.000 | -41.420 | -41.420 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 38.0 | 120.0 | 10.000 | -49.089 | -49.089 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 38.0 | 150.0 | 10.000 | -49.089 | -49.089 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 38.0 | 180.0 | 10.000 | -49.089 | -49.089 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 50.0 | 90.0 | 10.000 | -47.039 | -47.039 | -0.000 |
+| exact modal | fixed rigid | baseline geometry | 70.0 | 0.0 | 10.000 | -48.382 | -48.382 | -0.000 |
+| exact modal | fixed rigid | baseline geometry | 70.0 | 30.0 | 10.000 | -48.382 | -48.382 | -0.000 |
+| exact modal | fixed rigid | baseline geometry | 70.0 | 60.0 | 10.000 | -48.382 | -48.382 | -0.000 |
+| exact modal | fixed rigid | baseline geometry | 70.0 | 90.0 | 5.000 | -53.803 | -53.803 | -0.000 |
+| exact modal | fixed rigid | baseline geometry | 70.0 | 90.0 | 10.000 | -48.382 | -48.382 | -0.000 |
+| exact modal | fixed rigid | baseline geometry | 70.0 | 90.0 | 20.000 | -39.546 | -39.546 | -0.000 |
+| exact modal | fixed rigid | baseline geometry | 70.0 | 120.0 | 10.000 | -48.382 | -48.382 | -0.000 |
+| exact modal | fixed rigid | baseline geometry | 70.0 | 150.0 | 10.000 | -48.382 | -48.382 | -0.000 |
+| exact modal | fixed rigid | baseline geometry | 70.0 | 180.0 | 10.000 | -48.382 | -48.382 | -0.000 |
+| exact modal | fixed rigid | baseline geometry | 90.0 | 90.0 | 10.000 | -45.860 | -45.860 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 120.0 | 0.0 | 10.000 | -46.091 | -46.091 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 120.0 | 30.0 | 10.000 | -46.091 | -46.091 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 120.0 | 60.0 | 10.000 | -46.091 | -46.091 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 120.0 | 90.0 | 5.000 | -51.816 | -51.816 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 120.0 | 90.0 | 10.000 | -46.091 | -46.091 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 120.0 | 90.0 | 20.000 | -40.606 | -40.606 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 120.0 | 120.0 | 10.000 | -46.091 | -46.091 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 120.0 | 150.0 | 10.000 | -46.091 | -46.091 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 120.0 | 180.0 | 10.000 | -46.091 | -46.091 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 160.0 | 90.0 | 10.000 | -46.790 | -46.790 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 200.0 | 0.0 | 10.000 | -45.583 | -45.583 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 200.0 | 30.0 | 10.000 | -45.583 | -45.583 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 200.0 | 60.0 | 10.000 | -45.583 | -45.583 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 200.0 | 90.0 | 5.000 | -53.754 | -53.754 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 200.0 | 90.0 | 10.000 | -45.583 | -45.583 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 200.0 | 90.0 | 20.000 | -39.817 | -39.817 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 200.0 | 120.0 | 10.000 | -45.583 | -45.583 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 200.0 | 150.0 | 10.000 | -45.583 | -45.583 | 0.000 |
+| exact modal | fixed rigid | baseline geometry | 200.0 | 180.0 | 10.000 | -45.583 | -45.583 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / gas filled / baseline geometry / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | gas filled | baseline geometry | 12.0 | 0.0 | 10.000 | -42.344 | -42.344 | 0.000 |
+| exact modal | gas filled | baseline geometry | 12.0 | 30.0 | 10.000 | -42.344 | -42.344 | 0.000 |
+| exact modal | gas filled | baseline geometry | 12.0 | 60.0 | 10.000 | -42.344 | -42.344 | 0.000 |
+| exact modal | gas filled | baseline geometry | 12.0 | 90.0 | 5.000 | -46.632 | -46.632 | 0.000 |
+| exact modal | gas filled | baseline geometry | 12.0 | 90.0 | 10.000 | -42.344 | -42.344 | 0.000 |
+| exact modal | gas filled | baseline geometry | 12.0 | 90.0 | 20.000 | -38.762 | -38.762 | -0.000 |
+| exact modal | gas filled | baseline geometry | 12.0 | 120.0 | 10.000 | -42.344 | -42.344 | 0.000 |
+| exact modal | gas filled | baseline geometry | 12.0 | 150.0 | 10.000 | -42.344 | -42.344 | 0.000 |
+| exact modal | gas filled | baseline geometry | 12.0 | 180.0 | 10.000 | -42.344 | -42.344 | 0.000 |
+| exact modal | gas filled | baseline geometry | 18.0 | 90.0 | 10.000 | -44.035 | -44.035 | 0.000 |
+| exact modal | gas filled | baseline geometry | 25.0 | 90.0 | 10.000 | -44.708 | -44.708 | 0.000 |
+| exact modal | gas filled | baseline geometry | 38.0 | 0.0 | 10.000 | -44.989 | -44.989 | 0.000 |
+| exact modal | gas filled | baseline geometry | 38.0 | 30.0 | 10.000 | -44.989 | -44.989 | 0.000 |
+| exact modal | gas filled | baseline geometry | 38.0 | 60.0 | 10.000 | -44.989 | -44.989 | 0.000 |
+| exact modal | gas filled | baseline geometry | 38.0 | 90.0 | 5.000 | -50.245 | -50.245 | 0.000 |
+| exact modal | gas filled | baseline geometry | 38.0 | 90.0 | 10.000 | -44.989 | -44.989 | 0.000 |
+| exact modal | gas filled | baseline geometry | 38.0 | 90.0 | 20.000 | -39.256 | -39.256 | 0.000 |
+| exact modal | gas filled | baseline geometry | 38.0 | 120.0 | 10.000 | -44.989 | -44.989 | 0.000 |
+| exact modal | gas filled | baseline geometry | 38.0 | 150.0 | 10.000 | -44.989 | -44.989 | 0.000 |
+| exact modal | gas filled | baseline geometry | 38.0 | 180.0 | 10.000 | -44.989 | -44.989 | 0.000 |
+| exact modal | gas filled | baseline geometry | 50.0 | 90.0 | 10.000 | -45.475 | -45.475 | 0.000 |
+| exact modal | gas filled | baseline geometry | 70.0 | 0.0 | 10.000 | -45.636 | -45.636 | 0.000 |
+| exact modal | gas filled | baseline geometry | 70.0 | 30.0 | 10.000 | -45.636 | -45.636 | 0.000 |
+| exact modal | gas filled | baseline geometry | 70.0 | 60.0 | 10.000 | -45.636 | -45.636 | 0.000 |
+| exact modal | gas filled | baseline geometry | 70.0 | 90.0 | 5.000 | -50.879 | -50.879 | 0.000 |
+| exact modal | gas filled | baseline geometry | 70.0 | 90.0 | 10.000 | -45.636 | -45.636 | 0.000 |
+| exact modal | gas filled | baseline geometry | 70.0 | 90.0 | 20.000 | -39.860 | -39.860 | 0.000 |
+| exact modal | gas filled | baseline geometry | 70.0 | 120.0 | 10.000 | -45.636 | -45.636 | 0.000 |
+| exact modal | gas filled | baseline geometry | 70.0 | 150.0 | 10.000 | -45.636 | -45.636 | 0.000 |
+| exact modal | gas filled | baseline geometry | 70.0 | 180.0 | 10.000 | -45.636 | -45.636 | 0.000 |
+| exact modal | gas filled | baseline geometry | 90.0 | 90.0 | 10.000 | -45.747 | -45.747 | 0.000 |
+| exact modal | gas filled | baseline geometry | 120.0 | 0.0 | 10.000 | -45.923 | -45.923 | 0.000 |
+| exact modal | gas filled | baseline geometry | 120.0 | 30.0 | 10.000 | -45.923 | -45.923 | 0.000 |
+| exact modal | gas filled | baseline geometry | 120.0 | 60.0 | 10.000 | -45.923 | -45.923 | 0.000 |
+| exact modal | gas filled | baseline geometry | 120.0 | 90.0 | 5.000 | -51.434 | -51.434 | 0.000 |
+| exact modal | gas filled | baseline geometry | 120.0 | 90.0 | 10.000 | -45.923 | -45.923 | 0.000 |
+| exact modal | gas filled | baseline geometry | 120.0 | 90.0 | 20.000 | -40.021 | -40.021 | 0.000 |
+| exact modal | gas filled | baseline geometry | 120.0 | 120.0 | 10.000 | -45.923 | -45.923 | 0.000 |
+| exact modal | gas filled | baseline geometry | 120.0 | 150.0 | 10.000 | -45.923 | -45.923 | 0.000 |
+| exact modal | gas filled | baseline geometry | 120.0 | 180.0 | 10.000 | -45.923 | -45.923 | 0.000 |
+| exact modal | gas filled | baseline geometry | 160.0 | 90.0 | 10.000 | -45.829 | -45.829 | 0.000 |
+| exact modal | gas filled | baseline geometry | 200.0 | 0.0 | 10.000 | -46.452 | -46.452 | 0.000 |
+| exact modal | gas filled | baseline geometry | 200.0 | 30.0 | 10.000 | -46.452 | -46.452 | 0.000 |
+| exact modal | gas filled | baseline geometry | 200.0 | 60.0 | 10.000 | -46.452 | -46.452 | 0.000 |
+| exact modal | gas filled | baseline geometry | 200.0 | 90.0 | 5.000 | -51.809 | -51.809 | 0.000 |
+| exact modal | gas filled | baseline geometry | 200.0 | 90.0 | 10.000 | -46.452 | -46.452 | 0.000 |
+| exact modal | gas filled | baseline geometry | 200.0 | 90.0 | 20.000 | -40.025 | -40.025 | 0.000 |
+| exact modal | gas filled | baseline geometry | 200.0 | 120.0 | 10.000 | -46.452 | -46.452 | 0.000 |
+| exact modal | gas filled | baseline geometry | 200.0 | 150.0 | 10.000 | -46.452 | -46.452 | 0.000 |
+| exact modal | gas filled | baseline geometry | 200.0 | 180.0 | 10.000 | -46.452 | -46.452 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / gas filled / dense fast / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | gas filled | dense fast | 12.0 | 60.0 | 10.000 | -42.235 | -42.235 | 0.000 |
+| exact modal | gas filled | dense fast | 12.0 | 90.0 | 10.000 | -42.235 | -42.235 | 0.000 |
+| exact modal | gas filled | dense fast | 12.0 | 120.0 | 10.000 | -42.235 | -42.235 | 0.000 |
+| exact modal | gas filled | dense fast | 38.0 | 60.0 | 10.000 | -45.014 | -45.014 | 0.000 |
+| exact modal | gas filled | dense fast | 38.0 | 90.0 | 10.000 | -45.014 | -45.014 | 0.000 |
+| exact modal | gas filled | dense fast | 38.0 | 120.0 | 10.000 | -45.014 | -45.014 | 0.000 |
+| exact modal | gas filled | dense fast | 70.0 | 60.0 | 10.000 | -45.596 | -45.596 | 0.000 |
+| exact modal | gas filled | dense fast | 70.0 | 90.0 | 10.000 | -45.596 | -45.596 | 0.000 |
+| exact modal | gas filled | dense fast | 70.0 | 120.0 | 10.000 | -45.596 | -45.596 | 0.000 |
+| exact modal | gas filled | dense fast | 120.0 | 60.0 | 10.000 | -44.158 | -44.158 | 0.000 |
+| exact modal | gas filled | dense fast | 120.0 | 90.0 | 10.000 | -44.158 | -44.158 | 0.000 |
+| exact modal | gas filled | dense fast | 120.0 | 120.0 | 10.000 | -44.158 | -44.158 | 0.000 |
+| exact modal | gas filled | dense fast | 200.0 | 60.0 | 10.000 | -45.877 | -45.877 | 0.000 |
+| exact modal | gas filled | dense fast | 200.0 | 90.0 | 10.000 | -45.877 | -45.877 | 0.000 |
+| exact modal | gas filled | dense fast | 200.0 | 120.0 | 10.000 | -45.877 | -45.877 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / gas filled / light slow / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | gas filled | light slow | 12.0 | 60.0 | 10.000 | -42.296 | -42.296 | 0.000 |
+| exact modal | gas filled | light slow | 12.0 | 90.0 | 10.000 | -42.296 | -42.296 | 0.000 |
+| exact modal | gas filled | light slow | 12.0 | 120.0 | 10.000 | -42.296 | -42.296 | 0.000 |
+| exact modal | gas filled | light slow | 38.0 | 60.0 | 10.000 | -44.995 | -44.995 | 0.000 |
+| exact modal | gas filled | light slow | 38.0 | 90.0 | 10.000 | -44.995 | -44.995 | 0.000 |
+| exact modal | gas filled | light slow | 38.0 | 120.0 | 10.000 | -44.995 | -44.995 | 0.000 |
+| exact modal | gas filled | light slow | 70.0 | 60.0 | 10.000 | -45.643 | -45.643 | 0.000 |
+| exact modal | gas filled | light slow | 70.0 | 90.0 | 10.000 | -45.643 | -45.643 | 0.000 |
+| exact modal | gas filled | light slow | 70.0 | 120.0 | 10.000 | -45.643 | -45.643 | 0.000 |
+| exact modal | gas filled | light slow | 120.0 | 60.0 | 10.000 | -45.832 | -45.832 | -0.000 |
+| exact modal | gas filled | light slow | 120.0 | 90.0 | 10.000 | -45.832 | -45.832 | -0.000 |
+| exact modal | gas filled | light slow | 120.0 | 120.0 | 10.000 | -45.832 | -45.832 | -0.000 |
+| exact modal | gas filled | light slow | 200.0 | 60.0 | 10.000 | -45.391 | -45.391 | 0.000 |
+| exact modal | gas filled | light slow | 200.0 | 90.0 | 10.000 | -45.391 | -45.391 | 0.000 |
+| exact modal | gas filled | light slow | 200.0 | 120.0 | 10.000 | -45.391 | -45.391 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / liquid filled / baseline geometry / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | liquid filled | baseline geometry | 12.0 | 0.0 | 10.000 | -103.954 | -103.954 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 12.0 | 30.0 | 10.000 | -103.954 | -103.954 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 12.0 | 60.0 | 10.000 | -103.954 | -103.954 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 12.0 | 90.0 | 5.000 | -121.321 | -121.321 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 12.0 | 90.0 | 10.000 | -103.954 | -103.954 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 12.0 | 90.0 | 20.000 | -88.848 | -88.848 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 12.0 | 120.0 | 10.000 | -103.954 | -103.954 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 12.0 | 150.0 | 10.000 | -103.954 | -103.954 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 12.0 | 180.0 | 10.000 | -103.954 | -103.954 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 18.0 | 90.0 | 10.000 | -98.105 | -98.105 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 25.0 | 90.0 | 10.000 | -94.515 | -94.515 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 38.0 | 0.0 | 10.000 | -94.134 | -94.134 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 38.0 | 30.0 | 10.000 | -94.134 | -94.134 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 38.0 | 60.0 | 10.000 | -94.134 | -94.134 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 38.0 | 90.0 | 5.000 | -103.438 | -103.438 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 38.0 | 90.0 | 10.000 | -94.134 | -94.134 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 38.0 | 90.0 | 20.000 | -88.216 | -88.216 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 38.0 | 120.0 | 10.000 | -94.134 | -94.134 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 38.0 | 150.0 | 10.000 | -94.134 | -94.134 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 38.0 | 180.0 | 10.000 | -94.134 | -94.134 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 50.0 | 90.0 | 10.000 | -106.291 | -106.291 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 70.0 | 0.0 | 10.000 | -93.905 | -93.905 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 70.0 | 30.0 | 10.000 | -93.905 | -93.905 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 70.0 | 60.0 | 10.000 | -93.905 | -93.905 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 70.0 | 90.0 | 5.000 | -99.523 | -99.523 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 70.0 | 90.0 | 10.000 | -93.905 | -93.905 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 70.0 | 90.0 | 20.000 | -89.408 | -89.408 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 70.0 | 120.0 | 10.000 | -93.905 | -93.905 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 70.0 | 150.0 | 10.000 | -93.905 | -93.905 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 70.0 | 180.0 | 10.000 | -93.905 | -93.905 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 90.0 | 90.0 | 10.000 | -114.758 | -114.758 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 120.0 | 0.0 | 10.000 | -97.409 | -97.409 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 120.0 | 30.0 | 10.000 | -97.409 | -97.409 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 120.0 | 60.0 | 10.000 | -97.409 | -97.409 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 120.0 | 90.0 | 5.000 | -105.038 | -105.038 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 120.0 | 90.0 | 10.000 | -97.409 | -97.409 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 120.0 | 90.0 | 20.000 | -125.442 | -125.442 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 120.0 | 120.0 | 10.000 | -97.409 | -97.409 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 120.0 | 150.0 | 10.000 | -97.409 | -97.409 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 120.0 | 180.0 | 10.000 | -97.409 | -97.409 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 160.0 | 90.0 | 10.000 | -100.456 | -100.456 | -0.000 |
+| exact modal | liquid filled | baseline geometry | 200.0 | 0.0 | 10.000 | -106.585 | -106.585 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 200.0 | 30.0 | 10.000 | -106.585 | -106.585 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 200.0 | 60.0 | 10.000 | -106.585 | -106.585 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 200.0 | 90.0 | 5.000 | -103.196 | -103.196 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 200.0 | 90.0 | 10.000 | -106.585 | -106.585 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 200.0 | 90.0 | 20.000 | -89.347 | -89.347 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 200.0 | 120.0 | 10.000 | -106.585 | -106.585 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 200.0 | 150.0 | 10.000 | -106.585 | -106.585 | 0.000 |
+| exact modal | liquid filled | baseline geometry | 200.0 | 180.0 | 10.000 | -106.585 | -106.585 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / liquid filled / dense fast / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | liquid filled | dense fast | 12.0 | 60.0 | 10.000 | -90.297 | -90.297 | 0.000 |
+| exact modal | liquid filled | dense fast | 12.0 | 90.0 | 10.000 | -90.297 | -90.297 | 0.000 |
+| exact modal | liquid filled | dense fast | 12.0 | 120.0 | 10.000 | -90.297 | -90.297 | 0.000 |
+| exact modal | liquid filled | dense fast | 38.0 | 60.0 | 10.000 | -80.481 | -80.481 | -0.000 |
+| exact modal | liquid filled | dense fast | 38.0 | 90.0 | 10.000 | -80.481 | -80.481 | -0.000 |
+| exact modal | liquid filled | dense fast | 38.0 | 120.0 | 10.000 | -80.481 | -80.481 | -0.000 |
+| exact modal | liquid filled | dense fast | 70.0 | 60.0 | 10.000 | -80.559 | -80.559 | 0.000 |
+| exact modal | liquid filled | dense fast | 70.0 | 90.0 | 10.000 | -80.559 | -80.559 | 0.000 |
+| exact modal | liquid filled | dense fast | 70.0 | 120.0 | 10.000 | -80.559 | -80.559 | 0.000 |
+| exact modal | liquid filled | dense fast | 120.0 | 60.0 | 10.000 | -82.471 | -82.471 | 0.000 |
+| exact modal | liquid filled | dense fast | 120.0 | 90.0 | 10.000 | -82.471 | -82.471 | 0.000 |
+| exact modal | liquid filled | dense fast | 120.0 | 120.0 | 10.000 | -82.471 | -82.471 | 0.000 |
+| exact modal | liquid filled | dense fast | 200.0 | 60.0 | 10.000 | -89.199 | -89.199 | 0.000 |
+| exact modal | liquid filled | dense fast | 200.0 | 90.0 | 10.000 | -89.199 | -89.199 | 0.000 |
+| exact modal | liquid filled | dense fast | 200.0 | 120.0 | 10.000 | -89.199 | -89.199 | 0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / liquid filled / light slow / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | liquid filled | light slow | 12.0 | 60.0 | 10.000 | -91.431 | -91.431 | -0.000 |
+| exact modal | liquid filled | light slow | 12.0 | 90.0 | 10.000 | -91.431 | -91.431 | -0.000 |
+| exact modal | liquid filled | light slow | 12.0 | 120.0 | 10.000 | -91.431 | -91.431 | -0.000 |
+| exact modal | liquid filled | light slow | 38.0 | 60.0 | 10.000 | -81.608 | -81.608 | 0.000 |
+| exact modal | liquid filled | light slow | 38.0 | 90.0 | 10.000 | -81.608 | -81.608 | 0.000 |
+| exact modal | liquid filled | light slow | 38.0 | 120.0 | 10.000 | -81.608 | -81.608 | 0.000 |
+| exact modal | liquid filled | light slow | 70.0 | 60.0 | 10.000 | -81.081 | -81.081 | 0.000 |
+| exact modal | liquid filled | light slow | 70.0 | 90.0 | 10.000 | -81.081 | -81.081 | 0.000 |
+| exact modal | liquid filled | light slow | 70.0 | 120.0 | 10.000 | -81.081 | -81.081 | 0.000 |
+| exact modal | liquid filled | light slow | 120.0 | 60.0 | 10.000 | -86.741 | -86.741 | -0.000 |
+| exact modal | liquid filled | light slow | 120.0 | 90.0 | 10.000 | -86.741 | -86.741 | -0.000 |
+| exact modal | liquid filled | light slow | 120.0 | 120.0 | 10.000 | -86.741 | -86.741 | -0.000 |
+| exact modal | liquid filled | light slow | 200.0 | 60.0 | 10.000 | -100.686 | -100.686 | -0.000 |
+| exact modal | liquid filled | light slow | 200.0 | 90.0 | 10.000 | -100.686 | -100.686 | -0.000 |
+| exact modal | liquid filled | light slow | 200.0 | 120.0 | 10.000 | -100.686 | -100.686 | -0.000 |
+
+</details>
+
+<details>
+<summary>exact modal / pressure release / baseline geometry / 12.0-200.0 kHz</summary>
+
+| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+|:--|:--|:--|--:|--:|--:|--:|--:|--:|
+| exact modal | pressure release | baseline geometry | 12.0 | 0.0 | 10.000 | -42.288 | -42.288 | 0.000 |
+| exact modal | pressure release | baseline geometry | 12.0 | 30.0 | 10.000 | -42.288 | -42.288 | 0.000 |
+| exact modal | pressure release | baseline geometry | 12.0 | 60.0 | 10.000 | -42.288 | -42.288 | 0.000 |
+| exact modal | pressure release | baseline geometry | 12.0 | 90.0 | 5.000 | -46.660 | -46.660 | 0.000 |
+| exact modal | pressure release | baseline geometry | 12.0 | 90.0 | 10.000 | -42.288 | -42.288 | 0.000 |
+| exact modal | pressure release | baseline geometry | 12.0 | 90.0 | 20.000 | -38.729 | -38.729 | 0.000 |
+| exact modal | pressure release | baseline geometry | 12.0 | 120.0 | 10.000 | -42.288 | -42.288 | 0.000 |
+| exact modal | pressure release | baseline geometry | 12.0 | 150.0 | 10.000 | -42.288 | -42.288 | 0.000 |
+| exact modal | pressure release | baseline geometry | 12.0 | 180.0 | 10.000 | -42.288 | -42.288 | 0.000 |
+| exact modal | pressure release | baseline geometry | 18.0 | 90.0 | 10.000 | -44.020 | -44.020 | 0.000 |
+| exact modal | pressure release | baseline geometry | 25.0 | 90.0 | 10.000 | -44.775 | -44.775 | 0.000 |
+| exact modal | pressure release | baseline geometry | 38.0 | 0.0 | 10.000 | -44.998 | -44.998 | 0.000 |
+| exact modal | pressure release | baseline geometry | 38.0 | 30.0 | 10.000 | -44.998 | -44.998 | 0.000 |
+| exact modal | pressure release | baseline geometry | 38.0 | 60.0 | 10.000 | -44.998 | -44.998 | 0.000 |
+| exact modal | pressure release | baseline geometry | 38.0 | 90.0 | 5.000 | -50.245 | -50.245 | 0.000 |
+| exact modal | pressure release | baseline geometry | 38.0 | 90.0 | 10.000 | -44.998 | -44.998 | 0.000 |
+| exact modal | pressure release | baseline geometry | 38.0 | 90.0 | 20.000 | -39.680 | -39.680 | 0.000 |
+| exact modal | pressure release | baseline geometry | 38.0 | 120.0 | 10.000 | -44.998 | -44.998 | 0.000 |
+| exact modal | pressure release | baseline geometry | 38.0 | 150.0 | 10.000 | -44.998 | -44.998 | 0.000 |
+| exact modal | pressure release | baseline geometry | 38.0 | 180.0 | 10.000 | -44.998 | -44.998 | 0.000 |
+| exact modal | pressure release | baseline geometry | 50.0 | 90.0 | 10.000 | -45.453 | -45.453 | 0.000 |
+| exact modal | pressure release | baseline geometry | 70.0 | 0.0 | 10.000 | -45.640 | -45.640 | 0.000 |
+| exact modal | pressure release | baseline geometry | 70.0 | 30.0 | 10.000 | -45.640 | -45.640 | 0.000 |
+| exact modal | pressure release | baseline geometry | 70.0 | 60.0 | 10.000 | -45.640 | -45.640 | 0.000 |
+| exact modal | pressure release | baseline geometry | 70.0 | 90.0 | 5.000 | -50.884 | -50.884 | 0.000 |
+| exact modal | pressure release | baseline geometry | 70.0 | 90.0 | 10.000 | -45.640 | -45.640 | 0.000 |
+| exact modal | pressure release | baseline geometry | 70.0 | 90.0 | 20.000 | -39.866 | -39.866 | 0.000 |
+| exact modal | pressure release | baseline geometry | 70.0 | 120.0 | 10.000 | -45.640 | -45.640 | 0.000 |
+| exact modal | pressure release | baseline geometry | 70.0 | 150.0 | 10.000 | -45.640 | -45.640 | 0.000 |
+| exact modal | pressure release | baseline geometry | 70.0 | 180.0 | 10.000 | -45.640 | -45.640 | 0.000 |
+| exact modal | pressure release | baseline geometry | 90.0 | 90.0 | 10.000 | -45.734 | -45.734 | 0.000 |
+| exact modal | pressure release | baseline geometry | 120.0 | 0.0 | 10.000 | -45.849 | -45.849 | 0.000 |
+| exact modal | pressure release | baseline geometry | 120.0 | 30.0 | 10.000 | -45.849 | -45.849 | 0.000 |
+| exact modal | pressure release | baseline geometry | 120.0 | 60.0 | 10.000 | -45.849 | -45.849 | 0.000 |
+| exact modal | pressure release | baseline geometry | 120.0 | 90.0 | 5.000 | -51.498 | -51.498 | 0.000 |
+| exact modal | pressure release | baseline geometry | 120.0 | 90.0 | 10.000 | -45.849 | -45.849 | 0.000 |
+| exact modal | pressure release | baseline geometry | 120.0 | 90.0 | 20.000 | -39.953 | -39.953 | 0.000 |
+| exact modal | pressure release | baseline geometry | 120.0 | 120.0 | 10.000 | -45.849 | -45.849 | 0.000 |
+| exact modal | pressure release | baseline geometry | 120.0 | 150.0 | 10.000 | -45.849 | -45.849 | 0.000 |
+| exact modal | pressure release | baseline geometry | 120.0 | 180.0 | 10.000 | -45.849 | -45.849 | 0.000 |
+| exact modal | pressure release | baseline geometry | 160.0 | 90.0 | 10.000 | -45.922 | -45.922 | 0.000 |
+| exact modal | pressure release | baseline geometry | 200.0 | 0.0 | 10.000 | -45.951 | -45.951 | 0.000 |
+| exact modal | pressure release | baseline geometry | 200.0 | 30.0 | 10.000 | -45.951 | -45.951 | 0.000 |
+| exact modal | pressure release | baseline geometry | 200.0 | 60.0 | 10.000 | -45.951 | -45.951 | 0.000 |
+| exact modal | pressure release | baseline geometry | 200.0 | 90.0 | 5.000 | -51.829 | -51.829 | 0.000 |
+| exact modal | pressure release | baseline geometry | 200.0 | 90.0 | 10.000 | -45.951 | -45.951 | 0.000 |
+| exact modal | pressure release | baseline geometry | 200.0 | 90.0 | 20.000 | -39.982 | -39.982 | 0.000 |
+| exact modal | pressure release | baseline geometry | 200.0 | 120.0 | 10.000 | -45.951 | -45.951 | 0.000 |
+| exact modal | pressure release | baseline geometry | 200.0 | 150.0 | 10.000 | -45.951 | -45.951 | 0.000 |
+| exact modal | pressure release | baseline geometry | 200.0 | 180.0 | 10.000 | -45.951 | -45.951 | 0.000 |
+
+</details>
+
+
+## Residual Summary
+
+| Axis | Method | Boundary | Frequency (kHz) | Angle (deg) | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|--:|--:|
+| Boundary Cases | exact modal | fixed rigid | 12.0-200.0 | 0.0-180.0 | 0.000 | 0.000 |
+| Boundary Cases | exact modal | gas filled | 12.0-200.0 | 0.0-180.0 | 0.000 | 0.000 |
+| Boundary Cases | exact modal | liquid filled | 12.0-200.0 | 0.0-180.0 | 0.000 | 0.000 |
+| Boundary Cases | exact modal | pressure release | 12.0-200.0 | 0.0-180.0 | 0.000 | 0.000 |
+| TS-Frequency | exact modal | fixed rigid | 12.0-200.0 | 90.0 | 0.000 | 0.000 |
+| TS-Frequency | exact modal | gas filled | 12.0-200.0 | 90.0 | 0.000 | 0.000 |
+| TS-Frequency | exact modal | liquid filled | 12.0-200.0 | 90.0 | 0.000 | 0.000 |
+| TS-Frequency | exact modal | pressure release | 12.0-200.0 | 90.0 | 0.000 | 0.000 |
+| TS-Orientation | exact modal | fixed rigid | 12.0-200.0 | 0.0-180.0 | 0.000 | 0.000 |
+| TS-Orientation | exact modal | gas filled | 12.0-200.0 | 0.0-180.0 | 0.000 | 0.000 |
+| TS-Orientation | exact modal | liquid filled | 12.0-200.0 | 0.0-180.0 | 0.000 | 0.000 |
+| TS-Orientation | exact modal | pressure release | 12.0-200.0 | 0.0-180.0 | 0.000 | 0.000 |
+| TS-Parameter | exact modal | gas filled | 12.0-200.0 | 60.0-120.0 | 0.000 | 0.000 |
+| TS-Parameter | exact modal | liquid filled | 12.0-200.0 | 60.0-120.0 | 0.000 | 0.000 |
+| TS-Size | exact modal | fixed rigid | 12.0-200.0 | 90.0 | 0.000 | 0.000 |
+| TS-Size | exact modal | gas filled | 12.0-200.0 | 90.0 | 0.000 | 0.000 |
+| TS-Size | exact modal | liquid filled | 12.0-200.0 | 90.0 | 0.000 | 0.000 |
+| TS-Size | exact modal | pressure release | 12.0-200.0 | 90.0 | 0.000 | 0.000 |
+

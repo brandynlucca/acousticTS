@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Body-backbone fish model"
 output:
   rmarkdown::html_vignette:
@@ -25,8 +25,9 @@ acousticTS:::.model_family_header(
   family = "bbfm",
   pages = c(
     Overview = "index.html",
+    Theory = "bbfm-theory.html",
     Implementation = "bbfm-implementation.html",
-    Theory = "bbfm-theory.html"
+    Validation = "bbfm-validation.html"
   )
 )
 ```

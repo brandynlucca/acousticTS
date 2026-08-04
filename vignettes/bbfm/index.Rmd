@@ -1,4 +1,4 @@
-﻿---
+---
 title: "BBFM"
 output:
   rmarkdown::html_vignette:
@@ -21,8 +21,9 @@ acousticTS:::.model_family_header(
   family = "bbfm",
   pages = c(
     Overview = "index.html",
+    Theory = "bbfm-theory.html",
     Implementation = "bbfm-implementation.html",
-    Theory = "bbfm-theory.html"
+    Validation = "bbfm-validation.html"
   )
 )
 ```
@@ -61,17 +62,18 @@ acousticTS:::.model_family_overview(
     "No repeated rescattering or fully coupled embedded elastic-cylinder solve"
   ),
   reading = c(
-    "[Implementation](bbfm-implementation.html): object setup, stored outputs, and internal reconstruction checks",
+    "[Implementation](bbfm-implementation.html): object setup, stored outputs, and coherent reconstruction checks",
+    "[Validation](bbfm-validation.html): BEM/FEM component checks and coherent-sum table",
     "[Theory](bbfm-theory.html): composite amplitude, phase placement, and interference structure"
   )
 )
 ```
 
 ::: {.experiment data-title="Current family status"}
-`BBFM` is already useful as a transparent composite family, but it should still
-be treated as experimental. The main open work is external validation and, in
-the longer term, a more tightly coupled treatment of the backbone as an
-embedded elastic structure rather than a positioned component surrogate.
+`BBFM` is a partially validated experimental family. The current validation
+claim covers the component paths and coherent bookkeeping shown on the
+validation page; the model remains a first-order component surrogate rather
+than a fully coupled embedded-backbone boundary-value solve.
 :::
 
 ## Why it exists
