@@ -8,16 +8,16 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/brandynlucca/acousticTS/blob/v.2.0.1/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/brandynlucca/acousticTS/blob/main/DESCRIPTION)
 
 Lucca B (2026). *acousticTS: Estimating Acoustic Target Strength via
-Physics-Based Scattering Models*. R package version 2026.3.0,
+Physics-Based Scattering Models*. R package version 2.0.1,
 <https://brandynlucca.github.io/acousticTS/>.
 
     @Manual{,
       title = {acousticTS: Estimating Acoustic Target Strength via Physics-Based Scattering Models},
       author = {Brandyn Lucca},
       year = {2026},
-      note = {R package version 2026.3.0},
+      note = {R package version 2.0.1},
       url = {https://brandynlucca.github.io/acousticTS/},
     }
