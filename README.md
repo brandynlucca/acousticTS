@@ -64,15 +64,15 @@ results in a structured `S4` object.
 | Model | Abbreviation | Scatterer type | Boundary |
 |----|----|----|----|
 | Distorted-wave Born approximation | `DWBA` | FLS | Fluid |
-| Stochastic DWBA | `SDWBA` | FLS | Fluid |
-| Kirchhoff-ray mode | `KRM` | FLS, SBF | Fluid + gas |
-| High-pass approximation | `HPA` | FLS, GAS | Fluid / gas |
-| Two-ray cylinder model | `TRCM` | FLS | Fluid |
-| Modal series solution (sphere) | `SPHMS` | CAL, ESS | Multiple |
-| Modal series solution (prolate spheroid) | `PSMS` | FLS | Fluid |
-| Modal series solution (elastic shell) | `ESSMS` | ESS | Elastic |
-| Finite-cylinder modal series | `FCMS` | CAL | Rigid / fluid |
-| Resonance model (gas sphere) | `SOEMS` | GAS, CAL | Gas |
+| Stochastic DWBA | `SDWBA` | `FLS` | Fluid |
+| Kirchhoff-ray mode | `KRM` | `FLS`, `SBF`, `GAS` | Fluid + gas |
+| High-pass approximation | `HPA` | `FLS`, `GAS` | Multiple |
+| Two-ray cylinder model | `TRCM` | `FLS` | Fluid |
+| Modal series solution (sphere) | `SPHMS` | `FLS`, `GAS` | Multiple |
+| Modal series solution (prolate spheroid) | `PSMS` | `FLS` | Multiple |
+| Modal series solution (elastic shell) | `ESSMS` | `ESS` | Elastic |
+| Finite-cylinder modal series | `FCMS` | `FLS`, `GAS` | Multiple |
+| Modal series solution (elastic sphere) | `SOEMS` | CAL | Elastic |
 
 ## Quick start
 
