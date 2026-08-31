@@ -32,9 +32,11 @@ acousticTS:::.model_family_header(
 ```
 
 
-These pages are grounded in the classical elastic-shell scattering literature for fluid-filled spherical shells [@Goodman_1962; @Faran_1951; @Stanton_1990].
+ESSMS evaluates a fluid-filled spherical elastic shell
+[@Goodman_1962; @Faran_1951; @Stanton_1990].
 
-The acousticTS package uses object-based scatterers so the same implementation pattern carries across models: create a scatterer, run `target_strength()`, inspect the stored model output, and then compare a small set of physically important inputs. For `ESSMS`, the required object class is `ESS`, which combines a spherical shell, an optional internal fluid, and the elastic constants required for the shell solution.
+The required `ESS` object stores the spherical shell, its internal fluid, and
+the elastic constants used by the shell solution.
 
 ::: {.caution data-title="Current ESSMS status"}
 `ESSMS` is unvalidated in the package. The benchmark family exists, but the implementation does not return finite full-grid `TS` values across those shell-sphere comparison sweeps, so this page documents behavior and limitations rather than benchmark-grade agreement.
@@ -108,3 +110,10 @@ knitr::include_graphics("essms-thickness-comparison.png")
 ```
 
 When you move from a tutorial object to a real calibration or biological shell, the next quantities to revisit are the shell elastic constants and the shell-to-fluid property contrast, because those control where the strongest modal features occur.
+
+::: {.caution data-title="Interpreting non-finite output"}
+The current ESSMS implementation is not reliable over the full benchmark grid.
+Treat `NA`, `NaN`, or infinite values as a failed numerical evaluation, not as
+a physical zero or a resonance estimate. Inspect the result in linear form and
+reduce the frequency range before drawing conclusions.
+:::

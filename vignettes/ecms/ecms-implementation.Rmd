@@ -32,7 +32,8 @@ acousticTS:::.model_family_header(
 ```
 
 
-These pages sit between the classical elastic-cylinder literature and later finite-length cylinder approximations used in fisheries acoustics [@Faran_1951; @Stanton_1988].
+ECMS implements the elastic-cylinder series used in the Faran--Stanton
+finite-length approximation [@Faran_1951; @Stanton_1988].
 
 The elastic-cylinder modal-series solution is available through `target_strength(..., model = "ecms")`. The preferred geometry carrier is an elastic-cylinder `ESS` object, while the elastic material parameters are supplied through:
 
@@ -108,16 +109,12 @@ knitr::kable(
     Metric = c(
       "Max abs. $\\Delta$ TS (dB)",
       "Mean abs. $\\Delta$ TS (dB)",
-      "Frequency at max $\\Delta$ (kHz)",
-      "acousticTS elapsed (s)",
-      "Direct transcription elapsed (s)"
+      "Frequency at max $\\Delta$ (kHz)"
     ),
     Value = c(
       ecms_summary$max_abs_delta_TS_dB,
       ecms_summary$mean_abs_delta_TS_dB,
-      ecms_summary$frequency_at_max_delta_kHz,
-      ecms_summary$elapsed_acousticts_s,
-      ecms_summary$elapsed_reference_s
+      ecms_summary$frequency_at_max_delta_kHz
     )
   ),
   digits = 6,
@@ -135,5 +132,7 @@ knitr::include_graphics("ecms-reference-comparison.png")
 
 ## Closing note
 
-The point of this page is therefore narrower than the benchmarked modal-series families. `ECMS` is not being claimed here as externally validated. What is being documented is that the package reproduces the elastic-cylinder algebra it claims to implement, across a full frequency band rather than only at a few checkpoint frequencies.
+ECMS is not claimed as externally validated. The documented check establishes
+agreement with an independent transcription of the elastic-cylinder algebra
+over the full comparison band.
 

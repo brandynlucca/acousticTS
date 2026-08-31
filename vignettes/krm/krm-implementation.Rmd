@@ -32,7 +32,8 @@ acousticTS:::.model_family_header(
 ```
 
 
-These pages follow the composite body-plus-swimbladder fish modeling literature initiated for cod and later generalized in open software implementations [@Clay_1991; @Clay_1994].
+KRM combines a weakly scattering fish body with an optional, strongly
+contrasting swimbladder [@Clay_1991; @Clay_1994].
 
 The acousticTS package uses object-based scatterers, so the KRM workflow follows the same broad structure used elsewhere in the package: define the geometry, attach material meaning to the body and any internal inclusion, evaluate the model over the desired frequency range, and then inspect the returned response carefully enough to understand what part of the target is driving it. For KRM, the main structural choice is whether the target is represented as a fluid-like body only or as a body plus an internal strongly contrasting inclusion such as a swimbladder.
 
@@ -132,7 +133,6 @@ knitr::include_graphics("krm-variant-comparison.png")
 
 For the bundled `sardine` target over `12-400 kHz`, the `mixed` and `body_embedded` curves are numerically identical, so the practical split is between the default `lowcontrast` spectrum and the body-medium alternative.
 
-:::
 ## Extracting model results
 
 Model results can be extracted either visually or directly through `extract()`.
@@ -174,20 +174,24 @@ For more realistic biological examples, the bundled `cod` and `sardine` datasets
 
 The primary KRM implementation benchmark for the canonical gas-filled and weakly scattering shapes is the published modal-series reference solution for each isolated canonical case. The summary table below keeps that benchmark visible without mixing it with the separate software-compatibility checks for body-plus-swimbladder targets.
 
-| Canonical case | Max abs. $\Delta$ TS (dB) | Mean abs. $\Delta$ TS (dB) | Elapsed (s) |
-|:--|--:|--:|--:|
-| Gas sphere | 7.91469 | 6.04116 | 0.01 |
-| Weakly scattering sphere | 11.21090 | 0.47451 | 0.15 |
-| Gas prolate spheroid | 7.36054 | 4.62751 | 0.00 |
-| Weakly scattering prolate spheroid | 14.27193 | 0.46239 | 0.00 |
-| Gas cylinder | 7.35632 | 6.19094 | 0.02 |
-| Weakly scattering cylinder | 23.22115 | 0.59807 | 0.02 |
+| Canonical case | Max abs. $\Delta$ TS (dB) | Mean abs. $\Delta$ TS (dB) |
+|:--|--:|--:|
+| Gas sphere | 7.91469 | 6.04116 |
+| Weakly scattering sphere | 11.21090 | 0.47451 |
+| Gas prolate spheroid | 7.36054 | 4.62751 |
+| Weakly scattering prolate spheroid | 14.27193 | 0.46239 |
+| Gas cylinder | 7.35632 | 6.19094 |
+| Weakly scattering cylinder | 23.22115 | 0.59807 |
 
 The modal-series table above remains the implementation benchmark for the canonical KRM targets.
 
 ### Bundled fish compatibility checks {.tabset .tabset-fade .tabset-pills}
 
-The bundled fish objects serve a different benchmark role from the canonical modal-series targets above. There is no exact modal-series reference for these segmented body-plus-swimbladder geometries, so they are used only to check software-to-software agreement for the `krm_variant` branches on realistic fish shapes. This inclues KRMr [@KRMr_software], echoSMs [@echoSMs_software], and the SWFSC applet [@NOAA_KRM_software].
+The bundled fish objects serve a different benchmark role from the canonical
+modal-series targets. There is no exact modal-series reference for these
+segmented body-plus-swimbladder geometries, so they check software agreement
+for the `krm_variant` branches. The comparisons include KRMr [@KRMr_software],
+echoSMs [@echoSMs_software], and the SWFSC applet [@NOAA_KRM_software].
 
 #### Sardine
 

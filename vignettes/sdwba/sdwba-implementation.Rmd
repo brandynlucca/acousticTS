@@ -32,7 +32,8 @@ acousticTS:::.model_family_header(
 ```
 
 
-These pages connect krill-body DWBA models to phase variability, orientation effects, and practical survey use [@Demer_2003_1; @Demer_2003_2; @Conti_2006; @Demer_2005].
+SDWBA applies stochastic phase variability to the segment contributions of a
+DWBA target [@Demer_2003_1; @Demer_2003_2; @Conti_2006; @Demer_2005].
 
 The acousticTS package uses object-based scatterers so the same implementation pattern carries across models: create a scatterer, run `target_strength()`, inspect the stored model output, and then compare a small set of physically important inputs. For SDWBA, the required object class is still `FLS`, but `target_strength()` also receives stochastic controls for phase variability and resampling.
 
@@ -65,6 +66,7 @@ The example below runs both `dwba` and `sdwba` so the stochastic averaging can b
 
 ```{r}
 frequency <- seq(50e3, 200e3, by = 10e3)
+set.seed(2025)
 
 stochastic_scatterer <- target_strength(
   object = stochastic_scatterer,
@@ -129,35 +131,39 @@ For practical SDWBA work, the first controls to revisit are usually:
 
 ### Published reference comparisons
 
-SDWBA should be judged against the exact modal-series `Benchmark` column in the Jech weakly scattering sphere, prolate-spheroid, and cylinder files. The table below reports that direct comparison together with the representative runtime on the current machine.
+The following comparison uses the exact modal-series `Benchmark` column in the
+Jech weakly scattering sphere, prolate-spheroid, and cylinder files
+[@Jech_2015].
 
-| Geometry | Max abs. $\Delta$ vs benchmark (dB) | Mean abs. $\Delta$ vs benchmark (dB) | Elapsed (s) |
-|:--|--:|--:|--:|
-| Weakly scattering sphere | 10.08475 | 0.35609 | 0.72 |
-| Weakly scattering prolate spheroid | 2.05918 | 0.07638 | 3.58 |
-| Weakly scattering cylinder | 2.07406 | 0.15895 | 1.91 |
+| Geometry | Max abs. $\Delta$ vs benchmark (dB) | Mean abs. $\Delta$ vs benchmark (dB) |
+|:--|--:|--:|
+| Weakly scattering sphere | 10.08475 | 0.35609 |
+| Weakly scattering prolate spheroid | 2.05918 | 0.07638 |
+| Weakly scattering cylinder | 2.07406 | 0.15895 |
 
 These runs use the same stochastic reference values throughout the benchmark set: `N0 = 50`, `phase_sd_init = sqrt(2) / 32`, `L0 = 38.35 mm`, `f0 = 120 kHz`, and `n_iterations = 100`.
 
 For SDWBA, the most important additional implementation control is `n_iterations`, because it determines how well the stochastic ensemble average is actually resolved numerically. The table below keeps the same Jech targets and changes only `n_iterations`.
 
-| Geometry | `n_iterations` | Max abs. $\Delta$ vs benchmark (dB) | Mean abs. $\Delta$ vs benchmark (dB) | Elapsed (s) |
-|:--|--:|--:|--:|--:|
-| Weakly scattering sphere | 25 | 9.30458 | 0.34871 | 0.58 |
-| Weakly scattering sphere | 100 | 10.08475 | 0.35609 | 0.63 |
-| Weakly scattering sphere | 500 | 9.97080 | 0.35343 | 1.11 |
-| Weakly scattering prolate spheroid | 25 | 1.26004 | 0.06948 | 3.08 |
-| Weakly scattering prolate spheroid | 100 | 2.05918 | 0.07638 | 3.63 |
-| Weakly scattering prolate spheroid | 500 | 1.28403 | 0.07107 | 6.50 |
-| Weakly scattering cylinder | 25 | 2.07406 | 0.15899 | 1.75 |
-| Weakly scattering cylinder | 100 | 2.07406 | 0.15895 | 2.03 |
-| Weakly scattering cylinder | 500 | 2.07403 | 0.15895 | 3.39 |
+| Geometry | `n_iterations` | Max abs. $\Delta$ vs benchmark (dB) | Mean abs. $\Delta$ vs benchmark (dB) |
+|:--|--:|--:|--:|
+| Weakly scattering sphere | 25 | 9.30458 | 0.34871 |
+| Weakly scattering sphere | 100 | 10.08475 | 0.35609 |
+| Weakly scattering sphere | 500 | 9.97080 | 0.35343 |
+| Weakly scattering prolate spheroid | 25 | 1.26004 | 0.06948 |
+| Weakly scattering prolate spheroid | 100 | 2.05918 | 0.07638 |
+| Weakly scattering prolate spheroid | 500 | 1.28403 | 0.07107 |
+| Weakly scattering cylinder | 25 | 2.07406 | 0.15899 |
+| Weakly scattering cylinder | 100 | 2.07406 | 0.15895 |
+| Weakly scattering cylinder | 500 | 2.07403 | 0.15895 |
 
-That sensitivity table is useful because it shows two things at once. First, the runtime cost does scale with the number of stochastic realizations, just as the implementation description says it should. Second, once the reference stochastic parameters are fixed, simply driving `n_iterations` upward does not force SDWBA onto the exact benchmark family. It mainly stabilizes the ensemble average around the stochastic approximation itself.
+Increasing `n_iterations` stabilizes the ensemble estimate. It does not force
+the stochastic approximation onto the exact benchmark family. Use a fixed seed
+when comparing stochastic settings or reproducing a documented result.
 
 ### Bundled krill implementation comparison
 
-The bundled `krill` object serves a different role from the canonical weakly scattering targets above. Here the goal is not to compare against an exact modal-series solution, but to compare the same stored krill geometry across four SDWBA implementations using a common frequency grid, a common broadside incidence, and the same stochastic reference values used for the benchmark calculations (`N0 = 50`, `phase_sd_init = sqrt(2) / 32`, `L0 = 38.35 mm`, `f0 = 120 kHz`, `n_iterations = 100`). These include a `MATLAB` implementation from CCAMLR [@CCAMLR_SDWBA_software], NOAA applet [@NOAA-SDWBA_software], and the `Python` package echoSMs [@echoSMs_software].
+The bundled `krill` object serves a different role from the canonical weakly scattering targets above. Here the goal is not to compare against an exact modal-series solution, but to compare the same stored krill geometry across four SDWBA implementations using a common frequency grid, a common broadside incidence, and the same stochastic reference values used for the benchmark calculations (`N0 = 50`, `phase_sd_init = sqrt(2) / 32`, `L0 = 38.35 mm`, `f0 = 120 kHz`, `n_iterations = 100`). These include a `MATLAB` implementation from CCAMLR [@CCAMLR_SDWBA_software], NOAA applet [@NOAA_SDWBA_software], and the `Python` package echoSMs [@echoSMs_software].
 
 | Comparison | Mean abs. $\Delta$ TS (dB) | Max abs. $\Delta$ TS (dB) |
 |:--|--:|--:|

@@ -32,23 +32,36 @@ acousticTS:::.model_family_header(
 ```
 
 
-These pages follow the coefficient-map view of acoustic scattering: the target response is represented as a map from incident modal amplitudes to scattered modal amplitudes [@Waterman_1969; @Waterman_2009].
+TMM represents a target by the linear map from incident modal coefficients to
+scattered modal coefficients [@Waterman_1969; @Waterman_2009].
 
-The acousticTS package uses object-based scatterers, so the `TMM` workflow follows the same broad structure used elsewhere in the package: define the geometry, attach the material interpretation, evaluate target strength over the frequency range of interest, and then inspect the returned response carefully enough to understand what the model is actually buying you.
+Build a supported canonical scatterer, solve it with `target_strength()`, and
+optionally retain the modal blocks for angular or orientation post-processing.
 
 ## Why use `TMM` over `SPHMS` or `PSMS`?
 
-For the supported canonical shapes, `TMM` is not primarily about producing a different target-strength answer from `SPHMS`, `PSMS`, or `FCMS`. In the exact or sanity-checked single-target cases documented here, it agrees with those shape-specific families where they describe the same physics. The reason to use `TMM` is that it organizes the scattering problem around an incident-to-scattered coefficient map rather than only around a monostatic backscatter formula. That makes it the natural family for stored T-matrix blocks, bistatic scattering, orientation averaging, and later multi-target workflows.
+On a canonical shape, TMM should reproduce the corresponding shape-specific
+family when both solve the same boundary-value problem. Its added value is the
+retained coefficient map, which supports bistatic scattering and orientation
+averaging without repeating the boundary solve.
 
 In other words:
 
 1. if the goal is only a sphere target-strength calculation, `SPHMS` is the more direct exact model,
 2. if the goal is only a prolate-spheroid target-strength calculation, `PSMS` is the more direct exact model,
-3. if the goal is only a finite-cylinder target-strength calculation, `FCMS` is the more direct exact model even though the default monostatic cylinder branch in `TMM` is benchmark-matched to it, and
+3. if the goal is only a finite-cylinder target-strength calculation, `FCMS`
+   is the more direct cylinder model, and
 4. if the goal is to stay inside a transition-matrix framework that can grow into broader scattering workflows while using one common post-processing layer across spheres, spheroids, and cylinders, `TMM` is the relevant model family.
 
 ::: {.caution data-title="Cylinder TMM scope"}
 The `TMM` cylinder branch is intentionally narrower than the sphere, oblate, and prolate branches. The default monostatic path is benchmark-matched to `FCMS`, but full retained-angle cylinder grids and bistatic summaries remain outside the validated public scope.
+:::
+
+::: {.note data-title="Stored-state scope"}
+General-angle post-processing is available for sphere, oblate-spheroid, and
+prolate-spheroid branches. Spherical `ESS` objects also support the documented
+fluid-shell and elastic-shell boundaries. Cylinder storage is limited to
+monostatic reuse and orientation-averaged monostatic products.
 :::
 
 ## Object generation
@@ -105,7 +118,7 @@ cylinder_object <- fls_generate(
 )
 ```
 
-The setup looks like the other exact families in the package: build a shape, generate a homogeneous scatterer, and then call `target_strength()`. The practical difference is that `TMM` keeps the calculation inside a transition-matrix viewpoint rather than only inside a direct modal-series viewpoint. The documented shape set is:
+The homogeneous-scatterer branches support:
 
 1. `Sphere`
 2. `OblateSpheroid`
@@ -137,7 +150,9 @@ sphere_object@model$TMM
 prolate_object@model$TMM
 ```
 
-This step is intentionally similar to the other exact families. The important part is not that the call looks unfamiliar. It is that the stored result comes from a T-matrix-centered model family. For spheres, the reported `n_max` is the retained spherical-wave cutoff. For prolates, the reported `n_max` is inherited from the exact spheroidal retained system and should therefore be interpreted as the size of the retained spheroidal solve rather than as a spherical-wave truncation limit.
+For spheres, `n_max` is the spherical-wave cutoff. For prolates, it is inherited
+from the spheroidal retained system and describes the size of that solve, not a
+spherical-wave truncation.
 
 ## Extracting model results
 
@@ -156,11 +171,13 @@ tmm_results <- extract(sphere_object, "model")$TMM
 head(tmm_results)
 ```
 
-At this stage, the main thing to confirm is that `TMM` is reproducing the expected exact-family response for the chosen geometry rather than drifting away from it. That is especially important for a model family like this one, because the main value of the transition-matrix formulation is not that it should disagree with `SPHMS` or `PSMS` on canonical shapes. It is that it should reproduce them while retaining the more general transition-matrix bookkeeping.
+For a canonical shape, compare the stored monostatic result with the matching
+shape-specific model before relying on post-processed angular products.
 
 ### Explicit T-matrix storage
 
-Explicit per-frequency T-matrix block storage is available for both supported geometry branches.
+Explicit per-frequency modal-block storage is enabled with
+`store_t_matrix = TRUE`.
 
 ```{r}
 sphere_store <- target_strength(
@@ -247,7 +264,8 @@ The same stored blocks can also be sent through `plot(..., type = "scattering")`
 knitr::include_graphics("tmm-scattering-slice.png")
 ```
 
-This is useful when the question is no longer just "what is the monostatic target strength?" but also "how does the same stored transition matrix distribute scattering over receive angle at a fixed frequency?" That is exactly the kind of post-processing that is natural in a T-matrix workflow and comparatively awkward in the purely direct exact-family formulations.
+The angular slice shows how a stored operator distributes scattering over
+receive angle at one frequency.
 
 All of the `tmm_scattering()`-style helpers use the **body-fixed angular coordinates** of the canonical axisymmetric target, not arbitrary world-frame directions. For the built-in prolate, oblate, and cylinder shapes in acousticTS, the symmetry axis is the body `x`-axis. So when these helpers are compared against an external BEM/FEM slice generated in a world `x-y` plane, the world directions need to be converted to the body-fixed `(\theta, \phi)` convention before the comparison is apples-to-apples.
 
@@ -275,11 +293,13 @@ summary_70$metrics
 summary_70$sector_integrals
 ```
 
-Those summary products are not new physics. They are just structured reuses of the same stored T-matrix blocks. That makes them a good sanity-check layer: the exact monostatic value reported by `summary_70$metrics$TS` should agree with the monostatic `TS` already stored on the object at `70 kHz`.
+These summaries reuse the stored blocks. The monostatic value in
+`summary_70$metrics$TS` should agree with the `TS` already stored at `70 kHz`.
 
 ### Single solved target, many post-process products
 
-The separate helpers are useful when only one post-processing product is needed. But the broader T-matrix workflow is often "solve once, then ask for several things." The higher-level `tmm_products()` wrapper is meant for exactly that pattern.
+Use `tmm_products()` when several post-processing products are required from
+the same solved target.
 
 ```{r}
 products_70 <- tmm_products(
@@ -296,13 +316,16 @@ names(products_70)
 products_70$bistatic_summary$metrics
 ```
 
-This is closer to the real reason for keeping a T-matrix-based representation around. The workflow is no longer "get one monostatic spectrum and stop." It becomes "solve the target once, then reuse the stored operator for monostatic, orientation-averaged, and bistatic products."
+The stored operator can therefore supply monostatic, orientation-averaged, and
+bistatic products without repeating the target solve.
 
 ### Bistatic scattering grids and polar maps
 
 For two-dimensional receive-angle views, the stored blocks can be reused through `tmm_scattering_grid()` or displayed directly through `plot(..., type = "scattering", polar = TRUE)` or `plot(..., type = "scattering", heatmap = TRUE)`. The implementation page uses pre-rendered figures for those heavier views so the article stays lightweight to build.
 
-The vignette embeds pre-rendered examples here so the implementation page does not need to rebuild the heavier two-dimensional scattering figures every time it is rendered. The gallery covers the stored branches that actually support angular grids: `Sphere`, `OblateSpheroid`, and `ProlateSpheroid`. `Cylinder` is intentionally omitted because the retained-cylinder path stops at exact monostatic reuse and orientation-averaged monostatic products.
+The pre-rendered gallery covers the branches that support angular grids:
+`Sphere`, `OblateSpheroid`, and `ProlateSpheroid`. Cylinder is omitted because
+its retained state does not expose a validated angular grid.
 
 ### Shape gallery
 ::: {.panel-tabset}
@@ -458,7 +481,8 @@ The figure below shows the built-in continuation path for a pressure-release pro
 
 ![Sphere-to-spheroid continuation path for a pressure-release prolate spheroid. The exact sphere limit is at aspect ratio 1, and the target spheroid is at aspect ratio 3.5.](tmm-sphere-to-spheroid-continuation.png){fig-alt="Sphere-to-spheroid continuation path for a pressure-release prolate spheroid, showing target strength versus aspect ratio for 38 and 70 kHz. The curves begin at the exact sphere limit and deform smoothly to the target aspect ratio."}
 
-The practical point is simple: this is a much faster development check than an external solver loop. It constrains whether the stored T-matrix branch behaves sensibly before external meshing, field normalization, or far-field extraction are even involved.
+This continuation check can reveal an unstable retained branch before an
+external mesh or far-field normalization is introduced.
 
 ## Exact prolate angular validation
 
@@ -469,7 +493,8 @@ For the retained prolate branch, the most useful validation is not a paper-style
 3. the same scalar boundary conditions, and
 4. the same far-field normalization.
 
-So, for the retained prolate `TMM` operator, the key question is simply whether `tmm_scattering()` reproduces the exact `prolate_spheroid_fbs()` field when both are evaluated at the same stored frequency and the same incident/receive angles.
+The retained prolate operator is checked by comparing `tmm_scattering()` with
+`prolate_spheroid_fbs()` at the same frequency and angles.
 
 The figure below shows that check for a rigid and a pressure-release prolate spheroid with `L = 70 mm`, `a = 10 mm`, broadside incidence, and a `38 kHz` equatorial receive-angle sweep. The line is the exact general-angle spheroidal solution and the open symbols are the stored-block `TMM` reconstruction.
 
@@ -634,11 +659,13 @@ knitr::include_graphics("tmm-bempp-cylinder-validation.png")
 
 For the cylinder, the analogous full-angle figure is shown here only as a **constraint on the exploratory retained-angle cylinder operator**. It is not documenting a supported public cylinder workflow. The point of the figure is to show why the package refuses to provide full retained cylinder grids and bistatic summaries instead of pretending they are validated.
 
-These figures make the external-validation story much more concrete:
+The external comparisons support the following conclusions:
 
-1. the sphere is externally calibrated to BEM/FEM across all four boundaries,
-2. the retained oblate branch also agrees closely once the frame convention is matched correctly,
-3. the retained prolate branch also agrees closely once the frame convention is matched correctly,
+1. the sphere has been compared with BEM/FEM across all four boundaries,
+2. pressure-release oblate and prolate angular fields agree closely after the
+   frame convention is matched,
+3. some penetrable BEM comparisons contain large maxima near nulls and should
+   be interpreted with the exact-family and mean-residual columns,
 4. the exploratory retained-angle cylinder branch does **not** agree externally and is therefore not part of the documented public retained-cylinder workflow, and
 5. even the exact monostatic pressure-release cylinder branch is only externally close near broadside on the tested cases, so cylinder remains the least externally constrained `TMM` shape family and emits a warning by default when used.
 
@@ -651,4 +678,5 @@ At this point, no direct paper-figure reproduction is claimed here for the prola
 knitr::include_graphics("tmm-representative-spectra.png")
 ```
 
-The sphere figure is the more conventional benchmark story: a T-matrix implementation agreeing with the exact spherical modal solution. The prolate figure is really a geometry-consistency story: the `TMM` family lands on the exact spheroidal solution rather than drifting because of a mismatched basis.
+The sphere spectrum checks agreement with SPHMS. The prolate spectrum checks
+agreement with the spheroidal solution used by PSMS.
