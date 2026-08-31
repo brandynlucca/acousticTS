@@ -31,13 +31,29 @@ acousticTS:::.model_family_header(
 )
 ```
 
-The sphere is the classical geometry for which the acoustic scattering problem can be solved exactly by separation of variables. Because the Helmholtz equation separates in spherical coordinates, the incident, scattered, and interior fields can be expanded in spherical eigenfunctions, and the boundary conditions reduce to independent algebraic equations for each angular order [@Anderson_1950; @Faran_1951; @Hickling_1962].
+The acoustic scattering problem for a sphere separates exactly in spherical
+coordinates. The incident, scattered, and interior fields can therefore be
+expanded in spherical eigenfunctions, and the boundary conditions reduce to
+independent algebraic equations for each angular order [@Anderson_1950].
 
-That structure is what underlies the spherical modal series solution for rigid, pressure-release, fluid-filled, and gas-filled spheres. In this article, medium `1` denotes the surrounding seawater and medium `2` denotes the sphere interior, consistent with the shared package notation summarized in the [acoustic scattering primer](../acoustic-scattering-primer/acoustic-scattering-primer.html) and [notation guide](../notation-and-symbols/notation-and-symbols.html). Shell-based spherical problems are treated separately in the `ESSMS` and calibration articles because once an intermediate shell is introduced, the interface physics changes qualitatively.
+The spherical modal-series solution applies that structure to fixed-rigid,
+pressure-release, liquid-filled, and gas-filled spheres. Medium `1` is the
+surrounding fluid and medium `2` is the sphere interior.
 
-The unshelled spherical problem considered here has three boundary families. A rigid sphere enforces zero normal velocity at $r = a$, a pressure-release sphere enforces zero pressure there, and a fluid-filled or gas-filled sphere enforces continuity of pressure and normal velocity between the surrounding medium and the interior. Shell-supported spherical problems are treated separately because once an elastic shell is introduced, the interface physics changes qualitatively.
+::: {.note data-title="Shared conventions"}
+Symbols and medium indexing follow [Notation and
+Symbols](../notation-and-symbols/notation-and-symbols.html). The physical
+meaning of each interface type is developed in [Boundary
+Conditions](../boundary_conditions.html).
+:::
 
-<!-- ![SPHMS spherical-coordinate and partial-wave schematic, showing the boundary at $r=a$, the polar angle $\theta$, and the radial basis functions used inside and outside the sphere.](sphms-coordinate-geometry-clean.png) -->
+The unshelled problem has three boundary families. A fixed-rigid sphere
+enforces zero normal velocity at $r=a$, a pressure-release sphere enforces zero
+pressure, and a penetrable sphere enforces pressure and normal-velocity
+continuity. Elastic solids and shells require additional displacement and
+traction conditions and are treated by `SOEMS` and `ESSMS`.
+
+![SPHMS spherical-coordinate and partial-wave schematic, showing the boundary at $r=a$, the polar angle $\theta$, and the radial basis functions used inside and outside the sphere.](sphms-coordinate-geometry-clean.png)
 
 The boundary condition is imposed at $r = a$, the incident and scattered fields are expanded in spherical partial waves outside the sphere, and the interior field is expanded in regular spherical waves inside the sphere. The polar angle $\theta$ identifies the usual axisymmetric geometry, while the coefficient $A_n$ carries the scattered contribution of angular order $n$.
 
@@ -102,7 +118,10 @@ $$
     \left(k^2r^2 - n(n+1)\right)R = 0,
 $$
 
-whose independent solutions are the spherical Bessel, oeumann, and Hankel functions. The essential point is that spherical geometry keeps the angular order $n$ separated exactly. That is why each partial wave can be solved independently once the boundary condition is imposed.
+whose independent solutions are the spherical Bessel, Neumann, and Hankel
+functions. Spherical geometry keeps the angular order $n$ separated, so each
+partial wave can be solved independently after the boundary condition is
+imposed [@Morse_1953].
 
 ## Orthogonality
 
@@ -113,7 +132,8 @@ $$
     \frac{2}{2n+1}\delta_{mn}.
 $$
 
-This orthogonality is the key step that turns the continuous boundary conditions into independent equations for each order $n$.
+This orthogonality turns the continuous boundary conditions into independent
+equations for each order $n$.
 
 # Incident and scattered field expansions
 
@@ -290,7 +310,10 @@ $$
   }
 $$
 
-This is the direct spherical analogue of the fluid-filled cylindrical coefficient formulas seen in other modal models. The important mathematical step is the elimination of the interior amplitude from the $2 \times 2$ continuity system. Gas-filled spheres obey exactly the same algebra. The only difference is physical: the contrasts $g_{21}$ and $h_{21}$ are then typically far from unity rather than moderately close to it.
+The interior amplitude has now been eliminated from the $2\times2$ continuity
+system. Liquid-filled and gas-filled spheres use the same coefficient equation
+[@Anderson_1950]. Their physical distinction lies in the values of
+$g_{21}$ and $h_{21}$, which are usually much farther from unity for a gas.
 
 # Modal truncation
 
@@ -298,7 +321,10 @@ The exact solution is an infinite partial-wave series. In practice only finitely
 
 This is a general feature of all modal scattering solutions and follows from the fact that the angular spectrum broadens as the target becomes acoustically larger.
 
-After choosing a truncation order $n_{max}$, one simply evaluates the independent coefficient problem for each $n=0,1,\ldots,n_{max}$ and inserts the resulting $A_n$ into the far-field series. Because the spherical basis remains orthogonal at every step, truncation introduces only a cutoff in the number of retained partial waves; it does not change the diagonal structure of the mode-wise solve.
+After choosing $n_{\max}$, evaluate the independent coefficient problem for
+$n=0,1,\ldots,n_{\max}$ and insert the resulting $A_n$ into the far-field
+series. Truncation limits the retained partial waves but does not change the
+diagonal structure of the mode-wise solve.
 
 # Backscattering cross-section and target strength
 
@@ -308,13 +334,16 @@ $$
   \sigma_\text{bs} = |\mathcal{f}_\text{bs}|^2
 $$
 
-and the target strength is [@MacLennan_2002; @Urick_1983; @Simmonds_2005]:
+and target strength is [@MacLennan_2002]:
 
 $$
-  TS = 10\log_{10}(\sigma_\text{bs}).
+  TS = 10\log_{10}\left(
+  \frac{\sigma_\text{bs}}{1\ \mathrm{m}^2}\right).
 $$
 
-Since $\sigma_\text{bs}$ is the squared magnitude of a scattering amplitude, one may also write $TS = 20\log_{10}|\mathcal{f}_\text{bs}|$ when the amplitude itself is the reported quantity. Because the derivation is exact within linear acoustics and the stated boundary model, the only approximations thereafter are those introduced by truncating the infinite modal series.
+Equivalently, $TS=20\log_{10}(|\mathcal f_\text{bs}|/1\ \mathrm{m})$.
+Within the stated boundary model, numerical approximation enters through modal
+truncation and special-function evaluation.
 
 # Mathematical assumptions
 
@@ -326,7 +355,10 @@ The spherical modal series rests on the following assumptions:
 4. Exact separability in spherical coordinates.
 5. Radiation condition in the exterior field.
 
-Those assumptions are what make the sphere the natural reference problem for validating more complicated scattering models. The geometry is perfectly matched to the coordinate system, the angular basis remains orthogonal, and every retained order remains algebraically local even in the fluid-filled case. That is exactly why the spherical problem serves as the standard benchmark against which more complicated modal and approximate models are often judged.
+The matched geometry and orthogonal angular basis make this solution a useful
+reference for more general modal and approximate models. The validation scope
+of the package implementation is documented on the [SPHMS implementation
+page](sphms-implementation.html).
 
 
 
