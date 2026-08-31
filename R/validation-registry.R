@@ -100,7 +100,7 @@
     section = c(
       rep("Modal-series families", 7L),
       rep("Approximation and ray-based families", 6L),
-      rep("Composite and emerging families", 3L)
+      rep("Composite, layered, and transition-matrix families", 3L)
     ),
     section_order = c(rep(1L, 7L), rep(2L, 6L), rep(3L, 3L)),
     family_order = c(
@@ -143,7 +143,7 @@
       "Weak-scattering elongated-body approximation for fluid-like targets.",
       "Stochastic DWBA family for unresolved phase variability.",
       paste(
-        "Kirchhoff-ray mode model for segmented fish-like ",
+        "Kirchhoff-ray mode model for segmented fish-like",
         "body-plus-inclusion targets."
       ),
       "High-pass approximation for compact asymptotic screening.",
@@ -153,7 +153,7 @@
       ),
       "Phase-compensated DWBA for bent weakly scattering targets.",
       paste(
-        "Composite flesh-plus-backbone family for swimbladder-less ",
+        "Composite flesh-plus-backbone family for swimbladder-less",
         "fish-like targets."
       ),
       paste(
@@ -352,7 +352,7 @@
         "in benchmark_ts."
       ),
       paste(
-        "Validated against`KRMr, echoSMs, and the NOAA KRM applet on",
+        "Validated against KRMr, echoSMs, and the NOAA KRM applet on",
         "bundled fish objects and shared workflows."
       ),
       # HPA
@@ -728,12 +728,17 @@
 
   sections <- unique(families$section)
   section_prefix <- paste(rep("#", heading_level), collapse = "")
-  family_prefix <- paste(rep("#", heading_level + 1L), collapse = "")
+  family_heading <- heading_level + 1L
 
   out <- character()
 
   for (section in sections) {
-    out <- c(out, paste(section_prefix, section))
+    out <- c(
+      out,
+      paste(section_prefix, section),
+      "",
+      '<div class="model-library-grid" role="list">'
+    )
 
     rows <- families[families$section == section, , drop = FALSE]
     for (i in seq_len(nrow(rows))) {
@@ -749,16 +754,26 @@
 
       out <- c(
         out,
-        "",
-        paste0(family_prefix, " [", display, "](", rows$url[[i]], ")"),
-        "",
-        status_markup,
-        "",
-        rows$description[[i]]
+        paste0(
+          '<article class="model-card" id="model-family-', family,
+          '" role="listitem">'
+        ),
+        paste0(
+          "<h", family_heading, ' class="model-card__title"><a href="',
+          rows$url[[i]], '">', .validation_html_escape(display), "</a></h",
+          family_heading, ">"
+        ),
+        paste0(
+          '<div class="model-status-line" aria-label="Model status">',
+          status_markup,
+          "</div>"
+        ),
+        paste0("<p>", .validation_html_escape(rows$description[[i]]), "</p>"),
+        "</article>"
       )
     }
 
-    out <- c(out, "")
+    out <- c(out, "</div>", "")
   }
 
   out <- paste(out, collapse = "\n")

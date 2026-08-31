@@ -250,4 +250,4 @@ to select the target class and attach these values to the geometry.
 - [Building Shapes](../building-shapes/building-shapes.html)
 - [Building Scatterers](../building-scatterers/building-scatterers.html)
 - [Scattering Boundary Conditions](../boundary_conditions.html)
-- [Calibration Workflow](../calibration-workflow/calibration-workflow.html)
+- [SOEMS calibration spheres](../calibration/index.html)
