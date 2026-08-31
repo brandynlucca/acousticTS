@@ -414,10 +414,10 @@ decomposition but makes different choices in five places:
 An "exact" series is exact only for its stated geometry, constitutive law, and
 boundary conditions. Its computed value still depends on truncation, special
 functions, quadrature, and finite-precision linear algebra. Those issues are
-treated in [Numerical Foundations](../numerical-foundations/numerical-foundations.html).
+treated in [Numerical Methods](../numerical-foundations/numerical-foundations.html).
 
 # Companion pages
 
 - [Notation and symbols](../notation-and-symbols/notation-and-symbols.html)
 - [Scattering boundary conditions](../boundary_conditions.html)
-- [Numerical foundations](../numerical-foundations/numerical-foundations.html)
+- [Numerical methods](../numerical-foundations/numerical-foundations.html)

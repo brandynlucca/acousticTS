@@ -177,5 +177,5 @@ That ladder avoids blaming the mathematics before checking the setup, and it avo
 # Related reading
 
 - [Working with real example data](../example-data/example-data.html)
-- [Numerical foundations and special functions](../numerical-foundations/numerical-foundations.html)
+- [Numerical methods and special functions](../numerical-foundations/numerical-foundations.html)
 - [FAQ and troubleshooting](../faq-troubleshooting/faq-troubleshooting.html)

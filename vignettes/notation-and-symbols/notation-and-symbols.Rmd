@@ -30,7 +30,7 @@ The suggested reading order is:
 1. this notation guide,
 2. the [acoustic scattering primer](../acoustic-scattering-primer/acoustic-scattering-primer.html),
 3. [scattering boundary conditions](../boundary_conditions.html),
-4. [numerical foundations](../numerical-foundations/numerical-foundations.html).
+4. [numerical methods](../numerical-foundations/numerical-foundations.html).
 
 # Vectors, positions, and directions
 
@@ -205,5 +205,5 @@ and so on.
 
 - [Acoustic scattering primer](../acoustic-scattering-primer/acoustic-scattering-primer.html)
 - [Scattering boundary conditions](../boundary_conditions.html)
-- [Numerical foundations](../numerical-foundations/numerical-foundations.html)
+- [Numerical methods](../numerical-foundations/numerical-foundations.html)
 
