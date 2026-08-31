@@ -23,10 +23,10 @@ navbar:
     physics:
       text: Physics Primer
       menu:
-        - text: "Acoustic scattering primer"
-          href: articles/acoustic-scattering-primer/acoustic-scattering-primer.html
         - text: "Notation and symbols"
           href: articles/notation-and-symbols/notation-and-symbols.html
+        - text: "Acoustic scattering primer"
+          href: articles/acoustic-scattering-primer/acoustic-scattering-primer.html
         - text: "Boundary conditions"
           href: articles/boundary_conditions.html
         - text: "Material properties"
@@ -101,8 +101,8 @@ articles:
 
   - title: Acoustic Physics Primer
     contents:
-      - acoustic-scattering-primer/acoustic-scattering-primer
       - notation-and-symbols/notation-and-symbols
+      - acoustic-scattering-primer/acoustic-scattering-primer
       - boundary_conditions
       - material-properties/material-properties
       - numerical-foundations/numerical-foundations
