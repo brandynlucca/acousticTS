@@ -29,8 +29,6 @@ navbar:
           href: articles/acoustic-scattering-primer/acoustic-scattering-primer.html
         - text: "Boundary conditions"
           href: articles/boundary_conditions.html
-        - text: "Material properties"
-          href: articles/material-properties/material-properties.html
         - text: "Numerical methods"
           href: articles/numerical-foundations/numerical-foundations.html
     build:
@@ -38,6 +36,8 @@ navbar:
       menu:
         - text: "Building Shapes"
           href: articles/building-shapes/building-shapes.html
+        - text: "Material Properties"
+          href: articles/material-properties/material-properties.html
         - text: "Building Scatterers"
           href: articles/building-scatterers/building-scatterers.html
         - text: "Shape Manipulation"
@@ -96,6 +96,7 @@ articles:
   - title: Build Targets
     contents:
       - building-shapes/building-shapes
+      - material-properties/material-properties
       - building-scatterers/building-scatterers
       - shape-manipulation-reforging/shape-manipulation-reforging
 
@@ -104,7 +105,6 @@ articles:
       - notation-and-symbols/notation-and-symbols
       - acoustic-scattering-primer/acoustic-scattering-primer
       - boundary_conditions
-      - material-properties/material-properties
       - numerical-foundations/numerical-foundations
 
   - title: Run Models

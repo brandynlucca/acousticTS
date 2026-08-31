@@ -420,5 +420,4 @@ treated in [Numerical Foundations](../numerical-foundations/numerical-foundation
 
 - [Notation and symbols](../notation-and-symbols/notation-and-symbols.html)
 - [Scattering boundary conditions](../boundary_conditions.html)
-- [Material properties](../material-properties/material-properties.html)
 - [Numerical foundations](../numerical-foundations/numerical-foundations.html)

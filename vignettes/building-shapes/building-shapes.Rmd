@@ -240,4 +240,7 @@ Those checks help prevent a common mistake in acoustic workflows: building a geo
 
 # Recommended next step
 
-The next step after geometry construction is usually [building scatterers](../building-scatterers/building-scatterers.html), where material properties, contrasts, and target type are added to the geometric object. That is the stage where a shape becomes a model-ready acoustic target.
+After geometry construction, [prepare the material properties](../material-properties/material-properties.html)
+that describe the target and its reference medium. Then continue to
+[Building Scatterers](../building-scatterers/building-scatterers.html) to attach
+those properties to the shape and create a model-ready acoustic target.

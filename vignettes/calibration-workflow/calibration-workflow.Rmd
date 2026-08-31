@@ -103,4 +103,4 @@ The calibration theory page explains the elastic-sphere physics and the normaliz
 
 - [Solid elastic sphere theory](../calibration/calibration-theory.html)
 - [Calibration implementation](../calibration/calibration-implementation.html)
-- [Material properties and acoustic utilities](../material-properties/material-properties.html)
+- [Preparing material properties](../material-properties/material-properties.html)

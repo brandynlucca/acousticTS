@@ -1,5 +1,5 @@
 ---
-title: "Material Properties and Acoustic Utilities"
+title: "Preparing Material Properties"
 output:
   rmarkdown::html_vignette:
     toc: true
@@ -11,20 +11,22 @@ bibliography: ../REFERENCES.bib
 link-citations: true
 reference-section-title: References
 vignette: >
-  %\VignetteIndexEntry{Material Properties and Acoustic Utilities}
+  %\VignetteIndexEntry{Preparing Material Properties}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---
 
 # Introduction
 
-The property conventions on this page follow standard acoustics and elastic-wave references used throughout underwater scattering theory [@Medwin_1998; @Achenbach_1973].
+Use this guide after choosing a target geometry and before building a
+scatterer. It covers how to record, convert, and check the material values that
+will be attached to the target. Constructor selection and object assembly are
+covered in [Building Scatterers](../building-scatterers/building-scatterers.html).
 
-
-
-Many modeling errors are not caused by the scattering model itself. They are caused by incorrect material properties, inconsistent contrasts, or unit conversion mistakes. This article collects the supporting acoustic-property functions that feed the model layer and explains how to think about them physically before they are ever passed into a target-strength model.
-
-In practice, this page is the bookkeeping companion to the theory pages. If a model result looks suspicious, one of the first things to check is whether the object was parameterized with sensible densities, sound speeds, contrasts, elastic constants, and medium properties. That may sound secondary compared with model choice, but it often is not. A theoretically appropriate model will still give an inappropriate answer if the target and medium properties do not describe the same physical situation the reader believes they are describing.
+::: {.note data-title="Physical interpretation"}
+See [Scattering Boundary Conditions](../boundary_conditions.html) for how
+material properties enter the interface conditions.
+:::
 
 ```{r echo=FALSE, results='asis'}
 acousticTS:::.vignette_static_figure(
@@ -33,130 +35,219 @@ acousticTS:::.vignette_static_figure(
 )
 ```
 
-# Main utility groups
+# Record the source values
 
-The package includes utilities for density- and sound-speed-derived quantities, compressibility- and impedance-related calculations, elastic moduli such as Lamé parameters, shear modulus, Poisson ratio, and Young's modulus, wavenumber and acoustic-size conversions, and logarithmic and linear-scale conversions. The functions are small, but they are central. Nearly every model in the package uses some subset of them, either explicitly or as part of the physical quantities from which the model inputs are built.
+Record each value with its units, source, and measurement conditions. Density
+and sound speed can depend on temperature, salinity, pressure, and composition.
+In dispersive or lossy media, effective wave properties may also depend on
+frequency. A contrast copied from a publication is usable only when its
+reference medium is known [@Medwin_1998].
 
-It is useful to think of these utilities as belonging to three different tasks:
+::: {.note data-title="Symbols and units"}
+See [Notation and Symbols](../notation-and-symbols/notation-and-symbols.html)
+for the shared material-property definitions and units.
+:::
 
-1. converting between alternative descriptions of the same material,
-2. checking whether target and medium contrasts are physically plausible, and
-3. converting between reporting scales so that the model output is interpreted in the right domain.
+Convert units before constructing the scatterer. In particular, elastic
+moduli should be supplied in pascals and geometric dimensions should follow
+the units declared in the constructor call.
 
-That separation matters because a workflow can fail at any of those stages. A user may know the correct material but express it in the wrong parameterization. A user may compute a mathematically valid contrast that still does not correspond to the intended target. Or a user may obtain a correct model result and then summarize it in a domain that answers a different question.
+# Make the reference medium explicit
 
-# Contrasts versus absolute properties
-
-One of the most useful design choices in acousticTS is that many constructors and models accept either contrasts or absolute properties. A density contrast such as `g_body` expresses target density relative to the surrounding medium, while a sound-speed contrast such as `h_body` expresses target sound speed relative to the surrounding medium. Absolute properties such as `density_body` and `sound_speed_body` can often be supplied instead, with contrasts derived internally.
-
-This flexibility is convenient, but it also means a user should be deliberate about which representation is being supplied. The package can often derive missing pieces, but it cannot rescue physically inconsistent inputs. If absolute properties imply one contrast and the manually supplied contrast implies another, the inconsistency belongs to the setup rather than to the scattering model.
-
-The choice between contrasts and absolute properties is not only a coding convenience. It changes how the physical problem is being framed. Contrasts emphasize the target relative to the surrounding medium and are often the most natural way to think about weak-scattering approximations. Absolute properties emphasize the target itself and are often the most natural form when drawing from laboratory measurements or literature tables. Both are useful, but they should not be mixed casually.
-
-It is also important to remember that a contrast is meaningless without an explicit reference medium. A value such as `g_body = 1.02` says very little by itself unless the medium density is also understood. If the surrounding water properties change, the same absolute target properties imply different contrasts. That is one reason medium bookkeeping should remain visible in the workflow rather than being treated as an afterthought.
-
-# Acoustic utilities
-
-## Wavenumber
-
-The acoustic wavenumber appears everywhere because it connects frequency and sound speed to acoustic size.
+Absolute target properties remain properties of the target, but their acoustic
+interpretation and all derived ratios depend on the exterior medium used in the
+calculation. Keep those medium values with the target setup, even when they are
+not arguments to the scatterer constructor:
 
 ```{r}
 library(acousticTS)
 
-frequency <- c(38e3, 70e3, 120e3)
-sound_speed_sw <- 1500
+medium <- data.frame(
+  density = 1026,
+  sound_speed = 1500
+)
 
-wavenumber(frequency, sound_speed_sw)
+body <- data.frame(
+  density = 1045,
+  sound_speed = 1520
+)
 ```
 
-That quantity underlies $ka$, reduced frequency, and many truncation rules. It is one of the simplest examples of why material bookkeeping matters. Changing only sound speed, while keeping the same nominal frequency and geometry, changes acoustic size and therefore changes which asymptotic or modal regime a model may be operating in.
+The same exterior density and sound speed should later be supplied to the
+scattering calculation. Otherwise, ratios derived during target preparation
+and properties completed during model evaluation can describe different
+physical systems.
 
-This is also why frequency and sound speed should be checked together rather than separately. A frequency sequence may look reasonable on paper, but if the wrong sound speed is being used the implied acoustic-size range may not match the intended problem at all.
+# Choose absolute properties or ratios
 
-## Linear and logarithmic conversion
+Fluid-like constructors commonly accept either absolute values such as
+`density_body` and `sound_speed_body` or directional ratios such as `g_body`
+and `h_body`. For a body in the exterior medium, those ratios are
+$g_{21}=\rho_2/\rho_1$ and $h_{21}=c_2/c_1$.
 
-Model outputs are often easier to compare in different domains depending on the question.
+Compute the ratios from the recorded absolute values when both are available:
 
 ```{r}
-linear(-60)
-db(1e-6)
+g_body <- body$density / medium$density
+h_body <- body$sound_speed / medium$sound_speed
+
+data.frame(g_body, h_body)
 ```
 
-The practical rule is simple. Use `TS` in dB for reporting and communication, and use linear quantities such as `sigma_bs` when averaging, combining, or checking interference logic. Many avoidable interpretation errors arise from mixing those two roles.
+Supply one representation for each property. Providing an absolute density
+and a contradictory density ratio does not describe a unique target. The same
+rule applies to sound speed.
 
-This distinction matters well beyond plotting. If readers compare two models with RMSE, MAD, or other residual summaries, they should decide first whether the scientific question lives in the linear scattering domain or in the logarithmic reporting domain. A small dB discrepancy can correspond to a substantial difference in linear cross-section, and the reverse can also happen.
-
-## Compressibility contrast
-
-The package also exposes simple interface-level calculations that are useful for sanity checks.
+Ratios and perturbation contrasts are also different quantities. The package
+helpers `rho()` and `compressibility()` calculate the density and
+compressibility perturbations used by weak-scattering formulations:
 
 ```{r}
-medium <- data.frame(density = 1026, sound_speed = 1500)
-target <- data.frame(density = 1045, sound_speed = 1520)
-
-compressibility(medium, target)
+data.frame(
+  gamma_rho = acousticTS::rho(medium, body),
+  gamma_kappa = compressibility(medium, body)
+)
 ```
 
-Those utilities are especially helpful when a user wants to understand why a weak-scattering approximation is or is not plausible for a given target. Density contrast alone is rarely the whole story. Compressibility, impedance mismatch, and the joint behavior of density and sound speed are often the quantities that determine whether a target behaves as weakly scattering, strongly reflecting, or something in between [@Medwin_1998].
+The ratios $g_{21}$ and $h_{21}$ approach one for a weak contrast. The
+perturbations $\gamma_\rho$ and $\gamma_\kappa$ approach zero. They should not
+be substituted for one another.
 
-This is one of the most common places where intuition can go wrong. A target may have density close to water but still differ noticeably in sound speed, or vice versa. Looking only at one property can therefore suggest a weak contrast when the combined interface behavior is more consequential.
+# Check combined fluid properties
 
-# Elastic utilities
-
-Shell and solid-sphere models need elastic constants that are often reported inconsistently across sources. One paper may give $E$ and $\nu$, another may give $K$ and $G$, and a third may effectively imply Lamé parameters. The package utilities make it easier to move among those descriptions.
-
-Representative functions include `pois()` for Poisson ratio, `bulk()` for bulk modulus, `young()` for Young's modulus, `shear()` for shear modulus, and `lame()` for the Lamé parameter [@Achenbach_1973].
+Density and sound speed should also be checked together. Acoustic impedance
+and absolute compressibility provide compact diagnostics for an interface:
 
 ```{r}
-E <- 7e10
+property_check <- rbind(
+  exterior = medium,
+  body = body
+)
+
+property_check$impedance <-
+  property_check$density * property_check$sound_speed
+property_check$compressibility_pa_inverse <-
+  1 / (property_check$density * property_check$sound_speed^2)
+
+property_check
+```
+
+A density ratio close to one does not guarantee a small acoustic contrast if
+the sound speeds differ materially. Likewise, a gas component should not be
+treated as weakly contrasting merely because the chosen density value has not
+yet been checked against its sound speed.
+
+# Convert elastic properties
+
+Elastic properties are reported in several equivalent parameterizations. The
+package provides `pois()`, `bulk()`, `young()`, `shear()`, and `lame()` to
+convert between the common isotropic elastic constants [@Achenbach_1973].
+
+For example, Young's modulus and Poisson ratio can be converted before an
+elastic scatterer is built:
+
+```{r}
+E <- 70e9
 nu <- 0.32
+density_solid <- 2700
 
 G <- shear(E = E, nu = nu)
 K <- bulk(E = E, nu = nu)
 lambda <- lame(E = E, nu = nu)
 
-G
-K
-lambda
+c_L <- sqrt((lambda + 2 * G) / density_solid)
+c_T <- sqrt(G / density_solid)
+
+data.frame(E, nu, G, K, lambda, c_L, c_T)
 ```
 
-That kind of conversion is useful when building `ESS` or calibration-style objects from literature values that do not already match the package argument names.
+Supply only the independent values intended for the conversion. Redundant and
+inconsistent elastic constants can hide which pair was actually used. For a
+stable isotropic linear-elastic material, check that $K>0$, $G>0$, and $E>0$
+as applicable, and that $-1<\nu<0.5$ before construction. Lamé's first
+parameter need not be positive for every stable auxetic material.
 
-These conversions are not merely notational. Different elastic quantities emphasize different physical aspects of a material. Young's modulus and Poisson ratio are often how a material is reported mechanically, while shear modulus, bulk modulus, and Lamé parameters are often closer to the quantities that enter wave propagation and boundary-condition formulas. A careful workflow therefore converts once, checks consistency, and then carries the internally consistent elastic set through the model setup.
+Different target classes expose different elastic inputs. An elastic-shell
+constructor may accept a pair such as `E` and `nu`, while a calibration sphere
+may be specified by density and longitudinal and transverse wave speeds. Use
+the representation supported by the intended constructor rather than
+converting values that are already available in the required form.
 
-Readers should also be cautious about units and admissibility. Elastic moduli are in pascals, not megapascals unless explicitly converted, and not every arbitrary pair of elastic constants is physically admissible. If a conversion produces an obviously implausible modulus or a Poisson ratio outside its admissible range, the source values should be checked before the scatterer is built.
+# Keep layered components separate
 
-# A practical material-property workflow
+For a layered target, retain one labeled record per physical region. Do not
+collapse shell, core, viscous layer, and exterior values into an unlabeled set
+of generic properties.
 
-For most users, a robust material-property workflow begins by deciding whether the source information is best represented as contrasts or absolute values. The surrounding medium should then be kept explicit when deriving contrasts. If the model needs elastic constants, missing quantities should be derived before the scatterer is built. Simple utilities such as `wavenumber()`, `reflection_coefficient()`, or `compressibility()` are then worth checking whenever a result looks implausible. Only after those checks should the scattering model itself be treated as the likely source of disagreement.
+| Region | Values to retain |
+|---|---|
+| exterior fluid | density and sound speed |
+| fluid-like body or core | density and sound speed, or documented ratios |
+| elastic solid or shell | density and an independent elastic parameter set |
+| viscous layer | density, compressional sound speed, shear viscosity, and bulk viscosity when required |
 
-This workflow matters especially when comparing multiple models, because what looks like a model discrepancy is often really a parameterization discrepancy. Two models cannot be meaningfully compared if their working target properties are not describing the same physical object.
+The theoretical ratios between adjacent media can always be derived from
+these labeled absolute values. Constructor argument names may instead express
+a component relative to the exterior medium, so check the constructor
+documentation before supplying a precomputed ratio.
 
-A practical sequence is often:
+# Build a constructor-ready target
 
-1. define the surrounding medium explicitly,
-2. express the target either in absolute properties or in contrasts, but not in a partially contradictory mix of both,
-3. derive any missing elastic quantities before object construction,
-4. check acoustic size and interface behavior with small utility calculations, and
-5. only then run the scattering model and interpret the output.
+Once the values are checked, attach them to a compatible shape. Absolute
+properties can be supplied directly:
 
-That sequence may feel slower, but it usually prevents much larger downstream confusion. It is far easier to catch an inconsistent sound speed or modulus before object construction than to infer later that an unexpected target-strength curve was caused by a bookkeeping mismatch rather than by the model physics.
+```{r}
+body_shape <- prolate_spheroid(
+  length_body = 0.04,
+  radius_body = 0.004,
+  n_segments = 60
+)
 
-# Common failure modes
+body_target <- fls_generate(
+  shape = body_shape,
+  density_body = body$density,
+  sound_speed_body = body$sound_speed
+)
 
-Some of the most common material-property mistakes are mixing units, especially mm versus m and kHz versus Hz, supplying both contrasts and absolutes that are inconsistent with each other, forgetting that elastic moduli are in Pa, treating a gas-filled component as if it were only slightly different from the surrounding fluid, and interpreting a target-strength difference caused by material properties as if it were caused by geometry.
+extract(body_target, "body")
+```
 
-Another common failure mode is importing values from the literature without checking the associated medium, temperature, salinity, or measurement context. Material properties reported for a target in one surrounding medium are not automatically transferable as contrasts to another. If the package run and the source measurement are not using the same reference medium, the target can be parameterized incorrectly even when every individual number has been copied exactly.
+The same shape can instead be constructed from ratios derived against the
+recorded exterior medium:
 
-# Why this matters
+```{r}
+body_target_ratios <- fls_generate(
+  shape = body_shape,
+  g_body = g_body,
+  h_body = h_body
+)
 
-Almost every theory page assumes that material properties are already correctly specified. In practice, those properties are often the most fragile part of a workflow. A page dedicated to them makes it easier to separate physics errors from bookkeeping errors.
+extract(body_target_ratios, "body")
+```
 
-That separation is useful both scientifically and practically. Scientifically, it keeps readers from attributing a contrast-driven effect to the wrong geometric or model mechanism. Practically, it makes model debugging much faster. Before concluding that a model is failing, it is usually worth confirming that the target, the surrounding medium, and the reporting domain were all defined consistently.
+These objects describe the same material only when the later model run uses
+the exterior values stored in `medium`.
 
-# Companion reading
+# Validation checklist
 
-- [Boundary conditions](../boundary_conditions.html)
-- [Boundary conditions in practice](../boundary-conditions-practice/boundary-conditions-practice.html)
-- [FAQ and troubleshooting](../faq-troubleshooting/faq-troubleshooting.html)
+Before moving to scatterer construction or model evaluation, confirm that:
+
+1. every dimensional value has been converted to the units expected by the package,
+2. the exterior medium used to derive ratios is recorded,
+3. absolute values and ratios do not contradict one another,
+4. $g$ and $h$ ratios have not been confused with perturbation contrasts,
+5. each region of a layered target has its own labeled property set,
+6. elastic constants form a physically admissible independent set, and
+7. frequency-dependent or complex properties have not been replaced silently by unrelated static values.
+
+# Next step
+
+Continue to [Building Scatterers](../building-scatterers/building-scatterers.html)
+to select the target class and attach these values to the geometry.
+
+# Related pages
+
+- [Building Shapes](../building-shapes/building-shapes.html)
+- [Building Scatterers](../building-scatterers/building-scatterers.html)
+- [Scattering Boundary Conditions](../boundary_conditions.html)
+- [Calibration Workflow](../calibration-workflow/calibration-workflow.html)

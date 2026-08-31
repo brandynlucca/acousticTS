@@ -26,6 +26,11 @@ Once a geometry exists, it still has to be assigned a physical interpretation be
 
 This distinction matters because the same outline can support several different physical interpretations. A smooth elongated body might be treated as a weakly scattering fluid-like target, as a gas-filled inclusion, or as part of a composite fish-like target with an internal swimbladder. The geometry by itself does not decide among those cases. Scatterer construction is the step where the reader turns a geometric description into a model-ready acoustic object.
 
+::: {.tip data-title="Prepare material inputs"}
+Use [Preparing Material Properties](../material-properties/material-properties.html)
+to convert and validate target properties before attaching them to a shape.
+:::
+
 ```{r echo=FALSE, results='asis'}
 acousticTS:::.vignette_clickable_figure("building_scatterers_map")
 ```
