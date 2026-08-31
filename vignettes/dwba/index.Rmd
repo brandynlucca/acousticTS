@@ -1,4 +1,4 @@
-﻿---
+---
 title: "DWBA"
 output:
   rmarkdown::html_vignette:
@@ -13,6 +13,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---
+
 # Overview
 
 ```{r model_family_header, echo=FALSE, results='asis'}
@@ -26,44 +27,38 @@ acousticTS:::.model_family_header(
 )
 ```
 
-
-These pages follow the weak-scattering elongated-body formulation and later applied fisheries-acoustics usage of the distorted-wave Born approximation [@Morse_1968; @Chu_1993; @Stanton_1998_2].
-
 ```{r dwba_overview, echo=FALSE, results='asis'}
 acousticTS:::.model_family_overview(
   family = "dwba",
   summary = paste(
-    "The distorted wave Born approximation (`DWBA`) is the package's main",
-    "weak-scattering fluid-body model for elongated targets that are no",
-    "longer well represented by a single canonical sphere, cylinder, or",
-    "spheroid."
+    "The distorted-wave Born approximation (`DWBA`) calculates monostatic",
+    "backscatter from weakly contrasting fluid-like bodies represented by a",
+    "segmented centerline and local radius profile."
   ),
   core_idea = paste(
-    "Treat the target as a weak perturbation of the surrounding fluid, retain",
-    "the two-way phase accumulation along the body, and integrate the local",
-    "cross-sectional response over a segmented centerline."
+    "Linearize the scattering response in density and compressibility",
+    "contrast, calculate each local cross-section, and integrate the complex",
+    "contributions with their two-way phase [@Chu_1993; @Stanton_1998_2]."
   ),
   best_for = c(
-    "Weakly scattering fluid-like elongated bodies",
-    "Zooplankton-like or swimbladder-less flesh-body calculations where density and sound-speed contrasts remain modest",
-    "Arbitrary profiles that do not fit a single canonical exact geometry"
+    "Weakly scattering zooplankton and other fluid-like elongated bodies",
+    "Arbitrary profiles that are not well represented by one sphere, cylinder, or spheroid",
+    "Deterministic calculations for a specified geometry and orientation"
   ),
   supports = c(
-    "`FLS` objects with canonical or arbitrary shapes",
-    "Material contrasts expressed naturally as $g_{21}$ and $h_{21}$ relative to seawater",
-    "Segmented body-axis integrations in the monostatic backscatter setting"
+    "`FLS` scatterers with canonical or arbitrary body profiles",
+    "Density and sound-speed contrasts relative to the surrounding water",
+    "Frequency-dependent complex amplitude, cross-section, and target strength"
   ),
   assumptions = c(
     "Small density and sound-speed contrasts",
-    "First-order Born linearization",
-    "Single scattering with no strong internal reverberation",
-    "Fluid-like, non-elastic interior response"
+    "First-order Born-type scattering with no strong internal reverberation",
+    "A fluid-like interior without elastic shear response",
+    "Sufficient body discretization for the local radius and phase variation"
   ),
   reading = c(
-    "[Implementation](dwba-implementation.html): object workflows, spectra, and validation tables",
-    "[Theory](dwba-theory.html): Born linearization, contrast term, and centerline integral"
+    "[Implementation](dwba-implementation.html): object preparation, discretization, output, and comparisons",
+    "[Theory](dwba-theory.html): weak-scattering contrast and centerline integral"
   )
 )
 ```
-
-

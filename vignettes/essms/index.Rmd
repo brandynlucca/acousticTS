@@ -13,7 +13,9 @@ vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---
+
 # Overview
+
 ```{r model_family_header, echo=FALSE, results='asis'}
 acousticTS:::.model_family_header(
   family = "essms",
@@ -25,43 +27,39 @@ acousticTS:::.model_family_header(
 )
 ```
 
-
-These pages are grounded in the classical elastic-shell scattering literature for fluid-filled spherical shells [@Goodman_1962; @Faran_1951; @Stanton_1990].
-
 ```{r essms_overview, echo=FALSE, results='asis'}
 acousticTS:::.model_family_overview(
   family = "essms",
   summary = paste(
-    "The elastic shelled spherical modal series (`ESSMS`) is the package's",
-    "layered spherical family for an elastic shell surrounding either a fluid",
-    "interior or a pressure-release cavity."
+    "The elastic-shelled spherical modal-series model (`ESSMS`) calculates",
+    "scattering from an elastic spherical shell around an inner fluid or",
+    "cavity."
   ),
   core_idea = paste(
-    "Represent the exterior acoustic field, the shell's longitudinal and",
-    "transverse elastic fields, and the interior acoustic field in spherical",
-    "modes, then match pressure, displacement, and traction conditions at both",
-    "shell interfaces."
+    "Represent the exterior and interior acoustic fields and the shell's",
+    "longitudinal and transverse elastic fields in spherical modes. Match",
+    "pressure, displacement, and traction at both interfaces",
+    "[@Goodman_1962; @Faran_1951]."
   ),
   best_for = c(
-    "Spherical elastic shells with fluid or gas interiors",
-    "Layered shell problems where shell resonances matter explicitly",
-    "Theoretical reference work on spherical shell scattering"
+    "Spherical elastic shells with fluid or gas-like interiors",
+    "Shell-resonance and thickness-sensitivity studies",
+    "Canonical layered-sphere calculations where shell elasticity must be retained"
   ),
   supports = c(
-    "`ESS` spherical geometries",
-    "Exterior seawater (medium `1`), shell (medium `2`), and interior fluid or cavity (medium `3`)",
-    "Pressure-release and fluid-filled shell interiors"
+    "Spherical `ESS` objects with an explicit shell and inner fluid",
+    "Shell density, elastic moduli, longitudinal speed, and shear speed",
+    "User-controlled modal truncation"
   ),
   assumptions = c(
-    "Perfectly spherical shell geometry",
-    "Homogeneous isotropic shell material",
+    "Concentric spherical interfaces",
+    "Homogeneous isotropic shell and homogeneous inner fluid",
     "Linear elasticity and linear acoustics",
-    "Modal truncation of an exact spherical layered system"
+    "No viscosity, nonspherical deformation, or eccentric core"
   ),
   reading = c(
-    "[Implementation](essms-implementation.html): current usage and validation status",
-    "[Theory](essms-theory.html): full layered shell derivation, tractions, and mode-wise boundary systems"
+    "[Implementation](essms-implementation.html): object construction, output, and current validation scope",
+    "[Theory](essms-theory.html): layered fields, interface tractions, and modal systems"
   )
 )
 ```
-
