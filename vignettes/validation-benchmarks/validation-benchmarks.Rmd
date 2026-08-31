@@ -1,5 +1,5 @@
 ---
-title: "Validation and Benchmark Reproduction"
+title: "Validation Methods"
 output:
   rmarkdown::html_vignette:
     toc: true
@@ -11,68 +11,87 @@ bibliography: ../REFERENCES.bib
 link-citations: true
 reference-section-title: References
 vignette: >
-  %\VignetteIndexEntry{Validation and Benchmark Reproduction}
+  %\VignetteIndexEntry{Validation Methods}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---
 
-# What this page establishes
+# What validation establishes
 
-Validation is evidence that a model reproduces an independent result within a
-stated scope. It is not established by a successful function call or a
-plausible-looking curve. `acousticTS` uses stored canonical benchmarks,
-comparisons with independent implementations, numerical checks, and regression
-tests. These forms of evidence answer different questions and should not be
-treated as interchangeable [@Jech_2015; @echoSMs_software].
+A function that runs without error is not necessarily correct. A physically
+plausible curve is not validation either. Evidence must connect a defined model
+case to an independent result within a stated geometry, boundary condition,
+parameter range, numerical configuration, and output convention.
 
 ![Validation proceeds from object and unit checks through known limits and published or independent comparisons.](validation-ladder.svg)
 
-The ladder is ordered deliberately. A benchmark comparison is not interpretable
-until geometry, units, boundary condition, medium properties, orientation, and
-output normalization have been matched.
+The order matters. Agreement with a published curve is difficult to interpret
+until units, geometry, material properties, orientation, and normalization have
+been matched. Regression tests then preserve an established result, but they do
+not establish its correctness on their own.
 
-# Four distinct checks
+# Distinguish the checks
 
-## Setup checks
+## Input and object checks
 
-Confirm that the object represents the intended geometry and physical target.
-Inspect dimensions, units, component placement, material properties, medium
-properties, boundary condition, frequency, and orientation. This catches many
-large discrepancies before they are attributed to a solver.
+Confirm that constructors, S4 slots, units, dimensions, component placement,
+material ratios, exterior medium, boundary condition, frequency, and angle
+describe the intended target. These checks belong close to the initializer and
+should fail clearly when input is outside the model's supported domain.
 
 ## Numerical verification
 
-Check that the implemented equations are being solved consistently. Depending
-on the model, this can include convergence with modal truncation, quadrature
-order, geometric resolution, precision, or iterative tolerance. Known limiting
-behavior and agreement between mathematically equivalent formulations also
-belong here.
+Numerical verification asks whether the implemented equations are solved
+consistently. The applicable checks depend on the method and can include:
 
-## Benchmark or external validation
+- convergence with modal truncation, quadrature order, or geometric resolution,
+- stability under tighter tolerances or higher precision,
+- agreement between equivalent formulations,
+- recovery of a simpler solution in a limiting geometry, and
+- expected low- or high-frequency asymptotic behaviour.
 
-Reproduce a case whose target definition and expected result are documented.
-Canonical data from inter-model studies are useful for this purpose
-[@Jech_2015]. Independent software comparisons provide stronger separation from
-the package implementation when the two codes do not share the same numerical
-path [@echoSMs_software; @ZooScatR_software; @SphereTS_software]. Agreement
-applies only to the geometry, boundary, parameter range, and output quantity
-that were compared.
+A convergence check should vary one control at a time and report the quantity
+being monitored. See [Numerical Methods and Special
+Functions](../numerical-foundations/numerical-foundations.html) for the
+numerical components used by the package.
+
+## Benchmark reproduction
+
+A benchmark reproduces a fully specified canonical calculation. The stored
+cases in [`benchmark_ts`](../../reference/benchmark_ts.html) follow the sphere,
+finite-cylinder, and prolate-spheroid comparisons assembled by @Jech_2015 and
+the associated `echoSMs` resources [@echoSMs_software]. Benchmark agreement is
+evidence only for the reproduced case and nearby conditions justified by the
+model theory.
+
+## Independent comparison
+
+Independent software or experimental comparisons provide separation from the
+package implementation. They are strongest when the codes do not share the
+same derivation, numerical kernel, or stored output. Existing package evidence
+includes comparisons with `echoSMs`, `ZooScatR`, and `SphereTS`
+[@echoSMs_software; @ZooScatR_software; @SphereTS_software]. The comparison
+record must state exactly which branch, boundary, and parameter range were
+tested.
 
 ## Regression testing
 
-A regression test detects whether package output changed. It does not by itself
-show that the stored output is physically correct. Regression values are most
-useful after the underlying case has been tied to theory, a benchmark, or an
-independent calculation.
+A regression test detects later changes to an accepted result. Store regression
+values only after the case has been tied to theory, a benchmark, or an
+independent calculation. A test should use a tolerance supported by the
+reference precision and numerical method, not one chosen only to make the test
+pass.
 
-# Package validation status
+# Package evidence registry
 
-The family badges summarize the documented evidence currently registered in the
-package:
+The model-library badges are generated from the family and evidence tables in
+`R/validation-registry.R`. Their meanings are defined here:
 
 ```{r validation_policy, echo=FALSE, results='asis'}
 acousticTS:::.validation_status_policy()
 ```
+
+The current family-level claims are:
 
 ```{r validation_status_table, echo=FALSE}
 knitr::kable(
@@ -81,12 +100,8 @@ knitr::kable(
 )
 ```
 
-These labels are scope statements. A family can be benchmarked and experimental
-at the same time, or validated for some branches while other public branches
-remain outside the external comparison.
-
 <details>
-<summary>Show the evidence recorded for each family</summary>
+<summary>Show the evidence registered for each family</summary>
 
 ```{r validation_evidence_table, echo=FALSE}
 knitr::kable(
@@ -97,40 +112,47 @@ knitr::kable(
 
 </details>
 
-Use the relevant model's implementation page for the actual comparison setup,
-numerical controls, plots, and limitations. The registry is an index of that
-evidence, not a substitute for it.
+The registry is an index, not the evidence itself. Each row should point readers
+to a model implementation page that records the comparison target, controls,
+metric, tolerance, figure, and limitations. A family may be benchmarked while
+some of its public branches remain unvalidated. The family badge must reflect
+that narrower scope.
 
-# The bundled benchmark data
+# Adding validation evidence
 
-[`benchmark_ts`](../../reference/benchmark_ts.html) contains target-strength
-spectra for canonical sphere, finite-cylinder, and prolate-spheroid cases, plus
-angle spectra for the cylinder and prolate spheroid. The data follow the target
-definitions assembled for the comparison by @Jech_2015 and the associated
-`echoSMs` resources [@echoSMs_software].
+Use the following sequence when adding or changing a solver:
 
-```{r}
-library(acousticTS)
+1. **Define the claim.** Name the geometry, boundary, frequency or angle range,
+   material values, numerical branch, and output quantity being checked.
+2. **Choose an independent reference.** Prefer a published table, archived
+   dataset, separately implemented code, exact limit, or trusted canonical
+   solution over a plot digitized without its full setup.
+3. **Reconstruct the target explicitly.** Do not rely on session state or
+   undocumented defaults. Record units and angle conventions.
+4. **Compare in the correct domain.** Use `TS` for reported decibel agreement,
+   `sigma_bs` for linear scattering strength, and complex amplitude when phase
+   or coherent interference is part of the claim.
+5. **Check nearby numerical stability.** Vary truncation, discretization,
+   quadrature, precision, or tolerance as appropriate.
+6. **Store a durable result.** Commit compact numeric data and the rendered
+   figure when they are part of the public evidence.
+7. **Add tests.** Test the result, output structure, invalid inputs, and relevant
+   limiting behaviour.
+8. **Update the registry last.** Change badges only after the supporting page,
+   data, and tests are present.
 
-data(benchmark_ts)
+Deep nulls deserve special care. A small absolute error in `sigma_bs` can become
+a large difference in `TS`, while agreement in `TS` says nothing about complex
+phase. Report the comparison domain beside the metric and tolerance.
 
-names(benchmark_ts)
-names(benchmark_ts$frequency_spectra)
-names(benchmark_ts$frequency_spectra$sphere)
-```
+# Reproduce a bundled case
 
-The benchmark object stores expected outputs, not a complete self-executing
-test. A reproduction still has to rebuild the documented geometry and physical
-conditions explicitly.
-
-# Reproduce a canonical sphere case
-
-The following example rebuilds the 10 mm-radius rigid-sphere frequency
-benchmark using only exported package functions. It is not evaluated while the
-site is built because the purpose here is to show the reproducible check rather
-than add another full model run to documentation rendering:
+The following code rebuilds the 10 mm-radius fixed-rigid sphere case. It is not
+evaluated during site construction because the benchmark output is already
+committed:
 
 ```{r eval=FALSE}
+library(acousticTS)
 data(benchmark_ts)
 
 frequency <- benchmark_ts$frequency_spectra$index$frequency
@@ -160,66 +182,39 @@ c(
 all.equal(predicted, reference, tolerance = 1e-2)
 ```
 
-The tolerance is part of the test definition. It should reflect the benchmark
-precision, interpolation, numerical method, and scientific purpose. It should
-not be adjusted only until a failing comparison passes.
-
 The [SPHMS](../sphms/sphms-implementation.html),
 [FCMS](../fcms/fcms-implementation.html), and
-[PSMS](../psms/psms-implementation.html) implementation pages provide their
-model-specific benchmark details. Some PSMS comparisons require particular
-precision and integration settings, which is why benchmark reproduction must
-record numerical controls as well as physical inputs.
+[PSMS](../psms/psms-implementation.html) implementation pages document their
+model-specific comparisons and numerical controls.
 
-# Choose the comparison quantity
+# Generated evidence and provenance
 
-Compare the quantity that the reference result actually reports:
+Public implementation figures are committed outputs. Their builders live under
+`tools/implementation-figures/`, which is excluded from the package bundle and
+is not run during ordinary package installation or pkgdown rendering. The
+manifest records each family, builder, package-code input, and expected output.
 
-- Use `TS` for agreement in reported decibels.
-- Use `sigma_bs` when relative or absolute scattering strength in the linear
-  domain is the question.
-- Use complex amplitude when phase, interference, or coherent combination is
-  being tested.
+Run all builders from the repository root with:
 
-Errors near a deep null can appear large in decibels even when the absolute
-linear-domain discrepancy is small. Conversely, agreement in `TS` does not test
-phase. Report the comparison domain with the metric and tolerance.
+```{r eval=FALSE}
+source("tools/implementation-figures/run_all.R")
+```
 
-# Check numerical stability around the benchmark
+Set `ACOUSTICTS_IMPL_FAMILIES` to a comma-separated family list for a selected
+rebuild. The runner uses one sequential R subprocess per family, validates
+declared outputs, and writes commit, elapsed-time, size, and MD5 provenance to
+`.tmp/implementation-figures/provenance.csv`. Pull requests rebuild affected
+families and fail when committed outputs drift from their declared inputs.
 
-Matching one stored curve is not enough when the result is sensitive to a
-numerical control. Repeat the calculation while varying the controls that apply
-to the model:
+A complete validation record should retain:
 
-- shape or boundary discretization,
-- modal truncation,
-- quadrature order,
-- floating-point precision,
-- iterative tolerance, and
-- frequency or angle resolution used to compare curves.
+- the package version or commit and relevant input hashes,
+- the reference source and citation,
+- geometry, units, material values, exterior medium, and boundary condition,
+- frequency and angle grids,
+- numerical controls and software versions,
+- the comparison domain, metric, tolerance, and result, and
+- the code that generated committed tables or figures.
 
-Change one control at a time. A result is numerically stable when further
-refinement changes the quantity of interest by less than a stated tolerance.
-Do not use agreement at one hand-picked setting to conceal instability nearby.
-See [Numerical Methods and Special
-Functions](../numerical-foundations/numerical-foundations.html) for the package's
-underlying numerical components.
-
-# Record enough information to reproduce the check
-
-A useful validation record includes:
-
-1. the package version or commit,
-2. the benchmark source and citation,
-3. target geometry and units,
-4. material, medium, and boundary definitions,
-5. frequency and angle grids,
-6. model and numerical options,
-7. the output domain, error metric, and tolerance, and
-8. the code and input hashes used to generate any stored comparison figure or
-   table.
-
-That record distinguishes a reproducible benchmark from a plot that merely
-resembles a published result. When a model is used outside the registered
-comparison scope, describe the result as an extrapolation from validated or
-benchmarked behavior rather than extending the validation claim implicitly.
+When a model is used outside this recorded scope, describe the calculation as
+an application or extrapolation. Do not silently broaden the validation claim.

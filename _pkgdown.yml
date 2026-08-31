@@ -53,14 +53,14 @@ navbar:
           href: articles/comparing-models/comparing-models.html
         - text: "Simulation sweeps"
           href: articles/simulation-parameter-sweeps/simulation-parameter-sweeps.html
-        - text: "Validating models"
-          href: articles/validation-benchmarks/validation-benchmarks.html
     library:
       text: Models
       href: articles/model-library/model-library.html
     developers:
       text: Developers
       menu:
+        - text: "Validation methods"
+          href: articles/validation-benchmarks/validation-benchmarks.html
         - text: "Creating models"
           href: articles/creating-models-from-scratch/creating-models-from-scratch.html
         - text: "Combining components"
@@ -109,7 +109,6 @@ articles:
       - model-selection/model-selection
       - comparing-models/comparing-models
       - simulation-parameter-sweeps/simulation-parameter-sweeps
-      - validation-benchmarks/validation-benchmarks
 
   - title: Model Library
     contents:
@@ -117,6 +116,7 @@ articles:
 
   - title: Developer Guides
     contents:
+      - validation-benchmarks/validation-benchmarks
       - creating-models-from-scratch/creating-models-from-scratch
       - combining-components/combining-components
       - faq-troubleshooting/faq-troubleshooting

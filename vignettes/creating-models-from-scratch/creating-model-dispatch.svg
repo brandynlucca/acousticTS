@@ -35,9 +35,9 @@
      inkscape:window-maximized="1"
      inkscape:current-layer="svg11" />
   <title
-     id="title">Dispatch flow for a new acousticTS model</title>
+     id="title">Registry dispatch for a new acousticTS model</title>
   <desc
-     id="desc">Diagram showing target_strength dispatching to tsl_initialize and then TSL, with model parameters and model results stored on the object.</desc>
+     id="desc">Diagram showing a registered model name dispatching from target_strength to an initializer and solver that use a shared result slot.</desc>
   <defs
      id="defs1">
     <style
@@ -80,7 +80,7 @@
      y="35.297295"
      text-anchor="middle"
      id="text2"
-     style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:22px;line-height:normal;font-family:Georgia, 'Times New Roman', serif">A new model only needs an initializer and a model function</text>
+     style="font-style:normal;font-variant:normal;font-weight:700;font-stretch:normal;font-size:22px;line-height:normal;font-family:Georgia, 'Times New Roman', serif">The registry connects a model name to its implementation</text>
   <g
      id="g14"
      transform="translate(-32,-22.702703)">
@@ -216,7 +216,7 @@
      id="text11"
      style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;line-height:normal;font-family:Georgia, 'Times New Roman', serif;text-anchor:middle;fill:#4f473f"><tspan
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:16px;font-family:Georgia, 'Times New Roman', serif;-inkscape-font-specification:'Georgia, Times New Roman, serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
-       id="tspan18">Naming is the key convention: lower-case model name for initialization, upper-case model label for execution.</tspan></text>
+       id="tspan18">The registry stores the initializer, solver, aliases, and shared result-slot name.</tspan></text>
   <text
      class="small"
      x="163.13503"
