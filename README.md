@@ -87,9 +87,9 @@ krill_shape <- cylinder(
 # ---- Create the actual Scatterer-class object (FLS)
 krill <- fls_generate(
   shape = krill_shape,
-  g = 1.0357,             # density contrast
-  h = 1.0279,             # sound speed contrast
-  theta = pi / 2          # broadside incidence
+  g_body = 1.0357,        # density contrast
+  h_body = 1.0279,        # sound speed contrast
+  theta_body = pi / 2     # broadside incidence
 )
 
 # Run the DWBA model from 1 kHz to 300 kHz
