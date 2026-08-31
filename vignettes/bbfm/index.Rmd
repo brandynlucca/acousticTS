@@ -63,17 +63,17 @@ acousticTS:::.model_family_overview(
   ),
   reading = c(
     "[Implementation](bbfm-implementation.html): object setup, stored outputs, and coherent reconstruction checks",
-    "[Validation](bbfm-validation.html): BEM/FEM component checks and coherent-sum table",
+    "[Validation](bbfm-validation.html): hybrid FEM-BEM composite checks",
     "[Theory](bbfm-theory.html): composite amplitude, phase placement, and interference structure"
   )
 )
 ```
 
 ::: {.experiment data-title="Current family status"}
-`BBFM` is a partially validated experimental family. The current validation
-claim covers the component paths and coherent bookkeeping shown on the
-validation page; the model remains a first-order component surrogate rather
-than a fully coupled embedded-backbone boundary-value solve.
+`BBFM` is a partially validated experimental family. The validation page
+checks the complete body-plus-backbone response against hybrid FEM-BEM
+cases over frequency, orientation, length, radius, material, and
+modal-truncation scenarios.
 :::
 
 ## Why it exists

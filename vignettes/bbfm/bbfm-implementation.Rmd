@@ -53,8 +53,8 @@ family:
 ::: {.experiment data-title="Current scope"}
 `BBFM` is an experimental family. The package documents the
 composite bookkeeping and verifies that the stored result reproduces the stated
-component sum. The validation page gives component-level BEM/FEM checks for the
-current simplified body and backbone cases.
+component sum. The validation page gives hybrid FEM-BEM checks for the
+complete body-plus-backbone response.
 :::
 
 ::: {.caution data-title="Approximation structure"}

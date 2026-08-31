@@ -253,7 +253,8 @@
       # PSMS
       "benchmark_ts / Jech et al. (2015)", "Prolate-spheroid BEM checks",
       # SOEMS
-      "Published calibration spheres", "Elastic calibration-sphere calculations",
+      "Published calibration spheres",
+      "Solid elastic sphere radial FEM with spherical DtN checks",
       # ESSMS
       "Spherical shell FEM/BEM and hybrid checks",
       # BCMS
@@ -281,11 +282,11 @@
       "Fluid-filled cylinder FEM reference",
       # PCDWBA
       "ZooScatR and Echopop PCDWBA benchmark",
-      "Direct phase-compensated quadrature validation",
+      "BCMS and radial FEM bent-cylinder checks",
       "Current PCDWBA argument surface",
       # BBFM
-      "BEM/FEM component checks",
-      "Internal DWBA + ECMS reconstruction",
+      "Hybrid FEM-BEM composite checks",
+      "BBFM coherent reconstruction checks",
       # VESM
       "Layered-sphere benchmark calculation",
       "Radial FEM layered-sphere validation",
@@ -293,7 +294,7 @@
       # TMM
       "SPHMS / PSMS / FCMS benchmark ladder",
       "BEM far-field checks",
-      "Exact general-angle spheroidal solution",
+      "FEM and hybrid FEM-BEM checks",
       "Cylinder retained-angle scope",
       "Current retained-state branch matrix"
     ),
@@ -304,8 +305,9 @@
         "in benchmark_ts."
       ),
       paste(
-        "Validation uses monostatic spherical BEM far-field checks",
-        "across rigid, pressure-release, liquid-filled, and gas-filled cases."
+        "Validation uses monostatic spherical radial FEM checks",
+        "across rigid, pressure-release, liquid-filled, gas-filled,",
+        "radius, orientation, and material-property cases."
       ),
       # FCMS
       paste(
@@ -333,8 +335,9 @@
         "throughout the package documentation."
       ),
       paste(
-        "Validation uses independent elastic calibration-sphere",
-        "calculations on matched material constants and frequency grids."
+        "Validation compares solid elastic sphere results against",
+        "radial FEM checks over frequency, orientation, diameter,",
+        "and elastic material-property sweeps."
       ),
       # ESSMS
       paste(
@@ -428,9 +431,9 @@
         "`ZooScatR` and `Echopop` over 12-200 kHz."
       ),
       paste(
-        "Partial validation compares the package output against a direct",
-        "phase-compensated quadrature over curvature, taper, size, contrast,",
-        "orientation, and node-count cases."
+        "Partial validation compares the weak curved-cylinder regime",
+        "against BCMS and radial FEM finite-cylinder checks over boundary,",
+        "frequency, orientation, size, and curvature cases."
       ),
       paste(
         "PCDWBA is currently marked experimental because the public",
@@ -438,14 +441,13 @@
       ),
       # BBFM
       paste(
-        "Partial validation compares the flesh-body component against",
-        "a liquid-filled finite-cylinder BEM reference and the backbone",
-        "component against an elastic-cylinder FEM reference."
+        "Partial validation compares the complete body-plus-backbone",
+        "response against hybrid FEM-BEM cases over frequency,",
+        "orientation, length, radius, material, and modal-truncation scenarios."
       ),
       paste(
-        "BBFM is currently marked experimental because it has documented",
-        "internal reconstruction checks, while the fully coupled embedded",
-        "body-plus-backbone surface remains outside the current claim."
+        "BBFM is currently marked experimental because it remains a",
+        "coherent first-order body-plus-backbone approximation."
       ),
       # VESM
       paste(
@@ -471,8 +473,8 @@
         "and prolate pressure-release cases."
       ),
       paste(
-        "Retained prolate angular products are also checked against the",
-        "exact general-angle spheroidal solution."
+        "Elastic-shell sphere rows use FEM, and liquid-filled prolate",
+        "orientation rows use hybrid FEM-BEM checks."
       ),
       paste(
         "TMM is partially validated because the sphere, oblate, and prolate",
@@ -501,7 +503,13 @@
       "Prolate-spheroid spectra across the canonical benchmark grid.",
       "Broadside prolate-spheroid BEM checks.",
       "Tungsten-carbide and copper calibration spheres.",
-      "Shared calibration-sphere material sets and frequency sweeps.",
+      paste(
+        "Solid elastic calibration spheres: WC38.1 frequency spectrum",
+        "from 12-120 kHz, WC38.1 monostatic orientation sweep at",
+        "38 kHz, tungsten-carbide diameter sweep from 20-60 mm,",
+        "and 38.1 mm material sweep across tungsten carbide, copper,",
+        "aluminum, steel, and brass."
+      ),
       paste(
         "Monostatic elastic-shelled sphere checks with radial FEM/BEM",
         "comparison and shell boundary-condition variants."
@@ -575,10 +583,9 @@
         "`Echopop`."
       ),
       paste(
-        "Bent weak-scattering cylinders from 12-200 kHz, including",
-        "curvature ratios 1.5, 3, and 6; taper orders 4 and 10;",
-        "15-20 mm lengths; 1.0-1.2 mm radii; contrast and",
-        "near-broadside angle variants."
+        "Weak curved-cylinder validation against BCMS and radial FEM",
+        "over boundary/material cases, frequency spectra, orientation",
+        "sets, length scale, and curvature scale."
       ),
       "Current PCDWBA argument surface.",
       paste(
@@ -597,7 +604,7 @@
       "Current documented layered-sphere benchmark surface.",
       "Sphere, oblate, prolate, and guarded cylinder monostatic branches.",
       "Pressure-release angular slices for sphere, oblate, and prolate cases.",
-      "General-angle prolate retained-state validation.",
+      "Sphere shell FEM rows and liquid-filled prolate hybrid FEM-BEM rows.",
       "Cylinder retained-angle scope limitation and guardrails.",
       "Current retained-state branch matrix across supported shapes."
     ),

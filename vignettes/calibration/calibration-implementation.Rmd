@@ -143,12 +143,11 @@ knitr::include_graphics("calibration-material-comparison.png")
 
 Material comparisons are especially informative because they isolate the role of elastic wave speeds and density from the purely geometric role of sphere size. A tungsten carbide sphere and an aluminum sphere of the same diameter do not simply differ by a vertical offset. Their resonance structure can also shift because the interior compressional and shear wave speeds have changed.
 
-### Benchmark and validation references
+### Benchmark references
 
-For calibration benchmark and validation evidence, use:
+For calibration benchmark evidence, use:
 
 - [Calibration benchmarks](calibration-benchmarks.html)
-- [Calibration validation](calibration-validation.html)
 
 ## Closing note
 

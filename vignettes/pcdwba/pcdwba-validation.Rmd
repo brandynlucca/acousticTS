@@ -29,515 +29,91 @@ acousticTS:::.model_family_header(
 )
 ```
 
-PCDWBA is checked with a direct phase-compensated quadrature reference over frequency, incidence angle, size, curvature, taper, contrast, and node-spacing parameterizations.
+PCDWBA validation uses the weak curved-cylinder regime and compares the curved-body approximation against BCMS and radial FEM finite-cylinder results. The validation set covers frequency, incidence angle, boundary/material condition, body size, and curvature.
 
-::: {.tip data-title="Residuals near nulls"}
-Mean absolute differences describe the typical agreement; maximum differences are retained because deep nulls can expose localized convention or resolution errors.
+::: {.tip data-title="Reading residuals"}
+Mean absolute residuals describe typical agreement across a sweep. Maximum residuals are retained because narrow TS nulls can dominate a single point.
 :::
 
 ## TS-Frequency
 
-Frequency rows retain the matched target and orientation while sweeping frequency.
+The frequency sweep uses straight and bent finite cylinders from `12-400 kHz`.
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
-|:--|:--|:--|:--|:--|:--|--:|--:|
-| Direct integral |  | baseline geometry | 12.0-200.0 | 90.0 | Length (mm) 15.000 | 0.000 | 0.000 |
+| Validation method | Boundary / material | Geometry | Frequency (kHz) | Angle (deg) | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|--:|--:|
+| radial FEM / BCMS | fixed rigid | bent cylinder | 12-400 | 90 | 0.008 | 0.019 |
+| radial FEM / BCMS | gas filled | bent cylinder | 12-400 | 90 | 0.002 | 0.045 |
+| radial FEM / BCMS | liquid filled | bent cylinder | 12-400 | 90 | 0.026 | 0.073 |
+| radial FEM / BCMS | pressure release | bent cylinder | 12-400 | 90 | 0.001 | 0.003 |
 
 <details>
-<summary>Direct integral / baseline geometry / 12.0-200.0 kHz</summary>
+<summary>Frequency rows: bent fixed-rigid cylinder</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | baseline geometry | 12.0 | 90.0 | 15.000 | -124.227 | -124.227 | 0.000 |
-| Direct integral |  | baseline geometry | 38.0 | 90.0 | 15.000 | -111.595 | -111.595 | 0.000 |
-| Direct integral |  | baseline geometry | 70.0 | 90.0 | 15.000 | -108.327 | -108.327 | 0.000 |
-| Direct integral |  | baseline geometry | 120.0 | 90.0 | 15.000 | -108.582 | -108.582 | 0.000 |
-| Direct integral |  | baseline geometry | 160.0 | 90.0 | 15.000 | -108.199 | -108.199 | 0.000 |
-| Direct integral |  | baseline geometry | 200.0 | 90.0 | 15.000 | -99.536 | -99.536 | 0.000 |
+| Frequency (kHz) | `TS` from radial FEM (dB) | `TS` from BCMS (dB) | Delta `TS` (BCMS - FEM, dB) |
+|--:|--:|--:|--:|
+| 12 | -93.746 | -93.765 | -0.019 |
+| 16 | -88.755 | -88.773 | -0.018 |
+| 20 | -84.888 | -84.906 | -0.018 |
+| 24 | -81.733 | -81.750 | -0.018 |
+| 28 | -79.070 | -79.087 | -0.018 |
+| 32 | -76.769 | -76.786 | -0.017 |
+| 36 | -74.745 | -74.762 | -0.017 |
+| 40 | -72.941 | -72.957 | -0.017 |
+| 44 | -71.315 | -71.331 | -0.016 |
+| 48 | -69.838 | -69.854 | -0.016 |
+| 52 | -68.486 | -68.502 | -0.016 |
 
 </details>
-
 
 ## TS-Orientation
 
-Orientation rows retain the matched target and frequency ladder while sweeping incidence or scatter angle.
+The orientation sweep uses near-broadside incidence over `12-200 kHz`.
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+| Validation method | Boundary / material | Geometry | Orientation set | Frequency (kHz) | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|:--|--:|--:|
+| radial FEM / BCMS | fixed rigid | bent cylinder | truncated normal broadside | 12-200 | 0.178 | 0.274 |
+| radial FEM / BCMS | fixed rigid | bent cylinder | uniform near broadside | 12-200 | 0.661 | 1.132 |
+| radial FEM / BCMS | gas filled | bent cylinder | truncated normal broadside | 12-200 | 0.024 | 0.031 |
+| radial FEM / BCMS | gas filled | bent cylinder | uniform near broadside | 12-200 | 0.096 | 0.137 |
+| radial FEM / BCMS | liquid filled | bent cylinder | truncated normal broadside | 12-200 | 0.215 | 0.325 |
+| radial FEM / BCMS | liquid filled | bent cylinder | uniform near broadside | 12-200 | 0.713 | 1.182 |
+| radial FEM / BCMS | pressure release | bent cylinder | truncated normal broadside | 12-200 | 0.023 | 0.033 |
+| radial FEM / BCMS | pressure release | bent cylinder | uniform near broadside | 12-200 | 0.096 | 0.148 |
+
+<details>
+<summary>Orientation rows: bent fixed-rigid cylinder</summary>
+
+| Angle (deg) | Frequency (kHz) | `TS` from radial FEM (dB) | `TS` from BCMS (dB) | Delta `TS` (BCMS - FEM, dB) |
+|--:|--:|--:|--:|--:|
+| 105 | 12 | -93.768 | -94.395 | -0.627 |
+| 105 | 38 | -74.094 | -74.712 | -0.618 |
+| 105 | 70 | -64.523 | -65.113 | -0.591 |
+| 105 | 120 | -58.511 | -58.995 | -0.485 |
+| 105 | 200 | -61.188 | -61.348 | -0.160 |
+| 120 | 12 | -93.844 | -96.367 | -2.523 |
+
+</details>
+
+## TS-Size And Curvature
+
+Size and curvature checks use the same cylinder family while changing the body scale or curvature scale.
+
+| Validation method | Boundary / material | Geometry | Sweep | Frequency (kHz) | Angle (deg) | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
 |:--|:--|:--|:--|:--|:--|--:|--:|
-| Direct integral |  | 100 deg incidence | 12.0 | 100.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-| Direct integral |  | 100 deg incidence | 120.0 | 100.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-| Direct integral |  | 100 deg incidence | 160.0 | 100.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-| Direct integral |  | 100 deg incidence | 200.0 | 100.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-| Direct integral |  | 100 deg incidence | 38.0 | 100.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-| Direct integral |  | 100 deg incidence | 70.0 | 100.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-| Direct integral |  | 80 deg incidence | 12.0 | 80.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-| Direct integral |  | 80 deg incidence | 120.0 | 80.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-| Direct integral |  | 80 deg incidence | 160.0 | 80.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-| Direct integral |  | 80 deg incidence | 200.0 | 80.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-| Direct integral |  | 80 deg incidence | 38.0 | 80.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-| Direct integral |  | 80 deg incidence | 70.0 | 80.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-| Direct integral |  | baseline geometry | 12.0 | 90.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-| Direct integral |  | baseline geometry | 120.0 | 90.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-| Direct integral |  | baseline geometry | 160.0 | 90.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-| Direct integral |  | baseline geometry | 200.0 | 90.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-| Direct integral |  | baseline geometry | 38.0 | 90.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-| Direct integral |  | baseline geometry | 70.0 | 90.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-
-<details>
-<summary>Direct integral / 100 deg incidence / 12.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | 100 deg incidence | 12.0 | 100.0 | 15.000 | -124.206 | -124.206 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / 80 deg incidence / 12.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | 80 deg incidence | 12.0 | 80.0 | 15.000 | -124.206 | -124.206 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / baseline geometry / 12.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | baseline geometry | 12.0 | 90.0 | 15.000 | -124.227 | -124.227 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / 100 deg incidence / 120.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | 100 deg incidence | 120.0 | 100.0 | 15.000 | -110.506 | -110.506 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / 80 deg incidence / 120.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | 80 deg incidence | 120.0 | 80.0 | 15.000 | -110.503 | -110.503 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / baseline geometry / 120.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | baseline geometry | 120.0 | 90.0 | 15.000 | -108.582 | -108.582 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / 100 deg incidence / 160.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | 100 deg incidence | 160.0 | 100.0 | 15.000 | -105.622 | -105.622 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / 80 deg incidence / 160.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | 80 deg incidence | 160.0 | 80.0 | 15.000 | -105.615 | -105.615 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / baseline geometry / 160.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | baseline geometry | 160.0 | 90.0 | 15.000 | -108.199 | -108.199 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / 100 deg incidence / 200.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | 100 deg incidence | 200.0 | 100.0 | 15.000 | -98.965 | -98.965 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / 80 deg incidence / 200.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | 80 deg incidence | 200.0 | 80.0 | 15.000 | -98.959 | -98.959 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / baseline geometry / 200.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | baseline geometry | 200.0 | 90.0 | 15.000 | -99.536 | -99.536 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / 100 deg incidence / 38.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | 100 deg incidence | 38.0 | 100.0 | 15.000 | -111.294 | -111.294 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / 80 deg incidence / 38.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | 80 deg incidence | 38.0 | 80.0 | 15.000 | -111.294 | -111.294 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / baseline geometry / 38.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | baseline geometry | 38.0 | 90.0 | 15.000 | -111.595 | -111.595 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / 100 deg incidence / 70.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | 100 deg incidence | 70.0 | 100.0 | 15.000 | -108.740 | -108.740 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / 80 deg incidence / 70.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | 80 deg incidence | 70.0 | 80.0 | 15.000 | -108.739 | -108.739 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / baseline geometry / 70.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | baseline geometry | 70.0 | 90.0 | 15.000 | -108.327 | -108.327 | 0.000 |
-
-</details>
-
-
-## TS-Size
-
-Size rows retain the matched material constants while sweeping length, radius, diameter, or scale.
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
-|:--|:--|:--|:--|:--|:--|--:|--:|
-| Direct integral |  | baseline geometry | 12.0 | 90.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-| Direct integral |  | baseline geometry | 120.0 | 90.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-| Direct integral |  | baseline geometry | 160.0 | 90.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-| Direct integral |  | baseline geometry | 200.0 | 90.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-| Direct integral |  | baseline geometry | 38.0 | 90.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-| Direct integral |  | baseline geometry | 70.0 | 90.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-| Direct integral |  | longer body | 12.0 | 90.0 | Length (mm) 20.000 | 0.000 | 0.000 |
-| Direct integral |  | longer body | 120.0 | 90.0 | Length (mm) 20.000 | 0.000 | 0.000 |
-| Direct integral |  | longer body | 160.0 | 90.0 | Length (mm) 20.000 | 0.000 | 0.000 |
-| Direct integral |  | longer body | 200.0 | 90.0 | Length (mm) 20.000 | 0.000 | 0.000 |
-| Direct integral |  | longer body | 38.0 | 90.0 | Length (mm) 20.000 | 0.000 | 0.000 |
-| Direct integral |  | longer body | 70.0 | 90.0 | Length (mm) 20.000 | 0.000 | 0.000 |
-
-<details>
-<summary>Direct integral / baseline geometry / 12.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | baseline geometry | 12.0 | 90.0 | 15.000 | -124.227 | -124.227 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / longer body / 12.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | longer body | 12.0 | 90.0 | 20.000 | -119.099 | -119.099 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / baseline geometry / 120.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | baseline geometry | 120.0 | 90.0 | 15.000 | -108.582 | -108.582 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / longer body / 120.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | longer body | 120.0 | 90.0 | 20.000 | -107.522 | -107.522 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / baseline geometry / 160.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | baseline geometry | 160.0 | 90.0 | 15.000 | -108.199 | -108.199 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / longer body / 160.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | longer body | 160.0 | 90.0 | 20.000 | -105.692 | -105.692 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / baseline geometry / 200.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | baseline geometry | 200.0 | 90.0 | 15.000 | -99.536 | -99.536 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / longer body / 200.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | longer body | 200.0 | 90.0 | 20.000 | -105.301 | -105.301 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / baseline geometry / 38.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | baseline geometry | 38.0 | 90.0 | 15.000 | -111.595 | -111.595 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / longer body / 38.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | longer body | 38.0 | 90.0 | 20.000 | -117.448 | -117.448 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / baseline geometry / 70.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | baseline geometry | 70.0 | 90.0 | 15.000 | -108.327 | -108.327 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / longer body / 70.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | longer body | 70.0 | 90.0 | 20.000 | -103.608 | -103.608 | 0.000 |
-
-</details>
-
-
-## TS-Parameter
-
-Parameter rows retain the matched geometry class while sweeping material, curvature, taper, thickness, or discretization parameters.
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
-|:--|:--|:--|:--|:--|:--|--:|--:|
-| Direct integral |  | 100 deg incidence | 12.0-200.0 | 100.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-| Direct integral |  | 80 deg incidence | 12.0-200.0 | 80.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-| Direct integral |  | baseline geometry | 12.0-200.0 | 90.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-| Direct integral |  | broad taper | 12.0-200.0 | 90.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-| Direct integral |  | coarser integration grid | 12.0-200.0 | 90.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-| Direct integral |  | finer integration grid | 12.0-200.0 | 90.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-| Direct integral |  | higher material contrast | 12.0-200.0 | 90.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-| Direct integral |  | longer body | 12.0-200.0 | 90.0 | Length (mm) 20.000 | 0.000 | 0.000 |
-| Direct integral |  | mild curvature | 12.0-200.0 | 90.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-| Direct integral |  | strong curvature | 12.0-200.0 | 90.0 | Length (mm) 15.000 | 0.000 | 0.000 |
-
-<details>
-<summary>Direct integral / 100 deg incidence / 12.0-200.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | 100 deg incidence | 12.0 | 100.0 | 15.000 | -124.206 | -124.206 | 0.000 |
-| Direct integral |  | 100 deg incidence | 38.0 | 100.0 | 15.000 | -111.294 | -111.294 | 0.000 |
-| Direct integral |  | 100 deg incidence | 70.0 | 100.0 | 15.000 | -108.740 | -108.740 | 0.000 |
-| Direct integral |  | 100 deg incidence | 120.0 | 100.0 | 15.000 | -110.506 | -110.506 | 0.000 |
-| Direct integral |  | 100 deg incidence | 160.0 | 100.0 | 15.000 | -105.622 | -105.622 | 0.000 |
-| Direct integral |  | 100 deg incidence | 200.0 | 100.0 | 15.000 | -98.965 | -98.965 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / 80 deg incidence / 12.0-200.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | 80 deg incidence | 12.0 | 80.0 | 15.000 | -124.206 | -124.206 | 0.000 |
-| Direct integral |  | 80 deg incidence | 38.0 | 80.0 | 15.000 | -111.294 | -111.294 | 0.000 |
-| Direct integral |  | 80 deg incidence | 70.0 | 80.0 | 15.000 | -108.739 | -108.739 | 0.000 |
-| Direct integral |  | 80 deg incidence | 120.0 | 80.0 | 15.000 | -110.503 | -110.503 | 0.000 |
-| Direct integral |  | 80 deg incidence | 160.0 | 80.0 | 15.000 | -105.615 | -105.615 | 0.000 |
-| Direct integral |  | 80 deg incidence | 200.0 | 80.0 | 15.000 | -98.959 | -98.959 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / baseline geometry / 12.0-200.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | baseline geometry | 12.0 | 90.0 | 15.000 | -124.227 | -124.227 | 0.000 |
-| Direct integral |  | baseline geometry | 38.0 | 90.0 | 15.000 | -111.595 | -111.595 | 0.000 |
-| Direct integral |  | baseline geometry | 70.0 | 90.0 | 15.000 | -108.327 | -108.327 | 0.000 |
-| Direct integral |  | baseline geometry | 120.0 | 90.0 | 15.000 | -108.582 | -108.582 | 0.000 |
-| Direct integral |  | baseline geometry | 160.0 | 90.0 | 15.000 | -108.199 | -108.199 | 0.000 |
-| Direct integral |  | baseline geometry | 200.0 | 90.0 | 15.000 | -99.536 | -99.536 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / broad taper / 12.0-200.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | broad taper | 12.0 | 90.0 | 15.000 | -125.229 | -125.229 | 0.000 |
-| Direct integral |  | broad taper | 38.0 | 90.0 | 15.000 | -111.088 | -111.088 | 0.000 |
-| Direct integral |  | broad taper | 70.0 | 90.0 | 15.000 | -115.816 | -115.816 | 0.000 |
-| Direct integral |  | broad taper | 120.0 | 90.0 | 15.000 | -127.806 | -127.806 | 0.000 |
-| Direct integral |  | broad taper | 160.0 | 90.0 | 15.000 | -107.639 | -107.639 | 0.000 |
-| Direct integral |  | broad taper | 200.0 | 90.0 | 15.000 | -105.231 | -105.231 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / coarser integration grid / 12.0-200.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | coarser integration grid | 12.0 | 90.0 | 15.000 | -124.261 | -124.261 | 0.000 |
-| Direct integral |  | coarser integration grid | 38.0 | 90.0 | 15.000 | -111.521 | -111.521 | 0.000 |
-| Direct integral |  | coarser integration grid | 70.0 | 90.0 | 15.000 | -108.435 | -108.435 | 0.000 |
-| Direct integral |  | coarser integration grid | 120.0 | 90.0 | 15.000 | -108.981 | -108.981 | 0.000 |
-| Direct integral |  | coarser integration grid | 160.0 | 90.0 | 15.000 | -107.017 | -107.017 | 0.000 |
-| Direct integral |  | coarser integration grid | 200.0 | 90.0 | 15.000 | -98.821 | -98.821 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / finer integration grid / 12.0-200.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | finer integration grid | 12.0 | 90.0 | 15.000 | -124.219 | -124.219 | 0.000 |
-| Direct integral |  | finer integration grid | 38.0 | 90.0 | 15.000 | -111.612 | -111.612 | 0.000 |
-| Direct integral |  | finer integration grid | 70.0 | 90.0 | 15.000 | -108.304 | -108.304 | 0.000 |
-| Direct integral |  | finer integration grid | 120.0 | 90.0 | 15.000 | -108.499 | -108.499 | 0.000 |
-| Direct integral |  | finer integration grid | 160.0 | 90.0 | 15.000 | -108.478 | -108.478 | 0.000 |
-| Direct integral |  | finer integration grid | 200.0 | 90.0 | 15.000 | -99.700 | -99.700 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / higher material contrast / 12.0-200.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | higher material contrast | 12.0 | 90.0 | 15.000 | -116.648 | -116.648 | 0.000 |
-| Direct integral |  | higher material contrast | 38.0 | 90.0 | 15.000 | -103.660 | -103.660 | 0.000 |
-| Direct integral |  | higher material contrast | 70.0 | 90.0 | 15.000 | -101.314 | -101.314 | 0.000 |
-| Direct integral |  | higher material contrast | 120.0 | 90.0 | 15.000 | -103.625 | -103.625 | 0.000 |
-| Direct integral |  | higher material contrast | 160.0 | 90.0 | 15.000 | -97.419 | -97.419 | 0.000 |
-| Direct integral |  | higher material contrast | 200.0 | 90.0 | 15.000 | -91.218 | -91.218 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / longer body / 12.0-200.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | longer body | 12.0 | 90.0 | 20.000 | -119.099 | -119.099 | 0.000 |
-| Direct integral |  | longer body | 38.0 | 90.0 | 20.000 | -117.448 | -117.448 | 0.000 |
-| Direct integral |  | longer body | 70.0 | 90.0 | 20.000 | -103.608 | -103.608 | 0.000 |
-| Direct integral |  | longer body | 120.0 | 90.0 | 20.000 | -107.522 | -107.522 | 0.000 |
-| Direct integral |  | longer body | 160.0 | 90.0 | 20.000 | -105.692 | -105.692 | 0.000 |
-| Direct integral |  | longer body | 200.0 | 90.0 | 20.000 | -105.301 | -105.301 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / mild curvature / 12.0-200.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | mild curvature | 12.0 | 90.0 | 15.000 | -124.225 | -124.225 | 0.000 |
-| Direct integral |  | mild curvature | 38.0 | 90.0 | 15.000 | -111.632 | -111.632 | 0.000 |
-| Direct integral |  | mild curvature | 70.0 | 90.0 | 15.000 | -108.311 | -108.311 | 0.000 |
-| Direct integral |  | mild curvature | 120.0 | 90.0 | 15.000 | -108.291 | -108.291 | 0.000 |
-| Direct integral |  | mild curvature | 160.0 | 90.0 | 15.000 | -108.895 | -108.895 | 0.000 |
-| Direct integral |  | mild curvature | 200.0 | 90.0 | 15.000 | -99.718 | -99.718 | 0.000 |
-
-</details>
-
-<details>
-<summary>Direct integral / strong curvature / 12.0-200.0 kHz</summary>
-
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
-|:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| Direct integral |  | strong curvature | 12.0 | 90.0 | 15.000 | -124.234 | -124.234 | 0.000 |
-| Direct integral |  | strong curvature | 38.0 | 90.0 | 15.000 | -111.449 | -111.449 | 0.000 |
-| Direct integral |  | strong curvature | 70.0 | 90.0 | 15.000 | -108.409 | -108.409 | 0.000 |
-| Direct integral |  | strong curvature | 120.0 | 90.0 | 15.000 | -109.930 | -109.930 | 0.000 |
-| Direct integral |  | strong curvature | 160.0 | 90.0 | 15.000 | -105.873 | -105.873 | 0.000 |
-| Direct integral |  | strong curvature | 200.0 | 90.0 | 15.000 | -98.937 | -98.937 | 0.000 |
-
-</details>
-
+| radial FEM / BCMS | fixed rigid | bent cylinder | length scale | 120 | 90 | 0.495 | 1.034 |
+| radial FEM / BCMS | gas filled | bent cylinder | length scale | 120 | 90 | 0.065 | 0.126 |
+| radial FEM / BCMS | liquid filled | bent cylinder | length scale | 120 | 90 | 0.563 | 1.108 |
+| radial FEM / BCMS | pressure release | bent cylinder | length scale | 120 | 90 | 0.089 | 0.142 |
+| radial FEM / BCMS | fixed rigid | bent cylinder | curvature scale | 120 | 90 | 0.366 | 0.865 |
+| radial FEM / BCMS | gas filled | bent cylinder | curvature scale | 120 | 90 | 0.055 | 0.130 |
+| radial FEM / BCMS | liquid filled | bent cylinder | curvature scale | 120 | 90 | 0.438 | 0.986 |
+| radial FEM / BCMS | pressure release | bent cylinder | curvature scale | 120 | 90 | 0.054 | 0.128 |
 
 ## Residual Summary
 
-| Axis | Method | Boundary | Frequency (kHz) | Angle (deg) | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
-|:--|:--|:--|:--|:--|--:|--:|
-| TS-Frequency | Direct integral |  | 12.0-200.0 | 90.0 | 0.000 | 0.000 |
-| TS-Orientation | Direct integral |  | 12.0-200.0 | 80.0-100.0 | 0.000 | 0.000 |
-| TS-Parameter | Direct integral |  | 12.0-200.0 | 80.0-100.0 | 0.000 | 0.000 |
-| TS-Size | Direct integral |  | 12.0-200.0 | 90.0 | 0.000 | 0.000 |
-
+| Axis | Method | Geometry | Frequency (kHz) | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+|:--|:--|:--|:--|--:|--:|
+| TS-Frequency | radial FEM / BCMS | bent cylinder, four boundary/material cases | 12-400 | 0.009 | 0.073 |
+| TS-Orientation | radial FEM / BCMS | bent cylinder, four boundary/material cases | 12-200 | 0.251 | 1.182 |
+| TS-Size | radial FEM / BCMS | bent cylinder, four boundary/material cases | 120 | 0.303 | 1.108 |
+| TS-Curvature | radial FEM / BCMS | bent cylinder, four boundary/material cases | 120 | 0.228 | 0.986 |

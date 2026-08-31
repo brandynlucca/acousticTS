@@ -38,14 +38,14 @@ Mean absolute differences describe the typical agreement; maximum differences ar
 
 Frequency rows retain the matched target and orientation while sweeping frequency.
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
 |:--|:--|:--|:--|:--|:--|--:|--:|
 | FEM | elastic shell | elastic-shelled sphere | 38.0-118.0 |  |  | 0.002 | 0.013 |
 
 <details>
 <summary>FEM / elastic shell / elastic-shelled sphere / 38.0-118.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | FEM | elastic shell | elastic-shelled sphere | 38.0 |  |  | -40.934 | -40.935 | -0.001 |
 | FEM | elastic shell | elastic-shelled sphere | 42.0 |  |  | -57.057 | -57.057 | 0.000 |
@@ -76,7 +76,7 @@ Frequency rows retain the matched target and orientation while sweeping frequenc
 
 Orientation rows retain the matched target and frequency ladder while sweeping incidence or scatter angle.
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
 |:--|:--|:--|:--|:--|:--|--:|--:|
 | Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 0.0-180.0 |  | 0.003 | 0.020 |
 | Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 0.0-180.0 |  | 0.000 | 0.000 |
@@ -87,7 +87,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>Hybrid FEM/BEM / elastic shell / Elastic-shelled sphere / 110.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 0.0 |  | -60.866 | -60.847 | -0.020 |
 | Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 110.0 | 2.0 |  | -60.730 | -60.721 | -0.009 |
@@ -186,7 +186,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>Hybrid FEM/BEM / elastic shell / Elastic-shelled sphere / 12.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 0.0 |  | -64.453 | -64.453 | 0.000 |
 | Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 12.0 | 2.0 |  | -64.563 | -64.563 | 0.000 |
@@ -285,7 +285,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>Hybrid FEM/BEM / elastic shell / Elastic-shelled sphere / 38.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 0.0 |  | -57.704 | -57.704 | 0.000 |
 | Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 38.0 | 2.0 |  | -57.104 | -57.105 | 0.000 |
@@ -384,7 +384,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>Hybrid FEM/BEM / elastic shell / Elastic-shelled sphere / 54.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 0.0 |  | -50.241 | -50.241 | -0.000 |
 | Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 54.0 | 2.0 |  | -50.259 | -50.258 | -0.000 |
@@ -483,7 +483,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>Hybrid FEM/BEM / elastic shell / Elastic-shelled sphere / 86.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 0.0 |  | -50.854 | -50.854 | -0.000 |
 | Hybrid FEM/BEM | elastic shell | Elastic-shelled sphere | 86.0 | 2.0 |  | -50.226 | -50.226 | -0.000 |

@@ -39,14 +39,14 @@ Mean absolute differences describe the typical agreement; maximum differences ar
 
 Frequency rows retain the matched target and orientation while sweeping frequency.
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
 |:--|:--|:--|:--|:--|:--|--:|--:|
 | FEM | elastic shell | layered gas-core elastic-shell sphere | 1.0-150.0 |  |  | 0.003 | 0.067 |
 
 <details>
 <summary>FEM / elastic shell / layered gas-core elastic-shell sphere / 1.0-150.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | FEM | elastic shell | layered gas-core elastic-shell sphere | 1.0 |  |  | -116.008 | -116.010 | -0.003 |
 | FEM | elastic shell | layered gas-core elastic-shell sphere | 2.0 |  |  | -103.918 | -103.921 | -0.003 |
@@ -206,7 +206,7 @@ Frequency rows retain the matched target and orientation while sweeping frequenc
 
 Size rows retain the matched material constants while sweeping length, radius, diameter, or scale.
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
 |:--|:--|:--|:--|:--|:--|--:|--:|
 | FEM | elastic shell | layered sphere radius sweep | 12.0 |  | Radius scale 0.700-1.300 | 0.074 | 0.101 |
 | FEM | elastic shell | layered sphere radius sweep | 120.0 |  | Radius scale 0.700-1.300 | 0.121 | 0.203 |
@@ -217,7 +217,7 @@ Size rows retain the matched material constants while sweeping length, radius, d
 <details>
 <summary>FEM / elastic shell / layered sphere radius sweep / 12.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | FEM | elastic shell | layered sphere radius sweep | 12.0 |  | 0.700 | -80.977 | -81.078 | -0.101 |
 | FEM | elastic shell | layered sphere radius sweep | 12.0 |  | 0.900 | -73.678 | -73.760 | -0.081 |
@@ -230,7 +230,7 @@ Size rows retain the matched material constants while sweeping length, radius, d
 <details>
 <summary>FEM / elastic shell / layered sphere radius sweep / 120.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | FEM | elastic shell | layered sphere radius sweep | 120.0 |  | 0.700 | -63.209 | -63.218 | -0.009 |
 | FEM | elastic shell | layered sphere radius sweep | 120.0 |  | 0.900 | -60.079 | -60.209 | -0.129 |
@@ -243,7 +243,7 @@ Size rows retain the matched material constants while sweeping length, radius, d
 <details>
 <summary>FEM / elastic shell / layered sphere radius sweep / 150.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | FEM | elastic shell | layered sphere radius sweep | 150.0 |  | 0.700 | -62.915 | -63.019 | -0.104 |
 | FEM | elastic shell | layered sphere radius sweep | 150.0 |  | 0.900 | -64.381 | -64.572 | -0.191 |
@@ -256,7 +256,7 @@ Size rows retain the matched material constants while sweeping length, radius, d
 <details>
 <summary>FEM / elastic shell / layered sphere radius sweep / 38.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | FEM | elastic shell | layered sphere radius sweep | 38.0 |  | 0.700 | -47.383 | -50.804 | -3.421 |
 | FEM | elastic shell | layered sphere radius sweep | 38.0 |  | 0.900 | -54.777 | -55.240 | -0.462 |
@@ -269,7 +269,7 @@ Size rows retain the matched material constants while sweeping length, radius, d
 <details>
 <summary>FEM / elastic shell / layered sphere radius sweep / 70.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | FEM | elastic shell | layered sphere radius sweep | 70.0 |  | 0.700 | -60.973 | -61.145 | -0.172 |
 | FEM | elastic shell | layered sphere radius sweep | 70.0 |  | 0.900 | -60.086 | -60.115 | -0.029 |
@@ -284,14 +284,14 @@ Size rows retain the matched material constants while sweeping length, radius, d
 
 Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled, and shell cases when those branches apply.
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
 |:--|:--|:--|:--|:--|:--|--:|--:|
 | FEM | elastic shell | layered sphere radius sweep | 12.0-150.0 |  | Radius scale 0.700-1.300 | 0.265 | 3.421 |
 
 <details>
 <summary>FEM / elastic shell / layered sphere radius sweep / 12.0-150.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | FEM | elastic shell | layered sphere radius sweep | 12.0 |  | 0.700 | -80.977 | -81.078 | -0.101 |
 | FEM | elastic shell | layered sphere radius sweep | 12.0 |  | 0.900 | -73.678 | -73.760 | -0.081 |

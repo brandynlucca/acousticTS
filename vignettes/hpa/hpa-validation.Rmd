@@ -39,7 +39,7 @@ Mean absolute differences describe the typical agreement; maximum differences ar
 
 Frequency rows retain the matched target and orientation while sweeping frequency.
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
 |:--|:--|:--|:--|:--|:--|--:|--:|
 | exact modal | gas filled | baseline geometry | 12.0-200.0 | 90.0 | Radius (mm) 10.000 | 0.997 | 3.682 |
 | exact modal | liquid filled | baseline geometry | 12.0-200.0 | 90.0 | Radius (mm) 10.000 | 5.266 | 14.910 |
@@ -47,7 +47,7 @@ Frequency rows retain the matched target and orientation while sweeping frequenc
 <details>
 <summary>exact modal / gas filled / baseline geometry / 12.0-200.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | gas filled | baseline geometry | 12.0 | 90.0 | 10.000 | -42.344 | -46.025 | -3.682 |
 | exact modal | gas filled | baseline geometry | 18.0 | 90.0 | 10.000 | -44.035 | -46.025 | -1.991 |
@@ -65,7 +65,7 @@ Frequency rows retain the matched target and orientation while sweeping frequenc
 <details>
 <summary>exact modal / liquid filled / baseline geometry / 12.0-200.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | liquid filled | baseline geometry | 12.0 | 90.0 | 10.000 | -103.954 | -104.734 | -0.781 |
 | exact modal | liquid filled | baseline geometry | 18.0 | 90.0 | 10.000 | -98.105 | -101.342 | -3.237 |
@@ -85,7 +85,7 @@ Frequency rows retain the matched target and orientation while sweeping frequenc
 
 Orientation rows retain the matched target and frequency ladder while sweeping incidence or scatter angle.
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
 |:--|:--|:--|:--|:--|:--|--:|--:|
 | exact modal | gas filled | baseline geometry | 12.0 | 0.0-180.0 | Radius (mm) 10.000 | 3.682 | 3.682 |
 | exact modal | gas filled | baseline geometry | 120.0 | 0.0-180.0 | Radius (mm) 10.000 | 0.102 | 0.102 |
@@ -101,7 +101,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>exact modal / gas filled / baseline geometry / 12.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | gas filled | baseline geometry | 12.0 | 0.0 | 10.000 | -42.344 | -46.025 | -3.682 |
 | exact modal | gas filled | baseline geometry | 12.0 | 30.0 | 10.000 | -42.344 | -46.025 | -3.682 |
@@ -116,7 +116,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>exact modal / gas filled / baseline geometry / 120.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | gas filled | baseline geometry | 120.0 | 0.0 | 10.000 | -45.923 | -46.025 | -0.102 |
 | exact modal | gas filled | baseline geometry | 120.0 | 30.0 | 10.000 | -45.923 | -46.025 | -0.102 |
@@ -131,7 +131,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>exact modal / gas filled / baseline geometry / 200.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | gas filled | baseline geometry | 200.0 | 0.0 | 10.000 | -46.452 | -46.025 | 0.427 |
 | exact modal | gas filled | baseline geometry | 200.0 | 30.0 | 10.000 | -46.452 | -46.025 | 0.427 |
@@ -146,7 +146,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>exact modal / gas filled / baseline geometry / 38.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | gas filled | baseline geometry | 38.0 | 0.0 | 10.000 | -44.989 | -46.025 | -1.037 |
 | exact modal | gas filled | baseline geometry | 38.0 | 30.0 | 10.000 | -44.989 | -46.025 | -1.037 |
@@ -161,7 +161,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>exact modal / gas filled / baseline geometry / 70.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | gas filled | baseline geometry | 70.0 | 0.0 | 10.000 | -45.636 | -46.025 | -0.390 |
 | exact modal | gas filled | baseline geometry | 70.0 | 30.0 | 10.000 | -45.636 | -46.025 | -0.390 |
@@ -176,7 +176,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>exact modal / liquid filled / baseline geometry / 12.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | liquid filled | baseline geometry | 12.0 | 0.0 | 10.000 | -103.954 | -104.734 | -0.781 |
 | exact modal | liquid filled | baseline geometry | 12.0 | 30.0 | 10.000 | -103.954 | -104.734 | -0.781 |
@@ -191,7 +191,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>exact modal / liquid filled / baseline geometry / 120.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | liquid filled | baseline geometry | 120.0 | 0.0 | 10.000 | -97.409 | -99.846 | -2.437 |
 | exact modal | liquid filled | baseline geometry | 120.0 | 30.0 | 10.000 | -97.409 | -99.846 | -2.437 |
@@ -206,7 +206,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>exact modal / liquid filled / baseline geometry / 200.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | liquid filled | baseline geometry | 200.0 | 0.0 | 10.000 | -106.585 | -99.846 | 6.740 |
 | exact modal | liquid filled | baseline geometry | 200.0 | 30.0 | 10.000 | -106.585 | -99.846 | 6.740 |
@@ -221,7 +221,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>exact modal / liquid filled / baseline geometry / 38.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | liquid filled | baseline geometry | 38.0 | 0.0 | 10.000 | -94.134 | -99.935 | -5.800 |
 | exact modal | liquid filled | baseline geometry | 38.0 | 30.0 | 10.000 | -94.134 | -99.935 | -5.800 |
@@ -236,7 +236,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>exact modal / liquid filled / baseline geometry / 70.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | liquid filled | baseline geometry | 70.0 | 0.0 | 10.000 | -93.905 | -99.853 | -5.948 |
 | exact modal | liquid filled | baseline geometry | 70.0 | 30.0 | 10.000 | -93.905 | -99.853 | -5.948 |
@@ -253,7 +253,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 
 Size rows retain the matched material constants while sweeping length, radius, diameter, or scale.
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
 |:--|:--|:--|:--|:--|:--|--:|--:|
 | exact modal | gas filled | baseline geometry | 12.0 | 90.0 | Radius (mm) 5.000-20.000 | 3.446 | 5.414 |
 | exact modal | gas filled | baseline geometry | 120.0 | 90.0 | Radius (mm) 5.000-20.000 | 0.243 | 0.612 |
@@ -269,7 +269,7 @@ Size rows retain the matched material constants while sweeping length, radius, d
 <details>
 <summary>exact modal / gas filled / baseline geometry / 12.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | gas filled | baseline geometry | 12.0 | 90.0 | 5.000 | -46.632 | -52.046 | -5.414 |
 | exact modal | gas filled | baseline geometry | 12.0 | 90.0 | 10.000 | -42.344 | -46.025 | -3.682 |
@@ -280,7 +280,7 @@ Size rows retain the matched material constants while sweeping length, radius, d
 <details>
 <summary>exact modal / gas filled / baseline geometry / 120.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | gas filled | baseline geometry | 120.0 | 90.0 | 5.000 | -51.434 | -52.046 | -0.612 |
 | exact modal | gas filled | baseline geometry | 120.0 | 90.0 | 10.000 | -45.923 | -46.025 | -0.102 |
@@ -291,7 +291,7 @@ Size rows retain the matched material constants while sweeping length, radius, d
 <details>
 <summary>exact modal / gas filled / baseline geometry / 200.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | gas filled | baseline geometry | 200.0 | 90.0 | 5.000 | -51.809 | -52.046 | -0.237 |
 | exact modal | gas filled | baseline geometry | 200.0 | 90.0 | 10.000 | -46.452 | -46.025 | 0.427 |
@@ -302,7 +302,7 @@ Size rows retain the matched material constants while sweeping length, radius, d
 <details>
 <summary>exact modal / gas filled / baseline geometry / 38.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | gas filled | baseline geometry | 38.0 | 90.0 | 5.000 | -50.245 | -52.046 | -1.801 |
 | exact modal | gas filled | baseline geometry | 38.0 | 90.0 | 10.000 | -44.989 | -46.025 | -1.037 |
@@ -313,7 +313,7 @@ Size rows retain the matched material constants while sweeping length, radius, d
 <details>
 <summary>exact modal / gas filled / baseline geometry / 70.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | gas filled | baseline geometry | 70.0 | 90.0 | 5.000 | -50.879 | -52.046 | -1.167 |
 | exact modal | gas filled | baseline geometry | 70.0 | 90.0 | 10.000 | -45.636 | -46.025 | -0.390 |
@@ -324,7 +324,7 @@ Size rows retain the matched material constants while sweeping length, radius, d
 <details>
 <summary>exact modal / liquid filled / baseline geometry / 12.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | liquid filled | baseline geometry | 12.0 | 90.0 | 5.000 | -121.321 | -121.221 | 0.100 |
 | exact modal | liquid filled | baseline geometry | 12.0 | 90.0 | 10.000 | -103.954 | -104.734 | -0.781 |
@@ -335,7 +335,7 @@ Size rows retain the matched material constants while sweeping length, radius, d
 <details>
 <summary>exact modal / liquid filled / baseline geometry / 120.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | liquid filled | baseline geometry | 120.0 | 90.0 | 5.000 | -105.038 | -105.881 | -0.842 |
 | exact modal | liquid filled | baseline geometry | 120.0 | 90.0 | 10.000 | -97.409 | -99.846 | -2.437 |
@@ -346,7 +346,7 @@ Size rows retain the matched material constants while sweeping length, radius, d
 <details>
 <summary>exact modal / liquid filled / baseline geometry / 200.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | liquid filled | baseline geometry | 200.0 | 90.0 | 5.000 | -103.196 | -105.868 | -2.672 |
 | exact modal | liquid filled | baseline geometry | 200.0 | 90.0 | 10.000 | -106.585 | -99.846 | 6.740 |
@@ -357,7 +357,7 @@ Size rows retain the matched material constants while sweeping length, radius, d
 <details>
 <summary>exact modal / liquid filled / baseline geometry / 38.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | liquid filled | baseline geometry | 38.0 | 90.0 | 5.000 | -103.438 | -107.109 | -3.671 |
 | exact modal | liquid filled | baseline geometry | 38.0 | 90.0 | 10.000 | -94.134 | -99.935 | -5.800 |
@@ -368,7 +368,7 @@ Size rows retain the matched material constants while sweeping length, radius, d
 <details>
 <summary>exact modal / liquid filled / baseline geometry / 70.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | liquid filled | baseline geometry | 70.0 | 90.0 | 5.000 | -99.523 | -105.989 | -6.466 |
 | exact modal | liquid filled | baseline geometry | 70.0 | 90.0 | 10.000 | -93.905 | -99.853 | -5.948 |
@@ -381,7 +381,7 @@ Size rows retain the matched material constants while sweeping length, radius, d
 
 Parameter rows retain the matched geometry class while sweeping material, curvature, taper, thickness, or discretization parameters.
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
 |:--|:--|:--|:--|:--|:--|--:|--:|
 | exact modal | gas filled | baseline geometry | 12.0-200.0 | 60.0-120.0 | Radius (mm) 10.000 | 1.128 | 3.682 |
 | exact modal | gas filled | dense fast | 12.0-200.0 | 60.0-120.0 | Radius (mm) 10.000 | 1.454 | 3.796 |
@@ -393,7 +393,7 @@ Parameter rows retain the matched geometry class while sweeping material, curvat
 <details>
 <summary>exact modal / gas filled / baseline geometry / 12.0-200.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | gas filled | baseline geometry | 12.0 | 60.0 | 10.000 | -42.344 | -46.025 | -3.682 |
 | exact modal | gas filled | baseline geometry | 12.0 | 90.0 | 10.000 | -42.344 | -46.025 | -3.682 |
@@ -416,7 +416,7 @@ Parameter rows retain the matched geometry class while sweeping material, curvat
 <details>
 <summary>exact modal / gas filled / dense fast / 12.0-200.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | gas filled | dense fast | 12.0 | 60.0 | 10.000 | -42.235 | -46.030 | -3.796 |
 | exact modal | gas filled | dense fast | 12.0 | 90.0 | 10.000 | -42.235 | -46.030 | -3.796 |
@@ -439,7 +439,7 @@ Parameter rows retain the matched geometry class while sweeping material, curvat
 <details>
 <summary>exact modal / gas filled / light slow / 12.0-200.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | gas filled | light slow | 12.0 | 60.0 | 10.000 | -42.296 | -46.024 | -3.728 |
 | exact modal | gas filled | light slow | 12.0 | 90.0 | 10.000 | -42.296 | -46.024 | -3.728 |
@@ -462,7 +462,7 @@ Parameter rows retain the matched geometry class while sweeping material, curvat
 <details>
 <summary>exact modal / liquid filled / baseline geometry / 12.0-200.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | liquid filled | baseline geometry | 12.0 | 60.0 | 10.000 | -103.954 | -104.734 | -0.781 |
 | exact modal | liquid filled | baseline geometry | 12.0 | 90.0 | 10.000 | -103.954 | -104.734 | -0.781 |
@@ -485,7 +485,7 @@ Parameter rows retain the matched geometry class while sweeping material, curvat
 <details>
 <summary>exact modal / liquid filled / dense fast / 12.0-200.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | liquid filled | dense fast | 12.0 | 60.0 | 10.000 | -90.297 | -91.031 | -0.734 |
 | exact modal | liquid filled | dense fast | 12.0 | 90.0 | 10.000 | -90.297 | -91.031 | -0.734 |
@@ -508,7 +508,7 @@ Parameter rows retain the matched geometry class while sweeping material, curvat
 <details>
 <summary>exact modal / liquid filled / light slow / 12.0-200.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | liquid filled | light slow | 12.0 | 60.0 | 10.000 | -91.431 | -92.266 | -0.835 |
 | exact modal | liquid filled | light slow | 12.0 | 90.0 | 10.000 | -91.431 | -92.266 | -0.835 |
@@ -533,7 +533,7 @@ Parameter rows retain the matched geometry class while sweeping material, curvat
 
 Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled, and shell cases when those branches apply.
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
 |:--|:--|:--|:--|:--|:--|--:|--:|
 | exact modal | gas filled | baseline geometry | 12.0-200.0 | 0.0-180.0 | Radius (mm) 5.000-20.000 | 1.104 | 5.414 |
 | exact modal | gas filled | dense fast | 12.0-200.0 | 60.0-120.0 | Radius (mm) 10.000 | 1.454 | 3.796 |
@@ -545,7 +545,7 @@ Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled,
 <details>
 <summary>exact modal / gas filled / baseline geometry / 12.0-200.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | gas filled | baseline geometry | 12.0 | 0.0 | 10.000 | -42.344 | -46.025 | -3.682 |
 | exact modal | gas filled | baseline geometry | 12.0 | 30.0 | 10.000 | -42.344 | -46.025 | -3.682 |
@@ -603,7 +603,7 @@ Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled,
 <details>
 <summary>exact modal / gas filled / dense fast / 12.0-200.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | gas filled | dense fast | 12.0 | 60.0 | 10.000 | -42.235 | -46.030 | -3.796 |
 | exact modal | gas filled | dense fast | 12.0 | 90.0 | 10.000 | -42.235 | -46.030 | -3.796 |
@@ -626,7 +626,7 @@ Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled,
 <details>
 <summary>exact modal / gas filled / light slow / 12.0-200.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | gas filled | light slow | 12.0 | 60.0 | 10.000 | -42.296 | -46.024 | -3.728 |
 | exact modal | gas filled | light slow | 12.0 | 90.0 | 10.000 | -42.296 | -46.024 | -3.728 |
@@ -649,7 +649,7 @@ Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled,
 <details>
 <summary>exact modal / liquid filled / baseline geometry / 12.0-200.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | liquid filled | baseline geometry | 12.0 | 0.0 | 10.000 | -103.954 | -104.734 | -0.781 |
 | exact modal | liquid filled | baseline geometry | 12.0 | 30.0 | 10.000 | -103.954 | -104.734 | -0.781 |
@@ -707,7 +707,7 @@ Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled,
 <details>
 <summary>exact modal / liquid filled / dense fast / 12.0-200.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | liquid filled | dense fast | 12.0 | 60.0 | 10.000 | -90.297 | -91.031 | -0.734 |
 | exact modal | liquid filled | dense fast | 12.0 | 90.0 | 10.000 | -90.297 | -91.031 | -0.734 |
@@ -730,7 +730,7 @@ Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled,
 <details>
 <summary>exact modal / liquid filled / light slow / 12.0-200.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | exact modal | liquid filled | light slow | 12.0 | 60.0 | 10.000 | -91.431 | -92.266 | -0.835 |
 | exact modal | liquid filled | light slow | 12.0 | 90.0 | 10.000 | -91.431 | -92.266 | -0.835 |

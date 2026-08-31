@@ -39,7 +39,7 @@ Mean absolute differences describe the typical agreement; maximum differences ar
 
 Frequency rows retain the matched target and orientation while sweeping frequency.
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
 |:--|:--|:--|:--|:--|:--|--:|--:|
 | finite-cylinder modal | liquid filled | 12 kHz | 12.0 | 90.0 | Length (mm) 70.000 | 0.267 | 0.267 |
 | finite-cylinder modal | liquid filled | 120 kHz | 120.0 | 90.0 | Length (mm) 70.000 | 9.150 | 9.150 |
@@ -53,7 +53,7 @@ Frequency rows retain the matched target and orientation while sweeping frequenc
 <details>
 <summary>finite-cylinder modal / liquid filled / 12 kHz / 12.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 12 kHz | 12.0 | 90.0 | 70.000 | -89.789 | -90.056 | -0.267 |
 
@@ -62,7 +62,7 @@ Frequency rows retain the matched target and orientation while sweeping frequenc
 <details>
 <summary>finite-cylinder modal / liquid filled / 120 kHz / 120.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 120 kHz | 120.0 | 90.0 | 70.000 | -113.364 | -104.214 | 9.150 |
 
@@ -71,7 +71,7 @@ Frequency rows retain the matched target and orientation while sweeping frequenc
 <details>
 <summary>finite-cylinder modal / liquid filled / 18 kHz / 18.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 18 kHz | 18.0 | 90.0 | 70.000 | -84.273 | -84.485 | -0.212 |
 
@@ -80,7 +80,7 @@ Frequency rows retain the matched target and orientation while sweeping frequenc
 <details>
 <summary>finite-cylinder modal / liquid filled / 25 kHz / 25.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 25 kHz | 25.0 | 90.0 | 70.000 | -81.363 | -81.630 | -0.266 |
 
@@ -89,7 +89,7 @@ Frequency rows retain the matched target and orientation while sweeping frequenc
 <details>
 <summary>finite-cylinder modal / liquid filled / 38 kHz / 38.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 38 kHz | 38.0 | 90.0 | 70.000 | -84.801 | -85.515 | -0.714 |
 
@@ -98,7 +98,7 @@ Frequency rows retain the matched target and orientation while sweeping frequenc
 <details>
 <summary>finite-cylinder modal / liquid filled / 50 kHz / 50.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 50 kHz | 50.0 | 90.0 | 70.000 | -86.684 | -85.992 | 0.692 |
 
@@ -107,7 +107,7 @@ Frequency rows retain the matched target and orientation while sweeping frequenc
 <details>
 <summary>finite-cylinder modal / liquid filled / 70 kHz / 70.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 70 kHz | 70.0 | 90.0 | 70.000 | -78.293 | -78.478 | -0.185 |
 
@@ -116,7 +116,7 @@ Frequency rows retain the matched target and orientation while sweeping frequenc
 <details>
 <summary>finite-cylinder modal / liquid filled / 90 kHz / 90.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 90 kHz | 90.0 | 90.0 | 70.000 | -80.795 | -80.473 | 0.322 |
 
@@ -127,7 +127,7 @@ Frequency rows retain the matched target and orientation while sweeping frequenc
 
 Orientation rows retain the matched target and frequency ladder while sweeping incidence or scatter angle.
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
 |:--|:--|:--|:--|:--|:--|--:|--:|
 | finite-cylinder modal | liquid filled | 120 deg | 12.0 | 120.0 | Length (mm) 70.000 | 1.443 | 1.443 |
 | finite-cylinder modal | liquid filled | 120 deg | 120.0 | 120.0 | Length (mm) 70.000 | 0.664 | 0.664 |
@@ -158,7 +158,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>finite-cylinder modal / liquid filled / 120 deg / 12.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 120 deg | 12.0 | 120.0 | 70.000 | -97.235 | -98.678 | -1.443 |
 
@@ -167,7 +167,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>finite-cylinder modal / liquid filled / 150 deg / 12.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 150 deg | 12.0 | 150.0 | 70.000 | -137.219 | -150.276 | -13.058 |
 
@@ -176,7 +176,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>finite-cylinder modal / liquid filled / 30 deg / 12.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 30 deg | 12.0 | 30.0 | 70.000 | -137.219 | -150.276 | -13.058 |
 
@@ -185,7 +185,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>finite-cylinder modal / liquid filled / 60 deg / 12.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 60 deg | 12.0 | 60.0 | 70.000 | -97.235 | -98.678 | -1.443 |
 
@@ -194,7 +194,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>finite-cylinder modal / liquid filled / 90 deg / 12.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 90 deg | 12.0 | 90.0 | 70.000 | -89.789 | -90.056 | -0.267 |
 
@@ -203,7 +203,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>finite-cylinder modal / liquid filled / 120 deg / 120.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 120 deg | 120.0 | 120.0 | 70.000 | -102.252 | -102.915 | -0.664 |
 
@@ -212,7 +212,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>finite-cylinder modal / liquid filled / 150 deg / 120.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 150 deg | 120.0 | 150.0 | 70.000 | -114.876 | -117.907 | -3.032 |
 
@@ -221,7 +221,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>finite-cylinder modal / liquid filled / 30 deg / 120.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 30 deg | 120.0 | 30.0 | 70.000 | -114.876 | -117.907 | -3.032 |
 
@@ -230,7 +230,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>finite-cylinder modal / liquid filled / 60 deg / 120.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 60 deg | 120.0 | 60.0 | 70.000 | -102.252 | -102.915 | -0.664 |
 
@@ -239,7 +239,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>finite-cylinder modal / liquid filled / 90 deg / 120.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 90 deg | 120.0 | 90.0 | 70.000 | -113.364 | -104.214 | 9.150 |
 
@@ -248,7 +248,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>finite-cylinder modal / liquid filled / 120 deg / 25.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 120 deg | 25.0 | 120.0 | 70.000 | -99.006 | -99.922 | -0.915 |
 
@@ -257,7 +257,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>finite-cylinder modal / liquid filled / 150 deg / 25.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 150 deg | 25.0 | 150.0 | 70.000 | -121.179 | -126.179 | -5.000 |
 
@@ -266,7 +266,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>finite-cylinder modal / liquid filled / 30 deg / 25.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 30 deg | 25.0 | 30.0 | 70.000 | -121.179 | -126.179 | -5.000 |
 
@@ -275,7 +275,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>finite-cylinder modal / liquid filled / 60 deg / 25.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 60 deg | 25.0 | 60.0 | 70.000 | -99.006 | -99.922 | -0.915 |
 
@@ -284,7 +284,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>finite-cylinder modal / liquid filled / 90 deg / 25.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 90 deg | 25.0 | 90.0 | 70.000 | -81.363 | -81.630 | -0.266 |
 
@@ -293,7 +293,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>finite-cylinder modal / liquid filled / 120 deg / 38.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 120 deg | 38.0 | 120.0 | 70.000 | -101.433 | -102.375 | -0.942 |
 
@@ -302,7 +302,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>finite-cylinder modal / liquid filled / 150 deg / 38.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 150 deg | 38.0 | 150.0 | 70.000 | -112.252 | -116.010 | -3.758 |
 
@@ -311,7 +311,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>finite-cylinder modal / liquid filled / 30 deg / 38.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 30 deg | 38.0 | 30.0 | 70.000 | -112.252 | -116.010 | -3.758 |
 
@@ -320,7 +320,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>finite-cylinder modal / liquid filled / 60 deg / 38.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 60 deg | 38.0 | 60.0 | 70.000 | -101.433 | -102.375 | -0.942 |
 
@@ -329,7 +329,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>finite-cylinder modal / liquid filled / 90 deg / 38.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 90 deg | 38.0 | 90.0 | 70.000 | -84.801 | -85.515 | -0.714 |
 
@@ -338,7 +338,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>finite-cylinder modal / liquid filled / 120 deg / 70.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 120 deg | 70.0 | 120.0 | 70.000 | -99.980 | -100.575 | -0.595 |
 
@@ -347,7 +347,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>finite-cylinder modal / liquid filled / 150 deg / 70.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 150 deg | 70.0 | 150.0 | 70.000 | -110.634 | -113.551 | -2.918 |
 
@@ -356,7 +356,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>finite-cylinder modal / liquid filled / 30 deg / 70.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 30 deg | 70.0 | 30.0 | 70.000 | -110.634 | -113.551 | -2.918 |
 
@@ -365,7 +365,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>finite-cylinder modal / liquid filled / 60 deg / 70.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 60 deg | 70.0 | 60.0 | 70.000 | -99.980 | -100.575 | -0.595 |
 
@@ -374,7 +374,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 <details>
 <summary>finite-cylinder modal / liquid filled / 90 deg / 70.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 90 deg | 70.0 | 90.0 | 70.000 | -78.293 | -78.478 | -0.185 |
 
@@ -385,7 +385,7 @@ Orientation rows retain the matched target and frequency ladder while sweeping i
 
 Size rows retain the matched material constants while sweeping length, radius, diameter, or scale.
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
 |:--|:--|:--|:--|:--|:--|--:|--:|
 | finite-cylinder modal | liquid filled | 105 x 15 mm | 12.0 | 90.0 | Length (mm) 105.000 | 0.212 | 0.212 |
 | finite-cylinder modal | liquid filled | 105 x 15 mm | 120.0 | 90.0 | Length (mm) 105.000 | 0.042 | 0.042 |
@@ -406,7 +406,7 @@ Size rows retain the matched material constants while sweeping length, radius, d
 <details>
 <summary>finite-cylinder modal / liquid filled / 105 x 15 mm / 12.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 105 x 15 mm | 12.0 | 90.0 | 105.000 | -80.751 | -80.963 | -0.212 |
 
@@ -415,7 +415,7 @@ Size rows retain the matched material constants while sweeping length, radius, d
 <details>
 <summary>finite-cylinder modal / liquid filled / 35 x 5 mm / 12.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 35 x 5 mm | 12.0 | 90.0 | 35.000 | -106.975 | -107.722 | -0.746 |
 
@@ -424,7 +424,7 @@ Size rows retain the matched material constants while sweeping length, radius, d
 <details>
 <summary>finite-cylinder modal / liquid filled / 70 x 10 mm / 12.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 70 x 10 mm | 12.0 | 90.0 | 70.000 | -89.789 | -90.056 | -0.267 |
 
@@ -433,7 +433,7 @@ Size rows retain the matched material constants while sweeping length, radius, d
 <details>
 <summary>finite-cylinder modal / liquid filled / 105 x 15 mm / 120.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 105 x 15 mm | 120.0 | 90.0 | 105.000 | -70.194 | -70.235 | -0.042 |
 
@@ -442,7 +442,7 @@ Size rows retain the matched material constants while sweeping length, radius, d
 <details>
 <summary>finite-cylinder modal / liquid filled / 35 x 5 mm / 120.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 35 x 5 mm | 120.0 | 90.0 | 35.000 | -84.305 | -84.237 | 0.068 |
 
@@ -451,7 +451,7 @@ Size rows retain the matched material constants while sweeping length, radius, d
 <details>
 <summary>finite-cylinder modal / liquid filled / 70 x 10 mm / 120.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 70 x 10 mm | 120.0 | 90.0 | 70.000 | -113.364 | -104.214 | 9.150 |
 
@@ -460,7 +460,7 @@ Size rows retain the matched material constants while sweeping length, radius, d
 <details>
 <summary>finite-cylinder modal / liquid filled / 105 x 15 mm / 25.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 105 x 15 mm | 25.0 | 90.0 | 105.000 | -80.822 | -81.492 | -0.670 |
 
@@ -469,7 +469,7 @@ Size rows retain the matched material constants while sweeping length, radius, d
 <details>
 <summary>finite-cylinder modal / liquid filled / 35 x 5 mm / 25.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 35 x 5 mm | 25.0 | 90.0 | 35.000 | -95.201 | -95.456 | -0.255 |
 
@@ -478,7 +478,7 @@ Size rows retain the matched material constants while sweeping length, radius, d
 <details>
 <summary>finite-cylinder modal / liquid filled / 70 x 10 mm / 25.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 70 x 10 mm | 25.0 | 90.0 | 70.000 | -81.363 | -81.630 | -0.266 |
 
@@ -487,7 +487,7 @@ Size rows retain the matched material constants while sweeping length, radius, d
 <details>
 <summary>finite-cylinder modal / liquid filled / 105 x 15 mm / 38.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 105 x 15 mm | 38.0 | 90.0 | 105.000 | -76.062 | -75.900 | 0.163 |
 
@@ -496,7 +496,7 @@ Size rows retain the matched material constants while sweeping length, radius, d
 <details>
 <summary>finite-cylinder modal / liquid filled / 35 x 5 mm / 38.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 35 x 5 mm | 38.0 | 90.0 | 35.000 | -89.680 | -89.895 | -0.215 |
 
@@ -505,7 +505,7 @@ Size rows retain the matched material constants while sweeping length, radius, d
 <details>
 <summary>finite-cylinder modal / liquid filled / 70 x 10 mm / 38.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 70 x 10 mm | 38.0 | 90.0 | 70.000 | -84.801 | -85.515 | -0.714 |
 
@@ -514,7 +514,7 @@ Size rows retain the matched material constants while sweeping length, radius, d
 <details>
 <summary>finite-cylinder modal / liquid filled / 105 x 15 mm / 70.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 105 x 15 mm | 70.0 | 90.0 | 105.000 | -72.286 | -72.382 | -0.096 |
 
@@ -523,7 +523,7 @@ Size rows retain the matched material constants while sweeping length, radius, d
 <details>
 <summary>finite-cylinder modal / liquid filled / 35 x 5 mm / 70.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 35 x 5 mm | 70.0 | 90.0 | 35.000 | -88.650 | -89.165 | -0.514 |
 
@@ -532,7 +532,7 @@ Size rows retain the matched material constants while sweeping length, radius, d
 <details>
 <summary>finite-cylinder modal / liquid filled / 70 x 10 mm / 70.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 70 x 10 mm | 70.0 | 90.0 | 70.000 | -78.293 | -78.478 | -0.185 |
 
@@ -543,7 +543,7 @@ Size rows retain the matched material constants while sweeping length, radius, d
 
 Parameter rows retain the matched geometry class while sweeping material, curvature, taper, thickness, or discretization parameters.
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
 |:--|:--|:--|:--|:--|:--|--:|--:|
 | finite-cylinder modal | liquid filled | denser faster | 12.0-120.0 | 60.0-120.0 | Length (mm) 70.000 | 0.855 | 3.289 |
 | finite-cylinder modal | liquid filled | lighter slower | 12.0-120.0 | 60.0-120.0 | Length (mm) 70.000 | 0.836 | 1.437 |
@@ -552,7 +552,7 @@ Parameter rows retain the matched geometry class while sweeping material, curvat
 <details>
 <summary>finite-cylinder modal / liquid filled / denser faster / 12.0-120.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | denser faster | 12.0 | 60.0 | 70.000 | -83.579 | -85.038 | -1.459 |
 | finite-cylinder modal | liquid filled | denser faster | 12.0 | 90.0 | 70.000 | -76.136 | -76.399 | -0.264 |
@@ -575,7 +575,7 @@ Parameter rows retain the matched geometry class while sweeping material, curvat
 <details>
 <summary>finite-cylinder modal / liquid filled / lighter slower / 12.0-120.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | lighter slower | 12.0 | 60.0 | 70.000 | -84.714 | -86.151 | -1.437 |
 | finite-cylinder modal | liquid filled | lighter slower | 12.0 | 90.0 | 70.000 | -77.264 | -77.546 | -0.281 |
@@ -598,7 +598,7 @@ Parameter rows retain the matched geometry class while sweeping material, curvat
 <details>
 <summary>finite-cylinder modal / liquid filled / near matched / 12.0-120.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | near matched | 12.0 | 60.0 | 70.000 | -97.235 | -98.678 | -1.443 |
 | finite-cylinder modal | liquid filled | near matched | 12.0 | 90.0 | 70.000 | -89.789 | -90.056 | -0.267 |
@@ -623,7 +623,7 @@ Parameter rows retain the matched geometry class while sweeping material, curvat
 
 Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled, and shell cases when those branches apply.
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size / parameter | Mean abs. delta `TS` (dB) | Max abs. delta `TS` (dB) |
 |:--|:--|:--|:--|:--|:--|--:|--:|
 | finite-cylinder modal | gas filled | gas-bladder-dominant SBF cylinder; pressure-release finite-cylinder... | 12.0-200.0 | 30.0-150.0 | Length (mm) 70.000 | 2.163 | 6.073 |
 | finite-cylinder modal | liquid filled | 105 x 15 mm | 12.0-120.0 | 90.0 | Length (mm) 105.000 | 0.237 | 0.670 |
@@ -649,7 +649,7 @@ Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled,
 <details>
 <summary>finite-cylinder modal / gas filled / gas-bladder-dominant SBF cylinder; pressure-release finit... / 12.0-200.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | gas filled | gas-bladder-dominant SBF cylinder; pressure-release finite-cylinder modal | 12.0 | 30.0 | 70.000 | -72.825 | -78.897 | -6.073 |
 | finite-cylinder modal | gas filled | gas-bladder-dominant SBF cylinder; pressure-release finite-cylinder modal | 12.0 | 60.0 | 70.000 | -40.820 | -40.726 | 0.094 |
@@ -682,7 +682,7 @@ Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled,
 <details>
 <summary>finite-cylinder modal / liquid filled / 105 x 15 mm / 12.0-120.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 105 x 15 mm | 12.0 | 90.0 | 105.000 | -80.751 | -80.963 | -0.212 |
 | finite-cylinder modal | liquid filled | 105 x 15 mm | 25.0 | 90.0 | 105.000 | -80.822 | -81.492 | -0.670 |
@@ -695,7 +695,7 @@ Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled,
 <details>
 <summary>finite-cylinder modal / liquid filled / 12 kHz / 12.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 12 kHz | 12.0 | 90.0 | 70.000 | -89.789 | -90.056 | -0.267 |
 
@@ -704,7 +704,7 @@ Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled,
 <details>
 <summary>finite-cylinder modal / liquid filled / 120 deg / 12.0-120.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 120 deg | 12.0 | 120.0 | 70.000 | -97.235 | -98.678 | -1.443 |
 | finite-cylinder modal | liquid filled | 120 deg | 25.0 | 120.0 | 70.000 | -99.006 | -99.922 | -0.915 |
@@ -717,7 +717,7 @@ Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled,
 <details>
 <summary>finite-cylinder modal / liquid filled / 120 kHz / 120.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 120 kHz | 120.0 | 90.0 | 70.000 | -113.364 | -104.214 | 9.150 |
 
@@ -726,7 +726,7 @@ Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled,
 <details>
 <summary>finite-cylinder modal / liquid filled / 150 deg / 12.0-120.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 150 deg | 12.0 | 150.0 | 70.000 | -137.219 | -150.276 | -13.058 |
 | finite-cylinder modal | liquid filled | 150 deg | 25.0 | 150.0 | 70.000 | -121.179 | -126.179 | -5.000 |
@@ -739,7 +739,7 @@ Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled,
 <details>
 <summary>finite-cylinder modal / liquid filled / 18 kHz / 18.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 18 kHz | 18.0 | 90.0 | 70.000 | -84.273 | -84.485 | -0.212 |
 
@@ -748,7 +748,7 @@ Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled,
 <details>
 <summary>finite-cylinder modal / liquid filled / 25 kHz / 25.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 25 kHz | 25.0 | 90.0 | 70.000 | -81.363 | -81.630 | -0.266 |
 
@@ -757,7 +757,7 @@ Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled,
 <details>
 <summary>finite-cylinder modal / liquid filled / 30 deg / 12.0-120.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 30 deg | 12.0 | 30.0 | 70.000 | -137.219 | -150.276 | -13.058 |
 | finite-cylinder modal | liquid filled | 30 deg | 25.0 | 30.0 | 70.000 | -121.179 | -126.179 | -5.000 |
@@ -770,7 +770,7 @@ Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled,
 <details>
 <summary>finite-cylinder modal / liquid filled / 35 x 5 mm / 12.0-120.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 35 x 5 mm | 12.0 | 90.0 | 35.000 | -106.975 | -107.722 | -0.746 |
 | finite-cylinder modal | liquid filled | 35 x 5 mm | 25.0 | 90.0 | 35.000 | -95.201 | -95.456 | -0.255 |
@@ -783,7 +783,7 @@ Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled,
 <details>
 <summary>finite-cylinder modal / liquid filled / 38 kHz / 38.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 38 kHz | 38.0 | 90.0 | 70.000 | -84.801 | -85.515 | -0.714 |
 
@@ -792,7 +792,7 @@ Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled,
 <details>
 <summary>finite-cylinder modal / liquid filled / 50 kHz / 50.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 50 kHz | 50.0 | 90.0 | 70.000 | -86.684 | -85.992 | 0.692 |
 
@@ -801,7 +801,7 @@ Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled,
 <details>
 <summary>finite-cylinder modal / liquid filled / 60 deg / 12.0-120.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 60 deg | 12.0 | 60.0 | 70.000 | -97.235 | -98.678 | -1.443 |
 | finite-cylinder modal | liquid filled | 60 deg | 25.0 | 60.0 | 70.000 | -99.006 | -99.922 | -0.915 |
@@ -814,7 +814,7 @@ Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled,
 <details>
 <summary>finite-cylinder modal / liquid filled / 70 kHz / 70.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 70 kHz | 70.0 | 90.0 | 70.000 | -78.293 | -78.478 | -0.185 |
 
@@ -823,7 +823,7 @@ Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled,
 <details>
 <summary>finite-cylinder modal / liquid filled / 70 x 10 mm / 12.0-120.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 70 x 10 mm | 12.0 | 90.0 | 70.000 | -89.789 | -90.056 | -0.267 |
 | finite-cylinder modal | liquid filled | 70 x 10 mm | 25.0 | 90.0 | 70.000 | -81.363 | -81.630 | -0.266 |
@@ -836,7 +836,7 @@ Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled,
 <details>
 <summary>finite-cylinder modal / liquid filled / 90 deg / 12.0-120.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 90 deg | 12.0 | 90.0 | 70.000 | -89.789 | -90.056 | -0.267 |
 | finite-cylinder modal | liquid filled | 90 deg | 25.0 | 90.0 | 70.000 | -81.363 | -81.630 | -0.266 |
@@ -849,7 +849,7 @@ Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled,
 <details>
 <summary>finite-cylinder modal / liquid filled / 90 kHz / 90.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | 90 kHz | 90.0 | 90.0 | 70.000 | -80.795 | -80.473 | 0.322 |
 
@@ -858,7 +858,7 @@ Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled,
 <details>
 <summary>finite-cylinder modal / liquid filled / denser faster / 12.0-120.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | denser faster | 12.0 | 60.0 | 70.000 | -83.579 | -85.038 | -1.459 |
 | finite-cylinder modal | liquid filled | denser faster | 12.0 | 90.0 | 70.000 | -76.136 | -76.399 | -0.264 |
@@ -881,7 +881,7 @@ Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled,
 <details>
 <summary>finite-cylinder modal / liquid filled / lighter slower / 12.0-120.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | lighter slower | 12.0 | 60.0 | 70.000 | -84.714 | -86.151 | -1.437 |
 | finite-cylinder modal | liquid filled | lighter slower | 12.0 | 90.0 | 70.000 | -77.264 | -77.546 | -0.281 |
@@ -904,7 +904,7 @@ Boundary rows separate pressure-release, fixed-rigid, liquid-filled, gas-filled,
 <details>
 <summary>finite-cylinder modal / liquid filled / near matched / 12.0-120.0 kHz</summary>
 
-| Method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` reference (dB) | `TS` model (dB) | Delta `TS` (dB) |
+| Validation method | Boundary | Validation case | Frequency (kHz) | Angle (deg) | Size | `TS` from validation method (dB) | `TS` from acousticTS (dB) | Delta `TS` (acousticTS - validation method, dB) |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
 | finite-cylinder modal | liquid filled | near matched | 12.0 | 60.0 | 70.000 | -97.235 | -98.678 | -1.443 |
 | finite-cylinder modal | liquid filled | near matched | 12.0 | 90.0 | 70.000 | -89.789 | -90.056 | -0.267 |

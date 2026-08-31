@@ -31,10 +31,6 @@ acousticTS:::.model_family_header(
 
 The TMM benchmark ladder is shape-specific: spheres are compared with `SPHMS`, prolates with `PSMS`, and finite cylinders with `FCMS`. Shell-sphere cases are compared against the published shell-sphere reference used for ESSMS.
 
-::: {.note data-title="Benchmark versus validation"}
-The exact-family rows check monostatic agreement with acousticTS modal families.
-:::
-
 ## Benchmark tables
 
 ::: {.panel-tabset}
@@ -94,3 +90,45 @@ The exact-family rows check monostatic agreement with acousticTS modal families.
 ```{r echo=FALSE, out.width='85%', fig.align='center', fig.alt="Two-panel representative TMM benchmarks: liquid-filled sphere against SPHMS and liquid-filled prolate spheroid against PSMS."}
 knitr::include_graphics("tmm-representative-spectra.png")
 ```
+
+```{r echo=FALSE, out.width='85%', fig.align='center', fig.alt='TMM orientation-averaged spectrum benchmark figure.'}
+knitr::include_graphics("tmm-orientation-average-spectrum.png")
+```
+
+<details>
+<summary>Benchmark branch and continuation figures</summary>
+
+```{r echo=FALSE, out.width='85%', fig.align='center', fig.alt='TMM sphere-to-spheroid continuation benchmark figure.'}
+knitr::include_graphics("tmm-sphere-to-spheroid-continuation.png")
+```
+
+```{r echo=FALSE, out.width='85%', fig.align='center', fig.alt='TMM prolate exact angular benchmark figure.'}
+knitr::include_graphics("tmm-prolate-exact-angular-validation.png")
+```
+
+</details>
+
+<details>
+<summary>Stored scattering benchmark maps</summary>
+
+```{r echo=FALSE, out.width=c('49%','49%'), fig.align='center', fig.alt='TMM pressure-release sphere heatmap and polar scattering benchmark maps.'}
+knitr::include_graphics(c("tmm-sphere-heatmap.png", "tmm-sphere-polar.png"))
+```
+
+```{r echo=FALSE, out.width=c('49%','49%'), fig.align='center', fig.alt='TMM liquid-filled oblate heatmap and polar scattering benchmark maps.'}
+knitr::include_graphics(c("tmm-oblate-heatmap.png", "tmm-oblate-polar.png"))
+```
+
+```{r echo=FALSE, out.width=c('49%','49%'), fig.align='center', fig.alt='TMM liquid-filled prolate heatmap and polar scattering benchmark maps.'}
+knitr::include_graphics(c("tmm-prolate-heatmap.png", "tmm-prolate-polar.png"))
+```
+
+```{r echo=FALSE, out.width='85%', fig.align='center', fig.alt='TMM bistatic polar scattering map benchmark figure.'}
+knitr::include_graphics("tmm-bistatic-polar-map.png")
+```
+
+```{r echo=FALSE, out.width='85%', fig.align='center', fig.alt='TMM angular scattering slice benchmark figure.'}
+knitr::include_graphics("tmm-scattering-slice.png")
+```
+
+</details>
