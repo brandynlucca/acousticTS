@@ -305,7 +305,10 @@ That example is useful because it separates two different ideas cleanly:
 1. the bent state comes from the baseline object passed into `simulate_ts()`,
 2. the resizing comes from `length_body` or `body_target`.
 
-If the scientific workflow instead needs "resize a straight object and then bend it differently for each realization," that should currently be constructed outside `simulate_ts()` or through the deprecated `*_curved` model interfaces that still wire curvature in internally.
+If the scientific workflow instead needs "resize a straight object and then
+bend it differently for each realization," construct that sequence outside
+`simulate_ts()` by resizing the straight object first and applying `brake()` to
+each realization afterward.
 
 # When simulation is useful
 

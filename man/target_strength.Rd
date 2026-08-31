@@ -114,11 +114,8 @@ target_strength(
 )
 }
 
-The legacy curved-entry wrappers \code{"dwba_curved"} and
-\code{"sdwba_curved"} are deprecated; apply \code{\link{brake}} to the
-scatterer first, then run \code{"dwba"} or \code{"sdwba"} on the curved
-object. Model names are normalized internally, so case-insensitive inputs
-such as \code{"DWBA"} and \code{"dwba"} resolve to the same family.
+Model names are normalized internally, so case-insensitive inputs such as
+\code{"DWBA"} and \code{"dwba"} resolve to the same family.
 }
 \seealso{
 \code{\link{DWBA}}, \code{\link{BBFM}}, \code{\link{PCDWBA}},
