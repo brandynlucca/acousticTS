@@ -33,3 +33,4 @@ src/*.mod
 src/*.o
 tests/testthat/Rplots.pdf
 vignettes/*/figure/
+.tmp/
