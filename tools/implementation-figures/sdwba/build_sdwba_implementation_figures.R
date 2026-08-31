@@ -1,6 +1,9 @@
+# Build SDWBA response and stochastic-phase comparison figures.
+# Outputs are written to vignettes/sdwba as declared in the manifest.
 source("tools/implementation-figures/helpers/common.R")
 impl_load_all()
 
+# Construct the canonical SDWBA example for a requested phase spread.
 make_sdwba_object <- function(phase_sd_init = sqrt(2) / 2) {
   obj <- fls_generate(
     shape = cylinder(

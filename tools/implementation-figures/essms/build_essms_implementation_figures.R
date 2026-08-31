@@ -1,6 +1,9 @@
+# Build ESSMS shape and shell-thickness comparison figures.
+# Outputs are written to vignettes/essms as declared in the manifest.
 source("tools/implementation-figures/helpers/common.R")
 impl_load_all()
 
+# Construct the canonical elastic shell example for a given shell thickness.
 make_essms_object <- function(shell_thickness = 0.8e-3) {
   ess_generate(
     shape = sphere(radius_body = 10e-3, n_segments = 80),

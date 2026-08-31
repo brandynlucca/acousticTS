@@ -1,3 +1,5 @@
+# Build KRM component, variant, and body-versus-swimbladder figures.
+# The example uses deterministic package-native fish geometry.
 source("tools/implementation-figures/helpers/common.R")
 impl_load_all()
 

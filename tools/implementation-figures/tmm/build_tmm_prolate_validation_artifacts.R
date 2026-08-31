@@ -1,3 +1,5 @@
+# Build the pure-R sphere-to-prolate continuation table and figure.
+# Outputs are deterministic package-facing validation artifacts.
 source("tools/implementation-figures/helpers/common.R")
 impl_load_all()
 

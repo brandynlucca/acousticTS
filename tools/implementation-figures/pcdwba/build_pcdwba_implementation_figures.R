@@ -1,3 +1,5 @@
+# Build the phase-corrected DWBA reference-comparison figure.
+# Compact comparison data are read from tools/implementation-figures/data.
 source("tools/implementation-figures/helpers/common.R")
 impl_load_all()
 

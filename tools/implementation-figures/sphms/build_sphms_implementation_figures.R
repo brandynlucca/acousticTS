@@ -1,6 +1,9 @@
+# Build SPHMS shape, response, and boundary-condition comparison figures.
+# Outputs are written to vignettes/sphms as declared in the manifest.
 source("tools/implementation-figures/helpers/common.R")
 impl_load_all()
 
+# Construct and evaluate the canonical SPHMS sphere for one boundary condition.
 make_sphms_object <- function(boundary = "gas_filled") {
   obj <- gas_generate(
     shape = sphere(radius_body = 1e-3),

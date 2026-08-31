@@ -43,7 +43,6 @@
 ^Rplots
 ^src/.*\.(dll|o|mod)$
 ^tests/testthat/Rplots\.pdf$
-^tools/implementation-figures/data/final$
-^tools/implementation-figures/data/final/.*$
-^vignettes/.*/figure$
-^vignettes/.*/figure/.*
+^vignettes/[^/]+/
+^tools/implementation-figures($|/)
+^tools/documentation($|/)

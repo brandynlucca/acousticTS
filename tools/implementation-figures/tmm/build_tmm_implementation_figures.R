@@ -1,3 +1,5 @@
+# Build the core T-matrix shape, response, angular, and summary figures.
+# Additional TMM gallery/validation products have separate manifest builders.
 source("tools/implementation-figures/helpers/common.R")
 impl_load_all()
 

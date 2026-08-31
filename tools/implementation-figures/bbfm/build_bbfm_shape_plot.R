@@ -1,5 +1,5 @@
-devtools::load_all(".")
-
+# Generate the BBFM component-shape figure used by the implementation article.
+# The parent BBFM builder sources this script from the repository root.
 body_shape <- cylinder(
   length_body = 0.08,
   radius_body = 0.003,

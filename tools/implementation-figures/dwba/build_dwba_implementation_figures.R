@@ -1,6 +1,9 @@
+# Build DWBA geometry, response, and orientation-comparison figures.
+# Outputs are written to vignettes/dwba as declared in the manifest.
 source("tools/implementation-figures/helpers/common.R")
 impl_load_all()
 
+# Construct the canonical DWBA example at a requested body orientation.
 make_dwba_object <- function(theta_body = pi / 2) {
   fls_generate(
     shape = cylinder(

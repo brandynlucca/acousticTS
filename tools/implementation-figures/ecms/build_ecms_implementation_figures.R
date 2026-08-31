@@ -1,3 +1,5 @@
+# Build the ECMS reference-comparison figure from committed compact data.
+# No external solver or machine-local input is required.
 source("tools/implementation-figures/helpers/common.R")
 impl_load_all()
 

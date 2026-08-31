@@ -1,4 +1,9 @@
+# Shared repository, graphics-device, labeling, and table helpers for the
+# manifest-listed implementation figure builders.
+
+# Locate the repository root and make it the working directory.
 impl_set_repo_root <- function() {
+  # A valid root contains both package metadata and the figure manifest.
   has_repo_root <- function(path) {
     file.exists(file.path(path, "DESCRIPTION")) &&
       file.exists(file.path(
@@ -9,10 +14,12 @@ impl_set_repo_root <- function() {
       ))
   }
 
+  # Normalize a candidate's parent for portable upward traversal.
   parent_dir <- function(path) {
     normalizePath(file.path(path, ".."), winslash = "/", mustWork = FALSE)
   }
 
+  # Walk upward from one candidate until a valid root or filesystem root.
   search_upward <- function(start_path) {
     current <- normalizePath(start_path, winslash = "/", mustWork = FALSE)
     repeat {
@@ -58,20 +65,24 @@ impl_set_repo_root <- function() {
   )
 }
 
+# Load the development package after normalizing the working directory.
 impl_load_all <- function() {
   impl_set_repo_root()
   devtools::load_all(".", quiet = TRUE)
   invisible(TRUE)
 }
 
+# Construct a path to a compact committed figure input.
 impl_data_path <- function(name) {
   file.path("tools", "implementation-figures", "data", name)
 }
 
+# Construct the canonical output path for a family article asset.
 impl_output_path <- function(family, name) {
   file.path("vignettes", family, name)
 }
 
+# Open a PNG device, evaluate plotting code, and reliably close the device.
 impl_with_png <- function(path,
                           code,
                           width = 1600,
@@ -84,18 +95,22 @@ impl_with_png <- function(path,
   invisible(path)
 }
 
+# Return the shared target-strength plot label.
 impl_ts_label <- function() {
   expression(Target ~ strength ~ (dB ~ re. ~ 1 ~ m^2))
 }
 
+# Return the shared target-strength-difference plot label.
 impl_delta_label <- function() {
   expression(Delta ~ TS ~ (dB))
 }
 
+# Generate the diverging palette used by validation heatmaps.
 impl_heatmap_palette <- function(n = 101) {
   grDevices::colorRampPalette(c("#2166ac", "#f7f7f7", "#b2182b"))(n)
 }
 
+# Draw a color scale outside the active plot region.
 impl_draw_colorbar <- function(zlim,
                                palette_vals = impl_heatmap_palette(),
                                label = impl_delta_label(),
@@ -175,6 +190,7 @@ impl_draw_colorbar <- function(zlim,
   )
 }
 
+# Stabilize comparison-table ordering before plotting or committing outputs.
 impl_sort_compare_df <- function(df) {
   sort_cols <- intersect(
     c(
@@ -204,6 +220,7 @@ impl_sort_compare_df <- function(df) {
   df[row_idx, , drop = FALSE]
 }
 
+# Refresh non-deterministic timing values locally unless explicitly overridden.
 impl_should_refresh_timings <- function() {
   refresh_override <- tolower(
     Sys.getenv("ACOUSTICTS_IMPL_REFRESH_TIMINGS", unset = "")
@@ -213,6 +230,7 @@ impl_should_refresh_timings <- function() {
     !nzchar(Sys.getenv("CI", unset = ""))
 }
 
+# Round elapsed-time columns so committed compact tables remain readable.
 impl_round_timing_columns <- function(df, digits = 6) {
   timing_cols <- grep("elapsed", names(df), value = TRUE)
 

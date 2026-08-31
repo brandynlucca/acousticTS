@@ -1,3 +1,5 @@
+# Build HPA response and formulation-comparison figures for a fluid sphere.
+# Outputs are written to vignettes/hpa as declared in the manifest.
 source("tools/implementation-figures/helpers/common.R")
 impl_load_all()
 
