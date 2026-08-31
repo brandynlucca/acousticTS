@@ -82,10 +82,12 @@ assigned.
 
 The function performs two stages for each model. The initializer converts the
 scatterer and call arguments into the model-specific parameterization. The
-solver then calculates and stores the result. Inspect the two slots with
+solver then calculates and stores the result. Use `show()` for a compact object
+summary, then inspect the two result slots with
 [`extract()`](../../reference/extract.html):
 
 ```{r}
+show(scatterer_obj)
 names(extract(scatterer_obj, "model_parameters"))
 names(extract(scatterer_obj, "model"))
 
@@ -203,8 +205,9 @@ plot(scatterer_obj, type = "model")
 For quantitative work, extract the underlying result rather than reading values
 from a plot. Target strength is appropriate for logarithmic reporting.
 Cross-section or complex amplitude may be required for linear averaging,
-coherent combination, or mechanism-level analysis. See [Plotting and
-Inspecting Results](../plotting-inspecting-results/plotting-inspecting-results.html).
+coherent combination, or mechanism-level analysis. Before comparison or export,
+confirm the shape and orientation, requested model, frequency grid, and output
+columns.
 
 # When to run again
 

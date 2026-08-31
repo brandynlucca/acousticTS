@@ -67,3 +67,29 @@ acousticTS:::.model_family_overview(
 )
 ```
 
+# Calibration as a reference workflow
+
+SOEMS is not simply another spherical model. A calibration sphere is used as a
+reference target, so its diameter, material properties, surrounding medium, and
+frequency grid must describe the actual calibration conditions. A smooth or
+plausible spectrum is not sufficient evidence that the reference response is
+correct.
+
+```{r calibration_workflow_map, echo=FALSE, out.width='100%', fig.align='center', fig.alt='Calibration workflow from defining and checking an elastic sphere through running SOEMS and interpreting the result as a reference.'}
+knitr::include_graphics("../calibration-workflow/calibration-workflow-map.svg")
+```
+
+The practical sequence is:
+
+1. construct the sphere with the specified material and diameter,
+2. confirm the elastic and surrounding-water properties against the source for
+   the physical standard,
+3. evaluate SOEMS on the instrument or comparison frequency grid, and
+4. compare the result with the applicable reference curve before using it for
+   calibration.
+
+The [implementation page](calibration-implementation.html) shows object
+construction, spectra, and external comparisons. The [material-properties
+guide](../material-properties/material-properties.html) covers preparation of
+non-default material inputs.
+

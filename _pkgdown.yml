@@ -51,12 +51,8 @@ navbar:
           href: articles/model-selection/model-selection.html
         - text: "Comparing Models"
           href: articles/comparing-models/comparing-models.html
-        - text: "Visualizing results"
-          href: articles/plotting-inspecting-results/plotting-inspecting-results.html
         - text: "Simulation sweeps"
           href: articles/simulation-parameter-sweeps/simulation-parameter-sweeps.html
-        - text: "Calibration workflow"
-          href: articles/calibration-workflow/calibration-workflow.html
         - text: "Validating models"
           href: articles/validation-benchmarks/validation-benchmarks.html
     library:
@@ -112,9 +108,7 @@ articles:
       - running-models/running-models
       - model-selection/model-selection
       - comparing-models/comparing-models
-      - plotting-inspecting-results/plotting-inspecting-results
       - simulation-parameter-sweeps/simulation-parameter-sweeps
-      - calibration-workflow/calibration-workflow
       - validation-benchmarks/validation-benchmarks
 
   - title: Model Library
