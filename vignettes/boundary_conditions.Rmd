@@ -20,316 +20,573 @@ vignette: >
 
 # Introduction
 
-The boundary families summarized here correspond to the classical fluid, rigid, elastic, shell, and viscous-interface scattering literature [@Anderson_1950; @Faran_1951; @Goodman_1962; @Feuillade_1998].
+Boundary conditions turn the governing wave equations into a particular
+scattering problem. They state whether an interface can sustain pressure,
+whether it can move, and which field quantities pass continuously between
+adjacent media. A fixed-rigid surface, a pressure-release surface, and a
+penetrable fluid target can therefore scatter very differently even when they
+have the same geometry.
 
+The conditions must act on the **total** field at an exterior boundary. The
+incident and scattered fields are separated to solve the exterior problem, but
+neither field generally satisfies the boundary condition alone [@Colton_2013].
 
-
-Boundary conditions are the mathematical statements that turn a general wave equation into a specific scattering problem. In target-strength modeling, they specify what the target surface can and cannot do in response to the incident sound field. A boundary may be perfectly rigid, perfectly pressure releasing, fluid transmitting, weakly contrasting, or dynamically elastic. Those are not just different algebraic cases. They are different physical idealizations, and they produce different scattering mechanisms even for the same gross geometry.
-
-This page gathers the main boundary families that recur throughout the theory articles. The aim is to explain both the mathematics and the physics clearly enough that a reader can understand what is being assumed before turning to any model-specific derivation.
-
-It is best read alongside the shared
-[acoustic scattering primer](acoustic-scattering-primer/acoustic-scattering-primer.html)
-and [notation guide](notation-and-symbols/notation-and-symbols.html). In the
-package theory pages, medium `1` is always the surrounding seawater, medium `2`
-is the first target region encountered from the outside, and deeper internal
-regions are numbered inward.
-
-The main boundary families separate most naturally according to the field quantity constrained most directly at the interface: pressure, normal velocity, layered acoustic transmission, or elastic traction.
+::: {.note data-title="Notation"}
+See [Notation and Symbols](notation-and-symbols/notation-and-symbols.html) and
+the [Acoustic Scattering Primer](acoustic-scattering-primer/acoustic-scattering-primer.html).
+:::
 
 # Shared interface notation
 
-Before specializing to any one interface, it helps to keep the common
-two-medium notation explicit. If media `i` and `j` meet at an interface, then
-the density and sound-speed contrasts are:
+Medium `1` is the exterior fluid. Target regions are numbered inward. For an
+unlayered target, $\Gamma$ denotes the interface between media `1` and `2`.
+For a shell with outer radius $a$ and inner radius $b$, the outer and inner
+interfaces are $\Gamma_a$ and $\Gamma_b$.
+
+The exterior pressure is decomposed as:
 
 $$
-  g_{ij} = \frac{\rho_i}{\rho_j},
+  p_1^{\mathrm{tot}}
+  =p_1^{\mathrm{inc}}+p_1^{\mathrm{scat}}.
+$$
+
+At a fluid-fluid interface, $\mathbf{n}$ is one unit normal used on both sides
+of the interface. Its orientation does not change the continuity conditions as
+long as it is used consistently. The normal derivative is:
+
+$$
+  \partial_n p
+  =\frac{\partial p}{\partial n}
+  =\mathbf{n}\mathbin{\cdot}\nabla p.
+$$
+
+With the $e^{-i\omega t}$ convention, the linearized momentum equation and its
+phasor form are [@Morse_1968]:
+
+$$
+  \rho_j\frac{\partial\mathbf{v}_j}{\partial t}
+  =-\nabla p_j,
   \qquad
-  h_{ij} = \frac{c_i}{c_j},
+  -i\omega\rho_j\mathbf{v}_j=-\nabla p_j.
 $$
 
-and the acoustic wavenumbers are:
+The fluid particle velocity is therefore:
 
 $$
-  k_i = \frac{\omega}{c_i},
+  \mathbf{v}_j
+  =\frac{1}{i\omega\rho_j}\nabla p_j,
   \qquad
-  k_j = \frac{\omega}{c_j}.
+  v_{n,j}
+  =\frac{1}{i\omega\rho_j}\partial_n p_j.
 $$
 
-For a one-region target in seawater, the most common contrasts are therefore
-$g_{21}$ and $h_{21}$. For a shelled target, the shell-to-water interface uses
-$g_{21}$ and $h_{21}$, while an internal fluid relative to the shell uses
-$g_{32}$ and $h_{32}$.
+Each homogeneous fluid pressure satisfies the Helmholtz equation:
+
+$$
+  \nabla^2p_j+k_j^2p_j=0,
+  \qquad
+  k_j=\frac{\omega}{c_j}.
+$$
+
+The directional density and sound-speed ratios used for adjacent media are:
+
+$$
+  g_{ij}=\frac{\rho_i}{\rho_j},
+  \qquad
+  h_{ij}=\frac{c_i}{c_j}.
+$$
+
+Thus, $g_{21}$ and $h_{21}$ compare the first target region with the exterior.
+For a shelled target, $g_{32}$ and $h_{32}$ compare the core with the shell.
 
 # Simple boundaries
 
 ## Fixed rigid
 
-A fixed rigid boundary is the limiting case of a scatterer whose surface cannot move in the normal direction. In an inviscid surrounding fluid, the acoustic pressure field $p(\mathbf{x}, t)$ and the particle velocity field $\mathbf{v}(\mathbf{x}, t)$ satisfy the linearized momentum equation:
+A fixed-rigid boundary cannot move in its normal direction. The normal fluid
+velocity at the surface must therefore vanish:
 
 $$
-  \rho \frac{\partial \mathbf{v}}{\partial t} = -\nabla p,
+  v_{n,1}=\mathbf{v}_1\mathbin{\cdot}\mathbf{n}=0
+  \qquad\text{on }\Gamma.
 $$
 
-where $\rho$ is the surrounding-fluid density, $\mathbf{x}$ is the position vector, and $\nabla p$ is the pressure gradient. If $\mathbf{n}$ denotes the outward unit normal vector to the target surface, then the normal component of particle velocity is:
+The same limit can be expressed through the specific surface impedance:
 
 $$
-  v_n = \mathbf{v} \cdot \mathbf{n},
+  Z_s=\frac{p_1^{\mathrm{tot}}}{v_{n,1}},
+  \qquad
+  |Z_s|\longrightarrow\infty.
 $$
 
-where the dot denotes the Euclidean inner product. The mechanical impedance at the boundary is then defined by:
+Substitution of the phasor momentum relation gives the Neumann boundary
+condition:
 
 $$
-  Z_s = \frac{p}{v_n},
+  \partial_n p_1^{\mathrm{tot}}=0
+  \qquad\text{on }\Gamma.
 $$
 
-where $Z_s$ is the surface impedance. For a rigid boundary, the surface cannot move, so:
+In terms of the incident and scattered fields, the prescribed data for the
+scattered field are:
 
 $$
-  v_n = 0.
+  \partial_n p_1^{\mathrm{scat}}
+  =-\partial_n p_1^{\mathrm{inc}}
+  \qquad\text{on }\Gamma.
 $$
 
-With harmonic time dependence, that implies the Neumann boundary condition:
-
-$$
-  \frac{\partial p}{\partial n} =
-    \nabla p \cdot \mathbf{n} =
-    0,
-$$
-
-where $\partial / \partial n$ denotes the derivative taken along the outward normal direction. The exterior acoustic field is therefore solved subject to:
-
-$$
-  \nabla^2 p + k^2 p = 0,
-$$
-
-where $k = \omega / c$ is the surrounding-fluid wavenumber, $\omega$ is angular frequency, and $c$ is sound speed. Physically, the interface stores no normal motion. In partial-wave and modal formulations, that condition fixes the scattering coefficients by eliminating any solution that would produce radial displacement of the boundary. In the high-frequency limit, a sufficiently smooth rigid surface supports specular reflection without the phase inversion associated with a pressure-release boundary.
+The pressure itself need not vanish. Instead, the reflected field cancels the
+incident normal velocity at the surface. In partial-wave formulations, the
+Neumann condition fixes each scattering coefficient by excluding any total
+field that would produce radial surface motion. At high frequency, a smooth
+rigid surface supports a locally specular reflection without the pressure
+phase reversal of a pressure-release surface.
 
 ## Pressure release
 
-A pressure-release boundary is the opposite limiting case. Here the surface cannot sustain an acoustic pressure fluctuation, so the interface behaves like a perfectly soft boundary. In impedance language:
+A pressure-release surface cannot sustain an acoustic pressure fluctuation.
+It is the zero-impedance limit:
 
 $$
-  Z_s = \frac{p}{v_n} \to 0.
+  Z_s=\frac{p_1^{\mathrm{tot}}}{v_{n,1}},
+  \qquad
+  |Z_s|\longrightarrow0.
 $$
 
-For finite normal motion, the only consistent condition is:
+For finite normal velocity, the total pressure obeys the Dirichlet condition:
 
 $$
-  p = 0.
+  p_1^{\mathrm{tot}}=0
+  \qquad\text{on }\Gamma.
 $$
 
-This is a Dirichlet boundary condition. It removes any admissible solution of the Helmholtz equation that carries nonzero pressure at the interface. Physically, this corresponds to a surface that relieves pressure fluctuations essentially instantaneously, as in an idealized gas interface or other highly compliant boundary. Relative to the rigid case, the reflected pressure undergoes a phase reversal. In modal descriptions, the scattering coefficients are fixed by enforcing zero pressure rather than zero normal velocity at the surface.
+The corresponding condition on the scattered field is:
+
+$$
+  p_1^{\mathrm{scat}}=-p_1^{\mathrm{inc}}
+  \qquad\text{on }\Gamma.
+$$
+
+Normal motion is not constrained to vanish. The idealization is appropriate
+when the material on the other side has negligible acoustic impedance relative
+to the exterior fluid, as for an idealized gas boundary away from effects that
+require an explicit interior solution. A locally reflected pressure wave
+undergoes a phase reversal. In a modal solution, zero surface pressure replaces
+the zero-normal-velocity condition used for a rigid target.
 
 ## Fluid-filled
 
-For a fluid-filled scatterer, both the exterior and interior regions support acoustic pressure fields. Let medium 1 denote the surrounding fluid and medium 2 the interior fluid. Then:
+A penetrable fluid target supports acoustic pressure on both sides of its
+boundary. The exterior total field and interior field satisfy [@Anderson_1950]:
 
 $$
-  \nabla^2 p_1 + k_1^2 p_1 = 0,
+  \nabla^2p_1^{\mathrm{tot}}+k_1^2p_1^{\mathrm{tot}}=0,
   \qquad
-  \nabla^2 p_2 + k_2^2 p_2 = 0,
+  \nabla^2p_2+k_2^2p_2=0.
 $$
 
-where $p_1$ and $p_2$ are the exterior and interior pressures, and:
+An inviscid fluid has Cauchy stress
+$\boldsymbol{\sigma}_j=-p_j\mathbf{I}$. Continuity of normal traction therefore
+requires pressure continuity:
 
 $$
-  k_j = \frac{\omega}{c_j},
+  p_1^{\mathrm{tot}}=p_2
+  \qquad\text{on }\Gamma.
+$$
+
+The interface also admits neither separation nor interpenetration, so normal
+particle velocity is continuous:
+
+$$
+  \mathbf{v}_1\mathbin{\cdot}\mathbf{n}
+  =\mathbf{v}_2\mathbin{\cdot}\mathbf{n}
+  \qquad\text{on }\Gamma.
+$$
+
+Using the momentum equation gives the derivative form of the second
+transmission condition:
+
+$$
+  \frac{1}{\rho_1}\partial_n p_1^{\mathrm{tot}}
+  =\frac{1}{\rho_2}\partial_n p_2
+  \qquad\text{on }\Gamma.
+$$
+
+Pressure and normal motion are both generally nonzero. Their continuity couples
+the exterior and interior solutions, while density and compressibility
+contrasts determine the strength and phase of the reflected and transmitted
+fields [@Medwin_1998]. Tangential velocity need not be continuous across an
+ideal inviscid fluid-fluid interface because neither fluid transmits shear
+traction.
+
+# Acoustic shelled boundaries
+
+<span id="inelastic-shelled-boundaries"></span>
+
+An acoustic shell is a finite fluid layer, not an immobile shell and not an
+elastic solid. Medium `2` occupies the region between $\Gamma_a$ and
+$\Gamma_b$. It supports compressional pressure waves but no shear stress. The
+shell field satisfies:
+
+$$
+  \nabla^2p_2+k_2^2p_2=0
+  \qquad\text{between }\Gamma_a\text{ and }\Gamma_b.
+$$
+
+At the outer interface, pressure and normal velocity are continuous:
+
+$$
+  p_1^{\mathrm{tot}}=p_2,
   \qquad
-  j = 1, 2,
+  \frac{1}{\rho_1}\partial_n p_1^{\mathrm{tot}}
+  =\frac{1}{\rho_2}\partial_n p_2
+  \qquad\text{on }\Gamma_a.
 $$
 
-with $c_j$ the sound speed in medium $j$. At the interface, continuity of normal traction gives continuity of acoustic pressure:
+For a spherical shell, both independent radial solutions are admissible because
+the layer does not include the origin. An axisymmetric shell field can be
+expanded as:
 
 $$
-  p_1 = p_2.
+  p_2(r,\theta)
+  =\sum_{m=0}^{\infty}
+  \left[
+    B_m\,j_m(k_2r)+C_m\,y_m(k_2r)
+  \right]P_m(\cos\theta),
+  \qquad b<r<a.
 $$
 
-Continuity of normal particle velocity gives:
-
-$$
-  \mathbf{v}_1 \cdot \mathbf{n} =
-    \mathbf{v}_2 \cdot \mathbf{n},
-$$
-
-where $\mathbf{v}_1$ and $\mathbf{v}_2$ are the particle-velocity fields in the two media. Using the linearized momentum relation in each fluid:
-
-$$
-  \mathbf{v}_j = -\frac{1}{i \omega \rho_j}\nabla p_j,
-$$
-
-the normal-velocity condition can also be written as:
-
-$$
-  \frac{1}{\rho_1}\frac{\partial p_1}{\partial n} =
-    \frac{1}{\rho_2}\frac{\partial p_2}{\partial n}.
-$$
-
-These are the standard transmission conditions for an acoustic fluid-fluid boundary [@Morse_1968; @Medwin_1998]. Neither pressure nor normal motion is forced to vanish. Instead, both media participate in the interface dynamics, and the scattering is controlled by density and compressibility contrast across the boundary.
-
-# Inelastic shelled boundaries
-
-The inelastic shelled cases are layered acoustic idealizations rather than true elastic shell problems. The shell is treated as a non-deforming, non-shear-supporting layer that constrains the adjacent acoustic fields kinematically. That makes these boundaries useful as simplified layered models, but they should be distinguished clearly from a genuinely elastic shell that supports both compressional and shear waves.
+Here, $j_m$ and $y_m$ are spherical Bessel functions of the first and second
+kinds. The singularity of $y_m(k_2r)$ at the origin is irrelevant because
+$r=0$ is outside the shell layer. The condition at $\Gamma_b$ determines the
+relative weights of these two branches.
 
 ## Pressure release interior
 
-In this configuration, an inelastic shell surrounds a pressure-release interior. The shell is assumed not to support elastic wave propagation and not to deform according to Hooke's law. It therefore acts as a kinematic constraint rather than as a dynamic elastic medium. A convenient way to describe the surrounding-fluid and shell-adjacent acoustic fields is to introduce an exterior pressure field $p_{\text{exterior}}$ and an acoustic field immediately adjacent to the shell, written here as $p_{\text{shell}}$.
-
-At the shell-exterior interface, continuity of pressure and normal velocity with the surrounding fluid is enforced:
-
-$$
-  p_{\text{shell}} = p_{\text{exterior}},
-  \qquad
-  v_{n,\text{shell}} = v_{n,\text{exterior}},
-$$
-
-where $v_{n,\text{shell}}$ and $v_{n,\text{exterior}}$ are the normal particle velocities just inside and outside the shell interface, respectively. At the shell-interior interface, the interior is pressure releasing, so:
+For a pressure-release core, the shell pressure vanishes at the inner
+interface:
 
 $$
-  p_{\text{shell}} = 0,
-  \qquad
-  v_{n,\text{shell}} \neq 0.
+  p_2=0
+  \qquad\text{on }\Gamma_b.
 $$
 
-This idealization means that the shell must transmit normal motion while accommodating a zero-pressure cavity on its inner side. The shell itself does not carry elastic shell-wave physics, but it does modify how the exterior acoustic field couples to the interior cavity. In scattering formulations, the resulting layered boundary conditions differ from both rigid and ordinary fluid-filled cases and can introduce low-frequency cavity-type resonances.
+In a spherical modal solution, a radial combination that satisfies this inner
+condition identically is:
 
-Mathematically, this case may be viewed as an acoustic transmission problem with an outer continuity condition and an inner Dirichlet condition. The shell is therefore acting as a geometric and kinematic intermediary between the exterior fluid and a pressure-release cavity, not as an elastic medium in its own right.
+$$
+  R_m^{\mathrm{pr}}(r)
+  =j_m(k_2r)y_m(k_2b)-y_m(k_2r)j_m(k_2b).
+$$
+
+Its value at the inner radius is:
+
+$$
+  R_m^{\mathrm{pr}}(b)=0.
+$$
+
+The outer pressure and velocity conditions then couple this admissible shell
+field to $p_1^{\mathrm{tot}}$. The shell can carry normal acoustic motion even
+though the pressure is zero at its inner boundary. Its finite thickness and
+wavenumber add propagation phase between the two interfaces. The resulting
+response can contain cavity-like resonances that are absent from a single
+pressure-release surface.
 
 ## Fluid-filled interior
 
-For an inelastic shell enclosing a fluid-filled interior, the shell is taken to have effectively infinite mechanical impedance and therefore negligible normal displacement:
+If medium `3` is a fluid or gas core, it supports its own Helmholtz field:
 
 $$
-  v_{n,\text{shell}} = 0.
+  \nabla^2p_3+k_3^2p_3=0
+  \qquad\text{inside }\Gamma_b.
 $$
 
-At the shell-exterior interface, that produces a Neumann condition on the acoustic field:
+Pressure and normal velocity are continuous at the inner interface:
 
 $$
-  \frac{\partial p_{\text{shell}}}{\partial n} = 0.
-$$
-
-At the shell-interior fluid interface, the interior fluid must satisfy continuity of pressure and normal velocity with the shell-adjacent field:
-
-$$
-  p_{\text{interior}} = p_{\text{shell}},
+  p_2=p_3,
   \qquad
-  v_{n,\text{interior}} = v_{n,\text{shell}},
+  \frac{1}{\rho_2}\partial_n p_2
+  =\frac{1}{\rho_3}\partial_n p_3
+  \qquad\text{on }\Gamma_b.
 $$
 
-where $p_{\text{interior}}$ is the interior-fluid pressure and $v_{n,\text{interior}}$ is the interior-fluid normal velocity at the inner shell surface. Because the shell is inelastic, one typically also takes:
+For a spherical core containing the origin, regularity excludes the spherical
+Bessel function of the second kind. The core expansion is therefore:
 
 $$
-  v_{n,\text{shell}} \approx 0.
+  p_3(r,\theta)
+  =\sum_{m=0}^{\infty}D_m\,j_m(k_3r)P_m(\cos\theta),
+  \qquad 0\leq r<b.
 $$
 
-The interior fluid therefore experiences an effectively rigid boundary while still supporting compressional waves of its own. In that sense, the system is a layered acoustic cavity rather than an elastic shell. The resulting scattering is controlled by acoustic layering and cavity behavior rather than by shell-wave propagation.
-
-To make that structure explicit, the interior acoustic field still satisfies:
-
-$$
-  \nabla^2 p_{\text{interior}} +
-    k_{\text{interior}}^2 p_{\text{interior}} = 0,
-$$
-
-The associated interior wavenumber is:
-
-$$
-  k_{\text{interior}} = \frac{\omega}{c_{\text{interior}}},
-$$
-
-where $c_{\text{interior}}$ is the sound speed of the interior fluid. The shell therefore modifies the interior field through boundary constraints even though it does not itself support elastic motion.
+Together, the two conditions at $\Gamma_a$ and the two at $\Gamma_b$ determine
+the exterior scattering field, the two shell branches, and the regular core
+field for each mode. The shell is not assigned infinite impedance, and its
+normal velocity is not set to zero. Resonance and interference arise from
+compressional propagation through the shell and core rather than from elastic
+shear or bending waves.
 
 # Elastic shelled boundaries
 
 ## Elastic shell boundary
 
-An elastic shell supports both longitudinal and transverse elastic motion [@Achenbach_1973]. The displacement field $\mathbf{u}(\mathbf{x}, t)$ within the shell satisfies the Navier equation:
+An elastic shell supports longitudinal and transverse motion. Its displacement
+$\mathbf{u}(\mathbf{x},t)$ follows from balance of linear momentum and Hooke's
+law. For a homogeneous isotropic shell, the time-domain Navier equation is
+[@Achenbach_1973]:
 
 $$
-  (\lambda + 2 \mu)\nabla(\nabla \cdot \mathbf{u}) -
-    \mu \nabla \times (\nabla \times \mathbf{u}) +
-    \rho_s \frac{\partial^2 \mathbf{u}}{\partial t^2} =
-    0,
+  (\lambda+2\mu)\nabla(\nabla\mathbin{\cdot}\mathbf{u})
+  -\mu\nabla\mathbin{\times}(\nabla\mathbin{\times}\mathbf{u})
+  -\rho_s\frac{\partial^2\mathbf{u}}{\partial t^2}
+  =0.
 $$
 
-where $\lambda$ and $\mu$ are the Lamé parameters and $\rho_s$ is the shell density. Using the Helmholtz decomposition:
+For a displacement phasor with $e^{-i\omega t}$ dependence, this becomes:
 
 $$
-  \mathbf{u} = \nabla \phi + \nabla \times \mathbf{\Psi},
+  (\lambda+2\mu)\nabla(\nabla\mathbin{\cdot}\mathbf{u})
+  -\mu\nabla\mathbin{\times}(\nabla\mathbin{\times}\mathbf{u})
+  +\rho_s\omega^2\mathbf{u}
+  =0.
 $$
 
-the displacement separates into longitudinal and transverse potentials, each satisfying its own Helmholtz equation with wavenumbers:
+The Helmholtz decomposition separates dilatational and equivoluminal motion:
 
 $$
-  k_\ell = \frac{\omega}{c_\ell},
+  \mathbf{u}=\nabla\Phi+\nabla\mathbin{\times}\mathbf{\Psi},
   \qquad
-  k_\tau = \frac{\omega}{c_\tau},
+  \nabla\mathbin{\cdot}\mathbf{\Psi}=0.
 $$
 
-and wave speeds:
+The scalar and vector potentials satisfy separate Helmholtz equations:
 
 $$
-  c_\ell = \sqrt{\frac{\lambda + 2 \mu}{\rho_s}},
+  \nabla^2\Phi+k_L^2\Phi=0,
   \qquad
-  c_\tau = \sqrt{\frac{\mu}{\rho_s}}.
+  \nabla^2\mathbf{\Psi}+k_T^2\mathbf{\Psi}=0.
 $$
 
-The elastic stress tensor is:
+Their wavenumbers and wave speeds are:
 
 $$
-  \sigma_{ij} =
-    \lambda \delta_{ij}\nabla \cdot \mathbf{u} +
-    2 \mu \varepsilon_{ij},
-$$
-
-where $\delta_{ij}$ is the Kronecker delta and $\varepsilon_{ij}$ is the infinitesimal strain tensor:
-
-$$
-  \varepsilon_{ij} =
-    \frac{1}{2}
-  \left(
-  \frac{\partial u_i}{\partial x_j} +
-    \frac{\partial u_j}{\partial x_i}
-  \right).
-$$
-
-At a fluid-solid interface, the fluid pressure must balance the normal traction in the shell, the normal fluid velocity must match the normal shell velocity, and the tangential traction must vanish because the fluid is inviscid. If $u_n = \mathbf{u} \cdot \mathbf{n}$ is the shell displacement in the normal direction, $\sigma_{nn}$ is the normal traction, and $\sigma_{nt}$ is the tangential traction, then the interface conditions may be written schematically as:
-
-$$
-  p = -\sigma_{nn},
-  \qquad -\frac{1}{i \omega \rho_f}\frac{\partial p}{\partial n} = -i \omega u_n,
+  k_L=\frac{\omega}{c_L},
   \qquad
-  \sigma_{nt} = 0,
+  k_T=\frac{\omega}{c_T},
+  \qquad
+  c_L=\sqrt{\frac{\lambda+2\mu}{\rho_s}},
+  \qquad
+  c_T=\sqrt{\frac{\mu}{\rho_s}}.
 $$
 
-where $\rho_f$ is the fluid density. The exact sign of the pressure-traction relation depends on the outward-normal convention, but the physical content is unchanged. The shell carries both normal and tangential motion, and that coupling makes the scattering problem much richer than either the rigid or the inelastic-shell cases. The resulting modal systems support resonance structure associated with shell thickness, elastic moduli, and both the exterior and interior fluid properties.
+The infinitesimal strain and Cauchy stress tensors are:
+
+$$
+  \boldsymbol{\varepsilon}
+  =\frac{1}{2}\left[
+    \nabla\mathbf{u}+(\nabla\mathbf{u})^{\mathsf T}
+  \right],
+  \qquad
+  \boldsymbol{\sigma}
+  =\lambda(\nabla\mathbin{\cdot}\mathbf{u})\mathbf{I}
+  +2\mu\boldsymbol{\varepsilon}.
+$$
+
+At either fluid-solid interface, let $\mathbf{n}_s$ point from the solid shell
+into the adjacent fluid. The fluid stress is
+$\boldsymbol{\sigma}_f=-p_f\mathbf{I}$. Continuity of traction is then the
+vector condition:
+
+$$
+  \boldsymbol{\sigma}\mathbf{n}_s
+  =-p_f\mathbf{n}_s.
+$$
+
+Separating that relation into normal and tangential parts gives:
+
+$$
+  \mathbf{n}_s\mathbin{\cdot}
+  \boldsymbol{\sigma}\mathbf{n}_s=-p_f,
+  \qquad
+  (\mathbf{I}-\mathbf{n}_s\mathbf{n}_s^{\mathsf T})
+  \boldsymbol{\sigma}\mathbf{n}_s=\mathbf{0}.
+$$
+
+The second condition states that an inviscid fluid applies no tangential
+traction. It does not require the tangential solid displacement to vanish.
+Continuity of normal velocity supplies the remaining kinematic condition:
+
+$$
+  \mathbf{v}_f\mathbin{\cdot}\mathbf{n}_s
+  =-i\omega\mathbf{u}\mathbin{\cdot}\mathbf{n}_s.
+$$
+
+Written in terms of fluid pressure, the same condition is:
+
+$$
+  \frac{1}{i\omega\rho_f}\partial_{n_s}p_f
+  =-i\omega u_n,
+  \qquad
+  u_n=\mathbf{u}\mathbin{\cdot}\mathbf{n}_s.
+$$
+
+At the outer shell surface, $p_f=p_1^{\mathrm{tot}}$. At the inner surface,
+$p_f=p_3$. The normal $\mathbf{n}_s$ points radially outward at $r=a$ and
+radially inward at $r=b$. Stating the normal this way removes any ambiguity in
+the pressure-traction sign.
+
+For a solid elastic target with no core, these conditions are imposed only at
+the exterior surface. Regularity at the origin excludes singular longitudinal
+and transverse radial solutions. The resulting fluid-solid coupling is the
+starting point for classical elastic-sphere and elastic-cylinder scattering
+theory [@Faran_1951].
+
+For an axisymmetric shell, normal traction, normal velocity, and one tangential
+traction condition are imposed at each radius. These six scalar conditions
+couple the exterior acoustic field, both elastic potentials in the shell, and
+the interior acoustic field [@Goodman_1962]. They admit resonances governed by
+shell thickness, density, longitudinal and transverse wave speeds, and fluid
+loading. This is the essential distinction from an acoustic shell, which has
+no transverse potential and cannot support shear or bending motion
+[@Stanton_1990].
+
+# Viscous interfaces
+
+A compressible Newtonian viscous fluid supports deviatoric stress as well as
+pressure. If $\eta$ is the shear viscosity, $\zeta$ is the bulk viscosity, and
+$\mathbf{D}$ is the rate-of-deformation tensor, its Cauchy stress is
+[@Pierce_1989]:
+
+$$
+  \boldsymbol{\sigma}_v
+  =-p_v\mathbf{I}
+  +2\eta\mathbf{D}
+  +\left(\zeta-\frac{2}{3}\eta\right)
+  (\nabla\mathbin{\cdot}\mathbf{v}_v)\mathbf{I}.
+$$
+
+The rate-of-deformation tensor is:
+
+$$
+  \mathbf{D}
+  =\frac{1}{2}\left[
+    \nabla\mathbf{v}_v+(\nabla\mathbf{v}_v)^{\mathsf T}
+  \right].
+$$
+
+At an interface with an inviscid acoustic fluid, let $\mathbf{n}$ point from
+the viscous medium into the inviscid fluid. Normal traction and normal velocity
+are continuous:
+
+$$
+  \mathbf{n}\mathbin{\cdot}\boldsymbol{\sigma}_v\mathbf{n}
+  =-p_f,
+  \qquad
+  \mathbf{v}_v\mathbin{\cdot}\mathbf{n}
+  =\mathbf{v}_f\mathbin{\cdot}\mathbf{n}.
+$$
+
+Because the inviscid fluid cannot apply shear traction, the tangential traction
+on the viscous side vanishes:
+
+$$
+  (\mathbf{I}-\mathbf{n}\mathbf{n}^{\mathsf T})
+  \boldsymbol{\sigma}_v\mathbf{n}=\mathbf{0}.
+$$
+
+At a bonded viscous-fluid and elastic-solid interface, both velocity and
+traction are continuous. With $\mathbf{n}$ used consistently on both sides,
+the phasor conditions are:
+
+$$
+  \mathbf{v}_v=-i\omega\mathbf{u}_s,
+  \qquad
+  \boldsymbol{\sigma}_v\mathbf{n}
+  =\boldsymbol{\sigma}_s\mathbf{n}.
+$$
+
+These vector conditions couple normal and tangential motion. Viscous
+compressional and shear branches are generally attenuating, so the interface
+can broaden and damp resonances that would be sharper in a lossless elastic
+shell [@Feuillade_1998].
+
+# Circumferential waves and resonance families
+
+Boundary conditions do not introduce circumferential waves as separate terms.
+Instead, they determine which wave families the complete field solution can
+support and how those waves couple to the exterior fluid. Geometry, frequency,
+material properties, and attenuation then control their phase, propagation
+distance, and resonance structure [@Uberall_1973].
+
+| Phenomenon | Boundary setting | Physical interpretation |
+|---|---|---|
+| Franz or creeping waves | Smooth convex rigid or pressure-release boundaries | Exterior diffracted waves that follow the surface into the geometrical shadow while continually radiating into the surrounding fluid. |
+| Rayleigh-type waves | Fluid-loaded elastic solids and sufficiently thick elastic shells | Surface-localized elastic motion formed from coupled longitudinal and transverse fields. |
+| Lamb-type waves | Thin or moderately thin elastic shells | Dispersive guided shell waves whose motion depends on the conditions at both shell surfaces. |
+| Whispering-gallery waves | Penetrable fluid or elastic targets | High-order internal or surface-guided waves retained near the boundary by repeated refraction or reflection. |
+| Glory | Spherical or nearly axisymmetric targets | A directional enhancement produced when circumferential contributions converge coherently near a symmetry direction. It is an interference or focusing effect, not a separate wave family. |
+
+These labels describe identifiable contributions within an exact modal solution.
+They are not additional boundary conditions. For example, the longitudinal and
+transverse potentials of an elastic target already contain its surface and
+guided-wave contributions once the traction and velocity conditions have been
+enforced. Separating those contributions generally requires modal phase,
+resonance-pole, time-domain, or asymptotic analysis. Surface-elastic-wave
+interpretations of elastic-sphere and elastic-cylinder backscatter provide a
+classical example [@Marston_1988].
 
 # Weak, fluid-like
 
-The weak fluid-like case is best understood as an approximation regime rather than as a sharply enforcing boundary type. The main assumption is that the target differs only slightly from the surrounding medium, so the acoustic field inside the scatterer remains close to the incident field. In that limit:
+Weak fluid-like scattering is an approximation regime, not a replacement for
+the fluid-fluid transmission conditions. For spatially varying density and
+compressibility, the source-free pressure equation can be written as:
 
 $$
-  p_{\text{interior}} \approx p_{\text{exterior}}.
-$$
-
-The corresponding material contrasts are small. If $\rho_1$ and $c_1$ denote the surrounding-fluid density and sound speed, and $\rho_2$ and $c_2$ denote the target values, one typically writes:
-
-$$
-  g = \frac{\rho_2}{\rho_1} \approx 1,
+  \nabla\mathbin{\cdot}
+  \left(\frac{1}{\rho}\nabla p\right)
+  +\omega^2\kappa p=0,
   \qquad
-  h = \frac{c_2}{c_1} \approx 1.
+  \kappa=\frac{1}{\rho c^2}.
 $$
 
-Equivalent density and compressibility contrasts may be written as:
+When medium `2` differs only slightly from medium `1`, its total internal field
+may be replaced at first order by the incident field:
 
 $$
-  \gamma_\rho = \frac{\rho_2 - \rho_1}{\rho_2},
+  p_2(\mathbf{x})\approx p_1^{\mathrm{inc}}(\mathbf{x}).
+$$
+
+The density and sound-speed ratios must remain close to unity:
+
+$$
+  g_{21}=\frac{\rho_2}{\rho_1}\approx1,
   \qquad
-  \gamma_\kappa = \frac{\kappa_2 - \kappa_1}{\kappa_1},
+  h_{21}=\frac{c_2}{c_1}\approx1.
 $$
 
-where $\kappa_j = (\rho_j c_j^2)^{-1}$ is compressibility in medium $j$ [@Medwin_1998]. The scattered field is then treated as a first-order perturbation produced by these small departures from the surrounding fluid rather than by a strongly reflecting or traction-supporting surface.
+The corresponding density and compressibility perturbations are:
 
-This is why weak-scattering treatments are usually expressed as perturbative approximations instead of exact boundary-value problems with a sharply enforcing interface condition. Physically, the target behaves approximately like the surrounding fluid, and the backscatter is produced by residual density and compressibility contrasts rather than by a large impedance jump at the boundary.
+$$
+  \gamma_\rho
+  =\frac{\rho_2-\rho_1}{\rho_2}
+  =1-\frac{1}{g_{21}},
+  \qquad
+  \gamma_\kappa
+  =\frac{\kappa_2-\kappa_1}{\kappa_1}
+  =\frac{1}{g_{21}h_{21}^2}-1.
+$$
+
+The weak-contrast assumption requires:
+
+$$
+  |\gamma_\rho|\ll1,
+  \qquad
+  |\gamma_\kappa|\ll1.
+$$
+
+The scattered field is then the first-order response to the residual density
+and compressibility contrasts [@Chu_1999]. Strong impedance jumps, internal
+multiple scattering, and resonant behavior violate this approximation even
+though the exact fluid-fluid boundary conditions remain valid.
