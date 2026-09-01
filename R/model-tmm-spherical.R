@@ -464,7 +464,7 @@
           rho_sw = rho_sw,
           rho_body = rho_body
         )
-        coeffs <- as.vector(solved$T %*% incident$a_inc)
+        coeffs <- as.vector(solved[["T"]] %*% incident$a_inc)
 
         t_store[[frequency_idx]][[m + 1L]] <- list(
           m = m,
@@ -472,7 +472,7 @@
           p_inc = incident$p_inc,
           coefficients = coeffs,
           rcond_lhs = solved$rcond_lhs,
-          T = if (isTRUE(store_t_matrix)) solved$T else NULL
+          T = if (isTRUE(store_t_matrix)) solved[["T"]] else NULL
         )
       }
     }
@@ -523,7 +523,7 @@
 
     # Apply the block T-matrix to the incident coefficients ====================
     incident <- .tmm_spherical_incident_block(setup, mu0)
-    coeffs <- as.vector(solved$T %*% incident$a_inc)
+    coeffs <- as.vector(solved[["T"]] %*% incident$a_inc)
 
     # Store the solved block and its diagnostic bookkeeping ====================
     blocks[[m + 1L]] <- list(
@@ -532,7 +532,7 @@
       p_inc = incident$p_inc,
       coefficients = coeffs,
       rcond_lhs = solved$rcond_lhs,
-      T = if (isTRUE(store_t_matrix)) solved$T else NULL
+      T = if (isTRUE(store_t_matrix)) solved[["T"]] else NULL
     )
   }
 
