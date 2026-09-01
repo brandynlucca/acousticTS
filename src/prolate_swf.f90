@@ -153,23 +153,25 @@ module prolate_swf
         pdnorm(maxt), pnorm(maxt), alpha(maxp), beta(maxp), gamma(maxp), &
         coefa(maxp), coefb(maxp), coefc(maxp), coefd(maxp), coefe(maxp)
     integer, intent(out) :: ipdnorm(maxt), ipnorm(maxt)
+    integer :: ncoef
 
     ! Copy cached arrays back into the caller's workspaces.
+    ncoef = min(lim + 2, maxp)
     barg(1:narg) = pleg_cache(idx)%barg(1:narg)
-    pr(1:maxt, 1:lim) = pleg_cache(idx)%pr(1:maxt, 1:lim)
-    pdr(1:maxt, 1:lim) = pleg_cache(idx)%pdr(1:maxt, 1:lim)
+    pr(1:maxt, 1:ncoef) = pleg_cache(idx)%pr(1:maxt, 1:ncoef)
+    pdr(1:maxt, 1:ncoef) = pleg_cache(idx)%pdr(1:maxt, 1:ncoef)
     pdnorm(1:maxt) = pleg_cache(idx)%pdnorm(1:maxt)
     ipdnorm(1:maxt) = pleg_cache(idx)%ipdnorm(1:maxt)
     pnorm(1:maxt) = pleg_cache(idx)%pnorm(1:maxt)
     ipnorm(1:maxt) = pleg_cache(idx)%ipnorm(1:maxt)
-    alpha(1:lim) = pleg_cache(idx)%alpha(1:lim)
-    beta(1:lim) = pleg_cache(idx)%beta(1:lim)
-    gamma(1:lim) = pleg_cache(idx)%gamma(1:lim)
-    coefa(1:lim) = pleg_cache(idx)%coefa(1:lim)
-    coefb(1:lim) = pleg_cache(idx)%coefb(1:lim)
-    coefc(1:lim) = pleg_cache(idx)%coefc(1:lim)
-    coefd(1:lim) = pleg_cache(idx)%coefd(1:lim)
-    coefe(1:lim) = pleg_cache(idx)%coefe(1:lim)
+    alpha(3:ncoef) = pleg_cache(idx)%alpha(3:ncoef)
+    beta(3:ncoef) = pleg_cache(idx)%beta(3:ncoef)
+    gamma(3:ncoef) = pleg_cache(idx)%gamma(3:ncoef)
+    coefa(3:ncoef) = pleg_cache(idx)%coefa(3:ncoef)
+    coefb(3:ncoef) = pleg_cache(idx)%coefb(3:ncoef)
+    coefc(3:ncoef) = pleg_cache(idx)%coefc(3:ncoef)
+    coefd(3:ncoef) = pleg_cache(idx)%coefd(3:ncoef)
+    coefe(3:ncoef) = pleg_cache(idx)%coefe(3:ncoef)
   end subroutine
 
   subroutine store_pleg_cache(m, iopd, ndec, nex, barg, narg, maxt, lim, &
@@ -180,7 +182,7 @@ module prolate_swf
         pdnorm(maxt), pnorm(maxt), alpha(maxp), beta(maxp), gamma(maxp), &
         coefa(maxp), coefb(maxp), coefc(maxp), coefd(maxp), coefe(maxp)
     integer, intent(in) :: ipdnorm(maxt), ipnorm(maxt)
-    integer :: idx
+    integer :: idx, ncoef
 
     ! Reuse a matching slot when possible; otherwise take a free or round-robin
     ! replacement slot.
@@ -235,20 +237,23 @@ module prolate_swf
     pleg_cache(idx)%coefc = 0.0_knd
     pleg_cache(idx)%coefd = 0.0_knd
     pleg_cache(idx)%coefe = 0.0_knd
-    pleg_cache(idx)%pr(1:maxt, 1:lim) = pr(1:maxt, 1:lim)
-    pleg_cache(idx)%pdr(1:maxt, 1:lim) = pdr(1:maxt, 1:lim)
+    ncoef = min(lim + 2, maxp)
+    pleg_cache(idx)%pr(1:maxt, 1:ncoef) = pr(1:maxt, 1:ncoef)
+    if(iopd == 1 .or. iopd == 3) then
+      pleg_cache(idx)%pdr(1:maxt, 1:ncoef) = pdr(1:maxt, 1:ncoef)
+    end if
     pleg_cache(idx)%pdnorm(1:maxt) = pdnorm(1:maxt)
     pleg_cache(idx)%pnorm(1:maxt) = pnorm(1:maxt)
     pleg_cache(idx)%ipdnorm(1:maxt) = ipdnorm(1:maxt)
     pleg_cache(idx)%ipnorm(1:maxt) = ipnorm(1:maxt)
-    pleg_cache(idx)%alpha(1:lim) = alpha(1:lim)
-    pleg_cache(idx)%beta(1:lim) = beta(1:lim)
-    pleg_cache(idx)%gamma(1:lim) = gamma(1:lim)
-    pleg_cache(idx)%coefa(1:lim) = coefa(1:lim)
-    pleg_cache(idx)%coefb(1:lim) = coefb(1:lim)
-    pleg_cache(idx)%coefc(1:lim) = coefc(1:lim)
-    pleg_cache(idx)%coefd(1:lim) = coefd(1:lim)
-    pleg_cache(idx)%coefe(1:lim) = coefe(1:lim)
+    pleg_cache(idx)%alpha(3:ncoef) = alpha(3:ncoef)
+    pleg_cache(idx)%beta(3:ncoef) = beta(3:ncoef)
+    pleg_cache(idx)%gamma(3:ncoef) = gamma(3:ncoef)
+    pleg_cache(idx)%coefa(3:ncoef) = coefa(3:ncoef)
+    pleg_cache(idx)%coefb(3:ncoef) = coefb(3:ncoef)
+    pleg_cache(idx)%coefc(3:ncoef) = coefc(3:ncoef)
+    pleg_cache(idx)%coefd(3:ncoef) = coefd(3:ncoef)
+    pleg_cache(idx)%coefe(3:ncoef) = coefe(3:ncoef)
   end subroutine
 
   subroutine pleg_cached(m, lim, maxp, limcsav, iopd, ndec, nex, barg, &
@@ -258,7 +263,8 @@ module prolate_swf
     integer, intent(inout) :: limcsav
     real(knd), intent(inout) :: barg(maxt)
     real(knd), intent(out) :: pr(maxt, maxp), pdr(maxt, maxp), &
-        pdnorm(maxt), pnorm(maxt), alpha(maxp), beta(maxp), gamma(maxp), &
+        pdnorm(maxt), pnorm(maxt)
+    real(knd), intent(inout) :: alpha(maxp), beta(maxp), gamma(maxp), &
         coefa(maxp), coefb(maxp), coefc(maxp), coefd(maxp), coefe(maxp)
     integer, intent(out) :: ipdnorm(maxt), ipnorm(maxt)
     integer :: idx
@@ -604,6 +610,23 @@ module prolate_swf
     ndec = precision(c)
     nex = range(c) - 1
 
+    ! main leaves disabled radial or angular components untouched. Initialize
+    ! every temporary so copying those optional outputs remains well-defined.
+    qr1_tmp = 0.0_knd
+    qr1d_tmp = 0.0_knd
+    qr2_tmp = 0.0_knd
+    qr2d_tmp = 0.0_knd
+    s1_tmp = 0.0_knd
+    s1d_tmp = 0.0_knd
+    ir1_tmp = 0
+    ir1d_tmp = 0
+    ir2_tmp = 0
+    ir2d_tmp = 0
+    nar_tmp = 0
+    is1_tmp = 0
+    is1d_tmp = 0
+    naccs_tmp = 0
+
 !       open input and output files
 !    if (output) then
 !     open(20, file='fort.20')
@@ -708,6 +731,24 @@ module prolate_swf
 
     ndec = precision(c)
     nex = range(c) - 1
+
+    ! The C++ buffers are not defined on entry to this intent(out) wrapper.
+    ! Give optional outputs deterministic values before main fills requested
+    ! radial and angular components.
+    r1c = 0.0_knd
+    r1dc = 0.0_knd
+    r2c = 0.0_knd
+    r2dc = 0.0_knd
+    s1c = 0.0_knd
+    s1dc = 0.0_knd
+    ir1e = 0
+    ir1de = 0
+    ir2e = 0
+    ir2de = 0
+    naccr = 0
+    is1e = 0
+    is1de = 0
+    naccs = 0
 
     ! Request a consecutive block of orders from main.
     mnum = m_count
