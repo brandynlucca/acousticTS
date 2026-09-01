@@ -47,10 +47,9 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-physics-primer" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Physics Primer</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-physics-primer">
-<li><a class="dropdown-item" href="../../articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
-    <li><a class="dropdown-item" href="../../articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+<li><a class="dropdown-item" href="../../articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+    <li><a class="dropdown-item" href="../../articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
     <li><a class="dropdown-item" href="../../articles/boundary_conditions.html">Boundary conditions</a></li>
-    <li><a class="dropdown-item" href="../../articles/material-properties/material-properties.html">Material properties</a></li>
     <li><a class="dropdown-item" href="../../articles/numerical-foundations/numerical-foundations.html">Numerical methods</a></li>
   </ul>
 </li>
@@ -58,6 +57,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-build-targets" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Build Targets</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-build-targets">
 <li><a class="dropdown-item" href="../../articles/building-shapes/building-shapes.html">Building Shapes</a></li>
+    <li><a class="dropdown-item" href="../../articles/material-properties/material-properties.html">Material Properties</a></li>
     <li><a class="dropdown-item" href="../../articles/building-scatterers/building-scatterers.html">Building Scatterers</a></li>
     <li><a class="dropdown-item" href="../../articles/shape-manipulation-reforging/shape-manipulation-reforging.html">Shape Manipulation</a></li>
   </ul>
@@ -68,17 +68,15 @@
 <li><a class="dropdown-item" href="../../articles/running-models/running-models.html">Running Models</a></li>
     <li><a class="dropdown-item" href="../../articles/model-selection/model-selection.html">Choosing a Model</a></li>
     <li><a class="dropdown-item" href="../../articles/comparing-models/comparing-models.html">Comparing Models</a></li>
-    <li><a class="dropdown-item" href="../../articles/plotting-inspecting-results/plotting-inspecting-results.html">Visualizing results</a></li>
     <li><a class="dropdown-item" href="../../articles/simulation-parameter-sweeps/simulation-parameter-sweeps.html">Simulation sweeps</a></li>
-    <li><a class="dropdown-item" href="../../articles/calibration-workflow/calibration-workflow.html">Calibration workflow</a></li>
-    <li><a class="dropdown-item" href="../../articles/validation-benchmarks/validation-benchmarks.html">Validating models</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../../articles/model-library/model-library.html">Models</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-developers" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Developers</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-developers">
-<li><a class="dropdown-item" href="../../articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
+<li><a class="dropdown-item" href="../../articles/validation-benchmarks/validation-benchmarks.html">Validation methods</a></li>
+    <li><a class="dropdown-item" href="../../articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
     <li><a class="dropdown-item" href="../../articles/combining-components/combining-components.html">Combining components</a></li>
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
@@ -119,82 +117,31 @@
     
     
 <div class="section level2">
-<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>Parameter sweeps are especially useful when a model has to be
-interpreted over the orientation, size, and contrast ranges emphasized
-in benchmark and survey studies [<span class="citation">Jech et al. (<a href="#ref-Jech_2015">2015</a>)</span>; <span class="citation">Demer and
-Conti (<a href="#ref-Demer_2005">2005</a>)</span>.</p>
-<p>Single deterministic model runs are useful, but many acoustic
-questions are inherently distributional. The package therefore includes
-simulation tools for repeated realizations, parameter batching, and
-ensemble summaries.</p>
+<p>A single target-strength run answers a question about one specified
+target state. <a href="../../reference/simulate_ts.html"><code>simulate_ts()</code></a>
+repeats that workflow over deterministic parameter combinations,
+stochastic realizations, or both. This is useful for orientation
+distributions, morphology studies, uncertain material properties, and
+matched comparisons among models <span class="citation">(<a href="#ref-Jech_2015">Jech et al. 2015</a>; <a href="#ref-Demer_2005">Demer and Conti 2005</a>)</span>.</p>
 <div class="float">
-<img src="simulation-batching-schematic.svg" alt="Batching and realizations schematic"><div class="figcaption">Batching and realizations schematic</div>
+<img src="simulation-batching-schematic.svg" alt="A baseline scatterer, parameter rules, the simulation design, and the collected model output."><div class="figcaption">A baseline scatterer, parameter rules, the
+simulation design, and the collected model output.</div>
 </div>
-<p>This page is about how to turn a single target description into a
-structured family of model runs. The core idea is that the object
-remains fixed as the bookkeeping container, while selected inputs are
-varied across realizations or across a parameter grid.</p>
+<p><code><a href="../../reference/simulate_ts.html">simulate_ts()</a></code> calls <code><a href="../../reference/target_strength.html">target_strength()</a></code> for
+each job and returns a named list of data frames, one per model. Each
+row retains the realized parameters beside the acoustic output.</p>
 </div>
 <div class="section level2">
-<h2 id="main-entry-point">Main entry point<a class="anchor" aria-label="anchor" href="#main-entry-point"></a>
+<h2 id="a-minimal-simulation">A minimal simulation<a class="anchor" aria-label="anchor" href="#a-minimal-simulation"></a>
 </h2>
-<p>The main current simulation interface is <code><a href="../../reference/simulate_ts.html">simulate_ts()</a></code>.
-It supports repeated draws of user-specified parameters, optional
-batching over one or more variables, and optional parallel
-execution.</p>
-<p>In other words, <code><a href="../../reference/simulate_ts.html">simulate_ts()</a></code> is a workflow wrapper
-around repeated <code><a href="../../reference/target_strength.html">target_strength()</a></code> calls. It does not
-replace the usual model layer. It automates the process of rebuilding a
-set of parameters, optionally reworking the object, running the model,
-and collecting the outputs into a set of tidy result tables.</p>
-<p>Both <code>n_realizations</code> and <code>parameters</code> are
-optional. Calling <code><a href="../../reference/simulate_ts.html">simulate_ts()</a></code> with neither runs a single
-realization of the object unchanged.</p>
+<p>Begin with a valid <code>Scatterer</code>, then specify the
+frequency, model, and parameters to vary:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://brandynlucca.github.io/acousticTS/">acousticTS</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">shape_obj_default</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/cylinder.html">cylinder</a></span><span class="op">(</span></span>
-<span>  length_body <span class="op">=</span> <span class="fl">0.05</span>,</span>
-<span>  radius_body <span class="op">=</span> <span class="fl">0.003</span>,</span>
-<span>  n_segments <span class="op">=</span> <span class="fl">80</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">obj_default</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/fls_generate.html">fls_generate</a></span><span class="op">(</span></span>
-<span>  shape <span class="op">=</span> <span class="va">shape_obj_default</span>,</span>
-<span>  density_body <span class="op">=</span> <span class="fl">1045</span>,</span>
-<span>  sound_speed_body <span class="op">=</span> <span class="fl">1520</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">res_default</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/simulate_ts.html">simulate_ts</a></span><span class="op">(</span></span>
-<span>  object <span class="op">=</span> <span class="va">obj_default</span>,</span>
-<span>  frequency <span class="op">=</span> <span class="fl">70e3</span>,</span>
-<span>  model <span class="op">=</span> <span class="st">"DWBA"</span>,</span>
-<span>  parallel <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## ====================================</span></span>
-<span><span class="co">## Scatterer-class: FLS </span></span>
-<span><span class="co">## Model(s): DWBA </span></span>
-<span><span class="co">## Simulated parameters:  </span></span>
-<span><span class="co">## Total simulation realizations: 1 </span></span>
-<span><span class="co">## Parallelize TS calculations: FALSE </span></span>
-<span><span class="co">## ====================================</span></span>
-<span><span class="co">## ====================================</span></span>
-<span><span class="co">## Preparing sequential simulations</span></span>
-<span><span class="co">## ====================================</span></span>
-<span><span class="co">## Simulations complete!</span></span>
-<span><span class="co">## ====================================</span></span></code></pre>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">res_default</span><span class="op">$</span><span class="va">DWBA</span></span></code></pre></div>
-<pre><code><span><span class="co">##   model realization frequency        ka                        f_bs</span></span>
-<span><span class="co">## 1  DWBA           1     70000 0.8796459 -0.0003953234-3.502174e-19i</span></span>
-<span><span class="co">##       sigma_bs        TS</span></span>
-<span><span class="co">## 1 1.562806e-07 -68.06095</span></span></code></pre>
-<p>Once actual parameters are involved, the more typical call supplies
-both.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">shape_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/cylinder.html">cylinder</a></span><span class="op">(</span></span>
+<span><span class="va">shape_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/cylinder.html">cylinder</a></span><span class="op">(</span></span>
 <span>  length_body <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>  radius_body <span class="op">=</span> <span class="fl">0.003</span>,</span>
 <span>  n_segments <span class="op">=</span> <span class="fl">80</span></span>
@@ -206,153 +153,77 @@ both.</p>
 <span>  sound_speed_body <span class="op">=</span> <span class="fl">1520</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/simulate_ts.html">simulate_ts</a></span><span class="op">(</span></span>
+<span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/simulate_ts.html">simulate_ts</a></span><span class="op">(</span></span>
 <span>  object <span class="op">=</span> <span class="va">obj</span>,</span>
 <span>  frequency <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">38e3</span>, <span class="fl">120e3</span>, by <span class="op">=</span> <span class="fl">6e3</span><span class="op">)</span>,</span>
-<span>  model <span class="op">=</span> <span class="st">"DWBA"</span>,</span>
+<span>  model <span class="op">=</span> <span class="st">"dwba"</span>,</span>
 <span>  n_realizations <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    theta_body <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>, min <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="va">pi</span>, max <span class="op">=</span> <span class="va">pi</span><span class="op">)</span>,</span>
+<span>    theta_body <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.5</span> <span class="op">*</span> <span class="va">pi</span>, <span class="va">pi</span><span class="op">)</span>,</span>
 <span>    density_body <span class="op">=</span> <span class="fl">1045</span></span>
 <span>  <span class="op">)</span>,</span>
 <span>  parallel <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## ====================================</span></span>
-<span><span class="co">## Scatterer-class: FLS </span></span>
-<span><span class="co">## Model(s): DWBA </span></span>
-<span><span class="co">## Simulated parameters: theta_body, density_body </span></span>
-<span><span class="co">## Total simulation realizations: 5 </span></span>
-<span><span class="co">## Parallelize TS calculations: FALSE </span></span>
-<span><span class="co">## ====================================</span></span>
-<span><span class="co">## ====================================</span></span>
-<span><span class="co">## Preparing sequential simulations</span></span>
-<span><span class="co">## ====================================</span></span>
-<span><span class="co">## Simulations complete!</span></span>
-<span><span class="co">## ====================================</span></span></code></pre>
-<p>The return value is a named list with one data frame per model.</p>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">sim</span><span class="op">$</span><span class="va">DWBA</span><span class="op">)</span></span></code></pre></div>
+<p>With no <code>parameters</code> and no <code>n_realizations</code>,
+the function performs one run of the unchanged object. Use
+<code><a href="../../reference/target_strength.html">target_strength()</a></code> directly when that is all the workflow
+requires.</p>
 </div>
 <div class="section level2">
-<h2 id="parameter-specification">Parameter specification<a class="anchor" aria-label="anchor" href="#parameter-specification"></a>
+<h2 id="how-parameters-are-interpreted">How parameters are interpreted<a class="anchor" aria-label="anchor" href="#how-parameters-are-interpreted"></a>
 </h2>
-<p>The scratch simulation notes are worth keeping in mind here because
-they clarify the four main parameter modes supported by
-<code><a href="../../reference/simulate_ts.html">simulate_ts()</a></code>:</p>
-<ol style="list-style-type: decimal">
-<li>single fixed values,</li>
-<li>explicit vectors,</li>
-<li>generating functions that return one draw at a time,</li>
-<li>structured <code><a href="../../reference/reforge.html">reforge()</a></code> inputs such as named
-target-dimension vectors.</li>
-</ol>
-<p>Every parameter supplied as more than one deterministic value - an
-explicit vector, or a list of more than one structured target -
-automatically defines a grid axis, whether or not it is also named in
-<code>batch_by</code>. Each cell of the resulting grid is then repeated
-for <code>n_realizations</code>. <code>batch_by</code> no longer
-controls <em>whether</em> a parameter is swept; naming an axis there
-only documents intent. What a bare multi-value parameter never means on
-its own is “align one value per realization” - that alignment is what
-<code>n_realizations</code> together with per-realization generating
-functions is for, or what <code>permute = FALSE</code> is for when two
-swept parameters should instead move together (see <a href="#crossing-versus-pairing-varied-parameters">Crossing versus
-pairing varied parameters</a>).</p>
-<p>Those four modes answer different questions:</p>
-<ol style="list-style-type: decimal">
-<li>fixed values are for constants that should be repeated in every
-realization,</li>
-<li>explicit vectors are for a known set of realization-level
-values,</li>
-<li>functions are for stochastic draws generated on demand,</li>
-<li>structured values are for explicit geometry targets that should be
-preserved as one unit.</li>
-</ol>
-<p>The distinction matters because it separates deterministic sweeps
-from uncertainty propagation.</p>
+<p>The meaning of a parameter depends on how it is supplied:</p>
 <div class="float">
-<img src="simulation-parameter-modes.svg" alt="Three parameter-specification modes in simulate_ts(): fixed constants, explicit vectors, and per-realization generating functions."><div class="figcaption">Three parameter-specification modes in
-<code><a href="../../reference/simulate_ts.html">simulate_ts()</a></code>: fixed constants, explicit vectors, and
-per-realization generating functions.</div>
+<img src="simulation-parameter-modes.svg" alt="Fixed values, explicit vectors, and generating functions have different simulation roles."><div class="figcaption">Fixed values, explicit vectors, and generating
+functions have different simulation roles.</div>
 </div>
-<p>Fixed values are copied into every run unchanged. Explicit vectors
-supply a known sequence of values. Generating functions do not provide a
-pre-listed table at all. They create a new draw whenever a realization
-is built. Structured values are preserved as list-columns so named
-geometry targets remain intact. That difference is what separates a
-design grid from on-the-fly uncertainty propagation and from explicit
-morphology rebuilding.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<ul>
+<li>A scalar is fixed across all jobs.</li>
+<li>A deterministic vector with more than one value defines a sweep
+axis.</li>
+<li>A function is called once for each realization and supplies a new
+value.</li>
+<li>A structured value, such as a named <code>body_target</code> vector,
+is passed to the applicable object-rebuilding pathway as one unit.</li>
+</ul>
+<p>For example:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  sound_speed_body <span class="op">=</span> <span class="fl">1520</span>,</span>
 <span>  theta_body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.5</span> <span class="op">*</span> <span class="va">pi</span>, <span class="va">pi</span>, length.out <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>,</span>
 <span>  density_body <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, mean <span class="op">=</span> <span class="fl">1045</span>, sd <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>,</span>
-<span>  sound_speed_body <span class="op">=</span> <span class="fl">1520</span>,</span>
 <span>  body_target <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fl">0.045</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>In this example, <code>theta_body</code> is an explicit set of
-values, <code>density_body</code> is random,
-<code>sound_speed_body</code> is held fixed, and
-<code>body_target</code> is a structured <code><a href="../../reference/reforge.html">reforge()</a></code>
-input.</p>
-<p>For fluid-like scatterers, convenience aliases such as
-<code>length_body</code> are also supported. These are normalized
-internally onto the same <code><a href="../../reference/reforge.html">reforge()</a></code> pathway as
-<code>body_target</code>, while preserving the original simulation
-column in the returned output.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">res_length_alias</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/simulate_ts.html">simulate_ts</a></span><span class="op">(</span></span>
-<span>  object <span class="op">=</span> <span class="va">obj</span>,</span>
-<span>  frequency <span class="op">=</span> <span class="fl">120e3</span>,</span>
-<span>  model <span class="op">=</span> <span class="st">"DWBA"</span>,</span>
-<span>  n_realizations <span class="op">=</span> <span class="fl">4</span>,</span>
-<span>  parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    length_body <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>, min <span class="op">=</span> <span class="fl">0.04</span>, max <span class="op">=</span> <span class="fl">0.06</span><span class="op">)</span>,</span>
-<span>    theta_body <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>, min <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="va">pi</span>, max <span class="op">=</span> <span class="va">pi</span><span class="op">)</span></span>
-<span>  <span class="op">)</span>,</span>
-<span>  parallel <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## ====================================</span></span>
-<span><span class="co">## Scatterer-class: FLS </span></span>
-<span><span class="co">## Model(s): DWBA </span></span>
-<span><span class="co">## Simulated parameters: length_body, theta_body </span></span>
-<span><span class="co">## Total simulation realizations: 4 </span></span>
-<span><span class="co">## Parallelize TS calculations: FALSE </span></span>
-<span><span class="co">## ====================================</span></span>
-<span><span class="co">## ====================================</span></span>
-<span><span class="co">## Preparing sequential simulations</span></span>
-<span><span class="co">## ====================================</span></span>
-<span><span class="co">## Simulations complete!</span></span>
-<span><span class="co">## ====================================</span></span></code></pre>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">res_length_alias</span><span class="op">$</span><span class="va">DWBA</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"length_body"</span>, <span class="st">"theta_body"</span>, <span class="st">"TS"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##   length_body theta_body        TS</span></span>
-<span><span class="co">## 1  0.04932787   2.784270 -67.69139</span></span>
-<span><span class="co">## 2  0.04995555   2.944616 -67.80459</span></span>
-<span><span class="co">## 3  0.04579534   1.845592 -67.42663</span></span>
-<span><span class="co">## 4  0.05465764   1.624582 -69.50127</span></span></code></pre>
+<p>This defines five deterministic orientation cells. Within each cell,
+<code>density_body</code> is redrawn for every realization. Sound speed
+and target length remain fixed.</p>
+<div class="important" data-title="Vectors are sweep axes">
+<p>A multi-value vector is not matched automatically to
+<code>n_realizations</code>. It defines a deterministic axis. Use a
+generating function for realization-level randomness or
+<code>permute = FALSE</code> to pair several deterministic axes.</p>
+</div>
 </div>
 <div class="section level2">
-<h2 id="batching-versus-realizations">Batching versus realizations<a class="anchor" aria-label="anchor" href="#batching-versus-realizations"></a>
+<h2 id="design-cells-and-realizations">Design cells and realizations<a class="anchor" aria-label="anchor" href="#design-cells-and-realizations"></a>
 </h2>
-<p>The most important conceptual distinction in the interface is the
-difference between a batched parameter and a realization-level
-parameter.</p>
-<ol style="list-style-type: decimal">
-<li>any parameter supplied as more than one deterministic value defines
-a grid axis, and every such axis is crossed into a design grid whose
-cells are kept distinct in the output,</li>
-<li>
-<code>n_realizations</code> controls how many repeated runs are
-performed within each resulting grid cell, redrawing any generating
-functions each time.</li>
-</ol>
-<p>Suppose <code>theta_body</code> and <code>density_body</code> are
-both supplied as explicit multi-value vectors. The simulation does not
-treat them as uncertain draws around one target. It treats them as a
-design grid whose combinations are all run separately.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">res_grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/simulate_ts.html">simulate_ts</a></span><span class="op">(</span></span>
+<p>Every deterministic multi-value parameter becomes an outer design
+axis. <code>n_realizations</code> controls the number of repeated
+evaluations inside each design cell:</p>
+<div class="float">
+<img src="simulation-batch-cells.svg" alt="Cartesian parameter cells outside repeated within-cell realizations."><div class="figcaption">Cartesian parameter cells outside repeated
+within-cell realizations.</div>
+</div>
+<p>The following design has four orientations, three densities, and
+three realizations per cell. It therefore creates 36 jobs for each
+requested model:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sim_grid</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/simulate_ts.html">simulate_ts</a></span><span class="op">(</span></span>
 <span>  object <span class="op">=</span> <span class="va">obj</span>,</span>
 <span>  frequency <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">38e3</span>, <span class="fl">120e3</span>, by <span class="op">=</span> <span class="fl">6e3</span><span class="op">)</span>,</span>
-<span>  model <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DWBA"</span>, <span class="st">"SDWBA"</span><span class="op">)</span>,</span>
+<span>  model <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"dwba"</span>, <span class="st">"sdwba"</span><span class="op">)</span>,</span>
 <span>  n_realizations <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    theta_body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.5</span> <span class="op">*</span> <span class="va">pi</span>, <span class="va">pi</span>, length.out <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>,</span>
@@ -361,53 +232,21 @@ design grid whose combinations are all run separately.</p>
 <span>  batch_by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"theta_body"</span>, <span class="st">"density_body"</span><span class="op">)</span>,</span>
 <span>  parallel <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## ====================================</span></span>
-<span><span class="co">## Scatterer-class: FLS </span></span>
-<span><span class="co">## Model(s): DWBA, SDWBA </span></span>
-<span><span class="co">## Batching parameter(s): theta_body, density_body </span></span>
-<span><span class="co">## Simulated parameters: theta_body, density_body </span></span>
-<span><span class="co">## Total simulation realizations: 36 </span></span>
-<span><span class="co">## Parallelize TS calculations: FALSE </span></span>
-<span><span class="co">## ====================================</span></span>
-<span><span class="co">## ====================================</span></span>
-<span><span class="co">## Preparing sequential simulations</span></span>
-<span><span class="co">## ====================================</span></span>
-<span><span class="co">## Simulations complete!</span></span>
-<span><span class="co">## ====================================</span></span></code></pre>
-<p>Here the output contains one row structure per model, per frequency,
-per batch cell, and per realization. That is why batched jobs can grow
-quickly.</p>
-<div class="float">
-<img src="simulation-batch-cells.svg" alt="How batch_by creates Cartesian design cells and n_realizations nests repeated runs inside each cell."><div class="figcaption">How <code>batch_by</code> creates Cartesian
-design cells and <code>n_realizations</code> nests repeated runs inside
-each cell.</div>
-</div>
-<p>This is the core simulation structure in the current interface.
-Batched parameters define the outer design. Realizations live inside
-that design. If a user loses track of that nesting, it becomes very easy
-to misread deterministic design cells as random draws or random draws as
-deterministic sweep levels.</p>
-<p>The <code>batch_by = c("theta_body", "density_body")</code> argument
-above is not what makes these two parameters a grid. Both are already
-multi-value vectors, so they would form the same design grid without it.
-Supplying <code>batch_by</code> here documents intent - it is useful for
-that reason, and for cases where a parameter list mixes several
-multi-value parameters and only some of them are meant to read as the
-“design” - but it no longer changes what gets swept.</p>
+<p>Multi-value parameters are detected automatically, so
+<code>batch_by</code> is not required to make those vectors vary. Naming
+them in <code>batch_by</code> makes the outer design explicit and is
+useful when reading or generating a simulation call.</p>
 <div class="section level3">
-<h3 id="crossing-versus-pairing-varied-parameters">Crossing versus pairing varied parameters<a class="anchor" aria-label="anchor" href="#crossing-versus-pairing-varied-parameters"></a>
+<h3 id="crossing-or-pairing-axes">Crossing or pairing axes<a class="anchor" aria-label="anchor" href="#crossing-or-pairing-axes"></a>
 </h3>
-<p>By default, every varied parameter is crossed into the full Cartesian
-grid (<code>permute = TRUE</code>). Setting <code>permute = FALSE</code>
-instead pairs (zips) the varied parameters element-wise, so they advance
-together rather than combinatorially. Every varied parameter must then
-supply the same number of values; a length-one parameter is held
-constant across the paired runs.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">res_paired</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/simulate_ts.html">simulate_ts</a></span><span class="op">(</span></span>
+<p>With <code>permute = TRUE</code>, the default, deterministic axes
+form a Cartesian grid. Set <code>permute = FALSE</code> when their
+values describe matched states that should advance together:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sim_paired</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/simulate_ts.html">simulate_ts</a></span><span class="op">(</span></span>
 <span>  object <span class="op">=</span> <span class="va">obj</span>,</span>
 <span>  frequency <span class="op">=</span> <span class="fl">70e3</span>,</span>
-<span>  model <span class="op">=</span> <span class="st">"DWBA"</span>,</span>
+<span>  model <span class="op">=</span> <span class="st">"dwba"</span>,</span>
 <span>  parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    theta_body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0.5</span> <span class="op">*</span> <span class="va">pi</span>, <span class="va">pi</span>, length.out <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>,</span>
 <span>    density_body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1035</span>, <span class="fl">1045</span>, <span class="fl">1050</span>, <span class="fl">1055</span><span class="op">)</span></span>
@@ -415,357 +254,133 @@ constant across the paired runs.</p>
 <span>  permute <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  parallel <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## ====================================</span></span>
-<span><span class="co">## Scatterer-class: FLS </span></span>
-<span><span class="co">## Model(s): DWBA </span></span>
-<span><span class="co">## Batching parameter(s): theta_body, density_body </span></span>
-<span><span class="co">## Simulated parameters: theta_body, density_body </span></span>
-<span><span class="co">## Total simulation realizations: 4 </span></span>
-<span><span class="co">## Parallelize TS calculations: FALSE </span></span>
-<span><span class="co">## ====================================</span></span>
-<span><span class="co">## ====================================</span></span>
-<span><span class="co">## Preparing sequential simulations</span></span>
-<span><span class="co">## ====================================</span></span>
-<span><span class="co">## Simulations complete!</span></span>
-<span><span class="co">## ====================================</span></span></code></pre>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">res_paired</span><span class="op">$</span><span class="va">DWBA</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] 4</span></span></code></pre>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">res_paired</span><span class="op">$</span><span class="va">DWBA</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"theta_body"</span>, <span class="st">"density_body"</span>, <span class="st">"TS"</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
-<pre><code><span><span class="co">##   theta_body density_body        TS</span></span>
-<span><span class="co">## 1   1.570796         1035 -68.06095</span></span>
-<span><span class="co">## 2   2.094395         1045 -68.06095</span></span>
-<span><span class="co">## 3   2.617994         1050 -68.06095</span></span>
-<span><span class="co">## 4   3.141593         1055 -68.06095</span></span></code></pre>
-<p>Four <code>theta_body</code> values paired with four
-<code>density_body</code> values yields four paired runs rather than the
-sixteen that <code>permute = TRUE</code> would produce for the same
-inputs. Pairing is the right tool when two parameters are meant to move
-together - for example, a size series where length and density both vary
-along one intended trajectory - rather than being screened independently
-against each other.</p>
+<p>This creates four paired states rather than sixteen crossed states.
+All varied axes must have the same length. Length-one inputs remain
+fixed.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="parameters-that-modify-the-object">Parameters that modify the object<a class="anchor" aria-label="anchor" href="#parameters-that-modify-the-object"></a>
+<h2 id="parameters-that-rebuild-the-target">Parameters that rebuild the target<a class="anchor" aria-label="anchor" href="#parameters-that-rebuild-the-target"></a>
 </h2>
-<p>Not every simulated parameter is a simple scalar passed into
-<code><a href="../../reference/target_strength.html">target_strength()</a></code>. Some parameters alter the working object
-itself. This is especially important for reshaping workflows.</p>
-<p>The current simulation code supports two broad cases:</p>
-<ol style="list-style-type: decimal">
-<li>parameters matching accepted <code><a href="../../reference/reforge.html">reforge()</a></code> inputs can
-trigger per-realization resizing or reparameterization,</li>
-<li>parameters matching object-component fields can be inserted into the
-working object before the model call.</li>
-</ol>
-<p>This means <code><a href="../../reference/simulate_ts.html">simulate_ts()</a></code> can be used not just for
-orientation or density perturbations, but also for controlled morphology
-studies.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">body_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/arbitrary.html">arbitrary</a></span><span class="op">(</span></span>
-<span>  x_body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.00</span>, <span class="fl">0.02</span>, <span class="fl">0.05</span>, <span class="fl">0.08</span><span class="op">)</span>,</span>
-<span>  zU_body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.001</span>, <span class="fl">0.004</span>, <span class="fl">0.004</span>, <span class="fl">0.001</span><span class="op">)</span>,</span>
-<span>  zL_body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.001</span>, <span class="op">-</span><span class="fl">0.004</span>, <span class="op">-</span><span class="fl">0.004</span>, <span class="op">-</span><span class="fl">0.001</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">bladder_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/arbitrary.html">arbitrary</a></span><span class="op">(</span></span>
-<span>  x_bladder <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.02</span>, <span class="fl">0.04</span>, <span class="fl">0.06</span><span class="op">)</span>,</span>
-<span>  zU_bladder <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.0012</span>, <span class="fl">0.0018</span>, <span class="fl">0.0012</span><span class="op">)</span>,</span>
-<span>  zL_bladder <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.0012</span>, <span class="op">-</span><span class="fl">0.0018</span>, <span class="op">-</span><span class="fl">0.0012</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">obj_sbf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/sbf_generate.html">sbf_generate</a></span><span class="op">(</span></span>
-<span>  body_shape <span class="op">=</span> <span class="va">body_shape</span>,</span>
-<span>  bladder_shape <span class="op">=</span> <span class="va">bladder_shape</span>,</span>
-<span>  density_body <span class="op">=</span> <span class="fl">1045</span>,</span>
-<span>  sound_speed_body <span class="op">=</span> <span class="fl">1520</span>,</span>
-<span>  density_bladder <span class="op">=</span> <span class="fl">1.2</span>,</span>
-<span>  sound_speed_bladder <span class="op">=</span> <span class="fl">343</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">res_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/simulate_ts.html">simulate_ts</a></span><span class="op">(</span></span>
-<span>  object <span class="op">=</span> <span class="va">obj_sbf</span>,</span>
-<span>  frequency <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">38e3</span>, <span class="fl">120e3</span>, by <span class="op">=</span> <span class="fl">6e3</span><span class="op">)</span>,</span>
-<span>  model <span class="op">=</span> <span class="st">"DWBA"</span>,</span>
-<span>  n_realizations <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>  parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    body_scale <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.9</span>, <span class="fl">1.1</span><span class="op">)</span>,</span>
-<span>    swimbladder_inflation_factor <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.8</span>, <span class="fl">1.2</span><span class="op">)</span></span>
-<span>  <span class="op">)</span>,</span>
-<span>  batch_by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"body_scale"</span>, <span class="st">"swimbladder_inflation_factor"</span><span class="op">)</span>,</span>
-<span>  parallel <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## ====================================</span></span>
-<span><span class="co">## Scatterer-class: SBF </span></span>
-<span><span class="co">## Model(s): DWBA </span></span>
-<span><span class="co">## Batching parameter(s): body_scale, swimbladder_inflation_factor </span></span>
-<span><span class="co">## Simulated parameters: body_scale, swimbladder_inflation_factor </span></span>
-<span><span class="co">## Total simulation realizations: 8 </span></span>
-<span><span class="co">## Parallelize TS calculations: FALSE </span></span>
-<span><span class="co">## ====================================</span></span>
-<span><span class="co">## ====================================</span></span>
-<span><span class="co">## Preparing sequential simulations</span></span>
-<span><span class="co">## ====================================</span></span>
-<span><span class="co">## Simulations complete!</span></span>
-<span><span class="co">## ====================================</span></span></code></pre>
-<p>This is one of the cleanest ways to keep a morphology-sensitivity
-analysis tied to the same baseline target.</p>
-<p>For <code>FLS</code> objects, the same idea can be expressed more
-explicitly through <code>body_target</code> or through the convenience
-alias <code>length_body</code>.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">res_fls_reforge</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/simulate_ts.html">simulate_ts</a></span><span class="op">(</span></span>
+<p>Some parameters alter the target rather than only the model call.
+Compatible arguments are applied through <a href="../../reference/reforge.html"><code>reforge()</code></a>, and
+matching component fields can be updated before the model is run. Each
+output then represents a distinct target state derived from the baseline
+object:</p>
+<div class="float">
+<img src="simulation-object-reforge.svg" alt="A baseline scatterer is reforged into distinct geometric states before each model run."><div class="figcaption">A baseline scatterer is reforged into distinct
+geometric states before each model run.</div>
+</div>
+<p>For an <code>FLS</code> object, convenience names such as
+<code>length_body</code> use the same rebuilding pathway as
+<code>body_target</code>:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sim_length</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/simulate_ts.html">simulate_ts</a></span><span class="op">(</span></span>
 <span>  object <span class="op">=</span> <span class="va">obj</span>,</span>
 <span>  frequency <span class="op">=</span> <span class="fl">120e3</span>,</span>
-<span>  model <span class="op">=</span> <span class="st">"DWBA"</span>,</span>
-<span>  n_realizations <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  model <span class="op">=</span> <span class="st">"dwba"</span>,</span>
+<span>  n_realizations <span class="op">=</span> <span class="fl">4</span>,</span>
+<span>  parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    length_body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.04</span>, <span class="fl">0.05</span>, <span class="fl">0.06</span><span class="op">)</span>,</span>
+<span>    theta_body <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.5</span> <span class="op">*</span> <span class="va">pi</span>, <span class="va">pi</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  parallel <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Use a list when each sweep level is itself a structured target
+specification:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sim_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/simulate_ts.html">simulate_ts</a></span><span class="op">(</span></span>
+<span>  object <span class="op">=</span> <span class="va">obj</span>,</span>
+<span>  frequency <span class="op">=</span> <span class="fl">120e3</span>,</span>
+<span>  model <span class="op">=</span> <span class="st">"dwba"</span>,</span>
 <span>  parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    body_target <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fl">0.04</span>, radius <span class="op">=</span> <span class="fl">0.0025</span><span class="op">)</span>,</span>
 <span>      <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>length <span class="op">=</span> <span class="fl">0.06</span>, radius <span class="op">=</span> <span class="fl">0.0035</span><span class="op">)</span></span>
 <span>    <span class="op">)</span>,</span>
-<span>    isometric_body <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>    theta_body <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>, min <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="va">pi</span>, max <span class="op">=</span> <span class="va">pi</span><span class="op">)</span></span>
+<span>    isometric_body <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span>  <span class="op">)</span>,</span>
-<span>  batch_by <span class="op">=</span> <span class="st">"body_target"</span>,</span>
 <span>  parallel <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## ====================================</span></span>
-<span><span class="co">## Scatterer-class: FLS </span></span>
-<span><span class="co">## Model(s): DWBA </span></span>
-<span><span class="co">## Batching parameter(s): body_target </span></span>
-<span><span class="co">## Simulated parameters: body_target, isometric_body, theta_body </span></span>
-<span><span class="co">## Total simulation realizations: 4 </span></span>
-<span><span class="co">## Parallelize TS calculations: FALSE </span></span>
-<span><span class="co">## ====================================</span></span>
-<span><span class="co">## ====================================</span></span>
-<span><span class="co">## Preparing sequential simulations</span></span>
-<span><span class="co">## ====================================</span></span>
-<span><span class="co">## Simulations complete!</span></span>
-<span><span class="co">## ====================================</span></span></code></pre>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">res_fls_reforge</span><span class="op">$</span><span class="va">DWBA</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"body_target"</span>, <span class="st">"theta_body"</span>, <span class="st">"TS"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##    body_target theta_body        TS</span></span>
-<span><span class="co">## 1 0.04, 0.0025   2.490944 -68.15085</span></span>
-<span><span class="co">## 2 0.04, 0.0025   2.235577 -68.15085</span></span>
-<span><span class="co">## 3 0.06, 0.0035   2.730156 -72.25574</span></span>
-<span><span class="co">## 4 0.06, 0.0035   1.845710 -72.25574</span></span></code></pre>
-<p>When batching across structured geometry targets, wrap the candidates
-in a list so each target vector is treated as one batch value.</p>
+<p>For an already bent <code>FLS</code> object, <code>length_body</code>
+refers to the bent centerline arc length. <code><a href="../../reference/simulate_ts.html">simulate_ts()</a></code>
+does not bend a straight baseline automatically. Create the intended
+baseline with <a href="../../reference/brake.html"><code>brake()</code></a> before the
+simulation. If bending must vary by realization, construct those objects
+outside <code><a href="../../reference/simulate_ts.html">simulate_ts()</a></code> so the order of resizing and bending
+is explicit.</p>
+</div>
+<div class="section level2">
+<h2 id="inspect-and-summarize-output">Inspect and summarize output<a class="anchor" aria-label="anchor" href="#inspect-and-summarize-output"></a>
+</h2>
+<p>The returned object is organized by model:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">sim_grid</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">sim_grid</span><span class="op">$</span><span class="va">DWBA</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">sim_grid</span><span class="op">$</span><span class="va">SDWBA</span><span class="op">)</span></span></code></pre></div>
+<p>Group summaries should respect the design columns and
+<code>realization</code> index. Common summaries include mean or
+quantile target strength by frequency, orientation distributions,
+sensitivity across morphology cells, and matched differences between
+models. Perform energetic averages in a linear cross-section domain
+rather than averaging target strength in decibels unless a specific
+reporting convention requires otherwise.</p>
+</div>
+<div class="section level2">
+<h2 id="parallel-execution-and-reproducibility">Parallel execution and reproducibility<a class="anchor" aria-label="anchor" href="#parallel-execution-and-reproducibility"></a>
+</h2>
+<p>The parallel pathway distributes the same logical job table over
+PSOCK workers:</p>
 <div class="float">
-<img src="simulation-object-reforge.svg" alt="Object-modifying simulation workflow, where baseline geometry is reforged into a family of derived target states before model execution."><div class="figcaption">Object-modifying simulation workflow, where
-baseline geometry is reforged into a family of derived target states
-before model execution.</div>
+<img src="simulation-execution-layout.svg" alt="Serial and parallel execution use the same simulation jobs with different scheduling."><div class="figcaption">Serial and parallel execution use the same
+simulation jobs with different scheduling.</div>
 </div>
-<p>Morphology-affecting parameters do not behave like ordinary scalar
-metadata. They change the working target itself before the model is run.
-The resulting simulations should therefore be interpreted as distinct
-geometric states derived from one baseline object, not as repeated
-evaluations of a single unchanged shape.</p>
-<p>There is one especially important point for curvature-aware
-workflows: <code><a href="../../reference/simulate_ts.html">simulate_ts()</a></code> does not automatically call
-<code><a href="../../reference/brake.html">brake()</a></code> for the modern <code>DWBA</code> or
-<code>SDWBA</code> paths. If the baseline object is straight, then
-<code>length_body</code> or <code>body_target</code> simply resize that
-straight object. If the baseline object is already a bent
-<code>FLS</code>, then those same parameters resize the existing bent
-geometry directly.</p>
-<p>For bent <code>FLS</code> objects, <code>length_body</code> and
-<code>body_target["length"]</code> are interpreted as the target bent
-centerline arc length, not as the flattened projected <code>x</code>
-span. That makes the resize semantics consistent with the object that is
-actually being modeled.</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">obj_bent</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/brake.html">brake</a></span><span class="op">(</span><span class="va">obj</span>, radius_curvature <span class="op">=</span> <span class="fl">5</span>, mode <span class="op">=</span> <span class="st">"ratio"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">res_bent</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/simulate_ts.html">simulate_ts</a></span><span class="op">(</span></span>
-<span>  object <span class="op">=</span> <span class="va">obj_bent</span>,</span>
-<span>  frequency <span class="op">=</span> <span class="fl">120e3</span>,</span>
-<span>  model <span class="op">=</span> <span class="st">"DWBA"</span>,</span>
-<span>  n_realizations <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>  parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    length_body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.04</span>, <span class="fl">0.05</span><span class="op">)</span>,</span>
-<span>    theta_body <span class="op">=</span> <span class="fl">0.5</span> <span class="op">*</span> <span class="va">pi</span></span>
-<span>  <span class="op">)</span>,</span>
-<span>  batch_by <span class="op">=</span> <span class="st">"length_body"</span>,</span>
-<span>  parallel <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## ====================================</span></span>
-<span><span class="co">## Scatterer-class: FLS </span></span>
-<span><span class="co">## Model(s): DWBA </span></span>
-<span><span class="co">## Batching parameter(s): length_body </span></span>
-<span><span class="co">## Simulated parameters: length_body, theta_body </span></span>
-<span><span class="co">## Total simulation realizations: 4 </span></span>
-<span><span class="co">## Parallelize TS calculations: FALSE </span></span>
-<span><span class="co">## ====================================</span></span>
-<span><span class="co">## ====================================</span></span>
-<span><span class="co">## Preparing sequential simulations</span></span>
-<span><span class="co">## ====================================</span></span>
-<span><span class="co">## Simulations complete!</span></span>
-<span><span class="co">## ====================================</span></span></code></pre>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">res_bent</span><span class="op">$</span><span class="va">DWBA</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"length_body"</span>, <span class="st">"theta_body"</span>, <span class="st">"TS"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##   length_body theta_body        TS</span></span>
-<span><span class="co">## 1        0.04   1.570796 -68.48278</span></span>
-<span><span class="co">## 2        0.04   1.570796 -68.48278</span></span>
-<span><span class="co">## 3        0.05   1.570796 -68.35455</span></span>
-<span><span class="co">## 4        0.05   1.570796 -68.35455</span></span></code></pre>
-<p>That example is useful because it separates two different ideas
-cleanly:</p>
-<ol style="list-style-type: decimal">
-<li>the bent state comes from the baseline object passed into
-<code><a href="../../reference/simulate_ts.html">simulate_ts()</a></code>,</li>
-<li>the resizing comes from <code>length_body</code> or
-<code>body_target</code>.</li>
-</ol>
-<p>If the scientific workflow instead needs “resize a straight object
-and then bend it differently for each realization,” that should
-currently be constructed outside <code><a href="../../reference/simulate_ts.html">simulate_ts()</a></code> or through
-the deprecated <code>*_curved</code> model interfaces that still wire
-curvature in internally.</p>
-</div>
-<div class="section level2">
-<h2 id="when-simulation-is-useful">When simulation is useful<a class="anchor" aria-label="anchor" href="#when-simulation-is-useful"></a>
-</h2>
-<p>Simulation or batched evaluation is most useful when:</p>
-<ol style="list-style-type: decimal">
-<li>orientation is uncertain,</li>
-<li>material properties are better treated as distributions than as
-fixed values,</li>
-<li>multiple body lengths or frequencies must be screened
-systematically,</li>
-<li>model sensitivity is of greater interest than a single nominal
-prediction.</li>
-</ol>
-<p>In practice, this means simulation is less about “making the model
-stochastic” and more about mapping the consequences of uncertainty,
-variability, or design decisions.</p>
-</div>
-<div class="section level2">
-<h2 id="interpreting-the-output">Interpreting the output<a class="anchor" aria-label="anchor" href="#interpreting-the-output"></a>
-</h2>
-<p>The returned list is model-centered. Each element is a data frame
-that carries the realization index, any batched parameters, and the
-model outputs. That organization is deliberate: it makes downstream
-plotting or aggregation straightforward.</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">res_grid</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "DWBA"  "SDWBA"</span></span></code></pre>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">res_grid</span><span class="op">$</span><span class="va">DWBA</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##   model realization theta_body_idx density_body_idx theta_body density_body</span></span>
-<span><span class="co">## 1  DWBA           1              1                1   1.570796         1035</span></span>
-<span><span class="co">## 2  DWBA           1              1                1   1.570796         1035</span></span>
-<span><span class="co">## 3  DWBA           1              1                1   1.570796         1035</span></span>
-<span><span class="co">## 4  DWBA           1              1                1   1.570796         1035</span></span>
-<span><span class="co">## 5  DWBA           1              1                1   1.570796         1035</span></span>
-<span><span class="co">## 6  DWBA           1              1                1   1.570796         1035</span></span>
-<span><span class="co">##   frequency        ka                        f_bs     sigma_bs        TS</span></span>
-<span><span class="co">## 1     38000 0.4775221 -0.0001558136-7.493349e-20i 2.427787e-08 -76.14790</span></span>
-<span><span class="co">## 2     44000 0.5529203 -0.0002007945-1.118128e-19i 4.031842e-08 -73.94497</span></span>
-<span><span class="co">## 3     50000 0.6283185 -0.0002476169-1.566886e-19i 6.131414e-08 -72.12439</span></span>
-<span><span class="co">## 4     56000 0.7037168 -0.0002946149-2.087997e-19i 8.679795e-08 -70.61491</span></span>
-<span><span class="co">## 5     62000 0.7791150 -0.0003400723-2.668395e-19i 1.156492e-07 -69.36857</span></span>
-<span><span class="co">## 6     68000 0.8545132 -0.0003822717-3.289791e-19i 1.461317e-07 -68.35256</span></span></code></pre>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">res_grid</span><span class="op">$</span><span class="va">SDWBA</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##   model realization theta_body_idx density_body_idx theta_body density_body</span></span>
-<span><span class="co">## 1 SDWBA           1              1                1   1.570796         1035</span></span>
-<span><span class="co">## 2 SDWBA           1              1                1   1.570796         1035</span></span>
-<span><span class="co">## 3 SDWBA           1              1                1   1.570796         1035</span></span>
-<span><span class="co">## 4 SDWBA           1              1                1   1.570796         1035</span></span>
-<span><span class="co">## 5 SDWBA           1              1                1   1.570796         1035</span></span>
-<span><span class="co">## 6 SDWBA           1              1                1   1.570796         1035</span></span>
-<span><span class="co">##   frequency                        f_bs     sigma_bs        TS     TS_sd</span></span>
-<span><span class="co">## 1     38000 -9.447098e-05-7.072660e-07i 9.925839e-09 -80.03233 -85.54242</span></span>
-<span><span class="co">## 2     44000 -1.214249e-04-3.378969e-06i 1.590348e-08 -77.98508 -83.24166</span></span>
-<span><span class="co">## 3     50000 -1.522909e-04-6.089763e-06i 2.509366e-08 -76.00436 -81.99001</span></span>
-<span><span class="co">## 4     56000 -1.771822e-04+1.795488e-06i 3.431663e-08 -74.64495 -80.07396</span></span>
-<span><span class="co">## 5     62000 -2.039148e-04-3.418298e-06i 4.576683e-08 -73.39449 -78.60106</span></span>
-<span><span class="co">## 6     68000 -2.284664e-04+7.397460e-06i 5.717119e-08 -72.42823 -77.59347</span></span></code></pre>
-<p>Common downstream summaries include:</p>
-<ol style="list-style-type: decimal">
-<li>mean and quantiles of <code>TS</code> by frequency,</li>
-<li>variance decomposition by orientation or material parameter,</li>
-<li>pairwise model differences across matched grid cells,</li>
-<li>screening plots to identify nonlinear regions before deeper
-analysis.</li>
-</ol>
-</div>
-<div class="section level2">
-<h2 id="parallel-execution">Parallel execution<a class="anchor" aria-label="anchor" href="#parallel-execution"></a>
-</h2>
-<p><code><a href="../../reference/simulate_ts.html">simulate_ts()</a></code> currently uses PSOCK workers for parallel
-execution across Windows, macOS, and Linux. That has two practical
-consequences:</p>
-<ol style="list-style-type: decimal">
-<li>startup overhead is more noticeable for small jobs,</li>
-<li>larger simulations benefit more clearly from parallelization than
-tiny exploratory runs.</li>
-</ol>
-<p>For this reason, <code>parallel = FALSE</code> is often the right
-default while debugging a workflow, even if <code>parallel = TRUE</code>
-is the right choice for production runs.</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">res_parallel</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/simulate_ts.html">simulate_ts</a></span><span class="op">(</span></span>
+<p>Use <code>parallel = FALSE</code> while developing a design. PSOCK
+startup and, when working from a source checkout, preparation of a
+worker installation can cost more than the model calls for a small job.
+Parallel execution becomes more useful once individual jobs are
+sufficiently expensive.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sim_parallel</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/simulate_ts.html">simulate_ts</a></span><span class="op">(</span></span>
 <span>  object <span class="op">=</span> <span class="va">obj</span>,</span>
 <span>  frequency <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">38e3</span>, <span class="fl">120e3</span>, by <span class="op">=</span> <span class="fl">2e3</span><span class="op">)</span>,</span>
-<span>  model <span class="op">=</span> <span class="st">"DWBA"</span>,</span>
+<span>  model <span class="op">=</span> <span class="st">"dwba"</span>,</span>
 <span>  n_realizations <span class="op">=</span> <span class="fl">100</span>,</span>
-<span>  parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>theta_body <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.5</span> <span class="op">*</span> <span class="va">pi</span>, <span class="va">pi</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  parameters <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    theta_body <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.5</span> <span class="op">*</span> <span class="va">pi</span>, <span class="va">pi</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
 <span>  parallel <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  n_cores <span class="op">=</span> <span class="fl">4</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<div class="float">
-<img src="simulation-execution-layout.svg" alt="Execution layout for serial and parallel simulation runs, emphasizing the same logical job table with different scheduling."><div class="figcaption">Execution layout for serial and parallel
-simulation runs, emphasizing the same logical job table with different
-scheduling.</div>
-</div>
-<p>Parallelization changes scheduling, not interpretation. The same
-batched cells and realization-level jobs still exist. Parallel execution
-simply distributes them across workers. That is why debugging is often
-easier in serial mode first, even when the final production run is
-parallel.</p>
+<p>Record the parameter definitions, package version, and random-number
+settings for reproducible stochastic work. Verify a stochastic design
+serially before assuming that worker scheduling will reproduce the same
+draws as a sequential run.</p>
 </div>
 <div class="section level2">
-<h2 id="practical-cautions">Practical cautions<a class="anchor" aria-label="anchor" href="#practical-cautions"></a>
+<h2 id="plan-the-grid-before-running-it">Plan the grid before running it<a class="anchor" aria-label="anchor" href="#plan-the-grid-before-running-it"></a>
 </h2>
-<p>The simulation workflow can become expensive quickly, especially when
-several parameters are batched simultaneously. The main practical risks
-are:</p>
-<ul>
-<li>combinatorial growth in the evaluation grid,</li>
-<li>unnecessary parallel overhead for small jobs,</li>
-<li>confusion between realization-level randomness and batch-level
-parameter sweeps.</li>
-</ul>
-<p>Two additional cautions are worth keeping in mind:</p>
+<p>For crossed axes, the number of jobs per model is the product of the
+axis lengths multiplied by <code>n_realizations</code>. Frequency points
+add rows to each job’s result. Several moderate axes can therefore
+create a large output and a large number of model calls.</p>
+<p>Before a production run:</p>
 <ol style="list-style-type: decimal">
-<li>if a parameter sequence is meant to represent uncertainty, supplying
-it as an explicit multi-value vector changes the interpretation from
-random variation to a deterministic design grid regardless of whether it
-is also named in <code>batch_by</code>. Instead, use a generating
-function when the intent is a random draw,</li>
-<li>if geometry-affecting parameters are varied, the results should be
-interpreted as new target states rather than as mere perturbations of
-one fixed shape.</li>
+<li>calculate the number of design cells and expected output rows,</li>
+<li>run a small serial subset and inspect the realized parameters,</li>
+<li>confirm that crossed or paired semantics match the scientific
+design,</li>
+<li>verify that geometry-changing parameters rebuild the intended
+target, and</li>
+<li>split very large studies into recoverable batches or a cached
+project-level pipeline.</li>
 </ol>
-<p>For that reason, this page should be read together with <a href="../faq-troubleshooting/faq-troubleshooting.html">FAQ and
-troubleshooting</a>.</p>
-<p>Because the current parallel path is PSOCK-based, larger simulations
-benefit from being planned deliberately instead of relying on a maximal
-batch grid by default.</p>
-</div>
-<div class="section level2">
-<h2 id="relationship-to-anneal">Relationship to <code>anneal()</code><a class="anchor" aria-label="anchor" href="#relationship-to-anneal"></a>
-</h2>
-<p>The current documentation and source code indicate that
-<code><a href="../../reference/simulate_ts.html">simulate_ts()</a></code> is expected to give way to
-<code>anneal()</code> in future releases. The important point for
-current users is that the workflow logic on this page remains useful
-even if the interface evolves.</p>
+<p><code><a href="../../reference/simulate_ts.html">simulate_ts()</a></code> is appropriate for a structured family of
+related model calls. For a long-running study with external data
+dependencies, many intermediate products, or expensive downstream
+summaries, a workflow manager such as <code>targets</code> can
+orchestrate separate <code><a href="../../reference/simulate_ts.html">simulate_ts()</a></code> calls without becoming a
+dependency of <code>acousticTS</code>.</p>
 </div>
 <div class="section level2">
 <h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>

@@ -7,9 +7,9 @@ Unvalidated Experimental
 [Overview](https://brandynlucca.github.io/acousticTS/articles/bcms/index.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/bcms/bcms-theory.md)
 
-This family follows the deformed-cylinder and coherence-corrected
-cylinder literature for weakly scattering elongated bodies ([Stanton
-1989](#ref-Stanton_1989_2), [1988](#ref-Stanton_1988)).
+BCMS applies a curvature-dependent coherence correction to the
+finite-cylinder modal series ([Stanton 1989](#ref-Stanton_1989_2),
+[1988](#ref-Stanton_1988)).
 
 The bent-cylinder modal-series solution is available through
 `target_strength(..., model = "bcms")`. It is intended for slender,
@@ -18,12 +18,9 @@ represented by the finite-cylinder modal-series family, but whose
 centerline curvature reduces backscattering coherence relative to the
 straight-cylinder case.
 
-That is the practical reason to use `BCMS` instead of `FCMS`. `FCMS` is
-the appropriate model when the target can be treated as a straight
-finite cylinder. `BCMS` is the natural extension when the same cylinder
-idealization is still acceptable locally, but the body curvature is
-strong enough that the straight-cylinder coherence assumption is no
-longer appropriate.
+Use `FCMS` for a straight finite cylinder. Use `BCMS` when the target
+remains locally cylindrical but centerline curvature changes its
+along-axis coherence.
 
 `BCMS` is marked unvalidated because there is not an external public
 software benchmark ladder wired into the package. The implementation
@@ -199,21 +196,18 @@ relative to the straight-cylinder baseline.
 
 #### Straight-cylinder reduction
 
-| Reference relation | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | f at max \Delta (kHz) | acousticTS elapsed (s) | Reference elapsed (s) |
-|:---|---:|---:|---:|---:|---:|
-| BCMS straight branch vs FCMS | 0 | 0 | 12 | 0.04 | 0.04 |
+| Reference relation | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | f at max \Delta (kHz) |
+|:---|---:|---:|---:|
+| BCMS straight branch vs FCMS | 0 | 0 | 12 |
 
-This is the first defining identity of the model. When curvature is
-absent, `BCMS` should not behave like a different cylinder model. It
-should reduce exactly to the straight finite-cylinder modal-series
-solution. The zero residual therefore matters because it shows that the
-curvature correction truly drops out when it should.
+With no curvature, BCMS must reduce to FCMS. The residual verifies that
+the curvature correction drops out in this limit.
 
 #### Bent-cylinder coherence relation
 
-| Reference relation | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | f at max \Delta (kHz) | acousticTS elapsed (s) | Reference elapsed (s) |
-|:---|---:|---:|---:|---:|---:|
-| BCMS bent branch vs Stanton (1989) coherence construction | 0 | 0 | 12 | 0.13 | 0 |
+| Reference relation | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | f at max \Delta (kHz) |
+|:---|---:|---:|---:|
+| BCMS bent branch vs Stanton (1989) coherence construction | 0 | 0 | 12 |
 
 This is the second defining identity. The bent-cylinder branch is
 expected to match the straight-cylinder modal-series result multiplied
@@ -228,22 +222,14 @@ explicit coherence-corrected construction that defines the model.
 spectra together with acousticTS overlays and residual
 panels.](bcms-reference-comparison.png)
 
-The overlay makes the two implementation identities easier to interpret.
-The straight branch sits exactly on the `FCMS` baseline, while the bent
-branch sits exactly on the coherence-corrected reference. The practical
-takeaway is that the package is honoring the intended model
-decomposition: straight-cylinder modal scattering plus a
-curvature-driven coherence correction.
+The overlay shows the straight branch on the FCMS baseline and the bent
+branch on the coherence-corrected reference.
 
 ### Closing note
 
-`BCMS` is best viewed as a controlled extension of `FCMS`, not as a
-completely separate scattering family. The page is therefore organized
-around the two checks that matter most for that relationship: reduction
-to `FCMS` in the straight limit, and exact agreement with the
-bent-cylinder coherence construction in the curved case. Those checks do
-not replace an external benchmark ladder, but they do establish that the
-implementation respects the defining algebra of the model.
+BCMS is a curvature correction to FCMS. Its two implementation checks
+establish the straight-cylinder limit and the bent-cylinder coherence
+relation. They do not replace an external benchmark ladder.
 
 ## References
 

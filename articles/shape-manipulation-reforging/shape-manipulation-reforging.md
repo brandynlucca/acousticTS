@@ -1,74 +1,169 @@
-# Shape Manipulation and Reforging
+# Shape Manipulation
 
-## Introduction
+## Overview
 
-Shape manipulation matters because many published target representations
-are built from segmented or reformatted coordinate sets rather than from
-canonical closed forms ([Clay and Horne 1994](#ref-Clay_1994); [Gastauer
-et al. 2019](#ref-ZooScatR_software)).
+Geometry can be repositioned, bent, resized, or resampled without
+rebuilding a target from its original inputs. These operations are
+useful for cleaning measured profiles and for controlled studies of
+posture, size, component placement, and numerical resolution.
 
-Real workflows often begin with a target description that is close to
-useful but not quite in the form required for the next model or
-comparison step. The package includes tools for reshaping, bending, or
-otherwise transforming existing objects rather than rebuilding them from
-scratch.
+Manipulation changes the object returned by the package. It can also
+change the scientific meaning of that object. Keep the original object,
+give each modified variant a distinct name, and record what the
+transformation represents.
 
 ![Shape
 manipulation](shape-manipulation-schematic.png)[](https://brandynlucca.github.io/acousticTS/reference/brake.md "brake()")[](https://brandynlucca.github.io/acousticTS/reference/reforge.md "reforge()")
 
-These tools are not cosmetic. They are part of the modeling layer
-because curvature, segmentation, and relative body-swimbladder scaling
-can all change the resulting backscatter in physically meaningful ways.
-
-That is the key idea behind this vignette. Shape manipulation is not
-only about producing a different outline. It is about deciding how a
-target should be represented for a specific scientific or modeling
-question. A bent body, an inflated swimbladder, or a resampled
-segmentation may all be legitimate transformations, but each of them
-changes what the object means physically.
-
-## Main ideas
-
-This part of the package is centered on utilities such as
+Select
 [`brake()`](https://brandynlucca.github.io/acousticTS/reference/brake.md)
-and
-[`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md).
-Conceptually, these tools let the user keep the same target identity
-while changing representation, curvature, or model-facing structure.
+or
+[`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md)
+in the figure to open its reference page.
 
-The scratch notes make the distinction especially clear:
+## Choose the operation
 
-1.  [`brake()`](https://brandynlucca.github.io/acousticTS/reference/brake.md)
-    changes curvature while preserving the target identity,
-2.  [`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md)
-    changes scaling, target dimensions, or resolution of an existing
-    representation.
+| Function | Use |
+|----|----|
+| [`brake()`](https://brandynlucca.github.io/acousticTS/reference/brake.md) | Bend a centerline using relative or measured curvature. |
+| [`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md) | Resize components, set target dimensions, or change segment counts. |
+| [`translate_shape()`](https://brandynlucca.github.io/acousticTS/reference/translate_shape.md) | Apply coordinate offsets. |
+| [`reanchor_shape()`](https://brandynlucca.github.io/acousticTS/reference/reanchor_shape.md) | Place the nose, center, or tail at a requested coordinate. |
+| [`offset_component()`](https://brandynlucca.github.io/acousticTS/reference/offset_component.md) | Move one component within a composite scatterer. |
+| [`inflate_shape()`](https://brandynlucca.github.io/acousticTS/reference/inflate_shape.md) | Widen or narrow a selected axial region. |
+| [`smooth_shape()`](https://brandynlucca.github.io/acousticTS/reference/smooth_shape.md) | Smooth a stored profile. |
+| [`resample_shape()`](https://brandynlucca.github.io/acousticTS/reference/resample_shape.md) | Change axial discretization. |
+| [`flip_shape()`](https://brandynlucca.github.io/acousticTS/reference/flip_shape.md) | Reverse the axial profile. |
 
-The practical distinction is simple:
+Use
+[`brake()`](https://brandynlucca.github.io/acousticTS/reference/brake.md)
+for posture or curvature. Use
+[`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md)
+for size, proportions, or resolution. The smaller helpers handle
+positioning and profile preparation.
 
-1.  use
-    [`brake()`](https://brandynlucca.github.io/acousticTS/reference/brake.md)
-    when the main question is body curvature or pose,
-2.  use
-    [`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md)
-    when the question is dimensions, proportions, or axial resolution.
+## Bending with `brake()`
 
-## Quick reshaping examples
-
-It helps to see the two workflows immediately in code before discussing
-the details.
+[`brake()`](https://brandynlucca.github.io/acousticTS/reference/brake.md)
+applies a smooth curvature to a body component or supported scatterer.
+In `mode = "ratio"`, `radius_curvature` is relative to body length. In
+`mode = "measurement"`, it is a physical radius in the geometry’s length
+units. Ratio mode supports size-normalized comparisons. Measurement mode
+is appropriate when curvature has been measured directly.
 
 ``` r
 
 library(acousticTS)
 
+straight_obj <- fls_generate(
+  shape = cylinder(
+    length_body = 0.05,
+    radius_body = 0.003,
+    n_segments = 120
+  ),
+  density_body = 1045,
+  sound_speed_body = 1520
+)
+
+bent_ratio <- brake(
+  straight_obj,
+  radius_curvature = 5,
+  mode = "ratio"
+)
+
+bent_measured <- brake(
+  straight_obj,
+  radius_curvature = 0.35,
+  mode = "measurement"
+)
+```
+
+``` r
+
+old_par <- par(no.readonly = TRUE)
+par(mfrow = c(1, 2), mar = c(3.2, 3.2, 2.6, 0.8))
+plot(straight_obj, type = "shape", main = "Original FLS cylinder")
+plot(bent_ratio, type = "shape", main = "After brake()")
+```
+
+![A fluid-like cylinder before and after ratio-based
+bending.](shape-manipulation-reforging_files/figure-html/unnamed-chunk-3-1.png)
+
+A fluid-like cylinder before and after ratio-based bending.
+
+``` r
+
+par(old_par)
+```
+
+Curvature changes the projected length, local orientation, and phase
+relationships along the body. Check the modified centerline and segment
+resolution, not only the outline.
+
+For a bent `FLS`, stored body length is the centerline arc length rather
+than the projected `x` span. If
+[`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md)
+is applied afterward, a requested length rescales that bent centerline.
+To resize a straight target and bend it afterward, apply the functions
+in that order explicitly.
+
+The distinction can be checked directly:
+
+``` r
+
+bent_rescaled <- reforge(
+  bent_ratio,
+  body_target = c(length = 0.08)
+)
+
+bent_rpos <- extract(bent_rescaled, "body")$rpos
+centerline_length <- sum(sqrt(
+  diff(bent_rpos["x", ])^2 + diff(bent_rpos["z", ])^2
+))
+
+c(
+  stored_length = extract(
+    bent_rescaled,
+    c("shape_parameters", "length")
+  ),
+  centerline_length = centerline_length,
+  projected_x_span = diff(range(bent_rpos["x", ]))
+)
+```
+
+    ##     stored_length centerline_length  projected_x_span 
+    ##        0.08000000        0.08000000        0.07986674
+
+## Resizing with `reforge()`
+
+[`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md)
+is an S4 generic with methods for `FLS`, `GAS`, `SBF`, and `BBF`
+objects. Its arguments depend on the class, but two forms recur:
+
+- `*_scale` multiplies current dimensions.
+- `*_target` requests final dimensions.
+
+Use named dimensions such as `length`, `width`, `height`, and `radius`.
+Set the corresponding `isometric_*` argument to `FALSE` when the
+dimensions should vary independently. Segment-count arguments change
+numerical resolution without requiring a separate reconstruction.
+
+``` r
+
 data(krill, package = "acousticTS")
 
-krill_40mm <- reforge(krill, body_target = c(length = 0.04))
-krill_fine <- reforge(krill, n_segments_body = 200)
+krill_40mm <- reforge(
+  krill,
+  body_target = c(length = 0.04)
+)
+
+krill_fine <- reforge(
+  krill,
+  n_segments_body = 200
+)
 
 data.frame(
-  object = c("original", "krill_40mm", "krill_fine"),
+  object = c("original", "40 mm", "200 segments"),
   length_m = c(
     extract(krill, c("shape_parameters", "length")),
     extract(krill_40mm, c("shape_parameters", "length")),
@@ -82,308 +177,22 @@ data.frame(
 )
 ```
 
-    ##       object  length_m n_segments
-    ## 1   original 0.0410898         14
-    ## 2 krill_40mm 0.0400000         14
-    ## 3 krill_fine 0.0410898        200
+    ##         object  length_m n_segments
+    ## 1     original 0.0410898         14
+    ## 2        40 mm 0.0400000         14
+    ## 3 200 segments 0.0410898        200
 
-That is the simplest
-[`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md)
-pattern for a one-body `FLS` object: reuse the same target and change
-the body target dimensions or axial resolution explicitly without
-rebuilding it from scratch.
+### Composite scatterers
 
-## Bending with `brake()`
-
-[`brake()`](https://brandynlucca.github.io/acousticTS/reference/brake.md)
-applies a smooth curvature transformation to an existing body
-description. It can work on a body-style coordinate list or on a full
-scatterer object, depending on the workflow.
-
-The key arguments are:
-
-1.  `radius_curvature`, the amount of curvature,
-2.  `mode = "ratio"`, which interprets curvature relative to body
-    length,
-3.  `mode = "measurement"`, which interprets curvature in physical
-    units.
-
-Ratio mode is often the more robust choice for comparative studies
-because it keeps curvature tied to target size. Measurement mode is more
-natural when curvature is known from direct observation.
-
-This distinction matters because the same nominal curvature can mean
-very different things for differently sized targets. Ratio mode
-preserves geometric interpretation across a size series. Measurement
-mode preserves literal physical curvature. Neither is universally
-better, but they answer different questions and should not be treated as
-interchangeable.
-
-For curved `FLS` objects, the stored body length is treated as the bent
-centerline arc length rather than as the flattened `x`-axis span. That
-matters for later workflows because
-[`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md)
-now uses that same curved centerline directly when a bent `FLS` is
-resized. In other words, there is no hidden straight surrogate being
-rebuilt behind the scenes. The existing bent `rpos` is what gets
-rescaled.
-
-``` r
-
-shape_obj <- cylinder(
-  length_body = 0.05,
-  radius_body = 0.003,
-  n_segments = 120
-)
-
-obj <- fls_generate(
-  shape = shape_obj,
-  density_body = 1045,
-  sound_speed_body = 1520
-)
-
-bent_ratio <- brake(obj, radius_curvature = 5, mode = "ratio")
-bent_measured <- brake(obj, radius_curvature = 0.35, mode = "measurement")
-
-curvature_ratio <- function(x) {
-  value <- extract(x, "shape_parameters")$radius_curvature_ratio
-  if (is.null(value)) NA_real_ else value
-}
-
-data.frame(
-  object = c("original", "bent_ratio", "bent_measured"),
-  length_m = c(
-    extract(obj, c("shape_parameters", "length")),
-    extract(bent_ratio, c("shape_parameters", "length")),
-    extract(bent_measured, c("shape_parameters", "length"))
-  ),
-  curvature_ratio = c(
-    curvature_ratio(obj),
-    curvature_ratio(bent_ratio),
-    curvature_ratio(bent_measured)
-  )
-)
-```
-
-    ##          object   length_m curvature_ratio
-    ## 1      original 0.05000000              NA
-    ## 2    bent_ratio 0.04999999               5
-    ## 3 bent_measured 0.05000000               7
-
-Plotting the object before and after bending makes the transformation
-much easier to interpret.
-
-``` r
-
-old_par <- par(no.readonly = TRUE)
-on.exit(par(old_par))
-
-par(mfrow = c(1, 2), mar = c(3.2, 3.2, 2.6, 0.8))
-plot(obj, type = "shape", main = "Original FLS cylinder")
-plot(bent_ratio, type = "shape", main = "After brake(mode = \"ratio\")")
-```
-
-![](shape-manipulation-reforging_files/figure-html/unnamed-chunk-4-1.png)
-
-It is also helpful to inspect the stored position matrix directly. For a
-straight cylinder the body centerline stays at `z = 0`, while
-[`brake()`](https://brandynlucca.github.io/acousticTS/reference/brake.md)
-shifts the centerline into a curved arc and slightly adjusts the `x`
-positions accordingly.
-
-``` r
-
-body_before <- extract(obj, "body")$rpos
-body_after <- extract(bent_ratio, "body")$rpos
-stations <- unique(round(seq(1, ncol(body_before), length.out = 5)))
-
-data.frame(
-  station = stations,
-  x_before = round(body_before["x", stations], 5),
-  z_before = round(body_before["z", stations], 5),
-  x_after = round(body_after["x", stations], 5),
-  z_after = round(body_after["z", stations], 5)
-)
-```
-
-    ##   station x_before z_before x_after  z_after
-    ## 1       1   0.0500        0 0.04996 -0.00125
-    ## 2      31   0.0375        0 0.03749 -0.00031
-    ## 3      61   0.0250        0 0.02500  0.00000
-    ## 4      91   0.0125        0 0.01251 -0.00031
-    ## 5     121   0.0000        0 0.00004 -0.00125
-
-That check is worth doing because a mathematically valid transformation
-can still create a geometry that is too coarse for the intended model if
-the segmentation is sparse.
-
-It is also worth checking because curvature can alter more than the
-silhouette. Depending on the downstream model, bending can change
-projected length, local orientation, and the phase relationships among
-different parts of the body. A curvature transformation is therefore
-best interpreted as a new geometric state of the same target, not just
-as a cosmetic deformation of a drawing.
-
-That distinction becomes especially important when a bent object is
-later resized. The example below shows that the requested
-`body_target["length"]` is matched to the true bent centerline length,
-while the projected `x` span stays slightly shorter.
-
-``` r
-
-centerline_arc_length <- function(x) {
-  body <- extract(x, "body")
-  rpos <- body$rpos
-  sum(sqrt(diff(rpos["x", ])^2 + diff(rpos["z", ])^2))
-}
-
-bent_rescaled <- reforge(bent_ratio, body_target = c(length = 0.08))
-body_bent_rescaled <- extract(bent_rescaled, "body")$rpos
-
-data.frame(
-  metric = c(
-    "target_length_m",
-    "stored_shape_length_m",
-    "centerline_arc_length_m",
-    "projected_x_length_m"
-  ),
-  value = c(
-    0.08,
-    extract(bent_rescaled, c("shape_parameters", "length")),
-    centerline_arc_length(bent_rescaled),
-    diff(range(body_bent_rescaled["x", ]))
-  )
-)
-```
-
-    ##                    metric      value
-    ## 1         target_length_m 0.08000000
-    ## 2   stored_shape_length_m 0.08000000
-    ## 3 centerline_arc_length_m 0.08000000
-    ## 4    projected_x_length_m 0.07986674
-
-This is the behavior to expect for an already bent `FLS`: resizing is
-arc-length aware. If the scientific question is instead “what happens if
-a straight target of length `L` is bent afterward?”, the safer workflow
-is still to
-[`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md)
-the straight object first and then apply
-[`brake()`](https://brandynlucca.github.io/acousticTS/reference/brake.md).
-
-## Positioning and local profile edits
-
-Not every geometry edit is about bending or global resizing. It is also
-useful to have small helpers for positioning, resampling, smoothing, or
-locally widening and pinching an existing profile.
-
-``` r
-
-translated_obj <- translate_shape(obj, x_offset = -0.025)
-centered_obj <- reanchor_shape(obj, anchor = "center", at = 0)
-
-data.frame(
-  object = c("original", "translated", "centered"),
-  x_min = c(
-    min(extract(obj, "body")$rpos["x", ]),
-    min(extract(translated_obj, "body")$rpos["x", ]),
-    min(extract(centered_obj, "body")$rpos["x", ])
-  ),
-  x_max = c(
-    max(extract(obj, "body")$rpos["x", ]),
-    max(extract(translated_obj, "body")$rpos["x", ]),
-    max(extract(centered_obj, "body")$rpos["x", ])
-  )
-)
-```
-
-    ##       object  x_min x_max
-    ## 1   original  0.000 0.050
-    ## 2 translated -0.025 0.025
-    ## 3   centered -0.025 0.025
-
-Those helpers are intentionally simple:
-
-1.  [`translate_shape()`](https://brandynlucca.github.io/acousticTS/reference/translate_shape.md)
-    applies a direct offset,
-2.  [`reanchor_shape()`](https://brandynlucca.github.io/acousticTS/reference/reanchor_shape.md)
-    computes the required offset from a nose, center, or tail anchor.
-
-There are also helpers for local edits to the stored profile:
-
-``` r
-
-obj_inflated <- inflate_shape(
-  obj,
-  x_range = c(0.015, 0.035),
-  scale = 1.35
-)
-obj_smoothed <- smooth_shape(obj_inflated, span = 7)
-obj_dense <- resample_shape(obj_smoothed, n_segments = 120)
-obj_flipped <- flip_shape(obj_inflated, axis = "x")
-
-data.frame(
-  object = c("original", "inflated", "dense"),
-  shape_label = c(
-    extract(obj, c("shape_parameters", "shape")),
-    extract(obj_inflated, c("shape_parameters", "shape")),
-    extract(obj_dense, c("shape_parameters", "shape"))
-  ),
-  n_segments = c(
-    extract(obj, c("shape_parameters", "n_segments")),
-    extract(obj_inflated, c("shape_parameters", "n_segments")),
-    extract(obj_dense, c("shape_parameters", "n_segments"))
-  )
-)
-```
-
-    ##     object shape_label n_segments
-    ## 1 original    Cylinder        120
-    ## 2 inflated   Arbitrary        120
-    ## 3    dense   Arbitrary        120
-
-In that sequence:
-
-1.  [`inflate_shape()`](https://brandynlucca.github.io/acousticTS/reference/inflate_shape.md)
-    widens a selected axial region,
-2.  [`smooth_shape()`](https://brandynlucca.github.io/acousticTS/reference/smooth_shape.md)
-    regularizes the resulting outline,
-3.  [`resample_shape()`](https://brandynlucca.github.io/acousticTS/reference/resample_shape.md)
-    changes the discretization density without rebuilding the object,
-4.  [`flip_shape()`](https://brandynlucca.github.io/acousticTS/reference/flip_shape.md)
-    reverses the stored axial profile while keeping the x grid intact.
-
-These operations are helpful when the main question is geometric
-preprocessing rather than formal rescaling. They are especially useful
-for measured outlines that need light cleanup before canonicalization or
-model runs.
-
-## Re-parameterizing with `reforge()`
-
-[`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md)
-is a generic interface for reshaping or resizing an existing object. The
-package currently supports both one-body `FLS` workflows and more
-explicitly multi-component classes such as `SBF` and `BBF`.
-
-Its most important arguments are:
-
-1.  `body_scale` and `swimbladder_scale` for proportional resizing,
-2.  `body_target` and `swimbladder_target` for direct target dimensions,
-3.  `maintain_ratio` for preserving relative component proportions when
-    appropriate,
-4.  `n_segments_body` and `n_segments_swimbladder` for resampling,
-5.  `swimbladder_inflation_factor` for controlled bladder-size changes.
-
-There is a critical interpretation difference between scale arguments
-and target-dimension arguments. Scale arguments ask, “How much larger or
-smaller should this component become relative to its current state?”
-Target-dimension arguments ask, “What final dimensions should this
-component have?”
+For `SBF` and `BBF` objects, body and internal components can be changed
+separately. The following example lengthens the body, reduces
+swimbladder height, and resamples both components:
 
 ``` r
 
 data(sardine, package = "acousticTS")
 
-obj_scaled <- reforge(
+sardine_modified <- reforge(
   sardine,
   body_scale = c(length = 1.2),
   swimbladder_scale = c(height = 0.8),
@@ -391,202 +200,29 @@ obj_scaled <- reforge(
   isometric_swimbladder = FALSE,
   maintain_ratio = FALSE,
   n_segments_body = 60,
-  n_segments_swimbladder = 40
-)
-
-obj_target <- reforge(
-  sardine,
-  body_target = c(length = 0.12),
-  swimbladder_target = c(length = 0.07, height = 0.0025),
-  isometric_swimbladder = FALSE,
-  maintain_ratio = FALSE
+  n_segments_swimbladder = 40,
+  containment = "warn"
 )
 ```
 
-    ## Warning: Swimbladder exceeds body bounds at some positions.
+Height changes are applied about each component’s own vertical center.
+For upper/lower envelope profiles, this is the implied local midline.
+For explicit centerlines, such as an `FLS` body or `BBF` backbone, the
+path remains fixed while the surrounding thickness changes.
 
-``` r
+After changing an internal component, verify that it remains inside the
+body. The `containment` argument can warn, stop with an error, or skip
+this check. Use
+[`offset_component()`](https://brandynlucca.github.io/acousticTS/reference/offset_component.md)
+when a bladder or backbone needs a controlled positional adjustment.
 
-data.frame(
-  object = c("original", "obj_scaled", "obj_target"),
-  body_length_m = c(
-    extract(sardine, c("shape_parameters", "body", "length")),
-    extract(obj_scaled, c("shape_parameters", "body", "length")),
-    extract(obj_target, c("shape_parameters", "body", "length"))
-  ),
-  bladder_length_m = c(
-    extract(sardine, c("shape_parameters", "bladder", "length")),
-    extract(obj_scaled, c("shape_parameters", "bladder", "length")),
-    extract(obj_target, c("shape_parameters", "bladder", "length"))
-  )
-)
-```
+### Canonical gas-filled bodies
 
-    ##       object body_length_m bladder_length_m
-    ## 1   original         0.210            0.085
-    ## 2 obj_scaled         0.252            0.085
-    ## 3 obj_target         0.120            0.070
-
-Height scaling is applied about each component’s own vertical center
-rather than around a shared coordinate origin. For components built from
-upper/lower envelopes with no explicit centerline row - the common case
-for `SBF`/`BBF` body profiles - that center is the midline implied by
-those envelopes, so a curved or undulating midline keeps its proportions
-instead of warping when the body is enlarged or shrunk. Components that
-do carry an explicit centerline row, such as an `FLS` or `BBF` backbone,
-are treated differently: the centerline is held fixed and only the
-surrounding tube thickness responds to the height factor, since that row
-is a genuine path rather than an emergent midline.
-
-The same idea applies when the body stays fixed but an internal
-component needs to move. For example, a swimbladder can be shifted
-fore-aft or dorsoventrally without rebuilding the entire object:
-
-``` r
-
-bladder_forward <- offset_component(
-  sardine,
-  component = "bladder",
-  x_offset = 0.002
-)
-
-data.frame(
-  object = c("original", "bladder_forward"),
-  bladder_x_min = c(
-    min(extract(sardine, "bladder")$rpos[1, ]),
-    min(extract(bladder_forward, "bladder")$rpos[1, ])
-  )
-)
-```
-
-    ##            object bladder_x_min
-    ## 1        original         0.065
-    ## 2 bladder_forward         0.067
-
-The same interface also extends to newer multi-component classes such as
-`BBF`, where the body and backbone can be reforged separately:
-
-``` r
-
-bbf_rescaled <- reforge(
-  bbf_obj,
-  body_scale = c(length = 1.1),
-  backbone_scale = c(length = 1.1),
-  n_segments_body = 120,
-  n_segments_backbone = 60
-)
-```
-
-For reference, the scale-target patterns above can also be written more
-compactly as:
-
-``` r
-
-obj_scaled <- reforge(
-  obj_sbf,
-  body_scale = c(length = 1.2),
-  swimbladder_scale = c(height = 0.8),
-  n_segments_body = 60,
-  n_segments_swimbladder = 40
-)
-
-obj_target <- reforge(
-  obj_sbf,
-  body_target = c(length = 0.12),
-  swimbladder_target = c(length = 0.07, height = 0.0025),
-  maintain_ratio = FALSE
-)
-```
-
-Named vectors matter here. For anisotropic changes, dimensions should be
-supplied using names such as `length`, `width`, and `height`. That keeps
-the transformation explicit and avoids accidental axis mismatches.
-
-The deeper point is that
+For canonical `GAS` bodies,
 [`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md)
-often changes representation more directly than
-[`brake()`](https://brandynlucca.github.io/acousticTS/reference/brake.md).
-Bending usually preserves the same broad anatomical proportions while
-changing pose. Reforging may change size, aspect ratio, internal
-proportions, and numerical resolution all at once. That makes it
-especially powerful for simulation and sensitivity studies, but it also
-means the transformed object should be treated as a deliberate new
-parameterization rather than as a trivial variant of the original.
-
-For bent `FLS` objects, there is one more important interpretation
-detail: `body_target = c(length = ...)` refers to the new bent
-centerline arc length, not to the projected `x` extent. For straight
-`FLS` objects those two quantities are effectively the same, but once
-curvature has been introduced they should not be treated as
-interchangeable.
-
-## Reshaping gas-filled bodies with `reforge()`
-
-`GAS` objects follow the same `body_scale`/`body_target` interface used
-for `FLS`, but because a `GAS` body can be a canonical sphere, prolate
-spheroid, or cylinder,
-[`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md)
-treats `length` and `radius` as independently addressable dimensions
-rather than forcing isometric scaling.
-
-``` r
-
-gas_prolate <- gas_generate(
-  shape = prolate_spheroid(
-    length_body = 0.05,
-    radius_body = 0.01,
-    n_segments = 40
-  ),
-  g_fluid = 0.0012,
-  h_fluid = 0.22
-)
-
-gas_length_only <- reforge(
-  gas_prolate,
-  body_target = c(length = 0.09),
-  isometric_body = FALSE
-)
-
-gas_radius_only <- reforge(
-  gas_prolate,
-  body_target = c(radius = 0.02),
-  isometric_body = FALSE
-)
-
-data.frame(
-  object = c("original", "length_only", "radius_only"),
-  length_m = c(
-    extract(gas_prolate, c("shape_parameters", "length")),
-    extract(gas_length_only, c("shape_parameters", "length")),
-    extract(gas_radius_only, c("shape_parameters", "length"))
-  ),
-  radius_m = c(
-    max(extract(gas_prolate, "body")$rpos[, "zU"]),
-    max(extract(gas_length_only, "body")$rpos[, "zU"]),
-    max(extract(gas_radius_only, "body")$rpos[, "zU"])
-  )
-)
-```
-
-    ##        object length_m radius_m
-    ## 1    original     0.05     0.01
-    ## 2 length_only     0.09     0.01
-    ## 3 radius_only     0.05     0.02
-
-When the stored body is one of the package’s canonical families
-(`Sphere`, `ProlateSpheroid`, `Cylinder`),
-[`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md)
-does not scale the position matrix directly. It instead regenerates the
-geometry from the requested `length` and `radius` through the matching
-shape constructor, so the discretization stays clean and the stored
-shape descriptor - and therefore any model that inspects it - remains
-accurate.
-
-That regeneration has one notable consequence for spheres: a sphere is
-only a sphere while `length == 2 * radius`. Scaling both dimensions
-together, the default isometric behavior, keeps it a sphere. But an
-independent length change under `isometric_body = FALSE` breaks that
-identity and promotes the body to a prolate spheroid.
+regenerates the geometry with the matching shape constructor instead of
+scaling the stored coordinates directly. This preserves a clean
+discretization and an accurate shape label.
 
 ``` r
 
@@ -596,161 +232,74 @@ gas_sphere <- gas_generate(
   h_fluid = 0.22
 )
 
-gas_sphere_isometric <- reforge(gas_sphere, radius_target = 0.015)
-gas_sphere_promoted <- reforge(
+gas_isometric <- reforge(
+  gas_sphere,
+  body_target = c(radius = 0.015)
+)
+
+gas_elongated <- reforge(
   gas_sphere,
   body_target = c(length = 0.05),
   isometric_body = FALSE
 )
 
-data.frame(
-  object = c("original", "isometric_resize", "independent_length"),
-  shape = c(
-    extract(gas_sphere, c("shape_parameters", "shape")),
-    extract(gas_sphere_isometric, c("shape_parameters", "shape")),
-    extract(gas_sphere_promoted, c("shape_parameters", "shape"))
-  )
+c(
+  original = extract(gas_sphere, c("shape_parameters", "shape")),
+  isometric = extract(gas_isometric, c("shape_parameters", "shape")),
+  elongated = extract(gas_elongated, c("shape_parameters", "shape"))
 )
 ```
 
-    ##               object           shape
-    ## 1           original          Sphere
-    ## 2   isometric_resize          Sphere
-    ## 3 independent_length ProlateSpheroid
+    ##          original         isometric         elongated 
+    ##          "Sphere"          "Sphere" "ProlateSpheroid"
 
-Arbitrary, non-canonical `GAS` bodies do not have a matching shape
-constructor to regenerate from, so they fall back to direct per-axis
-scaling of the position matrix - the same approach `FLS` and `SBF`
-bodies already use.
+A sphere remains spherical only when length and radius retain the
+spherical relationship. An independent length change promotes it to a
+prolate spheroid. Arbitrary `GAS` bodies have no canonical constructor
+to regenerate them, so they are scaled directly by axis.
 
-The legacy `scale`, `radius_target`, and `n_segments` arguments are
-still available on `GAS` objects and remain isometric, so existing code
-that only needs uniform scaling does not need to change.
-`body_scale`/`body_target` (with `isometric_body = FALSE`) are the
-interface to reach for once length and radius need to move
-independently.
+## Positioning and profile preparation
 
-## Why this matters
+The smaller manipulation helpers can be combined for measured profiles:
 
-These tools are especially useful when:
+``` r
 
-1.  an arbitrary measured geometry must be adapted for a model family,
-2.  curvature or pose needs to be explored systematically,
-3.  one object representation needs to be converted into another for
-    comparison.
+centered_obj <- reanchor_shape(
+  straight_obj,
+  anchor = "center",
+  at = 0
+)
 
-They are also useful when the scientific question itself is
-morphological. For example, one may want to ask whether target strength
-is more sensitive to curvature, overall length, or swimbladder
-inflation. Those are exactly the kinds of questions that reshaping
-utilities make tractable.
+prepared_obj <- straight_obj |>
+  inflate_shape(x_range = c(0.015, 0.035), scale = 1.35) |>
+  smooth_shape(span = 7) |>
+  resample_shape(n_segments = 120)
 
-In that sense, these utilities are often not just preprocessing steps.
-They can be the mechanism by which the actual hypothesis is encoded. If
-a workflow is designed to ask what aspect of morphology matters most
-acoustically, then the transformation function is part of the
-experimental design.
+reversed_obj <- flip_shape(prepared_obj, axis = "x")
+```
 
-## Resolution and physicality checks
+Profile-changing operations can convert canonical geometry into an
+arbitrary representation. Recheck the stored shape label and model
+compatibility after local edits. Translation and reanchoring change
+position but not dimensions.
 
-Two geometry checks are especially important after
-[`brake()`](https://brandynlucca.github.io/acousticTS/reference/brake.md)
-or
-[`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md):
+## Checks after manipulation
 
-1.  whether the object still has adequate segment resolution for the
-    intended model,
-2.  whether the transformed swimbladder remains physically plausible
-    inside the body.
+Before running another model:
 
-The second point is particularly important for `SBF` workflows. If the
-swimbladder is inflated or rescaled aggressively, geometric containment
-can become questionable even before the code throws a warning.
+- plot the original and modified objects together
+- inspect component lengths, radii, and relative positions
+- confirm the stored shape class or label
+- check segment convergence after resampling
+- verify containment for composite targets
+- record whether the change represents biology, posture, or numerical
+  cleanup
+- rerun the model rather than reusing results stored before the
+  transformation
 
-For that reason, a practical reshaping workflow is usually:
-
-1.  transform the object,
-2.  plot the transformed geometry,
-3.  inspect component dimensions,
-4.  then re-run
-    [`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md).
-
-## Choosing between `brake()` and `reforge()`
-
-Although both functions manipulate geometry, they answer different
-questions.
-
-Use
-[`brake()`](https://brandynlucca.github.io/acousticTS/reference/brake.md)
-when:
-
-1.  the target identity should remain the same but posture changes,
-2.  curvature is the parameter of interest,
-3.  the original segmentation is already suitable.
-
-Use
-[`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md)
-when:
-
-1.  component lengths or widths need to be rescaled,
-2.  body and swimbladder proportions must be altered separately,
-3.  segment counts must be regularized for downstream modeling,
-4.  simulation workflows need dimension changes as explicit parameters.
-
-If a simulation needs both curvature and resizing, it helps to decide
-which quantity is supposed to stay physically meaningful. When the
-object is already bent,
-[`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md)
-preserves the bent state and rescales that geometry directly. When the
-intended interpretation is “start straight, resize, then bend,” that
-sequence should be built explicitly in the workflow.
-
-## Recommended use
-
-Geometry transformation is best treated as a modeling decision rather
-than a purely cosmetic step. Any reshaping or reforging should be
-interpreted in light of the model assumptions it is intended to support.
-
-For
-[`brake()`](https://brandynlucca.github.io/acousticTS/reference/brake.md),
-the practical distinction is between ratio-based curvature and curvature
-specified in measured units. For
-[`reforge()`](https://brandynlucca.github.io/acousticTS/reference/reforge.md),
-the practical distinction is between proportional scaling and
-target-dimension-based resizing. Both are useful, but they answer
-different modeling questions.
-
-One useful habit is to preserve the original object and store
-transformed variants as separate named objects. That makes it easier to
-compare before/after model outputs without losing the original
-parameterization.
-
-Another useful habit is to document what physical interpretation the
-transformation is meant to represent. A bent object may correspond to
-posture. A rescaled swimbladder may correspond to inflation state. A
-resampled geometry may correspond to numerical regularization rather
-than a biological change. Making that meaning explicit helps keep later
-comparisons scientifically interpretable instead of turning into an
-untracked series of geometric edits.
-
-## Related reading
-
-- [Building
-  shapes](https://brandynlucca.github.io/acousticTS/articles/building-shapes/building-shapes.md)
-- [Building
-  scatterers](https://brandynlucca.github.io/acousticTS/articles/building-scatterers/building-scatterers.md)
-- [Comparing models on the same
-  target](https://brandynlucca.github.io/acousticTS/articles/comparing-models/comparing-models.md)
-
-## References
-
-Clay, Clarence S., and John K. Horne. 1994. “Acoustic Models of Fish:
-The Atlantic Cod (*Gadus Morhua*).” *The Journal of the Acoustical
-Society of America* 96 (3): 1661–68. <https://doi.org/10.1121/1.410245>.
-
-Gastauer, Sven, Dezhang Chu, and Martin J. Cox. 2019. “ZooScatR—An
-\<Span Style="font-Variant:small-Caps;"\>r\</Span\> Package for
-Modelling the Scattering Properties of Weak Scattering Targets Using the
-Distorted Wave Born Approximation.” *The Journal of the Acoustical
-Society of America* 145 (1): EL102–8.
-<https://doi.org/10.1121/1.5085655>.
+Continue with [Building
+Shapes](https://brandynlucca.github.io/acousticTS/articles/building-shapes/building-shapes.md),
+[Building
+Scatterers](https://brandynlucca.github.io/acousticTS/articles/building-scatterers/building-scatterers.md),
+or [Comparing
+Models](https://brandynlucca.github.io/acousticTS/articles/comparing-models/comparing-models.md).

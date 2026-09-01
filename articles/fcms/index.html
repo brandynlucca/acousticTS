@@ -47,10 +47,9 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-physics-primer" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Physics Primer</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-physics-primer">
-<li><a class="dropdown-item" href="../../articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
-    <li><a class="dropdown-item" href="../../articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+<li><a class="dropdown-item" href="../../articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+    <li><a class="dropdown-item" href="../../articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
     <li><a class="dropdown-item" href="../../articles/boundary_conditions.html">Boundary conditions</a></li>
-    <li><a class="dropdown-item" href="../../articles/material-properties/material-properties.html">Material properties</a></li>
     <li><a class="dropdown-item" href="../../articles/numerical-foundations/numerical-foundations.html">Numerical methods</a></li>
   </ul>
 </li>
@@ -58,6 +57,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-build-targets" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Build Targets</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-build-targets">
 <li><a class="dropdown-item" href="../../articles/building-shapes/building-shapes.html">Building Shapes</a></li>
+    <li><a class="dropdown-item" href="../../articles/material-properties/material-properties.html">Material Properties</a></li>
     <li><a class="dropdown-item" href="../../articles/building-scatterers/building-scatterers.html">Building Scatterers</a></li>
     <li><a class="dropdown-item" href="../../articles/shape-manipulation-reforging/shape-manipulation-reforging.html">Shape Manipulation</a></li>
   </ul>
@@ -68,17 +68,15 @@
 <li><a class="dropdown-item" href="../../articles/running-models/running-models.html">Running Models</a></li>
     <li><a class="dropdown-item" href="../../articles/model-selection/model-selection.html">Choosing a Model</a></li>
     <li><a class="dropdown-item" href="../../articles/comparing-models/comparing-models.html">Comparing Models</a></li>
-    <li><a class="dropdown-item" href="../../articles/plotting-inspecting-results/plotting-inspecting-results.html">Visualizing results</a></li>
     <li><a class="dropdown-item" href="../../articles/simulation-parameter-sweeps/simulation-parameter-sweeps.html">Simulation sweeps</a></li>
-    <li><a class="dropdown-item" href="../../articles/calibration-workflow/calibration-workflow.html">Calibration workflow</a></li>
-    <li><a class="dropdown-item" href="../../articles/validation-benchmarks/validation-benchmarks.html">Validating models</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../../articles/model-library/model-library.html">Models</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-developers" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Developers</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-developers">
-<li><a class="dropdown-item" href="../../articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
+<li><a class="dropdown-item" href="../../articles/validation-benchmarks/validation-benchmarks.html">Validation methods</a></li>
+    <li><a class="dropdown-item" href="../../articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
     <li><a class="dropdown-item" href="../../articles/combining-components/combining-components.html">Combining components</a></li>
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
@@ -130,29 +128,25 @@
 <a class="model-nav-badge" href="fcms-implementation.html">Implementation</a>
 </div>
 </div>
-<p>These pages follow the finite-cylinder modal-series literature for
-straight circular cylinders near broadside <span class="citation">(<a href="#ref-Stanton_1988">Stanton 1988</a>, <a href="#ref-Stanton_1989_2">1989</a>)</span>.</p>
-<p>The finite cylinder modal series solution (<code>FCMS</code>) is the
-package’s geometry-matched cylinder family for straight circular
-cylinders. It keeps the exact cylindrical-harmonic treatment of the
-cross-section and closes the finite-length problem with the standard
-near-broadside coherence factor.</p>
+<p>The finite-cylinder modal-series solution (<code>FCMS</code>)
+calculates monostatic scattering from a straight circular cylinder near
+broadside.</p>
 <div class="section level3">
 <h3 id="core-idea">Core idea<a class="anchor" aria-label="anchor" href="#core-idea"></a>
 </h3>
-<p>Solve the circular cross-section exactly in cylindrical partial
-waves, then multiply by the finite-length directivity factor that
-accounts for the coherent addition along the cylinder axis.</p>
+<p>Solve the circular cross-section in cylindrical partial waves, then
+apply the finite-length coherence factor that describes addition along
+the straight cylinder axis <span class="citation">(<a href="#ref-Stanton_1988">Stanton 1988</a>, <a href="#ref-Stanton_1989_2">1989</a>)</span>.</p>
 </div>
 <div class="section level3">
 <h3 id="best-for">Best for<a class="anchor" aria-label="anchor" href="#best-for"></a>
 </h3>
 <ul>
-<li>Straight finite cylinders near broadside</li>
-<li>Rigid, pressure-release, liquid-filled, and gas-filled cylinder
-comparisons</li>
-<li>Reference checks for cylinder-like targets before using higher-level
-approximations</li>
+<li>Straight, constant-radius finite cylinders near broadside</li>
+<li>Comparing fixed-rigid, pressure-release, liquid-filled, and
+gas-filled cylinder boundaries</li>
+<li>Canonical cylinder benchmarks before adopting an asymptotic
+model</li>
 </ul>
 </div>
 <div class="section level3">
@@ -160,22 +154,23 @@ approximations</li>
 </h3>
 <ul>
 <li>
-<code>Cylinder</code> shapes on <code>FLS</code> or <code>GAS</code>
-objects</li>
-<li>Near-broadside monostatic target strength</li>
-<li>Fluid and gas interiors parameterized relative to seawater as medium
-<code>1</code>
-</li>
+<code>Cylinder</code> shapes carried by <code>FLS</code> or
+<code>GAS</code> scatterers</li>
+<li>Homogeneous fluid or gas interiors, plus fixed-rigid and
+pressure-release limits</li>
+<li>Monostatic complex amplitude, backscattering cross-section, and
+target strength</li>
 </ul>
 </div>
 <div class="section level3">
 <h3 id="main-assumptions">Main assumptions<a class="anchor" aria-label="anchor" href="#main-assumptions"></a>
 </h3>
 <ul>
-<li>Circular cross-section and straight centerline</li>
+<li>A straight centerline and circular, constant-radius
+cross-section</li>
 <li>Broadside or near-broadside incidence</li>
-<li>Homogeneous interior material properties for penetrable cases</li>
-<li>No elastic shear support in the interior</li>
+<li>Finite length represented by a coherence factor</li>
+<li>No elastic shear response in the cylinder interior</li>
 </ul>
 </div>
 <div class="section level3">
@@ -192,11 +187,11 @@ benchmark_ts.</li>
 </h3>
 <ul>
 <li>
-<a href="fcms-implementation.html">Implementation</a>: spectra,
-result extraction, and comparison tables</li>
+<a href="fcms-implementation.html">Implementation</a>: cylinder
+construction, boundaries, output, and comparisons</li>
 <li>
-<a href="fcms-theory.html">Theory</a>: cylindrical modal reduction,
-boundary conditions, and finite-length factorization</li>
+<a href="fcms-theory.html">Theory</a>: cylindrical modes, interface
+conditions, and finite-length closure</li>
 </ul>
 </div>
 </div>

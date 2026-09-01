@@ -1,4 +1,4 @@
-# TMM theory
+# Transition matrix method (TMM) theory
 
 ## Introduction
 
@@ -7,34 +7,29 @@ Benchmarked Partially validated Experimental
 [Overview](https://brandynlucca.github.io/acousticTS/articles/tmm/index.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/tmm/tmm-implementation.md)
 
-The transition matrix method (`TMM`) is a basis-expansion view of
-scattering. Instead of solving directly for the scattered pressure in
-physical space, one expands both the incident and scattered fields in
-complete wave bases and then asks for the linear map between the two
-coefficient vectors. That map is the transition matrix, or T-matrix
-([Waterman 1969](#ref-Waterman_1969)).
+The transition matrix method (`TMM`) represents a target by the linear
+map from incident-wave coefficients to scattered-wave coefficients
+([Waterman 1969](#ref-Waterman_1969)). Once constructed, that map can be
+evaluated for different incident and receive directions without
+resolving the boundary-value problem.
 
-For a single target, that point of view is valuable even before one
-thinks about multiple scattering. Once the target response is
-represented in a basis-to-basis form, the same mathematical object can
-in principle support monostatic scattering, bistatic scattering,
-rotations, and later orientation averaging.
+This coefficient map supports monostatic and bistatic scattering,
+rotations, and orientation averages when the retained basis and
+numerical solution are valid for those operations.
 
-For smooth axisymmetric targets, the most natural basis depends on the
-geometry. A sphere is naturally represented in spherical coordinates,
-while a prolate spheroid is naturally represented in prolate spheroidal
-coordinates. Oblate spheroids can still be handled in a spherical-wave
-T-matrix framework by enforcing the boundary conditions on the actual
-surface r(\theta), but the surface geometry then enters explicitly
-through the boundary operator. Finite cylinders are different again: the
-sidewall-endcap junctions make a purely spherical retained operator much
-less natural than a cylindrical modal basis, especially once one wants
-reliable angular products away from the simplest monostatic setting
-([Varadan et al. 1982](#ref-Varadan_1982); [Waterman
-2009](#ref-Waterman_2009)).
+The useful basis depends on geometry. Spheres and spherical shells use
+spherical waves. Prolate spheroids use prolate spheroidal waves. Oblate
+spheroids can use spherical waves enforced on r(\theta). Finite
+cylinders favor cylindrical modes because the sidewall-endcap junction
+converges poorly in a smooth spherical basis ([Varadan et al.
+1982](#ref-Varadan_1982); [Waterman 2009](#ref-Waterman_2009)).
 
-Unless stated otherwise, medium `1` is the surrounding seawater and
-medium `2` is the target interior.
+Medium indices, field conventions, and reporting quantities follow
+[Notation and
+symbols](https://brandynlucca.github.io/acousticTS/articles/notation-and-symbols/notation-and-symbols.md).
+Boundary types are defined on the [Boundary
+conditions](https://brandynlucca.github.io/acousticTS/articles/boundary_conditions.md)
+page.
 
 ## General single-target T-matrix formulation
 
@@ -52,17 +47,25 @@ expanded as:
 p^{inc} = \sum\_{\nu} a\_{\nu}\\\psi^{(1)}\_{\nu}, \qquad p^{sca} =
 \sum\_{\nu} f\_{\nu}\\\psi^{(3)}\_{\nu}.
 
-where \psi^{(1)}\_{\nu} denotes a regular basis state and
-\psi^{(3)}\_{\nu} denotes an outgoing basis state. The single-target
-transition matrix is then the linear map:
+Here \psi^{(1)}\_{\nu} is regular and \psi^{(3)}\_{\nu} is outgoing. The
+transition matrix is the linear map:
 
 \mathbf{f} = \mathbf{T}\mathbf{a}.
 
-For axisymmetric targets, the azimuthal order decouples. The T-matrix
-can therefore be organized into independent m-blocks, and the monostatic
-backscatter amplitude is reconstructed from those blocks after the
-incident plane-wave coefficients have been determined ([Waterman
-1969](#ref-Waterman_1969); [Varadan et al. 1982](#ref-Varadan_1982)).
+For an axisymmetric target, azimuthal order m decouples and \mathbf T is
+block diagonal in m. If a\_{m'n'}(\widehat{\mathbf k}\_i) are the
+plane-wave coefficients for incident direction \widehat{\mathbf k}\_i,
+the far-field amplitude in receive direction \widehat{\mathbf k}\_s has
+the general form:
+
+f(\widehat{\mathbf k}\_s,\widehat{\mathbf k}\_i) = \frac{1}{k_1}
+\sum\_{mn}\sum\_{m'n'} \mathcal Y\_{mn}(\widehat{\mathbf k}\_s)
+T\_{mn,m'n'} a\_{m'n'}(\widehat{\mathbf k}\_i),
+
+where \mathcal Y\_{mn} includes the angular basis and outgoing-wave
+phase. Backscatter is the special case \widehat{\mathbf
+k}\_s=-\widehat{\mathbf k}\_i ([Mishchenko et al.
+2002](#ref-Mishchenko_2002)).
 
 ### Boundary conditions
 
@@ -81,9 +84,7 @@ p^{ext} = p^{int}, \qquad \frac{1}{\rho\_{ext}} \frac{\partial
 p^{ext}}{\partial n} = \frac{1}{\rho\_{int}} \frac{\partial
 p^{int}}{\partial n}.
 
-This is the part of the formulation where density and sound-speed
-contrasts become part of the modal system rather than only simple
-amplitude rescalings.
+Density and sound speed therefore enter the modal boundary operator.
 
 ## Spherical-coordinate branch
 
@@ -109,13 +110,11 @@ derivative is:
 r\right\]^2}} \left( \frac{\partial}{\partial r} -
 \frac{r\_\theta}{r^2}\frac{\partial}{\partial \theta} \right).
 
-where r\_\theta = dr/d\theta.
+where r\_\theta=dr/d\theta.
 
-So even in a spherical basis, a nonspherical axisymmetric boundary
-couples the radial and angular derivatives of each retained basis state.
-The block T-matrix equations are then obtained by enforcing the boundary
-conditions on the physical surface and projecting the resulting
-equations back onto the retained spherical basis.
+A nonspherical boundary therefore couples radial and angular
+derivatives. The boundary residual is projected back onto the retained
+spherical basis to form each m-block.
 
 ### Special geometries in the spherical branch
 
@@ -128,6 +127,24 @@ r(\theta) = a.
 so r\_\theta = 0 and the normal derivative reduces to the ordinary
 radial derivative. The spherical-coordinate T-matrix formulation
 therefore collapses to the classical spherical partial-wave problem.
+
+#### Spherical shells
+
+For a concentric shell with outer radius a and inner radius b, spherical
+symmetry keeps the T-matrix diagonal in (m,n). The diagonal coefficient
+is the exterior modal scattering coefficient obtained from the two
+interface systems. A fluid shell couples exterior, shell, and core
+acoustic fields. An elastic shell also carries longitudinal and
+transverse elastic potentials. The coefficient map is therefore:
+
+f\_{mn}=T_n a\_{mn},
+
+with T_n supplied by the corresponding shell boundary determinant. See
+[VESM
+theory](https://brandynlucca.github.io/acousticTS/articles/vesm/vesm-theory.md)
+for fluid shells and [ESSMS
+theory](https://brandynlucca.github.io/acousticTS/articles/essms/essms-theory.md)
+for elastic shells.
 
 #### Oblate spheroid
 
@@ -156,12 +173,10 @@ as:
 r(\theta) = \min\left( \frac{a}{\|\cos\theta\|},
 \frac{b}{\|\sin\theta\|} \right).
 
-This simply states that a ray from the origin first meets either an
-end-cap plane or the cylindrical side wall. The resulting r(\theta) is
-continuous but not differentiable where the side wall and end-cap meet,
-which is one reason finite cylinders are numerically less forgiving than
-smooth spheres or spheroids in a spherical-basis T-matrix treatment
-([Waterman 2009](#ref-Waterman_2009)).
+A ray from the origin first meets either an end cap or the sidewall. The
+profile is continuous but not differentiable at their junction, which
+slows convergence of a spherical-wave representation ([Waterman
+2009](#ref-Waterman_2009)).
 
 ### Monostatic reconstruction
 
@@ -172,30 +187,20 @@ backscattering cross section then follows from:
 
 \sigma\_{bs} = \|f\_{bs}\|^2
 
-and finally ([MacLennan et al. 2002](#ref-MacLennan_2002); [Urick
-1983](#ref-Urick_1983); [Simmonds and MacLennan
-2005](#ref-Simmonds_2005)):
+and target strength is ([MacLennan et al. 2002](#ref-MacLennan_2002)):
 
-TS = 10 \log\_{10} \left(\sigma\_{bs}\right)
+TS = 10 \log\_{10}\left( \frac{\sigma\_{bs}}{1\\ \mathrm{m}^2}\right).
 
 ## Cylindrical interpretation
 
-For a finite cylinder, the most natural modal picture is again geometry
-matched. The circular cross-section is represented by cylindrical
-partial waves, while the finite length enters through an axial operator
-that reduces to the familiar finite-cylinder coherence factor in the
-monostatic near-broadside problem. In that sense, the cylinder T-matrix
-viewpoint is not different in principle from the spherical or spheroidal
-ones: incident coefficients are still mapped to scattered coefficients.
-What changes is the basis in which that mapping is most stable and
-physically transparent.
+For a finite cylinder, cylindrical partial waves describe the
+cross-section and an axial operator describes finite length. Near
+broadside in monostatic scattering, that operator reduces to the
+familiar finite-cylinder coherence factor.
 
-The main obstacle for cylinders is geometric non-smoothness. A sphere or
-smooth spheroid has a differentiable meridional profile everywhere,
-whereas a finite cylinder has sidewall-endcap junctions. Those corners
-are exactly what make spherical retained operators converge slowly and
-what motivate a cylindrical interpretation whenever one wants a
-trustworthy finite-cylinder operator.
+The sidewall-endcap corners are the main obstacle. Angular products
+require particular care because a near-broadside coherence closure is
+not a general bistatic cylinder solution.
 
 ## Prolate spheroid branch
 
@@ -208,10 +213,8 @@ spheroidal-coordinate transition-matrix literature becomes relevant
 ([Varadan et al. 1982](#ref-Varadan_1982); [Hackman and Todoroff
 1984](#ref-Hackman_1984)).
 
-For the single-target scalar acoustic problem, it is more natural to use
-prolate spheroidal coordinates and write the target surface as a single
-coordinate surface \xi = \xi_1. That is also the natural starting point
-for a geometry-matched T-matrix formulation.
+In prolate spheroidal coordinates, the boundary is the coordinate
+surface \xi=\xi_1.
 
 ### Prolate spheroidal coordinates
 
@@ -235,6 +238,11 @@ so equivalently:
 
 \xi_1 = \left\[1 - \left(\frac{b}{a}\right)^2\right\]^{-1/2}.
 
+![Meridional-plane geometry for the prolate spheroidal TMM
+branch.](tmm-prolate-coordinate-schematic.png)
+
+Meridional-plane geometry for the prolate spheroidal TMM branch.
+
 ### Spheroidal modal representation
 
 In a homogeneous region, the separated pressure field is written as the
@@ -255,17 +263,19 @@ exact prolate spheroidal modal-series solution ([Hackman and Todoroff
 
 ### T-matrix interpretation in a geometry-matched basis
 
-The essential mathematical point is that the T-matrix concept does not
-depend on using spherical coordinates specifically. What matters is that
-the incident and scattered fields are both expanded in complete modal
-bases, and that a linear operator maps one coefficient vector to the
-other.
+The T-matrix concept is independent of a particular coordinate system.
+It requires regular and outgoing bases, a boundary operator, and a
+converged coefficient map between them.
 
-For spheres, the geometry-matched basis is spherical. For prolate
-spheroids, the geometry-matched basis is spheroidal. In both cases, the
-T-matrix interpretation is the same: the target response is represented
-as a linear map from incident modal amplitudes to scattered modal
-amplitudes in the basis natural to that geometry.
+## Mathematical assumptions and scope
+
+The formulations above assume linear time-harmonic acoustics, a single
+target, an axisymmetric geometry, and homogeneous properties within each
+region. Accuracy depends on modal truncation, boundary quadrature, and
+using a basis suited to the surface. Smooth spherical and spheroidal
+surfaces support general angular reconstruction once their blocks
+converge. A finite-cylinder near-broadside closure does not by itself
+establish a general bistatic cylinder operator.
 
 ## References
 
@@ -283,19 +293,16 @@ Consistent Approach to Definitions and Symbols in Fisheries Acoustics.”
 *ICES Journal of Marine Science* 59 (2): 365–69.
 <https://doi.org/10.1006/jmsc.2001.1158>.
 
+Mishchenko, Michael I., Larry D. Travis, and Andrew A. Lacis. 2002.
+*Scattering, Absorption, and Emission of Light by Small Particles*.
+Cambridge University Press.
+
 Morse, Philip M., and K. Uno Ingard. 1968. *Theoretical Acoustics*.
 McGraw-Hill.
-
-Simmonds, John, and David N. MacLennan. 2005. *Fisheries Acoustics:
-Theory and Practice*. 2nd ed. Blackwell Science.
-<https://doi.org/10.1002/9780470995303>.
 
 Spence, R. D., and Sara Granger. 1951. “The Scattering of Sound from a
 Prolate Spheroid.” *The Journal of the Acoustical Society of America* 23
 (6): 701–6. <https://doi.org/10.1121/1.1906827>.
-
-Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed.
-McGraw-Hill.
 
 Varadan, V. K., V. V. Varadan, Louis R. Dragonette, and Lawrence Flax.
 1982. “Computation of Rigid Body Scattering by Prolate Spheroids Using

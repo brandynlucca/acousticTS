@@ -7,46 +7,39 @@ Benchmarked Validated
 [Theory](https://brandynlucca.github.io/acousticTS/articles/sdwba/sdwba-theory.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/sdwba/sdwba-implementation.md)
 
-These pages connect krill-body DWBA models to phase variability,
-orientation effects, and practical survey use ([Demer and Stephane G.
-Conti 2003](#ref-Demer_2003_1); [Demer and Stéphane G. Conti
-2003](#ref-Demer_2003_2), [2005](#ref-Demer_2005); [Conti and Demer
-2006](#ref-Conti_2006)).
-
-The stochastic distorted wave Born approximation (`SDWBA`) extends the
-deterministic `DWBA` by treating unresolved posture and shape
-variability as stochastic phase variability along the body.
+The stochastic distorted-wave Born approximation (`SDWBA`) extends the
+weak-fluid `DWBA` by averaging over random phase perturbations along the
+body.
 
 ### Core idea
 
-Start from the same segmented weak-scattering sum as `DWBA`, then
-replace the strictly coherent phase accumulation by a randomized phase
-model whose statistics are chosen to mimic unresolved biological
-variability.
+Retain the local weak-scattering contributions used by `DWBA`, perturb
+their relative phases over repeated realizations, and report the mean
+linear backscatter response ([Demer and Conti 2003](#ref-Demer_2003_1);
+[Demer and Conti 2005](#ref-Demer_2005)).
 
 ### Best for
 
-- Krill-like or zooplankton-like targets where deterministic body
-  geometry is not known precisely
-- Orientation-averaged or ensemble-style weak-scattering predictions
-- Situations where fully coherent `DWBA` overpredicts narrow
-  interference structure
+- Krill-like and zooplankton-like targets with unresolved shape or
+  posture variability
+- Ensemble predictions in which phase variability is part of the model
+- Assessing how deterministic interference structure changes under
+  randomization
 
 ### Supports
 
-- `FLS` objects with the same geometry support as `DWBA`
-- Monostatic target strength based on an averaged linear backscatter
-  quantity
-- The same local contrast notation as `DWBA`, with seawater as medium
-  `1` and the body as medium `2`
+- `FLS` geometry and material inputs accepted by `DWBA`
+- Configurable realization count and reference phase-scaling parameters
+- Averaged complex amplitude, linear cross-section, and target strength
 
 ### Main assumptions
 
-- Weak-scattering fluid-like body
-- Phase variability enters statistically rather than through an explicit
-  new boundary-value solve
-- Randomization acts on the coherent sum rather than on the local
-  scattering kernel
+- The same weak-fluid and single-scattering regime as `DWBA`
+- Unresolved variability can be represented by the specified phase
+  distribution
+- Randomization modifies coherence rather than the local scattering
+  kernel
+- Monte Carlo settings are adequate for the requested summary
 
 ### Validation status
 
@@ -57,28 +50,17 @@ variability.
 ### Family pages
 
 - [Implementation](https://brandynlucca.github.io/acousticTS/articles/sdwba/sdwba-implementation.md):
-  stochastic settings, spectra, and validation workflows
+  stochastic controls, reproducibility, output, and comparisons
 - [Theory](https://brandynlucca.github.io/acousticTS/articles/sdwba/sdwba-theory.md):
-  randomized coherent sums and scale-invariant phase statistics
+  random phase model and ensemble averaging
 
 ## References
-
-Conti, Stéphane G., and David A. Demer. 2006. “Improved Parameterization
-of the SDWBA for Estimating Krill Target Strength.” *ICES Journal of
-Marine Science* 63 (5): 928–35.
-<https://doi.org/10.1016/j.icesjms.2006.02.007>.
 
 Demer, David A., and Stephane G. Conti. 2003. “Reconciling Theoretical
 Versus Empirical Target Strengths of Krill: Effects of Phase Variability
 on the Distorted-Wave Born Approximation.” *ICES Journal of Marine
 Science* 60 (2): 429–34.
 <https://doi.org/10.1016/S1054-3139(03)00002-X>.
-
-Demer, David A., and Stéphane G. Conti. 2003. “Validation of the
-Stochastic Distorted-Wave Born Approximation Model with Broad Bandwidth
-Total Target Strength Measurements of Antarctic Krill.” *ICES Journal of
-Marine Science* 60 (3): 625–35.
-<https://doi.org/10.1016/S1054-3139(03)00063-8>.
 
 Demer, David A., and Stéphane G. Conti. 2005. “New Target-Strength Model
 Indicates More Krill in the Southern Ocean.” *ICES Journal of Marine

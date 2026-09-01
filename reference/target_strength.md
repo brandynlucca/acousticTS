@@ -168,12 +168,8 @@ numerical control:
       )
     )
 
-The legacy curved-entry wrappers `"dwba_curved"` and `"sdwba_curved"`
-are deprecated; apply
-[`brake`](https://brandynlucca.github.io/acousticTS/reference/brake.md)
-to the scatterer first, then run `"dwba"` or `"sdwba"` on the curved
-object. Model names are normalized internally, so case-insensitive
-inputs such as `"DWBA"` and `"dwba"` resolve to the same family.
+Model names are normalized internally, so case-insensitive inputs such
+as `"DWBA"` and `"dwba"` resolve to the same family.
 
 ## See also
 

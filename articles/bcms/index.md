@@ -7,42 +7,37 @@ Unvalidated Experimental
 [Theory](https://brandynlucca.github.io/acousticTS/articles/bcms/bcms-theory.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/bcms/bcms-implementation.md)
 
-This family follows the deformed-cylinder and coherence-corrected
-cylinder literature for weakly scattering elongated bodies ([Stanton
-1989](#ref-Stanton_1989_2), [1988](#ref-Stanton_1988)).
-
-The bent cylinder modal series solution (`BCMS`) extends the straight
-finite-cylinder modal family to uniformly bent cylinders by keeping the
-straight cross-sectional modal physics and modifying only the along-axis
-coherence.
+The bent-cylinder modal-series model (`BCMS`) calculates near-broadside
+scattering from straight or uniformly bent circular cylinders while
+retaining the `FCMS` cross-sectional modal solution.
 
 ### Core idea
 
-Start from the finite-cylinder modal backscatter of a straight cylinder,
-then replace the straight-axis coherent length by the curved equivalent
-coherent length derived for a uniformly bent axis.
+Use the straight-cylinder partial-wave coefficients locally, then
+replace the straight axial coherence factor with the Fresnel-integral
+correction for uniform curvature ([Stanton 1989](#ref-Stanton_1989_2)).
 
 ### Best for
 
-- Uniformly bent fluid-like cylinders near broadside
-- Curvature studies where the straight cylinder modal content remains
-  the right local kernel
-- Problems where a full curved-body rederivation is unnecessary or
-  unavailable
+- Uniformly bent, constant-radius cylinders near broadside
+- Isolating curvature-driven coherence changes from cross-sectional
+  boundary physics
+- Comparisons with the straight `FCMS` limit
 
 ### Supports
 
-- Bent `Cylinder` geometries represented through a curvature ratio
-- Monostatic near-broadside target strength
-- The same fluid boundary families carried by the straight-cylinder
-  modal kernel
+- `Cylinder` shapes carried by `FLS` or `GAS` scatterers
+- Curvature supplied through the shape’s radius-of-curvature ratio
+- Liquid-filled, gas-filled, fixed-rigid, and pressure-release
+  boundaries
 
 ### Main assumptions
 
-- Uniform curvature
-- Near-broadside incidence
-- Curvature modifies coherence along the axis but not the local
-  cross-sectional modal physics
+- Uniform centerline curvature and constant circular cross-section
+- Broadside or near-broadside incidence
+- Curvature changes axial coherence but not local modal coefficients
+- No arbitrary bending, torsion, taper, or fully three-dimensional
+  boundary solve
 
 ### Validation status
 
@@ -53,16 +48,11 @@ coherent length derived for a uniformly bent axis.
 ### Family pages
 
 - [Implementation](https://brandynlucca.github.io/acousticTS/articles/bcms/bcms-implementation.md):
-  usage and current reference checks
+  curvature input, boundaries, output, and internal checks
 - [Theory](https://brandynlucca.github.io/acousticTS/articles/bcms/bcms-theory.md):
-  bent-axis coherence integrals and relation to the straight-cylinder
-  modal kernel
+  Fresnel coherence correction and the straight-cylinder limit
 
 ## References
-
-Stanton, T. K. 1988. “Sound Scattering by Cylinders of Finite Length. I.
-Fluid Cylinders.” *The Journal of the Acoustical Society of America* 83
-(1): 55–63. <https://doi.org/10.1121/1.396184>.
 
 Stanton, T. K. 1989. “Sound Scattering by Cylinders of Finite Length.
 III. Deformed Cylinders.” *The Journal of the Acoustical Society of

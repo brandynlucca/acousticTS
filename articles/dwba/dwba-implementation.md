@@ -7,9 +7,8 @@ Benchmarked Validated
 [Overview](https://brandynlucca.github.io/acousticTS/articles/dwba/index.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/dwba/dwba-theory.md)
 
-These pages follow the weak-scattering elongated-body formulation and
-later applied fisheries-acoustics usage of the distorted-wave Born
-approximation ([Morse and Ingard 1968](#ref-Morse_1968); [Chu et al.
+DWBA evaluates weakly scattering fluid-like targets from a segmented
+body profile ([Morse and Ingard 1968](#ref-Morse_1968); [Chu et al.
 1993](#ref-Chu_1993)).
 
 The acousticTS implementation of deterministic DWBA follows the same
@@ -23,12 +22,10 @@ discretized body geometry and the orientation assigned to the object.
 
 ### Fluid-like scatterer object generation
 
-For deterministic DWBA, the relevant object class is `FLS`. The object
-may be supplied using direct contrasts such as `g_body` and `h_body`, or
-by supplying absolute material properties from which the contrasts can
-be derived relative to the surrounding medium. The important point is
-that the target should remain within the weak-scattering regime for
-which the DWBA is intended.
+Deterministic DWBA uses an `FLS` object. Supply `g_body` and `h_body`
+directly, or provide absolute material properties from which contrasts
+can be derived. The target must remain within the weak-scattering
+regime.
 
 The example below uses a simple cylinder. That geometry is not meant to
 imply that DWBA is only for cylinders. It is simply a clean way to show
@@ -189,15 +186,14 @@ the same DWBA workflow.
 
 #### Published reference comparisons
 
-The comparison below uses those canonical targets directly as reported
-in Jech et al. ([2015](#ref-Jech_2015)). Elapsed times are
-representative values from the current machine.
+The comparison below uses the canonical targets reported by Jech et al.
+([2015](#ref-Jech_2015)).
 
-| Geometry | Max abs. \Delta vs benchmark (dB) | Mean abs. \Delta vs benchmark (dB) | Elapsed (s) |
-|:---|---:|---:|---:|
-| Weakly scattering sphere | 16.17744 | 0.29031 | 0.74 |
-| Weakly scattering prolate spheroid | 0.04993 | 0.01735 | 5.11 |
-| Weakly scattering cylinder | 2.28194 | 0.06664 | 2.53 |
+| Geometry | Max abs. \Delta vs benchmark (dB) | Mean abs. \Delta vs benchmark (dB) |
+|:---|---:|---:|
+| Weakly scattering sphere | 16.17744 | 0.29031 |
+| Weakly scattering prolate spheroid | 0.04993 | 0.01735 |
+| Weakly scattering cylinder | 2.28194 | 0.06664 |
 
 Those values still need to be read carefully. The largest absolute
 \Delta TS values are concentrated near deep nulls, so the sphere and
@@ -207,11 +203,10 @@ by a uniform offset across the full sweep.
 #### Bundled krill compatibility check
 
 The bundled `krill` object serves a different role from the canonical
-modal-series targets above. Rather than testing an exact canonical-shape
-solution, it is used to verify that the stored segmented-body geometry
-reproduces the `MATLAB` code provded by McGehee et al.
-([1998](#ref-mcgehee_software)) and echoSMs ([Macaulay and contributors
-2024](#ref-echoSMs_software)).
+modal-series targets. It verifies the segmented-body calculation against
+the MATLAB code provided by McGehee et al.
+([1998](#ref-mcgehee_software)) and against echoSMs ([Macaulay and
+contributors 2024](#ref-echoSMs_software)).
 
 | Comparison | Mean abs. \Delta TS (dB) | Max abs. \Delta TS (dB) |
 |:---|---:|---:|

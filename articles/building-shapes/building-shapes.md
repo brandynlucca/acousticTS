@@ -1,258 +1,178 @@
-# Building shapes
+# Building Shapes
 
-## Introduction
+## Overview
 
-The shape pathways on this page are most useful when read against the
-canonical geometries that dominate the scattering literature, especially
-spheres, cylinders, spheroids, and piecewise elongated bodies.
+A shape describes geometry only. It does not assign material properties,
+boundary conditions, or a physical target type. Those are added when the
+shape is used to build a scatterer.
 
-Geometry is the first major decision in the package. Before choosing a
-scatterer class or a target-strength model, it is usually worth deciding
-whether the target is best represented as a canonical shape or as a
-segmented arbitrary body. That decision is not just cosmetic. It
-determines how faithfully the object matches a theory family, how much
-geometric detail is preserved, and how easy it will be to interpret the
-response later.
+Every constructor on this page returns an S4 object derived from the
+[`Shape`
+class](https://brandynlucca.github.io/acousticTS/reference/Shape-class.md).
+A `Shape` contains a `position_matrix` and a `shape_parameters` list.
+Keeping geometry separate makes it possible to inspect, reuse, or
+simplify a body before choosing a scattering model.
 
-The important point is that shape construction is not the stage where
-material contrasts or boundary conditions are fixed. At this stage, only
-the geometric description of the target is being chosen. That separation
-is intentional. It keeps the geometric question distinct from the
-physical one and makes it easier to evaluate later whether a modeled
-response is being driven by morphology, by material properties, or by
-model assumptions.
+A detailed outline is not automatically better. Use a canonical shape
+when its geometry is part of the model assumption. Preserve a measured
+or segmented shape when local morphology is important to the
+calculation.
 
-![Shape-selection spectrum](building-shapes-spectrum.png)
+![Geometric representations ranging from canonical shapes to arbitrary
+segmented bodies](building-shapes-spectrum.png)
 
-## Quick construction examples
+## Choosing a constructor
 
-Before getting into the interpretation tradeoffs, it helps to see the
-main shape builders in direct use.
+| Constructor | Representation | Main inputs |
+|----|----|----|
+| [`sphere()`](https://brandynlucca.github.io/acousticTS/reference/sphere.md) | Sphere | Radius |
+| [`cylinder()`](https://brandynlucca.github.io/acousticTS/reference/cylinder.md) | Straight or tapered cylinder | Length and radius, or a length-to-radius ratio |
+| [`prolate_spheroid()`](https://brandynlucca.github.io/acousticTS/reference/prolate_spheroid.md) | Elongated spheroid | Body length and maximum radius |
+| [`oblate_spheroid()`](https://brandynlucca.github.io/acousticTS/reference/oblate_spheroid.md) | Flattened spheroid | Body-axis length and equatorial radius |
+| [`polynomial_cylinder()`](https://brandynlucca.github.io/acousticTS/reference/polynomial_cylinder.md) | Cylinder with a polynomial radius profile | Length, radius, and polynomial coefficients |
+| [`arbitrary()`](https://brandynlucca.github.io/acousticTS/reference/arbitrary.md) | Measured or user-defined profile | Coordinate and dimension vectors |
+
+The direct constructors make the resulting class clear. The
+[`create_shape()`](https://brandynlucca.github.io/acousticTS/reference/create_shape.md)
+wrapper can dispatch to a canonical constructor when a single
+programmatic interface is more convenient.
+
+## Canonical shapes
+
+Canonical shapes are useful for model families derived in spherical,
+cylindrical, or spheroidal coordinates. They are also useful for
+benchmarks and controlled model comparisons. Construct them with
+dimensions in meters unless the surrounding workflow explicitly handles
+another unit convention:
 
 ``` r
 
 library(acousticTS)
 
-sphere_shape <- sphere(radius_body = 0.01, n_segments = 40)
-cylinder_shape <- cylinder(length_body = 0.05, radius_body = 0.003, n_segments = 80)
-ps_shape <- prolate_spheroid(length_body = 0.04, radius_body = 0.004, n_segments = 60)
-oblate_shape <- oblate_spheroid(length_body = 0.012, radius_body = 0.01, n_segments = 60)
+sphere_shape <- sphere(
+  radius_body = 0.01,
+  n_segments = 40
+)
 
-shape_summary <- function(shape_obj) {
-  params <- extract(shape_obj, "shape_parameters")
-  pos <- extract(shape_obj, "position_matrix")
-  radius_value <- params$radius
-  if (length(radius_value) > 1) {
-    radius_value <- max(radius_value, na.rm = TRUE)
-  }
+cylinder_shape <- cylinder(
+  length_body = 0.05,
+  radius_body = 0.003,
+  n_segments = 80
+)
 
-  data.frame(
-    shape = class(shape_obj)[1],
-    length_m = max(pos[, 1], na.rm = TRUE) - min(pos[, 1], na.rm = TRUE),
-    max_radius_m = radius_value,
-    n_segments = params$n_segments
-  )
-}
+prolate_shape <- prolate_spheroid(
+  length_body = 0.04,
+  radius_body = 0.004,
+  n_segments = 60
+)
 
-do.call(
-  rbind,
-  lapply(
-    list(sphere_shape, cylinder_shape, ps_shape, oblate_shape),
-    shape_summary
-  )
+oblate_shape <- oblate_spheroid(
+  length_body = 0.012,
+  radius_body = 0.01,
+  n_segments = 60
 )
 ```
 
-    ##             shape length_m max_radius_m n_segments
-    ## 1          Sphere    0.020        0.010         40
-    ## 2        Cylinder    0.050        0.003         80
-    ## 3 ProlateSpheroid    0.040        0.004         60
-    ## 4  OblateSpheroid    0.012        0.010         60
+`n_segments` controls the axial discretization. Increase it when the
+radius profile or downstream numerical method requires finer resolution,
+then check that the result is insensitive to further refinement.
 
-Those four examples cover the main canonical branches. The important
-practical point is that each constructor returns a `Shape` object that
-can later be passed into a scatterer constructor without re-entering the
-geometry.
+![Profiles produced by the four canonical
+constructors.](building-shapes_files/figure-html/unnamed-chunk-4-1.png)
 
-It is usually worth plotting those objects immediately so that the
-stored geometry is being checked, not just assumed from the constructor
-call.
+Profiles produced by the four canonical constructors.
 
-``` r
+## Stored coordinates
 
-plot_shape_profile <- function(shape_obj, main) {
-  pos <- extract(shape_obj, "position_matrix")
-  x <- pos[, "x"]
-  zU <- pos[, "zU"]
-  zL <- pos[, "zL"]
-  ylim <- range(c(zU, zL), finite = TRUE)
+Canonical and arbitrary shapes use a common axial profile. The `x`
+column gives the axial location. The `zU` and `zL` columns give the
+upper and lower profile bounds. Some arbitrary shapes also contain `w`,
+the transverse span in the `y` direction.
 
-  plot(x, zU,
-    type = "l",
-    ylim = ylim,
-    xlab = "x",
-    ylab = "z",
-    main = main
-  )
-  lines(x, zL)
-  lines(x, rep(0, length(x)), lty = 3, col = "grey70")
-}
+![Stored coordinate conventions for spheres, cylinders, prolate
+spheroids, and arbitrary profiles](building-shapes-coordinates.png)
 
-old_par <- par(no.readonly = TRUE)
-on.exit(par(old_par), add = TRUE)
+For a sphere of radius a centered at x_c, the stored profile follows:
 
-par(mfrow = c(2, 2), mar = c(3, 3, 2.2, 0.8))
-plot_shape_profile(sphere_shape, main = "Sphere")
-plot_shape_profile(cylinder_shape, main = "Cylinder")
-plot_shape_profile(ps_shape, main = "Prolate spheroid")
-plot_shape_profile(oblate_shape, main = "Oblate spheroid")
-```
+z_U(x) = \sqrt{a^2 - (x-x_c)^2}, \qquad z_L(x) = -z_U(x).
 
-![](building-shapes_files/figure-html/unnamed-chunk-3-1.png)
+For a straight cylinder of radius a, the stored bounds are:
 
-## Why geometry choice matters
+z_U(x) = a, \qquad z_L(x) = -a.
 
-The geometry chosen at this stage strongly influences which later models
-are natural and which approximations are defensible. A canonical
-geometry can align very well with an exact or modal-series model, while
-a segmented arbitrary geometry can align better with a
-morphology-preserving approximation. Neither option is automatically
-more correct. The right choice depends on whether the main goal is to
-preserve measured shape, to stay close to a canonical theory family, or
-to build a deliberately simplified object for comparison and intuition.
+A polynomial or tapered cylinder retains the same columns while allowing
+the local radius to vary with x.
 
-This is why the package keeps shape construction upstream of scatterer
-generation and model selection. A good workflow begins by deciding how
-much geometric structure needs to survive into the acoustic problem.
+For a prolate spheroid, the body semimajor axis lies along x and the
+semiminor axis lies along z. The corresponding focal half-distance is:
 
-## Canonical shape generators
+q = \sqrt{a^2-b^2},
 
-The package includes several geometry constructors for canonical
-targets:
-[`sphere()`](https://brandynlucca.github.io/acousticTS/reference/sphere.md)
-for spherical bodies,
-[`cylinder()`](https://brandynlucca.github.io/acousticTS/reference/cylinder.md)
-for straight cylindrical bodies,
-[`prolate_spheroid()`](https://brandynlucca.github.io/acousticTS/reference/prolate_spheroid.md)
-for smooth elongated bodies, and
-[`polynomial_cylinder()`](https://brandynlucca.github.io/acousticTS/reference/polynomial_cylinder.md)
-for parameterized cylindrical profiles. The convenience wrapper
-[`create_shape()`](https://brandynlucca.github.io/acousticTS/reference/create_shape.md)
-can be used when the goal is to dispatch to one of these canonical
-builders through a single interface.
+Here, the semimajor axis a is greater than the semiminor axis b. These
+coordinates describe the geometry. Target orientation is assigned later
+when building the scatterer.
 
-Canonical shapes are especially useful when the geometry itself is part
-of the model assumption. A spherical target is naturally paired with a
-spherical theory family, a smooth prolate body aligns naturally with a
-spheroidal theory family, and a straight finite cylinder aligns
-naturally with cylindrical model families. In those cases, using a
-canonical shape is not only convenient. It is often the most physically
-interpretable choice because the geometry and the mathematical basis are
-consistent with each other.
-
-Canonical geometry is also useful for comparison studies. If the goal is
-to understand how two model families differ under controlled conditions,
-a simple sphere, cylinder, or spheroid often provides a cleaner starting
-point than a highly detailed arbitrary outline.
-
-The direct generators are usually the clearest interface because they
-make the resulting shape class explicit at the call site.
-[`create_shape()`](https://brandynlucca.github.io/acousticTS/reference/create_shape.md)
-is a thin convenience dispatcher rather than the main pedagogical path.
+Use
+[`extract()`](https://brandynlucca.github.io/acousticTS/reference/extract.md)
+to inspect either slot without editing the S4 object directly:
 
 ``` r
 
-wrapped_shape <- create_shape(
-  "cylinder",
-  length_body = 0.03,
-  radius_body = 0.002,
-  n_segments = 50
-)
-
-extract(wrapped_shape, "shape_parameters")[c("shape", "length", "radius", "n_segments")]
+head(extract(prolate_shape, "position_matrix"))
 ```
 
-    ## $<NA>
-    ## NULL
-    ## 
+    ##               x y z          zU           zL
+    ## [1,] 0.04000000 0 0 0.000000000  0.000000000
+    ## [2,] 0.03933333 0 0 0.001024153 -0.001024153
+    ## [3,] 0.03866667 0 0 0.001436044 -0.001436044
+    ## [4,] 0.03800000 0 0 0.001743560 -0.001743560
+    ## [5,] 0.03733333 0 0 0.001995551 -0.001995551
+    ## [6,] 0.03666667 0 0 0.002211083 -0.002211083
+
+``` r
+
+extract(prolate_shape, "shape_parameters")
+```
+
     ## $length
-    ## [1] 0.03
+    ## [1] 0.04
     ## 
     ## $radius
-    ##  [1] 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002
-    ## [13] 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002
-    ## [25] 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002
-    ## [37] 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002
-    ## [49] 0.002 0.002 0.002
+    ##  [1] 0.000000000 0.001024153 0.001436044 0.001743560 0.001995551 0.002211083
+    ##  [7] 0.002400000 0.002568181 0.002719477 0.002856571 0.002981424 0.003095516
+    ## [13] 0.003200000 0.003295789 0.003383621 0.003464102 0.003537733 0.003604935
+    ## [19] 0.003666061 0.003721410 0.003771236 0.003815757 0.003855155 0.003889587
+    ## [25] 0.003919184 0.003944053 0.003964285 0.003979950 0.003991101 0.003997777
+    ## [31] 0.004000000 0.003997777 0.003991101 0.003979950 0.003964285 0.003944053
+    ## [37] 0.003919184 0.003889587 0.003855155 0.003815757 0.003771236 0.003721410
+    ## [43] 0.003666061 0.003604935 0.003537733 0.003464102 0.003383621 0.003295789
+    ## [49] 0.003200000 0.003095516 0.002981424 0.002856571 0.002719477 0.002568181
+    ## [55] 0.002400000 0.002211083 0.001995551 0.001743560 0.001436044 0.001024153
+    ## [61] 0.000000000
+    ## 
+    ## $semimajor_length
+    ## [1] 0.02
+    ## 
+    ## $semiminor_length
+    ## [1] 0.004
+    ## 
+    ## $length_radius_ratio
+    ## [1] 10
     ## 
     ## $n_segments
-    ## [1] 50
-
-## Coordinate conventions by shape
-
-The package stores shape geometry in a way that is consistent across
-models, but it is easier to read those objects once the coordinate
-conventions are made explicit. The schematic below shows the profile
-view used by the canonical shapes and the side-profile plus
-cross-section interpretation used by arbitrary shapes.
-
-![Coordinate conventions for canonical and arbitrary
-shapes](building-shapes-coordinates.png)
-
-For
-[`sphere()`](https://brandynlucca.github.io/acousticTS/reference/sphere.md),
-the geometry is most naturally interpreted as a profile in the `x-z`
-plane with a single radius `a`. At any axial coordinate `x_i`, the upper
-and lower boundaries are `zU(x_i)` and `zL(x_i)`. For a perfect sphere,
-those are the positive and negative branches of the same circular
-boundary.
-
-For
-[`cylinder()`](https://brandynlucca.github.io/acousticTS/reference/cylinder.md),
-the profile is still expressed in `x-z`, but the upper and lower limits
-are constant over the body length. In other words, `zU(x) = +a` and
-`zL(x) = -a` for the straight cylindrical section.
-[`polynomial_cylinder()`](https://brandynlucca.github.io/acousticTS/reference/polynomial_cylinder.md)
-uses the same coordinate framing, but lets the radius vary smoothly with
-`x`.
-
-For
-[`prolate_spheroid()`](https://brandynlucca.github.io/acousticTS/reference/prolate_spheroid.md),
-the semimajor axis lies along `x` and the semiminor axis lies along `z`.
-The focal half-distance `q` appears naturally in the prolate spheroidal
-coordinate system, so it is worth showing explicitly even when the
-object is generated from the more intuitive axis lengths.
-
-For
-[`arbitrary()`](https://brandynlucca.github.io/acousticTS/reference/arbitrary.md),
-the stored side profile is again defined along `x`, with `zU(x)` and
-`zL(x)` describing the upper and lower body bounds. When a transverse
-width `w(x)` is present, it describes the span of the body in the
-orthogonal `y` direction at the same axial station. In KRM-style uses,
-that width can also be represented as a local radius `a(x) = w(x) / 2`
-when the cross-section is being treated as a disc or ellipse.
+    ## [1] 60
+    ## 
+    ## $length_units
+    ## [1] "m"
 
 ## Arbitrary and measured shapes
 
-When measured body coordinates or bespoke outlines are available,
+Use
 [`arbitrary()`](https://brandynlucca.github.io/acousticTS/reference/arbitrary.md)
-is often the most flexible starting point. Arbitrary shapes are
-particularly important for elongated biological targets whose centerline
-and cross-sectional variation are more important than exact canonical
-separability. In those situations, preserving the morphology may matter
-more than matching a canonical coordinate system.
-
-This is one of the main geometric tradeoffs in the package. A canonical
-shape may offer stronger mathematical alignment with an exact theory
-family, but it may smooth away anatomical features that are important
-for an approximate segmented model. An arbitrary shape may preserve
-those features better, but it may no longer support the same
-geometry-matched analytical simplifications. The right choice depends on
-what role the geometry must play in the later acoustic interpretation.
-
-The further a body departs from a separable canonical surface, the
-stronger the case becomes for preserving the measured morphology rather
-than forcing the target into an overly simple idealized form.
+when measured coordinates, taper, curvature, or anatomical detail should
+be retained. It accepts an existing position matrix or named coordinate
+vectors. The following symmetric profile is defined by axial locations
+and local radii:
 
 ``` r
 
@@ -261,7 +181,7 @@ measured_like <- arbitrary(
   radius_body = c(0, 0.004, 0.006, 0.004, 0)
 )
 
-head(extract(measured_like, "position_matrix"))
+extract(measured_like, "position_matrix")
 ```
 
     ##         x     a    zU     zL
@@ -271,143 +191,77 @@ head(extract(measured_like, "position_matrix"))
     ## [4,] 0.03 0.004 0.004 -0.004
     ## [5,] 0.04 0.000 0.000  0.000
 
-``` r
+For asymmetric profiles, provide `zU_body` and `zL_body`. A transverse
+`w_body` vector can record width at the same axial stations. All
+coordinate vectors should describe the same body in a consistent
+coordinate system and unit convention.
 
-plot_shape_profile(measured_like, main = "Arbitrary measured-like body")
-```
+![An arbitrary profile defined by axial locations and local
+radii.](building-shapes_files/figure-html/unnamed-chunk-8-1.png)
 
-![](building-shapes_files/figure-html/unnamed-chunk-7-1.png)
+An arbitrary profile defined by axial locations and local radii.
 
-That is the most direct pathway when the user already has an axial
-coordinate series or wants to sketch a bespoke elongated target by hand.
+Operations such as translating, reanchoring, resampling, smoothing, and
+inflating a shape are covered in [Shape
+Manipulation](https://brandynlucca.github.io/acousticTS/articles/shape-manipulation-reforging/shape-manipulation-reforging.md).
 
-## Canonical surrogates from measured shapes
+## Fitting a canonical surrogate
 
-Sometimes the right workflow is not to choose between a measured shape
-and a canonical one at the beginning, but to use both on purpose. A
-measured or segmented outline can be preserved first as an `Arbitrary`
-shape and then reduced explicitly to a canonical surrogate when the goal
-is to run a shape-specific model such as `SPHMS`, `PSMS`, or `FCMS`.
-
-That is what
+A measured body sometimes needs a canonical approximation for a
+shape-specific model or a controlled comparison. This approximation
+should be explicit.
 [`canonicalize_shape()`](https://brandynlucca.github.io/acousticTS/reference/canonicalize_shape.md)
-is for. It takes an existing `Shape` object and fits one of the
-supported canonical targets:
+can fit a sphere, cylinder, prolate spheroid, or oblate spheroid while
+returning diagnostics for the reduction.
 
-- `Sphere`
-- `Cylinder`
-- `ProlateSpheroid`
-- `OblateSpheroid`
-
-This step is deliberately explicit rather than automatic. There is no
-single universally correct way to turn a biological or measured target
-into a canonical surface. Some workflows want to preserve length and
-enclosed volume, while others want the canonical profile that best
-matches the measured radius variation.
-[`canonicalize_shape()`](https://brandynlucca.github.io/acousticTS/reference/canonicalize_shape.md)
-therefore reports fit diagnostics rather than hiding the approximation
-inside the later model call.
-
-In practice, this means a workflow such as:
-
-1.  build or import the measured shape,
-2.  canonicalize it transparently,
-3.  then run the shape-specific model on the canonical surrogate.
-
-That pattern keeps the model assumptions honest. The later `PSMS` or
-`FCMS` result can then be interpreted as the response of the fitted
-canonical surrogate, not as though the original irregular target had
-somehow become exactly separable in spheroidal or cylindrical
-coordinates.
+Available fitting rules preserve volume, preserve length and volume, or
+fit the equivalent-radius profile by least squares. The default depends
+on the requested target shape. There is no single best rule for every
+measured body.
 
 ``` r
 
-cyl_fit <- canonicalize_shape(
+cylinder_fit <- canonicalize_shape(
   measured_like,
   to = "Cylinder",
   diagnostics = TRUE
 )
 
 data.frame(
-  fitted_shape = class(cyl_fit$shape)[1],
-  source_length_m = cyl_fit$diagnostics$source$length,
-  fitted_length_m = cyl_fit$diagnostics$target$length,
-  radius_rmse = cyl_fit$diagnostics$fit$radius_rmse,
-  radius_nrmse = cyl_fit$diagnostics$fit$radius_nrmse
+  fitted_shape = class(cylinder_fit$shape)[1],
+  source_length_m = cylinder_fit$diagnostics$source$length,
+  fitted_length_m = cylinder_fit$diagnostics$target$length,
+  radius_rmse = cylinder_fit$diagnostics$fit$radius_rmse,
+  radius_nrmse = cylinder_fit$diagnostics$fit$radius_nrmse
 )
 ```
 
     ##   fitted_shape source_length_m fitted_length_m radius_rmse radius_nrmse
     ## 1     Cylinder            0.04            0.04 0.002740549    0.4567582
 
-``` r
+![The original arbitrary profile and its fitted cylindrical
+surrogate.](building-shapes_files/figure-html/unnamed-chunk-10-1.png)
 
-old_par <- par(no.readonly = TRUE)
-on.exit(par(old_par), add = TRUE)
+The original arbitrary profile and its fitted cylindrical surrogate.
 
-par(mfrow = c(1, 2), mar = c(3, 3, 2.2, 0.8))
-plot_shape_profile(measured_like, main = "Original arbitrary shape")
-plot_shape_profile(cyl_fit$shape, main = "Canonicalized cylinder surrogate")
-```
+Judge the surrogate using both the plotted profiles and the reported
+length, volume, radius, and fit errors. A model applied to the fitted
+object describes the canonical surrogate, not the original irregular
+body.
 
-![](building-shapes_files/figure-html/unnamed-chunk-9-1.png)
+## Before building a scatterer
 
-If the diagnostics are acceptable for the intended use, the fitted shape
-can be passed on like any other canonical `Shape` object.
+Check the following before adding physical properties:
 
-## Choosing the right level of geometric detail
+- overall length and maximum radius
+- axial ordering and coordinate units
+- upper, lower, and transverse profiles where present
+- segment resolution
+- agreement between the geometry and the intended model assumptions
+- canonicalization error if a surrogate was fitted
 
-More detail is not automatically better. Canonical modal models benefit
-from geometry that matches the separable coordinate system. Segmented
-approximate models benefit from geometry that matches the intended
-physical approximation. Screening or exploratory work often benefits
-from a simpler geometry first, because simpler objects make it easier to
-distinguish broad physical trends from geometric complications.
-
-That is why the package treats shape construction as a deliberate
-modeling choice rather than as a purely technical preprocessing step. A
-very detailed geometry can be helpful when the scientific question
-depends on curvature, taper, segmentation, or anatomy. The same level of
-detail can be unnecessary, or even misleading, if the chosen model
-assumes a much simpler geometry than the object actually contains.
-
-## A practical way to choose
-
-A practical way to think about shape choice is to ask what aspect of the
-target must be preserved for the later model run to remain meaningful.
-If near-isotropic roundness is the important feature, a sphere is
-usually sufficient. If the target is smooth and elongated with no sharp
-geometric transitions, a prolate spheroid may capture the essential
-structure well. If the body is straight and approximately constant in
-radius, a finite cylinder may be the most natural simplification. If
-curvature, taper, segmentation, or anatomy are central to the question,
-an arbitrary or segmented representation is usually the better starting
-point.
-
-This way of choosing keeps the geometry tied to the scientific purpose
-rather than to habit. It also makes later model selection much easier,
-because the most defensible model families often become obvious once the
-geometry has been chosen for the right reason.
-
-## What to check before moving on
-
-Before turning a shape into a scatterer, it is worth checking whether
-the geometry is serving the intended role. The object should preserve
-the body features that matter acoustically, but it should not be more
-complicated than the planned model interpretation can actually use.
-Segment density, radius variation, curvature, and overall dimensions
-should all be visually and numerically sensible. If the object is meant
-to approximate a canonical surface, it should do so clearly rather than
-ambiguously.
-
-Those checks help prevent a common mistake in acoustic workflows:
-building a geometry that is internally reasonable, but poorly aligned
-with the later physical and mathematical assumptions.
-
-## Recommended next step
-
-The next step after geometry construction is usually [building
-scatterers](https://brandynlucca.github.io/acousticTS/articles/building-scatterers/building-scatterers.md),
-where material properties, contrasts, and target type are added to the
-geometric object. That is the stage where a shape becomes a model-ready
-acoustic target.
+Next, [prepare the material
+properties](https://brandynlucca.github.io/acousticTS/articles/material-properties/material-properties.md)
+and use [Building
+Scatterers](https://brandynlucca.github.io/acousticTS/articles/building-scatterers/building-scatterers.md)
+to combine the geometry with its physical interpretation.

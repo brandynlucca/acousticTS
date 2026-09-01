@@ -7,48 +7,45 @@ Benchmarked Partially validated Experimental
 [Theory](https://brandynlucca.github.io/acousticTS/articles/tmm/tmm-theory.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/tmm/tmm-implementation.md)
 
-These pages follow the coefficient-map view of acoustic scattering: the
-target response is represented as a map from incident modal amplitudes
-to scattered modal amplitudes ([Waterman 1969](#ref-Waterman_1969),
-[2009](#ref-Waterman_2009)).
-
-The transition matrix method (`TMM`) is the package’s current
-single-target bridge between exact modal-series solvers and broader
-angle-dependent scattering products.
+The transition-matrix method (`TMM`) represents a target by the linear
+map from incident modal coefficients to scattered modal coefficients.
+Its retained state can support more than a monostatic target-strength
+curve.
 
 ### Core idea
 
-Represent the incident and scattered fields in complete modal bases and
-solve for the linear map between those coefficient vectors. In the
-supported package scope, that gives a reusable single-target retained
-state for monostatic target strength and, where externally constrained,
-for general-angle or orientation-averaged post-processing.
+Choose a basis matched to the supported geometry, solve the boundary
+problem for the coefficient map, and optionally retain its
+frequency-wise blocks for angular scattering, orientation averages, and
+diagnostics ([Waterman 1969](#ref-Waterman_1969),
+[2009](#ref-Waterman_2009)).
 
 ### Best for
 
-- Single-target axisymmetric scattering problems that need more than one
-  post-processed product from one solve
-- Sphere, oblate spheroid, and prolate spheroid problems with retained
-  scattering products
-- Geometry-specific comparisons between exact modal families and a
-  T-matrix viewpoint
+- Supported single-target canonical geometries requiring retained
+  angular products
+- Bistatic slices, scattering grids, and orientation post-processing
+  from one solved state
+- Cross-checking geometry-specific modal families within a
+  transition-matrix representation
 
 ### Supports
 
-- `Sphere`, `OblateSpheroid`, `ProlateSpheroid`, and guarded `Cylinder`
+- Sphere, oblate-spheroid, prolate-spheroid, and guarded finite-cylinder
   branches
-- Single homogeneous interiors under rigid, pressure-release,
-  liquid-filled, and gas-filled boundaries
-- Stored retained state for scattering slices, grids, diagnostics, and
-  orientation averages where validated
+- Supported fixed-rigid, pressure-release, penetrable, and
+  spherical-shell boundaries
+- Optional retained T-matrix blocks for branch-specific post-processing
 
 ### Main assumptions
 
-- Single-target scope only
-- Geometry-specific basis choice rather than one universal retained
-  operator for every shape
-- Cylinder branch has narrower validated scope than sphere, oblate, and
-  prolate branches
+- A single target represented by one of the documented geometry-specific
+  bases
+- Homogeneous-region or supported concentric spherical-shell material
+  structure
+- Post-processing uses the documented body-fixed angular convention
+- Validation and retained-state support differ by geometry and boundary
+  branch
 
 ### Validation status
 
@@ -68,19 +65,16 @@ for general-angle or orientation-averaged post-processing.
 ### Family pages
 
 - [Implementation](https://brandynlucca.github.io/acousticTS/articles/tmm/tmm-implementation.md):
-  stored-state workflows, plots, benchmarks, and supported scope
+  branch matrix, retained-state workflows, output, and validation
 - [Theory](https://brandynlucca.github.io/acousticTS/articles/tmm/tmm-theory.md):
-  T-matrix interpretation, boundary operators, and geometry-matched
-  bases
+  coefficient maps, boundary operators, and geometry-matched bases
 
-![Single-target TMM workflow, showing the spherical-coordinate branch
-used for spheres and oblates, the spheroidal branch used for prolates,
-and the cylindrical monostatic branch used for finite
-cylinders.](tmm-branch-schematic.png)
+![The supported single-target TMM branches use spherical, spheroidal, or
+cylindrical coordinates according to target
+geometry.](tmm-branch-schematic.png)
 
-Single-target TMM workflow, showing the spherical-coordinate branch used
-for spheres and oblates, the spheroidal branch used for prolates, and
-the cylindrical monostatic branch used for finite cylinders.
+The supported single-target TMM branches use spherical, spheroidal, or
+cylindrical coordinates according to target geometry.
 
 ## References
 

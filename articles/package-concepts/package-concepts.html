@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Package concepts • acousticTS</title>
+<title>Package Concepts • acousticTS</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../../favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="../../favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="../../apple-touch-icon.png">
@@ -17,7 +17,7 @@
 <script src="../../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../../deps/headroom-0.11.0/headroom.min.js"></script><script src="../../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../../deps/search-1.0.0/fuse.min.js"></script><script src="../../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../../pkgdown.js"></script><link href="../../extra.css" rel="stylesheet">
-<meta property="og:title" content="Package concepts">
+<meta property="og:title" content="Package Concepts">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -47,10 +47,9 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-physics-primer" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Physics Primer</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-physics-primer">
-<li><a class="dropdown-item" href="../../articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
-    <li><a class="dropdown-item" href="../../articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+<li><a class="dropdown-item" href="../../articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+    <li><a class="dropdown-item" href="../../articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
     <li><a class="dropdown-item" href="../../articles/boundary_conditions.html">Boundary conditions</a></li>
-    <li><a class="dropdown-item" href="../../articles/material-properties/material-properties.html">Material properties</a></li>
     <li><a class="dropdown-item" href="../../articles/numerical-foundations/numerical-foundations.html">Numerical methods</a></li>
   </ul>
 </li>
@@ -58,6 +57,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-build-targets" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Build Targets</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-build-targets">
 <li><a class="dropdown-item" href="../../articles/building-shapes/building-shapes.html">Building Shapes</a></li>
+    <li><a class="dropdown-item" href="../../articles/material-properties/material-properties.html">Material Properties</a></li>
     <li><a class="dropdown-item" href="../../articles/building-scatterers/building-scatterers.html">Building Scatterers</a></li>
     <li><a class="dropdown-item" href="../../articles/shape-manipulation-reforging/shape-manipulation-reforging.html">Shape Manipulation</a></li>
   </ul>
@@ -68,17 +68,15 @@
 <li><a class="dropdown-item" href="../../articles/running-models/running-models.html">Running Models</a></li>
     <li><a class="dropdown-item" href="../../articles/model-selection/model-selection.html">Choosing a Model</a></li>
     <li><a class="dropdown-item" href="../../articles/comparing-models/comparing-models.html">Comparing Models</a></li>
-    <li><a class="dropdown-item" href="../../articles/plotting-inspecting-results/plotting-inspecting-results.html">Visualizing results</a></li>
     <li><a class="dropdown-item" href="../../articles/simulation-parameter-sweeps/simulation-parameter-sweeps.html">Simulation sweeps</a></li>
-    <li><a class="dropdown-item" href="../../articles/calibration-workflow/calibration-workflow.html">Calibration workflow</a></li>
-    <li><a class="dropdown-item" href="../../articles/validation-benchmarks/validation-benchmarks.html">Validating models</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../../articles/model-library/model-library.html">Models</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-developers" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Developers</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-developers">
-<li><a class="dropdown-item" href="../../articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
+<li><a class="dropdown-item" href="../../articles/validation-benchmarks/validation-benchmarks.html">Validation methods</a></li>
+    <li><a class="dropdown-item" href="../../articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
     <li><a class="dropdown-item" href="../../articles/combining-components/combining-components.html">Combining components</a></li>
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
@@ -109,7 +107,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../../logo.png" class="logo" alt=""><h1>Package concepts</h1>
+      <img src="../../logo.png" class="logo" alt=""><h1>Package Concepts</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/brandynlucca/acousticTS/blob/main/vignettes/package-concepts/package-concepts.Rmd" class="external-link"><code>vignettes/package-concepts/package-concepts.Rmd</code></a></small>
@@ -119,299 +117,215 @@
     
     
 <div class="section level2">
-<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+<h2 id="why-the-package-separates-these-layers">Why the package separates these layers<a class="anchor" aria-label="anchor" href="#why-the-package-separates-these-layers"></a>
 </h2>
-<p>The package concepts reflect the same divide between exact solutions,
-asymptotic approximations, and organism-specific composites seen in the
-scattering literature <span class="citation">(<a href="#ref-Jech_2015">Jech et al. 2015</a>; <a href="#ref-Stanton_1996">Stanton 1996</a>)</span>.</p>
-<p>The package is easiest to use once three ideas are kept separate:
-geometry, physical target type, and scattering model. Those three ideas
-are related, but they are not interchangeable. Many practical mistakes
-in acousticTS come from confusing one of those layers with another, such
-as treating a shape as if it were already a physical scatterer, or
-treating a model name as if it defined the target itself.</p>
+<p><code>acousticTS</code> separates a target’s geometry, physical
+interpretation, and scattering model. These layers are related, but they
+answer different questions:</p>
+<ul>
+<li>A <strong>shape</strong> defines what the target looks like.</li>
+<li>A <strong>scatterer</strong> defines what the target represents
+physically.</li>
+<li>A <strong>model</strong> calculates an acoustic response from that
+representation.</li>
+</ul>
+<p>Keeping these concerns separate is the central package design choice.
+It lets geometry be checked before material assumptions are introduced.
+It also lets a physical target be reused across compatible models
+without reconstructing it for every calculation.</p>
 <div class="clickable-figure">
 <img class="clickable-figure__image" src="package-concepts-architecture.png" alt="Conceptual layers"><a class="clickable-figure__link" href="../building-shapes/building-shapes.html" aria-label="Shape concepts" title="Shape concepts" style="left:0.53%;top:26.49%;width:38.36%;height:43.69%;"></a><a class="clickable-figure__link" href="../building-scatterers/building-scatterers.html" aria-label="Scatterer concepts" title="Scatterer concepts" style="left:46.03%;top:16.80%;width:23.76%;height:61.72%;"></a><a class="clickable-figure__link" href="../running-models/running-models.html" aria-label="Model execution" title="Model execution" style="left:76.70%;top:35.98%;width:22.73%;height:24.41%;"></a>
 </div>
-<p>This page is the conceptual map for the rest of the documentation.
-The goal is not to derive any model. The goal is to stabilize the
-package vocabulary before moving into theory pages and workflow pages.
-If readers understand why the package separates geometry from scatterer
-meaning and scatterer meaning from model choice, most of the later
-documentation becomes much easier to navigate.</p>
+<div class="tip" data-title="Explore the package layers">
+<p>Select <strong>Shape</strong>, <strong>Scatterer</strong>, or
+<strong>Model</strong> in the figure to open the corresponding practical
+guide.</p>
+</div>
 </div>
 <div class="section level2">
-<h2 id="shapes-versus-scatterers">Shapes versus scatterers<a class="anchor" aria-label="anchor" href="#shapes-versus-scatterers"></a>
+<h2 id="why-the-package-uses-s4-objects">Why the package uses S4 objects<a class="anchor" aria-label="anchor" href="#why-the-package-uses-s4-objects"></a>
 </h2>
-<p>A <code>Shape</code> describes geometry only. It answers geometric
-questions such as whether the target is spherical, cylindrical, prolate
-spheroidal, or arbitrary, and it stores the coordinate or discretization
-information needed to represent that geometry. A shape by itself does
-not say whether the target is fluid-like, gas-filled, shelled, elastic,
-or calibration-like. It is only the geometric scaffold.</p>
-<p>A <code>Scatterer</code> object adds physical interpretation to that
-scaffold. It says what the target is made of, which components are
-present, how the body is oriented, and what material contrasts or
-elastic quantities should later be passed to a scattering model. This is
-the stage at which a geometric outline becomes an acoustically
-meaningful target.</p>
-<p>The distinction matters because the same geometry can appear in more
-than one physical regime. A sphere-shaped geometry may be used as a
-gas-filled sphere in <code>SPHMS</code>, a fluid sphere in
-<code>HPA</code>, an elastic-shelled sphere in <code>ESSMS</code>, or a
-calibration sphere in the calibration workflow. In all four cases the
-outer geometry may still be spherical. What changes is the physical
-interpretation of the boundary and material properties. The package
-keeps that distinction explicit because it makes model choice,
-debugging, and comparison much more transparent.</p>
-<p>This is one of the most important conceptual decisions in the
-package. Geometry answers “what does the target look like?” A scatterer
-answers “what kind of thing is it physically?” Those questions overlap,
-but they are not identical. A shape can be reused across several
-scatterer classes, and a scatterer class can sometimes be applied to
-several shapes. The package design keeps that flexibility visible rather
-than hiding it inside a single overloaded constructor.</p>
+<p>Shapes and scatterers are represented as S4 objects. S4 gives each
+class a declared structure, supports inheritance from broader parent
+classes, and lets generic functions behave according to the type of
+object they receive. These features are useful for acoustic targets
+because related objects share some information while requiring different
+geometry or physical components.</p>
+<p>The base <a href="../../reference/Shape-class.html"><code>Shape</code> class</a>
+declares slots for a position matrix and shape parameters. Its
+subclasses provide the structure for canonical and arbitrary geometries.
+The base <a href="../../reference/Scatterer-class.html"><code>Scatterer</code>
+class</a> declares common metadata and model parameters. Its subclasses
+add the components needed for particular physical targets. For example,
+a scatterer may require a body alone, a body and bladder, or a shell and
+enclosed fluid.</p>
+<p>This formal structure prevents the meaning of an object from
+depending only on the names in an unrestricted list. It also lets shared
+operations such as display, plotting, and extraction work across related
+classes. Constructors are the usual way to create these objects because
+they assemble and check the required slots.</p>
 </div>
 <div class="section level2">
-<h2 id="scatterer-classes">Scatterer classes<a class="anchor" aria-label="anchor" href="#scatterer-classes"></a>
+<h2 id="three-distinct-layers">Three distinct layers<a class="anchor" aria-label="anchor" href="#three-distinct-layers"></a>
 </h2>
-<p>The package uses several high-level scatterer classes, including
-<code>FLS</code> for fluid-like scatterers, <code>GAS</code> for
-gas-filled simple bodies, <code>SBF</code> for swimbladder-bearing
-fish-like targets, <code>ESS</code> for elastic-shelled spheres, and
-<code>CAL</code> for calibration spheres. These classes are not just
-labels. They determine which physical components the object should carry
-and which model families are naturally compatible with that target
-description.</p>
-<p>In practical terms, class selection answers the question, “What kind
-of information should this object contain?” An <code>FLS</code> object
-is the natural starting point for weakly scattering fluid-like bodies. A
-<code>GAS</code> object is appropriate when the relevant physics is
-dominated by a gaseous or highly compressible inclusion. An
-<code>SBF</code> object is built for workflows where a body and
-swimbladder need to remain distinct. An <code>ESS</code> object is for
-shell problems where the shell material and the internal fluid both
-matter. A <code>CAL</code> object is for calibration targets where the
-material definition is intentionally more constrained.</p>
-<p>Those classes also determine the internal component structure of the
-object. An <code>FLS</code> object carries a <code>body</code> slot. An
-<code>SBF</code> object carries <code>body</code> and
-<code>bladder</code>. An <code>ESS</code> object carries
-<code>shell</code> and <code>fluid</code>. That organization is what
-lets the package reuse generic functions such as <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> and
-<code><a href="../../reference/extract.html">extract()</a></code> across very different kinds of targets without
-collapsing them into one indistinct object type.</p>
-<p>This is also why class choice is a conceptual decision rather than a
-purely technical one. Choosing a class says what components the package
-should expect the target to have and what kinds of model assumptions can
-later be attached to it cleanly. When the wrong class is chosen, the
-problem is not only that a later function call becomes awkward. It is
-that the package has been asked to represent the wrong kind of target
-from the start.</p>
+<div class="section level3">
+<h3 id="shape-geometry">Shape: geometry<a class="anchor" aria-label="anchor" href="#shape-geometry"></a>
+</h3>
+<p>A <a href="../../reference/Shape-class.html"><code>Shape</code>
+object</a> contains geometry and associated morphometrics. It may
+describe a canonical form, such as a sphere or cylinder, or an arbitrary
+body represented by coordinates. It does not assign material properties,
+a boundary condition, or biological meaning.</p>
+<p>This narrow responsibility makes shapes reusable. The same spherical
+geometry, for example, can participate in target descriptions with very
+different materials and boundary behavior. Conversely, the same physical
+class can use different supported geometries. Geometry therefore remains
+an input to the physical description rather than serving as a proxy for
+it.</p>
+</div>
+<div class="section level3">
+<h3 id="scatterer-physical-target">Scatterer: physical target<a class="anchor" aria-label="anchor" href="#scatterer-physical-target"></a>
+</h3>
+<p>A <a href="../../reference/Scatterer-class.html"><code>Scatterer</code>
+object</a> combines geometry with its acoustic interpretation. Its class
+expresses what kind of target is being represented and what components
+it must contain. A fluid-like body, a gas-bearing target, a shell
+surrounding a fluid, and a calibration sphere do not require the same
+information, even when their outer geometries are similar.</p>
+<p>The class structure makes those differences explicit. Depending on
+the target, a scatterer may contain a <code>body</code>,
+<code>bladder</code>, <code>shell</code>, or <code>fluid</code>
+component. It also carries metadata, orientation, geometric parameters,
+and the material quantities required by compatible models. The class is
+therefore part of the scientific definition of the target, not just a
+programming label.</p>
+</div>
+<div class="section level3">
+<h3 id="model-acoustic-calculation">Model: acoustic calculation<a class="anchor" aria-label="anchor" href="#model-acoustic-calculation"></a>
+</h3>
+<p>A model maps a compatible scatterer and a set of acoustic conditions
+to a predicted response. It does not redefine the target. This
+distinction matters because several models may be defensible for the
+same physical object, while making different approximations or covering
+different regimes.</p>
+<p>Each model family has two stages inside the package. An initializer
+translates the common scatterer representation into the parameters
+needed by that model. A solver then evaluates the calculation and stores
+its output. This shared structure allows <a href="../../reference/target_strength.html"><code>target_strength()</code></a>
+to provide one interface while preserving the differences among model
+formulations.</p>
+</div>
 </div>
 <div class="section level2">
-<h2 id="object-structure-in-practice">Object structure in practice<a class="anchor" aria-label="anchor" href="#object-structure-in-practice"></a>
+<h2 id="design-philosophy">Design philosophy<a class="anchor" aria-label="anchor" href="#design-philosophy"></a>
 </h2>
-<p>Almost every scatterer object is organized around the same broad
-layers of information. There is metadata for IDs and bookkeeping,
-<code>shape_parameters</code> for geometric metadata, one or more
-physical component slots such as <code>body</code>,
-<code>bladder</code>, <code>shell</code>, or <code>fluid</code>, a
-<code>model_parameters</code> slot for the intermediate parameterization
-a specific model needs, and a <code>model</code> slot for the final
-outputs. The exact details differ by class, but the logic is stable
-across the package.</p>
-<p>That arrangement is easiest to see with a small example.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://brandynlucca.github.io/acousticTS/">acousticTS</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">shape_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/cylinder.html">cylinder</a></span><span class="op">(</span></span>
-<span>  length_body <span class="op">=</span> <span class="fl">0.03</span>,</span>
-<span>  radius_body <span class="op">=</span> <span class="fl">0.0025</span>,</span>
-<span>  n_segments <span class="op">=</span> <span class="fl">60</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">scatterer_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/fls_generate.html">fls_generate</a></span><span class="op">(</span></span>
-<span>  shape <span class="op">=</span> <span class="va">shape_obj</span>,</span>
-<span>  density_body <span class="op">=</span> <span class="fl">1045</span>,</span>
-<span>  sound_speed_body <span class="op">=</span> <span class="fl">1520</span>,</span>
-<span>  theta_body <span class="op">=</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">2</span>,</span>
-<span>  ID <span class="op">=</span> <span class="st">"example-cylinder"</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">scatterer_obj</span><span class="op">@</span><span class="va">metadata</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "ID"</span></span></code></pre>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">scatterer_obj</span><span class="op">@</span><span class="va">body</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "rpos"                   "radius"                 "theta"                 </span></span>
-<span><span class="co">## [4] "g"                      "h"                      "density"               </span></span>
-<span><span class="co">## [7] "sound_speed"            "radius_curvature_ratio"</span></span></code></pre>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">scatterer_obj</span><span class="op">@</span><span class="va">shape_parameters</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "length"                 "radius"                 "n_segments"            </span></span>
-<span><span class="co">## [4] "radius_curvature_ratio" "taper_order"            "shape"                 </span></span>
-<span><span class="co">## [7] "length_units"           "theta_units"</span></span></code></pre>
-<p>At this point the object is physically defined, but no
-target-strength model has been run yet. That is why
-<code>model_parameters</code> and <code>model</code> begin as empty
-containers and are populated only after <code><a href="../../reference/target_strength.html">target_strength()</a></code>
-is called. This delayed population is a useful design choice. It means
-the target object can exist first as a stable physical description, and
-only later acquire model-specific parameterizations and predictions.</p>
-<p>That separation is valuable because it keeps debugging ordered.
-Readers can inspect the geometry, inspect the physical parameters, and
-verify the target representation before they ever ask the package to
-predict backscatter. Once model output is attached, the full object
-still carries the original geometry and physical meaning with it, which
-makes later comparison and validation much easier.</p>
+<div class="section level3">
+<h3 id="reusing-shapes-and-scatterers">Reusing shapes and scatterers<a class="anchor" aria-label="anchor" href="#reusing-shapes-and-scatterers"></a>
+</h3>
+<p>The package is designed around two forms of reuse shown in the
+architecture figure. One geometry can support several physical
+interpretations, and one physical target can be evaluated with several
+compatible models. Neither form of reuse implies that the alternatives
+are physically interchangeable.</p>
+<p>This separation is especially useful for model comparison. Holding
+the target definition fixed reduces the chance that an apparent model
+difference was actually caused by a changed geometry, orientation, or
+material value. It also supports parameter studies in which only one
+layer should vary.</p>
+</div>
+<div class="section level3">
+<h3 id="keeping-assumptions-explicit">Keeping assumptions explicit<a class="anchor" aria-label="anchor" href="#keeping-assumptions-explicit"></a>
+</h3>
+<p>Important assumptions should be represented in the object or model
+call rather than inferred from an ambiguous collection of values.
+Scatterer classes expose component structure. Model initializers
+establish model-specific parameters. Compatibility checks can then
+reject combinations that the implementation does not support.</p>
+<p>The same principle applies to units and orientation conventions.
+Package interfaces use a shared internal representation so that
+downstream models do not each invent their own interpretation. The
+relevant conventions and symbols are collected in <a href="../notation-and-symbols/notation-and-symbols.html">Notation and
+Symbols</a>.</p>
+</div>
+<div class="section level3">
+<h3 id="different-models-serve-different-purposes">Different models serve different purposes<a class="anchor" aria-label="anchor" href="#different-models-serve-different-purposes"></a>
+</h3>
+<p><code>acousticTS</code> does not treat the presence of a model as
+evidence that it is the best choice for every supported target. Exact
+series solutions, approximations, composite models, and numerical
+methods answer different questions and have different domains of
+validity. The package provides a shared target representation so those
+alternatives can be applied and compared deliberately.</p>
+<p>The package tracks model registration and model validation
+separately. The model registry connects each model name to its
+initializer, solver, and stored result. A separate validation registry
+records benchmark and validation status. A model being available does
+not mean that it has been validated across every parameter regime. See
+<a href="../model-selection/model-selection.html">Choosing a Model</a>
+and <a href="../validation-benchmarks/validation-benchmarks.html">Validation
+and Benchmarks</a> before relying on a model outside its documented
+scope.</p>
+</div>
+<div class="section level3">
+<h3 id="keeping-results-with-their-inputs">Keeping results with their inputs<a class="anchor" aria-label="anchor" href="#keeping-results-with-their-inputs"></a>
+</h3>
+<p><a href="../../reference/target_strength.html"><code>target_strength()</code></a>
+returns the scatterer with the requested model parameterizations and
+outputs attached. The returned object still carries the target geometry,
+physical components, and metadata used in the calculation. Multiple
+model results can therefore remain associated with a common target
+definition.</p>
+<p>This is local traceability, not a substitute for a complete
+reproducibility record. Code, package versions, input data, and
+computational settings still need to be recorded by the surrounding
+analysis. Within a workflow, however, keeping inputs and outputs on the
+same scientific object makes results easier to inspect with common
+interfaces such as <a href="../../reference/extract.html"><code>extract()</code></a> and <a href="../../reference/plot.Scatterer.html"><code>plot()</code></a>.</p>
+</div>
+<div class="section level3">
+<h3 id="adding-new-models">Adding new models<a class="anchor" aria-label="anchor" href="#adding-new-models"></a>
+</h3>
+<p>The package is not limited to its built-in models. A new model can be
+registered with <a href="../../reference/register_model.html"><code>register_model()</code></a>
+by supplying an initializer, a solver, and a result name. It then uses
+the same shape–scatterer–model organization as the built-in methods
+without requiring changes to the package source. The steps are described
+in <a href="../creating-models-from-scratch/creating-models-from-scratch.html">Creating
+Models from Scratch</a>.</p>
+</div>
 </div>
 <div class="section level2">
-<h2 id="models-as-separate-layers">Models as separate layers<a class="anchor" aria-label="anchor" href="#models-as-separate-layers"></a>
+<h2 id="object-lifecycle">Object lifecycle<a class="anchor" aria-label="anchor" href="#object-lifecycle"></a>
 </h2>
-<p>Models in acousticTS are not the same thing as scatterers. A model is
-a mathematical mapping from the scatterer description and acoustic
-conditions to predicted backscatter. This is why the package can support
-multiple models for the same target. A fluid-like elongated object might
-be explored with <code>DWBA</code>, <code>SDWBA</code>,
-<code>TRCM</code>, <code>HPA</code>, or another more canonical model
-depending on the question being asked and the approximation regime that
-is defensible.</p>
-<p>This separation is one of the most useful design choices in the
-package because it means you do not have to rebuild the target every
-time you ask a different modeling question. One object can support
-several model runs, provided the geometry and physical interpretation
-are compatible with those models.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">frequency</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">38e3</span>, <span class="fl">120e3</span>, by <span class="op">=</span> <span class="fl">6e3</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">scatterer_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/target_strength.html">target_strength</a></span><span class="op">(</span></span>
-<span>  object <span class="op">=</span> <span class="va">scatterer_obj</span>,</span>
-<span>  frequency <span class="op">=</span> <span class="va">frequency</span>,</span>
-<span>  model <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"dwba"</span>, <span class="st">"hpa"</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">scatterer_obj</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "DWBA" "HPA"</span></span></code></pre>
-<p>At the conceptual level, the important point is that a model is a
-lens applied to the same physical target, not a replacement for the
-target object itself. That way of thinking is especially helpful when
-several models are reasonable. Readers do not need to decide that one
-object is a <code>DWBA</code> object and another is an <code>HPA</code>
-object. Instead, they can define one physically meaningful target and
-then ask what different model families predict for it.</p>
-<p>This keeps model comparison tied to a common target description
-instead of letting the object definition drift from one comparison to
-the next. The <a href="../model-selection/model-selection.html">choosing
-a model article</a> is the practical guide to that decision, while the
-model theory pages explain the mathematical tradeoffs in detail.</p>
+<p>A typical object moves through four states:</p>
+<ol style="list-style-type: decimal">
+<li>A shape records geometry.</li>
+<li>A scatterer constructor assigns physical meaning and component
+structure.</li>
+<li>A model initializer derives the model-specific
+parameterization.</li>
+<li>A solver returns the scatterer with calculated results
+attached.</li>
+</ol>
+<p>These states suggest a useful order for diagnosing unexpected
+results. Inspect the geometry first, then the scatterer class and
+physical inputs, followed by model compatibility and numerical settings.
+Interpretation comes last, after the preceding layers have been
+verified.</p>
 </div>
 <div class="section level2">
-<h2 id="stored-results-and-traceability">Stored results and traceability<a class="anchor" aria-label="anchor" href="#stored-results-and-traceability"></a>
-</h2>
-<p>Model outputs are written back onto the scatterer object rather than
-returned as entirely unrelated standalone structures. This makes it
-easier to compare multiple models on the same target, retain geometry
-and parameter metadata, plot shape and model output from the same
-object, and inspect nested results with <code><a href="../../reference/extract.html">extract()</a></code>.</p>
-<p>That becomes especially useful when comparison is the real goal. A
-user can keep one object in memory, run several models, and then pull
-the corresponding sub-results by name.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">scatterer_obj</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">$</span><span class="va">DWBA</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##   frequency        ka                        f_bs     sigma_bs        TS</span></span>
-<span><span class="co">## 1     38000 0.3979351 -6.723778e-05-1.940150e-20i 4.520919e-09 -83.44773</span></span>
-<span><span class="co">## 2     44000 0.4607669 -8.773690e-05-2.931388e-20i 7.697764e-09 -81.13635</span></span>
-<span><span class="co">## 3     50000 0.5235988 -1.097965e-04-4.168663e-20i 1.205527e-08 -79.18823</span></span>
-<span><span class="co">## 4     56000 0.5864306 -1.328846e-04-5.650686e-20i 1.765833e-08 -77.53050</span></span>
-<span><span class="co">## 5     62000 0.6492625 -1.564363e-04-7.364911e-20i 2.447231e-08 -76.11325</span></span>
-<span><span class="co">## 6     68000 0.7120943 -1.798640e-04-9.287346e-20i 3.235107e-08 -74.90111</span></span></code></pre>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">scatterer_obj</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">$</span><span class="va">HPA</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##   frequency     sigma_bs        TS</span></span>
-<span><span class="co">## 1     38000 3.087454e-09 -85.10400</span></span>
-<span><span class="co">## 2     44000 4.476195e-09 -83.49091</span></span>
-<span><span class="co">## 3     50000 5.951762e-09 -82.25354</span></span>
-<span><span class="co">## 4     56000 7.447037e-09 -81.28017</span></span>
-<span><span class="co">## 5     62000 8.924453e-09 -80.49418</span></span>
-<span><span class="co">## 6     68000 1.036723e-08 -79.84337</span></span></code></pre>
-<p>The practical advantage is traceability. When the result stays
-attached to the same object that carries geometry, material properties,
-and metadata, it is much easier to see which assumptions generated which
-curve. This reduces one of the most common sources of confusion in
-modeling workflows, namely losing track of which result belongs to which
-target parameterization.</p>
-<p>It is also the reason the package can support workflow pages such as
-comparison, simulation, and validation without requiring a separate
-results-management system. The object itself becomes the local record of
-what was modeled, under what assumptions, and with what outcome.</p>
-</div>
-<div class="section level2">
-<h2 id="a-practical-mental-model">A practical mental model<a class="anchor" aria-label="anchor" href="#a-practical-mental-model"></a>
-</h2>
-<p>For most workflows, the simplest mental model is the following. A
-<code>Shape</code> answers “what is the geometry?” A
-<code>Scatterer</code> answers “what kind of target is this physically?”
-<code><a href="../../reference/target_strength.html">target_strength()</a></code> answers “which model should be applied
-under which acoustic conditions?” <code><a href="../../reference/extract.html">extract()</a></code> and
-<code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> answer “what came out, and how do I inspect it?”</p>
-<p>That mental model is enough to keep most workflows organized even
-before the theory pages come into play. It also suggests a useful
-debugging order. If a result looks wrong, first ask whether the geometry
-is right. Then ask whether the scatterer class and material meaning are
-right. Only then ask whether the chosen model is the right one, or
-whether its numerical settings need adjustment. That order usually
-isolates problems faster than jumping directly to model equations.</p>
-</div>
-<div class="section level2">
-<h2 id="why-this-design-is-useful">Why this design is useful<a class="anchor" aria-label="anchor" href="#why-this-design-is-useful"></a>
-</h2>
-<p>This object separation allows the package to support both canonical
-theory and more empirical or workflow-oriented use cases. A user can
-build one target description and then ask several different questions of
-it without rebuilding the object from scratch each time. That is
-especially valuable in comparison studies, validation work, and
-exploratory parameter sweeps where consistency of target definition
-matters just as much as the model formulas themselves.</p>
-<p>It also makes bookkeeping errors easier to catch. When geometry,
-material properties, and model outputs all remain attached to the same
-object, it is harder to lose track of which assumptions produced which
-target-strength curve. More broadly, this design lets the documentation
-stay modular without becoming fragmented. Workflow pages can focus on
-how to move through the package. Theory pages can focus on model
-assumptions. Concept pages like this one can focus on object meaning and
-package structure. Because the same object logic runs underneath all of
-them, those different kinds of documentation still connect cleanly.</p>
-</div>
-<div class="section level2">
-<h2 id="related-articles">Related articles<a class="anchor" aria-label="anchor" href="#related-articles"></a>
+<h2 id="related-guides">Related guides<a class="anchor" aria-label="anchor" href="#related-guides"></a>
 </h2>
 <ul>
-<li><a href="../getting-started/getting-started.html">Getting
-started</a></li>
+<li><a href="../getting-started/getting-started.html">Quick
+Start</a></li>
 <li><a href="../building-shapes/building-shapes.html">Building
-shapes</a></li>
+Shapes</a></li>
 <li><a href="../building-scatterers/building-scatterers.html">Building
-scatterers</a></li>
-<li><a href="../running-models/running-models.html">Running target
-strength models</a></li>
+Scatterers</a></li>
+<li><a href="../running-models/running-models.html">Running
+Models</a></li>
 </ul>
-</div>
-<div class="section level2">
-<h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
-</h2>
-<div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-Jech_2015" class="csl-entry">
-Jech, J. Michael, John K. Horne, Dezhang Chu, et al. 2015.
-<span>“Comparisons Among Ten Models of Acoustic Backscattering Used in
-Aquatic Ecosystem Research.”</span> <em>The Journal of the Acoustical
-Society of America</em> 138 (6): 3742–64. <a href="https://doi.org/10.1121/1.4937607" class="external-link">https://doi.org/10.1121/1.4937607</a>.
-</div>
-<div id="ref-Stanton_1996" class="csl-entry">
-Stanton, T. 1996. <span>“Acoustic Scattering Characteristics of Several
-Zooplankton Groups.”</span> <em>ICES Journal of Marine Science</em> 53
-(2): 289–95. <a href="https://doi.org/10.1006/jmsc.1996.0037" class="external-link">https://doi.org/10.1006/jmsc.1996.0037</a>.
-</div>
-</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

@@ -7,25 +7,12 @@ Benchmarked Validated
 [Overview](https://brandynlucca.github.io/acousticTS/articles/fcms/index.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/fcms/fcms-theory.md)
 
-These pages follow the finite-cylinder modal-series literature for
-straight circular cylinders near broadside ([Stanton
-1988](#ref-Stanton_1988), [1989](#ref-Stanton_1989_2)).
+FCMS evaluates straight circular cylinders with a finite-length
+modal-series approximation ([Stanton 1988](#ref-Stanton_1988),
+[1989](#ref-Stanton_1989_2)).
 
-The acousticTS package uses object-based scatterers, so the FCMS
-workflow follows the same broad pattern used elsewhere in the package:
-construct a geometry, attach the material properties needed for a
-cylindrical scatterer, evaluate target strength over the frequencies of
-interest, and then inspect how the result changes when the physically
-important assumptions are changed. For FCMS, the most important
-assumptions are usually the cylinder radius, cylinder length,
-orientation, and the boundary condition used to represent the cylinder
-interior.
-
-The point of this implementation page is therefore not just to show
-which commands run. It is to show how the model is set up in a way that
-remains interpretable. A reader should be able to look at the input
-object and understand what geometric and material assumptions were
-actually passed into the FCMS calculation.
+The principal inputs are cylinder radius, length, orientation, interior
+properties, and boundary condition.
 
 ### Cylinder object generation
 
@@ -180,17 +167,15 @@ any disagreement is interpreted as a model effect.
 
 #### Benchmark comparisons
 
-FCMS can also be compared directly against the Jech cylindrical
-benchmark family stored in `benchmark_ts`. The table below uses the full
-cylindrical benchmark grid. Elapsed times are representative values from
-the current machine.
+FCMS can be compared directly against the Jech cylindrical benchmark
+family stored in `benchmark_ts`.
 
-| Boundary | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | Elapsed (s) |
-|:---|---:|---:|---:|
-| `fixed_rigid` | 0.19454 | 0.00914 | 0.01 |
-| `pressure_release` | 0.00780 | 0.00263 | 0.03 |
-| `gas_filled` | 0.00499 | 0.00245 | 0.05 |
-| `liquid_filled` | 0.11453 | 0.00512 | 0.05 |
+| Boundary           | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) |
+|:-------------------|------------------------:|-------------------------:|
+| `fixed_rigid`      |                 0.19454 |                  0.00914 |
+| `pressure_release` |                 0.00780 |                  0.00263 |
+| `gas_filled`       |                 0.00499 |                  0.00245 |
+| `liquid_filled`    |                 0.11453 |                  0.00512 |
 
 The pressure-release and gas-filled cases remain very close to the
 benchmark family across the full frequency grid. The larger residuals
@@ -200,12 +185,10 @@ present implementation at a small number of frequencies.
 
 #### Cross-software implementation checks
 
-The same four cylindrical boundary definitions were also compared
-directly against the locally available `echoSMs` finite-cylinder
-implementation. This check serves a different purpose from the benchmark
-table above. It asks whether the software implementations agree with
-each other on the same finite-cylinder problem, and whether the
-remaining benchmark residual is shared rather than unique to acousticTS.
+The same four boundary definitions were also compared with the echoSMs
+finite-cylinder implementation ([Macaulay and contributors
+2024](#ref-echoSMs_software)). This tests agreement on the same problem
+independently of the rounded benchmark values.
 
 | Boundary | Mean abs. \Delta acousticTS vs `echoSMs` (dB) | Max abs. \Delta acousticTS vs `echoSMs` (dB) | Mean abs. \Delta `echoSMs` vs benchmark (dB) | Max abs. \Delta `echoSMs` vs benchmark (dB) |
 |:---|---:|---:|---:|---:|
@@ -225,11 +208,11 @@ natural follow-up check is the same one used for SPHMS: hold the
 liquid-filled benchmark definition fixed and inspect how strongly the
 benchmark fit depends on a reduced modal cap.
 
-| Boundary | `m_limit` | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | Elapsed (s) |
-|:---|:---|---:|---:|---:|
-| `liquid_filled` | default rule | 0.11453 | 0.00512 | 0.05 |
-| `liquid_filled` | `20` | 0.12618 | 0.00547 | 0.09 |
-| `liquid_filled` | `10` | 43.09805 | 4.29035 | 0.01 |
+| Boundary | `m_limit` | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) |
+|:---|:---|---:|---:|
+| `liquid_filled` | default rule | 0.11453 | 0.00512 |
+| `liquid_filled` | `20` | 0.12618 | 0.00547 |
+| `liquid_filled` | `10` | 43.09805 | 4.29035 |
 
 That sensitivity check shows why the FCMS page does not need a large
 PSMS-style configuration matrix. The physically meaningful benchmark
@@ -239,6 +222,12 @@ pushed somewhat, but not recklessly, before the cylindrical modal sum is
 no longer trustworthy.
 
 ## References
+
+Macaulay, Gavin, and contributors. 2024. “echoSMs: Making Acoustic
+Scattering Models Available to Fisheries and Plankton Scientists.” In
+*GitHub Repository*.
+[Https://github.com/ices-tools-dev/echoSMs](https://github.com/ices-tools-dev/echoSMs);
+GitHub.
 
 Stanton, T. K. 1988. “Sound Scattering by Cylinders of Finite Length. I.
 Fluid Cylinders.” *The Journal of the Acoustical Society of America* 83

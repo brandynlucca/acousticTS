@@ -236,6 +236,10 @@ Hickling, Robert. 1962. “Analysis of Echoes from a Solid Elastic Sphere
 in Water.” *The Journal of the Acoustical Society of America* 34 (10):
 1582–92. <https://doi.org/10.1121/1.1909055>.
 
+Higham, Nicholas J. 2002. *Accuracy and Stability of Numerical
+Algorithms*. 2nd ed. Society for Industrial; Applied Mathematics.
+<https://doi.org/10.1137/1.9780898718027>.
+
 Hiptmair, Ralf, and Carlos Jerez-Hanckes. 2012. “Multiple Traces
 Boundary Integral Formulation for Helmholtz Transmission Problems.”
 *Advances in Computational Mathematics* 37 (1): 39–91.
@@ -347,6 +351,11 @@ Spectroscopy and Radiative Transfer* 79: 1019–29.
 
 Pierce, Allan D. 1989. *Acoustics: An Introduction to Its Physical
 Principles and Applications*. Acoustical Society of America.
+
+Piessens, Robert, Elise de Doncker-Kapenga, Christoph W. Überhuber, and
+David K. Kahaner. 1983. *QUADPACK: A Subroutine Package for Automatic
+Integration*. Vol. 1. Springer Series in Computational Mathematics.
+Springer-Verlag. <https://doi.org/10.1007/978-3-642-61786-7>.
 
 Press, William H., Saul A. Teukolsky, William T. Vetterling, and Brian
 P. Flannery. 2007. *Numerical Recipes: The Art of Scientific Computing*.

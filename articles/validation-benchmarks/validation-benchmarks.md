@@ -1,88 +1,109 @@
-# Validation and benchmark reproduction
+# Validation Methods
 
-## Introduction
+## What validation establishes
 
-The validation workflow on this page is grounded in inter-model
-benchmark comparisons and open-software reproductions ([Jech et al.
-2015](#ref-Jech_2015); [Macaulay and contributors
-2024](#ref-echoSMs_software); [Gastauer et al.
-2019](#ref-ZooScatR_software); [Gastauer 2025](#ref-KRMr_software);
-[Betcke and Scroggs 2021](#ref-Bempp-cl_software); [Elavia
-2021](#ref-liquid_spheroid_software); [McGehee et al.
-1998](#ref-mcgehee_software); [Lucca and Lee
-2026](#ref-Echopop_software); [Commission for the Conservation of
-Antarctic Marine Living Resources 2019](#ref-CCAMLR_SDWBA_software);
-[Southwest Fisheries Science Center 2022a](#ref-NOAA_KRM_software),
-[2022b](#ref-NOAA_SDWBA_software); [Renfree and Demer
-2014](#ref-NOAA_sphere_software); [Khodabandeloo et al.
-2025](#ref-Prol_Spheroid_software); [Macaulay
-2025](#ref-SphereTS_software)).
+A function that runs without error is not necessarily correct. A
+physically plausible curve is not validation either. Evidence must
+connect a defined model case to an independent result within a stated
+geometry, boundary condition, parameter range, numerical configuration,
+and output convention.
 
-Modeling packages become much more useful when users can distinguish a
-physically surprising result from a setup error. Validation pages help
-provide that context. In acousticTS, validation is not a single check
-with a single threshold. It is a layered workflow that begins with
-object and unit sanity, then moves to canonical benchmark reproduction,
-and finally asks whether the numerical behavior is stable enough that
-any remaining discrepancy deserves physical interpretation.
+![Validation proceeds from object and unit checks through known limits
+and published or independent comparisons.](validation-ladder.svg)
 
-![Validation ladder](validation-ladder.png)
+Validation proceeds from object and unit checks through known limits and
+published or independent comparisons.
 
-Validation ladder
+The order matters. Agreement with a published curve is difficult to
+interpret until units, geometry, material properties, orientation, and
+normalization have been matched. Regression tests then preserve an
+established result, but they do not establish its correctness on their
+own.
 
-That layered view matters because benchmark comparisons are only
-informative when the target definition, acoustic assumptions, numerical
-settings, and reporting scale are already aligned. A mismatch against a
-stored benchmark curve does not automatically diagnose a broken model.
-It may instead reflect a different boundary condition, a different
-frequency grid, a different medium, a different orientation convention,
-or a comparison being carried out in a quantity that is not the one the
-benchmark was intended to validate.
+## Distinguish the checks
 
-## What the benchmark resources are for
+### Input and object checks
 
-The package includes `benchmark_ts`, which provides stored benchmark
-curves for several canonical model-and-geometry combinations. Together
-with the bundled example scatterers and the theory vignettes, it
-provides a documented basis for regression-style checks. That makes the
-dataset more than a teaching convenience. It is also part of the
-package’s broader numerical validation strategy.
+Confirm that constructors, S4 slots, units, dimensions, component
+placement, material ratios, exterior medium, boundary condition,
+frequency, and angle describe the intended target. These checks belong
+close to the initializer and should fail clearly when input is outside
+the model’s supported domain.
 
-``` r
+### Numerical verification
 
-library(acousticTS)
+Numerical verification asks whether the implemented equations are solved
+consistently. The applicable checks depend on the method and can
+include:
 
-data(benchmark_ts)
+- convergence with modal truncation, quadrature order, or geometric
+  resolution,
+- stability under tighter tolerances or higher precision,
+- agreement between equivalent formulations,
+- recovery of a simpler solution in a limiting geometry, and
+- expected low- or high-frequency asymptotic behaviour.
 
-names(benchmark_ts$frequency_spectra)
-```
+A convergence check should vary one control at a time and report the
+quantity being monitored. See [Numerical Methods and Special
+Functions](https://brandynlucca.github.io/acousticTS/articles/numerical-foundations/numerical-foundations.md)
+for the numerical components used by the package.
 
-    ## [1] "index"            "sphere"           "prolate_spheroid" "cylinder"
+### Benchmark reproduction
 
-``` r
+A benchmark reproduces a fully specified canonical calculation. The
+stored cases in
+[`benchmark_ts`](https://brandynlucca.github.io/acousticTS/reference/benchmark_ts.md)
+follow the sphere, finite-cylinder, and prolate-spheroid comparisons
+assembled by Jech et al. ([2015](#ref-Jech_2015)) and the associated
+`echoSMs` resources ([Macaulay and contributors
+2024](#ref-echoSMs_software)). Benchmark agreement is evidence only for
+the reproduced case and nearby conditions justified by the model theory.
 
-head(benchmark_ts$frequency_spectra$index$frequency)
-```
+### Independent comparison
 
-    ## [1] 12000 14000 16000 18000 20000 22000
+Independent software or experimental comparisons provide separation from
+the package implementation. They are strongest when the codes do not
+share the same derivation, numerical kernel, or stored output. Existing
+package evidence includes comparisons with `echoSMs`, `ZooScatR`, and
+`SphereTS` ([Macaulay and contributors 2024](#ref-echoSMs_software);
+[Gastauer et al. 2019](#ref-ZooScatR_software); [Macaulay
+2025](#ref-SphereTS_software)). The comparison record must state exactly
+which branch, boundary, and parameter range were tested.
 
-The benchmark cases emphasize canonical exact or near-exact comparison
-problems: `SPHMS` sphere cases with several boundary conditions, `FCMS`
-finite-cylinder cases, and `PSMS` prolate-spheroid cases. That
-combination is useful because it spans several canonical geometries and
-several different numerical mechanisms. In practice, these resources let
-a user ask two related but different questions. The first is whether a
-known reference problem can be reproduced. The second is whether a new
-workflow still behaves consistently when anchored to a trusted canonical
-case.
+### Regression testing
 
-## Validation registry snapshot
+A regression test detects later changes to an accepted result. Store
+regression values only after the case has been tied to theory, a
+benchmark, or an independent calculation. A test should use a tolerance
+supported by the reference precision and numerical method, not one
+chosen only to make the test pass.
 
-The package also keeps a small internal validation registry so the
-family-page badges, model-library summaries, and validation evidence can
-be drawn from one source rather than maintained separately.
+## Package evidence registry
 
-### Family statuses
+The model-library badges are generated from the family and evidence
+tables in `R/validation-registry.R`. Their meanings are defined here:
+
+- Benchmarked means the family has a documented comparison against a
+  canonical benchmark ladder or stored benchmark values.
+- Validated means the currently supported public scope has a documented
+  external software or independent-comparison check.
+- Partially validated means some supported branches are externally
+  checked, but the full public scope is not yet closed.
+- Unvalidated means the package does not yet claim external validation
+  across the current public scope.
+- Experimental means the family is available to use, but its interface
+  or supported workflow should still be treated as provisional.
+
+These tags are intended to be read in three pieces:
+
+- `Benchmarked` is independent of the validation badge and can appear
+  alongside `Validated`, `Partially validated`, or `Unvalidated`.
+- The validation badge is always exactly one of `Validated`,
+  `Partially validated`, or `Unvalidated`.
+- `Experimental` is a separate lifecycle tag and can coexist with any
+  benchmark or validation badge.
+
+The current family-level claims are:
 
 | Family | Section | Status |
 |:---|:---|:---|
@@ -99,264 +120,165 @@ be drawn from one source rather than maintained separately.
 | HPA | Approximation and ray-based families | Benchmarked, Validated |
 | TRCM | Approximation and ray-based families | Benchmarked, Unvalidated |
 | PCDWBA | Approximation and ray-based families | Validated, Experimental |
-| BBFM | Composite and emerging families | Unvalidated, Experimental |
-| VESM | Composite and emerging families | Validated, Experimental |
-| TMM | Composite and emerging families | Benchmarked, Partially validated, Experimental |
+| BBFM | Composite, layered, and transition-matrix families | Unvalidated, Experimental |
+| VESM | Composite, layered, and transition-matrix families | Validated, Experimental |
+| TMM | Composite, layered, and transition-matrix families | Benchmarked, Partially validated, Experimental |
 
-### Benchmark evidence
+Show the evidence registered for each family
 
 | Family | Evidence type | Source | Scope | Summary |
 |:---|:---|:---|:---|:---|
 | SPHMS | Benchmarked | benchmark_ts / Jech et al. (2015) | Sphere spectra across rigid, soft, liquid-filled, and gas-filled cases. | Benchmarked against the canonical spherical spectra stored in benchmark_ts. |
-| FCMS | Benchmarked | benchmark_ts / Jech et al. (2015) | Finite-cylinder spectra across the canonical cylindrical benchmark grid. | Benchmarked against the canonical finite-cylinder spectra stored in benchmark_ts. |
-| PSMS | Benchmarked | benchmark_ts / Jech et al. (2015) | Prolate-spheroid spectra across the canonical benchmark grid. | Benchmarked against the canonical prolate-spheroid spectra stored in benchmark_ts. |
-| SOEMS | Benchmarked | Published calibration spheres | Tungsten-carbide and copper calibration spheres. | Benchmarked against published calibration-sphere targets used throughout the package documentation. |
-| DWBA | Benchmarked | benchmark_ts / Jech et al. (2015) | Weakly scattering sphere, prolate spheroid, and cylinder targets. | Benchmarked against the canonical spectra stored in benchmark_ts. |
-| SDWBA | Benchmarked | benchmark_ts / Jech et al. (2015) | Weakly scattering sphere, prolate spheroid, and cylinder stochastic targets. | Benchmarked against the canonical spectra stored in benchmark_ts. |
-| KRM | Benchmarked | benchmark_ts / Jech et al. (2015) | Canonical isolated targets used for the package KRM benchmark ladder. | Benchmarked against the canonical spectra stored in benchmark_ts. |
-| HPA | Benchmarked | benchmark_ts / Jech et al. (2015) | Sphere, prolate spheroid, and cylinder asymptotic benchmark targets. | Benchmarked against the canonical spherical spectra stored in benchmark_ts. |
-| TRCM | Benchmarked | benchmark_ts / Jech et al. (2015) | Straight and bent cylindrical validation cases documented in the package. | Benchmarked within the package validation workflow against the canonical spectra stored in benchmark_ts. Further compared to the straight-cylinder and FCMS-derived bent-cylinder reference constructions. |
-| TMM | Benchmarked | SPHMS / PSMS / FCMS benchmark ladder | Sphere, oblate, prolate, and guarded cylinder monostatic branches. | Benchmarked against `SPHMS`, `PSMS`, and `FCMS` on the currently supported canonical shape branches. |
-
-### Validated-comparison evidence
-
-| Family | Evidence type | Source | Scope | Summary |
-|:---|:---|:---|:---|:---|
 | SPHMS | Validated | KRMr and echoSMs | Penetrable sphere spectra on shared software definitions. | Validated against `KRMr` and `echoSMs` on shared penetrable-sphere cases. |
+| FCMS | Benchmarked | benchmark_ts / Jech et al. (2015) | Finite-cylinder spectra across the canonical cylindrical benchmark grid. | Benchmarked against the canonical finite-cylinder spectra stored in benchmark_ts. |
 | FCMS | Validated | echoSMs | Rigid, soft, liquid-filled, and gas-filled finite-cylinder spectra. | Validated against the echoSMs finite-cylinder implementation. |
+| PSMS | Benchmarked | benchmark_ts / Jech et al. (2015) | Prolate-spheroid spectra across the canonical benchmark grid. | Benchmarked against the canonical prolate-spheroid spectra stored in benchmark_ts. |
 | PSMS | Validated | Prol_Spheroid and echoSMs | Liquid-filled and gas-filled prolate-spheroid software comparisons. | Validated against the external Prol_Spheroid and echoSMs implementations on shared prolate cases. |
+| SOEMS | Benchmarked | Published calibration spheres | Tungsten-carbide and copper calibration spheres. | Benchmarked against published calibration-sphere targets used throughout the package documentation. |
 | SOEMS | Validated | echoSMs, SphereTS, NOAA applet | Shared calibration-sphere material sets and frequency sweeps. | Validated against echoSMs, SphereTS, and the NOAA calibration applet. |
-| DWBA | Validated | McGehee et al. (1998) and echoSMs | Bundled krill geometry and published DWBA reference workflows. | Validated against the published McGehee et al (1998) and echoSMs workflows. |
-| SDWBA | Validated | CCAMLR MATLAB, NOAA applet, echoSMs | Bundled krill stochastic workflow comparisons. | Validated against the CCAMLR, NOAA applet, and echoSMs implementations. |
-| KRM | Validated | KRMr, echoSMs, NOAA applet | Bundled sardine and cod software-to-software comparisons. | Validated against\`KRMr, echoSMs, and the NOAA KRM applet on bundled fish objects and shared workflows. |
-| HPA | Validated | echoSMs | Spherical HPModel branch and published asymptotic formulas. | Validated against the spherical echoSMs implementation. |
-| PCDWBA | Validated | benchmark_ts / Jech et al. (2015) | Curved weak-scattering reference workflows on shared bent-body cases. | Validated against source-level ZooScatR and Echopop PCDWBA workflows. |
-| VESM | Validated | Reference Python VESM workflow | Documented spherical layered case used by the original VESM implementation. | Validated against the reference Python VESM implementation on the documented layered-sphere case. |
-| TMM | Validated | BEMPP far-field checks | Pressure-release angular slices for sphere, oblate, and prolate cases. | Validated against external BEMPP far-field checks for sphere, oblate, and prolate pressure-release cases. |
-| TMM | Validated | Exact general-angle spheroidal solution | General-angle prolate retained-state validation. | Retained prolate angular products are also checked against the exact general-angle spheroidal solution. |
-
-### Partially-validated scope evidence
-
-| Family | Evidence type | Source | Scope | Summary |
-|:---|:---|:---|:---|:---|
-| TMM | Partially validated | Cylinder retained-angle scope | Cylinder retained-angle scope limitation and guardrails. | TMM is partially validated because the sphere, oblate, and prolate branches have external checks, but retained general-angle cylinder products remain outside the validated public scope. |
-
-### Experimental-scope evidence
-
-| Family | Evidence type | Source | Scope | Summary |
-|:---|:---|:---|:---|:---|
 | BCMS | Experimental | Internal FCMS-based reference reconstruction | Uniform-curvature cylinder coherence extension of FCMS. | BCMS is currently marked experimental because the documented checks are internal coherence reconstructions rather than an external benchmark or software-comparison ladder. |
 | ECMS | Experimental | Independent algebra transcription | Elastic-cylinder component family and near-broadside canonical cases. | ECMS is currently marked experimental because the documented checks are independent algebra reconstructions rather than an external benchmark or software-comparison ladder. |
+| DWBA | Benchmarked | benchmark_ts / Jech et al. (2015) | Weakly scattering sphere, prolate spheroid, and cylinder targets. | Benchmarked against the canonical spectra stored in benchmark_ts. |
+| DWBA | Validated | McGehee et al. (1998) and echoSMs | Bundled krill geometry and published DWBA reference workflows. | Validated against the published McGehee et al (1998) and echoSMs workflows. |
+| SDWBA | Benchmarked | benchmark_ts / Jech et al. (2015) | Weakly scattering sphere, prolate spheroid, and cylinder stochastic targets. | Benchmarked against the canonical spectra stored in benchmark_ts. |
+| SDWBA | Validated | CCAMLR MATLAB, NOAA applet, echoSMs | Bundled krill stochastic workflow comparisons. | Validated against the CCAMLR, NOAA applet, and echoSMs implementations. |
+| KRM | Benchmarked | benchmark_ts / Jech et al. (2015) | Canonical isolated targets used for the package KRM benchmark ladder. | Benchmarked against the canonical spectra stored in benchmark_ts. |
+| KRM | Validated | KRMr, echoSMs, NOAA applet | Bundled sardine and cod software-to-software comparisons. | Validated against KRMr, echoSMs, and the NOAA KRM applet on bundled fish objects and shared workflows. |
+| HPA | Benchmarked | benchmark_ts / Jech et al. (2015) | Sphere, prolate spheroid, and cylinder asymptotic benchmark targets. | Benchmarked against the canonical spherical spectra stored in benchmark_ts. |
+| HPA | Validated | echoSMs | Spherical HPModel branch and published asymptotic formulas. | Validated against the spherical echoSMs implementation. |
+| TRCM | Benchmarked | benchmark_ts / Jech et al. (2015) | Straight and bent cylindrical validation cases documented in the package. | Benchmarked within the package validation workflow against the canonical spectra stored in benchmark_ts. Further compared to the straight-cylinder and FCMS-derived bent-cylinder reference constructions. |
+| PCDWBA | Validated | benchmark_ts / Jech et al. (2015) | Curved weak-scattering reference workflows on shared bent-body cases. | Validated against source-level ZooScatR and Echopop PCDWBA workflows. |
 | PCDWBA | Experimental | ZooScatR | Current package-facing PCDWBA workflow and argument surface. | PCDWBA is currently marked experimental because the public package workflow is still being tightened even though the current source- level comparison cases are documented. |
 | BBFM | Experimental | Internal DWBA + ECMS reconstruction | Internal composite-component consistency checks only. | BBFM is currently marked experimental because it has documented internal reconstruction checks but no external benchmark ladder or independent public implementation comparison. |
+| VESM | Validated | Reference Python VESM workflow | Documented spherical layered case used by the original VESM implementation. | Validated against the reference Python VESM implementation on the documented layered-sphere case. |
 | VESM | Experimental | Current layered-sphere workflow surface | Current documented layered-sphere workflow surface. | VESM is currently marked experimental because the documented public workflow is still limited to the current layered-sphere scope. |
+| TMM | Benchmarked | SPHMS / PSMS / FCMS benchmark ladder | Sphere, oblate, prolate, and guarded cylinder monostatic branches. | Benchmarked against `SPHMS`, `PSMS`, and `FCMS` on the currently supported canonical shape branches. |
+| TMM | Validated | BEMPP far-field checks | Pressure-release angular slices for sphere, oblate, and prolate cases. | Validated against external BEMPP far-field checks for sphere, oblate, and prolate pressure-release cases. |
+| TMM | Validated | Exact general-angle spheroidal solution | General-angle prolate retained-state validation. | Retained prolate angular products are also checked against the exact general-angle spheroidal solution. |
+| TMM | Partially validated | Cylinder retained-angle scope | Cylinder retained-angle scope limitation and guardrails. | TMM is partially validated because the sphere, oblate, and prolate branches have external checks, but retained general-angle cylinder products remain outside the validated public scope. |
 | TMM | Experimental | Current retained-state branch matrix | Current retained-state branch matrix across supported shapes. | TMM is currently marked experimental because the retained-state workflow and branch matrix are still guarded while shape-specific support continues to be tightened. |
 
-## What validation means in this package
+The registry is an index, not the evidence itself. Each row should point
+readers to a model implementation page that records the comparison
+target, controls, metric, tolerance, figure, and limitations. A family
+may be benchmarked while some of its public branches remain unvalidated.
+The family badge must reflect that narrower scope.
 
-Validation in acousticTS is best understood as at least four related
-layers of evidence.
+## Adding validation evidence
 
-First, the object and setup have to be internally consistent. The
-geometry must be the one the user thinks was created, the material
-properties must be in the correct units, the model must be appropriate
-for the target class and boundary interpretation, and the frequency grid
-and orientation convention must match the intended analysis. If any of
-that is wrong, benchmark disagreement says very little.
+Use the following sequence when adding or changing a solver:
 
-Second, the workflow should reproduce known theoretical or canonical
-limits whenever those are available. For some models that means checking
-against an exact modal-series benchmark. For others it means checking
-whether the limiting behavior is consistent with the approximation
-regime documented in the theory page.
+1.  **Define the claim.** Name the geometry, boundary, frequency or
+    angle range, material values, numerical branch, and output quantity
+    being checked.
+2.  **Choose an independent reference.** Prefer a published table,
+    archived dataset, separately implemented code, exact limit, or
+    trusted canonical solution over a plot digitized without its full
+    setup.
+3.  **Reconstruct the target explicitly.** Do not rely on session state
+    or undocumented defaults. Record units and angle conventions.
+4.  **Compare in the correct domain.** Use `TS` for reported decibel
+    agreement, `sigma_bs` for linear scattering strength, and complex
+    amplitude when phase or coherent interference is part of the claim.
+5.  **Check nearby numerical stability.** Vary truncation,
+    discretization, quadrature, precision, or tolerance as appropriate.
+6.  **Store a durable result.** Commit compact numeric data and the
+    rendered figure when they are part of the public evidence.
+7.  **Add tests.** Test the result, output structure, invalid inputs,
+    and relevant limiting behaviour.
+8.  **Update the registry last.** Change badges only after the
+    supporting page, data, and tests are present.
 
-Third, the numerical solution has to be stable enough that the reported
-agreement is meaningful. Some comparisons are only trustworthy after
-truncation settings, precision choices, quadrature controls, or object
-resolution have been perturbed and found not to change the result
-materially.
+Deep nulls deserve special care. A small absolute error in `sigma_bs`
+can become a large difference in `TS`, while agreement in `TS` says
+nothing about complex phase. Report the comparison domain beside the
+metric and tolerance.
 
-Fourth, the reporting quantity has to match the comparison question. A
-benchmark assessed in `TS` is not necessarily saying the same thing as a
-benchmark assessed in `sigma_bs`, and neither is equivalent to direct
-comparison of the complex scattering amplitude.
+## Reproduce a bundled case
 
-## Layer 1: geometry and setup checks
-
-The first layer of validation is simple but essential. Confirm the shape
-is what you think it is, confirm that the material properties and units
-are sensible, confirm that the selected model is compatible with the
-target class and boundary interpretation, and confirm that the frequency
-grid and orientation convention match the intended benchmark. This layer
-is often enough to explain large discrepancies. Many apparent model
-failures are actually mismatches in units, contrasts, orientation, or
-boundary-condition naming.
-
-This is also the stage where readers should decide whether a benchmark
-is even comparable to the problem they are running. A rigid-sphere
-benchmark is not a useful reference for a fluid-filled sphere setup, and
-a benchmark built in seawater is not a direct check on a target rebuilt
-with different ambient properties unless the comparison has been
-intentionally nondimensionalized.
-
-## Layer 2: benchmark reproduction
-
-The second layer is to reproduce a known benchmark curve or stored
-regression case. The bundled resources and the package tests provide the
-clearest examples of this workflow. For spheres, one can build the
-canonical sphere case, run `SPHMS`, and compare the resulting `TS`
-vector against the stored benchmark curve.
+The following code rebuilds the 10 mm-radius fixed-rigid sphere case. It
+is not evaluated during site construction because the benchmark output
+is already committed:
 
 ``` r
 
+library(acousticTS)
 data(benchmark_ts)
 
 frequency <- benchmark_ts$frequency_spectra$index$frequency
-density_sw <- 1026.8
-sound_speed_sw <- 1477.3
+reference <- benchmark_ts$frequency_spectra$sphere$fixed_rigid
 
-scatterer_ess <- fixture_sphere("fixed_rigid")
+sphere_obj <- gas_generate(
+  shape = sphere(radius_body = 0.01, n_segments = 60)
+)
 
-scatterer_ess <- target_strength(
-  scatterer_ess,
+sphere_obj <- target_strength(
+  object = sphere_obj,
   frequency = frequency,
   model = "sphms",
   boundary = "fixed_rigid",
-  density_sw = density_sw,
-  sound_speed_sw = sound_speed_sw
+  density_sw = 1026.8,
+  sound_speed_sw = 1477.3
 )
 
-all.equal(
-  extract(scatterer_ess, "model")$SPHMS$TS,
-  benchmark_ts$frequency_spectra$sphere$fixed_rigid,
-  tolerance = 1e-2
+predicted <- extract(sphere_obj, "model")$SPHMS$TS
+delta_dB <- predicted - reference
+
+c(
+  max_abs_dB = max(abs(delta_dB)),
+  rmse_dB = sqrt(mean(delta_dB^2))
 )
+
+all.equal(predicted, reference, tolerance = 1e-2)
 ```
 
-The cylinder and prolate-spheroid benchmark workflows follow the same
-broad pattern with `FCMS` and `PSMS`, respectively. For the
-prolate-spheroid case, the benchmark setup also shows something
-important: faithful reproduction can require model-specific numerical
-settings such as `precision = "quad"` or `simplify_Amn = FALSE`. In
-other words, a model may be mathematically correct and still miss a
-benchmark if the numerical configuration is not the one the comparison
-requires.
+The
+[SPHMS](https://brandynlucca.github.io/acousticTS/articles/sphms/sphms-implementation.md),
+[FCMS](https://brandynlucca.github.io/acousticTS/articles/fcms/fcms-implementation.md),
+and
+[PSMS](https://brandynlucca.github.io/acousticTS/articles/psms/psms-implementation.md)
+implementation pages document their model-specific comparisons and
+numerical controls.
 
-## Layer 3: choosing the comparison quantity
+## Generated evidence and provenance
 
-Benchmark agreement should be interpreted in the quantity that answers
-the validation question. When the goal is to reproduce the exact
-reported target-strength curve from a publication or stored package
-resource, comparison in `TS` is often appropriate because the benchmark
-itself is already expressed in decibels. In that setting, absolute dB
-differences are directly interpretable and are often the most convenient
-regression metric.
+Public implementation figures are committed outputs. Their builders live
+under `tools/implementation-figures/`, which is excluded from the
+package bundle and is not run during ordinary package installation or
+pkgdown rendering. The manifest records each family, builder,
+package-code input, and expected output.
 
-When the goal is to assess scattering strength as a physical quantity,
-or when the benchmark is really about backscattering magnitude rather
-than reported target strength, comparison in the linear domain is
-usually more informative. That means working with `sigma_bs` or, when
-phase matters, with `f_bs`. Two solutions that differ modestly in `TS`
-can represent a much larger relative disagreement in `sigma_bs` at
-low-scattering portions of the curve. The converse can also happen: a
-visually noticeable dB mismatch near a strong peak may correspond to a
-smaller relative linear-domain error than a reader expects.
+Run all builders from the repository root with:
 
-For that reason, validation metrics such as MAD, RMSE, or maximum
-absolute error should be interpreted together with the domain in which
-they were computed. A dB-domain RMSE rewards agreement in the reported
-target-strength scale. A linear-domain RMSE rewards agreement in
-physical scattering magnitude. Neither dominates the other universally.
-The right choice depends on whether the benchmark is being used as a
-reporting check, a physical-strength check, or a numerical-regression
-check.
+``` r
 
-## Layer 4: numerical stability checks
+source("tools/implementation-figures/run_all.R")
+```
 
-Benchmark reproduction is necessary, but it is not the whole story. Some
-workflows also need local numerical checks such as increasing object
-resolution, changing truncation or integration controls, checking
-sensitivity to precision settings, and confirming that oscillatory
-structure is physically consistent rather than an artifact. This is
-especially relevant for models with heavier numerical machinery, such as
-`PSMS` or boundary-value problems involving multiple coupled
-coefficients.
+Set `ACOUSTICTS_IMPL_FAMILIES` to a comma-separated family list for a
+selected rebuild. The runner uses one sequential R subprocess per
+family, validates declared outputs, and writes commit, elapsed-time,
+size, and MD5 provenance to
+`.tmp/implementation-figures/provenance.csv`. Pull requests rebuild
+affected families and fail when committed outputs drift from their
+declared inputs.
 
-A benchmark should therefore be thought of as an anchor, not as a
-substitute for local numerical inspection. If a curve agrees with a
-benchmark only at one specific precision or one specific truncation
-setting but changes materially under modest perturbation, the agreement
-should be treated cautiously. Conversely, a small residual mismatch may
-be acceptable when the solution is numerically stable and the comparison
-is known to involve different interpolation, reporting, or precision
-conventions.
+A complete validation record should retain:
 
-## How to use the bundled benchmarks well
+- the package version or commit and relevant input hashes,
+- the reference source and citation,
+- geometry, units, material values, exterior medium, and boundary
+  condition,
+- frequency and angle grids,
+- numerical controls and software versions,
+- the comparison domain, metric, tolerance, and result, and
+- the code that generated committed tables or figures.
 
-The bundled benchmark dataset is most useful when it is treated as a
-regression reference rather than just a plotting convenience. Good uses
-include checking a local modification to a model implementation,
-confirming that a custom object-construction workflow reproduces a known
-canonical case, verifying that changes in numerical options do not
-materially alter a trusted solution, and teaching the difference between
-a setup error and a model limitation.
-
-Less useful uses include comparing a benchmark curve to a target built
-with different physical assumptions and then interpreting the mismatch
-as a numerical problem. A benchmark is only informative when the target
-definition and the acoustic assumptions are genuinely aligned. Before
-treating disagreement as evidence of model failure, it is worth
-confirming that the benchmark and the reproduced case actually describe
-the same geometry, medium, boundary condition, orientation convention,
-and reported quantity.
-
-## A practical validation ladder
-
-For routine work, a conservative sequence is usually best.
-
-1.  Plot the geometry and confirm that the object matches the intended
-    canonical case.
-2.  Inspect the material properties, units, boundary interpretation, and
-    medium parameters.
-3.  Run one deterministic model call and inspect the extracted outputs
-    in the quantity the benchmark actually reports.
-4.  Compare against a canonical or benchmark case when one is available.
-5.  Vary one numerical control at a time if the result still looks
-    suspicious.
-6.  Only after those checks, decide whether any remaining disagreement
-    is physical, numerical, or simply a difference in reporting scale.
-
-That ladder avoids blaming the mathematics before checking the setup,
-and it avoids over-interpreting benchmark mismatches that are really
-mismatches of assumptions.
-
-## Related reading
-
-- [Working with real example
-  data](https://brandynlucca.github.io/acousticTS/articles/example-data/example-data.md)
-- [Numerical foundations and special
-  functions](https://brandynlucca.github.io/acousticTS/articles/numerical-foundations/numerical-foundations.md)
-- [FAQ and
-  troubleshooting](https://brandynlucca.github.io/acousticTS/articles/faq-troubleshooting/faq-troubleshooting.md)
+When a model is used outside this recorded scope, describe the
+calculation as an application or extrapolation. Do not silently broaden
+the validation claim.
 
 ## References
-
-Betcke, Timo, and Matthew Scroggs. 2021. “Bempp-Cl: A Fast Python Based
-Just-in-Time Compiling Boundary Element Library.” *Journal of Open
-Source Software* 6 (59): 2879. <https://doi.org/10.21105/joss.02879>.
-
-Commission for the Conservation of Antarctic Marine Living Resources.
-2019. *SDWBA_TS: Stochastic Distorted-Wave Born Approximation (SDWBA)
-Target Strength (TS) Model*. V. 1.3.
-[Https://github.com/ccamlr/SDWBA_TS](https://github.com/ccamlr/SDWBA_TS);
-GitHub, released.
-
-Elavia, A. 2021. *Liquid_spheroid: Acoustic Scattering by a Liquid
-Prolate Spheroid*. Released.
-<https://github.com/elavia/liquid_spheroid>.
-
-Gastauer, Sven. 2025. *SvenGastauer/KRMr: V0.4.8*. Zenodo.
-<https://doi.org/10.5281/ZENODO.15838374>.
 
 Gastauer, Sven, Dezhang Chu, and Martin J. Cox. 2019. “ZooScatR—An
 \<Span Style="font-Variant:small-Caps;"\>r\</Span\> Package for
@@ -370,16 +292,6 @@ Among Ten Models of Acoustic Backscattering Used in Aquatic Ecosystem
 Research.” *The Journal of the Acoustical Society of America* 138 (6):
 3742–64. <https://doi.org/10.1121/1.4937607>.
 
-Khodabandeloo, Babak, Yngve Heggelund, Bjørnar Ystad, Sander Andre Berg
-Marx, and Geir Pedersen. 2025. “High-Precision Model and Open-Source
-Software for Acoustic Backscattering by Liquid- and Gas-Filled Prolate
-Spheroids Across a Wide Frequency Range and Incident Angles:
-Implications for Fisheries Acoustics.” *Journal of Sound and Vibration*,
-119227. https://doi.org/<https://doi.org/10.1016/j.jsv.2025.119227>.
-
-Lucca, Brandyn, and Wu-Jung Lee. 2026. *OSOceanAcoustics/Echopop:
-V0.6.0*. Zenodo. <https://doi.org/10.5281/ZENODO.18975959>.
-
 Macaulay, Gavin J. 2025. *gavinmacaulay/SphereTS: V1.0.8*.
 <https://github.com/gavinmacaulay/SphereTS>.
 
@@ -388,22 +300,3 @@ Scattering Models Available to Fisheries and Plankton Scientists.” In
 *GitHub Repository*.
 [Https://github.com/ices-tools-dev/echoSMs](https://github.com/ices-tools-dev/echoSMs);
 GitHub.
-
-McGehee, D. E., R. L. O’Driscoll, and L. V.Martin Traykovski. 1998.
-“Effects of Orientation on Acoustic Scattering from Antarctic Krill at
-120 kHz.” *Deep Sea Research Part II: Topical Studies in Oceanography*
-45 (7): 1273–94. <https://doi.org/10.1016/S0967-0645(98)00036-8>.
-
-Renfree, J. S., and D. A. Demer. 2014. *Standard Sphere Target Strength
-Calculator*. Advanced Survey Technologies, Fisheries Resource Division,
-Southwest Fisheries Science Center, National Marine Fisheries Service,
-National Oceanic; Atmospheric Administration.
-<https://www.fisheries.noaa.gov/data-tools/standard-sphere-target-strength-calculator>.
-
-Southwest Fisheries Science Center. 2022a. *KRM Model*. National Marine
-Fisheries Service, National Oceanic; Atmospheric Administration.
-<https://www.fisheries.noaa.gov/data-tools/krm-model>.
-
-Southwest Fisheries Science Center. 2022b. *SDWBA Model*. National
-Marine Fisheries Service, National Oceanic; Atmospheric Administration.
-<https://www.fisheries.noaa.gov/data-tools/sdwba-model>.

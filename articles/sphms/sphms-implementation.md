@@ -7,8 +7,7 @@ Benchmarked Validated
 [Overview](https://brandynlucca.github.io/acousticTS/articles/sphms/index.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/sphms/sphms-theory.md)
 
-These pages follow the classical exact sphere literature for fluid,
-elastic, and approximate shell limits ([Anderson
+SPHMS evaluates canonical spherical boundary-value problems ([Anderson
 1950](#ref-Anderson_1950); [Faran 1951](#ref-Faran_1951); [Hickling
 1962](#ref-Hickling_1962)).
 
@@ -142,26 +141,22 @@ motion, vanishing surface pressure, or a highly compressible gas-filled
 interior. That makes the resulting differences much easier to interpret
 than if geometry and boundary were changed simultaneously.
 
-For fluid-filled spheres, the same implementation pattern applies; the
-main change is the selected `boundary` and the interior material
-properties. In practical SPHMS work, the first controls to revisit are
-usually the sphere radius, the selected boundary condition, and the
-medium-to-interior contrasts, because those are the inputs that
-determine the modal coefficient problem most directly.
+For fluid-filled spheres, the same implementation pattern applies.
+Change the selected `boundary` and interior material properties. Sphere
+radius, boundary condition, and medium-to-interior contrasts are the
+first inputs to verify.
 
 #### Benchmark comparisons
 
 SPHMS can be compared directly against the Jech benchmark definitions
-stored in `benchmark_ts`. The summary below uses the full spherical
-benchmark grid. Elapsed times are representative values from the current
-machine rather than universal expectations.
+stored in `benchmark_ts` ([Jech et al. 2015](#ref-Jech_2015)).
 
-| Boundary | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | Elapsed (s) |
-|:---|---:|---:|---:|
-| `fixed_rigid` | 0.00497 | 0.00246 | 0.03 |
-| `pressure_release` | 0.00500 | 0.00243 | 0.09 |
-| `gas_filled` | 0.00499 | 0.00263 | 0.06 |
-| `liquid_filled` | 0.00492 | 0.00241 | 0.11 |
+| Boundary           | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) |
+|:-------------------|------------------------:|-------------------------:|
+| `fixed_rigid`      |                 0.00497 |                  0.00246 |
+| `pressure_release` |                 0.00500 |                  0.00243 |
+| `gas_filled`       |                 0.00499 |                  0.00263 |
+| `liquid_filled`    |                 0.00492 |                  0.00241 |
 
 All four spherical boundary types remain very close to the benchmark
 family over the full grid, with the implementation staying within about
@@ -180,7 +175,10 @@ any one implementation tracks the benchmark family.
 
 | Boundary | Comparison | Mean abs. \Delta TS (dB) | Max abs. \Delta TS (dB) |
 |:---|:---|---:|---:|
-| `gas_filled` | acousticTS vs`KRMr | 3.21e-14 | 2.21e-12 | |`gas_filled`| acousticTS vs echoSMs | 1.71e-13 | 1.52e-11 | |`liquid_filled`| acousticTS vs KRMr | 5.70e-12 | 1.30e-10 | |`liquid_filled\` | acousticTS vs echoSMs | 3.68e-11 |
+| `gas_filled` | acousticTS vs KRMr | 3.21e-14 | 2.21e-12 |
+| `gas_filled` | acousticTS vs echoSMs | 1.71e-13 | 1.52e-11 |
+| `liquid_filled` | acousticTS vs KRMr | 5.70e-12 | 1.30e-10 |
+| `liquid_filled` | acousticTS vs echoSMs | 3.68e-11 | 3.37e-09 |
 
 Those values show that the penetrable SPHMS branches are effectively
 identical across the three implementations on the shared spherical
@@ -195,18 +193,15 @@ liquid-filled benchmark fit starts to move. The table below keeps the
 same weakly scattering liquid-filled benchmark and only changes that
 truncation cap.
 
-| Boundary | `m_limit` | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | Elapsed (s) |
-|:---|:---|---:|---:|---:|
-| `liquid_filled` | default rule | 0.00492 | 0.00241 | 0.07 |
-| `liquid_filled` | `20` | 0.52550 | 0.00640 | 0.14 |
-| `liquid_filled` | `10` | 58.24225 | 8.07819 | 0.02 |
+| Boundary | `m_limit` | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) |
+|:---|:---|---:|---:|
+| `liquid_filled` | default rule | 0.00492 | 0.00241 |
+| `liquid_filled` | `20` | 0.52550 | 0.00640 |
+| `liquid_filled` | `10` | 58.24225 | 8.07819 |
 
-That pattern is useful because it shows that SPHMS is not especially
-tolerant of aggressive modal under-truncation, even though the
-wall-clock time can drop. The benchmarked spherical branches therefore
-do not need the same kind of configuration matrix as PSMS. Boundary
-choice is the main physical switch, and `m_limit` is best treated as a
-guarded numerical override rather than as a routine tuning knob.
+Aggressive under-truncation degrades the spherical result. Treat
+`m_limit` as a guarded numerical override rather than a routine tuning
+control.
 
 ## References
 
@@ -224,6 +219,11 @@ Gastauer, Sven. 2025. *SvenGastauer/KRMr: V0.4.8*. Zenodo.
 Hickling, Robert. 1962. “Analysis of Echoes from a Solid Elastic Sphere
 in Water.” *The Journal of the Acoustical Society of America* 34 (10):
 1582–92. <https://doi.org/10.1121/1.1909055>.
+
+Jech, J. Michael, John K. Horne, Dezhang Chu, et al. 2015. “Comparisons
+Among Ten Models of Acoustic Backscattering Used in Aquatic Ecosystem
+Research.” *The Journal of the Acoustical Society of America* 138 (6):
+3742–64. <https://doi.org/10.1121/1.4937607>.
 
 Macaulay, Gavin, and contributors. 2024. “echoSMs: Making Acoustic
 Scattering Models Available to Fisheries and Plankton Scientists.” In

@@ -7,46 +7,41 @@ Unvalidated Experimental
 [Theory](https://brandynlucca.github.io/acousticTS/articles/bbfm/bbfm-theory.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/bbfm/bbfm-implementation.md)
 
-This family is best read alongside the swimbladder-less fish and
-composite-scatterer literature that motivates explicit flesh-body and
-backbone terms ([Gorska et al. 2005](#ref-Gorska_2005); [Stanton et al.
-1998](#ref-Stanton_1998_1); [Clay and Horne 1994](#ref-Clay_1994)).
-
-The body-backbone fish model (`BBFM`) is the package’s composite
-swimbladder-less family for targets whose flesh body and backbone should
-remain explicit acoustic components.
+The body-backbone fish model (`BBFM`) is a composite model for
+swimbladder-less fish in which the flesh body and an elastic backbone
+are retained as separate acoustic components.
 
 ### Core idea
 
-Compute a weak-fluid flesh-body term with `DWBA`, compute an elastic
-backbone term with `ECMS`, place the backbone inside the same body-fixed
-frame with a two-way phase factor, and then sum the two complex
-amplitudes coherently.
+Calculate the flesh-body contribution with `DWBA`, calculate the
+backbone with `ECMS`, translate both amplitudes into one body-fixed
+phase reference, and add them coherently. This separates mechanisms
+emphasized in swimbladder-less fish models ([Gorska et al.
+2005](#ref-Gorska_2005); [Stanton et al. 1998](#ref-Stanton_1998_1)).
 
 ### Best for
 
-- Swimbladder-less fish where the backbone should remain acoustically
-  explicit
-- Composite body-plus-backbone studies that are too structured for a
-  body-only approximation
-- Intermediate modeling between weak-fluid body models and future fully
-  coupled composite solvers
+- Swimbladder-less fish with explicit body and backbone geometry
+- Studying interference between weak-fluid flesh and an elastic internal
+  component
+- A transparent first-order composite approximation before a coupled
+  solver is available
 
 ### Supports
 
-- `BBF` scatterers built from explicit `body_shape` and `backbone_shape`
-  inputs
-- Flesh-body material properties as contrasts or absolute density/sound
-  speed
-- Backbone density plus longitudinal and transverse elastic wave speeds
+- `BBF` objects constructed from separate body and backbone `Shape`
+  objects
+- Fluid-like body properties and elastic backbone density and wave
+  speeds
+- Stored body, backbone, phase-shifted, and combined outputs
 
 ### Main assumptions
 
-- Flesh body treated in the weak-fluid `DWBA` regime
-- Backbone treated as an elastic cylinder through `ECMS`
-- Components combined coherently after centroid-based phase placement
-- No repeated rescattering or fully coupled embedded elastic-cylinder
-  solve
+- The flesh remains within the `DWBA` weak-scattering regime
+- The backbone is represented by the canonical `ECMS` cylinder solution
+- Centroid translation is sufficient to place the component phases
+- No shadowing, repeated rescattering, or coupled embedded-cylinder
+  boundary solve
 
 ### Validation status
 
@@ -57,34 +52,15 @@ amplitudes coherently.
 ### Family pages
 
 - [Implementation](https://brandynlucca.github.io/acousticTS/articles/bbfm/bbfm-implementation.md):
-  object setup, stored outputs, and internal reconstruction checks
+  constructing `BBF` objects, component output, and reconstruction
+  checks
 - [Theory](https://brandynlucca.github.io/acousticTS/articles/bbfm/bbfm-theory.md):
-  composite amplitude, phase placement, and interference structure
-
-`BBFM` is already useful as a transparent composite family, but it
-should still be treated as experimental. The main open work is external
-validation and, in the longer term, a more tightly coupled treatment of
-the backbone as an embedded elastic structure rather than a positioned
-component surrogate.
-
-### Why it exists
-
-`BBFM` fills the gap between:
-
-- body-only weak-scattering models that ignore the backbone,
-- and future fully coupled body-plus-backbone solvers that are not yet
-  in the package.
-
-That is why the family belongs in acousticTS even before a more complete
-composite solver exists: it gives a physically interpretable way to keep
-the two dominant anatomical components explicit in one coherent
-target-strength calculation.
+  component amplitudes, phase translation, and interference
+- [Combining
+  components](https://brandynlucca.github.io/acousticTS/articles/combining-components/combining-components.md):
+  requirements for coherent and incoherent sums
 
 ## References
-
-Clay, Clarence S., and John K. Horne. 1994. “Acoustic Models of Fish:
-The Atlantic Cod (*Gadus Morhua*).” *The Journal of the Acoustical
-Society of America* 96 (3): 1661–68. <https://doi.org/10.1121/1.410245>.
 
 Gorska, Natalia, Egil Ona, and Rolf Korneliussen. 2005. “Acoustic
 Backscattering by Atlantic Mackerel as Being Representative of Fish That

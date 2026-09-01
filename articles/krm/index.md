@@ -7,60 +7,51 @@ Benchmarked Validated
 [Theory](https://brandynlucca.github.io/acousticTS/articles/krm/krm-theory.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/krm/krm-implementation.md)
 
-These pages follow the composite body-plus-swimbladder fish modeling
-literature initiated for cod and later generalized in open software
-implementations ([Clay 1991](#ref-Clay_1991); [Clay and Horne
-1994](#ref-Clay_1994)).
-
-The Kirchhoff-ray mode model (`KRM`) is the package’s composite fish
-family for targets whose body and swimbladder occupy different acoustic
-regimes. It keeps a weakly contrasting ray-style body treatment and a
-separate swimbladder treatment that switches between low-mode and
-high-frequency behavior.
+The Kirchhoff-ray mode model (`KRM`) calculates composite monostatic
+backscatter from a fish body and an explicitly represented gas-filled
+swimbladder.
 
 ### Core idea
 
-Treat the fish body with a Kirchhoff-style short-segment approximation,
-treat the swimbladder with a simplified cylinder-based modal or
-high-frequency branch depending on acoustic size, and combine the
-complex component amplitudes coherently.
+Treat the segmented flesh body with a Kirchhoff-style approximation, use
+an acoustic-size-dependent mode or ray description for the swimbladder,
+and combine the component amplitudes coherently ([Clay
+1991](#ref-Clay_1991); [Clay and Horne 1994](#ref-Clay_1994)).
 
 ### Best for
 
-- Gas-bearing fish whose body and swimbladder should not be modeled by
-  the same exact family
-- Fish-like profile data represented by segmented body and bladder
-  outlines
-- Practical fisheries workflows where composite body-plus-swimbladder
-  structure matters
+- Gas-bearing fish with separate body and swimbladder outlines
+- Frequency and orientation studies where the internal gas component
+  dominates or interferes with the body return
+- Comparison of supported KRM material and embedding variants
 
 ### Supports
 
-- `SBF` composite scatterers
-- Body contrasts relative to seawater as medium `1` and swimbladder
-  contrasts relative to the body in the local bladder subproblem
-- Monostatic composite target strength
+- `SBF` objects with body and swimbladder shapes, placement, and
+  orientation
+- Separate body and bladder material descriptions
+- Stored body, swimbladder, and coherently combined outputs
 
 ### Main assumptions
 
-- Short-segment ray-style treatment of the body
-- Simplified swimbladder physics chosen by acoustic size regime
-- Coherent component combination without a full coupled body-bladder
-  boundary-value solve
+- Segment-wise body and simplified swimbladder approximations
+- The selected KRM variant matches the intended material interpretation
+- Coherent first-order component combination
+- No fully coupled body-swimbladder boundary solve or repeated
+  rescattering
 
 ### Validation status
 
 - Benchmarked against the canonical spectra stored in benchmark_ts.
-- Validated against\`KRMr, echoSMs, and the NOAA KRM applet on bundled
+- Validated against KRMr, echoSMs, and the NOAA KRM applet on bundled
   fish objects and shared workflows.
 
 ### Family pages
 
 - [Implementation](https://brandynlucca.github.io/acousticTS/articles/krm/krm-implementation.md):
-  scatterer setup, spectra, and validation tables
+  building fish objects, variants, component output, and comparisons
 - [Theory](https://brandynlucca.github.io/acousticTS/articles/krm/krm-theory.md):
-  body Kirchhoff reduction, swimbladder mode/ray branches, and coherent
-  composite sum
+  body term, swimbladder branches, and coherent sum
 
 ## References
 

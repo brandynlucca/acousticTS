@@ -8,58 +8,43 @@ Benchmarked Unvalidated
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/trcm/trcm-implementation.md)
 
 The two-ray cylinder model (TRCM) is a high-frequency approximation for
-elongated fluid-like bodies. It assumes that the dominant backscatter
-from a locally cylindrical body is produced by two coherent
-contributions: a prompt reflection from the near interface and a second
-contribution that enters the body, traverses the diameter, reflects from
-the far interface, and returns with additional phase ([Stanton et al.
-1993](#ref-Stanton_1993); [Stanton, Chu, and Wiebe
-1998](#ref-Stanton_1998_2); [Stanton, Chu, Wiebe, Martin, et al.
-1998](#ref-Stanton_1998_1)). The model is therefore asymptotic from the
-outset. It does not attempt to represent low-order resonances or a full
-internal reverberation series. Instead, it keeps only the first two
-physically important specular paths and asks how they interfere.
+an elongated fluid-like body. It retains a prompt near-interface
+reflection and the first return that traverses the body diameter
+([Stanton et al. 1993](#ref-Stanton_1993)). Their coherent interference
+produces the principal spectral structure. Low-order resonances and
+later internal returns are omitted.
 
-Throughout this page, medium `1` is the surrounding seawater and medium
-`2` is the fluid-like body interior.
+Medium 1 is the exterior fluid and medium 2 is the body. Interface and
+scattering symbols follow [Notation and
+symbols](https://brandynlucca.github.io/acousticTS/articles/notation-and-symbols/notation-and-symbols.md).
 
-The reflection and transmission factors entering the model come from
-ordinary fluid-fluid interface physics. Pressure is continuous across
-the boundary, normal particle velocity is continuous across the
-boundary, and the resulting impedance contrast determines how much of
-the incident field is reflected or transmitted. The TRCM does not solve
-that boundary-value problem exactly. It inserts those local interface
-coefficients into a high-frequency two-path reduction for an elongated
-body.
+The local reflection and transmission factors follow from pressure and
+normal-velocity continuity at a fluid-fluid interface. TRCM inserts them
+into a two-path asymptotic reduction rather than solving the
+finite-cylinder boundary-value problem.
 
-The model can be read as the product of four ingredients. The fluid
-interface supplies a reflection coefficient. The cross-section supplies
-a normalized two-ray interference factor. The finite body axis supplies
-a directivity factor. The high-frequency asymptotics supply the specular
-amplitude and phase scaling. Curvature then modifies only the coherent
-axial accumulation, not the local two-path cross-sectional physics.
+![Straight-cylinder cross-section and the two retained TRCM
+paths.](trcm-two-ray-geometry-clean.png)
+
+Straight-cylinder cross-section and the two retained TRCM paths.
+
+The amplitude combines an interface coefficient, a two-ray interference
+factor, finite-axis directivity, and specular asymptotic scaling.
+Curvature changes the axial coherence term.
 
 ## Physical basis of the TRCM
 
 ### High-frequency starting point
 
-The TRCM begins from the same physical picture as other Kirchhoff-type
-high-frequency models: when a smooth fluid body is acoustically large,
-the scattered field is dominated by contributions from specular regions
-of the surface. For an elongated locally cylindrical body, the strongest
-backscatter comes from those parts of the cross-section for which the
-incident and scattered directions are symmetric about the local outward
-normal. The model then truncates the internal path bookkeeping very
-aggressively. It assumes that one prompt reflected path and one first
-traversing internal path carry most of the coherent backscatter.
+For a smooth, acoustically large body, stationary-phase neighborhoods
+around specular points dominate the surface integral. TRCM applies that
+picture to a locally cylindrical cross-section and truncates the
+internal path series after the first through-body return ([Stanton et
+al. 1993](#ref-Stanton_1993)).
 
-This is the key reason the TRCM is useful and also the key reason it can
-fail. It is useful because the dominant oscillatory structure of many
-elongated weakly curved fluid-like bodies is often controlled by
-interference between those two contributions. It can fail when the body
-is not locally cylindrical, when the acoustic size is not large enough,
-or when neglected internal paths and resonance structure are no longer
-small corrections.
+The approximation weakens at small acoustic size, for noncylindrical
+local geometry, or when omitted internal paths and resonances are
+appreciable.
 
 ### From multiple internal paths to a two-ray interference factor
 
@@ -154,10 +139,9 @@ The through-body contribution therefore carries the factor:
 
 e^{4 i k_2 a \cos \hat{\theta}}.
 
-This is simply the two-way interior optical path associated with the
-first transmitted return. The model also introduces an empirical phase
-correction to shift that return away from the strict geometric-optics
-value at finite acoustic size:
+This is the two-way interior path of the first transmitted return. An
+empirical phase correction accounts for finite-size departure from
+geometric optics:
 
 \mu = -\frac{(\pi / 2) k_1 a}{k_1 a + 0.4}.
 
@@ -226,23 +210,19 @@ scattering amplitude:
 4} e^{-2 i k_1 a \cos \hat{\theta}} L \sqrt{k_1 a \cos \hat{\theta}} \\
 \mathcal{R}\_{12} \\ s \\ \mathcal{I}\_{TR}.
 
-Every factor in this expression has a separate meaning. The coefficient
-\mathcal{R}\_{12} comes from the fluid-fluid interface, the factor s
-comes from axial phase integration, the square-root scale together with
-e^{i \pi / 4} comes from high-frequency specular asymptotics, and the
-bracket \mathcal{I}\_{TR} comes from the coherent sum of the two
-retained cross-sectional rays.
+\mathcal R\_{12} is the interface reflection, s is axial directivity,
+the square-root and e^{i\pi/4} terms are the stationary-phase scale and
+phase, and \mathcal I\_{TR} is the two-ray interference.
 
 For either the straight or curved form of the model, the associated
 backscattering cross-section is:
 
 \sigma\_\text{bs} = \left\| \mathcal{f}\_\text{bs} \right\|^2,
 
-and the corresponding target strength is ([MacLennan et al.
-2002](#ref-MacLennan_2002); [Urick 1983](#ref-Urick_1983); [Simmonds and
-MacLennan 2005](#ref-Simmonds_2005)):
+and target strength is ([MacLennan et al. 2002](#ref-MacLennan_2002)):
 
-TS = 10 \log\_{10} \sigma\_\text{bs}.
+TS = 10 \log\_{10}\left( \frac{\sigma\_\text{bs}}{1\\
+\mathrm{m}^2}\right).
 
 ## Curved-cylinder extension
 
@@ -255,6 +235,12 @@ not the local cross-sectional two-ray physics. The same local reflection
 coefficient, transmission coefficients, empirical phase correction, and
 diameter-traversal phase are retained, but the effective coherent length
 of the body is reduced by curvature-induced phase variation.
+
+![Curvature changes axial coherence length, not the local two-ray
+cross-sectional physics.](trcm-curvature-coherence-clean.png)
+
+Curvature changes axial coherence length, not the local two-ray
+cross-sectional physics.
 
 Treat the bent body as a circular arc of radius of curvature \rho_c and
 total length L. The half-body tangent rotation is then:
@@ -271,10 +257,8 @@ curvature-modified equivalent coherent length is then written as:
 L\_{ebc}(k_1) = \int\_{-L/2}^{L/2} \exp \left\[ i \\ \frac{8 k_1
 z\_{max}}{L^2} x^2 \right\] dx.
 
-This is still a quadratic-phase coherence correction. It states that
-curvature causes phase to vary quadratically away from the dominant
-specular region, so the bent body behaves like a shorter coherent
-radiator than the corresponding straight cylinder.
+This quadratic phase makes contributions away from the dominant specular
+region dephase.
 
 For gentle curvature, where \gamma\_{max} is small, one has:
 
@@ -297,10 +281,8 @@ length L\_{ebc}:
 \mathcal{f}\_\text{bs}^{(curved)} = \frac{L\_{ebc}}{L}
 \mathcal{f}\_\text{bs}^{(straight)}.
 
-This expression states the main physical idea behind the curved TRCM:
-curvature does not replace the local two-ray interference law, but it
-does reduce the span of the axis over which those local contributions
-remain phase-aligned.
+The local two-ray law is unchanged. Only the coherent axial length is
+replaced.
 
 ### Stationary-phase reduction
 
@@ -337,10 +319,8 @@ The TRCM depends on the following assumptions:
     can be represented by a quadratic coherence integral or its
     stationary-phase reduction.
 
-Under these assumptions the TRCM captures the main oscillatory structure
-associated with two-ray interference, but it is not intended to
-reproduce a full modal or reverberant description of a finite fluid
-cylinder.
+TRCM does not provide a complete modal or reverberant solution for a
+finite fluid cylinder.
 
 ## References
 
@@ -349,25 +329,7 @@ Consistent Approach to Definitions and Symbols in Fisheries Acoustics.”
 *ICES Journal of Marine Science* 59 (2): 365–69.
 <https://doi.org/10.1006/jmsc.2001.1158>.
 
-Simmonds, John, and David N. MacLennan. 2005. *Fisheries Acoustics:
-Theory and Practice*. 2nd ed. Blackwell Science.
-<https://doi.org/10.1002/9780470995303>.
-
-Stanton, Timothy K., Dezhang Chu, and Peter H. Wiebe. 1998. “Sound
-Scattering by Several Zooplankton Groups. II. Scattering Models.” *The
-Journal of the Acoustical Society of America* 103 (1): 236–53.
-<https://doi.org/10.1121/1.421110>.
-
 Stanton, Timothy K., Dezhang Chu, Peter H. Wiebe, and Clarence S. Clay.
 1993. “Average Echoes from Randomly Oriented Random-Length Finite
 Cylinders: Zooplankton Models.” *The Journal of the Acoustical Society
 of America* 94 (6): 3463–72. <https://doi.org/10.1121/1.407200>.
-
-Stanton, Timothy K., Dezhang Chu, Peter H. Wiebe, Linda V. Martin, and
-Robert L. Eastwood. 1998. “Sound Scattering by Several Zooplankton
-Groups. I. Experimental Determination of Dominant Scattering
-Mechanisms.” *The Journal of the Acoustical Society of America* 103 (1):
-225–35. <https://doi.org/10.1121/1.421469>.
-
-Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed.
-McGraw-Hill.

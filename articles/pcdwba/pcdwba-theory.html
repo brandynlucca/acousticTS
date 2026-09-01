@@ -47,10 +47,9 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-physics-primer" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Physics Primer</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-physics-primer">
-<li><a class="dropdown-item" href="../../articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
-    <li><a class="dropdown-item" href="../../articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+<li><a class="dropdown-item" href="../../articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+    <li><a class="dropdown-item" href="../../articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
     <li><a class="dropdown-item" href="../../articles/boundary_conditions.html">Boundary conditions</a></li>
-    <li><a class="dropdown-item" href="../../articles/material-properties/material-properties.html">Material properties</a></li>
     <li><a class="dropdown-item" href="../../articles/numerical-foundations/numerical-foundations.html">Numerical methods</a></li>
   </ul>
 </li>
@@ -58,6 +57,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-build-targets" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Build Targets</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-build-targets">
 <li><a class="dropdown-item" href="../../articles/building-shapes/building-shapes.html">Building Shapes</a></li>
+    <li><a class="dropdown-item" href="../../articles/material-properties/material-properties.html">Material Properties</a></li>
     <li><a class="dropdown-item" href="../../articles/building-scatterers/building-scatterers.html">Building Scatterers</a></li>
     <li><a class="dropdown-item" href="../../articles/shape-manipulation-reforging/shape-manipulation-reforging.html">Shape Manipulation</a></li>
   </ul>
@@ -68,17 +68,15 @@
 <li><a class="dropdown-item" href="../../articles/running-models/running-models.html">Running Models</a></li>
     <li><a class="dropdown-item" href="../../articles/model-selection/model-selection.html">Choosing a Model</a></li>
     <li><a class="dropdown-item" href="../../articles/comparing-models/comparing-models.html">Comparing Models</a></li>
-    <li><a class="dropdown-item" href="../../articles/plotting-inspecting-results/plotting-inspecting-results.html">Visualizing results</a></li>
     <li><a class="dropdown-item" href="../../articles/simulation-parameter-sweeps/simulation-parameter-sweeps.html">Simulation sweeps</a></li>
-    <li><a class="dropdown-item" href="../../articles/calibration-workflow/calibration-workflow.html">Calibration workflow</a></li>
-    <li><a class="dropdown-item" href="../../articles/validation-benchmarks/validation-benchmarks.html">Validating models</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../../articles/model-library/model-library.html">Models</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-developers" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Developers</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-developers">
-<li><a class="dropdown-item" href="../../articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
+<li><a class="dropdown-item" href="../../articles/validation-benchmarks/validation-benchmarks.html">Validation methods</a></li>
+    <li><a class="dropdown-item" href="../../articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
     <li><a class="dropdown-item" href="../../articles/combining-components/combining-components.html">Combining components</a></li>
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
@@ -131,19 +129,16 @@
 </div>
 </div>
 <p>The phase-compensated distorted wave Born approximation
-(<code>PCDWBA</code>) extends the ordinary <code>DWBA</code> to
-elongated bodies whose centerlines are curved rather than straight <span class="citation">(<a href="#ref-Chu_1999">Chu and Ye 1999</a>; <a href="#ref-Stanton_1989_2">Stanton 1989</a>)</span>. It preserves the
-same weak-scattering local kernel used for slender fluid-like bodies,
-but it replaces the straight-body phase bookkeeping by a
-centerline-dependent phase that follows the bent geometry
-explicitly.</p>
-<p>The family therefore sits conceptually between two extremes: it is
-more physical than treating a curved body as if it were straight, but it
-remains a Born-type perturbation model rather than a full curved-body
-boundary-value solution.</p>
-<p>The notation below follows the shared package conventions: medium
-<code>1</code> is the surrounding seawater and medium <code>2</code> is
-the weakly scattering body.</p>
+(<code>PCDWBA</code>) applies a weak-scattering, slender-body kernel
+along a curved centerline <span class="citation">(<a href="#ref-Chu_1999">Chu and Ye 1999</a>)</span>. Its distinguishing
+term is the two-way phase evaluated on the curved geometry.</p>
+<p>It remains a first-order Born approximation, not an exact
+curved-boundary solution.</p>
+<div class="note" data-title="Shared conventions">
+<p>Medium indices follow <a href="../notation-and-symbols/notation-and-symbols.html">Notation and
+symbols</a>. The weak-contrast derivation and straight-centerline limit
+are given in <a href="../dwba/dwba-theory.html">DWBA theory</a>.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="weak-scattering-starting-point">Weak-scattering starting point<a class="anchor" aria-label="anchor" href="#weak-scattering-starting-point"></a>
@@ -207,22 +202,16 @@ body centerline and let <span class="math inline">\mathbf{r}_c(s)</span>
 denote the corresponding centerline position. The local body radius is
 <span class="math inline">a(s)</span>, and the local tangent angle is
 <span class="math inline">\beta(s)</span>.</p>
-<p>For a uniformly bent canonical body, the centerline is wrapped around
-an osculating circle of radius <span class="math inline">\rho_c</span>,
-with curvature <span class="math inline">\kappa = 1/\rho_c</span>. A
-taper function may also scale the local radius toward the ends, but that
-taper only changes the local cross-sectional factor; it does not alter
-the phase logic that motivates <code>PCDWBA</code>.</p>
+<p>For a uniformly bent body, the centerline follows a circle of radius
+<span class="math inline">\rho_c</span> and curvature <span class="math inline">\kappa=1/\rho_c</span>. A taper changes <span class="math inline">a(s)</span> but not the form of the centerline
+phase.</p>
 </div>
 <div class="section level3">
 <h3 id="why-curvature-matters">Why curvature matters<a class="anchor" aria-label="anchor" href="#why-curvature-matters"></a>
 </h3>
-<p>In a straight-body <code>DWBA</code>, the two-way phase factor
-depends only on the axial position along a straight line. Once the body
-bends, two points with the same arc-length separation no longer have the
-same projection onto the incident or receive directions. That means a
-curved target cannot be described correctly by the same straight-axis
-phase term unless the curvature is negligible.</p>
+<p>For a curved body, arc-length separation and projected separation are
+not the same. Contributions that would have a linear phase on a straight
+axis therefore acquire a nonlinear phase.</p>
 </div>
 </div>
 <div class="section level2">
@@ -257,25 +246,24 @@ amplitude can be written schematically as:</p>
   \propto
   \int_{-L/2}^{L/2}
   C_{21}(s)
-  \left(\frac{k_2 a(s)}{1}\right)^2
+  \left(k_2 a(s)\right)^2
   \frac{J_1\!\left(2 k_2 a(s)\, \chi(s)\right)}
   {2 k_2 a(s)\, \chi(s)}
   \exp\!\left[
-  2 i k_1 \hat{\mathbf{q}}\cdot \mathbf{r}_c(s)
+  2 i k_2 \hat{\mathbf{q}}\cdot \mathbf{r}_c(s)
   \right]
   ds,
 </span></p>
 <p>where <span class="math inline">\hat{\mathbf{q}}</span> denotes the
 backscatter direction.</p>
-<p>The crucial ingredient is the phase factor:</p>
+<p>The phase-compensation factor is:</p>
 <p><span class="math display">
   \exp\!\left[
-  2 i k_1 \hat{\mathbf{q}}\cdot \mathbf{r}_c(s)
+  2 i k_2 \hat{\mathbf{q}}\cdot \mathbf{r}_c(s)
   \right].
 </span></p>
-<p>This is what makes the model phase compensated: the phase is
-evaluated on the actual curved centerline rather than on a fictitiously
-straight axis.</p>
+<p>The actual curved centerline replaces the straight-axis phase
+approximation.</p>
 </div>
 <div class="section level3">
 <h3 id="discrete-form">Discrete form<a class="anchor" aria-label="anchor" href="#discrete-form"></a>
@@ -290,16 +278,15 @@ straight axis.</p>
   \frac{J_1\!\left(2 k_2 a_j \chi_j\right)}
   {2 k_2 a_j \chi_j}
   \exp\!\left[
-  2 i k_1 \hat{\mathbf{q}}\cdot \mathbf{r}_{c,j}
+  2 i k_2 \hat{\mathbf{q}}\cdot \mathbf{r}_{c,j}
   \right]
   \Delta s_j,
 </span></p>
 <p>where the index <span class="math inline">j</span> labels body
 segments and <span class="math inline">\Delta s_j</span> is the local
 centerline spacing.</p>
-<p>This is the form most directly useful for irregular profiles, because
-it treats curvature, taper, and segment spacing in the same
-centerline-aligned framework.</p>
+<p>This form accommodates a varying radius, curvature, and segment
+spacing.</p>
 </div>
 </div>
 <div class="section level2">
@@ -309,22 +296,20 @@ centerline-aligned framework.</p>
 of <span class="math inline">s</span> and the phase-compensated
 expression collapses to the ordinary straight-body
 <code>DWBA</code>.</p>
-<p>That limiting behavior is important physically: <code>DWBA</code> is
-the straight-axis weak-scattering limit, while <code>PCDWBA</code> is
-the curved-axis weak-scattering extension.</p>
-<p>The two models therefore differ in phase bookkeeping, not in the
-local cross-sectional contrast physics.</p>
+<p>Thus the two models share their local contrast kernel and differ in
+geometric phase bookkeeping.</p>
 </div>
 <div class="section level2">
 <h2 id="backscatter-and-target-strength">Backscatter and target strength<a class="anchor" aria-label="anchor" href="#backscatter-and-target-strength"></a>
 </h2>
 <p>Once the complex backscattering amplitude has been assembled from the
-curved centerline sum, the standard monostatic outputs are <span class="citation">(<a href="#ref-MacLennan_2002">MacLennan et al.
-2002</a>; <a href="#ref-Urick_1983">Urick 1983</a>; <a href="#ref-Simmonds_2005">Simmonds and MacLennan 2005</a>)</span>:</p>
+curved centerline sum, the monostatic outputs are <span class="citation">(<a href="#ref-MacLennan_2002">MacLennan et al.
+2002</a>)</span>:</p>
 <p><span class="math display">
   \sigma_{\mathrm{bs}} = \left|f_{\mathrm{bs}}\right|^2,
   \qquad
-  \mathrm{TS} = 10 \log_{10}\left(\sigma_{\mathrm{bs}}\right).
+  \mathrm{TS} = 10 \log_{10}\left(
+  \frac{\sigma_{\mathrm{bs}}}{1\ \mathrm{m}^2}\right).
 </span></p>
 <p>No new reporting convention is introduced by the curvature
 correction. The change is entirely in the underlying phase-sensitive
@@ -343,11 +328,8 @@ exact cross-sectional boundary solve,</li>
 <li>the target is described meaningfully by a centerline and local
 radius profile.</li>
 </ol>
-<p>That is why <code>PCDWBA</code> should be read as a curved-body
-extension of <code>DWBA</code>, not as a new exact geometry family. Its
-main purpose is to keep the part of the physics that <code>DWBA</code>
-misses first when the body bends: the geometry-dependent coherent
-phase.</p>
+<p>These assumptions make PCDWBA a curved-axis extension of DWBA. Its
+additional physics is the geometry-dependent coherent phase.</p>
 </div>
 <div class="section level2">
 <h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
@@ -365,20 +347,6 @@ MacLennan, David N., Percy G. Fernandes, and John Dalen. 2002. <span>“A
 Consistent Approach to Definitions and Symbols in Fisheries
 Acoustics.”</span> <em>ICES Journal of Marine Science</em> 59 (2):
 365–69. <a href="https://doi.org/10.1006/jmsc.2001.1158" class="external-link">https://doi.org/10.1006/jmsc.2001.1158</a>.
-</div>
-<div id="ref-Simmonds_2005" class="csl-entry">
-Simmonds, John, and David N. MacLennan. 2005. <em>Fisheries Acoustics:
-Theory and Practice</em>. 2nd ed. Blackwell Science. <a href="https://doi.org/10.1002/9780470995303" class="external-link">https://doi.org/10.1002/9780470995303</a>.
-</div>
-<div id="ref-Stanton_1989_2" class="csl-entry">
-Stanton, T. K. 1989. <span>“Sound Scattering by Cylinders of Finite
-Length. <span>III</span>. <span>Deformed</span> Cylinders.”</span>
-<em>The Journal of the Acoustical Society of America</em> 86 (2):
-691–705. <a href="https://doi.org/10.1121/1.398193" class="external-link">https://doi.org/10.1121/1.398193</a>.
-</div>
-<div id="ref-Urick_1983" class="csl-entry">
-Urick, Robert J. 1983. <em>Principles of Underwater Sound</em>. 3rd ed.
-McGraw-Hill.
 </div>
 </div>
 </div>

@@ -1,16 +1,37 @@
-# Notation and symbols
+# Notation and Symbols
 
 ## Introduction
 
-The notation on this page follows standard scattering texts for
-Helmholtz, elastic-wave, and basis-expansion formulations ([Morse and
-Ingard 1968](#ref-Morse_1968); [Flammer 1957](#ref-Flammer_1957);
-[Waterman 2009](#ref-Waterman_2009)).
+This is the landing page for the Physics Primer. It defines the symbols,
+units, medium numbering, and scattering-angle notation used by the
+remaining theory pages. A model-specific page may introduce additional
+symbols, but it should state explicitly whenever it departs from the
+notation below. Equations and physical interpretation remain on the
+topical pages rather than being repeated here.
 
-This page is the compact notation guide for the package theory articles.
-The model-family pages still define symbols locally when needed, but the
-symbols listed here are intended to carry the same meaning everywhere
-unless a page explicitly says otherwise.
+The suggested reading order is:
+
+1.  this notation guide,
+2.  the [acoustic scattering
+    primer](https://brandynlucca.github.io/acousticTS/articles/acoustic-scattering-primer/acoustic-scattering-primer.md),
+3.  [scattering boundary
+    conditions](https://brandynlucca.github.io/acousticTS/articles/boundary_conditions.md),
+4.  [numerical
+    methods](https://brandynlucca.github.io/acousticTS/articles/numerical-foundations/numerical-foundations.md).
+
+## Vectors, positions, and directions
+
+| Symbol | Meaning | Typical units |
+|----|----|----|
+| \mathbf{x} | field-point position | m |
+| r=\lVert\mathbf{x}\rVert | distance from the target origin | m |
+| \widehat{\mathbf{x}}=\mathbf{x}/r | observation-direction unit vector | dimensionless |
+| \widehat{\mathbf{k}}\_i | incident propagation-direction unit vector | dimensionless |
+| \widehat{\mathbf{s}} | scattered or receive-direction unit vector | dimensionless |
+| \mathbf{n} | unit normal, with orientation stated on the relevant interface | dimensionless |
+| \Omega_i=(\theta_i,\phi_i) | incident direction | rad |
+| \Omega_s=(\theta_s,\phi_s) | scattered or receive direction | rad |
+| \psi=\cos^{-1}(\widehat{\mathbf{s}}\\\cdot\\\widehat{\mathbf{k}}\_i) | scattering angle: 0 forward and \pi backward | rad |
 
 ## Medium indexing
 
@@ -27,6 +48,10 @@ Examples: an unshelled sphere uses media `1` and `2`, an elastic shell
 with internal fluid uses media `1`, `2`, and `3`, and a viscous-elastic
 layered sphere can use media `1`, `2`, `3`, and `4`.
 
+Subscripts i and j denote arbitrary media. A subscript `1` always
+denotes the exterior medium in the Physics Primer and model-family
+theory pages.
+
 ## Shared field variables
 
 | Symbol | Meaning | Typical units |
@@ -37,49 +62,86 @@ layered sphere can use media `1`, `2`, `3`, and `4`.
 | p_j | pressure in medium j | Pa |
 | \mathbf{u} | elastic displacement vector | m |
 | \mathbf{v} | fluid particle velocity | m s^{-1} |
-| \mathbf{n} | outward unit normal | dimensionless |
+| \rho' | acoustic density perturbation | kg m^{-3} |
 | \sigma\_{ij} | stress-tensor components | Pa |
+| \mathbf{t}=\boldsymbol{\sigma}\mathbf{n} | traction acting on a surface with normal \mathbf{n} | Pa |
+| \partial_n=\mathbf{n}\cdot\nabla | normal derivative | m^{-1} acting on the differentiated field |
 
 ## Frequencies, speeds, and wavenumbers
 
-| Symbol   | Meaning                                     | Typical units |
-|----------|---------------------------------------------|---------------|
-| f        | acoustic frequency                          | Hz            |
-| \omega   | angular frequency, 2\pi f                   | rad s^{-1}    |
-| c_j      | sound speed in medium j                     | m s^{-1}      |
-| k_j      | acoustic wavenumber in medium j, \omega/c_j | m^{-1}        |
-| k\_{L,j} | longitudinal elastic wavenumber in medium j | m^{-1}        |
-| k\_{T,j} | transverse or shear wavenumber in medium j  | m^{-1}        |
-| a        | characteristic radius                       | m             |
-| L        | characteristic length                       | m             |
-| ka       | acoustic size based on a chosen radius      | dimensionless |
+| Symbol           | Meaning                                     | Typical units |
+|------------------|---------------------------------------------|---------------|
+| f                | acoustic frequency                          | Hz            |
+| \omega           | angular frequency, 2\pi f                   | rad s^{-1}    |
+| c_j              | sound speed in medium j                     | m s^{-1}      |
+| k_j              | acoustic wavenumber in medium j, \omega/c_j | m^{-1}        |
+| k\_{L,j}         | longitudinal elastic wavenumber in medium j | m^{-1}        |
+| k\_{T,j}         | transverse or shear wavenumber in medium j  | m^{-1}        |
+| \alpha_j         | amplitude-attenuation coefficient           | Np m^{-1}     |
+| \widetilde{k}\_j | complex acoustic wavenumber                 | m^{-1}        |
+| \lambda_a=2\pi/k | acoustic wavelength in a lossless fluid     | m             |
+| a                | characteristic radius                       | m             |
+| L                | characteristic length                       | m             |
+| ka               | acoustic size based on a chosen radius      | dimensionless |
 
-## Material properties and contrasts
+The wavelength is written \lambda_a here to distinguish it from Lamé’s
+first elastic parameter \lambda. A page using complex sound speed rather
+than complex wavenumber must state its sign convention explicitly.
 
-| Symbol    | Meaning                                    | Typical units |
-|-----------|--------------------------------------------|---------------|
-| \rho_j    | density in medium j                        | kg m^{-3}     |
-| \kappa_j  | compressibility in medium j                | Pa^{-1}       |
-| \lambda_j | Lamé’s first parameter in elastic medium j | Pa            |
-| \mu_j     | shear modulus in elastic medium j          | Pa            |
-| g\_{ij}   | density contrast, \rho_i / \rho_j          | dimensionless |
-| h\_{ij}   | sound-speed contrast, c_i / c_j            | dimensionless |
+## Acoustic material properties
 
-Important examples: body relative to seawater is expressed with g\_{21}
-and h\_{21}, a shell relative to seawater is likewise expressed with
-g\_{21} and h\_{21} when the shell is the first interior region, an
-internal fluid relative to the shell is expressed with g\_{32} and
-h\_{32}, and an internal fluid relative directly to seawater is
-expressed with g\_{31} and h\_{31}.
+| Symbol   | Meaning                               | Typical units |
+|----------|---------------------------------------|---------------|
+| \rho_j   | equilibrium mass density in medium j  | kg m^{-3}     |
+| c_j      | compressional sound speed in medium j | m s^{-1}      |
+| \kappa_j | adiabatic compressibility of a fluid  | Pa^{-1}       |
+| K_j      | bulk modulus                          | Pa            |
+| Z_j      | plane-wave acoustic impedance         | Pa s m^{-1}   |
+| \eta_j   | dynamic or shear viscosity            | Pa s          |
+| \zeta_j  | bulk viscosity                        | Pa s          |
+
+Compressibility \kappa and bulk modulus K are distinct symbols.
+
+## Elastic material properties
+
+| Symbol | Meaning | Typical units |
+|----|----|----|
+| E_j | Young’s modulus | Pa |
+| \nu_j | Poisson ratio | dimensionless |
+| K_j | bulk modulus | Pa |
+| G_j or \mu_j | shear modulus (\mu_j is Lamé’s second parameter) | Pa |
+| \lambda_j | Lamé’s first parameter | Pa |
+| c\_{L,j} | longitudinal wave speed | m s^{-1} |
+| c\_{T,j} | transverse or shear-wave speed | m s^{-1} |
+
+## Material contrasts
+
+| Symbol | Meaning | Typical units |
+|----|----|----|
+| g\_{ij} | density contrast, \rho_i / \rho_j | dimensionless |
+| h\_{ij} | sound-speed contrast, c_i / c_j | dimensionless |
+| \gamma\_{\rho,ij} | density perturbation, (\rho_i-\rho_j)/\rho_i | dimensionless |
+| \gamma\_{\kappa,ij} | compressibility perturbation, (\kappa_i-\kappa_j)/\kappa_j | dimensionless |
+
+For example, g\_{21} and h\_{21} compare the first target region with
+the exterior medium. The symbols g\_{32} and h\_{32} compare the next
+region with the first.
 
 ## Scattering quantities
 
 | Symbol | Meaning | Typical units |
 |----|----|----|
-| f(\theta_s,\phi_s \mid \theta_i,\phi_i) | far-field scattering amplitude | m |
+| p_0 | incident plane-wave pressure amplitude | Pa |
+| f(\Omega_s\mid\Omega_i) | far-field scattering amplitude | m |
+| \mathrm{d}\sigma/\mathrm{d}\Omega | differential scattering cross-section | m^2 sr^{-1} |
 | f\_{\mathrm{bs}} | backscattering amplitude | m |
-| \sigma\_{\mathrm{bs}} | backscattering cross-section, \|f\_{\mathrm{bs}}\|^2 | m^2 |
-| \mathrm{TS} | target strength, 10 \log\_{10}(\sigma\_{\mathrm{bs}}) | dB |
+| \sigma\_{\mathrm{bs}} | backscattering cross-section | m^2 |
+| \sigma_s | total scattering cross-section | m^2 |
+| \sigma_a | absorption cross-section | m^2 |
+| \sigma_e | extinction cross-section | m^2 |
+| \mathrm{TS} | monostatic target strength | dB re 1 m^2 |
+| \mathrm{TS}(\Omega_s\mid\Omega_i) | directional or bistatic target-strength notation | dB |
+| F or \mathcal{F} | dimensionless form function | dimensionless |
 
 ## Angles and directions
 
@@ -87,8 +149,29 @@ expressed with g\_{31} and h\_{31}.
 |----|----|----|
 | \theta_i, \phi_i | incident polar and azimuthal angles | rad |
 | \theta_s, \phi_s | scattered or receive polar and azimuthal angles | rad |
+| \psi | angle between incident propagation and receive directions | rad |
 | \theta | body or target orientation angle when a page uses a 2D axisymmetric reduction | rad |
 | \beta | local body-tilt angle along a segmented or curved centerline | rad |
+
+Incident direction, target orientation, and receive direction are
+independent quantities. A monostatic geometry fixes the receive
+direction opposite the incident propagation direction. A bistatic
+geometry does not.
+
+## Basis and special-function notation
+
+| Symbol | Meaning |
+|----|----|
+| J_m, Y_m, H_m^{(1)} | cylindrical Bessel, Neumann, and outgoing Hankel functions |
+| j_n, y_n, h_n^{(1)} | spherical Bessel, Neumann, and outgoing Hankel functions |
+| P_n | Legendre polynomial |
+| P_n^m | associated Legendre function |
+| S\_{mn} | angular spheroidal wave function |
+| R\_{mn}^{(q)} | radial spheroidal wave function of kind q |
+| prime ' | derivative with respect to the function’s complete argument unless stated otherwise |
+
+Normalizations for spheroidal functions and dimensionless form functions
+are given on the topical page where they are used.
 
 ## Coordinate-specific notation
 
@@ -113,17 +196,5 @@ h\_{21}, h\_{32}, and so on.
   primer](https://brandynlucca.github.io/acousticTS/articles/acoustic-scattering-primer/acoustic-scattering-primer.md)
 - [Scattering boundary
   conditions](https://brandynlucca.github.io/acousticTS/articles/boundary_conditions.md)
-- [Material
-  properties](https://brandynlucca.github.io/acousticTS/articles/material-properties/material-properties.md)
-
-## References
-
-Flammer, Carson. 1957. *Spheroidal Wave Functions*.
-<https://ui.adsabs.harvard.edu/abs/1957spwf.book.....F>.
-
-Morse, Philip M., and K. Uno Ingard. 1968. *Theoretical Acoustics*.
-McGraw-Hill.
-
-Waterman, P. C. 2009. “T -Matrix Methods in Acoustic Scattering.” *The
-Journal of the Acoustical Society of America* 125 (1): 42–51.
-<https://doi.org/10.1121/1.3035839>.
+- [Numerical
+  methods](https://brandynlucca.github.io/acousticTS/articles/numerical-foundations/numerical-foundations.md)

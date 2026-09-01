@@ -47,10 +47,9 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-physics-primer" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Physics Primer</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-physics-primer">
-<li><a class="dropdown-item" href="../../articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
-    <li><a class="dropdown-item" href="../../articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+<li><a class="dropdown-item" href="../../articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+    <li><a class="dropdown-item" href="../../articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
     <li><a class="dropdown-item" href="../../articles/boundary_conditions.html">Boundary conditions</a></li>
-    <li><a class="dropdown-item" href="../../articles/material-properties/material-properties.html">Material properties</a></li>
     <li><a class="dropdown-item" href="../../articles/numerical-foundations/numerical-foundations.html">Numerical methods</a></li>
   </ul>
 </li>
@@ -58,6 +57,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-build-targets" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Build Targets</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-build-targets">
 <li><a class="dropdown-item" href="../../articles/building-shapes/building-shapes.html">Building Shapes</a></li>
+    <li><a class="dropdown-item" href="../../articles/material-properties/material-properties.html">Material Properties</a></li>
     <li><a class="dropdown-item" href="../../articles/building-scatterers/building-scatterers.html">Building Scatterers</a></li>
     <li><a class="dropdown-item" href="../../articles/shape-manipulation-reforging/shape-manipulation-reforging.html">Shape Manipulation</a></li>
   </ul>
@@ -68,17 +68,15 @@
 <li><a class="dropdown-item" href="../../articles/running-models/running-models.html">Running Models</a></li>
     <li><a class="dropdown-item" href="../../articles/model-selection/model-selection.html">Choosing a Model</a></li>
     <li><a class="dropdown-item" href="../../articles/comparing-models/comparing-models.html">Comparing Models</a></li>
-    <li><a class="dropdown-item" href="../../articles/plotting-inspecting-results/plotting-inspecting-results.html">Visualizing results</a></li>
     <li><a class="dropdown-item" href="../../articles/simulation-parameter-sweeps/simulation-parameter-sweeps.html">Simulation sweeps</a></li>
-    <li><a class="dropdown-item" href="../../articles/calibration-workflow/calibration-workflow.html">Calibration workflow</a></li>
-    <li><a class="dropdown-item" href="../../articles/validation-benchmarks/validation-benchmarks.html">Validating models</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../../articles/model-library/model-library.html">Models</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-developers" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Developers</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-developers">
-<li><a class="dropdown-item" href="../../articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
+<li><a class="dropdown-item" href="../../articles/validation-benchmarks/validation-benchmarks.html">Validation methods</a></li>
+    <li><a class="dropdown-item" href="../../articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
     <li><a class="dropdown-item" href="../../articles/combining-components/combining-components.html">Combining components</a></li>
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
@@ -130,50 +128,50 @@
 <a class="model-nav-badge" href="ecms-implementation.html">Implementation</a>
 </div>
 </div>
-<p>These pages sit between the classical elastic-cylinder literature and
-later finite-length cylinder approximations used in fisheries acoustics
-<span class="citation">(<a href="#ref-Faran_1951">Faran 1951</a>; <a href="#ref-Stanton_1988">Stanton 1988</a>)</span>.</p>
-<p>The elastic cylinder modal series solution (<code>ECMS</code>) is the
-package’s solid elastic-cylinder family. It combines the phase-shift
-treatment of an infinite elastic circular cylinder with the usual
-finite-length coherence factor used near broadside.</p>
+<p>The elastic-cylinder modal-series model (<code>ECMS</code>)
+calculates near-broadside scattering from a finite solid elastic
+cylinder. It retains both longitudinal and shear waves in the solid.</p>
 <div class="section level3">
 <h3 id="core-idea">Core idea<a class="anchor" aria-label="anchor" href="#core-idea"></a>
 </h3>
-<p>Represent the elastic interior by longitudinal and transverse
-cylindrical waves, determine the phase shifts induced by the boundary
-conditions, and apply the near-broadside finite-length coherence factor
-to recover monostatic backscatter.</p>
+<p>Solve the infinite circular elastic-cylinder interface through modal
+phase shifts, then apply a finite-length coherence factor. Uniform
+curvature can be represented by the corresponding Fresnel correction
+<span class="citation">(<a href="#ref-Faran_1951">Faran 1951</a>; <a href="#ref-Stanton_1988">Stanton 1988</a>)</span>.</p>
 </div>
 <div class="section level3">
 <h3 id="best-for">Best for<a class="anchor" aria-label="anchor" href="#best-for"></a>
 </h3>
 <ul>
-<li>Solid elastic finite cylinders near broadside</li>
-<li>Backbone-like cylindrical structures where shear-wave support
+<li>Straight or uniformly bent solid elastic cylinders near
+broadside</li>
+<li>Backbone-like canonical components where shear-wave support
 matters</li>
-<li>Canonical elastic-cylinder benchmarks and component models</li>
+<li>Elastic-cylinder reference and sensitivity calculations</li>
 </ul>
 </div>
 <div class="section level3">
 <h3 id="supports">Supports<a class="anchor" aria-label="anchor" href="#supports"></a>
 </h3>
 <ul>
-<li>
-<code>ESS</code> or compatible elastic-cylinder scatterers</li>
-<li>Longitudinal and transverse elastic wave speeds in the cylinder
-interior</li>
-<li>Straight and current bent broadside branches</li>
+<li>Cylindrical <code>ESS</code> objects, with the elastic component
+stored in the shell slot</li>
+<li>Legacy cylindrical <code>FLS</code> geometry carriers for backward
+compatibility</li>
+<li>User-supplied density and longitudinal and transverse elastic wave
+speeds</li>
 </ul>
 </div>
 <div class="section level3">
 <h3 id="main-assumptions">Main assumptions<a class="anchor" aria-label="anchor" href="#main-assumptions"></a>
 </h3>
 <ul>
-<li>Circular cylinder with homogeneous elastic properties</li>
+<li>A homogeneous isotropic solid with circular cross-section</li>
 <li>Broadside or near-broadside incidence</li>
-<li>Finite-length treatment through a coherence factor rather than a
-fully general 3D elastic solve</li>
+<li>Finite length and uniform curvature represented through coherence
+factors</li>
+<li>No surrounding flesh-body coupling or arbitrary elastic
+geometry</li>
 </ul>
 </div>
 <div class="section level3">
@@ -190,11 +188,11 @@ benchmark or software-comparison ladder.</li>
 </h3>
 <ul>
 <li>
-<a href="ecms-implementation.html">Implementation</a>: object setup
-and current comparison workflow</li>
+<a href="ecms-implementation.html">Implementation</a>: supported
+objects, material inputs, output, and current checks</li>
 <li>
-<a href="ecms-theory.html">Theory</a>: elastic cylindrical
-potentials, phase shifts, and finite-length closure</li>
+<a href="ecms-theory.html">Theory</a>: elastic potentials, phase
+shifts, and finite-length closure</li>
 </ul>
 </div>
 </div>

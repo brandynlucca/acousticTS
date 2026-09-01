@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>FAQ and Troubleshooting • acousticTS</title>
+<title>Developer Troubleshooting • acousticTS</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../../favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="../../favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="../../apple-touch-icon.png">
@@ -17,7 +17,7 @@
 <script src="../../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../../deps/headroom-0.11.0/headroom.min.js"></script><script src="../../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../../deps/search-1.0.0/fuse.min.js"></script><script src="../../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../../pkgdown.js"></script><link href="../../extra.css" rel="stylesheet">
-<meta property="og:title" content="FAQ and Troubleshooting">
+<meta property="og:title" content="Developer Troubleshooting">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -47,10 +47,9 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-physics-primer" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Physics Primer</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-physics-primer">
-<li><a class="dropdown-item" href="../../articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
-    <li><a class="dropdown-item" href="../../articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+<li><a class="dropdown-item" href="../../articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+    <li><a class="dropdown-item" href="../../articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
     <li><a class="dropdown-item" href="../../articles/boundary_conditions.html">Boundary conditions</a></li>
-    <li><a class="dropdown-item" href="../../articles/material-properties/material-properties.html">Material properties</a></li>
     <li><a class="dropdown-item" href="../../articles/numerical-foundations/numerical-foundations.html">Numerical methods</a></li>
   </ul>
 </li>
@@ -58,6 +57,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-build-targets" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Build Targets</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-build-targets">
 <li><a class="dropdown-item" href="../../articles/building-shapes/building-shapes.html">Building Shapes</a></li>
+    <li><a class="dropdown-item" href="../../articles/material-properties/material-properties.html">Material Properties</a></li>
     <li><a class="dropdown-item" href="../../articles/building-scatterers/building-scatterers.html">Building Scatterers</a></li>
     <li><a class="dropdown-item" href="../../articles/shape-manipulation-reforging/shape-manipulation-reforging.html">Shape Manipulation</a></li>
   </ul>
@@ -68,17 +68,15 @@
 <li><a class="dropdown-item" href="../../articles/running-models/running-models.html">Running Models</a></li>
     <li><a class="dropdown-item" href="../../articles/model-selection/model-selection.html">Choosing a Model</a></li>
     <li><a class="dropdown-item" href="../../articles/comparing-models/comparing-models.html">Comparing Models</a></li>
-    <li><a class="dropdown-item" href="../../articles/plotting-inspecting-results/plotting-inspecting-results.html">Visualizing results</a></li>
     <li><a class="dropdown-item" href="../../articles/simulation-parameter-sweeps/simulation-parameter-sweeps.html">Simulation sweeps</a></li>
-    <li><a class="dropdown-item" href="../../articles/calibration-workflow/calibration-workflow.html">Calibration workflow</a></li>
-    <li><a class="dropdown-item" href="../../articles/validation-benchmarks/validation-benchmarks.html">Validating models</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../../articles/model-library/model-library.html">Models</a></li>
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-developers" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Developers</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-developers">
-<li><a class="dropdown-item" href="../../articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
+<li><a class="dropdown-item" href="../../articles/validation-benchmarks/validation-benchmarks.html">Validation methods</a></li>
+    <li><a class="dropdown-item" href="../../articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
     <li><a class="dropdown-item" href="../../articles/combining-components/combining-components.html">Combining components</a></li>
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
@@ -109,7 +107,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../../logo.png" class="logo" alt=""><h1>FAQ and Troubleshooting</h1>
+      <img src="../../logo.png" class="logo" alt=""><h1>Developer Troubleshooting</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/brandynlucca/acousticTS/blob/main/vignettes/faq-troubleshooting/faq-troubleshooting.Rmd" class="external-link"><code>vignettes/faq-troubleshooting/faq-troubleshooting.Rmd</code></a></small>
@@ -119,176 +117,198 @@
     
     
 <div class="section level2">
-<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+<h2 id="start-from-a-clean-diagnosis">Start from a clean diagnosis<a class="anchor" aria-label="anchor" href="#start-from-a-clean-diagnosis"></a>
 </h2>
-<p>Many common modeling pathologies are simply violations of the
-asymptotic, boundary, or material assumptions documented in the core
-scattering texts <span class="citation">(<a href="#ref-Medwin_1998">Medwin and Clay 1998</a>; <a href="#ref-Morse_1968">Morse and Ingard 1968</a>)</span>.</p>
-<p>Many problems that look like model failures are really workflow
-failures: wrong units, wrong boundary assumption, wrong target class,
-inconsistent material properties, or an interpretation error about what
-quantity is being combined or plotted. This page collects the issues
-that are most likely to surface first and arranges them in the order
-that is usually most efficient for debugging.</p>
-<p>The main theme is simple. Before assuming a model is wrong, confirm
-that the object, the physical interpretation, and the output quantity
-are all the ones you think they are. In acoustics, small setup
-mismatches can create large-looking disagreements.</p>
+<p>First determine whether R is using the source checkout, an installed
+release, or a previously loaded namespace. Many apparent code failures
+are version mismatches between those states.</p>
+<p>From the repository root, load the working tree and record the
+session:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">load_all</span><span class="op">(</span><span class="st">"."</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/packageDescription.html" class="external-link">packageVersion</a></span><span class="op">(</span><span class="st">"acousticTS"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>Reproduce the failure in a fresh R process before changing code. A
+result that only fails after other scripts have run usually indicates
+leaked options, registry state, attached packages, working-directory
+assumptions, or modified objects.</p>
 </div>
 <div class="section level2">
-<h2 id="common-questions">Common questions<a class="anchor" aria-label="anchor" href="#common-questions"></a>
+<h2 id="installation-and-compiled-code">Installation and compiled code<a class="anchor" aria-label="anchor" href="#installation-and-compiled-code"></a>
 </h2>
-<div class="section level3">
-<h3 id="why-does-the-model-output-look-unreasonable">Why does the model output look unreasonable?<a class="anchor" aria-label="anchor" href="#why-does-the-model-output-look-unreasonable"></a>
-</h3>
-<p>The first things to check are geometry, units, orientation, material
-properties, and whether the chosen model matches the intended target
-type. Large discrepancies are often caused by a mismatch between the
-physical target and the model family rather than by a coding error. A
-sphere built with the wrong boundary interpretation, a fish-like body
-represented without its dominant gas-filled component, or a frequency
-vector supplied in kHz instead of Hz can all produce results that look
-dramatic while still being explained entirely by setup rather than
-numerics.</p>
-<p>In practice, the fastest way to debug a surprising curve is usually
-to move backward through the workflow. Plot the shape. Inspect the
-stored body or component properties. Confirm the frequency grid and
-orientation angle. Then ask whether the selected model is actually
-intended for that target. Only after those checks is it worth treating
-the issue as a possible numerical or implementation problem.</p>
+<p><code>acousticTS</code> contains C++17 and Fortran code. Installing
+from source requires a matching compiler toolchain:</p>
+<ul>
+<li>
+<strong>Windows:</strong> install the Rtools version for the
+installed R release and check that its compiler tools are available to
+R.</li>
+<li>
+<strong>macOS:</strong> install the Xcode Command Line Tools and the
+GNU Fortran compiler recommended for the installed R release.</li>
+<li>
+<strong>Linux:</strong> install <code>make</code>, a C++17 compiler,
+<code>gfortran</code>, and the development libraries required by the R
+installation.</li>
+</ul>
+<p>Check the toolchain before interpreting a long linker error:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">pkgbuild</span><span class="fu">::</span><span class="fu"><a href="https://pkgbuild.r-lib.org/reference/has_build_tools.html" class="external-link">check_build_tools</a></span><span class="op">(</span>debug <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p>Messages mentioning <code>CXX17</code>, <code>gfortran</code>,
+<code>quadmath</code>, BLAS, undefined Fortran symbols, or an
+unavailable linker usually indicate a build environment problem. Run a
+source install in a clean process to preserve the full compiler
+output:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">R</span> CMD INSTALL <span class="op">.</span></span></code></pre></div>
+<p>Do not edit <code>R/RcppExports.R</code> or
+<code>src/RcppExports.cpp</code> by hand. Run
+<code><a href="https://rdrr.io/pkg/Rcpp/man/compileAttributes.html" class="external-link">Rcpp::compileAttributes()</a></code> only when an exported C++
+interface changes, then review both generated files. Similarly, use
+<code>devtools::document()</code> after roxygen changes and review
+updates to <code>NAMESPACE</code> and <code>man/</code>.</p>
 </div>
-<div class="section level3">
-<h3 id="why-do-two-models-disagree-strongly">Why do two models disagree strongly?<a class="anchor" aria-label="anchor" href="#why-do-two-models-disagree-strongly"></a>
-</h3>
-<p>Strong disagreement is not necessarily a bug. It often means the
-models encode different boundary assumptions, high-frequency reductions,
-coherence assumptions, or geometry simplifications. Before deciding that
-one of the models is wrong, check whether both models were actually
-intended to describe the same physics.</p>
-<p>Disagreement between <code>DWBA</code> and <code>SDWBA</code>, for
-example, may reflect the effect of unresolved phase variability rather
-than a coding issue. Disagreement between a modal-series model and an
-asymptotic model may simply mark the point where a compact approximation
-begins to leave its most reliable regime. In that sense, disagreement is
-often informative, but only if the comparison itself was fair.</p>
+<div class="section level2">
+<h2 id="a-registered-model-is-missing">A registered model is missing<a class="anchor" aria-label="anchor" href="#a-registered-model-is-missing"></a>
+</h2>
+<p>Inspect the registry before debugging dispatch:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../../reference/available_models.html">available_models</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>For a session model, confirm that <code><a href="../../reference/register_model.html">register_model()</a></code> ran
+after <code>acousticTS</code> was loaded and that its canonical name or
+alias appears in the table. Function names do not have to match the
+model name. The registry entry itself must point to resolvable
+initializer and solver functions.</p>
+<p>Persistent registrations require package-qualified references such as
+<code>"myPackage::initialize_tsl"</code>. Raw function objects cannot be
+restored in a new session. Name conflicts are also rejected, including
+aliases that collide with built-in or user registrations.</p>
+<p>Remove a single user entry with:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../../reference/unregister_model.html">unregister_model</a></span><span class="op">(</span><span class="st">"tsl"</span><span class="op">)</span></span></code></pre></div>
+<p>To test without any session registrations, clear them while retaining
+the on-disk configuration:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../../reference/reset_model_registry.html">reset_model_registry</a></span><span class="op">(</span>remove_persisted <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<p>Use <code>remove_persisted = TRUE</code> only when the saved user
+configuration should also be deleted. See <a href="../creating-models-from-scratch/creating-models-from-scratch.html">Creating
+Models</a> for the registry contract.</p>
 </div>
-<div class="section level3">
-<h3 id="can-i-add-component-target-strengths-directly">Can I add component target strengths directly?<a class="anchor" aria-label="anchor" href="#can-i-add-component-target-strengths-directly"></a>
-</h3>
-<p>Usually no. Target strength is a logarithmic reporting quantity, so
-adding component <code>TS</code> values directly is not generally
-meaningful. The correct combination rule depends on whether amplitudes
-or cross-sections are being combined and on whether the components are
-coherent or incoherent. A deterministic coherent sum requires complex
-amplitudes and a shared phase reference. An incoherent sum requires an
-explicit averaging argument.</p>
-<p>This is one of the most common places where a workflow can go wrong
-while still looking algebraically neat. See <a href="../combining-components/combining-components.html">combining
-scattering components</a> for the full discussion.</p>
+<div class="section level2">
+<h2 id="initializer-and-solver-failures">Initializer and solver failures<a class="anchor" aria-label="anchor" href="#initializer-and-solver-failures"></a>
+</h2>
+<p>Separate dispatch from calculation. Call the initializer directly
+with a small canonical object, inspect its slots, then call the
+solver:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">prepared</span> <span class="op">&lt;-</span> <span class="fu">tsl_initialize</span><span class="op">(</span></span>
+<span>  object <span class="op">=</span> <span class="va">target</span>,</span>
+<span>  frequency <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">38e3</span>, <span class="fl">70e3</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">prepared</span>, <span class="st">"model_parameters"</span><span class="op">)</span><span class="op">$</span><span class="va">TSL</span></span>
+<span><span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">prepared</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">$</span><span class="va">TSL</span></span>
+<span></span>
+<span><span class="va">solved</span> <span class="op">&lt;-</span> <span class="fu">TSL</span><span class="op">(</span><span class="va">prepared</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">solved</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">$</span><span class="va">TSL</span></span></code></pre></div>
+<p>Check these contracts:</p>
+<ul>
+<li>both functions return the updated <code>Scatterer</code>,</li>
+<li>the initializer and solver use the registry’s same slot name,</li>
+<li>model-specific arguments appear in the initializer formals,</li>
+<li>output rows align with the documented frequency or angle grid,</li>
+<li>
+<code>TS</code>, <code>sigma_bs</code>, and <code>f_bs</code> agree
+with their definitions, and</li>
+<li>unsupported classes, boundaries, and parameter values fail
+explicitly.</li>
+</ul>
+<p>If direct calls work but <code><a href="../../reference/target_strength.html">target_strength()</a></code> fails,
+inspect the registry entry, the requested alias, and
+<code>model_args</code>. If deterministic runs work but
+<code><a href="../../reference/simulate_ts.html">simulate_ts()</a></code> fails, test one realization without parallel
+execution. This usually exposes an argument-shape or worker-export
+problem more clearly.</p>
 </div>
-<div class="section level3">
-<h3 id="why-does-increasing-geometric-detail-change-the-answer">Why does increasing geometric detail change the answer?<a class="anchor" aria-label="anchor" href="#why-does-increasing-geometric-detail-change-the-answer"></a>
-</h3>
-<p>Because different models are sensitive to segmentation, coherence,
-truncation, and geometric idealization in different ways. More geometric
-detail does not automatically mean a more appropriate model. In some
-cases, added detail improves the physical representation. In other
-cases, it creates a mismatch between the object description and the
-assumptions of the model being used.</p>
-<p>That is why it is often useful to compare a simple canonical geometry
-against a more detailed segmented geometry before assuming that the more
-detailed version is automatically better. A model that assumes a
-canonical sphere, cylinder, or spheroid does not necessarily benefit
-from extra geometric complexity if that complexity is outside the theory
-the model was derived for.</p>
+<div class="section level2">
+<h2 id="tests-pass-alone-but-fail-in-the-suite">Tests pass alone but fail in the suite<a class="anchor" aria-label="anchor" href="#tests-pass-alone-but-fail-in-the-suite"></a>
+</h2>
+<p>Run the smallest relevant test first:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_file.html" class="external-link">test_file</a></span><span class="op">(</span><span class="st">"tests/testthat/test-model_registry.R"</span><span class="op">)</span></span></code></pre></div>
+<p>Then run the package tests in a fresh process with
+<code>devtools::test()</code>. Tests that modify the model registry,
+options, environment variables, random-number state, or working
+directory must restore the original state with <code><a href="https://rdrr.io/r/base/on.exit.html" class="external-link">on.exit()</a></code>.
+Avoid assertions that depend on test order or on objects created by
+another file.</p>
+<p>For numerical failures, compare the first differing intermediate
+quantity rather than only the final <code>TS</code>. Record the
+geometry, boundary, material values, frequency, angle, numerical
+controls, and comparison domain. The procedure in <a href="../validation-benchmarks/validation-benchmarks.html">Validation
+Methods</a> separates numerical verification from regression
+testing.</p>
 </div>
-<div class="section level3">
-<h3 id="what-should-i-inspect-first-when-debugging-a-workflow">What should I inspect first when debugging a workflow?<a class="anchor" aria-label="anchor" href="#what-should-i-inspect-first-when-debugging-a-workflow"></a>
-</h3>
-<p>Start with shape plots, then stored parameters, then the model choice
-itself. Only after those are checked is it worth treating the issue as a
-possible numerical or implementation problem. In practice, the most
-efficient sequence is usually:</p>
+<div class="section level2">
+<h2 id="pkgdown-and-vignette-failures">Pkgdown and vignette failures<a class="anchor" aria-label="anchor" href="#pkgdown-and-vignette-failures"></a>
+</h2>
+<p>The site builds from the source package in one R process in
+continuous integration. Reproduce that mode locally after loading the
+checkout:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">load_all</span><span class="op">(</span><span class="st">"."</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">pkgdown</span><span class="fu">::</span><span class="fu"><a href="https://pkgdown.r-lib.org/reference/build_site_github_pages.html" class="external-link">build_site_github_pages</a></span><span class="op">(</span></span>
+<span>  new_process <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  install <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>For one page, use its pkgdown article identifier:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">pkgdown</span><span class="fu">::</span><span class="fu"><a href="https://pkgdown.r-lib.org/reference/build_articles.html" class="external-link">build_article</a></span><span class="op">(</span></span>
+<span>  <span class="st">"creating-models-from-scratch/creating-models-from-scratch"</span>,</span>
+<span>  lazy <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  new_process <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>An error that occurs only with <code>new_process = TRUE</code> often
+means the child process loaded an installed copy rather than uninstalled
+source changes. Install the working tree first, or use the
+source-loading mode above to match this repository’s workflow.</p>
+<p>When a page fails, also check:</p>
+<ul>
+<li>chunk working-directory assumptions,</li>
+<li>paths to local images, SVG files, CSS hooks, and article links,</li>
+<li>use of unexported helpers from an older installed namespace,</li>
+<li>duplicate chunk labels, and</li>
+<li>code that performs expensive scientific calculations during
+rendering.</li>
+</ul>
+<p>Implementation figures are precomputed. Ordinary vignette and pkgdown
+builds should consume committed outputs rather than execute the builders
+under <code>tools/implementation-figures/</code>. To investigate
+generated drift, run the family through
+<code>tools/implementation-figures/run_all.R</code> and inspect the
+provenance file under <code>.tmp/implementation-figures/</code>.</p>
+</div>
+<div class="section level2">
+<h2 id="reporting-a-reproducible-problem">Reporting a reproducible problem<a class="anchor" aria-label="anchor" href="#reporting-a-reproducible-problem"></a>
+</h2>
+<p>A useful issue contains:</p>
 <ol style="list-style-type: decimal">
-<li>plot the shape or scatterer geometry,</li>
-<li>inspect the object with <code>show()</code> or
-<code><a href="../../reference/extract.html">extract()</a></code>,</li>
-<li>confirm the boundary and material assumptions,</li>
-<li>verify the frequency grid and orientation convention,</li>
-<li>compare the requested model against the model-selection and theory
-pages.</li>
+<li>a minimal object and function call,</li>
+<li>the complete error and warnings,</li>
+<li>
+<code><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo()</a></code> and the package version or commit,</li>
+<li>the operating system and compiler versions for installation
+failures,</li>
+<li>the model, boundary, geometry, frequency, and numerical options,
+and</li>
+<li>whether the failure reproduces in a clean R process.</li>
 </ol>
-<p>This sequence works well because it mirrors the structure of the
-package itself. The object definition comes first, the model assignment
-comes second, and result interpretation comes third.</p>
-</div>
-<div class="section level3">
-<h3 id="why-does-a-benchmark-or-documentation-example-not-reproduce-exactly">Why does a benchmark or documentation example not reproduce
-exactly?<a class="anchor" aria-label="anchor" href="#why-does-a-benchmark-or-documentation-example-not-reproduce-exactly"></a>
-</h3>
-<p>The most common reasons are mismatched units, different medium
-properties, a changed frequency grid, a different orientation
-convention, or a model-specific numerical option that was not carried
-over. A benchmark curve is only meaningful when the target definition
-and calculation settings are genuinely aligned with the reference.</p>
-<p>This is especially important for benchmark-style datasets and
-calibration workflows. In those cases, a result can be physically
-plausible and still fail to reproduce the intended reference because one
-small part of the setup was changed.</p>
-</div>
-<div class="section level3">
-<h3 id="why-does-a-model-run-but-still-not-answer-my-scientific-question">Why does a model run but still not answer my scientific
-question?<a class="anchor" aria-label="anchor" href="#why-does-a-model-run-but-still-not-answer-my-scientific-question"></a>
-</h3>
-<p>Because a successful model execution and a defensible model choice
-are not the same thing. A model can run cleanly while still being the
-wrong model for the body type, the boundary interpretation, or the
-acoustic regime. This is one reason the package documentation separates
-workflow pages, theory pages, and model-selection pages rather than
-treating a successful function call as proof that the modeling
-assumptions are appropriate.</p>
-</div>
-</div>
-<div class="section level2">
-<h2 id="a-practical-debugging-mindset">A practical debugging mindset<a class="anchor" aria-label="anchor" href="#a-practical-debugging-mindset"></a>
-</h2>
-<p>The most useful troubleshooting habit is to treat debugging as a
-sequence of narrowing assumptions rather than as a hunt for broken code.
-First confirm the object. Then confirm the physics. Then confirm the
-model family. Then confirm the output quantity being interpreted. Only
-after those steps should the user move to questions of numerical
-stability or implementation.</p>
-<p>That mindset is especially helpful because many of the
-hardest-looking failures in scattering workflows are really problems of
-interpretation. The model may be doing exactly what it was asked to do,
-but the object or assumptions may not be the ones the user thought they
-had supplied.</p>
-</div>
-<div class="section level2">
-<h2 id="recommended-reading-order">Recommended reading order<a class="anchor" aria-label="anchor" href="#recommended-reading-order"></a>
-</h2>
-<p>If you are stuck, the most useful sequence is usually <a href="../getting-started/getting-started.html">Getting started</a>, then
-<a href="../boundary-conditions-practice/boundary-conditions-practice.html">Boundary
-conditions in practice</a>, then <a href="../model-selection/model-selection.html">Choosing a model</a>, and
-finally the relevant theory page. That reading order mirrors the
-workflow itself: first confirm the package logic, then the boundary
-interpretation, then the model family, and only then the model-specific
-mathematics.</p>
-</div>
-<div class="section level2">
-<h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
-</h2>
-<div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-Medwin_1998" class="csl-entry">
-Medwin, Herman, and Clarence S. Clay. 1998. <em>Fundamentals of
-Acoustical Oceanography</em>. Applications of Modern Acoustics. Academic
-Press.
-</div>
-<div id="ref-Morse_1968" class="csl-entry">
-Morse, Philip M., and K. Uno Ingard. 1968. <em>Theoretical
-Acoustics</em>. McGraw-Hill.
-</div>
-</div>
+<p>For unexpected physical output, first confirm units, geometry,
+material properties, boundary condition, and model domain. Then report
+the smallest case that separates the unexpected result from the expected
+reference. Questions about model suitability belong with <a href="../model-selection/model-selection.html">Choosing a Model</a>,
+while phase and component-addition questions belong with <a href="../combining-components/combining-components.html">Combining
+Scattering Components</a>.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

@@ -7,50 +7,28 @@ Benchmarked Validated
 [Overview](https://brandynlucca.github.io/acousticTS/articles/calibration/index.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/calibration/calibration-theory.md)
 
-These pages are grounded in the standard-target calibration literature
-for elastic reference spheres ([Dragonette et al.
-1981](#ref-Dragonette_1981); [Foote 1990](#ref-Foote_1990); [MacLennan
-1981](#ref-Maclennan_1981)).
+SOEMS evaluates solid elastic reference spheres used in standard-target
+calibration ([Dragonette et al. 1981](#ref-Dragonette_1981); [Foote
+1990](#ref-Foote_1990); [MacLennan 1981](#ref-Maclennan_1981)).
 
-The calibration workflow in acousticTS is designed to be short and
-explicit. A user first creates a calibration sphere object, then
-evaluates the calibration model over a chosen frequency grid, and
-finally inspects or plots the stored results. The object-based design is
-useful here because the sphere dimensions, elastic material properties,
-medium properties, and model outputs remain attached to the same object
-throughout the workflow.
+Create a `CAL` object, evaluate it with
+[`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md),
+and inspect the stored spectrum. The object retains the sphere
+dimensions and elastic material properties alongside the result.
 
 ### Calibration sphere object generation
 
-The calibration target is represented by the `CAL` object class. This
-object stores metadata, model parameters, model results, body
-properties, and shape-specific information in one place. In practical
-terms, that means the sphere can be built once and then reused for
-plotting, comparison, and repeated model runs without reconstructing the
-target from scratch each time.
-
-A calibration sphere object is created with
+A calibration sphere is created with
 [`cal_generate()`](https://brandynlucca.github.io/acousticTS/reference/cal_generate.md).
-The two most important user-facing arguments are `material` and
-`diameter`. The default diameter is 38.1 mm, written in the package as
-`38.1e-3` m, and the diameter input is always interpreted in meters. The
-`material` argument provides several common defaults whose longitudinal
-sound speed, transverse sound speed, and density are supplied
-automatically.
+`diameter` is supplied in metres. `material` selects a stored preset, or
+the density and longitudinal and transverse sound speeds can be supplied
+directly.
 
-| Material         | Argument value | c\_\ell | c\_\tau | \rho  |
-|------------------|----------------|---------|---------|-------|
-| Tungsten carbide | `"WC"`         | 6853    | 4171    | 14900 |
-| Aluminum         | `"Al"`         | 6260    | 3080    | 2700  |
-| Stainless steel  | `"steel"`      | 5610    | 3120    | 7800  |
-| Brass            | `"brass"`      | 4372    | 2100    | 8360  |
-| Copper           | `"Cu"`         | 4760    | 2288.5  | 8947  |
-
-If a sphere material is not one of those defaults, the object can still
-be created by supplying the material properties directly. The important
-point is that the calibration sphere is treated as a solid elastic
-target, so both longitudinal and transverse wave speeds are part of the
-definition.
+See
+[`cal_generate()`](https://brandynlucca.github.io/acousticTS/reference/cal_generate.md)
+for the current preset names and values. Keeping that list on the
+function reference page avoids a second copy that can drift from the
+package definitions.
 
 When using the defaults:
 
@@ -64,20 +42,9 @@ cal_sphere <- cal_generate()
 
 ### Calculating a target-strength spectrum
 
-Once the calibration sphere object has been created, target strength is
-computed with
-[`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md).
-In this workflow, the core inputs are `object`, `frequency`, and
-`model`. The `object` argument is the `CAL` object, `frequency` is
-usually a vector of values in Hz, and `model` should be `"calibration"`
-or `"SOEMS"`.
-
-The most important practical point is that
 [`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md)
-returns the updated object. Reassigning to the same object is convenient
-when the goal is to keep working with a single sphere definition.
-Assigning to a new object is useful when several model runs or parameter
-sets need to be kept side by side.
+returns an updated object. The registered model name is `"calibration"`.
+`"SOEMS"` is its public alias.
 
 ``` r
 
@@ -88,24 +55,15 @@ cal_sphere <- target_strength(
   frequency = frequency,
   model = "calibration"
 )
-
-cal_sphere_copy <- target_strength(
-  object = cal_sphere,
-  frequency = frequency,
-  model = "calibration"
-)
 ```
 
 ### Inspecting model results
 
-Model results can be inspected visually or accessed directly with
-[`extract()`](https://brandynlucca.github.io/acousticTS/reference/extract.md).
-Both approaches are useful. Plotting is the fastest way to check whether
-the spectrum behaves plausibly, while direct extraction is the best way
-to compare outputs, build custom graphics, or verify the numerical
-quantities being stored.
+Plot the stored spectrum for a quick check or use
+[`extract()`](https://brandynlucca.github.io/acousticTS/reference/extract.md)
+for downstream analysis.
 
-### Plotting results
+#### Plotting results
 
 The [`plot()`](https://rdrr.io/r/graphics/plot.default.html) method can
 be used to display either the sphere geometry or the modeled output. For
@@ -131,7 +89,7 @@ natural axis for practical calibration work, while the radius-scaled
 wavenumber views are useful when comparing spheres of different
 diameters or different materials on a common nondimensional scale.
 
-### Accessing results
+#### Accessing results
 
 The model results can also be accessed directly with
 [`extract()`](https://brandynlucca.github.io/acousticTS/reference/extract.md).
@@ -161,18 +119,13 @@ by:
 \sigma\_{\mathrm{bs}} = \|f\_{\mathrm{bs}}\|^2, \qquad \mathit{TS} = 10
 \log\_{10}\left(\sigma\_{\mathrm{bs}}\right).
 
-That relationship is worth stating clearly because calibration
-literature is not always written with the same normalization. The
-implementation page should therefore be read together with the theory
-page when the dimensional meaning of the reported quantities matters.
+Calibration references do not always use the same amplitude
+normalization. See the Theory page for the normalization used by SOEMS.
 
 ### Comparison workflows
 
-One advantage of the calibration workflow is that it becomes easy to
-compare spheres that differ only in diameter or material. Those
-comparisons are useful because they show how the resonance pattern
-shifts when the sphere size changes and how the elastic response changes
-when the material parameters change.
+Diameter and material comparisons isolate geometric scaling from elastic
+material effects.
 
 #### Diameter comparisons
 
@@ -201,24 +154,15 @@ wave speeds have changed.
 
 #### External implementation comparison
 
-Because the calibration-sphere model is itself a modal-series solution,
-the most useful implementation check is agreement with other MacLennan
-([1981](#ref-Maclennan_1981)) elastic-sphere implementations rather than
-with a separate benchmark family. In the comparisons below, that
-includes SphereTS ([Macaulay 2025](#ref-SphereTS_software)) alongside
-the other reference implementations. The acousticTS solver includes an
-`adaptive` argument. When `adaptive = TRUE` (the default), the solver
-starts from the usual \mathrm{round}(ka)+10 partial waves and then
-extends the sum until the tail term is below 10^{-10}. When
-`adaptive = FALSE`, it falls back to the original fixed cutoff only. The
-adaptive mode removes the small truncation bias that otherwise remains
-at the upper end of the comparison band. For the default 38.1 mm
-tungsten-carbide sphere, the comparison below uses the shared material
-properties c\_\ell = 6853 m s^{-1}, c\_\tau = 4171 m s^{-1}, and \rho =
-14900 kg m^{-3} together with the standard surrounding-water values c =
-1477.3 m s^{-1} and \rho = 1026.8 kg m^{-3}. The frequency grid is
-limited to 1–360 kHz so that the NWFSC calibration-sphere applet remains
-inside its stated ka \lesssim 30 reliability range.
+The external check compares the MacLennan elastic-sphere formulation
+with SphereTS, echoSMs, and the NWFSC calibration applet ([MacLennan
+1981](#ref-Maclennan_1981); [Macaulay 2025](#ref-SphereTS_software);
+[Macaulay and contributors 2024](#ref-echoSMs_software)). With
+`adaptive = TRUE` (the default), the solver starts at
+\operatorname{round}(ka)+10 partial waves and extends the sum until its
+tail falls below 10^{-10}. `adaptive = FALSE` uses only the initial
+fixed cutoff. The 38.1 mm tungsten-carbide comparison is limited to
+1–360 kHz so the applet remains within its stated ka \lesssim 30 range.
 
 | Comparison | N frequency | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) |
 |:---|---:|---:|---:|
@@ -233,19 +177,9 @@ inside its stated ka \lesssim 30 reliability range.
 NOAA calibration applet for the 38.1 mm tungsten-carbide
 sphere.](calibration-external-comparison.png)
 
-These comparisons show that the current acousticTS elastic-sphere
-implementation is numerically aligned with the other MacLennan
-([1981](#ref-Maclennan_1981)) software implementations over the full
-comparison band. For the 38.1 mm tungsten-carbide case, the largest
-absolute differences are on the order of 10^{-10} dB when
-`adaptive = TRUE`, which means the remaining disagreement is just
-numerical noise from the special-function libraries and stopping
-criteria rather than a substantive model discrepancy. With the original
-fixed cutoff (`adaptive = FALSE`), the same case stays very close but
-relaxes to a maximum package-to-package difference of about 7.2 \times
-10^{-5} dB. On this machine, the adaptive cutoff increases the elapsed
-time for the 360-point 38.1 mm tungsten-carbide spectrum from about 0.31
-s to about 0.37 s.
+For the 38.1 mm tungsten-carbide sphere, `adaptive = TRUE` agrees with
+the other implementations to about 10^{-10} dB. The fixed cutoff remains
+close, with a maximum difference of about 7.2 \times 10^{-5} dB.
 
 To show that this is not unique to the 38.1 mm tungsten-carbide sphere,
 the same comparison was repeated for one smaller tungsten-carbide sphere
@@ -254,27 +188,21 @@ with echoSMs ([Macaulay and contributors 2024](#ref-echoSMs_software)),
 again including the `SphereTS` implementation ([Macaulay
 2025](#ref-SphereTS_software)).
 
-| Target | Diameter (mm) | N frequency | Max frequency (kHz) | Max abs. \Delta adapt = TRUE vs echoSMs (dB) | Max abs. \Delta adapt = FALSE vs echoSMs (dB) | Max abs. \Delta adapt = TRUE vs sphereTS (dB) | Max abs. \Delta adapt = FALSE vs sphereTS (dB) | Max abs. \Delta adapt = TRUE vs NOAA applet (dB) | Max abs. \Delta adapt = FALSE vs NOAA applet (dB) | Elapsed acousticTS adapt = TRUE (s) | Elapsed acousticTS adapt = FALSE (s) | Elapsed echoSMs (s) | Elapsed sphereTS (s) | Elapsed NOAA applet (s) |
-|:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| WC20 calibration sphere | 20.0 | 360 | 360 | 0 | 1.0e-06 | 0 | 1.0e-06 | 0 | 1.0e-06 | 0.30 | 0.27 | 5.299925 | 0.133197 | 9.941499 |
-| WC38.1 calibration sphere | 38.1 | 360 | 360 | 0 | 7.2e-05 | 0 | 7.2e-05 | 0 | 7.2e-05 | 0.37 | 0.31 | 7.249260 | 0.203651 | 14.536226 |
-| Cu32.1 calibration sphere | 32.1 | 360 | 360 | 0 | 4.5e-05 | 0 | 4.5e-05 | 0 | 4.5e-05 | 0.33 | 0.28 | 6.737922 | 0.233885 | 13.309330 |
+| Target | Diameter (mm) | N frequency | Max frequency (kHz) | Max abs. \Delta adapt = TRUE vs echoSMs (dB) | Max abs. \Delta adapt = FALSE vs echoSMs (dB) | Max abs. \Delta adapt = TRUE vs sphereTS (dB) | Max abs. \Delta adapt = FALSE vs sphereTS (dB) | Max abs. \Delta adapt = TRUE vs NOAA applet (dB) | Max abs. \Delta adapt = FALSE vs NOAA applet (dB) |
+|:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| WC20 calibration sphere | 20.0 | 360 | 360 | 0 | 1.0e-06 | 0 | 1.0e-06 | 0 | 1.0e-06 |
+| WC38.1 calibration sphere | 38.1 | 360 | 360 | 0 | 7.2e-05 | 0 | 7.2e-05 | 0 | 7.2e-05 |
+| Cu32.1 calibration sphere | 32.1 | 360 | 360 | 0 | 4.5e-05 | 0 | 4.5e-05 | 0 | 4.5e-05 |
 
-Across those additional targets, the adaptive solver keeps the maximum
-absolute differences near 10^{-10} dB, while the original fixed cutoff
-remains within about 10^{-5} to 10^{-4} dB of the other implementations
-over the same grids. The timing columns are machine-specific, but they
-are still useful for showing the qualitative cost of the adaptive cutoff
-relative to the old fixed modal limit and the other available
-implementations.
+Across the additional targets, the adaptive solver keeps the maximum
+absolute differences near 10^{-10} dB. The fixed cutoff remains within
+about 10^{-5} to 10^{-4} dB of the other implementations.
 
 ### Closing note
 
-Calibration spheres are one of the cleanest places in the package to see
-the full object-to-model workflow in action. A well-defined object is
-created, a canonical model is applied, and the outputs can then be
-compared across diameter, material, or frequency range with very little
-ambiguity about what the target actually is.
+SOEMS provides a compact workflow for constructing a reference sphere,
+computing its spectrum, and comparing diameter, material, or solver
+settings.
 
 ## References
 

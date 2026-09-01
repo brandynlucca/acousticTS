@@ -47,10 +47,9 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-physics-primer" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Physics Primer</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-physics-primer">
-<li><a class="dropdown-item" href="../../articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
-    <li><a class="dropdown-item" href="../../articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+<li><a class="dropdown-item" href="../../articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+    <li><a class="dropdown-item" href="../../articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
     <li><a class="dropdown-item" href="../../articles/boundary_conditions.html">Boundary conditions</a></li>
-    <li><a class="dropdown-item" href="../../articles/material-properties/material-properties.html">Material properties</a></li>
     <li><a class="dropdown-item" href="../../articles/numerical-foundations/numerical-foundations.html">Numerical methods</a></li>
   </ul>
 </li>
@@ -58,6 +57,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-build-targets" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Build Targets</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-build-targets">
 <li><a class="dropdown-item" href="../../articles/building-shapes/building-shapes.html">Building Shapes</a></li>
+    <li><a class="dropdown-item" href="../../articles/material-properties/material-properties.html">Material Properties</a></li>
     <li><a class="dropdown-item" href="../../articles/building-scatterers/building-scatterers.html">Building Scatterers</a></li>
     <li><a class="dropdown-item" href="../../articles/shape-manipulation-reforging/shape-manipulation-reforging.html">Shape Manipulation</a></li>
   </ul>
@@ -68,17 +68,15 @@
 <li><a class="dropdown-item" href="../../articles/running-models/running-models.html">Running Models</a></li>
     <li><a class="dropdown-item" href="../../articles/model-selection/model-selection.html">Choosing a Model</a></li>
     <li><a class="dropdown-item" href="../../articles/comparing-models/comparing-models.html">Comparing Models</a></li>
-    <li><a class="dropdown-item" href="../../articles/plotting-inspecting-results/plotting-inspecting-results.html">Visualizing results</a></li>
     <li><a class="dropdown-item" href="../../articles/simulation-parameter-sweeps/simulation-parameter-sweeps.html">Simulation sweeps</a></li>
-    <li><a class="dropdown-item" href="../../articles/calibration-workflow/calibration-workflow.html">Calibration workflow</a></li>
-    <li><a class="dropdown-item" href="../../articles/validation-benchmarks/validation-benchmarks.html">Validating models</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../../articles/model-library/model-library.html">Models</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-developers" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Developers</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-developers">
-<li><a class="dropdown-item" href="../../articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
+<li><a class="dropdown-item" href="../../articles/validation-benchmarks/validation-benchmarks.html">Validation methods</a></li>
+    <li><a class="dropdown-item" href="../../articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
     <li><a class="dropdown-item" href="../../articles/combining-components/combining-components.html">Combining components</a></li>
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
@@ -130,18 +128,14 @@
 <a class="model-nav-badge" href="bbfm-theory.html">Theory</a>
 </div>
 </div>
-<p>This family is best read alongside the swimbladder-less fish and
-composite-scatterer literature that motivates explicit flesh-body and
-backbone terms <span class="citation">(<a href="#ref-Gorska_2005">Gorska
-et al. 2005</a>; <a href="#ref-Stanton_1998_1">Stanton et al. 1998</a>;
-<a href="#ref-Clay_1994">Clay and Horne 1994</a>)</span>.</p>
+<p>BBFM represents a swimbladder-less fish as separate flesh-body and
+backbone scatterers <span class="citation">(<a href="#ref-Gorska_2005">Gorska et al. 2005</a>; <a href="#ref-Stanton_1998_1">Stanton et al. 1998</a>; <a href="#ref-Clay_1994">Clay and Horne 1994</a>)</span>.</p>
 <p>The body-backbone fish model is available through
 <code>target_strength(..., model = "bbfm")</code>. It is intended for
 swimbladder-less targets whose flesh body and backbone should remain
 acoustically explicit components rather than being collapsed into a
 single effective medium.</p>
-<p>In practice, <code>BBFM</code> is the package’s composite
-body-plus-backbone family:</p>
+<p>The implementation performs four operations:</p>
 <ol style="list-style-type: decimal">
 <li>the flesh body is evaluated with <code>DWBA</code>,</li>
 <li>the backbone is evaluated with <code>ECMS</code>,</li>
@@ -164,10 +158,9 @@ shared body frame. That is why the family is useful as a transparent
 composite scaffold, but it is also why it should not yet be read as a
 fully embedded elastic-backbone theory.</p>
 </div>
-</div>
-<div class="section level2">
-<h2 id="why-use-bbfm">Why use <code>BBFM</code>?<a class="anchor" aria-label="anchor" href="#why-use-bbfm"></a>
-</h2>
+<div class="section level3">
+<h3 id="when-to-use-bbfm">When to use BBFM<a class="anchor" aria-label="anchor" href="#when-to-use-bbfm"></a>
+</h3>
 <p><code>BBFM</code> is useful when a swimbladder-less target is poorly
 described by either of the simpler extremes:</p>
 <ul>
@@ -184,12 +177,12 @@ body component, and</li>
 <li>the backbone, which is much stiffer and behaves more like an
 internal elastic cylinder than like another weak fluid inclusion.</li>
 </ul>
-<p>That makes <code>BBFM</code> a natural intermediate model between a
-body-only approximation and a future fully coupled composite solver.</p>
+<p>BBFM therefore occupies the middle ground between a body-only
+approximation and a fully coupled composite solver.</p>
 </div>
-<div class="section level2">
-<h2 id="reference-workflow">Reference workflow<a class="anchor" aria-label="anchor" href="#reference-workflow"></a>
-</h2>
+<div class="section level3">
+<h3 id="reference-workflow">Reference workflow<a class="anchor" aria-label="anchor" href="#reference-workflow"></a>
+</h3>
 <p>The recommended workflow is:</p>
 <ol style="list-style-type: decimal">
 <li>build a <code>Shape</code> for the flesh body,</li>
@@ -266,12 +259,12 @@ offset along the body axis.</p>
 <span><span class="co">## 5 -74.65936   -88.25087 -73.00987</span></span>
 <span><span class="co">## 6 -72.87706   -86.42593 -71.22018</span></span></code></pre>
 </div>
-<div class="section level2">
-<h2 id="example-outputs">Example outputs<a class="anchor" aria-label="anchor" href="#example-outputs"></a>
-</h2>
 <div class="section level3">
-<h3 id="shape-geometry">Shape geometry<a class="anchor" aria-label="anchor" href="#shape-geometry"></a>
+<h3 id="example-outputs">Example outputs<a class="anchor" aria-label="anchor" href="#example-outputs"></a>
 </h3>
+<div class="section level4">
+<h4 id="shape-geometry">Shape geometry<a class="anchor" aria-label="anchor" href="#shape-geometry"></a>
+</h4>
 <p>The shape plot below shows the body-plus-backbone composite geometry
 used by the reference example. The important point is that the backbone
 is retained as its own internal component, with its own geometry and
@@ -279,9 +272,9 @@ stored offset, rather than being folded into a single effective body
 region.</p>
 <p><img src="bbfm-shape-plot.png" class="r-plt" alt="Pre-rendered BBFM shape plot showing the outer cylindrical flesh body and the shorter internal backbone cylinder offset along the body axis." width="80%" style="display: block; margin: auto;"></p>
 </div>
-<div class="section level3">
-<h3 id="composite-spectrum">Composite spectrum<a class="anchor" aria-label="anchor" href="#composite-spectrum"></a>
-</h3>
+<div class="section level4">
+<h4 id="composite-spectrum">Composite spectrum<a class="anchor" aria-label="anchor" href="#composite-spectrum"></a>
+</h4>
 <p>This spectrum shows the stored <code>BBFM</code> output for the same
 reference target. The composite <code>TS</code> is plotted together with
 the component-level flesh and backbone contributions so the interference
@@ -289,9 +282,9 @@ structure is visible rather than hidden.</p>
 <p><img src="bbfm-example-spectrum.png" class="r-plt" alt="Pre-rendered BBFM spectrum showing the composite target strength together with the flesh-body and backbone component curves and the residual from the explicit reconstruction check." width="85%" style="display: block; margin: auto;"></p>
 </div>
 </div>
-<div class="section level2">
-<h2 id="stored-model-outputs">Stored model outputs<a class="anchor" aria-label="anchor" href="#stored-model-outputs"></a>
-</h2>
+<div class="section level3">
+<h3 id="stored-model-outputs">Stored model outputs<a class="anchor" aria-label="anchor" href="#stored-model-outputs"></a>
+</h3>
 <p>The <code>BBFM</code> output table keeps the component bookkeeping
 explicit instead of returning only a final <code>TS</code> column.</p>
 <table class="table">
@@ -364,14 +357,12 @@ translation into the body frame</td>
 </tr>
 </tbody>
 </table>
-<p>Those columns make it possible to inspect not just the final
-spectrum, but also which part of the result comes from the body, which
-part comes from the backbone, and how much of the composite behavior is
-due to coherent interference between them.</p>
+<p>These columns separate the two component responses from their
+coherent sum.</p>
 </div>
-<div class="section level2">
-<h2 id="internal-consistency-check">Internal consistency check<a class="anchor" aria-label="anchor" href="#internal-consistency-check"></a>
-</h2>
+<div class="section level3">
+<h3 id="internal-consistency-check">Internal consistency check<a class="anchor" aria-label="anchor" href="#internal-consistency-check"></a>
+</h3>
 <p>The first validation step for <code>BBFM</code> is to confirm that
 the stored composite result equals the component-wise reconstruction
 implied by the model design:</p>
@@ -478,9 +469,9 @@ floating-point noise. That does not replace an external benchmark, but
 it does verify that the family is carrying out the coherent composite
 sum it claims to perform.</p>
 </div>
-<div class="section level2">
-<h2 id="how-to-interpret-the-result">How to interpret the result<a class="anchor" aria-label="anchor" href="#how-to-interpret-the-result"></a>
-</h2>
+<div class="section level3">
+<h3 id="interpreting-the-result">Interpreting the result<a class="anchor" aria-label="anchor" href="#interpreting-the-result"></a>
+</h3>
 <p>The most important interpretive point is that the final
 <code>TS</code> curve is not just the arithmetic sum of
 <code>TS_body</code> and <code>TS_backbone</code>. The model works in
@@ -502,13 +493,12 @@ constructively, or</li>
 <li>smaller than the linear sum of the component cross-sections when the
 phases interfere destructively.</li>
 </ul>
-<p>This is exactly why <code>BBFM</code> is useful. It preserves the
-anatomy-specific components while still letting them interfere
-coherently in one stored body frame.</p>
+<p>BBFM preserves the anatomy-specific components while allowing them to
+interfere coherently in one stored body frame.</p>
 </div>
-<div class="section level2">
-<h2 id="scope">Scope<a class="anchor" aria-label="anchor" href="#scope"></a>
-</h2>
+<div class="section level3">
+<h3 id="scope">Scope<a class="anchor" aria-label="anchor" href="#scope"></a>
+</h3>
 <p><code>BBFM</code> should be interpreted as:</p>
 <ul>
 <li>a reproducible composite model for a body plus an explicit
@@ -518,10 +508,10 @@ should remain acoustically explicit,</li>
 <li>a first-order coherent combination model rather than a fully coupled
 multi-region boundary-value solve.</li>
 </ul>
-<p>So the implementation answers the bookkeeping question clearly:
-acousticTS can construct, evaluate, and inspect this composite family in
-a transparent way. The remaining open work is external benchmarking and,
-later, more tightly coupled composite physics.</p>
+<p>The current implementation provides reproducible component
+bookkeeping and an explicit reconstruction check. External benchmarking
+and a fully coupled body-backbone treatment remain open work.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>

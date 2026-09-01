@@ -7,9 +7,8 @@ Benchmarked Validated
 [Overview](https://brandynlucca.github.io/acousticTS/articles/krm/index.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/krm/krm-theory.md)
 
-These pages follow the composite body-plus-swimbladder fish modeling
-literature initiated for cod and later generalized in open software
-implementations ([Clay 1991](#ref-Clay_1991); [Clay and Horne
+KRM combines a weakly scattering fish body with an optional, strongly
+contrasting swimbladder ([Clay 1991](#ref-Clay_1991); [Clay and Horne
 1994](#ref-Clay_1994)).
 
 The acousticTS package uses object-based scatterers, so the KRM workflow
@@ -163,7 +162,7 @@ For the bundled `sardine` target over `12-400 kHz`, the `mixed` and
 is between the default `lowcontrast` spectrum and the body-medium
 alternative.
 
-::: \## Extracting model results
+### Extracting model results
 
 Model results can be extracted either visually or directly through
 [`extract()`](https://brandynlucca.github.io/acousticTS/reference/extract.md).
@@ -245,14 +244,14 @@ solution for each isolated canonical case. The summary table below keeps
 that benchmark visible without mixing it with the separate
 software-compatibility checks for body-plus-swimbladder targets.
 
-| Canonical case | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | Elapsed (s) |
-|:---|---:|---:|---:|
-| Gas sphere | 7.91469 | 6.04116 | 0.01 |
-| Weakly scattering sphere | 11.21090 | 0.47451 | 0.15 |
-| Gas prolate spheroid | 7.36054 | 4.62751 | 0.00 |
-| Weakly scattering prolate spheroid | 14.27193 | 0.46239 | 0.00 |
-| Gas cylinder | 7.35632 | 6.19094 | 0.02 |
-| Weakly scattering cylinder | 23.22115 | 0.59807 | 0.02 |
+| Canonical case | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) |
+|:---|---:|---:|
+| Gas sphere | 7.91469 | 6.04116 |
+| Weakly scattering sphere | 11.21090 | 0.47451 |
+| Gas prolate spheroid | 7.36054 | 4.62751 |
+| Weakly scattering prolate spheroid | 14.27193 | 0.46239 |
+| Gas cylinder | 7.35632 | 6.19094 |
+| Weakly scattering cylinder | 23.22115 | 0.59807 |
 
 The modal-series table above remains the implementation benchmark for
 the canonical KRM targets.
@@ -260,12 +259,11 @@ the canonical KRM targets.
 #### Bundled fish compatibility checks
 
 The bundled fish objects serve a different benchmark role from the
-canonical modal-series targets above. There is no exact modal-series
-reference for these segmented body-plus-swimbladder geometries, so they
-are used only to check software-to-software agreement for the
-`krm_variant` branches on realistic fish shapes. This inclues KRMr
-([Gastauer 2025](#ref-KRMr_software)), echoSMs ([Macaulay and
-contributors 2024](#ref-echoSMs_software)), and the SWFSC applet
+canonical modal-series targets. There is no exact modal-series reference
+for these segmented body-plus-swimbladder geometries, so they check
+software agreement for the `krm_variant` branches. The comparisons
+include KRMr ([Gastauer 2025](#ref-KRMr_software)), echoSMs ([Macaulay
+and contributors 2024](#ref-echoSMs_software)), and the SWFSC applet
 ([Southwest Fisheries Science Center 2022](#ref-NOAA_KRM_software)).
 
 ##### Sardine

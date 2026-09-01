@@ -7,31 +7,19 @@ Benchmarked Validated
 [Overview](https://brandynlucca.github.io/acousticTS/articles/hpa/index.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/hpa/hpa-implementation.md)
 
-The high-pass approximation (HPA) is not an exact boundary-value
-solution. It is a compact asymptotic model constructed so that the
-low-frequency limit matches the Rayleigh expansion of weakly scattering
-bodies, while the large-ka limit remains bounded and approaches a
-reflection-controlled scale ([Johnson 1977](#ref-Johnson_1977); [Stanton
-1989](#ref-Stanton_1989_1)). The model is therefore best understood as
-an interpolation between two physically distinct regimes rather than as
-a direct solution of the governing boundary-value problem at all
-frequencies.
+The high-pass approximation (HPA) interpolates between a Rayleigh
+low-frequency term and a bounded, reflection-controlled high-frequency
+scale ([Johnson 1977](#ref-Johnson_1977); [Stanton
+1989](#ref-Stanton_1989_1)). It is a rational approximation to
+backscattering cross-section, not an exact boundary-value solution. It
+therefore captures broad frequency trends but not individual modal
+resonances.
 
-Its usefulness comes from that interpolation. Instead of carrying a full
-modal series or surface integral, the HPA writes the backscattering
-cross-section as a rational function of frequency whose numerator
-reproduces the small-target limit and whose denominator suppresses the
-unbounded growth that a naive low-frequency continuation would otherwise
-produce.
-
-In a full boundary-value formulation, the same problem would be
-represented either by a partial-wave expansion for a canonical shape or
-by a Green’s-function surface integral whose large-ka limit is
-controlled by reflected or specular contributions. The HPA should be
-read as a compact replacement for those exact descriptions: it keeps the
-correct Rayleigh numerator at small ka and replaces the full
-high-frequency asymptotics by a bounded reflection-controlled
-denominator.
+Material ratios and scattering quantities follow [Notation and
+symbols](https://brandynlucca.github.io/acousticTS/articles/notation-and-symbols/notation-and-symbols.md).
+The assumptions behind the Rayleigh and reflected-wave limits are
+summarized in the [Acoustic scattering
+primer](https://brandynlucca.github.io/acousticTS/articles/acoustic-scattering-primer/acoustic-scattering-primer.md).
 
 ![HPA transition schematic](hpa-transition-schematic.svg)
 
@@ -44,21 +32,14 @@ factors.](hpa-asymptotic-bookkeeping.svg)
 Asymptotic bookkeeping behind the HPA: Rayleigh numerator, bounded
 denominator, and Stanton correction factors.
 
-The HPA is built from three pieces. The low-frequency branch is the
-Rayleigh numerator proportional to (ka)^4\alpha\_\pi^2. The large-ka
-behavior is controlled by a bounded denominator scaled by interface
-reflection. The Stanton corrections \mathcal{F} and \mathcal{G} modify
-those leading limits without turning the model into a full
-boundary-value solution.
+The construction has a Rayleigh numerator proportional to
+(ka)^4\alpha\_\pi^2, a denominator that bounds its growth, and optional
+Stanton corrections \mathcal F and \mathcal G.
 
-Geometry enters through distinct bookkeeping for each shape family. A
-sphere uses a single radius scale. A prolate spheroid uses the
-corresponding spheroidal size factor. A straight cylinder combines the
-transverse size parameter Ka with the finite-length directivity factor
-s. A bent cylinder replaces that straight-axis factor with the curvature
-term \mathcal{H}. The HPA family is therefore not one equation with
-minor symbol changes, but a set of related asymptotic forms with
-different geometric bookkeeping.
+Geometry determines the prefactor and coherence term. Spheres use one
+radius, prolate spheroids use their length and radius scales, straight
+cylinders use the transverse size Ka and directivity s, and bent
+cylinders use the curvature factor \mathcal H.
 
 ## Low-frequency scattering ingredients
 
@@ -69,12 +50,8 @@ density and sound-speed contrasts by:
 
 g\_{21} = \frac{\rho_2}{\rho_1}, \qquad h\_{21} = \frac{c_2}{c_1}.
 
-These are the two material ratios that enter the long-wavelength
-expansion for a fluid-like body. In the HPA they appear only through
-low-frequency contrast coefficients and through the reflection
-coefficient used to control the high-frequency scale. That is one reason
-the model remains compact: it does not attempt to carry the full spatial
-structure of the exact boundary-value solution.
+These ratios enter the Rayleigh coefficients and the impedance
+reflection coefficient.
 
 ### Reflection coefficient
 
@@ -84,12 +61,9 @@ reflection coefficient is therefore introduced as:
 
 \mathcal{R} = \frac{g\_{21}h\_{21} - 1}{g\_{21}h\_{21} + 1}.
 
-This quantity appears in the denominator of the HPA because the
-high-frequency asymptote is governed by interface reflection rather than
-by the small-contrast polarizability term that controls the Rayleigh
-regime. The reflection coefficient is therefore not a small-ka
-ingredient. It is the scale-setting quantity that keeps the large-ka
-response physically bounded.
+\mathcal R is the pressure-amplitude reflection coefficient at normal
+incidence. In the Stanton forms, it sets the scale of the large-ka
+limit.
 
 ### Rayleigh coefficients for spheres and cylinders
 
@@ -110,11 +84,9 @@ cylindrical limit, the corresponding coefficient is:
 \alpha\_{\pi c} = \frac{1 - g\_{21}h\_{21}^2}{2g\_{21}h\_{21}^2} +
 \frac{1 - g\_{21}}{1 + g\_{21}}.
 
-These coefficients arise by expanding the boundary conditions for weak
-contrast and retaining the leading backscattering contribution to the
-scattered field. Their role is specific to the Rayleigh regime. They say
-how strongly the body departs from the surrounding medium when the
-acoustic wavelength is large compared with the target dimensions.
+These coefficients collect the monopole-like compressibility contrast
+and the dipole-like density contrast in the leading Rayleigh backscatter
+term ([Johnson 1977](#ref-Johnson_1977)).
 
 ## Johnson (1977) sphere approximation
 
@@ -126,11 +98,7 @@ cross-section has the form:
 \sigma\_\text{bs} \sim a^2 (ka)^4 \alpha\_{\pi s}^2 \qquad \text{as } ka
 \to 0.
 
-This fixes the numerator of any interpolation formula that is to
-reproduce the correct low-frequency limit. If an approximate formula
-fails to recover this scaling, it has already lost the correct
-weak-scattering behavior before any high-frequency correction is
-considered.
+This expression fixes the numerator of the interpolation.
 
 ### High-pass denominator
 
@@ -140,14 +108,9 @@ simplest rational completion of that numerator by writing:
 \sigma\_\text{bs} = \frac{a^2 (ka)^4 \alpha\_{\pi s}^2}{1 +
 \tfrac{3}{2}(ka)^4}.
 
-The derivation is not an exact resummation of the full modal series.
-Rather, it is a two-limit construction. The numerator enforces the
-Rayleigh law, while the denominator suppresses the nonphysical growth
-that would occur if the (ka)^4 term were extrapolated to large argument.
-That is the central idea behind the model and the reason the term
-“approximation” has to be taken seriously here: the HPA is deliberately
-shaped to match limiting behavior, not to reproduce every
-intermediate-frequency feature of an exact solution.
+The denominator prevents the Rayleigh term from growing without bound.
+It is an interpolation chosen for the two limiting regimes, not a
+resummation of the exact modal series.
 
 Two limits follow immediately. In the Rayleigh regime, where:
 
@@ -163,20 +126,15 @@ ka \gg 1,
 
 the same expression tends toward:
 
-\sigma\_\text{bs} \to \frac{2}{3}a^2,
+\sigma\_\text{bs} \to \frac{2}{3}a^2\alpha\_{\pi s}^2,
 
-so the response approaches a bounded geometric scale instead of
-diverging.
+so the response approaches a bounded contrast-weighted geometric scale.
 
 ## Stanton (1989) generalization
 
-Stanton ([1989](#ref-Stanton_1989_1)) extended the same logic to a
-broader class of shapes by matching a low-frequency scattering term to a
-reflected-wave asymptote and then introducing empirical correction
-factors where needed. In this broader setting, the geometric prefactors
-and directivity terms become just as important as the material contrasts
-because they determine how the same asymptotic logic is adapted to
-spheres, spheroids, straight cylinders, and bent cylinders.
+Stanton ([1989](#ref-Stanton_1989_1)) extended this construction to
+spheres, spheroids, straight cylinders, and bent cylinders by changing
+the geometric prefactors and coherence terms.
 
 ### Deviation and null functions
 
@@ -186,12 +144,8 @@ the transition between the Rayleigh and large-ka regimes. \mathcal{G}
 adjusts the numerator to account for destructive-interference minima and
 shape-dependent departures from the simplest interpolation.
 
-These terms are phenomenological. They do not arise from the first few
-algebraic steps of the governing differential equation. They enter after
-the asymptotic structure has already been identified. Readers should
-therefore interpret them as correction factors layered onto the
-asymptotic backbone, not as exact modal quantities with independent
-physical meaning at the same level as g\_{21}, h\_{21}, or \mathcal{R}.
+These are phenomenological corrections, not independent modal
+quantities.
 
 ### Spherical form
 
@@ -201,13 +155,8 @@ For a sphere, the generalized expression from Stanton
 \sigma\_\text{bs} = \frac{a^2 (ka)^4 \alpha\_{\pi s}^2 \mathcal{G}}{ 1 +
 \dfrac{4(ka)^4 \alpha\_{\pi s}^2}{\mathcal{R}^2 \mathcal{F}} }.
 
-The low-frequency numerator is still the Rayleigh term. The denominator
-is written so that the high-frequency scale is set explicitly by the
-reflection coefficient \mathcal{R}. Compared with the simpler form of
-Johnson ([1977](#ref-Johnson_1977)), the version from Stanton
-([1989](#ref-Stanton_1989_1)) makes the reflection-controlled nature of
-the large-ka limit more explicit and leaves room for the correction
-factors \mathcal{F} and \mathcal{G}.
+The numerator retains the Rayleigh term. The denominator sets the
+reflection-controlled limit and includes \mathcal F and \mathcal G.
 
 ### Prolate spheroid form
 
@@ -217,12 +166,8 @@ For a prolate spheroid of total length L, the corresponding formula is:
 \mathcal{G}}{ 1 + \dfrac{\tfrac{16}{9}(ka)^4 \alpha\_{\pi
 c}^2}{\mathcal{R}^2 \mathcal{F}} }.
 
-The change from a^2 to L^2 reflects the fact that the illuminated
-longitudinal extent becomes important for elongated bodies, even though
-the local contrast coefficient still has cylindrical form. This is one
-of the places where the HPA is easiest to misread. The local material
-physics remains fluid-like and weak-contrast, but the geometric scaling
-is no longer purely radial.
+The factor L^2 accounts for the longitudinal extent of the elongated
+body, while \alpha\_{\pi c} retains the cylindrical Rayleigh contrast.
 
 ### Straight cylinder form
 
@@ -241,12 +186,9 @@ The resulting cross-section is:
 \mathcal{G}}{ 1 + \dfrac{\pi (Ka)^3 \alpha\_{\pi c}^2}{\mathcal{R}^2
 \mathcal{F}} }.
 
-The factor s comes directly from integrating the phase over a uniformly
-illuminated finite cylinder. It is the same sinc-type directivity that
-appears in more detailed elongated-body scattering models. The argument
-of that factor is important physically: as the incidence moves away from
-broadside, longitudinal phase cancellation can reduce the coherent
-contribution even when the transverse contrast remains unchanged.
+The sinc factor follows from integrating a uniform phase along the
+finite axis. Away from broadside, longitudinal phase cancellation
+reduces coherence.
 
 ### Bent-cylinder form
 
@@ -262,12 +204,8 @@ This yields:
 \mathcal{H}^2 \mathcal{G}}{ 1 + \dfrac{L^2 (ka)^4 \alpha\_{\pi c}^2
 \mathcal{H}^2}{\rho_c a \\ \mathcal{R}^2 \mathcal{F}} }.
 
-The factor \mathcal{H} is obtained by averaging the phase over the
-curved axis and therefore plays the same role for a bent body that s
-plays for a straight one. In other words, straight-axis coherence is
-replaced by curvature-weighted coherence. This gives the bent-cylinder
-HPA enough geometric flexibility to account for gross curvature effects
-without leaving the asymptotic closed-form framework.
+\mathcal H replaces straight-axis coherence with a curvature-weighted
+effective length.
 
 ## Why the approximation is called high-pass
 
@@ -282,6 +220,15 @@ That analogy is only qualitative. The HPA is not derived from circuit
 theory. It is derived by matching low- and high-frequency acoustic
 asymptotes.
 
+## Target strength
+
+Each HPA branch returns a backscattering cross-section. Target strength
+follows the same reporting convention as the other models ([MacLennan et
+al. 2002](#ref-MacLennan_2002)):
+
+TS = 10\log\_{10}\left( \frac{\sigma\_{\mathrm{bs}}}{1\\
+\mathrm{m}^2}\right).
+
 ## Mathematical assumptions
 
 The HPA rests on the following assumptions:
@@ -295,19 +242,20 @@ The HPA rests on the following assumptions:
 5.  Shape effects enter primarily through explicit geometric factors
     such as L, s, and \mathcal{H}.
 
-The strength of the HPA is that it compresses those asymptotic ideas
-into simple closed forms. The limitation is that it does not reproduce
-fine modal resonances, exact boundary-condition structure, or detailed
-internal wave effects that would appear in a fuller solution. It is
-therefore most useful when the scientific question is about broad
-frequency trends, relative shape effects, or fast exploratory
-calculations rather than resonance-resolving inference.
+HPA is appropriate for broad trends and inexpensive comparisons. It does
+not resolve fine resonances, exact boundary-condition structure, or
+detailed internal waves.
 
 ## References
 
 Johnson, Richard K. 1977. “Sound Scattering from a Fluid Sphere
 Revisited.” *The Journal of the Acoustical Society of America* 61 (2):
 375–77. <https://doi.org/10.1121/1.381326>.
+
+MacLennan, David N., Percy G. Fernandes, and John Dalen. 2002. “A
+Consistent Approach to Definitions and Symbols in Fisheries Acoustics.”
+*ICES Journal of Marine Science* 59 (2): 365–69.
+<https://doi.org/10.1006/jmsc.2001.1158>.
 
 Stanton, Timothy K. 1989. “Simple Approximate Formulas for
 Backscattering of Sound by Spherical and Elongated Objects.” *The

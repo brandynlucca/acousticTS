@@ -7,43 +7,37 @@ Benchmarked Validated
 [Theory](https://brandynlucca.github.io/acousticTS/articles/fcms/fcms-theory.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/fcms/fcms-implementation.md)
 
-These pages follow the finite-cylinder modal-series literature for
-straight circular cylinders near broadside ([Stanton
-1988](#ref-Stanton_1988), [1989](#ref-Stanton_1989_2)).
-
-The finite cylinder modal series solution (`FCMS`) is the package’s
-geometry-matched cylinder family for straight circular cylinders. It
-keeps the exact cylindrical-harmonic treatment of the cross-section and
-closes the finite-length problem with the standard near-broadside
-coherence factor.
+The finite-cylinder modal-series solution (`FCMS`) calculates monostatic
+scattering from a straight circular cylinder near broadside.
 
 ### Core idea
 
-Solve the circular cross-section exactly in cylindrical partial waves,
-then multiply by the finite-length directivity factor that accounts for
-the coherent addition along the cylinder axis.
+Solve the circular cross-section in cylindrical partial waves, then
+apply the finite-length coherence factor that describes addition along
+the straight cylinder axis ([Stanton 1988](#ref-Stanton_1988),
+[1989](#ref-Stanton_1989_2)).
 
 ### Best for
 
-- Straight finite cylinders near broadside
-- Rigid, pressure-release, liquid-filled, and gas-filled cylinder
-  comparisons
-- Reference checks for cylinder-like targets before using higher-level
-  approximations
+- Straight, constant-radius finite cylinders near broadside
+- Comparing fixed-rigid, pressure-release, liquid-filled, and gas-filled
+  cylinder boundaries
+- Canonical cylinder benchmarks before adopting an asymptotic model
 
 ### Supports
 
-- `Cylinder` shapes on `FLS` or `GAS` objects
-- Near-broadside monostatic target strength
-- Fluid and gas interiors parameterized relative to seawater as medium
-  `1`
+- `Cylinder` shapes carried by `FLS` or `GAS` scatterers
+- Homogeneous fluid or gas interiors, plus fixed-rigid and
+  pressure-release limits
+- Monostatic complex amplitude, backscattering cross-section, and target
+  strength
 
 ### Main assumptions
 
-- Circular cross-section and straight centerline
+- A straight centerline and circular, constant-radius cross-section
 - Broadside or near-broadside incidence
-- Homogeneous interior material properties for penetrable cases
-- No elastic shear support in the interior
+- Finite length represented by a coherence factor
+- No elastic shear response in the cylinder interior
 
 ### Validation status
 
@@ -54,10 +48,9 @@ the coherent addition along the cylinder axis.
 ### Family pages
 
 - [Implementation](https://brandynlucca.github.io/acousticTS/articles/fcms/fcms-implementation.md):
-  spectra, result extraction, and comparison tables
+  cylinder construction, boundaries, output, and comparisons
 - [Theory](https://brandynlucca.github.io/acousticTS/articles/fcms/fcms-theory.md):
-  cylindrical modal reduction, boundary conditions, and finite-length
-  factorization
+  cylindrical modes, interface conditions, and finite-length closure
 
 ## References
 

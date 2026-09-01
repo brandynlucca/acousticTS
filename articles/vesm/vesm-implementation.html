@@ -47,10 +47,9 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-physics-primer" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Physics Primer</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-physics-primer">
-<li><a class="dropdown-item" href="../../articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
-    <li><a class="dropdown-item" href="../../articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+<li><a class="dropdown-item" href="../../articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+    <li><a class="dropdown-item" href="../../articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
     <li><a class="dropdown-item" href="../../articles/boundary_conditions.html">Boundary conditions</a></li>
-    <li><a class="dropdown-item" href="../../articles/material-properties/material-properties.html">Material properties</a></li>
     <li><a class="dropdown-item" href="../../articles/numerical-foundations/numerical-foundations.html">Numerical methods</a></li>
   </ul>
 </li>
@@ -58,6 +57,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-build-targets" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Build Targets</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-build-targets">
 <li><a class="dropdown-item" href="../../articles/building-shapes/building-shapes.html">Building Shapes</a></li>
+    <li><a class="dropdown-item" href="../../articles/material-properties/material-properties.html">Material Properties</a></li>
     <li><a class="dropdown-item" href="../../articles/building-scatterers/building-scatterers.html">Building Scatterers</a></li>
     <li><a class="dropdown-item" href="../../articles/shape-manipulation-reforging/shape-manipulation-reforging.html">Shape Manipulation</a></li>
   </ul>
@@ -68,17 +68,15 @@
 <li><a class="dropdown-item" href="../../articles/running-models/running-models.html">Running Models</a></li>
     <li><a class="dropdown-item" href="../../articles/model-selection/model-selection.html">Choosing a Model</a></li>
     <li><a class="dropdown-item" href="../../articles/comparing-models/comparing-models.html">Comparing Models</a></li>
-    <li><a class="dropdown-item" href="../../articles/plotting-inspecting-results/plotting-inspecting-results.html">Visualizing results</a></li>
     <li><a class="dropdown-item" href="../../articles/simulation-parameter-sweeps/simulation-parameter-sweeps.html">Simulation sweeps</a></li>
-    <li><a class="dropdown-item" href="../../articles/calibration-workflow/calibration-workflow.html">Calibration workflow</a></li>
-    <li><a class="dropdown-item" href="../../articles/validation-benchmarks/validation-benchmarks.html">Validating models</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../../articles/model-library/model-library.html">Models</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-developers" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Developers</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-developers">
-<li><a class="dropdown-item" href="../../articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
+<li><a class="dropdown-item" href="../../articles/validation-benchmarks/validation-benchmarks.html">Validation methods</a></li>
+    <li><a class="dropdown-item" href="../../articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
     <li><a class="dropdown-item" href="../../articles/combining-components/combining-components.html">Combining components</a></li>
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
@@ -130,20 +128,17 @@
 <a class="model-nav-badge" href="vesm-theory.html">Theory</a>
 </div>
 </div>
-<p>These pages are motivated by layered gas-bearing fish scattering
-models and viscous resonance broadening <span class="citation">(<a href="#ref-Khodabandeloo_2021">Khodabandeloo et al. 2021</a>; <a href="#ref-Feuillade_1998">Feuillade and Nero 1998</a>)</span>.</p>
+<p>VESM models a gas core, elastic shell, viscous outer layer, and
+surrounding fluid <span class="citation">(<a href="#ref-Khodabandeloo_2021">Khodabandeloo et al. 2021</a>; <a href="#ref-Feuillade_1998">Feuillade and Nero 1998</a>)</span>.</p>
 <p>The viscous-elastic spherical model is available through
 <code>target_strength(..., model = "vesms")</code>. The implementation
 is built on top of <code>ESS</code> objects so that the gas core and
 elastic shell are stored in the same object framework already used by
 the elastic-shelled sphere model. The additional viscous layer is then
 supplied through model arguments at run time.</p>
-<p>This page focuses on a single reproducible reference case that
-implemented the model presented by Khodabandeloo et al. (2021) in
-Python. The goal is not to restate that code line by line. It is to show
-how the same layered target is built in acousticTS, how the model is
-called, and how closely the resulting spectrum matches the original
-implementation over a broader frequency range.</p>
+<p>The reference case reproduces the Python implementation associated
+with <span class="citation">Khodabandeloo et al. (<a href="#ref-Khodabandeloo_2021">2021</a>)</span> over a shared frequency
+grid.</p>
 <div class="experiment" data-title="Validation scope">
 <p><code>VESMS</code> is benchmarked here against a reference Python
 implementation over a dense frequency sweep. That is strong
@@ -272,32 +267,15 @@ material properties were run through:</p>
 <p>The comparison uses a shared <code>1-150 kHz</code> grid with
 <code>1 kHz</code> spacing and the same retained modal orders
 (<code>m = 0, 1, 2</code>).</p>
-<p>After regenerating the benchmark against the current compiled
-acousticTS implementation, the reference case gives:</p>
-<ul>
-<li>max abs. <span class="math inline">\Delta</span> TS =
-<code>0.05598 dB</code>
-</li>
-<li>mean abs. <span class="math inline">\Delta</span> TS =
-<code>0.00885 dB</code>
-</li>
-<li>frequency at max abs. <span class="math inline">\Delta</span> =
-<code>60 kHz</code>
-</li>
-<li>elapsed time = <code>0.79 s</code> for acousticTS and
-<code>0.98 s</code> for the Python implementation</li>
-</ul>
-<table class="table">
+<table style="width:100%;" class="table">
 <colgroup>
-<col width="10%">
-<col width="4%">
-<col width="10%">
-<col width="10%">
-<col width="14%">
-<col width="14%">
-<col width="19%">
-<col width="8%">
-<col width="7%">
+<col width="12%">
+<col width="5%">
+<col width="12%">
+<col width="12%">
+<col width="17%">
+<col width="17%">
+<col width="22%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">Comparison</th>
@@ -310,8 +288,6 @@ acousticTS implementation, the reference case gives:</p>
 <th align="right">Mean |Δ| <i>TS</i> (dB)</th>
 <th align="right">
 <i>f</i> at max |Δ| <i>TS</i> (kHz)</th>
-<th align="right">acousticTS elapsed (s)</th>
-<th align="right">Python elapsed (s)</th>
 </tr></thead>
 <tbody><tr class="odd">
 <td align="left">acousticTS vs original VESM</td>
@@ -321,8 +297,6 @@ acousticTS implementation, the reference case gives:</p>
 <td align="right">0.0572</td>
 <td align="right">0.0089</td>
 <td align="right">60</td>
-<td align="right">0.05</td>
-<td align="right">1.0962</td>
 </tr></tbody>
 </table>
 <p>The largest mismatch on this grid remains well below
@@ -335,11 +309,9 @@ higher-order solves at some frequencies.</p>
 <h4 id="spectrum-overlay">Spectrum overlay<a class="anchor" aria-label="anchor" href="#spectrum-overlay"></a>
 </h4>
 <p><img src="vesm-reference-comparison.png" class="r-plt" alt="Pre-rendered VESM comparison showing the original reference spectrum, the acousticTS spectrum, and the residual across frequency." width="85%" style="display: block; margin: auto;"></p>
-<p>The upper panel shows that the two spectra are visually superposed
-across the full comparison band. The lower panel makes the small
-residual drift easier to see. In this case the largest difference occurs
-near <code>60 kHz</code> and reaches <code>0.05598 dB</code>, which
-remains small relative to the scale of the full spectrum.</p>
+<p>The spectra are visually superposed across the comparison band. The
+residual reaches about <code>0.0572 dB</code> near <code>60 kHz</code>,
+which remains small relative to the scale of the full spectrum.</p>
 </div>
 <div class="section level4">
 <h4 id="a-few-explicit-checkpoints">A few explicit checkpoints<a class="anchor" aria-label="anchor" href="#a-few-explicit-checkpoints"></a>

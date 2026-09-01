@@ -47,10 +47,9 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-physics-primer" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Physics Primer</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-physics-primer">
-<li><a class="dropdown-item" href="../../articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
-    <li><a class="dropdown-item" href="../../articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+<li><a class="dropdown-item" href="../../articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+    <li><a class="dropdown-item" href="../../articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
     <li><a class="dropdown-item" href="../../articles/boundary_conditions.html">Boundary conditions</a></li>
-    <li><a class="dropdown-item" href="../../articles/material-properties/material-properties.html">Material properties</a></li>
     <li><a class="dropdown-item" href="../../articles/numerical-foundations/numerical-foundations.html">Numerical methods</a></li>
   </ul>
 </li>
@@ -58,6 +57,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-build-targets" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Build Targets</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-build-targets">
 <li><a class="dropdown-item" href="../../articles/building-shapes/building-shapes.html">Building Shapes</a></li>
+    <li><a class="dropdown-item" href="../../articles/material-properties/material-properties.html">Material Properties</a></li>
     <li><a class="dropdown-item" href="../../articles/building-scatterers/building-scatterers.html">Building Scatterers</a></li>
     <li><a class="dropdown-item" href="../../articles/shape-manipulation-reforging/shape-manipulation-reforging.html">Shape Manipulation</a></li>
   </ul>
@@ -68,17 +68,15 @@
 <li><a class="dropdown-item" href="../../articles/running-models/running-models.html">Running Models</a></li>
     <li><a class="dropdown-item" href="../../articles/model-selection/model-selection.html">Choosing a Model</a></li>
     <li><a class="dropdown-item" href="../../articles/comparing-models/comparing-models.html">Comparing Models</a></li>
-    <li><a class="dropdown-item" href="../../articles/plotting-inspecting-results/plotting-inspecting-results.html">Visualizing results</a></li>
     <li><a class="dropdown-item" href="../../articles/simulation-parameter-sweeps/simulation-parameter-sweeps.html">Simulation sweeps</a></li>
-    <li><a class="dropdown-item" href="../../articles/calibration-workflow/calibration-workflow.html">Calibration workflow</a></li>
-    <li><a class="dropdown-item" href="../../articles/validation-benchmarks/validation-benchmarks.html">Validating models</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../../articles/model-library/model-library.html">Models</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-developers" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Developers</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-developers">
-<li><a class="dropdown-item" href="../../articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
+<li><a class="dropdown-item" href="../../articles/validation-benchmarks/validation-benchmarks.html">Validation methods</a></li>
+    <li><a class="dropdown-item" href="../../articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
     <li><a class="dropdown-item" href="../../articles/combining-components/combining-components.html">Combining components</a></li>
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
@@ -130,30 +128,27 @@
 <a class="model-nav-badge" href="essms-implementation.html">Implementation</a>
 </div>
 </div>
-<p>These pages are grounded in the classical elastic-shell scattering
-literature for fluid-filled spherical shells <span class="citation">(<a href="#ref-Goodman_1962">Goodman and Stern 1962</a>; <a href="#ref-Faran_1951">Faran 1951</a>; <a href="#ref-Stanton_1990">Stanton 1990</a>)</span>.</p>
-<p>An elastic shell is a solid scattering structure that supports both
-longitudinal (<span class="math inline">\ell</span>) and transverse
-(<span class="math inline">\tau</span>) wave within the shell material
-and encloses a fluid interior. The presence of multiple wave types and
-two fluid-solid interfaces leads to several distinct scattering
-mechanisms.</p>
-<p>The shell derivation specializes the usual interface statements to a
-fluid-solid-fluid system. Pressure and normal velocity are continuous
-across both shell interfaces, shear traction vanishes on the fluid sides
-because the exterior and interior media do not support shear stress, and
-the shell itself carries both longitudinal and transverse elastic
-waves.</p>
+<p>An elastic shell supports longitudinal (<span class="math inline">\ell</span>) and transverse (<span class="math inline">\tau</span>) waves and encloses a fluid interior.
+Its response therefore couples two elastic wave types across two
+fluid-solid interfaces. The formulation below follows the modal
+treatment of <span class="citation">Goodman and Stern (<a href="#ref-Goodman_1962">1962</a>)</span> and the scattering conventions
+developed by <span class="citation">Stanton (<a href="#ref-Stanton_1990">1990</a>)</span>.</p>
+<p>At each interface, normal traction and normal velocity are
+continuous. The fluid exerts no shear traction, while the shell carries
+both normal and shear stress. These six scalar conditions determine the
+exterior scattered field, the four elastic-potential amplitudes, and the
+interior acoustic field.</p>
+<div class="note" data-title="Shared conventions">
+<p>Symbols and medium indices follow the <a href="../notation-and-symbols/notation-and-symbols.html">Notation and
+symbols</a> page. The physical interface conditions are developed in <a href="../boundary_conditions.html">Boundary conditions</a>.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="elastic-shelled-sphere-theory">Elastic-shelled sphere theory<a class="anchor" aria-label="anchor" href="#elastic-shelled-sphere-theory"></a>
 </h2>
-<p>The modal series solution for an elastic-shelled sphere is formulated
-by solving coupled wave equations in a fluid medium surrounding a
-fluid-filled elastic sphere. The key property that enables this modal
-series solution is that, after appropriate variable transformations, all
-governing equations reduce to Helmholtz equations that are separable in
-spherical coordinates.</p>
+<p>The solution expands the coupled fluid and solid fields in spherical
+modes. Spherical symmetry makes every governing Helmholtz equation
+separable and allows each angular order to be solved independently.</p>
 <div class="section level3">
 <h3 id="notation-and-geometry">Notation and geometry<a class="anchor" aria-label="anchor" href="#notation-and-geometry"></a>
 </h3>
@@ -161,17 +156,17 @@ spherical coordinates.</p>
 <p><span class="math display">
   \Delta = a - b.
 </span></p>
-<p>Points along the shell’s surface, <span class="math inline">\mathbf{x}</span>, are represented using spherical
-coordinates where <span class="math inline">\mathbf{x} = (r, \theta,
-\varphi)</span>. In this model, there are three sets of material
-properties to consider: the exterior, surrounding medium (<span class="math inline">c_1</span>, <span class="math inline">\rho_1</span>); the elastic shell (<span class="math inline">\lambda_2</span>, <span class="math inline">\mu_2</span>, <span class="math inline">\rho_2</span>, <span class="math inline">c_\ell</span>, <span class="math inline">c_\tau</span>); and the interior fluid (<span class="math inline">c_3</span>, <span class="math inline">\rho_3</span>). The material property contrasts are
-represented by:</p>
+<p>Points are represented by spherical coordinates <span class="math inline">\mathbf{x}=(r,\theta,\varphi)</span>. Medium 1 is
+the exterior fluid, medium 2 is the elastic shell, and medium 3 is the
+interior fluid. The shell has Lamé parameters <span class="math inline">\lambda_2</span> and <span class="math inline">\mu_2</span>, density <span class="math inline">\rho_2</span>, and wave speeds <span class="math inline">c_\ell</span> and <span class="math inline">c_\tau</span>. Density and sound-speed ratios
+are:</p>
 <p><span class="math display">
-  g_{(ij)} = \frac{\rho_{(i)}}{\rho_{(j)}}, \quad  h_{(ij)} =
-\frac{c_{(i)}}{c_{(j)}},
+  g_{ij} = \frac{\rho_i}{\rho_j}, \qquad
+  h_{ij} = \frac{c_i}{c_j},
 </span></p>
-<p>where <span class="math inline">i</span> and <span class="math inline">j</span> represent two separate media. Consequently,
-there are two primary interfaces: exterior-shell (<span class="math inline">g_{21}</span>, <span class="math inline">h_{21}</span>) and shell-interior (<span class="math inline">g_{32}</span>, <span class="math inline">h_{32}</span>).</p>
+<p>where <span class="math inline">i</span> and <span class="math inline">j</span> identify media. The two interfaces are
+exterior-shell at <span class="math inline">r=a</span> and
+shell-interior at <span class="math inline">r=b</span>.</p>
 <div class="float">
 <img src="essms-boundary-bookkeeping.png" alt="ESSMS mode-wise boundary bookkeeping from the two shell radii to the exterior scattering coefficient."><div class="figcaption">ESSMS mode-wise boundary bookkeeping from the
 two shell radii to the exterior scattering coefficient.</div>
@@ -193,16 +188,16 @@ exterior and interior, with their respective material properties:</p>
 \frac{\partial \rho^\prime}{\partial t} + \rho \nabla \cdot \mathbf{v} =
 0,
 </span></p>
-<p>where <span class="math inline">p</span> is the incident acoustic
-pressure and <span class="math inline">\mathbf{v}(\mathbf{x}, t)</span>
-is the particle velocity defined as:</p>
+<p>where <span class="math inline">p</span> is acoustic pressure and
+<span class="math inline">\mathbf{v}(\mathbf{x},t)</span> is particle
+velocity. With the <span class="math inline">e^{-i\omega t}</span>
+convention, their phasors satisfy:</p>
 <p><span class="math display">
-  \mathbf{v} = -\frac{1}{i \omega \rho} \nabla p.
+  \mathbf{v} = \frac{1}{i \omega \rho} \nabla p.
 </span></p>
-<p>No boundary condition is imposed <em>a priori</em> on the fluid at
-the shell surface. Instead, continuity of normal velocity and normal
-traction at the fluid-solid interfaces constrains the admissible
-solutions of the Helmholtz equation: <span class="math display">
+<p>No rigid or pressure-release condition is prescribed at either shell
+surface. The coupled interface conditions instead constrain solutions of
+the Helmholtz equation: <span class="math display">
   \nabla^2 p + k^2p = 0.
 </span></p>
 <p>Consequently, the exterior pressure <span class="math inline">p_1</span> and interior pressure <span class="math inline">p_3</span> satisfy:</p>
@@ -261,20 +256,15 @@ functions. Consequently, each field admits an expansion of the form:</p>
   \psi(r,\theta) =
     \sum_{m=0}^\infty R_m(r)\,P_m(\cos\theta).
 </span></p>
-<p>The angular dependence is expressed with Legendre polynomials <span class="math inline">P_m(\cos\theta)</span>, which ensures that different
-angular orders are mathematically independent. The orthogonality of
-<span class="math inline">P_m(\cos\theta)</span> is expressed as:</p>
+<p>Different angular orders are independent because the Legendre
+polynomials are orthogonal:</p>
 <p><span class="math display">
   \int\limits_{-1}^{1} P_m(\mu) P_n(\mu)\,d\mu =
 \frac{2}{2m+1}\,\delta_{mn}.
 </span></p>
-<p>This modal decoupling holds regardless of shell thickness because it
-follows from spherical symmetry and the orthogonality of the angular
-eigenfunctions. Moreover, this remains valid even though multiple wave
-types are present within the shell. Consequently, each order <span class="math inline">m</span> yields an independent algebraic system. The
-complexity of the elastic response is therefore confined to the
-mode-dependent coefficient matrices, while the angular structure of the
-solution remains identical to that of a solid sphere.</p>
+<p>This decoupling follows from spherical symmetry, not from a
+thin-shell approximation. Shell thickness and elastic coupling enter the
+radial functions and the coefficient matrix for each <span class="math inline">m</span>.</p>
 </div>
 <div class="section level3">
 <h3 id="modal-expansions-of-the-acoustic-and-elastic-fields">Modal expansions of the acoustic and elastic fields<a class="anchor" aria-label="anchor" href="#modal-expansions-of-the-acoustic-and-elastic-fields"></a>
@@ -308,10 +298,8 @@ t}</span> dependence, the pressure can be further expressed as <span class="cita
 <p><span class="math display">
   p = i\omega\rho\,\phi.
 </span></p>
-<p>Working with velocity potentials is advantageous because it reduces
-the governing equations in the fluid to a scalar Helmholtz equation and
-leads to boundary conditions that couple directly to the elastic shell
-displacement through normal velocity and normal traction continuity.</p>
+<p>The velocity potential makes normal-velocity continuity direct, while
+pressure follows from <span class="math inline">p=i\omega\rho\phi</span>.</p>
 <p>In each fluid region, the velocity potential satisfies the Helmholtz
 equation:</p>
 <p><span class="math display">
@@ -325,27 +313,21 @@ wave and fluid regions:</p>
     e^{ik_1 r\cos\theta} \\ &amp;= \sum\limits_{m=0}^\infty
 i^m(2m+1)\,j_m(k_1 r)\,P_m(\cos\theta), \\
     \phi_1(\theta,r) &amp;= \sum\limits_{m=0}^\infty i^m(2m+1)
-A_m^{(1)}\,h_m^{(1)}(k_1 r)\,P_m(\cos\theta), \\
+b_m\,h_m^{(1)}(k_1 r)\,P_m(\cos\theta), \\
     \phi_3(\theta,r) &amp;= \sum\limits_{m=0}^\infty i^m(2m+1)
-A_m^{(3)}\,j_m(k_3 r)\,P_m(\cos\theta),
+q_m\,j_m(k_3 r)\,P_m(\cos\theta),
   \end{aligned}
 </span></p>
-<p>where the coefficients <span class="math inline">A_m^{(1)}</span> and
-<span class="math inline">A_m^{(3)}</span> are unknown modal amplitudes
-determined by the boundary conditions at the shell interfaces. The
-incident field <span class="math inline">\phi_\text{inc}</span> acts as
-a known forcing term in these conditions.</p>
+<p>where <span class="math inline">b_m</span> and <span class="math inline">q_m</span> are the exterior scattered-field and
+interior-field amplitudes. The known incident field supplies the forcing
+at <span class="math inline">r=a</span>.</p>
 </div>
 <div class="section level4">
 <h4 id="shell-potentials">Shell potentials<a class="anchor" aria-label="anchor" href="#shell-potentials"></a>
 </h4>
-<p>Within the elastic shell (<span class="math inline">b&lt;r&lt;a</span>),the mechanical response of the
-material is governed by the equations of linear elastodynamics. Unlike
-the surrounding and interior fluids, the shell supports both
-compressional (longitudinal) and shear (transverse) elastic waves. As a
-result, the displacement field <span class="math inline">\mathbf{u}</span> in the shell cannot be described
-by a single scalar potential. Instead, it is decomposed using the
-Helmholtz decomposition into irrotational and solenoidal components.</p>
+<p>Within the elastic shell (<span class="math inline">b&lt;r&lt;a</span>), the displacement requires both
+an irrotational longitudinal potential and a solenoidal transverse
+potential.</p>
 <p>Because the shell occupies an annular region and does not include the
 origin, both independent radial solutions of the Helmholtz equation are
 admissible. The longitudinal and transverse potentials are therefore
@@ -362,33 +344,23 @@ coefficients and <span class="math inline">C_m</span> and <span class="math inli
 coefficients for each angular order <span class="math inline">m</span>.
 Each set of coefficients represents the contribution of angular order
 <span class="math inline">m</span> to the total displacement field.</p>
-<p>Physically, the inclusion of both <span class="math inline">j_m</span> and <span class="math inline">y_m</span>
-terms reflects the fact that elastic waves in the shell can propagate
-both inward and outward between the inner and outer interfaces. These
-waves undergo multiple reflections within the shell and interact through
-the boundary conditions, giving rise to resonant behavior that depends
-on shell thickness, elastic properties, and frequency.</p>
-<p>The elastic potentials do not directly represent observable
-quantities such as pressure or velocity. Instead, they serve as
-intermediate fields from which the displacement components and stresses
-are derived. Through the stress-displacement relations and interface
-boundary conditions, the elastic modal coefficients <span class="math inline">(A_m, B_m, C_m, D_m)</span> become coupled to the
-acoustic fields in the surrounding fluids. Solving this coupled system
-determines the elastic response of the shell and, ultimately, the
-acoustic scattering coefficients.</p>
+<p>Both <span class="math inline">j_m</span> and <span class="math inline">y_m</span> are admissible because the shell excludes
+the origin. Their combination represents elastic waves reflected between
+the two interfaces. The potentials generate displacement and stress,
+which couple the four elastic coefficients to the two fluid fields.</p>
 </div>
 <div class="section level4">
 <h4 id="displacement-components">Displacement components<a class="anchor" aria-label="anchor" href="#displacement-components"></a>
 </h4>
-<p>The elastic displacement field in the shell is obtained from the
-longitudinal and transverse potentials according to:</p>
+<p>Using an axisymmetric vector potential <span class="math inline">\boldsymbol{\Psi}</span>, the shell displacement
+is:</p>
 <p><span class="math display">
-  \mathbf{u} = \nabla \phi_2 + \nabla \times \left( \mathbf{r}\, \Psi
-\right)
+  \mathbf{u} = \nabla \phi_2 + \nabla \times \boldsymbol{\Psi}.
 </span></p>
-<p>which is the axisymmetric specialization of the Helmholtz
-decomposition. Substituting the modal expansions for <span class="math inline">\phi_2</span> and <span class="math inline">\Psi</span> yields expressions for the displacement
-components that separate by angular order.</p>
+<p>The transverse-potential normalization can be chosen so that the
+separated radial functions <span class="math inline">\phi_m</span> and
+<span class="math inline">\psi_m</span> give the displacement
+components:</p>
 <p>For each angular mode <span class="math inline">m</span>, the radial
 and tangential displacement components in the shell are:</p>
 <p><span class="math display">
@@ -505,52 +477,28 @@ shell potentials to the acoustic fields.</p>
 <div class="section level3">
 <h3 id="boundary-conditions">Boundary conditions<a class="anchor" aria-label="anchor" href="#boundary-conditions"></a>
 </h3>
-<p>The shell occupies <span class="math inline">b &lt; r &lt; a</span>.
-At each fluid-solid interface, continuity of normal stress and normal
-velocity is enforced, along with vanishing tangential traction in the
-surrounding fluids. Because the surrounding and interior media are
-inviscid fluids, the tangential (shear) traction must vanish at both
-interfaces. Projecting each condition onto <span class="math inline">P_m(\cos\theta)</span> and using orthogonality
-yields a mode-decoupled set of algebraic equations, so each angular
-order <span class="math inline">m</span> can be solved independently.
-Each equation is a linear combination of spherical Bessel functions and
-their derivatives evaluated at <span class="math inline">r=a</span> or
-<span class="math inline">r=b</span>.</p>
-<p><style> /* The main container for the callout <em>/ .note-callout {
-border: 1px solid #1a1f33; /</em> Darker border around the entire block
-<em>/ border-radius: 4px; overflow: hidden; /</em> Ensures the border
-radius applies to children */ margin: 1em 0; }</p>
-<p>/* The blue title bar section <em>/ .note-callout .note-title {
-background-color: #1f3056; /</em> Dark blue background for the title
-<em>/ color: #ffffff; /</em> White text for the title */ padding: 10px
-15px; font-weight: bold; display: flex; align-items: center; font-size:
-1.2em; }</p>
-<p>/* A specific span for the light blue vertical line <em>/
-.note-callout .note-title .vertical-line { border-left: 3px solid
-#5d93e1; /</em> Light blue line <em>/ margin-right: 10px; height: 1.2em;
-/</em> Aligns with the text height */ }</p>
-<p>/* The body section where the main note text goes <em>/ .note-callout
-.note-body { background-color: inherit; color: inherit; /</em> Inherit
-text color for accessibility <em>/ padding: 15px; border-left: 3px solid
-#5d93e1; /</em> The continuous light blue line down the left */ }
-</style></p>
-<p>::: {.note-callout}</p>
-<p>::: {.note-title} Sign conventions and normal direction :::</p>
-<p>::: {.note-body} A time-dependence of <span class="math inline">e^{-i
-\omega t}</span> is assumed. The outward radial direction defines the
-positive normal. Normal stresses are taken positive in compression, so
-the fluid pressure equals the normal compressive stress acting on the
-shell. :::</p>
-<p>:::</p>
+<p>The shell occupies <span class="math inline">b&lt;r&lt;a</span>.
+Projecting the interface conditions onto <span class="math inline">P_m(\cos\theta)</span> produces six equations for
+every <span class="math inline">m&gt;0</span>: normal traction, normal
+velocity, and zero shear traction at each radius. Each equation is a
+linear combination of spherical Bessel functions and their
+derivatives.</p>
+<div class="note" data-title="Traction signs">
+<p>The coordinate vector <span class="math inline">\mathbf e_r</span>
+points toward increasing <span class="math inline">r</span>, but the
+outward normal of the shell is <span class="math inline">\mathbf
+e_r</span> at <span class="math inline">r=a</span> and <span class="math inline">-\mathbf e_r</span> at <span class="math inline">r=b</span>. The coordinate-free condition <span class="math inline">\boldsymbol\sigma\mathbf n=-p\mathbf n</span> avoids
+ambiguity. Scalar matrix rows may differ in sign when a source uses a
+compression-positive normal stress.</p>
+</div>
 <div class="section level4">
 <h4 id="exterior-interface-ra">Exterior interface <span class="math inline">r=a</span><a class="anchor" aria-label="anchor" href="#exterior-interface-ra"></a>
 </h4>
-<p>At the shell-exterior fluid interface, using <span class="math inline">\mathbf{v}_1 = -\frac{1}{i\omega\rho_1}\nabla
-p_1</span> and <span class="math inline">v_{n,1} =
-\mathbf{v}_1\cdot\mathbf{n}</span> with <span class="math inline">\mathbf{n}</span> radial gives:</p>
+<p>At the shell-exterior interface, traction and normal velocity
+satisfy:</p>
 <p><span class="math display">
-  p_1 = \sigma_{rr},
-  \quad -\frac{1}{i\omega\rho_1}\frac{\partial p_1}{\partial r} =
+  \boldsymbol\sigma_2\mathbf n = -p_1\mathbf n,
+  \quad \frac{1}{i\omega\rho_1}\frac{\partial p_1}{\partial r} =
 -i\omega u_r,
   \quad
   \sigma_{r\theta} = 0
@@ -560,13 +508,11 @@ p_1</span> and <span class="math inline">v_{n,1} =
 <div class="section level4">
 <h4 id="interior-interface-rb">Interior interface <span class="math inline">r=b</span><a class="anchor" aria-label="anchor" href="#interior-interface-rb"></a>
 </h4>
-<p>At the shell-interior interface, continuity of pressure and radial
-velocity is enforced, together with vanishing shear traction. Using
-<span class="math inline">\mathbf{v}_3 = -\frac{1}{i\omega\rho_3}\nabla
-p_3</span> gives:</p>
+<p>At the shell-interior interface, the corresponding conditions
+are:</p>
 <p><span class="math display">
-  p_3 = \sigma_{rr},
-  \quad -\frac{1}{i\omega\rho_3}\frac{\partial p_3}{\partial r} =
+  \boldsymbol\sigma_2\mathbf n = -p_3\mathbf n,
+  \quad \frac{1}{i\omega\rho_3}\frac{\partial p_3}{\partial r} =
 -i\omega u_r,
   \quad
   \sigma_{r\theta} = 0
@@ -576,13 +522,14 @@ p_3</span> gives:</p>
 <div class="section level4">
 <h4 id="boundary-matrix-construction">Boundary matrix construction<a class="anchor" aria-label="anchor" href="#boundary-matrix-construction"></a>
 </h4>
-<p>For each <span class="math inline">m</span>, the six boundary
-conditions become six linear equations in the unknown modal
-coefficients. It is convenient to collect the unknowns into a
-vector:</p>
+<p>For each <span class="math inline">m&gt;0</span>, the six boundary
+conditions become six linear equations. Let <span class="math inline">b_m</span> denote the exterior scattering
+coefficient, let <span class="math inline">(L_m^{(j)},T_m^{(j)},L_m^{(y)},T_m^{(y)})</span>
+denote the shell coefficients, and let <span class="math inline">q_m</span> denote the interior-fluid coefficient.
+The unknown vector is:</p>
 <p><span class="math display">
-  \mathbf{x}_m = [\ A_m^{(1)}, \ A_m^{(2)},\ B_m^{(2)},\ C_m^{(2)},\
-D_m,\ A_m^{(3)}]^T
+  \mathbf{x}_m =
+  [\ b_m,\ L_m^{(j)},\ T_m^{(j)},\ L_m^{(y)},\ T_m^{(y)},\ q_m\ ]^T.
 </span></p>
 <p>This system may also be written in matrix-form:</p>
 <p><span class="math display">
@@ -616,7 +563,7 @@ to a boundary condition:</p>
     0 &amp; \alpha_{52} &amp; \alpha_{53} &amp; \alpha_{54} &amp;
 \alpha_{55} &amp; \alpha_{56} \\
     0 &amp; \alpha_{62} &amp; \alpha_{63} &amp; \alpha_{64} &amp;
-\alpha_{65} &amp; \alpha_{66}
+\alpha_{65} &amp; 0
   \end{bmatrix}
   \mathbf{x}_m =
     \begin{bmatrix}
@@ -654,30 +601,26 @@ Explicit expressions for all <span class="math inline">\alpha_{ij}</span> are gi
 described in <span class="citation">Stanton (<a href="#ref-Stanton_1990">1990</a>)</span>.</p>
 </div>
 <div class="section level4">
-<h4 id="solving-for-a_m1">Solving for <span class="math inline">A_m^{(1)}</span><a class="anchor" aria-label="anchor" href="#solving-for-a_m1"></a>
+<h4 id="solving-for-b_m">Solving for <span class="math inline">b_m</span><a class="anchor" aria-label="anchor" href="#solving-for-b_m"></a>
 </h4>
-<p>For each angular order <span class="math inline">m</span>, the
-interface conditions yield the linear system <span class="math inline">\mathbf{M}_m \mathbf{x}_m = \mathbf{F}_m</span>,
-where the first unknown corresponds to the exterior scattering
-coefficient, <span class="math inline">A_m^{(1)}</span>. For each <span class="math inline">m&gt;0</span>, <span class="math inline">A_m^{(1)}</span> is obtained by <a href="https://en.wikipedia.org/wiki/Cramer%27s_rule" class="external-link">Cramer’s
-rule</a>:</p>
+<p>For each angular order, the first unknown is the exterior scattering
+coefficient. Cramer’s rule gives, for <span class="math inline">m&gt;0</span>:</p>
 <p><span class="math display">
-  A_m^{(1)} = -i^m (2m + 1)
-  \frac{
+  b_m = \frac{
   \det(\mathbf{M}_m^{(1)})
   }{
   \det(\mathbf{M}_m)
-  }, ~ \text{for } m &gt; 0
+  }, \qquad m&gt;0.
 </span></p>
 <p>The determinant ratio is built from:</p>
 <p><span class="math display">
-  \frac{\mathbf{M}_m^{(1)}}{\mathbf{M}_m} =
+  \frac{\det(\mathbf{M}_m^{(1)})}{\det(\mathbf{M}_m)} =
     \frac{
   \begin{bmatrix}
-  \alpha_{1} &amp; \alpha_{12} &amp; \alpha_{13} &amp; \alpha_{14} &amp;
+  a_1 &amp; \alpha_{12} &amp; \alpha_{13} &amp; \alpha_{14} &amp;
 \alpha_{15} &amp; 0 \\
-    \alpha_{2} &amp; \alpha_{22} &amp; \alpha_{23} &amp; \alpha_{24}
-&amp; \alpha_{25} &amp; 0 \\
+    a_2 &amp; \alpha_{22} &amp; \alpha_{23} &amp; \alpha_{24} &amp;
+\alpha_{25} &amp; 0 \\
     0 &amp; \alpha_{32} &amp; \alpha_{33} &amp; \alpha_{34} &amp;
 \alpha_{35} &amp; 0 \\
     0 &amp; \alpha_{42} &amp; \alpha_{43} &amp; \alpha_{44} &amp;
@@ -709,31 +652,29 @@ rule</a>:</p>
 <p>Matrix notation</p>
 </div>
 <div class="note-body">
-<p>The notation <span class="math inline">\mathbf{M}_m</span> and <span class="math inline">\mathbf{M}_m^{(1)}</span> is purely linear-algebra
-notation used to describe the mode-wise boundary system. It does not
-introduce any new physical coefficients. In particular, <span class="math inline">\mathbf{M}_m^{(1)}</span> denotes the matrix
-obtained by replacing the first column of the linear system with the
-forcing terms, as required by Cramer’s rule.</p>
+<p><span class="math inline">\mathbf{M}_m^{(1)}</span> is obtained by
+replacing the first column of <span class="math inline">\mathbf{M}_m</span> with the forcing vector. No
+additional physical coefficient is introduced.</p>
 </div>
 </div>
-<p>At <span class="math inline">m=0</span>, tangential terms vanish so
-the transverse contribution drops out and the system reduces to a
-smaller determinant ratio. This therefore defines <span class="math inline">A_{m=0}^{(1)}</span> as:</p>
+<p>At <span class="math inline">m=0</span>, tangential motion vanishes
+and the transverse columns and shear rows drop out. The resulting
+coefficient is:</p>
 <p><span class="math display">
-  A_{m=0}^{(1)} = -
-    \frac{
+  b_0 = \frac{
   \det(\widehat{\mathbf{M}}_m^{(1)})
   }{
   \det(\widehat{\mathbf{M}}_m)
-  }, ~ \text{for } m \equiv 0
+  }, \qquad m=0.
 </span></p>
 <p>The reduced determinant ratio is built from:</p>
 <p><span class="math display">
-  \frac{\widehat{\mathbf{M}}_m^{(1)}}{\widehat{\mathbf{M}}_m} =
+  \frac{\det(\widehat{\mathbf{M}}_m^{(1)})}
+       {\det(\widehat{\mathbf{M}}_m)} =
     \frac{
   \begin{bmatrix}
-  \alpha_{1} &amp; \alpha_{12} &amp; \alpha_{14} &amp; 0 \\
-    \alpha_{2} &amp; \alpha_{22} &amp; \alpha_{24} &amp; 0 \\
+  a_1 &amp; \alpha_{12} &amp; \alpha_{14} &amp; 0 \\
+    a_2 &amp; \alpha_{22} &amp; \alpha_{24} &amp; 0 \\
     0 &amp; \alpha_{42} &amp; \alpha_{44} &amp; \alpha_{46} \\
     0 &amp; \alpha_{52} &amp; \alpha_{54} &amp; \alpha_{56}
   \end{bmatrix}
@@ -765,7 +706,7 @@ outgoing spherical Hankel functions to enforce the Sommerfeld radiation
 condition <span class="citation">(<a href="#ref-Sommerfeld_1949">Sommerfeld 1949</a>)</span>:</p>
 <p><span class="math display">
   p_{\mathrm{scat}}(r,\theta) =
-    P_0 \sum_{m=0}^{\infty} (2m+1) A_m^{(1)}
+    P_0 \sum_{m=0}^{\infty} (2m+1)i^m b_m
   h_m^{(1)}(k_1 r) P_m(\cos\theta).
 </span></p>
 <p>When summed together, the total exterior pressure field becomes:</p>
@@ -774,7 +715,7 @@ condition <span class="citation">(<a href="#ref-Sommerfeld_1949">Sommerfeld 1949
     p_{\mathrm{inc}} + p_{\mathrm{scat}} =
     P_0 \sum_{m=0}^\infty (2m + 1) i^m P_m(\cos\theta)
   \left[
-  j_m(k_1r) + A_m^{(1)}h_m^{(1)}(k_1r)
+  j_m(k_1r) + b_m h_m^{(1)}(k_1r)
   \right].
 </span></p>
 <p>In the far-field limit, <span class="math inline">k_1 r \gg 1</span>,
@@ -788,9 +729,8 @@ the spherical Hankel function satisfies:</p>
 modifies <span class="math inline">p_\text{scat}</span> to:</p>
 <p><span class="math display">
   p_\text{scat}(r, \theta) \sim
-  \frac{P_0 e^{i k_1 r}}{k_1 r}
-  \sum\limits_{m=0}^\infty (2m + 1)(-i)^{(m+1)} A_m^{(1)}
-P_m(\cos\theta).
+  -\frac{iP_0 e^{i k_1 r}}{k_1 r}
+  \sum\limits_{m=0}^\infty (2m + 1)b_m P_m(\cos\theta).
 </span></p>
 <p>The far-field form function, <span class="math inline">\mathcal{f}(\theta)</span>, is defined as the factor
 that relates the incident pressure amplitude to the scattered pressure
@@ -801,27 +741,18 @@ and phase change (<span class="math inline">e^{i k_1 r}</span>):</p>
   p_\text{scat}(r, \theta) \sim P_0 \frac{e^{i k_1 r}}{r}
 \mathcal{f}(\theta).
 </span></p>
-<p>Consequently, the form function, <span class="math inline">\mathcal{f}(\theta)</span>, is written as:</p>
+<p>Consequently, the dimensional far-field amplitude is:</p>
 <p><span class="math display">
   \mathcal{f}(\theta) =
-    \frac{1}{k_1}
-  \sum\limits_{m=0}^\infty (2m + 1)(-i)^{(m+1)} A_m^{(1)}
-P_m(\cos\theta).
+    -\frac{i}{k_1}
+  \sum\limits_{m=0}^\infty (2m + 1)b_m P_m(\cos\theta).
 </span></p>
-<p>Using the phase identity for the outgoing-wave prefactor gives:</p>
+<p>The phase cancellation that produces the factor <span class="math inline">-i</span> is:</p>
 <p><span class="math display">
-  \begin{aligned}
-  \mathcal{f}(\theta) &amp;=
-    \frac{-i}{k_1}
-  \sum\limits_{m=0}^\infty (2m + 1)(-i)^{(m)} A_m^{(1)} P_m(\cos\theta),
-\\ &amp;=
-    \frac{-i}{k}
-  \sum\limits_{m=0}^\infty (2m + 1)A_m^{(1)} P_m(\cos\theta),
-  \end{aligned}
+  i^m(-i)^{m+1}
+  =(-i)(i\,{-i})^m
+  =-i.
 </span></p>
-<p>where the <span class="math inline">(-i)^m</span> term disappears
-since <span class="math inline">A_m^{(1)}</span> is defined to
-explicitly include it.</p>
 <p>In the backscattering direction where <span class="math inline">\theta = \pi</span>, the Legendre polynomials
 simplify to:</p>
 <p><span class="math display">
@@ -829,71 +760,50 @@ simplify to:</p>
 </span></p>
 <p>This gives the final linear scattering coefficient:</p>
 <p><span class="math display">
-  \mathcal{f}_\text{bs}(\theta = \pi) = -\frac{i}{k_1}
-\sum_{m=0}^{\infty} (2m+1) A_m^{(1)} (-1)^m.
+  \mathcal{f}_\text{bs} = -\frac{i}{k_1}
+  \sum_{m=0}^{\infty} (2m+1)b_m(-1)^m.
 </span></p>
-<p>This coefficient therefore defines the backscattering cross-section
-and target strength through <span class="citation">(<a href="#ref-MacLennan_2002">MacLennan et al. 2002</a>; <a href="#ref-Urick_1983">Urick 1983</a>; <a href="#ref-Simmonds_2005">Simmonds and MacLennan 2005</a>)</span>:</p>
+<p>The backscattering cross-section and target strength are then <span class="citation">(<a href="#ref-MacLennan_2002">MacLennan et al.
+2002</a>)</span>:</p>
 <p><span class="math display">
-  \sigma_\text{bs} = |\mathcal{f}_\text{bs}(\theta = \pi)|^2,
+  \sigma_\text{bs} = |\mathcal{f}_\text{bs}|^2,
   \quad
-  TS = 10\log_{10}\left(\sigma_\text{bs}\right).
+  TS = 10\log_{10}\left(\frac{\sigma_\text{bs}}{1\ \mathrm{m}^2}\right).
 </span></p>
 </div>
 <div class="section level2">
 <h2 id="limiting-cases-and-validation">Limiting cases and validation<a class="anchor" aria-label="anchor" href="#limiting-cases-and-validation"></a>
 </h2>
-<p>The ESSMS solution reduces to several classical limits. If the shell
-stiffness becomes very large, radial motion is suppressed and the
-response approaches the fixed-rigid boundary limit. If the shear modulus
-tends toward zero while the shell and interior properties are adjusted
-consistently, the model approaches an acoustic layered-sphere
-description rather than a fully elastic shell. When the shell becomes
-thin relative to the radius, Stanton (1990) gives simplified
-interpretations in which guided circumferential motion becomes more
-prominent. These limits are useful numerical checks because they test
-whether the matrix assembly, density ratios, and wavenumber bookkeeping
-have all been applied consistently.</p>
+<p>The solution provides several useful limits. Increasing shell
+stiffness suppresses radial motion and approaches a fixed-rigid
+boundary. If the shear modulus tends to zero while the remaining
+properties are adjusted consistently, the response approaches an
+acoustic layered sphere. Thin shells make guided circumferential motion
+more prominent <span class="citation">(<a href="#ref-Stanton_1990">Stanton 1990</a>)</span>. These limits test
+matrix assembly, density ratios, and wavenumber bookkeeping.</p>
 </div>
 <div class="section level2">
 <h2 id="circumferential-lamb-type-waves-and-shell-thickness">Circumferential (Lamb-type) waves and shell thickness<a class="anchor" aria-label="anchor" href="#circumferential-lamb-type-waves-and-shell-thickness"></a>
 </h2>
-<p>The ESSMS formulation does <strong>not</strong> introduce Lamb waves
-as separate entities. Instead, circumferential or guided-wave behavior
-is implicit in the elastic shell solution through the coupled
-longitudinal and transverse potentials and the shell boundary
-conditions. These guided waves arise when the shell supports standing or
-traveling circumferential motion that is phase matched to the incident
-field. In practice, they appear as modal resonances in <span class="math inline">A_m^{(1)}</span> and as sharp features in <span class="math inline">\mathcal{f}_\text{bs}</span>.</p>
-<p>The involvement of circumferential waves increases as the shell
-becomes thinner relative to its radius because thickness controls the
-spacing and strength of guided-wave branches. A convenient scaling
-parameter is the nondimensional thickness <span class="math inline">\tilde{\Delta} = (a-b)/a</span> or equivalently the
-ratio of thickness to wavelength in the shell, <span class="math inline">k_\ell(a-b)</span> and <span class="math inline">k_\tau(a-b)</span>. As <span class="math inline">\tilde{\Delta} \to 0</span>, the shell behaves more
-like a thin plate wrapped into a cylinder/sphere, and low-order
-circumferential wave families (often referred to as Lamb-type
-symmetric/antisymmetric modes in the plate limit) become more weakly
-damped and more strongly coupled to the acoustic field. As <span class="math inline">\tilde{\Delta}</span> increases, the shell supports
-a larger number of through-thickness elastic modes, which shifts the
-resonances and typically reduces the dominance of any single
-circumferential branch.</p>
-<p>In the ESSMS matrices, this thickness dependence is encoded entirely
-in the arguments <span class="math inline">k_\ell a</span>, <span class="math inline">k_\ell b</span>, <span class="math inline">k_\tau
-a</span>, and <span class="math inline">k_\tau b</span>, as well as in
-the stress continuity terms that couple radial and tangential motion.
-Therefore, any circumferential-wave effects are captured automatically
-by the modal system without introducing additional phenomenological
-terms.</p>
+<p>The ESSMS formulation does not add Lamb waves as separate terms.
+Circumferential or guided-wave behavior is already contained in the
+coupled longitudinal and transverse potentials. These waves appear as
+resonances in <span class="math inline">b_m</span> and as narrow
+features in <span class="math inline">\mathcal{f}_\text{bs}</span>.</p>
+<p>Thickness controls the spacing and strength of these branches. Useful
+nondimensional measures are <span class="math inline">\widetilde\Delta=(a-b)/a</span>, <span class="math inline">k_\ell(a-b)</span>, and <span class="math inline">k_\tau(a-b)</span>. In the thin-shell limit, the
+circumferential families are related to the symmetric and antisymmetric
+Lamb modes of a flat plate. Thicker shells admit more through-thickness
+structure and shift the modal resonances.</p>
+<p>The matrices encode this dependence through <span class="math inline">k_\ell a</span>, <span class="math inline">k_\ell
+b</span>, <span class="math inline">k_\tau a</span>, <span class="math inline">k_\tau b</span>, and the traction terms coupling
+radial and tangential motion. No separate phenomenological correction is
+required.</p>
 </div>
 <div class="section level2">
 <h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
 </h2>
 <div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-Faran_1951" class="csl-entry">
-Faran, James J. 1951. <span>“Sound Scattering by Solid Cylinders and
-Spheres.”</span> <em>The Journal of the Acoustical Society of
-America</em> 23 (4): 405–18. <a href="https://doi.org/10.1121/1.1906780" class="external-link">https://doi.org/10.1121/1.1906780</a>.
-</div>
 <div id="ref-Goodman_1962" class="csl-entry">
 Goodman, Ralph R., and Raya Stern. 1962. <span>“Reflection and
 Transmission of Sound by Elastic Spherical Shells.”</span> <em>The
@@ -909,10 +819,6 @@ Acoustics.”</span> <em>ICES Journal of Marine Science</em> 59 (2):
 Morse, Philip M., and K. Uno Ingard. 1968. <em>Theoretical
 Acoustics</em>. McGraw-Hill.
 </div>
-<div id="ref-Simmonds_2005" class="csl-entry">
-Simmonds, John, and David N. MacLennan. 2005. <em>Fisheries Acoustics:
-Theory and Practice</em>. 2nd ed. Blackwell Science. <a href="https://doi.org/10.1002/9780470995303" class="external-link">https://doi.org/10.1002/9780470995303</a>.
-</div>
 <div id="ref-Sommerfeld_1949" class="csl-entry">
 Sommerfeld, Arnold. 1949. <em>Partial Differential Equations in
 Physics</em>. Vol. 6. Lectures on Theoretical Physics. Academic Press.
@@ -921,10 +827,6 @@ Physics</em>. Vol. 6. Lectures on Theoretical Physics. Academic Press.
 Stanton, T. K. 1990. <span>“Sound Scattering by Spherical and Elongated
 Shelled Bodies.”</span> <em>The Journal of the Acoustical Society of
 America</em> 88 (3): 1619–33. <a href="https://doi.org/10.1121/1.400321" class="external-link">https://doi.org/10.1121/1.400321</a>.
-</div>
-<div id="ref-Urick_1983" class="csl-entry">
-Urick, Robert J. 1983. <em>Principles of Underwater Sound</em>. 3rd ed.
-McGraw-Hill.
 </div>
 </div>
 </div>

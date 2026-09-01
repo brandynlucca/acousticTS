@@ -7,11 +7,10 @@ Benchmarked Unvalidated
 [Overview](https://brandynlucca.github.io/acousticTS/articles/trcm/index.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/trcm/trcm-theory.md)
 
-These pages come from the high-frequency elongated-body literature and
-later fish and zooplankton applications ([Stanton et al.
-1993](#ref-Stanton_1993); [Stanton, Chu, and Wiebe
-1998](#ref-Stanton_1998_2); [Stanton, Chu, Wiebe, Martin, et al.
-1998](#ref-Stanton_1998_1)).
+TRCM implements the two-ray high-frequency approximation for elongated
+fluid-like targets ([Stanton et al. 1993](#ref-Stanton_1993); [Stanton,
+Chu, and Wiebe 1998](#ref-Stanton_1998_2); [Stanton, Chu, Wiebe, Martin,
+et al. 1998](#ref-Stanton_1998_1)).
 
 The acousticTS package uses object-based scatterers so the same
 implementation pattern carries across models: create a scatterer, run
@@ -192,11 +191,11 @@ uniformly bent weak-fluid cylinder setup discussed by Stanton
 ([1993](#ref-Stanton_1993)): `L/a = 10.5`, `rho_c/L = 1.5`,
 `g = 1.0357`, `h = 1.0279`, and `ka` spanning `0.1` to `10`.
 
-| Geometry | Implementation branch | Reference family | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | Elapsed (s) |
-|:---|:---|:---|---:|---:|---:|
-| Straight cylinder | Standard TRCM | Weakly scattering straight-cylinder benchmark | `23.76946` | `0.59807` | `0.00` |
-| Bent cylinder | Fresnel-integral branch (`stationary_phase = FALSE`) | FCMS-derived bent-cylinder reference from Stanton (1989, Eq. 25-26) | `10.39341` | `0.73244` | `0.05` |
-| Bent cylinder | Stationary-phase branch (`stationary_phase = TRUE`) | FCMS-derived bent-cylinder reference from Stanton (1989, Eq. 25-26) | `12.10080` | `1.41033` | `0.00` |
+| Geometry | Implementation branch | Reference family | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) |
+|:---|:---|:---|---:|---:|
+| Straight cylinder | Standard TRCM | Weakly scattering straight-cylinder benchmark | `23.76946` | `0.59807` |
+| Bent cylinder | Fresnel-integral branch (`stationary_phase = FALSE`) | FCMS-derived bent-cylinder reference from Stanton (1989, Eq. 25-26) | `10.39341` | `0.73244` |
+| Bent cylinder | Stationary-phase branch (`stationary_phase = TRUE`) | FCMS-derived bent-cylinder reference from Stanton (1989, Eq. 25-26) | `12.10080` | `1.41033` |
 
 This split separates the approximation structure cleanly. The
 straight-cylinder row checks the ordinary two-ray reduction against the

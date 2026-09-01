@@ -7,41 +7,38 @@ Unvalidated Experimental
 [Theory](https://brandynlucca.github.io/acousticTS/articles/ecms/ecms-theory.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/ecms/ecms-implementation.md)
 
-These pages sit between the classical elastic-cylinder literature and
-later finite-length cylinder approximations used in fisheries acoustics
-([Faran 1951](#ref-Faran_1951); [Stanton 1988](#ref-Stanton_1988)).
-
-The elastic cylinder modal series solution (`ECMS`) is the package’s
-solid elastic-cylinder family. It combines the phase-shift treatment of
-an infinite elastic circular cylinder with the usual finite-length
-coherence factor used near broadside.
+The elastic-cylinder modal-series model (`ECMS`) calculates
+near-broadside scattering from a finite solid elastic cylinder. It
+retains both longitudinal and shear waves in the solid.
 
 ### Core idea
 
-Represent the elastic interior by longitudinal and transverse
-cylindrical waves, determine the phase shifts induced by the boundary
-conditions, and apply the near-broadside finite-length coherence factor
-to recover monostatic backscatter.
+Solve the infinite circular elastic-cylinder interface through modal
+phase shifts, then apply a finite-length coherence factor. Uniform
+curvature can be represented by the corresponding Fresnel correction
+([Faran 1951](#ref-Faran_1951); [Stanton 1988](#ref-Stanton_1988)).
 
 ### Best for
 
-- Solid elastic finite cylinders near broadside
-- Backbone-like cylindrical structures where shear-wave support matters
-- Canonical elastic-cylinder benchmarks and component models
+- Straight or uniformly bent solid elastic cylinders near broadside
+- Backbone-like canonical components where shear-wave support matters
+- Elastic-cylinder reference and sensitivity calculations
 
 ### Supports
 
-- `ESS` or compatible elastic-cylinder scatterers
-- Longitudinal and transverse elastic wave speeds in the cylinder
-  interior
-- Straight and current bent broadside branches
+- Cylindrical `ESS` objects, with the elastic component stored in the
+  shell slot
+- Legacy cylindrical `FLS` geometry carriers for backward compatibility
+- User-supplied density and longitudinal and transverse elastic wave
+  speeds
 
 ### Main assumptions
 
-- Circular cylinder with homogeneous elastic properties
+- A homogeneous isotropic solid with circular cross-section
 - Broadside or near-broadside incidence
-- Finite-length treatment through a coherence factor rather than a fully
-  general 3D elastic solve
+- Finite length and uniform curvature represented through coherence
+  factors
+- No surrounding flesh-body coupling or arbitrary elastic geometry
 
 ### Validation status
 
@@ -52,10 +49,9 @@ to recover monostatic backscatter.
 ### Family pages
 
 - [Implementation](https://brandynlucca.github.io/acousticTS/articles/ecms/ecms-implementation.md):
-  object setup and current comparison workflow
+  supported objects, material inputs, output, and current checks
 - [Theory](https://brandynlucca.github.io/acousticTS/articles/ecms/ecms-theory.md):
-  elastic cylindrical potentials, phase shifts, and finite-length
-  closure
+  elastic potentials, phase shifts, and finite-length closure
 
 ## References
 

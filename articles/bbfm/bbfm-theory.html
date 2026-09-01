@@ -47,10 +47,9 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-physics-primer" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Physics Primer</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-physics-primer">
-<li><a class="dropdown-item" href="../../articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
-    <li><a class="dropdown-item" href="../../articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+<li><a class="dropdown-item" href="../../articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+    <li><a class="dropdown-item" href="../../articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
     <li><a class="dropdown-item" href="../../articles/boundary_conditions.html">Boundary conditions</a></li>
-    <li><a class="dropdown-item" href="../../articles/material-properties/material-properties.html">Material properties</a></li>
     <li><a class="dropdown-item" href="../../articles/numerical-foundations/numerical-foundations.html">Numerical methods</a></li>
   </ul>
 </li>
@@ -58,6 +57,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-build-targets" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Build Targets</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-build-targets">
 <li><a class="dropdown-item" href="../../articles/building-shapes/building-shapes.html">Building Shapes</a></li>
+    <li><a class="dropdown-item" href="../../articles/material-properties/material-properties.html">Material Properties</a></li>
     <li><a class="dropdown-item" href="../../articles/building-scatterers/building-scatterers.html">Building Scatterers</a></li>
     <li><a class="dropdown-item" href="../../articles/shape-manipulation-reforging/shape-manipulation-reforging.html">Shape Manipulation</a></li>
   </ul>
@@ -68,17 +68,15 @@
 <li><a class="dropdown-item" href="../../articles/running-models/running-models.html">Running Models</a></li>
     <li><a class="dropdown-item" href="../../articles/model-selection/model-selection.html">Choosing a Model</a></li>
     <li><a class="dropdown-item" href="../../articles/comparing-models/comparing-models.html">Comparing Models</a></li>
-    <li><a class="dropdown-item" href="../../articles/plotting-inspecting-results/plotting-inspecting-results.html">Visualizing results</a></li>
     <li><a class="dropdown-item" href="../../articles/simulation-parameter-sweeps/simulation-parameter-sweeps.html">Simulation sweeps</a></li>
-    <li><a class="dropdown-item" href="../../articles/calibration-workflow/calibration-workflow.html">Calibration workflow</a></li>
-    <li><a class="dropdown-item" href="../../articles/validation-benchmarks/validation-benchmarks.html">Validating models</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../../articles/model-library/model-library.html">Models</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-developers" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Developers</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-developers">
-<li><a class="dropdown-item" href="../../articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
+<li><a class="dropdown-item" href="../../articles/validation-benchmarks/validation-benchmarks.html">Validation methods</a></li>
+    <li><a class="dropdown-item" href="../../articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
     <li><a class="dropdown-item" href="../../articles/combining-components/combining-components.html">Combining components</a></li>
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
@@ -130,21 +128,13 @@
 <a class="model-nav-badge" href="bbfm-implementation.html">Implementation</a>
 </div>
 </div>
-<p>This family is best read alongside the swimbladder-less fish and
-composite-scatterer literature that motivates explicit flesh-body and
-backbone terms <span class="citation">(<a href="#ref-Gorska_2005">Gorska
-et al. 2005</a>; <a href="#ref-Stanton_1998_1">Stanton et al. 1998</a>;
-<a href="#ref-Clay_1994">Clay and Horne 1994</a>)</span>.</p>
-<p>The body-backbone fish model (<code>BBFM</code>) is a composite
-scattering family for swimbladder-less targets whose flesh body and
-backbone should remain explicit, separately parameterized contributors.
-The point of the model is not to solve a fully coupled three-medium
-boundary-value problem exactly. The point is to keep the two dominant
-anatomical components acoustically visible in one coherent backscatter
-calculation.</p>
-<p>That makes <code>BBFM</code> conceptually closer to the hybrid logic
-of <code>KRM</code> than to a single-region canonical modal
-solution:</p>
+<p>The body-backbone fish model (<code>BBFM</code>) represents a
+swimbladder-less fish as two explicit contributors: a weakly scattering
+flesh body and an elastic backbone. This separation is motivated by
+measurements and models in which skeletal scattering cannot be absorbed
+reliably into a homogeneous flesh contrast <span class="citation">(<a href="#ref-Gorska_2005">Gorska et al. 2005</a>; <a href="#ref-Stanton_1998_1">Stanton et al. 1998</a>)</span>.</p>
+<p>BBFM is a coherent component model rather than an exact three-medium
+boundary solution:</p>
 <ol style="list-style-type: decimal">
 <li>the flesh body is treated as a weakly scattering fluid-like
 region,</li>
@@ -153,8 +143,12 @@ and</li>
 <li>the two terms are embedded into one body-fixed frame through a phase
 translation before their complex amplitudes are summed.</li>
 </ol>
-<p>The result is a transparent composite model rather than a homogenized
-single-medium approximation.</p>
+<p>The complex amplitudes are combined before forming backscattering
+cross-section.</p>
+<div class="note" data-title="Shared conventions">
+<p>Medium indices and target-strength quantities follow <a href="../notation-and-symbols/notation-and-symbols.html">Notation and
+symbols</a>. The component approximations are developed on the <a href="../dwba/dwba-theory.html">DWBA theory</a> and <a href="../ecms/ecms-theory.html">ECMS theory</a> pages.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="geometry-and-medium-indexing">Geometry and medium indexing<a class="anchor" aria-label="anchor" href="#geometry-and-medium-indexing"></a>
@@ -184,11 +178,9 @@ explicit:</p>
 </span></p>
 <p>where <span class="math inline">c_{L,3}</span> and <span class="math inline">c_{T,3}</span> are the longitudinal and transverse
 wave speeds of the elastic backbone.</p>
-<p>The important approximation enters immediately here: the backbone
-term used here is not the exact solution for an elastic region
-<code>3</code> embedded inside flesh region <code>2</code>. Instead, it
-is a seawater-referenced elastic-cylinder surrogate that is then
-positioned inside the same body frame as the flesh solve.</p>
+<p>The backbone term is a seawater-referenced elastic-cylinder
+surrogate. It is not the exact solution for an elastic region 3 embedded
+in flesh region 2.</p>
 </div>
 <div class="section level2">
 <h2 id="flesh-body-contribution">Flesh-body contribution<a class="anchor" aria-label="anchor" href="#flesh-body-contribution"></a>
@@ -196,12 +188,11 @@ positioned inside the same body frame as the flesh solve.</p>
 <div class="section level3">
 <h3 id="weak-fluid-assumption">Weak-fluid assumption<a class="anchor" aria-label="anchor" href="#weak-fluid-assumption"></a>
 </h3>
-<p>The flesh component is treated as a weakly scattering fluid-like
-body. Its physics therefore follows the distorted-wave Born logic: the
-material contrasts relative to seawater are small enough that
-first-order scattering remains meaningful, while the body is still
-extended enough that phase accumulation along the body cannot be
-ignored.</p>
+<p>The flesh component follows the distorted-wave Born approximation.
+Material contrasts relative to seawater must be weak enough for
+first-order scattering, while the phase is retained across the extended
+body <span class="citation">(<a href="#ref-Chu_1999">Chu and Ye
+1999</a>)</span>.</p>
 <p>Using the same contrast notation as the <code>DWBA</code> theory
 page, the compressibility and density perturbations are:</p>
 <p><span class="math display">
@@ -232,11 +223,9 @@ schematically as:</p>
 <span class="math inline">\mathbf{k}_2</span> is the distorted interior
 propagation vector, and <span class="math inline">\beta</span> is the
 local angle between propagation direction and body tangent.</p>
-<p>For the elongated axisymmetric bodies used in practice, this is
-reduced to the usual one-dimensional <code>DWBA</code> body integral.
-The important point for <code>BBFM</code> is not the exact quadrature
-form, but the physical role of the term: it is the weak-fluid flesh-body
-amplitude.</p>
+<p>For an elongated axisymmetric body, analytic transverse integration
+reduces this volume expression to the one-dimensional DWBA body
+integral.</p>
 </div>
 </div>
 <div class="section level2">
@@ -271,10 +260,9 @@ backscattering amplitude may then be written schematically as:</p>
 <span class="math inline">\epsilon_m</span> is the usual Neumann factor,
 and <span class="math inline">\eta_m</span> collects the
 elastic-cylinder boundary-condition physics.</p>
-<p>This term is what distinguishes <code>BBFM</code> from a pure
-body-only weak-scattering model. The backbone is not just another
-contrast perturbation. It is an explicit elastic structure with its own
-internal wave-conversion physics.</p>
+<p>The backbone is therefore an elastic structure with
+longitudinal-to-transverse wave conversion, not another weak contrast
+perturbation.</p>
 </div>
 </div>
 <div class="section level2">
@@ -301,9 +289,8 @@ becomes:</p>
 <p>with <span class="math inline">(x_c, z_c)</span> the backbone
 centroid and <span class="math inline">\theta</span> the stored body
 angle.</p>
-<p>This is the step that embeds the backbone inside the same coordinate
-frame as the flesh solve. Without it, the model would implicitly assume
-that the flesh and backbone scatter from the same effective point.</p>
+<p>This translation prevents the two components from being treated as if
+they scattered from the same point.</p>
 </div>
 <div class="section level2">
 <h2 id="coherent-composite-amplitude">Coherent composite amplitude<a class="anchor" aria-label="anchor" href="#coherent-composite-amplitude"></a>
@@ -317,10 +304,8 @@ the total backscattering amplitude is:</p>
   \exp\!\left(2 i k_1
   \hat{\mathbf{q}}_{\mathrm{bs}}\cdot\mathbf{r}_c\right).
 </span></p>
-<p>This is the core <code>BBFM</code> statement. The family is coherent
-because it adds the two complex amplitudes before squaring.</p>
-<p>That distinction matters. If the model instead added cross-sections
-directly, all interference between flesh and backbone would be lost.</p>
+<p>Adding the amplitudes before squaring retains flesh-backbone
+interference.</p>
 </div>
 <div class="section level2">
 <h2 id="cross-section-and-interference-structure">Cross-section and interference structure<a class="anchor" aria-label="anchor" href="#cross-section-and-interference-structure"></a>
@@ -330,10 +315,11 @@ directly, all interference between flesh and backbone would be lost.</p>
   \sigma_{\mathrm{bs}} =
     \left|f_{\mathrm{bs}}^{(\mathrm{BBFM})}\right|^2,
 </span></p>
-<p>and the target strength is <span class="citation">(<a href="#ref-MacLennan_2002">MacLennan et al. 2002</a>; <a href="#ref-Urick_1983">Urick 1983</a>; <a href="#ref-Simmonds_2005">Simmonds and MacLennan 2005</a>)</span>:</p>
+<p>and the target strength is <span class="citation">(<a href="#ref-MacLennan_2002">MacLennan et al. 2002</a>)</span>:</p>
 <p><span class="math display">
   \mathrm{TS} =
-    10 \log_{10}\left(\sigma_{\mathrm{bs}}\right).
+    10 \log_{10}\left(\frac{\sigma_{\mathrm{bs}}}{1\
+\mathrm{m}^2}\right).
 </span></p>
 <p>Expanding the squared magnitude makes the composite physics
 explicit:</p>
@@ -378,33 +364,28 @@ body frame.</li>
 <li>anatomical variability in backbone placement across an
 ensemble.</li>
 </ol>
-<p>These omissions matter because they define exactly what
-<code>BBFM</code> is: a component-resolved coherent model, not a full
-coupled composite-wave solver.</p>
+<p>These omissions distinguish the component model from a fully coupled
+composite-wave solution.</p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="why-this-family-is-still-useful">Why this family is still useful<a class="anchor" aria-label="anchor" href="#why-this-family-is-still-useful"></a>
 </h2>
-<p>Even with those approximations, <code>BBFM</code> fills a real
-modeling gap. A swimbladder-less fish often has flesh that behaves
-broadly like a weakly scattering body and a backbone that is
-acoustically much stiffer than the surrounding tissue.</p>
-<p>Folding both of those into one effective region can hide the very
-mechanism one is trying to study. <code>BBFM</code> therefore earns its
-place not by being exact, but by keeping the dominant anatomical
-contributors explicit while preserving coherent interference between
-them.</p>
+<p>BBFM is useful when flesh is weakly scattering but the backbone is
+much stiffer than the surrounding tissue. Keeping the components
+separate exposes their individual amplitudes and their
+frequency-dependent interference.</p>
 </div>
 <div class="section level2">
 <h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
 </h2>
 <div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-Clay_1994" class="csl-entry">
-Clay, Clarence S., and John K. Horne. 1994. <span>“Acoustic Models of
-Fish: <span>The</span> <span>Atlantic</span> Cod (<em><span>Gadus</span>
-Morhua</em>).”</span> <em>The Journal of the Acoustical Society of
-America</em> 96 (3): 1661–68. <a href="https://doi.org/10.1121/1.410245" class="external-link">https://doi.org/10.1121/1.410245</a>.
+<div id="ref-Chu_1999" class="csl-entry">
+Chu, Dezhang, and Zhen Ye. 1999. <span>“A Phase-Compensated Distorted
+Wave <span>Born</span> Approximation Representation of the Bistatic
+Scattering by Weakly Scattering Objects: <span>Application</span> to
+Zooplankton.”</span> <em>The Journal of the Acoustical Society of
+America</em> 106 (4): 1732–43. <a href="https://doi.org/10.1121/1.428036" class="external-link">https://doi.org/10.1121/1.428036</a>.
 </div>
 <div id="ref-Gorska_2005" class="csl-entry">
 Gorska, Natalia, Egil Ona, and Rolf Korneliussen. 2005. <span>“Acoustic
@@ -419,20 +400,12 @@ Consistent Approach to Definitions and Symbols in Fisheries
 Acoustics.”</span> <em>ICES Journal of Marine Science</em> 59 (2):
 365–69. <a href="https://doi.org/10.1006/jmsc.2001.1158" class="external-link">https://doi.org/10.1006/jmsc.2001.1158</a>.
 </div>
-<div id="ref-Simmonds_2005" class="csl-entry">
-Simmonds, John, and David N. MacLennan. 2005. <em>Fisheries Acoustics:
-Theory and Practice</em>. 2nd ed. Blackwell Science. <a href="https://doi.org/10.1002/9780470995303" class="external-link">https://doi.org/10.1002/9780470995303</a>.
-</div>
 <div id="ref-Stanton_1998_1" class="csl-entry">
 Stanton, Timothy K., Dezhang Chu, Peter H. Wiebe, Linda V. Martin, and
 Robert L. Eastwood. 1998. <span>“Sound Scattering by Several Zooplankton
 Groups. <span>I</span>. <span>Experimental</span> Determination of
 Dominant Scattering Mechanisms.”</span> <em>The Journal of the
 Acoustical Society of America</em> 103 (1): 225–35. <a href="https://doi.org/10.1121/1.421469" class="external-link">https://doi.org/10.1121/1.421469</a>.
-</div>
-<div id="ref-Urick_1983" class="csl-entry">
-Urick, Robert J. 1983. <em>Principles of Underwater Sound</em>. 3rd ed.
-McGraw-Hill.
 </div>
 </div>
 </div>

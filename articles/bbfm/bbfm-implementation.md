@@ -7,10 +7,9 @@ Unvalidated Experimental
 [Overview](https://brandynlucca.github.io/acousticTS/articles/bbfm/index.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/bbfm/bbfm-theory.md)
 
-This family is best read alongside the swimbladder-less fish and
-composite-scatterer literature that motivates explicit flesh-body and
-backbone terms ([Gorska et al. 2005](#ref-Gorska_2005); [Stanton et al.
-1998](#ref-Stanton_1998_1); [Clay and Horne 1994](#ref-Clay_1994)).
+BBFM represents a swimbladder-less fish as separate flesh-body and
+backbone scatterers ([Gorska et al. 2005](#ref-Gorska_2005); [Stanton et
+al. 1998](#ref-Stanton_1998_1); [Clay and Horne 1994](#ref-Clay_1994)).
 
 The body-backbone fish model is available through
 `target_strength(..., model = "bbfm")`. It is intended for
@@ -18,8 +17,7 @@ swimbladder-less targets whose flesh body and backbone should remain
 acoustically explicit components rather than being collapsed into a
 single effective medium.
 
-In practice, `BBFM` is the package’s composite body-plus-backbone
-family:
+The implementation performs four operations:
 
 1.  the flesh body is evaluated with `DWBA`,
 2.  the backbone is evaluated with `ECMS`,
@@ -40,7 +38,7 @@ shared body frame. That is why the family is useful as a transparent
 composite scaffold, but it is also why it should not yet be read as a
 fully embedded elastic-backbone theory.
 
-## Why use `BBFM`?
+### When to use BBFM
 
 `BBFM` is useful when a swimbladder-less target is poorly described by
 either of the simpler extremes:
@@ -58,10 +56,10 @@ separately:
 - the backbone, which is much stiffer and behaves more like an internal
   elastic cylinder than like another weak fluid inclusion.
 
-That makes `BBFM` a natural intermediate model between a body-only
-approximation and a future fully coupled composite solver.
+BBFM therefore occupies the middle ground between a body-only
+approximation and a fully coupled composite solver.
 
-## Reference workflow
+### Reference workflow
 
 The recommended workflow is:
 
@@ -143,9 +141,9 @@ head(extract(bbf_object, "model")$BBFM)
     ## 5 -74.65936   -88.25087 -73.00987
     ## 6 -72.87706   -86.42593 -71.22018
 
-## Example outputs
+### Example outputs
 
-### Shape geometry
+#### Shape geometry
 
 The shape plot below shows the body-plus-backbone composite geometry
 used by the reference example. The important point is that the backbone
@@ -157,7 +155,7 @@ region.
 and the shorter internal backbone cylinder offset along the body
 axis.](bbfm-shape-plot.png)
 
-### Composite spectrum
+#### Composite spectrum
 
 This spectrum shows the stored `BBFM` output for the same reference
 target. The composite `TS` is plotted together with the component-level
@@ -169,7 +167,7 @@ together with the flesh-body and backbone component curves and the
 residual from the explicit reconstruction
 check.](bbfm-example-spectrum.png)
 
-## Stored model outputs
+### Stored model outputs
 
 The `BBFM` output table keeps the component bookkeeping explicit instead
 of returning only a final `TS` column.
@@ -190,12 +188,10 @@ of returning only a final `TS` column.
 | `TS_backbone` | Backbone target strength |
 | `TS` | Total composite target strength |
 
-Those columns make it possible to inspect not just the final spectrum,
-but also which part of the result comes from the body, which part comes
-from the backbone, and how much of the composite behavior is due to
-coherent interference between them.
+These columns separate the two component responses from their coherent
+sum.
 
-## Internal consistency check
+### Internal consistency check
 
 The first validation step for `BBFM` is to confirm that the stored
 composite result equals the component-wise reconstruction implied by the
@@ -292,7 +288,7 @@ floating-point noise. That does not replace an external benchmark, but
 it does verify that the family is carrying out the coherent composite
 sum it claims to perform.
 
-## How to interpret the result
+### Interpreting the result
 
 The most important interpretive point is that the final `TS` curve is
 not just the arithmetic sum of `TS_body` and `TS_backbone`. The model
@@ -310,11 +306,10 @@ That means the total `TS` can be:
 - smaller than the linear sum of the component cross-sections when the
   phases interfere destructively.
 
-This is exactly why `BBFM` is useful. It preserves the anatomy-specific
-components while still letting them interfere coherently in one stored
-body frame.
+BBFM preserves the anatomy-specific components while allowing them to
+interfere coherently in one stored body frame.
 
-## Scope
+### Scope
 
 `BBFM` should be interpreted as:
 
@@ -324,10 +319,9 @@ body frame.
 - a first-order coherent combination model rather than a fully coupled
   multi-region boundary-value solve.
 
-So the implementation answers the bookkeeping question clearly:
-acousticTS can construct, evaluate, and inspect this composite family in
-a transparent way. The remaining open work is external benchmarking and,
-later, more tightly coupled composite physics.
+The current implementation provides reproducible component bookkeeping
+and an explicit reconstruction check. External benchmarking and a fully
+coupled body-backbone treatment remain open work.
 
 ## References
 

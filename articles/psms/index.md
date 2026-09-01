@@ -7,43 +7,37 @@ Benchmarked Validated
 [Theory](https://brandynlucca.github.io/acousticTS/articles/psms/psms-theory.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/psms/psms-implementation.md)
 
-These pages are rooted in exact spheroidal-coordinate separations and
-later fisheries-acoustics use of prolate-spheroid models ([Spence and
-Granger 1951](#ref-Spence_1951); [Furusawa 1988](#ref-Furusawa_1988)).
-
-The prolate spheroidal modal series solution (`PSMS`) is the exact
-single-target modal family for homogeneous prolate spheroids. It is the
-spheroidal analogue of spherical partial-wave theory and the natural
-exact reference for elongated canonical bodies whose surface follows a
-prolate spheroid.
+The prolate-spheroidal modal-series solution (`PSMS`) calculates
+scattering from a homogeneous prolate spheroid. It is the
+geometry-matched reference for smooth elongated canonical targets.
 
 ### Core idea
 
 Separate the Helmholtz equation in prolate spheroidal coordinates,
-expand the incident, scattered, and interior fields in spheroidal wave
-functions, and solve the retained boundary systems order by order.
+expand the fields in angular and radial spheroidal wave functions, and
+solve the retained boundary system ([Spence and Granger
+1951](#ref-Spence_1951); [Furusawa 1988](#ref-Furusawa_1988)).
 
 ### Best for
 
-- Rigid, pressure-release, liquid-filled, and gas-filled prolate
+- Fixed-rigid, pressure-release, liquid-filled, or gas-filled prolate
   spheroids
 - Canonical elongated-body benchmarks
-- Validating prolate branches of more general methods such as `TMM`
+- Reference comparisons for the prolate branch of `TMM`
 
 ### Supports
 
-- `ProlateSpheroid` shapes on `FLS` or `GAS` objects
-- Exact monostatic target strength for homogeneous single-region
-  spheroids
-- Spheroidal modal solutions in which medium `1` is seawater and medium
-  `2` is the spheroid interior
+- `ProlateSpheroid` shapes carried by `FLS` or `GAS` scatterers
+- Broadside and oblique monostatic calculations with explicit roll angle
+- Configurable truncation, integration, adaptive evaluation, and
+  numerical precision
 
 ### Main assumptions
 
-- Perfect prolate spheroidal geometry
-- Homogeneous interior region
-- Linear, time-harmonic acoustics
-- No shell or internal secondary component
+- An exact prolate-spheroidal outer boundary
+- One homogeneous interior region
+- Linear time-harmonic acoustics
+- No shell, secondary component, or arbitrary body profile
 
 ### Validation status
 
@@ -55,9 +49,9 @@ functions, and solve the retained boundary systems order by order.
 ### Family pages
 
 - [Implementation](https://brandynlucca.github.io/acousticTS/articles/psms/psms-implementation.md):
-  workflows, comparisons, and timing tables
+  supported branches, numerical controls, output, and benchmarks
 - [Theory](https://brandynlucca.github.io/acousticTS/articles/psms/psms-theory.md):
-  full spheroidal-coordinate derivation and retained modal systems
+  spheroidal coordinates, wave functions, and boundary systems
 
 ## References
 

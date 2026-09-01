@@ -8,20 +8,18 @@ Validated Experimental
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/pcdwba/pcdwba-implementation.md)
 
 The phase-compensated distorted wave Born approximation (`PCDWBA`)
-extends the ordinary `DWBA` to elongated bodies whose centerlines are
-curved rather than straight ([Chu and Ye 1999](#ref-Chu_1999); [Stanton
-1989](#ref-Stanton_1989_2)). It preserves the same weak-scattering local
-kernel used for slender fluid-like bodies, but it replaces the
-straight-body phase bookkeeping by a centerline-dependent phase that
-follows the bent geometry explicitly.
+applies a weak-scattering, slender-body kernel along a curved centerline
+([Chu and Ye 1999](#ref-Chu_1999)). Its distinguishing term is the
+two-way phase evaluated on the curved geometry.
 
-The family therefore sits conceptually between two extremes: it is more
-physical than treating a curved body as if it were straight, but it
-remains a Born-type perturbation model rather than a full curved-body
-boundary-value solution.
+It remains a first-order Born approximation, not an exact
+curved-boundary solution.
 
-The notation below follows the shared package conventions: medium `1` is
-the surrounding seawater and medium `2` is the weakly scattering body.
+Medium indices follow [Notation and
+symbols](https://brandynlucca.github.io/acousticTS/articles/notation-and-symbols/notation-and-symbols.md).
+The weak-contrast derivation and straight-centerline limit are given in
+[DWBA
+theory](https://brandynlucca.github.io/acousticTS/articles/dwba/dwba-theory.md).
 
 ## Weak-scattering starting point
 
@@ -66,20 +64,15 @@ Let s denote arc length along the body centerline and let
 \mathbf{r}\_c(s) denote the corresponding centerline position. The local
 body radius is a(s), and the local tangent angle is \beta(s).
 
-For a uniformly bent canonical body, the centerline is wrapped around an
-osculating circle of radius \rho_c, with curvature \kappa = 1/\rho_c. A
-taper function may also scale the local radius toward the ends, but that
-taper only changes the local cross-sectional factor; it does not alter
-the phase logic that motivates `PCDWBA`.
+For a uniformly bent body, the centerline follows a circle of radius
+\rho_c and curvature \kappa=1/\rho_c. A taper changes a(s) but not the
+form of the centerline phase.
 
 ### Why curvature matters
 
-In a straight-body `DWBA`, the two-way phase factor depends only on the
-axial position along a straight line. Once the body bends, two points
-with the same arc-length separation no longer have the same projection
-onto the incident or receive directions. That means a curved target
-cannot be described correctly by the same straight-axis phase term
-unless the curvature is negligible.
+For a curved body, arc-length separation and projected separation are
+not the same. Contributions that would have a linear phase on a straight
+axis therefore acquire a nonlinear phase.
 
 ## Local cylindrical reduction
 
@@ -106,20 +99,19 @@ After the local cross-sectional reduction, the scattered field becomes a
 centerline integral. In monostatic form, the backscattering amplitude
 can be written schematically as:
 
-f\_{\mathrm{bs}} \propto \int\_{-L/2}^{L/2} C\_{21}(s) \left(\frac{k_2
-a(s)}{1}\right)^2 \frac{J_1\\\left(2 k_2 a(s)\\ \chi(s)\right)} {2 k_2
-a(s)\\ \chi(s)} \exp\\\left\[ 2 i k_1 \hat{\mathbf{q}}\cdot
+f\_{\mathrm{bs}} \propto \int\_{-L/2}^{L/2} C\_{21}(s) \left(k_2
+a(s)\right)^2 \frac{J_1\\\left(2 k_2 a(s)\\ \chi(s)\right)} {2 k_2
+a(s)\\ \chi(s)} \exp\\\left\[ 2 i k_2 \hat{\mathbf{q}}\cdot
 \mathbf{r}\_c(s) \right\] ds,
 
 where \hat{\mathbf{q}} denotes the backscatter direction.
 
-The crucial ingredient is the phase factor:
+The phase-compensation factor is:
 
-\exp\\\left\[ 2 i k_1 \hat{\mathbf{q}}\cdot \mathbf{r}\_c(s) \right\].
+\exp\\\left\[ 2 i k_2 \hat{\mathbf{q}}\cdot \mathbf{r}\_c(s) \right\].
 
-This is what makes the model phase compensated: the phase is evaluated
-on the actual curved centerline rather than on a fictitiously straight
-axis.
+The actual curved centerline replaces the straight-axis phase
+approximation.
 
 ### Discrete form
 
@@ -127,15 +119,13 @@ In segmented form, the same model appears as:
 
 f\_{\mathrm{bs}} \propto \sum_j C\_{21,j} \left(k_2 a_j\right)^2
 \frac{J_1\\\left(2 k_2 a_j \chi_j\right)} {2 k_2 a_j \chi_j}
-\exp\\\left\[ 2 i k_1 \hat{\mathbf{q}}\cdot \mathbf{r}\_{c,j} \right\]
+\exp\\\left\[ 2 i k_2 \hat{\mathbf{q}}\cdot \mathbf{r}\_{c,j} \right\]
 \Delta s_j,
 
 where the index j labels body segments and \Delta s_j is the local
 centerline spacing.
 
-This is the form most directly useful for irregular profiles, because it
-treats curvature, taper, and segment spacing in the same
-centerline-aligned framework.
+This form accommodates a varying radius, curvature, and segment spacing.
 
 ## Relation to straight `DWBA`
 
@@ -143,22 +133,18 @@ If the centerline becomes straight, then \mathbf{r}\_c(s) reduces to a
 linear function of s and the phase-compensated expression collapses to
 the ordinary straight-body `DWBA`.
 
-That limiting behavior is important physically: `DWBA` is the
-straight-axis weak-scattering limit, while `PCDWBA` is the curved-axis
-weak-scattering extension.
-
-The two models therefore differ in phase bookkeeping, not in the local
-cross-sectional contrast physics.
+Thus the two models share their local contrast kernel and differ in
+geometric phase bookkeeping.
 
 ## Backscatter and target strength
 
 Once the complex backscattering amplitude has been assembled from the
-curved centerline sum, the standard monostatic outputs are ([MacLennan
-et al. 2002](#ref-MacLennan_2002); [Urick 1983](#ref-Urick_1983);
-[Simmonds and MacLennan 2005](#ref-Simmonds_2005)):
+curved centerline sum, the monostatic outputs are ([MacLennan et al.
+2002](#ref-MacLennan_2002)):
 
 \sigma\_{\mathrm{bs}} = \left\|f\_{\mathrm{bs}}\right\|^2, \qquad
-\mathrm{TS} = 10 \log\_{10}\left(\sigma\_{\mathrm{bs}}\right).
+\mathrm{TS} = 10 \log\_{10}\left( \frac{\sigma\_{\mathrm{bs}}}{1\\
+\mathrm{m}^2}\right).
 
 No new reporting convention is introduced by the curvature correction.
 The change is entirely in the underlying phase-sensitive amplitude.
@@ -175,10 +161,8 @@ The change is entirely in the underlying phase-sensitive amplitude.
 5.  the target is described meaningfully by a centerline and local
     radius profile.
 
-That is why `PCDWBA` should be read as a curved-body extension of
-`DWBA`, not as a new exact geometry family. Its main purpose is to keep
-the part of the physics that `DWBA` misses first when the body bends:
-the geometry-dependent coherent phase.
+These assumptions make PCDWBA a curved-axis extension of DWBA. Its
+additional physics is the geometry-dependent coherent phase.
 
 ## References
 
@@ -192,14 +176,3 @@ MacLennan, David N., Percy G. Fernandes, and John Dalen. 2002. “A
 Consistent Approach to Definitions and Symbols in Fisheries Acoustics.”
 *ICES Journal of Marine Science* 59 (2): 365–69.
 <https://doi.org/10.1006/jmsc.2001.1158>.
-
-Simmonds, John, and David N. MacLennan. 2005. *Fisheries Acoustics:
-Theory and Practice*. 2nd ed. Blackwell Science.
-<https://doi.org/10.1002/9780470995303>.
-
-Stanton, T. K. 1989. “Sound Scattering by Cylinders of Finite Length.
-III. Deformed Cylinders.” *The Journal of the Acoustical Society of
-America* 86 (2): 691–705. <https://doi.org/10.1121/1.398193>.
-
-Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed.
-McGraw-Hill.

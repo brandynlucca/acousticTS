@@ -1,4 +1,4 @@
-# Target strength for a calibration sphere
+# SOEMS theory for a solid calibration sphere
 
 ## Introduction
 
@@ -7,28 +7,23 @@ Benchmarked Validated
 [Overview](https://brandynlucca.github.io/acousticTS/articles/calibration/index.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/calibration/calibration-implementation.md)
 
-Echosounders are commonly calibrated with standard targets whose
-acoustic response is strong, repeatable, and sufficiently well
-understood that the backscattering level can be predicted independently
-of the instrument being calibrated ([Foote 1990](#ref-Foote_1990);
-[Demer et al. 2015](#ref-Demer_2015)). In fisheries and ocean-acoustics
-work, that standard target is often a tungsten carbide sphere, although
-aluminum, steel, brass, and copper spheres are also used in some
-settings ([Foote 1982](#ref-Foote_1982); [Hickling
-1962](#ref-Hickling_1962); [MacLennan 1981](#ref-Maclennan_1981)). The
-reason a solid sphere is so useful is not only that it is mechanically
-robust. It is also one of the few practically important targets for
-which the full elastic scattering problem remains separable in spherical
-coordinates.
+Standard-target calibration uses a target whose backscatter can be
+predicted independently of the echosounder ([Foote
+1990](#ref-Foote_1990); [Demer et al. 2015](#ref-Demer_2015)). Tungsten
+carbide spheres are common in fisheries acoustics, while copper,
+aluminum, steel, and other elastic solids are used for particular
+frequency ranges and calibration requirements ([Foote
+1982](#ref-Foote_1982); [MacLennan 1981](#ref-Maclennan_1981)).
 
-For a calibration sphere, the surrounding medium supports an acoustic
-pressure field, while the sphere interior supports both compressional
-and shear motion. The scattering problem therefore differs fundamentally
-from a fluid-filled or rigid sphere problem. The exterior field must be
-matched to an elastic interior rather than to a single scalar potential.
-That coupling is what gives the calibration target its characteristic
-resonance structure and why the material properties of the sphere matter
-so strongly.
+The surrounding fluid supports acoustic pressure, while the solid
+supports longitudinal and shear motion. Matching those fields at a
+spherical interface produces the elastic resonances used in the `SOEMS`
+calculation ([Hickling 1962](#ref-Hickling_1962)).
+
+Symbols and medium indexing follow [Notation and
+Symbols](https://brandynlucca.github.io/acousticTS/articles/notation-and-symbols/notation-and-symbols.md).
+Material inputs for calibration standards are covered in [Material
+Properties](https://brandynlucca.github.io/acousticTS/articles/material-properties/material-properties.md).
 
 ## Governing fields
 
@@ -37,10 +32,9 @@ In the surrounding fluid, the acoustic pressure field, p(\mathbf{x},
 
 \nabla^2p + k^2\_{1}p = 0,
 
-where \omega is the angular frequency, \mathbf{x} = (r, \theta, \varphi)
-is the position vector in spherical coordinates, c_1 is the fluid sound
-speed, and k_1 = \frac{\omega}{c_1} is the acoustic wavenumber. The
-gradient, \nabla, is the vector differential operator defined by:
+where \omega is angular frequency, \mathbf{x}=(r,\theta,\varphi) is
+position in spherical coordinates, c_1 is the exterior sound speed, and
+k_1=\omega/c_1. In Cartesian components, the gradient is:
 
 \nabla = \left( \frac{\partial}{\partial x} , \frac{\partial}{\partial
 y} , \frac{\partial}{\partial z} \right).
@@ -55,7 +49,7 @@ where \lambda and \mu are the Lamé elastic constants and \rho_2 is the
 sphere density. The elastic field is then decomposed into compressional
 and shear potentials:
 
-\mathbf{u} = \nabla \phi + \nabla \times \mathbf{\Psi},
+\mathbf{u} = \nabla \phi + \nabla \times \mathbf{\Psi}.
 
 After that decomposition, the interior problem separates into two
 Helmholtz equations:
@@ -63,20 +57,19 @@ Helmholtz equations:
 \nabla^2 \phi + k\_\ell^2 \phi = 0, \qquad \nabla^2 \mathbf{\Psi} +
 k\_\tau^2 \mathbf{\Psi} = 0,
 
-where k\_\ell and k\_\tau are the longitudinal and transverse
-wavenumbers, respectively. The key point is that the sphere supports two
-distinct elastic wave families internally, and both must satisfy the
-boundary conditions at the fluid-solid interface.
+where k\_\ell=\omega/c\_\ell and k\_\tau=\omega/c\_\tau are the
+longitudinal and transverse wavenumbers. Both potentials contribute to
+the fluid-solid interface conditions ([Achenbach
+1973](#ref-Achenbach_1973)).
 
-### Separability of the Hemholtz equation in spherical coordinates
+### Separability of the Helmholtz equation in spherical coordinates
 
 Because the geometry is spherical, the exterior and interior Helmholtz
-equations are separable in spherical coordinates ([Achenbach
-1973](#ref-Achenbach_1973)). For a sphere centered at the origin, the
-Hemholtz equation provides solutions that can be written as products of
+equations are separable in spherical coordinates. For a sphere centered
+at the origin, their solutions can be written as products of
 single-variable functions:
 
-\psi(r, \theta, \varphi) = R(r) \Theta(\theta) \mathbf{\Phi}(\varphi).
+\psi(r, \theta, \varphi) = R(r) \Theta(\theta) \Phi(\varphi).
 
 This separation leads to angular eigenfunctions that are spherical
 harmonics, \mathcal{Y}^n_m(\theta, \varphi), and radial functions that
@@ -112,30 +105,27 @@ boundary conditions at surface r = a decouple by angular order:
 where a is the sphere radius. The boundary conditions then enforce:
 
 \begin{aligned} \mathbf{u}\_2(r) &= \mathbf{u}\_1(r) ~ \text{(continuity
-of normal displacement)} , \\ \sigma_2(rr) &= -p_1 ~ \text{(continuity
-of normal stress)} , \\ \sigma_2(r\theta) &= 0 ~ \text{(zero tangential
-stress)} , \end{aligned}
+of normal displacement)} , \\ \sigma\_{rr}^{(2)} &= -p_1 ~
+\text{(continuity of normal stress)} , \\ \sigma\_{r\theta}^{(2)} &= 0 ~
+\text{(zero tangential stress)} , \end{aligned}
 
-where \sigma denotes the Cauchy stress tensor describing internal forces
-in the solid, \sigma_2(rr) is its component along the radial direction
-in spherical coordinates (i.e., the normal stress on a spherical
-surface), and \sigma_2(r \theta) is the shear stress along the polar
-direction \theta of the sphere.
+where \sigma\_{rr}^{(2)} is the normal solid traction and
+\sigma\_{r\theta}^{(2)} is its tangential component.
 
-This model incorporates compressional and shear waves within the
-calibration sphere alongside the boundary conditions at the
-sphere-medium interface to compute the far-field acoustic backscatter.
-Since the full elastodynamic scattering problem is separable for an
-elastic sphere immersed in a fluid, the natural eigenfunctions are
-spherical harmonics. These boundary conditions can then be projected
-onto the basis of Legendre polynomials due to the assumed orthogonality
-whereby each angular mode n interacts only with itself. Thus:
+For axisymmetric incidence, write the exterior pressure as the known
+incident field plus an outgoing modal expansion:
+
+p_1(r,\theta) = p\_{\mathrm{inc}}(r,\theta) +
+P_0\sum\_{m=0}^{\infty}(2m+1)i^m B_m h_m^{(1)}(k_1r)P_m(\cos\theta).
+
+Projecting each interface condition onto the Legendre basis gives:
 
 \int\limits\_{-1}^1 P_m(\cos \theta)\underbrace{(\text{boundary
 condition})}\_{\text{function of }\theta} d(\cos \theta),
 
-where h_m^{(1)} is the outgoing spherical Hankel function and B_m is the
-scattering coefficient for mode m.
+where orthogonality removes contributions from every degree other than
+the projected degree. Here h_m^{(1)} is the outgoing spherical Hankel
+function and B_m is its scattering coefficient.
 
 The interior elastic potentials are expanded with regular spherical
 Bessel functions:
@@ -172,13 +162,13 @@ field and material properties.
 
 ### Far-field scattering
 
-For a plane wave incident along polar coordinate z, the acoustic
-pressure is expressed as ([Hickling 1962](#ref-Hickling_1962)):
+Place a point source at r_0 on the negative polar axis. Its field admits
+the addition-theorem expansion ([Hickling 1962](#ref-Hickling_1962)):
 
 \begin{aligned} p\_\text{inc}(r, \theta) &= P_0 \frac{e^{-i k_1
 \mathcal{D}}}{\mathcal{D}} \\ &= ik_1 P_0 \sum\limits\_{m=0}^\infty
-(2m + 1) (-1)^n j_m(k_1r) h_m(k_1 r_0) P_m(\cos \theta), \quad (0 \< r
-\< r_0), \end{aligned}
+(2m + 1) (-1)^m j_m(k_1r) h_m^{(1)}(k_1 r_0) P_m(\cos \theta), \quad (0
+\< r \< r_0), \end{aligned}
 
 where k_1 = \omega / c_1 is the acoustic wavenumber in the surrounding
 fluid, P_0 is the incident pressure amplitude, and the function
@@ -193,10 +183,9 @@ the field point. The source is taken to lie along the negative z-axis.
 The quantity \mathcal{D} therefore represents the distance between the
 source and the field point.
 
-::: {.note data-title=“Note on notation”} This expression represents a
-spherical wave emanating from a point source and is used as an
-intermediate step to derive the plane-wave representation in the
-far-field limit. :::
+This spherical source is an intermediate construction. Moving it to the
+far field while holding its incident amplitude fixed produces the plane
+wave used by `SOEMS`.
 
 Using the spherical-wave addition theorem, the incident field can be
 expanded as: p\_\text{inc}(r, \theta) = i k_1 P_0
@@ -219,17 +208,15 @@ which has the standard plane-wave expansion:
 p\_\text{inc}(r, \theta) = P_0 \sum\limits\_{m=0}^\infty (2m + 1) i^m
 j_m(k_1 r) P_m(\cos \theta).
 
-where \mathcal{D} represents the additive effect of r and stress
-components, i is an imaginary number (i=\sqrt{-1}), and P_0 is the
-amplitude of pressure in the incident wave. In the far-field, r \to
-\infty which means that the asymptotic forms of the Hankel function and
-\frac{e^{-i k_1 \mathcal{D}}}{\mathcal{D}} term can be used:
+The same limit can be shown by collecting the two asymptotic relations.
+Here \mathcal D remains the source-to-field distance, i=\sqrt{-1}, and
+P_0 is the incident pressure amplitude:
 
 \begin{aligned} \frac{e^{-i k_1 \mathcal{D}}}{\mathcal{D}} &\sim e^{ik_1
 r_0} \frac{e^{i k_1 r \cos \theta}}{r_0}, \\ h_m^{(1)}(k_1r_0) &\sim
 (-i)^{m+1} \frac{e^{i k_1 r_0}}{k_1r_0}. \end{aligned}
 
-These limits consequently simplify p\_\text{inc} to:
+They reproduce the plane-wave limit and its partial-wave expansion:
 
 \begin{aligned} p\_\text{inc}(r, \theta) &= P_0 e^{ik_1 r \cos \theta}
 \\ &= P_0 \sum\limits\_{m=0}^\infty (2m + 1) i^m j_m(k_1 r) P_m(\cos
@@ -273,25 +260,27 @@ where \alpha_m, \beta_m, and \delta_m are the scattering phase-angles,
 and \Phi_m is the boundary impedance phase-angle. These angles are
 defined as: \begin{aligned} \delta_m(k_1a) &= \tan^{-1} \left\[
 \frac{-j_m(k_1a)}{y_m(k_1a)} \right\] ,\\ \alpha_m(k_1a) &= \tan^{-1}
-\left\[ \frac{-k_1 a ~j^\prime_m(k_1a)}{y_m(k_1a)} \right\] ,\\
+\left\[ \frac{-k_1 a ~j^\prime_m(k_1a)}{j_m(k_1a)} \right\] ,\\
 \beta_m(k_1a) &= \tan^{-1} \left\[ \frac{-k_1 a
 ~y^\prime_m(k_1a)}{y_m(k_1a)} \right\] , \\ \tan \Phi_m &=
 -\frac{\rho_1}{\rho_2} \tan \zeta_m(k\_\ell a, \sigma), \end{aligned}
 
-where \zeta_m(k\_\ell a, \sigma) is the boundary-impedance phase angle
+where \zeta_m(k\_\ell a,\sigma) is the boundary-impedance phase angle
 induced by the elastic interior ([Faran 1951](#ref-Faran_1951)). Once
-obtained, B_m is: B_m = k_1 (-1)^m (2m + 1) h_m^{(1)}(k_1 r_0) \sin
-\eta_m e^{-i \eta_m}.
+\eta_m is known, the source-normalized modal coefficient is:
 
-By imposing Neumann boundary conditions at the sphere’s surface (i.e., a
-hard or rigid boundary), then the form function can be derived:
+B_m = k_1 (-1)^m (2m + 1) h_m^{(1)}(k_1 r_0) \sin \eta_m e^{-i \eta_m}.
+
+With the finite-range phase convention used in this derivation, the
+corresponding intermediate form function is:
 
 \mathcal{f}\_\infty(k_1 a) = -2 \frac{k_1 r}{k_1 a} e^{i k_1 r}
 \sum\limits\_{m=0}^\infty (-i)^{m+1} h_m^{(2)}(k_1 r) (-1)^m (2m + 1)
 \sin \eta_m e^{i \eta_m}.
 
-This can be further simplified to derive the far-field expression in the
-backscattering direction in the far-field limit r \to \infty:
+Applying the radial far-field asymptotic and selecting the
+backscattering direction gives the dimensionless backscattering form
+function:
 
 \mathcal{f}\_\text{bs}(k_1 a) = -\frac{2}{k_1a}
 \sum\limits\_{m=0}^\infty (-1)^m (2m + 1) \sin \eta_m e^{i \eta_m}.
@@ -303,19 +292,26 @@ over those lagged partial waves.
 
 ## Backscattering length, cross-section, and target strength
 
-The associated backscattering cross-section is:
+Calibration literature often first defines the scattering cross-section
+from the dimensionless form function \mathcal f\_{\mathrm{bs}}:
 
-\sigma\_{\mathrm{bs}} = \pi a^2 \|f\_{\mathrm{bs}}\|^2.
+\sigma_s = \pi a^2 \|\mathcal f\_{\mathrm{bs}}\|^2.
 
-Target strength is then reported as ([MacLennan
-1981](#ref-Maclennan_1981)):
+The package stores the dimensional backscattering length and its
+associated backscattering cross-section:
 
-\mathit{TS} = 10 \log\_{10} \frac{\sigma\_{\mathrm{bs}}}{4 \pi}.
+f\_{\mathrm{bs}} = \frac{a}{2}\mathcal f\_{\mathrm{bs}}, \qquad
+\sigma\_{\mathrm{bs}} = \|f\_{\mathrm{bs}}\|^2 = \frac{a^2}{4}\|\mathcal
+f\_{\mathrm{bs}}\|^2 = \frac{\sigma_s}{4\pi}.
 
-This normalization is important because calibration references are
-sometimes written in terms of a dimensionless form function and
-sometimes in terms of a dimensional backscattering length. Those
-descriptions are compatible, but only if the rescaling is made explicit.
+Target strength is therefore ([MacLennan 1981](#ref-Maclennan_1981)):
+
+\mathit{TS} = 10 \log\_{10} \left(\frac{\sigma\_{\mathrm{bs}}}{1\\
+\mathrm{m}^2}\right).
+
+Thus the calibration convention \sigma_s/(4\pi) and the package
+convention \|f\_{\mathrm{bs}}\|^2 are identical after the form-function
+scaling is made explicit.
 
 ![Calibration sphere modal bookkeeping from partial waves to reported
 backscatter quantities.](calibration-modal-bookkeeping.png)
@@ -328,6 +324,15 @@ is decomposed into modal terms, each mode acquires an elastic phase
 shift at the sphere surface, the far-field series is summed, and the
 final result is reported as a linear backscattering length, a
 backscattering cross-section, and target strength.
+
+## Mathematical assumptions
+
+The SOEMS derivation assumes a homogeneous, isotropic, linearly elastic
+sphere in a homogeneous inviscid fluid. The interface is perfectly
+spherical, the material properties are frequency independent unless
+supplied otherwise, and the reported amplitude is a far-field quantity.
+Numerical evaluation also requires enough partial waves to resolve the
+largest retained acoustic size.
 
 ## References
 

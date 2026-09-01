@@ -7,42 +7,38 @@ Benchmarked Validated
 [Theory](https://brandynlucca.github.io/acousticTS/articles/dwba/dwba-theory.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/dwba/dwba-implementation.md)
 
-These pages follow the weak-scattering elongated-body formulation and
-later applied fisheries-acoustics usage of the distorted-wave Born
-approximation ([Morse and Ingard 1968](#ref-Morse_1968); [Chu et al.
-1993](#ref-Chu_1993); [Stanton et al. 1998](#ref-Stanton_1998_2)).
-
-The distorted wave Born approximation (`DWBA`) is the package’s main
-weak-scattering fluid-body model for elongated targets that are no
-longer well represented by a single canonical sphere, cylinder, or
-spheroid.
+The distorted-wave Born approximation (`DWBA`) calculates monostatic
+backscatter from weakly contrasting fluid-like bodies represented by a
+segmented centerline and local radius profile.
 
 ### Core idea
 
-Treat the target as a weak perturbation of the surrounding fluid, retain
-the two-way phase accumulation along the body, and integrate the local
-cross-sectional response over a segmented centerline.
+Linearize the scattering response in density and compressibility
+contrast, calculate each local cross-section, and integrate the complex
+contributions with their two-way phase ([Chu et al.
+1993](#ref-Chu_1993); [Stanton et al. 1998](#ref-Stanton_1998_2)).
 
 ### Best for
 
-- Weakly scattering fluid-like elongated bodies
-- Zooplankton-like or swimbladder-less flesh-body calculations where
-  density and sound-speed contrasts remain modest
-- Arbitrary profiles that do not fit a single canonical exact geometry
+- Weakly scattering zooplankton and other fluid-like elongated bodies
+- Arbitrary profiles that are not well represented by one sphere,
+  cylinder, or spheroid
+- Deterministic calculations for a specified geometry and orientation
 
 ### Supports
 
-- `FLS` objects with canonical or arbitrary shapes
-- Material contrasts expressed naturally as g\_{21} and h\_{21} relative
-  to seawater
-- Segmented body-axis integrations in the monostatic backscatter setting
+- `FLS` scatterers with canonical or arbitrary body profiles
+- Density and sound-speed contrasts relative to the surrounding water
+- Frequency-dependent complex amplitude, cross-section, and target
+  strength
 
 ### Main assumptions
 
 - Small density and sound-speed contrasts
-- First-order Born linearization
-- Single scattering with no strong internal reverberation
-- Fluid-like, non-elastic interior response
+- First-order Born-type scattering with no strong internal reverberation
+- A fluid-like interior without elastic shear response
+- Sufficient body discretization for the local radius and phase
+  variation
 
 ### Validation status
 
@@ -53,9 +49,9 @@ cross-sectional response over a segmented centerline.
 ### Family pages
 
 - [Implementation](https://brandynlucca.github.io/acousticTS/articles/dwba/dwba-implementation.md):
-  object workflows, spectra, and validation tables
+  object preparation, discretization, output, and comparisons
 - [Theory](https://brandynlucca.github.io/acousticTS/articles/dwba/dwba-theory.md):
-  Born linearization, contrast term, and centerline integral
+  weak-scattering contrast and centerline integral
 
 ## References
 
@@ -64,9 +60,6 @@ Analysis of Target Strength Measurements of Antarctic Krill at 38 and
 120 kHz: Comparison with Deformed Cylinder Model and Inference of
 Orientation Distribution.” *The Journal of the Acoustical Society of
 America* 93 (5): 2985–88. <https://doi.org/10.1121/1.405818>.
-
-Morse, Philip M., and K. Uno Ingard. 1968. *Theoretical Acoustics*.
-McGraw-Hill.
 
 Stanton, Timothy K., Dezhang Chu, and Peter H. Wiebe. 1998. “Sound
 Scattering by Several Zooplankton Groups. II. Scattering Models.” *The

@@ -1,35 +1,46 @@
-# Running target strength models
+# Running Models
 
-## Introduction
+## Overview
 
-The execution patterns shown here are designed to make it easy to
-reproduce the same kinds of spectra and angle-series comparisons
-reported in benchmark and software papers ([Jech et al.
-2015](#ref-Jech_2015); [Gastauer et al. 2019](#ref-ZooScatR_software)).
+[`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md)
+is the common interface for running models in `acousticTS`. It combines
+a scatterer, a frequency vector, and one or more model names. The
+function returns the scatterer with model parameters and results
+attached.
 
-Model execution in acousticTS is organized around the target object
-rather than around detached parameter tables. A model reads the
-scatterer geometry and properties, applies a chosen theoretical or
-approximate formulation, and stores the resulting outputs back onto the
-object.
+This page covers execution and inspection. Use [Choosing a
+Model](https://brandynlucca.github.io/acousticTS/articles/model-selection/model-selection.md)
+for geometry, boundary, and validity considerations. Consult the model’s
+theory and implementation pages for its assumptions and numerical
+controls.
 
-This article is the practical bridge between object construction and
-result interpretation. It does not try to explain the derivation of any
-one model. Instead, it explains how model calls are structured, how
-multiple models can be run on the same object, and how to interpret the
-stored output consistently.
+Successful execution confirms that the supplied inputs passed the
+implemented checks. It does not establish that the model is appropriate
+or validated for the target and parameter range. Review [Validation and
+Benchmarks](https://brandynlucca.github.io/acousticTS/articles/validation-benchmarks/validation-benchmarks.md)
+before using a model outside its documented scope.
 
-The central point is that running a model is not just a calculation
-step. It is the point at which the package combines geometry, physical
-interpretation, acoustic conditions, and model assumptions into a
-specific prediction. Because of that, model execution deserves the same
-level of care as object construction. A result is only as meaningful as
-the object and the model assumptions that were combined to produce it.
+## Available models
 
-## The main entry point: `target_strength()`
+[`available_models()`](https://brandynlucca.github.io/acousticTS/reference/available_models.md)
+lists built-in and user-registered models, their accepted aliases,
+result names, and source:
 
-Most workflows eventually pass through
-[`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md):
+``` r
+
+library(acousticTS)
+
+available_models()
+```
+
+Model names are case-insensitive. An alias and its canonical name
+resolve to the same registered model. Availability does not imply
+compatibility with every scatterer or shape.
+
+## Run one model
+
+Build the scatterer first, then supply frequencies in hertz and a model
+name:
 
 ``` r
 
@@ -45,7 +56,8 @@ scatterer_obj <- fls_generate(
   shape = shape_obj,
   density_body = 1045,
   sound_speed_body = 1520,
-  theta_body = pi / 2
+  theta_body = pi / 2,
+  ID = "example cylinder"
 )
 
 frequency <- seq(38e3, 120e3, by = 6e3)
@@ -57,101 +69,63 @@ scatterer_obj <- target_strength(
 )
 ```
 
-The three core arguments are:
-
-1.  `object`, the scatterer to be modeled,
-2.  `frequency`, usually a vector in Hz,
-3.  `model`, one or more model names.
-
-Additional arguments are model-specific and are forwarded through `...`.
-For example, `boundary` matters for `SPHMS`, `PSMS`, and `FCMS`, while
-`method` matters for `HPA`, and stochastic controls matter for `SDWBA`.
-
-This structure is important because it makes the function call read like
-a compact statement of the modeling problem. The object says what the
-target is. The frequency vector says where the target is being
-interrogated acoustically. The model name says which physical
-approximation or exact solution family is being applied. Model-specific
-arguments then refine that statement rather than replacing it.
-
-## Shared and model-specific argument bundles
-
-When only one model is being run, the ordinary `...` interface is
-usually sufficient. The more delicate case is when several models are
-requested together. In that situation, some inputs are genuinely shared
-across all requested models, while others belong only to one model
-family.
-
+Reassignment is required.
 [`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md)
-therefore supports both:
+returns an updated S4 object. It does not modify the object bound to
+`scatterer_obj` unless the returned value is assigned.
 
-- shared arguments through `...`
-- model-specific argument bundles through `model_args`
+The function performs two stages for each model. The initializer
+converts the scatterer and call arguments into the model-specific
+parameterization. The solver then calculates and stores the result. Use
+`show()` for a compact object summary, then inspect the two result slots
+with
+[`extract()`](https://brandynlucca.github.io/acousticTS/reference/extract.md):
 
 ``` r
 
-comparison_obj <- target_strength(
-  object = scatterer_obj,
-  frequency = frequency,
-  model = c("dwba", "sdwba"),
-  density_sw = 1026,
-  sound_speed_sw = 1478,
-  model_args = list(
-    sdwba = list(
-      n_iterations = 100,
-      n_segments_init = 14,
-      phase_sd_init = sqrt(2) / 2,
-      length_init = 38.35e-3,
-      frequency_init = 120e3
-    )
-  )
-)
+show(scatterer_obj)
 ```
 
-This pattern avoids duplicating truly shared inputs such as medium
-properties, while keeping model-specific controls attached only to the
-relevant model. If the same argument appears in both places, the entry
-in `model_args[[model_name]]` takes precedence for that model.
-
-That is usually the safer pattern whenever the requested models share
-some argument names but not the full same interpretation of every
-keyword.
-
-## Typical outputs
-
-Most models ultimately produce some combination of:
-
-- complex backscattering amplitude,
-- `sigma_bs`, the backscattering cross-section,
-- `TS`, the logarithmic target strength,
-- the frequency or acoustic-size domain used in the calculation.
-
-Those quantities answer different questions. `TS` is usually the
-reporting quantity, while `sigma_bs` and the complex amplitude are often
-more useful when comparing mechanisms or combining components.
-
-Many models also store intermediate acoustic size quantities such as
-`ka`, as well as model-specific outputs that are useful for diagnostics.
-Because those fields differ by model, it is worth inspecting the result
-once before building a larger workflow around it.
-
-This is one of the reasons direct extraction matters. A plotted curve
-may be all that is needed for a quick look, but the stored output often
-contains the information needed to understand why a model behaved the
-way it did. For careful comparison or later reuse, it is usually worth
-knowing exactly which variables a given model stores.
+    ## FLS-object
+    ##  Fluid-like scatterer 
+    ##  ID:example cylinder
+    ## Body dimensions:
+    ##  Length:0.03 m(n = 60 cylinders)
+    ##  Mean radius:0.0025 m
+    ##  Max radius:0.0025 m
+    ## Shape parameters:
+    ##  Defined shape:Cylinder
+    ##  L/a ratio:12
+    ##  Taper order:N/A
+    ## Material properties:
+    ##  Density: 1045 kg m^-3 | Sound speed: 1520 m s^-1
+    ## Body orientation (relative to transducer face/axis):1.571 radians
 
 ``` r
 
-model_output <- extract(scatterer_obj, "model")$DWBA
-names(model_output)
+names(extract(scatterer_obj, "model_parameters"))
+```
+
+    ## [1] "DWBA"
+
+``` r
+
+names(extract(scatterer_obj, "model"))
+```
+
+    ## [1] "DWBA"
+
+``` r
+
+dwba_output <- extract(scatterer_obj, "model")$DWBA
+names(dwba_output)
 ```
 
     ## [1] "frequency" "ka"        "f_bs"      "sigma_bs"  "TS"
 
 ``` r
 
-head(model_output)
+head(dwba_output)
 ```
 
     ##   frequency        ka                        f_bs     sigma_bs        TS
@@ -162,12 +136,52 @@ head(model_output)
     ## 5     62000 0.6492625 -1.564363e-04-7.364911e-20i 2.447231e-08 -76.11325
     ## 6     68000 0.7120943 -1.798640e-04-9.287346e-20i 3.235107e-08 -74.90111
 
-## Running more than one model on the same object
+Output fields vary by model. Inspect their names before assuming that
+every result contains the same amplitude, cross-section, acoustic-size,
+or diagnostic columns.
 
-One of the strengths of the package is that several models can be run on
-the same target description. That is particularly useful when the
-question is about sensitivity to model assumptions rather than about
-obtaining only a single curve.
+## Model-specific arguments
+
+Arguments after `model` are forwarded to the selected model initializer.
+Their meaning is model-specific. Examples include boundary conditions,
+medium properties, approximation methods, integration settings, and
+stochastic controls. Use the model reference page to determine which are
+required.
+
+``` r
+
+target_strength(
+  object = sphere_obj,
+  frequency = frequency,
+  model = "sphms",
+  boundary = "gas_filled"
+)
+
+target_strength(
+  object = fls_obj,
+  frequency = frequency,
+  model = "hpa",
+  method = "stanton"
+)
+```
+
+`verbose = TRUE` prints model initialization and execution progress. It
+is useful for locating the stage at which a larger call fails:
+
+``` r
+
+target_strength(
+  object = scatterer_obj,
+  frequency = frequency,
+  model = "dwba",
+  verbose = TRUE
+)
+```
+
+## Run several models
+
+A vector of model names runs the requested models sequentially on the
+same scatterer:
 
 ``` r
 
@@ -189,210 +203,103 @@ names(extract(comparison_obj, "model"))
 
     ## [1] "DWBA" "HPA"
 
-This works because
-[`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md)
-initializes the requested model, stores its parameterization in
-`model_parameters`, then stores the result in `model`. The original
-object remains the anchor that keeps geometry, material properties, and
-results tied together.
+This keeps geometry, material properties, and frequency fixed while
+different model formulations are evaluated. It does not make the models
+physically equivalent. Compare only outputs with compatible definitions
+and domains.
 
-That design makes model comparison much cleaner than a workflow built
-around disconnected result tables. When several models are run on the
-same object, the geometry and material assumptions remain fixed in one
-place. This reduces the chance that a model comparison is accidentally
-turned into a comparison of slightly different targets.
+### Shared and per-model arguments
 
-When the same multi-model call needs distinct controls, `model_args`
-keeps those differences explicit without forcing every extra argument
-into the shared `...` bundle. That is especially helpful when one
-requested model needs additional stochastic, numerical, or
-boundary-condition inputs that the others do not use.
-
-## Choosing a model call
-
-The package supports both exact modal solutions and approximations. The
-correct choice depends on geometry, boundary condition, and acoustic
-regime. The practical screening guide is [choosing a
-model](https://brandynlucca.github.io/acousticTS/articles/model-selection/model-selection.md).
-The mathematical derivations live in the model-specific theory pages.
-
-At a workflow level, there are a few recurring patterns:
-
-1.  `DWBA` and `SDWBA` are natural for weak fluid-like elongated
-    targets.
-2.  `TRCM` and `FCMS` are natural for cylindrical targets.
-3.  `SPHMS` is natural for spherical boundary-value problems.
-4.  `PSMS` is natural for prolate spheroids when exact spheroidal
-    structure matters.
-5.  `ESSMS` and `calibration` are used when shell or calibration-sphere
-    physics are central.
-
-The key practical mistake to avoid is choosing a model because the name
-sounds familiar rather than because the geometry and boundary
-assumptions match the object.
-
-At the execution stage, this usually means pausing long enough to ask a
-few questions before running the call:
-
-1.  Is the object geometry actually compatible with the chosen model
-    family?
-2.  Does the boundary or material interpretation match the physics I
-    care about?
-3.  Is the selected frequency range inside a regime where this model is
-    intended to be informative?
-4.  If the model has numerical controls, have I chosen values that are
-    at least reasonable as a first pass?
-
-That short check often prevents a lot of downstream confusion.
-
-## Model-specific arguments
-
-Some model calls require only the object, frequency, and model name.
-Others require additional inputs. A few representative patterns are:
+Arguments supplied through `...` are shared with the requested model
+initializers when relevant. Use `model_args` for arguments that belong
+to one model. A model-specific value overrides a shared value with the
+same name:
 
 ``` r
 
-# Sphere modal series with an explicit boundary condition
-target_strength(gas_sphere, frequency, model = "sphms", boundary = "gas_filled")
-
-# High-pass approximation with explicit method choice
-target_strength(fls_obj, frequency, model = "hpa", method = "stanton")
-
-# Stochastic DWBA with phase-variability controls
-target_strength(
-  fls_obj,
-  frequency,
-  model = "sdwba",
-  n_iterations = 100,
-  n_segments_init = 14,
-  phase_sd_init = sqrt(2) / 2,
-  length_init = 38.35e-3,
-  frequency_init = 120e3
-)
-```
-
-When in doubt, the implementation pages are the best starting point
-because they show the model-specific arguments in context rather than in
-isolation.
-
-This matters because many of those arguments are not merely optional
-toggles. They often encode real physical or numerical assumptions. A
-boundary condition changes the underlying scattering problem. A method
-choice selects between approximation formulas. A numerical setting can
-determine whether a truncated modal system is being solved robustly
-enough for interpretation. Reading those arguments in context is
-therefore much safer than treating them as anonymous function options.
-
-## Verbose mode and debugging
-
-For larger workflows, `verbose = TRUE` is useful because it prints the
-initialization and execution stages. That can help distinguish between
-object-construction problems, model-compatibility problems, and
-post-processing problems.
-
-``` r
-
-target_strength(
+comparison_obj <- target_strength(
   object = scatterer_obj,
   frequency = frequency,
-  model = "dwba",
-  verbose = TRUE
+  model = c("dwba", "sdwba"),
+  density_sw = 1026,
+  sound_speed_sw = 1478,
+  model_args = list(
+    sdwba = list(
+      n_iterations = 100,
+      n_segments_init = 14,
+      phase_sd_init = sqrt(2) / 2,
+      length_init = 38.35e-3,
+      frequency_init = 120e3
+    )
+  )
 )
 ```
 
-## Interpreting the result
+Each `model_args` name must identify a requested model. Each entry must
+be a named list or named atomic vector.
 
-After a model is run, the updated scatterer object can be inspected with
-[`extract()`](https://brandynlucca.github.io/acousticTS/reference/extract.md)
-or plotted with `plot(..., type = "model")`. That makes it easy to
-compare multiple models or to keep geometry and modeled output together.
+## Plot and inspect results
+
+The returned object retains its target definition and the stored model
+output.
+[`plot()`](https://brandynlucca.github.io/acousticTS/reference/plot.Scatterer.md)
+can display either:
 
 ``` r
 
 plot(scatterer_obj, type = "shape")
 ```
 
-![](running-models_files/figure-html/unnamed-chunk-7-1.png)
+![Geometry stored on the modeled
+scatterer.](running-models_files/figure-html/unnamed-chunk-8-1.png)
+
+Geometry stored on the modeled scatterer.
 
 ``` r
 
 plot(scatterer_obj, type = "model")
 ```
 
-![](running-models_files/figure-html/unnamed-chunk-7-2.png)
+![Model output stored on the same
+scatterer.](running-models_files/figure-html/unnamed-chunk-9-1.png)
 
-The important practical rule is to compare like with like. If two model
-outputs are to be compared, they should usually be compared on the same
-object, the same frequency grid, and the same reporting quantity.
+Model output stored on the same scatterer.
 
-It is also worth checking whether the output is being interpreted in the
-right domain. For many reporting tasks, `TS` is the natural quantity.
-For coherent addition, residual analysis, or mechanism-level
-interpretation, linear quantities such as `sigma_bs` or the complex
-amplitude may be more informative. A run can be numerically fine and
-still be inspected in the wrong domain for the scientific question.
+For quantitative work, extract the underlying result rather than reading
+values from a plot. Target strength is appropriate for logarithmic
+reporting. Cross-section or complex amplitude may be required for linear
+averaging, coherent combination, or mechanism-level analysis. Before
+comparison or export, confirm the shape and orientation, requested
+model, frequency grid, and output columns.
 
-## When a model should be re-run
+## When to run again
 
-Because model outputs are stored back onto the object, it is easy to
-forget that any substantive change to geometry, material properties,
-orientation, frequency grid, or model arguments requires a new run. The
-stored result does not update automatically just because an upstream
-object or variable in the workflow has changed.
+Treat each stored result as belonging to one run configuration. Run the
+model again after changing:
 
-As a practical rule, a model should be re-run whenever:
+- geometry, segmentation, or component placement
+- material properties, contrasts, or orientation
+- frequency or other acoustic conditions
+- model name, boundary condition, method, or numerical controls
 
-1.  the geometry or segmentation changes,
-2.  any contrast or material property changes,
-3.  the frequency vector changes,
-4.  the model name changes, or
-5.  a model-specific argument such as `boundary`, `method`, `phi_body`,
-    `n_integration`, or `precision` changes.
+Create curved targets with
+[`brake()`](https://brandynlucca.github.io/acousticTS/reference/brake.md)
+before running the relevant model.
 
-Treating the stored result as tied to a specific run configuration helps
-keep later comparisons honest.
+## Execution checks
 
-## Common pitfalls
+Before interpreting a result, confirm:
 
-The most common execution problems are not numerical failures. They are
-setup mismatches. Typical examples are:
+- the scatterer class and shape are supported by the model
+- frequencies are in hertz and use the intended grid
+- medium and target properties use consistent units and definitions
+- model-specific arguments represent the intended physical and numerical
+  case
+- results are stable under relevant resolution or truncation changes
+- compared models use the same target, conditions, and reporting
+  quantity
 
-1.  using a model that is incompatible with the object class or shape,
-2.  mixing contrasts and absolute properties inconsistently,
-3.  forgetting that frequencies are in Hz,
-4.  forgetting to re-run a model after changing geometry or material
-    properties,
-5.  comparing outputs from different frequency grids as if they were
-    pointwise comparable.
-
-This is one reason the package stores model outputs back on the object:
-it keeps the geometry and the result attached to the same record.
-
-Another common pitfall is over-interpreting the first successful run. A
-run that completes without error is only the beginning of
-interpretation. It should still be checked for model compatibility,
-plausible magnitude, stability under modest numerical refinement when
-relevant, and consistency with the intended target description.
-
-## Related articles
-
-- [Comparing models on the same
-  target](https://brandynlucca.github.io/acousticTS/articles/comparing-models/comparing-models.md)
-- [Plotting and inspecting
-  results](https://brandynlucca.github.io/acousticTS/articles/plotting-inspecting-results/plotting-inspecting-results.md)
-- [Simulation and parameter
-  sweeps](https://brandynlucca.github.io/acousticTS/articles/simulation-parameter-sweeps/simulation-parameter-sweeps.md)
-
-## References
-
-Gastauer, Sven, Dezhang Chu, and Martin J. Cox. 2019. “ZooScatR—An
-\<Span Style="font-Variant:small-Caps;"\>r\</Span\> Package for
-Modelling the Scattering Properties of Weak Scattering Targets Using the
-Distorted Wave Born Approximation.” *The Journal of the Acoustical
-Society of America* 145 (1): EL102–8.
-<https://doi.org/10.1121/1.5085655>.
-
-Jech, J. Michael, John K. Horne, Dezhang Chu, et al. 2015. “Comparisons
-Among Ten Models of Acoustic Backscattering Used in Aquatic Ecosystem
-Research.” *The Journal of the Acoustical Society of America* 138 (6):
-3742–64. <https://doi.org/10.1121/1.4937607>.
+Continue with [Comparing
+Models](https://brandynlucca.github.io/acousticTS/articles/comparing-models/comparing-models.md)
+or [Simulation and Parameter
+Sweeps](https://brandynlucca.github.io/acousticTS/articles/simulation-parameter-sweeps/simulation-parameter-sweeps.md).

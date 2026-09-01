@@ -7,9 +7,9 @@ Benchmarked Validated
 [Overview](https://brandynlucca.github.io/acousticTS/articles/hpa/index.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/hpa/hpa-theory.md)
 
-These pages follow Johnson’s asymptotic fluid-sphere formulation and
-Stanton’s generalized approximate backscatter formulas ([Johnson
-1977](#ref-Johnson_1977); [Stanton 1989](#ref-Stanton_1989_1)).
+HPA exposes Johnson’s fluid-sphere approximation and Stanton’s
+generalized high-pass formulas ([Johnson 1977](#ref-Johnson_1977);
+[Stanton 1989](#ref-Stanton_1989_1)).
 
 The acousticTS package uses object-based scatterers, so the HPA workflow
 follows the same broad pattern used throughout the package: define the
@@ -240,20 +240,16 @@ representation.
 
 #### Benchmark comparisons
 
-HPA is an approximation family, not an exact boundary-value solution, so
-the most transparent comparison is against the weakly scattering
-benchmark curves summarized by Jech et al. (2015). The table below uses
-the corresponding sphere, prolate-spheroid, and cylinder target
-definitions and shows how the current HPA implementations compare with
-those benchmark series. Elapsed times are representative values from the
-current machine.
+HPA is an approximation family, not an exact boundary-value solution.
+The table compares its broad response with the weakly scattering
+benchmark curves summarized by Jech et al. ([2015](#ref-Jech_2015)).
 
-| Case | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | Elapsed (s) |
-|:---|---:|---:|---:|
-| Johnson (1977) sphere | 42.20232 | 6.34274 | 0.00 |
-| Stanton (1989) sphere | 35.46445 | 5.48942 | 0.01 |
-| Stanton (1989) prolate spheroid | 46.13636 | 5.57418 | 0.01 |
-| Stanton (1989) cylinder | 46.97943 | 5.65639 | 0.00 |
+| Case | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) |
+|:---|---:|---:|
+| Johnson (1977) sphere | 42.20232 | 6.34274 |
+| Stanton (1989) sphere | 35.46445 | 5.48942 |
+| Stanton (1989) prolate spheroid | 46.13636 | 5.57418 |
+| Stanton (1989) cylinder | 46.97943 | 5.65639 |
 
 Those numbers make the role of HPA very clear. It is extremely fast, but
 it is not a mode-by-mode benchmark reproducer. Its value is in
@@ -269,23 +265,19 @@ so this implementation page keeps them at their neutral value of `1`
 when reporting \Delta TS benchmark summaries. That leaves `method` and
 target geometry as the defensible comparison dimensions for validation.
 
-If those arguments are explored at all, the cleanest workflow is to
-treat that as a separate sensitivity or calibration exercise after the
-neutral benchmark comparison has already been reported. In other words,
-first ask whether the base asymptotic formula behaves sensibly with
-`deviation_fun = 1` and `null_fun = 1`; only then ask whether a
-user-specified empirical adjustment improves agreement with a particular
-measured dataset.
+Treat those arguments as a separate sensitivity or calibration exercise.
+First check the base formula with `deviation_fun = 1` and
+`null_fun = 1`. Then test whether an empirical adjustment improves
+agreement with a specified dataset.
 
 #### Cross-software and formula checks
 
-The locally available `echoSMs::HPModel` provides a direct
-software-to-software check for the spherical Stanton (1989) branch. For
-the other HPA paths, the cleaner validation target is the published
-Johnson (1977) and Stanton (1989) algebra itself. The current local
-`HPModel` prolate-spheroid and cylinder branches error before returning
-a spectrum, so those cells are reported as `N/A` in the
-software-comparison columns below.
+`echoSMs::HPModel` provides a software comparison for the spherical
+Stanton (1989) branch ([Macaulay and contributors
+2024](#ref-echoSMs_software)). For the other HPA paths, the validation
+target is the published Johnson and Stanton algebra. The echoSMs version
+used for this comparison did not return prolate-spheroid or cylinder
+spectra, so those cells are reported as `N/A`.
 
 | Case | Mean abs. \Delta acousticTS vs `echoSMs` (dB) | Max abs. \Delta acousticTS vs `echoSMs` (dB) | Mean abs. \Delta vs published algebra (dB) | Max abs. \Delta vs published algebra (dB) |
 |:---|---:|---:|---:|---:|
@@ -304,9 +296,20 @@ asymptotic formulas correctly.
 
 ## References
 
+Jech, J. Michael, John K. Horne, Dezhang Chu, et al. 2015. “Comparisons
+Among Ten Models of Acoustic Backscattering Used in Aquatic Ecosystem
+Research.” *The Journal of the Acoustical Society of America* 138 (6):
+3742–64. <https://doi.org/10.1121/1.4937607>.
+
 Johnson, Richard K. 1977. “Sound Scattering from a Fluid Sphere
 Revisited.” *The Journal of the Acoustical Society of America* 61 (2):
 375–77. <https://doi.org/10.1121/1.381326>.
+
+Macaulay, Gavin, and contributors. 2024. “echoSMs: Making Acoustic
+Scattering Models Available to Fisheries and Plankton Scientists.” In
+*GitHub Repository*.
+[Https://github.com/ices-tools-dev/echoSMs](https://github.com/ices-tools-dev/echoSMs);
+GitHub.
 
 Stanton, Timothy K. 1989. “Simple Approximate Formulas for
 Backscattering of Sound by Spherical and Elongated Objects.” *The

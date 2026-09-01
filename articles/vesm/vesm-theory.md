@@ -7,28 +7,21 @@ Validated Experimental
 [Overview](https://brandynlucca.github.io/acousticTS/articles/vesm/index.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/vesm/vesm-implementation.md)
 
-The viscous-elastic spherical model describes a layered resonant target
-whose gas core is surrounded first by an elastic shell and then by a
-viscous biological layer before the whole target is embedded in
-seawater. In the mesopelagic-fish setting of Khodabandeloo et
-al. (2021), those layers represent gas, a mechanically stiffer
-shell-like inclusion, and soft tissue whose viscosity damps and broadens
-the gas-driven resonance ([Khodabandeloo et al.
-2021](#ref-Khodabandeloo_2021); [Feuillade and Nero
-1998](#ref-Feuillade_1998)).
+The viscous-elastic spherical model (VESM) describes a gas core inside
+an elastic shell, a viscous outer layer, and seawater. The gas supplies
+the main compressibility resonance, the shell adds stiffness and elastic
+waves, and the outer layer damps and broadens the response ([Feuillade
+and Nero 1998](#ref-Feuillade_1998); [Khodabandeloo et al.
+2021](#ref-Khodabandeloo_2021)).
 
-This family is still spherical, so the angular dependence remains
-separable. What makes it more intricate than `SPHMS`, `ESSMS`, or a
-simple bubble model is that four regions must be matched simultaneously
-and two of those regions support more than one wave family.
+Concentric spherical symmetry keeps angular orders independent. The
+modal system is larger because the viscous layer and elastic shell each
+support compressional and shear motion.
 
-The notation here follows the shared package convention introduced in
-the [acoustic scattering
-primer](https://brandynlucca.github.io/acousticTS/articles/acoustic-scattering-primer/acoustic-scattering-primer.md)
-and [notation
-guide](https://brandynlucca.github.io/acousticTS/articles/notation-and-symbols/notation-and-symbols.md):
-medium `1` is the surrounding seawater, medium `2` is the viscous outer
-layer, medium `3` is the elastic shell, and medium `4` is the gas core.
+Medium 1 is seawater, medium 2 is the viscous layer, medium 3 is the
+elastic shell, and medium 4 is the gas core. Other symbols follow
+[Notation and
+symbols](https://brandynlucca.github.io/acousticTS/articles/notation-and-symbols/notation-and-symbols.md).
 
 ## Layered geometry and medium indexing
 
@@ -40,6 +33,11 @@ R_2 \> R_3 \> R_4,
 
 Here R_2 is the outer radius of the viscous layer, R_3 is the outer
 radius of the elastic shell, and R_4 is the radius of the gas core.
+
+![Layered spherical bookkeeping for the viscous-elastic
+model.](vesm-layered-sphere-schematic.png)
+
+Layered spherical bookkeeping for the viscous-elastic model.
 
 The model therefore contains three interfaces:
 
@@ -57,10 +55,9 @@ R_2 = R_4 \left( 1 + \frac{\rho_1 - \rho_4}{\rho_2 - \rho_1}
 \right)^{1/3},
 
 where \rho_1, \rho_2, and \rho_4 are the densities of seawater, the
-viscous layer, and the gas core, respectively. This is not part of the
-modal solution itself; it is a physical closure used when the outer
-viscous radius is estimated from a buoyancy argument rather than
-specified independently.
+viscous layer, and the gas core. This is a closure for estimating R_2,
+not part of the modal boundary solution ([Khodabandeloo et al.
+2021](#ref-Khodabandeloo_2021)).
 
 ## Governing fields in the four regions
 
@@ -94,10 +91,8 @@ k\_{T,2} = (1+i)\sqrt{\frac{\omega \rho_2}{2\eta_2}},
 where c_2 and \rho_2 are the compressional sound speed and density of
 the viscous layer.
 
-The essential point is that the outer tissue is not treated as a simple
-fluid contrast. Its viscous properties give the compressional and shear
-branches complex wavenumbers, which is how attenuation and resonance
-broadening enter the model.
+The complex wavenumbers introduce attenuation and phase dispersion in
+the outer layer.
 
 ### Elastic shell
 
@@ -137,13 +132,11 @@ mode by mode.
 For an incident plane wave aligned with the polar axis, the exterior
 total pressure is written as:
 
-p_1(r,\theta) = \sum\_{m=0}^{\infty} \left\[ A_m^{(\mathrm{inc})}
-j_m(k_1 r) + A_m^{(\mathrm{sca})} h_m^{(1)}(k_1 r) \right\]
-P_m(\cos\theta),
+p_1(r,\theta) = P_0 \sum\_{m=0}^{\infty} i^m(2m+1) \left\[j_m(k_1r)+b_m
+h_m^{(1)}(k_1r)\right\] P_m(\cos\theta),
 
-where j_m is the spherical Bessel function, h_m^{(1)} is the outgoing
-spherical Hankel function, and A_m^{(\mathrm{sca})} is the unknown
-scattered coefficient of order m.
+where j_m is regular, h_m^{(1)} is outgoing, and b_m is the normalized
+scattering coefficient.
 
 ### Viscous-layer potentials
 
@@ -153,13 +146,16 @@ representation is to decompose the motion into compressional and shear
 potentials:
 
 \Phi_2(r,\theta) = \sum\_{m=0}^{\infty} \left\[ B_m j_m(k\_{L,2} r) +
-C_m y_m(k\_{L,2} r) \right\] P_m(\cos\theta)
+C_m h_m^{(1)}(k\_{L,2} r) \right\] P_m(\cos\theta)
+
+The transverse potential is:
 
 \Psi_2(r,\theta) = \sum\_{m=0}^{\infty} \left\[ D_m j_m(k\_{T,2} r) +
-E_m y_m(k\_{T,2} r) \right\] P_m(\cos\theta),
+E_m h_m^{(1)}(k\_{T,2} r) \right\] P_m(\cos\theta),
 
-where y_m is the spherical Neumann function. The viscous-layer
-displacement and stresses are reconstructed from these potentials.
+Either \\j_m,y_m\\ or \\j_m,h_m^{(1)}\\ spans the annular radial
+solution. The latter pair is written here. Displacement and viscous
+stress follow from these potentials.
 
 ### Elastic-shell potentials
 
@@ -167,10 +163,12 @@ The shell also occupies an annulus, so it likewise uses longitudinal and
 transverse potentials with both radial branches retained:
 
 \Phi_3(r,\theta) = \sum\_{m=0}^{\infty} \left\[ F_m j_m(k\_{L,3} r) +
-G_m y_m(k\_{L,3} r) \right\] P_m(\cos\theta)
+G_m h_m^{(1)}(k\_{L,3} r) \right\] P_m(\cos\theta)
+
+The transverse elastic potential is:
 
 \Psi_3(r,\theta) = \sum\_{m=0}^{\infty} \left\[ H_m j_m(k\_{T,3} r) +
-I_m y_m(k\_{T,3} r) \right\] P_m(\cos\theta).
+I_m h_m^{(1)}(k\_{T,3} r) \right\] P_m(\cos\theta).
 
 ### Gas-core field
 
@@ -179,9 +177,7 @@ admissible:
 
 p_4(r,\theta) = \sum\_{m=0}^{\infty} J_m j_m(k_4 r) P_m(\cos\theta).
 
-This layered modal bookkeeping is why the spherical geometry remains
-tractable: all angular coupling disappears, and each mode is solved
-independently.
+Legendre orthogonality leaves one independent radial system for each m.
 
 ## Interface conditions
 
@@ -211,8 +207,7 @@ u\_{r,2} = u\_{r,3}, \qquad u\_{\theta,2} = u\_{\theta,3}, \qquad
 \sigma\_{rr}^{(2)} = \sigma\_{rr}^{(3)}, \qquad \sigma\_{r\theta}^{(2)}
 = \sigma\_{r\theta}^{(3)}.
 
-This is the main coupling point between viscous damping and the shell’s
-elastic resonance structure.
+This interface couples viscous attenuation to elastic motion.
 
 ### Shell-gas interface at r = R_4
 
@@ -233,7 +228,7 @@ one independent linear system for each angular order m:
 \mathbf{M}\_m \mathbf{x}\_m = \mathbf{F}\_m.
 
 The structure of \mathbf{x}\_m depends on whether shear terms are
-active: for the monopole term m = 0, the tangential and shear branch
+active. For the monopole term m = 0, the tangential and shear branch
 drops out and the system reduces to a smaller 6\times 6 problem, whereas
 for m \ge 1 the coupled viscous and elastic shear branches are active
 and the system becomes a 10\times 10 problem.
@@ -245,23 +240,20 @@ orders.
 
 ## Far-field backscatter
 
-The exterior scattered field uses the outgoing spherical Hankel branch,
-so the far-field amplitude depends only on the exterior coefficients
-A_m^{(\mathrm{sca})}. Using the standard large-r asymptotics:
+Using the large-r asymptotic form of h_m^{(1)}, the far-field
+backscatter amplitude is:
 
-f\_{\mathrm{bs}} = -\frac{i}{k_1} \sum\_{m=0}^{M} (2m+1)(-1)^m
-A_m^{(\mathrm{sca})},
+f\_{\mathrm{bs}} = -\frac{i}{k_1} \sum\_{m=0}^{M} (2m+1)(-1)^m b_m,
 
 where the (-1)^m factor comes from evaluating the Legendre polynomials
 in the backscattering direction.
 
-The backscattering cross-section and target strength are then
-([MacLennan et al. 2002](#ref-MacLennan_2002); [Urick
-1983](#ref-Urick_1983); [Simmonds and MacLennan
-2005](#ref-Simmonds_2005)):
+The backscattering cross-section and target strength are ([MacLennan et
+al. 2002](#ref-MacLennan_2002)):
 
 \sigma\_{\mathrm{bs}} = \left\|f\_{\mathrm{bs}}\right\|^2, \qquad
-\mathrm{TS} = 10\log\_{10}\left(\sigma\_{\mathrm{bs}}\right).
+\mathrm{TS} = 10\log\_{10}\left( \frac{\sigma\_{\mathrm{bs}}}{1\\
+\mathrm{m}^2}\right).
 
 ## Physical interpretation
 
@@ -299,10 +291,8 @@ The model rests on the following assumptions:
 4.  time-harmonic steady-state forcing,
 5.  no nonspherical posture, taper, or internal asymmetry.
 
-That combination makes `VESM` a layered spherical resonance model, not a
-general fish-body solver. Its strength is that it retains the physics of
-gas compression, shell elasticity, and viscous damping within one
-separable spherical framework.
+VESM is therefore a concentric layered-sphere model, not a general
+fish-body solution.
 
 ## References
 
@@ -322,10 +312,3 @@ MacLennan, David N., Percy G. Fernandes, and John Dalen. 2002. “A
 Consistent Approach to Definitions and Symbols in Fisheries Acoustics.”
 *ICES Journal of Marine Science* 59 (2): 365–69.
 <https://doi.org/10.1006/jmsc.2001.1158>.
-
-Simmonds, John, and David N. MacLennan. 2005. *Fisheries Acoustics:
-Theory and Practice*. 2nd ed. Blackwell Science.
-<https://doi.org/10.1002/9780470995303>.
-
-Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed.
-McGraw-Hill.

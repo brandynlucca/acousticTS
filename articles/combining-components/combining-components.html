@@ -47,10 +47,9 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-physics-primer" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Physics Primer</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-physics-primer">
-<li><a class="dropdown-item" href="../../articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
-    <li><a class="dropdown-item" href="../../articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+<li><a class="dropdown-item" href="../../articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+    <li><a class="dropdown-item" href="../../articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
     <li><a class="dropdown-item" href="../../articles/boundary_conditions.html">Boundary conditions</a></li>
-    <li><a class="dropdown-item" href="../../articles/material-properties/material-properties.html">Material properties</a></li>
     <li><a class="dropdown-item" href="../../articles/numerical-foundations/numerical-foundations.html">Numerical methods</a></li>
   </ul>
 </li>
@@ -58,6 +57,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-build-targets" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Build Targets</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-build-targets">
 <li><a class="dropdown-item" href="../../articles/building-shapes/building-shapes.html">Building Shapes</a></li>
+    <li><a class="dropdown-item" href="../../articles/material-properties/material-properties.html">Material Properties</a></li>
     <li><a class="dropdown-item" href="../../articles/building-scatterers/building-scatterers.html">Building Scatterers</a></li>
     <li><a class="dropdown-item" href="../../articles/shape-manipulation-reforging/shape-manipulation-reforging.html">Shape Manipulation</a></li>
   </ul>
@@ -68,17 +68,15 @@
 <li><a class="dropdown-item" href="../../articles/running-models/running-models.html">Running Models</a></li>
     <li><a class="dropdown-item" href="../../articles/model-selection/model-selection.html">Choosing a Model</a></li>
     <li><a class="dropdown-item" href="../../articles/comparing-models/comparing-models.html">Comparing Models</a></li>
-    <li><a class="dropdown-item" href="../../articles/plotting-inspecting-results/plotting-inspecting-results.html">Visualizing results</a></li>
     <li><a class="dropdown-item" href="../../articles/simulation-parameter-sweeps/simulation-parameter-sweeps.html">Simulation sweeps</a></li>
-    <li><a class="dropdown-item" href="../../articles/calibration-workflow/calibration-workflow.html">Calibration workflow</a></li>
-    <li><a class="dropdown-item" href="../../articles/validation-benchmarks/validation-benchmarks.html">Validating models</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../../articles/model-library/model-library.html">Models</a></li>
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-developers" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Developers</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-developers">
-<li><a class="dropdown-item" href="../../articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
+<li><a class="dropdown-item" href="../../articles/validation-benchmarks/validation-benchmarks.html">Validation methods</a></li>
+    <li><a class="dropdown-item" href="../../articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
     <li><a class="dropdown-item" href="../../articles/combining-components/combining-components.html">Combining components</a></li>
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
@@ -119,365 +117,242 @@
     
     
 <div class="section level2">
-<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+<h2 id="the-combination-problem">The combination problem<a class="anchor" aria-label="anchor" href="#the-combination-problem"></a>
 </h2>
-<p>Component combination becomes most important in fish-like targets
-where anatomically distinct regions scatter in different regimes <span class="citation">(<a href="#ref-Clay_1994">Clay and Horne 1994</a>; <a href="#ref-Gorska_2005">Gorska et al. 2005</a>; <a href="#ref-Stanton_1996">Stanton 1996</a>)</span>.</p>
-<p>It is often tempting to build a composite target by running two
-canonical models separately and then combining the results. In a few
-restricted cases, that can be a useful first approximation. In many
-others, it fails for exactly the reasons that make scattering a wave
-problem rather than a bookkeeping exercise. The issue is not simply that
-there are several subcomponents. The issue is that the total response
-depends on how those components share phase, how they are positioned
-relative to one another, and whether they are weakly interacting enough
-that isolated calculations remain meaningful.</p>
-<p>This article is therefore deliberately cautionary. Its purpose is not
-to forbid all component-wise combinations. Its purpose is to explain
-what must be true before such a combination is even approximately
-defensible, what kinds of sums are algebraically wrong from the start,
-and why a composite target is often a new scattering problem rather than
-a simple sum of old ones.</p>
+<p>Composite biological targets may contain regions with different
+geometry and material response. Fish bodies and gas-filled inclusions
+are a common example <span class="citation">(<a href="#ref-Clay_1994">Clay and Horne 1994</a>; <a href="#ref-Gorska_2005">Gorska et al. 2005</a>)</span>. Running a
+separate canonical model for each region does not, by itself, produce a
+model of the combined target. A component-wise approximation must
+address phase, position, coherence, shadowing, and mutual
+scattering.</p>
+<p>The first question is therefore not which outputs to add. It is
+whether the isolated component solutions can represent weakly
+interacting contributions to one scattering problem.</p>
 </div>
 <div class="section level2">
-<h2 id="the-first-distinction-amplitude-versus-intensity">The first distinction: amplitude versus intensity<a class="anchor" aria-label="anchor" href="#the-first-distinction-amplitude-versus-intensity"></a>
+<h2 id="amplitude-and-cross-section">Amplitude and cross-section<a class="anchor" aria-label="anchor" href="#amplitude-and-cross-section"></a>
 </h2>
-<p>Suppose two subscatterers produce complex backscattering amplitudes
-<span class="math inline">f_1</span> and <span class="math inline">f_2</span>. If they can be treated as independent
-first-order contributors in a common surrounding field, then the
-combined amplitude is:</p>
+<p>Suppose two subscatterers have complex backscattering amplitudes
+<span class="math inline">f_1</span> and <span class="math inline">f_2</span>. If both are first-order contributions in
+a common incident field, their combined amplitude is approximately:</p>
 <p><span class="math display">
   f_{\mathrm{tot}} \approx f_1 + f_2.
 </span></p>
-<p>The corresponding backscattering cross-section is:</p>
+<p>The backscattering cross-section is then:</p>
 <p><span class="math display">
-  \sigma_{\mathrm{bs,tot}} = |f_{\mathrm{tot}}|^2 = |f_1|^2 + |f_2|^2 +
-2 \operatorname{Re}(f_1 f_2^*).
+  \sigma_{\mathrm{bs,tot}}
+  = |f_{\mathrm{tot}}|^2
+  = |f_1|^2 + |f_2|^2 + 2\operatorname{Re}(f_1 f_2^*).
 </span></p>
-<p>The last term is the interference term. It is not optional, and it is
-exactly the term that disappears when a user jumps too quickly from a
-wave problem to a scalar bookkeeping shortcut. This is why one should
-not add target strengths in dB, should not add cross-sections when phase
-coherence matters, and should not imagine that a final scalar output
-contains enough information for a coherent sum unless the complex
-amplitude and a common phase reference are available.</p>
-<p>That distinction between amplitude and intensity is the first gate in
-any component-combination workflow. If the available outputs do not
-preserve the phase information needed to build <span class="math inline">f_{\mathrm{tot}}</span>, then a deterministic
-coherent composite prediction is already out of reach.</p>
+<p>The final term is interference. It is lost if cross-sections are
+added before the coherence assumption has been established. Target
+strengths cannot be added because <code>TS</code> is a logarithmic
+report of cross-section, not a wave quantity.</p>
 </div>
 <div class="section level2">
-<h2 id="coherent-versus-incoherent-summation">Coherent versus incoherent summation<a class="anchor" aria-label="anchor" href="#coherent-versus-incoherent-summation"></a>
+<h2 id="coherence-regimes">Coherence regimes<a class="anchor" aria-label="anchor" href="#coherence-regimes"></a>
 </h2>
-<p>The next practical question is whether the subcomponents should be
-treated as phase coherent or phase incoherent. That choice is not a
-matter of convenience. It is a statement about the physics of the target
-and about the type of averaging, if any, that the user intends the
-result to represent.</p>
 <div class="section level3">
-<h3 id="coherent-summation">Coherent summation<a class="anchor" aria-label="anchor" href="#coherent-summation"></a>
+<h3 id="coherent-sum">Coherent sum<a class="anchor" aria-label="anchor" href="#coherent-sum"></a>
 </h3>
-<p>Coherent summation is the appropriate first-order description when
-the relative phase between components is physically meaningful and
-stable for the quantity being predicted. In that case, one sums complex
-amplitudes:</p>
+<p>Use a coherent sum when relative phase is defined and remains stable
+for the prediction. For <span class="math inline">N</span> components,
+place every amplitude in the same phase reference before summing <span class="citation">(<a href="#ref-Morse_1968">Morse and Ingard
+1968</a>)</span>:</p>
 <p><span class="math display">
-  f_{\mathrm{tot}} = \sum_{j=1}^{N} f_j e^{i \phi_j},
+  f_{\mathrm{tot}} = \sum_{j=1}^{N} f_j e^{i\phi_j},
 </span></p>
 <p>where <span class="math inline">\phi_j</span> includes the
-translation phase, orientation-dependent phase, and any other shared
-reference-phase adjustments needed to place all components in one
-coordinate system.</p>
-<p>The resulting cross-section is then:</p>
+translation and orientation adjustments required by the common
+coordinate system. The cross-section is:</p>
 <p><span class="math display">
-  \sigma_{\mathrm{bs,tot}} =
-    \left|
-  \sum_{j=1}^{N} f_j e^{i \phi_j}
-  \right|^2.
+  \sigma_{\mathrm{bs,tot}}
+  = \left|\sum_{j=1}^{N} f_j e^{i\phi_j}\right|^2.
 </span></p>
-<p>Expanding this shows that coherent summation retains all interference
-terms:</p>
+<p>Expanding it retains every cross term:</p>
 <p><span class="math display">
-  \sigma_{\mathrm{bs,tot}} =
-    \sum_{j=1}^{N} |f_j|^2 +
-    \sum_{j \neq \ell} f_j f_\ell^* e^{i(\phi_j - \phi_\ell)}.
+  \sigma_{\mathrm{bs,tot}}
+  = \sum_{j=1}^{N}|f_j|^2
+  + \sum_{j\ne\ell} f_j f_\ell^* e^{i(\phi_j-\phi_\ell)}.
 </span></p>
-<p>Coherent summation is therefore most appropriate when the geometry is
-fixed or nearly fixed, the relative positions of the components are
-known, the phase relationship survives the averaging procedure of
-interest, and the user wants a single-target prediction rather than an
-ensemble average over random realizations.</p>
+<p>This description applies to a fixed target only when component
+locations and orientations are known, their amplitude conventions are
+compatible, and mutual interaction is weak enough to neglect.</p>
 </div>
 <div class="section level3">
-<h3 id="incoherent-summation">Incoherent summation<a class="anchor" aria-label="anchor" href="#incoherent-summation"></a>
+<h3 id="incoherent-sum">Incoherent sum<a class="anchor" aria-label="anchor" href="#incoherent-sum"></a>
 </h3>
-<p>Incoherent summation is appropriate only when the relative phases
-between components are effectively random over the ensemble of interest,
-so that the cross terms average away. In that case:</p>
+<p>An incoherent sum describes an ensemble in which relative phases vary
+enough that the mean cross terms vanish. The assumption is:</p>
 <p><span class="math display">
   \left\langle
-  f_j f_\ell^* e^{i(\phi_j - \phi_\ell)}
+    f_j f_\ell^* e^{i(\phi_j-\phi_\ell)}
   \right\rangle
   \approx 0
-  \qquad (j \neq \ell),
+  \qquad (j\ne\ell).
 </span></p>
-<p>and the ensemble-averaged cross-section reduces to:</p>
+<p>The ensemble-mean cross-section then becomes:</p>
 <p><span class="math display">
-  \left\langle
-  \sigma_{\mathrm{bs,tot}}
-  \right\rangle
+  \left\langle\sigma_{\mathrm{bs,tot}}\right\rangle
   \approx
-  \sum_{j=1}^{N}
-  \left\langle
-  |f_j|^2
-  \right\rangle.
+  \sum_{j=1}^{N}\left\langle|f_j|^2\right\rangle.
 </span></p>
-<p>This is the mathematical statement behind incoherent addition. One is
-not claiming that the waves fail to interfere instantaneously. One is
-claiming that the interference does not survive the ensemble average
-being taken. That is a much narrower and more defensible statement.</p>
-<p>Incoherent summation becomes plausible when component positions vary
-from realization to realization, posture randomization destroys stable
-phase alignment, spacing is uncertain enough that relative phase is not
-reproducible, or the quantity of interest is already an ensemble average
-rather than a deterministic single realization.</p>
+<p>Waves still interfere in each realization. The statement is only that
+random posture, uncertain spacing, roughness, or another defined
+averaging process removes the interference terms from the reported mean.
+Incoherent addition is not a fallback chosen merely because phase was
+unavailable.</p>
 </div>
 <div class="section level3">
 <h3 id="partial-coherence">Partial coherence<a class="anchor" aria-label="anchor" href="#partial-coherence"></a>
 </h3>
-<p>Many realistic cases lie between these two limits. Then the
-ensemble-averaged cross-section has the form:</p>
+<p>Many targets lie between the coherent and incoherent limits.
+Represent an effective degree of coherence by <span class="math inline">\Gamma_{j\ell}</span>:</p>
 <p><span class="math display">
-  \left\langle
-  \sigma_{\mathrm{bs,tot}}
-  \right\rangle =
-    \sum_{j=1}^{N}
-  \left\langle
-  |f_j|^2
-  \right\rangle +
-    \sum_{j \neq \ell}
-  \left\langle
-  f_j f_\ell^* \Gamma_{j\ell}
-  \right\rangle,
+  \left\langle\sigma_{\mathrm{bs,tot}}\right\rangle
+  = \sum_{j=1}^{N}\left\langle|f_j|^2\right\rangle
+  + \sum_{j\ne\ell}
+    \left\langle f_j f_\ell^*\Gamma_{j\ell}\right\rangle.
 </span></p>
-<p>where <span class="math inline">\Gamma_{j\ell}</span> is an effective
-coherence factor with magnitude between 0 and 1. The limiting cases
-are:</p>
+<p>The limiting cases are:</p>
 <p><span class="math display">
-  |\Gamma_{j\ell}| = 1
-  \quad \text{for full coherence},
+  |\Gamma_{j\ell}|=1
+  \quad\text{for full coherence},
   \qquad
-  \Gamma_{j\ell} = 0
-  \quad \text{for full incoherence}.
+  \Gamma_{j\ell}=0
+  \quad\text{for full incoherence}.
 </span></p>
-<p>This is often the most honest description for biological targets,
-because posture variability, roughness, and unresolved internal
-structure may suppress interference without eliminating it
-completely.</p>
 <div class="float">
-<img src="combining-coherence-schematic.png" alt="Coherence regimes schematic"><div class="figcaption">Coherence regimes schematic</div>
+<img src="combining-coherence-schematic.png" alt="Fixed phase retains interference, randomized phase removes cross terms in the mean, and partial coherence damps them."><div class="figcaption">Fixed phase retains interference, randomized
+phase removes cross terms in the mean, and partial coherence damps
+them.</div>
 </div>
-<p>Full coherence retains fixed relative phase and therefore full
-interference, incoherent averaging randomizes the phase enough that
-cross terms vanish in the mean, and partial coherence damps but does not
-eliminate them.</p>
+<p>A partial-coherence model must define how <span class="math inline">\Gamma_{j\ell}</span> follows from the posture,
+displacement, roughness, or sampling distribution. Treating it as an
+unconstrained fitting factor gives little physical support to the
+result.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="what-must-be-true-before-coherent-summation-is-plausible">What must be true before coherent summation is plausible<a class="anchor" aria-label="anchor" href="#what-must-be-true-before-coherent-summation-is-plausible"></a>
+<h2 id="coordinate-and-phase-requirements">Coordinate and phase requirements<a class="anchor" aria-label="anchor" href="#coordinate-and-phase-requirements"></a>
 </h2>
-<p>Coherent addition is only meaningful if all amplitudes are expressed
-in one common reference frame. That means more than using the same
-units. Each component must be referenced to the same incident field, the
-same origin convention, the same orientation convention, and the same
-phase reference. If two isolated calculations are performed with
-different implicit phase origins, then simply adding their amplitudes is
-meaningless even before any physics questions arise.</p>
-<p>If component centers are located at positions <span class="math inline">\mathbf{r}_1</span> and <span class="math inline">\mathbf{r}_2</span>, then even the simplest
-first-order combination requires translation phases of the form:</p>
+<p>Equal units are not enough for coherent addition. The component
+results must use the same incident-wave convention, origin, orientation,
+exterior medium, and far-field amplitude normalization. A translation
+changes the phase even when it does not change an isolated component’s
+cross-section.</p>
+<p>For monostatic backscatter with component positions <span class="math inline">\mathbf r_j</span>, a simple first-order translation
+has the form:</p>
 <p><span class="math display">
   f_{\mathrm{tot}}
   \approx
-  f_1 e^{2 i k \hat{\mathbf{k}} \cdot \mathbf{r}_1} +
-    f_2 e^{2 i k \hat{\mathbf{k}} \cdot \mathbf{r}_2}.
+  f_1 e^{2ik\hat{\mathbf k}\cdot\mathbf r_1}
+  + f_2 e^{2ik\hat{\mathbf k}\cdot\mathbf r_2}.
 </span></p>
-<p>Without these factors, the interference term is wrong even when the
-components are otherwise weakly coupled. This is also why coherent and
-incoherent combinations cannot be chosen casually. If a user does not
-know the relative phase convention well enough to write these
-translation factors, that is already a warning sign that coherent
-summation may not be under control.</p>
-<p>Weak mutual interaction is the second requirement. The simple
-coherent sum assumes that the field incident on component 1 is still
-essentially the external incident field, not the external field plus the
-rescattered field from component 2. Likewise for component 2. In other
-words, multiple scattering between components is neglected. That
-assumption is most plausible when the components are well separated
-relative to their characteristic size and when neither one strongly
-shadows or reradiates into the other.</p>
+<p>The sign of this phase factor depends on the time, incident-wave, and
+amplitude conventions. It must be derived from the conventions shared by
+the component models rather than copied without checking. If a model
+reports only <code>TS</code> or <code>sigma_bs</code>, its complex phase
+cannot be reconstructed from that scalar output.</p>
 </div>
 <div class="section level2">
-<h2 id="why-simple-sums-often-break-down">Why simple sums often break down<a class="anchor" aria-label="anchor" href="#why-simple-sums-often-break-down"></a>
+<h2 id="multiple-scattering-and-coupled-geometry">Multiple scattering and coupled geometry<a class="anchor" aria-label="anchor" href="#multiple-scattering-and-coupled-geometry"></a>
 </h2>
-<p>The most common reason simple component sums fail is multiple
-scattering. If one component scatters strongly enough to modify the
-field incident on the other, then the total field is no longer described
-by two isolated first-order returns. Instead, rescattering terms
-appear:</p>
+<p>The isolated-component sum assumes that each component is illuminated
+by the external incident field. If one component modifies the field at
+another, rescattering terms enter the total field <span class="citation">(<a href="#ref-Morse_1968">Morse and Ingard
+1968</a>)</span>:</p>
 <p><span class="math display">
-  p_{\mathrm{tot}} =
-    p_{\mathrm{inc}} +
-    p_{\mathrm{scat},1} +
-    p_{\mathrm{scat},2} +
-    p_{12} + p_{21} + \cdots,
+  p_{\mathrm{tot}}
+  = p_{\mathrm{inc}}
+  + p_{\mathrm{scat},1}
+  + p_{\mathrm{scat},2}
+  + p_{12} + p_{21} + \cdots.
 </span></p>
-<p>where <span class="math inline">p_{12}</span> and <span class="math inline">p_{21}</span> denote intercomponent rescattering.
-Those terms are absent from isolated-model amplitudes, so a simple sum
-misses part of the physics immediately.</p>
-<p>Geometric shadowing and exclusion cause a second kind of failure. If
-one component is close to, attached to, or embedded in another, then the
-illuminated region of one component depends on the presence of the
-other. In that case the actual boundary-value problem is not the
-superposition of two isolated canonical shapes. It is a new object with
-a new boundary, and the isolated solutions are no longer exact
-subsolutions of the composite target.</p>
-<p>There is also a subtler failure mode in which the component models do
-not share the same approximation regime. A weak-scattering volume model
-and a high-frequency specular model may each be useful in their own
-intended limits, but simply adding their outputs can mix approximations
-that are not consistent within one common expansion. The arithmetic can
-look tidy while the physics becomes incoherent.</p>
+<p>Those terms are absent from the two isolated calculations. The
+approximation also weakens when components touch, overlap, are embedded,
+strongly shadow one another, or materially alter each other’s boundary.
+The physical target is then a coupled boundary-value problem, not two
+canonical solutions joined after the fact.</p>
+<p>Compatibility of approximations matters as well. A weak-scattering
+volume model and a high-frequency specular model may each be useful in
+its own regime, yet their amplitudes need not form terms in one
+consistent expansion. Composite models such as <code>KRM</code> combine
+components within a shared formulation. That is different from adding
+unrelated final outputs.</p>
 </div>
 <div class="section level2">
-<h2 id="example-a-fluid-like-cylinder-plus-a-gas-filled-sphere">Example: a fluid-like cylinder plus a gas-filled sphere<a class="anchor" aria-label="anchor" href="#example-a-fluid-like-cylinder-plus-a-gas-filled-sphere"></a>
+<h2 id="working-with-package-output">Working with package output<a class="anchor" aria-label="anchor" href="#working-with-package-output"></a>
 </h2>
-<p>Suppose one considers combining <code>FCMS</code> for a fluid-like
-finite cylinder with <code>SPHMS</code> for a gas-filled sphere. This
-may be a reasonable exploratory approximation only if the sphere and
-cylinder are truly distinct components rather than one embedded
-boundary-value problem, if they are separated enough that multiple
-scattering between them is weak, if both are referenced to a common
-coordinate system and orientation convention, if amplitudes rather than
-target strengths are combined, and if the necessary translation phases
-are included before the total cross-section is formed.</p>
-<p>Even then, the result is still only a first-order composite
-approximation rather than a single exact model. If instead the
-gas-filled sphere is attached to, partly inside, or very close to the
-cylinder, then the combination becomes much less defensible because the
-sphere changes the field seen by the cylinder and the cylinder changes
-the field seen by the sphere. At that point the coupled geometry should
-be treated as a new scattering problem rather than as an algebraic
-combination of two old ones.</p>
+<p>Retrieve each result table with
+<code>extract(object, "model")</code>. Before any combination, check
+whether it contains a complex <code>f_bs</code> and whether the model’s
+documentation defines a phase convention compatible with the other
+component. The presence of a column named <code>f_bs</code> does not
+establish compatibility by itself.</p>
+<p>When an incoherent ensemble sum has been physically justified,
+convert reported target strengths to cross-sections, add in the linear
+domain, and convert the result back to decibels:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">sigma_total</span> <span class="op">&lt;-</span> <span class="fu">acousticTS</span><span class="fu">::</span><span class="fu"><a href="../../reference/linear.html">linear</a></span><span class="op">(</span><span class="va">TS_component_1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">acousticTS</span><span class="fu">::</span><span class="fu"><a href="../../reference/linear.html">linear</a></span><span class="op">(</span><span class="va">TS_component_2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">TS_incoherent</span> <span class="op">&lt;-</span> <span class="fu">acousticTS</span><span class="fu">::</span><span class="fu"><a href="../../reference/linear.html">db</a></span><span class="op">(</span><span class="va">sigma_total</span><span class="op">)</span></span></code></pre></div>
+<p>This code is algebraically correct for the stated incoherent mean. It
+does not justify the incoherence assumption. For coherent addition,
+preserve complex amplitudes through translation and summation, then form
+the result:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">f_total</span> <span class="op">&lt;-</span> <span class="va">f_component_1</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fl">1i</span> <span class="op">*</span> <span class="va">phase_1</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="va">f_component_2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">exp</a></span><span class="op">(</span><span class="fl">1i</span> <span class="op">*</span> <span class="va">phase_2</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">sigma_total</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/complex.html" class="external-link">Mod</a></span><span class="op">(</span><span class="va">f_total</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span></span>
+<span><span class="va">TS_coherent</span> <span class="op">&lt;-</span> <span class="fu">acousticTS</span><span class="fu">::</span><span class="fu"><a href="../../reference/linear.html">db</a></span><span class="op">(</span><span class="va">sigma_total</span><span class="op">)</span></span></code></pre></div>
+<p><code>acousticTS</code> does not automatically certify phase
+compatibility or account for multiple scattering between outputs from
+separate models. Those are properties of the proposed physical
+approximation and must be demonstrated by its author.</p>
 </div>
 <div class="section level2">
-<h2 id="when-a-component-sum-is-most-defensible">When a component sum is most defensible<a class="anchor" aria-label="anchor" href="#when-a-component-sum-is-most-defensible"></a>
+<h2 id="example-decision-cylinder-and-sphere">Example decision: cylinder and sphere<a class="anchor" aria-label="anchor" href="#example-decision-cylinder-and-sphere"></a>
 </h2>
-<p>Component-wise coherent summation is most plausible when the
-subscatterers are physically distinct, the interaction between them is
-weak, the surrounding field is approximately the same for each
-component, all amplitudes are expressed in a common phase convention,
-and the result is explicitly presented as a first-order approximation
-rather than as a complete composite solution.</p>
-<p>This is the logic behind models such as <code>KRM</code>, where
-several components are combined inside one shared approximation
-framework rather than by naively adding unrelated final outputs from
-unrelated standalone models. If those conditions are not met, but the
-science question concerns an ensemble average over many random
-realizations, then incoherent or partially coherent addition may be more
-defensible than a deterministic coherent sum. Even then, that choice
-should be justified as an averaging argument, not as a generic algebraic
-shortcut.</p>
+<p>Consider a fluid-like finite cylinder calculated with
+<code>FCMS</code> and a gas-filled sphere calculated with
+<code>SPHMS</code>. A first-order coherent approximation may be useful
+when the components are physically separate, sufficiently far apart for
+mutual scattering and shadowing to be weak, expressed in the same
+exterior medium and coordinate system, and available as compatible
+complex amplitudes with the required translation phases.</p>
+<p>If the sphere is attached to or embedded in the cylinder, those
+conditions are unlikely to hold. A coupled model or full-wave
+boundary-element, finite-element, or transition-matrix treatment is then
+more appropriate. An incoherent sum may still describe a clearly defined
+randomized ensemble, but it is not the exact response of a fixed
+composite target.</p>
 </div>
 <div class="section level2">
-<h2 id="when-one-should-not-trust-it">When one should not trust it<a class="anchor" aria-label="anchor" href="#when-one-should-not-trust-it"></a>
+<h2 id="decision-checklist">Decision checklist<a class="anchor" aria-label="anchor" href="#decision-checklist"></a>
 </h2>
-<p>Supreme caution is warranted when components touch, overlap, or are
-embedded, when one component strongly shadows another, when the
-component models come from incompatible physical approximations, when
-the relative phase is unknown, or when the scientific question depends
-on absolute target strength rather than on rough trend comparison. In
-such cases, a component sum can still be informative as a sensitivity
-exercise, but it should not be mistaken for a defensible composite
-scattering model.</p>
-</div>
-<div class="section level2">
-<h2 id="better-alternatives">Better alternatives<a class="anchor" aria-label="anchor" href="#better-alternatives"></a>
-</h2>
-<p>If a simple component sum is not good enough, the usual alternatives
-are to derive a composite approximation within one shared framework,
-build a dedicated segmented-body model for the coupled geometry, or move
-to a numerical boundary-element, finite-element, or other full-wave
-solver. Each of those alternatives is harder than a quick sum, but they
-are harder for a reason: they attempt to solve the actual coupled target
-rather than a simplified bookkeeping surrogate.</p>
-</div>
-<div class="section level2">
-<h2 id="a-practical-workflow-checklist">A practical workflow checklist<a class="anchor" aria-label="anchor" href="#a-practical-workflow-checklist"></a>
-</h2>
-<p>Before combining any components, it is worth walking through a short
-checklist. Are the components physically distinct rather than
-overlapping or embedded? Are the underlying models formulated in
-compatible media and coordinate conventions? Do you have access to
-linear quantities or complex amplitudes rather than only <code>TS</code>
-in dB? Is the intended output a deterministic single-realization
-quantity or an ensemble average? Can you justify neglecting or averaging
-away multiple scattering and cross terms? If any answer is no, the
-component sum should be treated as a rough exploratory device at
-most.</p>
-</div>
-<div class="section level2">
-<h2 id="what-not-to-do">What not to do<a class="anchor" aria-label="anchor" href="#what-not-to-do"></a>
-</h2>
-<p>Three shortcuts are especially common and especially risky. The first
-is adding target strengths in dB. That is simply wrong algebraically
-because dB values are logarithmic reports of linear quantities, not
-quantities that can themselves be superposed. The second is adding
-cross-sections from phase-coherent components without a justification
-for dropping interference. The third is combining outputs from different
-models without checking whether their amplitude conventions and
-coordinate references are compatible. The first shortcut is always
-wrong. The second and third can be wrong even when the arithmetic looks
-cleaner.</p>
-</div>
-<div class="section level2">
-<h2 id="when-only-ts-is-available">When only <code>TS</code> is available<a class="anchor" aria-label="anchor" href="#when-only-ts-is-available"></a>
-</h2>
-<p>In some workflows, the user only has access to <code>TS</code> or to
-a reported <code>sigma_{\mathrm{bs}}</code> curve and not to the complex
-amplitude. In that case, a coherent combination is not available because
-the relative phase is missing. The only defensible fallback is an
-explicitly incoherent combination, and even that requires an averaging
-argument.</p>
-<p>In practice, this means the reported <code>TS</code> should first be
-converted back to a linear quantity, the linear quantities should only
-be added when phase randomization is justified for the ensemble of
-interest, and the result should only then be converted back to
-<code>TS</code>. Even under those conditions, the outcome should be
-described as an incoherent ensemble approximation, not as the exact
-response of a composite target.</p>
-</div>
-<div class="section level2">
-<h2 id="connection-to-package-workflows">Connection to package workflows<a class="anchor" aria-label="anchor" href="#connection-to-package-workflows"></a>
-</h2>
-<p>This cautionary logic is exactly why acousticTS distinguishes between
-comparing models and combining components. Comparing models asks how
-different formulations behave on the same target. Combining components
-asks whether separate subtargets can be turned into one composite
-prediction. Those are not interchangeable tasks. A model-comparison
-workflow can often be rigorous with matched inputs, while a
-component-combination workflow usually requires much stronger physical
-assumptions.</p>
-</div>
-<div class="section level2">
-<h2 id="final-rule">Final rule<a class="anchor" aria-label="anchor" href="#final-rule"></a>
-</h2>
-<p>If one feels the urge to ask whether two model outputs can simply be
-added, the safe default answer is no. The useful follow-up question is
-narrower: can the two components be represented as weakly interacting
-subscatterers whose complex amplitudes may be added with a common phase
-reference as a first-order approximation? Only if the answer to that
-narrower question is yes does coherent component summation become
-plausible.</p>
+<p>Before reporting a combined result, document:</p>
+<ol style="list-style-type: decimal">
+<li>whether the target is a fixed realization or an ensemble
+average,</li>
+<li>whether components are separate enough to neglect coupling and
+shadowing,</li>
+<li>which amplitude, phase, coordinate, and exterior-medium conventions
+are shared,</li>
+<li>how component translations and orientations enter the phase,</li>
+<li>why cross terms are retained, damped, or averaged away,</li>
+<li>whether the component approximations are physically compatible,
+and</li>
+<li>how the composite approximation was checked against a coupled
+solution, limiting case, or independent result.</li>
+</ol>
+<p>If only <code>TS</code> is available, deterministic coherent
+combination is not possible. If cross-sections are added, label the
+result as an incoherent ensemble approximation and state the averaging
+argument that removes the cross terms.</p>
 </div>
 <div class="section level2">
 <h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
@@ -496,10 +371,9 @@ of Fish That Lack a Swimbladder. <span>Backscattering</span> by
 Individual Fish.”</span> <em>ICES Journal of Marine Science</em> 62 (5):
 984–95. <a href="https://doi.org/10.1016/j.icesjms.2005.03.010" class="external-link">https://doi.org/10.1016/j.icesjms.2005.03.010</a>.
 </div>
-<div id="ref-Stanton_1996" class="csl-entry">
-Stanton, T. 1996. <span>“Acoustic Scattering Characteristics of Several
-Zooplankton Groups.”</span> <em>ICES Journal of Marine Science</em> 53
-(2): 289–95. <a href="https://doi.org/10.1006/jmsc.1996.0037" class="external-link">https://doi.org/10.1006/jmsc.1996.0037</a>.
+<div id="ref-Morse_1968" class="csl-entry">
+Morse, Philip M., and K. Uno Ingard. 1968. <em>Theoretical
+Acoustics</em>. McGraw-Hill.
 </div>
 </div>
 </div>

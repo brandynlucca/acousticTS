@@ -7,9 +7,9 @@ Validated Experimental
 [Overview](https://brandynlucca.github.io/acousticTS/articles/pcdwba/index.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/pcdwba/pcdwba-theory.md)
 
-These pages follow the phase-compensated weak-scattering literature for
-broadside elongated bodies and krill-style applications ([Chu and Ye
-1999](#ref-Chu_1999); [Chu et al. 1993](#ref-Chu_1993)).
+PCDWBA follows the phase-compensated weak-scattering formulation for
+broadside elongated targets ([Chu and Ye 1999](#ref-Chu_1999); [Chu et
+al. 1993](#ref-Chu_1993)).
 
 The phase-compensated distorted wave Born approximation is available
 through `target_strength(..., model = "pcdwba")`. The implementation is
@@ -19,10 +19,10 @@ bent cylinder or an arbitrary fluid-like profile.
 
 This page checks the implementation against two source-level references:
 
-- the `pcdwba_fbs` routine in the `Python` package Echopop (Lucca and
-  Lee ([2026](#ref-Echopop_software))),
-- the bent-cylinder DWBA routines in the `R`-package ZooScatR (Gastauer
-  et al. ([2019](#ref-ZooScatR_software))) .
+- the `pcdwba_fbs` routine in the Python package Echopop ([Lucca and Lee
+  2026](#ref-Echopop_software))
+- the bent-cylinder DWBA routines in the R package ZooScatR ([Gastauer
+  et al. 2019](#ref-ZooScatR_software))
 
 `PCDWBA` is validated here against source-level reference
 implementations rather than against a separate published benchmark
@@ -93,21 +93,11 @@ head(extract(pcdwba_object, "model")$PCDWBA)
 | echopop vs ZooScatR-source | 0.073947 | 0.001123 |
 
 The ZooScatR and acousticTS outputs are indistinguishable on this grid.
-The Echopop comparison remains close as well, but it is not at machine
-precision because that implementation evaluates the cylindrical Bessel
-term through interpolation rather than a direct nodewise call. On this
-grid, the largest mismatch occurs near `112 kHz`; replacing the
-interpolated `J_1(x)/x` evaluation with a direct call collapses that
-residual onto the acousticTS / ZooScatR curve. So the remaining drift is
-numerical, not geometrical.
-
-#### Timings
-
-| Implementation  | Elapsed (s) | f min (kHz) | f max (kHz) | Step (kHz) | Node count |
-|:----------------|------------:|------------:|------------:|-----------:|-----------:|
-| acousticTS      |      0.0100 |          12 |         200 |          2 |         51 |
-| echopop         |      3.3122 |          12 |         200 |          2 |         51 |
-| ZooScatR-source |      0.1200 |          12 |         200 |          2 |         51 |
+Echopop remains close but evaluates the cylindrical Bessel term through
+interpolation rather than a direct nodewise call. The largest mismatch
+is near `112 kHz`. Replacing the interpolated `J_1(x)/x` value with a
+direct call collapses the residual onto the acousticTS and ZooScatR
+curve, identifying the drift as numerical rather than geometrical.
 
 #### Spectrum overlay
 
@@ -117,13 +107,10 @@ references.](pcdwba-reference-comparison.png)
 
 ### Closing note
 
-This is the kind of implementation check that matters for a
-phase-compensated bent-cylinder solver. The comparison is not just
-against a benchmark curve. It is against two independently written
-source routines that share the same governing model. On this reference
-case, acousticTS reproduces the direct ZooScatR-style calculation
-exactly and stays very close to the Echopop implementation across the
-full frequency band.
+The two source-level comparisons exercise the same governing model
+through independent code paths. acousticTS reproduces the direct
+ZooScatR calculation on this case and remains close to Echopop across
+the comparison band.
 
 ## References
 

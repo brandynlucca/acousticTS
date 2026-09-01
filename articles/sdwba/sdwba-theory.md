@@ -7,34 +7,18 @@ Benchmarked Validated
 [Overview](https://brandynlucca.github.io/acousticTS/articles/sdwba/index.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/sdwba/sdwba-implementation.md)
 
-The stochastic distorted wave Born approximation (SDWBA) begins with the
-same weak-scattering derivation as the deterministic DWBA, then modifies
-the phase structure of the coherent sum to account for unresolved
-variability in body shape, posture, and internal structure ([Demer and
-Conti 2003](#ref-Demer_2003_1); [Conti and Demer 2006](#ref-Conti_2006);
-[Stanton et al. 1998](#ref-Stanton_1998_2)).
+The stochastic distorted wave Born approximation (SDWBA) retains the
+local weak-scattering amplitude of DWBA and perturbs the phases of its
+body segments. The random phase represents unresolved variation in
+morphology, posture, or internal structure that changes acoustic path
+length ([Demer and Conti 2003](#ref-Demer_2003_1); [Conti and Demer
+2006](#ref-Conti_2006)). It broadens deterministic interference features
+without replacing the underlying DWBA kernel.
 
-The deterministic part of the derivation still assumes a weakly
-scattering fluid-like body, so the local scattering strength is
-controlled by small density and compressibility contrasts in the same
-way as in the DWBA. The stochastic extension is introduced only after
-that weak-contrast amplitude model has been established.
-
-The central idea is simple. The deterministic DWBA assumes that the
-phase of the contribution from every local body segment is known
-exactly. For live organisms, that assumption is often too strong. If
-small geometric perturbations alter the optical path length across the
-body, then the coherent interference pattern predicted by the
-deterministic model becomes too sharp. The SDWBA models that mismatch as
-a random perturbation of the segment phases.
-
-The important point is that the stochastic term is not introduced as an
-unrelated correction factor. It is meant to stand in for unresolved
-path-length variability. In that sense, the SDWBA does not replace the
-DWBA amplitude model. It modifies the coherence structure of the DWBA
-sum when the exact phase bookkeeping implied by the deterministic
-geometry is no longer believable at the resolution of the available
-target description.
+The deterministic amplitude and its symbols are derived in [DWBA
+theory](https://brandynlucca.github.io/acousticTS/articles/dwba/dwba-theory.md).
+Reporting quantities follow [Notation and
+symbols](https://brandynlucca.github.io/acousticTS/articles/notation-and-symbols/notation-and-symbols.md).
 
 ## Deterministic starting point
 
@@ -66,20 +50,15 @@ q_j(\theta) = \frac{k_1}{4} \left(\gamma\_\kappa -
 \gamma\_\rho\right)\_j a_j e^{2 i \mathbf{k}\_2 \cdot \mathbf{r}\_j}
 \frac{J_1\\\left(2 k_2 a_j \cos\beta_j\right)}{\cos\beta_j} \Delta s_j.
 
-This representation is exact up to the numerical quadrature error
-associated with segmentation. It is also fully coherent: every complex
-segment contribution interferes with every other one.
+Within the slender-body DWBA approximation, this discretization is fully
+coherent. Its additional numerical error is the segment quadrature
+error.
 
 ## Why a stochastic extension is needed
 
-The deterministic sum assumes that the segment geometry (\mathbf{r}\_j,
-a_j, \beta_j) is known without error. That assumption is usually
-violated in biological targets for at least three reasons.
-
-First, real body surfaces are not exactly smooth or axisymmetric.
-Second, internal material contrasts can vary on scales smaller than the
-model resolution. Third, organism posture changes from one realization
-to the next even at fixed macroscopic orientation.
+The deterministic sum treats (\mathbf{r}\_j,a_j,\beta_j) as exact. Real
+targets depart from this description through surface structure,
+unresolved material variation, and changes in posture.
 
 Each of these effects modifies the phase more strongly than it modifies
 the amplitude. If the total path length to and from a segment changes by
@@ -102,13 +81,12 @@ q_j(\theta)e^{i\varphi_j^{(m)}},
 where m indexes a stochastic realization and \varphi_j^{(m)} is the
 random phase assigned to segment j in that realization.
 
-The standard assumption is that these phases are independent Gaussian
-random variables with zero mean:
+A common SDWBA closure uses independent, zero-mean Gaussian phases
+([Demer and Conti 2003](#ref-Demer_2003_1)):
 
 \varphi_j \sim \mathcal{N}(0, \sigma\_\varphi^2).
 
-The mean is taken to be zero so that the stochastic model perturbs
-coherence without systematically biasing the phase in one direction.
+The zero mean avoids a systematic phase shift.
 
 ![How increasing phase variance moves the SDWBA from a coherent segment
 sum toward an incoherent intensity sum.](sdwba-coherence-regimes.svg)
@@ -116,39 +94,24 @@ sum toward an incoherent intensity sum.](sdwba-coherence-regimes.svg)
 How increasing phase variance moves the SDWBA from a coherent segment
 sum toward an incoherent intensity sum.
 
-The deterministic DWBA segment term q_j is retained, but its phase is
-perturbed through unresolved path-length offsets \delta \ell_j, which
-produce realization-specific factors e^{i\varphi_j}. The model is
-therefore not randomizing segment amplitudes arbitrarily. It is
-randomizing the phase implied by a slightly perturbed effective path
-length. As \sigma\_\varphi increases, self-terms remain intact while
-organized interference across segments is progressively suppressed, and
-the ensemble response moves from a coherent sum toward an incoherent
-intensity-like limit.
+The deterministic q_j remains fixed. Increasing \sigma\_\varphi
+suppresses organized interference between segments while leaving their
+self-terms intact.
 
 ### Why Gaussian phase noise is used
 
-The Gaussian choice is mathematically convenient and physically
-reasonable when the phase perturbation is the sum of many small
-unresolved contributions. By the central limit theorem, the cumulative
-phase error then tends toward a normal distribution even if the
-underlying geometric perturbations are not themselves Gaussian.
-
-The zero-mean Gaussian phase model also produces a closed form for the
-expected coherence factor:
+The Gaussian model is appropriate when phase error accumulates from many
+small, unresolved contributions. It also gives the characteristic
+function in closed form:
 
 \mathbb{E}\[e^{i\varphi}\] = e^{-\sigma\_\varphi^2/2}.
 
 This is the key quantity controlling the reduction in cross terms after
 averaging.
 
-It is also helpful to connect this directly to the path-length picture
-introduced above. If \varphi_j = 2 k_2 \delta \ell_j and the unresolved
-path-length offsets are themselves centered and weakly fluctuating, then
-a centered Gaussian model for \varphi_j is the natural short description
-of many small unresolved geometric contributions. The parameter
-\sigma\_\varphi should therefore be interpreted as a phase-disorder
-scale, not as a purely abstract fitting constant detached from geometry.
+If \varphi_j=2k_2\delta\ell_j, then \sigma\_\varphi is a scale for
+unresolved path-length disorder. It is therefore frequency dependent
+when the underlying length perturbations are held fixed.
 
 ## Ensemble-averaged backscattering cross-section
 
@@ -183,9 +146,8 @@ Under that assumption, the ensemble-averaged cross-section becomes:
 \langle \sigma\_\text{bs} \rangle = \sum\_{j=1}^{N} \|q_j\|^2 +
 e^{-\sigma\_\varphi^2} \sum\_{j \ne \ell} q_j q\_\ell^\*.
 
-This equation makes the stochastic mechanism explicit. The self-terms
-remain unchanged, while the cross terms are damped by the coherence
-factor e^{-\sigma\_\varphi^2}.
+The self-terms remain unchanged, while each cross term is multiplied by
+e^{-\sigma\_\varphi^2}.
 
 ### Deterministic and incoherent limits
 
@@ -224,13 +186,12 @@ realizations:
 \langle \sigma\_\text{bs}(\theta) \rangle \approx \frac{1}{M}
 \sum\_{m=1}^{M} \left\|\mathcal{f}\_\text{bs}^{(m)}(\theta)\right\|^2,
 
-where M is the number of realizations. The target strength is then
-defined from the averaged linear cross-section ([MacLennan et al.
-2002](#ref-MacLennan_2002); [Urick 1983](#ref-Urick_1983); [Simmonds and
-MacLennan 2005](#ref-Simmonds_2005)):
+where M is the number of realizations. Target strength is computed from
+the averaged linear cross-section ([MacLennan et al.
+2002](#ref-MacLennan_2002)):
 
-TS = 10\log\_{10}\\\left(\langle \sigma\_\text{bs}(\theta)
-\rangle\right).
+TS = 10\log\_{10}\\\left( \frac{\langle \sigma\_\text{bs}(\theta)
+\rangle}{1\\ \mathrm{m}^2} \right).
 
 This ordering matters. The average is taken in linear units before
 conversion to decibels.
@@ -257,10 +218,8 @@ L is taken to scale as:
 
 N(f,L) = N_0 \frac{fL}{f_0 L_0}.
 
-This relation keeps the typical segment length approximately
-proportional to wavelength. Since wavelength is inversely proportional
-to frequency, the number of segments must increase with both f and L if
-the same physical resolution is to be maintained.
+This keeps segment length approximately proportional to wavelength. The
+number of segments therefore grows with frequency and body length.
 
 ### Phase-standard-deviation scaling
 
@@ -290,10 +249,8 @@ small set of new ones:
 5.  The perturbations are represented adequately by a zero-mean Gaussian
     law.
 
-These assumptions explain the role of the SDWBA. It does not replace the
-underlying scattering physics. It softens the coherence structure of the
-deterministic model when unresolved morphology or posture would
-otherwise make the predicted interference pattern unrealistically sharp.
+SDWBA is therefore a model of unresolved phase coherence, not an
+alternative local scattering law.
 
 ## References
 
@@ -312,15 +269,3 @@ MacLennan, David N., Percy G. Fernandes, and John Dalen. 2002. “A
 Consistent Approach to Definitions and Symbols in Fisheries Acoustics.”
 *ICES Journal of Marine Science* 59 (2): 365–69.
 <https://doi.org/10.1006/jmsc.2001.1158>.
-
-Simmonds, John, and David N. MacLennan. 2005. *Fisheries Acoustics:
-Theory and Practice*. 2nd ed. Blackwell Science.
-<https://doi.org/10.1002/9780470995303>.
-
-Stanton, Timothy K., Dezhang Chu, and Peter H. Wiebe. 1998. “Sound
-Scattering by Several Zooplankton Groups. II. Scattering Models.” *The
-Journal of the Acoustical Society of America* 103 (1): 236–53.
-<https://doi.org/10.1121/1.421110>.
-
-Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed.
-McGraw-Hill.

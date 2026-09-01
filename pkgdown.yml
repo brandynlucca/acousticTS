@@ -13,7 +13,6 @@ articles:
   building-shapes/building-shapes: building-shapes/building-shapes.html
   calibration/calibration-implementation: calibration/calibration-implementation.html
   calibration/calibration-theory: calibration/calibration-theory.html
-  calibration-workflow/calibration-workflow: calibration-workflow/calibration-workflow.html
   combining-components/combining-components: combining-components/combining-components.html
   comparing-models/comparing-models: comparing-models/comparing-models.html
   creating-models-from-scratch/creating-models-from-scratch: creating-models-from-scratch/creating-models-from-scratch.html
@@ -56,7 +55,6 @@ articles:
   package-concepts/package-concepts: package-concepts/package-concepts.html
   pcdwba/pcdwba-implementation: pcdwba/pcdwba-implementation.html
   pcdwba/pcdwba-theory: pcdwba/pcdwba-theory.html
-  plotting-inspecting-results/plotting-inspecting-results: plotting-inspecting-results/plotting-inspecting-results.html
   psms/psms-implementation: psms/psms-implementation.html
   psms/psms-theory: psms/psms-theory.html
   running-models/running-models: running-models/running-models.html
@@ -73,7 +71,7 @@ articles:
   validation-benchmarks/validation-benchmarks: validation-benchmarks/validation-benchmarks.html
   vesm/vesm-implementation: vesm/vesm-implementation.html
   vesm/vesm-theory: vesm/vesm-theory.html
-last_built: 2026-08-31T16:46Z
+last_built: 2026-09-01T16:43Z
 urls:
   reference: https://brandynlucca.github.io/acousticTS/reference
   article: https://brandynlucca.github.io/acousticTS/articles

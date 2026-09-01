@@ -47,10 +47,9 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-physics-primer" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Physics Primer</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-physics-primer">
-<li><a class="dropdown-item" href="../../articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
-    <li><a class="dropdown-item" href="../../articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+<li><a class="dropdown-item" href="../../articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+    <li><a class="dropdown-item" href="../../articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
     <li><a class="dropdown-item" href="../../articles/boundary_conditions.html">Boundary conditions</a></li>
-    <li><a class="dropdown-item" href="../../articles/material-properties/material-properties.html">Material properties</a></li>
     <li><a class="dropdown-item" href="../../articles/numerical-foundations/numerical-foundations.html">Numerical methods</a></li>
   </ul>
 </li>
@@ -58,6 +57,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-build-targets" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Build Targets</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-build-targets">
 <li><a class="dropdown-item" href="../../articles/building-shapes/building-shapes.html">Building Shapes</a></li>
+    <li><a class="dropdown-item" href="../../articles/material-properties/material-properties.html">Material Properties</a></li>
     <li><a class="dropdown-item" href="../../articles/building-scatterers/building-scatterers.html">Building Scatterers</a></li>
     <li><a class="dropdown-item" href="../../articles/shape-manipulation-reforging/shape-manipulation-reforging.html">Shape Manipulation</a></li>
   </ul>
@@ -68,17 +68,15 @@
 <li><a class="dropdown-item" href="../../articles/running-models/running-models.html">Running Models</a></li>
     <li><a class="dropdown-item" href="../../articles/model-selection/model-selection.html">Choosing a Model</a></li>
     <li><a class="dropdown-item" href="../../articles/comparing-models/comparing-models.html">Comparing Models</a></li>
-    <li><a class="dropdown-item" href="../../articles/plotting-inspecting-results/plotting-inspecting-results.html">Visualizing results</a></li>
     <li><a class="dropdown-item" href="../../articles/simulation-parameter-sweeps/simulation-parameter-sweeps.html">Simulation sweeps</a></li>
-    <li><a class="dropdown-item" href="../../articles/calibration-workflow/calibration-workflow.html">Calibration workflow</a></li>
-    <li><a class="dropdown-item" href="../../articles/validation-benchmarks/validation-benchmarks.html">Validating models</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../../articles/model-library/model-library.html">Models</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-developers" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Developers</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-developers">
-<li><a class="dropdown-item" href="../../articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
+<li><a class="dropdown-item" href="../../articles/validation-benchmarks/validation-benchmarks.html">Validation methods</a></li>
+    <li><a class="dropdown-item" href="../../articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
     <li><a class="dropdown-item" href="../../articles/combining-components/combining-components.html">Combining components</a></li>
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
@@ -130,10 +128,9 @@
 <a class="model-nav-badge" href="krm-theory.html">Theory</a>
 </div>
 </div>
-<p>These pages follow the composite body-plus-swimbladder fish modeling
-literature initiated for cod and later generalized in open software
-implementations <span class="citation">(<a href="#ref-Clay_1991">Clay
-1991</a>; <a href="#ref-Clay_1994">Clay and Horne 1994</a>)</span>.</p>
+<p>KRM combines a weakly scattering fish body with an optional, strongly
+contrasting swimbladder <span class="citation">(<a href="#ref-Clay_1991">Clay 1991</a>; <a href="#ref-Clay_1994">Clay and
+Horne 1994</a>)</span>.</p>
 <p>The acousticTS package uses object-based scatterers, so the KRM
 workflow follows the same broad structure used elsewhere in the package:
 define the geometry, attach material meaning to the body and any
@@ -281,10 +278,13 @@ k_B</span>. This is the most literal body-embedded reading of <span class="citat
 <code>body_embedded</code> curves are numerically identical, so the
 practical split is between the default <code>lowcontrast</code> spectrum
 and the body-medium alternative.</p>
-<p>::: ## Extracting model results</p>
+</div>
+</div>
+<div class="section level3">
+<h3 id="extracting-model-results">Extracting model results<a class="anchor" aria-label="anchor" href="#extracting-model-results"></a>
+</h3>
 <p>Model results can be extracted either visually or directly through
 <code><a href="../../reference/extract.html">extract()</a></code>.</p>
-</div>
 <div class="section level4">
 <h4 id="plotting-results">Plotting results<a class="anchor" aria-label="anchor" href="#plotting-results"></a>
 </h4>
@@ -354,10 +354,9 @@ that benchmark visible without mixing it with the separate
 software-compatibility checks for body-plus-swimbladder targets.</p>
 <table class="table">
 <colgroup>
-<col width="25%">
-<col width="25%">
-<col width="25%">
-<col width="25%">
+<col width="33%">
+<col width="33%">
+<col width="33%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">Canonical case</th>
@@ -365,44 +364,37 @@ software-compatibility checks for body-plus-swimbladder targets.</p>
 (dB)</th>
 <th align="right">Mean abs. <span class="math inline">\Delta</span> TS
 (dB)</th>
-<th align="right">Elapsed (s)</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td align="left">Gas sphere</td>
 <td align="right">7.91469</td>
 <td align="right">6.04116</td>
-<td align="right">0.01</td>
 </tr>
 <tr class="even">
 <td align="left">Weakly scattering sphere</td>
 <td align="right">11.21090</td>
 <td align="right">0.47451</td>
-<td align="right">0.15</td>
 </tr>
 <tr class="odd">
 <td align="left">Gas prolate spheroid</td>
 <td align="right">7.36054</td>
 <td align="right">4.62751</td>
-<td align="right">0.00</td>
 </tr>
 <tr class="even">
 <td align="left">Weakly scattering prolate spheroid</td>
 <td align="right">14.27193</td>
 <td align="right">0.46239</td>
-<td align="right">0.00</td>
 </tr>
 <tr class="odd">
 <td align="left">Gas cylinder</td>
 <td align="right">7.35632</td>
 <td align="right">6.19094</td>
-<td align="right">0.02</td>
 </tr>
 <tr class="even">
 <td align="left">Weakly scattering cylinder</td>
 <td align="right">23.22115</td>
 <td align="right">0.59807</td>
-<td align="right">0.02</td>
 </tr>
 </tbody>
 </table>
@@ -414,14 +406,12 @@ the canonical KRM targets.</p>
 checks<a class="anchor" aria-label="anchor" href="#bundled-fish-compatibility-checks"></a>
 </h4>
 <p>The bundled fish objects serve a different benchmark role from the
-canonical modal-series targets above. There is no exact modal-series
-reference for these segmented body-plus-swimbladder geometries, so they
-are used only to check software-to-software agreement for the
-<code>krm_variant</code> branches on realistic fish shapes. This inclues
-KRMr <span class="citation">(<a href="#ref-KRMr_software">Gastauer
-2025</a>)</span>, echoSMs <span class="citation">(<a href="#ref-echoSMs_software"><span class="nocase">Macaulay and
-contributors</span> 2024</a>)</span>, and the SWFSC applet <span class="citation">(<a href="#ref-NOAA_KRM_software">Southwest Fisheries
-Science Center 2022</a>)</span>.</p>
+canonical modal-series targets. There is no exact modal-series reference
+for these segmented body-plus-swimbladder geometries, so they check
+software agreement for the <code>krm_variant</code> branches. The
+comparisons include KRMr <span class="citation">(<a href="#ref-KRMr_software">Gastauer 2025</a>)</span>, echoSMs <span class="citation">(<a href="#ref-echoSMs_software"><span class="nocase">Macaulay and contributors</span> 2024</a>)</span>, and
+the SWFSC applet <span class="citation">(<a href="#ref-NOAA_KRM_software">Southwest Fisheries Science Center
+2022</a>)</span>.</p>
 <div class="section level5">
 <h5 id="sardine">Sardine<a class="anchor" aria-label="anchor" href="#sardine"></a>
 </h5>

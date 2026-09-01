@@ -7,34 +7,37 @@ Benchmarked Validated
 [Overview](https://brandynlucca.github.io/acousticTS/articles/sphms/index.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/sphms/sphms-implementation.md)
 
-The sphere is the classical geometry for which the acoustic scattering
-problem can be solved exactly by separation of variables. Because the
-Helmholtz equation separates in spherical coordinates, the incident,
-scattered, and interior fields can be expanded in spherical
-eigenfunctions, and the boundary conditions reduce to independent
-algebraic equations for each angular order ([Anderson
-1950](#ref-Anderson_1950); [Faran 1951](#ref-Faran_1951); [Hickling
-1962](#ref-Hickling_1962)).
+The acoustic scattering problem for a sphere separates exactly in
+spherical coordinates. The incident, scattered, and interior fields can
+therefore be expanded in spherical eigenfunctions, and the boundary
+conditions reduce to independent algebraic equations for each angular
+order ([Anderson 1950](#ref-Anderson_1950)).
 
-That structure is what underlies the spherical modal series solution for
-rigid, pressure-release, fluid-filled, and gas-filled spheres. In this
-article, medium `1` denotes the surrounding seawater and medium `2`
-denotes the sphere interior, consistent with the shared package notation
-summarized in the [acoustic scattering
-primer](https://brandynlucca.github.io/acousticTS/articles/acoustic-scattering-primer/acoustic-scattering-primer.md)
-and [notation
-guide](https://brandynlucca.github.io/acousticTS/articles/notation-and-symbols/notation-and-symbols.md).
-Shell-based spherical problems are treated separately in the `ESSMS` and
-calibration articles because once an intermediate shell is introduced,
-the interface physics changes qualitatively.
+The spherical modal-series solution applies that structure to
+fixed-rigid, pressure-release, liquid-filled, and gas-filled spheres.
+Medium `1` is the surrounding fluid and medium `2` is the sphere
+interior.
 
-The unshelled spherical problem considered here has three boundary
-families. A rigid sphere enforces zero normal velocity at r = a, a
-pressure-release sphere enforces zero pressure there, and a fluid-filled
-or gas-filled sphere enforces continuity of pressure and normal velocity
-between the surrounding medium and the interior. Shell-supported
-spherical problems are treated separately because once an elastic shell
-is introduced, the interface physics changes qualitatively.
+Symbols and medium indexing follow [Notation and
+Symbols](https://brandynlucca.github.io/acousticTS/articles/notation-and-symbols/notation-and-symbols.md).
+The physical meaning of each interface type is developed in [Boundary
+Conditions](https://brandynlucca.github.io/acousticTS/articles/boundary_conditions.md).
+
+The unshelled problem has three boundary families. A fixed-rigid sphere
+enforces zero normal velocity at r=a, a pressure-release sphere enforces
+zero pressure, and a penetrable sphere enforces pressure and
+normal-velocity continuity. Elastic solids and shells require additional
+displacement and traction conditions and are treated by `SOEMS` and
+`ESSMS`.
+
+![SPHMS spherical-coordinate and partial-wave schematic, showing the
+boundary at r=a, the polar angle \theta, and the radial basis functions
+used inside and outside the
+sphere.](sphms-coordinate-geometry-clean.png)
+
+SPHMS spherical-coordinate and partial-wave schematic, showing the
+boundary at r=a, the polar angle \theta, and the radial basis functions
+used inside and outside the sphere.
 
 The boundary condition is imposed at r = a, the incident and scattered
 fields are expanded in spherical partial waves outside the sphere, and
@@ -96,10 +99,11 @@ The radial equation takes the form:
 \frac{d}{dr}\left(r^2\frac{dR}{dr}\right) + \left(k^2r^2 -
 n(n+1)\right)R = 0,
 
-whose independent solutions are the spherical Bessel, oeumann, and
-Hankel functions. The essential point is that spherical geometry keeps
-the angular order n separated exactly. That is why each partial wave can
-be solved independently once the boundary condition is imposed.
+whose independent solutions are the spherical Bessel, Neumann, and
+Hankel functions. Spherical geometry keeps the angular order n
+separated, so each partial wave can be solved independently after the
+boundary condition is imposed ([Morse and Feshbach
+1953](#ref-Morse_1953)).
 
 ### Orthogonality
 
@@ -107,8 +111,8 @@ The angular modes decouple because the Legendre polynomials satisfy:
 
 \int\_{-1}^{1} P_m(\mu)P_n(\mu)\\d\mu = \frac{2}{2n+1}\delta\_{mn}.
 
-This orthogonality is the key step that turns the continuous boundary
-conditions into independent equations for each order n.
+This orthogonality turns the continuous boundary conditions into
+independent equations for each order n.
 
 ## Incident and scattered field expansions
 
@@ -255,13 +259,11 @@ h_n^{(1)\\\prime}(k_1 a) -
 \dfrac{1}{g\_{21}h\_{21}}\dfrac{\text{j}\_n^\prime(k_2
 a)}{\text{j}\_n(k_2 a)}h_n^{(1)}(k_1 a) }
 
-This is the direct spherical analogue of the fluid-filled cylindrical
-coefficient formulas seen in other modal models. The important
-mathematical step is the elimination of the interior amplitude from the
-2 \times 2 continuity system. Gas-filled spheres obey exactly the same
-algebra. The only difference is physical: the contrasts g\_{21} and
-h\_{21} are then typically far from unity rather than moderately close
-to it.
+The interior amplitude has now been eliminated from the 2\times2
+continuity system. Liquid-filled and gas-filled spheres use the same
+coefficient equation ([Anderson 1950](#ref-Anderson_1950)). Their
+physical distinction lies in the values of g\_{21} and h\_{21}, which
+are usually much farther from unity for a gas.
 
 ## Modal truncation
 
@@ -274,12 +276,10 @@ This is a general feature of all modal scattering solutions and follows
 from the fact that the angular spectrum broadens as the target becomes
 acoustically larger.
 
-After choosing a truncation order n\_{max}, one simply evaluates the
-independent coefficient problem for each n=0,1,\ldots,n\_{max} and
-inserts the resulting A_n into the far-field series. Because the
-spherical basis remains orthogonal at every step, truncation introduces
-only a cutoff in the number of retained partial waves; it does not
-change the diagonal structure of the mode-wise solve.
+After choosing n\_{\max}, evaluate the independent coefficient problem
+for n=0,1,\ldots,n\_{\max} and insert the resulting A_n into the
+far-field series. Truncation limits the retained partial waves but does
+not change the diagonal structure of the mode-wise solve.
 
 ## Backscattering cross-section and target strength
 
@@ -288,18 +288,14 @@ cross-section is:
 
 \sigma\_\text{bs} = \|\mathcal{f}\_\text{bs}\|^2
 
-and the target strength is ([MacLennan et al.
-2002](#ref-MacLennan_2002); [Urick 1983](#ref-Urick_1983); [Simmonds and
-MacLennan 2005](#ref-Simmonds_2005)):
+and target strength is ([MacLennan et al. 2002](#ref-MacLennan_2002)):
 
-TS = 10\log\_{10}(\sigma\_\text{bs}).
+TS = 10\log\_{10}\left( \frac{\sigma\_\text{bs}}{1\\
+\mathrm{m}^2}\right).
 
-Since \sigma\_\text{bs} is the squared magnitude of a scattering
-amplitude, one may also write TS =
-20\log\_{10}\|\mathcal{f}\_\text{bs}\| when the amplitude itself is the
-reported quantity. Because the derivation is exact within linear
-acoustics and the stated boundary model, the only approximations
-thereafter are those introduced by truncating the infinite modal series.
+Equivalently, TS=20\log\_{10}(\|\mathcal f\_\text{bs}\|/1\\ \mathrm{m}).
+Within the stated boundary model, numerical approximation enters through
+modal truncation and special-function evaluation.
 
 ## Mathematical assumptions
 
@@ -311,13 +307,11 @@ The spherical modal series rests on the following assumptions:
 4.  Exact separability in spherical coordinates.
 5.  Radiation condition in the exterior field.
 
-Those assumptions are what make the sphere the natural reference problem
-for validating more complicated scattering models. The geometry is
-perfectly matched to the coordinate system, the angular basis remains
-orthogonal, and every retained order remains algebraically local even in
-the fluid-filled case. That is exactly why the spherical problem serves
-as the standard benchmark against which more complicated modal and
-approximate models are often judged.
+The matched geometry and orthogonal angular basis make this solution a
+useful reference for more general modal and approximate models. The
+validation scope of the package implementation is documented on the
+[SPHMS implementation
+page](https://brandynlucca.github.io/acousticTS/articles/sphms/sphms-implementation.md).
 
 ## References
 
@@ -325,25 +319,13 @@ Anderson, Victor C. 1950. “Sound Scattering from a Fluid Sphere.” *The
 Journal of the Acoustical Society of America* 22 (4): 426–31.
 <https://doi.org/10.1121/1.1906621>.
 
-Faran, James J. 1951. “Sound Scattering by Solid Cylinders and Spheres.”
-*The Journal of the Acoustical Society of America* 23 (4): 405–18.
-<https://doi.org/10.1121/1.1906780>.
-
-Hickling, Robert. 1962. “Analysis of Echoes from a Solid Elastic Sphere
-in Water.” *The Journal of the Acoustical Society of America* 34 (10):
-1582–92. <https://doi.org/10.1121/1.1909055>.
-
 MacLennan, David N., Percy G. Fernandes, and John Dalen. 2002. “A
 Consistent Approach to Definitions and Symbols in Fisheries Acoustics.”
 *ICES Journal of Marine Science* 59 (2): 365–69.
 <https://doi.org/10.1006/jmsc.2001.1158>.
 
-Simmonds, John, and David N. MacLennan. 2005. *Fisheries Acoustics:
-Theory and Practice*. 2nd ed. Blackwell Science.
-<https://doi.org/10.1002/9780470995303>.
+Morse, Philip M., and Herman Feshbach. 1953. *Methods of Theoretical
+Physics*. McGraw-Hill.
 
 Sommerfeld, Arnold. 1949. *Partial Differential Equations in Physics*.
 Vol. 6. Lectures on Theoretical Physics. Academic Press.
-
-Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed.
-McGraw-Hill.

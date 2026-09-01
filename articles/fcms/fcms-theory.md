@@ -7,22 +7,13 @@ Benchmarked Validated
 [Overview](https://brandynlucca.github.io/acousticTS/articles/fcms/index.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/fcms/fcms-implementation.md)
 
-The finite cylinder modal series solution (FCMS) is one of the standard
-ways to represent acoustic backscatter from straight cylinders of finite
-length ([Stanton 1988](#ref-Stanton_1988), [1989](#ref-Stanton_1989_2)).
-Its appeal is that it retains the exact cylindrical-harmonic treatment
-of the circular cross-section while replacing the fully
-three-dimensional endcap problem with a finite-axis coherence factor.
-That combination makes the model substantially more informative than a
-purely asymptotic ray-style approximation, while still remaining much
-simpler than a complete three-dimensional elastic boundary-value
-treatment.
+The finite-cylinder modal-series solution (FCMS) combines an exact
+cylindrical-harmonic solution for a circular cross-section with an
+approximate finite-axis coherence factor ([Stanton
+1988](#ref-Stanton_1988), [1989](#ref-Stanton_1989_2)). It does not
+solve the fully three-dimensional endcap problem.
 
-This structure is also the main conceptual point a reader should carry
-away from the model. The FCMS is not derived by separating variables for
-the entire finite cylinder, because a finite cylinder with endcaps is
-not globally separable in cylindrical coordinates. Instead, it is
-assembled from two pieces:
+The construction has two pieces:
 
 1.  an exact two-dimensional modal solution for the circular
     cross-section, and
@@ -37,8 +28,13 @@ this vignette is to show how those cylindrical boundary conditions
 determine the coefficients B_m and how the resulting cross-sectional
 response is combined with finite-axis coherence.
 
-The medium numbering follows the shared package convention: medium `1`
-is the surrounding seawater and medium `2` is the cylinder interior.
+Medium `1` is the surrounding fluid and medium `2` is the cylinder
+interior.
+
+Symbols and medium indexing follow [Notation and
+Symbols](https://brandynlucca.github.io/acousticTS/articles/notation-and-symbols/notation-and-symbols.md).
+The interface conditions used below are contextualized in [Boundary
+Conditions](https://brandynlucca.github.io/acousticTS/articles/boundary_conditions.md).
 
 ## Physical basis of the FCMS
 
@@ -156,13 +152,10 @@ Therefore the backscattering amplitude is written as:
 The derivation of the model is therefore reduced to deriving the
 cross-sectional modal coefficients B_m.
 
-This is the crucial reduction. The finite-cylinder problem is not solved
-by direct three-dimensional separation. Instead, it is decomposed into
-an exact cross-sectional modal problem and a one-dimensional axial
-coherence problem. Readers should interpret that factorization
-carefully: the modal sum tells us how the circumference satisfies the
-boundary condition, while the sinc term tells us how those local
-responses interfere when distributed over a segment of finite length.
+The modal sum enforces the boundary condition around the circumference.
+The sinc factor describes interference among those local responses along
+a finite segment. It does not resolve the endcaps as coupled scattering
+surfaces.
 
 ## Cylindrical modal expansion
 
@@ -221,12 +214,9 @@ where the Neumann factor is:
 This expansion is the cylindrical counterpart of the spherical
 partial-wave expansion of a plane wave.
 
-It is obtained by expressing the plane-wave phase factor e^{iKr\cos\phi}
-in the complete angular basis \cos(m\phi) and matching the associated
-radial dependence to the regular Bessel functions. The Neumann factor
-\epsilon_m is simply a bookkeeping device that allows the cosine-series
-expansion to be written in a compact one-sided form over nonnegative
-mode number.
+The Neumann factor \epsilon_m permits the cosine series to be written
+over nonnegative mode numbers while retaining the contributions from
+positive and negative angular orders.
 
 ### Scattered field
 
@@ -321,8 +311,8 @@ J_m(Ka) + B_m H_m^{(1)}(Ka) = C_m^{(int)}J_m(K'a),
 
 and continuity of normal velocity gives:
 
-\frac{1}{\rho_1}\left\[J_m'(Ka)+B_m H_m^{(1)\prime}(Ka)\right\] =
-\frac{1}{\rho_2}\frac{K'}{K}C_m^{(int)}J_m'(K'a).
+\frac{K}{\rho_1}\left\[J_m'(Ka)+B_m H_m^{(1)\prime}(Ka)\right\] =
+\frac{K'}{\rho_2}C_m^{(int)}J_m'(K'a).
 
 Solving the pressure-continuity equation for the interior coefficient
 gives:
@@ -332,19 +322,20 @@ C_m^{(int)} = \frac{J_m(Ka)+B_mH_m^{(1)}(Ka)}{J_m(K'a)}.
 Substituting this into the velocity condition gives:
 
 J_m'(Ka)+B_mH_m^{(1)\prime}(Ka) = \\
-g\_{21}h\_{21}\\\frac{J_m'(K'a)}{J_m(K'a)}
+\frac{1}{g\_{21}h\_{21}}\frac{J_m'(K'a)}{J_m(K'a)}
 \left\[J_m(Ka)+B_mH_m^{(1)}(Ka)\right\],
 
 where g\_{21}=\rho_2/\rho_1 and h\_{21}=c_2/c_1. Rearranging yields:
 
 B_m
-\left\[H_m^{(1)\prime}(Ka)-g\_{21}h\_{21}\frac{J_m'(K'a)}{J_m(K'a)}H_m^{(1)}(Ka)\right\]
-= \\ g\_{21}h\_{21}\frac{J_m'(K'a)}{J_m(K'a)}J_m(Ka)-J_m'(Ka).
+\left\[H_m^{(1)\prime}(Ka)-\frac{1}{g\_{21}h\_{21}}\frac{J_m'(K'a)}{J_m(K'a)}H_m^{(1)}(Ka)\right\]
+= \\ \frac{1}{g\_{21}h\_{21}}\frac{J_m'(K'a)}{J_m(K'a)}J_m(Ka)-J_m'(Ka).
 
 Solving for the exterior scattering coefficient gives:
 
-B_m = \frac{g\_{21}h\_{21}\dfrac{J_m'(K'a)}{J_m(K'a)}J_m(Ka)-J_m'(Ka)}
-{H_m^{(1)\prime}(Ka)-g\_{21}h\_{21}\dfrac{J_m'(K'a)}{J_m(K'a)}H_m^{(1)}(Ka)}.
+B_m =
+\frac{\dfrac{1}{g\_{21}h\_{21}}\dfrac{J_m'(K'a)}{J_m(K'a)}J_m(Ka)-J_m'(Ka)}
+{H_m^{(1)\prime}(Ka)-\dfrac{1}{g\_{21}h\_{21}}\dfrac{J_m'(K'a)}{J_m(K'a)}H_m^{(1)}(Ka)}.
 
 After expressing the Hankel function as:
 
@@ -363,9 +354,10 @@ g\_{21}h\_{21}\left\[Y_m'(Ka)/J_m'(Ka)\right\] }{
 \left\[J_m'(K'a)J_m(Ka)\right\]/\left\[J_m(K'a)J_m'(Ka)\right\] -
 g\_{21}h\_{21} }.
 
-This expression is not introduced independently. It is simply the ratio
-that appears when the two boundary equations are solved for the exterior
-coefficient.
+Multiplying the preceding numerator and denominator by g\_{21}h\_{21}
+and separating H_m^{(1)}=J_m+iY_m produces this auxiliary ratio. Thus
+the g\_{21}h\_{21} factors in C_m are consistent with the reciprocal
+factor in the normal-velocity equation.
 
 The physics is the same as for any fluid-fluid modal scattering problem:
 one imposes continuity of pressure and normal velocity, solves for the
@@ -396,20 +388,14 @@ m\_{max} \approx \lceil ka \rceil + C,
 
 with a modest positive constant C chosen to ensure convergence.
 
-Once m\_{max} is fixed, the calculation is therefore a straightforward
-truncated sum: solve the scalar or 2\times2 coefficient problem for each
-m=0,1,\ldots,m\_{max}, evaluate the cross-sectional modal contribution,
-and then multiply the resulting series by the finite-length axial
-coherence factor. In that sense, FCMS truncation limits the number of
-retained cylindrical harmonics, but it does not create a dense global
-matrix problem.
+Once m\_{\max} is fixed, solve the scalar or 2\times2 coefficient
+problem for each m=0,1,\ldots,m\_{\max}, evaluate the cross-sectional
+modal sum, and apply the finite-length coherence factor. Truncation does
+not create a dense cross-mode system.
 
-It is also helpful to remember what truncation does and does not mean
-physically. Truncating the series does not change the underlying
-boundary condition; it only limits how many angular harmonics are
-retained to represent it numerically. If too few modes are kept, the
-model loses accuracy by under-resolving the angular structure of the
-cross-sectional field, especially at larger acoustic size.
+Truncation leaves the boundary condition unchanged. Too few modes
+under-resolve the cross-sectional field, especially at larger acoustic
+size.
 
 ## Backscattering cross-section and target strength
 
@@ -418,10 +404,10 @@ Once the modal sum is evaluated:
 \sigma\_\text{bs} = \|\mathcal{f}\_\text{bs}\|^2,
 
 The corresponding target strength is ([MacLennan et al.
-2002](#ref-MacLennan_2002); [Urick 1983](#ref-Urick_1983); [Simmonds and
-MacLennan 2005](#ref-Simmonds_2005)):
+2002](#ref-MacLennan_2002)):
 
-TS = 10\log\_{10}(\sigma\_\text{bs}).
+TS = 10\log\_{10}\left( \frac{\sigma\_\text{bs}}{1\\
+\mathrm{m}^2}\right).
 
 ## Mathematical assumptions
 
@@ -440,14 +426,10 @@ exactly within the cross-sectional modal description, but it treats the
 finite length through a separated directivity factor rather than through
 a fully three-dimensional separable solution.
 
-For readers using the model in practice, the most important consequence
-is that FCMS is best interpreted as a cylinder model with exact
-circular-boundary physics and approximate finite-length physics. That is
-a meaningful and often very useful balance, but it also tells us when
-caution is needed: strongly nonuniform radii, strongly influential
-endcaps, or material distributions that vary along the axis are outside
-the ideal assumptions under which the factorized representation is most
-defensible.
+FCMS therefore has exact circular-boundary physics within its
+cross-sectional problem and approximate finite-length physics. Strongly
+varying radii, influential endcaps, or axial material variation fall
+outside that factorization.
 
 ## References
 
@@ -461,10 +443,6 @@ Consistent Approach to Definitions and Symbols in Fisheries Acoustics.”
 *ICES Journal of Marine Science* 59 (2): 365–69.
 <https://doi.org/10.1006/jmsc.2001.1158>.
 
-Simmonds, John, and David N. MacLennan. 2005. *Fisheries Acoustics:
-Theory and Practice*. 2nd ed. Blackwell Science.
-<https://doi.org/10.1002/9780470995303>.
-
 Sommerfeld, Arnold. 1949. *Partial Differential Equations in Physics*.
 Vol. 6. Lectures on Theoretical Physics. Academic Press.
 
@@ -475,6 +453,3 @@ Fluid Cylinders.” *The Journal of the Acoustical Society of America* 83
 Stanton, T. K. 1989. “Sound Scattering by Cylinders of Finite Length.
 III. Deformed Cylinders.” *The Journal of the Acoustical Society of
 America* 86 (2): 691–705. <https://doi.org/10.1121/1.398193>.
-
-Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed.
-McGraw-Hill.

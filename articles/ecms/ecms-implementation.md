@@ -7,9 +7,9 @@ Unvalidated Experimental
 [Overview](https://brandynlucca.github.io/acousticTS/articles/ecms/index.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/ecms/ecms-theory.md)
 
-These pages sit between the classical elastic-cylinder literature and
-later finite-length cylinder approximations used in fisheries acoustics
-([Faran 1951](#ref-Faran_1951); [Stanton 1988](#ref-Stanton_1988)).
+ECMS implements the elastic-cylinder series used in the Faran–Stanton
+finite-length approximation ([Faran 1951](#ref-Faran_1951); [Stanton
+1988](#ref-Stanton_1988)).
 
 The elastic-cylinder modal-series solution is available through
 `target_strength(..., model = "ecms")`. The preferred geometry carrier
@@ -85,13 +85,11 @@ head(extract(elastic_cylinder, "model")$ECMS)
 
 ### Implementation check
 
-| Diagnostic                       | Value |
-|:---------------------------------|------:|
-| Max abs. \Delta TS (dB)          |  0.00 |
-| Mean abs. \Delta TS (dB)         |  0.00 |
-| Frequency at max \Delta (kHz)    | 12.00 |
-| acousticTS elapsed (s)           |  0.08 |
-| Direct transcription elapsed (s) |  0.03 |
+| Diagnostic                    | Value |
+|:------------------------------|------:|
+| Max abs. \Delta TS (dB)       |     0 |
+| Mean abs. \Delta TS (dB)      |     0 |
+| Frequency at max \Delta (kHz) |    12 |
 
 This is not presented as a benchmark. It is an implementation identity
 check: the package output and the independent algebra transcription
@@ -106,11 +104,9 @@ frequency.](ecms-reference-comparison.png)
 
 ### Closing note
 
-The point of this page is therefore narrower than the benchmarked
-modal-series families. `ECMS` is not being claimed here as externally
-validated. What is being documented is that the package reproduces the
-elastic-cylinder algebra it claims to implement, across a full frequency
-band rather than only at a few checkpoint frequencies.
+ECMS is not claimed as externally validated. The documented check
+establishes agreement with an independent transcription of the
+elastic-cylinder algebra over the full comparison band.
 
 ## References
 

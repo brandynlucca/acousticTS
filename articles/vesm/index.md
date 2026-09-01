@@ -7,44 +7,43 @@ Validated Experimental
 [Theory](https://brandynlucca.github.io/acousticTS/articles/vesm/vesm-theory.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/vesm/vesm-implementation.md)
 
-These pages are motivated by layered gas-bearing fish scattering models
-and viscous resonance broadening ([Khodabandeloo et al.
-2021](#ref-Khodabandeloo_2021); [Feuillade and Nero
-1998](#ref-Feuillade_1998)).
-
-The viscous-elastic spherical model (`VESM`) is a layered spherical
-resonance family for a gas core surrounded by an elastic shell and an
-outer viscous biological layer.
+The viscous-elastic spherical model (`VESM`) calculates resonant
+scattering from a gas core, elastic shell, and outer viscous layer. The
+package interface uses `model = "vesms"` and stores output under
+`VESMS`.
 
 ### Core idea
 
-Solve the spherical layered problem mode by mode, with acoustic waves in
-the exterior and gas core, viscous compressional/shear branches in the
-soft outer layer, and elastic longitudinal/transverse waves in the
-shell.
+Solve the concentric layered sphere mode by mode, including acoustic
+waves in the exterior and gas, elastic waves in the shell, and complex
+compressional and shear response in the viscous layer ([Khodabandeloo et
+al. 2021](#ref-Khodabandeloo_2021); [Feuillade and Nero
+1998](#ref-Feuillade_1998)).
 
 ### Best for
 
-- Gas-bearing mesopelagic-fish style layered spheres
-- Problems where gas resonance, shell elasticity, and viscous damping
-  all matter simultaneously
-- Wideband spherical resonance studies beyond a simple bubble or
-  shell-only idealization
+- Gas-bearing layered targets represented by a concentric spherical
+  idealization
+- Resonance studies in which shell elasticity and viscous damping both
+  matter
+- Comparison with simpler bubble, fluid-sphere, or elastic-shell models
 
 ### Supports
 
-- `ESS` spherical objects with an explicit shell and inner gas core plus
-  viscous-layer model arguments
-- Four-region spherical bookkeeping with seawater as medium `1`
-- Monostatic layered resonance calculations
+- Spherical `ESS` objects containing the elastic shell and inner
+  gas-like fluid
+- Run-time viscous-layer density, sound speed, shear viscosity, bulk
+  viscosity, and thickness or radius
+- Configurable spherical modal truncation
 
 ### Main assumptions
 
-- Spherical symmetry
-- Homogeneous material properties within each layer
-- Linear acoustics and linear elasticity
-- Layered spherical interfaces with no nonspherical posture or geometry
-  effects
+- Concentric spherical interfaces and homogeneous properties in each
+  layer
+- Linear acoustics, elasticity, and the documented viscous constitutive
+  model
+- No nonspherical posture, eccentric core, or spatial material gradients
+- Validation is limited to the documented layered-sphere cases
 
 ### Validation status
 
@@ -56,10 +55,10 @@ shell.
 ### Family pages
 
 - [Implementation](https://brandynlucca.github.io/acousticTS/articles/vesm/vesm-implementation.md):
-  layered-object workflow and benchmark comparisons
+  building the layered object, required arguments, output, and
+  comparison
 - [Theory](https://brandynlucca.github.io/acousticTS/articles/vesm/vesm-theory.md):
-  full layered spherical field structure, interface conditions, and
-  mode-wise systems
+  fields in all four regions and interface systems
 
 ## References
 

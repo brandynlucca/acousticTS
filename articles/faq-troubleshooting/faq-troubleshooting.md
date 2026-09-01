@@ -1,164 +1,222 @@
-# FAQ and Troubleshooting
+# Developer Troubleshooting
 
-## Introduction
+## Start from a clean diagnosis
 
-Many common modeling pathologies are simply violations of the
-asymptotic, boundary, or material assumptions documented in the core
-scattering texts ([Medwin and Clay 1998](#ref-Medwin_1998); [Morse and
-Ingard 1968](#ref-Morse_1968)).
+First determine whether R is using the source checkout, an installed
+release, or a previously loaded namespace. Many apparent code failures
+are version mismatches between those states.
 
-Many problems that look like model failures are really workflow
-failures: wrong units, wrong boundary assumption, wrong target class,
-inconsistent material properties, or an interpretation error about what
-quantity is being combined or plotted. This page collects the issues
-that are most likely to surface first and arranges them in the order
-that is usually most efficient for debugging.
+From the repository root, load the working tree and record the session:
 
-The main theme is simple. Before assuming a model is wrong, confirm that
-the object, the physical interpretation, and the output quantity are all
-the ones you think they are. In acoustics, small setup mismatches can
-create large-looking disagreements.
+``` r
 
-## Common questions
+devtools::load_all(".")
+packageVersion("acousticTS")
+sessionInfo()
+```
 
-### Why does the model output look unreasonable?
+Reproduce the failure in a fresh R process before changing code. A
+result that only fails after other scripts have run usually indicates
+leaked options, registry state, attached packages, working-directory
+assumptions, or modified objects.
 
-The first things to check are geometry, units, orientation, material
-properties, and whether the chosen model matches the intended target
-type. Large discrepancies are often caused by a mismatch between the
-physical target and the model family rather than by a coding error. A
-sphere built with the wrong boundary interpretation, a fish-like body
-represented without its dominant gas-filled component, or a frequency
-vector supplied in kHz instead of Hz can all produce results that look
-dramatic while still being explained entirely by setup rather than
-numerics.
+## Installation and compiled code
 
-In practice, the fastest way to debug a surprising curve is usually to
-move backward through the workflow. Plot the shape. Inspect the stored
-body or component properties. Confirm the frequency grid and orientation
-angle. Then ask whether the selected model is actually intended for that
-target. Only after those checks is it worth treating the issue as a
-possible numerical or implementation problem.
+`acousticTS` contains C++17 and Fortran code. Installing from source
+requires a matching compiler toolchain:
 
-### Why do two models disagree strongly?
+- **Windows:** install the Rtools version for the installed R release
+  and check that its compiler tools are available to R.
+- **macOS:** install the Xcode Command Line Tools and the GNU Fortran
+  compiler recommended for the installed R release.
+- **Linux:** install `make`, a C++17 compiler, `gfortran`, and the
+  development libraries required by the R installation.
 
-Strong disagreement is not necessarily a bug. It often means the models
-encode different boundary assumptions, high-frequency reductions,
-coherence assumptions, or geometry simplifications. Before deciding that
-one of the models is wrong, check whether both models were actually
-intended to describe the same physics.
+Check the toolchain before interpreting a long linker error:
 
-Disagreement between `DWBA` and `SDWBA`, for example, may reflect the
-effect of unresolved phase variability rather than a coding issue.
-Disagreement between a modal-series model and an asymptotic model may
-simply mark the point where a compact approximation begins to leave its
-most reliable regime. In that sense, disagreement is often informative,
-but only if the comparison itself was fair.
+``` r
 
-### Can I add component target strengths directly?
+pkgbuild::check_build_tools(debug = TRUE)
+```
 
-Usually no. Target strength is a logarithmic reporting quantity, so
-adding component `TS` values directly is not generally meaningful. The
-correct combination rule depends on whether amplitudes or cross-sections
-are being combined and on whether the components are coherent or
-incoherent. A deterministic coherent sum requires complex amplitudes and
-a shared phase reference. An incoherent sum requires an explicit
-averaging argument.
+Messages mentioning `CXX17`, `gfortran`, `quadmath`, BLAS, undefined
+Fortran symbols, or an unavailable linker usually indicate a build
+environment problem. Run a source install in a clean process to preserve
+the full compiler output:
 
-This is one of the most common places where a workflow can go wrong
-while still looking algebraically neat. See [combining scattering
-components](https://brandynlucca.github.io/acousticTS/articles/combining-components/combining-components.md)
-for the full discussion.
+``` powershell
+R CMD INSTALL .
+```
 
-### Why does increasing geometric detail change the answer?
+Do not edit `R/RcppExports.R` or `src/RcppExports.cpp` by hand. Run
+[`Rcpp::compileAttributes()`](https://rdrr.io/pkg/Rcpp/man/compileAttributes.html)
+only when an exported C++ interface changes, then review both generated
+files. Similarly, use `devtools::document()` after roxygen changes and
+review updates to `NAMESPACE` and `man/`.
 
-Because different models are sensitive to segmentation, coherence,
-truncation, and geometric idealization in different ways. More geometric
-detail does not automatically mean a more appropriate model. In some
-cases, added detail improves the physical representation. In other
-cases, it creates a mismatch between the object description and the
-assumptions of the model being used.
+## A registered model is missing
 
-That is why it is often useful to compare a simple canonical geometry
-against a more detailed segmented geometry before assuming that the more
-detailed version is automatically better. A model that assumes a
-canonical sphere, cylinder, or spheroid does not necessarily benefit
-from extra geometric complexity if that complexity is outside the theory
-the model was derived for.
+Inspect the registry before debugging dispatch:
 
-### What should I inspect first when debugging a workflow?
+``` r
 
-Start with shape plots, then stored parameters, then the model choice
-itself. Only after those are checked is it worth treating the issue as a
-possible numerical or implementation problem. In practice, the most
-efficient sequence is usually:
+available_models()
+```
 
-1.  plot the shape or scatterer geometry,
-2.  inspect the object with `show()` or
-    [`extract()`](https://brandynlucca.github.io/acousticTS/reference/extract.md),
-3.  confirm the boundary and material assumptions,
-4.  verify the frequency grid and orientation convention,
-5.  compare the requested model against the model-selection and theory
-    pages.
+For a session model, confirm that
+[`register_model()`](https://brandynlucca.github.io/acousticTS/reference/register_model.md)
+ran after `acousticTS` was loaded and that its canonical name or alias
+appears in the table. Function names do not have to match the model
+name. The registry entry itself must point to resolvable initializer and
+solver functions.
 
-This sequence works well because it mirrors the structure of the package
-itself. The object definition comes first, the model assignment comes
-second, and result interpretation comes third.
+Persistent registrations require package-qualified references such as
+`"myPackage::initialize_tsl"`. Raw function objects cannot be restored
+in a new session. Name conflicts are also rejected, including aliases
+that collide with built-in or user registrations.
 
-### Why does a benchmark or documentation example not reproduce exactly?
+Remove a single user entry with:
 
-The most common reasons are mismatched units, different medium
-properties, a changed frequency grid, a different orientation
-convention, or a model-specific numerical option that was not carried
-over. A benchmark curve is only meaningful when the target definition
-and calculation settings are genuinely aligned with the reference.
+``` r
 
-This is especially important for benchmark-style datasets and
-calibration workflows. In those cases, a result can be physically
-plausible and still fail to reproduce the intended reference because one
-small part of the setup was changed.
+unregister_model("tsl")
+```
 
-### Why does a model run but still not answer my scientific question?
+To test without any session registrations, clear them while retaining
+the on-disk configuration:
 
-Because a successful model execution and a defensible model choice are
-not the same thing. A model can run cleanly while still being the wrong
-model for the body type, the boundary interpretation, or the acoustic
-regime. This is one reason the package documentation separates workflow
-pages, theory pages, and model-selection pages rather than treating a
-successful function call as proof that the modeling assumptions are
-appropriate.
+``` r
 
-## A practical debugging mindset
+reset_model_registry(remove_persisted = FALSE)
+```
 
-The most useful troubleshooting habit is to treat debugging as a
-sequence of narrowing assumptions rather than as a hunt for broken code.
-First confirm the object. Then confirm the physics. Then confirm the
-model family. Then confirm the output quantity being interpreted. Only
-after those steps should the user move to questions of numerical
-stability or implementation.
+Use `remove_persisted = TRUE` only when the saved user configuration
+should also be deleted. See [Creating
+Models](https://brandynlucca.github.io/acousticTS/articles/creating-models-from-scratch/creating-models-from-scratch.md)
+for the registry contract.
 
-That mindset is especially helpful because many of the hardest-looking
-failures in scattering workflows are really problems of interpretation.
-The model may be doing exactly what it was asked to do, but the object
-or assumptions may not be the ones the user thought they had supplied.
+## Initializer and solver failures
 
-## Recommended reading order
+Separate dispatch from calculation. Call the initializer directly with a
+small canonical object, inspect its slots, then call the solver:
 
-If you are stuck, the most useful sequence is usually [Getting
-started](https://brandynlucca.github.io/acousticTS/articles/getting-started/getting-started.md),
-then [Boundary conditions in
-practice](https://brandynlucca.github.io/acousticTS/articles/boundary-conditions-practice/boundary-conditions-practice.md),
-then [Choosing a
-model](https://brandynlucca.github.io/acousticTS/articles/model-selection/model-selection.md),
-and finally the relevant theory page. That reading order mirrors the
-workflow itself: first confirm the package logic, then the boundary
-interpretation, then the model family, and only then the model-specific
-mathematics.
+``` r
 
-## References
+prepared <- tsl_initialize(
+  object = target,
+  frequency = c(38e3, 70e3)
+)
 
-Medwin, Herman, and Clarence S. Clay. 1998. *Fundamentals of Acoustical
-Oceanography*. Applications of Modern Acoustics. Academic Press.
+extract(prepared, "model_parameters")$TSL
+extract(prepared, "model")$TSL
 
-Morse, Philip M., and K. Uno Ingard. 1968. *Theoretical Acoustics*.
-McGraw-Hill.
+solved <- TSL(prepared)
+extract(solved, "model")$TSL
+```
+
+Check these contracts:
+
+- both functions return the updated `Scatterer`,
+- the initializer and solver use the registry’s same slot name,
+- model-specific arguments appear in the initializer formals,
+- output rows align with the documented frequency or angle grid,
+- `TS`, `sigma_bs`, and `f_bs` agree with their definitions, and
+- unsupported classes, boundaries, and parameter values fail explicitly.
+
+If direct calls work but
+[`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md)
+fails, inspect the registry entry, the requested alias, and
+`model_args`. If deterministic runs work but
+[`simulate_ts()`](https://brandynlucca.github.io/acousticTS/reference/simulate_ts.md)
+fails, test one realization without parallel execution. This usually
+exposes an argument-shape or worker-export problem more clearly.
+
+## Tests pass alone but fail in the suite
+
+Run the smallest relevant test first:
+
+``` r
+
+testthat::test_file("tests/testthat/test-model_registry.R")
+```
+
+Then run the package tests in a fresh process with `devtools::test()`.
+Tests that modify the model registry, options, environment variables,
+random-number state, or working directory must restore the original
+state with [`on.exit()`](https://rdrr.io/r/base/on.exit.html). Avoid
+assertions that depend on test order or on objects created by another
+file.
+
+For numerical failures, compare the first differing intermediate
+quantity rather than only the final `TS`. Record the geometry, boundary,
+material values, frequency, angle, numerical controls, and comparison
+domain. The procedure in [Validation
+Methods](https://brandynlucca.github.io/acousticTS/articles/validation-benchmarks/validation-benchmarks.md)
+separates numerical verification from regression testing.
+
+## Pkgdown and vignette failures
+
+The site builds from the source package in one R process in continuous
+integration. Reproduce that mode locally after loading the checkout:
+
+``` r
+
+devtools::load_all(".")
+
+pkgdown::build_site_github_pages(
+  new_process = FALSE,
+  install = FALSE
+)
+```
+
+For one page, use its pkgdown article identifier:
+
+``` r
+
+pkgdown::build_article(
+  "creating-models-from-scratch/creating-models-from-scratch",
+  lazy = FALSE,
+  new_process = FALSE
+)
+```
+
+An error that occurs only with `new_process = TRUE` often means the
+child process loaded an installed copy rather than uninstalled source
+changes. Install the working tree first, or use the source-loading mode
+above to match this repository’s workflow.
+
+When a page fails, also check:
+
+- chunk working-directory assumptions,
+- paths to local images, SVG files, CSS hooks, and article links,
+- use of unexported helpers from an older installed namespace,
+- duplicate chunk labels, and
+- code that performs expensive scientific calculations during rendering.
+
+Implementation figures are precomputed. Ordinary vignette and pkgdown
+builds should consume committed outputs rather than execute the builders
+under `tools/implementation-figures/`. To investigate generated drift,
+run the family through `tools/implementation-figures/run_all.R` and
+inspect the provenance file under `.tmp/implementation-figures/`.
+
+## Reporting a reproducible problem
+
+A useful issue contains:
+
+1.  a minimal object and function call,
+2.  the complete error and warnings,
+3.  [`sessionInfo()`](https://rdrr.io/r/utils/sessionInfo.html) and the
+    package version or commit,
+4.  the operating system and compiler versions for installation
+    failures,
+5.  the model, boundary, geometry, frequency, and numerical options, and
+6.  whether the failure reproduces in a clean R process.
+
+For unexpected physical output, first confirm units, geometry, material
+properties, boundary condition, and model domain. Then report the
+smallest case that separates the unexpected result from the expected
+reference. Questions about model suitability belong with [Choosing a
+Model](https://brandynlucca.github.io/acousticTS/articles/model-selection/model-selection.md),
+while phase and component-addition questions belong with [Combining
+Scattering
+Components](https://brandynlucca.github.io/acousticTS/articles/combining-components/combining-components.md).

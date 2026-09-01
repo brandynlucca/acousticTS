@@ -47,10 +47,9 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-physics-primer" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Physics Primer</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-physics-primer">
-<li><a class="dropdown-item" href="../../articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
-    <li><a class="dropdown-item" href="../../articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+<li><a class="dropdown-item" href="../../articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+    <li><a class="dropdown-item" href="../../articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
     <li><a class="dropdown-item" href="../../articles/boundary_conditions.html">Boundary conditions</a></li>
-    <li><a class="dropdown-item" href="../../articles/material-properties/material-properties.html">Material properties</a></li>
     <li><a class="dropdown-item" href="../../articles/numerical-foundations/numerical-foundations.html">Numerical methods</a></li>
   </ul>
 </li>
@@ -58,6 +57,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-build-targets" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Build Targets</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-build-targets">
 <li><a class="dropdown-item" href="../../articles/building-shapes/building-shapes.html">Building Shapes</a></li>
+    <li><a class="dropdown-item" href="../../articles/material-properties/material-properties.html">Material Properties</a></li>
     <li><a class="dropdown-item" href="../../articles/building-scatterers/building-scatterers.html">Building Scatterers</a></li>
     <li><a class="dropdown-item" href="../../articles/shape-manipulation-reforging/shape-manipulation-reforging.html">Shape Manipulation</a></li>
   </ul>
@@ -68,17 +68,15 @@
 <li><a class="dropdown-item" href="../../articles/running-models/running-models.html">Running Models</a></li>
     <li><a class="dropdown-item" href="../../articles/model-selection/model-selection.html">Choosing a Model</a></li>
     <li><a class="dropdown-item" href="../../articles/comparing-models/comparing-models.html">Comparing Models</a></li>
-    <li><a class="dropdown-item" href="../../articles/plotting-inspecting-results/plotting-inspecting-results.html">Visualizing results</a></li>
     <li><a class="dropdown-item" href="../../articles/simulation-parameter-sweeps/simulation-parameter-sweeps.html">Simulation sweeps</a></li>
-    <li><a class="dropdown-item" href="../../articles/calibration-workflow/calibration-workflow.html">Calibration workflow</a></li>
-    <li><a class="dropdown-item" href="../../articles/validation-benchmarks/validation-benchmarks.html">Validating models</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../../articles/model-library/model-library.html">Models</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-developers" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Developers</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-developers">
-<li><a class="dropdown-item" href="../../articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
+<li><a class="dropdown-item" href="../../articles/validation-benchmarks/validation-benchmarks.html">Validation methods</a></li>
+    <li><a class="dropdown-item" href="../../articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
     <li><a class="dropdown-item" href="../../articles/combining-components/combining-components.html">Combining components</a></li>
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
@@ -130,20 +128,17 @@
 <a class="model-nav-badge" href="bcms-theory.html">Theory</a>
 </div>
 </div>
-<p>This family follows the deformed-cylinder and coherence-corrected
-cylinder literature for weakly scattering elongated bodies <span class="citation">(<a href="#ref-Stanton_1989_2">Stanton 1989</a>, <a href="#ref-Stanton_1988">1988</a>)</span>.</p>
+<p>BCMS applies a curvature-dependent coherence correction to the
+finite-cylinder modal series <span class="citation">(<a href="#ref-Stanton_1989_2">Stanton 1989</a>, <a href="#ref-Stanton_1988">1988</a>)</span>.</p>
 <p>The bent-cylinder modal-series solution is available through
 <code>target_strength(..., model = "bcms")</code>. It is intended for
 slender, weakly scattering cylinders whose cross-section is still well
 represented by the finite-cylinder modal-series family, but whose
 centerline curvature reduces backscattering coherence relative to the
 straight-cylinder case.</p>
-<p>That is the practical reason to use <code>BCMS</code> instead of
-<code>FCMS</code>. <code>FCMS</code> is the appropriate model when the
-target can be treated as a straight finite cylinder. <code>BCMS</code>
-is the natural extension when the same cylinder idealization is still
-acceptable locally, but the body curvature is strong enough that the
-straight-cylinder coherence assumption is no longer appropriate.</p>
+<p>Use <code>FCMS</code> for a straight finite cylinder. Use
+<code>BCMS</code> when the target remains locally cylindrical but
+centerline curvature changes its along-axis coherence.</p>
 <div class="experiment" data-title="Current validation scope">
 <p><code>BCMS</code> is marked unvalidated because there is not an
 external public software benchmark ladder wired into the package. The
@@ -314,12 +309,10 @@ the straight-cylinder baseline.</p>
 </h4>
 <table class="table">
 <colgroup>
-<col width="18%">
-<col width="16%">
-<col width="17%">
-<col width="16%">
-<col width="15%">
-<col width="14%">
+<col width="26%">
+<col width="24%">
+<col width="25%">
+<col width="24%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">Reference relation</th>
@@ -329,35 +322,26 @@ the straight-cylinder baseline.</p>
 (dB)</th>
 <th align="right">
 <span class="math inline">f</span> at max <span class="math inline">\Delta</span> (kHz)</th>
-<th align="right">acousticTS elapsed (s)</th>
-<th align="right">Reference elapsed (s)</th>
 </tr></thead>
 <tbody><tr class="odd">
 <td align="left">BCMS straight branch vs FCMS</td>
 <td align="right">0</td>
 <td align="right">0</td>
 <td align="right">12</td>
-<td align="right">0.04</td>
-<td align="right">0.04</td>
 </tr></tbody>
 </table>
-<p>This is the first defining identity of the model. When curvature is
-absent, <code>BCMS</code> should not behave like a different cylinder
-model. It should reduce exactly to the straight finite-cylinder
-modal-series solution. The zero residual therefore matters because it
-shows that the curvature correction truly drops out when it should.</p>
+<p>With no curvature, BCMS must reduce to FCMS. The residual verifies
+that the curvature correction drops out in this limit.</p>
 </div>
 <div class="section level4">
 <h4 id="bent-cylinder-coherence-relation">Bent-cylinder coherence relation<a class="anchor" aria-label="anchor" href="#bent-cylinder-coherence-relation"></a>
 </h4>
-<table class="table">
+<table style="width:100%;" class="table">
 <colgroup>
-<col width="31%">
-<col width="14%">
-<col width="14%">
-<col width="14%">
-<col width="12%">
-<col width="12%">
+<col width="42%">
+<col width="18%">
+<col width="19%">
+<col width="18%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">Reference relation</th>
@@ -367,8 +351,6 @@ shows that the curvature correction truly drops out when it should.</p>
 (dB)</th>
 <th align="right">
 <span class="math inline">f</span> at max <span class="math inline">\Delta</span> (kHz)</th>
-<th align="right">acousticTS elapsed (s)</th>
-<th align="right">Reference elapsed (s)</th>
 </tr></thead>
 <tbody><tr class="odd">
 <td align="left">BCMS bent branch vs Stanton (1989) coherence
@@ -376,8 +358,6 @@ construction</td>
 <td align="right">0</td>
 <td align="right">0</td>
 <td align="right">12</td>
-<td align="right">0.13</td>
-<td align="right">0</td>
 </tr></tbody>
 </table>
 <p>This is the second defining identity. The bent-cylinder branch is
@@ -392,25 +372,16 @@ defines the model.</p>
 <h4 id="spectrum-overlay">Spectrum overlay<a class="anchor" aria-label="anchor" href="#spectrum-overlay"></a>
 </h4>
 <p><img src="bcms-reference-comparison.png" class="r-plt" alt="Pre-rendered BCMS comparison showing straight and bent reference spectra together with acousticTS overlays and residual panels." width="90%" style="display: block; margin: auto;"></p>
-<p>The overlay makes the two implementation identities easier to
-interpret. The straight branch sits exactly on the <code>FCMS</code>
-baseline, while the bent branch sits exactly on the coherence-corrected
-reference. The practical takeaway is that the package is honoring the
-intended model decomposition: straight-cylinder modal scattering plus a
-curvature-driven coherence correction.</p>
+<p>The overlay shows the straight branch on the FCMS baseline and the
+bent branch on the coherence-corrected reference.</p>
 </div>
 </div>
 <div class="section level3">
 <h3 id="closing-note">Closing note<a class="anchor" aria-label="anchor" href="#closing-note"></a>
 </h3>
-<p><code>BCMS</code> is best viewed as a controlled extension of
-<code>FCMS</code>, not as a completely separate scattering family. The
-page is therefore organized around the two checks that matter most for
-that relationship: reduction to <code>FCMS</code> in the straight limit,
-and exact agreement with the bent-cylinder coherence construction in the
-curved case. Those checks do not replace an external benchmark ladder,
-but they do establish that the implementation respects the defining
-algebra of the model.</p>
+<p>BCMS is a curvature correction to FCMS. Its two implementation checks
+establish the straight-cylinder limit and the bent-cylinder coherence
+relation. They do not replace an external benchmark ladder.</p>
 </div>
 </div>
 <div class="section level2">

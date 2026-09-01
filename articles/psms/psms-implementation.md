@@ -7,25 +7,13 @@ Benchmarked Validated
 [Overview](https://brandynlucca.github.io/acousticTS/articles/psms/index.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/psms/psms-theory.md)
 
-These pages are rooted in exact spheroidal-coordinate separations and
-later fisheries-acoustics use of prolate-spheroid models ([Spence and
-Granger 1951](#ref-Spence_1951); [Furusawa 1988](#ref-Furusawa_1988)).
+PSMS solves canonical prolate-spheroidal scattering problems in
+spheroidal coordinates ([Spence and Granger 1951](#ref-Spence_1951);
+[Furusawa 1988](#ref-Furusawa_1988)).
 
-The acousticTS package uses object-based scatterers so the same
-implementation pattern carries across models: create a scatterer, run
-[`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md),
-inspect the stored model output, and then compare a small set of
-physically important inputs. For PSMS, the main additional choices are
-the boundary condition, the incident roll angle `phi_body`, and the
-numerical settings that control how the retained spheroidal system is
-actually evaluated.
-
-That last point is especially important for PSMS. Unlike some of the
-simpler modal models, the prolate spheroidal calculation can make
-numerical settings part of the practical interpretation of the run. The
-geometry and material properties still define the target, but
-convergence-related controls help determine how faithfully the truncated
-spheroidal system has been solved.
+The principal choices are the boundary condition, incident roll angle
+`phi_body`, numerical precision, modal stopping rule, and overlap
+quadrature.
 
 ### Prolate spheroid object generation
 
@@ -64,12 +52,8 @@ prolate_object
     ##  Density: 1045 kg m^-3 | Sound speed: 1520 m s^-1
     ## Body orientation (relative to transducer face/axis):1.571 radians
 
-This object setup is doing more than creating an elongated target. It is
-declaring that a prolate spheroid is the intended geometric
-idealization. That is a stronger statement than simply saying the object
-is elongated. A reader should use PSMS when the prolate spheroidal
-geometry itself is physically meaningful, not merely when a target looks
-somewhat longer than it is wide.
+Use PSMS when a prolate spheroid is the intended geometric idealization,
+not merely because a target is elongated.
 
 ### Calculating a TS-frequency spectrum
 
@@ -139,13 +123,10 @@ double-precision path is usually the more practical choice.
 
 ### Adaptive mode
 
-The `adaptive` argument is the main switch that separates a fully
-literal retained-mode evaluation from a more pragmatic backscatter
-evaluation. The important point is that `adaptive = TRUE` does not
-redefine the PSMS mathematics. It changes how aggressively the
-implementation is allowed to stop once the retained modal tail has
-already become numerically inactive
-\[([**Press_2007?**](#ref-Press_2007)); DLMF:ch1; DLMF:ch3\].
+`adaptive = TRUE` retains the same PSMS equations and hard modal
+ceilings, but allows the calculation to stop when the remaining modal
+tail is numerically inactive ([Press et al. 2007](#ref-Press2007); [Roy
+and Reinhardt 2026](#ref-DLMF:ch1); [Temme 2026](#ref-DLMF:ch3)).
 
 The hard modal limits remain the same in both modes. The initialization
 step still defines:
@@ -254,15 +235,13 @@ adaptive quadrature branch.
 
 ### Benchmark comparisons
 
-The PSMS implementation is easiest to interpret when the main numerical
-switches are compared directly against the published benchmark geometry.
-For `fixed_rigid`, `pressure_release`, and `liquid_filled`, the summary
-below uses the bundled `benchmark_ts` data ([Jech et al.
+The main numerical switches are compared on the published benchmark
+geometry. For `fixed_rigid`, `pressure_release`, and `liquid_filled`,
+the summary uses the bundled `benchmark_ts` data ([Jech et al.
 2015](#ref-Jech_2015); [Macaulay and contributors
 2024](#ref-echoSMs_software)). For `gas_filled`, the same `140 x 10 mm`
-broadside prolate geometry is run directly, but the external reference
-are predictions from a boundary element method (BEM) model ([Betcke and
-Scroggs 2021](#ref-Bempp-cl_software)).
+broadside prolate geometry is compared with boundary element predictions
+([Betcke and Scroggs 2021](#ref-Bempp-cl_software)).
 
 Three coverage details matter when reading the numbers:
 
@@ -276,6 +255,11 @@ Three coverage details matter when reading the numbers:
 
 The reported \Delta values are therefore computed only where validated
 benchmark values exist.
+
+The full diagnostic grid retained by the configuration comparison is:
+
+12,\\ 18,\\ 38,\\ 70,\\ 120,\\ 200,\\ 250,\\ 300,\\ 333,\\ 400\\
+\text{kHz}.
 
 #### Benchmark summary
 
@@ -436,128 +420,21 @@ only about `1.4e-07 dB` at `38 kHz`, then separate to about `0.01 dB` by
 starts to favor quadruple precision once the retained PSMS system moves
 into the higher-frequency penetrable regime.
 
-### Representative runtime
-
-Absolute runtime depends strongly on the local machine, compiler,
-BLAS/LAPACK setup, and background system load, so the values below
-should be read as representative timings rather than portable
-expectations. These runs were recorded on:
-
-1.  Windows 10 Home
-2.  AMD Ryzen 5 5600XT 6-Core Processor (`6` physical cores, `12`
-    logical processors)
-3.  `32 GB` RAM
-4.  R `4.5.2` (`x86_64-w64-mingw32`, `ucrt`)
-5.  `g++`
-
-For `fixed_rigid`, `pressure_release`, `gas_filled`, and
-`liquid_filled`, the timed frequency grid was the same one used in the
-benchmark table:
-
-12,\\ 18,\\ 38,\\ 70,\\ 120,\\ 200,\\ 250,\\ 300,\\ 333,\\ 400\\
-\text{kHz}.
-
-For `gas_filled`, these timings use the same published `140 x 10 mm`
-broadside benchmark geometry discussed above rather than the shorter
-bundled fixture run.
-
-#### Runtime summary
-
-- Rigid and pressure release
-- Gas filled
-- Liquid filled
-
-| Boundary           | Precision | `adaptive` | `n_integration` | Elapsed time (s) |
-|:-------------------|:----------|:-----------|:----------------|-----------------:|
-| `fixed_rigid`      | `double`  | `FALSE`    | `96`            |             0.20 |
-| `fixed_rigid`      | `double`  | `TRUE`     |                 |             0.14 |
-| `fixed_rigid`      | `quad`    | `FALSE`    | `96`            |            13.61 |
-| `fixed_rigid`      | `quad`    | `TRUE`     |                 |            13.53 |
-| `pressure_release` | `double`  | `FALSE`    | `96`            |             0.14 |
-| `pressure_release` | `double`  | `TRUE`     |                 |             0.14 |
-| `pressure_release` | `quad`    | `FALSE`    | `96`            |            13.38 |
-| `pressure_release` | `quad`    | `TRUE`     |                 |            13.36 |
-
-| Precision | `simplify_Amn` | `adaptive` | `n_integration` | Elapsed time (s) |
-|:----------|:---------------|:-----------|:----------------|-----------------:|
-| `double`  | `FALSE`        | `FALSE`    | `96`            |           `0.47` |
-| `double`  | `FALSE`        | `TRUE`     |                 |           `0.41` |
-| `double`  | `TRUE`         | `FALSE`    | `96`            |           `0.40` |
-| `double`  | `TRUE`         | `TRUE`     |                 |           `0.38` |
-| `quad`    | `FALSE`        | `FALSE`    | `96`            |          `16.92` |
-| `quad`    | `FALSE`        | `TRUE`     |                 |          `16.67` |
-| `quad`    | `TRUE`         | `FALSE`    | `96`            |          `16.83` |
-| `quad`    | `TRUE`         | `TRUE`     |                 |          `16.90` |
-
-| Precision | `simplify_Amn` | `adaptive` | `n_integration` | Elapsed time (s) |
-|:----------|:---------------|:-----------|:----------------|-----------------:|
-| `double`  | `FALSE`        | `FALSE`    | `96`            |             1.81 |
-| `double`  | `FALSE`        | `TRUE`     |                 |             1.31 |
-| `double`  | `TRUE`         | `FALSE`    | `96`            |             0.18 |
-| `double`  | `TRUE`         | `TRUE`     |                 |             0.15 |
-| `quad`    | `FALSE`        | `FALSE`    | `96`            |            59.66 |
-| `quad`    | `FALSE`        | `TRUE`     |                 |            48.33 |
-| `quad`    | `TRUE`         | `FALSE`    | `96`            |            14.75 |
-| `quad`    | `TRUE`         | `TRUE`     |                 |            14.56 |
-
-The practical interpretation is straightforward:
-
-1.  The rigid and pressure-release PSMS paths are comparatively cheap,
-    even in quadruple precision, because they avoid the dense
-    overlap-driven fluid solve.
-2.  The full liquid-filled solve with `simplify_Amn = FALSE` is still by
-    far the most expensive configuration in this benchmark set.
-3.  The gas-filled benchmark shape is no longer cheap once the published
-    geometry is used, especially in quadruple precision.
-4.  The gas-filled runtime split is therefore diagnostic:
-    `simplify_Amn = TRUE` is not just faster, it is the gas branch that
-    is both stable and externally consistent on the benchmark geometry.
-    In the current public implementation, rows with
-    `simplify_Amn = FALSE` are routed onto that same simplified
-    formulation, so their benchmark deltas now match and their runtime
-    differences reduce to small wrapper overhead rather than different
-    core solves.
-5.  The adaptive liquid-filled path is faster because it combines a
-    smaller modal-content-based quadrature rule at lower reduced
-    frequency with more aggressive n- and m-tail termination inside the
-    backscatter assembly.
-6.  On this machine and grid, that reduces the full liquid-filled quad
-    run from about `59.7 s` to about `48.3 s` without materially
-    changing benchmark agreement.
-7.  The same statement is not automatically true in double precision:
-    the adaptive full liquid-filled double run is faster here, but the
-    benchmark table above shows that it also drifts much farther from
-    the benchmark curve.
-8.  In this adaptive liquid-filled quad comparison, the internally
-    selected quadrature orders were
-    `32, 32, 32, 32, 32, 48, 56, 64, 72, 88`; that sequence is shown in
-    the frequency-by-frequency table above because it is an internal
-    implementation detail, not a user-specified input.
-
 ### Cross-software implementation checks
 
-Beyond the published benchmark curves, it is also useful to check
-whether the same prolate spheroid definitions produce comparable spectra
-in other locally available implementations. The liquid-filled and
-rigid/pressure-release checks below use the shared
-`12, 18, 38, 70, 100 kHz` frequency set so that the cross-software
-comparison reaches more informative reduced frequencies while still
-remaining computationally manageable. The gas-filled comparison is
-summarized separately because the most informative current check is the
-published benchmark geometry run directly against live outputs from
+The cross-software checks use `12, 18, 38, 70, 100 kHz` for
+liquid-filled, rigid, and pressure-release cases. The gas-filled
+comparison instead uses the published benchmark geometry with
 Prol_Spheroid ([Khodabandeloo et al. 2025](#ref-Prol_Spheroid_software))
 and echoSMs ([Macaulay and contributors 2024](#ref-echoSMs_software)).
 
 `Prol_Spheroid` only treats penetrable prolate spheroids, so its cells
-are `N/A` for `fixed_rigid` and `pressure_release`. The original and
-vectorized `Prol_Spheroid` branches are split below because their
-numerical agreement is nearly identical while their runtimes are not.
+are `N/A` for `fixed_rigid` and `pressure_release`.
 
 #### Cross-software summary
 
 - echoSMs
 - Prol_Spheroid
-- Runtime
 
 | Case | Frequency set (kHz) | Max abs. \Delta TS | Mean abs. \Delta TS (dB) |
 |:---|:---|---:|---:|
@@ -571,51 +448,33 @@ numerical agreement is nearly identical while their runtimes are not.
 | `pressure_release` | `12, 18, 38, 70, 100` | `N/A` | `N/A` | `N/A` | `N/A` |
 | `liquid_filled` | `12, 18, 38, 70, 100` | `0.00128` | `0.00055` | `0.00128` | `0.00055` |
 
-| Case | Frequency set (kHz) | t\_\text{acousticTS} (s) | t\_\text{echoSMs} (s) | t\_\text{Prol\\Spheroid} (s) | t\_\text{Prol\\Spheroid-vectorized} (s) |
-|:---|:---|---:|---:|---:|---:|
-| `fixed_rigid` | `12, 18, 38, 70, 100` | `0.86` | `0.34` | `N/A` | `N/A` |
-| `pressure_release` | `12, 18, 38, 70, 100` | `0.93` | `0.33` | `N/A` | `N/A` |
-| `liquid_filled` | `12, 18, 38, 70, 100` | `2.72` | `48.02` | `48.65` | `11.06` |
-
-These checks are informative in a more mixed way once `70` and `100 kHz`
-are included. The penetrable liquid-filled case remains extremely close
-to the independent Prol_Spheroid implementation in both branches, with a
-maximum absolute difference of only `0.00128 dB` over the full
-five-frequency set. The more interesting difference there is
-computational rather than acoustic: the vectorized branch reduces the
-liquid-filled runtime from about `48.65 s` to `11.06 s` on this machine
-while returning the same agreement to the displayed precision.
+The penetrable liquid-filled case remains close to the independent
+Prol_Spheroid implementation, with a maximum absolute difference of
+`0.00128 dB` over the five-frequency set.
 
 By contrast, the shared
 [echoSMs::PSMSModel](https://ices-tools-dev.github.io/echoSMs/api_reference/#echosms.PSMSModel)
-comparison begins to separate at the higher two frequencies, especially
-for the penetrable cases: the liquid-filled difference reaches about
-`1.02 dB` at `100 kHz`. The gas-filled comparison is summarized
-separately below because the current implementation story there is not
-“another representative case ladder.” It is the benchmark geometry
-itself and the fact that the simplified gas branch is the only one that
-presently stays stable and externally consistent.
+comparison separates at the higher two frequencies, especially for the
+penetrable cases. The liquid-filled difference reaches about `1.02 dB`
+at `100 kHz`. The gas-filled comparison uses the benchmark geometry
+because only the simplified gas branch is currently stable and
+externally consistent.
 
 #### Gas-filled cross-software comparison
 
-The gas-filled PSMS path is summarized here on the published benchmark
-geometry itself: `L = 140 mm`, `a = 10 mm`, `theta_body = 90 deg`,
-`phi_body = pi`, `density_body = 1.24 kg m^-3`, and
-`sound_speed_body = 345 m s^-1`. The frequency set is the
-external-reference overlap `12, 18, 38, 70, 120, 200 kHz`. The table
-below compares the stable benchmark-shape gas runs against live
-vectorized `Prol_Spheroid` outputs. The `acousticTS elapsed` values were
-recomputed on exactly this six-frequency grid. In the current public
-implementation, requests for the full gas-filled branch are routed onto
-the same simplified penetrable formulation used by the explicit
-`simplify_Amn = TRUE` rows.
+The gas-filled check uses the published benchmark geometry:
+`L = 140 mm`, `a = 10 mm`, `theta_body = 90 deg`, `phi_body = pi`,
+`density_body = 1.24 kg m^-3`, and `sound_speed_body = 345 m s^-1`. The
+frequency set is `12, 18, 38, 70, 120, 200 kHz`. Requests for the full
+gas-filled branch are currently routed to the same simplified penetrable
+formulation used when `simplify_Amn = TRUE`.
 
-| Case | Frequency set (kHz) | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) | t\_\text{acousticTS} (s) | t\_\text{Prol\\Spheroid} (s) |
-|:---|:---|---:|---:|---:|---:|
-| `benchmark broadside, double, simplified, literal` | `12, 18, 38, 70, 120, 200` | `2.19518` | `0.59593` | `0.13` | `89.93` |
-| `benchmark broadside, double, simplified, adaptive` | `12, 18, 38, 70, 120, 200` | `2.19518` | `0.59593` | `0.14` | `89.93` |
-| `benchmark broadside, quad, simplified, literal` | `12, 18, 38, 70, 120, 200` | `0.13946` | `0.04163` | `3.04` | `89.93` |
-| `benchmark broadside, quad, simplified, adaptive` | `12, 18, 38, 70, 120, 200` | `0.13946` | `0.04163` | `3.21` | `89.93` |
+| Case | Frequency set (kHz) | Max abs. \Delta TS (dB) | Mean abs. \Delta TS (dB) |
+|:---|:---|---:|---:|
+| `benchmark broadside, double, simplified, literal` | `12, 18, 38, 70, 120, 200` | `2.19518` | `0.59593` |
+| `benchmark broadside, double, simplified, adaptive` | `12, 18, 38, 70, 120, 200` | `2.19518` | `0.59593` |
+| `benchmark broadside, quad, simplified, literal` | `12, 18, 38, 70, 120, 200` | `0.13946` | `0.04163` |
+| `benchmark broadside, quad, simplified, adaptive` | `12, 18, 38, 70, 120, 200` | `0.13946` | `0.04163` |
 
 #### Plotting results
 
@@ -701,6 +560,20 @@ Scattering Models Available to Fisheries and Plankton Scientists.” In
 [Https://github.com/ices-tools-dev/echoSMs](https://github.com/ices-tools-dev/echoSMs);
 GitHub.
 
+Press, William H., Saul A. Teukolsky, William T. Vetterling, and Brian
+P. Flannery. 2007. *Numerical Recipes: The Art of Scientific Computing*.
+3rd ed. Cambridge University Press.
+
+Roy, Olver, R., and W. P Reinhardt. 2026. “Algebraic and Analytical
+Methods.” Chap. 1 in *NIST Digital Library of Mathematical Functions*,
+edited by F. W. J. Olver, A. B. Olde Daalhuis, D. W. Lozier, et al.
+[Https://dlmf.nist.gov/1.5#ii](https://dlmf.nist.gov/1.5#ii), Release
+1.2.6 of 2026-03-15. <https://dlmf.nist.gov/1.5#ii>.
+
 Spence, R. D., and Sara Granger. 1951. “The Scattering of Sound from a
 Prolate Spheroid.” *The Journal of the Acoustical Society of America* 23
 (6): 701–6. <https://doi.org/10.1121/1.1906827>.
+
+Temme, N. M. 2026. “Numerical Methods.” Chap. 3 in *NIST Digital Library
+of Mathematical Functions*, edited by F. W. J. Olver, A. B. Olde
+Daalhuis, D. W. Lozier, et al. <https://dlmf.nist.gov/3>.

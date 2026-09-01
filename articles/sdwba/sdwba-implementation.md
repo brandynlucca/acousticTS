@@ -7,11 +7,10 @@ Benchmarked Validated
 [Overview](https://brandynlucca.github.io/acousticTS/articles/sdwba/index.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/sdwba/sdwba-theory.md)
 
-These pages connect krill-body DWBA models to phase variability,
-orientation effects, and practical survey use ([Demer and Stephane G.
-Conti 2003](#ref-Demer_2003_1); [Demer and Stéphane G. Conti
-2003](#ref-Demer_2003_2), [2005](#ref-Demer_2005); [Conti and Demer
-2006](#ref-Conti_2006)).
+SDWBA applies stochastic phase variability to the segment contributions
+of a DWBA target ([Demer and Stephane G. Conti 2003](#ref-Demer_2003_1);
+[Demer and Stéphane G. Conti 2003](#ref-Demer_2003_2),
+[2005](#ref-Demer_2005); [Conti and Demer 2006](#ref-Conti_2006)).
 
 The acousticTS package uses object-based scatterers so the same
 implementation pattern carries across models: create a scatterer, run
@@ -76,6 +75,7 @@ response.
 ``` r
 
 frequency <- seq(50e3, 200e3, by = 10e3)
+set.seed(2025)
 
 stochastic_scatterer <- target_strength(
   object = stochastic_scatterer,
@@ -138,12 +138,12 @@ head(sdwba_results)
 ```
 
     ##   frequency                        f_bs     sigma_bs        TS     TS_sd
-    ## 1     5e+04 -8.440082e-05-5.811999e-06i 7.631414e-09 -81.17395 -88.39526
-    ## 2     6e+04 -1.206802e-04+4.996901e-06i 1.509232e-08 -78.21244 -86.18244
-    ## 3     7e+04 -1.547700e-04+6.557770e-06i 2.528108e-08 -75.97204 -84.06123
-    ## 4     8e+04 -1.993909e-04-9.048857e-06i 4.131196e-08 -73.83924 -82.42271
-    ## 5     9e+04 -2.345411e-04+2.148183e-07i 5.798801e-08 -72.36662 -80.29417
-    ## 6     1e+05 -2.650423e-04+7.759001e-07i 7.417350e-08 -71.29751 -78.95465
+    ## 1     5e+04 -8.584266e-05+7.619334e-07i 7.663389e-09 -81.15579 -89.16974
+    ## 2     6e+04 -1.173376e-04+1.137190e-06i 1.451589e-08 -78.38156 -84.56710
+    ## 3     7e+04 -1.543290e-04+9.972511e-07i 2.503192e-08 -76.01506 -83.13435
+    ## 4     8e+04 -1.887673e-04+8.474688e-06i 3.742329e-08 -74.26858 -81.77264
+    ## 5     9e+04 -2.305227e-04+6.249856e-06i 5.537246e-08 -72.56706 -79.48317
+    ## 6     1e+05 -2.660114e-04+1.462433e-05i 7.373492e-08 -71.32327 -79.23634
 
 The SDWBA results include the same main fields as DWBA plus `TS_sd`,
 which summarizes how much the stochastic realizations vary at each
@@ -194,16 +194,15 @@ For practical SDWBA work, the first controls to revisit are usually:
 
 #### Published reference comparisons
 
-SDWBA should be judged against the exact modal-series `Benchmark` column
+The following comparison uses the exact modal-series `Benchmark` column
 in the Jech weakly scattering sphere, prolate-spheroid, and cylinder
-files. The table below reports that direct comparison together with the
-representative runtime on the current machine.
+files ([Jech et al. 2015](#ref-Jech_2015)).
 
-| Geometry | Max abs. \Delta vs benchmark (dB) | Mean abs. \Delta vs benchmark (dB) | Elapsed (s) |
-|:---|---:|---:|---:|
-| Weakly scattering sphere | 10.08475 | 0.35609 | 0.72 |
-| Weakly scattering prolate spheroid | 2.05918 | 0.07638 | 3.58 |
-| Weakly scattering cylinder | 2.07406 | 0.15895 | 1.91 |
+| Geometry | Max abs. \Delta vs benchmark (dB) | Mean abs. \Delta vs benchmark (dB) |
+|:---|---:|---:|
+| Weakly scattering sphere | 10.08475 | 0.35609 |
+| Weakly scattering prolate spheroid | 2.05918 | 0.07638 |
+| Weakly scattering cylinder | 2.07406 | 0.15895 |
 
 These runs use the same stochastic reference values throughout the
 benchmark set: `N0 = 50`, `phase_sd_init = sqrt(2) / 32`,
@@ -214,25 +213,22 @@ For SDWBA, the most important additional implementation control is
 average is actually resolved numerically. The table below keeps the same
 Jech targets and changes only `n_iterations`.
 
-| Geometry | `n_iterations` | Max abs. \Delta vs benchmark (dB) | Mean abs. \Delta vs benchmark (dB) | Elapsed (s) |
-|:---|---:|---:|---:|---:|
-| Weakly scattering sphere | 25 | 9.30458 | 0.34871 | 0.58 |
-| Weakly scattering sphere | 100 | 10.08475 | 0.35609 | 0.63 |
-| Weakly scattering sphere | 500 | 9.97080 | 0.35343 | 1.11 |
-| Weakly scattering prolate spheroid | 25 | 1.26004 | 0.06948 | 3.08 |
-| Weakly scattering prolate spheroid | 100 | 2.05918 | 0.07638 | 3.63 |
-| Weakly scattering prolate spheroid | 500 | 1.28403 | 0.07107 | 6.50 |
-| Weakly scattering cylinder | 25 | 2.07406 | 0.15899 | 1.75 |
-| Weakly scattering cylinder | 100 | 2.07406 | 0.15895 | 2.03 |
-| Weakly scattering cylinder | 500 | 2.07403 | 0.15895 | 3.39 |
+| Geometry | `n_iterations` | Max abs. \Delta vs benchmark (dB) | Mean abs. \Delta vs benchmark (dB) |
+|:---|---:|---:|---:|
+| Weakly scattering sphere | 25 | 9.30458 | 0.34871 |
+| Weakly scattering sphere | 100 | 10.08475 | 0.35609 |
+| Weakly scattering sphere | 500 | 9.97080 | 0.35343 |
+| Weakly scattering prolate spheroid | 25 | 1.26004 | 0.06948 |
+| Weakly scattering prolate spheroid | 100 | 2.05918 | 0.07638 |
+| Weakly scattering prolate spheroid | 500 | 1.28403 | 0.07107 |
+| Weakly scattering cylinder | 25 | 2.07406 | 0.15899 |
+| Weakly scattering cylinder | 100 | 2.07406 | 0.15895 |
+| Weakly scattering cylinder | 500 | 2.07403 | 0.15895 |
 
-That sensitivity table is useful because it shows two things at once.
-First, the runtime cost does scale with the number of stochastic
-realizations, just as the implementation description says it should.
-Second, once the reference stochastic parameters are fixed, simply
-driving `n_iterations` upward does not force SDWBA onto the exact
-benchmark family. It mainly stabilizes the ensemble average around the
-stochastic approximation itself.
+Increasing `n_iterations` stabilizes the ensemble estimate. It does not
+force the stochastic approximation onto the exact benchmark family. Use
+a fixed seed when comparing stochastic settings or reproducing a
+documented result.
 
 #### Bundled krill implementation comparison
 
@@ -245,9 +241,9 @@ values used for the benchmark calculations (`N0 = 50`,
 `phase_sd_init = sqrt(2) / 32`, `L0 = 38.35 mm`, `f0 = 120 kHz`,
 `n_iterations = 100`). These include a `MATLAB` implementation from
 CCAMLR ([Commission for the Conservation of Antarctic Marine Living
-Resources 2019](#ref-CCAMLR_SDWBA_software)), NOAA applet
-([**NOAA-SDWBA_software?**](#ref-NOAA-SDWBA_software)), and the `Python`
-package echoSMs ([Macaulay and contributors
+Resources 2019](#ref-CCAMLR_SDWBA_software)), NOAA applet ([Southwest
+Fisheries Science Center 2022](#ref-NOAA_SDWBA_software)), and the
+`Python` package echoSMs ([Macaulay and contributors
 2024](#ref-echoSMs_software)).
 
 | Comparison | Mean abs. \Delta TS (dB) | Max abs. \Delta TS (dB) |
@@ -301,8 +297,17 @@ Demer, David A., and Stéphane G. Conti. 2005. “New Target-Strength Model
 Indicates More Krill in the Southern Ocean.” *ICES Journal of Marine
 Science* 62 (1): 25–32. <https://doi.org/10.1016/j.icesjms.2004.07.027>.
 
+Jech, J. Michael, John K. Horne, Dezhang Chu, et al. 2015. “Comparisons
+Among Ten Models of Acoustic Backscattering Used in Aquatic Ecosystem
+Research.” *The Journal of the Acoustical Society of America* 138 (6):
+3742–64. <https://doi.org/10.1121/1.4937607>.
+
 Macaulay, Gavin, and contributors. 2024. “echoSMs: Making Acoustic
 Scattering Models Available to Fisheries and Plankton Scientists.” In
 *GitHub Repository*.
 [Https://github.com/ices-tools-dev/echoSMs](https://github.com/ices-tools-dev/echoSMs);
 GitHub.
+
+Southwest Fisheries Science Center. 2022. *SDWBA Model*. National Marine
+Fisheries Service, National Oceanic; Atmospheric Administration.
+<https://www.fisheries.noaa.gov/data-tools/sdwba-model>.

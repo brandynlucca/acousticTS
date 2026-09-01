@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Building shapes • acousticTS</title>
+<title>Building Shapes • acousticTS</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../../favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="../../favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="../../apple-touch-icon.png">
@@ -17,7 +17,7 @@
 <script src="../../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../../deps/headroom-0.11.0/headroom.min.js"></script><script src="../../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../../deps/search-1.0.0/fuse.min.js"></script><script src="../../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../../pkgdown.js"></script><link href="../../extra.css" rel="stylesheet">
-<meta property="og:title" content="Building shapes">
+<meta property="og:title" content="Building Shapes">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -47,10 +47,9 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-physics-primer" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Physics Primer</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-physics-primer">
-<li><a class="dropdown-item" href="../../articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
-    <li><a class="dropdown-item" href="../../articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+<li><a class="dropdown-item" href="../../articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+    <li><a class="dropdown-item" href="../../articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
     <li><a class="dropdown-item" href="../../articles/boundary_conditions.html">Boundary conditions</a></li>
-    <li><a class="dropdown-item" href="../../articles/material-properties/material-properties.html">Material properties</a></li>
     <li><a class="dropdown-item" href="../../articles/numerical-foundations/numerical-foundations.html">Numerical methods</a></li>
   </ul>
 </li>
@@ -58,6 +57,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-build-targets" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Build Targets</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-build-targets">
 <li><a class="dropdown-item" href="../../articles/building-shapes/building-shapes.html">Building Shapes</a></li>
+    <li><a class="dropdown-item" href="../../articles/material-properties/material-properties.html">Material Properties</a></li>
     <li><a class="dropdown-item" href="../../articles/building-scatterers/building-scatterers.html">Building Scatterers</a></li>
     <li><a class="dropdown-item" href="../../articles/shape-manipulation-reforging/shape-manipulation-reforging.html">Shape Manipulation</a></li>
   </ul>
@@ -68,17 +68,15 @@
 <li><a class="dropdown-item" href="../../articles/running-models/running-models.html">Running Models</a></li>
     <li><a class="dropdown-item" href="../../articles/model-selection/model-selection.html">Choosing a Model</a></li>
     <li><a class="dropdown-item" href="../../articles/comparing-models/comparing-models.html">Comparing Models</a></li>
-    <li><a class="dropdown-item" href="../../articles/plotting-inspecting-results/plotting-inspecting-results.html">Visualizing results</a></li>
     <li><a class="dropdown-item" href="../../articles/simulation-parameter-sweeps/simulation-parameter-sweeps.html">Simulation sweeps</a></li>
-    <li><a class="dropdown-item" href="../../articles/calibration-workflow/calibration-workflow.html">Calibration workflow</a></li>
-    <li><a class="dropdown-item" href="../../articles/validation-benchmarks/validation-benchmarks.html">Validating models</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../../articles/model-library/model-library.html">Models</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-developers" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Developers</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-developers">
-<li><a class="dropdown-item" href="../../articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
+<li><a class="dropdown-item" href="../../articles/validation-benchmarks/validation-benchmarks.html">Validation methods</a></li>
+    <li><a class="dropdown-item" href="../../articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
     <li><a class="dropdown-item" href="../../articles/combining-components/combining-components.html">Combining components</a></li>
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
@@ -109,7 +107,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../../logo.png" class="logo" alt=""><h1>Building shapes</h1>
+      <img src="../../logo.png" class="logo" alt=""><h1>Building Shapes</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/brandynlucca/acousticTS/blob/main/vignettes/building-shapes/building-shapes.Rmd" class="external-link"><code>vignettes/building-shapes/building-shapes.Rmd</code></a></small>
@@ -119,370 +117,285 @@
     
     
 <div class="section level2">
-<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>The shape pathways on this page are most useful when read against the
-canonical geometries that dominate the scattering literature, especially
-spheres, cylinders, spheroids, and piecewise elongated bodies.</p>
-<p>Geometry is the first major decision in the package. Before choosing
-a scatterer class or a target-strength model, it is usually worth
-deciding whether the target is best represented as a canonical shape or
-as a segmented arbitrary body. That decision is not just cosmetic. It
-determines how faithfully the object matches a theory family, how much
-geometric detail is preserved, and how easy it will be to interpret the
-response later.</p>
-<p>The important point is that shape construction is not the stage where
-material contrasts or boundary conditions are fixed. At this stage, only
-the geometric description of the target is being chosen. That separation
-is intentional. It keeps the geometric question distinct from the
-physical one and makes it easier to evaluate later whether a modeled
-response is being driven by morphology, by material properties, or by
-model assumptions.</p>
-<p><img class="vignette-figure" src="building-shapes-spectrum.png" alt="Shape-selection spectrum"></p>
+<p>A shape describes geometry only. It does not assign material
+properties, boundary conditions, or a physical target type. Those are
+added when the shape is used to build a scatterer.</p>
+<p>Every constructor on this page returns an S4 object derived from the
+<a href="../../reference/Shape-class.html"><code>Shape</code> class</a>.
+A <code>Shape</code> contains a <code>position_matrix</code> and a
+<code>shape_parameters</code> list. Keeping geometry separate makes it
+possible to inspect, reuse, or simplify a body before choosing a
+scattering model.</p>
+<div class="note" data-title="Choose geometry for the intended model">
+<p>A detailed outline is not automatically better. Use a canonical shape
+when its geometry is part of the model assumption. Preserve a measured
+or segmented shape when local morphology is important to the
+calculation.</p>
+</div>
+<p><img class="vignette-figure" src="building-shapes-spectrum.png" alt="Geometric representations ranging from canonical shapes to arbitrary segmented bodies"></p>
 </div>
 <div class="section level2">
-<h2 id="quick-construction-examples">Quick construction examples<a class="anchor" aria-label="anchor" href="#quick-construction-examples"></a>
+<h2 id="choosing-a-constructor">Choosing a constructor<a class="anchor" aria-label="anchor" href="#choosing-a-constructor"></a>
 </h2>
-<p>Before getting into the interpretation tradeoffs, it helps to see the
-main shape builders in direct use.</p>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th>Constructor</th>
+<th>Representation</th>
+<th>Main inputs</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><a href="../../reference/sphere.html"><code>sphere()</code></a></td>
+<td>Sphere</td>
+<td>Radius</td>
+</tr>
+<tr class="even">
+<td><a href="../../reference/cylinder.html"><code>cylinder()</code></a></td>
+<td>Straight or tapered cylinder</td>
+<td>Length and radius, or a length-to-radius ratio</td>
+</tr>
+<tr class="odd">
+<td><a href="../../reference/prolate_spheroid.html"><code>prolate_spheroid()</code></a></td>
+<td>Elongated spheroid</td>
+<td>Body length and maximum radius</td>
+</tr>
+<tr class="even">
+<td><a href="../../reference/oblate_spheroid.html"><code>oblate_spheroid()</code></a></td>
+<td>Flattened spheroid</td>
+<td>Body-axis length and equatorial radius</td>
+</tr>
+<tr class="odd">
+<td><a href="../../reference/polynomial_cylinder.html"><code>polynomial_cylinder()</code></a></td>
+<td>Cylinder with a polynomial radius profile</td>
+<td>Length, radius, and polynomial coefficients</td>
+</tr>
+<tr class="even">
+<td><a href="../../reference/arbitrary.html"><code>arbitrary()</code></a></td>
+<td>Measured or user-defined profile</td>
+<td>Coordinate and dimension vectors</td>
+</tr>
+</tbody>
+</table>
+<p>The direct constructors make the resulting class clear. The <a href="../../reference/create_shape.html"><code>create_shape()</code></a>
+wrapper can dispatch to a canonical constructor when a single
+programmatic interface is more convenient.</p>
+</div>
+<div class="section level2">
+<h2 id="canonical-shapes">Canonical shapes<a class="anchor" aria-label="anchor" href="#canonical-shapes"></a>
+</h2>
+<p>Canonical shapes are useful for model families derived in spherical,
+cylindrical, or spheroidal coordinates. They are also useful for
+benchmarks and controlled model comparisons. Construct them with
+dimensions in meters unless the surrounding workflow explicitly handles
+another unit convention:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://brandynlucca.github.io/acousticTS/">acousticTS</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">sphere_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/sphere.html">sphere</a></span><span class="op">(</span>radius_body <span class="op">=</span> <span class="fl">0.01</span>, n_segments <span class="op">=</span> <span class="fl">40</span><span class="op">)</span></span>
-<span><span class="va">cylinder_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/cylinder.html">cylinder</a></span><span class="op">(</span>length_body <span class="op">=</span> <span class="fl">0.05</span>, radius_body <span class="op">=</span> <span class="fl">0.003</span>, n_segments <span class="op">=</span> <span class="fl">80</span><span class="op">)</span></span>
-<span><span class="va">ps_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/prolate_spheroid.html">prolate_spheroid</a></span><span class="op">(</span>length_body <span class="op">=</span> <span class="fl">0.04</span>, radius_body <span class="op">=</span> <span class="fl">0.004</span>, n_segments <span class="op">=</span> <span class="fl">60</span><span class="op">)</span></span>
-<span><span class="va">oblate_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/oblate_spheroid.html">oblate_spheroid</a></span><span class="op">(</span>length_body <span class="op">=</span> <span class="fl">0.012</span>, radius_body <span class="op">=</span> <span class="fl">0.01</span>, n_segments <span class="op">=</span> <span class="fl">60</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">shape_summary</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">shape_obj</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">shape_obj</span>, <span class="st">"shape_parameters"</span><span class="op">)</span></span>
-<span>  <span class="va">pos</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">shape_obj</span>, <span class="st">"position_matrix"</span><span class="op">)</span></span>
-<span>  <span class="va">radius_value</span> <span class="op">&lt;-</span> <span class="va">params</span><span class="op">$</span><span class="va">radius</span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">radius_value</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">1</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">radius_value</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">radius_value</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span>  <span class="op">}</span></span>
-<span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>    shape <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">shape_obj</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
-<span>    length_m <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">pos</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">-</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">pos</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span>    max_radius_m <span class="op">=</span> <span class="va">radius_value</span>,</span>
-<span>    n_segments <span class="op">=</span> <span class="va">params</span><span class="op">$</span><span class="va">n_segments</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span></span>
-<span>  <span class="va">rbind</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">sphere_shape</span>, <span class="va">cylinder_shape</span>, <span class="va">ps_shape</span>, <span class="va">oblate_shape</span><span class="op">)</span>,</span>
-<span>    <span class="va">shape_summary</span></span>
-<span>  <span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##             shape length_m max_radius_m n_segments</span></span>
-<span><span class="co">## 1          Sphere    0.020        0.010         40</span></span>
-<span><span class="co">## 2        Cylinder    0.050        0.003         80</span></span>
-<span><span class="co">## 3 ProlateSpheroid    0.040        0.004         60</span></span>
-<span><span class="co">## 4  OblateSpheroid    0.012        0.010         60</span></span></code></pre>
-<p>Those four examples cover the main canonical branches. The important
-practical point is that each constructor returns a <code>Shape</code>
-object that can later be passed into a scatterer constructor without
-re-entering the geometry.</p>
-<p>It is usually worth plotting those objects immediately so that the
-stored geometry is being checked, not just assumed from the constructor
-call.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">plot_shape_profile</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">shape_obj</span>, <span class="va">main</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">pos</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">shape_obj</span>, <span class="st">"position_matrix"</span><span class="op">)</span></span>
-<span>  <span class="va">x</span> <span class="op">&lt;-</span> <span class="va">pos</span><span class="op">[</span>, <span class="st">"x"</span><span class="op">]</span></span>
-<span>  <span class="va">zU</span> <span class="op">&lt;-</span> <span class="va">pos</span><span class="op">[</span>, <span class="st">"zU"</span><span class="op">]</span></span>
-<span>  <span class="va">zL</span> <span class="op">&lt;-</span> <span class="va">pos</span><span class="op">[</span>, <span class="st">"zL"</span><span class="op">]</span></span>
-<span>  <span class="va">ylim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/range.html" class="external-link">range</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">zU</span>, <span class="va">zL</span><span class="op">)</span>, finite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">zU</span>,</span>
-<span>    type <span class="op">=</span> <span class="st">"l"</span>,</span>
-<span>    ylim <span class="op">=</span> <span class="va">ylim</span>,</span>
-<span>    xlab <span class="op">=</span> <span class="st">"x"</span>,</span>
-<span>    ylab <span class="op">=</span> <span class="st">"z"</span>,</span>
-<span>    main <span class="op">=</span> <span class="va">main</span></span>
-<span>  <span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">zL</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">x</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span><span class="op">)</span>, lty <span class="op">=</span> <span class="fl">3</span>, col <span class="op">=</span> <span class="st">"grey70"</span><span class="op">)</span></span>
-<span><span class="op">}</span></span>
-<span></span>
-<span><span class="va">old_par</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>no.readonly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/on.exit.html" class="external-link">on.exit</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="va">old_par</span><span class="op">)</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">3</span>, <span class="fl">2.2</span>, <span class="fl">0.8</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu">plot_shape_profile</span><span class="op">(</span><span class="va">sphere_shape</span>, main <span class="op">=</span> <span class="st">"Sphere"</span><span class="op">)</span></span>
-<span><span class="fu">plot_shape_profile</span><span class="op">(</span><span class="va">cylinder_shape</span>, main <span class="op">=</span> <span class="st">"Cylinder"</span><span class="op">)</span></span>
-<span><span class="fu">plot_shape_profile</span><span class="op">(</span><span class="va">ps_shape</span>, main <span class="op">=</span> <span class="st">"Prolate spheroid"</span><span class="op">)</span></span>
-<span><span class="fu">plot_shape_profile</span><span class="op">(</span><span class="va">oblate_shape</span>, main <span class="op">=</span> <span class="st">"Oblate spheroid"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="building-shapes_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" alt="" width="768"></p>
-</div>
-<div class="section level2">
-<h2 id="why-geometry-choice-matters">Why geometry choice matters<a class="anchor" aria-label="anchor" href="#why-geometry-choice-matters"></a>
-</h2>
-<p>The geometry chosen at this stage strongly influences which later
-models are natural and which approximations are defensible. A canonical
-geometry can align very well with an exact or modal-series model, while
-a segmented arbitrary geometry can align better with a
-morphology-preserving approximation. Neither option is automatically
-more correct. The right choice depends on whether the main goal is to
-preserve measured shape, to stay close to a canonical theory family, or
-to build a deliberately simplified object for comparison and
-intuition.</p>
-<p>This is why the package keeps shape construction upstream of
-scatterer generation and model selection. A good workflow begins by
-deciding how much geometric structure needs to survive into the acoustic
-problem.</p>
-</div>
-<div class="section level2">
-<h2 id="canonical-shape-generators">Canonical shape generators<a class="anchor" aria-label="anchor" href="#canonical-shape-generators"></a>
-</h2>
-<p>The package includes several geometry constructors for canonical
-targets: <code><a href="../../reference/sphere.html">sphere()</a></code> for spherical bodies,
-<code><a href="../../reference/cylinder.html">cylinder()</a></code> for straight cylindrical bodies,
-<code><a href="../../reference/prolate_spheroid.html">prolate_spheroid()</a></code> for smooth elongated bodies, and
-<code><a href="../../reference/polynomial_cylinder.html">polynomial_cylinder()</a></code> for parameterized cylindrical
-profiles. The convenience wrapper <code><a href="../../reference/create_shape.html">create_shape()</a></code> can be
-used when the goal is to dispatch to one of these canonical builders
-through a single interface.</p>
-<p>Canonical shapes are especially useful when the geometry itself is
-part of the model assumption. A spherical target is naturally paired
-with a spherical theory family, a smooth prolate body aligns naturally
-with a spheroidal theory family, and a straight finite cylinder aligns
-naturally with cylindrical model families. In those cases, using a
-canonical shape is not only convenient. It is often the most physically
-interpretable choice because the geometry and the mathematical basis are
-consistent with each other.</p>
-<p>Canonical geometry is also useful for comparison studies. If the goal
-is to understand how two model families differ under controlled
-conditions, a simple sphere, cylinder, or spheroid often provides a
-cleaner starting point than a highly detailed arbitrary outline.</p>
-<p>The direct generators are usually the clearest interface because they
-make the resulting shape class explicit at the call site.
-<code><a href="../../reference/create_shape.html">create_shape()</a></code> is a thin convenience dispatcher rather than
-the main pedagogical path.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">wrapped_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/create_shape.html">create_shape</a></span><span class="op">(</span></span>
-<span>  <span class="st">"cylinder"</span>,</span>
-<span>  length_body <span class="op">=</span> <span class="fl">0.03</span>,</span>
-<span>  radius_body <span class="op">=</span> <span class="fl">0.002</span>,</span>
-<span>  n_segments <span class="op">=</span> <span class="fl">50</span></span>
+<span><span class="va">sphere_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/sphere.html">sphere</a></span><span class="op">(</span></span>
+<span>  radius_body <span class="op">=</span> <span class="fl">0.01</span>,</span>
+<span>  n_segments <span class="op">=</span> <span class="fl">40</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">wrapped_shape</span>, <span class="st">"shape_parameters"</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"shape"</span>, <span class="st">"length"</span>, <span class="st">"radius"</span>, <span class="st">"n_segments"</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
-<pre><code><span><span class="co">## $&lt;NA&gt;</span></span>
-<span><span class="co">## NULL</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## $length</span></span>
-<span><span class="co">## [1] 0.03</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## $radius</span></span>
-<span><span class="co">##  [1] 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002</span></span>
-<span><span class="co">## [13] 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002</span></span>
-<span><span class="co">## [25] 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002</span></span>
-<span><span class="co">## [37] 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002 0.002</span></span>
-<span><span class="co">## [49] 0.002 0.002 0.002</span></span>
-<span><span class="co">## </span></span>
-<span><span class="co">## $n_segments</span></span>
-<span><span class="co">## [1] 50</span></span></code></pre>
+<span><span class="va">cylinder_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/cylinder.html">cylinder</a></span><span class="op">(</span></span>
+<span>  length_body <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>  radius_body <span class="op">=</span> <span class="fl">0.003</span>,</span>
+<span>  n_segments <span class="op">=</span> <span class="fl">80</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">prolate_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/prolate_spheroid.html">prolate_spheroid</a></span><span class="op">(</span></span>
+<span>  length_body <span class="op">=</span> <span class="fl">0.04</span>,</span>
+<span>  radius_body <span class="op">=</span> <span class="fl">0.004</span>,</span>
+<span>  n_segments <span class="op">=</span> <span class="fl">60</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">oblate_shape</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/oblate_spheroid.html">oblate_spheroid</a></span><span class="op">(</span></span>
+<span>  length_body <span class="op">=</span> <span class="fl">0.012</span>,</span>
+<span>  radius_body <span class="op">=</span> <span class="fl">0.01</span>,</span>
+<span>  n_segments <span class="op">=</span> <span class="fl">60</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><code>n_segments</code> controls the axial discretization. Increase
+it when the radius profile or downstream numerical method requires finer
+resolution, then check that the result is insensitive to further
+refinement.</p>
+<div class="figure">
+<img src="building-shapes_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" alt="Profiles produced by the four canonical constructors." width="768"><p class="caption">
+Profiles produced by the four canonical constructors.
+</p>
+</div>
 </div>
 <div class="section level2">
-<h2 id="coordinate-conventions-by-shape">Coordinate conventions by shape<a class="anchor" aria-label="anchor" href="#coordinate-conventions-by-shape"></a>
+<h2 id="stored-coordinates">Stored coordinates<a class="anchor" aria-label="anchor" href="#stored-coordinates"></a>
 </h2>
-<p>The package stores shape geometry in a way that is consistent across
-models, but it is easier to read those objects once the coordinate
-conventions are made explicit. The schematic below shows the profile
-view used by the canonical shapes and the side-profile plus
-cross-section interpretation used by arbitrary shapes.</p>
-<p><img class="vignette-figure" src="building-shapes-coordinates.png" alt="Coordinate conventions for canonical and arbitrary shapes"></p>
-<p>For <code><a href="../../reference/sphere.html">sphere()</a></code>, the geometry is most naturally interpreted
-as a profile in the <code>x-z</code> plane with a single radius
-<code>a</code>. At any axial coordinate <code>x_i</code>, the upper and
-lower boundaries are <code>zU(x_i)</code> and <code>zL(x_i)</code>. For
-a perfect sphere, those are the positive and negative branches of the
-same circular boundary.</p>
-<p>For <code><a href="../../reference/cylinder.html">cylinder()</a></code>, the profile is still expressed in
-<code>x-z</code>, but the upper and lower limits are constant over the
-body length. In other words, <code>zU(x) = +a</code> and
-<code>zL(x) = -a</code> for the straight cylindrical section.
-<code><a href="../../reference/polynomial_cylinder.html">polynomial_cylinder()</a></code> uses the same coordinate framing, but
-lets the radius vary smoothly with <code>x</code>.</p>
-<p>For <code><a href="../../reference/prolate_spheroid.html">prolate_spheroid()</a></code>, the semimajor axis lies along
-<code>x</code> and the semiminor axis lies along <code>z</code>. The
-focal half-distance <code>q</code> appears naturally in the prolate
-spheroidal coordinate system, so it is worth showing explicitly even
-when the object is generated from the more intuitive axis lengths.</p>
-<p>For <code><a href="../../reference/arbitrary.html">arbitrary()</a></code>, the stored side profile is again
-defined along <code>x</code>, with <code>zU(x)</code> and
-<code>zL(x)</code> describing the upper and lower body bounds. When a
-transverse width <code>w(x)</code> is present, it describes the span of
-the body in the orthogonal <code>y</code> direction at the same axial
-station. In KRM-style uses, that width can also be represented as a
-local radius <code>a(x) = w(x) / 2</code> when the cross-section is
-being treated as a disc or ellipse.</p>
+<p>Canonical and arbitrary shapes use a common axial profile. The
+<code>x</code> column gives the axial location. The <code>zU</code> and
+<code>zL</code> columns give the upper and lower profile bounds. Some
+arbitrary shapes also contain <code>w</code>, the transverse span in the
+<code>y</code> direction.</p>
+<p><img class="vignette-figure" src="building-shapes-coordinates.png" alt="Stored coordinate conventions for spheres, cylinders, prolate spheroids, and arbitrary profiles"></p>
+<p>For a sphere of radius <span class="math inline">a</span> centered at
+<span class="math inline">x_c</span>, the stored profile follows:</p>
+<p><span class="math display">
+z_U(x) = \sqrt{a^2 - (x-x_c)^2},
+\qquad
+z_L(x) = -z_U(x).
+</span></p>
+<p>For a straight cylinder of radius <span class="math inline">a</span>,
+the stored bounds are:</p>
+<p><span class="math display">
+z_U(x) = a,
+\qquad
+z_L(x) = -a.
+</span></p>
+<p>A polynomial or tapered cylinder retains the same columns while
+allowing the local radius to vary with <span class="math inline">x</span>.</p>
+<p>For a prolate spheroid, the body semimajor axis lies along <span class="math inline">x</span> and the semiminor axis lies along <span class="math inline">z</span>. The corresponding focal half-distance
+is:</p>
+<p><span class="math display">
+q = \sqrt{a^2-b^2},
+</span></p>
+<p>Here, the semimajor axis <span class="math inline">a</span> is
+greater than the semiminor axis <span class="math inline">b</span>.
+These coordinates describe the geometry. Target orientation is assigned
+later when building the scatterer.</p>
+<p>Use <a href="../../reference/extract.html"><code>extract()</code></a>
+to inspect either slot without editing the S4 object directly:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">prolate_shape</span>, <span class="st">"position_matrix"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##               x y z          zU           zL</span></span>
+<span><span class="co">## [1,] 0.04000000 0 0 0.000000000  0.000000000</span></span>
+<span><span class="co">## [2,] 0.03933333 0 0 0.001024153 -0.001024153</span></span>
+<span><span class="co">## [3,] 0.03866667 0 0 0.001436044 -0.001436044</span></span>
+<span><span class="co">## [4,] 0.03800000 0 0 0.001743560 -0.001743560</span></span>
+<span><span class="co">## [5,] 0.03733333 0 0 0.001995551 -0.001995551</span></span>
+<span><span class="co">## [6,] 0.03666667 0 0 0.002211083 -0.002211083</span></span></code></pre>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">prolate_shape</span>, <span class="st">"shape_parameters"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## $length</span></span>
+<span><span class="co">## [1] 0.04</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $radius</span></span>
+<span><span class="co">##  [1] 0.000000000 0.001024153 0.001436044 0.001743560 0.001995551 0.002211083</span></span>
+<span><span class="co">##  [7] 0.002400000 0.002568181 0.002719477 0.002856571 0.002981424 0.003095516</span></span>
+<span><span class="co">## [13] 0.003200000 0.003295789 0.003383621 0.003464102 0.003537733 0.003604935</span></span>
+<span><span class="co">## [19] 0.003666061 0.003721410 0.003771236 0.003815757 0.003855155 0.003889587</span></span>
+<span><span class="co">## [25] 0.003919184 0.003944053 0.003964285 0.003979950 0.003991101 0.003997777</span></span>
+<span><span class="co">## [31] 0.004000000 0.003997777 0.003991101 0.003979950 0.003964285 0.003944053</span></span>
+<span><span class="co">## [37] 0.003919184 0.003889587 0.003855155 0.003815757 0.003771236 0.003721410</span></span>
+<span><span class="co">## [43] 0.003666061 0.003604935 0.003537733 0.003464102 0.003383621 0.003295789</span></span>
+<span><span class="co">## [49] 0.003200000 0.003095516 0.002981424 0.002856571 0.002719477 0.002568181</span></span>
+<span><span class="co">## [55] 0.002400000 0.002211083 0.001995551 0.001743560 0.001436044 0.001024153</span></span>
+<span><span class="co">## [61] 0.000000000</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $semimajor_length</span></span>
+<span><span class="co">## [1] 0.02</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $semiminor_length</span></span>
+<span><span class="co">## [1] 0.004</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $length_radius_ratio</span></span>
+<span><span class="co">## [1] 10</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $n_segments</span></span>
+<span><span class="co">## [1] 60</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## $length_units</span></span>
+<span><span class="co">## [1] "m"</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 id="arbitrary-and-measured-shapes">Arbitrary and measured shapes<a class="anchor" aria-label="anchor" href="#arbitrary-and-measured-shapes"></a>
 </h2>
-<p>When measured body coordinates or bespoke outlines are available,
-<code><a href="../../reference/arbitrary.html">arbitrary()</a></code> is often the most flexible starting point.
-Arbitrary shapes are particularly important for elongated biological
-targets whose centerline and cross-sectional variation are more
-important than exact canonical separability. In those situations,
-preserving the morphology may matter more than matching a canonical
-coordinate system.</p>
-<p>This is one of the main geometric tradeoffs in the package. A
-canonical shape may offer stronger mathematical alignment with an exact
-theory family, but it may smooth away anatomical features that are
-important for an approximate segmented model. An arbitrary shape may
-preserve those features better, but it may no longer support the same
-geometry-matched analytical simplifications. The right choice depends on
-what role the geometry must play in the later acoustic
-interpretation.</p>
-<p>The further a body departs from a separable canonical surface, the
-stronger the case becomes for preserving the measured morphology rather
-than forcing the target into an overly simple idealized form.</p>
+<p>Use <code><a href="../../reference/arbitrary.html">arbitrary()</a></code> when measured coordinates, taper,
+curvature, or anatomical detail should be retained. It accepts an
+existing position matrix or named coordinate vectors. The following
+symmetric profile is defined by axial locations and local radii:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">measured_like</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/arbitrary.html">arbitrary</a></span><span class="op">(</span></span>
 <span>  x_body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.01</span>, <span class="fl">0.02</span>, <span class="fl">0.03</span>, <span class="fl">0.04</span><span class="op">)</span>,</span>
 <span>  radius_body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.004</span>, <span class="fl">0.006</span>, <span class="fl">0.004</span>, <span class="fl">0</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">measured_like</span>, <span class="st">"position_matrix"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">measured_like</span>, <span class="st">"position_matrix"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##         x     a    zU     zL</span></span>
 <span><span class="co">## [1,] 0.00 0.000 0.000  0.000</span></span>
 <span><span class="co">## [2,] 0.01 0.004 0.004 -0.004</span></span>
 <span><span class="co">## [3,] 0.02 0.006 0.006 -0.006</span></span>
 <span><span class="co">## [4,] 0.03 0.004 0.004 -0.004</span></span>
 <span><span class="co">## [5,] 0.04 0.000 0.000  0.000</span></span></code></pre>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">plot_shape_profile</span><span class="op">(</span><span class="va">measured_like</span>, main <span class="op">=</span> <span class="st">"Arbitrary measured-like body"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="building-shapes_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="672"></p>
-<p>That is the most direct pathway when the user already has an axial
-coordinate series or wants to sketch a bespoke elongated target by
-hand.</p>
+<p>For asymmetric profiles, provide <code>zU_body</code> and
+<code>zL_body</code>. A transverse <code>w_body</code> vector can record
+width at the same axial stations. All coordinate vectors should describe
+the same body in a consistent coordinate system and unit convention.</p>
+<div class="figure">
+<img src="building-shapes_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="An arbitrary profile defined by axial locations and local radii." width="672"><p class="caption">
+An arbitrary profile defined by axial locations and local radii.
+</p>
+</div>
+<p>Operations such as translating, reanchoring, resampling, smoothing,
+and inflating a shape are covered in <a href="../shape-manipulation-reforging/shape-manipulation-reforging.html">Shape
+Manipulation</a>.</p>
 </div>
 <div class="section level2">
-<h2 id="canonical-surrogates-from-measured-shapes">Canonical surrogates from measured shapes<a class="anchor" aria-label="anchor" href="#canonical-surrogates-from-measured-shapes"></a>
+<h2 id="fitting-a-canonical-surrogate">Fitting a canonical surrogate<a class="anchor" aria-label="anchor" href="#fitting-a-canonical-surrogate"></a>
 </h2>
-<p>Sometimes the right workflow is not to choose between a measured
-shape and a canonical one at the beginning, but to use both on purpose.
-A measured or segmented outline can be preserved first as an
-<code>Arbitrary</code> shape and then reduced explicitly to a canonical
-surrogate when the goal is to run a shape-specific model such as
-<code>SPHMS</code>, <code>PSMS</code>, or <code>FCMS</code>.</p>
-<p>That is what <code><a href="../../reference/canonicalize_shape.html">canonicalize_shape()</a></code> is for. It takes an
-existing <code>Shape</code> object and fits one of the supported
-canonical targets:</p>
-<ul>
-<li><code>Sphere</code></li>
-<li><code>Cylinder</code></li>
-<li><code>ProlateSpheroid</code></li>
-<li><code>OblateSpheroid</code></li>
-</ul>
-<p>This step is deliberately explicit rather than automatic. There is no
-single universally correct way to turn a biological or measured target
-into a canonical surface. Some workflows want to preserve length and
-enclosed volume, while others want the canonical profile that best
-matches the measured radius variation. <code><a href="../../reference/canonicalize_shape.html">canonicalize_shape()</a></code>
-therefore reports fit diagnostics rather than hiding the approximation
-inside the later model call.</p>
-<p>In practice, this means a workflow such as:</p>
-<ol style="list-style-type: decimal">
-<li>build or import the measured shape,</li>
-<li>canonicalize it transparently,</li>
-<li>then run the shape-specific model on the canonical surrogate.</li>
-</ol>
-<p>That pattern keeps the model assumptions honest. The later
-<code>PSMS</code> or <code>FCMS</code> result can then be interpreted as
-the response of the fitted canonical surrogate, not as though the
-original irregular target had somehow become exactly separable in
-spheroidal or cylindrical coordinates.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cyl_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/canonicalize_shape.html">canonicalize_shape</a></span><span class="op">(</span></span>
+<p>A measured body sometimes needs a canonical approximation for a
+shape-specific model or a controlled comparison. This approximation
+should be explicit. <a href="../../reference/canonicalize_shape.html"><code>canonicalize_shape()</code></a>
+can fit a sphere, cylinder, prolate spheroid, or oblate spheroid while
+returning diagnostics for the reduction.</p>
+<p>Available fitting rules preserve volume, preserve length and volume,
+or fit the equivalent-radius profile by least squares. The default
+depends on the requested target shape. There is no single best rule for
+every measured body.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cylinder_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/canonicalize_shape.html">canonicalize_shape</a></span><span class="op">(</span></span>
 <span>  <span class="va">measured_like</span>,</span>
 <span>  to <span class="op">=</span> <span class="st">"Cylinder"</span>,</span>
 <span>  diagnostics <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  fitted_shape <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">cyl_fit</span><span class="op">$</span><span class="va">shape</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
-<span>  source_length_m <span class="op">=</span> <span class="va">cyl_fit</span><span class="op">$</span><span class="va">diagnostics</span><span class="op">$</span><span class="va">source</span><span class="op">$</span><span class="va">length</span>,</span>
-<span>  fitted_length_m <span class="op">=</span> <span class="va">cyl_fit</span><span class="op">$</span><span class="va">diagnostics</span><span class="op">$</span><span class="va">target</span><span class="op">$</span><span class="va">length</span>,</span>
-<span>  radius_rmse <span class="op">=</span> <span class="va">cyl_fit</span><span class="op">$</span><span class="va">diagnostics</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">radius_rmse</span>,</span>
-<span>  radius_nrmse <span class="op">=</span> <span class="va">cyl_fit</span><span class="op">$</span><span class="va">diagnostics</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">radius_nrmse</span></span>
+<span>  fitted_shape <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">cylinder_fit</span><span class="op">$</span><span class="va">shape</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>  source_length_m <span class="op">=</span> <span class="va">cylinder_fit</span><span class="op">$</span><span class="va">diagnostics</span><span class="op">$</span><span class="va">source</span><span class="op">$</span><span class="va">length</span>,</span>
+<span>  fitted_length_m <span class="op">=</span> <span class="va">cylinder_fit</span><span class="op">$</span><span class="va">diagnostics</span><span class="op">$</span><span class="va">target</span><span class="op">$</span><span class="va">length</span>,</span>
+<span>  radius_rmse <span class="op">=</span> <span class="va">cylinder_fit</span><span class="op">$</span><span class="va">diagnostics</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">radius_rmse</span>,</span>
+<span>  radius_nrmse <span class="op">=</span> <span class="va">cylinder_fit</span><span class="op">$</span><span class="va">diagnostics</span><span class="op">$</span><span class="va">fit</span><span class="op">$</span><span class="va">radius_nrmse</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##   fitted_shape source_length_m fitted_length_m radius_rmse radius_nrmse</span></span>
 <span><span class="co">## 1     Cylinder            0.04            0.04 0.002740549    0.4567582</span></span></code></pre>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">old_par</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>no.readonly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/on.exit.html" class="external-link">on.exit</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="va">old_par</span><span class="op">)</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">3</span>, <span class="fl">2.2</span>, <span class="fl">0.8</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu">plot_shape_profile</span><span class="op">(</span><span class="va">measured_like</span>, main <span class="op">=</span> <span class="st">"Original arbitrary shape"</span><span class="op">)</span></span>
-<span><span class="fu">plot_shape_profile</span><span class="op">(</span><span class="va">cyl_fit</span><span class="op">$</span><span class="va">shape</span>, main <span class="op">=</span> <span class="st">"Canonicalized cylinder surrogate"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="building-shapes_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="672"></p>
-<p>If the diagnostics are acceptable for the intended use, the fitted
-shape can be passed on like any other canonical <code>Shape</code>
-object.</p>
+<div class="figure">
+<img src="building-shapes_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="The original arbitrary profile and its fitted cylindrical surrogate." width="672"><p class="caption">
+The original arbitrary profile and its fitted cylindrical surrogate.
+</p>
+</div>
+<p>Judge the surrogate using both the plotted profiles and the reported
+length, volume, radius, and fit errors. A model applied to the fitted
+object describes the canonical surrogate, not the original irregular
+body.</p>
 </div>
 <div class="section level2">
-<h2 id="choosing-the-right-level-of-geometric-detail">Choosing the right level of geometric detail<a class="anchor" aria-label="anchor" href="#choosing-the-right-level-of-geometric-detail"></a>
+<h2 id="before-building-a-scatterer">Before building a scatterer<a class="anchor" aria-label="anchor" href="#before-building-a-scatterer"></a>
 </h2>
-<p>More detail is not automatically better. Canonical modal models
-benefit from geometry that matches the separable coordinate system.
-Segmented approximate models benefit from geometry that matches the
-intended physical approximation. Screening or exploratory work often
-benefits from a simpler geometry first, because simpler objects make it
-easier to distinguish broad physical trends from geometric
-complications.</p>
-<p>That is why the package treats shape construction as a deliberate
-modeling choice rather than as a purely technical preprocessing step. A
-very detailed geometry can be helpful when the scientific question
-depends on curvature, taper, segmentation, or anatomy. The same level of
-detail can be unnecessary, or even misleading, if the chosen model
-assumes a much simpler geometry than the object actually contains.</p>
-</div>
-<div class="section level2">
-<h2 id="a-practical-way-to-choose">A practical way to choose<a class="anchor" aria-label="anchor" href="#a-practical-way-to-choose"></a>
-</h2>
-<p>A practical way to think about shape choice is to ask what aspect of
-the target must be preserved for the later model run to remain
-meaningful. If near-isotropic roundness is the important feature, a
-sphere is usually sufficient. If the target is smooth and elongated with
-no sharp geometric transitions, a prolate spheroid may capture the
-essential structure well. If the body is straight and approximately
-constant in radius, a finite cylinder may be the most natural
-simplification. If curvature, taper, segmentation, or anatomy are
-central to the question, an arbitrary or segmented representation is
-usually the better starting point.</p>
-<p>This way of choosing keeps the geometry tied to the scientific
-purpose rather than to habit. It also makes later model selection much
-easier, because the most defensible model families often become obvious
-once the geometry has been chosen for the right reason.</p>
-</div>
-<div class="section level2">
-<h2 id="what-to-check-before-moving-on">What to check before moving on<a class="anchor" aria-label="anchor" href="#what-to-check-before-moving-on"></a>
-</h2>
-<p>Before turning a shape into a scatterer, it is worth checking whether
-the geometry is serving the intended role. The object should preserve
-the body features that matter acoustically, but it should not be more
-complicated than the planned model interpretation can actually use.
-Segment density, radius variation, curvature, and overall dimensions
-should all be visually and numerically sensible. If the object is meant
-to approximate a canonical surface, it should do so clearly rather than
-ambiguously.</p>
-<p>Those checks help prevent a common mistake in acoustic workflows:
-building a geometry that is internally reasonable, but poorly aligned
-with the later physical and mathematical assumptions.</p>
-</div>
-<div class="section level2">
-<h2 id="recommended-next-step">Recommended next step<a class="anchor" aria-label="anchor" href="#recommended-next-step"></a>
-</h2>
-<p>The next step after geometry construction is usually <a href="../building-scatterers/building-scatterers.html">building
-scatterers</a>, where material properties, contrasts, and target type
-are added to the geometric object. That is the stage where a shape
-becomes a model-ready acoustic target.</p>
+<p>Check the following before adding physical properties:</p>
+<ul>
+<li>overall length and maximum radius</li>
+<li>axial ordering and coordinate units</li>
+<li>upper, lower, and transverse profiles where present</li>
+<li>segment resolution</li>
+<li>agreement between the geometry and the intended model
+assumptions</li>
+<li>canonicalization error if a surrogate was fitted</li>
+</ul>
+<p>Next, <a href="../material-properties/material-properties.html">prepare the
+material properties</a> and use <a href="../building-scatterers/building-scatterers.html">Building
+Scatterers</a> to combine the geometry with its physical
+interpretation.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

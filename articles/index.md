@@ -2,64 +2,60 @@
 
 ### Getting Started
 
-- [Getting started with
-  acousticTS](https://brandynlucca.github.io/acousticTS/articles/getting-started/getting-started.md):
+- [Quick
+  Start](https://brandynlucca.github.io/acousticTS/articles/getting-started/getting-started.md):
 - [Package
-  concepts](https://brandynlucca.github.io/acousticTS/articles/package-concepts/package-concepts.md):
-- [Working with example
-  data](https://brandynlucca.github.io/acousticTS/articles/example-data/example-data.md):
+  Concepts](https://brandynlucca.github.io/acousticTS/articles/package-concepts/package-concepts.md):
+- [Working with Example
+  Data](https://brandynlucca.github.io/acousticTS/articles/example-data/example-data.md):
 
 ### Build Targets
 
 - [Building
-  shapes](https://brandynlucca.github.io/acousticTS/articles/building-shapes/building-shapes.md):
+  Shapes](https://brandynlucca.github.io/acousticTS/articles/building-shapes/building-shapes.md):
+- [Preparing Material
+  Properties](https://brandynlucca.github.io/acousticTS/articles/material-properties/material-properties.md):
 - [Building
-  scatterers](https://brandynlucca.github.io/acousticTS/articles/building-scatterers/building-scatterers.md):
-- [Shape Manipulation and
-  Reforging](https://brandynlucca.github.io/acousticTS/articles/shape-manipulation-reforging/shape-manipulation-reforging.md):
+  Scatterers](https://brandynlucca.github.io/acousticTS/articles/building-scatterers/building-scatterers.md):
+- [Shape
+  Manipulation](https://brandynlucca.github.io/acousticTS/articles/shape-manipulation-reforging/shape-manipulation-reforging.md):
 
 ### Acoustic Physics Primer
 
+- [Notation and
+  Symbols](https://brandynlucca.github.io/acousticTS/articles/notation-and-symbols/notation-and-symbols.md):
 - [Acoustic Scattering
   Primer](https://brandynlucca.github.io/acousticTS/articles/acoustic-scattering-primer/acoustic-scattering-primer.md):
-- [Notation and
-  symbols](https://brandynlucca.github.io/acousticTS/articles/notation-and-symbols/notation-and-symbols.md):
 - [Scattering boundary
   conditions](https://brandynlucca.github.io/acousticTS/articles/boundary_conditions.md):
-- [Material Properties and Acoustic
-  Utilities](https://brandynlucca.github.io/acousticTS/articles/material-properties/material-properties.md):
-- [Numerical Foundations and Special
+- [Numerical Methods and Special
   Functions](https://brandynlucca.github.io/acousticTS/articles/numerical-foundations/numerical-foundations.md):
 
 ### Run Models
 
-- [Running target strength
-  models](https://brandynlucca.github.io/acousticTS/articles/running-models/running-models.md):
+- [Running
+  Models](https://brandynlucca.github.io/acousticTS/articles/running-models/running-models.md):
 - [Choosing a
-  model](https://brandynlucca.github.io/acousticTS/articles/model-selection/model-selection.md):
+  Model](https://brandynlucca.github.io/acousticTS/articles/model-selection/model-selection.md):
 - [Comparing models on the same
   target](https://brandynlucca.github.io/acousticTS/articles/comparing-models/comparing-models.md):
-- [Plotting and Inspecting
-  Results](https://brandynlucca.github.io/acousticTS/articles/plotting-inspecting-results/plotting-inspecting-results.md):
 - [Simulation and Parameter
   Sweeps](https://brandynlucca.github.io/acousticTS/articles/simulation-parameter-sweeps/simulation-parameter-sweeps.md):
-- [Calibration
-  workflow](https://brandynlucca.github.io/acousticTS/articles/calibration-workflow/calibration-workflow.md):
-- [Validation and benchmark
-  reproduction](https://brandynlucca.github.io/acousticTS/articles/validation-benchmarks/validation-benchmarks.md):
 
 ### Model Library
 
 - [Model
-  library](https://brandynlucca.github.io/acousticTS/articles/model-library/model-library.md):
+  Library](https://brandynlucca.github.io/acousticTS/articles/model-library/model-library.md):
 
 ### Developer Guides
 
-- [Creating a Model from
-  Scratch](https://brandynlucca.github.io/acousticTS/articles/creating-models-from-scratch/creating-models-from-scratch.md):
+- [Validation
+  Methods](https://brandynlucca.github.io/acousticTS/articles/validation-benchmarks/validation-benchmarks.md):
+- [Creating
+  Models](https://brandynlucca.github.io/acousticTS/articles/creating-models-from-scratch/creating-models-from-scratch.md):
 - [Combining Scattering
   Components](https://brandynlucca.github.io/acousticTS/articles/combining-components/combining-components.md):
-- [FAQ and
+- [Developer
   Troubleshooting](https://brandynlucca.github.io/acousticTS/articles/faq-troubleshooting/faq-troubleshooting.md):
 
 ### Bibliography
@@ -87,12 +83,12 @@
 - [TMM](https://brandynlucca.github.io/acousticTS/articles/tmm/index.md):
 - [TMM
   implementation](https://brandynlucca.github.io/acousticTS/articles/tmm/tmm-implementation.md):
-- [TMM
+- [Transition matrix method (TMM)
   theory](https://brandynlucca.github.io/acousticTS/articles/tmm/tmm-theory.md):
 - [SOEMS](https://brandynlucca.github.io/acousticTS/articles/calibration/index.md):
 - [Target strength for a calibration
   sphere](https://brandynlucca.github.io/acousticTS/articles/calibration/calibration-implementation.md):
-- [Target strength for a calibration
+- [SOEMS theory for a solid calibration
   sphere](https://brandynlucca.github.io/acousticTS/articles/calibration/calibration-theory.md):
 - [ESSMS](https://brandynlucca.github.io/acousticTS/articles/essms/index.md):
 - [Elastic-shelled sphere

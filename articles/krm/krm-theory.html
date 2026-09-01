@@ -47,10 +47,9 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-physics-primer" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Physics Primer</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-physics-primer">
-<li><a class="dropdown-item" href="../../articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
-    <li><a class="dropdown-item" href="../../articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+<li><a class="dropdown-item" href="../../articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+    <li><a class="dropdown-item" href="../../articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
     <li><a class="dropdown-item" href="../../articles/boundary_conditions.html">Boundary conditions</a></li>
-    <li><a class="dropdown-item" href="../../articles/material-properties/material-properties.html">Material properties</a></li>
     <li><a class="dropdown-item" href="../../articles/numerical-foundations/numerical-foundations.html">Numerical methods</a></li>
   </ul>
 </li>
@@ -58,6 +57,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-build-targets" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Build Targets</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-build-targets">
 <li><a class="dropdown-item" href="../../articles/building-shapes/building-shapes.html">Building Shapes</a></li>
+    <li><a class="dropdown-item" href="../../articles/material-properties/material-properties.html">Material Properties</a></li>
     <li><a class="dropdown-item" href="../../articles/building-scatterers/building-scatterers.html">Building Scatterers</a></li>
     <li><a class="dropdown-item" href="../../articles/shape-manipulation-reforging/shape-manipulation-reforging.html">Shape Manipulation</a></li>
   </ul>
@@ -68,17 +68,15 @@
 <li><a class="dropdown-item" href="../../articles/running-models/running-models.html">Running Models</a></li>
     <li><a class="dropdown-item" href="../../articles/model-selection/model-selection.html">Choosing a Model</a></li>
     <li><a class="dropdown-item" href="../../articles/comparing-models/comparing-models.html">Comparing Models</a></li>
-    <li><a class="dropdown-item" href="../../articles/plotting-inspecting-results/plotting-inspecting-results.html">Visualizing results</a></li>
     <li><a class="dropdown-item" href="../../articles/simulation-parameter-sweeps/simulation-parameter-sweeps.html">Simulation sweeps</a></li>
-    <li><a class="dropdown-item" href="../../articles/calibration-workflow/calibration-workflow.html">Calibration workflow</a></li>
-    <li><a class="dropdown-item" href="../../articles/validation-benchmarks/validation-benchmarks.html">Validating models</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../../articles/model-library/model-library.html">Models</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-developers" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Developers</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-developers">
-<li><a class="dropdown-item" href="../../articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
+<li><a class="dropdown-item" href="../../articles/validation-benchmarks/validation-benchmarks.html">Validation methods</a></li>
+    <li><a class="dropdown-item" href="../../articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
     <li><a class="dropdown-item" href="../../articles/combining-components/combining-components.html">Combining components</a></li>
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
@@ -130,50 +128,29 @@
 <a class="model-nav-badge" href="krm-implementation.html">Implementation</a>
 </div>
 </div>
-<p>The Kirchhoff-Ray Mode (KRM) model is a composite scattering theory
-for elongated fish-like bodies. Its defining assumption is that
-different anatomical components can occupy different acoustic regimes.
-The fish body is treated with a Kirchhoff-ray approximation appropriate
-for a weakly contrasting, smoothly varying, elongated fluid-like body,
-while the swimbladder is treated either by a low-order modal
-approximation when its acoustic size is small or by a Kirchhoff
-approximation when it is larger <span class="citation">(<a href="#ref-Clay_1991">Clay 1991</a>; <a href="#ref-Clay_1992">Clay
-1992</a>; <a href="#ref-Clay_1994">Clay and Horne 1994</a>)</span>.</p>
-<p>Its body term therefore uses weak fluid-like tissue contrasts at a
-fluid interface, while its swimbladder term uses a much stronger
-gas-tissue contrast that can support either a low-order modal response
-or a higher-frequency Kirchhoff response. The same target is
-intentionally split across approximation regimes because the dominant
-scattering mechanisms of tissue and gas are not the same.</p>
-<p>The name of the model follows directly from that hybrid structure:
-Kirchhoff for the geometric body treatment, ray for the body traversal
-terms, and mode for the low-frequency cylindrical (or <strong>elliptic
-cylindrical</strong>) contribution retained for the swimbladder. The
-point of the model is not that one approximation is universally best,
-but that a fish-like target naturally mixes a weakly scattering body
-with a much stronger internal inclusion. The KRM is designed to keep
-those two physical roles distinct rather than forcing the entire target
-into a single approximation regime.</p>
-<p>Throughout this page, seawater is medium <code>1</code>, the body
-tissue is medium <code>2</code>, and a strongly contrasting internal
-inclusion such as a gas-filled swimbladder is medium <code>3</code>.</p>
+<p>The Kirchhoff-ray mode (KRM) model assigns different approximations
+to the anatomical components of an elongated fish. The weakly
+contrasting body uses a segmented Kirchhoff-ray treatment. A strongly
+contrasting inclusion uses either a low-order cylindrical mode at small
+acoustic size or a segmented Kirchhoff term at larger acoustic size
+<span class="citation">(<a href="#ref-Clay_1991">Clay 1991</a>; <a href="#ref-Clay_1994">Clay and Horne 1994</a>)</span>.</p>
+<p>The name reflects that hybrid: Kirchhoff surface scattering, a
+through-body ray, and the low-frequency mode of the inclusion.</p>
+<div class="note" data-title="Shared conventions">
+<p>Seawater is medium 1, body tissue is medium 2, and the internal
+inclusion is medium 3. Other symbols follow <a href="../notation-and-symbols/notation-and-symbols.html">Notation and
+symbols</a>.</p>
+</div>
 <div class="float">
 <img src="krm-regime-assignment-schematic.svg" alt="KRM approximation assignment for weakly scattering body tissue and strongly contrasting internal inclusion."><div class="figcaption">KRM approximation assignment for weakly
 scattering body tissue and strongly contrasting internal
 inclusion.</div>
 </div>
-<p>The model is built from two different physical pieces. The body is
-represented as a chain of short locally cylindrical Kirchhoff segments,
-whereas the internal inclusion is the component assigned either a
-low-order modal treatment or a higher-frequency local Kirchhoff
-term.</p>
+<p>The body and inclusion amplitudes are evaluated separately and then
+added coherently.</p>
 <div class="note" data-title="Swimbladders aren't a requirement">
-<p>Although the swimbladder is the canonical internal scatterer in
-fisheries applications, the KRM formulation does not require a
-gas-filled inclusion. The internal term more generally represents any
-region of strong acoustic contrast embedded within a weakly scattering
-body. In the absence of such a feature, the model reduces naturally to
-the body-only Kirchhoff-ray formulation.</p>
+<p>The internal term can represent another strongly contrasting fluid
+inclusion. Without one, KRM reduces to its body term.</p>
 </div>
 </div>
 <div class="section level2">
@@ -182,15 +159,9 @@ the body-only Kirchhoff-ray formulation.</p>
 <div class="section level3">
 <h3 id="kirchhoff-approximation-for-a-smooth-body">Kirchhoff approximation for a smooth body<a class="anchor" aria-label="anchor" href="#kirchhoff-approximation-for-a-smooth-body"></a>
 </h3>
-<p>The starting point for the KRM body contribution is the Kirchhoff
-approximation for scattering from a smooth convex surface. In that
-approximation, each small patch of the illuminated surface is replaced
-by its tangent plane, and the local scattered field is taken to be the
-field that would be produced by an infinite plane with the same local
-material boundary. This is a high-frequency approximation: the local
-radius of curvature must be large compared with the wavelength, and the
-surface must be smoothly varying over a scale of several
-wavelengths.</p>
+<p>The Kirchhoff approximation replaces each illuminated surface patch
+by its tangent plane. It requires a smooth surface and local radii of
+curvature large relative to wavelength.</p>
 <p>For a locally cylindrical fish body this means that a short segment
 can be treated as a small fluid cylinder whose scattering is dominated
 by specular reflection and a transmitted path through the body. The
@@ -232,13 +203,9 @@ cylindrical response dominates the backscatter. A single asymptotic
 description is therefore not adequate across all components. The KRM is
 constructed specifically to combine these regimes in one coherent
 sum.</p>
-<p>That distinction is the main conceptual reason the KRM exists. If one
-forced the whole animal into a weak-contrast body approximation, the
-dominant bladder contribution would be misrepresented. If one forced the
-whole animal into a gas-cylinder-style modal approximation, the body
-would be over-idealized in a different way. The hybrid formulation keeps
-the body and internal inclusion in the regimes that matter most
-physically.</p>
+<p>The hybrid construction avoids applying the body’s weak-contrast
+approximation to the gas inclusion or applying a gas-cylinder model to
+the whole fish.</p>
 </div>
 </div>
 <div class="section level2">
@@ -256,12 +223,9 @@ rotated coordinates aligned with the incident wave through:</p>
 <p><span class="math display">
   v(j) = x(j)\cos\theta + z(j)\sin\theta.
 </span></p>
-<p>The quantity <span class="math inline">u(j)</span> measures projected
-location across the insonified length, while <span class="math inline">v(j)</span> determines phase accumulation along the
-incident direction. This change of variables is not just a geometric
-convenience. It is the step that allows the segmented body to be written
-as a coherent sum of short contributions with the correct projected
-lengths and phases for the chosen angle of incidence.</p>
+<p><span class="math inline">u(j)</span> measures position along the
+projected insonified length, while <span class="math inline">v(j)</span>
+sets propagation phase.</p>
 <div class="float">
 <img src="krm-coordinate-bookkeeping.svg" alt="KRM coordinate bookkeeping for projected segment length, phase coordinate, and body thickness."><div class="figcaption">KRM coordinate bookkeeping for projected segment
 length, phase coordinate, and body thickness.</div>
@@ -314,8 +278,8 @@ factor:</p>
 <p><span class="math display">
   \mathcal{T}_{wb}\mathcal{T}_{bw} = 1-\mathcal{R}_{wb}^2.
 </span></p>
-<p>This identity holds under lossless, locally planar, and near-normal
-incidence assumptions used in the KRM approximation.</p>
+<p>This identity uses lossless, locally planar, normal-incidence
+coefficients.</p>
 <p>For normal incidence on a fluid-fluid interface, the reflection
 coefficient is determined by impedance contrast:</p>
 <p><span class="math display">
@@ -355,15 +319,14 @@ a smooth curved segment.</p>
 <div class="section level3">
 <h3 id="near-surface-and-through-body-rays">Near-surface and through-body rays<a class="anchor" aria-label="anchor" href="#near-surface-and-through-body-rays"></a>
 </h3>
-<p>Each short body segment contributes two principal coherent terms. The
-first is a direct reflection from the dorsal surface. The second enters
-the body, propagates through it, reflects internally, and exits again.
-Retaining the standard KRM notation, the rotated upper and lower surface
-phase coordinates are denoted by <span class="math inline">v_{U,j}</span> and <span class="math inline">v_{L,j}</span>. The two contributions are:</p>
+<p>Each body segment retains a near-surface reflection and one
+through-body return. With rotated upper and lower phase coordinates
+<span class="math inline">v_{U,j}</span> and <span class="math inline">v_{L,j}</span>, the normalized near-surface phase
+is:</p>
 <p><span class="math display">
-  \mathcal{R}_{wb} e^{-i2k v_{U,j}},
+  e^{-i2k v_{U,j}}.
 </span></p>
-<p>The transmitted-return contribution is:</p>
+<p>The normalized through-body contribution is:</p>
 <p><span class="math display">
   \mathcal{T}_{wb}\mathcal{T}_{bw}
   e^{-i2k v_{U,j} + i2k_B(v_{U,j}-v_{L,j}) + i\psi_{B,j}},
@@ -386,8 +349,8 @@ as:</p>
 </span></p>
 <p>so the coherent local bracket becomes:</p>
 <p><span class="math display">
-  \left[
-  \mathcal{R}_{wb} e^{-i2k v_{U,j}} -
+  \mathcal{R}_{wb}\left[
+  e^{-i2k v_{U,j}} -
     \mathcal{T}_{wb}\mathcal{T}_{bw}
   e^{-i2k v_{U,j}+i2k_B(v_{U,j}-v_{L,j})+i\psi_{B,j}}
   \right].
@@ -397,13 +360,8 @@ as:</p>
 and internal reflection process and is retained here to match the
 standard KRM formulation.</p>
 </div>
-<p>This is the explicit bridge from Kirchhoff surface scattering to the
-KRM body formula: start from the leading specular contribution, retain
-the first through-body transmitted return, and neglect higher multiple
-internal traversals. The KRM body expression is the coherent sum of two
-local paths: a near-surface reflected contribution and a first
-transmitted traversal through the body thickness, both multiplied by the
-same Kirchhoff scaling for the segment.</p>
+<p>The body formula retains these two paths and neglects further
+internal traversals.</p>
 </div>
 <div class="section level3">
 <h3 id="segment-amplitude-scaling">Segment amplitude scaling<a class="anchor" aria-label="anchor" href="#segment-amplitude-scaling"></a>
@@ -461,31 +419,31 @@ phases.</p>
 <div class="section level3">
 <h3 id="low-frequency-modal-approximation">Low-frequency modal approximation<a class="anchor" aria-label="anchor" href="#low-frequency-modal-approximation"></a>
 </h3>
-<p>In the classical KRM description, when the swimbladder acoustic size
-is small, the scattering is dominated by the azimuthally symmetric
-(<span class="math inline">m = 0</span>) mode. The swimbladder
-scattering length is then approximated by:</p>
+<p>When the inclusion’s acoustic size is small, the azimuthally
+symmetric (<span class="math inline">m=0</span>) cylindrical mode
+dominates <span class="citation">(<a href="#ref-Clay_1994">Clay and
+Horne 1994</a>)</span>. In the segmented notation, its scattering length
+is:</p>
 <p><span class="math display">
-  L_M(ka)\big|_{m=0} =
-e^{i(\chi-\pi/4)}\frac{L_e}{\pi}\frac{\sin\Delta}{\Delta}b_0,
+  f_M = -\frac{iL_e}{\pi}
+  \frac{\sin\Delta}{\Delta}\,b_0\,\Phi,
 </span></p>
-<p>where <span class="math inline">L_e</span> is an effective length,
-<span class="math inline">\Delta</span> is the same finite-length phase
-parameter used in short-cylinder scattering, and:</p>
+<p>where <span class="math inline">L_e</span> is the equivalent length,
+<span class="math inline">\Delta=k_mL_e\cos\theta</span> is the
+finite-length phase parameter, and <span class="math inline">\Phi</span>
+places the inclusion in the common phase frame. For segments with
+midpoint coordinate <span class="math inline">v_j</span> and axial width
+<span class="math inline">\Delta x_j</span>, this phase factor is:</p>
+<p><span class="math display">
+  \Phi = \frac{1}{L_e}\sum_j e^{2ik_m v_j}\Delta x_j.
+</span></p>
+<p>The breathing-mode coefficient is:</p>
 <p><span class="math display">
   b_0 = -\frac{1}{1+iC_0}.
 </span></p>
-<p>The coefficient <span class="math inline">b_0</span> is the
-zeroth-order cylindrical scattering coefficient obtained by imposing
-boundary conditions on a gas-filled cylinder in the long-wavelength
-limit. Thus the modal component of the KRM is literally the retention of
-the breathing-mode contribution and the neglect of higher cylindrical
-modes.</p>
-<p>This point is essential to the logic of the KRM. The modal term is
-not merely another empirical correction. It comes from the low-frequency
-partial-wave description of a gas-filled cylinder, for which the
-azimuthally symmetric mode dominates as <span class="math inline">ka \to
-0</span>.</p>
+<p><span class="math inline">b_0</span> follows from the fluid-cylinder
+boundary conditions. Truncating at <span class="math inline">m=0</span>
+retains the breathing mode and omits higher azimuthal orders.</p>
 <p>For the low-frequency swimbladder term, the relevant local scattering
 problem is not gas in water. It is gas inside body tissue. Accordingly,
 let the surrounding body medium be region 2 and the internal gas be
@@ -535,8 +493,19 @@ inherits its coefficient directly from the same pressure-continuity and
 normal-velocity conditions used in cylindrical modal theory. The
 additional KRM simplification is only the truncation to the azimuthally
 symmetric mode when <span class="math inline">ka \ll 1</span>.</p>
-<p>This <span class="math inline">b_0</span> coefficient is the modal
-ingredient used in the low-frequency KRM swimbladder contribution.</p>
+<p>This <span class="math inline">b_0</span> is used only in the
+low-acoustic-size branch.</p>
+</div>
+<div class="section level3">
+<h3 id="medium-convention-for-the-inclusion">Medium convention for the inclusion<a class="anchor" aria-label="anchor" href="#medium-convention-for-the-inclusion"></a>
+</h3>
+<p>The inclusion is physically embedded in body tissue, suggesting <span class="math inline">k_m=k_2</span>, <span class="math inline">g_{32}=\rho_3/\rho_2</span>, and <span class="math inline">h_{32}=c_3/c_2</span>. Because body-water contrast
+is often small, the classical approximation may instead use <span class="math inline">k_m\approx k_1</span> and reference the inclusion
+properties to water <span class="citation">(<a href="#ref-Clay_1994">Clay and Horne 1994</a>)</span>. These choices
+change both the modal coefficient and the propagation phase. A mixed
+convention can use body-referenced propagation for the high-frequency
+term and water-referenced properties for the low-frequency term. The
+convention must therefore be reported with a KRM result.</p>
 </div>
 <div class="section level3">
 <h3 id="high-frequency-kirchhoff-approximation-for-the-swimbladder">High-frequency Kirchhoff approximation for the swimbladder<a class="anchor" aria-label="anchor" href="#high-frequency-kirchhoff-approximation-for-the-swimbladder"></a>
@@ -554,18 +523,9 @@ The segment contribution becomes:</p>
 <p>where <span class="math inline">\mathcal{R}_{bc}</span> is the
 body-to-bladder reflection coefficient and <span class="math inline">v_j</span> is the rotated phase coordinate of
 segment <span class="math inline">j</span>.</p>
-<p>Thus the KRM assigns the swimbladder to one of two regimes. In the
-long-wavelength regime it is treated by the leading cylindrical mode. In
-the larger-size regime it is treated as a chain of locally specular
-segments. The model is hybrid because it explicitly switches the
-physical description according to which asymptotic regime is more
-appropriate.</p>
-<p>This is also the point at which readers should be careful about
-interpretation. The regime switch is not claiming that the swimbladder
-ceases to have modal structure above a particular threshold in any exact
-mathematical sense. It is a modeling choice that says one asymptotic
-description becomes more useful than the other as acoustic size
-increases.</p>
+<p>The regime switch is an approximation. Modal structure does not
+disappear at the threshold. The model changes formulas where the local
+Kirchhoff description is expected to be more useful.</p>
 </div>
 <div class="section level3">
 <h3 id="swimbladder-amplitude-and-phase-corrections">Swimbladder amplitude and phase corrections<a class="anchor" aria-label="anchor" href="#swimbladder-amplitude-and-phase-corrections"></a>
@@ -607,9 +567,11 @@ swimbladder terms:</p>
 <p><span class="math display">
   \sigma_\text{bs} = |\mathcal{f}_\text{bs}|^2
 </span></p>
-<p>and the target strength is <span class="citation">(<a href="#ref-MacLennan_2002">MacLennan et al. 2002</a>; <a href="#ref-Urick_1983">Urick 1983</a>; <a href="#ref-Simmonds_2005">Simmonds and MacLennan 2005</a>)</span>:</p>
+<p>and target strength is <span class="citation">(<a href="#ref-MacLennan_2002">MacLennan et al. 2002</a>)</span>:</p>
 <p><span class="math display">
-  TS = 20\log_{10}|\mathcal{f}_\text{bs}|.
+  TS = 20\log_{10}\left(
+  \frac{|\mathcal{f}_\text{bs}|}{1\ \mathrm{m}}
+  \right).
 </span></p>
 <p>The logarithmic definition uses <span class="math inline">20\log_{10}</span> because <span class="math inline">\mathcal{f}_\text{bs}</span> is a scattering length
 rather than a cross-section.</p>
@@ -630,11 +592,8 @@ Kirchhoff regime.</li>
 <li>The Kirchhoff approximation is valid locally, implying smoothly
 varying geometry and sufficiently large local acoustic size.</li>
 </ol>
-<p>Under these assumptions the KRM captures the leading scattering
-mechanisms of fish-like bodies with gas-filled inclusions, but it is not
-intended to model fine elastic resonances, anatomically complex
-multiple-scattering phenomena, or detailed three-dimensional end effects
-that fall outside the segmented locally cylindrical description.</p>
+<p>KRM does not resolve fine elastic resonances, repeated scattering
+among distant segments, or detailed three-dimensional end effects.</p>
 </div>
 <div class="section level2">
 <h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
@@ -645,12 +604,6 @@ Clay, C. S. 1991. <span>“Low-Resolution Acoustic Scattering Models:
 <span>Fluid</span>-Filled Cylinders and Fish with Swim Bladders.”</span>
 <em>The Journal of the Acoustical Society of America</em> 89 (5):
 2168–79. <a href="https://doi.org/10.1121/1.400910" class="external-link">https://doi.org/10.1121/1.400910</a>.
-</div>
-<div id="ref-Clay_1992" class="csl-entry">
-Clay, Clarence S. 1992. <span>“Composite Ray-Mode Approximations for
-Backscattered Sound from Gas-Filled Cylinders and Swimbladders.”</span>
-<em>The Journal of the Acoustical Society of America</em> 92 (4):
-2173–80. <a href="https://doi.org/10.1121/1.405211" class="external-link">https://doi.org/10.1121/1.405211</a>.
 </div>
 <div id="ref-Clay_1994" class="csl-entry">
 Clay, Clarence S., and John K. Horne. 1994. <span>“Acoustic Models of
@@ -663,14 +616,6 @@ MacLennan, David N., Percy G. Fernandes, and John Dalen. 2002. <span>“A
 Consistent Approach to Definitions and Symbols in Fisheries
 Acoustics.”</span> <em>ICES Journal of Marine Science</em> 59 (2):
 365–69. <a href="https://doi.org/10.1006/jmsc.2001.1158" class="external-link">https://doi.org/10.1006/jmsc.2001.1158</a>.
-</div>
-<div id="ref-Simmonds_2005" class="csl-entry">
-Simmonds, John, and David N. MacLennan. 2005. <em>Fisheries Acoustics:
-Theory and Practice</em>. 2nd ed. Blackwell Science. <a href="https://doi.org/10.1002/9780470995303" class="external-link">https://doi.org/10.1002/9780470995303</a>.
-</div>
-<div id="ref-Urick_1983" class="csl-entry">
-Urick, Robert J. 1983. <em>Principles of Underwater Sound</em>. 3rd ed.
-McGraw-Hill.
 </div>
 </div>
 </div>

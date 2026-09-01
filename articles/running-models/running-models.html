@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Running target strength models • acousticTS</title>
+<title>Running Models • acousticTS</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../../favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="../../favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="../../apple-touch-icon.png">
@@ -17,7 +17,7 @@
 <script src="../../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../../deps/headroom-0.11.0/headroom.min.js"></script><script src="../../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../../deps/search-1.0.0/fuse.min.js"></script><script src="../../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../../pkgdown.js"></script><link href="../../extra.css" rel="stylesheet">
-<meta property="og:title" content="Running target strength models">
+<meta property="og:title" content="Running Models">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -47,10 +47,9 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-physics-primer" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Physics Primer</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-physics-primer">
-<li><a class="dropdown-item" href="../../articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
-    <li><a class="dropdown-item" href="../../articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+<li><a class="dropdown-item" href="../../articles/notation-and-symbols/notation-and-symbols.html">Notation and symbols</a></li>
+    <li><a class="dropdown-item" href="../../articles/acoustic-scattering-primer/acoustic-scattering-primer.html">Acoustic scattering primer</a></li>
     <li><a class="dropdown-item" href="../../articles/boundary_conditions.html">Boundary conditions</a></li>
-    <li><a class="dropdown-item" href="../../articles/material-properties/material-properties.html">Material properties</a></li>
     <li><a class="dropdown-item" href="../../articles/numerical-foundations/numerical-foundations.html">Numerical methods</a></li>
   </ul>
 </li>
@@ -58,6 +57,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-build-targets" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Build Targets</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-build-targets">
 <li><a class="dropdown-item" href="../../articles/building-shapes/building-shapes.html">Building Shapes</a></li>
+    <li><a class="dropdown-item" href="../../articles/material-properties/material-properties.html">Material Properties</a></li>
     <li><a class="dropdown-item" href="../../articles/building-scatterers/building-scatterers.html">Building Scatterers</a></li>
     <li><a class="dropdown-item" href="../../articles/shape-manipulation-reforging/shape-manipulation-reforging.html">Shape Manipulation</a></li>
   </ul>
@@ -68,17 +68,15 @@
 <li><a class="dropdown-item" href="../../articles/running-models/running-models.html">Running Models</a></li>
     <li><a class="dropdown-item" href="../../articles/model-selection/model-selection.html">Choosing a Model</a></li>
     <li><a class="dropdown-item" href="../../articles/comparing-models/comparing-models.html">Comparing Models</a></li>
-    <li><a class="dropdown-item" href="../../articles/plotting-inspecting-results/plotting-inspecting-results.html">Visualizing results</a></li>
     <li><a class="dropdown-item" href="../../articles/simulation-parameter-sweeps/simulation-parameter-sweeps.html">Simulation sweeps</a></li>
-    <li><a class="dropdown-item" href="../../articles/calibration-workflow/calibration-workflow.html">Calibration workflow</a></li>
-    <li><a class="dropdown-item" href="../../articles/validation-benchmarks/validation-benchmarks.html">Validating models</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../../articles/model-library/model-library.html">Models</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-developers" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Developers</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-developers">
-<li><a class="dropdown-item" href="../../articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
+<li><a class="dropdown-item" href="../../articles/validation-benchmarks/validation-benchmarks.html">Validation methods</a></li>
+    <li><a class="dropdown-item" href="../../articles/creating-models-from-scratch/creating-models-from-scratch.html">Creating models</a></li>
     <li><a class="dropdown-item" href="../../articles/combining-components/combining-components.html">Combining components</a></li>
     <li><a class="dropdown-item" href="../../articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a></li>
   </ul>
@@ -109,7 +107,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../../logo.png" class="logo" alt=""><h1>Running target strength models</h1>
+      <img src="../../logo.png" class="logo" alt=""><h1>Running Models</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/brandynlucca/acousticTS/blob/main/vignettes/running-models/running-models.Rmd" class="external-link"><code>vignettes/running-models/running-models.Rmd</code></a></small>
@@ -119,35 +117,45 @@
     
     
 <div class="section level2">
-<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
+<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>The execution patterns shown here are designed to make it easy to
-reproduce the same kinds of spectra and angle-series comparisons
-reported in benchmark and software papers <span class="citation">(<a href="#ref-Jech_2015">Jech et al. 2015</a>; <a href="#ref-ZooScatR_software">Gastauer et al. 2019</a>)</span>.</p>
-<p>Model execution in acousticTS is organized around the target object
-rather than around detached parameter tables. A model reads the
-scatterer geometry and properties, applies a chosen theoretical or
-approximate formulation, and stores the resulting outputs back onto the
-object.</p>
-<p>This article is the practical bridge between object construction and
-result interpretation. It does not try to explain the derivation of any
-one model. Instead, it explains how model calls are structured, how
-multiple models can be run on the same object, and how to interpret the
-stored output consistently.</p>
-<p>The central point is that running a model is not just a calculation
-step. It is the point at which the package combines geometry, physical
-interpretation, acoustic conditions, and model assumptions into a
-specific prediction. Because of that, model execution deserves the same
-level of care as object construction. A result is only as meaningful as
-the object and the model assumptions that were combined to produce
-it.</p>
+<p><a href="../../reference/target_strength.html"><code>target_strength()</code></a>
+is the common interface for running models in <code>acousticTS</code>.
+It combines a scatterer, a frequency vector, and one or more model
+names. The function returns the scatterer with model parameters and
+results attached.</p>
+<p>This page covers execution and inspection. Use <a href="../model-selection/model-selection.html">Choosing a Model</a> for
+geometry, boundary, and validity considerations. Consult the model’s
+theory and implementation pages for its assumptions and numerical
+controls.</p>
+<div class="warning" data-title="A completed calculation is not a validation result">
+<p>Successful execution confirms that the supplied inputs passed the
+implemented checks. It does not establish that the model is appropriate
+or validated for the target and parameter range. Review <a href="../validation-benchmarks/validation-benchmarks.html">Validation
+and Benchmarks</a> before using a model outside its documented
+scope.</p>
+</div>
 </div>
 <div class="section level2">
-<h2 id="the-main-entry-point-target_strength">The main entry point: <code>target_strength()</code><a class="anchor" aria-label="anchor" href="#the-main-entry-point-target_strength"></a>
+<h2 id="available-models">Available models<a class="anchor" aria-label="anchor" href="#available-models"></a>
 </h2>
-<p>Most workflows eventually pass through
-<code><a href="../../reference/target_strength.html">target_strength()</a></code>:</p>
+<p><a href="../../reference/available_models.html"><code>available_models()</code></a>
+lists built-in and user-registered models, their accepted aliases,
+result names, and source:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://brandynlucca.github.io/acousticTS/">acousticTS</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../../reference/available_models.html">available_models</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>Model names are case-insensitive. An alias and its canonical name
+resolve to the same registered model. Availability does not imply
+compatibility with every scatterer or shape.</p>
+</div>
+<div class="section level2">
+<h2 id="run-one-model">Run one model<a class="anchor" aria-label="anchor" href="#run-one-model"></a>
+</h2>
+<p>Build the scatterer first, then supply frequencies in hertz and a
+model name:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://brandynlucca.github.io/acousticTS/">acousticTS</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">shape_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/cylinder.html">cylinder</a></span><span class="op">(</span></span>
@@ -160,7 +168,8 @@ it.</p>
 <span>  shape <span class="op">=</span> <span class="va">shape_obj</span>,</span>
 <span>  density_body <span class="op">=</span> <span class="fl">1045</span>,</span>
 <span>  sound_speed_body <span class="op">=</span> <span class="fl">1520</span>,</span>
-<span>  theta_body <span class="op">=</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">2</span></span>
+<span>  theta_body <span class="op">=</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">2</span>,</span>
+<span>  ID <span class="op">=</span> <span class="st">"example cylinder"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">frequency</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">38e3</span>, <span class="fl">120e3</span>, by <span class="op">=</span> <span class="fl">6e3</span><span class="op">)</span></span>
@@ -170,43 +179,119 @@ it.</p>
 <span>  frequency <span class="op">=</span> <span class="va">frequency</span>,</span>
 <span>  model <span class="op">=</span> <span class="st">"dwba"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>The three core arguments are:</p>
-<ol style="list-style-type: decimal">
-<li>
-<code>object</code>, the scatterer to be modeled,</li>
-<li>
-<code>frequency</code>, usually a vector in Hz,</li>
-<li>
-<code>model</code>, one or more model names.</li>
-</ol>
-<p>Additional arguments are model-specific and are forwarded through
-<code>...</code>. For example, <code>boundary</code> matters for
-<code>SPHMS</code>, <code>PSMS</code>, and <code>FCMS</code>, while
-<code>method</code> matters for <code>HPA</code>, and stochastic
-controls matter for <code>SDWBA</code>.</p>
-<p>This structure is important because it makes the function call read
-like a compact statement of the modeling problem. The object says what
-the target is. The frequency vector says where the target is being
-interrogated acoustically. The model name says which physical
-approximation or exact solution family is being applied. Model-specific
-arguments then refine that statement rather than replacing it.</p>
+<p>Reassignment is required. <code><a href="../../reference/target_strength.html">target_strength()</a></code> returns an
+updated S4 object. It does not modify the object bound to
+<code>scatterer_obj</code> unless the returned value is assigned.</p>
+<p>The function performs two stages for each model. The initializer
+converts the scatterer and call arguments into the model-specific
+parameterization. The solver then calculates and stores the result. Use
+<code>show()</code> for a compact object summary, then inspect the two
+result slots with <a href="../../reference/extract.html"><code>extract()</code></a>:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">show</span><span class="op">(</span><span class="va">scatterer_obj</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## FLS-object</span></span>
+<span><span class="co">##  Fluid-like scatterer </span></span>
+<span><span class="co">##  ID:example cylinder</span></span>
+<span><span class="co">## Body dimensions:</span></span>
+<span><span class="co">##  Length:0.03 m(n = 60 cylinders)</span></span>
+<span><span class="co">##  Mean radius:0.0025 m</span></span>
+<span><span class="co">##  Max radius:0.0025 m</span></span>
+<span><span class="co">## Shape parameters:</span></span>
+<span><span class="co">##  Defined shape:Cylinder</span></span>
+<span><span class="co">##  L/a ratio:12</span></span>
+<span><span class="co">##  Taper order:N/A</span></span>
+<span><span class="co">## Material properties:</span></span>
+<span><span class="co">##  Density: 1045 kg m^-3 | Sound speed: 1520 m s^-1</span></span>
+<span><span class="co">## Body orientation (relative to transducer face/axis):1.571 radians</span></span></code></pre>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">scatterer_obj</span>, <span class="st">"model_parameters"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] "DWBA"</span></span></code></pre>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">scatterer_obj</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] "DWBA"</span></span></code></pre>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">dwba_output</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">scatterer_obj</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">$</span><span class="va">DWBA</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">dwba_output</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] "frequency" "ka"        "f_bs"      "sigma_bs"  "TS"</span></span></code></pre>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">dwba_output</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##   frequency        ka                        f_bs     sigma_bs        TS</span></span>
+<span><span class="co">## 1     38000 0.3979351 -6.723778e-05-1.940150e-20i 4.520919e-09 -83.44773</span></span>
+<span><span class="co">## 2     44000 0.4607669 -8.773690e-05-2.931388e-20i 7.697764e-09 -81.13635</span></span>
+<span><span class="co">## 3     50000 0.5235988 -1.097965e-04-4.168663e-20i 1.205527e-08 -79.18823</span></span>
+<span><span class="co">## 4     56000 0.5864306 -1.328846e-04-5.650686e-20i 1.765833e-08 -77.53050</span></span>
+<span><span class="co">## 5     62000 0.6492625 -1.564363e-04-7.364911e-20i 2.447231e-08 -76.11325</span></span>
+<span><span class="co">## 6     68000 0.7120943 -1.798640e-04-9.287346e-20i 3.235107e-08 -74.90111</span></span></code></pre>
+<p>Output fields vary by model. Inspect their names before assuming that
+every result contains the same amplitude, cross-section, acoustic-size,
+or diagnostic columns.</p>
 </div>
 <div class="section level2">
-<h2 id="shared-and-model-specific-argument-bundles">Shared and model-specific argument bundles<a class="anchor" aria-label="anchor" href="#shared-and-model-specific-argument-bundles"></a>
+<h2 id="model-specific-arguments">Model-specific arguments<a class="anchor" aria-label="anchor" href="#model-specific-arguments"></a>
 </h2>
-<p>When only one model is being run, the ordinary <code>...</code>
-interface is usually sufficient. The more delicate case is when several
-models are requested together. In that situation, some inputs are
-genuinely shared across all requested models, while others belong only
-to one model family.</p>
-<p><code><a href="../../reference/target_strength.html">target_strength()</a></code> therefore supports both:</p>
-<ul>
-<li>shared arguments through <code>...</code>
-</li>
-<li>model-specific argument bundles through <code>model_args</code>
-</li>
-</ul>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<p>Arguments after <code>model</code> are forwarded to the selected
+model initializer. Their meaning is model-specific. Examples include
+boundary conditions, medium properties, approximation methods,
+integration settings, and stochastic controls. Use the model reference
+page to determine which are required.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../../reference/target_strength.html">target_strength</a></span><span class="op">(</span></span>
+<span>  object <span class="op">=</span> <span class="va">sphere_obj</span>,</span>
+<span>  frequency <span class="op">=</span> <span class="va">frequency</span>,</span>
+<span>  model <span class="op">=</span> <span class="st">"sphms"</span>,</span>
+<span>  boundary <span class="op">=</span> <span class="st">"gas_filled"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../../reference/target_strength.html">target_strength</a></span><span class="op">(</span></span>
+<span>  object <span class="op">=</span> <span class="va">fls_obj</span>,</span>
+<span>  frequency <span class="op">=</span> <span class="va">frequency</span>,</span>
+<span>  model <span class="op">=</span> <span class="st">"hpa"</span>,</span>
+<span>  method <span class="op">=</span> <span class="st">"stanton"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><code>verbose = TRUE</code> prints model initialization and execution
+progress. It is useful for locating the stage at which a larger call
+fails:</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../../reference/target_strength.html">target_strength</a></span><span class="op">(</span></span>
+<span>  object <span class="op">=</span> <span class="va">scatterer_obj</span>,</span>
+<span>  frequency <span class="op">=</span> <span class="va">frequency</span>,</span>
+<span>  model <span class="op">=</span> <span class="st">"dwba"</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="run-several-models">Run several models<a class="anchor" aria-label="anchor" href="#run-several-models"></a>
+</h2>
+<p>A vector of model names runs the requested models sequentially on the
+same scatterer:</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">comparison_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/fls_generate.html">fls_generate</a></span><span class="op">(</span></span>
+<span>  shape <span class="op">=</span> <span class="va">shape_obj</span>,</span>
+<span>  density_body <span class="op">=</span> <span class="fl">1045</span>,</span>
+<span>  sound_speed_body <span class="op">=</span> <span class="fl">1520</span>,</span>
+<span>  theta_body <span class="op">=</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">2</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">comparison_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/target_strength.html">target_strength</a></span><span class="op">(</span></span>
+<span>  object <span class="op">=</span> <span class="va">comparison_obj</span>,</span>
+<span>  frequency <span class="op">=</span> <span class="va">frequency</span>,</span>
+<span>  model <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"dwba"</span>, <span class="st">"hpa"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">comparison_obj</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] "DWBA" "HPA"</span></span></code></pre>
+<p>This keeps geometry, material properties, and frequency fixed while
+different model formulations are evaluated. It does not make the models
+physically equivalent. Compare only outputs with compatible definitions
+and domains.</p>
+<div class="section level3">
+<h3 id="shared-and-per-model-arguments">Shared and per-model arguments<a class="anchor" aria-label="anchor" href="#shared-and-per-model-arguments"></a>
+</h3>
+<p>Arguments supplied through <code>...</code> are shared with the
+requested model initializers when relevant. Use <code>model_args</code>
+for arguments that belong to one model. A model-specific value overrides
+a shared value with the same name:</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">comparison_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/target_strength.html">target_strength</a></span><span class="op">(</span></span>
 <span>  object <span class="op">=</span> <span class="va">scatterer_obj</span>,</span>
 <span>  frequency <span class="op">=</span> <span class="va">frequency</span>,</span>
@@ -223,288 +308,70 @@ to one model family.</p>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>This pattern avoids duplicating truly shared inputs such as medium
-properties, while keeping model-specific controls attached only to the
-relevant model. If the same argument appears in both places, the entry
-in <code>model_args[[model_name]]</code> takes precedence for that
-model.</p>
-<p>That is usually the safer pattern whenever the requested models share
-some argument names but not the full same interpretation of every
-keyword.</p>
+<p>Each <code>model_args</code> name must identify a requested model.
+Each entry must be a named list or named atomic vector.</p>
+</div>
 </div>
 <div class="section level2">
-<h2 id="typical-outputs">Typical outputs<a class="anchor" aria-label="anchor" href="#typical-outputs"></a>
+<h2 id="plot-and-inspect-results">Plot and inspect results<a class="anchor" aria-label="anchor" href="#plot-and-inspect-results"></a>
 </h2>
-<p>Most models ultimately produce some combination of:</p>
-<ul>
-<li>complex backscattering amplitude,</li>
-<li>
-<code>sigma_bs</code>, the backscattering cross-section,</li>
-<li>
-<code>TS</code>, the logarithmic target strength,</li>
-<li>the frequency or acoustic-size domain used in the calculation.</li>
-</ul>
-<p>Those quantities answer different questions. <code>TS</code> is
-usually the reporting quantity, while <code>sigma_bs</code> and the
-complex amplitude are often more useful when comparing mechanisms or
-combining components.</p>
-<p>Many models also store intermediate acoustic size quantities such as
-<code>ka</code>, as well as model-specific outputs that are useful for
-diagnostics. Because those fields differ by model, it is worth
-inspecting the result once before building a larger workflow around
-it.</p>
-<p>This is one of the reasons direct extraction matters. A plotted curve
-may be all that is needed for a quick look, but the stored output often
-contains the information needed to understand why a model behaved the
-way it did. For careful comparison or later reuse, it is usually worth
-knowing exactly which variables a given model stores.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">model_output</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">scatterer_obj</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">$</span><span class="va">DWBA</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">model_output</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "frequency" "ka"        "f_bs"      "sigma_bs"  "TS"</span></span></code></pre>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">model_output</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##   frequency        ka                        f_bs     sigma_bs        TS</span></span>
-<span><span class="co">## 1     38000 0.3979351 -6.723778e-05-1.940150e-20i 4.520919e-09 -83.44773</span></span>
-<span><span class="co">## 2     44000 0.4607669 -8.773690e-05-2.931388e-20i 7.697764e-09 -81.13635</span></span>
-<span><span class="co">## 3     50000 0.5235988 -1.097965e-04-4.168663e-20i 1.205527e-08 -79.18823</span></span>
-<span><span class="co">## 4     56000 0.5864306 -1.328846e-04-5.650686e-20i 1.765833e-08 -77.53050</span></span>
-<span><span class="co">## 5     62000 0.6492625 -1.564363e-04-7.364911e-20i 2.447231e-08 -76.11325</span></span>
-<span><span class="co">## 6     68000 0.7120943 -1.798640e-04-9.287346e-20i 3.235107e-08 -74.90111</span></span></code></pre>
-</div>
-<div class="section level2">
-<h2 id="running-more-than-one-model-on-the-same-object">Running more than one model on the same object<a class="anchor" aria-label="anchor" href="#running-more-than-one-model-on-the-same-object"></a>
-</h2>
-<p>One of the strengths of the package is that several models can be run
-on the same target description. That is particularly useful when the
-question is about sensitivity to model assumptions rather than about
-obtaining only a single curve.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">comparison_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/fls_generate.html">fls_generate</a></span><span class="op">(</span></span>
-<span>  shape <span class="op">=</span> <span class="va">shape_obj</span>,</span>
-<span>  density_body <span class="op">=</span> <span class="fl">1045</span>,</span>
-<span>  sound_speed_body <span class="op">=</span> <span class="fl">1520</span>,</span>
-<span>  theta_body <span class="op">=</span> <span class="va">pi</span> <span class="op">/</span> <span class="fl">2</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">comparison_obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/target_strength.html">target_strength</a></span><span class="op">(</span></span>
-<span>  object <span class="op">=</span> <span class="va">comparison_obj</span>,</span>
-<span>  frequency <span class="op">=</span> <span class="va">frequency</span>,</span>
-<span>  model <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"dwba"</span>, <span class="st">"hpa"</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="../../reference/extract.html">extract</a></span><span class="op">(</span><span class="va">comparison_obj</span>, <span class="st">"model"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "DWBA" "HPA"</span></span></code></pre>
-<p>This works because <code><a href="../../reference/target_strength.html">target_strength()</a></code> initializes the
-requested model, stores its parameterization in
-<code>model_parameters</code>, then stores the result in
-<code>model</code>. The original object remains the anchor that keeps
-geometry, material properties, and results tied together.</p>
-<p>That design makes model comparison much cleaner than a workflow built
-around disconnected result tables. When several models are run on the
-same object, the geometry and material assumptions remain fixed in one
-place. This reduces the chance that a model comparison is accidentally
-turned into a comparison of slightly different targets.</p>
-<p>When the same multi-model call needs distinct controls,
-<code>model_args</code> keeps those differences explicit without forcing
-every extra argument into the shared <code>...</code> bundle. That is
-especially helpful when one requested model needs additional stochastic,
-numerical, or boundary-condition inputs that the others do not use.</p>
-</div>
-<div class="section level2">
-<h2 id="choosing-a-model-call">Choosing a model call<a class="anchor" aria-label="anchor" href="#choosing-a-model-call"></a>
-</h2>
-<p>The package supports both exact modal solutions and approximations.
-The correct choice depends on geometry, boundary condition, and acoustic
-regime. The practical screening guide is <a href="../model-selection/model-selection.html">choosing a model</a>. The
-mathematical derivations live in the model-specific theory pages.</p>
-<p>At a workflow level, there are a few recurring patterns:</p>
-<ol style="list-style-type: decimal">
-<li>
-<code>DWBA</code> and <code>SDWBA</code> are natural for weak
-fluid-like elongated targets.</li>
-<li>
-<code>TRCM</code> and <code>FCMS</code> are natural for cylindrical
-targets.</li>
-<li>
-<code>SPHMS</code> is natural for spherical boundary-value
-problems.</li>
-<li>
-<code>PSMS</code> is natural for prolate spheroids when exact
-spheroidal structure matters.</li>
-<li>
-<code>ESSMS</code> and <code>calibration</code> are used when shell
-or calibration-sphere physics are central.</li>
-</ol>
-<p>The key practical mistake to avoid is choosing a model because the
-name sounds familiar rather than because the geometry and boundary
-assumptions match the object.</p>
-<p>At the execution stage, this usually means pausing long enough to ask
-a few questions before running the call:</p>
-<ol style="list-style-type: decimal">
-<li>Is the object geometry actually compatible with the chosen model
-family?</li>
-<li>Does the boundary or material interpretation match the physics I
-care about?</li>
-<li>Is the selected frequency range inside a regime where this model is
-intended to be informative?</li>
-<li>If the model has numerical controls, have I chosen values that are
-at least reasonable as a first pass?</li>
-</ol>
-<p>That short check often prevents a lot of downstream confusion.</p>
-</div>
-<div class="section level2">
-<h2 id="model-specific-arguments">Model-specific arguments<a class="anchor" aria-label="anchor" href="#model-specific-arguments"></a>
-</h2>
-<p>Some model calls require only the object, frequency, and model name.
-Others require additional inputs. A few representative patterns are:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Sphere modal series with an explicit boundary condition</span></span>
-<span><span class="fu"><a href="../../reference/target_strength.html">target_strength</a></span><span class="op">(</span><span class="va">gas_sphere</span>, <span class="va">frequency</span>, model <span class="op">=</span> <span class="st">"sphms"</span>, boundary <span class="op">=</span> <span class="st">"gas_filled"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># High-pass approximation with explicit method choice</span></span>
-<span><span class="fu"><a href="../../reference/target_strength.html">target_strength</a></span><span class="op">(</span><span class="va">fls_obj</span>, <span class="va">frequency</span>, model <span class="op">=</span> <span class="st">"hpa"</span>, method <span class="op">=</span> <span class="st">"stanton"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Stochastic DWBA with phase-variability controls</span></span>
-<span><span class="fu"><a href="../../reference/target_strength.html">target_strength</a></span><span class="op">(</span></span>
-<span>  <span class="va">fls_obj</span>,</span>
-<span>  <span class="va">frequency</span>,</span>
-<span>  model <span class="op">=</span> <span class="st">"sdwba"</span>,</span>
-<span>  n_iterations <span class="op">=</span> <span class="fl">100</span>,</span>
-<span>  n_segments_init <span class="op">=</span> <span class="fl">14</span>,</span>
-<span>  phase_sd_init <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span> <span class="op">/</span> <span class="fl">2</span>,</span>
-<span>  length_init <span class="op">=</span> <span class="fl">38.35e-3</span>,</span>
-<span>  frequency_init <span class="op">=</span> <span class="fl">120e3</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p>When in doubt, the implementation pages are the best starting point
-because they show the model-specific arguments in context rather than in
-isolation.</p>
-<p>This matters because many of those arguments are not merely optional
-toggles. They often encode real physical or numerical assumptions. A
-boundary condition changes the underlying scattering problem. A method
-choice selects between approximation formulas. A numerical setting can
-determine whether a truncated modal system is being solved robustly
-enough for interpretation. Reading those arguments in context is
-therefore much safer than treating them as anonymous function
-options.</p>
-</div>
-<div class="section level2">
-<h2 id="verbose-mode-and-debugging">Verbose mode and debugging<a class="anchor" aria-label="anchor" href="#verbose-mode-and-debugging"></a>
-</h2>
-<p>For larger workflows, <code>verbose = TRUE</code> is useful because
-it prints the initialization and execution stages. That can help
-distinguish between object-construction problems, model-compatibility
-problems, and post-processing problems.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../../reference/target_strength.html">target_strength</a></span><span class="op">(</span></span>
-<span>  object <span class="op">=</span> <span class="va">scatterer_obj</span>,</span>
-<span>  frequency <span class="op">=</span> <span class="va">frequency</span>,</span>
-<span>  model <span class="op">=</span> <span class="st">"dwba"</span>,</span>
-<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="interpreting-the-result">Interpreting the result<a class="anchor" aria-label="anchor" href="#interpreting-the-result"></a>
-</h2>
-<p>After a model is run, the updated scatterer object can be inspected
-with <code><a href="../../reference/extract.html">extract()</a></code> or plotted with
-<code>plot(..., type = "model")</code>. That makes it easy to compare
-multiple models or to keep geometry and modeled output together.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<p>The returned object retains its target definition and the stored
+model output. <a href="../../reference/plot.Scatterer.html"><code>plot()</code></a> can
+display either:</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">scatterer_obj</span>, type <span class="op">=</span> <span class="st">"shape"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="running-models_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="576"></p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="figure">
+<img src="running-models_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="Geometry stored on the modeled scatterer." width="576"><p class="caption">
+Geometry stored on the modeled scatterer.
+</p>
+</div>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">scatterer_obj</span>, type <span class="op">=</span> <span class="st">"model"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="running-models_files/figure-html/unnamed-chunk-7-2.png" class="r-plt" alt="" width="576"></p>
-<p>The important practical rule is to compare like with like. If two
-model outputs are to be compared, they should usually be compared on the
-same object, the same frequency grid, and the same reporting
-quantity.</p>
-<p>It is also worth checking whether the output is being interpreted in
-the right domain. For many reporting tasks, <code>TS</code> is the
-natural quantity. For coherent addition, residual analysis, or
-mechanism-level interpretation, linear quantities such as
-<code>sigma_bs</code> or the complex amplitude may be more informative.
-A run can be numerically fine and still be inspected in the wrong domain
-for the scientific question.</p>
+<div class="figure">
+<img src="running-models_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="Model output stored on the same scatterer." width="576"><p class="caption">
+Model output stored on the same scatterer.
+</p>
+</div>
+<p>For quantitative work, extract the underlying result rather than
+reading values from a plot. Target strength is appropriate for
+logarithmic reporting. Cross-section or complex amplitude may be
+required for linear averaging, coherent combination, or mechanism-level
+analysis. Before comparison or export, confirm the shape and
+orientation, requested model, frequency grid, and output columns.</p>
 </div>
 <div class="section level2">
-<h2 id="when-a-model-should-be-re-run">When a model should be re-run<a class="anchor" aria-label="anchor" href="#when-a-model-should-be-re-run"></a>
+<h2 id="when-to-run-again">When to run again<a class="anchor" aria-label="anchor" href="#when-to-run-again"></a>
 </h2>
-<p>Because model outputs are stored back onto the object, it is easy to
-forget that any substantive change to geometry, material properties,
-orientation, frequency grid, or model arguments requires a new run. The
-stored result does not update automatically just because an upstream
-object or variable in the workflow has changed.</p>
-<p>As a practical rule, a model should be re-run whenever:</p>
-<ol style="list-style-type: decimal">
-<li>the geometry or segmentation changes,</li>
-<li>any contrast or material property changes,</li>
-<li>the frequency vector changes,</li>
-<li>the model name changes, or</li>
-<li>a model-specific argument such as <code>boundary</code>,
-<code>method</code>, <code>phi_body</code>, <code>n_integration</code>,
-or <code>precision</code> changes.</li>
-</ol>
-<p>Treating the stored result as tied to a specific run configuration
-helps keep later comparisons honest.</p>
-</div>
-<div class="section level2">
-<h2 id="common-pitfalls">Common pitfalls<a class="anchor" aria-label="anchor" href="#common-pitfalls"></a>
-</h2>
-<p>The most common execution problems are not numerical failures. They
-are setup mismatches. Typical examples are:</p>
-<ol style="list-style-type: decimal">
-<li>using a model that is incompatible with the object class or
-shape,</li>
-<li>mixing contrasts and absolute properties inconsistently,</li>
-<li>forgetting that frequencies are in Hz,</li>
-<li>forgetting to re-run a model after changing geometry or material
-properties,</li>
-<li>comparing outputs from different frequency grids as if they were
-pointwise comparable.</li>
-</ol>
-<p>This is one reason the package stores model outputs back on the
-object: it keeps the geometry and the result attached to the same
-record.</p>
-<p>Another common pitfall is over-interpreting the first successful run.
-A run that completes without error is only the beginning of
-interpretation. It should still be checked for model compatibility,
-plausible magnitude, stability under modest numerical refinement when
-relevant, and consistency with the intended target description.</p>
-</div>
-<div class="section level2">
-<h2 id="related-articles">Related articles<a class="anchor" aria-label="anchor" href="#related-articles"></a>
-</h2>
+<p>Treat each stored result as belonging to one run configuration. Run
+the model again after changing:</p>
 <ul>
-<li><a href="../comparing-models/comparing-models.html">Comparing models
-on the same target</a></li>
-<li><a href="../plotting-inspecting-results/plotting-inspecting-results.html">Plotting
-and inspecting results</a></li>
-<li><a href="../simulation-parameter-sweeps/simulation-parameter-sweeps.html">Simulation
-and parameter sweeps</a></li>
+<li>geometry, segmentation, or component placement</li>
+<li>material properties, contrasts, or orientation</li>
+<li>frequency or other acoustic conditions</li>
+<li>model name, boundary condition, method, or numerical controls</li>
 </ul>
+<p>Create curved targets with <a href="../../reference/brake.html"><code>brake()</code></a> before
+running the relevant model.</p>
 </div>
 <div class="section level2">
-<h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
+<h2 id="execution-checks">Execution checks<a class="anchor" aria-label="anchor" href="#execution-checks"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-ZooScatR_software" class="csl-entry">
-Gastauer, Sven, Dezhang Chu, and Martin J. Cox. 2019.
-<span>“<span>ZooScatR</span>—<span>An</span> <span>&lt;</span>Span
-Style="font-Variant:small-Caps;"<span>&gt;</span>r<span>&lt;</span>/Span<span>&gt;</span>
-Package for Modelling the Scattering Properties of Weak Scattering
-Targets Using the Distorted Wave <span>Born</span>
-Approximation.”</span> <em>The Journal of the Acoustical Society of
-America</em> 145 (1): EL102–8. <a href="https://doi.org/10.1121/1.5085655" class="external-link">https://doi.org/10.1121/1.5085655</a>.
-</div>
-<div id="ref-Jech_2015" class="csl-entry">
-Jech, J. Michael, John K. Horne, Dezhang Chu, et al. 2015.
-<span>“Comparisons Among Ten Models of Acoustic Backscattering Used in
-Aquatic Ecosystem Research.”</span> <em>The Journal of the Acoustical
-Society of America</em> 138 (6): 3742–64. <a href="https://doi.org/10.1121/1.4937607" class="external-link">https://doi.org/10.1121/1.4937607</a>.
-</div>
-</div>
+<p>Before interpreting a result, confirm:</p>
+<ul>
+<li>the scatterer class and shape are supported by the model</li>
+<li>frequencies are in hertz and use the intended grid</li>
+<li>medium and target properties use consistent units and
+definitions</li>
+<li>model-specific arguments represent the intended physical and
+numerical case</li>
+<li>results are stable under relevant resolution or truncation
+changes</li>
+<li>compared models use the same target, conditions, and reporting
+quantity</li>
+</ul>
+<p>Continue with <a href="../comparing-models/comparing-models.html">Comparing Models</a> or
+<a href="../simulation-parameter-sweeps/simulation-parameter-sweeps.html">Simulation
+and Parameter Sweeps</a>.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

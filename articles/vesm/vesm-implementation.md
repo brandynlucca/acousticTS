@@ -7,10 +7,9 @@ Validated Experimental
 [Overview](https://brandynlucca.github.io/acousticTS/articles/vesm/index.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/vesm/vesm-theory.md)
 
-These pages are motivated by layered gas-bearing fish scattering models
-and viscous resonance broadening ([Khodabandeloo et al.
-2021](#ref-Khodabandeloo_2021); [Feuillade and Nero
-1998](#ref-Feuillade_1998)).
+VESM models a gas core, elastic shell, viscous outer layer, and
+surrounding fluid ([Khodabandeloo et al. 2021](#ref-Khodabandeloo_2021);
+[Feuillade and Nero 1998](#ref-Feuillade_1998)).
 
 The viscous-elastic spherical model is available through
 `target_strength(..., model = "vesms")`. The implementation is built on
@@ -19,12 +18,9 @@ in the same object framework already used by the elastic-shelled sphere
 model. The additional viscous layer is then supplied through model
 arguments at run time.
 
-This page focuses on a single reproducible reference case that
-implemented the model presented by Khodabandeloo et al. (2021) in
-Python. The goal is not to restate that code line by line. It is to show
-how the same layered target is built in acousticTS, how the model is
-called, and how closely the resulting spectrum matches the original
-implementation over a broader frequency range.
+The reference case reproduces the Python implementation associated with
+Khodabandeloo et al. ([2021](#ref-Khodabandeloo_2021)) over a shared
+frequency grid.
 
 `VESMS` is benchmarked here against a reference Python implementation
 over a dense frequency sweep. That is strong across-language validation
@@ -136,18 +132,9 @@ material properties were run through:
 The comparison uses a shared `1-150 kHz` grid with `1 kHz` spacing and
 the same retained modal orders (`m = 0, 1, 2`).
 
-After regenerating the benchmark against the current compiled acousticTS
-implementation, the reference case gives:
-
-- max abs. \Delta TS = `0.05598 dB`
-- mean abs. \Delta TS = `0.00885 dB`
-- frequency at max abs. \Delta = `60 kHz`
-- elapsed time = `0.79 s` for acousticTS and `0.98 s` for the Python
-  implementation
-
-| Comparison | N frequency | *f*_(min) (kHz) | *f*_(max) (kHz) | Max \|Δ\| *TS* (dB) | Mean \|Δ\| *TS* (dB) | *f* at max \|Δ\| *TS* (kHz) | acousticTS elapsed (s) | Python elapsed (s) |
-|:---|---:|---:|---:|---:|---:|---:|---:|---:|
-| acousticTS vs original VESM | 150 | 1 | 150 | 0.0572 | 0.0089 | 60 | 0.05 | 1.0962 |
+| Comparison | N frequency | *f*_(min) (kHz) | *f*_(max) (kHz) | Max \|Δ\| *TS* (dB) | Mean \|Δ\| *TS* (dB) | *f* at max \|Δ\| *TS* (kHz) |
+|:---|---:|---:|---:|---:|---:|---:|
+| acousticTS vs original VESM | 150 | 1 | 150 | 0.0572 | 0.0089 | 60 |
 
 The largest mismatch on this grid remains well below `0.1 dB`, and the
 mean absolute difference stays below `0.01 dB`. That is strong agreement
@@ -160,11 +147,9 @@ near-singular higher-order solves at some frequencies.
 the acousticTS spectrum, and the residual across
 frequency.](vesm-reference-comparison.png)
 
-The upper panel shows that the two spectra are visually superposed
-across the full comparison band. The lower panel makes the small
-residual drift easier to see. In this case the largest difference occurs
-near `60 kHz` and reaches `0.05598 dB`, which remains small relative to
-the scale of the full spectrum.
+The spectra are visually superposed across the comparison band. The
+residual reaches about `0.0572 dB` near `60 kHz`, which remains small
+relative to the scale of the full spectrum.
 
 #### A few explicit checkpoints
 

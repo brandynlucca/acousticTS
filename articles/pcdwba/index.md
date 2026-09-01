@@ -7,40 +7,40 @@ Validated Experimental
 [Theory](https://brandynlucca.github.io/acousticTS/articles/pcdwba/pcdwba-theory.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/pcdwba/pcdwba-implementation.md)
 
-These pages follow the phase-compensated weak-scattering literature for
-broadside elongated bodies and krill-style applications ([Chu and Ye
-1999](#ref-Chu_1999); [Chu et al. 1993](#ref-Chu_1993)).
-
-The phase-compensated distorted wave Born approximation (`PCDWBA`) is
-the curved-body extension of the weak-scattering `DWBA`. It keeps the
-same local fluid-like cylindrical kernel but corrects the along-body
-phase accumulation for a bent centerline.
+The phase-compensated distorted-wave Born approximation (`PCDWBA`)
+calculates weak-fluid scattering from an elongated body while retaining
+the phase associated with its curved centerline.
 
 ### Core idea
 
-Write the weak-scattering backscatter as a sum over local cross-sections
-along a bent body, and retain the position- and tilt-dependent phase
-that would be lost by treating the target as straight.
+Use the local cross-sectional kernel of `DWBA`, but calculate position,
+local tilt, spacing, and two-way phase from the actual centerline rather
+than from a straight-axis reduction ([Chu and Ye 1999](#ref-Chu_1999)).
 
 ### Best for
 
-- Weakly scattering elongated targets with meaningful curvature
-- Bent zooplankton-like bodies parameterized by a centerline and local
-  radius profile
-- Curved-body problems where a straight `DWBA` is too restrictive
+- Weakly contrasting elongated bodies with physically meaningful
+  curvature
+- Uniformly bent cylinders or curved arbitrary profiles
+- Assessing the phase effect of curvature relative to a straight
+  weak-scattering calculation
 
 ### Supports
 
-- Canonical bent cylinders and arbitrary fluid-like centerline profiles
-- Weak-contrast notation relative to seawater as g\_{21} and h\_{21}
-- Monostatic and phase-sensitive curved-body backscatter calculations
+- `FLS` scatterers converted to a DWBA-style radius and centerline
+  profile
+- Curvature already present in the profile or supplied as a radius or
+  radius-to-length ratio
+- Nodewise density and sound-speed contrast bookkeeping
 
 ### Main assumptions
 
-- Born-type weak-scattering regime
-- Curvature modifies phase bookkeeping but not the local weak-fluid
+- The same first-order weak-scattering regime as `DWBA`
+- Curvature changes position and phase but not the local scattering
   kernel
-- Single scattering from an elongated fluid-like target
+- Single scattering from a fluid-like target
+- The centerline and local radius discretization resolve the target
+  geometry
 
 ### Validation status
 
@@ -52,18 +52,11 @@ that would be lost by treating the target as straight.
 ### Family pages
 
 - [Implementation](https://brandynlucca.github.io/acousticTS/articles/pcdwba/pcdwba-implementation.md):
-  object workflow and comparison results
+  accepted profiles, curvature inputs, output, and comparisons
 - [Theory](https://brandynlucca.github.io/acousticTS/articles/pcdwba/pcdwba-theory.md):
-  bent-centerline parameterization and phase-compensated weak-scattering
-  sum
+  centerline geometry and phase-compensated sum
 
 ## References
-
-Chu, Dezhang, Kenneth G. Foote, and Timothy K. Stanton. 1993. “Further
-Analysis of Target Strength Measurements of Antarctic Krill at 38 and
-120 kHz: Comparison with Deformed Cylinder Model and Inference of
-Orientation Distribution.” *The Journal of the Acoustical Society of
-America* 93 (5): 2985–88. <https://doi.org/10.1121/1.405818>.
 
 Chu, Dezhang, and Zhen Ye. 1999. “A Phase-Compensated Distorted Wave
 Born Approximation Representation of the Bistatic Scattering by Weakly

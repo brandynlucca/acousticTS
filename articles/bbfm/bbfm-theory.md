@@ -7,28 +7,31 @@ Unvalidated Experimental
 [Overview](https://brandynlucca.github.io/acousticTS/articles/bbfm/index.md)
 [Implementation](https://brandynlucca.github.io/acousticTS/articles/bbfm/bbfm-implementation.md)
 
-This family is best read alongside the swimbladder-less fish and
-composite-scatterer literature that motivates explicit flesh-body and
-backbone terms ([Gorska et al. 2005](#ref-Gorska_2005); [Stanton et al.
-1998](#ref-Stanton_1998_1); [Clay and Horne 1994](#ref-Clay_1994)).
+The body-backbone fish model (`BBFM`) represents a swimbladder-less fish
+as two explicit contributors: a weakly scattering flesh body and an
+elastic backbone. This separation is motivated by measurements and
+models in which skeletal scattering cannot be absorbed reliably into a
+homogeneous flesh contrast ([Gorska et al. 2005](#ref-Gorska_2005);
+[Stanton et al. 1998](#ref-Stanton_1998_1)).
 
-The body-backbone fish model (`BBFM`) is a composite scattering family
-for swimbladder-less targets whose flesh body and backbone should remain
-explicit, separately parameterized contributors. The point of the model
-is not to solve a fully coupled three-medium boundary-value problem
-exactly. The point is to keep the two dominant anatomical components
-acoustically visible in one coherent backscatter calculation.
-
-That makes `BBFM` conceptually closer to the hybrid logic of `KRM` than
-to a single-region canonical modal solution:
+BBFM is a coherent component model rather than an exact three-medium
+boundary solution:
 
 1.  the flesh body is treated as a weakly scattering fluid-like region,
 2.  the backbone is treated as an elastic cylindrical structure, and
 3.  the two terms are embedded into one body-fixed frame through a phase
     translation before their complex amplitudes are summed.
 
-The result is a transparent composite model rather than a homogenized
-single-medium approximation.
+The complex amplitudes are combined before forming backscattering
+cross-section.
+
+Medium indices and target-strength quantities follow [Notation and
+symbols](https://brandynlucca.github.io/acousticTS/articles/notation-and-symbols/notation-and-symbols.md).
+The component approximations are developed on the [DWBA
+theory](https://brandynlucca.github.io/acousticTS/articles/dwba/dwba-theory.md)
+and [ECMS
+theory](https://brandynlucca.github.io/acousticTS/articles/ecms/ecms-theory.md)
+pages.
 
 ## Geometry and medium indexing
 
@@ -53,22 +56,18 @@ explicit:
 where c\_{L,3} and c\_{T,3} are the longitudinal and transverse wave
 speeds of the elastic backbone.
 
-The important approximation enters immediately here: the backbone term
-used here is not the exact solution for an elastic region `3` embedded
-inside flesh region `2`. Instead, it is a seawater-referenced
-elastic-cylinder surrogate that is then positioned inside the same body
-frame as the flesh solve.
+The backbone term is a seawater-referenced elastic-cylinder surrogate.
+It is not the exact solution for an elastic region 3 embedded in flesh
+region 2.
 
 ## Flesh-body contribution
 
 ### Weak-fluid assumption
 
-The flesh component is treated as a weakly scattering fluid-like body.
-Its physics therefore follows the distorted-wave Born logic: the
-material contrasts relative to seawater are small enough that
-first-order scattering remains meaningful, while the body is still
-extended enough that phase accumulation along the body cannot be
-ignored.
+The flesh component follows the distorted-wave Born approximation.
+Material contrasts relative to seawater must be weak enough for
+first-order scattering, while the phase is retained across the extended
+body ([Chu and Ye 1999](#ref-Chu_1999)).
 
 Using the same contrast notation as the `DWBA` theory page, the
 compressibility and density perturbations are:
@@ -89,10 +88,9 @@ Here V_2 is the flesh-body volume, \mathbf{k}\_2 is the distorted
 interior propagation vector, and \beta is the local angle between
 propagation direction and body tangent.
 
-For the elongated axisymmetric bodies used in practice, this is reduced
-to the usual one-dimensional `DWBA` body integral. The important point
-for `BBFM` is not the exact quadrature form, but the physical role of
-the term: it is the weak-fluid flesh-body amplitude.
+For an elongated axisymmetric body, analytic transverse integration
+reduces this volume expression to the one-dimensional DWBA body
+integral.
 
 ## Backbone contribution
 
@@ -120,10 +118,9 @@ Here L_3 is backbone length, \theta_3 is the backbone incidence angle,
 \epsilon_m is the usual Neumann factor, and \eta_m collects the
 elastic-cylinder boundary-condition physics.
 
-This term is what distinguishes `BBFM` from a pure body-only
-weak-scattering model. The backbone is not just another contrast
-perturbation. It is an explicit elastic structure with its own internal
-wave-conversion physics.
+The backbone is therefore an elastic structure with
+longitudinal-to-transverse wave conversion, not another weak contrast
+perturbation.
 
 ## Spatial placement in the body frame
 
@@ -148,9 +145,8 @@ z_c\sin\theta.
 
 with (x_c, z_c) the backbone centroid and \theta the stored body angle.
 
-This is the step that embeds the backbone inside the same coordinate
-frame as the flesh solve. Without it, the model would implicitly assume
-that the flesh and backbone scatter from the same effective point.
+This translation prevents the two components from being treated as if
+they scattered from the same point.
 
 ## Coherent composite amplitude
 
@@ -161,11 +157,8 @@ f\_{\mathrm{bs}}^{(\mathrm{BBFM})} = f\_{\mathrm{bs}}^{(2)} +
 f\_{\mathrm{bs}}^{(3)} \exp\\\left(2 i k_1
 \hat{\mathbf{q}}\_{\mathrm{bs}}\cdot\mathbf{r}\_c\right).
 
-This is the core `BBFM` statement. The family is coherent because it
-adds the two complex amplitudes before squaring.
-
-That distinction matters. If the model instead added cross-sections
-directly, all interference between flesh and backbone would be lost.
+Adding the amplitudes before squaring retains flesh-backbone
+interference.
 
 ## Cross-section and interference structure
 
@@ -175,10 +168,10 @@ The linear backscattering cross-section is:
 \left\|f\_{\mathrm{bs}}^{(\mathrm{BBFM})}\right\|^2,
 
 and the target strength is ([MacLennan et al.
-2002](#ref-MacLennan_2002); [Urick 1983](#ref-Urick_1983); [Simmonds and
-MacLennan 2005](#ref-Simmonds_2005)):
+2002](#ref-MacLennan_2002)):
 
-\mathrm{TS} = 10 \log\_{10}\left(\sigma\_{\mathrm{bs}}\right).
+\mathrm{TS} = 10 \log\_{10}\left(\frac{\sigma\_{\mathrm{bs}}}{1\\
+\mathrm{m}^2}\right).
 
 Expanding the squared magnitude makes the composite physics explicit:
 
@@ -212,27 +205,23 @@ reduce to a simple sum of the flesh and backbone `TS` curves.
 3.  shadowing or blockage of one component by the other,
 4.  anatomical variability in backbone placement across an ensemble.
 
-These omissions matter because they define exactly what `BBFM` is: a
-component-resolved coherent model, not a full coupled composite-wave
-solver.
+These omissions distinguish the component model from a fully coupled
+composite-wave solution.
 
 ## Why this family is still useful
 
-Even with those approximations, `BBFM` fills a real modeling gap. A
-swimbladder-less fish often has flesh that behaves broadly like a weakly
-scattering body and a backbone that is acoustically much stiffer than
-the surrounding tissue.
-
-Folding both of those into one effective region can hide the very
-mechanism one is trying to study. `BBFM` therefore earns its place not
-by being exact, but by keeping the dominant anatomical contributors
-explicit while preserving coherent interference between them.
+BBFM is useful when flesh is weakly scattering but the backbone is much
+stiffer than the surrounding tissue. Keeping the components separate
+exposes their individual amplitudes and their frequency-dependent
+interference.
 
 ## References
 
-Clay, Clarence S., and John K. Horne. 1994. “Acoustic Models of Fish:
-The Atlantic Cod (*Gadus Morhua*).” *The Journal of the Acoustical
-Society of America* 96 (3): 1661–68. <https://doi.org/10.1121/1.410245>.
+Chu, Dezhang, and Zhen Ye. 1999. “A Phase-Compensated Distorted Wave
+Born Approximation Representation of the Bistatic Scattering by Weakly
+Scattering Objects: Application to Zooplankton.” *The Journal of the
+Acoustical Society of America* 106 (4): 1732–43.
+<https://doi.org/10.1121/1.428036>.
 
 Gorska, Natalia, Egil Ona, and Rolf Korneliussen. 2005. “Acoustic
 Backscattering by Atlantic Mackerel as Being Representative of Fish That
@@ -245,15 +234,8 @@ Consistent Approach to Definitions and Symbols in Fisheries Acoustics.”
 *ICES Journal of Marine Science* 59 (2): 365–69.
 <https://doi.org/10.1006/jmsc.2001.1158>.
 
-Simmonds, John, and David N. MacLennan. 2005. *Fisheries Acoustics:
-Theory and Practice*. 2nd ed. Blackwell Science.
-<https://doi.org/10.1002/9780470995303>.
-
 Stanton, Timothy K., Dezhang Chu, Peter H. Wiebe, Linda V. Martin, and
 Robert L. Eastwood. 1998. “Sound Scattering by Several Zooplankton
 Groups. I. Experimental Determination of Dominant Scattering
 Mechanisms.” *The Journal of the Acoustical Society of America* 103 (1):
 225–35. <https://doi.org/10.1121/1.421469>.
-
-Urick, Robert J. 1983. *Principles of Underwater Sound*. 3rd ed.
-McGraw-Hill.

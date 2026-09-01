@@ -1,418 +1,462 @@
-# Numerical Foundations and Special Functions
+# Numerical Methods and Special Functions
 
 ## Introduction
 
-The numerical choices documented here are motivated by the
-special-function and basis-expansion structure of the underlying
-scattering literature ([Flammer 1957](#ref-Flammer_1957); [Waterman
-2009](#ref-Waterman_2009); [Betcke and Scroggs
-2021](#ref-Bempp-cl_software)).
+Canonical scattering models replace a field defined throughout space
+with a series of geometry-matched eigenfunctions. This is the principal
+numerical advantage of modal scattering theory ([Waterman
+2009](#ref-Waterman_2009)). It does not eliminate numerical
+approximation. The infinite series must be truncated, special functions
+must be evaluated in finite precision, overlap integrals may require
+quadrature, and the resulting coefficient systems may be
+ill-conditioned.
 
-Several of the package models are mathematically exact only because they
-are written in special-function bases adapted to canonical geometries.
-This article is the high-level guide to those numerical ingredients.
-
-The theory pages explain where the formulas come from. This page
-explains why those formulas remain computationally nontrivial even after
-the mathematics is settled. The central themes are basis choice,
-truncation, quadrature, conditioning, and the practical meaning of
-convergence.
-
-This distinction matters because “exact” in a modeling article and
-“numerically effortless” are not the same thing. A geometry-matched
-modal formulation may be exact in the mathematical sense that it solves
-the stated boundary-value problem, but that solution still has to be
-evaluated with finite precision, finite truncation, and finite numerical
-resolution. Readers should therefore treat numerical settings as part of
-the reliability of the answer, not as an afterthought that becomes
-relevant only when something fails dramatically.
+This page develops those numerical ingredients and the other
+integration, projection, and summation methods used by the package.
+Model-specific derivations remain on their theory pages.
 
 ![Numerical foundations map](numerical-foundations-map.png)
 
-## Package numerical policy
+See [Notation and
+Symbols](https://brandynlucca.github.io/acousticTS/articles/notation-and-symbols/notation-and-symbols.md)
+for the shared definitions of k, ka, J_m, j_n, P_n^m, S\_{mn}, and
+R\_{mn}^{(q)}.
 
-The package follows a simple numerical policy so that model arguments
-are not left to imply solver behavior silently.
+## Geometry-matched modal bases
 
-First, compiled backends are preferred whenever the special functions or
-linear algebra become a meaningful part of the runtime or stability of
-the model. That is why the cylindrical, spherical, shell, and spheroidal
-workflows lean on `C++` and `Fortran` support once the calculations move
-beyond small scalar expressions. Pure `R` implementations remain
-appropriate for lightweight algebra, initialization, and orchestration,
-but the intended default for numerically heavy kernels is the compiled
-path.
+Let \\\Psi\_\nu\\ be a basis adapted to the target boundary. A separated
+field is represented formally as:
 
-Second, adaptive numerical controls are used when a fixed cutoff is
-known to leave visible truncation error in normal package usage. The
-clearest example is `SOEMS`, where `adaptive = TRUE` extends the modal
-sum until the tail contribution is negligible. When an adaptive switch
-is exposed publicly, the package keeps the legacy fixed option only so
-that older calculations remain reproducible.
+p(\boldsymbol{x}) = \sum\_{\nu=0}^{\infty}
+a\_\nu\Psi\_\nu(\boldsymbol{x}).
 
-Third, precision toggles are used only where double precision has a
-clear, model-dependent failure mode. In practice, that mostly matters
-for the spheroidal models. `PSMS` can use quadruple precision because
-the spheroidal basis and the dense fluid-filled kernel systems can
-become numerically delicate at higher acoustic size. By contrast, most
-of the spherical and cylindrical families are intended to remain in
-double precision unless a paper or benchmark comparison shows that
-higher precision is materially changing the answer.
+For a sphere, cylinder, or spheroid, the boundary is a coordinate
+surface. Orthogonality then decouples the boundary conditions by mode or
+reduces them to small blocks. A penetrable spheroid is an important
+exception. Its interior and exterior angular bases generally have
+different spheroidal parameters, so projection between those bases
+produces a coupled system.
 
-Fourth, a difference in numerical settings should be interpreted as a
-difference in how faithfully the same mathematical problem is being
-solved, not as a difference in target definition. Changing `adaptive`,
-quadrature order, or precision does not create a new scatterer. It
-changes the numerical resolution of the calculation. That is why these
-settings should be checked through stability tests rather than tuned
-opportunistically to chase a preferred spectrum.
+The basis is exact for the stated canonical geometry. A numerical
+calculation is still finite because it retains only a subset of the
+coefficients a\_\nu. The errors of concern are representation error from
+an inappropriate geometry, truncation error from too few modes,
+evaluation error in the special functions, quadrature error, and error
+amplified by an ill-conditioned solve.
 
-## Main ingredients
+## Cylindrical and spherical functions
 
-The numerical backbone of the package includes cylindrical and spherical
-Bessel and Hankel functions, Legendre and associated angular functions,
-spheroidal wave functions, quadrature rules for overlap integrals, modal
-truncation rules, and small linear systems or, in some cases, dense
-truncated matrix solves. Those ingredients appear in different
-combinations across the package. `SPHMS` and `FCMS` rely on canonical
-Bessel and Hankel expansions. `PSMS` adds spheroidal wave functions and
-overlap integrals. `ESSMS` layers elastic-shell algebra on top of
-spherical modal structure. Approximate models such as `HPA`, `DWBA`, and
-`TRCM` use simpler algebra, but still depend on acoustic size, phase,
-and geometry-dependent numerical evaluation.
+### Bessel and Hankel functions
 
-It helps to group these ingredients by the kind of numerical burden they
-introduce. Some ingredients mainly affect representation, such as basis
-choice and modal truncation. Some mainly affect evaluation, such as
-oscillatory special functions and numerical quadrature. Others mainly
-affect stability, such as dense matrix solves and cancellation in
-coefficient formulas. A reader does not need to master all of those
-topics in full detail, but it is useful to know which kind of numerical
-issue a given model is most likely to encounter.
+Separation of the Helmholtz equation in cylindrical coordinates gives
+the cylindrical Bessel equation, while spherical separation gives its
+spherical counterpart ([Folver and Maximon 2026](#ref-DLMF:ch10)). For
+order m and degree n, respectively, the equations are:
 
-## Geometry-matched bases
+\begin{aligned} z^2 y'' + z y' + \left(z^2-m^2\right)y &= 0, \\ z^2
+y'' + 2z y' + \left\[z^2-n(n+1)\right\]y &= 0. \end{aligned}
 
-The strongest numerical simplification in the package comes from using a
-basis that matches the geometry. Spheres are expanded in spherical
-functions, cylinders in cylindrical functions, and prolate spheroids in
-spheroidal functions. That matching is what turns a boundary-value
-problem into a tractable modal problem. When the basis and the geometry
-line up, boundary conditions often decouple by mode or at least reduce
-to much smaller systems than a generic full-wave discretization would
-require.
+The spherical functions can be evaluated through half-integer
+cylindrical functions. For example:
 
-This is the main reason the exact modal models are so powerful. They are
-not exact because they avoid numerics. They are exact because the
-geometry has already done most of the structural work.
+j_n(z) = \sqrt{\frac{\pi}{2z}}J\_{n+1/2}(z), \qquad y_n(z) =
+\sqrt{\frac{\pi}{2z}}Y\_{n+1/2}(z).
 
-The same point also explains why geometry mismatch can be numerically
-expensive. Once the target no longer aligns naturally with the basis,
-the mathematical simplifications that made the canonical model elegant
-begin to disappear. That is why arbitrary or biologically segmented
-bodies are often treated with approximations such as `DWBA`, `SDWBA`,
-`TRCM`, or `KRM` rather than by forcing them into a poorly matched
-canonical basis.
+Regular incident or interior fields use J_m or j_n. Outgoing scattered
+fields use the corresponding Hankel combinations:
 
-## Special functions in practice
+H_m^{(1)}(z) = J_m(z) + iY_m(z), \qquad h_n^{(1)}(z) = j_n(z) + iy_n(z).
 
-### Cylindrical and spherical Bessel/Hankel functions
+Boundary conditions also require derivatives of these functions. At high
+order or near zeros, ratios of a function and its derivative can lose
+accuracy through underflow, overflow, or cancellation. Stable
+recurrences and scaled representations are therefore as important as the
+defining equations ([Abramowitz and Stegun 1964](#ref-Abramowitz_1964)).
 
-These functions are the basic radial building blocks for `FCMS`,
-`SPHMS`, `ESSMS`, and parts of other workflows ([Abramowitz and Stegun
-1964](#ref-Abramowitz_1964); [Folver and Maximon 2026](#ref-DLMF:ch10)).
-Computationally, they are important because boundary conditions
-frequently depend on both the functions themselves and their
-derivatives.
+### Legendre functions and recurrences
 
-At a practical level, increasing acoustic size usually means more
-oscillatory special functions, more modes required for convergence, and
-a greater risk of cancellation or conditioning issues in coefficient
-formulas.
+The angular factor in spherical separation is an associated Legendre
+function. It satisfies:
 
-Readers do not need to inspect these functions directly to feel their
-numerical consequences. They show up indirectly as slower convergence,
-greater sensitivity to truncation limits, or sudden instability if a
-coefficient formula involves the subtraction of large nearly equal
-quantities.
+\frac{d}{d\mu}\left\[(1-\mu^2)\frac{dP_n^m}{d\mu}\right\] +
+\left\[n(n+1)-\frac{m^2}{1-\mu^2}\right\]P_n^m = 0.
 
-### Legendre and angular functions
+For the axisymmetric case, the Legendre polynomials obey the
+orthogonality relation:
 
-For spherical problems, Legendre structure is what separates angular
-dependence from radial dependence ([Abramowitz and Stegun
-1964](#ref-Abramowitz_1964); [Dunster 2026](#ref-DLMF:ch14)). That
-separation is why the spherical models can be solved one order at a time
-rather than as a fully coupled field everywhere in space.
+\int\_{-1}^{1}P_n(\mu)P\_\ell(\mu)\\d\mu =
+\frac{2}{2n+1}\delta\_{n\ell}.
 
-The practical importance of that separation is that numerical growth
-happens in an organized way. As acoustic size increases, more angular
-orders contribute, but the model still retains a mode-by-mode structure
-that is easier to diagnose than a generic global discretization.
+This relation isolates spherical modal coefficients after the boundary
+conditions are projected onto P_n. Associated functions provide the
+corresponding structure when azimuthal order is nonzero ([Dunster
+2026](#ref-DLMF:ch14)).
 
-### Spheroidal wave functions
+Integer-degree Legendre values are generated efficiently through the
+three-term recurrence:
 
-The prolate spheroidal model is numerically more demanding because the
-basis itself is more specialized ([Flammer 1957](#ref-Flammer_1957);
-[Volkmer 2026](#ref-DLMF:ch30)). The advantage is geometric fidelity for
-prolate bodies. The cost is that evaluating and coupling spheroidal wave
-functions is more delicate than working in ordinary spherical or
-cylindrical bases.
+(n+1)P\_{n+1}(\mu) = (2n+1)\mu P_n(\mu)-nP\_{n-1}(\mu).
 
-This is why `PSMS` often deserves more numerical scrutiny than the
-simpler canonical modal models. The question is not whether the
-mathematics is legitimate. The question is whether the chosen truncation
-and quadrature settings are resolving that more delicate basis
-accurately enough for the intended calculation.
+The package’s general Legendre utilities also support cases outside the
+integer modal path. Those branches use hypergeometric series, numerical
+integration, or finite-difference derivatives as needed. Values near
+branch points or singular endpoints deserve additional scrutiny because
+those general evaluators do not have the same numerical behavior as the
+integer recurrences.
 
-### Spheroidal wave-function implementation
+## Prolate spheroidal wave functions
 
-For the prolate spheroidal basis, the most important numerical objects
-are the angular wave functions
-[`Smn()`](https://brandynlucca.github.io/acousticTS/reference/Smn.md)
-and the radial wave functions
-[`Rmn()`](https://brandynlucca.github.io/acousticTS/reference/Rmn.md).
-Those are the actual special-function building blocks that the rest of
-the spheroidal models depend on, so it is useful to separate their
-evaluation from the later model-specific algebra.
+Prolate spheroidal coordinates use an angular coordinate -1\leq\eta\leq
+1, a radial coordinate \xi\geq 1, and a spheroidal parameter c.
+Separation produces angular and radial functions with the same order m,
+degree n, and eigenvalue \lambda\_{mn}(c) ([Flammer
+1957](#ref-Flammer_1957)).
 
-In acousticTS, those functions are evaluated through the `profcn`
-backend in `src/prolate_swf.f90` ([Van Buren and Boisvert
-2002](#ref-prolate_swf_software_2002),
-[2004](#ref-prolate_swf_software_2004)), with the corresponding `C++`
-wrappers in `src/psms.cpp` handling the extraction and rescaling needed
-by the exported
+The angular function satisfies:
+
+\frac{d}{d\eta}\left\[(1-\eta^2)\frac{dS\_{mn}}{d\eta}\right\] +
+\left\[\lambda\_{mn}(c)-c^2\eta^2- \frac{m^2}{1-\eta^2}\right\]S\_{mn} =
+0.
+
+The radial function satisfies:
+
+\frac{d}{d\xi}\left\[(\xi^2-1)\frac{dR\_{mn}}{d\xi}\right\] -
+\left\[\lambda\_{mn}(c)-c^2\xi^2+ \frac{m^2}{\xi^2-1}\right\]R\_{mn} =
+0.
+
+When c\rightarrow 0, the angular eigenvalue approaches n(n+1) and the
+angular functions approach associated Legendre functions. At nonzero c,
+both the eigenvalue and the basis depend on the acoustic size. This
+dependence is one reason spheroidal evaluation is more demanding than
+evaluation of a fixed Legendre basis ([Volkmer 2026](#ref-DLMF:ch30)).
+
+For fixed m and c, the angular functions are orthogonal under the
+normalization used by the surrounding derivation. Writing the squared
+norm as N\_{mn}(c), the relation is:
+
+\int\_{-1}^{1}S\_{mn}(c,\eta)S\_{m\ell}(c,\eta)\\d\eta =
+N\_{mn}(c)\delta\_{n\ell}.
+
+The first radial kind is regular and the second is the independent
+singular solution. The third and fourth kinds are formed as:
+
+R\_{mn}^{(3)} = R\_{mn}^{(1)} + iR\_{mn}^{(2)}, \qquad R\_{mn}^{(4)} =
+R\_{mn}^{(1)} - iR\_{mn}^{(2)}.
+
+The package uses the third kind for an outgoing spheroidal field. The
+[PSMS theory
+page](https://brandynlucca.github.io/acousticTS/articles/psms/psms-theory.md)
+gives the coordinate definitions, field expansions, normalization
+factors, and boundary projections.
+
+### Numerical implementation
+
+The
 [`Smn()`](https://brandynlucca.github.io/acousticTS/reference/Smn.md)
 and
 [`Rmn()`](https://brandynlucca.github.io/acousticTS/reference/Rmn.md)
-interfaces. That split of responsibility matters because the Fortran
-routine computes a large family of spheroidal quantities at once, while
-the package-level functions usually want one specific angular or radial
-quantity and, often, its derivative.
+functions validate inputs and dispatch to compiled code. They are not
+themselves the spheroidal algorithm. The numerical methods come from the
+Van Buren and Boisvert `profcn` program, including the Bouwkamp
+eigenvalue method and alternative expansions for radial functions over
+different parameter ranges ([Van Buren and Boisvert
+2002](#ref-prolate_swf_software_2002)). The treatment of the second
+radial kind is described separately by Van Buren and Boisvert
+([2004](#ref-prolate_swf_software_2004)).
 
-One detail that is easy to miss from the outside is that the Fortran
-backend stores many spheroidal quantities in
-mantissa-and-base-10-exponent form rather than as a single
-floating-point number. This is a stability device. High-order prolate
-spheroidal functions can become so large or so small that a naive
-single-number representation would overflow or underflow before the
-scaled value of interest is assembled. The `C++` layer therefore
-reconstructs the ordinary numeric value only after the backend
-evaluation is complete.
+The actual special-function implementation used by `acousticTS` is the
+vendored and package-adapted [`profcn` source in
+`src/prolate_swf.f90`](https://github.com/brandynlucca/acousticTS/blob/main/src/prolate_swf.f90).
+It calculates eigenvalues, angular functions, radial functions of the
+first and second kinds, derivatives, normalization quantities, and
+accuracy indicators. The same file is compiled in both double and
+quadruple precision, as shown in
+[`src/Makevars`](https://github.com/brandynlucca/acousticTS/blob/main/src/Makevars).
 
-The package also avoids repeatedly redoing the expensive backend setup
-when several nearby spheroidal values are needed. Rather than calling
-the Fortran routine separately for every single (m,n) query, the
-`psms.cpp` wrappers request blocks of retained orders and then extract
-the required angular or radial entries from that batched result. This is
-especially useful internally because the exported
-[`Smn()`](https://brandynlucca.github.io/acousticTS/reference/Smn.md)
-and
-[`Rmn()`](https://brandynlucca.github.io/acousticTS/reference/Rmn.md)
-functions and the PSMS model code rely on the same backend and therefore
-benefit from the same blockwise evaluation strategy.
+The rest of the source tree connects that kernel to R:
 
-For
-[`Smn()`](https://brandynlucca.github.io/acousticTS/reference/Smn.md),
-the main numerical tasks are:
+- [`R/spheroidal.R`](https://github.com/brandynlucca/acousticTS/blob/main/R/spheroidal.R)
+  provides user-facing validation and dispatch.
+- [`src/psms.cpp`](https://github.com/brandynlucca/acousticTS/blob/main/src/psms.cpp)
+  defines the R-to-C++ entry points.
+- [`src/psms_smn.h`](https://github.com/brandynlucca/acousticTS/blob/main/src/psms_smn.h)
+  extracts angular values and derivatives.
+- [`src/psms_rmn.h`](https://github.com/brandynlucca/acousticTS/blob/main/src/psms_rmn.h)
+  extracts radial kinds and forms the complex incoming and outgoing
+  functions.
+- [`src/psms_support.h`](https://github.com/brandynlucca/acousticTS/blob/main/src/psms_support.h)
+  handles batched calls and base-10 exponent rescaling.
 
-1.  evaluating the angular function of the first kind for the requested
-    order and degree,
-2.  extracting the derivative when it is needed, and
-3.  carrying the backend normalization and rescaling cleanly into the
-    returned value.
+The vendored kernel was adapted for the package, including batching and
+cached support calculations. Its numerical ancestry and the original
+program remain available in the [upstream `prolate_swf`
+repository](https://github.com/MathieuandSpheroidalWaveFunctions/prolate_swf).
+For an audit of the special-function mathematics, begin with
+`src/prolate_swf.f90`, then use the C++ headers to trace how its outputs
+enter the package models.
 
-For
-[`Rmn()`](https://brandynlucca.github.io/acousticTS/reference/Rmn.md),
-the numerical tasks are similar but slightly broader because the radial
-routines must distinguish among radial kinds and their derivatives. The
-package wrappers therefore handle both the extraction of the correct
-radial branch and the conversion from the backend’s scaled
-representation into ordinary double- or quadruple-precision values.
+Many backend results are stored as a mantissa and a base-10 exponent.
+The C++ support layer reconstructs a returned component as:
 
-The important practical point is that
-[`Smn()`](https://brandynlucca.github.io/acousticTS/reference/Smn.md)
-and
-[`Rmn()`](https://brandynlucca.github.io/acousticTS/reference/Rmn.md)
-are not numerically difficult because the formulas are conceptually
-obscure. They are difficult because spheroidal special functions are
-expensive and delicate at high order. The implementation in
-`prolate_swf.f90` and the related `psms.cpp` wrappers is designed to
-keep those evaluations stable before any model-specific scattering
-algebra is applied.
+x = \widehat{x}\\10^{e}.
 
-## Acoustic size and truncation
+Keeping \widehat{x} and e separate during the difficult part of the
+calculation extends the usable dynamic range. Batching consecutive
+degrees for a fixed order also avoids repeating the expensive eigenvalue
+and expansion setup for each (m,n) pair.
 
-Most exact-style models replace an infinite expansion with a truncated
-one. That is unavoidable. The practical question is not whether
-truncation happens, but whether the chosen truncation is large enough to
-give a stable answer.
+## Modal truncation and convergence
 
-As a rule, larger acoustic size means more modal content. That is why
-model-specific truncation rules are typically expressed in terms of
-quantities like ka, k a + C, or related reduced frequencies.
+An infinite modal result has the form:
 
-For example, spherical and cylindrical modal sums often use a rule of
-thumb such as ka plus a small safety margin, prolate spheroidal models
-use separate limits for the azimuthal and total orders, and shell
-problems inherit the same modal-growth logic but with more algebra per
-mode.
+F = \sum\_{n=0}^{\infty} a_n.
 
-The practical implication is simple: a target that is easy to solve at
-low frequency may require significantly more work at high frequency even
-if the geometry does not change.
+The computed result retains a finite upper order N:
 
-This is also where one of the most important numerical habits comes in:
-convergence should be checked by increasing the truncation and asking
-whether the result changes materially. A truncation rule of thumb is a
-starting point, not a proof of adequacy. If a spectrum, resonance
-feature, or angular response moves noticeably when the truncation is
-increased moderately, that result should not yet be treated as
-numerically settled.
+F_N = \sum\_{n=0}^{N} a_n, \qquad E_N = F-F_N =
+\sum\_{n=N+1}^{\infty}a_n.
 
-## Quadrature and overlap integrals
+The tail E_N is not normally known. Acoustic size supplies a starting
+scale because progressively higher orders become important as ka
+increases. The current package defaults are model-specific:
 
-Some models do not reduce to purely closed-form modal coefficients.
-`PSMS` is the clearest example, because kernel and overlap terms must be
-evaluated numerically. In those cases, quadrature accuracy becomes part
-of the model setup.
+| Modal calculation | Starting or hard upper order |
+|----|---:|
+| Spherical fluid and related boundaries | N=\operatorname{round}(ka+20) |
+| Elastic spherical shell | N=\operatorname{round}(ka)+10 |
+| Viscous-layer elastic spherical shell | N=\max\\2,\operatorname{round}(ka)+10\\ |
+| Finite cylinder | N=\lceil ka\rceil+10 |
+| Solid elastic sphere | N_0=\operatorname{round}(ka)+10 before adaptive extension |
+| Prolate spheroid | m\_{\max}=\lceil 2ka\rceil, n\_{\max}=m\_{\max}+\lceil\chi_1/2\rceil |
 
-Gauss-Legendre quadrature is especially useful here because many of the
-relevant overlap integrals live on finite intervals and involve smooth
-but nontrivial products of special functions ([Abramowitz and Stegun
-1964](#ref-Abramowitz_1964); [Press et al. 2007](#ref-Press2007)). The
-package therefore exposes numerical controls such as the number of
-integration points where the model requires them.
+Here a is the relevant exterior radius and \chi_1=k_1q is the exterior
+spheroidal parameter based on semifocal length q. These formulas are
+initial resolution choices, not mathematical error bounds. Material
+contrast, incidence angle, resonances, and cancellation can all require
+additional resolution.
 
-The practical interpretation is that some model arguments are numerical
-arguments rather than physical arguments. Changing `n_integration`,
-precision, or simplification options does not change the target. It
-changes how faithfully the truncated mathematical problem is being
-solved.
+When two truncations can be compared, a useful convergence diagnostic
+is:
 
-That distinction is worth making explicit because numerical arguments
-are easy to misread. If a result changes when `n_integration` changes,
-that does not mean the target changed. It means the previous quadrature
-was not yet resolving the same target problem adequately. Numerical
-settings therefore need to be interpreted as part of the calculation
-quality, not as part of the target definition.
+\varepsilon_N = \frac{\|F\_{N+\Delta N}-F_N\|}
+{\max\\\left(\|F\_{N+\Delta N}\|,F\_{\mathrm{scale}}\right)}.
 
-## Conditioning and matrix solves
+The positive scale F\_{\mathrm{scale}} prevents division by a value near
+a physical null. A small \varepsilon_N supports convergence with respect
+to that refinement. It does not establish that the physical model or
+geometry is appropriate.
 
-Not all modal problems are equally easy after truncation. Some models
-decouple into scalar mode-by-mode coefficient formulas, some reduce to
-very small systems for each mode, and some, especially fluid-filled
-spheroidal problems, require dense truncated linear solves.
+Adaptive summation applies the same idea to individual modal terms. The
+solid elastic-sphere calculation begins from its usual ka-based order
+and extends the series until its tail term is sufficiently small. The
+spheroidal solver can also suppress negligible modal tails and select
+quadrature order from the retained angular content. Fixed controls
+remain useful for reproducibility and for explicit convergence studies.
 
-This is where conditioning matters. A mathematically correct truncated
-system can still be numerically awkward if the basis functions become
-nearly dependent at the working precision or if large cancellations
-occur in the coefficient matrices.
+## Quadrature and continuous integrals
 
-That is why several theory pages mention stabilization strategies such
-as singular value decomposition ([Press et al. 2007](#ref-Press2007)),
-cautious truncation, or warnings about effective precision limits.
+### Gauss-Legendre overlap quadrature
 
-Readers should not interpret such stabilization language as a sign that
-the underlying physics is dubious. It usually means the numerical
-representation has become delicate enough that ordinary direct
-evaluation may not be robust across the whole working range. In other
-words, stabilization is often a mark of numerical honesty rather than a
-warning that the model should be discarded.
+Interior and exterior spheroidal angular functions have different
+parameters when the wave speeds differ. Their cross-products are not
+diagonal under the ordinary orthogonality relation, so the penetrable
+problem contains overlap integrals such as:
 
-## A few simple utility examples
+K\_{n\ell}^{(m)} = \int\_{-1}^{1}
+S\_{mn}(c_1,\eta)S\_{m\ell}(c_2,\eta)\\d\eta.
 
-Even outside the exact modal models, a few small acoustic utilities
-appear constantly in the package.
+The package evaluates these finite-interval integrals with
+Gauss-Legendre quadrature. For Q nodes, the approximation is:
 
-``` r
+\int\_{-1}^{1}f(\eta)\\d\eta \approx \sum\_{q=1}^{Q}w_q f(\eta_q).
 
-library(acousticTS)
+The nodes are the roots of P_Q, and their weights are:
 
-frequency <- c(38e3, 70e3, 120e3)
-sound_speed <- 1500
+P_Q(\eta_q)=0, \qquad w_q=\frac{2}
+{(1-\eta_q^2)\left\[P_Q'(\eta_q)\right\]^2}.
 
-wavenumber(frequency, sound_speed)
-```
+The compiled quadrature routine obtains the nodes by Newton iteration
+starting from Chebyshev-like estimates. Gauss-Legendre quadrature is
+exact for polynomials through degree 2Q-1, but an overlap of oscillatory
+spheroidal functions is not a polynomial. Quadrature order must
+therefore increase with the angular content that the modal system
+retains ([Temme 2026](#ref-DLMF:ch3)).
 
-    ## [1] 159.1740 293.2153 502.6548
+### Adaptive integration of oscillatory amplitudes
 
-``` r
+Weak-scattering and curved-ray formulations contain continuous line
+integrals whose phase can oscillate rapidly. Their common numerical form
+is:
 
-linear(-60)
-```
+F(k)=C(k)\int_a^b A(s,k)e^{i\Phi(s,k)}\\ds.
 
-    ## [1] 1e-06
+The compiled DWBA path linearly interpolates the stored centerline and
+radius within each body segment, then evaluates the real and imaginary
+parts with the adaptive QAGS routine from QUADPACK. The curved-cylinder
+Fresnel calculation uses the same real-and-imaginary decomposition
+through R’s [`integrate()`](https://rdrr.io/r/stats/integrate.html)
+interface. QAGS combines Gauss-Kronrod error estimates with interval
+subdivision and extrapolation ([Piessens et al.
+1983](#ref-Piessens_1983)).
 
-``` r
+Relative tolerance, absolute tolerance, and the subdivision limit
+control the integration error. Geometry resolution is a separate issue.
+Tightening the quadrature tolerance cannot recover curvature or radius
+variation that was lost when the body was represented by too few
+segments.
 
-db(1e-6)
-```
+## Projection and linear systems
 
-    ## [1] -60
+### Transition-matrix projection
 
-Those are simple functions, but they show the two numerical domains that
-the package moves between constantly: physical frequency or wavenumber
-space and linear or logarithmic backscatter space.
+A transition matrix maps incident coefficients to scattered coefficients
+([Waterman 1969](#ref-Waterman_1969)). In block form, the map is:
 
-This is numerically relevant because a result can look smooth or erratic
-depending on the domain in which it is inspected. A narrow interference
-feature may be obvious in the linear domain and compressed in dB, or the
-reverse. Numerical checking is therefore not only about whether a
-calculation ran. It is also about whether the result is being inspected
-in a domain that reveals the behavior of interest.
+\boldsymbol{b}^{(m)} =\boldsymbol{T}^{(m)}\boldsymbol{a}^{(m)}.
 
-## What users should actually check
+For spherical-coordinate branches, the package evaluates the boundary
+operator on Gauss-Legendre surface nodes and projects the residual back
+onto the retained angular basis. A projected boundary equation has the
+form:
 
-Users do not need to inspect every special-function evaluation. They do,
-however, benefit from checking a few practical indicators: whether the
-selected model uses numerical controls such as truncation or quadrature,
-whether the result is stable to moderate increases in those controls,
-whether a very oscillatory curve is likely to be physics rather than a
-discretization problem, and whether the object resolution is fine enough
-for the model being used.
+\left\langle \Psi\_\mu,
+\mathcal{B}\\\left\[p\_{\mathrm{inc}}+p\_{\mathrm{scat}}\right\]
+\right\rangle_Q=0, \qquad \mu=1,\ldots,N.
 
-For approximate models, those checks are often mild. For exact modal
-models, especially `PSMS` and `ESSMS`, they can be central to
-interpretation.
+The subscript Q indicates that the surface inner product is evaluated by
+quadrature. Increasing basis order without enough surface nodes can
+therefore produce a larger algebraic system that represents the boundary
+no more accurately. The current finite-cylinder branch uses a
+cylindrical modal basis rather than forcing its sidewall-endcap corner
+into this spherical surface projection.
 
-A good practical check often looks like this:
+### Dense boundary systems
 
-1.  rerun with a modestly larger truncation or integration setting,
-2.  compare the new and old curves in the same domain,
-3.  confirm that the major features are stable rather than drifting, and
-4.  only then interpret peaks, nulls, or small model-to-model
-    differences physically.
+After truncation and projection, a coupled boundary problem has the
+matrix form:
 
-If a result changes materially under that kind of moderate numerical
-refinement, the safer conclusion is that the calculation is not yet
-converged rather than that the target has revealed unexpectedly rich new
-physics.
+\boldsymbol{K}\boldsymbol{a}=\boldsymbol{b}.
 
-## Why this page is useful
+This structure occurs in penetrable spheroidal kernels, projected
+T-matrix blocks, and the modewise viscous-layer shell calculation. The
+latter solves a 6\times6 monopole system and a 10\times10 system for
+each higher spherical order. Direct solves are used first where
+appropriate, with more robust solves or a pseudoinverse used as
+fallbacks.
 
-Users do not need to understand every numerical detail to run the
-package, but they often do need to know why one model converges rapidly
-while another requires more care, or why a geometry-matched exact
-solution may still involve nontrivial numerical stabilization.
+If columns of \boldsymbol{K} become nearly dependent, small evaluation
+or quadrature errors can produce large changes in \boldsymbol{a}. With
+the singular value decomposition, the system matrix is written as:
 
-That awareness makes model comparison better as well. If two models
-disagree, it is important to know whether the disagreement is likely to
-be physical, structural, or numerical. A short numerical check is often
-enough to separate those possibilities before a reader starts drawing
-strong physical conclusions from a curve that may not yet be numerically
-settled.
+\boldsymbol{K} =\boldsymbol{U}\boldsymbol{\Sigma}\boldsymbol{V}^{\*}.
 
-## Connection to theory pages
+For the double-precision dense spheroidal kernel solve, the package
+constructs a pseudoinverse by retaining singular values above the
+cutoff:
 
-The theory pages derive the governing equations and modal forms. This
-article complements them by emphasizing the computational consequences
-of those derivations: orthogonality, decoupling, truncation, quadrature,
-conditioning, and stored special-function evaluations.
+\tau = N\\\sigma\_{\max}\\\epsilon\_{\mathrm{mach}}, \qquad
+\boldsymbol{K}^{+}
+=\boldsymbol{V}\boldsymbol{\Sigma}\_{\tau}^{+}\boldsymbol{U}^{\*}.
 
-In other words, the theory pages answer “why does this formula exist?”
-This page answers “what is hard about evaluating it robustly?”
+Here N is the block dimension and singular values no larger than \tau
+are assigned a zero reciprocal. This prevents the solver from amplifying
+numerically unresolved directions without bound. The package relies on
+LAPACK and Armadillo for its standard dense decompositions ([Anderson et
+al. 1999](#ref-Anderson_1990)).
 
-## Best companion pages
+A common summary of sensitivity is the two-norm condition number:
 
+\kappa_2(\boldsymbol{K}) =\frac{\sigma\_{\max}}{\sigma\_{\min}}.
+
+When \sigma\_{\min} is small, increasing precision may reduce roundoff,
+but it cannot repair an under-resolved truncation or quadrature rule.
+The quadruple-precision spheroidal path therefore combines higher
+precision with a complete-pivoting linear solve and iterative
+refinement. It is a numerical resolution option for difficult parameter
+ranges, not a different scattering model ([Higham
+2002](#ref-Higham_2002)).
+
+## Summation, segmentation, and stochastic convergence
+
+### Cancellation and compensated sums
+
+Modal far fields and segmented-body approximations add complex terms
+with different phases. If large terms nearly cancel, ordinary
+left-to-right summation can discard low-order digits. The spheroidal
+far-field code uses a Kahan-style compensated update. For a running sum
+s_j and compensation c_j, one step is:
+
+\begin{aligned} y_j &= a_j-c_j, \\ t_j &= s_j+y_j, \\ c\_{j+1} &=
+(t_j-s_j)-y_j, \\ s\_{j+1} &= t_j. \end{aligned}
+
+Compensation reduces rounding error in the retained sum. It does not
+make an insufficient modal cutoff converge ([Higham
+2002](#ref-Higham_2002)).
+
+### Segmented geometries
+
+Several elongated-body models replace a continuous body with axial
+segments. Their coherent amplitude has the discrete form:
+
+F_N(k)=\sum\_{s=1}^{N}F_s(k).
+
+The segment count controls how well the stored centerline, radius,
+curvature, and phase are resolved. This affects DWBA-based models,
+phase-compensated variants, and the composite fish-body calculation. A
+segment-refinement study should keep the physical body fixed, resample
+it more finely, and compare the complex amplitude before converting it
+to target strength. Agreement only in dB can conceal compensating phase
+errors near a null.
+
+### Stochastic realizations
+
+The stochastic DWBA adds random phase perturbations to segment
+contributions and averages linear backscatter over M realizations
+([Demer and Conti 2003](#ref-Demer_2003_1)). For realization values X_r,
+the Monte Carlo mean and its estimated standard error are:
+
+\overline{X}\_M=\frac{1}{M}\sum\_{r=1}^{M}X_r, \qquad
+\operatorname{SE}(\overline{X}\_M) =\frac{s_X}{\sqrt{M}}.
+
+The familiar M^{-1/2} decrease is statistical rather than deterministic.
+Reproducibility requires recording the random seed and the number of
+realizations. Numerical convergence also requires checking segment
+resolution because increasing M cannot correct a poorly resolved body.
+
+## Interpreting numerical convergence
+
+A numerical result should be stable under moderate, targeted refinement.
+The relevant check depends on the calculation:
+
+1.  increase the modal upper order and compare the complex amplitude or
+    target strength,
+2.  increase quadrature order when modal overlaps or surface projections
+    are present,
+3.  tighten adaptive integration tolerances for continuous line
+    integrals,
+4.  refine segmented geometry without changing the underlying target,
+5.  increase stochastic realizations and report the seed for stochastic
+    models, and
+6.  compare double and quadruple precision when the spheroidal system is
+    sensitive.
+
+Agreement under one refinement tests only that numerical choice.
+Agreement between two truncations does not validate material properties,
+boundary conditions, or the use of a canonical geometry. Conversely, an
+oscillatory spectrum is not automatically a numerical artifact.
+Resonances and interference are physical when their locations and
+amplitudes persist under the relevant refinements.
+
+## Companion pages
+
+- [Acoustic Scattering
+  Primer](https://brandynlucca.github.io/acousticTS/articles/acoustic-scattering-primer/acoustic-scattering-primer.md)
+- [Boundary
+  Conditions](https://brandynlucca.github.io/acousticTS/articles/boundary_conditions.md)
+- [DWBA
+  theory](https://brandynlucca.github.io/acousticTS/articles/dwba/dwba-theory.md)
+- [TMM
+  theory](https://brandynlucca.github.io/acousticTS/articles/tmm/tmm-theory.md)
 - [SPHMS
   theory](https://brandynlucca.github.io/acousticTS/articles/sphms/sphms-theory.md)
 - [PSMS
@@ -428,9 +472,14 @@ Abramowitz, Milton, and Irene A. Stegun. 1964. *Handbook of Mathematical
 Functions with Formulas, Graphs, and Mathematical Tables*. Ninth Dover
 printing, tenth GPO printing. Dover Publications.
 
-Betcke, Timo, and Matthew Scroggs. 2021. “Bempp-Cl: A Fast Python Based
-Just-in-Time Compiling Boundary Element Library.” *Journal of Open
-Source Software* 6 (59): 2879. <https://doi.org/10.21105/joss.02879>.
+Anderson, Edward et al. 1999. *LAPACK Users’ Guide*. 3rd ed. SIAM.
+<https://doi.org/10.1137/1.9780898719604>.
+
+Demer, David A., and Stephane G. Conti. 2003. “Reconciling Theoretical
+Versus Empirical Target Strengths of Krill: Effects of Phase Variability
+on the Distorted-Wave Born Approximation.” *ICES Journal of Marine
+Science* 60 (2): 429–34.
+<https://doi.org/10.1016/S1054-3139(03)00002-X>.
 
 Dunster, T. M. 2026. “Legendre and Related Functions.” Chap. 14 in *NIST
 Digital Library of Mathematical Functions*, edited by F. W. J. Olver, A.
@@ -444,9 +493,18 @@ in *NIST Digital Library of Mathematical Functions*, edited by F. W. J.
 Olver, A. B. Olde Daalhuis, D. W. Lozier, et al.
 <https://dlmf.nist.gov/10>.
 
-Press, William H., Saul A. Teukolsky, William T. Vetterling, and Brian
-P. Flannery. 2007. *Numerical Recipes: The Art of Scientific Computing*.
-3rd ed. Cambridge University Press.
+Higham, Nicholas J. 2002. *Accuracy and Stability of Numerical
+Algorithms*. 2nd ed. Society for Industrial; Applied Mathematics.
+<https://doi.org/10.1137/1.9780898718027>.
+
+Piessens, Robert, Elise de Doncker-Kapenga, Christoph W. Überhuber, and
+David K. Kahaner. 1983. *QUADPACK: A Subroutine Package for Automatic
+Integration*. Vol. 1. Springer Series in Computational Mathematics.
+Springer-Verlag. <https://doi.org/10.1007/978-3-642-61786-7>.
+
+Temme, N. M. 2026. “Numerical Methods.” Chap. 3 in *NIST Digital Library
+of Mathematical Functions*, edited by F. W. J. Olver, A. B. Olde
+Daalhuis, D. W. Lozier, et al. <https://dlmf.nist.gov/3>.
 
 Van Buren, A. L., and J. E. Boisvert. 2002. “Accurate Calculation of
 Prolate Spheroidal Radial Functions of the First Kind and Their First
@@ -461,6 +519,10 @@ Derivatives.” *Quarterly of Applied Mathematics* 62 (3): 493–507.
 Volkmer, H. 2026. “Spheroidal Wave Functions.” Chap. 30 in *NIST Digital
 Library of Mathematical Functions*, edited by F. W. J. Olver, A. B. Olde
 Daalhuis, D. W. Lozier, et al. <https://dlmf.nist.gov/30>.
+
+Waterman, P. C. 1969. “New Formulation of Acoustic Scattering.” *The
+Journal of the Acoustical Society of America* 45 (6): 1417–29.
+<https://doi.org/10.1121/1.1911619>.
 
 Waterman, P. C. 2009. “T -Matrix Methods in Acoustic Scattering.” *The
 Journal of the Acoustical Society of America* 125 (1): 42–51.

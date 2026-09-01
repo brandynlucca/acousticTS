@@ -7,18 +7,12 @@ Unvalidated
 [Overview](https://brandynlucca.github.io/acousticTS/articles/essms/index.md)
 [Theory](https://brandynlucca.github.io/acousticTS/articles/essms/essms-theory.md)
 
-These pages are grounded in the classical elastic-shell scattering
-literature for fluid-filled spherical shells ([Goodman and Stern
-1962](#ref-Goodman_1962); [Faran 1951](#ref-Faran_1951); [Stanton
+ESSMS evaluates a fluid-filled spherical elastic shell ([Goodman and
+Stern 1962](#ref-Goodman_1962); [Faran 1951](#ref-Faran_1951); [Stanton
 1990](#ref-Stanton_1990)).
 
-The acousticTS package uses object-based scatterers so the same
-implementation pattern carries across models: create a scatterer, run
-[`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md),
-inspect the stored model output, and then compare a small set of
-physically important inputs. For `ESSMS`, the required object class is
-`ESS`, which combines a spherical shell, an optional internal fluid, and
-the elastic constants required for the shell solution.
+The required `ESS` object stores the spherical shell, its internal
+fluid, and the elastic constants used by the shell solution.
 
 `ESSMS` is unvalidated in the package. The benchmark family exists, but
 the implementation does not return finite full-grid `TS` values across
@@ -176,6 +170,12 @@ When you move from a tutorial object to a real calibration or biological
 shell, the next quantities to revisit are the shell elastic constants
 and the shell-to-fluid property contrast, because those control where
 the strongest modal features occur.
+
+The current ESSMS implementation is not reliable over the full benchmark
+grid. Treat `NA`, `NaN`, or infinite values as a failed numerical
+evaluation, not as a physical zero or a resonance estimate. Inspect the
+result in linear form and reduce the frequency range before drawing
+conclusions.
 
 ## References
 
