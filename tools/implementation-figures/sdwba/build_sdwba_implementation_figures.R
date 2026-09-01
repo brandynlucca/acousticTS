@@ -3,6 +3,10 @@
 source("tools/implementation-figures/helpers/common.R")
 impl_load_all()
 
+# SDWBA is stochastic by definition. Use a fixed stream for committed figures
+# so repeated rebuilds exercise the same realizations and produce stable files.
+set.seed(20260831)
+
 # Construct the canonical SDWBA example for a requested phase spread.
 make_sdwba_object <- function(phase_sd_init = sqrt(2) / 2) {
   obj <- fls_generate(
