@@ -1257,8 +1257,11 @@ end if
                     5 * ndec + 4 * m + c + 01000))
        if(x1 > 1.0e0_knd) limdneu = int(2 * ((lplus) * 0.5e0_knd + 5 * ndec+ &
                      4 * m + c + 00500))
+       ! r2neu extends the converged Neumann sum by int(1/x1) terms.  Include
+       ! the same tail when constructing the d-coefficient ratios so every
+       ! enr value consumed by r2neu has first been defined by conver/dnorm.
        if(iopneu == 2 .and. naccneu > 0) &
-           limdneu = jneu + jneu + 20 + int(sqrt(c))
+           limdneu = jneu + jneu + 20 + int(sqrt(c)) + int(1.0e0_knd / x1)
        if(iopneu /= 0) limd = max(limd, limdneu)
        limdeta = limd
        if(x1 >= 0.00065e0_knd) limdeta = int(2 * ((lplus) * (-18.5e0_knd- &
@@ -1724,6 +1727,7 @@ end if
        if(iopneu == 2 .and. naccneu > 0) limneu = jneu + jneu + 20+ &
                    int(sqrt(c)) + int(1.0e0_knd / x1)
        if(limneu > limp1 - 2) limneu = limp1 - 2
+       if(limneu > limd) limneu = limd
        call r2neu(l, m, c, x1, limneu, ndec, nex, maxd, maxlp, maxn, maxp, &
              enr, sneuf, sneun, ineue, sneudf, sneudr, &
              prat1, pcoefn, ipcoefn, dmfnorm, idmfe, r1dc, ir1de, &
