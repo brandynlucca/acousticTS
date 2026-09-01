@@ -121,7 +121,9 @@ Rmn(m = 1, n = 1, c = 2, xi = 1.2, kind = 4)
 Rmn(m = 2, n = 3, c = 1, xi = 1.5)
 
 # Quad precision
+\dontrun{
 Rmn(m = 2, n = 3, c = 1, xi = 1.5, precision = "quad")
+}
 
 }
 \references{

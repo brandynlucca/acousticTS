@@ -9,6 +9,14 @@ test_that("psms helper validators and quadrature selectors enforce the documente
   expect_error(acousticTS:::.psms_validate_boundary("invalid"), "Only the following values")
   expect_identical(acousticTS:::.psms_validate_precision("double"), "double")
   expect_error(acousticTS:::.psms_validate_precision("single"), "must be either 'double' or 'quad'")
+  if (acousticTS:::.quad_precision_available()) {
+    expect_identical(acousticTS:::.psms_validate_precision("quad"), "quad")
+  } else {
+    expect_error(
+      acousticTS:::.psms_validate_precision("quad"),
+      "Native quad precision is unavailable"
+    )
+  }
   expect_identical(acousticTS:::.psms_validate_adaptive(TRUE), TRUE)
   expect_error(acousticTS:::.psms_validate_adaptive(NA), "'adaptive' must be either TRUE or FALSE")
 
@@ -145,6 +153,11 @@ test_that("psms helper validators and quadrature selectors enforce the documente
   expect_true(all(adaptive_quad %% 8L == 0L))
   expect_true(all(adaptive_quad >= 32L & adaptive_quad <= 96L))
   expect_true(all(adaptive_quad >= adaptive_double))
+
+  skip_if_not(
+    acousticTS:::.quad_precision_available(),
+    "native quad precision is unavailable"
+  )
 
   gas_obj <- gas_generate(
     shape = prolate_spheroid(

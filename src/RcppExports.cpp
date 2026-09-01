@@ -385,6 +385,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// quad_precision_available_cpp
+bool quad_precision_available_cpp();
+RcppExport SEXP _acousticTS_quad_precision_available_cpp() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(quad_precision_available_cpp());
+    return rcpp_result_gen;
+END_RCPP
+}
 // Smn_cpp
 Rcpp::List Smn_cpp(Rcpp::IntegerVector m, Rcpp::IntegerVector n, double c, Rcpp::NumericVector arg, bool normalize, std::string precision);
 RcppExport SEXP _acousticTS_Smn_cpp(SEXP mSEXP, SEXP nSEXP, SEXP cSEXP, SEXP argSEXP, SEXP normalizeSEXP, SEXP precisionSEXP) {
@@ -578,6 +588,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_acousticTS_Pn_deriv_cpp", (DL_FUNC) &_acousticTS_Pn_deriv_cpp, 3},
     {"_acousticTS_Qn_cpp", (DL_FUNC) &_acousticTS_Qn_cpp, 2},
     {"_acousticTS_Qn_deriv_cpp", (DL_FUNC) &_acousticTS_Qn_deriv_cpp, 3},
+    {"_acousticTS_quad_precision_available_cpp", (DL_FUNC) &_acousticTS_quad_precision_available_cpp, 0},
     {"_acousticTS_Smn_cpp", (DL_FUNC) &_acousticTS_Smn_cpp, 6},
     {"_acousticTS_Rmn_cpp", (DL_FUNC) &_acousticTS_Rmn_cpp, 6},
     {"_acousticTS_prolate_spheroid_fbs", (DL_FUNC) &_acousticTS_prolate_spheroid_fbs, 8},

@@ -263,6 +263,27 @@ NULL
   boundary
 }
 
+# Report whether this installation has the complete native quad backend.
+#' @noRd
+.quad_precision_available <- function() {
+  isTRUE(quad_precision_available_cpp())
+}
+
+# Reject requests for quad precision when configure could not build the
+# matching C++ and Fortran binary128 implementations.
+#' @noRd
+.validate_quad_precision_available <- function(precision) {
+  if (identical(precision, "quad") && !.quad_precision_available()) {
+    stop(
+      "Native quad precision is unavailable with the C++ and Fortran ",
+      "compilers used to build this installation; use precision = \"double\".",
+      call. = FALSE
+    )
+  }
+
+  precision
+}
+
 # Validate the PSMS precision label.
 #' @noRd
 .psms_validate_precision <- function(precision) {
@@ -271,7 +292,7 @@ NULL
     stop("'precision' must be either 'double' or 'quad'.")
   }
 
-  precision
+  .validate_quad_precision_available(precision)
 }
 
 # Validate the PSMS adaptive-mode flag.

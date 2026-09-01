@@ -132,7 +132,7 @@ test_that("Test prolate spheroid model", {
       simplify_Amn = FALSE,
       density_sw = density_sw,
       sound_speed_sw = sound_speed_sw,
-      precision = "quad"
+      precision = if (boundary == "liquid_filled") "quad" else "double"
     )
     # ----> RETURN TS
     expect_equal(
@@ -149,10 +149,19 @@ test_that("Test prolate spheroid model", {
   check_ps_mss(boundary = "pressure_release")
 
   # FLS - PROLATE SPHEROID - LIQUID-FILLED
+  skip_if_not(
+    acousticTS:::.quad_precision_available(),
+    "native quad precision is unavailable"
+  )
   check_ps_mss(boundary = "liquid_filled")
 })
 
 test_that("Gas-filled prolate spheroid PSMS returns finite values on the benchmark-supported grid", {
+  skip_if_not(
+    acousticTS:::.quad_precision_available(),
+    "native quad precision is unavailable"
+  )
+
   data(benchmark_ts)
 
   density_sw <- 1026.8

@@ -89,7 +89,9 @@
 #' Smn(m = 2, n = 3, c = 1, eta = 0.5, precision = "double")
 #'
 #' # Quad precision
+#' \dontrun{
 #' Smn(m = 2, n = 3, c = 1, eta = 0.5, precision = "quad")
+#' }
 #'
 #' @references
 #' Van Buren, A. L. and Boisvert, J. E. "Prolate Spheroidal Wave Functions."
@@ -127,6 +129,7 @@ Smn <- function(m, n, c, eta, normalize = FALSE, precision = "double") {
   if (!precision %in% c("double", "quad")) {
     stop("'precision' must either be 'double' (default) or 'quad'.")
   }
+  precision <- .validate_quad_precision_available(precision)
   # Run compiled function ======================================================
   Smn_cpp(m, n, c, eta, normalize, precision)
 }
@@ -241,7 +244,9 @@ Smn <- function(m, n, c, eta, normalize = FALSE, precision = "double") {
 #' Rmn(m = 2, n = 3, c = 1, xi = 1.5)
 #'
 #' # Quad precision
+#' \dontrun{
 #' Rmn(m = 2, n = 3, c = 1, xi = 1.5, precision = "quad")
+#' }
 #'
 #' @references
 #' Van Buren, A. L. and Boisvert, J. E. "Prolate Spheroidal Wave Functions."
@@ -279,6 +284,7 @@ Rmn <- function(m, n, c, xi, kind = 1, precision = "double") {
   if (!precision %in% c("double", "quad")) {
     stop("'precision' must either be 'double' (default) or 'quad'.")
   }
+  precision <- .validate_quad_precision_available(precision)
   # Run compiled function ======================================================
   Rmn_cpp(m, n, c, xi, kind, precision)
 }

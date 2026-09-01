@@ -102,7 +102,9 @@ Smn(m = 1, n = 1, c = 2, eta = 0.3, normalize = TRUE)
 Smn(m = 2, n = 3, c = 1, eta = 0.5, precision = "double")
 
 # Quad precision
+\dontrun{
 Smn(m = 2, n = 3, c = 1, eta = 0.5, precision = "quad")
+}
 
 }
 \references{

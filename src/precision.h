@@ -3,37 +3,29 @@
 // INCLUDES
 // ============================================================================
 // [[Rcpp::depends(BH)]]
-#include <boost/multiprecision/cpp_bin_float.hpp>
 #include <cmath>
 #include <complex>
 #include <limits>
 #include <type_traits>
 
-// Guard the optional quad-precision path so the same headers compile on
-// toolchains that do not provide __float128 or libquadmath.
+// Configure defines this only after verifying the complete C++/Fortran
+// binary128 backend.  Standalone compilation defaults to the portable path.
 #ifndef ACOUSTICTS_HAVE_QUADMATH
-#if defined(__has_include)
-#if __has_include(<quadmath.h>)
-#define ACOUSTICTS_HAVE_QUADMATH 1
-#else
 #define ACOUSTICTS_HAVE_QUADMATH 0
-#endif
-#else
-#define ACOUSTICTS_HAVE_QUADMATH 0
-#endif
 #endif
 
 #if ACOUSTICTS_HAVE_QUADMATH
 #include <quadmath.h>
 #endif
 
-// Use the native GCC/libquadmath scalar when it exists, and otherwise fall
-// back to Boost's IEEE-quad-equivalent binary float so clang/macOS can still
-// compile the precision = "quad" path.
+// Native quad is enabled only when configure verifies both sides of the
+// C++/Fortran interface.  A long-double placeholder keeps the templates
+// compilable on unsupported libc++ toolchains, but public callers are prevented
+// from selecting it as genuine quad precision.
 #if ACOUSTICTS_HAVE_QUADMATH
 using acousticts_quad_t = __float128;
 #else
-using acousticts_quad_t = boost::multiprecision::cpp_bin_float_quad;
+using acousticts_quad_t = long double;
 #endif
 
 template<typename T>
@@ -70,8 +62,7 @@ inline acousticts_quad_t pow10_typed<acousticts_quad_t>(int exponent) {
 #if ACOUSTICTS_HAVE_QUADMATH
     return powq(double_to_quad(10.0), double_to_quad(static_cast<double>(exponent)));
 #else
-    using boost::multiprecision::pow;
-    return pow(acousticts_quad_t(10), acousticts_quad_t(exponent));
+    return std::pow(acousticts_quad_t(10), acousticts_quad_t(exponent));
 #endif
 }
 
@@ -85,8 +76,7 @@ inline acousticts_quad_t preccos(acousticts_quad_t x) {
 #if ACOUSTICTS_HAVE_QUADMATH
     return cosq(x);
 #else
-    using boost::multiprecision::cos;
-    return cos(x);
+    return std::cos(x);
 #endif
 }
 
@@ -100,8 +90,7 @@ inline acousticts_quad_t precpi<acousticts_quad_t>() {
 #if ACOUSTICTS_HAVE_QUADMATH
     return acosq(acousticts_quad_t(-1));
 #else
-    using boost::multiprecision::acos;
-    return acos(acousticts_quad_t(-1));
+    return std::acos(acousticts_quad_t(-1));
 #endif
 }
 
@@ -113,8 +102,7 @@ inline acousticts_quad_t precsqrt(acousticts_quad_t x) {
 #if ACOUSTICTS_HAVE_QUADMATH
     return sqrtq(x);
 #else
-    using boost::multiprecision::sqrt;
-    return sqrt(x);
+    return std::sqrt(x);
 #endif
 }
 
@@ -126,8 +114,7 @@ inline acousticts_quad_t precabs(acousticts_quad_t x) {
 #if ACOUSTICTS_HAVE_QUADMATH
     return fabsq(x);
 #else
-    using boost::multiprecision::abs;
-    return abs(x);
+    return std::abs(x);
 #endif
 }
 

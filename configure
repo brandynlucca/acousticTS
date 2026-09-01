@@ -1,0 +1,68 @@
+#!/bin/sh
+
+# Configure the optional native binary128 backend.  It is usable only when the
+# active Fortran compiler can compile the REAL(16) spheroidal implementation
+# and the active C++17 compiler can instantiate the matching complex type.
+
+set -eu
+
+srcdir=$(CDPATH= cd "$(dirname "$0")" && pwd)
+if test -n "${R_HOME:-}"; then
+    r_command="$R_HOME/bin/R"
+else
+    r_command=R
+fi
+
+FC=${FC:-$("$r_command" CMD config FC)}
+FFLAGS=${FFLAGS:-$("$r_command" CMD config FFLAGS)}
+CXX17=${CXX17:-$("$r_command" CMD config CXX17)}
+CXX17STD=${CXX17STD:-$("$r_command" CMD config CXX17STD)}
+CXX17FLAGS=${CXX17FLAGS:-$("$r_command" CMD config CXX17FLAGS)}
+
+quad_objects=
+quad_cppflags=-DACOUSTICTS_HAVE_QUADMATH=0
+
+makevars_template=${ACOUSTICTS_MAKEVARS_TEMPLATE:-Makevars.in}
+makevars_output=${ACOUSTICTS_MAKEVARS_OUTPUT:-Makevars}
+
+configure_tmp=$(mktemp -d "${TMPDIR:-/tmp}/acousticTS-configure.XXXXXX") || exit 1
+trap 'rm -rf "$configure_tmp"' EXIT HUP INT TERM
+
+cp "$srcdir/src/param_quad.f90" "$configure_tmp/param_quad.f90"
+cp "$srcdir/src/prolate_swf.f90" "$configure_tmp/prolate_swf.f90"
+
+cat > "$configure_tmp/conftest.cpp" <<'EOF'
+#include <quadmath.h>
+#include <complex>
+
+int main() {
+    std::complex<__float128> numerator(
+        static_cast<__float128>(1), static_cast<__float128>(2));
+    std::complex<__float128> denominator(
+        static_cast<__float128>(3), static_cast<__float128>(4));
+    const std::complex<__float128> result = numerator / denominator;
+    return result.real() == static_cast<__float128>(0);
+}
+EOF
+
+printf '%s' 'checking for a compatible native binary128 C++/Fortran backend... '
+if test "${ACOUSTICTS_DISABLE_QUAD:-0}" != 1 && (
+    cd "$configure_tmp"
+    eval "$FC $FFLAGS -cpp -c param_quad.f90 -o param_quad.o" >fortran.log 2>&1
+    eval "$FC $FFLAGS -cpp -DUSE_QUAD -c prolate_swf.f90 -o prolate_swf_quad.o" >>fortran.log 2>&1
+    eval "$CXX17 $CXX17STD $CXX17FLAGS -c conftest.cpp -o conftest.o" >cxx.log 2>&1
+); then
+    quad_objects='param_quad.o prolate_swf_quad.o'
+    quad_cppflags=-DACOUSTICTS_HAVE_QUADMATH=1
+    echo yes
+else
+    echo no
+    echo '  native quad precision will be unavailable; the double backend will still be built'
+fi
+
+sed \
+    -e "s|@QUAD_CPPFLAGS@|$quad_cppflags|g" \
+    -e "s|@QUAD_OBJECTS@|$quad_objects|g" \
+    "$srcdir/src/$makevars_template" > "$srcdir/src/$makevars_output"
+
+exit 0

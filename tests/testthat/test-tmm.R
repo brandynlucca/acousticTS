@@ -260,7 +260,10 @@ test_that("TMM matches PSMS across multiple prolate spheroids and boundary cases
       boundary = boundary,
       density_sw = density_sw,
       sound_speed_sw = sound_speed_sw,
-      precision = if (boundary %in% c("liquid_filled", "gas_filled")) "quad" else "double",
+      precision = if (
+        acousticTS:::.quad_precision_available() &&
+          boundary %in% c("liquid_filled", "gas_filled")
+      ) "quad" else "double",
       simplify_Amn = FALSE
     )
 
@@ -514,7 +517,7 @@ test_that("Stored and unstored prolate TMM runs agree and stay tied to the PSMS 
     boundary = "liquid_filled",
     density_sw = density_sw,
     sound_speed_sw = sound_speed_sw,
-    precision = "quad",
+    precision = if (acousticTS:::.quad_precision_available()) "quad" else "double",
     simplify_Amn = FALSE
   )
   expected_f_bs <- (-2i / wavenumber(frequency, sound_speed_sw)) * psms_obj@model$PSMS$f_bs

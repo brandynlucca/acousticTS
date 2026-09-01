@@ -580,7 +580,9 @@
 #' @noRd
 .tmm_precision_label <- function(use_spheroidal_branch, boundary) {
   # Penetrable spheroidal runs use the quad-precision backend =================
-  if (use_spheroidal_branch && boundary %in% c("liquid_filled", "gas_filled")) {
+  if (use_spheroidal_branch &&
+      boundary %in% c("liquid_filled", "gas_filled") &&
+      .quad_precision_available()) {
     return("quad")
   }
 
