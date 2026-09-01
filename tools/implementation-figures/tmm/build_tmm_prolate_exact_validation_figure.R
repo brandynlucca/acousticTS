@@ -1,3 +1,5 @@
+# Build the pure-R prolate exact-angular validation table and figure.
+# The generated compact CSV is retained as a documented validation product.
 source("tools/implementation-figures/helpers/common.R")
 impl_load_all()
 
@@ -9,6 +11,7 @@ theta_scatter <- rep(pi / 2, 181)
 phi_scatter <- seq(0, 2 * pi, length.out = 181)
 quad <- gauss_legendre(n = 96, a = -1, b = 1)
 
+# Evaluate one boundary-condition/coefficient-method validation case.
 build_case <- function(boundary, Amn_method) {
   object <- target_strength(
     object = fls_generate(
@@ -78,6 +81,11 @@ df <- rbind(
   build_case("fixed_rigid", "Amn_fixed_rigid")
 )
 
+# The retained precision is well below any plotted or reported tolerance and
+# prevents different BLAS/compiler combinations from changing the CSV by a
+# few units in the final floating-point digits.
+df <- impl_signif_numeric_columns(df)
+
 write.csv(
   df,
   "tools/implementation-figures/data/tmm/tmm_prolate_exact_angular_validation.csv",
@@ -93,6 +101,7 @@ png(
 
 par(mfrow = c(1, 2), mar = c(4.6, 4.8, 3.2, 1.2), oma = c(0, 0, 0, 0))
 
+# Draw one validation case into the active multi-panel graphics device.
 plot_case <- function(case_df, title_text) {
   y_range <- range(
     c(case_df$exact_sigma_scat_dB, case_df$stored_sigma_scat_dB),

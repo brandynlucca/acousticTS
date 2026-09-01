@@ -313,7 +313,7 @@
        x="36.58807"
        y="68.141663"><tspan
    style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:17px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
-   id="tspan141">Disclaimer:</tspan> this flowchart suggests where the acousticTS is the strongest, not that every case has a unique model. User-discretion is advised.</tspan></text>
+   id="tspan141">Scope:</tspan> the chart narrows candidates; it does not establish physical suitability or validation.</tspan></text>
   <a
      id="a69"
      transform="translate(99.043988,-35.739833)" />
@@ -1158,7 +1158,7 @@
            sodipodi:role="line"
            id="tspan171"
            x="408.32169"
-           y="327.8017">PCWBA</tspan></text>
+           y="327.8017">PCDWBA</tspan></text>
     </g>
   </a>
   <a
@@ -1188,7 +1188,7 @@
            sodipodi:role="line"
            id="tspan180"
            x="409.58771"
-           y="326.4342">TTM</tspan></text>
+           y="326.4342">TMM</tspan></text>
     </g>
   </a>
   <a
@@ -1218,7 +1218,7 @@
            sodipodi:role="line"
            id="tspan183"
            x="409.58771"
-           y="326.43475">TTM</tspan></text>
+           y="326.43475">TMM</tspan></text>
     </g>
   </a>
   <a
@@ -1264,11 +1264,6 @@
      class="line"
      id="path187"
      sodipodi:nodetypes="ccc" />
-  <path
-     d="M 766.98583,653.03428 H 712.1569 v 44.75081"
-     class="line"
-     id="path188"
-     sodipodi:nodetypes="ccc" />
   <a
      id="a189"
      href="../ttm/index.html"
@@ -1296,30 +1291,7 @@
            sodipodi:role="line"
            id="tspan189"
            x="409.58771"
-           y="326.4342">TTM</tspan></text>
-    </g>
-  </a>
-  <a
-     id="a190"
-     transform="translate(577.63592,415.84549)">
-    <g
-       id="g190"
-       transform="translate(-0.78177202)">
-      <rect
-         x="103.30112"
-         y="388.48447"
-         width="64.070175"
-         height="25.614033"
-         rx="5.6951265"
-         class="exact"
-         id="rect190"
-         ry="5.6951265"
-         style="fill:#eceff1;fill-opacity:1;stroke:#5f6b75;stroke-opacity:1" />
-      <text
-         x="111.59182"
-         y="407.19333"
-         class="small"
-         id="text190">OSMS</text>
+           y="326.4342">TMM</tspan></text>
     </g>
   </a>
   <a
@@ -1349,14 +1321,14 @@
            sodipodi:role="line"
            id="tspan191"
            x="409.58771"
-           y="326.4342">TTM</tspan></text>
+           y="326.4342">TMM</tspan></text>
     </g>
   </a>
   <a
      id="a192"
      target="_top"
      transform="translate(600.27245,411.77251)"
-     t="../bcms/index.html">
+     href="../bcms/index.html">
     <g
        id="g192"
        transform="translate(16.679081,-4.6153932)">
@@ -1386,7 +1358,7 @@
      id="a193"
      target="_top"
      transform="translate(600.27245,441.77251)"
-     t="../ecms/index.html">
+     href="../ecms/index.html">
     <g
        id="g193"
        transform="translate(16.679081,-4.6153932)">
@@ -1575,30 +1547,6 @@
              id="tspan194"
              x="185.54219"
              y="1008.5072">Experimental</tspan></text>
-      </g>
-      <g
-         id="g201"
-         transform="translate(200,-69.999939)">
-        <rect
-           x="107.54219"
-           y="1062.4641"
-           width="72"
-           height="24"
-           rx="6"
-           ry="6"
-           class="exact"
-           id="rect196"
-           style="fill:#eceff1;fill-opacity:1;stroke:#5f6b75;stroke-width:2.5;stroke-opacity:1" />
-        <text
-           x="185.54219"
-           y="1078.5071"
-           class="legend-note"
-           id="text197"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15px;font-family:Georgia, serif;-inkscape-font-specification:'Georgia, serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#203040"><tspan
-             sodipodi:role="line"
-             id="tspan197"
-             x="185.54219"
-             y="1078.5071">Future development</tspan></text>
       </g>
     </g>
   </g>

@@ -1,3 +1,5 @@
+# Build the pure-R sphere-to-prolate continuation table and figure.
+# Outputs are deterministic package-facing validation artifacts.
 source("tools/implementation-figures/helpers/common.R")
 impl_load_all()
 
@@ -35,6 +37,10 @@ continuation_diag <- tmm_diagnostics(
   n_phi = 41
 )
 continuation_df <- continuation_diag$continuation
+
+# Stabilize the committed table across supported operating systems and
+# compiler toolchains without changing any scientifically relevant value.
+continuation_df <- impl_signif_numeric_columns(continuation_df)
 write.csv(
   continuation_df,
   "tools/implementation-figures/data/tmm/tmm_sphere_to_spheroid_continuation.csv",

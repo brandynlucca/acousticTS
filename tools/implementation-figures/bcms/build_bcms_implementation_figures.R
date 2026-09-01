@@ -1,3 +1,5 @@
+# Build BCMS geometry, model-response, and reference-comparison figures.
+# Compact comparison data are read from tools/implementation-figures/data.
 source("tools/implementation-figures/helpers/common.R")
 impl_load_all()
 

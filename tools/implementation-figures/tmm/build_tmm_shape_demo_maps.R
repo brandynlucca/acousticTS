@@ -1,8 +1,12 @@
-devtools::load_all(getwd())
+# Build heatmap and polar-map pairs for the supported T-matrix geometries.
+# Each pair is generated from one retained package model result.
+source("tools/implementation-figures/helpers/common.R")
+impl_load_all()
 
 density_sw <- 1026.8
 sound_speed_sw <- 1477.3
 
+# Render matching heatmap and polar views for a stored scattering object.
 render_scattering_pair <- function(object,
                                    heatmap_file,
                                    polar_file,

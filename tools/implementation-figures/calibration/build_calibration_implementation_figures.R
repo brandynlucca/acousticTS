@@ -1,3 +1,5 @@
+# Build calibration spectra and material/diameter comparison figures.
+# The script consumes only package code and compact committed comparison data.
 source("tools/implementation-figures/helpers/common.R")
 impl_load_all()
 

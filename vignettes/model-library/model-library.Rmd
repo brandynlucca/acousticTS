@@ -1,5 +1,5 @@
 ---
-title: "Model library"
+title: "Model Library"
 output:
   rmarkdown::html_vignette:
     toc: true
@@ -9,29 +9,48 @@ bibliography: ../REFERENCES.bib
 link-citations: true
 reference-section-title: References
 vignette: >
-  %\VignetteIndexEntry{Model library}
+  %\VignetteIndexEntry{Model Library}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---
 
-# Introduction
+# Find a model family
 
-The family library is easiest to navigate when read against model-comparison reviews, organism-focused scattering surveys, and companion open-source modeling ecosystems [@Jech_2015].
+`acousticTS` includes geometry-matched modal solutions, weak-scattering and
+high-frequency approximations, composite-target models, layered-sphere models,
+and a transition-matrix family. These models are alternatives only when their
+geometry, boundary conditions, acoustic regime, and outputs overlap. The
+inter-model literature provides useful comparisons, but does not define one
+model as the universal default [@Jech_2015].
 
+Use [Choosing a Model](../model-selection/model-selection.html) to narrow the
+library by target and scientific question. Select a family name below to open
+its overview.
 
+::: {.note data-title="Model-status badges"}
+The badge icons summarize benchmark, validation, and lifecycle status. Hover
+over a badge, or move keyboard focus to it, to read the evidence and scope for
+that family. See [Validation and Benchmark
+Reproduction](../validation-benchmarks/validation-benchmarks.html) for the full
+status definitions and evidence registry.
+:::
 
-The package contains enough model families that the site works better when the model pages are treated as a library rather than as a flat list in the top navigation. This page is the main entry point for that library.
-
-## Model-status policy
-
-```{r model_status_policy, echo=FALSE, results='asis'}
-acousticTS:::.validation_status_policy()
-```
+## Browse by family
 
 ```{r model_library_listing, echo=FALSE, results='asis'}
-acousticTS:::.validation_model_library()
+acousticTS:::.validation_model_library(heading_level = 2L)
 ```
 
-# How to use this page
+# What each family page contains
 
-Each family page is intended to be the local navigation hub for that model family. Use the family page to move between overview, theory, implementation, and related package pages, rather than relying on a long global theory or implementation menu.
+Each family has a local set of pages:
+
+- **Overview** identifies the intended target, supported object types, and main
+  assumptions.
+- **Theory** develops the physical and mathematical formulation.
+- **Implementation** documents package inputs, numerical controls, examples,
+  figures, and validation details.
+
+Model status can differ across branches of the same family. Read the family
+overview and implementation page before treating a compatible function call as
+evidence that the model is appropriate for a target.

@@ -1,6 +1,9 @@
+# Build PSMS shape, boundary, and numerical-precision figures.
+# Outputs are written to vignettes/psms as declared in the manifest.
 source("tools/implementation-figures/helpers/common.R")
 impl_load_all()
 
+# Construct and evaluate the canonical PSMS example for one solver setup.
 make_psms_object <- function(boundary = "liquid_filled",
                              precision = "double",
                              simplify_Amn = TRUE) {

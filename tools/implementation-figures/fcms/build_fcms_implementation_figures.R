@@ -1,6 +1,9 @@
+# Build FCMS shape, response, and boundary-condition comparison figures.
+# Outputs are written to vignettes/fcms as declared in the manifest.
 source("tools/implementation-figures/helpers/common.R")
 impl_load_all()
 
+# Construct and evaluate the canonical FCMS example for one boundary condition.
 make_fcms_object <- function(boundary = "liquid_filled") {
   obj <- fls_generate(
     shape = cylinder(

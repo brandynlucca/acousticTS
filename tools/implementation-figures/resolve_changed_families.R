@@ -1,3 +1,7 @@
+# Resolve the smallest safe implementation-figure rebuild scope for CI.
+# Model-specific inputs come from manifest.csv; unmapped package code rebuilds all.
+
+# Locate the package repository from a candidate directory.
 find_repo_root <- function(start_dir) {
   search_dir <- normalizePath(start_dir, winslash = "/", mustWork = FALSE)
 
@@ -63,6 +67,12 @@ light_families <- sort(unique(tolower(manifest$family[manifest$profile == "light
 requested_profile <- tolower(
   Sys.getenv("ACOUSTICTS_IMPL_PROFILE", unset = "light")
 )
+if (!identical(requested_profile, "light")) {
+  stop(
+    "The package-side implementation workflow supports only the 'light' profile.",
+    call. = FALSE
+  )
+}
 event_name <- tolower(Sys.getenv("GITHUB_EVENT_NAME", unset = ""))
 base_ref <- Sys.getenv("GITHUB_BASE_REF", unset = "")
 manual_families <- tolower(
@@ -71,36 +81,55 @@ manual_families <- tolower(
 output_path <- Sys.getenv("GITHUB_OUTPUT", unset = "")
 
 shared_patterns <- c(
-  "^tools/implementation-figures/(helpers/|manifest\\.csv$|run_all\\.R$)",
-  "^tools/implementation-figures/build_impl_benchmark",
+  paste0(
+    "^tools/implementation-figures/(",
+    "helpers/|manifest\\.csv$|run_all\\.R$|run_family\\.R$)"
+  ),
   "^\\.github/workflows/implementation-figures\\.ya?ml$"
 )
 
+# Escape literal repository paths before constructing change-match expressions.
 escape_regex <- function(x) {
   gsub("([][{}()+*^$|\\\\?.])", "\\\\\\1", x)
+}
+
+# Split semicolon-delimited manifest cells and normalize path separators.
+split_manifest_values <- function(values) {
+  values <- values[!is.na(values) & nzchar(values)]
+  if (!length(values)) {
+    return(character())
+  }
+
+  values <- trimws(unlist(strsplit(values, ";", fixed = TRUE)))
+  unique(gsub("\\\\", "/", values[nzchar(values)]))
 }
 
 family_patterns <- lapply(
   split(manifest, tolower(manifest$family)),
   function(rows) {
-    vignette_paths <- unique(file.path(
+    vignette_paths <- paste(
       "vignettes",
       tolower(rows$family),
-      rows$vignette
-    ))
-    script_paths <- unique(file.path(
+      rows$vignette,
+      sep = "/"
+    )
+    script_paths <- paste(
       "tools",
       "implementation-figures",
-      rows$script
-    ))
+      rows$script,
+      sep = "/"
+    )
+    input_paths <- split_manifest_values(rows$inputs)
 
     c(
       paste0("^", escape_regex(vignette_paths), "$"),
-      paste0("^", escape_regex(script_paths), "$")
+      paste0("^", escape_regex(script_paths), "$"),
+      paste0("^", escape_regex(input_paths), "$")
     )
   }
 )
 
+# Append a named value to the GitHub Actions output file when one is available.
 write_output <- function(name, value, path) {
   if (!nzchar(path)) {
     return(invisible(NULL))
@@ -182,6 +211,17 @@ selected_families <- names(family_patterns)[vapply(
   logical(1)
 )]
 selected_families <- sort(unique(selected_families))
+
+package_code_files <- changed_files[grepl("^(R|src)/", changed_files)]
+declared_package_inputs <- split_manifest_values(manifest$inputs)
+unmapped_package_code <- setdiff(package_code_files, declared_package_inputs)
+
+if (length(unmapped_package_code) > 0L) {
+  write_output("scope", "all", output_path)
+  write_output("families", "", output_path)
+  write_output("profile", requested_profile, output_path)
+  quit(save = "no", status = 0)
+}
 
 if (length(selected_families) == 0L) {
   write_output("scope", "skip", output_path)

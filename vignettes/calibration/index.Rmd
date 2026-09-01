@@ -13,6 +13,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---
+
 # Overview
 
 ```{r model_family_header, echo=FALSE, results='asis'}
@@ -26,44 +27,56 @@ acousticTS:::.model_family_header(
 )
 ```
 
-
-These pages are grounded in the standard-target calibration literature for elastic reference spheres [@Dragonette_1981; @Foote_1990; @Maclennan_1981].
-
 ```{r calibration_overview, echo=FALSE, results='asis'}
 acousticTS:::.model_family_overview(
   family = "calibration",
   summary = paste(
-    "`SOEMS` is the package's elastic solid-sphere family for standard-target",
-    "calibration work. It follows the classic solid elastic sphere literature",
-    "and is intended for metal calibration spheres whose compressional and",
-    "shear wave physics matter directly."
+    "The solid elastic sphere modal-series model (`SOEMS`) calculates the",
+    "reference response of homogeneous metal calibration spheres. In package",
+    "calls, select it with `model = \"calibration\"` or the `soems` alias."
   ),
   core_idea = paste(
-    "Expand the exterior acoustic field and the interior elastic displacement",
-    "field in spherical modes, enforce pressure, normal-velocity, and traction",
-    "conditions at the sphere surface, and reconstruct the far-field",
-    "backscatter from the resulting phase-shifted partial waves."
+    "Expand the exterior acoustic field and the solid's longitudinal and shear",
+    "displacements in spherical modes, enforce the fluid-solid interface",
+    "conditions, and sum the elastic phase shifts [@Hickling_1962;",
+    "@Maclennan_1981]."
   ),
   best_for = c(
-    "Calibration spheres made of tungsten carbide, copper, aluminum, steel, or similar elastic solids",
-    "Frequency-response calculations for standard-target calibration workflows",
-    "Benchmarking elastic spherical scattering against literature values"
+    "Standard-target calibration spheres made from homogeneous elastic solids",
+    "Frequency-dependent reference spectra for specified sphere materials and diameters",
+    "Comparison with published calibration-sphere calculations"
   ),
   supports = c(
-    "`CAL` objects representing homogeneous elastic spheres",
-    "Solid elastic interiors with both longitudinal and shear wave support",
-    "Medium `1` as seawater and medium `2` as the elastic solid sphere"
+    "`CAL` objects created with `cal_generate()`",
+    "Built-in calibration materials or user-supplied density and longitudinal and shear speeds",
+    "Adaptive or fixed modal truncation"
   ),
   assumptions = c(
-    "Perfectly spherical homogeneous solid target",
-    "Linear elasticity in the solid interior",
-    "Inviscid exterior fluid",
-    "No shell or internal cavity"
+    "A perfectly spherical, homogeneous isotropic solid",
+    "Linear elasticity within the sphere and an inviscid exterior fluid",
+    "No coating, shell, cavity, or material gradient",
+    "Material and water properties match the actual calibration conditions"
   ),
   reading = c(
-    "[Implementation](calibration-implementation.html): calibration workflows and benchmark comparisons",
-    "[Theory](calibration-theory.html): elastic-sphere modal theory and phase-shift representation"
+    "[Implementation](calibration-implementation.html): building standards, spectra, and external comparisons",
+    "[Theory](calibration-theory.html): elastic potentials, interface conditions, and phase shifts"
   )
 )
 ```
 
+## Calibration workflow
+
+```{r calibration_workflow_map, echo=FALSE, results='asis'}
+workflow_svg <- readLines(
+  "../calibration-workflow/calibration-workflow-map.svg",
+  warn = FALSE
+)
+workflow_svg <- workflow_svg[!grepl("^<\\?xml", workflow_svg)]
+knitr::asis_output(paste(workflow_svg, collapse = "\n"))
+```
+
+A calibration calculation is only a reference when diameter, material
+properties, surrounding water, and frequency match the physical standard
+[@Dragonette_1981; @Foote_1990]. The [material-properties
+guide](../material-properties/material-properties.html) covers non-default
+inputs.
