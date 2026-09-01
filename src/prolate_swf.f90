@@ -6081,16 +6081,27 @@ subroutine profcn_cpp_interface(c, m, lnum, ioprad, x1, iopang, iopnorm, narg, a
            r1c, ir1e, r1dc, ir1de, r2c, ir2e, r2dc, ir2de, naccr, &
            s1c, is1e, s1dc, is1de, naccs) bind(C)
 
-    use iso_c_binding
+#ifdef USE_QUAD
+    use iso_c_binding, only: c_float128, c_int
+#else
+    use iso_c_binding, only: c_double, c_int
+#endif
     implicit none
 
     ! Thin ISO C binding wrapper used by psms.cpp for single-order requests.
-    real(knd), intent(in) :: c, x1, arg(*)
-    integer, intent(in) :: m, lnum, ioprad, iopang, iopnorm, narg
-    real(knd), intent(out) :: r1c(lnum), r1dc(lnum), r2c(lnum), r2dc(lnum), &
-                              s1c(lnum, narg), s1dc(lnum, narg)
-    integer, intent(out) :: ir1e(lnum), ir1de(lnum), ir2e(lnum), ir2de(lnum), &
-                            is1e(lnum, narg), is1de(lnum, narg), naccr(lnum), naccs(lnum, narg)
+    integer(c_int), intent(in) :: m, lnum, ioprad, iopang, iopnorm, narg
+#ifdef USE_QUAD
+    real(c_float128), intent(in) :: c, x1, arg(*)
+    real(c_float128), intent(out) :: r1c(lnum), r1dc(lnum), r2c(lnum), r2dc(lnum), &
+                                     s1c(lnum, narg), s1dc(lnum, narg)
+#else
+    real(c_double), intent(in) :: c, x1, arg(*)
+    real(c_double), intent(out) :: r1c(lnum), r1dc(lnum), r2c(lnum), r2dc(lnum), &
+                                   s1c(lnum, narg), s1dc(lnum, narg)
+#endif
+    integer(c_int), intent(out) :: ir1e(lnum), ir1de(lnum), ir2e(lnum), ir2de(lnum), &
+                                   is1e(lnum, narg), is1de(lnum, narg), &
+                                   naccr(lnum), naccs(lnum, narg)
 
     call profcn(c, m, lnum, ioprad, x1, iopang, iopnorm, narg, arg, &
                 r1c, ir1e, r1dc, ir1de, r2c, ir2e, r2dc, ir2de, naccr, &
@@ -6111,19 +6122,30 @@ subroutine profcn_cpp_interface_batch(c, m_start, m_count, lnum, ioprad, x1, iop
            r1c, ir1e, r1dc, ir1de, r2c, ir2e, r2dc, ir2de, naccr, &
            s1c, is1e, s1dc, is1de, naccs) bind(C)
 
-    use iso_c_binding
+#ifdef USE_QUAD
+    use iso_c_binding, only: c_float128, c_int
+#else
+    use iso_c_binding, only: c_double, c_int
+#endif
     implicit none
 
     ! Thin ISO C binding wrapper used by psms.cpp for batched m-block requests.
-    real(knd), intent(in) :: c, x1, arg(*)
-    integer, intent(in) :: m_start, m_count, lnum, ioprad, iopang, iopnorm, narg
-    real(knd), intent(out) :: r1c(lnum, m_count), r1dc(lnum, m_count), &
-                              r2c(lnum, m_count), r2dc(lnum, m_count), &
-                              s1c(lnum, narg, m_count), s1dc(lnum, narg, m_count)
-    integer, intent(out) :: ir1e(lnum, m_count), ir1de(lnum, m_count), &
-                            ir2e(lnum, m_count), ir2de(lnum, m_count), naccr(lnum, m_count), &
-                            is1e(lnum, narg, m_count), is1de(lnum, narg, m_count), &
-                            naccs(lnum, narg, m_count)
+    integer(c_int), intent(in) :: m_start, m_count, lnum, ioprad, iopang, iopnorm, narg
+#ifdef USE_QUAD
+    real(c_float128), intent(in) :: c, x1, arg(*)
+    real(c_float128), intent(out) :: r1c(lnum, m_count), r1dc(lnum, m_count), &
+                                     r2c(lnum, m_count), r2dc(lnum, m_count), &
+                                     s1c(lnum, narg, m_count), s1dc(lnum, narg, m_count)
+#else
+    real(c_double), intent(in) :: c, x1, arg(*)
+    real(c_double), intent(out) :: r1c(lnum, m_count), r1dc(lnum, m_count), &
+                                   r2c(lnum, m_count), r2dc(lnum, m_count), &
+                                   s1c(lnum, narg, m_count), s1dc(lnum, narg, m_count)
+#endif
+    integer(c_int), intent(out) :: ir1e(lnum, m_count), ir1de(lnum, m_count), &
+                                   ir2e(lnum, m_count), ir2de(lnum, m_count), &
+                                   naccr(lnum, m_count), is1e(lnum, narg, m_count), &
+                                   is1de(lnum, narg, m_count), naccs(lnum, narg, m_count)
 
     call profcn_batch(c, m_start, m_count, lnum, ioprad, x1, iopang, iopnorm, narg, arg, &
                       r1c, ir1e, r1dc, ir1de, r2c, ir2e, r2dc, ir2de, naccr, &
