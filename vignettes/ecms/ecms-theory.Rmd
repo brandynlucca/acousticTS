@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Elastic cylinder modal series solution"
 output:
   rmarkdown::html_vignette:
@@ -43,7 +43,7 @@ approximate only in the way finite length is reduced to a coherence factor.
 ::: {.note data-title="Shared conventions"}
 Medium indices and reporting quantities follow [Notation and
 symbols](../notation-and-symbols/notation-and-symbols.html). The fluid-solid
-interface conditions are given on the [Boundary conditions](../boundary-conditions/boundary-conditions.html)
+interface conditions are given on the [Boundary conditions](../boundary_conditions.html)
 page.
 :::
 

@@ -66,8 +66,13 @@ acousticTS:::.model_family_overview(
 
 ## Calibration workflow
 
-```{r calibration_workflow_map, echo=FALSE, out.width='100%', fig.align='center', fig.alt='Calibration workflow from defining and checking an elastic sphere through running SOEMS and interpreting the result as a reference.'}
-knitr::include_graphics("../calibration-workflow/calibration-workflow-map.svg")
+```{r calibration_workflow_map, echo=FALSE, results='asis'}
+workflow_svg <- readLines(
+  "../calibration-workflow/calibration-workflow-map.svg",
+  warn = FALSE
+)
+workflow_svg <- workflow_svg[!grepl("^<\\?xml", workflow_svg)]
+knitr::asis_output(paste(workflow_svg, collapse = "\n"))
 ```
 
 A calibration calculation is only a reference when diameter, material

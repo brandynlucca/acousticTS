@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Body-backbone fish model"
 output:
   rmarkdown::html_vignette:

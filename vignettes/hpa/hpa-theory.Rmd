@@ -1,4 +1,4 @@
-﻿---
+---
 title: "High-pass approximation (HPA) theory"
 output:
   rmarkdown::html_vignette:

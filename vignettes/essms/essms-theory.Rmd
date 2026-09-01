@@ -46,7 +46,7 @@ the four elastic-potential amplitudes, and the interior acoustic field.
 ::: {.note data-title="Shared conventions"}
 Symbols and medium indices follow the [Notation and symbols](../notation-and-symbols/notation-and-symbols.html)
 page. The physical interface conditions are developed in [Boundary
-conditions](../boundary-conditions/boundary-conditions.html).
+conditions](../boundary_conditions.html).
 :::
 
 # Elastic-shelled sphere theory 

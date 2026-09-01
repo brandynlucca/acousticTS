@@ -53,6 +53,8 @@ scatterer or shape.
 Build the scatterer first, then supply frequencies in hertz and a model name:
 
 ```{r}
+library(acousticTS)
+
 shape_obj <- cylinder(
   length_body = 0.03,
   radius_body = 0.0025,

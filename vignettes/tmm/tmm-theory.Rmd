@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Transition matrix method (TMM) theory"
 output:
   rmarkdown::html_vignette:
@@ -49,7 +49,7 @@ spherical basis [@Varadan_1982; @Waterman_2009].
 ::: {.note data-title="Shared conventions"}
 Medium indices, field conventions, and reporting quantities follow [Notation
 and symbols](../notation-and-symbols/notation-and-symbols.html). Boundary types
-are defined on the [Boundary conditions](../boundary-conditions/boundary-conditions.html)
+are defined on the [Boundary conditions](../boundary_conditions.html)
 page.
 :::
 

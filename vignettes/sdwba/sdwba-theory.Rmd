@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Stochastic distorted wave Born approximation (SDWBA) theory"
 output:
   rmarkdown::html_vignette:

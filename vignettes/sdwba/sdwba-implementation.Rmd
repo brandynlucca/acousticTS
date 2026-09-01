@@ -1,4 +1,4 @@
-﻿---
+---
 title: "SDWBA implementation"
 output:
   rmarkdown::html_vignette:

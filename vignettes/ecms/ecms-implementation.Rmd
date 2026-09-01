@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Elastic cylinder modal series solution"
 output:
   rmarkdown::html_vignette:

@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Finite cylinder modal series solution (FCMS) theory"
 output:
   rmarkdown::html_vignette:

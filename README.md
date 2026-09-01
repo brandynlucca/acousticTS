@@ -6,7 +6,7 @@
 status](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml)
 [![Code Coverage](https://img.shields.io/codecov/c/github/brandynlucca/acousticTS?label=Code+Coverage)](https://app.codecov.io/gh/brandynlucca/acousticTS)
 [![License:
-GPL-3](https://img.shields.io/badge/License-GPL--3-blue.svg)](LICENSE)
+GPL-3](https://img.shields.io/badge/License-GPL--3-blue.svg)](https://github.com/brandynlucca/acousticTS/blob/main/LICENSE)
 
 ## Overview
 
@@ -191,4 +191,4 @@ a minimal reproducible example when reporting bugs.
 
 ## License
 
-GPL-3. See [LICENSE](LICENSE) for details.
+GPL-3. See [LICENSE](https://github.com/brandynlucca/acousticTS/blob/main/LICENSE) for details.

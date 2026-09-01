@@ -1,4 +1,4 @@
-﻿---
+---
 title: "SOEMS theory for a solid calibration sphere"
 output:
   rmarkdown::html_vignette:

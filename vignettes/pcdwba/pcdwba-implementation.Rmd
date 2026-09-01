@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Phase-compensated distorted wave Born approximation"
 output:
   rmarkdown::html_vignette:

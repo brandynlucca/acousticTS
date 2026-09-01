@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Spherical modal series solution (SPHMS) theory"
 output:
   rmarkdown::html_vignette:

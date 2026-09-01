@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Two-ray cylinder model (TRCM) theory"
 output:
   rmarkdown::html_vignette:

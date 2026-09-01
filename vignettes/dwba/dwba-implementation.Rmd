@@ -1,4 +1,4 @@
-﻿---
+---
 title: "DWBA implementation"
 output:
   rmarkdown::html_vignette:

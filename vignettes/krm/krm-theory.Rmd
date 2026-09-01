@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Kirchhoff-Ray Mode (KRM) theory"
 output:
   rmarkdown::html_vignette:

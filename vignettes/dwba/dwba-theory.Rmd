@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Distorted wave Born approximation (DWBA) theory"
 output:
   rmarkdown::html_vignette:

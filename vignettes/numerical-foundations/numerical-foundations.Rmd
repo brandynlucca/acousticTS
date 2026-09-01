@@ -523,7 +523,7 @@ the relevant refinements.
 # Companion pages
 
 - [Acoustic Scattering Primer](../acoustic-scattering-primer/acoustic-scattering-primer.html)
-- [Boundary Conditions](../boundary_conditions/boundary_conditions.html)
+- [Boundary Conditions](../boundary_conditions.html)
 - [DWBA theory](../dwba/dwba-theory.html)
 - [TMM theory](../tmm/tmm-theory.html)
 - [SPHMS theory](../sphms/sphms-theory.html)
