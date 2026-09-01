@@ -81,6 +81,11 @@ df <- rbind(
   build_case("fixed_rigid", "Amn_fixed_rigid")
 )
 
+# The retained precision is well below any plotted or reported tolerance and
+# prevents different BLAS/compiler combinations from changing the CSV by a
+# few units in the final floating-point digits.
+df <- impl_signif_numeric_columns(df)
+
 write.csv(
   df,
   "tools/implementation-figures/data/tmm/tmm_prolate_exact_angular_validation.csv",

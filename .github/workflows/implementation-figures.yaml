@@ -115,7 +115,9 @@ jobs:
 
           if [ "${{ github.event_name }}" = "pull_request" ] || \
              [ "${{ inputs.fail_on_drift }}" = "true" ]; then
-            echo "Implementation figures/data are out of date."
+            echo "::error::Implementation figures/data are out of date."
+            echo "Download the implementation-drift artifact from this run,"
+            echo "then apply implementation_drift.patch and commit the results."
             exit 1
           fi
 

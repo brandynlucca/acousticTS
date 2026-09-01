@@ -242,3 +242,19 @@ impl_round_timing_columns <- function(df, digits = 6) {
 
   df
 }
+
+# Retain scientifically useful precision while removing platform-dependent
+# floating-point noise from committed validation tables.
+impl_signif_numeric_columns <- function(df, digits = 10) {
+  # Integer identifiers and counters are already exact and should retain
+  # their storage type.
+  numeric_cols <- vapply(df, is.double, logical(1))
+
+  df[numeric_cols] <- lapply(
+    df[numeric_cols],
+    signif,
+    digits = digits
+  )
+
+  df
+}
