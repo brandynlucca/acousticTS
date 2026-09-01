@@ -2,14 +2,12 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, master]
+    branches: [main]
     paths-ignore:
       - 'README.md'
-      - '.github/workflows/**'
   pull_request:
     paths-ignore:
       - 'README.md'
-      - '.github/workflows/**'
       
 name: Build status
 
@@ -22,21 +20,23 @@ jobs:
   R-CMD-check:
     runs-on: ${{ matrix.config.os }}
 
-    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+    name: ${{ matrix.config.name }}
 
     strategy:
       fail-fast: false
       matrix:
         config:
-          - {os: macos-latest,   r: 'release'}
-          - {os: windows-latest, r: 'release'}
-          - {os: ubuntu-latest,   r: 'release'}
-          - {os: ubuntu-latest,   r: 'oldrel-1'}
+          - {os: macos-latest,   r: 'release',  name: 'macos-latest (release)'}
+          - {os: windows-latest, r: 'release',  name: 'windows-latest (release)'}
+          - {os: ubuntu-latest,  r: 'devel',    name: 'ubuntu-latest (devel)', http-user-agent: 'release'}
+          - {os: ubuntu-latest,  r: 'release',  name: 'ubuntu-latest (release)'}
+          - {os: ubuntu-latest,  r: 'release',  name: 'ubuntu-clang (release)', compiler: 'clang'}
+          - {os: ubuntu-latest,  r: 'oldrel-1', name: 'ubuntu-latest (oldrel-1)'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
-      _R_CHECK_TESTS_NLINE_: 0
+      _R_CHECK_TESTS_NLINES_: 0
 
     steps:
       - uses: actions/checkout@v4
@@ -52,6 +52,20 @@ jobs:
       - name: Install Linux Fortran toolchain
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y gfortran
+
+      - name: Install and configure Clang
+        if: matrix.config.compiler == 'clang'
+        run: |
+          sudo apt-get install -y clang
+          mkdir -p ~/.R
+          {
+            echo "CC=clang"
+            echo "CXX=clang++"
+            echo "CXX11=clang++"
+            echo "CXX14=clang++"
+            echo "CXX17=clang++"
+            echo "CXX17STD=-std=gnu++17"
+          } >> ~/.R/Makevars
 
       - name: Install macOS GNU toolchain
         if: runner.os == 'macOS'
@@ -93,6 +107,45 @@ jobs:
       - uses: r-lib/actions/check-r-package@v2
         env:
           _R_CHECK_TESTS_NLINES_: 0
+        with:
+          upload-snapshots: true
+          build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
+
+  check-no-suggests:
+    runs-on: ubuntu-latest
+    name: ubuntu-latest (no-suggests)
+    timeout-minutes: 45
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+      _R_CHECK_FORCE_SUGGESTS_: false
+      _R_CHECK_TESTS_NLINES_: 0
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: 'release'
+
+      - name: Install Linux Fortran toolchain
+        run: sudo apt-get update && sudo apt-get install -y gfortran
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          dependencies: '"hard"'
+          cache: false
+          extra-packages: |
+            any::rcmdcheck
+            any::testthat
+            any::knitr
+            any::rmarkdown
+          needs: check
+
+      - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
           build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
