@@ -21,6 +21,7 @@ CXX17FLAGS=${CXX17FLAGS:-$("$r_command" CMD config CXX17FLAGS)}
 
 quad_objects=
 quad_cppflags=-DACOUSTICTS_HAVE_QUADMATH=0
+fc_heap_flags=
 
 makevars_template=${ACOUSTICTS_MAKEVARS_TEMPLATE:-Makevars.in}
 makevars_output=${ACOUSTICTS_MAKEVARS_OUTPUT:-Makevars}
@@ -30,6 +31,30 @@ trap 'rm -rf "$configure_tmp"' EXIT HUP INT TERM
 
 cp "$srcdir/src/param_quad.f90" "$configure_tmp/param_quad.f90"
 cp "$srcdir/src/prolate_swf.f90" "$configure_tmp/prolate_swf.f90"
+
+cat > "$configure_tmp/conftest_heap.f90" <<'EOF'
+subroutine conftest_heap(n)
+    integer, intent(in) :: n
+    real :: work(n)
+    work = 0.0
+end subroutine conftest_heap
+EOF
+
+# Intel Fortran places runtime-sized local arrays on the stack by default.
+# The spheroidal backend has several such arrays, particularly in REAL(16),
+# so use the compiler's heap-allocation option when it is available.  Probe
+# the option instead of identifying compilers by name.
+printf '%s' 'checking whether the Fortran compiler supports heap arrays... '
+if (
+    cd "$configure_tmp"
+    eval "$FC $FFLAGS -heap-arrays -c conftest_heap.f90 -o conftest_heap.o" \
+        >heap-arrays.log 2>&1
+); then
+    fc_heap_flags=-heap-arrays
+    echo yes
+else
+    echo no
+fi
 
 cat > "$configure_tmp/conftest.cpp" <<'EOF'
 #include <quadmath.h>
@@ -48,8 +73,8 @@ EOF
 printf '%s' 'checking for a compatible native binary128 C++/Fortran backend... '
 if test "${ACOUSTICTS_DISABLE_QUAD:-0}" != 1 && (
     cd "$configure_tmp"
-    eval "$FC $FFLAGS -cpp -c param_quad.f90 -o param_quad.o" >fortran.log 2>&1
-    eval "$FC $FFLAGS -cpp -DUSE_QUAD -c prolate_swf.f90 -o prolate_swf_quad.o" >>fortran.log 2>&1
+    eval "$FC $FFLAGS $fc_heap_flags -cpp -c param_quad.f90 -o param_quad.o" >fortran.log 2>&1
+    eval "$FC $FFLAGS $fc_heap_flags -cpp -DUSE_QUAD -c prolate_swf.f90 -o prolate_swf_quad.o" >>fortran.log 2>&1
     eval "$CXX17 $CXX17STD $CXX17FLAGS -c conftest.cpp -o conftest.o" >cxx.log 2>&1
 ); then
     quad_objects='param_quad.o prolate_swf_quad.o'
@@ -63,6 +88,7 @@ fi
 sed \
     -e "s|@QUAD_CPPFLAGS@|$quad_cppflags|g" \
     -e "s|@QUAD_OBJECTS@|$quad_objects|g" \
+    -e "s|@FC_HEAP_FLAGS@|$fc_heap_flags|g" \
     "$srcdir/src/$makevars_template" > "$srcdir/src/$makevars_output"
 
 exit 0
