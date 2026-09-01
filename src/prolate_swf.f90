@@ -587,7 +587,7 @@ module prolate_swf
 !       precision and quadruple precision if those values are different than
 !       these.
 
-5    kindd = 8
+    kindd = 8
     kindq = 16
 
 !       set the minimum desired accuray minacc to 8 for real*8
@@ -632,14 +632,14 @@ module prolate_swf
     ngau = 200
     if(ioprad == 2) then
       lnump = max(lnum + maxm, 64)
-      if(x1 >= 0.00065e0_knd) maxn = 2 * (lnump * (-18.5e0_knd - 20.e0_knd * &
-              log10(x1)) + 5 * ndec + 4 * maxm + c + 5000) + maxm + 5
+      if(x1 >= 0.00065e0_knd) maxn = int(2 * (lnump * (-18.5e0_knd - 20.e0_knd * &
+              log10(x1)) + 5 * ndec + 4 * maxm + c + 5000) + maxm + 5)
 
-      if(x1 > 0.08e0_knd) maxn = 2 * (lnump * (0.5e0_knd - 3.0e0_knd * &
-              log10(x1)) + 5 * ndec + 4 * maxm + c + 1000) + maxm + 5
+      if(x1 > 0.08e0_knd) maxn = int(2 * (lnump * (0.5e0_knd - 3.0e0_knd * &
+              log10(x1)) + 5 * ndec + 4 * maxm + c + 1000) + maxm + 5)
 
-      if(x1 > 1.0e0_knd) maxn = 2 * (lnump * 0.5e0_knd + 5 * ndec &
-              + 4 * maxm + c + 500) + maxm + 5
+      if(x1 > 1.0e0_knd) maxn = int(2 * (lnump * 0.5e0_knd + 5 * ndec &
+              + 4 * maxm + c + 500) + maxm + 5)
       maxp = max(maxn, maxp)
       if(x1 < 1.0e-3_knd) ngau = 200 - 50 * int(log10(x1) - 1.0e-30_knd)
       if(x1 < 1.0e-10_knd) ngau = 250 - 50 * int(log10(x1) - 1.0e-30_knd)
@@ -700,7 +700,7 @@ module prolate_swf
                   ir2e(lnum, m_count), ir2de(lnum, m_count), naccr(lnum, m_count), &
                   is1e(lnum, narg, m_count), is1de(lnum, narg, m_count), &
                   naccs(lnum, narg, m_count)
-5    kindd = 8
+    kindd = 8
     kindq = 16
 
     if(knd == kindd) minacc = 8
@@ -724,14 +724,14 @@ module prolate_swf
     ngau = 200
     if(ioprad == 2) then
       lnump = max(lnum + maxm, 64)
-      if(x1 >= 0.00065e0_knd) maxn = 2 * (lnump * (-18.5e0_knd - 20.e0_knd * &
-              log10(x1)) + 5 * ndec + 4 * maxm + c + 5000) + maxm + 5
+      if(x1 >= 0.00065e0_knd) maxn = int(2 * (lnump * (-18.5e0_knd - 20.e0_knd * &
+              log10(x1)) + 5 * ndec + 4 * maxm + c + 5000) + maxm + 5)
 
-      if(x1 > 0.08e0_knd) maxn = 2 * (lnump * (0.5e0_knd - 3.0e0_knd * &
-              log10(x1)) + 5 * ndec + 4 * maxm + c + 1000) + maxm + 5
+      if(x1 > 0.08e0_knd) maxn = int(2 * (lnump * (0.5e0_knd - 3.0e0_knd * &
+              log10(x1)) + 5 * ndec + 4 * maxm + c + 1000) + maxm + 5)
 
-      if(x1 > 1.0e0_knd) maxn = 2 * (lnump * 0.5e0_knd + 5 * ndec &
-              + 4 * maxm + c + 500) + maxm + 5
+      if(x1 > 1.0e0_knd) maxn = int(2 * (lnump * 0.5e0_knd + 5 * ndec &
+              + 4 * maxm + c + 500) + maxm + 5)
       maxp = max(maxn, maxp)
       if(x1 < 1.0e-3_knd) ngau = 200 - 50 * int(log10(x1) - 1.0e-30_knd)
       if(x1 < 1.0e-10_knd) ngau = 250 - 50 * int(log10(x1) - 1.0e-30_knd)
@@ -1124,7 +1124,7 @@ end if
       iflagq = 0
       iflagp = 0
       jbes = 3 * ndec + int(c)
-110     continue
+        continue
 if (output) then
       if(knd == kindd .and. ioprad /= 0) write(20, 115) x, c, m
 115     format(1x, e23.14, e23.14, i5)
@@ -1159,6 +1159,10 @@ end if
        if(li == 1) naccrsav = minacc
        if(li > 1) naccrsav = naccr
        naccr = -1
+       r2c = 0.0e0_knd
+       ir2e = 0
+       r2dc = 0.0e0_knd
+       ir2de = 0
        nacce = 0
        limdrad = 3 * ndec + int(c)
        if(ioprad /= 0 .and. li /= 1) limdrad = jbes + jbes + 20+ &
@@ -1735,7 +1739,7 @@ end if
        iopeta = 2
 440      if(iopeta == 3) go to 540
        etaval = eta(nee)
-450      xbninp = xbn(nee)
+         xbninp = xbn(nee)
        netainp = 1
        etainp(1) = eta(nee)
        xlninp(1) = xln(nee)
@@ -3253,7 +3257,7 @@ end if
        dold = dnew
        doldd = dnewd
      end do
-70   nsqnsum = 0
+     nsqnsum = 0
     if(qnsum * qnsump /= 0.0e0_knd) nsqnsum= &
              int(log10(abs(qnsump / qnsum)))
     if(nsqnsum > ndec) nsqnsum = ndec
@@ -4311,11 +4315,11 @@ end if
 !
 !  first order
     eigval = 2.0e0_knd * eig5 - eig4
-20   return
+     return
 !
 !  second order
 30   eigval = 3.0e0_knd * eig5 - 3.0e0_knd * eig4 + eig3
-40   return
+     return
 !
 !  third order
 50   eigval = 4.0e0_knd * eig5 - 6.0e0_knd * eig4 + 4.0e0_knd * eig3 - eig2
@@ -4733,7 +4737,7 @@ if (debug) then
 190   format(5x,' Meixner-Schafke normalization converged in ', &
         i6,' terms; ',i6,' terms available.')
 end if
-200   continue
+      continue
     return
     end subroutine
 !
@@ -5407,7 +5411,7 @@ end if
 !  backward recursion from qr(m-1+m) = q    / q     = x
 !                                       m-2    m-1
 !
-20   if(m == 0) go to 100
+     if(m == 0) go to 100
     qr(m + m - 1) = x
     if(m == 1) go to 40
      do 30 jn = m - 1, 2 - m,-1
