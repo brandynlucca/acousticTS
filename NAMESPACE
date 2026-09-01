@@ -100,9 +100,11 @@ exportClasses(Sphere)
 exportMethods(reforge)
 exportMethods(show)
 importFrom(Rcpp,sourceCpp)
-importFrom(methods,"slot<-")
-importFrom(methods,new)
-importFrom(methods,setMethod)
-importFrom(methods,show)
+importFrom(methods,
+  "slot<-",
+  new,
+  setMethod,
+  show
+)
 importFrom(pbapply,pblapply)
 useDynLib(acousticTS, .registration = TRUE)
