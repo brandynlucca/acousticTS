@@ -145,9 +145,13 @@ module prolate_swf
     end do
   end function
 
-  subroutine load_pleg_cache(idx, maxt, narg, lim, maxp, barg, pr, pdr, pdnorm, ipdnorm, pnorm, ipnorm, alpha, beta, gamma, coefa, coefb, coefc, coefd, coefe)
+  subroutine load_pleg_cache(idx, maxt, narg, lim, maxp, barg, pr, pdr, &
+      pdnorm, ipdnorm, pnorm, ipnorm, alpha, beta, gamma, coefa, coefb, &
+      coefc, coefd, coefe)
     integer, intent(in) :: idx, maxt, narg, lim, maxp
-    real(knd), intent(out) :: barg(maxt), pr(maxt, maxp), pdr(maxt, maxp), pdnorm(maxt), pnorm(maxt), alpha(maxp), beta(maxp), gamma(maxp), coefa(maxp), coefb(maxp), coefc(maxp), coefd(maxp), coefe(maxp)
+    real(knd), intent(out) :: barg(maxt), pr(maxt, maxp), pdr(maxt, maxp), &
+        pdnorm(maxt), pnorm(maxt), alpha(maxp), beta(maxp), gamma(maxp), &
+        coefa(maxp), coefb(maxp), coefc(maxp), coefd(maxp), coefe(maxp)
     integer, intent(out) :: ipdnorm(maxt), ipnorm(maxt)
 
     ! Copy cached arrays back into the caller's workspaces.
@@ -168,9 +172,13 @@ module prolate_swf
     coefe(1:lim) = pleg_cache(idx)%coefe(1:lim)
   end subroutine
 
-  subroutine store_pleg_cache(m, iopd, ndec, nex, barg, narg, maxt, lim, maxp, pr, pdr, pdnorm, ipdnorm, pnorm, ipnorm, alpha, beta, gamma, coefa, coefb, coefc, coefd, coefe)
+  subroutine store_pleg_cache(m, iopd, ndec, nex, barg, narg, maxt, lim, &
+      maxp, pr, pdr, pdnorm, ipdnorm, pnorm, ipnorm, alpha, beta, gamma, &
+      coefa, coefb, coefc, coefd, coefe)
     integer, intent(in) :: m, iopd, ndec, nex, narg, maxt, lim, maxp
-    real(knd), intent(in) :: barg(maxt), pr(maxt, maxp), pdr(maxt, maxp), pdnorm(maxt), pnorm(maxt), alpha(maxp), beta(maxp), gamma(maxp), coefa(maxp), coefb(maxp), coefc(maxp), coefd(maxp), coefe(maxp)
+    real(knd), intent(in) :: barg(maxt), pr(maxt, maxp), pdr(maxt, maxp), &
+        pdnorm(maxt), pnorm(maxt), alpha(maxp), beta(maxp), gamma(maxp), &
+        coefa(maxp), coefb(maxp), coefc(maxp), coefd(maxp), coefe(maxp)
     integer, intent(in) :: ipdnorm(maxt), ipnorm(maxt)
     integer :: idx
 
@@ -243,11 +251,15 @@ module prolate_swf
     pleg_cache(idx)%coefe(1:lim) = coefe(1:lim)
   end subroutine
 
-  subroutine pleg_cached(m, lim, maxp, limcsav, iopd, ndec, nex, barg, narg, maxt, pr, pdr, pdnorm, ipdnorm, pnorm, ipnorm, alpha, beta, gamma, coefa, coefb, coefc, coefd, coefe)
+  subroutine pleg_cached(m, lim, maxp, limcsav, iopd, ndec, nex, barg, &
+      narg, maxt, pr, pdr, pdnorm, ipdnorm, pnorm, ipnorm, alpha, beta, &
+      gamma, coefa, coefb, coefc, coefd, coefe)
     integer, intent(in) :: m, lim, maxp, iopd, ndec, nex, narg, maxt
     integer, intent(inout) :: limcsav
     real(knd), intent(inout) :: barg(maxt)
-    real(knd), intent(out) :: pr(maxt, maxp), pdr(maxt, maxp), pdnorm(maxt), pnorm(maxt), alpha(maxp), beta(maxp), gamma(maxp), coefa(maxp), coefb(maxp), coefc(maxp), coefd(maxp), coefe(maxp)
+    real(knd), intent(out) :: pr(maxt, maxp), pdr(maxt, maxp), &
+        pdnorm(maxt), pnorm(maxt), alpha(maxp), beta(maxp), gamma(maxp), &
+        coefa(maxp), coefb(maxp), coefc(maxp), coefd(maxp), coefe(maxp)
     integer, intent(out) :: ipdnorm(maxt), ipnorm(maxt)
     integer :: idx
 
@@ -255,13 +267,19 @@ module prolate_swf
     ! and store for later calls at the same settings.
     idx = find_pleg_cache(m, iopd, ndec, nex, barg, narg, maxt, lim, maxp)
     if(idx /= 0) then
-      call load_pleg_cache(idx, maxt, narg, lim, maxp, barg, pr, pdr, pdnorm, ipdnorm, pnorm, ipnorm, alpha, beta, gamma, coefa, coefb, coefc, coefd, coefe)
+      call load_pleg_cache(idx, maxt, narg, lim, maxp, barg, pr, pdr, &
+          pdnorm, ipdnorm, pnorm, ipnorm, alpha, beta, gamma, coefa, &
+          coefb, coefc, coefd, coefe)
       limcsav = max(limcsav, lim)
       return
     end if
 
-    call pleg(m, lim, maxp, limcsav, iopd, ndec, nex, barg, narg, maxt, pr, pdr, pdnorm, ipdnorm, pnorm, ipnorm, alpha, beta, gamma, coefa, coefb, coefc, coefd, coefe)
-    call store_pleg_cache(m, iopd, ndec, nex, barg, narg, maxt, lim, maxp, pr, pdr, pdnorm, ipdnorm, pnorm, ipnorm, alpha, beta, gamma, coefa, coefb, coefc, coefd, coefe)
+    call pleg(m, lim, maxp, limcsav, iopd, ndec, nex, barg, narg, maxt, &
+        pr, pdr, pdnorm, ipdnorm, pnorm, ipnorm, alpha, beta, gamma, &
+        coefa, coefb, coefc, coefd, coefe)
+    call store_pleg_cache(m, iopd, ndec, nex, barg, narg, maxt, lim, &
+        maxp, pr, pdr, pdnorm, ipdnorm, pnorm, ipnorm, alpha, beta, &
+        gamma, coefa, coefb, coefc, coefd, coefe)
   end subroutine
 
   subroutine clear_qleg_cache_slot(idx)
@@ -2567,7 +2585,7 @@ end if
 if (debug) then
     if(iflag == 1) write(40, 10) lm2
 10   format(8x,'r1bes: numerator forward series not used; backward ', &
-        'series has 'i5,' terms.')
+        'series has ',i5,' terms.')
 end if
     jtop = lm2
     if(iflag == 1) go to 50
@@ -2897,7 +2915,7 @@ end if
     isub = max(isub, isubd + jsub)
 if (debug) then
     write(40, 80) jint, lim, isub, isubd + jsub
-80   format(8x,'r2int: converged in ',i6,' terms; 'i6, &
+80   format(8x,'r2int: converged in ',i6,' terms; ',i6, &
         ' available; ',i3,' and ',i3,' digits of sub. error.')
 end if
     jterm = int(log10(abs(r2dtemp)))
@@ -3457,7 +3475,7 @@ if (debug) then
     if(ioppsum == 1 .and. iopqnsum == 1) write(40, 190) jleg, jlegp, &
                       m, lim1, lim2, m, nsub, nsubd
 190   format(8x,'r2leg: qsum, psum and qnsum series converged in ',i6, &
-       ',' i6,' and ',i4,' terms; ',i6,',' i6,' and ' i4, &
+       ',',i6,' and ',i4,' terms; ',i6,',',i6,' and ',i4, &
        ' terms avail.',/,15x, i2,' and ',i2,' digits of sub.', &
        ' error in r2 and r2d.')
     if(ioppsum == 1 .and. iopqnsum == 0) write(40, 200) jleg, jlegp, &
@@ -3470,12 +3488,12 @@ if (debug) then
                       lim1, m, nsub, nsubd
  210   format(8x,'r2leg: qsum and qnsum series converged in ',i6, &
        ' and ',i4,' terms; ',i6,' and ',i4,' terms avail.',/, &
-        15x, i2,' and ',i2,' digits of sub. error in r2 and r2d;' &
+        15x, i2,' and ',i2,' digits of sub. error in r2 and r2d;', &
         ' psum is negligible.')
      if(ioppsum == 0 .and. iopqnsum == 0) write(40, 220) jleg, lim1, &
                          nsub, nsubd
  220   format(8x,'r2leg: qsum series converged in ',i6,' terms with ', &
-        i6,' terms avail.; 'i2,' and ',i2,' digits of',/,15x, &
+        i6,' terms avail.; ',i2,' and ',i2,' digits of',/,15x, &
         'sub. error in r2 and r2d; psum and qnsum are ', &
         'negligible.')
      if(jflagl == 1) write(40, 230)
@@ -5621,8 +5639,8 @@ end if
 20   step2 = (1.0e0_knd - step1) / (ngqs - 1)
 if (debug) then
     write(40, 30) ngau, step1
-30   format(11x,'order of gauss quadrature =',i4,'. first step' &
-        ' size = 'f10.6,'.')
+30   format(11x,'order of gauss quadrature =',i4,'. first step', &
+        ' size = ',f10.6,'.')
 end if
 !
 !  calculation of scaling factors for the associated Legendre functions
