@@ -23,19 +23,26 @@
 * R-hub v2:
     * atlas
     * c23
-    * clang-asan
-    * clang-ubsan
     * clang16
     * clang17
     * clang18
     * clang19
     * clang20
+    * clang21
+    * clang22    
+    * clang-asan
+    * clang-ubsan
     * donttest
     * gcc-asan
     * gcc13
     * gcc14
     * gcc15
     * intel
+    * linux (R-devel)
+    * lto
+    * m1-san (R-devel)
+    * macos (R-devel)
+    * macos-arm64 (R-devel)
     * mkl
     * nold
     * noremap
@@ -43,12 +50,9 @@
     * ubuntu-gcc12
     * ubuntu-next
     * ubuntu-release
-    * valgrind
-    * linux (R-devel)
-    * macos (R-devel)
-    * macos-arm64 (R-devel)
-    * windows (R-devel)
-    * m1-san (R-devel)
+    * valgrind   
+    * vnu
+    * windows (R-devel)    
 
 ## Note on R-devel
 * Some additional experimental R-devel environments encountered upstream dependency installation failures under the current R-devel toolchain, not failures in acousticTS itself.

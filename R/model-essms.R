@@ -144,7 +144,7 @@
 #'
 #' @section Implementation:
 #'
-#' <u>**\code{C++}**</u>
+#' **\code{C++}**
 #'
 #' The computation for \eqn{b_m} was done in \code{C++} due to relatively large
 #' computational costs with increasing \eqn{ka} (and subsequently larger limits
@@ -162,7 +162,7 @@
 #' Partial pivoting and row-scaling are also incorporated to improve numerical
 #' stability and reduce the effect of high-leverage values in a matrix.
 #'
-#' <u>**Modal Truncation**</u>
+#' **Modal Truncation**
 #'
 #' The maximum number of terms for \eqn{n} is chosen as \eqn{k_w a_{shell} +
 #' 10} (rounded to the nearest integer), which is sufficient for convergence in

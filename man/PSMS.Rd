@@ -180,7 +180,7 @@ The maximum values of \eqn{m} and \eqn{n} can be estimated by:
 \section{Implementation}{
 
 
-\if{html}{\out{<u>}}\strong{\code{C++}}\if{html}{\out{</u>}}
+\strong{\code{C++}}
 
 This model is primarily implemented in \code{C++} since it leverages the
 \code{Fortran} algorithm developed by Arnie Lee van Buren and Jeffery
@@ -197,7 +197,7 @@ uses compiled matrix algebra throughout, applies backscatter parity to avoid
 recomputing one of the two angular \eqn{S_{mn}} matrices, and solves the
 fluid-filled kernel system natively in the requested arithmetic.
 
-\if{html}{\out{<u>}}\strong{Precision}\if{html}{\out{</u>}}
+\strong{Precision}
 
 Another consideration is the floating point precision inherent to \code{R}.
 \code{R} uses double-precision, which stores numeric values in a 64-bit

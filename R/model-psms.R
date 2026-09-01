@@ -168,7 +168,7 @@
 #'
 #' @section Implementation:
 #'
-#' <u>**\code{C++}**</u>
+#' **\code{C++}**
 #'
 #' This model is primarily implemented in \code{C++} since it leverages the
 #' \code{Fortran} algorithm developed by Arnie Lee van Buren and Jeffery
@@ -185,7 +185,7 @@
 #' recomputing one of the two angular \eqn{S_{mn}} matrices, and solves the
 #' fluid-filled kernel system natively in the requested arithmetic.
 #'
-#' <u>**Precision**</u>
+#' **Precision**
 #'
 #' Another consideration is the floating point precision inherent to \code{R}.
 #' \code{R} uses double-precision, which stores numeric values in a 64-bit

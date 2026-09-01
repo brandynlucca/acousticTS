@@ -153,7 +153,7 @@ Since \eqn{\theta = \pi} in the backscattering case, the equation for
 \section{Implementation}{
 
 
-\if{html}{\out{<u>}}\strong{\code{C++}}\if{html}{\out{</u>}}
+\strong{\code{C++}}
 
 The computation for \eqn{b_m} was done in \code{C++} due to relatively large
 computational costs with increasing \eqn{ka} (and subsequently larger limits
@@ -171,7 +171,7 @@ is determined based on the pivot ratio from the calculated condition number.
 Partial pivoting and row-scaling are also incorporated to improve numerical
 stability and reduce the effect of high-leverage values in a matrix.
 
-\if{html}{\out{<u>}}\strong{Modal Truncation}\if{html}{\out{</u>}}
+\strong{Modal Truncation}
 
 The maximum number of terms for \eqn{n} is chosen as \eqn{k_w a_{shell} +
 10} (rounded to the nearest integer), which is sufficient for convergence in
