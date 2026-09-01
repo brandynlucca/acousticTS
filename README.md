@@ -1,194 +1,164 @@
+
 # acousticTS <img src="man/figures/logo.png" align="right" height="158" alt="acousticTS hex logo" />
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7600659.svg)](https://doi.org/10.5281/zenodo.7600659)
-[![Documentation](https://img.shields.io/badge/Latest_Documentation-blue)](https://brandynlucca.github.io/acousticTS/)
-[![Build
-status](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml)
-[![Code Coverage](https://img.shields.io/codecov/c/github/brandynlucca/acousticTS?label=Code+Coverage)](https://app.codecov.io/gh/brandynlucca/acousticTS)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.7600659-blue.svg)](https://doi.org/10.5281/zenodo.7600659)
+[![Documentation](https://img.shields.io/badge/documentation-latest-blue)](https://brandynlucca.github.io/acousticTS/)
+[![R-CMD-check](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml)
+[![Codecov](https://codecov.io/gh/brandynlucca/acousticTS/graph/badge.svg?branch=main)](https://app.codecov.io/gh/brandynlucca/acousticTS?branch=main)
 [![License:
-GPL-3](https://img.shields.io/badge/License-GPL--3-blue.svg)](https://github.com/brandynlucca/acousticTS/blob/main/LICENSE)
+GPL-3](https://img.shields.io/badge/license-GPL--3-blue.svg)](LICENSE)
 
-## Overview
+`acousticTS` estimates the acoustic target strength of aquatic
+organisms, calibration spheres, and other individual scatterers with
+physics-based models. It provides one interface for defining geometry
+and material properties, running compatible scattering models, and
+comparing results across frequency, orientation, and morphology.
 
-acousticTS is an R package for estimating the acoustic target strength
-(TS) of aquatic organisms and objects using physics-based scattering
-models. It supports a range of scatterer types: fluid-like bodies (e.g.,
-fish, zooplankton), gas-filled bodies (e.g. swimbladders), elastic
-shells (e.g. pteropods, euphausiids), and calibration spheres. It
-further provides a unified interface for parameterizing, running, and
-comparing models across frequencies, orientations, and morphologies.
-Acoustic backscatter from a single target is expressed as the
-*backscattering cross-section* ($\sigma_\text{bs}$, m²). Target strength
-($TS$, dB re. 1 m²) is its logarithmic form:
+## Package workflow
 
-$$
-  TS = 10 \log_{10}(\sigma_\text{bs})
-$$
+The package separates geometry, physical interpretation, and model
+execution:
 
-$TS$ is used to:
+[![Build a shape, wrap it as a scatterer, and run a
+model](vignettes/getting-started/getting-started-workflow.png)](https://brandynlucca.github.io/acousticTS/articles/getting-started/getting-started.html)
 
-- Convert integrated backscatter (e.g. $S_\text{A}$), NASC) or
-  volumetric backscatter ($S_\text{V}$) into number density or biomass
-- Classify backscatter by species or taxon based on multi-frequency
-  response
-- Parameterize and evaluate physics-based scattering models over
-  statistical distributions of organism size and orientation
+Shapes and scatterers are implemented as S4 objects. A
+[`Shape`](https://brandynlucca.github.io/acousticTS/reference/Shape-class.html)
+stores geometry. A
+[`Scatterer`](https://brandynlucca.github.io/acousticTS/reference/Scatterer-class.html)
+adds the physical properties, orientation, model inputs, and results
+needed for an acoustic calculation.
 
 ## Installation
 
-Install the latest release from GitHub:
+Install the current GitHub version without building the full
+documentation site:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("brandynlucca/acousticTS")
+install.packages("remotes")
+remotes::install_github(
+  "brandynlucca/acousticTS",
+  build_vignettes = FALSE
+)
 ```
 
-## Scatterer classes
-
-acousticTS organizes targets into five `S4` classes:
-
-| Class | Description               | Example taxa                            |
-|-------|---------------------------|-----------------------------------------|
-| `FLS` | Fluid-like scatterer      | Euphausiids, myctophids, decapod shrimp |
-| `SBF` | Swimbladder-bearing fish  | Herring, cod, sardine                   |
-| `GAS` | Gas-filled body           | Siphonophore pneumatophores             |
-| `ESS` | Elastic-shelled scatterer | Pteropods, juvenile bivalves            |
-| `CAL` | Calibration sphere        | Tungsten carbide, copper spheres        |
-
-Each class stores a shape (position matrix + morphometrics), body
-material properties (density and sound speed contrasts), and model
-results in a structured `S4` object.
-
-## Models
-
-| Model | Abbreviation | Scatterer type | Boundary |
-|----|----|----|----|
-| Distorted-wave Born approximation | `DWBA` | FLS | Fluid |
-| Stochastic DWBA | `SDWBA` | `FLS` | Fluid |
-| Kirchhoff-ray mode | `KRM` | `FLS`, `SBF`, `GAS` | Fluid + gas |
-| High-pass approximation | `HPA` | `FLS`, `GAS` | Multiple |
-| Two-ray cylinder model | `TRCM` | `FLS` | Fluid |
-| Modal series solution (sphere) | `SPHMS` | `FLS`, `GAS` | Multiple |
-| Modal series solution (prolate spheroid) | `PSMS` | `FLS` | Multiple |
-| Modal series solution (elastic shell) | `ESSMS` | `ESS` | Elastic |
-| Finite-cylinder modal series | `FCMS` | `FLS`, `GAS` | Multiple |
-| Modal series solution (elastic sphere) | `SOEMS` | CAL | Elastic |
+> **Installation note:** `acousticTS` contains C++17 and Fortran source
+> code. Windows users need the version of
+> [Rtools](https://cran.r-project.org/bin/windows/Rtools/) matching
+> their R installation. macOS users need the Xcode Command Line Tools
+> and a compatible GNU Fortran compiler. Linux users need a C++17
+> compiler, `make`, and `gfortran`. See
+> [Troubleshooting](https://brandynlucca.github.io/acousticTS/articles/faq-troubleshooting/faq-troubleshooting.html)
+> if compilation fails.
 
 ## Quick start
+
+Build a shape, attach its acoustic properties, and run a model:
 
 ``` r
 library(acousticTS)
 
-# Build a fluid-like scatterer (e.g. krill) with a cylinder shape
+# 1. Build a geometric Shape
 krill_shape <- cylinder(
-  length_body = 0.03,          # 30 mm body length
-  radius_body = 0.003          # 3 mm max radius
+  length_body = 0.03,
+  radius_body = 0.003
 )
-# ---- Create the actual Scatterer-class object (FLS)
-krill <- fls_generate(
+
+# 2. Wrap it as a fluid-like Scatterer
+krill_target <- fls_generate(
   shape = krill_shape,
-  g_body = 1.0357,        # density contrast
-  h_body = 1.0279,        # sound speed contrast
-  theta_body = pi / 2     # broadside incidence
+  g_body = 1.0357,
+  h_body = 1.0279,
+  theta_body = pi / 2
 )
 
-# Run the DWBA model from 1 kHz to 300 kHz
-krill <- target_strength(krill,
-  frequency = seq(1e3, 300e3, by = 1e3),
-  model = "DWBA"
+# 3. Calculate and plot target strength
+krill_target <- target_strength(
+  object = krill_target,
+  frequency = seq(38e3, 120e3, by = 2e3),
+  model = "dwba"
 )
 
-# Plot TS vs frequency
-plot(krill, type = "model")
+plot(krill_target, type = "model")
 ```
 
-## Shapes and reforging
+The result remains attached to `krill_target`, so the same object can be
+plotted, inspected with `extract()`, or reused in a simulation.
 
-Scatterer shapes are created via dedicated constructors:
+## What is included
+
+- Constructors for canonical and arbitrary
+  [shapes](https://brandynlucca.github.io/acousticTS/articles/building-shapes/building-shapes.html),
+  including spheres, spheroids, cylinders, and digitized body profiles.
+- S4 scatterer classes for fluid-like, gas-filled, elastic, composite,
+  and calibration targets.
+- Exact, modal-series, T-matrix, weak-scattering, high-frequency, and
+  composite [model
+  families](https://brandynlucca.github.io/acousticTS/articles/model-library/model-library.html).
+- Shape manipulation and `reforge()` workflows for resizing, resampling,
+  bending, and repositioning targets.
+- Repeated parameter studies with
+  [`simulate_ts()`](https://brandynlucca.github.io/acousticTS/reference/simulate_ts.html).
+- Stored-state T-matrix tools for angular scattering, bistatic
+  summaries, and orientation averages.
+- Validation registries, benchmark datasets, and documented
+  implementation checks.
+
+Use
+[`available_models()`](https://brandynlucca.github.io/acousticTS/reference/available_models.html)
+for the current model registry and accepted aliases.
+
+## Example data
+
+The package includes ready-to-use biological targets and benchmark
+results:
 
 ``` r
-# Cylinder (used by FLS / CAL)
-fish_shape <- cylinder(length_body = 0.25, radius_body = 0.02)
+data(krill, package = "acousticTS")
+data(cod, package = "acousticTS")
+data(sardine, package = "acousticTS")
+data(benchmark_ts, package = "acousticTS")
 
-# Prolate spheroid (used by FLS / PSMS)
-ps_shape <- prolate_spheroid(length_body = 0.02, radius_body = 0.002)
-
-# Arbitrary shape from digitized position matrix
-arb_shape <- arbitrary(rpos = my_matrix)
-
-# Dorsal/ventral style inputs
-arbitrary(
-  x_body = c(0, 0.015),
-  w_body = c(0.005, 0.0075),
-  zU_body = c(0.001, 0.002),
-  zL_body = c(-0.001, -0.002)
-)
+plot(krill, type = "shape")
 ```
 
-Existing scatterer objects can be resized or re-discretized without
-reconstructing them from scratch using `reforge()`:
+See [Example
+Data](https://brandynlucca.github.io/acousticTS/articles/example-data/example-data.html)
+for the contents and intended use of each object.
 
-``` r
-# Rescale a krill to 40 mm
-krill_40mm <- reforge(krill, body_target = c(length = 0.04))
+## Documentation
 
-# Change segment count
-krill_fine <- reforge(krill, n_segments_body = 200)
-```
+- [Quick
+  Start](https://brandynlucca.github.io/acousticTS/articles/getting-started/getting-started.html)
+- [Build
+  Targets](https://brandynlucca.github.io/acousticTS/articles/building-shapes/building-shapes.html)
+- [Run
+  Models](https://brandynlucca.github.io/acousticTS/articles/running-models/running-models.html)
+- [Model
+  Library](https://brandynlucca.github.io/acousticTS/articles/model-library/model-library.html)
+- [Function
+  Reference](https://brandynlucca.github.io/acousticTS/reference/index.html)
 
-## Configuring simulations
-
-`simulate_ts()` runs repeated model evaluations across distributions of
-input parameters, supporting both vectorized and batch modes:
-
-``` r
-results <- simulate_ts(
-  krill,
-  model = "DWBA",
-  frequency = 120e3,
-  n_realizations = 1000,
-  parameters = list(
-    theta_body = function() rnorm(1, pi / 2, pi / 18),
-    length_body = function() rnorm(1, 0.03, 0.003)
-  )
-)
-```
-
-## Built-in datasets
-
-| Dataset | Description |
-|----|----|
-| `krill` | Antarctic krill (*Euphausia superba*) shape and material properties |
-| `cod` | Atlantic cod (*Gadus morhua*) shape and swimbladder |
-| `sardine` | Pacific sardine (*Sardinops sagax*) shape and swimbladder |
-| `benchmark_ts` | Benchmark TS values for model validation |
-
-``` r
-data(krill)
-data(cod)
-data(sardine)
-data(benchmark_ts)
-```
+The documentation explains package conventions, supported formulations,
+and validation scope. It complements the original scattering literature
+rather than replacing it.
 
 ## Citation
 
-If you use acousticTS in published work, please cite:
+To cite `acousticTS`, run:
 
 ``` r
 citation("acousticTS")
 ```
 
-The Zenodo concept DOI for acousticTS, which resolves to the latest
-archived release record, is:
+The Zenodo concept DOI, which resolves to the latest archived release,
+is [10.5281/zenodo.7600659](https://doi.org/10.5281/zenodo.7600659).
 
-<https://doi.org/10.5281/zenodo.7600659>
+## Contributing
 
-## Contributing and bug reports
+Bug reports and feature requests are welcome through [GitHub
+Issues](https://github.com/brandynlucca/acousticTS/issues). Please
+include a minimal reproducible example and `sessionInfo()` when
+reporting a problem.
 
-Bug reports and feature requests are welcome via the [GitHub Issues
-page](https://github.com/brandynlucca/acousticTS/issues). Please include
-a minimal reproducible example when reporting bugs.
-
-## License
-
-GPL-3. See [LICENSE](https://github.com/brandynlucca/acousticTS/blob/main/LICENSE) for details.
+`acousticTS` is licensed under GPL-3. See [LICENSE](LICENSE).
