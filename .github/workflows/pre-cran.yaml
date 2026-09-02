@@ -8,9 +8,14 @@ on:
 
 permissions: read-all
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   pre-cran-check:
     runs-on: ${{ matrix.config.os }}
+    timeout-minutes: 90
     name: ${{ matrix.config.name }}
     continue-on-error: ${{ matrix.config.experimental }}
 
@@ -30,7 +35,7 @@ jobs:
       R_KEEP_PKG_SOURCE: yes
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: r-lib/actions/setup-pandoc@v2
 
