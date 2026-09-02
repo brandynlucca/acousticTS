@@ -65,7 +65,14 @@ test_that("validation helper pages render expected sections", {
   ))
   expect_match(library_page, "Modal-series families")
   expect_match(library_page, "Approximation and ray-based families")
-  expect_match(library_page, "Composite and emerging families")
+  expect_match(
+    library_page,
+    "Composite, layered, and transition-matrix families",
+    fixed = TRUE
+  )
+  expect_match(library_page, 'class="model-library-grid"', fixed = TRUE)
+  expect_match(library_page, 'class="model-card"', fixed = TRUE)
+  expect_match(library_page, 'data-tooltip="', fixed = TRUE)
 })
 
 test_that("vignette figure helpers render png-based markup", {

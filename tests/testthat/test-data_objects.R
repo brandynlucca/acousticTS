@@ -119,3 +119,24 @@ test_that("Data objects can be used with generic methods", {
   expect_type(sardine_body, "list")
   expect_type(cod_bladder, "list")
 })
+
+test_that("krill shape plotting preserves its stored asymmetric envelope", {
+  data(krill, package = "acousticTS")
+
+  profile <- acousticTS:::.segmented_body_plot_data(
+    rpos = krill@body$rpos,
+    radius = krill@body$radius,
+    shape_parameters = krill@shape_parameters
+  )
+  ord <- order(krill@body$rpos["x", ])
+
+  expect_equal(profile$x, krill@body$rpos["x", ord])
+  expect_equal(profile$center, krill@body$rpos["z", ord])
+  expect_equal(profile$upper, krill@body$rpos["zU", ord])
+  expect_equal(profile$lower, krill@body$rpos["zL", ord])
+  expect_equal(
+    profile$upper - profile$lower,
+    2 * krill@body$radius[ord]
+  )
+  expect_gt(diff(range(profile$radius)), 0)
+})

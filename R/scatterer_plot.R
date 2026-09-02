@@ -284,6 +284,7 @@ fls_plot <- function(object,
     shape_params <- acousticTS::extract(object, "shape_parameters")
     .plot_row_major_segmented_body(
       rpos = body$rpos,
+      radius = body$radius,
       shape_parameters = shape_params,
       nudge_y = nudge_y,
       aspect_ratio = aspect_ratio

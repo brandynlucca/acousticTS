@@ -44,10 +44,9 @@
 ^Rplots
 ^src/.*\.(dll|o|mod)$
 ^tests/testthat/Rplots\.pdf$
-^tools/implementation-figures/data/final$
-^tools/implementation-figures/data/final/.*$
-^vignettes/.*/figure$
-^vignettes/.*/figure/.*
+^vignettes/[^/]+/
+^tools/implementation-figures($|/)
+^tools/documentation($|/)
 ^vignettes/bcms/bcms-cylinder-schematic\.png$
 ^vignettes/building-scatterers/building-scatterers-map\.png$
 ^vignettes/building-shapes/building-shapes-coordinates\.png$

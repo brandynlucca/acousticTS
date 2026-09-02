@@ -325,30 +325,49 @@
   invisible(outline)
 }
 
-#' Plot a segmented row-major body outline using the canonical geometry helpers
+#' Resolve the exact profile used to plot a segmented row-major body
 #' @param rpos Row-major position matrix.
+#' @param radius Optional nodewise radius profile stored with the body.
 #' @param shape_parameters Optional shape-parameter list.
-#' @param nudge_y y-axis nudge factor.
-#' @param aspect_ratio Plot aspect-ratio mode.
-#' @param xlab x-axis label.
-#' @param ylab y-axis label.
+#' @return A list containing ordered centerline and envelope coordinates.
 #' @keywords internal
 #' @noRd
-.plot_row_major_segmented_body <- function(rpos,
-                                           shape_parameters = NULL,
-                                           nudge_y = 1.05,
-                                           aspect_ratio = "manual",
-                                           xlab = "Length (m)",
-                                           ylab = "Thickness (m)") {
-  # Canonicalize the row-major geometry and recover its key profiles ===========
-  rpos <- .canonicalize_position_matrix(rpos, row_major = TRUE)
+.segmented_body_plot_data <- function(rpos,
+                                      radius = NULL,
+                                      shape_parameters = NULL) {
+  # Resolve radii before sorting so nodewise vectors retain their alignment ====
+  x_original <- .shape_x(rpos, row_major = TRUE)
+  n_nodes <- length(x_original)
+  if (is.null(radius)) {
+    radius <- .shape_radius_profile(
+      position_matrix = rpos,
+      shape_parameters = shape_parameters,
+      row_major = TRUE,
+      error_context = "segmented body plot"
+    )
+  } else {
+    radius <- as.numeric(radius)
+    if (length(radius) == 1L) {
+      radius <- rep(radius, n_nodes)
+    }
+    if (length(radius) != n_nodes) {
+      stop(
+        "The segmented-body radius profile must have one value per node.",
+        call. = FALSE
+      )
+    }
+  }
+
+  # Apply one stable ordering to the matrix and its associated radius profile ==
+  ord <- .canonicalize_x_order(x_original)
+  rpos <- rpos[, ord, drop = FALSE]
+  radius <- radius[ord]
   x <- .shape_x(rpos, row_major = TRUE)
-  radius <- .shape_radius_profile(
-    position_matrix = rpos,
-    shape_parameters = shape_parameters,
-    row_major = TRUE,
-    error_context = "segmented body plot"
-  )
+  z_center <- .shape_centerline_z(rpos, row_major = TRUE)
+
+  # Start with a radius-derived envelope for geometries lacking explicit bounds
+  upper <- z_center + radius
+  lower <- z_center - radius
   zU <- .geometry_axis_values(
     rpos,
     axis = "zU",
@@ -363,25 +382,61 @@
     default = NULL,
     context = "segmented body plot"
   )
-  z_center <- if (!is.null(rownames(rpos)) &&
-    any(c("z", "z_body", "z_bladder") %in% rownames(rpos))) {
-    .extract_shape_component_row(
-      rpos,
-      c("z", "z_body", "z_bladder"),
-      default = rep(0, ncol(rpos))
-    )
-  } else if (!is.null(zU) && !is.null(zL)) {
-    (zU + zL) / 2
-  } else {
-    rep(0, length(x))
+
+  # Stored envelopes are authoritative because they may be asymmetric =========
+  if (!is.null(zU) && !is.null(zL)) {
+    explicit <- is.finite(zU) & is.finite(zL)
+    upper[explicit] <- zU[explicit]
+    lower[explicit] <- zL[explicit]
   }
+
+  list(
+    x = x,
+    center = z_center,
+    upper = upper,
+    lower = lower,
+    radius = radius
+  )
+}
+
+#' Plot a segmented row-major body outline using the stored profile envelopes
+#' @param rpos Row-major position matrix.
+#' @param radius Optional nodewise radius profile stored with the body.
+#' @param shape_parameters Optional shape-parameter list.
+#' @param nudge_y y-axis nudge factor.
+#' @param aspect_ratio Plot aspect-ratio mode.
+#' @param xlab x-axis label.
+#' @param ylab y-axis label.
+#' @keywords internal
+#' @noRd
+.plot_row_major_segmented_body <- function(rpos,
+                                           radius = NULL,
+                                           shape_parameters = NULL,
+                                           nudge_y = 1.05,
+                                           aspect_ratio = "manual",
+                                           xlab = "Length (m)",
+                                           ylab = "Vertical position (m)") {
+  # Recover the ordered centerline and the exact upper and lower envelopes =====
+  profile <- .segmented_body_plot_data(
+    rpos = rpos,
+    radius = radius,
+    shape_parameters = shape_parameters
+  )
+  x <- profile$x
+  z_center <- profile$center
+  upper <- profile$upper
+  lower <- profile$lower
 
   # Resolve the plotting limits for the requested aspect-ratio mode ============
   if (aspect_ratio == "manual") {
-    vert_lims <- c(
-      min(z_center - radius, na.rm = TRUE) * (1 - (1 - nudge_y)),
-      max(z_center + radius, na.rm = TRUE) * nudge_y
-    )
+    envelope_range <- range(c(lower, upper), finite = TRUE)
+    envelope_midpoint <- mean(envelope_range)
+    envelope_half_range <- diff(envelope_range) / 2
+    if (envelope_half_range <= 0) {
+      envelope_half_range <- max(abs(envelope_midpoint), 1) * 0.05
+    }
+    vert_lims <- envelope_midpoint +
+      c(-1, 1) * envelope_half_range * nudge_y
   } else {
     max_x <- max(abs(x), na.rm = TRUE)
     vert_lims <- c(-max_x * 0.10, max_x * 0.10)
@@ -406,46 +461,17 @@
     ylim = vert_lims
   )
 
-  # Draw one quadrilateral per body segment using the local normal direction ===
+  # Join adjacent envelope stations to preserve the stored asymmetric profile ==
   for (i in seq_len(length(x) - 1L)) {
-    x0 <- x[i]
-    y0 <- z_center[i]
-    x1 <- x[i + 1L]
-    y1 <- z_center[i + 1L]
-    r0 <- radius[i]
-    r1 <- radius[i + 1L]
-
-    if ((!is.finite(r0) || r0 < 0) && (!is.finite(r1) || r1 < 0)) {
+    polygon_x <- c(x[i], x[i + 1L], x[i + 1L], x[i])
+    polygon_y <- c(upper[i], upper[i + 1L], lower[i + 1L], lower[i])
+    if (any(!is.finite(c(polygon_x, polygon_y)))) {
       next
     }
-
-    if ((!is.finite(r0) || r0 <= 0) && (!is.finite(r1) || r1 <= 0)) {
-      next
-    }
-
-    dx <- x1 - x0
-    dy <- y1 - y0
-    len <- sqrt(dx^2 + dy^2)
-    if (!is.finite(len) || len <= 0) {
-      next
-    }
-
-    px <- -dy / len
-    py <- dx / len
-    r0 <- if (is.finite(r0) && r0 > 0) r0 else 0
-    r1 <- if (is.finite(r1) && r1 > 0) r1 else 0
-    xA <- x0 + r0 * px
-    yA <- y0 + r0 * py
-    xB <- x1 + r1 * px
-    yB <- y1 + r1 * py
-    xC <- x1 - r1 * px
-    yC <- y1 - r1 * py
-    xD <- x0 - r0 * px
-    yD <- y0 - r0 * py
 
     graphics::polygon(
-      x = c(xA, xB, xC, xD),
-      y = c(yA, yB, yC, yD),
+      x = polygon_x,
+      y = polygon_y,
       col = grDevices::adjustcolor("gray50", alpha.f = 0.6),
       border = "black",
       lwd = 1
@@ -455,6 +481,7 @@
   # Overlay the segmented centerline and node markers ==========================
   graphics::lines(x, z_center, lwd = 3, col = "gray90")
   graphics::points(x, z_center, pch = 1, col = "black", cex = 0.8)
+  invisible(profile)
 }
 
 #' Resolve plotting fields for a row-major profile component

@@ -31,11 +31,25 @@ acousticTS:::.model_family_header(
 )
 ```
 
-The prolate spheroidal modal series solution (PSMS) is the natural exact-separation analogue of spherical partial-wave theory for elongated bodies whose surface is better approximated by a prolate spheroid than by a sphere or cylinder [@Spence_1951; @Silbiger_1963]. The essential fact is that the Helmholtz equation is separable in prolate spheroidal coordinates, so the incident, scattered, and interior fields can all be expanded in spheroidal angular and radial wave functions [@Spence_1951; @Silbiger_1963; @Furusawa_1988; @Yeh_1967; @Flammer_1957; @Ye_1997_2].
+The prolate-spheroidal modal-series solution (PSMS) is the exact-separation
+counterpart of spherical partial-wave theory for a prolate spheroid. The
+Helmholtz equation separates in prolate spheroidal coordinates, allowing the
+incident, scattered, and interior fields to be expanded in spheroidal angular
+and radial functions [@Spence_1951; @Silbiger_1963].
 
 The rigid case enforces zero normal velocity on $\xi = \xi_1$, the pressure-release case enforces zero pressure there, and the fluid-filled or gas-filled cases enforce continuity of pressure and normal velocity between the exterior and interior media. In the PSMS itself, the rigid and pressure-release cases remain comparatively simple because only the exterior basis is involved. The fluid-filled and gas-filled cases use the same interior-fluid algebra, but with different interior material properties and therefore different reduced frequencies. That basis mismatch is what makes the coupled interior problem harder.
 
-The mathematical structure is the same as in spherical scattering, but the basis is more intricate. Instead of Legendre polynomials and spherical Bessel functions, one obtains angular spheroidal functions and radial spheroidal functions [@Flammer_1957; @DLMF:ch30]. That similarity is what makes the PSMS interpretable as a true modal scattering theory. The difference is what makes it algebraically and numerically more demanding.
+Instead of Legendre polynomials and spherical Bessel functions, the separated
+basis contains angular and radial spheroidal wave functions
+[@Flammer_1957; @DLMF:ch30]. A penetrable spheroid is more demanding than a
+sphere because its interior and exterior angular bases generally differ.
+
+::: {.note data-title="Shared conventions"}
+Symbols and medium indexing follow [Notation and
+Symbols](../notation-and-symbols/notation-and-symbols.html). Numerical
+evaluation of the spheroidal functions is described in [Numerical
+Methods](../numerical-foundations/numerical-foundations.html).
+:::
 
 # Physical basis of the PSMS
 
@@ -47,7 +61,10 @@ The PSMS begins from a geometric observation. A prolate spheroid is a coordinate
 
 Assume linear acoustics with harmonic time dependence $e^{-i\omega t}$. In each homogeneous region, the pressure satisfies the Helmholtz equation [@Morse_1968]. The scattering problem then proceeds in three steps. First, the incident field is expanded in regular spheroidal eigenfunctions. Second, the scattered field is expanded in outgoing spheroidal eigenfunctions. Third, if the spheroid contains an interior fluid or gas, the interior field is expanded in regular interior spheroidal eigenfunctions. The boundary conditions then determine the modal coefficients.
 
-This summary is simple, but it already contains the main distinction between the rigid or pressure-release cases and the interior-fluid cases. When only the exterior basis matters, the coefficient bookkeeping remains effectively local. Once an interior medium with a different reduced frequency is introduced, the basis mismatch becomes part of the physics and part of the algebra.
+For fixed-rigid and pressure-release boundaries, only the exterior basis is
+needed and the coefficient equations remain mode-local. A penetrable interior
+introduces a second reduced frequency and therefore a second angular basis
+[@Yeh_1967; @Furusawa_1988].
 
 # Prolate spheroidal coordinates and geometry
 
@@ -105,7 +122,7 @@ Thus $\xi_1$ is the natural shape parameter of the spheroid, while $q$ sets the 
 
 <!-- ![PSMS coordinate geometry in the meridional plane, showing focal points, the boundary surface $\xi = \xi_1$, and representative $\xi$- and $\eta$-coordinate curves.](psms-coordinate-geometry-clean.svg) -->
 
-![Why rigid and pressure-release PSMS remain mode-local while the fluid-filled case introduces overlap-driven coupling between degrees.](psms-mode-coupling-schematic.svg)
+<!-- ![Why rigid and pressure-release PSMS remain mode-local while the fluid-filled case introduces overlap-driven coupling between degrees.](psms-mode-coupling-schematic.svg) -->
 
 The boundary is imposed on $\xi = \xi_1$, with the focal points at $\pm q$ fixing the prolate geometry and the semi-axes $a$ and $b$ setting the physical scale. In the rigid and pressure-release cases, one exterior spheroidal basis is sufficient, so each retained degree stays effectively local. In the fluid-filled and gas-filled cases, the interior and exterior reduced frequencies differ, so the angular bases no longer match exactly and the overlap integrals become the mechanism that couples degrees together.
 
@@ -180,7 +197,10 @@ $$
   \frac{d}{d\eta}\left[(1-\eta^2)\frac{dS}{d\eta}\right] + \left(\lambda_{mn}(\mathbb{k}) - \mathbb{k}^2\eta^2 - \frac{m^2}{1-\eta^2}\right)S = 0
 $$
 
-where $\lambda_{mn}(h)$ is the separation constant. When $h \to 0$, this reduces to the associated Legendre equation, so the spheroidal angular functions reduce smoothly to Legendre functions [@Flammer_1957; @DLMF:ch30; @DLMF:ch14].
+where $\lambda_{mn}(\mathbb{k})$ is the separation constant. When
+$\mathbb{k}\to0$, this reduces to the associated Legendre equation, so the
+spheroidal angular functions reduce smoothly to associated Legendre functions
+[@Flammer_1957; @DLMF:ch30; @DLMF:ch14].
 
 ## Radial equation
 
@@ -224,7 +244,9 @@ $$
   \end{aligned}
 $$
 
-These are the full modal expansions from which the pressure-release, rigid, fluid-filled, and gas-filled boundary systems follow. The important bookkeeping point is that the exterior incident and scattered fields share the same reduced frequency $\mathbb{k}_1$, whereas the interior field carries $\mathbb{k}_1$. That single difference is what later forces the projection step in the interior-fluid case.
+The exterior incident and scattered fields share reduced frequency
+$\mathbb{k}_1$, whereas the interior field carries $\mathbb{k}_2$. This
+difference requires projection between the two angular bases.
 
 ## Far-field scattering amplitude
 
@@ -232,7 +254,7 @@ The scattered far-field amplitude is expanded as:
 
 $$
   f_\infty(\theta,\phi\mid\theta',\phi') = \\
-    \frac{-2i}{k_2}
+    \frac{-2i}{k_1}
   \sum_{m=0}^{\infty}\sum_{n=m}^{\infty}
   \frac{\epsilon_m}{N_{mn}(\mathbb{k}_1)} 
   S_{mn}^{(1)}(\mathbb{k}_1,\cos\theta')
@@ -295,16 +317,28 @@ where $\Delta = 1$ for pressure release and $\Delta = \partial/\partial\xi$ for 
 
 ## Fluid-filled and gas-filled spheroid
 
-The fluid-filled case is more involved because the interior field uses a different reduced frequency, $\mathbb{k}_1 = k_2 q$, and therefore a different spheroidal basis [@Yeh_1967; @Furusawa_1988; @Ye_1997_2]. The exterior and interior angular functions are not identical when $\mathbb{k}_1 \ne \mathbb{k}_1$, so the boundary conditions do not remain diagonal in $n$. The gas-filled case uses exactly the same algebraic structure as the fluid-filled case; only the interior density and sound speed differ.
+The penetrable case is more involved because the interior field uses reduced
+frequency $\mathbb{k}_2=k_2q$ rather than the exterior value
+$\mathbb{k}_1=k_1q$ [@Yeh_1967; @Furusawa_1988; @Ye_1997_2]. The angular
+functions are not identical when $\mathbb{k}_1\ne\mathbb{k}_2$, so the
+boundary conditions do not remain diagonal in degree $n$. Liquid-filled and
+gas-filled cases use the same equations with different interior properties.
 
-Here $\mathbb{k}_1 = k_1 q$ and $\mathbb{k}_1 = k_2 q$ are the exterior and interior reduced frequencies, while $\rho_1$ and $\rho_2$ are the corresponding densities. Because the boundary is the coordinate surface $\xi = \xi_1$, the normal derivative is proportional to $\partial / \partial \xi$ on both sides of the interface, so the common metric factor cancels from the normal-velocity continuity condition.
+Here $\mathbb{k}_1=k_1q$ and $\mathbb{k}_2=k_2q$ are the exterior and interior
+reduced frequencies, while $\rho_1$ and $\rho_2$ are the corresponding
+densities. Because the boundary is the coordinate surface $\xi=\xi_1$, the
+same metric factor multiplies $\partial/\partial\xi$ on both sides and cancels
+from normal-velocity continuity.
 
-Let the exterior scattered coefficients be $A_{mn}$ and the interior coefficients be $B_{m\ell}$. With exterior total pressure $p_1 = p_{1,\text{inc}} + p_{1,\text{scat}}$ and interior pressure $p_1$, pressure continuity at $\xi = \xi_1$ gives:
+Let the exterior scattered coefficients be $A_{mn}$ and the interior
+coefficients be $B_{m\ell}$. With exterior total pressure
+$p_1=p_{1,\text{inc}}+p_{1,\text{scat}}$ and interior pressure $p_2$, pressure
+continuity at $\xi=\xi_1$ gives:
 
 $$
   \begin{aligned}
   &\sum_{n=m}^{\infty} A_{mn}S_{mn}^{(1)}(\mathbb{k}_1,\eta)R_{mn}^{(3)}(\mathbb{k}_1,\xi_1) +
-    \sum_{n=m}^{\infty} S_{mn}^{(1)}(\mathbb{k}_1,\eta)R_{mn}^{(1)}(\mathbb{k}_1,\xi_1) \\ &= \sum_{\ell=m}^{\infty} B_{m\ell}S_{m\ell}^{(1)}(\mathbb{k}_1,\eta)R_{m\ell}^{(1)}(\mathbb{k}_1,\xi_1).
+    \sum_{n=m}^{\infty} S_{mn}^{(1)}(\mathbb{k}_1,\eta)R_{mn}^{(1)}(\mathbb{k}_1,\xi_1) \\ &= \sum_{\ell=m}^{\infty} B_{m\ell}S_{m\ell}^{(1)}(\mathbb{k}_2,\eta)R_{m\ell}^{(1)}(\mathbb{k}_2,\xi_1).
   \end{aligned}
 $$
 
@@ -359,7 +393,9 @@ $$
   R_{mn}^{(z)\prime}(\mathbb{k}_1,\xi_1)
 $$
 
-This is the precise place where the interior-fluid spheroidal problem becomes harder than the spherical one: the mismatch between $\mathbb{k}_1$ and $\mathbb{k}_2$ causes mode coupling through the overlap integrals $\alpha_{n\ell}^m$. That statement matters physically as well as numerically. The overlap coefficients are not an arbitrary technical complication added after the fact. They are the direct mathematical expression of the fact that the interior and exterior media support different spheroidal angular bases on the same boundary.
+The mismatch between $\mathbb{k}_1$ and $\mathbb{k}_2$ therefore couples
+degrees through $\alpha_{n\ell}^m$. These coefficients are the projection of
+one medium's angular basis onto the other, not an empirical correction.
 
 ## Weak-coupling simplification
 
@@ -416,7 +452,9 @@ $$
   b_{\ell}^{(m)} = -\sum_{n=m}^{N_m} K_{n\ell}^{m(1)}
 $$
 
-The matrix is generally dense rather than diagonal because every retained exterior mode can couple to several interior modes through the overlap coefficients $\alpha_{n\ell}^m$. In other words, truncation converts the analytic mode-coupling statement into an ordinary finite-dimensional linear algebra problem.
+The matrix is generally dense because each retained exterior mode can couple
+to several interior modes through $\alpha_{n\ell}^m$. Truncation converts the
+infinite coupled system into a finite-dimensional linear algebra problem.
 
 ## Numerical evaluation of the overlap matrix
 
@@ -462,13 +500,14 @@ $$
   \sigma_\text{bs} = |f_\infty|^2
 $$
 
-with target strength [@MacLennan_2002; @Urick_1983; @Simmonds_2005]:
+with target strength [@MacLennan_2002]:
 
 $$
-  TS = 10\log_{10}(\sigma_\text{bs}).
+  TS = 10\log_{10}\left(
+  \frac{\sigma_\text{bs}}{1\ \mathrm{m}^2}\right).
 $$
 
-Equivalently, since $\sigma_\text{bs}$ is the squared magnitude of the scattering amplitude, one may write $TS = 20\log_{10}|f_\infty|$ when the amplitude itself is the reported quantity.
+Equivalently, $TS=20\log_{10}(|f_\infty|/1\ \mathrm{m})$.
 
 # Mathematical assumptions
 
@@ -480,6 +519,10 @@ The PSMS derivation rests on the following assumptions:
 4. The Helmholtz equation is separable in prolate spheroidal coordinates.
 5. The field expansions converge sufficiently rapidly after modal truncation.
 
-The great advantage of the PSMS is that the geometry is matched directly. The mathematical cost is the appearance of spheroidal special functions and mode coupling in the interior-fluid case. That tradeoff is exactly what makes the model valuable: it keeps a much closer relationship to a truly prolate geometry than a sphere- or cylinder-based substitute, but it pays for that fidelity with more complicated basis functions, overlap integrals, and linear algebra.
+PSMS matches the prolate boundary exactly. Its cost is the evaluation of
+spheroidal special functions and, for penetrable targets, overlap integrals and
+dense mode-coupling systems. Implementation-specific convergence and precision
+controls are documented on the [PSMS implementation
+page](psms-implementation.html).
 
 

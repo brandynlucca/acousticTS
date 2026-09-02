@@ -27,84 +27,40 @@ acousticTS:::.model_family_header(
 )
 ```
 
-
-This family is best read alongside the swimbladder-less fish and composite-scatterer literature that motivates explicit flesh-body and backbone terms [@Gorska_2005; @Stanton_1998_1; @Clay_1994].
-
 ```{r bbfm_overview, echo=FALSE, results='asis'}
 acousticTS:::.model_family_overview(
   family = "bbfm",
   summary = paste(
-    "The body-backbone fish model (`BBFM`) is the package's composite",
-    "swimbladder-less family for targets whose flesh body and backbone should",
-    "remain explicit acoustic components."
+    "The body-backbone fish model (`BBFM`) is a composite model for",
+    "swimbladder-less fish in which the flesh body and an elastic backbone are",
+    "retained as separate acoustic components."
   ),
   core_idea = paste(
-    "Compute a weak-fluid flesh-body term with `DWBA`, compute an elastic",
-    "backbone term with `ECMS`, place the backbone inside the same body-fixed",
-    "frame with a two-way phase factor, and then sum the two complex",
-    "amplitudes coherently."
+    "Calculate the flesh-body contribution with `DWBA`, calculate the backbone",
+    "with `ECMS`, translate both amplitudes into one body-fixed phase reference,",
+    "and add them coherently. This separates mechanisms emphasized in",
+    "swimbladder-less fish models [@Gorska_2005; @Stanton_1998_1]."
   ),
   best_for = c(
-    paste0(
-      "Swimbladder-less fish where the backbone should remain acoustically ",
-      "explicit"
-    ),
-    paste0(
-      "Composite body-plus-backbone studies that are too structured for a ",
-      "body-only approximation"
-    ),
-    paste0(
-      "Intermediate modeling between weak-fluid body models and future fully ",
-      "coupled composite solvers"
-    )
+    "Swimbladder-less fish with explicit body and backbone geometry",
+    "Studying interference between weak-fluid flesh and an elastic internal component",
+    "A transparent first-order composite approximation before a coupled solver is available"
   ),
   supports = c(
-    paste0(
-      "`BBF` scatterers built from explicit `body_shape` and ",
-      "`backbone_shape` inputs"
-    ),
-    paste0(
-      "Flesh-body material properties as contrasts or absolute density/sound ",
-      "speed"
-    ),
-    "Backbone density plus longitudinal and transverse elastic wave speeds"
+    "`BBF` objects constructed from separate body and backbone `Shape` objects",
+    "Fluid-like body properties and elastic backbone density and wave speeds",
+    "Stored body, backbone, phase-shifted, and combined outputs"
   ),
   assumptions = c(
-    "Flesh body treated in the weak-fluid `DWBA` regime",
-    "Backbone treated as an elastic cylinder through `ECMS`",
-    "Components combined coherently after centroid-based phase placement",
-    "No repeated rescattering or fully coupled embedded elastic-cylinder solve"
+    "The flesh remains within the `DWBA` weak-scattering regime",
+    "The backbone is represented by the canonical `ECMS` cylinder solution",
+    "Centroid translation is sufficient to place the component phases",
+    "No shadowing, repeated rescattering, or coupled embedded-cylinder boundary solve"
   ),
   reading = c(
-    paste0(
-      "[Implementation](bbfm-implementation.html): object setup, stored ",
-      "outputs, and internal reconstruction checks"
-    ),
-    paste0(
-      "[Theory](bbfm-theory.html): composite amplitude, phase placement, and ",
-      "interference structure"
-    )
+    "[Implementation](bbfm-implementation.html): constructing `BBF` objects, component output, and reconstruction checks",
+    "[Theory](bbfm-theory.html): component amplitudes, phase translation, and interference",
+    "[Combining components](../combining-components/combining-components.html): requirements for coherent and incoherent sums"
   )
 )
 ```
-
-::: {.experiment data-title="Current family status"}
-`BBFM` is already useful as a transparent composite family, but it should still
-be treated as experimental. The main open work is external validation and, in
-the longer term, a more tightly coupled treatment of the backbone as an
-embedded elastic structure rather than a positioned component surrogate.
-:::
-
-## Why it exists
-
-`BBFM` fills the gap between:
-
-- body-only weak-scattering models that ignore the backbone,
-- and future fully coupled body-plus-backbone solvers that are not yet in the
-  package.
-
-That is why the family belongs in acousticTS even before a more complete
-composite solver exists: it gives a physically interpretable way to keep the
-two dominant anatomical components explicit in one coherent target-strength
-calculation.
-

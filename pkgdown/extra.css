@@ -371,6 +371,7 @@ details.code-drop pre {
   padding: 1rem;
 }
 
+.model-card h2,
 .model-card h3,
 .model-card h4 {
   margin-top: 0;

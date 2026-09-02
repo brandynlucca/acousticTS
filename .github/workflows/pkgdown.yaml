@@ -6,7 +6,37 @@ env:
 on:
   push:
     branches: [main, master]
+    paths:
+      - DESCRIPTION
+      - NAMESPACE
+      - "R/**"
+      - "src/**"
+      - "man/**"
+      - "vignettes/**"
+      - "pkgdown/**"
+      - _pkgdown.yml
+      - README.md
+      - README.Rmd
+      - NEWS.md
+      - "tools/implementation-figures/**"
+      - .github/scripts/build-pkgdown-pr.R
+      - .github/workflows/pkgdown.yaml
   pull_request:
+    paths:
+      - DESCRIPTION
+      - NAMESPACE
+      - "R/**"
+      - "src/**"
+      - "man/**"
+      - "vignettes/**"
+      - "pkgdown/**"
+      - _pkgdown.yml
+      - README.md
+      - README.Rmd
+      - NEWS.md
+      - "tools/implementation-figures/**"
+      - .github/scripts/build-pkgdown-pr.R
+      - .github/workflows/pkgdown.yaml
   release:
     types: [published]
   workflow_dispatch:
@@ -16,15 +46,21 @@ permissions: read-all
 jobs:
   pkgdown:
     runs-on: ubuntu-latest
-    # Only restrict concurrency for non-PR jobs
     concurrency:
-      group: pkgdown-${{ github.event_name != 'pull_request' || github.run_id }}
+      group: pkgdown-${{ github.event_name == 'pull_request' && github.event.pull_request.number || github.ref }}
+      cancel-in-progress: true
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch PR base branch
+        if: github.event_name == 'pull_request'
+        run: git fetch origin "${{ github.base_ref }}" --depth=1
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -40,14 +76,20 @@ jobs:
           extra-packages: any::pkgdown, local::.
           needs: website
 
-      - name: Build site
+      - name: Build affected pull-request documentation
+        if: github.event_name == 'pull_request'
+        run: source(".github/scripts/build-pkgdown-pr.R")
+        shell: Rscript {0}
+
+      - name: Build complete site
+        if: github.event_name != 'pull_request'
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
         shell: Rscript {0}
 
-      - name: Deploy to GitHub pages 🚀
+      - name: Deploy to GitHub Pages
         if: github.event_name != 'pull_request'
         uses: JamesIves/github-pages-deploy-action@v4.5.0
         with:
-          clean: false
+          clean: true
           branch: gh-pages
           folder: docs

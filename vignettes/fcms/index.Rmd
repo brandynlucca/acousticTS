@@ -13,6 +13,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---
+
 # Overview
 
 ```{r model_family_header, echo=FALSE, results='asis'}
@@ -26,57 +27,37 @@ acousticTS:::.model_family_header(
 )
 ```
 
-
-These pages follow the finite-cylinder modal-series literature for straight circular cylinders near broadside [@Stanton_1988; @Stanton_1989_2].
-
 ```{r fcms_overview, echo=FALSE, results='asis'}
 acousticTS:::.model_family_overview(
   family = "fcms",
   summary = paste(
-    "The finite cylinder modal series solution (`FCMS`) is the package's",
-    "geometry-matched cylinder family for straight circular cylinders.",
-    "It keeps the exact cylindrical-harmonic treatment of the cross-section",
-    "and closes the finite-length problem with the standard near-broadside",
-    "coherence factor."
+    "The finite-cylinder modal-series solution (`FCMS`) calculates",
+    "monostatic scattering from a straight circular cylinder near broadside."
   ),
   core_idea = paste(
-    "Solve the circular cross-section exactly in cylindrical partial waves,",
-    "then multiply by the finite-length directivity factor that accounts for",
-    "the coherent addition along the cylinder axis."
+    "Solve the circular cross-section in cylindrical partial waves, then apply",
+    "the finite-length coherence factor that describes addition along the",
+    "straight cylinder axis [@Stanton_1988; @Stanton_1989_2]."
   ),
   best_for = c(
-    "Straight finite cylinders near broadside",
-    paste0(
-      "Rigid, pressure-release, liquid-filled, and gas-filled cylinder ",
-      "comparisons"
-    ),
-    paste0(
-      "Reference checks for cylinder-like targets before using higher-level ",
-      "approximations"
-    )
+    "Straight, constant-radius finite cylinders near broadside",
+    "Comparing fixed-rigid, pressure-release, liquid-filled, and gas-filled cylinder boundaries",
+    "Canonical cylinder benchmarks before adopting an asymptotic model"
   ),
   supports = c(
-    "`Cylinder` shapes on `FLS` or `GAS` objects",
-    "Near-broadside monostatic target strength",
-    "Fluid and gas interiors parameterized relative to seawater as medium `1`"
+    "`Cylinder` shapes carried by `FLS` or `GAS` scatterers",
+    "Homogeneous fluid or gas interiors, plus fixed-rigid and pressure-release limits",
+    "Monostatic complex amplitude, backscattering cross-section, and target strength"
   ),
   assumptions = c(
-    "Circular cross-section and straight centerline",
+    "A straight centerline and circular, constant-radius cross-section",
     "Broadside or near-broadside incidence",
-    "Homogeneous interior material properties for penetrable cases",
-    "No elastic shear support in the interior"
+    "Finite length represented by a coherence factor",
+    "No elastic shear response in the cylinder interior"
   ),
   reading = c(
-    paste0(
-      "[Implementation](fcms-implementation.html): spectra, result ",
-      "extraction, and comparison tables"
-    ),
-    paste0(
-      "[Theory](fcms-theory.html): cylindrical modal reduction, boundary ",
-      "conditions, and finite-length factorization"
-    )
+    "[Implementation](fcms-implementation.html): cylinder construction, boundaries, output, and comparisons",
+    "[Theory](fcms-theory.html): cylindrical modes, interface conditions, and finite-length closure"
   )
 )
 ```
-
-

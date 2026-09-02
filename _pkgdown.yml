@@ -23,14 +23,12 @@ navbar:
     physics:
       text: Physics Primer
       menu:
-        - text: "Acoustic scattering primer"
-          href: articles/acoustic-scattering-primer/acoustic-scattering-primer.html
         - text: "Notation and symbols"
           href: articles/notation-and-symbols/notation-and-symbols.html
+        - text: "Acoustic scattering primer"
+          href: articles/acoustic-scattering-primer/acoustic-scattering-primer.html
         - text: "Boundary conditions"
           href: articles/boundary_conditions.html
-        - text: "Material properties"
-          href: articles/material-properties/material-properties.html
         - text: "Numerical methods"
           href: articles/numerical-foundations/numerical-foundations.html
     build:
@@ -38,6 +36,8 @@ navbar:
       menu:
         - text: "Building Shapes"
           href: articles/building-shapes/building-shapes.html
+        - text: "Material Properties"
+          href: articles/material-properties/material-properties.html
         - text: "Building Scatterers"
           href: articles/building-scatterers/building-scatterers.html
         - text: "Shape Manipulation"
@@ -51,20 +51,16 @@ navbar:
           href: articles/model-selection/model-selection.html
         - text: "Comparing Models"
           href: articles/comparing-models/comparing-models.html
-        - text: "Visualizing results"
-          href: articles/plotting-inspecting-results/plotting-inspecting-results.html
         - text: "Simulation sweeps"
           href: articles/simulation-parameter-sweeps/simulation-parameter-sweeps.html
-        - text: "Calibration workflow"
-          href: articles/calibration-workflow/calibration-workflow.html
-        - text: "Validating models"
-          href: articles/validation-benchmarks/validation-benchmarks.html
     library:
       text: Models
       href: articles/model-library/model-library.html
     developers:
       text: Developers
       menu:
+        - text: "Validation methods"
+          href: articles/validation-benchmarks/validation-benchmarks.html
         - text: "Creating models"
           href: articles/creating-models-from-scratch/creating-models-from-scratch.html
         - text: "Combining components"
@@ -96,15 +92,15 @@ articles:
   - title: Build Targets
     contents:
       - building-shapes/building-shapes
+      - material-properties/material-properties
       - building-scatterers/building-scatterers
       - shape-manipulation-reforging/shape-manipulation-reforging
 
   - title: Acoustic Physics Primer
     contents:
-      - acoustic-scattering-primer/acoustic-scattering-primer
       - notation-and-symbols/notation-and-symbols
+      - acoustic-scattering-primer/acoustic-scattering-primer
       - boundary_conditions
-      - material-properties/material-properties
       - numerical-foundations/numerical-foundations
 
   - title: Run Models
@@ -112,10 +108,7 @@ articles:
       - running-models/running-models
       - model-selection/model-selection
       - comparing-models/comparing-models
-      - plotting-inspecting-results/plotting-inspecting-results
       - simulation-parameter-sweeps/simulation-parameter-sweeps
-      - calibration-workflow/calibration-workflow
-      - validation-benchmarks/validation-benchmarks
 
   - title: Model Library
     contents:
@@ -123,6 +116,7 @@ articles:
 
   - title: Developer Guides
     contents:
+      - validation-benchmarks/validation-benchmarks
       - creating-models-from-scratch/creating-models-from-scratch
       - combining-components/combining-components
       - faq-troubleshooting/faq-troubleshooting

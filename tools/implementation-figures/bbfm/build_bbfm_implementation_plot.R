@@ -1,5 +1,5 @@
-devtools::load_all(".")
-
+# Generate the BBFM example spectrum from a flesh body and elastic backbone.
+# The parent BBFM builder sources this script from the repository root.
 density_sw <- 1026.8
 sound_speed_sw <- 1477.3
 

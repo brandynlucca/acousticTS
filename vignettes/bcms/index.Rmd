@@ -13,7 +13,9 @@ vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---
+
 # Overview
+
 ```{r model_family_header, echo=FALSE, results='asis'}
 acousticTS:::.model_family_header(
   family = "bcms",
@@ -25,61 +27,38 @@ acousticTS:::.model_family_header(
 )
 ```
 
-
-This family follows the deformed-cylinder and coherence-corrected cylinder literature for weakly scattering elongated bodies [@Stanton_1989_2; @Stanton_1988].
-
 ```{r bcms_overview, echo=FALSE, results='asis'}
 acousticTS:::.model_family_overview(
   family = "bcms",
   summary = paste(
-    "The bent cylinder modal series solution (`BCMS`) extends the straight",
-    "finite-cylinder modal family to uniformly bent cylinders by keeping the",
-    "straight cross-sectional modal physics and modifying only the along-axis",
-    "coherence."
+    "The bent-cylinder modal-series model (`BCMS`) calculates near-broadside",
+    "scattering from straight or uniformly bent circular cylinders while",
+    "retaining the `FCMS` cross-sectional modal solution."
   ),
   core_idea = paste(
-    "Start from the finite-cylinder modal backscatter of a straight cylinder,",
-    "then replace the straight-axis coherent length by the curved equivalent",
-    "coherent length derived for a uniformly bent axis."
+    "Use the straight-cylinder partial-wave coefficients locally, then replace",
+    "the straight axial coherence factor with the Fresnel-integral correction",
+    "for uniform curvature [@Stanton_1989_2]."
   ),
   best_for = c(
-    "Uniformly bent fluid-like cylinders near broadside",
-    paste0(
-      "Curvature studies where the straight cylinder modal content remains ",
-      "the right local kernel"
-    ),
-    paste0(
-      "Problems where a full curved-body rederivation is unnecessary or ",
-      "unavailable"
-    )
+    "Uniformly bent, constant-radius cylinders near broadside",
+    "Isolating curvature-driven coherence changes from cross-sectional boundary physics",
+    "Comparisons with the straight `FCMS` limit"
   ),
   supports = c(
-    "Bent `Cylinder` geometries represented through a curvature ratio",
-    "Monostatic near-broadside target strength",
-    paste0(
-      "The same fluid boundary families carried by the straight-cylinder ",
-      "modal kernel"
-    )
+    "`Cylinder` shapes carried by `FLS` or `GAS` scatterers",
+    "Curvature supplied through the shape's radius-of-curvature ratio",
+    "Liquid-filled, gas-filled, fixed-rigid, and pressure-release boundaries"
   ),
   assumptions = c(
-    "Uniform curvature",
-    "Near-broadside incidence",
-    paste0(
-      "Curvature modifies coherence along the axis but not the local ",
-      "cross-sectional modal physics"
-    )
+    "Uniform centerline curvature and constant circular cross-section",
+    "Broadside or near-broadside incidence",
+    "Curvature changes axial coherence but not local modal coefficients",
+    "No arbitrary bending, torsion, taper, or fully three-dimensional boundary solve"
   ),
   reading = c(
-    paste0(
-      "[Implementation](bcms-implementation.html): usage and current ",
-      "reference checks"
-    ),
-    paste0(
-      "[Theory](bcms-theory.html): bent-axis coherence integrals and ",
-      "relation to the straight-cylinder modal kernel"
-    )
+    "[Implementation](bcms-implementation.html): curvature input, boundaries, output, and internal checks",
+    "[Theory](bcms-theory.html): Fresnel coherence correction and the straight-cylinder limit"
   )
 )
 ```
-
-

@@ -1,3 +1,5 @@
+# Build the core T-matrix shape, response, angular, and summary figures.
+# Additional TMM gallery/validation products have separate manifest builders.
 source("tools/implementation-figures/helpers/common.R")
 impl_load_all()
 
@@ -181,6 +183,17 @@ prolate_liq <- list(
   )
 )
 
+# Differences below numerical plotting precision are compiler-level roundoff,
+# not model disagreement. Snap them to zero so the comparison panels remain
+# meaningful and reproducible across supported toolchains.
+sphere_delta <-
+  sphere_liq$tmm@model$TMM$TS - sphere_liq$reference@model$SPHMS$TS
+prolate_delta <-
+  prolate_liq$tmm@model$TMM$TS - prolate_liq$reference@model$PSMS$TS
+zero_tolerance <- sqrt(.Machine$double.eps)
+sphere_delta[abs(sphere_delta) < zero_tolerance] <- 0
+prolate_delta[abs(prolate_delta) < zero_tolerance] <- 0
+
 impl_with_png(
   impl_output_path("tmm", "tmm-representative-spectra.png"),
   {
@@ -205,7 +218,7 @@ impl_with_png(
     )
     graphics::plot(
       sphere_frequency * 1e-3,
-      sphere_liq$tmm@model$TMM$TS - sphere_liq$reference@model$SPHMS$TS,
+      sphere_delta,
       type = "l",
       lwd = 2,
       col = "firebrick3",
@@ -235,8 +248,7 @@ impl_with_png(
     )
     graphics::plot(
       prolate_frequency * 1e-3,
-      prolate_liq$tmm@model$TMM$TS -
-        prolate_liq$reference@model$PSMS$TS,
+      prolate_delta,
       type = "b",
       lwd = 2,
       pch = 16,

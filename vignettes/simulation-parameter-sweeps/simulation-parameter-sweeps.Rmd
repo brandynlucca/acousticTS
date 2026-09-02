@@ -16,56 +16,29 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
 ---
 
-# Introduction
+# Overview
 
-Parameter sweeps are especially useful when a model has to be interpreted over
-the orientation, size, and contrast ranges emphasized in benchmark and survey
-studies [@Jech_2015; @Demer_2005].
+A single target-strength run answers a question about one specified target
+state. [`simulate_ts()`](../../reference/simulate_ts.html) repeats that workflow
+over deterministic parameter combinations, stochastic realizations, or both.
+This is useful for orientation distributions, morphology studies, uncertain
+material properties, and matched comparisons among models
+[@Jech_2015; @Demer_2005].
 
+![A baseline scatterer, parameter rules, the simulation design, and the collected model output.](simulation-batching-schematic.svg)
 
+`simulate_ts()` calls `target_strength()` for each job and returns a named list
+of data frames, one per model. Each row retains the realized parameters beside
+the acoustic output.
 
-Single deterministic model runs are useful, but many acoustic questions are inherently distributional. The package therefore includes simulation tools for repeated realizations, parameter batching, and ensemble summaries.
+# A minimal simulation
 
-![Batching and realizations schematic](simulation-batching-schematic.svg)
+Begin with a valid `Scatterer`, then specify the frequency, model, and parameters
+to vary:
 
-This page is about how to turn a single target description into a structured family of model runs. The core idea is that the object remains fixed as the bookkeeping container, while selected inputs are varied across realizations or across a parameter grid.
-
-# Main entry point
-
-The main current simulation interface is `simulate_ts()`. It supports repeated draws of user-specified parameters, optional batching over one or more variables, and optional parallel execution.
-
-In other words, `simulate_ts()` is a workflow wrapper around repeated `target_strength()` calls. It does not replace the usual model layer. It automates the process of rebuilding a set of parameters, optionally reworking the object, running the model, and collecting the outputs into a set of tidy result tables.
-
-Both `n_realizations` and `parameters` are optional. Calling `simulate_ts()` with neither runs a single realization of the object unchanged.
-
-```{r eval = TRUE}
+```{r eval=FALSE}
 library(acousticTS)
 
-shape_obj_default <- cylinder(
-  length_body = 0.05,
-  radius_body = 0.003,
-  n_segments = 80
-)
-
-obj_default <- fls_generate(
-  shape = shape_obj_default,
-  density_body = 1045,
-  sound_speed_body = 1520
-)
-
-res_default <- simulate_ts(
-  object = obj_default,
-  frequency = 70e3,
-  model = "DWBA",
-  parallel = FALSE
-)
-
-res_default$DWBA
-```
-
-Once actual parameters are involved, the more typical call supplies both.
-
-```{r eval = TRUE}
 shape_obj <- cylinder(
   length_body = 0.05,
   radius_body = 0.003,
@@ -78,88 +51,74 @@ obj <- fls_generate(
   sound_speed_body = 1520
 )
 
-res <- simulate_ts(
+sim <- simulate_ts(
   object = obj,
   frequency = seq(38e3, 120e3, by = 6e3),
-  model = "DWBA",
+  model = "dwba",
   n_realizations = 5,
   parameters = list(
-    theta_body = function() runif(1, min = 0.5 * pi, max = pi),
+    theta_body = function() runif(1, 0.5 * pi, pi),
     density_body = 1045
   ),
   parallel = FALSE
 )
+
+head(sim$DWBA)
 ```
 
-The return value is a named list with one data frame per model.
+With no `parameters` and no `n_realizations`, the function performs one run of
+the unchanged object. Use `target_strength()` directly when that is all the
+workflow requires.
 
-# Parameter specification
+# How parameters are interpreted
 
-The scratch simulation notes are worth keeping in mind here because they clarify the four main parameter modes supported by `simulate_ts()`:
+The meaning of a parameter depends on how it is supplied:
 
-1. single fixed values,
-2. explicit vectors,
-3. generating functions that return one draw at a time,
-4. structured `reforge()` inputs such as named target-dimension vectors.
+![Fixed values, explicit vectors, and generating functions have different simulation roles.](simulation-parameter-modes.svg)
 
-Every parameter supplied as more than one deterministic value - an explicit vector, or a list of more than one structured target - automatically defines a grid axis, whether or not it is also named in `batch_by`. Each cell of the resulting grid is then repeated for `n_realizations`. `batch_by` no longer controls *whether* a parameter is swept; naming an axis there only documents intent. What a bare multi-value parameter never means on its own is "align one value per realization" - that alignment is what `n_realizations` together with per-realization generating functions is for, or what `permute = FALSE` is for when two swept parameters should instead move together (see [Crossing versus pairing varied parameters](#crossing-versus-pairing-varied-parameters)).
+- A scalar is fixed across all jobs.
+- A deterministic vector with more than one value defines a sweep axis.
+- A function is called once for each realization and supplies a new value.
+- A structured value, such as a named `body_target` vector, is passed to the
+  applicable object-rebuilding pathway as one unit.
 
-Those four modes answer different questions:
+For example:
 
-1. fixed values are for constants that should be repeated in every realization,
-2. explicit vectors are for a known set of realization-level values,
-3. functions are for stochastic draws generated on demand,
-4. structured values are for explicit geometry targets that should be preserved as one unit.
-
-The distinction matters because it separates deterministic sweeps from uncertainty propagation.
-
-![Three parameter-specification modes in `simulate_ts()`: fixed constants, explicit vectors, and per-realization generating functions.](simulation-parameter-modes.svg)
-
-Fixed values are copied into every run unchanged. Explicit vectors supply a known sequence of values. Generating functions do not provide a pre-listed table at all. They create a new draw whenever a realization is built. Structured values are preserved as list-columns so named geometry targets remain intact. That difference is what separates a design grid from on-the-fly uncertainty propagation and from explicit morphology rebuilding.
-
-```{r eval = TRUE}
+```{r eval=FALSE}
 parameters <- list(
+  sound_speed_body = 1520,
   theta_body = seq(0.5 * pi, pi, length.out = 5),
   density_body = function() rnorm(1, mean = 1045, sd = 5),
-  sound_speed_body = 1520,
   body_target = c(length = 0.045)
 )
 ```
 
-In this example, `theta_body` is an explicit set of values, `density_body` is random, `sound_speed_body` is held fixed, and `body_target` is a structured `reforge()` input.
+This defines five deterministic orientation cells. Within each cell,
+`density_body` is redrawn for every realization. Sound speed and target length
+remain fixed.
 
-For fluid-like scatterers, convenience aliases such as `length_body` are also supported. These are normalized internally onto the same `reforge()` pathway as `body_target`, while preserving the original simulation column in the returned output.
+::: {.important data-title="Vectors are sweep axes"}
+A multi-value vector is not matched automatically to `n_realizations`. It
+defines a deterministic axis. Use a generating function for realization-level
+randomness or `permute = FALSE` to pair several deterministic axes.
+:::
 
-```{r eval = TRUE}
-res_length_alias <- simulate_ts(
-  object = obj,
-  frequency = 120e3,
-  model = "DWBA",
-  n_realizations = 4,
-  parameters = list(
-    length_body = function() runif(1, min = 0.04, max = 0.06),
-    theta_body = function() runif(1, min = 0.5 * pi, max = pi)
-  ),
-  parallel = FALSE
-)
+# Design cells and realizations
 
-head(res_length_alias$DWBA[, c("length_body", "theta_body", "TS")])
-```
+Every deterministic multi-value parameter becomes an outer design axis.
+`n_realizations` controls the number of repeated evaluations inside each design
+cell:
 
-# Batching versus realizations
+![Cartesian parameter cells outside repeated within-cell realizations.](simulation-batch-cells.svg)
 
-The most important conceptual distinction in the interface is the difference between a batched parameter and a realization-level parameter.
+The following design has four orientations, three densities, and three
+realizations per cell. It therefore creates 36 jobs for each requested model:
 
-1. any parameter supplied as more than one deterministic value defines a grid axis, and every such axis is crossed into a design grid whose cells are kept distinct in the output,
-2. `n_realizations` controls how many repeated runs are performed within each resulting grid cell, redrawing any generating functions each time.
-
-Suppose `theta_body` and `density_body` are both supplied as explicit multi-value vectors. The simulation does not treat them as uncertain draws around one target. It treats them as a design grid whose combinations are all run separately.
-
-```{r eval = TRUE}
-res_grid <- simulate_ts(
+```{r eval=FALSE}
+sim_grid <- simulate_ts(
   object = obj,
   frequency = seq(38e3, 120e3, by = 6e3),
-  model = c("DWBA", "SDWBA"),
+  model = c("dwba", "sdwba"),
   n_realizations = 3,
   parameters = list(
     theta_body = seq(0.5 * pi, pi, length.out = 4),
@@ -170,23 +129,21 @@ res_grid <- simulate_ts(
 )
 ```
 
-Here the output contains one row structure per model, per frequency, per batch cell, and per realization. That is why batched jobs can grow quickly.
+Multi-value parameters are detected automatically, so `batch_by` is not
+required to make those vectors vary. Naming them in `batch_by` makes the outer
+design explicit and is useful when reading or generating a simulation call.
 
-![How `batch_by` creates Cartesian design cells and `n_realizations` nests repeated runs inside each cell.](simulation-batch-cells.svg)
+## Crossing or pairing axes
 
-This is the core simulation structure in the current interface. Batched parameters define the outer design. Realizations live inside that design. If a user loses track of that nesting, it becomes very easy to misread deterministic design cells as random draws or random draws as deterministic sweep levels.
+With `permute = TRUE`, the default, deterministic axes form a Cartesian grid.
+Set `permute = FALSE` when their values describe matched states that should
+advance together:
 
-The `batch_by = c("theta_body", "density_body")` argument above is not what makes these two parameters a grid. Both are already multi-value vectors, so they would form the same design grid without it. Supplying `batch_by` here documents intent - it is useful for that reason, and for cases where a parameter list mixes several multi-value parameters and only some of them are meant to read as the "design" - but it no longer changes what gets swept.
-
-## Crossing versus pairing varied parameters
-
-By default, every varied parameter is crossed into the full Cartesian grid (`permute = TRUE`). Setting `permute = FALSE` instead pairs (zips) the varied parameters element-wise, so they advance together rather than combinatorially. Every varied parameter must then supply the same number of values; a length-one parameter is held constant across the paired runs.
-
-```{r eval = TRUE}
-res_paired <- simulate_ts(
+```{r eval=FALSE}
+sim_paired <- simulate_ts(
   object = obj,
   frequency = 70e3,
-  model = "DWBA",
+  model = "dwba",
   parameters = list(
     theta_body = seq(0.5 * pi, pi, length.out = 4),
     density_body = c(1035, 1045, 1050, 1055)
@@ -194,192 +151,126 @@ res_paired <- simulate_ts(
   permute = FALSE,
   parallel = FALSE
 )
-
-nrow(res_paired$DWBA)
-res_paired$DWBA[, c("theta_body", "density_body", "TS")]
 ```
 
-Four `theta_body` values paired with four `density_body` values yields four paired runs rather than the sixteen that `permute = TRUE` would produce for the same inputs. Pairing is the right tool when two parameters are meant to move together - for example, a size series where length and density both vary along one intended trajectory - rather than being screened independently against each other.
+This creates four paired states rather than sixteen crossed states. All varied
+axes must have the same length. Length-one inputs remain fixed.
 
-# Parameters that modify the object
+# Parameters that rebuild the target
 
-Not every simulated parameter is a simple scalar passed into `target_strength()`. Some parameters alter the working object itself. This is especially important for reshaping workflows.
+Some parameters alter the target rather than only the model call. Compatible
+arguments are applied through [`reforge()`](../../reference/reforge.html), and
+matching component fields can be updated before the model is run. Each output
+then represents a distinct target state derived from the baseline object:
 
-The current simulation code supports two broad cases:
+![A baseline scatterer is reforged into distinct geometric states before each model run.](simulation-object-reforge.svg)
 
-1. parameters matching accepted `reforge()` inputs can trigger per-realization resizing or reparameterization,
-2. parameters matching object-component fields can be inserted into the working object before the model call.
+For an `FLS` object, convenience names such as `length_body` use the same
+rebuilding pathway as `body_target`:
 
-This means `simulate_ts()` can be used not just for orientation or density perturbations, but also for controlled morphology studies.
-
-```{r eval = TRUE}
-body_shape <- arbitrary(
-  x_body = c(0.00, 0.02, 0.05, 0.08),
-  zU_body = c(0.001, 0.004, 0.004, 0.001),
-  zL_body = c(-0.001, -0.004, -0.004, -0.001)
-)
-
-bladder_shape <- arbitrary(
-  x_bladder = c(0.02, 0.04, 0.06),
-  zU_bladder = c(0.0012, 0.0018, 0.0012),
-  zL_bladder = c(-0.0012, -0.0018, -0.0012)
-)
-
-obj_sbf <- sbf_generate(
-  body_shape = body_shape,
-  bladder_shape = bladder_shape,
-  density_body = 1045,
-  sound_speed_body = 1520,
-  density_bladder = 1.2,
-  sound_speed_bladder = 343
-)
-
-res_shape <- simulate_ts(
-  object = obj_sbf,
-  frequency = seq(38e3, 120e3, by = 6e3),
-  model = "DWBA",
-  n_realizations = 2,
+```{r eval=FALSE}
+sim_length <- simulate_ts(
+  object = obj,
+  frequency = 120e3,
+  model = "dwba",
+  n_realizations = 4,
   parameters = list(
-    body_scale = c(0.9, 1.1),
-    swimbladder_inflation_factor = c(0.8, 1.2)
+    length_body = c(0.04, 0.05, 0.06),
+    theta_body = function() runif(1, 0.5 * pi, pi)
   ),
-  batch_by = c("body_scale", "swimbladder_inflation_factor"),
   parallel = FALSE
 )
 ```
 
-This is one of the cleanest ways to keep a morphology-sensitivity analysis tied to the same baseline target.
+Use a list when each sweep level is itself a structured target specification:
 
-For `FLS` objects, the same idea can be expressed more explicitly through `body_target` or through the convenience alias `length_body`.
-
-```{r eval = TRUE}
-res_fls_reforge <- simulate_ts(
+```{r eval=FALSE}
+sim_shape <- simulate_ts(
   object = obj,
   frequency = 120e3,
-  model = "DWBA",
-  n_realizations = 2,
+  model = "dwba",
   parameters = list(
     body_target = list(
       c(length = 0.04, radius = 0.0025),
       c(length = 0.06, radius = 0.0035)
     ),
-    isometric_body = FALSE,
-    theta_body = function() runif(1, min = 0.5 * pi, max = pi)
+    isometric_body = FALSE
   ),
-  batch_by = "body_target",
   parallel = FALSE
 )
-
-head(res_fls_reforge$DWBA[, c("body_target", "theta_body", "TS")])
 ```
 
-When batching across structured geometry targets, wrap the candidates in a list so each target vector is treated as one batch value.
+For an already bent `FLS` object, `length_body` refers to the bent centerline arc
+length. `simulate_ts()` does not bend a straight baseline automatically. Create
+the intended baseline with [`brake()`](../../reference/brake.html) before the
+simulation. If bending must vary by realization, construct those objects
+outside `simulate_ts()` so the order of resizing and bending is explicit.
 
-![Object-modifying simulation workflow, where baseline geometry is reforged into a family of derived target states before model execution.](simulation-object-reforge.svg)
+# Inspect and summarize output
 
-Morphology-affecting parameters do not behave like ordinary scalar metadata. They change the working target itself before the model is run. The resulting simulations should therefore be interpreted as distinct geometric states derived from one baseline object, not as repeated evaluations of a single unchanged shape.
+The returned object is organized by model:
 
-There is one especially important point for curvature-aware workflows: `simulate_ts()` does not automatically call `brake()` for the modern `DWBA` or `SDWBA` paths. If the baseline object is straight, then `length_body` or `body_target` simply resize that straight object. If the baseline object is already a bent `FLS`, then those same parameters resize the existing bent geometry directly.
-
-For bent `FLS` objects, `length_body` and `body_target["length"]` are interpreted as the target bent centerline arc length, not as the flattened projected `x` span. That makes the resize semantics consistent with the object that is actually being modeled.
-
-```{r eval = TRUE}
-obj_bent <- brake(obj, radius_curvature = 5, mode = "ratio")
-
-res_bent <- simulate_ts(
-  object = obj_bent,
-  frequency = 120e3,
-  model = "DWBA",
-  n_realizations = 2,
-  parameters = list(
-    length_body = c(0.04, 0.05),
-    theta_body = 0.5 * pi
-  ),
-  batch_by = "length_body",
-  parallel = FALSE
-)
-
-head(res_bent$DWBA[, c("length_body", "theta_body", "TS")])
+```{r eval=FALSE}
+names(sim_grid)
+head(sim_grid$DWBA)
+head(sim_grid$SDWBA)
 ```
 
-That example is useful because it separates two different ideas cleanly:
+Group summaries should respect the design columns and `realization` index.
+Common summaries include mean or quantile target strength by frequency,
+orientation distributions, sensitivity across morphology cells, and matched
+differences between models. Perform energetic averages in a linear
+cross-section domain rather than averaging target strength in decibels unless a
+specific reporting convention requires otherwise.
 
-1. the bent state comes from the baseline object passed into `simulate_ts()`,
-2. the resizing comes from `length_body` or `body_target`.
+# Parallel execution and reproducibility
 
-If the scientific workflow instead needs "resize a straight object and then bend it differently for each realization," that should currently be constructed outside `simulate_ts()` or through the deprecated `*_curved` model interfaces that still wire curvature in internally.
+The parallel pathway distributes the same logical job table over PSOCK workers:
 
-# When simulation is useful
+![Serial and parallel execution use the same simulation jobs with different scheduling.](simulation-execution-layout.svg)
 
-Simulation or batched evaluation is most useful when:
+Use `parallel = FALSE` while developing a design. PSOCK startup and, when
+working from a source checkout, preparation of a worker installation can cost
+more than the model calls for a small job. Parallel execution becomes more
+useful once individual jobs are sufficiently expensive.
 
-1. orientation is uncertain,
-2. material properties are better treated as distributions than as fixed values,
-3. multiple body lengths or frequencies must be screened systematically,
-4. model sensitivity is of greater interest than a single nominal prediction.
-
-In practice, this means simulation is less about "making the model stochastic" and more about mapping the consequences of uncertainty, variability, or design decisions.
-
-# Interpreting the output
-
-The returned list is model-centered. Each element is a data frame that carries the realization index, any batched parameters, and the model outputs. That organization is deliberate: it makes downstream plotting or aggregation straightforward.
-
-```{r eval = TRUE}
-names(res_grid)
-head(res_grid$DWBA)
-head(res_grid$SDWBA)
-```
-
-Common downstream summaries include:
-
-1. mean and quantiles of `TS` by frequency,
-2. variance decomposition by orientation or material parameter,
-3. pairwise model differences across matched grid cells,
-4. screening plots to identify nonlinear regions before deeper analysis.
-
-# Parallel execution
-
-`simulate_ts()` currently uses PSOCK workers for parallel execution across Windows, macOS, and Linux. That has two practical consequences:
-
-1. startup overhead is more noticeable for small jobs,
-2. larger simulations benefit more clearly from parallelization than tiny exploratory runs.
-
-For this reason, `parallel = FALSE` is often the right default while debugging a workflow, even if `parallel = TRUE` is the right choice for production runs.
-
-```{r eval = FALSE}
-res_parallel <- simulate_ts(
+```{r eval=FALSE}
+sim_parallel <- simulate_ts(
   object = obj,
   frequency = seq(38e3, 120e3, by = 2e3),
-  model = "DWBA",
+  model = "dwba",
   n_realizations = 100,
-  parameters = list(theta_body = function() runif(1, 0.5 * pi, pi)),
+  parameters = list(
+    theta_body = function() runif(1, 0.5 * pi, pi)
+  ),
   parallel = TRUE,
   n_cores = 2
 )
 ```
 
-![Execution layout for serial and parallel simulation runs, emphasizing the same logical job table with different scheduling.](simulation-execution-layout.svg)
+Record the parameter definitions, package version, and random-number settings
+for reproducible stochastic work. Verify a stochastic design serially before
+assuming that worker scheduling will reproduce the same draws as a sequential
+run.
 
-Parallelization changes scheduling, not interpretation. The same batched cells and realization-level jobs still exist. Parallel execution simply distributes them across workers. That is why debugging is often easier in serial mode first, even when the final production run is parallel.
+# Plan the grid before running it
 
-# Practical cautions
+For crossed axes, the number of jobs per model is the product of the axis
+lengths multiplied by `n_realizations`. Frequency points add rows to each job's
+result. Several moderate axes can therefore create a large output and a large
+number of model calls.
 
-The simulation workflow can become expensive quickly, especially when several parameters are batched simultaneously. The main practical risks are:
+Before a production run:
 
-- combinatorial growth in the evaluation grid,
-- unnecessary parallel overhead for small jobs,
-- confusion between realization-level randomness and batch-level parameter sweeps.
+1. calculate the number of design cells and expected output rows,
+2. run a small serial subset and inspect the realized parameters,
+3. confirm that crossed or paired semantics match the scientific design,
+4. verify that geometry-changing parameters rebuild the intended target, and
+5. split very large studies into recoverable batches or a cached project-level
+   pipeline.
 
-Two additional cautions are worth keeping in mind:
-
-1. if a parameter sequence is meant to represent uncertainty, supplying it as an explicit multi-value vector changes the interpretation from random variation to a deterministic design grid regardless of whether it is also named in `batch_by`. Instead, use a generating function when the intent is a random draw,
-2. if geometry-affecting parameters are varied, the results should be interpreted as new target states rather than as mere perturbations of one fixed shape.
-
-For that reason, this page should be read together with [FAQ and troubleshooting](../faq-troubleshooting/faq-troubleshooting.html).
-
-Because the current parallel path is PSOCK-based, larger simulations benefit from being planned deliberately instead of relying on a maximal batch grid by default.
-
-# Relationship to `anneal()`
-
-The current documentation and source code indicate that `simulate_ts()` is expected to give way to `anneal()` in future releases. The important point for current users is that the workflow logic on this page remains useful even if the interface evolves.
-
+`simulate_ts()` is appropriate for a structured family of related model calls.
+For a long-running study with external data dependencies, many intermediate
+products, or expensive downstream summaries, a workflow manager such as
+`targets` can orchestrate separate `simulate_ts()` calls without becoming a
+dependency of `acousticTS`.

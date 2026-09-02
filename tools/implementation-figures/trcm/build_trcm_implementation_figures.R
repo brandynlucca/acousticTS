@@ -1,6 +1,9 @@
+# Build TRCM shape, response, and straight-versus-bent comparison figures.
+# Outputs are written to vignettes/trcm as declared in the manifest.
 source("tools/implementation-figures/helpers/common.R")
 impl_load_all()
 
+# Construct the canonical TRCM example for straight or curved geometry.
 make_trcm_object <- function(radius_curvature_ratio = NULL) {
   obj <- fls_generate(
     shape = cylinder(

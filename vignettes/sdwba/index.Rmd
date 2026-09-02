@@ -13,6 +13,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---
+
 # Overview
 
 ```{r model_family_header, echo=FALSE, results='asis'}
@@ -26,69 +27,38 @@ acousticTS:::.model_family_header(
 )
 ```
 
-
-These pages connect krill-body DWBA models to phase variability, orientation effects, and practical survey use [@Demer_2003_1; @Demer_2003_2; @Conti_2006; @Demer_2005].
-
 ```{r sdwba_overview, echo=FALSE, results='asis'}
 acousticTS:::.model_family_overview(
   family = "sdwba",
   summary = paste(
-    "The stochastic distorted wave Born approximation (`SDWBA`) extends the",
-    "deterministic `DWBA` by treating unresolved posture and shape variability",
-    "as stochastic phase variability along the body."
+    "The stochastic distorted-wave Born approximation (`SDWBA`) extends the",
+    "weak-fluid `DWBA` by averaging over random phase perturbations along the",
+    "body."
   ),
   core_idea = paste(
-    "Start from the same segmented weak-scattering sum as `DWBA`, then replace",
-    paste0(
-      "the strictly coherent phase accumulation by a randomized phase model ",
-      "whose"
-    ),
-    "statistics are chosen to mimic unresolved biological variability."
+    "Retain the local weak-scattering contributions used by `DWBA`, perturb",
+    "their relative phases over repeated realizations, and report the mean",
+    "linear backscatter response [@Demer_2003_1; @Demer_2005]."
   ),
   best_for = c(
-    paste0(
-      "Krill-like or zooplankton-like targets where deterministic body ",
-      "geometry is not known precisely"
-    ),
-    "Orientation-averaged or ensemble-style weak-scattering predictions",
-    paste0(
-      "Situations where fully coherent `DWBA` overpredicts narrow ",
-      "interference structure"
-    )
+    "Krill-like and zooplankton-like targets with unresolved shape or posture variability",
+    "Ensemble predictions in which phase variability is part of the model",
+    "Assessing how deterministic interference structure changes under randomization"
   ),
   supports = c(
-    "`FLS` objects with the same geometry support as `DWBA`",
-    paste0(
-      "Monostatic target strength based on an averaged linear backscatter ",
-      "quantity"
-    ),
-    paste0(
-      "The same local contrast notation as `DWBA`, with seawater as medium ",
-      "`1` and the body as medium `2`"
-    )
+    "`FLS` geometry and material inputs accepted by `DWBA`",
+    "Configurable realization count and reference phase-scaling parameters",
+    "Averaged complex amplitude, linear cross-section, and target strength"
   ),
   assumptions = c(
-    "Weak-scattering fluid-like body",
-    paste0(
-      "Phase variability enters statistically rather than through an ",
-      "explicit new boundary-value solve"
-    ),
-    paste0(
-      "Randomization acts on the coherent sum rather than on the local ",
-      "scattering kernel"
-    )
+    "The same weak-fluid and single-scattering regime as `DWBA`",
+    "Unresolved variability can be represented by the specified phase distribution",
+    "Randomization modifies coherence rather than the local scattering kernel",
+    "Monte Carlo settings are adequate for the requested summary"
   ),
   reading = c(
-    paste0(
-      "[Implementation](sdwba-implementation.html): stochastic settings, ",
-      "spectra, and validation workflows"
-    ),
-    paste0(
-      "[Theory](sdwba-theory.html): randomized coherent sums and ",
-      "scale-invariant phase statistics"
-    )
+    "[Implementation](sdwba-implementation.html): stochastic controls, reproducibility, output, and comparisons",
+    "[Theory](sdwba-theory.html): random phase model and ensemble averaging"
   )
 )
 ```
-
-

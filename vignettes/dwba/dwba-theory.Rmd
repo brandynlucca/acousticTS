@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Distorted wave Born approximation (DWBA) theory"
 output:
   rmarkdown::html_vignette:
@@ -31,33 +31,40 @@ acousticTS:::.model_family_header(
 )
 ```
 
-The distorted wave Born approximation (DWBA) is a first-order scattering model for weakly scattering fluid-like bodies. It is most useful when the material contrasts are small enough that the total acoustic field inside the body remains close to the incident field, but the geometry is sufficiently extended that phase accumulation along the body cannot be ignored [@Morse_1968; @Stanton_1998_2]. In that regime, a purely local approximation is too crude, while a full boundary-value solution is often unnecessary or unavailable.
+The distorted wave Born approximation (DWBA) is a first-order model for weakly
+scattering fluid-like bodies. It approximates the interior amplitude by a
+reference field but evaluates its phase with the interior wavenumber. The
+accumulated phase can therefore remain important even when density and
+compressibility contrasts are small [@Stanton_1998_2].
 
-For elongated zooplankton and similar organisms, the most important consequence of the DWBA is that a three-dimensional volume scattering problem can be reduced to a one-dimensional integral along the body axis. That simplification is not an ad hoc shortcut. It follows from the weak-scattering approximation together with an elongated axisymmetric body representation.
+For an elongated axisymmetric body, analytic integration over each circular
+cross-section reduces the three-dimensional scattering integral to a
+one-dimensional centerline integral.
 
-Throughout this page, medium `1` is the surrounding seawater and medium `2` is
-the body interior, following the shared package conventions summarized in the
-[acoustic scattering primer](../acoustic-scattering-primer/acoustic-scattering-primer.html)
-and [notation guide](../notation-and-symbols/notation-and-symbols.html).
+::: {.note data-title="Shared conventions"}
+Medium indices and scattering quantities follow [Notation and
+symbols](../notation-and-symbols/notation-and-symbols.html). The governing wave
+equation is introduced in the [Acoustic scattering
+primer](../acoustic-scattering-primer/acoustic-scattering-primer.html).
+:::
 
 # Weak-scattering formulation
 
 ## Governing equation in a heterogeneous fluid
 
-Consider a lossless fluid with harmonic time dependence proportional to
-$e^{-i \omega t}$. Let the surrounding seawater be medium `1`, with density
-$\rho_1$, sound speed $c_1$, compressibility
-$\kappa_1 = (\rho_1 c_1^2)^{-1}$, and wavenumber:
+For a lossless heterogeneous fluid, the linearized momentum, continuity, and
+state equations are [@Morse_1968]:
 
 $$
   \begin{aligned}
   \rho(\mathbf{x})\frac{\partial \mathbf{v}}{\partial t} &= -\nabla p, \\
-    \frac{\partial \rho'}{\partial t} + \rho(\mathbf{x}) \, \nabla \cdot \mathbf{v} &= 0 \\
+    \frac{\partial \rho'}{\partial t} + \rho(\mathbf{x}) \, \nabla \cdot \mathbf{v} &= 0, \\
     p &= c^2(\mathbf{x}) \, \rho'.
   \end{aligned}
 $$
 
-Eliminating particle velocity $\mathbf{v}$ and density perturbation $\rho'$ gives an acoustic equation in a heterogeneous medium. When the medium is decomposed into a homogeneous background plus a localized perturbation, the pressure field satisfies an inhomogeneous Helmholtz equation whose source term is produced by departures of density and compressibility from the background fluid:
+For exterior density $\rho_1$, sound speed $c_1$, and compressibility
+$\kappa_1=(\rho_1c_1^2)^{-1}$, the background wavenumber is:
 
 $$
   k_1 = \frac{\omega}{c_1}.
@@ -69,7 +76,9 @@ $$
   k_2 = \frac{\omega}{c_2}.
 $$
 
-When the heterogeneous body is embedded in an otherwise homogeneous surrounding fluid, the acoustic pressure in the background medium can be written in the form:
+Eliminating $\mathbf v$ and $\rho'$ and separating the homogeneous background
+from the localized material perturbation gives an inhomogeneous Helmholtz
+equation:
 
 $$
   (\nabla^2 + k_1^2)p = -Q(\mathbf{r}),
@@ -115,7 +124,8 @@ This is the step that justifies a first-order treatment of the scattering source
 
 ## Born linearization and the distorted reference field
 
-The formal solution of the inhomogeneous Helmholtz equation can be written with the background Green's function $G_1(\mathbf{r}, \mathbf{r}^\prime) using the Lippmann-Schwinger form:
+The formal solution uses the background Green's function
+$G_1(\mathbf r,\mathbf r')$ in Lippmann--Schwinger form:
 
 $$
   p(\mathbf{r}) =
@@ -125,7 +135,8 @@ $$
   Q(\mathbf{r}') \, dV'.
 $$
 
-For a homogeneous background fluid, the scalar Green's function is:
+For a homogeneous background fluid, the outgoing scalar Green's function is
+[@Morse_1968]:
 
 $$
   G_1(\mathbf{r},\mathbf{r}') =
@@ -142,15 +153,16 @@ $$
   (\nabla^2 + k_1^2)G_1(\mathbf{r},\mathbf{r}') = -\delta(\mathbf{r}-\mathbf{r}').
 $$
 
-The exact source term depends on the unknown total field inside the target. The Born step is precisely the replacement of that unknown interior field by an analytically tractable approximation. In the ordinary Born approximation, one writes:
+The source depends on the unknown interior field. The ordinary Born
+linearization replaces it by the incident field:
 
 $$
-  p(\mathbf{r}') \approx p_{inc}(\mathbf{r}') = e^{i\mathbf{k}_1\cdot\mathbf{r}'}.
+  p(\mathbf{r}') \approx p_{\mathrm{inc}}(\mathbf{r}')
+  = e^{i\mathbf{k}_1\cdot\mathbf{r}'}.
 $$
 
-The ordinary Born approximation linearizes the problem by replacing the unknown total field inside the target with the incident field in the surrounding medium. The DWBA keeps the same first-order amplitude logic, but improves the phase description by evaluating the interior reference field with the interior wavenumber $k_2$ rather than with $k_1$. 
-
-The distorted wave Born approximation refines this linearization by separating amplitude and phase accuracy. While the scattering amplitude remains first order in the material contrasts, the phase of the internal field is evaluated using the interior wavenumber. This accounts for the fact that even weak contrasts can accumulate significant phase differences over distances comparable to the body length. The internal reference field is therefore taken as a transmitted or "distorted" plane wave:
+DWBA retains the first-order contrast amplitude but uses a transmitted, or
+"distorted," reference phase inside the body:
 
 $$
   p(\mathbf{r}') \approx e^{i\mathbf{k}_2\cdot\mathbf{r}'},
@@ -172,35 +184,38 @@ $$
   \qquad (r \to \infty).
 $$
 
-The asymptotic form can then be obtained:
+The Green's function then has the asymptotic form:
 
 $$
   G_1(\mathbf{r},\mathbf{r}') \sim \frac{e^{ik_1 r}}{4\pi r}e^{-ik_1\hat{\mathbf{r}}\cdot\mathbf{r}'}.
 $$
 
-:: {.note data-title="Note on notation"}
-In the integral formulations above, a prime (e.g., $\mathbf{r}'$) is often used in the literature to distinguish the integration variable (source point within the scattering volume) from the observation point $\mathbf{r}$. 
-For clarity and compactness, this distinction is not carried forward here. The position vector $\mathbf{r}$ is therefore understood to represent the integration variable within the body volume wherever it appears inside volume integrals.
+::: {.note data-title="Integration variable"}
+The prime distinguishes the source point $\mathbf r'$ from the observation
+point $\mathbf r$. Below, $\mathbf r$ denotes the source position whenever it
+appears inside a volume integral.
 :::
 
 To first order, the backscattering amplitude becomes:
 
 $$
   \mathcal{f}_\text{bs} =
-    \frac{k_1^2}{4\pi} \iiint_V \left(\gamma_\kappa - \gamma_\rho \cos^2\beta\right) e^{2 i \mathbf{k}_2 \cdot \mathbf{r}} \, dV,
+    \frac{k_1k_2}{4\pi} \iiint_V \left(\gamma_\kappa - \gamma_\rho \cos^2\beta\right) e^{2 i \mathbf{k}_2 \cdot \mathbf{r}} \, dV,
 $$
 
 where $\mathbf{k}_2$ is the interior propagation vector and $\beta$ is the local angle between the propagation direction and the body tangent. In the standard elongated-body form, this angular dependence is absorbed into the effective cross-sectional response, allowing the integrand to be written in the simplified isotropic contrast form:
 
 $$
   \mathcal{f}_\text{bs} =
-    \frac{k_1}{4\pi}
+    \frac{k_1k_2}{4\pi}
   \iiint_V
   \left(\gamma_\kappa - \gamma_\rho\right)
   e^{2 i \mathbf{k}_2 \cdot \mathbf{r}} \, dV.
 $$
 
-The essential physical idea is that each differential volume element contributes a small complex amplitude and the measured backscatter is the coherent sum of those contributions. The ordinary Born approximation would use the same coherent volume sum but with background-medium phase. The DWBA differs precisely in the choice of internal reference phase.
+Each volume element contributes a contrast-weighted complex amplitude. DWBA
+differs from the ordinary Born approximation through the interior reference
+phase.
 
 ![DWBA phase accumulation: each interior point contributes a contrast-weighted complex term, and the final backscatter is the coherent sum of those phase-weighted contributions.](dwba-phase-bookkeeping-clean.svg)
 
@@ -263,11 +278,12 @@ $$
   ds.
 $$
 
-The body is therefore reduced to a coherent sum of local cross-sectional responses distributed along the centerline. Moreover, if the material-property contrast does not vary across the local section, it can be taken outside the inner integral.
+If contrast is uniform across a local section, it can be taken outside the
+cross-sectional integral.
 
 ## Azimuthal and radial integration
 
-The azimuthal integral is evaluated with the standard Bessel identity:
+The azimuthal integral is evaluated with the Bessel identity [@DLMF:ch10]:
 
 $$
   \int_0^{2 \pi} e^{i z \cos \varphi} \, d\varphi = 2 \pi J_0(z).
@@ -322,13 +338,15 @@ $$
   }.
 $$
 
-This is the exact origin of the cylindrical Bessel factor in the reduced DWBA expression. It is not inserted empirically. It appears because the cross-section is assumed circular and the phase varies linearly across that disk.
+The Bessel factor follows from a circular cross-section with linear phase across
+the disk.
 
 ![Cross-sectional phase geometry leading to the Bessel factor: azimuthal integration over a tilted circular disk produces $J_0$, and radial integration produces $J_1$.](dwba-cross-section-bessel-clean.svg)
 
 # Reduced line-integral form
 
-Substituting the evaluated cross-sectional factor into the volume expression yields the elongated-body DWBA formula:
+Substituting the cross-sectional factor into the volume expression gives the
+elongated-body DWBA formula [@Stanton_1998_2]:
 
 $$
   f_{\mathrm{bs}} =
@@ -432,7 +450,8 @@ $$
   \Delta s_j.
 $$
 
-This discrete form makes the physical interpretation especially clear. The DWBA is a coherent sum over body segments. Its frequency structure arises from interference among segment contributions, not from any single local term acting alone.
+The discrete DWBA is a coherent segment sum. Its spectral structure arises from
+interference among segments.
 
 # Backscattering cross-section and target strength
 
@@ -443,12 +462,12 @@ $$
     |\mathcal{f}_{\text{bs}}|^2,
 $$
 
-and target strength is [@MacLennan_2002; @Urick_1983; @Simmonds_2005]:
+and target strength is [@MacLennan_2002]:
 
 $$
   \mathit{TS} =
     10 \log_{10}\left(
-  \sigma_{\text{bs}}
+  \frac{\sigma_{\text{bs}}}{1\ \mathrm{m}^2}
   \right).
 $$
 
@@ -465,6 +484,7 @@ The derivation above rests on a specific chain of assumptions:
 5. Each local cross-section is treated as circular and normal to the centerline tangent.
 6. Multiple scattering within the body is neglected beyond first order.
 
-These assumptions explain both the strength and the limitations of the DWBA. It is physically grounded for weakly contrasting fluid-like bodies, but it is not intended for rigid shells, elastic skeletons, or strongly resonant structures.
+DWBA is consequently intended for weakly contrasting fluid-like bodies, not
+rigid shells, elastic skeletons, or strongly resonant structures.
 
 

@@ -115,11 +115,10 @@ test_that("validation registry helper branches reject invalid inputs cleanly", {
   ))
   expect_match(
     acousticTS:::.validation_model_library(),
-    "Composite and emerging families"
+    "Composite, layered, and transition-matrix families",
+    fixed = TRUE
   )
-  expect_equal(
-    acousticTS:::.validation_family_meta("calibration")$display[[1]], "SOEMS"
-  )
+  expect_equal(acousticTS:::.validation_family_meta("calibration")$display[[1]], "SOEMS")
   expect_equal(
     acousticTS:::.validation_family_validation("essms"),
     paste0(

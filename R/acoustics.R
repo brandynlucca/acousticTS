@@ -537,11 +537,8 @@ lame <- function(K = NULL, E = NULL, G = NULL, nu = NULL) {
 #' )
 #' }
 #'
-#' The legacy curved-entry wrappers \code{"dwba_curved"} and
-#' \code{"sdwba_curved"} are deprecated; apply \code{\link{brake}} to the
-#' scatterer first, then run \code{"dwba"} or \code{"sdwba"} on the curved
-#' object. Model names are normalized internally, so case-insensitive inputs
-#' such as \code{"DWBA"} and \code{"dwba"} resolve to the same family.
+#' Model names are normalized internally, so case-insensitive inputs such as
+#' \code{"DWBA"} and \code{"dwba"} resolve to the same family.
 #' @return The input scatterer object with requested model parameters, model
 #'   outputs, and target strength results stored in its model slots.
 #' @examples
