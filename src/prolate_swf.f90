@@ -335,7 +335,9 @@ module prolate_swf
     end do
   end function
 
-  subroutine store_qleg_cache(m, lnum, limq, maxq, x1, ndec, qdr, qdml, iqdml, qdl, iqdl, qr, qml, iqml, ql, iql, termpq, itermpq)
+  subroutine store_qleg_cache(m, lnum, limq, maxq, x1, ndec, qdr, qdml, &
+                              iqdml, qdl, iqdl, qr, qml, iqml, ql, iql, &
+                              termpq, itermpq)
     integer, intent(in) :: m, lnum, limq, maxq, ndec, iqdml, iqml, itermpq
     real(knd), intent(in) :: x1, qdr(maxq), qdml, qdl(lnum), qr(maxq), qml, ql(lnum), termpq
     integer, intent(in) :: iqdl(lnum), iql(lnum)
@@ -384,7 +386,9 @@ module prolate_swf
     qleg_cache(idx)%iql(1:lnum) = iql(1:lnum)
   end subroutine
 
-  subroutine qleg_cached(m, lnum, limq, maxq, x1, ndec, qdr, qdml, iqdml, qdl, iqdl, qr, qml, iqml, ql, iql, termpq, itermpq)
+  subroutine qleg_cached(m, lnum, limq, maxq, x1, ndec, qdr, qdml, &
+                         iqdml, qdl, iqdl, qr, qml, iqml, ql, iql, &
+                         termpq, itermpq)
     integer, intent(in) :: m, lnum, limq, maxq, ndec
     real(knd), intent(in) :: x1
     real(knd), intent(out) :: qdr(maxq), qdml, qdl(lnum), qr(maxq), qml, ql(lnum), termpq
@@ -408,8 +412,11 @@ module prolate_swf
       return
     end if
 
-    call qleg(m, lnum, limq, maxq, x1, ndec, qdr, qdml, iqdml, qdl, iqdl, qr, qml, iqml, ql, iql, termpq, itermpq)
-    call store_qleg_cache(m, lnum, limq, maxq, x1, ndec, qdr, qdml, iqdml, qdl, iqdl, qr, qml, iqml, ql, iql, termpq, itermpq)
+    call qleg(m, lnum, limq, maxq, x1, ndec, qdr, qdml, iqdml, qdl, &
+              iqdl, qr, qml, iqml, ql, iql, termpq, itermpq)
+    call store_qleg_cache(m, lnum, limq, maxq, x1, ndec, qdr, qdml, &
+                          iqdml, qdl, iqdl, qr, qml, iqml, ql, iql, &
+                          termpq, itermpq)
   end subroutine
 
   subroutine gauss_cached(ndec, n, x, w)
@@ -448,11 +455,11 @@ module prolate_swf
 !  several times since then. For more information see the GitHub
 !  repository: GitHub.com/MathieuandSpheroidalWaveFunctions/Prolate_swf.
 !  Especially see the readme file, example input and output files and two
-!  journal articles describing the methods used in profcn. These subroutines 
-!  were modified by Brandyn M. Lucca to improve computational efficiency and 
-!  compatibility with the psms.cpp C++ interface used by the acousticTS 
-!  R-package. The scaffolding for the actual calculations and numerical 
-!  methods otherwise remain mostly the same as version 1.15 (Dec 2023) of 
+!  journal articles describing the methods used in profcn. These subroutines
+!  were modified by Brandyn M. Lucca to improve computational efficiency and
+!  compatibility with the psms.cpp C++ interface used by the acousticTS
+!  R-package. The scaffolding for the actual calculations and numerical
+!  methods otherwise remain mostly the same as version 1.15 (Dec 2023) of
 !  this file.
 !
 !  purpose:     To calculate the first and second kind prolate
@@ -2197,15 +2204,23 @@ if (debug) then
 end if
 if (output) then
         if(iopang == 1) write(30, 750) barg(jarg), s1c(jarg), is1e(jarg), naccs(jarg)
-        if(iopang == 2) write(30, 760) barg(jarg), s1c(jarg), is1e(jarg), s1dc(jarg), is1de(jarg), naccs(jarg)
+        if(iopang == 2) write(30, 760) barg(jarg), s1c(jarg), &
+                                      is1e(jarg), s1dc(jarg), &
+                                      is1de(jarg), naccs(jarg)
 750       format(1x, f19.14, 2x, f17.14, 2x, i5, 2x,', ',i2)
 760       format(1x, f19.14, 2x, f17.14, 2x, i5, 2x, f17.14, 2x, i5, 2x, i2)
 end if
 if (debug) then
         if(knd == kindd .and. iopang == 1) write(50, 770) s1c(jarg), is1e(jarg)
-        if(knd == kindd .and. iopang == 2) write(50, 780) s1c(jarg), is1e(jarg), s1dc(jarg), is1de(jarg)
+        if(knd == kindd .and. iopang == 2) write(50, 780) s1c(jarg), &
+                                                         is1e(jarg), &
+                                                         s1dc(jarg), &
+                                                         is1de(jarg)
         if(knd == kindq .and. iopang == 1) write(50, 790) s1c(jarg), is1e(jarg)
-        if(knd == kindq .and. iopang == 2) write(50, 800)s1c(jarg), is1e(jarg), s1dc(jarg), is1de(jarg)
+        if(knd == kindq .and. iopang == 2) write(50, 800) s1c(jarg), &
+                                                          is1e(jarg), &
+                                                          s1dc(jarg), &
+                                                          is1de(jarg)
 770       format(12x,'s1 = ',f17.14, 2x, i5)
 780       format(12x,'s1 = ',f17.14, 2x, i5, 5x,'s1d = ',f17.14, 2x, i5)
 790       format(12x,'s1 = ',f33.30, 2x, i5)
@@ -6210,9 +6225,13 @@ end subroutine profcn_cpp_interface
 
 ! Batched C interface
 #ifdef USE_QUAD
-subroutine profcn_cpp_interface_batch_quad(c, m_start, m_count, lnum, ioprad, x1, iopang, iopnorm, narg, arg, &
+subroutine profcn_cpp_interface_batch_quad(c, m_start, m_count, lnum, &
+                                           ioprad, x1, iopang, iopnorm, &
+                                           narg, arg, &
 #else
-subroutine profcn_cpp_interface_batch(c, m_start, m_count, lnum, ioprad, x1, iopang, iopnorm, narg, arg, &
+subroutine profcn_cpp_interface_batch(c, m_start, m_count, lnum, &
+                                      ioprad, x1, iopang, iopnorm, &
+                                      narg, arg, &
 #endif
            r1c, ir1e, r1dc, ir1de, r2c, ir2e, r2dc, ir2de, naccr, &
            s1c, is1e, s1dc, is1de, naccs) bind(C)
@@ -6254,6 +6273,6 @@ end subroutine profcn_cpp_interface_batch
 
 #ifdef USE_QUAD
 end module prolate_swf_quad
-#else  
+#else
 end module prolate_swf
 #endif
