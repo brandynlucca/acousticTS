@@ -1,6 +1,7 @@
 ^.*\.Rproj$
 ^.vscode$
 ^CITATION\.cff$
+^CONTRIBUTING\.md$
 ^LICENSE.md$
 ^LICENSE\.md$
 ^linter_file\.txt$
@@ -30,6 +31,7 @@
 ^checklist.yml$
 ^codecov\.yml$
 ^cran-comments\.md$
+^fortitude\.toml$
 ^data-raw$
 ^dev$
 ^doc$
