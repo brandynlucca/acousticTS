@@ -3,6 +3,7 @@
 ^CITATION\.cff$
 ^LICENSE.md$
 ^LICENSE\.md$
+^linter_file\.txt$
 ^Meta$
 ^README.Rmd$
 ^README\.Rmd$
