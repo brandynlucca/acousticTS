@@ -1,3 +1,6 @@
+! Adapted from the param module distributed with prolate_swf.
+! Original code Copyright (c) 2021 Arnie Lee Van Buren, licensed under MIT.
+! See inst/COPYRIGHTS for the complete upstream license notice.
 module param_quad
     integer, parameter :: knd = selected_real_kind(33)  ! quad precision (128-bit)
     logical, parameter :: debug = .false.

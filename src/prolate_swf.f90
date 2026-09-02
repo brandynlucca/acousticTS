@@ -1,3 +1,7 @@
+! Derived from prolate_swf by Arnie Lee Van Buren and Jeffrey E. Boisvert.
+! Original code Copyright (c) 2021 Arnie Lee Van Buren, licensed under MIT.
+! Package modifications Copyright (c) Brandyn M. Lucca.
+! See inst/COPYRIGHTS for the complete upstream license notice.
 #ifdef USE_QUAD
 module prolate_swf_quad
  use param_quad
