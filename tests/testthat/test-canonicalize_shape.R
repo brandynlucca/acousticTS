@@ -82,7 +82,10 @@ test_that(
         to = "OblateSpheroid",
         method = "length_volume"
       ),
-      "cannot preserve both length and volume while remaining an oblate spheroid"
+      paste(
+        "cannot preserve both length and volume while remaining an oblate",
+        "spheroid"
+      )
     )
   }
 )

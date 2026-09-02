@@ -86,7 +86,7 @@ test_that("vignette figure helpers render png-based markup", {
 
   expect_match(
     clickable_figure,
-    "getting-started-workflow.png",
+    "getting-started-workflow.svg",
     fixed = TRUE
   )
   expect_match(

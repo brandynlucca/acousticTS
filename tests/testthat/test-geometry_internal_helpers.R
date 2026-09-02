@@ -108,7 +108,10 @@ test_that(
         list(length = 0.04, volume = 5e-5),
         "ProlateSpheroid"
       ),
-      "cannot preserve both length and volume while remaining a prolate spheroid"
+      paste(
+        "cannot preserve both length and volume while remaining a prolate",
+        "spheroid"
+      )
     )
     oblate_fit <- acousticTS:::.canonicalize_shape_fit_length_volume(
       list(length = 0.04, volume = 5e-5),
@@ -167,7 +170,10 @@ test_that(
       radius = c(1, 2, 3)
     )
 
-    expect_error(acousticTS:::.shape_x(1), "'position_matrix' must be a matrix.")
+    expect_error(
+      acousticTS:::.shape_x(1),
+      "'position_matrix' must be a matrix."
+    )
     expect_error(
       acousticTS:::.canonicalize_x_order("bad"),
       "'x' must be numeric."
@@ -180,7 +186,10 @@ test_that(
     )
     expect_equal(acousticTS:::.shape_length(body = row_major_body), 2)
     expect_equal(
-      acousticTS:::.shape_radius_profile(body = row_major_body, row_major = TRUE),
+      acousticTS:::.shape_radius_profile(
+        body = row_major_body,
+        row_major = TRUE
+      ),
       rep(0.2, 3)
     )
     expect_equal(

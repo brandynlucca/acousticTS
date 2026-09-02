@@ -91,7 +91,10 @@ test_that(
 
     expect_s4_class(pinched_shape, "Arbitrary")
     expect_lt(
-      max(extract(pinched_shape, c("shape_parameters", "radius")), na.rm = TRUE),
+      max(
+        extract(pinched_shape, c("shape_parameters", "radius")),
+        na.rm = TRUE
+      ),
       max(extract(shape_obj, c("shape_parameters", "radius")), na.rm = TRUE)
     )
 
@@ -153,7 +156,11 @@ test_that(
   ),
   {
     obj <- fls_generate(
-      shape = cylinder(length_body = 0.05, radius_body = 0.003, n_segments = 12),
+      shape = cylinder(
+        length_body = 0.05,
+        radius_body = 0.003,
+        n_segments = 12
+      ),
       density_body = 1045,
       sound_speed_body = 1520
     )

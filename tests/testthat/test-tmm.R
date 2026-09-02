@@ -157,7 +157,8 @@ test_that(
     t_store <- oblate_tmm@model_parameters$TMM$parameters$t_matrix
     expect_length(t_store, length(frequency))
     expect_true(all(vapply(t_store, is.list, logical(1))))
-    expect_true(all(vapply(t_store[[1]], function(x) !is.null(x$T), logical(1))))
+    has_t_matrix <- vapply(t_store[[1]], function(x) !is.null(x$T), logical(1))
+    expect_true(all(has_t_matrix))
   }
 )
 
@@ -227,7 +228,11 @@ test_that(
     expect_true(all(is.finite(mono$sigma_scat)))
     expect_true(all(is.finite(avg$sigma_bs)))
     expect_equal(grid$sigma_scat[1, 1], mono$sigma_scat[2], tolerance = 1e-8)
-    expect_equal(summary$metrics$sigma_bs, mono$sigma_scat[2], tolerance = 1e-10)
+    expect_equal(
+      summary$metrics$sigma_bs,
+      mono$sigma_scat[2],
+      tolerance = 1e-10
+    )
     expect_equal(
       bundle$bistatic_summary$metrics$peak_sigma_scat,
       summary$metrics$peak_sigma_scat,
@@ -391,7 +396,8 @@ test_that(
     t_store <- object@model_parameters$TMM$parameters$t_matrix
     expect_length(t_store, 2)
     expect_true(all(vapply(t_store, is.list, logical(1))))
-    expect_true(all(vapply(t_store[[1]], function(x) !is.null(x$T), logical(1))))
+    has_t_matrix <- vapply(t_store[[1]], function(x) !is.null(x$T), logical(1))
+    expect_true(all(has_t_matrix))
   }
 )
 
@@ -794,7 +800,11 @@ test_that(
       weights = quadrature_dist$weights,
       phi_body = quadrature_dist$phi_body
     )
-    expect_equal(avg_from_dist$sigma_bs, avg_explicit$sigma_bs, tolerance = 1e-10)
+    expect_equal(
+      avg_from_dist$sigma_bs,
+      avg_explicit$sigma_bs,
+      tolerance = 1e-10
+    )
     expect_equal(avg_from_dist$TS, avg_explicit$TS, tolerance = 1e-10)
 
     pdf_dist <- tmm_orientation_distribution(
@@ -1215,7 +1225,11 @@ test_that(
     sound_speed_sw <- 1477.3
     object <- target_strength(
       object = fls_generate(
-        shape = cylinder(length_body = 0.07, radius_body = 0.01, n_segments = 80),
+        shape = cylinder(
+          length_body = 0.07,
+          radius_body = 0.01,
+          n_segments = 80
+        ),
         density_body = 1028.9,
         sound_speed_body = 1480.3,
         theta_body = pi / 2
@@ -1412,7 +1426,11 @@ test_that(
 
     object <- target_strength(
       object = fls_generate(
-        shape = cylinder(length_body = 0.07, radius_body = 0.01, n_segments = 80),
+        shape = cylinder(
+          length_body = 0.07,
+          radius_body = 0.01,
+          n_segments = 80
+        ),
         density_body = 1028.9,
         sound_speed_body = 1480.3,
         theta_body = pi / 2
@@ -1496,7 +1514,11 @@ test_that(
 
     cylinder_obj <- target_strength(
       object = fls_generate(
-        shape = cylinder(length_body = 0.07, radius_body = 0.01, n_segments = 80),
+        shape = cylinder(
+          length_body = 0.07,
+          radius_body = 0.01,
+          n_segments = 80
+        ),
         density_body = 1028.9,
         sound_speed_body = 1480.3,
         theta_body = pi / 2
@@ -1520,7 +1542,9 @@ test_that(
     expect_equal(length(sphere_diag$block_metrics), 2L)
     expect_true(all(is.finite(sphere_diag$summary$monostatic_rel_residual)))
     expect_true(all(sphere_diag$summary$reciprocity_rel_residual < 1e-10))
-    expect_true(all(is.finite(sphere_diag$summary$optical_theorem_rel_residual)))
+    expect_true(all(is.finite(
+      sphere_diag$summary$optical_theorem_rel_residual
+    )))
     expect_true(
       all(is.na(sphere_diag$summary$continuation_max_abs_second_diff_TS))
     )
@@ -1528,7 +1552,9 @@ test_that(
     expect_true(all(prolate_diag$summary$monostatic_rel_residual < 1e-10))
     expect_true(all(prolate_diag$summary$reciprocity_rel_residual < 1e-5))
     expect_true(all(is.na(prolate_diag$summary$optical_theorem_rel_residual)))
-    expect_true(all(is.finite(prolate_diag$summary$continuation_max_abs_step_TS)))
+    expect_true(all(is.finite(
+      prolate_diag$summary$continuation_max_abs_step_TS
+    )))
     expect_true(
       all(is.finite(prolate_diag$summary$continuation_max_abs_second_diff_TS))
     )
@@ -1549,7 +1575,8 @@ test_that(
     expect_true(all(is.na(cylinder_diag$summary$optical_theorem_rel_residual)))
     expect_true(all(is.na(cylinder_diag$summary$min_block_rcond)))
     expect_true(all(is.na(cylinder_diag$summary$max_block_transpose_residual)))
-    expect_true(all(vapply(cylinder_diag$block_metrics, nrow, integer(1)) == 0L))
+    block_rows <- vapply(cylinder_diag$block_metrics, nrow, integer(1))
+    expect_true(all(block_rows == 0L))
     expect_true(
       all(is.na(cylinder_diag$summary$continuation_max_abs_second_diff_TS))
     )

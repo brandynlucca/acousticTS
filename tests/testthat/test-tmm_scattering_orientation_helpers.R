@@ -79,7 +79,11 @@ test_that(
       "'uniform' requires a finite interval"
     )
     expect_equal(
-      acousticTS:::.tmm_validate_orientation_interval(0, pi / 2, "uniform")$upper,
+      acousticTS:::.tmm_validate_orientation_interval(
+        0,
+        pi / 2,
+        "uniform"
+      )$upper,
       pi / 2,
       tolerance = 1e-12
     )
@@ -119,7 +123,11 @@ test_that(
     expect_equal(sum(pdf_function$weights), 1, tolerance = 1e-12)
 
     uniform <- acousticTS:::.tmm_orientation_uniform(0, pi / 2, 5)
-    normal_density <- acousticTS:::.tmm_orientation_normal_density(pi / 2, 0.2, 5)
+    normal_density <- acousticTS:::.tmm_orientation_normal_density(
+      pi / 2,
+      0.2,
+      5
+    )
     truncated <- acousticTS:::.tmm_orientation_truncated_normal(
       mean_theta = pi / 2,
       sd_theta = 0.2,

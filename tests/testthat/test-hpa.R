@@ -244,7 +244,11 @@ test_that(
     expect_equal(johnson_out@model$HPA$TS, 10 * log10(johnson_expected))
 
     fls_obj <- fls_generate(
-      shape = cylinder(length_body = 0.02, radius_body = 0.001, n_segments = 20),
+      shape = cylinder(
+        length_body = 0.02,
+        radius_body = 0.001,
+        n_segments = 20
+      ),
       g_body = 1.02,
       h_body = 1.03,
       theta_body = 1.1

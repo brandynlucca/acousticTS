@@ -222,8 +222,12 @@ test_that(
       acousticTS:::.sphms_m_limit(11L, acoustics, body_params_fls),
       11L
     )
-    expect_true(acousticTS:::.sphms_m_limit(NULL, acoustics, body_params_ess) > 0)
-    expect_true(acousticTS:::.sphms_m_limit(NULL, acoustics, body_params_fls) > 0)
+    expect_true(
+      acousticTS:::.sphms_m_limit(NULL, acoustics, body_params_ess) > 0
+    )
+    expect_true(
+      acousticTS:::.sphms_m_limit(NULL, acoustics, body_params_fls) > 0
+    )
   }
 )
 
@@ -263,7 +267,10 @@ test_that(
     expect_true(acousticTS:::.pcdwba_is_straight(straight_body))
     expect_false(acousticTS:::.pcdwba_is_straight(curved_body))
 
-    expect_equal(acousticTS:::.pcdwba_node_property(2, 3, "density"), c(2, 2, 2))
+    expect_equal(
+      acousticTS:::.pcdwba_node_property(2, 3, "density"),
+      c(2, 2, 2)
+    )
     expect_equal(
       acousticTS:::.pcdwba_node_property(c(1, 2, 3), 3, "density"),
       c(1, 2, 3)

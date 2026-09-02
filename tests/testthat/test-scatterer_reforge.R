@@ -72,7 +72,8 @@ test_that(
     orig_body <- extract(fish, "body")
     orig_backbone <- extract(fish, "backbone")
 
-    # Explicit body/backbone resampling follows the multi-component reforge path.
+    # Explicit body/backbone resampling follows the multi-component reforge
+    # path.
     fish_hires <- reforge(
       fish,
       n_segments_body = 80,
@@ -147,7 +148,8 @@ test_that(
       max(orig_backbone$radius, na.rm = TRUE)
     )
 
-    # Guardrails and containment warnings should mirror the other composite paths.
+    # Guardrails and containment warnings should mirror the other composite
+    # paths.
     expect_error(reforge(fish), "Must specify at least one")
     expect_error(
       reforge(fish, body_scale = 2, body_target = c(length = 0.12)),

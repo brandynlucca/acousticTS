@@ -223,7 +223,9 @@ test_that(
       "must define an x-axis column"
     )
     expect_error(
-      acousticTS:::.validate_geometry_contract(cbind(x = c(0, 1), zU = c(1, 1))),
+      acousticTS:::.validate_geometry_contract(
+        cbind(x = c(0, 1), zU = c(1, 1))
+      ),
       "must define both upper and lower height coordinates"
     )
 
@@ -361,7 +363,10 @@ test_that(
     )
 
     inner_sphere <- acousticTS:::.inner_shape_from_shell(sphere_shape, 0.002)
-    inner_cylinder <- acousticTS:::.inner_shape_from_shell(cylinder_shape, 0.002)
+    inner_cylinder <- acousticTS:::.inner_shape_from_shell(
+      cylinder_shape,
+      0.002
+    )
     inner_prolate <- acousticTS:::.inner_shape_from_shell(prolate_shape, 0.002)
     inner_oblate <- acousticTS:::.inner_shape_from_shell(oblate_shape, 0.002)
     inner_arbitrary <- acousticTS:::.inner_shape_from_shell(

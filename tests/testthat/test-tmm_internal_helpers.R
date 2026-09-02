@@ -58,7 +58,10 @@ test_that(
       acousticTS:::.tmm_boundary_default(fls_obj, NULL),
       "liquid_filled"
     )
-    expect_equal(acousticTS:::.tmm_boundary_default(gas_obj, NULL), "gas_filled")
+    expect_equal(
+      acousticTS:::.tmm_boundary_default(gas_obj, NULL),
+      "gas_filled"
+    )
     expect_equal(
       acousticTS:::.tmm_boundary_default(fls_obj, "fixed_rigid"),
       "fixed_rigid"
@@ -559,7 +562,10 @@ test_that(
       g_body = 1,
       h_body = 1
     )@shape_parameters
-    expect_equal(acousticTS:::.tmm_equivalent_volume_radius(sphere_params), 0.01)
+    expect_equal(
+      acousticTS:::.tmm_equivalent_volume_radius(sphere_params),
+      0.01
+    )
     expect_equal(
       acousticTS:::.tmm_equivalent_volume_radius(oblate_params),
       (0.05^2 * 0.02)^(1 / 3),
@@ -775,7 +781,11 @@ test_that(
 
     expect_equal(acousticTS:::.tmm_interval_weights(0.5), 1)
     expect_equal(
-      acousticTS:::.tmm_interval_weights(c(0, pi / 2, pi), lower = 0, upper = pi),
+      acousticTS:::.tmm_interval_weights(
+        c(0, pi / 2, pi),
+        lower = 0,
+        upper = pi
+      ),
       c(pi / 4, pi / 2, pi / 4)
     )
     expect_error(
@@ -869,7 +879,9 @@ test_that(
       ),
       class = c("TMMOrientationDistribution", "data.frame")
     )
-    normalized <- acousticTS:::.tmm_validate_orientation_distribution(valid_dist)
+    normalized <- acousticTS:::.tmm_validate_orientation_distribution(
+      valid_dist
+    )
     expect_equal(sum(normalized$weights), 1)
     expect_error(
       acousticTS:::.tmm_validate_orientation_distribution(

@@ -296,7 +296,9 @@ test_that(
         },
         tmm_scattering = function(...) list(f_scat = 1 + 1i, sigma_scat = 2),
         tmm_average_orientation = function(...) list(sigma_bs = 3),
-        tmm_bistatic_summary = function(...) list(metrics = data.frame(flag = 1)),
+        tmm_bistatic_summary = function(...) {
+          list(metrics = data.frame(flag = 1))
+        },
         .package = "acousticTS"
       )
 
@@ -339,7 +341,8 @@ test_that(
       sigma_scat = matrix(c(1, 2, 3, 4), nrow = 2),
       f_scat = matrix(complex(real = 1:4, imaginary = 4:1), nrow = 2)
     )
-    expect_equal(acousticTS:::.tmm_grid_plot_data(grid)$quantity, "sigma_scat_dB")
+    plot_data <- acousticTS:::.tmm_grid_plot_data(grid)
+    expect_equal(plot_data$quantity, "sigma_scat_dB")
     expect_equal(
       acousticTS:::.tmm_grid_plot_data(grid, "sigma_scat")$z,
       grid$sigma_scat
