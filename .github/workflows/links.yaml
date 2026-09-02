@@ -1,0 +1,32 @@
+name: Link check
+
+on:
+  schedule:
+    - cron: "0 8 15 * *"
+  workflow_dispatch:
+
+permissions: read-all
+
+concurrency:
+  group: links-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --root-dir "${{ github.workspace }}"
+            --verbose
+            --no-progress
+            --exclude-mail
+            './**/*.md'
+            './**/*.Rmd'
+            './**/*.html'
+            './**/*.Rd'
+          fail: true
+          jobSummary: true
