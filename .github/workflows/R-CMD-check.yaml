@@ -84,13 +84,24 @@ jobs:
       - name: Configure macOS GNU toolchain
         if: runner.os == 'macOS'
         run: |
-          GXX=$(ls /opt/homebrew/bin/g++-* 2>/dev/null | sort -V | tail -1)
-          GFORTRAN=$(ls /opt/homebrew/bin/gfortran-* 2>/dev/null | sort -V | tail -1)
-          if [ -z "$GXX" ]; then
-            GXX=$(ls /usr/local/bin/g++-* 2>/dev/null | sort -V | tail -1)
-          fi
-          if [ -z "$GFORTRAN" ]; then
-            GFORTRAN=$(ls /usr/local/bin/gfortran-* 2>/dev/null | sort -V | tail -1)
+          shopt -s nullglob
+          gxx_candidates=(
+            /opt/homebrew/bin/g++-*
+            /usr/local/bin/g++-*
+          )
+          gfortran_candidates=(
+            /opt/homebrew/bin/gfortran-*
+            /usr/local/bin/gfortran-*
+          )
+          GXX=$(printf '%s\n' "${gxx_candidates[@]}" | sort -V | tail -1)
+          GFORTRAN=$(
+            printf '%s\n' "${gfortran_candidates[@]}" |
+              sort -V |
+              tail -1
+          )
+          if [ -z "$GXX" ] || [ -z "$GFORTRAN" ]; then
+            echo "Unable to locate the Homebrew GNU compilers." >&2
+            exit 1
           fi
           GCC=${GXX/g++/gcc}
           mkdir -p ~/.R
