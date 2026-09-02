@@ -1,3 +1,7 @@
+# acousticTS 2.0.3
+
+* Submission to CRAN
+
 # acousticTS 2.0.2
 
 ## What's Changed
