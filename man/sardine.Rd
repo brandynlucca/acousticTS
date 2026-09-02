@@ -58,12 +58,20 @@ archived \code{echoSMs} resource set
 \usage{
 data(sardine)
 }
+\value{
+A pre-generated \code{SBF} scatterer object.
+}
 \description{
 A pre-generated SBF scatterer containing all information required for
 target strength modeling. The packaged geometry follows the sardine entry
 distributed through the NOAA Fisheries KRM reference collection and
 archived in the \code{echoSMs} resources. The object metadata identifies the
 target as \emph{Sardinops sagax caerulea} following Conti and Demer (2003).
+}
+\examples{
+data(sardine, package = "acousticTS")
+sardine
+
 }
 \references{
 Conti, S.G., and Demer, D.A. (2003). Wide-bandwidth acoustical

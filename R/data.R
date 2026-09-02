@@ -60,6 +60,11 @@
 #' an echoic tank. \emph{ICES Journal of Marine Science}, 60, 617-624.
 #' \doi{10.1016/S1054-3139(03)00056-0}
 #'
+#' @return A pre-generated `SBF` scatterer object.
+#' @examples
+#' data(sardine, package = "acousticTS")
+#' sardine
+#'
 #' @usage data(sardine)
 "sardine"
 
@@ -113,6 +118,11 @@
 #' cod (\emph{Gadus morhua}). \emph{The Journal of the Acoustical Society of
 #' America}, 96, 1661-1668. \doi{10.1121/1.410245}
 #'
+#' @return A pre-generated `SBF` scatterer object.
+#' @examples
+#' data(cod, package = "acousticTS")
+#' cod
+#'
 #' @usage data(cod)
 "cod"
 
@@ -146,6 +156,10 @@
 #'     }
 #'   }
 #' }
+#' @return A pre-generated `FLS` scatterer object.
+#' @examples
+#' data(krill, package = "acousticTS")
+#' krill
 #' @usage data(krill)
 "krill"
 
@@ -170,6 +184,11 @@
 #' Jech, M., and Macaulay, G. \code{echoSMs}: Acoustic backscattering models
 #' used in aquatic ecosystem research. GitHub repository:
 #' \url{https://github.com/ices-tools-dev/echoSMs}
+#'
+#' @return A list of benchmark target-strength spectra.
+#' @examples
+#' data(benchmark_ts, package = "acousticTS")
+#' str(benchmark_ts, max.level = 1)
 #'
 #' @usage data(benchmark_ts)
 "benchmark_ts"

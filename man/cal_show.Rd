@@ -16,4 +16,7 @@ invisibly returns \code{NULL}.
 \description{
 show(...) for CAL-class objects.
 }
+\examples{
+cal_show(cal_generate(material = "WC", n_segments = 20))
+}
 \keyword{internal}

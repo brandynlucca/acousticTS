@@ -60,9 +60,12 @@
 #' Backscattering by individual fish. \emph{ICES Journal of Marine Science},
 #' 62: 984-995.
 #'
+#' @return No value; this help topic documents the ECMS model.
+#' @examples
+#' subset(available_models(), model == "ecms")
+#'
 #' @name ECMS
 #' @aliases ecms ECMS
-#' @docType data
 #' @keywords models acoustics internal
 NULL
 

@@ -45,9 +45,12 @@
 #' Deformed cylinders. \emph{The Journal of the Acoustical Society of America},
 #' 86, 691-705.
 #'
+#' @return No value; this help topic documents the PCDWBA model.
+#' @examples
+#' subset(available_models(), model == "pcdwba")
+#'
 #' @name PCDWBA
 #' @aliases pcdwba PCDWBA
-#' @docType data
 #' @keywords models acoustics internal
 NULL
 

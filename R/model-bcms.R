@@ -46,9 +46,12 @@
 #' from randomly oriented random-length finite cylinders: zooplankton models.
 #' \emph{The Journal of the Acoustical Society of America}, 94: 3463-3472.
 #'
+#' @return No value; this help topic documents the BCMS model.
+#' @examples
+#' subset(available_models(), model == "bcms")
+#'
 #' @name BCMS
 #' @aliases bcms BCMS
-#' @docType data
 #' @keywords models acoustics internal
 NULL
 

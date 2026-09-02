@@ -64,6 +64,11 @@ stored on the object. For example, \code{type = "model"} requires the object to
 already contain model output, and \code{type = "scattering"} currently applies
 only to stored \code{TMM} results.
 }
+\examples{
+data(krill, package = "acousticTS")
+plot(krill)
+
+}
 \seealso{
 \code{\link[=extract]{extract()}}, \code{\link[=target_strength]{target_strength()}}, \code{\link[=tmm_scattering]{tmm_scattering()}},
 \code{\link[=tmm_scattering_grid]{tmm_scattering_grid()}}

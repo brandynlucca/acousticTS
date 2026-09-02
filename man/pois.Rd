@@ -27,4 +27,8 @@ The relationships used are:
 \deqn{\nu = \frac{3K - 2G}{2(3K + G)}}
 \deqn{\nu = \frac{3K - E}{6K}}
 }
+\examples{
+pois(E = 3e9, G = 1.1e9)
+
+}
 \keyword{elastic}

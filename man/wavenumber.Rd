@@ -24,3 +24,6 @@ where \eqn{f} is the frequency (Hz) and \eqn{c} is the sound speed
 The wavenumber describes the spatial frequency of a sound wave and is
 fundamental in acoustic calculations.
 }
+\examples{
+wavenumber(frequency = 38e3, sound_speed = 1500)
+}

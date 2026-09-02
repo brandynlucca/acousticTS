@@ -15,12 +15,20 @@ and Jech benchmark tables archived at
 \usage{
 data(benchmark_ts)
 }
+\value{
+A list of benchmark target-strength spectra.
+}
 \description{
 A packaged list of benchmark target-strength spectra for the canonical
 sphere, shell-sphere, finite-cylinder, and prolate-spheroid comparison cases
 used throughout the package validation workflow. The stored values follow
 the benchmark definitions assembled by Jech et al. (2015) and distributed in
 the \code{echoSMs} reference resources.
+}
+\examples{
+data(benchmark_ts, package = "acousticTS")
+str(benchmark_ts, max.level = 1)
+
 }
 \references{
 Jech, J.M., Horne, J.K., Chu, D., Demer, D.A., Francis, D.T.I., Gorska, N.,

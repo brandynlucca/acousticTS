@@ -5,6 +5,9 @@
 \alias{Shape}
 \alias{Shape-class}
 \title{Generic scattering shape object used throughout this package.}
+\value{
+An object from the \code{Shape} S4 class hierarchy.
+}
 \description{
 A S4 class that provides slots to contain relevant shape data and metadata
 for a variety of arbitrary and canonical shapes and geometries. See
@@ -21,5 +24,9 @@ the body shape}
 \item{\code{shape_parameters}}{A list of additional shape specifications}
 }}
 
+\examples{
+methods::getClass("Shape")
+
+}
 \keyword{internal}
 \keyword{shapes}

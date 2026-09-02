@@ -72,9 +72,12 @@
 #' acoustic scattering by elastic spheres. \emph{The Journal of the Acoustical
 #' Society of America}, 93, 118-123.
 #'
+#' @return No value; this help topic documents the VESMS model.
+#' @examples
+#' subset(available_models(), model == "vesms")
+#'
 #' @name VESMS
 #' @aliases vesms VESMS
-#' @docType data
 #' @keywords models acoustics internal
 NULL
 

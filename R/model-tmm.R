@@ -131,9 +131,12 @@
 #' Waterman, P. C. (2009). T-matrix methods in acoustic scattering. *The
 #' Journal of the Acoustical Society of America*, **125**, 42-51.
 #'
+#' @return No value; this help topic documents the TMM model.
+#' @examples
+#' subset(available_models(), model == "tmm")
+#'
 #' @name TMM
 #' @aliases tmm TMM
-#' @docType data
 #' @keywords models acoustics internal
 NULL
 

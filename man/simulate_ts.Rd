@@ -108,7 +108,8 @@ c(length = 0.03, radius = 0.003)))}.
 
 Structured batch values should be wrapped in a list so that each candidate is
 preserved as one unit. For example, use
-\code{parameters = list(body_target = list(c(length = 0.02), c(length = 0.03))))}
+\code{parameters = list(body_target =
+list(c(length = 0.02), c(length = 0.03))))}
 when batching across multiple explicit \code{reforge()} targets.
 
 Convenience dimension aliases are also supported for compatible

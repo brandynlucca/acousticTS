@@ -16,4 +16,8 @@ invisibly returns \code{NULL}.
 \description{
 show(...) for FLS-class objects.
 }
+\examples{
+data(krill, package = "acousticTS")
+fls_show(krill)
+}
 \keyword{internal}

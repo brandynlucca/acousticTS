@@ -267,11 +267,13 @@
 #' (<i>Gadus morhua</i>). The Journal of the Acoustical Society of America, 96:
 #' 1661-1668.
 #'
+#' @return No value; this help topic documents the KRM model.
+#' @examples
+#' subset(available_models(), model == "krm")
+#'
 #' @name KRM
 #' @aliases krm KRM
-#' @docType data
 #' @keywords models acoustics internal
-#' @export
 NULL
 
 #' Initialize SBF-class object for KRM calculations.

@@ -16,4 +16,8 @@ invisibly returns \code{NULL}.
 \description{
 show(...) for SBF-class objects.
 }
+\examples{
+data(cod, package = "acousticTS")
+sbf_show(cod)
+}
 \keyword{internal}

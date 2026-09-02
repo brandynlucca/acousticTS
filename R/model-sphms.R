@@ -55,9 +55,12 @@
 #' Anderson, V.C. (1950). Sound scattering from a fluid sphere. The Journal of
 #' The Acoustical Society of America, 22: 426-431.
 #'
+#' @return No value; this help topic documents the SPHMS model.
+#' @examples
+#' subset(available_models(), model == "sphms")
+#'
 #' @name SPHMS
 #' @aliases sphms SPHMS
-#' @docType data
 #' @keywords models acoustics internal
 NULL
 

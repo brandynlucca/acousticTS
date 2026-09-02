@@ -35,6 +35,11 @@ onto \eqn{[a,b]}, and the weights are scaled by \eqn{(b-a)/2}.
 This wrapper performs basic argument validation and calls the C++ routine
 to obtain nodes and weights with high accuracy for moderate \code{n}.
 }
+\examples{
+rule <- gauss_legendre(n = 4, a = 0, b = 1)
+sum(rule$weights * rule$nodes^2)
+
+}
 \references{
 Davis, P. J., & Rabinowitz, P. (2007). Methods of Numerical Integration
 (2nd ed.).

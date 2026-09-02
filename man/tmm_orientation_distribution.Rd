@@ -58,6 +58,15 @@ reused by \code{\link{tmm_average_orientation}} or
 defined here are distributions in \code{theta_body} itself rather than isotropic
 solid-angle distributions.
 }
+\examples{
+tmm_orientation_distribution(
+  distribution = "uniform",
+  lower = pi / 3,
+  upper = 2 * pi / 3,
+  n_theta = 7
+)
+
+}
 \seealso{
 \code{\link{tmm_average_orientation}},
 \code{\link{tmm_products}}

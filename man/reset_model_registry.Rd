@@ -16,3 +16,8 @@ Invisibly returns \code{NULL}.
 \description{
 Clear user-defined model registrations
 }
+\examples{
+if (interactive()) {
+  reset_model_registry()
+}
+}

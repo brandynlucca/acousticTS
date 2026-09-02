@@ -5,8 +5,15 @@
 \alias{Sphere}
 \alias{Sphere-class}
 \title{Spherical body shape}
+\value{
+An object of the \code{Sphere} S4 class.
+}
 \description{
 Spherical body shape
+}
+\examples{
+methods::getClass("Sphere")
+
 }
 \seealso{
 \code{\link{Shape}}

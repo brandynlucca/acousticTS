@@ -66,9 +66,12 @@
 #' zooplankton groups. II. Scattering models. \emph{The Journal of the
 #' Acoustical Society of America}, 103: 236-253.
 #'
+#' @return No value; this help topic documents the BBFM model.
+#' @examples
+#' subset(available_models(), model == "bbfm")
+#'
 #' @name BBFM
 #' @aliases bbfm BBFM
-#' @docType data
 #' @keywords models acoustics internal
 NULL
 

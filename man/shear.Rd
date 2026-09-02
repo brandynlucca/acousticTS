@@ -18,7 +18,7 @@ shear(K = NULL, E = NULL, nu = NULL)
 Shear modulus (G, Pa).
 }
 \description{
-#' Calculates the shear modulus (G) from two of the three other elastic
+Calculates the shear modulus (G) from two of the three other elastic
 moduli: bulk modulus (K), Young's modulus (E), or Poisson's ratio
 (\eqn{\nu}). Assumes 3D material properties.
 
@@ -26,5 +26,9 @@ The relationships used are:
 \deqn{G = \frac{3KE}{9K - E}}
 \deqn{G = \frac{3K(1 - 2\nu)}{2(1 + \nu)}}
 \deqn{G = \frac{E}{2(1 + \nu)}}
+}
+\examples{
+shear(K = 2.5e9, E = 3e9)
+
 }
 \keyword{elastic}

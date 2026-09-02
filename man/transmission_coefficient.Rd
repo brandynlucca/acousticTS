@@ -21,3 +21,8 @@ Pressure-amplitude transmission coefficient at normal incidence.
 \description{
 Plane wave/plane interface transmission coefficient
 }
+\examples{
+seawater <- data.frame(density = 1026, sound_speed = 1480)
+animal <- data.frame(density = 1050, sound_speed = 1530)
+transmission_coefficient(seawater, animal)
+}

@@ -27,4 +27,8 @@ The relationships used are:
 \deqn{E = 3K(1 - 2\nu)}
 \deqn{E = 2G(1 + \nu)}
 }
+\examples{
+young(K = 2.5e9, G = 1.1e9)
+
+}
 \keyword{elastic}

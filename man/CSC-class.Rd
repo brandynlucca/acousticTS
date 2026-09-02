@@ -5,6 +5,9 @@
 \alias{CSC}
 \alias{CSC-class}
 \title{Composite scatterer (CSC) object/class.}
+\value{
+An object of the \code{CSC} S4 class.
+}
 \description{
 A shared parent S4 class for composite scatterers that retain a primary body
 component together with one or more additional anatomically distinct
@@ -14,6 +17,10 @@ swimbladder-bearing fish and swimbladder-less fish represented as flesh plus
 backbone. It stores the primary body, a general component list, the shared
 model output slot, and shape metadata without implying any one specific
 resonant or elastic inclusion type.
+}
+\examples{
+methods::getClass("CSC")
+
 }
 \seealso{
 \link{Scatterer}, \link{SBF}, \link{BBF}

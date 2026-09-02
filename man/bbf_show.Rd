@@ -16,4 +16,26 @@ invisibly returns \code{NULL}.
 \description{
 show(...) for BBF-class objects.
 }
+\examples{
+body <- arbitrary(
+  x_body = c(0, 0.04, 0.08),
+  zU_body = c(0.001, 0.004, 0.001),
+  zL_body = c(-0.001, -0.004, -0.001)
+)
+backbone <- cylinder(
+  length_body = 0.06,
+  radius_body = 0.0008,
+  n_segments = 20
+)
+fish <- bbf_generate(
+  body_shape = body,
+  backbone_shape = backbone,
+  density_body = 1070,
+  sound_speed_body = 1570,
+  density_backbone = 1900,
+  sound_speed_longitudinal_backbone = 3500,
+  sound_speed_transversal_backbone = 1700
+)
+bbf_show(fish)
+}
 \keyword{internal}

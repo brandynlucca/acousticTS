@@ -167,9 +167,12 @@
 #' sound by spherical and elongated objects. The Journal of the Acoustical
 #' Society of America, 86: 1499-1510.
 #'
+#' @return No value; this help topic documents the HPA model.
+#' @examples
+#' subset(available_models(), model == "hpa")
+#'
 #' @name HP
 #' @aliases hpa HPA high_pass HIGH_PASS
-#' @docType data
 #' @keywords models acoustics internal
 NULL
 

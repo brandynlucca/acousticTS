@@ -56,6 +56,9 @@ the swimbladder x-axis origin and terminus are both held constant.}
 \code{"warn"} to keep the current warning behavior, \code{"error"} to fail fast for
 invalid internal geometries, or \code{"ignore"} to skip containment checks.}
 }
+\value{
+An updated object of class \code{SBF}.
+}
 \description{
 Resize a swimbladdered fish scatterer by rescaling the flesh body and the
 gas-filled swimbladder together or independently. Body and swimbladder
@@ -73,5 +76,8 @@ The \code{swimbladder_inflation_factor} scales only the bladder width and height
 (its length endpoints are held fixed) about the bladder's own center. The
 \code{containment} policy governs what happens when the swimbladder exceeds the
 body envelope.
+}
+\examples{
+methods::selectMethod("reforge", "SBF")
 }
 \keyword{internal}

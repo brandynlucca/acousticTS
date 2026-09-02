@@ -35,6 +35,10 @@
 #' @return Called for its side effect of drawing a plot; returns the input
 #'   invisibly.
 #'
+#' @examples
+#' data(krill, package = "acousticTS")
+#' plot(krill)
+#'
 #' @details
 #' This method dispatches to the relevant scatterer-class plotting helper:
 #' `cal_plot()`, `ess_plot()`, `sbf_plot()`, `bbf_plot()`, `fls_plot()`, or

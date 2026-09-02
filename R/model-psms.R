@@ -224,9 +224,12 @@
 #' GitHub repository:
 #' \url{https://github.com/MathieuandSpheroidalWaveFunctions/Prolate_swf}
 #'
+#' @return No value; this help topic documents the PSMS model.
+#' @examples
+#' subset(available_models(), model == "psms")
+#'
 #' @name PSMS
 #' @aliases psms PSMS
-#' @docType data
 #' @keywords models acoustics internal
 NULL
 

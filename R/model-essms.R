@@ -187,9 +187,12 @@
 #' Stanton, T.K. (1990). Sound scattering by spherical and elongated shelled
 #' bodies. The Journal of the Acoustical Society of America, 88: 1619-1633.
 #'
+#' @return No value; this help topic documents the ESSMS model.
+#' @examples
+#' subset(available_models(), model == "essms")
+#'
 #' @name ESSMS
 #' @aliases essms ESSMS
-#' @docType data
 #' @keywords models acoustics internal
 NULL
 

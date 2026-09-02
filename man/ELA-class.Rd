@@ -5,6 +5,9 @@
 \alias{ELA}
 \alias{ELA-class}
 \title{Elastic-based scatterer (ELA) object/class.}
+\value{
+An object of the \code{ELA} S4 class.
+}
 \description{
 A shared parent S4 class for elastic-based scatterers. The \code{ELA}-class
 collects the slots common to solid elastic targets such as calibration
@@ -12,6 +15,10 @@ spheres (\link{CAL}) and elastic-shelled targets (\link{ESS}), without
 implying a particular internal structure such as a shell or homogeneous
 elastic solid. See \link{Scatterer} for a more detailed description of the
 shared object organization.
+}
+\examples{
+methods::getClass("ELA")
+
 }
 \seealso{
 \link{Scatterer}, \link{CAL}, \link{ESS}

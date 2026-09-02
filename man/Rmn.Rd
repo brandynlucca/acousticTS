@@ -120,7 +120,7 @@ Rmn(m = 1, n = 1, c = 2, xi = 1.2, kind = 4)
 # Double precision (default)
 Rmn(m = 2, n = 3, c = 1, xi = 1.5)
 
-# Quad precision
+# Quad precision, when supported by the package build
 \dontrun{
 Rmn(m = 2, n = 3, c = 1, xi = 1.5, precision = "quad")
 }

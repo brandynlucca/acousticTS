@@ -66,9 +66,12 @@
 #' zooplankton groups. II. Scattering models. The Journal of the Acoustical
 #' Society of America, 103: 236-253.
 #'
+#' @return No value; this help topic documents the TRCM model.
+#' @examples
+#' subset(available_models(), model == "trcm")
+#'
 #' @name TRCM
 #' @aliases trcm TRCM
-#' @docType data
 #' @keywords models acoustics internal
 NULL
 

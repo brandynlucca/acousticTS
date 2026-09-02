@@ -46,7 +46,10 @@ because the edited profile is no longer guaranteed to preserve the canonical
 class geometry.
 }
 \examples{
-shape_obj <- cylinder(length_body = 0.05, radius_body = 0.003, n_segments = 80)
+shape_obj <- cylinder(
+  length_body = 0.05, radius_body = 0.003,
+  n_segments = 80
+)
 pinched_shape <- inflate_shape(
   shape_obj,
   x_range = c(0.015, 0.035),

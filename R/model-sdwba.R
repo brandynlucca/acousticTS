@@ -140,9 +140,12 @@
 #' zooplankton groups. II. Scattering models. The Journal of the Acoustical
 #' Society of America, 103, 236-253.
 #'
+#' @return No value; this help topic documents the SDWBA model.
+#' @examples
+#' subset(available_models(), model == "sdwba")
+#'
 #' @name SDWBA
 #' @aliases sdwba SDWBA sdwba_curved SDWBA_CURVED
-#' @docType data
 #' @keywords models acoustics internal
 NULL
 

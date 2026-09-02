@@ -5,6 +5,9 @@
 \alias{SBF}
 \alias{SBF-class}
 \title{Swimbladdered fish (SBF) object/class.}
+\value{
+An object of the \code{SBF} S4 class.
+}
 \description{
 A S4 class that provides slots to contain relevant animal metadata for
 parameterizing models for swimbladdered fish (SBF) that are partitioned into
@@ -13,6 +16,10 @@ comprise independent position matrices, material properties, orientations,
 and other relevant shape-related data and metadata. See
 \link{Scatterer} for a more detailed description on how
 this S4 object is organized.
+}
+\examples{
+methods::getClass("SBF")
+
 }
 \seealso{
 \link{Scatterer}

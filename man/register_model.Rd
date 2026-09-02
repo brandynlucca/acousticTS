@@ -41,3 +41,15 @@ Invisibly returns the normalized registry entry.
 \description{
 Register a user-defined target-strength model
 }
+\examples{
+if (interactive()) {
+  initialize_demo <- function(object, frequency, ...) object
+  solve_demo <- function(object) object
+  register_model(
+    "demo",
+    initialize = initialize_demo,
+    solver = solve_demo
+  )
+  unregister_model("demo")
+}
+}

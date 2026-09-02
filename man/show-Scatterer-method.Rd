@@ -16,4 +16,7 @@ invisibly returns \code{NULL}.
 \description{
 Generic function for show(...) for different scatterers.
 }
+\examples{
+show(cal_generate(material = "WC", n_segments = 20))
+}
 \keyword{internal}

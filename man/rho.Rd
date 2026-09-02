@@ -20,3 +20,8 @@ Density contrast, defined as
 \description{
 Calculate the density contrast (\eqn{\rho}) of a scattering boundary
 }
+\examples{
+seawater <- data.frame(density = 1026, sound_speed = 1480)
+animal <- data.frame(density = 1050, sound_speed = 1530)
+rho(seawater, animal)
+}

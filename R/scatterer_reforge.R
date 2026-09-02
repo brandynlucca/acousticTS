@@ -568,6 +568,9 @@ setGeneric(
 #' @param containment Containment policy for internal geometry checks. Use
 #'   `"warn"` to keep the current warning behavior, `"error"` to fail fast for
 #'   invalid internal geometries, or `"ignore"` to skip containment checks.
+#' @return An updated object of class `SBF`.
+#' @examples
+#' methods::selectMethod("reforge", "SBF")
 #' @keywords internal
 #' @export
 setMethod(
@@ -783,6 +786,8 @@ setMethod(
 #'   `"warn"` to keep the current warning behavior, `"error"` to fail fast for
 #'   invalid internal geometries, or `"ignore"` to skip containment checks.
 #' @return Modified BBF-class object.
+#' @examples
+#' methods::selectMethod("reforge", "BBF")
 #' @keywords internal
 #' @export
 setMethod(
@@ -1087,6 +1092,8 @@ setMethod(
 #'   Mutually exclusive with `scale`.
 #' @param n_segments Legacy alias for `n_segments_body`.
 #' @return Modified GAS-class object.
+#' @examples
+#' methods::selectMethod("reforge", "GAS")
 #' @seealso [reforge()]
 #' @keywords internal
 #' @export
@@ -1265,6 +1272,8 @@ setMethod(
 #'   internally. Mutually exclusive with \code{scale}.
 #' @param n_segments New number of discrete segments along the major axis.
 #' @return Modified CAL-class object.
+#' @examples
+#' methods::selectMethod("reforge", "CAL")
 #' @keywords internal
 #' @export
 setMethod(
@@ -1356,6 +1365,8 @@ setMethod(
 #' @param n_segments New number of discrete segments.  All columns of both the
 #'   shell and fluid position matrices are re-interpolated along the x-axis.
 #' @return Modified ESS-class object.
+#' @examples
+#' methods::selectMethod("reforge", "ESS")
 #' @keywords internal
 #' @export
 setMethod(
@@ -1517,6 +1528,10 @@ setMethod(
 #' @param length_radius_ratio_constant Legacy toggle controlling whether a
 #'   length-only resize also rescales radius.
 #' @param n_segments Legacy alias for `n_segments_body`.
+#'
+#' @return An updated object of class `FLS`.
+#' @examples
+#' methods::selectMethod("reforge", "FLS")
 #'
 #' @keywords internal
 #' @export

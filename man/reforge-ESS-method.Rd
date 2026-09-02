@@ -42,4 +42,7 @@ in \code{\link{ess_generate}}).  The underlying shape (sphere, prolate
 spheroid, cylinder, etc.) is preserved for both shell and fluid bodies;
 scaling is applied uniformly to all axes of each position matrix.
 }
+\examples{
+methods::selectMethod("reforge", "ESS")
+}
 \keyword{internal}

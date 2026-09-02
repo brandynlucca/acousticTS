@@ -5,8 +5,15 @@
 \alias{Cylinder}
 \alias{Cylinder-class}
 \title{Cylindrical body shape}
+\value{
+An object of the \code{Cylinder} S4 class.
+}
 \description{
 Cylindrical body shape
+}
+\examples{
+methods::getClass("Cylinder")
+
 }
 \seealso{
 \code{\link{Shape}}

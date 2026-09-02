@@ -32,4 +32,8 @@ The relationships used are:
 \deqn{\lambda = \frac{3K(3K - E)}{9K - E}}
 \deqn{\lambda = \frac{G(E - 2G)}{3G - E}}
 }
+\examples{
+lame(K = 2.5e9, G = 1.1e9)
+
+}
 \keyword{elastic}

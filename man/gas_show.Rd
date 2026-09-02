@@ -16,4 +16,10 @@ invisibly returns \code{NULL}.
 \description{
 show(...) for GAS_class objects
 }
+\examples{
+bubble <- gas_generate(
+  shape = sphere(radius_body = 0.005, n_segments = 20)
+)
+gas_show(bubble)
+}
 \keyword{internal}

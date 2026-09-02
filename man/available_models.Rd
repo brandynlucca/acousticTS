@@ -13,3 +13,6 @@ target-strength models.
 \description{
 List available target-strength models
 }
+\examples{
+head(available_models())
+}

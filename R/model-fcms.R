@@ -106,9 +106,12 @@
 #' Deformed cylinders. The Journal of the Acoustical Society of America, 85:
 #' 232-237.
 #'
+#' @return No value; this help topic documents the FCMS model.
+#' @examples
+#' subset(available_models(), model == "fcms")
+#'
 #' @name FCMS
 #' @aliases fcms FCMS
-#' @docType data
 #' @keywords models acoustics internal
 NULL
 

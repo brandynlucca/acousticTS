@@ -5,11 +5,18 @@
 \alias{FLS}
 \alias{FLS-class}
 \title{Fluid-like scatterer (FLS) object/class.}
+\value{
+An object of the \code{FLS} S4 class.
+}
 \description{
 A S4 class that provides slots to contain relevant metadata for scatterers
 similar to the surrounding fluid medium (i.e fluid-like) belonging to
 FLS-class scatterers. See \link{Scatterer} for a more
 detailed description on how this S4 object is organized.
+}
+\examples{
+methods::getClass("FLS")
+
 }
 \seealso{
 \link{Scatterer}

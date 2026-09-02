@@ -85,6 +85,10 @@
 #'
 #' @keywords scatterer_type
 #'
+#' @return An object from the `Scatterer` S4 class hierarchy.
+#' @examples
+#' methods::getClass("Scatterer")
+#'
 #' @name Scatterer
 #' @aliases Scatterer-class
 #' @rdname Scatterer-class
@@ -112,6 +116,10 @@ setClass("Scatterer",
 #' @seealso \link{Scatterer}, \link{CAL}, \link{ESS}
 #'
 #' @keywords scatterer_type
+#'
+#' @return An object of the `ELA` S4 class.
+#' @examples
+#' methods::getClass("ELA")
 #'
 #' @name ELA
 #' @aliases ELA-class
@@ -150,6 +158,10 @@ ELA <- setClass("ELA",
 #'
 #' @keywords scatterer_type
 #'
+#' @return An object of the `CSC` S4 class.
+#' @examples
+#' methods::getClass("CSC")
+#'
 #' @name CSC
 #' @aliases CSC-class
 #' @rdname CSC-class
@@ -182,6 +194,10 @@ CSC <- setClass("CSC",
 #'
 #' @keywords scatterer_type
 #'
+#' @return An object of the `GAS` S4 class.
+#' @examples
+#' methods::getClass("GAS")
+#'
 #' @name GAS
 #' @aliases GAS-class
 #' @rdname GAS-class
@@ -210,6 +226,10 @@ GAS <- setClass("GAS",
 #' @seealso \link{Scatterer}
 #'
 #' @keywords scatterer_type
+#'
+#' @return An object of the `SBF` S4 class.
+#' @examples
+#' methods::getClass("SBF")
 #'
 #' @name SBF
 #' @aliases SBF-class
@@ -241,6 +261,10 @@ SBF <- setClass("SBF",
 #'
 #' @keywords scatterer_type
 #'
+#' @return An object of the `BBF` S4 class.
+#' @examples
+#' methods::getClass("BBF")
+#'
 #' @name BBF
 #' @aliases BBF-class
 #' @rdname BBF-class
@@ -271,6 +295,10 @@ BBF <- setClass("BBF",
 #'
 #' @keywords scatterer_type
 #'
+#' @return An object of the `ESS` S4 class.
+#' @examples
+#' methods::getClass("ESS")
+#'
 #' @name ESS
 #' @aliases ESS-class
 #' @rdname ESS-class
@@ -299,6 +327,10 @@ ESS <- setClass("ESS",
 #'
 #' @keywords scatterer_type
 #'
+#' @return An object of the `CAL` S4 class.
+#' @examples
+#' methods::getClass("CAL")
+#'
 #' @name CAL
 #' @aliases CAL-class
 #' @rdname CAL-class
@@ -321,6 +353,10 @@ CAL <- setClass("CAL",
 #' @seealso \link{Scatterer}
 #'
 #' @keywords scatterer_type
+#'
+#' @return An object of the `FLS` S4 class.
+#' @examples
+#' methods::getClass("FLS")
 #'
 #' @name FLS
 #' @aliases FLS-class
