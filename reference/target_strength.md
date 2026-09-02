@@ -189,3 +189,28 @@ as `"DWBA"` and `"dwba"` resolve to the same family.
 [`TMM`](https://brandynlucca.github.io/acousticTS/reference/TMM.md),
 [`TRCM`](https://brandynlucca.github.io/acousticTS/reference/TRCM.md),
 [`SOEMS`](https://brandynlucca.github.io/acousticTS/reference/SOEMS.md)
+
+## Examples
+
+``` r
+calibration_sphere <- cal_generate(
+  material = "WC",
+  diameter = 38.1e-3,
+  n_segments = 40
+)
+target_strength(
+  calibration_sphere,
+  frequency = c(38e3, 120e3),
+  model = "calibration"
+)
+#> CAL-object
+#>  Calibration sphere
+#>  ID:Calibration sphere
+#> Material:WC
+#>  Sphere longitudinal sound speed:6853m/s
+#>  Sphere transversal sound speed:4171m/s
+#>  Sphere density:14900kg/m^3
+#> Diameter:0.0381 m
+#>  Radius:0.01905 m
+#> Propagation direction of the incident sound wave:3.142 radians
+```

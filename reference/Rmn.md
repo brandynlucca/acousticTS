@@ -193,12 +193,8 @@ Rmn(m = 2, n = 3, c = 1, xi = 1.5)
 #> [1] 0.04735489
 #> 
 
-# Quad precision
+# Quad precision, when supported by the package build
+if (FALSE) { # \dontrun{
 Rmn(m = 2, n = 3, c = 1, xi = 1.5, precision = "quad")
-#> $value
-#> [1] 0.01634468
-#> 
-#> $derivative
-#> [1] 0.04735489
-#> 
+} # }
 ```

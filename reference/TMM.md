@@ -7,6 +7,10 @@ the package as a `Sphere`, `OblateSpheroid`, `ProlateSpheroid`, or
 `Cylinder`, and supports rigid, pressure-release, and homogeneous
 penetrable fluid/gas interiors.
 
+## Value
+
+No value; this help topic documents the TMM model.
+
 ## Details
 
 This implementation is intentionally scoped to **single targets**. The
@@ -147,3 +151,11 @@ scattering. *The Journal of the Acoustical Society of America*, **125**,
 [`oblate_spheroid`](https://brandynlucca.github.io/acousticTS/reference/oblate_spheroid.md),
 [`prolate_spheroid`](https://brandynlucca.github.io/acousticTS/reference/prolate_spheroid.md),
 [`cylinder`](https://brandynlucca.github.io/acousticTS/reference/cylinder.md)
+
+## Examples
+
+``` r
+subset(available_models(), model == "tmm")
+#>     model slot  source persistent aliases
+#> tmm   tmm  TMM builtin      FALSE        
+```

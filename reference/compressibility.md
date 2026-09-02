@@ -1,4 +1,4 @@
-# Calculate she compressibility (\\\kappa\\) of a scattering boundary/interface.
+# Calculate the compressibility (\\\kappa\\) of a scattering boundary/interface.
 
 Calculates the compressibility contrast (\\\kappa\\) between a
 scattering interface and the surrounding medium. Compressibility is
@@ -33,3 +33,12 @@ compressibility(medium, target)
 ## Value
 
 Compressibility contrast (\\\kappa\\), dimensionless.
+
+## Examples
+
+``` r
+seawater <- data.frame(density = 1026, sound_speed = 1480)
+animal <- data.frame(density = 1050, sound_speed = 1530)
+compressibility(seawater, animal)
+#> [1] -0.08567913
+```

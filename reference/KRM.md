@@ -2,7 +2,7 @@
 
 Computes the far-field acoustic scattering amplitude and derived
 quantities for fish and similar elongated scatterers using the
-Kirchhoff–Ray Mode (KRM) approximation described by Clay and Horne
+Kirchhoff-Ray Mode (KRM) approximation described by Clay and Horne
 (1994). The KRM model is widely used in fisheries acoustics for
 estimating target strength, particularly for fish with gas-filled
 swimbladders.
@@ -12,6 +12,10 @@ contiguous cylindrical elements and computes the coherent sum of their
 scattered fields. Depending on frequency and element size, scattering
 from each segment is evaluated using either a low-frequency modal
 solution or a high-frequency Kirchhoff (ray-based) approximation.
+
+## Value
+
+No value; this help topic documents the KRM model.
 
 ## Usage
 
@@ -254,3 +258,11 @@ scattering assumptions,
 [`target_strength`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md),
 [`SBF`](https://brandynlucca.github.io/acousticTS/reference/SBF-class.md),
 [`FLS`](https://brandynlucca.github.io/acousticTS/reference/FLS-class.md)
+
+## Examples
+
+``` r
+subset(available_models(), model == "krm")
+#>     model slot  source persistent aliases
+#> krm   krm  KRM builtin      FALSE        
+```

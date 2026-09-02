@@ -56,3 +56,18 @@ register_model(
 ## Value
 
 Invisibly returns the normalized registry entry.
+
+## Examples
+
+``` r
+if (interactive()) {
+  initialize_demo <- function(object, frequency, ...) object
+  solve_demo <- function(object) object
+  register_model(
+    "demo",
+    initialize = initialize_demo,
+    solver = solve_demo
+  )
+  unregister_model("demo")
+}
+```

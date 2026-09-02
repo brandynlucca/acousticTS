@@ -84,3 +84,22 @@ A data frame with normalized orientation weights and class
 
 [`tmm_average_orientation`](https://brandynlucca.github.io/acousticTS/reference/tmm_average_orientation.md),
 [`tmm_products`](https://brandynlucca.github.io/acousticTS/reference/tmm_products.md)
+
+## Examples
+
+``` r
+tmm_orientation_distribution(
+  distribution = "uniform",
+  lower = pi / 3,
+  upper = 2 * pi / 3,
+  n_theta = 7
+)
+#>   theta_body phi_body    weights distribution
+#> 1   1.047198 3.141593 0.08333333      uniform
+#> 2   1.221730 3.141593 0.16666667      uniform
+#> 3   1.396263 3.141593 0.16666667      uniform
+#> 4   1.570796 3.141593 0.16666667      uniform
+#> 5   1.745329 3.141593 0.16666667      uniform
+#> 6   1.919862 3.141593 0.16666667      uniform
+#> 7   2.094395 3.141593 0.08333333      uniform
+```

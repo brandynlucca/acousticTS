@@ -50,7 +50,7 @@ where i and j identify media. The two interfaces are exterior-shell at
 r=a and shell-interior at r=b.
 
 ![ESSMS mode-wise boundary bookkeeping from the two shell radii to the
-exterior scattering coefficient.](essms-boundary-bookkeeping.png)
+exterior scattering coefficient.](essms-boundary-bookkeeping.svg)
 
 ESSMS mode-wise boundary bookkeeping from the two shell radii to the
 exterior scattering coefficient.

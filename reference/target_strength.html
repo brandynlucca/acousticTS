@@ -208,6 +208,30 @@ numerical control:</p>
 <code><a href="SOEMS.html">SOEMS</a></code></p></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">calibration_sphere</span> <span class="op">&lt;-</span> <span class="fu"><a href="cal_generate.html">cal_generate</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  material <span class="op">=</span> <span class="st">"WC"</span>,</span></span>
+<span class="r-in"><span>  diameter <span class="op">=</span> <span class="fl">38.1e-3</span>,</span></span>
+<span class="r-in"><span>  n_segments <span class="op">=</span> <span class="fl">40</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">target_strength</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">calibration_sphere</span>,</span></span>
+<span class="r-in"><span>  frequency <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">38e3</span>, <span class="fl">120e3</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  model <span class="op">=</span> <span class="st">"calibration"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> CAL-object</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Calibration sphere</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ID:Calibration sphere</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Material:WC</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Sphere longitudinal sound speed:6853m/s</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Sphere transversal sound speed:4171m/s</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Sphere density:14900kg/m^3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Diameter:0.0381 m</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Radius:0.01905 m</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Propagation direction of the incident sound wave:3.142 radians</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

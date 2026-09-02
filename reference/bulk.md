@@ -30,3 +30,10 @@ bulk(E = NULL, G = NULL, nu = NULL)
 ## Value
 
 Bulk modulus (K, Pa).
+
+## Examples
+
+``` r
+bulk(E = 3e9, G = 1.1e9)
+#> [1] 3666666667
+```

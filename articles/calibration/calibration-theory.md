@@ -232,7 +232,7 @@ outgoing partial wave is shifted relative to the free spherical
 solution.
 
 ![Calibration sphere phase-shift
-schematic](calibration-phase-shift-schematic.png)
+schematic](calibration-phase-shift-schematic.svg)
 
 Calibration sphere phase-shift schematic
 
@@ -314,7 +314,7 @@ convention \|f\_{\mathrm{bs}}\|^2 are identical after the form-function
 scaling is made explicit.
 
 ![Calibration sphere modal bookkeeping from partial waves to reported
-backscatter quantities.](calibration-modal-bookkeeping.png)
+backscatter quantities.](calibration-modal-bookkeeping.svg)
 
 Calibration sphere modal bookkeeping from partial waves to reported
 backscatter quantities.

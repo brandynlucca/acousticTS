@@ -22,3 +22,18 @@ unregister_model(name, remove_persisted = TRUE)
 ## Value
 
 Invisibly returns the removed canonical model name.
+
+## Examples
+
+``` r
+if (interactive()) {
+  initialize_demo <- function(object, frequency, ...) object
+  solve_demo <- function(object) object
+  register_model(
+    "demo",
+    initialize = initialize_demo,
+    solver = solve_demo
+  )
+  unregister_model("demo")
+}
+```

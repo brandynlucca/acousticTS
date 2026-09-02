@@ -5,6 +5,10 @@ a finite cylinder using the modal series solution, supporting various
 boundary conditions (rigid, pressure-release, liquid-filled, and
 gas-filled).
 
+## Value
+
+No value; this help topic documents the FCMS model.
+
 ## Usage
 
 This model is accessed via:
@@ -87,7 +91,7 @@ most practical cases.
 ## References
 
 Stanton, T.K. (1988). Sound scattering by cylinders of finite length. I.
-Fuid cylinders. The Journal of the Acoustical Society of America, 83:
+Fluid cylinders. The Journal of the Acoustical Society of America, 83:
 55-63.
 
 Stanton, T.K. (1989). Sound scattering by cylinders of finite length.
@@ -101,3 +105,11 @@ America, 85: 232-237.
 [`GAS`](https://brandynlucca.github.io/acousticTS/reference/GAS-class.md),
 [`Cylinder`](https://brandynlucca.github.io/acousticTS/reference/Cylinder-class.md),
 [`cylinder`](https://brandynlucca.github.io/acousticTS/reference/cylinder.md)
+
+## Examples
+
+``` r
+subset(available_models(), model == "fcms")
+#>      model slot  source persistent aliases
+#> fcms  fcms FCMS builtin      FALSE        
+```

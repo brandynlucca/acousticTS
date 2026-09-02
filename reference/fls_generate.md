@@ -71,7 +71,7 @@ fls_generate(
 
 - h_body:
 
-  Soundspeed contrast. This can either be a single value (i.e.
+  Sound-speed contrast. This can either be a single value (i.e.
   homogenous) or a vector of values (i.e. inhomogenous).
 
 - density_body:

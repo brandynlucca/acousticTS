@@ -83,6 +83,10 @@ Goodman and Stern (1962).</p>
 
 
     <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>No value; this help topic documents the ESSMS model.</p>
+    </div>
+    <div class="section level2">
     <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a></h2>
 
 
@@ -220,7 +224,7 @@ $$</p>
 
 
 
-<p><u><strong><code>C++</code></strong></u></p>
+<p><strong><code>C++</code></strong></p>
 <p>The computation for \(b_m\) was done in <code>C++</code> due to relatively large
 computational costs with increasing \(ka\) (and subsequently larger limits
 for \(m\)) and the efficiency in solving the systems of linear equations
@@ -235,7 +239,7 @@ directly, but it will raise a warning when a matrix is ill-conditioned. This
 is determined based on the pivot ratio from the calculated condition number.
 Partial pivoting and row-scaling are also incorporated to improve numerical
 stability and reduce the effect of high-leverage values in a matrix.</p>
-<p><u><strong>Modal Truncation</strong></u></p>
+<p><strong>Modal Truncation</strong></p>
 <p>The maximum number of terms for \(n\) is chosen as \(k_w a_{shell} +
 10\) (rounded to the nearest integer), which is sufficient for convergence in
 most practical cases.</p>
@@ -243,7 +247,7 @@ most practical cases.</p>
     <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
     <p>Anderson, V.C. (1950). Sound scattering from a fluid sphere. The Journal of
-The Acoustical Society of America, 22: 426–431.</p>
+The Acoustical Society of America, 22: 426-431.</p>
 <p>Gaunaurd, G.C., and Wertman, W. (1991). Transient acoustic scattering by
 fluid-loaded elastic shells. International Journal of Solids and Structures,
 27: 699-811.</p>
@@ -259,6 +263,14 @@ conditions,
 <code><a href="sphere.html">sphere</a></code></p></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="fu"><a href="available_models.html">available_models</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">model</span> <span class="op">==</span> <span class="st">"essms"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       model  slot  source persistent aliases</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> essms essms ESSMS builtin      FALSE        </span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

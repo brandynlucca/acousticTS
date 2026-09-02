@@ -18,3 +18,11 @@ reset_model_registry(remove_persisted = FALSE)
 ## Value
 
 Invisibly returns `NULL`.
+
+## Examples
+
+``` r
+if (interactive()) {
+  reset_model_registry()
+}
+```

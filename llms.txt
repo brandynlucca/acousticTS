@@ -391,7 +391,7 @@ material-property conversions.
 - [`transmission_coefficient()`](https://brandynlucca.github.io/acousticTS/reference/transmission_coefficient.md)
   : Plane wave/plane interface transmission coefficient
 - [`compressibility()`](https://brandynlucca.github.io/acousticTS/reference/compressibility.md)
-  : Calculate she compressibility (\\\kappa\\) of a scattering
+  : Calculate the compressibility (\\\kappa\\) of a scattering
   boundary/interface.
 - [`rho()`](https://brandynlucca.github.io/acousticTS/reference/rho.md)
   : Calculate the density contrast (\\\rho\\) of a scattering boundary

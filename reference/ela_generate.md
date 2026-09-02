@@ -70,3 +70,15 @@ used by solid-elastic models such as `TMM`.
 [`ELA`](https://brandynlucca.github.io/acousticTS/reference/ELA-class.md),
 [`CAL`](https://brandynlucca.github.io/acousticTS/reference/CAL-class.md),
 [`ESS`](https://brandynlucca.github.io/acousticTS/reference/ESS-class.md)
+
+## Examples
+
+``` r
+elastic_sphere <- sphere(radius_body = 0.01, n_segments = 40)
+ela_generate(
+  shape = elastic_sphere,
+  density_body = 7800,
+  sound_speed_longitudinal_body = 5900,
+  sound_speed_transversal_body = 3200
+)
+```

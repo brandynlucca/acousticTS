@@ -69,13 +69,6 @@ diagnostics ([Waterman 1969](#ref-Waterman_1969),
 - [Theory](https://brandynlucca.github.io/acousticTS/articles/tmm/tmm-theory.md):
   coefficient maps, boundary operators, and geometry-matched bases
 
-![The supported single-target TMM branches use spherical, spheroidal, or
-cylindrical coordinates according to target
-geometry.](tmm-branch-schematic.png)
-
-The supported single-target TMM branches use spherical, spheroidal, or
-cylindrical coordinates according to target geometry.
-
 ## References
 
 Waterman, P. C. 1969. “New Formulation of Acoustic Scattering.” *The

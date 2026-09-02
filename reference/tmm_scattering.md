@@ -54,3 +54,23 @@ corresponding differential cross section, and its level in dB.
 
 [`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md),
 [`tmm_average_orientation`](https://brandynlucca.github.io/acousticTS/reference/tmm_average_orientation.md)
+
+## Examples
+
+``` r
+target <- fls_generate(
+  shape = sphere(radius_body = 0.005, n_segments = 20),
+  g_body = 1,
+  h_body = 1
+)
+stored <- target_strength(
+  target,
+  frequency = 12e3,
+  model = "tmm",
+  boundary = "pressure_release",
+  store_t_matrix = TRUE
+)
+tmm_scattering(stored)
+#>   frequency                    f_scat   sigma_scat sigma_scat_dB
+#> 1     12000 -0.004474609+0.001246817i 2.157667e-05     -46.66015
+```

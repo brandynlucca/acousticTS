@@ -144,6 +144,18 @@ models such as <code>TMM</code>.</p>
     <div class="dont-index"><p><code><a href="ELA-class.html">ELA</a></code>, <code><a href="CAL-class.html">CAL</a></code>, <code><a href="ESS-class.html">ESS</a></code></p></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">elastic_sphere</span> <span class="op">&lt;-</span> <span class="fu"><a href="sphere.html">sphere</a></span><span class="op">(</span>radius_body <span class="op">=</span> <span class="fl">0.01</span>, n_segments <span class="op">=</span> <span class="fl">40</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">ela_generate</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  shape <span class="op">=</span> <span class="va">elastic_sphere</span>,</span></span>
+<span class="r-in"><span>  density_body <span class="op">=</span> <span class="fl">7800</span>,</span></span>
+<span class="r-in"><span>  sound_speed_longitudinal_body <span class="op">=</span> <span class="fl">5900</span>,</span></span>
+<span class="r-in"><span>  sound_speed_transversal_body <span class="op">=</span> <span class="fl">3200</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

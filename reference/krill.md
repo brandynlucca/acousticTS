@@ -51,3 +51,29 @@ target strength modeling.
   - `theta_units`: Unit of orientation.
 
   - `length_units`: Unit of length.
+
+## Value
+
+A pre-generated `FLS` scatterer object.
+
+## Examples
+
+``` r
+data("krill", package = "acousticTS")
+krill
+#> FLS-object
+#>  Fluid-like scatterer 
+#>  ID:Antarctic Euphausia superba (McGehee et al., 1998)
+#> Body dimensions:
+#>  Length:0.041 m(n = 14 cylinders)
+#>  Mean radius:0.0013 m
+#>  Max radius:0.002 m
+#> Shape parameters:
+#>  Defined shape:arbitrary
+#>  L/a ratio:20.1
+#>  Taper order:N/A
+#> Material properties:
+#>  g: 1.0357
+#>  h: 1.0279
+#> Body orientation (relative to transducer face/axis):1.571 radians
+```

@@ -188,12 +188,8 @@ Smn(m = 2, n = 3, c = 1, eta = 0.5, precision = "double")
 #> [1] 3.454326
 #> 
 
-# Quad precision
+# Quad precision, when supported by the package build
+if (FALSE) { # \dontrun{
 Smn(m = 2, n = 3, c = 1, eta = 0.5, precision = "quad")
-#> $value
-#> [1] 5.650368
-#> 
-#> $derivative
-#> [1] 3.454326
-#> 
+} # }
 ```

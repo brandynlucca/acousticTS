@@ -9,6 +9,10 @@ solution (ECMS). The backbone amplitude is then translated into the
 stored body coordinate frame using a phase factor based on the backbone
 centroid before the two complex amplitudes are summed.
 
+## Value
+
+No value; this help topic documents the BBFM model.
+
 ## Usage
 
 This model is accessed via:
@@ -70,3 +74,11 @@ America*, 86: 691-705.
 Stanton, T.K., Chu, D., and Wiebe, P.H. (1998). Sound scattering by
 several zooplankton groups. II. Scattering models. *The Journal of the
 Acoustical Society of America*, 103: 236-253.
+
+## Examples
+
+``` r
+subset(available_models(), model == "bbfm")
+#>      model slot  source persistent aliases
+#> bbfm  bbfm BBFM builtin      FALSE        
+```

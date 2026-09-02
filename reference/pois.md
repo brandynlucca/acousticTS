@@ -30,3 +30,10 @@ pois(K = NULL, E = NULL, G = NULL)
 ## Value
 
 Poisson's ratio (\\\nu\\), dimensionless.
+
+## Examples
+
+``` r
+pois(E = 3e9, G = 1.1e9)
+#> [1] 0.3636364
+```

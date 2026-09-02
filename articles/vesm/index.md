@@ -33,7 +33,7 @@ al. 2021](#ref-Khodabandeloo_2021); [Feuillade and Nero
 - Spherical `ESS` objects containing the elastic shell and inner
   gas-like fluid
 - Run-time viscous-layer density, sound speed, shear viscosity, bulk
-  viscosity, and thickness or radius
+  viscosity, and thickness or relaxation time
 - Configurable spherical modal truncation
 
 ### Main assumptions
@@ -55,8 +55,7 @@ al. 2021](#ref-Khodabandeloo_2021); [Feuillade and Nero
 ### Family pages
 
 - [Implementation](https://brandynlucca.github.io/acousticTS/articles/vesm/vesm-implementation.md):
-  building the layered object, required arguments, output, and
-  comparison
+  building the layered object, required arguments, and output
 - [Theory](https://brandynlucca.github.io/acousticTS/articles/vesm/vesm-theory.md):
   fields in all four regions and interface systems
 

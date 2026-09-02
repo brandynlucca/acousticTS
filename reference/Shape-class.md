@@ -9,6 +9,10 @@ generic
 [Scatterer](https://brandynlucca.github.io/acousticTS/reference/Scatterer-class.md)
 objects.
 
+## Value
+
+An object from the `Shape` S4 class hierarchy.
+
 ## Slots
 
 - `position_matrix`:
@@ -18,3 +22,23 @@ objects.
 - `shape_parameters`:
 
   A list of additional shape specifications
+
+## Examples
+
+``` r
+methods::getClass("Shape")
+#> Class "Shape" [package "acousticTS"]
+#> 
+#> Slots:
+#>                                         
+#> Name:   position_matrix shape_parameters
+#> Class:           matrix             list
+#> 
+#> Known Subclasses: 
+#> Class "Arbitrary", directly
+#> Class "Sphere", directly
+#> Class "ProlateSpheroid", directly
+#> Class "OblateSpheroid", directly
+#> Class "Cylinder", directly
+#> Class "PolynomialCylinder", by class "Cylinder", distance 2
+```

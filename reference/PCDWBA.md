@@ -7,6 +7,10 @@ uniformly bent or gently curved cylindrical bodies with tapered ends,
 but it can also operate on arbitrary fluid-like centerline profiles
 stored in `FLS` objects.
 
+## Value
+
+No value; this help topic documents the PCDWBA model.
+
 ## Usage
 
 This model is accessed via:
@@ -51,3 +55,11 @@ Acoustical Society of America*, 106, 1732-1743.
 Stanton, T.K. (1989). Sound scattering by cylinders of finite length.
 III. Deformed cylinders. *The Journal of the Acoustical Society of
 America*, 86, 691-705.
+
+## Examples
+
+``` r
+subset(available_models(), model == "pcdwba")
+#>         model   slot  source persistent aliases
+#> pcdwba pcdwba PCDWBA builtin      FALSE        
+```

@@ -30,3 +30,10 @@ young(K = NULL, G = NULL, nu = NULL)
 ## Value
 
 Young's modulus (E, Pa).
+
+## Examples
+
+``` r
+young(K = 2.5e9, G = 1.1e9)
+#> [1] 2877906977
+```

@@ -38,3 +38,10 @@ lame(K = NULL, E = NULL, G = NULL, nu = NULL)
 ## Value
 
 Lamé's first parameter (\\\lambda\\, Pa).
+
+## Examples
+
+``` r
+lame(K = 2.5e9, G = 1.1e9)
+#> [1] 1766666667
+```

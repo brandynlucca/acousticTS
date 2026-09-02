@@ -7,6 +7,10 @@ parameterized on `ESS` objects, where the `fluid` slot represents the
 inner gas sphere and the `shell` slot represents the elastic shell. The
 external viscous layer is supplied as model-specific arguments.
 
+## Value
+
+No value; this help topic documents the VESMS model.
+
 ## Details
 
 When `radius_viscous` and `viscous_thickness` are both omitted, the
@@ -90,3 +94,11 @@ model for describing enhanced-frequency resonance scattering from fish.
 Anson, D.S., and Chivers, R.C. (1993). An irregular frequencies solution
 to acoustic scattering by elastic spheres. *The Journal of the
 Acoustical Society of America*, 93, 118-123.
+
+## Examples
+
+``` r
+subset(available_models(), model == "vesms")
+#>       model  slot  source persistent aliases
+#> vesms vesms VESMS builtin      FALSE        
+```

@@ -5,6 +5,10 @@ by combining the exact finite-cylinder modal-series kernel with the
 equivalent coherent-length correction used for uniformly bent cylinders
 near normal incidence.
 
+## Value
+
+No value; this help topic documents the BCMS model.
+
 ## Usage
 
 This model is accessed via:
@@ -53,3 +57,11 @@ Stanton, T.K., Chu, D., Wiebe, P.H., and Clay, C.S. (1993). Average
 echoes from randomly oriented random-length finite cylinders:
 zooplankton models. *The Journal of the Acoustical Society of America*,
 94: 3463-3472.
+
+## Examples
+
+``` r
+subset(available_models(), model == "bcms")
+#>      model slot  source persistent aliases
+#> bcms  bcms BCMS builtin      FALSE        
+```

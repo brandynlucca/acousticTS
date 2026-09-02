@@ -14,6 +14,29 @@ shells. See
 [Scatterer](https://brandynlucca.github.io/acousticTS/reference/Scatterer-class.md)
 for a more detailed description on how this S4 object is organized.
 
+## Value
+
+An object of the `CAL` S4 class.
+
 ## See also
 
 [Scatterer](https://brandynlucca.github.io/acousticTS/reference/Scatterer-class.md)
+
+## Examples
+
+``` r
+methods::getClass("CAL")
+#> Class "CAL" [package "acousticTS"]
+#> 
+#> Slots:
+#>                                                                           
+#> Name:             model             body shape_parameters         metadata
+#> Class:             list             list             list             list
+#>                        
+#> Name:  model_parameters
+#> Class:             list
+#> 
+#> Extends: 
+#> Class "ELA", directly
+#> Class "Scatterer", by class "ELA", distance 2
+```

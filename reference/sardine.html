@@ -143,6 +143,10 @@ archived <code>echoSMs</code> resource set
 (<a href="https://github.com/ices-tools-dev/echoSMs" class="external-link">https://github.com/ices-tools-dev/echoSMs</a>).</p>
     </div>
     <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>A pre-generated <code>SBF</code> scatterer object.</p>
+    </div>
+    <div class="section level2">
     <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a></h2>
     <p>Conti, S.G., and Demer, D.A. (2003). Wide-bandwidth acoustical
 characterization of anchovy and sardine from reverberation measurements in
@@ -150,6 +154,29 @@ an echoic tank. <em>ICES Journal of Marine Science</em>, 60, 617-624.
 <a href="https://doi.org/10.1016/S1054-3139%2803%2900056-0" class="external-link">doi:10.1016/S1054-3139(03)00056-0</a></p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"sardine"</span>, package <span class="op">=</span> <span class="st">"acousticTS"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">sardine</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> SBF-object</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Swimbladdered fish (SBF) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  ID:Sardinops sagax caerulea (Conti and Demer, 2003)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Body dimensions:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Length:0.21 m(n = 379 cylinders)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Mean radius:0.0155 m</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Max radius:0.0214 m</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bladder dimensions:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Length:0.085 m(n = 154 cylinders)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Mean radius:0.0048 m</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Max radius:0.0078 m</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Body material properties:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Density: 1070 kg m^-3 | Sound speed: 1570 m s^-1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bladder fluid material properties:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  Density: 1.24 kg m^-3 | Sound speed: 345 m s^-1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Body orientation (relative to transducer face/axis):1.571 radians</span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

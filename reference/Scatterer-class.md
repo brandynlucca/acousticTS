@@ -7,6 +7,10 @@ swimbladders
 and fluid-like crustaceans
 ([FLS](https://brandynlucca.github.io/acousticTS/reference/FLS-class.md)).
 
+## Value
+
+An object from the `Scatterer` S4 class hierarchy.
+
 ## Slots
 
 - `metadata`:
@@ -105,3 +109,25 @@ and fluid-like crustaceans
 
 - `Swimbladdered fish`
   ([SBF](https://brandynlucca.github.io/acousticTS/reference/SBF-class.md))
+
+## Examples
+
+``` r
+methods::getClass("Scatterer")
+#> Class "Scatterer" [package "acousticTS"]
+#> 
+#> Slots:
+#>                                         
+#> Name:          metadata model_parameters
+#> Class:             list             list
+#> 
+#> Known Subclasses: 
+#> Class "ELA", directly
+#> Class "CSC", directly
+#> Class "GAS", directly
+#> Class "FLS", directly
+#> Class "ESS", by class "ELA", distance 2
+#> Class "CAL", by class "ELA", distance 2
+#> Class "BBF", by class "CSC", distance 2
+#> Class "SBF", by class "GAS", distance 2
+```

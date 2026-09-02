@@ -80,12 +80,11 @@ invisibly.
 
 ## Details
 
-This method dispatches to the relevant scatterer-class plotting helper:
-`cal_plot()`, `ess_plot()`, `sbf_plot()`, `bbf_plot()`, `fls_plot()`, or
-`gas_plot()`. The supported `type` values therefore depend on what has
-been stored on the object. For example, `type = "model"` requires the
-object to already contain model output, and `type = "scattering"`
-currently applies only to stored `TMM` results.
+Plotting behavior is selected from the object's class. The supported
+`type` values therefore depend on what has been stored on the object.
+For example, `type = "model"` requires the object to already contain
+model output, and `type = "scattering"` currently applies only to stored
+`TMM` results.
 
 ## See also
 
@@ -93,3 +92,12 @@ currently applies only to stored `TMM` results.
 [`target_strength()`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md),
 [`tmm_scattering()`](https://brandynlucca.github.io/acousticTS/reference/tmm_scattering.md),
 [`tmm_scattering_grid()`](https://brandynlucca.github.io/acousticTS/reference/tmm_scattering_grid.md)
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+data("krill", package = "acousticTS")
+plot(krill)
+} # }
+```

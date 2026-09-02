@@ -238,11 +238,6 @@ so equivalently:
 
 \xi_1 = \left\[1 - \left(\frac{b}{a}\right)^2\right\]^{-1/2}.
 
-![Meridional-plane geometry for the prolate spheroidal TMM
-branch.](tmm-prolate-coordinate-schematic.png)
-
-Meridional-plane geometry for the prolate spheroidal TMM branch.
-
 ### Spheroidal modal representation
 
 In a homogeneous region, the separated pressure field is written as the

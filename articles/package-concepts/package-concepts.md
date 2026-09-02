@@ -16,7 +16,7 @@ also lets a physical target be reused across compatible models without
 reconstructing it for every calculation.
 
 ![Conceptual
-layers](package-concepts-architecture.png)[](https://brandynlucca.github.io/acousticTS/articles/building-shapes/building-shapes.md "Shape concepts")[](https://brandynlucca.github.io/acousticTS/articles/building-scatterers/building-scatterers.md "Scatterer concepts")[](https://brandynlucca.github.io/acousticTS/articles/running-models/running-models.md "Model execution")
+layers](package-concepts-architecture.svg)[](https://brandynlucca.github.io/acousticTS/articles/building-shapes/building-shapes.md "Shape concepts")[](https://brandynlucca.github.io/acousticTS/articles/building-scatterers/building-scatterers.md "Scatterer concepts")[](https://brandynlucca.github.io/acousticTS/articles/running-models/running-models.md "Model execution")
 
 Select **Shape**, **Scatterer**, or **Model** in the figure to open the
 corresponding practical guide.

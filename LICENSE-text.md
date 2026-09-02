@@ -1,6 +1,6 @@
 # License
 
-    YEAR: 2022
+    YEAR: 2026
     COPYRIGHT HOLDER: Brandyn Lucca
     =======
                         GNU GENERAL PUBLIC LICENSE

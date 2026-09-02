@@ -11,6 +11,29 @@ class. See
 [Scatterer](https://brandynlucca.github.io/acousticTS/reference/Scatterer-class.md)
 for a more detailed description on how this S4 object is organized.
 
+## Value
+
+An object of the `ESS` S4 class.
+
 ## See also
 
 [Scatterer](https://brandynlucca.github.io/acousticTS/reference/Scatterer-class.md)
+
+## Examples
+
+``` r
+methods::getClass("ESS")
+#> Class "ESS" [package "acousticTS"]
+#> 
+#> Slots:
+#>                                                                           
+#> Name:             shell            fluid            model             body
+#> Class:             list             list             list             list
+#>                                                          
+#> Name:  shape_parameters         metadata model_parameters
+#> Class:             list             list             list
+#> 
+#> Extends: 
+#> Class "ELA", directly
+#> Class "Scatterer", by class "ELA", distance 2
+```

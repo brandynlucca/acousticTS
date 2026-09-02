@@ -4,6 +4,10 @@ Calculates the far-field scattering amplitude and related quantities
 elastic shelled sphere using the modal series solution, as described by
 Goodman and Stern (1962).
 
+## Value
+
+No value; this help topic documents the ESSMS model.
+
 ## Usage
 
 This model is accessed via:
@@ -114,7 +118,7 @@ P_m(\cos\theta) \\ \phantom{f\_{bs}} = -\frac{i}{k} \sum\_{m=0}^{\infty}
 
 ## Implementation
 
-***`C++`***
+**`C++`**
 
 The computation for \\b_m\\ was done in `C++` due to relatively large
 computational costs with increasing \\ka\\ (and subsequently larger
@@ -134,7 +138,7 @@ calculated condition number. Partial pivoting and row-scaling are also
 incorporated to improve numerical stability and reduce the effect of
 high-leverage values in a matrix.
 
-***Modal Truncation***
+**Modal Truncation**
 
 The maximum number of terms for \\n\\ is chosen as \\k_w a\_{shell} +
 10\\ (rounded to the nearest integer), which is sufficient for
@@ -143,7 +147,7 @@ convergence in most practical cases.
 ## References
 
 Anderson, V.C. (1950). Sound scattering from a fluid sphere. The Journal
-of The Acoustical Society of America, 22: 426–431.
+of The Acoustical Society of America, 22: 426-431.
 
 Gaunaurd, G.C., and Wertman, W. (1991). Transient acoustic scattering by
 fluid-loaded elastic shells. International Journal of Solids and
@@ -161,3 +165,11 @@ elastic-shelled scattering relates to other boundary conditions,
 [`ESS`](https://brandynlucca.github.io/acousticTS/reference/ESS-class.md),
 [`Sphere`](https://brandynlucca.github.io/acousticTS/reference/Sphere-class.md),
 [`sphere`](https://brandynlucca.github.io/acousticTS/reference/sphere.md)
+
+## Examples
+
+``` r
+subset(available_models(), model == "essms")
+#>       model  slot  source persistent aliases
+#> essms essms ESSMS builtin      FALSE        
+```

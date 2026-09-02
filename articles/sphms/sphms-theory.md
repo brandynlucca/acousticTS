@@ -30,15 +30,6 @@ normal-velocity continuity. Elastic solids and shells require additional
 displacement and traction conditions and are treated by `SOEMS` and
 `ESSMS`.
 
-![SPHMS spherical-coordinate and partial-wave schematic, showing the
-boundary at r=a, the polar angle \theta, and the radial basis functions
-used inside and outside the
-sphere.](sphms-coordinate-geometry-clean.png)
-
-SPHMS spherical-coordinate and partial-wave schematic, showing the
-boundary at r=a, the polar angle \theta, and the radial basis functions
-used inside and outside the sphere.
-
 The boundary condition is imposed at r = a, the incident and scattered
 fields are expanded in spherical partial waves outside the sphere, and
 the interior field is expanded in regular spherical waves inside the

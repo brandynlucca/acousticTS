@@ -1,6 +1,6 @@
 # Calculate the shear modulus (G)
 
-\#' Calculates the shear modulus (G) from two of the three other elastic
+Calculates the shear modulus (G) from two of the three other elastic
 moduli: bulk modulus (K), Young's modulus (E), or Poisson's ratio
 (\\\nu\\). Assumes 3D material properties.
 
@@ -30,3 +30,10 @@ shear(K = NULL, E = NULL, nu = NULL)
 ## Value
 
 Shear modulus (G, Pa).
+
+## Examples
+
+``` r
+shear(K = 2.5e9, E = 3e9)
+#> [1] 1153846154
+```

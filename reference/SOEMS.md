@@ -3,6 +3,10 @@
 Calculates the far-field scattering amplitude and related quantities for
 a solid elastic (calibration) sphere using a modal series solution.
 
+## Value
+
+No value; this help topic documents the calibration model.
+
 ## Usage
 
 This model is accessed via:
@@ -83,3 +87,11 @@ and Fisheries for Scotland.
 [`CAL`](https://brandynlucca.github.io/acousticTS/reference/CAL-class.md),
 [`Sphere`](https://brandynlucca.github.io/acousticTS/reference/Sphere-class.md),
 [`sphere`](https://brandynlucca.github.io/acousticTS/reference/sphere.md)
+
+## Examples
+
+``` r
+subset(available_models(), model == "calibration")
+#>                   model        slot  source persistent aliases
+#> calibration calibration calibration builtin      FALSE   soems
+```

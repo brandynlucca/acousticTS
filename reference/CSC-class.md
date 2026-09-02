@@ -9,8 +9,31 @@ plus backbone. It stores the primary body, a general component list, the
 shared model output slot, and shape metadata without implying any one
 specific resonant or elastic inclusion type.
 
+## Value
+
+An object of the `CSC` S4 class.
+
 ## See also
 
 [Scatterer](https://brandynlucca.github.io/acousticTS/reference/Scatterer-class.md),
 [SBF](https://brandynlucca.github.io/acousticTS/reference/SBF-class.md),
 [BBF](https://brandynlucca.github.io/acousticTS/reference/BBF-class.md)
+
+## Examples
+
+``` r
+methods::getClass("CSC")
+#> Class "CSC" [package "acousticTS"]
+#> 
+#> Slots:
+#>                                                                           
+#> Name:             model             body shape_parameters       components
+#> Class:             list             list             list             list
+#>                                         
+#> Name:          metadata model_parameters
+#> Class:             list             list
+#> 
+#> Extends: "Scatterer"
+#> 
+#> Known Subclasses: "BBF"
+```

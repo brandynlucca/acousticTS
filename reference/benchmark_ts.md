@@ -22,6 +22,10 @@ An object of class `list` of length 2.
 benchmark tables archived at
 <https://github.com/ices-tools-dev/echoSMs>.
 
+## Value
+
+A list of benchmark target-strength spectra.
+
 ## References
 
 Jech, J.M., Horne, J.K., Chu, D., Demer, D.A., Francis, D.T.I., Gorska,
@@ -34,3 +38,13 @@ ecosystem research. *The Journal of the Acoustical Society of America*,
 Jech, M., and Macaulay, G. `echoSMs`: Acoustic backscattering models
 used in aquatic ecosystem research. GitHub repository:
 <https://github.com/ices-tools-dev/echoSMs>
+
+## Examples
+
+``` r
+data("benchmark_ts", package = "acousticTS")
+str(benchmark_ts, max.level = 1)
+#> List of 2
+#>  $ frequency_spectra:List of 4
+#>  $ angle_spectra    :List of 3
+```

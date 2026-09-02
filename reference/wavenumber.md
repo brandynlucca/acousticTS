@@ -26,3 +26,10 @@ wavenumber(frequency, sound_speed)
 
 Calculates the acoustic wavenumber (k) based on the sound speed of
 water.
+
+## Examples
+
+``` r
+wavenumber(frequency = 38e3, sound_speed = 1500)
+#> [1] 159.174
+```

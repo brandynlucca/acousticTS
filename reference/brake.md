@@ -64,7 +64,11 @@ head(extract(bent_obj, c("body", "rpos", "z")))
 extract(bent_obj, c("shape_parameters", "radius_curvature_ratio"))
 #> [1] 5
 
-bent_body <- brake(extract(obj, "body"), radius_curvature = 0.35, mode = "measurement")
+bent_body <- brake(
+  extract(obj, "body"),
+  radius_curvature = 0.35,
+  mode = "measurement"
+)
 head(bent_body$rpos["z", ])
 #> [1] -0.0008924776 -0.0008484293 -0.0008054944 -0.0007636730 -0.0007229653
 #> [6] -0.0006833713

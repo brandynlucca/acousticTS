@@ -108,21 +108,6 @@ Eliminating q gives:
 Thus \xi_1 is the natural shape parameter of the spheroid, while q sets
 the absolute scale.
 
-![PSMS coordinate geometry in the meridional plane, showing focal
-points, the boundary surface \xi = \xi_1, and representative \xi- and
-\eta-coordinate curves.](psms-coordinate-geometry-clean.png)
-
-PSMS coordinate geometry in the meridional plane, showing focal points,
-the boundary surface \xi = \xi_1, and representative \xi- and
-\eta-coordinate curves.
-
-![Why rigid and pressure-release PSMS remain mode-local while the
-fluid-filled case introduces overlap-driven coupling between
-degrees.](psms-mode-coupling-schematic.png)
-
-Why rigid and pressure-release PSMS remain mode-local while the
-fluid-filled case introduces overlap-driven coupling between degrees.
-
 The boundary is imposed on \xi = \xi_1, with the focal points at \pm q
 fixing the prolate geometry and the semi-axes a and b setting the
 physical scale. In the rigid and pressure-release cases, one exterior
@@ -131,13 +116,6 @@ effectively local. In the fluid-filled and gas-filled cases, the
 interior and exterior reduced frequencies differ, so the angular bases
 no longer match exactly and the overlap integrals become the mechanism
 that couples degrees together.
-
-![Projection of exterior angular modes onto the interior spheroidal
-basis in the fluid-filled PSMS
-system.](psms-overlap-projection-schematic.png)
-
-Projection of exterior angular modes onto the interior spheroidal basis
-in the fluid-filled PSMS system.
 
 The projection step is the part of the interior-fluid derivation that
 makes the PSMS algebra noticeably harder. The exterior angular basis is

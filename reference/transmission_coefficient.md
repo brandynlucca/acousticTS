@@ -27,3 +27,12 @@ transmission_coefficient(interface1, interface2, mode = "DWBA")
 ## Value
 
 Pressure-amplitude transmission coefficient at normal incidence.
+
+## Examples
+
+``` r
+seawater <- data.frame(density = 1026, sound_speed = 1480)
+animal <- data.frame(density = 1050, sound_speed = 1530)
+transmission_coefficient(seawater, animal)
+#> [1] 1.028167
+```

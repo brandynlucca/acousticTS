@@ -7,6 +7,10 @@ extends the deterministic DWBA by incorporating stochastic phase
 variability to account for unresolved structural complexity and dynamic
 variability in biological scatterers.
 
+## Value
+
+No value; this help topic documents the SDWBA model.
+
 ## Usage
 
 This model is accessed via:
@@ -150,3 +154,11 @@ scattering assumptions,
 [`target_strength`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md),
 [`FLS`](https://brandynlucca.github.io/acousticTS/reference/FLS-class.md),
 [`DWBA`](https://brandynlucca.github.io/acousticTS/reference/DWBA.md)
+
+## Examples
+
+``` r
+subset(available_models(), model == "sdwba")
+#>       model  slot  source persistent aliases
+#> sdwba sdwba SDWBA builtin      FALSE        
+```

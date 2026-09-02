@@ -2,6 +2,10 @@
 
 Prolate spheroidal modal series (PSMS) solution
 
+## Value
+
+No value; this help topic documents the PSMS model.
+
 ## Details
 
 Calculates the far-field scattering amplitude and related quantities for
@@ -170,7 +174,7 @@ The maximum values of \\m\\ and \\n\\ can be estimated by:
 
 ## Implementation
 
-***`C++`***
+**`C++`**
 
 This model is primarily implemented in `C++` since it leverages the
 `Fortran` algorithm developed by Arnie Lee van Buren and Jeffery
@@ -188,7 +192,7 @@ backscatter parity to avoid recomputing one of the two angular
 \\S\_{mn}\\ matrices, and solves the fluid-filled kernel system natively
 in the requested arithmetic.
 
-***Precision***
+**Precision**
 
 Another consideration is the floating point precision inherent to `R`.
 `R` uses double-precision, which stores numeric values in a 64-bit
@@ -232,3 +236,11 @@ Functions." GitHub repository:
 [`prolate_spheroid`](https://brandynlucca.github.io/acousticTS/reference/prolate_spheroid.md),
 [`Smn`](https://brandynlucca.github.io/acousticTS/reference/Smn.md),
 [`Rmn`](https://brandynlucca.github.io/acousticTS/reference/Rmn.md)
+
+## Examples
+
+``` r
+subset(available_models(), model == "psms")
+#>      model slot  source persistent aliases
+#> psms  psms PSMS builtin      FALSE        
+```

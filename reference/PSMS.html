@@ -77,6 +77,10 @@
 
 
     <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>No value; this help topic documents the PSMS model.</p>
+    </div>
+    <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Calculates the far-field scattering amplitude and related quantities for a
 prolate spheroid using the modal series solution, supporting various boundary
@@ -248,7 +252,7 @@ $$</p>
 
 
 
-<p><u><strong><code>C++</code></strong></u></p>
+<p><strong><code>C++</code></strong></p>
 <p>This model is primarily implemented in <code>C++</code> since it leverages the
 <code>Fortran</code> algorithm developed by Arnie Lee van Buren and Jeffery
 Boisvert. Another reason this is primarily written in <code>C++</code> is due to
@@ -263,7 +267,7 @@ burden compared to a pure <code>R</code> implementation. The current implementat
 uses compiled matrix algebra throughout, applies backscatter parity to avoid
 recomputing one of the two angular \(S_{mn}\) matrices, and solves the
 fluid-filled kernel system natively in the requested arithmetic.</p>
-<p><u><strong>Precision</strong></u></p>
+<p><strong>Precision</strong></p>
 <p>Another consideration is the floating point precision inherent to <code>R</code>.
 <code>R</code> uses double-precision, which stores numeric values in a 64-bit
 format. At low \(m_{\max}\) and \(n_{\max}\), there is lower numerical
@@ -300,6 +304,14 @@ GitHub repository:
 <code><a href="prolate_spheroid.html">prolate_spheroid</a></code>, <code><a href="Smn.html">Smn</a></code>, <code><a href="Rmn.html">Rmn</a></code></p></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="fu"><a href="available_models.html">available_models</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">model</span> <span class="op">==</span> <span class="st">"psms"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      model slot  source persistent aliases</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> psms  psms PSMS builtin      FALSE        </span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

@@ -7,6 +7,10 @@ properties may be contrasts or absolute (contrasts derived relative to
 seawater). Full equations and boundary-condition details are documented
 in the SPHMS vignette.
 
+## Value
+
+No value; this help topic documents the SPHMS model.
+
 ## Usage
 
 This model is accessed via:
@@ -55,7 +59,7 @@ is:
 ## References
 
 Anderson, V.C. (1950). Sound scattering from a fluid sphere. The Journal
-of The Acoustical Society of America, 22: 426–431.
+of The Acoustical Society of America, 22: 426-431.
 
 ## See also
 
@@ -65,3 +69,11 @@ of The Acoustical Society of America, 22: 426–431.
 [`ESS`](https://brandynlucca.github.io/acousticTS/reference/ESS-class.md),
 [`Sphere`](https://brandynlucca.github.io/acousticTS/reference/Sphere-class.md),
 [`sphere`](https://brandynlucca.github.io/acousticTS/reference/sphere.md)
+
+## Examples
+
+``` r
+subset(available_models(), model == "sphms")
+#>       model  slot  source persistent aliases
+#> sphms sphms SPHMS builtin      FALSE        
+```

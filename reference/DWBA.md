@@ -5,6 +5,10 @@ distorted wave Born approximation (DWBA). Frequencies in Hz; sound speed
 in m/s; density in kg/m^3. Material properties may be provided as
 contrasts or absolute values (contrasts derived relative to seawater).
 
+## Value
+
+No value; this help topic documents the DWBA model.
+
 ## Usage
 
 This model is accessed via:
@@ -72,7 +76,7 @@ surrounding fluid (\\c_1\\, \\\rho_1\\) where:
 \approx 1. \$\$
 
 In practice, \\c_2\\ and \\\rho_2\\ within 5% of \\c_1\\ and \\\rho_1\\,
-respectively, can be considered to be sufficent for the weak scattering
+respectively, can be considered to be sufficient for the weak scattering
 assumption whereby:
 
 \$\$ \|h - 1\| \le 0.05, \quad \|g - 1\| \le 0.05. \$\$
@@ -122,3 +126,11 @@ See the boundary conditions documentation for more details on how weak
 scattering relates to other boundary conditions,
 [`target_strength`](https://brandynlucca.github.io/acousticTS/reference/target_strength.md),
 [`FLS`](https://brandynlucca.github.io/acousticTS/reference/FLS-class.md)
+
+## Examples
+
+``` r
+subset(available_models(), model == "dwba")
+#>      model slot  source persistent aliases
+#> dwba  dwba DWBA builtin      FALSE        
+```

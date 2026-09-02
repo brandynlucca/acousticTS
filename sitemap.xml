@@ -116,12 +116,10 @@
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/arbitrary.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/available_models.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/bbf_generate.html</loc></url>
-<url><loc>https://brandynlucca.github.io/acousticTS/reference/bbf_show.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/benchmark_ts.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/brake.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/bulk.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/cal_generate.html</loc></url>
-<url><loc>https://brandynlucca.github.io/acousticTS/reference/cal_show.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/canonicalize_shape.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/cod.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/compressibility.html</loc></url>
@@ -130,13 +128,10 @@
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/degrees.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/ela_generate.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/ess_generate.html</loc></url>
-<url><loc>https://brandynlucca.github.io/acousticTS/reference/ess_show.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/extract.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/flip_shape.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/fls_generate.html</loc></url>
-<url><loc>https://brandynlucca.github.io/acousticTS/reference/fls_show.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/gas_generate.html</loc></url>
-<url><loc>https://brandynlucca.github.io/acousticTS/reference/gas_show.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/gauss_legendre.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/hc.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/hs.html</loc></url>
@@ -169,7 +164,6 @@
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/rho.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/sardine.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/sbf_generate.html</loc></url>
-<url><loc>https://brandynlucca.github.io/acousticTS/reference/sbf_show.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/shear.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/show-Scatterer-method.html</loc></url>
 <url><loc>https://brandynlucca.github.io/acousticTS/reference/simulate_ts.html</loc></url>

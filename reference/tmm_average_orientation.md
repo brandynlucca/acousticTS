@@ -66,3 +66,24 @@ orientation-averaged target strength.
 ## See also
 
 [`tmm_scattering`](https://brandynlucca.github.io/acousticTS/reference/tmm_scattering.md)
+
+## Examples
+
+``` r
+target <- fls_generate(
+  shape = sphere(radius_body = 0.005, n_segments = 20),
+  g_body = 1,
+  h_body = 1
+)
+stored <- target_strength(
+  target,
+  frequency = 12e3,
+  model = "tmm",
+  boundary = "pressure_release",
+  store_t_matrix = TRUE
+)
+distribution <- tmm_orientation_distribution(n_theta = 5)
+tmm_average_orientation(stored, distribution = distribution)
+#>   frequency     sigma_bs        TS
+#> 1     12000 2.157667e-05 -46.66015
+```

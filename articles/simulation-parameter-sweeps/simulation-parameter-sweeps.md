@@ -273,7 +273,7 @@ sim_parallel <- simulate_ts(
     theta_body = function() runif(1, 0.5 * pi, pi)
   ),
   parallel = TRUE,
-  n_cores = 4
+  n_cores = 2
 )
 ```
 

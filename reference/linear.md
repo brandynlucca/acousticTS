@@ -34,3 +34,11 @@ db(value, coefficient = 10)
 
 For `linear`, returns the value converted to the linear domain. For
 `db`, returns the value converted to the logarithmic (dB) domain.
+
+## Examples
+
+``` r
+sigma_bs <- linear(-40)
+db(sigma_bs)
+#> [1] -40
+```

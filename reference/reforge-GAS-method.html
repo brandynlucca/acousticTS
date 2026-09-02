@@ -173,6 +173,155 @@ radius control.</p>
     <div class="dont-index"><p><code><a href="reforge.html">reforge()</a></code></p></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">methods</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/methods/getMethod.html" class="external-link">selectMethod</a></span><span class="op">(</span><span class="st">"reforge"</span>, <span class="st">"GAS"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> new("MethodDefinition", .Data = function (object, ...) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     .local &lt;- function (object, body_scale = NULL, body_target = NULL, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         isometric_body = TRUE, n_segments_body = NULL, scale = NULL, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         radius_target = NULL, n_segments = NULL) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         if (!is.null(scale) &amp;&amp; !is.null(radius_target)) {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             stop("Specify only one of scale or radius_target, not both.", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 call. = FALSE)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         if (!is.null(scale) &amp;&amp; (!is.numeric(scale) || length(scale) != </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             1 || scale &lt;= 0)) {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             stop("'scale' must be a single positive number.", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 call. = FALSE)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         if (!is.null(radius_target) &amp;&amp; (!is.numeric(radius_target) || </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             length(radius_target) != 1 || radius_target &lt;= 0)) {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             stop("'radius_target' must be a single positive number.", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 call. = FALSE)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         if (!is.null(n_segments) &amp;&amp; !is.null(n_segments_body)) {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             stop("Specify only one of n_segments or n_segments_body, not both.", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 call. = FALSE)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         n_seg &lt;- n_segments_body %||% n_segments</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         if (!is.null(n_seg) &amp;&amp; (!is.numeric(n_seg) || length(n_seg) != </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             1 || n_seg &lt; 1)) {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             stop("'n_segments' must be a single positive integer.", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 call. = FALSE)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         if (!is.null(scale) || !is.null(radius_target)) {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             if (!is.null(body_scale) || !is.null(body_target)) {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 stop(paste0("Use either the legacy scale/radius_target arguments or the new ", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                   "body_scale/body_target arguments, not both."), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                   call. = FALSE)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         if (!is.null(body_scale) &amp;&amp; !is.null(body_target)) {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             stop("Specify only one of body_scale or body_target, not both.", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 call. = FALSE)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         if (is.null(body_scale) &amp;&amp; is.null(body_target) &amp;&amp; is.null(scale) &amp;&amp; </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             is.null(radius_target) &amp;&amp; is.null(n_seg)) {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             stop(paste0("Must specify at least one of: body_scale, body_target, scale, ", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 "radius_target, n_segments, or n_segments_body."), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 call. = FALSE)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         body &lt;- acousticTS::extract(object, "body")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         shape &lt;- acousticTS::extract(object, "shape_parameters")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         rpos &lt;- body$rpos</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         shape_type &lt;- shape$shape</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         current_length &lt;- shape$length %||% (max(rpos[, 1]) - </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             min(rpos[, 1]))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         current_max_r &lt;- max(shape$radius, na.rm = TRUE)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         current_n_seg &lt;- shape$n_segments %||% (nrow(rpos) - </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             1L)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         if (!is.null(radius_target)) {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             body_scale &lt;- radius_target/current_max_r</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         else if (!is.null(scale)) {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             body_scale &lt;- scale</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         body_dims &lt;- c(length = current_length, radius = current_max_r)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         body_target &lt;- .validate_dimensions_target(body_target, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             "body_target", c("length", "radius"))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         body_scale_lst &lt;- .reforge_scale_vector(body_scale, body_target, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             body_dims)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         body_scales &lt;- .validate_dimension_scaling(dims = body_scale_lst$scale, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             dims_name = paste0("body", body_scale_lst$suffix), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             valid_dims = c("length", "radius"), isometry = isometric_body, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             iso_name = "isometric_body")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         new_length &lt;- if (is.null(body_scales)) {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             current_length</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         else {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             current_length * unname(body_scales["length"])</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         new_radius &lt;- if (is.null(body_scales)) {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             current_max_r</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         else {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             current_max_r * unname(body_scales["radius"])</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         new_n_seg &lt;- if (!is.null(n_seg)) </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             as.integer(n_seg)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         else as.integer(current_n_seg)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         new_shape &lt;- .reforge_gas_canonical_shape(shape_type, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             new_length, new_radius, new_n_seg)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         if (!is.null(new_shape)) {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             rebuilt &lt;- gas_generate(shape = new_shape, g_fluid = body$g, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 h_fluid = body$h, theta_body = body$theta)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             methods::slot(object, "body")$rpos &lt;- acousticTS::extract(rebuilt, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 "body")$rpos</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             methods::slot(object, "body")$radius &lt;- acousticTS::extract(rebuilt, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 "body")$radius</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             methods::slot(object, "shape_parameters") &lt;- acousticTS::extract(rebuilt, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 "shape_parameters")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         else {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             if (!is.null(n_seg)) {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 rpos &lt;- .resample_rpos(rpos, new_n_seg + 1L)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             length_ratio &lt;- new_length/current_length</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             radius_ratio &lt;- new_radius/current_max_r</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             x_anchor &lt;- min(rpos[, 1], na.rm = TRUE)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             rpos[, 1] &lt;- x_anchor + (rpos[, 1] - x_anchor) * </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 length_ratio</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             radius_cols &lt;- intersect(colnames(rpos), c("y", "zU", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 "zL"))</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             for (col in radius_cols) {</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 rpos[, col] &lt;- rpos[, col] * radius_ratio</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             methods::slot(object, "body")$rpos &lt;- rpos</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             methods::slot(object, "body")$radius &lt;- shape$radius * </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 radius_ratio</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             methods::slot(object, "shape_parameters")$radius &lt;- shape$radius * </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                 radius_ratio</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             methods::slot(object, "shape_parameters")$length &lt;- new_length</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             methods::slot(object, "shape_parameters")$n_segments &lt;- new_n_seg</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         return(object)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     }</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     .local(object, ...)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> }, target = new("signature", .Data = "GAS", names = "object", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     package = "acousticTS"), defined = new("signature", .Data = "GAS", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     names = "object", package = "acousticTS"), generic = "reforge")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;bytecode: 0x55e96d19d370&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: namespace:acousticTS&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"target")</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> An object of class “signature”</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> object </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  "GAS" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"defined")</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> An object of class “signature”</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> object </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  "GAS" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"generic")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "reforge"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"generic")attr(,"package")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "acousticTS"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "MethodDefinition"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")attr(,"package")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "methods"</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

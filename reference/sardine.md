@@ -85,9 +85,36 @@ NOAA Fisheries KRM model reference collection
 (<https://www.fisheries.noaa.gov/data-tools/krm-model>) and the archived
 `echoSMs` resource set (<https://github.com/ices-tools-dev/echoSMs>).
 
+## Value
+
+A pre-generated `SBF` scatterer object.
+
 ## References
 
 Conti, S.G., and Demer, D.A. (2003). Wide-bandwidth acoustical
 characterization of anchovy and sardine from reverberation measurements
 in an echoic tank. *ICES Journal of Marine Science*, 60, 617-624.
 [doi:10.1016/S1054-3139(03)00056-0](https://doi.org/10.1016/S1054-3139%2803%2900056-0)
+
+## Examples
+
+``` r
+data("sardine", package = "acousticTS")
+sardine
+#> SBF-object
+#>  Swimbladdered fish (SBF) 
+#>  ID:Sardinops sagax caerulea (Conti and Demer, 2003)
+#> Body dimensions:
+#>  Length:0.21 m(n = 379 cylinders)
+#>  Mean radius:0.0155 m
+#>  Max radius:0.0214 m
+#> Bladder dimensions:
+#>  Length:0.085 m(n = 154 cylinders)
+#>  Mean radius:0.0048 m
+#>  Max radius:0.0078 m
+#> Body material properties:
+#>  Density: 1070 kg m^-3 | Sound speed: 1570 m s^-1
+#> Bladder fluid material properties:
+#>  Density: 1.24 kg m^-3 | Sound speed: 345 m s^-1
+#> Body orientation (relative to transducer face/axis):1.571 radians
+```

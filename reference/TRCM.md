@@ -16,6 +16,10 @@ shape effects on the directivity pattern. For a fuller derivation and
 implementation discussion, see
 `vignette("trcm-theory", package = "acousticTS")`.
 
+## Value
+
+No value; this help topic documents the TRCM model.
+
 ## Usage
 
 This model is accessed via:
@@ -81,3 +85,11 @@ Acoustical Society of America, 103: 236-253.
 [`FLS`](https://brandynlucca.github.io/acousticTS/reference/FLS-class.md),
 [`Cylinder`](https://brandynlucca.github.io/acousticTS/reference/Cylinder-class.md),
 [`cylinder`](https://brandynlucca.github.io/acousticTS/reference/cylinder.md)
+
+## Examples
+
+``` r
+subset(available_models(), model == "trcm")
+#>      model slot  source persistent aliases
+#> trcm  trcm TRCM builtin      FALSE        
+```

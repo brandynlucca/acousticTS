@@ -9,7 +9,30 @@ flesh-plus-backbone model development and future extensions where
 additional internal structures may need to be carried alongside the
 body.
 
+## Value
+
+An object of the `BBF` S4 class.
+
 ## See also
 
 [Scatterer](https://brandynlucca.github.io/acousticTS/reference/Scatterer-class.md),
 [CSC](https://brandynlucca.github.io/acousticTS/reference/CSC-class.md)
+
+## Examples
+
+``` r
+methods::getClass("BBF")
+#> Class "BBF" [package "acousticTS"]
+#> 
+#> Slots:
+#>                                                                           
+#> Name:          backbone            model             body shape_parameters
+#> Class:             list             list             list             list
+#>                                                          
+#> Name:        components         metadata model_parameters
+#> Class:             list             list             list
+#> 
+#> Extends: 
+#> Class "CSC", directly
+#> Class "Scatterer", by class "CSC", distance 2
+```

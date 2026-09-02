@@ -13,7 +13,7 @@ give each modified variant a distinct name, and record what the
 transformation represents.
 
 ![Shape
-manipulation](shape-manipulation-schematic.png)[](https://brandynlucca.github.io/acousticTS/reference/brake.md "brake()")[](https://brandynlucca.github.io/acousticTS/reference/reforge.md "reforge()")
+manipulation](shape-manipulation-schematic.svg)[](https://brandynlucca.github.io/acousticTS/reference/brake.md "brake()")[](https://brandynlucca.github.io/acousticTS/reference/reforge.md "reforge()")
 
 Select
 [`brake()`](https://brandynlucca.github.io/acousticTS/reference/brake.md)

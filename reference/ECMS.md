@@ -10,6 +10,10 @@ within the broader elastic-based `ELA` family, with the elastic-cylinder
 properties stored on the shell slot. Legacy `FLS`-class cylinders are
 also accepted as geometry carriers for backward compatibility.
 
+## Value
+
+No value; this help topic documents the ECMS model.
+
 ## Usage
 
 This model is accessed via:
@@ -71,3 +75,11 @@ Gorska, N., Ona, E., and Korneliussen, R. (2005). Acoustic
 backscattering by Atlantic mackerel as being representative of fish that
 lack a swimbladder. Backscattering by individual fish. *ICES Journal of
 Marine Science*, 62: 984-995.
+
+## Examples
+
+``` r
+subset(available_models(), model == "ecms")
+#>      model slot  source persistent aliases
+#> ecms  ecms ECMS builtin      FALSE        
+```

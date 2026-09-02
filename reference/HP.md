@@ -15,6 +15,10 @@ bent cylinders. Two implementations are available: the Johnson (1977)
 formulation for fluid spheres, and the Stanton (1989) generalization for
 spheres, prolate spheroids, and cylinders.
 
+## Value
+
+No value; this help topic documents the HPA model.
+
 ## Usage
 
 This model is accessed via:
@@ -149,3 +153,11 @@ revisited. The Journal of the Acoustical Society of America, 63: 626.
 Stanton, T.K. (1989). Simple approximate formulas for backscattering of
 sound by spherical and elongated objects. The Journal of the Acoustical
 Society of America, 86: 1499-1510.
+
+## Examples
+
+``` r
+subset(available_models(), model == "hpa")
+#>     model slot  source persistent   aliases
+#> hpa   hpa  HPA builtin      FALSE high_pass
+```

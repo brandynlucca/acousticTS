@@ -103,6 +103,14 @@ speed (m/s) values for a boundary/interface (2)</p></dd>
     <p>Pressure-amplitude transmission coefficient at normal incidence.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">seawater</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>density <span class="op">=</span> <span class="fl">1026</span>, sound_speed <span class="op">=</span> <span class="fl">1480</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">animal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>density <span class="op">=</span> <span class="fl">1050</span>, sound_speed <span class="op">=</span> <span class="fl">1530</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">transmission_coefficient</span><span class="op">(</span><span class="va">seawater</span>, <span class="va">animal</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1.028167</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
