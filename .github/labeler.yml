@@ -1,0 +1,40 @@
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "README.md"
+          - "NEWS.md"
+          - "man/**"
+          - "vignettes/**"
+          - "pkgdown/**"
+          - "_pkgdown.yml"
+
+compiled-code:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/**"
+
+models:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "R/model-*.R"
+
+tests:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "tests/**"
+
+automation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".github/**"
+
+dependencies:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "DESCRIPTION"
+
+data:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "data/**"
+          - "data-raw/**"

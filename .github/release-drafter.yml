@@ -1,0 +1,46 @@
+name-template: "acousticTS $RESOLVED_VERSION"
+tag-template: "v.$RESOLVED_VERSION"
+tag-prefix: "v."
+
+categories:
+  - type: pre-exclude
+    when:
+      label: skip-changelog
+  - title: Breaking changes
+    semver-increment: major
+    when:
+      labels:
+        - breaking
+  - title: New features
+    semver-increment: minor
+    when:
+      labels:
+        - enhancement
+  - title: Bug fixes
+    semver-increment: patch
+    when:
+      labels:
+        - bug
+  - title: Documentation
+    semver-increment: patch
+    when:
+      labels:
+        - documentation
+  - title: Maintenance
+    semver-increment: patch
+    when:
+      labels:
+        - automation
+        - compiled-code
+        - data
+        - dependencies
+        - models
+        - tests
+  - type: version-resolver
+    semver-increment: patch
+
+change-template: "- $TITLE (#$NUMBER) @$AUTHOR"
+template: |
+  ## What's Changed
+
+  $CHANGES
