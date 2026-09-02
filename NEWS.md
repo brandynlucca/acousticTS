@@ -1,3 +1,25 @@
+## What's Changed
+* Update DESCRIPTION by @brandynlucca in https://github.com/brandynlucca/acousticTS/pull/49
+* Reorganize and reformat `pkgdown` documentation by @brandynlucca in https://github.com/brandynlucca/acousticTS/pull/50
+* Address plotting bug for `FLS`-class objects by @brandynlucca in https://github.com/brandynlucca/acousticTS/pull/50
+* Adjust `pkgdown` documentation by @brandynlucca in https://github.com/brandynlucca/acousticTS/pull/50
+* Fix compilation-related warnings and bugs when running the `Rhub` testing suite by @brandynlucca in https://github.com/brandynlucca/acousticTS/pull/51
+* Modified `GitHub Actions` workflows to include additional containers and checks by @brandynlucca in https://github.com/brandynlucca/acousticTS/pull/51
+* Documentation styling and tidying by @brandynlucca in https://github.com/brandynlucca/acousticTS/pull/51
+
+**Full Changelog**: https://github.com/brandynlucca/acousticTS/compare/v.2.0.1...v.2.0.2
+
+# acousticTS 2.0.1
+
+## What's Changed
+* Enhance and apply bug-fixes to `Scatterer-reforge` and other shape manipulation methods by @brandynlucca in https://github.com/brandynlucca/acousticTS/pull/41, https://github.com/brandynlucca/acousticTS/pull/43,  https://github.com/brandynlucca/acousticTS/pull/48
+* Improve C++ backend for T-matrix methods by @brandynlucca in https://github.com/brandynlucca/acousticTS/pull/45, https://github.com/brandynlucca/acousticTS/pull/47
+* Implemented and tweaked various C++ internals for greater flexibility and adaptability for future model releases, such as the current (very) experimental elastic-shelled PSMS model  by @brandynlucca in https://github.com/brandynlucca/acousticTS/pull/44
+* Improve `pkgdown` documentation by @brandynlucca in https://github.com/brandynlucca/acousticTS/pull/45, https://github.com/brandynlucca/acousticTS/pull/46, https://github.com/brandynlucca/acousticTS/pull/47
+
+
+**Full Changelog**: https://github.com/brandynlucca/acousticTS/compare/v.2026.03.0...v.2.0.1
+
 # acousticTS 2026.3.0
 
 ## What's Changed

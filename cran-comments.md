@@ -2,15 +2,11 @@
 
 0 errors | 0 warnings | 1 note
 
-* This is a new submission.
-* The local Windows check could not verify the current time. This is an
-  external clock/network availability note.
+* New submission.
 
 ## Test environments
 
 * Local Windows 11 x64 (R 4.5.2)
-    * `R CMD build`
-    * `R CMD check --as-cran`
 * Local WSL (Ubuntu 26.04 LTS, R 4.5.2)
 * Remote RStudio Server (Linux x86_64, R 4.5.2)
 * Google Cloud Workstation (Linux container environment, R 4.5.2)
@@ -39,6 +35,7 @@
     * gcc13
     * gcc14
     * gcc15
+    * gcc16
     * intel
     * linux (R-devel)
     * lto
@@ -56,8 +53,9 @@
     * vnu
     * windows (R-devel)    
 
-## Note on R-devel
-* Some additional experimental R-devel environments encountered upstream dependency installation failures under the current R-devel toolchain, not failures in acousticTS itself.
+## Note on R-hub `rchk`
+
+The R-hub `rchk` job exits non-zero because its wrapper treats protection-balance diagnostics emitted for Rcpp's `Armor` and `Shield` helper headers as fatal. These diagnostics point to the installed Rcpp headers, not the package-authored C or C++ code. The acousticTS package contains no direct `PROTECT()` or `UNPROTECT()` calls. The additional "too many states" and `objdump` diagnostics are documented by `rchk` as ignorable. No package-level change is available or appropriate for these upstream diagnostics.
 
 ## Reverse dependencies
 
