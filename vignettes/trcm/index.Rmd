@@ -42,22 +42,34 @@ acousticTS:::.model_family_overview(
   ),
   best_for = c(
     "Acoustically large, locally cylindrical fluid-like targets",
-    "Interpreting high-frequency interference between reflected and transmitted paths",
+    paste(
+      "Interpreting high-frequency interference between reflected and",
+      "transmitted paths"
+    ),
     "Fast comparison with finite-cylinder modal calculations"
   ),
   supports = c(
     "Cylindrical `FLS` scatterers with density and sound-speed contrasts",
-    "Straight or uniformly curved centerline geometry represented by the current `TRCM` interface",
+    paste(
+      "Straight or uniformly curved centerline geometry represented by the",
+      "current `TRCM` interface"
+    ),
     "Monostatic complex amplitude, cross-section, and target strength"
   ),
   assumptions = c(
     "A high-frequency ray regime and locally circular cross-section",
     "Only the two leading coherent ray paths are retained",
     "No low-order modal resonances or full internal reverberation series",
-    "Finite-length and curvature effects enter through approximate coherence factors"
+    paste(
+      "Finite-length and curvature effects enter through approximate",
+      "coherence factors"
+    )
   ),
   reading = c(
-    "[Implementation](trcm-implementation.html): geometry, output, and reference comparisons",
+    paste(
+      "[Implementation](trcm-implementation.html): geometry, output, and",
+      "reference comparisons"
+    ),
     "[Theory](trcm-theory.html): ray paths, interference, and axial directivity"
   )
 )

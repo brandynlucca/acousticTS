@@ -53,7 +53,10 @@ shape when local morphology is important to the calculation.
 ```{r echo=FALSE, results='asis'}
 acousticTS:::.vignette_static_figure(
   src = "building-shapes-spectrum.png",
-  alt = "Geometric representations ranging from canonical shapes to arbitrary segmented bodies"
+  alt = paste(
+    "Geometric representations ranging from canonical shapes to arbitrary",
+    "segmented bodies"
+  )
 )
 ```
 
@@ -130,7 +133,10 @@ bounds. Some arbitrary shapes also contain `w`, the transverse span in the
 ```{r echo=FALSE, results='asis'}
 acousticTS:::.vignette_static_figure(
   src = "building-shapes-coordinates.png",
-  alt = "Stored coordinate conventions for spheres, cylinders, prolate spheroids, and arbitrary profiles"
+  alt = paste(
+    "Stored coordinate conventions for spheres, cylinders, prolate",
+    "spheroids, and arbitrary profiles"
+  )
 )
 ```
 

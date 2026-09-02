@@ -22,6 +22,7 @@ CXX17FLAGS=${CXX17FLAGS:-$("$r_command" CMD config CXX17FLAGS)}
 quad_objects=
 quad_cppflags=-DACOUSTICTS_HAVE_QUADMATH=0
 fc_heap_flags=
+fc_prolate_flags=
 
 makevars_template=${ACOUSTICTS_MAKEVARS_TEMPLATE:-Makevars.in}
 makevars_output=${ACOUSTICTS_MAKEVARS_OUTPUT:-Makevars}
@@ -56,6 +57,18 @@ else
     echo no
 fi
 
+# GCC 16 snapshots can crash in the SLP optimization pass while compiling
+# prolate_swf.f90 at -O2. Limit the workaround to that compiler series and
+# this source file; later compilers can use their normal optimization flags.
+fc_version=$(
+    eval "$FC -dumpfullversion -dumpversion" 2>/dev/null || true
+)
+case "$fc_version" in
+    16|16.*)
+        fc_prolate_flags=-fno-tree-slp-vectorize
+        ;;
+esac
+
 cat > "$configure_tmp/conftest.cpp" <<'EOF'
 #include <quadmath.h>
 #include <complex>
@@ -74,7 +87,8 @@ printf '%s' 'checking for a compatible native binary128 C++/Fortran backend... '
 if test "${ACOUSTICTS_DISABLE_QUAD:-0}" != 1 && (
     cd "$configure_tmp"
     eval "$FC $FFLAGS $fc_heap_flags -cpp -c param_quad.f90 -o param_quad.o" >fortran.log 2>&1
-    eval "$FC $FFLAGS $fc_heap_flags -cpp -DUSE_QUAD -c prolate_swf.f90 -o prolate_swf_quad.o" >>fortran.log 2>&1
+    eval "$FC $FFLAGS $fc_heap_flags $fc_prolate_flags -cpp -DUSE_QUAD \
+        -c prolate_swf.f90 -o prolate_swf_quad.o" >>fortran.log 2>&1
     eval "$CXX17 $CXX17STD $CXX17FLAGS -c conftest.cpp -o conftest.o" >cxx.log 2>&1
 ); then
     quad_objects='param_quad.o prolate_swf_quad.o'
@@ -89,6 +103,7 @@ sed \
     -e "s|@QUAD_CPPFLAGS@|$quad_cppflags|g" \
     -e "s|@QUAD_OBJECTS@|$quad_objects|g" \
     -e "s|@FC_HEAP_FLAGS@|$fc_heap_flags|g" \
+    -e "s|@FC_PROLATE_FLAGS@|$fc_prolate_flags|g" \
     "$srcdir/src/$makevars_template" > "$srcdir/src/$makevars_output"
 
 exit 0

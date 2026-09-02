@@ -30,7 +30,7 @@ material properties enter the interface conditions.
 
 ```{r echo=FALSE, results='asis'}
 acousticTS:::.vignette_static_figure(
-  src = "material-property-pipeline.svg",
+  src = "material-property-pipeline.png",
   alt = "Material property pipeline"
 )
 ```

@@ -118,7 +118,8 @@ test_that("validation registry helper branches reject invalid inputs cleanly", {
     "Composite, layered, and transition-matrix families",
     fixed = TRUE
   )
-  expect_equal(acousticTS:::.validation_family_meta("calibration")$display[[1]], "SOEMS")
+  calibration_meta <- acousticTS:::.validation_family_meta("calibration")
+  expect_equal(calibration_meta$display[[1]], "SOEMS")
   expect_equal(
     acousticTS:::.validation_family_validation("essms"),
     paste0(

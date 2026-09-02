@@ -37,14 +37,21 @@ acousticTS:::.model_family_overview(
   ),
   core_idea = paste(
     "Calculate the flesh-body contribution with `DWBA`, calculate the backbone",
-    "with `ECMS`, translate both amplitudes into one body-fixed phase reference,",
+    "with `ECMS`, translate both amplitudes into one body-fixed phase",
+    "reference,",
     "and add them coherently. This separates mechanisms emphasized in",
     "swimbladder-less fish models [@Gorska_2005; @Stanton_1998_1]."
   ),
   best_for = c(
     "Swimbladder-less fish with explicit body and backbone geometry",
-    "Studying interference between weak-fluid flesh and an elastic internal component",
-    "A transparent first-order composite approximation before a coupled solver is available"
+    paste(
+      "Studying interference between weak-fluid flesh and an elastic",
+      "internal component"
+    ),
+    paste(
+      "A transparent first-order composite approximation before a coupled",
+      "solver is available"
+    )
   ),
   supports = c(
     "`BBF` objects constructed from separate body and backbone `Shape` objects",
@@ -55,12 +62,27 @@ acousticTS:::.model_family_overview(
     "The flesh remains within the `DWBA` weak-scattering regime",
     "The backbone is represented by the canonical `ECMS` cylinder solution",
     "Centroid translation is sufficient to place the component phases",
-    "No shadowing, repeated rescattering, or coupled embedded-cylinder boundary solve"
+    paste(
+      "No shadowing, repeated rescattering, or coupled embedded-cylinder",
+      "boundary solve"
+    )
   ),
   reading = c(
-    "[Implementation](bbfm-implementation.html): constructing `BBF` objects, component output, and reconstruction checks",
-    "[Theory](bbfm-theory.html): component amplitudes, phase translation, and interference",
-    "[Combining components](../combining-components/combining-components.html): requirements for coherent and incoherent sums"
+    paste(
+      "[Implementation](bbfm-implementation.html): constructing `BBF`",
+      "objects, component output, and reconstruction checks"
+    ),
+    paste(
+      "[Theory](bbfm-theory.html): component amplitudes, phase translation,",
+      "and interference"
+    ),
+    paste(
+      paste0(
+        "[Combining components](../combining-components/",
+        "combining-components.html):"
+      ),
+      "requirements for coherent and incoherent sums"
+    )
   )
 )
 ```

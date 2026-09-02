@@ -235,7 +235,7 @@
 .vignette_clickable_figure_specs <- function() {
   list(
     getting_started_workflow = list(
-      image = "getting-started-workflow.svg",
+      image = "getting-started-workflow.png",
       alt = "Getting started workflow",
       areas = list(
         list(

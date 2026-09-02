@@ -41,13 +41,22 @@ acousticTS:::.model_family_overview(
   ),
   best_for = c(
     "Straight, constant-radius finite cylinders near broadside",
-    "Comparing fixed-rigid, pressure-release, liquid-filled, and gas-filled cylinder boundaries",
+    paste(
+      "Comparing fixed-rigid, pressure-release, liquid-filled, and gas-filled",
+      "cylinder boundaries"
+    ),
     "Canonical cylinder benchmarks before adopting an asymptotic model"
   ),
   supports = c(
     "`Cylinder` shapes carried by `FLS` or `GAS` scatterers",
-    "Homogeneous fluid or gas interiors, plus fixed-rigid and pressure-release limits",
-    "Monostatic complex amplitude, backscattering cross-section, and target strength"
+    paste(
+      "Homogeneous fluid or gas interiors, plus fixed-rigid and",
+      "pressure-release limits"
+    ),
+    paste(
+      "Monostatic complex amplitude, backscattering cross-section, and",
+      "target strength"
+    )
   ),
   assumptions = c(
     "A straight centerline and circular, constant-radius cross-section",
@@ -56,8 +65,14 @@ acousticTS:::.model_family_overview(
     "No elastic shear response in the cylinder interior"
   ),
   reading = c(
-    "[Implementation](fcms-implementation.html): cylinder construction, boundaries, output, and comparisons",
-    "[Theory](fcms-theory.html): cylindrical modes, interface conditions, and finite-length closure"
+    paste(
+      "[Implementation](fcms-implementation.html): cylinder construction,",
+      "boundaries, output, and comparisons"
+    ),
+    paste(
+      "[Theory](fcms-theory.html): cylindrical modes, interface conditions,",
+      "and finite-length closure"
+    )
   )
 )
 ```

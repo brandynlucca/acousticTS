@@ -43,12 +43,18 @@ acousticTS:::.model_family_overview(
   ),
   best_for = c(
     "Standard-target calibration spheres made from homogeneous elastic solids",
-    "Frequency-dependent reference spectra for specified sphere materials and diameters",
+    paste(
+      "Frequency-dependent reference spectra for specified sphere materials",
+      "and diameters"
+    ),
     "Comparison with published calibration-sphere calculations"
   ),
   supports = c(
     "`CAL` objects created with `cal_generate()`",
-    "Built-in calibration materials or user-supplied density and longitudinal and shear speeds",
+    paste(
+      "Built-in calibration materials or user-supplied density and",
+      "longitudinal and shear speeds"
+    ),
     "Adaptive or fixed modal truncation"
   ),
   assumptions = c(
@@ -58,8 +64,14 @@ acousticTS:::.model_family_overview(
     "Material and water properties match the actual calibration conditions"
   ),
   reading = c(
-    "[Implementation](calibration-implementation.html): building standards, spectra, and external comparisons",
-    "[Theory](calibration-theory.html): elastic potentials, interface conditions, and phase shifts"
+    paste(
+      "[Implementation](calibration-implementation.html): building",
+      "standards, spectra, and external comparisons"
+    ),
+    paste(
+      "[Theory](calibration-theory.html): elastic potentials, interface",
+      "conditions, and phase shifts"
+    )
   )
 )
 ```

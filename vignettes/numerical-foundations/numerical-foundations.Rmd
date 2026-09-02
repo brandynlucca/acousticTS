@@ -31,7 +31,7 @@ derivations remain on their theory pages.
 
 ```{r echo=FALSE, results='asis'}
 acousticTS:::.vignette_static_figure(
-  src = "numerical-foundations-map.svg",
+  src = "numerical-foundations-map.png",
   alt = "Numerical foundations map"
 )
 ```
