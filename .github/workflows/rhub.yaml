@@ -27,6 +27,7 @@ jobs:
 
   setup:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     outputs:
       containers: ${{ steps.rhub-setup.outputs.containers }}
       platforms: ${{ steps.rhub-setup.outputs.platforms }}
@@ -73,6 +74,7 @@ jobs:
     needs: setup
     if: ${{ needs.setup.outputs.platforms != '[]' }}
     runs-on: ${{ matrix.config.os }}
+    timeout-minutes: 90
     name: ${{ matrix.config.label }}
     strategy:
       fail-fast: false

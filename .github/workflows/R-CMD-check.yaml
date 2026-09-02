@@ -8,6 +8,8 @@ on:
   pull_request:
     paths-ignore:
       - 'README.md'
+  schedule:
+    - cron: '0 6 1 * *'
       
 name: Build status
 
@@ -16,9 +18,14 @@ env:
 
 permissions: read-all
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   R-CMD-check:
     runs-on: ${{ matrix.config.os }}
+    timeout-minutes: 90
 
     name: ${{ matrix.config.name }}
 
@@ -39,7 +46,7 @@ jobs:
       _R_CHECK_TESTS_NLINES_: 0
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: r-lib/actions/setup-pandoc@v2
 
@@ -123,7 +130,7 @@ jobs:
       _R_CHECK_TESTS_NLINES_: 0
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: r-lib/actions/setup-pandoc@v2
 
