@@ -1,0 +1,61 @@
+name: Bug report
+description: Report reproducible incorrect package behavior.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a problem. Please provide a minimal,
+        reproducible example without private or sensitive data.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Preliminary checks
+      options:
+        - label: I searched the existing issues for this problem.
+          required: true
+        - label: I can reproduce this with the current package version.
+          required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Problem description
+      description: Describe what happened and why it appears incorrect.
+    validations:
+      required: true
+
+  - type: textarea
+    id: example
+    attributes:
+      label: Minimal reproducible example
+      description: Provide the smallest complete R example that reproduces it.
+      render: R
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: Describe the result you expected.
+    validations:
+      required: true
+
+  - type: textarea
+    id: session
+    attributes:
+      label: Session information
+      description: Paste the output of sessionInfo().
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Add relevant logs, references, or screenshots if needed.

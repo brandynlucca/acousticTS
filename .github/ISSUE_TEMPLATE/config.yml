@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Package documentation
+    url: https://brandynlucca.github.io/acousticTS/
+    about: Review the documentation before opening a support request.

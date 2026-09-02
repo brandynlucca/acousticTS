@@ -1,0 +1,74 @@
+name: Model or numerical problem
+description: Report unexpected model output or numerical behavior.
+title: "[Model/numerical]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Include enough information to reproduce and evaluate the calculation.
+        Do not attach private datasets or sensitive information.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Preliminary checks
+      options:
+        - label: I searched the existing issues for this behavior.
+          required: true
+        - label: I reviewed the model assumptions in the documentation.
+          required: true
+
+  - type: input
+    id: model
+    attributes:
+      label: Model or function
+      placeholder: For example, TMM() or DWBA()
+    validations:
+      required: true
+
+  - type: textarea
+    id: configuration
+    attributes:
+      label: Physical and numerical configuration
+      description: |
+        Specify geometry, material properties, boundary conditions,
+        frequencies, angles, precision, tolerances, and other relevant inputs.
+    validations:
+      required: true
+
+  - type: textarea
+    id: example
+    attributes:
+      label: Minimal reproducible example
+      render: R
+    validations:
+      required: true
+
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed result
+      description: Include the relevant values, warnings, or error messages.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected or reference result
+      description: |
+        State the expected value and identify any paper, software, analytic
+        solution, or independent calculation used for comparison.
+    validations:
+      required: true
+
+  - type: textarea
+    id: session
+    attributes:
+      label: Session information
+      description: Paste the output of sessionInfo().
+      render: text
+    validations:
+      required: true
