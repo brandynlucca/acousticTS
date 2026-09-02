@@ -1,0 +1,22 @@
+[check]
+target-std = "f2008"
+line-length = 100
+select = ["E", "C", "S001", "S101"]
+
+# These rules describe established patterns in the upstream-derived solver.
+# Modernizing them requires a separate numerical refactor and regression audit.
+ignore = [
+    "C001", # implicit typing
+    "C011", # select case without a default branch
+    "C021", # real literal without a kind suffix
+    "C031", # literal array bound
+    "C032", # literal I/O unit number
+    "C061", # procedure argument without intent
+    "C071", # assumed-size array
+    "C121", # use statement without only
+    "C122", # intrinsic module without intrinsic
+    "C131", # module without default accessibility
+    "C132", # module with default public accessibility
+    "C142", # exit or cycle in an unnamed loop
+    "C152", # continuation in an inline if statement
+]

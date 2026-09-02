@@ -1,0 +1,60 @@
+name: Fortran lint
+
+on:
+  push:
+    paths:
+      - "src/**"
+      - "fortitude.toml"
+      - ".github/workflows/fortitude.yaml"
+  pull_request:
+    paths:
+      - "src/**"
+      - "fortitude.toml"
+      - ".github/workflows/fortitude.yaml"
+  workflow_dispatch:
+
+permissions: read-all
+
+concurrency:
+  group: fortitude-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Install Fortitude and GNU Fortran
+        run: |
+          python -m pip install fortitude-lint==0.9.2
+          sudo apt-get update
+          sudo apt-get install -y gfortran
+
+      - name: Preprocess conditional Fortran variants
+        run: |
+          lint_dir="$RUNNER_TEMP/fortitude"
+          mkdir -p "$lint_dir"
+          gfortran -cpp -E -P src/prolate_swf.f90 \
+            -o "$lint_dir/prolate-normal.f90"
+          gfortran -cpp -E -P -DUSE_QUAD src/prolate_swf.f90 \
+            -o "$lint_dir/prolate-quad.f90"
+
+      - name: Run Fortitude
+        run: |
+          lint_dir="$RUNNER_TEMP/fortitude"
+          mapfile -d '' sources < <(
+            find src -type f -name '*.f90' \
+              ! -name 'prolate_swf.f90' -print0
+          )
+          fortitude check \
+            --config-file fortitude.toml \
+            --output-format github \
+            "${sources[@]}" \
+            "$lint_dir/prolate-normal.f90" \
+            "$lint_dir/prolate-quad.f90"
