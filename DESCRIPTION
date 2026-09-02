@@ -33,6 +33,7 @@ Imports:
     pbapply,
     Rcpp,
     stats,
+    tools,
     utils
 Suggests: 
     knitr,
