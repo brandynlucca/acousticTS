@@ -1,3 +1,5 @@
+# acousticTS 2.0.2
+
 ## What's Changed
 * Update DESCRIPTION by @brandynlucca in https://github.com/brandynlucca/acousticTS/pull/49
 * Reorganize and reformat `pkgdown` documentation by @brandynlucca in https://github.com/brandynlucca/acousticTS/pull/50
