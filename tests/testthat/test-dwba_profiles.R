@@ -66,31 +66,37 @@ library(acousticTS)
   )
 }
 
-test_that("Canonical DWBA shapes resolve to the same nodewise profiles as equivalent arbitrary shapes", {
-  freq <- c(120e3, 240e3)
+test_that(
+  paste0(
+    "Canonical DWBA shapes resolve to the same nodewise profiles as ",
+    "equivalent arbitrary shapes"
+  ),
+  {
+    freq <- c(120e3, 240e3)
 
-  for (shape_name in c("sphere", "prolate_spheroid", "cylinder")) {
-    n_segments <- if (shape_name == "cylinder") 120 else 100
+    for (shape_name in c("sphere", "prolate_spheroid", "cylinder")) {
+      n_segments <- if (shape_name == "cylinder") 120 else 100
 
-    ts_canonical <- target_strength(
-      .make_dwba_canonical(shape_name, n_segments),
-      frequency = freq,
-      model = "DWBA",
-      sound_speed_sw = 1477.3,
-      density_sw = 1026.8
-    )@model$DWBA$TS
+      ts_canonical <- target_strength(
+        .make_dwba_canonical(shape_name, n_segments),
+        frequency = freq,
+        model = "DWBA",
+        sound_speed_sw = 1477.3,
+        density_sw = 1026.8
+      )@model$DWBA$TS
 
-    ts_arbitrary <- target_strength(
-      .make_dwba_arbitrary(shape_name, n_segments),
-      frequency = freq,
-      model = "DWBA",
-      sound_speed_sw = 1477.3,
-      density_sw = 1026.8
-    )@model$DWBA$TS
+      ts_arbitrary <- target_strength(
+        .make_dwba_arbitrary(shape_name, n_segments),
+        frequency = freq,
+        model = "DWBA",
+        sound_speed_sw = 1477.3,
+        density_sw = 1026.8
+      )@model$DWBA$TS
 
-    expect_equal(ts_canonical, ts_arbitrary, tolerance = 1e-10)
+      expect_equal(ts_canonical, ts_arbitrary, tolerance = 1e-10)
+    }
   }
-})
+)
 
 test_that("Canonical SDWBA shapes match equivalent arbitrary shapes", {
   freq <- c(120e3, 240e3)

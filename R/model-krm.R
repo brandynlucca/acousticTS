@@ -5,7 +5,7 @@
 #'
 #' @description
 #' Computes the far-field acoustic scattering amplitude and derived quantities
-#' for fish and similar elongated scatterers using the Kirchhoff–Ray Mode (KRM)
+#' for fish and similar elongated scatterers using the Kirchhoff-Ray Mode (KRM)
 #' approximation described by Clay and Horne (1994). The KRM model is widely
 #' used in fisheries acoustics for estimating target strength, particularly
 #' for fish with gas-filled swimbladders.

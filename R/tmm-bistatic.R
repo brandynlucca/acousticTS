@@ -271,8 +271,14 @@
 
   list(
     idx = .tmm_plot_frequency_index(frequency, acoustics$frequency),
-    theta_body = .tmm_scalar_angle(theta_body, defaults$theta_body, "theta_body"),
-    phi_body = .tmm_scalar_angle(phi_body, defaults$phi_body %||% pi, "phi_body"),
+    theta_body = .tmm_scalar_angle(
+      theta_body, defaults$theta_body,
+      "theta_body"
+    ),
+    phi_body = .tmm_scalar_angle(
+      phi_body, defaults$phi_body %||% pi,
+      "phi_body"
+    ),
     sectors = .tmm_validate_sectors(sectors)
   )
 }
@@ -396,7 +402,10 @@
 
 # Integrate user-defined angular sectors over the retained bistatic grid.
 #' @noRd
-.tmm_bistatic_sector_integrals <- function(sectors, psi_grid, sigma_scat, solid_angle) {
+.tmm_bistatic_sector_integrals <- function(
+  sectors, psi_grid, sigma_scat,
+  solid_angle
+) {
   # Integrate each requested sector over the retained grid =====================
   do.call(
     rbind,
@@ -449,6 +458,26 @@
 #'
 #' @return A list containing scalar summary metrics, the named slice data
 #'   frames, sector integrals, and optionally the underlying scattering grid.
+#'
+#' @examples
+#' target <- fls_generate(
+#'   shape = sphere(radius_body = 0.005, n_segments = 20),
+#'   g_body = 1,
+#'   h_body = 1
+#' )
+#' stored <- target_strength(
+#'   target,
+#'   frequency = 12e3,
+#'   model = "tmm",
+#'   boundary = "pressure_release",
+#'   store_t_matrix = TRUE
+#' )
+#' tmm_bistatic_summary(
+#'   stored,
+#'   n_theta = 5,
+#'   n_phi = 9,
+#'   n_psi = 9
+#' )
 #'
 #' @seealso \code{\link{tmm_scattering_grid}},
 #'   \code{\link{tmm_products}}
@@ -595,6 +624,21 @@ tmm_bistatic_summary <- function(object,
 #' @param drop_dB Positive dB drop used to define the backscatter-lobe width.
 #'
 #' @return A named list containing the requested post-processed TMM products.
+#'
+#' @examples
+#' target <- fls_generate(
+#'   shape = sphere(radius_body = 0.005, n_segments = 20),
+#'   g_body = 1,
+#'   h_body = 1
+#' )
+#' stored <- target_strength(
+#'   target,
+#'   frequency = 12e3,
+#'   model = "tmm",
+#'   boundary = "pressure_release",
+#'   store_t_matrix = TRUE
+#' )
+#' tmm_products(stored)
 #'
 #' @seealso \code{\link{tmm_scattering}},
 #'   \code{\link{tmm_average_orientation}},

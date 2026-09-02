@@ -1,4 +1,4 @@
-﻿---
+---
 title: "FCMS"
 output:
   rmarkdown::html_vignette:
@@ -46,8 +46,14 @@ acousticTS:::.model_family_overview(
   ),
   best_for = c(
     "Straight finite cylinders near broadside",
-    "Rigid, pressure-release, liquid-filled, and gas-filled cylinder comparisons",
-    "Reference checks for cylinder-like targets before using higher-level approximations"
+    paste0(
+      "Rigid, pressure-release, liquid-filled, and gas-filled cylinder ",
+      "comparisons"
+    ),
+    paste0(
+      "Reference checks for cylinder-like targets before using higher-level ",
+      "approximations"
+    )
   ),
   supports = c(
     "`Cylinder` shapes on `FLS` or `GAS` objects",
@@ -61,8 +67,14 @@ acousticTS:::.model_family_overview(
     "No elastic shear support in the interior"
   ),
   reading = c(
-    "[Implementation](fcms-implementation.html): spectra, result extraction, and comparison tables",
-    "[Theory](fcms-theory.html): cylindrical modal reduction, boundary conditions, and finite-length factorization"
+    paste0(
+      "[Implementation](fcms-implementation.html): spectra, result ",
+      "extraction, and comparison tables"
+    ),
+    paste0(
+      "[Theory](fcms-theory.html): cylindrical modal reduction, boundary ",
+      "conditions, and finite-length factorization"
+    )
   )
 )
 ```

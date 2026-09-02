@@ -21,6 +21,8 @@
 #' @param frequency Frequency (f, Hz)
 #' @return
 #' Calculates the acoustic wavenumber (k) based on the sound speed of water.
+#' @examples
+#' wavenumber(frequency = 38e3, sound_speed = 1500)
 #' @rdname wavenumber
 #' @export
 wavenumber <- function(frequency, sound_speed) 2 * pi * frequency / sound_speed
@@ -56,6 +58,9 @@ wavenumber <- function(frequency, sound_speed) 2 * pi * frequency / sound_speed
 #' @return
 #' For `linear`, returns the value converted to the linear domain. For `db`,
 #' returns the value converted to the logarithmic (dB) domain.
+#' @examples
+#' sigma_bs <- linear(-40)
+#' db(sigma_bs)
 #' @rdname linear
 #' @export
 linear <- function(value, coefficient = 10) {
@@ -96,6 +101,10 @@ reflection_coefficient <- function(interface1, interface2, mode = "DWBA") {
 #' speed (m/s) values for a boundary/interface (2)
 #' @param mode Two options: coefficient calculation for "DWBA" and "KRM"
 #' @return Pressure-amplitude transmission coefficient at normal incidence.
+#' @examples
+#' seawater <- data.frame(density = 1026, sound_speed = 1480)
+#' animal <- data.frame(density = 1050, sound_speed = 1530)
+#' transmission_coefficient(seawater, animal)
 #' @export
 transmission_coefficient <- function(interface1, interface2, mode = "DWBA") {
   Z1 <- interface1$density * interface1$sound_speed
@@ -131,6 +140,10 @@ transmission_coefficient <- function(interface1, interface2, mode = "DWBA") {
 #' sound speed (\eqn{ms^{-1}}) values for a target boundary.
 #'
 #' @return Compressibility contrast (\eqn{\kappa}), dimensionless.
+#' @examples
+#' seawater <- data.frame(density = 1026, sound_speed = 1480)
+#' animal <- data.frame(density = 1050, sound_speed = 1530)
+#' compressibility(seawater, animal)
 #' @export
 compressibility <- function(medium, target) {
   # Calculate acoustic compressibility of the first interface ==================
@@ -151,6 +164,10 @@ compressibility <- function(medium, target) {
 #' sound speed (\eqn{ms^{-1}}) values for the target boundary.
 #' @return Density contrast, defined as
 #'   \eqn{(\rho_{target} - \rho_{medium})/\rho_{target}}.
+#' @examples
+#' seawater <- data.frame(density = 1026, sound_speed = 1480)
+#' animal <- data.frame(density = 1050, sound_speed = 1530)
+#' rho(seawater, animal)
 #' @export
 rho <- function(medium, target) {
   (target$density - medium$density) / target$density
@@ -176,6 +193,9 @@ rho <- function(medium, target) {
 #' @param E Young's modulus (E, Pa).
 #' @param G Shear modulus (Pa).
 #' @return Poisson's ratio (\eqn{\nu}), dimensionless.
+#'
+#' @examples
+#' pois(E = 3e9, G = 1.1e9)
 #'
 #' @keywords elastic
 #' @rdname pois
@@ -222,6 +242,9 @@ pois <- function(K = NULL, E = NULL, G = NULL) {
 #'
 #' @return Bulk modulus (K, Pa).
 #'
+#' @examples
+#' bulk(E = 3e9, G = 1.1e9)
+#'
 #' @encoding UTF-8
 #' @keywords elastic
 #' @rdname bulk
@@ -267,6 +290,9 @@ bulk <- function(E = NULL, G = NULL, nu = NULL) {
 #'
 #' @return Young's modulus (E, Pa).
 #'
+#' @examples
+#' young(K = 2.5e9, G = 1.1e9)
+#'
 #' @encoding UTF-8
 #' @keywords elastic
 #' @rdname young
@@ -297,7 +323,7 @@ young <- function(K = NULL, G = NULL, nu = NULL) {
 #' Calculate the shear modulus (G)
 #'
 #' @description
-#' #' Calculates the shear modulus (G) from two of the three other elastic
+#' Calculates the shear modulus (G) from two of the three other elastic
 #' moduli: bulk modulus (K), Young's modulus (E), or Poisson's ratio
 #' (\eqn{\nu}). Assumes 3D material properties.
 #'
@@ -311,6 +337,9 @@ young <- function(K = NULL, G = NULL, nu = NULL) {
 #' @param nu Poisson's ratio (Dimensionless).
 #'
 #' @return Shear modulus (G, Pa).
+#'
+#' @examples
+#' shear(K = 2.5e9, E = 3e9)
 #'
 #' @encoding UTF-8
 #' @keywords elastic
@@ -360,6 +389,9 @@ shear <- function(K = NULL, E = NULL, nu = NULL) {
 #' @param G Shear modulus (Pa).
 #' @param nu Poisson's ratio (Dimensionless).
 #' @return Lam&eacute;'s first parameter (\eqn{\lambda}, Pa).
+#'
+#' @examples
+#' lame(K = 2.5e9, G = 1.1e9)
 #'
 #' @keywords elastic
 #' @rdname lame
@@ -512,6 +544,17 @@ lame <- function(K = NULL, E = NULL, G = NULL, nu = NULL) {
 #' such as \code{"DWBA"} and \code{"dwba"} resolve to the same family.
 #' @return The input scatterer object with requested model parameters, model
 #'   outputs, and target strength results stored in its model slots.
+#' @examples
+#' calibration_sphere <- cal_generate(
+#'   material = "WC",
+#'   diameter = 38.1e-3,
+#'   n_segments = 40
+#' )
+#' target_strength(
+#'   calibration_sphere,
+#'   frequency = c(38e3, 120e3),
+#'   model = "calibration"
+#' )
 #' @seealso
 #' \code{\link{DWBA}}, \code{\link{BBFM}}, \code{\link{PCDWBA}},
 #' \code{\link{SDWBA}}, \code{\link{FCMS}}, \code{\link{BCMS}},
@@ -686,7 +729,10 @@ target_strength <- function(object,
   )
   if (anyDuplicated(normalized_names)) {
     stop(
-      "'model_args' contains duplicate model entries after model normalization.",
+      paste0(
+        "'model_args' contains duplicate model entries after model ",
+        "normalization."
+      ),
       call. = FALSE
     )
   }

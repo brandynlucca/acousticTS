@@ -51,24 +51,27 @@ compute_essms_modal_coeffs <- function(density_fluid, sound_speed_fluid) {
   )
 }
 
-test_that("ESSMS shell coefficients respond to the Stanton fluid generalization", {
-  coeff_equal_fluids <- compute_essms_modal_coeffs(
-    density_fluid = 1026.8,
-    sound_speed_fluid = 1477.3
-  )
-  coeff_contrasted_fluids <- compute_essms_modal_coeffs(
-    density_fluid = 1077.3,
-    sound_speed_fluid = 1575
-  )
+test_that(
+  "ESSMS shell coefficients respond to the Stanton fluid generalization",
+  {
+    coeff_equal_fluids <- compute_essms_modal_coeffs(
+      density_fluid = 1026.8,
+      sound_speed_fluid = 1477.3
+    )
+    coeff_contrasted_fluids <- compute_essms_modal_coeffs(
+      density_fluid = 1077.3,
+      sound_speed_fluid = 1575
+    )
 
-  expect_false(
-    isTRUE(all.equal(
-      coeff_equal_fluids,
-      coeff_contrasted_fluids,
-      tolerance = 1e-8
-    ))
-  )
+    expect_false(
+      isTRUE(all.equal(
+        coeff_equal_fluids,
+        coeff_contrasted_fluids,
+        tolerance = 1e-8
+      ))
+    )
 
-  expect_true(all(is.finite(Mod(coeff_equal_fluids))))
-  expect_true(all(is.finite(Mod(coeff_contrasted_fluids))))
-})
+    expect_true(all(is.finite(Mod(coeff_equal_fluids))))
+    expect_true(all(is.finite(Mod(coeff_contrasted_fluids))))
+  }
+)

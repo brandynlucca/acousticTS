@@ -43,11 +43,20 @@ acousticTS:::.model_family_overview(
   ),
   best_for = c(
     "Gas-bearing mesopelagic-fish style layered spheres",
-    "Problems where gas resonance, shell elasticity, and viscous damping all matter simultaneously",
-    "Wideband spherical resonance studies beyond a simple bubble or shell-only idealization"
+    paste0(
+      "Problems where gas resonance, shell elasticity, and viscous damping ",
+      "all matter simultaneously"
+    ),
+    paste0(
+      "Wideband spherical resonance studies beyond a simple bubble or ",
+      "shell-only idealization"
+    )
   ),
   supports = c(
-    "`ESS` spherical objects with an explicit shell and inner gas core plus viscous-layer model arguments",
+    paste0(
+      "`ESS` spherical objects with an explicit shell and inner gas core ",
+      "plus viscous-layer model arguments"
+    ),
     "Four-region spherical bookkeeping with seawater as medium `1`",
     "Monostatic layered resonance calculations"
   ),
@@ -55,11 +64,20 @@ acousticTS:::.model_family_overview(
     "Spherical symmetry",
     "Homogeneous material properties within each layer",
     "Linear acoustics and linear elasticity",
-    "Layered spherical interfaces with no nonspherical posture or geometry effects"
+    paste0(
+      "Layered spherical interfaces with no nonspherical posture or geometry ",
+      "effects"
+    )
   ),
   reading = c(
-    "[Implementation](vesm-implementation.html): layered-object workflow and benchmark comparisons",
-    "[Theory](vesm-theory.html): full layered spherical field structure, interface conditions, and mode-wise systems"
+    paste0(
+      "[Implementation](vesm-implementation.html): layered-object workflow ",
+      "and benchmark comparisons"
+    ),
+    paste0(
+      "[Theory](vesm-theory.html): full layered spherical field structure, ",
+      "interface conditions, and mode-wise systems"
+    )
   )
 )
 ```

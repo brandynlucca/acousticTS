@@ -1,4 +1,4 @@
-﻿---
+---
 title: "TRCM"
 output:
   rmarkdown::html_vignette:
@@ -45,8 +45,14 @@ acousticTS:::.model_family_overview(
   ),
   best_for = c(
     "High-frequency elongated fluid-like targets",
-    "Cylinder-like bodies whose scattering is dominated by specular path interference",
-    "Fast asymptotic estimates when a full modal or perturbative solve is unnecessary"
+    paste0(
+      "Cylinder-like bodies whose scattering is dominated by specular path ",
+      "interference"
+    ),
+    paste0(
+      "Fast asymptotic estimates when a full modal or perturbative solve is ",
+      "unnecessary"
+    )
   ),
   supports = c(
     "Straight and bent cylindrical-style branches",
@@ -59,8 +65,14 @@ acousticTS:::.model_family_overview(
     "No low-order resonances or full internal multiple scattering series"
   ),
   reading = c(
-    "[Implementation](trcm-implementation.html): usage and comparison workflows",
-    "[Theory](trcm-theory.html): two-ray geometry, interference factor, and finite-length directivity"
+    paste0(
+      "[Implementation](trcm-implementation.html): usage and comparison ",
+      "workflows"
+    ),
+    paste0(
+      "[Theory](trcm-theory.html): two-ray geometry, interference factor, ",
+      "and finite-length directivity"
+    )
   )
 )
 ```

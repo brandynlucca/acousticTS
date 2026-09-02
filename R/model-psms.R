@@ -430,7 +430,10 @@ NULL
 # Attach the reduced frequencies and modal truncation limits to the PSMS
 # acoustics table.
 #' @noRd
-.psms_complete_acoustics <- function(model_params, body_params, scatterer_shape) {
+.psms_complete_acoustics <- function(
+  model_params, body_params,
+  scatterer_shape
+) {
   # Add reduced frequencies for the surrounding medium and interior ============
   model_params$acoustics$chi_sw <- model_params$acoustics$k_sw * body_params$q
   model_params$acoustics$chi_body <- model_params$acoustics$k_f * body_params$q
@@ -446,7 +449,10 @@ NULL
 
 # Promote the retained modal ceilings for the full gas-filled PSMS solve only.
 #' @noRd
-.psms_promote_gas_modal_limits <- function(model_params, body_params, boundary) {
+.psms_promote_gas_modal_limits <- function(
+  model_params, body_params,
+  boundary
+) {
   if (!identical(boundary, "gas_filled") ||
     !isTRUE(model_params$adaptive) ||
     !identical(model_params$Amn_method, "Amn_fluid_gas")) {

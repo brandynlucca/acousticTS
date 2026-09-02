@@ -41,9 +41,18 @@ Before getting into the interpretation tradeoffs, it helps to see the main shape
 library(acousticTS)
 
 sphere_shape <- sphere(radius_body = 0.01, n_segments = 40)
-cylinder_shape <- cylinder(length_body = 0.05, radius_body = 0.003, n_segments = 80)
-ps_shape <- prolate_spheroid(length_body = 0.04, radius_body = 0.004, n_segments = 60)
-oblate_shape <- oblate_spheroid(length_body = 0.012, radius_body = 0.01, n_segments = 60)
+cylinder_shape <- cylinder(
+  length_body = 0.05, radius_body = 0.003,
+  n_segments = 80
+)
+ps_shape <- prolate_spheroid(
+  length_body = 0.04, radius_body = 0.004,
+  n_segments = 60
+)
+oblate_shape <- oblate_spheroid(
+  length_body = 0.012, radius_body = 0.01,
+  n_segments = 60
+)
 
 shape_summary <- function(shape_obj) {
   params <- extract(shape_obj, "shape_parameters")
@@ -127,7 +136,10 @@ wrapped_shape <- create_shape(
   n_segments = 50
 )
 
-extract(wrapped_shape, "shape_parameters")[c("shape", "length", "radius", "n_segments")]
+extract(wrapped_shape, "shape_parameters")[c(
+  "shape", "length", "radius",
+  "n_segments"
+)]
 ```
 
 # Coordinate conventions by shape

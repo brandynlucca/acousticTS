@@ -49,7 +49,10 @@ acousticTS:::.model_family_overview(
   ),
   supports = c(
     "`ESS` spherical geometries",
-    "Exterior seawater (medium `1`), shell (medium `2`), and interior fluid or cavity (medium `3`)",
+    paste0(
+      "Exterior seawater (medium `1`), shell (medium `2`), and interior ",
+      "fluid or cavity (medium `3`)"
+    ),
     "Pressure-release and fluid-filled shell interiors"
   ),
   assumptions = c(
@@ -59,8 +62,14 @@ acousticTS:::.model_family_overview(
     "Modal truncation of an exact spherical layered system"
   ),
   reading = c(
-    "[Implementation](essms-implementation.html): current usage and validation status",
-    "[Theory](essms-theory.html): full layered shell derivation, tractions, and mode-wise boundary systems"
+    paste0(
+      "[Implementation](essms-implementation.html): current usage and ",
+      "validation status"
+    ),
+    paste0(
+      "[Theory](essms-theory.html): full layered shell derivation, ",
+      "tractions, and mode-wise boundary systems"
+    )
   )
 )
 ```

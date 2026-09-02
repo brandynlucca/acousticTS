@@ -52,8 +52,14 @@ test_that("Second-kind Legendre wrappers return expected values and warnings", {
   expect_error(Qn(1 + 1i, 0.5), "must be real numbers")
   expect_error(Qn(1, Inf), "'x' must be a real, finite numeric.")
   expect_error(Qn(Inf, 0.5), "'n' must be finite.")
-  expect_error(acousticTS:::.validate_Qndk_inputs(Inf, 0.5, 1), "'n' must be finite.")
-  expect_error(acousticTS:::.validate_Qndk_inputs(1, Inf, 1), "'x' must be a real, finite numeric.")
+  expect_error(
+    acousticTS:::.validate_Qndk_inputs(Inf, 0.5, 1),
+    "'n' must be finite."
+  )
+  expect_error(
+    acousticTS:::.validate_Qndk_inputs(1, Inf, 1),
+    "'x' must be a real, finite numeric."
+  )
   expect_error(Qndk(1, 0.5 + 1i, 1), "must be real numbers")
   expect_error(Qndk(1, 0.5, 1.5), "must be a non-negative integer")
 })

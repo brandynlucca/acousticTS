@@ -1,4 +1,4 @@
-﻿---
+---
 title: "DWBA"
 output:
   rmarkdown::html_vignette:
@@ -45,12 +45,18 @@ acousticTS:::.model_family_overview(
   ),
   best_for = c(
     "Weakly scattering fluid-like elongated bodies",
-    "Zooplankton-like or swimbladder-less flesh-body calculations where density and sound-speed contrasts remain modest",
+    paste0(
+      "Zooplankton-like or swimbladder-less flesh-body calculations where ",
+      "density and sound-speed contrasts remain modest"
+    ),
     "Arbitrary profiles that do not fit a single canonical exact geometry"
   ),
   supports = c(
     "`FLS` objects with canonical or arbitrary shapes",
-    "Material contrasts expressed naturally as $g_{21}$ and $h_{21}$ relative to seawater",
+    paste0(
+      "Material contrasts expressed naturally as $g_{21}$ and $h_{21}$ ",
+      "relative to seawater"
+    ),
     "Segmented body-axis integrations in the monostatic backscatter setting"
   ),
   assumptions = c(
@@ -60,8 +66,14 @@ acousticTS:::.model_family_overview(
     "Fluid-like, non-elastic interior response"
   ),
   reading = c(
-    "[Implementation](dwba-implementation.html): object workflows, spectra, and validation tables",
-    "[Theory](dwba-theory.html): Born linearization, contrast term, and centerline integral"
+    paste0(
+      "[Implementation](dwba-implementation.html): object workflows, ",
+      "spectra, and validation tables"
+    ),
+    paste0(
+      "[Theory](dwba-theory.html): Born linearization, contrast term, and ",
+      "centerline integral"
+    )
   )
 )
 ```

@@ -1,4 +1,4 @@
-﻿---
+---
 title: "Bent cylinder modal series solution"
 output:
   rmarkdown::html_vignette:
@@ -193,7 +193,8 @@ bent_check <- subset(bcms_summary, case == "bent")[
 ]
 
 bent_check <- data.frame(
-  `Reference relation` = "BCMS bent branch vs Stanton (1989) coherence construction",
+  `Reference relation` =
+    "BCMS bent branch vs Stanton (1989) coherence construction",
   `Max abs. $\\Delta$ TS (dB)` = bent_check$max_abs_delta_TS_dB,
   `Mean abs. $\\Delta$ TS (dB)` = bent_check$mean_abs_delta_TS_dB,
   `$f$ at max $\\Delta$ (kHz)` = bent_check$frequency_at_max_delta_kHz,

@@ -1,4 +1,4 @@
-﻿---
+---
 title: "ECMS"
 output:
   rmarkdown::html_vignette:
@@ -33,7 +33,10 @@ acousticTS:::.model_family_overview(
   family = "ecms",
   summary = paste(
     "The elastic cylinder modal series solution (`ECMS`) is the package's",
-    "solid elastic-cylinder family. It combines the phase-shift treatment of an",
+    paste0(
+      "solid elastic-cylinder family. It combines the phase-shift treatment ",
+      "of an"
+    ),
     "infinite elastic circular cylinder with the usual finite-length coherence",
     "factor used near broadside."
   ),
@@ -56,11 +59,20 @@ acousticTS:::.model_family_overview(
   assumptions = c(
     "Circular cylinder with homogeneous elastic properties",
     "Broadside or near-broadside incidence",
-    "Finite-length treatment through a coherence factor rather than a fully general 3D elastic solve"
+    paste0(
+      "Finite-length treatment through a coherence factor rather than a ",
+      "fully general 3D elastic solve"
+    )
   ),
   reading = c(
-    "[Implementation](ecms-implementation.html): object setup and current comparison workflow",
-    "[Theory](ecms-theory.html): elastic cylindrical potentials, phase shifts, and finite-length closure"
+    paste0(
+      "[Implementation](ecms-implementation.html): object setup and current ",
+      "comparison workflow"
+    ),
+    paste0(
+      "[Theory](ecms-theory.html): elastic cylindrical potentials, phase ",
+      "shifts, and finite-length closure"
+    )
   )
 )
 ```

@@ -1,6 +1,5 @@
 Package: acousticTS
-Title: Estimating Acoustic Target Strength via Physics-Based Scattering
-    Models
+Title: Physics-Based Models for Acoustic Target Strength
 Version: 2.0.1
 Authors@R: 
     person("Brandyn", "Lucca", , "brandyn.lucca@gmail.com", role = c("aut", "cre", "cph"),

@@ -8,6 +8,9 @@
 #' @param iterations Number of iterations
 #' @return A numeric matrix containing the adjacent column sums of
 #'   \code{rpos}.
+#' @examples
+#' positions <- matrix(1:8, nrow = 2)
+#' along_sum(positions, ncol(positions))
 #' @rdname along_sum
 #' @export
 along_sum <- function(rpos, iterations) {
@@ -172,6 +175,10 @@ neumann <- function(x) {
 #'
 #' This wrapper performs basic argument validation and calls the C++ routine
 #' to obtain nodes and weights with high accuracy for moderate \code{n}.
+#'
+#' @examples
+#' rule <- gauss_legendre(n = 4, a = 0, b = 1)
+#' sum(rule$weights * rule$nodes^2)
 #'
 #' @references
 #' Davis, P. J., & Rabinowitz, P. (2007). Methods of Numerical Integration

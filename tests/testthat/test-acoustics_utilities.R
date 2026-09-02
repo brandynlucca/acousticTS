@@ -241,7 +241,10 @@ test_that("Curvature edge-case", {
 test_that("`brake()` rejects unsupported inputs explicitly", {
   expect_error(
     brake(1, radius_curvature = 5),
-    "`brake\\(\\)` expects either a scatterer object or a list-like body component."
+    paste0(
+      "`brake\\(\\)` expects either a scatterer object or a list-like body ",
+      "component."
+    )
   )
 })
 

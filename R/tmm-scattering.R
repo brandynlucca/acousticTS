@@ -76,7 +76,8 @@
                                           phi_body,
                                           tol = 1e-8) {
   defaults <- model_params$body
-  delta_phi <- abs(.tmm_wrap_angle_2pi(phi_body) - .tmm_wrap_angle_2pi(defaults$phi_body))
+  delta_phi <-
+    abs(.tmm_wrap_angle_2pi(phi_body) - .tmm_wrap_angle_2pi(defaults$phi_body))
   delta_phi <- min(delta_phi, 2 * pi - delta_phi)
 
   abs(theta_body - defaults$theta_body) <= tol && delta_phi <= tol
@@ -94,7 +95,10 @@
                                                       tol = 1e-8) {
   f_exact <- model_params$parameters$exact_monostatic_f_bs
   if (is.null(f_exact) ||
-    !.tmm_matches_stored_incidence(model_params, theta_body, phi_body, tol = tol) ||
+    !.tmm_matches_stored_incidence(model_params, theta_body, phi_body,
+      tol =
+        tol
+    ) ||
     !.tmm_is_monostatic_direction(
       theta_body = theta_body,
       phi_body = phi_body,
@@ -633,7 +637,10 @@
                                               theta_scatter,
                                               phi_scatter) {
   store_i <- model_params$parameters$t_matrix[[frequency_idx]]
-  acoustics_i <- model_params$parameters$acoustics[frequency_idx, , drop = FALSE]
+  acoustics_i <- model_params$parameters$acoustics[frequency_idx, ,
+    drop =
+      FALSE
+  ]
 
   mu <- tcrossprod(
     cos(theta_scatter),
@@ -806,6 +813,21 @@
 #'
 #' @return A data frame with the frequency, complex scattering amplitude, the
 #'   corresponding differential cross section, and its level in dB.
+#'
+#' @examples
+#' target <- fls_generate(
+#'   shape = sphere(radius_body = 0.005, n_segments = 20),
+#'   g_body = 1,
+#'   h_body = 1
+#' )
+#' stored <- target_strength(
+#'   target,
+#'   frequency = 12e3,
+#'   model = "tmm",
+#'   boundary = "pressure_release",
+#'   store_t_matrix = TRUE
+#' )
+#' tmm_scattering(stored)
 #'
 #' @seealso [target_strength()], \code{\link{tmm_average_orientation}}
 #' @export
@@ -1105,6 +1127,21 @@ tmm_scattering <- function(object,
 #'   build the grid, the receive-angle vectors, and matrices for the complex
 #'   scattering amplitude, differential scattering cross section, and its level
 #'   in dB.
+#'
+#' @examples
+#' target <- fls_generate(
+#'   shape = sphere(radius_body = 0.005, n_segments = 20),
+#'   g_body = 1,
+#'   h_body = 1
+#' )
+#' stored <- target_strength(
+#'   target,
+#'   frequency = 12e3,
+#'   model = "tmm",
+#'   boundary = "pressure_release",
+#'   store_t_matrix = TRUE
+#' )
+#' tmm_scattering_grid(stored, n_theta = 5, n_phi = 9)
 #'
 #' @seealso \code{\link{tmm_scattering}}, \code{\link{tmm_average_orientation}}
 #' @export

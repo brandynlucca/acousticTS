@@ -114,7 +114,7 @@ NULL
 #' Build the stored BCMS body metadata
 #' @noRd
 .bcms_body_parameters <- function(shape, body) {
-  # Resolve the stored curvature metadata from the shape description ============
+  # Resolve the stored curvature metadata from the shape description ===========
   curvature_ratio <- shape$radius_curvature_ratio
 
   list(
@@ -124,7 +124,8 @@ NULL
     g = body$g,
     h = body$h,
     is_bent = !is.null(curvature_ratio) && !is.na(curvature_ratio),
-    radius_curvature = if (!is.null(curvature_ratio) && !is.na(curvature_ratio)) {
+    radius_curvature = if (!is.null(curvature_ratio) &&
+      !is.na(curvature_ratio)) {
       curvature_ratio * shape$length
     } else {
       NA_real_

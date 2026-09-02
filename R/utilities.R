@@ -178,7 +178,8 @@
 
   # Preserve structured scalar values across the full simulation grid ==========
   if (.is_structured_simulation_value(param_value)) {
-    if (!is.list(param_value) && !is.data.frame(param_value) && !is.matrix(param_value)) {
+    if (!is.list(param_value) && !is.data.frame(param_value) &&
+      !is.matrix(param_value)) {
       return(rep(list(param_value), grid_size))
     }
     if (length(param_value) == 1L) {
@@ -202,7 +203,10 @@
   # Reject ambiguous parameter lengths before model construction ==============
   stop(
     sprintf(
-      "Length of parameter '%s' [%d] does not match number of realizations [%d].",
+      paste0(
+        "Length of parameter '%s' [%d] does not match number of realizations ",
+        "[%d]."
+      ),
       param_name, length(param_value), grid_size
     ),
     call. = FALSE

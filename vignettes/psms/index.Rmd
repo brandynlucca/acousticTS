@@ -52,7 +52,10 @@ acousticTS:::.model_family_overview(
   supports = c(
     "`ProlateSpheroid` shapes on `FLS` or `GAS` objects",
     "Exact monostatic target strength for homogeneous single-region spheroids",
-    "Spheroidal modal solutions in which medium `1` is seawater and medium `2` is the spheroid interior"
+    paste0(
+      "Spheroidal modal solutions in which medium `1` is seawater and medium ",
+      "`2` is the spheroid interior"
+    )
   ),
   assumptions = c(
     "Perfect prolate spheroidal geometry",
@@ -61,8 +64,14 @@ acousticTS:::.model_family_overview(
     "No shell or internal secondary component"
   ),
   reading = c(
-    "[Implementation](psms-implementation.html): workflows, comparisons, and timing tables",
-    "[Theory](psms-theory.html): full spheroidal-coordinate derivation and retained modal systems"
+    paste0(
+      "[Implementation](psms-implementation.html): workflows, comparisons, ",
+      "and timing tables"
+    ),
+    paste0(
+      "[Theory](psms-theory.html): full spheroidal-coordinate derivation and ",
+      "retained modal systems"
+    )
   )
 )
 ```

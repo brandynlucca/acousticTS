@@ -173,43 +173,49 @@ test_that("pcdwba helper functions normalize geometry inputs cleanly", {
   )
 })
 
-test_that("pcdwba preparation rejects incompatible inputs and curves straight arbitrary profiles", {
-  expect_error(
-    acousticTS:::.pcdwba_prepare_geometry(
-      gas_generate(shape = sphere(radius_body = 0.01, n_segments = 40)),
-      radius_curvature_ratio = 3
-    ),
-    "requires a fluid-like scatterer"
-  )
+test_that(
+  paste0(
+    "pcdwba preparation rejects incompatible inputs and curves straight ",
+    "arbitrary profiles"
+  ),
+  {
+    expect_error(
+      acousticTS:::.pcdwba_prepare_geometry(
+        gas_generate(shape = sphere(radius_body = 0.01, n_segments = 40)),
+        radius_curvature_ratio = 3
+      ),
+      "requires a fluid-like scatterer"
+    )
 
-  obj <- fls_generate(
-    shape = arbitrary(
-      x_body = c(0, 0.01, 0.02),
-      z_body = c(0, 0, 0),
-      radius_body = c(0.001, 0.0015, 0.001)
-    ),
-    density_body = 1050,
-    sound_speed_body = 1505
-  )
+    obj <- fls_generate(
+      shape = arbitrary(
+        x_body = c(0, 0.01, 0.02),
+        z_body = c(0, 0, 0),
+        radius_body = c(0.001, 0.0015, 0.001)
+      ),
+      density_body = 1050,
+      sound_speed_body = 1505
+    )
 
-  expect_error(
-    acousticTS:::.pcdwba_prepare_geometry(
+    expect_error(
+      acousticTS:::.pcdwba_prepare_geometry(
+        obj,
+        radius_curvature = 0.03,
+        radius_curvature_ratio = 3
+      ),
+      "Specify at most one"
+    )
+
+    prepared <- acousticTS:::.pcdwba_prepare_geometry(
       obj,
-      radius_curvature = 0.03,
-      radius_curvature_ratio = 3
-    ),
-    "Specify at most one"
-  )
+      radius_curvature_ratio = 4
+    )
+    bent_body <- acousticTS::extract(prepared$object, "body")
 
-  prepared <- acousticTS:::.pcdwba_prepare_geometry(
-    obj,
-    radius_curvature_ratio = 4
-  )
-  bent_body <- acousticTS::extract(prepared$object, "body")
-
-  expect_s4_class(prepared$object, "FLS")
-  expect_true(prepared$geometry$length_body > 0)
-  expect_equal(prepared$max_radius, 0.0015)
-  expect_equal(bent_body$radius_curvature_ratio, 4)
-  expect_true(!is.null(bent_body$arc_length))
-})
+    expect_s4_class(prepared$object, "FLS")
+    expect_true(prepared$geometry$length_body > 0)
+    expect_equal(prepared$max_radius, 0.0015)
+    expect_equal(bent_body$radius_curvature_ratio, 4)
+    expect_true(!is.null(bent_body$arc_length))
+  }
+)

@@ -743,6 +743,21 @@
 #'   path for spheroidal targets, or `NULL` for other shapes.}
 #' }
 #'
+#' @examples
+#' target <- fls_generate(
+#'   shape = sphere(radius_body = 0.005, n_segments = 20),
+#'   g_body = 1,
+#'   h_body = 1
+#' )
+#' stored <- target_strength(
+#'   target,
+#'   frequency = 12e3,
+#'   model = "tmm",
+#'   boundary = "pressure_release",
+#'   store_t_matrix = TRUE
+#' )
+#' tmm_diagnostics(stored, n_theta = 5, n_phi = 9)
+#'
 #' @seealso \code{\link{tmm_scattering}}, \code{\link{tmm_scattering_grid}},
 #'   \code{\link{tmm_products}}
 #' @export

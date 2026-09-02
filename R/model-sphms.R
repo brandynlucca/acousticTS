@@ -53,7 +53,7 @@
 #'
 #' @references
 #' Anderson, V.C. (1950). Sound scattering from a fluid sphere. The Journal of
-#' The Acoustical Society of America, 22: 426–431.
+#' The Acoustical Society of America, 22: 426-431.
 #'
 #' @name SPHMS
 #' @aliases sphms SPHMS
@@ -86,7 +86,9 @@ NULL
 
   # Otherwise infer the appropriate sphere boundary from the scatterer class ===
   if (methods::is(object, "CAL")) {
-    stop("Use 'model = \"calibration\"' when modeling the TS of a solid sphere.")
+    stop(
+      "Use 'model = \"calibration\"' when modeling the TS of a solid sphere."
+    )
   }
   if (methods::is(object, "ESS")) {
     return("shelled_liquid")
@@ -175,7 +177,10 @@ NULL
 
 # Build the interface property ratios used by the SPHMS kernels.
 #' @noRd
-.sphms_body_parameters <- function(object, exterior, sound_speed_sw, density_sw) {
+.sphms_body_parameters <- function(
+  object, exterior, sound_speed_sw,
+  density_sw
+) {
   # Resolve the shell/body to surrounding-medium property ratios ===============
   g_exterior <- exterior$g %||%
     if (!is.null(exterior$density)) exterior$density / density_sw else NA_real_
@@ -211,7 +216,10 @@ NULL
   } else {
     exterior$h %||% NA_real_
   }
-  g32 <- if (!is.null(fluid$density)) fluid$density / (g21 * density_sw) else if (!is.null(fluid$g)) fluid$g / g21 else NA_real_
+  g32 <- if (!is.null(fluid$density)) {
+    fluid$density / (g21 *
+      density_sw)
+  } else if (!is.null(fluid$g)) fluid$g / g21 else NA_real_
   h32 <- if (!is.null(fluid$sound_speed)) {
     fluid$sound_speed / (h21 * sound_speed_sw)
   } else if (!is.null(fluid$h)) {
@@ -575,14 +583,20 @@ SPHMS <- function(object) {
 #' @keywords internal
 #' @noRd
 .sphms_bm_rigid <- function(k1a, m_limit) {
-  .modal_weighted_sum(.sphms_am_rigid(k1a, m_limit), .sphms_modal_weights(m_limit))
+  .modal_weighted_sum(
+    .sphms_am_rigid(k1a, m_limit),
+    .sphms_modal_weights(m_limit)
+  )
 }
 
 #' Helper function for pressure release sphere
 #' @keywords internal
 #' @noRd
 .sphms_bm_prelease <- function(k1a, m_limit) {
-  .modal_weighted_sum(.sphms_am_prelease(k1a, m_limit), .sphms_modal_weights(m_limit))
+  .modal_weighted_sum(
+    .sphms_am_prelease(k1a, m_limit),
+    .sphms_modal_weights(m_limit)
+  )
 }
 
 #' Helper function for fluid sphere

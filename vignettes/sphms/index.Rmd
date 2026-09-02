@@ -1,4 +1,4 @@
-﻿---
+---
 title: "SPHMS"
 output:
   rmarkdown::html_vignette:
@@ -48,11 +48,17 @@ acousticTS:::.model_family_overview(
   best_for = c(
     "Rigid, pressure-release, liquid-filled, and gas-filled spheres",
     "Canonical benchmark comparisons and sanity checks",
-    "Problems where exact spherical geometry is a reasonable physical idealization"
+    paste0(
+      "Problems where exact spherical geometry is a reasonable physical ",
+      "idealization"
+    )
   ),
   supports = c(
     "`Sphere` shapes on `FLS` or `GAS` objects",
-    "Medium-indexed spherical theory with medium `1` as seawater and medium `2` as the sphere interior",
+    paste0(
+      "Medium-indexed spherical theory with medium `1` as seawater and ",
+      "medium `2` as the sphere interior"
+    ),
     "Direct target-strength calculations from exact spherical coefficients"
   ),
   assumptions = c(
@@ -62,8 +68,14 @@ acousticTS:::.model_family_overview(
     "No elastic shell or viscous intermediate layer"
   ),
   reading = c(
-    "[Implementation](sphms-implementation.html): object construction, spectra, and software comparisons",
-    "[Theory](sphms-theory.html): full spherical separation, boundary conditions, and coefficient derivations"
+    paste0(
+      "[Implementation](sphms-implementation.html): object construction, ",
+      "spectra, and software comparisons"
+    ),
+    paste0(
+      "[Theory](sphms-theory.html): full spherical separation, boundary ",
+      "conditions, and coefficient derivations"
+    )
   )
 )
 ```

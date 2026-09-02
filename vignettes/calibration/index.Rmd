@@ -45,7 +45,10 @@ acousticTS:::.model_family_overview(
     "backscatter from the resulting phase-shifted partial waves."
   ),
   best_for = c(
-    "Calibration spheres made of tungsten carbide, copper, aluminum, steel, or similar elastic solids",
+    paste0(
+      "Calibration spheres made of tungsten carbide, copper, aluminum, ",
+      "steel, or similar elastic solids"
+    ),
     "Frequency-response calculations for standard-target calibration workflows",
     "Benchmarking elastic spherical scattering against literature values"
   ),
@@ -61,8 +64,14 @@ acousticTS:::.model_family_overview(
     "No shell or internal cavity"
   ),
   reading = c(
-    "[Implementation](calibration-implementation.html): calibration workflows and benchmark comparisons",
-    "[Theory](calibration-theory.html): elastic-sphere modal theory and phase-shift representation"
+    paste0(
+      "[Implementation](calibration-implementation.html): calibration ",
+      "workflows and benchmark comparisons"
+    ),
+    paste0(
+      "[Theory](calibration-theory.html): elastic-sphere modal theory and ",
+      "phase-shift representation"
+    )
   )
 )
 ```

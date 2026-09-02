@@ -124,7 +124,10 @@ test_that("pkgdown helpers cover fallback output and ordering branches", {
   )
 
   expect_null(acousticTS:::.model_family_current_page())
-  expect_equal(acousticTS:::.model_family_pages_ordered(character()), character())
+  expect_equal(
+    acousticTS:::.model_family_pages_ordered(character()),
+    character()
+  )
 
   unnamed_pages <- acousticTS:::.model_family_pages_ordered(
     c("implementation.html", "index.html")
@@ -145,13 +148,17 @@ test_that("pkgdown helpers cover fallback output and ordering branches", {
   )
   expect_match(overview, "Summary only")
 
-  static_figure <- acousticTS:::.vignette_static_figure("example.png", "Example")
+  static_figure <- acousticTS:::.vignette_static_figure(
+    "example.png",
+    "Example"
+  )
   expect_match(static_figure, 'src="example.png"', fixed = TRUE)
 
   expect_error(
     acousticTS:::.vignette_clickable_figure("unknown_id"),
     "Unknown clickable figure id"
   )
-  clickable <- acousticTS:::.vignette_clickable_figure("getting_started_workflow")
+  clickable <-
+    acousticTS:::.vignette_clickable_figure("getting_started_workflow")
   expect_match(clickable, 'class="clickable-figure"', fixed = TRUE)
 })

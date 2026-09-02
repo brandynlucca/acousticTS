@@ -48,8 +48,11 @@
 
 # Resolve the deterministic grid axes and the per-cell repeat count.
 #' @noRd
-.resolve_simulation_realizations <- function(parameters, batch_by, n_realizations) {
-  # Resolve the per-cell repeat count (defaults to a single evaluation) =========
+.resolve_simulation_realizations <- function(
+  parameters, batch_by,
+  n_realizations
+) {
+  # Resolve the per-cell repeat count (defaults to a single evaluation) ========
   # `n_realizations` is purely a repeat/redraw multiplier: each deterministic
   # grid cell is evaluated this many times, redrawing any generating functions.
   if (is.null(n_realizations)) {
@@ -106,7 +109,11 @@
   list(
     simulation_grid = data.frame(
       realization = rep(seq_len(n_realizations), times = nrow(parameter_grid)),
-      parameter_grid[rep(seq_len(nrow(parameter_grid)), each = n_realizations), ,
+      parameter_grid[
+        rep(seq_len(nrow(parameter_grid)),
+          each =
+            n_realizations
+        ), ,
         drop = FALSE
       ],
       row.names = NULL
@@ -486,7 +493,8 @@
 #'
 #' Structured batch values should be wrapped in a list so that each candidate is
 #' preserved as one unit. For example, use
-#' \code{parameters = list(body_target = list(c(length = 0.02), c(length = 0.03))))}
+#' \code{parameters = list(body_target =
+#' list(c(length = 0.02), c(length = 0.03))))}
 #' when batching across multiple explicit `reforge()` targets.
 #'
 #' Convenience dimension aliases are also supported for compatible
@@ -854,7 +862,10 @@ simulate_ts <- function(object,
         vapply(
           legacy_names,
           function(legacy_name) {
-            .simulation_alias_scalar(reforge_parameters[[legacy_name]], legacy_name)
+            .simulation_alias_scalar(
+              reforge_parameters[[legacy_name]],
+              legacy_name
+            )
           },
           numeric(1)
         ),

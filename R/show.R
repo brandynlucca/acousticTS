@@ -238,6 +238,8 @@
 #' @param object Scattering object.
 #' @return Called for its side effect of printing a formatted summary;
 #'   invisibly returns \code{NULL}.
+#' @examples
+#' show(cal_generate(material = "WC", n_segments = 20))
 #' @importFrom methods setMethod show
 #' @keywords internal
 #' @export
@@ -263,6 +265,9 @@ setMethod(
 #' @param object FLS-class object.
 #' @return Called for its side effect of printing a formatted summary;
 #'   invisibly returns \code{NULL}.
+#' @examples
+#' data(krill, package = "acousticTS")
+#' fls_show(krill)
 #' @keywords internal
 #' @export
 fls_show <- function(object) {
@@ -302,6 +307,11 @@ fls_show <- function(object) {
 #' @param object GAS-class object
 #' @return Called for its side effect of printing a formatted summary;
 #'   invisibly returns \code{NULL}.
+#' @examples
+#' bubble <- gas_generate(
+#'   shape = sphere(radius_body = 0.005, n_segments = 20)
+#' )
+#' gas_show(bubble)
 #' @keywords internal
 #' @export
 gas_show <- function(object) {
@@ -329,6 +339,9 @@ gas_show <- function(object) {
 #' @param object SBF_class object.
 #' @return Called for its side effect of printing a formatted summary;
 #'   invisibly returns \code{NULL}.
+#' @examples
+#' data(cod, package = "acousticTS")
+#' sbf_show(cod)
 #' @keywords internal
 #' @export
 sbf_show <- function(object) {
@@ -378,6 +391,27 @@ sbf_show <- function(object) {
 #' @param object BBF-class object.
 #' @return Called for its side effect of printing a formatted summary;
 #'   invisibly returns \code{NULL}.
+#' @examples
+#' body <- arbitrary(
+#'   x_body = c(0, 0.04, 0.08),
+#'   zU_body = c(0.001, 0.004, 0.001),
+#'   zL_body = c(-0.001, -0.004, -0.001)
+#' )
+#' backbone <- cylinder(
+#'   length_body = 0.06,
+#'   radius_body = 0.0008,
+#'   n_segments = 20
+#' )
+#' fish <- bbf_generate(
+#'   body_shape = body,
+#'   backbone_shape = backbone,
+#'   density_body = 1070,
+#'   sound_speed_body = 1570,
+#'   density_backbone = 1900,
+#'   sound_speed_longitudinal_backbone = 3500,
+#'   sound_speed_transversal_backbone = 1700
+#' )
+#' bbf_show(fish)
 #' @keywords internal
 #' @export
 bbf_show <- function(object) {
@@ -426,6 +460,8 @@ bbf_show <- function(object) {
 #' @param object CAL-class object.
 #' @return Called for its side effect of printing a formatted summary;
 #'   invisibly returns \code{NULL}.
+#' @examples
+#' cal_show(cal_generate(material = "WC", n_segments = 20))
 #' @keywords internal
 #' @export
 cal_show <- function(object) {
@@ -460,6 +496,19 @@ cal_show <- function(object) {
 #' @param object ESS-class object.
 #' @return Called for its side effect of printing a formatted summary;
 #'   invisibly returns \code{NULL}.
+#' @examples
+#' shell <- sphere(radius_body = 0.03, n_segments = 20)
+#' target <- ess_generate(
+#'   shape = shell,
+#'   shell_thickness = 0.001,
+#'   density_shell = 1050,
+#'   sound_speed_shell = 2350,
+#'   density_fluid = 1030,
+#'   sound_speed_fluid = 1500,
+#'   E = 3.5e9,
+#'   nu = 0.34
+#' )
+#' ess_show(target)
 #' @keywords internal
 #' @export
 ess_show <- function(object) {

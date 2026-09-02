@@ -156,36 +156,42 @@ test_that("Test prolate spheroid model", {
   check_ps_mss(boundary = "liquid_filled")
 })
 
-test_that("Gas-filled prolate spheroid PSMS returns finite values on the benchmark-supported grid", {
-  skip_if_not(
-    acousticTS:::.quad_precision_available(),
-    "native quad precision is unavailable"
-  )
+test_that(
+  paste0(
+    "Gas-filled prolate spheroid PSMS returns finite values on the ",
+    "benchmark-supported grid"
+  ),
+  {
+    skip_if_not(
+      acousticTS:::.quad_precision_available(),
+      "native quad precision is unavailable"
+    )
 
-  data(benchmark_ts)
+    data(benchmark_ts)
 
-  density_sw <- 1026.8
-  sound_speed_sw <- 1477.3
-  frequency <- benchmark_ts$frequency_spectra$index$frequency[
-    !is.na(benchmark_ts$frequency_spectra$prolate_spheroid$gas_filled)
-  ]
+    density_sw <- 1026.8
+    sound_speed_sw <- 1477.3
+    frequency <- benchmark_ts$frequency_spectra$index$frequency[
+      !is.na(benchmark_ts$frequency_spectra$prolate_spheroid$gas_filled)
+    ]
 
-  scatterer_ps <- fixture_ps("gas_filled")
-  scatterer_ps <- target_strength(
-    scatterer_ps,
-    frequency = frequency,
-    model = "psms",
-    boundary = "gas_filled",
-    simplify_Amn = TRUE,
-    density_sw = density_sw,
-    sound_speed_sw = sound_speed_sw,
-    precision = "quad"
-  )
+    scatterer_ps <- fixture_ps("gas_filled")
+    scatterer_ps <- target_strength(
+      scatterer_ps,
+      frequency = frequency,
+      model = "psms",
+      boundary = "gas_filled",
+      simplify_Amn = TRUE,
+      density_sw = density_sw,
+      sound_speed_sw = sound_speed_sw,
+      precision = "quad"
+    )
 
-  ts_vals <- acousticTS::extract(scatterer_ps, "model")$PSMS$TS
-  expect_length(ts_vals, length(frequency))
-  expect_true(all(is.finite(ts_vals)))
-})
+    ts_vals <- acousticTS::extract(scatterer_ps, "model")$PSMS$TS
+    expect_length(ts_vals, length(frequency))
+    expect_true(all(is.finite(ts_vals)))
+  }
+)
 
 test_that("internal modal helpers do not leak into the public API", {
   expect_false("modal_matrix" %in% getNamespaceExports("acousticTS"))

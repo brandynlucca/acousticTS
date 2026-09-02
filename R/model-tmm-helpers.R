@@ -106,7 +106,10 @@
 # Identify spherical elastic-shell runs that should stay on the exact elastic
 # spherical modal path rather than the projected spherical T-matrix solve.
 #' @noRd
-.tmm_is_elastic_shell_sphere_branch <- function(object, shape_parameters, boundary) {
+.tmm_is_elastic_shell_sphere_branch <- function(
+  object, shape_parameters,
+  boundary
+) {
   methods::is(object, "ESS") &&
     identical(as.character(shape_parameters[["shape"]])[1], "Sphere") &&
     identical(boundary, "elastic_shelled")
@@ -193,7 +196,10 @@
   # Apply the class-specific default boundary and validate the final label =====
   boundary <- .tmm_boundary_default(object, boundary)
   if (methods::is(object, "ESS")) {
-    shape_name <- as.character(acousticTS::extract(object, "shape_parameters")[["shape"]])[1]
+    shape_name <- as.character(acousticTS::extract(
+      object,
+      "shape_parameters"
+    )[["shape"]])[1]
     if (identical(shape_name, "Sphere") &&
       boundary %in% c(
         "shelled_pressure_release",
@@ -470,7 +476,12 @@
       frequency,
       k_sw = sound_speed_sw,
       k_shell = body$shell_sound_speed,
-      k_fluid = if (is.finite(body$fluid_sound_speed)) body$fluid_sound_speed else NA_real_
+      k_fluid = if (
+        is.finite(body$fluid_sound_speed)) {
+        body$fluid_sound_speed
+      } else {
+        NA_real_
+      }
     )
     acoustics$m_limit <- .sphms_m_limit(
       m_limit = n_max,
@@ -581,8 +592,8 @@
 .tmm_precision_label <- function(use_spheroidal_branch, boundary) {
   # Penetrable spheroidal runs use the quad-precision backend =================
   if (use_spheroidal_branch &&
-      boundary %in% c("liquid_filled", "gas_filled") &&
-      .quad_precision_available()) {
+    boundary %in% c("liquid_filled", "gas_filled") &&
+    .quad_precision_available()) {
     return("quad")
   }
 
@@ -707,7 +718,10 @@
 # Cylinder monostatic TMM uses the same modal truncation rule as FCMS so that
 # the cylindrical-coordinate backend remains benchmark-compatible by default.
 #' @noRd
-.tmm_prepare_cylinder_n_max <- function(n_max, frequency, k_sw, shape_parameters) {
+.tmm_prepare_cylinder_n_max <- function(
+  n_max, frequency, k_sw,
+  shape_parameters
+) {
   if (is.null(n_max)) {
     return(as.integer(ceiling(k_sw * max(as.numeric(shape_parameters$radius),
       na.rm = TRUE

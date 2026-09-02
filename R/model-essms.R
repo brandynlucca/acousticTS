@@ -178,7 +178,7 @@
 #' @references
 #'
 #' Anderson, V.C. (1950). Sound scattering from a fluid sphere. The Journal of
-#' The Acoustical Society of America, 22: 426–431.
+#' The Acoustical Society of America, 22: 426-431.
 #'
 #' Gaunaurd, G.C., and Wertman, W. (1991). Transient acoustic scattering by
 #' fluid-loaded elastic shells. International Journal of Solids and Structures,

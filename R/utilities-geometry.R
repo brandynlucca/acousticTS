@@ -445,7 +445,11 @@
 #' head(extract(bent_obj, c("body", "rpos", "z")))
 #' extract(bent_obj, c("shape_parameters", "radius_curvature_ratio"))
 #'
-#' bent_body <- brake(extract(obj, "body"), radius_curvature = 0.35, mode = "measurement")
+#' bent_body <- brake(
+#'   extract(obj, "body"),
+#'   radius_curvature = 0.35,
+#'   mode = "measurement"
+#' )
 #' head(bent_body$rpos["z", ])
 #'
 #' @seealso [extract()], [reforge()], [translate_shape()], [reanchor_shape()],
@@ -465,7 +469,10 @@ brake <- function(object, radius_curvature, mode = "ratio") {
 
   # Reject unsupported inputs explicitly rather than returning NULL ============
   stop(
-    "`brake()` expects either a scatterer object or a list-like body component.",
+    paste0(
+      "`brake()` expects either a scatterer object or a list-like body ",
+      "component."
+    ),
     call. = FALSE
   )
 }

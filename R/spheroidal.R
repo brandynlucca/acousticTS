@@ -88,9 +88,9 @@
 #' # Double precision (default)
 #' Smn(m = 2, n = 3, c = 1, eta = 0.5, precision = "double")
 #'
-#' # Quad precision
-#' \dontrun{
-#' Smn(m = 2, n = 3, c = 1, eta = 0.5, precision = "quad")
+#' # Quad precision, when supported by the package build
+#' if (isTRUE(acousticTS:::.quad_precision_available())) {
+#'   Smn(m = 2, n = 3, c = 1, eta = 0.5, precision = "quad")
 #' }
 #'
 #' @references
@@ -243,9 +243,9 @@ Smn <- function(m, n, c, eta, normalize = FALSE, precision = "double") {
 #' # Double precision (default)
 #' Rmn(m = 2, n = 3, c = 1, xi = 1.5)
 #'
-#' # Quad precision
-#' \dontrun{
-#' Rmn(m = 2, n = 3, c = 1, xi = 1.5, precision = "quad")
+#' # Quad precision, when supported by the package build
+#' if (isTRUE(acousticTS:::.quad_precision_available())) {
+#'   Rmn(m = 2, n = 3, c = 1, xi = 1.5, precision = "quad")
 #' }
 #'
 #' @references

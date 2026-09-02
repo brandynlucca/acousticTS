@@ -123,6 +123,14 @@
 #' @return A data frame with normalized orientation weights and class
 #'   `"TMMOrientationDistribution"`.
 #'
+#' @examples
+#' tmm_orientation_distribution(
+#'   distribution = "uniform",
+#'   lower = pi / 3,
+#'   upper = 2 * pi / 3,
+#'   n_theta = 7
+#' )
+#'
 #' @seealso \code{\link{tmm_average_orientation}},
 #'   \code{\link{tmm_products}}
 #' @export
@@ -327,6 +335,22 @@ tmm_orientation_distribution <- function(distribution = c(
 #' @return A data frame containing the frequency, the orientation-averaged
 #'   differential backscattering cross section and the corresponding
 #'   orientation-averaged target strength.
+#'
+#' @examples
+#' target <- fls_generate(
+#'   shape = sphere(radius_body = 0.005, n_segments = 20),
+#'   g_body = 1,
+#'   h_body = 1
+#' )
+#' stored <- target_strength(
+#'   target,
+#'   frequency = 12e3,
+#'   model = "tmm",
+#'   boundary = "pressure_release",
+#'   store_t_matrix = TRUE
+#' )
+#' distribution <- tmm_orientation_distribution(n_theta = 5)
+#' tmm_average_orientation(stored, distribution = distribution)
 #'
 #' @seealso \code{\link{tmm_scattering}}
 #' @export

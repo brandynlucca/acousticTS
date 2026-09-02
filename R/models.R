@@ -58,11 +58,15 @@
   source <- match.arg(source)
   canonical <- .normalize_model_identifier(name, "name")[[1]]
 
-  if (!is.character(slot) || length(slot) != 1L || is.na(slot) || !nzchar(slot)) {
+  if (!is.character(slot) || length(slot) != 1L || is.na(slot) ||
+    !nzchar(slot)) {
     stop("`slot` must be a single non-empty string.", call. = FALSE)
   }
 
-  aliases <- unique(.normalize_model_identifier(c(aliases, canonical), "aliases"))
+  aliases <- unique(.normalize_model_identifier(
+    c(aliases, canonical),
+    "aliases"
+  ))
 
   list(
     canonical = canonical,
@@ -264,13 +268,17 @@
 
   if (is.character(x) && length(x) == 1L && !is.na(x) && nzchar(x)) {
     return(list(
-      fn = .resolve_model_function_reference(x, envir = envir, arg_name = arg_name),
+      fn = .resolve_model_function_reference(x,
+        envir = envir, arg_name =
+          arg_name
+      ),
       ref = x
     ))
   }
 
   stop(
-    "`", arg_name, "` must be either a function or a single function reference.",
+    "`", arg_name,
+    "` must be either a function or a single function reference.",
     call. = FALSE
   )
 }
@@ -296,7 +304,10 @@
     name = entry$canonical,
     initialize = .resolve_model_function_reference(
       entry$initialize_ref,
-      arg_name = paste0("initialize reference for model '", entry$canonical, "'")
+      arg_name = paste0(
+        "initialize reference for model '", entry$canonical,
+        "'"
+      )
     ),
     solver = .resolve_model_function_reference(
       entry$solver_ref,
@@ -403,7 +414,10 @@
     return(matches[[1]])
   }
 
-  available <- sort(unique(unlist(lapply(entries, function(entry) entry$aliases))))
+  available <- sort(unique(unlist(lapply(
+    entries,
+    function(entry) entry$aliases
+  ))))
   stop(
     "Unknown target strength model '", name, "'. Available models: ",
     paste(available, collapse = ", "),
@@ -472,6 +486,8 @@
 #' @return
 #' A data frame describing currently available built-in and user-registered
 #' target-strength models.
+#' @examples
+#' head(available_models())
 #' @export
 available_models <- function() {
   entries <- .model_registry_entries()
@@ -505,6 +521,17 @@ available_models <- function() {
 #'   with the same canonical name can be replaced. Built-in models cannot be
 #'   overwritten.
 #' @return Invisibly returns the normalized registry entry.
+#' @examples
+#' if (interactive()) {
+#'   initialize_demo <- function(object, frequency, ...) object
+#'   solve_demo <- function(object) object
+#'   register_model(
+#'     "demo",
+#'     initialize = initialize_demo,
+#'     solver = solve_demo
+#'   )
+#'   unregister_model("demo")
+#' }
 #' @export
 register_model <- function(name,
                            initialize,
@@ -527,7 +554,10 @@ register_model <- function(name,
     envir = parent.frame()
   )
   slot <- if (is.null(slot)) .default_model_slot(canonical) else slot
-  aliases <- unique(.normalize_model_identifier(c(aliases, canonical), "aliases"))
+  aliases <- unique(.normalize_model_identifier(
+    c(aliases, canonical),
+    "aliases"
+  ))
 
   builtin_entries <- .builtin_model_registry()
   if (canonical %in% names(builtin_entries)) {
@@ -599,6 +629,17 @@ register_model <- function(name,
 #' @param remove_persisted Logical scalar. When `TRUE`, any persisted registry
 #'   entry is also removed from the user's config file.
 #' @return Invisibly returns the removed canonical model name.
+#' @examples
+#' if (interactive()) {
+#'   initialize_demo <- function(object, frequency, ...) object
+#'   solve_demo <- function(object) object
+#'   register_model(
+#'     "demo",
+#'     initialize = initialize_demo,
+#'     solver = solve_demo
+#'   )
+#'   unregister_model("demo")
+#' }
 #' @export
 unregister_model <- function(name, remove_persisted = TRUE) {
   .ensure_model_registry_loaded()
@@ -625,6 +666,10 @@ unregister_model <- function(name, remove_persisted = TRUE) {
 #' @param remove_persisted Logical scalar. When `TRUE`, persisted user model
 #'   registrations are also deleted from the user's config file.
 #' @return Invisibly returns `NULL`.
+#' @examples
+#' if (interactive()) {
+#'   reset_model_registry()
+#' }
 #' @export
 reset_model_registry <- function(remove_persisted = FALSE) {
   .ensure_model_registry_loaded()

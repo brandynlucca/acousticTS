@@ -142,7 +142,10 @@ sbf_obj <- sbf_generate(
 
 data.frame(
   body_length_m = extract(sbf_obj, c("shape_parameters", "body", "length")),
-  bladder_length_m = extract(sbf_obj, c("shape_parameters", "bladder", "length")),
+  bladder_length_m = extract(sbf_obj, c(
+    "shape_parameters", "bladder",
+    "length"
+  )),
   body_theta_rad = extract(sbf_obj, c("body", "theta"))
 )
 ```
@@ -154,7 +157,10 @@ At that point it is often useful to inspect the object internals directly so the
 ```{r}
 list(
   body_length_m = extract(sbf_obj, c("shape_parameters", "body", "length")),
-  bladder_length_m = extract(sbf_obj, c("shape_parameters", "bladder", "length")),
+  bladder_length_m = extract(sbf_obj, c(
+    "shape_parameters", "bladder",
+    "length"
+  )),
   body_theta_rad = extract(sbf_obj, c("body", "theta")),
   bladder_x_head = head(extract(sbf_obj, "bladder")$rpos[1, ])
 )

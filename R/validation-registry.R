@@ -25,7 +25,8 @@
   tooltip_attr <- ""
   if (isTRUE(tooltip) && !is.null(family)) {
     tooltip_text <- .validation_status_tooltip(family, status)
-    if (length(tooltip_text) == 1L && !is.na(tooltip_text) && nzchar(tooltip_text)) {
+    if (length(tooltip_text) == 1L && !is.na(tooltip_text) &&
+      nzchar(tooltip_text)) {
       escaped_tooltip <- .validation_html_escape(tooltip_text)
       tooltip_attr <- paste0(
         ' title="', escaped_tooltip,
@@ -547,7 +548,10 @@
   if (nrow(evidence) == 0) {
     if (identical(meta$validation_status[[1]], "unvalidated")) {
       return(
-        "The package does not yet claim external validation across the current public scope."
+        paste0(
+          "The package does not yet claim external validation across the ",
+          "current public scope."
+        )
       )
     }
 
@@ -575,7 +579,10 @@
 
   if (identical(status_type, "unvalidated")) {
     return(
-      "The package does not yet claim external validation across the current public scope."
+      paste0(
+        "The package does not yet claim external validation across the ",
+        "current public scope."
+      )
     )
   }
 
