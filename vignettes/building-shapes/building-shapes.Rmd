@@ -28,7 +28,7 @@ The important point is that shape construction is not the stage where material c
 
 ```{r echo=FALSE, results='asis'}
 acousticTS:::.vignette_static_figure(
-  src = "building-shapes-spectrum.png",
+  src = "building-shapes-spectrum.svg",
   alt = "Shape-selection spectrum"
 )
 ```
@@ -148,7 +148,7 @@ The package stores shape geometry in a way that is consistent across models, but
 
 ```{r echo=FALSE, results='asis'}
 acousticTS:::.vignette_static_figure(
-  src = "building-shapes-coordinates.png",
+  src = "building-shapes-coordinates.svg",
   alt = "Coordinate conventions for canonical and arbitrary shapes"
 )
 ```

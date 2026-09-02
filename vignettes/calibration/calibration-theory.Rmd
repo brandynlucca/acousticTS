@@ -77,9 +77,12 @@ $$
 
 where $k_\ell$ and $k_\tau$ are the longitudinal and transverse wavenumbers, respectively. The key point is that the sphere supports two distinct elastic wave families internally, and both must satisfy the boundary conditions at the fluid-solid interface.
 
-## Separability of the Hemholtz equation in spherical coordinates
+## Separability of the Helmholtz equation in spherical coordinates
 
-Because the geometry is spherical, the exterior and interior Helmholtz equations are separable in spherical coordinates [@Achenbach_1973]. For a sphere centered at the origin, the Hemholtz equation provides solutions that can be written as products of single-variable functions:
+Because the geometry is spherical, the exterior and interior Helmholtz
+equations are separable in spherical coordinates [@Achenbach_1973]. For a
+sphere centered at the origin, the Helmholtz equation provides solutions that
+can be written as products of single-variable functions:
 
 $$
   \psi(r, \theta, \varphi) = R(r) \Theta(\theta) \mathbf{\Phi}(\varphi).
@@ -233,7 +236,7 @@ $$
 
 It is often more informative to parameterize each partial wave by a real phase shift $\eta_m$ than by the raw complex coefficient $B_m$ [@Faran_1951; @Rudgers_1969]. In that representation, the elastic boundary conditions determine how far the outgoing partial wave is shifted relative to the free spherical solution.
 
-![Calibration sphere phase-shift schematic](calibration-phase-shift-schematic.png)
+![Calibration sphere phase-shift schematic](calibration-phase-shift-schematic.svg)
 
 The scattered acoustic field can be expressed as a sum of partial waves: 
 $$ 
@@ -299,7 +302,7 @@ $$
 
 This normalization is important because calibration references are sometimes written in terms of a dimensionless form function and sometimes in terms of a dimensional backscattering length. Those descriptions are compatible, but only if the rescaling is made explicit.
 
-![Calibration sphere modal bookkeeping from partial waves to reported backscatter quantities.](calibration-modal-bookkeeping.png)
+![Calibration sphere modal bookkeeping from partial waves to reported backscatter quantities.](calibration-modal-bookkeeping.svg)
 
 The modal bookkeeping proceeds in a fixed order. The incident plane wave is decomposed into modal terms, each mode acquires an elastic phase shift at the sphere surface, the far-field series is summed, and the final result is reported as a linear backscattering length, a backscattering cross-section, and target strength.
 

@@ -37,7 +37,7 @@ That structure is what underlies the spherical modal series solution for rigid, 
 
 The unshelled spherical problem considered here has three boundary families. A rigid sphere enforces zero normal velocity at $r = a$, a pressure-release sphere enforces zero pressure there, and a fluid-filled or gas-filled sphere enforces continuity of pressure and normal velocity between the surrounding medium and the interior. Shell-supported spherical problems are treated separately because once an elastic shell is introduced, the interface physics changes qualitatively.
 
-<!-- ![SPHMS spherical-coordinate and partial-wave schematic, showing the boundary at $r=a$, the polar angle $\theta$, and the radial basis functions used inside and outside the sphere.](sphms-coordinate-geometry-clean.png) -->
+<!-- ![SPHMS spherical-coordinate and partial-wave schematic, showing the boundary at $r=a$, the polar angle $\theta$, and the radial basis functions used inside and outside the sphere.](sphms-coordinate-geometry-clean.svg) -->
 
 The boundary condition is imposed at $r = a$, the incident and scattered fields are expanded in spherical partial waves outside the sphere, and the interior field is expanded in regular spherical waves inside the sphere. The polar angle $\theta$ identifies the usual axisymmetric geometry, while the coefficient $A_n$ carries the scattered contribution of angular order $n$.
 

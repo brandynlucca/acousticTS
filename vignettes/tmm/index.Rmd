@@ -100,4 +100,4 @@ acousticTS:::.model_family_overview(
 )
 ```
 
-![Single-target TMM workflow, showing the spherical-coordinate branch used for spheres and oblates, the spheroidal branch used for prolates, and the cylindrical monostatic branch used for finite cylinders.](tmm-branch-schematic.png)
+![Single-target TMM workflow, showing the spherical-coordinate branch used for spheres and oblates, the spheroidal branch used for prolates, and the cylindrical monostatic branch used for finite cylinders.](tmm-branch-schematic.svg)

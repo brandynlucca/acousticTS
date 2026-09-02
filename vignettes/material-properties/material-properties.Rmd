@@ -28,7 +28,7 @@ In practice, this page is the bookkeeping companion to the theory pages. If a mo
 
 ```{r echo=FALSE, results='asis'}
 acousticTS:::.vignette_static_figure(
-  src = "material-property-pipeline.png",
+  src = "material-property-pipeline.svg",
   alt = "Material property pipeline"
 )
 ```

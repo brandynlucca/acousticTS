@@ -237,7 +237,7 @@ $$
   \xi_1 = \left[1 - \left(\frac{b}{a}\right)^2\right]^{-1/2}.
 $$
 
-<!-- ![Meridional-plane geometry for the prolate spheroidal TMM branch.](tmm-prolate-coordinate-schematic.png) -->
+<!-- ![Meridional-plane geometry for the prolate spheroidal TMM branch.](tmm-prolate-coordinate-schematic.svg) -->
 
 ## Spheroidal modal representation
 

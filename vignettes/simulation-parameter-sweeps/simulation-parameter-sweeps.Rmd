@@ -18,7 +18,9 @@ vignette: >
 
 # Introduction
 
-Parameter sweeps are especially useful when a model has to be interpreted over the orientation, size, and contrast ranges emphasized in benchmark and survey studies [@Jech_2015; @Demer_2005.
+Parameter sweeps are especially useful when a model has to be interpreted over
+the orientation, size, and contrast ranges emphasized in benchmark and survey
+studies [@Jech_2015; @Demer_2005].
 
 
 
@@ -352,7 +354,7 @@ res_parallel <- simulate_ts(
   n_realizations = 100,
   parameters = list(theta_body = function() runif(1, 0.5 * pi, pi)),
   parallel = TRUE,
-  n_cores = 4
+  n_cores = 2
 )
 ```
 

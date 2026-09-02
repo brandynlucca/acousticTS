@@ -40,7 +40,7 @@ TSL <- function(object) {
 
 This vignette walks through that pattern and builds a simple example model from scratch. The example is intentionally simple. It is not meant to be a physically complete scattering model. Its purpose is to show how model dispatch, registration, parameter storage, and result storage work inside the package.
 
-![Dispatch path for a new model.](creating-model-dispatch.png)
+![Dispatch path for a new model.](creating-model-dispatch.svg)
 
 # How `target_strength()` finds your model
 

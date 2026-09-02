@@ -58,7 +58,7 @@ $$
 
 where $i$ and $j$ represent two separate media. Consequently, there are two primary interfaces: exterior-shell ($g_{21}$, $h_{21}$) and shell-interior ($g_{32}$, $h_{32}$).
 
-![ESSMS mode-wise boundary bookkeeping from the two shell radii to the exterior scattering coefficient.](essms-boundary-bookkeeping.png)
+![ESSMS mode-wise boundary bookkeeping from the two shell radii to the exterior scattering coefficient.](essms-boundary-bookkeeping.svg)
 
 The six scalar conditions arise because pressure and radial velocity are continuous at both radii, while shear traction vanishes at both fluid-solid interfaces.
 

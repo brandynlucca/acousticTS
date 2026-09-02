@@ -30,7 +30,7 @@ This distinction matters because "exact" in a modeling article and "numerically 
 
 ```{r echo=FALSE, results='asis'}
 acousticTS:::.vignette_static_figure(
-  src = "numerical-foundations-map.png",
+  src = "numerical-foundations-map.svg",
   alt = "Numerical foundations map"
 )
 ```

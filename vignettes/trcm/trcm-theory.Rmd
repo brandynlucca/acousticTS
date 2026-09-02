@@ -38,9 +38,9 @@ the fluid-like body interior.
 
 The reflection and transmission factors entering the model come from ordinary fluid-fluid interface physics. Pressure is continuous across the boundary, normal particle velocity is continuous across the boundary, and the resulting impedance contrast determines how much of the incident field is reflected or transmitted. The TRCM does not solve that boundary-value problem exactly. It inserts those local interface coefficients into a high-frequency two-path reduction for an elongated body.
 <!-- 
-![Straight-cylinder cross-section and the two retained TRCM paths.](trcm-two-ray-geometry-clean.png)
+![Straight-cylinder cross-section and the two retained TRCM paths.](trcm-two-ray-geometry-clean.svg)
 
-![Curvature changes axial coherence length, not the local two-ray cross-sectional physics.](trcm-curvature-coherence-clean.png) -->
+![Curvature changes axial coherence length, not the local two-ray cross-sectional physics.](trcm-curvature-coherence-clean.svg) -->
 
 The model can be read as the product of four ingredients. The fluid interface supplies a reflection coefficient. The cross-section supplies a normalized two-ray interference factor. The finite body axis supplies a directivity factor. The high-frequency asymptotics supply the specular amplitude and phase scaling. Curvature then modifies only the coherent axial accumulation, not the local two-path cross-sectional physics.
 

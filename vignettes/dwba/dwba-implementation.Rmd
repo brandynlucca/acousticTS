@@ -140,7 +140,11 @@ Those values still need to be read carefully. The largest absolute $\Delta TS$ v
 
 ### Bundled krill compatibility check
 
-The bundled `krill` object serves a different role from the canonical modal-series targets above. Rather than testing an exact canonical-shape solution, it is used to verify that the stored segmented-body geometry reproduces the `MATLAB` code provded by @mcgehee_software and echoSMs [@echoSMs_software].
+The bundled `krill` object serves a different role from the canonical
+modal-series targets above. Rather than testing an exact canonical-shape
+solution, it is used to verify that the stored segmented-body geometry
+reproduces the `MATLAB` code provided by @mcgehee_software and echoSMs
+[@echoSMs_software].
 
 | Comparison | Mean abs. $\Delta$ TS (dB) | Max abs. $\Delta$ TS (dB) |
 |:--|--:|--:|

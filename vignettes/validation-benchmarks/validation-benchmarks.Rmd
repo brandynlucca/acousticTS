@@ -24,7 +24,7 @@ The validation workflow on this page is grounded in inter-model benchmark compar
 
 Modeling packages become much more useful when users can distinguish a physically surprising result from a setup error. Validation pages help provide that context. In acousticTS, validation is not a single check with a single threshold. It is a layered workflow that begins with object and unit sanity, then moves to canonical benchmark reproduction, and finally asks whether the numerical behavior is stable enough that any remaining discrepancy deserves physical interpretation.
 
-![Validation ladder](validation-ladder.png)
+![Validation ladder](validation-ladder.svg)
 
 That layered view matters because benchmark comparisons are only informative when the target definition, acoustic assumptions, numerical settings, and reporting scale are already aligned. A mismatch against a stored benchmark curve does not automatically diagnose a broken model. It may instead reflect a different boundary condition, a different frequency grid, a different medium, a different orientation convention, or a comparison being carried out in a quantity that is not the one the benchmark was intended to validate.
 
