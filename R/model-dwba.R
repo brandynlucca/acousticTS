@@ -81,7 +81,7 @@
 #'  }
 #'
 #' In practice, \eqn{c_2} and \eqn{\rho_2} within 5% of \eqn{c_1} and
-#' \eqn{\rho_1}, respectively, can be considered to be sufficent for the
+#' \eqn{\rho_1}, respectively, can be considered to be sufficient for the
 #' weak scattering assumption whereby:
 #'
 #'  \deqn{

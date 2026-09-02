@@ -4,7 +4,7 @@
 ################################################################################
 # Methods for "show(...)" for each scattering class object
 ################################################################################
-#' Safe display helper: returns "NA" string for NULL/all-NA vectors
+#' Format a numeric mean for display
 #' @noRd
 .show_mean <- function(x) {
   # Return a printable NA token for missing inputs =============================
@@ -14,7 +14,8 @@
   # Otherwise return the rounded mean ==========================================
   round(mean(x, na.rm = TRUE), 4)
 }
-# Centralized named-property rendering for show() methods
+#' Format named properties for display
+#' @noRd
 .show_property_block <- function(properties,
                                  label_map = character(),
                                  unit_map = character(),
@@ -37,145 +38,53 @@
   paste("   ", prop_strings, collapse = "\n ")
 }
 
-#' Show emit helper
-#' @noRd
-.show_emit <- function(lines) {
-  # Emit one preformatted show() block =========================================
-  cat(paste(lines, collapse = "\n"))
-}
-
-.show_section_lines <- function(title, ...) {
-  # Prefix a block of lines with the section title =============================
-  c(paste0(title, ":"), ...)
-}
-
-.show_header_lines <- function(object, descriptor, meta) {
-  # Build the shared object header lines =======================================
-  c(
-    paste0(methods::is(object)[[1]], "-object"),
-    paste0(" ", descriptor),
-    paste0(" ID:", meta$ID)
-  )
-}
-
-#' Show summary appending helper
+#' Assemble the common scatterer summary header
 #' @noRd
 .show_summary_lines <- function(object, descriptor, meta, ...) {
   # Combine the header and body sections =======================================
   c(
-    .show_header_lines(object, descriptor, meta),
+    paste0(methods::is(object)[[1]], "-object"),
+    paste0(" ", descriptor),
+    paste0(" ID:", meta$ID),
     ...
   )
 }
 
-#' Show dimensions helper
+#' Format a shape section for display
 #' @noRd
-.show_dimension_lines <- function(section_name,
-                                  length_value,
-                                  units,
-                                  n_segments = NULL,
-                                  mean_radius = NULL,
-                                  max_radius = NULL,
-                                  segment_label = "cylinders") {
+.show_shape_section <- function(section_name,
+                                shape_meta,
+                                units,
+                                radius_values = NULL,
+                                segment_label = "segments") {
   # Build the primary length line ==============================================
   length_line <- paste0(
     " Length:",
-    round(length_value, 3),
+    round(shape_meta$length, 3),
     " ",
     units,
-    if (!is.null(n_segments)) {
-      paste0("(n = ", n_segments, " ", segment_label, ")")
+    if (!is.null(shape_meta$n_segments)) {
+      paste0("(n = ", shape_meta$n_segments, " ", segment_label, ")")
     } else {
       ""
     }
   )
   # Append the optional radius summaries =======================================
   lines <- c(paste0(section_name, ":"), length_line)
-  if (!is.null(mean_radius)) {
+  if (!is.null(radius_values)) {
     lines <- c(
       lines,
-      paste0(" Mean radius:", round(mean_radius, 4), " ", units)
-    )
-  }
-  if (!is.null(max_radius)) {
-    lines <- c(
-      lines,
-      paste0(" Max radius:", round(max_radius, 4), " ", units)
+      paste0(" Mean radius:", round(mean(radius_values, na.rm = TRUE), 4),
+        " ", units),
+      paste0(" Max radius:", round(max(radius_values, na.rm = TRUE), 4),
+        " ", units)
     )
   }
 
   lines
 }
 
-#' Show orientation line helper
-#' @noRd
-.show_orientation_line <- function(label, theta, theta_units) {
-  # Format one orientation line ================================================
-  paste0(label, round(theta, 3), " ", theta_units)
-}
-.show_density_speed_line <- function(prefix,
-                                     density,
-                                     sound_speed,
-                                     density_units = "kg m^-3",
-                                     sound_speed_units = "m s^-1") {
-  # Format one fluid-material summary line =====================================
-  paste0(
-    prefix,
-    " Density: ", .show_mean(density),
-    " ", density_units, " | Sound speed: ", .show_mean(sound_speed),
-    " ", sound_speed_units
-  )
-}
-
-#' Show elastic material properties helper
-#' @noRd
-.show_elastic_speed_line <- function(prefix,
-                                     density,
-                                     sound_speed_longitudinal,
-                                     sound_speed_transversal,
-                                     density_units = "kg m^-3",
-                                     speed_units = "m s^-1") {
-  # Format one elastic-material summary line ===================================
-  paste0(
-    prefix,
-    " Density: ", .show_mean(density),
-    " ", density_units,
-    " | cL: ", .show_mean(sound_speed_longitudinal),
-    " ", speed_units,
-    " | cT: ", .show_mean(sound_speed_transversal),
-    " ", speed_units
-  )
-}
-
-.show_shape_section <- function(section_name,
-                                shape_meta,
-                                units,
-                                radius_values = NULL,
-                                segment_label = "segments") {
-  # Summarize the available radius statistics ==================================
-  mean_radius <- if (!is.null(radius_values)) {
-    mean(radius_values, na.rm = TRUE)
-  } else {
-    NULL
-  }
-  max_radius <- if (!is.null(radius_values)) {
-    max(radius_values, na.rm = TRUE)
-  } else {
-    NULL
-  }
-  # Delegate the shared dimension formatting ===================================
-  .show_dimension_lines(
-    section_name = section_name,
-    length_value = shape_meta$length,
-    units = units,
-    n_segments = shape_meta$n_segments,
-    mean_radius = mean_radius,
-    max_radius = max_radius,
-    segment_label = segment_label
-  )
-}
-
-#' Show component radius helper
+#' Resolve component radius values for display
 #' @noRd
 .show_component_radius_values <- function(component,
                                           fallback_context = "component") {
@@ -191,6 +100,8 @@
   )
 }
 
+#' Format fluid material properties for display
+#' @noRd
 .show_fluid_material_section <- function(section_name,
                                          density = NULL,
                                          sound_speed = NULL,
@@ -199,42 +110,42 @@
   # Prefer absolute density and sound-speed values when present ================
   if ((!is.null(density) && !all(is.na(density))) ||
     (!is.null(sound_speed) && !all(is.na(sound_speed)))) {
-    return(.show_section_lines(
-      section_name,
-      .show_density_speed_line(
-        prefix = "",
-        density = density,
-        sound_speed = sound_speed
+    return(c(
+      paste0(section_name, ":"),
+      paste0(
+        " Density: ", .show_mean(density),
+        " kg m^-3 | Sound speed: ", .show_mean(sound_speed),
+        " m s^-1"
       )
     ))
   }
   # Otherwise print the stored contrast values =================================
-  .show_section_lines(
-    section_name,
+  c(
+    paste0(section_name, ":"),
     paste0(" g: ", .show_mean(g)),
     paste0(" h: ", .show_mean(h))
   )
 }
 
-#' Show summary elastic material properties helper
+#' Format elastic material properties for display
 #' @noRd
 .show_elastic_material_section <- function(section_name,
                                            density,
                                            sound_speed_longitudinal,
                                            sound_speed_transversal) {
   # Format one elastic-material section ========================================
-  .show_section_lines(
-    section_name,
-    .show_elastic_speed_line(
-      prefix = "",
-      density = density,
-      sound_speed_longitudinal = sound_speed_longitudinal,
-      sound_speed_transversal = sound_speed_transversal
+  c(
+    paste0(section_name, ":"),
+    paste0(
+      " Density: ", .show_mean(density),
+      " kg m^-3 | cL: ", .show_mean(sound_speed_longitudinal),
+      " m s^-1 | cT: ", .show_mean(sound_speed_transversal),
+      " m s^-1"
     )
   )
 }
 ################################################################################
-#' Generic function for show(...) for different scatterers.
+#' Display a scatterer object
 #' @param object Scattering object.
 #' @return Called for its side effect of printing a formatted summary;
 #'   invisibly returns \code{NULL}.
@@ -261,22 +172,15 @@ setMethod(
   }
 )
 ################################################################################
-#' show(...) for FLS-class objects.
-#' @param object FLS-class object.
-#' @return Called for its side effect of printing a formatted summary;
-#'   invisibly returns \code{NULL}.
-#' @examples
-#' data(krill, package = "acousticTS")
-#' fls_show(krill)
-#' @keywords internal
-#' @export
+#' Display an FLS object
+#' @noRd
 fls_show <- function(object) {
   meta <- acousticTS::extract(object, "metadata")
   shape <- acousticTS::extract(object, "shape_parameters")
   body <- acousticTS::extract(object, "body")
   radius_values <- .show_component_radius_values(body, "FLS body")
 
-  .show_emit(.show_summary_lines(
+  cat(paste(.show_summary_lines(
     object, "Fluid-like scatterer ", meta,
     .show_shape_section(
       section_name = "Body dimensions",
@@ -296,33 +200,25 @@ fls_show <- function(object) {
       g = body$g,
       h = body$h
     ),
-    .show_orientation_line(
+    paste0(
       "Body orientation (relative to transducer face/axis):",
-      body$theta,
+      round(body$theta, 3),
+      " ",
       shape$theta_units
     )
-  ))
+  ), collapse = "\n"))
 }
-#' show(...) for GAS_class objects
-#' @param object GAS-class object
-#' @return Called for its side effect of printing a formatted summary;
-#'   invisibly returns \code{NULL}.
-#' @examples
-#' bubble <- gas_generate(
-#'   shape = sphere(radius_body = 0.005, n_segments = 20)
-#' )
-#' gas_show(bubble)
-#' @keywords internal
-#' @export
+#' Display a GAS object
+#' @noRd
 gas_show <- function(object) {
   meta <- acousticTS::extract(object, "metadata")
   shape <- acousticTS::extract(object, "shape_parameters")
   body <- acousticTS::extract(object, "body")
 
-  .show_emit(.show_summary_lines(
+  cat(paste(.show_summary_lines(
     object, "Gas- and fluid-filled scatterer ", meta,
-    .show_section_lines(
-      "Body dimensions",
+    c(
+      "Body dimensions:",
       paste0(" Diameter:", shape$radius * 2, " ", shape$radius_units),
       paste0(" Radius:", shape$radius, " ", shape$radius_units)
     ),
@@ -333,24 +229,17 @@ gas_show <- function(object) {
       g = body$g,
       h = body$h
     )
-  ))
+  ), collapse = "\n"))
 }
-#' show(...) for SBF-class objects.
-#' @param object SBF_class object.
-#' @return Called for its side effect of printing a formatted summary;
-#'   invisibly returns \code{NULL}.
-#' @examples
-#' data(cod, package = "acousticTS")
-#' sbf_show(cod)
-#' @keywords internal
-#' @export
+#' Display an SBF object
+#' @noRd
 sbf_show <- function(object) {
   meta <- acousticTS::extract(object, "metadata")
   shape <- acousticTS::extract(object, "shape_parameters")
   body <- acousticTS::extract(object, "body")
   bladder <- acousticTS::extract(object, "bladder")
 
-  .show_emit(.show_summary_lines(
+  cat(paste(.show_summary_lines(
     object, "Swimbladdered fish (SBF) ", meta,
     .show_shape_section(
       section_name = "Body dimensions",
@@ -380,47 +269,23 @@ sbf_show <- function(object) {
       g = bladder$g,
       h = bladder$h
     ),
-    .show_orientation_line(
+    paste0(
       "Body orientation (relative to transducer face/axis):",
-      body$theta,
+      round(body$theta, 3),
+      " ",
       shape$theta_units
     )
-  ))
+  ), collapse = "\n"))
 }
-#' show(...) for BBF-class objects.
-#' @param object BBF-class object.
-#' @return Called for its side effect of printing a formatted summary;
-#'   invisibly returns \code{NULL}.
-#' @examples
-#' body <- arbitrary(
-#'   x_body = c(0, 0.04, 0.08),
-#'   zU_body = c(0.001, 0.004, 0.001),
-#'   zL_body = c(-0.001, -0.004, -0.001)
-#' )
-#' backbone <- cylinder(
-#'   length_body = 0.06,
-#'   radius_body = 0.0008,
-#'   n_segments = 20
-#' )
-#' fish <- bbf_generate(
-#'   body_shape = body,
-#'   backbone_shape = backbone,
-#'   density_body = 1070,
-#'   sound_speed_body = 1570,
-#'   density_backbone = 1900,
-#'   sound_speed_longitudinal_backbone = 3500,
-#'   sound_speed_transversal_backbone = 1700
-#' )
-#' bbf_show(fish)
-#' @keywords internal
-#' @export
+#' Display a BBF object
+#' @noRd
 bbf_show <- function(object) {
   meta <- acousticTS::extract(object, "metadata")
   shape <- acousticTS::extract(object, "shape_parameters")
   body <- acousticTS::extract(object, "body")
   backbone <- acousticTS::extract(object, "backbone")
 
-  .show_emit(.show_summary_lines(
+  cat(paste(.show_summary_lines(
     object, "Backboned fish (BBF) ", meta,
     .show_shape_section(
       section_name = "Body dimensions",
@@ -454,22 +319,16 @@ bbf_show <- function(object) {
       " | Backbone orientation:",
       round(backbone$theta, 3), " ", shape$theta_units
     )
-  ))
+  ), collapse = "\n"))
 }
-#' show(...) for CAL-class objects.
-#' @param object CAL-class object.
-#' @return Called for its side effect of printing a formatted summary;
-#'   invisibly returns \code{NULL}.
-#' @examples
-#' cal_show(cal_generate(material = "WC", n_segments = 20))
-#' @keywords internal
-#' @export
+#' Display a CAL object
+#' @noRd
 cal_show <- function(object) {
   meta <- acousticTS::extract(object, "metadata")
   shape <- acousticTS::extract(object, "shape_parameters")
   body <- acousticTS::extract(object, "body")
 
-  .show_emit(.show_summary_lines(
+  cat(paste(.show_summary_lines(
     object, "Calibration sphere", meta,
     paste0("Material:", meta$Material),
     paste0(
@@ -485,32 +344,16 @@ cal_show <- function(object) {
     paste0(" Sphere density:", body$density, "kg/m^3"),
     paste0("Diameter:", shape$diameter, " ", shape$diameter_units),
     paste0(" Radius:", shape$radius, " ", shape$diameter_units),
-    .show_orientation_line(
+    paste0(
       "Propagation direction of the incident sound wave:",
-      body$theta,
+      round(body$theta, 3),
+      " ",
       shape$theta_units
     )
-  ))
+  ), collapse = "\n"))
 }
-#' show(...) for ESS-class objects.
-#' @param object ESS-class object.
-#' @return Called for its side effect of printing a formatted summary;
-#'   invisibly returns \code{NULL}.
-#' @examples
-#' shell <- sphere(radius_body = 0.03, n_segments = 20)
-#' target <- ess_generate(
-#'   shape = shell,
-#'   shell_thickness = 0.001,
-#'   density_shell = 1050,
-#'   sound_speed_shell = 2350,
-#'   density_fluid = 1030,
-#'   sound_speed_fluid = 1500,
-#'   E = 3.5e9,
-#'   nu = 0.34
-#' )
-#' ess_show(target)
-#' @keywords internal
-#' @export
+#' Display an ESS object
+#' @noRd
 ess_show <- function(object) {
   # Parse metadata =============================================================
   meta <- acousticTS::extract(

@@ -2,8 +2,8 @@
 # Transition matrix method (TMM) post-processing helpers
 ################################################################################
 
-# Validate the stored TMM state before any core post-processing helper tries
-# to use the retained modal blocks.
+#' Validate the stored TMM state before any core post-processing helper tries
+#' to use the retained modal blocks.
 #' @noRd
 .tmm_require_stored_blocks <- function(object) {
   # Recover the stored TMM model-parameter bundle from the scatterer ===========
@@ -32,17 +32,17 @@
   model_params
 }
 
-# The cylindrical retained path is now geometry-matched and intentionally
-# limited to exact monostatic reuse. The helper is kept as a no-op so the
-# public post-processing calls can keep one shared structure without warning on
-# the supported cylinder workflow.
+#' The cylindrical retained path is now geometry-matched and intentionally
+#' limited to exact monostatic reuse. The helper is kept as a no-op so the
+#' public post-processing calls can keep one shared structure without warning on
+#' the supported cylinder workflow.
 #' @noRd
 .tmm_warn_exploratory_cylinder_blocks <- function(object, model_params) {
   # Keep the shared post-processing hook while suppressing cylinder warnings ===
   invisible(NULL)
 }
 
-# Wrap one angle onto [0, 2*pi).
+#' Wrap one angle onto [0, 2*pi).
 #' @noRd
 .tmm_wrap_angle_2pi <- function(angle) {
   # Wrap the input angle onto the principal 0-to-2pi interval ==================
@@ -50,8 +50,8 @@
   ifelse(wrapped < 0, wrapped + 2 * pi, wrapped)
 }
 
-# Check whether the supplied receive direction is the exact monostatic
-# opposite of the incident direction in the body-fixed convention.
+#' Check whether the supplied receive direction is the exact monostatic
+#' opposite of the incident direction in the body-fixed convention.
 #' @noRd
 .tmm_is_monostatic_direction <- function(theta_body,
                                          phi_body,
@@ -68,8 +68,8 @@
   abs(theta_scatter - expected_theta) <= tol && delta_phi <= tol
 }
 
-# Check whether one requested incident direction matches the stored TMM
-# incidence to within the standard angular tolerance.
+#' Check whether one requested incident direction matches the stored TMM
+#' incidence to within the standard angular tolerance.
 #' @noRd
 .tmm_matches_stored_incidence <- function(model_params,
                                           theta_body,
@@ -83,8 +83,8 @@
   abs(theta_body - defaults$theta_body) <= tol && delta_phi <= tol
 }
 
-# Recover the exact stored prolate monostatic amplitude when the requested
-# geometry matches the original stored incidence and receive direction.
+#' Recover the exact stored prolate monostatic amplitude when the requested
+#' geometry matches the original stored incidence and receive direction.
 #' @noRd
 .tmm_spheroidal_exact_monostatic_override <- function(model_params,
                                                       theta_body,
@@ -116,7 +116,7 @@
   f_exact[frequency_idx]
 }
 
-# Normalize a possibly-missing scalar angle onto the stored TMM defaults.
+#' Normalize a possibly-missing scalar angle onto the stored TMM defaults.
 #' @noRd
 .tmm_scalar_angle <- function(value, default, name) {
   # Fall back to the stored default when an angle is omitted ===================
@@ -133,7 +133,7 @@
   as.numeric(angle)
 }
 
-# Normalize a numeric angle vector used for grid-style evaluations.
+#' Normalize a numeric angle vector used for grid-style evaluations.
 #' @noRd
 .tmm_angle_vector <- function(value,
                               default = NULL,
@@ -174,8 +174,8 @@
   as.numeric(angles)
 }
 
-# Build cell-style interval weights from a monotone angle grid so that
-# user-supplied densities can be normalized into quadrature weights.
+#' Build cell-style interval weights from a monotone angle grid so that
+#' user-supplied densities can be normalized into quadrature weights.
 #' @noRd
 .tmm_interval_weights <- function(x,
                                   lower = NULL,
@@ -216,8 +216,8 @@
   diff(edges)
 }
 
-# Build a symmetric grid-edge vector for cell-based plotting and solid-angle
-# quadrature on stored theta-phi scattering grids.
+#' Build a symmetric grid-edge vector for cell-based plotting and solid-angle
+#' quadrature on stored theta-phi scattering grids.
 #' @noRd
 .tmm_grid_edges <- function(values, lower, upper) {
   # Handle the degenerate one-cell case directly ===============================
@@ -230,7 +230,7 @@
   c(lower, mids, upper)
 }
 
-# Validate the default 2D scattering-grid dimensions requested by the caller.
+#' Validate the default 2D scattering-grid dimensions requested by the caller.
 #' @noRd
 .tmm_validate_scattering_grid_dims <- function(n_theta, n_phi) {
   # Require at least two samples along each angular axis =======================
@@ -246,7 +246,7 @@
   invisible(NULL)
 }
 
-# Resolve the incident and receive angles used by `tmm_scattering_grid()`.
+#' Resolve the incident and receive angles used by `tmm_scattering_grid()`.
 #' @noRd
 .tmm_scattering_grid_angles <- function(theta_body,
                                         phi_body,
@@ -284,7 +284,7 @@
   )
 }
 
-# Assemble the standard return payload for `tmm_scattering_grid()`.
+#' Assemble the standard return payload for `tmm_scattering_grid()`.
 #' @noRd
 .tmm_scattering_grid_output <- function(acoustics,
                                         idx,
@@ -308,8 +308,8 @@
     sigma_scat_dB = sigma_scat_dB
   )
 }
-# Re-evaluate the exact-family finite-cylinder monostatic response for one
-# incident angle without rebuilding a dense spherical retained solve.
+#' Re-evaluate the exact-family finite-cylinder monostatic response for one
+#' incident angle without rebuilding a dense spherical retained solve.
 #' @noRd
 .tmm_cylindrical_monostatic_f_bs <- function(acoustics_row,
                                              body_defaults,
@@ -356,9 +356,9 @@
   }
 }
 
-# Evaluate the retained cylindrical branch. The current geometry-matched
-# cylinder family only supports exact monostatic reuse; general-angle cylinder
-# post-processing still needs a separate validated cylindrical operator.
+#' Evaluate the retained cylindrical branch. The current geometry-matched
+#' cylinder family only supports exact monostatic reuse; general-angle cylinder
+#' post-processing still needs a separate validated cylindrical operator.
 #' @noRd
 .tmm_scattering_cylindrical <- function(model_params,
                                         shape_parameters,
@@ -404,8 +404,8 @@
   )
 }
 
-# Evaluate the stored TMM blocks at one stored frequency over a set of
-# incident/receive-angle combinations.
+#' Evaluate the stored TMM blocks at one stored frequency over a set of
+#' incident/receive-angle combinations.
 #' @noRd
 .tmm_scattering_points <- function(model_params,
                                    frequency_idx,
@@ -503,14 +503,14 @@
   )
 }
 
-# Check whether one angle vector is effectively constant.
+#' Check whether one angle vector is effectively constant.
 #' @noRd
 .tmm_angles_all_equal <- function(angle, tol = 1e-12) {
   all(abs(angle - angle[1]) <= tol)
 }
 
-# Evaluate one stored TMM frequency over a full theta-phi receive grid while
-# caching the block terms that do not vary with azimuth.
+#' Evaluate one stored TMM frequency over a full theta-phi receive grid while
+#' caching the block terms that do not vary with azimuth.
 #' @noRd
 .tmm_scattering_grid_matrix <- function(model_params,
                                         frequency_idx,
@@ -588,8 +588,8 @@
   f_scat
 }
 
-# Resolve cos(gamma) for the scattering angle between the incident and receive
-# directions in the body-fixed spherical convention.
+#' Resolve cos(gamma) for the scattering angle between the incident and receive
+#' directions in the body-fixed spherical convention.
 #' @noRd
 .tmm_scattering_cosine <- function(theta_body,
                                    phi_body,
@@ -599,8 +599,8 @@
     sin(theta_body) * sin(theta_scatter) * cos(phi_body - phi_scatter)
 }
 
-# Evaluate the exact stored sphere-modal coefficients at arbitrary receive
-# directions. This is used by the shell-sphere TMM branch.
+#' Evaluate the exact stored sphere-modal coefficients at arbitrary receive
+#' directions. This is used by the shell-sphere TMM branch.
 #' @noRd
 .tmm_scattering_sphere_modal <- function(t_store,
                                          acoustics,
@@ -629,6 +629,7 @@
   )
 }
 
+#' Evaluate retained spherical modal coefficients on a scattering grid
 #' @noRd
 .tmm_scattering_sphere_modal_grid <- function(model_params,
                                               frequency_idx,
@@ -666,8 +667,8 @@
   -1i / acoustics_i$k_sw[1] * f_scat
 }
 
-# Evaluate one stored spherical-coordinate TMM frequency at many receive
-# points that share a single incident direction.
+#' Evaluate one stored spherical-coordinate TMM frequency at many receive
+#' points that share a single incident direction.
 #' @noRd
 .tmm_scattering_spherical_points_shared_incidence <- function(t_store,
                                                               acoustics,
@@ -703,8 +704,8 @@
   f_scat
 }
 
-# Evaluate the stored spherical-coordinate blocks at an arbitrary scattering
-# geometry without rebuilding the boundary solve.
+#' Evaluate the stored spherical-coordinate blocks at an arbitrary scattering
+#' geometry without rebuilding the boundary solve.
 #' @noRd
 .tmm_scattering_spherical <- function(t_store,
                                       acoustics,
@@ -748,8 +749,8 @@
   f_scat
 }
 
-# Evaluate the stored spheroidal-coordinate blocks at an arbitrary scattering
-# geometry using the retained prolate modal operator.
+#' Evaluate the stored spheroidal-coordinate blocks at an arbitrary scattering
+#' geometry using the retained prolate modal operator.
 #' @noRd
 .tmm_scattering_spheroidal <- function(t_store,
                                        acoustics,
@@ -770,8 +771,8 @@
   )
 }
 
-# Evaluate one stored spheroidal-coordinate TMM frequency at paired receive
-# points that share a single incident direction.
+#' Evaluate one stored spheroidal-coordinate TMM frequency at paired receive
+#' points that share a single incident direction.
 #' @noRd
 .tmm_scattering_spheroidal_points_shared_incidence <- function(t_store,
                                                                acoustics,
@@ -902,6 +903,7 @@ tmm_scattering <- function(object,
   )
 }
 
+#' Validate the number of orientation quadrature angles
 #' @noRd
 .tmm_validate_orientation_n_theta <- function(n_theta) {
   if (!is.numeric(n_theta) ||
@@ -915,6 +917,7 @@ tmm_scattering <- function(object,
   as.integer(n_theta)
 }
 
+#' Validate an orientation-distribution interval
 #' @noRd
 .tmm_validate_orientation_interval <- function(lower, upper, distribution) {
   if (!is.numeric(lower) ||
@@ -937,6 +940,7 @@ tmm_scattering <- function(object,
   list(lower = lower, upper = upper)
 }
 
+#' Validate normal orientation-distribution parameters
 #' @noRd
 .tmm_validate_orientation_normal <- function(mean_theta, sd_theta) {
   if (!is.numeric(mean_theta) ||
@@ -956,6 +960,7 @@ tmm_scattering <- function(object,
   list(mean_theta = mean_theta, sd_theta = sd_theta)
 }
 
+#' Normalize user-supplied orientation quadrature
 #' @noRd
 .tmm_orientation_quadrature <- function(theta_body, weights) {
   theta_body <- .tmm_angle_vector(
@@ -985,6 +990,7 @@ tmm_scattering <- function(object,
   list(theta_body = theta_body, weights = weights)
 }
 
+#' Evaluate and normalize a user-supplied orientation density
 #' @noRd
 .tmm_orientation_pdf <- function(theta_body, pdf) {
   theta_body <- .tmm_angle_vector(
@@ -1010,6 +1016,7 @@ tmm_scattering <- function(object,
   )
 }
 
+#' Build uniform orientation quadrature
 #' @noRd
 .tmm_orientation_uniform <- function(lower, upper, n_theta) {
   bounds <- .tmm_validate_orientation_interval(
@@ -1031,6 +1038,7 @@ tmm_scattering <- function(object,
   )
 }
 
+#' Build normal orientation-density quadrature
 #' @noRd
 .tmm_orientation_normal_density <- function(mean_theta, sd_theta, n_theta) {
   normal_args <- .tmm_validate_orientation_normal(mean_theta, sd_theta)
@@ -1052,6 +1060,7 @@ tmm_scattering <- function(object,
   )
 }
 
+#' Build truncated-normal orientation quadrature
 #' @noRd
 .tmm_orientation_truncated_normal <- function(mean_theta,
                                               sd_theta,
@@ -1082,6 +1091,7 @@ tmm_scattering <- function(object,
   )
 }
 
+#' Resolve azimuth angles for orientation averaging
 #' @noRd
 .tmm_resolve_orientation_phi <- function(phi_body, n_angles) {
   phi_body <- rep_len(phi_body, n_angles)
@@ -1201,8 +1211,8 @@ tmm_scattering_grid <- function(object,
   )
 }
 
-# Resolve one stored frequency for helpers that need a single retained TMM
-# frequency, using the nearest stored match when needed.
+#' Resolve one stored frequency for helpers that need a single retained TMM
+#' frequency, using the nearest stored match when needed.
 #' @noRd
 .tmm_plot_frequency_index <- function(frequency, available) {
   # Require an explicit frequency when more than one is stored =================

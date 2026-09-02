@@ -1,5 +1,5 @@
 ################################################################################
-# Cyndrical Bessel functions
+# Cylindrical Bessel functions
 ################################################################################
 ################################################################################
 #' Cylindrical Bessel function of the first kind, \eqn{J_\nu(z)}, and its
@@ -117,16 +117,18 @@
 jc <- function(l, n) {
   jc_cpp(n, l)
 }
+#' Evaluate first derivatives of cylindrical Bessel functions of the first kind
+#' @noRd
 #' @rdname jc
 #' @keywords internal
-#' @noRd
 jcd <- function(l, n) {
   # Internal helper function ===================================================
   jc_deriv_cpp(n, l, 1)
 }
+#' Evaluate second derivatives of cylindrical Bessel functions of the first kind
+#' @noRd
 #' @rdname jc
 #' @keywords internal
-#' @noRd
 jcdd <- function(l, n) {
   # Internal helper function ===================================================
   jc_deriv_cpp(n, l, 2)
@@ -250,16 +252,19 @@ jcdk <- function(l, n, k) {
 yc <- function(l, n) {
   yc_cpp(n, l)
 }
+#' Evaluate first derivatives of cylindrical Bessel functions of the second kind
+#' @noRd
 #' @rdname yc
 #' @keywords internal
-#' @noRd
 ycd <- function(l, n) {
   # Internal helper function ===================================================
   yc_deriv_cpp(n, l, 1)
 }
+#' Evaluate second derivatives of cylindrical Bessel functions of the second
+#' kind
+#' @noRd
 #' @rdname yc
 #' @keywords internal
-#' @noRd
 ycdd <- function(l, n) {
   # Internal helper function ===================================================
   yc_deriv_cpp(n, l, 2)
@@ -370,16 +375,18 @@ ycdk <- function(l, n, k) {
 hc <- function(l, n) {
   hc_cpp(n, l)
 }
+#' Evaluate first derivatives of cylindrical Hankel functions
+#' @noRd
 #' @rdname hc
 #' @keywords internal
-#' @noRd
 hcd <- function(l, n) {
   # Internal helper function ===================================================
   hc_deriv_cpp(n, l, 1)
 }
+#' Evaluate second derivatives of cylindrical Hankel functions
+#' @noRd
 #' @rdname hc
 #' @keywords internal
-#' @noRd
 hcdd <- function(l, n) {
   # Internal helper function ===================================================
   hc_deriv_cpp(n, l, 2)

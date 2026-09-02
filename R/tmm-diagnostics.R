@@ -2,7 +2,7 @@
 # Transition matrix method (TMM) diagnostics helpers
 ################################################################################
 
-# Resolve zero, one, or many stored frequencies for diagnostics-style helpers.
+#' Resolve zero, one, or many stored frequencies for diagnostics-style helpers.
 #' @noRd
 .tmm_frequency_indices <- function(frequency, available) {
   # Default to all stored frequencies ==========================================
@@ -28,8 +28,8 @@
   as.integer(idx)
 }
 
-# Deterministic angle pairs used by the reciprocity diagnostic when the user
-# does not supply a custom set.
+#' Deterministic angle pairs used by the reciprocity diagnostic when the user
+#' does not supply a custom set
 #' @noRd
 .tmm_default_reciprocity_pairs <- function() {
   data.frame(
@@ -40,7 +40,7 @@
   )
 }
 
-# Validate an optional user-supplied reciprocity-angle table.
+#' Validate an optional user-supplied reciprocity-angle table.
 #' @noRd
 .tmm_validate_reciprocity_pairs <- function(reciprocity_pairs) {
   # Fall back to the package-default reciprocity pairs =========================
@@ -77,7 +77,7 @@
   reciprocity_pairs
 }
 
-# Equivalent-volume sphere radius for the supported axisymmetric TMM shapes.
+#' Equivalent-volume sphere radius for the supported axisymmetric TMM shapes.
 #' @noRd
 .tmm_equivalent_volume_radius <- function(shape_parameters) {
   # Return the exact sphere radius when already spherical ======================
@@ -101,7 +101,7 @@
   NA_real_
 }
 
-# Target aspect ratio for the supported spheroidal TMM branches.
+#' Target aspect ratio for the supported spheroidal TMM branches
 #' @noRd
 .tmm_spheroidal_aspect_ratio <- function(shape_parameters) {
   # Return the prolate aspect ratio ============================================
@@ -115,8 +115,8 @@
   NA_real_
 }
 
-# Convert an equal-volume sphere radius and target aspect ratio into the shape
-# parameters needed by the public spheroid generators.
+#' Convert an equal-volume sphere radius and target aspect ratio into the shape
+#' parameters needed by the public spheroid generators
 #' @noRd
 .tmm_spheroid_axes_from_equal_volume <- function(shape_type,
                                                  radius_eq,
@@ -137,8 +137,8 @@
   stop("Unsupported shape for spheroidal continuation.", call. = FALSE)
 }
 
-# Rebuild one fluid- or gas-like scatterer around a new canonical shape while
-# preserving the original material specification.
+#' Rebuild one fluid- or gas-like scatterer around a new canonical shape while
+#' preserving the original material specification.
 #' @noRd
 .tmm_rebuild_shape_like <- function(object, shape, body) {
   # Rebuild a gas-filled surrogate when needed =================================
@@ -171,8 +171,8 @@
   do.call(fls_generate, args)
 }
 
-# Build the equal-volume sphere-to-spheroid continuation path for the stored
-# target so aspect-ratio drift can be checked as an internal TMM sanity test.
+#' Build the equal-volume sphere-to-spheroid continuation path for the stored
+#' target so aspect-ratio drift can be checked as an internal TMM sanity test
 #' @noRd
 .tmm_sphere_to_spheroid_path <- function(object,
                                          model_params,
@@ -271,7 +271,7 @@
   do.call(rbind, path_rows)
 }
 
-# Summarize the smoothness of one sphere-to-spheroid continuation path.
+#' Summarize the smoothness of one sphere-to-spheroid continuation path
 #' @noRd
 .tmm_sphere_to_spheroid_summary <- function(path_df) {
   # Skip missing continuation paths ============================================
@@ -307,7 +307,7 @@
   do.call(rbind, out)
 }
 
-# Integrate one scattering grid over solid angle for the optical-theorem check.
+#' Integrate one scattering grid over solid angle for the optical-theorem check
 #' @noRd
 .tmm_total_scattering_cross_section <- function(theta_scatter,
                                                 phi_scatter,
@@ -329,7 +329,7 @@
   sum(outer(w_theta * sin(theta_scatter), w_phi) * sigma_scat)
 }
 
-# Summarize one stored frequency's block-level conditioning indicators.
+#' Summarize one stored frequency's block-level conditioning indicators.
 #' @noRd
 .tmm_block_metrics <- function(t_blocks) {
   # Initialize the empty output template =======================================
@@ -380,8 +380,8 @@
   do.call(rbind, out)
 }
 
-# Compute reciprocity residuals by swapping the incident and receive angles at
-# fixed frequency.
+#' Compute reciprocity residuals by swapping the incident and receive angles at
+#' fixed frequency
 #' @noRd
 .tmm_reciprocity_residual <- function(model_params,
                                       frequency_idx,
@@ -411,6 +411,8 @@
   max(Mod(f_forward - f_reverse) / denom)
 }
 
+#' Validate the angular grid used by TMM diagnostics
+#' @noRd
 .tmm_validate_diagnostic_grid <- function(n_theta, n_phi) {
   # Validate the theta-grid control ===========================================
   if (!is.numeric(n_theta) || length(n_theta) != 1 || !is.finite(n_theta) ||
@@ -426,6 +428,8 @@
   list(n_theta = as.integer(n_theta), n_phi = as.integer(n_phi))
 }
 
+#' Calculate monostatic residual diagnostics
+#' @noRd
 .tmm_monostatic_residuals <- function(object,
                                       model_params,
                                       frequency_idx,
@@ -450,6 +454,8 @@
   list(abs = mono_abs, rel = mono_rel)
 }
 
+#' Calculate optical-theorem diagnostic metrics
+#' @noRd
 .tmm_optical_theorem_metrics <- function(model_params,
                                          acoustics,
                                          frequency_idx,
@@ -516,6 +522,8 @@
   )
 }
 
+#' Summarize conditioning metrics for retained TMM blocks
+#' @noRd
 .tmm_block_summary <- function(block_df) {
   # Estimate block conditioning from the stored summaries =====================
   min_rcond <- if (nrow(block_df)) {
@@ -540,6 +548,8 @@
   )
 }
 
+#' Calculate TMM shape-continuation diagnostic metrics
+#' @noRd
 .tmm_continuation_metrics <- function(continuation_summary, frequency_value) {
   # Return missing continuation metrics when no path is available =============
   if (is.null(continuation_summary)) {
@@ -574,6 +584,8 @@
   )
 }
 
+#' Calculate the TMM reciprocity diagnostic
+#' @noRd
 .tmm_reciprocity_metric <- function(model_params,
                                     frequency_idx,
                                     shape_parameters,
@@ -591,6 +603,8 @@
   )
 }
 
+#' Assemble one frequency-level TMM diagnostic summary
+#' @noRd
 .tmm_frequency_summary_row <- function(shape_type,
                                        parameters,
                                        frequency_value,
@@ -625,6 +639,8 @@
   )
 }
 
+#' Calculate all TMM diagnostics for one stored frequency
+#' @noRd
 .tmm_frequency_diagnostics <- function(object,
                                        model_params,
                                        parameters,

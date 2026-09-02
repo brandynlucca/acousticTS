@@ -100,7 +100,7 @@
 #' @references
 #'
 #' Stanton, T.K. (1988). Sound scattering by cylinders of finite length. I.
-#' Fuid cylinders. The Journal of the Acoustical Society of America, 83: 55-63.
+#' Fluid cylinders. The Journal of the Acoustical Society of America, 83: 55-63.
 #'
 #' Stanton, T.K. (1989). Sound scattering by cylinders of finite length. III.
 #' Deformed cylinders. The Journal of the Acoustical Society of America, 85:
@@ -263,8 +263,7 @@ FCMS <- function(object) {
   object
 }
 
-#' Helper function that calculates the boundary conditions for a fixed rigid
-#' finite cylinder.
+#' Calculate fixed-rigid finite-cylinder boundary coefficients
 #' @noRd
 .fcms_bm_fixed_rigid <- function(k1a, nu, m_limit) {
   # Precompute the rigid-cylinder modal weights ================================
@@ -280,8 +279,7 @@ FCMS <- function(object) {
 }
 
 
-#' Helper function that calculates the boundary conditions for a
-#' pressure-release finite cylinder.
+#' Calculate pressure-release finite-cylinder boundary coefficients
 #' @noRd
 .fcms_bm_pressure_release <- function(k1a, nu, m_limit) {
   # Precompute the soft-cylinder modal weights =================================
@@ -296,8 +294,7 @@ FCMS <- function(object) {
   ) * weights
 }
 
-#' Helper function that calculates the boundary conditions for a fluid-filled
-#' finite cylinder.
+#' Calculate fluid-filled finite-cylinder boundary coefficients
 #' @noRd
 .fcms_bm_fluid <- function(k1a, k2a, gh, nu, m_limit) {
   # Resolve the largest retained modal order ===================================

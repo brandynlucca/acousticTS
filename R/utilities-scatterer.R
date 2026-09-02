@@ -247,7 +247,7 @@
   do.call(arbitrary, args)
 }
 
-#' Internal geometry-schema registry
+#' Define geometry storage schemas
 #' @keywords internal
 #' @noRd
 .geometry_contract_schema <- function() {

@@ -69,7 +69,7 @@ archived in the \code{echoSMs} resources. The object metadata identifies the
 target as \emph{Sardinops sagax caerulea} following Conti and Demer (2003).
 }
 \examples{
-data(sardine, package = "acousticTS")
+data("sardine", package = "acousticTS")
 sardine
 
 }

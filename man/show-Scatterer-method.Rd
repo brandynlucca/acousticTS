@@ -2,7 +2,7 @@
 % Please edit documentation in R/show.R
 \name{show,Scatterer-method}
 \alias{show,Scatterer-method}
-\title{Generic function for show(...) for different scatterers.}
+\title{Display a scatterer object}
 \usage{
 \S4method{show}{Scatterer}(object)
 }
@@ -14,7 +14,7 @@ Called for its side effect of printing a formatted summary;
 invisibly returns \code{NULL}.
 }
 \description{
-Generic function for show(...) for different scatterers.
+Display a scatterer object
 }
 \examples{
 show(cal_generate(material = "WC", n_segments = 20))

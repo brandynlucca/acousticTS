@@ -69,8 +69,7 @@
 #' @keywords models acoustics internal
 NULL
 
-#' Initialize scatterer-class object for the elastic cylinder modal series
-#' model.
+#' Validate that an object and shape are supported by ECMS
 #' @noRd
 .ecms_validate_scope <- function(object, shape) {
   # Limit ECMS to cylindrical ESS and legacy cylindrical FLS objects ===========
@@ -316,6 +315,7 @@ ecms_initialize <- function(object,
   object
 }
 
+#' Divide ECMS terms while protecting zero denominators
 #' @noRd
 .ecms_safe_divide <- function(numerator, denominator, eps = 1e-12) {
   # Replace near-zero denominators with signed epsilons ========================
@@ -328,6 +328,7 @@ ecms_initialize <- function(object,
   numerator / denominator_adj
 }
 
+#' Calculate the ECMS backscattering amplitude for one frequency
 #' @noRd
 .ecms_backscatter_scalar <- function(k_sw,
                                      k_l,
@@ -394,6 +395,7 @@ ecms_initialize <- function(object,
   -(length_body / pi) * sinc_factor * modal_sum
 }
 
+#' Apply the ECMS Fresnel equivalent-length correction
 #' @noRd
 .ecms_equivalent_length_fresnel <- function(k1, l, a, rho_c) {
   .trcm_equivalent_length_fresnel(k1 = k1, l = l, a = a, rho_c = rho_c)

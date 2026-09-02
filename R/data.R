@@ -62,7 +62,7 @@
 #'
 #' @return A pre-generated `SBF` scatterer object.
 #' @examples
-#' data(sardine, package = "acousticTS")
+#' data("sardine", package = "acousticTS")
 #' sardine
 #'
 #' @usage data(sardine)
@@ -120,7 +120,7 @@
 #'
 #' @return A pre-generated `SBF` scatterer object.
 #' @examples
-#' data(cod, package = "acousticTS")
+#' data("cod", package = "acousticTS")
 #' cod
 #'
 #' @usage data(cod)
@@ -158,7 +158,7 @@
 #' }
 #' @return A pre-generated `FLS` scatterer object.
 #' @examples
-#' data(krill, package = "acousticTS")
+#' data("krill", package = "acousticTS")
 #' krill
 #' @usage data(krill)
 "krill"
@@ -187,7 +187,7 @@
 #'
 #' @return A list of benchmark target-strength spectra.
 #' @examples
-#' data(benchmark_ts, package = "acousticTS")
+#' data("benchmark_ts", package = "acousticTS")
 #' str(benchmark_ts, max.level = 1)
 #'
 #' @usage data(benchmark_ts)

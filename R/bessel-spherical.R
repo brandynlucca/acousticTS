@@ -104,9 +104,10 @@ js <- function(l, n) {
     js_cpp(l, n)
   }
 }
+#' Evaluate first derivatives of spherical Bessel functions of the first kind
+#' @noRd
 #' @rdname js
 #' @keywords internal
-#' @noRd
 jsd <- function(l, n) {
   # Internal helper function ===================================================
   if (is.complex(n)) {
@@ -115,9 +116,10 @@ jsd <- function(l, n) {
     js_deriv_cpp(l, n, 1)
   }
 }
+#' Evaluate second derivatives of spherical Bessel functions of the first kind
+#' @noRd
 #' @rdname js
 #' @keywords internal
-#' @noRd
 jsdd <- function(l, n) {
   # Internal helper function ===================================================
   if (is.complex(n)) {
@@ -245,9 +247,10 @@ ys <- function(l, n) {
     ys_cpp(l, n)
   }
 }
+#' Evaluate first derivatives of spherical Bessel functions of the second kind
+#' @noRd
 #' @rdname ys
 #' @keywords internal
-#' @noRd
 ysd <- function(l, n) {
   # Internal helper function ===================================================
   if (is.complex(n)) {
@@ -256,9 +259,10 @@ ysd <- function(l, n) {
     ys_deriv_cpp(l, n, 1)
   }
 }
+#' Evaluate second derivatives of spherical Bessel functions of the second kind
+#' @noRd
 #' @rdname ys
 #' @keywords internal
-#' @noRd
 ysdd <- function(l, n) {
   # Internal helper function ===================================================
   if (is.complex(n)) {
@@ -357,9 +361,10 @@ hs <- function(l, n) {
     hs_cpp(l, n)
   }
 }
+#' Evaluate first derivatives of spherical Hankel functions
+#' @noRd
 #' @rdname hs
 #' @keywords internal
-#' @noRd
 hsd <- function(l, n) {
   # Internal helper function ===================================================
   if (is.complex(n)) {
@@ -368,9 +373,10 @@ hsd <- function(l, n) {
     hs_deriv_cpp(l, n, 1)
   }
 }
+#' Evaluate second derivatives of spherical Hankel functions
+#' @noRd
 #' @rdname hs
 #' @keywords internal
-#' @noRd
 hsdd <- function(l, n) {
   # Internal helper function ===================================================
   if (is.complex(n)) {

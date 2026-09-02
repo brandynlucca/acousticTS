@@ -55,7 +55,7 @@
 #' @keywords models acoustics internal
 NULL
 
-#' Initialize scatterer-class object for the bent cylinder modal series model.
+#' Resolve and validate the BCMS boundary condition
 #' @noRd
 .bcms_resolve_boundary <- function(object, boundary) {
   # Derive the default boundary from the scatterer class when omitted ==========
@@ -200,6 +200,7 @@ bcms_initialize <- function(object,
   )
 }
 
+#' Calculate the straight-cylinder BCMS backscattering amplitude
 #' @noRd
 .bcms_straight_fbs <- function(acoustics, body, bm_method) {
   # Precompute the modal indexing terms ========================================
@@ -231,6 +232,7 @@ bcms_initialize <- function(object,
   }
 }
 
+#' Apply the BCMS Fresnel equivalent-length correction
 #' @noRd
 .bcms_equivalent_length_fresnel <- function(k1, l, a, rho_c) {
   .trcm_equivalent_length_fresnel(k1 = k1, l = l, a = a, rho_c = rho_c)

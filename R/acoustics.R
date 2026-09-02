@@ -112,7 +112,7 @@ transmission_coefficient <- function(interface1, interface2, mode = "DWBA") {
   2 * Z2 / (Z1 + Z2)
 }
 ################################################################################
-#' Calculate she compressibility (\eqn{\kappa}) of a scattering
+#' Calculate the compressibility (\eqn{\kappa}) of a scattering
 #' boundary/interface.
 #'
 #' @description

@@ -348,7 +348,6 @@ SDWBA <- function(object) {
 
 #' Initialize FLS-class object for SDWBA modeling
 #' @param object FLS-class object.
-#' @param object FLS-class object.
 #' @param frequency Frequency vector (Hz).
 #' @param sound_speed_sw Seawater sound speed (m/s).
 #' @param density_sw Seawater density (kg/m³).

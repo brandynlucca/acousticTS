@@ -5,9 +5,6 @@
 ################################################################################
 #' Validate a named target-dimension vector used in reforge operations
 #'
-#' Internal helper that checks \code{target} is a named numeric vector whose
-#' names are drawn from \code{valid_dims}.
-#'
 #' @param target Named numeric vector of target dimensions (e.g. length, width).
 #' @param target_name String used in error messages to identify the argument.
 #' @param valid_dims Character vector of acceptable dimension names.
@@ -47,9 +44,7 @@
   }
   target
 }
-#' Validate dimensional parameter (target or scale)
-#'
-#' Internal helper to validate named numeric vectors used in reforge operations.
+#' Validate dimension-scaling arguments used in reforge operations
 #'
 #' @param dims The dimensions of the parameter defined for rescaling
 #' @param dims_name Name of dimension
@@ -156,9 +151,6 @@
   dims
 }
 #' Validate elastic moduli inputs
-#'
-#' Internal helper to validate that sufficient elastic moduli are provided
-#' for calculations.
 #'
 #' @param ... Named elastic parameters (K, E, G, nu)
 #' @param min_required Minimum number of non-NULL parameters

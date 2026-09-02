@@ -42,7 +42,7 @@ A dataset containing a sample krill (Euphausia superba) body shape proposed
 by McGehee et al. (1998).
 }
 \examples{
-data(krill, package = "acousticTS")
+data("krill", package = "acousticTS")
 krill
 }
 \keyword{datasets}

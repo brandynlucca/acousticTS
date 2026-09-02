@@ -2,9 +2,9 @@
 # Transition matrix method (TMM) spheroidal-coordinate branch helpers
 ################################################################################
 
-# Convert the public/world spherical-angle convention used by the shared TMM
-# interface into the internal prolate spheroidal convention whose polar axis is
-# aligned with the body-fixed x-axis.
+#' Convert the public/world spherical-angle convention used by the shared TMM
+#' interface into the internal prolate spheroidal convention whose polar axis is
+#' aligned with the body-fixed x-axis.
 #' @noRd
 .tmm_public_to_spheroidal_angles <- function(theta, phi) {
   x <- sin(theta) * cos(phi)
@@ -21,9 +21,10 @@
   list(theta = theta_internal, phi = phi_internal)
 }
 
-# Convert the internal prolate spheroidal convention whose polar axis is aligned
-# with the body-fixed x-axis back into the shared public/world spherical-angle
-# convention used by the rest of the TMM interface.
+#' Convert the internal prolate spheroidal convention whose polar axis is
+#' aligned
+#' with the body-fixed x-axis back into the shared public/world spherical-angle
+#' convention used by the rest of the TMM interface.
 #' @noRd
 .tmm_spheroidal_to_public_angles <- function(theta, phi) {
   x <- cos(theta)
@@ -40,19 +41,19 @@
   list(theta = theta_public, phi = phi_public)
 }
 
-# Convert the Furusawa-style retained modal sum into the far-field scattering
-# amplitude used elsewhere in TMM. The spheroidal backend returns the series
-# before the -2i / k prefactor from the published far-field expression.
+#' Convert the Furusawa-style retained modal sum into the far-field scattering
+#' amplitude used elsewhere in TMM. The spheroidal backend returns the series
+#' before the -2i / k prefactor from the published far-field expression.
 #' @noRd
 .tmm_spheroidal_sum_to_amplitude <- function(f_sum, k_sw) {
   # Apply the far-field prefactor used by the public TMM outputs ===============
   (-2i / k_sw) * f_sum
 }
 
-# Reduce the stored TMM prolate body metadata to the scalar fields required by
-# the compiled spheroidal kernels. The stored body bundle can also carry shape
-# profiles such as the meridional radius vector, which should not be passed
-# through the one-row compiled data-frame interface.
+#' Reduce the stored TMM prolate body metadata to the scalar fields required by
+#' the compiled spheroidal kernels. The stored body bundle can also carry shape
+#' profiles such as the meridional radius vector, which should not be passed
+#' through the one-row compiled data-frame interface.
 #' @noRd
 .tmm_spheroidal_cpp_body <- function(body) {
   data.frame(
@@ -65,8 +66,8 @@
   )
 }
 
-# Evaluate the exact prolate monostatic spectrum through the PSMS family used
-# by the direct spheroidal TMM path.
+#' Evaluate the exact prolate monostatic spectrum through the PSMS family used
+#' by the direct spheroidal TMM path.
 #' @noRd
 .tmm_spheroidal_exact_monostatic <- function(object,
                                              acoustics,
@@ -113,9 +114,9 @@
   )
 }
 
-# Route the prolate branch through the exact scalar spheroidal modal-series
-# backend. For the current single-target scope, this is the geometry-matched
-# T-matrix-equivalent path.
+#' Route the prolate branch through the exact scalar spheroidal modal-series
+#' backend. For the current single-target scope, this is the geometry-matched
+#' T-matrix-equivalent path.
 #' @noRd
 .tmm_run_spheroidal_branch <- function(object,
                                        acoustics,

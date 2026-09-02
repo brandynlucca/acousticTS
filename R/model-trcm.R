@@ -158,7 +158,7 @@ trcm_initialize <- function(object,
   )
 }
 
-#' Helper function for handling the straight-cylinder form for TRCM.
+#' Calculate the straight-cylinder TRCM form
 #' @keywords internal
 #' @noRd
 .trcm_straight <- function(k1, k2a, l, a, r, I, theta_shift) {
@@ -176,7 +176,7 @@ trcm_initialize <- function(object,
     r * sinc_directivity * I_term
 }
 
-#' Helper function for handling the Fresnel integration for equivalent length
+#' Calculate the Fresnel equivalent length for TRCM
 #' @keywords internal
 #' @noRd
 .trcm_equivalent_length_fresnel <- function(k1, l, a, rho_c) {
@@ -215,14 +215,14 @@ trcm_initialize <- function(object,
   )
 }
 
-#' Helper function for handling the bent cylinder stationary phase
+#' Calculate the stationary-phase equivalent length for TRCM
 #' @keywords internal
 #' @noRd
 .trcm_equivalent_length_stationary_phase <- function(lambda, l, rho_c) {
   sqrt(rho_c * lambda / 2) * exp(1i * pi / 4)
 }
 
-#' Helper function for handling the bent-cylinder form for TRCM.
+#' Calculate the bent-cylinder TRCM form
 #' @keywords internal
 #' @noRd
 .trcm_curved <- function(

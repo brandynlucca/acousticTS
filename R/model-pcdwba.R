@@ -54,6 +54,7 @@
 #' @keywords models acoustics internal
 NULL
 
+#' Resolve the axial coordinate row used by PCDWBA
 #' @noRd
 .pcdwba_axis_row <- function(rpos, candidates, default = NULL) {
   # Match the first available candidate axis ===================================
@@ -72,6 +73,7 @@ NULL
   default
 }
 
+#' Determine whether a PCDWBA profile is straight
 #' @noRd
 .pcdwba_is_straight <- function(body) {
   # Resolve the transverse axis if present =====================================
@@ -85,6 +87,7 @@ NULL
   all(abs(rpos[z_idx, ]) <= sqrt(.Machine$double.eps))
 }
 
+#' Expand a PCDWBA material property across profile nodes
 #' @noRd
 .pcdwba_node_property <- function(x, n_nodes, label) {
   # Recycle scalar properties to all nodes =====================================
@@ -106,6 +109,7 @@ NULL
   )
 }
 
+#' Build regular PCDWBA integration geometry
 #' @noRd
 .pcdwba_regular_geometry <- function(n_nodes,
                                      radius_curvature_ratio,
@@ -143,6 +147,7 @@ NULL
   )
 }
 
+#' Build profile-based PCDWBA integration geometry
 #' @noRd
 .pcdwba_profile_geometry <- function(body) {
   # Resolve the profile axes from the stored geometry ==========================
@@ -196,6 +201,7 @@ NULL
   )
 }
 
+#' Select and prepare the PCDWBA integration geometry
 #' @noRd
 .pcdwba_prepare_geometry <- function(object,
                                      radius_curvature = NULL,

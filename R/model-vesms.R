@@ -81,6 +81,7 @@
 #' @keywords models acoustics internal
 NULL
 
+#' Determine whether a VESMS component is spherical
 #' @noRd
 .vesms_is_spherical <- function(object) {
   # Extract the stored shape tag ===============================================
@@ -90,6 +91,7 @@ NULL
   any(grepl("sphere", tolower(as.character(shape_tag))))
 }
 
+#' Validate the outer radius used by VESMS
 #' @noRd
 .vesms_validate_outer_radius <- function(radius_viscous, radius_shell) {
   # Validate the viscous-layer outer radius ====================================
@@ -106,6 +108,7 @@ NULL
   radius_viscous
 }
 
+#' Resolve an acoustically neutral VESMS layer radius
 #' @noRd
 .vesms_neutral_radius <- function(radius_gas,
                                   density_sw,
@@ -124,6 +127,7 @@ NULL
   radius_gas * (1 + (density_sw - density_gas) / denom)^(1 / 3)
 }
 
+#' Validate that a scatterer is supported by VESMS
 #' @noRd
 .vesms_validate_object_scope <- function(object) {
   if (!methods::is(object, "ESS")) {
@@ -140,6 +144,7 @@ NULL
   }
 }
 
+#' Validate VESMS radius-control arguments
 #' @noRd
 .vesms_validate_radius_controls <- function(radius_viscous, viscous_thickness) {
   if (!is.null(radius_viscous) && !is.null(viscous_thickness)) {
@@ -150,6 +155,7 @@ NULL
   }
 }
 
+#' Extract the layered components required by VESMS
 #' @noRd
 .vesms_extract_components <- function(object, sound_speed_sw, density_sw) {
   shell <- .extract_material_props(
@@ -170,6 +176,7 @@ NULL
   list(shell = shell, fluid = fluid)
 }
 
+#' Validate the VESMS shell-fluid configuration
 #' @noRd
 .vesms_validate_shell_fluid <- function(shell, fluid) {
   if (is.null(shell$radius) ||
@@ -203,6 +210,7 @@ NULL
   }
 }
 
+#' Resolve the shell Lame parameter used by VESMS
 #' @noRd
 .vesms_resolve_lambda <- function(shell) {
   if (!is.null(shell$lambda) && is.finite(shell$lambda)) {
@@ -225,6 +233,7 @@ NULL
   lambda_val
 }
 
+#' Validate required properties of the viscous layer
 #' @noRd
 .vesms_validate_viscous_required <- function(sound_speed_viscous,
                                              density_viscous,
@@ -251,6 +260,7 @@ NULL
   }
 }
 
+#' Resolve the viscous-layer bulk viscosity
 #' @noRd
 .vesms_resolve_bulk_viscosity <- function(bulk_viscosity_viscous,
                                           shear_viscosity_viscous) {
@@ -264,6 +274,7 @@ NULL
   bulk_viscosity_viscous
 }
 
+#' Resolve one VESMS layer radius
 #' @noRd
 .vesms_resolve_radius <- function(radius_viscous,
                                   viscous_thickness,
@@ -293,6 +304,7 @@ NULL
   )
 }
 
+#' Resolve the VESMS modal truncation limit
 #' @noRd
 .vesms_resolve_m_limit <- function(m_limit,
                                    frequency,
@@ -417,6 +429,7 @@ vesms_initialize <- function(object,
   object
 }
 
+#' Calculate the VESMS response for an initialized scatterer
 #' @noRd
 VESMS <- function(object) {
   # Extract the stored VESMS inputs ============================================

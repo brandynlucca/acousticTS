@@ -2,7 +2,7 @@
 # Transition matrix method (TMM) spherical-coordinate branch helpers
 ################################################################################
 
-# Stable odd double-factorial used in the associated Legendre seed term.
+#' Stable odd double-factorial used in the associated Legendre seed term.
 #' @noRd
 .tmm_double_factorial_odd <- function(m) {
   # Handle the seed case used by the associated Legendre recursion =============
@@ -14,7 +14,7 @@
   exp(lgamma(2 * m + 1) - m * log(2) - lgamma(m + 1))
 }
 
-# Build the associated Legendre table P_n^m(mu) for one azimuthal block.
+#' Build the associated Legendre table P_n^m(mu) for one azimuthal block.
 #' @noRd
 .tmm_assoc_legendre_table <- function(m, n_max, mu) {
   # Initialize the retained degree sequence and output table ===================
@@ -53,8 +53,8 @@
   p_mat
 }
 
-# Differentiate the associated Legendre table with respect to theta for the
-# curved-surface normal derivative.
+#' Differentiate the associated Legendre table with respect to theta for the
+#' curved-surface normal derivative.
 #' @noRd
 .tmm_assoc_legendre_theta_derivative <- function(m, n_seq, mu, p_mat) {
   # Preallocate the theta-derivative table for the retained block ==============
@@ -75,8 +75,8 @@
   deriv
 }
 
-# Evaluate r(theta) and dr/dtheta for the geometries supported by the
-# spherical-coordinate branch.
+#' Evaluate r(theta) and dr/dtheta for the geometries supported by the
+#' spherical-coordinate branch.
 #' @noRd
 .tmm_surface_radius <- function(shape_parameters, theta) {
   # Resolve the analytic radius law for a spherical target =====================
@@ -141,7 +141,7 @@
   stop("Unsupported TMM shape geometry.", call. = FALSE)
 }
 
-# Evaluate one spherical radial-function family across all retained degrees.
+#' Evaluate one spherical radial-function family across all retained degrees.
 #' @noRd
 .tmm_radial_matrix <- function(fun, n_seq, argument) {
   fun_name <- NULL
@@ -174,7 +174,7 @@
   do.call(cbind, values)
 }
 
-# Apply the geometric normal derivative on a curved axisymmetric surface.
+#' Apply the geometric normal derivative on a curved axisymmetric surface.
 #' @noRd
 .tmm_normal_derivative_matrix <- function(radial,
                                           radial_deriv,
@@ -193,8 +193,8 @@
     )
 }
 
-# Incident plane-wave coefficients for one azimuthal order in the spherical
-# basis.
+#' Incident plane-wave coefficients for one azimuthal order in the spherical
+#' basis.
 #' @noRd
 .tmm_incident_plane_wave_coefficients <- function(m, n_seq, mu0, p_inc) {
   # Resolve the m-dependent normalization factors ==============================
@@ -208,8 +208,8 @@
   (1i)^n_seq * (2 * n_seq + 1) * beta * p_inc
 }
 
-# Reconstruct the monostatic far-field amplitude from the solved outgoing
-# block coefficients.
+#' Reconstruct the monostatic far-field amplitude from the solved outgoing
+#' block coefficients.
 #' @noRd
 .tmm_backscatter_from_blocks <- function(blocks, k_sw, mu0) {
   # Initialize the accumulated monostatic far-field amplitude ==================
@@ -229,7 +229,7 @@
   f_bs
 }
 
-# Solve the projected block system with progressively more forgiving fallbacks.
+#' Solve the projected block system with progressively more forgiving fallbacks.
 #' @noRd
 .tmm_solve_linear_system <- function(lhs, rhs) {
   # Use the direct solve when the projected system is square ===================
@@ -254,8 +254,8 @@
   )
 }
 
-# Assemble the collocation system for one azimuthal block under the requested
-# boundary condition.
+#' Assemble the collocation system for one azimuthal block under the requested
+#' boundary condition.
 #' @noRd
 .tmm_boundary_block <- function(boundary,
                                 n_seq,
@@ -331,8 +331,8 @@
   list(lhs = lhs, rhs = rhs)
 }
 
-# Precompute the frequency-independent collocation and projection data for one
-# retained azimuthal block.
+#' Precompute the frequency-independent collocation and projection data for one
+#' retained azimuthal block.
 #' @noRd
 .tmm_spherical_block_setup <- function(m,
                                        n_max,
@@ -373,7 +373,7 @@
   )
 }
 
-# Solve one frequency-dependent radial block using a cached spherical setup.
+#' Solve one frequency-dependent radial block using a cached spherical setup.
 #' @noRd
 .tmm_solve_spherical_block <- function(setup,
                                        boundary,
@@ -411,7 +411,7 @@
   list(T = t_block, rcond_lhs = rcond_lhs)
 }
 
-# Build the incident-side coefficient state for one cached spherical block.
+#' Build the incident-side coefficient state for one cached spherical block.
 #' @noRd
 .tmm_spherical_incident_block <- function(setup, mu0) {
   p_inc <- as.numeric(.tmm_assoc_legendre_table(setup$m, setup$n_max, mu0))
@@ -425,8 +425,8 @@
   list(p_inc = p_inc, a_inc = a_inc)
 }
 
-# Solve the retained spherical branch by reusing each frequency-independent
-# azimuthal block setup across all frequencies in the same n_max bucket.
+#' Solve the retained spherical branch by reusing each frequency-independent
+#' azimuthal block setup across all frequencies in the same n_max bucket.
 #' @noRd
 .tmm_spherical_stored_frequency_sweep <- function(acoustics,
                                                   theta_body,
@@ -489,8 +489,8 @@
   list(f_bs = f_bs, t_matrix = t_store)
 }
 
-# Solve one frequency of the spherical-coordinate TMM branch and optionally
-# retain the per-order projected blocks.
+#' Solve one frequency of the spherical-coordinate TMM branch and optionally
+#' retain the per-order projected blocks.
 #' @noRd
 .tmm_single_frequency_spherical <- function(k_sw,
                                             k_body,

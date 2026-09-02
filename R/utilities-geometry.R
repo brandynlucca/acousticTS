@@ -478,7 +478,7 @@ brake <- function(object, radius_curvature, mode = "ratio") {
 }
 
 ################################################################################
-#' Support function for bending scatterer position matrix dataframe
+#' Bend a scatterer position data frame
 #' @param body_df Dataframe object containing body shape information
 #' @param radius_curvature Radius of curvature that can be parameterized either
 #' as a ratio relative to body length or actual measurement
@@ -569,7 +569,7 @@ brake_df <- function(body_df, radius_curvature, mode = "ratio") {
 }
 
 ################################################################################
-#' Support function for bending scatterer body shape scatterer object
+#' Bend the body shape stored on a scatterer object
 #' @param object Scatterer-class object
 #' @param radius_curvature Radius of curvature that can be parameterized either
 #' as a ratio relative to body length or actual measurement
@@ -600,7 +600,7 @@ brake_scatterer <- function(object, radius_curvature, mode = "ratio") {
 }
 
 ################################################################################
-#' Support rotation function for KRM (swimbladder)
+#' Rotate KRM swimbladder coordinates
 #' @inheritParams body_rotation
 #' @keywords internal
 #' @noRd
@@ -618,7 +618,7 @@ bladder_rotation <- function(sum_rpos, rpos, theta, k_length) {
 }
 
 ################################################################################
-#' Support rotating function for KRM (body)
+#' Rotate KRM body coordinates
 #' @param sum_rpos Summed position matrix
 #' @param rpos Position matrix
 #' @param theta Orientation angle
@@ -807,7 +807,7 @@ segmentize <- function(x1, x0) {
   object
 }
 
-#' Backward-compatible DWBA profile helper alias
+#' Rebuild a DWBA profile through the legacy alias
 #' @inheritParams .as_dwba_profile
 #' @keywords internal
 #' @noRd
@@ -919,7 +919,7 @@ segmentize <- function(x1, x0) {
   object
 }
 
-#' Backward-compatible KRM profile helper alias
+#' Rebuild a KRM profile through the legacy alias
 #' @inheritParams .as_krm_profile
 #' @keywords internal
 #' @noRd

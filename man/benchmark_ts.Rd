@@ -26,7 +26,7 @@ the benchmark definitions assembled by Jech et al. (2015) and distributed in
 the \code{echoSMs} reference resources.
 }
 \examples{
-data(benchmark_ts, package = "acousticTS")
+data("benchmark_ts", package = "acousticTS")
 str(benchmark_ts, max.level = 1)
 
 }

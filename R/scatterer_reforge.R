@@ -1706,7 +1706,7 @@ setMethod(
         abs(diff(range(rpos[1L, ])))
     }
     ############################################################################
-    # Rescale radius (standalone — only when length was not specified) =========
+    # Rescale radius when length was not specified =============================
     if (!is.null(radius) && is.null(length)) {
       r_scale <- radius / shape$radius
       radii <- radii * r_scale

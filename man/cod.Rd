@@ -59,7 +59,7 @@ Atlantic cod example used in the KRM literature and matches the Cod D case
 archived in the \code{echoSMs} KRM shape collection.
 }
 \examples{
-data(cod, package = "acousticTS")
+data("cod", package = "acousticTS")
 cod
 
 }

@@ -107,7 +107,7 @@ subset(available_models(), model == "fcms")
 }
 \references{
 Stanton, T.K. (1988). Sound scattering by cylinders of finite length. I.
-Fuid cylinders. The Journal of the Acoustical Society of America, 83: 55-63.
+Fluid cylinders. The Journal of the Acoustical Society of America, 83: 55-63.
 
 Stanton, T.K. (1989). Sound scattering by cylinders of finite length. III.
 Deformed cylinders. The Journal of the Acoustical Society of America, 85:
