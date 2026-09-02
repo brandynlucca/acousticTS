@@ -16,6 +16,9 @@ Description: Acoustic target strength (TS) represents the intensity of an
     theoretical TS that comprise exact and approximate solutions as well
     as analytical approaches. The models provided can help provide TS
     estimates over broad statistical distributions of model parameters.
+    Applications are described by Lucca et al. (2023)
+    <doi:10.1121/10.0022459>, with fisheries-acoustics principles from
+    Simmonds and MacLennan (2005) <doi:10.1002/9780470995303>.
 License: GPL-3 | file LICENSE
 URL: https://brandynlucca.github.io/acousticTS/,
     https://doi.org/10.5281/zenodo.7600659
