@@ -39,9 +39,6 @@
 
 #' Extract common initialization components
 #'
-#' Internal helper to extract shape, body, and medium parameters from scatterer
-#' objects during model initialization.
-#'
 #' @param object Scatterer object
 #' @param sound_speed_sw Sound speed in seawater (m/s)
 #' @param density_sw Density of seawater (kg/m^3)
@@ -163,9 +160,7 @@
   object
 }
 
-#' Calculate all relevant wavenumbers
-#'
-#' Internal helper to calculate wavenumbers for multiple sound speeds.
+#' Calculate wavenumbers for multiple sound speeds
 #'
 #' @param frequency Frequency vector (Hz)
 #' @param sound_speeds Named list of sound speeds (m/s)
@@ -179,10 +174,7 @@
   )
 }
 
-#' Extract material properties with fallback logic
-#'
-#' Internal helper to extract material properties from ESS components with
-#' contrast-based fallback calculations.
+#' Extract ESS material properties with contrast-based fallbacks
 #'
 #' @param component Material component (shell, fluid, etc.)
 #' @param ref_sound_speed Reference sound speed for contrast conversion

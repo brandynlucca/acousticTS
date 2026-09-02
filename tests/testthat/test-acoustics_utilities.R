@@ -185,34 +185,26 @@ test_that("Simple acoustic utility functions work as intended", {
   # ---- Error: sparse parameters -> K
   expect_error(
     lame(K = 1),
-    paste0(
-      "At least two elasticity moduli values are required to calculate ",
-      "the Lamé parameter."
-    )
+    "At least two elasticity moduli values are required",
+    fixed = TRUE
   )
   # ---- Error: sparse parameters -> E
   expect_error(
     lame(E = 1),
-    paste0(
-      "At least two elasticity moduli values are required to calculate ",
-      "the Lamé parameter."
-    )
+    "At least two elasticity moduli values are required",
+    fixed = TRUE
   )
   # ---- Error: sparse parameters -> G
   expect_error(
     lame(G = 1),
-    paste0(
-      "At least two elasticity moduli values are required to calculate ",
-      "the Lamé parameter."
-    )
+    "At least two elasticity moduli values are required",
+    fixed = TRUE
   )
   # ---- Error: sparse parameters -> G
   expect_error(
     lame(nu = 1),
-    paste0(
-      "At least two elasticity moduli values are required to calculate ",
-      "the Lamé parameter."
-    )
+    "At least two elasticity moduli values are required",
+    fixed = TRUE
   )
   # ---- Overloaded parameters: K & E & G & nu
   expect_equal(lame(K = 1, E = 1, G = 1, nu = 1), 1 / 3)
@@ -241,7 +233,10 @@ test_that("Curvature edge-case", {
 test_that("`brake()` rejects unsupported inputs explicitly", {
   expect_error(
     brake(1, radius_curvature = 5),
-    "`brake\\(\\)` expects either a scatterer object or a list-like body component."
+    paste0(
+      "`brake\\(\\)` expects either a scatterer object or a list-like body ",
+      "component."
+    )
   )
 })
 

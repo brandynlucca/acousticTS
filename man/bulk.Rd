@@ -27,4 +27,8 @@ The relationships used are:
 \deqn{K = \frac{2G(1 + \nu)}{3(1 - 2\nu)}}
 \deqn{K = \frac{E}{3(1 - 2\nu)}}
 }
+\examples{
+bulk(E = 3e9, G = 1.1e9)
+
+}
 \keyword{elastic}

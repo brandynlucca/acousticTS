@@ -468,54 +468,6 @@ static std::complex<double> tmm_backscatter_from_solved_block_cpp(
     return f_bs;
 }
 
-// Solve one frequency of the spherical-coordinate TMM branch and return only
-// the monostatic backscatter amplitude.
-static std::complex<double> tmm_single_frequency_cpp(double frequency,
-                                                     double theta_body,
-                                                     const std::string& shape,
-                                                     const NumericVector& shape_values,
-                                                     const std::string& boundary,
-                                                     double sound_speed_sw,
-                                                     double density_sw,
-                                                     double density_body,
-                                                     double sound_speed_body,
-                                                     int n_max) {
-    double mu0 = std::cos(theta_body);
-    double k_sw = 2.0 * M_PI * frequency / sound_speed_sw;
-    double k_body = std::numeric_limits<double>::quiet_NaN();
-    bool penetrable = boundary == "liquid_filled" || boundary == "gas_filled";
-
-    if (penetrable) {
-        k_body = 2.0 * M_PI * frequency / sound_speed_body;
-    }
-
-    std::complex<double> f_bs(0.0, 0.0);
-
-    for (int m = 0; m <= n_max; ++m) {
-        TmmSphericalBlockSetup setup = tmm_spherical_block_setup_cpp(
-            m,
-            n_max,
-            mu0,
-            shape,
-            shape_values,
-            boundary,
-            penetrable
-        );
-        arma::cx_mat t_block = tmm_solve_spherical_block_cpp(
-            setup,
-            boundary,
-            penetrable,
-            k_sw,
-            k_body,
-            density_sw,
-            density_body
-        );
-        f_bs += tmm_backscatter_from_solved_block_cpp(setup, t_block, k_sw);
-    }
-
-    return f_bs;
-}
-
 // Vectorized frequency wrapper used by the R-side spherical TMM path.
 // [[Rcpp::export]]
 Rcpp::ComplexVector tmm_backscatter_cpp(Rcpp::NumericVector frequency,

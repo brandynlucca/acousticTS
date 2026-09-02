@@ -57,12 +57,17 @@ single-target \code{TMM} scattering slice / map when the object was computed wit
 retained T-matrix state.
 }
 \details{
-This method dispatches to the relevant scatterer-class plotting helper:
-\code{cal_plot()}, \code{ess_plot()}, \code{sbf_plot()}, \code{bbf_plot()}, \code{fls_plot()}, or
-\code{gas_plot()}. The supported \code{type} values therefore depend on what has been
-stored on the object. For example, \code{type = "model"} requires the object to
-already contain model output, and \code{type = "scattering"} currently applies
-only to stored \code{TMM} results.
+Plotting behavior is selected from the object's class. The supported \code{type}
+values therefore depend on what has been stored on the object. For example,
+\code{type = "model"} requires the object to already contain model output, and
+\code{type = "scattering"} currently applies only to stored \code{TMM} results.
+}
+\examples{
+\dontrun{
+data("krill", package = "acousticTS")
+plot(krill)
+}
+
 }
 \seealso{
 \code{\link[=extract]{extract()}}, \code{\link[=target_strength]{target_strength()}}, \code{\link[=tmm_scattering]{tmm_scattering()}},

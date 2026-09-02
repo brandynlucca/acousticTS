@@ -1,6 +1,6 @@
 ################################################################################
 ################################################################################
-# FUNCTIONS FOR GENERATIGN CANONICAL & PRE-DEFINED SHAPES
+# FUNCTIONS FOR GENERATING CANONICAL & PRE-DEFINED SHAPES
 ################################################################################
 ################################################################################
 ################################################################################
@@ -117,6 +117,8 @@ arbitrary <- function(...,
   )
 }
 
+#' Validate paired coordinate aliases for arbitrary shapes
+#' @noRd
 .validate_coord_aliases <- function(x, pattern) {
   # Extract ====================================================================
   mask <- grepl(pattern, x, perl = TRUE)

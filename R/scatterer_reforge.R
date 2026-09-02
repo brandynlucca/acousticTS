@@ -144,7 +144,8 @@ setGeneric(
 #' @param scales Named vector with length/width/height multipliers.
 #' @keywords internal
 #' @noRd
-.reforge_apply_axis_scaling <- function(rpos, scales, scale_centerline = FALSE) {
+.reforge_apply_axis_scaling <- function(rpos, scales, scale_centerline =
+                                          FALSE) {
   # Leave the component untouched when no scaling was requested ================
   if (is.null(scales)) {
     return(rpos)
@@ -230,7 +231,7 @@ setGeneric(
       }
       half_height <- (rpos[zU_idx, ] - rpos[zL_idx, ]) / 2
       half_height <- half_height * scales["height"]
-      # ---- Scale emergent midlines about their own vertical center ++++++++++++
+      # ---- Scale emergent midlines about their own vertical center ===========
       if (!has_explicit_center) {
         z_ref <- mean(z_center, na.rm = TRUE)
         z_center <- z_ref + (z_center - z_ref) * scales["height"]
@@ -376,7 +377,8 @@ setGeneric(
 
 #' Reposition an internal component to preserve relative z-origin placement
 #' @param component_rpos Row-major internal-component position matrix.
-#' @param relative_offset Relative centerline offset scaled by parent half-height.
+#' @param relative_offset Relative centerline offset scaled by parent
+#'   half-height.
 #' @param parent_rpos Row-major parent-component position matrix.
 #' @keywords internal
 #' @noRd
@@ -426,7 +428,10 @@ setGeneric(
   # Shift every vertical coordinate row by one component-level displacement.
   # A nodewise displacement forces the internal component to inherit the body
   # centerline profile and changes the component shape during reforge.
-  z_idx <- .reforge_profile_row_idx(component_rpos, c("z", "z_body", "z_bladder"))
+  z_idx <- .reforge_profile_row_idx(component_rpos, c(
+    "z", "z_body",
+    "z_bladder"
+  ))
   zU_idx <- .reforge_profile_row_idx(
     component_rpos,
     .geometry_contract_schema()$profile_row_major$zU
@@ -460,7 +465,10 @@ setGeneric(
 .reforge_check_internal_containment <- function(rpos_b,
                                                 rpos_i,
                                                 component_label = "Swimbladder",
-                                                action = c("warn", "error", "ignore")) {
+                                                action = c(
+                                                  "warn", "error",
+                                                  "ignore"
+                                                )) {
   # Normalize the requested containment policy ================================
   action <- match.arg(action)
 
@@ -501,7 +509,10 @@ setGeneric(
 
   # Apply the configured containment policy ===================================
   if (!all(contained)) {
-    message_text <- paste0(component_label, " exceeds body bounds at some positions.")
+    message_text <- paste0(
+      component_label,
+      " exceeds body bounds at some positions."
+    )
     if (identical(action, "error")) {
       stop(message_text, call. = FALSE)
     }
@@ -557,6 +568,9 @@ setGeneric(
 #' @param containment Containment policy for internal geometry checks. Use
 #'   `"warn"` to keep the current warning behavior, `"error"` to fail fast for
 #'   invalid internal geometries, or `"ignore"` to skip containment checks.
+#' @return An updated object of class `SBF`.
+#' @examples
+#' methods::selectMethod("reforge", "SBF")
 #' @keywords internal
 #' @export
 setMethod(
@@ -772,6 +786,8 @@ setMethod(
 #'   `"warn"` to keep the current warning behavior, `"error"` to fail fast for
 #'   invalid internal geometries, or `"ignore"` to skip containment checks.
 #' @return Modified BBF-class object.
+#' @examples
+#' methods::selectMethod("reforge", "BBF")
 #' @keywords internal
 #' @export
 setMethod(
@@ -999,7 +1015,10 @@ setMethod(
 #'   axis scaling).
 #' @keywords internal
 #' @noRd
-.reforge_gas_canonical_shape <- function(shape_type, length, radius, n_segments) {
+.reforge_gas_canonical_shape <- function(
+  shape_type, length, radius,
+  n_segments
+) {
   # Resolve the canonical family from the stored shape descriptor ==============
   family <- tolower(shape_type %||% "")
   # Rebuild the requested canonical geometry ===================================
@@ -1073,6 +1092,8 @@ setMethod(
 #'   Mutually exclusive with `scale`.
 #' @param n_segments Legacy alias for `n_segments_body`.
 #' @return Modified GAS-class object.
+#' @examples
+#' methods::selectMethod("reforge", "GAS")
 #' @seealso [reforge()]
 #' @keywords internal
 #' @export
@@ -1186,7 +1207,8 @@ setMethod(
     } else {
       current_max_r * unname(body_scales["radius"])
     }
-    new_n_seg <- if (!is.null(n_seg)) as.integer(n_seg) else as.integer(current_n_seg)
+    new_n_seg <-
+      if (!is.null(n_seg)) as.integer(n_seg) else as.integer(current_n_seg)
     ############################################################################
     # Regenerate canonical geometry, otherwise scale the profile directly ======
     new_shape <- .reforge_gas_canonical_shape(
@@ -1250,6 +1272,8 @@ setMethod(
 #'   internally. Mutually exclusive with \code{scale}.
 #' @param n_segments New number of discrete segments along the major axis.
 #' @return Modified CAL-class object.
+#' @examples
+#' methods::selectMethod("reforge", "CAL")
 #' @keywords internal
 #' @export
 setMethod(
@@ -1341,6 +1365,8 @@ setMethod(
 #' @param n_segments New number of discrete segments.  All columns of both the
 #'   shell and fluid position matrices are re-interpolated along the x-axis.
 #' @return Modified ESS-class object.
+#' @examples
+#' methods::selectMethod("reforge", "ESS")
 #' @keywords internal
 #' @export
 setMethod(
@@ -1397,7 +1423,8 @@ setMethod(
     curr_shell_r <- shape$shell$radius
     curr_shell_max_r <- max(curr_shell_r, na.rm = TRUE)
     curr_fluid_r <- shape$fluid$radius # may be NA or a vector
-    curr_fluid_max_r <- if (!is.null(curr_fluid_r) && !all(is.na(curr_fluid_r))) {
+    curr_fluid_max_r <- if (!is.null(curr_fluid_r) &&
+      !all(is.na(curr_fluid_r))) {
       max(curr_fluid_r, na.rm = TRUE)
     } else {
       NA_real_
@@ -1501,6 +1528,10 @@ setMethod(
 #' @param length_radius_ratio_constant Legacy toggle controlling whether a
 #'   length-only resize also rescales radius.
 #' @param n_segments Legacy alias for `n_segments_body`.
+#'
+#' @return An updated object of class `FLS`.
+#' @examples
+#' methods::selectMethod("reforge", "FLS")
 #'
 #' @keywords internal
 #' @export
@@ -1675,7 +1706,7 @@ setMethod(
         abs(diff(range(rpos[1L, ])))
     }
     ############################################################################
-    # Rescale radius (standalone — only when length was not specified) =========
+    # Rescale radius when length was not specified =============================
     if (!is.null(radius) && is.null(length)) {
       r_scale <- radius / shape$radius
       radii <- radii * r_scale
@@ -1698,7 +1729,10 @@ setMethod(
 #' @noRd
 .reforge_method_formals <- function(method_definition) {
   # Prefer direct method formals when the wrapper exposes them =================
-  direct_formals <- setdiff(names(formals(method_definition)), c("object", "..."))
+  direct_formals <- setdiff(names(formals(method_definition)), c(
+    "object",
+    "..."
+  ))
   if (length(direct_formals) > 0) {
     return(direct_formals)
   }

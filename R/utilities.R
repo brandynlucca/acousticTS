@@ -5,9 +5,6 @@
 ################################################################################
 #' Calculate maximum radius from explicit value or ratio
 #'
-#' Internal helper function to standardize radius calculation logic across
-#' shape creation functions.
-#'
 #' @param radius Explicit radius value (can be NULL)
 #' @param length Body length
 #' @param length_radius_ratio Length-to-radius ratio (can be NULL)
@@ -72,18 +69,11 @@
   }
 }
 
-#' Resolve parameter value for simulation grid
+#' Simplify resolved simulation parameter draws
 #'
-#' Internal helper to resolve parameter values in simulate_ts based on type
-#' (batch, function, scalar, vector).
-#'
-#' @param param_name Parameter name
-#' @param param_value Parameter value (scalar, vector, or function)
-#' @param batch_by Batch parameter names
-#' @param batch_values Batch parameter values
-#' @param grid_size Simulation grid size
-#' @param simulation_grid Simulation grid data frame
-#' @return Resolved parameter vector
+#' @param values List of resolved parameter draws.
+#' @return An atomic vector when every draw is an unnamed atomic scalar;
+#'   otherwise, the original list.
 #' @keywords internal
 #' @noRd
 .simplify_simulation_draws <- function(values) {
@@ -178,7 +168,8 @@
 
   # Preserve structured scalar values across the full simulation grid ==========
   if (.is_structured_simulation_value(param_value)) {
-    if (!is.list(param_value) && !is.data.frame(param_value) && !is.matrix(param_value)) {
+    if (!is.list(param_value) && !is.data.frame(param_value) &&
+      !is.matrix(param_value)) {
       return(rep(list(param_value), grid_size))
     }
     if (length(param_value) == 1L) {
@@ -202,7 +193,10 @@
   # Reject ambiguous parameter lengths before model construction ==============
   stop(
     sprintf(
-      "Length of parameter '%s' [%d] does not match number of realizations [%d].",
+      paste0(
+        "Length of parameter '%s' [%d] does not match number of realizations ",
+        "[%d]."
+      ),
       param_name, length(param_value), grid_size
     ),
     call. = FALSE
@@ -210,9 +204,6 @@
 }
 
 #' Resolve parameter value for simulation grid
-#'
-#' Internal helper to resolve parameter values in simulate_ts based on type
-#' (batch, function, scalar, vector).
 #'
 #' @param param_name Parameter name
 #' @param param_value Parameter value (scalar, vector, or function)

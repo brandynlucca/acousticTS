@@ -2,7 +2,7 @@
 # Transition matrix method (TMM) bistatic-summary helpers
 ################################################################################
 
-# Convert spherical angles to a 3D unit vector.
+#' Convert spherical angles to a 3D unit vector
 #' @noRd
 .tmm_spherical_to_cartesian <- function(theta, phi) {
   # Return the 3D unit-vector components =======================================
@@ -13,7 +13,7 @@
   )
 }
 
-# Convert one 3D direction vector back into spherical angles.
+#' Convert one 3D direction vector back into spherical angles
 #' @noRd
 .tmm_cartesian_to_spherical <- function(vec) {
   # Normalize the input vector =================================================
@@ -28,7 +28,7 @@
   c(theta = theta, phi = phi)
 }
 
-# Compute the cross product of two 3D vectors.
+#' Compute the cross product of two 3D vectors.
 #' @noRd
 .tmm_cross_product <- function(a, b) {
   # Evaluate the 3D cross product ==============================================
@@ -39,8 +39,8 @@
   )
 }
 
-# Build one orthonormal basis around the forward-scattering direction so that
-# local great-circle slices can be defined independently of global coordinates.
+#' Build one orthonormal basis around the forward-scattering direction so that
+#' local great-circle slices can be defined independently of global coordinates
 #' @noRd
 .tmm_forward_basis <- function(theta_body, phi_body) {
   # Build the forward-scattering direction =====================================
@@ -55,8 +55,8 @@
   list(forward = forward, e1 = e1, e2 = e2)
 }
 
-# Build one great-circle scattering slice in local coordinates centered on the
-# forward-scattering direction.
+#' Build one great-circle scattering slice in local coordinates centered on the
+#' forward-scattering direction.
 #' @noRd
 .tmm_local_slice_directions <- function(theta_body,
                                         phi_body,
@@ -83,8 +83,8 @@
   )
 }
 
-# Compute the angular separation from the forward-scattering direction for one
-# scattering grid.
+#' Compute the angular separation from the forward-scattering direction for one
+#' scattering grid.
 #' @noRd
 .tmm_forward_separation_matrix <- function(theta_body,
                                            phi_body,
@@ -108,8 +108,8 @@
   acos(dot)
 }
 
-# Measure the -drop_dB width of the local backscatter lobe on one great-circle
-# slice expressed in forward-centered scattering angle.
+#' Measure the -drop_dB width of the local backscatter lobe on one great-circle
+#' slice expressed in forward-centered scattering angle.
 #' @noRd
 .tmm_lobe_width <- function(psi_scatter, sigma_scat_dB, center_psi = pi,
                             drop_dB = 3) {
@@ -142,7 +142,7 @@
 
   psi_scatter[right] - psi_scatter[left]
 }
-# Build one named local great-circle slice relative to the forward direction.
+#' Build one named local great-circle slice relative to the forward direction.
 #' @noRd
 .tmm_local_slice <- function(model_params,
                              frequency_idx,
@@ -182,7 +182,7 @@
   )
 }
 
-# Default coarse angular sectors used by the bistatic summary helper.
+#' Default coarse angular sectors used by the bistatic summary helper.
 #' @noRd
 .tmm_default_sectors <- function() {
   data.frame(
@@ -193,7 +193,7 @@
   )
 }
 
-# Validate one user-supplied angular-sector table.
+#' Validate one user-supplied angular-sector table.
 #' @noRd
 .tmm_validate_sectors <- function(sectors) {
   # Fall back to the package-default sectors ===================================
@@ -230,7 +230,7 @@
   sectors
 }
 
-# Compute solid-angle weights for one theta-phi scattering grid.
+#' Compute solid-angle weights for one theta-phi scattering grid.
 #' @noRd
 .tmm_grid_solid_angle <- function(theta_scatter, phi_scatter) {
   # Resolve the implied grid-cell edges ========================================
@@ -242,7 +242,7 @@
   tcrossprod(theta_band, dphi)
 }
 
-# Resolve and validate the core control inputs for `tmm_bistatic_summary()`.
+#' Resolve and validate the core control inputs for `tmm_bistatic_summary()`.
 #' @noRd
 .tmm_bistatic_summary_inputs <- function(model_params,
                                          frequency,
@@ -271,14 +271,20 @@
 
   list(
     idx = .tmm_plot_frequency_index(frequency, acoustics$frequency),
-    theta_body = .tmm_scalar_angle(theta_body, defaults$theta_body, "theta_body"),
-    phi_body = .tmm_scalar_angle(phi_body, defaults$phi_body %||% pi, "phi_body"),
+    theta_body = .tmm_scalar_angle(
+      theta_body, defaults$theta_body,
+      "theta_body"
+    ),
+    phi_body = .tmm_scalar_angle(
+      phi_body, defaults$phi_body %||% pi,
+      "phi_body"
+    ),
     sectors = .tmm_validate_sectors(sectors)
   )
 }
 
-# Build the retained scattering grid and angular quadrature helpers used by the
-# bistatic summary.
+#' Build the retained scattering grid and angular quadrature helpers used by the
+#' bistatic summary.
 #' @noRd
 .tmm_bistatic_summary_grid <- function(object,
                                        acoustics,
@@ -310,7 +316,7 @@
   )
 }
 
-# Build the forward-centered diagnostic slices used by the bistatic summary.
+#' Build the forward-centered diagnostic slices used by the bistatic summary.
 #' @noRd
 .tmm_bistatic_summary_slices <- function(model_params,
                                          idx,
@@ -346,8 +352,8 @@
   )
 }
 
-# Summarize the peak-scattering cell together with the exact forward and
-# monostatic evaluation points.
+#' Summarize the peak-scattering cell together with the exact forward and
+#' monostatic evaluation points.
 #' @noRd
 .tmm_bistatic_summary_points <- function(object,
                                          grid,
@@ -383,7 +389,7 @@
   )
 }
 
-# Build one logical mask for a named forward-separation sector.
+#' Build one logical mask for a named forward-separation sector.
 #' @noRd
 .tmm_bistatic_sector_mask <- function(psi_grid, sectors, i) {
   # Keep the upper bound closed only for the final sector ======================
@@ -394,9 +400,12 @@
   psi_grid >= sectors$psi_min[i] & psi_grid < sectors$psi_max[i]
 }
 
-# Integrate user-defined angular sectors over the retained bistatic grid.
+#' Integrate user-defined angular sectors over the retained bistatic grid.
 #' @noRd
-.tmm_bistatic_sector_integrals <- function(sectors, psi_grid, sigma_scat, solid_angle) {
+.tmm_bistatic_sector_integrals <- function(
+  sectors, psi_grid, sigma_scat,
+  solid_angle
+) {
   # Integrate each requested sector over the retained grid =====================
   do.call(
     rbind,
@@ -449,6 +458,26 @@
 #'
 #' @return A list containing scalar summary metrics, the named slice data
 #'   frames, sector integrals, and optionally the underlying scattering grid.
+#'
+#' @examples
+#' target <- fls_generate(
+#'   shape = sphere(radius_body = 0.005, n_segments = 20),
+#'   g_body = 1,
+#'   h_body = 1
+#' )
+#' stored <- target_strength(
+#'   target,
+#'   frequency = 12e3,
+#'   model = "tmm",
+#'   boundary = "pressure_release",
+#'   store_t_matrix = TRUE
+#' )
+#' tmm_bistatic_summary(
+#'   stored,
+#'   n_theta = 5,
+#'   n_phi = 9,
+#'   n_psi = 9
+#' )
 #'
 #' @seealso \code{\link{tmm_scattering_grid}},
 #'   \code{\link{tmm_products}}
@@ -595,6 +624,21 @@ tmm_bistatic_summary <- function(object,
 #' @param drop_dB Positive dB drop used to define the backscatter-lobe width.
 #'
 #' @return A named list containing the requested post-processed TMM products.
+#'
+#' @examples
+#' target <- fls_generate(
+#'   shape = sphere(radius_body = 0.005, n_segments = 20),
+#'   g_body = 1,
+#'   h_body = 1
+#' )
+#' stored <- target_strength(
+#'   target,
+#'   frequency = 12e3,
+#'   model = "tmm",
+#'   boundary = "pressure_release",
+#'   store_t_matrix = TRUE
+#' )
+#' tmm_products(stored)
 #'
 #' @seealso \code{\link{tmm_scattering}},
 #'   \code{\link{tmm_average_orientation}},

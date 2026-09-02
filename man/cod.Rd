@@ -49,11 +49,19 @@ Clay and Horne Atlantic cod example.
 \usage{
 data(cod)
 }
+\value{
+A pre-generated \code{SBF} scatterer object.
+}
 \description{
 A pre-generated SBF scatterer containing all information required for target
 strength modeling. The packaged object corresponds to the historical
 Atlantic cod example used in the KRM literature and matches the Cod D case
 archived in the \code{echoSMs} KRM shape collection.
+}
+\examples{
+data("cod", package = "acousticTS")
+cod
+
 }
 \references{
 Clay, C.S., and Horne, J.K. (1994). Acoustic models of fish: The Atlantic

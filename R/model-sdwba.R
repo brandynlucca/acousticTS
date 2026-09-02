@@ -140,9 +140,12 @@
 #' zooplankton groups. II. Scattering models. The Journal of the Acoustical
 #' Society of America, 103, 236-253.
 #'
+#' @return No value; this help topic documents the SDWBA model.
+#' @examples
+#' subset(available_models(), model == "sdwba")
+#'
 #' @name SDWBA
 #' @aliases sdwba SDWBA sdwba_curved SDWBA_CURVED
-#' @docType data
 #' @keywords models acoustics internal
 NULL
 
@@ -344,7 +347,6 @@ SDWBA <- function(object) {
 }
 
 #' Initialize FLS-class object for SDWBA modeling
-#' @param object FLS-class object.
 #' @param object FLS-class object.
 #' @param frequency Frequency vector (Hz).
 #' @param sound_speed_sw Seawater sound speed (m/s).

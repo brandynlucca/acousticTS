@@ -517,7 +517,8 @@
   )
 }
 
-#' Plot the shared two-panel shape layout used by profile-based composite targets
+#' Plot the shared two-panel shape layout used by profile-based composite
+#' targets
 #' @param primary_rpos Primary row-major profile matrix.
 #' @param primary_radius Optional explicit primary radius profile.
 #' @param secondary_rpos Optional secondary row-major profile matrix.

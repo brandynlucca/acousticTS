@@ -152,7 +152,10 @@ test_that("BBFM enforces the documented composite-input requirements", {
   expect_error(
     target_strength(
       fls_generate(
-        shape = cylinder(length_body = 0.08, radius_body = 0.003, n_segments = 40),
+        shape = cylinder(
+          length_body = 0.08, radius_body = 0.003, n_segments =
+            40
+        ),
         density_body = 1070,
         sound_speed_body = 1570
       ),

@@ -5,8 +5,15 @@
 \alias{PolynomialCylinder}
 \alias{PolynomialCylinder-class}
 \title{Cylindrical body shape deformed using a polynomial}
+\value{
+An object of the \code{PolynomialCylinder} S4 class.
+}
 \description{
 Cylindrical body shape deformed using a polynomial
+}
+\examples{
+methods::getClass("PolynomialCylinder")
+
 }
 \seealso{
 \code{\link{Shape}}

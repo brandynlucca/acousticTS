@@ -117,6 +117,18 @@ target_strength(
 Model names are normalized internally, so case-insensitive inputs such as
 \code{"DWBA"} and \code{"dwba"} resolve to the same family.
 }
+\examples{
+calibration_sphere <- cal_generate(
+  material = "WC",
+  diameter = 38.1e-3,
+  n_segments = 40
+)
+target_strength(
+  calibration_sphere,
+  frequency = c(38e3, 120e3),
+  model = "calibration"
+)
+}
 \seealso{
 \code{\link{DWBA}}, \code{\link{BBFM}}, \code{\link{PCDWBA}},
 \code{\link{SDWBA}}, \code{\link{FCMS}}, \code{\link{BCMS}},

@@ -6,9 +6,7 @@
 using namespace Rcpp;
 
 // Constants
-static const double pi = M_PI;
 static const double tol = 1E-300;
-static const std::complex<double> i_unit(0.0, 1.0);
 
 // =============================================================================
 // Helper: Compute determinant of a 4x4 complex matrix

@@ -16,6 +16,10 @@
 #'
 #' @keywords shapes internal
 #'
+#' @return An object from the `Shape` S4 class hierarchy.
+#' @examples
+#' methods::getClass("Shape")
+#'
 #' @name Shape
 #' @aliases Shape-class
 #' @rdname Shape-class
@@ -35,6 +39,10 @@ Shape <- setClass("Shape",
 #'
 #' @keywords shapes internal
 #'
+#' @return An object of the `Arbitrary` S4 class.
+#' @examples
+#' methods::getClass("Arbitrary")
+#'
 #' @name Arbitrary
 #' @aliases Arbitrary-class
 #' @rdname Arbitrary-class
@@ -50,6 +58,10 @@ Arbitrary <- setClass("Arbitrary",
 #' @seealso \code{\link{Shape}}
 #'
 #' @keywords shapes internal
+#'
+#' @return An object of the `Sphere` S4 class.
+#' @examples
+#' methods::getClass("Sphere")
 #'
 #' @name Sphere
 #' @aliases Sphere-class
@@ -67,6 +79,10 @@ Sphere <- setClass("Sphere",
 #'
 #' @keywords shapes internal
 #'
+#' @return An object of the `ProlateSpheroid` S4 class.
+#' @examples
+#' methods::getClass("ProlateSpheroid")
+#'
 #' @name ProlateSpheroid
 #' @aliases ProlateSpheroid-class
 #' @rdname ProlateSpheroid-class
@@ -82,6 +98,10 @@ ProlateSpheroid <- setClass("ProlateSpheroid",
 #' @seealso \code{\link{Shape}}
 #'
 #' @keywords shapes internal
+#'
+#' @return An object of the `OblateSpheroid` S4 class.
+#' @examples
+#' methods::getClass("OblateSpheroid")
 #'
 #' @name OblateSpheroid
 #' @aliases OblateSpheroid-class
@@ -99,6 +119,10 @@ OblateSpheroid <- setClass("OblateSpheroid",
 #'
 #' @keywords shapes internal
 #'
+#' @return An object of the `Cylinder` S4 class.
+#' @examples
+#' methods::getClass("Cylinder")
+#'
 #' @name Cylinder
 #' @aliases Cylinder-class
 #' @rdname Cylinder-class
@@ -114,6 +138,10 @@ Cylinder <- setClass("Cylinder",
 #' @seealso \code{\link{Shape}}
 #'
 #' @keywords shapes internal
+#'
+#' @return An object of the `PolynomialCylinder` S4 class.
+#' @examples
+#' methods::getClass("PolynomialCylinder")
 #'
 #' @name PolynomialCylinder
 #' @aliases PolynomialCylinder-class

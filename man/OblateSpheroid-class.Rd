@@ -5,8 +5,15 @@
 \alias{OblateSpheroid}
 \alias{OblateSpheroid-class}
 \title{Oblate spheroidal body shape}
+\value{
+An object of the \code{OblateSpheroid} S4 class.
+}
 \description{
 Oblate spheroidal body shape
+}
+\examples{
+methods::getClass("OblateSpheroid")
+
 }
 \seealso{
 \code{\link{Shape}}

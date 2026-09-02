@@ -59,4 +59,7 @@ length/width/height scaling used by \code{SBF}, while the backbone retains the
 same cylinder-style component bookkeeping and preserves its relative axial
 start within the body when body length changes.
 }
+\examples{
+methods::selectMethod("reforge", "BBF")
+}
 \keyword{internal}

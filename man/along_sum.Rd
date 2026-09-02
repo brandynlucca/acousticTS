@@ -18,3 +18,7 @@ A numeric matrix containing the adjacent column sums of
 \description{
 Along-matrix summing function
 }
+\examples{
+positions <- matrix(1:8, nrow = 2)
+along_sum(positions, ncol(positions))
+}

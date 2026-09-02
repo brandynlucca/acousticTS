@@ -66,12 +66,16 @@
 #' zooplankton groups. II. Scattering models. \emph{The Journal of the
 #' Acoustical Society of America}, 103: 236-253.
 #'
+#' @return No value; this help topic documents the BBFM model.
+#' @examples
+#' subset(available_models(), model == "bbfm")
+#'
 #' @name BBFM
 #' @aliases bbfm BBFM
-#' @docType data
 #' @keywords models acoustics internal
 NULL
 
+#' Construct the fluid-like body used by BBFM
 #' @noRd
 .bbfm_make_fls <- function(component, shape_parameters, id = "UID") {
   # Rewrap one component as an FLS object ======================================
@@ -84,6 +88,7 @@ NULL
   )
 }
 
+#' Project a BBFM component centroid onto the incident direction
 #' @noRd
 .bbfm_centroid_projection <- function(component) {
   # Pull the stored component geometry =========================================

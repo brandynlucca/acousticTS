@@ -414,6 +414,15 @@ bbf_generate <- function(body_shape,
 #' @return
 #' ELA-class object.
 #'
+#' @examples
+#' elastic_sphere <- sphere(radius_body = 0.01, n_segments = 40)
+#' ela_generate(
+#'   shape = elastic_sphere,
+#'   density_body = 7800,
+#'   sound_speed_longitudinal_body = 5900,
+#'   sound_speed_transversal_body = 3200
+#' )
+#'
 #' @seealso \code{\link{ELA}}, \code{\link{CAL}}, \code{\link{ESS}}
 #'
 #' @importFrom methods new
@@ -478,8 +487,8 @@ ela_generate <- function(shape,
 #'   meters and ignores non-SI alternatives.
 #' @param theta_units Compatibility argument. `cal_generate()` now assumes
 #'   radians and ignores non-SI alternatives.
-#' @param material Material-type for the soldi sphere. See 'Details' built-in
-#' material options.
+#' @param material Material type for the solid sphere. See 'Details' for
+#'   built-in material options.
 #' @examples
 #' cal_generate(material = "WC", diameter = 38.1e-3, n_segments = 120)
 #'
@@ -615,7 +624,7 @@ cal_generate <- function(material = "WC",
 #' @param g_body Density contrast. This can either be a single value (i.e.
 #' homogenous) or a vector of values (i.e. inhomogenous).
 #' @param density_body Absolute density (kg/m^3) if contrasts are not supplied.
-#' @param h_body Soundspeed contrast. This can either be a single value (i.e.
+#' @param h_body Sound-speed contrast. This can either be a single value (i.e.
 #' homogenous) or a vector of values (i.e. inhomogenous).
 #' @param sound_speed_body Absolute sound speed (m/s) if contrasts are not
 #' supplied.

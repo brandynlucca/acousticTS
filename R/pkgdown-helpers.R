@@ -1,19 +1,19 @@
 ################################################################################
 # PKGDOWN / VIGNETTE PRESENTATION HELPERS
 ################################################################################
-# Generate modal status badge for pkgdown site
+#' Generate modal status badge for pkgdown site
 #' @noRd
 .model_status_badge <- function(status) {
   .validation_status_badge(status)
 }
 
-# Model subdirectory linking for pkgdown site
+#' Model subdirectory linking for pkgdown site
 #' @noRd
 .model_family_page_order <- function() {
   c("Overview", "Theory", "Implementation")
 }
 
-# Detect current page to hide from list to avoid a duplicated listing
+#' Detect current page to hide from list to avoid a duplicated listing
 #' @noRd
 .model_family_current_page <- function() {
   if (!requireNamespace("knitr", quietly = TRUE)) {
@@ -40,7 +40,7 @@
   NULL
 }
 
-# Order the landing pages
+#' Order the landing pages
 #' @noRd
 .model_family_pages_ordered <- function(pages) {
   pages <- pages[!is.na(pages) & nzchar(pages)]
@@ -65,7 +65,7 @@
   c(canonical_pages, other_pages)
 }
 
-# Format the badges
+#' Format the badges
 #' @noRd
 .model_family_nav_badge <- function(label, href) {
   paste0(
@@ -75,7 +75,7 @@
   )
 }
 
-# Format and organize model family header landing pages
+#' Format and organize model family header landing pages
 #' @noRd
 .model_family_header <- function(family = NULL,
                                  status = character(),
@@ -138,7 +138,7 @@
   }
 }
 
-# Model family overiew landing page
+#' Build a model-family overview landing page
 #' @noRd
 .model_family_overview <- function(summary,
                                    family = NULL,
@@ -206,7 +206,7 @@
   }
 }
 
-# Utility function for handling HTML formatting
+#' Escape text for safe HTML output
 #' @noRd
 .html_escape <- function(x) {
   x <- gsub("&", "&amp;", x, fixed = TRUE)
@@ -215,7 +215,7 @@
   gsub(">", "&gt;", x, fixed = TRUE)
 }
 
-# Static, non-interactive vignette figure
+#' Static, non-interactive vignette figure
 #' @noRd
 .vignette_static_figure <- function(src, alt) {
   out <- paste0(
@@ -230,7 +230,7 @@
   }
 }
 
-# Interactive vignette figure configurations that routes to specified API/page
+#' Interactive vignette figure configurations that routes to specified API/page
 #' @noRd
 .vignette_clickable_figure_specs <- function() {
   list(
@@ -256,7 +256,7 @@
       )
     ),
     building_scatterers_map = list(
-      image = "building-scatterers-map.png",
+      image = "building-scatterers-map.svg",
       alt = "Updated scatterer-generation and class-hierarchy map",
       areas = list(
         list(
@@ -307,7 +307,7 @@
       )
     ),
     package_concepts_architecture = list(
-      image = "package-concepts-architecture.png",
+      image = "package-concepts-architecture.svg",
       alt = "Conceptual layers",
       areas = list(
         list(
@@ -328,7 +328,7 @@
       )
     ),
     shape_manipulation_schematic = list(
-      image = "shape-manipulation-schematic.png",
+      image = "shape-manipulation-schematic.svg",
       alt = "Shape manipulation",
       areas = list(
         list(
@@ -344,7 +344,7 @@
       )
     ),
     model_selection_flowchart = list(
-      image = "model-selection-flowchart.png",
+      image = "model-selection-flowchart.svg",
       alt = "Revised general model-selection flowchart",
       areas = list(
         list(
@@ -447,7 +447,7 @@
   )
 }
 
-# Interactive vignette figure that routes to specified API/page
+#' Interactive vignette figure that routes to specified API/page
 #' @noRd
 .vignette_clickable_figure <- function(id) {
   specs <- .vignette_clickable_figure_specs()

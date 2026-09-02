@@ -31,7 +31,8 @@ acousticTS:::.model_family_header(
 acousticTS:::.model_family_overview(
   family = "tmm",
   summary = paste(
-    "The transition-matrix method (`TMM`) represents a target by the linear map",
+    "The transition-matrix method (`TMM`) represents a target by the linear",
+    "map",
     "from incident modal coefficients to scattered modal coefficients. Its",
     "retained state can support more than a monostatic target-strength curve."
   ),
@@ -42,26 +43,57 @@ acousticTS:::.model_family_overview(
     "[@Waterman_1969; @Waterman_2009]."
   ),
   best_for = c(
-    "Supported single-target canonical geometries requiring retained angular products",
-    "Bistatic slices, scattering grids, and orientation post-processing from one solved state",
-    "Cross-checking geometry-specific modal families within a transition-matrix representation"
+    paste(
+      "Supported single-target canonical geometries requiring retained",
+      "angular products"
+    ),
+    paste(
+      "Bistatic slices, scattering grids, and orientation post-processing",
+      "from one solved state"
+    ),
+    paste(
+      "Cross-checking geometry-specific modal families within a",
+      "transition-matrix representation"
+    )
   ),
   supports = c(
-    "Sphere, oblate-spheroid, prolate-spheroid, and guarded finite-cylinder branches",
-    "Supported fixed-rigid, pressure-release, penetrable, and spherical-shell boundaries",
+    paste(
+      "Sphere, oblate-spheroid, prolate-spheroid, and guarded",
+      "finite-cylinder branches"
+    ),
+    paste(
+      "Supported fixed-rigid, pressure-release, penetrable, and",
+      "spherical-shell boundaries"
+    ),
     "Optional retained T-matrix blocks for branch-specific post-processing"
   ),
   assumptions = c(
-    "A single target represented by one of the documented geometry-specific bases",
-    "Homogeneous-region or supported concentric spherical-shell material structure",
+    paste(
+      "A single target represented by one of the documented",
+      "geometry-specific bases"
+    ),
+    paste(
+      "Homogeneous-region or supported concentric spherical-shell material",
+      "structure"
+    ),
     "Post-processing uses the documented body-fixed angular convention",
-    "Validation and retained-state support differ by geometry and boundary branch"
+    paste(
+      "Validation and retained-state support differ by geometry and",
+      "boundary branch"
+    )
   ),
   reading = c(
-    "[Implementation](tmm-implementation.html): branch matrix, retained-state workflows, output, and validation",
-    "[Theory](tmm-theory.html): coefficient maps, boundary operators, and geometry-matched bases"
+    paste(
+      "[Implementation](tmm-implementation.html): branch matrix,",
+      "retained-state workflows, output, and validation"
+    ),
+    paste(
+      "[Theory](tmm-theory.html): coefficient maps, boundary operators, and",
+      "geometry-matched bases"
+    )
   )
 )
 ```
 
-![The supported single-target TMM branches use spherical, spheroidal, or cylindrical coordinates according to target geometry.](tmm-branch-schematic.png)
+<!-- ![The supported single-target TMM branches use spherical, spheroidal, or cylindrical coordinates 
+according to target geometry.](tmm-branch-schematic.png) -->

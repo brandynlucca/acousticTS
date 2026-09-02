@@ -32,3 +32,7 @@ The conversions are defined as:
 \deqn{\text{db}(x) = c \log_c(x)}
 where \eqn{c} is the coefficient (default 10).
 }
+\examples{
+sigma_bs <- linear(-40)
+db(sigma_bs)
+}

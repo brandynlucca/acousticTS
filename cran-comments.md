@@ -3,12 +3,17 @@
 0 errors | 0 warnings | 1 note
 
 * This is a new submission.
+* The local Windows check could not verify the current time. This is an
+  external clock/network availability note.
 
 ## Test environments
 
-* Local Windows 11 x64, R 4.5.2
+* Local Windows 11 x64 (R 4.5.2)
     * `R CMD build`
     * `R CMD check --as-cran`
+* Local WSL (Ubuntu 26.04 LTS, R 4.5.2)
+* Remote RStudio Server (Linux x86_64, R 4.5.2)
+* Google Cloud Workstation (Linux container environment, R 4.5.2)
 * GitHub Actions CI
     * ubuntu-latest (release)
     * ubuntu-clang (release)
@@ -18,8 +23,38 @@
     * macos-latest (release)
     * windows-latest (release)
 * R-hub v2:
-    * ubuntu-release
+    * atlas
+    * c23
+    * clang16
+    * clang17
+    * clang18
+    * clang19
+    * clang20
+    * clang21
+    * clang22    
+    * clang-asan
+    * clang-ubsan
+    * donttest
+    * gcc-asan
+    * gcc13
+    * gcc14
     * gcc15
+    * intel
+    * linux (R-devel)
+    * lto
+    * m1-san (R-devel)
+    * macos (R-devel)
+    * macos-arm64 (R-devel)
+    * mkl
+    * nold
+    * noremap
+    * ubuntu-clang
+    * ubuntu-gcc12
+    * ubuntu-next
+    * ubuntu-release
+    * valgrind   
+    * vnu
+    * windows (R-devel)    
 
 ## Note on R-devel
 * Some additional experimental R-devel environments encountered upstream dependency installation failures under the current R-devel toolchain, not failures in acousticTS itself.

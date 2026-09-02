@@ -59,11 +59,17 @@ test_that("hpa_initialize validates method inputs and supported shapes", {
     "must be scalar"
   )
   expect_error(
-    acousticTS:::hpa_initialize(cylinder_obj, frequency = 38000, method = "johnson"),
+    acousticTS:::hpa_initialize(cylinder_obj,
+      frequency = 38000, method =
+        "johnson"
+    ),
     "requires scatterer to one of shape-type 'Sphere'"
   )
   expect_error(
-    acousticTS:::hpa_initialize(oblate_obj, frequency = 38000, method = "stanton"),
+    acousticTS:::hpa_initialize(oblate_obj,
+      frequency = 38000, method =
+        "stanton"
+    ),
     "requires scatterer to one of the following shape-types"
   )
 })
@@ -211,77 +217,84 @@ test_that("hpa helper formulas match their analytical expressions", {
   )
 })
 
-test_that("hpa initialization and evaluation wire sphere, cylinder, and ESS objects", {
-  gas_obj <- gas_generate(
-    shape = sphere(radius_body = 0.01, n_segments = 40),
-    density_fluid = 1.24,
-    sound_speed_fluid = 345
-  )
-  johnson_initialized <- acousticTS:::hpa_initialize(
-    gas_obj,
-    frequency = c(38000, 120000),
-    method = "johnson"
-  )
-  johnson_out <- acousticTS:::HPA(johnson_initialized)
-  johnson_model <- johnson_out@model_parameters$HPA
-  johnson_alpha <- acousticTS:::.alpha_pi(johnson_model$body)
-  johnson_expected <- acousticTS:::.johnson_hp(
-    acoustics = johnson_model$parameters$acoustics,
-    body = johnson_model$body,
-    alpha = johnson_alpha
-  )
+test_that(
+  "hpa initialization and evaluation wire sphere, cylinder, and ESS objects",
+  {
+    gas_obj <- gas_generate(
+      shape = sphere(radius_body = 0.01, n_segments = 40),
+      density_fluid = 1.24,
+      sound_speed_fluid = 345
+    )
+    johnson_initialized <- acousticTS:::hpa_initialize(
+      gas_obj,
+      frequency = c(38000, 120000),
+      method = "johnson"
+    )
+    johnson_out <- acousticTS:::HPA(johnson_initialized)
+    johnson_model <- johnson_out@model_parameters$HPA
+    johnson_alpha <- acousticTS:::.alpha_pi(johnson_model$body)
+    johnson_expected <- acousticTS:::.johnson_hp(
+      acoustics = johnson_model$parameters$acoustics,
+      body = johnson_model$body,
+      alpha = johnson_alpha
+    )
 
-  expect_s4_class(johnson_out, "GAS")
-  expect_equal(johnson_out@model$HPA$sigma_bs, johnson_expected)
-  expect_equal(johnson_out@model$HPA$TS, 10 * log10(johnson_expected))
+    expect_s4_class(johnson_out, "GAS")
+    expect_equal(johnson_out@model$HPA$sigma_bs, johnson_expected)
+    expect_equal(johnson_out@model$HPA$TS, 10 * log10(johnson_expected))
 
-  fls_obj <- fls_generate(
-    shape = cylinder(length_body = 0.02, radius_body = 0.001, n_segments = 20),
-    g_body = 1.02,
-    h_body = 1.03,
-    theta_body = 1.1
-  )
-  stanton_initialized <- acousticTS:::hpa_initialize(
-    fls_obj,
-    frequency = 38000,
-    method = "stanton",
-    deviation_fun = function(ka) ka + 1,
-    null_fun = function(ka) ka^2 + 1
-  )
-  stanton_out <- acousticTS:::HPA(stanton_initialized)
-  stanton_model <- stanton_out@model_parameters$HPA
-  stanton_alpha <- acousticTS:::.alpha_pi(stanton_model$body)
-  stanton_expected <- acousticTS:::.stanton_hp(
-    acoustics = stanton_model$parameters$acoustics,
-    body = stanton_model$body,
-    parameters = stanton_model$parameters,
-    alpha = stanton_alpha
-  )
+    fls_obj <- fls_generate(
+      shape = cylinder(
+        length_body = 0.02,
+        radius_body = 0.001,
+        n_segments = 20
+      ),
+      g_body = 1.02,
+      h_body = 1.03,
+      theta_body = 1.1
+    )
+    stanton_initialized <- acousticTS:::hpa_initialize(
+      fls_obj,
+      frequency = 38000,
+      method = "stanton",
+      deviation_fun = function(ka) ka + 1,
+      null_fun = function(ka) ka^2 + 1
+    )
+    stanton_out <- acousticTS:::HPA(stanton_initialized)
+    stanton_model <- stanton_out@model_parameters$HPA
+    stanton_alpha <- acousticTS:::.alpha_pi(stanton_model$body)
+    stanton_expected <- acousticTS:::.stanton_hp(
+      acoustics = stanton_model$parameters$acoustics,
+      body = stanton_model$body,
+      parameters = stanton_model$parameters,
+      alpha = stanton_alpha
+    )
 
-  expect_s4_class(stanton_out, "FLS")
-  expect_equal(stanton_out@model$HPA$sigma_bs, stanton_expected)
-  expect_equal(stanton_out@model$HPA$TS, 10 * log10(stanton_expected))
+    expect_s4_class(stanton_out, "FLS")
+    expect_equal(stanton_out@model$HPA$sigma_bs, stanton_expected)
+    expect_equal(stanton_out@model$HPA$TS, 10 * log10(stanton_expected))
 
-  ess_obj <- ess_generate(
-    shape = sphere(radius_body = 0.01, n_segments = 40),
-    shell_thickness = 1e-3,
-    sound_speed_shell = 3750,
-    sound_speed_fluid = 1575,
-    density_shell = 2565,
-    density_fluid = 1077.3,
-    K = 70e9,
-    nu = 0.32
-  )
-  ess_initialized <- acousticTS:::hpa_initialize(
-    ess_obj,
-    frequency = 38000,
-    method = "stanton"
-  )
+    ess_obj <- ess_generate(
+      shape = sphere(radius_body = 0.01, n_segments = 40),
+      shell_thickness = 1e-3,
+      sound_speed_shell = 3750,
+      sound_speed_fluid = 1575,
+      density_shell = 2565,
+      density_fluid = 1077.3,
+      K = 70e9,
+      nu = 0.32
+    )
+    ess_initialized <- acousticTS:::hpa_initialize(
+      ess_obj,
+      frequency = 38000,
+      method = "stanton"
+    )
 
-  expect_s4_class(ess_initialized, "ESS")
-  expect_true("HPA" %in% names(ess_initialized@model_parameters))
-  expect_identical(
-    as.character(ess_initialized@model_parameters$HPA$body$shape),
-    "Sphere"
-  )
-})
+    expect_s4_class(ess_initialized, "ESS")
+    expect_true("HPA" %in% names(ess_initialized@model_parameters))
+    expect_identical(
+      as.character(ess_initialized@model_parameters$HPA$body$shape),
+      "Sphere"
+    )
+  }
+)

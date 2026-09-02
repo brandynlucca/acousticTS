@@ -81,7 +81,7 @@
 #'  }
 #'
 #' In practice, \eqn{c_2} and \eqn{\rho_2} within 5% of \eqn{c_1} and
-#' \eqn{\rho_1}, respectively, can be considered to be sufficent for the
+#' \eqn{\rho_1}, respectively, can be considered to be sufficient for the
 #' weak scattering assumption whereby:
 #'
 #'  \deqn{
@@ -130,9 +130,12 @@
 #' zooplankton groups. II. Scattering models. The Journal of the Acoustical
 #' Society of America, 103, 236-253.
 #'
+#' @return No value; this help topic documents the DWBA model.
+#' @examples
+#' subset(available_models(), model == "dwba")
+#'
 #' @name DWBA
 #' @aliases dwba DWBA dwba_curved DWBA_CURVED
-#' @docType data
 #' @keywords models acoustics internal
 NULL
 

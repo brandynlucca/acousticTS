@@ -48,7 +48,7 @@ compatibility and is now deprecated.}
 \item{g_body}{Density contrast. This can either be a single value (i.e.
 homogenous) or a vector of values (i.e. inhomogenous).}
 
-\item{h_body}{Soundspeed contrast. This can either be a single value (i.e.
+\item{h_body}{Sound-speed contrast. This can either be a single value (i.e.
 homogenous) or a vector of values (i.e. inhomogenous).}
 
 \item{density_body}{Absolute density (kg/m^3) if contrasts are not supplied.}

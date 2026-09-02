@@ -382,7 +382,10 @@ test_that("simulate_ts works with batch_by parameter", {
   )
 
   result_df <- result_df[order(result_df$length, result_df$frequency), ]
-  reference_df <- reference_df[order(reference_df$length, reference_df$frequency), ]
+  reference_df <- reference_df[order(
+    reference_df$length,
+    reference_df$frequency
+  ), ]
   rownames(result_df) <- NULL
   rownames(reference_df) <- NULL
 
@@ -502,8 +505,14 @@ test_that("simulate_ts supports batched convenience FLS reforge aliases", {
     })
   )
 
-  result_df <- result$DWBA[order(result$DWBA$length_body, result$DWBA$frequency), ]
-  reference_df <- reference_df[order(reference_df$length_body, reference_df$frequency), ]
+  result_df <- result$DWBA[order(
+    result$DWBA$length_body,
+    result$DWBA$frequency
+  ), ]
+  reference_df <- reference_df[order(
+    reference_df$length_body,
+    reference_df$frequency
+  ), ]
   rownames(result_df) <- NULL
   rownames(reference_df) <- NULL
 
@@ -612,69 +621,72 @@ test_that("simulate_ts supports convenience reforge aliases from generators", {
   expect_true(length(unique(result$DWBA$TS)) > 1)
 })
 
-test_that("simulate_ts preserves legacy curved krill workflows via length_body", {
-  data(krill)
+test_that(
+  "simulate_ts preserves legacy curved krill workflows via length_body",
+  {
+    data(krill)
 
-  frequency <- 120e3
-  lengths <- c(0.015, 0.02)
-  params_legacy <- list(
-    length = lengths,
-    sound_speed_sw = 1500,
-    density_sw = 1026,
-    g = 1.02,
-    h = 1.03,
-    theta = function() pi / 2,
-    radius_curvature_ratio = function() 5,
-    n_iterations = 5,
-    n_segments_init = 15,
-    length_init = 17.9e-3,
-    frequency_init = 120e3,
-    phase_sd_init = 0.31
-  )
-  params_alias <- params_legacy
-  params_alias$length <- NULL
-  params_alias$length_body <- lengths
-
-  set.seed(20260331)
-  legacy <- suppressWarnings(
-    simulate_ts(
-      object = krill,
-      batch_by = "length",
-      n_realizations = 2,
-      frequency = frequency,
-      model = "SDWBA_curved",
-      parameters = params_legacy,
-      parallel = FALSE,
-      verbose = FALSE
+    frequency <- 120e3
+    lengths <- c(0.015, 0.02)
+    params_legacy <- list(
+      length = lengths,
+      sound_speed_sw = 1500,
+      density_sw = 1026,
+      g = 1.02,
+      h = 1.03,
+      theta = function() pi / 2,
+      radius_curvature_ratio = function() 5,
+      n_iterations = 5,
+      n_segments_init = 15,
+      length_init = 17.9e-3,
+      frequency_init = 120e3,
+      phase_sd_init = 0.31
     )
-  )
+    params_alias <- params_legacy
+    params_alias$length <- NULL
+    params_alias$length_body <- lengths
 
-  set.seed(20260331)
-  alias <- suppressWarnings(
-    simulate_ts(
-      object = krill,
-      batch_by = "length_body",
-      n_realizations = 2,
-      frequency = frequency,
-      model = "SDWBA_curved",
-      parameters = params_alias,
-      parallel = FALSE,
-      verbose = FALSE
+    set.seed(20260331)
+    legacy <- suppressWarnings(
+      simulate_ts(
+        object = krill,
+        batch_by = "length",
+        n_realizations = 2,
+        frequency = frequency,
+        model = "SDWBA_curved",
+        parameters = params_legacy,
+        parallel = FALSE,
+        verbose = FALSE
+      )
     )
-  )
 
-  legacy_df <- legacy$SDWBA_curved[
-    order(legacy$SDWBA_curved$length, legacy$SDWBA_curved$realization),
-    c("length", "TS")
-  ]
-  alias_df <- alias$SDWBA_curved[
-    order(alias$SDWBA_curved$length_body, alias$SDWBA_curved$realization),
-    c("length_body", "TS")
-  ]
+    set.seed(20260331)
+    alias <- suppressWarnings(
+      simulate_ts(
+        object = krill,
+        batch_by = "length_body",
+        n_realizations = 2,
+        frequency = frequency,
+        model = "SDWBA_curved",
+        parameters = params_alias,
+        parallel = FALSE,
+        verbose = FALSE
+      )
+    )
 
-  expect_equal(legacy_df$length, alias_df$length_body)
-  expect_equal(legacy_df$TS, alias_df$TS)
-})
+    legacy_df <- legacy$SDWBA_curved[
+      order(legacy$SDWBA_curved$length, legacy$SDWBA_curved$realization),
+      c("length", "TS")
+    ]
+    alias_df <- alias$SDWBA_curved[
+      order(alias$SDWBA_curved$length_body, alias$SDWBA_curved$realization),
+      c("length_body", "TS")
+    ]
+
+    expect_equal(legacy_df$length, alias_df$length_body)
+    expect_equal(legacy_df$TS, alias_df$TS)
+  }
+)
 
 test_that("simulate_ts works with multiple generating functions", {
   # Test with distribution parameters
@@ -893,7 +905,10 @@ test_that("simulate_ts works with PSOCK clusters when n_cores > 1", {
   expect_equal(result_parallel$DWBA$theta, result_sequential$DWBA$theta)
   expect_equal(result_parallel$DWBA$length, result_sequential$DWBA$length)
   expect_equal(result_parallel$DWBA$frequency, result_sequential$DWBA$frequency)
-  if (dir.exists(file.path(getNamespaceInfo(asNamespace("acousticTS"), "path"), "Meta"))) {
+  if (dir.exists(file.path(getNamespaceInfo(
+    asNamespace("acousticTS"),
+    "path"
+  ), "Meta"))) {
     expect_equal(result_parallel$DWBA$TS, result_sequential$DWBA$TS)
   } else {
     expect_true(all(is.finite(result_parallel$DWBA$TS)))
@@ -945,9 +960,15 @@ test_that("simulate_ts supports theta_body for FLS objects in PSOCK mode", {
 
   expect_true("DWBA" %in% names(result_parallel))
   expect_true("DWBA" %in% names(result_sequential))
-  expect_equal(result_parallel$DWBA$theta_body, result_sequential$DWBA$theta_body)
+  expect_equal(
+    result_parallel$DWBA$theta_body,
+    result_sequential$DWBA$theta_body
+  )
   expect_equal(result_parallel$DWBA$frequency, result_sequential$DWBA$frequency)
-  if (dir.exists(file.path(getNamespaceInfo(asNamespace("acousticTS"), "path"), "Meta"))) {
+  if (dir.exists(file.path(getNamespaceInfo(
+    asNamespace("acousticTS"),
+    "path"
+  ), "Meta"))) {
     expect_equal(result_parallel$DWBA$TS, result_sequential$DWBA$TS)
   } else {
     expect_true(all(is.finite(result_parallel$DWBA$TS)))
@@ -981,55 +1002,65 @@ test_that("Simulation errors are raised as expected", {
   )
 })
 
-test_that("simulation helper utilities print headers and prepare optional clusters", {
-  skip_on_cran()
+test_that(
+  "simulation helper utilities print headers and prepare optional clusters",
+  {
+    skip_on_cran()
 
-  cal_obj <- cal_generate()
-  simulation_grid <- data.frame(realization = 1:2)
+    cal_obj <- cal_generate()
+    simulation_grid <- data.frame(realization = 1:2)
 
-  header <- capture.output(
-    acousticTS:::.print_simulation_header(
-      object = cal_obj,
-      model = "calibration",
-      batch_by = NULL,
-      parameters = list(length = 0.02),
-      parallel = FALSE,
-      simulation_grid = simulation_grid
+    header <- capture.output(
+      acousticTS:::.print_simulation_header(
+        object = cal_obj,
+        model = "calibration",
+        batch_by = NULL,
+        parameters = list(length = 0.02),
+        parallel = FALSE,
+        simulation_grid = simulation_grid
+      )
     )
-  )
-  expect_true(any(grepl("Scatterer-class: CAL", header, fixed = TRUE)))
-  expect_true(any(grepl("Total simulation realizations: 2", header, fixed = TRUE)))
+    expect_true(any(grepl("Scatterer-class: CAL", header, fixed = TRUE)))
+    expect_true(any(grepl("Total simulation realizations: 2", header,
+      fixed =
+        TRUE
+    )))
 
-  sequential <- capture.output(
-    cluster <- acousticTS:::.prepare_simulation_cluster(
-      parallel = FALSE,
-      n_cores = 2,
-      object = cal_obj,
-      frequency = 38000,
-      normalized_model = "calibration",
-      simulation_grid = simulation_grid,
-      verbose = TRUE
+    sequential <- capture.output(
+      cluster <- acousticTS:::.prepare_simulation_cluster(
+        parallel = FALSE,
+        n_cores = 2,
+        object = cal_obj,
+        frequency = 38000,
+        normalized_model = "calibration",
+        simulation_grid = simulation_grid,
+        verbose = TRUE
+      )
     )
-  )
-  expect_null(cluster)
-  expect_true(any(grepl("Preparing sequential simulations", sequential, fixed = TRUE)))
+    expect_null(cluster)
+    expect_true(any(grepl("Preparing sequential simulations", sequential,
+      fixed = TRUE
+    )))
 
-  parallel_out <- capture.output(
-    cluster <- acousticTS:::.prepare_simulation_cluster(
-      parallel = TRUE,
-      n_cores = 2,
-      object = cal_obj,
-      frequency = 38000,
-      normalized_model = "calibration",
-      simulation_grid = simulation_grid,
-      verbose = TRUE
+    parallel_out <- capture.output(
+      cluster <- acousticTS:::.prepare_simulation_cluster(
+        parallel = TRUE,
+        n_cores = 2,
+        object = cal_obj,
+        frequency = 38000,
+        normalized_model = "calibration",
+        simulation_grid = simulation_grid,
+        verbose = TRUE
+      )
     )
-  )
-  on.exit(parallel::stopCluster(cluster), add = TRUE)
+    on.exit(parallel::stopCluster(cluster), add = TRUE)
 
-  expect_s3_class(cluster, "cluster")
-  expect_true(any(grepl("Preparing parallelized simulations", parallel_out, fixed = TRUE)))
-})
+    expect_s3_class(cluster, "cluster")
+    expect_true(any(grepl("Preparing parallelized simulations", parallel_out,
+      fixed = TRUE
+    )))
+  }
+)
 
 test_that("simulation helper utilities are exercised under coverage runs", {
   cal_obj <- cal_generate()
@@ -1059,7 +1090,9 @@ test_that("simulation helper utilities are exercised under coverage runs", {
     )
   )
   expect_null(cluster)
-  expect_true(any(grepl("Preparing sequential simulations", sequential, fixed = TRUE)))
+  expect_true(any(grepl("Preparing sequential simulations", sequential,
+    fixed = TRUE
+  )))
 
   parallel_out <- capture.output(
     cluster <- acousticTS:::.prepare_simulation_cluster(
@@ -1075,33 +1108,41 @@ test_that("simulation helper utilities are exercised under coverage runs", {
   on.exit(parallel::stopCluster(cluster), add = TRUE)
 
   expect_s3_class(cluster, "cluster")
-  expect_true(any(grepl("Preparing parallelized simulations", parallel_out, fixed = TRUE)))
+  expect_true(any(grepl("Preparing parallelized simulations", parallel_out,
+    fixed = TRUE
+  )))
 })
 
-test_that("simulation helpers cover scalar batch values, empty combines, and verbose sequential execution", {
-  expect_equal(
-    acousticTS:::.prepare_simulation_batch_values(
-      batch_by = c("length", "density_body"),
-      parameters = list(length = c(0.02, 0.03), density_body = 1028.9)
-    ),
-    list(length = c(0.02, 0.03), density_body = 1028.9)
-  )
-  expect_null(acousticTS:::.combine_simulation_results(list()))
-
-  cal_obj <- cal_generate()
-  verbose_run <- capture.output(
-    result <- simulate_ts(
-      object = cal_obj,
-      frequency = 38e3,
-      model = "calibration",
-      n_realizations = 1,
-      parameters = list(),
-      parallel = FALSE,
-      verbose = TRUE
+test_that(
+  paste0(
+    "simulation helpers cover scalar batch values, empty combines, and ",
+    "verbose sequential execution"
+  ),
+  {
+    expect_equal(
+      acousticTS:::.prepare_simulation_batch_values(
+        batch_by = c("length", "density_body"),
+        parameters = list(length = c(0.02, 0.03), density_body = 1028.9)
+      ),
+      list(length = c(0.02, 0.03), density_body = 1028.9)
     )
-  )
-  expect_true(is.list(result))
-  expect_s3_class(result$calibration, "data.frame")
-  expect_true(any(grepl("Scatterer-class: CAL", verbose_run, fixed = TRUE)))
-  expect_true(any(grepl("Simulations complete!", verbose_run, fixed = TRUE)))
-})
+    expect_null(acousticTS:::.combine_simulation_results(list()))
+
+    cal_obj <- cal_generate()
+    verbose_run <- capture.output(
+      result <- simulate_ts(
+        object = cal_obj,
+        frequency = 38e3,
+        model = "calibration",
+        n_realizations = 1,
+        parameters = list(),
+        parallel = FALSE,
+        verbose = TRUE
+      )
+    )
+    expect_true(is.list(result))
+    expect_s3_class(result$calibration, "data.frame")
+    expect_true(any(grepl("Scatterer-class: CAL", verbose_run, fixed = TRUE)))
+    expect_true(any(grepl("Simulations complete!", verbose_run, fixed = TRUE)))
+  }
+)

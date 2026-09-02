@@ -25,7 +25,10 @@ models, and checking calculations before working with custom targets.
 ```{r echo=FALSE, results='asis'}
 acousticTS:::.vignette_static_figure(
   src = "example-data-map.png",
-  alt = "Bundled data support learning workflows, model comparison, and validation"
+  alt = paste(
+    "Bundled data support learning workflows, model comparison, and",
+    "validation"
+  )
 )
 ```
 

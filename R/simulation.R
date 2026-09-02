@@ -1,7 +1,9 @@
 ################################################################################
 # SIMULATION HELPERS
 ################################################################################
-# Resolve the default core count used by `simulate_ts()`.
+.simulation_worker_cache <- new.env(parent = emptyenv())
+
+#' Resolve the default core count used by `simulate_ts()`.
 #' @noRd
 .default_simulation_cores <- function() {
   # Cap the default at two cores to stay within CRAN's shared-check guidance ===
@@ -11,7 +13,7 @@
   min(2L, max(1L, as.integer(detected) - 1L))
 }
 
-# Resolve whether `simulate_ts()` should actually use a PSOCK cluster.
+#' Resolve whether `simulate_ts()` should actually use a PSOCK cluster.
 #' @noRd
 .resolve_simulation_parallel <- function(parallel, n_cores) {
   # Require a valid multi-core request before enabling PSOCK execution =========
@@ -22,7 +24,7 @@
     n_cores > 1
 }
 
-# Validate the requested target-strength models for one simulation run.
+#' Validate the requested target-strength models for one simulation run.
 #' @noRd
 .validate_simulation_models <- function(model) {
   # Normalize model aliases and confirm each one is supported ==================
@@ -31,7 +33,7 @@
   normalized_model
 }
 
-# Identify a deterministic multi-level parameter that defines a grid axis.
+#' Identify a deterministic multi-level parameter that defines a grid axis.
 #' @noRd
 .is_auto_batch_parameter <- function(value) {
   # Generating functions are stochastic draws, not deterministic grid axes =====
@@ -46,10 +48,13 @@
   length(value) > 1
 }
 
-# Resolve the deterministic grid axes and the per-cell repeat count.
+#' Resolve the deterministic grid axes and the per-cell repeat count.
 #' @noRd
-.resolve_simulation_realizations <- function(parameters, batch_by, n_realizations) {
-  # Resolve the per-cell repeat count (defaults to a single evaluation) =========
+.resolve_simulation_realizations <- function(
+  parameters, batch_by,
+  n_realizations
+) {
+  # Resolve the per-cell repeat count (defaults to a single evaluation) ========
   # `n_realizations` is purely a repeat/redraw multiplier: each deterministic
   # grid cell is evaluated this many times, redrawing any generating functions.
   if (is.null(n_realizations)) {
@@ -74,7 +79,7 @@
   list(n_realizations = n_realizations, batch_by = batch_by)
 }
 
-# Build the simulation grid, including any batched parameter expansion.
+#' Build the simulation grid, including any batched parameter expansion.
 #' @noRd
 .prepare_simulation_grid <- function(n_realizations, parameters, batch_by,
                                      permute = TRUE) {
@@ -106,7 +111,11 @@
   list(
     simulation_grid = data.frame(
       realization = rep(seq_len(n_realizations), times = nrow(parameter_grid)),
-      parameter_grid[rep(seq_len(nrow(parameter_grid)), each = n_realizations), ,
+      parameter_grid[
+        rep(seq_len(nrow(parameter_grid)),
+          each =
+            n_realizations
+        ), ,
         drop = FALSE
       ],
       row.names = NULL
@@ -115,7 +124,7 @@
   )
 }
 
-# Build the per-axis index grid, crossing or pairing the varied parameters.
+#' Build the per-axis index grid, crossing or pairing the varied parameters.
 #' @noRd
 .simulation_index_grid <- function(batch_values, permute) {
   # Cross every axis into the full Cartesian grid ==============================
@@ -156,7 +165,7 @@
   )
 }
 
-# Resolve the concrete vectors used for each batched simulation parameter.
+#' Resolve the concrete vectors used for each batched simulation parameter.
 #' @noRd
 .prepare_simulation_batch_values <- function(batch_by, parameters) {
   # Resolve one normalized candidate set per batched parameter ================
@@ -172,7 +181,7 @@
   batch_values
 }
 
-# Expand the user-supplied parameter definitions across the simulation grid.
+#' Expand the user-supplied parameter definitions across the simulation grid.
 #' @noRd
 .simulation_parameter_matrix <- function(parameters,
                                          batch_by,
@@ -204,7 +213,7 @@
   out
 }
 
-# Print the high-level simulation summary shown before the TS runs begin.
+#' Print the high-level simulation summary shown before the TS runs begin.
 #' @noRd
 .print_simulation_header <- function(object,
                                      model,
@@ -227,7 +236,7 @@
   cat("====================================\n")
 }
 
-# Resolve the package-library path used by PSOCK workers.
+#' Resolve the package-library path used by PSOCK workers.
 #' @noRd
 .resolve_simulation_worker_library <- function(package = "acousticTS") {
   # Resolve the active namespace path used by the current R session ============
@@ -260,7 +269,7 @@
 
   # Reuse a session-cached worker library when it matches this source tree ====
   cache_key <- paste0(package, ".simulation_worker_library")
-  cache <- getOption(cache_key, NULL)
+  cache <- .simulation_worker_cache[[cache_key]]
   cache_lib <- if (is.list(cache)) cache$library else NULL
   cache_src <- if (is.list(cache)) cache$source else NULL
   cache_pkg <- if (!is.null(cache_lib)) file.path(cache_lib, package) else NULL
@@ -317,16 +326,14 @@
   }
 
   # Cache and return the worker library used for PSOCK execution ==============
-  options(
-    stats::setNames(
-      list(list(library = worker_lib, source = package_dir)),
-      cache_key
-    )
+  .simulation_worker_cache[[cache_key]] <- list(
+    library = worker_lib,
+    source = package_dir
   )
   worker_lib
 }
 
-# Prepare the optional PSOCK cluster used by `simulate_ts()`.
+#' Prepare the optional PSOCK cluster used by `simulate_ts()`.
 #' @noRd
 .prepare_simulation_cluster <- function(parallel,
                                         n_cores,
@@ -358,6 +365,9 @@
   parallel::clusterCall(
     cluster,
     function(worker_lib) {
+      if ("acousticTS" %in% loadedNamespaces()) {
+        unloadNamespace("acousticTS")
+      }
       if (!is.null(worker_lib)) {
         .libPaths(c(worker_lib, .libPaths()))
       }
@@ -372,19 +382,11 @@
     c("object", "frequency", "normalized_model", "simulation_grid"),
     envir = environment()
   )
-  parallel::clusterExport(
-    cluster,
-    c(
-      ".discover_reforge_params", ".get_TS", "reforge", "target_strength",
-      "extract"
-    ),
-    envir = asNamespace("acousticTS")
-  )
 
   cluster
 }
 
-# Bind one list of per-model simulation results into the final return object.
+#' Bind one list of per-model simulation results into the final return object.
 #' @noRd
 .combine_simulation_results <- function(results_list) {
   # Return NULL for the degenerate empty-simulation case =======================
@@ -486,7 +488,8 @@
 #'
 #' Structured batch values should be wrapped in a list so that each candidate is
 #' preserved as one unit. For example, use
-#' \code{parameters = list(body_target = list(c(length = 0.02), c(length = 0.03))))}
+#' \code{parameters = list(body_target =
+#' list(c(length = 0.02), c(length = 0.03))))}
 #' when batching across multiple explicit `reforge()` targets.
 #'
 #' Convenience dimension aliases are also supported for compatible
@@ -618,17 +621,33 @@ simulate_ts <- function(object,
     on.exit(parallel::stopCluster(cluster))
   }
   # Run TS simulations =========================================================
-  pbapply::pboptions(type = if (verbose) "txt" else "none")
-  results_list <- pbapply::pblapply(
-    seq_len(nrow(simulation_grid)),
-    function(grid_index) {
-      .get_TS(
-        grid_index, object, parameters, simulation_grid, frequency,
-        normalized_model
-      )
-    },
-    cl = cluster
+  old_pboptions <- pbapply::pboptions(
+    type = if (verbose) "txt" else "none"
   )
+  on.exit(pbapply::pboptions(old_pboptions), add = TRUE)
+  if (is.null(cluster)) {
+    results_list <- pbapply::pblapply(
+      seq_len(nrow(simulation_grid)),
+      function(grid_index) {
+        .get_TS(
+          grid_index, object, parameters, simulation_grid, frequency,
+          normalized_model
+        )
+      }
+    )
+  } else {
+    results_list <- pbapply::pblapply(
+      seq_len(nrow(simulation_grid)),
+      function(grid_index) {
+        worker_get_ts <- utils::getFromNamespace(".get_TS", "acousticTS")
+        worker_get_ts(
+          grid_index, object, parameters, simulation_grid, frequency,
+          normalized_model
+        )
+      },
+      cl = cluster
+    )
+  }
   # Prepare output =============================================================
   final_result <- .combine_simulation_results(results_list)
   # Return output dataframe ====================================================
@@ -652,7 +671,7 @@ simulate_ts <- function(object,
   )
 }
 
-# Extract one simulation-grid row while preserving structured list-columns.
+#' Extract one simulation-grid row while preserving structured list-columns.
 #' @noRd
 .simulation_grid_row_values <- function(simulation_grid, grid_index) {
   # Resolve one value per simulation-grid column ==============================
@@ -670,7 +689,7 @@ simulate_ts <- function(object,
   values
 }
 
-# Build a one-row data frame from one simulation parameter bundle.
+#' Build a one-row data frame from one simulation parameter bundle.
 #' @noRd
 .simulation_parameter_row_df <- function(parameter_values) {
   # Preserve structured values as list-columns in the returned results ========
@@ -690,7 +709,7 @@ simulate_ts <- function(object,
   out
 }
 
-# Resolve geometry-bearing component slots available for simulation overrides.
+#' Resolve geometry-bearing component slots available for simulation overrides.
 #' @noRd
 .simulation_component_slots <- function(object) {
   # Return the supported component slots present on this scatterer ============
@@ -700,7 +719,7 @@ simulate_ts <- function(object,
   )
 }
 
-# Resolve convenience aliases that map onto structured reforge targets.
+#' Resolve convenience aliases that map onto structured reforge targets.
 #' @noRd
 .simulation_reforge_alias_groups <- function(object) {
   # Resolve the current reforge method signature for this scatterer ===========
@@ -767,7 +786,7 @@ simulate_ts <- function(object,
   out
 }
 
-# Resolve one scalar numeric value used by a simulation convenience alias.
+#' Resolve one scalar numeric value used by a simulation convenience alias.
 #' @noRd
 .simulation_alias_scalar <- function(value, alias_name) {
   # Validate that the alias resolved to one numeric draw ======================
@@ -783,7 +802,7 @@ simulate_ts <- function(object,
   as.numeric(value)
 }
 
-# Normalize convenience aliases onto the active reforge() argument set.
+#' Normalize convenience aliases onto the active reforge() argument set.
 #' @noRd
 .normalize_simulation_reforge_parameters <- function(object, parameter_values) {
   # Start from the explicitly supported reforge parameters ====================
@@ -854,7 +873,10 @@ simulate_ts <- function(object,
         vapply(
           legacy_names,
           function(legacy_name) {
-            .simulation_alias_scalar(reforge_parameters[[legacy_name]], legacy_name)
+            .simulation_alias_scalar(
+              reforge_parameters[[legacy_name]],
+              legacy_name
+            )
           },
           numeric(1)
         ),
@@ -885,7 +907,7 @@ simulate_ts <- function(object,
   reforge_parameters
 }
 
-# Apply direct simulation-parameter overrides to matching scatterer components.
+#' Apply direct simulation-parameter overrides to matching scatterer components.
 #' @noRd
 .apply_simulation_parameter_overrides <- function(object, parameter_values) {
   # Resolve the component slots that can accept direct parameter overrides =====
@@ -918,10 +940,10 @@ simulate_ts <- function(object,
 
 #' Run a single simulation for a given parameter grid index
 #'
-#' This helper function extracts parameter values for a given simulation grid
-#' index, updates the working scatterer object accordingly (including reforge
-#' if needed), runs the target strength calculation, and formats the results
-#' for output.
+#' Calculate target strength for one simulation-grid row
+#'
+#' Extract parameter values for a simulation-grid index, update the working
+#' scatterer object, run the target-strength calculation, and format the result.
 #'
 #' @inheritParams simulate_ts
 #' @param grid_index Integer index of the row in \code{simulation_grid} to

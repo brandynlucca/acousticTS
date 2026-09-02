@@ -44,7 +44,10 @@ acousticTS:::.model_family_overview(
   best_for = c(
     "Spherical elastic shells with fluid or gas-like interiors",
     "Shell-resonance and thickness-sensitivity studies",
-    "Canonical layered-sphere calculations where shell elasticity must be retained"
+    paste(
+      "Canonical layered-sphere calculations where shell elasticity must",
+      "be retained"
+    )
   ),
   supports = c(
     "Spherical `ESS` objects with an explicit shell and inner fluid",
@@ -58,8 +61,14 @@ acousticTS:::.model_family_overview(
     "No viscosity, nonspherical deformation, or eccentric core"
   ),
   reading = c(
-    "[Implementation](essms-implementation.html): object construction, output, and current validation scope",
-    "[Theory](essms-theory.html): layered fields, interface tractions, and modal systems"
+    paste(
+      "[Implementation](essms-implementation.html): object construction,",
+      "output, and current validation scope"
+    ),
+    paste(
+      "[Theory](essms-theory.html): layered fields, interface tractions,",
+      "and modal systems"
+    )
   )
 )
 ```

@@ -41,9 +41,15 @@ acousticTS:::.model_family_overview(
     "linear backscatter response [@Demer_2003_1; @Demer_2005]."
   ),
   best_for = c(
-    "Krill-like and zooplankton-like targets with unresolved shape or posture variability",
+    paste(
+      "Krill-like and zooplankton-like targets with unresolved shape or",
+      "posture variability"
+    ),
     "Ensemble predictions in which phase variability is part of the model",
-    "Assessing how deterministic interference structure changes under randomization"
+    paste(
+      "Assessing how deterministic interference structure changes under",
+      "randomization"
+    )
   ),
   supports = c(
     "`FLS` geometry and material inputs accepted by `DWBA`",
@@ -52,12 +58,18 @@ acousticTS:::.model_family_overview(
   ),
   assumptions = c(
     "The same weak-fluid and single-scattering regime as `DWBA`",
-    "Unresolved variability can be represented by the specified phase distribution",
+    paste(
+      "Unresolved variability can be represented by the specified phase",
+      "distribution"
+    ),
     "Randomization modifies coherence rather than the local scattering kernel",
     "Monte Carlo settings are adequate for the requested summary"
   ),
   reading = c(
-    "[Implementation](sdwba-implementation.html): stochastic controls, reproducibility, output, and comparisons",
+    paste(
+      "[Implementation](sdwba-implementation.html): stochastic controls,",
+      "reproducibility, output, and comparisons"
+    ),
     "[Theory](sdwba-theory.html): random phase model and ensemble averaging"
   )
 )

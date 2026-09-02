@@ -2,6 +2,7 @@
 # INTERNAL VALIDATION / BENCHMARK REGISTRY
 ################################################################################
 
+#' Render a validation-status badge
 #' @noRd
 .validation_status_badge <- function(status,
                                      family = NULL,
@@ -25,7 +26,8 @@
   tooltip_attr <- ""
   if (isTRUE(tooltip) && !is.null(family)) {
     tooltip_text <- .validation_status_tooltip(family, status)
-    if (length(tooltip_text) == 1L && !is.na(tooltip_text) && nzchar(tooltip_text)) {
+    if (length(tooltip_text) == 1L && !is.na(tooltip_text) &&
+      nzchar(tooltip_text)) {
       escaped_tooltip <- .validation_html_escape(tooltip_text)
       tooltip_attr <- paste0(
         ' title="', escaped_tooltip,
@@ -42,6 +44,7 @@
   )
 }
 
+#' Escape text for validation HTML output
 #' @noRd
 .validation_html_escape <- function(x) {
   x <- gsub("&", "&amp;", x, fixed = TRUE)
@@ -50,6 +53,7 @@
   gsub(">", "&gt;", x, fixed = TRUE)
 }
 
+#' Normalize a model-family identifier
 #' @noRd
 .validation_normalize_family <- function(family) {
   if (length(family) != 1L || is.na(family) || !nzchar(family)) {
@@ -74,16 +78,19 @@
   family
 }
 
+#' List supported validation-evidence types
 #' @noRd
 .validation_evidence_types <- function() {
   c("benchmark", "validated", "partially_validated", "experimental")
 }
 
+#' List supported model-validation statuses
 #' @noRd
 .validation_validation_status_types <- function() {
   c("validated", "partially_validated", "unvalidated")
 }
 
+#' Build the model-family validation registry
 #' @noRd
 .validation_family_registry <- function() {
   data.frame(
@@ -193,6 +200,7 @@
   )
 }
 
+#' Build the validation-evidence registry
 #' @noRd
 .validation_evidence_registry <- function() {
   # Registry maintenance rules:
@@ -478,6 +486,7 @@
   )
 }
 
+#' Combine the family and evidence validation registries
 #' @noRd
 .validation_registry <- function() {
   list(
@@ -486,6 +495,7 @@
   )
 }
 
+#' Retrieve validation metadata for one model family
 #' @noRd
 .validation_family_meta <- function(family) {
   family <- .validation_normalize_family(family)
@@ -493,6 +503,7 @@
   meta[meta$family == family, , drop = FALSE]
 }
 
+#' Retrieve validation evidence for one model family
 #' @noRd
 .validation_family_evidence <- function(family, type = NULL) {
   family <- .validation_normalize_family(family)
@@ -506,6 +517,7 @@
   rows
 }
 
+#' Resolve the evidence status for one model family
 #' @noRd
 .validation_family_status <- function(family) {
   family <- .validation_normalize_family(family)
@@ -536,6 +548,7 @@
   unique(status)
 }
 
+#' Resolve the validation level for one model family
 #' @noRd
 .validation_family_validation <- function(family) {
   meta <- .validation_family_meta(family)
@@ -547,7 +560,10 @@
   if (nrow(evidence) == 0) {
     if (identical(meta$validation_status[[1]], "unvalidated")) {
       return(
-        "The package does not yet claim external validation across the current public scope."
+        paste0(
+          "The package does not yet claim external validation across the ",
+          "current public scope."
+        )
       )
     }
 
@@ -557,6 +573,7 @@
   }
 }
 
+#' Build validation-status tooltip text
 #' @noRd
 .validation_status_tooltip <- function(family, status) {
   family <- .validation_normalize_family(family)
@@ -575,7 +592,10 @@
 
   if (identical(status_type, "unvalidated")) {
     return(
-      "The package does not yet claim external validation across the current public scope."
+      paste0(
+        "The package does not yet claim external validation across the ",
+        "current public scope."
+      )
     )
   }
 
@@ -587,6 +607,7 @@
   paste(unique(evidence$summary), collapse = " ")
 }
 
+#' Render the model-validation status policy
 #' @noRd
 .validation_status_policy <- function() {
   badge <- function(x) .validation_status_badge(x)
@@ -650,6 +671,7 @@
   }
 }
 
+#' Build the model-family status table
 #' @noRd
 .validation_family_status_table <- function() {
   registry <- .validation_registry()
@@ -676,6 +698,7 @@
   )
 }
 
+#' Build a filtered validation-evidence table
 #' @noRd
 .validation_evidence_table <- function(
   type = c("benchmark", "validated", "partially_validated", "experimental")
@@ -718,6 +741,7 @@
   )
 }
 
+#' Render the validation model library
 #' @noRd
 .validation_model_library <- function(heading_level = 1L) {
   registry <- .validation_registry()
@@ -785,6 +809,7 @@
   }
 }
 
+#' Format a model-family display label
 #' @noRd
 .validation_family_label <- function(x) {
   labels <- c(

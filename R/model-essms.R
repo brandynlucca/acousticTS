@@ -144,7 +144,7 @@
 #'
 #' @section Implementation:
 #'
-#' <u>**\code{C++}**</u>
+#' **\code{C++}**
 #'
 #' The computation for \eqn{b_m} was done in \code{C++} due to relatively large
 #' computational costs with increasing \eqn{ka} (and subsequently larger limits
@@ -162,7 +162,7 @@
 #' Partial pivoting and row-scaling are also incorporated to improve numerical
 #' stability and reduce the effect of high-leverage values in a matrix.
 #'
-#' <u>**Modal Truncation**</u>
+#' **Modal Truncation**
 #'
 #' The maximum number of terms for \eqn{n} is chosen as \eqn{k_w a_{shell} +
 #' 10} (rounded to the nearest integer), which is sufficient for convergence in
@@ -178,7 +178,7 @@
 #' @references
 #'
 #' Anderson, V.C. (1950). Sound scattering from a fluid sphere. The Journal of
-#' The Acoustical Society of America, 22: 426–431.
+#' The Acoustical Society of America, 22: 426-431.
 #'
 #' Gaunaurd, G.C., and Wertman, W. (1991). Transient acoustic scattering by
 #' fluid-loaded elastic shells. International Journal of Solids and Structures,
@@ -187,9 +187,12 @@
 #' Stanton, T.K. (1990). Sound scattering by spherical and elongated shelled
 #' bodies. The Journal of the Acoustical Society of America, 88: 1619-1633.
 #'
+#' @return No value; this help topic documents the ESSMS model.
+#' @examples
+#' subset(available_models(), model == "essms")
+#'
 #' @name ESSMS
 #' @aliases essms ESSMS
-#' @docType data
 #' @keywords models acoustics internal
 NULL
 

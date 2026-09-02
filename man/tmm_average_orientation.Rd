@@ -47,6 +47,23 @@ section over a user-supplied set of incident orientations. By default the
 receive direction is taken to be the exact monostatic direction for each
 supplied orientation.
 }
+\examples{
+target <- fls_generate(
+  shape = sphere(radius_body = 0.005, n_segments = 20),
+  g_body = 1,
+  h_body = 1
+)
+stored <- target_strength(
+  target,
+  frequency = 12e3,
+  model = "tmm",
+  boundary = "pressure_release",
+  store_t_matrix = TRUE
+)
+distribution <- tmm_orientation_distribution(n_theta = 5)
+tmm_average_orientation(stored, distribution = distribution)
+
+}
 \seealso{
 \code{\link{tmm_scattering}}
 }

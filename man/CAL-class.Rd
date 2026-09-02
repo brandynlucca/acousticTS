@@ -5,6 +5,9 @@
 \alias{CAL}
 \alias{CAL-class}
 \title{Solid and calibration sphere (CAL) object/class.}
+\value{
+An object of the \code{CAL} S4 class.
+}
 \description{
 A S4 class that provides slots to contain relevant metadata for solid sphere
 objects belonging to the CAL-class scatterers. This object is created using
@@ -15,6 +18,10 @@ elastic-based \link{ELA} class rather than from \link{ESS}, because
 calibration targets are solid elastic bodies rather than elastic shells. See
 \link{Scatterer} for a more detailed description on how this S4 object is
 organized.
+}
+\examples{
+methods::getClass("CAL")
+
 }
 \seealso{
 \link{Scatterer}

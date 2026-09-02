@@ -46,13 +46,16 @@
 #' from randomly oriented random-length finite cylinders: zooplankton models.
 #' \emph{The Journal of the Acoustical Society of America}, 94: 3463-3472.
 #'
+#' @return No value; this help topic documents the BCMS model.
+#' @examples
+#' subset(available_models(), model == "bcms")
+#'
 #' @name BCMS
 #' @aliases bcms BCMS
-#' @docType data
 #' @keywords models acoustics internal
 NULL
 
-#' Initialize scatterer-class object for the bent cylinder modal series model.
+#' Resolve and validate the BCMS boundary condition
 #' @noRd
 .bcms_resolve_boundary <- function(object, boundary) {
   # Derive the default boundary from the scatterer class when omitted ==========
@@ -114,7 +117,7 @@ NULL
 #' Build the stored BCMS body metadata
 #' @noRd
 .bcms_body_parameters <- function(shape, body) {
-  # Resolve the stored curvature metadata from the shape description ============
+  # Resolve the stored curvature metadata from the shape description ===========
   curvature_ratio <- shape$radius_curvature_ratio
 
   list(
@@ -124,7 +127,8 @@ NULL
     g = body$g,
     h = body$h,
     is_bent = !is.null(curvature_ratio) && !is.na(curvature_ratio),
-    radius_curvature = if (!is.null(curvature_ratio) && !is.na(curvature_ratio)) {
+    radius_curvature = if (!is.null(curvature_ratio) &&
+      !is.na(curvature_ratio)) {
       curvature_ratio * shape$length
     } else {
       NA_real_
@@ -196,6 +200,7 @@ bcms_initialize <- function(object,
   )
 }
 
+#' Calculate the straight-cylinder BCMS backscattering amplitude
 #' @noRd
 .bcms_straight_fbs <- function(acoustics, body, bm_method) {
   # Precompute the modal indexing terms ========================================
@@ -227,6 +232,7 @@ bcms_initialize <- function(object,
   }
 }
 
+#' Apply the BCMS Fresnel equivalent-length correction
 #' @noRd
 .bcms_equivalent_length_fresnel <- function(k1, l, a, rho_c) {
   .trcm_equivalent_length_fresnel(k1 = k1, l = l, a = a, rho_c = rho_c)

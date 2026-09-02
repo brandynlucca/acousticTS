@@ -83,9 +83,12 @@
 #' Fisheries for Scotland.
 #'
 #'
+#' @return No value; this help topic documents the calibration model.
+#' @examples
+#' subset(available_models(), model == "calibration")
+#'
 #' @name SOEMS
 #' @aliases soems SOEMS calibration CALIBRATION
-#' @docType data
 #' @keywords models acoustics internal
 NULL
 

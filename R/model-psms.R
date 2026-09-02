@@ -168,7 +168,7 @@
 #'
 #' @section Implementation:
 #'
-#' <u>**\code{C++}**</u>
+#' **\code{C++}**
 #'
 #' This model is primarily implemented in \code{C++} since it leverages the
 #' \code{Fortran} algorithm developed by Arnie Lee van Buren and Jeffery
@@ -185,7 +185,7 @@
 #' recomputing one of the two angular \eqn{S_{mn}} matrices, and solves the
 #' fluid-filled kernel system natively in the requested arithmetic.
 #'
-#' <u>**Precision**</u>
+#' **Precision**
 #'
 #' Another consideration is the floating point precision inherent to \code{R}.
 #' \code{R} uses double-precision, which stores numeric values in a 64-bit
@@ -224,13 +224,16 @@
 #' GitHub repository:
 #' \url{https://github.com/MathieuandSpheroidalWaveFunctions/Prolate_swf}
 #'
+#' @return No value; this help topic documents the PSMS model.
+#' @examples
+#' subset(available_models(), model == "psms")
+#'
 #' @name PSMS
 #' @aliases psms PSMS
-#' @docType data
 #' @keywords models acoustics internal
 NULL
 
-# Validate that the current PSMS implementation is only used for prolates.
+#' Validate that the current PSMS implementation is only used for prolates.
 #' @noRd
 .psms_validate_shape <- function(scatterer_shape) {
   # Restrict the modal-series initializer to prolate spheroids =================
@@ -245,7 +248,7 @@ NULL
   invisible(TRUE)
 }
 
-# Validate the PSMS boundary label used to choose the Amn formulation.
+#' Validate the PSMS boundary label used to choose the Amn formulation.
 #' @noRd
 .psms_validate_boundary <- function(boundary) {
   # Confirm that the requested PSMS boundary is implemented ====================
@@ -263,7 +266,28 @@ NULL
   boundary
 }
 
-# Validate the PSMS precision label.
+#' Report whether this installation has the complete native quad backend.
+#' @noRd
+.quad_precision_available <- function() {
+  isTRUE(quad_precision_available_cpp())
+}
+
+#' Reject requests for quad precision when configure could not build the
+#' matching C++ and Fortran binary128 implementations.
+#' @noRd
+.validate_quad_precision_available <- function(precision) {
+  if (identical(precision, "quad") && !.quad_precision_available()) {
+    stop(
+      "Native quad precision is unavailable with the C++ and Fortran ",
+      "compilers used to build this installation; use precision = \"double\".",
+      call. = FALSE
+    )
+  }
+
+  precision
+}
+
+#' Validate the PSMS precision label.
 #' @noRd
 .psms_validate_precision <- function(precision) {
   # Restrict the precision choice to the supported backends ====================
@@ -271,10 +295,10 @@ NULL
     stop("'precision' must be either 'double' or 'quad'.")
   }
 
-  precision
+  .validate_quad_precision_available(precision)
 }
 
-# Validate the PSMS adaptive-mode flag.
+#' Validate the PSMS adaptive-mode flag.
 #' @noRd
 .psms_validate_adaptive <- function(adaptive) {
   # Require a scalar logical adaptive flag =====================================
@@ -285,7 +309,7 @@ NULL
   adaptive
 }
 
-# Resolve the Amn formulation associated with one PSMS boundary condition.
+#' Resolve the Amn formulation associated with one PSMS boundary condition.
 #' @noRd
 .psms_Amn_method <- function(boundary, simplify_Amn) {
   # Map the public PSMS boundary labels onto the internal kernel names ========
@@ -297,13 +321,13 @@ NULL
   )
 }
 
-# Identify the full penetrable PSMS solves that own their quadrature order.
+#' Identify the full penetrable PSMS solves that own their quadrature order.
 #' @noRd
 .psms_is_full_fluid_method <- function(Amn_method) {
   identical(Amn_method, "Amn_fluid") || identical(Amn_method, "Amn_fluid_gas")
 }
 
-# Resolve the hydrated PSMS body properties against the surrounding medium.
+#' Resolve the hydrated PSMS body properties against the surrounding medium.
 #' @noRd
 .psms_body_state <- function(object, sound_speed_sw, density_sw) {
   # Hydrate contrasts into absolute body properties ============================
@@ -319,7 +343,7 @@ NULL
   )
 }
 
-# Build the PSMS model-parameter list prior to geometry-specific bookkeeping.
+#' Build the PSMS model-parameter list prior to geometry-specific bookkeeping.
 #' @noRd
 .psms_model_parameters <- function(frequency,
                                    sound_speed_sw,
@@ -340,7 +364,7 @@ NULL
   )
 }
 
-# Build the stored body metadata for one initialized PSMS object.
+#' Build the stored body metadata for one initialized PSMS object.
 #' @noRd
 .psms_body_parameters <- function(scatterer_shape,
                                   body,
@@ -364,7 +388,7 @@ NULL
   body_params
 }
 
-# Resolve the quadrature order used by the PSMS kernels.
+#' Resolve the quadrature order used by the PSMS kernels.
 #' @noRd
 .psms_n_integration_label <- function(Amn_method) {
   switch(Amn_method,
@@ -374,7 +398,7 @@ NULL
   )
 }
 
-# Resolve the quadrature order used by the PSMS kernels.
+#' Resolve the quadrature order used by the PSMS kernels.
 #' @noRd
 .psms_n_integration <- function(n_integration, adaptive, Amn_method) {
   # Allow the adaptive full-fluid solve to choose quadrature internally ========
@@ -406,10 +430,13 @@ NULL
   as.integer(n_integration)
 }
 
-# Attach the reduced frequencies and modal truncation limits to the PSMS
-# acoustics table.
+#' Attach the reduced frequencies and modal truncation limits to the PSMS
+#' acoustics table.
 #' @noRd
-.psms_complete_acoustics <- function(model_params, body_params, scatterer_shape) {
+.psms_complete_acoustics <- function(
+  model_params, body_params,
+  scatterer_shape
+) {
   # Add reduced frequencies for the surrounding medium and interior ============
   model_params$acoustics$chi_sw <- model_params$acoustics$k_sw * body_params$q
   model_params$acoustics$chi_body <- model_params$acoustics$k_f * body_params$q
@@ -423,9 +450,12 @@ NULL
   model_params
 }
 
-# Promote the retained modal ceilings for the full gas-filled PSMS solve only.
+#' Promote the retained modal ceilings for the full gas-filled PSMS solve only.
 #' @noRd
-.psms_promote_gas_modal_limits <- function(model_params, body_params, boundary) {
+.psms_promote_gas_modal_limits <- function(
+  model_params, body_params,
+  boundary
+) {
   if (!identical(boundary, "gas_filled") ||
     !isTRUE(model_params$adaptive) ||
     !identical(model_params$Amn_method, "Amn_fluid_gas")) {

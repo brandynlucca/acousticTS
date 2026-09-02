@@ -113,6 +113,10 @@ Qn_deriv_cpp <- function(n, x, k) {
     .Call(`_acousticTS_Qn_deriv_cpp`, n, x, k)
 }
 
+quad_precision_available_cpp <- function() {
+    .Call(`_acousticTS_quad_precision_available_cpp`)
+}
+
 Smn_cpp <- function(m, n, c, arg, normalize = FALSE, precision = "double") {
     .Call(`_acousticTS_Smn_cpp`, m, n, c, arg, normalize, precision)
 }

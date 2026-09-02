@@ -5,8 +5,15 @@
 \alias{ProlateSpheroid}
 \alias{ProlateSpheroid-class}
 \title{Prolate spheroidal body shape}
+\value{
+An object of the \code{ProlateSpheroid} S4 class.
+}
 \description{
 Prolate spheroidal body shape
+}
+\examples{
+methods::getClass("ProlateSpheroid")
+
 }
 \seealso{
 \code{\link{Shape}}

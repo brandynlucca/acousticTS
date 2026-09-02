@@ -43,11 +43,17 @@ acousticTS:::.model_family_overview(
   ),
   best_for = c(
     "Gas-bearing fish with separate body and swimbladder outlines",
-    "Frequency and orientation studies where the internal gas component dominates or interferes with the body return",
+    paste(
+      "Frequency and orientation studies where the internal gas component",
+      "dominates or interferes with the body return"
+    ),
     "Comparison of supported KRM material and embedding variants"
   ),
   supports = c(
-    "`SBF` objects with body and swimbladder shapes, placement, and orientation",
+    paste(
+      "`SBF` objects with body and swimbladder shapes, placement, and",
+      "orientation"
+    ),
     "Separate body and bladder material descriptions",
     "Stored body, swimbladder, and coherently combined outputs"
   ),
@@ -58,8 +64,14 @@ acousticTS:::.model_family_overview(
     "No fully coupled body-swimbladder boundary solve or repeated rescattering"
   ),
   reading = c(
-    "[Implementation](krm-implementation.html): building fish objects, variants, component output, and comparisons",
-    "[Theory](krm-theory.html): body term, swimbladder branches, and coherent sum"
+    paste(
+      "[Implementation](krm-implementation.html): building fish objects,",
+      "variants, component output, and comparisons"
+    ),
+    paste(
+      "[Theory](krm-theory.html): body term, swimbladder branches, and",
+      "coherent sum"
+    )
   )
 )
 ```

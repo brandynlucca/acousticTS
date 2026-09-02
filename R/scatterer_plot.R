@@ -35,13 +35,17 @@
 #' @return Called for its side effect of drawing a plot; returns the input
 #'   invisibly.
 #'
+#' @examples
+#' \dontrun{
+#' data("krill", package = "acousticTS")
+#' plot(krill)
+#' }
+#'
 #' @details
-#' This method dispatches to the relevant scatterer-class plotting helper:
-#' `cal_plot()`, `ess_plot()`, `sbf_plot()`, `bbf_plot()`, `fls_plot()`, or
-#' `gas_plot()`. The supported `type` values therefore depend on what has been
-#' stored on the object. For example, `type = "model"` requires the object to
-#' already contain model output, and `type = "scattering"` currently applies
-#' only to stored `TMM` results.
+#' Plotting behavior is selected from the object's class. The supported `type`
+#' values therefore depend on what has been stored on the object. For example,
+#' `type = "model"` requires the object to already contain model output, and
+#' `type = "scattering"` currently applies only to stored `TMM` results.
 #'
 #' @seealso [extract()], [target_strength()], [tmm_scattering()],
 #'   [tmm_scattering_grid()]

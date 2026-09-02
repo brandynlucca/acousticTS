@@ -200,49 +200,52 @@ test_that("target_strength handles multiple models", {
   expect_true("DWBA" %in% names(fls_dwba@model))
 })
 
-test_that("target_strength applies shared and model-specific arguments cleanly", {
-  data(krill, package = "acousticTS")
+test_that(
+  "target_strength applies shared and model-specific arguments cleanly",
+  {
+    data(krill, package = "acousticTS")
 
-  fls_obj <- fls_generate(
-    x = krill@body$rpos[1, ],
-    y = krill@body$rpos[2, ],
-    z = krill@body$rpos[3, ],
-    radius_body = krill@body$radius,
-    g_body = krill@body$g,
-    h_body = krill@body$h,
-    radius_curvature_ratio = 3.3,
-    theta_body = krill@body$theta
-  )
+    fls_obj <- fls_generate(
+      x = krill@body$rpos[1, ],
+      y = krill@body$rpos[2, ],
+      z = krill@body$rpos[3, ],
+      radius_body = krill@body$radius,
+      g_body = krill@body$g,
+      h_body = krill@body$h,
+      radius_curvature_ratio = 3.3,
+      theta_body = krill@body$theta
+    )
 
-  out <- target_strength(
-    object = fls_obj,
-    frequency = 120e3,
-    model = c("dwba", "sdwba"),
-    density_sw = 1026,
-    sound_speed_sw = 1478,
-    model_args = list(
-      sdwba = c(
-        n_iterations = 5,
-        n_segments_init = 14,
-        phase_sd_init = 0.77,
-        length_init = 38.35e-3,
-        frequency_init = 120e3
+    out <- target_strength(
+      object = fls_obj,
+      frequency = 120e3,
+      model = c("dwba", "sdwba"),
+      density_sw = 1026,
+      sound_speed_sw = 1478,
+      model_args = list(
+        sdwba = c(
+          n_iterations = 5,
+          n_segments_init = 14,
+          phase_sd_init = 0.77,
+          length_init = 38.35e-3,
+          frequency_init = 120e3
+        )
       )
     )
-  )
 
-  expect_true(all(c("DWBA", "SDWBA") %in% names(out@model)))
-  expect_equal(out@model_parameters$DWBA$medium$density, 1026)
-  expect_equal(out@model_parameters$SDWBA$medium$density, 1026)
-  expect_equal(
-    out@model_parameters$SDWBA$parameters[[1]]$meta_params$p0,
-    0.77
-  )
-  expect_equal(
-    out@model_parameters$SDWBA$parameters[[1]]$meta_params$n_iterations,
-    5
-  )
-})
+    expect_true(all(c("DWBA", "SDWBA") %in% names(out@model)))
+    expect_equal(out@model_parameters$DWBA$medium$density, 1026)
+    expect_equal(out@model_parameters$SDWBA$medium$density, 1026)
+    expect_equal(
+      out@model_parameters$SDWBA$parameters[[1]]$meta_params$p0,
+      0.77
+    )
+    expect_equal(
+      out@model_parameters$SDWBA$parameters[[1]]$meta_params$n_iterations,
+      5
+    )
+  }
+)
 
 test_that("target_strength lets model_args override shared arguments", {
   data(krill, package = "acousticTS")

@@ -2,8 +2,8 @@
 # Transition matrix method (TMM) orientation helpers
 ################################################################################
 
-# Normalize one user-facing orientation distribution into the shared
-# theta/phi/weight data frame used by the TMM post-processing helpers.
+#' Normalize one user-facing orientation distribution into the shared
+#' theta/phi/weight data frame used by the TMM post-processing helpers.
 #' @noRd
 .tmm_validate_orientation_distribution <- function(distribution) {
   # Confirm the helper output carries the expected distribution class ==========
@@ -56,7 +56,7 @@
   distribution
 }
 
-# Convert one theta-grid density into normalized quadrature weights.
+#' Convert one theta-grid density into normalized quadrature weights.
 #' @noRd
 .tmm_distribution_weights <- function(theta_body,
                                       density_values,
@@ -122,6 +122,14 @@
 #'
 #' @return A data frame with normalized orientation weights and class
 #'   `"TMMOrientationDistribution"`.
+#'
+#' @examples
+#' tmm_orientation_distribution(
+#'   distribution = "uniform",
+#'   lower = pi / 3,
+#'   upper = 2 * pi / 3,
+#'   n_theta = 7
+#' )
 #'
 #' @seealso \code{\link{tmm_average_orientation}},
 #'   \code{\link{tmm_products}}
@@ -199,8 +207,8 @@ tmm_orientation_distribution <- function(distribution = c(
   distribution_df
 }
 
-# Resolve either a pre-built orientation distribution or the direct averaging
-# inputs supplied to `tmm_average_orientation()`.
+#' Resolve either a pre-built orientation distribution or the direct averaging
+#' inputs supplied to `tmm_average_orientation()`.
 #' @noRd
 .tmm_average_orientation_inputs <- function(distribution,
                                             theta_body,
@@ -224,7 +232,7 @@ tmm_orientation_distribution <- function(distribution = c(
   )
 }
 
-# Validate direct theta/phi/weight inputs for `tmm_average_orientation()`.
+#' Validate direct theta/phi/weight inputs for `tmm_average_orientation()`.
 #' @noRd
 .tmm_average_orientation_direct_inputs <- function(theta_body,
                                                    weights,
@@ -255,7 +263,7 @@ tmm_orientation_distribution <- function(distribution = c(
   )
 }
 
-# Normalize the averaging weights for `tmm_average_orientation()`.
+#' Normalize the averaging weights for `tmm_average_orientation()`.
 #' @noRd
 .tmm_average_orientation_weights <- function(weights, n_angles, theta_body) {
   # Default to equal weighting across the supplied angle grid ==================
@@ -279,7 +287,7 @@ tmm_orientation_distribution <- function(distribution = c(
   weights / sum(weights)
 }
 
-# Resolve the receive-angle vectors for one orientation-averaged TMM solve.
+#' Resolve the receive-angle vectors for one orientation-averaged TMM solve.
 #' @noRd
 .tmm_average_scatter_angles <- function(theta_body,
                                         phi_body,
@@ -327,6 +335,22 @@ tmm_orientation_distribution <- function(distribution = c(
 #' @return A data frame containing the frequency, the orientation-averaged
 #'   differential backscattering cross section and the corresponding
 #'   orientation-averaged target strength.
+#'
+#' @examples
+#' target <- fls_generate(
+#'   shape = sphere(radius_body = 0.005, n_segments = 20),
+#'   g_body = 1,
+#'   h_body = 1
+#' )
+#' stored <- target_strength(
+#'   target,
+#'   frequency = 12e3,
+#'   model = "tmm",
+#'   boundary = "pressure_release",
+#'   store_t_matrix = TRUE
+#' )
+#' distribution <- tmm_orientation_distribution(n_theta = 5)
+#' tmm_average_orientation(stored, distribution = distribution)
 #'
 #' @seealso \code{\link{tmm_scattering}}
 #' @export

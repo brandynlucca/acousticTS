@@ -1,0 +1,5 @@
+#!/bin/sh
+
+ACOUSTICTS_MAKEVARS_TEMPLATE=Makevars.win.in \
+ACOUSTICTS_MAKEVARS_OUTPUT=Makevars.win \
+exec "${CONFIG_SHELL:-/bin/sh}" "$(dirname "$0")/configure" "$@"

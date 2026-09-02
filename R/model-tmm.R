@@ -131,9 +131,12 @@
 #' Waterman, P. C. (2009). T-matrix methods in acoustic scattering. *The
 #' Journal of the Acoustical Society of America*, **125**, 42-51.
 #'
+#' @return No value; this help topic documents the TMM model.
+#' @examples
+#' subset(available_models(), model == "tmm")
+#'
 #' @name TMM
 #' @aliases tmm TMM
-#' @docType data
 #' @keywords models acoustics internal
 NULL
 
@@ -237,9 +240,9 @@ tmm_initialize <- function(object,
   )
 }
 
-# Build the exact spherical shell modal coefficients retained by the TMM shell
-# branch so bistatic scattering can be reconstructed directly from the
-# layered-fluid modal series.
+#' Build the exact spherical shell modal coefficients retained by the TMM shell
+#' branch so bistatic scattering can be reconstructed directly from the
+#' layered-fluid modal series.
 #' @noRd
 .tmm_store_sphere_modal_branch <- function(acoustics, body, boundary) {
   Am <- .sphms_modal_coefficients(
@@ -271,8 +274,8 @@ tmm_initialize <- function(object,
   )
 }
 
-# Store the exact elastic-shell sphere modal coefficients in the same retained
-# spherical-modal structure used by the shell-sphere fluid branch.
+#' Store the exact elastic-shell sphere modal coefficients in the same retained
+#' spherical-modal structure used by the shell-sphere fluid branch.
 #' @noRd
 .tmm_store_elastic_shell_modal_branch <- function(acoustics, body) {
   sound_speed_longitudinal <- sqrt(
@@ -310,7 +313,7 @@ tmm_initialize <- function(object,
   )
 }
 
-# Evaluate the exact stored spherical-modal TMM branches used by shell spheres.
+#' Evaluate the exact stored spherical-modal TMM branches used by shell spheres.
 #' @noRd
 .tmm_run_shell_sphere_branch <- function(acoustics, body, boundary) {
   t_store <- if (identical(boundary, "elastic_shelled")) {

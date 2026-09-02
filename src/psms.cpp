@@ -68,6 +68,13 @@ struct ProfcnBatchResult;
 
 #include "psms_smn.h"
 
+// Report whether configure enabled the complete native C++/Fortran binary128
+// backend.  R-side validation uses this before accepting precision = "quad".
+// [[Rcpp::export]]
+bool quad_precision_available_cpp() {
+    return ACOUSTICTS_HAVE_QUADMATH != 0;
+}
+
 // C++-R INTERFACE FUNCTION [Smn]
 // -----------------------------------------------------------
 // [[Rcpp::export]]

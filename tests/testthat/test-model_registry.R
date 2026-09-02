@@ -55,23 +55,33 @@ TSL <- function(object) {
   object
 }
 
-test_that("available_models lists built-ins and target_strength resolves aliases", {
-  models <- acousticTS::available_models()
+test_that(
+  "available_models lists built-ins and target_strength resolves aliases",
+  {
+    models <- acousticTS::available_models()
 
-  expect_true("calibration" %in% models$model)
-  expect_true(any(models$model == "calibration" & grepl("soems", models$aliases)))
-  expect_false("espsms" %in% models$model)
-  expect_false("epsms" %in% models$model)
+    expect_true("calibration" %in% models$model)
+    expect_true(any(models$model == "calibration" & grepl(
+      "soems",
+      models$aliases
+    )))
+    expect_false("espsms" %in% models$model)
+    expect_false("epsms" %in% models$model)
 
-  cal_obj <- target_strength(cal_generate(), frequency = 38e3, model = "soems")
+    cal_obj <- target_strength(
+      cal_generate(),
+      frequency = 38e3,
+      model = "soems"
+    )
 
-  expect_true("calibration" %in% names(cal_obj@model))
-  expect_true(all(is.finite(cal_obj@model$calibration$TS)))
-  expect_error(
-    target_strength(cal_generate(), frequency = 38e3, model = "epsms"),
-    "Unknown target strength model 'epsms'"
-  )
-})
+    expect_true("calibration" %in% names(cal_obj@model))
+    expect_true(all(is.finite(cal_obj@model$calibration$TS)))
+    expect_error(
+      target_strength(cal_generate(), frequency = 38e3, model = "epsms"),
+      "Unknown target strength model 'epsms'"
+    )
+  }
+)
 
 test_that("user-registered models work in target_strength and simulate_ts", {
   restore_registry <- capture_model_registry_state()
@@ -159,7 +169,10 @@ test_that("model registry guards collisions and unregisters user models", {
   expect_error(
     target_strength(
       object = fls_generate(
-        shape = cylinder(length_body = 0.07, radius_body = 0.01, n_segments = 80),
+        shape = cylinder(
+          length_body = 0.07, radius_body = 0.01, n_segments =
+            80
+        ),
         density_body = 1028.9,
         sound_speed_body = 1480.3
       ),

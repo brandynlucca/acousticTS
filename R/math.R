@@ -8,6 +8,9 @@
 #' @param iterations Number of iterations
 #' @return A numeric matrix containing the adjacent column sums of
 #'   \code{rpos}.
+#' @examples
+#' positions <- matrix(1:8, nrow = 2)
+#' along_sum(positions, ncol(positions))
 #' @rdname along_sum
 #' @export
 along_sum <- function(rpos, iterations) {
@@ -144,41 +147,7 @@ neumann <- function(x) {
   ifelse(x == 0, 1, 2)
 }
 ################################################################################
-#' Gauss–Legendre nodes and weights
-#'
-#' Compute Gauss–Legendre quadrature nodes and weights on an interval
-#' \eqn{[a,~b]}.
-#'
-#' @param n Number of quadrature nodes (n >= 1).
-#' @param a Left endpoint of the integration interval.
-#' @param b Right endpoint of the integration interval (b > a).
-#'
-#' @return A list with components:
-#' \describe{
-#'   \item{nodes}{Quadrature abscissae \eqn{x_i} in \eqn{[a,~b]}.}
-#'   \item{weights}{Quadrature weights \eqn{w_i} such that
-#'     \eqn{\int_a^b f(x)\,dx \approx \sum_{i=1}^n w_i\,f(x_i).}}
-#' }
-#'
-#' @details
-#' Gauss–Legendre quadrature provides exact integration for polynomials of
-#' degree up to \eqn{2n-1} using n nodes and weights chosen as the roots of the
-#' Legendre polynomial \eqn{P_n(x)} on the canonical interval \eqn{[-1,1]}. For
-#' a general interval \eqn{[a,b]} the mapping
-#' \deqn{x = \tfrac{a+b}{2} + \tfrac{b-a}{2}\,t,\quad t\in[-1,1],}
-#' transforms canonical nodes \eqn{t_i} to \eqn{x_i} and scales weights by
-#' \deqn{w_i = \tfrac{b-a}{2}\,w_i^{(0)},}
-#' where \eqn{w_i^{(0)}} are the standard weights on \eqn{[-1,1]}.
-#'
-#' This wrapper performs basic argument validation and calls the C++ routine
-#' to obtain nodes and weights with high accuracy for moderate \code{n}.
-#'
-#' @references
-#' Davis, P. J., & Rabinowitz, P. (2007). Methods of Numerical Integration
-#' (2nd ed.).
-#'
-#' @keywords integration quadrature
-#' @rdname gauss_legendre
+#' Validate inputs used to calculate Gauss-Legendre nodes and weights
 #' @noRd
 .validate_gauss_legendre_inputs <- function(n, a, b) {
   # Require a positive integer node count ======================================
@@ -222,6 +191,10 @@ neumann <- function(x) {
 #'
 #' This wrapper performs basic argument validation and calls the C++ routine
 #' to obtain nodes and weights with high accuracy for moderate \code{n}.
+#'
+#' @examples
+#' rule <- gauss_legendre(n = 4, a = 0, b = 1)
+#' sum(rule$weights * rule$nodes^2)
 #'
 #' @references
 #' Davis, P. J., & Rabinowitz, P. (2007). Methods of Numerical Integration

@@ -2,8 +2,8 @@
 # Transition matrix method (TMM) plotting helpers
 ################################################################################
 
-# Normalize the user-facing TMM post-processing quantity selection while
-# keeping the older `level_dB` name as a compatibility alias.
+#' Normalize the user-facing TMM post-processing quantity selection while
+#' keeping the older `level_dB` name as a compatibility alias.
 #' @noRd
 .tmm_plot_quantity <- function(quantity) {
   # Fall back to the default scattering-level display quantity =================
@@ -16,7 +16,7 @@
   # Validate the requested plotting quantity ===================================
   match.arg(quantity, c("sigma_scat_dB", "sigma_scat", "mod_f", "phase"))
 }
-# Build one angular scattering slice from the stored TMM blocks.
+#' Build one angular scattering slice from the stored TMM blocks.
 #' @noRd
 .tmm_scattering_slice_data <- function(object,
                                        frequency = NULL,
@@ -142,7 +142,7 @@
   )
 }
 
-# Resolve finite plotting data and labels for a stored TMM scattering grid.
+#' Resolve finite plotting data and labels for a stored TMM scattering grid.
 #' @noRd
 .tmm_grid_plot_data <- function(grid, quantity = "sigma_scat_dB") {
   # Normalize the requested plotted quantity ===================================
@@ -164,7 +164,7 @@
   list(z = z_vals, label = z_lab, quantity = quantity)
 }
 
-# Build a symmetric grid-edge vector for cell-based plotting.
+#' Build a symmetric grid-edge vector for cell-based plotting.
 #' @noRd
 .plot_tmm_scattering_heatmap <- function(grid, quantity = "sigma_scat_dB") {
   # Resolve the plotted grid values and legend label ===========================
@@ -194,7 +194,7 @@
   invisible(grid)
 }
 
-# Plot a polar-style scattering map from a stored TMM grid.
+#' Plot a polar-style scattering map from a stored TMM grid.
 #' @noRd
 .plot_tmm_scattering_polar <- function(grid, quantity = "sigma_scat_dB") {
   # Resolve the plotted quantity and finite dynamic range ======================
@@ -354,7 +354,7 @@
   invisible(grid)
 }
 
-# Plot a stored TMM angular scattering slice.
+#' Plot a stored TMM angular scattering slice.
 #' @noRd
 .plot_tmm_scattering_slice <- function(object,
                                        nudge_x = 1.01,

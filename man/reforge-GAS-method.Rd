@@ -64,6 +64,9 @@ available and are isometric: they scale every axis together, so a sphere
 stays a sphere. Use \code{body_scale}/\code{body_target} for independent length and
 radius control.
 }
+\examples{
+methods::selectMethod("reforge", "GAS")
+}
 \seealso{
 \code{\link[=reforge]{reforge()}}
 }

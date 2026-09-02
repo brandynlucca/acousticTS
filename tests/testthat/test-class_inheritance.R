@@ -13,7 +13,10 @@ test_that("Scatterer class inheritance works correctly", {
 
   # Test plain ELA solid target
   ela_obj <- ela_generate(
-    shape = prolate_spheroid(length_body = 0.04, radius_body = 0.004, n_segments = 40),
+    shape = prolate_spheroid(
+      length_body = 0.04, radius_body = 0.004,
+      n_segments = 40
+    ),
     density_body = 14900,
     sound_speed_longitudinal_body = 6853,
     sound_speed_transversal_body = 4171
@@ -320,7 +323,10 @@ test_that("FLS-class generation works as expected", {
   # ---- Case: Empty[x_body]
   expect_error(
     fls_generate(),
-    "Supply 'shape' as a pre-built Shape object, or provide explicit profile coordinates"
+    paste0(
+      "Supply 'shape' as a pre-built Shape object, or provide explicit ",
+      "profile coordinates"
+    )
   )
   # ---- Case: Different g count
   expect_error(

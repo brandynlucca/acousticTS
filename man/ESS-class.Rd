@@ -5,6 +5,9 @@
 \alias{ESS}
 \alias{ESS-class}
 \title{Elastic shelled scatterer (ESS) object/class.}
+\value{
+An object of the \code{ESS} S4 class.
+}
 \description{
 A S4 class that provides slots to contain relevant metadata for elastic
 shelled scatterers/objects belonging to the ESS-class. This object can be
@@ -14,6 +17,10 @@ reference the outer shell with few exceptions that are model-dependent.
 \code{ESS} inherits from the broader elastic-based \link{ELA} class. See
 \link{Scatterer} for a more detailed description on how this S4 object is
 organized.
+}
+\examples{
+methods::getClass("ESS")
+
 }
 \seealso{
 \link{Scatterer}

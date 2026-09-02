@@ -146,8 +146,14 @@ test_that("Spherical Bessel sequence matrix matches scalar API", {
   ref_j <- t(vapply(z_j, function(zz) js(orders, zz), numeric(length(orders))))
   expect_equal(seq_j, ref_j, tolerance = 1e-10)
 
-  seq_jd <- acousticTS:::spherical_bessel_sequence_matrix_cpp(orders, z_j, "jsd")
-  ref_jd <- t(vapply(z_j, function(zz) jsd(orders, zz), numeric(length(orders))))
+  seq_jd <- acousticTS:::spherical_bessel_sequence_matrix_cpp(
+    orders, z_j,
+    "jsd"
+  )
+  ref_jd <- t(vapply(
+    z_j, function(zz) jsd(orders, zz),
+    numeric(length(orders))
+  ))
   expect_equal(seq_jd, ref_jd, tolerance = 1e-9)
 
   z_h <- c(1.2, 9)
@@ -155,8 +161,14 @@ test_that("Spherical Bessel sequence matrix matches scalar API", {
   ref_h <- t(vapply(z_h, function(zz) hs(orders, zz), complex(length(orders))))
   expect_equal(seq_h, ref_h, tolerance = 1e-9)
 
-  seq_hd <- acousticTS:::spherical_bessel_sequence_matrix_cpp(orders, z_h, "hsd")
-  ref_hd <- t(vapply(z_h, function(zz) hsd(orders, zz), complex(length(orders))))
+  seq_hd <- acousticTS:::spherical_bessel_sequence_matrix_cpp(
+    orders, z_h,
+    "hsd"
+  )
+  ref_hd <- t(vapply(
+    z_h, function(zz) hsd(orders, zz),
+    complex(length(orders))
+  ))
   expect_equal(seq_hd, ref_hd, tolerance = 1e-8)
 })
 

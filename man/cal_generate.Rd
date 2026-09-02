@@ -18,8 +18,8 @@ cal_generate(
 )
 }
 \arguments{
-\item{material}{Material-type for the soldi sphere. See 'Details' built-in
-material options.}
+\item{material}{Material type for the solid sphere. See 'Details' for
+built-in material options.}
 
 \item{diameter}{Spherical diameter (m).}
 

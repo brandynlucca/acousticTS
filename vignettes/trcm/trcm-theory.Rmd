@@ -48,7 +48,7 @@ normal-velocity continuity at a fluid-fluid interface. TRCM inserts them into
 a two-path asymptotic reduction rather than solving the finite-cylinder
 boundary-value problem.
 
-![Straight-cylinder cross-section and the two retained TRCM paths.](trcm-two-ray-geometry-clean.png)
+<!-- ![Straight-cylinder cross-section and the two retained TRCM paths.](trcm-two-ray-geometry-clean.png) -->
 
 The amplitude combines an interface coefficient, a two-ray interference factor,
 finite-axis directivity, and specular asymptotic scaling. Curvature changes the

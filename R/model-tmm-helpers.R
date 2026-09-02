@@ -2,7 +2,7 @@
 # Transition matrix method (TMM) common helpers
 ################################################################################
 
-# Resolve the default boundary from the scatterer class when the user omits it.
+#' Resolve the default boundary from the scatterer class when the user omits it.
 #' @noRd
 .tmm_boundary_default <- function(object, boundary) {
   if (!is.null(boundary)) {
@@ -39,15 +39,15 @@
   )
 }
 
-# Guard the current public scope of TMM to the exact sphere and prolate
-# spheroid geometries already supported by the package.
+#' Guard the current public scope of TMM to the exact sphere and prolate
+#' spheroid geometries already supported by the package.
 #' @noRd
 .tmm_shape_name <- function(shape_parameters) {
   as.character(shape_parameters$shape)[1]
 }
 
-# Guard the current public scope of TMM to the exact sphere and prolate
-# spheroid geometries already supported by the package.
+#' Guard the current public scope of TMM to the exact sphere and prolate
+#' spheroid geometries already supported by the package.
 #' @noRd
 .tmm_validate_shape <- function(shape_parameters) {
   supported <- c("Sphere", "ProlateSpheroid", "OblateSpheroid", "Cylinder")
@@ -62,22 +62,22 @@
   }
 }
 
-# Decide whether the object should be routed through the spheroidal-coordinate
-# backend rather than the spherical-coordinate backend.
+#' Decide whether the object should be routed through the spheroidal-coordinate
+#' backend rather than the spherical-coordinate backend.
 #' @noRd
 .tmm_is_spheroidal_branch <- function(shape_parameters, boundary = NULL) {
   identical(.tmm_shape_name(shape_parameters), "ProlateSpheroid") &&
     !identical(boundary, "elastic_shelled")
 }
 
-# Cylinders now have a dedicated geometry-matched cylindrical backend rather
-# than the exploratory spherical stored-block branch.
+#' Cylinders now have a dedicated geometry-matched cylindrical backend rather
+#' than the exploratory spherical stored-block branch.
 #' @noRd
 .tmm_is_cylindrical_branch <- function(shape_parameters) {
   identical(.tmm_shape_name(shape_parameters), "Cylinder")
 }
 
-# Detect whether an ESS shell carries elastic properties.
+#' Detect whether an ESS shell carries elastic properties.
 #' @noRd
 .tmm_has_elastic_shell <- function(shell) {
   any(vapply(
@@ -90,8 +90,8 @@
   ))
 }
 
-# Identify spherical fluid-shell runs that should stay on the exact sphere
-# modal path rather than the projected spherical T-matrix solve.
+#' Identify spherical fluid-shell runs that should stay on the exact sphere
+#' modal path rather than the projected spherical T-matrix solve.
 #' @noRd
 .tmm_is_shell_sphere_branch <- function(object, shape_parameters, boundary) {
   methods::is(object, "ESS") &&
@@ -103,25 +103,28 @@
     )
 }
 
-# Identify spherical elastic-shell runs that should stay on the exact elastic
-# spherical modal path rather than the projected spherical T-matrix solve.
+#' Identify spherical elastic-shell runs that should stay on the exact elastic
+#' spherical modal path rather than the projected spherical T-matrix solve.
 #' @noRd
-.tmm_is_elastic_shell_sphere_branch <- function(object, shape_parameters, boundary) {
+.tmm_is_elastic_shell_sphere_branch <- function(
+  object, shape_parameters,
+  boundary
+) {
   methods::is(object, "ESS") &&
     identical(as.character(shape_parameters[["shape"]])[1], "Sphere") &&
     identical(boundary, "elastic_shelled")
 }
 
-# Identify all sphere-modal TMM branches that retain explicit spherical modal
-# coefficients for downstream bistatic reconstruction.
+#' Identify all sphere-modal TMM branches that retain explicit spherical modal
+#' coefficients for downstream bistatic reconstruction.
 #' @noRd
 .tmm_is_sphere_modal_branch <- function(object, shape_parameters, boundary) {
   .tmm_is_shell_sphere_branch(object, shape_parameters, boundary) ||
     .tmm_is_elastic_shell_sphere_branch(object, shape_parameters, boundary)
 }
 
-# The present penetrable implementation assumes a single homogeneous interior,
-# so vector-valued contrasts/properties must be rejected here.
+#' The present penetrable implementation assumes a single homogeneous interior,
+#' so vector-valued contrasts/properties must be rejected here.
 #' @noRd
 .tmm_require_homogeneous_body <- function(body, boundary) {
   if (!(boundary %in% c("liquid_filled", "gas_filled"))) {
@@ -143,7 +146,7 @@
   invisible(TRUE)
 }
 
-# Enforce the current public TMM scope to homogeneous fluid/gas scatterers.
+#' Enforce the current public TMM scope to homogeneous fluid/gas scatterers.
 #' @noRd
 .tmm_validate_object_scope <- function(object) {
   # Restrict the current TMM initializer to the supported scatterer classes ====
@@ -161,7 +164,7 @@
   invisible(TRUE)
 }
 
-# Resolve the active geometric branch for one TMM initialization call.
+#' Resolve the active geometric branch for one TMM initialization call.
 #' @noRd
 .tmm_branch_flags <- function(shape_parameters, boundary = NULL) {
   # Validate the supported geometry and identify the active backend ============
@@ -187,13 +190,16 @@
   )
 }
 
-# Validate the public TMM boundary labels after applying the class default.
+#' Validate the public TMM boundary labels after applying the class default.
 #' @noRd
 .tmm_resolve_boundary <- function(object, boundary) {
   # Apply the class-specific default boundary and validate the final label =====
   boundary <- .tmm_boundary_default(object, boundary)
   if (methods::is(object, "ESS")) {
-    shape_name <- as.character(acousticTS::extract(object, "shape_parameters")[["shape"]])[1]
+    shape_name <- as.character(acousticTS::extract(
+      object,
+      "shape_parameters"
+    )[["shape"]])[1]
     if (identical(shape_name, "Sphere") &&
       boundary %in% c(
         "shelled_pressure_release",
@@ -222,7 +228,7 @@
   boundary
 }
 
-# Validate the retained-block storage flag for one TMM initialization call.
+#' Validate the retained-block storage flag for one TMM initialization call.
 #' @noRd
 .tmm_validate_store_t_matrix <- function(store_t_matrix) {
   # Require an explicit scalar logical storage flag ============================
@@ -234,7 +240,7 @@
   invisible(TRUE)
 }
 
-# Disable unsupported spherical truncation overrides on the spheroidal branch.
+#' Disable unsupported spherical truncation overrides on the spheroidal branch.
 #' @noRd
 .tmm_branch_n_max <- function(n_max, use_spheroidal_branch) {
   # Ignore `n_max` on the prolate spheroidal branch ============================
@@ -249,7 +255,7 @@
   n_max
 }
 
-# Validate the interior material properties required for penetrable TMM runs.
+#' Validate the interior material properties required for penetrable TMM runs.
 #' @noRd
 .tmm_validate_penetrable_body <- function(body, boundary) {
   # Require scalar density and sound speed for penetrable targets ==============
@@ -265,7 +271,7 @@
   invisible(TRUE)
 }
 
-# Resolve the homogeneous interior properties used by the TMM initializer.
+#' Resolve the homogeneous interior properties used by the TMM initializer.
 #' @noRd
 .tmm_prepare_body <- function(object, sound_speed_sw, density_sw, boundary) {
   shape_parameters <- acousticTS::extract(object, "shape_parameters")
@@ -374,7 +380,7 @@
   body
 }
 
-# Build the prolate-spheroidal geometry scalars used by the TMM backend.
+#' Build the prolate-spheroidal geometry scalars used by the TMM backend.
 #' @noRd
 .tmm_spheroidal_geometry <- function(shape_parameters) {
   # Convert the stored prolate geometry to spheroidal coordinates =============
@@ -386,7 +392,7 @@
   list(xi = xi, q = q)
 }
 
-# Build the common acoustics table shared by all TMM branches.
+#' Build the common acoustics table shared by all TMM branches.
 #' @noRd
 .tmm_base_acoustics <- function(frequency, sound_speed_sw, body, boundary) {
   # Initialize the exterior and optional interior wavenumber columns ===========
@@ -400,7 +406,7 @@
   acoustics
 }
 
-# Attach the spheroidal reduced-frequency bookkeeping to the acoustics table.
+#' Attach the spheroidal reduced-frequency bookkeeping to the acoustics table.
 #' @noRd
 .tmm_add_spheroidal_acoustics <- function(acoustics, boundary, geometry) {
   # Add reduced frequencies and spheroidal truncation heuristics ==============
@@ -416,7 +422,7 @@
   acoustics
 }
 
-# Apply the branch-specific truncation rules to the TMM acoustics table.
+#' Apply the branch-specific truncation rules to the TMM acoustics table.
 #' @noRd
 .tmm_assign_branch_n_max <- function(acoustics,
                                      n_max,
@@ -451,7 +457,7 @@
   acoustics
 }
 
-# Build the branch-specific acoustics table and optional spheroidal geometry.
+#' Build the branch-specific acoustics table and optional spheroidal geometry.
 #' @noRd
 .tmm_prepare_acoustics <- function(frequency,
                                    sound_speed_sw,
@@ -470,7 +476,12 @@
       frequency,
       k_sw = sound_speed_sw,
       k_shell = body$shell_sound_speed,
-      k_fluid = if (is.finite(body$fluid_sound_speed)) body$fluid_sound_speed else NA_real_
+      k_fluid = if (
+        is.finite(body$fluid_sound_speed)) {
+        body$fluid_sound_speed
+      } else {
+        NA_real_
+      }
     )
     acoustics$m_limit <- .sphms_m_limit(
       m_limit = n_max,
@@ -519,7 +530,7 @@
   list(acoustics = acoustics, geometry = geometry)
 }
 
-# Build the stored body metadata used by the TMM runtime helpers.
+#' Build the stored body metadata used by the TMM runtime helpers.
 #' @noRd
 .tmm_body_parameters <- function(body, geometry) {
   # Start from the common body-fixed incident and material properties ==========
@@ -557,7 +568,7 @@
   body_params
 }
 
-# Resolve the coordinate-system label stored with the initialized TMM object.
+#' Resolve the coordinate-system label stored with the initialized TMM object.
 #' @noRd
 .tmm_coordinate_system <- function(use_spheroidal_branch,
                                    use_cylindrical_branch,
@@ -576,18 +587,20 @@
   "spherical"
 }
 
-# Resolve the stored precision label for one initialized TMM object.
+#' Resolve the stored precision label for one initialized TMM object.
 #' @noRd
 .tmm_precision_label <- function(use_spheroidal_branch, boundary) {
   # Penetrable spheroidal runs use the quad-precision backend =================
-  if (use_spheroidal_branch && boundary %in% c("liquid_filled", "gas_filled")) {
+  if (use_spheroidal_branch &&
+    boundary %in% c("liquid_filled", "gas_filled") &&
+    .quad_precision_available()) {
     return("quad")
   }
 
   "double"
 }
 
-# Resolve the stored quadrature-node count for the spheroidal TMM branch.
+#' Resolve the stored quadrature-node count for the spheroidal TMM branch.
 #' @noRd
 .tmm_n_integration_label <- function(use_spheroidal_branch, boundary) {
   # Only penetrable spheroidal runs currently keep an explicit quadrature count
@@ -598,7 +611,7 @@
   NA_integer_
 }
 
-# Return the outer size scale used in the default spherical truncation rule.
+#' Return the outer size scale used in the default spherical truncation rule.
 #' @noRd
 .tmm_bounding_radius <- function(shape_parameters) {
   switch(shape_parameters$shape,
@@ -612,8 +625,8 @@
   )
 }
 
-# Apply conservative hard overrides for slender prolates when a spherical-wave
-# truncation is still needed.
+#' Apply conservative hard overrides for slender prolates when a spherical-wave
+#' truncation is still needed.
 #' @noRd
 .tmm_prolate_nmax_override <- function(shape_parameters, boundary) {
   if (shape_parameters$shape != "ProlateSpheroid") {
@@ -637,9 +650,9 @@
   )
 }
 
-# Cylinders are the least smooth geometry currently handled by the
-# spherical-coordinate branch, so they benefit from a more conservative modal
-# floor than the generic bounding-sphere rule at low and moderate ka.
+#' Cylinders are the least smooth geometry currently handled by the
+#' spherical-coordinate branch, so they benefit from a more conservative modal
+#' floor than the generic bounding-sphere rule at low and moderate ka.
 #' @noRd
 .tmm_cylinder_nmax_floor <- function(shape_parameters, boundary) {
   if (shape_parameters$shape != "Cylinder") {
@@ -655,8 +668,8 @@
   )
 }
 
-# Default truncation based on the exterior size parameter, with geometry-
-# specific overrides when they are known to behave better.
+#' Default truncation based on the exterior size parameter, with geometry-
+#' specific overrides when they are known to behave better.
 #' @noRd
 .tmm_default_n_max <- function(k_sw, shape_parameters, boundary) {
   n_override <- .tmm_prolate_nmax_override(shape_parameters, boundary)
@@ -673,7 +686,7 @@
   n_default
 }
 
-# Normalize `n_max` into a per-frequency integer vector.
+#' Normalize `n_max` into a per-frequency integer vector.
 #' @noRd
 .tmm_prepare_n_max <- function(
   n_max, frequency, k_sw, shape_parameters, boundary
@@ -702,10 +715,13 @@
   as.integer(n_max)
 }
 
-# Cylinder monostatic TMM uses the same modal truncation rule as FCMS so that
-# the cylindrical-coordinate backend remains benchmark-compatible by default.
+#' Cylinder monostatic TMM uses the same modal truncation rule as FCMS so that
+#' the cylindrical-coordinate backend remains benchmark-compatible by default.
 #' @noRd
-.tmm_prepare_cylinder_n_max <- function(n_max, frequency, k_sw, shape_parameters) {
+.tmm_prepare_cylinder_n_max <- function(
+  n_max, frequency, k_sw,
+  shape_parameters
+) {
   if (is.null(n_max)) {
     return(as.integer(ceiling(k_sw * max(as.numeric(shape_parameters$radius),
       na.rm = TRUE
@@ -732,7 +748,7 @@
   as.integer(n_max)
 }
 
-# Shared collocation-node rule for the spherical-coordinate branch.
+#' Shared collocation-node rule for the spherical-coordinate branch.
 #' @noRd
 .tmm_collocation_nodes <- function(shape_parameters, boundary, n_terms) {
   if (identical(shape_parameters$shape, "Cylinder") &&
@@ -743,8 +759,8 @@
   max(64L, 4L * n_terms)
 }
 
-# Flatten the supported shape parameters into the compact numeric vector passed
-# into the compiled spherical backend.
+#' Flatten the supported shape parameters into the compact numeric vector passed
+#' into the compiled spherical backend.
 #' @noRd
 .tmm_shape_values <- function(shape_parameters) {
   switch(shape_parameters$shape,
@@ -765,9 +781,9 @@
   )
 }
 
-# Evaluate the exact finite-cylinder modal coefficients inside the TMM cylinder
-# branch so that the default monostatic cylinder response shares the same
-# geometry-matched backend as FCMS.
+#' Evaluate the exact finite-cylinder modal coefficients inside the TMM cylinder
+#' branch so that the default monostatic cylinder response shares the same
+#' geometry-matched backend as FCMS.
 #' @noRd
 .tmm_run_cylindrical_branch <- function(shape_parameters,
                                         acoustics,
@@ -819,10 +835,10 @@
   )
 }
 
-# Build one lightweight retained-state placeholder for the cylindrical branch.
-# The current cylindrical TMM post-processing reuses the exact-family modal
-# formulas directly rather than a dense stored matrix, so the retained state is
-# just enough to mark that this frequency was solved in the cylindrical family.
+#' Build one lightweight retained-state placeholder for the cylindrical branch.
+#' The current cylindrical TMM post-processing reuses the exact-family modal
+#' formulas directly rather than a dense stored matrix, so the retained state is
+#' just enough to mark that this frequency was solved in the cylindrical family.
 #' @noRd
 .tmm_store_cylindrical_branch <- function(acoustics) {
   lapply(

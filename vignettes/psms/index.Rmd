@@ -41,14 +41,20 @@ acousticTS:::.model_family_overview(
     "retained boundary system [@Spence_1951; @Furusawa_1988]."
   ),
   best_for = c(
-    "Fixed-rigid, pressure-release, liquid-filled, or gas-filled prolate spheroids",
+    paste(
+      "Fixed-rigid, pressure-release, liquid-filled, or gas-filled prolate",
+      "spheroids"
+    ),
     "Canonical elongated-body benchmarks",
     "Reference comparisons for the prolate branch of `TMM`"
   ),
   supports = c(
     "`ProlateSpheroid` shapes carried by `FLS` or `GAS` scatterers",
     "Broadside and oblique monostatic calculations with explicit roll angle",
-    "Configurable truncation, integration, adaptive evaluation, and numerical precision"
+    paste(
+      "Configurable truncation, integration, adaptive evaluation, and",
+      "numerical precision"
+    )
   ),
   assumptions = c(
     "An exact prolate-spheroidal outer boundary",
@@ -57,8 +63,14 @@ acousticTS:::.model_family_overview(
     "No shell, secondary component, or arbitrary body profile"
   ),
   reading = c(
-    "[Implementation](psms-implementation.html): supported branches, numerical controls, output, and benchmarks",
-    "[Theory](psms-theory.html): spheroidal coordinates, wave functions, and boundary systems"
+    paste(
+      "[Implementation](psms-implementation.html): supported branches,",
+      "numerical controls, output, and benchmarks"
+    ),
+    paste(
+      "[Theory](psms-theory.html): spheroidal coordinates, wave functions,",
+      "and boundary systems"
+    )
   )
 )
 ```

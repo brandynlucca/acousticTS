@@ -5,8 +5,15 @@
 \alias{Arbitrary}
 \alias{Arbitrary-class}
 \title{Arbitrary body shape}
+\value{
+An object of the \code{Arbitrary} S4 class.
+}
 \description{
 Arbitrary body shape
+}
+\examples{
+methods::getClass("Arbitrary")
+
 }
 \seealso{
 \code{\link{Shape}}

@@ -53,15 +53,18 @@
 #'
 #' @references
 #' Anderson, V.C. (1950). Sound scattering from a fluid sphere. The Journal of
-#' The Acoustical Society of America, 22: 426–431.
+#' The Acoustical Society of America, 22: 426-431.
+#'
+#' @return No value; this help topic documents the SPHMS model.
+#' @examples
+#' subset(available_models(), model == "sphms")
 #'
 #' @name SPHMS
 #' @aliases sphms SPHMS
-#' @docType data
 #' @keywords models acoustics internal
 NULL
 
-# Validate that the current SPHMS implementation is only used for spheres.
+#' Validate that the current SPHMS implementation is only used for spheres.
 #' @noRd
 .sphms_validate_shape <- function(scatterer_shape) {
   # Restrict the modal-series initializer to spherical shapes ==================
@@ -76,7 +79,7 @@ NULL
   invisible(TRUE)
 }
 
-# Resolve the default SPHMS boundary from the scatterer class.
+#' Resolve the default SPHMS boundary from the scatterer class.
 #' @noRd
 .sphms_default_boundary <- function(object, boundary) {
   # Keep the explicit boundary when the caller already supplied one ============
@@ -86,7 +89,9 @@ NULL
 
   # Otherwise infer the appropriate sphere boundary from the scatterer class ===
   if (methods::is(object, "CAL")) {
-    stop("Use 'model = \"calibration\"' when modeling the TS of a solid sphere.")
+    stop(
+      "Use 'model = \"calibration\"' when modeling the TS of a solid sphere."
+    )
   }
   if (methods::is(object, "ESS")) {
     return("shelled_liquid")
@@ -105,7 +110,8 @@ NULL
   )
 }
 
-# Validate that the resolved SPHMS boundary is compatible with the object class.
+#' Validate that the resolved SPHMS boundary is compatible with the object
+#' class.
 #' @noRd
 .sphms_validate_boundary <- function(object, boundary) {
   # Accept the supported public sphere boundary labels =========================
@@ -147,7 +153,7 @@ NULL
   )
 }
 
-# Resolve the internal Bm formulation associated with one SPHMS boundary.
+#' Resolve the internal Bm formulation associated with one SPHMS boundary.
 #' @noRd
 .sphms_Bm_method <- function(boundary) {
   # Map the public boundary labels onto the internal series-kernel names =======
@@ -162,7 +168,7 @@ NULL
   )
 }
 
-# Resolve the exterior shell/body layer used to define the SPHMS interfaces.
+#' Resolve the exterior shell/body layer used to define the SPHMS interfaces.
 #' @noRd
 .sphms_exterior_layer <- function(object) {
   # ESS objects use the shell as the exterior interface; other classes use body
@@ -173,9 +179,12 @@ NULL
   acousticTS::extract(object, "body")
 }
 
-# Build the interface property ratios used by the SPHMS kernels.
+#' Build the interface property ratios used by the SPHMS kernels.
 #' @noRd
-.sphms_body_parameters <- function(object, exterior, sound_speed_sw, density_sw) {
+.sphms_body_parameters <- function(
+  object, exterior, sound_speed_sw,
+  density_sw
+) {
   # Resolve the shell/body to surrounding-medium property ratios ===============
   g_exterior <- exterior$g %||%
     if (!is.null(exterior$density)) exterior$density / density_sw else NA_real_
@@ -211,7 +220,10 @@ NULL
   } else {
     exterior$h %||% NA_real_
   }
-  g32 <- if (!is.null(fluid$density)) fluid$density / (g21 * density_sw) else if (!is.null(fluid$g)) fluid$g / g21 else NA_real_
+  g32 <- if (!is.null(fluid$density)) {
+    fluid$density / (g21 *
+      density_sw)
+  } else if (!is.null(fluid$g)) fluid$g / g21 else NA_real_
   h32 <- if (!is.null(fluid$sound_speed)) {
     fluid$sound_speed / (h21 * sound_speed_sw)
   } else if (!is.null(fluid$h)) {
@@ -242,7 +254,7 @@ NULL
   )
 }
 
-# Build the acoustics table used by the SPHMS initializer.
+#' Build the acoustics table used by the SPHMS initializer.
 #' @noRd
 .sphms_acoustics <- function(frequency, sound_speed_sw, body_params) {
   # Initialize the exterior, shell, and interior wavenumber columns ============
@@ -257,7 +269,7 @@ NULL
   acoustics
 }
 
-# Resolve the modal truncation limit used by the SPHMS solver.
+#' Resolve the modal truncation limit used by the SPHMS solver.
 #' @noRd
 .sphms_m_limit <- function(m_limit, acoustics, body_params) {
   # Preserve an explicit modal cutoff when one was supplied ====================
@@ -381,13 +393,14 @@ SPHMS <- function(object) {
   object
 }
 
-# Common modal weights used by the spherical backscatter series.
+#' Common modal weights used by the spherical backscatter series.
 #' @noRd
 .sphms_modal_weights <- function(m_limit) {
   m_seq <- 0:max(m_limit)
   (2 * m_seq + 1) * (-1)^m_seq
 }
 
+#' Calculate SPHMS modal coefficients for a boundary condition
 #' @noRd
 .sphms_modal_coefficients <- function(k1a,
                                       k2a,
@@ -436,6 +449,7 @@ SPHMS <- function(object) {
   )
 }
 
+#' Calculate fixed-rigid SPHMS modal coefficients
 #' @noRd
 .sphms_am_rigid <- function(k1a, m_limit) {
   .modal_series_apply(
@@ -447,6 +461,7 @@ SPHMS <- function(object) {
   )
 }
 
+#' Calculate pressure-release SPHMS modal coefficients
 #' @noRd
 .sphms_am_prelease <- function(k1a, m_limit) {
   .modal_series_apply(
@@ -458,6 +473,7 @@ SPHMS <- function(object) {
   )
 }
 
+#' Calculate fluid-filled SPHMS modal coefficients
 #' @noRd
 .sphms_am_fluid <- function(k1a, k3a, g31, h31, m_limit) {
   # Get material properties product ===========================================
@@ -485,6 +501,7 @@ SPHMS <- function(object) {
   -1 / (1 + 1i * cm)
 }
 
+#' Calculate shelled pressure-release SPHMS modal coefficients
 #' @noRd
 .sphms_am_shelled_prelease <- function(k1a, k2a, k2b, g21, h21, m_limit) {
   target_length <- max(m_limit) + 1L
@@ -520,6 +537,7 @@ SPHMS <- function(object) {
   Am
 }
 
+#' Calculate shelled fluid-filled SPHMS modal coefficients
 #' @noRd
 .sphms_am_shelled_fluid <- function(
   k1a, k2a, k2b, k3b, g21, g31, g32, h21, h31, h32, m_limit
@@ -571,21 +589,27 @@ SPHMS <- function(object) {
   Am
 }
 
-#' Helper function for fixed rigid sphere
+#' Sum modal coefficients for a fixed-rigid sphere
 #' @keywords internal
 #' @noRd
 .sphms_bm_rigid <- function(k1a, m_limit) {
-  .modal_weighted_sum(.sphms_am_rigid(k1a, m_limit), .sphms_modal_weights(m_limit))
+  .modal_weighted_sum(
+    .sphms_am_rigid(k1a, m_limit),
+    .sphms_modal_weights(m_limit)
+  )
 }
 
-#' Helper function for pressure release sphere
+#' Sum modal coefficients for a pressure-release sphere
 #' @keywords internal
 #' @noRd
 .sphms_bm_prelease <- function(k1a, m_limit) {
-  .modal_weighted_sum(.sphms_am_prelease(k1a, m_limit), .sphms_modal_weights(m_limit))
+  .modal_weighted_sum(
+    .sphms_am_prelease(k1a, m_limit),
+    .sphms_modal_weights(m_limit)
+  )
 }
 
-#' Helper function for fluid sphere
+#' Sum modal coefficients for a fluid sphere
 #' @keywords internal
 #' @noRd
 .sphms_bm_fluid <- function(k1a, k3a, g31, h31, m_limit) {
@@ -595,7 +619,7 @@ SPHMS <- function(object) {
   )
 }
 
-#' Helper function for shelled pressure release sphere
+#' Sum modal coefficients for a shelled pressure-release sphere
 #' @keywords internal
 #' @noRd
 .sphms_bm_shelled_prelease <- function(k1a, k2a, k2b, g21, h21, m_limit) {
@@ -605,7 +629,7 @@ SPHMS <- function(object) {
   )
 }
 
-#' Helper function for shelled fluid sphere
+#' Sum modal coefficients for a shelled fluid sphere
 #' @keywords internal
 #' @noRd
 .sphms_bm_shelled_fluid <- function(

@@ -5,7 +5,7 @@
 #'
 #' @description
 #' Computes the far-field acoustic scattering amplitude and derived quantities
-#' for fish and similar elongated scatterers using the Kirchhoff–Ray Mode (KRM)
+#' for fish and similar elongated scatterers using the Kirchhoff-Ray Mode (KRM)
 #' approximation described by Clay and Horne (1994). The KRM model is widely
 #' used in fisheries acoustics for estimating target strength, particularly
 #' for fish with gas-filled swimbladders.
@@ -267,11 +267,13 @@
 #' (<i>Gadus morhua</i>). The Journal of the Acoustical Society of America, 96:
 #' 1661-1668.
 #'
+#' @return No value; this help topic documents the KRM model.
+#' @examples
+#' subset(available_models(), model == "krm")
+#'
 #' @name KRM
 #' @aliases krm KRM
-#' @docType data
 #' @keywords models acoustics internal
-#' @export
 NULL
 
 #' Initialize SBF-class object for KRM calculations.
@@ -345,6 +347,8 @@ krm_initialize <- function(object,
   )
 }
 ################################################################################
+#' Initialize KRM parameters for a fluid-like scatterer
+#' @noRd
 .krm_initialize_fls <- function(body,
                                 shape,
                                 model_params,
@@ -377,6 +381,8 @@ krm_initialize <- function(object,
 }
 
 ################################################################################
+#' Initialize KRM parameters for a swimbladdered fish
+#' @noRd
 .krm_initialize_sbf <- function(object,
                                 body,
                                 shape,
@@ -427,6 +433,8 @@ krm_initialize <- function(object,
 }
 
 ################################################################################
+#' Resolve settings for the selected KRM formulation
+#' @noRd
 .krm_variant_settings <- function(krm_variant = c(
                                     "lowcontrast",
                                     "mixed",
@@ -467,6 +475,8 @@ krm_initialize <- function(object,
   )
 }
 ################################################################################
+#' Prepare swimbladder geometry for KRM
+#' @noRd
 .krm_bladder_geometry <- function(rpos, theta) {
   # Parse bladder coordinate vectors ===========================================
   x <- rpos[1, ]
@@ -519,6 +529,8 @@ krm_initialize <- function(object,
   )
 }
 ################################################################################
+#' Calculate the low-mode KRM coefficient
+#' @noRd
 .krm_low_mode_b0 <- function(k_medium, k_bladder, a_eq, g13, h13) {
   # Combine acoustic size terms for exterior and bladder media =================
   k2a <- outer(k_medium, a_eq)
@@ -542,6 +554,8 @@ krm_initialize <- function(object,
 }
 
 ################################################################################
+#' Resolve body positions used by KRM
+#' @noRd
 .krm_body_rpos <- function(body, scatterer_type) {
   # Rebuild the body profile according to the active scatterer class ===========
   switch(scatterer_type,
@@ -561,6 +575,8 @@ krm_initialize <- function(object,
 }
 
 ################################################################################
+#' Calculate the KRM body-scattering term
+#' @noRd
 .krm_body_term <- function(model, body, scatterer_type) {
   # Recover the canonical body profile and local body radius ===================
   rpos <- .krm_body_rpos(body, scatterer_type)
@@ -622,6 +638,8 @@ krm_initialize <- function(object,
 }
 
 ################################################################################
+#' Resolve medium properties for the selected KRM formulation
+#' @noRd
 .krm_variant_media <- function(model, krm_variant) {
   # Fall back to the default low-contrast convention when unspecified ==========
   if (is.null(krm_variant)) {
@@ -654,6 +672,8 @@ krm_initialize <- function(object,
 }
 
 ################################################################################
+#' Calculate the high-frequency KRM swimbladder term
+#' @noRd
 .krm_swimbladder_high_term <- function(model,
                                        bladder,
                                        bladder_geom,
@@ -708,6 +728,8 @@ krm_initialize <- function(object,
 }
 
 ################################################################################
+#' Calculate the low-frequency KRM swimbladder term
+#' @noRd
 .krm_swimbladder_low_term <- function(model,
                                       bladder,
                                       bladder_geom,
@@ -753,6 +775,8 @@ krm_initialize <- function(object,
 }
 
 ################################################################################
+#' Select and calculate the KRM swimbladder term
+#' @noRd
 .krm_swimbladder_term <- function(model, body, bladder, krm_variant) {
   # Resolve the medium convention and interface properties =====================
   media <- .krm_variant_media(model, krm_variant)
@@ -784,6 +808,8 @@ krm_initialize <- function(object,
 }
 
 ################################################################################
+#' Combine the KRM body and swimbladder terms
+#' @noRd
 .krm_combine_terms <- function(f_body, f_bladder = NULL) {
   # Return the fluid-body-only outputs when no bladder term is present =========
   if (is.null(f_bladder)) {

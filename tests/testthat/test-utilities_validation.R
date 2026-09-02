@@ -25,94 +25,103 @@ test_that("general utilities resolve scalar and complex helpers correctly", {
   expect_equal(acousticTS:::`%R%`(5), 5)
 })
 
-test_that("simulation parameter resolver handles batch, function, scalar, and vector inputs", {
-  simulation_grid <- data.frame(alpha_idx = c(1, 2, 1))
-  batch_values <- list(alpha = c(10, 20))
+test_that(
+  paste0(
+    "simulation parameter resolver handles batch, function, scalar, and ",
+    "vector inputs"
+  ),
+  {
+    simulation_grid <- data.frame(alpha_idx = c(1, 2, 1))
+    batch_values <- list(alpha = c(10, 20))
 
-  expect_equal(
-    acousticTS:::.resolve_param_value(
-      param_name = "alpha",
-      param_value = 999,
-      batch_by = "alpha",
-      batch_values = batch_values,
-      grid_size = 3,
-      simulation_grid = simulation_grid
-    ),
-    c(10, 20, 10)
-  )
+    expect_equal(
+      acousticTS:::.resolve_param_value(
+        param_name = "alpha",
+        param_value = 999,
+        batch_by = "alpha",
+        batch_values = batch_values,
+        grid_size = 3,
+        simulation_grid = simulation_grid
+      ),
+      c(10, 20, 10)
+    )
 
-  expect_equal(
-    acousticTS:::.resolve_param_value(
-      param_name = "beta",
-      param_value = function() 7,
-      batch_by = NULL,
-      batch_values = list(),
-      grid_size = 4,
-      simulation_grid = data.frame()
-    ),
-    rep(7, 4)
-  )
+    expect_equal(
+      acousticTS:::.resolve_param_value(
+        param_name = "beta",
+        param_value = function() 7,
+        batch_by = NULL,
+        batch_values = list(),
+        grid_size = 4,
+        simulation_grid = data.frame()
+      ),
+      rep(7, 4)
+    )
 
-  structured_scalar <- acousticTS:::.resolve_param_value(
-    param_name = "beta_target",
-    param_value = c(length = 0.02),
-    batch_by = NULL,
-    batch_values = list(),
-    grid_size = 3,
-    simulation_grid = data.frame()
-  )
-  expect_true(is.list(structured_scalar))
-  expect_equal(structured_scalar[[1]], c(length = 0.02))
-  expect_equal(structured_scalar[[3]], c(length = 0.02))
-
-  structured_draws <- acousticTS:::.resolve_param_value(
-    param_name = "gamma_target",
-    param_value = function() c(length = 0.03),
-    batch_by = NULL,
-    batch_values = list(),
-    grid_size = 2,
-    simulation_grid = data.frame()
-  )
-  expect_true(is.list(structured_draws))
-  expect_equal(structured_draws[[1]], c(length = 0.03))
-  expect_equal(structured_draws[[2]], c(length = 0.03))
-
-  expect_equal(
-    acousticTS:::.resolve_param_value(
-      param_name = "gamma",
-      param_value = 3,
-      batch_by = NULL,
-      batch_values = list(),
-      grid_size = 4,
-      simulation_grid = data.frame()
-    ),
-    rep(3, 4)
-  )
-
-  expect_equal(
-    acousticTS:::.resolve_param_value(
-      param_name = "delta",
-      param_value = c(1, 2, 3),
+    structured_scalar <- acousticTS:::.resolve_param_value(
+      param_name = "beta_target",
+      param_value = c(length = 0.02),
       batch_by = NULL,
       batch_values = list(),
       grid_size = 3,
       simulation_grid = data.frame()
-    ),
-    c(1, 2, 3)
-  )
+    )
+    expect_true(is.list(structured_scalar))
+    expect_equal(structured_scalar[[1]], c(length = 0.02))
+    expect_equal(structured_scalar[[3]], c(length = 0.02))
 
-  expect_error(
-    acousticTS:::.resolve_param_value(
-      param_name = "epsilon",
-      param_value = c(1, 2),
+    structured_draws <- acousticTS:::.resolve_param_value(
+      param_name = "gamma_target",
+      param_value = function() c(length = 0.03),
       batch_by = NULL,
       batch_values = list(),
-      grid_size = 3,
+      grid_size = 2,
       simulation_grid = data.frame()
-    ),
-    "Length of parameter 'epsilon' \\[2\\] does not match number of realizations \\[3\\]."
-  )
-})
+    )
+    expect_true(is.list(structured_draws))
+    expect_equal(structured_draws[[1]], c(length = 0.03))
+    expect_equal(structured_draws[[2]], c(length = 0.03))
+
+    expect_equal(
+      acousticTS:::.resolve_param_value(
+        param_name = "gamma",
+        param_value = 3,
+        batch_by = NULL,
+        batch_values = list(),
+        grid_size = 4,
+        simulation_grid = data.frame()
+      ),
+      rep(3, 4)
+    )
+
+    expect_equal(
+      acousticTS:::.resolve_param_value(
+        param_name = "delta",
+        param_value = c(1, 2, 3),
+        batch_by = NULL,
+        batch_values = list(),
+        grid_size = 3,
+        simulation_grid = data.frame()
+      ),
+      c(1, 2, 3)
+    )
+
+    expect_error(
+      acousticTS:::.resolve_param_value(
+        param_name = "epsilon",
+        param_value = c(1, 2),
+        batch_by = NULL,
+        batch_values = list(),
+        grid_size = 3,
+        simulation_grid = data.frame()
+      ),
+      paste0(
+        "Length of parameter 'epsilon' \\[2\\] does not match number of ",
+        "realizations \\[3\\]."
+      )
+    )
+  }
+)
 
 test_that("simulation batch-value normalizer preserves structured candidates", {
   expect_equal(
@@ -145,9 +154,18 @@ test_that("extract walks nested list, matrix, and vector paths", {
     )
   )
 
-  expect_equal(acousticTS::extract(obj, c("model", "helper", "mat", "r1")), c(c1 = 1, c2 = 3))
-  expect_equal(acousticTS::extract(obj, c("model", "helper", "mat", "c2")), c(r1 = 3, r2 = 4))
-  expect_equal(acousticTS::extract(obj, c("model", "helper", "vec", "beta")), c(beta = 20))
+  expect_equal(
+    acousticTS::extract(obj, c("model", "helper", "mat", "r1")),
+    c(c1 = 1, c2 = 3)
+  )
+  expect_equal(
+    acousticTS::extract(obj, c("model", "helper", "mat", "c2")),
+    c(r1 = 3, r2 = 4)
+  )
+  expect_equal(
+    acousticTS::extract(obj, c("model", "helper", "vec", "beta")),
+    c(beta = 20)
+  )
 
   expect_error(
     acousticTS::extract(obj, c("model", "helper", "missing")),
@@ -182,11 +200,17 @@ test_that("validation helpers enforce expected argument contracts", {
     "'body_target' must be numeric."
   )
   expect_error(
-    acousticTS:::.validate_dimensions_target(c(1, 2), "body_target", valid_dims),
+    acousticTS:::.validate_dimensions_target(
+      c(1, 2), "body_target",
+      valid_dims
+    ),
     "'body_target' must either be a scalar or a named vector"
   )
   expect_error(
-    acousticTS:::.validate_dimensions_target(c(depth = 2), "body_target", valid_dims),
+    acousticTS:::.validate_dimensions_target(
+      c(depth = 2), "body_target",
+      valid_dims
+    ),
     "'body_target' has one or more invalid dimensions: 'depth'."
   )
 
@@ -228,7 +252,10 @@ test_that("validation helpers enforce expected argument contracts", {
       isometry = TRUE,
       iso_name = "isometric_body"
     ),
-    "'body_scale' contains more than 1 dimension while 'isometric_body' is TRUE."
+    paste0(
+      "'body_scale' contains more than 1 dimension while 'isometric_body' is ",
+      "TRUE."
+    )
   )
   expect_error(
     acousticTS:::.validate_dimension_scaling(

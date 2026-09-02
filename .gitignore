@@ -29,6 +29,8 @@ Rplots.pdf
 renv/library
 scratch/
 src/*.dll
+src/Makevars
+src/Makevars.win
 src/*.mod
 src/*.o
 tests/testthat/Rplots.pdf

@@ -63,7 +63,7 @@ $$
 Here $R_2$ is the outer radius of the viscous layer, $R_3$ is the outer radius
 of the elastic shell, and $R_4$ is the radius of the gas core.
 
-![Layered spherical bookkeeping for the viscous-elastic model.](vesm-layered-sphere-schematic.png)
+<!-- ![Layered spherical bookkeeping for the viscous-elastic model.](vesm-layered-sphere-schematic.svg) -->
 
 The model therefore contains three interfaces:
 

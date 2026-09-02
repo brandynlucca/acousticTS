@@ -136,7 +136,10 @@
 
   # Return the manipulated geometry summary ==================================
   list(
-    length = .shape_length(position_matrix = position_matrix, row_major = row_major),
+    length = .shape_length(
+      position_matrix = position_matrix, row_major =
+        row_major
+    ),
     n_segments = .shape_segment_count(position_matrix, row_major = row_major),
     radius_profile = radius_profile,
     max_radius = if (is.null(radius_profile)) {
@@ -274,11 +277,12 @@
 
     summary <- .shape_manipulation_summary(position_matrix, info$storage)
     methods::slot(object, "position_matrix") <- position_matrix
-    methods::slot(object, "shape_parameters") <- .update_manipulated_shape_params(
-      methods::slot(object, "shape_parameters"),
-      summary,
-      force_arbitrary = FALSE
-    )
+    methods::slot(object, "shape_parameters") <-
+      .update_manipulated_shape_params(
+        methods::slot(object, "shape_parameters"),
+        summary,
+        force_arbitrary = FALSE
+      )
     return(object)
   }
 
@@ -287,8 +291,10 @@
   summary <- .shape_manipulation_summary(position_matrix, info$storage)
   component_value$rpos <- position_matrix
 
-  if ("radius" %in% names(component_value) && !is.null(summary$radius_profile)) {
-    if (length(component_value$radius) > 1 || all(is.na(component_value$radius))) {
+  if ("radius" %in% names(component_value) &&
+    !is.null(summary$radius_profile)) {
+    if (length(component_value$radius) > 1 ||
+      all(is.na(component_value$radius))) {
       component_value$radius <- summary$radius_profile
     } else {
       component_value$radius <- summary$max_radius
@@ -465,7 +471,10 @@
   # Warn when no lateral centerline is stored ================================
   if (!has_y && !isTRUE(all.equal(y_offset, 0))) {
     warning(
-      "This geometry does not store an explicit lateral centerline; 'y_offset' ",
+      paste0(
+        "This geometry does not store an explicit lateral centerline; ",
+        "'y_offset' "
+      ),
       "was ignored.",
       call. = FALSE
     )
@@ -588,7 +597,10 @@
       if (length(x_idx) > 0) {
         non_x <- setdiff(non_x, x_idx)
       }
-      flipped[non_x, ] <- flipped[non_x, rev(seq_len(ncol(flipped))), drop = FALSE]
+      flipped[non_x, ] <- flipped[non_x, rev(seq_len(ncol(flipped))),
+        drop =
+          FALSE
+      ]
       return(flipped)
     }
 
@@ -623,7 +635,10 @@
     if (length(x_idx) > 0) {
       non_x <- setdiff(non_x, x_idx[1])
     }
-    flipped[, non_x] <- flipped[rev(seq_len(nrow(flipped))), non_x, drop = FALSE]
+    flipped[, non_x] <- flipped[rev(seq_len(nrow(flipped))), non_x,
+      drop =
+        FALSE
+    ]
     return(flipped)
   }
 
@@ -692,7 +707,10 @@
     x_range <- range(x, na.rm = TRUE)
   }
   if (!is.numeric(x_range) || length(x_range) != 2) {
-    stop("'x_range' must be NULL or a numeric vector of length two.", call. = FALSE)
+    stop("'x_range' must be NULL or a numeric vector of length two.",
+      call. =
+        FALSE
+    )
   }
 
   # Validate the finite axial interval ========================================
@@ -775,7 +793,8 @@
       scaled[width_idx, ] <- scaled[width_idx, ] * factors
     }
 
-    if (axis %in% c("radius", "height") && length(zU_idx) > 0 && length(zL_idx) > 0) {
+    if (axis %in% c("radius", "height") && length(zU_idx) > 0 &&
+      length(zL_idx) > 0) {
       center <- .reforge_profile_centerline(fields)
       half_height <- .reforge_profile_half_height(fields) * factors
       scaled[zU_idx, ] <- center + half_height
@@ -825,7 +844,8 @@
     scaled[, width_idx[1]] <- scaled[, width_idx[1]] * factors
   }
 
-  if (axis %in% c("radius", "height") && length(zU_idx) > 0 && length(zL_idx) > 0) {
+  if (axis %in% c("radius", "height") && length(zU_idx) > 0 &&
+    length(zL_idx) > 0) {
     center <- if (length(z_idx) > 0) {
       scaled[, z_idx[1]]
     } else {
@@ -1041,7 +1061,10 @@
 #' @return The modified object, returned as the same broad object type.
 #'
 #' @examples
-#' shape_obj <- cylinder(length_body = 0.05, radius_body = 0.003, n_segments = 40)
+#' shape_obj <- cylinder(
+#'   length_body = 0.05, radius_body = 0.003,
+#'   n_segments = 40
+#' )
 #' moved_shape <- translate_shape(shape_obj, x_offset = 0.01)
 #' range(extract(moved_shape, c("position_matrix", "x")))
 #'
@@ -1099,7 +1122,10 @@ translate_shape <- function(object,
 #' @keywords shape manipulator
 #' @export
 reanchor_shape <- function(object,
-                           anchor = c("nose", "center", "tail", "max_x", "min_x"),
+                           anchor = c(
+                             "nose", "center", "tail", "max_x",
+                             "min_x"
+                           ),
                            at = 0,
                            component = NULL,
                            containment = c("warn", "error", "ignore")) {
@@ -1155,7 +1181,11 @@ reanchor_shape <- function(object,
 #'   sound_speed_body = 1500,
 #'   sound_speed_bladder = 340
 #' )
-#' shifted_fish <- offset_component(fish, component = "bladder", x_offset = 0.003)
+#' shifted_fish <- offset_component(
+#'   fish,
+#'   component = "bladder",
+#'   x_offset = 0.003
+#' )
 #' min(extract(shifted_fish, c("bladder", "rpos", "x_bladder")))
 #'
 #' @seealso [translate_shape()], [reanchor_shape()], [reforge()]
@@ -1205,7 +1235,10 @@ offset_component <- function(object,
 #'   returned as `Arbitrary` shapes.
 #'
 #' @examples
-#' shape_obj <- cylinder(length_body = 0.05, radius_body = 0.003, n_segments = 80)
+#' shape_obj <- cylinder(
+#'   length_body = 0.05, radius_body = 0.003,
+#'   n_segments = 80
+#' )
 #' pinched_shape <- inflate_shape(
 #'   shape_obj,
 #'   x_range = c(0.015, 0.035),

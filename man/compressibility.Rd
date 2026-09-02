@@ -2,7 +2,7 @@
 % Please edit documentation in R/acoustics.R
 \name{compressibility}
 \alias{compressibility}
-\title{Calculate she compressibility (\eqn{\kappa}) of a scattering
+\title{Calculate the compressibility (\eqn{\kappa}) of a scattering
 boundary/interface.}
 \usage{
 compressibility(medium, target)
@@ -34,4 +34,9 @@ The compressibility contrast is then:
 
 where \eqn{K_1} is the compressibility of the medium and \eqn{K_2} is that
 of the target interface.
+}
+\examples{
+seawater <- data.frame(density = 1026, sound_speed = 1480)
+animal <- data.frame(density = 1050, sound_speed = 1530)
+compressibility(seawater, animal)
 }

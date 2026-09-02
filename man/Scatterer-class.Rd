@@ -5,6 +5,9 @@
 \alias{Scatterer}
 \alias{Scatterer-class}
 \title{Scatterer-class object for target strength estimation}
+\value{
+An object from the \code{Scatterer} S4 class hierarchy.
+}
 \description{
 The \code{acousticTS} package uses a variety of defined S4-class objects
 comprising different types of scatterers, such as fish with gas-filled
@@ -95,4 +98,8 @@ or more models in the linear domain (i.e.
 }
 }
 
+\examples{
+methods::getClass("Scatterer")
+
+}
 \keyword{scatterer_type}

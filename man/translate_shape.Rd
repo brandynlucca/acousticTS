@@ -39,7 +39,10 @@ profiles, aligning a stored body to a preferred axial origin, or nudging an
 internal component before model comparisons.
 }
 \examples{
-shape_obj <- cylinder(length_body = 0.05, radius_body = 0.003, n_segments = 40)
+shape_obj <- cylinder(
+  length_body = 0.05, radius_body = 0.003,
+  n_segments = 40
+)
 moved_shape <- translate_shape(shape_obj, x_offset = 0.01)
 range(extract(moved_shape, c("position_matrix", "x")))
 

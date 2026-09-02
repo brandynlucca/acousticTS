@@ -47,7 +47,11 @@ fish <- sbf_generate(
   sound_speed_body = 1500,
   sound_speed_bladder = 340
 )
-shifted_fish <- offset_component(fish, component = "bladder", x_offset = 0.003)
+shifted_fish <- offset_component(
+  fish,
+  component = "bladder",
+  x_offset = 0.003
+)
 min(extract(shifted_fish, c("bladder", "rpos", "x_bladder")))
 
 }

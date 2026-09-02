@@ -31,7 +31,10 @@ test_that("validation registry tables cover every documented family", {
   expect_equal(nrow(status_table), nrow(meta))
   expect_setequal(status_table$Family, meta$display)
   expect_true(all(c("Family", "Status") %in% names(status_table)))
-  expect_true(all(c("Family", "Evidence type", "Source", "Scope", "Summary") %in% names(evidence_table)))
+  expect_true(all(c(
+    "Family", "Evidence type", "Source", "Scope",
+    "Summary"
+  ) %in% names(evidence_table)))
 })
 
 test_that("family status metadata stays aligned with evidence rows", {
@@ -52,7 +55,10 @@ test_that("family status metadata stays aligned with evidence rows", {
     if (identical(meta_row$validation_status[[1]], "validated")) {
       expect_true(any(evidence$evidence_type == "validated"))
       expect_false(any(evidence$evidence_type == "partially_validated"))
-    } else if (identical(meta_row$validation_status[[1]], "partially_validated")) {
+    } else if (identical(
+      meta_row$validation_status[[1]],
+      "partially_validated"
+    )) {
       expect_true(any(evidence$evidence_type == "partially_validated"))
     } else {
       expect_false(any(validation_rows))
@@ -85,7 +91,10 @@ test_that("validation registry helper branches reject invalid inputs cleanly", {
 
   meta <- acousticTS:::.validation_family_meta("tmm")
   expect_equal(meta$validation_status[[1]], "partially_validated")
-  expect_true(any(grepl("validated", acousticTS:::.validation_family_validation("tmm"))))
+  expect_true(any(grepl(
+    "validated",
+    acousticTS:::.validation_family_validation("tmm")
+  )))
   policy <- as.character(acousticTS:::.validation_status_policy())
   expect_match(policy, "<ul>", fixed = TRUE)
   expect_match(policy, "Benchmarked", fixed = TRUE)
@@ -109,10 +118,14 @@ test_that("validation registry helper branches reject invalid inputs cleanly", {
     "Composite, layered, and transition-matrix families",
     fixed = TRUE
   )
-  expect_equal(acousticTS:::.validation_family_meta("calibration")$display[[1]], "SOEMS")
+  calibration_meta <- acousticTS:::.validation_family_meta("calibration")
+  expect_equal(calibration_meta$display[[1]], "SOEMS")
   expect_equal(
     acousticTS:::.validation_family_validation("essms"),
-    "The package does not yet claim external validation across the current public scope."
+    paste0(
+      "The package does not yet claim external validation across the current ",
+      "public scope."
+    )
   )
 })
 
@@ -129,7 +142,10 @@ test_that("validation badge tooltips come from registry summaries", {
   )
   expect_identical(
     essms_tooltip,
-    "The package does not yet claim external validation across the current public scope."
+    paste0(
+      "The package does not yet claim external validation across the current ",
+      "public scope."
+    )
   )
 
   badge <- acousticTS:::.validation_status_badge(
