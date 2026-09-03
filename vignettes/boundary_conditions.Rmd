@@ -18,6 +18,21 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
 ---
 
+```{r article-links, include=FALSE}
+article_root <- paste0(
+  "https://brandynlucca.github.io/acousticTS/",
+  "articles/"
+)
+notation_url <- paste0(
+  article_root,
+  "notation-and-symbols/notation-and-symbols.html"
+)
+primer_url <- paste0(
+  article_root,
+  "acoustic-scattering-primer/acoustic-scattering-primer.html"
+)
+```
+
 # Introduction
 
 Boundary conditions turn the governing wave equations into a particular
@@ -36,9 +51,9 @@ See [Notation and Symbols][n] and the
 [Acoustic Scattering Primer][p].
 
 [n]:
-  https://brandynlucca.github.io/acousticTS/articles/notation-and-symbols/
+  `r notation_url`
 [p]:
-  https://brandynlucca.github.io/acousticTS/articles/acoustic-scattering-primer/
+  `r primer_url`
 :::
 
 # Shared interface notation
