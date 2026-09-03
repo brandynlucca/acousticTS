@@ -1,5 +1,10 @@
 # Changelog
 
+## acousticTS 2.0.4
+
+- Replace invalid relative links in the installed boundary-conditions
+  vignette.
+
 ## acousticTS 2.0.3
 
 - Submission to CRAN

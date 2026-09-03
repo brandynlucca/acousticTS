@@ -15,9 +15,9 @@ problem, but neither field generally satisfies the boundary condition
 alone ([Colton and Kress 2013](#ref-Colton_2013)).
 
 See [Notation and
-Symbols](https://brandynlucca.github.io/acousticTS/articles/notation-and-symbols/notation-and-symbols.md)
+Symbols](https://brandynlucca.github.io/acousticTS/articles/notation-and-symbols/notation-and-symbols.html)
 and the [Acoustic Scattering
-Primer](https://brandynlucca.github.io/acousticTS/articles/acoustic-scattering-primer/acoustic-scattering-primer.md).
+Primer](https://brandynlucca.github.io/acousticTS/articles/acoustic-scattering-primer/acoustic-scattering-primer.html).
 
 ## Shared interface notation
 
