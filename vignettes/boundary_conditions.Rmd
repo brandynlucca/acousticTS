@@ -32,8 +32,13 @@ incident and scattered fields are separated to solve the exterior problem, but
 neither field generally satisfies the boundary condition alone [@Colton_2013].
 
 ::: {.note data-title="Notation"}
-See [Notation and Symbols](notation-and-symbols/notation-and-symbols.html) and
-the [Acoustic Scattering Primer](acoustic-scattering-primer/acoustic-scattering-primer.html).
+See [Notation and Symbols][n] and the
+[Acoustic Scattering Primer][p].
+
+[n]:
+  https://brandynlucca.github.io/acousticTS/articles/notation-and-symbols/
+[p]:
+  https://brandynlucca.github.io/acousticTS/articles/acoustic-scattering-primer/
 :::
 
 # Shared interface notation

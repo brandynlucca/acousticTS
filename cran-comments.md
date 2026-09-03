@@ -1,3 +1,11 @@
+## Resubmission
+
+This is a resubmission. In this version I have:
+
+* Replaced the two relative links in the installed boundary-conditions
+  vignette with absolute pkgdown URLs, resolving the invalid file URI note
+  reported by CRAN.
+
 ## R CMD check results
 
 0 errors | 0 warnings | 1 note
