@@ -1,7 +1,5 @@
 ## Resubmission
 
-## Resubmission
-
 This is a resubmission (version 2.0.5) addressing the latest review feedback:
 
 * Removed the `\dontrun{}` wrapper from the short `plot(krill)` example. Removed
