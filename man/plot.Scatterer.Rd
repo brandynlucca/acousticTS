@@ -63,10 +63,8 @@ values therefore depend on what has been stored on the object. For example,
 \code{type = "scattering"} currently applies only to stored \code{TMM} results.
 }
 \examples{
-\dontrun{
 data("krill", package = "acousticTS")
 plot(krill)
-}
 
 }
 \seealso{

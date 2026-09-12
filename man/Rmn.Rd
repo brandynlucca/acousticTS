@@ -32,7 +32,8 @@ arithmetic. Fastest and  sufficient for most applications.}
 \item{\code{"quad"}}{Uses quadruple-precision (128-bit) arithmetic for
 higher numerical  accuracy in challenging parameter regimes (e.g., large
 \eqn{m}, \eqn{n}, \eqn{c}, or near  singularities). Computation is
-significantly slower.}
+significantly slower and requires a package build with native quad
+precision support.}
 }}
 }
 \value{
@@ -119,11 +120,6 @@ Rmn(m = 1, n = 1, c = 2, xi = 1.2, kind = 4)
 
 # Double precision (default)
 Rmn(m = 2, n = 3, c = 1, xi = 1.5)
-
-# Quad precision, when supported by the package build
-\dontrun{
-Rmn(m = 2, n = 3, c = 1, xi = 1.5, precision = "quad")
-}
 
 }
 \references{

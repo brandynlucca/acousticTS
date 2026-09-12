@@ -36,10 +36,8 @@
 #'   invisibly.
 #'
 #' @examples
-#' \dontrun{
 #' data("krill", package = "acousticTS")
 #' plot(krill)
-#' }
 #'
 #' @details
 #' Plotting behavior is selected from the object's class. The supported `type`

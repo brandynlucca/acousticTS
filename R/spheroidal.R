@@ -64,7 +64,7 @@
 #'     \item{\code{"quad"}}{Uses quadruple-precision (128-bit) arithmetic for
 #'     higher numerical  accuracy in challenging parameter regimes (e.g., large
 #'     \eqn{m}, \eqn{n}, or near  singularities). Computation is significantly
-#'     slower.}
+#'     slower and requires a package build with native quad precision support.}
 #'   }
 
 #' @return A list containing:
@@ -87,11 +87,6 @@
 #'
 #' # Double precision (default)
 #' Smn(m = 2, n = 3, c = 1, eta = 0.5, precision = "double")
-#'
-#' # Quad precision, when supported by the package build
-#' \dontrun{
-#' Smn(m = 2, n = 3, c = 1, eta = 0.5, precision = "quad")
-#' }
 #'
 #' @references
 #' Van Buren, A. L. and Boisvert, J. E. "Prolate Spheroidal Wave Functions."
@@ -215,7 +210,8 @@ Smn <- function(m, n, c, eta, normalize = FALSE, precision = "double") {
 #'     \item{\code{"quad"}}{Uses quadruple-precision (128-bit) arithmetic for
 #'     higher numerical  accuracy in challenging parameter regimes (e.g., large
 #'     \eqn{m}, \eqn{n}, \eqn{c}, or near  singularities). Computation is
-#'     significantly slower.}
+#'     significantly slower and requires a package build with native quad
+#'     precision support.}
 #'   }
 
 #' @return A list containing:
@@ -242,11 +238,6 @@ Smn <- function(m, n, c, eta, normalize = FALSE, precision = "double") {
 #'
 #' # Double precision (default)
 #' Rmn(m = 2, n = 3, c = 1, xi = 1.5)
-#'
-#' # Quad precision, when supported by the package build
-#' \dontrun{
-#' Rmn(m = 2, n = 3, c = 1, xi = 1.5, precision = "quad")
-#' }
 #'
 #' @references
 #' Van Buren, A. L. and Boisvert, J. E. "Prolate Spheroidal Wave Functions."
