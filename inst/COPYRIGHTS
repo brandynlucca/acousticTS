@@ -5,7 +5,10 @@ code from the prolate_swf project:
   https://github.com/MathieuandSpheroidalWaveFunctions/prolate_swf
 
 That upstream code was developed by Arnie Lee Van Buren and Jeffrey E.
-Boisvert and is distributed under the following license.
+Boisvert and is distributed under the following license. It has been
+substantially modified for acousticTS by Brandyn Lucca. The upstream
+authors did not participate directly in development of the R package;
+their Authors@R entries identify the origin of the adapted code.
 
 MIT License
 
