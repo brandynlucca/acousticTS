@@ -1,3 +1,12 @@
+# acousticTS 2.0.5
+
+* Unwrap the short plotting example and remove optional quad precision examples
+  that require build-specific support, retaining runnable double precision examples.
+* Credit the authors of adapted upstream prolate_swf code in Authors@R, with
+  comments distinguishing upstream authorship from package development.
+* Simplify the license declaration to GPL-3 and remove the redundant top-level
+  LICENSE file, preserving upstream copyright and MIT license notices.
+
 # acousticTS 2.0.4
 
 * Replace invalid relative links in the installed boundary-conditions vignette.

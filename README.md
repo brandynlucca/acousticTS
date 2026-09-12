@@ -6,7 +6,7 @@
 [![R-CMD-check](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml)
 [![Codecov](https://codecov.io/gh/brandynlucca/acousticTS/graph/badge.svg?branch=main)](https://app.codecov.io/gh/brandynlucca/acousticTS?branch=main)
 [![License:
-GPL-3](https://img.shields.io/badge/license-GPL--3-blue.svg)](LICENSE)
+GPL-3](https://img.shields.io/badge/license-GPL--3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
 
 `acousticTS` estimates the acoustic target strength of aquatic
 organisms, calibration spheres, and other individual scatterers with
@@ -161,4 +161,6 @@ Issues](https://github.com/brandynlucca/acousticTS/issues). Please
 include a minimal reproducible example and `sessionInfo()` when
 reporting a problem.
 
-`acousticTS` is licensed under GPL-3. See [LICENSE](LICENSE).
+`acousticTS` is licensed under [GPL-3](https://www.gnu.org/licenses/gpl-3.0.html).
+Upstream code attribution and license notices are provided in
+[inst/COPYRIGHTS](inst/COPYRIGHTS).
