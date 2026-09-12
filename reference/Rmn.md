@@ -60,7 +60,8 @@ Rmn(m, n, c, xi, kind = 1, precision = "double")
   :   Uses quadruple-precision (128-bit) arithmetic for higher numerical
       accuracy in challenging parameter regimes (e.g., large \\m\\,
       \\n\\, \\c\\, or near singularities). Computation is significantly
-      slower.
+      slower and requires a package build with native quad precision
+      support.
 
 ## Value
 
@@ -192,9 +193,4 @@ Rmn(m = 2, n = 3, c = 1, xi = 1.5)
 #> $derivative
 #> [1] 0.04735489
 #> 
-
-# Quad precision, when supported by the package build
-if (FALSE) { # \dontrun{
-Rmn(m = 2, n = 3, c = 1, xi = 1.5, precision = "quad")
-} # }
 ```

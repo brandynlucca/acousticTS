@@ -56,8 +56,8 @@ Smn(m, n, c, eta, normalize = FALSE, precision = "double")
 
   :   Uses quadruple-precision (128-bit) arithmetic for higher numerical
       accuracy in challenging parameter regimes (e.g., large \\m\\,
-      \\n\\, or near singularities). Computation is significantly
-      slower.
+      \\n\\, or near singularities). Computation is significantly slower
+      and requires a package build with native quad precision support.
 
 ## Value
 
@@ -187,9 +187,4 @@ Smn(m = 2, n = 3, c = 1, eta = 0.5, precision = "double")
 #> $derivative
 #> [1] 3.454326
 #> 
-
-# Quad precision, when supported by the package build
-if (FALSE) { # \dontrun{
-Smn(m = 2, n = 3, c = 1, eta = 0.5, precision = "quad")
-} # }
 ```

@@ -96,8 +96,7 @@ model output, and `type = "scattering"` currently applies only to stored
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
 data("krill", package = "acousticTS")
 plot(krill)
-} # }
+
 ```
