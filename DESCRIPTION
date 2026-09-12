@@ -1,9 +1,15 @@
 Package: acousticTS
 Title: Physics-Based Models for Acoustic Target Strength
-Version: 2.0.4
-Authors@R: 
+Version: 2.0.5
+Authors@R: c(
     person("Brandyn", "Lucca", , "brandyn.lucca@gmail.com", role = c("aut", "cre", "cph"),
-           comment = c(ORCID = "0000-0003-3145-2969"))
+           comment = c(ORCID = "0000-0003-3145-2969")),
+    person("Arnie Lee", "Van Buren", role = c("ctb", "cph"),
+           comment = paste("Author and copyright holder of upstream prolate_swf",
+                           "code adapted for this package")),
+    person("Jeffrey E.", "Boisvert", role = "ctb",
+           comment = "Coauthor of upstream prolate_swf code adapted for this package")
+    )
 Copyright: See file inst/COPYRIGHTS.
 Description: Acoustic target strength (TS) represents the intensity of an
     echo returning from an individual scatterer such as bubbles, fish, or
@@ -20,7 +26,7 @@ Description: Acoustic target strength (TS) represents the intensity of an
     Applications are described by Lucca et al. (2023)
     <doi:10.1121/10.0022459>, with fisheries-acoustics principles from
     Simmonds and MacLennan (2005) <doi:10.1002/9780470995303>.
-License: GPL-3 | file LICENSE
+License: GPL-3
 URL: https://brandynlucca.github.io/acousticTS/,
     https://doi.org/10.5281/zenodo.7600659
 BugReports: https://github.com/brandynlucca/acousticTS/issues
