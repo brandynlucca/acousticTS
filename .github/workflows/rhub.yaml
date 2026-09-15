@@ -144,8 +144,7 @@ jobs:
             '  value = 0.0_c_double' \
             'end program flang_intrinsic_probe' \
             > "$probe_source"
-          "$required_fc" -Wall -Wno-unused-command-line-argument \
-            -fintrinsic-modules-path="$intrinsic_module_dir" \
+          "$required_fc" -fintrinsic-modules-path="$intrinsic_module_dir" \
             -c "$probe_source" -o "$probe_object"
 
           printf 'PKG_FFLAGS=-fintrinsic-modules-path=%s%s\n' \
