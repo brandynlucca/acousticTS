@@ -103,24 +103,54 @@ jobs:
             exit 0
           fi
 
-          echo "SDKROOT=$(xcrun --sdk macosx --show-sdk-path)" >> "$GITHUB_ENV"
+          SDKROOT="$(xcrun --sdk macosx --show-sdk-path)"
+          export SDKROOT
+          echo "SDKROOT=$SDKROOT" >> "$GITHUB_ENV"
 
-          if [[ -x "$required_fc" ]]; then
-            exit 0
+          if [[ ! -x "$required_fc" ]]; then
+            archive="$RUNNER_TEMP/flang-23.1.0-darwin23.tar.xz"
+            curl --fail --location --silent --show-error \
+              "$FLANG_ARCHIVE_URL" --output "$archive"
+
+            actual_sha256="$(shasum -a 256 "$archive" | awk '{ print $1 }')"
+            if [[ "$actual_sha256" != "$FLANG_ARCHIVE_SHA256" ]]; then
+              echo "Unexpected SHA-256 for $FLANG_ARCHIVE_URL" >&2
+              exit 1
+            fi
+
+            sudo tar -xJf "$archive" -C /
           fi
 
-          archive="$RUNNER_TEMP/flang-23.1.0-darwin23.tar.xz"
-          curl --fail --location --silent --show-error \
-            "$FLANG_ARCHIVE_URL" --output "$archive"
+          test -x "$required_fc"
 
-          actual_sha256="$(shasum -a 256 "$archive" | awk '{ print $1 }')"
-          if [[ "$actual_sha256" != "$FLANG_ARCHIVE_SHA256" ]]; then
-            echo "Unexpected SHA-256 for $FLANG_ARCHIVE_URL" >&2
+          resource_dir="$("$required_fc" -print-resource-dir)"
+          shopt -s nullglob
+          intrinsic_modules=(
+            "$resource_dir"/finclude/flang/*/iso_c_binding.mod
+          )
+          if [[ "${#intrinsic_modules[@]}" -ne 1 ]]; then
+            echo "Unable to locate Flang's intrinsic modules" >&2
             exit 1
           fi
 
-          sudo tar -xJf "$archive" -C /
-          test -x "$required_fc"
+          intrinsic_module_dir="${intrinsic_modules[0]%/*}"
+
+          probe_source="$RUNNER_TEMP/flang-intrinsic-probe.f90"
+          probe_object="$RUNNER_TEMP/flang-intrinsic-probe.o"
+          printf '%s\n' \
+            'program flang_intrinsic_probe' \
+            '  use, intrinsic :: iso_c_binding, only: c_double' \
+            '  real(c_double) :: value' \
+            '  value = 0.0_c_double' \
+            'end program flang_intrinsic_probe' \
+            > "$probe_source"
+          "$required_fc" -Wall -Wno-unused-command-line-argument \
+            -fintrinsic-modules-path="$intrinsic_module_dir" \
+            -c "$probe_source" -o "$probe_object"
+
+          printf 'PKG_FFLAGS=-fintrinsic-modules-path=%s%s\n' \
+            "$intrinsic_module_dir" "${PKG_FFLAGS:+ $PKG_FFLAGS}" \
+            >> "$GITHUB_ENV"
       - uses: r-hub/actions/platform-info@v1
         with:
           token: ${{ secrets.RHUB_TOKEN }}
