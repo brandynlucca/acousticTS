@@ -23,7 +23,6 @@ jobs:
             --root-dir "${{ github.workspace }}"
             --verbose
             --no-progress
-            --exclude-mail
             './**/*.md'
             './**/*.Rmd'
             './**/*.html'
