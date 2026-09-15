@@ -87,6 +87,40 @@ jobs:
         with:
           job-config: ${{ matrix.config.job-config }}
           token: ${{ secrets.RHUB_TOKEN }}
+      # ARM64 R-devel switched to this experimental compiler on 2026-09-04,
+      # but setup-r does not yet install the runtime named by R's Makeconf.
+      - name: Provision the Fortran toolchain required by macOS ARM R-devel
+        if: ${{ runner.os == 'macOS' && runner.arch == 'ARM64' }}
+        shell: bash
+        env:
+          FLANG_ARCHIVE_URL: https://mac.r-project.org/tools/flang-23.1.0-darwin23.tar.xz
+          FLANG_ARCHIVE_SHA256: ba81557faeb53c2d6a6b2d6711cb12b48d194eb64379c113ce4a0c0f8fcb5242
+        run: |
+          set -euo pipefail
+
+          required_fc="$(R CMD config FC | awk '{ print $1 }')"
+          if [[ "$required_fc" != "/opt/R/flang-23/bin/flang" ]]; then
+            exit 0
+          fi
+
+          echo "SDKROOT=$(xcrun --sdk macosx --show-sdk-path)" >> "$GITHUB_ENV"
+
+          if [[ -x "$required_fc" ]]; then
+            exit 0
+          fi
+
+          archive="$RUNNER_TEMP/flang-23.1.0-darwin23.tar.xz"
+          curl --fail --location --silent --show-error \
+            "$FLANG_ARCHIVE_URL" --output "$archive"
+
+          actual_sha256="$(shasum -a 256 "$archive" | awk '{ print $1 }')"
+          if [[ "$actual_sha256" != "$FLANG_ARCHIVE_SHA256" ]]; then
+            echo "Unexpected SHA-256 for $FLANG_ARCHIVE_URL" >&2
+            exit 1
+          fi
+
+          sudo tar -xJf "$archive" -C /
+          test -x "$required_fc"
       - uses: r-hub/actions/platform-info@v1
         with:
           token: ${{ secrets.RHUB_TOKEN }}
