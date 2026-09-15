@@ -14,7 +14,8 @@ else
 fi
 
 FC=${FC:-$("$r_command" CMD config FC)}
-FFLAGS=${FFLAGS:-$("$r_command" CMD config FFLAGS)}
+FCFLAGS=${FCFLAGS:-$("$r_command" CMD config FCFLAGS)}
+PKG_FFLAGS=${PKG_FFLAGS:-}
 CXX17=${CXX17:-$("$r_command" CMD config CXX17)}
 CXX17STD=${CXX17STD:-$("$r_command" CMD config CXX17STD)}
 CXX17FLAGS=${CXX17FLAGS:-$("$r_command" CMD config CXX17FLAGS)}
@@ -48,11 +49,12 @@ EOF
 printf '%s' 'checking whether the Fortran compiler needs unused-argument suppression... '
 if (
     cd "$configure_tmp"
-    eval "$FC $FFLAGS -c conftest_heap.f90 -o conftest_diagnostic.o" \
+    eval "$FC $PKG_FFLAGS $FCFLAGS \
+        -c conftest_heap.f90 -o conftest_diagnostic.o" \
         >diagnostic.log 2>&1 &&
     grep "argument unused during compilation: '-Wall'" diagnostic.log \
         >/dev/null 2>&1 &&
-    eval "$FC $FFLAGS -Wno-unused-command-line-argument \
+    eval "$FC $PKG_FFLAGS $FCFLAGS -Wno-unused-command-line-argument \
         -c conftest_heap.f90 -o conftest_diagnostic.o" \
         >diagnostic-suppressed.log 2>&1 &&
     ! grep "argument unused during compilation: '-Wall'" \
@@ -71,7 +73,8 @@ fi
 printf '%s' 'checking whether the Fortran compiler supports heap arrays... '
 if (
     cd "$configure_tmp"
-    eval "$FC $FFLAGS -heap-arrays -c conftest_heap.f90 -o conftest_heap.o" \
+    eval "$FC $PKG_FFLAGS $FCFLAGS -heap-arrays \
+        -c conftest_heap.f90 -o conftest_heap.o" \
         >heap-arrays.log 2>&1
 ); then
     fc_heap_flags=-heap-arrays
@@ -109,8 +112,10 @@ EOF
 printf '%s' 'checking for a compatible native binary128 C++/Fortran backend... '
 if test "${ACOUSTICTS_DISABLE_QUAD:-0}" != 1 && (
     cd "$configure_tmp"
-    eval "$FC $FFLAGS $fc_heap_flags -cpp -c param_quad.f90 -o param_quad.o" >fortran.log 2>&1
-    eval "$FC $FFLAGS $fc_heap_flags $fc_prolate_flags -cpp -DUSE_QUAD \
+    eval "$FC $PKG_FFLAGS $FCFLAGS $fc_heap_flags \
+        -cpp -c param_quad.f90 -o param_quad.o" >fortran.log 2>&1
+    eval "$FC $PKG_FFLAGS $FCFLAGS $fc_heap_flags $fc_prolate_flags \
+        -cpp -DUSE_QUAD \
         -c prolate_swf.f90 -o prolate_swf_quad.o" >>fortran.log 2>&1
     eval "$CXX17 $CXX17STD $CXX17FLAGS -c conftest.cpp -o conftest.o" >cxx.log 2>&1
 ); then
