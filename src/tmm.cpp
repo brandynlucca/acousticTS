@@ -5,6 +5,7 @@
 #include <complex>
 #include <cmath>
 #include "bessel_helpers.h"
+#include "svd_solve.h"
 
 using namespace Rcpp;
 
@@ -441,10 +442,9 @@ static arma::cx_mat tmm_solve_spherical_block_cpp(const TmmSphericalBlockSetup& 
         ok = arma::solve(solution, lhs_proj, rhs_proj);
     }
     if (!ok || !solution.is_finite()) {
-        solution = arma::pinv(lhs_proj) * rhs_proj;
-        ok = solution.is_finite();
+        ok = acousticts_svd_solve(solution, lhs_proj, rhs_proj);
     }
-    if (!solution.is_finite()) {
+    if (!ok || !solution.is_finite()) {
         stop("TMM was unable to solve the projected boundary system.");
     }
 

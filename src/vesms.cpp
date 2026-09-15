@@ -3,6 +3,7 @@
 #include <cmath>
 #include <complex>
 #include "bessel_helpers.h"
+#include "svd_solve.h"
 
 using namespace Rcpp;
 
@@ -10,8 +11,8 @@ static const double vesms_pi = M_PI;
 static const std::complex<double> vesms_i(0.0, 1.0);
 
 // Solve one dense modal boundary system. Try the fast direct solver first,
-// then the full Armadillo solve, and finally fall back to a pseudoinverse if
-// the matrix is close to singular.
+// then the full Armadillo solve, and finally fall back to an SVD least-squares
+// solve if the matrix is close to singular.
 static arma::cx_vec vesms_solve_system_impl(const arma::cx_mat& M, const arma::cx_vec& F) {
     arma::cx_vec sol;
 
@@ -25,9 +26,7 @@ static arma::cx_vec vesms_solve_system_impl(const arma::cx_mat& M, const arma::c
         return sol;
     }
 
-    arma::cx_mat pinv_M = arma::pinv(M);
-    sol = pinv_M * F;
-    if (sol.is_finite()) {
+    if (acousticts_svd_solve(sol, M, F)) {
         return sol;
     }
 
