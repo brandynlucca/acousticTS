@@ -1,5 +1,7 @@
-# acousticTS 2.0.5
+# acousticTS 2.0.6
 
+* Accommodate the experimental LLVM Flang 23 R-devel toolchains, including
+  their compiler diagnostics and target-specific intrinsic-module location.
 * Unwrap the short plotting example and remove optional quad precision examples
   that require build-specific support, retaining runnable double precision examples.
 * Credit the authors of adapted upstream prolate_swf code in Authors@R, with

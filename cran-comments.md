@@ -1,6 +1,6 @@
 ## Resubmission
 
-This is a resubmission (version 2.0.5) addressing the latest review feedback:
+This is a resubmission (version 2.0.6) addressing the latest review feedback:
 
 * Removed the `\dontrun{}` wrapper from the short `plot(krill)` example. Removed
   the two optional quad precision examples, which depend on native support
@@ -16,15 +16,63 @@ This is a resubmission (version 2.0.5) addressing the latest review feedback:
 * Simplified License to GPL-3 and removed the redundant top-level `LICENSE`
   file. The package's GPL-3 licensing is unchanged, and the upstream MIT
   license notice is retained in `inst/COPYRIGHTS`.
+* Added a compiler-capability check for LLVM Flang builds that diagnose R's global `-Wall` setting as an unused command-line argument. When that exact behavior is detected, the generated package Makevars applies the supported diagnostic-suppression flag to the package's Fortran compilation only.
+
+The words reported as possibly misspelled by the CRAN incoming check are correctly spelled author surnames (Lucca, MacLennan, and Simmonds), Latin citation terms (et al.), and accepted fisheries-acoustics terminology (backscatter and scatterer).
 
 The previous correction replacing two relative links in the installed
 boundary-conditions vignette with absolute pkgdown URLs is retained.
 
 ## Validation for this resubmission
 
-Local checks of version 2.0.5 are in progress. Results will be recorded here
-when complete. The environments and results below refer to the previous
-submission and have not yet been rerun for version 2.0.5.
+0 errors | 0 warnings | 0 notes
+
+* Local Windows 11 x64 (R 4.5.2), from the source tarball with vignettes   enabled (`R CMD check --no-manual`).
+* Local WSL (Ubuntu 26.04 LTS, R 4.5.2)
+* Remote RStudio Server (Linux x86_64, R 4.5.2)
+* Google Cloud Workstation (Linux container environment, R 4.5.2)
+* GitHub Actions CI
+    * ubuntu-latest (release)
+    * ubuntu-clang (release)
+    * ubuntu-latest (oldrel-1)
+    * ubuntu-latest (no-suggests)
+    * ubuntu-latest (devel)
+    * macos-latest (release)
+    * windows-latest (release)
+* R-hub v2:
+    * atlas
+    * c23
+    * clang16
+    * clang17
+    * clang18
+    * clang19
+    * clang20
+    * clang21
+    * clang22    
+    * clang-asan
+    * clang-ubsan
+    * donttest
+    * gcc-asan
+    * gcc13
+    * gcc14
+    * gcc15
+    * gcc16
+    * intel
+    * linux (R-devel)
+    * lto
+    * m1-san (R-devel)
+    * macos (R-devel)
+    * macos-arm64 (R-devel)
+    * mkl
+    * nold
+    * noremap
+    * ubuntu-clang
+    * ubuntu-gcc12
+    * ubuntu-next
+    * ubuntu-release
+    * valgrind   
+    * vnu
+    * windows (R-devel)   
 
 ## Previous submission: R CMD check results
 
