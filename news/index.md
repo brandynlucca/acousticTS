@@ -2,6 +2,8 @@
 
 ## acousticTS 2.0.6
 
+CRAN release: 2026-09-26
+
 - Accommodate the experimental LLVM Flang 23 R-devel toolchains,
   including their compiler diagnostics and target-specific
   intrinsic-module location.
