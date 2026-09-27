@@ -110,7 +110,8 @@
 <img src="logo.png" class="logo" alt=""><h1 id="acousticts-">acousticTS <a class="anchor" aria-label="anchor" href="#acousticts-"></a>
 </h1>
 </div>
-<p><a href="https://doi.org/10.5281/zenodo.7600659" class="external-link"><img src="https://img.shields.io/badge/DOI-10.5281%2Fzenodo.7600659-blue.svg" alt="DOI"></a> <a href="https://brandynlucca.github.io/acousticTS/"><img src="https://img.shields.io/badge/documentation-latest-blue" alt="Documentation"></a> <a href="https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a> <a href="https://app.codecov.io/gh/brandynlucca/acousticTS?branch=main" class="external-link"><img src="https://codecov.io/gh/brandynlucca/acousticTS/graph/badge.svg?branch=main" alt="Codecov"></a> <a href="https://www.gnu.org/licenses/gpl-3.0.html" class="external-link"><img src="https://img.shields.io/badge/license-GPL--3-blue.svg" alt="License: GPL-3"></a></p>
+<p><img src="https://www.r-pkg.org/badges/version/acousticTS" alt="CRAN Version"><img src="https://img.shields.io/github/v/release/brandynlucca/acousticTS?label=GitHub" alt="GitHub Version"><a href="https://doi.org/10.5281/zenodo.7600659" class="external-link"><img src="https://img.shields.io/badge/DOI-10.5281%2Fzenodo.7600659-blue.svg" alt="DOI"></a></p>
+<p><a href="https://brandynlucca.github.io/acousticTS/"><img src="https://img.shields.io/badge/documentation-latest-blue?label=Package%20documentation" alt="Documentation"></a> <a href="https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a> <a href="https://app.codecov.io/gh/brandynlucca/acousticTS?branch=main" class="external-link"><img src="https://codecov.io/gh/brandynlucca/acousticTS/graph/badge.svg?branch=main" alt="Codecov"></a> <a href="https://www.gnu.org/licenses/gpl-3.0.html" class="external-link"><img src="https://img.shields.io/badge/license-GPL--3-blue.svg" alt="License: GPL-3"></a></p>
 <p><code>acousticTS</code> estimates the acoustic target strength of aquatic organisms, calibration spheres, and other individual scatterers with physics-based models. It provides one interface for defining geometry and material properties, running compatible scattering models, and comparing results across frequency, orientation, and morphology.</p>
 <div class="section level2">
 <h2 id="package-workflow">Package workflow<a class="anchor" aria-label="anchor" href="#package-workflow"></a>
@@ -122,13 +123,13 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>Install the current GitHub version without building the full documentation site:</p>
+<p>Install the latest version on <code>CRAN</code>:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"acousticTS"</span><span class="op">)</span></span></code></pre></div>
+<p>Or install the latest developments from the current GitHub version:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span></span>
-<span>  <span class="st">"brandynlucca/acousticTS"</span>,</span>
-<span>  build_vignettes <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"brandynlucca/acousticTS"</span><span class="op">)</span></span></code></pre></div>
 <blockquote>
 <p><strong>Installation note:</strong> <code>acousticTS</code> contains C++17 and Fortran source code. Windows users need the version of <a href="https://cran.r-project.org/bin/windows/Rtools/" class="external-link">Rtools</a> matching their R installation. macOS users need the Xcode Command Line Tools and a compatible GNU Fortran compiler. Linux users need a C++17 compiler, <code>make</code>, and <code>gfortran</code>. See <a href="https://brandynlucca.github.io/acousticTS/articles/faq-troubleshooting/faq-troubleshooting.html">Troubleshooting</a> if compilation fails.</p>
 </blockquote>
@@ -137,7 +138,7 @@
 <h2 id="quick-start">Quick start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
 </h2>
 <p>Build a shape, attach its acoustic properties, and run a model:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://brandynlucca.github.io/acousticTS/">acousticTS</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 1. Build a geometric Shape</span></span>
@@ -182,7 +183,7 @@
 <h2 id="example-data">Example data<a class="anchor" aria-label="anchor" href="#example-data"></a>
 </h2>
 <p>The package includes ready-to-use biological targets and benchmark results:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">krill</span>, package <span class="op">=</span> <span class="st">"acousticTS"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">cod</span>, package <span class="op">=</span> <span class="st">"acousticTS"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">sardine</span>, package <span class="op">=</span> <span class="st">"acousticTS"</span><span class="op">)</span></span>
@@ -207,7 +208,7 @@
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
 </h2>
 <p>To cite <code>acousticTS</code>, run:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/citation.html" class="external-link">citation</a></span><span class="op">(</span><span class="st">"acousticTS"</span><span class="op">)</span></span></code></pre></div>
 <p>The Zenodo concept DOI, which resolves to the latest archived release, is <a href="https://doi.org/10.5281/zenodo.7600659" class="external-link">10.5281/zenodo.7600659</a>.</p>
 </div>
