@@ -1,8 +1,9 @@
 
 # acousticTS <img src="man/figures/logo.png" align="right" height="158" alt="acousticTS hex logo" />
 
-[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.7600659-blue.svg)](https://doi.org/10.5281/zenodo.7600659)
-[![Documentation](https://img.shields.io/badge/documentation-latest-blue)](https://brandynlucca.github.io/acousticTS/)
+![CRAN Version](https://www.r-pkg.org/badges/version/acousticTS) ![GitHub Version](https://img.shields.io/github/v/release/brandynlucca/acousticTS?label=GitHub) [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.7600659-blue.svg)](https://doi.org/10.5281/zenodo.7600659)
+
+[![Documentation](https://img.shields.io/badge/documentation-latest-blue?label=Package%20documentation)](https://brandynlucca.github.io/acousticTS/)
 [![R-CMD-check](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml)
 [![Codecov](https://codecov.io/gh/brandynlucca/acousticTS/graph/badge.svg?branch=main)](https://app.codecov.io/gh/brandynlucca/acousticTS?branch=main)
 [![License:
@@ -31,15 +32,17 @@ needed for an acoustic calculation.
 
 ## Installation
 
-Install the current GitHub version without building the full
-documentation site:
+Install the latest version on `CRAN`:
+
+```r
+install.packages("acousticTS")
+```
+
+Or install the latest developments from the current GitHub version:
 
 ``` r
 install.packages("remotes")
-remotes::install_github(
-  "brandynlucca/acousticTS",
-  build_vignettes = FALSE
-)
+remotes::install_github("brandynlucca/acousticTS")
 ```
 
 > **Installation note:** `acousticTS` contains C++17 and Fortran source
