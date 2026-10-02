@@ -127,7 +127,15 @@ cylindrical mode (breathing mode):
  }
 
 where \eqn{C_0} is a mode coefficient determined by the material properties
-and  boundary conditions of the swimbladder. For higher frequencies
+and boundary conditions of the swimbladder. In the far field,
+\eqn{\chi=-\pi/4}. The centered-cylinder amplitude is placed in the
+rotated coordinate frame by multiplying by \eqn{e^{-2ik_m v_e}}, where
+\eqn{k_m} is the selected low-frequency medium wavenumber and \eqn{v_e}
+is the axial-length-weighted mean of the rotated bladder centerline.
+This placement convention uses one equivalent cylinder, not a second
+distributed axial phase integral; finite-length directivity is already
+included in \eqn{\sin\Delta/\Delta}.
+For higher frequencies
 \eqn{ka \ge 0.15}), the Kirchhoff-ray approximation is used:
 
 \deqn{

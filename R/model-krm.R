@@ -116,7 +116,15 @@
 #'  }
 #'
 #' where \eqn{C_0} is a mode coefficient determined by the material properties
-#' and  boundary conditions of the swimbladder. For higher frequencies
+#' and boundary conditions of the swimbladder. In the far field,
+#' \eqn{\chi=-\pi/4}. The centered-cylinder amplitude is placed in the
+#' rotated coordinate frame by multiplying by \eqn{e^{-2ik_m v_e}}, where
+#' \eqn{k_m} is the selected low-frequency medium wavenumber and \eqn{v_e}
+#' is the axial-length-weighted mean of the rotated bladder centerline.
+#' This placement convention uses one equivalent cylinder, not a second
+#' distributed axial phase integral; finite-length directivity is already
+#' included in \eqn{\sin\Delta/\Delta}.
+#' For higher frequencies
 #' \eqn{ka \ge 0.15}), the Kirchhoff-ray approximation is used:
 #'
 #' \deqn{
@@ -750,18 +758,12 @@ krm_initialize <- function(object,
     h13 = h13
   )
 
-  # Assemble the low-ka phase and sinc factors along the bladder length ========
-  dx_matrix <- matrix(
-    data = rep(bladder_geom$delta_x,
-      each = length(model$parameters$acoustics$k_sw)
-    ),
-    ncol = length(bladder_geom$delta_x),
-    nrow = length(model$parameters$acoustics$k_sw)
+  # Clay (1992), Eq. (15), already integrates axial phase into the sinc.
+  # Place the single equivalent cylinder in the upward 1994 coordinate frame.
+  v_eq <- stats::weighted.mean(
+    bladder_geom$v_mid, abs(bladder_geom$delta_x)
   )
-  phase_low <- rowSums(
-    exp(2i * outer(k_bladder_low, bladder_geom$v_mid)) * dx_matrix,
-    na.rm = TRUE
-  ) / bladder_geom$length_eq
+  phase_low <- exp(-2i * k_bladder_low * v_eq)
   Delta_low <- k_bladder_low * bladder_geom$length_eq * cos(bladder$theta)
   sinc_low <- rep(1, length(Delta_low))
   nz_delta <- abs(Delta_low) > sqrt(.Machine$double.eps)
