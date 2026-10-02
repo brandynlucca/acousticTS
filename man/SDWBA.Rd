@@ -95,19 +95,16 @@ over multiple stochastic realizations:
  }
 
 The reported \code{TS} is \eqn{10\log_{10}\langle\sigma_{bs}\rangle}
-in dB re 1 square metre. This differs from the mean of realization TS values.
+in dB re 1 square metre.
 
-The reference parameterization approximately preserves the product of the
-phase standard deviation, \eqn{\mathrm{sd}_\varphi}, and frequency,
-\eqn{f}, above the minimum segment count:
+Above the minimum segment count, phase variability scales approximately as:
 
 \deqn{
    \mathrm{sd}_{\varphi}(f)\, f =
    \mathrm{sd}_{\varphi_0}\, f_0,
  }
 
-and by scaling the number of segments to maintain constant spatial
-resolution relative to acoustic wavelength:
+The segment count scales with frequency and length:
 
 \deqn{
    N(f, L) = \max\left(N_0, \left\lceil N_0
@@ -122,36 +119,22 @@ The phase standard deviation at arbitrary frequency and length is then:
    \frac{N_0 L}{N(f, L) L_0}.
  }
 
-Here \eqn{L} is the object's stored shape length. Coordinate-only objects
-infer this from axial span, which can differ from biological length.
-Use consistent length conventions for the object and \code{length_init}
-when comparing reference parameterizations. Integer rounding and the minimum
-segment count prevent exact inverse-frequency phase scaling.
+Here \eqn{L} is the stored shape length, inferred from axial span for
+coordinate-only objects. Match its convention to \code{length_init}.
 }
 
 \section{Implementation}{
 
-The implementation extracts geometric and acoustic parameters from the input
-object, constructs the required rotation and wavenumber matrices, and
-evaluates the DWBA contribution for each segment. For each stochastic
-realization, random phase perturbations are applied, and the resulting
-squared amplitude magnitudes are averaged over all realizations before
-conversion to TS.
+Independent random phases are applied to segment DWBA amplitudes.
+The resulting cross sections are averaged before conversion to TS.
 
-Resampling preserves existing nodes when the requested interval count is
-unchanged. Otherwise, centerline coordinates and radii are linearly
-interpolated onto a uniform axial grid with the same endpoints and direction.
-Axial coordinates must then be strictly monotonic. A new grid may approximate
-bends and radius breakpoints; each new interval receives an independent
-phase. Changing this partition changes the stochastic model, whereas refining
-quadrature within an interval does not.
+Resampling preserves nodes at unchanged resolution; otherwise, it linearly
+interpolates positions and radii on a uniform axial grid, preserving endpoints
+and direction. This requires monotonic axial coordinates and changes the
+independent phase intervals.
 
-The \code{TS_sd} result is the sample standard deviation of realization TS
-values in dB, not a standard error or confidence interval for the reported
-power-averaged TS. It is zero for identical finite realizations and
-\code{NA} for fewer than two realizations or any non-finite realization TS
-(including a zero cross section). Earlier versions instead returned
-\eqn{10\log_{10}(\operatorname{sd}(\sigma_{bs}))} in this column.
+\code{TS_sd} is the sample standard deviation of realization TS in dB.
+It is \code{NA} for fewer than two realizations or any non-finite TS.
 }
 
 \examples{
