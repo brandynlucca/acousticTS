@@ -1,7 +1,10 @@
 # acousticTS
 
-![CRAN Version](https://www.r-pkg.org/badges/version/acousticTS)![GitHub
-Version](https://img.shields.io/github/v/release/brandynlucca/acousticTS?label=GitHub)[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.7600659-blue.svg)](https://doi.org/10.5281/zenodo.7600659)
+[![CRAN
+Version](https://www.r-pkg.org/badges/version/acousticTS)](https://doi.org/10.32614/CRAN.package.acousticTS)
+[![GitHub
+Version](https://img.shields.io/github/v/release/brandynlucca/acousticTS?label=GitHub)](https://github.com/brandynlucca/acousticTS)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.7600659-blue.svg)](https://doi.org/10.5281/zenodo.7600659)
 
 [![Documentation](https://img.shields.io/badge/documentation-latest-blue?label=Package%20documentation)](https://brandynlucca.github.io/acousticTS/)
 [![R-CMD-check](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml)
