@@ -83,12 +83,12 @@
 #'    \left| f_{bs}^{(m)}(\theta) \right|^2,
 #'  }
 #'
-#' and the expected target strength, \eqn{\mathbb{E}[TS(\theta)]}, is computed
-#' from this mean.
+#' The reported \code{TS} is \eqn{10\log_{10}\langle\sigma_{bs}\rangle}
+#' in dB re 1 square metre. This differs from the mean of realization TS values.
 #'
-#' To ensure consistency across frequencies and body sizes, the SDWBA enforces
-#' scale invariance by preserving the product of the phase standard deviation,
-#' \eqn{\mathrm{sd}_\varphi}, and frequency, \eqn{f}:
+#' The reference parameterization approximately preserves the product of the
+#' phase standard deviation, \eqn{\mathrm{sd}_\varphi}, and frequency,
+#' \eqn{f}, above the minimum segment count:
 #'
 #'  \deqn{
 #'    \mathrm{sd}_{\varphi}(f)\, f =
@@ -99,7 +99,8 @@
 #' resolution relative to acoustic wavelength:
 #'
 #'  \deqn{
-#'    N(f, L) = N_0 \frac{f L}{f_0 L_0}.
+#'    N(f, L) = \max\left(N_0, \left\lceil N_0
+#'    \frac{f L}{f_0 L_0}\right\rceil\right).
 #'  }
 #'
 #' The phase standard deviation at arbitrary frequency and length is then:
@@ -110,16 +111,34 @@
 #'    \frac{N_0 L}{N(f, L) L_0}.
 #'  }
 #'
-#' These scaling relationships ensure that stochastic decorrelation effects
-#' remain physically consistent across different acoustic and geometric regimes.
+#' Here \eqn{L} is the object's stored shape length. Coordinate-only objects
+#' infer this from axial span, which can differ from biological length.
+#' Use consistent length conventions for the object and \code{length_init}
+#' when comparing reference parameterizations. Integer rounding and the minimum
+#' segment count prevent exact inverse-frequency phase scaling.
 #'
 #' @section Implementation:
 #' The implementation extracts geometric and acoustic parameters from the input
 #' object, constructs the required rotation and wavenumber matrices, and
 #' evaluates the DWBA contribution for each segment. For each stochastic
 #' realization, random phase perturbations are applied, and the resulting
-#' backscattering amplitudes are averaged over all realizations to estimate the
-#' expected target strength.
+#' squared amplitude magnitudes are averaged over all realizations before
+#' conversion to TS.
+#'
+#' Resampling preserves existing nodes when the requested interval count is
+#' unchanged. Otherwise, centerline coordinates and radii are linearly
+#' interpolated onto a uniform axial grid with the same endpoints and direction.
+#' Axial coordinates must then be strictly monotonic. A new grid may approximate
+#' bends and radius breakpoints; each new interval receives an independent
+#' phase. Changing this partition changes the stochastic model, whereas refining
+#' quadrature within an interval does not.
+#'
+#' The \code{TS_sd} result is the sample standard deviation of realization TS
+#' values in dB, not a standard error or confidence interval for the reported
+#' power-averaged TS. It is zero for identical finite realizations and
+#' \code{NA} for fewer than two realizations or any non-finite realization TS
+#' (including a zero cross section). Earlier versions instead returned
+#' \eqn{10\log_{10}(\operatorname{sd}(\sigma_{bs}))} in this column.
 #'
 #' @seealso
 #' See the boundary conditions documentation for
@@ -211,12 +230,13 @@ sdwba_initialize <- function(object,
       )
       body <- acousticTS::extract(object_new, "body")
       n_segments <- N_f_idx[i]
-      phase_sd <- phase_sd[i]
+      # Segment count fixes the phase SD for every member of this group.
+      group_phase_sd <- phase_sd[idx[1]]
       acoustics <- model_params$acoustics[idx, ]
       list(
         meta_params = data.frame(
           n_iterations = n_iterations,
-          phase_sd = phase_sd,
+          phase_sd = group_phase_sd,
           N0 = n_segments_init,
           f0 = frequency_init,
           L0 = length_init,
@@ -224,7 +244,8 @@ sdwba_initialize <- function(object,
         ),
         body_params = body,
         n_segments = n_segments,
-        acoustics = acoustics
+        acoustics = acoustics,
+        input_indices = idx
       )
     }
   )
@@ -277,7 +298,9 @@ sdwba_stochastic_summary <- function(segment_integrals,
     f_bs = colMeans(phase_cyl),
     sigma_bs = colMeans(.sigma_bs(phase_cyl)),
     TS_mean = db(colMeans(.sigma_bs(phase_cyl))),
-    TS_sd = db(apply(.sigma_bs(phase_cyl), 2, stats::sd))
+    TS_sd = apply(db(.sigma_bs(phase_cyl)), 2, function(ts) {
+      if (all(is.finite(ts))) stats::sd(ts) else NA_real_
+    })
   )
 }
 
@@ -337,6 +360,8 @@ SDWBA <- function(object) {
       FUN = function(i) SDWBA_resampled(i)
     )
   )
+  input_indices <- unlist(lapply(model$parameters, `[[`, "input_indices"))
+  results <- results[order(input_indices), , drop = FALSE]
   # Update scatterer object ====================================================
   methods::slot(object, "model")$SDWBA$f_bs <- results$f_bs
   methods::slot(object, "model")$SDWBA$sigma_bs <- results$sigma_bs
@@ -429,12 +454,13 @@ sdwba_curved_initialize <- function(object,
       )
       body <- extract(object_new, "body")
       n_segments <- N_f_idx[i]
-      phase_sd <- phase_sd[i]
+      # Segment count fixes the phase SD for every member of this group.
+      group_phase_sd <- phase_sd[idx[1]]
       acoustics <- model_params$acoustics[idx, ]
       list(
         meta_params = data.frame(
           n_iterations = n_iterations,
-          phase_sd = phase_sd,
+          phase_sd = group_phase_sd,
           N0 = n_segments_init,
           f0 = frequency_init,
           L0 = length_init,
@@ -442,7 +468,8 @@ sdwba_curved_initialize <- function(object,
         ),
         body_params = body,
         n_segments = n_segments,
-        acoustics = acoustics
+        acoustics = acoustics,
+        input_indices = idx
       )
     }
   )
@@ -508,6 +535,8 @@ SDWBA_curved <- function(object) {
       FUN = function(i) SDWBA_resampled_c(i)
     )
   )
+  input_indices <- unlist(lapply(model$parameters, `[[`, "input_indices"))
+  results <- results[order(input_indices), , drop = FALSE]
   # Update scatterer object ====================================================
   methods::slot(object, "model")$SDWBA_curved$f_bs <- results$f_bs
   methods::slot(object, "model")$SDWBA_curved$sigma_bs <- results$sigma_bs

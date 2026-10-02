@@ -94,12 +94,12 @@ over multiple stochastic realizations:
    \left| f_{bs}^{(m)}(\theta) \right|^2,
  }
 
-and the expected target strength, \eqn{\mathbb{E}[TS(\theta)]}, is computed
-from this mean.
+The reported \code{TS} is \eqn{10\log_{10}\langle\sigma_{bs}\rangle}
+in dB re 1 square metre. This differs from the mean of realization TS values.
 
-To ensure consistency across frequencies and body sizes, the SDWBA enforces
-scale invariance by preserving the product of the phase standard deviation,
-\eqn{\mathrm{sd}_\varphi}, and frequency, \eqn{f}:
+The reference parameterization approximately preserves the product of the
+phase standard deviation, \eqn{\mathrm{sd}_\varphi}, and frequency,
+\eqn{f}, above the minimum segment count:
 
 \deqn{
    \mathrm{sd}_{\varphi}(f)\, f =
@@ -110,7 +110,8 @@ and by scaling the number of segments to maintain constant spatial
 resolution relative to acoustic wavelength:
 
 \deqn{
-   N(f, L) = N_0 \frac{f L}{f_0 L_0}.
+   N(f, L) = \max\left(N_0, \left\lceil N_0
+   \frac{f L}{f_0 L_0}\right\rceil\right).
  }
 
 The phase standard deviation at arbitrary frequency and length is then:
@@ -121,8 +122,11 @@ The phase standard deviation at arbitrary frequency and length is then:
    \frac{N_0 L}{N(f, L) L_0}.
  }
 
-These scaling relationships ensure that stochastic decorrelation effects
-remain physically consistent across different acoustic and geometric regimes.
+Here \eqn{L} is the object's stored shape length. Coordinate-only objects
+infer this from axial span, which can differ from biological length.
+Use consistent length conventions for the object and \code{length_init}
+when comparing reference parameterizations. Integer rounding and the minimum
+segment count prevent exact inverse-frequency phase scaling.
 }
 
 \section{Implementation}{
@@ -131,8 +135,23 @@ The implementation extracts geometric and acoustic parameters from the input
 object, constructs the required rotation and wavenumber matrices, and
 evaluates the DWBA contribution for each segment. For each stochastic
 realization, random phase perturbations are applied, and the resulting
-backscattering amplitudes are averaged over all realizations to estimate the
-expected target strength.
+squared amplitude magnitudes are averaged over all realizations before
+conversion to TS.
+
+Resampling preserves existing nodes when the requested interval count is
+unchanged. Otherwise, centerline coordinates and radii are linearly
+interpolated onto a uniform axial grid with the same endpoints and direction.
+Axial coordinates must then be strictly monotonic. A new grid may approximate
+bends and radius breakpoints; each new interval receives an independent
+phase. Changing this partition changes the stochastic model, whereas refining
+quadrature within an interval does not.
+
+The \code{TS_sd} result is the sample standard deviation of realization TS
+values in dB, not a standard error or confidence interval for the reported
+power-averaged TS. It is zero for identical finite realizations and
+\code{NA} for fewer than two realizations or any non-finite realization TS
+(including a zero cross section). Earlier versions instead returned
+\eqn{10\log_{10}(\operatorname{sd}(\sigma_{bs}))} in this column.
 }
 
 \examples{
