@@ -23,12 +23,10 @@ plausible curve is not validation either. Evidence must connect a defined model
 case to an independent result within a stated geometry, boundary condition,
 parameter range, numerical configuration, and output convention.
 
-![Validation proceeds from object and unit checks through known limits and published or independent comparisons.](validation-ladder.svg)
-
-The order matters. Agreement with a published curve is difficult to interpret
+![The order matters. Agreement with a published curve is difficult to interpret
 until units, geometry, material properties, orientation, and normalization have
 been matched. Regression tests then preserve an established result, but they do
-not establish its correctness on their own.
+not establish its correctness on their own.](validation-ladder.svg)
 
 # Distinguish the checks
 
@@ -186,35 +184,3 @@ The [SPHMS](../sphms/sphms-implementation.html),
 [FCMS](../fcms/fcms-implementation.html), and
 [PSMS](../psms/psms-implementation.html) implementation pages document their
 model-specific comparisons and numerical controls.
-
-# Generated evidence and provenance
-
-Public implementation figures are committed outputs. Their builders live under
-`tools/implementation-figures/`, which is excluded from the package bundle and
-is not run during ordinary package installation or pkgdown rendering. The
-manifest records each family, builder, package-code input, and expected output.
-
-Run all builders from the repository root with:
-
-```{r eval=FALSE}
-source("tools/implementation-figures/run_all.R")
-```
-
-Set `ACOUSTICTS_IMPL_FAMILIES` to a comma-separated family list for a selected
-rebuild. The runner uses one sequential R subprocess per family, validates
-declared outputs, and writes commit, elapsed-time, size, and MD5 provenance to
-`.tmp/implementation-figures/provenance.csv`. Pull requests rebuild affected
-families and fail when committed outputs drift from their declared inputs.
-
-A complete validation record should retain:
-
-- the package version or commit and relevant input hashes,
-- the reference source and citation,
-- geometry, units, material values, exterior medium, and boundary condition,
-- frequency and angle grids,
-- numerical controls and software versions,
-- the comparison domain, metric, tolerance, and result, and
-- the code that generated committed tables or figures.
-
-When a model is used outside this recorded scope, describe the calculation as
-an application or extrapolation. Do not silently broaden the validation claim.
