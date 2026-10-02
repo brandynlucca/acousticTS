@@ -138,23 +138,24 @@ head(sdwba_results)
 ```
 
     ##   frequency                        f_bs     sigma_bs        TS     TS_sd
-    ## 1     5e+04 -8.584266e-05+7.619334e-07i 7.663389e-09 -81.15579 -89.16974
-    ## 2     6e+04 -1.173376e-04+1.137190e-06i 1.451589e-08 -78.38156 -84.56710
-    ## 3     7e+04 -1.543290e-04+9.972511e-07i 2.503192e-08 -76.01506 -83.13435
-    ## 4     8e+04 -1.887673e-04+8.474688e-06i 3.742329e-08 -74.26858 -81.77264
-    ## 5     9e+04 -2.305227e-04+6.249856e-06i 5.537246e-08 -72.56706 -79.48317
-    ## 6     1e+05 -2.660114e-04+1.462433e-05i 7.373492e-08 -71.32327 -79.23634
+    ## 1     5e+04 -9.477726e-05+1.382516e-07i 9.310958e-09 -80.31006 0.7220758
+    ## 2     6e+04 -1.298692e-04+1.812514e-07i 1.775192e-08 -77.50755 1.0205344
+    ## 3     7e+04 -1.705616e-04-3.598457e-08i 3.042126e-08 -75.16823 0.9357178
+    ## 4     8e+04 -2.064676e-04+9.556914e-06i 4.451770e-08 -73.51467 0.7428731
+    ## 5     9e+04 -2.542170e-04+5.321133e-06i 6.714795e-08 -71.72967 0.8568428
+    ## 6     1e+05 -2.915993e-04+1.296041e-05i 8.842701e-08 -70.53415 0.6857166
 
-The SDWBA results include the same main fields as DWBA plus `TS_sd`,
-which summarizes how much the stochastic realizations vary at each
-frequency.
+The SDWBA results include the same main fields as DWBA plus `TS_sd`, the
+sample standard deviation of realization TS values in dB. The reported
+`TS` remains 10\log\_{10}(\operatorname{mean}(\sigma\_{bs})), rather
+than the mean of realization TS values. `TS_sd` is zero for identical
+finite realizations and `NA` for fewer than two realizations or any
+non-finite realization TS, including zero cross sections.
 
-That additional field is important for interpretation. A smoothed mean
-`TS` curve by itself does not tell the reader whether the stochastic
-realizations were tightly clustered or broadly dispersed. `TS_sd`
-provides that missing context and helps distinguish between a stable
-partially incoherent prediction and one that is still strongly
-realization-dependent.
+`TS_sd` describes realization variability; it is not a standard error or
+confidence interval for the power-averaged `TS`. Earlier versions
+computed 10\log\_{10}(\operatorname{sd}(\sigma\_{bs})) in this column,
+which did not measure TS dispersion.
 
 ### Comparison workflows
 

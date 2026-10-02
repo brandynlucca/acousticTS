@@ -125,14 +125,12 @@ connect a defined model case to an independent result within a stated
 geometry, boundary condition, parameter range, numerical configuration,
 and output convention.</p>
 <div class="float">
-<img src="validation-ladder.svg" alt="Validation proceeds from object and unit checks through known limits and published or independent comparisons."><div class="figcaption">Validation proceeds from object and unit checks
-through known limits and published or independent comparisons.</div>
+<img src="validation-ladder.svg" alt="The order matters. Agreement with a published curve is difficult to interpret until units, geometry, material properties, orientation, and normalization have been matched. Regression tests then preserve an established result, but they do not establish its correctness on their own."><div class="figcaption">The order matters. Agreement with a published
+curve is difficult to interpret until units, geometry, material
+properties, orientation, and normalization have been matched. Regression
+tests then preserve an established result, but they do not establish its
+correctness on their own.</div>
 </div>
-<p>The order matters. Agreement with a published curve is difficult to
-interpret until units, geometry, material properties, orientation, and
-normalization have been matched. Regression tests then preserve an
-established result, but they do not establish its correctness on their
-own.</p>
 </div>
 <div class="section level2">
 <h2 id="distinguish-the-checks">Distinguish the checks<a class="anchor" aria-label="anchor" href="#distinguish-the-checks"></a>
@@ -717,39 +715,6 @@ output is already committed:</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">predicted</span>, <span class="va">reference</span>, tolerance <span class="op">=</span> <span class="fl">1e-2</span><span class="op">)</span></span></code></pre></div>
 <p>The <a href="../sphms/sphms-implementation.html">SPHMS</a>, <a href="../fcms/fcms-implementation.html">FCMS</a>, and <a href="../psms/psms-implementation.html">PSMS</a> implementation pages
 document their model-specific comparisons and numerical controls.</p>
-</div>
-<div class="section level2">
-<h2 id="generated-evidence-and-provenance">Generated evidence and provenance<a class="anchor" aria-label="anchor" href="#generated-evidence-and-provenance"></a>
-</h2>
-<p>Public implementation figures are committed outputs. Their builders
-live under <code>tools/implementation-figures/</code>, which is excluded
-from the package bundle and is not run during ordinary package
-installation or pkgdown rendering. The manifest records each family,
-builder, package-code input, and expected output.</p>
-<p>Run all builders from the repository root with:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="st">"tools/implementation-figures/run_all.R"</span><span class="op">)</span></span></code></pre></div>
-<p>Set <code>ACOUSTICTS_IMPL_FAMILIES</code> to a comma-separated family
-list for a selected rebuild. The runner uses one sequential R subprocess
-per family, validates declared outputs, and writes commit, elapsed-time,
-size, and MD5 provenance to
-<code>.tmp/implementation-figures/provenance.csv</code>. Pull requests
-rebuild affected families and fail when committed outputs drift from
-their declared inputs.</p>
-<p>A complete validation record should retain:</p>
-<ul>
-<li>the package version or commit and relevant input hashes,</li>
-<li>the reference source and citation,</li>
-<li>geometry, units, material values, exterior medium, and boundary
-condition,</li>
-<li>frequency and angle grids,</li>
-<li>numerical controls and software versions,</li>
-<li>the comparison domain, metric, tolerance, and result, and</li>
-<li>the code that generated committed tables or figures.</li>
-</ul>
-<p>When a model is used outside this recorded scope, describe the
-calculation as an application or extrapolation. Do not silently broaden
-the validation claim.</p>
 </div>
 <div class="section level2">
 <h2 class="unnumbered" id="bibliography">References<a class="anchor" aria-label="anchor" href="#bibliography"></a>
