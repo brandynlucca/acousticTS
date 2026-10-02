@@ -929,14 +929,15 @@ segmentize <- function(x1, x0) {
 }
 
 ################################################################################
-#' Resample shape for SDWBA model with piecewise constant radius
+#' Resample the piecewise-linear profile used by SDWBA
 #'
 #' This function resamples the shape of a fluid-like scatterer (FLS) object for
 #' use in stochastic distorted wave Born approximation (SDWBA) calculations.
-#' The resampling preserves the overall shape of the scatterer while creating
-#' a new representation with the specified number of segments. The radius
-#' assignment uses a stepwise algorithm to maintain piecewise constant radius
-#' values across segments.
+#' An unchanged interval count preserves the existing nodes. Otherwise,
+#' centerline coordinates and node radii are linearly interpolated onto a
+#' uniform axial grid, retaining both endpoints and the input direction.
+#' Changing the grid can approximate bends or radius breakpoints that do not
+#' coincide with new nodes; it also changes the independent phase partition.
 #'
 #' @param object FLS-class object to resample
 #' @param n_segments Number of segments in the resampled shape
@@ -952,54 +953,40 @@ sdwba_resample <- function(object, n_segments) {
 
   object <- .as_dwba_profile(object)
 
+  if (length(n_segments) != 1L || !is.finite(n_segments) ||
+      n_segments < 1 || n_segments != floor(n_segments)) {
+    stop("'n_segments' must be a positive integer")
+  }
+
   # Recover the original profile and build the new x grid ======================
   body <- extract(object, "body")
   orig_rpos <- body$rpos
   orig_x <- orig_rpos[1, ]
   n_orig <- length(orig_x)
 
+  if (n_segments == n_orig - 1L) {
+    return(object)
+  }
+  if (!all(is.finite(orig_x)) ||
+      !(all(diff(orig_x) > 0) || all(diff(orig_x) < 0))) {
+    stop("SDWBA resampling requires strictly monotonic axial coordinates")
+  }
+
   x_new <- seq(body$rpos[1, 1],
     body$rpos[1, dim(body$rpos)[2]],
     length.out = n_segments + 1
   )
 
-  # Align resampled nodes to existing interior breakpoints when possible =======
-  x_nearest <- vapply(orig_x, function(x) which.min(abs(x - x_new)), integer(1))
-  x_new[x_nearest[2:(n_orig - 1)]] <- orig_x[2:(n_orig - 1)]
-
-  # Repartition the new grid and interpolate the centerline coordinates ========
-  x_new_seg <- segmentize(x_new, orig_x)
-  new_rpos <- rbind(x = x_new_seg)
-
-  rpos_interp <- apply(
-    body$rpos[2:3, ],
-    1,
-    function(y) {
-      stats::spline(
-        x = body$rpos[1, ],
-        y = y,
-        xout = x_new_seg
-      )$y
-    }
-  )
+  # Use the same linear position/radius interpretation as the DWBA integral.
+  interpolate <- function(values) {
+    stats::approx(orig_x, values, xout = x_new)$y
+  }
+  new_radius <- interpolate(body$radius)
   new_rpos <- rbind(
-    new_rpos,
-    t(rpos_interp)
+    x = x_new,
+    y = interpolate(body$rpos[2, ]),
+    z = interpolate(body$rpos[3, ])
   )
-
-  # Assign piecewise-constant radii over the new segment layout ================
-  new_radius <- numeric(n_segments + 1)
-  decreasing <- orig_x[1] > orig_x[length(orig_x)]
-  lapply(1:(n_orig - 1), function(i) {
-    if (decreasing) {
-      indices <- which(x_new_seg <= orig_x[i]) + 1
-      indices <- indices[indices <= length(new_radius)]
-    } else {
-      indices <- which(x_new_seg >= orig_x[i] &
-        x_new_seg < orig_x[i + 1])
-    }
-    new_radius[indices] <<- body$radius[i + 1]
-  })
 
   # Rebuild the profile envelopes and update the scatterer slots ===============
   new_rpos <- rbind(
@@ -1013,7 +1000,6 @@ sdwba_resample <- function(object, n_segments) {
   object@body$rpos <- new_rpos
   object@body$radius <- new_radius
   object@shape_parameters$n_segments <- n_segments
-  object@shape_parameters$length <- abs(diff(range(new_rpos[1, ])))
 
   object
 }
