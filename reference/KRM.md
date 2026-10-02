@@ -103,8 +103,15 @@ by the first cylindrical mode (breathing mode):
 \Delta}{\Delta} b_0, \$\$ \$\$ b_0 = -\frac{1}{1 + i C_0}, \$\$
 
 where \\C_0\\ is a mode coefficient determined by the material
-properties and boundary conditions of the swimbladder. For higher
-frequencies \\ka \ge 0.15\\), the Kirchhoff-ray approximation is used:
+properties and boundary conditions of the swimbladder. In the far field,
+\\\chi=-\pi/4\\. The centered-cylinder amplitude is placed in the
+rotated coordinate frame by multiplying by \\e^{-2ik_m v_e}\\, where
+\\k_m\\ is the selected low-frequency medium wavenumber and \\v_e\\ is
+the axial-length-weighted mean of the rotated bladder centerline. This
+placement convention uses one equivalent cylinder, not a second
+distributed axial phase integral; finite-length directivity is already
+included in \\\sin\Delta/\Delta\\. For higher frequencies \\ka \ge
+0.15\\), the Kirchhoff-ray approximation is used:
 
 \$\$ \mathcal{L}\_{SB,s} \approx -i \frac{\mathcal{R}\_{bc}
 \mathcal{T}\_{wb}\mathcal{T}\_{bw}}{2\sqrt{\pi}} A\_{SB,s} \[(k a_s +

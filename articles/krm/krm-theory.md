@@ -273,18 +273,36 @@ phases.
 ### Low-frequency modal approximation
 
 When the inclusion’s acoustic size is small, the azimuthally symmetric
-(m=0) cylindrical mode dominates ([Clay and Horne
-1994](#ref-Clay_1994)). In the segmented notation, its scattering length
-is:
+(m=0) cylindrical mode dominates. Following Section II.A of Clay and
+Horne ([1994](#ref-Clay_1994)), the low-frequency branch uses one
+cylinder with the bladder’s volume and axial length. Its far-field
+scattering length, from Clay ([1992](#ref-Clay_1992)), Eq. (15), with a
+positional phase factor is:
 
 f_M = -\frac{iL_e}{\pi} \frac{\sin\Delta}{\Delta}\\b_0\\\Phi,
 
 where L_e is the equivalent length, \Delta=k_mL_e\cos\theta is the
-finite-length phase parameter, and \Phi places the inclusion in the
-common phase frame. For segments with midpoint coordinate v_j and axial
-width \Delta x_j, this phase factor is:
+finite-length phase parameter. The centered-cylinder prefactor follows
+from \chi=-\pi/4. To place the equivalent cylinder in the rotated frame,
+the implementation uses the axial-length-weighted mean centerline
+position:
 
-\Phi = \frac{1}{L_e}\sum_j e^{2ik_m v_j}\Delta x_j.
+v_e = \frac{\sum_j v\_{c,j}\|\Delta x_j\|}{\sum_j\|\Delta x_j\|}, \qquad
+\Phi = e^{-2ik_m v_e},
+
+where v\_{c,j}=x_j\cos\theta+z\_{c,j}\sin\theta and
+z\_{c,j}=(z\_{U,j}+z\_{L,j})/2 use segment-midpoint coordinates. This
+choice of reference position is an implementation convention for the
+equivalent cylinder, not an additional empirical formula from the
+papers. The negative exponent uses the upward coordinate of Clay and
+Horne ([1994](#ref-Clay_1994)). Clay’s positive deformation exponent
+instead uses displacement away from the incident wavefront (1991, Fig.
+11; 1992, Fig. 5).
+
+The sinc already includes the axial phase integration (1992, Appendix B,
+Eqs. (B12)-(B13)); it must not be multiplied by another integral of that
+same axial phase. No distributed bending factor is applied in this
+equivalent-cylinder branch.
 
 The breathing-mode coefficient is:
 
@@ -429,6 +447,11 @@ Clay, C. S. 1991. “Low-Resolution Acoustic Scattering Models:
 Fluid-Filled Cylinders and Fish with Swim Bladders.” *The Journal of the
 Acoustical Society of America* 89 (5): 2168–79.
 <https://doi.org/10.1121/1.400910>.
+
+Clay, Clarence S. 1992. “Composite Ray-Mode Approximations for
+Backscattered Sound from Gas-Filled Cylinders and Swimbladders.” *The
+Journal of the Acoustical Society of America* 92 (4): 2173–80.
+<https://doi.org/10.1121/1.405211>.
 
 Clay, Clarence S., and John K. Horne. 1994. “Acoustic Models of Fish:
 The Atlantic Cod (*Gadus Morhua*).” *The Journal of the Acoustical
