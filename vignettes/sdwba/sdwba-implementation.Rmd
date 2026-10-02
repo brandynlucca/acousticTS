@@ -104,9 +104,9 @@ head(dwba_results)
 head(sdwba_results)
 ```
 
-The SDWBA results include the same main fields as DWBA plus `TS_sd`, which summarizes how much the stochastic realizations vary at each frequency.
+The SDWBA results include the same main fields as DWBA plus `TS_sd`, the sample standard deviation of realization TS values in dB. The reported `TS` remains $10\log_{10}(\operatorname{mean}(\sigma_{bs}))$, rather than the mean of realization TS values. `TS_sd` is zero for identical finite realizations and `NA` for fewer than two realizations or any non-finite realization TS, including zero cross sections.
 
-That additional field is important for interpretation. A smoothed mean `TS` curve by itself does not tell the reader whether the stochastic realizations were tightly clustered or broadly dispersed. `TS_sd` provides that missing context and helps distinguish between a stable partially incoherent prediction and one that is still strongly realization-dependent.
+`TS_sd` describes realization variability; it is not a standard error or confidence interval for the power-averaged `TS`. Earlier versions computed $10\log_{10}(\operatorname{sd}(\sigma_{bs}))$ in this column, which did not measure TS dispersion.
 
 ## Comparison workflows
 
