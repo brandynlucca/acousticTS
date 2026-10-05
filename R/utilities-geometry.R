@@ -929,15 +929,12 @@ segmentize <- function(x1, x0) {
 }
 
 ################################################################################
-#' Resample the piecewise-linear profile used by SDWBA
+#' Resample shape for SDWBA model with piecewise constant radius
 #'
 #' This function resamples the shape of a fluid-like scatterer (FLS) object for
 #' use in stochastic distorted wave Born approximation (SDWBA) calculations.
-#' An unchanged interval count preserves the existing nodes. Otherwise,
-#' centerline coordinates and node radii are linearly interpolated onto a
-#' uniform axial grid, retaining both endpoints and the input direction.
-#' Changing the grid can approximate bends or radius breakpoints that do not
-#' coincide with new nodes; it also changes the independent phase partition.
+#' Uses the original breakpoint-aligned grid, spline centerline and stepwise
+#' cylinder radii. An unchanged interval count preserves the existing profile.
 #'
 #' @param object FLS-class object to resample
 #' @param n_segments Number of segments in the resampled shape
@@ -972,21 +969,51 @@ sdwba_resample <- function(object, n_segments) {
     stop("SDWBA resampling requires strictly monotonic axial coordinates")
   }
 
+  # Apply the original descending-coordinate algorithm in either input order.
+  increasing <- orig_x[1] < orig_x[n_orig]
+  if (increasing) {
+    body$rpos <- body$rpos[, n_orig:1, drop = FALSE]
+    body$radius <- rev(body$radius)
+    orig_x <- rev(orig_x)
+  }
+
   x_new <- seq(body$rpos[1, 1],
     body$rpos[1, dim(body$rpos)[2]],
     length.out = n_segments + 1
   )
 
-  # Use the same linear position/radius interpretation as the DWBA integral.
-  interpolate <- function(values) {
-    stats::approx(orig_x, values, xout = x_new)$y
+  # Align resampled nodes to existing interior breakpoints when possible =======
+  x_nearest <- vapply(orig_x, function(x) which.min(abs(x - x_new)), integer(1))
+  if (n_orig > 2L) {
+    interior <- 2:(n_orig - 1L)
+    # Interior breakpoints must not replace the target's endpoints.
+    interior <- interior[x_nearest[interior] > 1L &
+      x_nearest[interior] < length(x_new)]
+    x_new[x_nearest[interior]] <- orig_x[interior]
   }
-  new_radius <- interpolate(body$radius)
+
+  # Repartition the new grid and interpolate the centerline coordinates ========
+  x_new_seg <- segmentize(x_new, orig_x)
+  rpos_interp <- apply(body$rpos[2:3, , drop = FALSE], 1, function(y) {
+    stats::spline(x = orig_x, y = y, xout = x_new_seg)$y
+  })
   new_rpos <- rbind(
-    x = x_new,
-    y = interpolate(body$rpos[2, ]),
-    z = interpolate(body$rpos[3, ])
+    x = x_new_seg,
+    t(rpos_interp)
   )
+
+  # Retain the original descending stepwise radius assignment.
+  new_radius <- numeric(n_segments + 1L)
+  for (i in seq_len(n_orig - 1L)) {
+    indices <- which(x_new_seg <= orig_x[i]) + 1L
+    indices <- indices[indices <= length(new_radius)]
+    new_radius[indices] <- body$radius[i + 1L]
+  }
+  new_radius[c(1L, length(new_radius))] <- body$radius[c(1L, n_orig)]
+  if (increasing) {
+    new_rpos <- new_rpos[, ncol(new_rpos):1, drop = FALSE]
+    new_radius <- rev(new_radius)
+  }
 
   # Rebuild the profile envelopes and update the scatterer slots ===============
   new_rpos <- rbind(

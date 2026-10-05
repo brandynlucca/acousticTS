@@ -128,10 +128,8 @@ coordinate-only objects. Match its convention to \code{length_init}.
 Independent random phases are applied to segment DWBA amplitudes.
 The resulting cross sections are averaged before conversion to TS.
 
-Resampling preserves nodes at unchanged resolution; otherwise, it linearly
-interpolates positions and radii on a uniform axial grid, preserving endpoints
-and direction. This requires monotonic axial coordinates and changes the
-independent phase intervals.
+Resampling retains the breakpoint-aligned grid, spline centerline and
+stepwise cylinder radii. An unchanged interval count preserves the profile.
 
 \code{TS_sd} is the sample standard deviation of realization TS in dB.
 It is \code{NA} for fewer than two realizations or any non-finite TS.

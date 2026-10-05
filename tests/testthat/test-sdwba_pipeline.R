@@ -64,35 +64,41 @@ test_that("SDWBA resampling preserves nodes at unchanged resolution", {
   }
 })
 
-test_that("SDWBA resampling linearly interpolates position and radius", {
+test_that("SDWBA retains the original snapped grid, spline and cylinder radii", {
+  # Hand-repartitioned descending grid: retain 0.023 and 0.011, then
+  # split their adjoining intervals evenly. Cubic centerline data exercise
+  # the original spline interpolation, rather than linear interpolation.
+  x <- c(0.03, 0.023, 0.011, 0)
+  y <- function(x) 100 * x^3
+  z <- function(x) 2 * x^2
   object <- fls_generate(
-    x_body = c(0, 0.01, 0.03), y_body = c(0, 0.002, 0),
-    z_body = c(0, 0.003, 0.001), radius_body = c(0.0005, 0.002, 0.001),
+    x_body = x, y_body = y(x), z_body = z(x),
+    radius_body = c(0.0005, 0.002, 0.001, 0.0003),
     g_body = 1.0357, h_body = 1.0279
   )
   resampled <- sdwba_resample(object, 6)
-  expect_equal(resampled@body$rpos[1, ], seq(0, 0.03, length.out = 7))
+  expected_x <- c(0.03, 0.023, 0.019, 0.015, 0.011, 0.0055, 0)
+  expect_equal(unname(resampled@body$rpos[1, ]), expected_x)
   expect_equal(resampled@body$radius,
-               c(0.0005, 0.00125, 0.002, 0.00175, 0.0015, 0.00125, 0.001))
-  expect_equal(unname(resampled@body$rpos[2, ]),
-               c(0, 0.001, 0.002, 0.0015, 0.001, 0.0005, 0))
-  expect_equal(unname(resampled@body$rpos[3, ]),
-               c(0, 0.0015, 0.003, 0.0025, 0.002, 0.0015, 0.001))
+               c(0.0005, 0.002, 0.001, 0.001, 0.001, 0.0003, 0.0003))
+  expect_equal(unname(resampled@body$rpos[2, ]), y(expected_x))
+  expect_equal(unname(resampled@body$rpos[3, ]), z(expected_x))
   expect_equal(resampled@body$rpos["zU", ],
                resampled@body$rpos["z", ] + resampled@body$radius)
   expect_equal(resampled@body$rpos["zL", ],
                resampled@body$rpos["z", ] - resampled@body$radius)
   reversed <- object
-  reversed@body$rpos <- object@body$rpos[, 3:1]
+  reversed@body$rpos <- object@body$rpos[, 4:1]
   reversed@body$radius <- rev(object@body$radius)
   reversed <- sdwba_resample(reversed, 6)
   expect_equal(unname(reversed@body$rpos), unname(resampled@body$rpos[, 7:1]))
   expect_equal(reversed@body$radius, rev(resampled@body$radius))
   # Two endpoint nodes must remain endpoints when coarsening/refining.
   coarse <- sdwba_resample(object, 1)
-  expect_equal(coarse@body$radius, object@body$radius[c(1, 3)])
+  expect_equal(unname(coarse@body$rpos[1, ]), x[c(1, 4)])
+  expect_equal(coarse@body$radius, object@body$radius[c(1, 4)])
   expect_equal(sdwba_resample(coarse, 6)@body$radius,
-               seq(0.0005, 0.001, length.out = 7))
+               c(0.0005, rep(0.0003, 6)))
 })
 
 test_that("Zero-phase SDWBA agrees with DWBA for an unchanged cylinder", {
