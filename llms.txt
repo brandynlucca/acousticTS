@@ -11,6 +11,7 @@ Version](https://img.shields.io/github/v/release/brandynlucca/acousticTS?label=G
 [![Codecov](https://codecov.io/gh/brandynlucca/acousticTS/graph/badge.svg?branch=main)](https://app.codecov.io/gh/brandynlucca/acousticTS?branch=main)
 [![License:
 GPL-3](https://img.shields.io/badge/license-GPL--3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
+[![](https://cranlogs.r-pkg.org/badges/grand-total/acousticTS)](https://cran.rstudio.com/web/packages/acousticTS/index.html)
 
 `acousticTS` estimates the acoustic target strength of aquatic
 organisms, calibration spheres, and other individual scatterers with
