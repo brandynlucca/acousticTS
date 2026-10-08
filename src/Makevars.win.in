@@ -24,6 +24,10 @@ OBJECTS = RcppExports.o \
 
 all: $(SHLIB)
 
+psms.o: psms.cpp precision.h psms_support.h psms_smn.h psms_rmn.h \
+	psms_backscatter.h psms_linear_systems.h svd_solve.h \
+	../tests/testthat/native-solvers.h
+
 clean:
 	rm -f *.o *.mod $(SHLIB)
 

@@ -89,3 +89,152 @@ context("Pivoted spheroidal kernel solves") {
         expect_true(std::abs(actual[0][1] - Complex(1, 1)) < 1e-12);
     }
 }
+
+context("Packed spheroidal radial values") {
+    test_that("mantissas, exponents and wave conventions are preserved") {
+        ProfcnResult<double> packed;
+        packed.r1c = {2};
+        packed.r1dc = {-4};
+        packed.ir1e = {2};
+        packed.ir1de = {0};
+        packed.r2c = {6};
+        packed.r2dc = {8};
+        packed.ir2e = {-1};
+        packed.ir2de = {-2};
+        ProfcnBatchResult<double> block;
+        block.lnum = 1;
+        block.r1c = {200};
+        block.r1dc = {-4};
+        block.r2c = {0.6};
+        block.r2dc = {0.08};
+        for (int kind = 1; kind <= 4; ++kind) {
+            auto single = extract_radial_from_batch(
+                packed, packed, 0, kind, 0, 0, 1.0, 1.5
+            );
+            auto batched = extract_radial_from_mblock(block, 0, 0, kind);
+            expect_true(single.val_real == (kind == 2 ? 0.6 : 200));
+            expect_true(single.der_real == (kind == 2 ? 0.08 : -4));
+            expect_true(single.val_imag == (kind < 3 ? 0 : kind == 3 ? 0.6 : -0.6));
+            expect_true(single.der_imag == (kind < 3 ? 0 : kind == 3 ? 0.08 : -0.08));
+            expect_true(batched.val_real == single.val_real);
+            expect_true(batched.der_real == single.der_real);
+            expect_true(batched.val_imag == single.val_imag);
+            expect_true(batched.der_imag == single.der_imag);
+        }
+    }
+
+    test_that("missing and underflowed radial values remain invalid") {
+        ProfcnResult<double> packed;
+        ProfcnBatchResult<double> block;
+        block.lnum = 1;
+        for (int kind = 1; kind <= 4; ++kind) {
+            auto single = extract_radial_from_batch(
+                packed, packed, 0, kind, 0, 0, 1.0, 1.5
+            );
+            auto batched = extract_radial_from_mblock(block, 0, 0, kind);
+            expect_true(std::isnan(single.val_real));
+            expect_true(std::isnan(single.der_real));
+            expect_true(std::isnan(batched.val_real));
+            expect_true(std::isnan(batched.der_real));
+        }
+        packed.r2c = {0};
+        packed.r2dc = {0};
+        block.r2c = {0};
+        block.r2dc = {0};
+        for (int kind = 2; kind <= 4; ++kind) {
+            auto single = extract_radial_from_batch(
+                packed, packed, 0, kind, 0, 0, 1.0, 1.5
+            );
+            auto batched = extract_radial_from_mblock(block, 0, 0, kind);
+            expect_true(std::isnan(kind == 2 ? single.val_real : single.val_imag));
+            expect_true(std::isnan(kind == 2 ? batched.der_real : batched.der_imag));
+        }
+    }
+
+    test_that("native radial layouts retain invalid lower-triangle modes") {
+        for (int kind = 1; kind <= 4; ++kind) {
+            auto shared = Rmn_matrix<double>({1}, {0, 1, 3}, 2, 1.5, kind);
+            expect_true(std::isnan(shared.value[0][0].real()));
+            auto outer = Rmn_matrix<double>({0, 2}, {0, 1, 3}, 2, 1.5, kind);
+            expect_true(std::isnan(outer.value[1][0].real()));
+            expect_true(std::isnan(outer.derivative[1][1].real()));
+            auto paired = Rmn_matrix<double>({0, 1}, {2, 3}, 2, 1.5, kind);
+            auto expected = Rmn_scalar<double>(1, 3, 2, 1.5, kind);
+            expect_true(std::abs(paired.value[1][1] - expected.first) < 1e-10);
+        }
+    }
+}
+
+context("Modal summation invariants") {
+    test_that("adaptive and complete sums recover a finite geometric series") {
+        const int order = 24;
+        const double ratio = 0.1;
+        using Complex = std::complex<double>;
+        const Complex amplitude(2, -1);
+        std::vector<std::vector<double>> angular(order + 1, std::vector<double>(order + 1, 1));
+        std::vector<std::vector<Complex>> coefficients(order + 1, std::vector<Complex>(order + 1));
+        std::vector<std::vector<Complex>> triangular(order + 1);
+        for (int m = 0; m <= order; ++m) {
+            for (int n = m; n <= order; ++n) {
+                coefficients[m][n] = amplitude * std::pow(ratio, m + n);
+                triangular[m].push_back(coefficients[m][n]);
+            }
+        }
+        auto geometric = [&](double q) {
+            return 1 + 2 * q * (1 - std::pow(q, order)) / (1 - q);
+        };
+        Complex expected = amplitude * (
+            geometric(-ratio * ratio) - std::pow(-ratio, order + 1) * geometric(ratio)
+        ) / (1 + ratio);
+        for (bool adaptive : {false, true}) {
+            expect_true(std::abs(compute_fbs_backscatter(
+                order, order, angular, coefficients, adaptive
+            ) - expected) < 1e-10);
+            expect_true(std::abs(compute_fbs_backscatter_triangular(
+                order, angular, triangular, adaptive
+            ) - expected) < 1e-10);
+        }
+        auto azimuth = compute_azimuth(order, 0.0, std::acos(-1.0));
+        auto reflected = reflect_smn_matrix(angular);
+        expect_true(std::abs(compute_fbs(
+            order, order, azimuth, angular, reflected, coefficients
+        ) - expected) < 1e-12);
+        expect_error(compute_fbs(
+            order, order, std::vector<double>(), angular, reflected, coefficients
+        ));
+    }
+
+    test_that("invalid angular modes do not contaminate the retained sum") {
+        using Complex = std::complex<double>;
+        const double nan = std::numeric_limits<double>::quiet_NaN();
+        const std::vector<std::vector<double>> angular = {{1, nan}, {nan, 1}};
+        const std::vector<std::vector<Complex>> coefficients = {{{1, 0}, {2, 0}}, {{nan, 0}, {2, 0}}};
+        expect_true(compute_fbs_backscatter(1, 1, angular, coefficients) == Complex(-3, 0));
+        expect_true(compute_fbs(1, 1, {1.0, -1.0}, angular, angular, coefficients) == Complex(-3, 0));
+        auto expanded = expand_Amn_triangular<double>(1, 1, {{{1, 0}, {nan, 0}, {3, 0}}, {{2, 0}}});
+        expect_true(std::isnan(expanded[0][1].real()));
+        expect_true(expanded[1][1] == Complex(2, 0));
+        expect_true(std::isnan(reflect_smn_matrix(angular)[0][1]));
+    }
+}
+
+context("Packed angular data and native validation") {
+    test_that("missing exponents and modes preserve missingness") {
+        const double nan = std::numeric_limits<double>::quiet_NaN();
+        ProfcnResult<double> packed;
+        packed.s1c = {2, nan};
+        packed.is1e = {2, NA_INTEGER};
+        expect_true(extract_angular_value_from_batch(packed, 0) == 200);
+        expect_true(std::isnan(extract_angular_value_from_batch(packed, 1)));
+        expect_true(std::isnan(extract_angular_value_from_batch(packed, 3)));
+        std::vector<double> values = {2, 3, nan};
+        std::vector<int> exponents = {2, NA_INTEGER, 4};
+        scale_profcn_component(values, exponents);
+        expect_true(values[0] == 200);
+        expect_true(values[1] == 3);
+        expect_true(std::isnan(values[2]));
+        expect_true(exponents[1] == NA_INTEGER);
+        expect_error(Smn_matrix<double>({}, {0}, 1, {0}));
+        expect_error(Smn_matrix<double>({0}, {0}, 1, {}));
+    }
+}
