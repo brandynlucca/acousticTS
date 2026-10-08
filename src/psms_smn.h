@@ -326,6 +326,20 @@ Rcpp::List Smn_cpp_to_rcpp_list(
             Rcpp::Named("derivative") = derivatives
         );
     }
+    // Pairwise modes at multiple angles have one row per requested pair.
+    // They do not contain the n_len * eta_len entries of an outer product.
+    else if (m_len == n_len && m_len > 1) {
+        Rcpp::NumericMatrix values(m_len, eta_len), derivatives(m_len, eta_len);
+        for (int i = 0; i < m_len; ++i)
+            for (int j = 0; j < eta_len; ++j) {
+                values(i, j) = static_cast<double>(res.value[i][j]);
+                derivatives(i, j) = static_cast<double>(res.derivative[i][j]);
+            }
+        return Rcpp::List::create(
+            Rcpp::Named("value") = values,
+            Rcpp::Named("derivative") = derivatives
+        );
+    }
     // General case: if eta_len == 1, return m_len x n_len matrix as before
     else if (eta_len == 1) {
         Rcpp::NumericMatrix values(m_len, n_len), derivatives(m_len, n_len);
