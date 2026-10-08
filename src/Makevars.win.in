@@ -17,6 +17,7 @@ OBJECTS = RcppExports.o \
 	param.o \
 	prolate_swf.o \
 	psms.o \
+	test-runner.o \
 	tmm.o \
 	vesms.o \
 	$(QUAD_OBJECTS)
