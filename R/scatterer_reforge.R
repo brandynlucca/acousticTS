@@ -1677,49 +1677,6 @@ setMethod(
     }
     methods::slot(object, "shape_parameters")$radius <- max(radii, na.rm = TRUE)
     return(object)
-    ############################################################################
-    # Rescale length ===========================================================
-    if (!is.null(length)) {
-      new_scale <- length / shape$length
-      if (length_radius_ratio_constant) {
-        # Isometric: scale all axes (x, y/z centerline path, radius rows).
-        rpos <- rpos * new_scale
-        # Radius vector: follow length scale unless caller also supplied radius.
-        if (is.null(radius)) {
-          radii <- radii * new_scale
-        } else {
-          r_scale <- radius / shape$radius
-          radii <- radii * r_scale
-          # Correct the already-scaled radius rows in rpos so they match.
-          correction <- r_scale / new_scale
-          if (nrow(rpos) >= 4) {
-            rpos[seq(4L, nrow(rpos)), ] <- rpos[seq(4L, nrow(rpos)), ] *
-              correction
-          }
-        }
-        methods::slot(object, "shape_parameters")$radius <- max(radii)
-      } else {
-        # Length-only: move the x-axis while leaving the radius rows intact.
-        rpos[1L, ] <- rpos[1L, ] * new_scale
-      }
-      methods::slot(object, "shape_parameters")$length <-
-        abs(diff(range(rpos[1L, ])))
-    }
-    ############################################################################
-    # Rescale radius when length was not specified =============================
-    if (!is.null(radius) && is.null(length)) {
-      r_scale <- radius / shape$radius
-      radii <- radii * r_scale
-      if (nrow(rpos) >= 4) {
-        rpos[seq(4L, nrow(rpos)), ] <- rpos[seq(4L, nrow(rpos)), ] * r_scale
-      }
-      methods::slot(object, "shape_parameters")$radius <- max(radii)
-    }
-    ############################################################################
-    # Flush working copies to slots ============================================
-    methods::slot(object, "body")$rpos <- rpos
-    methods::slot(object, "body")$radius <- radii
-    return(object)
   }
 )
 
