@@ -51,9 +51,10 @@ Fully supported for both positive and negative values.
 \item \strong{Purely imaginary arguments} (\eqn{z = iy}, where
 \eqn{y \in \mathbb{R}}):
 Computed using the identity
-\eqn{Y_\nu(iy) = i e^{-i\pi\nu/2} I_\nu(y) - \frac{2}{\pi}
-        e^{i\pi\nu/2} K_\nu(y)}
+\eqn{Y_\nu(iy) = i e^{i\pi\nu/2} I_\nu(y) - \frac{2}{\pi}
+e^{-i\pi\nu/2} K_\nu(y)} for \eqn{y > 0},
 where \eqn{I_\nu} and \eqn{K_\nu} are modified Bessel functions.
+Negative imaginary arguments use complex conjugation for real order.
 \item \strong{General complex arguments} (\eqn{z = x + iy}, where \eqn{x \neq 0}
 and \eqn{y \neq 0}): \strong{Not supported}.
 }
@@ -61,9 +62,11 @@ and \eqn{y \neq 0}): \strong{Not supported}.
 \strong{Special cases:}
 \itemize{
 \item \eqn{Y_\nu(0) = -\infty} (singularity at the origin).
-\item For negative real arguments:
-\eqn{Y_\nu(-x) = \cos(\pi\nu) Y_\nu(x) + \sin(\pi\nu) J_\nu(x)}.
-\item For integer order \eqn{n}: \eqn{Y_n(-x) = (-1)^n Y_n(x)}.
+\item Negative real arguments use the upper lip of the principal branch
+cut. For \eqn{x > 0},
+\eqn{Y_\nu(-x) = e^{-i\pi\nu} Y_\nu(x) + 2i\cos(\pi\nu) J_\nu(x)}.
+\item For integer order \eqn{n}:
+\eqn{Y_n(-x) = (-1)^n [Y_n(x) + 2i J_n(x)]}.
 \item k-th derivative (DLMF 10.6.1):
 \deqn{
           \frac{d^k}{dz^k} Y_\nu(z) = \frac{1}{2^k} \sum_{j=0}^{k} (-1)^j
