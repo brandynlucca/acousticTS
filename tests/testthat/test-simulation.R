@@ -1,5 +1,161 @@
 library(acousticTS)
 
+test_that("worker libraries reuse installations and handle errors", {
+  # Isolate filesystem and subprocess boundaries without installing another
+  # package or changing the caller's worker cache.
+  resolver <- acousticTS:::.resolve_simulation_worker_library
+  source <- "/source/acousticTS"
+  libraries <- "/installed"
+  directories <- c(source)
+  install_status <- 0L
+  calls <- list()
+  cache <- new.env(parent = emptyenv())
+  environment(resolver) <- list2env(list(
+    getNamespaceInfo = function(...) source,
+    normalizePath = function(path, ...) path,
+    dir.exists = function(path) path %in% directories,
+    file.exists = function(path) {
+      basename(path) == "DESCRIPTION" & dirname(path) %in% directories
+    },
+    .libPaths = function() libraries,
+    tempdir = function() "/worker-cache",
+    dir.create = function(path, ...) {
+      directories <<- union(directories, path)
+      TRUE
+    },
+    unlink = function(path, ...) {
+      directories <<- setdiff(directories, path)
+      0L
+    },
+    system2 = function(command, args, ...) {
+      calls[[length(calls) + 1L]] <<- list(command = command, args = args)
+      directories <<- union(
+        directories, "/worker-cache/acousticTS-simulation-lib/acousticTS"
+      )
+      structure("installation output", status = install_status)
+    },
+    .simulation_worker_cache = cache
+  ), parent = environment(resolver))
+
+  library <- resolver()
+  expect_equal(library, "/worker-cache/acousticTS-simulation-lib")
+  expect_length(calls, 1L)
+  expect_true(source %in% calls[[1]]$args)
+  expect_true(library %in% calls[[1]]$args)
+  expect_equal(resolver(), library)
+  expect_length(calls, 1L)
+
+  cache$acousticTS.simulation_worker_library <- NULL
+  install_status <- 1L
+  expect_error(
+    resolver(), "Unable to prepare the temporary worker installation"
+  )
+  expect_length(calls, 2L)
+  expect_null(cache$acousticTS.simulation_worker_library)
+
+  install_status <- 0L
+  environment(resolver)$.Platform <- list(OS.type = "unix")
+  expect_equal(resolver(), library)
+  expect_equal(basename(calls[[3]]$command), "R")
+  expect_equal(calls[[3]]$args[1:2], c("CMD", "INSTALL"))
+
+  directories <- c(source, paste0(source, "/Meta"))
+  expect_equal(resolver(), dirname(source))
+  source <- "/missing/acousticTS"
+  directories <- "/installed/acousticTS"
+  expect_equal(resolver(), "/installed")
+  directories <- character()
+  expect_null(resolver())
+})
+
+test_that("composite simulation aliases agree with explicit geometry changes", {
+  data(sardine, package = "acousticTS")
+  aliased <- simulate_ts(
+    sardine,
+    frequency = 38000,
+    model = "KRM",
+    parameters = list(
+      length_bladder = 0.025,
+      maintain_ratio = FALSE
+    ),
+    parallel = FALSE,
+    verbose = FALSE
+  )
+  explicit <- target_strength(
+    reforge(
+      sardine,
+      swimbladder_target = c(length = 0.025),
+      maintain_ratio = FALSE
+    ),
+    frequency = 38000,
+    model = "KRM"
+  )
+  expect_equal(aliased$KRM$TS, explicit@model$KRM$TS)
+  expect_error(
+    simulate_ts(
+      sardine,
+      frequency = 38000,
+      model = "KRM",
+      parameters = list(length_bladder = 0.025, length_swimbladder = 0.025),
+      parallel = FALSE,
+      verbose = FALSE
+    ),
+    "duplicate one or more dimensions"
+  )
+  expect_error(
+    simulate_ts(
+      sardine,
+      frequency = 38000,
+      model = "KRM",
+      parameters = list(length_bladder = function() NA_real_),
+      parallel = FALSE,
+      verbose = FALSE
+    ),
+    "one non-missing numeric value"
+  )
+
+  fish <- bbf_generate(
+    body_shape = cylinder(0.08, 0.006),
+    backbone_shape = cylinder(
+      0.04,
+      8e-04
+    ),
+    g_body = 1.04,
+    h_body = 1.02,
+    density_backbone = 1900,
+    sound_speed_longitudinal_backbone = 3500,
+    sound_speed_transversal_backbone = 1700,
+    x_offset_backbone = 0.02
+  )
+  aliased <- simulate_ts(
+    fish,
+    frequency = 38000,
+    model = "BBFM",
+    parameters = list(
+      length_backbone = 0.03,
+      maintain_ratio = FALSE,
+      sound_speed_transversal = 1800
+    ),
+    parallel = FALSE,
+    verbose = FALSE
+  )
+  changed <- reforge(
+    fish,
+    backbone_target = c(length = 0.03),
+    maintain_ratio = FALSE
+  )
+  changed@backbone$sound_speed_transversal <- 1800
+  changed@components$backbone <- changed@backbone
+  explicit <- target_strength(changed, frequency = 38000, model = "BBFM")
+  expect_equal(aliased$BBFM$TS, explicit@model$BBFM$TS)
+  overridden <- acousticTS:::.apply_simulation_parameter_overrides(
+    fish,
+    list(sound_speed_transversal = 1800)
+  )
+  expect_equal(overridden@components$backbone, overridden@backbone)
+  expect_equal(overridden@backbone$sound_speed_transversal, 1800)
+})
+
 test_that("simulate_ts function works with empty parameters", {
   # Test with a simple CAL object
   cal_obj <- cal_generate()
@@ -1021,9 +1177,8 @@ test_that(
       )
     )
     expect_true(any(grepl("Scatterer-class: CAL", header, fixed = TRUE)))
-    expect_true(any(grepl("Total simulation realizations: 2", header,
-      fixed =
-        TRUE
+    expect_true(any(grepl(
+      "Total simulation realizations: 2", header, fixed = TRUE
     )))
 
     sequential <- capture.output(
@@ -1038,7 +1193,8 @@ test_that(
       )
     )
     expect_null(cluster)
-    expect_true(any(grepl("Preparing sequential simulations", sequential,
+    expect_true(any(grepl(
+      "Preparing sequential simulations", sequential,
       fixed = TRUE
     )))
 
@@ -1056,7 +1212,8 @@ test_that(
     on.exit(parallel::stopCluster(cluster), add = TRUE)
 
     expect_s3_class(cluster, "cluster")
-    expect_true(any(grepl("Preparing parallelized simulations", parallel_out,
+    expect_true(any(grepl(
+      "Preparing parallelized simulations", parallel_out,
       fixed = TRUE
     )))
   }
@@ -1090,7 +1247,8 @@ test_that("simulation helper utilities are exercised under coverage runs", {
     )
   )
   expect_null(cluster)
-  expect_true(any(grepl("Preparing sequential simulations", sequential,
+  expect_true(any(grepl(
+    "Preparing sequential simulations", sequential,
     fixed = TRUE
   )))
 
@@ -1108,7 +1266,8 @@ test_that("simulation helper utilities are exercised under coverage runs", {
   on.exit(parallel::stopCluster(cluster), add = TRUE)
 
   expect_s3_class(cluster, "cluster")
-  expect_true(any(grepl("Preparing parallelized simulations", parallel_out,
+  expect_true(any(grepl(
+    "Preparing parallelized simulations", parallel_out,
     fixed = TRUE
   )))
 })
