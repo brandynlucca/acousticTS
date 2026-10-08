@@ -1,5 +1,46 @@
 library(acousticTS)
 
+test_that("model argument bundles reject ambiguous names and accept defaults", {
+  object <- fixture_sphere("liquid_filled")
+  for (args in list(1, list(list()), setNames(list(list()), ""))) {
+    expect_error(
+      target_strength(
+        object,
+        frequency = 38000,
+        model = "SPHMS",
+        model_args = args
+      ),
+      "named list"
+    )
+  }
+  expect_error(
+    target_strength(
+      object,
+      frequency = 38000,
+      model = "SPHMS",
+      model_args = list(SPHMS = list(), sphms = list())
+    ),
+    "duplicate model entries"
+  )
+  expect_error(
+    target_strength(
+      object,
+      frequency = 38000,
+      model = "SPHMS",
+      model_args = list(SPHMS = setNames(list(1), ""))
+    ),
+    "named arguments only"
+  )
+  defaults <- target_strength(object, frequency = 38000, model = "SPHMS")
+  empty <- target_strength(
+    object,
+    frequency = 38000,
+    model = "SPHMS",
+    model_args = list(SPHMS = NULL)
+  )
+  expect_equal(empty@model$SPHMS, defaults@model$SPHMS)
+})
+
 test_that("target_strength function works correctly", {
   # Test target_strength with calibration sphere
   cal_obj <- cal_generate()
@@ -93,8 +134,9 @@ test_that("target_strength works with different scatterer types", {
 
   expect_s4_class(fls_with_ts, "FLS")
   expect_true(
-    all(c("DWBA", "SDWBA", "SDWBA_curved", "KRM")
-    %in% names(fls_with_ts@model))
+    all(
+      c("DWBA", "SDWBA", "SDWBA_curved", "KRM") %in% names(fls_with_ts@model)
+    )
   )
 
   # Test SBF object with KRM
@@ -157,8 +199,7 @@ test_that("target_strength works with different scatterer types", {
 
   expect_s4_class(ess_with_ts, "ESS")
   expect_true(
-    all(c("ESSMS", "HPA")
-    %in% names(ess_with_ts@model))
+    all(c("ESSMS", "HPA") %in% names(ess_with_ts@model))
   )
 })
 
