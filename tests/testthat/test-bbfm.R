@@ -117,7 +117,7 @@ test_that("BBFM matches the explicit DWBA-plus-ECMS coherent sum", {
   phase_shift <- exp(
     2i * acousticTS::wavenumber(frequency, sound_speed_sw) *
       (x_center * cos(backbone_body$theta) +
-        z_center * sin(backbone_body$theta))
+         z_center * sin(backbone_body$theta))
   )
   expected_fbs <- body_out$f_bs + backbone_out$f_bs * phase_shift
 
@@ -242,4 +242,7 @@ test_that("BBFM returns the documented component bookkeeping columns", {
     "TS_body", "TS_backbone", "TS"
   ) %in% names(out)))
   expect_equal(out$sigma_bs, Mod(out$f_bs)^2, tolerance = 1e-12)
+  grDevices::pdf(NULL)
+  on.exit(grDevices::dev.off(), add = TRUE)
+  expect_error(plot(object, type = "model"), NA)
 })
