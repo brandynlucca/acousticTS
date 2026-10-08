@@ -92,8 +92,7 @@ std::complex<double> jc_single_impl(std::complex<double> zi, double nui) {
         std::complex<double> final_cplx = exp_factor * I_nu_abs_y;
         
         if (y_val < 0) {
-            std::complex<double> sign_factor = std::exp(std::complex<double>(0.0, pi * nui));
-            final_cplx = sign_factor * final_cplx;
+            final_cplx = std::conj(final_cplx);
         }
         
         return final_cplx;
@@ -110,8 +109,6 @@ std::complex<double> jc_single_impl(std::complex<double> zi, double nui) {
 std::complex<double> yc_single_impl(std::complex<double> zi, double nui) {
     double zi_real = zi.real();
     double zi_imag = zi.imag();
-    
-    bool is_integer = std::abs(nui - std::round(nui)) < tol;
     
     // Handle z = 0
     if (std::abs(zi_real) < tol && std::abs(zi_imag) < tol) {
@@ -130,7 +127,11 @@ std::complex<double> yc_single_impl(std::complex<double> zi, double nui) {
             double J_nu_x = R::bessel_j(abs_xi, nui);
             double cos_nu_pi = std::cos(pi * nui);
             double sin_nu_pi = std::sin(pi * nui);
-            return std::complex<double>(cos_nu_pi * Y_nu_x + sin_nu_pi * J_nu_x, 0.0);
+            // Upper lip of the principal branch cut, DLMF 10.11.2 and 10.11.6.
+            return std::complex<double>(
+                cos_nu_pi * Y_nu_x,
+                2.0 * cos_nu_pi * J_nu_x - sin_nu_pi * Y_nu_x
+            );
         }
     }
     
@@ -142,22 +143,17 @@ std::complex<double> yc_single_impl(std::complex<double> zi, double nui) {
         double I_nu_abs_y = modified_bessel_i_impl(nui, abs_y);
         double K_nu_abs_y = modified_bessel_k_impl(nui, abs_y);
         
-        std::complex<double> factor1_exp = std::exp(-i_unit * pi * nui / 2.0);
+        // DLMF 10.27.6 and 10.27.8, with H^(1) = J + iY.
+        std::complex<double> factor1_exp = std::exp(i_unit * pi * nui / 2.0);
         std::complex<double> term1 = i_unit * factor1_exp * I_nu_abs_y;
         
-        std::complex<double> factor2_exp = std::exp(i_unit * pi * nui / 2.0);
+        std::complex<double> factor2_exp = std::exp(-i_unit * pi * nui / 2.0);
         std::complex<double> term2 = -(2.0 / pi) * factor2_exp * K_nu_abs_y;
         
         std::complex<double> final_cplx = term1 + term2;
         
         if (y_val < 0) {
-            if (is_integer) {
-                int int_nu = (int)std::round(nui);
-                std::complex<double> sign_factor = std::complex<double>(std::cos(pi * int_nu), 0.0);
-                final_cplx = sign_factor * final_cplx;
-            } else {
-                final_cplx = std::conj(term1) + std::conj(term2);
-            }
+            final_cplx = std::conj(final_cplx);
         }
         
         return final_cplx;
@@ -251,8 +247,10 @@ std::vector<double> js_sequence_miller_impl(int l_max, double zi) {
     double j0 = std::sin(z) / z;
     double j1 = std::sin(z) / (z * z) - std::cos(z) / z;
     double scale = R_NaN;
+    // Normalize with the larger analytic anchor. Near a zero of j_0, its
+    // recurrence value is dominated by cancellation even when nonzero.
     if (std::isfinite(work[0]) && std::abs(work[0]) > 1e-280 &&
-        std::abs(j0) > 1e-280) {
+        std::abs(j0) >= std::abs(j1)) {
         scale = j0 / work[0];
     } else if (std::isfinite(work[1]) && std::abs(work[1]) > 1e-280) {
         scale = j1 / work[1];
