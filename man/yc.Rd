@@ -52,7 +52,7 @@ Fully supported for both positive and negative values.
 \eqn{y \in \mathbb{R}}):
 Computed using the identity
 \eqn{Y_\nu(iy) = i e^{i\pi\nu/2} I_\nu(y) - \frac{2}{\pi}
-e^{-i\pi\nu/2} K_\nu(y)} for \eqn{y > 0},
+        e^{-i\pi\nu/2} K_\nu(y)} for \eqn{y > 0},
 where \eqn{I_\nu} and \eqn{K_\nu} are modified Bessel functions.
 Negative imaginary arguments use complex conjugation for real order.
 \item \strong{General complex arguments} (\eqn{z = x + iy}, where \eqn{x \neq 0}

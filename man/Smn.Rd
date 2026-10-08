@@ -45,8 +45,8 @@ A list containing:
 }
 Equally sized vectors \code{m} and \code{n} with more than one entry are
 evaluated pairwise. For these paired modes, a scalar \code{eta} gives vectors
-in \code{value} and \code{derivative}. Multiple \code{eta} values give matrices
-with one row per mode pair and one column per angular coordinate.
+in \code{value} and \code{derivative}. Multiple \code{eta} values give
+matrices with one row per mode pair and one column per angular coordinate.
 }
 \description{
 Computes the prolate spheroidal angular function of the first kind,
