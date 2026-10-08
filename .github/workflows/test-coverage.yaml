@@ -42,6 +42,7 @@ jobs:
           needs: coverage
 
       - name: Test coverage
+        id: coverage
         run: |
           cov <- covr::package_coverage(
             quiet = FALSE,
@@ -50,6 +51,11 @@ jobs:
           )
           print(cov)
           covr::to_cobertura(cov)
+          coverage <- covr::percent_coverage(cov)
+          cat(sprintf("coverage=%.10f\n", coverage),
+              file = Sys.getenv("GITHUB_OUTPUT"), append = TRUE)
+          cat(sprintf("Total package coverage: **%.2f%%**\n", coverage),
+              file = Sys.getenv("GITHUB_STEP_SUMMARY"), append = TRUE)
         shell: Rscript {0}
 
       - uses: codecov/codecov-action@v7
@@ -60,6 +66,16 @@ jobs:
           plugins: noop
           disable_search: true
           token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Require package coverage above 95 percent
+        env:
+          PACKAGE_COVERAGE: ${{ steps.coverage.outputs.coverage }}
+        run: |
+          coverage <- as.numeric(Sys.getenv("PACKAGE_COVERAGE"))
+          if (!is.finite(coverage) || coverage <= 95) {
+            stop(sprintf("Package coverage %.2f%% must exceed 95%%.", coverage))
+          }
+        shell: Rscript {0}
 
       - name: Show testthat output
         if: always()
