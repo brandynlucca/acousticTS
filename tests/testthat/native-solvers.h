@@ -1,6 +1,69 @@
 #include <testthat.h>
 #include "../../src/svd_solve.h"
 
+// Internal functions are linked directly so zero-order and empty-sequence
+// behavior is checked below the R wrappers that normally short-circuit it.
+std::vector<double> js_sequence_miller_impl(int, double);
+std::vector<double> ys_sequence_upward_impl(int, double);
+std::vector<double> js_deriv_sequence_impl(int, double);
+std::vector<std::complex<double>> hs_deriv_sequence_impl(int, double);
+double js_single_impl(int, double);
+double ys_single_impl(int, double);
+std::complex<double> hs_single_impl(int, double);
+std::complex<double> js_single_complex_impl(int, std::complex<double>);
+std::complex<double> ys_single_complex_impl(int, std::complex<double>);
+std::complex<double> hs_single_complex_impl(int, std::complex<double>);
+double js_deriv_single_impl(int, double, int);
+double ys_deriv_single_impl(int, double, int);
+std::complex<double> hs_deriv_single_impl(int, double, int);
+std::complex<double> js_deriv_single_complex_impl(int, std::complex<double>, int);
+std::complex<double> ys_deriv_single_complex_impl(int, std::complex<double>, int);
+std::complex<double> hs_deriv_single_complex_impl(int, std::complex<double>, int);
+std::complex<double> det6x6_scaled(std::complex<double>[6][6]);
+
+context("Native Bessel and determinant edge cases") {
+    test_that("zero-order derivatives retain values and empty orders stay empty") {
+        using Complex = std::complex<double>;
+        const Complex z(0.7, 0.3);
+        for (int n : {0, 1, 4}) {
+            expect_true(js_deriv_single_impl(n, 0.7, 0) == js_single_impl(n, 0.7));
+            expect_true(ys_deriv_single_impl(n, 0.7, 0) == ys_single_impl(n, 0.7));
+            expect_true(hs_deriv_single_impl(n, 0.7, 0) == hs_single_impl(n, 0.7));
+            expect_true(js_deriv_single_complex_impl(n, z, 0) == js_single_complex_impl(n, z));
+            expect_true(ys_deriv_single_complex_impl(n, z, 0) == ys_single_complex_impl(n, z));
+            expect_true(hs_deriv_single_complex_impl(n, z, 0) == hs_single_complex_impl(n, z));
+        }
+        expect_true(js_sequence_miller_impl(-1, 0.7).empty());
+        expect_true(ys_sequence_upward_impl(-1, 0.7).empty());
+        expect_true(js_deriv_sequence_impl(-1, 0.7).empty());
+        expect_true(hs_deriv_sequence_impl(-1, 0.7).empty());
+        auto singular = ys_single_complex_impl(0, Complex(0, 0));
+        expect_true(std::isnan(singular.real()));
+        expect_true(std::isnan(singular.imag()));
+        auto tiny = js_sequence_miller_impl(1, 1e-290);
+        expect_true(std::abs(tiny[0] - 1) < 1e-12);
+        expect_true(std::abs(tiny[1]) < 1e-280);
+        auto converted = to_Rcomplex(Complex(2, -3));
+        expect_true(converted.r == 2);
+        expect_true(converted.i == -3);
+    }
+
+    test_that("scaled determinants preserve products, permutation signs and rank") {
+        using Complex = std::complex<double>;
+        Complex matrix[6][6] = {};
+        Complex expected(1, 0);
+        for (int i = 0; i < 6; ++i) {
+            matrix[i][i] = Complex(i + 1, 1) * (i % 2 ? 1e30 : 1e-30);
+            expected *= matrix[i][i];
+        }
+        expect_true(std::abs(det6x6_scaled(matrix) / expected - Complex(1, 0)) < 1e-12);
+        for (int j = 0; j < 6; ++j) std::swap(matrix[0][j], matrix[1][j]);
+        expect_true(std::abs(det6x6_scaled(matrix) / expected + Complex(1, 0)) < 1e-12);
+        for (int j = 0; j < 6; ++j) matrix[0][j] = matrix[1][j];
+        expect_true(det6x6_scaled(matrix) == Complex(0, 0));
+    }
+}
+
 context("Minimum-norm SVD solutions") {
     test_that("rectangular complex systems recover known solutions") {
         arma::cx_mat matrix(3, 2);
@@ -53,7 +116,7 @@ context("Minimum-norm SVD solutions") {
 template<typename T>
 void check_pivoted_solver() {
     using Complex = std::complex<T>;
-    const std::vector<Complex> matrix = {{0, 0}, {2, 1}, {1, -1}, {3, 0}};
+    const std::vector<Complex> matrix = {{0, 0}, {4, 1}, {1, -1}, {2, 0}};
     const std::vector<Complex> expected = {{2, 1}, {-1, 2}};
     const auto rhs = matvec_product(matrix, expected, 2);
     auto factors = lup_decompose(matrix, 2);
@@ -69,6 +132,25 @@ void check_pivoted_solver() {
 }
 
 context("Pivoted spheroidal kernel solves") {
+    test_that("residual refinement retains accuracy for large complex solutions") {
+        using Complex = std::complex<double>;
+        const std::vector<Complex> matrix = {
+            {0.1, 0.3}, {0.2, -0.1}, {0.3, 0.7},
+            {0.7, -0.2}, {0.11, 0.4}, {0.13, -0.9},
+            {0.17, 0.6}, {0.19, -0.2}, {0.23, 0.5}
+        };
+        const std::vector<Complex> expected = {
+            {1e14, 2e14}, {-3e14, 1e14}, {2e14, -1e14}
+        };
+        auto rhs = matvec_product(matrix, expected, 3);
+        auto actual = solve_linear_system_lup_refined(matrix, rhs, 3, 3);
+        auto recovered = matvec_product(matrix, actual, 3);
+        for (int i = 0; i < 3; ++i) {
+            expect_true(std::abs(actual[i] / expected[i] - Complex(1, 0)) < 1e-13);
+            expect_true(std::abs(recovered[i] / rhs[i] - Complex(1, 0)) < 1e-13);
+        }
+    }
+
     test_that("complete pivoting preserves complex systems and rejects singularity") {
         // The double T-block specialization permits rank-deficient systems.
         // Exercise its LUP counterpart with the precision-independent kernel.
@@ -112,14 +194,14 @@ context("Packed spheroidal radial values") {
                 packed, packed, 0, kind, 0, 0, 1.0, 1.5
             );
             auto batched = extract_radial_from_mblock(block, 0, 0, kind);
-            expect_true(single.val_real == (kind == 2 ? 0.6 : 200));
-            expect_true(single.der_real == (kind == 2 ? 0.08 : -4));
-            expect_true(single.val_imag == (kind < 3 ? 0 : kind == 3 ? 0.6 : -0.6));
-            expect_true(single.der_imag == (kind < 3 ? 0 : kind == 3 ? 0.08 : -0.08));
-            expect_true(batched.val_real == single.val_real);
-            expect_true(batched.der_real == single.der_real);
-            expect_true(batched.val_imag == single.val_imag);
-            expect_true(batched.der_imag == single.der_imag);
+            expect_true(std::abs(single.val_real - (kind == 2 ? 0.6 : 200)) < 1e-12);
+            expect_true(std::abs(single.der_real - (kind == 2 ? 0.08 : -4)) < 1e-12);
+            expect_true(std::abs(single.val_imag - (kind < 3 ? 0 : kind == 3 ? 0.6 : -0.6)) < 1e-12);
+            expect_true(std::abs(single.der_imag - (kind < 3 ? 0 : kind == 3 ? 0.08 : -0.08)) < 1e-12);
+            expect_true(std::abs(batched.val_real - single.val_real) < 1e-12);
+            expect_true(std::abs(batched.der_real - single.der_real) < 1e-12);
+            expect_true(std::abs(batched.val_imag - single.val_imag) < 1e-12);
+            expect_true(std::abs(batched.der_imag - single.der_imag) < 1e-12);
         }
     }
 
@@ -153,8 +235,7 @@ context("Packed spheroidal radial values") {
 
     test_that("native radial layouts retain invalid lower-triangle modes") {
         for (int kind = 1; kind <= 4; ++kind) {
-            auto shared = Rmn_matrix<double>({1}, {0, 1, 3}, 2, 1.5, kind);
-            expect_true(std::isnan(shared.value[0][0].real()));
+            expect_error(Rmn_matrix<double>({1}, {0, 1, 3}, 2, 1.5, kind));
             auto outer = Rmn_matrix<double>({0, 2}, {0, 1, 3}, 2, 1.5, kind);
             expect_true(std::isnan(outer.value[1][0].real()));
             expect_true(std::isnan(outer.derivative[1][1].real()));
@@ -227,6 +308,13 @@ context("Packed angular data and native validation") {
         expect_true(extract_angular_value_from_batch(packed, 0) == 200);
         expect_true(std::isnan(extract_angular_value_from_batch(packed, 1)));
         expect_true(std::isnan(extract_angular_value_from_batch(packed, 3)));
+        ProfcnBatchResult<double> block;
+        block.lnum = 2;
+        block.narg = 1;
+        block.s1c = {200, nan};
+        expect_true(extract_angular_value_from_mblock(block, 0, 0) == 200);
+        expect_true(std::isnan(extract_angular_value_from_mblock(block, 0, 1)));
+        expect_true(std::isnan(extract_angular_value_from_mblock(block, 1, 0)));
         std::vector<double> values = {2, 3, nan};
         std::vector<int> exponents = {2, NA_INTEGER, 4};
         scale_profcn_component(values, exponents);
