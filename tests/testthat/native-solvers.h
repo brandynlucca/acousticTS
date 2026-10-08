@@ -141,6 +141,33 @@ void check_pivoted_solver() {
 }
 
 context("Pivoted spheroidal kernel solves") {
+    test_that("column scaling preserves small coefficients and deficient norms") {
+        arma::cx_mat matrix(3, 3, arma::fill::eye);
+        matrix(0, 1) = {0.01, 0.02};
+        matrix(2, 0) = {-0.02, 0.01};
+        // The unscaled SVD drops a physical mode at this radial scale ratio.
+        matrix.col(1) *= 1e16;
+        matrix.col(2) *= 1e8;
+        arma::cx_mat expected(3, 2);
+        expected.col(0) = arma::cx_vec({{2, 1}, {1e-16, -2e-16}, {3e-8, 1e-8}});
+        expected.col(1) = arma::cx_vec({{1, -2}, {3e-16, 1e-16}, {-2e-8, 1e-8}});
+        arma::cx_mat rhs = matrix * expected;
+        arma::cx_mat actual = solve_fluid_system_svd(matrix, rhs);
+        for (arma::uword i = 0; i < actual.n_elem; ++i) {
+            expect_true(std::abs(actual[i] / expected[i] - 1.0) < 1e-12);
+        }
+
+        matrix.ones(2, 2);
+        matrix.col(1) *= 2.0;
+        rhs.ones(2, 1);
+        actual = solve_fluid_system_svd(matrix, rhs);
+        expect_true(std::abs(actual[0] - 0.2) < 1e-12);
+        expect_true(std::abs(actual[1] - 0.4) < 1e-12);
+        matrix.zeros();
+        actual = solve_fluid_system_svd(matrix, rhs);
+        expect_true(arma::norm(actual) == 0.0);
+    }
+
     test_that("residual refinement retains accuracy for large complex solutions") {
         using Complex = std::complex<double>;
         const std::vector<Complex> matrix = {

@@ -20,19 +20,6 @@ test_that("unavailable quad builds reject quad requests", {
 })
 
 test_that("spheroidal fluid strategies agree at modal convergence", {
-  check_amplitude <- function(actual, expected, route, precision, method) {
-    expect_identical(dim(actual), dim(expected))
-    expect_length(actual, length(expected))
-    # Scale the complex amplitude as a whole, including near-zero components.
-    relative_error <- max(Mod(actual - expected)) / max(Mod(expected))
-    expect_true(
-      is.finite(relative_error) && relative_error <= 1e-07,
-      info = sprintf(
-        "%s, %s, %s: relative complex error %.17g",
-        precision, method, route, relative_error
-      )
-    )
-  }
   acoustics <- data.frame(chi_sw = 0.8, chi_body = 0.7, m_max = 8L, n_max = 12L)
   body <- data.frame(
     xi = 1.5,
@@ -78,10 +65,7 @@ test_that("spheroidal fluid strategies agree at modal convergence", {
           adaptive = TRUE,
           vectorized = vectorized
         )
-        check_amplitude(
-          actual, reference, paste("adaptive, vectorized", vectorized),
-          precision, method
-        )
+        expect_equal(actual, reference, tolerance = 1e-07)
       }
       vectorized <- acousticTS:::prolate_spheroid_fbs(
         acoustics,
@@ -93,7 +77,7 @@ test_that("spheroidal fluid strategies agree at modal convergence", {
         adaptive = FALSE,
         vectorized = TRUE
       )
-      check_amplitude(vectorized, reference, "vectorized", precision, method)
+      expect_equal(vectorized, reference, tolerance = 1e-07)
       # A general receive angle bypasses the monostatic shortcuts.
       general_body <- body
       general_body$theta_scatter <- 0.7
@@ -116,7 +100,7 @@ test_that("spheroidal fluid strategies agree at modal convergence", {
         precision,
         method
       )
-      check_amplitude(retained$f_scat, direct, "retained", precision, method)
+      expect_equal(retained$f_scat, direct, tolerance = 1e-07)
     }
   }
 })

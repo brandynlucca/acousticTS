@@ -1897,21 +1897,7 @@ std::vector<std::complex<T>> solve_fluid_mode_system_svd(
             static_cast<double>(rhs_val.imag())
         );
     }
-    arma::Mat<std::complex<double>> U, V;
-    arma::Col<double> s;
-    bool svd_ok = arma::svd(U, s, V, K3_arma);
-    if (!svd_ok) {
-        throw std::runtime_error("SVD failed");
-    }
-    double tol =
-        std::max(size, size) * s.max() * std::numeric_limits<double>::epsilon();
-    arma::Col<double> d_inv(s.n_elem);
-    for (arma::uword i = 0; i < s.n_elem; ++i) {
-        d_inv(i) = (s(i) > tol) ? (1.0 / s(i)) : 0.0;
-    }
-    arma::Mat<std::complex<double>> diag_dinv =
-        arma::diagmat(arma::conv_to<arma::Col<std::complex<double>>>::from(d_inv));
-    arma::Col<std::complex<double>> A = V * diag_dinv * U.t() * b;
+    arma::Col<std::complex<double>> A = solve_fluid_system_svd(K3_arma, b);
 
     std::vector<std::complex<T>> out(size);
     for (int i = 0; i < size; ++i) {
