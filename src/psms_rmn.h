@@ -67,28 +67,28 @@ RmnResult<T> Rmn_higher_order(int m, int n, int lnum, T c, T x1) {
         pwde2 = pow10_typed<T>(result2.ir2de[idx]);
     }
 
-    T R1 = std::numeric_limits<T>::quiet_NaN();
+    T R1 = precnan<T>();
     if (result1.r1c.size() > static_cast<size_t>(idx) &&
         !is_na_real(result1.r1c[idx]))
     {
         R1 = result1.r1c[idx] * pw1;
     }
 
-    T Rd1 = std::numeric_limits<T>::quiet_NaN();
+    T Rd1 = precnan<T>();
     if (result1.r1dc.size() > static_cast<size_t>(idx) &&
         !is_na_real(result1.r1dc[idx]))
     {
         Rd1 = result1.r1dc[idx] * pwde1;
     }
 
-    T R2 = std::numeric_limits<T>::quiet_NaN();
+    T R2 = precnan<T>();
     if (result2.r2c.size() > static_cast<size_t>(idx) &&
         !is_na_real(result2.r2c[idx]))
     {
         R2 = result2.r2c[idx] * pw2;
     }
 
-    T Rd2 = std::numeric_limits<T>::quiet_NaN();
+    T Rd2 = precnan<T>();
     if (result2.r2dc.size() > static_cast<size_t>(idx) &&
         !is_na_real(result2.r2dc[idx]))
     {
@@ -137,14 +137,14 @@ std::pair<std::complex<T>, std::complex<T>> Rmn_scalar(
             pwde = pow10_typed<T>((*ide)[idx]);
         }
 
-        T R = std::numeric_limits<T>::quiet_NaN();
+        T R = precnan<T>();
         if (val->size() > static_cast<size_t>(idx) &&
             !is_na_real((*val)[idx]))
         {
             R = (*val)[idx] * pw;
         }
 
-        T Rd = std::numeric_limits<T>::quiet_NaN();
+        T Rd = precnan<T>();
         if (der->size() > static_cast<size_t>(idx) &&
             !is_na_real((*der)[idx]))
         {
@@ -159,8 +159,8 @@ std::pair<std::complex<T>, std::complex<T>> Rmn_scalar(
                         !std::isfinite(static_cast<double>(Rd)) ||
                         (precabs(R) < tiny && precabs(Rd) < tiny);
             if (R_bad) {
-                R = std::numeric_limits<T>::quiet_NaN();
-                Rd = std::numeric_limits<T>::quiet_NaN();
+                R = precnan<T>();
+                Rd = precnan<T>();
             }
         }
         return {std::complex<T>(R, 0), std::complex<T>(Rd, 0)};
@@ -235,11 +235,11 @@ RadialValue<T> extract_radial_from_batch(
         if (ide->size() > static_cast<size_t>(idx) && !is_na_int((*ide)[idx])) {
             pwde = pow10_typed<T>((*ide)[idx]);
         }
-        out.val_real = std::numeric_limits<T>::quiet_NaN();
+        out.val_real = precnan<T>();
         if (rc->size() > static_cast<size_t>(idx) && !is_na_real((*rc)[idx])) {
             out.val_real = (*rc)[idx] * pw;
         }
-        out.der_real = std::numeric_limits<T>::quiet_NaN();
+        out.der_real = precnan<T>();
         if (rdc->size() > static_cast<size_t>(idx) && !is_na_real((*rdc)[idx])) {
             out.der_real = (*rdc)[idx] * pwde;
         }
@@ -251,8 +251,8 @@ RadialValue<T> extract_radial_from_batch(
                     !std::isfinite(static_cast<double>(out.der_real)) ||
                     (precabs(out.val_real) < tiny && precabs(out.der_real) < tiny);
             if (bad) {
-                out.val_real = std::numeric_limits<T>::quiet_NaN();
-                out.der_real = std::numeric_limits<T>::quiet_NaN();
+                out.val_real = precnan<T>();
+                out.der_real = precnan<T>();
             }
         }
         return out;
@@ -270,12 +270,12 @@ RadialValue<T> extract_radial_from_batch(
         !is_na_int(result1.ir1de[idx])) {
         pwde1 = pow10_typed<T>(result1.ir1de[idx]);
     }
-    out.val_real = std::numeric_limits<T>::quiet_NaN();
+    out.val_real = precnan<T>();
     if (result1.r1c.size() > static_cast<size_t>(idx) &&
         !is_na_real(result1.r1c[idx])) {
         out.val_real = result1.r1c[idx] * pw1;
     }
-    out.der_real = std::numeric_limits<T>::quiet_NaN();
+    out.der_real = precnan<T>();
     if (result1.r1dc.size() > static_cast<size_t>(idx) &&
         !is_na_real(result1.r1dc[idx])) {
         out.der_real = result1.r1dc[idx] * pwde1;
@@ -291,12 +291,12 @@ RadialValue<T> extract_radial_from_batch(
         !is_na_int(result2.ir2de[idx])) {
         pwde2 = pow10_typed<T>(result2.ir2de[idx]);
     }
-    out.val_imag = std::numeric_limits<T>::quiet_NaN();
+    out.val_imag = precnan<T>();
     if (result2.r2c.size() > static_cast<size_t>(idx) &&
         !is_na_real(result2.r2c[idx])) {
         out.val_imag = result2.r2c[idx] * pw2;
     }
-    out.der_imag = std::numeric_limits<T>::quiet_NaN();
+    out.der_imag = precnan<T>();
     if (result2.r2dc.size() > static_cast<size_t>(idx) &&
         !is_na_real(result2.r2dc[idx])) {
         out.der_imag = result2.r2dc[idx] * pwde2;
@@ -307,8 +307,8 @@ RadialValue<T> extract_radial_from_batch(
             !std::isfinite(static_cast<double>(out.der_imag)) ||
             (precabs(out.val_imag) < tiny && precabs(out.der_imag) < tiny);
     if (bad) {
-        out.val_imag = std::numeric_limits<T>::quiet_NaN();
-        out.der_imag = std::numeric_limits<T>::quiet_NaN();
+        out.val_imag = precnan<T>();
+        out.der_imag = precnan<T>();
     }
     if (kind == 4) {
         out.val_imag = -out.val_imag;
@@ -332,10 +332,10 @@ RadialValue<T> extract_radial_from_mblock(
     auto assign_kind12 = [&](const std::vector<T>& rc, const std::vector<T>& rdc) {
         out.val_real = (offset < rc.size() && !is_na_real(rc[offset]))
             ? rc[offset]
-            : std::numeric_limits<T>::quiet_NaN();
+            : precnan<T>();
         out.der_real = (offset < rdc.size() && !is_na_real(rdc[offset]))
             ? rdc[offset]
-            : std::numeric_limits<T>::quiet_NaN();
+            : precnan<T>();
         out.val_imag = T(0);
         out.der_imag = T(0);
         if (kind == 2) {
@@ -344,8 +344,8 @@ RadialValue<T> extract_radial_from_mblock(
                 !std::isfinite(static_cast<double>(out.der_real)) ||
                 (precabs(out.val_real) < tiny && precabs(out.der_real) < tiny);
             if (bad) {
-                out.val_real = std::numeric_limits<T>::quiet_NaN();
-                out.der_real = std::numeric_limits<T>::quiet_NaN();
+                out.val_real = precnan<T>();
+                out.der_real = precnan<T>();
             }
         }
     };
@@ -361,24 +361,24 @@ RadialValue<T> extract_radial_from_mblock(
 
     out.val_real = (offset < result.r1c.size() && !is_na_real(result.r1c[offset]))
         ? result.r1c[offset]
-        : std::numeric_limits<T>::quiet_NaN();
+        : precnan<T>();
     out.der_real = (offset < result.r1dc.size() && !is_na_real(result.r1dc[offset]))
         ? result.r1dc[offset]
-        : std::numeric_limits<T>::quiet_NaN();
+        : precnan<T>();
     out.val_imag = (offset < result.r2c.size() && !is_na_real(result.r2c[offset]))
         ? result.r2c[offset]
-        : std::numeric_limits<T>::quiet_NaN();
+        : precnan<T>();
     out.der_imag = (offset < result.r2dc.size() && !is_na_real(result.r2dc[offset]))
         ? result.r2dc[offset]
-        : std::numeric_limits<T>::quiet_NaN();
+        : precnan<T>();
 
     const T tiny = T(1e-300);
     bool bad = !std::isfinite(static_cast<double>(out.val_imag)) ||
         !std::isfinite(static_cast<double>(out.der_imag)) ||
         (precabs(out.val_imag) < tiny && precabs(out.der_imag) < tiny);
     if (bad) {
-        out.val_imag = std::numeric_limits<T>::quiet_NaN();
-        out.der_imag = std::numeric_limits<T>::quiet_NaN();
+        out.val_imag = precnan<T>();
+        out.der_imag = precnan<T>();
     }
     if (kind == 4) {
         out.val_imag = -out.val_imag;
@@ -436,8 +436,8 @@ RmnMatrixResult<T> Rmn_matrix(
         }
         for (int i = 0; i < n_len; ++i) {
             if (n[i] < m_val) {
-                out.value[0][i] = std::complex<T>(std::numeric_limits<T>::quiet_NaN(), 0);
-                out.derivative[0][i] = std::complex<T>(std::numeric_limits<T>::quiet_NaN(), 0);
+                out.value[0][i] = std::complex<T>(precnan<T>(), 0);
+                out.derivative[0][i] = std::complex<T>(precnan<T>(), 0);
                 continue;
             }
             RadialValue<T> rv = is_complex
@@ -511,8 +511,8 @@ RmnMatrixResult<T> Rmn_matrix(
         }
         for (int j = 0; j < n_len; ++j) {
             if (n[j] < m_val) {
-                out.value[i][j] = std::complex<T>(std::numeric_limits<T>::quiet_NaN(), 0);
-                out.derivative[i][j] = std::complex<T>(std::numeric_limits<T>::quiet_NaN(), 0);
+                out.value[i][j] = std::complex<T>(precnan<T>(), 0);
+                out.derivative[i][j] = std::complex<T>(precnan<T>(), 0);
                 continue;
             }
             RadialValue<T> rv = is_complex

@@ -21,6 +21,15 @@ std::complex<double> ys_deriv_single_complex_impl(int, std::complex<double>, int
 std::complex<double> hs_deriv_single_complex_impl(int, std::complex<double>, int);
 std::complex<double> det6x6_scaled(std::complex<double>[6][6]);
 
+context("Portable precision sentinels") {
+    test_that("missing values remain NaN across native precision conversions") {
+        expect_true(is_na_real(precnan<double>()));
+        expect_true(is_na_real(precnan<acousticts_quad_t>()));
+        expect_true(std::isnan(quad_to_double(precnan<acousticts_quad_t>())));
+        expect_true(is_na_real(double_to_quad(precnan<double>())));
+    }
+}
+
 context("Native Bessel and determinant edge cases") {
     test_that("zero-order derivatives retain values and empty orders stay empty") {
         using Complex = std::complex<double>;

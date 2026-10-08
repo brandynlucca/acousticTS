@@ -1011,16 +1011,15 @@ module prolate_swf
     dimension norme(maxmp)
 !
 !  real(knd) arrays with dimension maxn
-    real(knd) sneuf(maxn), sneudf(maxn), sneufe(maxn), sneudfe(maxn), &
-         sneufsv(jnenmax, maxn), sneudfsv(jnenmax, maxn)
+    real(knd) sneuf(maxn), sneudf(maxn), sneufe(maxn), sneudfe(maxn)
+    real(knd), allocatable :: sneufsv(:,:), sneudfsv(:,:)
 !
 !  real(knd) arrays with dimension given by maxp
     real(knd) alpha(maxp), beta(maxp), coefa(maxp), coefb(maxp), &
          coefc(maxp), coefd(maxp), coefe(maxp), gamma(maxp), &
-         pdr(maxt, maxp), pdrat(maxt, maxp), pdratt(maxp), &
-         pr(maxt, maxp), prat(maxt, maxp), pratb(maxp), pratt(maxp), &
-         prat1(maxp), pratbsv(jnenmax, maxp), &
-         prattsv(jnenmax, maxp), pdratsv(jnenmax, maxp)
+         pdratt(maxp), pratb(maxp), pratt(maxp), prat1(maxp)
+    real(knd), allocatable :: pdr(:,:), pdrat(:,:), pr(:,:), prat(:,:), &
+         pratbsv(:,:), prattsv(:,:), pdratsv(:,:)
 !
 !  real(knd) arrays with dimension maxpdr
     real(knd) prx(maxpdr), pdrx(maxpdr)
@@ -1048,6 +1047,13 @@ module prolate_swf
     integer, volatile :: neemax
     dimension nees(100), naccsav(100), neeb(jnenmax), limpsv(jnenmax), &
          limnsv(jnenmax), jelimsv(jnenmax)
+!
+    ! These tables exceed common thread stack limits at high modal orders.
+    ! Explicit allocation keeps their storage on the heap with every compiler.
+    ! Local allocatables are released automatically when main returns.
+    allocate(sneufsv(jnenmax, maxn), sneudfsv(jnenmax, maxn))
+    allocate(pdr(maxt, maxp), pdrat(maxt, maxp), pr(maxt, maxp), prat(maxt, maxp))
+    allocate(pratbsv(jnenmax, maxp), prattsv(jnenmax, maxp), pdratsv(jnenmax, maxp))
 !
     dec = 10.0e0_knd ** (-ndec - 1)
     if(ioprad /= 0) x = x1 + 1.0e0_knd

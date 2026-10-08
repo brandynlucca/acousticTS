@@ -54,13 +54,13 @@ SmnResult<T> Smn_scalar(
         if (!is_na_real(result.s1c[offset])) {
             out.value[i] = result.s1c[offset] * pw;
         } else {
-            out.value[i] = std::numeric_limits<T>::quiet_NaN();
+            out.value[i] = precnan<T>();
         }
 
         if (!is_na_real(result.s1dc[offset])) {
             out.derivative[i] = result.s1dc[offset] * pwde;
         } else {
-            out.derivative[i] = std::numeric_limits<T>::quiet_NaN();
+            out.derivative[i] = precnan<T>();
         }
     }
     
@@ -151,14 +151,14 @@ SmnMatrixResult<T> Smn_matrix(
                 if (valid_val) {
                     out.value[i][j] = result.s1c[offset] * pw;
                 } else {
-                    out.value[i][j] = std::numeric_limits<T>::quiet_NaN();
+                    out.value[i][j] = precnan<T>();
                 }
 
                 bool valid_der = !is_na_real(result.s1dc[offset]);
                 if (valid_der) {
                     out.derivative[i][j] = result.s1dc[offset] * pwde;
                 } else {
-                    out.derivative[i][j] = std::numeric_limits<T>::quiet_NaN();
+                    out.derivative[i][j] = precnan<T>();
                 }
             }
         }
@@ -211,14 +211,14 @@ SmnMatrixResult<T> Smn_matrix(
                     if (valid_val) {
                         out.value[i][j] = result.s1c[offset] * pw;
                     } else {
-                        out.value[i][j] = std::numeric_limits<T>::quiet_NaN();
+                        out.value[i][j] = precnan<T>();
                     }
 
                     bool valid_der = !is_na_real(result.s1dc[offset]);
                     if (valid_der) {
                         out.derivative[i][j] = result.s1dc[offset] * pwde;
                     } else {
-                        out.derivative[i][j] = std::numeric_limits<T>::quiet_NaN();
+                        out.derivative[i][j] = precnan<T>();
                     }                    
                 }
             }
@@ -240,8 +240,8 @@ SmnMatrixResult<T> Smn_matrix(
         for (int j = 0; j < n_len; ++j) {
             if (n[j] < m_val) {
                 for (int k = 0; k < eta_len; ++k) {
-                    out.value[i][j * eta_len + k] = std::numeric_limits<T>::quiet_NaN();
-                    out.derivative[i][j * eta_len + k] = std::numeric_limits<T>::quiet_NaN();
+                    out.value[i][j * eta_len + k] = precnan<T>();
+                    out.derivative[i][j * eta_len + k] = precnan<T>();
                 }
             } else {
                 int idx = n[j] - m_val;
@@ -261,14 +261,14 @@ SmnMatrixResult<T> Smn_matrix(
                     if (valid_val) {
                         out.value[i][j * eta_len + k] = result.s1c[offset] * pw;
                     } else {
-                        out.value[i][j * eta_len + k] = std::numeric_limits<T>::quiet_NaN();
+                        out.value[i][j * eta_len + k] = precnan<T>();
                     }
 
                     bool valid_der = !is_na_real(result.s1dc[offset]);
                     if (valid_der) {
                         out.derivative[i][j * eta_len + k] = result.s1dc[offset] * pwde;
                     } else {
-                        out.derivative[i][j * eta_len + k] = std::numeric_limits<T>::quiet_NaN();
+                        out.derivative[i][j * eta_len + k] = precnan<T>();
                     }    
                 }
             }

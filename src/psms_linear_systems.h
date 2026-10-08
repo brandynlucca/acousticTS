@@ -91,8 +91,8 @@ std::vector<std::vector<std::complex<T>>> expand_Amn_triangular(
         std::vector<std::complex<T>>(
             n_max + 1,
             std::complex<T>(
-                std::numeric_limits<T>::quiet_NaN(),
-                std::numeric_limits<T>::quiet_NaN()
+                precnan<T>(),
+                precnan<T>()
             )
         )
     );
@@ -104,8 +104,8 @@ std::vector<std::vector<std::complex<T>>> expand_Amn_triangular(
             auto val = Amn_tri[m][i];
             if (is_na_real(val.real()) || is_na_real(val.imag())) {
                 Amn_mat[m][n] = std::complex<T>(
-                    std::numeric_limits<T>::quiet_NaN(),
-                    std::numeric_limits<T>::quiet_NaN()
+                    precnan<T>(),
+                    precnan<T>()
                 );
             } else {
                 Amn_mat[m][n] = val;
@@ -268,17 +268,17 @@ ExternalRadialResult<T> radial_external_matrices(
 ) {
     ExternalRadialResult<T> out;
     out.incident.value.assign(
-        m_max + 1, std::vector<T>(n_max + 1, std::numeric_limits<T>::quiet_NaN())
+        m_max + 1, std::vector<T>(n_max + 1, precnan<T>())
     );
     out.incident.derivative.assign(
-        m_max + 1, std::vector<T>(n_max + 1, std::numeric_limits<T>::quiet_NaN())
+        m_max + 1, std::vector<T>(n_max + 1, precnan<T>())
     );
     out.scattering.value.assign(
         m_max + 1,
         std::vector<std::complex<T>>(
             n_max + 1,
             std::complex<T>(
-                std::numeric_limits<T>::quiet_NaN(), std::numeric_limits<T>::quiet_NaN()
+                precnan<T>(), precnan<T>()
             )
         )
     );
@@ -287,7 +287,7 @@ ExternalRadialResult<T> radial_external_matrices(
         std::vector<std::complex<T>>(
             n_max + 1,
             std::complex<T>(
-                std::numeric_limits<T>::quiet_NaN(), std::numeric_limits<T>::quiet_NaN()
+                precnan<T>(), precnan<T>()
             )
         )
     );
@@ -348,20 +348,20 @@ ExternalBoundaryResult<T> external_boundary_matrices(
 ) {
     ExternalBoundaryResult<T> out;
     out.smn.assign(
-        m_max + 1, std::vector<T>(n_max + 1, std::numeric_limits<T>::quiet_NaN())
+        m_max + 1, std::vector<T>(n_max + 1, precnan<T>())
     );
     out.radial.incident.value.assign(
-        m_max + 1, std::vector<T>(n_max + 1, std::numeric_limits<T>::quiet_NaN())
+        m_max + 1, std::vector<T>(n_max + 1, precnan<T>())
     );
     out.radial.incident.derivative.assign(
-        m_max + 1, std::vector<T>(n_max + 1, std::numeric_limits<T>::quiet_NaN())
+        m_max + 1, std::vector<T>(n_max + 1, precnan<T>())
     );
     out.radial.scattering.value.assign(
         m_max + 1,
         std::vector<std::complex<T>>(
             n_max + 1,
             std::complex<T>(
-                std::numeric_limits<T>::quiet_NaN(), std::numeric_limits<T>::quiet_NaN()
+                precnan<T>(), precnan<T>()
             )
         )
     );
@@ -370,7 +370,7 @@ ExternalBoundaryResult<T> external_boundary_matrices(
         std::vector<std::complex<T>>(
             n_max + 1,
             std::complex<T>(
-                std::numeric_limits<T>::quiet_NaN(), std::numeric_limits<T>::quiet_NaN()
+                precnan<T>(), precnan<T>()
             )
         )
     );
