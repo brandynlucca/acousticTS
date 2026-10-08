@@ -38,55 +38,6 @@ std::complex<double> det4x4(std::complex<double> A[4][4]) {
     return det;
 }
 
-// =============================================================================
-// Helper: Compute determinant of a 6x6 complex matrix using LU decomposition
-// =============================================================================
-std::complex<double> det6x6(std::complex<double> A[6][6]) {
-    std::complex<double> LU[6][6];
-    for (int i = 0; i < 6; ++i) {
-        for (int j = 0; j < 6; ++j) {
-            LU[i][j] = A[i][j];
-        }
-    }
-    
-    std::complex<double> det(1.0, 0.0);
-    int sign = 1;
-    
-    for (int k = 0; k < 6; ++k) {
-        // Partial pivoting keeps the elimination stable for the shell systems.
-        int pivot = k;
-        double max_val = std::abs(LU[k][k]);
-        for (int i = k + 1; i < 6; ++i) {
-            if (std::abs(LU[i][k]) > max_val) {
-                max_val = std::abs(LU[i][k]);
-                pivot = i;
-            }
-        }
-        
-        if (pivot != k) {
-            for (int j = 0; j < 6; ++j) {
-                std::swap(LU[k][j], LU[pivot][j]);
-            }
-            sign = -sign;
-        }
-        
-        if (std::abs(LU[k][k]) < tol) {
-            return std::complex<double>(0.0, 0.0);
-        }
-        
-        det *= LU[k][k];
-        
-        for (int i = k + 1; i < 6; ++i) {
-            std::complex<double> factor = LU[i][k] / LU[k][k];
-            for (int j = k + 1; j < 6; ++j) {
-                LU[i][j] -= factor * LU[k][j];
-            }
-        }
-    }
-    
-    return det * std::complex<double>(sign, 0.0);
-}
-
 std::complex<double> det6x6_scaled(std::complex<double> A[6][6]) {
     std::complex<double> LU[6][6];
     

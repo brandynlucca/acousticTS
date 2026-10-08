@@ -127,20 +127,6 @@
 
   # Handle scalar case where `isometry=FALSE`
   if (!isometry) {
-    if (is.null(names(dims))) {
-      stop(
-        sprintf(
-          paste0(
-            "When '%s' is FALSE, '%s' must be a named vector with at least ",
-            "one of the following dimensions: %s."
-          ),
-          iso_name,
-          dims_name,
-          paste0("'", valid_dims, "'", collapse = ", ")
-        ),
-        call. = FALSE
-      )
-    }
     # ---- Initialize vector
     output_dims <- stats::setNames(rep(1, length(valid_dims)), valid_dims)
     # ---- Override and return
