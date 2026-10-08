@@ -10,15 +10,6 @@ using boost::math::legendre_q;
 using boost::math::legendre_p;
 using std::complex;
 
-// Convert the internal std::complex representation used by the special-
-// function code into the Rcomplex layout expected by Rcpp.
-Rcomplex toRcomplex(const std::complex<double>& z) {
-    Rcomplex r;
-    r.r = z.real();
-    r.i = z.imag();
-    return r;
-}
-
 // Evaluate the Gauss hypergeometric series directly. The series is only used
 // in the fractional-order Ferrers P helper, so the implementation favors
 // clarity over a more elaborate continuation strategy.
@@ -202,41 +193,6 @@ NumericMatrix Pn_deriv_cpp(NumericVector n, NumericVector x, int k) {
     }
     
     return result;
-}
-
-// Fractional-order helper for Q_nu(x). The implementation mirrors the P_nu
-// helper but switches formulas according to whether x lies inside or outside
-// the canonical interval.
-double Q_fractional_complex_integral(double nu, double x) {
-    const int N = 4000;
-    
-    if(std::abs(x) <= 1.0) {
-        // Original code for |x| <= 1
-        double h = 2.0 * M_PI / N;
-        complex<double> I(0.0,1.0);
-        complex<double> sum(0.0, 0.0);
-        complex<double> r(std::sqrt(1.0 - x*x), 0.0);
-
-        for(int k=0; k<N; ++k) {
-            double theta = h * (k + 0.5);
-            complex<double> val = complex<double>(x,0.0) + r * std::cos(theta) * I;
-            sum += std::pow(val, nu);
-        }
-        return std::real(sum * h / (2.0 * M_PI));
-    } else {
-        // For |x| > 1: P_nu(x) = (1/pi) * integral_0^pi [(x + sqrt(x^2-1)*cos(t))^nu] dt
-        double h = M_PI / N;
-        double sum = 0.0;
-        double sqrt_term = std::sqrt(x*x - 1.0);
-        
-        for(int k=0; k<N; ++k) {
-            double t = h * (k + 0.5);
-            double arg = x + sqrt_term * std::cos(t);
-            sum += std::pow(arg, nu);
-        }
-        
-        return sum * h / M_PI;
-    }
 }
 
 // [[Rcpp::export]]

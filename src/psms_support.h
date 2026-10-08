@@ -52,7 +52,7 @@ inline T extract_angular_value_from_batch(
     if (result.s1c.size() > static_cast<size_t>(offset) && !is_na_real(result.s1c[offset])) {
         return result.s1c[offset] * scale;
     }
-    return std::numeric_limits<T>::quiet_NaN();
+    return precnan<T>();
 }
 
 template<typename T>
@@ -375,7 +375,7 @@ inline T extract_angular_value_from_mblock(
     if (offset < result.s1c.size() && !is_na_real(result.s1c[offset])) {
         return result.s1c[offset];
     }
-    return std::numeric_limits<T>::quiet_NaN();
+    return precnan<T>();
 }
 
 template<typename T>

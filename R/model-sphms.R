@@ -132,18 +132,6 @@ NULL
       "'shelled_gas'. Input boundary is '", boundary, "'."
     )
   }
-  if (boundary %in% c(
-    "shelled_pressure_release", "shelled_liquid",
-    "shelled_gas"
-  )) {
-    stop(
-      "Only the following values for 'boundary' are available in this ",
-      "implementation of the sphere modal series solution for the ",
-      "'", class(object)[1], "'-class: 'fixed_rigid', 'pressure_release', ",
-      "'liquid_filled', 'gas_filled'."
-    )
-  }
-
   stop(
     "Only the following values for 'boundary' are available in this ",
     "implementation of the sphere modal series solution: 'liquid_filled', ",

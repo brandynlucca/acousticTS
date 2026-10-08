@@ -512,6 +512,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// native_kernel_tests_cpp
+bool native_kernel_tests_cpp();
+RcppExport SEXP _acousticTS_native_kernel_tests_cpp() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(native_kernel_tests_cpp());
+    return rcpp_result_gen;
+END_RCPP
+}
 // tmm_backscatter_cpp
 Rcpp::ComplexVector tmm_backscatter_cpp(Rcpp::NumericVector frequency, double theta_body, std::string shape, Rcpp::NumericVector shape_values, std::string boundary, double sound_speed_sw, double density_sw, double density_body, double sound_speed_body, Rcpp::IntegerVector n_max);
 RcppExport SEXP _acousticTS_tmm_backscatter_cpp(SEXP frequencySEXP, SEXP theta_bodySEXP, SEXP shapeSEXP, SEXP shape_valuesSEXP, SEXP boundarySEXP, SEXP sound_speed_swSEXP, SEXP density_swSEXP, SEXP density_bodySEXP, SEXP sound_speed_bodySEXP, SEXP n_maxSEXP) {
@@ -596,6 +606,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_acousticTS_prolate_spheroid_scattering_from_tmatrix_cpp", (DL_FUNC) &_acousticTS_prolate_spheroid_scattering_from_tmatrix_cpp, 7},
     {"_acousticTS_prolate_spheroid_scattering_points_from_tmatrix_cpp", (DL_FUNC) &_acousticTS_prolate_spheroid_scattering_points_from_tmatrix_cpp, 7},
     {"_acousticTS_prolate_spheroid_scattering_grid_from_tmatrix_cpp", (DL_FUNC) &_acousticTS_prolate_spheroid_scattering_grid_from_tmatrix_cpp, 7},
+    {"_acousticTS_native_kernel_tests_cpp", (DL_FUNC) &_acousticTS_native_kernel_tests_cpp, 0},
     {"_acousticTS_tmm_backscatter_cpp", (DL_FUNC) &_acousticTS_tmm_backscatter_cpp, 10},
     {"_acousticTS_vesms_backscatter_cpp", (DL_FUNC) &_acousticTS_vesms_backscatter_cpp, 16},
     {NULL, NULL, 0}

@@ -736,3 +736,5 @@ Rcpp::ComplexMatrix prolate_spheroid_scattering_grid_from_tmatrix_cpp(
         Rcpp::as<std::vector<double>>(phi_scatter)
     );
 }
+
+#include "../tests/testthat/native-solvers.h"

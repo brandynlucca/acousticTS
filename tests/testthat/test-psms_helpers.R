@@ -1,5 +1,176 @@
 library(acousticTS)
 
+test_that("unavailable quad builds reject quad requests", {
+  local_mocked_bindings(
+    .quad_precision_available = function() FALSE,
+    .package = "acousticTS"
+  )
+  expect_error(
+    Smn(0, 0, 1, 0, precision = "quad"),
+    "Native quad precision is unavailable"
+  )
+  expect_error(
+    Rmn(0, 0, 1, 1.5, precision = "quad"),
+    "Native quad precision is unavailable"
+  )
+  expect_equal(
+    acousticTS:::.validate_quad_precision_available("double"),
+    "double"
+  )
+})
+
+test_that("spheroidal fluid strategies agree at modal convergence", {
+  acoustics <- data.frame(chi_sw = 0.8, chi_body = 0.7, m_max = 8L, n_max = 12L)
+  body <- data.frame(
+    xi = 1.5,
+    theta_body = pi / 3,
+    theta_scatter = 2 * pi / 3,
+    phi_body = 0,
+    phi_scatter = pi,
+    density = 1100
+  )
+  medium <- data.frame(density = 1000)
+  quadrature <- gauss_legendre(48, -1, 1)
+  precisions <- c(
+    "double",
+    if (acousticTS:::.quad_precision_available()) "quad"
+  )
+  for (precision in precisions) {
+    for (method in c(
+      "Amn_fluid",
+      "Amn_fluid_gas",
+      "Amn_fluid_simplify",
+      "Amn_fixed_rigid",
+      "Amn_pressure_release"
+    )) {
+      reference <- acousticTS:::prolate_spheroid_fbs(
+        acoustics,
+        body,
+        medium,
+        quadrature,
+        precision,
+        method,
+        adaptive = FALSE,
+        vectorized = FALSE
+      )
+      expect_true(all(is.finite(reference)))
+      for (vectorized in c(FALSE, TRUE)) {
+        actual <- acousticTS:::prolate_spheroid_fbs(
+          acoustics,
+          body,
+          medium,
+          quadrature,
+          precision,
+          method,
+          adaptive = TRUE,
+          vectorized = vectorized
+        )
+        expect_equal(actual, reference, tolerance = 1e-07)
+      }
+      vectorized <- acousticTS:::prolate_spheroid_fbs(
+        acoustics,
+        body,
+        medium,
+        quadrature,
+        precision,
+        method,
+        adaptive = FALSE,
+        vectorized = TRUE
+      )
+      expect_equal(vectorized, reference, tolerance = 1e-07)
+      # A general receive angle bypasses the monostatic shortcuts.
+      general_body <- body
+      general_body$theta_scatter <- 0.7
+      general_body$phi_scatter <- 0.4
+      direct <- acousticTS:::prolate_spheroid_fbs(
+        acoustics,
+        general_body,
+        medium,
+        quadrature,
+        precision,
+        method,
+        adaptive = FALSE,
+        vectorized = FALSE
+      )
+      retained <- acousticTS:::prolate_spheroid_tmatrix_cpp(
+        acoustics,
+        general_body,
+        medium,
+        quadrature,
+        precision,
+        method
+      )
+      expect_equal(retained$f_scat, direct, tolerance = 1e-07)
+    }
+  }
+})
+
+test_that("axial spheroidal scattering agrees under reversal", {
+  # Axial incidence excites only m = 0
+  acoustics <- data.frame(chi_sw = 0.8, chi_body = 0.7, m_max = 0L, n_max = 12L)
+  body <- data.frame(
+    xi = 1.5,
+    theta_body = 0,
+    theta_scatter = pi,
+    phi_body = 0,
+    phi_scatter = pi,
+    density = 1100
+  )
+  reversed <- body
+  reversed$theta_body <- pi
+  # Low component of pi represented as the sum of two doubles
+  reversed$theta_scatter <- 1.2246467991473532e-16
+  medium <- data.frame(density = 1000)
+  quadrature <- gauss_legendre(48, -1, 1)
+  precisions <- c(
+    "double",
+    if (acousticTS:::.quad_precision_available()) "quad"
+  )
+  for (precision in precisions) {
+    for (method in c(
+      "Amn_fluid",
+      "Amn_fluid_gas",
+      "Amn_fluid_simplify",
+      "Amn_fixed_rigid",
+      "Amn_pressure_release"
+    )) {
+      reference <- acousticTS:::prolate_spheroid_fbs(
+        acoustics,
+        body,
+        medium,
+        quadrature,
+        precision,
+        method,
+        adaptive = FALSE
+      )
+      expect_true(all(is.finite(reference)))
+      for (adaptive in c(FALSE, TRUE)) {
+        actual <- acousticTS:::prolate_spheroid_fbs(
+          acoustics,
+          reversed,
+          medium,
+          quadrature,
+          precision,
+          method,
+          adaptive = adaptive
+        )
+        expect_equal(actual, reference, tolerance = 1e-07)
+      }
+      # Rigid, pressure-release and diagonal fluid formulations can retain
+      # the unexcited azimuthal orders at exact axial incidence.
+      if (method != "Amn_fluid") {
+        extra_modes <- acoustics
+        extra_modes$m_max <- 4L
+        actual <- acousticTS:::prolate_spheroid_fbs(
+          extra_modes, reversed, medium, quadrature, precision, method,
+          adaptive = FALSE
+        )
+        expect_equal(actual, reference, tolerance = 1e-7)
+      }
+    }
+  }
+})
+
 test_that(
   paste0(
     "psms helper validators and quadrature selectors enforce the documented ",
@@ -155,10 +326,12 @@ test_that(
       body_params = body_params,
       boundary = "liquid_filled"
     )
-    expect_true(all(gas_promoted$acoustics$m_max >=
-      liquid_unchanged$acoustics$m_max))
-    expect_true(all(gas_promoted$acoustics$n_max >=
-      liquid_unchanged$acoustics$n_max))
+    expect_true(all(
+      gas_promoted$acoustics$m_max >= liquid_unchanged$acoustics$m_max
+    ))
+    expect_true(all(
+      gas_promoted$acoustics$n_max >= liquid_unchanged$acoustics$n_max
+    ))
 
     adaptive_double <- acousticTS:::.psms_adaptive_n_integration(
       chi_sw = c(1, 400),

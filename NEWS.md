@@ -1,13 +1,17 @@
+# acousticTS 2.0.7
+
+* Correct cylindrical Bessel functions on the imaginary axis and the upper side of the negative real axis branch cut.
+* Stabilize spherical Bessel sequences near zeros of the order-zero function.
+* Return correctly indexed angular matrices from `Smn()` when evaluating
+  paired mode vectors at multiple angular coordinates.
+* Return the finite minimum-norm solution for zero-rank SVD systems.
+
 # acousticTS 2.0.6
 
-* Accommodate the experimental LLVM Flang 23 R-devel toolchains, including
-  their compiler diagnostics and target-specific intrinsic-module location.
-* Unwrap the short plotting example and remove optional quad precision examples
-  that require build-specific support, retaining runnable double precision examples.
-* Credit the authors of adapted upstream prolate_swf code in Authors@R, with
-  comments distinguishing upstream authorship from package development.
-* Simplify the license declaration to GPL-3 and remove the redundant top-level
-  LICENSE file, preserving upstream copyright and MIT license notices.
+* Accommodate the experimental LLVM Flang 23 R-devel toolchains, including their compiler diagnostics and target-specific intrinsic-module location.
+* Unwrap the short plotting example and remove optional quad precision examples that require build-specific support, retaining runnable double precision examples.
+* Credit the authors of adapted upstream prolate_swf code in Authors@R, with comments distinguishing upstream authorship from package development.
+* Simplify the license declaration to GPL-3 and remove the redundant top-level LICENSE file, preserving upstream copyright and MIT license notices.
 
 # acousticTS 2.0.4
 

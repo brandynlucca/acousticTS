@@ -1,5 +1,224 @@
 library(acousticTS)
 
+test_that("TMM supports custom radial families and complex least squares", {
+  argument <- c(0.2, 1.3, 2.7)
+  actual <- acousticTS:::.tmm_radial_matrix(ys, 0:2, argument)
+  expected <- vapply(0:2, function(n) ys(n, argument), numeric(3))
+  expect_equal(actual, expected + 0i)
+  lhs <- matrix(c(1, 1i, 2, 1i, 2, 1), 3, 2)
+  coefficients <- matrix(c(2 + 3i, 4 - 1i), 2)
+  rhs <- lhs %*% coefficients
+  expect_equal(
+    acousticTS:::.tmm_solve_linear_system(lhs, rhs), coefficients
+  )
+  pairs <- acousticTS:::.tmm_default_reciprocity_pairs()
+  expect_equal(acousticTS:::.tmm_validate_reciprocity_pairs(pairs), pairs)
+  gas <- fixture_sphere("gas_filled")
+  rebuilt <- acousticTS:::.tmm_rebuild_shape_like(
+    gas, sphere(radius_body = 0.02), list(g = 0.001, h = 0.23)
+  )
+  expect_equal(rebuilt@body$g, 0.001)
+  expect_equal(rebuilt@body$h, 0.23)
+  expect_null(acousticTS:::.tmm_sphere_to_spheroid_path(gas, list()))
+})
+
+test_that("stored TMM monostatic amplitudes require matching directions", {
+  params <- list(
+    body = list(theta_body = pi / 3, phi_body = 0.2),
+    parameters = list(exact_monostatic_f_bs = c(1 + 2i, 3 + 4i))
+  )
+  retrieve <- acousticTS:::.tmm_spheroidal_exact_monostatic_override
+  expect_equal(
+    retrieve(params, pi / 3, 0.2 + 2 * pi, 2 * pi / 3, 0.2 + pi),
+    c(1 + 2i, 3 + 4i)
+  )
+  expect_equal(
+    retrieve(params, pi / 3, 0.2, 2 * pi / 3, 0.2 + pi, 2L), 3 + 4i
+  )
+  expect_null(retrieve(params, pi / 4, 0.2, 3 * pi / 4, 0.2 + pi))
+  expect_null(retrieve(params, pi / 3, 0.2, pi / 3, 0.2))
+})
+
+test_that("exact spheroidal scattering preserves PSMS power and limits", {
+  object <- fixture_ps("liquid_filled")
+  frequency <- c(1200, 3800)
+  acoustics <- data.frame(
+    frequency = frequency,
+    k_sw = 2 * pi * frequency / 1477.3
+  )
+  medium <- list(density = 1026.8, sound_speed = 1477.3)
+  for (n_integration in c(NA_integer_, 48L)) {
+    parameters <- list(
+      boundary = "liquid_filled",
+      precision = "double",
+      n_integration = n_integration
+    )
+    actual <- acousticTS:::.tmm_spheroidal_exact_monostatic(
+      object,
+      acoustics,
+      list(phi_body = 0),
+      medium,
+      parameters
+    )
+    reference <- target_strength(
+      object,
+      frequency,
+      "psms",
+      boundary = "liquid_filled",
+      precision = "double",
+      adaptive = FALSE,
+      simplify_Amn = FALSE,
+      phi_body = 0,
+      density_sw = 1026.8,
+      sound_speed_sw = 1477.3,
+      n_integration = if (is.na(n_integration)) {
+        NULL
+      } else {
+        n_integration
+      }
+    )
+    expect_equal(actual$model$TS, reference@model$PSMS$TS, tolerance = 1e-10)
+    expect_equal(
+      actual$model$sigma_bs,
+      Mod(actual$model$f_bs)^2,
+      tolerance = 1e-12
+    )
+    expect_equal(
+      actual$n_max,
+      reference@model_parameters$PSMS$parameters$acoustics$n_max
+    )
+  }
+})
+
+test_that("compiled spherical TMM agrees with independently assembled blocks", {
+  frequency <- 12000
+  theta <- 0.7
+  shapes <- list(
+    Sphere = list(shape = "Sphere", radius = 0.01),
+    ProlateSpheroid = list(
+      shape = "ProlateSpheroid",
+      semimajor_length = 0.012,
+      semiminor_length = 0.01
+    ),
+    Cylinder = list(
+      shape = "Cylinder",
+      length = 0.024,
+      radius = 0.01
+    )
+  )
+  for (shape_name in names(shapes)) {
+    params <- shapes[[shape_name]]
+    values <- switch(
+      shape_name,
+      Sphere = 0.01,
+      ProlateSpheroid = c(
+        0.012,
+        0.01
+      ),
+      Cylinder = c(0.012, 0.01)
+    )
+    for (boundary in c("pressure_release", "fixed_rigid", "liquid_filled")) {
+      compiled <- acousticTS:::tmm_backscatter_cpp(
+        frequency,
+        theta,
+        shape_name,
+        values,
+        boundary,
+        1500,
+        1000,
+        1050,
+        1540,
+        6L
+      )
+      reference <- acousticTS:::.tmm_single_frequency_spherical(
+        k_sw = 2 *
+          pi *
+          frequency /
+          1500,
+        k_body = 2 * pi * frequency / 1540,
+        theta_body = theta,
+        boundary = boundary,
+        shape_parameters = params,
+        rho_sw = 1000,
+        rho_body = 1050,
+        n_max = 6L
+      )
+      expect_equal(
+        as.vector(compiled),
+        as.vector(reference$f_bs),
+        tolerance = 1e-08
+      )
+    }
+  }
+  expect_error(
+    acousticTS:::tmm_backscatter_cpp(
+      frequency,
+      theta,
+      "unknown",
+      0.01,
+      "fixed_rigid",
+      1500,
+      1000,
+      1050,
+      1540,
+      6L
+    ),
+    "Unsupported TMM shape"
+  )
+  expect_error(
+    acousticTS:::tmm_backscatter_cpp(
+      c(12000, 38000),
+      theta,
+      "Sphere",
+      0.01,
+      "fixed_rigid",
+      1500,
+      1000,
+      1050,
+      1540,
+      6L
+    ),
+    "must match the frequency"
+  )
+})
+
+test_that("spheroidal angles preserve directions and pole conventions", {
+  theta <- c(0, pi / 2, pi / 2, pi, 0.3, 1.1)
+  phi <- c(0, 0, pi, 2, 0.8, 5)
+  internal <- acousticTS:::.tmm_public_to_spheroidal_angles(theta, phi)
+  public <- acousticTS:::.tmm_spheroidal_to_public_angles(
+    internal$theta,
+    internal$phi
+  )
+  direction <- function(theta, phi) {
+    cbind(
+      sin(theta) * cos(phi),
+      sin(theta) *
+        sin(phi),
+      cos(theta)
+    )
+  }
+  expect_equal(
+    direction(public$theta, public$phi),
+    direction(theta, phi),
+    tolerance = 1e-12
+  )
+  expect_equal(internal$phi[2:3], c(0, 0))
+  expect_equal(public$phi[c(1, 4)], c(0, 0))
+  body <- list(
+    xi = 1.2,
+    theta_body = 0.3,
+    theta_scatter = 0.5,
+    phi_body = 0.1,
+    phi_scatter = 2,
+    density = 1040,
+    radius = 1:10
+  )
+  compiled <- acousticTS:::.tmm_spheroidal_cpp_body(body)
+  expect_equal(nrow(compiled), 1L)
+  expect_equal(as.list(compiled), body[names(compiled)])
+})
+
 test_that(
   paste0(
     "internal TMM setup helpers cover boundary, truncation, and geometry ",
@@ -964,8 +1183,9 @@ test_that(
       "'phi_body' must be finite"
     )
     expect_error(
-      acousticTS:::.tmm_average_orientation_weights(c(1, -1), 2, c(pi / 4, pi /
-        3)),
+      acousticTS:::.tmm_average_orientation_weights(
+        c(1, -1), 2, c(pi / 4, pi / 3)
+      ),
       "'weights' must be a non-negative numeric vector"
     )
 
@@ -985,8 +1205,9 @@ test_that(
     expect_equal(explicit_scatter$theta_scatter, c(0.1, 0.1))
     expect_equal(explicit_scatter$phi_scatter, c(0.2, 0.2))
 
-    expect_equal(acousticTS:::.tmm_resolve_orientation_phi(pi / 4, 3), rep(pi /
-      4, 3))
+    expect_equal(
+      acousticTS:::.tmm_resolve_orientation_phi(pi / 4, 3), rep(pi / 4, 3)
+    )
     expect_error(
       acousticTS:::.tmm_resolve_orientation_phi(c(pi / 4, Inf), 2),
       "'phi_body' must be a finite numeric scalar or vector"

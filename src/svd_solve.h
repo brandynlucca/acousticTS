@@ -38,7 +38,7 @@ inline bool acousticts_svd_solve(ResultType& result,
 
     arma::uword retained = 0;
     for (arma::uword i = 0; i < singular_values.n_elem; ++i) {
-        retained += singular_values[i] >= tolerance ? 1u : 0u;
+        retained += singular_values[i] > tolerance ? 1u : 0u;
     }
 
     if (retained == 0) {

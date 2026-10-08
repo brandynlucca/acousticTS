@@ -1,5 +1,174 @@
 library(acousticTS)
 
+test_that("sphere modal sums recover elementary and transparent-shell limits", {
+  for (ka in c(0.2, 1.7)) {
+    j0 <- sin(ka) / ka
+    y0 <- -cos(ka) / ka
+    dj0 <- cos(ka) / ka - sin(ka) / ka^2
+    dy0 <- sin(ka) / ka + cos(ka) / ka^2
+    expect_equal(
+      acousticTS:::.sphms_bm_rigid(ka, 0L),
+      -dj0 / (dj0 + 1i * dy0)
+    )
+    expect_equal(
+      acousticTS:::.sphms_bm_prelease(ka, 0L),
+      -j0 / (j0 + 1i * y0)
+    )
+    expect_equal(
+      acousticTS:::.sphms_bm_fluid(ka, ka, 1, 1, 0L),
+      0i,
+      tolerance = 1e-12
+    )
+    kb <- 0.8 * ka
+    expect_equal(
+      acousticTS:::.sphms_bm_shelled_prelease(
+        ka,
+        ka,
+        kb,
+        1,
+        1,
+        0L
+      ),
+      -sin(kb) / (sin(kb) - 1i * cos(kb)),
+      tolerance = 1e-10
+    )
+    expect_equal(
+      acousticTS:::.sphms_bm_shelled_fluid(
+        ka,
+        ka,
+        kb,
+        kb,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0L
+      ),
+      0 + 0i,
+      tolerance = 1e-12
+    )
+  }
+})
+
+test_that("model initializers validate scope and modal cutoffs", {
+  cylinder <- fixture_cylinder("liquid_filled")
+  sphere <- fixture_sphere("liquid_filled")
+  expect_error(
+    acousticTS:::fcms_initialize(sphere, 38000),
+    "shape-type 'Cylinder'"
+  )
+  expect_error(
+    acousticTS:::fcms_initialize(cylinder, 38000, boundary = "unknown"),
+    "Only the following"
+  )
+  expect_error(
+    acousticTS:::bcms_initialize(cylinder, 38000, boundary = "unknown"),
+    "Only 'liquid_filled'"
+  )
+  expect_error(
+    acousticTS:::trcm_initialize(cal_generate(), 38000),
+    "fluid-like"
+  )
+  expect_error(
+    acousticTS:::trcm_initialize(sphere, 38000),
+    "shape-type 'Cylinder'"
+  )
+  expect_error(
+    acousticTS:::.ecms_validate_scope(cal_generate(), sphere@shape_parameters),
+    "requires a cylindrical"
+  )
+  for (boundary in c("fixed_rigid", "pressure_release")) {
+    straight <- target_strength(
+      cylinder,
+      c(12000, 38000),
+      "BCMS",
+      boundary = boundary,
+      m_limit = 5L
+    )
+    reference <- target_strength(
+      cylinder,
+      c(12000, 38000),
+      "FCMS",
+      boundary = boundary,
+      m_limit = 5L,
+      sound_speed_sw = 1477.3,
+      density_sw = 1026.8
+    )
+    expect_equal(
+      straight@model$BCMS$f_bs,
+      reference@model$FCMS$f_bs,
+      tolerance = 1e-10
+    )
+  }
+  expect_equal(
+    acousticTS:::.ecms_resolve_m_limit(
+      5L,
+      38000,
+      1500,
+      3500,
+      1700,
+      0.001,
+      pi / 2
+    ),
+    5L
+  )
+  geometry <- acousticTS:::.ecms_resolve_geometry(
+    list(),
+    list(
+      radius = c(
+        0.001,
+        0.002
+      ),
+      rpos = rbind(x = c(0.01, 0.04))
+    )
+  )
+  expect_equal(geometry$radius, 0.002)
+  expect_equal(geometry$length, 0.03)
+  warnings <- character()
+  withCallingHandlers(
+    acousticTS:::.ecms_warn_incidence_regime(
+      list(radius_curvature_ratio = 2),
+      list(theta = pi / 4)
+    ),
+    warning = function(w) {
+      warnings <<- c(warnings, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+  expect_length(warnings, 2L)
+  expect_match(warnings[2], "bent-cylinder correction")
+})
+
+test_that("viscous-shell inputs validate layers and elastic constants", {
+  expect_error(
+    acousticTS:::.vesms_validate_shell_fluid(
+      list(radius = 0.01),
+      list(radius = 0.02)
+    ),
+    "larger than the inner gas radius"
+  )
+  expect_error(
+    acousticTS:::.vesms_validate_viscous_required(),
+    "requires 'sound_speed_viscous'"
+  )
+  expect_equal(
+    acousticTS:::.vesms_resolve_lambda(list(K = 5e+09, G = 3e+09)),
+    3e+09
+  )
+  frequency <- c(12000, 38000)
+  expect_equal(
+    acousticTS:::.vesms_resolve_m_limit(
+      NULL,
+      frequency,
+      1500,
+      0.01
+    ),
+    pmax(2L, round(2 * pi * frequency / 1500 * 0.01) + 10L)
+  )
+})
+
 .with_temp_pdf_device <- function(expr) {
   path <- tempfile(fileext = ".pdf")
   grDevices::pdf(path)
@@ -171,10 +340,9 @@ test_that(
       "'ESS'-class"
     )
     expect_error(
-      acousticTS:::.sphms_validate_boundary(structure(list(),
-        class =
-          "mystery"
-      ), "mystery"),
+      acousticTS:::.sphms_validate_boundary(
+        structure(list(), class = "mystery"), "mystery"
+      ),
       "Only the following values for 'boundary' are available"
     )
 

@@ -1,5 +1,50 @@
 library(acousticTS)
 
+test_that("elastic-shell modal interfaces agree across frequencies", {
+  frequency <- c(12000, 38000, 70000)
+  ka <- acousticTS:::.calculate_ka_matrix(
+    frequency,
+    sound_speed_sw = 1477.3,
+    sound_speed_fluid = 1575,
+    sound_speed_longitudinal = 5600,
+    sound_speed_transversal = 3200,
+    radius_shell = 0.01,
+    radius_fluid = 0.009
+  )
+  density <- 2565
+  mu <- density * 3200^2
+  lambda <- density * 5600^2 - 2 * mu
+  limits <- c(2L, 4L, 6L)
+  actual <- acousticTS:::elastic_shell_boundary_conditions(
+    ka,
+    limits,
+    lambda,
+    mu,
+    1026.8 / density,
+    1077.3 / density
+  )
+  reference <- acousticTS:::elastic_shell_boundary_conditions_old(
+    ka[1, ],
+    ka[2, ],
+    ka[3, ],
+    ka[6, ],
+    ka[5, ],
+    ka[7, ],
+    0:6,
+    lambda,
+    mu,
+    1026.8 / density,
+    1077.3 / density
+  )
+  for (i in seq_along(frequency)) {
+    retained <- seq_len(limits[i] + 1L)
+    expect_equal(actual[i, retained], reference[i, retained], tolerance = 1e-12)
+    if (limits[i] < 6) {
+      expect_true(all(is.na(actual[i, -(retained)])))
+    }
+  }
+})
+
 compute_essms_modal_coeffs <- function(density_fluid, sound_speed_fluid) {
   object <- ess_generate(
     shape = sphere(radius_body = 0.01, n_segments = 80),

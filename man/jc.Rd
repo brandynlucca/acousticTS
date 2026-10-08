@@ -49,7 +49,9 @@ Fully supported for both positive and negative values.
 \item \strong{Purely imaginary arguments} (\eqn{z = iy}, where \eqn{y \in
   \mathbb{R}}):
 Computed using the identity \eqn{J_\nu(iy) = e^{i\pi\nu/2} I_\nu(y)}
-where \eqn{I_\nu} is the modified Bessel function of the first kind.
+for \eqn{y > 0}, where \eqn{I_\nu} is the modified Bessel function
+of the first kind. For negative imaginary arguments and real order,
+\eqn{J_\nu(-iy) = \overline{J_\nu(iy)}}.
 \item \strong{General complex arguments} (\eqn{z = x + iy}, where \eqn{x \neq 0}
 and \eqn{y \neq 0}): \strong{Not supported}.
 }

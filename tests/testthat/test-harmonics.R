@@ -1,5 +1,42 @@
 library(acousticTS)
 
+test_that("Legendre derivatives preserve polynomial and endpoint identities", {
+  x <- c(-1, -0.4, 0.3, 1)
+  expressions <- list(
+    quote(1 + 0 * x),
+    quote(x),
+    quote((3 * x^2 - 1) / 2),
+    quote((5 * x^3 - 3 * x) / 2),
+    quote((35 * x^4 - 30 * x^2 + 3) / 8)
+  )
+  for (k in 0:4) {
+    expected <- t(vapply(
+      expressions,
+      function(expr) {
+        rep_len(
+          eval(expr),
+          length(x)
+        )
+      },
+      numeric(length(x))
+    ))
+    expect_equal(Pndk(0:4, x, k), expected, tolerance = 1e-10)
+    expressions <- lapply(expressions, D, name = "x")
+  }
+  expect_equal(Qndk(0:2, c(-0.5, 0.5), 0), Qn(0:2, c(-0.5, 0.5)))
+  expect_warning(second <- Pndk(0.5, 0.25, 2), "finite differences")
+  expected <- (2 * 0.25 * Pndk(0.5, 0.25, 1) - 0.5 * 1.5 * Pn(0.5, 0.25)) /
+    (1 -
+       0.25^2)
+  # Fractional higher derivatives explicitly warn about their
+  # finite-difference approximation
+  expect_equal(second, expected, tolerance = 0.02)
+  expect_error(acousticTS:::Pn_deriv_cpp(1, 0, -1), "non-negative")
+  expect_error(acousticTS:::Qn_deriv_cpp(1, 0, -1), "non-negative")
+  expect_error(Qndk(0 + 1i, 0, 1), "real numbers")
+  expect_true(all(is.infinite(Qn(0:2, c(-1, 1)))))
+})
+
 test_that("Legendre wrappers handle standard values and validation branches", {
   expect_equal(drop(Pn(0, 0.5)), 1)
   expect_equal(drop(Pn(1, 0.5)), 0.5)

@@ -50,6 +50,10 @@
 ^vignettes/[^/]+/
 ^tools/implementation-figures($|/)
 ^tools/documentation($|/)
+^tools/validation($|/)
+^covr$
+^.gcda$
+^.gcno$
 ^vignettes/bcms/bcms-cylinder-schematic\.png$
 ^vignettes/building-scatterers/building-scatterers-map\.png$
 ^vignettes/building-shapes/building-shapes-coordinates\.png$

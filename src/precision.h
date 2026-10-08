@@ -47,6 +47,13 @@ inline double quad_to_double(const acousticts_quad_t& x) {
     return static_cast<double>(x);
 }
 
+// numeric_limits<__float128> is unspecialized in some standard libraries.
+// Converting a double NaN preserves the sentinel in every supported precision.
+template<typename T>
+inline T precnan() {
+    return static_cast<T>(std::numeric_limits<double>::quiet_NaN());
+}
+
 // profcn returns mantissas plus base-10 exponents. These helpers reconstruct
 // ordinary values without duplicating that logic in every caller.
 template<typename T>

@@ -2,9 +2,52 @@
 
 // EXPANSION COEFFICIENT MATRIX SOLVERS
 // -----------------------------------------------------------
-// Double precision keeps the mature Armadillo SVD path because it is robust for
-// the moderately sized dense kernel systems that arise in the retained modal
-// range.
+// Double precision uses column-scaled Armadillo SVD for the dense modal kernel
+// systems. Quad precision uses the native pivoted solver below.
+inline arma::cx_mat solve_fluid_system_svd(
+    const arma::cx_mat& matrix,
+    const arma::cx_mat& rhs
+) {
+    // Radial functions at consecutive degrees can differ by many orders of
+    // magnitude. Solve for column-scaled coefficients, then undo the scaling.
+    arma::rowvec scale = arma::max(arma::abs(matrix), 0);
+    arma::cx_mat balanced = matrix;
+    for (arma::uword j = 0; j < matrix.n_cols; ++j) {
+        if (scale[j] == 0.0) scale[j] = 1.0;
+        balanced.col(j) /= scale[j];
+    }
+
+    arma::cx_mat U, V;
+    arma::vec singular;
+    if (!arma::svd(U, singular, V, balanced)) {
+        throw std::runtime_error("SVD failed");
+    }
+    double tolerance = static_cast<double>(matrix.n_cols) * singular.max() *
+        std::numeric_limits<double>::epsilon();
+    bool full_rank = arma::all(singular > tolerance);
+
+    // Column scaling changes the minimum-norm convention for deficient
+    // systems. Retain the original unscaled pseudoinverse for those cases.
+    if (!full_rank) {
+        if (!arma::svd(U, singular, V, matrix)) {
+            throw std::runtime_error("SVD failed");
+        }
+        tolerance = static_cast<double>(matrix.n_cols) * singular.max() *
+            std::numeric_limits<double>::epsilon();
+    }
+
+    arma::cx_mat projected = U.t() * rhs;
+    for (arma::uword i = 0; i < singular.n_elem; ++i) {
+        if (singular[i] > tolerance) projected.row(i) /= singular[i];
+        else projected.row(i).zeros();
+    }
+    arma::cx_mat result = V * projected;
+    if (full_rank) {
+        for (arma::uword i = 0; i < result.n_rows; ++i) result.row(i) /= scale[i];
+    }
+    return result;
+}
+
 template<typename T>
 std::vector<std::vector<std::complex<T>>> solve_fluid_Amn_divide_and_conquer(
     const std::vector<std::vector<std::complex<T>>>& rhs,
@@ -33,19 +76,7 @@ std::vector<std::vector<std::complex<T>>> solve_fluid_Amn_divide_and_conquer(
                 static_cast<double>(rhs_val.imag())
             );
         }
-        arma::Mat<std::complex<double>> U, V;
-        arma::Col<double> s;
-        bool svd_ok = arma::svd(U, s, V, K3_arma);
-        if (!svd_ok) throw std::runtime_error("SVD failed");
-        double tol = std::max(size, size) * s.max() * std::numeric_limits<double>::epsilon();
-        arma::Col<double> d_inv(s.n_elem);
-        for (arma::uword i = 0; i < s.n_elem; ++i)
-            d_inv(i) = (s(i) > tol) ? (1.0 / s(i)) : 0.0;
-        arma::Mat<std::complex<double>> diag_dinv = arma::diagmat(
-            arma::conv_to<arma::Col<std::complex<double>>>::from(d_inv)
-        );
-        arma::Mat<std::complex<double>> K3_pinv = V * diag_dinv * U.t();
-        arma::Col<std::complex<double>> A = K3_pinv * b;
+        arma::Col<std::complex<double>> A = solve_fluid_system_svd(K3_arma, b);
         
         // Convert the solved coefficients back to the templated scalar type so
         // the calling code can stay precision-agnostic.
@@ -91,8 +122,8 @@ std::vector<std::vector<std::complex<T>>> expand_Amn_triangular(
         std::vector<std::complex<T>>(
             n_max + 1,
             std::complex<T>(
-                std::numeric_limits<T>::quiet_NaN(),
-                std::numeric_limits<T>::quiet_NaN()
+                precnan<T>(),
+                precnan<T>()
             )
         )
     );
@@ -104,8 +135,8 @@ std::vector<std::vector<std::complex<T>>> expand_Amn_triangular(
             auto val = Amn_tri[m][i];
             if (is_na_real(val.real()) || is_na_real(val.imag())) {
                 Amn_mat[m][n] = std::complex<T>(
-                    std::numeric_limits<T>::quiet_NaN(),
-                    std::numeric_limits<T>::quiet_NaN()
+                    precnan<T>(),
+                    precnan<T>()
                 );
             } else {
                 Amn_mat[m][n] = val;
@@ -268,17 +299,17 @@ ExternalRadialResult<T> radial_external_matrices(
 ) {
     ExternalRadialResult<T> out;
     out.incident.value.assign(
-        m_max + 1, std::vector<T>(n_max + 1, std::numeric_limits<T>::quiet_NaN())
+        m_max + 1, std::vector<T>(n_max + 1, precnan<T>())
     );
     out.incident.derivative.assign(
-        m_max + 1, std::vector<T>(n_max + 1, std::numeric_limits<T>::quiet_NaN())
+        m_max + 1, std::vector<T>(n_max + 1, precnan<T>())
     );
     out.scattering.value.assign(
         m_max + 1,
         std::vector<std::complex<T>>(
             n_max + 1,
             std::complex<T>(
-                std::numeric_limits<T>::quiet_NaN(), std::numeric_limits<T>::quiet_NaN()
+                precnan<T>(), precnan<T>()
             )
         )
     );
@@ -287,7 +318,7 @@ ExternalRadialResult<T> radial_external_matrices(
         std::vector<std::complex<T>>(
             n_max + 1,
             std::complex<T>(
-                std::numeric_limits<T>::quiet_NaN(), std::numeric_limits<T>::quiet_NaN()
+                precnan<T>(), precnan<T>()
             )
         )
     );
@@ -348,20 +379,20 @@ ExternalBoundaryResult<T> external_boundary_matrices(
 ) {
     ExternalBoundaryResult<T> out;
     out.smn.assign(
-        m_max + 1, std::vector<T>(n_max + 1, std::numeric_limits<T>::quiet_NaN())
+        m_max + 1, std::vector<T>(n_max + 1, precnan<T>())
     );
     out.radial.incident.value.assign(
-        m_max + 1, std::vector<T>(n_max + 1, std::numeric_limits<T>::quiet_NaN())
+        m_max + 1, std::vector<T>(n_max + 1, precnan<T>())
     );
     out.radial.incident.derivative.assign(
-        m_max + 1, std::vector<T>(n_max + 1, std::numeric_limits<T>::quiet_NaN())
+        m_max + 1, std::vector<T>(n_max + 1, precnan<T>())
     );
     out.radial.scattering.value.assign(
         m_max + 1,
         std::vector<std::complex<T>>(
             n_max + 1,
             std::complex<T>(
-                std::numeric_limits<T>::quiet_NaN(), std::numeric_limits<T>::quiet_NaN()
+                precnan<T>(), precnan<T>()
             )
         )
     );
@@ -370,7 +401,7 @@ ExternalBoundaryResult<T> external_boundary_matrices(
         std::vector<std::complex<T>>(
             n_max + 1,
             std::complex<T>(
-                std::numeric_limits<T>::quiet_NaN(), std::numeric_limits<T>::quiet_NaN()
+                precnan<T>(), precnan<T>()
             )
         )
     );

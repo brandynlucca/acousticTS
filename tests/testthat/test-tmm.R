@@ -1,5 +1,91 @@
 library(acousticTS)
 
+test_that("TMM shell spheres agree with modal and retained solutions", {
+  grDevices::pdf(NULL)
+  on.exit(grDevices::dev.off(), add = TRUE)
+  boundaries <- c(
+    "shelled_pressure_release",
+    "shelled_liquid",
+    "shelled_gas",
+    "elastic_shelled"
+  )
+  for (boundary in boundaries) {
+    object <- fixture_sphere(boundary)
+    reference_model <- if (boundary == "elastic_shelled") {
+      "essms"
+    } else {
+      "sphms"
+    }
+    reference <- target_strength(
+      object,
+      c(12000, 38000),
+      model = reference_model,
+      boundary = boundary,
+      density_sw = 1026.8,
+      sound_speed_sw = 1477.3
+    )
+    fit <- target_strength(
+      object,
+      c(12000, 38000),
+      model = "tmm",
+      boundary = boundary,
+      density_sw = 1026.8,
+      sound_speed_sw = 1477.3,
+      store_t_matrix = TRUE
+    )
+    expect_equal(
+      fit@model$TMM$TS,
+      reference@model[[toupper(reference_model)]]$TS,
+      tolerance = 1e-08
+    )
+    expect_equal(
+      fit@model$TMM$sigma_bs,
+      Mod(fit@model$TMM$f_bs)^2,
+      tolerance = 1e-12
+    )
+    expect_true(all(is.finite(fit@model$TMM$TS)))
+    expect_error(plot(fit, type = "model"), NA)
+    scattered <- tmm_scattering(fit)
+    expect_equal(scattered$f_scat, fit@model$TMM$f_bs, tolerance = 1e-08)
+    if (boundary %in% c("shelled_liquid", "elastic_shelled")) {
+      inferred <- target_strength(
+        object, c(12e3, 38e3), model = "tmm",
+        density_sw = 1026.8, sound_speed_sw = 1477.3
+      )
+      expect_equal(inferred@model$TMM$TS, fit@model$TMM$TS)
+      truncated <- target_strength(
+        object, c(12e3, 38e3), model = "tmm", n_max = 20L,
+        density_sw = 1026.8, sound_speed_sw = 1477.3
+      )
+      expect_equal(truncated@model$TMM$TS, fit@model$TMM$TS, tolerance = 1e-8)
+    }
+  }
+})
+
+test_that("TMM rejects unsupported shell geometries", {
+  object <- fixture_ps("elastic_shelled")
+  expect_error(
+    target_strength(object, 38e3, "tmm"), "Specify 'boundary' explicitly"
+  )
+  expect_error(
+    target_strength(object, 38e3, "tmm", boundary = "elastic_shelled"),
+    "Only the following values for 'boundary'"
+  )
+  expect_error(
+    target_strength(object, 38e3, "tmm", boundary = "liquid_filled"),
+    "supports spherical fluid shells"
+  )
+})
+
+test_that("gas-sphere retained scattering can be plotted", {
+  object <- target_strength(
+    fixture_sphere("gas_filled"), 38e3, "tmm", store_t_matrix = TRUE
+  )
+  grDevices::pdf(NULL)
+  on.exit(grDevices::dev.off(), add = TRUE)
+  expect_error(plot(object, type = "scattering"), NA)
+})
+
 .with_null_pdf_device <- function(expr) {
   grDevices::pdf(NULL)
   on.exit(grDevices::dev.off(), add = TRUE)
@@ -582,8 +668,7 @@ test_that(
       boundary = "liquid_filled",
       density_sw = density_sw,
       sound_speed_sw = sound_speed_sw,
-      precision = if (
-        acousticTS:::.quad_precision_available()) {
+      precision = if (acousticTS:::.quad_precision_available()) {
         "quad"
       } else {
         "double"
@@ -1159,8 +1244,10 @@ test_that("Default cylinder TMM matches FCMS through the cylindrical backend", {
 
     expect_true(all(is.finite(tmm_obj@model$TMM$TS)))
     expect_true(
-      all(tmm_obj@model_parameters$TMM$parameters$coordinate_system ==
-        "cylindrical")
+      all(
+        tmm_obj@model_parameters$TMM$parameters$coordinate_system ==
+          "cylindrical"
+      )
     )
     expect_equal(tmm_obj@model$TMM$f_bs, fcms_obj@model$FCMS$f_bs,
       tolerance =

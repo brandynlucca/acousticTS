@@ -1,5 +1,92 @@
 library(acousticTS)
 
+test_that("structured simulation draws preserve names and dimensions", {
+  normalize <- acousticTS:::.normalize_simulation_batch_values
+  resolve <- acousticTS:::.resolve_simulation_parameter_values
+  expect_equal(normalize("length", function() c(1, 2)), c(1, 2))
+  expect_error(normalize("length", numeric()), "at least 1 valid value")
+  expect_equal(resolve("scale", list(c(length = 2)), 3),
+               rep(list(c(length = 2)), 3))
+  draws <- list(c(length = 2), c(width = 3))
+  expect_equal(resolve("scale", draws, 2), draws)
+  expect_equal(resolve("scale", diag(2), 4), diag(2))
+})
+
+test_that("extraction and display handle missing metadata", {
+  unnamed <- matrix(1:6, 2)
+  expect_equal(
+    acousticTS:::.extract_matrix_layer(unnamed, "missing"),
+    list(layer = unnamed, fail_state = TRUE)
+  )
+  factor_value <- factor("a")
+  expect_equal(
+    acousticTS:::.extract_next_layer(factor_value, "missing"),
+    list(layer = factor_value, fail_state = FALSE)
+  )
+  expect_equal(acousticTS:::.show_mean(NULL), "NA")
+  expect_equal(acousticTS:::.show_mean(c(NA_real_, NA_real_)), "NA")
+  expect_match(
+    acousticTS:::.show_property_block(list(custom_property = 2)),
+    "custom property: 2", fixed = TRUE
+  )
+})
+
+test_that("initialization preserves units, contrasts and modal shapes", {
+  object <- fixture_sphere("liquid_filled")
+  common <- acousticTS:::.init_common(
+    object,
+    sound_speed_sw = 1500,
+    density_sw = 1000
+  )
+  expect_equal(common$shape, object@shape_parameters)
+  expect_equal(common$body, object@body)
+  expect_equal(common$medium, data.frame(sound_speed = 1500, density = 1000))
+  frequency <- c(12000, 38000)
+  expect_equal(
+    acousticTS:::.init_acoustics_df(frequency),
+    data.frame(frequency = frequency)
+  )
+  expect_equal(
+    acousticTS:::.calc_wavenumbers(
+      frequency,
+      list(
+        water = 1500,
+        gas = 340
+      )
+    ),
+    list(water = 2 * pi * frequency / 1500, gas = 2 * pi * frequency / 340)
+  )
+  props <- acousticTS:::.extract_material_props(
+    list(g = 1.03, h = 1.02),
+    1500,
+    1000
+  )
+  expect_equal(props$density, 1030)
+  expect_equal(props$sound_speed, 1530)
+  expect_equal(
+    acousticTS:::modal_matrix(c(2, 3), 2),
+    matrix(
+      c(
+        2,
+        2,
+        2,
+        3,
+        3,
+        3
+      ),
+      3
+    )
+  )
+  expect_equal(
+    acousticTS:::.modal_series_apply(0L, function(ml) 1 + 2i),
+    matrix(1 + 2i, 1, 1)
+  )
+  expect_error(
+    acousticTS:::.validate_elastic_inputs(E = 1, min_required = 3),
+    "At least 3 elasticity moduli"
+  )
+})
+
 test_that("general utilities resolve scalar and complex helpers correctly", {
   expect_equal(acousticTS:::.calculate_max_radius(0.02, 0.1, NULL), 0.02)
   expect_equal(acousticTS:::.calculate_max_radius(NULL, 0.1, 5), 0.02)
@@ -345,4 +432,30 @@ test_that("plotting and brake validators reject malformed inputs cleanly", {
   expect_equal(info$model$TS, 1)
   expect_equal(info$parameters$quantity, "TS")
   expect_true(is.list(info$shape))
+})
+test_that("empty named scaling and explicit scalar plot radii are handled", {
+  empty <- setNames(numeric(), character())
+  expect_identical(
+    acousticTS:::.validate_dimension_scaling(
+      empty, "scale", c("length", "width", "height"), TRUE, "isometric"
+    ),
+    empty
+  )
+  profile <- rbind(x = c(0, 1, 2), y = 0, z = 0, radius = 0.2)
+  expect_equal(
+    acousticTS:::.segmented_body_plot_data(profile, radius = 0.3)$radius,
+    rep(0.3, 3)
+  )
+  expect_error(
+    acousticTS:::.segmented_body_plot_data(profile, radius = c(0.2, 0.3)),
+    "must have one value per node"
+  )
+  expect_error(bbf_generate(body_shape = list()), "pre-built Shape")
+  expect_error(
+    bbf_generate(body_shape = sphere(0.01), backbone_shape = sphere(0.001)),
+    "must be a cylindrical Shape"
+  )
+  expect_error(ela_generate(shape = list()), "pre-built Shape")
+  expect_error(Pndk(1 + 1i, 0.2), "must be real numbers")
+  expect_error(Pndk(1, 0.2 + 0.1i), "must be real numbers")
 })

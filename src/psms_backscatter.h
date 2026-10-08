@@ -64,9 +64,9 @@ RadialMatrixResult<T> radial_external_incident_matrix(
     const std::vector<std::vector<T>>& smn_matrix
 ) {
     RadialMatrixResult<T> out;
-    out.value.assign(m_max + 1, std::vector<T>(n_max + 1, std::numeric_limits<T>::quiet_NaN()));
+    out.value.assign(m_max + 1, std::vector<T>(n_max + 1, precnan<T>()));
     out.derivative.assign(
-        m_max + 1, std::vector<T>(n_max + 1, std::numeric_limits<T>::quiet_NaN())
+        m_max + 1, std::vector<T>(n_max + 1, precnan<T>())
     );
 
     for (int m = 0; m <= m_max; ++m) {
@@ -114,7 +114,7 @@ RadialComplexMatrixResult<T> radial_external_scattering_matrix(
         std::vector<std::complex<T>>(
             n_max + 1, 
             std::complex<T>(
-                std::numeric_limits<T>::quiet_NaN(), std::numeric_limits<T>::quiet_NaN()
+                precnan<T>(), precnan<T>()
             )
         )
     );
@@ -123,7 +123,7 @@ RadialComplexMatrixResult<T> radial_external_scattering_matrix(
         std::vector<std::complex<T>>(
             n_max + 1, 
             std::complex<T>(
-                std::numeric_limits<T>::quiet_NaN(), std::numeric_limits<T>::quiet_NaN()
+                precnan<T>(), precnan<T>()
             )
         )
     );
@@ -168,10 +168,10 @@ RadialMatrixResult<T> radial_internal_incident_matrix(
 ) {
     RadialMatrixResult<T> out;
     out.value.assign(
-        m_max + 1, std::vector<T>(n_max + 1, std::numeric_limits<T>::quiet_NaN())
+        m_max + 1, std::vector<T>(n_max + 1, precnan<T>())
     );
     out.derivative.assign(
-        m_max + 1, std::vector<T>(n_max + 1, std::numeric_limits<T>::quiet_NaN())
+        m_max + 1, std::vector<T>(n_max + 1, precnan<T>())
     );
 
     for (int m = 0; m <= m_max; ++m) {
@@ -297,7 +297,7 @@ std::vector<std::vector<std::complex<T>>> simplified_boundary_coupling_incident_
     std::vector<std::vector<std::complex<T>>> lower(m_max + 1);
     for (int m = 0; m <= m_max; ++m) {
         int size = n_max - m + 1;
-        lower[m].resize(size, std::complex<T>(std::numeric_limits<T>::quiet_NaN(), 0));
+        lower[m].resize(size, std::complex<T>(precnan<T>(), 0));
         for (int li = 0; li < size; ++li) {
             int ell = m + li;
             T R_ml_1_val = i1_val_mat[m][ell];
@@ -306,7 +306,7 @@ std::vector<std::vector<std::complex<T>>> simplified_boundary_coupling_incident_
             T Rmn_i1_val = e1_val_mat[m][n];
             T Rmn_i1_d   = e1_der_mat[m][n];
             if (is_na_real(Rmn_i1_val)) {
-                lower[m][li] = std::complex<T>(std::numeric_limits<T>::quiet_NaN(), 0);
+                lower[m][li] = std::complex<T>(precnan<T>(), 0);
                 continue;
             }
             T factor = (R_ml_1_d != T(0))
@@ -320,7 +320,7 @@ std::vector<std::vector<std::complex<T>>> simplified_boundary_coupling_incident_
     std::vector<std::vector<std::complex<T>>> result_mat(
         m_max + 1, 
         std::vector<std::complex<T>>(
-            n_max + 1, std::complex<T>(std::numeric_limits<T>::quiet_NaN(), 0)
+            n_max + 1, std::complex<T>(precnan<T>(), 0)
         )
     );
     for (int m = 0; m <= m_max; ++m) {
@@ -351,8 +351,8 @@ std::vector<std::vector<std::complex<T>>> simplified_boundary_coupling_scatterin
     for (int m = 0; m <= m_max; ++m) {
         int size = n_max - m + 1;
         lower[m].resize(
-            size, std::complex<T>(std::numeric_limits<T>::quiet_NaN(), 
-            std::numeric_limits<T>::quiet_NaN())
+            size, std::complex<T>(precnan<T>(),
+            precnan<T>())
         );
         for (int li = 0; li < size; ++li) {
             int ell = m + li;
@@ -373,8 +373,8 @@ std::vector<std::vector<std::complex<T>>> simplified_boundary_coupling_scatterin
         m_max + 1, 
         std::vector<std::complex<T>>(
             n_max + 1, 
-            std::complex<T>(std::numeric_limits<T>::quiet_NaN(), 
-            std::numeric_limits<T>::quiet_NaN())
+            std::complex<T>(precnan<T>(),
+            precnan<T>())
         )
     );
     for (int m = 0; m <= m_max; ++m) {
@@ -517,7 +517,7 @@ std::vector<std::vector<T>> compute_smn_matrix(
 ) {
     // Result is (m_max+1) x (n_max+1), with quiet_NaN placeholders where n<m.
     std::vector<std::vector<T>> result(
-        m_max + 1, std::vector<T>(n_max + 1, std::numeric_limits<T>::quiet_NaN())
+        m_max + 1, std::vector<T>(n_max + 1, precnan<T>())
     );
 
     for (int m = 0; m <= m_max; ++m) {
@@ -616,20 +616,20 @@ FullFluidPrepResult<T> prepare_full_fluid_boundary_data(
     // by the batched fluid/gas PSMS pathway before kernel assembly.
     FullFluidPrepResult<T> out;
     out.smn_body.assign(
-        m_max + 1, std::vector<T>(n_max + 1, std::numeric_limits<T>::quiet_NaN())
+        m_max + 1, std::vector<T>(n_max + 1, precnan<T>())
     );
     out.radial_external.incident.value.assign(
-        m_max + 1, std::vector<T>(n_max + 1, std::numeric_limits<T>::quiet_NaN())
+        m_max + 1, std::vector<T>(n_max + 1, precnan<T>())
     );
     out.radial_external.incident.derivative.assign(
-        m_max + 1, std::vector<T>(n_max + 1, std::numeric_limits<T>::quiet_NaN())
+        m_max + 1, std::vector<T>(n_max + 1, precnan<T>())
     );
     out.radial_external.scattering.value.assign(
         m_max + 1,
         std::vector<std::complex<T>>(
             n_max + 1,
             std::complex<T>(
-                std::numeric_limits<T>::quiet_NaN(), std::numeric_limits<T>::quiet_NaN()
+                precnan<T>(), precnan<T>()
             )
         )
     );
@@ -638,15 +638,15 @@ FullFluidPrepResult<T> prepare_full_fluid_boundary_data(
         std::vector<std::complex<T>>(
             n_max + 1,
             std::complex<T>(
-                std::numeric_limits<T>::quiet_NaN(), std::numeric_limits<T>::quiet_NaN()
+                precnan<T>(), precnan<T>()
             )
         )
     );
     out.radial_internal.value.assign(
-        m_max + 1, std::vector<T>(n_max + 1, std::numeric_limits<T>::quiet_NaN())
+        m_max + 1, std::vector<T>(n_max + 1, precnan<T>())
     );
     out.radial_internal.derivative.assign(
-        m_max + 1, std::vector<T>(n_max + 1, std::numeric_limits<T>::quiet_NaN())
+        m_max + 1, std::vector<T>(n_max + 1, precnan<T>())
     );
     out.expansion_matrix.assign(m_max + 1, std::vector<std::vector<T>>());
 
@@ -1180,8 +1180,8 @@ std::vector<std::vector<std::complex<T>>> simplified_fluid_Amn_triangular(
         Amn_tri[m].assign(
             n_max - m + 1,
             std::complex<T>(
-                std::numeric_limits<T>::quiet_NaN(),
-                std::numeric_limits<T>::quiet_NaN()
+                precnan<T>(),
+                precnan<T>()
             )
         );
         for (int n = m; n <= n_max; ++n) {
@@ -1192,7 +1192,7 @@ std::vector<std::vector<std::complex<T>>> simplified_fluid_Amn_triangular(
                 is_na_real(e3.real()) || is_na_real(e3.imag()) ||
                 e3 == std::complex<T>(0, 0)) {
                 Amn_tri[m][n - m] = std::complex<T>(
-                    std::numeric_limits<T>::quiet_NaN(), std::numeric_limits<T>::quiet_NaN()
+                    precnan<T>(), precnan<T>()
                 );
             } else {
                 Amn_tri[m][n - m] = -e1 / e3;
@@ -1300,7 +1300,7 @@ std::vector<std::vector<std::complex<T>>> psms_tmatrix_blocks(
         // For the full fluid and simplified-fluid retained-block routes, keep
         // all retained diagonal modes active before building the kernels.
         std::vector<std::vector<T>> smn_active(
-            m_max + 1, std::vector<T>(n_max + 1, std::numeric_limits<T>::quiet_NaN())
+            m_max + 1, std::vector<T>(n_max + 1, precnan<T>())
         );
         for (int m = 0; m <= m_max; ++m) {
             for (int n = m; n <= n_max; ++n) {
@@ -1320,7 +1320,7 @@ std::vector<std::vector<std::complex<T>>> psms_tmatrix_blocks(
     }
 
     std::vector<std::vector<T>> smn_active(
-        m_max + 1, std::vector<T>(n_max + 1, std::numeric_limits<T>::quiet_NaN())
+        m_max + 1, std::vector<T>(n_max + 1, precnan<T>())
     );
     for (int m = 0; m <= m_max; ++m) {
         for (int n = m; n <= n_max; ++n) {
@@ -1897,21 +1897,7 @@ std::vector<std::complex<T>> solve_fluid_mode_system_svd(
             static_cast<double>(rhs_val.imag())
         );
     }
-    arma::Mat<std::complex<double>> U, V;
-    arma::Col<double> s;
-    bool svd_ok = arma::svd(U, s, V, K3_arma);
-    if (!svd_ok) {
-        throw std::runtime_error("SVD failed");
-    }
-    double tol =
-        std::max(size, size) * s.max() * std::numeric_limits<double>::epsilon();
-    arma::Col<double> d_inv(s.n_elem);
-    for (arma::uword i = 0; i < s.n_elem; ++i) {
-        d_inv(i) = (s(i) > tol) ? (1.0 / s(i)) : 0.0;
-    }
-    arma::Mat<std::complex<double>> diag_dinv =
-        arma::diagmat(arma::conv_to<arma::Col<std::complex<double>>>::from(d_inv));
-    arma::Col<std::complex<double>> A = V * diag_dinv * U.t() * b;
+    arma::Col<std::complex<double>> A = solve_fluid_system_svd(K3_arma, b);
 
     std::vector<std::complex<T>> out(size);
     for (int i = 0; i < size; ++i) {
