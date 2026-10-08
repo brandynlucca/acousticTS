@@ -1,6 +1,6 @@
 library(acousticTS)
 
-test_that("reforge helpers preserve degenerate placement and default dispatch", {
+test_that("reforge preserves degenerate placement and default dispatch", {
   expect_identical(reforge(2), 2)
   profile <- rbind(x = c(0, 1, 2), y = 0, z = c(1, 2, 3), radius = 0.2)
   expect_equal(
