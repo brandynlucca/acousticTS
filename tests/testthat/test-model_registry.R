@@ -11,6 +11,116 @@ capture_model_registry_state <- function() {
   }
 }
 
+test_that("persistent registrations round trip in an isolated registry", {
+  restore <- capture_model_registry_state()
+  on.exit(restore(), add = TRUE)
+  path <- tempfile(fileext = ".rds")
+  on.exit(unlink(path), add = TRUE)
+  local_mocked_bindings(
+    .model_registry_user_path = function() path,
+    .package = "acousticTS"
+  )
+  reset_model_registry(remove_persisted = TRUE)
+  register_model(
+    "persisted_dwba",
+    initialize = "acousticTS:::dwba_initialize",
+    solver = "acousticTS:::DWBA",
+    slot = "DWBA",
+    aliases = "persisted_alias",
+    persist = TRUE
+  )
+  expect_true(file.exists(path))
+  stored <- readRDS(path)
+  expect_equal(stored$persisted_dwba$canonical, "persisted_dwba")
+  state <- get(".model_registry_state", asNamespace("acousticTS"))
+  state$user <- list()
+  state$loaded <- FALSE
+  expect_true("persisted_dwba" %in% available_models()$model)
+  object <- fls_generate(
+    shape = cylinder(0.03, 0.003),
+    g_body = 1.03,
+    h_body = 1.02
+  )
+  actual <- target_strength(object, 38000, model = "persisted_alias")
+  expected <- target_strength(object, 38000, model = "dwba")
+  expect_equal(actual@model$DWBA, expected@model$DWBA)
+  unregister_model("persisted_dwba", remove_persisted = TRUE)
+  expect_false(file.exists(path))
+  register_model(
+    "persisted_dwba",
+    initialize = "acousticTS:::dwba_initialize",
+    solver = "acousticTS:::DWBA",
+    persist = TRUE
+  )
+  reset_model_registry(remove_persisted = TRUE)
+  expect_false(file.exists(path))
+  expect_false("persisted_dwba" %in% available_models()$model)
+
+  writeLines("invalid registry", path)
+  state$loaded <- FALSE
+  expect_warning(available_models(), "Could not read persisted")
+  saveRDS(
+    list(list(
+      canonical = "broken",
+      slot = "BROKEN",
+      initialize_ref = "missing_function",
+      solver_ref = "base::identity"
+    )),
+    path
+  )
+  state$loaded <- FALSE
+  expect_warning(available_models(), "Could not resolve")
+})
+
+test_that("registry validates identifiers and resolves qualified callables", {
+  restore <- capture_model_registry_state()
+  on.exit(restore(), add = TRUE)
+  expect_error(register_model(1, identity, identity), "must be character")
+  expect_error(register_model("", identity, identity), "non-empty model names")
+  expect_error(
+    register_model("test_model", identity, identity, slot = ""),
+    "non-empty string"
+  )
+  expect_error(register_model("test_model", 1, identity), "function reference")
+  expect_error(
+    register_model("test_model", "missing_function", identity),
+    "Could not resolve"
+  )
+  expect_error(
+    register_model("test_model", identity, identity, persist = TRUE),
+    "package-qualified"
+  )
+  register_model("test_model", identity, identity)
+  expect_error(
+    register_model("test_model", identity, identity),
+    "already registered"
+  )
+  register_model(
+    "test_model",
+    "base::identity",
+    "base::identity",
+    overwrite = TRUE
+  )
+  expect_identical(
+    acousticTS:::.resolve_model_function_reference("base::identity"),
+    identity
+  )
+  expect_error(
+    acousticTS:::.resolve_model_function_reference(NA_character_),
+    "non-empty function reference"
+  )
+  expect_error(unregister_model("dwba"), "Only user-registered")
+  expect_equal(acousticTS:::.default_model_slot("CALIBRATION"), "calibration")
+  solvers <- acousticTS:::.get_models()
+  expect_identical(solvers$DWBA, acousticTS:::DWBA)
+  expect_identical(
+    solvers$calibration,
+    acousticTS:::.resolve_model_function_reference(
+      acousticTS:::.resolve_model_registry_entry("calibration")$solver
+    )
+  )
+})
+
 tsl_initialize <- function(object,
                            frequency,
                            intercept = -70,
