@@ -1,5 +1,171 @@
 library(acousticTS)
 
+test_that("spherical derivatives match elementary solutions", {
+  # The first three orders have closed forms independent of the compiled
+  # recurrence. Symbolic derivatives also check complex arguments.
+  j <- list(
+    quote(sin(z) / z),
+    quote(sin(z) / z^2 - cos(z) / z),
+    quote((3 / z^3 - 1 / z) * sin(z) - 3 * cos(z) / z^2)
+  )
+  y <- list(
+    quote(-cos(z) / z),
+    quote(-cos(z) / z^2 - sin(z) / z),
+    quote(-(3 / z^3 - 1 / z) * cos(z) - 3 * sin(z) / z^2)
+  )
+  for (z in list(
+    c(0.8, 1.7, 3.2, 4.1),
+    c(
+      0.8 + 0.4i,
+      1.7 - 0.3i,
+      3.2 + 0.2i,
+      4.1 - 0.5i
+    )
+  )) {
+    j_expr <- j
+    y_expr <- y
+    for (k in 0:4) {
+      expected_j <- t(vapply(
+        j_expr,
+        eval,
+        complex(length(z)),
+        envir = list(z = z)
+      ))
+      expected_y <- t(vapply(
+        y_expr,
+        eval,
+        complex(length(z)),
+        envir = list(z = z)
+      ))
+      expect_equal(jsdk(0:2, z, k) + 0i, expected_j, tolerance = 1e-09)
+      expect_equal(ysdk(0:2, z, k) + 0i, expected_y, tolerance = 1e-09)
+      expect_equal(
+        as.complex(jsdk(0:2, z[1:3], k)),
+        diag(expected_j[, 1:3]),
+        tolerance = 1e-09
+      )
+      expect_equal(
+        hsdk(0:2, z, k),
+        expected_j + 1i * expected_y,
+        tolerance = 1e-09
+      )
+      for (l in 0:2) {
+        expect_equal(
+          as.complex(jsdk(l, z, k)),
+          expected_j[l + 1, ],
+          tolerance = 1e-09
+        )
+        expect_equal(
+          as.complex(ysdk(l, z, k)),
+          expected_y[l + 1, ],
+          tolerance = 1e-09
+        )
+        expect_equal(
+          hsdk(l, z, k),
+          expected_j[l + 1, ] + 1i * expected_y[l + 1, ],
+          tolerance = 1e-09
+        )
+      }
+      j_expr <- lapply(j_expr, D, name = "z")
+      y_expr <- lapply(y_expr, D, name = "z")
+    }
+    for (family in list(
+      list(jsd, jsdd, jsdk),
+      list(ysd, ysdd, ysdk),
+      list(hsd, hsdd, hsdk)
+    )) {
+      expect_equal(family[[1]](0:2, z), family[[3]](0:2, z, 1))
+      expect_equal(family[[2]](0:2, z), family[[3]](0:2, z, 2))
+      expect_error(family[[3]](1, z, -1), "non-negative")
+    }
+  }
+  for (z in list(0, 0 + 0i)) {
+    expect_equal(as.complex(js(0:2, z)), c(1, 0, 0) + 0i)
+    expect_equal(as.complex(jsd(0:2, z)), c(0, 1 / 3, 0) + 0i)
+    expect_equal(as.complex(jsdd(0:2, z)), c(-1 / 3, 0, 2 / 15) + 0i)
+    expect_true(all(!is.finite(ysd(0:2, z))))
+    expect_true(all(is.na(hsdd(0:2, z))))
+  }
+})
+
+test_that("cylindrical functions preserve analytic identities", {
+  x <- c(0.8, 2.1, 3.5, 4.2)
+  for (l in c(-2, -1, 0, 1, 2, 0.5)) {
+    expect_equal(jc(l, -x), exp(1i * pi * l) * besselJ(x, l), tolerance = 1e-10)
+    expect_equal(
+      yc(l, -x),
+      exp(-1i * pi * l) * besselY(x, l) + 2i * cos(pi * l) * besselJ(x, l),
+      tolerance = 1e-10
+    )
+    expect_equal(
+      jc(l, 1i * x),
+      exp(1i * pi * l / 2) * besselI(x, l),
+      tolerance = 1e-10
+    )
+    expect_equal(jc(l, -1i * x), Conj(jc(l, 1i * x)), tolerance = 1e-10)
+    expect_equal(
+      yc(l, 1i * x),
+      1i * jc(l, 1i * x) -
+        (2 / pi) * exp(-1i * pi * l / 2) * besselK(x, l),
+      tolerance = 1e-10
+    )
+    expect_equal(yc(l, -1i * x), Conj(yc(l, 1i * x)), tolerance = 1e-10)
+  }
+  for (family in list(
+    list(jc, jcd, jcdd, jcdk),
+    list(yc, ycd, ycdd, ycdk),
+    list(hc, hcd, hcdd, hcdk)
+  )) {
+    for (z in list(x, 1i * x)) {
+      expect_equal(family[[4]](0:2, z, 0), family[[1]](0:2, z))
+      expect_equal(family[[4]](0:2, z, 1), family[[2]](0:2, z))
+      expect_equal(family[[4]](0:2, z, 2), family[[3]](0:2, z))
+      for (l in 0:2) {
+        # The Bessel differential equation determines the second
+        # derivative.
+        expect_equal(
+          family[[3]](l, z),
+          -family[[2]](l, z) / z - (1 - l^2 / z^2) * family[[1]](l, z),
+          tolerance = 1e-09
+        )
+      }
+    }
+    expect_error(family[[4]](0, 1, -1), "non-negative")
+    expect_error(family[[1]](0 + 1i, 1), "order|orders")
+    expect_error(family[[1]](0, 1 + 1i), "complex|Complex")
+  }
+})
+
+test_that("spherical sequences preserve zero limits and modal order", {
+  sequence <- acousticTS:::spherical_bessel_sequence_matrix_cpp
+  z <- c(0, 1e-310, 0.2, pi, 4.5)
+  for (name in c("js", "jsd", "hs", "hsd")) {
+    fun <- get(name, asNamespace("acousticTS"))
+    for (orders in list(0L, c(5L, 0L, 2L, 5L))) {
+      expected <- matrix(
+        unlist(lapply(z, function(x) {
+          as.complex(fun(
+            orders,
+            x
+          ))
+        })),
+        nrow = length(z),
+        byrow = TRUE
+      )
+      expect_equal(sequence(orders, z, name) + 0i, expected, tolerance = 1e-09)
+    }
+  }
+  expect_error(sequence(integer(), 1, "js"), "non-empty")
+  expect_error(sequence(0L, numeric(), "js"), "non-empty")
+  expect_error(sequence(-1L, 1, "js"), "non-negative")
+  expect_error(sequence(0L, 1, "unknown"), "Unsupported")
+  for (family in list(list(js, jsdk), list(ys, ysdk), list(hs, hsdk))) {
+    for (z in list(0.8, 0.8 + 0.2i)) {
+      expect_equal(family[[2]](0:3, z, 0), family[[1]](0:3, z))
+    }
+  }
+})
+
 test_that("Bessel functions work correctly", {
   # Test jc (cylindrical Bessel function of the first kind)
   expect_equal(Re(jc(0, 1)), besselJ(1, 0))
