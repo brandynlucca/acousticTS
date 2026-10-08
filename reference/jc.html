@@ -9,7 +9,7 @@ and its k-th derivatives."><meta property="og:image" content="https://brandynluc
 
     <a class="navbar-brand me-2" href="../index.html">acousticTS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -124,7 +124,9 @@ Fully supported for both positive and negative values.</p></li>
 <li><p><strong>Purely imaginary arguments</strong> (\(z = iy\), where \(y \in
   \mathbb{R}\)):
 Computed using the identity \(J_\nu(iy) = e^{i\pi\nu/2} I_\nu(y)\)
-where \(I_\nu\) is the modified Bessel function of the first kind.</p></li>
+for \(y &gt; 0\), where \(I_\nu\) is the modified Bessel function
+of the first kind. For negative imaginary arguments and real order,
+\(J_\nu(-iy) = \overline{J_\nu(iy)}\).</p></li>
 <li><p><strong>General complex arguments</strong> (\(z = x + iy\), where \(x \neq 0\)
 and \(y \neq 0\)): <strong>Not supported</strong>.</p></li>
 </ul><p><strong>Special cases:</strong></p><ul><li><p>\(J_\nu(0) = 1\) if \(\nu = 0\), otherwise \(J_\nu(0) = 0\).</p></li>

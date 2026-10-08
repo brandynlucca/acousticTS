@@ -13,7 +13,7 @@ and vertical extent together."><meta property="og:image" content="https://brandy
 
     <a class="navbar-brand me-2" href="../index.html">acousticTS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -250,48 +250,12 @@ retained as thin wrappers over the <code>body_scale</code>/<code>body_target</co
 <span class="r-out co"><span class="r-pr">#&gt;</span>         methods::slot(object, "shape_parameters")$radius &lt;- max(radii, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             na.rm = TRUE)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         return(object)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         if (!is.null(length)) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             new_scale &lt;- length/shape$length</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             if (length_radius_ratio_constant) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 rpos &lt;- rpos * new_scale</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 if (is.null(radius)) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                   radii &lt;- radii * new_scale</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 }</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 else {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                   r_scale &lt;- radius/shape$radius</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                   radii &lt;- radii * r_scale</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                   correction &lt;- r_scale/new_scale</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                   if (nrow(rpos) &gt;= 4) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     rpos[seq(4L, nrow(rpos)), ] &lt;- rpos[seq(4L, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                       nrow(rpos)), ] * correction</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                   }</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 }</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 methods::slot(object, "shape_parameters")$radius &lt;- max(radii)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             }</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             else {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 rpos[1L, ] &lt;- rpos[1L, ] * new_scale</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             }</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             methods::slot(object, "shape_parameters")$length &lt;- abs(diff(range(rpos[1L, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 ])))</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         }</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         if (!is.null(radius) &amp;&amp; is.null(length)) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             r_scale &lt;- radius/shape$radius</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             radii &lt;- radii * r_scale</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             if (nrow(rpos) &gt;= 4) {</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                 rpos[seq(4L, nrow(rpos)), ] &lt;- rpos[seq(4L, nrow(rpos)), </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                   ] * r_scale</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             }</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             methods::slot(object, "shape_parameters")$radius &lt;- max(radii)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         }</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         methods::slot(object, "body")$rpos &lt;- rpos</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         methods::slot(object, "body")$radius &lt;- radii</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         return(object)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     }</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     .local(object, ...)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> }, target = new("signature", .Data = "FLS", names = "object", </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     package = "acousticTS"), defined = new("signature", .Data = "FLS", </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     names = "object", package = "acousticTS"), generic = "reforge")</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;bytecode: 0x557c99271f38&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;bytecode: 0x562506f3caf8&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> &lt;environment: namespace:acousticTS&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"target")</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> An object of class “signature”</span>

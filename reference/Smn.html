@@ -23,7 +23,7 @@ accuracy."><meta property="og:image" content="https://brandynlucca.github.io/aco
 
     <a class="navbar-brand me-2" href="../index.html">acousticTS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -161,7 +161,11 @@ slower and requires a package build with native quad precision support.</p></dd>
 \(\frac{d}{d\eta}S_{mn}^{(1)}(c, \eta)\) at each input <code>eta</code>.</p></dd>
 
 
-</dl></div>
+</dl><p>Equally sized vectors <code>m</code> and <code>n</code> with more than one entry are
+evaluated pairwise. For these paired modes, a scalar <code>eta</code> gives vectors
+in <code>value</code> and <code>derivative</code>. Multiple <code>eta</code> values give
+matrices with one row per mode pair and one column per angular coordinate.</p>
+    </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The prolate spheroidal angular functions are solutions to the angular part

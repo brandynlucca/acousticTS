@@ -56,8 +56,9 @@ differential equation:
 
 - **Purely imaginary arguments** (\\z = iy\\, where \\y \in
   \mathbb{R}\\): Computed using the identity \\J\_\nu(iy) =
-  e^{i\pi\nu/2} I\_\nu(y)\\ where \\I\_\nu\\ is the modified Bessel
-  function of the first kind.
+  e^{i\pi\nu/2} I\_\nu(y)\\ for \\y \> 0\\, where \\I\_\nu\\ is the
+  modified Bessel function of the first kind. For negative imaginary
+  arguments and real order, \\J\_\nu(-iy) = \overline{J\_\nu(iy)}\\.
 
 - **General complex arguments** (\\z = x + iy\\, where \\x \neq 0\\ and
   \\y \neq 0\\): **Not supported**.

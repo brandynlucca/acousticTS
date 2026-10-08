@@ -107,7 +107,7 @@ hc(0.5, 3)
 
 # Purely imaginary argument
 hc(1, 1i)
-#> [1] 0.383186+1.130318i
+#> [1] -0.383186+0i
 
 # First derivative
 hcdk(1, 2, 1)

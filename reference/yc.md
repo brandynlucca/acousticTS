@@ -57,8 +57,10 @@ but represents the linearly independent second solution.
 
 - **Purely imaginary arguments** (\\z = iy\\, where \\y \in
   \mathbb{R}\\): Computed using the identity \\Y\_\nu(iy) = i
-  e^{-i\pi\nu/2} I\_\nu(y) - \frac{2}{\pi} e^{i\pi\nu/2} K\_\nu(y)\\
-  where \\I\_\nu\\ and \\K\_\nu\\ are modified Bessel functions.
+  e^{i\pi\nu/2} I\_\nu(y) - \frac{2}{\pi} e^{-i\pi\nu/2} K\_\nu(y)\\ for
+  \\y \> 0\\, where \\I\_\nu\\ and \\K\_\nu\\ are modified Bessel
+  functions. Negative imaginary arguments use complex conjugation for
+  real order.
 
 - **General complex arguments** (\\z = x + iy\\, where \\x \neq 0\\ and
   \\y \neq 0\\): **Not supported**.
@@ -67,10 +69,11 @@ but represents the linearly independent second solution.
 
 - \\Y\_\nu(0) = -\infty\\ (singularity at the origin).
 
-- For negative real arguments: \\Y\_\nu(-x) = \cos(\pi\nu) Y\_\nu(x) +
-  \sin(\pi\nu) J\_\nu(x)\\.
+- Negative real arguments use the upper lip of the principal branch cut.
+  For \\x \> 0\\, \\Y\_\nu(-x) = e^{-i\pi\nu} Y\_\nu(x) + 2i\cos(\pi\nu)
+  J\_\nu(x)\\.
 
-- For integer order \\n\\: \\Y_n(-x) = (-1)^n Y_n(x)\\.
+- For integer order \\n\\: \\Y_n(-x) = (-1)^n \[Y_n(x) + 2i J_n(x)\]\\.
 
 - k-th derivative (DLMF 10.6.1): \$\$ \frac{d^k}{dz^k} Y\_\nu(z) =
   \frac{1}{2^k} \sum\_{j=0}^{k} (-1)^j \binom{k}{j} Y\_{\nu - k + 2j}(z)
@@ -119,11 +122,11 @@ yc(0.5, 3)
 
 # Negative real argument
 yc(2, -1.5)
-#> [1] -0.9321938+0i
+#> [1] -0.9321938+0.4641753i
 
 # Purely imaginary argument
 yc(1, 1i)
-#> [1] 0.5651591-0.383186i
+#> [1] -0.5651591+0.383186i
 yc(2, 3i)
 #> [1] 0.03915877-2.245212i
 

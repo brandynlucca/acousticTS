@@ -11,7 +11,7 @@ its derivatives through ycdk()."><meta property="og:image" content="https://bran
 
     <a class="navbar-brand me-2" href="../index.html">acousticTS</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -128,15 +128,18 @@ Fully supported for both positive and negative values.</p></li>
 <li><p><strong>Purely imaginary arguments</strong> (\(z = iy\), where
 \(y \in \mathbb{R}\)):
 Computed using the identity
-\(Y_\nu(iy) = i e^{-i\pi\nu/2} I_\nu(y) - \frac{2}{\pi}
-        e^{i\pi\nu/2} K_\nu(y)\)
-where \(I_\nu\) and \(K_\nu\) are modified Bessel functions.</p></li>
+\(Y_\nu(iy) = i e^{i\pi\nu/2} I_\nu(y) - \frac{2}{\pi}
+        e^{-i\pi\nu/2} K_\nu(y)\) for \(y &gt; 0\),
+where \(I_\nu\) and \(K_\nu\) are modified Bessel functions.
+Negative imaginary arguments use complex conjugation for real order.</p></li>
 <li><p><strong>General complex arguments</strong> (\(z = x + iy\), where \(x \neq 0\)
 and \(y \neq 0\)): <strong>Not supported</strong>.</p></li>
 </ul><p><strong>Special cases:</strong></p><ul><li><p>\(Y_\nu(0) = -\infty\) (singularity at the origin).</p></li>
-<li><p>For negative real arguments:
-\(Y_\nu(-x) = \cos(\pi\nu) Y_\nu(x) + \sin(\pi\nu) J_\nu(x)\).</p></li>
-<li><p>For integer order \(n\): \(Y_n(-x) = (-1)^n Y_n(x)\).</p></li>
+<li><p>Negative real arguments use the upper lip of the principal branch
+cut. For \(x &gt; 0\),
+\(Y_\nu(-x) = e^{-i\pi\nu} Y_\nu(x) + 2i\cos(\pi\nu) J_\nu(x)\).</p></li>
+<li><p>For integer order \(n\):
+\(Y_n(-x) = (-1)^n [Y_n(x) + 2i J_n(x)]\).</p></li>
 <li><p>k-th derivative (DLMF 10.6.1):
 $$
           \frac{d^k}{dz^k} Y_\nu(z) = \frac{1}{2^k} \sum_{j=0}^{k} (-1)^j
@@ -179,11 +182,11 @@ Series 55. Chapter 9.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Negative real argument</span></span></span>
 <span class="r-in"><span><span class="fu">yc</span><span class="op">(</span><span class="fl">2</span>, <span class="op">-</span><span class="fl">1.5</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -0.9321938+0i</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -0.9321938+0.4641753i</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Purely imaginary argument</span></span></span>
 <span class="r-in"><span><span class="fu">yc</span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1i</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.5651591-0.383186i</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] -0.5651591+0.383186i</span>
 <span class="r-in"><span><span class="fu">yc</span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3i</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] 0.03915877-2.245212i</span>
 <span class="r-in"><span></span></span>

@@ -173,48 +173,12 @@ methods::selectMethod("reforge", "FLS")
 #>         methods::slot(object, "shape_parameters")$radius <- max(radii, 
 #>             na.rm = TRUE)
 #>         return(object)
-#>         if (!is.null(length)) {
-#>             new_scale <- length/shape$length
-#>             if (length_radius_ratio_constant) {
-#>                 rpos <- rpos * new_scale
-#>                 if (is.null(radius)) {
-#>                   radii <- radii * new_scale
-#>                 }
-#>                 else {
-#>                   r_scale <- radius/shape$radius
-#>                   radii <- radii * r_scale
-#>                   correction <- r_scale/new_scale
-#>                   if (nrow(rpos) >= 4) {
-#>                     rpos[seq(4L, nrow(rpos)), ] <- rpos[seq(4L, 
-#>                       nrow(rpos)), ] * correction
-#>                   }
-#>                 }
-#>                 methods::slot(object, "shape_parameters")$radius <- max(radii)
-#>             }
-#>             else {
-#>                 rpos[1L, ] <- rpos[1L, ] * new_scale
-#>             }
-#>             methods::slot(object, "shape_parameters")$length <- abs(diff(range(rpos[1L, 
-#>                 ])))
-#>         }
-#>         if (!is.null(radius) && is.null(length)) {
-#>             r_scale <- radius/shape$radius
-#>             radii <- radii * r_scale
-#>             if (nrow(rpos) >= 4) {
-#>                 rpos[seq(4L, nrow(rpos)), ] <- rpos[seq(4L, nrow(rpos)), 
-#>                   ] * r_scale
-#>             }
-#>             methods::slot(object, "shape_parameters")$radius <- max(radii)
-#>         }
-#>         methods::slot(object, "body")$rpos <- rpos
-#>         methods::slot(object, "body")$radius <- radii
-#>         return(object)
 #>     }
 #>     .local(object, ...)
 #> }, target = new("signature", .Data = "FLS", names = "object", 
 #>     package = "acousticTS"), defined = new("signature", .Data = "FLS", 
 #>     names = "object", package = "acousticTS"), generic = "reforge")
-#> <bytecode: 0x557c99271f38>
+#> <bytecode: 0x562506f3caf8>
 #> <environment: namespace:acousticTS>
 #> attr(,"target")
 #> An object of class “signature”

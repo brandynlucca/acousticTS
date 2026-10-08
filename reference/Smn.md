@@ -73,6 +73,11 @@ A list containing:
   Numeric vector of first derivatives \\\frac{d}{d\eta}S\_{mn}^{(1)}(c,
   \eta)\\ at each input `eta`.
 
+Equally sized vectors `m` and `n` with more than one entry are evaluated
+pairwise. For these paired modes, a scalar `eta` gives vectors in
+`value` and `derivative`. Multiple `eta` values give matrices with one
+row per mode pair and one column per angular coordinate.
+
 ## Details
 
 The prolate spheroidal angular functions are solutions to the angular

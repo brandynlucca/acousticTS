@@ -1,5 +1,16 @@
 # Changelog
 
+## acousticTS 2.0.7
+
+- Correct cylindrical Bessel functions on the imaginary axis and the
+  upper side of the negative real axis branch cut.
+- Stabilize spherical Bessel sequences near zeros of the order-zero
+  function.
+- Return correctly indexed angular matrices from
+  [`Smn()`](https://brandynlucca.github.io/acousticTS/reference/Smn.md)
+  when evaluating paired mode vectors at multiple angular coordinates.
+- Return the finite minimum-norm solution for zero-rank SVD systems.
+
 ## acousticTS 2.0.6
 
 CRAN release: 2026-09-26
