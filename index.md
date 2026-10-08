@@ -55,8 +55,8 @@ install.packages("remotes")
 remotes::install_github("brandynlucca/acousticTS")
 ```
 
-> **Installation note:** `acousticTS` contains C++17 and Fortran source
-> code. Windows users need the version of
+> \[!NOTE\] `acousticTS` contains C++17 and Fortran source code. Windows
+> users need the version of
 > [Rtools](https://cran.r-project.org/bin/windows/Rtools/) matching
 > their R installation. macOS users need the Xcode Command Line Tools
 > and a compatible GNU Fortran compiler. Linux users need a C++17
