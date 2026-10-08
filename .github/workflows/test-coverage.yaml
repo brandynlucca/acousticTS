@@ -47,6 +47,8 @@ jobs:
           cov <- covr::package_coverage(
             quiet = FALSE,
             clean = TRUE,
+            # Measure implementation coverage, excluding the native test harness.
+            line_exclusions = c("tests/testthat/native-solvers.h", "src/test-runner.cpp"),
             install_path = file.path(normalizePath(Sys.getenv("RUNNER_TEMP"), winslash = "/"), "package")
           )
           print(cov)
