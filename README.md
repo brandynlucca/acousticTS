@@ -1,13 +1,16 @@
 
 # acousticTS <img src="man/figures/logo.png" align="right" height="158" alt="acousticTS hex logo" />
 
-[![CRAN Version](https://www.r-pkg.org/badges/version/acousticTS)](https://doi.org/10.32614/CRAN.package.acousticTS) [![GitHub Version](https://img.shields.io/github/v/release/brandynlucca/acousticTS?label=GitHub)](https://github.com/brandynlucca/acousticTS) [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.7600659-blue.svg)](https://doi.org/10.5281/zenodo.7600659)
+[![CRAN Version](https://www.r-pkg.org/badges/version/acousticTS)](https://doi.org/10.32614/CRAN.package.acousticTS) 
+[![GitHub Version](https://img.shields.io/github/v/release/brandynlucca/acousticTS?label=GitHub)](https://github.com/brandynlucca/acousticTS) 
+[![R Version](https://img.shields.io/badge/dynamic/regex?url=https%3A%2F%2Fraw.githubusercontent.com%2Fbrandynlucca%2FacousticTS%2Fmain%2FDESCRIPTION&search=R%5Cs%2A%5C%28%5Cs%2A%3E%3D%5Cs%2A%28%5B0-9.%5D%2B%29%5Cs%2A%5C%29&replace=%241%2B&label=R&color=blue)](https://www.r-project.org/)
+[![GitHub last commit](https://img.shields.io/github/last-commit/brandynlucca/acousticTS?label=Last%20commit)](https://github.com/brandynlucca/acousticTS/commits/main)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.7600659-blue.svg)](https://doi.org/10.5281/zenodo.7600659)
 
 [![Documentation](https://img.shields.io/badge/documentation-latest-blue?label=Package%20documentation)](https://brandynlucca.github.io/acousticTS/)
 [![R-CMD-check](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/brandynlucca/acousticTS/actions/workflows/R-CMD-check.yaml)
 [![Codecov](https://codecov.io/gh/brandynlucca/acousticTS/graph/badge.svg?branch=main)](https://app.codecov.io/gh/brandynlucca/acousticTS?branch=main)
-[![License:
-GPL-3](https://img.shields.io/badge/license-GPL--3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
+[![License: GPL-3](https://img.shields.io/badge/license-GPL--3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
 [![](https://cranlogs.r-pkg.org/badges/grand-total/acousticTS)](https://cran.rstudio.com/web/packages/acousticTS/index.html)
 
 `acousticTS` estimates the acoustic target strength of aquatic
