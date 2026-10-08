@@ -1,5 +1,38 @@
 library(acousticTS)
 
+test_that("arbitrary matrices and one-sided envelopes retain coordinates", {
+  profile <- cbind(x = c(0, 0.01, 0.03), a = c(0.001, 0.003, 0.002))
+  from_matrix <- arbitrary(rpos = profile)
+  from_vectors <- arbitrary(
+    x_body = profile[, "x"],
+    radius_body = profile[,
+      "a"
+    ]
+  )
+  expect_equal(from_matrix, from_vectors)
+  for (side in c("zU", "zL")) {
+    args <- list(x_body = profile[, "x"], radius_body = profile[, "a"])
+    args[[side]] <- if (side == "zU") {
+      profile[, "a"]
+    } else {
+      -profile[, "a"]
+    }
+    shape <- do.call(arbitrary, args)
+    expect_equal(shape@position_matrix[, "zU"], profile[, "a"])
+    expect_equal(shape@position_matrix[, "zL"], -profile[, "a"])
+  }
+  expect_error(arbitrary(x_body = 0:2), "at least two numeric vectors")
+  expect_error(arbitrary(x = 0:2, x_body = 0:2, radius_body = 1), "overlap")
+  expect_equal(
+    prolate_spheroid(semimajor_length = 0.02, semiminor_length = 0.003),
+    prolate_spheroid(length_body = 0.04, radius_body = 0.003)
+  )
+  expect_equal(
+    oblate_spheroid(semimajor_length = 0.02, semiminor_length = 0.003),
+    oblate_spheroid(length_body = 0.006, radius_body = 0.02)
+  )
+})
+
 test_that("Shape creation functions work correctly", {
   # Test sphere function
   radius <- 0.05 # 5 cm radius

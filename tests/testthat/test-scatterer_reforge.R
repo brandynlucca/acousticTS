@@ -1,5 +1,128 @@
 library(acousticTS)
 
+test_that("reforge helpers preserve degenerate placement and default dispatch", {
+  expect_identical(reforge(2), 2)
+  profile <- rbind(x = c(0, 1, 2), y = 0, z = c(1, 2, 3), radius = 0.2)
+  expect_equal(
+    acousticTS:::.reforge_component_dimensions(profile),
+    c(length = 2, width = 0, height = 0.4)
+  )
+  scaled <- acousticTS:::.reforge_apply_axis_scaling(
+    profile, c(length = 1, width = 1, height = 2)
+  )
+  expect_equal(scaled["z", ], c(0, 2, 4))
+  flat <- profile
+  flat["radius", ] <- 0
+  expect_equal(acousticTS:::.reforge_relative_vertical_offset(profile, flat), 0)
+  for (offset in list(NULL, NA_real_, 1)) {
+    expect_identical(
+      acousticTS:::.reforge_shift_to_relative_vertical_offset(
+        profile, offset, flat
+      ),
+      profile
+    )
+  }
+  direct <- methods::new("MethodDefinition", function(object, size) object)
+  empty <- methods::new("MethodDefinition", function(object, ...) object)
+  expect_identical(acousticTS:::.reforge_method_formals(direct), "size")
+  expect_identical(acousticTS:::.reforge_method_formals(empty), character())
+})
+
+test_that("legacy fluid dimensions agree with structured anisotropic targets", {
+  object <- fls_generate(
+    shape = cylinder(0.04, 0.003),
+    g_body = 1.03,
+    h_body = 1.02
+  )
+  legacy <- reforge(object, length = 0.08, radius = 0.005)
+  structured <- reforge(
+    object,
+    body_target = c(length = 0.08, radius = 0.005),
+    isometric_body = FALSE
+  )
+  expect_equal(legacy, structured)
+  expect_error(reforge(object), "Must specify at least one")
+  expect_error(
+    reforge(object, body_scale = 2, body_target = c(length = 0.08)),
+    "Specify only one of body_scale"
+  )
+  expect_error(
+    reforge(object, n_segments = 20, n_segments_body = 30),
+    "Specify only one of n_segments"
+  )
+  expect_error(
+    reforge(object, body_scale = 2, isometric_body = FALSE),
+    "scalar or a named vector"
+  )
+
+  gas <- gas_generate(
+    shape = arbitrary(
+      x_body = c(0.01, 0.02, 0.04),
+      radius_body = c(0.001, 0.003, 0.002)
+    ),
+    g_fluid = 0.001,
+    h_fluid = 0.23
+  )
+  grown <- reforge(
+    gas,
+    body_target = c(length = 0.06, radius = 0.006),
+    isometric_body = FALSE,
+    n_segments = 8
+  )
+  expect_equal(range(grown@body$rpos[, "x"]), c(0.01, 0.07))
+  expect_equal(grown@shape_parameters$radius, 2 * gas@shape_parameters$radius)
+  expect_equal(nrow(grown@body$rpos), 9L)
+  expect_equal(grown@body$g, gas@body$g)
+})
+
+test_that("backbone resizing preserves circularity and optional body ratios", {
+  fish <- bbf_generate(
+    body_shape = cylinder(0.08, 0.006),
+    backbone_shape = cylinder(
+      0.04,
+      8e-04
+    ),
+    g_body = 1.04,
+    h_body = 1.02,
+    density_backbone = 1900,
+    sound_speed_longitudinal_backbone = 3500,
+    sound_speed_transversal_backbone = 1700,
+    x_offset_backbone = 0.02
+  )
+  scaled <- reforge(fish, backbone_scale = 1.5)
+  expect_equal(scaled@shape_parameters$body$length, 0.12)
+  expect_equal(scaled@shape_parameters$backbone$length, 0.06)
+  for (axis in c("width", "height")) {
+    widened <- reforge(
+      fish,
+      backbone_scale = setNames(2, axis),
+      isometric_backbone = FALSE,
+      maintain_ratio = FALSE
+    )
+    expect_equal(widened@backbone$radius, 2 * fish@backbone$radius)
+    expect_equal(widened@body, fish@body)
+  }
+  expect_message(
+    independent <- reforge(fish, body_scale = 2, backbone_scale = 1.5),
+    "maintain_ratio.*ignored"
+  )
+  expect_equal(independent@shape_parameters$body$length, 0.16)
+  expect_equal(independent@shape_parameters$backbone$length, 0.06)
+  expect_error(
+    reforge(fish, backbone_scale = 2, backbone_target = c(length = 0.05)),
+    "Specify only one of backbone_scale or backbone_target"
+  )
+
+  shell <- fixture_sphere("shelled_liquid")
+  resized <- reforge(shell, scale = 2)
+  expect_equal(resized@fluid$rpos, 2 * shell@fluid$rpos)
+  expect_equal(resized@fluid$radius, 2 * shell@fluid$radius)
+  expect_error(
+    reforge(shell, scale = 0.1, shell_thickness = 0.002),
+    "shell_thickness exceeds new shell radius"
+  )
+})
+
 test_that("`.discover_reforge_params` returns expected keys.", {
   # Test FLS parameters
   expect_equal(
