@@ -36,3 +36,8 @@ src/*.o
 tests/testthat/Rplots.pdf
 vignettes/*/figure/
 .tmp/
+covr/
+*.gcda
+*.gcno
+src/*.mod
+tools/validation/
