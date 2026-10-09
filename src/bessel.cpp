@@ -2,6 +2,7 @@
 #include <cmath>
 #include <complex>
 #include <vector>
+#include <boost/math/policies/policy.hpp>
 #include <boost/math/special_functions/bessel.hpp>
 #include "bessel_helpers.h" 
 using namespace Rcpp;
@@ -12,7 +13,11 @@ const double tol = 1e-300;
 const std::complex<double> i_unit(0.0, 1.0);
 
 inline double modified_bessel_i_impl(double nu, double x) {
-    return boost::math::cyl_bessel_i(nu, x);
+    // Keep the continued fraction's bounds in the double working type.
+    // Promoted x87 bounds underflow in Valgrind's 64-bit FP emulation.
+    using bessel_policy = boost::math::policies::policy<
+        boost::math::policies::promote_double<false>>;
+    return boost::math::cyl_bessel_i(nu, x, bessel_policy());
 }
 
 inline double modified_bessel_k_impl(double nu, double x) {
