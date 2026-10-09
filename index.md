@@ -3,9 +3,7 @@
 [![CRAN
 Version](https://www.r-pkg.org/badges/version/acousticTS)](https://doi.org/10.32614/CRAN.package.acousticTS)
 [![GitHub
-Version](https://img.shields.io/github/v/release/brandynlucca/acousticTS?label=GitHub)](https://github.com/brandynlucca/acousticTS)
-[![R
-Version](https://img.shields.io/badge/dynamic/regex?url=https%3A%2F%2Fraw.githubusercontent.com%2Fbrandynlucca%2FacousticTS%2Fmain%2FDESCRIPTION&search=R%5Cs%2A%5C%28%5Cs%2A%3E%3D%5Cs%2A%28%5B0-9.%5D%2B%29%5Cs%2A%5C%29&replace=%241%2B&label=R&color=blue)](https://www.r-project.org/)
+Version](https://img.shields.io/badge/dynamic/regex?url=https%3A%2F%2Fraw.githubusercontent.com%2Fbrandynlucca%2FacousticTS%2Fmain%2FDESCRIPTION&search=Version%3A%5Cs%2A%28%5B0-9.%5D%2B%29&replace=%241&label=GitHub&color=blue)](https://github.com/brandynlucca/acousticTS)
 [![GitHub last
 commit](https://img.shields.io/github/last-commit/brandynlucca/acousticTS?label=Last%20commit)](https://github.com/brandynlucca/acousticTS/commits/main)
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.7600659-blue.svg)](https://doi.org/10.5281/zenodo.7600659)
