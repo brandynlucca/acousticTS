@@ -136,6 +136,40 @@ test_that("cylindrical functions preserve analytic identities", {
   }
 })
 
+test_that("imaginary cylindrical values match independent real references", {
+  x <- c(0.8, 2.1, 3.5, 4.2)
+  for (l in c(-2, -1, 0, 1, 2, 0.5)) {
+    phase <- complex(real = cospi(l / 2), imaginary = sinpi(l / 2))
+    expected_j <- phase * besselI(x, l)
+    expected_y <- 1i * expected_j - (2 / pi) * Conj(phase) * besselK(x, l)
+    for (direction in c(1, -1)) {
+      actual_j <- jc(l, direction * 1i * x)
+      actual_y <- yc(l, direction * 1i * x)
+      reference_j <- if (direction > 0) expected_j else Conj(expected_j)
+      reference_y <- if (direction > 0) expected_y else Conj(expected_y)
+      expect_true(all(is.finite(actual_j)))
+      expect_true(all(is.finite(actual_y)))
+      expect_equal(actual_j, reference_j, tolerance = 1e-12)
+      expect_equal(actual_y, reference_y, tolerance = 1e-12)
+    }
+  }
+})
+
+test_that("imaginary cylindrical J values match across orders and arguments", {
+  x <- c(0.05, 0.8, 2.1, 3.5, 4.2, 20, 50)
+  for (l in c(-5.5, -2, -1, -0.5, 0, 0.5, 1, 2, 5.5, 20)) {
+    # Preserve exact zero components when multiplying large Bessel values.
+    phase <- complex(real = cospi(l / 2), imaginary = sinpi(l / 2))
+    expected <- phase * besselI(x, l)
+    for (direction in c(1, -1)) {
+      actual <- jc(l, direction * 1i * x)
+      reference <- if (direction > 0) expected else Conj(expected)
+      expect_true(all(is.finite(actual)))
+      expect_equal(actual, reference, tolerance = 1e-12)
+    }
+  }
+})
+
 test_that("spherical sequences preserve zero limits and modal order", {
   sequence <- acousticTS:::spherical_bessel_sequence_matrix_cpp
   z <- c(0, 1e-310, 0.2, pi, 4.5)
