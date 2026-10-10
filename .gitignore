@@ -41,3 +41,11 @@ covr/
 *.gcno
 src/*.mod
 tools/validation/
+/manuscript/*.aux
+/manuscript/*.bbl
+/manuscript/*.blg
+/manuscript/*.log
+/manuscript/*.out
+/manuscript/*.fls
+/manuscript/*.fdb_latexmk
+/manuscript/*Notes.bib

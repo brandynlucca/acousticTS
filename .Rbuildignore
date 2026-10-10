@@ -37,6 +37,7 @@
 ^doc$
 ^docs$
 ^man-roxygen$
+^manuscript$
 ^organisation.yml$
 ^pkgdown$
 ^results$

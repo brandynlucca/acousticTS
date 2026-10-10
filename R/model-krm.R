@@ -117,13 +117,11 @@
 #'
 #' where \eqn{C_0} is a mode coefficient determined by the material properties
 #' and boundary conditions of the swimbladder. In the far field,
-#' \eqn{\chi=-\pi/4}. The centered-cylinder amplitude is placed in the
-#' rotated coordinate frame by multiplying by \eqn{e^{-2ik_m v_e}}, where
-#' \eqn{k_m} is the selected low-frequency medium wavenumber and \eqn{v_e}
-#' is the axial-length-weighted mean of the rotated bladder centerline.
-#' This placement convention uses one equivalent cylinder, not a second
-#' distributed axial phase integral; finite-length directivity is already
-#' included in \eqn{\sin\Delta/\Delta}.
+#' \eqn{\chi=-\pi/4}. The low-frequency branch evaluates the centered
+#' equivalent-cylinder expression in Clay (1992), Eq. (15), with the selected
+#' surrounding-medium wavenumber. Finite-length directivity is included in
+#' \eqn{\sin\Delta/\Delta}. This approximation uses the bladder volume and
+#' axial length and does not resolve its position or centerline bending.
 #' For higher frequencies
 #' \eqn{ka \ge 0.15}), the Kirchhoff-ray approximation is used:
 #'
@@ -758,12 +756,8 @@ krm_initialize <- function(object,
     h13 = h13
   )
 
-  # Clay (1992), Eq. (15), already integrates axial phase into the sinc.
-  # Place the single equivalent cylinder in the upward 1994 coordinate frame.
-  v_eq <- stats::weighted.mean(
-    bladder_geom$v_mid, abs(bladder_geom$delta_x)
-  )
-  phase_low <- exp(-2i * k_bladder_low * v_eq)
+  # Clay (1992), Eq. (15), for the centered equivalent cylinder.
+  # The single sinc already includes its finite-length angular response.
   Delta_low <- k_bladder_low * bladder_geom$length_eq * cos(bladder$theta)
   sinc_low <- rep(1, length(Delta_low))
   nz_delta <- abs(Delta_low) > sqrt(.Machine$double.eps)
@@ -771,7 +765,7 @@ krm_initialize <- function(object,
 
   # Return the low-ka swimbladder term and the regime mask =====================
   list(
-    f = -1i / pi * bladder_geom$length_eq * sinc_low * b0 * phase_low,
+    f = -1i / pi * bladder_geom$length_eq * sinc_low * b0,
     low_ka_mask = is.finite(ka_bladder_eq) & ka_bladder_eq <= 0.15
   )
 }

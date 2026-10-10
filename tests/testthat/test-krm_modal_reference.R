@@ -26,7 +26,7 @@
 
 # Clay (1991), Eqs. (7)-(12); Clay (1992), Eqs. (15)-(16), (A7).
 .krm_published_modal <- function(frequency, theta, sound_speed = 1500,
-                                 density = 1025, v_center = 0) {
+                                 density = 1025) {
   k <- 2 * pi * frequency / sound_speed
   q <- k * 0.001
   qi <- 2 * pi * frequency / 345 * 0.001
@@ -40,7 +40,7 @@
   sinc <- rep(1, length(delta))
   nonzero <- abs(delta) > 1e-12
   sinc[nonzero] <- sin(delta[nonzero]) / delta[nonzero]
-  -1i * 0.1 / pi * sinc * b0 * exp(-2i * k * v_center)
+  -1i * 0.1 / pi * sinc * b0
 }
 
 test_that("KRM low mode matches the published single-sinc cylinder", {
@@ -64,14 +64,12 @@ test_that("KRM low mode matches the published single-sinc cylinder", {
   }
 })
 
-test_that("KRM bladder position uses the upward-coordinate phase in both regimes", {
-  frequency <- c(100, 1000, 35000, 38000, 120000)
+test_that("KRM high-frequency bladder phase follows the published coordinates", {
+  frequency <- c(38000, 120000)
   theta <- 75 * pi / 180
   for (variant in c("lowcontrast", "mixed", "body_embedded")) {
-    c_low <- if (variant == "body_embedded") 1575 else 1500
     c_high <- if (variant == "lowcontrast") 1500 else 1575
-    k <- ifelse(2 * pi * frequency / c_low * 0.001 <= 0.15,
-                2 * pi * frequency / c_low, 2 * pi * frequency / c_high)
+    k <- 2 * pi * frequency / c_high
     original <- .krm_reference_result(.krm_reference_fish(theta = theta),
                                       frequency, variant)
     for (shift in list(c(0.02, 0), c(0, 0.003), c(0.02, 0.003))) {
@@ -87,8 +85,8 @@ test_that("KRM bladder position uses the upward-coordinate phase in both regimes
   }
 })
 
-test_that("KRM default coherent sum preserves axial translation phase", {
-  frequency <- c(100, 1000, 35000, 38000, 120000)
+test_that("KRM high-frequency coherent sum preserves axial translation phase", {
+  frequency <- c(38000, 120000)
   theta <- 75 * pi / 180
   original <- .krm_reference_result(.krm_reference_fish(theta = theta), frequency)
   moved <- .krm_reference_result(
@@ -104,12 +102,30 @@ test_that("KRM low mode retains one equivalent cylinder for a bent outline", {
   theta <- 75 * pi / 180
   for (x in list(c(-0.05, 0, 0.05), seq(-0.05, 0.05, length.out = 101))) {
     centerline <- 0.004 * abs(x) / 0.05
-    # The triangular centerline has length-averaged height 0.002 m.
+    # The equivalent-cylinder formula uses volume and axial length only.
     original <- .krm_reference_result(
       .krm_reference_fish(x, theta, centerline = centerline), frequency
     )
-    reference <- .krm_published_modal(frequency, theta,
-                                      v_center = 0.002 * sin(theta))
+    reference <- .krm_published_modal(frequency, theta)
     expect_equal(as.vector(original$f_bladder), reference, tolerance = 1e-12)
+  }
+})
+
+test_that("KRM low-frequency offsets retain the published centered-cylinder expression", {
+  frequency <- c(100, 1000, 35000)
+  for (variant in c("lowcontrast", "mixed", "body_embedded")) {
+    c_medium <- if (variant == "body_embedded") 1575 else 1500
+    rho_medium <- if (variant == "body_embedded") 1070 else 1025
+    for (theta in c(75, 90, 105) * pi / 180) {
+      expected <- .krm_published_modal(frequency, theta, c_medium, rho_medium)
+      for (shift in list(c(0.02, 0), c(0, 0.003), c(0.02, 0.003))) {
+        result <- .krm_reference_result(
+          .krm_reference_fish(theta = theta, dx = shift[1], dz = shift[2]),
+          frequency, variant
+        )
+        expect_equal(as.vector(result$f_bladder), expected, tolerance = 1e-12)
+        expect_equal(result$f_bs, result$f_body + result$f_bladder, tolerance = 1e-12)
+      }
+    }
   }
 })
