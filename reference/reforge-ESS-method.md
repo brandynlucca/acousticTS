@@ -175,7 +175,7 @@ methods::selectMethod("reforge", "ESS")
 #> }, target = new("signature", .Data = "ESS", names = "object", 
 #>     package = "acousticTS"), defined = new("signature", .Data = "ESS", 
 #>     names = "object", package = "acousticTS"), generic = "reforge")
-#> <bytecode: 0x55ba28aa9698>
+#> <bytecode: 0x563896169d58>
 #> <environment: namespace:acousticTS>
 #> attr(,"target")
 #> An object of class “signature”

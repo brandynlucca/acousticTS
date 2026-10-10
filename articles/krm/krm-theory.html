@@ -424,34 +424,19 @@ symmetric (<span class="math inline">m=0</span>) cylindrical mode
 dominates. Following Section II.A of <span class="citation">Clay and
 Horne (<a href="#ref-Clay_1994">1994</a>)</span>, the low-frequency
 branch uses one cylinder with the bladder’s volume and axial length. Its
-far-field scattering length, from <span class="citation">Clay (<a href="#ref-Clay_1992">1992</a>)</span>, Eq. (15), with a positional
-phase factor is:</p>
+far-field scattering length is the centered-cylinder expression in <span class="citation">Clay (<a href="#ref-Clay_1992">1992</a>)</span>, Eq.
+(15):</p>
 <p><span class="math display">
   f_M = -\frac{iL_e}{\pi}
-  \frac{\sin\Delta}{\Delta}\,b_0\,\Phi,
+  \frac{\sin\Delta}{\Delta}\,b_0.
 </span></p>
-<p>where <span class="math inline">L_e</span> is the equivalent length,
-<span class="math inline">\Delta=k_mL_e\cos\theta</span> is the
-finite-length phase parameter. The centered-cylinder prefactor follows
-from <span class="math inline">\chi=-\pi/4</span>. To place the
-equivalent cylinder in the rotated frame, the implementation uses the
-axial-length-weighted mean centerline position:</p>
-<p><span class="math display">
-  v_e = \frac{\sum_j v_{c,j}|\Delta x_j|}{\sum_j|\Delta x_j|},
-  \qquad \Phi = e^{-2ik_m v_e},
-</span></p>
-<p>where <span class="math inline">v_{c,j}=x_j\cos\theta+z_{c,j}\sin\theta</span> and
-<span class="math inline">z_{c,j}=(z_{U,j}+z_{L,j})/2</span> use
-segment-midpoint coordinates. This choice of reference position is an
-implementation convention for the equivalent cylinder, not an additional
-empirical formula from the papers. The negative exponent uses the upward
-coordinate of <span class="citation">Clay and Horne (<a href="#ref-Clay_1994">1994</a>)</span>. Clay’s positive deformation
-exponent instead uses displacement away from the incident wavefront
-(1991, Fig. 11; 1992, Fig. 5).</p>
-<p>The sinc already includes the axial phase integration (1992, Appendix
-B, Eqs. (B12)-(B13)); it must not be multiplied by another integral of
-that same axial phase. No distributed bending factor is applied in this
-equivalent-cylinder branch.</p>
+<p>Here <span class="math inline">L_e</span> is the equivalent length
+and <span class="math inline">\Delta=k_mL_e\cos\theta</span>, where
+<span class="math inline">k_m</span> is the selected surrounding-medium
+wavenumber. The prefactor follows from the far-field approximation <span class="math inline">\chi=-\pi/4</span>.</p>
+<p>The single sinc contains the axial phase integration (1992, Appendix
+B, Eqs. (B12)-(B13)). This equivalent-cylinder approximation does not
+resolve the bladder’s position or centerline bending.</p>
 <p>The breathing-mode coefficient is:</p>
 <p><span class="math display">
   b_0 = -\frac{1}{1+iC_0}.

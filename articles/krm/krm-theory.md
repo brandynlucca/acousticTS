@@ -276,33 +276,18 @@ When the inclusion’s acoustic size is small, the azimuthally symmetric
 (m=0) cylindrical mode dominates. Following Section II.A of Clay and
 Horne ([1994](#ref-Clay_1994)), the low-frequency branch uses one
 cylinder with the bladder’s volume and axial length. Its far-field
-scattering length, from Clay ([1992](#ref-Clay_1992)), Eq. (15), with a
-positional phase factor is:
+scattering length is the centered-cylinder expression in Clay
+([1992](#ref-Clay_1992)), Eq. (15):
 
-f_M = -\frac{iL_e}{\pi} \frac{\sin\Delta}{\Delta}\\b_0\\\Phi,
+f_M = -\frac{iL_e}{\pi} \frac{\sin\Delta}{\Delta}\\b_0.
 
-where L_e is the equivalent length, \Delta=k_mL_e\cos\theta is the
-finite-length phase parameter. The centered-cylinder prefactor follows
-from \chi=-\pi/4. To place the equivalent cylinder in the rotated frame,
-the implementation uses the axial-length-weighted mean centerline
-position:
+Here L_e is the equivalent length and \Delta=k_mL_e\cos\theta, where k_m
+is the selected surrounding-medium wavenumber. The prefactor follows
+from the far-field approximation \chi=-\pi/4.
 
-v_e = \frac{\sum_j v\_{c,j}\|\Delta x_j\|}{\sum_j\|\Delta x_j\|}, \qquad
-\Phi = e^{-2ik_m v_e},
-
-where v\_{c,j}=x_j\cos\theta+z\_{c,j}\sin\theta and
-z\_{c,j}=(z\_{U,j}+z\_{L,j})/2 use segment-midpoint coordinates. This
-choice of reference position is an implementation convention for the
-equivalent cylinder, not an additional empirical formula from the
-papers. The negative exponent uses the upward coordinate of Clay and
-Horne ([1994](#ref-Clay_1994)). Clay’s positive deformation exponent
-instead uses displacement away from the incident wavefront (1991, Fig.
-11; 1992, Fig. 5).
-
-The sinc already includes the axial phase integration (1992, Appendix B,
-Eqs. (B12)-(B13)); it must not be multiplied by another integral of that
-same axial phase. No distributed bending factor is applied in this
-equivalent-cylinder branch.
+The single sinc contains the axial phase integration (1992, Appendix B,
+Eqs. (B12)-(B13)). This equivalent-cylinder approximation does not
+resolve the bladder’s position or centerline bending.
 
 The breathing-mode coefficient is:
 
