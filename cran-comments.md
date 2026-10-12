@@ -1,3 +1,13 @@
+## Resubmission
+
+This resubmission addresses the `CRAN URL not in canonical form` NOTE that was triggered by `README.md`. The offending link has been replaced with the requested canonical form. 
+
+### R CMD check results
+
+0 errors | 0 warnings | 0 notes
+
+Other validation checks: all successful checks below in the original submission still apply.
+
 ## Submission
 
 This is a maintenance update to acousticTS, version 2.0.8
