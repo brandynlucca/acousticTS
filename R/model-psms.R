@@ -1,5 +1,5 @@
 ################################################################################
-# Prolate spheroid modal series solution
+# Prolate spheroid modal series solution =======================================
 ################################################################################
 #' Prolate spheroidal modal series (PSMS) solution
 #'
@@ -28,41 +28,37 @@
 #' @section Arguments:
 #' \describe{
 #'   \item{\code{phi_body}}{Incident roll angle (radians).}
-#'   \item{\code{boundary}}{Boundary condition at the cylinder surface.
+#'   \item{\code{boundary}}{Boundary condition at the spheroid surface.
 #'     One of \code{"fixed_rigid"}, \code{"pressure_release"},
 #'     \code{"liquid_filled"}, or \code{"gas_filled"}. See the
 #'     boundary conditions documentation for more
 #'     details on these different boundary conditions.}
-#'   \item{\code{adaptive}}{A boolean argument controlling whether the PSMS
-#'   backend is allowed to stop once the retained modal tail becomes
-#'   numerically negligible and to choose an adaptive quadrature order for full
-#'   fluid- or gas-filled overlap integrals. When \code{FALSE} (default), the
-#'   implementation uses the published hard truncation rule and a fixed
-#'   quadrature order unless the user overrides it directly. When
-#'   \code{TRUE}, the hard \eqn{m_{\max}} and \eqn{n_{\max}} rules remain the
-#'   upper bounds, but the backscatter implementation is allowed to stop early
-#'   once the retained tail is both numerically small and gradient-flat.}
-#'   \item{\code{simplify_Amn}}{A boolean argument that flags whether or not to
-#'   use the simplified calculation for the exansion matrix, \eqn{A_{mn}}, for a
-#'   fluid-filled scatterer. See Theory for the mathematical formulation and
-#'   assumptions. **Note:** this argument **only** applies to when
-#'   \code{boundary = "liquid_filled"} or \code{boundary = "gas_filled"}. It is
-#'   otherwise left unused for all other boundary conditions.}
+#'   \item{\code{adaptive}}{When \code{TRUE}, choose quadrature order for full
+#'   liquid-filled solutions and allow negligible modal tails to terminate
+#'   backscatter sums early. Full gas solutions retain every degree in the
+#'   selected modal system in either setting. Defaults to \code{FALSE}.}
+#'   \item{\code{simplify_Amn}}{When \code{FALSE} (default), solve the coupled
+#'   pressure and normal-velocity boundary equations for liquid- or gas-filled
+#'   spheroids. When \code{TRUE}, retain the diagonal approximation described in
+#'   Theory. This approximation can differ near gas resonances. Ignored for
+#'   other boundary conditions.}
 #'   \item{\code{precision}}{A literal argument that allows for levels of
 #'   precision when calculating the expansion matrix, \eqn{A_{mn}}. There are
 #'   two choices: \code{"double"} for double-precision (64-bit) and
-#'   \code{"quad"} for quadruple-precision (128-bit). See Details for more
-#'   double- and quadruple-precision usages are implemented.}
+#'   \code{"quad"} for quadruple-precision (128-bit). Use \code{"quad"} when
+#'   strong gas contrast or high acoustic size makes double precision unstable.}
 #'   \item{\code{n_integration}}{An integer argument that informs the model how
 #'   many integration points will be used to calculate \eqn{\alpha_{mn}^{m}},
 #'   which is numerically calculated using Gauss-Legendre quadrature. When left
 #'   as \code{NULL}, the model uses 96 integration points unless
 #'   \code{adaptive = TRUE}, in which case a reduced-frequency-based
 #'   quadrature rule is selected internally for the full liquid-filled
-#'   solve. See
+#'   solve. Full gas solutions evaluate angular overlaps from normalized
+#'   expansion coefficients using Legendre orthogonality, so they do not use
+#'   angular quadrature and are independent of \code{n_integration}. See
 #'   \link{gauss_legendre} for a full description of how \code{n_integration} is
 #'   used. **Note:** this argument **only** applies to when
-#'   \code{boundary = "liquid_filled"} or \code{boundary = "gas_filled"}. It is
+#'   \code{boundary = "liquid_filled"}. It is
 #'   otherwise left unused for all other boundary conditions.}
 #'   \item{\code{sound_speed_sw}}{Seawater sound speed (\eqn{m~s^{-1}}).}
 #'   \item{\code{density_sw}}{Seawater density (\eqn{kg~m^{-3}}).}
@@ -152,6 +148,13 @@
 #' linear-system stage does not become detached from the rest of the chosen
 #' precision pathway.
 #'
+#' For the full gas solution, angular overlaps are evaluated as dot products
+#' of expansion coefficients in an orthonormal associated Legendre basis.
+#' This follows from the spheroidal expansion and Legendre orthogonality
+#' identities in \href{https://dlmf.nist.gov/30.8.E1}{DLMF 30.8.1} and
+#' \href{https://dlmf.nist.gov/14.17.E6}{DLMF 14.17.6}. The coefficients and
+#' overlap sums retain the requested arithmetic precision.
+#'
 #' In the case that \eqn{h_0 \approx h_1}, \eqn{\alpha_{mn}^{m} \approx 0} for
 #' \eqn{n \neq l}, and a much simplified expression is derived:
 #'
@@ -211,6 +214,13 @@
 #' Furusawa, M. (1988). Prolate spheroidal models for predicting general trends
 #' of fish target strength. Journal of the Acoustical Society of Japan, 9:
 #' 13-24.
+#'
+#' Khodabandeloo, B., Heggelund, Y., Ystad, B., Marx, S. A. B., and Pedersen, G.
+#' (2025). High-precision model and open-source software for acoustic
+#' backscattering by liquid- and gas-filled prolate spheroids across a wide
+#' frequency range and incident angles: Implications for fisheries acoustics.
+#' Journal of Sound and Vibration, 616: 119227.
+#' \doi{10.1016/j.jsv.2025.119227}.
 #'
 #' Sanderson, C., and Curtin, R. (2019). Practical sparse matrices in C++ with
 #' hybrid storage and template-based expression optimisation. Mathematical and
@@ -312,7 +322,7 @@ NULL
 #' Resolve the Amn formulation associated with one PSMS boundary condition.
 #' @noRd
 .psms_Amn_method <- function(boundary, simplify_Amn) {
-  # Map the public PSMS boundary labels onto the internal kernel names ========
+  # Map the public PSMS boundary labels onto the internal kernel names =========
   switch(boundary,
     liquid_filled = ifelse(simplify_Amn, "Amn_fluid_simplify", "Amn_fluid"),
     gas_filled = ifelse(simplify_Amn, "Amn_fluid_simplify", "Amn_fluid_gas"),
@@ -401,9 +411,8 @@ NULL
 #' Resolve the quadrature order used by the PSMS kernels.
 #' @noRd
 .psms_n_integration <- function(n_integration, adaptive, Amn_method) {
-  # Allow the adaptive full-fluid solve to choose quadrature internally ========
-  use_adaptive_quadrature <- isTRUE(adaptive) &&
-    .psms_is_full_fluid_method(Amn_method)
+  # Let the full liquid solve choose adaptive quadrature =======================
+  use_adaptive_quadrature <- isTRUE(adaptive) && identical(Amn_method, "Amn_fluid")
   if (use_adaptive_quadrature) {
     if (!is.null(n_integration)) {
       warning(
@@ -415,7 +424,7 @@ NULL
     return(NA_integer_)
   }
 
-  # Otherwise validate or fill in the explicit quadrature order ===============
+  # Otherwise validate or fill in the explicit quadrature order ================
   if (is.null(n_integration)) {
     return(96L)
   }
@@ -440,7 +449,7 @@ NULL
   # Add reduced frequencies for the surrounding medium and interior ============
   model_params$acoustics$chi_sw <- model_params$acoustics$k_sw * body_params$q
   model_params$acoustics$chi_body <- model_params$acoustics$k_f * body_params$q
-  # Add the hard modal truncation limits used by the PSMS solver ==============
+  # Add the hard modal truncation limits used by the PSMS solver ===============
   model_params$acoustics$m_max <- ceiling(
     2 * model_params$acoustics$k_sw * scatterer_shape$radius
   )
@@ -457,13 +466,12 @@ NULL
   boundary
 ) {
   if (!identical(boundary, "gas_filled") ||
-    !isTRUE(model_params$adaptive) ||
     !identical(model_params$Amn_method, "Amn_fluid_gas")) {
     return(model_params)
   }
 
   broadside_weight <- abs(sin(body_params$theta_body))
-  chi_body_abs <- pmax(abs(model_params$acoustics$chi_body), 1)
+  chi_body_abs <- abs(model_params$acoustics$chi_body)
   sound_speed_ratio <- ifelse(
     chi_body_abs > .Machine$double.eps,
     abs(model_params$acoustics$chi_sw / model_params$acoustics$chi_body),
@@ -474,8 +482,9 @@ NULL
   } else {
     0.3 * sound_speed_ratio * broadside_weight^3 * chi_body_abs + 6
   }
-  n_offset <- if (identical(model_params$precision, "quad")) 12 else 8
-  angle_discount <- if (identical(model_params$precision, "quad")) 7 else 5
+  # Use the Prol_Spheroid high-accuracy interior-wave truncation rule ==========
+  n_offset <- 12
+  angle_discount <- 7
   n_seed <- 0.75 * chi_body_abs + n_offset - angle_discount * broadside_weight
   adaptive_m_max <- ceiling(m_seed)
   adaptive_n_max <- ceiling(n_seed)
@@ -540,16 +549,6 @@ psms_initialize <- function(object,
   )
   # Determine expansion coefficient Amn method =================================
   model_params$Amn_method <- .psms_Amn_method(boundary, simplify_Amn)
-  if (identical(boundary, "gas_filled") &&
-    identical(model_params$Amn_method, "Amn_fluid_gas")) {
-    warning(
-      "The full gas-filled PSMS kernel solve is numerically unstable in the ",
-      "current implementation; using the simplified gas-filled formulation ",
-      "instead.",
-      call. = FALSE
-    )
-    model_params$Amn_method <- "Amn_fluid_simplify"
-  }
   # Compute body parameters ====================================================
   body_params <- .psms_body_parameters(
     scatterer_shape = scatterer_shape,
@@ -601,10 +600,7 @@ psms_initialize <- function(object,
   step_n <- 8L
   floor_n <- if (identical(precision, "quad")) 32L else 24L
   cap_n <- 96L
-  # The overlap quadrature must resolve the same angular content that drives the
-  # retained PSMS modal system. Use the hard truncation ceilings as the main
-  # difficulty scale, with a smaller reduced-frequency bonus for the sharper
-  # high-chi oscillations that appear in the angular products. =================
+  # Apply the existing liquid quadrature rule to the retained modal limits =====
   modal_difficulty <- 0.75 * n_max + 0.25 * m_max
   chi_bonus <- if (identical(precision, "quad")) {
     0.10 * sqrt(pmax(chi_max, 1))
@@ -631,7 +627,11 @@ psms_initialize <- function(object,
   adaptive = FALSE
 ) {
   # Generate nodes and weights for quadrature ==================================
-  quad_pts <- gauss_legendre(n = n_integration, a = -1, b = 1)
+  quad_pts <- if (identical(boundary_method, "Amn_fluid_gas")) {
+    list(nodes = numeric(), weights = numeric())
+  } else {
+    gauss_legendre(n = n_integration, a = -1, b = 1)
+  }
   # Calculate the linear scattering coefficient, fbs ===========================
   prolate_spheroid_fbs(
     acoustics, body, medium, quad_pts, precision, boundary_method, adaptive,
@@ -701,8 +701,8 @@ prolate_spheroidal_kernels <- function(
   precision = "double",
   adaptive = FALSE
 ) {
-  # Use the adaptive grouped solver for full fluid penetrable cases ============
-  if (isTRUE(adaptive) && .psms_is_full_fluid_method(boundary_method)) {
+  # Use grouped adaptive quadrature for the full liquid solution ===============
+  if (isTRUE(adaptive) && identical(boundary_method, "Amn_fluid")) {
     return(
       .prolate_spheroidal_kernels_adaptive(
         acoustics = acoustics,

@@ -1,8 +1,8 @@
 ################################################################################
-# ACOUSTIC AND SIGNAL PROCESSING VARIABLE CALCULATIONS
+# ACOUSTIC AND SIGNAL PROCESSING VARIABLE CALCULATIONS =========================
 ################################################################################
 ################################################################################
-# GENERIC ACOUSTIC VARIABLES
+# GENERIC ACOUSTIC VARIABLES ===================================================
 ################################################################################
 ################################################################################
 #' Calculate the acoustic wavenumber (\eqn{k}) for a given frequency and sound
@@ -73,7 +73,7 @@ db <- function(value, coefficient = 10) {
 }
 ################################################################################
 ################################################################################
-# REFLECTIVITY VARIABLES, COEFFICIENTS, AND EQUATIONS
+# REFLECTIVITY VARIABLES, COEFFICIENTS, AND EQUATIONS ==========================
 ################################################################################
 ################################################################################
 #' Plane wave/plane interface reflection coefficient
@@ -174,7 +174,7 @@ rho <- function(medium, target) {
 }
 ################################################################################
 ################################################################################
-# ELASTICITY CALCULATIONS AND EQUATIONS
+# ELASTICITY CALCULATIONS AND EQUATIONS ========================================
 ################################################################################
 ################################################################################
 #' @title Calculate the Poisson's ratio (\eqn{\nu})
@@ -397,7 +397,7 @@ shear <- function(K = NULL, E = NULL, nu = NULL) {
 #' @rdname lame
 #' @export
 lame <- function(K = NULL, E = NULL, G = NULL, nu = NULL) {
-  # Validate the available elastic moduli before selecting a formula ==========
+  # Validate the available elastic moduli before selecting a formula ===========
   .validate_elastic_inputs(
     K = K,
     E = E,
@@ -429,7 +429,7 @@ lame <- function(K = NULL, E = NULL, G = NULL, nu = NULL) {
     logical(1)
   )
 
-  # Apply the historical precedence order used by the public helper ===========
+  # Apply the historical precedence order used by the public helper ============
   if (provided["K"] && provided["G"]) {
     return("K_G")
   }
@@ -577,8 +577,10 @@ target_strength <- function(object,
   # Resolve the requested target-strength model registry entries ===============
   model_specs <- .resolve_target_strength_model_specs(model)
   model <- vapply(model_specs, function(spec) spec$canonical, character(1))
-  model_args <- .normalize_target_strength_model_args(model_args, model)
-  # Initialize the requested model families ===================================
+  model_args <- .normalize_target_strength_model_args(
+    model_args, model, resolved = TRUE
+  )
+  # Initialize the requested model families ====================================
   target_object <- .initialize_target_strength_models(
     target_object = target_object,
     model_specs = model_specs,
@@ -631,7 +633,7 @@ target_strength <- function(object,
                                                shared_args,
                                                model_args,
                                                verbose = FALSE) {
-  # Initialize one model family at a time =====================================
+  # Initialize one model family at a time ======================================
   for (idx in seq_along(model_specs)) {
     spec <- model_specs[[idx]]
     initialize_fun <- .model_registry_initializer(spec)
@@ -665,7 +667,7 @@ target_strength <- function(object,
 .run_target_strength_models <- function(target_object,
                                         model_specs,
                                         verbose = FALSE) {
-  # Evaluate the requested target-strength models sequentially ================
+  # Evaluate the requested target-strength models sequentially =================
   for (idx in seq_along(model_specs)) {
     spec <- model_specs[[idx]]
     if (verbose) {
@@ -694,13 +696,18 @@ target_strength <- function(object,
 #' @keywords internal
 #' @noRd
 .normalize_target_strength_model_args <- function(model_args,
-                                                  requested_models) {
+                                                  requested_models,
+                                                  resolved = FALSE) {
   # Gather models to validate kwargs ===========================================
-  requested_models <- unique(vapply(
-    .resolve_model_registry_entries(requested_models),
-    function(spec) spec$canonical,
-    character(1)
-  ))
+  requested_models <- if (resolved) {
+    unique(requested_models)
+  } else {
+    unique(vapply(
+      .resolve_model_registry_entries(requested_models),
+      function(spec) spec$canonical,
+      character(1)
+    ))
+  }
   # Revert to default values ===================================================
   if (is.null(model_args)) {
     out <- vector("list", length(requested_models))
@@ -743,7 +750,7 @@ target_strength <- function(object,
       call. = FALSE
     )
   }
-  # Push model-specific kwarg lists into vector and coerce into expected format
+  # Coerce each model-specific argument list into the expected format ==========
   out <- vector("list", length(requested_models))
   names(out) <- requested_models
   for (i in seq_along(model_args)) {

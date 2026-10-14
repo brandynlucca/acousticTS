@@ -17,9 +17,11 @@ void gauss_legendre(int n, std::vector<double>& nodes, std::vector<double>& weig
     nodes.resize(n);
     weights.resize(n);
 
-    for (int k = 0; k < n; ++k) {
+    // Legendre roots and their weights occur in exact symmetric pairs.
+    for (int k = 0; k < (n + 1) / 2; ++k) {
         // Initial guess using Chebyshev nodes
-        double x = std::cos(M_PI * (k + 0.75) / (n + 0.5));
+        double x = 2 * k + 1 == n ? 0.0 :
+            std::cos(M_PI * (k + 0.75) / (n + 0.5));
         double x_prev;
         int iter = 0;
 
@@ -38,7 +40,8 @@ void gauss_legendre(int n, std::vector<double>& nodes, std::vector<double>& weig
             ++iter;
         } while (std::abs(x - x_prev) > 1e-15 && iter < 100);
 
-        nodes[k] = x;
+        nodes[k] = -x;
+        nodes[n - 1 - k] = x;
 
         // Weight
         double P0 = 1.0, P1 = x;
@@ -49,20 +52,8 @@ void gauss_legendre(int n, std::vector<double>& nodes, std::vector<double>& weig
         }
         double Pn_der = n * (x*P1 - P0) / (x*x - 1.0);
         weights[k] = 2.0 / ((1.0 - x*x) * Pn_der * Pn_der);
+        weights[n - 1 - k] = weights[k];
     }
-
-    // Sort nodes and weights in ascending order
-    std::vector<int> idx(n);
-    for (int i = 0; i < n; ++i) idx[i] = i;
-    std::sort(idx.begin(), idx.end(), [&](int i, int j){ return nodes[i] < nodes[j]; });
-
-    std::vector<double> nodes_sorted(n), weights_sorted(n);
-    for (int i = 0; i < n; ++i) {
-        nodes_sorted[i] = nodes[idx[i]];
-        weights_sorted[i] = weights[idx[i]];
-    }
-    nodes = nodes_sorted;
-    weights = weights_sorted;
 }
 
 // Rcpp wrapper for calling from R

@@ -1,10 +1,11 @@
 ################################################################################
-# MODEL REGISTRY
+# MODEL REGISTRY ===============================================================
 ################################################################################
 
 .model_registry_state <- local({
   env <- new.env(parent = emptyenv())
   env$user <- list()
+  env$builtin <- NULL
   env$loaded <- FALSE
   env
 })
@@ -85,7 +86,11 @@
 #' @keywords internal
 #' @noRd
 .builtin_model_registry <- function() {
-  list(
+  # Cache immutable metadata while retaining names for live function lookup. ===
+  if (!is.null(.model_registry_state$builtin)) {
+    return(.model_registry_state$builtin)
+  }
+  entries <- list(
     dwba = .new_model_registry_entry(
       name = "dwba",
       initialize = "dwba_initialize",
@@ -197,6 +202,8 @@
       slot = "TRCM"
     )
   )
+  .model_registry_state$builtin <- entries
+  entries
 }
 
 #' User-level registry path for persisted model registrations

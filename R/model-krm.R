@@ -1,5 +1,5 @@
 ################################################################################
-# Kirchoff-Ray Mode approximation
+# Kirchoff-Ray Mode approximation ==============================================
 ################################################################################
 #' Kirchhoff Ray Mode (KRM) scattering model
 #'
@@ -363,7 +363,7 @@ krm_initialize <- function(object,
                                 density_sw,
                                 krm_variant) {
   # Assemble the fluid-like body properties used by the KRM body term ==========
-  body_params <- data.frame(
+  body_params <- .model_data_frame(
     length = shape$length,
     theta = body$theta,
     density = density_sw * body$g,
@@ -403,13 +403,13 @@ krm_initialize <- function(object,
   body <- .complete_material_props(body, sound_speed_sw, density_sw)
 
   # Assemble the body and swimbladder parameter summaries ======================
-  body_params <- data.frame(
+  body_params <- .model_data_frame(
     length = shape$body$length,
     theta = body$theta,
     density = body$density,
     sound_speed = body$sound_speed
   )
-  bladder_params <- data.frame(
+  bladder_params <- .model_data_frame(
     length = shape$bladder$length,
     theta = bladder$theta,
     density = bladder$density,
@@ -483,7 +483,7 @@ krm_initialize <- function(object,
 ################################################################################
 #' Prepare swimbladder geometry for KRM
 #' @noRd
-.krm_bladder_geometry <- function(rpos, theta) {
+.krm_bladder_geometry <- function(rpos, theta, summary_only = FALSE) {
   # Parse bladder coordinate vectors ===========================================
   x <- rpos[1, ]
   w <- rpos[2, ]
@@ -491,10 +491,6 @@ krm_initialize <- function(object,
   z_l <- rpos[4, ]
   # Resolve local axial spacing ================================================
   dx <- diff(x)
-  # Summarize adjacent-cylinder geometry =======================================
-  sum_rpos <- along_sum(rpos, ncol(rpos))
-  center_z <- (sum_rpos[3, ] + sum_rpos[4, ]) / 4
-  v_mid <- sum_rpos[1, ] * cos(theta) / 2 + center_z * sin(theta)
   # Approximate local semi-axes at each segment end ============================
   half_width0 <- w[-length(w)] / 2
   half_width1 <- w[-1] / 2
@@ -510,6 +506,16 @@ krm_initialize <- function(object,
       (height_slope * half_width0 + width_slope * half_height0) * dx^2 / 2 +
       height_slope * width_slope * dx^3 / 3
   )
+  # The scattering kernels only need the whole-bladder equivalent cylinder. ====
+  length_eq <- max(x, na.rm = TRUE) - min(x, na.rm = TRUE)
+  a_eq_total <- sqrt(sum(dv, na.rm = TRUE) / (pi * length_eq))
+  if (summary_only) {
+    return(list(length_eq = length_eq, a_eq_total = a_eq_total))
+  }
+  # Summarize adjacent-cylinder geometry =======================================
+  sum_rpos <- along_sum(rpos, ncol(rpos))
+  center_z <- (sum_rpos[3, ] + sum_rpos[4, ]) / 4
+  v_mid <- sum_rpos[1, ] * cos(theta) / 2 + center_z * sin(theta)
   # Convert local volume to equivalent cylinder radius =========================
   a_eq <- sqrt(dv / (pi * abs(dx)))
   a_eq_fallback <- sqrt(pmax(
@@ -521,9 +527,6 @@ krm_initialize <- function(object,
   if (any(bad_idx)) {
     a_eq[bad_idx] <- a_eq_fallback[bad_idx]
   }
-  # Resolve whole-bladder equivalent-cylinder dimensions =======================
-  length_eq <- max(x, na.rm = TRUE) - min(x, na.rm = TRUE)
-  a_eq_total <- sqrt(sum(dv, na.rm = TRUE) / (pi * length_eq))
   # Return geometry bookkeeping ================================================
   list(
     sum_rpos = sum_rpos,
@@ -586,57 +589,21 @@ krm_initialize <- function(object,
 .krm_body_term <- function(model, body, scatterer_type) {
   # Recover the canonical body profile and local body radius ===================
   rpos <- .krm_body_rpos(body, scatterer_type)
-  body_rpos_sum <- along_sum(rpos, model$parameters$ns_b)
-  a_body <- body_rpos_sum[2, ] / 4
+  a_body <- (rpos[2, -ncol(rpos)] + rpos[2, -1L]) / 4
 
-  ka_body <- matrix(
-    data = rep(a_body, each = length(model$parameters$acoustics$k_sw)),
-    ncol = length(a_body),
-    nrow = length(model$parameters$acoustics$k_sw)
-  ) * model$parameters$acoustics$k_sw
-
-  # Rotate the body coordinates into the KRM working frame =====================
-  uv_body <- body_rotation(
-    body_rpos_sum,
-    body$rpos,
-    body$theta,
-    length(model$parameters$acoustics$k_sw)
-  )
-
-  body_dorsal_sum <- matrix(
-    data = rep(body_rpos_sum[3, ],
-      each = length(model$parameters$acoustics$k_sw)
-    ),
-    ncol = length(body_rpos_sum[3, ]),
-    nrow = length(model$parameters$acoustics$k_sw)
-  ) / 2
-  Psi_b <- -pi * model$parameters$acoustics$k_b * body_dorsal_sum /
-    (2 * (model$parameters$acoustics$k_b * body_dorsal_sum + 0.4))
-
-  # Resolve the interface coefficients for the body term =======================
   R12 <- reflection_coefficient(model$medium, model$body)
   T12T21 <- 1 - R12 * R12
-
-  # Build the coherent body phase factor and amplitude weights =================
-  exp_body <- exp(-2i * model$parameters$acoustics$k_sw * uv_body$vbU) -
-    T12T21 * exp(
-      -2i * model$parameters$acoustics$k_sw * uv_body$vbU +
-        2i * model$parameters$acoustics$k_b * (uv_body$vbU - uv_body$vbL) +
-        1i * Psi_b
-    )
-
-  delta_u_body <- matrix(
-    data = rep(uv_body$delta_u, each = length(model$parameters$acoustics$k_sw)),
-    ncol = length(uv_body$delta_u),
-    nrow = length(model$parameters$acoustics$k_sw)
+  f_body <- krm_body_fbs_cpp(
+    rpos = rpos,
+    k_sw = model$parameters$acoustics$k_sw,
+    k_body = model$parameters$acoustics$k_b,
+    theta = body$theta,
+    reflection = R12
   )
-  body_summation <- sqrt(ka_body) * delta_u_body
 
   # Return the coherent body scattering term and key diagnostics ===============
   list(
-    f_body = rowSums(
-      -((1i * (R12 / (2 * sqrt(pi)))) * body_summation * exp_body)
-    ),
+    f_body = f_body,
     a_body = a_body,
     R12 = R12,
     T12T21 = T12T21
@@ -686,48 +653,14 @@ krm_initialize <- function(object,
                                        R23,
                                        T12T21,
                                        k_bladder_high) {
-  # Recover the local swimbladder radius and size-parameter matrices ===========
-  bladder_rpos_sum <- bladder_geom$sum_rpos
-  a_bladder <- bladder_rpos_sum[2, ] / 4
-
-  ka_bladder_empirical <- matrix(
-    data = rep(a_bladder, each = length(model$parameters$acoustics$k_sw)),
-    ncol = length(a_bladder),
-    nrow = length(model$parameters$acoustics$k_sw)
-  ) * model$parameters$acoustics$k_sw
-  ka_bladder <- matrix(
-    data = rep(a_bladder, each = length(model$parameters$acoustics$k_sw)),
-    ncol = length(a_bladder),
-    nrow = length(model$parameters$acoustics$k_sw)
-  ) * k_bladder_high
-
-  # Build the empirical amplitude and phase corrections ========================
-  A_sb <- ka_bladder_empirical / (ka_bladder_empirical + 0.083)
-  Psi_p <- ka_bladder_empirical / (40 + ka_bladder_empirical) - 1.05
-
-  # Rotate the swimbladder geometry into the KRM working frame =================
-  uv_bladder <- bladder_rotation(
-    bladder_rpos_sum,
-    bladder$rpos,
-    bladder$theta,
-    length(model$parameters$acoustics$k_sw)
-  )
-  delta_u_bladder <- matrix(
-    data = rep(uv_bladder$delta_u,
-      each = length(model$parameters$acoustics$k_sw)
-    ),
-    ncol = length(uv_bladder$delta_u),
-    nrow = length(model$parameters$acoustics$k_sw)
-  )
-  exp_bladder <- exp(-1i * (2 * k_bladder_high * uv_bladder$v + Psi_p)) *
-    delta_u_bladder
-  bladder_summation <- A_sb * sqrt((ka_bladder + 1) * sin(bladder$theta))
-
-  # Return the high-ka swimbladder scattering contribution =====================
   list(
-    f = rowSums(
-      -1i * (R23 * T12T21) / (2 * sqrt(pi)) *
-        bladder_summation * exp_bladder
+    f = krm_bladder_fbs_cpp(
+      rpos = bladder$rpos,
+      k_sw = model$parameters$acoustics$k_sw,
+      k_medium = k_bladder_high,
+      theta = bladder$theta,
+      reflection = R23,
+      transmission = T12T21
     ),
     ka_bladder_eq = NULL
   )
@@ -756,8 +689,8 @@ krm_initialize <- function(object,
     h13 = h13
   )
 
-  # Clay (1992), Eq. (15), for the centered equivalent cylinder.
-  # The single sinc already includes its finite-length angular response.
+  # Clay (1992), Eq. (15), for the centered equivalent cylinder. ===============
+  # The single sinc already includes its finite-length angular response. =======
   Delta_low <- k_bladder_low * bladder_geom$length_eq * cos(bladder$theta)
   sinc_low <- rep(1, length(Delta_low))
   nz_delta <- abs(Delta_low) > sqrt(.Machine$double.eps)
@@ -777,29 +710,46 @@ krm_initialize <- function(object,
   # Resolve the medium convention and interface properties =====================
   media <- .krm_variant_media(model, krm_variant)
   R23 <- reflection_coefficient(body, bladder)
-  bladder_geom <- .krm_bladder_geometry(bladder$rpos, bladder$theta)
-
-  # Evaluate the high- and low-ka swimbladder approximations ===================
-  high_term <- .krm_swimbladder_high_term(
-    model = model,
-    bladder = bladder,
-    bladder_geom = bladder_geom,
-    R23 = R23,
-    T12T21 = 1 - reflection_coefficient(model$medium, model$body)^2,
-    k_bladder_high = media$k_bladder_high
-  )
-  low_term <- .krm_swimbladder_low_term(
-    model = model,
-    bladder = bladder,
-    bladder_geom = bladder_geom,
-    k_bladder_low = media$k_bladder_low,
-    low_density = media$low_density,
-    low_sound_speed = media$low_sound_speed
+  bladder_geom <- .krm_bladder_geometry(
+    bladder$rpos, bladder$theta, summary_only = TRUE
   )
 
-  # Substitute the breathing-mode result inside the low-ka regime ==============
-  f_bladder <- high_term$f
-  f_bladder[low_term$low_ka_mask] <- low_term$f[low_term$low_ka_mask]
+  ka_eq <- media$k_bladder_low * bladder_geom$a_eq_total
+  low_mask <- is.finite(ka_eq) & ka_eq <= 0.15
+  f_bladder <- complex(length(ka_eq))
+  # Evaluate the Kirchhoff term only outside the breathing-mode regime. ========
+  if (any(!low_mask)) {
+    high_model <- model
+    if (any(low_mask)) {
+      high_model$parameters$acoustics <-
+        model$parameters$acoustics[!low_mask, , drop = FALSE]
+    }
+    high_term <- .krm_swimbladder_high_term(
+      model = high_model,
+      bladder = bladder,
+      bladder_geom = bladder_geom,
+      R23 = R23,
+      T12T21 = 1 - reflection_coefficient(model$medium, model$body)^2,
+      k_bladder_high = media$k_bladder_high[!low_mask]
+    )
+    f_bladder[!low_mask] <- high_term$f
+  }
+  # Evaluate the breathing mode only where it contributes to the result. =======
+  if (any(low_mask)) {
+    low_model <- model
+    low_model$parameters$acoustics <-
+      model$parameters$acoustics[low_mask, , drop = FALSE]
+    low_term <- .krm_swimbladder_low_term(
+      model = low_model,
+      bladder = bladder,
+      bladder_geom = bladder_geom,
+      k_bladder_low = media$k_bladder_low[low_mask],
+      low_density = media$low_density,
+      low_sound_speed = media$low_sound_speed
+    )
+    f_bladder[low_mask] <- low_term$f
+  }
+
   f_bladder
 }
 
@@ -849,7 +799,7 @@ KRM <- function(object) {
   if (scatterer_type == "FLS") {
     totals <- .krm_combine_terms(body_terms$f_body)
     # Define KRM slot for FLS-type scatterer ===================================
-    methods::slot(object, "model")$KRM <- data.frame(
+    methods::slot(object, "model")$KRM <- .model_data_frame(
       frequency = model$parameters$acoustics$frequency,
       ka = model$parameters$acoustics$k_sw *
         stats::median(body_terms$a_body, na.rm = TRUE),
@@ -867,7 +817,7 @@ KRM <- function(object) {
     )
     totals <- .krm_combine_terms(body_terms$f_body, f_bladder)
     # Define KRM slot for FLS-type scatterer ===================================
-    methods::slot(object, "model")$KRM <- data.frame(
+    methods::slot(object, "model")$KRM <- .model_data_frame(
       frequency = model$parameters$acoustics$frequency,
       ka = model$parameters$acoustics$k_sw *
         stats::median(body_terms$a_body, na.rm = TRUE),

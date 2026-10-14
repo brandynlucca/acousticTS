@@ -10,10 +10,13 @@ QUAD_OBJECTS = @QUAD_OBJECTS@
 
 OBJECTS = RcppExports.o \
 	bessel.o \
+	calibration.o \
 	dwba.o \
+	fcms.o \
 	goodman_stern.o \
 	gauss_legendre.o \
 	legendre.o \
+	krm.o \
 	param.o \
 	prolate_swf.o \
 	psms.o \

@@ -63,6 +63,12 @@ std::complex<double> jc_single_impl(std::complex<double> zi, double nui) {
     // Case A1: Purely Real Argument
     if (std::abs(zi_imag) < tol) {
         double xi = zi_real;
+
+        // Specialize real J1, retaining Boost's default promoted evaluation.
+        if (std::abs(nui) == 1.0 && std::isfinite(xi)) {
+            double j1 = boost::math::cyl_bessel_j(1, xi);
+            return std::complex<double>(nui < 0.0 ? -j1 : j1, 0.0);
+        }
         
         if (xi > 0) {
             return std::complex<double>(R::bessel_j(xi, nui), 0.0);

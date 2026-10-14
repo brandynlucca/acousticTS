@@ -1,5 +1,5 @@
 ################################################################################
-# Finite cylinder modal series solution
+# Finite cylinder modal series solution ========================================
 ################################################################################
 #' Finite cylinder modal series (FCMS) solution
 #'
@@ -133,7 +133,7 @@ fcms_initialize <- function(object,
   scatterer_type <- class(object)
   # Detect object shape ========================================================
   scatterer_shape <- extract(object, "shape_parameters")
-  # Validate shape +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  # Validate shape =============================================================
   if (scatterer_shape$shape != "Cylinder") {
     stop(
       "The modal series solution for a finite cylinder requires scatterer to ",
@@ -155,7 +155,7 @@ fcms_initialize <- function(object,
     )
   )
   # Determine expansion coefficient Bm method ==================================
-  # Validate method ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  # Validate method ============================================================
   if (!(boundary %in% c(
     "liquid_filled", "fixed_rigid", "pressure_release", "gas_filled"
   ))) {
@@ -166,7 +166,7 @@ fcms_initialize <- function(object,
       'pressure_release'."
     )
   }
-  # Assign method ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  # Assign method ==============================================================
   model_params$Bm_method <- switch(boundary,
     liquid_filled = "Bm_fluid",
     gas_filled = "Bm_fluid",
@@ -175,18 +175,18 @@ fcms_initialize <- function(object,
   )
   # Compute body parameters ====================================================
   body_params <- list(
-    # Prolate spheroidal coordinate 'xi' +++++++++++++++++++++++++++++++++++++++
+    # Prolate spheroidal coordinate 'xi' =======================================
     length_body = scatterer_shape$length,
-    # Radius 'radius' ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    # Radius 'radius' ==========================================================
     radius_body = scatterer_shape$radius,
-    # Theta angle 'theta' (incident direction) +++++++++++++++++++++++++++++++++
+    # Theta angle 'theta' (incident direction) =================================
     theta_body = body$theta,
-    # Material properties
+    # Material properties ======================================================
     g_body = body$g,
     h_body = body$h
   )
   # Define limits for 'm' modal series iterator ================================
-  # ka + 10 seems to be an appropriate modal truncation ++++++++++++++++++++++++
+  # ka + 10 seems to be an appropriate modal truncation ========================
   if (!is.null(m_limit)) {
     model_params$acoustics$m_limit <- m_limit
   } else {
@@ -252,9 +252,9 @@ FCMS <- function(object) {
       colSums(Bm, na.rm = TRUE)
   }
   # Calculate backscatter and return ===========================================
-  # Compute sigma_bs +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  # Compute sigma_bs ===========================================================
   o_bs <- abs(f_bs)
-  methods::slot(object, "model")$FCMS <- data.frame(
+  methods::slot(object, "model")$FCMS <- .model_data_frame(
     frequency = acoustics$frequency,
     f_bs = f_bs,
     sigma_bs = o_bs,
@@ -269,13 +269,7 @@ FCMS <- function(object) {
   # Precompute the rigid-cylinder modal weights ================================
   weights <- (-1)^(0:max(m_limit)) * nu
   # Evaluate the rigid boundary-condition coefficients =========================
-  .modal_series_apply(
-    m_limit = m_limit,
-    FUN = function(k1a, ml) {
-      jcd(0:ml, k1a) / hcd(0:ml, k1a)
-    },
-    k1a = k1a
-  ) * weights
+  fcms_bm_cpp(k1a, as.integer(m_limit), rigid = TRUE) * weights
 }
 
 
@@ -285,13 +279,7 @@ FCMS <- function(object) {
   # Precompute the soft-cylinder modal weights =================================
   weights <- (-1)^(0:max(m_limit)) * nu
   # Evaluate the pressure-release coefficients =================================
-  .modal_series_apply(
-    m_limit = m_limit,
-    FUN = function(k1a, ml) {
-      jc(0:ml, k1a) / hc(0:ml, k1a)
-    },
-    k1a = k1a
-  ) * weights
+  fcms_bm_cpp(k1a, as.integer(m_limit), rigid = FALSE) * weights
 }
 
 #' Calculate fluid-filled finite-cylinder boundary coefficients

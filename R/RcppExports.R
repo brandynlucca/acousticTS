@@ -77,12 +77,20 @@ hs_complex_deriv_cpp <- function(l, z, k) {
     .Call(`_acousticTS_hs_complex_deriv_cpp`, l, z, k)
 }
 
+calibration_modal_sum_cpp <- function(ka_sw, ka_l, ka_t, theta, density_ratio, adaptive) {
+    .Call(`_acousticTS_calibration_modal_sum_cpp`, ka_sw, ka_l, ka_t, theta, density_ratio, adaptive)
+}
+
 dwba_fbs_cpp <- function(rpos, k_sw, theta, h, R, subdivisions = 100L, rel_tol = 0.0001220703125, abs_tol = 0.0001220703125) {
     .Call(`_acousticTS_dwba_fbs_cpp`, rpos, k_sw, theta, h, R, subdivisions, rel_tol, abs_tol)
 }
 
 dwba_segment_integrals_cpp <- function(rpos, k_sw, theta, h, R, subdivisions = 100L, rel_tol = 0.0001220703125, abs_tol = 0.0001220703125) {
     .Call(`_acousticTS_dwba_segment_integrals_cpp`, rpos, k_sw, theta, h, R, subdivisions, rel_tol, abs_tol)
+}
+
+fcms_bm_cpp <- function(ka, m_limit, rigid) {
+    .Call(`_acousticTS_fcms_bm_cpp`, ka, m_limit, rigid)
 }
 
 gauss_legendre_cpp <- function(n, a = -1.0, b = 1.0) {
@@ -95,6 +103,14 @@ elastic_shell_boundary_conditions_old <- function(k1a, kLa_shell, kTa_shell, kLa
 
 elastic_shell_boundary_conditions <- function(ka_matrix, m_limit, lambda, mu, rho_ratio_sw, rho_ratio_fl) {
     .Call(`_acousticTS_elastic_shell_boundary_conditions`, ka_matrix, m_limit, lambda, mu, rho_ratio_sw, rho_ratio_fl)
+}
+
+krm_body_fbs_cpp <- function(rpos, k_sw, k_body, theta, reflection) {
+    .Call(`_acousticTS_krm_body_fbs_cpp`, rpos, k_sw, k_body, theta, reflection)
+}
+
+krm_bladder_fbs_cpp <- function(rpos, k_sw, k_medium, theta, reflection, transmission) {
+    .Call(`_acousticTS_krm_bladder_fbs_cpp`, rpos, k_sw, k_medium, theta, reflection, transmission)
 }
 
 Pn_cpp <- function(n, x) {
