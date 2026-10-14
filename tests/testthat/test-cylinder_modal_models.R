@@ -1,5 +1,28 @@
 library(acousticTS)
 
+test_that("cylinder order sequences agree with scalar special functions", {
+  ka <- c(1e-4, 0.3, 1, 8, 40, 90)
+  limits <- c(12L, 16L, 20L, 30L, 60L, 120L)
+  weights <- (-1)^(0:max(limits)) * neumann(0:max(limits))
+  for (rigid in c(TRUE, FALSE)) {
+    actual <- if (rigid) {
+      acousticTS:::.fcms_bm_fixed_rigid(ka, neumann(0:max(limits)), limits)
+    } else {
+      acousticTS:::.fcms_bm_pressure_release(ka, neumann(0:max(limits)), limits)
+    }
+    for (i in seq_along(ka)) {
+      m <- 0:limits[i]
+      expected <- if (rigid) jcd(m, ka[i]) / hcd(m, ka[i]) else
+        jc(m, ka[i]) / hc(m, ka[i])
+      expect_equal(actual[m + 1L, i], as.vector(expected) * weights[m + 1L],
+        tolerance = 2e-13)
+      if (limits[i] < max(limits)) {
+        expect_true(all(is.na(actual[seq.int(limits[i] + 2L, nrow(actual)), i])))
+      }
+    }
+  }
+})
+
 test_that(
   "BCMS reproduces the exact straight-cylinder kernel and bent correction",
   {

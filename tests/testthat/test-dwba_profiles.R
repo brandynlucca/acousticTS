@@ -1,5 +1,45 @@
 library(acousticTS)
 
+test_that("DWBA quadrature agrees with an independent real-Bessel integral", {
+  profile <- rbind(x = c(0, 0.01, 0.024, 0.04), y = 0,
+    z = c(0, 0.004, -0.001, 0.005), a = c(0.001, 0.004, 0.002, 0.0005))
+  h <- 1.0279
+  contrast <- 1 / (1.0357 * h^2) + 1 / 1.0357 - 2
+  for (theta in c(0, 1.1, pi / 2)) {
+    for (k in c(80, 1500)) {
+      wave <- k * c(cos(theta), 0, sin(theta))
+      expected <- vapply(seq_len(ncol(profile) - 1L), function(j) {
+        delta <- profile[, j + 1L] - profile[, j]
+        length <- sqrt(sum(delta[1:3]^2))
+        cos_beta <- sqrt(max(0, 1 - (sum(delta[1:3] * wave) / (k * length))^2))
+        integrand <- function(s) {
+          radius <- profile[4, j] + s * delta[4]
+          phase <- sum(profile[1:3, j] * wave) / h +
+            s * sum(delta[1:3] * wave) / h
+          bessel <- if (cos_beta <= sqrt(.Machine$double.eps)) {
+            k / h * radius
+          } else {
+            besselJ(2 * k / h * radius * cos_beta, 1) / cos_beta
+          }
+          k / 4 * contrast * length * radius * exp(2i * phase) * bessel
+        }
+        complex(
+          real = integrate(function(s) Re(integrand(s)), 0, 1,
+            rel.tol = 1e-10, abs.tol = 1e-13)$value,
+          imaginary = integrate(function(s) Im(integrand(s)), 0, 1,
+            rel.tol = 1e-10, abs.tol = 1e-13)$value
+        )
+      }, complex(1))
+      actual <- acousticTS:::dwba_segment_integrals_cpp(profile, k, theta,
+        h, contrast, rel_tol = 1e-10, abs_tol = 1e-13)
+      total <- acousticTS:::dwba_fbs_cpp(profile, k, theta, h, contrast,
+        rel_tol = 1e-10, abs_tol = 1e-13)
+      expect_equal(as.vector(actual), expected, tolerance = 1e-12)
+      expect_equal(as.vector(total), sum(expected), tolerance = 1e-12)
+    }
+  }
+})
+
 test_that("DWBA integrators validate geometry and preserve the axial limit", {
   profile <- rbind(x = c(0, 0.04), y = 0, z = 0, a = 0.003)
   k <- 2 * pi * c(12000, 38000) / 1500

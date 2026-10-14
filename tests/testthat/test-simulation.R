@@ -1,5 +1,141 @@
 library(acousticTS)
 
+test_that("single PSMS sweeps distribute frequencies without changing results", {
+  object <- gas_generate(
+    shape = prolate_spheroid(length_body = 0.14, radius_body = 0.01),
+    density_fluid = 1.24, sound_speed_fluid = 345
+  )
+  object@model$HPA <- data.frame(frequency = 38000, TS = -20)
+  frequency <- c(18000, 12000, 18000)
+  parameters <- list(
+    boundary = "gas_filled", simplify_Amn = FALSE,
+    precision = if (acousticTS:::.quad_precision_available()) "quad" else "double",
+    density_sw = 1026.8, sound_speed_sw = 1477.3
+  )
+  reference <- simulate_ts(
+    object, frequency, "psms", parameters = parameters,
+    parallel = FALSE, verbose = FALSE
+  )
+  parameter_draws <- 0L
+  parameters$density_sw <- function() {
+    parameter_draws <<- parameter_draws + 1L
+    1026.8
+  }
+
+  # Execute scheduled tasks locally while observing their frequency inputs =====
+  task_indices <- NULL
+  task_frequencies <- list()
+  task_chunk_size <- NULL
+  task_load_balancing <- NULL
+  original_pboptions <- pbapply::pboptions()
+  original_get_ts <- acousticTS:::.get_TS
+  testthat::local_mocked_bindings(
+    .prepare_simulation_cluster = function(...) structure(list(), class = "cluster"),
+    .get_TS = function(grid_index, object, parameters, simulation_grid,
+                       frequency, model) {
+      task_frequencies[[length(task_frequencies) + 1L]] <<- frequency
+      original_get_ts(
+        grid_index, object, parameters, simulation_grid, frequency, model
+      )
+    },
+    .package = "acousticTS"
+  )
+  testthat::local_mocked_bindings(
+    pblapply = function(X, FUN, ..., cl, chunk.size = NULL) {
+      task_indices <<- X
+      task_chunk_size <<- chunk.size
+      task_load_balancing <<- pbapply::pboptions()$use_lb
+      lapply(X, FUN, ...)
+    },
+    .package = "pbapply"
+  )
+  testthat::local_mocked_bindings(stopCluster = function(...) NULL,
+                                .package = "parallel")
+  actual <- simulate_ts(
+    object, frequency, "PSMS", parameters = parameters,
+    parallel = TRUE, n_cores = 2, verbose = FALSE
+  )
+  expect_identical(task_indices, seq_along(frequency))
+  expect_identical(parameter_draws, 1L)
+  expect_identical(task_chunk_size, 1L)
+  expect_true(task_load_balancing)
+  expect_identical(pbapply::pboptions(), original_pboptions)
+  expect_identical(unlist(task_frequencies), frequency)
+  expect_identical(actual$PSMS$frequency, frequency)
+  expect_identical(actual$PSMS$realization, rep(1L, length(frequency)))
+  expect_equal(actual, reference, tolerance = 1e-12)
+  expect_identical(actual$HPA, reference$HPA)
+})
+
+test_that("frequency scheduling preserves stochastic and multi-row tasks", {
+  data(krill)
+  frequency <- c(38000, 70000)
+  parameters <- list(n_iterations = 2)
+  set.seed(193)
+  reference <- simulate_ts(
+    krill, frequency, "sdwba", parameters = parameters,
+    parallel = FALSE, verbose = FALSE
+  )
+
+  # Observe task counts without changing the stochastic model's random stream ==
+  task_indices <- NULL
+  testthat::local_mocked_bindings(
+    .prepare_simulation_cluster = function(...) structure(list(), class = "cluster"),
+    .package = "acousticTS"
+  )
+  testthat::local_mocked_bindings(
+    pblapply = function(X, FUN, ..., cl, chunk.size = NULL) {
+      task_indices <<- X
+      lapply(X, FUN, ...)
+    },
+    .package = "pbapply"
+  )
+  testthat::local_mocked_bindings(stopCluster = function(...) NULL,
+                                .package = "parallel")
+  set.seed(193)
+  actual <- simulate_ts(
+    krill, frequency, "sdwba", parameters = parameters,
+    parallel = TRUE, n_cores = 2, verbose = FALSE
+  )
+  expect_identical(task_indices, 1L)
+  expect_identical(actual, reference)
+
+  object <- gas_generate(shape = prolate_spheroid(0.14, 0.01))
+  actual <- simulate_ts(
+    object, c(12000, 18000, 12000), "psms",
+    parameters = list(theta_body = c(pi / 2, pi / 3)),
+    parallel = TRUE, n_cores = 2, verbose = FALSE
+  )
+  expect_identical(task_indices, 1:2)
+  expect_equal(nrow(actual$PSMS), 6L)
+  expect_identical(actual$PSMS$frequency, rep(c(12000, 18000, 12000), 2))
+})
+
+test_that("single PSMS sweeps agree across independent PSOCK workers", {
+  skip_on_cran()
+  object <- gas_generate(
+    shape = prolate_spheroid(length_body = 0.14, radius_body = 0.01),
+    density_fluid = 1.24, sound_speed_fluid = 345
+  )
+  frequency <- c(18000, 12000, 18000)
+  parameters <- list(
+    boundary = "gas_filled", simplify_Amn = FALSE,
+    precision = if (acousticTS:::.quad_precision_available()) "quad" else "double",
+    density_sw = 1026.8, sound_speed_sw = 1477.3
+  )
+  reference <- simulate_ts(
+    object, frequency, "psms", parameters = parameters,
+    parallel = FALSE, verbose = FALSE
+  )
+  actual <- simulate_ts(
+    object, frequency, "psms", parameters = parameters,
+    parallel = TRUE, n_cores = 2, verbose = FALSE
+  )
+  expect_identical(names(actual), "PSMS")
+  expect_identical(actual$PSMS$frequency, frequency)
+  expect_equal(actual, reference, tolerance = 1e-12)
+})
+
 test_that("worker libraries reuse installations and handle errors", {
   # Isolate filesystem and subprocess boundaries without installing another
   # package or changing the caller's worker cache.

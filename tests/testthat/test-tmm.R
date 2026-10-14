@@ -1,5 +1,38 @@
 library(acousticTS)
 
+test_that("exact spherical TMM preserves invalid-angle handling", {
+  for (angle in c(NA_real_, NaN, Inf, -Inf)) {
+    amplitude <- acousticTS:::tmm_backscatter_cpp(
+      38000, angle, "Sphere", .01, "fixed_rigid", 1477.4, 1026.8, 1030, 1490, 8L
+    )
+    expect_true(all(is.na(amplitude)))
+  }
+})
+
+test_that("exact spherical TMM preserves retained blocks and modal cutoffs", {
+  frequencies <- c(1000, 38000, 180000)
+  cutoffs <- c(1L, 8L, 24L)
+  for (boundary in c("fixed_rigid", "pressure_release", "liquid_filled", "gas_filled")) {
+    for (angle in c(0, 0.7, pi / 2)) {
+      object <- if (boundary == "gas_filled") {
+        gas_generate(sphere(.01), density_fluid = 1.24, sound_speed_fluid = 345,
+          theta_body = angle)
+      } else {
+        fls_generate(sphere(.01), g_body = 1.0357, h_body = 1.0279,
+          theta_body = angle)
+      }
+      direct <- target_strength(object, frequencies, "tmm", boundary = boundary,
+        n_max = cutoffs, sound_speed_sw = 1477.4, density_sw = 1026.8)
+      retained <- target_strength(object, frequencies, "tmm", boundary = boundary,
+        n_max = cutoffs, sound_speed_sw = 1477.4, density_sw = 1026.8,
+        store_t_matrix = TRUE)
+      expect_equal(direct@model$TMM$f_bs, retained@model$TMM$f_bs, tolerance = 2e-10)
+      expect_equal(direct@model$TMM$TS, retained@model$TMM$TS, tolerance = 2e-10)
+      expect_identical(direct@model$TMM$n_max, cutoffs)
+    }
+  }
+})
+
 test_that("TMM shell spheres agree with modal and retained solutions", {
   grDevices::pdf(NULL)
   on.exit(grDevices::dev.off(), add = TRUE)
@@ -200,8 +233,7 @@ test_that(
     sound_speed_sw <- 1477.3
     frequency <- c(12e3, 38e3, 70e3, 120e3)
 
-    # Sphere-limit sanity check: when the polar and equatorial radii match, the
-    # oblate shape should reduce to the exact sphere response.
+    # Equal polar and equatorial radii recover the exact sphere response =======
     oblate_sphere <- fls_generate(
       shape = oblate_spheroid(
         length_body = 0.02, radius_body = 0.01,
@@ -1025,6 +1057,38 @@ test_that("TMM scattering plots require stored blocks", {
     ),
     "Stored T-matrix blocks are required"
   )
+})
+
+test_that("prolate TMM angular batches preserve pointwise complex fields", {
+  precisions <- c("double", if (acousticTS:::.quad_precision_available()) "quad")
+  theta <- c(0, 0.3 * pi, 0.7 * pi, pi)
+  phi <- c(0.2, 1.4, 2.8)
+  for (precision in precisions) {
+    object <- target_strength(
+      fls_generate(
+        prolate_spheroid(length_body = 0.14, radius_body = 0.01),
+        density_body = 1028.9, sound_speed_body = 1480.3,
+        theta_body = 1.1
+      ),
+      38e3, "tmm", boundary = "liquid_filled", precision = precision,
+      density_sw = 1026.8, sound_speed_sw = 1477.3, store_t_matrix = TRUE
+    )
+    grid <- tmm_scattering_grid(
+      object, theta_body = 1.1, phi_body = 0.4,
+      theta_scatter = theta, phi_scatter = phi
+    )
+    expected <- matrix(0i, length(theta), length(phi))
+    for (i in seq_along(theta)) {
+      for (j in seq_along(phi)) {
+        point <- tmm_scattering(
+          object, theta_body = 1.1, phi_body = 0.4,
+          theta_scatter = theta[i], phi_scatter = phi[j]
+        )
+        expected[i, j] <- point$f_scat
+      }
+    }
+    expect_equal(grid$f_scat, expected, tolerance = 1e-12)
+  }
 })
 
 test_that("tmm_scattering_grid reproduces stored monostatic scattering", {

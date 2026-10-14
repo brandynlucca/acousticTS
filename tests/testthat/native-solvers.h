@@ -22,6 +22,217 @@ std::complex<double> hs_deriv_single_complex_impl(int, std::complex<double>, int
 std::complex<double> det6x6_scaled(std::complex<double>[6][6]);
 
 context("Portable precision sentinels") {
+    test_that("broadside symmetry preserves adjacent public angle values") {
+        const double half_pi = std::acos(-1.0) / 2;
+        auto check = [half_pi](auto scalar) {
+            using T = decltype(scalar);
+            expect_true((psms_direction_cosine(T(half_pi)) == T(0)));
+            for (double angle : {std::nextafter(half_pi, 0.0),
+                    std::nextafter(half_pi, 2.0)}) {
+                expect_true((psms_direction_cosine(T(angle)) == preccos(T(angle))));
+                expect_true((psms_direction_cosine(T(angle)) != T(0)));
+            }
+        };
+        check(double(0));
+#if ACOUSTICTS_HAVE_QUADMATH
+        check(acousticts_quad_t(0));
+#endif
+    }
+
+    test_that("coupled gas cache respects physical inputs and angular parity") {
+        auto check = [](auto scalar) {
+            using T = decltype(scalar);
+            auto evaluate = [](int m, int n, T c, T ci, T xi, T density, T eta,
+                    T receive = T(0.4), T phi = T(1.3)) {
+                return psms_full_coupled_field<T>(m, n, c, ci, xi,
+                    eta, receive, phi, density, {}, {}, false, true);
+            };
+            auto invalidate = [&]() {
+                evaluate(0, 2, T(0.2), T(0.7), T(1.1), T(0.01), T(0.4));
+            };
+            const T tolerance = is_quad_precision_v<T> ? T(1e-27) : T(1e-11);
+            for (int changed = 0; changed < 10; ++changed) {
+                const int m = changed == 0 ? 3 : 4, n = changed == 1 ? 19 : 18;
+                const T c = changed == 2 ? T(4.1) : T(4);
+                const T ci = changed == 3 ? T(17.1) : T(17);
+                const T xi = changed == 4 ? T(1.02) : T(1.01);
+                const T density = changed == 5 ? T(0.0013) : T(0.0012);
+                const T eta = changed == 6 ? T(0) : T(0.6);
+                const T receive = changed == 8 ? T(0.7) : T(0.4);
+                const T phi = changed == 9 ? T(2.3) : T(1.3);
+                evaluate(4, 18, T(4), T(17), T(1.01), T(0.0012), T(0.3));
+                const auto reused = evaluate(m, n, c, ci, xi, density, eta, receive, phi);
+                invalidate();
+                const auto rebuilt = evaluate(m, n, c, ci, xi, density, eta, receive, phi);
+                expect_true((complex_abs_sq(reused - rebuilt) <=
+                    tolerance * tolerance * complex_abs_sq(rebuilt)));
+            }
+        };
+        check(double(0));
+#if ACOUSTICTS_HAVE_QUADMATH
+        check(acousticts_quad_t(0));
+#endif
+    }
+
+    test_that("zero angular modes preserve the next degree's convergence history") {
+        auto check = [](auto scalar) {
+            using T = decltype(scalar);
+            const T tolerance = is_quad_precision_v<T> ? T(1e-25) : T(1e-10);
+            for (int m : {0, 38}) {
+                auto result = cprofcn_mblock_coefficients<T>(
+                    T(58.93344), m, 1, 88, {T(0)}, 0, 1, T(0.01)
+                );
+                // Evaluate the normalized Ferrers basis at zero independently.
+                T seed = T(1) / precsqrt(T(2));
+                for (int order = 1; order <= m; ++order) {
+                    seed *= precsqrt(T(2 * order + 1) / T(2 * order));
+                }
+                for (int index : {0, 1, 2, 3, 10, 11, 40, 41, 86, 87}) {
+                    T basis = seed, expected = T(0);
+                    for (int offset = 0; offset < result.lengths[index]; offset += 2) {
+                        if (offset != 0) {
+                            const T degree = T(m + offset);
+                            basis *= -precsqrt(
+                                ((degree + T(m) - T(1)) * (degree - T(m) - T(1)) *
+                                    (T(2) * degree + T(1))) /
+                                ((degree - T(m)) * (degree + T(m)) *
+                                    (T(2) * degree - T(3)))
+                            );
+                        }
+                        expected += result.coefficients[result.capacity * index + offset] * basis;
+                    }
+                    const T actual = extract_angular_value_from_mblock<T>(
+                        result.functions, 0, index, 0
+                    );
+                    expect_true((precabs(actual - expected) < tolerance));
+                    if (index % 2 != 0) expect_true((actual == T(0)));
+                }
+            }
+        };
+        check(double(0));
+#if ACOUSTICTS_HAVE_QUADMATH
+        check(acousticts_quad_t(0));
+#endif
+    }
+
+    test_that("one-degree radial batches preserve the joining-factor recurrence") {
+        auto check = [](auto scalar) {
+            using T = decltype(scalar);
+            const T c = T(11.2), x1 = T(0.01);
+            const T tolerance = is_quad_precision_v<T> ? T(1e-25) : T(1e-10);
+            auto single = cprofcn_mblock<T>(c, 48, 2, 1, {T(0.2)}, 2, 1, 1, x1);
+            auto padded = cprofcn_mblock<T>(c, 48, 2, 2, {T(0.2)}, 2, 1, 1, x1);
+            auto coefficients = cprofcn_mblock_coefficients<T>(
+                c, 48, 2, 1, {T(0.2)}, 2, 1, x1
+            );
+            expect_true((single.lnum == 1 && single.r2c.size() == 2));
+            expect_true((coefficients.functions.r2c == single.r2c));
+            expect_true((coefficients.functions.r2dc == single.r2dc));
+            const T wronskian = T(1) / (c * x1 * (x1 + T(2)));
+            for (int m = 0; m < 2; ++m) {
+                // The first degree must agree with a two-degree native request.
+                expect_true((precabs(single.r1c[m] / padded.r1c[2 * m] - T(1)) < tolerance));
+                expect_true((precabs(single.r1dc[m] / padded.r1dc[2 * m] - T(1)) < tolerance));
+                expect_true((precabs(single.r2c[m] / padded.r2c[2 * m] - T(1)) < tolerance));
+                expect_true((precabs(single.r2dc[m] / padded.r2dc[2 * m] - T(1)) < tolerance));
+                const T first_product = single.r1c[m] * single.r2dc[m] *
+                    pow10_typed<T>(single.ir1e[m] + single.ir2de[m]);
+                const T second_product = single.r1dc[m] * single.r2c[m] *
+                    pow10_typed<T>(single.ir1de[m] + single.ir2e[m]);
+                // Check the Wronskian against the backend's reported decimal accuracy.
+                expect_true((single.naccr[m] > 0));
+                const T reported_radial_error = pow10_typed<T>(-single.naccr[m]);
+                expect_true((precabs((first_product - second_product) / wronskian - T(1)) < reported_radial_error));
+            }
+        };
+        check(double(0));
+#if ACOUSTICTS_HAVE_QUADMATH
+        check(acousticts_quad_t(0));
+#endif
+    }
+
+    test_that("spheroidal expansion coefficients preserve the orthonormal basis") {
+        auto check = [](auto scalar) {
+            using T = decltype(scalar);
+            for (T c : {T(0.2), T(8), T(80)}) {
+                auto coefficients = cprofcn_mblock_coefficients<T>(
+                    c, 0, 3, 12, {T(-0.6), T(0), T(0.6)}, 0, 1, T(0)
+                );
+                auto legacy = cprofcn_mblock<T>(
+                    c, 0, 3, 12, {T(-0.6), T(0), T(0.6)}, 0, 1, 1, T(0)
+                );
+                expect_true((coefficients.functions.s1c == legacy.s1c));
+                expect_true((coefficients.functions.naccs == legacy.naccs));
+                // Unit-normalized angular eigenfunctions have an identity Gram matrix.
+                T largest_error = 0;
+                for (int m = 0; m < 3; ++m) {
+                    for (int row = 0; row < 12; ++row) {
+                        for (int col = 0; col < 12; ++col) {
+                            const T value = spheroidal_coefficient_overlap<T>(
+                                coefficients, coefficients, m, row, col
+                            );
+                            largest_error = std::max(largest_error,
+                                precabs(value - (row == col ? T(1) : T(0))));
+                        }
+                    }
+                }
+                const T tolerance = is_quad_precision_v<T> ? T(1e-27) : T(1e-12);
+                expect_true((largest_error < tolerance));
+            }
+        };
+        check(double(0));
+#if ACOUSTICTS_HAVE_QUADMATH
+        check(acousticts_quad_t(0));
+#endif
+    }
+
+    test_that("radial quadrature reuse is independent of scattering angle") {
+        auto check = [](auto scalar) {
+            using T = decltype(scalar);
+            auto first = cprofcn_mblock<T>(T(40), 0, 3, 10, {T(0.2)}, 2, 1, 1, T(0.01));
+            auto second = cprofcn_mblock<T>(T(40), 0, 3, 10, {T(0.4)}, 2, 1, 1, T(0.01));
+            expect_true((first.r1c == second.r1c));
+            expect_true((first.r2c == second.r2c));
+            expect_true((first.r1dc == second.r1dc));
+            expect_true((first.r2dc == second.r2dc));
+            expect_true((first.ir2e == second.ir2e));
+            expect_true((first.s1c != second.s1c));
+            // Check the radial Wronskian before any conversion back to R doubles.
+            const T wronskian = T(1) / (T(40) * T(0.01) * (T(0.01) + T(2)));
+            const T tolerance = is_quad_precision_v<T> ? T(1e-25) : T(1e-10);
+            for (size_t i = 0; i < first.r1c.size(); ++i) {
+                const T first_product = first.r1c[i] * first.r2dc[i] *
+                    pow10_typed<T>(first.ir1e[i] + first.ir2de[i]);
+                const T second_product = first.r1dc[i] * first.r2c[i] *
+                    pow10_typed<T>(first.ir1de[i] + first.ir2e[i]);
+                expect_true((precabs((first_product - second_product) / wronskian - T(1)) < tolerance));
+            }
+        };
+        check(double(0));
+#if ACOUSTICTS_HAVE_QUADMATH
+        check(acousticts_quad_t(0));
+#endif
+    }
+
+    test_that("values-only spheroidal batches preserve angular normalization") {
+        auto check = [](auto scalar) {
+            using T = decltype(scalar);
+            const std::vector<T> eta = {T(-0.7), T(0), T(0.3), T(1)};
+            auto reference = cprofcn_mblock<T>(T(8), 0, 3, 8, eta, 2, 1, 2, T(0.15));
+            for (int repeat = 0; repeat < 2; ++repeat) {
+                auto actual = cprofcn_mblock<T>(T(8), 0, 3, 8, eta, 2, 1, 1, T(0.15));
+                for (size_t i = 0; i < actual.s1c.size(); ++i) {
+                    expect_true((precabs(actual.s1c[i] - reference.s1c[i]) < T(1e-12)));
+                    expect_true((actual.s1dc[i] == T(0)));
+                }
+            }
+        };
+        check(double(0));
+#if ACOUSTICTS_HAVE_QUADMATH
+        check(acousticts_quad_t(0));
+#endif
+    }
+
     test_that("missing values remain NaN across native precision conversions") {
         expect_true(is_na_real(precnan<double>()));
         expect_true(is_na_real(precnan<acousticts_quad_t>()));

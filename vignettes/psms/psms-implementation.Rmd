@@ -80,12 +80,12 @@ prolate_object <- target_strength(
 
 This example chooses the fluid-filled boundary because it shows the most demanding PSMS workflow. The `boundary` argument determines the physical interface conditions, `phi_body` controls the roll orientation used in the spheroidal geometry, and `n_integration` together with `simplify_Amn` affects how the coupled fluid-filled system is evaluated numerically.
 
-For PSMS, `boundary = "liquid_filled"` and `boundary = "gas_filled"` use the same penetrable-interface formulation. The difference is not a separate boundary equation. It is the material contrast carried by the scatterer object itself: an `FLS` object supplies liquid-like body properties, while a `GAS` object supplies gas-like body properties. In that sense, the two options are best read as liquid-filled and gas-filled instantiations of the same underlying penetrable PSMS problem. In the current implementation, however, the public gas-filled path is routed onto the simplified penetrable formulation because that is the branch that stays externally consistent on the published benchmark geometry.
+For PSMS, `boundary = "liquid_filled"` and `boundary = "gas_filled"` use the same penetrable-interface formulation. The difference is not a separate boundary equation. It is the material contrast carried by the scatterer object itself: an `FLS` object supplies liquid-like body properties, while a `GAS` object supplies gas-like body properties. In that sense, the two options are best read as liquid-filled and gas-filled instantiations of the same underlying penetrable PSMS problem. With `simplify_Amn = FALSE`, both boundaries solve the full coupled pressure and normal-velocity conditions. Set `simplify_Amn = TRUE` to select the diagonal approximation. Gas-filled targets use the interior-wavelength modal limits from the high-accuracy Prol_Spheroid formulation [@Prol_Spheroid_software].
 
 For rigid and pressure-release boundaries, the PSMS bookkeeping is simpler because the modal coefficients remain effectively diagonal by retained degree. For fluid-filled runs, the numerical settings deserve more attention because the overlap integrals and dense solves are part of the practical calculation.
 
 ::: {.caution data-title="Quad precision and fluid-filled PSMS"}
-If `precision = "quad"` is requested, the main practical warning is cost. [Quad precision](https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format) remains substantially slower than double precision because the spheroidal functions, overlap integrals, and kernel matrices all grow quickly with acoustic size. That is true for every PSMS boundary, and it is especially important for the full liquid-filled solve and for the externally benchmarked gas-filled simplified branch.
+If `precision = "quad"` is requested, the main practical warning is cost. [Quad precision](https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format) remains substantially slower than double precision because the spheroidal functions, overlap integrals, and kernel matrices all grow quickly with acoustic size. That is true for every PSMS boundary, and it is especially important for the full liquid-filled solve and for the full gas-filled solution.
 
 The implementation reduces some of that burden by batching spheroidal-function calls over blocks of $m$, reusing the incident angular matrix to construct the backscatter angular matrix through parity, and avoiding unnecessary rectangular expansions of triangular modal data. Even with those savings, high-$ka$ PSMS sweeps in quad precision can take a very long time.
 
@@ -160,7 +160,7 @@ obj_adaptive <- target_strength(
 )
 ```
 
-In the second call, `n_integration` is omitted on purpose. For the full liquid-filled PSMS solve, `adaptive = TRUE` chooses the quadrature order internally from the retained modal difficulty and ignores a user-supplied `n_integration`. The public gas-filled path currently uses the simplified penetrable formulation instead, so it does not take that adaptive quadrature branch.
+In the second call, `n_integration` is omitted on purpose. For the full liquid-filled PSMS solve, `adaptive = TRUE` chooses the quadrature order internally from the retained modal difficulty and ignores a user-supplied `n_integration`. The full gas-filled solution evaluates angular overlaps directly from normalized expansion coefficients using Legendre orthogonality. It does not use angular quadrature and is independent of `n_integration`.
 
 ## Benchmark comparisons
 
@@ -221,7 +221,7 @@ Several practical points follow from this comparison.
 2. When `adaptive = FALSE`, the model keeps the literal fixed `n_integration = 96` default. When `adaptive = TRUE`, the table leaves that cell blank because the adaptive path no longer treats quadrature order as a user-fixed input.
 3. `simplify_Amn` only affects the fluid or gas PSMS solve, so that column is blank for `fixed_rigid` and `pressure_release`.
 4. For liquid-filled PSMS, the full formulation with `simplify_Amn = FALSE` and `precision = "quad"` remains the only configuration in this table that stays benchmark-close through the higher-frequency benchmark range.
-5. The simplified gas-filled prolate spheroid model tracks closely with the BEM predictions. That behavior is exactly why `simplify_Amn` is currently better suited for gas-filled PSMS. The gas interior creates an extreme-contrast fluid problem, and the present dense overlap-coupled full gas solve becomes numerically unstable there. The simplified branch removes the unstable off-diagonal coupling and, for this benchmark geometry, is the one that agrees with `BEM` *and* `FEM` predictions, as well as external software references [@Prol_Spheroid_software]. In the current public implementation, requests for the full gas-filled branch are therefore routed onto this simplified formulation.
+5. The gas-filled comparisons in this figure use `simplify_Amn = TRUE`. This diagonal approximation can agree with BEM and FEM in parts of the spectrum, but it does not include coupling between spheroidal degrees. Select `simplify_Amn = FALSE` for the full penetrable boundary solution and use quad precision when high material contrast makes double precision unstable [@Prol_Spheroid_software].
 6. The adaptive liquid-filled path is useful in quad precision, but it is not universally beneficial. In particular, the `precision = "double"`, `simplify_Amn = FALSE`, `adaptive = TRUE` combination drifts much farther from benchmark on this grid than the literal double-precision run.
 7. The largest liquid-filled deviations occur in deep null neighborhoods, where small phase or truncation differences can produce visibly larger `TS` differences in dB than they would on a linear scattering-amplitude scale.
 
@@ -342,16 +342,16 @@ By contrast, the shared
 comparison separates at the higher two frequencies, especially for the
 penetrable cases. The liquid-filled difference reaches about `1.02 dB` at
 `100 kHz`. The gas-filled comparison uses the benchmark geometry because only
-the simplified gas branch is currently stable and externally consistent.
+the recorded comparison uses the simplified gas branch.
 
 ### Gas-filled cross-software comparison
 
 The gas-filled check uses the published benchmark geometry: `L = 140 mm`,
 `a = 10 mm`, `theta_body = 90 deg`, `phi_body = pi`,
 `density_body = 1.24 kg m^-3`, and `sound_speed_body = 345 m s^-1`. The
-frequency set is `12, 18, 38, 70, 120, 200 kHz`. Requests for the full
-gas-filled branch are currently routed to the same simplified penetrable
-formulation used when `simplify_Amn = TRUE`.
+frequency set is `12, 18, 38, 70, 120, 200 kHz`. The table below records the diagonal approximation selected with
+`simplify_Amn = TRUE`. The full coupled solution is selected independently
+with `simplify_Amn = FALSE`.
 
 | Case | Frequency set (kHz) | Max abs. $\Delta$ TS (dB) | Mean abs. $\Delta$ TS (dB) |
 |:--|:--|--:|--:|
