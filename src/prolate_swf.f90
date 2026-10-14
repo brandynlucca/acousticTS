@@ -63,13 +63,70 @@ module prolate_swf
    real(knd), allocatable :: x(:), w(:)
  end type
 
+ type :: pint_cache_entry
+   logical :: valid = .false.
+   integer :: m = -1, lnum = 0, limint = 0, ndec = 0, ngau = 0, ngqs = 0
+   real(knd) :: c = 0.0_knd, x1 = 0.0_knd, coefme = 0.0_knd, coefmo = 0.0_knd
+   real(knd), allocatable :: wg(:), xg(:), rpint1(:), rpint2(:)
+   real(knd), allocatable :: pint1(:), pint2(:), pint3(:), pint4(:), pnorm(:)
+   integer, allocatable :: norme(:), ipnorm(:)
+ end type
+
+ ! Share a bounded geometry budget without limiting computed support.
+#ifndef ACOUSTICTS_PINT_CACHE_BYTES
+ integer, parameter :: pint_geometry_cache_bytes = 384 * 1024 * 1024
+#else
+ integer, parameter :: pint_geometry_cache_bytes = ACOUSTICTS_PINT_CACHE_BYTES
+#endif
+ type :: pint_geometry_entry
+   logical :: valid = .false.
+   integer :: m = -1, ndec = 0, ngau = 0, ngqs = 0, nodes = 0, degrees = 0
+   real(knd) :: x1 = 0.0_knd
+   real(knd), allocatable :: wg(:), xg(:), geometry(:,:), basis(:,:)
+ end type
+
+ ! Retain exact Legendre norm factors without limiting coefficient support.
+ integer, parameter :: legendre_normalization_slot_bytes = 64 * 1024
+ type :: legendre_normalization_entry
+   integer :: m = -1
+   real(knd), allocatable :: steps(:)
+ end type
+
  type(pleg_cache_entry), save :: pleg_cache(pleg_cache_slots)
  type(qleg_cache_entry), save :: qleg_cache(qleg_cache_slots)
  type(gauss_cache_entry), save :: gauss_cache
+ type(pint_cache_entry), save :: pint_cache(48)
+ type(pint_geometry_entry), target, save :: pint_geometry_cache(48)
+ type(legendre_normalization_entry), save :: legendre_normalization_cache(48)
+ integer, save :: legendre_normalization_next = 1
+ integer, save :: pint_geometry_next = 1
+ integer, save :: pint_cache_next = 1
  integer, save :: pleg_cache_next = 1
  integer, save :: qleg_cache_next = 1
 
  contains
+
+  integer function decimal_exponent(value) result(power)
+    real(knd), intent(in) :: value
+#ifdef USE_QUAD
+    real(kind(1.0d0)) :: estimate
+    real(knd) :: lower, upper
+    ! Verify the integer exponent in quad before using a cheap initial estimate.
+    if(value >= real(tiny(1.0d0), knd) .and. value <= real(huge(1.0d0), knd)) then
+      estimate = log10(real(value, kind(1.0d0)))
+      power = int(estimate)
+      if(value >= 1.0_knd) then
+        lower = 10.0_knd ** power
+        upper = 10.0_knd ** (power + 1)
+      else
+        lower = 10.0_knd ** (power - 1)
+        upper = 10.0_knd ** power
+      end if
+      if(value > lower .and. value < upper) return
+    end if
+#endif
+    power = int(log10(value))
+  end function
 
   logical function cache_real_equal(a, b)
     real(knd), intent(in) :: a, b
@@ -443,6 +500,251 @@ module prolate_swf
     gauss_cache%w(1:n) = w(1:n)
   end subroutine
 
+  integer function pint_geometry_entry_bytes(entry) result(bytes)
+    type(pint_geometry_entry), intent(in) :: entry
+    integer :: values
+
+    values = 0
+    if(allocated(entry%wg)) values = values + size(entry%wg)
+    if(allocated(entry%xg)) values = values + size(entry%xg)
+    if(allocated(entry%geometry)) values = values + size(entry%geometry)
+    if(allocated(entry%basis)) values = values + size(entry%basis)
+    bytes = values * (storage_size(1.0_knd) / 8)
+  end function
+
+  integer function pint_geometry_retained_bytes() result(bytes)
+    integer :: slot
+
+    ! Include fixed keys and array descriptors as well as allocated native values.
+    bytes = size(pint_geometry_cache) * (storage_size(pint_geometry_cache) / 8)
+    do slot = 1, size(pint_geometry_cache)
+      bytes = bytes + pint_geometry_entry_bytes(pint_geometry_cache(slot))
+    end do
+  end function
+
+  subroutine prepare_pint_geometry(m, x1, ndec, ngau, ngqs, wg, xg, &
+      step1, step2, x1sm1, dec, twomi, alpha, beta, lim, idx)
+    integer, intent(in) :: m, ndec, ngau, ngqs, lim
+    real(knd), intent(in) :: x1, wg(ngau), xg(ngau), step1, step2, x1sm1, dec, twomi
+    real(knd), intent(in) :: alpha(:), beta(:)
+    integer, intent(out) :: idx
+    type(pint_geometry_entry), pointer :: entry
+    type(pint_geometry_entry) :: empty
+    integer :: node, k, i, degree, retained_degrees, capacity, allocation_status, candidate
+    integer :: real_bytes, remaining_values, requested_degrees, previous_capacity, available_bytes
+    real(knd) :: etal, etau, step, etcoef1, etcoef2, etai, etaim1, argb
+    real(knd) :: window_base, window_power, legendre_power, coef, sargb
+    real(knd), allocatable :: expanded_basis(:,:)
+
+    ! Geometry and recurrence prefixes are independent of frequency and final degree.
+    real_bytes = storage_size(x1) / 8
+    requested_degrees = 2 * ((lim + 1) / 2) + 2
+    do idx = 1, size(pint_geometry_cache)
+      entry => pint_geometry_cache(idx)
+      if(.not. entry%valid) cycle
+      if(entry%m /= m .or. entry%x1 /= x1 .or. entry%ndec /= ndec) cycle
+      if(entry%ngau /= ngau .or. entry%ngqs /= ngqs) cycle
+      if(any(entry%wg /= wg) .or. any(entry%xg /= xg)) cycle
+      exit
+    end do
+    if(idx > size(pint_geometry_cache)) then
+      idx = 0
+      if(ngau <= 0 .or. ngqs <= 0) return
+      if(ngau > pint_geometry_cache_bytes / real_bytes / 2) return
+      remaining_values = pint_geometry_cache_bytes / real_bytes - 2 * ngau
+      if(ngqs > remaining_values / ngau / 7) return
+
+      ! Replace an old key only when admitting a new geometry or order.
+      available_bytes = pint_geometry_cache_bytes - pint_geometry_retained_bytes()
+      candidate = pint_geometry_next
+      if(available_bytes / real_bytes < 2 * ngau + 7 * ngau * ngqs .and. &
+          .not. pint_geometry_cache(candidate)%valid) then
+        do i = 1, size(pint_geometry_cache)
+          candidate = mod(pint_geometry_next + i - 2, size(pint_geometry_cache)) + 1
+          if(pint_geometry_cache(candidate)%valid) exit
+        end do
+      end if
+      available_bytes = available_bytes + pint_geometry_entry_bytes(pint_geometry_cache(candidate))
+      remaining_values = available_bytes / real_bytes - 2 * ngau
+      if(remaining_values < 0) return
+      if(ngqs > remaining_values / ngau / 7) return
+      idx = candidate
+      entry => pint_geometry_cache(idx)
+      entry = empty
+      allocate(entry%wg(ngau), entry%xg(ngau), entry%geometry(5, ngau * ngqs), &
+          stat=allocation_status)
+      if(allocation_status /= 0) then
+        entry = empty
+        idx = 0
+        return
+      end if
+      entry%wg = wg
+      entry%xg = xg
+      entry%m = m
+      entry%x1 = x1
+      entry%ndec = ndec
+      entry%ngau = ngau
+      entry%ngqs = ngqs
+
+      ! Retain precisely the node prefix selected by the original window cutoff.
+      node = 0
+      node_steps: do k = 1, ngqs
+        if(k == 1) then
+          etal = 0.0_knd
+          etau = step1
+          step = step1
+        else
+          etal = step1 + (real(k, knd) - 2.0_knd) * step2
+          etau = etal + step2
+          step = step2
+        end if
+        etcoef1 = (etau + etal) / 2.0_knd
+        etcoef2 = (etau - etal) / 2.0_knd
+        do i = 1, ngau
+          etai = etcoef1 + xg(i) * etcoef2
+          etaim1 = 1.0_knd - etai * etai
+          argb = x1sm1 + etai * etai
+          window_base = x1sm1 * etaim1 / argb
+#ifdef USE_QUAD
+          window_power = window_base ** (m / 2)
+          if(mod(m, 2) /= 0) window_power = window_power * sqrt(window_base)
+          legendre_power = etaim1 ** (m / 2)
+          if(mod(m, 2) /= 0) legendre_power = legendre_power * sqrt(etaim1)
+#else
+          window_power = window_base ** (0.5_knd * m)
+          legendre_power = etaim1 ** (0.5_knd * m)
+#endif
+          coef = step * window_power
+          if(coef < dec) exit node_steps
+          sargb = sqrt(argb)
+          node = node + 1
+          entry%geometry(:, node) = [etai, coef, sargb, 1.0_knd / sargb, twomi * legendre_power]
+        end do
+      end do node_steps
+      entry%nodes = node
+      remaining_values = (pint_geometry_cache_bytes - pint_geometry_retained_bytes()) / real_bytes
+      capacity = min(requested_degrees, 2 * ((remaining_values / max(1, node)) / 2))
+      allocate(entry%basis(capacity, node), stat=allocation_status)
+      if(allocation_status /= 0) then
+        entry = empty
+        idx = 0
+        return
+      end if
+      entry%valid = .true.
+      pint_geometry_next = mod(idx, size(pint_geometry_cache)) + 1
+    end if
+
+    ! Grow a matching prefix only into free budget, preserving an uncached tail.
+    previous_capacity = size(entry%basis, 1)
+    if(requested_degrees > previous_capacity) then
+      remaining_values = (pint_geometry_cache_bytes - pint_geometry_retained_bytes()) / real_bytes
+      capacity = min(requested_degrees, previous_capacity + &
+          2 * ((remaining_values / max(1, entry%nodes)) / 2))
+      if(capacity > previous_capacity) then
+        allocate(expanded_basis(capacity, entry%nodes), stat=allocation_status)
+        if(allocation_status == 0) then
+          expanded_basis(1:previous_capacity,:) = entry%basis
+          call move_alloc(expanded_basis, entry%basis)
+        end if
+      end if
+    end if
+
+    ! Extend the cached prefix using the unchanged recurrence in native precision.
+    retained_degrees = min(requested_degrees, size(entry%basis, 1))
+    if(retained_degrees <= entry%degrees) return
+    do node = 1, entry%nodes
+      etai = entry%geometry(1, node)
+      if(entry%degrees == 0) then
+        entry%basis(1, node) = entry%geometry(5, node)
+        entry%basis(2, node) = alpha(1) * etai * entry%basis(1, node)
+      end if
+      do degree = max(2, entry%degrees), retained_degrees - 2, 2
+        entry%basis(degree + 1, node) = alpha(degree) * etai * entry%basis(degree, node) &
+            + beta(degree) * entry%basis(degree - 1, node)
+        entry%basis(degree + 2, node) = alpha(degree + 1) * etai * entry%basis(degree + 1, node) &
+            + beta(degree + 1) * entry%basis(degree, node)
+      end do
+    end do
+    entry%degrees = retained_degrees
+  end subroutine
+
+  subroutine pint_cached(c, m, lnum, x1, limint, maxint, maxlp, maxmp, ndec, &
+      wg, xg, ngau, ngqs, rpint1, rpint2, pint1, pint2, pint3, pint4, &
+      norme, pnorm, ipnorm, coefme, coefmo)
+    integer, intent(in) :: m, lnum, limint, maxint, maxlp, maxmp, ndec, ngau, ngqs
+    real(knd), intent(in) :: c, x1, wg(ngau), xg(ngau)
+    real(knd), intent(out) :: rpint1(maxint), rpint2(maxint), pint1(maxint), &
+        pint2(maxint), pint3(maxint), pint4(maxint), pnorm(maxlp), coefme, coefmo
+    integer, intent(out) :: norme(maxmp), ipnorm(maxlp)
+    type(pint_cache_entry) :: entry
+    integer :: idx
+
+    ! Radial quadrature is independent of incidence and receive angles.
+    do idx = 1, size(pint_cache)
+      if(.not. pint_cache(idx)%valid) cycle
+      if(pint_cache(idx)%m /= m .or. pint_cache(idx)%lnum /= lnum) cycle
+      if(pint_cache(idx)%c /= c .or. pint_cache(idx)%x1 /= x1) cycle
+      if(pint_cache(idx)%limint /= limint .or. pint_cache(idx)%ndec /= ndec) cycle
+      if(pint_cache(idx)%ngau /= ngau .or. pint_cache(idx)%ngqs /= ngqs) cycle
+      if(size(pint_cache(idx)%pint1) /= maxint) cycle
+      if(size(pint_cache(idx)%pnorm) /= maxlp) cycle
+      if(size(pint_cache(idx)%norme) /= maxmp) cycle
+      if(any(pint_cache(idx)%wg /= wg) .or. any(pint_cache(idx)%xg /= xg)) cycle
+      rpint1 = pint_cache(idx)%rpint1
+      rpint2 = pint_cache(idx)%rpint2
+      pint1 = pint_cache(idx)%pint1
+      pint2 = pint_cache(idx)%pint2
+      pint3 = pint_cache(idx)%pint3
+      pint4 = pint_cache(idx)%pint4
+      pnorm = pint_cache(idx)%pnorm
+      norme = pint_cache(idx)%norme
+      ipnorm = pint_cache(idx)%ipnorm
+      coefme = pint_cache(idx)%coefme
+      coefmo = pint_cache(idx)%coefmo
+      return
+    end do
+
+    ! Initialize unused parity entries so cached workspaces contain defined values.
+    rpint1 = 0.0_knd
+    rpint2 = 0.0_knd
+    pint1 = 0.0_knd
+    pint2 = 0.0_knd
+    pint3 = 0.0_knd
+    pint4 = 0.0_knd
+    pnorm = 0.0_knd
+    norme = 0
+    ipnorm = 0
+    call pint(c, m, lnum, x1, limint, maxint, maxlp, maxmp, ndec, wg, xg, &
+        ngau, ngqs, rpint1, rpint2, pint1, pint2, pint3, pint4, &
+        norme, pnorm, ipnorm, coefme, coefmo)
+
+    ! Bound retained memory and replace the oldest entry after the cache fills.
+    entry%valid = .true.
+    entry%m = m
+    entry%lnum = lnum
+    entry%limint = limint
+    entry%ndec = ndec
+    entry%ngau = ngau
+    entry%ngqs = ngqs
+    entry%c = c
+    entry%x1 = x1
+    entry%wg = wg
+    entry%xg = xg
+    entry%rpint1 = rpint1
+    entry%rpint2 = rpint2
+    entry%pint1 = pint1
+    entry%pint2 = pint2
+    entry%pint3 = pint3
+    entry%pint4 = pint4
+    entry%pnorm = pnorm
+    entry%norme = norme
+    entry%ipnorm = ipnorm
+    entry%coefme = coefme
+    entry%coefmo = coefmo
+    pint_cache(pint_cache_next) = entry
+    pint_cache_next = mod(pint_cache_next, size(pint_cache)) + 1
+  end subroutine
+
   subroutine profcn(c, m, lnum, ioprad, x1, iopang, iopnorm, narg, arg, &
            r1c, ir1e, r1dc, ir1de, r2c, &
            ir2e, r2dc, ir2de, naccr, &
@@ -718,7 +1020,7 @@ module prolate_swf
   subroutine profcn_batch(c, m_start, m_count, lnum, ioprad, x1, iopang, iopnorm, narg, arg, &
            r1c, ir1e, r1dc, ir1de, r2c, &
            ir2e, r2dc, ir2de, naccr, &
-           s1c, is1e, s1dc, is1de, naccs)
+           s1c, is1e, s1dc, is1de, naccs, coefficient_values, coefficient_lengths, coefficient_status)
 
 !  purpose:     Batched wrapper around profcn for consecutive orders
 !               m = m_start, ..., m_start + m_count - 1.
@@ -734,6 +1036,8 @@ module prolate_swf
                   ir2e(lnum, m_count), ir2de(lnum, m_count), naccr(lnum, m_count), &
                   is1e(lnum, narg, m_count), is1de(lnum, narg, m_count), &
                   naccs(lnum, narg, m_count)
+    real(knd), optional, intent(out) :: coefficient_values(:,:,:)
+    integer, optional, intent(out) :: coefficient_lengths(:,:), coefficient_status
     kindd = 8
     kindq = 16
 
@@ -760,6 +1064,11 @@ module prolate_swf
     is1e = 0
     is1de = 0
     naccs = 0
+    if(present(coefficient_values)) then
+      coefficient_values = 0.0_knd
+      coefficient_lengths = 0
+      coefficient_status = 0
+    end if
 
     ! Request a consecutive block of orders from main.
     mnum = m_count
@@ -805,7 +1114,8 @@ module prolate_swf
           x1, ngau, arg, narg, neta, maxd, maxdr, maxint, maxj, maxlp, &
           maxm, maxmp, maxn, maxp, maxpdr, maxq, maxt, jnenmax, &
           kindd, kindq, ndec, nex, r1c, ir1e, r1dc, ir1de, r2c, ir2e, &
-          r2dc, ir2de, naccr, s1c, is1e, s1dc, is1de, naccs)
+          r2dc, ir2de, naccr, s1c, is1e, s1dc, is1de, naccs, &
+          coefficient_values, coefficient_lengths, coefficient_status)
 
     end subroutine
 
@@ -814,7 +1124,7 @@ module prolate_swf
              maxint, maxj, maxlp, maxm, maxmp, maxn, maxp, maxpdr, &
              maxq, maxt, jnenmax, kindd, kindq, ndec, nex, qr1, ir1, &
              qr1d, ir1d, qr2, ir2, qr2d, ir2d, nar, s1, is1, s1d, is1d, &
-             nas)
+             nas, coefficient_values, coefficient_lengths, coefficient_status)
 
 !  purpose:     To coordinate the calculation of both the prolate
 !               spheroidal radial and angular functions and their
@@ -983,6 +1293,8 @@ module prolate_swf
 !  real(knd) and integer arrays with dimensions lnum and narg
     real(knd) s1(lnum, narg, mnum), s1d(lnum, narg, mnum)
     dimension is1(lnum, narg, mnum), is1d(lnum, narg, mnum), nas(lnum, narg, mnum)
+    real(knd), optional, intent(inout) :: coefficient_values(:,:,:)
+    integer, optional, intent(inout) :: coefficient_lengths(:,:), coefficient_status
 !
 !  real(knd) arrays with dimension maxd
     real(knd) enr(maxd), bliste(maxd), gliste(maxd), &
@@ -1073,13 +1385,14 @@ if (debug) then
      if(knd == kindq .and. ioprad /= 0) write(40, 30) x, c
 30    format(1x,'x = ',e39.30,/,1x,'c = ',e39.30)
 end if
-     nc = int(log10(c))
+     nc = decimal_exponent(c)
      if(nc < 0) nc = 0
      if(ioprad == 2) wront = 1.0e0_knd / (c * x1 * (x1 + 2.0e0_knd))
      ibflag1 = 0
      neemax = 1
       do 900 mi = 1, mnum
       m = mmin + minc * (mi - 1)
+      jang = 0
       m2 = m + m
 if (debug) then
        if(knd == kindd .and. iopang /= 0) write(50, 35) c, m
@@ -1381,7 +1694,15 @@ end if
 176      call dnorm (l, m, c, ndec, nex, limd, maxd, enr, sgn, d01, id01, &
              dmfnorm, idmfe, dmlmf, idmlmfe, dmsnorm, idmse, &
              dmlms, idmlmse, jmf, jsub)
-       if(li /= 1 .and. eigval <= eigvalp) go to 900
+       if(present(coefficient_values)) then
+         call normalized_legendre_coefficients(l, m, limd, enr, dmlms, idmlmse, &
+             coefficient_values(:,li,mi), coefficient_lengths(li,mi), coefficient_status)
+       end if
+       if(li /= 1 .and. eigval <= eigvalp) then
+         ! Report incomplete coefficient output without changing legacy control flow.
+         if(present(coefficient_status)) coefficient_status = max(coefficient_status, 2)
+         go to 900
+       end if
        if(l == m .and. jsub > jtest .and. iopneu /= 0) iopneu = 0
        if(l == m .and. jsub > jtest .and. iopleg /= 0) iopleg = 0
        eigvalp = eigval
@@ -1436,7 +1757,7 @@ end if
      dold = dnew
      end do
     end if
-    iterm = int(log10(abs(dfnorm)))
+    iterm = decimal_exponent(abs(dfnorm))
     dfnorm = dfnorm * (10.0e0_knd ** (-iterm))
     idfe = iterm
     dmlf = 1.0e0_knd / dfnorm
@@ -1447,24 +1768,24 @@ end if
     if(ix == 0) then
      if(l > 0) coefr1e = coefr1e * rl / (rl - 1.0e0_knd)
      r1c = coefr1e * d01 * dmlf
-     iterm = int(log10(abs(r1c)))
+     iterm = decimal_exponent(abs(r1c))
      r1c = r1c * (10.0e0_knd ** (-iterm))
      ir1e = id01 + idmlfe + iterm
      r1dc = c * c * coefr1e * d01 * dmlf * ((enr(1) / 15.0e0_knd)-&
        (1.0e0_knd / 3.0e0_knd))
-     iterm = int(log10(abs(r1dc)))
+     iterm = decimal_exponent(abs(r1dc))
      r1dc = r1dc * (10.0e0_knd ** (-iterm))
      ir1de = id01 + idmlfe + iterm
     end if
     if(ix == 1) then
      if(l > 1) coefr1o = coefr1o * (rl - 1.0e0_knd) / rl
      r1c = c * coefr1o * d01 * dmlf / 3.0e0_knd
-     iterm = int(log10(abs(r1c)))
+     iterm = decimal_exponent(abs(r1c))
      r1c = r1c * (10.0e0_knd ** (-iterm))
      ir1e = id01 + idmlfe + iterm
      r1dc = c * c * c * coefr1o * d01 * dmlf * ((enr(1) / 35.0e0_knd)- &
        (1.0e0_knd / 15.0e0_knd) + (1.0e0_knd / (3.0e0_knd * c * c)))
-     iterm = int(log10(abs(r1dc)))
+     iterm = decimal_exponent(abs(r1dc))
      r1dc = r1dc * (10.0e0_knd ** (-iterm))
      ir1de = id01 + idmlfe + iterm
     end if
@@ -1492,12 +1813,12 @@ end if
              nex, iflag, sbesf, sbesdf, sbesn, ibese, sbesdr, &
              d01, id01, r1c, ir1e, r1dc, ir1de, dfnorm, jbes, &
              factor)
-       iterm = int(log10(abs(dfnorm)))
+       iterm = decimal_exponent(abs(dfnorm))
        dfnorm = dfnorm * (10.0e0_knd ** (-iterm))
        idfe = iterm
        dmlf = 1.0e0_knd / dfnorm
        idmlfe = -idfe
-       if(ioprad == 2) ir2est = int(log10(wront)) - ir1de + 1
+       if(ioprad == 2) ir2est = decimal_exponent(wront) - ir1de + 1
 if (debug) then
        if(knd == kindd) write(40, 180) r1c, ir1e, r1dc, ir1de
        if(knd == kindq) write(40, 185) r1c, ir1e, r1dc, ir1de
@@ -1521,7 +1842,7 @@ end if
        ngqs = 10
        if(c > 2000.0e0_knd) ngqs = int(ngqs * (c / 2000.0e0_knd)* &
                      (c / 2000.0e0_knd))
-       call pint(c, m, lnum, x1, limint, maxint, maxlp, maxmp, ndec, &
+       call pint_cached(c, m, lnum, x1, limint, maxint, maxlp, maxmp, ndec, &
             wr, xr, ngau, ngqs, rpint1, rpint2, pint1, &
             pint2, pint3, pint4, norme, pnormint, ipnormint, &
             coefme, coefmo)
@@ -1538,9 +1859,9 @@ end if
        wronca = r1c * r2dic * 10.0e0_knd ** (ir1e+ir2die)
        wroncb = r2ic * r1dc * 10.0e0_knd ** (ir2ie+ir1de)
        wronc = wronca - wroncb
-       naccint = -int(log10(abs((wronc - wront) / wront) + dec))
+       naccint = -decimal_exponent(abs((wronc - wront) / wront) + dec)
        if(naccint < 0) naccint = 0
-       nsubw = -int(log10(abs(wronc / wronca) + dec))
+       nsubw = -decimal_exponent(abs(wronc / wronca) + dec)
        if(nsubw < 0) nsubw = 0
        if(naccint > 1) naccint = naccint + nsubw
        if(naccint > ndec - 1) naccint = ndec - 1
@@ -1622,6 +1943,8 @@ end if
 270       continue
         end do
 280      continue
+       ! A single retained degree needs only the initialized even joining factor.
+       if(lnum == 1) go to 310
        fajo(2) = -c * fajo(1) / (rm2 - 3.0e0_knd)
        ifajo(2) = ifajo(1)
         do jl = 3, lnum - 1, 2
@@ -1752,9 +2075,9 @@ end if
        wronca = r1c * r2dnc * 10.0e0_knd ** (ir1e+ir2dne)
        wroncb = r2nc * r1dc * 10.0e0_knd ** (ir2ne+ir1de)
        wronc = wronca - wroncb
-       naccneu = -int(log10(abs((wronc - wront) / wront) + dec))
+       naccneu = -decimal_exponent(abs((wronc - wront) / wront) + dec)
        if(naccneu < 0) naccneu = 0
-       nsubw = -int(log10(abs(wronc / wronca) + dec))
+       nsubw = -decimal_exponent(abs(wronc / wronca) + dec)
        if(nsubw < 0) nsubw = 0
        if(naccneu > 1) naccneu = naccneu + nsubw
        if(naccneu > ndec - 1) naccneu = ndec - 1
@@ -1938,11 +2261,11 @@ end if
        if(li < 3) go to 540
         do jl = 3, li + ix, 2
         pcoefe = pcoefe * pratt(jl) / pratb(jl)
-        iterm = int(log10(abs(pcoefe)))
+        iterm = decimal_exponent(abs(pcoefe))
         pcoefe = pcoefe * 10.0e0_knd ** (-iterm)
         ipcoefe = ipcoefe + iterm
         pdcoefe = pdcoefe * pdratt(jl) / pratb(jl)
-        iterm = int(log10(abs(pdcoefe)))
+        iterm = decimal_exponent(abs(pdcoefe))
         pdcoefe = pdcoefe * 10.0e0_knd ** (-iterm)
         ipdcoefe = ipdcoefe + iterm
         end do
@@ -1950,11 +2273,11 @@ end if
        if(li < 4) go to 540
         do jl = 4, li + 1 - ix, 2
         pcoefo = pcoefo * pratt(jl) / pratb(jl)
-        iterm = int(log10(abs(pcoefo)))
+        iterm = decimal_exponent(abs(pcoefo))
         pcoefo = pcoefo * 10.0e0_knd ** (-iterm)
         ipcoefo = ipcoefo + iterm
         pdcoefo = pdcoefo * pdratt(jl) / pratb(jl)
-        iterm = int(log10(abs(pdcoefo)))
+        iterm = decimal_exponent(abs(pdcoefo))
         pdcoefo = pdcoefo * 10.0e0_knd ** (-iterm)
         ipdcoefo = ipdcoefo + iterm
         end do
@@ -1963,26 +2286,26 @@ end if
        pcoefet = pcoefo
        ipcoefet = ipcoefo
        pcoefo = pcoefo * pratt(li + 2) / pratb(li + 2)
-       iterm = int(log10(abs(pcoefo)))
+       iterm = decimal_exponent(abs(pcoefo))
        pcoefo = pcoefo * 10.0e0_knd ** (-iterm)
        ipcoefo = ipcoefo + iterm
        pdcoefet = pdcoefo
        ipdcoefet = ipdcoefo
        pdcoefo = pdcoefo * pdratt(li + 2) / pratb(li + 2)
-       iterm = int(log10(abs(pdcoefo)))
+       iterm = decimal_exponent(abs(pdcoefo))
        pdcoefo = pdcoefo * 10.0e0_knd ** (-iterm)
        ipdcoefo = ipdcoefo + iterm
        go to 560
 550      pcoefet = pcoefe
        ipcoefet = ipcoefe
        pcoefe = pcoefe * pratt(li + 2) / pratb(li + 2)
-       iterm = int(log10(abs(pcoefe)))
+       iterm = decimal_exponent(abs(pcoefe))
        pcoefe = pcoefe * 10.0e0_knd ** (-iterm)
        ipcoefe = ipcoefe + iterm
        pdcoefet = pdcoefe
        ipdcoefet = ipdcoefe
        pdcoefe = pdcoefe * pdratt(li + 2) / pratb(li + 2)
-       iterm = int(log10(abs(pdcoefe)))
+       iterm = decimal_exponent(abs(pdcoefe))
        pdcoefe = pdcoefe * 10.0e0_knd ** (-iterm)
        ipdcoefe = ipdcoefe + iterm
 560      continue
@@ -2191,11 +2514,14 @@ end if
        if(l == m) lims1 = 3 * ndec + int(c)
        if(l /= m) lims1 = jang + jang + 20 + int(sqrt(c))
        if(lims1 > maxp) lims1 = maxp
+       jang_previous = jang
        call s1leg(l, m, iopang, iopnorm, barg, narg, lims1, ndec, maxt, &
              maxd, maxp, enr, pr, pdr, pdnorm, ipdnorm, pnorm, &
              ipnorm, pdtempe, ipdtempe, pdtempo, ipdtempo, &
              ptempe, iptempe, ptempo, iptempo, dmlms, idmlmse, &
              s1c, is1e, s1dc, is1de, dmlms1, idmlms1e, naccs, jang)
+       ! An exactly zero angular mode supplies no new convergence estimate.
+       if(jang == 0) jang = jang_previous
         do 810 jarg = 1, narg
         s1(li, jarg, mi) = s1c(jarg)
         s1d(li, jarg, mi) = s1dc(jarg)
@@ -2361,6 +2687,11 @@ end if
         ipdtempe(maxt), iptempe(maxt), ipdtempo(maxt), &
         iptempo(maxt), is1de(maxt), is1e(maxt), naccs(maxt)
 !
+    ! Disabled angular derivatives must not expose uninitialized workspace.
+    if(iopang /= 2) then
+      s1dc = 0.0_knd
+      is1de = 0
+    end if
     dec = 10.0e0_knd ** (-ndec - 1)
     dcon = dec
     adec = 1000.0e0_knd * dec
@@ -2416,7 +2747,10 @@ end if
 50    pdtemp(k) = pdtempe(k)
      ipdtemp(k) = ipdtempe(k)
      go to 100
-60    if(abs(barg(k)) < adec) go to 80
+60    if(abs(barg(k)) < adec) then
+       if(iopang /= 2) go to 100
+       go to 80
+      end if
      ptempo(k) = ptempo(k) * pr(k, l - m + 1)
      if(abs(ptempo(k)) < 1.0e+10_knd) go to 70
      ptempo(k) = ptempo(k) * (1.0e-10_knd)
@@ -2459,7 +2793,7 @@ end if
 190   factor = factor * 2.0e0_knd / (l + l + 1.0e0_knd)
     factor = sqrt(factor)
     ifactor = ifactor / 2
-    iterm = int(log10(factor))
+    iterm = decimal_exponent(factor)
     factor = factor * (10.0e0_knd ** (-iterm))
     ifactor = ifactor + iterm
     dmlms1 = dmlms / factor
@@ -2514,7 +2848,7 @@ end if
       j = j - 1
 270     continue
 280    s1c(k) = s1 * dmlms * ptemp(k) * pnorm(k) / factor
-     if(s1c(k) /= 0.0e0_knd) iterm = int(log10(abs(s1c(k))))
+     if(s1c(k) /= 0.0e0_knd) iterm = decimal_exponent(abs(s1c(k)))
      if(s1c(k) == 0.0e0_knd) iterm = 0
      s1c(k) = s1c(k) * (10.0e0_knd ** (-iterm))
      is1e(k) = iptemp(k) + ipnorm(k) + iterm + idmlmse - ifactor
@@ -2566,7 +2900,7 @@ end if
       j = j - 1
 350     continue
 360    s1dc(k) = s1d * dmlms * pdtemp(k) * pdnorm(k) / factor
-     if(s1dc(k) /= 0.0e0_knd) iterm = int(log10(abs(s1dc(k))))
+     if(s1dc(k) /= 0.0e0_knd) iterm = decimal_exponent(abs(s1dc(k)))
      if(s1dc(k) == 0.0e0_knd) iterm = 0
      s1dc(k) = s1dc(k) * 10.0e0_knd ** (-iterm)
      is1de(k) = ipdtemp(k) + ipdnorm(k) + iterm + idmlmse - ifactor
@@ -2788,7 +3122,7 @@ end if
 !  compute r1 and r1d
     r1temp = r1top * sbesn(l + 1) / r1bot
     if(ix == 1) r1temp = r1temp * con
-    iterm = int(log10(abs(r1temp)))
+    iterm = decimal_exponent(abs(r1temp))
     ir1e = ir1tope + ibese(l + 1) + iterm
     r1c = r1temp * (10.0e0_knd ** (-iterm))
     if(abs(r1c) >= 1.0e0_knd) go to 140
@@ -2800,7 +3134,7 @@ end if
     r1dstore = r1d * con
     ndsub = 0
     if(ix == 1) r1d = r1d * con - r1temp / (x1 * x * (x1 + 2.0e0_knd))
-    if(ix == 1) ndsub = -int(log10(abs(r1d / r1dstore)))
+    if(ix == 1) ndsub = -decimal_exponent(abs(r1d / r1dstore))
     if(ndsub < 0) ndsub = 0
     if(iflagd == 0) go to 150
     term = x1 * (x1 + 2.0e0_knd) * sbesdr(2) * sbesn(2)
@@ -2818,7 +3152,7 @@ if (debug) then
     if(ix == 1 .and. ndsub > 0) write(40, 160) ndsub
 160   format(24x,'subtraction error in forming r1d =',i3,' digits.')
 end if
-    iterm = int(log10(abs(r1d)))
+    iterm = decimal_exponent(abs(r1d))
     ir1de = ir1tope + ibese(l + 1) + iterm
     r1dc = r1d * (10.0e0_knd ** (-iterm))
     if(abs(r1dc) >= 1.0e0_knd) go to 170
@@ -2942,7 +3276,7 @@ end if
      do 10 i = 1, m
      ri = i
      coefn = coefn / (ri + ri)
-     iterm = int(log10(abs(coefn)))
+     iterm = decimal_exponent(abs(coefn))
      coefn = coefn * 10.0e0_knd ** (-iterm)
      icoefn = icoefn + iterm
 10    continue
@@ -3003,13 +3337,13 @@ end if
      j = j - 1
 50    continue
 60   continue
-    isub = int(log10(abs(r2pos / r2temp) + dec))
-    isubd = int(log10(abs(r2dpos / r2dtemp) + dec))
+    isub = decimal_exponent(abs(r2pos / r2temp) + dec)
+    isubd = decimal_exponent(abs(r2dpos / r2dtemp) + dec)
     if(isubd < 0) isubd = 0
     r2temp = r2temp * coefl * pnorm(l - m + 1)
     if(ix == 0) r2temp = r2temp * pint1(l - m + 1)
     if(ix == 1) r2temp = r2temp * pint3(l - m + 1) * x
-    iterm = int(log10(abs(r2temp)))
+    iterm = decimal_exponent(abs(r2temp))
     ir2e = iterm + ipnorm(l - m + 1) + icoefl
     r2c = r2temp * 10.0e0_knd ** (-iterm)
     if(abs(r2c) >= 1.0e0_knd) go to 70
@@ -3018,8 +3352,8 @@ end if
 70   r2dtemp = -r2dtemp * coefl * pnorm(l - m + 1) * c * x
     if(ix == 0) r2dtemp = r2dtemp * pint2(l - m + 1) + r2temp * coefme
     if(ix == 1) r2dtemp = r2dtemp * pint4(l - m + 1) * x + r2temp * coefmo
-    if(ix == 0) jsub = int(log10(abs(r2temp * coefme / r2dtemp) + dec))
-    if(ix == 1) jsub = int(log10(abs(r2temp * coefmo / r2dtemp) + dec))
+    if(ix == 0) jsub = decimal_exponent(abs(r2temp * coefme / r2dtemp) + dec)
+    if(ix == 1) jsub = decimal_exponent(abs(r2temp * coefmo / r2dtemp) + dec)
     if(jsub < 0) jsub = 0
     isub = max(isub, isubd + jsub)
 if (debug) then
@@ -3027,7 +3361,7 @@ if (debug) then
 80   format(8x,'r2int: converged in ',i6,' terms; ',i6, &
         ' available; ',i3,' and ',i3,' digits of sub. error.')
 end if
-    jterm = int(log10(abs(r2dtemp)))
+    jterm = decimal_exponent(abs(r2dtemp))
     ir2de = jterm + ipnorm(l - m + 1) + icoefl
     r2dc = r2dtemp * 10.0e0_knd ** (-jterm)
     if(abs(r2dc) >= 1.0e0_knd) go to 90
@@ -3229,13 +3563,13 @@ end if
     idnegjf = idneg + id01
     if(m == 0) idnegjf = id01
     fajo(l - m + 1) = fajo(l - m + 1) * dmfnorm * dnegjf / dfnorm
-    iterm = int(log10(abs(fajo(l - m + 1))))
+    iterm = decimal_exponent(abs(fajo(l - m + 1)))
     fajo(l - m + 1) = fajo(l - m + 1) * ten ** (-iterm)
     ifajo(l - m + 1) = ifajo(l - m + 1) + idnegjf + idmfe - idfe + iterm
-    iterm = -int(log10(abs(c * x1 * (x1 + 2.0e0_knd) * r1dc)))
-    itermq = int(log10(abs(fajo(l - m + 1) * termpq / ql(l - m + 1))))
+    iterm = -decimal_exponent(abs(c * x1 * (x1 + 2.0e0_knd) * r1dc))
+    itermq = decimal_exponent(abs(fajo(l - m + 1) * termpq / ql(l - m + 1)))
     itestq = iterm + itermq - ir1de + itermpq + ifajo(l - m + 1) - iql(l - m + 1) + ndec + 3
-    itermp = int(log10(abs(fajo(l - m + 1) / (dnegjf * termpq))))
+    itermp = decimal_exponent(abs(fajo(l - m + 1) / (dnegjf * termpq)))
     itestp = iterm + itermp - ir1de - idnegjf - itermpq + ifajo(l - m + 1) + ndec + 3
 !
 !  begin calculation of series for r2
@@ -3258,7 +3592,7 @@ end if
      dnewd = doldd / (qdr(j + j + imxp) * qdr(j + j + imxp - 1) * enr(j))
      qdsum = qdsum + dnewd
      if(dnewd > 0.0e0_knd) qdsump = qdsump + dnewd
-      if(int(log10(abs(qsum))) + iscale > itestq .and. iflagq == 0) &
+      if(decimal_exponent(abs(qsum)) + iscale > itestq .and. iflagq == 0) &
         then
       r2c = 0.0e0_knd
       r2dc = 0.0e0_knd
@@ -3311,20 +3645,20 @@ end if
     jleg = j
     if(jleg > lim1) jleg = lim1
 45   nsqsum = 0
-    if(qsum * qsump /= 0.0e0_knd) nsqsum = int(log10(abs(qsump / qsum)))
+    if(qsum * qsump /= 0.0e0_knd) nsqsum = decimal_exponent(abs(qsump / qsum))
     if(nsqsum > ndec) nsqsum = ndec
     if(nsqsum < 0) nsqsum = 0
     nsqdsum = 0
     if(qdsum * qdsump /= 0.0e0_knd) nsqdsum= &
-                 int(log10(abs(qdsump / qdsum)))
+                 decimal_exponent(abs(qdsump / qdsum))
     if(nsqdsum > ndec) nsqdsum = ndec
     if(nsqdsum < 0) nsqdsum = 0
     qsum = qsum * ql(l - m + 1) / (fajo(l - m + 1) * termpq)
-    iterm = int(log10(abs(qsum)))
+    iterm = decimal_exponent(abs(qsum))
     qsum = qsum * (10.0e0_knd ** (-iterm))
     iqsum = iql(l - m + 1) - ifajo(l - m + 1) - itermpq + iscale + iterm
     qdsum = qdsum * qdl(l - m + 1) / (fajo(l - m + 1) * termpq)
-    iterm = int(log10(abs(qdsum)))
+    iterm = decimal_exponent(abs(qdsum))
     qdsum = qdsum * (10.0e0_knd ** (-iterm))
     iqdsum = iqdl(l - m + 1) - ifajo(l - m + 1) - itermpq + iscale + iterm
     qdsum = qdsum * (10.0e0_knd ** (iqdsum - iqsum))
@@ -3364,23 +3698,23 @@ end if
      end do
      nsqnsum = 0
     if(qnsum * qnsump /= 0.0e0_knd) nsqnsum= &
-             int(log10(abs(qnsump / qnsum)))
+             decimal_exponent(abs(qnsump / qnsum))
     if(nsqnsum > ndec) nsqnsum = ndec
     if(nsqnsum < 0) nsqnsum = 0
     nsqnsum = max(nsqnsum, nsdneg)
     nsqndsum = 0
     if(qndsum * qndsump /= 0.0e0_knd) nsqndsum= &
-             int(log10(abs(qndsump / qndsum)))
+             decimal_exponent(abs(qndsump / qndsum))
     if(nsqndsum > ndec) nsqndsum = ndec
     if(nsqndsum < 0) nsqndsum = 0
     nsqndsum = max(nsqndsum, nsdneg)
 80   qnsum = qnsum * qml * d01 / (fajo(l - m + 1) * termpq)
-    iterm = int(log10(abs(qnsum)))
+    iterm = decimal_exponent(abs(qnsum))
     qnsum = qnsum * (10.0e0_knd ** (-iterm))
     iqnsum = iqml + id01 - ifajo(l - m + 1) - itermpq + iterm
     qnsum = qnsum * (10.0e0_knd ** (iqnsum - iqsum))
     qndsum = qndsum * qdml * d01 / (fajo(l - m + 1) * termpq)
-    iterm = int(log10(abs(qndsum)))
+    iterm = decimal_exponent(abs(qndsum))
     qndsum = qndsum * (10.0e0_knd ** (-iterm))
     iqndsum = iqdml + id01 - ifajo(l - m + 1) - itermpq + iterm
     qndsum = qndsum * (10.0e0_knd ** (iqndsum - iqsum))
@@ -3421,7 +3755,7 @@ end if
      if(dnew > 0.0e0_knd) psump = psump + dnew
      dnewd = doldd * drhor(j) * pdrx(j + j - ix)
      pdsum = pdsum + dnewd
-      if(int(log10(abs(psum))) > itestp .and. iflagp == 0) then
+      if(decimal_exponent(abs(psum)) > itestp .and. iflagp == 0) then
       r2c = 0.0e0_knd
       r2dc = 0.0e0_knd
       ir2e = 0
@@ -3455,31 +3789,31 @@ end if
     pdsum = spdsum
     psump = spsump
     pdsump = spdsump
-    ntestm = -int(log10(testm))
-    ntestdm = -int(log10(testdm))
+    ntestm = -decimal_exponent(testm)
+    ntestdm = -decimal_exponent(testdm)
     if(ntestm > ndec) ntestm = ndec
     if(ntestdm > ndec) ntestdm = ndec
     nspsum = 0
-    if(psum * psump /= 0.0e0_knd) nspsum = int(log10(abs(psump / psum)))
+    if(psum * psump /= 0.0e0_knd) nspsum = decimal_exponent(abs(psump / psum))
     if(nspsum > ndec) nspsum = ndec
     if(nspsum < 0) nspsum = 0
     nspsum = max(ndec - ntestm, nspsum, nsdrho)
     nspdsum = 0
     if(pdsum * pdsump /= 0.0e0_knd) nspdsum= &
-             int(log10(abs(pdsump / pdsum)))
+             decimal_exponent(abs(pdsump / pdsum))
     if(nspdsum > ndec) nspdsum = ndec
     if(nspdsum < 0) nspdsum = 0
     nspdsum = max(ndec - ntestdm, nspdsum, nsdrho)
     psum = psum * dnegjf * termpq / fajo(l - m + 1)
     iterm = 0
-    if(psum /= 0.0e0_knd) iterm = int(log10(abs(psum)))
+    if(psum /= 0.0e0_knd) iterm = decimal_exponent(abs(psum))
     psum = psum * (10.0e0_knd ** (-iterm))
     ipsum = idnegjf + itermpq - ifajo(l - m + 1) + iterm
     psum = psum * (10.0e0_knd ** (ipsum - iqsum))
     pdsum = pdsum * dnegjf * termpq / fajo(l - m + 1)
     if(m /= 0) pdsum = pdsum * rm * (x1 + 1.0e0_knd) / (x1 * (x1 + 2.0e0_knd))
     iterm = 0
-    if(pdsum /= 0.0e0_knd) iterm = int(log10(abs(pdsum)))
+    if(pdsum /= 0.0e0_knd) iterm = decimal_exponent(abs(pdsum))
     pdsum = pdsum * (10.0e0_knd ** (-iterm))
     ipdsum = idnegjf + itermpq - ifajo(l - m + 1) + iterm
     pdsum = pdsum * (10.0e0_knd ** (ipdsum - iqsum))
@@ -3487,13 +3821,13 @@ end if
     r2c = qsum + qnsum + psum
     r2dc = qdsum + qndsum + pdsum
     nqs = 0
-    if(qsum / r2c /= 0.0e0_knd) nqs = int(log10(abs(qsum / r2c)))
+    if(qsum / r2c /= 0.0e0_knd) nqs = decimal_exponent(abs(qsum / r2c))
     nqns = 0
     if(qnsum / r2c /= 0.0e0_knd) &
-           nqns = int(log10(abs(qnsum / r2c)))
+           nqns = decimal_exponent(abs(qnsum / r2c))
     nps = 0
     if(psum / r2c /= 0.0e0_knd) &
-           nps = int(log10(abs(psum / r2c)))
+           nps = decimal_exponent(abs(psum / r2c))
     nsqsum = nsqsum + nqs
     if(nsqsum < 0) nsqsum = 0
     if(nsqsum > ndec) nsqsum = ndec
@@ -3508,14 +3842,14 @@ end if
     if(psum / r2c == 0.0e0_knd) nspsum = 0
     nsub = max(nsqsum, nsqnsum, nspsum)
     nqds = 0
-    if(qdsum / r2dc /= 0.0e0_knd) nqds = int(log10(abs(qdsum / r2dc)))
+    if(qdsum / r2dc /= 0.0e0_knd) nqds = decimal_exponent(abs(qdsum / r2dc))
     nqnds = 0
     if(qndsum / r2dc /= 0.0e0_knd) &
-           nqnds = int(log10(abs(qndsum / r2dc)))
+           nqnds = decimal_exponent(abs(qndsum / r2dc))
     if(qnsum == 0.0e0_knd .and. qndsum == 0.0e0_knd) iopqnsum = 0
     npds = 0
     if(pdsum / r2dc /= 0.0e0_knd) &
-           npds = int(log10(abs(pdsum / r2dc)))
+           npds = decimal_exponent(abs(pdsum / r2dc))
     if(psum == 0.0e0_knd .and. pdsum == 0.0e0_knd) ioppsum = 0
     nsqdsum = nsqdsum + nqds
     if(nsqdsum < 0) nsqdsum = 0
@@ -3535,10 +3869,10 @@ end if
     wronca = r1c * r2dc * 10.0e0_knd ** (ir1e+iqsum)
     wroncb = r2c * r1dc * 10.0e0_knd ** (iqsum + ir1de)
     wronc = wronca - wroncb
-    naccleg = -int(log10(abs((wronc - wront) / wront) + dec))
+    naccleg = -decimal_exponent(abs((wronc - wront) / wront) + dec)
     if(naccleg < 0) naccleg = 0
     if(naccleg > ndec - 1) naccleg = ndec - 1
-    nsubw = -int(log10(abs(wronc / wronca) + dec))
+    nsubw = -decimal_exponent(abs(wronc / wronca) + dec)
     if(nsubw < 0) nsubw = 0
     if(naccleg > 1) naccleg = naccleg + nsubw
     itest = ndec - 2 - nsubw - max(nsub, nsubd)
@@ -3566,14 +3900,14 @@ end if
      nsub = max(nsub, jsub, nsdneg)
      nsubd = max(nsubd, jsub, nsdneg)
      end if
-    iterm = int(log10(abs(r2c)))
+    iterm = decimal_exponent(abs(r2c))
     r2c = r2c * (10.0e0_knd ** (-iterm))
     ir2e = iqsum + iterm
     if(abs(r2c) >= 1.0e0_knd) go to 170
     r2c = r2c * 10.0e0_knd
     ir2e = ir2e - 1
 170   continue
-    iterm = int(log10(abs(r2dc)))
+    iterm = decimal_exponent(abs(r2dc))
     r2dc = r2dc * (10.0e0_knd ** (-iterm))
     ir2de = iqsum + iterm
     if(abs(r2dc) >= 1.0e0_knd) go to 180
@@ -3800,16 +4134,16 @@ end if
     sumdp = txd
 90   continue
     jneu = max(js, jds)
-    naccs1 = int(log10(abs(tx / r2temp) + dconf))
+    naccs1 = decimal_exponent(abs(tx / r2temp) + dconf)
     if(naccs1 < 0) naccs1 = 0
     if(naccs1 > ndec) naccs1 = ndec
-    naccs2 = int(log10(abs(txd / r2dtemp) + dconf))
+    naccs2 = decimal_exponent(abs(txd / r2dtemp) + dconf)
     if(naccs2 < 0) naccs2 = 0
     if(naccs2 > ndec) naccs2 = ndec
-    jtestm = -int(log10(testm + dconf))
+    jtestm = -decimal_exponent(testm + dconf)
     if(jtestm < 0) jtestm = 0
     if(jtestm > ndec) jtestm = ndec
-    jtestdm = -int(log10(testdm + dconf))
+    jtestdm = -decimal_exponent(testdm + dconf)
     if(jtestdm < 0) jtestdm = 0
     if(jtestdm > ndec) jtestdm = ndec
 if (debug) then
@@ -3825,7 +4159,7 @@ end if
 !  combining results to form the radial function characteristics
 !  r2c and r2dc and corresponding exponents ir2e and ir2de
     r2c = r2temp * sneun(l + 1) * pcoefn / dmfnorm
-    iterm = int(log10(abs(r2c)))
+    iterm = decimal_exponent(abs(r2c))
     ir2e = ineue(l + 1) + ipcoefn - idmfe + iterm + iscale
     r2c = r2c * 10.0e0_knd ** (-iterm)
     if(abs(r2c) >= 1.0e0_knd) go to 110
@@ -3834,7 +4168,7 @@ end if
 110   continue
     r2dc = r2dcoef * r2c + (c * r2dtemp * sneun(l + 1) * sneudr(l + 1) * pcoefn/ &
        dmfnorm) * 10.0e0_knd ** (ineue(l + 1) + ipcoefn - idmfe+iscale-ir2e)
-    iterm = int(log10(abs(r2dc)))
+    iterm = decimal_exponent(abs(r2dc))
     ir2de = ir2e + iterm
     r2dc = r2dc * 10.0e0_knd ** (-iterm)
     if(abs(r2dc) >= 1.0e0_knd) go to 120
@@ -4049,10 +4383,10 @@ end if
 40   continue
     jden = j
     numsub = 0
-    if(sumdp /= 0.0e0_knd) numsub = int(log10(abs(sumdp / denom)))
+    if(sumdp /= 0.0e0_knd) numsub = decimal_exponent(abs(sumdp / denom))
     if(numsub < 0) numsub = 0
     if(numsub > ndec) numsub = ndec
-    naccd = ndec - max(2, int(log10(c))) - numsub
+    naccd = ndec - max(2, decimal_exponent(c)) - numsub
     if(naccd < 0) naccd = 0
     r2est = abs(sumcoef * denom)
     r2test = r2est * dconi
@@ -4215,37 +4549,37 @@ end if
     jeta = max(js, jds1, jds2, jden)
     jds = max(jds1, jds2)
     jtestm = ndec
-    if(testm /= 0.0e0_knd) jtestm = -int(log10(testm))
+    if(testm /= 0.0e0_knd) jtestm = -decimal_exponent(testm)
     if(jtestm < 0) jtestm = 0
     if(jtestm > ndec) jtestm = ndec
     jtestdm1 = ndec
      if(testdm1 /= 0.0e0_knd) then
-     jtestdm1 = -int(log10(testdm1))
+     jtestdm1 = -decimal_exponent(testdm1)
      end if
     if(jtestdm1 < 0) jtestdm1 = 0
     if(jtestdm1 > ndec) jtestdm1 = ndec
     jtestdm2 = ndec
      if(testdm2 /= 0.0e0_knd) then
-     jtestdm2 = -int(log10(testdm2))
+     jtestdm2 = -decimal_exponent(testdm2)
      end if
     if(jtestdm2 < 0) jtestdm2 = 0
     if(jtestdm2 > ndec) jtestdm2 = ndec
     jtestdm = min(jtestdm1, jtestdm2)
     naccns1 = 0
      if(abs(tx * r2temp) /= 0.0e0_knd) then
-     naccns1 = int(log10(abs(tx / r2temp)))
+     naccns1 = decimal_exponent(abs(tx / r2temp))
      end if
     if(naccns1 < 0) naccns1 = 0
     if(naccns1 > ndec) naccns1 = ndec
     r2dtemp = r2dtemp1 + r2dtemp2
     naccns2 = 0
      if(abs((txd1 + txd2) * r2dtemp) /= 0.0e0_knd) then
-     naccns2 = int(log10(abs((txd1 + txd2) / r2dtemp)))
+     naccns2 = decimal_exponent(abs((txd1 + txd2) / r2dtemp))
      end if
     if(naccns2 < 0) naccns2 = 0
     if(naccns2 > ndec) naccns2 = ndec
      if(abs(r2dtemp1 * r2dtemp2) /= 0.0e0_knd) then
-     icord = int(log10(abs(r2dtemp1 / r2dtemp2)))
+     icord = decimal_exponent(abs(r2dtemp1 / r2dtemp2))
      if(icord > 0) jtestdm2 = jtestdm2 + icord
      if(icord < 0) jtestdm1 = jtestdm1 - icord
      jtestdm = min(jtestdm1, jtestdm2)
@@ -4270,12 +4604,12 @@ end if
 !  r2c and r2dc and corresponding exponents ir2e and ir2de
     r2c = r2temp * sneun(l + 1) * pcoefn / denom
     iterm = 0
-    if(r2c /= 0.0e0_knd) iterm = int(log10(abs(r2c)))
+    if(r2c /= 0.0e0_knd) iterm = decimal_exponent(abs(r2c))
     ir2e = ineue(l + 1) + ipcoefn + iterm + iscale
     r2c = r2c * 10.0e0_knd ** (-iterm)
     r2dc = r2dcoef1 * r2dtemp * sneun(l + 1) * pdcoefn / denom
     iterm = 0
-    if(r2dc /= 0.0e0_knd) iterm = int(log10(abs(r2dc)))
+    if(r2dc /= 0.0e0_knd) iterm = decimal_exponent(abs(r2dc))
     ir2de = ineue(l + 1) + ipdcoefn + iterm + iscale
     r2dc = r2dc * 10.0e0_knd ** (-iterm)
 if (debug) then
@@ -4295,8 +4629,8 @@ end if
     wronc = wronca - wroncb
     wront = 1.0e0_knd / (c * x1 * (x1 + 2.0e0_knd))
     wroncm = max(abs(wronca), abs(wroncb))
-    nsubw =-int(log10(abs(wronc / wroncm) + dec))
-    nacceta = -int(log10(abs((wronc - wront) / wront) + dec))
+    nsubw =-decimal_exponent(abs(wronc / wroncm) + dec)
+    nacceta = -decimal_exponent(abs((wronc - wront) / wront) + dec)
     if(nacceta < 0) nacceta = 0
     if(nacceta > ndec - 1) nacceta = ndec - 1
     nacciop = 0
@@ -4313,12 +4647,12 @@ end if
     nacceta = naccn - nsubw
     r2c = r2c * wront / wronc
     iterm = 0
-    if(r2c /= 00.0e0_knd) iterm = int(log10(abs(r2c)))
+    if(r2c /= 00.0e0_knd) iterm = decimal_exponent(abs(r2c))
     ir2e = ir2e + iterm
     r2c = r2c * 10.0e0_knd ** (-iterm)
     r2dc = r2dc * wront / wronc
     iterm = 0
-    if(r2dc /= 00.0e0_knd) iterm = int(log10(abs(r2dc)))
+    if(r2dc /= 00.0e0_knd) iterm = decimal_exponent(abs(r2dc))
     ir2de = ir2de + iterm
     r2dc = r2dc * 10.0e0_knd ** (-iterm)
 160   if(abs(r2c) >= 1.0e0_knd) go to 170
@@ -4694,6 +5028,10 @@ end if
     real(knd) aj, aj2, arr, c, coef, csq, dec, dmfnorm, dmsnorm, dmlmf, &
          dmlms, d01, ea, rm2, sgn, sump, ten, term, teste, testeo
     real(knd) enr(maxd)
+    real(knd), allocatable, save :: ratio_numerators(:,:), ratio_denominators(:,:)
+    real(knd), save :: ratio_parameter = -1.0_knd
+    integer, save :: ratio_order = -1, ratio_counts(2) = 0
+    integer :: parity_index
 !
     ten = 10.0e0_knd
     rm2 = m + m
@@ -4709,14 +5047,32 @@ end if
     lm2 = (l - m) / 2
     ix = l - m - 2 * lm2
     lim2 = limd / 2 - ix
+    ! Reuse coefficient-conversion factors shared by every degree of each parity.
+    if(allocated(ratio_numerators)) then
+      if(size(ratio_numerators, 1) < maxd) then
+        deallocate(ratio_numerators, ratio_denominators)
+      end if
+    end if
+    if(.not. allocated(ratio_numerators)) then
+      allocate(ratio_numerators(maxd, 2), ratio_denominators(maxd, 2))
+      ratio_counts = 0
+    end if
+    if(ratio_order /= m .or. ratio_parameter /= c) ratio_counts = 0
+    ratio_order = m
+    ratio_parameter = c
+    parity_index = ix + 1
+    do i = ratio_counts(parity_index) + 1, lim2
+      arr = ix + i + i
+      ea = arr + arr + rm2
+      ratio_numerators(i, parity_index) = (ea - 1.0_knd) * (ea + 1.0_knd)
+      ratio_denominators(i, parity_index) = (arr + rm2) * (arr + rm2 - 1.0_knd) * csq
+    end do
+    ratio_counts(parity_index) = max(ratio_counts(parity_index), lim2)
     sgn = 1.0e0_knd
      do 20 i = 1, lim2
-     arr = ix + i + i
-     ea = arr + arr + rm2
      if(i > lm2) go to 10
      if(enr(i) < (0.0e0_knd)) sgn = sgn * (-1.0e0_knd)
-10    enr(i) = (ea - 1.0e0_knd) * (ea + 1.0e0_knd) * enr(i) / ((arr + rm2)* &
-          (arr + rm2 - 1.0e0_knd) * csq)
+10    enr(i) = ratio_numerators(i, parity_index) * enr(i) / ratio_denominators(i, parity_index)
 20    continue
 !
 !  compute the Morse-Feshbach normalizing factor
@@ -4758,11 +5114,11 @@ end if
 50    continue
 60   continue
     if(dmfnorm == 0.0e0_knd) dmfnorm = dec
-    jsub = int(log10(abs(sump / dmfnorm) + dec))
+    jsub = decimal_exponent(abs(sump / dmfnorm) + dec)
     if(jsub < 0) jsub = 0
     if(jsub > ndec) jsub = ndec
     iterm = 0
-    if(dmfnorm /= 0.0e0_knd) iterm = int(log10(abs(dmfnorm)))
+    if(dmfnorm /= 0.0e0_knd) iterm = decimal_exponent(abs(dmfnorm))
     idmfe = idmfe + iterm
     dmfnorm = dmfnorm * (10.0e0_knd ** (-iterm))
     dmlmf = 1.0e0_knd / dmfnorm
@@ -4789,7 +5145,7 @@ end if
       id01 = id01 - nfac
       end if
 80    continue
-    iterm = int(log10(abs(d01)))
+    iterm = decimal_exponent(abs(d01))
     d01 = d01 * (10.0e0_knd ** (-iterm))
     id01 = id01 + iterm
 90   continue
@@ -4833,7 +5189,7 @@ end if
      dmsnorm = dmsnorm + coef
      if(abs(coef / dmsnorm) < dec) go to 180
 170    continue
-180   iterm = int(log10(dmsnorm))
+180   iterm = decimal_exponent(dmsnorm)
     dmsnorm = dmsnorm * ten ** (-iterm)
     idmse = idmse + iterm
      if(2 * (idmse / 2) /= idmse) then
@@ -4852,6 +5208,157 @@ end if
     end subroutine
 !
 !
+    pure function legendre_normalization_step(twice_m, offset) result(step)
+    implicit none
+    real(knd), intent(in) :: twice_m
+    integer, intent(in) :: offset
+    real(knd) :: step, r, norm_ratio
+
+    ! Preserve the existing native arithmetic used for each normalization factor.
+    r = real(offset, knd)
+    norm_ratio = ((r + twice_m + 2.0_knd) / (r + 2.0_knd)) * &
+                 ((r + twice_m + 1.0_knd) / (r + 1.0_knd)) * &
+                 ((2.0_knd * r + twice_m + 1.0_knd) / &
+                  (2.0_knd * r + twice_m + 5.0_knd))
+    step = sqrt(norm_ratio)
+    end function legendre_normalization_step
+
+    subroutine prepare_legendre_normalization(m, required_steps, slot)
+    implicit none
+    integer, intent(in) :: m, required_steps
+    integer, intent(out) :: slot
+    integer :: retained_steps, previous_steps, offset, allocation_status
+    real(knd) :: twice_m
+    real(knd), allocatable :: expanded_steps(:)
+    logical :: new_order
+
+    ! Reuse factors across frequencies and the exterior and interior expansions.
+    if(required_steps <= 0) then
+      slot = 0
+      return
+    end if
+    do slot = 1, size(legendre_normalization_cache)
+      if(legendre_normalization_cache(slot)%m /= m) cycle
+      if(allocated(legendre_normalization_cache(slot)%steps)) exit
+    end do
+    new_order = slot > size(legendre_normalization_cache)
+    if(new_order) slot = legendre_normalization_next
+    previous_steps = 0
+    if(.not. new_order) previous_steps = size(legendre_normalization_cache(slot)%steps)
+    retained_steps = min(max(0, required_steps), &
+        legendre_normalization_slot_bytes / (storage_size(1.0_knd) / 8))
+    if(retained_steps <= previous_steps) return
+
+    ! Allocation failure leaves existing entries intact and uses direct factors.
+    allocate(expanded_steps(retained_steps), stat=allocation_status)
+    if(allocation_status /= 0) then
+      slot = 0
+      return
+    end if
+    if(previous_steps > 0) expanded_steps(1:previous_steps) = &
+        legendre_normalization_cache(slot)%steps
+    twice_m = real(2 * m, knd)
+    do offset = previous_steps, retained_steps - 1
+      expanded_steps(offset + 1) = legendre_normalization_step(twice_m, offset)
+    end do
+    call move_alloc(expanded_steps, legendre_normalization_cache(slot)%steps)
+    legendre_normalization_cache(slot)%m = m
+    if(new_order) legendre_normalization_next = mod(slot, size(legendre_normalization_cache)) + 1
+    end subroutine prepare_legendre_normalization
+
+    subroutine normalized_legendre_coefficients(l, m, limd, enr, seed, seed_exponent, &
+                                                values, length, status)
+    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
+    implicit none
+    integer, intent(in) :: l, m, limd, seed_exponent
+    real(knd), intent(in) :: enr(:), seed
+    real(knd), intent(out) :: values(:)
+    integer, intent(out) :: length
+    integer, intent(inout) :: status
+    integer :: parity, last_ratio, seed_index, j, offset, normalization_slot, cached_steps
+    real(knd) :: twice_m, ratio, normalization_step
+
+    ! Express the existing Meixner coefficients in a unit-norm Legendre basis.
+    parity = modulo(l - m, 2)
+    last_ratio = limd / 2 - parity
+    seed_index = (l - m - parity) / 2
+    length = 2 * last_ratio + parity + 1
+    values = 0.0_knd
+    if(last_ratio < seed_index .or. last_ratio > size(enr)) then
+      status = max(status, 2)
+      return
+    end if
+    if(size(values) < length) then
+      status = max(status, 1)
+      return
+    end if
+    values(l - m + 1) = seed * 10.0_knd ** seed_exponent
+    if(.not. ieee_is_finite(values(l - m + 1)) .or. values(l - m + 1) == 0.0_knd) then
+      status = max(status, 2)
+      return
+    end if
+    twice_m = real(2 * m, knd)
+
+    ! Reuse Legendre norm ratios that depend only on order and coefficient index.
+    call prepare_legendre_normalization(m, size(values) - 2, normalization_slot)
+    cached_steps = 0
+    if(normalization_slot > 0) then
+      if(allocated(legendre_normalization_cache(normalization_slot)%steps)) &
+          cached_steps = size(legendre_normalization_cache(normalization_slot)%steps)
+    end if
+
+    ! Reconstruct every available same-parity coefficient above the seed.
+    do j = seed_index + 1, last_ratio
+      offset = 2 * (j - 1) + parity
+      if(offset < cached_steps) then
+        normalization_step = legendre_normalization_cache(normalization_slot)%steps(offset + 1)
+      else
+        normalization_step = legendre_normalization_step(twice_m, offset)
+      end if
+      ratio = enr(j) * normalization_step
+      values(offset + 3) = values(offset + 1) * ratio
+      if(.not. ieee_is_finite(values(offset + 3))) status = max(status, 2)
+    end do
+
+    ! Preserve the native normalization and phase while recursing downward.
+    do j = seed_index, 1, -1
+      offset = 2 * (j - 1) + parity
+      if(offset < cached_steps) then
+        normalization_step = legendre_normalization_cache(normalization_slot)%steps(offset + 1)
+      else
+        normalization_step = legendre_normalization_step(twice_m, offset)
+      end if
+      ratio = enr(j) * normalization_step
+      if(ratio == 0.0_knd .or. .not. ieee_is_finite(ratio)) then
+        status = max(status, 2)
+        return
+      end if
+      values(offset + 1) = values(offset + 3) / ratio
+      if(.not. ieee_is_finite(values(offset + 1))) status = max(status, 2)
+    end do
+    end subroutine normalized_legendre_coefficients
+
+    subroutine identity_legendre_coefficients(values, lengths, status)
+    implicit none
+    real(knd), intent(out) :: values(:,:,:)
+    integer, intent(out) :: lengths(:,:), status
+    integer :: degree_index, m_index
+
+    ! At zero spheroidal parameter each angular mode is one Legendre mode.
+    values = 0.0_knd
+    status = 0
+    do m_index = 1, size(lengths, 2)
+      do degree_index = 1, size(lengths, 1)
+        lengths(degree_index, m_index) = degree_index
+        if(degree_index <= size(values, 1)) then
+          values(degree_index, degree_index, m_index) = 1.0_knd
+        else
+          status = 1
+        end if
+      end do
+    end do
+    end subroutine identity_legendre_coefficients
+
     subroutine dalt (l, m, c, limdr, maxdr, maxmp, ndec, nex, ioppsum, &
              eigval, enrneg, drhor, dneg, idneg, nsdneg, nsdrho)
 !
@@ -4980,7 +5487,7 @@ end if
       end if
      end do
      if(nsdneg > ndec) nsdneg = ndec
-    iterm = int(log10(abs(dneg)))
+    iterm = decimal_exponent(abs(dneg))
     dneg = dneg * (ten ** (-iterm))
     idneg = idneg + iterm
 !
@@ -5258,7 +5765,7 @@ end if
        iterm = iterm + nfac
       end if
      end do
-     jterm = int(log10(term))
+     jterm = decimal_exponent(term)
      term = term * (ten ** (-jterm))
      iterm = iterm + jterm
     end if
@@ -5390,7 +5897,8 @@ end if
      jterm = int(ajterm)
      ipnorm(k) = ipnorm(k) + jterm
      pnorm(k) = pnorm(k) * (ten ** (ajterm - jterm))
-     if(iopd == 0) go to 130
+     ! Values-only requests retain the computed Legendre normalization.
+     if(iopd == 0) go to 140
      ajterm = log10(rm * abs(barg(k))) + (rm - 2.0e0_knd)* &
          log10(1.0e0_knd - bargs) / 2.0e0_knd
      jterm = int(ajterm)
@@ -5574,7 +6082,7 @@ end if
 80    continue
      end do
 90   continue
-    iterm = int(log10(abs(qml)))
+    iterm = decimal_exponent(abs(qml))
     qml = qml * 10.0e0_knd ** (-iterm)
     iqml = iqml + iterm
 !
@@ -5603,7 +6111,7 @@ end if
      qlow = qupp
      qupp = ql(1)
      end do
-130   iql(1) = int(log10(abs(ql(1))))
+130   iql(1) = decimal_exponent(abs(ql(1)))
     ql(1) = ql(1) * (10.0e0_knd ** (-iql(1)))
 !
 !  calculation of ratios of the first derivatives of q with respect
@@ -5638,7 +6146,7 @@ end if
     iqdl(1) = 0
     go to 160
 150   qdml = -rm * x * qml / x1d
-    iterm = int(log10(abs(qdml)))
+    iterm = decimal_exponent(abs(qdml))
     qdml = qdml * (10.0e0_knd ** (-iterm))
     iqdml = iqml + iterm
     qdl(1) = rm * (x * ql(1) - 2.0e0_knd * qml * (10.0e0_knd ** (iqml - iql(1)))) &
@@ -5667,7 +6175,7 @@ end if
 !
     subroutine pint (c, m, lnum, x1, limint, maxint, maxlp, maxmp, ndec, &
             wg, xg, ngau, ngqs, rpint1, rpint2, pint1, pint2, &
-            pint3, pint4, norme, pnorm, ipnorm, coefme, coefmo)
+            pint3, pint4, norme, pnorm, ipnorm, coefme, coefmo, use_geometry_cache)
 !
 !  purpose:     To calculate integrals of the product of associated
 !               Legendre functions and kernels containing spherical
@@ -5729,14 +6237,19 @@ end if
          coefmo, coefo, coef1, coef2, coef4, darg, dec, etai, &
          etaim1, etais, etal, etau, etcoef1, etcoef2, rm, rn, sargb, &
          scal, sneu1, sneu2, sneu3, stemp0, step, step0, step1, step2, &
-         twom, twomi, x1, x1sm1
+         twom, twomi, x1, x1sm1, window_base, window_power, legendre_power, &
+         neumann_shift2, neumann_shift3
     real(knd) alpha(maxint), beta(maxint), p(maxint), pint1(maxint), &
          pint2(maxint), pint3(maxint), pint4(maxint), &
          pnorm(maxlp), rpint1(maxint), rpint2(maxint), &
-         sneun(maxmp), wg(ngau), xg(ngau), ynormn(maxmp)
+         sneun(maxmp), wg(ngau), xg(ngau), ynormn(maxmp), neumann_scale(maxmp)
 !
 !  integer arrays
     dimension norme(maxmp), ipnorm(maxlp)
+    logical, optional, intent(in) :: use_geometry_cache
+    logical :: reuse_geometry
+    integer :: geometry_index, geometry_node, cached_degrees
+    type(pint_geometry_entry), pointer :: geometry_entry
 !
     x1sm1 = x1 * (x1 + 2.0e0_knd)
     dec = 10.0e0_knd ** (-ndec - 1)
@@ -5770,8 +6283,8 @@ end if
      bn = n + n + 1
      pnorm(1) = pnorm(1) * an
      pnorm(2) = pnorm(2) * bn
-     iterm1 = int(log10(pnorm(1)))
-     iterm2 = int(log10(pnorm(2)))
+     iterm1 = decimal_exponent(pnorm(1))
+     iterm2 = decimal_exponent(pnorm(2))
      pnorm(1) = pnorm(1) * 10.0e0_knd ** (-iterm1)
      pnorm(2) = pnorm(2) * 10.0e0_knd ** (-iterm2)
      ipnorm(1) = ipnorm(1) + iterm1
@@ -5779,15 +6292,15 @@ end if
 40    continue
 50   twom = m + m
     pnorm(3) = pnorm(1) * (twom + 2) / 2
-    iterm3 = int(log10(pnorm(3)))
+    iterm3 = decimal_exponent(pnorm(3))
     pnorm(3) = pnorm(3) * 10.0e0_knd ** (-iterm3)
     ipnorm(3) = iterm3 + ipnorm(1)
     if(lnum < 4) go to 70
      do 60 il = 4, lnum, 2
      pnorm(il) = pnorm(il - 2) * (twom + il - 1) / (il - 1)
      pnorm(il + 1) = pnorm(il - 1) * (twom + il) / (il)
-     iterm1 = int(log10(pnorm(il)))
-     iterm2 = int(log10(pnorm(il + 1)))
+     iterm1 = decimal_exponent(pnorm(il))
+     iterm2 = decimal_exponent(pnorm(il + 1))
      ipnorm(il) = ipnorm(il - 2) + iterm1
      ipnorm(il + 1) = ipnorm(il - 1) + iterm2
      pnorm(il) = pnorm(il) * 10.0e0_knd ** (-iterm1)
@@ -5824,10 +6337,26 @@ end if
        twomi = twomi * (n + n - 1) / (n + n)
      end do
 110   continue
+#ifdef USE_QUAD
+    reuse_geometry = .true.
+#else
+    ! Double arithmetic is cheaper than retaining and copying these large tables.
+    reuse_geometry = .false.
+#endif
+    if(present(use_geometry_cache)) reuse_geometry = use_geometry_cache
+    geometry_index = 0
+    cached_degrees = 0
+    if(reuse_geometry) call prepare_pint_geometry(m, x1, ndec, ngau, ngqs, wg, xg, &
+        step1, step2, x1sm1, dec, twomi, alpha, beta, lim, geometry_index)
+    if(geometry_index > 0) then
+      geometry_entry => pint_geometry_cache(geometry_index)
+      cached_degrees = min(geometry_entry%degrees, 2 * ((lim + 1) / 2) + 2)
+    end if
+    geometry_node = 0
     arg = c * sqrt(x1 * (x1 + 2.0e0_knd))
     darg = 1.0e0_knd / arg
     stemp0 = -cos(arg) * darg
-    norme(1) = int(log10(abs(stemp0)))
+    norme(1) = decimal_exponent(abs(stemp0))
     ynormn(1) = stemp0 * 10.0e0_knd ** (-norme(1))
     ynormn(2) = stemp0 * darg - sin(arg) * darg
     norme(2) = norme(1)
@@ -5838,13 +6367,23 @@ end if
      arn = n + n - 1
      ynormn(n) = -ynormn(n - 2) + darg * rn * ynormn(n - 1)
      ynormn(n + 1) = -ynormn(n - 1) + darg * arn * ynormn(n)
-     norme(n + 1) = int(log10(abs(ynormn(n + 1))))
+     norme(n + 1) = decimal_exponent(abs(ynormn(n + 1)))
      scal = 10.0e0_knd ** (-norme(n + 1))
      ynormn(n + 1) = ynormn(n + 1) * scal
      ynormn(n) = ynormn(n) * scal
      norme(n + 1) = norme(n + 1) + norme(n - 1)
      norme(n) = norme(n + 1)
 120    continue
+!
+!  Reuse decimal scaling factors at every quadrature node.
+    neumann_scale(1) = 10.0e0_knd ** (-norme(1))
+    neumann_scale(2) = 10.0e0_knd ** (-norme(2))
+    do n = 3, m + 3, 2
+      neumann_scale(n) = 10.0e0_knd ** (-norme(n) + norme(n - 1))
+      neumann_scale(n + 1) = 10.0e0_knd ** (-norme(n + 1) + norme(n - 1))
+    end do
+    neumann_shift2 = 10.0e0_knd ** (norme(m + 2) - norme(m + 1))
+    neumann_shift3 = 10.0e0_knd ** (norme(m + 3) - norme(m + 1))
 !
 !  gaussian quadrature integration loops. first dividing integrand
 !  into ngqs steps
@@ -5863,34 +6402,61 @@ end if
 !
 !  gaussian quadrature integration over each step
       do 170 i = 1, ngau
+      geometry_node = geometry_node + 1
+      if(geometry_index > 0) then
+        if(geometry_node > geometry_entry%nodes) go to 190
+        etai = geometry_entry%geometry(1, geometry_node)
+        coef = geometry_entry%geometry(2, geometry_node)
+        sargb = geometry_entry%geometry(3, geometry_node)
+        coefo = geometry_entry%geometry(4, geometry_node)
+      else
       etai = etcoef1 + xg(i) * etcoef2
       etais = etai * etai
       etaim1 = 1.0e0_knd - etais
       argb = x1sm1 + etais
-      coef = step * ((x1sm1 * etaim1 / argb) ** amo2)
+      window_base = x1sm1 * etaim1 / argb
+#ifdef USE_QUAD
+!  The exponent m/2 is integral or half integral, so general real powers are unnecessary.
+      window_power = window_base ** (m / 2)
+      if(mod(m, 2) /= 0) window_power = window_power * sqrt(window_base)
+#else
+      window_power = window_base ** amo2
+#endif
+      coef = step * window_power
       if(coef < dec) go to 190
       sargb = sqrt(argb)
       coefo = 1.0e0_knd / sargb
+      end if
       arg = c * sargb
       stemp0 = -cos(arg) / arg
       sneun(1) = stemp0
-      sneun(1) = sneun(1) * 10.0e0_knd ** (-norme(1))
+      sneun(1) = sneun(1) * neumann_scale(1)
       sneun(2) = stemp0 / arg - sin(arg) / arg
-      sneun(2) = sneun(2) * 10.0e0_knd ** (-norme(2))
+      sneun(2) = sneun(2) * neumann_scale(2)
       darg = 1.0e0_knd / arg
        do 150 n = 3, m + 3, 2
        rn = n + n - 3
        arn = n + n - 1
        sneun(n) = -sneun(n - 2) + darg * rn * sneun(n - 1)
        sneun(n + 1) = -sneun(n - 1) + darg * arn * sneun(n)
-       sneun(n + 1) = sneun(n + 1) * 10.0e0_knd ** (-norme(n + 1) + norme(n - 1))
-       sneun(n) = sneun(n) * 10.0e0_knd ** (-norme(n) + norme(n - 1))
+       sneun(n + 1) = sneun(n + 1) * neumann_scale(n + 1)
+       sneun(n) = sneun(n) * neumann_scale(n)
 150      continue
       sneu1 = sneun(m + 1)
-      sneu2 = sneun(m + 2) * 10.0e0_knd ** (norme(m + 2) - norme(m + 1))
-      sneu3 = sneun(m + 3) * 10.0e0_knd ** (norme(m + 3) - norme(m + 1))
-      p(1) = twomi * (etaim1 ** amo2)
+      sneu2 = sneun(m + 2) * neumann_shift2
+      sneu3 = sneun(m + 3) * neumann_shift3
+      if(cached_degrees > 0) then
+        p(1:cached_degrees) = geometry_entry%basis(1:cached_degrees, geometry_node)
+      else
+#ifdef USE_QUAD
+      legendre_power = etaim1 ** (m / 2)
+      if(mod(m, 2) /= 0) legendre_power = legendre_power * sqrt(etaim1)
+#else
+      legendre_power = etaim1 ** amo2
+#endif
+      p(1) = twomi * legendre_power
       p(2) = alpha(1) * etai * p(1)
+      end if
       coef1 = coef * sneu1 * wg(i)
       coef2 = coef * coefo * sneu2 * wg(i)
       coef4 = coef * coefo * coefo * etai * sneu3 * wg(i)
@@ -5899,8 +6465,11 @@ end if
       pint4(2) = pint4(2) + coef4 * p(2)
 !
        do 160 il = 2, lim + 1, 2
+       ! Compute the complete uncached tail when the retained table reaches its memory limit.
+       if(il + 2 > cached_degrees) then
        p(il + 1) = alpha(il) * etai * p(il) + beta(il) * p(il - 1)
        p(il + 2) = alpha(il + 1) * etai * p(il + 1) + beta(il + 1) * p(il)
+       end if
        pint1(il + 1) = pint1(il + 1) + coef1 * p(il + 1)
        pint2(il + 1) = pint2(il + 1) + coef2 * p(il + 1)
        pint4(il + 2) = pint4(il + 2) + coef4 * p(il + 2)
@@ -6017,21 +6586,21 @@ end if
 !  ratios.
     stemp0 = sin(cx) / cx
     stemp1 = stemp0 / cx - cos(cx) / cx
-    ibese(1) = int(log10(abs(stemp0)))
+    ibese(1) = decimal_exponent(abs(stemp0))
     sbesn(1) = stemp0 * 10.0e0_knd ** (-ibese(1))
     if(abs(sin(cx)) < 0.5e0_knd .and. cx > 1.0e0_knd) go to 70
     sbesn(2) = sbesn(1) * sbesf(1)
-    ibese(2) = int(log10(abs(sbesn(2))))
+    ibese(2) = decimal_exponent(abs(sbesn(2)))
     sbesn(2) = sbesn(2) * 10.0e0_knd ** (-ibese(2))
     ibese(2) = ibese(2) + ibese(1)
     go to 80
-70   ibese(2) = int(log10(abs(stemp1)))
+70   ibese(2) = decimal_exponent(abs(stemp1))
     sbesn(2) = stemp1 * 10.0e0_knd ** (-ibese(2))
     sbesf(1) = stemp1 / stemp0
 80   continue
      do 90 n = 3, maxlp
      sbesn(n) = sbesn(n - 1) * sbesf(n - 1)
-     ibese(n) = int(log10(abs(sbesn(n))))
+     ibese(n) = decimal_exponent(abs(sbesn(n)))
      sbesn(n) = sbesn(n) * 10.0e0_knd ** (-ibese(n))
      ibese(n) = ibese(n) + ibese(n - 1)
 90    continue
@@ -6133,15 +6702,15 @@ end if
 !
 !  calculate the characteristic and exponent
 !  by forward operation on the Neumann function ratios:
-    ineue(1) = int(log10(abs(stemp0)))
+    ineue(1) = decimal_exponent(abs(stemp0))
     sneun(1) = stemp0 * 10.0e0_knd ** (-ineue(1))
-    ineue(2) = int(log10(abs(stemp1)))
+    ineue(2) = decimal_exponent(abs(stemp1))
     sneun(2) = stemp1 * 10.0e0_knd ** (-ineue(2))
     nlimit = maxlp
     if(maxlp > limn + 1) nlimit = limn + 1
      do 20 n = 3, nlimit
      sneun(n) = sneun(n - 1) * sneuf(n - 1)
-     ineue(n) = int(log10(abs(sneun(n))))
+     ineue(n) = decimal_exponent(abs(sneun(n)))
      sneun(n) = sneun(n) * 10.0e0_knd ** (-ineue(n))
      ineue(n) = ineue(n) + ineue(n - 1)
 20    continue
@@ -6275,6 +6844,101 @@ subroutine profcn_cpp_interface_batch(c, m_start, m_count, lnum, &
 end subroutine profcn_cpp_interface_batch_quad
 #else
 end subroutine profcn_cpp_interface_batch
+#endif
+
+! Return coefficient expansions with the existing radial and angular outputs.
+#ifdef USE_QUAD
+subroutine profcn_cpp_interface_batch_coeff_quad(c, m_start, m_count, lnum, &
+#else
+subroutine profcn_cpp_interface_batch_coeff(c, m_start, m_count, lnum, &
+#endif
+           ioprad, x1, iopang, iopnorm, narg, arg, &
+           r1c, ir1e, r1dc, ir1de, r2c, ir2e, r2dc, ir2de, naccr, &
+           s1c, is1e, s1dc, is1de, naccs, capacity, coefficients, lengths, status) bind(C)
+#ifdef USE_QUAD
+    use iso_c_binding, only: c_float128, c_int
+#else
+    use iso_c_binding, only: c_double, c_int
+#endif
+    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
+    implicit none
+    integer(c_int), intent(in) :: m_start, m_count, lnum, ioprad, iopang, iopnorm, narg, capacity
+#ifdef USE_QUAD
+    real(c_float128), intent(in) :: c, x1, arg(*)
+    real(c_float128), intent(out) :: r1c(lnum, m_count), r1dc(lnum, m_count), &
+        r2c(lnum, m_count), r2dc(lnum, m_count), s1c(lnum, narg, m_count), &
+        s1dc(lnum, narg, m_count), coefficients(capacity, lnum, m_count)
+#else
+    real(c_double), intent(in) :: c, x1, arg(*)
+    real(c_double), intent(out) :: r1c(lnum, m_count), r1dc(lnum, m_count), &
+        r2c(lnum, m_count), r2dc(lnum, m_count), s1c(lnum, narg, m_count), &
+        s1dc(lnum, narg, m_count), coefficients(capacity, lnum, m_count)
+#endif
+    integer(c_int), intent(out) :: ir1e(lnum, m_count), ir1de(lnum, m_count), &
+        ir2e(lnum, m_count), ir2de(lnum, m_count), naccr(lnum, m_count), &
+        is1e(lnum, narg, m_count), is1de(lnum, narg, m_count), naccs(lnum, narg, m_count), &
+        lengths(lnum, m_count), status
+
+    status = 2
+    lengths = 0
+    coefficients = 0.0_knd
+    if(m_start < 0 .or. m_count < 1 .or. lnum < 1 .or. capacity < 0 .or. narg < 1) return
+    if(.not. ieee_is_finite(c) .or. c <= 0.0_knd) return
+    call profcn_batch(c, m_start, m_count, lnum, ioprad, x1, iopang, iopnorm, narg, arg, &
+        r1c, ir1e, r1dc, ir1de, r2c, ir2e, r2dc, ir2de, naccr, &
+        s1c, is1e, s1dc, is1de, naccs, coefficients, lengths, status)
+#ifdef USE_QUAD
+end subroutine profcn_cpp_interface_batch_coeff_quad
+#else
+end subroutine profcn_cpp_interface_batch_coeff
+#endif
+
+! A coefficient-only request avoids radial work and supports the c=0 limit.
+#ifdef USE_QUAD
+subroutine profcn_coefficients_cpp_interface_quad(c, m_start, m_count, lnum, &
+#else
+subroutine profcn_coefficients_cpp_interface(c, m_start, m_count, lnum, &
+#endif
+                                                 capacity, coefficients, lengths, status) bind(C)
+#ifdef USE_QUAD
+    use iso_c_binding, only: c_float128, c_int
+#else
+    use iso_c_binding, only: c_double, c_int
+#endif
+    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
+    implicit none
+    integer(c_int), intent(in) :: m_start, m_count, lnum, capacity
+#ifdef USE_QUAD
+    real(c_float128), intent(in) :: c
+    real(c_float128), intent(out) :: coefficients(capacity, lnum, m_count)
+#else
+    real(c_double), intent(in) :: c
+    real(c_double), intent(out) :: coefficients(capacity, lnum, m_count)
+#endif
+    integer(c_int), intent(out) :: lengths(lnum, m_count), status
+    real(knd) :: radial(lnum, m_count, 4), angular(lnum, 1, m_count, 2), args(1)
+    integer :: radial_exponents(lnum, m_count, 4), radial_accuracy(lnum, m_count), &
+        angular_exponents(lnum, 1, m_count, 2), angular_accuracy(lnum, 1, m_count)
+
+    status = 2
+    lengths = 0
+    coefficients = 0.0_knd
+    if(m_start < 0 .or. m_count < 1 .or. lnum < 1 .or. capacity < 0) return
+    if(.not. ieee_is_finite(c) .or. c < 0.0_knd) return
+    if(c == 0.0_knd) then
+      call identity_legendre_coefficients(coefficients, lengths, status)
+      return
+    end if
+    args = 0.0_knd
+    call profcn_batch(c, m_start, m_count, lnum, 0, 1.0_knd, 0, 1, 1, args, &
+        radial(:,:,1), radial_exponents(:,:,1), radial(:,:,2), radial_exponents(:,:,2), &
+        radial(:,:,3), radial_exponents(:,:,3), radial(:,:,4), radial_exponents(:,:,4), &
+        radial_accuracy, angular(:,:,:,1), angular_exponents(:,:,:,1), &
+        angular(:,:,:,2), angular_exponents(:,:,:,2), angular_accuracy, coefficients, lengths, status)
+#ifdef USE_QUAD
+end subroutine profcn_coefficients_cpp_interface_quad
+#else
+end subroutine profcn_coefficients_cpp_interface
 #endif
 
 #ifdef USE_QUAD

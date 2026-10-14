@@ -508,34 +508,47 @@ std::vector<std::vector<std::complex<T>>> kernel_scattering_matrix(
 // PRE-COMPUTED SMN MATRIX USED FOR STREAMLINING COMPUTATIONAL EFFICIENCY
 // -----------------------------------------------------------
 template<typename T>
-std::vector<std::vector<T>> compute_smn_matrix(
+std::vector<std::vector<std::vector<T>>> compute_smn_matrices(
     int m_max,
     int n_max,
     T chi_sw,
-    T eta_scalar,
+    const std::vector<T>& eta,
     bool normalize = true
 ) {
-    // Result is (m_max+1) x (n_max+1), with quiet_NaN placeholders where n<m.
-    std::vector<std::vector<T>> result(
-        m_max + 1, std::vector<T>(n_max + 1, precnan<T>())
+    // Retain the triangular modal layout separately for each angular argument.
+    std::vector<std::vector<std::vector<T>>> result(
+        eta.size(), std::vector<std::vector<T>>(
+            m_max + 1, std::vector<T>(n_max + 1, precnan<T>()))
     );
+    if (eta.empty()) return result;
 
     for (int m = 0; m <= m_max; ++m) {
         int size = n_max - m + 1;
         if (size <= 0) continue;
         int ioprad = 0;
         int iopnorm = normalize ? 1 : 0;
-        int iopang = 2;
+        // Share the native expansion setup across angles and omit unused derivatives.
+        int iopang = 1;
         auto profcn_result = cprofcn<T>(
-            chi_sw, m, size, {eta_scalar}, ioprad, iopnorm, iopang, T(0)
+            chi_sw, m, size, eta, ioprad, iopnorm, iopang, T(0)
         );
 
-        for (int i = 0; i < size; ++i) {
-            int n = m + i;
-            result[m][n] = extract_angular_value_from_batch<T>(profcn_result, i);
+        for (size_t angle = 0; angle < eta.size(); ++angle) {
+            for (int i = 0; i < size; ++i) {
+                result[angle][m][m + i] = extract_angular_value_from_batch<T>(
+                    profcn_result, i, size, angle
+                );
+            }
         }
     }
     return result;
+}
+
+template<typename T>
+std::vector<std::vector<T>> compute_smn_matrix(
+    int m_max, int n_max, T chi_sw, T eta_scalar, bool normalize = true
+) {
+    return compute_smn_matrices<T>(m_max, n_max, chi_sw, {eta_scalar}, normalize)[0];
 }
 // -----------------------------------------------------------
 // ALPHA INTEGRATION COEFFICIENT
@@ -665,10 +678,10 @@ FullFluidPrepResult<T> prepare_full_fluid_boundary_data(
         int m_count = std::min(chunk_size, m_max - m_start + 1);
         int lnum = n_max - m_start + 1;
         auto ext_result_batch = cprofcn_mblock<T>(
-            chi_sw, m_start, m_count, lnum, ext_args, 2, iopnorm, 2, x1_r
+            chi_sw, m_start, m_count, lnum, ext_args, 2, iopnorm, 1, x1_r
         );
         auto int_result_batch = cprofcn_mblock<T>(
-            chi_body, m_start, m_count, lnum, nodes, 1, iopnorm, 2, x1_r
+            chi_body, m_start, m_count, lnum, nodes, 1, iopnorm, 1, x1_r
         );
 
         for (int local_m = 0; local_m < m_count; ++local_m) {
@@ -1709,7 +1722,7 @@ std::complex<T> psms_backscatter_pressure_release(
         int m_count = std::min(chunk_size, m_max - m_start + 1);
         int lnum = n_max - m_start + 1;
         auto result_both = cprofcn_mblock<T>(
-            chi_sw, m_start, m_count, lnum, {eta_body}, 2, 1, 2, x1_r
+            chi_sw, m_start, m_count, lnum, {eta_body}, 2, 1, 1, x1_r
         );
 
         for (int local_m = 0; local_m < m_count; ++local_m) {
@@ -1802,7 +1815,7 @@ std::complex<T> psms_backscatter_fixed_rigid(
         int m_count = std::min(chunk_size, m_max - m_start + 1);
         int lnum = n_max - m_start + 1;
         auto result_both = cprofcn_mblock<T>(
-            chi_sw, m_start, m_count, lnum, {eta_body}, 2, 1, 2, x1_r
+            chi_sw, m_start, m_count, lnum, {eta_body}, 2, 1, 1, x1_r
         );
 
         for (int local_m = 0; local_m < m_count; ++local_m) {
@@ -2020,10 +2033,10 @@ std::complex<T> psms_backscatter_fluid_adaptive(
         int m_count = std::min(chunk_size, m_max - m_start + 1);
         int lnum = n_max - m_start + 1;
         auto ext_result_batch = cprofcn_mblock<T>(
-            chi_sw, m_start, m_count, lnum, ext_args, 2, iopnorm, 2, x1_r
+            chi_sw, m_start, m_count, lnum, ext_args, 2, iopnorm, 1, x1_r
         );
         auto int_result_batch = cprofcn_mblock<T>(
-            chi_body, m_start, m_count, lnum, nodes, 1, iopnorm, 2, x1_r
+            chi_body, m_start, m_count, lnum, nodes, 1, iopnorm, 1, x1_r
         );
 
         for (int local_m = 0; local_m < m_count; ++local_m) {
@@ -2221,7 +2234,277 @@ std::complex<T> psms_backscatter_fluid_adaptive(
     return fbs_sum;
 }
 
-// ============================================================================
+template<typename T>
+struct SpheroidalCoupledBlock {
+    std::vector<std::complex<T>> matrix;
+    std::vector<T> incident_kernel, column_scales, row_scales;
+    LUPFactorization<T> factors;
+};
+
+template<typename T>
+struct SpheroidalCoupledCache {
+    bool ready = false;
+    bool even_only = false;
+    int n_max = -1, m_max = -1;
+    T chi_sw = 0, chi_body = 0, xi = 0, density_ratio = 0;
+    std::vector<SpheroidalCoupledBlock<T>> blocks;
+};
+
+template<typename T>
+T psms_direction_cosine(T theta) {
+    // Preserve exact broadside for the public R representation of pi/2.
+    if (precabs(theta) == T(std::acos(-1.0) / 2)) return T(0);
+    return preccos(theta);
+}
+
+// Solve for scattered coefficients without dividing by incident angular zeros.
+template<typename T>
+std::complex<T> psms_full_coupled_field(
+    int m_max, int n_max, T chi_sw, T chi_body, T xi,
+    T eta_body, T eta_scatter, T phi_difference,
+    T density_ratio, const std::vector<T>& nodes,
+    const std::vector<T>& weights, bool backscatter,
+    bool coefficient_overlap = false
+) {
+    if (m_max < 0 || n_max < m_max) {
+        throw std::invalid_argument("Spheroidal modal limits require 0 <= m_max <= n_max.");
+    }
+    // Reflect symmetric quadrature onto the positive half of the angular domain.
+    std::vector<T> qnodes, qweights;
+    bool symmetric = true;
+    for (size_t k = 0; !coefficient_overlap && k < nodes.size(); ++k) {
+        const size_t j = nodes.size() - 1 - k;
+        if (nodes[k] != -nodes[j] || weights[k] != weights[j]) {
+            symmetric = false;
+        }
+    }
+    for (size_t k = 0; !coefficient_overlap && k < nodes.size(); ++k) {
+        if (symmetric && nodes[k] < T(0)) continue;
+        qnodes.push_back(nodes[k]);
+        const T multiplier = symmetric && nodes[k] > T(0) ? T(2) : T(1);
+        qweights.push_back(weights[k] * multiplier);
+    }
+    // Backscatter uses angular parity, so its receive angle needs no evaluation.
+    std::vector<T> args = {eta_body};
+    if (!backscatter) args.push_back(eta_scatter);
+    const size_t quadrature_offset = args.size();
+    args.insert(args.end(), qnodes.begin(), qnodes.end());
+    std::complex<T> total(0, 0), correction(0, 0);
+    const int chunk = psms_profcn_mblock_chunk_size<T>();
+    if (precabs(eta_body) == T(1)) m_max = 0;
+    const bool even_only = eta_body == T(0);
+    // Retain one exact physical system within a 64 MiB allocation budget.
+    static thread_local SpheroidalCoupledCache<T> cache;
+    size_t cache_bytes = 2 * (m_max + 1) * sizeof(SpheroidalCoupledBlock<T>);
+    for (int m = 0; coefficient_overlap && m <= m_max; ++m) {
+        for (int parity = 0; parity < 2; ++parity) {
+            if (even_only && parity == 1) continue;
+            const size_t dim = (n_max - m - parity + 2) / 2;
+            cache_bytes += dim * dim * (2 * sizeof(std::complex<T>) + sizeof(T)) +
+                dim * (2 * sizeof(T) + 2 * sizeof(int));
+        }
+    }
+    const bool retain_system = coefficient_overlap && cache_bytes <= 64 * 1024 * 1024;
+    const bool reuse_system = retain_system && cache.ready && cache.even_only == even_only && cache.n_max == n_max &&
+        cache.m_max == m_max && cache.chi_sw == chi_sw && cache.chi_body == chi_body &&
+        cache.xi == xi && cache.density_ratio == density_ratio;
+    if (!reuse_system) {
+        cache.ready = false;
+        cache.blocks.clear();
+        if (retain_system) cache.blocks.resize(2 * (m_max + 1));
+    }
+    for (int start = 0; start <= m_max; start += chunk) {
+        // Share special-function setup across neighboring azimuthal orders.
+        Rcpp::checkUserInterrupt();
+        const int count = std::min(chunk, m_max - start + 1);
+        const int lnum = n_max - start + 1;
+        ProfcnBatchResult<T> external, internal;
+        ProfcnCoefficientBatchResult<T> external_coefficients, internal_coefficients;
+        if (reuse_system) {
+            // New directions need only the unchanged native angular evaluator.
+            external = cprofcn_mblock<T>(
+                chi_sw, start, count, lnum, args, 0, 1, 1, xi - T(1)
+            );
+        } else if (coefficient_overlap) {
+            // Use normalized Legendre expansions for the full gas angular overlaps.
+            external_coefficients = cprofcn_mblock_coefficients<T>(
+                chi_sw, start, count, lnum, args, 2, 1, xi - T(1)
+            );
+            internal_coefficients = cprofcn_mblock_coefficients<T>(
+                chi_body, start, count, lnum, {}, 1, 0, xi - T(1)
+            );
+        } else {
+            external = cprofcn_mblock<T>(
+                chi_sw, start, count, lnum, args, 2, 1, 1, xi - T(1)
+            );
+            internal = cprofcn_mblock<T>(
+                chi_body, start, count, lnum, qnodes, 1, 1, 1, xi - T(1)
+            );
+        }
+        const auto& external_functions = coefficient_overlap && !reuse_system ?
+            external_coefficients.functions : external;
+        const auto& internal_functions = coefficient_overlap ?
+            internal_coefficients.functions : internal;
+        for (int local = 0; local < count; ++local) {
+            const int m = start + local, size = n_max - m + 1;
+            const T azimuth = backscatter ? (m % 2 ? T(-1) : T(1)) :
+                preccos(T(m) * phi_difference);
+            const T multiplicity = m == 0 ? T(1) : T(2);
+            // Solve even and odd degree blocks without discarding coupled modes.
+            for (int parity = 0; parity < 2; ++parity) {
+                // Odd angular modes have zero broadside forcing (DLMF 30.4.3).
+                if (even_only && parity == 1) continue;
+                const int dim = (size - parity + 1) / 2;
+                if (dim <= 0) continue;
+                std::vector<T> incident_angular(dim), receive_angular(dim);
+                std::vector<T> interior_value(dim), interior_derivative(dim);
+                std::vector<std::complex<T>> external_value(dim), external_derivative(dim);
+                std::vector<std::complex<T>> incident_coefficients(dim);
+                std::vector<T> external_angular(dim * qnodes.size());
+                std::vector<T> weighted_internal_angular(dim * qnodes.size());
+                for (int i = 0; i < dim; ++i) {
+                    // Cache angular samples and radial boundary values for reuse.
+                    const int index = parity + 2 * i, degree = m + index;
+                    incident_angular[i] = extract_angular_value_from_mblock<T>(
+                        external_functions, local, index, 0
+                    );
+                    receive_angular[i] = backscatter ?
+                        (index % 2 ? -incident_angular[i] : incident_angular[i]) :
+                        extract_angular_value_from_mblock<T>(external_functions, local, index, 1);
+                    incident_coefficients[i] = imaginary_unit_power<T>(degree) * incident_angular[i];
+                    if (reuse_system) continue;
+                    auto external_radial = extract_radial_from_mblock<T>(external_functions, local, index, 3);
+                    auto internal_radial = extract_radial_from_mblock<T>(internal_functions, local, index, 1);
+                    external_value[i] = {external_radial.val_real, external_radial.val_imag};
+                    external_derivative[i] = {external_radial.der_real, external_radial.der_imag};
+                    // Scale the interior pair before multiplying radial functions.
+                    const T scale = std::max(
+                        precabs(internal_radial.der_real),
+                        precabs(density_ratio * internal_radial.val_real)
+                    );
+                    if (!(scale > T(0))) {
+                        throw std::runtime_error(
+                            "Interior spheroidal radial values underflowed at the retained modal order."
+                        );
+                    }
+                    interior_value[i] = density_ratio * internal_radial.val_real / scale;
+                    interior_derivative[i] = internal_radial.der_real / scale;
+                    for (size_t k = 0; k < qnodes.size(); ++k) {
+                        external_angular[i * qnodes.size() + k] =
+                            extract_angular_value_from_mblock<T>(external, local, index, k + quadrature_offset);
+                        weighted_internal_angular[i * qnodes.size() + k] =
+                            extract_angular_value_from_mblock<T>(internal, local, index, k) * qweights[k];
+                    }
+                }
+                std::vector<std::complex<T>> matrix(reuse_system ? 0 : dim * dim), rhs(dim, {0, 0});
+                std::vector<T> incident_kernel(retain_system && !reuse_system ? dim * dim : 0);
+                std::vector<T> scales(dim), row_scales(dim);
+                std::vector<std::complex<T>> scattered_coefficients;
+                if (reuse_system) {
+                    // Rebuild the angle-dependent forcing with its original summation order.
+                    const auto& block = cache.blocks[2 * m + parity];
+                    for (int row = 0; row < dim; ++row) {
+                        for (int col = 0; col < dim; ++col) {
+                            rhs[row] -= block.incident_kernel[row * dim + col] *
+                                incident_coefficients[col];
+                        }
+                        rhs[row] /= block.row_scales[row];
+                    }
+                    scales = block.column_scales;
+                    scattered_coefficients = solve_factored_system_lup_refined<T>(
+                        block.matrix, rhs, block.factors, dim, 2
+                    );
+                } else {
+                    // Match pressure and normal velocity in the interior angular basis.
+                    for (int row = 0; row < dim; ++row) {
+                        for (int col = 0; col < dim; ++col) {
+                            T overlap = coefficient_overlap ? spheroidal_coefficient_overlap<T>(
+                                external_coefficients, internal_coefficients, local,
+                                parity + 2 * col, parity + 2 * row
+                            ) : T(0);
+                            for (size_t k = 0; k < qnodes.size(); ++k) {
+                                overlap += external_angular[col * qnodes.size() + k] *
+                                    weighted_internal_angular[row * qnodes.size() + k];
+                            }
+                            matrix[row * dim + col] = overlap * (
+                                external_value[col] * interior_derivative[row] -
+                                interior_value[row] * external_derivative[col]
+                            );
+                            const T forcing = overlap * (
+                                external_value[col].real() * interior_derivative[row] -
+                                interior_value[row] * external_derivative[col].real()
+                            );
+                            rhs[row] -= forcing * incident_coefficients[col];
+                            if (retain_system) incident_kernel[row * dim + col] = forcing;
+                        }
+                    }
+                    // Balance radial column magnitudes, then boundary-equation rows.
+                    for (int col = 0; col < dim; ++col) {
+                        T scale = T(0);
+                        for (int row = 0; row < dim; ++row) {
+                            const auto& value = matrix[row * dim + col];
+                            scale = std::max(scale, precabs(value.real()) + precabs(value.imag()));
+                        }
+                        if (!(scale > T(0))) {
+                            throw std::runtime_error(
+                                "Spheroidal coupling column is numerically zero."
+                            );
+                        }
+                        scales[col] = scale;
+                        for (int row = 0; row < dim; ++row) matrix[row * dim + col] /= scale;
+                    }
+                    for (int row = 0; row < dim; ++row) {
+                        T scale = T(0);
+                        for (int col = 0; col < dim; ++col) {
+                            const auto& value = matrix[row * dim + col];
+                            scale = std::max(scale, precabs(value.real()) + precabs(value.imag()));
+                        }
+                        if (!(scale > T(0))) {
+                            throw std::runtime_error(
+                                "Spheroidal coupling row is numerically zero. Check modal convergence and precision."
+                            );
+                        }
+                        for (int col = 0; col < dim; ++col) matrix[row * dim + col] /= scale;
+                        rhs[row] /= scale;
+                        row_scales[row] = scale;
+                    }
+                    auto factors = lup_decompose<T>(matrix, dim);
+                    scattered_coefficients = solve_factored_system_lup_refined<T>(matrix, rhs, factors, dim, 2);
+                    if (retain_system) {
+                        auto& block = cache.blocks[2 * m + parity];
+                        block.matrix = std::move(matrix);
+                        block.incident_kernel = std::move(incident_kernel);
+                        block.column_scales = scales;
+                        block.row_scales = std::move(row_scales);
+                        block.factors = std::move(factors);
+                    }
+                }
+                // Undo column scaling and sum the receive field with compensation.
+                for (int i = 0; i < dim; ++i) {
+                    const int degree = m + parity + 2 * i;
+                    const auto term = multiplicity * azimuth * receive_angular[i] *
+                        imaginary_unit_power<T>(-degree) * (scattered_coefficients[i] / scales[i]);
+                    const auto y = term - correction;
+                    const auto updated = total + y;
+                    correction = (updated - total) - y;
+                    total = updated;
+                }
+            }
+        }
+    }
+    if (retain_system && !reuse_system) {
+        cache.n_max = n_max;
+        cache.even_only = even_only;
+        cache.m_max = m_max;
+        cache.chi_sw = chi_sw;
+        cache.chi_body = chi_body;
+        cache.xi = xi;
+        cache.density_ratio = density_ratio;
+        cache.ready = true;
+    }
+    return total;
+}
+
 // LINEAR SCATTERING COEFFICIENT FOR A PROLATE SPHEROID
 // ----------------------------------------------------------------------------
 // Linear scattering coefficient, f_inf(theta, phi|theta', phi'), based on 
@@ -2243,16 +2526,22 @@ std::complex<T> psms_fbs(
     const std::vector<T>& nodes,
     const std::vector<T>& weights,
     const std::string& Amn_method,
+    bool is_backscatter,
     bool adaptive = false,
     bool vectorized = false
 ) {
     T eta_body = preccos(theta_body);
     T eta_scatter = preccos(theta_scatter);
-    T pi_val = precpi<T>();
-    bool is_backscatter =
-        precabs(theta_scatter - (pi_val - theta_body)) <= T(64) * preceps<T>() &&
-        precabs(preccos(phi_body - phi_scatter) + T(1)) <= T(64) * preceps<T>();
-
+    if (Amn_method == "Amn_fluid_gas" ||
+        (is_quad_precision_v<T> && Amn_method == "Amn_fluid")) {
+        eta_body = psms_direction_cosine(theta_body);
+        eta_scatter = psms_direction_cosine(theta_scatter);
+        return psms_full_coupled_field<T>(
+            m_max, n_max, chi_sw, chi_body, xi, eta_body, eta_scatter,
+            phi_body - phi_scatter, density_body / density_sw,
+            nodes, weights, is_backscatter, Amn_method == "Amn_fluid_gas"
+        );
+    }
     if (is_backscatter && Amn_method == "Amn_fixed_rigid") {
         return psms_backscatter_fixed_rigid<T>(
             m_max, n_max, chi_sw, xi, eta_body, adaptive
@@ -2267,12 +2556,13 @@ std::complex<T> psms_fbs(
 
 #if ACOUSTICTS_HAVE_QUADMATH
     if constexpr (is_quad_precision_v<T>) {
-        if (is_backscatter &&
-            (Amn_method == "Amn_fluid" || Amn_method == "Amn_fluid_gas")) {
+        // The gas shortcut also changes the retained degree limit for each m.
+        // Keep gas solves on the full retained system below so recognizing
+        // double-origin backscatter angles does not change their truncation.
+        if (is_backscatter && Amn_method == "Amn_fluid") {
             return psms_backscatter_fluid_adaptive<T>(
                 m_max, n_max, chi_sw, chi_body, xi, eta_body,
-                density_body, density_sw, nodes, weights, true, adaptive,
-                Amn_method == "Amn_fluid_gas"
+                density_body, density_sw, nodes, weights, true, adaptive, false
             );
         }
     }

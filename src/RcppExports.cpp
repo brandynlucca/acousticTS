@@ -249,6 +249,22 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// calibration_modal_sum_cpp
+ComplexVector calibration_modal_sum_cpp(NumericVector ka_sw, NumericVector ka_l, NumericVector ka_t, NumericVector theta, NumericVector density_ratio, bool adaptive);
+RcppExport SEXP _acousticTS_calibration_modal_sum_cpp(SEXP ka_swSEXP, SEXP ka_lSEXP, SEXP ka_tSEXP, SEXP thetaSEXP, SEXP density_ratioSEXP, SEXP adaptiveSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type ka_sw(ka_swSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type ka_l(ka_lSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type ka_t(ka_tSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type density_ratio(density_ratioSEXP);
+    Rcpp::traits::input_parameter< bool >::type adaptive(adaptiveSEXP);
+    rcpp_result_gen = Rcpp::wrap(calibration_modal_sum_cpp(ka_sw, ka_l, ka_t, theta, density_ratio, adaptive));
+    return rcpp_result_gen;
+END_RCPP
+}
 // dwba_fbs_cpp
 ComplexVector dwba_fbs_cpp(NumericMatrix rpos, NumericVector k_sw, double theta, double h, double R, int subdivisions, double rel_tol, double abs_tol);
 RcppExport SEXP _acousticTS_dwba_fbs_cpp(SEXP rposSEXP, SEXP k_swSEXP, SEXP thetaSEXP, SEXP hSEXP, SEXP RSEXP, SEXP subdivisionsSEXP, SEXP rel_tolSEXP, SEXP abs_tolSEXP) {
@@ -282,6 +298,19 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type rel_tol(rel_tolSEXP);
     Rcpp::traits::input_parameter< double >::type abs_tol(abs_tolSEXP);
     rcpp_result_gen = Rcpp::wrap(dwba_segment_integrals_cpp(rpos, k_sw, theta, h, R, subdivisions, rel_tol, abs_tol));
+    return rcpp_result_gen;
+END_RCPP
+}
+// fcms_bm_cpp
+ComplexMatrix fcms_bm_cpp(NumericVector ka, IntegerVector m_limit, bool rigid);
+RcppExport SEXP _acousticTS_fcms_bm_cpp(SEXP kaSEXP, SEXP m_limitSEXP, SEXP rigidSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type ka(kaSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type m_limit(m_limitSEXP);
+    Rcpp::traits::input_parameter< bool >::type rigid(rigidSEXP);
+    rcpp_result_gen = Rcpp::wrap(fcms_bm_cpp(ka, m_limit, rigid));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -332,6 +361,37 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type rho_ratio_sw(rho_ratio_swSEXP);
     Rcpp::traits::input_parameter< double >::type rho_ratio_fl(rho_ratio_flSEXP);
     rcpp_result_gen = Rcpp::wrap(elastic_shell_boundary_conditions(ka_matrix, m_limit, lambda, mu, rho_ratio_sw, rho_ratio_fl));
+    return rcpp_result_gen;
+END_RCPP
+}
+// krm_body_fbs_cpp
+ComplexVector krm_body_fbs_cpp(NumericMatrix rpos, NumericVector k_sw, NumericVector k_body, double theta, double reflection);
+RcppExport SEXP _acousticTS_krm_body_fbs_cpp(SEXP rposSEXP, SEXP k_swSEXP, SEXP k_bodySEXP, SEXP thetaSEXP, SEXP reflectionSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type rpos(rposSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type k_sw(k_swSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type k_body(k_bodySEXP);
+    Rcpp::traits::input_parameter< double >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< double >::type reflection(reflectionSEXP);
+    rcpp_result_gen = Rcpp::wrap(krm_body_fbs_cpp(rpos, k_sw, k_body, theta, reflection));
+    return rcpp_result_gen;
+END_RCPP
+}
+// krm_bladder_fbs_cpp
+ComplexVector krm_bladder_fbs_cpp(NumericMatrix rpos, NumericVector k_sw, NumericVector k_medium, double theta, double reflection, double transmission);
+RcppExport SEXP _acousticTS_krm_bladder_fbs_cpp(SEXP rposSEXP, SEXP k_swSEXP, SEXP k_mediumSEXP, SEXP thetaSEXP, SEXP reflectionSEXP, SEXP transmissionSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type rpos(rposSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type k_sw(k_swSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type k_medium(k_mediumSEXP);
+    Rcpp::traits::input_parameter< double >::type theta(thetaSEXP);
+    Rcpp::traits::input_parameter< double >::type reflection(reflectionSEXP);
+    Rcpp::traits::input_parameter< double >::type transmission(transmissionSEXP);
+    rcpp_result_gen = Rcpp::wrap(krm_bladder_fbs_cpp(rpos, k_sw, k_medium, theta, reflection, transmission));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -589,11 +649,15 @@ static const R_CallMethodDef CallEntries[] = {
     {"_acousticTS_js_complex_deriv_cpp", (DL_FUNC) &_acousticTS_js_complex_deriv_cpp, 3},
     {"_acousticTS_ys_complex_deriv_cpp", (DL_FUNC) &_acousticTS_ys_complex_deriv_cpp, 3},
     {"_acousticTS_hs_complex_deriv_cpp", (DL_FUNC) &_acousticTS_hs_complex_deriv_cpp, 3},
+    {"_acousticTS_calibration_modal_sum_cpp", (DL_FUNC) &_acousticTS_calibration_modal_sum_cpp, 6},
     {"_acousticTS_dwba_fbs_cpp", (DL_FUNC) &_acousticTS_dwba_fbs_cpp, 8},
     {"_acousticTS_dwba_segment_integrals_cpp", (DL_FUNC) &_acousticTS_dwba_segment_integrals_cpp, 8},
+    {"_acousticTS_fcms_bm_cpp", (DL_FUNC) &_acousticTS_fcms_bm_cpp, 3},
     {"_acousticTS_gauss_legendre_cpp", (DL_FUNC) &_acousticTS_gauss_legendre_cpp, 3},
     {"_acousticTS_elastic_shell_boundary_conditions_old", (DL_FUNC) &_acousticTS_elastic_shell_boundary_conditions_old, 11},
     {"_acousticTS_elastic_shell_boundary_conditions", (DL_FUNC) &_acousticTS_elastic_shell_boundary_conditions, 6},
+    {"_acousticTS_krm_body_fbs_cpp", (DL_FUNC) &_acousticTS_krm_body_fbs_cpp, 5},
+    {"_acousticTS_krm_bladder_fbs_cpp", (DL_FUNC) &_acousticTS_krm_bladder_fbs_cpp, 6},
     {"_acousticTS_Pn_cpp", (DL_FUNC) &_acousticTS_Pn_cpp, 2},
     {"_acousticTS_Pn_deriv_cpp", (DL_FUNC) &_acousticTS_Pn_deriv_cpp, 3},
     {"_acousticTS_Qn_cpp", (DL_FUNC) &_acousticTS_Qn_cpp, 2},

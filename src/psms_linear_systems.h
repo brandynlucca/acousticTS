@@ -188,22 +188,37 @@ LUPFactorization<T> lup_decompose(
         int pivot_row = k;
         int pivot_col = k;
         T pivot_abs_sq = complex_abs_sq(fac.lu[k * n + k]);
+        T pivot_component_bound = std::max(precabs(fac.lu[k * n + k].real()),
+            precabs(fac.lu[k * n + k].imag())) * T(0.5);
         for (int i = k + 1; i < n; ++i) {
             for (int j = k; j < n; ++j) {
+                // Two components below half the pivot maximum cannot beat its norm.
+                if constexpr (is_quad_precision_v<T>) {
+                    if (precabs(fac.lu[i * n + j].real()) <= pivot_component_bound &&
+                        precabs(fac.lu[i * n + j].imag()) <= pivot_component_bound) continue;
+                }
                 T cand_abs_sq = complex_abs_sq(fac.lu[i * n + j]);
                 if (cand_abs_sq > pivot_abs_sq) {
                     pivot_row = i;
                     pivot_col = j;
                     pivot_abs_sq = cand_abs_sq;
+                    pivot_component_bound = std::max(precabs(fac.lu[i * n + j].real()),
+                        precabs(fac.lu[i * n + j].imag())) * T(0.5);
                 }
             }
         }
         for (int j = k; j < n; ++j) {
+            if constexpr (is_quad_precision_v<T>) {
+                if (precabs(fac.lu[k * n + j].real()) <= pivot_component_bound &&
+                    precabs(fac.lu[k * n + j].imag()) <= pivot_component_bound) continue;
+            }
             T cand_abs_sq = complex_abs_sq(fac.lu[k * n + j]);
             if (cand_abs_sq > pivot_abs_sq) {
                 pivot_row = k;
                 pivot_col = j;
                 pivot_abs_sq = cand_abs_sq;
+                pivot_component_bound = std::max(precabs(fac.lu[k * n + j].real()),
+                    precabs(fac.lu[k * n + j].imag())) * T(0.5);
             }
         }
 
@@ -415,7 +430,7 @@ ExternalBoundaryResult<T> external_boundary_matrices(
         int size = n_max - m + 1;
         if (size <= 0) continue;
 
-        auto result_both = cprofcn<T>(chi_sw, m, size, {eta_body}, 2, iopnorm, 2, x1_r);
+        auto result_both = cprofcn<T>(chi_sw, m, size, {eta_body}, 2, iopnorm, 1, x1_r);
 
         for (int i = 0; i < size; ++i) {
             int n = m + i;
@@ -448,13 +463,13 @@ ExternalBoundaryResult<T> external_boundary_matrices(
 }
 
 template<typename T>
-std::vector<std::complex<T>> solve_linear_system_lup_refined(
+std::vector<std::complex<T>> solve_factored_system_lup_refined(
     const std::vector<std::complex<T>>& A,
     const std::vector<std::complex<T>>& b,
+    const LUPFactorization<T>& fac,
     int n,
     int n_refine = 1
 ) {
-    auto fac = lup_decompose<T>(A, n);
     if (fac.singular) {
         throw std::runtime_error("Fluid kernel system is singular or ill-conditioned");
     }
@@ -484,6 +499,17 @@ std::vector<std::complex<T>> solve_linear_system_lup_refined(
     }
 
     return x;
+}
+
+template<typename T>
+std::vector<std::complex<T>> solve_linear_system_lup_refined(
+    const std::vector<std::complex<T>>& A,
+    const std::vector<std::complex<T>>& b,
+    int n,
+    int n_refine = 1
+) {
+    const auto factors = lup_decompose<T>(A, n);
+    return solve_factored_system_lup_refined<T>(A, b, factors, n, n_refine);
 }
 
 template<typename T>

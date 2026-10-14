@@ -468,6 +468,62 @@ static std::complex<double> tmm_backscatter_from_solved_block_cpp(
     return f_bs;
 }
 
+// A sphere has diagonal T-matrix entries fixed by its radial boundary equations.
+static std::complex<double> tmm_exact_sphere_backscatter(
+    double k_sw,
+    double radius,
+    int n_max,
+    const std::string& boundary,
+    bool penetrable,
+    double sound_speed_sw,
+    double sound_speed_body,
+    double density_sw,
+    double density_body) {
+    double x = k_sw * radius;
+    std::vector<double> j = js_sequence_miller_impl(n_max + 1, x);
+    std::vector<double> y = ys_sequence_upward_impl(n_max + 1, x);
+    std::vector<double> interior;
+    double x_body = 0.0;
+    double impedance_ratio = 0.0;
+    if (penetrable) {
+        // Reuse the interior radial sequence for every retained degree.
+        x_body = x * (sound_speed_sw / sound_speed_body);
+        interior = js_sequence_miller_impl(n_max + 1, x_body);
+        impedance_ratio = (density_body / density_sw) *
+            (sound_speed_body / sound_speed_sw);
+    }
+
+    long double real_sum = 0.0L;
+    long double imaginary_sum = 0.0L;
+    for (int n = 0; n <= n_max; ++n) {
+        double a = j[n];
+        double b = y[n];
+        if (boundary == "fixed_rigid" || penetrable) {
+            // Differentiate the same sequences used in the pressure equation.
+            double derivative_j = n * j[n] / x - j[n + 1];
+            double derivative_y = n * y[n] / x - y[n + 1];
+            if (penetrable) {
+                double derivative_interior = n * interior[n] / x_body -
+                    interior[n + 1];
+                a = j[n] * derivative_interior -
+                    impedance_ratio * interior[n] * derivative_j;
+                b = y[n] * derivative_interior -
+                    impedance_ratio * interior[n] * derivative_y;
+            } else {
+                a = derivative_j;
+                b = derivative_y;
+            }
+        }
+        std::complex<double> coefficient = -a / std::complex<double>(a, b);
+        // The addition theorem sums all azimuthal orders exactly for a sphere.
+        double weight = (2.0 * n + 1.0) * (n % 2 == 0 ? 1.0 : -1.0);
+        real_sum += weight * coefficient.real();
+        imaginary_sum += weight * coefficient.imag();
+    }
+    return std::complex<double>(static_cast<double>(imaginary_sum),
+        -static_cast<double>(real_sum)) / k_sw;
+}
+
 // Vectorized frequency wrapper used by the R-side spherical TMM path.
 // [[Rcpp::export]]
 Rcpp::ComplexVector tmm_backscatter_cpp(Rcpp::NumericVector frequency,
@@ -489,6 +545,27 @@ Rcpp::ComplexVector tmm_backscatter_cpp(Rcpp::NumericVector frequency,
     std::vector<int> processed(n_freq, 0);
     double mu0 = std::cos(theta_body);
     bool penetrable = boundary == "liquid_filled" || boundary == "gas_filled";
+
+    // Evaluate exact spherical blocks without quadrature or dense projection.
+    bool spherical_boundary = penetrable || boundary == "fixed_rigid" ||
+        boundary == "pressure_release";
+    if (shape == "Sphere" && spherical_boundary && shape_values.size() > 0 &&
+        shape_values[0] > 0.0 && std::isfinite(shape_values[0]) &&
+        std::isfinite(theta_body)) {
+        for (int i = 0; i < n_freq; ++i) {
+            if (i % 32 == 0) Rcpp::checkUserInterrupt();
+            double k_sw = 2.0 * M_PI * frequency[i] / sound_speed_sw;
+            if (!(k_sw > 0.0) || !std::isfinite(k_sw) || n_max[i] < 0) continue;
+            std::complex<double> amplitude = tmm_exact_sphere_backscatter(
+                k_sw, shape_values[0], n_max[i], boundary, penetrable,
+                sound_speed_sw, sound_speed_body, density_sw, density_body);
+            // Retain the projected solver if a radial sequence is nonfinite.
+            if (std::isfinite(amplitude.real()) && std::isfinite(amplitude.imag())) {
+                out[i] = to_Rcomplex(amplitude);
+                processed[i] = 1;
+            }
+        }
+    }
 
     for (int start = 0; start < n_freq; ++start) {
         if (processed[start]) {

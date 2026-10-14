@@ -67,6 +67,18 @@ inline double pow10_typed<double>(int exponent) {
 template<>
 inline acousticts_quad_t pow10_typed<acousticts_quad_t>(int exponent) {
 #if ACOUSTICTS_HAVE_QUADMATH
+    // Reuse quadmath powers for the repeated integer exponents in modal tables.
+    constexpr int limit = 512;
+    static thread_local acousticts_quad_t values[2 * limit + 1] = {};
+    static thread_local bool ready[2 * limit + 1] = {};
+    if (exponent >= -limit && exponent <= limit) {
+        const int index = exponent + limit;
+        if (!ready[index]) {
+            values[index] = powq(acousticts_quad_t(10), acousticts_quad_t(exponent));
+            ready[index] = true;
+        }
+        return values[index];
+    }
     return powq(double_to_quad(10.0), double_to_quad(static_cast<double>(exponent)));
 #else
     return std::pow(acousticts_quad_t(10), acousticts_quad_t(exponent));

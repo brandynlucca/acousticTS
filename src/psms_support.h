@@ -334,6 +334,121 @@ inline ProfcnBatchResult<acousticts_quad_t> cprofcn_batch_quad(
 }
 #endif
 
+
+template<typename T>
+struct ProfcnCoefficientBatchResult {
+    ProfcnBatchResult<T> functions;
+    int capacity = 0;
+    std::vector<T> coefficients;
+    std::vector<int> lengths;
+};
+
+template<typename T>
+ProfcnCoefficientBatchResult<T> cprofcn_mblock_coefficients(
+    T c, int m_start, int m_count, int lnum, const std::vector<T>& arguments,
+    int ioprad, int iopang, T x1
+) {
+    if (lnum < 1 || m_count < 1) {
+        throw std::invalid_argument("Spheroidal coefficient dimensions must be positive.");
+    }
+    ProfcnCoefficientBatchResult<T> output;
+    auto& result = output.functions;
+    result.lnum = lnum;
+    result.narg = std::max<int>(arguments.size(), 1);
+    result.m_count = m_count;
+    const size_t radial_size = static_cast<size_t>(lnum) * m_count;
+    const size_t angular_size = radial_size * result.narg;
+    // Allocate the unchanged native radial and angular output layout.
+    result.r1c.resize(radial_size);
+    result.r1dc.resize(radial_size);
+    result.r2c.resize(radial_size);
+    result.r2dc.resize(radial_size);
+    result.ir1e.resize(radial_size);
+    result.ir1de.resize(radial_size);
+    result.ir2e.resize(radial_size);
+    result.ir2de.resize(radial_size);
+    result.naccr.resize(radial_size);
+    result.s1c.resize(angular_size);
+    result.s1dc.resize(angular_size);
+    result.is1e.resize(angular_size);
+    result.is1de.resize(angular_size);
+    result.naccs.resize(angular_size);
+    std::vector<T> args = arguments;
+    args.resize(result.narg, T(0));
+    int iopnorm = 1, status = 0;
+    // Match the native coefficient workspace, retrying any larger reported support.
+    const int digits = is_quad_precision_v<T> ? 33 : 15;
+    output.capacity = lnum + 3 * digits + static_cast<int>(precabs(c)) + 5;
+    output.lengths.resize(radial_size);
+    for (;;) {
+        output.coefficients.assign(radial_size * output.capacity, T(0));
+        if constexpr (std::is_same_v<T, double>) {
+            profcn_cpp_interface_batch_coeff(
+                &c, &m_start, &m_count, &lnum, &ioprad, &x1, &iopang, &iopnorm,
+                &result.narg, args.data(), result.r1c.data(), result.ir1e.data(),
+                result.r1dc.data(), result.ir1de.data(), result.r2c.data(),
+                result.ir2e.data(), result.r2dc.data(), result.ir2de.data(),
+                result.naccr.data(), result.s1c.data(), result.is1e.data(),
+                result.s1dc.data(), result.is1de.data(), result.naccs.data(),
+                &output.capacity, output.coefficients.data(), output.lengths.data(), &status
+            );
+        } else {
+#if ACOUSTICTS_HAVE_QUADMATH
+            profcn_cpp_interface_batch_coeff_quad(
+                &c, &m_start, &m_count, &lnum, &ioprad, &x1, &iopang, &iopnorm,
+                &result.narg, args.data(), result.r1c.data(), result.ir1e.data(),
+                result.r1dc.data(), result.ir1de.data(), result.r2c.data(),
+                result.ir2e.data(), result.r2dc.data(), result.ir2de.data(),
+                result.naccr.data(), result.s1c.data(), result.is1e.data(),
+                result.s1dc.data(), result.is1de.data(), result.naccs.data(),
+                &output.capacity, output.coefficients.data(), output.lengths.data(), &status
+            );
+#else
+            throw std::runtime_error("Native quad spheroidal coefficients are unavailable.");
+#endif
+        }
+        if (status == 0) break;
+        const int required = *std::max_element(output.lengths.begin(), output.lengths.end());
+        if (status != 1 || required <= output.capacity) {
+            throw std::runtime_error("Native spheroidal expansion coefficients could not be resolved.");
+        }
+        output.capacity = required;
+    }
+    // Restore the existing mantissa/exponent representation in native precision.
+    scale_profcn_component(result.r1c, result.ir1e);
+    scale_profcn_component(result.r1dc, result.ir1de);
+    scale_profcn_component(result.r2c, result.ir2e);
+    scale_profcn_component(result.r2dc, result.ir2de);
+    scale_profcn_component(result.s1c, result.is1e);
+    scale_profcn_component(result.s1dc, result.is1de);
+    return output;
+}
+
+template<typename T>
+T spheroidal_coefficient_overlap(
+    const ProfcnCoefficientBatchResult<T>& exterior,
+    const ProfcnCoefficientBatchResult<T>& interior,
+    int local_order, int external_degree_index, int internal_degree_index
+) {
+    // Apply Ferrers expansion and orthogonality (DLMF 30.8.1 and 14.17.6).
+    if ((external_degree_index - internal_degree_index) % 2 != 0) return T(0);
+    const size_t external_index = external_degree_index +
+        static_cast<size_t>(exterior.functions.lnum) * local_order;
+    const size_t internal_index = internal_degree_index +
+        static_cast<size_t>(interior.functions.lnum) * local_order;
+    const int length = std::min(exterior.lengths[external_index],
+        interior.lengths[internal_index]);
+    T sum = 0, correction = 0;
+    for (int r = external_degree_index % 2; r < length; r += 2) {
+        const T product = exterior.coefficients[r + exterior.capacity * external_index] *
+            interior.coefficients[r + interior.capacity * internal_index];
+        const T next = product - correction;
+        const T updated = sum + next;
+        correction = (updated - sum) - next;
+        sum = updated;
+    }
+    return sum;
+}
 template<typename T>
 inline size_t profcn_batch_radial_offset(
     int l_idx,
