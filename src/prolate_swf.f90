@@ -571,8 +571,14 @@ module prolate_swf
       idx = candidate
       entry => pint_geometry_cache(idx)
       entry = empty
-      allocate(entry%wg(ngau), entry%xg(ngau), entry%geometry(5, ngau * ngqs), &
-          stat=allocation_status)
+      allocate(entry%wg(ngau), stat=allocation_status, errmsg=allocation_message)
+      if(allocation_status == 0) then
+        allocate(entry%xg(ngau), stat=allocation_status, errmsg=allocation_message)
+      end if
+      if(allocation_status == 0) then
+        allocate(entry%geometry(5, ngau * ngqs), &
+            stat=allocation_status, errmsg=allocation_message)
+      end if
       if(allocation_status /= 0) then
         entry = empty
         idx = 0
@@ -624,7 +630,7 @@ module prolate_swf
       entry%nodes = node
       remaining_values = (pint_geometry_cache_bytes - pint_geometry_retained_bytes()) / real_bytes
       capacity = min(requested_degrees, 2 * ((remaining_values / max(1, node)) / 2))
-      allocate(entry%basis(capacity, node), stat=allocation_status)
+      allocate(entry%basis(capacity, node), stat=allocation_status, errmsg=allocation_message)
       if(allocation_status /= 0) then
         entry = empty
         idx = 0
@@ -641,7 +647,8 @@ module prolate_swf
       capacity = min(requested_degrees, previous_capacity + &
           2 * ((remaining_values / max(1, entry%nodes)) / 2))
       if(capacity > previous_capacity) then
-        allocate(expanded_basis(capacity, entry%nodes), stat=allocation_status)
+        allocate(expanded_basis(capacity, entry%nodes), &
+            stat=allocation_status, errmsg=allocation_message)
         if(allocation_status == 0) then
           expanded_basis(1:previous_capacity,:) = entry%basis
           call move_alloc(expanded_basis, entry%basis)
@@ -1020,7 +1027,8 @@ module prolate_swf
   subroutine profcn_batch(c, m_start, m_count, lnum, ioprad, x1, iopang, iopnorm, narg, arg, &
            r1c, ir1e, r1dc, ir1de, r2c, &
            ir2e, r2dc, ir2de, naccr, &
-           s1c, is1e, s1dc, is1de, naccs, coefficient_values, coefficient_lengths, coefficient_status)
+           s1c, is1e, s1dc, is1de, naccs, coefficient_values, coefficient_lengths, &
+           coefficient_status)
 
 !  purpose:     Batched wrapper around profcn for consecutive orders
 !               m = m_start, ..., m_start + m_count - 1.
@@ -5231,6 +5239,7 @@ end if
     real(knd) :: twice_m
     real(knd), allocatable :: expanded_steps(:)
     logical :: new_order
+    character(len=256) :: allocation_message
 
     ! Reuse factors across frequencies and the exterior and interior expansions.
     if(required_steps <= 0) then
@@ -5250,7 +5259,7 @@ end if
     if(retained_steps <= previous_steps) return
 
     ! Allocation failure leaves existing entries intact and uses direct factors.
-    allocate(expanded_steps(retained_steps), stat=allocation_status)
+    allocate(expanded_steps(retained_steps), stat=allocation_status, errmsg=allocation_message)
     if(allocation_status /= 0) then
       slot = 0
       return
@@ -6934,7 +6943,8 @@ subroutine profcn_coefficients_cpp_interface(c, m_start, m_count, lnum, &
         radial(:,:,1), radial_exponents(:,:,1), radial(:,:,2), radial_exponents(:,:,2), &
         radial(:,:,3), radial_exponents(:,:,3), radial(:,:,4), radial_exponents(:,:,4), &
         radial_accuracy, angular(:,:,:,1), angular_exponents(:,:,:,1), &
-        angular(:,:,:,2), angular_exponents(:,:,:,2), angular_accuracy, coefficients, lengths, status)
+        angular(:,:,:,2), angular_exponents(:,:,:,2), angular_accuracy, &
+        coefficients, lengths, status)
 #ifdef USE_QUAD
 end subroutine profcn_coefficients_cpp_interface_quad
 #else
