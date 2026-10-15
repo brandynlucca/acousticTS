@@ -206,8 +206,6 @@ vendored and package-adapted
 [`profcn` source in `src/prolate_swf.f90`](https://github.com/brandynlucca/acousticTS/blob/main/src/prolate_swf.f90).
 It calculates eigenvalues, angular functions, radial functions of the first and
 second kinds, derivatives, normalization quantities, and accuracy indicators.
-The same file is compiled in both double and quadruple precision, as shown in
-[`src/Makevars`](https://github.com/brandynlucca/acousticTS/blob/main/src/Makevars).
 
 The rest of the source tree connects that kernel to R:
 
@@ -224,11 +222,10 @@ The rest of the source tree connects that kernel to R:
 
 The vendored kernel was adapted for the package, including batching and cached
 support calculations. Its numerical ancestry and the original program remain
-available in the
+available in the 
 [upstream `prolate_swf` repository](https://github.com/MathieuandSpheroidalWaveFunctions/prolate_swf).
-For an audit of the special-function mathematics, begin with
-`src/prolate_swf.f90`, then use the C++ headers to trace how its outputs enter
-the package models.
+For an audit of the special-function mathematics, begin with `src/prolate_swf.f90`, then use the 
+C++ headers to trace how its outputs enter the package models.
 :::
 
 Many backend results are stored as a mantissa and a base-10 exponent. The C++

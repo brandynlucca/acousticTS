@@ -338,7 +338,7 @@ Prol_Spheroid implementation, with a maximum absolute difference of
 `0.00128 dB` over the five-frequency set.
 
 By contrast, the shared
-[echoSMs::PSMSModel](https://ices-tools-dev.github.io/echoSMs/api_reference/#echosms.PSMSModel)
+[echoSMs::PSMSModel](https://ices-tools-dev.github.io/echoSMs/api_scattering_models/#echosms.PSMSModel)
 comparison separates at the higher two frequencies, especially for the
 penetrable cases. The liquid-filled difference reaches about `1.02 dB` at
 `100 kHz`. The gas-filled comparison uses the benchmark geometry because only
