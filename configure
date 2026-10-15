@@ -2,7 +2,7 @@
 
 # Configure the optional native binary128 backend.  It is usable only when the
 # active Fortran compiler can compile the REAL(16) spheroidal implementation
-# and the active C++17 compiler can instantiate the matching complex type.
+# and the active C++17 toolchain can compile and link the matching complex type.
 
 set -eu
 
@@ -48,7 +48,7 @@ EOF
 # and, only when needed and supported, silence that driver-level diagnostic.
 printf '%s' 'checking whether the Fortran compiler needs unused-argument suppression... '
 if (
-    cd "$configure_tmp"
+    cd "$configure_tmp" &&
     eval "$FC $PKG_FFLAGS $FCFLAGS \
         -c conftest_heap.f90 -o conftest_diagnostic.o" \
         >diagnostic.log 2>&1 &&
@@ -60,7 +60,7 @@ if (
         -Qunused-arguments
     do
         if (
-            cd "$configure_tmp"
+            cd "$configure_tmp" &&
             eval "$FC $PKG_FFLAGS $FCFLAGS $candidate \
                 -c conftest_heap.f90 -o conftest_diagnostic.o" \
                 >diagnostic-suppressed.log 2>&1 &&
@@ -85,7 +85,7 @@ fi
 # the option instead of identifying compilers by name.
 printf '%s' 'checking whether the Fortran compiler supports heap arrays... '
 if (
-    cd "$configure_tmp"
+    cd "$configure_tmp" &&
     eval "$FC $PKG_FFLAGS $FCFLAGS -heap-arrays \
         -c conftest_heap.f90 -o conftest_heap.o" \
         >heap-arrays.log 2>&1
@@ -112,25 +112,33 @@ cat > "$configure_tmp/conftest.cpp" <<'EOF'
 #include <quadmath.h>
 #include <complex>
 
-int main() {
+int main(int argc, char**) {
+    const __float128 argument = static_cast<__float128>(argc);
+    __float128 sine, cosine;
+    sincosq(argument, &sine, &cosine);
     std::complex<__float128> numerator(
-        static_cast<__float128>(1), static_cast<__float128>(2));
+        jnq(1, argument), sqrtq(argument));
     std::complex<__float128> denominator(
-        static_cast<__float128>(3), static_cast<__float128>(4));
+        cosine + powq(argument, static_cast<__float128>(2)), sine);
     const std::complex<__float128> result = numerator / denominator;
-    return result.real() == static_cast<__float128>(0);
+    return finiteq(result.real()) ? 0 : 1;
 }
 EOF
 
 printf '%s' 'checking for a compatible native binary128 C++/Fortran backend... '
 if test "${ACOUSTICTS_DISABLE_QUAD:-0}" != 1 && (
-    cd "$configure_tmp"
+    cd "$configure_tmp" &&
     eval "$FC $PKG_FFLAGS $FCFLAGS $fc_heap_flags \
-        -cpp -c param_quad.f90 -o param_quad.o" >fortran.log 2>&1
+        -cpp -c param_quad.f90 -o param_quad.o" >fortran.log 2>&1 &&
     eval "$FC $PKG_FFLAGS $FCFLAGS $fc_heap_flags $fc_prolate_flags \
         -cpp -DUSE_QUAD \
-        -c prolate_swf.f90 -o prolate_swf_quad.o" >>fortran.log 2>&1
-    eval "$CXX17 $CXX17STD $CXX17FLAGS -c conftest.cpp -o conftest.o" >cxx.log 2>&1
+        -c prolate_swf.f90 -o prolate_swf_quad.o" >>fortran.log 2>&1 &&
+    eval "$CXX17 $CXX17STD $CXX17FLAGS -c conftest.cpp -o conftest.o" >cxx.log 2>&1 &&
+    LDFLAGS=${LDFLAGS-$("$r_command" CMD config LDFLAGS)} &&
+    FLIBS=${FLIBS-$("$r_command" CMD config FLIBS)} &&
+    # Link the actual quad objects with R's runtime libraries without running the probe.
+    eval "$CXX17 $CXX17STD $CXX17FLAGS $LDFLAGS conftest.o \
+        param_quad.o prolate_swf_quad.o $FLIBS -o conftest" >>cxx.log 2>&1
 ); then
     quad_objects='param_quad.o prolate_swf_quad.o'
     quad_cppflags=-DACOUSTICTS_HAVE_QUADMATH=1
