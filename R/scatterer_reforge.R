@@ -1676,6 +1676,17 @@ setMethod(
       )
     }
     methods::slot(object, "shape_parameters")$radius <- max(radii, na.rm = TRUE)
+    # Scale stored prolate semiaxes alongside the unchanged sampled profile ====
+    if (identical(shape$shape, "ProlateSpheroid") && !is.null(body_scales)) {
+      if ("semimajor_length" %in% names(shape)) {
+        methods::slot(object, "shape_parameters")$semimajor_length <-
+          shape$semimajor_length * unname(body_scales["length"])
+      }
+      if ("semiminor_length" %in% names(shape)) {
+        methods::slot(object, "shape_parameters")$semiminor_length <-
+          shape$semiminor_length * unname(body_scales["radius"])
+      }
+    }
     return(object)
   }
 )

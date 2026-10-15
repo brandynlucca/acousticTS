@@ -82,6 +82,60 @@
   abs(diff(range(x_vals, na.rm = TRUE)))
 }
 
+#' Resolve exact semiaxes for the prolate modal-series backends
+#' @param shape_parameters Stored prolate shape metadata.
+#' @return Scalar semiaxes, spheroidal surface coordinate, and focal distance.
+#' @keywords internal
+#' @noRd
+.prolate_spheroidal_geometry <- function(shape_parameters) {
+  # Fall back to sampled geometry only when semiaxis metadata is absent ========
+  if ("semimajor_length" %in% names(shape_parameters)) {
+    semimajor_length <- shape_parameters$semimajor_length
+  } else {
+    semimajor_length <- shape_parameters$length
+    if (is.numeric(semimajor_length)) {
+      semimajor_length <- semimajor_length / 2
+    }
+  }
+  semiminor_length <- if ("semiminor_length" %in% names(shape_parameters)) {
+    shape_parameters$semiminor_length
+  } else {
+    shape_parameters$radius
+  }
+
+  # Reject invalid supplied semiaxes before considering spheroidal coordinates =
+  valid_axis <- function(value) {
+    is.numeric(value) && !is.complex(value) && length(value) == 1L &&
+      is.finite(value) && value > 0
+  }
+  if (!valid_axis(semimajor_length) || !valid_axis(semiminor_length) ||
+    semiminor_length >= semimajor_length) {
+    stop(
+      "Prolate spheroidal coordinates require finite scalar semiaxes with ",
+      "0 < b < a. Use a Sphere object for an exact sphere.",
+      call. = FALSE
+    )
+  }
+
+  # Preserve the existing arithmetic after resolving the exact semiaxes ========
+  xi <- 1 / sqrt(1 - (semiminor_length / semimajor_length)^2)
+  q <- semimajor_length / xi
+  if (!is.finite(xi) || xi <= 1 || !is.finite(q) || q <= 0) {
+    stop(
+      "Prolate geometry is not representable by finite spheroidal ",
+      "coordinates with xi > 1.",
+      call. = FALSE
+    )
+  }
+
+  list(
+    semimajor_length = semimajor_length,
+    semiminor_length = semiminor_length,
+    xi = xi,
+    q = q
+  )
+}
+
 #' Resolve centerline z coordinates from a position matrix or body list
 #' @param position_matrix Numeric position matrix.
 #' @param body Body list containing an \code{rpos} matrix.
