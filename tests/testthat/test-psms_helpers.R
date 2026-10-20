@@ -32,7 +32,7 @@ test_that("prolate coordinates preserve exact semiaxes and legacy metadata", {
 
   # Coordinate representation does not certify subsequent radial accuracy ======
   expect_error(geometry(list(semimajor_length = 1, semiminor_length = 2^-27)),
-    "R input arithmetic")
+    "not representable by finite spheroidal coordinates")
   near_sphere <- geometry(list(semimajor_length = 1,
     semiminor_length = 1 - .Machine$double.eps / 2))
   expect_identical(near_sphere$xi, 2^26)
@@ -170,6 +170,23 @@ psms_enlarged_reference <- function(acoustics, evaluate, tolerance = 1e-12,
   list(field = more_orders, acoustics = enlarged)
 }
 
+# Retained T-matrix evaluation supplies an independent fixed-support reference =
+psms_fixed_reference <- function(acoustics, body, medium, boundary_method,
+                                 n_integration, precision, adaptive = FALSE) {
+  stopifnot(!adaptive)
+  acousticTS:::prolate_spheroid_tmatrix_cpp(acoustics, body, medium,
+    gauss_legendre(n_integration, -1, 1), precision, boundary_method)$f_scat
+}
+
+# Converge liquid references independently of adaptive stopping ================
+psms_liquid_enlarged_reference <- function(acoustics, body, medium) {
+  psms_enlarged_reference(acoustics, function(retained) {
+    acousticTS:::prolate_spheroid_fbs(retained, body, medium,
+      list(nodes = numeric(), weights = numeric()), precision = "quad",
+      Amn_method = "Amn_fluid_coefficients", adaptive = FALSE)
+  }, axial = body$theta_body %in% c(0, pi))$field
+}
+
 test_that("quad radial overflow at the R boundary is not misclassified as missing", {
   skip_if_not(acousticTS:::.quad_precision_available())
   xi <- 0.07 / sqrt(0.07^2 - 0.01^2)
@@ -191,29 +208,29 @@ test_that("quad radial overflow at the R boundary is not misclassified as missin
   }
 })
 
-test_that("PSMS selects coefficient overlaps for full gas and liquid", {
+test_that("PSMS preserves liquid quadrature and gas coefficient overlaps", {
   object <- fls_generate(prolate_spheroid(length_body = 0.14, radius_body = 0.01),
     density_body = 1028.9, sound_speed_body = 1480.3)
   initialize <- function(...) acousticTS:::psms_initialize(object, 70000, ...)
   liquid <- initialize()
   expect_identical(liquid@model_parameters$PSMS$parameters$Amn_method,
-    "Amn_fluid_coefficients")
+    "Amn_fluid")
   gas <- initialize(boundary = "gas_filled")
   expect_identical(gas@model_parameters$PSMS$parameters$Amn_method, "Amn_fluid_gas")
   simplified <- initialize(simplify_Amn = TRUE)
   expect_identical(simplified@model_parameters$PSMS$parameters$Amn_method,
     "Amn_fluid_simplify")
   expect_true(acousticTS:::.psms_is_full_fluid_method("Amn_fluid_coefficients"))
-  expect_identical(acousticTS:::.psms_Amn_method("liquid_filled", 1, "quad"),
+  expect_identical(acousticTS:::.psms_Amn_method("liquid_filled", 1),
     "Amn_fluid_simplify")
-  expect_identical(acousticTS:::.psms_Amn_method("liquid_filled", 0, "quad"),
-    "Amn_fluid_coefficients")
-  expect_identical(acousticTS:::.psms_Amn_method("liquid_filled", NA, "quad"),
+  expect_identical(acousticTS:::.psms_Amn_method("liquid_filled", 0),
+    "Amn_fluid")
+  expect_identical(acousticTS:::.psms_Amn_method("liquid_filled", NA),
     NA)
   if (acousticTS:::.quad_precision_available()) {
     coefficients <- initialize(precision = "quad")
     expect_identical(coefficients@model_parameters$PSMS$parameters$Amn_method,
-      "Amn_fluid_coefficients")
+      "Amn_fluid")
     simplified_quad <- initialize(precision = "quad", simplify_Amn = TRUE)
     expect_identical(simplified_quad@model_parameters$PSMS$parameters$Amn_method,
       "Amn_fluid_simplify")
@@ -241,7 +258,7 @@ test_that("full liquid PSMS retains the converged axial field", {
       enlarged <- inputs$parameters$acoustics
       enlarged$m_max <- enlarged$m_max + 16L
       enlarged$n_max <- enlarged$n_max + 16L
-      field <- acousticTS:::.prolate_spheroidal_kernels_fixed(
+      field <- psms_fixed_reference(
         acoustics = enlarged, body = inputs$body, medium = inputs$medium,
         boundary_method = inputs$parameters$Amn_method,
         n_integration = 96L, precision = precision, adaptive = FALSE)
@@ -250,7 +267,42 @@ test_that("full liquid PSMS retains the converged axial field", {
   }
 })
 
-test_that("quad liquid coefficient overlaps preserve the full quadrature field", {
+test_that("automatic liquid integration resolves the high-size overlap integrals", {
+  skip_if_not(acousticTS:::.quad_precision_available())
+  cases <- data.frame(h0 = c(90, 180, 120), angle = c(0, 0, 37),
+    points = c(192L, 384L, 192L))
+  for (index in seq_len(nrow(cases))) {
+    selected <- cases[index, ]
+    object <- fls_generate(
+      prolate_spheroid(length_body = 0.14, radius_body = 0.01),
+      density_body = 1028.9, sound_speed_body = 1480.3,
+      theta_body = selected$angle * pi / 180)
+    frequency <- selected$h0 * 1477.3 / (2 * pi * sqrt(0.07^2 - 0.01^2))
+    evaluate <- function(adaptive, points = NULL) {
+      target_strength(object, frequency, "psms", boundary = "liquid_filled",
+        precision = "quad", adaptive = adaptive, n_integration = points,
+        density_sw = 1026.8, sound_speed_sw = 1477.3)
+    }
+    reference <- evaluate(FALSE, selected$points)
+    fixed <- evaluate(FALSE)
+    adapted <- evaluate(TRUE)
+    expect_identical(reference@model_parameters$PSMS$parameters$n_integration,
+      selected$points)
+    expect_true(is.na(fixed@model_parameters$PSMS$parameters$n_integration))
+    expect_equal(fixed@model_parameters$PSMS$parameters$acoustics$n_max,
+      reference@model_parameters$PSMS$parameters$acoustics$n_max)
+    expect_lt(Mod(fixed@model$PSMS$f_bs - reference@model$PSMS$f_bs) /
+      Mod(reference@model$PSMS$f_bs), 1e-12)
+    # Check adaptive TS against independently enlarged modal support ===========
+    inputs <- adapted@model_parameters$PSMS
+    enlarged <- psms_liquid_enlarged_reference(inputs$parameters$acoustics,
+      inputs$body, inputs$medium)
+    expect_lte(max(abs(20 * log10(Mod(adapted@model$PSMS$f_bs) /
+      Mod(enlarged)))), 1e-8)
+  }
+})
+
+test_that("quad liquid quadrature and adaptive controls retain numerical agreement", {
   skip_if_not(acousticTS:::.quad_precision_available())
   for (angle in c(90, 37)) {
     object <- fls_generate(prolate_spheroid(length_body = 0.14, radius_body = 0.01),
@@ -261,27 +313,39 @@ test_that("quad liquid coefficient overlaps preserve the full quadrature field",
         n_integration = n_integration, adaptive = adaptive,
         density_sw = 1026.8, sound_speed_sw = 1477.3)
     }
-    coefficients <- evaluate()
-    inputs <- coefficients@model_parameters$PSMS
-    evaluate_reference <- function(acoustics, order = 192L) {
-      acousticTS:::.prolate_spheroidal_kernels_fixed(
+    fixed <- evaluate()
+    inputs <- fixed@model_parameters$PSMS
+    evaluate_reference <- function(acoustics, order = 96L) {
+      psms_fixed_reference(
         acoustics = acoustics, body = inputs$body, medium = inputs$medium,
         boundary_method = "Amn_fluid", n_integration = order,
         precision = "quad", adaptive = FALSE)
     }
-    reference <- psms_enlarged_reference(inputs$parameters$acoustics,
-      evaluate_reference)
-    more_nodes <- evaluate_reference(reference$acoustics, 256L)
-    expect_lt(max(Mod(more_nodes - reference$field) / Mod(more_nodes)), 1e-12)
-    expect_lt(max(Mod(coefficients@model$PSMS$f_bs - reference$field) /
-      Mod(reference$field)), 1e-12)
-    expect_identical(coefficients@model_parameters$PSMS$parameters$Amn_method,
-      "Amn_fluid_coefficients")
-    # Coefficient overlaps retain the same modes without angular quadrature ====
-    without_quadrature <- evaluate(n_integration = 8L, adaptive = TRUE)
-    expect_identical(without_quadrature@model$PSMS$f_bs, coefficients@model$PSMS$f_bs)
-    expect_identical(without_quadrature@model_parameters$PSMS$parameters$acoustics,
-      coefficients@model_parameters$PSMS$parameters$acoustics)
+    # Separate quadrature stability from agreement at prescribed modal limits ==
+    reference <- evaluate_reference(inputs$parameters$acoustics)
+    more_nodes <- evaluate_reference(inputs$parameters$acoustics, 128L)
+    expect_lt(max(Mod(more_nodes - reference) / Mod(more_nodes)), 1e-12)
+    expect_lt(max(Mod(fixed@model$PSMS$f_bs - reference) /
+      Mod(reference)), 1e-12)
+    expect_identical(fixed@model_parameters$PSMS$parameters$Amn_method,
+      "Amn_fluid")
+    # Explicit counts remain effective when adaptive quadrature is disabled ====
+    denser <- evaluate(n_integration = 128L)
+    expect_identical(denser@model_parameters$PSMS$parameters$n_integration, 128L)
+    expect_lt(max(Mod(denser@model$PSMS$f_bs - fixed@model$PSMS$f_bs) /
+      Mod(fixed@model$PSMS$f_bs)), 1e-12)
+    # Adapt quadrature and outgoing tails while retaining full coupling ========
+    expect_warning(adapted <- evaluate(n_integration = 8L, adaptive = TRUE),
+      "'n_integration' is ignored when 'adaptive = TRUE'")
+    expect_true(is.na(adapted@model_parameters$PSMS$parameters$n_integration))
+    # Check adaptive TS against independently enlarged modal support ===========
+    enlarged <- psms_liquid_enlarged_reference(inputs$parameters$acoustics,
+      inputs$body, inputs$medium)
+    expect_lte(max(abs(20 * log10(Mod(adapted@model$PSMS$f_bs) /
+      Mod(enlarged)))), 1e-8)
+    # Never reuse incomplete factors left by an adaptive solve =================
+    repeated <- evaluate()
+    expect_identical(repeated@model$PSMS$f_bs, fixed@model$PSMS$f_bs)
   }
 })
 
@@ -301,18 +365,18 @@ test_that("quad liquid overlaps agree across aspect ratios and material contrast
       density_sw = 1026.8, sound_speed_sw = 1477.3)
     inputs <- fit@model_parameters$PSMS
     expect_true(all(is.finite(fit@model$PSMS$f_bs)))
-    evaluate_reference <- function(acoustics, order = 192L) {
-      acousticTS:::.prolate_spheroidal_kernels_fixed(
+    evaluate_reference <- function(acoustics, order = 96L) {
+      psms_fixed_reference(
         acoustics = acoustics, body = inputs$body, medium = inputs$medium,
         boundary_method = "Amn_fluid", n_integration = order,
         precision = "quad", adaptive = FALSE)
     }
-    reference <- psms_enlarged_reference(inputs$parameters$acoustics,
-      evaluate_reference)
-    more_nodes <- evaluate_reference(reference$acoustics, 256L)
-    expect_lt(max(Mod(more_nodes - reference$field) / Mod(more_nodes)), 1e-12)
-    expect_lt(max(Mod(fit@model$PSMS$f_bs - reference$field) /
-      Mod(reference$field)), 1e-12)
+    # Match modal support while checking quadrature stability independently ====
+    reference <- evaluate_reference(inputs$parameters$acoustics)
+    more_nodes <- evaluate_reference(inputs$parameters$acoustics, 128L)
+    expect_lt(max(Mod(more_nodes - reference) / Mod(more_nodes)), 1e-12)
+    expect_lt(max(Mod(fit@model$PSMS$f_bs - reference) /
+      Mod(reference)), 1e-12)
   }
 })
 
@@ -344,11 +408,22 @@ test_that("full gas coefficient overlaps agree with converged quad quadrature", 
     density_fluid = 1.24, sound_speed_fluid = 345
   )
   # Quad M=64/80, N=320/400 and 512/640-node enlargements agree ================
-  result <- target_strength(
-    object, 200e3, "psms", boundary = "gas_filled", precision = "quad",
+  initialized <- acousticTS:::psms_initialize(
+    object, 200e3, boundary = "gas_filled", precision = "quad",
     density_sw = 1026.8, sound_speed_sw = 1477.3
   )
-  expect_equal(result@model$PSMS$TS, -29.0909526869064, tolerance = 1e-10)
+  # Evaluate the independently verified converged support explicitly ===========
+  inputs <- initialized@model_parameters$PSMS
+  acoustics <- inputs$parameters$acoustics
+  acoustics$m_max <- 64L
+  acoustics$n_max <- 320L
+  field <- acousticTS:::prolate_spheroid_fbs(
+    acoustics, inputs$body, inputs$medium,
+    list(nodes = numeric(), weights = numeric()), "quad", "Amn_fluid_gas",
+    adaptive = FALSE
+  )
+  target <- 20 * log10(Mod(-2i / acoustics$k_sw * field))
+  expect_equal(target, -29.0909526869064, tolerance = 1e-10)
 
   # Full gas overlaps do not depend on the liquid quadrature setting ===========
   coarse <- target_strength(
@@ -362,11 +437,41 @@ test_that("full gas coefficient overlaps agree with converged quad quadrature", 
   expect_identical(coarse@model$PSMS$TS, fine@model$PSMS$TS)
 })
 
-test_that("full fluid refinement accepts equal initial order and degree limits", {
+
+test_that("quad full gas recovers the converged axial field at h0 = 120", {
   skip_if_not(acousticTS:::.quad_precision_available())
-  expected <- c(liquid_filled = -77.20002046221784,
-    gas_filled = -28.634043251185428)
-  for (boundary in names(expected)) {
+  semimajor <- 0.07
+  semiminor <- 0.01
+  frequency <- 120 * 1477.3 / (2 * pi * sqrt(semimajor^2 - semiminor^2))
+  wave_number <- 2 * pi * frequency / 1477.3
+  object <- gas_generate(
+    prolate_spheroid(length_body = 2 * semimajor, radius_body = semiminor),
+    density_fluid = 1.24, sound_speed_fluid = 345, theta_body = 0
+  )
+  # Native quad N=621 and N=776 agree in the complete complex field ============
+  reference_field <- complex(
+    real = 0.182688116344343582053401185024321438,
+    imaginary = 0.657194044775623801719392956161668946
+  )
+  reference_amplitude <- -2i / wave_number * reference_field
+  for (adaptive in c(FALSE, TRUE)) {
+    result <- target_strength(
+      object, frequency, "psms", boundary = "gas_filled", precision = "quad",
+      simplify_Amn = FALSE, adaptive = adaptive,
+      density_sw = 1026.8, sound_speed_sw = 1477.3
+    )
+    # Convert the returned modal sum to the physical scattering amplitude ======
+    amplitude <- -2i / wave_number * result@model$PSMS$f_bs
+    expect_length(amplitude, 1L)
+    expect_true(all(is.finite(amplitude)))
+    expect_lt(Mod(amplitude - reference_amplitude) / Mod(reference_amplitude),
+      1e-12)
+  }
+})
+
+test_that("full fluid solves retain equal prescribed order and degree limits", {
+  skip_if_not(acousticTS:::.quad_precision_available())
+  for (boundary in c("liquid_filled", "gas_filled")) {
     shape <- prolate_spheroid(length_body = 0.14, radius_body = 0.01)
     object <- if (boundary == "gas_filled") {
       gas_generate(shape, density_fluid = 1.24, sound_speed_fluid = 345)
@@ -385,8 +490,22 @@ test_that("full fluid refinement accepts equal initial order and degree limits",
       acoustics, model$body, model$medium, model$parameters$Amn_method,
       n_integration = 96, precision = "quad", adaptive = FALSE
     )
+    # Match the prescribed support in the independent retained T-matrix ========
+    reference <- psms_fixed_reference(
+      acoustics, model$body, model$medium, model$parameters$Amn_method,
+      n_integration = if (boundary == "gas_filled") 192L else 96L,
+      precision = "quad"
+    )
+    if (boundary == "gas_filled") {
+      denser <- psms_fixed_reference(
+        acoustics, model$body, model$medium, model$parameters$Amn_method,
+        n_integration = 256L, precision = "quad"
+      )
+      expect_lt(Mod(denser - reference) / Mod(denser), 1e-12)
+    }
     actual <- 20 * log10(Mod(-2i / acoustics$k_sw * field))
-    expect_equal(as.numeric(actual), unname(expected[boundary]), tolerance = 2e-9)
+    expected <- 20 * log10(Mod(-2i / acoustics$k_sw * reference))
+    expect_equal(as.numeric(actual), as.numeric(expected), tolerance = 2e-9)
   }
 })
 
@@ -512,32 +631,29 @@ test_that("quad monostatic kernels agree with retained bistatic amplitudes", {
       "Amn_fixed_rigid", "Amn_pressure_release", "Amn_fluid",
       "Amn_fluid_gas", "Amn_fluid_simplify"
     )) {
-      # Only automatically refined methods require enlarged fixed references ===
-      if (method %in% c("Amn_fixed_rigid", "Amn_pressure_release", "Amn_fluid_gas")) {
-        evaluate_reference <- function(limits, order = 128L) {
-          acousticTS:::prolate_spheroid_tmatrix_cpp(
-            limits, body, medium, gauss_legendre(order, -1, 1), "quad", method
-          )$f_scat
-        }
-        reference <- psms_enlarged_reference(acoustics, evaluate_reference,
-          axial = angle == 0)
-        retained <- reference$field
-        if (method == "Amn_fluid_gas") {
-          more_nodes <- evaluate_reference(reference$acoustics, 192L)
-          expect_lt(Mod(more_nodes - retained) / Mod(more_nodes), 1e-12)
-        }
-      } else {
-        retained <- acousticTS:::prolate_spheroid_tmatrix_cpp(
-          acoustics, body, medium, quadrature, "quad", method
+      # Compare the two implementations at identical prescribed modal limits ===
+      retained <- acousticTS:::prolate_spheroid_tmatrix_cpp(
+        acoustics, body, medium, quadrature, "quad", method
+      )$f_scat
+      if (method == "Amn_fluid_gas") {
+        more_nodes <- acousticTS:::prolate_spheroid_tmatrix_cpp(
+          acoustics, body, medium, gauss_legendre(192L, -1, 1), "quad", method
         )$f_scat
+        expect_lt(Mod(more_nodes - retained) / Mod(more_nodes), 1e-12)
       }
       for (adaptive in c(FALSE, TRUE)) {
         actual <- acousticTS:::prolate_spheroid_fbs(
           acoustics, body, medium, quadrature, "quad", method,
           adaptive = adaptive
         )
-        expect_equal(actual, retained, tolerance = 1e-7,
-          info = paste(method, angle, adaptive))
+        if (method == "Amn_fluid" && adaptive) {
+          # Adaptive liquid selects its support against the TS target ==========
+          enlarged <- psms_liquid_enlarged_reference(acoustics, body, medium)
+          expect_lte(abs(20 * log10(Mod(actual) / Mod(enlarged))), 1e-8)
+        } else {
+          expect_equal(actual, retained, tolerance = 1e-7,
+            info = paste(method, angle, adaptive))
+        }
       }
     }
   }
@@ -556,16 +672,11 @@ test_that("near-backscatter azimuths retain their bistatic dependence", {
   actual <- acousticTS:::prolate_spheroid_fbs(
     acoustics, body, medium, quadrature, "double", "Amn_pressure_release"
   )
-  # Resolve the larger transverse incident support before checking stability ===
-  reference_limits <- acoustics
-  reference_limits$m_max <- 36L
-  reference_limits$n_max <- 51L
-  reference <- psms_enlarged_reference(reference_limits, function(limits) {
-    acousticTS:::prolate_spheroid_tmatrix_cpp(
-      limits, body, medium, quadrature, "double", "Amn_pressure_release"
-    )$f_scat
-  }, tolerance = 1e-13)
-  expect_equal(actual, reference$field, tolerance = 1e-13)
+  # Hold modal support fixed to isolate the specified receiver direction =======
+  reference <- acousticTS:::prolate_spheroid_tmatrix_cpp(
+    acoustics, body, medium, quadrature, "double", "Amn_pressure_release"
+  )$f_scat
+  expect_equal(actual, reference, tolerance = 1e-13)
 })
 
 test_that("axial spheroidal scattering agrees under reversal", {
@@ -796,28 +907,6 @@ test_that(
       gas_promoted$acoustics$n_max >= liquid_unchanged$acoustics$n_max
     ))
 
-    adaptive_double <- acousticTS:::.psms_adaptive_n_integration(
-      chi_sw = c(1, 400),
-      chi_body = c(4, 900),
-      m_max = c(3, 18),
-      n_max = c(8, 40),
-      precision = "double"
-    )
-    adaptive_quad <- acousticTS:::.psms_adaptive_n_integration(
-      chi_sw = c(1, 400),
-      chi_body = c(4, 900),
-      m_max = c(3, 18),
-      n_max = c(8, 40),
-      precision = "quad"
-    )
-
-    expect_type(adaptive_double, "integer")
-    expect_true(all(adaptive_double %% 8L == 0L))
-    expect_true(all(adaptive_double >= 24L & adaptive_double <= 96L))
-    expect_true(all(adaptive_quad %% 8L == 0L))
-    expect_true(all(adaptive_quad >= 32L & adaptive_quad <= 96L))
-    expect_true(all(adaptive_quad >= adaptive_double))
-
     skip_if_not(
       acousticTS:::.quad_precision_available(),
       "native quad precision is unavailable"
@@ -887,112 +976,141 @@ test_that(
   }
 )
 
-test_that(
-  paste0(
-    "psms adaptive kernel helpers group repeated quadrature orders and ",
-    "dispatch cleanly"
-  ),
-  {
-    calls <- list()
-    acoustics <- data.frame(
-      frequency = c(38000, 70000, 120000),
-      chi_sw = c(1, 2, 3),
-      chi_body = c(1, 2, 3),
-      m_max = c(2, 2, 2),
-      n_max = c(4, 4, 4)
-    )
-
-    local({
-      testthat::local_mocked_bindings(
-        .psms_adaptive_n_integration = function(...) c(24L, 32L, 24L),
-        .prolate_spheroidal_kernels_fixed = function(acoustics,
-                                                     body,
-                                                     medium,
-                                                     boundary_method,
-                                                     n_integration,
-                                                     precision,
-                                                     adaptive) {
-          calls[[length(calls) + 1L]] <<- list(
-            frequencies = acoustics$frequency,
-            n_integration = n_integration,
-            precision = precision,
-            adaptive = adaptive,
-            boundary_method = boundary_method
-          )
-          rep(as.complex(n_integration), nrow(acoustics))
-        },
-        .package = "acousticTS"
-      )
-
-      grouped <- acousticTS:::.prolate_spheroidal_kernels_adaptive(
-        acoustics = acoustics,
-        body = list(),
-        medium = data.frame(),
-        boundary_method = "Amn_fluid",
-        precision = "double",
-        adaptive = TRUE
-      )
-
-      expect_equal(as.vector(grouped), c(24 + 0i, 32 + 0i, 24 + 0i))
-      expect_equal(attr(grouped, "n_integration"), c(24L, 32L, 24L))
-      expect_length(calls, 2)
-      expect_equal(
-        sort(vapply(calls, `[[`, integer(1), "n_integration")),
-        c(24L, 32L)
-      )
-    })
-
-    local({
-      testthat::local_mocked_bindings(
-        .prolate_spheroidal_kernels_adaptive = function(...) rep(1 + 2i, 2),
-        .prolate_spheroidal_kernels_fixed = function(acoustics,
-                                                     body,
-                                                     medium,
-                                                     boundary_method,
-                                                     n_integration,
-                                                     precision,
-                                                     adaptive) {
-          structure(
-            rep(2 + 0i, nrow(acoustics)),
-            n_integration = n_integration,
-            adaptive = adaptive,
-            precision = precision,
-            boundary_method = boundary_method
-          )
-        },
-        .package = "acousticTS"
-      )
-
-      adaptive_out <- acousticTS:::prolate_spheroidal_kernels(
-        acoustics = acoustics[1:2, , drop = FALSE],
-        body = list(),
-        medium = data.frame(),
-        boundary_method = "Amn_fluid",
-        precision = "double",
-        adaptive = TRUE
-      )
-      adaptive_out_gas <- acousticTS:::prolate_spheroidal_kernels(
-        acoustics = acoustics[1:2, , drop = FALSE],
-        body = list(),
-        medium = data.frame(),
-        boundary_method = "Amn_fluid_gas",
-        precision = "double",
-        adaptive = TRUE
-      )
-      fixed_out <- acousticTS:::prolate_spheroidal_kernels(
-        acoustics = acoustics[1:2, , drop = FALSE],
-        body = list(),
-        medium = data.frame(),
-        boundary_method = "Amn_fixed_rigid",
-        n_integration = NA_integer_,
-        precision = "quad",
-        adaptive = FALSE
-      )
-
-      expect_equal(adaptive_out, rep(1 + 2i, 2))
-      expect_equal(as.vector(adaptive_out_gas), rep(2 + 0i, 2))
-      expect_identical(attr(adaptive_out_gas, "n_integration"), 96)
-      expect_equal(as.vector(fixed_out), rep(2 + 0i, 2))
-    })
+test_that("PSMS rejects unrepresentable fixed quadrature counts", {
+  object <- fls_generate(prolate_spheroid(length_body = 0.14, radius_body = 0.01),
+    density_body = 1028.9, sound_speed_body = 1480.3)
+  for (points in c(Inf, -Inf, NaN, NA_real_, 0, 1.5,
+    as.double(.Machine$integer.max) + 1, 1e100)) {
+    expect_error(acousticTS:::psms_initialize(object, 12000,
+      boundary = "liquid_filled", adaptive = FALSE, n_integration = points),
+      "'n_integration' must be a single positive integer within R's integer range")
   }
-)
+})
+
+test_that("liquid quadrature controls reject insufficient fixed integration", {
+  object <- fls_generate(prolate_spheroid(semimajor_length = 0.07,
+    semiminor_length = 0.01), density_body = 1028.9,
+    sound_speed_body = 1480.3, theta_body = 37 * pi / 180)
+  precisions <- c("double", if (acousticTS:::.quad_precision_available()) "quad")
+  for (precision in precisions) {
+    evaluate <- function(points, adaptive) {
+      target_strength(object, 12000, "psms", boundary = "liquid_filled",
+        precision = precision, n_integration = points, adaptive = adaptive,
+        density_sw = 1026.8, sound_speed_sw = 1477.3)
+    }
+    expect_error(evaluate(1L, FALSE), "[Qq]uadrature")
+    fixed <- evaluate(96L, FALSE)
+    # Compare integration methods without adaptive modal-tail truncation =======
+    inputs <- fixed@model_parameters$PSMS
+    coefficients <- acousticTS:::prolate_spheroid_fbs(
+      inputs$parameters$acoustics, inputs$body, inputs$medium,
+      list(nodes = numeric(), weights = numeric()), precision,
+      "Amn_fluid_coefficients", adaptive = FALSE
+    )
+    expect_lt(Mod(coefficients - fixed@model$PSMS$f_bs) /
+      Mod(fixed@model$PSMS$f_bs), if (precision == "quad") 1e-12 else 1e-8)
+    # Requested quadrature counts must not affect adaptive integration =========
+    expect_warning(adapted <- evaluate(1L, TRUE),
+      "'n_integration' is ignored when 'adaptive = TRUE'")
+    expect_warning(adapted_again <- evaluate(96L, TRUE),
+      "'n_integration' is ignored when 'adaptive = TRUE'")
+    expect_true(all(is.finite(adapted@model$PSMS$f_bs)))
+    expect_true(is.na(adapted@model_parameters$PSMS$parameters$n_integration))
+    expect_true(is.na(adapted_again@model_parameters$PSMS$parameters$n_integration))
+    expect_identical(adapted@model$PSMS$f_bs, adapted_again@model$PSMS$f_bs)
+  }
+})
+
+
+test_that("adaptive quad liquid support meets TS and complex targets", {
+  skip_if_not(acousticTS:::.quad_precision_available())
+  semimajor <- 0.01
+  semiminor <- 0.75 * semimajor
+  sound_speed <- 1477.3
+  frequency <- 5 * sound_speed / (2 * pi * sqrt(semimajor^2 - semiminor^2))
+  object <- fls_generate(prolate_spheroid(semimajor_length = semimajor,
+    semiminor_length = semiminor), density_body = 1028.9,
+    sound_speed_body = 1480.3, theta_body = 89.999 * pi / 180)
+  optimized <- target_strength(object, frequency, "psms",
+    boundary = "liquid_filled", precision = "quad", adaptive = TRUE,
+    density_sw = 1026.8, sound_speed_sw = sound_speed)
+  inputs <- optimized@model_parameters$PSMS
+  # Enlarge both support directions without adaptive stopping ==================
+  enlarged <- inputs$parameters$acoustics
+  enlarged$m_max <- pmax(enlarged$m_max + 8L, 24L)
+  enlarged$n_max <- pmax(enlarged$n_max + 16L, 36L, enlarged$m_max)
+  reference <- acousticTS:::prolate_spheroid_fbs(
+    enlarged, inputs$body, inputs$medium,
+    list(nodes = numeric(), weights = numeric()), precision = "quad",
+    Amn_method = "Amn_fluid_coefficients", adaptive = FALSE)
+  reference_ts <- 20 * log10(Mod(-2i / enlarged$k_sw * reference))
+  expect_true(all(is.finite(optimized@model$PSMS$TS)))
+  expect_lte(max(abs(optimized@model$PSMS$TS - reference_ts)), 1e-8)
+  optimized_field <- optimized@model$PSMS$f_bs
+  expect_true(all(Mod(optimized_field - reference) <= 1e-18 +
+    1e-14 * Mod(reference)))
+})
+
+test_that("adaptive quad liquid returns the exact matched-medium solution", {
+  skip_if_not(acousticTS:::.quad_precision_available())
+  object <- fls_generate(prolate_spheroid(semimajor_length = 0.01,
+    semiminor_length = 0.0075), density_body = 1026.8,
+    sound_speed_body = 1477.3, theta_body = 0.37)
+  matched <- target_strength(object, 38000, "psms",
+    boundary = "liquid_filled", precision = "quad", adaptive = TRUE,
+    density_sw = 1026.8, sound_speed_sw = 1477.3)
+  expect_true(all(matched@model$PSMS$f_bs == 0i))
+  expect_identical(matched@model$PSMS$TS, -Inf)
+})
+
+
+test_that("adaptive quad hard boundaries match enlarged-support references", {
+  skip_if_not(acousticTS:::.quad_precision_available())
+  # Quad references use independently enlarged degree and order support ========
+  cases <- data.frame(
+    boundary = rep(c("fixed_rigid", "pressure_release"), 4L),
+    semimajor_m = rep(c(0.001, 0.01, 0.001, 0.01), each = 2L),
+    aspect_ratio = rep(c(100, 5, 1 / 0.9, 1 / 0.75),
+      each = 2L),
+    incidence_deg = rep(c(0, 45, 0.0001, 89.999), each = 2L),
+    frequency = rep(c(0x1.ae89d283d4291p+24,
+      0x1.d4aff795ee44ap+18,
+      0x1.07612b3284a0ep+19,
+      0x1.5b22dad00543ep+17), each = 2L),
+    reference_real = c(6.37998830762401526607560478301551386e-06,
+      -0.00231054766363223068713298784191789936,
+      -0.270303041864811095929197098942407886,
+      0.330896130822711613907144017486289914,
+      -0.359307021100057917449804245034194428,
+      0.483552953730301897755781437363595613,
+      -1.57653241517880346146415797755356448,
+      1.82190537750399140983966870507909978),
+    reference_imaginary = c(0.000783301731615198875682995259801178308,
+      -0.0633636064825864037530188103511905989,
+      0.0565510431422121736774288513736311321,
+      0.364658434424076755911778314881162379,
+      0.250208551116167601850576350633109049,
+      0.174753789240174688153480489535039548,
+      1.07772791206368720569079611274673828,
+      -0.557421921909752217543144402163310505)
+  )
+  for (index in seq_len(nrow(cases))) {
+    case <- cases[index, ]
+    object <- fls_generate(prolate_spheroid(length_body = 2 * case$semimajor_m,
+      radius_body = case$semimajor_m / case$aspect_ratio),
+      density_body = 1028.9, sound_speed_body = 1480.3,
+      theta_body = case$incidence_deg * pi / 180)
+    optimized <- target_strength(object, case$frequency, "psms",
+      boundary = case$boundary, precision = "quad", adaptive = TRUE,
+      density_sw = 1026.8, sound_speed_sw = 1477.3, phi_body = pi)
+    expected <- complex(real = case$reference_real,
+      imaginary = case$reference_imaginary)
+    actual <- optimized@model$PSMS$f_bs
+    wavenumber <- optimized@model_parameters$PSMS$parameters$acoustics$k_sw
+    expect_true(all(is.finite(actual)))
+    expect_lte(Mod(actual - expected), 1e-18 + 1e-14 * Mod(expected),
+      label = paste(case$boundary, "field error at", case$incidence_deg, "degrees"))
+    expect_lte(abs(optimized@model$PSMS$TS -
+      20 * log10(Mod(-2i / wavenumber * expected))), 1e-8)
+  }
+})
