@@ -1,7 +1,7 @@
 // ============================================================================
 // INCLUDES
 // ============================================================================
-// [[Rcpp::depends(RcppArmadillo)]]
+// [[Rcpp::depends(RcppArmadillo, BH)]]
 #include <RcppArmadillo.h>
 #include <Rcpp.h>
 #include <algorithm>
@@ -259,13 +259,59 @@ Rcpp::List Rmn_cpp(
 
 // ============================================================================
 #include "psms_backscatter.h"
-// Keep this translation unit dependent on the header-only PSMS solver changes
-// so Windows rebuilds the compiled wrapper when those headers change.
+
+// Dispatch modal support selection and full boundary solves.
+template<typename T>
+std::complex<T> psms_public_field(
+    int m_seed, int n_seed, T chi_sw, T chi_body, T xi,
+    T theta_body, T theta_scatter, T phi_body, T phi_scatter,
+    T density_body, T density_sw, const std::vector<T>& nodes,
+    const std::vector<T>& weights, const std::string& method,
+    bool backscatter, bool adaptive, bool vectorized
+) {
+    // Full solutions share packed native arithmetic in fixed and adaptive evaluations.
+    const bool fluid = method == "Amn_fluid_gas" ||
+        method == "Amn_fluid_coefficients" || method == "Amn_fluid";
+    const bool hard = method == "Amn_pressure_release" ||
+        method == "Amn_fixed_rigid";
+    if (fluid || hard) {
+        const auto incidence = psms_direction_from_angle(theta_body);
+        const auto reception = psms_direction_from_angle(theta_scatter);
+#if ACOUSTICTS_HAVE_QUADMATH
+        if constexpr (is_quad_precision_v<T>) {
+            // Adapt full-liquid backscatter without changing fixed integration or other boundaries.
+            if (adaptive && backscatter &&
+                    (method == "Amn_fluid" || method == "Amn_fluid_coefficients"))
+                return psms_adaptive_liquid_field(m_seed, n_seed, chi_sw, chi_body, xi,
+                    incidence, reception, phi_scatter - phi_body, density_body / density_sw);
+        }
+#endif
+        return psms_fixed_support_field<T>(m_seed, n_seed, chi_sw, chi_body, xi,
+            incidence, reception, phi_scatter - phi_body, density_body / density_sw,
+            backscatter, hard, method == "Amn_fixed_rigid", adaptive,
+            method == "Amn_fluid" ? &nodes : nullptr,
+            method == "Amn_fluid" ? &weights : nullptr,
+            method == "Amn_fluid_gas" && is_quad_precision_v<T>);
+    }
+    // Retain the selected diagonal approximation and its optional modal stopping.
+    return psms_fbs<T>(m_seed, n_seed, chi_sw, chi_body, xi,
+        theta_body, theta_scatter, phi_body, phi_scatter,
+        density_body, density_sw, nodes, weights, method,
+        backscatter, adaptive, vectorized);
+}
 
 // C++-R INTERFACE FUNCTION FOR PROLATE SPHEROID MODAL SERIES SOLUTION
 // ----------------------------------------------------------------------------
 // Based on the algorithm proposed by Furusawa (1988).
 // ============================================================================
+inline bool psms_public_backscatter_angles(double theta_body, double theta_scatter,
+        double phi_body, double phi_scatter) {
+    const double pi = std::acos(-1.0);
+    // Match the public monostatic construction exactly, preserving neighboring receiver angles.
+    return theta_scatter == pi - theta_body &&
+        (phi_scatter == phi_body + pi || phi_scatter == phi_body - pi);
+}
+
 // [[Rcpp::export]]
 Rcpp::ComplexVector prolate_spheroid_fbs(
     Rcpp::DataFrame acoustics,
@@ -291,16 +337,9 @@ Rcpp::ComplexVector prolate_spheroid_fbs(
     double phi_scatter = body["phi_scatter"];
     double density_body = body["density"];
 
-    // R supplies double-precision angles, even when the solver uses quad.
-    // Detect backscatter before promotion so rounding in pi cannot disable
-    // the monostatic kernels. Compare azimuth angles directly, since a cosine
-    // test loses first-order sensitivity close to pi.
-    const double angle_tolerance = 64 * std::numeric_limits<double>::epsilon();
-    const double pi_val = std::acos(-1.0);
-    const bool is_backscatter =
-        std::abs(theta_scatter - (pi_val - theta_body)) <= angle_tolerance &&
-        std::abs(std::abs(std::remainder(phi_scatter - phi_body, 2 * pi_val)) - pi_val)
-            <= angle_tolerance;
+    // Detect the exact R angle construction before promotion to the requested arithmetic.
+    const bool is_backscatter = psms_public_backscatter_angles(
+        theta_body, theta_scatter, phi_body, phi_scatter);
 
     // Extract the surrounding-medium density used in the boundary terms.
     double density_sw = medium["density"];
@@ -309,6 +348,9 @@ Rcpp::ComplexVector prolate_spheroid_fbs(
     // pathways.
     Rcpp::NumericVector nodes = integration_pts["nodes"];
     Rcpp::NumericVector weights = integration_pts["weights"];
+    // Reject unrepresentable quadrature dimensions before native copies or allocations.
+    if (nodes.size() >= INT_MAX || weights.size() >= INT_MAX)
+        Rcpp::stop("Fluid overlap quadrature exceeds the native integer range.");
 
     int n_freq = acoustics.nrows();
     std::vector<Rcomplex> f_bs_out(n_freq);
@@ -317,11 +359,22 @@ Rcpp::ComplexVector prolate_spheroid_fbs(
         std::vector<acousticts_quad_t> nodes_q(nodes.size()), weights_q(weights.size());
         for (int i = 0; i < nodes.size(); ++i) nodes_q[i] = static_cast<acousticts_quad_t>(nodes[i]);
         for (int i = 0; i < weights.size(); ++i) weights_q[i] = static_cast<acousticts_quad_t>(weights[i]);
+        // Refine known Gauss rules at the same requested order without changing arbitrary rules.
+        if (Amn_method == "Amn_fluid" && !adaptive &&
+                integration_pts.hasAttribute("acousticTS_gauss_legendre") &&
+                Rcpp::as<bool>(integration_pts.attr("acousticTS_gauss_legendre"))) {
+            if (nodes.size() < 1 || nodes.size() != weights.size() || nodes.size() >= INT_MAX)
+                Rcpp::stop("Prescribed fluid Gauss quadrature has invalid dimensions.");
+            psms_automatic::Quadrature<acousticts_quad_t> quadrature;
+            quadrature.prepare(static_cast<int>(nodes.size()));
+            nodes_q = std::move(quadrature.nodes);
+            weights_q = std::move(quadrature.weights);
+        }
         for (int f = 0; f < n_freq; ++f) {
             // Each frequency is independent, so the wrapper simply dispatches
             // one retained PSMS solve per frequency and stores the resulting
             // complex backscatter amplitude.
-            auto fbs = psms_fbs<acousticts_quad_t>(
+            auto fbs = psms_public_field<acousticts_quad_t>(
                 m_max[f], n_max[f],
                 static_cast<acousticts_quad_t>(chi_sw[f]),
                 static_cast<acousticts_quad_t>(chi_body[f]),
@@ -341,7 +394,7 @@ Rcpp::ComplexVector prolate_spheroid_fbs(
         std::vector<double> nodes_vec = Rcpp::as<std::vector<double>>(nodes);
         std::vector<double> weights_vec = Rcpp::as<std::vector<double>>(weights);
         for (int f = 0; f < n_freq; ++f) {
-            auto fbs = psms_fbs<double>(
+            auto fbs = psms_public_field<double>(
                 m_max[f], n_max[f],
                 chi_sw[f], chi_body[f], xi,
                 theta_body, theta_scatter, phi_body, phi_scatter,
@@ -430,13 +483,13 @@ Rcpp::List prolate_spheroid_tmatrix_cpp(
                 nodes_q, weights_q,
                 Amn_method
             );
-            auto smn_inc = compute_smn_matrix<acousticts_quad_t>(
+            auto smn_inc = compute_smn_direction_matrix<acousticts_quad_t>(
                 m_max[f], n_max[f], static_cast<acousticts_quad_t>(chi_sw[f]),
-                preccos(static_cast<acousticts_quad_t>(theta_body)), true
+                psms_direction_from_angle(static_cast<acousticts_quad_t>(theta_body))
             );
-            auto smn_scat = compute_smn_matrix<acousticts_quad_t>(
+            auto smn_scat = compute_smn_direction_matrix<acousticts_quad_t>(
                 m_max[f], n_max[f], static_cast<acousticts_quad_t>(chi_sw[f]),
-                preccos(static_cast<acousticts_quad_t>(theta_scatter)), true
+                psms_direction_from_angle(static_cast<acousticts_quad_t>(theta_scatter))
             );
             auto azimuth = compute_azimuth<acousticts_quad_t>(
                 m_max[f],
@@ -461,11 +514,11 @@ Rcpp::List prolate_spheroid_tmatrix_cpp(
                 m_max[f], n_max[f], chi_sw[f], chi_body[f], xi,
                 density_body, density_sw, nodes_vec, weights_vec, Amn_method
             );
-            auto smn_inc = compute_smn_matrix<double>(
-                m_max[f], n_max[f], chi_sw[f], preccos(theta_body), true
+            auto smn_inc = compute_smn_direction_matrix<double>(
+                m_max[f], n_max[f], chi_sw[f], psms_direction_from_angle(theta_body)
             );
-            auto smn_scat = compute_smn_matrix<double>(
-                m_max[f], n_max[f], chi_sw[f], preccos(theta_scatter), true
+            auto smn_scat = compute_smn_direction_matrix<double>(
+                m_max[f], n_max[f], chi_sw[f], psms_direction_from_angle(theta_scatter)
             );
             auto azimuth = compute_azimuth<double>(m_max[f], phi_body, phi_scatter);
 
@@ -535,8 +588,8 @@ std::complex<T> prolate_scattering_from_retained_blocks_single(
     int n_max = n_seq_last[n_seq_last.size() - 1];
 
     auto t_blocks = prolate_tmatrix_blocks_from_rcpp<T>(blocks);
-    auto smn_inc = compute_smn_matrix<T>(m_max, n_max, chi_sw, preccos(theta_body), true);
-    auto smn_scat = compute_smn_matrix<T>(m_max, n_max, chi_sw, preccos(theta_scatter), true);
+    auto smn_inc = compute_smn_direction_matrix<T>(m_max, n_max, chi_sw, psms_direction_from_angle(theta_body));
+    auto smn_scat = compute_smn_direction_matrix<T>(m_max, n_max, chi_sw, psms_direction_from_angle(theta_scatter));
     auto azimuth = compute_azimuth<T>(m_max, phi_body, phi_scatter);
     auto raw_sum = compute_fbs_from_tmatrix_blocks<T>(
         m_max, n_max, azimuth, smn_inc, smn_scat, t_blocks
@@ -563,13 +616,13 @@ Rcpp::ComplexMatrix prolate_scattering_grid_from_retained_blocks_single(
     int n_max = n_seq_last[n_seq_last.size() - 1];
 
     auto t_blocks = prolate_tmatrix_blocks_from_rcpp<T>(blocks);
-    auto smn_inc = compute_smn_matrix<T>(m_max, n_max, chi_sw, preccos(theta_body), true);
+    auto smn_inc = compute_smn_direction_matrix<T>(m_max, n_max, chi_sw, psms_direction_from_angle(theta_body));
 
-    std::vector<T> eta_scatter(theta_scatter.size());
+    std::vector<SpheroidalDirection<T>> receive_directions(theta_scatter.size());
     for (size_t i = 0; i < theta_scatter.size(); ++i) {
-        eta_scatter[i] = preccos(theta_scatter[i]);
+        receive_directions[i] = psms_direction_from_angle(theta_scatter[i]);
     }
-    auto smn_scat = compute_smn_matrices<T>(m_max, n_max, chi_sw, eta_scatter, true);
+    auto smn_scat = compute_smn_direction_matrices<T>(m_max, n_max, chi_sw, receive_directions);
 
     Rcpp::ComplexMatrix f_grid(theta_scatter.size(), phi_scatter.size());
     for (size_t i = 0; i < theta_scatter.size(); ++i) {
@@ -607,14 +660,14 @@ Rcpp::ComplexVector prolate_scattering_points_from_retained_blocks_single(
     int n_max = n_seq_last[n_seq_last.size() - 1];
 
     auto t_blocks = prolate_tmatrix_blocks_from_rcpp<T>(blocks);
-    auto smn_inc = compute_smn_matrix<T>(m_max, n_max, chi_sw, preccos(theta_body), true);
+    auto smn_inc = compute_smn_direction_matrix<T>(m_max, n_max, chi_sw, psms_direction_from_angle(theta_body));
 
     // Reuse each order's spheroidal expansion for the complete receive-point batch.
-    std::vector<T> eta_scatter(theta_scatter.size());
+    std::vector<SpheroidalDirection<T>> receive_directions(theta_scatter.size());
     for (size_t i = 0; i < theta_scatter.size(); ++i) {
-        eta_scatter[i] = preccos(theta_scatter[i]);
+        receive_directions[i] = psms_direction_from_angle(theta_scatter[i]);
     }
-    auto smn_scat = compute_smn_matrices<T>(m_max, n_max, chi_sw, eta_scatter, true);
+    auto smn_scat = compute_smn_direction_matrices<T>(m_max, n_max, chi_sw, receive_directions);
     Rcpp::ComplexVector f_points(theta_scatter.size());
     for (size_t i = 0; i < theta_scatter.size(); ++i) {
         auto azimuth = compute_azimuth<T>(m_max, phi_body, phi_scatter[i]);
