@@ -9,6 +9,7 @@ module prolate_swf_quad
 module prolate_swf
  use param
 #endif
+ use iso_fortran_env, only: int64
 
  ! ---------------------------------------------------------------------------
  ! Lightweight caches for repeated Legendre- and quadrature-related work.
@@ -19,9 +20,14 @@ module prolate_swf
  ! ---------------------------------------------------------------------------
  integer, parameter :: pleg_cache_slots = 48
  integer, parameter :: qleg_cache_slots = 48
+ ! Auxiliary entries share a 64 MiB retained-storage budget in each precision.
+ integer(int64), parameter :: auxiliary_cache_bytes = 64_int64 * 1024 * 1024
+ integer(int64), save :: auxiliary_cache_budget = auxiliary_cache_bytes
+ integer, save :: auxiliary_cache_next = 1
 
  type :: pleg_cache_entry
    logical :: valid = .false.
+   integer(int64) :: bytes = 0
    integer :: m = -1
    integer :: iopd = -1
    integer :: narg = 0
@@ -40,6 +46,7 @@ module prolate_swf
 
  type :: qleg_cache_entry
    logical :: valid = .false.
+   integer(int64) :: bytes = 0
    integer :: m = -1
    integer :: lnum = 0
    integer :: limq = 0
@@ -58,6 +65,7 @@ module prolate_swf
 
  type :: gauss_cache_entry
    logical :: valid = .false.
+   integer(int64) :: bytes = 0
    integer :: ndec = 0
    integer :: n = 0
    real(knd), allocatable :: x(:), w(:)
@@ -65,6 +73,7 @@ module prolate_swf
 
  type :: pint_cache_entry
    logical :: valid = .false.
+   integer(int64) :: bytes = 0
    integer :: m = -1, lnum = 0, limint = 0, ndec = 0, ngau = 0, ngqs = 0
    real(knd) :: c = 0.0_knd, x1 = 0.0_knd, coefme = 0.0_knd, coefmo = 0.0_knd
    real(knd), allocatable :: wg(:), xg(:), rpint1(:), rpint2(:)
@@ -92,19 +101,50 @@ module prolate_swf
    real(knd), allocatable :: steps(:)
  end type
 
+ ! Bound storage for frequency-independent angular normalization by exact mode.
+ type :: angular_normalization_entry
+   integer :: m = -1, l = -1, exponent = 0
+   real(knd) :: factor = 0.0_knd
+ end type
+
  type(pleg_cache_entry), save :: pleg_cache(pleg_cache_slots)
  type(qleg_cache_entry), save :: qleg_cache(qleg_cache_slots)
  type(gauss_cache_entry), save :: gauss_cache
  type(pint_cache_entry), save :: pint_cache(48)
  type(pint_geometry_entry), target, save :: pint_geometry_cache(48)
  type(legendre_normalization_entry), save :: legendre_normalization_cache(48)
+ type(angular_normalization_entry), save :: angular_normalization_cache(16384)
  integer, save :: legendre_normalization_next = 1
  integer, save :: pint_geometry_next = 1
  integer, save :: pint_cache_next = 1
  integer, save :: pleg_cache_next = 1
  integer, save :: qleg_cache_next = 1
 
+#ifdef USE_QUAD
+ interface
+   subroutine quad_sincos(argument, sine, cosine) bind(C, name="sincosq")
+     import knd
+     implicit none
+     real(knd), value :: argument
+     real(knd), intent(out) :: sine, cosine
+   end subroutine
+ end interface
+#endif
+
  contains
+
+  subroutine paired_sine_cosine(argument, sine, cosine)
+    real(knd), intent(in) :: argument
+    real(knd), intent(out) :: sine, cosine
+#ifdef USE_QUAD
+    ! Share argument reduction between the two quad trigonometric evaluations.
+    call quad_sincos(argument, sine, cosine)
+#else
+    sine = sin(argument)
+    cosine = cos(argument)
+#endif
+  end subroutine
+
 
   integer function decimal_exponent(value) result(power)
     real(knd), intent(in) :: value
@@ -130,13 +170,9 @@ module prolate_swf
 
   logical function cache_real_equal(a, b)
     real(knd), intent(in) :: a, b
-    real(knd) :: scale, tol
 
-    ! Use a precision-scaled tolerance so cache lookup is robust to the small
-    ! roundoff differences introduced by repeated calls from C++.
-    scale = max(1.0_knd, max(abs(a), abs(b)))
-    tol = 64.0_knd * epsilon(1.0_knd) * scale
-    cache_real_equal = abs(a - b) <= tol
+    ! Distinct native arguments require their own special-function values.
+    cache_real_equal = a == b
   end function
 
   logical function cache_real_vector_equal(a, b, n)
@@ -152,11 +188,103 @@ module prolate_swf
     cache_real_vector_equal = .true.
   end function
 
+  logical function add_auxiliary_cache_bytes(bytes, element_bytes, rows, columns) result(fits)
+    integer(int64), intent(inout) :: bytes
+    integer, intent(in) :: element_bytes, rows
+    integer, optional, intent(in) :: columns
+    integer(int64) :: row_bytes, column_count
+
+    ! Bound each product before multiplication, including impossible array dimensions.
+    fits = .false.
+    if(bytes < 0 .or. bytes > auxiliary_cache_budget .or. element_bytes <= 0 .or. rows < 0) return
+    column_count = 1
+    if(present(columns)) column_count = int(columns, int64)
+    if(column_count < 0) return
+    if(int(rows, int64) > (auxiliary_cache_budget - bytes) / element_bytes) return
+    row_bytes = int(rows, int64) * element_bytes
+    if(row_bytes > 0) then
+      if(column_count > (auxiliary_cache_budget - bytes) / row_bytes) return
+    end if
+    bytes = bytes + row_bytes * column_count
+    fits = .true.
+  end function
+
+  integer(int64) function auxiliary_cache_retained_bytes() result(bytes)
+    integer :: slot
+
+    bytes = gauss_cache%bytes
+    do slot = 1, size(pleg_cache)
+      bytes = bytes + pleg_cache(slot)%bytes
+    end do
+    do slot = 1, size(qleg_cache)
+      bytes = bytes + qleg_cache(slot)%bytes
+    end do
+    do slot = 1, size(pint_cache)
+      bytes = bytes + pint_cache(slot)%bytes
+    end do
+  end function
+
+  subroutine clear_gauss_cache()
+    gauss_cache%valid = .false.
+    gauss_cache%bytes = 0
+    if(allocated(gauss_cache%x)) deallocate(gauss_cache%x)
+    if(allocated(gauss_cache%w)) deallocate(gauss_cache%w)
+  end subroutine
+
+  subroutine clear_pint_cache_slot(idx)
+    integer, intent(in) :: idx
+    type(pint_cache_entry) :: empty
+
+    pint_cache(idx) = empty
+  end subroutine
+
+  subroutine clear_auxiliary_cache_slot(slot)
+    integer, intent(in) :: slot
+    integer :: idx
+
+    idx = slot
+    if(idx <= size(pleg_cache)) then
+      call clear_pleg_cache_slot(idx)
+      return
+    end if
+    idx = idx - size(pleg_cache)
+    if(idx <= size(qleg_cache)) then
+      call clear_qleg_cache_slot(idx)
+      return
+    end if
+    idx = idx - size(qleg_cache)
+    if(idx == 1) then
+      call clear_gauss_cache()
+      return
+    end if
+    call clear_pint_cache_slot(idx - 1)
+  end subroutine
+
+  logical function reserve_auxiliary_cache_bytes(requested) result(fits)
+    integer(int64), intent(in) :: requested
+    integer :: visited, slots
+
+    ! Evict retained results only, never shorten the caller's computed support.
+    fits = .false.
+    if(requested < 0 .or. requested > auxiliary_cache_budget) return
+    slots = size(pleg_cache) + size(qleg_cache) + 1 + size(pint_cache)
+    do visited = 0, slots
+      if(auxiliary_cache_retained_bytes() <= auxiliary_cache_budget - requested) then
+        fits = .true.
+        return
+      end if
+      if(visited == slots) exit
+      call clear_auxiliary_cache_slot(auxiliary_cache_next)
+      auxiliary_cache_next = mod(auxiliary_cache_next, slots) + 1
+    end do
+  end function
+
   subroutine clear_pleg_cache_slot(idx)
     integer, intent(in) :: idx
 
     ! Reset and deallocate one cache slot before it is reused.
     pleg_cache(idx)%valid = .false.
+    pleg_cache(idx)%bytes = 0
     pleg_cache(idx)%m = -1
     pleg_cache(idx)%iopd = -1
     pleg_cache(idx)%narg = 0
@@ -243,10 +371,19 @@ module prolate_swf
         pdnorm(maxt), pnorm(maxt), alpha(maxp), beta(maxp), gamma(maxp), &
         coefa(maxp), coefb(maxp), coefc(maxp), coefd(maxp), coefe(maxp)
     integer, intent(in) :: ipdnorm(maxt), ipnorm(maxt)
-    integer :: idx, ncoef
+    integer :: idx, ncoef, allocation_status, real_bytes, integer_bytes
+    integer(int64) :: requested_bytes
 
-    ! Reuse a matching slot when possible; otherwise take a free or round-robin
-    ! replacement slot.
+    ! Oversized tables remain solely in the caller's complete workspaces.
+    requested_bytes = 0
+    real_bytes = storage_size(1.0_knd) / 8
+    integer_bytes = storage_size(1) / 8
+    if(.not. add_auxiliary_cache_bytes(requested_bytes, real_bytes, narg)) return
+    if(.not. add_auxiliary_cache_bytes(requested_bytes, 2 * real_bytes, maxt, maxp)) return
+    if(.not. add_auxiliary_cache_bytes(requested_bytes, 2 * real_bytes + 2 * integer_bytes, maxt)) return
+    if(.not. add_auxiliary_cache_bytes(requested_bytes, 8 * real_bytes, maxp)) return
+
+    ! Reuse a matching slot or replace one entry in round-robin order.
     idx = find_pleg_cache(m, iopd, ndec, nex, barg, narg, maxt, lim, maxp)
     if(idx == 0) then
       idx = 1
@@ -262,23 +399,22 @@ module prolate_swf
     end if
 
     call clear_pleg_cache_slot(idx)
-    allocate(pleg_cache(idx)%barg(narg))
-    allocate(pleg_cache(idx)%pr(maxt, maxp))
-    allocate(pleg_cache(idx)%pdr(maxt, maxp))
-    allocate(pleg_cache(idx)%pdnorm(maxt))
-    allocate(pleg_cache(idx)%pnorm(maxt))
-    allocate(pleg_cache(idx)%ipdnorm(maxt))
-    allocate(pleg_cache(idx)%ipnorm(maxt))
-    allocate(pleg_cache(idx)%alpha(maxp))
-    allocate(pleg_cache(idx)%beta(maxp))
-    allocate(pleg_cache(idx)%gamma(maxp))
-    allocate(pleg_cache(idx)%coefa(maxp))
-    allocate(pleg_cache(idx)%coefb(maxp))
-    allocate(pleg_cache(idx)%coefc(maxp))
-    allocate(pleg_cache(idx)%coefd(maxp))
-    allocate(pleg_cache(idx)%coefe(maxp))
+    if(.not. reserve_auxiliary_cache_bytes(requested_bytes)) return
+    allocate(pleg_cache(idx)%barg(narg), pleg_cache(idx)%pr(maxt, maxp), &
+        pleg_cache(idx)%pdr(maxt, maxp), pleg_cache(idx)%pdnorm(maxt), &
+        pleg_cache(idx)%pnorm(maxt), pleg_cache(idx)%ipdnorm(maxt), &
+        pleg_cache(idx)%ipnorm(maxt), pleg_cache(idx)%alpha(maxp), &
+        pleg_cache(idx)%beta(maxp), pleg_cache(idx)%gamma(maxp), &
+        pleg_cache(idx)%coefa(maxp), pleg_cache(idx)%coefb(maxp), &
+        pleg_cache(idx)%coefc(maxp), pleg_cache(idx)%coefd(maxp), &
+        pleg_cache(idx)%coefe(maxp), stat=allocation_status)
+    if(allocation_status /= 0) then
+      call clear_pleg_cache_slot(idx)
+      return
+    end if
 
     pleg_cache(idx)%valid = .true.
+    pleg_cache(idx)%bytes = requested_bytes
     pleg_cache(idx)%m = m
     pleg_cache(idx)%iopd = iopd
     pleg_cache(idx)%narg = narg
@@ -353,6 +489,7 @@ module prolate_swf
     integer, intent(in) :: idx
 
     qleg_cache(idx)%valid = .false.
+    qleg_cache(idx)%bytes = 0
     qleg_cache(idx)%m = -1
     qleg_cache(idx)%lnum = 0
     qleg_cache(idx)%limq = 0
@@ -398,8 +535,14 @@ module prolate_swf
     integer, intent(in) :: m, lnum, limq, maxq, ndec, iqdml, iqml, itermpq
     real(knd), intent(in) :: x1, qdr(maxq), qdml, qdl(lnum), qr(maxq), qml, ql(lnum), termpq
     integer, intent(in) :: iqdl(lnum), iql(lnum)
-    integer :: idx
+    integer :: idx, allocation_status, real_bytes, integer_bytes
+    integer(int64) :: requested_bytes
 
+    requested_bytes = 0
+    real_bytes = storage_size(1.0_knd) / 8
+    integer_bytes = storage_size(1) / 8
+    if(.not. add_auxiliary_cache_bytes(requested_bytes, 2 * real_bytes, maxq)) return
+    if(.not. add_auxiliary_cache_bytes(requested_bytes, 2 * real_bytes + 2 * integer_bytes, lnum)) return
     idx = find_qleg_cache(m, lnum, limq, maxq, x1, ndec)
     if(idx == 0) then
       idx = 1
@@ -415,14 +558,17 @@ module prolate_swf
     end if
 
     call clear_qleg_cache_slot(idx)
-    allocate(qleg_cache(idx)%qdr(maxq))
-    allocate(qleg_cache(idx)%qr(maxq))
-    allocate(qleg_cache(idx)%qdl(lnum))
-    allocate(qleg_cache(idx)%ql(lnum))
-    allocate(qleg_cache(idx)%iqdl(lnum))
-    allocate(qleg_cache(idx)%iql(lnum))
+    if(.not. reserve_auxiliary_cache_bytes(requested_bytes)) return
+    allocate(qleg_cache(idx)%qdr(maxq), qleg_cache(idx)%qr(maxq), &
+        qleg_cache(idx)%qdl(lnum), qleg_cache(idx)%ql(lnum), &
+        qleg_cache(idx)%iqdl(lnum), qleg_cache(idx)%iql(lnum), stat=allocation_status)
+    if(allocation_status /= 0) then
+      call clear_qleg_cache_slot(idx)
+      return
+    end if
 
     qleg_cache(idx)%valid = .true.
+    qleg_cache(idx)%bytes = requested_bytes
     qleg_cache(idx)%m = m
     qleg_cache(idx)%lnum = lnum
     qleg_cache(idx)%limq = limq
@@ -479,6 +625,8 @@ module prolate_swf
   subroutine gauss_cached(ndec, n, x, w)
     integer, intent(in) :: ndec, n
     real(knd), intent(out) :: x(n), w(n)
+    integer :: allocation_status
+    integer(int64) :: requested_bytes
 
     if(gauss_cache%valid) then
       if(gauss_cache%ndec == ndec .and. gauss_cache%n == n) then
@@ -486,14 +634,20 @@ module prolate_swf
         w(1:n) = gauss_cache%w(1:n)
         return
       end if
-      if(allocated(gauss_cache%x)) deallocate(gauss_cache%x)
-      if(allocated(gauss_cache%w)) deallocate(gauss_cache%w)
     end if
 
     call gauss(ndec, n, x, w)
-    allocate(gauss_cache%x(n))
-    allocate(gauss_cache%w(n))
+    requested_bytes = 0
+    if(.not. add_auxiliary_cache_bytes(requested_bytes, 2 * (storage_size(1.0_knd) / 8), n)) return
+    call clear_gauss_cache()
+    if(.not. reserve_auxiliary_cache_bytes(requested_bytes)) return
+    allocate(gauss_cache%x(n), gauss_cache%w(n), stat=allocation_status)
+    if(allocation_status /= 0) then
+      call clear_gauss_cache()
+      return
+    end if
     gauss_cache%valid = .true.
+    gauss_cache%bytes = requested_bytes
     gauss_cache%ndec = ndec
     gauss_cache%n = n
     gauss_cache%x(1:n) = x(1:n)
@@ -535,6 +689,7 @@ module prolate_swf
     real(knd) :: etal, etau, step, etcoef1, etcoef2, etai, etaim1, argb
     real(knd) :: window_base, window_power, legendre_power, coef, sargb
     real(knd), allocatable :: expanded_basis(:,:)
+    character(len=256) :: allocation_message
 
     ! Geometry and recurrence prefixes are independent of frequency and final degree.
     real_bytes = storage_size(x1) / 8
@@ -683,8 +838,8 @@ module prolate_swf
     real(knd), intent(out) :: rpint1(maxint), rpint2(maxint), pint1(maxint), &
         pint2(maxint), pint3(maxint), pint4(maxint), pnorm(maxlp), coefme, coefmo
     integer, intent(out) :: norme(maxmp), ipnorm(maxlp)
-    type(pint_cache_entry) :: entry
-    integer :: idx
+    integer :: idx, allocation_status, real_bytes, integer_bytes
+    integer(int64) :: requested_bytes
 
     ! Radial quadrature is independent of incidence and receive angles.
     do idx = 1, size(pint_cache)
@@ -725,31 +880,218 @@ module prolate_swf
         ngau, ngqs, rpint1, rpint2, pint1, pint2, pint3, pint4, &
         norme, pnorm, ipnorm, coefme, coefmo)
 
-    ! Bound retained memory and replace the oldest entry after the cache fills.
-    entry%valid = .true.
-    entry%m = m
-    entry%lnum = lnum
-    entry%limint = limint
-    entry%ndec = ndec
-    entry%ngau = ngau
-    entry%ngqs = ngqs
-    entry%c = c
-    entry%x1 = x1
-    entry%wg = wg
-    entry%xg = xg
-    entry%rpint1 = rpint1
-    entry%rpint2 = rpint2
-    entry%pint1 = pint1
-    entry%pint2 = pint2
-    entry%pint3 = pint3
-    entry%pint4 = pint4
-    entry%pnorm = pnorm
-    entry%norme = norme
-    entry%ipnorm = ipnorm
-    entry%coefme = coefme
-    entry%coefmo = coefmo
-    pint_cache(pint_cache_next) = entry
+    ! Allocate directly in the bounded cache without implicit duplicate copies.
+    requested_bytes = 0
+    real_bytes = storage_size(1.0_knd) / 8
+    integer_bytes = storage_size(1) / 8
+    if(.not. add_auxiliary_cache_bytes(requested_bytes, 2 * real_bytes, ngau)) return
+    if(.not. add_auxiliary_cache_bytes(requested_bytes, 6 * real_bytes, maxint)) return
+    if(.not. add_auxiliary_cache_bytes(requested_bytes, real_bytes + integer_bytes, maxlp)) return
+    if(.not. add_auxiliary_cache_bytes(requested_bytes, integer_bytes, maxmp)) return
+    idx = pint_cache_next
+    call clear_pint_cache_slot(idx)
+    if(.not. reserve_auxiliary_cache_bytes(requested_bytes)) return
+    associate(entry => pint_cache(idx))
+      allocate(entry%wg(ngau), entry%xg(ngau), entry%rpint1(maxint), &
+          entry%rpint2(maxint), entry%pint1(maxint), entry%pint2(maxint), &
+          entry%pint3(maxint), entry%pint4(maxint), entry%pnorm(maxlp), &
+          entry%norme(maxmp), entry%ipnorm(maxlp), stat=allocation_status)
+      if(allocation_status /= 0) then
+        call clear_pint_cache_slot(idx)
+        return
+      end if
+      entry%valid = .true.
+      entry%bytes = requested_bytes
+      entry%m = m
+      entry%lnum = lnum
+      entry%limint = limint
+      entry%ndec = ndec
+      entry%ngau = ngau
+      entry%ngqs = ngqs
+      entry%c = c
+      entry%x1 = x1
+      entry%wg = wg
+      entry%xg = xg
+      entry%rpint1 = rpint1
+      entry%rpint2 = rpint2
+      entry%pint1 = pint1
+      entry%pint2 = pint2
+      entry%pint3 = pint3
+      entry%pint4 = pint4
+      entry%pnorm = pnorm
+      entry%norme = norme
+      entry%ipnorm = ipnorm
+      entry%coefme = coefme
+      entry%coefmo = coefmo
+    end associate
     pint_cache_next = mod(pint_cache_next, size(pint_cache)) + 1
+  end subroutine
+
+  ! Exercise cache admission and native-value identity without a public control.
+#ifdef USE_QUAD
+  subroutine profcn_auxiliary_cache_audit_quad(checks) bind(C)
+#else
+  subroutine profcn_auxiliary_cache_audit(checks) bind(C)
+#endif
+    use iso_c_binding, only: c_int
+    implicit none
+    integer(c_int), intent(out) :: checks(12)
+    integer, parameter :: degrees = 8, arguments = 3
+    real(knd) :: radial(degrees, 4, 3), angular(degrees, arguments, 2, 3), args(arguments)
+    integer :: radial_exponents(degrees, 4, 3), angular_exponents(degrees, arguments, 2, 3)
+    integer :: radial_accuracy(degrees, 3), angular_accuracy(degrees, arguments, 3)
+    integer :: slot, trial
+    integer(int64) :: previous_budget, requested_bytes
+    logical :: admitted
+
+    checks = 0
+    previous_budget = auxiliary_cache_budget
+    auxiliary_cache_budget = auxiliary_cache_bytes
+    do slot = 1, size(pleg_cache) + size(qleg_cache) + 1 + size(pint_cache)
+      call clear_auxiliary_cache_slot(slot)
+    end do
+    requested_bytes = 0
+    admitted = add_auxiliary_cache_bytes(requested_bytes, storage_size(1.0_knd) / 8, huge(1), huge(1))
+    checks(1) = merge(1, 0, .not. admitted .and. requested_bytes == 0)
+    args = [0.1_knd, 0.4_knd, 0.7_knd]
+    radial = 0.0_knd
+    angular = 0.0_knd
+    radial_exponents = 0
+    angular_exponents = 0
+    radial_accuracy = 0
+    angular_accuracy = 0
+    do trial = 1, 3
+      if(trial == 3) then
+        checks(2) = merge(1, 0, auxiliary_cache_retained_bytes() > 0 .and. &
+            auxiliary_cache_retained_bytes() <= auxiliary_cache_bytes)
+        admitted = reserve_auxiliary_cache_bytes(auxiliary_cache_bytes + 1)
+        checks(3) = merge(1, 0, .not. admitted)
+        admitted = reserve_auxiliary_cache_bytes(auxiliary_cache_bytes)
+        checks(4) = merge(1, 0, admitted .and. auxiliary_cache_retained_bytes() == 0)
+        auxiliary_cache_budget = 0
+      end if
+      call profcn(6.0_knd, 2, degrees, 2, 0.07_knd, 2, 1, arguments, args, &
+          radial(:,1,trial), radial_exponents(:,1,trial), radial(:,2,trial), radial_exponents(:,2,trial), &
+          radial(:,3,trial), radial_exponents(:,3,trial), radial(:,4,trial), radial_exponents(:,4,trial), &
+          radial_accuracy(:,trial), angular(:,:,1,trial), angular_exponents(:,:,1,trial), &
+          angular(:,:,2,trial), angular_exponents(:,:,2,trial), angular_accuracy(:,:,trial))
+    end do
+    checks(5) = merge(1, 0, all(radial(:,:,1) == radial(:,:,2)) .and. &
+        all(angular(:,:,:,1) == angular(:,:,:,2)) .and. &
+        all(radial_exponents(:,:,1) == radial_exponents(:,:,2)) .and. &
+        all(angular_exponents(:,:,:,1) == angular_exponents(:,:,:,2)) .and. &
+        all(radial_accuracy(:,1) == radial_accuracy(:,2)) .and. &
+        all(angular_accuracy(:,:,1) == angular_accuracy(:,:,2)))
+    checks(6) = merge(1, 0, all(radial(:,:,1) == radial(:,:,3)) .and. &
+        all(angular(:,:,:,1) == angular(:,:,:,3)) .and. &
+        all(radial_exponents(:,:,1) == radial_exponents(:,:,3)) .and. &
+        all(angular_exponents(:,:,:,1) == angular_exponents(:,:,:,3)) .and. &
+        all(radial_accuracy(:,1) == radial_accuracy(:,3)) .and. &
+        all(angular_accuracy(:,:,1) == angular_accuracy(:,:,3)))
+    checks(7) = merge(1, 0, auxiliary_cache_retained_bytes() == 0)
+    call audit_auxiliary_cache_arguments(checks(8:12))
+    auxiliary_cache_budget = previous_budget
+  end subroutine
+
+  subroutine audit_auxiliary_cache_arguments(checks)
+    use iso_c_binding, only: c_int
+    implicit none
+    integer(c_int), intent(out) :: checks(5)
+    integer, parameter :: plim = 8, psize = plim + 2, qlim = 12, qsize = qlim + 8, qdegrees = 4
+    real(knd) :: scalar_cases(8), p_cases(6), q_cases(3), adjacent, shifted_argument
+    real(knd) :: parg(1,3), pr(1,psize,3), pdr(1,psize,3), pnorm(1,3), pdnorm(1,3)
+    real(knd) :: coefficients(psize,8,3), qratios(qsize,2,3), qvalues(qdegrees,2,3), qnormal(3,3)
+    integer :: ipnorm(1,3), ipdnorm(1,3), qexponents(qdegrees,2,3), qnormal_exponents(3,3)
+    integer :: sample, trial, slot, saved_limit, digits_native, exponent_range, direction
+
+    checks = 1
+    digits_native = precision(1.0_knd)
+    exponent_range = range(1.0_knd) - 1
+    scalar_cases = [0.4_knd, -0.4_knd, 1.0_knd, -1.0_knd, &
+        nearest(1.0_knd,-1.0_knd), nearest(-1.0_knd,1.0_knd), 1.0e-6_knd, -1.0e-6_knd]
+    ! Adjacent values must remain distinct on both sides of zero and the endpoints.
+    do sample = 1, size(scalar_cases)
+      if(.not. cache_real_equal(scalar_cases(sample), scalar_cases(sample))) checks(1) = 0
+      do direction = -1, 1, 2
+        adjacent = nearest(scalar_cases(sample), real(direction,knd))
+        if(cache_real_equal(scalar_cases(sample), adjacent)) checks(1) = 0
+        if(cache_real_vector_equal([scalar_cases(sample)], [adjacent], 1)) checks(1) = 0
+      end do
+    end do
+    p_cases = [0.4_knd, -0.4_knd, 1.0e-6_knd, -1.0e-6_knd, &
+        nearest(nearest(1.0_knd,-1.0_knd),-1.0_knd), &
+        nearest(nearest(-1.0_knd,1.0_knd),1.0_knd)]
+    ! Compare a changed PLEG argument with a fresh cache-disabled evaluation.
+    do sample = 1, size(p_cases)
+      shifted_argument = nearest(p_cases(sample), sign(1.0_knd,p_cases(sample)))
+      do slot = 1, size(pleg_cache) + size(qleg_cache) + 1 + size(pint_cache)
+        call clear_auxiliary_cache_slot(slot)
+      end do
+      auxiliary_cache_budget = auxiliary_cache_bytes
+      coefficients = 0.0_knd
+      do trial = 1, 3
+        parg(1,trial) = shifted_argument
+        if(trial == 1) parg(1,trial) = p_cases(sample)
+        if(trial == 2) then
+          if(find_pleg_cache(2,1,digits_native,exponent_range,[p_cases(sample)],1,1,plim,psize) == 0) &
+              checks(2) = 0
+          if(find_pleg_cache(2,1,digits_native,exponent_range,[shifted_argument],1,1,plim,psize) /= 0) &
+              checks(2) = 0
+        end if
+        if(trial == 3) then
+          do slot = 1, size(pleg_cache) + size(qleg_cache) + 1 + size(pint_cache)
+            call clear_auxiliary_cache_slot(slot)
+          end do
+          auxiliary_cache_budget = 0
+        end if
+        saved_limit = 0
+        call pleg_cached(2,plim,psize,saved_limit,1,digits_native,exponent_range,parg(:,trial), &
+            1,1,pr(:,:,trial),pdr(:,:,trial),pdnorm(:,trial),ipdnorm(:,trial),pnorm(:,trial), &
+            ipnorm(:,trial),coefficients(:,1,trial),coefficients(:,2,trial),coefficients(:,3,trial), &
+            coefficients(:,4,trial),coefficients(:,5,trial),coefficients(:,6,trial), &
+            coefficients(:,7,trial),coefficients(:,8,trial))
+      end do
+      ! PLEG leaves coefficient entries below m+1 unwritten.
+      if(.not. (all(parg(:,2) == parg(:,3)) .and. all(pr(:,:,2) == pr(:,:,3)) .and. &
+          all(pdr(:,:,2) == pdr(:,:,3)) .and. all(pnorm(:,2) == pnorm(:,3)) .and. &
+          all(pdnorm(:,2) == pdnorm(:,3)) .and. all(ipnorm(:,2) == ipnorm(:,3)) .and. &
+          all(ipdnorm(:,2) == ipdnorm(:,3)) .and. &
+          all(coefficients(3:,:,2) == coefficients(3:,:,3)))) checks(3) = 0
+    end do
+    q_cases = [0.07_knd, 1.0e-6_knd, nearest(1.0_knd,-1.0_knd)]
+    ! QLEG uses positive xi-1, including values much smaller than unity.
+    do sample = 1, size(q_cases)
+      shifted_argument = nearest(q_cases(sample), 1.0_knd)
+      do slot = 1, size(pleg_cache) + size(qleg_cache) + 1 + size(pint_cache)
+        call clear_auxiliary_cache_slot(slot)
+      end do
+      auxiliary_cache_budget = auxiliary_cache_bytes
+      do trial = 1, 3
+        adjacent = shifted_argument
+        if(trial == 1) adjacent = q_cases(sample)
+        if(trial == 2) then
+          if(find_qleg_cache(4,qdegrees,qlim,qsize,q_cases(sample),digits_native) == 0) checks(4) = 0
+          if(find_qleg_cache(4,qdegrees,qlim,qsize,shifted_argument,digits_native) /= 0) checks(4) = 0
+        end if
+        if(trial == 3) then
+          do slot = 1, size(pleg_cache) + size(qleg_cache) + 1 + size(pint_cache)
+            call clear_auxiliary_cache_slot(slot)
+          end do
+          auxiliary_cache_budget = 0
+        end if
+        call qleg_cached(4,qdegrees,qlim,qsize,adjacent,digits_native, &
+            qratios(:,1,trial),qnormal(1,trial),qnormal_exponents(1,trial), &
+            qvalues(:,1,trial),qexponents(:,1,trial),qratios(:,2,trial), &
+            qnormal(2,trial),qnormal_exponents(2,trial),qvalues(:,2,trial), &
+            qexponents(:,2,trial),qnormal(3,trial),qnormal_exponents(3,trial))
+      end do
+      ! For m=4, QLEG leaves recurrence entry 8 unwritten.
+      if(.not. (all(qratios(1:7,:,2) == qratios(1:7,:,3)) .and. &
+          all(qratios(9:qsize,:,2) == qratios(9:qsize,:,3)) .and. &
+          all(qvalues(:,:,2) == qvalues(:,:,3)) .and. all(qexponents(:,:,2) == qexponents(:,:,3)) .and. &
+          all(qnormal(:,2) == qnormal(:,3)) .and. &
+          all(qnormal_exponents(:,2) == qnormal_exponents(:,3)))) checks(5) = 0
+    end do
   end subroutine
 
   subroutine profcn(c, m, lnum, ioprad, x1, iopang, iopnorm, narg, arg, &
@@ -1713,6 +2055,8 @@ end if
        end if
        if(l == m .and. jsub > jtest .and. iopneu /= 0) iopneu = 0
        if(l == m .and. jsub > jtest .and. iopleg /= 0) iopleg = 0
+       ! Restore the integral path if joining-factor cancellation disabled the initial method.
+       if(l == m .and. ioprad == 2 .and. iopleg == 0 .and. iopneu == 0 .and. iopint == 0) iopint = 1
        eigvalp = eigval
 !
 !  determine prolate radial functions of the first kind
@@ -2782,28 +3126,7 @@ end if
     factor = 1.0e0_knd
     ifactor = 0
     if(iopnorm == 0) go to 210
-    if(m == 0) go to 170
-     do 160 j = 1, m
-     aj = j
-     factor = factor * (aj + aj) * (aj + aj - 1.0e0_knd)
-     if(factor < 1.0e100_knd) go to 160
-     factor = factor * 1.0e-100_knd
-     ifactor = ifactor + 100
-160    continue
-170   if(l == m) go to 190
-     do 180 j = 1, l - m
-     aj = j
-     factor = factor * (rm2 + aj) / (aj)
-     if(factor < 1.0e100_knd) go to 180
-     factor = factor * 1.0e-100_knd
-     ifactor = ifactor + 100
-180    continue
-190   factor = factor * 2.0e0_knd / (l + l + 1.0e0_knd)
-    factor = sqrt(factor)
-    ifactor = ifactor / 2
-    iterm = decimal_exponent(factor)
-    factor = factor * (10.0e0_knd ** (-iterm))
-    ifactor = ifactor + iterm
+    call angular_legendre_normalization(l, m, factor, ifactor)
     dmlms1 = dmlms / factor
     idmlms1e = idmlmse - ifactor
 if (debug) then
@@ -4973,6 +5296,180 @@ end if
     end subroutine
 !
 !
+  real(knd) function normalization_align(mantissa, shift) result(value)
+    implicit none
+    real(knd), intent(in) :: mantissa
+    integer(int64), intent(in) :: shift
+
+    ! Discard only values below the native subnormal range when aligning sums.
+    value = 0.0_knd
+    if(shift < int(minexponent(1.0_knd) - digits(1.0_knd), int64)) return
+    value = scale(mantissa, int(shift))
+  end function normalization_align
+
+  subroutine normalization_square_step(mantissa, power, ratio, weight, upward, valid)
+    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
+    implicit none
+    real(knd), intent(inout) :: mantissa
+    integer(int64), intent(inout) :: power
+    real(knd), intent(in) :: ratio, weight
+    logical, intent(in) :: upward
+    logical, intent(out) :: valid
+    real(knd) :: ratio_fraction, weight_fraction, product
+    integer :: ratio_power, weight_power, product_power
+
+    valid = .false.
+    if(.not. ieee_is_finite(ratio) .or. .not. ieee_is_finite(weight)) return
+    if(weight <= 0.0_knd) return
+    if(ratio == 0.0_knd) then
+      if(.not. upward) return
+      mantissa = 0.0_knd
+      valid = .true.
+      return
+    end if
+    if(mantissa == 0.0_knd) then
+      valid = .true.
+      return
+    end if
+
+    ! Form ratio squares from bounded fractions without overflowing the ratio.
+    ratio_fraction = fraction(abs(ratio))
+    ratio_power = exponent(abs(ratio))
+    weight_fraction = fraction(weight)
+    weight_power = exponent(weight)
+    if(upward) then
+      product = mantissa * ratio_fraction * ratio_fraction * weight_fraction
+      power = power + 2_int64 * ratio_power + weight_power
+    else
+      product = mantissa / ratio_fraction / ratio_fraction * weight_fraction
+      power = power - 2_int64 * ratio_power + weight_power
+    end if
+    if(.not. ieee_is_finite(product) .or. product <= 0.0_knd) return
+    product_power = exponent(product)
+    mantissa = fraction(product)
+    power = power + product_power
+    valid = .true.
+  end subroutine normalization_square_step
+
+  subroutine normalization_add_square(total, correction, total_power, term, term_power)
+    implicit none
+    real(knd), intent(inout) :: total, correction
+    integer(int64), intent(inout) :: total_power
+    real(knd), intent(in) :: term
+    integer(int64), intent(in) :: term_power
+    real(knd) :: aligned, updated
+    integer :: renormalize
+
+    ! Accumulate the positive sum with native compensation at a common scale.
+    if(term == 0.0_knd) return
+    if(term_power > total_power) then
+      total = normalization_align(total, total_power - term_power)
+      correction = normalization_align(correction, total_power - term_power)
+      total_power = term_power
+    end if
+    aligned = normalization_align(term, term_power - total_power)
+    updated = total + aligned
+    if(total >= aligned) then
+      correction = correction + ((total - updated) + aligned)
+    else
+      correction = correction + ((aligned - updated) + total)
+    end if
+    total = updated
+    renormalize = exponent(total)
+    total = fraction(total)
+    correction = scale(correction, -renormalize)
+    total_power = total_power + renormalize
+  end subroutine normalization_add_square
+
+  subroutine complete_meixner_normalization(l, m, limd, enr, factors, dec, sgn, &
+                                           dmsnorm, idmse, dmlms, idmlmse, schedule_index)
+    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite, ieee_value, ieee_quiet_nan
+    implicit none
+    integer, intent(in) :: l, m, limd
+    real(knd), intent(in) :: enr(:), factors(:,:), dec, sgn
+    real(knd), intent(out) :: dmsnorm, dmlms
+    integer, intent(out) :: idmse, idmlmse, schedule_index
+    integer :: parity, seed_index, last_ratio, j, index, step, decimal_shift
+    integer(int64) :: total_power, term_power, remaining, decimal_power
+    real(knd) :: total, correction, term, weight, relative_term
+    logical :: valid, recorded_schedule
+
+    parity = modulo(l - m, 2)
+    seed_index = (l - m - parity) / 2
+    last_ratio = limd / 2 - parity
+    schedule_index = last_ratio
+    idmse = 0
+    idmlmse = 0
+    if(seed_index < 0 .or. last_ratio < seed_index .or. last_ratio > size(enr)) go to 900
+    if(limd > size(factors, 2) .or. size(factors, 1) < 6) go to 900
+    total = 0.5_knd
+    total_power = 1_int64
+    correction = 0.0_knd
+    term = 0.5_knd
+    term_power = 1_int64
+    recorded_schedule = .false.
+
+    ! Include every available forward coefficient, including later oscillating lobes.
+    do index = seed_index + 1, last_ratio
+      j = 2 * index + parity
+      weight = (factors(3, j) / factors(1, j)) * &
+               (factors(4, j) / factors(2, j)) * (factors(5, j) / factors(6, j))
+      call normalization_square_step(term, term_power, enr(index), weight, .true., valid)
+      if(.not. valid) go to 900
+      call normalization_add_square(total, correction, total_power, term, term_power)
+      if(.not. recorded_schedule) then
+        relative_term = normalization_align(term, term_power - total_power) / (total + correction)
+        if(relative_term < dec) then
+          schedule_index = index
+          recorded_schedule = .true.
+        end if
+      end if
+    end do
+
+    ! Include every backward coefficient even when the forward sum required scaling.
+    term = 0.5_knd
+    term_power = 1_int64
+    do index = seed_index, 1, -1
+      j = 2 * index + parity
+      weight = (factors(1, j) / factors(3, j)) * &
+               (factors(2, j) / factors(4, j)) * (factors(6, j) / factors(5, j))
+      call normalization_square_step(term, term_power, enr(index), weight, .false., valid)
+      if(.not. valid) go to 900
+      call normalization_add_square(total, correction, total_power, term, term_power)
+    end do
+
+    ! Convert the packed binary sum to the existing decimal normalization contract.
+    total = total + correction
+    if(.not. ieee_is_finite(total) .or. total <= 0.0_knd) go to 900
+    total_power = total_power + exponent(total)
+    dmsnorm = fraction(total)
+    remaining = total_power
+    decimal_power = 0_int64
+    if(remaining < 0_int64) go to 900
+    if(remaining > 4_int64 * (int(huge(idmse), int64) + 2_int64)) go to 900
+    do while(remaining > 0_int64)
+      step = int(min(remaining, int(maxexponent(1.0_knd) / 2, int64)))
+      dmsnorm = scale(dmsnorm, step)
+      decimal_shift = decimal_exponent(dmsnorm)
+      dmsnorm = dmsnorm / (10.0_knd ** decimal_shift)
+      decimal_power = decimal_power + decimal_shift
+      remaining = remaining - step
+    end do
+    if(decimal_power > int(huge(idmse), int64)) go to 900
+    idmse = int(decimal_power)
+    if(modulo(idmse, 2) /= 0) then
+      idmse = idmse - 1
+      dmsnorm = 10.0_knd * dmsnorm
+    end if
+    dmlms = sgn / sqrt(dmsnorm)
+    idmlmse = -idmse / 2
+    return
+
+900 dmsnorm = ieee_value(0.0_knd, ieee_quiet_nan)
+    dmlms = dmsnorm
+  end subroutine complete_meixner_normalization
+
+
     subroutine dnorm (l, m, c, ndec, nex, limd, maxd, enr, sgn, d01, id01, &
              dmfnorm, idmfe, dmlmf, idmlmfe, dmsnorm, idmse, &
              dmlms, idmlmse, jnorm, jsub)
@@ -5037,8 +5534,10 @@ end if
          dmlms, d01, ea, rm2, sgn, sump, ten, term, teste, testeo
     real(knd) enr(maxd)
     real(knd), allocatable, save :: ratio_numerators(:,:), ratio_denominators(:,:)
+    real(knd), allocatable, save :: normalization_factors(:,:)
     real(knd), save :: ratio_parameter = -1.0_knd
     integer, save :: ratio_order = -1, ratio_counts(2) = 0
+    integer, save :: normalization_order = -1, normalization_count = 0
     integer :: parity_index
 !
     ten = 10.0e0_knd
@@ -5055,6 +5554,30 @@ end if
     lm2 = (l - m) / 2
     ix = l - m - 2 * lm2
     lim2 = limd / 2 - ix
+    ! Reuse the unchanged integer factors in both normalization sums across degrees.
+    if(allocated(normalization_factors)) then
+      if(size(normalization_factors, 2) < limd) deallocate(normalization_factors)
+    end if
+    if(.not. allocated(normalization_factors)) then
+      allocate(normalization_factors(9, max(limd, 2 * maxd)))
+      normalization_count = 0
+    end if
+    if(normalization_order /= m) normalization_count = 0
+    normalization_order = m
+    do j = normalization_count + 1, limd
+      aj = j
+      aj2 = aj + aj
+      normalization_factors(1, j) = aj
+      normalization_factors(2, j) = aj - 1.0_knd
+      normalization_factors(3, j) = aj + rm2
+      normalization_factors(4, j) = aj + rm2m1
+      normalization_factors(5, j) = aj2 + rm2m3
+      normalization_factors(6, j) = aj2 + rm2p1
+      normalization_factors(7, j) = aj * (aj - 1.0_knd)
+      normalization_factors(8, j) = aj * (aj - 1.0_knd) * (aj2 + rm2p1)
+      normalization_factors(9, j) = (aj + rm2 - 1.0_knd) * (aj + rm2)
+    end do
+    normalization_count = max(normalization_count, limd)
     ! Reuse coefficient-conversion factors shared by every degree of each parity.
     if(allocated(ratio_numerators)) then
       if(size(ratio_numerators, 1) < maxd) then
@@ -5094,8 +5617,8 @@ end if
      do 30 j = jlow, limd, 2
      aj = j
      jterm = jterm + 1
-     term = term * (aj + rm2) * enr(jterm) * (aj + rm2 - 1.0e0_knd)/ &
-        (aj * (aj - 1.0e0_knd))
+     term = term * normalization_factors(3, j) * enr(jterm) * &
+        normalization_factors(4, j) / normalization_factors(7, j)
      if(term > 0.0e0_knd) sump = sump + term
      dmfnorm = dmfnorm + term
      if(abs(term / dmfnorm) < dec) go to 40
@@ -5113,8 +5636,8 @@ end if
     jterm = lm2
      do 50 j = jlow, 2,-2
      aj = j
-     term = term * aj * (aj - 1.0e0_knd) / ((aj + rm2 &
-        -1.0e0_knd) * (aj + rm2) * enr(jterm))
+     term = term * normalization_factors(1, j) * normalization_factors(2, j) / &
+        (normalization_factors(9, j) * enr(jterm))
      if(term > 0.0e0_knd) sump = sump + term
      jterm = jterm - 1
      dmfnorm = dmfnorm + term
@@ -5159,56 +5682,13 @@ end if
 90   continue
 !
 !  compute the Meixner-Schafke normalizing factor
-    jflag = 0
-    idmse = 0
-    dmsnorm = 1.0e0_knd
-    coef = 1.0e0_knd
-    jlow = l - m + 2
-    jterm = lm2
-     do 150 j = jlow, limd, 2
-     aj = j
-     aj2 = aj + aj
-     jterm = jterm + 1
-     coef = coef * (aj + rm2) * enr(jterm) * (aj + rm2m1) * enr(jterm) &
-        *(aj2 + rm2m3) / (aj * (aj - 1.0e0_knd) * (aj2 + rm2p1))
-     dmsnorm = dmsnorm + coef
-     if(abs(coef / dmsnorm) < dec) go to 160
-      if(abs(dmsnorm) > teste) then
-      dmsnorm = dmsnorm * testeo
-      coef = coef * testeo
-      idmse = idmse + nfac
-      jflag = 1
-      end if
-150    continue
-160   jlow = l - m
-    jn = jterm
+    call complete_meixner_normalization(l, m, limd, enr, normalization_factors, dec, sgn, &
+                                        dmsnorm, idmse, dmlms, idmlmse, jn)
+    ! Keep the inherited workspace estimate separate from the complete positive sum.
     jnorm = max(jmf, jn)
-    if(jlow < 2 .or. jflag == 1) go to 180
-    coef = 1.0e0_knd
-    jterm = lm2
-    j = jlow
-     do 170 jj = 2, jlow, 2
-     aj = j
-     aj2 = aj + aj
-     coef = coef * aj * (aj - 1.0e0_knd) * (aj2 + rm2p1) / ((aj2 + rm2m3)* &
-         enr(jterm) * enr(jterm) * (aj + rm2) * (aj + rm2m1))
-     jterm = jterm - 1
-     j = j - 2
-     dmsnorm = dmsnorm + coef
-     if(abs(coef / dmsnorm) < dec) go to 180
-170    continue
-180   iterm = decimal_exponent(dmsnorm)
-    dmsnorm = dmsnorm * ten ** (-iterm)
-    idmse = idmse + iterm
-     if(2 * (idmse / 2) /= idmse) then
-     idmse = idmse - 1
-     dmsnorm = ten * dmsnorm
-     end if
-    dmlms = sgn / sqrt(dmsnorm)
-    idmlmse = -idmse / 2
 if (debug) then
     write(50, 190) jn, lim2
-190   format(5x,' Meixner-Schafke normalization converged in ', &
+190   format(5x,' Meixner-Schafke scheduling index ', &
         i6,' terms; ',i6,' terms available.')
 end if
       continue
@@ -5216,6 +5696,52 @@ end if
     end subroutine
 !
 !
+    subroutine angular_legendre_normalization(l, m, factor, exponent)
+    implicit none
+    integer, intent(in) :: l, m
+    real(knd), intent(out) :: factor
+    integer, intent(out) :: exponent
+    integer :: slot, j, decimal_shift
+    integer(kind=8) :: mode_index
+    real(knd) :: aj, twice_m
+
+    ! Collisions replace entries without changing normalization or modal support.
+    mode_index = int(l, 8) * (int(l, 8) + 1) / 2 + int(m, 8)
+    slot = 1 + int(modulo(mode_index, int(size(angular_normalization_cache), 8)))
+    if(angular_normalization_cache(slot)%m == m .and. &
+        angular_normalization_cache(slot)%l == l) then
+      factor = angular_normalization_cache(slot)%factor
+      exponent = angular_normalization_cache(slot)%exponent
+      return
+    end if
+
+    ! Preserve the original scaled factorial products and their operation order.
+    factor = 1.0_knd
+    exponent = 0
+    twice_m = m + m
+    do j = 1, m
+      aj = j
+      factor = factor * (aj + aj) * (aj + aj - 1.0_knd)
+      if(factor < 1.0e100_knd) cycle
+      factor = factor * 1.0e-100_knd
+      exponent = exponent + 100
+    end do
+    do j = 1, l - m
+      aj = j
+      factor = factor * (twice_m + aj) / aj
+      if(factor < 1.0e100_knd) cycle
+      factor = factor * 1.0e-100_knd
+      exponent = exponent + 100
+    end do
+    factor = factor * 2.0_knd / (l + l + 1.0_knd)
+    factor = sqrt(factor)
+    exponent = exponent / 2
+    decimal_shift = decimal_exponent(factor)
+    factor = factor * (10.0_knd ** (-decimal_shift))
+    exponent = exponent + decimal_shift
+    angular_normalization_cache(slot) = angular_normalization_entry(m, l, exponent, factor)
+    end subroutine angular_legendre_normalization
+
     pure function legendre_normalization_step(twice_m, offset) result(step)
     implicit none
     real(knd), intent(in) :: twice_m
@@ -5285,38 +5811,36 @@ end if
     integer, intent(out) :: length
     integer, intent(inout) :: status
     integer :: parity, last_ratio, seed_index, j, offset, normalization_slot, cached_steps
-    real(knd) :: twice_m, ratio, normalization_step
+    real(knd) :: twice_m, ratio, normalization_step, seed_value, current_value
 
     ! Express the existing Meixner coefficients in a unit-norm Legendre basis.
     parity = modulo(l - m, 2)
     last_ratio = limd / 2 - parity
     seed_index = (l - m - parity) / 2
-    length = 2 * last_ratio + parity + 1
+    length = l - m + 1
     values = 0.0_knd
     if(last_ratio < seed_index .or. last_ratio > size(enr)) then
       status = max(status, 2)
       return
     end if
-    if(size(values) < length) then
-      status = max(status, 1)
-      return
-    end if
-    values(l - m + 1) = seed * 10.0_knd ** seed_exponent
-    if(.not. ieee_is_finite(values(l - m + 1)) .or. values(l - m + 1) == 0.0_knd) then
+    seed_value = seed * 10.0_knd ** seed_exponent
+    if(.not. ieee_is_finite(seed_value) .or. seed_value == 0.0_knd) then
       status = max(status, 2)
       return
     end if
+    if(length <= size(values)) values(length) = seed_value
     twice_m = real(2 * m, knd)
 
     ! Reuse Legendre norm ratios that depend only on order and coefficient index.
-    call prepare_legendre_normalization(m, size(values) - 2, normalization_slot)
+    call prepare_legendre_normalization(m, 2 * last_ratio + parity - 1, normalization_slot)
     cached_steps = 0
     if(normalization_slot > 0) then
       if(allocated(legendre_normalization_cache(normalization_slot)%steps)) &
           cached_steps = size(legendre_normalization_cache(normalization_slot)%steps)
     end if
 
-    ! Reconstruct every available same-parity coefficient above the seed.
+    ! Stream the unchanged recurrence and retain every representable nonzero coefficient.
+    current_value = seed_value
     do j = seed_index + 1, last_ratio
       offset = 2 * (j - 1) + parity
       if(offset < cached_steps) then
@@ -5325,11 +5849,14 @@ end if
         normalization_step = legendre_normalization_step(twice_m, offset)
       end if
       ratio = enr(j) * normalization_step
-      values(offset + 3) = values(offset + 1) * ratio
-      if(.not. ieee_is_finite(values(offset + 3))) status = max(status, 2)
+      current_value = current_value * ratio
+      if(.not. ieee_is_finite(current_value)) status = max(status, 2)
+      if(current_value /= 0.0_knd) length = offset + 3
+      if(offset + 3 <= size(values)) values(offset + 3) = current_value
     end do
 
     ! Preserve the native normalization and phase while recursing downward.
+    current_value = seed_value
     do j = seed_index, 1, -1
       offset = 2 * (j - 1) + parity
       if(offset < cached_steps) then
@@ -5342,9 +5869,11 @@ end if
         status = max(status, 2)
         return
       end if
-      values(offset + 1) = values(offset + 3) / ratio
-      if(.not. ieee_is_finite(values(offset + 1))) status = max(status, 2)
+      current_value = current_value / ratio
+      if(.not. ieee_is_finite(current_value)) status = max(status, 2)
+      if(offset + 1 <= size(values)) values(offset + 1) = current_value
     end do
+    if(size(values) < length) status = max(status, 1)
     end subroutine normalized_legendre_coefficients
 
     subroutine identity_legendre_coefficients(values, lengths, status)
@@ -6242,6 +6771,7 @@ end if
 !    use param
 !
 !  real(knd) scalars and arrays
+    real(knd) sine_value, cosine_value
     real(knd) ak, amo2, an, arg, argb, arn, bn, c, coef, coefme, &
          coefmo, coefo, coef1, coef2, coef4, darg, dec, etai, &
          etaim1, etais, etal, etau, etcoef1, etcoef2, rm, rn, sargb, &
@@ -6363,11 +6893,12 @@ end if
     end if
     geometry_node = 0
     arg = c * sqrt(x1 * (x1 + 2.0e0_knd))
+    call paired_sine_cosine(arg, sine_value, cosine_value)
     darg = 1.0e0_knd / arg
-    stemp0 = -cos(arg) * darg
+    stemp0 = -cosine_value * darg
     norme(1) = decimal_exponent(abs(stemp0))
     ynormn(1) = stemp0 * 10.0e0_knd ** (-norme(1))
-    ynormn(2) = stemp0 * darg - sin(arg) * darg
+    ynormn(2) = stemp0 * darg - sine_value * darg
     norme(2) = norme(1)
     ynormn(2) = ynormn(2) * 10.0e0_knd ** (-norme(1))
 !
@@ -6437,10 +6968,11 @@ end if
       coefo = 1.0e0_knd / sargb
       end if
       arg = c * sargb
-      stemp0 = -cos(arg) / arg
+      call paired_sine_cosine(arg, sine_value, cosine_value)
+      stemp0 = -cosine_value / arg
       sneun(1) = stemp0
       sneun(1) = sneun(1) * neumann_scale(1)
-      sneun(2) = stemp0 / arg - sin(arg) / arg
+      sneun(2) = stemp0 / arg - sine_value / arg
       sneun(2) = sneun(2) * neumann_scale(2)
       darg = 1.0e0_knd / arg
        do 150 n = 3, m + 3, 2
@@ -6544,6 +7076,7 @@ end if
 !    use param
 !
 !  real(knd) scalars and arrays
+    real(knd) sine_value, cosine_value
     real(knd) c, cx, rn, stemp0, stemp1, x
     real(knd) sbesdf(maxj), sbesdr(maxlp), sbesf(maxj), sbesn(maxlp)
 !
@@ -6551,6 +7084,7 @@ end if
     dimension ibese(maxlp)
 !
     cx = c * x
+    call paired_sine_cosine(cx, sine_value, cosine_value)
     lim1 = int(cx + cx + 20)
 !
 !  compute first kind Bessel function ratios
@@ -6563,8 +7097,8 @@ end if
 !  get fcn. ratios:
 !       j(n+1,c*x)/j(n,c*x)=(2*n+1)/(c*x)-1/(j(n,c*x)/j(n-1,c*x))
 !
-    stemp0 = sin(cx) / cx
-    sbesf(1) = (stemp0 / cx - cos(cx) / cx) / stemp0
+    stemp0 = sine_value / cx
+    sbesf(1) = (stemp0 / cx - cosine_value / cx) / stemp0
      do 10 n = 1, limj - 1
      rn = n + n + 1
      sbesf(n + 1) = (rn / cx) - (1.0e0_knd / sbesf(n))
@@ -6593,11 +7127,11 @@ end if
 !  for all c*x, calculate the amplitude and sign scale
 !  factors by forward operation on the Bessel function
 !  ratios.
-    stemp0 = sin(cx) / cx
-    stemp1 = stemp0 / cx - cos(cx) / cx
+    stemp0 = sine_value / cx
+    stemp1 = stemp0 / cx - cosine_value / cx
     ibese(1) = decimal_exponent(abs(stemp0))
     sbesn(1) = stemp0 * 10.0e0_knd ** (-ibese(1))
-    if(abs(sin(cx)) < 0.5e0_knd .and. cx > 1.0e0_knd) go to 70
+    if(abs(sine_value) < 0.5e0_knd .and. cx > 1.0e0_knd) go to 70
     sbesn(2) = sbesn(1) * sbesf(1)
     ibese(2) = decimal_exponent(abs(sbesn(2)))
     sbesn(2) = sbesn(2) * 10.0e0_knd ** (-ibese(2))
@@ -6673,6 +7207,7 @@ end if
 !    use param
 !
 !  real(knd) scalars and arrays
+    real(knd) sine_value, cosine_value
     real(knd) c, cx, rn, rnn, stemp0, stemp1, x
     real(knd) sneudf(maxn), sneudr(maxlp), sneuf(maxn), sneun(maxlp)
 !
@@ -6693,8 +7228,9 @@ end if
 !
 !  compute derivative ratios at same time using function ratios.
     cx = c * x
-    stemp0 = -cos(cx) / cx
-    stemp1 = stemp0 / cx - sin(cx) / cx
+    call paired_sine_cosine(cx, sine_value, cosine_value)
+    stemp0 = -cosine_value / cx
+    stemp1 = stemp0 / cx - sine_value / cx
     sneuf(1) = stemp1 / stemp0
     sneudf(1) = -(cx - 2.0e0_knd * sneuf(1)) / (cx * sneuf(1))
      do 10 n = 1, limn - 1
