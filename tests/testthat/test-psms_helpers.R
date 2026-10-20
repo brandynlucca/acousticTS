@@ -1114,3 +1114,157 @@ test_that("adaptive quad hard boundaries match enlarged-support references", {
       20 * log10(Mod(-2i / wavenumber * expected))), 1e-8)
   }
 })
+
+test_that("adaptive quad PSMS preserves frequency vectors and scalar results", {
+  skip_if_not(acousticTS:::.quad_precision_available())
+  object <- gas_generate(
+    prolate_spheroid(length_body = 0.02, radius_body = 0.002),
+    density_fluid = 1.24, sound_speed_fluid = 345,
+    theta_body = 37.19 * pi / 180
+  )
+  original <- object
+  frequency <- c(2, 1, 2) * 1477.3 /
+    (2 * pi * sqrt(0.01^2 - 0.002^2))
+  for (boundary in c("gas_filled", "fixed_rigid", "pressure_release")) {
+    evaluate <- function(values) {
+      target_strength(object, values, "psms", boundary = boundary,
+        adaptive = TRUE, precision = "quad", simplify_Amn = FALSE,
+        density_sw = 1026.8, sound_speed_sw = 1477.3)
+    }
+    vector_result <- evaluate(frequency)
+    scalar_results <- lapply(frequency, evaluate)
+    expected_field <- vapply(scalar_results,
+      function(result) result@model$PSMS$f_bs, complex(1))
+    expected_ts <- vapply(scalar_results,
+      function(result) result@model$PSMS$TS, numeric(1))
+    expect_identical(vector_result@model$PSMS$frequency, frequency)
+    expect_true(all(Mod(vector_result@model$PSMS$f_bs - expected_field) <=
+      1e-18 + 1e-14 * Mod(expected_field)))
+    expect_lte(max(abs(vector_result@model$PSMS$TS - expected_ts)), 1e-8)
+    expect_identical(vector_result@model_parameters$PSMS$parameters$adaptive,
+      TRUE)
+    expect_identical(vector_result@model$PSMS$f_bs[1],
+      vector_result@model$PSMS$f_bs[3])
+  }
+  expect_identical(object, original)
+})
+
+test_that("adaptive quad PSMS preserves simulation grids and generated inputs", {
+  skip_if_not(acousticTS:::.quad_precision_available())
+  withr::local_seed(1379)
+  object <- gas_generate(
+    prolate_spheroid(length_body = 0.02, radius_body = 0.002),
+    density_fluid = 1.24, sound_speed_fluid = 345
+  )
+  original <- object
+  angle_draws <- 0L
+  speed_draws <- 0L
+  frequency <- c(30000, 15000)
+  parameters <- list(
+    boundary = c("gas_filled", "pressure_release"),
+    length_body = c(0.02, 0.03),
+    radius_body = 0.002,
+    theta = function() {
+      angle_draws <<- angle_draws + 1L
+      runif(1, 0.1, 1.3)
+    },
+    sound_speed_sw = function() {
+      speed_draws <<- speed_draws + 1L
+      runif(1, 1470, 1485)
+    },
+    density_sw = 1026.8,
+    adaptive = TRUE,
+    precision = "quad",
+    simplify_Amn = FALSE
+  )
+  actual <- simulate_ts(object, frequency, "psms", parameters = parameters,
+    parallel = FALSE, verbose = FALSE)$PSMS
+  expect_identical(angle_draws, 4L)
+  expect_identical(speed_draws, 4L)
+  expect_identical(actual$frequency, rep(frequency, 4L))
+  expect_equal(nrow(actual), 8L)
+  expected_grid <- expand.grid(boundary = parameters$boundary,
+    length_body = parameters$length_body, stringsAsFactors = FALSE)
+  cells <- seq.int(1L, nrow(actual), by = length(frequency))
+  expect_identical(actual$boundary[cells], expected_grid$boundary)
+  expect_identical(actual$length_body[cells], expected_grid$length_body)
+  expect_identical(actual$realization, rep(1L, 8L))
+  expect_identical(actual$radius_body, rep(0.002, 8L))
+  expect_true(all(actual$adaptive))
+  expect_true(all(actual$precision == "quad"))
+  expect_length(unique(actual$theta), 4L)
+  expect_length(unique(actual$sound_speed_sw), 4L)
+  # Reconstruct each resolved draw through independent public scalar calls =====
+  for (index in seq_len(nrow(actual))) {
+    row <- actual[index, ]
+    reference_object <- gas_generate(
+      prolate_spheroid(length_body = row$length_body,
+        radius_body = row$radius_body),
+      density_fluid = 1.24, sound_speed_fluid = 345,
+      theta_body = row$theta
+    )
+    reference <- target_strength(reference_object, row$frequency, "psms",
+      boundary = row$boundary, adaptive = TRUE, precision = "quad",
+      simplify_Amn = FALSE, density_sw = row$density_sw,
+      sound_speed_sw = row$sound_speed_sw)@model$PSMS
+    expect_lte(Mod(row$f_bs - reference$f_bs),
+      1e-18 + 1e-14 * Mod(reference$f_bs))
+    expect_lte(abs(row$TS - reference$TS), 1e-8)
+  }
+  expect_identical(object, original)
+})
+
+test_that("adaptive quad gas agrees with independently enlarged references", {
+  skip_if_not(acousticTS:::.quad_precision_available())
+  # Two successive joint enlargements confirmed each native quad reference =====
+  # Final (M,N,Ni): (11,66,66), (11,66,66), (16,241,241), (21,218,218) =========
+  # The final axial Robin reference uses (M,N,Ni) = (0,931,1214) ===============
+  cases <- data.frame(
+    semimajor_m = c(0.001, 0.001, 0.001, 0.01, 0.001),
+    frequency = c(0x1.1f068c57e2c6p+20, 0x1.1f068c57e2c6p+20,
+      0x1.1f068c57e2c6p+22, 0x1.cb3dad596ad66p+18,
+      0x1.ae89d283d4291p+24),
+    incidence = c(0, 0x1.0c152382d7365p-1, 0x1.0c152382d7365p-1,
+      0x1.921fb54442d18p+0, 0),
+    chi_sw = c(0x1.4p+2, 0x1.4p+2, 0x1.4p+4,
+      0x1.4000000000001p+4, 0x1.e000000000001p+6),
+    chi_body = c(0x1.568ff420a636fp+4, 0x1.568ff420a636fp+4,
+      0x1.568ff420a636fp+6, 0x1.568ff420a636fp+6,
+      0x1.00ebf7187ca93p+9),
+    reference_real = c(-0.0149132796747873439902380674882470732,
+      -0.0330585259897998436184308747532578063,
+      -0.0292157432844645998068917828336100188,
+      -2.45013905130522499746404858835601201,
+      -0.00321730834899562075031858529974459608),
+    reference_imaginary = c(0.028068678398639622227980460933428143,
+      -0.0465735001884262774735069284435437581,
+      0.0128533562928119153046266375917432826,
+      -2.81634227872851779357279836203608593,
+      -0.0637679656318616669605227867913564312)
+  )
+  for (index in seq_len(nrow(cases))) {
+    case <- cases[index, ]
+    object <- gas_generate(
+      prolate_spheroid(length_body = 2 * case$semimajor_m,
+        radius_body = case$semimajor_m / 100),
+      density_fluid = 1.24, sound_speed_fluid = 345,
+      theta_body = case$incidence
+    )
+    optimized <- target_strength(object, case$frequency, "psms",
+      boundary = "gas_filled", adaptive = TRUE, precision = "quad",
+      simplify_Amn = FALSE, density_sw = 1026.8,
+      sound_speed_sw = 1477.3, phi_body = pi)
+    inputs <- optimized@model_parameters$PSMS
+    expect_identical(inputs$parameters$acoustics$chi_sw, case$chi_sw)
+    expect_identical(inputs$parameters$acoustics$chi_body, case$chi_body)
+    expect_identical(inputs$body$xi, 0x1.000346ec78e6bp+0)
+    reference <- complex(real = case$reference_real,
+      imaginary = case$reference_imaginary)
+    field <- optimized@model$PSMS$f_bs
+    wavenumber <- inputs$parameters$acoustics$k_sw
+    expect_true(all(is.finite(field)))
+    expect_lte(Mod(field - reference), 1e-18 + 1e-14 * Mod(reference))
+    expect_lte(abs(optimized@model$PSMS$TS -
+      20 * log10(Mod(-2i / wavenumber * reference))), 1e-8)
+  }
+})
