@@ -101,23 +101,23 @@ struct State {
 };
 
 // Robin traces test pressure and normal-velocity continuity in separate spaces.
-void advance(State& state, psms_angle_prepared::Workspace<T>& prepared,
-    int m, int shared_degree, int shared_interior_degree,
-    T chi_sw, T chi_body, T xi, T density_ratio, T phi_difference) {
+inline void advance(State& state, psms_angle_prepared::Workspace<T>& prepared,
+        int m, int shared_degree, int shared_interior_degree,
+        T chi_sw, T chi_body, T xi, T density_ratio, T phi_difference) {
     const auto& incidence = state.incidence;
     const T pressure_reference = T(1) / precsqrt(T(2));
     const T derivative_reference = T(chi_sw) * precsqrt((incidence.cosine * incidence.cosine +
-    T(xi) * T(xi) * incidence.sine * incidence.sine / ((T(xi) - T(1)) * (T(xi) + T(1)))) / T(6));
+        T(xi) * T(xi) * incidence.sine * incidence.sine / ((T(xi) - T(1)) * (T(xi) + T(1)))) / T(6));
     const T amplitude_allowance = std::min(-expm1q(-logq(T(10)) * T(1e-8) / T(20)), psms_modal_rel_tol<T>());
     auto field_norm = [](const Complex& value) { return combine_norms(precabs(value.real()), precabs(value.imag())); };
     auto projection_defect = [](const OrderSolution<T>& order) {
-    TailNorm<T> defect;
-    for (size_t index = 0; index < order.traces[0].size(); ++index) {
-        const auto pressure = order.traces[0][index] - order.traces[2][index];
-        const auto derivative = order.traces[1][index] - order.traces[3][index];
-        defect.append(derivative + Complex(0, 1) * pressure);
-    }
-    return defect.value();
+        TailNorm<T> defect;
+        for (size_t index = 0; index < order.traces[0].size(); ++index) {
+            const auto pressure = order.traces[0][index] - order.traces[2][index];
+            const auto derivative = order.traces[1][index] - order.traces[3][index];
+            defect.append(derivative + Complex(0, 1) * pressure);
+        }
+        return defect.value();
     };
     auto& field = state.field;
     auto& correction = state.correction;
@@ -191,7 +191,6 @@ void advance(State& state, psms_angle_prepared::Workspace<T>& prepared,
     if (order_pass) state.finished = true;
     penultimate_order = previous_order;
     previous_order = magnitude;
-    
 }
 
 // Each order shares native coefficients across angles with identical physical inputs.
