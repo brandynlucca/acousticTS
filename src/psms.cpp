@@ -419,6 +419,87 @@ Rcpp::ComplexVector prolate_spheroid_fbs(
     }
     return Rcpp::wrap(f_bs_out);
 }
+
+// [[Rcpp::export]]
+Rcpp::List prolate_spheroid_gas_batch(Rcpp::List requests) {
+#if ACOUSTICTS_HAVE_QUADMATH
+    using T = acousticts_quad_t;
+    struct Group {
+        std::array<double, 8> physical;
+        std::vector<int> degrees;
+        std::vector<SpheroidalDirection<T>> directions;
+        std::vector<std::pair<R_xlen_t, int>> destinations;
+    };
+    Rcpp::List results(requests.size());
+    std::vector<Group> groups;
+    std::map<std::string, size_t> group_indices;
+    // Group exact initialized inputs while retaining each realization's frequency order.
+    for (R_xlen_t index = 0; index < requests.size(); ++index) {
+        const Rcpp::List request = requests[index];
+        const Rcpp::DataFrame acoustics = request["acoustics"];
+        const Rcpp::DataFrame body = request["body"];
+        const Rcpp::DataFrame medium = request["medium"];
+        const Rcpp::NumericVector chi_sw = acoustics["chi_sw"], chi_body = acoustics["chi_body"];
+        const Rcpp::NumericVector wavenumber = acoustics["k_sw"];
+        const Rcpp::IntegerVector orders = acoustics["m_max"], degrees = acoustics["n_max"];
+        const double xi = body["xi"], density_body = body["density"];
+        const double density_sw = medium["density"];
+        const double theta_body = body["theta_body"], theta_scatter = body["theta_scatter"];
+        const double phi_body = body["phi_body"], phi_scatter = body["phi_scatter"];
+        if (!std::isfinite(theta_body) || !std::isfinite(theta_scatter) ||
+                !psms_public_backscatter_angles(theta_body, theta_scatter, phi_body, phi_scatter))
+            Rcpp::stop("Gas angle batches require initialized backscatter directions.");
+        const int count = acoustics.nrows();
+        if (chi_sw.size() != count || chi_body.size() != count || wavenumber.size() != count ||
+                orders.size() != count || degrees.size() != count)
+            Rcpp::stop("Gas angle-batch acoustic columns have inconsistent lengths.");
+        results[index] = Rcpp::ComplexVector(count);
+        for (int frequency = 0; frequency < count; ++frequency) {
+            const std::array<double, 8> physical{
+                chi_sw[frequency], chi_body[frequency], xi, density_body, density_sw,
+                phi_body, phi_scatter, wavenumber[frequency]};
+            for (double value : physical) if (!std::isfinite(value))
+                Rcpp::stop("Gas angle-batch inputs must be finite.");
+            if (!(physical[0] > 0) || !(physical[1] > 0) || !(xi > 1) ||
+                    !(density_body > 0) || !(density_sw > 0) || !(physical[7] > 0) ||
+                    orders[frequency] < 0 || degrees[frequency] < orders[frequency])
+                Rcpp::stop("Invalid gas angle-batch geometry, material or modal support.");
+            std::string key;
+            for (double value : physical)
+                psms_coefficient_operator_cache::append_exact(key, value);
+            const auto found = group_indices.find(key);
+            size_t group_index;
+            if (found == group_indices.end()) {
+                group_index = groups.size();
+                group_indices.emplace(std::move(key), group_index);
+                groups.push_back(Group{physical, {}, {}, {}});
+            } else group_index = found->second;
+            auto& group = groups[group_index];
+            group.degrees.push_back(degrees[frequency]);
+            group.directions.push_back(psms_direction_from_angle(T(theta_body)));
+            group.destinations.emplace_back(index, frequency);
+        }
+    }
+    // Solve each physical group with shared functions and independent angular checks.
+    for (const auto& group : groups) {
+        Rcpp::checkUserInterrupt();
+        const auto& physical = group.physical;
+        const auto fields = psms_gas_support::fields(T(physical[0]), T(physical[1]),
+            T(physical[2]), group.degrees, T(physical[3]) / T(physical[4]),
+            group.directions, T(physical[6]) - T(physical[5]));
+        for (size_t index = 0; index < fields.size(); ++index) {
+            const auto& destination = group.destinations[index];
+            Rcpp::ComplexVector values = results[destination.first];
+            values[destination.second] = to_Rcomplex(fields[index]);
+        }
+    }
+    return results;
+#else
+    Rcpp::stop("Gas angle batches require native quad precision.");
+    return Rcpp::List();
+#endif
+}
+
 template<typename T>
 Rcpp::List prolate_tmatrix_blocks_to_rcpp(
     int m_max,
