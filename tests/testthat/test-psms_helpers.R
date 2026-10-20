@@ -656,13 +656,14 @@ test_that("quad monostatic kernels agree with retained bistatic amplitudes", {
           enlarged <- acoustics
           enlarged$m_max <- if (angle == 0) 0L else 24L
           enlarged$n_max <- 40L
+          enlarged_quadrature <- gauss_legendre(192L, -1, 1)
           first <- acousticTS:::prolate_spheroid_tmatrix_cpp(
-            enlarged, body, medium, quadrature, "quad", method
+            enlarged, body, medium, enlarged_quadrature, "quad", method
           )$f_scat
           enlarged$m_max <- if (angle == 0) 0L else 32L
           enlarged$n_max <- 56L
           second <- acousticTS:::prolate_spheroid_tmatrix_cpp(
-            enlarged, body, medium, quadrature, "quad", method
+            enlarged, body, medium, enlarged_quadrature, "quad", method
           )$f_scat
           expect_lte(Mod(first - second), 1e-18 + 1e-14 * Mod(second))
           expect_lte(Mod(actual - second), 1e-18 + 1e-14 * Mod(second))

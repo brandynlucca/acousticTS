@@ -111,7 +111,7 @@ test_that("frequency scheduling preserves stochastic and multi-row tasks", {
   expect_identical(actual$PSMS$frequency, rep(c(12000, 18000, 12000), 2))
 })
 
-test_that("single PSMS sweeps agree across independent PSOCK workers", {
+test_that("PSMS realizations agree across independent PSOCK workers", {
   skip_on_cran()
   object <- gas_generate(
     shape = prolate_spheroid(length_body = 0.14, radius_body = 0.01),
@@ -121,7 +121,8 @@ test_that("single PSMS sweeps agree across independent PSOCK workers", {
   parameters <- list(
     boundary = "gas_filled", simplify_Amn = FALSE,
     precision = if (acousticTS:::.quad_precision_available()) "quad" else "double",
-    density_sw = 1026.8, sound_speed_sw = 1477.3
+    density_sw = 1026.8, sound_speed_sw = 1477.3,
+    theta = c(pi / 2, pi / 3)
   )
   reference <- simulate_ts(
     object, frequency, "psms", parameters = parameters,
@@ -132,7 +133,7 @@ test_that("single PSMS sweeps agree across independent PSOCK workers", {
     parallel = TRUE, n_cores = 2, verbose = FALSE
   )
   expect_identical(names(actual), "PSMS")
-  expect_identical(actual$PSMS$frequency, frequency)
+  expect_identical(actual$PSMS$frequency, rep(frequency, 2L))
   expect_equal(actual, reference, tolerance = 1e-12)
 })
 
