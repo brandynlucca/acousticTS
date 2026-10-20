@@ -198,7 +198,10 @@ inline std::vector<Complex> fields(T chi_sw, T chi_body, T xi,
         const std::vector<int>& degree_seeds, T density_ratio,
         const std::vector<SpheroidalDirection<T>>& directions, T phi_difference) {
     if (directions.empty() || directions.size() != degree_seeds.size() ||
-            !(chi_sw > 0) || !(chi_body > 0) || !(xi > 1) || !(density_ratio > 0))
+            !(chi_sw > 0) || !(chi_body > 0) || !(xi > 1) || !(density_ratio > 0) ||
+            !is_finite_real(chi_sw) || !is_finite_real(chi_body) ||
+            !is_finite_real(xi) || !is_finite_real(density_ratio) ||
+            !is_finite_real(phi_difference))
         throw std::invalid_argument("Invalid gas support inputs.");
     // Furusawa's exterior estimate seeds refinement rather than limiting support.
     const T exterior_seed = ceilq(T(2) * chi_sw * precsqrt((xi - T(1)) * (xi + T(1)))) +
