@@ -2882,6 +2882,7 @@ template<typename T> void evaluate_coefficient_angular_values(ProfcnCoefficientB
 template<typename T> struct IncidentSequence {
     T argument = T(-1);
     int degree = -1, start = 0;
+    bool reset_start_on_extension = false;
     T pressure_change = 0, radial_change = 0, angular_change = 0;
     std::vector<T> values, derivatives, logarithmic_bounds;
 
@@ -3474,7 +3475,8 @@ template<typename T> void prepare_incident_sequence(IncidentSequence<T>& sequenc
     if (sequence.degree < degree) {
         if (degree > INT_MAX - 2)
             throw std::length_error("Incident coefficient support exceeds the native index range.");
-        sequence.start = std::max(sequence.start, degree + 1);
+        sequence.start = sequence.reset_start_on_extension ? degree + 1 :
+            std::max(sequence.start, degree + 1);
         auto initial = incident_miller_sequence(sequence.argument, degree, sequence.start);
         sequence.values = std::move(initial.first);
         sequence.derivatives = std::move(initial.second);
@@ -3726,6 +3728,55 @@ template<typename T> size_t batch_bytes(const ProfcnCoefficientBatchResult<T>& b
         functions.is1e.capacity() + functions.is1de.capacity() + functions.naccs.capacity()) * sizeof(int);
 }
 
+namespace psms_angle_prepared {
+// Unique identities prevent cache reuse after coefficient storage is replaced.
+inline std::uint64_t next_identity() {
+    static std::atomic<std::uint64_t> next{1};
+    auto value = next.load(std::memory_order_relaxed);
+    while (value != 0 && !next.compare_exchange_weak(value,
+            value == UINT64_MAX ? 0 : value + 1, std::memory_order_relaxed)) {}
+    return value;
+}
+template<typename T> struct Batch {
+    T c, x1;
+    int m, degree, radial_kind;
+    ProfcnCoefficientBatchResult<T> values;
+    Batch(T parameter, int order, int last_degree, T coordinate, int kind)
+        : c(parameter), x1(coordinate), m(order), degree(last_degree), radial_kind(kind),
+          values(cprofcn_mblock_coefficients<T>(c, m, 1, degree - m + 1,
+              kind == 2 ? std::vector<T>{T(0)} : std::vector<T>{}, kind, 0, x1, true)) {
+        values.cache_identity = next_identity();
+    }
+    const ProfcnCoefficientBatchResult<T>& checked(T parameter, int order, int last_degree,
+            T coordinate, int kind) const {
+        if (c != parameter || m != order || degree != last_degree || x1 != coordinate ||
+                radial_kind != kind || values.functions.m_count != 1 ||
+                values.functions.lnum != degree - m + 1)
+            throw std::invalid_argument("Prepared gas function inputs differ from the requested order.");
+        return values;
+    }
+};
+template<typename T> struct Workspace {
+    std::unique_ptr<Batch<T>> exterior, interior;
+    int current_order = -1;
+    Batch<T>& get(bool external, T c, int m, int degree, T x1) {
+        if (current_order != m) {
+            exterior.reset();
+            interior.reset();
+            current_order = m;
+        }
+        auto& stored = external ? exterior : interior;
+        const int kind = external ? 2 : 1;
+        if (!stored || stored->c != c || stored->m != m || stored->degree != degree || stored->x1 != x1) {
+            stored.reset();
+            stored.reset(new Batch<T>(c, m, degree, x1, kind));
+        }
+        stored->checked(c, m, degree, x1, kind);
+        return *stored;
+    }
+};
+}
+
 template<typename T> OrderSolution<T> solve_order(int m, int degree, int interior_degree,
         T chi_body, T xi, T incident_cosine, T phi_difference, T density_ratio,
         bool backscatter, bool robin, const ProfcnCoefficientBatchResult<T>& exterior,
@@ -3733,7 +3784,8 @@ template<typename T> OrderSolution<T> solve_order(int m, int degree, int interio
         SpheroidalCoefficientOverlapCache<T>* overlap_cache = nullptr,
         bool export_traces = true, bool retain_outgoing_terms = false,
         bool checked_direct = false, bool matrix_free_robin = false,
-        bool check_degree_support = false) {
+        bool check_degree_support = false,
+        const psms_angle_prepared::Batch<T>* prepared_interior = nullptr) {
     using Complex = std::complex<T>;
     OrderSolution<T> result;
     result.m = m;
@@ -3746,8 +3798,12 @@ template<typename T> OrderSolution<T> solve_order(int m, int degree, int interio
     // Each retry allocates one azimuthal order and preserves packed radial outputs.
     const int interior_size = checked_profcn_integer(static_cast<long long>(interior_degree) - m + 1,
         "inclusive interior degree count");
-    const auto interior = cprofcn_mblock_coefficients<T>(chi_body, m, 1,
+    // Reuse only a complete native batch with the exact requested physical inputs.
+    ProfcnCoefficientBatchResult<T> interior_storage;
+    if (!prepared_interior) interior_storage = cprofcn_mblock_coefficients<T>(chi_body, m, 1,
         interior_size, {}, 1, 0, xi - T(1), true);
+    const auto& interior = prepared_interior ?
+        prepared_interior->checked(chi_body, m, interior_degree, xi - T(1), 1) : interior_storage;
     OverlapSamples<T> quadrature_samples;
     const bool use_quadrature = overlap_quadrature != nullptr && overlap_quadrature->active();
     const bool sample_quadrature = use_quadrature && !overlap_quadrature->adaptive;

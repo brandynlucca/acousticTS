@@ -259,6 +259,8 @@ Rcpp::List Rmn_cpp(
 
 // ============================================================================
 #include "psms_backscatter.h"
+#include "psms_hard_support.h"
+#include "psms_gas_support.h"
 
 // Dispatch modal support selection and full boundary solves.
 template<typename T>
@@ -279,6 +281,16 @@ std::complex<T> psms_public_field(
         const auto reception = psms_direction_from_angle(theta_scatter);
 #if ACOUSTICTS_HAVE_QUADMATH
         if constexpr (is_quad_precision_v<T>) {
+            if (adaptive && backscatter && (hard || method == "Amn_fluid_gas")) {
+                if (m_seed < 0 || n_seed < m_seed)
+                    throw std::invalid_argument("Invalid spheroidal modal support.");
+                if (hard) return psms_adaptive_hard_field(chi_sw, xi, incidence,
+                    phi_scatter - phi_body, method == "Amn_fixed_rigid");
+                return psms_gas_support::fields(chi_sw, chi_body, xi,
+                    std::vector<int>{n_seed}, density_body / density_sw,
+                    std::vector<SpheroidalDirection<T>>{incidence},
+                    phi_scatter - phi_body).front();
+            }
             // Adapt full-liquid backscatter without changing fixed integration or other boundaries.
             if (adaptive && backscatter &&
                     (method == "Amn_fluid" || method == "Amn_fluid_coefficients"))
