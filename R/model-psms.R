@@ -170,8 +170,9 @@
 #'
 #' Full liquid and gas solutions also use the interior-wave and
 #' incidence-dependent estimates accompanying Khodabandeloo et al. (2025).
-#' These estimates define the retained modal ceilings. Adaptive calculations
-#' can truncate negligible modal tails before reaching those ceilings.
+#' These estimates initialize the retained modal support. Adaptive quad-precision
+#' backscatter calculations can enlarge support when degree-tail or boundary
+#' checks require it and stop negligible azimuthal contributions early.
 #'
 #' Full fluid solutions preserve pressure and normal-velocity continuity.
 #' Radial mantissas and exponents remain separate during assembly to avoid
