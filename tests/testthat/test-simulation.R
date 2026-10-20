@@ -1,6 +1,6 @@
 library(acousticTS)
 
-test_that("single PSMS sweeps distribute frequencies without changing results", {
+test_that("parallel simulations preserve full frequency vectors", {
   object <- gas_generate(
     shape = prolate_spheroid(length_body = 0.14, radius_body = 0.01),
     density_fluid = 1.24, sound_speed_fluid = 345
@@ -55,10 +55,10 @@ test_that("single PSMS sweeps distribute frequencies without changing results", 
     object, frequency, "PSMS", parameters = parameters,
     parallel = TRUE, n_cores = 2, verbose = FALSE
   )
-  expect_identical(task_indices, seq_along(frequency))
+  expect_identical(task_indices, 1L)
   expect_identical(parameter_draws, 1L)
-  expect_identical(task_chunk_size, 1L)
-  expect_true(task_load_balancing)
+  expect_null(task_chunk_size)
+  expect_identical(task_load_balancing, original_pboptions$use_lb)
   expect_identical(pbapply::pboptions(), original_pboptions)
   expect_identical(unlist(task_frequencies), frequency)
   expect_identical(actual$PSMS$frequency, frequency)

@@ -1246,17 +1246,27 @@ context("Automatic spheroidal boundary convergence") {
 #endif
     }
 
-    test_that("axial h0=60 hard boundaries retain the complete prescribed field with adaptive tails") {
+    test_that("axial h0=60 hard boundaries retain fixed double and converged quad fields") {
         auto check = [](auto scalar) {
             using T = decltype(scalar);
             using namespace psms_automatic;
             const T chi = T(60), xi = T(7) / precsqrt(T(48));
             const std::vector<T> empty;
-            // The failing public fixture prescribes M=18 and N=49 before exact axial reduction.
+            // Quad support is checked against two independently enlarged fixed series.
+            const int reference_degree = is_quad_precision_v<T> ? 160 : 49;
             for (const std::string method : {"Amn_pressure_release", "Amn_fixed_rigid"}) {
-                const auto complete = psms_public_field<T>(18, 49, chi, chi, xi,
+                const auto complete = psms_public_field<T>(18, reference_degree, chi, chi, xi,
                     T(0), T(0), T(0), T(0), T(1), T(1), empty, empty,
                     method, true, false, false);
+                if constexpr (is_quad_precision_v<T>) {
+                    const auto enlarged = psms_public_field<T>(18, 200, chi, chi, xi,
+                        T(0), T(0), T(0), T(0), T(1), T(1), empty, empty,
+                        method, true, false, false);
+                    const T scale = combine_norms(precabs(enlarged.real()), precabs(enlarged.imag()));
+                    const auto difference = complete - enlarged;
+                    expect_true(bool(combine_norms(precabs(difference.real()), precabs(difference.imag())) <=
+                        numerical_budget(scale)));
+                }
                 const auto adaptive = psms_public_field<T>(18, 49, chi, chi, xi,
                     T(0), T(0), T(0), T(0), T(1), T(1), empty, empty,
                     method, true, true, false);
@@ -1273,7 +1283,7 @@ context("Automatic spheroidal boundary convergence") {
 #endif
     }
 
-    test_that("prescribed PSMS ceilings remain fixed outside adaptive quad liquid backscatter") {
+    test_that("prescribed PSMS ceilings remain fixed outside adaptive quad backscatter") {
         auto check = [](auto scalar) {
             using T = decltype(scalar);
             const T chi = T(0.4), internal_chi = T(0.7), xi = T(1.5), density = T(1.1);
@@ -1294,6 +1304,8 @@ context("Automatic spheroidal boundary convergence") {
                         cosine, T(0.7), density, backscatter, false, exterior);
                     expect_true(bool(!fluid.singular));
                     for (bool adaptive : {false, true}) {
+                        // Adaptive quad backscatter selects support beyond the supplied seeds.
+                        if (adaptive && is_quad_precision_v<T> && backscatter) continue;
                         const auto actual = psms_public_field<T>(0, 0, chi, internal_chi, xi,
                             T(angle), T(receive_angle), T(0), T(0.7), density, T(1),
                             quadrature.nodes, quadrature.weights, "Amn_fluid_gas", backscatter, adaptive, false);

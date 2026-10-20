@@ -650,6 +650,23 @@ test_that("quad monostatic kernels agree with retained bistatic amplitudes", {
           # Adaptive liquid selects its support against the TS target ==========
           enlarged <- psms_liquid_enlarged_reference(acoustics, body, medium)
           expect_lte(abs(20 * log10(Mod(actual) / Mod(enlarged))), 1e-8)
+        } else if (adaptive && method %in%
+          c("Amn_fixed_rigid", "Amn_pressure_release", "Amn_fluid_gas")) {
+          # Confirm the adaptive field against two enlarged retained series ====
+          enlarged <- acoustics
+          enlarged$m_max <- if (angle == 0) 0L else 24L
+          enlarged$n_max <- 40L
+          first <- acousticTS:::prolate_spheroid_tmatrix_cpp(
+            enlarged, body, medium, quadrature, "quad", method
+          )$f_scat
+          enlarged$m_max <- if (angle == 0) 0L else 32L
+          enlarged$n_max <- 56L
+          second <- acousticTS:::prolate_spheroid_tmatrix_cpp(
+            enlarged, body, medium, quadrature, "quad", method
+          )$f_scat
+          expect_lte(Mod(first - second), 1e-18 + 1e-14 * Mod(second))
+          expect_lte(Mod(actual - second), 1e-18 + 1e-14 * Mod(second))
+          expect_lte(abs(20 * log10(Mod(actual) / Mod(second))), 1e-8)
         } else {
           expect_equal(actual, retained, tolerance = 1e-7,
             info = paste(method, angle, adaptive))
