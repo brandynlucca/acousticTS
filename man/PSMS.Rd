@@ -43,10 +43,8 @@ One of \code{"fixed_rigid"}, \code{"pressure_release"},
 \code{"liquid_filled"}, or \code{"gas_filled"}. See the
 boundary conditions documentation for more
 details on these different boundary conditions.}
-\item{\code{adaptive}}{When \code{TRUE}, choose quadrature order for full
-liquid-filled solutions and allow negligible modal tails to terminate
-backscatter sums early. Full gas solutions retain every degree in the
-selected modal system in either setting. Defaults to \code{FALSE}.}
+  \item{\code{adaptive}}{Apply adaptive modal support and quadrature
+selection. Defaults to \code{FALSE}.}
 \item{\code{simplify_Amn}}{When \code{FALSE} (default), solve the coupled
 pressure and normal-velocity boundary equations for liquid- or gas-filled
 spheroids. When \code{TRUE}, retain the diagonal approximation described in
@@ -57,19 +55,20 @@ precision when calculating the expansion matrix, \eqn{A_{mn}}. There are
 two choices: \code{"double"} for double-precision (64-bit) and
 \code{"quad"} for quadruple-precision (128-bit). Use \code{"quad"} when
 strong gas contrast or high acoustic size makes double precision unstable.}
-\item{\code{n_integration}}{An integer argument that informs the model how
-many integration points will be used to calculate \eqn{\alpha_{mn}^{m}},
-which is numerically calculated using Gauss-Legendre quadrature. When left
-as \code{NULL}, the model uses 96 integration points unless
-\code{adaptive = TRUE}, in which case a reduced-frequency-based
-quadrature rule is selected internally for the full liquid-filled
-solve. Full gas solutions evaluate angular overlaps from normalized
-expansion coefficients using Legendre orthogonality, so they do not use
-angular quadrature and are independent of \code{n_integration}. See
-\link{gauss_legendre} for a full description of how \code{n_integration} is
-used. \strong{Note:} this argument \strong{only} applies to when
-\code{boundary = "liquid_filled"}. It is
-otherwise left unused for all other boundary conditions.}
+\item{\code{n_integration}}{Number of Gauss-Legendre integration points
+used to calculate angular overlap integrals for full liquid-filled
+solutions in either precision. With \code{adaptive = FALSE}, an explicit
+value is used as supplied and \code{NULL} selects automatic integration. With
+\code{adaptive = TRUE}, quadrature order is selected internally and an
+explicit value is ignored with a warning. Full gas solutions calculate
+overlaps from normalized expansion coefficients and do not use this
+quadrature count. Fixed quadrature must resolve the angular functions.
+Automatic quadrature integrates the retained angular expansion products
+using the Gauss-Legendre polynomial exactness condition.
+Under this condition, orthogonality allows the integral to be evaluated
+algebraically from the complete expansion coefficients. Fixed integration
+counts continue to use their requested quadrature rule.
+See \link{gauss_legendre}.}
 \item{\code{sound_speed_sw}}{Seawater sound speed (\eqn{m~s^{-1}}).}
 \item{\code{density_sw}}{Seawater density (\eqn{kg~m^{-3}}).}
 }
@@ -160,7 +159,7 @@ keeps the fluid-filled solve in the requested arithmetic so that the
 linear-system stage does not become detached from the rest of the chosen
 precision pathway.
 
-For the full gas solution, angular overlaps are evaluated as dot products
+For full gas solutions, angular overlaps are dot products
 of expansion coefficients in an orthonormal associated Legendre basis.
 This follows from the spheroidal expansion and Legendre orthogonality
 identities in \href{https://dlmf.nist.gov/30.8.E1}{DLMF 30.8.1} and
@@ -180,6 +179,15 @@ The maximum values of \eqn{m} and \eqn{n} can be estimated by:
   m_{\max} = [2 k_0 b] \\
   n_{\max} = m_{\max} + [h_0 / 2]
 }
+
+Full liquid and gas solutions also use the interior-wave and
+incidence-dependent estimates accompanying Khodabandeloo et al. (2025).
+These estimates define the retained modal ceilings. Adaptive calculations
+can truncate negligible modal tails before reaching those ceilings.
+
+Full fluid solutions preserve pressure and normal-velocity continuity.
+Radial mantissas and exponents remain separate during assembly to avoid
+intermediate overflow.
 }
 
 \section{Implementation}{
