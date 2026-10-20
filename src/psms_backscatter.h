@@ -936,6 +936,7 @@ KernelResult<double> fluid_boundary_kernels_vectorized_double(
 // LUP/SVD solve paths, and shared boundary-matrix assembly utilities.
 // -----------------------------------------------------------
 #include "psms_linear_systems.h"
+#include "psms_coefficient_operator.h"
 
 // EXPANSION COEFFICIENT MATRICES FOR SCATTERED WAVES
 // ----------------------------------------------------------------------------
@@ -3797,7 +3798,8 @@ template<typename T> OrderSolution<T> solve_order(int m, int degree, int interio
             throw std::length_error("Full-fluid block exceeds the native matrix index range.");
         std::vector<T> incident_value(dim), incident_derivative(dim), receive_angular(dim);
         std::vector<T> interior_value(internal_dim), interior_derivative(internal_dim);
-        std::vector<T> column_scales(dim), overlaps(size_t(internal_dim) * dim);
+        bool implicit_overlap = robin && matrix_free_robin && !sample_quadrature;
+        std::vector<T> column_scales(dim), overlaps(implicit_overlap ? 0 : size_t(internal_dim) * dim);
         std::vector<Complex> external_value(dim), external_derivative(dim), incident_coefficients(dim);
         std::vector<Complex> robin_pressure(robin || export_traces ? internal_dim : 0);
         std::vector<Complex> robin_derivative(export_traces ? internal_dim : 0);
@@ -3823,7 +3825,7 @@ template<typename T> OrderSolution<T> solve_order(int m, int degree, int interio
             if (angular != T(0) && !is_na_int(angular_accuracy))
                 result.minimum_angular_accuracy = std::min(result.minimum_angular_accuracy, angular_accuracy);
         }
-        const bool reuse_coefficients = overlap_cache != nullptr && !sample_quadrature;
+        const bool reuse_coefficients = !implicit_overlap && overlap_cache != nullptr && !sample_quadrature;
         if (reuse_coefficients) {
             // Reuse only unchanged complete coefficient columns within this azimuthal order.
             overlap_cache->fill(m, parity, exterior, interior, overlaps);
@@ -3846,7 +3848,7 @@ template<typename T> OrderSolution<T> solve_order(int m, int degree, int interio
                 robin_pressure[row] = radial.first / denominator;
                 if (export_traces) robin_derivative[row] = radial.second / denominator;
             }
-            if (reuse_coefficients) continue;
+            if (implicit_overlap || reuse_coefficients) continue;
             for (int col = 0; col < dim; ++col) {
                 // Preserve supplied samples for fixed rules and use Ferrers orthogonality otherwise.
                 const T overlap = sample_quadrature ?
@@ -3870,7 +3872,10 @@ template<typename T> OrderSolution<T> solve_order(int m, int degree, int interio
                     throw std::runtime_error("Invalid outgoing Robin trace divisor.");
                 forcing[col] = Complex(incident_derivative[col], incident_value[col]) * incident_coefficients[col];
             }
-            auto rhs = psms_robin_solver::apply_map(overlaps, robin_pressure, forcing, internal_dim, dim);
+            // Apply complete coefficient projections without allocating the overlap matrix.
+            auto rhs = implicit_overlap ? psms_implicit_overlap::apply_map(
+                exterior, interior, parity, robin_pressure, forcing) :
+                psms_robin_solver::apply_map(overlaps, robin_pressure, forcing, internal_dim, dim);
             for (int col = 0; col < dim; ++col) rhs[col] -= incident_value[col] * incident_coefficients[col];
             // Bound retained arrays and restarted Arnoldi storage for workspace reporting.
             const size_t columns = size_t(dim), rows = size_t(internal_dim);
@@ -3883,8 +3888,46 @@ template<typename T> OrderSolution<T> solve_order(int m, int degree, int interio
                 (arnoldi_complex + retained_complex) * sizeof(Complex) + retained_real * sizeof(T) +
                 columns * sizeof(long long) + (2 * restart + 1) * sizeof(std::vector<Complex>) +
                 (overlap_cache ? overlap_cache->bytes() : 0));
-            const auto solution = psms_robin_solver::solve(overlaps, robin_pressure, exterior_ratio,
-                rhs, internal_dim, dim);
+            // Reconstruct the original represented overlaps only after an implicit rejection.
+            auto restore_explicit_overlaps = [&]() {
+                overlaps.resize(size_t(internal_dim) * dim);
+                if (overlap_cache) {
+                    overlap_cache->fill(m, parity, exterior, interior, overlaps);
+                    result.overlap_entries_reused += overlap_cache->reused_entries;
+                    result.overlap_entries_computed += overlap_cache->computed_entries;
+                } else {
+                    for (int row = 0; row < internal_dim; ++row) {
+                        for (int column = 0; column < dim; ++column) {
+                            const T value = spheroidal_coefficient_overlap(exterior, interior,
+                                0, parity + 2 * column, parity + 2 * row);
+                            if (!is_finite_real(value)) throw std::runtime_error("Angular overlap is nonfinite.");
+                            overlaps[size_t(row) * dim + column] = value;
+                            ++result.overlap_entries_computed;
+                        }
+                    }
+                }
+                implicit_overlap = false;
+                result.working_bytes = std::max(result.working_bytes, base_bytes +
+                    overlaps.capacity() * sizeof(T) + (overlap_cache ? overlap_cache->peak_bytes : 0));
+            };
+            psms_robin_solver::Result<T> solution;
+            if (implicit_overlap) {
+                psms_implicit_overlap::Operator<T> operation(
+                    exterior, interior, parity, robin_pressure, exterior_ratio);
+                solution = psms_robin_solver::solve_implicit(operation, rhs);
+                if (!solution.success) {
+                    restore_explicit_overlaps();
+                    // Recompute forcing in the original explicit representation before retrying.
+                    rhs = psms_robin_solver::apply_map(overlaps, robin_pressure, forcing, internal_dim, dim);
+                    for (int col = 0; col < dim; ++col)
+                        rhs[col] -= incident_value[col] * incident_coefficients[col];
+                    solution = psms_robin_solver::solve(overlaps, robin_pressure, exterior_ratio,
+                        rhs, internal_dim, dim);
+                }
+            } else {
+                solution = psms_robin_solver::solve(overlaps, robin_pressure, exterior_ratio,
+                    rhs, internal_dim, dim);
+            }
             if (solution.success) {
                 scattered.resize(dim);
                 for (int col = 0; col < dim; ++col) {
@@ -4058,9 +4101,13 @@ template<typename T> OrderSolution<T> solve_order(int m, int degree, int interio
         }
         // Fixed-support evaluation needs the coupled field but no boundary trace reconstruction.
         if (!export_traces) continue;
+        // Reuse the same complete projection for the physical interior trace.
+        const auto projected_robin = implicit_overlap ? psms_implicit_overlap::overlap_projection(
+            exterior, interior, parity, exterior_robin) : std::vector<Complex>();
         for (int row = 0; row < internal_dim; ++row) {
             Complex trace(0, 0), correction(0, 0);
-            for (int col = 0; col < dim; ++col)
+            if (implicit_overlap) trace = projected_robin[row];
+            else for (int col = 0; col < dim; ++col)
                 add(trace, correction, overlaps[size_t(row) * dim + col] * exterior_robin[col]);
             internal_pressure[row] = robin_pressure[row] * trace;
             internal_derivative[row] = robin_derivative[row] * trace;
