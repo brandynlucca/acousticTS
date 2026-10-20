@@ -2950,3 +2950,139 @@ context("Embedded liquid degree support") {
 #endif
     }
 }
+
+#if ACOUSTICTS_HAVE_QUADMATH
+context("Complete-coefficient Robin operator") {
+    test_that("implicit projections preserve full dense actions and residuals") {
+        using T = acousticts_quad_t;
+        using Complex = std::complex<T>;
+        int exact_comparisons = 0, rejected_inputs = 0;
+        auto require = [](bool condition, const char* message) {
+            if (!condition) Rcpp::stop(message);
+        };
+        auto equal_vectors = [&](const std::vector<Complex>& actual, const std::vector<Complex>& expected) {
+            require(actual == expected, "Implicit operator dyadic identity failed.");
+            exact_comparisons += int(actual.size());
+        };
+        auto batch = [](int capacity, std::initializer_list<int> lengths) {
+            ProfcnCoefficientBatchResult<T> result;
+            result.capacity = capacity;
+            result.functions.lnum = int(lengths.size());
+            result.functions.m_count = 1;
+            result.lengths.assign(lengths);
+            result.coefficients.assign(std::size_t(capacity) * lengths.size(), T(0));
+            for (int degree = 0; degree < result.functions.lnum; ++degree) {
+                const int length = result.lengths[degree];
+                for (int position = degree % 2; position < length; position += 2) {
+                    const int numerator = (3 * degree + 2 * position) % 7 + 1;
+                    const T sign = ((degree + position / 2) % 2) ? T(-1) : T(1);
+                    result.coefficients[std::size_t(capacity) * degree + position] = sign * T(numerator) / T(8);
+                }
+                // Nonzero padding detects any accidental use beyond the native column length.
+                for (int position = length; position < capacity; ++position)
+                    result.coefficients[std::size_t(capacity) * degree + position] = T(13) / T(2);
+            }
+            return result;
+        };
+        const auto exterior = batch(7, {5, 4, 7, 6, 3});
+        const auto interior = batch(9, {9, 2, 5, 8, 3, 4, 7});
+        for (int parity = 0; parity < 2; ++parity) {
+            const int columns = (exterior.functions.lnum - parity + 1) / 2;
+            const int rows = (interior.functions.lnum - parity + 1) / 2;
+            std::vector<T> overlap(std::size_t(rows) * columns, T(0));
+            std::vector<Complex> response(rows), diagonal(columns), input(columns), rhs(columns);
+            for (int row = 0; row < rows; ++row)
+                response[row] = Complex(T(row + 1) / T(8), T(1 - row) / T(16));
+            for (int column = 0; column < columns; ++column) {
+                diagonal[column] = Complex(T(2) + T(column) / T(4), -T(column + 1) / T(8));
+                input[column] = Complex(T(column + 1) / T(8), T(2 - column) / T(16));
+                rhs[column] = Complex(-T(column + 1) / T(4), T(column + 2) / T(8));
+            }
+    
+            // Independently form C from only the shared retained Legendre positions.
+            for (int row = 0; row < rows; ++row) {
+                const int internal_degree = parity + 2 * row;
+                for (int column = 0; column < columns; ++column) {
+                    const int external_degree = parity + 2 * column;
+                    const int length = std::min(interior.lengths[internal_degree], exterior.lengths[external_degree]);
+                    for (int position = parity; position < length; position += 2)
+                        overlap[std::size_t(row) * columns + column] +=
+                            interior.coefficients[std::size_t(interior.capacity) * internal_degree + position] *
+                            exterior.coefficients[std::size_t(exterior.capacity) * external_degree + position];
+                }
+            }
+            std::vector<Complex> expected_projection(rows), weighted(rows), expected_map(columns);
+            for (int row = 0; row < rows; ++row) {
+                for (int column = 0; column < columns; ++column)
+                    expected_projection[row] += overlap[std::size_t(row) * columns + column] * input[column];
+                weighted[row] = response[row] * expected_projection[row];
+            }
+            for (int column = 0; column < columns; ++column)
+                for (int row = 0; row < rows; ++row)
+                    expected_map[column] += overlap[std::size_t(row) * columns + column] * weighted[row];
+            equal_vectors(psms_implicit_overlap::overlap_projection(exterior, interior, parity, input), expected_projection);
+            equal_vectors(psms_implicit_overlap::apply_map(exterior, interior, parity, response, input), expected_map);
+    
+            // Compare both affine signs and the actual dense infinity norm exactly.
+            std::vector<Complex> expected_action(columns), expected_residual(columns), actual;
+            T dense_norm = 0;
+            for (int column = 0; column < columns; ++column) {
+                expected_action[column] = diagonal[column] * input[column] - expected_map[column];
+                expected_residual[column] = rhs[column] - expected_action[column];
+                T row_norm = 0;
+                for (int other = 0; other < columns; ++other) {
+                    Complex entry = column == other ? diagonal[column] : Complex(0, 0);
+                    for (int row = 0; row < rows; ++row)
+                        entry -= overlap[std::size_t(row) * columns + column] * response[row] *
+                            overlap[std::size_t(row) * columns + other];
+                    row_norm += precabs(entry.real()) + precabs(entry.imag());
+                }
+                dense_norm = std::max(dense_norm, row_norm);
+            }
+            psms_implicit_overlap::Operator<T> operation(exterior, interior, parity, response, diagonal);
+            require(operation.initialize(), "Implicit operator initialization failed.");
+            require(operation.diagonal == diagonal, "Implicit preconditioner changed the exterior diagonal.");
+            require(operation.norm_bound >= dense_norm, "Implicit norm bound is below the explicit matrix norm.");
+            require(operation.apply(input, actual), "Implicit operator action failed.");
+            equal_vectors(actual, expected_action);
+            require(operation.action(input, actual, &rhs), "Implicit affine residual failed.");
+            equal_vectors(actual, expected_residual);
+    
+            // Recover an independent manufactured solution with the implicit GMRES solve.
+            const auto solution = psms_robin_solver::solve_implicit(operation, expected_action);
+            require(solution.success, "Implicit GMRES rejected a manufactured system.");
+            for (int column = 0; column < columns; ++column)
+                require(psms_automatic::combine_norms(
+                    precabs(solution.solution[column].real() - input[column].real()),
+                    precabs(solution.solution[column].imag() - input[column].imag())) < T(1e-28),
+                    "Implicit GMRES disagrees with its manufactured solution.");
+    
+            // Reject malformed dimensions and nonfinite inputs before entering native arithmetic.
+            auto invalid = exterior;
+            invalid.lengths[parity] = invalid.capacity + 1;
+            psms_implicit_overlap::Operator<T> bad_length(invalid, interior, parity, response, diagonal);
+            require(!bad_length.initialize(), "Implicit operator accepted an invalid coefficient length.");
+            ++rejected_inputs;
+            invalid = exterior;
+            invalid.coefficients.pop_back();
+            psms_implicit_overlap::Operator<T> bad_rectangle(invalid, interior, parity, response, diagonal);
+            require(!bad_rectangle.initialize(), "Implicit operator accepted an invalid coefficient rectangle.");
+            ++rejected_inputs;
+            auto bad_input = input;
+            bad_input.pop_back();
+            require(!operation.apply(bad_input, actual), "Implicit operator accepted an invalid input length.");
+            ++rejected_inputs;
+            bad_input = input;
+            bad_input[0] = Complex(precnan<T>(), T(0));
+            require(!operation.apply(bad_input, actual), "Implicit operator accepted a nonfinite input.");
+            ++rejected_inputs;
+            auto bad_rhs = rhs;
+            bad_rhs.pop_back();
+            require(!operation.action(input, actual, &bad_rhs), "Implicit operator accepted an invalid RHS length.");
+            ++rejected_inputs;
+        }
+        expect_true(exact_comparisons > 0);
+        expect_true(rejected_inputs == 10);
+    }
+}
+#endif
