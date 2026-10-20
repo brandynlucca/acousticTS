@@ -516,12 +516,8 @@
 #' required exported objects, and it also means startup overhead is more
 #' noticeable for very small simulation jobs than for larger batched runs.
 #'
-#' For a single PSMS realization with multiple frequencies, the frequencies
-#' are distributed across workers. Their input order and duplicates are
-#' preserved, and the result remains in \code{result$PSMS}. Model controls such
-#' as \code{precision = "quad"} and \code{boundary = "gas_filled"} belong in
-#' \code{parameters}. Other models and simulations with multiple realizations
-#' continue to distribute complete realizations across workers.
+#' Each worker evaluates complete parameter realizations, passing the frequency
+#' vector to the requested models without changing its order or duplicates.
 #' Each worker has its own numerical caches and memory allocation. Increase
 #' \code{n_cores} only when sufficient memory is available for those processes.
 #'
@@ -633,12 +629,6 @@ simulate_ts <- function(object,
     type = if (verbose) "txt" else "none"
   )
   on.exit(pbapply::pboptions(old_pboptions), add = TRUE)
-  # Distribute a single deterministic PSMS sweep across frequency tasks ========
-  split_frequency <- !is.null(cluster) &&
-    nrow(simulation_grid) == 1L &&
-    identical(normalized_model, "psms") &&
-    length(frequency) > 1L
-  if (split_frequency) pbapply::pboptions(use_lb = TRUE)
   if (is.null(cluster)) {
     results_list <- pbapply::pblapply(
       seq_len(nrow(simulation_grid)),
@@ -650,34 +640,20 @@ simulate_ts <- function(object,
       }
     )
   } else {
-    task_indices <- if (split_frequency) {
-      seq_along(frequency)
-    } else {
-      seq_len(nrow(simulation_grid))
-    }
     results_list <- pbapply::pblapply(
-      task_indices,
-      function(task_index) {
+      seq_len(nrow(simulation_grid)),
+      function(grid_index) {
         worker_get_ts <- utils::getFromNamespace(".get_TS", "acousticTS")
-        grid_index <- if (split_frequency) 1L else task_index
-        task_frequency <- if (split_frequency) frequency[task_index] else frequency
         worker_get_ts(
-          grid_index, object, parameters, simulation_grid, task_frequency,
+          grid_index, object, parameters, simulation_grid, frequency,
           normalized_model
         )
       },
-      cl = cluster,
-      chunk.size = if (split_frequency) 1L else NULL
+      cl = cluster
     )
   }
   # Prepare output =============================================================
   final_result <- .combine_simulation_results(results_list)
-  # Preserve any unrequested model results already stored on the input object ==
-  if (split_frequency) {
-    for (model_name in setdiff(names(final_result), "PSMS")) {
-      final_result[[model_name]] <- results_list[[1L]][[model_name]]
-    }
-  }
   # Return output dataframe ====================================================
   if (verbose) {
     cat("====================================\n")

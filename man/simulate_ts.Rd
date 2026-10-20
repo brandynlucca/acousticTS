@@ -137,12 +137,8 @@ That means worker processes need access to the package namespace and any
 required exported objects, and it also means startup overhead is more
 noticeable for very small simulation jobs than for larger batched runs.
 
-For a single PSMS realization with multiple frequencies, the frequencies
-are distributed across workers. Their input order and duplicates are
-preserved, and the result remains in \code{result$PSMS}. Model controls such
-as \code{precision = "quad"} and \code{boundary = "gas_filled"} belong in
-\code{parameters}. Other models and simulations with multiple realizations
-continue to distribute complete realizations across workers.
+Each worker evaluates complete parameter realizations, passing the frequency
+vector to the requested models without changing its order or duplicates.
 Each worker has its own numerical caches and memory allocation. Increase
 \code{n_cores} only when sufficient memory is available for those processes.
 }
