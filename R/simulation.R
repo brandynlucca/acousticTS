@@ -425,7 +425,9 @@
 #' draw repeated samples from generating functions (distributions).
 #' @param parameters List containing the values, distributions, or generating
 #' functions of parameter values that inform the TS model. Defaults to an empty
-#' list, which runs a single realization of the unmodified object.
+#' list, which runs a single realization of the unmodified object. An explicit
+#' \code{frequency} entry supplies the frequency for each simulation row,
+#' overriding the shared \code{frequency} argument.
 #' @param batch_by Optional. Specifies which parameters in \code{parameters} to
 #' batch over. Simulations will be run for all combinations of these parameter
 #' values. Default is \code{NULL}.
@@ -518,6 +520,9 @@
 #'
 #' Each worker evaluates complete parameter realizations, passing the frequency
 #' vector to the requested models without changing its order or duplicates.
+#' To distribute individual frequencies across workers, supply them through
+#' \code{parameters = list(frequency = ...)}. Use \code{permute = FALSE} to pair
+#' those frequencies with other varied parameters.
 #' Each worker has its own numerical caches and memory allocation. Increase
 #' \code{n_cores} only when sufficient memory is available for those processes.
 #'
@@ -995,14 +1000,20 @@ simulate_ts <- function(object,
   # Calculate acousticTS =======================================================
   # [pun intended :)]
   # ---- Set up TS function arguments ++++++++++++++++++++++++++++++++++++++++++
+  # Use an explicitly varied frequency for this simulation row =================
+  row_frequency <- if ("frequency" %in% names(parameter_values)) {
+    parameter_values$frequency
+  } else {
+    frequency
+  }
   ts_args <- c(
     list(
       object = working_object,
-      frequency = frequency,
+      frequency = row_frequency,
       model = model,
       verbose = FALSE
     ),
-    parameter_values
+    parameter_values[names(parameter_values) != "frequency"]
   )
   # ---- Compute TS ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   working_object <- do.call(target_strength, ts_args)
@@ -1020,6 +1031,10 @@ simulate_ts <- function(object,
       }
       # ---- Add model name, parameter values, and realization number ++++++++++
       parameter_df <- .simulation_parameter_row_df(parameter_values)
+      # Retain the model frequency column without duplicate parameter metadata =
+      if ("frequency" %in% names(df)) {
+        parameter_df$frequency <- NULL
+      }
       parameter_df <- parameter_df[rep(1L, nrow(df)), , drop = FALSE]
       data.frame(
         model = rep(mod_name, nrow(df)),

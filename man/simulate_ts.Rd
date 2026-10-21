@@ -37,7 +37,9 @@ draw repeated samples from generating functions (distributions).}
 
 \item{parameters}{List containing the values, distributions, or generating
 functions of parameter values that inform the TS model. Defaults to an empty
-list, which runs a single realization of the unmodified object.}
+list, which runs a single realization of the unmodified object. An explicit
+\code{frequency} entry supplies the frequency for each simulation row,
+overriding the shared \code{frequency} argument.}
 
 \item{batch_by}{Optional. Specifies which parameters in \code{parameters} to
 batch over. Simulations will be run for all combinations of these parameter
@@ -139,6 +141,9 @@ noticeable for very small simulation jobs than for larger batched runs.
 
 Each worker evaluates complete parameter realizations, passing the frequency
 vector to the requested models without changing its order or duplicates.
+To distribute individual frequencies across workers, supply them through
+\code{parameters = list(frequency = ...)}. Use \code{permute = FALSE} to pair
+those frequencies with other varied parameters.
 Each worker has its own numerical caches and memory allocation. Increase
 \code{n_cores} only when sufficient memory is available for those processes.
 }
