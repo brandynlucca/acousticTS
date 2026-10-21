@@ -73,7 +73,6 @@ cal_sphere <- target_strength(
   frequency = frequency,
   model = "calibration"
 )
-
 ```
 
 ## Inspecting model results

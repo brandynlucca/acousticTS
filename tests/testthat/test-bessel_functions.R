@@ -3,8 +3,10 @@ library(acousticTS)
 test_that("real order-one Bessel values preserve roots and large arguments", {
   # Evaluate reference values with 50 digits before conversion to double =======
   x <- c(0, 3.8317059702075125, 7.015586669815619, 1e6)
-  expected <- c(0, -6.14980735699491e-17, 2.82533940947893e-17,
-    -0.000725968356813763)
+  expected <- c(
+    0, -6.14980735699491e-17, 2.82533940947893e-17,
+    -0.000725968356813763
+  )
   expect_lte(max(abs(Re(jc(1, x)) - expected)), 2e-18)
   expect_lte(max(abs(Re(jc(1, -x)) + expected)), 2e-18)
   expect_lte(max(abs(Re(jc(-1, x)) + expected)), 2e-18)

@@ -1,5 +1,5 @@
 ################################################################################
-# Stochastic distorted wave Born approximation (SDWBA)
+# Stochastic distorted wave Born approximation (SDWBA) =========================
 ################################################################################
 #' Stochastic distorted wave Born approximation (SDWBA) for weak scatterers
 #'
@@ -211,7 +211,7 @@ sdwba_initialize <- function(object,
       )
       body <- acousticTS::extract(object_new, "body")
       n_segments <- N_f_idx[i]
-      # Segment count fixes the phase SD for every member of this group.
+      # Segment count fixes the phase SD for every member of this group. =======
       group_phase_sd <- phase_sd[idx[1]]
       acoustics <- model_params$acoustics[idx, ]
       list(
@@ -435,7 +435,7 @@ sdwba_curved_initialize <- function(object,
       )
       body <- extract(object_new, "body")
       n_segments <- N_f_idx[i]
-      # Segment count fixes the phase SD for every member of this group.
+      # Segment count fixes the phase SD for every member of this group. =======
       group_phase_sd <- phase_sd[idx[1]]
       acoustics <- model_params$acoustics[idx, ]
       list(

@@ -2,14 +2,17 @@ library(acousticTS)
 
 test_that("simulation frequency rows cross other axes without duplicate columns", {
   object <- fls_generate(prolate_spheroid(0.02, 0.002),
-    density_body = 1045, sound_speed_body = 1520)
+    density_body = 1045, sound_speed_body = 1520
+  )
   original <- object
   calls <- list()
   testthat::local_mocked_bindings(
     target_strength = function(object, frequency, ...) {
       calls[[length(calls) + 1L]] <<- frequency
-      object@model$DWBA <- data.frame(frequency = frequency,
-        TS = frequency / 1000 + object@body$theta)
+      object@model$DWBA <- data.frame(
+        frequency = frequency,
+        TS = frequency / 1000 + object@body$theta
+      )
       object
     },
     .package = "acousticTS"
@@ -17,9 +20,12 @@ test_that("simulation frequency rows cross other axes without duplicate columns"
   parameters <- list(frequency = c(38000, 12000, 38000), theta = c(0.2, 0.7))
   actual <- simulate_ts(object, c(71000, 99000), "dwba",
     parameters = parameters, n_realizations = 2L,
-    parallel = FALSE, verbose = FALSE)$DWBA
-  grid <- expand.grid(frequency = parameters$frequency,
-    theta = parameters$theta)
+    parallel = FALSE, verbose = FALSE
+  )$DWBA
+  grid <- expand.grid(
+    frequency = parameters$frequency,
+    theta = parameters$theta
+  )
   expected <- grid[rep(seq_len(nrow(grid)), each = 2L), ]
   expect_identical(actual$frequency, expected$frequency)
   expect_identical(actual$theta, expected$theta)
@@ -34,7 +40,8 @@ test_that("simulation frequency rows cross other axes without duplicate columns"
 
 test_that("simulation frequency rows pair and schedule through parallel tasks", {
   object <- fls_generate(prolate_spheroid(0.02, 0.002),
-    density_body = 1045, sound_speed_body = 1520)
+    density_body = 1045, sound_speed_body = 1520
+  )
   tasks <- NULL
   calls <- list()
   progress_type <- NULL
@@ -42,8 +49,10 @@ test_that("simulation frequency rows pair and schedule through parallel tasks", 
   testthat::local_mocked_bindings(
     target_strength = function(object, frequency, ...) {
       calls[[length(calls) + 1L]] <<- frequency
-      object@model$DWBA <- data.frame(frequency = frequency,
-        TS = frequency / 1000 + object@body$theta)
+      object@model$DWBA <- data.frame(
+        frequency = frequency,
+        TS = frequency / 1000 + object@body$theta
+      )
       object
     },
     .prepare_simulation_cluster = function(...) {
@@ -59,13 +68,18 @@ test_that("simulation frequency rows pair and schedule through parallel tasks", 
     },
     .package = "pbapply"
   )
-  testthat::local_mocked_bindings(stopCluster = function(...) NULL,
-    .package = "parallel")
-  parameters <- list(frequency = c(38000, 12000, 38000),
-    theta = c(0.2, 0.7, 1.1))
+  testthat::local_mocked_bindings(
+    stopCluster = function(...) NULL,
+    .package = "parallel"
+  )
+  parameters <- list(
+    frequency = c(38000, 12000, 38000),
+    theta = c(0.2, 0.7, 1.1)
+  )
   capture.output(actual <- simulate_ts(object, 999000, "dwba",
     parameters = parameters, permute = FALSE, parallel = TRUE,
-    n_cores = 2L, verbose = TRUE)$DWBA)
+    n_cores = 2L, verbose = TRUE
+  )$DWBA)
   expect_identical(tasks, 1:3)
   expect_identical(actual$frequency, parameters$frequency)
   expect_identical(actual$theta, parameters$theta)
@@ -79,13 +93,16 @@ test_that("simulation frequency rows pair and schedule through parallel tasks", 
 
 test_that("simulation frequency rows preserve shared vectors and generated draws", {
   object <- fls_generate(prolate_spheroid(0.02, 0.002),
-    density_body = 1045, sound_speed_body = 1520)
+    density_body = 1045, sound_speed_body = 1520
+  )
   calls <- list()
   testthat::local_mocked_bindings(
     target_strength = function(object, frequency, ...) {
       calls[[length(calls) + 1L]] <<- frequency
-      object@model$DWBA <- data.frame(frequency = frequency,
-        TS = frequency / 1000 + object@body$theta)
+      object@model$DWBA <- data.frame(
+        frequency = frequency,
+        TS = frequency / 1000 + object@body$theta
+      )
       object
     },
     .package = "acousticTS"
@@ -93,17 +110,20 @@ test_that("simulation frequency rows preserve shared vectors and generated draws
   frequency <- c(38000, 12000, 38000)
   shared <- simulate_ts(object, frequency, "dwba",
     parameters = list(theta = c(0.2, 0.7)),
-    parallel = FALSE, verbose = FALSE)$DWBA
+    parallel = FALSE, verbose = FALSE
+  )$DWBA
   expect_identical(calls, list(frequency, frequency))
   expect_identical(shared$frequency, rep(frequency, 2L))
   expect_equal(shared$TS, rep(frequency / 1000, 2L) +
     rep(c(0.2, 0.7), each = length(frequency)))
   draws <- 0L
-  generated <- simulate_ts(object, frequency, "dwba", n_realizations = 3L,
+  generated <- simulate_ts(object, frequency, "dwba",
+    n_realizations = 3L,
     parameters = list(frequency = function() {
       draws <<- draws + 1L
       frequency[[draws]]
-    }), parallel = FALSE, verbose = FALSE)$DWBA
+    }), parallel = FALSE, verbose = FALSE
+  )$DWBA
   expect_identical(draws, 3L)
   expect_identical(generated$frequency, frequency)
   expect_identical(unlist(calls[3:5], use.names = FALSE), frequency)
@@ -123,7 +143,8 @@ test_that("parallel simulations preserve full frequency vectors", {
     density_sw = 1026.8, sound_speed_sw = 1477.3
   )
   reference <- simulate_ts(
-    object, frequency, "psms", parameters = parameters,
+    object, frequency, "psms",
+    parameters = parameters,
     parallel = FALSE, verbose = FALSE
   )
   parameter_draws <- 0L
@@ -159,10 +180,13 @@ test_that("parallel simulations preserve full frequency vectors", {
     },
     .package = "pbapply"
   )
-  testthat::local_mocked_bindings(stopCluster = function(...) NULL,
-                                .package = "parallel")
+  testthat::local_mocked_bindings(
+    stopCluster = function(...) NULL,
+    .package = "parallel"
+  )
   actual <- simulate_ts(
-    object, frequency, "PSMS", parameters = parameters,
+    object, frequency, "PSMS",
+    parameters = parameters,
     parallel = TRUE, n_cores = 2, verbose = FALSE
   )
   expect_identical(task_indices, 1L)
@@ -183,7 +207,8 @@ test_that("frequency scheduling preserves stochastic and multi-row tasks", {
   parameters <- list(n_iterations = 2)
   set.seed(193)
   reference <- simulate_ts(
-    krill, frequency, "sdwba", parameters = parameters,
+    krill, frequency, "sdwba",
+    parameters = parameters,
     parallel = FALSE, verbose = FALSE
   )
 
@@ -200,11 +225,14 @@ test_that("frequency scheduling preserves stochastic and multi-row tasks", {
     },
     .package = "pbapply"
   )
-  testthat::local_mocked_bindings(stopCluster = function(...) NULL,
-                                .package = "parallel")
+  testthat::local_mocked_bindings(
+    stopCluster = function(...) NULL,
+    .package = "parallel"
+  )
   set.seed(193)
   actual <- simulate_ts(
-    krill, frequency, "sdwba", parameters = parameters,
+    krill, frequency, "sdwba",
+    parameters = parameters,
     parallel = TRUE, n_cores = 2, verbose = FALSE
   )
   expect_identical(task_indices, 1L)
@@ -235,11 +263,13 @@ test_that("PSMS realizations agree across independent PSOCK workers", {
     theta = c(pi / 2, pi / 3)
   )
   reference <- simulate_ts(
-    object, frequency, "psms", parameters = parameters,
+    object, frequency, "psms",
+    parameters = parameters,
     parallel = FALSE, verbose = FALSE
   )
   actual <- simulate_ts(
-    object, frequency, "psms", parameters = parameters,
+    object, frequency, "psms",
+    parameters = parameters,
     parallel = TRUE, n_cores = 2, verbose = FALSE
   )
   expect_identical(names(actual), "PSMS")
@@ -248,8 +278,8 @@ test_that("PSMS realizations agree across independent PSOCK workers", {
 })
 
 test_that("worker libraries reuse installations and handle errors", {
-  # Isolate filesystem and subprocess boundaries without installing another
-  # package or changing the caller's worker cache.
+  # Isolate filesystem and subprocess boundaries without installing another ====
+  # package or changing the caller's worker cache. =============================
   resolver <- acousticTS:::.resolve_simulation_worker_library
   source <- "/source/acousticTS"
   libraries <- "/installed"
@@ -404,14 +434,14 @@ test_that("composite simulation aliases agree with explicit geometry changes", {
 })
 
 test_that("simulate_ts function works with empty parameters", {
-  # Test with a simple CAL object
+  # Test with a simple CAL object ==============================================
   cal_obj <- cal_generate()
   frequency <- c(38e3, 120e3)
 
-  # Basic simulation parameters -- nothing varies
+  # Basic simulation parameters -- nothing varies ==============================
   parameters <- list()
 
-  # Run simulation
+  # Run simulation =============================================================
   result <- simulate_ts(
     object = cal_obj,
     frequency = frequency,
@@ -422,20 +452,20 @@ test_that("simulate_ts function works with empty parameters", {
     verbose = FALSE
   )
 
-  # Check that result is a data frame
+  # Check that result is a data frame ==========================================
   expect_type(result, "list")
 
-  # Get the results
+  # Get the results ============================================================
   result_df <- result$calibration
 
-  # Check that we get the expected number of rows
+  # Check that we get the expected number of rows ==============================
   expect_equal(nrow(result_df), 5 * length(frequency))
 
-  # Check that required columns exist
+  # Check that required columns exist ==========================================
   expect_true("frequency" %in% colnames(result_df))
   expect_true("TS" %in% colnames(result_df))
 
-  # Check values
+  # Check values ===============================================================
   cal_reference <- cal_generate()
   cal_reference <- target_strength(
     cal_reference,
@@ -464,17 +494,17 @@ test_that("simulate_ts is the stable simulation entry point", {
 })
 
 test_that("simulate_ts function works with single sets of parameters", {
-  # Test with a simple CAL object
+  # Test with a simple CAL object ==============================================
   data(krill)
   frequency <- c(38e3, 120e3)
 
-  # Basic simulation parameters -- nothing varies
+  # Basic simulation parameters -- nothing varies ==============================
   parameters <- list(
     length = 20e-3,
     radius = 4e-3
   )
 
-  # Run simulation
+  # Run simulation =============================================================
   result <- simulate_ts(
     object = krill,
     frequency = frequency,
@@ -485,20 +515,20 @@ test_that("simulate_ts function works with single sets of parameters", {
     verbose = FALSE
   )
 
-  # Check that result is a data frame
+  # Check that result is a data frame ==========================================
   expect_type(result, "list")
 
-  # Get the results
+  # Get the results ============================================================
   result_df <- result$DWBA
 
-  # Check that we get the expected number of rows
+  # Check that we get the expected number of rows ==============================
   expect_equal(nrow(result_df), length(frequency))
 
-  # Check that required columns exist
+  # Check that required columns exist ==========================================
   expect_true("frequency" %in% colnames(result_df))
   expect_true("TS" %in% colnames(result_df))
 
-  # Check values
+  # Check values ===============================================================
   krill_reference <- target_strength(
     krill,
     frequency = frequency,
@@ -508,7 +538,7 @@ test_that("simulate_ts function works with single sets of parameters", {
 
   expect_false(all(unique(result_df$TS) == unique(reference_df$TS)))
 
-  # Pass undefined variable (i.e. not already within the object)
+  # Pass undefined variable (i.e. not already within the object) ===============
   expect_warning(
     result_curved <- simulate_ts(
       object = krill,
@@ -522,7 +552,7 @@ test_that("simulate_ts function works with single sets of parameters", {
     "deprecated"
   )
 
-  # Check values
+  # Check values ===============================================================
   expect_false(all(result_curved$DWBA_curved$TS == reference_df$TS))
 })
 
@@ -559,7 +589,7 @@ test_that("simulate_ts accepts model names case-insensitively", {
 test_that("simulate_ts infers realizations from deterministic parameters", {
   data(krill)
 
-  # A single deterministic grid axis needs no explicit n_realizations.
+  # A single deterministic grid axis needs no explicit n_realizations. =========
   one_by_two <- simulate_ts(
     object = krill,
     frequency = 38e3,
@@ -570,7 +600,7 @@ test_that("simulate_ts infers realizations from deterministic parameters", {
   )
   expect_equal(nrow(one_by_two$DWBA), 2)
 
-  # Multiple deterministic axes expand to their Cartesian product.
+  # Multiple deterministic axes expand to their Cartesian product. =============
   two_by_three <- simulate_ts(
     object = krill,
     frequency = 38e3,
@@ -588,7 +618,7 @@ test_that("simulate_ts infers realizations from deterministic parameters", {
     6
   )
 
-  # With no varying parameters a single realization runs.
+  # With no varying parameters a single realization runs. ======================
   none <- simulate_ts(
     object = krill,
     frequency = 38e3,
@@ -598,7 +628,7 @@ test_that("simulate_ts infers realizations from deterministic parameters", {
   )
   expect_equal(nrow(none$DWBA), 1)
 
-  # A structured multi-dimension target is one unit, not a grid axis.
+  # A structured multi-dimension target is one unit, not a grid axis. ==========
   structured <- simulate_ts(
     object = krill,
     frequency = 38e3,
@@ -612,7 +642,7 @@ test_that("simulate_ts infers realizations from deterministic parameters", {
   )
   expect_equal(nrow(structured$DWBA), 1)
 
-  # A list of structured targets is a grid axis.
+  # A list of structured targets is a grid axis. ===============================
   target_list <- simulate_ts(
     object = krill,
     frequency = 38e3,
@@ -625,7 +655,8 @@ test_that("simulate_ts infers realizations from deterministic parameters", {
   )
   expect_equal(nrow(target_list$DWBA), 2)
 
-  # Generating functions draw once per grid cell when n_realizations is absent.
+  # Generating functions draw once per grid cell when n_realizations is ========
+  # absent. ====================================================================
   inferred_gen <- simulate_ts(
     object = krill,
     frequency = 38e3,
@@ -639,7 +670,7 @@ test_that("simulate_ts infers realizations from deterministic parameters", {
   )
   expect_equal(nrow(inferred_gen$DWBA), 2)
 
-  # An explicit n_realizations still repeats every deterministic cell.
+  # An explicit n_realizations still repeats every deterministic cell. =========
   repeated <- simulate_ts(
     object = krill,
     frequency = 38e3,
@@ -669,7 +700,7 @@ test_that("simulate_ts infers realizations from deterministic parameters", {
 test_that("simulate_ts pairs parameters when permute = FALSE", {
   data(krill)
 
-  # Default crosses the two axes into the full grid.
+  # Default crosses the two axes into the full grid. ===========================
   crossed <- simulate_ts(
     object = krill,
     frequency = 38e3,
@@ -680,7 +711,7 @@ test_that("simulate_ts pairs parameters when permute = FALSE", {
   )
   expect_equal(nrow(crossed$DWBA), 4)
 
-  # permute = FALSE zips the axes element-wise into aligned pairs.
+  # permute = FALSE zips the axes element-wise into aligned pairs. =============
   paired <- simulate_ts(
     object = krill,
     frequency = 38e3,
@@ -694,7 +725,7 @@ test_that("simulate_ts pairs parameters when permute = FALSE", {
   expect_equal(paired$DWBA$theta_body, c(1, 2))
   expect_equal(paired$DWBA$density_body, c(1040, 1050))
 
-  # Length-one parameters stay constant across the pairs.
+  # Length-one parameters stay constant across the pairs. ======================
   const <- simulate_ts(
     object = krill,
     frequency = 38e3,
@@ -707,7 +738,7 @@ test_that("simulate_ts pairs parameters when permute = FALSE", {
   expect_equal(nrow(const$DWBA), 3)
   expect_true(all(const$DWBA$density_body == 1040))
 
-  # n_realizations still repeats each paired cell.
+  # n_realizations still repeats each paired cell. =============================
   repeated <- simulate_ts(
     object = krill,
     frequency = 38e3,
@@ -720,7 +751,7 @@ test_that("simulate_ts pairs parameters when permute = FALSE", {
   )
   expect_equal(nrow(repeated$DWBA), 6)
 
-  # Mismatched axis lengths cannot be zipped.
+  # Mismatched axis lengths cannot be zipped. ==================================
   expect_error(
     simulate_ts(
       object = krill,
@@ -736,16 +767,16 @@ test_that("simulate_ts pairs parameters when permute = FALSE", {
 })
 
 test_that("simulate_ts works with batch_by parameter", {
-  # Test batching with different parameter values
+  # Test batching with different parameter values ==============================
   data(krill)
   frequency <- c(38e3, 120e3)
 
-  # Parameters with batch_by
+  # Parameters with batch_by ===================================================
   parameters <- list(
     length = c(10e-3, 20e-3, 30e-3) # Will batch over these values
   )
 
-  # Run simulation with batching
+  # Run simulation with batching ===============================================
   result <- simulate_ts(
     object = krill,
     frequency = frequency,
@@ -757,15 +788,15 @@ test_that("simulate_ts works with batch_by parameter", {
     verbose = FALSE
   )
 
-  # Check that result is a data frame
+  # Check that result is a data frame ==========================================
   expect_type(result, "list")
   result_df <- result$DWBA
   expect_s3_class(result_df, "data.frame")
 
-  # Should have more rows due to batching
+  # Should have more rows due to batching ======================================
   expect_true(nrow(result_df) == 6)
 
-  # Check values against direct reforge() + target_strength() references
+  # Check values against direct reforge() + target_strength() references =======
   reference_df <- do.call(
     rbind,
     lapply(parameters$length, function(length_value) {
@@ -962,16 +993,16 @@ test_that("simulate_ts rejects conflicting convenience and explicit targets", {
 })
 
 test_that("simulate_ts works with generating functions", {
-  # Test with a generating function
+  # Test with a generating function ============================================
   data(krill)
   frequency <- c(38e3)
 
-  # Parameters with a generating function
+  # Parameters with a generating function ======================================
   parameters <- list(
     length = function() stats::rnorm(1, mean = 40e-3, sd = 5e-3)
   )
 
-  # Run simulation
+  # Run simulation =============================================================
   result <- simulate_ts(
     object = krill,
     frequency = frequency,
@@ -982,22 +1013,22 @@ test_that("simulate_ts works with generating functions", {
     verbose = FALSE
   )
 
-  # Check that result is a data frame
+  # Check that result is a data frame ==========================================
   expect_type(result, "list")
   result_df <- result$DWBA
   expect_s3_class(result_df, "data.frame")
 
-  # Get the results
+  # Get the results ============================================================
   result_df <- result$DWBA
 
-  # Check that we get the expected number of rows
+  # Check that we get the expected number of rows ==============================
   expect_equal(nrow(result_df), length(frequency) * 10)
 
-  # Check that required columns exist
+  # Check that required columns exist ==========================================
   expect_true("frequency" %in% colnames(result_df))
   expect_true("TS" %in% colnames(result_df))
 
-  # Ensure that values are not duplicated
+  # Ensure that values are not duplicated ======================================
   expect_true(length(unique(result_df$TS)) == length(frequency) * 10)
 })
 
@@ -1092,17 +1123,17 @@ test_that(
 )
 
 test_that("simulate_ts works with multiple generating functions", {
-  # Test with distribution parameters
+  # Test with distribution parameters ==========================================
   data(krill)
   frequency <- c(120e3)
 
-  # Parameters with distribution
+  # Parameters with distribution ===============================================
   parameters <- list(
     length = function() runif(1, min = 0.01, max = 0.05),
     theta = function() runif(1, min = 0, max = pi)
   )
 
-  # Run simulation
+  # Run simulation =============================================================
   result <- simulate_ts(
     object = krill,
     frequency = frequency,
@@ -1113,20 +1144,20 @@ test_that("simulate_ts works with multiple generating functions", {
     verbose = FALSE
   )
 
-  # Check that result is a data frame
+  # Check that result is a data frame ==========================================
   expect_type(result, "list")
   result_df <- result$DWBA
   expect_s3_class(result_df, "data.frame")
 
-  # Check number of rows
+  # Check number of rows =======================================================
   expect_equal(nrow(result_df), 10 * length(frequency))
 
-  # Ensure that values are not duplicated
+  # Ensure that values are not duplicated ======================================
   expect_true(length(unique(result_df$TS)) == length(frequency) * 10)
 })
 
 test_that("simulate_ts handles mixed parameter types", {
-  # Test mixing single values, vectors, and generating functions
+  # Test mixing single values, vectors, and generating functions ===============
   data(krill)
   frequency <- c(38e3, 70e3)
 
@@ -1146,23 +1177,23 @@ test_that("simulate_ts handles mixed parameter types", {
     verbose = FALSE
   )
 
-  # Check that result is a data frame
+  # Check that result is a data frame ==========================================
   expect_type(result, "list")
   result_df <- result$DWBA
   expect_s3_class(result_df, "data.frame")
 
-  # Get the results
+  # Get the results ============================================================
   result_df <- result$DWBA
 
-  # Check that we get the expected number of rows
+  # Check that we get the expected number of rows ==============================
   expect_equal(nrow(result_df), length(frequency) * 10)
 
-  # Ensure that values are not duplicated
+  # Ensure that values are not duplicated ======================================
   expect_true(length(unique(result_df$TS)) == length(frequency) * 10)
 })
 
 test_that("simulate_ts validates inputs correctly", {
-  # Test mixing single values, vectors, and generating functions
+  # Test mixing single values, vectors, and generating functions ===============
   data(krill)
   frequency <- c(38e3)
   parameters <- list(
@@ -1171,13 +1202,13 @@ test_that("simulate_ts validates inputs correctly", {
     theta = function() runif(1, min = 0, max = pi)
   )
 
-  # Test invalid model
+  # Test invalid model =========================================================
   expect_error(
     simulate_ts(krill, frequency, "invalid_model", 5, parameters),
     "Unknown target strength model 'invalid_model'"
   )
 
-  # Test missing batch_by parameter
+  # Test missing batch_by parameter ============================================
   expect_error(
     simulate_ts(krill, frequency, "calibration", 5, parameters,
       batch_by = "nonexistent_param"
@@ -1185,7 +1216,7 @@ test_that("simulate_ts validates inputs correctly", {
     "missing from 'parameters'"
   )
 
-  # Test invalid object class
+  # Test invalid object class ==================================================
   expect_error(
     simulate_ts("not_a_scatterer", frequency, "calibration", 5, parameters),
     "must be a 'scatterer'-based class"
@@ -1193,7 +1224,7 @@ test_that("simulate_ts validates inputs correctly", {
 })
 
 test_that("simulate_ts works with parallel processing", {
-  # Test mixing single values, vectors, and generating functions
+  # Test mixing single values, vectors, and generating functions ===============
   data(krill)
   frequency <- c(38e3, 70e3)
 
@@ -1205,7 +1236,7 @@ test_that("simulate_ts works with parallel processing", {
     }
   )
 
-  # Test with parallel = TRUE (default)
+  # Test with parallel = TRUE (default) ========================================
   result_parallel <- simulate_ts(
     object = krill,
     frequency = frequency,
@@ -1217,7 +1248,7 @@ test_that("simulate_ts works with parallel processing", {
     verbose = FALSE
   )
 
-  # Test with parallel = FALSE
+  # Test with parallel = FALSE =================================================
   result_sequential <- simulate_ts(
     object = krill,
     frequency = frequency,
@@ -1228,7 +1259,7 @@ test_that("simulate_ts works with parallel processing", {
     verbose = FALSE
   )
 
-  # Test batch_by parameter with generating function
+  # Test batch_by parameter with generating function ===========================
   result_gen <- simulate_ts(
     object = krill,
     frequency = frequency,
@@ -1242,28 +1273,28 @@ test_that("simulate_ts works with parallel processing", {
     verbose = FALSE
   )
 
-  # Check that result is a data frame
+  # Check that result is a data frame ==========================================
   expect_type(result_parallel, "list")
   result_df <- result_parallel$DWBA
   expect_s3_class(result_df, "data.frame")
 
-  # Extract sequential
+  # Extract sequential =========================================================
   sequential_df <- result_sequential$DWBA
 
-  # Check that we get the expected number of rows
+  # Check that we get the expected number of rows ==============================
   expect_equal(nrow(result_df), length(frequency) * 10)
 
-  # Ensure that values are not duplicated
+  # Ensure that values are not duplicated ======================================
   expect_true(length(unique(result_df$TS)) == 2)
   expect_true(all(result_df$TS == sequential_df$TS))
 
-  # Extract generative
+  # Extract generative =========================================================
   gen_df <- result_gen$DWBA
 
-  # Check that we get the expected number of rows
+  # Check that we get the expected number of rows ==============================
   expect_equal(nrow(gen_df), length(frequency) * 10)
 
-  # Ensure that values are not duplicated
+  # Ensure that values are not duplicated ======================================
   expect_true(length(unique(gen_df$TS)) == 2)
   expect_true(all(gen_df$TS != sequential_df$TS))
 })
@@ -1380,7 +1411,7 @@ test_that("simulate_ts supports theta_body for FLS objects in PSOCK mode", {
 })
 
 test_that("Simulation errors are raised as expected", {
-  # Test mixing single values, vectors, and generating functions
+  # Test mixing single values, vectors, and generating functions ===============
   data(krill)
   frequency <- c(38e3, 70e3)
   parameters <- list(
@@ -1389,7 +1420,7 @@ test_that("Simulation errors are raised as expected", {
     } # NULL value
   )
 
-  # Test case with invalid output [empty] from generating function
+  # Test case with invalid output [empty] from generating function =============
   expect_error(
     simulate_ts(
       object = krill,
@@ -1425,7 +1456,8 @@ test_that(
     )
     expect_true(any(grepl("Scatterer-class: CAL", header, fixed = TRUE)))
     expect_true(any(grepl(
-      "Total simulation realizations: 2", header, fixed = TRUE
+      "Total simulation realizations: 2", header,
+      fixed = TRUE
     )))
 
     sequential <- capture.output(

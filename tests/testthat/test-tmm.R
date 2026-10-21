@@ -3,28 +3,39 @@ library(acousticTS)
 test_that("prolate TMM geometry and retained blocks preserve exact semiaxes", {
   segments <- c(99L, 100L, 101L)
   objects <- lapply(segments, function(count) {
-    fls_generate(prolate_spheroid(semimajor_length = 0.07,
-      semiminor_length = 0.01, n_segments = count),
-      g_body = 1.03, h_body = 1.02, theta_body = 37 * pi / 180)
+    fls_generate(
+      prolate_spheroid(
+        semimajor_length = 0.07,
+        semiminor_length = 0.01, n_segments = count
+      ),
+      g_body = 1.03, h_body = 1.02, theta_body = 37 * pi / 180
+    )
   })
   initialized <- lapply(objects, function(object) {
-    acousticTS:::tmm_initialize(object, 12000, boundary = "fixed_rigid",
-      density_sw = 1026.8, sound_speed_sw = 1477.3, store_t_matrix = TRUE)
+    acousticTS:::tmm_initialize(object, 12000,
+      boundary = "fixed_rigid",
+      density_sw = 1026.8, sound_speed_sw = 1477.3, store_t_matrix = TRUE
+    )
   })
   reference <- initialized[[2]]@model_parameters$TMM
   psms <- acousticTS:::psms_initialize(objects[[2]], 12000,
-    boundary = "fixed_rigid", density_sw = 1026.8, sound_speed_sw = 1477.3)
+    boundary = "fixed_rigid", density_sw = 1026.8, sound_speed_sw = 1477.3
+  )
   psms_inputs <- psms@model_parameters$PSMS
   expect_identical(reference$body$xi, psms_inputs$body$xi)
   expect_identical(reference$body$q, psms_inputs$body$q)
   columns <- c("chi_sw", "m_max", "n_max")
-  expect_identical(reference$parameters$acoustics[, columns],
-    psms_inputs$parameters$acoustics[, columns])
+  expect_identical(
+    reference$parameters$acoustics[, columns],
+    psms_inputs$parameters$acoustics[, columns]
+  )
   for (index in c(1L, 3L)) {
     actual <- initialized[[index]]@model_parameters$TMM
     expect_identical(actual$body, reference$body)
-    expect_identical(actual$parameters$acoustics,
-      reference$parameters$acoustics)
+    expect_identical(
+      actual$parameters$acoustics,
+      reference$parameters$acoustics
+    )
   }
 
   # Compare the same finite retained system across profile discretizations =====
@@ -35,22 +46,30 @@ test_that("prolate TMM geometry and retained blocks preserve exact semiaxes", {
   expect_true(all(is.finite(solved[[2]]@model$TMM$f_bs)))
   expect_gt(Mod(solved[[2]]@model$TMM$f_bs), 0)
   for (index in c(1L, 3L)) {
-    expect_identical(solved[[index]]@model$TMM$f_bs,
-      solved[[2]]@model$TMM$f_bs)
-    expect_identical(solved[[index]]@model_parameters$TMM$parameters$t_matrix,
-      expected_blocks)
+    expect_identical(
+      solved[[index]]@model$TMM$f_bs,
+      solved[[2]]@model$TMM$f_bs
+    )
+    expect_identical(
+      solved[[index]]@model_parameters$TMM$parameters$t_matrix,
+      expected_blocks
+    )
   }
 
   # Direct and retained branches must initialize the same physical coordinates =
   direct <- acousticTS:::tmm_initialize(objects[[1]], 12000,
-    boundary = "fixed_rigid", density_sw = 1026.8, sound_speed_sw = 1477.3)
+    boundary = "fixed_rigid", density_sw = 1026.8, sound_speed_sw = 1477.3
+  )
   expect_identical(direct@model_parameters$TMM$body, reference$body)
-  expect_identical(direct@model_parameters$TMM$parameters$acoustics,
-    reference$parameters$acoustics)
+  expect_identical(
+    direct@model_parameters$TMM$parameters$acoustics,
+    reference$parameters$acoustics
+  )
   invalid <- objects[[1]]
   invalid@shape_parameters$semiminor_length <- 0.07
   expect_error(acousticTS:::tmm_initialize(invalid, 12000,
-    boundary = "fixed_rigid"), "finite scalar semiaxes")
+    boundary = "fixed_rigid"
+  ), "finite scalar semiaxes")
 })
 
 test_that("exact spherical TMM preserves invalid-angle handling", {
@@ -68,17 +87,25 @@ test_that("exact spherical TMM preserves retained blocks and modal cutoffs", {
   for (boundary in c("fixed_rigid", "pressure_release", "liquid_filled", "gas_filled")) {
     for (angle in c(0, 0.7, pi / 2)) {
       object <- if (boundary == "gas_filled") {
-        gas_generate(sphere(.01), density_fluid = 1.24, sound_speed_fluid = 345,
-          theta_body = angle)
+        gas_generate(sphere(.01),
+          density_fluid = 1.24, sound_speed_fluid = 345,
+          theta_body = angle
+        )
       } else {
-        fls_generate(sphere(.01), g_body = 1.0357, h_body = 1.0279,
-          theta_body = angle)
+        fls_generate(sphere(.01),
+          g_body = 1.0357, h_body = 1.0279,
+          theta_body = angle
+        )
       }
-      direct <- target_strength(object, frequencies, "tmm", boundary = boundary,
-        n_max = cutoffs, sound_speed_sw = 1477.4, density_sw = 1026.8)
-      retained <- target_strength(object, frequencies, "tmm", boundary = boundary,
+      direct <- target_strength(object, frequencies, "tmm",
+        boundary = boundary,
+        n_max = cutoffs, sound_speed_sw = 1477.4, density_sw = 1026.8
+      )
+      retained <- target_strength(object, frequencies, "tmm",
+        boundary = boundary,
         n_max = cutoffs, sound_speed_sw = 1477.4, density_sw = 1026.8,
-        store_t_matrix = TRUE)
+        store_t_matrix = TRUE
+      )
       expect_equal(direct@model$TMM$f_bs, retained@model$TMM$f_bs, tolerance = 2e-10)
       expect_equal(direct@model$TMM$TS, retained@model$TMM$TS, tolerance = 2e-10)
       expect_identical(direct@model$TMM$n_max, cutoffs)
@@ -135,12 +162,14 @@ test_that("TMM shell spheres agree with modal and retained solutions", {
     expect_equal(scattered$f_scat, fit@model$TMM$f_bs, tolerance = 1e-08)
     if (boundary %in% c("shelled_liquid", "elastic_shelled")) {
       inferred <- target_strength(
-        object, c(12e3, 38e3), model = "tmm",
+        object, c(12e3, 38e3),
+        model = "tmm",
         density_sw = 1026.8, sound_speed_sw = 1477.3
       )
       expect_equal(inferred@model$TMM$TS, fit@model$TMM$TS)
       truncated <- target_strength(
-        object, c(12e3, 38e3), model = "tmm", n_max = 20L,
+        object, c(12e3, 38e3),
+        model = "tmm", n_max = 20L,
         density_sw = 1026.8, sound_speed_sw = 1477.3
       )
       expect_equal(truncated@model$TMM$TS, fit@model$TMM$TS, tolerance = 1e-8)
@@ -165,7 +194,8 @@ test_that("TMM rejects unsupported shell geometries", {
 
 test_that("gas-sphere retained scattering can be plotted", {
   object <- target_strength(
-    fixture_sphere("gas_filled"), 38e3, "tmm", store_t_matrix = TRUE
+    fixture_sphere("gas_filled"), 38e3, "tmm",
+    store_t_matrix = TRUE
   )
   grDevices::pdf(NULL)
   on.exit(grDevices::dev.off(), add = TRUE)
@@ -787,9 +817,11 @@ tmm_finite_hard_field <- function(acoustics, body, boundary) {
     n <- unlist(lapply(orders, function(order) seq.int(order, acoustic$n_max)))
     # Evaluate the finite separated series independently through public APIs ===
     incident <- Smn(m, n, acoustic$chi_sw, cos(body$theta_body),
-      normalize = TRUE)$value
+      normalize = TRUE
+    )$value
     receiving <- Smn(m, n, acoustic$chi_sw, cos(body$theta_scatter),
-      normalize = TRUE)$value
+      normalize = TRUE
+    )$value
     first <- Rmn(m, n, acoustic$chi_sw, body$xi, kind = 1)
     outgoing <- Rmn(m, n, acoustic$chi_sw, body$xi, kind = 3)
     component <- if (boundary == "fixed_rigid") "derivative" else "value"
@@ -880,7 +912,8 @@ test_that(
         enlarged_f <- tmm_scattering(fitted,
           theta_body = theta_body, phi_body = phi_body,
           theta_scatter = body$theta_scatter,
-          phi_scatter = body$phi_scatter)$f_scat
+          phi_scatter = body$phi_scatter
+        )$f_scat
         if (!is.null(previous)) {
           expect_equal(enlarged_f, previous, tolerance = 1e-10)
         }
@@ -960,7 +993,8 @@ test_that("Stored prolate rigid scattering preserves finite support and converge
       enlarged_f <- tmm_scattering(fitted,
         theta_body = theta_body, phi_body = phi_body,
         theta_scatter = body$theta_scatter,
-        phi_scatter = body$phi_scatter)$f_scat
+        phi_scatter = body$phi_scatter
+      )$f_scat
       if (!is.null(previous)) {
         expect_equal(enlarged_f, previous, tolerance = 1e-10)
       }
@@ -1191,18 +1225,21 @@ test_that("prolate TMM angular batches preserve pointwise complex fields", {
         density_body = 1028.9, sound_speed_body = 1480.3,
         theta_body = 1.1
       ),
-      38e3, "tmm", boundary = "liquid_filled", precision = precision,
+      38e3, "tmm",
+      boundary = "liquid_filled", precision = precision,
       density_sw = 1026.8, sound_speed_sw = 1477.3, store_t_matrix = TRUE
     )
     grid <- tmm_scattering_grid(
-      object, theta_body = 1.1, phi_body = 0.4,
+      object,
+      theta_body = 1.1, phi_body = 0.4,
       theta_scatter = theta, phi_scatter = phi
     )
     expected <- matrix(0i, length(theta), length(phi))
     for (i in seq_along(theta)) {
       for (j in seq_along(phi)) {
         point <- tmm_scattering(
-          object, theta_body = 1.1, phi_body = 0.4,
+          object,
+          theta_body = 1.1, phi_body = 0.4,
           theta_scatter = theta[i], phi_scatter = phi[j]
         )
         expected[i, j] <- point$f_scat

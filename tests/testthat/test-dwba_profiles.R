@@ -1,8 +1,10 @@
 library(acousticTS)
 
 test_that("DWBA quadrature agrees with an independent real-Bessel integral", {
-  profile <- rbind(x = c(0, 0.01, 0.024, 0.04), y = 0,
-    z = c(0, 0.004, -0.001, 0.005), a = c(0.001, 0.004, 0.002, 0.0005))
+  profile <- rbind(
+    x = c(0, 0.01, 0.024, 0.04), y = 0,
+    z = c(0, 0.004, -0.001, 0.005), a = c(0.001, 0.004, 0.002, 0.0005)
+  )
   h <- 1.0279
   contrast <- 1 / (1.0357 * h^2) + 1 / 1.0357 - 2
   for (theta in c(0, 1.1, pi / 2)) {
@@ -25,15 +27,20 @@ test_that("DWBA quadrature agrees with an independent real-Bessel integral", {
         }
         complex(
           real = integrate(function(s) Re(integrand(s)), 0, 1,
-            rel.tol = 1e-10, abs.tol = 1e-13)$value,
+            rel.tol = 1e-10, abs.tol = 1e-13
+          )$value,
           imaginary = integrate(function(s) Im(integrand(s)), 0, 1,
-            rel.tol = 1e-10, abs.tol = 1e-13)$value
+            rel.tol = 1e-10, abs.tol = 1e-13
+          )$value
         )
       }, complex(1))
       actual <- acousticTS:::dwba_segment_integrals_cpp(profile, k, theta,
-        h, contrast, rel_tol = 1e-10, abs_tol = 1e-13)
+        h, contrast,
+        rel_tol = 1e-10, abs_tol = 1e-13
+      )
       total <- acousticTS:::dwba_fbs_cpp(profile, k, theta, h, contrast,
-        rel_tol = 1e-10, abs_tol = 1e-13)
+        rel_tol = 1e-10, abs_tol = 1e-13
+      )
       expect_equal(as.vector(actual), expected, tolerance = 1e-12)
       expect_equal(as.vector(total), sum(expected), tolerance = 1e-12)
     }
@@ -176,8 +183,7 @@ test_that("Canonical SDWBA matches the selected analytic profile", {
   )
 
   for (shape_name in c("sphere", "prolate_spheroid", "cylinder")) {
-    body_length <- switch(
-      shape_name,
+    body_length <- switch(shape_name,
       sphere = 0.02,
       prolate_spheroid = 0.14,
       cylinder = 0.07

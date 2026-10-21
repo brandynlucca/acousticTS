@@ -19,12 +19,13 @@
 
 .krm_reference_result <- function(object, frequency, variant = "lowcontrast") {
   target_strength(
-    object, frequency, "krm", density_sw = 1025, sound_speed_sw = 1500,
+    object, frequency, "krm",
+    density_sw = 1025, sound_speed_sw = 1500,
     krm_variant = variant
   )@model$KRM
 }
 
-# Clay (1991), Eqs. (7)-(12); Clay (1992), Eqs. (15)-(16), (A7).
+# Clay (1991), Eqs. (7)-(12); Clay (1992), Eqs. (15)-(16), (A7). ===============
 .krm_published_modal <- function(frequency, theta, sound_speed = 1500,
                                  density = 1025) {
   k <- 2 * pi * frequency / sound_speed
@@ -56,8 +57,10 @@ test_that("KRM low mode matches the published single-sinc cylinder", {
     for (theta in c(75, 90, 105) * pi / 180) {
       reference <- .krm_published_modal(frequency, theta, c_medium, rho_medium)
       for (x in grids) {
-        actual <- .krm_reference_result(.krm_reference_fish(x, theta),
-                                        frequency, variant)
+        actual <- .krm_reference_result(
+          .krm_reference_fish(x, theta),
+          frequency, variant
+        )
         expect_equal(as.vector(actual$f_bladder), reference, tolerance = 1e-12)
       }
     }
@@ -70,8 +73,10 @@ test_that("KRM high-frequency bladder phase follows the published coordinates", 
   for (variant in c("lowcontrast", "mixed", "body_embedded")) {
     c_high <- if (variant == "lowcontrast") 1500 else 1575
     k <- 2 * pi * frequency / c_high
-    original <- .krm_reference_result(.krm_reference_fish(theta = theta),
-                                      frequency, variant)
+    original <- .krm_reference_result(
+      .krm_reference_fish(theta = theta),
+      frequency, variant
+    )
     for (shift in list(c(0.02, 0), c(0, 0.003), c(0.02, 0.003))) {
       moved <- .krm_reference_result(
         .krm_reference_fish(theta = theta, dx = shift[1], dz = shift[2]),
@@ -102,7 +107,7 @@ test_that("KRM low mode retains one equivalent cylinder for a bent outline", {
   theta <- 75 * pi / 180
   for (x in list(c(-0.05, 0, 0.05), seq(-0.05, 0.05, length.out = 101))) {
     centerline <- 0.004 * abs(x) / 0.05
-    # The equivalent-cylinder formula uses volume and axial length only.
+    # The equivalent-cylinder formula uses volume and axial length only. =======
     original <- .krm_reference_result(
       .krm_reference_fish(x, theta, centerline = centerline), frequency
     )

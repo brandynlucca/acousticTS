@@ -31,7 +31,8 @@ test_that("profile operations agree across matrix orientations", {
   )
   expect_warning(
     shifted <- acousticTS:::.translate_column_position_matrix(
-      columns, x_offset = 1, y_offset = 2, z_offset = 3
+      columns,
+      x_offset = 1, y_offset = 2, z_offset = 3
     ),
     "does not store an explicit lateral centerline"
   )

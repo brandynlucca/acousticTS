@@ -36,7 +36,8 @@ test_that("SDWBA retains input order and duplicate frequencies", {
     slot <- if (model == "sdwba") "SDWBA" else "SDWBA_curved"
     run <- function(f) {
       suppressWarnings(target_strength(
-        object, frequency = f, model = model, phase_sd_init = 0,
+        object,
+        frequency = f, model = model, phase_sd_init = 0,
         n_iterations = 2, sound_speed_sw = 1456, density_sw = 1025
       ))@model[[slot]]
     }
@@ -65,9 +66,9 @@ test_that("SDWBA resampling preserves nodes at unchanged resolution", {
 })
 
 test_that("SDWBA retains the original snapped grid, spline and cylinder radii", {
-  # Hand-repartitioned descending grid: retain 0.023 and 0.011, then
-  # split their adjoining intervals evenly. Cubic centerline data exercise
-  # the original spline interpolation, rather than linear interpolation.
+  # Hand-repartitioned descending grid: retain 0.023 and 0.011, then ===========
+  # split their adjoining intervals evenly. Cubic centerline data exercise =====
+  # the original spline interpolation, rather than linear interpolation. =======
   x <- c(0.03, 0.023, 0.011, 0)
   y <- function(x) 100 * x^3
   z <- function(x) 2 * x^2
@@ -79,26 +80,34 @@ test_that("SDWBA retains the original snapped grid, spline and cylinder radii", 
   resampled <- sdwba_resample(object, 6)
   expected_x <- c(0.03, 0.023, 0.019, 0.015, 0.011, 0.0055, 0)
   expect_equal(unname(resampled@body$rpos[1, ]), expected_x)
-  expect_equal(resampled@body$radius,
-               c(0.0005, 0.002, 0.001, 0.001, 0.001, 0.0003, 0.0003))
+  expect_equal(
+    resampled@body$radius,
+    c(0.0005, 0.002, 0.001, 0.001, 0.001, 0.0003, 0.0003)
+  )
   expect_equal(unname(resampled@body$rpos[2, ]), y(expected_x))
   expect_equal(unname(resampled@body$rpos[3, ]), z(expected_x))
-  expect_equal(resampled@body$rpos["zU", ],
-               resampled@body$rpos["z", ] + resampled@body$radius)
-  expect_equal(resampled@body$rpos["zL", ],
-               resampled@body$rpos["z", ] - resampled@body$radius)
+  expect_equal(
+    resampled@body$rpos["zU", ],
+    resampled@body$rpos["z", ] + resampled@body$radius
+  )
+  expect_equal(
+    resampled@body$rpos["zL", ],
+    resampled@body$rpos["z", ] - resampled@body$radius
+  )
   reversed <- object
   reversed@body$rpos <- object@body$rpos[, 4:1]
   reversed@body$radius <- rev(object@body$radius)
   reversed <- sdwba_resample(reversed, 6)
   expect_equal(unname(reversed@body$rpos), unname(resampled@body$rpos[, 7:1]))
   expect_equal(reversed@body$radius, rev(resampled@body$radius))
-  # Two endpoint nodes must remain endpoints when coarsening/refining.
+  # Two endpoint nodes must remain endpoints when coarsening/refining. =========
   coarse <- sdwba_resample(object, 1)
   expect_equal(unname(coarse@body$rpos[1, ]), x[c(1, 4)])
   expect_equal(coarse@body$radius, object@body$radius[c(1, 4)])
-  expect_equal(sdwba_resample(coarse, 6)@body$radius,
-               c(0.0005, rep(0.0003, 6)))
+  expect_equal(
+    sdwba_resample(coarse, 6)@body$radius,
+    c(0.0005, rep(0.0003, 6))
+  )
 })
 
 test_that("Zero-phase SDWBA agrees with DWBA for an unchanged cylinder", {
@@ -107,7 +116,8 @@ test_that("Zero-phase SDWBA agrees with DWBA for an unchanged cylinder", {
     object@body$theta <- theta
     for (f in c(38e3, 120e3, 200e3)) {
       result <- target_strength(
-        object, frequency = f, model = c("dwba", "sdwba"),
+        object,
+        frequency = f, model = c("dwba", "sdwba"),
         phase_sd_init = 0, n_iterations = 3,
         sound_speed_sw = 1456, density_sw = 1025
       )@model
@@ -142,7 +152,7 @@ test_that("SDWBA stochastic power agrees with the Gaussian expectation", {
   power <- Mod(rowSums(sweep(exp(1i * phase_sd * draws), 2, amplitudes, `*`)))^2
   expected <- exp(-phase_sd^2) * Mod(sum(amplitudes))^2 +
     (1 - exp(-phase_sd^2)) * sum(Mod(amplitudes)^2)
-  # Six estimated standard errors bound sampling noise, not solver error.
+  # Six estimated standard errors bound sampling noise, not solver error. ======
   expect_lt(abs(result$sigma_bs - expected), 6 * sd(power) / sqrt(n))
 })
 
@@ -153,7 +163,8 @@ test_that("SDWBA preserves bent profiles in the zero-phase limit", {
   object@body$rpos["zL", ] <- object@body$rpos[3, ] - object@body$radius
   object@body$theta <- pi / 3
   result <- target_strength(
-    object, frequency = 120e3, model = c("dwba", "sdwba"),
+    object,
+    frequency = 120e3, model = c("dwba", "sdwba"),
     phase_sd_init = 0, n_iterations = 3
   )@model
   expect_equal(result$SDWBA$f_bs, result$DWBA$f_bs, tolerance = 1e-10)

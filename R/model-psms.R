@@ -48,7 +48,7 @@
 #'   \item{\code{n_integration}}{Number of Gauss-Legendre integration points
 #'   used to calculate angular overlap integrals for full liquid-filled
 #'   solutions in either precision. With \code{adaptive = FALSE}, an explicit
-#'   value is used as supplied and \code{NULL} selects automatic integration. 
+#'   value is used as supplied and \code{NULL} selects automatic integration.
 #'   With \code{adaptive = TRUE}, quadrature order is selected internally and an
 #'   explicit value is ignored with a warning. Full gas solutions calculate
 #'   overlaps from normalized expansion coefficients and do not use this
@@ -343,9 +343,11 @@ NULL
 #' Identify full penetrable PSMS boundary solves.
 #' @noRd
 .psms_is_full_fluid_method <- function(Amn_method) {
-  isTRUE(Amn_method %in% c("Amn_fluid", 
-  "Amn_fluid_gas", 
-  "Amn_fluid_coefficients"))
+  isTRUE(Amn_method %in% c(
+    "Amn_fluid",
+    "Amn_fluid_gas",
+    "Amn_fluid_coefficients"
+  ))
 }
 
 #' Resolve the hydrated PSMS body properties against the surrounding medium.
@@ -422,7 +424,7 @@ NULL
 #' @noRd
 .psms_n_integration <- function(n_integration, adaptive, Amn_method) {
   # Let the full liquid solve choose adaptive quadrature =======================
-  use_adaptive_quadrature <- isTRUE(adaptive) && 
+  use_adaptive_quadrature <- isTRUE(adaptive) &&
     identical(Amn_method, "Amn_fluid")
   if (use_adaptive_quadrature) {
     if (!is.null(n_integration)) {
@@ -617,8 +619,10 @@ psms_initialize <- function(object,
   adaptive = FALSE
 ) {
   # Generate nodes and weights for quadrature ==================================
-  quad_pts <- if (boundary_method %in% c("Amn_fluid_gas",
-    "Amn_fluid_coefficients") ||
+  quad_pts <- if (boundary_method %in% c(
+    "Amn_fluid_gas",
+    "Amn_fluid_coefficients"
+  ) ||
     (isTRUE(adaptive) && identical(boundary_method, "Amn_fluid"))) {
     list(nodes = numeric(), weights = numeric())
   } else {

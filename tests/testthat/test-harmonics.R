@@ -27,9 +27,9 @@ test_that("Legendre derivatives preserve polynomial and endpoint identities", {
   expect_warning(second <- Pndk(0.5, 0.25, 2), "finite differences")
   expected <- (2 * 0.25 * Pndk(0.5, 0.25, 1) - 0.5 * 1.5 * Pn(0.5, 0.25)) /
     (1 -
-       0.25^2)
-  # Fractional higher derivatives explicitly warn about their
-  # finite-difference approximation
+      0.25^2)
+  # Fractional higher derivatives explicitly warn about their ==================
+  # finite-difference approximation ============================================
   expect_equal(second, expected, tolerance = 0.02)
   expect_error(acousticTS:::Pn_deriv_cpp(1, 0, -1), "non-negative")
   expect_error(acousticTS:::Qn_deriv_cpp(1, 0, -1), "non-negative")

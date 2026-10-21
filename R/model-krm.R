@@ -711,7 +711,8 @@ krm_initialize <- function(object,
   media <- .krm_variant_media(model, krm_variant)
   R23 <- reflection_coefficient(body, bladder)
   bladder_geom <- .krm_bladder_geometry(
-    bladder$rpos, bladder$theta, summary_only = TRUE
+    bladder$rpos, bladder$theta,
+    summary_only = TRUE
   )
 
   ka_eq <- media$k_bladder_low * bladder_geom$a_eq_total

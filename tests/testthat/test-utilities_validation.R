@@ -5,8 +5,10 @@ test_that("structured simulation draws preserve names and dimensions", {
   resolve <- acousticTS:::.resolve_simulation_parameter_values
   expect_equal(normalize("length", function() c(1, 2)), c(1, 2))
   expect_error(normalize("length", numeric()), "at least 1 valid value")
-  expect_equal(resolve("scale", list(c(length = 2)), 3),
-               rep(list(c(length = 2)), 3))
+  expect_equal(
+    resolve("scale", list(c(length = 2)), 3),
+    rep(list(c(length = 2)), 3)
+  )
   draws <- list(c(length = 2), c(width = 3))
   expect_equal(resolve("scale", draws, 2), draws)
   expect_equal(resolve("scale", diag(2), 4), diag(2))
@@ -27,7 +29,8 @@ test_that("extraction and display handle missing metadata", {
   expect_equal(acousticTS:::.show_mean(c(NA_real_, NA_real_)), "NA")
   expect_match(
     acousticTS:::.show_property_block(list(custom_property = 2)),
-    "custom property: 2", fixed = TRUE
+    "custom property: 2",
+    fixed = TRUE
   )
 })
 

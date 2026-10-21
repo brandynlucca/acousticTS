@@ -39,13 +39,16 @@ test_that("calibration sequences preserve scalar modal solutions", {
   for (material in c("WC", "Cu", "Al")) {
     for (theta in c(0, 0.7, pi)) {
       object <- cal_generate(material = material, theta_sphere = theta)
-      expected <- vapply(frequencies, function(f)
-        .calibration_scalar_reference(object, f), numeric(1))
+      expected <- vapply(frequencies, function(f) {
+        .calibration_scalar_reference(object, f)
+      }, numeric(1))
       actual <- target_strength(object, frequencies, "calibration",
-        sound_speed_sw = 1500, density_sw = 1026)
+        sound_speed_sw = 1500, density_sw = 1026
+      )
       expect_equal(actual@model$calibration$f_bs, expected, tolerance = 1e-11)
       expect_equal(actual@model$calibration$TS, 20 * log10(expected),
-        tolerance = 1e-7)
+        tolerance = 1e-7
+      )
     }
   }
 })

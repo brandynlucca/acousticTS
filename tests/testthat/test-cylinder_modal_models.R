@@ -12,10 +12,14 @@ test_that("cylinder order sequences agree with scalar special functions", {
     }
     for (i in seq_along(ka)) {
       m <- 0:limits[i]
-      expected <- if (rigid) jcd(m, ka[i]) / hcd(m, ka[i]) else
+      expected <- if (rigid) {
+        jcd(m, ka[i]) / hcd(m, ka[i])
+      } else {
         jc(m, ka[i]) / hc(m, ka[i])
+      }
       expect_equal(actual[m + 1L, i], as.vector(expected) * weights[m + 1L],
-        tolerance = 2e-13)
+        tolerance = 2e-13
+      )
       if (limits[i] < max(limits)) {
         expect_true(all(is.na(actual[seq.int(limits[i] + 2L, nrow(actual)), i])))
       }

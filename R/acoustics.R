@@ -578,7 +578,8 @@ target_strength <- function(object,
   model_specs <- .resolve_target_strength_model_specs(model)
   model <- vapply(model_specs, function(spec) spec$canonical, character(1))
   model_args <- .normalize_target_strength_model_args(
-    model_args, model, resolved = TRUE
+    model_args, model,
+    resolved = TRUE
   )
   # Initialize the requested model families ====================================
   target_object <- .initialize_target_strength_models(

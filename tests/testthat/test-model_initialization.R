@@ -15,10 +15,14 @@ test_that("numerical model tables retain data-frame recycling and metadata", {
       do.call(data.frame, args)
     )
   }
-  expect_error(acousticTS:::.model_data_frame(frequency = 1:3, sigma_bs = 1:2),
-    "differing number of rows")
-  expect_error(acousticTS:::.model_data_frame(frequency = numeric(), sigma_bs = 1),
-    "differing number of rows")
+  expect_error(
+    acousticTS:::.model_data_frame(frequency = 1:3, sigma_bs = 1:2),
+    "differing number of rows"
+  )
+  expect_error(
+    acousticTS:::.model_data_frame(frequency = numeric(), sigma_bs = 1),
+    "differing number of rows"
+  )
 })
 
 test_that("calibration_initialize works correctly", {

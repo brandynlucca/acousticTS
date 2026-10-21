@@ -1,8 +1,8 @@
 ################################################################################
-# Show functions
+# Show functions ===============================================================
 ################################################################################
 ################################################################################
-# Methods for "show(...)" for each scattering class object
+# Methods for "show(...)" for each scattering class object =====================
 ################################################################################
 #' Format a numeric mean for display
 #' @noRd
@@ -74,10 +74,14 @@
   if (!is.null(radius_values)) {
     lines <- c(
       lines,
-      paste0(" Mean radius:", round(mean(radius_values, na.rm = TRUE), 4),
-        " ", units),
-      paste0(" Max radius:", round(max(radius_values, na.rm = TRUE), 4),
-        " ", units)
+      paste0(
+        " Mean radius:", round(mean(radius_values, na.rm = TRUE), 4),
+        " ", units
+      ),
+      paste0(
+        " Max radius:", round(max(radius_values, na.rm = TRUE), 4),
+        " ", units
+      )
     )
   }
 
