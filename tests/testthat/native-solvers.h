@@ -2779,7 +2779,33 @@ context("Binary128 complete-pivot screening") {
 #endif
 
 
-context("Embedded liquid degree support") {
+context("Embedded fluid degree support") {
+    test_that("adaptive quad gas recovers a degree allowance invalidated by cancellation") {
+#if ACOUSTICTS_HAVE_QUADMATH
+        using T = acousticts_quad_t;
+        // Preserve public binary64 inputs for the 188 kHz, 45 degree gas case.
+        const T chi = T(0x1.bb2df130cdc7cp+5), interior_chi = T(0x1.da6d446763a2ap+7);
+        const T xi = T(0x1.02a725cde2cb9p+0);
+        const T incidence = T(0x1.921fb54442d18p-1), scattering = T(0x1.2d97c7f3321d2p+1);
+        const T incident_azimuth = T(0x1.921fb54442d18p+1), scattered_azimuth = T(0x1.921fb54442d18p+2);
+        const T density_body = T(0x1.3d70a3d70a3d7p+0), density_water = T(1026.8);
+        const std::vector<T> empty;
+        const auto optimized = psms_public_field<T>(18, 185, chi, interior_chi, xi,
+            incidence, scattering, incident_azimuth, scattered_azimuth, density_body, density_water,
+            empty, empty, "Amn_fluid_gas", true, true, false);
+        // Fixed support M=48,N=320 agrees with independent M=60 and N=400 controls.
+        const std::complex<T> reference(T(0.125805993390489), T(-0.000718870932272577));
+        const T reference_norm = psms_direct_refinement::modulus(reference);
+        expect_true(psms_direct_refinement::finite(optimized));
+        const T difference_db = T(20) * precabs(log10q(
+            psms_direct_refinement::modulus(optimized) / reference_norm));
+        expect_true(bool(difference_db <= T(1e-8)));
+        const T complex_difference = psms_direct_refinement::modulus(optimized - reference);
+        expect_true(bool(complex_difference <= psms_modal_abs_tol<T>() +
+            psms_modal_rel_tol<T>() * reference_norm));
+#endif
+    }
+
     test_that("adaptive quad liquid expands an undersized seed to match enlarged support") {
 #if ACOUSTICTS_HAVE_QUADMATH
         using T = acousticts_quad_t;
@@ -2808,6 +2834,46 @@ context("Embedded liquid degree support") {
             expect_true(bool(complex_difference <= psms_modal_abs_tol<T>() +
                 psms_modal_rel_tol<T>() * reference_norm));
         }
+#endif
+    }
+
+    test_that("adaptive quad liquid recovers a degree allowance invalidated by cancellation") {
+#if ACOUSTICTS_HAVE_QUADMATH
+        using T = acousticts_quad_t;
+        // Preserve the public double inputs for the 128 kHz, 60 degree liquid null.
+        const T chi = T(0x1.2dbd3cb9bd207p+5), interior_chi = T(0x1.2d20b0d584431p+5);
+        const T xi = T(0x1.02a725cde2cb9p+0);
+        const T incidence = T(0x1.0c152382d7365p+0), scattering = T(0x1.0c152382d7366p+1);
+        const T incident_azimuth = T(0x1.921fb54442d18p+1), scattered_azimuth = T(0x1.921fb54442d18p+2);
+        const T density_body = T(0x1.013999999999ap+10), density_water = T(1026.8);
+        const std::vector<T> empty;
+        auto evaluate = [&](int maximum_order, int maximum_degree, bool adaptive) {
+            return psms_public_field<T>(maximum_order, maximum_degree, chi, interior_chi, xi,
+                incidence, scattering, incident_azimuth, scattered_azimuth, density_body, density_water,
+                empty, empty, "Amn_fluid_coefficients", true, adaptive, false);
+        };
+        const auto optimized = evaluate(14, 35, true);
+        // Separate order and degree enlargements check the fixed-support reference.
+        const auto reference = evaluate(32, 80, false);
+        const auto order_control = evaluate(40, 80, false);
+        const auto degree_control = evaluate(32, 100, false);
+        auto check_agreement = [&](const std::complex<T>& actual, const std::complex<T>& expected) {
+            expect_true(psms_direct_refinement::finite(actual));
+            expect_true(psms_direct_refinement::finite(expected));
+            const T reference_norm = psms_direct_refinement::modulus(expected);
+            expect_true(bool(reference_norm > T(0)));
+            if (reference_norm > T(0)) {
+                const T difference_db = T(20) * precabs(log10q(
+                    psms_direct_refinement::modulus(actual) / reference_norm));
+                expect_true(bool(difference_db <= T(1e-8)));
+                const T complex_difference = psms_direct_refinement::modulus(actual - expected);
+                expect_true(bool(complex_difference <= psms_modal_abs_tol<T>() +
+                    psms_modal_rel_tol<T>() * reference_norm));
+            }
+        };
+        check_agreement(reference, order_control);
+        check_agreement(reference, degree_control);
+        check_agreement(optimized, reference);
 #endif
     }
 

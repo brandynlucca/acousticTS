@@ -4823,20 +4823,22 @@ inline std::complex<acousticts_quad_t> psms_adaptive_liquid_field(
     const T target_strength_tolerance_db = T(1e-8);
     const T ts_amplitude_allowance = -expm1q(-logq(T(10)) * target_strength_tolerance_db / T(20));
     const T amplitude_allowance = std::min(ts_amplitude_allowance, psms_modal_rel_tol<T>());
-    Complex field(0, 0), field_correction(0, 0);
-    T previous_order = -1, penultimate_order = -1, total_degree_estimate = 0;
-    int small_orders = 0;
-    // Refine only the unresolved order while retaining completed contributions.
-    for (int m = 0; ; ++m) {
-        Rcpp::checkUserInterrupt();
-        // Removing two coefficients per parity requires at least six retained degrees.
-        int degree = std::max(n_seed, checked_profcn_integer(
-            static_cast<long long>(m) + 5, "embedded degree support"));
+    struct DegreeContribution {
+        int degree = 0, attempts = 0;
+        Complex field{0, 0};
+        T estimate = 0;
+        bool arithmetic_floor = false;
+    };
+    // Retain scalar summaries so later cancellation can tighten earlier allocations.
+    std::vector<DegreeContribution> contributions;
+    auto resolve_degree = [&](int m, int degree, int previous_attempts,
+            const Complex& other_orders, bool cancellation_recovery) {
         SpheroidalCoefficientOverlapCache<T> overlap_cache;
         OrderSolution<T> order;
+        DegreeContribution accepted;
         T estimate = 0, allowance = 0;
-        bool degree_pass = false;
-        for (int refinement = 0; refinement < 12; ++refinement) {
+        for (int refinement = previous_attempts; refinement < 12; ++refinement) {
+            Rcpp::checkUserInterrupt();
             auto exterior = cprofcn_mblock_coefficients<T>(chi_sw, m, 1,
                 degree - m + 1, arguments, 2, 0, xi - T(1), true);
             evaluate_coefficient_angular_values(exterior, m, directions, workspace);
@@ -4848,31 +4850,51 @@ inline std::complex<acousticts_quad_t> psms_adaptive_liquid_field(
                 throw std::runtime_error("Adaptive liquid coupled system is singular.");
             if (!order.embedded_valid[0] || !order.embedded_valid[1])
                 throw std::runtime_error("Adaptive liquid degree comparison failed its arithmetic check.");
-            const T scale = field_norm(field + order.field);
+            const T scale = field_norm(other_orders + order.field);
             allowance = amplitude_allowance * scale / (T(2) * T(m + 1) * T(m + 2));
             const T last = field_norm(order.field - order.embedded_fields[0]);
             const T preceding = field_norm(order.embedded_fields[0] - order.embedded_fields[1]);
             // Use modal magnitudes to account for cancellation in the rounding scale.
             const T arithmetic_floor = T(64) * preceps<T>() * order.embedded_roundoff_scale;
-            degree_pass = false;
+            bool degree_pass = false;
+            accepted.arithmetic_floor = false;
             // A geometric remainder estimates continued contraction of the degree increments.
             if (last <= arithmetic_floor && preceding <= arithmetic_floor) {
                 estimate = arithmetic_floor;
                 degree_pass = estimate <= allowance;
+                accepted.arithmetic_floor = true;
             } else if (preceding > T(0) && last < preceding) {
                 const T ratio = last / preceding;
                 estimate = last / (T(1) - ratio);
                 degree_pass = estimate <= allowance && preceding <= allowance;
             }
-            if (degree_pass) break;
+            // A floor-limited recovery is assessed against the complete error sum below.
+            if (degree_pass || (cancellation_recovery && accepted.arithmetic_floor)) {
+                accepted.degree = degree;
+                accepted.attempts = refinement + 1;
+                accepted.field = order.field;
+                accepted.estimate = estimate;
+                return accepted;
+            }
             degree = checked_profcn_integer((5LL * (degree + 1LL) + 3LL) / 4LL - 1LL,
                 "adaptive liquid degree refinement");
         }
-        if (!degree_pass)
-            throw std::runtime_error("Adaptive liquid degree tail did not converge within twelve refinements.");
-        total_degree_estimate += estimate;
+        throw std::runtime_error("Adaptive liquid degree tail did not converge within twelve refinements.");
+    };
+    Complex field(0, 0), field_correction(0, 0);
+    T previous_order = -1, penultimate_order = -1, total_degree_estimate = 0;
+    int small_orders = 0;
+    // Refine only the unresolved order while retaining completed contributions.
+    for (int m = 0; ; ++m) {
+        Rcpp::checkUserInterrupt();
+        // Removing two coefficients per parity requires at least six retained degrees.
+        const int degree = std::max(n_seed, checked_profcn_integer(
+            static_cast<long long>(m) + 5, "embedded degree support"));
+        const auto order = resolve_degree(m, degree, 0, field, false);
+        contributions.push_back(order);
+        total_degree_estimate += order.estimate;
         add_field(field, field_correction, order.field);
-        const T magnitude = field_norm(order.field);
+        T magnitude = field_norm(order.field);
         const T order_allowance = amplitude_allowance * field_norm(field) / T(2);
         small_orders = m >= 2 && magnitude <= order_allowance ? small_orders + 1 : 0;
         bool order_pass = incidence.exact_axis;
@@ -4881,11 +4903,61 @@ inline std::complex<acousticts_quad_t> psms_adaptive_liquid_field(
             order_pass = ratio < T(1) && magnitude * ratio / (T(1) - ratio) <= order_allowance;
         }
         if (order_pass) {
-            // Recheck the total degree allowance against the final accumulated field.
-            if (total_degree_estimate > amplitude_allowance * field_norm(field) / T(2))
-                throw std::runtime_error("Cancellation invalidated the adaptive liquid degree allowance.");
-            finite(field);
-            return field;
+            bool recovered = false;
+            // Tighten only offending contributions against the final, possibly cancelled field.
+            while (total_degree_estimate > amplitude_allowance * field_norm(field) / T(2)) {
+                Rcpp::checkUserInterrupt();
+                T fixed_estimate = 0, largest_estimate = -1;
+                int selected = -1;
+                for (int index = 0; index <= m; ++index) {
+                    const auto& retained = contributions[index];
+                    if (retained.arithmetic_floor || retained.attempts >= 12) {
+                        fixed_estimate += retained.estimate;
+                    } else if (retained.estimate > largest_estimate) {
+                        largest_estimate = retained.estimate;
+                        selected = index;
+                    }
+                }
+                if (selected < 0 || fixed_estimate > amplitude_allowance * field_norm(field) / T(2))
+                    throw std::runtime_error("Adaptive liquid cancellation exhausts the degree arithmetic or refinement allowance.");
+                auto& retained = contributions[selected];
+                // Rebuild the other-order field rather than subtract nearly cancelling terms.
+                Complex other_orders(0, 0), other_correction(0, 0);
+                for (int index = 0; index <= m; ++index)
+                    if (index != selected)
+                        add_field(other_orders, other_correction, contributions[index].field);
+                const int enlarged_degree = checked_profcn_integer(
+                    (5LL * (retained.degree + 1LL) + 3LL) / 4LL - 1LL,
+                    "adaptive liquid cancellation refinement");
+                retained = resolve_degree(selected, enlarged_degree, retained.attempts, other_orders, true);
+                field = field_correction = Complex(0, 0);
+                total_degree_estimate = 0;
+                for (const auto& contribution : contributions) {
+                    add_field(field, field_correction, contribution.field);
+                    total_degree_estimate += contribution.estimate;
+                }
+                recovered = true;
+            }
+            if (recovered) {
+                // Updated degree contributions must still satisfy the same azimuthal tail test.
+                const T updated_allowance = amplitude_allowance * field_norm(field) / T(2);
+                small_orders = 0;
+                for (int index = m; index >= 2 &&
+                        field_norm(contributions[index].field) <= updated_allowance; --index)
+                    ++small_orders;
+                magnitude = field_norm(contributions[m].field);
+                previous_order = m > 0 ? field_norm(contributions[m - 1].field) : T(-1);
+                penultimate_order = m > 1 ? field_norm(contributions[m - 2].field) : T(-1);
+                order_pass = incidence.exact_axis;
+                if (small_orders >= 2 && previous_order > T(0) && penultimate_order > T(0)) {
+                    const T ratio = std::max(magnitude / previous_order, previous_order / penultimate_order);
+                    order_pass = ratio < T(1) && magnitude * ratio / (T(1) - ratio) <= updated_allowance;
+                }
+            }
+            if (order_pass) {
+                finite(field);
+                return field;
+            }
         }
         penultimate_order = previous_order;
         previous_order = magnitude;

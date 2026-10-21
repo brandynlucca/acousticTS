@@ -1,5 +1,115 @@
 library(acousticTS)
 
+test_that("simulation frequency rows cross other axes without duplicate columns", {
+  object <- fls_generate(prolate_spheroid(0.02, 0.002),
+    density_body = 1045, sound_speed_body = 1520)
+  original <- object
+  calls <- list()
+  testthat::local_mocked_bindings(
+    target_strength = function(object, frequency, ...) {
+      calls[[length(calls) + 1L]] <<- frequency
+      object@model$DWBA <- data.frame(frequency = frequency,
+        TS = frequency / 1000 + object@body$theta)
+      object
+    },
+    .package = "acousticTS"
+  )
+  parameters <- list(frequency = c(38000, 12000, 38000), theta = c(0.2, 0.7))
+  actual <- simulate_ts(object, c(71000, 99000), "dwba",
+    parameters = parameters, n_realizations = 2L,
+    parallel = FALSE, verbose = FALSE)$DWBA
+  grid <- expand.grid(frequency = parameters$frequency,
+    theta = parameters$theta)
+  expected <- grid[rep(seq_len(nrow(grid)), each = 2L), ]
+  expect_identical(actual$frequency, expected$frequency)
+  expect_identical(actual$theta, expected$theta)
+  expect_identical(actual$realization, rep(1:2, nrow(grid)))
+  expect_equal(actual$TS, expected$frequency / 1000 + expected$theta)
+  expect_identical(unlist(calls, use.names = FALSE), expected$frequency)
+  expect_true(all(lengths(calls) == 1L))
+  expect_identical(sum(names(actual) == "frequency"), 1L)
+  expect_false(anyDuplicated(names(actual)) > 0L)
+  expect_identical(object, original)
+})
+
+test_that("simulation frequency rows pair and schedule through parallel tasks", {
+  object <- fls_generate(prolate_spheroid(0.02, 0.002),
+    density_body = 1045, sound_speed_body = 1520)
+  tasks <- NULL
+  calls <- list()
+  progress_type <- NULL
+  original_options <- pbapply::pboptions()
+  testthat::local_mocked_bindings(
+    target_strength = function(object, frequency, ...) {
+      calls[[length(calls) + 1L]] <<- frequency
+      object@model$DWBA <- data.frame(frequency = frequency,
+        TS = frequency / 1000 + object@body$theta)
+      object
+    },
+    .prepare_simulation_cluster = function(...) {
+      structure(list(), class = "cluster")
+    },
+    .package = "acousticTS"
+  )
+  testthat::local_mocked_bindings(
+    pblapply = function(X, FUN, ..., cl) {
+      tasks <<- X
+      progress_type <<- pbapply::pboptions()$type
+      lapply(X, FUN, ...)
+    },
+    .package = "pbapply"
+  )
+  testthat::local_mocked_bindings(stopCluster = function(...) NULL,
+    .package = "parallel")
+  parameters <- list(frequency = c(38000, 12000, 38000),
+    theta = c(0.2, 0.7, 1.1))
+  capture.output(actual <- simulate_ts(object, 999000, "dwba",
+    parameters = parameters, permute = FALSE, parallel = TRUE,
+    n_cores = 2L, verbose = TRUE)$DWBA)
+  expect_identical(tasks, 1:3)
+  expect_identical(actual$frequency, parameters$frequency)
+  expect_identical(actual$theta, parameters$theta)
+  expect_equal(actual$TS, parameters$frequency / 1000 + parameters$theta)
+  expect_identical(unlist(calls, use.names = FALSE), parameters$frequency)
+  expect_true(all(lengths(calls) == 1L))
+  expect_identical(sum(names(actual) == "frequency"), 1L)
+  expect_identical(progress_type, "txt")
+  expect_identical(pbapply::pboptions(), original_options)
+})
+
+test_that("simulation frequency rows preserve shared vectors and generated draws", {
+  object <- fls_generate(prolate_spheroid(0.02, 0.002),
+    density_body = 1045, sound_speed_body = 1520)
+  calls <- list()
+  testthat::local_mocked_bindings(
+    target_strength = function(object, frequency, ...) {
+      calls[[length(calls) + 1L]] <<- frequency
+      object@model$DWBA <- data.frame(frequency = frequency,
+        TS = frequency / 1000 + object@body$theta)
+      object
+    },
+    .package = "acousticTS"
+  )
+  frequency <- c(38000, 12000, 38000)
+  shared <- simulate_ts(object, frequency, "dwba",
+    parameters = list(theta = c(0.2, 0.7)),
+    parallel = FALSE, verbose = FALSE)$DWBA
+  expect_identical(calls, list(frequency, frequency))
+  expect_identical(shared$frequency, rep(frequency, 2L))
+  expect_equal(shared$TS, rep(frequency / 1000, 2L) +
+    rep(c(0.2, 0.7), each = length(frequency)))
+  draws <- 0L
+  generated <- simulate_ts(object, frequency, "dwba", n_realizations = 3L,
+    parameters = list(frequency = function() {
+      draws <<- draws + 1L
+      frequency[[draws]]
+    }), parallel = FALSE, verbose = FALSE)$DWBA
+  expect_identical(draws, 3L)
+  expect_identical(generated$frequency, frequency)
+  expect_identical(unlist(calls[3:5], use.names = FALSE), frequency)
+  expect_identical(sum(names(generated) == "frequency"), 1L)
+})
+
 test_that("parallel simulations preserve full frequency vectors", {
   object <- gas_generate(
     shape = prolate_spheroid(length_body = 0.14, radius_body = 0.01),

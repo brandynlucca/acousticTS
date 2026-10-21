@@ -18,19 +18,22 @@ inline bool direct_field(T chi_sw, T chi_body, T xi, int degree_seed,
     // Require both the TS target and the native complex-amplitude tolerance.
     const T ts_amplitude_allowance = -expm1q(-logq(T(10)) * T(1e-8) / T(20));
     const T amplitude_allowance = std::min(ts_amplitude_allowance, psms_modal_rel_tol<T>());
-    field = Complex(0, 0);
-    Complex field_correction(0, 0);
-    T previous_order = -1, penultimate_order = -1, total_degree_estimate = 0;
-    int small_orders = 0;
-    // Independent order blocks permit refinement without discarding accepted work.
-    for (int m = 0; !(chi_sw == chi_body && density_ratio == T(1)); ++m) {
-        Rcpp::checkUserInterrupt();
-        int degree = std::max(degree_seed, m + 5);
+    struct DegreeContribution {
+        int degree = 0, attempts = 0;
+        Complex field{0, 0};
+        T estimate = 0;
+        bool arithmetic_floor = false;
+    };
+    // Retain scalar summaries so cancellation can tighten previously accepted orders.
+    std::vector<DegreeContribution> contributions;
+    auto resolve_degree = [&](int m, int degree, int previous_attempts,
+            const Complex& other_orders, bool cancellation_recovery,
+            DegreeContribution& accepted) {
         SpheroidalCoefficientOverlapCache<T> overlap_cache;
         OrderSolution<T> order;
         T estimate = 0, allowance = 0;
-        bool degree_pass = false;
-        for (int refinement = 0; refinement < 12; ++refinement) {
+        for (int refinement = previous_attempts; refinement < 12; ++refinement) {
+            Rcpp::checkUserInterrupt();
             auto exterior = cprofcn_mblock_coefficients<T>(T(chi_sw), m, 1,
                 degree - m + 1, arguments, 2, 0, T(xi) - T(1), true);
             evaluate_coefficient_angular_values(exterior, m, directions, workspace);
@@ -40,32 +43,54 @@ inline bool direct_field(T chi_sw, T chi_body, T xi, int degree_seed,
             if (order.singular) return false;
             if (!order.embedded_valid[0] || !order.embedded_valid[1])
                 return false;
-            const T scale = norm(field + order.field);
+            const T scale = norm(other_orders + order.field);
             allowance = amplitude_allowance * scale / (T(2) * T(m + 1) * T(m + 2));
             const T last = norm(order.field - order.embedded_fields[0]);
             const T preceding = norm(order.embedded_fields[0] - order.embedded_fields[1]);
             // Account for cancellation between modal terms when identifying quad roundoff.
             const T arithmetic_floor = T(64) * preceps<T>() * order.embedded_roundoff_scale;
-            degree_pass = false;
+            bool degree_pass = false;
+            accepted.arithmetic_floor = false;
             // Geometric continuation is conditional on contraction, not a universal bound.
             if (order.embedded_valid[0] && order.embedded_valid[1]) {
                 if (last <= arithmetic_floor && preceding <= arithmetic_floor) {
                     estimate = arithmetic_floor;
                     degree_pass = estimate <= allowance;
+                    accepted.arithmetic_floor = true;
                 } else if (preceding > T(0) && last < preceding) {
                     const T ratio = last / preceding;
                     estimate = last / (T(1) - ratio);
                     degree_pass = estimate <= allowance && preceding <= allowance;
                 }
             }
-            if (degree_pass) break;
+            // A floor-limited recovery still has to pass the complete error sum below.
+            if (degree_pass || (cancellation_recovery && accepted.arithmetic_floor)) {
+                accepted.degree = degree;
+                accepted.attempts = refinement + 1;
+                accepted.field = order.field;
+                accepted.estimate = estimate;
+                return true;
+            }
             degree = checked_profcn_integer((5LL * (degree + 1LL) + 3LL) / 4LL - 1LL,
                 "optimized degree refinement");
         }
-        if (!degree_pass) Rcpp::stop("Optimized degree tail did not converge within twelve refinements.");
-        total_degree_estimate += estimate;
+        Rcpp::stop("Optimized degree tail did not converge within twelve refinements.");
+        return false;
+    };
+    field = Complex(0, 0);
+    Complex field_correction(0, 0);
+    T previous_order = -1, penultimate_order = -1, total_degree_estimate = 0;
+    int small_orders = 0;
+    // Independent order blocks permit refinement without discarding accepted work.
+    for (int m = 0; !(chi_sw == chi_body && density_ratio == T(1)); ++m) {
+        Rcpp::checkUserInterrupt();
+        const int degree = std::max(degree_seed, m + 5);
+        DegreeContribution order;
+        if (!resolve_degree(m, degree, 0, field, false, order)) return false;
+        contributions.push_back(order);
+        total_degree_estimate += order.estimate;
         add_field(field, field_correction, order.field);
-        const T magnitude = norm(order.field);
+        T magnitude = norm(order.field);
         const T order_allowance = amplitude_allowance * norm(field) / T(2);
         small_orders = m >= 2 && magnitude <= order_allowance ? small_orders + 1 : 0;
         bool order_pass = incidence.exact_axis;
@@ -74,9 +99,59 @@ inline bool direct_field(T chi_sw, T chi_body, T xi, int degree_seed,
             order_pass = ratio < T(1) && magnitude * ratio / (T(1) - ratio) <= order_allowance;
         }
         if (order_pass) {
-            if (total_degree_estimate > amplitude_allowance * norm(field) / T(2))
-                Rcpp::stop("Cancellation invalidated the accumulated degree-error allowance.");
-            break;
+            bool recovered = false;
+            // Refine the largest remaining error against the complete cancelled field.
+            while (total_degree_estimate > amplitude_allowance * norm(field) / T(2)) {
+                Rcpp::checkUserInterrupt();
+                T fixed_estimate = 0, largest_estimate = -1;
+                int selected = -1;
+                for (int index = 0; index <= m; ++index) {
+                    const auto& retained = contributions[index];
+                    if (retained.arithmetic_floor || retained.attempts >= 12) {
+                        fixed_estimate += retained.estimate;
+                    } else if (retained.estimate > largest_estimate) {
+                        largest_estimate = retained.estimate;
+                        selected = index;
+                    }
+                }
+                if (selected < 0 || fixed_estimate > amplitude_allowance * norm(field) / T(2))
+                    Rcpp::stop("Adaptive gas cancellation exhausts the degree arithmetic or refinement allowance.");
+                auto& retained = contributions[selected];
+                // Rebuild other contributions instead of subtracting nearly cancelling terms.
+                Complex other_orders(0, 0), other_correction(0, 0);
+                for (int index = 0; index <= m; ++index)
+                    if (index != selected)
+                        add_field(other_orders, other_correction, contributions[index].field);
+                const int enlarged_degree = checked_profcn_integer(
+                    (5LL * (retained.degree + 1LL) + 3LL) / 4LL - 1LL,
+                    "adaptive gas cancellation refinement");
+                if (!resolve_degree(selected, enlarged_degree, retained.attempts,
+                        other_orders, true, retained)) return false;
+                field = field_correction = Complex(0, 0);
+                total_degree_estimate = 0;
+                for (const auto& contribution : contributions) {
+                    add_field(field, field_correction, contribution.field);
+                    total_degree_estimate += contribution.estimate;
+                }
+                recovered = true;
+            }
+            if (recovered) {
+                // Renew the azimuthal-tail check after replacing any degree contribution.
+                const T updated_allowance = amplitude_allowance * norm(field) / T(2);
+                small_orders = 0;
+                for (int index = m; index >= 2 &&
+                        norm(contributions[index].field) <= updated_allowance; --index)
+                    ++small_orders;
+                magnitude = norm(contributions[m].field);
+                previous_order = m > 0 ? norm(contributions[m - 1].field) : T(-1);
+                penultimate_order = m > 1 ? norm(contributions[m - 2].field) : T(-1);
+                order_pass = incidence.exact_axis;
+                if (small_orders >= 2 && previous_order > T(0) && penultimate_order > T(0)) {
+                    const T ratio = std::max(magnitude / previous_order, previous_order / penultimate_order);
+                    order_pass = ratio < T(1) && magnitude * ratio / (T(1) - ratio) <= updated_allowance;
+                }
+            }
+            if (order_pass) break;
         }
         penultimate_order = previous_order;
         previous_order = magnitude;
