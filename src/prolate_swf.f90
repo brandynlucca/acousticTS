@@ -373,6 +373,7 @@ module prolate_swf
     integer, intent(in) :: ipdnorm(maxt), ipnorm(maxt)
     integer :: idx, ncoef, allocation_status, real_bytes, integer_bytes
     integer(int64) :: requested_bytes
+    character(len=256) :: allocation_message
 
     ! Oversized tables remain solely in the caller's complete workspaces.
     requested_bytes = 0
@@ -380,7 +381,8 @@ module prolate_swf
     integer_bytes = storage_size(1) / 8
     if(.not. add_auxiliary_cache_bytes(requested_bytes, real_bytes, narg)) return
     if(.not. add_auxiliary_cache_bytes(requested_bytes, 2 * real_bytes, maxt, maxp)) return
-    if(.not. add_auxiliary_cache_bytes(requested_bytes, 2 * real_bytes + 2 * integer_bytes, maxt)) return
+    if(.not. add_auxiliary_cache_bytes(requested_bytes, &
+        2 * real_bytes + 2 * integer_bytes, maxt)) return
     if(.not. add_auxiliary_cache_bytes(requested_bytes, 8 * real_bytes, maxp)) return
 
     ! Reuse a matching slot or replace one entry in round-robin order.
@@ -400,14 +402,50 @@ module prolate_swf
 
     call clear_pleg_cache_slot(idx)
     if(.not. reserve_auxiliary_cache_bytes(requested_bytes)) return
-    allocate(pleg_cache(idx)%barg(narg), pleg_cache(idx)%pr(maxt, maxp), &
-        pleg_cache(idx)%pdr(maxt, maxp), pleg_cache(idx)%pdnorm(maxt), &
-        pleg_cache(idx)%pnorm(maxt), pleg_cache(idx)%ipdnorm(maxt), &
-        pleg_cache(idx)%ipnorm(maxt), pleg_cache(idx)%alpha(maxp), &
-        pleg_cache(idx)%beta(maxp), pleg_cache(idx)%gamma(maxp), &
-        pleg_cache(idx)%coefa(maxp), pleg_cache(idx)%coefb(maxp), &
-        pleg_cache(idx)%coefc(maxp), pleg_cache(idx)%coefd(maxp), &
-        pleg_cache(idx)%coefe(maxp), stat=allocation_status)
+    ! Stop on the first failed allocation and discard any partially stored entry.
+    allocate(pleg_cache(idx)%barg(narg), stat=allocation_status, errmsg=allocation_message)
+    if(allocation_status == 0) then
+      allocate(pleg_cache(idx)%pr(maxt, maxp), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(pleg_cache(idx)%pdr(maxt, maxp), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(pleg_cache(idx)%pdnorm(maxt), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(pleg_cache(idx)%pnorm(maxt), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(pleg_cache(idx)%ipdnorm(maxt), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(pleg_cache(idx)%ipnorm(maxt), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(pleg_cache(idx)%alpha(maxp), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(pleg_cache(idx)%beta(maxp), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(pleg_cache(idx)%gamma(maxp), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(pleg_cache(idx)%coefa(maxp), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(pleg_cache(idx)%coefb(maxp), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(pleg_cache(idx)%coefc(maxp), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(pleg_cache(idx)%coefd(maxp), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(pleg_cache(idx)%coefe(maxp), stat=allocation_status, errmsg=allocation_message)
+    end if
     if(allocation_status /= 0) then
       call clear_pleg_cache_slot(idx)
       return
@@ -537,12 +575,14 @@ module prolate_swf
     integer, intent(in) :: iqdl(lnum), iql(lnum)
     integer :: idx, allocation_status, real_bytes, integer_bytes
     integer(int64) :: requested_bytes
+    character(len=256) :: allocation_message
 
     requested_bytes = 0
     real_bytes = storage_size(1.0_knd) / 8
     integer_bytes = storage_size(1) / 8
     if(.not. add_auxiliary_cache_bytes(requested_bytes, 2 * real_bytes, maxq)) return
-    if(.not. add_auxiliary_cache_bytes(requested_bytes, 2 * real_bytes + 2 * integer_bytes, lnum)) return
+    if(.not. add_auxiliary_cache_bytes(requested_bytes, &
+        2 * real_bytes + 2 * integer_bytes, lnum)) return
     idx = find_qleg_cache(m, lnum, limq, maxq, x1, ndec)
     if(idx == 0) then
       idx = 1
@@ -559,9 +599,22 @@ module prolate_swf
 
     call clear_qleg_cache_slot(idx)
     if(.not. reserve_auxiliary_cache_bytes(requested_bytes)) return
-    allocate(qleg_cache(idx)%qdr(maxq), qleg_cache(idx)%qr(maxq), &
-        qleg_cache(idx)%qdl(lnum), qleg_cache(idx)%ql(lnum), &
-        qleg_cache(idx)%iqdl(lnum), qleg_cache(idx)%iql(lnum), stat=allocation_status)
+    allocate(qleg_cache(idx)%qdr(maxq), stat=allocation_status, errmsg=allocation_message)
+    if(allocation_status == 0) then
+      allocate(qleg_cache(idx)%qr(maxq), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(qleg_cache(idx)%qdl(lnum), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(qleg_cache(idx)%ql(lnum), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(qleg_cache(idx)%iqdl(lnum), stat=allocation_status, errmsg=allocation_message)
+    end if
+    if(allocation_status == 0) then
+      allocate(qleg_cache(idx)%iql(lnum), stat=allocation_status, errmsg=allocation_message)
+    end if
     if(allocation_status /= 0) then
       call clear_qleg_cache_slot(idx)
       return
@@ -627,6 +680,7 @@ module prolate_swf
     real(knd), intent(out) :: x(n), w(n)
     integer :: allocation_status
     integer(int64) :: requested_bytes
+    character(len=256) :: allocation_message
 
     if(gauss_cache%valid) then
       if(gauss_cache%ndec == ndec .and. gauss_cache%n == n) then
@@ -641,7 +695,10 @@ module prolate_swf
     if(.not. add_auxiliary_cache_bytes(requested_bytes, 2 * (storage_size(1.0_knd) / 8), n)) return
     call clear_gauss_cache()
     if(.not. reserve_auxiliary_cache_bytes(requested_bytes)) return
-    allocate(gauss_cache%x(n), gauss_cache%w(n), stat=allocation_status)
+    allocate(gauss_cache%x(n), stat=allocation_status, errmsg=allocation_message)
+    if(allocation_status == 0) then
+      allocate(gauss_cache%w(n), stat=allocation_status, errmsg=allocation_message)
+    end if
     if(allocation_status /= 0) then
       call clear_gauss_cache()
       return
@@ -840,6 +897,7 @@ module prolate_swf
     integer, intent(out) :: norme(maxmp), ipnorm(maxlp)
     integer :: idx, allocation_status, real_bytes, integer_bytes
     integer(int64) :: requested_bytes
+    character(len=256) :: allocation_message
 
     ! Radial quadrature is independent of incidence and receive angles.
     do idx = 1, size(pint_cache)
@@ -892,10 +950,37 @@ module prolate_swf
     call clear_pint_cache_slot(idx)
     if(.not. reserve_auxiliary_cache_bytes(requested_bytes)) return
     associate(entry => pint_cache(idx))
-      allocate(entry%wg(ngau), entry%xg(ngau), entry%rpint1(maxint), &
-          entry%rpint2(maxint), entry%pint1(maxint), entry%pint2(maxint), &
-          entry%pint3(maxint), entry%pint4(maxint), entry%pnorm(maxlp), &
-          entry%norme(maxmp), entry%ipnorm(maxlp), stat=allocation_status)
+      allocate(entry%wg(ngau), stat=allocation_status, errmsg=allocation_message)
+      if(allocation_status == 0) then
+        allocate(entry%xg(ngau), stat=allocation_status, errmsg=allocation_message)
+      end if
+      if(allocation_status == 0) then
+        allocate(entry%rpint1(maxint), stat=allocation_status, errmsg=allocation_message)
+      end if
+      if(allocation_status == 0) then
+        allocate(entry%rpint2(maxint), stat=allocation_status, errmsg=allocation_message)
+      end if
+      if(allocation_status == 0) then
+        allocate(entry%pint1(maxint), stat=allocation_status, errmsg=allocation_message)
+      end if
+      if(allocation_status == 0) then
+        allocate(entry%pint2(maxint), stat=allocation_status, errmsg=allocation_message)
+      end if
+      if(allocation_status == 0) then
+        allocate(entry%pint3(maxint), stat=allocation_status, errmsg=allocation_message)
+      end if
+      if(allocation_status == 0) then
+        allocate(entry%pint4(maxint), stat=allocation_status, errmsg=allocation_message)
+      end if
+      if(allocation_status == 0) then
+        allocate(entry%pnorm(maxlp), stat=allocation_status, errmsg=allocation_message)
+      end if
+      if(allocation_status == 0) then
+        allocate(entry%norme(maxmp), stat=allocation_status, errmsg=allocation_message)
+      end if
+      if(allocation_status == 0) then
+        allocate(entry%ipnorm(maxlp), stat=allocation_status, errmsg=allocation_message)
+      end if
       if(allocation_status /= 0) then
         call clear_pint_cache_slot(idx)
         return
@@ -951,7 +1036,8 @@ module prolate_swf
       call clear_auxiliary_cache_slot(slot)
     end do
     requested_bytes = 0
-    admitted = add_auxiliary_cache_bytes(requested_bytes, storage_size(1.0_knd) / 8, huge(1), huge(1))
+    admitted = add_auxiliary_cache_bytes(requested_bytes, &
+        storage_size(1.0_knd) / 8, huge(1), huge(1))
     checks(1) = merge(1, 0, .not. admitted .and. requested_bytes == 0)
     args = [0.1_knd, 0.4_knd, 0.7_knd]
     radial = 0.0_knd
@@ -971,8 +1057,10 @@ module prolate_swf
         auxiliary_cache_budget = 0
       end if
       call profcn(6.0_knd, 2, degrees, 2, 0.07_knd, 2, 1, arguments, args, &
-          radial(:,1,trial), radial_exponents(:,1,trial), radial(:,2,trial), radial_exponents(:,2,trial), &
-          radial(:,3,trial), radial_exponents(:,3,trial), radial(:,4,trial), radial_exponents(:,4,trial), &
+          radial(:,1,trial), radial_exponents(:,1,trial), &
+          radial(:,2,trial), radial_exponents(:,2,trial), &
+          radial(:,3,trial), radial_exponents(:,3,trial), &
+          radial(:,4,trial), radial_exponents(:,4,trial), &
           radial_accuracy(:,trial), angular(:,:,1,trial), angular_exponents(:,:,1,trial), &
           angular(:,:,2,trial), angular_exponents(:,:,2,trial), angular_accuracy(:,:,trial))
     end do
@@ -1033,9 +1121,11 @@ module prolate_swf
         parg(1,trial) = shifted_argument
         if(trial == 1) parg(1,trial) = p_cases(sample)
         if(trial == 2) then
-          if(find_pleg_cache(2,1,digits_native,exponent_range,[p_cases(sample)],1,1,plim,psize) == 0) &
+          if(find_pleg_cache(2,1,digits_native,exponent_range, &
+              [p_cases(sample)],1,1,plim,psize) == 0) &
               checks(2) = 0
-          if(find_pleg_cache(2,1,digits_native,exponent_range,[shifted_argument],1,1,plim,psize) /= 0) &
+          if(find_pleg_cache(2,1,digits_native,exponent_range, &
+              [shifted_argument],1,1,plim,psize) /= 0) &
               checks(2) = 0
         end if
         if(trial == 3) then
@@ -1047,7 +1137,8 @@ module prolate_swf
         saved_limit = 0
         call pleg_cached(2,plim,psize,saved_limit,1,digits_native,exponent_range,parg(:,trial), &
             1,1,pr(:,:,trial),pdr(:,:,trial),pdnorm(:,trial),ipdnorm(:,trial),pnorm(:,trial), &
-            ipnorm(:,trial),coefficients(:,1,trial),coefficients(:,2,trial),coefficients(:,3,trial), &
+            ipnorm(:,trial),coefficients(:,1,trial),coefficients(:,2,trial), &
+            coefficients(:,3,trial), &
             coefficients(:,4,trial),coefficients(:,5,trial),coefficients(:,6,trial), &
             coefficients(:,7,trial),coefficients(:,8,trial))
       end do
@@ -1070,8 +1161,10 @@ module prolate_swf
         adjacent = shifted_argument
         if(trial == 1) adjacent = q_cases(sample)
         if(trial == 2) then
-          if(find_qleg_cache(4,qdegrees,qlim,qsize,q_cases(sample),digits_native) == 0) checks(4) = 0
-          if(find_qleg_cache(4,qdegrees,qlim,qsize,shifted_argument,digits_native) /= 0) checks(4) = 0
+          if(find_qleg_cache(4,qdegrees,qlim,qsize,q_cases(sample),digits_native) == 0) &
+              checks(4) = 0
+          if(find_qleg_cache(4,qdegrees,qlim,qsize,shifted_argument,digits_native) /= 0) &
+              checks(4) = 0
         end if
         if(trial == 3) then
           do slot = 1, size(pleg_cache) + size(qleg_cache) + 1 + size(pint_cache)
@@ -1088,7 +1181,8 @@ module prolate_swf
       ! For m=4, QLEG leaves recurrence entry 8 unwritten.
       if(.not. (all(qratios(1:7,:,2) == qratios(1:7,:,3)) .and. &
           all(qratios(9:qsize,:,2) == qratios(9:qsize,:,3)) .and. &
-          all(qvalues(:,:,2) == qvalues(:,:,3)) .and. all(qexponents(:,:,2) == qexponents(:,:,3)) .and. &
+          all(qvalues(:,:,2) == qvalues(:,:,3)) .and. &
+          all(qexponents(:,:,2) == qexponents(:,:,3)) .and. &
           all(qnormal(:,2) == qnormal(:,3)) .and. &
           all(qnormal_exponents(:,2) == qnormal_exponents(:,3)))) checks(5) = 0
     end do
