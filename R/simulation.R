@@ -413,7 +413,7 @@
 #' Resolve optional model-specific tasks without changing simulation inputs.
 #' @noRd
 .simulation_batch_tasks <- function(object, frequency, model, parameters,
-                                    simulation_grid) {
+                                    simulation_grid, parallel) {
   tasks <- as.list(seq_len(nrow(simulation_grid)))
   if (length(tasks) < 2L || length(model) != 1L) {
     return(tasks)
@@ -428,7 +428,7 @@
     spec$simulation_batch$plan,
     envir = asNamespace("acousticTS")
   )
-  proposed <- plan(object, frequency, parameters, simulation_grid)
+  proposed <- plan(object, frequency, parameters, simulation_grid, parallel)
   indices <- unlist(proposed, use.names = FALSE)
   if (!is.list(proposed) ||
     !identical(sort(as.integer(indices)), seq_len(nrow(simulation_grid)))) {
@@ -663,7 +663,7 @@ simulate_ts <- function(object,
     )
   }
   batch_tasks <- .simulation_batch_tasks(
-    object, frequency, normalized_model, parameters, simulation_grid
+    object, frequency, normalized_model, parameters, simulation_grid, parallel
   )
   # Prepare the optional PSOCK cluster =========================================
   cluster <- .prepare_simulation_cluster(

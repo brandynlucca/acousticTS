@@ -280,7 +280,7 @@ test_that("adaptive quad rigid and release PSMS batches retain model results", {
     parameters = parameters,
     parallel = TRUE, n_cores = 2L, verbose = FALSE
   )$PSMS
-  expect_identical(task_count, 1L)
+  expect_identical(task_count, 4L)
   expect_equal(parallel_result, actual, tolerance = 1e-12)
 })
 
