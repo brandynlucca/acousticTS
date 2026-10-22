@@ -149,6 +149,10 @@ prolate_spheroid_rigid_release_batch <- function(acoustics, body, medium, theta_
     .Call(`_acousticTS_prolate_spheroid_rigid_release_batch`, acoustics, body, medium, theta_body, rigid)
 }
 
+prolate_spheroid_fluid_batch <- function(acoustics, body, medium, m_seeds, n_seeds, theta_body, theta_scatter, gas) {
+    .Call(`_acousticTS_prolate_spheroid_fluid_batch`, acoustics, body, medium, m_seeds, n_seeds, theta_body, theta_scatter, gas)
+}
+
 prolate_spheroid_tmatrix_cpp <- function(acoustics, body, medium, integration_pts, precision = "double", Amn_method = "Amn_fluid") {
     .Call(`_acousticTS_prolate_spheroid_tmatrix_cpp`, acoustics, body, medium, integration_pts, precision, Amn_method)
 }

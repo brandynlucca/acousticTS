@@ -284,6 +284,60 @@ test_that("adaptive quad rigid and release PSMS batches retain model results", {
   expect_equal(parallel_result, actual, tolerance = 1e-12)
 })
 
+test_that("adaptive quad fluid PSMS batches retain independent complex fields", {
+  skip_if_not(acousticTS:::.quad_precision_available())
+  angles <- c(0.0001, 37.19, 90) * pi / 180
+  frequency <- c(19000, 38000)
+  shape <- prolate_spheroid(length_body = 0.02, radius_body = 0.002)
+  for (boundary in c("liquid_filled", "gas_filled")) {
+    object <- if (boundary == "gas_filled") {
+      gas_generate(shape, density_fluid = 1.24, sound_speed_fluid = 345)
+    } else {
+      fls_generate(shape, density_body = 1045, sound_speed_body = 1520)
+    }
+    actual <- simulate_ts(
+      object, frequency, "psms",
+      parameters = list(
+        theta = angles, boundary = boundary, precision = "quad",
+        adaptive = TRUE, simplify_Amn = FALSE
+      ),
+      parallel = FALSE, verbose = FALSE
+    )$PSMS
+    reference <- lapply(angles, function(angle) {
+      row_object <- object
+      row_object@body$theta <- angle
+      target_strength(
+        row_object, frequency, "psms", boundary = boundary,
+        precision = "quad", adaptive = TRUE, simplify_Amn = FALSE
+      )
+    })
+    expected_field <- unlist(lapply(reference, function(row) {
+      row@model$PSMS$f_bs
+    }))
+    expected_ts <- unlist(lapply(reference, function(row) {
+      row@model$PSMS$TS
+    }))
+    expect_true(all(Mod(actual$f_bs - expected_field) <=
+      1e-18 + 1e-14 * Mod(expected_field)))
+    expect_lte(max(abs(actual$TS - expected_ts)), 1e-8)
+    states <- lapply(reference, function(row) row@model_parameters$PSMS)
+    m_seeds <- matrix(as.integer(unlist(lapply(states, function(state) {
+      state$parameters$acoustics$m_max
+    }), use.names = FALSE)), nrow = length(frequency))
+    n_seeds <- matrix(as.integer(unlist(lapply(states, function(state) {
+      state$parameters$acoustics$n_max
+    }), use.names = FALSE)), nrow = length(frequency))
+    native_fields <- acousticTS:::prolate_spheroid_fluid_batch(
+      states[[1L]]$parameters$acoustics, states[[1L]]$body,
+      states[[1L]]$medium, m_seeds, n_seeds, angles, pi - angles,
+      boundary == "gas_filled"
+    )
+    expect_identical(dim(native_fields), c(length(frequency), length(angles)))
+    expect_true(all(Mod(as.vector(native_fields) - expected_field) <=
+      1e-18 + 1e-14 * Mod(expected_field)))
+  }
+})
+
 test_that("frequency scheduling preserves stochastic and multi-row tasks", {
   data(krill)
   frequency <- c(38000, 70000)

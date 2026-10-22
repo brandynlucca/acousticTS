@@ -177,7 +177,7 @@ struct State {
 
 // Robin traces test pressure and normal-velocity continuity in separate spaces.
 inline void advance(State& state, psms_angle_prepared::Workspace<T>& prepared,
-        int m, int shared_degree, int shared_interior_degree,
+        int m,
         T chi_sw, T chi_body, T xi, T density_ratio, T phi_difference) {
     const auto& incidence = state.incidence;
     const T pressure_reference = T(1) / precsqrt(T(2));
@@ -205,8 +205,8 @@ inline void advance(State& state, psms_angle_prepared::Workspace<T>& prepared,
     auto& angular_workspace = state.angular_workspace;
 
     Rcpp::checkUserInterrupt();
-    int degree = std::max(std::max(previous_degree, shared_degree), m + 1);
-    int interior_degree = std::max(std::max(previous_interior_degree, shared_interior_degree), m + 1);
+    int degree = std::max(previous_degree, m + 1);
+    int interior_degree = std::max(previous_interior_degree, m + 1);
     SpheroidalCoefficientOverlapCache<T> overlap_cache;
     int exterior_degree = -1;
     OrderSolution<T> order;
@@ -296,16 +296,13 @@ inline std::vector<Complex> fields(T chi_sw, T chi_body, T xi,
         if (!state.finished) state.field = Complex(0, 0);
     }
     psms_angle_prepared::Workspace<T> prepared;
-    int shared_degree = 0, shared_interior_degree = 0;
     for (int m = 0; ; ++m) {
         bool active = false;
         for (auto& state : states) {
             if (state.finished) continue;
             active = true;
-            advance(state, prepared, m, shared_degree, shared_interior_degree,
+            advance(state, prepared, m,
                 chi_sw, chi_body, xi, density_ratio, phi_difference);
-            shared_degree = std::max(shared_degree, state.previous_degree);
-            shared_interior_degree = std::max(shared_interior_degree, state.previous_interior_degree);
         }
         if (!active) break;
     }

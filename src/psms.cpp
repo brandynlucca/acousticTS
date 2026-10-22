@@ -468,13 +468,97 @@ Rcpp::ComplexMatrix prolate_spheroid_rigid_release_batch(
             static_cast<acousticts_quad_t>(chi_sw[f]),
             static_cast<acousticts_quad_t>(xi),
             incidences, rigid_flags,
-            static_cast<acousticts_quad_t>(phi_scatter - phi_body));
+            static_cast<acousticts_quad_t>(phi_scatter) -
+                static_cast<acousticts_quad_t>(phi_body));
         for (int case_index = 0; case_index < n_case; ++case_index)
             output(f, case_index) = to_Rcomplex(fields[case_index]);
     }
     return output;
 #else
     Rcpp::stop("Native quad precision is unavailable for fixed-rigid/pressure-release batching.");
+#endif
+}
+
+// [[Rcpp::export]]
+Rcpp::ComplexMatrix prolate_spheroid_fluid_batch(
+    Rcpp::DataFrame acoustics,
+    Rcpp::List body,
+    Rcpp::List medium,
+    Rcpp::IntegerMatrix m_seeds,
+    Rcpp::IntegerMatrix n_seeds,
+    Rcpp::NumericVector theta_body,
+    Rcpp::NumericVector theta_scatter,
+    bool gas
+) {
+#if ACOUSTICTS_HAVE_QUADMATH
+    const int n_freq = acoustics.nrows();
+    const int n_case = theta_body.size();
+    if (n_freq < 1 || n_case < 1 || theta_scatter.size() != n_case ||
+            m_seeds.nrow() != n_freq || n_seeds.nrow() != n_freq ||
+            m_seeds.ncol() != n_case || n_seeds.ncol() != n_case)
+        Rcpp::stop("Liquid/gas batch dimensions are invalid.");
+    const auto chi_sw = Rcpp::as<std::vector<double>>(acoustics["chi_sw"]);
+    const auto chi_body = Rcpp::as<std::vector<double>>(acoustics["chi_body"]);
+    if (chi_sw.size() != size_t(n_freq) || chi_body.size() != size_t(n_freq))
+        Rcpp::stop("Liquid/gas batch acoustics have inconsistent lengths.");
+    const double xi = Rcpp::as<double>(body["xi"]);
+    const double phi_body = Rcpp::as<double>(body["phi_body"]);
+    const double phi_scatter = Rcpp::as<double>(body["phi_scatter"]);
+    const double density_body = Rcpp::as<double>(body["density"]);
+    const double density_sw = Rcpp::as<double>(medium["density"]);
+    const auto density_ratio = static_cast<acousticts_quad_t>(density_body) /
+        static_cast<acousticts_quad_t>(density_sw);
+    const auto phi_difference = static_cast<acousticts_quad_t>(phi_scatter) -
+        static_cast<acousticts_quad_t>(phi_body);
+    std::vector<SpheroidalDirection<acousticts_quad_t>> incidences, receptions;
+    incidences.reserve(n_case);
+    receptions.reserve(n_case);
+    for (int case_index = 0; case_index < n_case; ++case_index) {
+        if (!psms_public_backscatter_angles(theta_body[case_index],
+                theta_scatter[case_index], phi_body, phi_scatter))
+            Rcpp::stop("Liquid/gas batching requires monostatic directions.");
+        incidences.push_back(psms_direction_from_angle(
+            static_cast<acousticts_quad_t>(theta_body[case_index])));
+        receptions.push_back(psms_direction_from_angle(
+            static_cast<acousticts_quad_t>(theta_scatter[case_index])));
+    }
+    Rcpp::ComplexMatrix output(n_freq, n_case);
+    // Each frequency retains its angle-specific modal seeds and stopping tests.
+    for (int f = 0; f < n_freq; ++f) {
+        Rcpp::checkUserInterrupt();
+        std::vector<int> m_limits, n_limits;
+        m_limits.reserve(n_case);
+        n_limits.reserve(n_case);
+        for (int case_index = 0; case_index < n_case; ++case_index) {
+            const int m_seed = m_seeds(f, case_index);
+            const int n_seed = n_seeds(f, case_index);
+            if (m_seed == NA_INTEGER || n_seed == NA_INTEGER ||
+                    m_seed < 0 || n_seed < m_seed)
+                Rcpp::stop("Invalid liquid/gas modal support.");
+            m_limits.push_back(m_seed);
+            n_limits.push_back(n_seed);
+        }
+        std::vector<std::complex<acousticts_quad_t>> fields;
+        if (gas) {
+            fields = psms_gas_support::fields(
+                static_cast<acousticts_quad_t>(chi_sw[f]),
+                static_cast<acousticts_quad_t>(chi_body[f]),
+                static_cast<acousticts_quad_t>(xi), n_limits,
+                density_ratio, incidences, phi_difference);
+        } else {
+            fields = psms_adaptive_liquid_fields(
+                m_limits, n_limits,
+                static_cast<acousticts_quad_t>(chi_sw[f]),
+                static_cast<acousticts_quad_t>(chi_body[f]),
+                static_cast<acousticts_quad_t>(xi), incidences, receptions,
+                phi_difference, density_ratio);
+        }
+        for (int case_index = 0; case_index < n_case; ++case_index)
+            output(f, case_index) = to_Rcomplex(fields[case_index]);
+    }
+    return output;
+#else
+    Rcpp::stop("Native quad precision is unavailable for liquid/gas batching.");
 #endif
 }
 

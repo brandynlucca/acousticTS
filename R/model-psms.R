@@ -719,8 +719,12 @@ PSMS <- function(object) {
 #' Plan exact-state groups for adaptive quad spheroidal simulations.
 #' @noRd
 .psms_simulation_batch_plan <- function(object, frequency, parameters,
-                                        simulation_grid) {
+                                        simulation_grid, parallel) {
   tasks <- as.list(seq_len(nrow(simulation_grid)))
+  # Preserve worker-level parallelism until batching succeeds ==================
+  if (parallel) {
+    return(tasks)
+  }
   supported <- c(
     "theta", "boundary", "precision", "adaptive", "sound_speed_sw",
     "density_sw", "n_integration", "simplify_Amn", "phi_body", "frequency"
@@ -740,7 +744,10 @@ PSMS <- function(object) {
   eligible <- vapply(row_values, function(values) {
     identical(values$precision, "quad") &&
       identical(values$adaptive, TRUE) &&
-      values$boundary %in% c("fixed_rigid", "pressure_release") &&
+      values$boundary %in% c(
+        "fixed_rigid", "pressure_release", "liquid_filled", "gas_filled"
+      ) &&
+      !isTRUE(values$simplify_Amn) &&
       is.numeric(values$theta %||% extract(object, "body")$theta)
   }, logical(1))
   if (!any(eligible)) {
@@ -753,7 +760,10 @@ PSMS <- function(object) {
       return(paste0("singleton-", index))
     }
     values <- row_values[[index]]
-    excluded <- c("theta", "boundary", "theta_idx", "boundary_idx")
+    excluded <- c("theta", "theta_idx", "boundary_idx")
+    if (values$boundary %in% c("fixed_rigid", "pressure_release")) {
+      excluded <- c(excluded, "boundary")
+    }
     state <- values[!names(values) %in% excluded]
     paste0(as.character(serialize(state, NULL, version = 2)), collapse = "")
   }, character(1))
@@ -782,12 +792,22 @@ PSMS <- function(object) {
     extract(row, "model_parameters")$PSMS
   })
   state_key <- function(state) {
+    fluid <- state$parameters$Amn_method %in% c(
+      "Amn_fluid", "Amn_fluid_coefficients", "Amn_fluid_gas"
+    )
+    acoustics <- state$parameters$acoustics
+    if (fluid) {
+      acoustics <- acoustics[
+        !names(acoustics) %in% c("m_max", "n_max")
+      ]
+    }
     list(
-      acoustics = state$parameters$acoustics,
+      acoustics = acoustics,
       body = state$body[
         !names(state$body) %in% c("theta_body", "theta_scatter")
       ],
       medium = state$medium,
+      method = if (fluid) state$parameters$Amn_method else "rigid_release",
       precision = state$parameters$precision,
       adaptive = state$parameters$adaptive,
       n_integration = state$parameters$n_integration
@@ -798,7 +818,8 @@ PSMS <- function(object) {
   if (!all(vapply(model_states, function(state) {
     identical(state_key(state), shared_state) &&
       state$parameters$Amn_method %in% c(
-        "Amn_fixed_rigid", "Amn_pressure_release"
+        "Amn_fixed_rigid", "Amn_pressure_release", "Amn_fluid",
+        "Amn_fluid_coefficients", "Amn_fluid_gas"
       )
   }, logical(1)))) {
     return(ordinary())
@@ -807,21 +828,44 @@ PSMS <- function(object) {
   theta_body <- vapply(model_states, function(state) {
     state$body$theta_body
   }, numeric(1))
-  rigid <- vapply(model_states, function(state) {
-    identical(state$parameters$Amn_method, "Amn_fixed_rigid")
-  }, logical(1))
-  fields <- tryCatch(
-    prolate_spheroid_rigid_release_batch(
-      shared_state$acoustics,
-      model_states[[1L]]$body,
-      shared_state$medium,
-      theta_body,
-      rigid
-    ),
-    error = function(error) NULL
+  fluid <- model_states[[1L]]$parameters$Amn_method %in% c(
+    "Amn_fluid", "Amn_fluid_coefficients", "Amn_fluid_gas"
   )
+  fields <- tryCatch({
+    if (fluid) {
+      n_frequency <- nrow(model_states[[1L]]$parameters$acoustics)
+      m_seeds <- matrix(as.integer(unlist(lapply(model_states, function(state) {
+        state$parameters$acoustics$m_max
+      }), use.names = FALSE)), nrow = n_frequency)
+      n_seeds <- matrix(as.integer(unlist(lapply(model_states, function(state) {
+        state$parameters$acoustics$n_max
+      }), use.names = FALSE)), nrow = n_frequency)
+      theta_scatter <- vapply(model_states, function(state) {
+        state$body$theta_scatter
+      }, numeric(1))
+      prolate_spheroid_fluid_batch(
+        model_states[[1L]]$parameters$acoustics,
+        model_states[[1L]]$body,
+        model_states[[1L]]$medium,
+        m_seeds, n_seeds, theta_body, theta_scatter,
+        identical(model_states[[1L]]$parameters$Amn_method, "Amn_fluid_gas")
+      )
+    } else {
+      rigid <- vapply(model_states, function(state) {
+        identical(state$parameters$Amn_method, "Amn_fixed_rigid")
+      }, logical(1))
+      prolate_spheroid_rigid_release_batch(
+        model_states[[1L]]$parameters$acoustics,
+        model_states[[1L]]$body,
+        model_states[[1L]]$medium,
+        theta_body, rigid
+      )
+    }
+  }, error = function(error) NULL)
   if (!is.complex(fields) ||
-    !identical(dim(fields), c(nrow(shared_state$acoustics), length(rigid)))) {
+    !identical(dim(fields), c(
+      nrow(model_states[[1L]]$parameters$acoustics), length(model_states)
+    ))) {
     return(ordinary())
   }
 
