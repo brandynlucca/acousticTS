@@ -209,7 +209,7 @@ test_that("adaptive quad rigid and release PSMS batches retain model results", {
     sound_speed_body = 1520
   )
   frequency <- c(1500, 3000)
-  angles <- c(0, pi / 3)
+  angles <- c(0, 0.0001, 37.19, 89.999, 90) * pi / 180
   boundaries <- c("fixed_rigid", "pressure_release")
   parameters <- list(
     theta = angles,
@@ -280,13 +280,13 @@ test_that("adaptive quad rigid and release PSMS batches retain model results", {
     parameters = parameters,
     parallel = TRUE, n_cores = 2L, verbose = FALSE
   )$PSMS
-  expect_identical(task_count, 4L)
+  expect_identical(task_count, 10L)
   expect_equal(parallel_result, actual, tolerance = 1e-12)
 })
 
 test_that("adaptive quad fluid PSMS batches retain independent complex fields", {
   skip_if_not(acousticTS:::.quad_precision_available())
-  angles <- c(0.0001, 37.19, 90) * pi / 180
+  angles <- c(0, 0.0001, 37.19, 90) * pi / 180
   frequency <- c(19000, 38000)
   shape <- prolate_spheroid(length_body = 0.02, radius_body = 0.002)
   for (boundary in c("liquid_filled", "gas_filled")) {

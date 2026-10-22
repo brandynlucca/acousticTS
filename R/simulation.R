@@ -1090,7 +1090,7 @@ simulate_ts <- function(object,
   # Calculate acousticTS =======================================================
   # [pun intended :)]
   # ---- Set up TS function arguments ++++++++++++++++++++++++++++++++++++++++++
-  # Use an explicitly varied frequency for this simulation row =================
+  # Use an explicitly varied frequency for this simulation row +++++++++++++++++
   row_frequency <- if ("frequency" %in% names(parameter_values)) {
     parameter_values$frequency
   } else {

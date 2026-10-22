@@ -809,7 +809,7 @@ test_that(
   }
 )
 
-tmm_finite_hard_field <- function(acoustics, body, boundary) {
+tmm_finite_rigid_release_field <- function(acoustics, body, boundary) {
   vapply(seq_len(nrow(acoustics)), function(index) {
     acoustic <- acoustics[index, , drop = FALSE]
     orders <- seq.int(0L, acoustic$m_max)
@@ -904,7 +904,7 @@ test_that(
         phi_scatter = body$phi_scatter
       )$f_scat
 
-      finite_f <- tmm_finite_hard_field(acoustics, body, "pressure_release")
+      finite_f <- tmm_finite_rigid_release_field(acoustics, body, "pressure_release")
       expect_equal(stored_f, finite_f, tolerance = 1e-10)
       # Check separate degree and order growth against automatic PSMS ==========
       previous <- NULL
@@ -985,7 +985,7 @@ test_that("Stored prolate rigid scattering preserves finite support and converge
       phi_scatter = body$phi_scatter
     )$f_scat
 
-    finite_f <- tmm_finite_hard_field(acoustics, body, "fixed_rigid")
+    finite_f <- tmm_finite_rigid_release_field(acoustics, body, "fixed_rigid")
     expect_equal(stored_f, finite_f, tolerance = 1e-10)
     # Check degree and order enlargement before comparison with automatic PSMS =
     previous <- NULL

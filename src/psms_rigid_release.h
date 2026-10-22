@@ -1,5 +1,5 @@
-#ifndef ACOUSTICTS_PSMS_HARD_SUPPORT_H
-#define ACOUSTICTS_PSMS_HARD_SUPPORT_H
+#ifndef ACOUSTICTS_PSMS_RIGID_RELEASE_H
+#define ACOUSTICTS_PSMS_RIGID_RELEASE_H
 
 #include <algorithm>
 #include <array>
@@ -13,7 +13,7 @@
 #if ACOUSTICTS_HAVE_QUADMATH
 
 // These helpers use the normalized expansions and packed radial values in psms_backscatter.h.
-namespace psms_hard_support {
+namespace psms_rigid_release {
 using Real = acousticts_quad_t;
 using Complex = std::complex<Real>;
 
@@ -156,7 +156,7 @@ inline Real term_mass(const std::vector<Complex>& terms) {
 }
 }
 
-inline std::complex<acousticts_quad_t> psms_adaptive_hard_field(
+inline std::complex<acousticts_quad_t> psms_adaptive_rigid_release_field(
         acousticts_quad_t chi, acousticts_quad_t xi,
         const SpheroidalDirection<acousticts_quad_t>& incidence,
         acousticts_quad_t phi_difference, bool rigid) {
@@ -167,7 +167,7 @@ inline std::complex<acousticts_quad_t> psms_adaptive_hard_field(
             !is_finite_real(phi_difference) || !is_finite_real(incidence.cosine) ||
             precabs(incidence.cosine) > T(1) || !is_finite_real(incidence.sine) ||
             incidence.sine < T(0) || incidence.sine > T(1))
-        throw std::invalid_argument("Adaptive hard-boundary inputs are outside their native physical domain.");
+        throw std::invalid_argument("Adaptive fixed-rigid/pressure-release inputs are outside their native physical domain.");
     const bool broadside = incidence.cosine == T(0);
     // DLMF 30.3.3-4 and 30.13.9 justify these transition gates, not final cutoffs.
     const T ka = chi * xi, kb = chi * precsqrt((xi - T(1)) * (xi + T(1)));
@@ -197,7 +197,7 @@ inline std::complex<acousticts_quad_t> psms_adaptive_hard_field(
         bool have_candidate = false;
         std::vector<Complex> previous_terms;
         OrderSolution<T> accepted;
-        psms_hard_support::DegreeTail accepted_tail;
+        psms_rigid_release::DegreeTail accepted_tail;
         // Only the unresolved order regenerates its native degree block.
         for (;;) {
             Rcpp::checkUserInterrupt();
@@ -206,17 +206,17 @@ inline std::complex<acousticts_quad_t> psms_adaptive_hard_field(
             auto exterior = cprofcn_mblock_coefficients<T>(chi, m, 1, count,
                 arguments, 2, 0, xi - T(1), true);
             evaluate_coefficient_angular_values(exterior, m, directions, workspace);
-            auto trial = solve_hard_order(m, degree, incidence.cosine,
+            auto trial = solve_rigid_release_order(m, degree, incidence.cosine,
                 phi_difference, true, rigid, exterior, false, true);
-            const auto tail = psms_hard_support::degree_tail(
+            const auto tail = psms_rigid_release::degree_tail(
                 exterior, m, transition_degree, broadside, rigid, angular_bound_weights);
             T prefix_change = 0, prefix_correction = 0, added_mass = 0, added_correction = 0;
             if (have_candidate) {
                 for (size_t index = 0; index < previous_terms.size(); ++index)
-                    add(prefix_change, prefix_correction, psms_hard_support::magnitude(
+                    add(prefix_change, prefix_correction, psms_rigid_release::magnitude(
                         trial.outgoing_terms[index] - previous_terms[index]));
                 for (size_t index = previous_terms.size(); index < trial.outgoing_terms.size(); ++index)
-                    add(added_mass, added_correction, psms_hard_support::magnitude(trial.outgoing_terms[index]));
+                    add(added_mass, added_correction, psms_rigid_release::magnitude(trial.outgoing_terms[index]));
             }
             const bool tail_pass = tail.resolved && tail.log_estimate <= logq(degree_allowance);
             const bool confirmation_pass = have_candidate && tail_pass &&
@@ -233,7 +233,7 @@ inline std::complex<acousticts_quad_t> psms_adaptive_hard_field(
         }
         add_field(field, field_correction, accepted.field);
         add(degree_error, degree_error_correction, accepted_tail.estimate);
-        const T envelope = finite_norm(psms_hard_support::term_mass(accepted.outgoing_terms) +
+        const T envelope = finite_norm(psms_rigid_release::term_mass(accepted.outgoing_terms) +
             accepted_tail.estimate);
         order_envelopes[0] = order_envelopes[1];
         order_envelopes[1] = order_envelopes[2];
@@ -254,16 +254,16 @@ inline std::complex<acousticts_quad_t> psms_adaptive_hard_field(
         }
         previous_order_pass = order_pass;
         if (incidence.exact_axis || order_confirmed) break;
-        if (m == INT_MAX - 1) throw std::length_error("Hard-boundary support exceeds the native order range.");
+        if (m == INT_MAX - 1) throw std::length_error("Fixed-rigid/pressure-release support exceeds the native order range.");
     }
     const T estimated_error = finite_norm(degree_error + order_error);
     if (estimated_error > absolute_allowance)
-        throw std::runtime_error("The combined hard-boundary tail estimate exceeds its absolute allowance.");
+        throw std::runtime_error("The combined fixed-rigid/pressure-release tail estimate exceeds its absolute allowance.");
     finite(field);
     return field;
 }
 
-namespace psms_hard_support {
+namespace psms_rigid_release {
 struct BatchState {
     SpheroidalDirection<Real> incidence;
     bool rigid = false, finished = false, previous_order_pass = false;
@@ -286,7 +286,7 @@ inline std::vector<std::complex<acousticts_quad_t>> psms_adaptive_rigid_release_
         const std::vector<SpheroidalDirection<acousticts_quad_t>>& incidences,
         const std::vector<bool>& rigid, acousticts_quad_t phi_difference) {
     using namespace psms_automatic;
-    using namespace psms_hard_support;
+    using namespace psms_rigid_release;
     using T = acousticts_quad_t;
     if (incidences.size() != rigid.size() || incidences.empty())
         throw std::invalid_argument("Fixed-rigid/pressure-release batch cases need matching dimensions.");
@@ -352,7 +352,7 @@ inline std::vector<std::complex<acousticts_quad_t>> psms_adaptive_rigid_release_
                 const size_t case_index = group.second[angle_index];
                 auto& state = states[case_index];
                 auto& step = degree_states[case_index];
-                auto trial = solve_hard_order(
+                auto trial = solve_rigid_release_order(
                     m, degree, state.incidence.cosine, phi_difference, true,
                     state.rigid, exterior, false, true, static_cast<int>(angle_index));
                 const auto tail = degree_tail(exterior, m, transition_degree,

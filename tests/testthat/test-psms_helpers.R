@@ -1212,7 +1212,7 @@ test_that("adaptive quad liquid returns the exact matched-medium solution", {
 })
 
 
-test_that("adaptive quad hard boundaries match enlarged-support references", {
+test_that("adaptive quad rigid and release boundaries match enlarged references", {
   skip_if_not(acousticTS:::.quad_precision_available())
   # Quad references use independently enlarged degree and order support ========
   cases <- data.frame(

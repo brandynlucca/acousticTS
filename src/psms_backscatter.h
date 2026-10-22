@@ -4570,7 +4570,7 @@ template<typename T> psms_automatic::Result<T> psms_automatic_full_fluid_field(
 }
 
 namespace psms_automatic {
-template<typename T> OrderSolution<T> solve_hard_order(int m, int degree,
+template<typename T> OrderSolution<T> solve_rigid_release_order(int m, int degree,
         T incident_cosine, T phi_difference, bool backscatter, bool rigid,
         const ProfcnCoefficientBatchResult<T>& exterior, bool export_traces = true,
         bool retain_outgoing_terms = false, int angle_index = 0) {
@@ -4605,12 +4605,12 @@ template<typename T> OrderSolution<T> solve_hard_order(int m, int degree,
         const T receive_angular = backscatter ? (parity ? -angular : angular) :
             extract_angular_value_from_mblock<T>(exterior.functions, 0, index, angle_index + 1);
         if (!is_finite_real(angular) || !is_finite_real(receive_angular))
-            throw std::runtime_error("Hard-boundary angular function is nonfinite.");
+            throw std::runtime_error("Fixed-rigid/pressure-release angular function is nonfinite.");
         const Complex incident = imaginary_unit_power<T>(m + index) * angular;
         const auto radial = psms_packed::exterior_pair(exterior.functions, 0, index, result.scaling);
         const Complex divisor = rigid ? radial.derivative : radial.value;
         if (divisor == Complex(0, 0))
-            throw std::runtime_error("The outgoing hard-boundary radial divisor vanished in native precision.");
+            throw std::runtime_error("The outgoing fixed-rigid/pressure-release radial divisor vanished in native precision.");
         // Each separated boundary equation is diagonal and keeps its outgoing exponent packed.
         const T forcing = rigid ? radial.incident_derivative : radial.incident_value;
         const Complex scattered = -incident * (forcing / divisor);
@@ -4653,7 +4653,7 @@ template<typename T> OrderSolution<T> solve_hard_order(int m, int degree,
 }
 }
 
-template<typename T> psms_automatic::Result<T> psms_automatic_hard_boundary_field(
+template<typename T> psms_automatic::Result<T> psms_automatic_rigid_release_field(
         int m_seed, int n_seed, T chi_sw, T xi,
         const SpheroidalDirection<T>& incidence, const SpheroidalDirection<T>& reception,
         T phi_difference, bool backscatter, bool rigid) {
@@ -4672,7 +4672,7 @@ template<typename T> psms_automatic::Result<T> psms_automatic_hard_boundary_fiel
                 !is_finite_real(phi_difference) || !is_finite_real(incidence.sine) ||
                 !is_finite_real(reception.sine) || incidence.sine < T(0) || incidence.sine > T(1) ||
                 reception.sine < T(0) || reception.sine > T(1))
-            throw std::invalid_argument("Automatic hard-boundary inputs are outside their native physical domain.");
+            throw std::invalid_argument("Automatic fixed-rigid/pressure-release inputs are outside their native physical domain.");
         const bool axial = incidence.exact_axis;
         if (axial) m_seed = 0;
         const T sine_squared = incidence.sine * incidence.sine;
@@ -4706,7 +4706,7 @@ template<typename T> psms_automatic::Result<T> psms_automatic_hard_boundary_fiel
                 std::vector<SpheroidalDirection<T>> directions = {incidence};
                 if (!backscatter) directions.push_back(reception);
                 evaluate_coefficient_angular_values(exterior, m, directions, quadrature.legendre);
-                auto trial = solve_hard_order(m, degree, eta_body, phi_difference,
+                auto trial = solve_rigid_release_order(m, degree, eta_body, phi_difference,
                     backscatter, rigid, exterior);
                 ++attempts;
                 // Only the prescribed Dirichlet or Neumann trace controls boundary acceptance.
@@ -4732,7 +4732,7 @@ template<typename T> psms_automatic::Result<T> psms_automatic_hard_boundary_fiel
                 }
                 if (!boundary_ok && have_previous && trial.coefficient_change == T(0) &&
                         error == previous_error && incident_error == previous_incident_error)
-                    throw std::runtime_error("Native hard-boundary coefficients and residuals stagnated before the requested tolerance.");
+                    throw std::runtime_error("Native fixed-rigid/pressure-release coefficients and residuals stagnated before the requested tolerance.");
                 previous_coefficients = trial.coefficients;
                 previous_error = error;
                 previous_incident_error = incident_error;
@@ -4763,7 +4763,7 @@ template<typename T> psms_automatic::Result<T> psms_automatic_hard_boundary_fiel
             else result.pressure_relative = relative;
             if (azimuth_ok && outgoing_ok) {
                 if (combine_norms(boundary_error_norm, omitted_forcing) > boundary_budget)
-                    throw std::runtime_error("The accumulated hard-boundary error exceeds its allocated numerical tolerance.");
+                    throw std::runtime_error("The accumulated fixed-rigid/pressure-release error exceeds its allocated numerical tolerance.");
                 finite(field);
                 result.converged = true;
                 result.field = field;
@@ -4773,9 +4773,9 @@ template<typename T> psms_automatic::Result<T> psms_automatic_hard_boundary_fiel
                 return result;
             }
             added_order_norm = T(0);
-            if (axial) throw std::runtime_error("The analytic axial hard-boundary azimuthal check failed.");
+            if (axial) throw std::runtime_error("The analytic axial fixed-rigid/pressure-release azimuthal check failed.");
             if (m > INT_MAX - shell_size)
-                throw std::length_error("Hard-boundary azimuthal refinement exceeds the native index range.");
+                throw std::length_error("Fixed-rigid/pressure-release azimuthal refinement exceeds the native index range.");
             shell_end = m + shell_size;
         }
     } catch (const std::exception& error) {
@@ -4785,10 +4785,10 @@ template<typename T> psms_automatic::Result<T> psms_automatic_hard_boundary_fiel
     }
 }
 
-template<typename T> psms_automatic::Result<T> psms_automatic_hard_boundary_field(
+template<typename T> psms_automatic::Result<T> psms_automatic_rigid_release_field(
         int m_seed, int n_seed, T chi_sw, T xi, T eta_body, T eta_scatter,
         T phi_difference, bool backscatter, bool rigid) {
-    return psms_automatic_hard_boundary_field(m_seed, n_seed, chi_sw, xi,
+    return psms_automatic_rigid_release_field(m_seed, n_seed, chi_sw, xi,
         psms_direction_from_cosine(eta_body), psms_direction_from_cosine(eta_scatter),
         phi_difference, backscatter, rigid);
 }
@@ -5195,7 +5195,7 @@ inline std::vector<std::complex<acousticts_quad_t>> psms_adaptive_liquid_fields(
 template<typename T> std::complex<T> psms_fixed_support_field(
         int m_max, int n_max, T chi_sw, T chi_body, T xi,
         const SpheroidalDirection<T>& incidence, const SpheroidalDirection<T>& reception,
-        T phi_difference, T density_ratio, bool backscatter, bool hard, bool rigid, bool adaptive,
+        T phi_difference, T density_ratio, bool backscatter, bool rigid_or_release, bool rigid, bool adaptive,
         const std::vector<T>* overlap_nodes = nullptr,
         const std::vector<T>* overlap_weights = nullptr, bool gas_recovery = false) {
     using namespace psms_automatic;
@@ -5207,7 +5207,7 @@ template<typename T> std::complex<T> psms_fixed_support_field(
             !is_finite_real(reception.cosine) || precabs(reception.cosine) > T(1) ||
             !is_finite_real(incidence.sine) || incidence.sine < T(0) || incidence.sine > T(1) ||
             !is_finite_real(reception.sine) || reception.sine < T(0) || reception.sine > T(1) ||
-            (!hard && (!is_finite_real(chi_body) || !(chi_body > T(0)) ||
+            (!rigid_or_release && (!is_finite_real(chi_body) || !(chi_body > T(0)) ||
                 !is_finite_real(density_ratio) || !(density_ratio > T(0)))))
         throw std::invalid_argument("Fixed-support spheroidal inputs are outside their native physical domain.");
     checked_profcn_integer(static_cast<long long>(n_max) + 1, "inclusive maximum degree count");
@@ -5216,7 +5216,7 @@ template<typename T> std::complex<T> psms_fixed_support_field(
     overlap_quadrature.supplied_weights = overlap_weights;
     overlap_quadrature.adaptive = adaptive;
     overlap_quadrature.validate();
-    if (!hard && chi_sw == chi_body && density_ratio == T(1)) return Complex(0, 0);
+    if (!rigid_or_release && chi_sw == chi_body && density_ratio == T(1)) return Complex(0, 0);
 
     // Exact axial incidence has only m=0, while all other directions retain the requested orders.
     if (incidence.exact_axis) m_max = 0;
@@ -5235,7 +5235,7 @@ template<typename T> std::complex<T> psms_fixed_support_field(
     T max_band = 0, previous_band = -1;
     int small_bands = 0;
     const bool recovery_enabled = gas_recovery && is_quad_precision_v<T> &&
-        !hard && !overlap_quadrature.active();
+        !rigid_or_release && !overlap_quadrature.active();
     bool recovery_required = false;
     int previous_recovery_degree = n_max;
     for (int stage = 0; stage < (recovery_enabled ? 2 : 1); ++stage) {
@@ -5256,8 +5256,8 @@ template<typename T> std::complex<T> psms_fixed_support_field(
             auto exterior = cprofcn_mblock_coefficients<T>(chi_sw, m, 1,
                 degree - m + 1, arguments, 2, 0, xi - T(1), true);
             evaluate_coefficient_angular_values(exterior, m, directions, workspace);
-            auto order = hard ?
-                solve_hard_order(m, n_max, incidence.cosine, phi_difference,
+            auto order = rigid_or_release ?
+                solve_rigid_release_order(m, n_max, incidence.cosine, phi_difference,
                     backscatter, rigid, exterior, false, truncate_tails) :
                 solve_order<T>(m, degree, degree, chi_body, xi, incidence.cosine,
                     phi_difference, density_ratio, backscatter, recovering, exterior,
@@ -5307,7 +5307,7 @@ template<typename T> std::complex<T> psms_fixed_support_field(
                 }
                 previous_recovery_degree = degree;
             }
-            if (order.singular && !hard && (!overlap_quadrature.active() || overlap_quadrature.adaptive)) {
+            if (order.singular && !rigid_or_release && (!overlap_quadrature.active() || overlap_quadrature.adaptive)) {
                 // Retry only the failed coefficient-overlap order without enlarging either degree support.
                 order = solve_order<T>(m, n_max, n_max, chi_body, xi, incidence.cosine,
                     phi_difference, density_ratio, backscatter, true, exterior,

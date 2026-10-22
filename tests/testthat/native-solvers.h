@@ -306,10 +306,10 @@ context("Automatic spheroidal boundary convergence") {
                 expect_true(bool(!fluid.converged && fluid.orders.empty()));
                 expect_true(bool(fluid.detail.find("integer range exceeded") != std::string::npos));
                 for (bool rigid : {false, true}) {
-                    const auto hard = psms_automatic_hard_boundary_field<T>(0, degree,
+                    const auto boundary_result = psms_automatic_rigid_release_field<T>(0, degree,
                         T(4), T(1.5), T(0.3), T(0.4), T(1), false, rigid);
-                    expect_true(bool(!hard.converged && hard.orders.empty()));
-                    expect_true(bool(hard.detail.find("integer range exceeded") != std::string::npos));
+                    expect_true(bool(!boundary_result.converged && boundary_result.orders.empty()));
+                    expect_true(bool(boundary_result.detail.find("integer range exceeded") != std::string::npos));
                 }
             }
         };
@@ -462,7 +462,7 @@ context("Automatic spheroidal boundary convergence") {
 #endif
     }
 
-    test_that("near-axis fluid and hard fields preserve bistatic reciprocity and nonzero odd orders") {
+    test_that("near-axis fluid, rigid, and release fields preserve bistatic reciprocity and nonzero odd orders") {
         auto check = [](auto scalar) {
             using T = decltype(scalar);
             const auto incidence = psms_direction_from_angle(T(1e-8));
@@ -475,7 +475,7 @@ context("Automatic spheroidal boundary convergence") {
                         const SpheroidalDirection<T>& outgoing, T azimuth) {
                     return fluid ? psms_automatic_full_fluid_field<T>(4, 24, T(2), T(8.5), xi,
                         incoming, outgoing, azimuth, T(1) / T(800), false) :
-                        psms_automatic_hard_boundary_field<T>(4, 24, T(2), xi,
+                        psms_automatic_rigid_release_field<T>(4, 24, T(2), xi,
                             incoming, outgoing, azimuth, false, false);
                 };
                 const auto forward = solve(incidence, reception, phi);
@@ -622,11 +622,11 @@ context("Automatic spheroidal boundary convergence") {
         }
     }
 
-    test_that("hard boundaries agree with independently enlarged modal sums off-axis") {
+    test_that("fixed-rigid and pressure-release boundaries agree with independently enlarged modal sums off-axis") {
         const double xi = 0.07 / std::sqrt(0.07 * 0.07 - 0.01 * 0.01);
         const double eta = std::cos(37.0 * std::acos(-1.0) / 180.0);
         for (bool rigid : {false, true}) {
-            const auto result = psms_automatic_hard_boundary_field<double>(8, 28,
+            const auto result = psms_automatic_rigid_release_field<double>(8, 28,
                 20.0, xi, eta, -eta, 0.0, true, rigid);
             expect_true(bool(result.converged));
             if (!result.converged) continue;
@@ -1143,19 +1143,19 @@ context("Automatic spheroidal boundary convergence") {
             expect_true(bool(!sampled_field_only.singular && sampled_field_only.field == reference.field));
             expect_true(bool(sampled_field_only.coefficients == reference.coefficients));
             for (const auto& trace : sampled_field_only.traces) expect_true(bool(trace.empty()));
-            // Both hard boundaries retain exactly the same packed coefficients without trace exports.
+            // Both boundary types retain packed coefficients without trace exports.
             for (bool rigid : {false, true}) {
-                const auto complete = psms_automatic::solve_hard_order(1, 16, T(0.3), T(0),
+                const auto complete = psms_automatic::solve_rigid_release_order(1, 16, T(0.3), T(0),
                     true, rigid, exterior);
-                const auto field_only_hard = psms_automatic::solve_hard_order(1, 16, T(0.3), T(0),
+                const auto field_only_boundary = psms_automatic::solve_rigid_release_order(1, 16, T(0.3), T(0),
                     true, rigid, exterior, false, true);
-                expect_true(bool(field_only_hard.field == complete.field &&
-                    field_only_hard.coefficients == complete.coefficients &&
-                    field_only_hard.scaled_coefficients == complete.scaled_coefficients &&
-                    field_only_hard.radial_exponents == complete.radial_exponents));
-                expect_true(bool(field_only_hard.outgoing_terms.size() == 16 &&
-                    field_only_hard.working_bytes < complete.working_bytes));
-                for (const auto& trace : field_only_hard.traces) expect_true(bool(trace.empty()));
+                expect_true(bool(field_only_boundary.field == complete.field &&
+                    field_only_boundary.coefficients == complete.coefficients &&
+                    field_only_boundary.scaled_coefficients == complete.scaled_coefficients &&
+                    field_only_boundary.radial_exponents == complete.radial_exponents));
+                expect_true(bool(field_only_boundary.outgoing_terms.size() == 16 &&
+                    field_only_boundary.working_bytes < complete.working_bytes));
+                for (const auto& trace : field_only_boundary.traces) expect_true(bool(trace.empty()));
             }
         };
         check(double(0));
@@ -1246,7 +1246,7 @@ context("Automatic spheroidal boundary convergence") {
 #endif
     }
 
-    test_that("axial h0=60 hard boundaries retain fixed double and converged quad fields") {
+    test_that("axial h0=60 fixed-rigid and pressure-release boundaries retain fixed double and converged quad fields") {
         auto check = [](auto scalar) {
             using T = decltype(scalar);
             using namespace psms_automatic;
@@ -1317,13 +1317,13 @@ context("Automatic spheroidal boundary convergence") {
                             expect_true(bool(liquid == fluid.field));
                         }
                         for (bool rigid : {false, true}) {
-                            const auto hard = psms_automatic::solve_hard_order(0, 0, cosine,
+                            const auto boundary_result = psms_automatic::solve_rigid_release_order(0, 0, cosine,
                                 T(0.7), backscatter, rigid, exterior);
                             const auto value = psms_public_field<T>(0, 0, chi, internal_chi, xi,
                                 T(angle), T(receive_angle), T(0), T(0.7), density, T(1),
                                 quadrature.nodes, quadrature.weights,
                                 rigid ? "Amn_fixed_rigid" : "Amn_pressure_release", backscatter, adaptive, false);
-                            expect_true(bool(value == hard.field));
+                            expect_true(bool(value == boundary_result.field));
                         }
                     }
                     psms_automatic::OverlapQuadrature<T> prescribed;

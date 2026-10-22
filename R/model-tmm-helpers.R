@@ -624,7 +624,7 @@
   )
 }
 
-#' Apply conservative hard overrides for slender prolates when a spherical-wave
+#' Apply conservative modal overrides for slender prolates when a spherical-wave
 #' truncation is still needed.
 #' @noRd
 .tmm_prolate_nmax_override <- function(shape_parameters, boundary) {

@@ -159,6 +159,169 @@ inline bool direct_field(T chi_sw, T chi_body, T xi, int degree_seed,
     return true;
 }
 
+struct DirectContribution {
+    int degree = 0, attempts = 0;
+    Complex field{0, 0};
+    T estimate = 0;
+    bool arithmetic_floor = false;
+};
+
+struct DirectState {
+    SpheroidalDirection<T> incidence;
+    int degree_seed;
+    std::vector<DirectContribution> contributions;
+    Complex field{0, 0}, correction{0, 0};
+    T previous_order = -1, penultimate_order = -1, total_degree_estimate = 0;
+    int small_orders = 0;
+    bool finished = false, rejected = false;
+    DirectState(const SpheroidalDirection<T>& direction, int seed)
+        : incidence(direction), degree_seed(seed) {}
+};
+
+inline T direct_norm(const Complex& value) {
+    return combine_norms(precabs(value.real()), precabs(value.imag()));
+}
+
+inline bool resolve_direct_degree(DirectState& state,
+        psms_angle_prepared::Workspace<T>& prepared, LegendreWorkspace<T>& angular_workspace,
+        int m, int degree, int previous_attempts, const Complex& other_orders,
+        bool cancellation_recovery, T chi_sw, T chi_body, T xi, T density_ratio,
+        T phi_difference, T amplitude_allowance, DirectContribution& accepted) {
+    SpheroidalCoefficientOverlapCache<T> overlap_cache;
+    OrderSolution<T> order;
+    for (int refinement = previous_attempts; refinement < 12; ++refinement) {
+        Rcpp::checkUserInterrupt();
+        // Refresh this angle's angular values on the shared native degree block.
+        auto& exterior = prepared.get(true, chi_sw, m, degree, xi - T(1)).values;
+        evaluate_coefficient_angular_values(exterior, m,
+            std::vector<SpheroidalDirection<T>>{state.incidence}, angular_workspace);
+        const auto& interior = prepared.get(false, chi_body, m, degree, xi - T(1));
+        order = solve_order<T>(m, degree, degree, chi_body, xi, state.incidence.cosine,
+            phi_difference, density_ratio, true, false, exterior, nullptr,
+            &overlap_cache, false, false, true, false, true, &interior);
+        if (order.singular || !order.embedded_valid[0] || !order.embedded_valid[1])
+            return false;
+        const T scale = direct_norm(other_orders + order.field);
+        const T allowance = amplitude_allowance * scale / (T(2) * T(m + 1) * T(m + 2));
+        const T last = direct_norm(order.field - order.embedded_fields[0]);
+        const T preceding = direct_norm(order.embedded_fields[0] - order.embedded_fields[1]);
+        const T arithmetic_floor = T(64) * preceps<T>() * order.embedded_roundoff_scale;
+        bool degree_pass = false;
+        accepted.arithmetic_floor = false;
+        if (last <= arithmetic_floor && preceding <= arithmetic_floor) {
+            accepted.estimate = arithmetic_floor;
+            degree_pass = accepted.estimate <= allowance;
+            accepted.arithmetic_floor = true;
+        } else if (preceding > T(0) && last < preceding) {
+            const T ratio = last / preceding;
+            accepted.estimate = last / (T(1) - ratio);
+            degree_pass = accepted.estimate <= allowance && preceding <= allowance;
+        }
+        if (degree_pass || (cancellation_recovery && accepted.arithmetic_floor)) {
+            accepted.degree = degree;
+            accepted.attempts = refinement + 1;
+            accepted.field = order.field;
+            return true;
+        }
+        degree = checked_profcn_integer((5LL * (degree + 1LL) + 3LL) / 4LL - 1LL,
+            "optimized degree refinement");
+    }
+    Rcpp::stop("Optimized degree tail did not converge within twelve refinements.");
+    return false;
+}
+
+inline void advance_direct(DirectState& state,
+        psms_angle_prepared::Workspace<T>& prepared, LegendreWorkspace<T>& angular_workspace,
+        int m, T chi_sw, T chi_body, T xi, T density_ratio,
+        T phi_difference, T amplitude_allowance) {
+    Rcpp::checkUserInterrupt();
+    const int degree = std::max(state.degree_seed, m + 5);
+    DirectContribution order;
+    if (!resolve_direct_degree(state, prepared, angular_workspace, m, degree, 0,
+            state.field, false, chi_sw, chi_body, xi, density_ratio,
+            phi_difference, amplitude_allowance, order)) {
+        state.rejected = true;
+        return;
+    }
+    state.contributions.push_back(order);
+    state.total_degree_estimate += order.estimate;
+    add_field(state.field, state.correction, order.field);
+    T magnitude = direct_norm(order.field);
+    const T order_allowance = amplitude_allowance * direct_norm(state.field) / T(2);
+    state.small_orders = m >= 2 && magnitude <= order_allowance ? state.small_orders + 1 : 0;
+    bool order_pass = state.incidence.exact_axis;
+    if (state.small_orders >= 2 && state.previous_order > T(0) && state.penultimate_order > T(0)) {
+        const T ratio = std::max(magnitude / state.previous_order,
+            state.previous_order / state.penultimate_order);
+        order_pass = ratio < T(1) && magnitude * ratio / (T(1) - ratio) <= order_allowance;
+    }
+    if (order_pass) {
+        bool recovered = false;
+        // Tighten only this angle's previously accepted degree contributions.
+        while (state.total_degree_estimate > amplitude_allowance * direct_norm(state.field) / T(2)) {
+            Rcpp::checkUserInterrupt();
+            T fixed_estimate = 0, largest_estimate = -1;
+            int selected = -1;
+            for (int index = 0; index <= m; ++index) {
+                const auto& retained = state.contributions[index];
+                if (retained.arithmetic_floor || retained.attempts >= 12) {
+                    fixed_estimate += retained.estimate;
+                } else if (retained.estimate > largest_estimate) {
+                    largest_estimate = retained.estimate;
+                    selected = index;
+                }
+            }
+            if (selected < 0 || fixed_estimate > amplitude_allowance * direct_norm(state.field) / T(2))
+                Rcpp::stop("Adaptive gas cancellation exhausts the degree arithmetic or refinement allowance.");
+            auto& retained = state.contributions[selected];
+            Complex other_orders(0, 0), other_correction(0, 0);
+            for (int index = 0; index <= m; ++index)
+                if (index != selected)
+                    add_field(other_orders, other_correction, state.contributions[index].field);
+            const int enlarged_degree = checked_profcn_integer(
+                (5LL * (retained.degree + 1LL) + 3LL) / 4LL - 1LL,
+                "adaptive gas cancellation refinement");
+            if (!resolve_direct_degree(state, prepared, angular_workspace, selected,
+                    enlarged_degree, retained.attempts, other_orders, true, chi_sw,
+                    chi_body, xi, density_ratio, phi_difference, amplitude_allowance,
+                    retained)) {
+                state.rejected = true;
+                return;
+            }
+            state.field = state.correction = Complex(0, 0);
+            state.total_degree_estimate = 0;
+            for (const auto& contribution : state.contributions) {
+                add_field(state.field, state.correction, contribution.field);
+                state.total_degree_estimate += contribution.estimate;
+            }
+            recovered = true;
+        }
+        if (recovered) {
+            const T updated_allowance = amplitude_allowance * direct_norm(state.field) / T(2);
+            state.small_orders = 0;
+            for (int index = m; index >= 2 &&
+                    direct_norm(state.contributions[index].field) <= updated_allowance; --index)
+                ++state.small_orders;
+            magnitude = direct_norm(state.contributions[m].field);
+            state.previous_order = m > 0 ? direct_norm(state.contributions[m - 1].field) : T(-1);
+            state.penultimate_order = m > 1 ? direct_norm(state.contributions[m - 2].field) : T(-1);
+            order_pass = state.incidence.exact_axis;
+            if (state.small_orders >= 2 && state.previous_order > T(0) &&
+                    state.penultimate_order > T(0)) {
+                const T ratio = std::max(magnitude / state.previous_order,
+                    state.previous_order / state.penultimate_order);
+                order_pass = ratio < T(1) && magnitude * ratio / (T(1) - ratio) <= updated_allowance;
+            }
+        }
+        if (order_pass) {
+            state.finished = true;
+            return;
+        }
+    }
+    state.penultimate_order = state.previous_order;
+    state.previous_order = magnitude;
+}
+
 struct State {
     SpheroidalDirection<T> incidence;
     int previous_degree, previous_interior_degree;
@@ -289,11 +452,43 @@ inline std::vector<Complex> fields(T chi_sw, T chi_body, T xi,
         if (degree_seeds[index] < 0)
             throw std::invalid_argument("Invalid gas degree seed.");
         states.emplace_back(directions[index], degree_seeds[index], std::max(1, int(exterior_seed)));
-        auto& state = states.back();
-        state.finished = direct_field(chi_sw, chi_body, xi, degree_seeds[index],
+    }
+    if (directions.size() == 1) {
+        auto& state = states.front();
+        state.finished = direct_field(chi_sw, chi_body, xi, degree_seeds.front(),
             density_ratio, state.incidence, phi_difference, state.field);
-        // Discard the entire rejected direct sum before changing formulation.
+        // A rejected direct sum cannot seed the Robin solve.
         if (!state.finished) state.field = Complex(0, 0);
+    } else {
+        std::vector<DirectState> direct_states;
+        direct_states.reserve(directions.size());
+        for (size_t index = 0; index < directions.size(); ++index)
+            direct_states.emplace_back(directions[index], degree_seeds[index]);
+        if (chi_sw == chi_body && density_ratio == T(1)) {
+            for (auto& state : direct_states) state.finished = true;
+        } else {
+            const T ts_allowance = -expm1q(-logq(T(10)) * T(1e-8) / T(20));
+            const T amplitude_allowance = std::min(ts_allowance, psms_modal_rel_tol<T>());
+            psms_angle_prepared::Workspace<T> direct_prepared;
+            LegendreWorkspace<T> angular_workspace;
+            // Interleave independent direct solves to reuse exact native degree blocks.
+            for (int m = 0; ; ++m) {
+                bool active = false;
+                for (auto& state : direct_states) {
+                    if (state.finished || state.rejected) continue;
+                    active = true;
+                    advance_direct(state, direct_prepared, angular_workspace, m,
+                        chi_sw, chi_body, xi, density_ratio, phi_difference,
+                        amplitude_allowance);
+                }
+                if (!active) break;
+            }
+        }
+        for (size_t index = 0; index < states.size(); ++index) {
+            states[index].finished = direct_states[index].finished;
+            // A rejected direct sum never contributes to the Robin fallback.
+            if (states[index].finished) states[index].field = direct_states[index].field;
+        }
     }
     psms_angle_prepared::Workspace<T> prepared;
     for (int m = 0; ; ++m) {

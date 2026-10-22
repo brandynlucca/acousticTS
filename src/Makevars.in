@@ -29,7 +29,7 @@ all: $(SHLIB)
 
 psms.o: psms.cpp precision.h psms_support.h psms_smn.h psms_rmn.h \
 	psms_backscatter.h psms_linear_systems.h psms_coefficient_operator.h \
-	psms_hard_support.h psms_gas_support.h svd_solve.h \
+	psms_rigid_release.h psms_gas_support.h svd_solve.h \
 	../tests/testthat/native-solvers.h
 
 clean:

@@ -259,7 +259,7 @@ Rcpp::List Rmn_cpp(
 
 // ============================================================================
 #include "psms_backscatter.h"
-#include "psms_hard_support.h"
+#include "psms_rigid_release.h"
 #include "psms_gas_support.h"
 
 // Dispatch modal support selection and full boundary solves.
@@ -274,17 +274,17 @@ std::complex<T> psms_public_field(
     // Full solutions share packed native arithmetic in fixed and adaptive evaluations.
     const bool fluid = method == "Amn_fluid_gas" ||
         method == "Amn_fluid_coefficients" || method == "Amn_fluid";
-    const bool hard = method == "Amn_pressure_release" ||
+    const bool rigid_or_release = method == "Amn_pressure_release" ||
         method == "Amn_fixed_rigid";
-    if (fluid || hard) {
+    if (fluid || rigid_or_release) {
         const auto incidence = psms_direction_from_angle(theta_body);
         const auto reception = psms_direction_from_angle(theta_scatter);
 #if ACOUSTICTS_HAVE_QUADMATH
         if constexpr (is_quad_precision_v<T>) {
-            if (adaptive && backscatter && (hard || method == "Amn_fluid_gas")) {
+            if (adaptive && backscatter && (rigid_or_release || method == "Amn_fluid_gas")) {
                 if (m_seed < 0 || n_seed < m_seed)
                     throw std::invalid_argument("Invalid spheroidal modal support.");
-                if (hard) return psms_adaptive_hard_field(chi_sw, xi, incidence,
+                if (rigid_or_release) return psms_adaptive_rigid_release_field(chi_sw, xi, incidence,
                     phi_scatter - phi_body, method == "Amn_fixed_rigid");
                 return psms_gas_support::fields(chi_sw, chi_body, xi,
                     std::vector<int>{n_seed}, density_body / density_sw,
@@ -300,7 +300,7 @@ std::complex<T> psms_public_field(
 #endif
         return psms_fixed_support_field<T>(m_seed, n_seed, chi_sw, chi_body, xi,
             incidence, reception, phi_scatter - phi_body, density_body / density_sw,
-            backscatter, hard, method == "Amn_fixed_rigid", adaptive,
+            backscatter, rigid_or_release, method == "Amn_fixed_rigid", adaptive,
             method == "Amn_fluid" ? &nodes : nullptr,
             method == "Amn_fluid" ? &weights : nullptr,
             method == "Amn_fluid_gas" && is_quad_precision_v<T>);
