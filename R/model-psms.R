@@ -698,8 +698,14 @@ PSMS <- function(object) {
     acoustics, body, medium, parameters$Amn_method, parameters$n_integration,
     parameters$precision, parameters$adaptive
   )
-  # Calculate backscatter and return ===========================================
-  # Compute sigma_bs +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  .psms_store_field(object, f_bs)
+}
+
+#' Store one PSMS field using the ordinary amplitude and TS convention.
+#' @noRd
+.psms_store_field <- function(object, f_bs) {
+  acoustics <- extract(object, "model_parameters")$PSMS$parameters$acoustics
+  # Compute sigma_bs and TS from the field =====================================
   o_bs <- abs(-2i / acoustics$k_sw * f_bs)
   methods::slot(object, "model")$PSMS <- data.frame(
     frequency = acoustics$frequency,
@@ -708,4 +714,119 @@ PSMS <- function(object) {
     TS = 20 * log10(o_bs)
   )
   object
+}
+
+#' Plan exact-state groups for adaptive quad spheroidal simulations.
+#' @noRd
+.psms_simulation_batch_plan <- function(object, frequency, parameters,
+                                        simulation_grid) {
+  tasks <- as.list(seq_len(nrow(simulation_grid)))
+  supported <- c(
+    "theta", "boundary", "precision", "adaptive", "sound_speed_sw",
+    "density_sw", "n_integration", "simplify_Amn", "phi_body", "frequency"
+  )
+  # Keep stochastic and structural overrides on the ordinary row path ==========
+  if (!all(names(parameters) %in% supported) ||
+    any(vapply(parameters, function(value) {
+      is.function(value) || is.list(value) || is.object(value)
+    }, logical(1))) ||
+    !all(c("boundary", "precision", "adaptive") %in% names(parameters))) {
+    return(tasks)
+  }
+
+  row_values <- lapply(tasks, function(index) {
+    .simulation_grid_row_values(simulation_grid, index)
+  })
+  eligible <- vapply(row_values, function(values) {
+    identical(values$precision, "quad") &&
+      identical(values$adaptive, TRUE) &&
+      values$boundary %in% c("fixed_rigid", "pressure_release") &&
+      is.numeric(values$theta %||% extract(object, "body")$theta)
+  }, logical(1))
+  if (!any(eligible)) {
+    return(tasks)
+  }
+
+  # Group identical inputs while excluding incidence and boundary labels =======
+  keys <- vapply(seq_along(tasks), function(index) {
+    if (!eligible[[index]]) {
+      return(paste0("singleton-", index))
+    }
+    values <- row_values[[index]]
+    excluded <- c("theta", "boundary", "theta_idx", "boundary_idx")
+    state <- values[!names(values) %in% excluded]
+    paste0(as.character(serialize(state, NULL, version = 2)), collapse = "")
+  }, character(1))
+  unname(split(seq_along(tasks), factor(keys, levels = unique(keys))))
+}
+
+#' Evaluate one exact-state PSMS batch or use the ordinary row solver.
+#' @noRd
+.psms_simulation_batch_run <- function(grid_indices, object, parameters,
+                                       simulation_grid, frequency, model) {
+  ordinary <- function() {
+    lapply(grid_indices, function(index) {
+      .get_TS(index, object, parameters, simulation_grid, frequency, model)
+    })
+  }
+  prepared <- lapply(grid_indices, function(index) {
+    .prepare_simulation_target(
+      index, object, parameters, simulation_grid, frequency, model
+    )
+  })
+  initialized <- lapply(prepared, function(row) {
+    args <- .filter_shape_args(psms_initialize, row$ts_args)
+    do.call(psms_initialize, args)
+  })
+  model_states <- lapply(initialized, function(row) {
+    extract(row, "model_parameters")$PSMS
+  })
+  state_key <- function(state) {
+    list(
+      acoustics = state$parameters$acoustics,
+      body = state$body[
+        !names(state$body) %in% c("theta_body", "theta_scatter")
+      ],
+      medium = state$medium,
+      precision = state$parameters$precision,
+      adaptive = state$parameters$adaptive,
+      n_integration = state$parameters$n_integration
+    )
+  }
+  shared_state <- state_key(model_states[[1L]])
+  # Reject groups whose initialized wave functions cannot be shared exactly ====
+  if (!all(vapply(model_states, function(state) {
+    identical(state_key(state), shared_state) &&
+      state$parameters$Amn_method %in% c(
+        "Amn_fixed_rigid", "Amn_pressure_release"
+      )
+  }, logical(1)))) {
+    return(ordinary())
+  }
+
+  theta_body <- vapply(model_states, function(state) {
+    state$body$theta_body
+  }, numeric(1))
+  rigid <- vapply(model_states, function(state) {
+    identical(state$parameters$Amn_method, "Amn_fixed_rigid")
+  }, logical(1))
+  fields <- tryCatch(
+    prolate_spheroid_rigid_release_batch(
+      shared_state$acoustics,
+      model_states[[1L]]$body,
+      shared_state$medium,
+      theta_body,
+      rigid
+    ),
+    error = function(error) NULL
+  )
+  if (!is.complex(fields) ||
+    !identical(dim(fields), c(nrow(shared_state$acoustics), length(rigid)))) {
+    return(ordinary())
+  }
+
+  lapply(seq_along(prepared), function(index) {
+    solved <- .psms_store_field(initialized[[index]], fields[, index])
+    .format_simulation_target(solved, prepared[[index]]$parameter_values)
+  })
 }

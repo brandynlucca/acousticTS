@@ -505,6 +505,21 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// prolate_spheroid_rigid_release_batch
+Rcpp::ComplexMatrix prolate_spheroid_rigid_release_batch(Rcpp::DataFrame acoustics, Rcpp::List body, Rcpp::List medium, Rcpp::NumericVector theta_body, Rcpp::LogicalVector rigid);
+RcppExport SEXP _acousticTS_prolate_spheroid_rigid_release_batch(SEXP acousticsSEXP, SEXP bodySEXP, SEXP mediumSEXP, SEXP theta_bodySEXP, SEXP rigidSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::DataFrame >::type acoustics(acousticsSEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type body(bodySEXP);
+    Rcpp::traits::input_parameter< Rcpp::List >::type medium(mediumSEXP);
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type theta_body(theta_bodySEXP);
+    Rcpp::traits::input_parameter< Rcpp::LogicalVector >::type rigid(rigidSEXP);
+    rcpp_result_gen = Rcpp::wrap(prolate_spheroid_rigid_release_batch(acoustics, body, medium, theta_body, rigid));
+    return rcpp_result_gen;
+END_RCPP
+}
 // prolate_spheroid_tmatrix_cpp
 Rcpp::List prolate_spheroid_tmatrix_cpp(Rcpp::DataFrame acoustics, Rcpp::DataFrame body, Rcpp::DataFrame medium, Rcpp::List integration_pts, std::string precision, std::string Amn_method);
 RcppExport SEXP _acousticTS_prolate_spheroid_tmatrix_cpp(SEXP acousticsSEXP, SEXP bodySEXP, SEXP mediumSEXP, SEXP integration_ptsSEXP, SEXP precisionSEXP, SEXP Amn_methodSEXP) {
@@ -666,6 +681,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_acousticTS_Smn_cpp", (DL_FUNC) &_acousticTS_Smn_cpp, 6},
     {"_acousticTS_Rmn_cpp", (DL_FUNC) &_acousticTS_Rmn_cpp, 6},
     {"_acousticTS_prolate_spheroid_fbs", (DL_FUNC) &_acousticTS_prolate_spheroid_fbs, 8},
+    {"_acousticTS_prolate_spheroid_rigid_release_batch", (DL_FUNC) &_acousticTS_prolate_spheroid_rigid_release_batch, 5},
     {"_acousticTS_prolate_spheroid_tmatrix_cpp", (DL_FUNC) &_acousticTS_prolate_spheroid_tmatrix_cpp, 6},
     {"_acousticTS_prolate_spheroid_scattering_from_tmatrix_cpp", (DL_FUNC) &_acousticTS_prolate_spheroid_scattering_from_tmatrix_cpp, 7},
     {"_acousticTS_prolate_spheroid_scattering_points_from_tmatrix_cpp", (DL_FUNC) &_acousticTS_prolate_spheroid_scattering_points_from_tmatrix_cpp, 7},

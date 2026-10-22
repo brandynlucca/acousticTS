@@ -4573,7 +4573,7 @@ namespace psms_automatic {
 template<typename T> OrderSolution<T> solve_hard_order(int m, int degree,
         T incident_cosine, T phi_difference, bool backscatter, bool rigid,
         const ProfcnCoefficientBatchResult<T>& exterior, bool export_traces = true,
-        bool retain_outgoing_terms = false) {
+        bool retain_outgoing_terms = false, int angle_index = 0) {
     using Complex = std::complex<T>;
     OrderSolution<T> result;
     result.m = m;
@@ -4600,9 +4600,10 @@ template<typename T> OrderSolution<T> solve_hard_order(int m, int degree,
     for (int index = 0; index < size; ++index) {
         const int parity = index % 2;
         if (incident_cosine == T(0) && parity == 1) continue;
-        const T angular = extract_angular_value_from_mblock<T>(exterior.functions, 0, index, 0);
+        const T angular = extract_angular_value_from_mblock<T>(
+            exterior.functions, 0, index, angle_index);
         const T receive_angular = backscatter ? (parity ? -angular : angular) :
-            extract_angular_value_from_mblock<T>(exterior.functions, 0, index, 1);
+            extract_angular_value_from_mblock<T>(exterior.functions, 0, index, angle_index + 1);
         if (!is_finite_real(angular) || !is_finite_real(receive_angular))
             throw std::runtime_error("Hard-boundary angular function is nonfinite.");
         const Complex incident = imaginary_unit_power<T>(m + index) * angular;
@@ -4630,7 +4631,8 @@ template<typename T> OrderSolution<T> solve_hard_order(int m, int degree,
         add_field(result.field, field_correction, term);
         if (retain_outgoing_terms) result.outgoing_terms[index] = term;
         const int radial_accuracy = exterior.functions.naccr[index];
-        const int angular_accuracy = exterior.functions.naccs[index];
+        const int angular_accuracy = exterior.functions.naccs[
+            index + size_t(exterior.functions.lnum) * angle_index];
         if (!is_na_int(radial_accuracy))
             result.minimum_radial_accuracy = std::min(result.minimum_radial_accuracy, radial_accuracy);
         if (angular != T(0) && !is_na_int(angular_accuracy))
@@ -4962,6 +4964,231 @@ inline std::complex<acousticts_quad_t> psms_adaptive_liquid_field(
         penultimate_order = previous_order;
         previous_order = magnitude;
     }
+}
+
+namespace psms_liquid_batch {
+using T = acousticts_quad_t;
+using Complex = std::complex<T>;
+using namespace psms_automatic;
+
+struct DegreeContribution {
+    int degree = 0, attempts = 0;
+    Complex field{0, 0};
+    T estimate = 0;
+    bool arithmetic_floor = false;
+};
+
+struct State {
+    SpheroidalDirection<T> incidence;
+    int n_seed;
+    std::vector<DegreeContribution> contributions;
+    Complex field{0, 0}, field_correction{0, 0};
+    T previous_order = -1, penultimate_order = -1, total_degree_estimate = 0;
+    int small_orders = 0;
+    bool finished = false;
+    State(const SpheroidalDirection<T>& direction, int seed)
+        : incidence(direction), n_seed(seed) {}
+};
+
+inline T field_norm(const Complex& value) {
+    return combine_norms(precabs(value.real()), precabs(value.imag()));
+}
+
+inline DegreeContribution resolve_degree(State& state,
+        psms_angle_prepared::Workspace<T>& prepared, int m, int degree,
+        int previous_attempts, const Complex& other_orders,
+        bool cancellation_recovery, T chi_sw, T chi_body, T xi,
+        T phi_difference, T density_ratio, T amplitude_allowance,
+        LegendreWorkspace<T>& angular_workspace) {
+    SpheroidalCoefficientOverlapCache<T> overlap_cache;
+    OrderSolution<T> order;
+    DegreeContribution accepted;
+    for (int refinement = previous_attempts; refinement < 12; ++refinement) {
+        Rcpp::checkUserInterrupt();
+        // Reuse the radial and coefficient blocks across angles at this order.
+        auto& exterior = prepared.get(true, chi_sw, m, degree, xi - T(1)).values;
+        evaluate_coefficient_angular_values(exterior, m,
+            std::vector<SpheroidalDirection<T>>{state.incidence}, angular_workspace);
+        auto& interior = prepared.get(false, chi_body, m, degree, xi - T(1));
+        order = solve_order<T>(m, degree, degree, chi_body, xi, state.incidence.cosine,
+            phi_difference, density_ratio, true, false, exterior, nullptr,
+            &overlap_cache, false, false, false, false, true, &interior);
+        if (order.singular)
+            throw std::runtime_error("Adaptive liquid coupled system is singular.");
+        if (!order.embedded_valid[0] || !order.embedded_valid[1])
+            throw std::runtime_error("Adaptive liquid degree comparison failed its arithmetic check.");
+        const T scale = field_norm(other_orders + order.field);
+        const T allowance = amplitude_allowance * scale / (T(2) * T(m + 1) * T(m + 2));
+        const T last = field_norm(order.field - order.embedded_fields[0]);
+        const T preceding = field_norm(order.embedded_fields[0] - order.embedded_fields[1]);
+        const T arithmetic_floor = T(64) * preceps<T>() * order.embedded_roundoff_scale;
+        bool degree_pass = false;
+        accepted.arithmetic_floor = false;
+        if (last <= arithmetic_floor && preceding <= arithmetic_floor) {
+            accepted.estimate = arithmetic_floor;
+            degree_pass = accepted.estimate <= allowance;
+            accepted.arithmetic_floor = true;
+        } else if (preceding > T(0) && last < preceding) {
+            const T ratio = last / preceding;
+            accepted.estimate = last / (T(1) - ratio);
+            degree_pass = accepted.estimate <= allowance && preceding <= allowance;
+        }
+        if (degree_pass || (cancellation_recovery && accepted.arithmetic_floor)) {
+            accepted.degree = degree;
+            accepted.attempts = refinement + 1;
+            accepted.field = order.field;
+            return accepted;
+        }
+        degree = checked_profcn_integer((5LL * (degree + 1LL) + 3LL) / 4LL - 1LL,
+            "adaptive liquid degree refinement");
+    }
+    throw std::runtime_error("Adaptive liquid degree tail did not converge within twelve refinements.");
+}
+
+inline void advance(State& state, psms_angle_prepared::Workspace<T>& prepared,
+        int m, T chi_sw, T chi_body, T xi, T phi_difference,
+        T density_ratio, T amplitude_allowance,
+        LegendreWorkspace<T>& angular_workspace) {
+    Rcpp::checkUserInterrupt();
+    const int degree = std::max(state.n_seed, checked_profcn_integer(
+        static_cast<long long>(m) + 5, "embedded degree support"));
+    auto order = resolve_degree(state, prepared, m, degree, 0, state.field, false,
+        chi_sw, chi_body, xi, phi_difference, density_ratio, amplitude_allowance,
+        angular_workspace);
+    state.contributions.push_back(order);
+    state.total_degree_estimate += order.estimate;
+    add_field(state.field, state.field_correction, order.field);
+    T magnitude = field_norm(order.field);
+    const T order_allowance = amplitude_allowance * field_norm(state.field) / T(2);
+    state.small_orders = m >= 2 && magnitude <= order_allowance ? state.small_orders + 1 : 0;
+    bool order_pass = state.incidence.exact_axis;
+    if (state.small_orders >= 2 && state.previous_order > T(0) &&
+            state.penultimate_order > T(0)) {
+        const T ratio = std::max(magnitude / state.previous_order,
+            state.previous_order / state.penultimate_order);
+        order_pass = ratio < T(1) && magnitude * ratio / (T(1) - ratio) <= order_allowance;
+    }
+    if (order_pass) {
+        bool recovered = false;
+        // Cancellation recovery changes only the affected angle's support.
+        while (state.total_degree_estimate >
+                amplitude_allowance * field_norm(state.field) / T(2)) {
+            Rcpp::checkUserInterrupt();
+            T fixed_estimate = 0, largest_estimate = -1;
+            int selected = -1;
+            for (int index = 0; index <= m; ++index) {
+                const auto& retained = state.contributions[index];
+                if (retained.arithmetic_floor || retained.attempts >= 12) {
+                    fixed_estimate += retained.estimate;
+                } else if (retained.estimate > largest_estimate) {
+                    largest_estimate = retained.estimate;
+                    selected = index;
+                }
+            }
+            if (selected < 0 || fixed_estimate >
+                    amplitude_allowance * field_norm(state.field) / T(2))
+                throw std::runtime_error("Adaptive liquid cancellation exhausts the degree arithmetic or refinement allowance.");
+            auto& retained = state.contributions[selected];
+            Complex other_orders(0, 0), other_correction(0, 0);
+            for (int index = 0; index <= m; ++index)
+                if (index != selected)
+                    add_field(other_orders, other_correction, state.contributions[index].field);
+            const int enlarged_degree = checked_profcn_integer(
+                (5LL * (retained.degree + 1LL) + 3LL) / 4LL - 1LL,
+                "adaptive liquid cancellation refinement");
+            retained = resolve_degree(state, prepared, selected, enlarged_degree,
+                retained.attempts, other_orders, true, chi_sw, chi_body, xi,
+                phi_difference, density_ratio, amplitude_allowance,
+                angular_workspace);
+            state.field = state.field_correction = Complex(0, 0);
+            state.total_degree_estimate = 0;
+            for (const auto& contribution : state.contributions) {
+                add_field(state.field, state.field_correction, contribution.field);
+                state.total_degree_estimate += contribution.estimate;
+            }
+            recovered = true;
+        }
+        if (recovered) {
+            const T updated_allowance = amplitude_allowance * field_norm(state.field) / T(2);
+            state.small_orders = 0;
+            for (int index = m; index >= 2 &&
+                    field_norm(state.contributions[index].field) <= updated_allowance; --index)
+                ++state.small_orders;
+            magnitude = field_norm(state.contributions[m].field);
+            state.previous_order = m > 0 ? field_norm(state.contributions[m - 1].field) : T(-1);
+            state.penultimate_order = m > 1 ? field_norm(state.contributions[m - 2].field) : T(-1);
+            order_pass = state.incidence.exact_axis;
+            if (state.small_orders >= 2 && state.previous_order > T(0) &&
+                    state.penultimate_order > T(0)) {
+                const T ratio = std::max(magnitude / state.previous_order,
+                    state.previous_order / state.penultimate_order);
+                order_pass = ratio < T(1) && magnitude * ratio / (T(1) - ratio) <= updated_allowance;
+            }
+        }
+        if (order_pass) {
+            finite(state.field);
+            state.finished = true;
+            return;
+        }
+    }
+    state.penultimate_order = state.previous_order;
+    state.previous_order = magnitude;
+}
+}
+
+inline std::vector<std::complex<acousticts_quad_t>> psms_adaptive_liquid_fields(
+        const std::vector<int>& m_seeds, const std::vector<int>& n_seeds,
+        acousticts_quad_t chi_sw, acousticts_quad_t chi_body, acousticts_quad_t xi,
+        const std::vector<SpheroidalDirection<acousticts_quad_t>>& incidences,
+        const std::vector<SpheroidalDirection<acousticts_quad_t>>& receptions,
+        acousticts_quad_t phi_difference, acousticts_quad_t density_ratio) {
+    using T = acousticts_quad_t;
+    using Complex = std::complex<T>;
+    using namespace psms_liquid_batch;
+    if (incidences.empty() || incidences.size() != receptions.size() ||
+            incidences.size() != m_seeds.size() || incidences.size() != n_seeds.size() ||
+            !is_finite_real(chi_sw) || !(chi_sw > T(0)) || !is_finite_real(chi_body) ||
+            !(chi_body > T(0)) || !is_finite_real(xi) || !(xi > T(1)) ||
+            !is_finite_real(phi_difference) || !is_finite_real(density_ratio) ||
+            !(density_ratio > T(0)))
+        throw std::invalid_argument("Adaptive liquid spheroidal inputs are outside their native physical domain.");
+    std::vector<State> states;
+    states.reserve(incidences.size());
+    for (size_t index = 0; index < incidences.size(); ++index) {
+        const auto& incidence = incidences[index];
+        const auto& reception = receptions[index];
+        if (m_seeds[index] < 0 || n_seeds[index] < m_seeds[index] ||
+                !is_finite_real(incidence.cosine) || precabs(incidence.cosine) > T(1) ||
+                !is_finite_real(reception.cosine) || precabs(reception.cosine) > T(1) ||
+                !is_finite_real(incidence.sine) || incidence.sine < T(0) || incidence.sine > T(1) ||
+                !is_finite_real(reception.sine) || reception.sine < T(0) || reception.sine > T(1))
+            throw std::invalid_argument("Adaptive liquid spheroidal inputs are outside their native physical domain.");
+        checked_profcn_integer(static_cast<long long>(n_seeds[index]) + 1,
+            "inclusive maximum degree count");
+        states.emplace_back(incidence, n_seeds[index]);
+    }
+    if (chi_sw == chi_body && density_ratio == T(1))
+        return std::vector<Complex>(incidences.size(), Complex(0, 0));
+    const T ts_amplitude_allowance = -expm1q(-logq(T(10)) * T(1e-8) / T(20));
+    const T amplitude_allowance = std::min(ts_amplitude_allowance, psms_modal_rel_tol<T>());
+    psms_angle_prepared::Workspace<T> prepared;
+    LegendreWorkspace<T> angular_workspace;
+    // Interleave angles by order so identical native degree blocks remain live.
+    for (int m = 0; ; ++m) {
+        bool active = false;
+        for (auto& state : states) {
+            if (state.finished) continue;
+            active = true;
+            advance(state, prepared, m, chi_sw, chi_body, xi,
+                phi_difference, density_ratio, amplitude_allowance,
+                angular_workspace);
+        }
+        if (!active) break;
+    }
+    std::vector<Complex> fields;
+    fields.reserve(states.size());
+    for (const auto& state : states) fields.push_back(state.field);
+    return fields;
 }
 #endif
 

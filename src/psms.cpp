@@ -420,6 +420,64 @@ Rcpp::ComplexVector prolate_spheroid_fbs(
     return Rcpp::wrap(f_bs_out);
 }
 
+// [[Rcpp::export]]
+Rcpp::ComplexMatrix prolate_spheroid_rigid_release_batch(
+    Rcpp::DataFrame acoustics,
+    Rcpp::List body,
+    Rcpp::List medium,
+    Rcpp::NumericVector theta_body,
+    Rcpp::LogicalVector rigid
+) {
+#if ACOUSTICTS_HAVE_QUADMATH
+    const int n_freq = acoustics.nrows();
+    const int n_case = theta_body.size();
+    if (n_freq < 1 || n_case < 1 || rigid.size() != n_case)
+        Rcpp::stop("Fixed-rigid/pressure-release batch dimensions are invalid.");
+    const auto chi_sw = Rcpp::as<std::vector<double>>(acoustics["chi_sw"]);
+    const auto m_max = Rcpp::as<std::vector<int>>(acoustics["m_max"]);
+    const auto n_max = Rcpp::as<std::vector<int>>(acoustics["n_max"]);
+    if (chi_sw.size() != size_t(n_freq) || m_max.size() != size_t(n_freq) ||
+            n_max.size() != size_t(n_freq))
+        Rcpp::stop("Fixed-rigid/pressure-release batch acoustics have inconsistent lengths.");
+    const double xi = Rcpp::as<double>(body["xi"]);
+    const double phi_body = Rcpp::as<double>(body["phi_body"]);
+    const double phi_scatter = Rcpp::as<double>(body["phi_scatter"]);
+    const double pi = std::acos(-1.0);
+    if (phi_scatter != phi_body + pi && phi_scatter != phi_body - pi)
+        Rcpp::stop("Fixed-rigid/pressure-release batching requires monostatic azimuths.");
+    if (!medium.containsElementNamed("density"))
+        Rcpp::stop("Fixed-rigid/pressure-release batch medium is incomplete.");
+    std::vector<SpheroidalDirection<acousticts_quad_t>> incidences;
+    std::vector<bool> rigid_flags;
+    incidences.reserve(n_case);
+    rigid_flags.reserve(n_case);
+    for (int case_index = 0; case_index < n_case; ++case_index) {
+        if (rigid[case_index] == NA_LOGICAL)
+            Rcpp::stop("Fixed-rigid/pressure-release batch labels cannot be missing.");
+        incidences.push_back(psms_direction_from_angle(
+            static_cast<acousticts_quad_t>(theta_body[case_index])));
+        rigid_flags.push_back(rigid[case_index] == TRUE);
+    }
+    Rcpp::ComplexMatrix output(n_freq, n_case);
+    // Each frequency shares native degree blocks only among its own cases.
+    for (int f = 0; f < n_freq; ++f) {
+        Rcpp::checkUserInterrupt();
+        if (m_max[f] < 0 || n_max[f] < m_max[f])
+            Rcpp::stop("Invalid spheroidal modal support.");
+        const auto fields = psms_adaptive_rigid_release_fields(
+            static_cast<acousticts_quad_t>(chi_sw[f]),
+            static_cast<acousticts_quad_t>(xi),
+            incidences, rigid_flags,
+            static_cast<acousticts_quad_t>(phi_scatter - phi_body));
+        for (int case_index = 0; case_index < n_case; ++case_index)
+            output(f, case_index) = to_Rcomplex(fields[case_index]);
+    }
+    return output;
+#else
+    Rcpp::stop("Native quad precision is unavailable for fixed-rigid/pressure-release batching.");
+#endif
+}
+
 template<typename T>
 Rcpp::List prolate_tmatrix_blocks_to_rcpp(
     int m_max,

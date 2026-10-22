@@ -201,6 +201,89 @@ test_that("parallel simulations preserve full frequency vectors", {
   expect_identical(actual$HPA, reference$HPA)
 })
 
+test_that("adaptive quad rigid and release PSMS batches retain model results", {
+  skip_if_not(acousticTS:::.quad_precision_available())
+  object <- fls_generate(
+    prolate_spheroid(length_body = 0.02, radius_body = 0.002),
+    density_body = 1045,
+    sound_speed_body = 1520
+  )
+  frequency <- c(1500, 3000)
+  angles <- c(0, pi / 3)
+  boundaries <- c("fixed_rigid", "pressure_release")
+  parameters <- list(
+    theta = angles,
+    boundary = boundaries,
+    precision = "quad",
+    adaptive = TRUE
+  )
+  actual <- simulate_ts(
+    object, frequency, "psms",
+    parameters = parameters,
+    parallel = FALSE,
+    verbose = FALSE
+  )$PSMS
+  cases <- expand.grid(theta = angles, boundary = boundaries)
+  expected <- lapply(seq_len(nrow(cases)), function(index) {
+    row_object <- object
+    row_object@body$theta <- cases$theta[[index]]
+    result <- target_strength(
+      row_object, frequency, "psms",
+      boundary = as.character(cases$boundary[[index]]),
+      precision = "quad", adaptive = TRUE
+    )@model$PSMS
+    result
+  })
+  expect_identical(actual$frequency, rep(frequency, nrow(cases)))
+  expect_identical(actual$theta, rep(cases$theta, each = length(frequency)))
+  expect_identical(actual$boundary, rep(as.character(cases$boundary),
+    each = length(frequency)))
+  expect_equal(actual$f_bs, unlist(lapply(expected, `[[`, "f_bs")),
+    tolerance = 1e-12)
+  expect_equal(actual$TS, unlist(lapply(expected, `[[`, "TS")),
+    tolerance = 1e-12)
+  initialized <- target_strength(
+    object, frequency, "psms",
+    boundary = "fixed_rigid", precision = "quad", adaptive = TRUE
+  )@model_parameters$PSMS
+  native_fields <- acousticTS:::prolate_spheroid_rigid_release_batch(
+    initialized$parameters$acoustics,
+    initialized$body,
+    initialized$medium,
+    cases$theta,
+    cases$boundary == "fixed_rigid"
+  )
+  expect_identical(dim(native_fields), c(length(frequency), nrow(cases)))
+  expect_equal(as.vector(native_fields),
+    unlist(lapply(expected, `[[`, "f_bs")), tolerance = 1e-12)
+
+  task_count <- NULL
+  testthat::local_mocked_bindings(
+    .prepare_simulation_cluster = function(...) {
+      structure(list(), class = "cluster")
+    },
+    .package = "acousticTS"
+  )
+  testthat::local_mocked_bindings(
+    pblapply = function(X, FUN, ..., cl) {
+      task_count <<- length(X)
+      lapply(X, FUN, ...)
+    },
+    .package = "pbapply"
+  )
+  testthat::local_mocked_bindings(
+    stopCluster = function(...) NULL,
+    .package = "parallel"
+  )
+  parallel_result <- simulate_ts(
+    object, frequency, "psms",
+    parameters = parameters,
+    parallel = TRUE, n_cores = 2L, verbose = FALSE
+  )$PSMS
+  expect_identical(task_count, 1L)
+  expect_equal(parallel_result, actual, tolerance = 1e-12)
+})
+
 test_that("frequency scheduling preserves stochastic and multi-row tasks", {
   data(krill)
   frequency <- c(38000, 70000)

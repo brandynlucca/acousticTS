@@ -55,7 +55,8 @@
                                       source = c("builtin", "user"),
                                       persistent = FALSE,
                                       initialize_ref = NULL,
-                                      solver_ref = NULL) {
+                                      solver_ref = NULL,
+                                      simulation_batch = NULL) {
   source <- match.arg(source)
   canonical <- .normalize_model_identifier(name, "name")[[1]]
 
@@ -78,7 +79,8 @@
     source = source,
     persistent = isTRUE(persistent),
     initialize_ref = initialize_ref,
-    solver_ref = solver_ref
+    solver_ref = solver_ref,
+    simulation_batch = simulation_batch
   )
 }
 
@@ -175,7 +177,11 @@
       name = "psms",
       initialize = "psms_initialize",
       solver = "PSMS",
-      slot = "PSMS"
+      slot = "PSMS",
+      simulation_batch = list(
+        plan = ".psms_simulation_batch_plan",
+        run = ".psms_simulation_batch_run"
+      )
     ),
     fcms = .new_model_registry_entry(
       name = "fcms",

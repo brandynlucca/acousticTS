@@ -410,6 +410,52 @@
   )
 }
 
+#' Resolve optional model-specific tasks without changing simulation inputs.
+#' @noRd
+.simulation_batch_tasks <- function(object, frequency, model, parameters,
+                                    simulation_grid) {
+  tasks <- as.list(seq_len(nrow(simulation_grid)))
+  if (length(tasks) < 2L || length(model) != 1L) {
+    return(tasks)
+  }
+
+  spec <- .resolve_model_registry_entry(model[[1L]])
+  if (is.null(spec$simulation_batch)) {
+    return(tasks)
+  }
+
+  plan <- .resolve_model_function_reference(
+    spec$simulation_batch$plan,
+    envir = asNamespace("acousticTS")
+  )
+  proposed <- plan(object, frequency, parameters, simulation_grid)
+  indices <- unlist(proposed, use.names = FALSE)
+  if (!is.list(proposed) ||
+    !identical(sort(as.integer(indices)), seq_len(nrow(simulation_grid)))) {
+    stop("The model simulation batch plan did not cover the grid exactly.")
+  }
+  proposed
+}
+
+#' Execute one registered simulation task and retain its grid-row order.
+#' @noRd
+.get_TS_batch <- function(grid_indices, object, parameters, simulation_grid,
+                          frequency, model) {
+  if (length(grid_indices) == 1L) {
+    return(list(.get_TS(
+      grid_indices[[1L]], object, parameters, simulation_grid, frequency,
+      model
+    )))
+  }
+
+  spec <- .resolve_model_registry_entry(model[[1L]])
+  run <- .resolve_model_function_reference(
+    spec$simulation_batch$run,
+    envir = asNamespace("acousticTS")
+  )
+  run(grid_indices, object, parameters, simulation_grid, frequency, model)
+}
+
 #' Simulate target strength (TS) with flexible parameterization and batching
 #' @inheritParams target_strength
 #' @param model Model name. If multiple models are specified, the output will
@@ -616,6 +662,9 @@ simulate_ts <- function(object,
       simulation_grid = simulation_grid
     )
   }
+  batch_tasks <- .simulation_batch_tasks(
+    object, frequency, normalized_model, parameters, simulation_grid
+  )
   # Prepare the optional PSOCK cluster =========================================
   cluster <- .prepare_simulation_cluster(
     parallel = parallel,
@@ -634,7 +683,37 @@ simulate_ts <- function(object,
     type = if (verbose) "txt" else "none"
   )
   on.exit(pbapply::pboptions(old_pboptions), add = TRUE)
-  if (is.null(cluster)) {
+  if (any(lengths(batch_tasks) > 1L)) {
+    if (is.null(cluster)) {
+      task_results <- pbapply::pblapply(
+        batch_tasks,
+        function(grid_indices) {
+          .get_TS_batch(
+            grid_indices, object, parameters, simulation_grid, frequency,
+            normalized_model
+          )
+        }
+      )
+    } else {
+      task_results <- pbapply::pblapply(
+        batch_tasks,
+        function(grid_indices) {
+          worker_get_ts_batch <- utils::getFromNamespace(
+            ".get_TS_batch", "acousticTS"
+          )
+          worker_get_ts_batch(
+            grid_indices, object, parameters, simulation_grid, frequency,
+            normalized_model
+          )
+        },
+        cl = cluster
+      )
+    }
+    results_list <- vector("list", nrow(simulation_grid))
+    for (task_index in seq_along(batch_tasks)) {
+      results_list[batch_tasks[[task_index]]] <- task_results[[task_index]]
+    }
+  } else if (is.null(cluster)) {
     results_list <- pbapply::pblapply(
       seq_len(nrow(simulation_grid)),
       function(grid_index) {
@@ -977,6 +1056,17 @@ simulate_ts <- function(object,
                     simulation_grid,
                     frequency,
                     model) {
+  prepared <- .prepare_simulation_target(
+    grid_index, object, parameters, simulation_grid, frequency, model
+  )
+  working_object <- do.call(target_strength, prepared$ts_args)
+  .format_simulation_target(working_object, prepared$parameter_values)
+}
+
+#' Prepare one grid row using the ordinary reforge and override path.
+#' @noRd
+.prepare_simulation_target <- function(grid_index, object, parameters,
+                                       simulation_grid, frequency, model) {
   # Extract parameter values for this grid index ===============================
   parameter_values <- .simulation_grid_row_values(simulation_grid, grid_index)
   # Create working copy of scattering object ===================================
@@ -1015,8 +1105,16 @@ simulate_ts <- function(object,
     ),
     parameter_values[names(parameter_values) != "frequency"]
   )
-  # ---- Compute TS ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  working_object <- do.call(target_strength, ts_args)
+  list(
+    object = working_object,
+    parameter_values = parameter_values,
+    ts_args = ts_args
+  )
+}
+
+#' Format initialized model results with their original grid-row metadata.
+#' @noRd
+.format_simulation_target <- function(working_object, parameter_values) {
   # Extract the results ========================================================
   model_results <- extract(working_object, "model")
   # Process the results for output =============================================
