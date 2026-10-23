@@ -7,6 +7,7 @@
 #include <new>
 
 inline constexpr size_t psms_retained_cache_budget_bytes = 64 * 1024 * 1024;
+inline constexpr size_t psms_coefficient_buffer_budget_bytes = 16 * 1024 * 1024;
 
 struct ProfcnWorkspaceDimensions {
     int narg = 0, maxm = 0, maxint = 0, maxj = 0, maxp = 0, maxn = 0;
@@ -480,10 +481,15 @@ ProfcnCoefficientBatchResult<T> cprofcn_mblock_coefficients(
 ) {
     const auto dimensions = preflight_profcn_dimensions(c, m_start, m_count, lnum,
         arguments.size(), ioprad, iopang, x1);
-    // Check native indexing before allocating any of the output rectangles.
-    const int initial_capacity = dimensions.maxint;
     const int argument_count = dimensions.narg;
     const size_t radial_size = dimensions.radial_size;
+    // The native limd bound avoids a second solve when its buffer fits memory.
+    const size_t complete_capacity = size_t(dimensions.maxp) + 1;
+    const bool use_complete_capacity = complete_capacity <= size_t(INT_MAX) &&
+        radial_size <= size_t(INT_MAX) / complete_capacity &&
+        radial_size <= psms_coefficient_buffer_budget_bytes / sizeof(T) / complete_capacity;
+    const int initial_capacity = use_complete_capacity ?
+        static_cast<int>(complete_capacity) : dimensions.maxint;
     if (radial_size > size_t(INT_MAX) / size_t(initial_capacity) ||
             radial_size > size_t(INT_MAX) / size_t(argument_count)) {
         throw std::length_error("Spheroidal coefficient workspace exceeds the native indexing range.");

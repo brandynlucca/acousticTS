@@ -320,14 +320,16 @@ context("Automatic spheroidal boundary convergence") {
     }
 
     test_that("bounded native auxiliary caches preserve cold warm and uncached results") {
-        const std::array<const char*, 12> checks = {"checked dimension arithmetic",
+        const std::array<const char*, 15> checks = {"checked dimension arithmetic",
             "bounded nonempty retention", "oversize admission bypass", "budget eviction",
             "cold versus warm native values", "cold versus uncached native values",
             "zero-budget bypass", "adjacent signed native arguments remain distinct",
             "changed PLEG arguments miss the cache", "changed PLEG cached versus disabled values",
-            "changed QLEG arguments miss the cache", "changed QLEG cached versus disabled values"};
+            "changed QLEG arguments miss the cache", "changed QLEG cached versus disabled values",
+            "PINT even-to-odd prefix versus cold values", "PINT odd-to-even prefix versus cold values",
+            "PINT after clearing cache versus cold values"};
         auto verify = [&](void (*audit)(int*), const char* precision) {
-            std::array<int, 12> status{};
+            std::array<int, 15> status{};
             audit(status.data());
             for (size_t index = 0; index < status.size(); ++index) {
                 CATCH_INFO(precision << ": " << checks[index]);
