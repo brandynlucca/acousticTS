@@ -88,10 +88,11 @@ module prolate_swf
  integer, parameter :: pint_geometry_cache_bytes = ACOUSTICTS_PINT_CACHE_BYTES
 #endif
  type :: pint_geometry_entry
-   logical :: valid = .false.
+   logical :: valid = .false., kernels_valid = .false.
    integer :: m = -1, ndec = 0, ngau = 0, ngqs = 0, nodes = 0, degrees = 0
-   real(knd) :: x1 = 0.0_knd
+   real(knd) :: x1 = 0.0_knd, kernel_c = 0.0_knd
    real(knd), allocatable :: wg(:), xg(:), geometry(:,:), basis(:,:)
+   real(knd), allocatable :: kernels(:,:)
  end type
 
  ! Retain exact Legendre norm factors without limiting coefficient support.
@@ -144,7 +145,6 @@ module prolate_swf
     cosine = cos(argument)
 #endif
   end subroutine
-
 
   integer function decimal_exponent(value) result(power)
     real(knd), intent(in) :: value
@@ -720,6 +720,7 @@ module prolate_swf
     if(allocated(entry%xg)) values = values + size(entry%xg)
     if(allocated(entry%geometry)) values = values + size(entry%geometry)
     if(allocated(entry%basis)) values = values + size(entry%basis)
+    if(allocated(entry%kernels)) values = values + size(entry%kernels)
     bytes = values * (storage_size(1.0_knd) / 8)
   end function
 
@@ -841,7 +842,16 @@ module prolate_swf
       end do node_steps
       entry%nodes = node
       remaining_values = (pint_geometry_cache_bytes - pint_geometry_retained_bytes()) / real_bytes
+      if(node > 0 .and. node <= remaining_values / 5) then
+        allocate(entry%kernels(3, node), stat=allocation_status, errmsg=allocation_message)
+      end if
+      remaining_values = (pint_geometry_cache_bytes - pint_geometry_retained_bytes()) / real_bytes
       capacity = min(requested_degrees, 2 * ((remaining_values / max(1, node)) / 2))
+      if(capacity < 2) then
+        entry = empty
+        idx = 0
+        return
+      end if
       allocate(entry%basis(capacity, node), stat=allocation_status, errmsg=allocation_message)
       if(allocation_status /= 0) then
         entry = empty
@@ -895,7 +905,8 @@ module prolate_swf
     real(knd), intent(out) :: rpint1(maxint), rpint2(maxint), pint1(maxint), &
         pint2(maxint), pint3(maxint), pint4(maxint), pnorm(maxlp), coefme, coefmo
     integer, intent(out) :: norme(maxmp), ipnorm(maxlp)
-    integer :: idx, allocation_status, real_bytes, integer_bytes
+    integer :: idx, prefix_idx, prefix_limint, prefix_odd, allocation_status
+    integer :: real_bytes, integer_bytes
     integer(int64) :: requested_bytes
     character(len=256) :: allocation_message
 
@@ -934,9 +945,33 @@ module prolate_swf
     pnorm = 0.0_knd
     norme = 0
     ipnorm = 0
+    prefix_idx = 0
+    prefix_limint = 0
+    ! Reuse completed quadrature sums when only the requested degree grows.
+    do idx = 1, size(pint_cache)
+      if(.not. pint_cache(idx)%valid) cycle
+      if(pint_cache(idx)%m /= m .or. pint_cache(idx)%c /= c) cycle
+      if(pint_cache(idx)%x1 /= x1 .or. pint_cache(idx)%ndec /= ndec) cycle
+      if(pint_cache(idx)%ngau /= ngau .or. pint_cache(idx)%ngqs /= ngqs) cycle
+      if(pint_cache(idx)%limint > limint .or. &
+          pint_cache(idx)%limint <= prefix_limint) cycle
+      if(any(pint_cache(idx)%wg /= wg) .or. any(pint_cache(idx)%xg /= xg)) cycle
+      prefix_odd = 2 * ((pint_cache(idx)%limint + 1) / 2) + 1
+      if(size(pint_cache(idx)%pint1) < prefix_odd .or. &
+          size(pint_cache(idx)%pint4) < prefix_odd + 1 .or. &
+          maxint < prefix_odd + 1) cycle
+      prefix_idx = idx
+      prefix_limint = pint_cache(idx)%limint
+    end do
+    if(prefix_idx > 0) then
+      prefix_odd = 2 * ((prefix_limint + 1) / 2) + 1
+      pint1(1:prefix_odd:2) = pint_cache(prefix_idx)%pint1(1:prefix_odd:2)
+      pint2(1:prefix_odd:2) = pint_cache(prefix_idx)%pint2(1:prefix_odd:2)
+      pint4(2:prefix_odd + 1:2) = pint_cache(prefix_idx)%pint4(2:prefix_odd + 1:2)
+    end if
     call pint(c, m, lnum, x1, limint, maxint, maxlp, maxmp, ndec, wg, xg, &
         ngau, ngqs, rpint1, rpint2, pint1, pint2, pint3, pint4, &
-        norme, pnorm, ipnorm, coefme, coefmo)
+        norme, pnorm, ipnorm, coefme, coefmo, resume_lim=prefix_limint)
 
     ! Allocate directly in the bounded cache without implicit duplicate copies.
     requested_bytes = 0
@@ -1020,7 +1055,7 @@ module prolate_swf
 #endif
     use iso_c_binding, only: c_int
     implicit none
-    integer(c_int), intent(out) :: checks(12)
+    integer(c_int), intent(out) :: checks(15)
     integer, parameter :: degrees = 8, arguments = 3
     real(knd) :: radial(degrees, 4, 3), angular(degrees, arguments, 2, 3), args(arguments)
     integer :: radial_exponents(degrees, 4, 3), angular_exponents(degrees, arguments, 2, 3)
@@ -1078,6 +1113,7 @@ module prolate_swf
         all(angular_accuracy(:,:,1) == angular_accuracy(:,:,3)))
     checks(7) = merge(1, 0, auxiliary_cache_retained_bytes() == 0)
     call audit_auxiliary_cache_arguments(checks(8:12))
+    call audit_pint_prefix(checks(13:15))
     auxiliary_cache_budget = previous_budget
   end subroutine
 
@@ -1185,6 +1221,81 @@ module prolate_swf
           all(qexponents(:,:,2) == qexponents(:,:,3)) .and. &
           all(qnormal(:,2) == qnormal(:,3)) .and. &
           all(qnormal_exponents(:,2) == qnormal_exponents(:,3)))) checks(5) = 0
+    end do
+  end subroutine
+
+  subroutine audit_pint_prefix(checks)
+    use iso_c_binding, only: c_int
+    implicit none
+    integer(c_int), intent(out) :: checks(3)
+    integer, parameter :: m = 2, ndec = 2, ngau = 24, ngqs = 3
+    integer, parameter :: maxint_high = 27, maxlp_high = 17, maxmp = 7
+    real(knd), parameter :: c = 6.0_knd, x1 = 0.07_knd
+    real(knd) :: wg(ngau), xg(ngau), cached(maxint_high,6), direct(maxint_high,6)
+    real(knd) :: cached_pnorm(maxlp_high), direct_pnorm(maxlp_high)
+    real(knd) :: cached_coefme, cached_coefmo, direct_coefme, direct_coefmo
+    integer :: cached_norme(maxmp), direct_norme(maxmp)
+    integer :: cached_ipnorm(maxlp_high), direct_ipnorm(maxlp_high)
+    integer :: stage, lnum, limint, maxint, maxlp, slot
+    logical :: prior_present, exact, baseline_exact
+
+    checks = 0
+    baseline_exact = .false.
+    auxiliary_cache_budget = auxiliary_cache_bytes
+    do slot = 1, size(pint_cache)
+      call clear_pint_cache_slot(slot)
+    end do
+    call gauss_cached(ndec, ngau, xg, wg)
+    do stage = 1, 4
+      lnum = 7 + min(stage, 3)
+      limint = lnum + 3 * ndec + int(c)
+      maxint = limint + 5
+      maxlp = lnum + m + 5
+      prior_present = stage == 1
+      if(stage > 1 .and. stage < 4) then
+        do slot = 1, size(pint_cache)
+          if(pint_cache(slot)%valid) then
+            if(pint_cache(slot)%limint == limint - 1) prior_present = .true.
+          end if
+        end do
+      end if
+      if(stage == 4) then
+        do slot = 1, size(pint_cache)
+          call clear_pint_cache_slot(slot)
+        end do
+        prior_present = .true.
+        do slot = 1, size(pint_cache)
+          if(pint_cache(slot)%valid) prior_present = .false.
+        end do
+      end if
+      cached = 0.0_knd
+      direct = 0.0_knd
+      cached_pnorm = 0.0_knd
+      direct_pnorm = 0.0_knd
+      cached_norme = 0
+      direct_norme = 0
+      cached_ipnorm = 0
+      direct_ipnorm = 0
+      call pint_cached(c, m, lnum, x1, limint, maxint, maxlp, maxmp, ndec, wg, xg, &
+          ngau, ngqs, cached(1:maxint,1), cached(1:maxint,2), &
+          cached(1:maxint,3), cached(1:maxint,4), cached(1:maxint,5), &
+          cached(1:maxint,6), cached_norme, cached_pnorm(1:maxlp), &
+          cached_ipnorm(1:maxlp), cached_coefme, cached_coefmo)
+      call pint(c, m, lnum, x1, limint, maxint, maxlp, maxmp, ndec, wg, xg, &
+          ngau, ngqs, direct(1:maxint,1), direct(1:maxint,2), &
+          direct(1:maxint,3), direct(1:maxint,4), direct(1:maxint,5), &
+          direct(1:maxint,6), direct_norme, direct_pnorm(1:maxlp), &
+          direct_ipnorm(1:maxlp), direct_coefme, direct_coefmo, use_geometry_cache=.false.)
+      exact = all(cached(1:maxint,:) == direct(1:maxint,:)) .and. &
+          all(cached_norme == direct_norme) .and. &
+          all(cached_pnorm(1:maxlp) == direct_pnorm(1:maxlp)) .and. &
+          all(cached_ipnorm(1:maxlp) == direct_ipnorm(1:maxlp)) .and. &
+          cached_coefme == direct_coefme .and. cached_coefmo == direct_coefmo
+      if(stage == 1) baseline_exact = exact
+      if(stage > 1) checks(stage - 1) = merge(1, 0, baseline_exact .and. prior_present .and. exact)
+    end do
+    do slot = 1, size(pint_cache)
+      call clear_pint_cache_slot(slot)
     end do
   end subroutine
 
@@ -1803,6 +1914,7 @@ module prolate_swf
     integer, volatile :: neemax
     dimension nees(100), naccsav(100), neeb(jnenmax), limpsv(jnenmax), &
          limnsv(jnenmax), jelimsv(jnenmax)
+    integer :: pint_available, pint_full_upper, pint_required
 !
     ! These tables exceed common thread stack limits at high modal orders.
     ! Explicit allocation keeps their storage on the heap with every compiler.
@@ -1858,6 +1970,8 @@ end if
       iopneu = 0
       iopeta = 0
       iopint = 1
+      pint_available = 0
+      pint_full_upper = 0
       jintm = 0
       iopd = 3
       limcsav = 0
@@ -2282,19 +2396,30 @@ end if
 !  calculation using integration technique
        if(iopint == 0) go to 230
        if(iopint == 2) go to 190
-       limint = lnum + 3 * ndec + int(c)
+       pint_full_upper = lnum + 3 * ndec + int(c)
+       pint_available = max(lnum, 3 * ndec + int(c) + 1)
        if(igau == 0) call gauss_cached(ndec, ngau, xr, wr)
        igau = 1
        ngqs = 10
        if(c > 2000.0e0_knd) ngqs = int(ngqs * (c / 2000.0e0_knd)* &
                      (c / 2000.0e0_knd))
-       call pint_cached(c, m, lnum, x1, limint, maxint, maxlp, maxmp, ndec, &
+       call pint_cached(c, m, lnum, x1, pint_available, maxint, maxlp, maxmp, ndec, &
             wr, xr, ngau, ngqs, rpint1, rpint2, pint1, &
             pint2, pint3, pint4, norme, pnormint, ipnormint, &
             coefme, coefmo)
 190      continue
        if(iopint == 1) limint = 3 * ndec + int(c)
        if(iopint == 2) limint = jintm + jintm + 20 + int(sqrt(c))
+       ! Extend the same quadrature only when r2int can index a new degree.
+       pint_required = max(l - m + 1, limint + 1)
+       if(pint_required > pint_available .and. pint_available > 0 .and. &
+           pint_available < pint_full_upper) then
+         pint_available = min(pint_required, pint_full_upper)
+         call pint_cached(c, m, lnum, x1, pint_available, maxint, maxlp, maxmp, ndec, &
+              wr, xr, ngau, ngqs, rpint1, rpint2, pint1, &
+              pint2, pint3, pint4, norme, pnormint, ipnormint, &
+              coefme, coefmo)
+       end if
        call r2int(l, m, c, x, limint, ndec, maxd, enr, d01, id01, &
              maxint, maxmp, maxlp, rpint1, rpint2, pint1, pint2, &
              pint3, pint4, norme, pnormint, ipnormint, coefme, &
@@ -6807,7 +6932,7 @@ end if
 !
     subroutine pint (c, m, lnum, x1, limint, maxint, maxlp, maxmp, ndec, &
             wg, xg, ngau, ngqs, rpint1, rpint2, pint1, pint2, &
-            pint3, pint4, norme, pnorm, ipnorm, coefme, coefmo, use_geometry_cache)
+            pint3, pint4, norme, pnorm, ipnorm, coefme, coefmo, use_geometry_cache, resume_lim)
 !
 !  purpose:     To calculate integrals of the product of associated
 !               Legendre functions and kernels containing spherical
@@ -6880,14 +7005,20 @@ end if
 !  integer arrays
     dimension norme(maxmp), ipnorm(maxlp)
     logical, optional, intent(in) :: use_geometry_cache
-    logical :: reuse_geometry
-    integer :: geometry_index, geometry_node, cached_degrees
+    integer, optional, intent(in) :: resume_lim
+    logical :: reuse_geometry, reuse_kernels, store_kernels, need_new_integrals
+    integer :: geometry_index, geometry_node, cached_degrees, prior_odd
     type(pint_geometry_entry), pointer :: geometry_entry
 !
     x1sm1 = x1 * (x1 + 2.0e0_knd)
     dec = 10.0e0_knd ** (-ndec - 1)
     amo2 = 0.5e0_knd * m
     lim = limint
+    prior_odd = 0
+    if(present(resume_lim)) then
+      if(resume_lim > 0) prior_odd = 2 * ((resume_lim + 1) / 2) + 1
+    end if
+    need_new_integrals = prior_odd < 2 * ((lim + 1) / 2) + 1
     step0 = 1.0e0_knd / ngqs
     coefme = (m * (x1 + 1.0e0_knd)) / x1sm1
     coefmo = (m * (x1 + 1.0e0_knd) ** 2 + x1sm1) / ((x1 + 1.0e0_knd) * x1sm1)
@@ -6956,10 +7087,12 @@ end if
 80    continue
 !
      do 90 il = 1, lim + 2, 2
-     pint1(il) = 0.0e0_knd
-     pint2(il) = 0.0e0_knd
+     if(il > prior_odd) then
+       pint1(il) = 0.0e0_knd
+       pint2(il) = 0.0e0_knd
+       pint4(il + 1) = 0.0e0_knd
+     end if
      pint3(il + 1) = 0.0e0_knd
-     pint4(il + 1) = 0.0e0_knd
 90    continue
 !
 !  calculation of the scaling exponents for the spherical Bessel
@@ -6979,11 +7112,18 @@ end if
     if(present(use_geometry_cache)) reuse_geometry = use_geometry_cache
     geometry_index = 0
     cached_degrees = 0
-    if(reuse_geometry) call prepare_pint_geometry(m, x1, ndec, ngau, ngqs, wg, xg, &
+    reuse_kernels = .false.
+    store_kernels = .false.
+    if(reuse_geometry .and. need_new_integrals) &
+        call prepare_pint_geometry(m, x1, ndec, ngau, ngqs, wg, xg, &
         step1, step2, x1sm1, dec, twomi, alpha, beta, lim, geometry_index)
     if(geometry_index > 0) then
       geometry_entry => pint_geometry_cache(geometry_index)
       cached_degrees = min(geometry_entry%degrees, 2 * ((lim + 1) / 2) + 2)
+      if(allocated(geometry_entry%kernels)) then
+        reuse_kernels = geometry_entry%kernels_valid .and. geometry_entry%kernel_c == c
+        store_kernels = .not. reuse_kernels
+      end if
     end if
     geometry_node = 0
     arg = c * sqrt(x1 * (x1 + 2.0e0_knd))
@@ -7018,6 +7158,7 @@ end if
     end do
     neumann_shift2 = 10.0e0_knd ** (norme(m + 2) - norme(m + 1))
     neumann_shift3 = 10.0e0_knd ** (norme(m + 3) - norme(m + 1))
+    if(.not. need_new_integrals) go to 190
 !
 !  gaussian quadrature integration loops. first dividing integrand
 !  into ngqs steps
@@ -7061,25 +7202,48 @@ end if
       sargb = sqrt(argb)
       coefo = 1.0e0_knd / sargb
       end if
-      arg = c * sargb
-      call paired_sine_cosine(arg, sine_value, cosine_value)
-      stemp0 = -cosine_value / arg
-      sneun(1) = stemp0
-      sneun(1) = sneun(1) * neumann_scale(1)
-      sneun(2) = stemp0 / arg - sine_value / arg
-      sneun(2) = sneun(2) * neumann_scale(2)
-      darg = 1.0e0_knd / arg
-       do 150 n = 3, m + 3, 2
-       rn = n + n - 3
-       arn = n + n - 1
-       sneun(n) = -sneun(n - 2) + darg * rn * sneun(n - 1)
-       sneun(n + 1) = -sneun(n - 1) + darg * arn * sneun(n)
-       sneun(n + 1) = sneun(n + 1) * neumann_scale(n + 1)
-       sneun(n) = sneun(n) * neumann_scale(n)
+      if(.not. reuse_kernels) then
+        arg = c * sargb
+        call paired_sine_cosine(arg, sine_value, cosine_value)
+        stemp0 = -cosine_value / arg
+        sneun(1) = stemp0
+        sneun(1) = sneun(1) * neumann_scale(1)
+        sneun(2) = stemp0 / arg - sine_value / arg
+        sneun(2) = sneun(2) * neumann_scale(2)
+        darg = 1.0e0_knd / arg
+         do 150 n = 3, m + 3, 2
+         rn = n + n - 3
+         arn = n + n - 1
+         sneun(n) = -sneun(n - 2) + darg * rn * sneun(n - 1)
+         sneun(n + 1) = -sneun(n - 1) + darg * arn * sneun(n)
+         sneun(n + 1) = sneun(n + 1) * neumann_scale(n + 1)
+         sneun(n) = sneun(n) * neumann_scale(n)
 150      continue
-      sneu1 = sneun(m + 1)
-      sneu2 = sneun(m + 2) * neumann_shift2
-      sneu3 = sneun(m + 3) * neumann_shift3
+        sneu1 = sneun(m + 1)
+        sneu2 = sneun(m + 2) * neumann_shift2
+        sneu3 = sneun(m + 3) * neumann_shift3
+        coef1 = coef * sneu1 * wg(i)
+        coef2 = coef * coefo * sneu2 * wg(i)
+        coef4 = coef * coefo * coefo * etai * sneu3 * wg(i)
+        if(store_kernels) geometry_entry%kernels(:, geometry_node) = [coef1, coef2, coef4]
+      else
+        coef1 = geometry_entry%kernels(1, geometry_node)
+        coef2 = geometry_entry%kernels(2, geometry_node)
+        coef4 = geometry_entry%kernels(3, geometry_node)
+      end if
+      if(cached_degrees >= 2 * ((lim + 1) / 2) + 2) then
+        ! Sum new integrals directly from the complete cached degree block.
+        if(prior_odd < 1) then
+          pint1(1) = pint1(1) + coef1 * geometry_entry%basis(1, geometry_node)
+          pint2(1) = pint2(1) + coef2 * geometry_entry%basis(1, geometry_node)
+          pint4(2) = pint4(2) + coef4 * geometry_entry%basis(2, geometry_node)
+        end if
+        do il = max(2, prior_odd + 1), lim + 1, 2
+          pint1(il + 1) = pint1(il + 1) + coef1 * geometry_entry%basis(il + 1, geometry_node)
+          pint2(il + 1) = pint2(il + 1) + coef2 * geometry_entry%basis(il + 1, geometry_node)
+          pint4(il + 2) = pint4(il + 2) + coef4 * geometry_entry%basis(il + 2, geometry_node)
+        end do
+      else
       if(cached_degrees > 0) then
         p(1:cached_degrees) = geometry_entry%basis(1:cached_degrees, geometry_node)
       else
@@ -7092,12 +7256,11 @@ end if
       p(1) = twomi * legendre_power
       p(2) = alpha(1) * etai * p(1)
       end if
-      coef1 = coef * sneu1 * wg(i)
-      coef2 = coef * coefo * sneu2 * wg(i)
-      coef4 = coef * coefo * coefo * etai * sneu3 * wg(i)
-      pint1(1) = pint1(1) + coef1 * p(1)
-      pint2(1) = pint2(1) + coef2 * p(1)
-      pint4(2) = pint4(2) + coef4 * p(2)
+      if(prior_odd < 1) then
+        pint1(1) = pint1(1) + coef1 * p(1)
+        pint2(1) = pint2(1) + coef2 * p(1)
+        pint4(2) = pint4(2) + coef4 * p(2)
+      end if
 !
        do 160 il = 2, lim + 1, 2
        ! Compute the complete uncached tail when the retained table reaches its memory limit.
@@ -7105,13 +7268,20 @@ end if
        p(il + 1) = alpha(il) * etai * p(il) + beta(il) * p(il - 1)
        p(il + 2) = alpha(il + 1) * etai * p(il + 1) + beta(il + 1) * p(il)
        end if
-       pint1(il + 1) = pint1(il + 1) + coef1 * p(il + 1)
-       pint2(il + 1) = pint2(il + 1) + coef2 * p(il + 1)
-       pint4(il + 2) = pint4(il + 2) + coef4 * p(il + 2)
+       if(il + 1 > prior_odd) then
+         pint1(il + 1) = pint1(il + 1) + coef1 * p(il + 1)
+         pint2(il + 1) = pint2(il + 1) + coef2 * p(il + 1)
+         pint4(il + 2) = pint4(il + 2) + coef4 * p(il + 2)
+       end if
 160      continue
+      end if
 170     continue
 180    continue
 190   continue
+    if(store_kernels) then
+      geometry_entry%kernel_c = c
+      geometry_entry%kernels_valid = .true.
+    end if
      do 200 il = 1, lim, 2
      pint3(il + 1) = (pint2(il + 2) - beta(il + 1) * pint2(il)) &
            /alpha(il + 1)
