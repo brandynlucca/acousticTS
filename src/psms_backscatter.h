@@ -2848,11 +2848,17 @@ template<typename T> std::vector<T> normalized_ferrers_values(int m,
 template<typename T> void evaluate_coefficient_angular_values(ProfcnCoefficientBatchResult<T>& batch,
         int m, const std::vector<SpheroidalDirection<T>>& directions, LegendreWorkspace<T>& workspace) {
     auto& functions = batch.functions;
-    if (functions.m_count != 1 || directions.size() != size_t(functions.narg))
+    if (functions.m_count != 1 || directions.size() != size_t(functions.narg) ||
+            functions.lnum < 1 || batch.lengths.size() != size_t(functions.lnum))
         throw std::invalid_argument("An angular coefficient block requires one order and its complete direction list.");
+    const auto lengths = std::minmax_element(batch.lengths.begin(), batch.lengths.end());
+    if (*lengths.first < 1 || *lengths.second > batch.capacity)
+        throw std::invalid_argument("Angular coefficient lengths exceed their native storage.");
+    // Evaluate the complete retained basis without traversing unused buffer capacity.
+    const size_t basis_count = static_cast<size_t>(*lengths.second);
     // All normalized expansion coefficients contribute to each angular value without an angle cutoff.
     for (size_t angle = 0; angle < directions.size(); ++angle) {
-        const auto basis = normalized_ferrers_values(m, directions[angle], batch.capacity, workspace);
+        const auto basis = normalized_ferrers_values(m, directions[angle], basis_count, workspace);
         for (int degree = 0; degree < functions.lnum; ++degree) {
             const size_t offset = degree + size_t(functions.lnum) * angle;
             const T* coefficients = batch.coefficients.data() + size_t(batch.capacity) * degree;

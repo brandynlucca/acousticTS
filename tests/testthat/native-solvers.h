@@ -464,6 +464,56 @@ context("Automatic spheroidal boundary convergence") {
 #endif
     }
 
+    test_that("padded radial coefficient buffers retain exact angular values without unused recurrence terms") {
+        auto check = [](auto scalar) {
+            using T = decltype(scalar);
+            const double pi = std::acos(-1.0), half_pi = pi / 2;
+            const std::vector<SpheroidalDirection<T>> directions = {
+                psms_direction_from_angle(T(0)), psms_direction_from_angle(T(37 * pi / 180)),
+                psms_direction_from_angle(T(half_pi)), psms_direction_from_angle(T(pi)),
+                psms_direction_from_angle(T(std::nextafter(half_pi, 0.0))),
+                psms_direction_from_angle(T(std::nextafter(half_pi, pi)))};
+            const T x1 = T(10) / precsqrt(T(99)) - T(1);
+            const std::vector<T> arguments(directions.size(), T(0));
+            psms_automatic::LegendreWorkspace<T> workspace, full_workspace;
+            for (int m : {0, 2}) {
+                auto batch = cprofcn_mblock_coefficients<T>(T(0.3), m, 1, 10,
+                    arguments, 2, 0, x1, true);
+                const int retained = *std::max_element(batch.lengths.begin(), batch.lengths.end());
+                expect_true(batch.capacity > 10 * retained);
+                psms_automatic::evaluate_coefficient_angular_values(batch, m, directions, workspace);
+                expect_true(workspace.support == size_t(retained));
+                // The previous full-capacity expansion provides an exact arithmetic comparison.
+                for (size_t angle = 0; angle < directions.size(); ++angle) {
+                    const auto full_basis = psms_automatic::normalized_ferrers_values(
+                        m, directions[angle], batch.capacity, full_workspace);
+                    for (int degree = 0; degree < batch.functions.lnum; ++degree) {
+                        const T* coefficients = batch.coefficients.data() + size_t(batch.capacity) * degree;
+                        T expected = 0;
+#if ACOUSTICTS_HAVE_EXACT_QUAD_DOT
+                        if constexpr (std::is_same_v<T, acousticts_quad_t>) {
+                            quad_dot_product::Accumulator accumulator;
+                            expected = quad_dot_product::dot(coefficients, full_basis.data(),
+                                batch.lengths[degree], accumulator);
+                        } else
+#endif
+                        {
+                            T correction = 0;
+                            for (int index = 0; index < batch.lengths[degree]; ++index)
+                                psms_automatic::add(expected, correction, coefficients[index] * full_basis[index]);
+                        }
+                        const size_t offset = degree + size_t(batch.functions.lnum) * angle;
+                        expect_true(bool(batch.functions.s1c[offset] == expected));
+                    }
+                }
+            }
+        };
+        check(double(0));
+#if ACOUSTICTS_HAVE_QUADMATH
+        check(acousticts_quad_t(0));
+#endif
+    }
+
     test_that("near-axis fluid, rigid, and release fields preserve bistatic reciprocity and nonzero odd orders") {
         auto check = [](auto scalar) {
             using T = decltype(scalar);

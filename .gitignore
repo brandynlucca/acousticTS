@@ -28,6 +28,7 @@ output
 Rplots.pdf
 renv/library
 scratch/
+.scratch/
 src/*.dll
 src/Makevars
 src/Makevars.win
