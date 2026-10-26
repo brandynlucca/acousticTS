@@ -375,15 +375,17 @@ module prolate_swf
     integer(int64) :: requested_bytes
     character(len=256) :: allocation_message
 
+    ! Retain only the prefix copied by load_pleg_cache, preserving the maxp key.
+    ncoef = min(lim + 2, maxp)
     ! Oversized tables remain solely in the caller's complete workspaces.
     requested_bytes = 0
     real_bytes = storage_size(1.0_knd) / 8
     integer_bytes = storage_size(1) / 8
     if(.not. add_auxiliary_cache_bytes(requested_bytes, real_bytes, narg)) return
-    if(.not. add_auxiliary_cache_bytes(requested_bytes, 2 * real_bytes, maxt, maxp)) return
+    if(.not. add_auxiliary_cache_bytes(requested_bytes, 2 * real_bytes, maxt, ncoef)) return
     if(.not. add_auxiliary_cache_bytes(requested_bytes, &
         2 * real_bytes + 2 * integer_bytes, maxt)) return
-    if(.not. add_auxiliary_cache_bytes(requested_bytes, 8 * real_bytes, maxp)) return
+    if(.not. add_auxiliary_cache_bytes(requested_bytes, 8 * real_bytes, ncoef)) return
 
     ! Reuse a matching slot or replace one entry in round-robin order.
     idx = find_pleg_cache(m, iopd, ndec, nex, barg, narg, maxt, lim, maxp)
@@ -405,10 +407,10 @@ module prolate_swf
     ! Stop on the first failed allocation and discard any partially stored entry.
     allocate(pleg_cache(idx)%barg(narg), stat=allocation_status, errmsg=allocation_message)
     if(allocation_status == 0) then
-      allocate(pleg_cache(idx)%pr(maxt, maxp), stat=allocation_status, errmsg=allocation_message)
+      allocate(pleg_cache(idx)%pr(maxt, ncoef), stat=allocation_status, errmsg=allocation_message)
     end if
     if(allocation_status == 0) then
-      allocate(pleg_cache(idx)%pdr(maxt, maxp), stat=allocation_status, errmsg=allocation_message)
+      allocate(pleg_cache(idx)%pdr(maxt, ncoef), stat=allocation_status, errmsg=allocation_message)
     end if
     if(allocation_status == 0) then
       allocate(pleg_cache(idx)%pdnorm(maxt), stat=allocation_status, errmsg=allocation_message)
@@ -423,28 +425,28 @@ module prolate_swf
       allocate(pleg_cache(idx)%ipnorm(maxt), stat=allocation_status, errmsg=allocation_message)
     end if
     if(allocation_status == 0) then
-      allocate(pleg_cache(idx)%alpha(maxp), stat=allocation_status, errmsg=allocation_message)
+      allocate(pleg_cache(idx)%alpha(ncoef), stat=allocation_status, errmsg=allocation_message)
     end if
     if(allocation_status == 0) then
-      allocate(pleg_cache(idx)%beta(maxp), stat=allocation_status, errmsg=allocation_message)
+      allocate(pleg_cache(idx)%beta(ncoef), stat=allocation_status, errmsg=allocation_message)
     end if
     if(allocation_status == 0) then
-      allocate(pleg_cache(idx)%gamma(maxp), stat=allocation_status, errmsg=allocation_message)
+      allocate(pleg_cache(idx)%gamma(ncoef), stat=allocation_status, errmsg=allocation_message)
     end if
     if(allocation_status == 0) then
-      allocate(pleg_cache(idx)%coefa(maxp), stat=allocation_status, errmsg=allocation_message)
+      allocate(pleg_cache(idx)%coefa(ncoef), stat=allocation_status, errmsg=allocation_message)
     end if
     if(allocation_status == 0) then
-      allocate(pleg_cache(idx)%coefb(maxp), stat=allocation_status, errmsg=allocation_message)
+      allocate(pleg_cache(idx)%coefb(ncoef), stat=allocation_status, errmsg=allocation_message)
     end if
     if(allocation_status == 0) then
-      allocate(pleg_cache(idx)%coefc(maxp), stat=allocation_status, errmsg=allocation_message)
+      allocate(pleg_cache(idx)%coefc(ncoef), stat=allocation_status, errmsg=allocation_message)
     end if
     if(allocation_status == 0) then
-      allocate(pleg_cache(idx)%coefd(maxp), stat=allocation_status, errmsg=allocation_message)
+      allocate(pleg_cache(idx)%coefd(ncoef), stat=allocation_status, errmsg=allocation_message)
     end if
     if(allocation_status == 0) then
-      allocate(pleg_cache(idx)%coefe(maxp), stat=allocation_status, errmsg=allocation_message)
+      allocate(pleg_cache(idx)%coefe(ncoef), stat=allocation_status, errmsg=allocation_message)
     end if
     if(allocation_status /= 0) then
       call clear_pleg_cache_slot(idx)
@@ -472,7 +474,6 @@ module prolate_swf
     pleg_cache(idx)%coefc = 0.0_knd
     pleg_cache(idx)%coefd = 0.0_knd
     pleg_cache(idx)%coefe = 0.0_knd
-    ncoef = min(lim + 2, maxp)
     pleg_cache(idx)%pr(1:maxt, 1:ncoef) = pr(1:maxt, 1:ncoef)
     if(iopd == 1 .or. iopd == 3) then
       pleg_cache(idx)%pdr(1:maxt, 1:ncoef) = pdr(1:maxt, 1:ncoef)
@@ -1055,7 +1056,7 @@ module prolate_swf
 #endif
     use iso_c_binding, only: c_int
     implicit none
-    integer(c_int), intent(out) :: checks(15)
+    integer(c_int), intent(out) :: checks(20)
     integer, parameter :: degrees = 8, arguments = 3
     real(knd) :: radial(degrees, 4, 3), angular(degrees, arguments, 2, 3), args(arguments)
     integer :: radial_exponents(degrees, 4, 3), angular_exponents(degrees, arguments, 2, 3)
@@ -1114,7 +1115,105 @@ module prolate_swf
     checks(7) = merge(1, 0, auxiliary_cache_retained_bytes() == 0)
     call audit_auxiliary_cache_arguments(checks(8:12))
     call audit_pint_prefix(checks(13:15))
+    call audit_pleg_storage(checks(16:20))
     auxiliary_cache_budget = previous_budget
+  end subroutine
+
+  subroutine audit_pleg_storage(checks)
+    use iso_c_binding, only: c_int
+    implicit none
+    integer(c_int), intent(out) :: checks(5)
+    integer, parameter :: psize = 512, plim = 16, grown_limit = 24, trials = 6
+    real(knd) :: args(1,trials), pr(1,psize,trials), pdr(1,psize,trials)
+    real(knd) :: coefficients(psize,8,trials), pnorm(1,trials), pdnorm(1,trials)
+    integer :: ipnorm(1,trials), ipdnorm(1,trials)
+    integer :: slot, trial, requested_size, requested_limit, saved_limit, ncoef, cache_slot
+    integer :: digits_native, exponent_range, real_bytes, integer_bytes
+    integer(int64) :: expected_bytes
+
+    checks = 1
+    digits_native = precision(1.0_knd)
+    exponent_range = range(1.0_knd) - 1
+    real_bytes = storage_size(1.0_knd) / 8
+    integer_bytes = storage_size(1) / 8
+    auxiliary_cache_budget = auxiliary_cache_bytes
+    do slot = 1, size(pleg_cache) + size(qleg_cache) + 1 + size(pint_cache)
+      call clear_auxiliary_cache_slot(slot)
+    end do
+    args = 0.4_knd
+    pr = 0.0_knd
+    pdr = 0.0_knd
+    coefficients = 0.0_knd
+    ! Exercise unchanged matching with deliberately oversized caller workspaces.
+    do trial = 1, trials
+      requested_size = psize
+      requested_limit = plim
+      if(trial == 3) then
+        requested_size = psize / 2
+        requested_limit = plim / 2
+      end if
+      if(trial >= 4) requested_limit = grown_limit
+      ncoef = requested_limit + 2
+      cache_slot = find_pleg_cache(2,1,digits_native,exponent_range, &
+          args(:,trial),1,1,requested_limit,requested_size)
+      if(trial == 2 .and. cache_slot == 0) checks(2) = 0
+      if(trial == 3 .and. cache_slot == 0) checks(3) = 0
+      if(trial == 4 .and. cache_slot /= 0) checks(4) = 0
+      if(trial == 5 .and. cache_slot == 0) checks(4) = 0
+      if(trial == 6) then
+        do slot = 1, size(pleg_cache) + size(qleg_cache) + 1 + size(pint_cache)
+          call clear_auxiliary_cache_slot(slot)
+        end do
+        auxiliary_cache_budget = 0
+      end if
+      saved_limit = 0
+      call pleg_cached(2,requested_limit,requested_size,saved_limit,1,digits_native, &
+          exponent_range,args(:,trial),1,1,pr(:,1:requested_size,trial), &
+          pdr(:,1:requested_size,trial),pdnorm(:,trial),ipdnorm(:,trial),pnorm(:,trial), &
+          ipnorm(:,trial),coefficients(1:requested_size,1,trial), &
+          coefficients(1:requested_size,2,trial),coefficients(1:requested_size,3,trial), &
+          coefficients(1:requested_size,4,trial),coefficients(1:requested_size,5,trial), &
+          coefficients(1:requested_size,6,trial),coefficients(1:requested_size,7,trial), &
+          coefficients(1:requested_size,8,trial))
+      if(trial == 1) then
+        cache_slot = find_pleg_cache(2,1,digits_native,exponent_range,args(:,trial),1,1,plim,psize)
+        if(cache_slot == 0) then
+          checks(1) = 0
+        else
+          associate(entry => pleg_cache(cache_slot))
+            expected_bytes = int(10 * ncoef + 3, int64) * real_bytes + 2 * integer_bytes
+            if(entry%maxp /= psize .or. entry%lim /= plim .or. &
+                size(entry%pr,2) /= ncoef .or. size(entry%pdr,2) /= ncoef .or. &
+                any([size(entry%alpha),size(entry%beta),size(entry%gamma), &
+                size(entry%coefa),size(entry%coefb),size(entry%coefc), &
+                size(entry%coefd),size(entry%coefe)] /= ncoef) .or. &
+                entry%bytes /= expected_bytes .or. &
+                auxiliary_cache_retained_bytes() /= expected_bytes) checks(1) = 0
+          end associate
+        end if
+        if(find_pleg_cache(2,1,digits_native,exponent_range,args(:,trial),1,1,plim,psize+1) /= 0) &
+            checks(3) = 0
+      end if
+    end do
+    ! Compare every defined value, including coefficients and normalization exponents.
+    do trial = 2, trials
+      if(trial == 4) cycle
+      slot = 1
+      ncoef = plim + 2
+      if(trial == 3) ncoef = plim / 2 + 2
+      if(trial >= 5) then
+        slot = 4
+        ncoef = grown_limit + 2
+      end if
+      if(.not. (all(pr(:,1:ncoef,trial) == pr(:,1:ncoef,slot)) .and. &
+          all(pdr(:,1:ncoef,trial) == pdr(:,1:ncoef,slot)) .and. &
+          all(coefficients(3:ncoef,:,trial) == coefficients(3:ncoef,:,slot)) .and. &
+          all(pnorm(:,trial) == pnorm(:,slot)) .and. all(pdnorm(:,trial) == pdnorm(:,slot)) .and. &
+          all(ipnorm(:,trial) == ipnorm(:,slot)) .and. all(ipdnorm(:,trial) == ipdnorm(:,slot)))) &
+          checks(min(trial,5)) = 0
+    end do
+    if(auxiliary_cache_retained_bytes() /= 0) checks(5) = 0
+    auxiliary_cache_budget = auxiliary_cache_bytes
   end subroutine
 
   subroutine audit_auxiliary_cache_arguments(checks)
