@@ -151,6 +151,162 @@ const RegisterIntegralSums registered_integral_sums;
 }
 #endif
 
+#if ACOUSTICTS_HAVE_QUADMATH
+// Preserve exact binary128 products in radial sums and panel discrepancies.
+
+using PintQuad=acousticts_quad_t;
+extern "C" int pint_radial_stream_quad(int m,int parity,int seed,int lim,int maxint,
+    const PintQuad* enr,const PintQuad* p1,const PintQuad* p2,const PintQuad* p3,const PintQuad* p4,const PintQuad* errors,
+    PintQuad dcon,PintQuad* out,int* jint) {
+#if ACOUSTICTS_HAVE_EXACT_QUAD_DOT
+  if(std::fegetround()!=FE_TONEAREST) return 6;
+  if(m<0 || (parity!=0 && parity!=1) || seed<0 || lim<=seed ||
+      2LL*lim+parity>=maxint) return 3;
+  try {
+    static thread_local std::array<quad_dot_product::Accumulator,4> accumulators;
+    for(auto& accumulator:accumulators) accumulator.reset();
+    std::fill(out,out+8,PintQuad(0));
+    *jint=lim;
+    PintQuad partial1=0,partial2=0,correction1=0,correction2=0;
+    bool stopped=false;
+    auto multiply=[](PintQuad a,PintQuad b,PintQuad& result) {
+      result=a*b;
+      if(!finiteq(a)||!finiteq(b)||!finiteq(result)) return 6;
+      return a!=0 && b!=0 && result==0 ? 5 : 1;
+    };
+    auto add=[](PintQuad term,PintQuad& total,PintQuad& correction) {
+      const PintQuad adjusted=term-correction;
+      const PintQuad updated=total+adjusted;
+      correction=(updated-total)-adjusted;
+      total=updated;
+      return finiteq(total)&&finiteq(correction);
+    };
+    for(int pass=0;pass<2;++pass) {
+      PintQuad weight=1;
+      const int first=pass==0?seed:seed-1;
+      const int last=pass==0?lim:0;
+      const int increment=pass==0?1:-1;
+      for(int j=first;pass==0?j<=last:j>=last;j+=increment) {
+        if((pass==0&&j>seed)||pass==1) {
+          const int ratio_index=pass==0?j:j+1;
+          const int i=2*ratio_index+parity+1;
+          const PintQuad ratio=(PintQuad(2)*m+i-1)/(i-1);
+          PintQuad factor=0,next=0;
+          int status=multiply(enr[ratio_index-1],ratio,factor);
+          if(status!=1) return status;
+          if(pass==0) status=multiply(weight,factor,next);
+          else {
+            if(factor==0) return 6;
+            next=weight/factor;
+            if(!finiteq(next)) return 6;
+            if(weight!=0&&next==0) return 5;
+          }
+          if(status!=1) return status;
+          weight=next;
+        }
+        const int index=2*j+parity;
+        const PintQuad value1=parity==0?p1[index]:p3[index];
+        const PintQuad value2=parity==0?p2[index]:p4[index];
+        const PintQuad error1=errors[index],error2=errors[maxint+index];
+        if(error1<0||error2<0) return 6;
+        PintQuad term1=0,term2=0,term_error1=0,term_error2=0;
+        int status=multiply(weight,value1,term1);
+        if(status!=1) return status;
+        status=multiply(weight,value2,term2);
+        if(status!=1) return status;
+        status=multiply(fabsq(weight),error1,term_error1);
+        if(status!=1) return status;
+        status=multiply(fabsq(weight),error2,term_error2);
+        if(status!=1) return status;
+        if(!accumulators[0].add(weight,value1)||!accumulators[1].add(weight,value2)||
+           !accumulators[2].add(fabsq(weight),error1)||!accumulators[3].add(fabsq(weight),error2)) return 6;
+        if((pass==0&&!stopped)||j==lim) {
+          if(pass==0&&!stopped) {
+            if(!add(term1,partial1,correction1)||!add(term2,partial2,correction2)) return 6;
+            if(j>seed&&partial1!=0&&partial2!=0) {
+              const PintQuad endpoint1=fabsq(term1/partial1),endpoint2=fabsq(term2/partial2);
+              if(finiteq(endpoint1)&&finiteq(endpoint2)&&endpoint1+endpoint2<dcon) {
+                *jint=j;
+                stopped=true;
+              }
+            }
+          }
+          if(j==lim) {
+            out[4]=fabsq(term1);
+            out[5]=fabsq(term2);
+            out[6]=term_error1;
+            out[7]=term_error2;
+          }
+        }
+      }
+    }
+    for(int i=0;i<4;++i) {
+      out[i]=accumulators[i].rounded();
+      if(!finiteq(out[i])) return 6;
+    }
+    return 1;
+  } catch(...) { return 6; }
+#else
+  return 6;
+#endif
+}
+using PintRadialStream=decltype(&pint_radial_stream_quad);
+extern "C" void profcn_set_radial_stream_quad(PintRadialStream);
+namespace {
+struct RegisterRadialStream {
+  RegisterRadialStream() { profcn_set_radial_stream_quad(&pint_radial_stream_quad); }
+};
+const RegisterRadialStream registered_radial_stream;
+}
+
+
+extern "C" int pint_panel_error_quad(const PintQuad* basis,const PintQuad* kernels,
+    const PintQuad* coarse,int capacity,int nodes,int panel_nodes,int first,int last,int extra,
+    PintQuad* errors1,PintQuad* errors2,PintQuad* errors4) {
+#if ACOUSTICTS_HAVE_EXACT_QUAD_DOT
+  if(std::fegetround()!=FE_TONEAREST||capacity<1||nodes<1||panel_nodes<1||
+      nodes%panel_nodes!=0||first<1||last<first||last>capacity||extra<1||extra>capacity) return 6;
+  try {
+    static thread_local quad_dot_product::Accumulator panel,total;
+    const PintQuad infinity=HUGE_VALQ;
+    auto error=[&](int degree,int family,PintQuad& result) {
+      total.reset();
+      for(int start=0;start<nodes;start+=panel_nodes) {
+        panel.reset();
+        for(int node=start;node<start+panel_nodes;++node) {
+          const PintQuad value=basis[size_t(node)*capacity+degree];
+          if(!panel.add(value,kernels[size_t(node)*3+family])||
+              !panel.add(value,-coarse[size_t(node)*3+family])) return false;
+        }
+        const PintQuad discrepancy=fabsq(panel.rounded());
+        if(!finiteq(discrepancy)) return false;
+        if(!total.add(nextafterq(discrepancy,infinity),PintQuad(1))) return false;
+      }
+      result=nextafterq(total.rounded(),infinity);
+      return finiteq(result)&&result>=0;
+    };
+    for(int degree=first-1;degree<last;degree+=2) {
+      if(!error(degree,0,errors1[degree])||!error(degree,1,errors2[degree])||
+          !error(degree,2,errors4[degree])) return 6;
+    }
+    if(!error(extra-1,2,errors4[extra-1])) return 6;
+    return 1;
+  } catch(...) { return 6; }
+#else
+  return 6;
+#endif
+}
+using PintPanelError=decltype(&pint_panel_error_quad);
+extern "C" void profcn_set_panel_error_quad(PintPanelError);
+namespace {
+struct RegisterPanelError {
+  RegisterPanelError() { profcn_set_panel_error_quad(&pint_panel_error_quad); }
+};
+const RegisterPanelError registered_panel_error;
+}
+
+#endif
+
 #include "psms_smn.h"
 
 // Report whether configure enabled the complete native C++/Fortran binary128

@@ -183,6 +183,183 @@ inline Real term_mass(const std::vector<Complex>& terms) {
 }
 }
 
+
+extern "C" void profcn_set_radial_quadrature_quad(int);
+extern "C" int profcn_get_radial_quadrature_quad();
+extern "C" void profcn_get_radial_quadrature_errors_quad(int,acousticts_quad_t*,acousticts_quad_t*,int*);
+extern "C" void profcn_set_radial_quadrature_even_quad(int);
+extern "C" int profcn_get_radial_quadrature_even_quad();
+extern "C" int profcn_radial_quadrature_available_quad();
+struct PsmsRadialQuadratureScope {
+    bool enabled=false;
+    int previous=profcn_get_radial_quadrature_quad();
+    int previous_even=profcn_get_radial_quadrature_even_quad();
+    explicit PsmsRadialQuadratureScope(bool broadside) {
+        enabled=profcn_radial_quadrature_available_quad()!=0;
+        profcn_set_radial_quadrature_quad(enabled?1:0);
+        profcn_set_radial_quadrature_even_quad(broadside?1:0);
+    }
+    ~PsmsRadialQuadratureScope() {
+        profcn_set_radial_quadrature_quad(previous);
+        profcn_set_radial_quadrature_even_quad(previous_even);
+    }
+};
+struct PsmsRadialQuadratureError {
+    bool valid=false;
+    bool angular_evaluated=false;
+    acousticts_quad_t field_error=0;
+    std::vector<acousticts_quad_t> relative_errors;
+};
+enum class PsmsRadialUncertaintyRejection {
+    none=0, invalid_input=1, shifted_underflow=2, packed_underflow=3,
+    invalid_divisor=4, relative_underflow=5, first_ratio_underflow=6,
+    multiplier_underflow=7, invalid_output=8
+};
+struct PsmsScaledRadialError {
+    bool valid=false;
+    PsmsRadialUncertaintyRejection rejection=PsmsRadialUncertaintyRejection::invalid_input;
+    acousticts_quad_t relative_error=0, multiplier_error=0;
+};
+inline PsmsScaledRadialError psms_scaled_radial_uncertainty(
+        const psms_packed::Decimal<acousticts_quad_t>& first,
+        const psms_packed::Decimal<acousticts_quad_t>& second,
+        acousticts_quad_t packed_error,long long error_exponent) {
+    using T=acousticts_quad_t;
+    using Rejection=PsmsRadialUncertaintyRejection;
+    PsmsScaledRadialError result;
+    if(!(packed_error>=0) || !is_finite_real(packed_error) ||
+            !is_finite_real(first.mantissa) || !is_finite_real(second.mantissa)) return result;
+    const auto exponent=std::max(first.exponent,second.exponent);
+    psms_packed::ScalingDiagnostics scaling;
+    const T a=psms_packed::shifted(first,exponent,scaling);
+    const T b=psms_packed::shifted(second,exponent,scaling);
+    if(scaling.scaled_underflows>0) {
+        result.rejection=Rejection::shifted_underflow;
+        return result;
+    }
+    const T uncertainty=psms_packed::scale_decimal(packed_error,error_exponent-exponent);
+    if(packed_error>0 && uncertainty==0) {
+        result.rejection=Rejection::packed_underflow;
+        return result;
+    }
+    const T high_modulus=hypotq(a,b);
+    const T lower_modulus=hypotq(a,std::max(T(0),precabs(b)-uncertainty));
+    if(!(lower_modulus>0) || !is_finite_real(uncertainty) || !is_finite_real(high_modulus)) {
+        result.rejection=Rejection::invalid_divisor;
+        return result;
+    }
+    result.relative_error=uncertainty/lower_modulus;
+    if(uncertainty>0 && result.relative_error==0) {
+        result.rejection=Rejection::relative_underflow;
+        return result;
+    }
+    const T first_ratio=precabs(a)/high_modulus;
+    if(a!=0 && first_ratio==0) {
+        result.rejection=Rejection::first_ratio_underflow;
+        return result;
+    }
+    result.multiplier_error=first_ratio*result.relative_error;
+    if(first_ratio>0 && result.relative_error>0 && result.multiplier_error==0) {
+        result.rejection=Rejection::multiplier_underflow;
+        return result;
+    }
+    if(!is_finite_real(result.relative_error) || !is_finite_real(result.multiplier_error)) {
+        result.rejection=Rejection::invalid_output;
+        return result;
+    }
+    result.valid=true;
+    result.rejection=Rejection::none;
+    return result;
+}
+inline PsmsRadialQuadratureError psms_radial_quadrature_error(
+        ProfcnCoefficientBatchResult<acousticts_quad_t>& exterior,
+        int order,bool broadside,bool rigid,
+        const std::vector<SpheroidalDirection<acousticts_quad_t>>& directions,
+        psms_automatic::LegendreWorkspace<acousticts_quad_t>& workspace) {
+    using T=acousticts_quad_t;
+    PsmsRadialQuadratureError result;
+    const int count=exterior.functions.lnum;
+    std::vector<int> valid(count,0);
+    std::vector<T> radial_error(count,0),derivative_error(count,0);
+    profcn_get_radial_quadrature_errors_quad(count,radial_error.data(),derivative_error.data(),valid.data());
+    std::vector<T> multiplier_errors(count,0);
+    result.relative_errors.resize(count,0);
+    bool have_error=false;
+    for(int index=0;index<count;++index) {
+        if(broadside && index%2) continue;
+        if(!valid[index]) return result;
+        const auto& data=exterior.functions;
+        const T packed_error=rigid?derivative_error[index]:radial_error[index];
+        if(!(packed_error>=0) || !is_finite_real(packed_error)) return result;
+        if(packed_error==0) continue;
+        const auto first=psms_packed::component(rigid?data.r1dc:data.r1c,
+            rigid?data.ir1de:data.ir1e,index);
+        const auto second=psms_packed::component(rigid?data.r2dc:data.r2c,
+            rigid?data.ir2de:data.ir2e,index);
+        const auto scaled=psms_scaled_radial_uncertainty(first,second,packed_error,
+            static_cast<long long>(rigid?data.ir2de[index]:data.ir2e[index]));
+        if(!scaled.valid) return result;
+        result.relative_errors[index]=scaled.relative_error;
+        const T error=scaled.multiplier_error;
+        if(!is_finite_real(error) || !is_finite_real(result.relative_errors[index])) return result;
+        multiplier_errors[index]=error;
+        have_error=have_error || error>0;
+    }
+    T correction=0;
+    if(have_error) {
+        psms_automatic::evaluate_coefficient_angular_values(exterior,order,directions,workspace);
+        result.angular_evaluated=true;
+    }
+    for(int index=0;have_error && index<count;++index) {
+        if(multiplier_errors[index]==0) continue;
+        const T angular=extract_angular_value_from_mblock<T>(exterior.functions,0,index,0);
+        const T contribution=(order==0?T(1):T(2))*angular*angular*multiplier_errors[index];
+        if(angular!=0 && contribution==0) return result;
+        psms_automatic::add(result.field_error,correction,contribution);
+    }
+    result.valid=is_finite_real(result.field_error);
+    return result;
+}
+inline psms_rigid_release::DegreeTail psms_quadrature_degree_tail(
+        const ProfcnCoefficientBatchResult<acousticts_quad_t>& exterior,int order,
+        int transition_degree,bool broadside,bool rigid,std::vector<acousticts_quad_t>& weights,
+        const std::vector<acousticts_quad_t>& relative_errors) {
+    using T=acousticts_quad_t;
+    using namespace psms_rigid_release;
+    DegreeTail result;
+    bool have_tail=false;
+    for(int parity=0;parity<2;++parity) {
+        if(broadside && parity==1) continue;
+        int last=exterior.functions.lnum-1;
+        if(last%2!=parity) --last;
+        if(last<4 || order+last-4<=transition_degree) return result;
+        std::array<T,3> upper,lower;
+        for(int sample=0;sample<3;++sample) {
+            const int index=last-4+2*sample;
+            T logarithm=0;
+            if(!coefficient_envelope_log(exterior,order,index,rigid,weights,logarithm,result.reason)) return result;
+            const T uncertainty=relative_errors[index];
+            if(!(uncertainty>=0 && uncertainty<1)) return result;
+            upper[sample]=logarithm+log1pq(uncertainty);
+            lower[sample]=logarithm+log1pq(-uncertainty);
+        }
+        const T ratio=std::max(upper[1]-lower[0],upper[2]-lower[1]);
+        if(!is_finite_real(ratio) || !(ratio<0)) return result;
+        const T tail=upper[2]+ratio-logq(-expm1q(ratio));
+        if(!is_finite_real(tail)) return result;
+        result.parity_estimates[parity]=positive_tail_estimate(tail);
+        result.log_ratios[parity]=ratio;
+        if(have_tail) {
+            const T larger=std::max(result.log_estimate,tail);
+            const T smaller=std::min(result.log_estimate,tail);
+            result.log_estimate=larger+log1pq(expq(smaller-larger));
+        } else { result.log_estimate=tail; have_tail=true; }
+    }
+    result.estimate=positive_tail_estimate(result.log_estimate);
+    result.resolved=true;
+    result.reason="resolved_with_quadrature_estimate";
+    return result;
+}
 inline std::complex<acousticts_quad_t> psms_adaptive_rigid_release_field(
         acousticts_quad_t chi, acousticts_quad_t xi,
         const SpheroidalDirection<acousticts_quad_t>& incidence,
@@ -190,6 +367,7 @@ inline std::complex<acousticts_quad_t> psms_adaptive_rigid_release_field(
     using namespace psms_automatic;
     using T = acousticts_quad_t;
     using Complex = std::complex<T>;
+    PsmsRadialQuadratureScope quadrature_scope(incidence.cosine==T(0));
     if (!(chi > T(0) && xi > T(1)) || !is_finite_real(chi) || !is_finite_real(xi) ||
             !is_finite_real(phi_difference) || !is_finite_real(incidence.cosine) ||
             precabs(incidence.cosine) > T(1) || !is_finite_real(incidence.sine) ||
@@ -212,6 +390,7 @@ inline std::complex<acousticts_quad_t> psms_adaptive_rigid_release_field(
     const std::vector<T> arguments = {incidence.cosine};
     const std::vector<SpheroidalDirection<T>> directions = {incidence};
     int previous_order_seed = 0;
+    bool original_quadrature_for_point=!quadrature_scope.enabled;
     // Summable absolute allocations remain valid if later orders cancel the field.
     for (int m = 0;; ++m) {
         Rcpp::checkUserInterrupt();
@@ -227,6 +406,9 @@ inline std::complex<acousticts_quad_t> psms_adaptive_rigid_release_field(
         degree = psms_rigid_release::refinement_start_from_hint(degree, m, previous_order_seed);
         int previous_degree = degree;
         bool have_candidate = false;
+        bool original_quadrature = original_quadrature_for_point;
+        const int original_initial_degree = degree;
+        T previous_quadrature_error=0, accepted_quadrature_error=0;
         std::vector<Complex> previous_terms;
         OrderSolution<T> accepted;
         psms_rigid_release::DegreeTail accepted_tail;
@@ -235,23 +417,90 @@ inline std::complex<acousticts_quad_t> psms_adaptive_rigid_release_field(
             Rcpp::checkUserInterrupt();
             const int count = checked_profcn_integer(static_cast<long long>(degree) - m + 1,
                 "joint inclusive degree count");
-            auto exterior = cprofcn_mblock_coefficients<T>(chi, m, 1, count,
-                arguments, 2, 0, xi - T(1), true);
-            const auto tail = psms_rigid_release::degree_tail(
-                exterior, m, transition_degree, broadside, rigid, angular_bound_weights);
-            const bool tail_pass = tail.resolved && tail.log_estimate <= logq(degree_allowance);
+            auto fallback = [&]() {
+                original_quadrature=true;
+                original_quadrature_for_point=true;
+                degree=original_initial_degree;
+                previous_degree=degree;
+                have_candidate=false;
+                previous_terms.clear();
+                previous_quadrature_error=0;
+                profcn_retain_geometry_order_quad(-1);
+                profcn_set_radial_quadrature_quad(0);
+
+            };
+            profcn_set_radial_quadrature_quad(original_quadrature?0:1);
+            if(!original_quadrature) profcn_set_radial_quadrature_even_quad(broadside?1:0);
+            ProfcnCoefficientBatchResult<T> exterior;
+            try {
+                exterior=cprofcn_mblock_coefficients<T>(chi,m,1,count,
+                    arguments,2,0,xi-T(1),true);
+            } catch(const std::runtime_error&) {
+                if(original_quadrature) throw;
+                fallback(); continue;
+            }
+
+            psms_rigid_release::DegreeTail ordinary_tail;
+            try {
+                ordinary_tail=psms_rigid_release::degree_tail(
+                    exterior,m,transition_degree,broadside,rigid,angular_bound_weights);
+            } catch(const std::runtime_error&) {
+                if(original_quadrature) throw;
+                fallback(); continue;
+            }
+            auto tail=ordinary_tail;
+            T quadrature_error=0;
+            bool angular_evaluated=false;
+            if(!original_quadrature) {
+                PsmsRadialQuadratureError estimate;
+                try {
+                    estimate=psms_radial_quadrature_error(exterior,m,broadside,rigid,directions,workspace);
+                    angular_evaluated=estimate.angular_evaluated;
+                } catch(const std::runtime_error&) {
+                    estimate.valid=false;
+                }
+                if(!estimate.valid) {
+                    fallback(); continue;
+                }
+                quadrature_error=estimate.field_error;
+                if(!(quadrature_error<degree_allowance)) {
+                    fallback(); continue;
+                }
+                const bool radial_uncertainty=std::any_of(estimate.relative_errors.begin(),
+                    estimate.relative_errors.end(),[](T value) { return value>T(0); });
+                if(radial_uncertainty)
+                    tail=psms_quadrature_degree_tail(exterior,m,transition_degree,broadside,
+                        rigid,angular_bound_weights,estimate.relative_errors);
+                if(ordinary_tail.resolved && ordinary_tail.estimate<=degree_allowance &&
+                        (!tail.resolved || tail.estimate+quadrature_error>degree_allowance)) {
+                    fallback(); continue;
+                }
+            }
+            const bool tail_pass=tail.resolved && (quadrature_error==0
+                ? tail.log_estimate<=logq(degree_allowance)
+                : tail.estimate+quadrature_error<=degree_allowance);
             // Unresolved tails cannot pass confirmation and need no angular field sum.
             if (!tail_pass) {
-                psms_rigid_release::validate_rejected_radials(exterior, broadside, rigid);
+                try { psms_rigid_release::validate_rejected_radials(exterior,broadside,rigid); }
+                catch(const std::runtime_error&) {
+                    if(original_quadrature) throw;
+                    fallback(); continue;
+                }
                 have_candidate = false;
                 previous_terms.clear();
                 previous_degree = degree;
                 degree = grow_degree(degree, m);
                 continue;
             }
-            evaluate_coefficient_angular_values(exterior, m, directions, workspace);
-            auto trial = solve_rigid_release_order(m, degree, incidence.cosine,
-                phi_difference, true, rigid, exterior, false, true);
+            if(!angular_evaluated) evaluate_coefficient_angular_values(exterior, m, directions, workspace);
+            OrderSolution<T> trial;
+            try {
+                trial=solve_rigid_release_order(m,degree,incidence.cosine,
+                    phi_difference,true,rigid,exterior,false,true);
+            } catch(const std::runtime_error&) {
+                if(original_quadrature) throw;
+                fallback(); continue;
+            }
             T prefix_change = 0, prefix_correction = 0, added_mass = 0, added_correction = 0;
             if (have_candidate) {
                 for (size_t index = 0; index < previous_terms.size(); ++index)
@@ -261,13 +510,21 @@ inline std::complex<acousticts_quad_t> psms_adaptive_rigid_release_field(
                     add(added_mass, added_correction, psms_rigid_release::magnitude(trial.outgoing_terms[index]));
             }
             const bool confirmation_pass = have_candidate && tail_pass &&
-                finite_norm(prefix_change + added_mass) <= degree_allowance;
+                finite_norm(prefix_change + added_mass + previous_quadrature_error + quadrature_error) <= degree_allowance;
             if (confirmation_pass) {
                 accepted = std::move(trial);
                 accepted_tail = tail;
+                accepted_quadrature_error=quadrature_error;
+
                 previous_order_seed = previous_degree;
                 break;
             }
+            if(have_candidate && prefix_change+added_mass<=degree_allowance &&
+                    prefix_change+added_mass+previous_quadrature_error+quadrature_error>degree_allowance &&
+                    !original_quadrature) {
+                fallback(); continue;
+            }
+            previous_quadrature_error=quadrature_error;
             have_candidate = tail_pass;
             if (have_candidate) previous_terms = std::move(trial.outgoing_terms);
             else previous_terms.clear();
@@ -275,9 +532,10 @@ inline std::complex<acousticts_quad_t> psms_adaptive_rigid_release_field(
             degree = grow_degree(degree, m);
         }
         add_field(field, field_correction, accepted.field);
-        add(degree_error, degree_error_correction, accepted_tail.estimate);
+        add(degree_error, degree_error_correction, accepted_tail.estimate + accepted_quadrature_error);
         const T envelope = finite_norm(psms_rigid_release::term_mass(accepted.outgoing_terms) +
-            accepted_tail.estimate);
+            accepted_tail.estimate + accepted_quadrature_error);
+
         order_envelopes[0] = order_envelopes[1];
         order_envelopes[1] = order_envelopes[2];
         order_envelopes[2] = envelope;
@@ -286,8 +544,8 @@ inline std::complex<acousticts_quad_t> psms_adaptive_rigid_release_field(
         // The outgoing azimuthal estimate is conditional on continued contraction.
         if (!incidence.exact_axis && m >= 2 && T(m - 2) > kb &&
                 order_envelopes[0] > 0 && order_envelopes[1] > 0 && order_envelopes[2] > 0) {
-            const T ratio = std::max(order_envelopes[1] / order_envelopes[0],
-                order_envelopes[2] / order_envelopes[1]);
+            const T ratio=std::max(order_envelopes[1]/order_envelopes[0],
+                order_envelopes[2]/order_envelopes[1]);
             if (ratio < 1) {
                 order_error = finite_norm(envelope * ratio / (T(1) - ratio));
                 order_pass = order_error <= order_allowance;
@@ -305,7 +563,6 @@ inline std::complex<acousticts_quad_t> psms_adaptive_rigid_release_field(
     finite(field);
     return field;
 }
-
 namespace psms_rigid_release {
 struct BatchState {
     SpheroidalDirection<Real> incidence;

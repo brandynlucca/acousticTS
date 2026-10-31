@@ -76,7 +76,10 @@ module prolate_swf
  type :: pint_cache_entry
    logical :: valid = .false.
 #ifdef USE_QUAD
-   logical :: parity_integrals = .false.
+   logical :: parity_integrals = .false., moment_errors_valid = .false.
+   integer :: quadrature_rule = 0
+   integer :: moment_error_highest(2) = 0
+   real(knd), allocatable :: moment_errors(:,:)
 #endif
    integer(int64) :: bytes = 0
    integer :: m = -1, lnum = 0, limint = 0, ndec = 0, ngau = 0, ngqs = 0
@@ -93,6 +96,9 @@ module prolate_swf
  integer, parameter :: pint_geometry_cache_bytes = ACOUSTICTS_PINT_CACHE_BYTES
 #endif
  type :: pint_geometry_entry
+#ifdef USE_QUAD
+   integer :: quadrature_rule = 0
+#endif
    logical :: valid = .false., kernels_valid = .false.
    integer :: m = -1, ndec = 0, ngau = 0, ngqs = 0, nodes = 0, degrees = 0
    real(knd) :: x1 = 0.0_knd, kernel_c = 0.0_knd
@@ -169,7 +175,662 @@ module prolate_swf
  end interface
 #endif
 
+
+#ifdef USE_QUAD
+ integer, save :: radial_quadrature_mode = 0, radial_quadrature_cache_index = 0
+ integer, save :: radial_quadrature_count = 0
+ real(knd), allocatable, save :: radial_quadrature_errors(:,:)
+ integer, allocatable, save :: radial_quadrature_valid(:)
+ integer, save :: radial_quadrature_even_only=0
+ ! G32/K65 tables rounded once to binary128 after independent 256/512-bit construction.
+ ! Laurie (1997), Math. Comp. 66:1133-1145, doi:10.1090/S0025-5718-97-00861-2.
+ real(knd), parameter :: radial_kronrod_nodes(65) = [ &
+     -0.9995459021243644786356102801611156773503686_knd, &
+     -0.9972638618494815635449811286650407007025362_knd, &
+     -0.9926280352629719126857911564384674665955853_knd, &
+     -0.9856115115452683354001750446309020202789914_knd, &
+     -0.9763102836146638071976696431931250008536076_knd, &
+     -0.9647622555875064307738119281182749256381614_knd, &
+     -0.9509546848486611853898827506153308138838534_knd, &
+     -0.9349060759377396891709191348354093484659924_knd, &
+     -0.9166772666513643242753456588579187060499126_knd, &
+     -0.8963211557660521239653072437192122956357944_knd, &
+     -0.8738697689453106061296618026136287985488697_knd, &
+     -0.8493676137325699701336930049677425157861154_knd, &
+     -0.8228829501360513216482688494721261945318814_knd, &
+     -0.7944837959679424069630972989704289426673091_knd, &
+     -0.7642282519978037041506601268743724296595995_knd, &
+     -0.7321821187402896803874266650912671758177258_knd, &
+     -0.6984265577952104928847701424474830393966363_knd, &
+     -0.6630442669302152009751151686632383824009494_knd, &
+     -0.6261129377018239978202383797579510343888991_knd, &
+     -0.587715757240762329040745476401826832814152_knd, &
+     -0.5479463141991524786809395016097409353325334_knd, &
+     -0.5068999089322293900237474743778212210719605_knd, &
+     -0.4646693084819922177561782003797081319536022_knd, &
+     -0.4213512761306353453641194361724264880270147_knd, &
+     -0.3770494211541211054453354855498081152933683_knd, &
+     -0.3318686022821276497799168057301879773123819_knd, &
+     -0.2859124585894597594166071011903518559017199_knd, &
+     -0.2392873622521370745446032091655015218137725_knd, &
+     -0.1921036089831424972716415922525946227283582_knd, &
+     -0.144471961582796493485186373598810646713169_knd, &
+     -0.09650269687689436580083125301636477223757547_knd, &
+     -0.0483076656877383162348125704405021659326524_knd, &
+     0.0_knd, &
+     0.0483076656877383162348125704405021659326524_knd, &
+     0.09650269687689436580083125301636477223757547_knd, &
+     0.144471961582796493485186373598810646713169_knd, &
+     0.1921036089831424972716415922525946227283582_knd, &
+     0.2392873622521370745446032091655015218137725_knd, &
+     0.2859124585894597594166071011903518559017199_knd, &
+     0.3318686022821276497799168057301879773123819_knd, &
+     0.3770494211541211054453354855498081152933683_knd, &
+     0.4213512761306353453641194361724264880270147_knd, &
+     0.4646693084819922177561782003797081319536022_knd, &
+     0.5068999089322293900237474743778212210719605_knd, &
+     0.5479463141991524786809395016097409353325334_knd, &
+     0.587715757240762329040745476401826832814152_knd, &
+     0.6261129377018239978202383797579510343888991_knd, &
+     0.6630442669302152009751151686632383824009494_knd, &
+     0.6984265577952104928847701424474830393966363_knd, &
+     0.7321821187402896803874266650912671758177258_knd, &
+     0.7642282519978037041506601268743724296595995_knd, &
+     0.7944837959679424069630972989704289426673091_knd, &
+     0.8228829501360513216482688494721261945318814_knd, &
+     0.8493676137325699701336930049677425157861154_knd, &
+     0.8738697689453106061296618026136287985488697_knd, &
+     0.8963211557660521239653072437192122956357944_knd, &
+     0.9166772666513643242753456588579187060499126_knd, &
+     0.9349060759377396891709191348354093484659924_knd, &
+     0.9509546848486611853898827506153308138838534_knd, &
+     0.9647622555875064307738119281182749256381614_knd, &
+     0.9763102836146638071976696431931250008536076_knd, &
+     0.9856115115452683354001750446309020202789914_knd, &
+     0.9926280352629719126857911564384674665955853_knd, &
+     0.9972638618494815635449811286650407007025362_knd, &
+     0.9995459021243644786356102801611156773503686_knd ]
+ real(knd), parameter :: radial_kronrod_weights(65) = [ &
+     0.001223360817951471800293037150648862627265593_knd, &
+     0.003426818775772370935574575578524918012668217_knd, &
+     0.005841737079166693303947976639999538411357158_knd, &
+     0.00817250403853166841434380511928449699180114_knd, &
+     0.01042398739880681882803425076201579041885857_knd, &
+     0.01267605480665440285936888339950223514688111_knd, &
+     0.0149361036060860273850967513325093980381689_knd, &
+     0.01714980520978425325608582622023252404175238_knd, &
+     0.01929877143032681129440373976352388503097007_knd, &
+     0.02140891318482191595577751802023112132255121_knd, &
+     0.02348665967216332459208791286477200902335634_knd, &
+     0.0255056954808946528145288998993078328531122_knd, &
+     0.02745209842221040378314770679595457074187528_knd, &
+     0.02933695668962066136861561458558389021413469_knd, &
+     0.03116332556197373717115584868496635394761078_knd, &
+     0.03291507764390360026329647678555552914446816_knd, &
+     0.03458212274473303413072638341688458206622867_knd, &
+     0.0361697694756422998609583913032902788041436_knd, &
+     0.0376791306456133985148959737488490213918369_knd, &
+     0.03909942013330661120748212704423617154824023_knd, &
+     0.04042349237037309667234926942157626500174432_knd, &
+     0.04165401998564305139829641329777878502822819_knd, &
+     0.04279111559644674693365492544373854847761422_knd, &
+     0.04382754403013974904681615267379811578296547_knd, &
+     0.04475863874976693729519919207537853267515619_knd, &
+     0.04558582656454707028057546196326516247466871_knd, &
+     0.04630875673802571324038129847244323547068304_knd, &
+     0.04692296828170361110348071335251484336463502_knd, &
+     0.0474260618738823823628799498539220833462199_knd, &
+     0.04781890873698847221226358465730239704751049_knd, &
+     0.0481009691854577469278465438391580807352269_knd, &
+     0.04827019307577738559871207883299113908757599_knd, &
+     0.04832638398656775837544543400051961361725191_knd, &
+     0.04827019307577738559871207883299113908757599_knd, &
+     0.0481009691854577469278465438391580807352269_knd, &
+     0.04781890873698847221226358465730239704751049_knd, &
+     0.0474260618738823823628799498539220833462199_knd, &
+     0.04692296828170361110348071335251484336463502_knd, &
+     0.04630875673802571324038129847244323547068304_knd, &
+     0.04558582656454707028057546196326516247466871_knd, &
+     0.04475863874976693729519919207537853267515619_knd, &
+     0.04382754403013974904681615267379811578296547_knd, &
+     0.04279111559644674693365492544373854847761422_knd, &
+     0.04165401998564305139829641329777878502822819_knd, &
+     0.04042349237037309667234926942157626500174432_knd, &
+     0.03909942013330661120748212704423617154824023_knd, &
+     0.0376791306456133985148959737488490213918369_knd, &
+     0.0361697694756422998609583913032902788041436_knd, &
+     0.03458212274473303413072638341688458206622867_knd, &
+     0.03291507764390360026329647678555552914446816_knd, &
+     0.03116332556197373717115584868496635394761078_knd, &
+     0.02933695668962066136861561458558389021413469_knd, &
+     0.02745209842221040378314770679595457074187528_knd, &
+     0.0255056954808946528145288998993078328531122_knd, &
+     0.02348665967216332459208791286477200902335634_knd, &
+     0.02140891318482191595577751802023112132255121_knd, &
+     0.01929877143032681129440373976352388503097007_knd, &
+     0.01714980520978425325608582622023252404175238_knd, &
+     0.0149361036060860273850967513325093980381689_knd, &
+     0.01267605480665440285936888339950223514688111_knd, &
+     0.01042398739880681882803425076201579041885857_knd, &
+     0.00817250403853166841434380511928449699180114_knd, &
+     0.005841737079166693303947976639999538411357158_knd, &
+     0.003426818775772370935574575578524918012668217_knd, &
+     0.001223360817951471800293037150648862627265593_knd ]
+ real(knd), parameter :: radial_gauss_weights(65) = [ &
+     0.0_knd, &
+     0.007018610009470096600407063738853182667819391_knd, &
+     0.0_knd, &
+     0.01627439473090567060517056220638661833146524_knd, &
+     0.0_knd, &
+     0.02539206530926205945575258978922403004323919_knd, &
+     0.0_knd, &
+     0.03427386291302143310268773225237270477414701_knd, &
+     0.0_knd, &
+     0.04283589802222668065687864660612553058235913_knd, &
+     0.0_knd, &
+     0.05099805926237617619616324468952169640208691_knd, &
+     0.0_knd, &
+     0.05868409347853554714528363730017088442840841_knd, &
+     0.0_knd, &
+     0.06582222277636184683765006370693877267645803_knd, &
+     0.0_knd, &
+     0.07234579410884850622539935647848778582913504_knd, &
+     0.0_knd, &
+     0.07819389578707030647174091882830667516452729_knd, &
+     0.0_knd, &
+     0.08331192422694675522219907460434860756319818_knd, &
+     0.0_knd, &
+     0.08765209300440381114277146275180229285411485_knd, &
+     0.0_knd, &
+     0.0911738786957638847128685771116370669828272_knd, &
+     0.0_knd, &
+     0.093844399080804565639180237668117257198119_knd, &
+     0.0_knd, &
+     0.0956387200792748594190820022041311029919722_knd, &
+     0.0_knd, &
+     0.09654008851472780056676483006357579677633761_knd, &
+     0.0_knd, &
+     0.09654008851472780056676483006357579677633761_knd, &
+     0.0_knd, &
+     0.0956387200792748594190820022041311029919722_knd, &
+     0.0_knd, &
+     0.093844399080804565639180237668117257198119_knd, &
+     0.0_knd, &
+     0.0911738786957638847128685771116370669828272_knd, &
+     0.0_knd, &
+     0.08765209300440381114277146275180229285411485_knd, &
+     0.0_knd, &
+     0.08331192422694675522219907460434860756319818_knd, &
+     0.0_knd, &
+     0.07819389578707030647174091882830667516452729_knd, &
+     0.0_knd, &
+     0.07234579410884850622539935647848778582913504_knd, &
+     0.0_knd, &
+     0.06582222277636184683765006370693877267645803_knd, &
+     0.0_knd, &
+     0.05868409347853554714528363730017088442840841_knd, &
+     0.0_knd, &
+     0.05099805926237617619616324468952169640208691_knd, &
+     0.0_knd, &
+     0.04283589802222668065687864660612553058235913_knd, &
+     0.0_knd, &
+     0.03427386291302143310268773225237270477414701_knd, &
+     0.0_knd, &
+     0.02539206530926205945575258978922403004323919_knd, &
+     0.0_knd, &
+     0.01627439473090567060517056220638661833146524_knd, &
+     0.0_knd, &
+     0.007018610009470096600407063738853182667819391_knd, &
+     0.0_knd ]
+#endif
+
+
+#ifdef USE_QUAD
+ abstract interface
+   function radial_quadrature_stream_callback(m,parity,seed,lim,maxint,enr,p1,p2,p3,p4, &
+       errors,dcon,outputs,jint) bind(C) result(status)
+     use iso_c_binding,only:c_int
+     import knd
+     integer(c_int),value::m,parity,seed,lim,maxint
+     real(knd),intent(in)::enr(*),p1(*),p2(*),p3(*),p4(*),errors(*)
+     real(knd),value::dcon
+     real(knd),intent(out)::outputs(8)
+     integer(c_int),intent(out)::jint
+     integer(c_int)::status
+   end function
+ end interface
+ procedure(radial_quadrature_stream_callback),pointer,save::radial_quadrature_stream_proc=>null()
+#endif
+
+#ifdef USE_QUAD
+ abstract interface
+   function radial_quadrature_panel_callback(basis,kernels,coarse_kernels,capacity,nodes, &
+       panel_nodes,first,last,extra,error1,error2,error4) bind(C) result(status)
+     use iso_c_binding,only:c_int
+     import knd
+     real(knd),intent(in)::basis(*),kernels(*),coarse_kernels(*)
+     integer(c_int),value::capacity,nodes,panel_nodes,first,last,extra
+     real(knd),intent(inout)::error1(*),error2(*),error4(*)
+     integer(c_int)::status
+   end function
+ end interface
+ procedure(radial_quadrature_panel_callback),pointer,save::radial_quadrature_panel_proc=>null()
+#endif
  contains
+
+#ifdef USE_QUAD
+  function profcn_radial_quadrature_available_quad() bind(C) result(available)
+    use iso_c_binding,only:c_int
+    integer(c_int)::available
+    available=0_c_int
+    if(.not.associated(radial_quadrature_stream_proc)) return
+    if(.not.associated(radial_quadrature_panel_proc)) return
+    if(.not.pint_exact_sums_enabled()) return
+    available=1_c_int
+  end function
+#endif
+
+#ifdef USE_QUAD
+ subroutine profcn_set_panel_error_quad(callback) bind(C)
+   use iso_c_binding,only:c_funptr,c_f_procpointer,c_associated
+   type(c_funptr),value::callback
+   integer::slot
+   ! Changing the interpretation of paired columns invalidates every affected mapped moment entry.
+   do slot=1,size(pint_cache)
+     if(pint_cache(slot)%valid .and. pint_cache(slot)%quadrature_rule==1) &
+         call clear_pint_cache_slot(slot)
+   end do
+   radial_quadrature_cache_index=0
+   radial_quadrature_count=0
+   nullify(radial_quadrature_panel_proc)
+   if(c_associated(callback)) call c_f_procpointer(callback,radial_quadrature_panel_proc)
+   if(profcn_radial_quadrature_available_quad()==0) call profcn_set_radial_quadrature_quad(0)
+ end subroutine
+#endif
+
+#ifdef USE_QUAD
+ subroutine profcn_set_radial_stream_quad(callback) bind(C)
+   use iso_c_binding,only:c_funptr,c_f_procpointer,c_associated
+   type(c_funptr),value::callback
+   nullify(radial_quadrature_stream_proc)
+   if(c_associated(callback)) call c_f_procpointer(callback,radial_quadrature_stream_proc)
+   radial_quadrature_count=0
+   if(profcn_radial_quadrature_available_quad()==0) call profcn_set_radial_quadrature_quad(0)
+ end subroutine
+#endif
+
+#ifdef USE_QUAD
+  subroutine profcn_set_radial_quadrature_even_quad(even_only) bind(C)
+    use iso_c_binding,only:c_int
+    integer(c_int),value::even_only
+    integer::selected
+    selected=0
+    if(even_only/=0_c_int) selected=1
+    if(selected/=radial_quadrature_even_only) radial_quadrature_count=0
+    radial_quadrature_even_only=selected
+  end subroutine
+  function profcn_get_radial_quadrature_even_quad() bind(C) result(even_only)
+    use iso_c_binding,only:c_int
+    integer(c_int)::even_only
+    even_only=int(radial_quadrature_even_only,c_int)
+  end function
+
+#endif
+
+#ifdef USE_QUAD
+
+
+  subroutine profcn_get_radial_quadrature_errors_quad(capacity,error_r2,error_r2d,valid) bind(C)
+    use iso_c_binding,only:c_int
+    integer(c_int),value::capacity
+    real(knd),intent(out)::error_r2(*),error_r2d(*)
+    integer(c_int),intent(out)::valid(*)
+    integer::j
+    do j=1,max(0,int(capacity))
+      error_r2(j)=0.0_knd
+      error_r2d(j)=0.0_knd
+      valid(j)=0_c_int
+    end do
+    if(radial_quadrature_count<=0 .or. capacity<radial_quadrature_count) return
+    do j=1,radial_quadrature_count
+      error_r2(j)=radial_quadrature_errors(j,1)
+      error_r2d(j)=radial_quadrature_errors(j,2)
+      valid(j)=int(radial_quadrature_valid(j),c_int)
+    end do
+  end subroutine
+
+  subroutine radial_error_product(a,b,value,valid)
+    use, intrinsic::ieee_arithmetic,only:ieee_is_finite
+    real(knd),intent(in)::a,b
+    real(knd),intent(out)::value
+    logical,intent(inout)::valid
+    value=a*b
+    if(.not.ieee_is_finite(a).or..not.ieee_is_finite(b).or..not.ieee_is_finite(value)) then
+      valid=.false.
+    end if
+    if(a/=0.0_knd.and.b/=0.0_knd.and.value==0.0_knd) then
+      valid=.false.
+    end if
+  end subroutine
+
+  subroutine radial_error_quotient(a,b,value,valid)
+    use, intrinsic::ieee_arithmetic,only:ieee_is_finite
+    real(knd),intent(in)::a,b
+    real(knd),intent(out)::value
+    logical,intent(inout)::valid
+    value=0.0_knd
+    if(.not.ieee_is_finite(a).or..not.ieee_is_finite(b).or.b==0.0_knd) then
+      valid=.false.
+      return
+    end if
+    value=a/b
+    if(.not.ieee_is_finite(value)) then
+      valid=.false.
+    end if
+    if(a/=0.0_knd.and.value==0.0_knd) then
+      valid=.false.
+    end if
+  end subroutine
+
+  subroutine radial_error_decimal_scale(a,power,value,valid)
+    real(knd),intent(in)::a
+    integer(int64),intent(in)::power
+    real(knd),intent(out)::value
+    logical,intent(inout)::valid
+    integer(int64)::remaining,step
+    real(knd)::next
+    value=a
+    remaining=power
+    do while(remaining/=0 .and. valid)
+      step=max(-1000_int64,min(1000_int64,remaining))
+      call radial_error_product(value,10.0_knd**int(step),next,valid)
+      value=next
+      remaining=remaining-step
+    end do
+  end subroutine
+
+
+  subroutine prepare_radial_moment_errors(idx,m,parity,highest,maxint,maxlp,pnorm,ipnorm,valid)
+    use, intrinsic::ieee_arithmetic,only:ieee_is_finite
+    integer,intent(in)::idx,m,parity,highest,maxint,maxlp,ipnorm(maxlp)
+    real(knd),intent(in)::pnorm(maxlp)
+    logical,intent(inout)::valid
+    real(knd)::alpha(maxint),twom,beta,temp,temp2,error1,error2
+    integer::i,first
+    if(pint_cache(idx)%moment_error_highest(parity+1)>=highest) return
+    twom=real(m,knd)+real(m,knd)
+    if(parity==1) then
+      alpha(2)=(twom+3.0_knd)*pnorm(2)/(pnorm(3)*2.0_knd)
+      alpha(2)=alpha(2)*10.0_knd**(ipnorm(2)-ipnorm(3))
+      do i=4,highest,2
+        alpha(i)=alpha(i-2)*(twom+i-1)*(twom+i+i-1)*(i-2)/ &
+            ((i-1)*(twom+i)*(twom+i+i-5))
+      end do
+    end if
+    first=parity+1
+    if(pint_cache(idx)%moment_error_highest(parity+1)>0) &
+        first=pint_cache(idx)%moment_error_highest(parity+1)+2
+    do i=first,highest,2
+      if(parity==0) then
+        error1=pint_cache(idx)%moment_errors(i,3)
+        error2=pint_cache(idx)%moment_errors(i,4)
+      else
+        beta=-(twom+i-1)/(twom+i)
+        call radial_error_product(abs(beta),pint_cache(idx)%moment_errors(i-1,4),temp,valid)
+        temp2=pint_cache(idx)%moment_errors(i+1,4)+temp
+        call radial_error_quotient(temp2,abs(alpha(i)),error1,valid)
+        call radial_error_product(abs(beta),pint_cache(idx)%moment_errors(i-1,6),temp,valid)
+        temp2=pint_cache(idx)%moment_errors(i+1,6)+temp
+        call radial_error_quotient(temp2,abs(alpha(i)),error2,valid)
+      end if
+      if(.not.ieee_is_finite(error1).or..not.ieee_is_finite(error2)) then
+        valid=.false.
+      end if
+      if(.not.valid) return
+      ! Raw panel errors occupy columns 3, 4, 6 and propagated family errors occupy 1, 2.
+      pint_cache(idx)%moment_errors(i,1)=error1
+      pint_cache(idx)%moment_errors(i,2)=error2
+      pint_cache(idx)%moment_error_highest(parity+1)=i
+    end do
+  end subroutine
+
+
+  subroutine pack_radial_quadrature_result(value,uncertainty,power,packed,exponent,error,valid)
+    use, intrinsic::ieee_arithmetic,only:ieee_is_finite
+    real(knd),intent(in)::value,uncertainty
+    integer(int64),intent(in)::power
+    real(knd),intent(out)::packed,error
+    integer,intent(out)::exponent
+    logical,intent(inout)::valid
+    integer::shift
+    integer(int64)::packed_power
+    real(knd)::temp
+    packed=0.0_knd
+    error=0.0_knd
+    exponent=0
+    if(.not.valid) return
+    if(.not.ieee_is_finite(value).or..not.ieee_is_finite(uncertainty).or.uncertainty<0.0_knd) then
+      valid=.false.
+      return
+    end if
+    shift=0
+    if(value/=0.0_knd) shift=decimal_exponent(abs(value))
+    call radial_error_decimal_scale(value,-int(shift,int64),packed,valid)
+    packed_power=power+int(shift,int64)
+    if(packed/=0.0_knd.and.abs(packed)<1.0_knd) then
+      call radial_error_product(packed,10.0_knd,temp,valid)
+      packed=temp
+      packed_power=packed_power-1_int64
+    end if
+    if(packed_power>int(huge(exponent),int64).or.packed_power<-int(huge(exponent),int64)) then
+      valid=.false.
+      return
+    end if
+    exponent=int(packed_power)
+    call radial_error_decimal_scale(uncertainty,power-packed_power,error,valid)
+  end subroutine
+
+  subroutine r2int_with_quadrature_error(l,m,c,x,limint,limd,ndec,maxd,enr,d01,id01, &
+      maxint,maxmp,maxlp,idx,norme,pnorm,ipnorm,coefme,coefmo,p1,p2,p3,p4, &
+      high,e_high,highd,e_highd,jint,coefn,icoefn,error,error_d,valid)
+    use iso_c_binding,only:c_int
+    use, intrinsic::ieee_arithmetic,only:ieee_is_finite
+    integer,intent(in)::l,m,limint,limd,ndec,maxd,id01,maxint,maxmp,maxlp,idx, &
+        norme(maxmp),ipnorm(maxlp)
+    real(knd),intent(in)::c,x,enr(maxd),d01,pnorm(maxlp),coefme,coefmo, &
+        p1(maxint),p2(maxint),p3(maxint),p4(maxint)
+    real(knd),intent(out)::high,highd,error,error_d
+    integer,intent(out)::e_high,e_highd,jint
+    real(knd),intent(inout)::coefn
+    integer,intent(inout)::icoefn
+    logical,intent(out)::valid
+    real(knd)::sum1,sum2,unc1,unc2,last1,last2,lerr1,lerr2
+    real(knd)::temp,temp2,coefa,leading,radial_factor,derivative_factor,correction_factor
+    real(knd)::full,full_d,raw_error,raw_error_d,full_correction,error_correction,twom
+    real(knd)::lower1,lower2,endpoint,endpoint2,odd_factor,coef_derivative,dcon,ri
+    integer::parity,seed,lim,base,highest,prepared_last_odd,i,iterm
+    integer(int64)::leading_exponent
+    integer(c_int)::stream_status,stream_stop
+    real(knd)::stream_outputs(8)
+    high=0.0_knd
+    highd=0.0_knd
+    e_high=0
+    e_highd=0
+    error=0.0_knd
+    error_d=0.0_knd
+    jint=0
+    valid=.false.
+    estimate: block
+    parity=mod(l-m,2)
+    seed=(l-m)/2
+    lim=limint/2-parity
+    base=l-m+1
+    highest=2*lim+parity+1
+    jint=max(0,lim)
+    if(l<m.or.lim<=seed.or.lim>maxd.or.lim>limd/2-parity) exit estimate
+    if(base>maxlp.or.highest+parity>maxint.or.m+1>maxmp) exit estimate
+    if(idx<1.or.idx>size(pint_cache)) exit estimate
+    if(.not.allocated(pint_cache(idx)%moment_errors)) exit estimate
+    if(size(pint_cache(idx)%moment_errors,1)/=maxint) exit estimate
+    ! Check prepared moments, including the odd neighbor needed by reconstructed families.
+    prepared_last_odd=2*((pint_cache(idx)%limint+1)/2)+1
+    if(highest+parity>prepared_last_odd) exit estimate
+    valid=.true.
+    twom=real(m,knd)+real(m,knd)
+    dcon=10.0_knd**(-ndec-1)
+    ! Preserve initialization of the leading coefficient used by subsequent degrees.
+    if(l==m) then
+      icoefn=norme(m+1)
+      coefn=0.5_knd
+      do i=1,m
+        ri=real(i,knd)
+        coefn=coefn/(ri+ri)
+        iterm=decimal_exponent(abs(coefn))
+        coefn=coefn*10.0_knd**(-iterm)
+        icoefn=icoefn+iterm
+      end do
+    end if
+    call prepare_radial_moment_errors(idx,m,parity,highest,maxint,maxlp,pnorm,ipnorm,valid)
+    if(.not.valid) exit estimate
+    ! Accumulate complete signed sums and positive panel uncertainties in one exact stream.
+    if(.not.associated(radial_quadrature_stream_proc)) then
+      valid=.false.
+      exit estimate
+    end if
+    stream_status=radial_quadrature_stream_proc(int(m,c_int),int(parity,c_int),int(seed,c_int), &
+        int(lim,c_int),int(maxint,c_int),enr,p1,p2,p3,p4,pint_cache(idx)%moment_errors, &
+        dcon,stream_outputs,stream_stop)
+    if(stream_status/=1_c_int) then
+      valid=.false.
+      exit estimate
+    end if
+    if(.not.all(ieee_is_finite(stream_outputs)).or.any(stream_outputs(3:8)<0.0_knd).or. &
+        stream_stop<=seed.or.stream_stop>lim) then
+      valid=.false.
+      exit estimate
+    end if
+    sum1=stream_outputs(1)
+    sum2=stream_outputs(2)
+    unc1=stream_outputs(3)
+    unc2=stream_outputs(4)
+    last1=stream_outputs(5)
+    last2=stream_outputs(6)
+    lerr1=stream_outputs(7)
+    lerr2=stream_outputs(8)
+    jint=int(stream_stop)
+    ! Panel differences are conditional estimates, not certified integration-error bounds.
+    ! Preserve the native finite endpoint test under the propagated moment uncertainty.
+    lower1=abs(sum1)-unc1
+    lower2=abs(sum2)-unc2
+    if(lower1<=0.0_knd.or.lower2<=0.0_knd) then
+      valid=.false.
+      exit estimate
+    end if
+    call radial_error_quotient(last1+lerr1,lower1,endpoint,valid)
+    call radial_error_quotient(last2+lerr2,lower2,endpoint2,valid)
+    if(.not.valid) exit estimate
+    if(endpoint+endpoint2>=dcon) then
+      valid=.false.
+      exit estimate
+    end if
+    ! Pack full finite values and errors in the same decimal exponent units.
+    coefa=(twom+real(2*parity+1,knd))*coefn
+    if(mod(seed,2)/=0) coefa=-coefa
+    call radial_error_quotient(coefa,d01,temp,valid)
+    call radial_error_product(temp,pnorm(base),leading,valid)
+    leading_exponent=int(icoefn,int64)-int(id01,int64)+int(ipnorm(base),int64)
+    odd_factor=1.0_knd
+    coef_derivative=coefme
+    if(parity==1) then
+      odd_factor=x
+      coef_derivative=coefmo
+    end if
+    call radial_error_product(leading,odd_factor,radial_factor,valid)
+    call radial_error_product(radial_factor,sum1,full,valid)
+    call radial_error_product(abs(radial_factor),unc1,raw_error,valid)
+    call radial_error_product(-c,x,temp,valid)
+    call radial_error_product(temp,radial_factor,derivative_factor,valid)
+    call radial_error_product(derivative_factor,sum2,full_d,valid)
+    call radial_error_product(abs(derivative_factor),unc2,raw_error_d,valid)
+    call radial_error_product(coef_derivative,radial_factor,correction_factor,valid)
+    call radial_error_product(correction_factor,sum1,full_correction,valid)
+    call radial_error_product(abs(correction_factor),unc1,error_correction,valid)
+    temp=full_d+full_correction
+    temp2=raw_error_d+error_correction
+    call pack_radial_quadrature_result(full,raw_error,leading_exponent,high,e_high,error,valid)
+    call pack_radial_quadrature_result(temp,temp2,leading_exponent,highd,e_highd,error_d,valid)
+    end block estimate
+
+  end subroutine
+
+
+#endif
+
+
+#ifdef USE_QUAD
+  subroutine profcn_set_radial_quadrature_quad(mode) bind(C)
+    use iso_c_binding, only: c_int
+    integer(c_int), value :: mode
+    integer :: selected
+    selected=0
+    if(mode==1_c_int) then
+      if(profcn_radial_quadrature_available_quad()==1_c_int) selected=1
+    end if
+    if(selected /= radial_quadrature_mode) then
+      radial_quadrature_even_only=0
+      radial_quadrature_cache_index=0
+      radial_quadrature_count=0
+    end if
+    ! Keep original and mapped rules in the existing bounded caches.
+    radial_quadrature_mode=selected
+  end subroutine
+
+  function profcn_get_radial_quadrature_quad() bind(C) result(mode)
+    use iso_c_binding, only: c_int
+    integer(c_int) :: mode
+    mode=int(radial_quadrature_mode,c_int)
+  end function
+
+
+  subroutine prepare_radial_quadrature_results(lnum,mnum)
+    integer, intent(in) :: lnum,mnum
+    integer :: status
+    radial_quadrature_count=0
+    if(radial_quadrature_mode/=1 .or. mnum/=1) return
+    ! This allocation bound only disables the estimate, never the original radial calculation.
+    if(lnum<1 .or. lnum>1048576/(4*storage_size(0.0_knd)/8+4*storage_size(0)/8)) return
+    if(allocated(radial_quadrature_errors)) then
+      if(size(radial_quadrature_errors,1)/=lnum) &
+          deallocate(radial_quadrature_errors,radial_quadrature_valid)
+    end if
+    if(.not.allocated(radial_quadrature_errors)) then
+      allocate(radial_quadrature_errors(lnum,2),radial_quadrature_valid(lnum),stat=status)
+      if(status/=0) then
+        if(allocated(radial_quadrature_errors)) deallocate(radial_quadrature_errors)
+        if(allocated(radial_quadrature_valid)) deallocate(radial_quadrature_valid)
+        return
+      end if
+    end if
+    radial_quadrature_errors=0.0_knd
+    radial_quadrature_valid=0
+    radial_quadrature_count=lnum
+  end subroutine
+
+  subroutine map_radial_quadrature_node(left,right,node,q,eta,measure)
+    real(knd), intent(in) :: left,right,node,q
+    real(knd), intent(out) :: eta,measure
+    real(knd) :: root,lower,width,t
+    ! eta=sqrt(q)*sinh(t) preserves each original panel and removes nearby square-root singularities.
+    root=sqrt(q)
+    lower=asinh(left/root)
+    width=asinh(right/root)-lower
+    t=lower+(node+1.0_knd)*width/2.0_knd
+    eta=root*sinh(t)
+    if(node==-1.0_knd) eta=left
+    if(node==1.0_knd) eta=right
+    measure=width*sqrt(q+eta*eta)
+  end subroutine
+#endif
 
 #ifdef USE_QUAD
   subroutine profcn_set_integral_sums_quad(available_callback, sum_callback) bind(C)
@@ -753,6 +1414,13 @@ module prolate_swf
     integer(int64) :: requested_bytes
     character(len=256) :: allocation_message
 
+#ifdef USE_QUAD
+    if(radial_quadrature_mode==1 .and. n==65) then
+      x=radial_kronrod_nodes
+      w=radial_kronrod_weights
+      return
+    end if
+#endif
     if(gauss_cache%valid) then
       if(gauss_cache%ndec == ndec .and. gauss_cache%n == n) then
         x(1:n) = gauss_cache%x(1:n)
@@ -832,7 +1500,7 @@ module prolate_swf
     integer :: node, k, i, degree, retained_degrees, capacity, allocation_status, candidate
     integer :: real_bytes, remaining_values, requested_degrees, previous_capacity, available_bytes
     real(knd) :: etal, etau, step, etcoef1, etcoef2, etai, etaim1, argb
-    real(knd) :: window_base, window_power, legendre_power, coef, sargb
+    real(knd) :: window_base, window_power, legendre_power, coef, sargb, mapped_measure
     real(knd), allocatable :: expanded_basis(:,:)
 #ifdef USE_QUAD
     real(knd) :: parity_forward(size(alpha)), parity_diagonal(size(alpha))
@@ -855,6 +1523,9 @@ module prolate_swf
       if(.not. entry%valid) cycle
       if(entry%m /= m .or. entry%x1 /= x1 .or. entry%ndec /= ndec) cycle
       if(entry%ngau /= ngau .or. entry%ngqs /= ngqs) cycle
+#ifdef USE_QUAD
+      if(entry%quadrature_rule /= radial_quadrature_mode) cycle
+#endif
       if(any(entry%wg /= wg) .or. any(entry%xg /= xg)) cycle
       exit
     end do
@@ -902,6 +1573,9 @@ module prolate_swf
       entry%ndec = ndec
       entry%ngau = ngau
       entry%ngqs = ngqs
+#ifdef USE_QUAD
+      entry%quadrature_rule = radial_quadrature_mode
+#endif
 
       ! Retain precisely the node prefix selected by the original window cutoff.
       node = 0
@@ -919,6 +1593,10 @@ module prolate_swf
         etcoef2 = (etau - etal) / 2.0_knd
         do i = 1, ngau
           etai = etcoef1 + xg(i) * etcoef2
+#ifdef USE_QUAD
+          if(radial_quadrature_mode==1) &
+              call map_radial_quadrature_node(etal,etau,xg(i),x1sm1,etai,mapped_measure)
+#endif
           etaim1 = 1.0_knd - etai * etai
           argb = x1sm1 + etai * etai
           window_base = x1sm1 * etaim1 / argb
@@ -932,7 +1610,15 @@ module prolate_swf
           legendre_power = etaim1 ** (0.5_knd * m)
 #endif
           coef = step * window_power
-          if(coef < dec) exit node_steps
+#ifdef USE_QUAD
+          if(radial_quadrature_mode==1) then
+            coef=mapped_measure*window_power
+          else
+#endif
+            if(coef < dec) exit node_steps
+#ifdef USE_QUAD
+          end if
+#endif
           sargb = sqrt(argb)
           node = node + 1
           entry%geometry(:, node) = [etai, coef, sargb, 1.0_knd / sargb, twomi * legendre_power]
@@ -1037,8 +1723,13 @@ module prolate_swf
     integer(int64) :: requested_bytes
     character(len=256) :: allocation_message
 #ifdef USE_QUAD
-    logical :: parity_integrals
+    logical :: parity_integrals, quadrature_pair_valid
+    real(knd), allocatable :: quadrature_pair_work(:,:)
+    integer :: quadrature_pair_prefix
 
+    radial_quadrature_cache_index=0
+    quadrature_pair_valid=.false.
+    quadrature_pair_prefix=0
     parity_integrals = limint >= 0 .and. limint <= maxint - 4 .and. limint <= huge(limint) - 5
 #endif
 
@@ -1051,6 +1742,7 @@ module prolate_swf
       if(pint_cache(idx)%ngau /= ngau .or. pint_cache(idx)%ngqs /= ngqs) cycle
 #ifdef USE_QUAD
       if(pint_cache(idx)%parity_integrals .neqv. parity_integrals) cycle
+      if(pint_cache(idx)%quadrature_rule /= radial_quadrature_mode) cycle
 #endif
       if(size(pint_cache(idx)%pint1) /= maxint) cycle
       if(size(pint_cache(idx)%pnorm) /= maxlp) cycle
@@ -1067,6 +1759,11 @@ module prolate_swf
       ipnorm = pint_cache(idx)%ipnorm
       coefme = pint_cache(idx)%coefme
       coefmo = pint_cache(idx)%coefmo
+#ifdef USE_QUAD
+      if(radial_quadrature_mode==1 .and. pint_cache(idx)%moment_errors_valid) then
+        if(pint_exact_sums_enabled()) radial_quadrature_cache_index=idx
+      end if
+#endif
       return
     end do
 
@@ -1090,6 +1787,7 @@ module prolate_swf
       if(pint_cache(idx)%ngau /= ngau .or. pint_cache(idx)%ngqs /= ngqs) cycle
 #ifdef USE_QUAD
       if(pint_cache(idx)%parity_integrals .neqv. parity_integrals) cycle
+      if(pint_cache(idx)%quadrature_rule /= radial_quadrature_mode) cycle
 #endif
       if(pint_cache(idx)%limint > limint .or. &
           pint_cache(idx)%limint <= prefix_limint) cycle
@@ -1120,9 +1818,37 @@ module prolate_swf
       end if
 #endif
     end if
+#ifdef USE_QUAD
+    if(radial_quadrature_mode==1 .and. maxint>0) then
+      if(int(maxint,int64)<=auxiliary_cache_budget/(6_int64*(storage_size(0.0_knd)/8))) then
+        allocate(quadrature_pair_work(maxint,6),stat=allocation_status)
+        if(allocation_status==0) then
+          quadrature_pair_work=0.0_knd
+          if(prefix_idx>0) then
+            if(pint_cache(prefix_idx)%moment_errors_valid) then
+              prefix_odd=2*((prefix_limint+1)/2)+1
+              quadrature_pair_work(1:prefix_odd+2,:)= &
+                  pint_cache(prefix_idx)%moment_errors(1:prefix_odd+2,:)
+              quadrature_pair_prefix=prefix_limint
+            end if
+          end if
+        end if
+      end if
+    end if
+    if(allocated(quadrature_pair_work)) then
+      call pint(c, m, lnum, x1, limint, maxint, maxlp, maxmp, ndec, wg, xg, &
+          ngau, ngqs, rpint1, rpint2, pint1, pint2, pint3, pint4, &
+          norme, pnorm, ipnorm, coefme, coefmo, resume_lim=prefix_limint, &
+          moment_errors=quadrature_pair_work, moment_error_prefix=quadrature_pair_prefix, &
+          moment_errors_valid=quadrature_pair_valid)
+    else
+#endif
     call pint(c, m, lnum, x1, limint, maxint, maxlp, maxmp, ndec, wg, xg, &
         ngau, ngqs, rpint1, rpint2, pint1, pint2, pint3, pint4, &
         norme, pnorm, ipnorm, coefme, coefmo, resume_lim=prefix_limint)
+#ifdef USE_QUAD
+    end if
+#endif
 
     ! Allocate directly in the bounded cache without implicit duplicate copies.
     requested_bytes = 0
@@ -1130,6 +1856,11 @@ module prolate_swf
     integer_bytes = storage_size(1) / 8
     if(.not. add_auxiliary_cache_bytes(requested_bytes, 2 * real_bytes, ngau)) return
     if(.not. add_auxiliary_cache_bytes(requested_bytes, 6 * real_bytes, maxint)) return
+#ifdef USE_QUAD
+    if(quadrature_pair_valid) then
+      if(.not. add_auxiliary_cache_bytes(requested_bytes, 6 * real_bytes, maxint)) return
+    end if
+#endif
     if(.not. add_auxiliary_cache_bytes(requested_bytes, real_bytes + integer_bytes, maxlp)) return
     if(.not. add_auxiliary_cache_bytes(requested_bytes, integer_bytes, maxmp)) return
     idx = pint_cache_next
@@ -1181,6 +1912,12 @@ module prolate_swf
       entry%ngqs = ngqs
 #ifdef USE_QUAD
       entry%parity_integrals = parity_integrals
+      entry%quadrature_rule = radial_quadrature_mode
+      if(quadrature_pair_valid) then
+        call move_alloc(quadrature_pair_work,entry%moment_errors)
+        entry%moment_errors_valid=.true.
+        radial_quadrature_cache_index=idx
+      end if
 #endif
       entry%c = c
       entry%x1 = x1
@@ -1911,6 +2648,9 @@ module prolate_swf
       if(x1 < 1.0e-12_knd) ngau =2400
       if(x1 <= 0.5e0_knd) maxpdr = maxpdr + int(2.e0_knd * c + 100.0e0_knd * x1) + 400
     end if
+#ifdef USE_QUAD
+    if(radial_quadrature_mode==1) ngau=65
+#endif
     maxq = maxint + maxm + maxm
     maxdr = maxpdr / 2 + 1
     maxp = max(maxp, maxpdr)
@@ -2029,6 +2769,9 @@ module prolate_swf
       if(x1 < 1.0e-12_knd) ngau =2400
       if(x1 <= 0.5e0_knd) maxpdr = maxpdr + int(2.e0_knd * c + 100.0e0_knd * x1) + 400
     end if
+#ifdef USE_QUAD
+    if(radial_quadrature_mode==1) ngau=65
+#endif
     maxq = maxint + maxm + maxm
     maxdr = maxpdr / 2 + 1
     maxp = max(maxp, maxpdr)
@@ -2211,6 +2954,11 @@ module prolate_swf
          r2ic, r2dic, r2lc, r2dlc, r2nc, r2dnc, sgn, termpq, x, xb, &
          xbninp, x1, wm, wronc, wront, wronca, wroncb
     character chr
+#ifdef USE_QUAD
+    logical :: radial_integral_selected, radial_error_valid_here
+    real(knd) :: radial_value_error,radial_derivative_error
+    integer :: radial_error_slot
+#endif
 !
 !  integer and real(knd) arrays with dimension lnum
     dimension iqdl(lnum), iql(lnum), ifajo(lnum)
@@ -2297,6 +3045,9 @@ module prolate_swf
     allocate(pdr(maxt, maxp), pdrat(maxt, maxp), pr(maxt, maxp), prat(maxt, maxp))
     allocate(pratbsv(jnenmax, maxp), prattsv(jnenmax, maxp), pdratsv(jnenmax, maxp))
 !
+#ifdef USE_QUAD
+    call prepare_radial_quadrature_results(lnum,mnum)
+#endif
     dec = 10.0e0_knd ** (-ndec - 1)
     if(ioprad /= 0) x = x1 + 1.0e0_knd
     jtest = ndec - minacc - 2
@@ -2485,6 +3236,10 @@ end if
        naccetas = minacc
        if(li == 1) naccrsav = minacc
        if(li > 1) naccrsav = naccr
+#ifdef USE_QUAD
+       radial_integral_selected=.false.
+       radial_error_valid_here=.false.
+#endif
        naccr = -1
        r2c = 0.0e0_knd
        ir2e = 0
@@ -2827,11 +3582,35 @@ end if
               pint2, pint3, pint4, norme, pnormint, ipnormint, &
               coefme, coefmo)
        end if
+#ifdef USE_QUAD
+       radial_error_valid_here=.false.
+       if(radial_quadrature_mode==1 .and. &
+           .not.(radial_quadrature_even_only==1 .and. mod(l-m,2)==1)) then
+         radial_error_slot=radial_quadrature_cache_index
+         if(radial_error_slot>0 .and. pint_exact_sums_enabled()) then
+           if(pint_cache(radial_error_slot)%valid .and. pint_cache(radial_error_slot)%moment_errors_valid) then
+             if(pint_cache(radial_error_slot)%m==m .and. pint_cache(radial_error_slot)%c==c .and. &
+                 pint_cache(radial_error_slot)%x1==x1 .and. pint_cache(radial_error_slot)%limint==pint_available .and. &
+                 pint_cache(radial_error_slot)%ndec==ndec .and. pint_cache(radial_error_slot)%ngau==65 .and. &
+                 pint_cache(radial_error_slot)%ngqs==10 .and. pint_cache(radial_error_slot)%quadrature_rule==1) then
+               call r2int_with_quadrature_error(l,m,c,x,limint,limd,ndec,maxd,enr,d01,id01, &
+                   maxint,maxmp,maxlp,radial_error_slot,norme,pnormint,ipnormint,coefme,coefmo, &
+                   pint1,pint2,pint3,pint4,r2ic,ir2ie,r2dic,ir2die,jint,coefn,icoefn, &
+                   radial_value_error,radial_derivative_error,radial_error_valid_here)
+             end if
+           end if
+         end if
+       end if
+       if(.not.radial_error_valid_here) then
+#endif
        call r2int(l, m, c, x, limint, ndec, maxd, enr, d01, id01, &
              maxint, maxmp, maxlp, rpint1, rpint2, pint1, pint2, &
              pint3, pint4, norme, pnormint, ipnormint, coefme, &
              coefmo, r2ic, ir2ie, r2dic, ir2die, jint, coefn, &
              icoefn)
+#ifdef USE_QUAD
+       end if
+#endif
        iopint = 2
        if(jint > jintm) jintm = jint
        wronca = r1c * r2dic * 10.0e0_knd ** (ir1e+ir2die)
@@ -2853,6 +3632,9 @@ end if
         if(naccint >= naccr) then
         naccr = naccint
         r2c = r2ic
+#ifdef USE_QUAD
+        radial_integral_selected=.true.
+#endif
         ir2e = ir2ie
         r2dc = r2dic
         ir2de = ir2die
@@ -2969,6 +3751,9 @@ end if
        if(naccleg <= naccr) go to 320
        naccr = naccleg
        r2c = r2lc
+#ifdef USE_QUAD
+        radial_integral_selected=.false.
+#endif
        ir2e = ir2le
        r2dc = r2dlc
        ir2de = ir2dle
@@ -3070,6 +3855,9 @@ end if
        naccr = naccneu
        iopneu = 2
        r2c = r2nc
+#ifdef USE_QUAD
+        radial_integral_selected=.false.
+#endif
        ir2e = ir2ne
        r2dc = r2dnc
        ir2de = ir2dne
@@ -3345,6 +4133,9 @@ end if
            nacciop == 0)) then
         naccr = naccetas
         r2c = r2ec
+#ifdef USE_QUAD
+        radial_integral_selected=.false.
+#endif
         ir2e = ir2ee
         r2dc = r2dec
         ir2de = ir2dee
@@ -3442,6 +4233,20 @@ end if
        r2dc = 0.0e0_knd
        ir2de = 0
 680      continue
+#ifdef USE_QUAD
+       if(radial_quadrature_count==lnum .and. mi==1 .and. ioprad==2) then
+         radial_quadrature_errors(li,:)=0.0_knd
+         radial_quadrature_valid(li)=1
+         if(radial_integral_selected) then
+           radial_quadrature_valid(li)=0
+           if(radial_error_valid_here) then
+             radial_quadrature_errors(li,:)=[radial_value_error,radial_derivative_error]
+             radial_quadrature_valid(li)=1
+           end if
+         end if
+         if(radial_quadrature_even_only==1 .and. mod(l-m,2)==1) radial_quadrature_valid(li)=0
+       end if
+#endif
 if (output) then
        if(nacce /= 1) chr = 'w'
        if(nacce == 1) chr = 'e'
@@ -7377,7 +8182,8 @@ end if
 !
     subroutine pint (c, m, lnum, x1, limint, maxint, maxlp, maxmp, ndec, &
             wg, xg, ngau, ngqs, rpint1, rpint2, pint1, pint2, &
-            pint3, pint4, norme, pnorm, ipnorm, coefme, coefmo, use_geometry_cache, resume_lim)
+            pint3, pint4, norme, pnorm, ipnorm, coefme, coefmo, use_geometry_cache, resume_lim, &
+            moment_errors, moment_error_prefix, moment_errors_valid)
     use iso_c_binding, only: c_int
 !
 !  purpose:     To calculate integrals of the product of associated
@@ -7451,16 +8257,23 @@ end if
 !  integer arrays
     dimension norme(maxmp), ipnorm(maxlp)
     logical, optional, intent(in) :: use_geometry_cache
-    integer, optional, intent(in) :: resume_lim
+    integer, optional, intent(in) :: resume_lim, moment_error_prefix
+    real(knd), optional, intent(inout) :: moment_errors(:,:)
+    logical, optional, intent(out) :: moment_errors_valid
     logical :: reuse_geometry, reuse_kernels, store_kernels, need_new_integrals
     integer :: geometry_index, geometry_node, cached_degrees, prior_odd
     type(pint_geometry_entry), pointer :: geometry_entry
 #ifdef USE_QUAD
     logical :: parity_integrals, exact_integrals
     integer :: recurrence_limit, required_degrees, extra_odd
+    integer :: coarse_prefix, coarse_node, coarse_weight_index, coarse_status
+    real(knd), allocatable :: coarse_kernels(:,:)
+    real(knd) :: mapped_measure, coarse_weight_ratio
+    logical :: paired_geometry_complete
     real(knd) :: parity_forward(maxint), parity_diagonal(maxint), parity_backward(maxint), eta_squared
 #endif
 !
+    if(present(moment_errors_valid)) moment_errors_valid=.false.
     x1sm1 = x1 * (x1 + 2.0e0_knd)
     dec = 10.0e0_knd ** (-ndec - 1)
     amo2 = 0.5e0_knd * m
@@ -7593,7 +8406,11 @@ end if
     cached_degrees = 0
     reuse_kernels = .false.
     store_kernels = .false.
-    if(reuse_geometry .and. need_new_integrals) &
+    if(reuse_geometry .and. (need_new_integrals &
+#ifdef USE_QUAD
+        .or. (radial_quadrature_mode==1 .and. present(moment_errors)) &
+#endif
+        )) &
         call prepare_pint_geometry(m, x1, ndec, ngau, ngqs, wg, xg, &
         step1, step2, x1sm1, dec, twomi, alpha, beta, lim, geometry_index)
     if(geometry_index > 0) then
@@ -7685,6 +8502,10 @@ end if
         coefo = geometry_entry%geometry(4, geometry_node)
       else
       etai = etcoef1 + xg(i) * etcoef2
+#ifdef USE_QUAD
+      if(radial_quadrature_mode==1) &
+          call map_radial_quadrature_node(etal,etau,xg(i),x1sm1,etai,mapped_measure)
+#endif
       etais = etai * etai
       etaim1 = 1.0e0_knd - etais
       argb = x1sm1 + etais
@@ -7697,7 +8518,15 @@ end if
       window_power = window_base ** amo2
 #endif
       coef = step * window_power
-      if(coef < dec) go to 190
+#ifdef USE_QUAD
+      if(radial_quadrature_mode==1) then
+        coef=mapped_measure*window_power
+      else
+#endif
+        if(coef < dec) go to 190
+#ifdef USE_QUAD
+      end if
+#endif
       sargb = sqrt(argb)
       coefo = 1.0e0_knd / sargb
       end if
@@ -7861,6 +8690,40 @@ end if
       geometry_entry%kernel_c = c
       geometry_entry%kernels_valid = .true.
     end if
+#ifdef USE_QUAD
+    if(radial_quadrature_mode==1 .and. present(moment_errors) .and. present(moment_errors_valid)) then
+      paired_geometry_complete=.false.
+      if(exact_integrals .and. ngau==65 .and. ngqs==10) then
+        if(geometry_entry%nodes==650 .and. geometry_entry%kernels_valid) then
+          paired_geometry_complete=size(moment_errors,1)>=maxint .and. size(moment_errors,2)==6 .and. &
+              associated(radial_quadrature_panel_proc)
+        end if
+      end if
+      if(paired_geometry_complete) then
+        allocate(coarse_kernels(3,650),stat=coarse_status)
+        if(coarse_status==0) then
+          do coarse_node=1,650
+            coarse_weight_index=mod(coarse_node-1,65)+1
+            coarse_weight_ratio=radial_gauss_weights(coarse_weight_index)/radial_kronrod_weights(coarse_weight_index)
+            coarse_kernels(:,coarse_node)=geometry_entry%kernels(:,coarse_node)*coarse_weight_ratio
+          end do
+          coarse_prefix=0
+          if(present(moment_error_prefix)) then
+            if(moment_error_prefix>0) coarse_prefix=2*((moment_error_prefix+1)/2)+1
+          end if
+          coarse_status=1
+          if(coarse_prefix<2*((lim+1)/2)+1) then
+            coarse_status=radial_quadrature_panel_proc(geometry_entry%basis,geometry_entry%kernels, &
+                coarse_kernels,int(size(geometry_entry%basis,1),c_int),650_c_int,65_c_int, &
+                int(merge(1,coarse_prefix+2,coarse_prefix<1),c_int),int(lim+2,c_int), &
+                int(required_degrees-1,c_int),moment_errors(:,3),moment_errors(:,4),moment_errors(:,6))
+          end if
+          moment_errors_valid=coarse_status==1
+
+        end if
+      end if
+    end if
+#endif
 #ifdef USE_QUAD
     if(parity_integrals) then
       ! Recover eta times odd degree offsets by integrating the same recurrence.
