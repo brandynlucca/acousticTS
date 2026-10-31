@@ -269,7 +269,7 @@ std::complex<T> psms_public_field(
     T theta_body, T theta_scatter, T phi_body, T phi_scatter,
     T density_body, T density_sw, const std::vector<T>& nodes,
     const std::vector<T>& weights, const std::string& method,
-    bool backscatter, bool adaptive, bool vectorized
+    bool backscatter, bool adaptive, bool vectorized, bool retain_geometry_orders = true
 ) {
     // Full solutions share packed native arithmetic in fixed and adaptive evaluations.
     const bool fluid = method == "Amn_fluid_gas" ||
@@ -285,7 +285,7 @@ std::complex<T> psms_public_field(
                 if (m_seed < 0 || n_seed < m_seed)
                     throw std::invalid_argument("Invalid spheroidal modal support.");
                 if (rigid_or_release) return psms_adaptive_rigid_release_field(chi_sw, xi, incidence,
-                    phi_scatter - phi_body, method == "Amn_fixed_rigid");
+                    phi_scatter - phi_body, method == "Amn_fixed_rigid", retain_geometry_orders);
                 return psms_gas_support::fields(chi_sw, chi_body, xi,
                     std::vector<int>{n_seed}, density_body / density_sw,
                     std::vector<SpheroidalDirection<T>>{incidence},
@@ -398,7 +398,7 @@ Rcpp::ComplexVector prolate_spheroid_fbs(
                 static_cast<acousticts_quad_t>(density_body),
                 static_cast<acousticts_quad_t>(density_sw),
                 nodes_q, weights_q,
-                Amn_method, is_backscatter, adaptive, vectorized
+                Amn_method, is_backscatter, adaptive, vectorized, n_freq > 1
             );
             f_bs_out[f] = to_Rcomplex(fbs);
         }
@@ -469,7 +469,7 @@ Rcpp::ComplexMatrix prolate_spheroid_rigid_release_batch(
             static_cast<acousticts_quad_t>(xi),
             incidences, rigid_flags,
             static_cast<acousticts_quad_t>(phi_scatter) -
-                static_cast<acousticts_quad_t>(phi_body));
+                static_cast<acousticts_quad_t>(phi_body), n_freq > 1);
         for (int case_index = 0; case_index < n_case; ++case_index)
             output(f, case_index) = to_Rcomplex(fields[case_index]);
     }

@@ -767,6 +767,22 @@ module prolate_swf
     end do
   end function
 
+#ifdef USE_QUAD
+  subroutine profcn_retain_geometry_order_quad(order) bind(C)
+    use iso_c_binding, only: c_int
+    implicit none
+    integer(c_int), value, intent(in) :: order
+    type(pint_geometry_entry) :: empty
+    integer :: slot
+
+    ! Release completed orders while retaining the current degree-refinement tables.
+    do slot = 1, size(pint_geometry_cache)
+      if(pint_geometry_cache(slot)%valid .and. pint_geometry_cache(slot)%m /= order) &
+          pint_geometry_cache(slot) = empty
+    end do
+  end subroutine
+#endif
+
   subroutine prepare_pint_geometry(m, x1, ndec, ngau, ngqs, wg, xg, &
       step1, step2, x1sm1, dec, twomi, alpha, beta, lim, idx)
     integer, intent(in) :: m, ndec, ngau, ngqs, lim
