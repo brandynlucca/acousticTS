@@ -75,6 +75,9 @@ module prolate_swf
 
  type :: pint_cache_entry
    logical :: valid = .false.
+#ifdef USE_QUAD
+   logical :: parity_integrals = .false.
+#endif
    integer(int64) :: bytes = 0
    integer :: m = -1, lnum = 0, limint = 0, ndec = 0, ngau = 0, ngqs = 0
    real(knd) :: c = 0.0_knd, x1 = 0.0_knd, coefme = 0.0_knd, coefmo = 0.0_knd
@@ -796,11 +799,22 @@ module prolate_swf
     real(knd) :: etal, etau, step, etcoef1, etcoef2, etai, etaim1, argb
     real(knd) :: window_base, window_power, legendre_power, coef, sargb
     real(knd), allocatable :: expanded_basis(:,:)
+#ifdef USE_QUAD
+    real(knd) :: parity_forward(size(alpha)), parity_diagonal(size(alpha))
+    real(knd) :: parity_backward(size(alpha)), eta_squared
+#endif
     character(len=256) :: allocation_message
 
     ! Geometry and recurrence prefixes are independent of frequency and final degree.
     real_bytes = storage_size(x1) / 8
+#ifdef USE_QUAD
+    idx = 0
+    if(lim < 0 .or. lim > huge(lim) - 5) return
+    if(lim > size(alpha) - 4 .or. lim > size(beta) - 4) return
+    requested_degrees = 2 * ((lim + 1) / 2) + 4
+#else
     requested_degrees = 2 * ((lim + 1) / 2) + 2
+#endif
     do idx = 1, size(pint_geometry_cache)
       entry => pint_geometry_cache(idx)
       if(.not. entry%valid) cycle
@@ -921,7 +935,11 @@ module prolate_swf
         allocate(expanded_basis(capacity, entry%nodes), &
             stat=allocation_status, errmsg=allocation_message)
         if(allocation_status == 0) then
+#ifdef USE_QUAD
+          expanded_basis(1:previous_capacity - 1:2,:) = entry%basis(1:previous_capacity - 1:2,:)
+#else
           expanded_basis(1:previous_capacity,:) = entry%basis
+#endif
           call move_alloc(expanded_basis, entry%basis)
         end if
       end if
@@ -930,6 +948,30 @@ module prolate_swf
     ! Extend the cached prefix using the unchanged recurrence in native precision.
     retained_degrees = min(requested_degrees, size(entry%basis, 1))
     if(retained_degrees <= entry%degrees) return
+#ifdef USE_QUAD
+    ! Eliminate alternate degrees from the recurrence in DLMF 14.10.3.
+    do degree = 3, retained_degrees - 3, 2
+      parity_forward(degree) = alpha(degree + 1) * alpha(degree)
+      parity_diagonal(degree) = beta(degree + 1) &
+          + alpha(degree + 1) * beta(degree) / alpha(degree - 1)
+      parity_backward(degree) = -alpha(degree + 1) * beta(degree) &
+          * beta(degree - 1) / alpha(degree - 1)
+    end do
+    do node = 1, entry%nodes
+      etai = entry%geometry(1, node)
+      eta_squared = etai * etai
+      if(entry%degrees < 2) entry%basis(1, node) = entry%geometry(5, node)
+      if(entry%degrees < 4 .and. retained_degrees >= 4) then
+        entry%basis(3, node) = (alpha(2) * alpha(1) * eta_squared + beta(2)) &
+            * entry%basis(1, node)
+      end if
+      do degree = max(3, entry%degrees - 1), retained_degrees - 3, 2
+        entry%basis(degree + 2, node) = (parity_forward(degree) * eta_squared &
+            + parity_diagonal(degree)) * entry%basis(degree, node) &
+            + parity_backward(degree) * entry%basis(degree - 2, node)
+      end do
+    end do
+#else
     do node = 1, entry%nodes
       etai = entry%geometry(1, node)
       if(entry%degrees == 0) then
@@ -943,6 +985,7 @@ module prolate_swf
             + beta(degree + 1) * entry%basis(degree, node)
       end do
     end do
+#endif
     entry%degrees = retained_degrees
   end subroutine
 
@@ -958,6 +1001,11 @@ module prolate_swf
     integer :: real_bytes, integer_bytes
     integer(int64) :: requested_bytes
     character(len=256) :: allocation_message
+#ifdef USE_QUAD
+    logical :: parity_integrals
+
+    parity_integrals = limint >= 0 .and. limint <= maxint - 4 .and. limint <= huge(limint) - 5
+#endif
 
     ! Radial quadrature is independent of incidence and receive angles.
     do idx = 1, size(pint_cache)
@@ -966,6 +1014,9 @@ module prolate_swf
       if(pint_cache(idx)%c /= c .or. pint_cache(idx)%x1 /= x1) cycle
       if(pint_cache(idx)%limint /= limint .or. pint_cache(idx)%ndec /= ndec) cycle
       if(pint_cache(idx)%ngau /= ngau .or. pint_cache(idx)%ngqs /= ngqs) cycle
+#ifdef USE_QUAD
+      if(pint_cache(idx)%parity_integrals .neqv. parity_integrals) cycle
+#endif
       if(size(pint_cache(idx)%pint1) /= maxint) cycle
       if(size(pint_cache(idx)%pnorm) /= maxlp) cycle
       if(size(pint_cache(idx)%norme) /= maxmp) cycle
@@ -1002,6 +1053,9 @@ module prolate_swf
       if(pint_cache(idx)%m /= m .or. pint_cache(idx)%c /= c) cycle
       if(pint_cache(idx)%x1 /= x1 .or. pint_cache(idx)%ndec /= ndec) cycle
       if(pint_cache(idx)%ngau /= ngau .or. pint_cache(idx)%ngqs /= ngqs) cycle
+#ifdef USE_QUAD
+      if(pint_cache(idx)%parity_integrals .neqv. parity_integrals) cycle
+#endif
       if(pint_cache(idx)%limint > limint .or. &
           pint_cache(idx)%limint <= prefix_limint) cycle
       if(any(pint_cache(idx)%wg /= wg) .or. any(pint_cache(idx)%xg /= xg)) cycle
@@ -1009,6 +1063,11 @@ module prolate_swf
       if(size(pint_cache(idx)%pint1) < prefix_odd .or. &
           size(pint_cache(idx)%pint4) < prefix_odd + 1 .or. &
           maxint < prefix_odd + 1) cycle
+#ifdef USE_QUAD
+      if(parity_integrals) then
+        if(size(pint_cache(idx)%pint4) < prefix_odd + 2 .or. maxint < prefix_odd + 2) cycle
+      end if
+#endif
       prefix_idx = idx
       prefix_limint = pint_cache(idx)%limint
     end do
@@ -1016,7 +1075,15 @@ module prolate_swf
       prefix_odd = 2 * ((prefix_limint + 1) / 2) + 1
       pint1(1:prefix_odd:2) = pint_cache(prefix_idx)%pint1(1:prefix_odd:2)
       pint2(1:prefix_odd:2) = pint_cache(prefix_idx)%pint2(1:prefix_odd:2)
-      pint4(2:prefix_odd + 1:2) = pint_cache(prefix_idx)%pint4(2:prefix_odd + 1:2)
+#ifdef USE_QUAD
+      if(parity_integrals) then
+        pint4(1:prefix_odd + 2) = pint_cache(prefix_idx)%pint4(1:prefix_odd + 2)
+      else
+#endif
+        pint4(2:prefix_odd + 1:2) = pint_cache(prefix_idx)%pint4(2:prefix_odd + 1:2)
+#ifdef USE_QUAD
+      end if
+#endif
     end if
     call pint(c, m, lnum, x1, limint, maxint, maxlp, maxmp, ndec, wg, xg, &
         ngau, ngqs, rpint1, rpint2, pint1, pint2, pint3, pint4, &
@@ -1077,6 +1144,9 @@ module prolate_swf
       entry%ndec = ndec
       entry%ngau = ngau
       entry%ngqs = ngqs
+#ifdef USE_QUAD
+      entry%parity_integrals = parity_integrals
+#endif
       entry%c = c
       entry%x1 = x1
       entry%wg = wg
@@ -7227,11 +7297,26 @@ end if
     logical :: reuse_geometry, reuse_kernels, store_kernels, need_new_integrals
     integer :: geometry_index, geometry_node, cached_degrees, prior_odd
     type(pint_geometry_entry), pointer :: geometry_entry
+#ifdef USE_QUAD
+    logical :: parity_integrals
+    integer :: recurrence_limit, required_degrees, extra_odd
+    real(knd) :: parity_forward(maxint), parity_diagonal(maxint), parity_backward(maxint), eta_squared
+#endif
 !
     x1sm1 = x1 * (x1 + 2.0e0_knd)
     dec = 10.0e0_knd ** (-ndec - 1)
     amo2 = 0.5e0_knd * m
     lim = limint
+#ifdef USE_QUAD
+    ! Keep the original direct calculation when extra parity support cannot fit.
+    parity_integrals = lim >= 0 .and. lim <= maxint - 4 .and. lim <= huge(lim) - 5
+    recurrence_limit = lim + 2
+    required_degrees = 2 * ((lim + 1) / 2) + 2
+    if(parity_integrals) then
+      recurrence_limit = lim + 4
+      required_degrees = required_degrees + 2
+    end if
+#endif
     prior_odd = 0
     if(present(resume_lim)) then
       if(resume_lim > 0) prior_odd = 2 * ((resume_lim + 1) / 2) + 1
@@ -7298,7 +7383,11 @@ end if
     alpha(2) = (twom + 3.0e0_knd) * pnorm(2) / (pnorm(3) * 2.0e0_knd)
     alpha(2) = alpha(2) * 10.0e0_knd ** (ipnorm(2) - ipnorm(3))
     beta(2) = -(twom + 1.0e0_knd) / (twom + 2.0e0_knd)
+#ifdef USE_QUAD
+     do 80 il = 3, recurrence_limit
+#else
      do 80 il = 3, lim + 2
+#endif
      alpha(il) = alpha(il - 2) * (twom + il - 1) * (twom + il + il - 1)* &
      (il - 2) / ((il - 1) * (twom + il) * (twom + il + il - 5))
      beta(il) = -(twom + il - 1) / (twom + il)
@@ -7308,10 +7397,21 @@ end if
      if(il > prior_odd) then
        pint1(il) = 0.0e0_knd
        pint2(il) = 0.0e0_knd
-       pint4(il + 1) = 0.0e0_knd
+#ifdef USE_QUAD
+       if(parity_integrals) then
+         pint4(il) = 0.0_knd
+       else
+#endif
+         pint4(il + 1) = 0.0e0_knd
+#ifdef USE_QUAD
+       end if
+#endif
      end if
      pint3(il + 1) = 0.0e0_knd
 90    continue
+#ifdef USE_QUAD
+    if(parity_integrals .and. need_new_integrals) pint4(required_degrees - 1) = 0.0_knd
+#endif
 !
 !  calculation of the scaling exponents for the spherical Bessel
 !  functions required for the four types of integrals
@@ -7328,6 +7428,9 @@ end if
     reuse_geometry = .false.
 #endif
     if(present(use_geometry_cache)) reuse_geometry = use_geometry_cache
+#ifdef USE_QUAD
+    if(.not. parity_integrals) reuse_geometry = .false.
+#endif
     geometry_index = 0
     cached_degrees = 0
     reuse_kernels = .false.
@@ -7337,12 +7440,26 @@ end if
         step1, step2, x1sm1, dec, twomi, alpha, beta, lim, geometry_index)
     if(geometry_index > 0) then
       geometry_entry => pint_geometry_cache(geometry_index)
+#ifdef USE_QUAD
+      cached_degrees = min(geometry_entry%degrees, required_degrees)
+#else
       cached_degrees = min(geometry_entry%degrees, 2 * ((lim + 1) / 2) + 2)
+#endif
       if(allocated(geometry_entry%kernels)) then
         reuse_kernels = geometry_entry%kernels_valid .and. geometry_entry%kernel_c == c
         store_kernels = .not. reuse_kernels
       end if
     end if
+#ifdef USE_QUAD
+    ! Reuse eliminated recurrence coefficients only for an uncached basis tail.
+    if(parity_integrals .and. need_new_integrals .and. cached_degrees < required_degrees) then
+      do il = 3, required_degrees - 3, 2
+        parity_forward(il) = alpha(il + 1) * alpha(il)
+        parity_diagonal(il) = beta(il + 1) + alpha(il + 1) * beta(il) / alpha(il - 1)
+        parity_backward(il) = -alpha(il + 1) * beta(il) * beta(il - 1) / alpha(il - 1)
+      end do
+    end if
+#endif
     geometry_node = 0
     arg = c * sqrt(x1 * (x1 + 2.0e0_knd))
     call paired_sine_cosine(arg, sine_value, cosine_value)
@@ -7442,13 +7559,81 @@ end if
         sneu3 = sneun(m + 3) * neumann_shift3
         coef1 = coef * sneu1 * wg(i)
         coef2 = coef * coefo * sneu2 * wg(i)
-        coef4 = coef * coefo * coefo * etai * sneu3 * wg(i)
+#ifdef USE_QUAD
+        if(parity_integrals) then
+          coef4 = coef * coefo * coefo * sneu3 * wg(i)
+        else
+#endif
+          coef4 = coef * coefo * coefo * etai * sneu3 * wg(i)
+#ifdef USE_QUAD
+        end if
+#endif
         if(store_kernels) geometry_entry%kernels(:, geometry_node) = [coef1, coef2, coef4]
       else
         coef1 = geometry_entry%kernels(1, geometry_node)
         coef2 = geometry_entry%kernels(2, geometry_node)
         coef4 = geometry_entry%kernels(3, geometry_node)
       end if
+#ifdef USE_QUAD
+      if(parity_integrals) then
+        ! Only even degree offsets enter the first two integral families.
+        if(cached_degrees >= required_degrees) then
+          if(prior_odd < 1) then
+            pint1(1) = pint1(1) + coef1 * geometry_entry%basis(1, geometry_node)
+            pint2(1) = pint2(1) + coef2 * geometry_entry%basis(1, geometry_node)
+            pint4(1) = pint4(1) + coef4 * geometry_entry%basis(1, geometry_node)
+          end if
+          do il = max(2, prior_odd + 1), lim + 1, 2
+            pint1(il + 1) = pint1(il + 1) + coef1 * geometry_entry%basis(il + 1, geometry_node)
+            pint2(il + 1) = pint2(il + 1) + coef2 * geometry_entry%basis(il + 1, geometry_node)
+            pint4(il + 1) = pint4(il + 1) + coef4 * geometry_entry%basis(il + 1, geometry_node)
+          end do
+          extra_odd = required_degrees - 1
+          pint4(extra_odd) = pint4(extra_odd) + coef4 * geometry_entry%basis(extra_odd, geometry_node)
+        else
+          ! Continue the same recurrence when storage holds only a prefix or no table.
+          eta_squared = etai * etai
+          if(cached_degrees >= 2) then
+            p(1:cached_degrees - 1:2) = geometry_entry%basis(1:cached_degrees - 1:2, geometry_node)
+          else
+            legendre_power = etaim1 ** (m / 2)
+            if(mod(m, 2) /= 0) legendre_power = legendre_power * sqrt(etaim1)
+            p(1) = twomi * legendre_power
+          end if
+          if(prior_odd < 1) then
+            pint1(1) = pint1(1) + coef1 * p(1)
+            pint2(1) = pint2(1) + coef2 * p(1)
+            pint4(1) = pint4(1) + coef4 * p(1)
+          end if
+          do il = 2, lim + 1, 2
+            if(il + 1 > cached_degrees) then
+              if(il == 2) then
+                p(3) = (alpha(2) * alpha(1) * eta_squared + beta(2)) * p(1)
+              else
+                p(il + 1) = (parity_forward(il - 1) * eta_squared + parity_diagonal(il - 1)) &
+                    * p(il - 1) + parity_backward(il - 1) * p(il - 3)
+              end if
+            end if
+            if(il + 1 > prior_odd) then
+              pint1(il + 1) = pint1(il + 1) + coef1 * p(il + 1)
+              pint2(il + 1) = pint2(il + 1) + coef2 * p(il + 1)
+              pint4(il + 1) = pint4(il + 1) + coef4 * p(il + 1)
+            end if
+          end do
+          extra_odd = required_degrees - 1
+          if(extra_odd > cached_degrees) then
+            if(extra_odd == 3) then
+              p(3) = (alpha(2) * alpha(1) * eta_squared + beta(2)) * p(1)
+            else
+              p(extra_odd) = (parity_forward(extra_odd - 2) * eta_squared &
+                  + parity_diagonal(extra_odd - 2)) * p(extra_odd - 2) &
+                  + parity_backward(extra_odd - 2) * p(extra_odd - 4)
+            end if
+          end if
+          pint4(extra_odd) = pint4(extra_odd) + coef4 * p(extra_odd)
+        end if
+      else
+#endif
       if(cached_degrees >= 2 * ((lim + 1) / 2) + 2) then
         ! Sum new integrals directly from the complete cached degree block.
         if(prior_odd < 1) then
@@ -7493,6 +7678,9 @@ end if
        end if
 160      continue
       end if
+#ifdef USE_QUAD
+      end if
+#endif
 170     continue
 180    continue
 190   continue
@@ -7500,6 +7688,14 @@ end if
       geometry_entry%kernel_c = c
       geometry_entry%kernels_valid = .true.
     end if
+#ifdef USE_QUAD
+    if(parity_integrals) then
+      ! Recover eta times odd degree offsets by integrating the same recurrence.
+      do il = 1, required_degrees - 3, 2
+        pint4(il + 1) = (pint4(il + 2) - beta(il + 1) * pint4(il)) / alpha(il + 1)
+      end do
+    end if
+#endif
      do 200 il = 1, lim, 2
      pint3(il + 1) = (pint2(il + 2) - beta(il + 1) * pint2(il)) &
            /alpha(il + 1)
