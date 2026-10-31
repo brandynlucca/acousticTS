@@ -129,6 +129,13 @@ module prolate_swf
      real(knd), value :: argument
      real(knd), intent(out) :: sine, cosine
    end subroutine
+   function quad_fraction_exponent(argument, power) bind(C, name="frexpq") result(mantissa)
+     use iso_c_binding, only: c_int
+     import knd
+     real(knd), value :: argument
+     integer(c_int), intent(out) :: power
+     real(knd) :: mantissa
+   end function
  end interface
 #endif
 
@@ -5625,6 +5632,28 @@ end if
     value = scale(mantissa, int(shift))
   end function normalization_align
 
+  subroutine normalization_split(value, mantissa, power)
+#ifdef USE_QUAD
+    use iso_c_binding, only: c_int
+#endif
+    implicit none
+    real(knd), intent(in) :: value
+    real(knd), intent(out) :: mantissa
+    integer, intent(out) :: power
+#ifdef USE_QUAD
+    integer(c_int) :: quad_power
+#endif
+
+    ! Extract both exact binary components in one quad library call.
+#ifdef USE_QUAD
+    mantissa = quad_fraction_exponent(value, quad_power)
+    power = int(quad_power, kind(power))
+#else
+    mantissa = fraction(value)
+    power = exponent(value)
+#endif
+  end subroutine normalization_split
+
   subroutine normalization_square_step(mantissa, power, ratio, weight, upward, valid)
     use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
     implicit none
@@ -5651,10 +5680,8 @@ end if
     end if
 
     ! Form ratio squares from bounded fractions without overflowing the ratio.
-    ratio_fraction = fraction(abs(ratio))
-    ratio_power = exponent(abs(ratio))
-    weight_fraction = fraction(weight)
-    weight_power = exponent(weight)
+    call normalization_split(abs(ratio), ratio_fraction, ratio_power)
+    call normalization_split(weight, weight_fraction, weight_power)
     if(upward) then
       product = mantissa * ratio_fraction * ratio_fraction * weight_fraction
       power = power + 2_int64 * ratio_power + weight_power
@@ -5663,8 +5690,7 @@ end if
       power = power - 2_int64 * ratio_power + weight_power
     end if
     if(.not. ieee_is_finite(product) .or. product <= 0.0_knd) return
-    product_power = exponent(product)
-    mantissa = fraction(product)
+    call normalization_split(product, mantissa, product_power)
     power = power + product_power
     valid = .true.
   end subroutine normalization_square_step
@@ -5693,8 +5719,8 @@ end if
       correction = correction + ((aligned - updated) + total)
     end if
     total = updated
-    renormalize = exponent(total)
-    total = fraction(total)
+    call normalization_split(total, updated, renormalize)
+    total = updated
     correction = scale(correction, -renormalize)
     total_power = total_power + renormalize
   end subroutine normalization_add_square
@@ -5730,8 +5756,12 @@ end if
     ! Include every available forward coefficient, including later oscillating lobes.
     do index = seed_index + 1, last_ratio
       j = 2 * index + parity
-      weight = (factors(3, j) / factors(1, j)) * &
-               (factors(4, j) / factors(2, j)) * (factors(5, j) / factors(6, j))
+      if(size(factors, 1) >= 11) then
+        weight = factors(10, j)
+      else
+        weight = (factors(3, j) / factors(1, j)) * &
+                 (factors(4, j) / factors(2, j)) * (factors(5, j) / factors(6, j))
+      end if
       call normalization_square_step(term, term_power, enr(index), weight, .true., valid)
       if(.not. valid) go to 900
       call normalization_add_square(total, correction, total_power, term, term_power)
@@ -5749,8 +5779,12 @@ end if
     term_power = 1_int64
     do index = seed_index, 1, -1
       j = 2 * index + parity
-      weight = (factors(1, j) / factors(3, j)) * &
-               (factors(2, j) / factors(4, j)) * (factors(6, j) / factors(5, j))
+      if(size(factors, 1) >= 11) then
+        weight = factors(11, j)
+      else
+        weight = (factors(1, j) / factors(3, j)) * &
+                 (factors(2, j) / factors(4, j)) * (factors(6, j) / factors(5, j))
+      end if
       call normalization_square_step(term, term_power, enr(index), weight, .false., valid)
       if(.not. valid) go to 900
       call normalization_add_square(total, correction, total_power, term, term_power)
@@ -5759,8 +5793,8 @@ end if
     ! Convert the packed binary sum to the existing decimal normalization contract.
     total = total + correction
     if(.not. ieee_is_finite(total) .or. total <= 0.0_knd) go to 900
-    total_power = total_power + exponent(total)
-    dmsnorm = fraction(total)
+    call normalization_split(total, dmsnorm, decimal_shift)
+    total_power = total_power + decimal_shift
     remaining = total_power
     decimal_power = 0_int64
     if(remaining < 0_int64) go to 900
@@ -5877,7 +5911,7 @@ end if
       if(size(normalization_factors, 2) < limd) deallocate(normalization_factors)
     end if
     if(.not. allocated(normalization_factors)) then
-      allocate(normalization_factors(9, max(limd, 2 * maxd)))
+      allocate(normalization_factors(11, max(limd, 2 * maxd)))
       normalization_count = 0
     end if
     if(normalization_order /= m) normalization_count = 0
@@ -5894,6 +5928,17 @@ end if
       normalization_factors(7, j) = aj * (aj - 1.0_knd)
       normalization_factors(8, j) = aj * (aj - 1.0_knd) * (aj2 + rm2p1)
       normalization_factors(9, j) = (aj + rm2 - 1.0_knd) * (aj + rm2)
+      ! Reuse complete norm weights without changing the division or product order.
+      if(j >= 2) then
+        normalization_factors(10, j) = &
+            (normalization_factors(3, j) / normalization_factors(1, j)) * &
+            (normalization_factors(4, j) / normalization_factors(2, j)) * &
+            (normalization_factors(5, j) / normalization_factors(6, j))
+        normalization_factors(11, j) = &
+            (normalization_factors(1, j) / normalization_factors(3, j)) * &
+            (normalization_factors(2, j) / normalization_factors(4, j)) * &
+            (normalization_factors(6, j) / normalization_factors(5, j))
+      end if
     end do
     normalization_count = max(normalization_count, limd)
     ! Reuse coefficient-conversion factors shared by every degree of each parity.
