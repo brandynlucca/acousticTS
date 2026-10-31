@@ -2770,16 +2770,18 @@ template<typename T> struct LegendreWorkspace {
     std::vector<T> diagonal_factors, first_factors, second_factors;
 
     void prepare(int order, size_t count) {
-        if (order == m && count == support) return;
-        m = order;
+        const size_t first = order == m ? first_factors.size() : 0;
         support = count;
-        diagonal_factors.resize(m);
+        if (order == m && count <= first) return;
+        m = order;
+        const size_t diagonal_first = diagonal_factors.size();
+        if (diagonal_first < size_t(m)) diagonal_factors.resize(m);
         first_factors.resize(count);
         second_factors.resize(count);
-        // Recurrence factors depend on degree and order, never on the quadrature node.
-        for (int index = 1; index <= m; ++index)
+        // Reuse order-independent diagonal factors and each initialized same-order prefix.
+        for (int index = int(diagonal_first) + 1; index <= m; ++index)
             diagonal_factors[index - 1] = precsqrt((T(2) * index + T(1)) / (T(2) * index));
-        for (size_t index = 0; index < count; ++index) {
+        for (size_t index = first; index < count; ++index) {
             const T degree = T(m) + T(index) + T(1);
             const T denominator = degree * degree - T(m) * T(m);
             first_factors[index] = precsqrt((T(4) * degree * degree - T(1)) / denominator);
@@ -2787,6 +2789,8 @@ template<typename T> struct LegendreWorkspace {
                 ((degree - T(1)) * (degree - T(1)) - T(m) * T(m))) /
                 ((T(2) * degree - T(3)) * denominator));
         }
+        // Scaling constants depend only on the arithmetic type.
+        if (scale_step != 0) return;
         scale_step = std::numeric_limits<T>::max_exponent10 / 2;
 #if ACOUSTICTS_HAVE_QUADMATH
         if constexpr (std::is_same_v<T, acousticts_quad_t>) scale_step = FLT128_MAX_10_EXP / 2;

@@ -395,6 +395,50 @@ context("Automatic spheroidal boundary convergence") {
 #endif
     }
 
+    test_that("Ferrers workspaces preserve active traces when cached support shrinks") {
+        auto check = [](auto scalar) {
+            using T = decltype(scalar);
+            using namespace psms_automatic;
+            LegendreWorkspace<T> reused;
+            const std::array<std::pair<int, size_t>, 9> requests = {{
+                {0, 5}, {0, 17}, {0, 3}, {0, 11}, {4, 7},
+                {4, 19}, {1, 6}, {1, 2}, {4, 5}}};
+            for (const auto& request : requests) {
+                const int m = request.first;
+                const size_t count = request.second;
+                LegendreWorkspace<T> fresh;
+                reused.prepare(m, count);
+                fresh.prepare(m, count);
+                expect_true(bool(reused.m == m && reused.support == count));
+                expect_true(bool(reused.scale_step == fresh.scale_step));
+                expect_true(bool(reused.upper_scale == fresh.upper_scale));
+                expect_true(bool(reused.lower_scale == fresh.lower_scale));
+                for (int index = 0; index < m; ++index)
+                    expect_true(bool(reused.diagonal_factors[index] == fresh.diagonal_factors[index]));
+                for (size_t index = 0; index < count; ++index) {
+                    expect_true(bool(reused.first_factors[index] == fresh.first_factors[index]));
+                    expect_true(bool(reused.second_factors[index] == fresh.second_factors[index]));
+                }
+                std::array<std::vector<std::complex<T>>, 6> traces;
+                for (size_t trace = 0; trace < traces.size(); ++trace)
+                    for (size_t index = 0; index < count; ++index)
+                        traces[trace].emplace_back(T(index + 1) / T(trace + 2),
+                            -T(trace + 1) / T(index + 2));
+                for (T cosine : {T(-1), T(-0.75), T(0), T(0.6), T(1)}) {
+                    const auto direction = psms_direction_from_cosine(cosine);
+                    expect_true(bool(normalized_ferrers_values(m, direction, count, reused) ==
+                        normalized_ferrers_values(m, direction, count, fresh)));
+                    expect_true(bool(evaluate_traces(m, cosine, traces, reused) ==
+                        evaluate_traces(m, cosine, traces, fresh)));
+                }
+            }
+        };
+        check(double(0));
+#if ACOUSTICTS_HAVE_QUADMATH
+        check(acousticts_quad_t(0));
+#endif
+    }
+
     test_that("native directions preserve near-axis and adjacent broadside Ferrers values") {
         auto check = [](auto scalar) {
             using T = decltype(scalar);
