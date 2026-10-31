@@ -136,6 +136,22 @@ module prolate_swf
  type(ieee_round_type), save :: bouwkamp_rounding = ieee_nearest
 
 #ifdef USE_QUAD
+ abstract interface
+   function pint_exact_available_callback() bind(C) result(available)
+     use iso_c_binding, only: c_int
+     integer(c_int) :: available
+   end function
+   subroutine pint_exact_sum_callback(basis, kernels, degree_capacity, nodes, &
+       first, last, extra, pint1, pint2, pint4) bind(C)
+     use iso_c_binding, only: c_int
+     import knd
+     integer(c_int), value :: degree_capacity, nodes, first, last, extra
+     real(knd), intent(in) :: basis(*), kernels(*)
+     real(knd), intent(inout) :: pint1(*), pint2(*), pint4(*)
+   end subroutine
+ end interface
+ procedure(pint_exact_available_callback), pointer, save :: pint_exact_available_proc => null()
+ procedure(pint_exact_sum_callback), pointer, save :: pint_exact_sum_proc => null()
  interface
    subroutine quad_sincos(argument, sine, cosine) bind(C, name="sincosq")
      import knd
@@ -154,6 +170,25 @@ module prolate_swf
 #endif
 
  contains
+
+#ifdef USE_QUAD
+  subroutine profcn_set_integral_sums_quad(available_callback, sum_callback) bind(C)
+    use iso_c_binding, only: c_funptr, c_f_procpointer
+    type(c_funptr), value :: available_callback, sum_callback
+
+    ! Optional callbacks preserve standalone Fortran linkage and the original fallback.
+    call c_f_procpointer(available_callback, pint_exact_available_proc)
+    call c_f_procpointer(sum_callback, pint_exact_sum_proc)
+  end subroutine
+
+  logical function pint_exact_sums_enabled() result(enabled)
+    use iso_c_binding, only: c_int
+    enabled = .false.
+    if(.not. associated(pint_exact_available_proc)) return
+    if(.not. associated(pint_exact_sum_proc)) return
+    enabled = pint_exact_available_proc() == 1_c_int
+  end function
+#endif
 
   subroutine prepare_bouwkamp_cache(c, m)
     real(knd), intent(in) :: c
@@ -1441,6 +1476,100 @@ module prolate_swf
     end do
   end subroutine
 
+#ifdef USE_QUAD
+  logical function audit_pint_roundoff(m, lim, observed, original, pnorm, ipnorm, basis, kernels) result(agrees)
+    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
+    integer, intent(in) :: m, lim, ipnorm(:)
+    real(knd), intent(in) :: observed(:,:), original(:,:), pnorm(:), basis(:,:), kernels(:,:)
+    real(knd) :: bounds(size(observed,1),6), alpha(size(observed,1)), beta(size(observed,1))
+    real(knd) :: absolute_sum, magnitude, allowance, denominator, factor, roundoff
+    real(knd) :: twom, first_scale, second_scale
+    integer :: degree, node, kernel, column, last_odd, extra_odd, row, numerator, divisor
+
+    ! Bound summation differences by absolute products, including cancellation and underflow.
+    agrees = .false.
+    last_odd = 2 * ((lim + 1) / 2) + 1
+    extra_odd = last_odd + 2
+    if(size(basis,1) < extra_odd .or. extra_odd > size(observed,1)) return
+    if(size(basis,2) /= size(kernels,2) .or. size(kernels,1) /= 3) return
+    if(any(.not. ieee_is_finite(observed)) .or. any(.not. ieee_is_finite(original))) return
+    bounds = 0.0_knd
+    roundoff = (8.0_knd * size(kernels,2) + 32.0_knd) * epsilon(1.0_knd)
+    if(roundoff >= 0.25_knd) return
+    do degree = 1, extra_odd, 2
+      do kernel = 1, 3
+        if(degree == extra_odd .and. kernel < 3) cycle
+        column = kernel + 2
+        if(kernel == 3) column = 6
+        absolute_sum = 0.0_knd
+        do node = 1, size(kernels,2)
+          absolute_sum = absolute_sum + &
+              abs(basis(degree,node) * kernels(kernel,node))
+        end do
+        if(.not. ieee_is_finite(absolute_sum)) return
+        ! With epsilon=2u this exceeds both gamma(2N) bounds and rounding of the L1 sum.
+        bounds(degree,column) = nearest(roundoff * absolute_sum + &
+            (8.0_knd * size(kernels,2) + 32.0_knd) * tiny(1.0_knd), 1.0_knd)
+      end do
+    end do
+
+    ! Propagate the raw-moment bounds through the unchanged neighboring-degree recurrence.
+    twom = real(m, knd) + real(m, knd)
+    alpha(1) = (twom + 1.0_knd) * pnorm(1) / pnorm(2)
+    alpha(1) = alpha(1) * 10.0_knd ** (ipnorm(1) - ipnorm(2))
+    alpha(2) = (twom + 3.0_knd) * pnorm(2) / (pnorm(3) * 2.0_knd)
+    alpha(2) = alpha(2) * 10.0_knd ** (ipnorm(2) - ipnorm(3))
+    do degree = 2, extra_odd - 1
+      if(degree > 2) alpha(degree) = alpha(degree - 2) * (twom + degree - 1) &
+          * (twom + degree + degree - 1) * (degree - 2) &
+          / ((degree - 1) * (twom + degree) * (twom + degree + degree - 5))
+      beta(degree) = -(twom + degree - 1) / (twom + degree)
+    end do
+    do column = 5, 6
+      kernel = column
+      if(column == 5) kernel = 4
+      do degree = 1, extra_odd - 2, 2
+        if(column == 5 .and. degree > lim) cycle
+        magnitude = abs(observed(degree+2,kernel)) + abs(original(degree+2,kernel)) &
+            + abs(beta(degree+1)) * (abs(observed(degree,kernel)) + abs(original(degree,kernel)))
+        allowance = (bounds(degree+2,kernel) + abs(beta(degree+1)) * bounds(degree,kernel) &
+            + 8.0_knd * epsilon(1.0_knd) * magnitude) / abs(alpha(degree+1))
+        bounds(degree+1,column) = nearest(allowance * (1.0_knd + 16.0_knd * epsilon(1.0_knd)) &
+            + 8.0_knd * tiny(1.0_knd), 1.0_knd)
+      end do
+    end do
+
+    ! A ratio is certified only when its denominator remains separated from zero.
+    do degree = 3, lim, 2
+      do column = 1, 2
+        do row = degree, degree + 1
+          kernel = column + 2
+          first_scale = twom + degree - 1
+          second_scale = degree - 1
+          if(row == degree + 1) then
+            kernel = column + 4
+            first_scale = twom + degree
+            second_scale = degree
+          end if
+          numerator = row
+          divisor = row - 2
+          denominator = nearest(abs(original(divisor,kernel)) - bounds(divisor,kernel), -1.0_knd)
+          if(denominator <= 0.0_knd) return
+          factor = first_scale / second_scale
+          allowance = factor * (bounds(numerator,kernel) + &
+              abs(original(numerator,kernel) / original(divisor,kernel)) * bounds(divisor,kernel)) &
+              / denominator + 8.0_knd * epsilon(1.0_knd) &
+              * (abs(observed(row,column)) + abs(original(row,column)))
+          bounds(row,column) = nearest(allowance * (1.0_knd + 16.0_knd * epsilon(1.0_knd)) &
+              + 8.0_knd * tiny(1.0_knd), 1.0_knd)
+        end do
+      end do
+    end do
+    if(any(.not. ieee_is_finite(bounds))) return
+    agrees = all(abs(observed - original) <= bounds)
+  end function
+#endif
+
   subroutine audit_pint_prefix(checks)
     use iso_c_binding, only: c_int
     implicit none
@@ -1449,6 +1578,9 @@ module prolate_swf
     integer, parameter :: maxint_high = 27, maxlp_high = 17, maxmp = 7
     real(knd), parameter :: c = 6.0_knd, x1 = 0.07_knd
     real(knd) :: wg(ngau), xg(ngau), cached(maxint_high,6), direct(maxint_high,6)
+#ifdef USE_QUAD
+    real(knd) :: fresh(maxint_high,6)
+#endif
     real(knd) :: cached_pnorm(maxlp_high), direct_pnorm(maxlp_high)
     real(knd) :: cached_coefme, cached_coefmo, direct_coefme, direct_coefmo
     integer :: cached_norme(maxmp), direct_norme(maxmp)
@@ -1498,13 +1630,38 @@ module prolate_swf
           cached(1:maxint,3), cached(1:maxint,4), cached(1:maxint,5), &
           cached(1:maxint,6), cached_norme, cached_pnorm(1:maxlp), &
           cached_ipnorm(1:maxlp), cached_coefme, cached_coefmo)
+#ifdef USE_QUAD
+      ! Prefix reuse must reproduce a fresh evaluation on the same summation route exactly.
+      fresh = 0.0_knd
+      call pint(c, m, lnum, x1, limint, maxint, maxlp, maxmp, ndec, wg, xg, &
+          ngau, ngqs, fresh(1:maxint,1), fresh(1:maxint,2), &
+          fresh(1:maxint,3), fresh(1:maxint,4), fresh(1:maxint,5), &
+          fresh(1:maxint,6), direct_norme, direct_pnorm(1:maxlp), &
+          direct_ipnorm(1:maxlp), direct_coefme, direct_coefmo)
+      if(any(fresh /= cached)) return
+#endif
       call pint(c, m, lnum, x1, limint, maxint, maxlp, maxmp, ndec, wg, xg, &
           ngau, ngqs, direct(1:maxint,1), direct(1:maxint,2), &
           direct(1:maxint,3), direct(1:maxint,4), direct(1:maxint,5), &
           direct(1:maxint,6), direct_norme, direct_pnorm(1:maxlp), &
           direct_ipnorm(1:maxlp), direct_coefme, direct_coefmo, use_geometry_cache=.false.)
-      exact = all(cached(1:maxint,:) == direct(1:maxint,:)) .and. &
-          all(cached_norme == direct_norme) .and. &
+      exact = all(cached(1:maxint,:) == direct(1:maxint,:))
+#ifdef USE_QUAD
+      if(.not. exact .and. pint_exact_sums_enabled()) then
+        do slot = 1, size(pint_geometry_cache)
+          if(.not. pint_geometry_cache(slot)%valid) cycle
+          if(pint_geometry_cache(slot)%m /= m .or. pint_geometry_cache(slot)%x1 /= x1) cycle
+          if(pint_geometry_cache(slot)%kernel_c /= c) cycle
+          if(pint_geometry_cache(slot)%ngau /= ngau .or. pint_geometry_cache(slot)%ngqs /= ngqs) cycle
+          if(.not. allocated(pint_geometry_cache(slot)%basis) .or. &
+              .not. allocated(pint_geometry_cache(slot)%kernels)) cycle
+          exact = audit_pint_roundoff(m, limint, cached(1:maxint,:), direct(1:maxint,:), &
+              cached_pnorm, cached_ipnorm, pint_geometry_cache(slot)%basis, pint_geometry_cache(slot)%kernels)
+          exit
+        end do
+      end if
+#endif
+      exact = exact .and. all(cached_norme == direct_norme) .and. &
           all(cached_pnorm(1:maxlp) == direct_pnorm(1:maxlp)) .and. &
           all(cached_ipnorm(1:maxlp) == direct_ipnorm(1:maxlp)) .and. &
           cached_coefme == direct_coefme .and. cached_coefmo == direct_coefmo
@@ -7221,6 +7378,7 @@ end if
     subroutine pint (c, m, lnum, x1, limint, maxint, maxlp, maxmp, ndec, &
             wg, xg, ngau, ngqs, rpint1, rpint2, pint1, pint2, &
             pint3, pint4, norme, pnorm, ipnorm, coefme, coefmo, use_geometry_cache, resume_lim)
+    use iso_c_binding, only: c_int
 !
 !  purpose:     To calculate integrals of the product of associated
 !               Legendre functions and kernels containing spherical
@@ -7298,7 +7456,7 @@ end if
     integer :: geometry_index, geometry_node, cached_degrees, prior_odd
     type(pint_geometry_entry), pointer :: geometry_entry
 #ifdef USE_QUAD
-    logical :: parity_integrals
+    logical :: parity_integrals, exact_integrals
     integer :: recurrence_limit, required_degrees, extra_odd
     real(knd) :: parity_forward(maxint), parity_diagonal(maxint), parity_backward(maxint), eta_squared
 #endif
@@ -7459,6 +7617,12 @@ end if
         parity_backward(il) = -alpha(il + 1) * beta(il) * beta(il - 1) / alpha(il - 1)
       end do
     end if
+    ! Sum complete stored products exactly when binary128 nearest rounding is supported.
+    exact_integrals = .false.
+    if(geometry_index > 0 .and. parity_integrals) then
+      if(cached_degrees >= required_degrees .and. allocated(geometry_entry%kernels)) &
+          exact_integrals = pint_exact_sums_enabled()
+    end if
 #endif
     geometry_node = 0
     arg = c * sqrt(x1 * (x1 + 2.0e0_knd))
@@ -7575,6 +7739,7 @@ end if
         coef4 = geometry_entry%kernels(3, geometry_node)
       end if
 #ifdef USE_QUAD
+      if(exact_integrals) go to 170
       if(parity_integrals) then
         ! Only even degree offsets enter the first two integral families.
         if(cached_degrees >= required_degrees) then
@@ -7684,6 +7849,14 @@ end if
 170     continue
 180    continue
 190   continue
+#ifdef USE_QUAD
+    if(exact_integrals .and. need_new_integrals) then
+      call pint_exact_sum_proc(geometry_entry%basis, geometry_entry%kernels, &
+          int(size(geometry_entry%basis, 1), c_int), int(geometry_entry%nodes, c_int), &
+          int(merge(1, prior_odd + 2, prior_odd < 1), c_int), int(lim + 2, c_int), &
+          int(required_degrees - 1, c_int), pint1, pint2, pint4)
+    end if
+#endif
     if(store_kernels) then
       geometry_entry%kernel_c = c
       geometry_entry%kernels_valid = .true.

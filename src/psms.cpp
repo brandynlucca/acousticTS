@@ -82,6 +82,75 @@ struct ProfcnBatchResult;
 // exponent rescaling helpers, and precision-agnostic scaffolding.
 #include "psms_support.h"
 
+#if ACOUSTICTS_HAVE_QUADMATH
+// Keep unsupported arithmetic and rounding modes on the original integral path.
+extern "C" int pint_exact_sums_available_quad() {
+#if ACOUSTICTS_HAVE_EXACT_QUAD_DOT
+    return std::fegetround() == FE_TONEAREST;
+#else
+    return 0;
+#endif
+}
+
+static acousticts_quad_t pint_original_dot_quad(const acousticts_quad_t* basis,
+        const acousticts_quad_t* kernel, int nodes, int basis_stride) {
+    acousticts_quad_t sum = 0;
+    for (int node = 0; node < nodes; ++node)
+        sum += basis[size_t(node) * basis_stride] * kernel[size_t(node) * 3];
+    return sum;
+}
+
+static acousticts_quad_t pint_exact_dot_quad(const acousticts_quad_t* basis,
+        const acousticts_quad_t* kernel, int nodes, int basis_stride) {
+#if ACOUSTICTS_HAVE_EXACT_QUAD_DOT
+    if (std::fegetround() == FE_TONEAREST) {
+        static thread_local quad_dot_product::Accumulator accumulator;
+        try {
+            accumulator.reset();
+            bool finite = true;
+            for (int node = 0; node < nodes; ++node) {
+                if (!accumulator.add(basis[size_t(node) * basis_stride], kernel[size_t(node) * 3])) {
+                    finite = false;
+                    break;
+                }
+            }
+            if (finite) return accumulator.rounded();
+        } catch (...) {
+            // Preserve native arithmetic and its existing failure checks on fallback.
+        }
+    }
+#endif
+    return pint_original_dot_quad(basis, kernel, nodes, basis_stride);
+}
+
+extern "C" void pint_exact_sums_quad(const acousticts_quad_t* basis,
+        const acousticts_quad_t* kernels, int degree_capacity, int nodes,
+        int first, int last, int extra, acousticts_quad_t* first_integrals,
+        acousticts_quad_t* second_integrals, acousticts_quad_t* fourth_integrals) {
+    // Accumulate the same stored binary128 products and round each moment once.
+    for (int degree = first - 1; degree < last; degree += 2) {
+        first_integrals[degree] = pint_exact_dot_quad(basis + degree, kernels, nodes, degree_capacity);
+        second_integrals[degree] = pint_exact_dot_quad(basis + degree, kernels + 1, nodes, degree_capacity);
+        fourth_integrals[degree] = pint_exact_dot_quad(basis + degree, kernels + 2, nodes, degree_capacity);
+    }
+    fourth_integrals[extra - 1] = pint_exact_dot_quad(
+        basis + extra - 1, kernels + 2, nodes, degree_capacity);
+}
+
+extern "C" void profcn_set_integral_sums_quad(
+    int (*available)(), decltype(&pint_exact_sums_quad) sum);
+
+namespace {
+struct RegisterIntegralSums {
+    RegisterIntegralSums() {
+        // Register optional acceleration without adding a standalone Fortran link dependency.
+        profcn_set_integral_sums_quad(&pint_exact_sums_available_quad, &pint_exact_sums_quad);
+    }
+};
+const RegisterIntegralSums registered_integral_sums;
+}
+#endif
+
 #include "psms_smn.h"
 
 // Report whether configure enabled the complete native C++/Fortran binary128
