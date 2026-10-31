@@ -3411,12 +3411,19 @@ end if
 175      limdlo = limd + 1
        if(2 * (limd / 2) /= limd) limdlo = limd + 2
        jlowo = (limd - 1) / 2 + 1
-176      call dnorm (l, m, c, ndec, nex, limd, maxd, enr, sgn, d01, id01, &
+176      if(present(coefficient_values) .and. iopang == 0) then
+         call dnorm (l, m, c, ndec, nex, limd, maxd, enr, sgn, d01, id01, &
+             dmfnorm, idmfe, dmlmf, idmlmfe, dmsnorm, idmse, &
+             dmlms, idmlmse, jmf, jsub, coefficient_values(:,li,mi), &
+             coefficient_lengths(li,mi), coefficient_status)
+       else
+         call dnorm (l, m, c, ndec, nex, limd, maxd, enr, sgn, d01, id01, &
              dmfnorm, idmfe, dmlmf, idmlmfe, dmsnorm, idmse, &
              dmlms, idmlmse, jmf, jsub)
-       if(present(coefficient_values)) then
-         call normalized_legendre_coefficients(l, m, limd, enr, dmlms, idmlmse, &
-             coefficient_values(:,li,mi), coefficient_lengths(li,mi), coefficient_status)
+         if(present(coefficient_values)) then
+           call normalized_legendre_coefficients(l, m, limd, enr, dmlms, idmlmse, &
+               coefficient_values(:,li,mi), coefficient_lengths(li,mi), coefficient_status)
+         end if
        end if
        if(li /= 1 .and. eigval <= eigvalp) then
          ! Report incomplete coefficient output without changing legacy control flow.
@@ -6831,6 +6838,230 @@ end if
     total_power = total_power + renormalize
   end subroutine normalization_add_square
 
+
+  subroutine joint_meixner_coefficients(l, m, limd, enr, factors, dec, sgn, &
+      dmsnorm, idmse, dmlms, idmlmse, schedule_index, values, length, status)
+    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
+    implicit none
+    integer, intent(in) :: l, m, limd
+    real(knd), intent(in) :: enr(:), factors(:,:), dec, sgn
+    real(knd), intent(out) :: dmsnorm, dmlms, values(:)
+    integer, intent(out) :: idmse, idmlmse, schedule_index, length
+    integer, intent(inout) :: status
+    integer :: parity, seed_index, last_ratio, j, offset, output_index, pass, increment, first, last
+    integer :: normalization_slot, cached_steps, shift, step, decimal_shift, ratio_power, product_power
+    integer(int64) :: powers(0:limd/2), current_power, total_power, remaining, decimal_power, half_power
+    real(knd) :: fractions(0:limd/2), twice_m, normalization_step, ratio, current, next_value
+    real(knd) :: total, correction, term, updated, norm_total, norm_root, ratio_fraction, product
+    logical :: ordinary, recorded_schedule
+
+    ! The full Meixner norm is the sum of squared unit-norm Legendre coefficients.
+    ! Schulz et al. (1998), Applied Optics 37:7875-7896, Eqs. (A14), (A18)-(A20).
+    ! Retain every available coefficient in both directions, including later lobes.
+    parity=modulo(l-m,2)
+    seed_index=(l-m-parity)/2
+    last_ratio=limd/2-parity
+    values=0.0_knd
+    length=l-m+1
+    if(seed_index<0 .or. last_ratio<seed_index .or. last_ratio>size(enr)) go to 900
+    twice_m=real(2*m,knd)
+    call prepare_legendre_normalization(m,2*last_ratio+parity-1,normalization_slot)
+    cached_steps=0
+    if(normalization_slot>0) then
+      if(allocated(legendre_normalization_cache(normalization_slot)%steps)) &
+          cached_steps=size(legendre_normalization_cache(normalization_slot)%steps)
+    end if
+
+    ! Ordinary amplitudes avoid exponent work only when every operation stays representable.
+    ordinary=.true.
+    total=1.0_knd
+    correction=0.0_knd
+    fractions(seed_index)=1.0_knd
+    schedule_index=last_ratio
+    recorded_schedule=.false.
+    do pass=1,2
+      current=1.0_knd
+      first=seed_index+1
+      last=last_ratio
+      increment=1
+      if(pass==2) then
+        first=seed_index
+        last=1
+        increment=-1
+      end if
+      do j=first,last,increment
+        offset=2*(j-1)+parity
+        if(offset<cached_steps) then
+          normalization_step=legendre_normalization_cache(normalization_slot)%steps(offset+1)
+        else
+          normalization_step=legendre_normalization_step(twice_m,offset)
+        end if
+        ratio=enr(j)*normalization_step
+        if(.not.ieee_is_finite(ratio)) go to 100
+        if(enr(j)/=0.0_knd .and. ratio==0.0_knd) go to 100
+        if(ratio/=0.0_knd .and. abs(ratio)<tiny(1.0_knd)) go to 100
+        if(pass==1) then
+          next_value=current*ratio
+          output_index=j
+        else
+          if(ratio==0.0_knd) go to 100
+          next_value=current/ratio
+          output_index=j-1
+        end if
+        if(.not.ieee_is_finite(next_value)) go to 100
+        if(current/=0.0_knd .and. ratio/=0.0_knd .and. next_value==0.0_knd) go to 100
+        if(next_value/=0.0_knd .and. abs(next_value)<tiny(1.0_knd)) go to 100
+        current=next_value
+        fractions(output_index)=current
+        term=current*current
+        if(.not.ieee_is_finite(term)) go to 100
+        if(current/=0.0_knd .and. term==0.0_knd) go to 100
+        updated=total+term
+        if(.not.ieee_is_finite(updated)) go to 100
+        if(total>=term) then
+          correction=correction+((total-updated)+term)
+        else
+          correction=correction+((term-updated)+total)
+        end if
+        total=updated
+        if(pass==1 .and. .not.recorded_schedule) then
+          if(term/(total+correction)<dec) then
+            schedule_index=j
+            recorded_schedule=.true.
+          end if
+        end if
+      end do
+    end do
+    norm_total=total+correction
+    if(.not.ieee_is_finite(norm_total) .or. norm_total<=0.0_knd) go to 100
+    norm_root=sqrt(norm_total)
+    call normalization_split(norm_total,total,shift)
+    total_power=int(shift,int64)
+    go to 200
+
+100 ordinary=.false.
+    total=0.5_knd
+    total_power=1_int64
+    correction=0.0_knd
+    fractions(seed_index)=0.5_knd
+    powers(seed_index)=1_int64
+    schedule_index=last_ratio
+    recorded_schedule=.false.
+    do pass=1,2
+      current=0.5_knd
+      current_power=1_int64
+      first=seed_index+1
+      last=last_ratio
+      increment=1
+      if(pass==2) then
+        first=seed_index
+        last=1
+        increment=-1
+      end if
+      do j=first,last,increment
+        offset=2*(j-1)+parity
+        if(offset<cached_steps) then
+          normalization_step=legendre_normalization_cache(normalization_slot)%steps(offset+1)
+        else
+          normalization_step=legendre_normalization_step(twice_m,offset)
+        end if
+        if(.not.ieee_is_finite(enr(j)) .or. .not.ieee_is_finite(normalization_step)) go to 900
+        if(normalization_step<=0.0_knd) go to 900
+        if(enr(j)==0.0_knd) then
+          if(pass==2) go to 900
+          current=0.0_knd
+          current_power=0_int64
+        else if(current/=0.0_knd) then
+          ratio=enr(j)*normalization_step
+          if(ieee_is_finite(ratio) .and. abs(ratio)>=tiny(1.0_knd)) then
+            call normalization_split(ratio,ratio_fraction,ratio_power)
+          else
+            call normalization_split(enr(j),ratio_fraction,ratio_power)
+            ratio_fraction=ratio_fraction*normalization_step
+            call normalization_split(ratio_fraction,product,product_power)
+            ratio_fraction=product
+            ratio_power=ratio_power+product_power
+          end if
+          if(pass==1) then
+            product=current*ratio_fraction
+            current_power=current_power+int(ratio_power,int64)
+          else
+            product=current/ratio_fraction
+            current_power=current_power-int(ratio_power,int64)
+          end if
+          if(.not.ieee_is_finite(product) .or. product==0.0_knd) go to 900
+          call normalization_split(product,current,product_power)
+          current_power=current_power+int(product_power,int64)
+        end if
+        output_index=j
+        if(pass==2) output_index=j-1
+        fractions(output_index)=current
+        powers(output_index)=current_power
+        term=current*current
+        call normalization_add_square(total,correction,total_power,term,2_int64*current_power)
+        if(pass==1 .and. .not.recorded_schedule) then
+          if(normalization_align(term,2_int64*current_power-total_power)/(total+correction)<dec) then
+            schedule_index=j
+            recorded_schedule=.true.
+          end if
+        end if
+      end do
+    end do
+    total=total+correction
+    if(.not.ieee_is_finite(total) .or. total<=0.0_knd) go to 900
+    call normalization_split(total,norm_total,shift)
+    total=norm_total
+    total_power=total_power+int(shift,int64)
+    half_power=total_power/2_int64
+    norm_root=sqrt(scale(total,int(modulo(total_power,2_int64))))
+
+    ! Preserve the public decimal normalization contract from the completed binary sum.
+200 dmsnorm=total
+    remaining=total_power
+    decimal_power=0_int64
+    idmse=0
+    idmlmse=0
+    if(remaining<0_int64) go to 900
+    if(remaining>4_int64*(int(huge(idmse),int64)+2_int64)) go to 900
+    do while(remaining>0_int64)
+      step=int(min(remaining,int(maxexponent(1.0_knd)/2,int64)))
+      dmsnorm=scale(dmsnorm,step)
+      decimal_shift=decimal_exponent(dmsnorm)
+      dmsnorm=dmsnorm/(10.0_knd**decimal_shift)
+      decimal_power=decimal_power+decimal_shift
+      remaining=remaining-step
+    end do
+    if(decimal_power>int(huge(idmse),int64)) go to 900
+    idmse=int(decimal_power)
+    if(modulo(idmse,2)/=0) then
+      idmse=idmse-1
+      dmsnorm=10.0_knd*dmsnorm
+    end if
+    dmlms=sgn/sqrt(dmsnorm)
+    idmlmse=-idmse/2
+
+    ! Rescale retained signed coefficients without another ratio recurrence.
+    do j=0,last_ratio
+      if(ordinary) then
+        current=sgn*(fractions(j)/norm_root)
+      else
+        current=normalization_align(sgn*(fractions(j)/norm_root),powers(j)-half_power)
+      end if
+      if(.not.ieee_is_finite(current)) go to 900
+      output_index=2*j+parity+1
+      if(j>seed_index .and. current/=0.0_knd) length=output_index
+      if(output_index<=size(values)) values(output_index)=current
+    end do
+    if(size(values)<length) status=max(status,1)
+    return
+
+    ! Retain the unchanged implementation if the joint route cannot certify its arithmetic.
+900 continue
+    call complete_meixner_normalization(l,m,limd,enr,factors,dec,sgn, &
+        dmsnorm,idmse,dmlms,idmlmse,schedule_index)
+    call normalized_legendre_coefficients(l,m,limd,enr,dmlms,idmlmse,values,length,status)
+  end subroutine joint_meixner_coefficients
+
   subroutine complete_meixner_normalization(l, m, limd, enr, factors, dec, sgn, &
                                            dmsnorm, idmse, dmlms, idmlmse, schedule_index)
     use, intrinsic :: ieee_arithmetic, only: ieee_is_finite, ieee_value, ieee_quiet_nan
@@ -6930,7 +7161,7 @@ end if
 
     subroutine dnorm (l, m, c, ndec, nex, limd, maxd, enr, sgn, d01, id01, &
              dmfnorm, idmfe, dmlmf, idmlmfe, dmsnorm, idmse, &
-             dmlms, idmlmse, jnorm, jsub)
+             dmlms, idmlmse, jnorm, jsub, coefficient_values, coefficient_length, coefficient_status)
 !
 !  purpose:     To compute d coefficient ratios from n values and to
 !               calculate the normalization of the d coefficients.
@@ -6997,6 +7228,9 @@ end if
     integer, save :: ratio_order = -1, ratio_counts(2) = 0
     integer, save :: normalization_order = -1, normalization_count = 0
     integer :: parity_index
+    real(knd), optional, intent(out) :: coefficient_values(:)
+    integer, optional, intent(out) :: coefficient_length
+    integer, optional, intent(inout) :: coefficient_status
 !
     ten = 10.0e0_knd
     rm2 = m + m
@@ -7151,8 +7385,13 @@ end if
 90   continue
 !
 !  compute the Meixner-Schafke normalizing factor
-    call complete_meixner_normalization(l, m, limd, enr, normalization_factors, dec, sgn, &
-                                        dmsnorm, idmse, dmlms, idmlmse, jn)
+    if(present(coefficient_values)) then
+      call joint_meixner_coefficients(l, m, limd, enr, normalization_factors, dec, sgn, &
+          dmsnorm, idmse, dmlms, idmlmse, jn, coefficient_values, coefficient_length, coefficient_status)
+    else
+      call complete_meixner_normalization(l, m, limd, enr, normalization_factors, dec, sgn, &
+                                          dmsnorm, idmse, dmlms, idmlmse, jn)
+    end if
     ! Keep the inherited workspace estimate separate from the complete positive sum.
     jnorm = max(jmf, jn)
 if (debug) then
