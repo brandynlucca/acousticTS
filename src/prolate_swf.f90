@@ -10,6 +10,8 @@ module prolate_swf
  use param
 #endif
  use iso_fortran_env, only: int64
+ use, intrinsic :: ieee_arithmetic, only: ieee_round_type, ieee_nearest, &
+     ieee_get_rounding_mode, operator(==), operator(/=)
 
  ! ---------------------------------------------------------------------------
  ! Lightweight caches for repeated Legendre- and quadrature-related work.
@@ -121,6 +123,15 @@ module prolate_swf
  integer, save :: pleg_cache_next = 1
  integer, save :: qleg_cache_next = 1
 
+ ! Retain one bounded Bouwkamp table without limiting the requested support.
+ integer, parameter :: bouwkamp_cache_bytes = 128 * 1024
+ integer, parameter :: bouwkamp_cache_entries = &
+     bouwkamp_cache_bytes / (4 * (storage_size(0.0_knd) / 8))
+ real(knd), save :: bouwkamp_tables(bouwkamp_cache_entries, 4)
+ real(knd), save :: bouwkamp_parameter = -1.0_knd
+ integer, save :: bouwkamp_order = -1, bouwkamp_counts(4) = 0
+ type(ieee_round_type), save :: bouwkamp_rounding = ieee_nearest
+
 #ifdef USE_QUAD
  interface
    subroutine quad_sincos(argument, sine, cosine) bind(C, name="sincosq")
@@ -140,6 +151,20 @@ module prolate_swf
 #endif
 
  contains
+
+  subroutine prepare_bouwkamp_cache(c, m)
+    real(knd), intent(in) :: c
+    integer, intent(in) :: m
+    type(ieee_round_type) :: rounding
+
+    ! Reset both parity prefixes when any arithmetic input changes.
+    call ieee_get_rounding_mode(rounding)
+    if(bouwkamp_parameter /= c .or. bouwkamp_order /= m .or. &
+        bouwkamp_rounding /= rounding) bouwkamp_counts = 0
+    bouwkamp_parameter = c
+    bouwkamp_order = m
+    bouwkamp_rounding = rounding
+  end subroutine
 
   subroutine paired_sine_cosine(argument, sine, cosine)
     real(knd), intent(in) :: argument
@@ -2056,6 +2081,7 @@ end if
       m = mmin + minc * (mi - 1)
       jang = 0
       m2 = m + m
+      call prepare_bouwkamp_cache(c, m)
 if (debug) then
        if(knd == kindd .and. iopang /= 0) write(50, 35) c, m
  35     format(1x,'c = ',e23.14,'; m = ',i5)
@@ -2295,10 +2321,18 @@ end if
        j = jlowe
         do 158 i = limdle, limd, 2
         i2 = i + i
+        if(j <= bouwkamp_counts(1)) then
+          bliste(j) = bouwkamp_tables(j, 1)
+        else
         bliste(j) = c4 * real(i, knd) * real((i - 1), knd)* &
              real((m2 + i), knd) * real((m2 + i - 1), knd)/ &
              (real((m2 + i2 - 1), knd) * real((m2 + i2 - 1), knd)* &
              real((m2 + i2 - 3), knd) * real((m2 + i2 + 1), knd))
+          if(j <= bouwkamp_cache_entries) then
+            bouwkamp_tables(j, 1) = bliste(j)
+            bouwkamp_counts(1) = j
+          end if
+        end if
         j = j + 1
 158       continue
 !
@@ -2306,9 +2340,17 @@ end if
        j = jlowe
         do 159 i = limdle - 1, limd + 1, 2
         i2 = i + i
+        if(j <= bouwkamp_counts(2)) then
+          gliste(j) = bouwkamp_tables(j, 2)
+        else
         gliste(j) = real((m + i - 1), knd) * real((m + i), knd) + 0.5e0_knd* &
              c2 * ((1.0e0_knd - real((m2 * m2 - 1), knd)/ &
              (real((m2 + i2 - 3), knd) * real((m2 + i2 + 1), knd))))
+          if(j <= bouwkamp_cache_entries) then
+            bouwkamp_tables(j, 2) = gliste(j)
+            bouwkamp_counts(2) = j
+          end if
+        end if
         j = j + 1
 159       continue
        go to 163
@@ -2319,10 +2361,18 @@ end if
        j = jlowo
         do 161 i = limdlo, limd, 2
         i2 = i + i
+        if(j <= bouwkamp_counts(3)) then
+          blisto(j) = bouwkamp_tables(j, 3)
+        else
         blisto(j) = c4 * real(i, knd) * real((i - 1), knd)* &
              real((m2 + i), knd) * real((m2 + i - 1), knd)/ &
              (real((m2 + i2 - 1), knd) * real((m2 + i2 - 1), knd)* &
              real((m2 + i2 - 3), knd) * real((m2 + i2 + 1), knd))
+          if(j <= bouwkamp_cache_entries) then
+            bouwkamp_tables(j, 3) = blisto(j)
+            bouwkamp_counts(3) = j
+          end if
+        end if
         j = j + 1
 161       continue
 !
@@ -2330,9 +2380,17 @@ end if
        j = jlowo
         do 162 i = limdlo - 1, limd + 1, 2
         i2 = i + i
+        if(j <= bouwkamp_counts(4)) then
+          glisto(j) = bouwkamp_tables(j, 4)
+        else
         glisto(j) = real((m + i - 1), knd) * real((m + i), knd) + 0.5e0_knd* &
              c2 * (1.0e0_knd - real((m2 * m2 - 1), knd)/ &
              (real((m2 + i2 - 3), knd) * real((m2 + i2 + 1), knd)))
+          if(j <= bouwkamp_cache_entries) then
+            bouwkamp_tables(j, 4) = glisto(j)
+            bouwkamp_counts(4) = j
+          end if
+        end if
        j = j + 1
 162      continue
 163      continue
@@ -7622,6 +7680,9 @@ end if
 !  integer arrays
     dimension ineue(maxlp)
 !
+    ! Reuse exact forward prefixes when the complete request fits the cache.
+    if(sphneu_cached(c, x, limn, maxn, maxlp, sneuf, sneun, ineue, sneudf, sneudr)) return
+!
 !  compute first kind ratios of Neumann functions and ratios
 !  of their first derivatives
 !
@@ -7683,6 +7744,104 @@ end if
 40    continue
     return
     end subroutine
+
+    logical function sphneu_cached(c, x, limn, maxn, maxlp, sneuf, sneun, ineue, &
+                                  sneudf, sneudr) result(reused)
+    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
+    implicit none
+    integer, intent(in) :: limn, maxn, maxlp
+    real(knd), intent(in) :: c, x
+    real(knd), intent(inout) :: sneuf(maxn), sneun(maxlp), sneudf(maxn), sneudr(maxlp)
+    integer, intent(inout) :: ineue(maxlp)
+    integer, parameter :: cache_bytes = 256 * 1024
+    integer, parameter :: cache_entries = cache_bytes / &
+        (4 * (storage_size(0.0_knd) / 8) + storage_size(0) / 8)
+    real(knd), save :: ratios(cache_entries), derivative_ratios(cache_entries)
+    real(knd), save :: amplitudes(cache_entries), derivative_values(cache_entries)
+    integer, save :: exponents(cache_entries)
+    real(knd), save :: cached_argument = 0.0_knd
+    integer, save :: ratio_count = 0, amplitude_count = 0, derivative_count = 0
+    type(ieee_round_type), save :: cached_rounding = ieee_nearest
+    type(ieee_round_type) :: rounding
+    real(knd) :: cx, rn, rnn, stemp0, stemp1, sine_value, cosine_value
+    integer :: n, nlimit, derivative_limit
+
+    ! Larger requests retain the original unbounded computation below.
+    reused = .false.
+    nlimit = min(maxlp, limn + 1)
+    if(limn < 1 .or. limn > cache_entries .or. nlimit < 2 .or. &
+        nlimit > cache_entries .or. maxn < limn + 2) return
+    cx = c * x
+    if(.not. ieee_is_finite(cx) .or. cx == 0.0_knd) return
+    call ieee_get_rounding_mode(rounding)
+    if(cached_argument /= cx .or. cached_rounding /= rounding) then
+      ratio_count = 0
+      amplitude_count = 0
+      derivative_count = 0
+    end if
+    cached_argument = cx
+    cached_rounding = rounding
+
+    ! Keep adjacent ratios separate from the same-parity output transformation.
+    if(ratio_count == 0) then
+      call paired_sine_cosine(cx, sine_value, cosine_value)
+      stemp0 = -cosine_value / cx
+      stemp1 = stemp0 / cx - sine_value / cx
+      ratios(1) = stemp1 / stemp0
+      derivative_ratios(1) = -(cx - 2.0e0_knd * ratios(1)) / (cx * ratios(1))
+      ratio_count = 1
+    end if
+    do n = ratio_count, limn - 1
+      rn = n
+      rnn = n + n + 1
+      ratios(n + 1) = rnn / cx - 1.0e0_knd / ratios(n)
+      derivative_ratios(n + 1) = (cx - (rn + 2.0e0_knd) * ratios(n + 1)) / (rn- &
+          cx * ratios(n + 1))
+    end do
+    ratio_count = max(ratio_count, limn)
+
+    ! Extend each scaled amplitude in the original forward operation order.
+    if(amplitude_count == 0) then
+      exponents(1) = decimal_exponent(abs(stemp0))
+      amplitudes(1) = stemp0 * 10.0e0_knd ** (-exponents(1))
+      exponents(2) = decimal_exponent(abs(stemp1))
+      amplitudes(2) = stemp1 * 10.0e0_knd ** (-exponents(2))
+      amplitude_count = 2
+    end if
+    do n = amplitude_count + 1, nlimit
+      amplitudes(n) = amplitudes(n - 1) * ratios(n - 1)
+      exponents(n) = decimal_exponent(abs(amplitudes(n)))
+      amplitudes(n) = amplitudes(n) * 10.0e0_knd ** (-exponents(n))
+      exponents(n) = exponents(n) + exponents(n - 1)
+    end do
+    amplitude_count = max(amplitude_count, nlimit)
+    derivative_limit = min(nlimit, limn)
+    do n = derivative_count + 1, derivative_limit
+      rn = n - 1
+      derivative_values(n) = (rn / cx) - ratios(n)
+    end do
+    derivative_count = max(derivative_count, derivative_limit)
+
+    ! Restore the requested tail sentinels before evaluating their derivative.
+    sneuf(1:limn) = ratios(1:limn)
+    sneudf(1:limn) = derivative_ratios(1:limn)
+    sneuf(limn + 1) = 0.0e0_knd
+    sneuf(limn + 2) = 0.0e0_knd
+    sneudf(limn + 1) = 0.0e0_knd
+    sneudf(limn + 2) = 0.0e0_knd
+    sneun(1:nlimit) = amplitudes(1:nlimit)
+    ineue(1:nlimit) = exponents(1:nlimit)
+    sneudr(1:derivative_limit) = derivative_values(1:derivative_limit)
+    if(nlimit == limn + 1) then
+      rn = nlimit - 1
+      sneudr(nlimit) = (rn / cx) - sneuf(nlimit)
+    end if
+    do n = limn, 2,-1
+      sneuf(n) = sneuf(n - 1) * sneuf(n)
+      sneudf(n) = sneudf(n - 1) * sneudf(n)
+    end do
+    reused = .true.
+    end function
 ! end module prolate_swf
 
 ! Link to C
