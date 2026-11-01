@@ -6,6 +6,40 @@
 #include <cstring>
 #include <new>
 
+#if ACOUSTICTS_HAVE_QUADMATH
+extern "C" int pint_set_checked_moments_quad(int enabled);
+extern "C" int pint_checked_moments_available_quad();
+extern "C" int profcn_set_checked_radial_mode_quad(int enabled);
+extern "C" std::int64_t profcn_current_radial_token_quad();
+extern "C" int profcn_retry_current_radials_quad(
+    const acousticts_quad_t*, const acousticts_quad_t*, int, int, std::int64_t, const int*,
+    const acousticts_quad_t*, const int*, const acousticts_quad_t*, const int*,
+    acousticts_quad_t*, int*, acousticts_quad_t*, int*, int*);
+
+namespace psms_checked_radials {
+// Keep checked integration and same-degree alternatives local to one scalar solve.
+class Scope {
+    int previous_moments_, previous_radials_;
+public:
+    const bool enabled;
+    explicit Scope(bool requested) :
+        previous_moments_(pint_set_checked_moments_quad(requested ? 1 : 0)),
+        previous_radials_(profcn_set_checked_radial_mode_quad(pint_checked_moments_available_quad())),
+        enabled(pint_checked_moments_available_quad() != 0) {}
+    Scope(const Scope&) = delete;
+    Scope& operator=(const Scope&) = delete;
+    ~Scope() {
+        pint_set_checked_moments_quad(previous_moments_);
+        profcn_set_checked_radial_mode_quad(previous_radials_);
+    }
+    void disable() {
+        profcn_set_checked_radial_mode_quad(0);
+        pint_set_checked_moments_quad(0);
+    }
+};
+}
+#endif
+
 inline constexpr size_t psms_retained_cache_budget_bytes = 64 * 1024 * 1024;
 inline constexpr size_t psms_coefficient_buffer_budget_bytes = 16 * 1024 * 1024;
 
@@ -473,6 +507,22 @@ struct ProfcnCoefficientBatchResult {
     std::vector<T> coefficients;
     std::vector<int> lengths;
 };
+
+#if ACOUSTICTS_HAVE_QUADMATH
+namespace psms_checked_radials {
+inline bool retry(ProfcnCoefficientBatchResult<acousticts_quad_t>& batch,
+        const acousticts_quad_t& c, const acousticts_quad_t& x1, int order,
+        std::int64_t token, const std::vector<int>& requests) {
+    auto& functions = batch.functions;
+    if (functions.m_count != 1 || functions.lnum < 1 ||
+            requests.size() != size_t(functions.lnum) || !pint_checked_moments_available_quad()) return false;
+    return profcn_retry_current_radials_quad(&c, &x1, order, functions.lnum, token, requests.data(),
+        functions.r1c.data(), functions.ir1e.data(), functions.r1dc.data(), functions.ir1de.data(),
+        functions.r2c.data(), functions.ir2e.data(), functions.r2dc.data(), functions.ir2de.data(),
+        functions.naccr.data()) != 0;
+}
+}
+#endif
 
 template<typename T>
 ProfcnCoefficientBatchResult<T> cprofcn_mblock_coefficients(

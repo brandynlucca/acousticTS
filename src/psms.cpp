@@ -151,6 +151,739 @@ const RegisterIntegralSums registered_integral_sums;
 }
 #endif
 
+
+#if ACOUSTICTS_HAVE_QUADMATH
+namespace psms_checked_integrals {
+static thread_local bool enabled = false;
+}
+
+extern "C" int pint_set_checked_moments_quad(int enabled) {
+    const int previous = psms_checked_integrals::enabled;
+    psms_checked_integrals::enabled = enabled != 0;
+    return previous;
+}
+
+extern "C" int pint_checked_moments_available_quad() {
+#if ACOUSTICTS_HAVE_EXACT_QUAD_DOT && !defined(__FAST_MATH__) && \
+    !defined(__ASSOCIATIVE_MATH__) && !defined(__RECIPROCAL_MATH__) && \
+    (!defined(__FINITE_MATH_ONLY__) || __FINITE_MATH_ONLY__ == 0) && \
+    (!defined(__GCC_IEC_559) || __GCC_IEC_559 > 0)
+    return psms_checked_integrals::enabled && std::numeric_limits<double>::is_iec559 &&
+        std::numeric_limits<double>::digits == 53 && std::numeric_limits<double>::max_exponent == 1024 &&
+        std::fegetround() == FE_TONEAREST;
+#else
+    return 0;
+#endif
+}
+
+#if ACOUSTICTS_HAVE_EXACT_QUAD_DOT
+namespace psms_checked_integrals {
+// The Taylor identity follows DLMF 10.51.2 and Jacobi Rodrigues integration.
+// DLMF 10.50.3 supplies the discrete Green factor for the scaled Neumann recurrence.
+// Bounds concern the real expression at fixed stored native inputs. Values and signed
+// products remain binary128. Only outward positive bounds use scaled binary64 mantissas.
+using Quad = acousticts_quad_t;
+using quad_dot_product::Accumulator;
+
+// Binary128 unit roundoff, and the smallest double step used for outward rounding.
+static const Quad unit_roundoff = ldexpq(Quad(1), -113);
+static const double positive_upper_factor = 1.0 + 0x1p-52, positive_lower_factor = 1.0 - 0x1p-52;
+
+// ---- Bit-level binary128 helpers ------------------------------------------
+inline void words(Quad x, std::uint64_t w[2]) { std::memcpy(w, &x, 16); }
+inline Quad fromw(std::uint64_t lo, std::uint64_t hi) { const std::uint64_t w[2]{lo, hi}; Quad x; std::memcpy(&x, w, 16); return x; }
+// A rounded result is normal exactly when its exponent field is neither 0 nor 0x7fff.
+inline bool normal_quad(Quad x) { std::uint64_t w[2]; words(x, w); return ((w[1] >> 48) & 0x7fff) - 1u < 0x7ffeu; }
+inline bool finite_quad(Quad x) { std::uint64_t w[2]; words(x, w); return ((w[1] >> 48) & 0x7fff) != 0x7fff; }
+// Next value toward +inf by integer increment of the sign-magnitude encoding.
+inline Quad next_upper(Quad x) {
+    std::uint64_t w[2]; words(x, w);
+    if (((w[1] >> 48) & 0x7fff) == 0x7fff) return x;
+    if ((w[1] << 1 | w[0]) == 0) return fromw(1, 0);
+    if (w[1] >> 63) { if (w[0]-- == 0) --w[1]; }
+    else { if (++w[0] == 0) ++w[1]; }
+    return fromw(w[0], w[1]);
+}
+inline Quad next_lower(Quad x) { return -next_upper(-x); }
+inline Quad quad_abs(Quad x) { std::uint64_t w[2]; words(x, w); w[1] &= ~(UINT64_C(1) << 63); return fromw(w[0], w[1]); }
+
+// ---- Outward positive arithmetic with a free integer exponent --------------
+// A positive mantissa times an integer power of two. Results are upper bounds unless named lower.
+struct PositiveBound { double mantissa; int exponent; };
+inline double pow2d(int d) { const std::uint64_t b = std::uint64_t(d + 1023) << 52; double v; std::memcpy(&v, &b, 8); return v; }
+inline PositiveBound pnorm_(double m, int e) { if (m >= 2.0) { m *= 0.5; e += 1; } return {m, e}; }
+inline PositiveBound pmul(PositiveBound a, PositiveBound b) { return pnorm_(a.mantissa * b.mantissa * positive_upper_factor, a.exponent + b.exponent); }
+// Lower bound for a*b, used only to build denominators.
+inline PositiveBound pmul_lo(PositiveBound a, PositiveBound b) { return pnorm_(a.mantissa * b.mantissa * positive_lower_factor, a.exponent + b.exponent); }
+inline PositiveBound padd(PositiveBound a, PositiveBound b) {
+    if (a.mantissa == 0) return b;
+    if (b.mantissa == 0) return a;
+    if (a.exponent < b.exponent) std::swap(a, b);
+    const int d = a.exponent - b.exponent;
+    const double s = d < 1000 ? a.mantissa + b.mantissa * pow2d(-d) : a.mantissa + 0x1p-998;
+    return pnorm_(s * positive_upper_factor, a.exponent);
+}
+// Upper bound for a/b where b.mantissa>0 is a lower bound of the true denominator.
+inline PositiveBound pdiv(PositiveBound a, PositiveBound b) {
+    double m = a.mantissa / b.mantissa * positive_upper_factor; int e = a.exponent - b.exponent;
+    if (m == 0) return {0, 0};
+    if (m < 1.0) { m *= 2.0; e -= 1; }
+    return {m, e};
+}
+// Exact outward conversion of a nonzero binary128 subnormal magnitude.
+inline PositiveBound psubnormal(std::uint64_t lo, std::uint64_t hi, bool upper) {
+    const unsigned __int128 v = (static_cast<unsigned __int128>(hi & UINT64_C(0xffffffffffff)) << 64) | lo;
+    const std::uint64_t top = std::uint64_t(v >> 64);
+    const int bits = top ? 128 - __builtin_clzll(top) : 64 - __builtin_clzll(lo);
+    const int shift = std::max(0, bits - 53);
+    std::uint64_t kept = std::uint64_t(v >> shift);
+    if (upper && shift > 0) ++kept;
+    return pnorm_(double(kept) * pow2d(-(bits - shift - 1)), bits - 1 - 16494);
+}
+inline PositiveBound pfromq_up(Quad x, bool& ok) {
+    std::uint64_t w[2]; words(x, w);
+    const unsigned E = unsigned(w[1] >> 48) & 0x7fff;
+    if (E == 0x7fff) { ok = false; return {0, 0}; }
+    if (E == 0) return ((w[1] << 16) | w[0]) == 0 ? PositiveBound{0, 0} : psubnormal(w[0], w[1], true);
+    const std::uint64_t f = (w[1] & UINT64_C(0xffffffffffff)) | (UINT64_C(1) << 48);
+    return pnorm_(double(f + 1) * 0x1p-48, int(E) - 16383);
+}
+// A zero lower bound stays 0, which every division rejects.
+inline PositiveBound pfromq_dn(Quad x, bool& ok) {
+    std::uint64_t w[2]; words(x, w);
+    const unsigned E = unsigned(w[1] >> 48) & 0x7fff;
+    if (E == 0x7fff) { ok = false; return {0, 0}; }
+    if (E == 0) return ((w[1] << 16) | w[0]) == 0 ? PositiveBound{0, 0} : psubnormal(w[0], w[1], false);
+    const std::uint64_t f = (w[1] & UINT64_C(0xffffffffffff)) | (UINT64_C(1) << 48);
+    return {double(f) * 0x1p-48, int(E) - 16383};
+}
+inline PositiveBound pfromd(double x) {
+    if (x == 0) return {0, 0};
+    int e; double m = std::frexp(x, &e) * 2.0;
+    return {m, e - 1};
+}
+inline PositiveBound pint(unsigned long long n) { return pfromd(double(n) * (n >> 53 ? positive_upper_factor : 1.0)); }
+// Upper double, saturating to +inf above and to 2^-1000 below.
+inline double pdbl_up(PositiveBound a) {
+    if (a.mantissa == 0) return 0;
+    if (a.exponent > 1000) return HUGE_VAL;
+    if (a.exponent < -1000) return 0x1p-999;
+    return a.mantissa * pow2d(a.exponent);
+}
+inline bool ple(PositiveBound a, PositiveBound b) {
+    if (a.mantissa == 0) return true;
+    if (b.mantissa == 0) return false;
+    const int d = a.exponent - b.exponent;
+    if (d < -2) return true;
+    if (d > 2) return false;
+    return a.mantissa * pow2d(d) <= b.mantissa;
+}
+inline PositiveBound psqrt(PositiveBound a) {
+    if (a.mantissa == 0) return a;
+    double m = a.mantissa; int e = a.exponent;
+    if (e & 1) { m *= 2.0; e -= 1; }
+    return pnorm_(std::sqrt(m) * positive_upper_factor, e / 2);
+}
+// Exact conversion to binary128 storage. Reject values above the format.
+inline Quad ptoq_up(PositiveBound a, bool& ok) {
+    if (a.mantissa == 0) return 0;
+    if (!(a.mantissa < 4.0)) { ok = false; return 0; }
+    double m = a.mantissa; int e = a.exponent;
+    if (m >= 2.0) { m *= 0.5; e += 1; }
+    if (e > 16382) { ok = false; return 0; }
+    if (e < -16381) return fromw(0, UINT64_C(2) << 48);
+    std::uint64_t b; std::memcpy(&b, &m, 8);
+    b &= UINT64_C(0xfffffffffffff);
+    return fromw(b << 60, (std::uint64_t(e + 16383) << 48) | (b >> 4));
+}
+
+// ---- Outward binary128 interval helpers used only in setup and fallback -----
+struct Interval { Quad lower, upper; };
+inline Interval ivadd(Interval a, Interval b) { return {next_lower(a.lower + b.lower), next_upper(a.upper + b.upper)}; }
+inline Interval ivsub(Interval a, Interval b) { return {next_lower(a.lower - b.upper), next_upper(a.upper - b.lower)}; }
+inline Interval ivmul(Interval a, Interval b) {
+    const Quad p[4]{a.lower * b.lower, a.lower * b.upper, a.upper * b.lower, a.upper * b.upper};
+    Quad lo = p[0], hi = p[0];
+    for (int i = 0; i < 4; ++i) { if (!finite_quad(p[i])) return {-HUGE_VALQ, HUGE_VALQ}; if (p[i] < lo) lo = p[i]; if (p[i] > hi) hi = p[i]; }
+    return {next_lower(lo), next_upper(hi)};
+}
+inline Interval ivdivp(Interval a, Interval b) {
+    if (!(b.lower > 0) || !finite_quad(b.upper)) return {-HUGE_VALQ, HUGE_VALQ};
+    return ivmul(a, Interval{next_lower(1 / b.upper), next_upper(1 / b.lower)});
+}
+
+// ---- Rigorous relative bound for r rounded steps ---------------------------
+// Q_S=S/(1-S). The lemma needs S<1, so S>=1 returns failure.
+struct CoefficientBounds {
+    std::vector<PositiveBound> q; std::vector<double> onep; PositiveBound sigma; bool ok = true;
+    void init(PositiveBound sig, int cap) {
+        sigma = sig; q.assign(cap + 1, PositiveBound{0, 0}); onep.assign(cap + 1, 1.0);
+        for (int r = 1; r <= cap; ++r) {
+            const PositiveBound S = pmul(pint(r), sig);
+            const double sd = pdbl_up(S), den = (1.0 - sd) * positive_lower_factor;
+            if (!(den > 0)) { ok = false; return; }
+            q[r] = pdiv(S, pfromd(den));
+            onep[r] = (1.0 / den) * positive_upper_factor;
+        }
+    }
+};
+inline PositiveBound relq(PositiveBound S, bool& ok) {
+    const double den = (1.0 - pdbl_up(S)) * positive_lower_factor;
+    if (!(den > 0)) { ok = false; return {0, 0}; }
+    return pdiv(S, pfromd(den));
+}
+
+// Sign/cos on a binary128 point with outward radii. The series and rounding model replace
+// the interval recurrence. Alternating remainders are DLMF 4.19 with |x|<=1.
+// Fix the nearest binary128 value independently of the rounding mode at DLL load.
+static const Quad half_pi = fromw(UINT64_C(0x8469898cc51701b8), UINT64_C(0x3fff921fb54442d1));
+static bool validated_sincos(Quad z, Quad& sval, Quad& cval, PositiveBound& srad, PositiveBound& crad) {
+    bool ok = true;
+    const Quad quot = roundq(z / half_pi);
+    if (fabsq(quot) > Quad(1e18)) return false;
+    const long long j = (long long)quot;
+    const Quad prod = quot * half_pi, x = z - prod;
+    if (fabsq(x) > 1 || !normal_quad(x)) return false;
+    const PositiveBound pu{1.0, -113};
+    // |pi/2-stored|<=2^-112, the verified adjacent-endpoint enclosure.
+    PositiveBound dr = padd(padd(pmul(pint(j < 0 ? -j : j), PositiveBound{1.0, -112}), pmul(pfromq_up(prod, ok), pu)), pmul(pfromq_up(x, ok), pu));
+    const Quad x2 = x * x;
+    if (!normal_quad(x2)) return false;
+    const PositiveBound stepS = pmul(pint(3), pu);
+    Quad ts = x, tc = 1, ss = x, sc = 1;
+    PositiveBound es{0, 0}, ec{0, 0};
+    PositiveBound lasts = pfromq_up(ts, ok), lastc = PositiveBound{1.0, 0};
+    for (int j2 = 1; j2 <= 24; ++j2) {
+        const Quad ds = Quad(2 * j2 * (2 * j2 + 1)), dc = Quad((2 * j2 - 1) * 2 * j2);
+        ts = (ts * x2) / ds; tc = (tc * x2) / dc;
+        if (!normal_quad(ts) || !normal_quad(tc)) return false;
+        const PositiveBound S = pmul(pint(j2), stepS), qr = relq(S, ok);
+        const PositiveBound as = pfromq_up(ts, ok), ac = pfromq_up(tc, ok);
+        if (j2 & 1) { ss -= ts; sc -= tc; } else { ss += ts; sc += tc; }
+        es = padd(es, padd(pmul(as, qr), pmul(pfromq_up(ss, ok), pu)));
+        ec = padd(ec, padd(pmul(ac, qr), pmul(pfromq_up(sc, ok), pu)));
+        lasts = as; lastc = ac;
+    }
+    // One further term dominates the alternating truncation remainder.
+    srad = padd(padd(es, lasts), dr); crad = padd(padd(ec, lastc), dr);
+    switch (((j % 4) + 4) % 4) {
+        case 0: sval = ss; cval = sc; break;
+        case 1: sval = sc; cval = -ss; std::swap(srad, crad); break;
+        case 2: sval = -ss; cval = -sc; break;
+        default: sval = -sc; cval = ss; std::swap(srad, crad); break;
+    }
+    return ok;
+}
+
+// Interval route with the same series, for arguments outside the normal contract.
+static bool interval_sincos(Quad z, Quad& sval, Quad& cval, PositiveBound& srad, PositiveBound& crad) {
+    bool ok = true;
+    const Interval pib{next_lower(half_pi), next_upper(half_pi)};
+    const Quad quot = roundq(z / half_pi);
+    if (fabsq(quot) > Quad(1e18)) return false;
+    const long long j = (long long)quot;
+    const Interval x = ivsub(Interval{z, z}, ivmul(Interval{quot, quot}, pib));
+    if (!finite_quad(x.lower) || !finite_quad(x.upper) || fmaxq(fabsq(x.lower), fabsq(x.upper)) > 1) return false;
+    Interval sq = ivmul(x, x);
+    if (x.lower <= 0 && x.upper >= 0) sq.lower = 0;
+    const Interval negsq{-sq.upper, -sq.lower};
+    Interval ts = x, tc{1, 1}, ss = x, sc{1, 1};
+    for (int i = 1; i <= 24; ++i) {
+        const Quad ds = Quad(2 * i * (2 * i + 1)), dc = Quad((2 * i - 1) * 2 * i);
+        ts = ivdivp(ivmul(ts, negsq), Interval{ds, ds}); ss = ivadd(ss, ts);
+        tc = ivdivp(ivmul(tc, negsq), Interval{dc, dc}); sc = ivadd(sc, tc);
+    }
+    const Quad rs = fmaxq(fabsq(ts.lower), fabsq(ts.upper)), rc = fmaxq(fabsq(tc.lower), fabsq(tc.upper));
+    const Interval s2{next_lower(ss.lower - rs), next_upper(ss.upper + rs)}, c2{next_lower(sc.lower - rc), next_upper(sc.upper + rc)};
+    const Quad smid = (s2.lower + s2.upper) / 2, cmid = (c2.lower + c2.upper) / 2;
+    const Quad sr = next_upper(fmaxq(next_upper(smid - s2.lower), next_upper(s2.upper - smid))), cr = next_upper(fmaxq(next_upper(cmid - c2.lower), next_upper(c2.upper - cmid)));
+    srad = pfromq_up(sr, ok); crad = pfromq_up(cr, ok);
+    switch (((j % 4) + 4) % 4) {
+        case 0: sval = smid; cval = cmid; break;
+        case 1: sval = cmid; cval = -smid; std::swap(srad, crad); break;
+        case 2: sval = -smid; cval = -cmid; break;
+        default: sval = -cmid; cval = smid; std::swap(srad, crad); break;
+    }
+    return ok;
+}
+
+// ---- Green table in outward positive arithmetic ----------------------------
+struct MomentRecurrence {
+    int nmax = 0, last = -1, avail = -1;
+    Quad c, q, s, origin, root, z, h, inverse;
+    Interval zb, hb, rootb, originb;
+    PositiveBound zL, zU, dz, green, asum, bsum, eps_h, eps_root, eps_origin, abss;
+    PositiveBound pref_step;
+    bool inverse_normal = true;
+    std::vector<Quad> y;
+    std::vector<PositiveBound> ay, E, Y, J, Bm;
+    CoefficientBounds rel;
+    Accumulator defect_acc;
+};
+
+static PositiveBound h_norm(int order, PositiveBound zLinv2) {
+    PositiveBound term = zLinv2, total = term;
+    for (int k = 0; k < order; ++k) {
+        const double ratio = (double(2 * k + 1) / double(2 * k + 2)) * positive_upper_factor * double(order - k) * positive_upper_factor * double(order + k + 1) * positive_upper_factor;
+        term = pmul(term, pmul(pfromd(ratio), zLinv2));
+        total = padd(total, term);
+    }
+    return psqrt(total);
+}
+
+static bool initialize_recurrence(MomentRecurrence& T, Quad c, Quad q, Quad s, int center, int nmax, int cap) {
+    bool ok = true;
+    if (std::fegetround() != FE_TONEAREST) return false;
+    T.c = c; T.q = q; T.s = s; T.nmax = nmax;
+    if (!(c > 0) || !(q > 0) || s == 0 || !finite_quad(c) || !finite_quad(q) || !finite_quad(s)) return false;
+    T.origin = q + Quad(center);
+    T.originb = ivadd(Interval{q, q}, Interval{Quad(center), Quad(center)});
+    if (!(T.originb.lower > 1) || !finite_quad(T.originb.upper)) return false;
+    T.root = sqrtq(T.origin);
+    if (!(T.root > 0) || !finite_quad(T.root)) return false;
+    // A residual encloses the root without an accuracy assumption on sqrt.
+    const Interval r2 = ivmul(Interval{T.root, T.root}, Interval{T.root, T.root});
+    const Interval res = ivsub(T.originb, r2);
+    const Quad rerr = next_upper(fmaxq(fabsq(res.lower), fabsq(res.upper)) / T.root);
+    T.rootb = Interval{next_lower(T.root - rerr), next_upper(T.root + rerr)};
+    if (!(T.rootb.lower > 0)) return false;
+    T.z = c * T.root;
+    T.h = c / (2 * T.root);
+    T.zb = ivmul(Interval{c, c}, T.rootb);
+    T.hb = ivdivp(Interval{c, c}, ivmul(Interval{2, 2}, T.rootb));
+    if (!(T.zb.lower > 0) || !finite_quad(T.zb.upper) || !(T.hb.lower > 0) || !finite_quad(T.hb.upper)) return false;
+    T.inverse = 1 / T.z;
+    T.zL = pfromq_dn(T.zb.lower, ok); T.zU = pfromq_up(T.zb.upper, ok);
+    const Quad dzq = next_upper(fmaxq(fabsq(T.z - T.zb.lower), fabsq(T.zb.upper - T.z)));
+    T.dz = pfromq_up(dzq, ok);
+    if (T.zL.mantissa == 0) return false;
+    T.abss = pfromq_up(quad_abs(s), ok);
+    const PositiveBound absL = pfromq_dn(quad_abs(s), ok);
+    if (absL.mantissa == 0) return false;
+    T.green = pdiv(pmul(T.zU, T.zU), absL);
+    // |hhat/h-1|<=max(hhat-hL,hU-hhat)/hL.
+    const Quad hrad = next_upper(fmaxq(next_upper(T.h - T.hb.lower), next_upper(T.hb.upper - T.h)));
+    T.eps_h = pdiv(pfromq_up(hrad, ok), pfromq_dn(T.hb.lower, ok));
+    const PositiveBound pu{1.0, -113};
+    T.eps_root = pdiv(pfromq_up(rerr, ok), pfromq_dn(T.rootb.lower, ok));
+    T.eps_origin = pdiv(pfromq_up(next_upper(fmaxq(fabsq(T.origin - T.originb.lower), fabsq(T.originb.upper - T.origin))), ok), pfromq_dn(T.originb.lower, ok));
+    T.rel.init(padd(T.eps_h, pmul(pint(3), pu)), cap);
+    if (!T.rel.ok) return false;
+    T.pref_step = padd(T.eps_h, pmul(pint(3), pu));
+    // Seed values use the same library sin/cos as the native y table, checked against validated values.
+    Quad sl, cl, sv, cv; PositiveBound srad, crad;
+    sincosq(T.z, &sl, &cl);
+    if (!validated_sincos(T.z, sv, cv, srad, crad)) {
+        if (!interval_sincos(T.z, sv, cv, srad, crad)) return false;
+    }
+    const PositiveBound Se = padd(padd(pfromq_up(quad_abs(sl - sv), ok), pmul(pfromq_up(quad_abs(sl - sv), ok), pu)), padd(srad, T.dz));
+    const PositiveBound Ce = padd(padd(pfromq_up(quad_abs(cl - cv), ok), pmul(pfromq_up(quad_abs(cl - cv), ok), pu)), padd(crad, T.dz));
+    T.y.assign(nmax + 1, Quad(0));
+    T.ay.assign(nmax + 1, PositiveBound{0, 0}); T.E = T.ay; T.Y = T.ay; T.J = T.ay; T.Bm = T.ay;
+    T.inverse_normal = normal_quad(T.inverse);
+    const Quad a0 = cl * T.inverse;
+    T.y[0] = -a0 * s;
+    const Quad b1 = sl * T.inverse, a1 = a0 * T.inverse, d1 = -a1 - b1;
+    T.y[1] = d1 * s;
+    const PositiveBound zL2 = pmul_lo(T.zL, T.zL), acl = pfromq_up(quad_abs(cl), ok), asl = pfromq_up(quad_abs(sl), ok);
+    const PositiveBound Q2 = relq(pmul(pint(2), pu), ok), Q3 = relq(pmul(pint(3), pu), ok), Q4 = relq(pmul(pint(4), pu), ok);
+    T.ay[0] = pfromq_up(quad_abs(T.y[0]), ok);
+    T.ay[1] = pfromq_up(quad_abs(T.y[1]), ok);
+    PositiveBound e0 = padd(pmul(T.ay[0], Q3), pmul(T.abss, padd(pdiv(Ce, T.zL), pdiv(pmul(acl, T.dz), zL2))));
+    const PositiveBound zL4 = pmul_lo(zL2, zL2), two{1.0, 1};
+    const PositiveBound inner = padd(padd(pmul(pfromq_up(quad_abs(d1), ok), pu), pmul(pfromq_up(quad_abs(a1), ok), Q4)),
+        padd(pmul(pfromq_up(quad_abs(b1), ok), Q2), padd(pdiv(Ce, zL2), padd(pdiv(pmul(pmul(acl, pmul(two, T.zU)), T.dz), zL4),
+        padd(pdiv(Se, T.zL), pdiv(pmul(asl, T.dz), zL2))))));
+    PositiveBound e1 = padd(pmul(T.ay[1], pu), pmul(T.abss, inner));
+    const bool seed_normal = T.inverse_normal && normal_quad(cl) && normal_quad(sl) && normal_quad(a0) && normal_quad(T.y[0]) && normal_quad(a1) && normal_quad(b1) && normal_quad(T.y[1]);
+    if (!seed_normal) {
+        // Non-normal seeds take the absolute interval route.
+        const Quad Ceq = ptoq_up(Ce, ok), Seq = ptoq_up(Se, ok);
+        const Interval cosb{next_lower(cl - Ceq), next_upper(cl + Ceq)}, sinb{next_lower(sl - Seq), next_upper(sl + Seq)};
+        const Interval un0 = ivdivp(Interval{-cosb.upper, -cosb.lower}, T.zb), un1 = ivdivp(ivsub(un0, sinb), T.zb);
+        const Interval sb{s, s}, y0b = ivmul(un0, sb), y1b = ivmul(un1, sb);
+        if (!finite_quad(y0b.lower) || !finite_quad(y0b.upper) || !finite_quad(y1b.lower) || !finite_quad(y1b.upper)) return false;
+        e0 = pfromq_up(next_upper(fmaxq(fabsq(T.y[0] - y0b.lower), fabsq(y0b.upper - T.y[0]))), ok);
+        e1 = pfromq_up(next_upper(fmaxq(fabsq(T.y[1] - y1b.lower), fabsq(y1b.upper - T.y[1]))), ok);
+    }
+    T.E[0] = e0; T.E[1] = e1;
+    T.Y[0] = padd(T.ay[0], e0); T.Y[1] = padd(T.ay[1], e1);
+    // Sparse order anchors from DLMF 10.49.17-18, then the backward ratio sweep above z.
+    const PositiveBound zLinv2 = pdiv(PositiveBound{1.0, 0}, zL2);
+    const double zUd = pdbl_up(T.zU);
+    int n0 = nmax;
+    if (zUd < double(nmax - 1)) n0 = int(std::ceil(zUd)) + 1;
+    int previous = -1;
+    for (int sample = 0; sample <= 8; ++sample) {
+        const int anchor = (sample * n0 + 7) / 8;
+        const PositiveBound b = h_norm(anchor, zLinv2);
+        for (int i = previous + 1; i <= anchor; ++i) T.J[i] = b;
+        previous = anchor;
+    }
+    if (n0 < nmax) {
+        std::vector<double> ratios(nmax + 1, 1.0);
+        for (int i = nmax; i > n0; --i) {
+            const double den = (double(2 * i + 1) * positive_lower_factor - zUd * ratios[i] * positive_upper_factor) * positive_lower_factor;
+            if (!(den > 0)) return false;
+            ratios[i - 1] = std::min(1.0, (zUd / den) * positive_upper_factor);
+        }
+        for (int i = n0 + 1; i <= nmax; ++i) T.J[i] = pmul(T.J[i - 1], pfromd(ratios[i - 1]));
+    }
+    T.asum = padd(pmul(T.J[1], e0), pmul(T.J[0], e1));
+    T.bsum = padd(pmul(T.Y[1], e0), pmul(T.Y[0], e1));
+    T.Bm[0] = pdiv(T.abss, T.zL);
+    T.Bm[1] = padd(T.Bm[0], pdiv(T.Bm[0], T.zL));
+    T.last = 1; T.avail = 1;
+    return ok;
+}
+
+// Enclose each Neumann recurrence defect with exact products before propagating it.
+static inline bool extend_recurrence(MomentRecurrence& T, int target) {
+    bool ok = true;
+    while (T.last < target) {
+        const int n = T.last + 1, i = n - 1;
+        const Quad w = Quad(2 * i + 1), kappa = w * T.inverse, p = kappa * T.y[i];
+        const Quad yn = p - T.y[i - 1];
+        T.y[n] = yn;
+        if (!finite_quad(yn)) return false;
+        const PositiveBound an = pfromq_up(quad_abs(yn), ok), ap1 = T.ay[i - 1];
+        T.ay[n] = an;
+        const PositiveBound sum = padd(an, ap1);
+        PositiveBound R;
+            T.defect_acc.reset();
+            if (!T.defect_acc.add(T.z, yn) || !T.defect_acc.add(T.z, T.y[i - 1]) || !T.defect_acc.add(-w, T.y[i])) return false;
+            const Quad D = T.defect_acc.rounded();
+            if (!finite_quad(D)) return false;
+            R = pdiv(padd(pfromq_up(next_upper(quad_abs(D)), ok), pmul(T.dz, sum)), T.zL);
+        T.asum = padd(T.asum, pmul(T.J[i], R));
+        T.bsum = padd(T.bsum, pmul(T.Y[i], R));
+        const PositiveBound prod = pmul(T.green, T.asum);
+        const double den = (1.0 - pdbl_up(prod)) * positive_lower_factor;
+        if (!(den > 0)) return false;
+        const PositiveBound numer = padd(pmul(an, T.asum), pmul(T.J[n], T.bsum));
+        T.E[n] = pdiv(pmul(T.green, numer), pfromd(den));
+        T.Y[n] = padd(an, T.E[n]);
+        T.last = n;
+    }
+    return ok;
+}
+
+static inline void majorant_extend(MomentRecurrence& T, int target) {
+    while (T.avail < target) {
+        const int j = T.avail;
+        T.Bm[j + 1] = padd(pmul(pdiv(pint(2 * j + 1), T.zL), T.Bm[j]), T.Bm[j - 1]);
+        T.avail = j + 1;
+    }
+}
+
+// ---- Enclosed moment table -------------------------------------------------
+struct MomentResult {
+    int status = 0;
+    std::vector<Quad> values, bounds;
+};
+
+// Exceeding this work budget rejects the candidate without truncating the original solver.
+static const int moment_term_budget = 1024;
+
+static void enclose_moments(MomentRecurrence& T, int m, int center, int kmax, MomentResult& out, int first_k=0) {
+    bool ok = true;
+    const PositiveBound pu{1.0, -113}, eta{1.0, -16495};
+    if (std::fegetround() != FE_TONEAREST) { out.status = 9; return; }
+    out.status = 0;
+    out.values.assign(3 * (kmax + 1), Quad(0)); out.bounds = out.values;
+    static thread_local Accumulator acc[3];
+    std::vector<Quad> coef(moment_term_budget);
+    const Quad origin = T.origin, root = T.root, h = T.h;
+    const Quad step = center == 0 ? -h : h;
+    const Interval stepb = center == 0 ? Interval{-T.hb.upper, -T.hb.lower} : T.hb;
+    const Quad mq = Quad(m);
+    // Leading factor and its rigorous starting relative bound.
+    Quad leading = Quad(2) / Quad(2 * m + 1);
+    Interval leadb = ivdivp(Interval{2, 2}, Interval{Quad(2 * m + 1), Quad(2 * m + 1)});
+    if (center == 1) {
+        const Quad ratio = T.q / origin;
+        const Interval ratb = ivdivp(Interval{T.q, T.q}, T.originb);
+        Quad p = 1; Interval pb{1, 1}, fb = ratb; Quad f = ratio;
+        int ex = m / 2;
+        while (ex > 0) { if (ex & 1) { p *= f; pb = ivmul(pb, fb); } ex >>= 1; if (ex) { f *= f; fb = ivmul(fb, fb); } }
+        leading *= p; leadb = ivmul(leadb, pb);
+        if (m & 1) {
+            const Quad rt = sqrtq(ratio);
+            const Interval r2 = ivmul(Interval{rt, rt}, Interval{rt, rt}), rs = ivsub(ratb, r2);
+            const Quad e = next_upper(fmaxq(fabsq(rs.lower), fabsq(rs.upper)) / rt);
+            leading *= rt; leadb = ivmul(leadb, Interval{next_lower(rt - e), next_upper(rt + e)});
+        }
+    }
+    if (!(leadb.lower > 0) || !finite_quad(leadb.upper)) { out.status = 1; return; }
+    PositiveBound lead_rel0 = pdiv(pfromq_up(next_upper(fmaxq(next_upper(leading - leadb.lower), next_upper(leadb.upper - leading))), ok), pfromq_dn(leadb.lower, ok));
+    bool lead_fast = true;
+    const PositiveBound invoL = pdiv(PositiveBound{1.0, 0}, pfromq_dn(T.originb.lower, ok));
+    const PositiveBound c2_upper = pmul(pfromq_up(T.c, ok), pfromq_up(T.c, ok));
+    for (int k = 0; k <= kmax; ++k) {
+        const PositiveBound Sk = padd(lead_rel0, pmul(pint(k), T.pref_step));
+        if(k>=first_k) {
+        Quad a = 1;
+        Interval ab{1, 1};
+        bool fast = true;
+        PositiveBound Cint{0, 0};
+        PositiveBound Ae[3] = {{0, 0}, {0, 0}, {0, 0}}, Ce[3] = {{0, 0}, {0, 0}, {0, 0}}, tail[3] = {{0, 0}, {0, 0}, {0, 0}};
+        int r = 0;
+        const double fam = double(std::max(0, 2 * (m + k + 2) - 1));
+        bool stopped = false;
+        for (; r < moment_term_budget; ++r) {
+            const int n = m + k + r;
+            if (n + 2 > T.nmax) { out.status = 2; return; }
+            if (n + 2 > T.last) { if (!extend_recurrence(T, n + 2)) { out.status = 2; return; } }
+            if (n + 2 > T.avail) majorant_extend(T, n + 2);
+            coef[r] = a;
+            const PositiveBound aU = pfromq_up(quad_abs(a), ok);
+            PositiveBound aC, aTail;
+            double onep;
+            if (fast) { aC = pmul(aU, T.rel.q[r]); onep = T.rel.onep[r]; aTail = pmul(aU, pfromd(onep)); }
+            else { aC = Cint; aTail = pfromq_up(fmaxq(quad_abs(ab.lower), quad_abs(ab.upper)), ok); }
+            for (int f = 0; f < 3; ++f) {
+                Ae[f] = padd(Ae[f], pmul(aU, T.E[n + f]));
+                Ce[f] = padd(Ce[f], pmul(aC, T.Y[n + f]));
+            }
+            if (n >= 1) {
+                const PositiveBound rho_bound=padd(invoL,padd(
+                    pdiv(pmul(invoL,pint(static_cast<unsigned long long>(fam))),pint(2*(r+1))),
+                    pdiv(c2_upper,pint(2ULL*(2*n-1)*(r+1)))));
+                const double rho=pdbl_up(rho_bound);
+                if (rho < 1.0) {
+                    const double den=(1.0-rho)*positive_lower_factor;
+                    const PositiveBound frac=pdiv(rho_bound,pfromd(den));
+                    bool done = true;
+                    for (int f = 0; f < 3; ++f) {
+                        tail[f] = pmul(pmul(aTail, T.Bm[n + f]), frac);
+                        if (!ple(tail[f], padd(Ae[f], Ce[f]))) done = false;
+                    }
+                    if (done) { stopped = true; break; }
+                }
+            }
+            const Quad num = center == 0 ? Quad(k + r) + Quad(0.5) : Quad(k + m + r + 1);
+            const Quad den = Quad(r + 1) * (Quad(2 * k + m + r) + Quad(1.5));
+            const Quad t1 = a * step, t2 = t1 * num, anext = t2 / den;
+            if (fast && !(normal_quad(t1) && normal_quad(t2) && normal_quad(anext))) {
+                // Switch to the absolute interval from the proved bound at the last normal step.
+                const Quad cq = ptoq_up(pmul(aU, T.rel.q[r]), ok);
+                ab = Interval{next_lower(a - cq), next_upper(a + cq)};
+                fast = false;
+            }
+            if (!fast) {
+                ab = ivdivp(ivmul(ivmul(ab, stepb), Interval{num, num}), Interval{den, den});
+                if (!finite_quad(ab.lower) || !finite_quad(ab.upper)) { out.status = 6; return; }
+                Cint = pfromq_up(next_upper(fmaxq(fabsq(anext - ab.lower), fabsq(ab.upper - anext))), ok);
+            }
+            a = anext;
+        }
+        if (!stopped) { out.status = 3; return; }
+        const int count = r + 1;
+        // Rounded exact signed sums use the same stored products as the native dot.
+        for (int f = 0; f < 3; ++f) acc[f].reset();
+        for (int i = 0; i < count; ++i) {
+            const int n = m + k + i;
+            for (int f = 0; f < 3; ++f) if (!acc[f].add(coef[i], T.y[n + f])) { out.status = 4; return; }
+        }
+        Quad sums[3];
+        for (int f = 0; f < 3; ++f) { sums[f] = acc[f].rounded(); if (!finite_quad(sums[f])) { out.status = 4; return; } }
+        PositiveBound arith[3];
+        for (int f = 0; f < 3; ++f) arith[f] = padd(Ae[f], Ce[f]);
+        // Family prefactors and final rounded moments.
+        for (int f = 0; f < 3; ++f) {
+            const PositiveBound Es = padd(padd(arith[f], tail[f]), padd(pmul(pfromq_up(quad_abs(sums[f]), ok), pu), eta));
+            const Quad P = f == 0 ? leading : (f == 1 ? leading / root : leading / origin);
+            const Quad value = P * sums[f];
+            out.values[3 * k + f] = value;
+            PositiveBound relP = Sk;
+            if (f == 1) relP = padd(relP, padd(T.eps_root, pu));
+            if (f == 2) relP = padd(relP, padd(T.eps_origin, pu));
+            const PositiveBound qP = relq(relP, ok), aP = pfromq_up(quad_abs(P), ok);
+            if (!lead_fast || !normal_quad(P) || !(normal_quad(value) || sums[f] == 0)) {
+                // Absolute product of the prefactor interval and the sum interval.
+                Interval Lb = leadb;
+                if (lead_fast) { const Quad rq = ptoq_up(pmul(pfromq_up(quad_abs(leading), ok), relq(Sk, ok)), ok); Lb = Interval{next_lower(leading - rq), next_upper(leading + rq)}; }
+                const Interval Pb = f == 0 ? Lb : (f == 1 ? ivdivp(Lb, T.rootb) : ivdivp(Lb, T.originb));
+                const Quad Eq = ptoq_up(Es, ok);
+                const Interval mb = ivmul(Pb, Interval{next_lower(sums[f] - Eq), next_upper(sums[f] + Eq)});
+                if (!finite_quad(mb.lower) || !finite_quad(mb.upper)) { out.status = 5; return; }
+                out.bounds[3 * k + f] = next_upper(fmaxq(fabsq(value - mb.lower), fabsq(mb.upper - value)));
+                if (!finite_quad(out.bounds[3 * k + f])) { out.status = 5; return; }
+                continue;
+            }
+            const PositiveBound b = padd(padd(pmul(pfromq_up(quad_abs(value), ok), pu), pmul(pmul(aP, pfromq_up(quad_abs(sums[f]), ok)), qP)),
+                pmul(pmul(aP, padd(PositiveBound{1.0, 0}, qP)), Es));
+            out.bounds[3 * k + f] = ptoq_up(b, ok);
+        }
+        }
+        const Quad num = mq + Quad(k) + Quad(0.5), d1 = Quad(2 * k + m) + Quad(1.5), d2 = Quad(2 * k + m) + Quad(2.5);
+        const Quad den = d1 * d2, t1 = leading * (-h), t2 = t1 * num, next = t2 / den;
+        if (lead_fast && !(normal_quad(t1) && normal_quad(t2) && normal_quad(next))) {
+            // Hand the proved relative radius to the interval recurrence at the last normal step.
+            const Quad rq = ptoq_up(pmul(pfromq_up(quad_abs(leading), ok), relq(Sk, ok)), ok);
+            leadb = Interval{next_lower(leading - rq), next_upper(leading + rq)};
+            lead_fast = false;
+        }
+        if (!lead_fast) {
+            leadb = ivdivp(ivmul(ivmul(leadb, Interval{-T.hb.upper, -T.hb.lower}), Interval{num, num}), Interval{den, den});
+            if (k < kmax && (!finite_quad(leadb.lower) || !finite_quad(leadb.upper))) { out.status = 5; return; }
+        }
+        leading = next;
+        if (!ok) { out.status = 8; return; }
+    }
+}
+
+
+static int enclose_stream_rounding(Quad* out) {
+    bool ok=true;
+    const PositiveBound pu{1,-112},eta{1,-16494};
+    for(int f=0;f<2;++f) {
+        const PositiveBound radius=padd(pfromq_up(next_upper(out[2+f]),ok),
+            padd(pmul(pfromq_up(quad_abs(out[f]),ok),pu),eta));
+        const PositiveBound last=padd(pfromq_up(next_upper(out[6+f]),ok),
+            padd(pmul(pfromq_up(quad_abs(out[4+f]),ok),pu),eta));
+        out[2+f]=ptoq_up(radius,ok);out[6+f]=ptoq_up(last,ok);
+    }
+    return ok?1:6;
+}
+
+
+// Fixed-input propagation only. Successful returns preserve the supplied values.
+// Inputs and radii are exact stored binary128 numbers. Every result encloses the
+// corresponding real expression, not errors in creating its stored factors.
+static bool input_interval(Quad value,Quad radius,Interval& interval) noexcept {
+    if(!finite_quad(value) || !finite_quad(radius) || radius<0) return false;
+    interval=radius==0 ? Interval{value,value} : Interval{next_lower(value-radius),next_upper(value+radius)};
+    return finite_quad(interval.lower) && finite_quad(interval.upper) && interval.lower<=interval.upper;
+}
+
+static bool enclosing_radius(Quad actual,Interval interval,Quad& radius) noexcept {
+    if(!finite_quad(actual) || !finite_quad(interval.lower) || !finite_quad(interval.upper) || interval.lower>interval.upper) return false;
+    if(actual==interval.lower && actual==interval.upper) {radius=0;return true;}
+    const Quad left=next_upper(quad_abs(actual-interval.lower)),right=next_upper(quad_abs(interval.upper-actual));
+    radius=left>right ? left : right;
+    return finite_quad(radius) && radius>=0;
+}
+
+
+} // namespace psms_checked_integrals
+#endif
+extern "C" int pint_checked_moments_quad(int m,const acousticts_quad_t* c,const acousticts_quad_t* q,const acousticts_quad_t* s,int capacity,
+        int required,int first,acousticts_quad_t* p1,acousticts_quad_t* p2,acousticts_quad_t* p4,acousticts_quad_t* errors) {
+#if ACOUSTICTS_HAVE_EXACT_QUAD_DOT
+    using namespace psms_checked_integrals;
+    if(!pint_checked_moments_available_quad()) return 0;
+    if(!c || !q || !s || !p1 || !p2 || !p4 || !errors || capacity>INT_MAX/6) return 0;
+    if(m<0 || required<2 || required>capacity || first<1 || first>required ||
+       !(first&1) || m>1022 || std::fegetround()!=FE_TONEAREST) return 0;
+    const int kmax=(required-2)/2,first_k=(first-1)/2;
+    if(kmax>1022-m || first_k>kmax) return 0;
+    try {
+        MomentRecurrence table;
+        if(!initialize_recurrence(table,*c,*q,*s,0,m+kmax+moment_term_budget+2,moment_term_budget)) return 0;
+        MomentResult result;
+        enclose_moments(table,m,0,kmax,result,first_k);
+        if(result.status) return 0;
+        for(int k=first_k;k<=kmax;++k) for(int f=0;f<3;++f)
+            if(!finite_quad(result.values[3*k+f]) || !finite_quad(result.bounds[3*k+f]) ||
+               result.bounds[3*k+f]<0) return 0;
+        for(int k=first_k;k<=kmax;++k) {
+            const int i=2*k;
+            p1[i]=result.values[3*k];p2[i]=result.values[3*k+1];p4[i]=result.values[3*k+2];
+            errors[2*capacity+i]=result.bounds[3*k];
+            errors[3*capacity+i]=result.bounds[3*k+1];
+            errors[5*capacity+i]=result.bounds[3*k+2];
+        }
+        return 1;
+    } catch(...) { return 0; }
+
+#else
+    return 0;
+#endif
+}
+extern "C" int pint_checked_parity_quad(const acousticts_quad_t* alpha,const acousticts_quad_t* beta,const acousticts_quad_t* minus,const acousticts_quad_t* plus,
+        const acousticts_quad_t* eminus,const acousticts_quad_t* eplus,const acousticts_quad_t* returned,acousticts_quad_t* error) {
+#if ACOUSTICTS_HAVE_EXACT_QUAD_DOT
+    using namespace psms_checked_integrals;
+    if(!pint_checked_moments_available_quad()) return 0;
+    if(!alpha || !beta || !minus || !plus || !eminus || !eplus || !returned || !error) return 0;
+    if(std::fegetround()!=FE_TONEAREST || !finite_quad(*alpha) || *alpha==0 || !finite_quad(*beta) ||
+       !finite_quad(*returned)) return 0;
+    Interval low,high;
+    if(!input_interval(*minus,*eminus,low) || !input_interval(*plus,*eplus,high)) return 0;
+    Interval target=ivsub(high,ivmul(Interval{*beta,*beta},low));
+    if(!finite_quad(target.lower) || !finite_quad(target.upper)) return 0;
+    if(*alpha<0) target=Interval{-target.upper,-target.lower};
+    const Quad denominator=quad_abs(*alpha);
+    target=ivdivp(target,Interval{denominator,denominator});
+    return enclosing_radius(*returned,target,*error) ? 1 : 0;
+
+#else
+    return 0;
+#endif
+}
+extern "C" int pint_checked_radial_quad(const acousticts_quad_t* F,const acousticts_quad_t* D,const acousticts_quad_t* C,const acousticts_quad_t* s1,const acousticts_quad_t* s2,
+        const acousticts_quad_t* u1,const acousticts_quad_t* u2,const acousticts_quad_t* full,const acousticts_quad_t* first_deriv,const acousticts_quad_t* correction,
+        const acousticts_quad_t* derivsum,acousticts_quad_t* error,acousticts_quad_t* error_d) {
+#if ACOUSTICTS_HAVE_EXACT_QUAD_DOT
+    using namespace psms_checked_integrals;
+    if(!pint_checked_moments_available_quad()) return 0;
+    if(!F || !D || !C || !s1 || !s2 || !u1 || !u2 || !full || !first_deriv || !correction ||
+       !derivsum || !error || !error_d) return 0;
+    if(std::fegetround()!=FE_TONEAREST) return 0;
+    for(Quad value:{*F,*D,*C,*s1,*s2,*u1,*u2,*full,*first_deriv,*correction,*derivsum})
+        if(!finite_quad(value)) return 0;
+    if(*u1<0 || *u2<0) return 0;
+    // s1/s2 and u1/u2 are rounded exact signed and positive dot sums.
+    const Quad upper1=next_upper(*u1),upper2=next_upper(*u2);
+    if(!finite_quad(upper1) || !finite_quad(upper2)) return 0;
+    const Interval x1{next_lower(next_lower(*s1)-upper1),next_upper(next_upper(*s1)+upper1)};
+    const Interval x2{next_lower(next_lower(*s2)-upper2),next_upper(next_upper(*s2)+upper2)};
+    if(!finite_quad(x1.lower) || !finite_quad(x1.upper) || !finite_quad(x2.lower) || !finite_quad(x2.upper)) return 0;
+    const Interval radial=ivmul(Interval{*F,*F},x1);
+    const Interval derivative=ivadd(ivmul(Interval{*D,*D},x2),ivmul(Interval{*C,*C},x1));
+    Quad radial_error=0,derivative_error=0;
+    if(!enclosing_radius(*full,radial,radial_error) || !enclosing_radius(*derivsum,derivative,derivative_error)) return 0;
+    *error=radial_error;*error_d=derivative_error;return 1;
+
+#else
+    return 0;
+#endif
+}
+extern "C" int pint_checked_pack_quad(const acousticts_quad_t* value,const acousticts_quad_t* uncertainty,int decimal_shift,
+        const acousticts_quad_t* returned_packed,acousticts_quad_t* error) {
+#if ACOUSTICTS_HAVE_EXACT_QUAD_DOT
+    using namespace psms_checked_integrals;
+    if(!pint_checked_moments_available_quad()) return 0;
+    if(!value || !uncertainty || !returned_packed || !error) return 0;
+    if(std::fegetround()!=FE_TONEAREST || decimal_shift < -5000 || decimal_shift > 5000 ||
+       !finite_quad(*returned_packed)) return 0;
+    Interval target;
+    if(!input_interval(*value,*uncertainty,target)) return 0;
+    if(target.lower==0 && target.upper==0) return enclosing_radius(*returned_packed,target,*error) ? 1 : 0;
+    // 5**48 has 112 bits, so every integer power 10**j through j=48 is exact.
+    static const std::array<Quad,49> powers=[] {
+        std::array<Quad,49> p{};p[0]=1;
+        for(int i=1;i<=48;++i) p[i]=p[i-1]*Quad(10);
+        return p;
+    }();
+    int remaining=decimal_shift<0 ? -decimal_shift : decimal_shift;
+    while(remaining>0) {
+        const int step=remaining<48 ? remaining : 48;
+        const Quad factor=powers[step];
+        if(decimal_shift>0) target=Interval{next_lower(target.lower*factor),next_upper(target.upper*factor)};
+        else target=Interval{next_lower(target.lower/factor),next_upper(target.upper/factor)};
+        if(!finite_quad(target.lower) || !finite_quad(target.upper)) return 0;
+        remaining-=step;
+    }
+    return enclosing_radius(*returned_packed,target,*error) ? 1 : 0;
+
+#else
+    return 0;
+#endif
+}
+#endif
+
 #if ACOUSTICTS_HAVE_QUADMATH
 // Preserve exact binary128 products in radial sums and panel discrepancies.
 
@@ -244,7 +977,7 @@ extern "C" int pint_radial_stream_quad(int m,int parity,int seed,int lim,int max
       out[i]=accumulators[i].rounded();
       if(!finiteq(out[i])) return 6;
     }
-    return 1;
+    return pint_checked_moments_available_quad() ? psms_checked_integrals::enclose_stream_rounding(out) : 1;
   } catch(...) { return 6; }
 #else
   return 6;
@@ -257,6 +990,22 @@ struct RegisterRadialStream {
   RegisterRadialStream() { profcn_set_radial_stream_quad(&pint_radial_stream_quad); }
 };
 const RegisterRadialStream registered_radial_stream;
+}
+
+extern "C" void profcn_set_checked_radial_callbacks_quad(
+    decltype(&pint_checked_moments_available_quad), decltype(&pint_checked_moments_quad),
+    decltype(&pint_checked_parity_quad), decltype(&pint_checked_radial_quad),
+    decltype(&pint_checked_pack_quad));
+namespace {
+struct RegisterCheckedRadials {
+  RegisterCheckedRadials() {
+    // Keep checked evaluation optional in standalone native capability probes.
+    profcn_set_checked_radial_callbacks_quad(&pint_checked_moments_available_quad,
+        &pint_checked_moments_quad, &pint_checked_parity_quad,
+        &pint_checked_radial_quad, &pint_checked_pack_quad);
+  }
+};
+const RegisterCheckedRadials registered_checked_radials;
 }
 
 

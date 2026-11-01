@@ -9,6 +9,7 @@ module prolate_swf_quad
 module prolate_swf
  use param
 #endif
+ use iso_c_binding, only: c_int
  use iso_fortran_env, only: int64
  use, intrinsic :: ieee_arithmetic, only: ieee_round_type, ieee_nearest, &
      ieee_get_rounding_mode, operator(==), operator(/=)
@@ -416,7 +417,409 @@ module prolate_swf
  end interface
  procedure(radial_quadrature_panel_callback),pointer,save::radial_quadrature_panel_proc=>null()
 #endif
+#ifdef USE_QUAD
+ logical, save :: checked_moments_rejected=.false.
+ integer, save :: checked_moments_key_m=-1,checked_moments_key_mode=-1
+ real(knd), save :: checked_moments_key_c=-1.0_knd,checked_moments_key_x=-1.0_knd
+ abstract interface
+   integer(c_int) function checked_available_callback() bind(C)
+     import c_int
+   end function
+   integer(c_int) function checked_moments_callback(m,c,q,s,capacity,required,first,p1,p2,p4,errors) bind(C)
+     import c_int,knd
+     integer(c_int),value::m,capacity,required,first
+     real(knd),intent(in)::c,q,s
+     real(knd),intent(inout)::p1(*),p2(*),p4(*),errors(*)
+   end function
+   integer(c_int) function checked_parity_callback(alpha,beta,minus,plus,eminus,eplus,returned,error) bind(C)
+     import c_int,knd
+     real(knd),intent(in)::alpha,beta,minus,plus,eminus,eplus,returned
+     real(knd),intent(out)::error
+   end function
+   integer(c_int) function checked_radial_callback(f,d,c,s1,s2,u1,u2,v,v1,v2,vd,error,error_d) bind(C)
+     import c_int,knd
+     real(knd),intent(in)::f,d,c,s1,s2,u1,u2,v,v1,v2,vd
+     real(knd),intent(out)::error,error_d
+   end function
+   integer(c_int) function checked_pack_callback(value,uncertainty,shift,packed,error) bind(C)
+     import c_int,knd
+     real(knd),intent(in)::value,uncertainty,packed
+     integer(c_int),value::shift
+     real(knd),intent(out)::error
+   end function
+ end interface
+ type :: radial_retry_workspace
+   logical :: prepared=.false.
+   real(knd), allocatable :: nf(:),ndf(:),nv(:),ndr(:),prat(:)
+   real(knd), allocatable :: ratios(:),beta(:),gamma(:)
+   integer, allocatable :: ne(:)
+   real(knd) :: factor=0
+   integer :: exponent=0,ratio_count=0
+ end type
+ logical, save :: checked_radial_enabled=.false.
+ logical, save :: radial_retry_tracking=.false.,radial_retry_converged=.false.
+ integer, save :: radial_retry_m=-1,radial_retry_count=0,radial_retry_captured=0,radial_retry_dimensions(6)=0
+ integer(int64), save :: radial_retry_generation=0_int64
+ real(knd), save :: radial_retry_c=-1.0_knd,radial_retry_x1=-1.0_knd
+ real(knd), allocatable, save :: radial_retry_values(:,:)
+ integer, allocatable, save :: radial_retry_metadata(:,:),radial_retry_done(:)
+ type(radial_retry_workspace), save :: radial_retry_work
+
+ procedure(checked_available_callback),pointer,save :: checked_available_proc=>null()
+
+ procedure(checked_moments_callback),pointer,save :: checked_moments_proc=>null()
+
+ procedure(checked_parity_callback),pointer,save :: checked_parity_proc=>null()
+
+ procedure(checked_radial_callback),pointer,save :: checked_radial_proc=>null()
+
+ procedure(checked_pack_callback),pointer,save :: checked_pack_proc=>null()
+
+#endif
+
  contains
+
+#ifdef USE_QUAD
+ subroutine clear_radial_retry_ledger()
+   implicit none
+   type(radial_retry_workspace) :: empty
+   radial_retry_m=-1
+   radial_retry_count=0
+   radial_retry_captured=0
+   if(allocated(radial_retry_values)) deallocate(radial_retry_values)
+   if(allocated(radial_retry_metadata)) deallocate(radial_retry_metadata)
+   if(allocated(radial_retry_done)) deallocate(radial_retry_done)
+   radial_retry_work=empty
+   if(radial_retry_generation==huge(radial_retry_generation)) then
+     radial_retry_generation=1
+   else
+     radial_retry_generation=radial_retry_generation+1
+   end if
+ end subroutine
+
+ subroutine begin_radial_retry_ledger(m,count,c,x1,ndec,nex,maxd,maxlp,maxn,maxp)
+   implicit none
+   integer, intent(in) :: m,count,ndec,nex,maxd,maxlp,maxn,maxp
+   real(knd), intent(in) :: c,x1
+   integer :: allocation_status
+   call clear_radial_retry_ledger()
+   if(.not.checked_radial_enabled) return
+   allocate(radial_retry_values(2,count),radial_retry_metadata(6,count),radial_retry_done(count),stat=allocation_status)
+   if(allocation_status/=0) then
+     call clear_radial_retry_ledger()
+     return
+   end if
+   radial_retry_values=0
+   radial_retry_metadata=0
+   radial_retry_done=0
+   radial_retry_m=m
+   radial_retry_count=count
+   radial_retry_c=c
+   radial_retry_x1=x1
+   radial_retry_dimensions=[ndec,nex,maxd,maxlp,maxn,maxp]
+ end subroutine
+
+ function profcn_retry_current_radials_quad(c,x1,m,count,token,requests,r1,r1e,r1d,r1de,r2,r2e,r2d,r2de,accuracy) &
+     bind(C) result(status)
+   use iso_c_binding, only: c_int,c_int64_t
+   implicit none
+   integer(c_int), value :: m,count
+   real(knd), intent(in) :: c,x1,r1(count),r1d(count)
+   integer(c_int64_t), value :: token
+   integer(c_int), intent(in) :: requests(count),r1e(count),r1de(count)
+   real(knd), intent(inout) :: r2(count),r2d(count)
+   integer(c_int), intent(inout) :: r2e(count),r2de(count),accuracy(count)
+   integer(c_int) :: status
+   integer :: i,l,ndec,nex,maxd,maxlp,maxn,maxp,limd,planned,idmf,current,jsub,terms,support,reason,a,ie,ide,allocation_status
+   real(knd) :: eigval,dmf,value,derivative
+   real(knd), allocatable :: original_ratios(:)
+   logical :: reconstructed
+   status=0
+   if(.not.checked_radial_enabled.or.token/=radial_retry_generation.or.radial_retry_m/=m.or. &
+      radial_retry_count/=count.or.radial_retry_captured/=count.or.radial_retry_c/=c.or.radial_retry_x1/=x1) return
+   if(radial_quadrature_count/=count) return
+   if(checked_moment_callbacks_available()/=1) return
+   if(.not.allocated(radial_quadrature_errors).or..not.allocated(radial_quadrature_valid)) return
+   ndec=radial_retry_dimensions(1)
+   nex=radial_retry_dimensions(2)
+   maxd=radial_retry_dimensions(3)
+   maxlp=radial_retry_dimensions(4)
+   maxn=radial_retry_dimensions(5)
+   maxp=radial_retry_dimensions(6)
+   allocate(original_ratios(maxd),stat=allocation_status)
+   if(allocation_status/=0) return
+   do i=1,count
+     if(requests(i)==0.or.radial_retry_done(i)/=0) cycle
+     radial_retry_done(i)=1
+     if(radial_retry_metadata(6,i)==0) cycle
+     l=m+i-1
+     eigval=radial_retry_values(1,i)
+     dmf=radial_retry_values(2,i)
+     limd=radial_retry_metadata(1,i)
+     planned=radial_retry_metadata(2,i)
+     idmf=radial_retry_metadata(3,i)
+     current=radial_retry_metadata(4,i)
+     jsub=radial_retry_metadata(5,i)
+     call reconstruct_radial_retry_ratios(l,m,c,eigval,limd,ndec,nex,maxd,radial_retry_work,dmf,idmf,reconstructed)
+     if(.not.reconstructed) cycle
+     original_ratios=radial_retry_work%ratios
+     call retry_radial_neumann(l,m,c,x1,eigval,limd,planned,ndec,nex,maxd,maxlp,maxn,maxp,original_ratios,dmf,idmf, &
+       r1(i),r1e(i),r1d(i),r1de(i),current,jsub,radial_retry_work,value,ie,derivative,ide,a,terms,support,reason)
+     if(reason/=0) cycle
+     r2(i)=value
+     r2e(i)=ie
+     r2d(i)=derivative
+     r2de(i)=ide
+     accuracy(i)=a
+     ! This alternative adds no integration uncertainty. Native accuracy and support checks remain.
+     radial_quadrature_errors(i,:)=0
+     radial_quadrature_valid(i)=1
+   end do
+   status=1
+ end function
+
+ subroutine reconstruct_radial_retry_ratios(l,m,c,eigval,limd,ndec,nex,maxd,workspace,dmfnorm,idmfe,valid)
+   use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
+   implicit none
+   integer, intent(in) :: l,m,limd,ndec,nex,maxd,idmfe
+   real(knd), intent(in) :: c,eigval,dmfnorm
+   type(radial_retry_workspace), intent(inout) :: workspace
+   logical, intent(out) :: valid
+   integer :: ix,lm2,lim2,i,i2,j,m2,allocation_status,id01,idmf,idmlmf,idms,idmlms,jnorm,jsub
+   real(knd) :: c2,c4,sgn,d01,dmf,dmlmf,dms,dmlms
+   valid=.false.
+   if(.not.allocated(workspace%ratios).or..not.allocated(workspace%beta).or..not.allocated(workspace%gamma)) then
+     if(allocated(workspace%ratios)) deallocate(workspace%ratios)
+     if(allocated(workspace%beta)) deallocate(workspace%beta)
+     if(allocated(workspace%gamma)) deallocate(workspace%gamma)
+     allocate(workspace%ratios(maxd),workspace%beta(maxd),workspace%gamma(maxd),stat=allocation_status)
+     if(allocation_status/=0) then
+       if(allocated(workspace%ratios)) deallocate(workspace%ratios)
+       if(allocated(workspace%beta)) deallocate(workspace%beta)
+       if(allocated(workspace%gamma)) deallocate(workspace%gamma)
+       return
+     end if
+   end if
+   lm2=(l-m)/2
+   ix=mod(l-m,2)
+   lim2=limd/2-ix
+   if(lim2<=lm2.or.lim2+1>maxd) return
+   c2=c*c
+   c4=c2*c2
+   m2=m+m
+   workspace%ratios=0
+   ! Recreate the native Bouwkamp factors without modifying its history or caches.
+   j=1
+   do i=2+ix,limd,2
+     i2=i+i
+     workspace%beta(j)=c4*real(i,knd)*real(i-1,knd)*real(m2+i,knd)*real(m2+i-1,knd)/ &
+       (real(m2+i2-1,knd)*real(m2+i2-1,knd)*real(m2+i2-3,knd)*real(m2+i2+1,knd))
+     j=j+1
+   end do
+   j=1
+   do i=1+ix,limd+1,2
+     i2=i+i
+     workspace%gamma(j)=real(m+i-1,knd)*real(m+i,knd)+0.5_knd*c2* &
+       (1.0_knd-real(m2*m2-1,knd)/(real(m2+i2-3,knd)*real(m2+i2+1,knd)))
+     j=j+1
+   end do
+   ! Match the native forward/backward ratio reconstruction at the stored eigenvalue.
+   workspace%ratios(1)=eigval-workspace%gamma(1)
+   do i=1,lm2-1
+     workspace%ratios(i+1)=-workspace%beta(i)/workspace%ratios(i)-workspace%gamma(i+1)+eigval
+   end do
+   workspace%ratios(lim2)=-workspace%beta(lim2)/(workspace%gamma(lim2+1)-eigval)
+   do i=lim2-1,lm2+1,-1
+     workspace%ratios(i)=-workspace%beta(i)/(workspace%gamma(i+1)-eigval+workspace%ratios(i+1))
+   end do
+   call dnorm(l,m,c,ndec,nex,limd,maxd,workspace%ratios,sgn,d01,id01,dmf,idmf,dmlmf,idmlmf, &
+     dms,idms,dmlms,idmlms,jnorm,jsub)
+   if(any(.not.ieee_is_finite(workspace%ratios(1:lim2)))) return
+   ! Retain the original fixed normalization before permitting a longer radial sum.
+   if(dmf/=dmfnorm.or.idmf/=idmfe) return
+   valid=.true.
+ end subroutine
+
+ subroutine retry_radial_neumann(l,m,c,x1,eigval,limd,planned_support,ndec,nex,maxd,maxlp,maxn,maxp,enr,dmfnorm,idmfe, &
+     r1c,ir1e,r1dc,ir1de,current_accuracy,jsub,workspace,r2,ir2,r2d,ir2d,accuracy,terms,used_support,reason)
+   use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
+   implicit none
+   integer, intent(in) :: l,m,limd,planned_support,ndec,nex,maxd,maxlp,maxn,maxp,idmfe,ir1e,ir1de,current_accuracy,jsub
+   real(knd), intent(in) :: c,x1,eigval,enr(maxd),dmfnorm,r1c,r1dc
+   type(radial_retry_workspace), intent(inout) :: workspace
+   real(knd), intent(out) :: r2,r2d
+   integer, intent(out) :: ir2,ir2d,accuracy,terms,used_support,reason
+   integer :: n,j,limneu,nsub,allocation_status,support_cap
+   logical :: extended_valid
+   real(knd) :: x,rm,rm2,aj1,aj2,apcoef,w1,w2,wr,wt,dec,ratio
+   r2=0
+   r2d=0
+   ir2=0
+   ir2d=0
+   accuracy=-1
+   terms=-1
+   used_support=limd
+   reason=2
+   ! These are the existing eligibility and initialized-support conditions.
+   if(x1<0.00065_knd.or.ndec-jsub<=current_accuracy.or.r1dc==0) return
+   limneu=min(limd,maxp-2,maxn-m-2)
+   if(limneu/2-mod(l-m,2)<=(l-m)/2.or.l+1>maxlp) return
+   if(.not.workspace%prepared) then
+     n=min(maxn-2,maxp+m)
+     if(l+1>n.or.limneu+m>n) return
+     allocate(workspace%nf(maxn),workspace%ndf(maxn),workspace%nv(maxlp),workspace%ndr(maxlp), &
+       workspace%ne(maxlp),workspace%prat(maxp),stat=allocation_status)
+     if(allocation_status/=0) then
+       if(allocated(workspace%nf)) deallocate(workspace%nf)
+       if(allocated(workspace%ndf)) deallocate(workspace%ndf)
+       if(allocated(workspace%nv)) deallocate(workspace%nv)
+       if(allocated(workspace%ndr)) deallocate(workspace%ndr)
+       if(allocated(workspace%ne)) deallocate(workspace%ne)
+       if(allocated(workspace%prat)) deallocate(workspace%prat)
+       reason=7
+       return
+     end if
+     x=x1+1
+     call sphneu(c,x,n,maxn,maxlp,workspace%nf,workspace%nv,workspace%ne,workspace%ndf,workspace%ndr)
+     rm=real(m,knd)
+     rm2=rm+rm
+     workspace%prat(1)=1
+     workspace%prat(2)=rm2+1
+     do j=3,maxp
+       aj1=j-1
+       aj2=j-2
+       workspace%prat(j)=(rm2+aj1)*(rm2+aj2)/(aj1*aj2)
+     end do
+     ratio=x1*(x1+2)/(x*x)
+     apcoef=rm/2*log10(ratio)
+     workspace%exponent=int(apcoef)
+     workspace%factor=10.0_knd**(apcoef-workspace%exponent)
+     workspace%ratio_count=n
+     workspace%prepared=.true.
+   end if
+   if(limneu+m>workspace%ratio_count) return
+   support_cap=2*(min(max(limd,planned_support),maxp-2,maxn-m-2)/2)
+   do
+     radial_retry_tracking=.true.
+     radial_retry_converged=.false.
+     if(used_support==limd) then
+       call r2neu(l,m,c,x1,limneu,ndec,nex,maxd,maxlp,maxn,maxp,enr,workspace%nf,workspace%nv, &
+         workspace%ne,workspace%ndf,workspace%ndr,workspace%prat,workspace%factor,workspace%exponent, &
+         dmfnorm,idmfe,r1dc,ir1de,r2,ir2,r2d,ir2d,terms)
+     else
+       call r2neu(l,m,c,x1,limneu,ndec,nex,maxd,maxlp,maxn,maxp,workspace%ratios,workspace%nf,workspace%nv, &
+         workspace%ne,workspace%ndf,workspace%ndr,workspace%prat,workspace%factor,workspace%exponent, &
+         dmfnorm,idmfe,r1dc,ir1de,r2,ir2,r2d,ir2d,terms)
+     end if
+     radial_retry_tracking=.false.
+     if(radial_retry_converged) exit
+     reason=3
+     if(used_support>=support_cap) return
+     ! Grow work only after actual series nonconvergence, within the existing native cap.
+     used_support=2*(min(support_cap,used_support+max(2,used_support/4))/2)
+     limneu=used_support
+     call reconstruct_radial_retry_ratios(l,m,c,eigval,used_support,ndec,nex,maxd,workspace,dmfnorm,idmfe,extended_valid)
+     reason=8
+     if(.not.extended_valid) return
+   end do
+   reason=4
+   if(.not.ieee_is_finite(r2).or..not.ieee_is_finite(r2d)) return
+   dec=10.0_knd**(-ndec-1)
+   w1=r1c*r2d*10.0_knd**(ir1e+ir2d)
+   w2=r2*r1dc*10.0_knd**(ir2+ir1de)
+   wr=w1-w2
+   wt=1/(c*x1*(x1+2))
+   if(.not.ieee_is_finite(wr).or.w1==0.or.wt==0) return
+   accuracy=max(0,-decimal_exponent(abs((wr-wt)/wt)+dec))
+   nsub=max(0,-decimal_exponent(abs(wr/w1)+dec))
+   if(accuracy>1) accuracy=accuracy+nsub
+   accuracy=min(accuracy,ndec-1)
+   reason=5
+   ! No inherited previous-degree estimate is used to select this candidate.
+   if(accuracy<=current_accuracy) return
+   reason=0
+ end subroutine
+
+ function profcn_current_radial_token_quad() bind(C) result(token)
+   use iso_c_binding, only: c_int64_t
+   implicit none
+   integer(c_int64_t) :: token
+   token=radial_retry_generation
+ end function
+ subroutine capture_radial_retry_degree(index,m,eigenvalue,support,planned,normalization,exponent,accuracy,jsub,integral)
+   implicit none
+   integer, intent(in) :: index,m,support,planned,exponent,accuracy,jsub
+   real(knd), intent(in) :: eigenvalue,normalization
+   logical, intent(in) :: integral
+   if(.not.checked_radial_enabled.or.radial_retry_m/=m.or.index<1.or.index>radial_retry_count) return
+   radial_retry_values(:,index)=[eigenvalue,normalization]
+   radial_retry_metadata(:,index)=[support,planned,exponent,accuracy,jsub,merge(1,0,integral)]
+   radial_retry_captured=index
+ end subroutine
+
+ function profcn_set_checked_radial_mode_quad(enabled) bind(C) result(previous)
+   use iso_c_binding, only: c_int
+   implicit none
+   integer(c_int), value :: enabled
+   integer(c_int) :: previous
+   previous=merge(1_c_int,0_c_int,checked_radial_enabled)
+   call clear_radial_retry_ledger()
+   checked_radial_enabled=enabled/=0.and.checked_moment_callbacks_available()==1
+   if(.not.checked_radial_enabled) call clear_checked_moment_caches()
+ end function
+
+ subroutine profcn_set_checked_radial_callbacks_quad(available,moments,parity,radial,packing) bind(C)
+   use iso_c_binding, only: c_funptr,c_f_procpointer,c_associated
+   implicit none
+   type(c_funptr), value :: available,moments,parity,radial,packing
+   call clear_radial_retry_ledger()
+   call clear_checked_moment_caches()
+   checked_radial_enabled=.false.
+   nullify(checked_available_proc,checked_moments_proc,checked_parity_proc,checked_radial_proc,checked_pack_proc)
+   if(c_associated(available)) call c_f_procpointer(available,checked_available_proc)
+   if(c_associated(moments)) call c_f_procpointer(moments,checked_moments_proc)
+   if(c_associated(parity)) call c_f_procpointer(parity,checked_parity_proc)
+   if(c_associated(radial)) call c_f_procpointer(radial,checked_radial_proc)
+   if(c_associated(packing)) call c_f_procpointer(packing,checked_pack_proc)
+ end subroutine
+
+ integer(c_int) function checked_moment_callbacks_available() result(available)
+   implicit none
+   available=0_c_int
+   if(.not.associated(checked_available_proc).or..not.associated(checked_moments_proc).or. &
+       .not.associated(checked_parity_proc).or..not.associated(checked_radial_proc).or. &
+       .not.associated(checked_pack_proc)) return
+   available=checked_available_proc()
+ end function
+
+ logical function cache_has_checked_moments(index) result(tagged)
+   implicit none
+   integer, intent(in) :: index
+   tagged=.false.
+   if(.not.allocated(pint_cache(index)%moment_errors)) return
+   if(size(pint_cache(index)%moment_errors,1)<1.or.size(pint_cache(index)%moment_errors,2)<5) return
+   tagged=pint_cache(index)%moment_errors(1,5)==1.0_knd
+ end function
+
+ subroutine clear_checked_moment_caches()
+   implicit none
+   integer :: index
+   do index=1,size(pint_cache)
+     if(cache_has_checked_moments(index)) call clear_pint_cache_slot(index)
+   end do
+ end subroutine
+
+ logical function checked_moment_cache_eligible(index) result(eligible)
+   implicit none
+   integer, intent(in) :: index
+   eligible=.true.
+   if(.not.cache_has_checked_moments(index)) return
+   if(checked_radial_enabled.and.checked_moment_callbacks_available()==1) return
+   call clear_pint_cache_slot(index)
+   eligible=.false.
+ end function
+
+#endif
 
 #ifdef USE_QUAD
   function profcn_radial_quadrature_available_quad() bind(C) result(available)
@@ -557,6 +960,14 @@ module prolate_swf
     logical,intent(inout)::valid
     real(knd)::alpha(maxint),twom,beta,temp,temp2,error1,error2
     integer::i,first
+    if(checked_radial_enabled.and.pint_cache(idx)%moment_errors(1,5)==1.0_knd) then
+      if(highest>size(pint_cache(idx)%moment_errors,1)) then
+        valid=.false.
+      else
+        valid=all(ieee_is_finite(pint_cache(idx)%moment_errors(parity+1:highest:2,1:2)))
+      end if
+      return
+    end if
     if(pint_cache(idx)%moment_error_highest(parity+1)>=highest) return
     twom=real(m,knd)+real(m,knd)
     if(parity==1) then
@@ -603,6 +1014,7 @@ module prolate_swf
     integer,intent(out)::exponent
     logical,intent(inout)::valid
     integer::shift
+    integer(c_int)::checked_status
     integer(int64)::packed_power
     real(knd)::temp
     packed=0.0_knd
@@ -627,7 +1039,12 @@ module prolate_swf
       return
     end if
     exponent=int(packed_power)
-    call radial_error_decimal_scale(uncertainty,power-packed_power,error,valid)
+    if(valid.and.checked_radial_enabled) then
+      checked_status=checked_pack_proc(value,uncertainty,int(power-packed_power,c_int),packed,error)
+      if(checked_status/=1) valid=.false.
+    else if(valid) then
+      call radial_error_decimal_scale(uncertainty,power-packed_power,error,valid)
+    end if
   end subroutine
 
   subroutine r2int_with_quadrature_error(l,m,c,x,limint,limd,ndec,maxd,enr,d01,id01, &
@@ -649,6 +1066,7 @@ module prolate_swf
     real(knd)::full,full_d,raw_error,raw_error_d,full_correction,error_correction,twom
     real(knd)::lower1,lower2,endpoint,endpoint2,odd_factor,coef_derivative,dcon,ri
     integer::parity,seed,lim,base,highest,prepared_last_odd,i,iterm
+    integer(c_int)::checked_status
     integer(int64)::leading_exponent
     integer(c_int)::stream_status,stream_stop
     real(knd)::stream_outputs(8)
@@ -757,6 +1175,11 @@ module prolate_swf
     call radial_error_product(abs(correction_factor),unc1,error_correction,valid)
     temp=full_d+full_correction
     temp2=raw_error_d+error_correction
+    if(checked_radial_enabled.and.pint_cache(idx)%moment_errors(1,5)==1.0_knd) then
+      checked_status=checked_radial_proc(radial_factor,derivative_factor,correction_factor, &
+          sum1,sum2,unc1,unc2,full,full_d,full_correction,temp,raw_error,temp2)
+      if(checked_status/=1) valid=.false.
+    end if
     call pack_radial_quadrature_result(full,raw_error,leading_exponent,high,e_high,error,valid)
     call pack_radial_quadrature_result(temp,temp2,leading_exponent,highd,e_highd,error_d,valid)
     end block estimate
@@ -1743,6 +2166,7 @@ module prolate_swf
 #ifdef USE_QUAD
       if(pint_cache(idx)%parity_integrals .neqv. parity_integrals) cycle
       if(pint_cache(idx)%quadrature_rule /= radial_quadrature_mode) cycle
+      if(.not.checked_moment_cache_eligible(idx)) cycle
 #endif
       if(size(pint_cache(idx)%pint1) /= maxint) cycle
       if(size(pint_cache(idx)%pnorm) /= maxlp) cycle
@@ -1788,6 +2212,7 @@ module prolate_swf
 #ifdef USE_QUAD
       if(pint_cache(idx)%parity_integrals .neqv. parity_integrals) cycle
       if(pint_cache(idx)%quadrature_rule /= radial_quadrature_mode) cycle
+      if(.not.checked_moment_cache_eligible(idx)) cycle
 #endif
       if(pint_cache(idx)%limint > limint .or. &
           pint_cache(idx)%limint <= prefix_limint) cycle
@@ -3038,6 +3463,9 @@ module prolate_swf
          limnsv(jnenmax), jelimsv(jnenmax)
     integer :: pint_available, pint_full_upper, pint_required
 !
+#ifdef USE_QUAD
+    call clear_radial_retry_ledger()
+#endif
     ! These tables exceed common thread stack limits at high modal orders.
     ! Explicit allocation keeps their storage on the heap with every compiler.
     ! Local allocatables are released automatically when main returns.
@@ -3047,6 +3475,8 @@ module prolate_swf
 !
 #ifdef USE_QUAD
     call prepare_radial_quadrature_results(lnum,mnum)
+    if(mnum==1.and.ioprad==2.and.iopang==0.and.present(coefficient_values)) &
+      call begin_radial_retry_ledger(mmin,lnum,c,x1,ndec,nex,maxd,maxlp,maxn,maxp)
 #endif
     dec = 10.0e0_knd ** (-ndec - 1)
     if(ioprad /= 0) x = x1 + 1.0e0_knd
@@ -4298,7 +4728,12 @@ end if
              x,' c = ', c,' m = ',m,' l = ',l
         end if
         end if
-720      if(iopang == 0) go to 850
+720      continue
+#ifdef USE_QUAD
+       if(ioprad==2.and.mi==1.and.iopang==0.and.present(coefficient_values)) &
+         call capture_radial_retry_degree(li,m,eigval,limd,limdneu,dmfnorm,idmfe,naccr,jsub,radial_integral_selected)
+#endif
+       if(iopang == 0) go to 850
 !
 !  determine first kind prolate angular function
        if(l == m) lims1 = 3 * ndec + int(c)
@@ -5879,7 +6314,12 @@ end if
      txd = sumdp
      jds = j
 60    continue
-     if(test + testd < dconf) go to 90
+     if(test + testd < dconf) then
+#ifdef USE_QUAD
+       if(radial_retry_tracking) radial_retry_converged=.true.
+#endif
+       go to 90
+     end if
       if(abs(r2temp) > teste) then
       r2temp = r2temp * testeo
       r2dtemp = r2dtemp * testeo
@@ -8419,7 +8859,7 @@ end if
     end subroutine
 !
 !
-    subroutine pint (c, m, lnum, x1, limint, maxint, maxlp, maxmp, ndec, &
+    recursive subroutine pint (c, m, lnum, x1, limint, maxint, maxlp, maxmp, ndec, &
             wg, xg, ngau, ngqs, rpint1, rpint2, pint1, pint2, &
             pint3, pint4, norme, pnorm, ipnorm, coefme, coefmo, use_geometry_cache, resume_lim, &
             moment_errors, moment_error_prefix, moment_errors_valid)
@@ -8508,10 +8948,41 @@ end if
     integer :: coarse_prefix, coarse_node, coarse_weight_index, coarse_status
     real(knd), allocatable :: coarse_kernels(:,:)
     real(knd) :: mapped_measure, coarse_weight_ratio
-    logical :: paired_geometry_complete
+    logical :: paired_geometry_complete,checked_eligible,checked_used,discard_checked_prefix
+    integer(c_int) :: checked_status
     real(knd) :: parity_forward(maxint), parity_diagonal(maxint), parity_backward(maxint), eta_squared
 #endif
 !
+#ifdef USE_QUAD
+    checked_eligible=.false.
+    checked_used=.false.
+    discard_checked_prefix=.false.
+    if(checked_radial_enabled.and.radial_quadrature_mode==1) then
+      if(checked_moment_callbacks_available()==1.and.x1*(x1+2.0_knd)>1.0_knd) &
+        checked_eligible=present(moment_errors).and.present(moment_errors_valid)
+    end if
+    if(m/=checked_moments_key_m.or.c/=checked_moments_key_c.or.x1/=checked_moments_key_x.or. &
+        radial_quadrature_mode/=checked_moments_key_mode) then
+      checked_moments_key_m=m
+      checked_moments_key_c=c
+      checked_moments_key_x=x1
+      checked_moments_key_mode=radial_quadrature_mode
+      checked_moments_rejected=.false.
+    end if
+    checked_eligible=checked_eligible.and..not.checked_moments_rejected
+    if(present(moment_errors)) then
+      if(size(moment_errors,1)>0.and.size(moment_errors,2)>=5) then
+        if(checked_eligible) then
+          discard_checked_prefix=moment_errors(1,5)/=1.0_knd
+        else
+          discard_checked_prefix=moment_errors(1,5)==1.0_knd
+        end if
+      end if
+    else if(radial_quadrature_mode==1) then
+      discard_checked_prefix=.true.
+    end if
+    if(discard_checked_prefix.and.present(moment_errors)) moment_errors=0.0_knd
+#endif
     if(present(moment_errors_valid)) moment_errors_valid=.false.
     x1sm1 = x1 * (x1 + 2.0e0_knd)
     dec = 10.0e0_knd ** (-ndec - 1)
@@ -8531,6 +9002,9 @@ end if
     if(present(resume_lim)) then
       if(resume_lim > 0) prior_odd = 2 * ((resume_lim + 1) / 2) + 1
     end if
+#ifdef USE_QUAD
+    if(discard_checked_prefix) prior_odd=0
+#endif
     need_new_integrals = prior_odd < 2 * ((lim + 1) / 2) + 1
     step0 = 1.0e0_knd / ngqs
     coefme = (m * (x1 + 1.0e0_knd)) / x1sm1
@@ -8639,6 +9113,9 @@ end if
 #endif
     if(present(use_geometry_cache)) reuse_geometry = use_geometry_cache
 #ifdef USE_QUAD
+    if(checked_eligible) reuse_geometry=.false.
+#endif
+#ifdef USE_QUAD
     if(.not. parity_integrals) reuse_geometry = .false.
 #endif
     geometry_index = 0
@@ -8713,6 +9190,27 @@ end if
     end do
     neumann_shift2 = 10.0e0_knd ** (norme(m + 2) - norme(m + 1))
     neumann_shift3 = 10.0e0_knd ** (norme(m + 3) - norme(m + 1))
+#ifdef USE_QUAD
+    if(checked_eligible) then
+      checked_status=0
+      if(parity_integrals.and.size(moment_errors,1)==maxint.and.size(moment_errors,2)==6) then
+        checked_status=checked_moments_proc(int(m,c_int),c,x1sm1,10.0_knd**(-norme(m+1)), &
+            int(maxint,c_int),int(required_degrees,c_int), &
+            int(merge(1,prior_odd+2,prior_odd<1),c_int),pint1,pint2,pint4,moment_errors)
+      end if
+      if(checked_status/=1) then
+      checked_moments_rejected=.true.
+      moment_errors=0.0_knd
+      call pint(c,m,lnum,x1,limint,maxint,maxlp,maxmp,ndec,wg,xg,ngau,ngqs, &
+          rpint1,rpint2,pint1,pint2,pint3,pint4,norme,pnorm,ipnorm,coefme,coefmo, &
+          use_geometry_cache,0,moment_errors,0,moment_errors_valid)
+      return
+      end if
+      checked_used=.true.
+      moment_errors_valid=.true.
+      go to 190
+    end if
+#endif
     if(.not. need_new_integrals) go to 190
 !
 !  gaussian quadrature integration loops. first dividing integrand
@@ -8930,7 +9428,8 @@ end if
       geometry_entry%kernels_valid = .true.
     end if
 #ifdef USE_QUAD
-    if(radial_quadrature_mode==1 .and. present(moment_errors) .and. present(moment_errors_valid)) then
+    if(.not.checked_used.and.radial_quadrature_mode==1.and. &
+        present(moment_errors).and.present(moment_errors_valid)) then
       paired_geometry_complete=.false.
       if(exact_integrals .and. ngau==65 .and. ngqs==10) then
         if(geometry_entry%nodes==650 .and. geometry_entry%kernels_valid) then
@@ -8950,6 +9449,7 @@ end if
           if(present(moment_error_prefix)) then
             if(moment_error_prefix>0) coarse_prefix=2*((moment_error_prefix+1)/2)+1
           end if
+          if(discard_checked_prefix) coarse_prefix=0
           coarse_status=1
           if(coarse_prefix<2*((lim+1)/2)+1) then
             coarse_status=radial_quadrature_panel_proc(geometry_entry%basis,geometry_entry%kernels, &
@@ -8975,6 +9475,34 @@ end if
      pint3(il + 1) = (pint2(il + 2) - beta(il + 1) * pint2(il)) &
            /alpha(il + 1)
 200    continue
+#ifdef USE_QUAD
+    if(checked_used) then
+      ! Propagate through the same stored coefficients used for parity reconstruction.
+      do il=1,required_degrees-1,2
+        moment_errors(il,1)=moment_errors(il,3)
+        moment_errors(il,2)=moment_errors(il,4)
+      end do
+      do il=2,lim+1,2
+        checked_status=checked_parity_proc(alpha(il),beta(il),pint2(il-1),pint2(il+1), &
+            moment_errors(il-1,4),moment_errors(il+1,4),pint3(il),moment_errors(il,1))
+        if(checked_status/=1) moment_errors_valid=.false.
+      end do
+      do il=2,required_degrees-2,2
+        checked_status=checked_parity_proc(alpha(il),beta(il),pint4(il-1),pint4(il+1), &
+            moment_errors(il-1,6),moment_errors(il+1,6),pint4(il),moment_errors(il,2))
+        if(checked_status/=1) moment_errors_valid=.false.
+      end do
+      if(.not.moment_errors_valid) then
+      checked_moments_rejected=.true.
+      moment_errors=0.0_knd
+      call pint(c,m,lnum,x1,limint,maxint,maxlp,maxmp,ndec,wg,xg,ngau,ngqs, &
+          rpint1,rpint2,pint1,pint2,pint3,pint4,norme,pnorm,ipnorm,coefme,coefmo, &
+          use_geometry_cache,0,moment_errors,0,moment_errors_valid)
+      return
+      end if
+      moment_errors(1,5)=1.0_knd
+    end if
+#endif
 !
 !  calculation of ratios of integrals for ease in compution of r2 and
 !  r2d in subroutine r2int
