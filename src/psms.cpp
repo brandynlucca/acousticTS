@@ -1056,6 +1056,244 @@ const RegisterPanelError registered_panel_error;
 
 #endif
 
+
+#if ACOUSTICTS_HAVE_QUADMATH
+namespace psms_degree_replay {
+using Real = acousticts_quad_t;
+struct PrimitiveSnapshot {
+    std::vector<Real> bessel_ratios, bessel_derivative_ratios, bessel_values, bessel_log_derivatives, neumann_ratios,
+        neumann_derivative_ratios, neumann_values, neumann_log_derivatives, legendre_ratios;
+    std::vector<int> bessel_exponents, neumann_exponents;
+    bool ready = false;
+    size_t bytes() const {
+        return sizeof(Real) * (bessel_ratios.capacity() + bessel_derivative_ratios.capacity() +
+            bessel_values.capacity() + bessel_log_derivatives.capacity() +
+            neumann_ratios.capacity() + neumann_derivative_ratios.capacity() + neumann_values.capacity() +
+                neumann_log_derivatives.capacity() + legendre_ratios.capacity()) +
+            sizeof(int) * (bessel_exponents.capacity() + neumann_exponents.capacity());
+    }
+};
+struct DegreeCheckpoint {
+    std::vector<Real> raw_ratios, normalized_ratios, coefficients;
+    std::array<Real, 5> input_scalars{};
+    std::array<int, 28> input_state{};
+    std::array<Real, 18> real_outputs{};
+    std::array<int, 31> integer_outputs{};
+    int coefficient_length = 0, coefficient_prefix = 0;
+    bool eligible = false;
+    size_t bytes() const {
+        return sizeof(*this) + sizeof(Real) * (raw_ratios.capacity() + normalized_ratios.capacity() +
+            coefficients.capacity());
+    }
+};
+struct BlockCheckpoint {
+    int m = -1, count = 0;
+    Real c = 0, x1 = 0;
+    PrimitiveSnapshot primitive;
+    std::map<int, DegreeCheckpoint> degrees;
+    size_t bytes() const {
+        size_t result = sizeof(*this) + primitive.bytes();
+        for (const auto& degree : degrees) result += degree.second.bytes() + 64;
+        return result;
+    }
+};
+static BlockCheckpoint previous, current;
+static bool active = false, nearest_history = true;
+static constexpr size_t budget = 2 * 1024 * 1024;
+
+static void clear() noexcept {
+    previous = BlockCheckpoint{};
+    current = BlockCheckpoint{};
+}
+static void invalidate() noexcept {
+    active = false;
+    clear();
+}
+static bool available() noexcept {
+#if defined(__FAST_MATH__) || defined(__ASSOCIATIVE_MATH__) || defined(__RECIPROCAL_MATH__) || \
+    (defined(__FINITE_MATH_ONLY__) && __FINITE_MATH_ONLY__ != 0) || \
+    (defined(__GCC_IEC_559) && __GCC_IEC_559 <= 0)
+    nearest_history = false;
+    invalidate();
+    return false;
+#else
+    if (std::fegetround() != FE_TONEAREST) {
+        nearest_history = false;
+        invalidate();
+    }
+    return active && nearest_history;
+#endif
+}
+static bool admit(size_t additional) noexcept {
+    if (additional > budget || previous.bytes() + current.bytes() > budget - additional) {
+        invalidate();
+        return false;
+    }
+    return true;
+}
+static bool equal(const Real* left, const Real* right, size_t count) noexcept {
+    return count == 0 || std::memcmp(left, right, count * sizeof(Real)) == 0;
+}
+template<class T> static bool prefix(const std::vector<T>& left, const std::vector<T>& right, int count) noexcept {
+    return count >= 0 && size_t(count) <= left.size() && size_t(count) <= right.size() &&
+        (count == 0 || std::memcmp(left.data(), right.data(), size_t(count) * sizeof(T)) == 0);
+}
+Scope::Scope() noexcept {
+    clear();
+    active = true;
+    available();
+}
+Scope::~Scope() noexcept { invalidate(); }
+void Scope::disable() noexcept { invalidate(); }
+
+extern "C" int acousticts_degree_replay_available_quad() noexcept { return available() ? 1 : 0; }
+extern "C" void acousticts_degree_replay_clear_quad() noexcept { invalidate(); }
+extern "C" void acousticts_degree_replay_begin_quad(int m, int count, const Real* c, const Real* x1) noexcept {
+    if (!available()) return;
+    if (current.m == m && equal(c, &current.c, 1) && equal(x1, &current.x1, 1)) previous = std::move(current);
+    else previous = BlockCheckpoint{};
+    current = BlockCheckpoint{};
+    current.m = m;
+    current.count = count;
+    current.c = *c;
+    current.x1 = *x1;
+}
+extern "C" int acousticts_degree_replay_probe_quad(int m, int count, int l, int ratio_count,
+        int bessel_support, int neumann_support, int bessel_ratio_capacity, int radial_value_capacity,
+            int neumann_ratio_capacity, int legendre_ratio_capacity, const int* input_state,
+            const Real* input_scalars,
+        Real* raw_ratios, const Real* bessel_ratios, const Real* bessel_derivative_ratios, const Real* bessel_values,
+            const Real* bessel_log_derivatives, const int* bessel_exponents,
+        const Real* neumann_ratios, const Real* neumann_derivative_ratios, const Real* neumann_values,
+            const Real* neumann_log_derivatives, const int* neumann_exponents,
+        const Real* legendre_ratios, int coefficient_capacity, Real* coefficients, int* coefficient_length,
+            Real* real_outputs, int* integer_outputs) noexcept {
+    if (!available()) return 0;
+    const int parity = (l - m) % 2, degree_seed = (l - m) / 2, coefficient_prefix = 2 * ratio_count + parity + 1;
+    if (m != current.m || count != current.count || ratio_count <= 0 || degree_seed < 0 ||
+        degree_seed > ratio_count || coefficient_prefix > coefficient_capacity) return 0;
+    const int bessel_last_term = std::max(degree_seed, bessel_support / 2 - parity),
+        neumann_last_term = std::max(degree_seed, neumann_support / 2 - parity);
+    const int bessel_ratio_prefix = m + 2 * bessel_last_term + parity, neumann_ratio_prefix = m +
+        2 * neumann_last_term + parity, legendre_ratio_prefix = 2 * neumann_last_term + parity + 1;
+    const int bessel_value_prefix = std::max(l + 1, 3), neumann_value_prefix = l + 1,
+        bessel_value_count = std::min(radial_value_capacity, bessel_ratio_capacity),
+        neumann_value_count = std::min(radial_value_capacity, neumann_ratio_capacity + 1);
+    if (bessel_ratio_prefix > bessel_ratio_capacity || bessel_value_prefix > bessel_value_count ||
+        neumann_ratio_prefix > neumann_ratio_capacity || neumann_value_prefix > neumann_value_count ||
+        legendre_ratio_prefix > legendre_ratio_capacity) return 0;
+    try {
+        // These native tables are immutable within the single-order block.
+        auto& primitive = current.primitive;
+        if (!primitive.ready) {
+            const size_t bytes = sizeof(Real) * (2ULL * bessel_ratio_capacity + 2ULL * bessel_value_count +
+                2ULL * neumann_ratio_capacity + 2ULL * neumann_value_count + legendre_ratio_capacity) +
+                sizeof(int) * (size_t(bessel_value_count) + neumann_value_count);
+            if (!admit(bytes)) return 0;
+            primitive.bessel_ratios.assign(bessel_ratios, bessel_ratios + bessel_ratio_capacity);
+            primitive.bessel_derivative_ratios.assign(bessel_derivative_ratios, bessel_derivative_ratios +
+                bessel_ratio_capacity);
+            primitive.bessel_values.assign(bessel_values, bessel_values + bessel_value_count);
+            primitive.bessel_log_derivatives.assign(bessel_log_derivatives, bessel_log_derivatives +
+                bessel_value_count);
+            primitive.bessel_exponents.assign(bessel_exponents, bessel_exponents + bessel_value_count);
+            primitive.neumann_ratios.assign(neumann_ratios, neumann_ratios + neumann_ratio_capacity);
+            primitive.neumann_derivative_ratios.assign(neumann_derivative_ratios, neumann_derivative_ratios +
+                neumann_ratio_capacity);
+            primitive.neumann_values.assign(neumann_values, neumann_values + neumann_value_count);
+            primitive.neumann_log_derivatives.assign(neumann_log_derivatives, neumann_log_derivatives +
+                neumann_value_count);
+            primitive.neumann_exponents.assign(neumann_exponents, neumann_exponents + neumann_value_count);
+            primitive.legendre_ratios.assign(legendre_ratios, legendre_ratios + legendre_ratio_capacity);
+            primitive.ready = true;
+        }
+        if (!admit(sizeof(DegreeCheckpoint) + 64 + sizeof(Real) * (size_t(2) * ratio_count +
+            coefficient_prefix))) return 0;
+        auto& checkpoint = current.degrees[l];
+        checkpoint.raw_ratios.assign(raw_ratios, raw_ratios + ratio_count);
+        checkpoint.coefficient_prefix = coefficient_prefix;
+        std::copy(input_state, input_state + 28, checkpoint.input_state.begin());
+        std::copy(input_scalars, input_scalars + 5, checkpoint.input_scalars.begin());
+        const auto found = previous.degrees.find(l);
+        if (found == previous.degrees.end() || !found->second.eligible || !previous.primitive.ready) return 0;
+        const auto& saved_checkpoint = found->second;
+        const auto& old_primitive = previous.primitive;
+        // Fresh support and eigenpairs must reproduce every downstream input bit.
+        const bool matches = checkpoint.raw_ratios.size() == saved_checkpoint.raw_ratios.size() &&
+            checkpoint.coefficient_prefix == saved_checkpoint.coefficient_prefix &&
+            equal(checkpoint.raw_ratios.data(), saved_checkpoint.raw_ratios.data(), checkpoint.raw_ratios.size()) &&
+                checkpoint.input_state == saved_checkpoint.input_state &&
+            equal(checkpoint.input_scalars.data(), saved_checkpoint.input_scalars.data(), 5) &&
+            prefix(primitive.bessel_ratios, old_primitive.bessel_ratios, bessel_ratio_prefix) &&
+                prefix(primitive.bessel_derivative_ratios, old_primitive.bessel_derivative_ratios,
+                bessel_ratio_prefix) &&
+            prefix(primitive.bessel_values, old_primitive.bessel_values, bessel_value_prefix) &&
+                prefix(primitive.bessel_log_derivatives, old_primitive.bessel_log_derivatives, bessel_value_prefix) &&
+            prefix(primitive.bessel_exponents, old_primitive.bessel_exponents, bessel_value_prefix) &&
+                prefix(primitive.neumann_ratios, old_primitive.neumann_ratios, neumann_ratio_prefix) &&
+            prefix(primitive.neumann_derivative_ratios, old_primitive.neumann_derivative_ratios,
+                neumann_ratio_prefix) && prefix(primitive.neumann_values, old_primitive.neumann_values,
+                neumann_value_prefix) &&
+            prefix(primitive.neumann_log_derivatives, old_primitive.neumann_log_derivatives, neumann_value_prefix) &&
+                prefix(primitive.neumann_exponents, old_primitive.neumann_exponents, neumann_value_prefix) &&
+            prefix(primitive.legendre_ratios, old_primitive.legendre_ratios, legendre_ratio_prefix);
+        if (!matches) return 0;
+        checkpoint = saved_checkpoint;
+        std::copy(checkpoint.normalized_ratios.begin(), checkpoint.normalized_ratios.end(), raw_ratios);
+        std::fill(coefficients, coefficients + coefficient_capacity, Real(0));
+        std::copy(checkpoint.coefficients.begin(), checkpoint.coefficients.end(), coefficients);
+        *coefficient_length = checkpoint.coefficient_length;
+        std::copy(checkpoint.real_outputs.begin(), checkpoint.real_outputs.end(), real_outputs);
+        std::copy(checkpoint.integer_outputs.begin(), checkpoint.integer_outputs.end(), integer_outputs);
+        previous.degrees.erase(found);
+        return 1;
+    } catch (const std::bad_alloc&) {
+        invalidate();
+        return 0;
+    }
+}
+extern "C" void acousticts_degree_replay_finish_quad(int l, int eligible, int normalization_terms, int ratio_count,
+        const Real* normalized_ratios, int coefficient_capacity, const Real* coefficients, int coefficient_length,
+            int status,
+        const Real* real_outputs, const int* integer_outputs) noexcept {
+    if (!available()) return;
+    const auto found = current.degrees.find(l);
+    if (found == current.degrees.end()) return;
+    auto& checkpoint = found->second;
+    if (!eligible || normalization_terms > ratio_count || status != 0 || coefficient_length <= 0 ||
+        coefficient_length > checkpoint.coefficient_prefix || checkpoint.coefficient_prefix > coefficient_capacity) {
+        previous.degrees.erase(l);
+        return;
+    }
+    try {
+        if (!admit(sizeof(Real) * (size_t(ratio_count) + checkpoint.coefficient_prefix))) return;
+        checkpoint.normalized_ratios.assign(normalized_ratios, normalized_ratios + ratio_count);
+        checkpoint.coefficients.assign(coefficients, coefficients + checkpoint.coefficient_prefix);
+        checkpoint.coefficient_length = coefficient_length;
+        std::copy(real_outputs, real_outputs + 18, checkpoint.real_outputs.begin());
+        std::copy(integer_outputs, integer_outputs + 31, checkpoint.integer_outputs.begin());
+        checkpoint.eligible = true;
+        previous.degrees.erase(l);
+    } catch (const std::bad_alloc&) {
+        invalidate();
+    }
+}
+extern "C" void profcn_set_degree_replay_callbacks_quad(
+    decltype(&acousticts_degree_replay_available_quad), decltype(&acousticts_degree_replay_begin_quad),
+    decltype(&acousticts_degree_replay_probe_quad), decltype(&acousticts_degree_replay_finish_quad),
+    decltype(&acousticts_degree_replay_clear_quad));
+struct RegisterCallbacks {
+    RegisterCallbacks() {
+        // Standalone Fortran retains the original path when these callbacks are absent.
+        profcn_set_degree_replay_callbacks_quad(&acousticts_degree_replay_available_quad,
+            &acousticts_degree_replay_begin_quad, &acousticts_degree_replay_probe_quad,
+            &acousticts_degree_replay_finish_quad, &acousticts_degree_replay_clear_quad);
+    }
+};
+static const RegisterCallbacks registered_callbacks;
+}
+#endif
+
 #include "psms_smn.h"
 
 // Report whether configure enabled the complete native C++/Fortran binary128

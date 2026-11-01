@@ -491,7 +491,88 @@ module prolate_swf
 
 #endif
 
+#ifdef USE_QUAD
+ abstract interface
+  subroutine degree_replay_begin_callback(m,count,c,x1) bind(C)
+   import knd,c_int
+   implicit none
+   integer(c_int),value::m,count
+   real(knd),intent(in)::c,x1
+  end subroutine
+  integer(c_int) function degree_replay_probe_callback(m,count,l,terms,limr,limn,nb,nv,nn,np, &
+       state,scalars,enr,bf,bdf,bn,bdr,be,nf,ndf,nnorm,ndr,ne,prat,capacity,coefficients, &
+       length,outputs,integers) bind(C)
+   import knd,c_int
+   implicit none
+   integer(c_int),value::m,count,l,terms,limr,limn,nb,nv,nn,np,capacity
+   integer(c_int),intent(in)::state(*),be(*),ne(*)
+   real(knd),intent(in)::scalars(*),bf(*),bdf(*),bn(*),bdr(*),nf(*),ndf(*),nnorm(*),ndr(*),prat(*)
+   real(knd),intent(inout)::enr(*),coefficients(*)
+   real(knd),intent(out)::outputs(*)
+   integer(c_int),intent(out)::length,integers(*)
+  end function
+  subroutine degree_replay_finish_callback(l,eligible,jnorm,terms,enr,capacity,coefficients, &
+       length,status,outputs,integers) bind(C)
+   import knd,c_int
+   implicit none
+   integer(c_int),value::l,eligible,jnorm,terms,capacity,length,status
+   integer(c_int),intent(in)::integers(*)
+   real(knd),intent(in)::enr(*),coefficients(*),outputs(*)
+  end subroutine
+  integer(c_int) function degree_replay_available_callback() bind(C)
+   import c_int
+   implicit none
+  end function
+  subroutine degree_replay_clear_callback() bind(C)
+   implicit none
+  end subroutine
+ end interface
+ procedure(degree_replay_available_callback),pointer,save :: degree_replay_available_proc=>null()
+ procedure(degree_replay_begin_callback),pointer,save :: degree_replay_begin_proc=>null()
+ procedure(degree_replay_probe_callback),pointer,save :: degree_replay_probe_proc=>null()
+ procedure(degree_replay_finish_callback),pointer,save :: degree_replay_finish_proc=>null()
+ procedure(degree_replay_clear_callback),pointer,save :: degree_replay_clear_proc=>null()
+#endif
+
  contains
+
+#ifdef USE_QUAD
+ subroutine invalidate_degree_replay()
+   implicit none
+   if(associated(degree_replay_clear_proc)) call degree_replay_clear_proc()
+ end subroutine
+
+ logical function degree_replay_available() result(available)
+   implicit none
+   available=.false.
+#if defined(__FAST_MATH__) || defined(__ASSOCIATIVE_MATH__) || defined(__RECIPROCAL_MATH__) || \
+    (defined(__FINITE_MATH_ONLY__) && __FINITE_MATH_ONLY__ != 0)
+   call invalidate_degree_replay()
+   return
+#endif
+   if(.not.associated(degree_replay_available_proc).or. &
+       .not.associated(degree_replay_begin_proc).or. &
+       .not.associated(degree_replay_probe_proc).or..not.associated(degree_replay_finish_proc).or. &
+       .not.associated(degree_replay_clear_proc)) return
+   available=degree_replay_available_proc()==1_c_int
+ end function
+
+ subroutine profcn_set_degree_replay_callbacks_quad(available,begin,probe,finish,clear) bind(C)
+   use iso_c_binding,only:c_funptr,c_f_procpointer,c_associated
+   implicit none
+   type(c_funptr),value::available,begin,probe,finish,clear
+   ! Registration changes retire both the previous callback state and the new context.
+   call invalidate_degree_replay()
+   nullify(degree_replay_available_proc,degree_replay_begin_proc,degree_replay_probe_proc, &
+       degree_replay_finish_proc,degree_replay_clear_proc)
+   if(c_associated(available)) call c_f_procpointer(available,degree_replay_available_proc)
+   if(c_associated(begin)) call c_f_procpointer(begin,degree_replay_begin_proc)
+   if(c_associated(probe)) call c_f_procpointer(probe,degree_replay_probe_proc)
+   if(c_associated(finish)) call c_f_procpointer(finish,degree_replay_finish_proc)
+   if(c_associated(clear)) call c_f_procpointer(clear,degree_replay_clear_proc)
+   call invalidate_degree_replay()
+ end subroutine
+#endif
 
 #ifdef USE_QUAD
  subroutine clear_radial_retry_ledger()
@@ -829,6 +910,7 @@ module prolate_swf
    use iso_c_binding, only: c_funptr,c_f_procpointer,c_associated
    implicit none
    type(c_funptr), value :: available,moments,parity,radial,packing
+   call invalidate_degree_replay()
    call clear_radial_retry_ledger()
    call clear_checked_moment_caches()
    checked_radial_enabled=.false.
@@ -897,6 +979,7 @@ module prolate_swf
    type(c_funptr),value::callback
    integer::slot
    ! Changing the interpretation of paired columns invalidates every affected mapped moment entry.
+   call invalidate_degree_replay()
    do slot=1,size(pint_cache)
      if(pint_cache(slot)%valid .and. pint_cache(slot)%quadrature_rule==1) &
          call clear_pint_cache_slot(slot)
@@ -913,6 +996,7 @@ module prolate_swf
  subroutine profcn_set_radial_stream_quad(callback) bind(C)
    use iso_c_binding,only:c_funptr,c_f_procpointer,c_associated
    type(c_funptr),value::callback
+   call invalidate_degree_replay()
    nullify(radial_quadrature_stream_proc)
    if(c_associated(callback)) call c_f_procpointer(callback,radial_quadrature_stream_proc)
    radial_quadrature_count=0
@@ -1324,6 +1408,7 @@ module prolate_swf
     type(c_funptr), value :: available_callback, sum_callback
 
     ! Optional callbacks preserve standalone Fortran linkage and the original fallback.
+   call invalidate_degree_replay()
     call c_f_procpointer(available_callback, pint_exact_available_proc)
     call c_f_procpointer(sum_callback, pint_exact_sum_proc)
   end subroutine
@@ -3449,7 +3534,11 @@ module prolate_swf
          xbninp, x1, wm, wronc, wront, wronca, wroncb
     character chr
 #ifdef USE_QUAD
-    logical :: radial_integral_selected, radial_error_valid_here
+    logical :: radial_integral_selected, radial_error_valid_here, degree_replay_eligible
+    integer :: degree_replay_bessel_limit,degree_replay_neumann_limit,degree_replay_ratio_count, &
+            degree_replay_input_state(28),degree_replay_action
+    integer :: degree_replay_integer_outputs(31)
+    real(knd) :: degree_replay_input_scalars(5),degree_replay_real_outputs(18)
     real(knd) :: radial_value_error,radial_derivative_error
     integer :: radial_error_slot
 #endif
@@ -3572,6 +3661,9 @@ end if
      neemax = 1
       do 900 mi = 1, mnum
       m = mmin + minc * (mi - 1)
+#ifdef USE_QUAD
+      if(degree_replay_available()) call degree_replay_begin_proc(m,lnum,c,x1)
+#endif
       jang = 0
       m2 = m + m
       call prepare_bouwkamp_cache(c, m)
@@ -3910,7 +4002,90 @@ end if
 175      limdlo = limd + 1
        if(2 * (limd / 2) /= limd) limdlo = limd + 2
        jlowo = (limd - 1) / 2 + 1
-176      if(present(coefficient_values) .and. iopang == 0) then
+176      continue
+#ifdef USE_QUAD
+       ! Reconstruct support and eigenpairs before matching a complete downstream degree stage.
+       degree_replay_eligible=.false.
+       degree_replay_action=0
+       if(present(coefficient_values).and.present(coefficient_lengths).and. &
+           present(coefficient_status)) then
+         degree_replay_eligible=mnum==1.and.ioprad==2.and.iopang==0.and.li>1.and.x1>0.0_knd.and. &
+             iopneu==2.and.iopint==0.and.iopleg==0.and.iopeta==0.and.naccneu>0.and. &
+             .not.radial_retry_tracking.and.coefficient_status==0.and.eigval>eigvalp.and. &
+             .not.debug.and..not.output
+       end if
+       if(degree_replay_eligible) degree_replay_eligible=degree_replay_available()
+       if(degree_replay_eligible) then
+         degree_replay_ratio_count=limd/2-ix
+         degree_replay_bessel_limit=jbes+jbes+20+int(sqrt(c))
+         degree_replay_neumann_limit=min(limdneu,limp1-2,limd)
+         degree_replay_input_state=[iflag,jbes,jmf,jneu,naccneu,naccneup,naccrp,naccrsav, &
+             lowacc,istartr2,legstart,nflag,ibflag1,ibflag2,jflagleg,minacc,ndec,nex,ipcoefn,limd, &
+             degree_replay_bessel_limit,degree_replay_neumann_limit,iopleg,iopneu,iopint, &
+             iopeta,lowtest,nacctest]
+         degree_replay_input_scalars=[c,x1,factor,pcoefn,eigval]
+         degree_replay_action=degree_replay_probe_proc(m,lnum,l,degree_replay_ratio_count, &
+             degree_replay_bessel_limit,degree_replay_neumann_limit,limj,maxlp,limn1,limp1, &
+             degree_replay_input_state,degree_replay_input_scalars,enr,sbesf,sbesdf,sbesn,sbesdr, &
+             ibese,sneuf,sneudf,sneun,sneudr,ineue,prat1,size(coefficient_values,1), &
+             coefficient_values(:,li,mi),coefficient_lengths(li,mi), &
+             degree_replay_real_outputs,degree_replay_integer_outputs)
+         if(degree_replay_action==1) then
+           sgn=degree_replay_real_outputs(1)
+           d01=degree_replay_real_outputs(2)
+           dmfnorm=degree_replay_real_outputs(3)
+           dmlmf=degree_replay_real_outputs(4)
+           dmsnorm=degree_replay_real_outputs(5)
+           dmlms=degree_replay_real_outputs(6)
+           factor=degree_replay_real_outputs(7)
+           r1c=degree_replay_real_outputs(8)
+           r1dc=degree_replay_real_outputs(9)
+           r2c=degree_replay_real_outputs(10)
+           r2dc=degree_replay_real_outputs(11)
+           dfnorm=degree_replay_real_outputs(12)
+           dmlf=degree_replay_real_outputs(13)
+           r2nc=degree_replay_real_outputs(14)
+           r2dnc=degree_replay_real_outputs(15)
+           wronca=degree_replay_real_outputs(16)
+           wroncb=degree_replay_real_outputs(17)
+           wronc=degree_replay_real_outputs(18)
+           id01=degree_replay_integer_outputs(1)
+           idmfe=degree_replay_integer_outputs(2)
+           idmlmfe=degree_replay_integer_outputs(3)
+           idmse=degree_replay_integer_outputs(4)
+           idmlmse=degree_replay_integer_outputs(5)
+           jmf=degree_replay_integer_outputs(6)
+           jsub=degree_replay_integer_outputs(7)
+           iflag=degree_replay_integer_outputs(8)
+           jbes=degree_replay_integer_outputs(9)
+           ir1e=degree_replay_integer_outputs(10)
+           ir1de=degree_replay_integer_outputs(11)
+           ir2e=degree_replay_integer_outputs(12)
+           ir2de=degree_replay_integer_outputs(13)
+           idfe=degree_replay_integer_outputs(14)
+           idmlfe=degree_replay_integer_outputs(15)
+           ir2est=degree_replay_integer_outputs(16)
+           jneu=degree_replay_integer_outputs(17)
+           naccneu=degree_replay_integer_outputs(18)
+           naccneup=degree_replay_integer_outputs(19)
+           nflag=degree_replay_integer_outputs(20)
+           naccr=degree_replay_integer_outputs(21)
+           nacce=degree_replay_integer_outputs(22)
+           ir2ne=degree_replay_integer_outputs(23)
+           ir2dne=degree_replay_integer_outputs(24)
+           limr1=degree_replay_integer_outputs(25)
+           limneu=degree_replay_integer_outputs(26)
+           nsubw=degree_replay_integer_outputs(27)
+           iopleg=degree_replay_integer_outputs(28)
+           iopneu=degree_replay_integer_outputs(29)
+           iopint=degree_replay_integer_outputs(30)
+           iopeta=degree_replay_integer_outputs(31)
+           eigvalp=eigval
+           go to 680
+         end if
+       end if
+#endif
+       if(present(coefficient_values) .and. iopang == 0) then
          call dnorm (l, m, c, ndec, nex, limd, maxd, enr, sgn, d01, id01, &
              dmfnorm, idmfe, dmlmf, idmlmfe, dmsnorm, idmse, &
              dmlms, idmlmse, jmf, jsub, coefficient_values(:,li,mi), &
@@ -4744,6 +4919,19 @@ end if
        ir2de = 0
 680      continue
 #ifdef USE_QUAD
+       ! Store only the unchanged stable Neumann route before fresh output and scheduling updates.
+       if(degree_replay_eligible.and.degree_replay_action/=1.and.degree_replay_available()) then
+         degree_replay_real_outputs=[sgn,d01,dmfnorm,dmlmf,dmsnorm,dmlms,factor,r1c,r1dc,r2c,r2dc, &
+             dfnorm,dmlf,r2nc,r2dnc,wronca,wroncb,wronc]
+         degree_replay_integer_outputs=[id01,idmfe,idmlmfe,idmse,idmlmse,jmf,jsub,iflag,jbes, &
+             ir1e,ir1de,ir2e,ir2de,idfe,idmlfe,ir2est,jneu,naccneu,naccneup,nflag,naccr,nacce, &
+             ir2ne,ir2dne,limr1,limneu,nsubw,iopleg,iopneu,iopint,iopeta]
+         call degree_replay_finish_proc(l,merge(1,0,iopneu==2.and.iopint==0.and.iopleg==0.and. &
+             iopeta==0.and.naccneu>minacc.and.naccr>0.and.limr1==degree_replay_bessel_limit.and. &
+             limneu==degree_replay_neumann_limit),jmf,degree_replay_ratio_count,enr, &
+             size(coefficient_values,1),coefficient_values(:,li,mi),coefficient_lengths(li,mi), &
+             coefficient_status,degree_replay_real_outputs,degree_replay_integer_outputs)
+       end if
        if(radial_quadrature_count==lnum .and. mi==1 .and. ioprad==2) then
          radial_quadrature_errors(li,:)=0.0_knd
          radial_quadrature_valid(li)=1

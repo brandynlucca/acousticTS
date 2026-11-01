@@ -401,6 +401,7 @@ inline std::complex<acousticts_quad_t> psms_adaptive_rigid_release_field(
     using Complex = std::complex<T>;
     PsmsRadialQuadratureScope quadrature_scope(incidence.cosine==T(0));
     psms_checked_radials::Scope checked_scope(quadrature_scope.enabled);
+    psms_degree_replay::Scope degree_replay_scope;
     if (!(chi > T(0) && xi > T(1)) || !is_finite_real(chi) || !is_finite_real(xi) ||
             !is_finite_real(phi_difference) || !is_finite_real(incidence.cosine) ||
             precabs(incidence.cosine) > T(1) || !is_finite_real(incidence.sine) ||
@@ -452,6 +453,7 @@ inline std::complex<acousticts_quad_t> psms_adaptive_rigid_release_field(
             const int count = checked_profcn_integer(static_cast<long long>(degree) - m + 1,
                 "joint inclusive degree count");
             auto fallback = [&]() {
+                degree_replay_scope.disable();
                 radial_retry_mask.clear();
                 checked_scope.disable();
                 original_quadrature=true;

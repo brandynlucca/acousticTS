@@ -16,6 +16,19 @@ extern "C" int profcn_retry_current_radials_quad(
     const acousticts_quad_t*, const int*, const acousticts_quad_t*, const int*,
     acousticts_quad_t*, int*, acousticts_quad_t*, int*, int*);
 
+
+namespace psms_degree_replay {
+// A checkpoint belongs to one scalar solve and is released on every exit path.
+class Scope {
+public:
+    Scope() noexcept;
+    ~Scope() noexcept;
+    Scope(const Scope&) = delete;
+    Scope& operator=(const Scope&) = delete;
+    void disable() noexcept;
+};
+}
+
 namespace psms_checked_radials {
 // Keep checked integration and same-degree alternatives local to one scalar solve.
 class Scope {
