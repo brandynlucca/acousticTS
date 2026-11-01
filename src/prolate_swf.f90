@@ -146,12 +146,14 @@ module prolate_swf
  abstract interface
    function pint_exact_available_callback() bind(C) result(available)
      use iso_c_binding, only: c_int
+     implicit none
      integer(c_int) :: available
    end function
    subroutine pint_exact_sum_callback(basis, kernels, degree_capacity, nodes, &
        first, last, extra, pint1, pint2, pint4) bind(C)
      use iso_c_binding, only: c_int
      import knd
+     implicit none
      integer(c_int), value :: degree_capacity, nodes, first, last, extra
      real(knd), intent(in) :: basis(*), kernels(*)
      real(knd), intent(inout) :: pint1(*), pint2(*), pint4(*)
@@ -169,6 +171,7 @@ module prolate_swf
    function quad_fraction_exponent(argument, power) bind(C, name="frexpq") result(mantissa)
      use iso_c_binding, only: c_int
      import knd
+     implicit none
      real(knd), value :: argument
      integer(c_int), intent(out) :: power
      real(knd) :: mantissa
@@ -392,6 +395,7 @@ module prolate_swf
        errors,dcon,outputs,jint) bind(C) result(status)
      use iso_c_binding,only:c_int
      import knd
+     implicit none
      integer(c_int),value::m,parity,seed,lim,maxint
      real(knd),intent(in)::enr(*),p1(*),p2(*),p3(*),p4(*),errors(*)
      real(knd),value::dcon
@@ -409,6 +413,7 @@ module prolate_swf
        panel_nodes,first,last,extra,error1,error2,error4) bind(C) result(status)
      use iso_c_binding,only:c_int
      import knd
+     implicit none
      real(knd),intent(in)::basis(*),kernels(*),coarse_kernels(*)
      integer(c_int),value::capacity,nodes,panel_nodes,first,last,extra
      real(knd),intent(inout)::error1(*),error2(*),error4(*)
@@ -424,25 +429,33 @@ module prolate_swf
  abstract interface
    integer(c_int) function checked_available_callback() bind(C)
      import c_int
+     implicit none
    end function
-   integer(c_int) function checked_moments_callback(m,c,q,s,capacity,required,first,p1,p2,p4,errors) bind(C)
+   integer(c_int) function checked_moments_callback(m,c,q,s,capacity,required,first, &
+       p1,p2,p4,errors) bind(C)
      import c_int,knd
+     implicit none
      integer(c_int),value::m,capacity,required,first
      real(knd),intent(in)::c,q,s
      real(knd),intent(inout)::p1(*),p2(*),p4(*),errors(*)
    end function
-   integer(c_int) function checked_parity_callback(alpha,beta,minus,plus,eminus,eplus,returned,error) bind(C)
+   integer(c_int) function checked_parity_callback(alpha,beta,minus,plus,eminus,eplus, &
+       returned,error) bind(C)
      import c_int,knd
+     implicit none
      real(knd),intent(in)::alpha,beta,minus,plus,eminus,eplus,returned
      real(knd),intent(out)::error
    end function
-   integer(c_int) function checked_radial_callback(f,d,c,s1,s2,u1,u2,v,v1,v2,vd,error,error_d) bind(C)
+   integer(c_int) function checked_radial_callback(f,d,c,s1,s2,u1,u2,v,v1,v2,vd, &
+       error,error_d) bind(C)
      import c_int,knd
+     implicit none
      real(knd),intent(in)::f,d,c,s1,s2,u1,u2,v,v1,v2,vd
      real(knd),intent(out)::error,error_d
    end function
    integer(c_int) function checked_pack_callback(value,uncertainty,shift,packed,error) bind(C)
      import c_int,knd
+     implicit none
      real(knd),intent(in)::value,uncertainty,packed
      integer(c_int),value::shift
      real(knd),intent(out)::error
@@ -458,7 +471,8 @@ module prolate_swf
  end type
  logical, save :: checked_radial_enabled=.false.
  logical, save :: radial_retry_tracking=.false.,radial_retry_converged=.false.
- integer, save :: radial_retry_m=-1,radial_retry_count=0,radial_retry_captured=0,radial_retry_dimensions(6)=0
+ integer, save :: radial_retry_m=-1,radial_retry_count=0,radial_retry_captured=0, &
+     radial_retry_dimensions(6)=0
  integer(int64), save :: radial_retry_generation=0_int64
  real(knd), save :: radial_retry_c=-1.0_knd,radial_retry_x1=-1.0_knd
  real(knd), allocatable, save :: radial_retry_values(:,:)
@@ -502,9 +516,16 @@ module prolate_swf
    integer, intent(in) :: m,count,ndec,nex,maxd,maxlp,maxn,maxp
    real(knd), intent(in) :: c,x1
    integer :: allocation_status
+   character(len=256) :: allocation_message
    call clear_radial_retry_ledger()
    if(.not.checked_radial_enabled) return
-   allocate(radial_retry_values(2,count),radial_retry_metadata(6,count),radial_retry_done(count),stat=allocation_status)
+   allocate(radial_retry_values(2,count),stat=allocation_status,errmsg=allocation_message)
+   if(allocation_status==0) then
+     allocate(radial_retry_metadata(6,count),stat=allocation_status,errmsg=allocation_message)
+   end if
+   if(allocation_status==0) then
+     allocate(radial_retry_done(count),stat=allocation_status,errmsg=allocation_message)
+   end if
    if(allocation_status/=0) then
      call clear_radial_retry_ledger()
      return
@@ -519,8 +540,8 @@ module prolate_swf
    radial_retry_dimensions=[ndec,nex,maxd,maxlp,maxn,maxp]
  end subroutine
 
- function profcn_retry_current_radials_quad(c,x1,m,count,token,requests,r1,r1e,r1d,r1de,r2,r2e,r2d,r2de,accuracy) &
-     bind(C) result(status)
+ function profcn_retry_current_radials_quad(c,x1,m,count,token,requests,r1,r1e,r1d, &
+     r1de,r2,r2e,r2d,r2de,accuracy) bind(C) result(status)
    use iso_c_binding, only: c_int,c_int64_t
    implicit none
    integer(c_int), value :: m,count
@@ -530,13 +551,16 @@ module prolate_swf
    real(knd), intent(inout) :: r2(count),r2d(count)
    integer(c_int), intent(inout) :: r2e(count),r2de(count),accuracy(count)
    integer(c_int) :: status
-   integer :: i,l,ndec,nex,maxd,maxlp,maxn,maxp,limd,planned,idmf,current,jsub,terms,support,reason,a,ie,ide,allocation_status
+   integer :: i,l,ndec,nex,maxd,maxlp,maxn,maxp,limd,planned,idmf,current,jsub,terms, &
+       support,reason,a,ie,ide,allocation_status
    real(knd) :: eigval,dmf,value,derivative
    real(knd), allocatable :: original_ratios(:)
    logical :: reconstructed
+   character(len=256) :: allocation_message
    status=0
    if(.not.checked_radial_enabled.or.token/=radial_retry_generation.or.radial_retry_m/=m.or. &
-      radial_retry_count/=count.or.radial_retry_captured/=count.or.radial_retry_c/=c.or.radial_retry_x1/=x1) return
+      radial_retry_count/=count.or.radial_retry_captured/=count.or. &
+      radial_retry_c/=c.or.radial_retry_x1/=x1) return
    if(radial_quadrature_count/=count) return
    if(checked_moment_callbacks_available()/=1) return
    if(.not.allocated(radial_quadrature_errors).or..not.allocated(radial_quadrature_valid)) return
@@ -546,7 +570,7 @@ module prolate_swf
    maxlp=radial_retry_dimensions(4)
    maxn=radial_retry_dimensions(5)
    maxp=radial_retry_dimensions(6)
-   allocate(original_ratios(maxd),stat=allocation_status)
+   allocate(original_ratios(maxd),stat=allocation_status,errmsg=allocation_message)
    if(allocation_status/=0) return
    do i=1,count
      if(requests(i)==0.or.radial_retry_done(i)/=0) cycle
@@ -560,11 +584,13 @@ module prolate_swf
      idmf=radial_retry_metadata(3,i)
      current=radial_retry_metadata(4,i)
      jsub=radial_retry_metadata(5,i)
-     call reconstruct_radial_retry_ratios(l,m,c,eigval,limd,ndec,nex,maxd,radial_retry_work,dmf,idmf,reconstructed)
+     call reconstruct_radial_retry_ratios(l,m,c,eigval,limd,ndec,nex,maxd, &
+         radial_retry_work,dmf,idmf,reconstructed)
      if(.not.reconstructed) cycle
      original_ratios=radial_retry_work%ratios
-     call retry_radial_neumann(l,m,c,x1,eigval,limd,planned,ndec,nex,maxd,maxlp,maxn,maxp,original_ratios,dmf,idmf, &
-       r1(i),r1e(i),r1d(i),r1de(i),current,jsub,radial_retry_work,value,ie,derivative,ide,a,terms,support,reason)
+     call retry_radial_neumann(l,m,c,x1,eigval,limd,planned,ndec,nex,maxd,maxlp,maxn,maxp, &
+       original_ratios,dmf,idmf,r1(i),r1e(i),r1d(i),r1de(i),current,jsub,radial_retry_work, &
+       value,ie,derivative,ide,a,terms,support,reason)
      if(reason/=0) cycle
      r2(i)=value
      r2e(i)=ie
@@ -578,7 +604,8 @@ module prolate_swf
    status=1
  end function
 
- subroutine reconstruct_radial_retry_ratios(l,m,c,eigval,limd,ndec,nex,maxd,workspace,dmfnorm,idmfe,valid)
+ subroutine reconstruct_radial_retry_ratios(l,m,c,eigval,limd,ndec,nex,maxd, &
+     workspace,dmfnorm,idmfe,valid)
    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
    implicit none
    integer, intent(in) :: l,m,limd,ndec,nex,maxd,idmfe
@@ -587,12 +614,20 @@ module prolate_swf
    logical, intent(out) :: valid
    integer :: ix,lm2,lim2,i,i2,j,m2,allocation_status,id01,idmf,idmlmf,idms,idmlms,jnorm,jsub
    real(knd) :: c2,c4,sgn,d01,dmf,dmlmf,dms,dmlms
+   character(len=256) :: allocation_message
    valid=.false.
-   if(.not.allocated(workspace%ratios).or..not.allocated(workspace%beta).or..not.allocated(workspace%gamma)) then
+   if(.not.allocated(workspace%ratios).or..not.allocated(workspace%beta).or. &
+       .not.allocated(workspace%gamma)) then
      if(allocated(workspace%ratios)) deallocate(workspace%ratios)
      if(allocated(workspace%beta)) deallocate(workspace%beta)
      if(allocated(workspace%gamma)) deallocate(workspace%gamma)
-     allocate(workspace%ratios(maxd),workspace%beta(maxd),workspace%gamma(maxd),stat=allocation_status)
+     allocate(workspace%ratios(maxd),stat=allocation_status,errmsg=allocation_message)
+     if(allocation_status==0) then
+       allocate(workspace%beta(maxd),stat=allocation_status,errmsg=allocation_message)
+     end if
+     if(allocation_status==0) then
+       allocate(workspace%gamma(maxd),stat=allocation_status,errmsg=allocation_message)
+     end if
      if(allocation_status/=0) then
        if(allocated(workspace%ratios)) deallocate(workspace%ratios)
        if(allocated(workspace%beta)) deallocate(workspace%beta)
@@ -640,11 +675,13 @@ module prolate_swf
    valid=.true.
  end subroutine
 
- subroutine retry_radial_neumann(l,m,c,x1,eigval,limd,planned_support,ndec,nex,maxd,maxlp,maxn,maxp,enr,dmfnorm,idmfe, &
-     r1c,ir1e,r1dc,ir1de,current_accuracy,jsub,workspace,r2,ir2,r2d,ir2d,accuracy,terms,used_support,reason)
+ subroutine retry_radial_neumann(l,m,c,x1,eigval,limd,planned_support,ndec,nex,maxd, &
+     maxlp,maxn,maxp,enr,dmfnorm,idmfe,r1c,ir1e,r1dc,ir1de,current_accuracy,jsub, &
+     workspace,r2,ir2,r2d,ir2d,accuracy,terms,used_support,reason)
    use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
    implicit none
-   integer, intent(in) :: l,m,limd,planned_support,ndec,nex,maxd,maxlp,maxn,maxp,idmfe,ir1e,ir1de,current_accuracy,jsub
+   integer, intent(in) :: l,m,limd,planned_support,ndec,nex,maxd,maxlp,maxn,maxp, &
+       idmfe,ir1e,ir1de,current_accuracy,jsub
    real(knd), intent(in) :: c,x1,eigval,enr(maxd),dmfnorm,r1c,r1dc
    type(radial_retry_workspace), intent(inout) :: workspace
    real(knd), intent(out) :: r2,r2d
@@ -652,6 +689,7 @@ module prolate_swf
    integer :: n,j,limneu,nsub,allocation_status,support_cap
    logical :: extended_valid
    real(knd) :: x,rm,rm2,aj1,aj2,apcoef,w1,w2,wr,wt,dec,ratio
+   character(len=256) :: allocation_message
    r2=0
    r2d=0
    ir2=0
@@ -667,8 +705,22 @@ module prolate_swf
    if(.not.workspace%prepared) then
      n=min(maxn-2,maxp+m)
      if(l+1>n.or.limneu+m>n) return
-     allocate(workspace%nf(maxn),workspace%ndf(maxn),workspace%nv(maxlp),workspace%ndr(maxlp), &
-       workspace%ne(maxlp),workspace%prat(maxp),stat=allocation_status)
+     allocate(workspace%nf(maxn),stat=allocation_status,errmsg=allocation_message)
+     if(allocation_status==0) then
+       allocate(workspace%ndf(maxn),stat=allocation_status,errmsg=allocation_message)
+     end if
+     if(allocation_status==0) then
+       allocate(workspace%nv(maxlp),stat=allocation_status,errmsg=allocation_message)
+     end if
+     if(allocation_status==0) then
+       allocate(workspace%ndr(maxlp),stat=allocation_status,errmsg=allocation_message)
+     end if
+     if(allocation_status==0) then
+       allocate(workspace%ne(maxlp),stat=allocation_status,errmsg=allocation_message)
+     end if
+     if(allocation_status==0) then
+       allocate(workspace%prat(maxp),stat=allocation_status,errmsg=allocation_message)
+     end if
      if(allocation_status/=0) then
        if(allocated(workspace%nf)) deallocate(workspace%nf)
        if(allocated(workspace%ndf)) deallocate(workspace%ndf)
@@ -680,7 +732,8 @@ module prolate_swf
        return
      end if
      x=x1+1
-     call sphneu(c,x,n,maxn,maxlp,workspace%nf,workspace%nv,workspace%ne,workspace%ndf,workspace%ndr)
+     call sphneu(c,x,n,maxn,maxlp,workspace%nf,workspace%nv,workspace%ne, &
+         workspace%ndf,workspace%ndr)
      rm=real(m,knd)
      rm2=rm+rm
      workspace%prat(1)=1
@@ -704,12 +757,12 @@ module prolate_swf
      radial_retry_converged=.false.
      if(used_support==limd) then
        call r2neu(l,m,c,x1,limneu,ndec,nex,maxd,maxlp,maxn,maxp,enr,workspace%nf,workspace%nv, &
-         workspace%ne,workspace%ndf,workspace%ndr,workspace%prat,workspace%factor,workspace%exponent, &
-         dmfnorm,idmfe,r1dc,ir1de,r2,ir2,r2d,ir2d,terms)
+         workspace%ne,workspace%ndf,workspace%ndr,workspace%prat,workspace%factor, &
+         workspace%exponent,dmfnorm,idmfe,r1dc,ir1de,r2,ir2,r2d,ir2d,terms)
      else
-       call r2neu(l,m,c,x1,limneu,ndec,nex,maxd,maxlp,maxn,maxp,workspace%ratios,workspace%nf,workspace%nv, &
-         workspace%ne,workspace%ndf,workspace%ndr,workspace%prat,workspace%factor,workspace%exponent, &
-         dmfnorm,idmfe,r1dc,ir1de,r2,ir2,r2d,ir2d,terms)
+       call r2neu(l,m,c,x1,limneu,ndec,nex,maxd,maxlp,maxn,maxp,workspace%ratios, &
+         workspace%nf,workspace%nv,workspace%ne,workspace%ndf,workspace%ndr,workspace%prat, &
+         workspace%factor,workspace%exponent,dmfnorm,idmfe,r1dc,ir1de,r2,ir2,r2d,ir2d,terms)
      end if
      radial_retry_tracking=.false.
      if(radial_retry_converged) exit
@@ -718,7 +771,8 @@ module prolate_swf
      ! Grow work only after actual series nonconvergence, within the existing native cap.
      used_support=2*(min(support_cap,used_support+max(2,used_support/4))/2)
      limneu=used_support
-     call reconstruct_radial_retry_ratios(l,m,c,eigval,used_support,ndec,nex,maxd,workspace,dmfnorm,idmfe,extended_valid)
+     call reconstruct_radial_retry_ratios(l,m,c,eigval,used_support,ndec,nex,maxd, &
+         workspace,dmfnorm,idmfe,extended_valid)
      reason=8
      if(.not.extended_valid) return
    end do
@@ -746,12 +800,14 @@ module prolate_swf
    integer(c_int64_t) :: token
    token=radial_retry_generation
  end function
- subroutine capture_radial_retry_degree(index,m,eigenvalue,support,planned,normalization,exponent,accuracy,jsub,integral)
+ subroutine capture_radial_retry_degree(index,m,eigenvalue,support,planned,normalization, &
+     exponent,accuracy,jsub,integral)
    implicit none
    integer, intent(in) :: index,m,support,planned,exponent,accuracy,jsub
    real(knd), intent(in) :: eigenvalue,normalization
    logical, intent(in) :: integral
-   if(.not.checked_radial_enabled.or.radial_retry_m/=m.or.index<1.or.index>radial_retry_count) return
+   if(.not.checked_radial_enabled.or.radial_retry_m/=m.or.index<1.or. &
+       index>radial_retry_count) return
    radial_retry_values(:,index)=[eigenvalue,normalization]
    radial_retry_metadata(:,index)=[support,planned,exponent,accuracy,jsub,merge(1,0,integral)]
    radial_retry_captured=index
@@ -768,14 +824,16 @@ module prolate_swf
    if(.not.checked_radial_enabled) call clear_checked_moment_caches()
  end function
 
- subroutine profcn_set_checked_radial_callbacks_quad(available,moments,parity,radial,packing) bind(C)
+ subroutine profcn_set_checked_radial_callbacks_quad(available,moments,parity, &
+     radial,packing) bind(C)
    use iso_c_binding, only: c_funptr,c_f_procpointer,c_associated
    implicit none
    type(c_funptr), value :: available,moments,parity,radial,packing
    call clear_radial_retry_ledger()
    call clear_checked_moment_caches()
    checked_radial_enabled=.false.
-   nullify(checked_available_proc,checked_moments_proc,checked_parity_proc,checked_radial_proc,checked_pack_proc)
+   nullify(checked_available_proc,checked_moments_proc,checked_parity_proc, &
+       checked_radial_proc,checked_pack_proc)
    if(c_associated(available)) call c_f_procpointer(available,checked_available_proc)
    if(c_associated(moments)) call c_f_procpointer(moments,checked_moments_proc)
    if(c_associated(parity)) call c_f_procpointer(parity,checked_parity_proc)
@@ -1218,6 +1276,7 @@ module prolate_swf
   subroutine prepare_radial_quadrature_results(lnum,mnum)
     integer, intent(in) :: lnum,mnum
     integer :: status
+    character(len=256) :: allocation_message
     radial_quadrature_count=0
     if(radial_quadrature_mode/=1 .or. mnum/=1) return
     ! This allocation bound only disables the estimate, never the original radial calculation.
@@ -1227,7 +1286,10 @@ module prolate_swf
           deallocate(radial_quadrature_errors,radial_quadrature_valid)
     end if
     if(.not.allocated(radial_quadrature_errors)) then
-      allocate(radial_quadrature_errors(lnum,2),radial_quadrature_valid(lnum),stat=status)
+      allocate(radial_quadrature_errors(lnum,2),stat=status,errmsg=allocation_message)
+      if(status==0) then
+        allocate(radial_quadrature_valid(lnum),stat=status,errmsg=allocation_message)
+      end if
       if(status/=0) then
         if(allocated(radial_quadrature_errors)) deallocate(radial_quadrature_errors)
         if(allocated(radial_quadrature_valid)) deallocate(radial_quadrature_valid)
@@ -1243,7 +1305,8 @@ module prolate_swf
     real(knd), intent(in) :: left,right,node,q
     real(knd), intent(out) :: eta,measure
     real(knd) :: root,lower,width,t
-    ! eta=sqrt(q)*sinh(t) preserves each original panel and removes nearby square-root singularities.
+    ! eta=sqrt(q)*sinh(t) preserves each original panel and removes nearby
+    ! square-root singularities.
     root=sqrt(q)
     lower=asinh(left/root)
     width=asinh(right/root)-lower
@@ -2051,6 +2114,9 @@ module prolate_swf
       remaining_values = (pint_geometry_cache_bytes - pint_geometry_retained_bytes()) / real_bytes
       if(node > 0 .and. node <= remaining_values / 5) then
         allocate(entry%kernels(3, node), stat=allocation_status, errmsg=allocation_message)
+        if(allocation_status /= 0) then
+          if(allocated(entry%kernels)) deallocate(entry%kernels)
+        end if
       end if
       remaining_values = (pint_geometry_cache_bytes - pint_geometry_retained_bytes()) / real_bytes
       capacity = min(requested_degrees, 2 * ((remaining_values / max(1, node)) / 2))
@@ -2246,7 +2312,7 @@ module prolate_swf
 #ifdef USE_QUAD
     if(radial_quadrature_mode==1 .and. maxint>0) then
       if(int(maxint,int64)<=auxiliary_cache_budget/(6_int64*(storage_size(0.0_knd)/8))) then
-        allocate(quadrature_pair_work(maxint,6),stat=allocation_status)
+        allocate(quadrature_pair_work(maxint,6),stat=allocation_status,errmsg=allocation_message)
         if(allocation_status==0) then
           quadrature_pair_work=0.0_knd
           if(prefix_idx>0) then
@@ -2639,7 +2705,8 @@ module prolate_swf
   end subroutine
 
 #ifdef USE_QUAD
-  logical function audit_pint_roundoff(m, lim, observed, original, pnorm, ipnorm, basis, kernels) result(agrees)
+  logical function audit_pint_roundoff(m, lim, observed, original, pnorm, ipnorm, &
+      basis, kernels) result(agrees)
     use, intrinsic :: ieee_arithmetic, only: ieee_is_finite
     integer, intent(in) :: m, lim, ipnorm(:)
     real(knd), intent(in) :: observed(:,:), original(:,:), pnorm(:), basis(:,:), kernels(:,:)
@@ -2814,11 +2881,13 @@ module prolate_swf
           if(.not. pint_geometry_cache(slot)%valid) cycle
           if(pint_geometry_cache(slot)%m /= m .or. pint_geometry_cache(slot)%x1 /= x1) cycle
           if(pint_geometry_cache(slot)%kernel_c /= c) cycle
-          if(pint_geometry_cache(slot)%ngau /= ngau .or. pint_geometry_cache(slot)%ngqs /= ngqs) cycle
+          if(pint_geometry_cache(slot)%ngau /= ngau .or. &
+              pint_geometry_cache(slot)%ngqs /= ngqs) cycle
           if(.not. allocated(pint_geometry_cache(slot)%basis) .or. &
               .not. allocated(pint_geometry_cache(slot)%kernels)) cycle
           exact = audit_pint_roundoff(m, limint, cached(1:maxint,:), direct(1:maxint,:), &
-              cached_pnorm, cached_ipnorm, pint_geometry_cache(slot)%basis, pint_geometry_cache(slot)%kernels)
+              cached_pnorm, cached_ipnorm, pint_geometry_cache(slot)%basis, &
+              pint_geometry_cache(slot)%kernels)
           exit
         end do
       end if
@@ -4025,11 +4094,15 @@ end if
            .not.(radial_quadrature_even_only==1 .and. mod(l-m,2)==1)) then
          radial_error_slot=radial_quadrature_cache_index
          if(radial_error_slot>0 .and. pint_exact_sums_enabled()) then
-           if(pint_cache(radial_error_slot)%valid .and. pint_cache(radial_error_slot)%moment_errors_valid) then
+           if(pint_cache(radial_error_slot)%valid .and. &
+               pint_cache(radial_error_slot)%moment_errors_valid) then
              if(pint_cache(radial_error_slot)%m==m .and. pint_cache(radial_error_slot)%c==c .and. &
-                 pint_cache(radial_error_slot)%x1==x1 .and. pint_cache(radial_error_slot)%limint==pint_available .and. &
-                 pint_cache(radial_error_slot)%ndec==ndec .and. pint_cache(radial_error_slot)%ngau==65 .and. &
-                 pint_cache(radial_error_slot)%ngqs==10 .and. pint_cache(radial_error_slot)%quadrature_rule==1) then
+                 pint_cache(radial_error_slot)%x1==x1 .and. &
+                 pint_cache(radial_error_slot)%limint==pint_available .and. &
+                 pint_cache(radial_error_slot)%ndec==ndec .and. &
+                 pint_cache(radial_error_slot)%ngau==65 .and. &
+                 pint_cache(radial_error_slot)%ngqs==10 .and. &
+                 pint_cache(radial_error_slot)%quadrature_rule==1) then
                call r2int_with_quadrature_error(l,m,c,x,limint,limd,ndec,maxd,enr,d01,id01, &
                    maxint,maxmp,maxlp,radial_error_slot,norme,pnormint,ipnormint,coefme,coefmo, &
                    pint1,pint2,pint3,pint4,r2ic,ir2ie,r2dic,ir2die,jint,coefn,icoefn, &
@@ -4731,7 +4804,8 @@ end if
 720      continue
 #ifdef USE_QUAD
        if(ioprad==2.and.mi==1.and.iopang==0.and.present(coefficient_values)) &
-         call capture_radial_retry_degree(li,m,eigval,limd,limdneu,dmfnorm,idmfe,naccr,jsub,radial_integral_selected)
+         call capture_radial_retry_degree(li,m,eigval,limd,limdneu,dmfnorm,idmfe,naccr, &
+             jsub,radial_integral_selected)
 #endif
        if(iopang == 0) go to 850
 !
@@ -7289,8 +7363,10 @@ end if
     integer, intent(out) :: idmse, idmlmse, schedule_index, length
     integer, intent(inout) :: status
     integer :: parity, seed_index, last_ratio, j, offset, output_index, pass, increment, first, last
-    integer :: normalization_slot, cached_steps, shift, step, decimal_shift, ratio_power, product_power
-    integer(int64) :: powers(0:limd/2), current_power, total_power, remaining, decimal_power, half_power
+    integer :: normalization_slot, cached_steps, shift, step, decimal_shift, &
+        ratio_power, product_power
+    integer(int64) :: powers(0:limd/2), current_power, total_power, remaining, &
+        decimal_power, half_power
     real(knd) :: fractions(0:limd/2), twice_m, normalization_step, ratio, current, next_value
     real(knd) :: total, correction, term, updated, norm_total, norm_root, ratio_fraction, product
     logical :: ordinary, recorded_schedule
@@ -7440,7 +7516,8 @@ end if
         term=current*current
         call normalization_add_square(total,correction,total_power,term,2_int64*current_power)
         if(pass==1 .and. .not.recorded_schedule) then
-          if(normalization_align(term,2_int64*current_power-total_power)/(total+correction)<dec) then
+          if(normalization_align(term,2_int64*current_power-total_power)/ &
+              (total+correction)<dec) then
             schedule_index=j
             recorded_schedule=.true.
           end if
@@ -7601,7 +7678,8 @@ end if
 
     subroutine dnorm (l, m, c, ndec, nex, limd, maxd, enr, sgn, d01, id01, &
              dmfnorm, idmfe, dmlmf, idmlmfe, dmsnorm, idmse, &
-             dmlms, idmlmse, jnorm, jsub, coefficient_values, coefficient_length, coefficient_status)
+             dmlms, idmlmse, jnorm, jsub, coefficient_values, coefficient_length, &
+             coefficient_status)
 !
 !  purpose:     To compute d coefficient ratios from n values and to
 !               calculate the normalization of the d coefficients.
@@ -7827,7 +7905,8 @@ end if
 !  compute the Meixner-Schafke normalizing factor
     if(present(coefficient_values)) then
       call joint_meixner_coefficients(l, m, limd, enr, normalization_factors, dec, sgn, &
-          dmsnorm, idmse, dmlms, idmlmse, jn, coefficient_values, coefficient_length, coefficient_status)
+          dmsnorm, idmse, dmlms, idmlmse, jn, coefficient_values, coefficient_length, &
+          coefficient_status)
     else
       call complete_meixner_normalization(l, m, limd, enr, normalization_factors, dec, sgn, &
                                           dmsnorm, idmse, dmlms, idmlmse, jn)
@@ -8946,11 +9025,13 @@ end if
     logical :: parity_integrals, exact_integrals
     integer :: recurrence_limit, required_degrees, extra_odd
     integer :: coarse_prefix, coarse_node, coarse_weight_index, coarse_status
+    character(len=256) :: allocation_message
     real(knd), allocatable :: coarse_kernels(:,:)
     real(knd) :: mapped_measure, coarse_weight_ratio
     logical :: paired_geometry_complete,checked_eligible,checked_used,discard_checked_prefix
     integer(c_int) :: checked_status
-    real(knd) :: parity_forward(maxint), parity_diagonal(maxint), parity_backward(maxint), eta_squared
+    real(knd) :: parity_forward(maxint), parity_diagonal(maxint), &
+        parity_backward(maxint), eta_squared
 #endif
 !
 #ifdef USE_QUAD
@@ -9320,7 +9401,8 @@ end if
             pint4(il + 1) = pint4(il + 1) + coef4 * geometry_entry%basis(il + 1, geometry_node)
           end do
           extra_odd = required_degrees - 1
-          pint4(extra_odd) = pint4(extra_odd) + coef4 * geometry_entry%basis(extra_odd, geometry_node)
+          pint4(extra_odd) = pint4(extra_odd) + &
+              coef4 * geometry_entry%basis(extra_odd, geometry_node)
         else
           ! Continue the same recurrence when storage holds only a prefix or no table.
           eta_squared = etai * etai
@@ -9433,16 +9515,18 @@ end if
       paired_geometry_complete=.false.
       if(exact_integrals .and. ngau==65 .and. ngqs==10) then
         if(geometry_entry%nodes==650 .and. geometry_entry%kernels_valid) then
-          paired_geometry_complete=size(moment_errors,1)>=maxint .and. size(moment_errors,2)==6 .and. &
+          paired_geometry_complete=size(moment_errors,1)>=maxint .and. &
+              size(moment_errors,2)==6 .and. &
               associated(radial_quadrature_panel_proc)
         end if
       end if
       if(paired_geometry_complete) then
-        allocate(coarse_kernels(3,650),stat=coarse_status)
+        allocate(coarse_kernels(3,650),stat=coarse_status,errmsg=allocation_message)
         if(coarse_status==0) then
           do coarse_node=1,650
             coarse_weight_index=mod(coarse_node-1,65)+1
-            coarse_weight_ratio=radial_gauss_weights(coarse_weight_index)/radial_kronrod_weights(coarse_weight_index)
+            coarse_weight_ratio=radial_gauss_weights(coarse_weight_index)/ &
+                radial_kronrod_weights(coarse_weight_index)
             coarse_kernels(:,coarse_node)=geometry_entry%kernels(:,coarse_node)*coarse_weight_ratio
           end do
           coarse_prefix=0
@@ -9452,10 +9536,12 @@ end if
           if(discard_checked_prefix) coarse_prefix=0
           coarse_status=1
           if(coarse_prefix<2*((lim+1)/2)+1) then
-            coarse_status=radial_quadrature_panel_proc(geometry_entry%basis,geometry_entry%kernels, &
+            coarse_status=radial_quadrature_panel_proc(geometry_entry%basis, &
+                geometry_entry%kernels, &
                 coarse_kernels,int(size(geometry_entry%basis,1),c_int),650_c_int,65_c_int, &
                 int(merge(1,coarse_prefix+2,coarse_prefix<1),c_int),int(lim+2,c_int), &
-                int(required_degrees-1,c_int),moment_errors(:,3),moment_errors(:,4),moment_errors(:,6))
+                int(required_degrees-1,c_int),moment_errors(:,3),moment_errors(:,4), &
+                moment_errors(:,6))
           end if
           moment_errors_valid=coarse_status==1
 
