@@ -2224,8 +2224,9 @@ module prolate_swf
     previous_capacity = size(entry%basis, 1)
     if(requested_degrees > previous_capacity) then
       remaining_values = (pint_geometry_cache_bytes - pint_geometry_retained_bytes()) / real_bytes
-      capacity = min(requested_degrees, previous_capacity + &
-          2 * ((remaining_values / max(1, entry%nodes)) / 2))
+      ! Amortize prefix copies with even capacity growth within the retained budget.
+      capacity = min(max(requested_degrees, previous_capacity + 2 * (previous_capacity / 4)), &
+          previous_capacity + 2 * ((remaining_values / max(1, entry%nodes)) / 2))
       if(capacity > previous_capacity) then
         allocate(expanded_basis(capacity, entry%nodes), &
             stat=allocation_status, errmsg=allocation_message)

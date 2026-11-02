@@ -389,12 +389,26 @@ public:
         const bool negative = first.negative != second.negative;
         std::uint32_t carry = 0;
         // Each shifted exact product contributes to at most nine overlapping bins.
-        for (int limb = 0; limb < 8; ++limb) {
-            const std::uint64_t shifted = (std::uint64_t(product[limb]) << offset) | carry;
-            add_bin(initial + limb, std::uint32_t(shifted), negative);
-            carry = std::uint32_t(shifted >> 32);
+        if (initial + 9 < bin_count) {
+            // Cover the product once while retaining the same exact integer additions.
+            low = std::min(low, initial);
+            high = std::max(high, initial + 8);
+            const std::int64_t sign_mask = negative ? -1 : 0;
+            std::int64_t* const target = bins.data() + initial;
+            for (int limb = 0; limb < 8; ++limb) {
+                const std::uint64_t shifted = (std::uint64_t(product[limb]) << offset) | carry;
+                target[limb] += (std::int64_t(std::uint32_t(shifted)) ^ sign_mask) - sign_mask;
+                carry = std::uint32_t(shifted >> 32);
+            }
+            target[8] += (std::int64_t(carry) ^ sign_mask) - sign_mask;
+        } else {
+            for (int limb = 0; limb < 8; ++limb) {
+                const std::uint64_t shifted = (std::uint64_t(product[limb]) << offset) | carry;
+                add_bin(initial + limb, std::uint32_t(shifted), negative);
+                carry = std::uint32_t(shifted >> 32);
+            }
+            add_bin(initial + 8, carry, negative);
         }
-        add_bin(initial + 8, carry, negative);
         // At most 2^20 unsigned32 additions keep each signed64 bin below 2^53.
         if (++pending >= carry_interval) normalize();
         return true;
