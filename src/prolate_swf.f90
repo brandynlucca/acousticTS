@@ -2232,9 +2232,9 @@ module prolate_swf
             stat=allocation_status, errmsg=allocation_message)
         if(allocation_status == 0) then
 #ifdef USE_QUAD
-          expanded_basis(1:previous_capacity - 1:2,:) = entry%basis(1:previous_capacity - 1:2,:)
+          expanded_basis(1:entry%degrees - 1:2,:) = entry%basis(1:entry%degrees - 1:2,:)
 #else
-          expanded_basis(1:previous_capacity,:) = entry%basis
+          expanded_basis(1:entry%degrees,:) = entry%basis(1:entry%degrees,:)
 #endif
           call move_alloc(expanded_basis, entry%basis)
         end if
