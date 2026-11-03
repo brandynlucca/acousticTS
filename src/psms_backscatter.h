@@ -3787,6 +3787,74 @@ template<typename T> struct Workspace {
 };
 }
 
+#if ACOUSTICTS_HAVE_EXACT_QUAD_DOT
+// Separate trace reconstruction from the coupled-system factorization and iteration paths.
+template<typename T>
+#if defined(__GNUC__)
+__attribute__((noinline))
+#endif
+bool export_exact_boundary_traces(OrderSolution<T>& result,
+        const ProfcnCoefficientBatchResult<T>& exterior, const ProfcnCoefficientBatchResult<T>& interior,
+        int parity, const std::vector<std::complex<T>>& exterior_pressure,
+        const std::vector<std::complex<T>>& exterior_derivative,
+        const std::vector<std::complex<T>>& internal_pressure,
+        const std::vector<std::complex<T>>& internal_derivative,
+        const std::vector<T>& incident_value, const std::vector<T>& incident_derivative,
+        const std::vector<std::complex<T>>& incident_coefficients) {
+    using Complex = std::complex<T>;
+    const int dim = int(exterior_pressure.size()), internal_dim = int(internal_pressure.size());
+    const int support = int(result.traces[0].size());
+    // Omit only the identically zero tail beyond every exported coefficient length.
+    int active_trace_support = 0;
+    for (int col = 0; col < dim; ++col)
+        active_trace_support = std::max(active_trace_support, exterior.lengths[parity + 2 * col]);
+    for (int row = 0; row < internal_dim; ++row)
+        active_trace_support = std::max(active_trace_support, interior.lengths[parity + 2 * row]);
+    bool finite_traces = true;
+    for (const auto* values : {&exterior_pressure, &exterior_derivative, &internal_pressure,
+            &internal_derivative, &incident_coefficients})
+        for (const auto& value : *values)
+            finite_traces = psms_robin_solver::finite(value) && finite_traces;
+    for (const auto* values : {&incident_value, &incident_derivative})
+        for (const auto& value : *values)
+            finite_traces = is_finite_real(value) && finite_traces;
+    if (!finite_traces || std::fegetround() != FE_TONEAREST) active_trace_support = support;
+#if ACOUSTICTS_HAVE_EXACT_QUAD_DOT
+    if constexpr (std::is_same_v<T, acousticts_quad_t>) {
+        if (finite_traces && std::fegetround() == FE_TONEAREST) {
+            // Round complete binary128 trace products once with the existing exact accumulator.
+            static thread_local std::array<quad_dot_product::Accumulator, 12> accumulators;
+            auto accumulate = [&](int trace, T basis, const Complex& value) {
+                if (!accumulators[2 * trace].add(basis, value.real()) ||
+                        !accumulators[2 * trace + 1].add(basis, value.imag()))
+                    throw std::runtime_error("Invalid complete boundary trace product.");
+            };
+            for (int legendre = parity; legendre < active_trace_support; legendre += 2) {
+                for (auto& accumulator : accumulators) accumulator.reset();
+                for (int col = 0; col < dim; ++col) {
+                    const T basis = coefficient(exterior, parity + 2 * col, legendre);
+                    accumulate(0, basis, exterior_pressure[col]);
+                    accumulate(1, basis, exterior_derivative[col]);
+                    accumulate(4, basis * incident_value[col], incident_coefficients[col]);
+                    accumulate(5, basis * incident_derivative[col], incident_coefficients[col]);
+                }
+                for (int row = 0; row < internal_dim; ++row) {
+                    const T basis = coefficient(interior, parity + 2 * row, legendre);
+                    accumulate(2, basis, internal_pressure[row]);
+                    accumulate(3, basis, internal_derivative[row]);
+                }
+                for (int trace = 0; trace < 6; ++trace)
+                    result.traces[trace][legendre] = Complex(accumulators[2 * trace].rounded(),
+                        accumulators[2 * trace + 1].rounded());
+            }
+            return true;
+        }
+    }
+#endif
+    return false;
+}
+#endif
+
 template<typename T> OrderSolution<T> solve_order(int m, int degree, int interior_degree,
         T chi_body, T xi, T incident_cosine, T phi_difference, T density_ratio,
         bool backscatter, bool robin, const ProfcnCoefficientBatchResult<T>& exterior,
@@ -4178,7 +4246,14 @@ template<typename T> OrderSolution<T> solve_order(int m, int degree, int interio
             internal_pressure[row] = robin_pressure[row] * trace;
             internal_derivative[row] = robin_derivative[row] * trace;
         }
-        // Export complete Legendre traces for an independent exact-incident check.
+#if ACOUSTICTS_HAVE_EXACT_QUAD_DOT
+        if constexpr (std::is_same_v<T, acousticts_quad_t>) {
+            if (export_exact_boundary_traces(result, exterior, interior, parity,
+                    exterior_pressure, exterior_derivative, internal_pressure, internal_derivative,
+                    incident_value, incident_derivative, incident_coefficients)) continue;
+        }
+#endif
+        // Retain compensated arithmetic for double precision and other rounding modes.
         for (int legendre = parity; legendre < support; legendre += 2) {
             for (int col = 0; col < dim; ++col) {
                 const T basis = coefficient(exterior, parity + 2 * col, legendre);
