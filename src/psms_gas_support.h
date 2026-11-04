@@ -451,7 +451,15 @@ inline std::vector<Complex> fields(T chi_sw, T chi_body, T xi,
     for (size_t index = 0; index < directions.size(); ++index) {
         if (degree_seeds[index] < 0)
             throw std::invalid_argument("Invalid gas degree seed.");
-        states.emplace_back(directions[index], degree_seeds[index], std::max(1, int(exterior_seed)));
+        // Start farther along the existing refinement sequence within the supplied seed.
+        int prepared_exterior_seed = std::max(1, int(exterior_seed));
+        while (prepared_exterior_seed < degree_seeds[index]) {
+            const long long next = prepared_exterior_seed +
+                std::max(2LL, (static_cast<long long>(prepared_exterior_seed) + 1) / 4);
+            if (next > degree_seeds[index]) break;
+            prepared_exterior_seed = grow_degree(prepared_exterior_seed, 0);
+        }
+        states.emplace_back(directions[index], degree_seeds[index], prepared_exterior_seed);
     }
     if (directions.size() == 1) {
         auto& state = states.front();
