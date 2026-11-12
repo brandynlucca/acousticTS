@@ -3262,3 +3262,373 @@ context("Complete-coefficient Robin operator") {
     }
 }
 #endif
+
+
+#if ACOUSTICTS_HAVE_QUADMATH && ACOUSTICTS_HAVE_EXACT_QUAD_DOT
+namespace checked_moment_regression {
+struct ScopedArithmetic {
+    int rounding = std::fegetround();
+    int enabled = pint_set_checked_moments_quad(1);
+    ScopedArithmetic() { std::fesetround(FE_TONEAREST); }
+    ~ScopedArithmetic() {
+        pint_set_checked_moments_quad(enabled);
+        std::fesetround(rounding);
+    }
+};
+using Q = acousticts_quad_t;
+inline Q decimal(const char* value) { return strtoflt128(value, nullptr); }
+}
+
+context("Checked binary128 integration uncertainty") {
+    test_that("Taylor moments enclose independent quadrature and preserve resumed prefixes") {
+        using namespace checked_moment_regression;
+        ScopedArithmetic arithmetic;
+        if (!pint_checked_moments_available_quad()) return;
+        // Independent 85-digit Gauss-Legendre integration used 64 and 96 nodes.
+        // Rules agree within 2e-74 for c=1, q=4 and the first three even degrees.
+        // The integrand is the scaled Ferrers basis times y_(m+f)(sqrt(4+t*t))
+        // divided by (4+t*t)^(f/2), including the original spheroidal window.
+        const std::array<std::array<const char*, 9>, 2> references{{
+            {{"0.466373593250215636576961494180224647846431128218185846761206",
+              "-0.297340626842711180182151790121494451341639071404736599886108",
+              "-0.316333342640129824959401526307995967666411528167507726539915",
+              "0.0187680372445494910818722625730769831070925520015377287392737",
+              "0.0200722358416466109633110207996888465046946676750733703980976",
+              "0.0185735164933200965509846241849117870246524194402067528801495",
+              "-0.000942175441090356782680908817869832697664577034008663606389901",
+              "-0.000864941501087386905159988056577808385273516774693985799044365",
+              "-0.00115675438678451173443586493867366296238987450740136913153432"}},
+            {{"-0.211608575122905194096975207280788865230889159386539980189471",
+              "-0.223271239422299947673590766995271836460709298405142986280043",
+              "-0.216900147250488587792252344831436685755838123439690361362611",
+              "0.0179461520080577124586894361625142756199727295283720195975502",
+              "0.0169116607543753785303604192487875285603219662408069617243005",
+              "0.0233737367379657167118045772367391116319854467782171244208368",
+              "-0.000822495057026075308694231200714405885008619096846728902110006",
+              "-0.00111892811233534519790052852532248135449888691359601445125157",
+              "-0.00212679814653708790996584028384431525747308803749373337768251"}}
+        }};
+        const int capacity = 8, required = 6;
+        const Q c = 1, q = 4, sentinel = 73;
+        for (int m : {0, 1}) for (Q scale : {Q(1), Q(-8)}) {
+            CATCH_INFO("m=" << m << " scale=" << double(scale));
+            std::array<std::vector<Q>, 3> values;
+            for (auto& family : values) family.assign(capacity, sentinel);
+            std::vector<Q> errors(6 * capacity, sentinel);
+            const int status = pint_checked_moments_quad(m, &c, &q, &scale, capacity,
+                required, 1, values[0].data(), values[1].data(), values[2].data(), errors.data());
+            expect_true(status == 1);
+            if (status != 1) continue;
+            const std::array<int, 3> error_column{{2, 3, 5}};
+            for (int k = 0; k < 3; ++k) for (int family = 0; family < 3; ++family) {
+                const Q reference = scale * decimal(references[m][3 * k + family]);
+                const Q radius = errors[error_column[family] * capacity + 2 * k];
+                const Q conversion = Q(4) * preceps<Q>() * fabsq(reference);
+                expect_true(bool(finiteq(radius) && radius >= 0));
+                expect_true(bool(fabsq(values[family][2 * k] - reference) <= radius + conversion));
+            }
+            for (int index = 0; index < capacity; ++index) {
+                if (index % 2 || index >= required)
+                    for (const auto& family : values) expect_true(bool(family[index] == sentinel));
+                for (int column : {0, 1, 4})
+                    expect_true(bool(errors[column * capacity + index] == sentinel));
+            }
+            std::array<std::vector<Q>, 3> resumed;
+            for (auto& family : resumed) family.assign(capacity, sentinel);
+            std::vector<Q> resumed_errors(6 * capacity, sentinel);
+            expect_true(pint_checked_moments_quad(m, &c, &q, &scale, capacity, 2, 1,
+                resumed[0].data(), resumed[1].data(), resumed[2].data(), resumed_errors.data()) == 1);
+            const auto prefix = resumed;
+            const auto prefix_errors = resumed_errors;
+            expect_true(pint_checked_moments_quad(m, &c, &q, &scale, capacity, required, 3,
+                resumed[0].data(), resumed[1].data(), resumed[2].data(), resumed_errors.data()) == 1);
+            for (int family = 0; family < 3; ++family) {
+                expect_true(bool(resumed[family][0] == prefix[family][0]));
+                expect_true(bool(resumed_errors[error_column[family] * capacity] ==
+                    prefix_errors[error_column[family] * capacity]));
+                for (int index : {2, 4}) {
+                    expect_true(bool(resumed[family][index] == values[family][index]));
+                    expect_true(bool(resumed_errors[error_column[family] * capacity + index] ==
+                        errors[error_column[family] * capacity + index]));
+                }
+            }
+            // Expansion about the other endpoint must enclose the same integral.
+            psms_checked_integrals::MomentRecurrence recurrence;
+            expect_true(psms_checked_integrals::initialize_recurrence(recurrence, c, q,
+                scale, 1, m + 1028, 1024));
+            psms_checked_integrals::MomentResult alternate;
+            psms_checked_integrals::enclose_moments(recurrence, m, 1, 2, alternate);
+            expect_true(alternate.status == 0);
+            if (alternate.status == 0) for (int index = 0; index < 9; ++index) {
+                const Q reference = scale * decimal(references[m][index]);
+                expect_true(bool(fabsq(alternate.values[index] - reference) <= alternate.bounds[index] +
+                    Q(4) * preceps<Q>() * fabsq(reference)));
+            }
+        }
+    }
+
+    test_that("checked moment rejection preserves caller buffers and arithmetic state") {
+        using namespace checked_moment_regression;
+        ScopedArithmetic arithmetic;
+        if (!pint_checked_moments_available_quad()) return;
+        Q c = 1, q = 4, scale = 1;
+        const int capacity = 8;
+        std::vector<Q> first(capacity, Q(17)), second = first, fourth = first;
+        std::vector<Q> errors(6 * capacity, Q(19));
+        auto rejected = [&](int order, int required, int begin) {
+            expect_true(pint_checked_moments_quad(order, &c, &q, &scale, capacity,
+                required, begin, first.data(), second.data(), fourth.data(), errors.data()) == 0);
+            for (const auto* values : {&first, &second, &fourth})
+                for (Q value : *values) expect_true(bool(value == 17));
+            for (Q value : errors) expect_true(bool(value == 19));
+        };
+        rejected(-1, 6, 1);
+        rejected(1023, 6, 1);
+        rejected(0, 1, 1);
+        rejected(0, 9, 1);
+        rejected(0, 6, 2);
+        rejected(0, 6, 7);
+        c = 0; rejected(0, 6, 1); c = 1;
+        q = 1; rejected(0, 6, 1); q = 4;
+        scale = 0; rejected(0, 6, 1); scale = 1;
+        c = HUGE_VALQ; rejected(0, 6, 1); c = 1;
+        pint_set_checked_moments_quad(0);
+        rejected(0, 6, 1);
+        pint_set_checked_moments_quad(1);
+        std::fesetround(FE_UPWARD);
+        rejected(0, 6, 1);
+        std::fesetround(FE_TONEAREST);
+        expect_true(pint_checked_moments_available_quad() == 1);
+        // Exhausted recurrence support must reject rather than return a truncated moment.
+        psms_checked_integrals::MomentRecurrence recurrence;
+        expect_true(psms_checked_integrals::initialize_recurrence(recurrence, c, q, scale, 0, 2, 1024));
+        psms_checked_integrals::MomentResult result;
+        psms_checked_integrals::enclose_moments(recurrence, 0, 0, 2, result);
+        expect_true(result.status != 0);
+    }
+
+    test_that("fixed-input parity radial and decimal propagation enclose endpoint extrema") {
+        using namespace checked_moment_regression;
+        ScopedArithmetic arithmetic;
+        if (!pint_checked_moments_available_quad()) return;
+        Q alpha = 2, beta = 3, minus = 4, plus = 20, eminus = Q(0.25), eplus = Q(0.5);
+        Q returned = 4, error = -1;
+        for (Q sign : {Q(1), Q(-1)}) {
+            alpha = 2 * sign;
+            returned = 4 * sign;
+            expect_true(pint_checked_parity_quad(&alpha, &beta, &minus, &plus,
+                &eminus, &eplus, &returned, &error) == 1);
+            expect_true(bool(error >= Q(0.625) && error < Q(0.626)));
+            expect_true(bool(returned == 4 * sign));
+        }
+        returned += Q(0.125);
+        expect_true(pint_checked_parity_quad(&alpha, &beta, &minus, &plus,
+            &eminus, &eplus, &returned, &error) == 1);
+        expect_true(bool(error >= Q(0.75) && error < Q(0.751)));
+        const Q saved_error = error;
+        alpha = 0;
+        expect_true(pint_checked_parity_quad(&alpha, &beta, &minus, &plus,
+            &eminus, &eplus, &returned, &error) == 0);
+        expect_true(bool(error == saved_error));
+        alpha = 2; eminus = -1;
+        expect_true(pint_checked_parity_quad(&alpha, &beta, &minus, &plus,
+            &eminus, &eplus, &returned, &error) == 0);
+
+        Q F = 2, D = 3, C = -1, s1 = 4, s2 = 5, u1 = Q(0.25), u2 = Q(0.5);
+        Q full = 8, derivative = 15, correction = -4, total = 11, error_d = -1;
+        expect_true(pint_checked_radial_quad(&F, &D, &C, &s1, &s2, &u1, &u2,
+            &full, &derivative, &correction, &total, &error, &error_d) == 1);
+        expect_true(bool(error >= Q(0.5) && error < Q(0.501)));
+        expect_true(bool(error_d >= Q(1.75) && error_d < Q(1.751)));
+        expect_true(bool(full == 8 && total == 11));
+        u1 = -1;
+        expect_true(pint_checked_radial_quad(&F, &D, &C, &s1, &s2, &u1, &u2,
+            &full, &derivative, &correction, &total, &error, &error_d) == 0);
+
+        Q value = Q(1.25), radius = Q(0.125), packed = 1250;
+        expect_true(pint_checked_pack_quad(&value, &radius, 3, &packed, &error) == 1);
+        expect_true(bool(error >= 125 && error < Q(125.001)));
+        packed = decimal("0.00125");
+        expect_true(pint_checked_pack_quad(&value, &radius, -3, &packed, &error) == 1);
+        expect_true(bool(error >= decimal("0.000125") && error < decimal("0.000125001")));
+        value = 0; radius = 0; packed = 0;
+        expect_true(pint_checked_pack_quad(&value, &radius, 5000, &packed, &error) == 1);
+        expect_true(bool(error == 0));
+        expect_true(pint_checked_pack_quad(&value, &radius, 5001, &packed, &error) == 0);
+        radius = -1;
+        expect_true(pint_checked_pack_quad(&value, &radius, 0, &packed, &error) == 0);
+    }
+
+    test_that("positive bounds retain range and outward direction across binary128 exponents") {
+        using namespace checked_moment_regression;
+        using namespace psms_checked_integrals;
+        ScopedArithmetic arithmetic;
+        auto real = [](PositiveBound bound) { return ldexpq(Q(bound.mantissa), bound.exponent); };
+        for (Q value : {Q(0), Q(1), Q(-1), ldexpq(Q(1), -16494),
+                ldexpq(Q(3), -16440), ldexpq(Q(1), -16382), ldexpq(Q(1), 16000)}) {
+            bool ok = true;
+            const auto lower = pfromq_dn(value, ok), upper = pfromq_up(value, ok);
+            expect_true(ok);
+            expect_true(bool(real(lower) <= fabsq(value) && real(upper) >= fabsq(value)));
+            const Q stored = ptoq_up(upper, ok);
+            expect_true(ok);
+            expect_true(bool(stored >= fabsq(value)));
+        }
+        const auto a = pfromd(1.5), b = pfromd(1.25), small = PositiveBound{1, -1200};
+        expect_true(bool(real(pmul(a, b)) >= Q(1.875)));
+        expect_true(bool(real(pmul_lo(a, b)) <= Q(1.875)));
+        expect_true(bool(real(pdiv(a, b)) >= Q(6) / Q(5)));
+        expect_true(bool(real(pdiv(b, a)) >= Q(5) / Q(6)));
+        expect_true(bool(real(padd(small, a)) > Q(1.5)));
+        expect_true(bool(real(psqrt(PositiveBound{1, 1})) >= sqrtq(Q(2))));
+        expect_true(bool(real(psqrt(PositiveBound{1, 2})) >= Q(2)));
+        expect_true(ple(small, a));
+        expect_true(!ple(a, small));
+        expect_true(!ple(a, PositiveBound{0, 0}));
+        expect_true(std::isinf(pdbl_up(PositiveBound{1, 1200})));
+        expect_true(pdbl_up(small) > 0);
+        bool ok = true;
+        pfromq_up(HUGE_VALQ, ok);
+        expect_true(!ok);
+        ok = true; pfromq_dn(nanq(""), ok); expect_true(!ok);
+        ok = true; ptoq_up(PositiveBound{1, 16383}, ok); expect_true(!ok);
+        ok = true; ptoq_up(PositiveBound{4, 0}, ok); expect_true(!ok);
+        ok = true; relq(PositiveBound{1, 0}, ok); expect_true(!ok);
+        CoefficientBounds coefficients;
+        coefficients.init(PositiveBound{1, -1}, 4);
+        expect_true(!coefficients.ok);
+        const Interval product = ivmul(Interval{-2, 3}, Interval{-4, 5});
+        expect_true(bool(product.lower <= -12 && product.upper >= 15));
+        const Interval invalid = ivdivp(Interval{1, 2}, Interval{-1, 1});
+        expect_true(bool(!finiteq(invalid.lower) && !finiteq(invalid.upper)));
+    }
+
+    test_that("trigonometric enclosures preserve quadrants zero and adjacent zeros") {
+        using namespace checked_moment_regression;
+        using namespace psms_checked_integrals;
+        ScopedArithmetic arithmetic;
+        for (Q argument : {Q(0), Q(0.5), Q(2), Q(4), Q(5), Q(7), Q(-5),
+                half_pi, nextafterq(half_pi, HUGE_VALQ)}) {
+            Q sine = 0, cosine = 0;
+            PositiveBound sine_radius{}, cosine_radius{};
+            bool accepted = validated_sincos(argument, sine, cosine, sine_radius, cosine_radius);
+            if (!accepted) accepted = interval_sincos(argument, sine, cosine, sine_radius, cosine_radius);
+            expect_true(accepted);
+            bool ok = true;
+            const Q sr = ptoq_up(sine_radius, ok), cr = ptoq_up(cosine_radius, ok);
+            expect_true(ok);
+            expect_true(bool(fabsq(sine - sinq(argument)) <= sr + Q(4) * preceps<Q>()));
+            expect_true(bool(fabsq(cosine - cosq(argument)) <= cr + Q(4) * preceps<Q>()));
+            if (argument == 0) {
+                expect_true(bool(fabsq(sine) <= sr));
+                expect_true(bool(fabsq(cosine - 1) <= cr));
+            }
+        }
+        Q sine = 0, cosine = 0;
+        PositiveBound sr{}, cr{};
+        expect_true(!validated_sincos(ldexpq(Q(1), 100), sine, cosine, sr, cr));
+        expect_true(!interval_sincos(ldexpq(Q(1), 100), sine, cosine, sr, cr));
+    }
+}
+#endif
+
+
+context("Independent fluid reference formulations") {
+    test_that("separate batched and packed fluid equations preserve the same finite modal field") {
+        auto check = [](auto scalar) {
+            using T = decltype(scalar);
+            using Complex = std::complex<T>;
+            const int m_max = 3, n_max = 9;
+            const T chi_sw = T(1.5), chi_body = T(1.25), xi = T(1.5), eta = T(0.37);
+            const T density_body = T(1.2), density_sw = T(1);
+            const T relative = is_quad_precision_v<T> ? T(1e-25L) : T(1e-11);
+            auto agree = [&](Complex actual, Complex expected) {
+                expect_true(bool(is_finite_real(actual.real()) && is_finite_real(actual.imag())));
+                expect_true(bool(precabs(actual.real() - expected.real()) <=
+                    relative * std::max(T(1), precabs(expected.real()))));
+                expect_true(bool(precabs(actual.imag() - expected.imag()) <=
+                    relative * std::max(T(1), precabs(expected.imag()))));
+            };
+            psms_automatic::Quadrature<T> quadrature;
+            quadrature.prepare(64);
+            const auto prepared = prepare_full_fluid_boundary_data<T>(m_max, n_max,
+                chi_sw, chi_body, xi, eta, quadrature.nodes, quadrature.weights);
+            const auto angular = compute_smn_matrix<T>(m_max, n_max, chi_sw, eta);
+            for (int m = 0; m <= m_max; ++m) for (int n = m; n <= n_max; ++n)
+                agree(Complex(prepared.smn_body[m][n], 0), Complex(angular[m][n], 0));
+            const auto separate = fluid_boundary_kernels<T>(m_max, n_max, chi_sw,
+                chi_body, xi, density_body, density_sw, quadrature.nodes,
+                quadrature.weights, angular, prepared.radial_external);
+            if constexpr (std::is_same_v<T, double>) {
+                const auto vectorized = fluid_boundary_kernels_vectorized_double(m_max,
+                    n_max, chi_sw, chi_body, xi, density_body, density_sw,
+                    quadrature.nodes, quadrature.weights, angular, prepared.radial_external);
+                for (int m = 0; m <= m_max; ++m) {
+                    for (size_t index = 0; index < separate.rhs[m].size(); ++index)
+                        agree(vectorized.rhs[m][index], separate.rhs[m][index]);
+                    for (size_t index = 0; index < separate.K3_kernel[m].size(); ++index)
+                        agree(vectorized.K3_kernel[m][index], separate.K3_kernel[m][index]);
+                }
+            }
+            std::vector<std::vector<Complex>> coefficients(m_max + 1);
+            for (int m = 0; m <= m_max; ++m)
+                coefficients[m] = solve_fluid_mode_system<T>(separate.K3_kernel[m],
+                    separate.rhs[m], n_max - m + 1, false);
+            const auto reference = compute_fbs_backscatter_triangular<T>(m_max, angular, coefficients);
+            const auto batched = psms_backscatter_fluid_adaptive<T>(m_max, n_max,
+                chi_sw, chi_body, xi, eta, density_body, density_sw,
+                quadrature.nodes, quadrature.weights, true, false, false);
+            const auto packed = psms_full_coupled_field<T>(m_max, n_max, chi_sw,
+                chi_body, xi, eta, -eta, precpi<T>(), density_body / density_sw,
+                quadrature.nodes, quadrature.weights, true, false, false);
+            agree(batched, reference);
+            agree(packed, reference);
+            // Check the existing stopping allowance against a complete finite solve.
+            const T allowance = T(4) * (psms_modal_abs_tol<T>() + psms_modal_rel_tol<T>() *
+                std::max(T(1), precsqrt(complex_abs_sq(reference))));
+            const auto adaptive = psms_backscatter_fluid_adaptive<T>(m_max, n_max,
+                chi_sw, chi_body, xi, eta, density_body, density_sw,
+                quadrature.nodes, quadrature.weights, true, true, false);
+            const auto coupled = psms_full_coupled_field<T>(m_max, n_max, chi_sw,
+                chi_body, xi, eta, -eta, precpi<T>(), density_body / density_sw,
+                quadrature.nodes, quadrature.weights, true, false, true);
+            expect_true(bool(precsqrt(complex_abs_sq(adaptive - reference)) <= allowance));
+            expect_true(bool(precsqrt(complex_abs_sq(coupled - reference)) <= allowance));
+            const auto broadside = prepare_full_fluid_boundary_data<T>(m_max, n_max,
+                chi_sw, chi_body, xi, T(0), quadrature.nodes, quadrature.weights);
+            for (int m = 0; m <= m_max; ++m) for (int n = m + 1; n <= n_max; n += 2) {
+                expect_true(bool(broadside.smn_body[m][n] == 0));
+                expect_true(bool(broadside.radial_external.incident.value[m][n] == 0));
+                expect_true(bool(broadside.radial_external.scattering.value[m][n] == Complex(0, 0)));
+            }
+        };
+        check(double(0));
+#if ACOUSTICTS_HAVE_QUADMATH
+        check(acousticts_quad_t(0));
+#endif
+    }
+
+    test_that("fluid and gas kernel dispatch recover a manufactured complex solution") {
+        auto check = [](auto scalar) {
+            using T = decltype(scalar);
+            using Complex = std::complex<T>;
+            const std::vector<Complex> matrix{{T(2), T(1)}, {T(0.5), T(-0.25)},
+                {T(-0.5), T(0.75)}, {T(3), T(-1)}};
+            const std::vector<Complex> expected{{T(0.5), T(-0.25)}, {T(-1), T(0.75)}};
+            const auto rhs = matvec_product(matrix, expected, 2);
+            // The retained gas compatibility path explicitly uses binary64 SVD.
+            for (bool gas : {false, true}) {
+                const auto actual = solve_fluid_mode_system<T>(matrix, rhs, 2, gas);
+                const auto recovered = matvec_product(matrix, actual, 2);
+                for (int index = 0; index < 2; ++index) {
+                    expect_true(bool(precsqrt(complex_abs_sq(actual[index] - expected[index])) < T(1e-13)));
+                    expect_true(bool(precsqrt(complex_abs_sq(recovered[index] - rhs[index])) < T(1e-13)));
+                }
+            }
+        };
+        check(double(0));
+#if ACOUSTICTS_HAVE_QUADMATH
+        check(acousticts_quad_t(0));
+#endif
+    }
+}
