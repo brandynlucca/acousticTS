@@ -35,6 +35,7 @@ makevars_output=${ACOUSTICTS_MAKEVARS_OUTPUT:-Makevars}
 configure_tmp=$(mktemp -d "${TMPDIR:-/tmp}/acousticTS-configure.XXXXXX") || exit 1
 trap 'rm -rf "$configure_tmp"' EXIT HUP INT TERM
 
+cp "$srcdir/src/param.f90" "$configure_tmp/param.f90"
 cp "$srcdir/src/param_quad.f90" "$configure_tmp/param_quad.f90"
 cp "$srcdir/src/prolate_swf.f90" "$configure_tmp/prolate_swf.f90"
 
@@ -112,27 +113,20 @@ case "$fc_version" in
 esac
 
 # Flang 21 moved the Fortran runtime into libflang_rt.runtime. Some R builds
-# still omit that library from FLIBS. Check an allocating Fortran routine with
-# the C++ linker, adding the matching runtime only after the ordinary link fails.
+# still omit that library from FLIBS. Link the actual double-precision solver
+# because simple local allocations can bypass the Fortran runtime entirely.
 # https://releases.llvm.org/21.1.0/tools/flang/docs/FlangDriver.html#linker-driver
-cat > "$configure_tmp/conftest_runtime.f90" <<'EOF'
-subroutine conftest_runtime(n, result) bind(C)
-    use, intrinsic :: iso_c_binding, only: c_int, c_double
-    integer(c_int), value :: n
-    real(c_double), intent(out) :: result
-    real(c_double), allocatable :: work(:)
-    allocate(work(n))
-    work = 1.0_c_double
-    result = sum(work)
-    deallocate(work)
-end subroutine conftest_runtime
-EOF
 cat > "$configure_tmp/conftest_runtime.cpp" <<'EOF'
-extern "C" void conftest_runtime(int, double*);
+extern "C" void profcn_coefficients_cpp_interface(const double*, const int*,
+    const int*, const int*, const int*, double*, int*, int*);
 int main(int argc, char**) {
-    double result = 0;
-    conftest_runtime(argc, &result);
-    return result == argc ? 0 : 1;
+    const double c = static_cast<double>(argc);
+    const int order = 0, orders = 1, degrees = 1, capacity = 64;
+    double coefficients[capacity] = {};
+    int length = 0, status = -1;
+    profcn_coefficients_cpp_interface(&c, &order, &orders, &degrees, &capacity,
+        coefficients, &length, &status);
+    return status;
 }
 EOF
 
@@ -140,9 +134,19 @@ printf '%s' 'checking whether the C++ linker resolves the Fortran runtime... '
 if ! (
     cd "$configure_tmp" &&
     eval "$FC $PKG_FFLAGS $FCFLAGS $fc_diagnostic_flags $fc_heap_flags \
-        -c conftest_runtime.f90 -o conftest_runtime.o" >runtime.log 2>&1 &&
+        -cpp -c param.f90 -o param.o" >runtime.log 2>&1 &&
+    eval "$FC $PKG_FFLAGS $FCFLAGS $fc_diagnostic_flags $fc_heap_flags \
+        $fc_prolate_flags -cpp -c prolate_swf.f90 -o prolate_swf.o" >>runtime.log 2>&1
+); then
+    echo no
+    cat "$configure_tmp/runtime.log" >&2
+    echo 'configure: error: the double-precision Fortran solver cannot be compiled' >&2
+    exit 1
+fi
+if ! (
+    cd "$configure_tmp" &&
     eval "$CXX17 $CXX17STD $CXX17FLAGS $LDFLAGS \
-        conftest_runtime.cpp conftest_runtime.o $FLIBS \
+        conftest_runtime.cpp param.o prolate_swf.o $FLIBS \
         -o conftest_runtime" >>runtime.log 2>&1
 ); then
     fc_runtime_path=$(
@@ -160,7 +164,7 @@ if ! (
     if grep '_Fortran' "$configure_tmp/runtime.log" >/dev/null 2>&1 && (
         cd "$configure_tmp" &&
         eval "$CXX17 $CXX17STD $CXX17FLAGS $LDFLAGS \
-            conftest_runtime.cpp conftest_runtime.o $fc_runtime_candidate $FLIBS \
+            conftest_runtime.cpp param.o prolate_swf.o $fc_runtime_candidate $FLIBS \
             -o conftest_runtime" >>runtime.log 2>&1
     ); then
         fc_runtime_libs=$fc_runtime_candidate
