@@ -2,7 +2,8 @@ library(acousticTS)
 
 test_that("real order-one Bessel values preserve roots and large arguments", {
   # Evaluate reference values with 50 digits before conversion to double =======
-  x <- c(0, 3.8317059702075125, 7.015586669815619, 1e6)
+  # Pin binary64 root arguments independently of decimal parsing precision +++++
+  x <- c(0, 0x1.ea75575af6f09p+1, 0x1.c0ff5f3b4725p+2, 1e6)
   expected <- c(
     0, -6.14980735699491e-17, 2.82533940947893e-17,
     -0.000725968356813763
@@ -14,7 +15,7 @@ test_that("real order-one Bessel values preserve roots and large arguments", {
 
 test_that("spherical derivatives match elementary solutions", {
   # The first three orders have closed forms independent of the compiled =======
-  # recurrence. Symbolic derivatives also check complex arguments. =============
+  # recurrence. Symbolic derivatives also check complex arguments. +++++++++++++
   j <- list(
     quote(sin(z) / z),
     quote(sin(z) / z^2 - cos(z) / z),
