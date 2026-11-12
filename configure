@@ -19,12 +19,15 @@ PKG_FFLAGS=${PKG_FFLAGS:-}
 CXX17=${CXX17:-$("$r_command" CMD config CXX17)}
 CXX17STD=${CXX17STD:-$("$r_command" CMD config CXX17STD)}
 CXX17FLAGS=${CXX17FLAGS:-$("$r_command" CMD config CXX17FLAGS)}
+LDFLAGS=${LDFLAGS-$("$r_command" CMD config LDFLAGS)}
+FLIBS=${FLIBS-$("$r_command" CMD config FLIBS)}
 
 quad_objects=
 quad_cppflags=-DACOUSTICTS_HAVE_QUADMATH=0
 fc_heap_flags=
 fc_prolate_flags=
 fc_diagnostic_flags=
+fc_runtime_libs=
 
 makevars_template=${ACOUSTICTS_MAKEVARS_TEMPLATE:-Makevars.in}
 makevars_output=${ACOUSTICTS_MAKEVARS_OUTPUT:-Makevars}
@@ -108,6 +111,68 @@ case "$fc_version" in
         ;;
 esac
 
+# Flang 21 moved the Fortran runtime into libflang_rt.runtime. Some R builds
+# still omit that library from FLIBS. Check an allocating Fortran routine with
+# the C++ linker, adding the matching runtime only after the ordinary link fails.
+# https://releases.llvm.org/21.1.0/tools/flang/docs/FlangDriver.html#linker-driver
+cat > "$configure_tmp/conftest_runtime.f90" <<'EOF'
+subroutine conftest_runtime(n, result) bind(C)
+    use, intrinsic :: iso_c_binding, only: c_int, c_double
+    integer(c_int), value :: n
+    real(c_double), intent(out) :: result
+    real(c_double), allocatable :: work(:)
+    allocate(work(n))
+    work = 1.0_c_double
+    result = sum(work)
+    deallocate(work)
+end subroutine conftest_runtime
+EOF
+cat > "$configure_tmp/conftest_runtime.cpp" <<'EOF'
+extern "C" void conftest_runtime(int, double*);
+int main(int argc, char**) {
+    double result = 0;
+    conftest_runtime(argc, &result);
+    return result == argc ? 0 : 1;
+}
+EOF
+
+printf '%s' 'checking whether the C++ linker resolves the Fortran runtime... '
+if ! (
+    cd "$configure_tmp" &&
+    eval "$FC $PKG_FFLAGS $FCFLAGS $fc_diagnostic_flags $fc_heap_flags \
+        -c conftest_runtime.f90 -o conftest_runtime.o" >runtime.log 2>&1 &&
+    eval "$CXX17 $CXX17STD $CXX17FLAGS $LDFLAGS \
+        conftest_runtime.cpp conftest_runtime.o $FLIBS \
+        -o conftest_runtime" >>runtime.log 2>&1
+); then
+    fc_runtime_path=$(
+        eval "$FC -print-file-name=libflang_rt.runtime.a" 2>/dev/null || true
+    )
+    if ! test -f "$fc_runtime_path"; then
+        fc_runtime_path=$(
+            eval "$CXX17 $CXX17STD -print-file-name=libflang_rt.runtime.a" 2>/dev/null || true
+        )
+    fi
+    fc_runtime_candidate=-lflang_rt.runtime
+    if test -f "$fc_runtime_path"; then
+        fc_runtime_candidate="\"$fc_runtime_path\""
+    fi
+    if grep '_Fortran' "$configure_tmp/runtime.log" >/dev/null 2>&1 && (
+        cd "$configure_tmp" &&
+        eval "$CXX17 $CXX17STD $CXX17FLAGS $LDFLAGS \
+            conftest_runtime.cpp conftest_runtime.o $fc_runtime_candidate $FLIBS \
+            -o conftest_runtime" >>runtime.log 2>&1
+    ); then
+        fc_runtime_libs=$fc_runtime_candidate
+    else
+        echo no
+        cat "$configure_tmp/runtime.log" >&2
+        echo 'configure: error: the C++ linker cannot resolve the Fortran runtime' >&2
+        exit 1
+    fi
+fi
+echo "yes${fc_runtime_libs:+ ($fc_runtime_libs)}"
+
 cat > "$configure_tmp/conftest.cpp" <<'EOF'
 #include <quadmath.h>
 #include <complex>
@@ -134,11 +199,10 @@ if test "${ACOUSTICTS_DISABLE_QUAD:-0}" != 1 && (
         -cpp -DUSE_QUAD \
         -c prolate_swf.f90 -o prolate_swf_quad.o" >>fortran.log 2>&1 &&
     eval "$CXX17 $CXX17STD $CXX17FLAGS -c conftest.cpp -o conftest.o" >cxx.log 2>&1 &&
-    LDFLAGS=${LDFLAGS-$("$r_command" CMD config LDFLAGS)} &&
-    FLIBS=${FLIBS-$("$r_command" CMD config FLIBS)} &&
     # Link the actual quad objects with R's runtime libraries without running the probe.
     eval "$CXX17 $CXX17STD $CXX17FLAGS $LDFLAGS conftest.o \
-        param_quad.o prolate_swf_quad.o $FLIBS -o conftest" >>cxx.log 2>&1
+        param_quad.o prolate_swf_quad.o $fc_runtime_libs $FLIBS \
+        -o conftest" >>cxx.log 2>&1
 ); then
     quad_objects='param_quad.o prolate_swf_quad.o'
     quad_cppflags=-DACOUSTICTS_HAVE_QUADMATH=1
@@ -154,6 +218,7 @@ sed \
     -e "s|@FC_HEAP_FLAGS@|$fc_heap_flags|g" \
     -e "s|@FC_PROLATE_FLAGS@|$fc_prolate_flags|g" \
     -e "s|@FC_DIAGNOSTIC_FLAGS@|$fc_diagnostic_flags|g" \
+    -e "s|@FC_RUNTIME_LIBS@|$fc_runtime_libs|g" \
     "$srcdir/src/$makevars_template" > "$srcdir/src/$makevars_output"
 
 exit 0
