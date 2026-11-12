@@ -54,8 +54,9 @@ jobs:
           print(cov)
           covr::to_cobertura(cov)
           saveRDS(cov, file.path(Sys.getenv("RUNNER_TEMP"), "coverage.rds"))
+          coverage_data <- as.data.frame(cov)
           write.csv(
-            covr::zero_coverage(cov),
+            coverage_data[coverage_data$value == 0, , drop = FALSE],
             file.path(Sys.getenv("RUNNER_TEMP"), "coverage-uncovered.csv"),
             row.names = FALSE
           )
